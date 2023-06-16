@@ -17,21 +17,31 @@ const GET_TEST_RUNS_FOR_WORKSPACE = gql`
       ... on Workspace {
         id
         testRuns {
-          id
-          title
-          branch
-          commitId
-          commitTitle
-          mergeId
-          mergeTitle
-          mode
-          repository
-          user
-          date
-          stats {
-            failed
-            flaky
-            passed
+          edges {
+            node {
+              id
+              date
+              mode
+              results {
+                counts {
+                  failed
+                  flaky
+                  passed
+                }
+              }
+              source {
+                commitId
+                commitTitle
+                groupLabel
+                isPrimaryBranch
+                branchName
+                prNumber
+                prTitle
+                repository
+                triggerUrl
+                user
+              }
+            }
           }
         }
       }
@@ -45,34 +55,40 @@ export const GET_TEST_RUN = gql`
       ... on Workspace {
         id
         testRuns(id: $id) {
-          id
-          title
-          branch
-          commitId
-          commitTitle
-          mergeId
-          mergeTitle
-          mode
-          repository
-          user
-          date
-          stats {
-            failed
-            flaky
-            passed
-          }
-          recordings {
-            edges {
-              node {
-                uuid
-                duration
-                createdAt
-                metadata
-                comments {
-                  user {
-                    id
+          edges {
+            node {
+              id
+              date
+              mode
+              results {
+                counts {
+                  failed
+                  flaky
+                  passed
+                }
+                recordings {
+                  uuid
+                  duration
+                  createdAt
+                  metadata
+                  comments {
+                    user {
+                      id
+                    }
                   }
                 }
+              }
+              source {
+                commitId
+                commitTitle
+                groupLabel
+                isPrimaryBranch
+                branchName
+                prNumber
+                prTitle
+                repository
+                triggerUrl
+                user
               }
             }
           }
@@ -98,7 +114,7 @@ export function useGetTestRunForWorkspace(
   }
   assert("testRuns" in data.node, "No results in GetTestsRun response");
 
-  const summary = data.node.testRuns?.[0];
+  const summary = (data as any).node.testRuns?.edges[0]?.node;
 
   return {
     summary: summary ? convertSummary(summary) : null,
@@ -127,9 +143,9 @@ export function useGetTestRunsForWorkspace(workspaceId: WorkspaceId): {
     const summaries: Summary[] = [];
 
     // Convert legacy test runs; filter out ones with invalid data
-    data.node.testRuns?.forEach(legacySummary => {
+    (data as any).node.testRuns?.edges.forEach(({ node: summary }: any) => {
       try {
-        summaries.push(convertSummary(legacySummary));
+        summaries.push(convertSummary(summary));
       } catch (error) {
         // Filter out and ignore data that's too old or corrupt to defined the required fields
       }
