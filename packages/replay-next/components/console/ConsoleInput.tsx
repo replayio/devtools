@@ -16,10 +16,11 @@ import { SelectedFrameContext } from "replay-next/src/contexts/SelectedFrameCont
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { NewTerminalExpression, TerminalContext } from "replay-next/src/contexts/TerminalContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
+import { useCurrentFocusWindow } from "replay-next/src/hooks/useCurrentFocusWindow";
 import useLoadedRegions from "replay-next/src/hooks/useRegions";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
-import { isPointInRegions } from "shared/utils/time";
+import { isPointInRegion } from "shared/utils/time";
 
 import { ConsoleSearchContext } from "./ConsoleSearchContext";
 import EagerEvaluationResult from "./EagerEvaluationResult";
@@ -27,14 +28,14 @@ import useTerminalHistory from "./hooks/useTerminalHistory";
 import styles from "./ConsoleInput.module.css";
 
 export default function ConsoleInput({ inputRef }: { inputRef?: RefObject<ImperativeHandle> }) {
-  const replayClient = useContext(ReplayClientContext);
-  const loadedRegions = useLoadedRegions(replayClient);
+  const focusWindow = useCurrentFocusWindow();
+
   const { executionPoint } = useContext(TimelineContext);
   const { enterFocusMode } = useContext(FocusContext);
 
   let disabledMessage = null;
   let disabledReason = undefined;
-  if (!isPointInRegions(executionPoint, loadedRegions?.loading ?? [])) {
+  if (!focusWindow || !isPointInRegion(executionPoint, focusWindow)) {
     disabledReason = "not-focused";
     disabledMessage = (
       <>
@@ -44,9 +45,6 @@ export default function ConsoleInput({ inputRef }: { inputRef?: RefObject<Impera
         </span>
       </>
     );
-  } else if (!isPointInRegions(executionPoint, loadedRegions?.loaded ?? [])) {
-    disabledReason = "loading";
-    disabledMessage = <>Disabled while loading</>;
   }
 
   if (disabledMessage) {

@@ -1,6 +1,15 @@
-import { ForwardedRef, MutableRefObject, ReactNode, forwardRef, useContext, useMemo } from "react";
+import {
+  ForwardedRef,
+  MutableRefObject,
+  ReactNode,
+  Suspense,
+  forwardRef,
+  useContext,
+  useMemo,
+} from "react";
 
 import Icon from "replay-next/components/Icon";
+import Loader from "replay-next/components/Loader";
 import { ConsoleFiltersContext } from "replay-next/src/contexts/ConsoleFiltersContext";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
@@ -45,7 +54,7 @@ const ErrorBoundary = ({ children }: { children: ReactNode }) => (
 // The primary purpose of this component is to showcase:
 // 1. Using React Suspense (and Suspense caches) for just-in-time loading of Protocol data
 // 2. Using an injected ReplayClientInterface to enable easy testing/mocking
-function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement> }) {
+function MessagesListSuspends({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement> }) {
   const {
     filterByText,
     showErrors,
@@ -219,7 +228,17 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
 }
 
 function MessagesListRefForwarder(_: Object, ref: ForwardedRef<HTMLElement>) {
-  return <MessagesList forwardedRef={ref} />;
+  return (
+    <Suspense
+      fallback={
+        <div className={styles.Container}>
+          <Loader />
+        </div>
+      }
+    >
+      <MessagesListSuspends forwardedRef={ref} />
+    </Suspense>
+  );
 }
 
 export default forwardRef(MessagesListRefForwarder);
