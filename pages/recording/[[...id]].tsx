@@ -163,19 +163,19 @@ function RecordingPage({
       const isTestReplay = rec.metadata?.test && rec.metadata?.source;
       const isTestWorkspace = rec.workspace?.isTest;
 
-      if (rec.private) {
-        if (isTestReplay && !isTestWorkspace) {
-          setExpectedError({
-            content: "This recording is not available.",
-            message: "The recording must belong to a test suite",
-          });
-        } else if (!isTestReplay && isTestWorkspace) {
-          setExpectedError({
-            content: "This recording is not available.",
-            message: "The recording cannot be in a test suite",
-          });
-        }
-      }
+      // if (rec.private) {
+      //   if (isTestReplay && !isTestWorkspace) {
+      //     setExpectedError({
+      //       content: "This recording is not available.",
+      //       message: "The recording must belong to a test suite",
+      //     });
+      //   } else if (!isTestReplay && isTestWorkspace) {
+      //     setExpectedError({
+      //       content: "This recording is not available.",
+      //       message: "The recording cannot be in a test suite",
+      //     });
+      //   }
+      // }
 
       if (rec.metadata?.test) {
         trackEvent("session_start.test");
