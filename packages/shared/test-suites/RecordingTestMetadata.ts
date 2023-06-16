@@ -566,8 +566,8 @@ export async function processGroupedTestCases(
 
         // Annotations for the entire recording (which may include more than one test)
         // we need to splice only the appropriate subset for each test.
-        const annotationsByTest: Annotation[][] = annotations.reduce(
-          (accumulated: Annotation[][], annotation: Annotation) => {
+        const annotationsByTest: Annotation[][] = annotations
+          .reduce((accumulated: Annotation[][], annotation: Annotation) => {
             if (annotation.message.event === "test:start") {
               // Start a new annotations array for each test
               accumulated.push([annotation]);
@@ -578,9 +578,10 @@ export async function processGroupedTestCases(
             }
 
             return accumulated;
-          },
-          []
-        );
+          }, [])
+          .filter(annotations =>
+            annotations.find(annotation => annotation.message.event === "test:end")
+          );
 
         // GroupedTestCasesV2 and GroupedTestCases types are the same,
         // except for annotation data inside of their recorded tests
