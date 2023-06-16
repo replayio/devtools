@@ -11,33 +11,55 @@ export interface GetTestsRunsForWorkspace_node_Recording {
   __typename: "Recording";
 }
 
-export interface GetTestsRunsForWorkspace_node_Workspace_testRuns_stats {
+export interface GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node_results_counts {
   __typename: "TestRunStats";
-  failed: number | null;
-  flaky: number | null;
-  passed: number | null;
+  failed: number;
+  flaky: number;
+  passed: number;
+}
+
+export interface GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node_results {
+  __typename: "TestRunResults";
+  counts: GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node_results_counts;
+}
+
+export interface GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node_source {
+  __typename: "TestRunSource";
+  commitId: string;
+  commitTitle: string | null;
+  groupLabel: string | null;
+  isPrimaryBranch: boolean;
+  branchName: string | null;
+  prNumber: number | null;
+  prTitle: string | null;
+  repository: string | null;
+  triggerUrl: string | null;
+  user: string | null;
+}
+
+export interface GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node {
+  __typename: "TestRun";
+  id: string;
+  date: any;
+  mode: string | null;
+  results: GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node_results;
+  source: GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node_source | null;
+}
+
+export interface GetTestsRunsForWorkspace_node_Workspace_testRuns_edges {
+  __typename: "TestRunEdge";
+  node: GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node;
 }
 
 export interface GetTestsRunsForWorkspace_node_Workspace_testRuns {
-  __typename: "TestRun";
-  id: string | null;
-  title: string | null;
-  branch: string | null;
-  commitId: string | null;
-  commitTitle: string | null;
-  mergeId: string | null;
-  mergeTitle: string | null;
-  mode: string | null;
-  repository: string | null;
-  user: string | null;
-  date: any | null;
-  stats: GetTestsRunsForWorkspace_node_Workspace_testRuns_stats | null;
+  __typename: "TestRunConnection";
+  edges: GetTestsRunsForWorkspace_node_Workspace_testRuns_edges[];
 }
 
 export interface GetTestsRunsForWorkspace_node_Workspace {
   __typename: "Workspace";
   id: string;
-  testRuns: GetTestsRunsForWorkspace_node_Workspace_testRuns[] | null;
+  testRuns: GetTestsRunsForWorkspace_node_Workspace_testRuns | null;
 }
 
 export type GetTestsRunsForWorkspace_node = GetTestsRunsForWorkspace_node_Recording | GetTestsRunsForWorkspace_node_Workspace;
