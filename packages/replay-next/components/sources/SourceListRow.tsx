@@ -31,8 +31,8 @@ import {
   POINT_BEHAVIOR_DISABLED,
   POINT_BEHAVIOR_DISABLED_TEMPORARILY,
   POINT_BEHAVIOR_ENABLED,
+  Point,
 } from "shared/client/types";
-import { Point } from "shared/client/types";
 
 import ColumnBreakpointMarker from "./ColumnBreakpointMarker";
 import CurrentLineHighlight from "./CurrentLineHighlight";

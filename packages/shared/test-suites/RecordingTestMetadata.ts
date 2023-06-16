@@ -412,7 +412,7 @@ export async function processCypressTestRecording(
 
         const annotations = userActionEventIdToAnnotations[id];
 
-        assert(annotations != null, `Missing annotations for test event ${id}`);
+        assert(annotations != null, `Missing annotations for test event (${command.name})`);
 
         let beginPoint: TimeStampedPoint | null = null;
         let endPoint: TimeStampedPoint | null = null;
