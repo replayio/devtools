@@ -32,7 +32,7 @@ import {
   requestSent,
   responseReceived,
 } from "ui/reducers/protocolMessages";
-import { setFocusRegion } from "ui/reducers/timeline";
+import { setFocusWindow } from "ui/reducers/timeline";
 import type { ExpectedError, UnexpectedError } from "ui/state/app";
 import { extractGraphQLError } from "ui/utils/apolloClient";
 import { getPausePointParams, isMock, isTest } from "ui/utils/environment";
@@ -236,19 +236,18 @@ export function createSocket(
         }
       }
 
-      const focusRegion = getPausePointParams().focusRegion;
-      const focusRange = focusRegion
-        ? {
-            begin: focusRegion.begin.time,
-            end: focusRegion.end.time,
-          }
-        : undefined;
+      const focusWindowFromParams = getPausePointParams().focusWindow;
 
       const sessionId = await createSession(
         recordingId,
         loadPoint,
         experimentalSettings,
-        focusRange,
+        focusWindowFromParams
+          ? {
+              begin: focusWindowFromParams.begin.time,
+              end: focusWindowFromParams.end.time,
+            }
+          : undefined,
         {
           onEvent: (event: ProtocolEvent) => {
             if (getFeature("logProtocolEvents")) {
@@ -317,7 +316,7 @@ export function createSocket(
       });
 
       window.sessionId = sessionId;
-      replayClient.configure(sessionId);
+      await replayClient.configure(sessionId);
       ThreadFront.setSessionId(sessionId);
       const recordingTarget = await recordingTargetCache.readAsync(replayClient);
       dispatch(actions.setRecordingTarget(recordingTarget));
@@ -337,13 +336,14 @@ export function createSocket(
 
       dispatch(actions.setLoadingFinished(true));
 
-      const focusWindow = await replayClient.getFocusWindow();
+      const focusWindow = replayClient.getCurrentFocusWindow();
+      assert(focusWindow !== null); // replayClient.configure() sets this value
       if (
-        !focusRegion ||
-        focusRegion.begin.point !== focusWindow.begin.point ||
-        focusRegion.end.point !== focusWindow.end.point
+        !focusWindowFromParams ||
+        focusWindowFromParams.begin.point !== focusWindow.begin.point ||
+        focusWindowFromParams.end.point !== focusWindow.end.point
       ) {
-        dispatch(setFocusRegion(focusWindow));
+        dispatch(setFocusWindow(focusWindow));
       }
     } catch (e: any) {
       const currentError = getUnexpectedError(getState());

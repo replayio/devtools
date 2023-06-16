@@ -11,7 +11,7 @@ export interface ZoomRegion {
   scale: number;
 }
 
-export interface FocusRegion {
+export interface FocusWindow {
   end: TimeStampedPoint;
   begin: TimeStampedPoint;
 }
@@ -20,8 +20,8 @@ export interface TimelineState {
   allPaintsReceived: boolean;
   currentTime: number;
   dragging: boolean;
-  focusRegion: FocusRegion | null;
-  focusRegionBackup: FocusRegion | null;
+  focusWindow: FocusWindow | null;
+  focusWindowBackup: FocusWindow | null;
   hoveredItem: HoveredItem | null;
   hoverTime: number | null;
   markTimeStampedPoint: TimeStampedPoint | null;
@@ -31,7 +31,7 @@ export interface TimelineState {
     beginDate: number;
     time: number;
   } | null;
-  playbackFocusRegion: boolean;
+  playbackFocusWindow: boolean;
   playbackPrecachedTime: number;
   points: TimeStampedPoint[];
   recordingDuration: number | null;

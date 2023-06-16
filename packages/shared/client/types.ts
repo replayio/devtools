@@ -133,7 +133,7 @@ export type PointBehavior = {
   shouldLog: POINT_BEHAVIOR;
 };
 
-export type ReplayClientEvents = "focusRangeChange" | "loadedRegionsChange";
+export type ReplayClientEvents = "focusWindowChange" | "loadedRegionsChange";
 
 export type HitPointStatus =
   | "complete"
@@ -199,7 +199,6 @@ export interface ReplayClientInterface {
     focusRange: PointRange | null
   ): Promise<Record<string, number>>;
   getExceptionValue(pauseId: PauseId): Promise<getExceptionValueResult>;
-  getFocusWindow(): Promise<TimeStampedPointRange>;
   getFrameSteps(pauseId: PauseId, frameId: FrameId): Promise<PointDescription[]>;
   getMappedLocation(location: Location): Promise<MappedLocation>;
   getObjectWithPreview(
@@ -234,7 +233,8 @@ export interface ReplayClientInterface {
   hasAnnotationKind(kind: string): Promise<boolean>;
   initialize(recordingId: string, accessToken: string | null): Promise<SessionId>;
   mapExpressionToGeneratedScope(expression: string, location: Location): Promise<string>;
-  requestFocusRange(range: FocusWindowRequest): Promise<TimeStampedPointRange>;
+  requestFocusWindow(range: FocusWindowRequest): Promise<TimeStampedPointRange>;
+  getCurrentFocusWindow(): TimeStampedPointRange | null;
   removeEventListener(type: ReplayClientEvents, handler: Function): void;
   repaintGraphics(pauseId: PauseId): Promise<repaintGraphicsResult>;
   runEvaluation(

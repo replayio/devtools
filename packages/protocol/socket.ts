@@ -6,7 +6,6 @@ import {
   EventParams,
   FocusWindowRequest as FocusWindow,
   PauseId,
-  PointDescription,
   ProtocolClient,
   SessionId,
 } from "@replayio/protocol";

@@ -138,7 +138,6 @@ function _DevTools({
   apiKey,
   clearTrialExpired,
   createSocket,
-  loadedRegions,
   loadingFinished,
   sessionId,
   showCommandPalette,
@@ -263,7 +262,6 @@ function _DevTools({
 const connector = connect(
   (state: UIState) => ({
     loadingFinished: selectors.getLoadingFinished(state),
-    loadedRegions: selectors.getLoadedRegions(state),
     sessionId: selectors.getSessionId(state),
     showCommandPalette: selectors.getShowCommandPalette(state),
   }),

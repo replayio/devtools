@@ -29,20 +29,20 @@ import { ReplayClientInterface } from "shared/client/types";
 import { getFirstComment } from "ui/hooks/comments/comments";
 import {
   getCurrentTime,
-  getFocusRegion,
+  getFocusWindow,
   getHoverTime,
   getHoveredItem,
   getPlayback,
-  getPlaybackFocusRegion,
+  getPlaybackFocusWindow,
   getPlaybackPrecachedTime,
   getRecordingDuration,
   getShowFocusModeControls,
   getZoomRegion,
   pointsReceived,
-  setFocusRegion,
+  setFocusWindow,
   setPlaybackPrecachedTime,
 } from "ui/reducers/timeline";
-import { FocusRegion, HoveredItem, PlaybackOptions, TimeRange } from "ui/state/timeline";
+import { FocusWindow, HoveredItem, PlaybackOptions, TimeRange } from "ui/state/timeline";
 import {
   encodeObjectToURL,
   getPausePointParams,
@@ -52,10 +52,10 @@ import {
 import KeyShortcuts, { isEditableElement } from "ui/utils/key-shortcuts";
 import { features } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
-import { rangeForFocusRegion } from "ui/utils/timeline";
+import { rangeForFocusWindow } from "ui/utils/timeline";
 
 import {
-  setFocusRegion as newFocusRegion,
+  setFocusWindow as newFocusWindow,
   setHoveredItem as setHoveredItemAction,
   setPlaybackStalled,
   setTimelineState,
@@ -140,9 +140,9 @@ export async function getInitialPausePoint(recordingId: string) {
 
 function onPaused({ point, time }: PauseEventArgs): UIThunkAction {
   return async (dispatch, getState) => {
-    const focusRegion = getFocusRegion(getState());
-    const params: Omit<PauseEventArgs, "openSource"> & { focusRegion: FocusRegion | null } = {
-      focusRegion,
+    const focusWindow = getFocusWindow(getState());
+    const params: Omit<PauseEventArgs, "openSource"> & { focusWindow: FocusWindow | null } = {
+      focusWindow,
       point,
       time,
     };
@@ -203,43 +203,43 @@ export function setTimelineToPauseTime(
 }
 
 export function getUrlParams({
-  focusRegion,
+  focusWindow,
   point,
   time,
 }: {
-  focusRegion: FocusRegion | null;
+  focusWindow: FocusWindow | null;
   point: ExecutionPoint;
   time: number;
 }) {
   return {
     point,
     time: `${time}`,
-    focusRegion: encodeFocusRegion(focusRegion),
+    focusWindow: encodeFocusWindow(focusWindow),
   };
 }
 
 export function updatePausePointParams({
   point,
   time,
-  focusRegion,
+  focusWindow,
 }: {
   point: ExecutionPoint;
   time: number;
-  focusRegion: FocusRegion | null;
+  focusWindow: FocusWindow | null;
 }) {
-  const params = getUrlParams({ focusRegion, point, time });
+  const params = getUrlParams({ focusWindow, point, time });
   updateUrlWithParams(params);
 }
 
-export function updateFocusRegionParam(): UIThunkAction<void> {
+export function updateFocusWindowParam(): UIThunkAction<void> {
   return (dispatch, getState) => {
-    const focusRegion = getFocusRegion(getState());
-    updateUrlWithParams({ focusRegion: encodeFocusRegion(focusRegion) });
+    const focusWindow = getFocusWindow(getState());
+    updateUrlWithParams({ focusWindow: encodeFocusWindow(focusWindow) });
   };
 }
 
-function encodeFocusRegion(focusRegion: FocusRegion | null) {
-  return focusRegion ? encodeObjectToURL(rangeForFocusRegion(focusRegion)) : undefined;
+function encodeFocusWindow(focusWindow: FocusWindow | null) {
+  return focusWindow ? encodeObjectToURL(rangeForFocusWindow(focusWindow)) : undefined;
 }
 
 export function seek(
@@ -321,14 +321,14 @@ export function startPlayback(
 
     const endTime =
       optEndTime ||
-      (getPlaybackFocusRegion(state) && getFocusRegion(state)?.end.time) ||
+      (getPlaybackFocusWindow(state) && getFocusWindow(state)?.end.time) ||
       getZoomRegion(state).endTime;
 
     const beginDate = Date.now();
     const beginTime =
       optBeginTime ||
       (currentTime >= endTime
-        ? (getPlaybackFocusRegion(state) && getFocusRegion(state)?.begin.time) || 0
+        ? (getPlaybackFocusWindow(state) && getFocusWindow(state)?.begin.time) || 0
         : currentTime);
 
     dispatch(
@@ -529,12 +529,12 @@ export function clearHoveredItem(): UIThunkAction {
   };
 }
 
-export function setFocusRegionFromTimeRange(
+export function setFocusWindowFromTimeRange(
   timeRange: TimeRange | null
 ): UIThunkAction<Promise<void>> {
   return async (dispatch, getState, { replayClient }) => {
     if (timeRange === null) {
-      dispatch(newFocusRegion(null));
+      dispatch(newFocusWindow(null));
       return;
     }
 
@@ -545,12 +545,12 @@ export function setFocusRegionFromTimeRange(
     const begin = pointsBoundingBegin.before;
     const end = pointsBoundingEnd.after;
 
-    dispatch(newFocusRegion({ begin, end }));
+    dispatch(newFocusWindow({ begin, end }));
   };
 }
 
-export function updateFocusRegion(
-  focusRegion: { begin: number; end: number } | null
+export function updateFocusWindow(
+  focusWindow: { begin: number; end: number } | null
 ): UIThunkAction<Promise<void>> {
   return async (dispatch, getState) => {
     const state = getState();
@@ -562,17 +562,17 @@ export function updateFocusRegion(
       dispatch(stopPlayback());
     }
 
-    if (focusRegion === null) {
-      dispatch(setTimelineState({ focusRegion: null }));
+    if (focusWindow === null) {
+      dispatch(setTimelineState({ focusWindow: null }));
       return;
     }
 
-    let { begin: beginTime, end: endTime } = focusRegion;
+    let { begin: beginTime, end: endTime } = focusWindow;
 
     const zoomRegion = getZoomRegion(state);
-    const prevFocusRegion = getFocusRegion(state);
-    const prevBeginTime = prevFocusRegion?.begin.time;
-    const prevEndTime = prevFocusRegion?.end.time;
+    const prevFocusWindow = getFocusWindow(state);
+    const prevBeginTime = prevFocusWindow?.begin.time;
+    const prevEndTime = prevFocusWindow?.end.time;
 
     // Basic bounds check.
     if (beginTime < zoomRegion.beginTime) {
@@ -624,45 +624,45 @@ export function updateFocusRegion(
       }
     }
 
-    await dispatch(setFocusRegionFromTimeRange({ begin: beginTime, end: endTime }));
+    await dispatch(setFocusWindowFromTimeRange({ begin: beginTime, end: endTime }));
   };
 }
 
-export function setFocusRegionEndTime(end: number, sync: boolean): UIThunkAction<Promise<void>> {
+export function setFocusWindowEndTime(end: number, sync: boolean): UIThunkAction<Promise<void>> {
   return async (dispatch, getState) => {
     const state = getState();
-    const focusRegion = getFocusRegion(state);
+    const focusWindow = getFocusWindow(state);
 
     // If this is the first time the user is focusing, begin at the beginning of the recording (or zoom region).
     // Let the focus action/reducer will handle cropping for us.
-    const begin = focusRegion?.begin.time ?? 0;
+    const begin = focusWindow?.begin.time ?? 0;
 
-    await dispatch(updateFocusRegion({ begin, end }));
+    await dispatch(updateFocusWindow({ begin, end }));
 
     if (sync) {
       await dispatch(syncFocusedRegion());
-      dispatch(updateFocusRegionParam());
+      dispatch(updateFocusWindowParam());
     }
   };
 }
 
-export function setFocusRegionBeginTime(
+export function setFocusWindowBeginTime(
   begin: number,
   sync: boolean
 ): UIThunkAction<Promise<void>> {
   return async (dispatch, getState) => {
     const state = getState();
-    const focusRegion = getFocusRegion(state);
+    const focusWindow = getFocusWindow(state);
 
     // If this is the first time the user is focusing, extend to the end of the recording (or zoom region).
     // Let the focus action/reducer will handle cropping for us.
-    const end = focusRegion?.end.time ?? Number.POSITIVE_INFINITY;
+    const end = focusWindow?.end.time ?? Number.POSITIVE_INFINITY;
 
-    await dispatch(updateFocusRegion({ begin, end }));
+    await dispatch(updateFocusWindow({ begin, end }));
 
     if (sync) {
       await dispatch(syncFocusedRegion());
-      dispatch(updateFocusRegionParam());
+      dispatch(updateFocusWindowParam());
     }
   };
 }
@@ -672,23 +672,23 @@ export function syncFocusedRegion(): UIThunkAction {
     const state = getState();
 
     // Note that we should use the displayed focus window here because the deferred one may still have a pending update.
-    const focusRegion = getFocusRegion(state);
-    if (focusRegion === null) {
+    const focusWindow = getFocusWindow(state);
+    if (focusWindow === null) {
       return;
     }
 
     const currentTime = getCurrentTime(state);
     const zoomTime = getZoomRegion(state);
 
-    const begin = focusRegion ? focusRegion.begin.time : zoomTime.beginTime;
-    const end = focusRegion ? focusRegion.end.time : zoomTime.endTime;
+    const begin = focusWindow ? focusWindow.begin.time : zoomTime.beginTime;
+    const end = focusWindow ? focusWindow.end.time : zoomTime.endTime;
 
     let bias: FocusWindowRequestBias | undefined;
     if (currentTime >= begin && currentTime <= end) {
       bias = currentTime - begin < end - currentTime ? "begin" : "end";
     }
 
-    const window = await replayClient.requestFocusRange({
+    const window = await replayClient.requestFocusWindow({
       begin,
       bias,
       end,
@@ -697,25 +697,25 @@ export function syncFocusedRegion(): UIThunkAction {
     // If the actual region that's focused is smaller than the requested region,
     // refine the local focus region to stay in sync.
     // Note this may result in the current time/point being outside of the focus region.
-    if (focusRegion) {
-      if (window.begin.time > focusRegion.begin.time || window.end.time < focusRegion.end.time) {
+    if (focusWindow) {
+      if (window.begin.time > focusWindow.begin.time || window.end.time < focusWindow.end.time) {
         dispatch(
-          setFocusRegion({
+          setFocusWindow({
             begin: window.begin,
             end: window.end,
           })
         );
-        dispatch(setFocusRegion(window));
+        dispatch(setFocusWindow(window));
       }
     } else {
       if (window.begin.time > zoomTime.beginTime || window.end.time < zoomTime.endTime) {
         dispatch(
-          setFocusRegion({
+          setFocusWindow({
             begin: window.begin,
             end: window.end,
           })
         );
-        dispatch(setFocusRegion(window));
+        dispatch(setFocusWindow(window));
       }
     }
   };
@@ -727,33 +727,33 @@ export function enterFocusMode(): UIThunkAction {
 
     const state = getState();
     const currentTime = getCurrentTime(state);
-    const prevFocusRegion = getFocusRegion(state);
+    const prevFocusWindow = getFocusWindow(state);
     const zoomRegion = getZoomRegion(state);
 
     // If there's no focus range, or it's the full recording,
     // shrink it to ~30% of the overall recording and center it around the current time.
-    let initialFocusRegion: TimeRange;
+    let initialFocusWindow: TimeRange;
     if (
-      prevFocusRegion == null ||
-      (prevFocusRegion.begin.time === zoomRegion.beginTime &&
-        prevFocusRegion.end.time === zoomRegion.endTime)
+      prevFocusWindow == null ||
+      (prevFocusWindow.begin.time === zoomRegion.beginTime &&
+        prevFocusWindow.end.time === zoomRegion.endTime)
     ) {
       const focusWindowSize =
         (zoomRegion.endTime - zoomRegion.beginTime) * DEFAULT_FOCUS_WINDOW_PERCENTAGE;
 
-      initialFocusRegion = {
+      initialFocusWindow = {
         begin: Math.max(zoomRegion.beginTime, currentTime - focusWindowSize / 2),
         end: Math.min(zoomRegion.endTime, currentTime + focusWindowSize / 2),
       };
     } else {
-      initialFocusRegion = { begin: prevFocusRegion.begin.time, end: prevFocusRegion.end.time };
+      initialFocusWindow = { begin: prevFocusWindow.begin.time, end: prevFocusWindow.end.time };
     }
 
-    await dispatch(updateFocusRegion(initialFocusRegion));
+    await dispatch(updateFocusWindow(initialFocusWindow));
 
     await dispatch(
       setTimelineState({
-        focusRegionBackup: prevFocusRegion,
+        focusWindowBackup: prevFocusWindow,
         showFocusModeControls: true,
       })
     );
@@ -765,7 +765,7 @@ export function exitFocusMode(): UIThunkAction {
     trackEvent("timeline.exit_focus_edit");
     dispatch(
       setTimelineState({
-        focusRegionBackup: null,
+        focusWindowBackup: null,
         showFocusModeControls: false,
       })
     );

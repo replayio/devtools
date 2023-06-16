@@ -102,14 +102,14 @@ export function hasLoadingParam() {
   return getURL().searchParams.get("loading") != null;
 }
 
-export function getFocusRegion() {
+export function getFocusWindow() {
   const url = getURL();
-  const focusRegionParam = url.searchParams.get("focusRegion");
-  return focusRegionParam ? (decodeBase64FromURL(focusRegionParam) as TimeStampedPointRange) : null;
+  const focusWindowParam = url.searchParams.get("focusWindow");
+  return focusWindowParam ? (decodeBase64FromURL(focusWindowParam) as TimeStampedPointRange) : null;
 }
 
 export function getPausePointParams(): {
-  focusRegion: TimeStampedPointRange | null;
+  focusWindow: TimeStampedPointRange | null;
   point: ExecutionPoint | null;
   time: number | null;
 } {
@@ -127,12 +127,12 @@ export function getPausePointParams(): {
     }
   }
 
-  const focusRegion = getFocusRegion();
+  const focusWindow = getFocusWindow();
 
   if (time != null && point != null) {
-    return { focusRegion, point, time };
+    return { focusWindow, point, time };
   } else {
-    return { focusRegion, point: null, time: null };
+    return { focusWindow, point: null, time: null };
   }
 }
 

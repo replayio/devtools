@@ -89,7 +89,7 @@ export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
     }
 
     const timeoutId = setTimeout(() => {
-      client.requestFocusRange({ begin: range.begin.time, end: range.end.time });
+      client.requestFocusWindow({ begin: range.begin.time, end: range.end.time });
     }, FOCUS_DEBOUNCE_DURATION);
 
     return () => {

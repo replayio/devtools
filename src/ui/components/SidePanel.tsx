@@ -13,7 +13,7 @@ import { isTestSuiteReplay } from "ui/components/TestSuite/utils/isTestSuiteRepl
 import hooks from "ui/hooks";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { useFeature } from "ui/hooks/settings";
-import { getFilteredEventsForFocusRegion } from "ui/reducers/app";
+import { getFilteredEventsForFocusWindow } from "ui/reducers/app";
 import { getSelectedPrimaryPanel } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { PrimaryPanelName } from "ui/state/layout";
@@ -67,7 +67,7 @@ export default function SidePanel() {
   const selectedPrimaryPanel = useInitialPrimaryPanel();
   const [replayInfoCollapsed, setReplayInfoCollapsed] = useState(false);
   const [eventsCollapsed, setEventsCollapsed] = useState(false);
-  const events = useAppSelector(getFilteredEventsForFocusRegion);
+  const events = useAppSelector(getFilteredEventsForFocusWindow);
   const { isAuthenticated } = useAuth0();
 
   const launchQuickstart = (url: string) => {

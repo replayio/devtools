@@ -29,7 +29,7 @@ export default function Focuser() {
   };
 
   return (
-    <div className={rangeForDisplay === null ? styles.FocusRegionRowOff : styles.FocusRegionRowOn}>
+    <div className={rangeForDisplay === null ? styles.FocusWindowRowOff : styles.FocusWindowRowOn}>
       <button className={styles.FocusToggleButton} onClick={toggleFocus}>
         Focus {rangeForDisplay === null ? "off" : "on"}
       </button>

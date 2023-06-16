@@ -1,17 +1,17 @@
-import { FocusRegion, ZoomRegion } from "ui/state/timeline";
+import { FocusWindow, ZoomRegion } from "ui/state/timeline";
 
 import {
-  filterToFocusRegion,
+  filterToFocusWindow,
   getSecondsFromFormattedTime,
   getTimeFromPosition,
-  isFocusRegionSubset,
+  isFocusWindowSubset,
   isValidTimeString,
   mergeSortedPointLists,
   overlap,
 } from "./timeline";
 
 const point = (time: number) => ({ time, point: `${time}` });
-const focusRegion = (from: number, to: number): FocusRegion => ({
+const focusWindow = (from: number, to: number): FocusWindow => ({
   begin: point(from),
   end: point(to),
 });
@@ -100,28 +100,28 @@ describe("getTimeFromPosition", () => {
   });
 });
 
-describe("isFocusRegionSubset", () => {
+describe("isFocusWindowSubset", () => {
   it("should always be true when previous focus region was null", () => {
-    expect(isFocusRegionSubset(null, null)).toBe(true);
-    expect(isFocusRegionSubset(null, focusRegion(0, 0))).toBe(true);
-    expect(isFocusRegionSubset(null, focusRegion(0, 1000))).toBe(true);
-    expect(isFocusRegionSubset(null, focusRegion(1000, 1000))).toBe(true);
+    expect(isFocusWindowSubset(null, null)).toBe(true);
+    expect(isFocusWindowSubset(null, focusWindow(0, 0))).toBe(true);
+    expect(isFocusWindowSubset(null, focusWindow(0, 1000))).toBe(true);
+    expect(isFocusWindowSubset(null, focusWindow(1000, 1000))).toBe(true);
   });
 
   it("should never be true when new focus region was null (unless previous one was also)", () => {
-    expect(isFocusRegionSubset(focusRegion(0, 0), null)).toBe(false);
-    expect(isFocusRegionSubset(focusRegion(0, 1000), null)).toBe(false);
-    expect(isFocusRegionSubset(focusRegion(1000, 1000), null)).toBe(false);
+    expect(isFocusWindowSubset(focusWindow(0, 0), null)).toBe(false);
+    expect(isFocusWindowSubset(focusWindow(0, 1000), null)).toBe(false);
+    expect(isFocusWindowSubset(focusWindow(1000, 1000), null)).toBe(false);
   });
 
   it("should correctly differentiate between overlapping and non-overlapping focus regions", () => {
-    expect(isFocusRegionSubset(focusRegion(0, 0), focusRegion(0, 0))).toBe(true);
-    expect(isFocusRegionSubset(focusRegion(100, 200), focusRegion(0, 50))).toBe(false);
-    expect(isFocusRegionSubset(focusRegion(100, 200), focusRegion(50, 150))).toBe(false);
-    expect(isFocusRegionSubset(focusRegion(100, 200), focusRegion(100, 200))).toBe(true);
-    expect(isFocusRegionSubset(focusRegion(100, 200), focusRegion(125, 175))).toBe(true);
-    expect(isFocusRegionSubset(focusRegion(100, 200), focusRegion(150, 250))).toBe(false);
-    expect(isFocusRegionSubset(focusRegion(100, 200), focusRegion(200, 300))).toBe(false);
+    expect(isFocusWindowSubset(focusWindow(0, 0), focusWindow(0, 0))).toBe(true);
+    expect(isFocusWindowSubset(focusWindow(100, 200), focusWindow(0, 50))).toBe(false);
+    expect(isFocusWindowSubset(focusWindow(100, 200), focusWindow(50, 150))).toBe(false);
+    expect(isFocusWindowSubset(focusWindow(100, 200), focusWindow(100, 200))).toBe(true);
+    expect(isFocusWindowSubset(focusWindow(100, 200), focusWindow(125, 175))).toBe(true);
+    expect(isFocusWindowSubset(focusWindow(100, 200), focusWindow(150, 250))).toBe(false);
+    expect(isFocusWindowSubset(focusWindow(100, 200), focusWindow(200, 300))).toBe(false);
   });
 });
 describe("isValidTimeString", () => {
@@ -184,22 +184,22 @@ describe("overlap", () => {
   });
 });
 
-describe("filterToFocusRegion", () => {
+describe("filterToFocusWindow", () => {
   it("will not include points before the region", () => {
-    expect(filterToFocusRegion([point(5)], focusRegion(10, 20))).toEqual([[], 1, 0]);
+    expect(filterToFocusWindow([point(5)], focusWindow(10, 20))).toEqual([[], 1, 0]);
   });
   it("will not include points after the region", () => {
-    expect(filterToFocusRegion([point(25)], focusRegion(10, 20))).toEqual([[], 0, 1]);
+    expect(filterToFocusWindow([point(25)], focusWindow(10, 20))).toEqual([[], 0, 1]);
   });
   it("will include points inside the region", () => {
-    expect(filterToFocusRegion([point(5), point(15), point(25)], focusRegion(10, 20))).toEqual([
+    expect(filterToFocusWindow([point(5), point(15), point(25)], focusWindow(10, 20))).toEqual([
       [point(15)],
       1,
       1,
     ]);
   });
   it("will include points on the boundaries the region", () => {
-    expect(filterToFocusRegion([point(10), point(15), point(20)], focusRegion(10, 20))).toEqual([
+    expect(filterToFocusWindow([point(10), point(15), point(20)], focusWindow(10, 20))).toEqual([
       [point(10), point(15), point(20)],
       0,
       0,
