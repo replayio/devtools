@@ -8,6 +8,7 @@ import {
 } from "shared/graphql/generated/GetTestsRun";
 import { GetTestsRunsForWorkspace_node_Workspace_testRuns } from "shared/graphql/generated/GetTestsRunsForWorkspace";
 import { Recording } from "shared/graphql/types";
+import { convertRecording } from "ui/hooks/recordings";
 
 // This type is supported, but must be converted to version 2 format before use
 export namespace TestRunV1 {
@@ -59,8 +60,14 @@ export type SourceMetadata = TestRunV2.SourceMetadata;
 
 export function convertSummary(summary: AnySummary): TestRunV2.Summary {
   if (isTestRunV2(summary)) {
-    // If data from GraphQL is already in the new format, skip the conversion
-    return summary;
+    // If data from GraphQL is already in the new format, only convert the contained recordings
+    return {
+      ...summary,
+      results: {
+        ...summary.results,
+        recordings: summary.results.recordings?.map((rec: any) => convertRecording(rec)!),
+      },
+    };
   }
 
   const {
