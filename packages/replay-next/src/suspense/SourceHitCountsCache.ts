@@ -1,4 +1,5 @@
 import { PointRange, SourceId, TimeStampedPointRange } from "@replayio/protocol";
+import { captureException } from "@sentry/react";
 
 import { binarySearch } from "protocol/utils";
 import { LineHitCounts, LineNumberToHitCountMap, ReplayClientInterface } from "shared/client/types";
@@ -110,8 +111,9 @@ export const sourceHitCountsCache = createFocusIntervalCache<
         !isCommandError(error, ProtocolError.TooManyLocations) &&
         !isCommandError(error, ProtocolError.LinkerDoesNotSupportAction)
       ) {
-        throw error;
+        captureException(error);
       }
+
       return [];
     }
   },
