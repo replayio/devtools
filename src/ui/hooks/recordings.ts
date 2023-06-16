@@ -189,7 +189,7 @@ export async function getRecording(recordingId: RecordingId) {
     variables: { recordingId },
   });
 
-  return convertRecording(result.data?.recording);
+  return result.data?.recording ? convertRecording(result.data.recording) : undefined;
 }
 
 export function useGetRecording(recordingId: RecordingId | null | undefined): {
@@ -206,7 +206,10 @@ export function useGetRecording(recordingId: RecordingId | null | undefined): {
     console.error("Apollo error while getting the recording", error);
   }
 
-  const recording = useMemo(() => convertRecording(data?.recording), [data]);
+  const recording = useMemo(
+    () => (data?.recording ? convertRecording(data.recording) : undefined),
+    [data]
+  );
 
   // Tests don't have an associated user so we just let it bypass the check here.
   const isAuthorized = isTest() || recording;
@@ -269,13 +272,7 @@ export function convertRecording(
     | GetMyRecordings_viewer_recordings_edges_node
     | GetWorkspaceRecordings_node_Workspace_recordings_edges_node
     | GetTestsRun_node_Workspace_testRuns_edges_node_results_recordings
-    | null
-    | undefined
-): Recording | undefined {
-  if (!rec) {
-    return undefined;
-  }
-
+): Recording {
   const recording: Recording = {
     id: rec.uuid,
     user: "owner" in rec ? rec.owner : undefined,

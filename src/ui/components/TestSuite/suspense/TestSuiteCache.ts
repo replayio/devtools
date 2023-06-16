@@ -5,8 +5,8 @@ import { createSingleEntryCacheWithTelemetry } from "replay-next/src/utils/suspe
 import { ReplayClientInterface } from "shared/client/types";
 import {
   GroupedTestCases,
-  convertGroupedTestCases,
   isGroupedTestCasesV1,
+  processGroupedTestCases,
 } from "shared/test-suites/RecordingTestMetadata";
 import { RecordingCache } from "ui/components/TestSuite/suspense/RecordingCache";
 import { isTestSuiteReplay } from "ui/components/TestSuite/utils/isTestSuiteReplay";
@@ -32,7 +32,7 @@ export const TestSuiteCache = createSingleEntryCacheWithTelemetry<
     }
 
     // Migrate intermediate test data to the final format used by the client
-    const groupedTestCases = await convertGroupedTestCases(testMetadata, replayClient);
+    const groupedTestCases = await processGroupedTestCases(testMetadata, replayClient);
 
     return groupedTestCases;
   },
