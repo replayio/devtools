@@ -114,7 +114,7 @@ export function useGetTestRunForWorkspace(
   }
   assert("testRuns" in data.node, "No results in GetTestsRun response");
 
-  const summary = (data as any).node.testRuns?.edges[0]?.node;
+  const summary = data.node.testRuns?.edges[0]?.node;
 
   return {
     summary: summary ? convertSummary(summary) : null,
@@ -143,7 +143,7 @@ export function useGetTestRunsForWorkspace(workspaceId: WorkspaceId): {
     const summaries: Summary[] = [];
 
     // Convert legacy test runs; filter out ones with invalid data
-    (data as any).node.testRuns?.edges.forEach(({ node: summary }: any) => {
+    data.node.testRuns?.edges.forEach(({ node: summary }) => {
       try {
         summaries.push(convertSummary(summary));
       } catch (error) {

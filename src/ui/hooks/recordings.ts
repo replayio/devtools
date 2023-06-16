@@ -38,6 +38,7 @@ import {
   GetRecordingUserId,
   GetRecordingUserIdVariables,
 } from "shared/graphql/generated/GetRecordingUserId";
+import { GetTestsRun_node_Workspace_testRuns_edges_node_results_recordings } from "shared/graphql/generated/GetTestsRun";
 import {
   GetWorkspaceRecordings,
   GetWorkspaceRecordingsVariables,
@@ -267,6 +268,7 @@ export function convertRecording(
     | GetRecording_recording
     | GetMyRecordings_viewer_recordings_edges_node
     | GetWorkspaceRecordings_node_Workspace_recordings_edges_node
+    | GetTestsRun_node_Workspace_testRuns_edges_node_results_recordings
     | null
     | undefined
 ): Recording | undefined {
@@ -276,17 +278,17 @@ export function convertRecording(
 
   const recording: Recording = {
     id: rec.uuid,
-    user: rec.owner,
-    userId: rec.owner?.id,
+    user: "owner" in rec ? rec.owner : undefined,
+    userId: "owner" in rec ? rec.owner?.id : undefined,
     // NOTE: URLs are nullable in the database
-    url: rec.url || "",
-    title: rec.title,
+    url: "url" in rec ? rec.url || "" : "",
+    title: "title" in rec ? rec.title : undefined,
     duration: rec.duration,
-    private: rec.private,
-    isInitialized: rec.isInitialized,
+    private: "private" in rec ? rec.private : undefined,
+    isInitialized: "isInitialized" in rec ? rec.isInitialized : undefined,
     date: rec.createdAt,
     comments: rec.comments,
-    userRole: rec.userRole as RecordingRole,
+    userRole: "userRole" in rec ? (rec.userRole as RecordingRole) : undefined,
   };
 
   if ("workspace" in rec) {

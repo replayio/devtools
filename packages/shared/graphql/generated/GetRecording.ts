@@ -83,6 +83,7 @@ export interface GetRecording_recording_workspace {
   id: string;
   name: string;
   hasPaymentMethod: boolean;
+  isTest: boolean;
   subscription: GetRecording_recording_workspace_subscription | null;
 }
 
