@@ -3,7 +3,7 @@ import { PayloadAction, createSelector, createSlice } from "@reduxjs/toolkit";
 import { RecordingTarget } from "replay-next/src/suspense/BuildIdCache";
 import { compareExecutionPoints, isExecutionPointsWithinRange } from "replay-next/src/utils/time";
 import { Workspace } from "shared/graphql/types";
-import { getCurrentTime, getFocusRegion, getZoomRegion } from "ui/reducers/timeline";
+import { getCurrentTime, getFocusWindow, getZoomRegion } from "ui/reducers/timeline";
 import { UIState } from "ui/state";
 import {
   AppMode,
@@ -302,16 +302,16 @@ export const getSortedEventsForDisplay = createSelector(
   }
 );
 
-export const getFilteredEventsForFocusRegion = createSelector(
-  getFocusRegion,
+export const getFilteredEventsForFocusWindow = createSelector(
+  getFocusWindow,
   getSortedEventsForDisplay,
-  (focusRegion, sortedEvents) => {
-    if (!focusRegion) {
+  (focusWindow, sortedEvents) => {
+    if (!focusWindow) {
       return sortedEvents;
     }
 
     const filteredEvents = sortedEvents.filter(e => {
-      return isExecutionPointsWithinRange(e.point, focusRegion.begin.point, focusRegion.end.point);
+      return isExecutionPointsWithinRange(e.point, focusWindow.begin.point, focusWindow.end.point);
     });
     return filteredEvents;
   }

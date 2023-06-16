@@ -5,7 +5,7 @@ import { STATUS_PENDING, STATUS_RESOLVED, useImperativeCacheValue } from "suspen
 
 import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { getFilteredEventsForFocusRegion } from "ui/actions/app";
+import { getFilteredEventsForFocusWindow } from "ui/actions/app";
 import { seek } from "ui/actions/timeline";
 import useEventsPreferences from "ui/components/Events/useEventsPreferences";
 import { getCurrentTime } from "ui/reducers/timeline";
@@ -32,7 +32,7 @@ function Events() {
   const dispatch = useAppDispatch();
   const currentTime = useAppSelector(getCurrentTime);
   const executionPoint = useAppSelector(getExecutionPoint);
-  const events = useAppSelector(getFilteredEventsForFocusRegion);
+  const events = useAppSelector(getFilteredEventsForFocusWindow);
 
   const { status: annotationsStatus, value: parsedAnnotations } = useImperativeCacheValue(
     eventListenersJumpLocationsCache,

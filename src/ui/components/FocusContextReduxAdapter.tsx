@@ -5,28 +5,28 @@ import { FocusContext, UpdateOptions } from "replay-next/src/contexts/FocusConte
 import { TimeRange } from "replay-next/src/types";
 import {
   enterFocusMode,
-  setFocusRegionFromTimeRange,
+  setFocusWindowFromTimeRange,
   syncFocusedRegion,
-  updateFocusRegionParam,
+  updateFocusWindowParam,
 } from "ui/actions/timeline";
-import { getFocusRegion } from "ui/reducers/timeline";
+import { getFocusWindow } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { rangeForFocusRegion } from "ui/utils/timeline";
+import { rangeForFocusWindow } from "ui/utils/timeline";
 
 // Adapter that reads focus region (from Redux) and passes it to the FocusContext.
 export default function FocusContextReduxAdapter({ children }: PropsWithChildren) {
   const dispatch = useAppDispatch();
-  const focusRegion = useAppSelector(getFocusRegion);
+  const focusWindow = useAppSelector(getFocusWindow);
 
-  const deferredFocusRegion = useDeferredValue(focusRegion);
-  const isPending = deferredFocusRegion !== focusRegion;
+  const deferredFocusWindow = useDeferredValue(focusWindow);
+  const isPending = deferredFocusWindow !== focusWindow;
 
   const update = useCallback(
     async (value: TimeStampedPointRange | null, options: UpdateOptions) => {
       const { sync } = options;
 
       await dispatch(
-        setFocusRegionFromTimeRange(
+        setFocusWindowFromTimeRange(
           value !== null
             ? {
                 begin: value.begin.time,
@@ -38,7 +38,7 @@ export default function FocusContextReduxAdapter({ children }: PropsWithChildren
 
       if (sync) {
         await dispatch(syncFocusedRegion());
-        dispatch(updateFocusRegionParam());
+        dispatch(updateFocusWindowParam());
       }
     },
     [dispatch]
@@ -49,7 +49,7 @@ export default function FocusContextReduxAdapter({ children }: PropsWithChildren
       const { sync } = options;
 
       await dispatch(
-        setFocusRegionFromTimeRange(
+        setFocusWindowFromTimeRange(
           value !== null
             ? {
                 begin: value[0],
@@ -61,7 +61,7 @@ export default function FocusContextReduxAdapter({ children }: PropsWithChildren
 
       if (sync) {
         await dispatch(syncFocusedRegion());
-        dispatch(updateFocusRegionParam());
+        dispatch(updateFocusWindowParam());
       }
     },
     [dispatch]
@@ -73,12 +73,12 @@ export default function FocusContextReduxAdapter({ children }: PropsWithChildren
         dispatch(enterFocusMode());
       },
       isTransitionPending: isPending,
-      range: deferredFocusRegion ? rangeForFocusRegion(deferredFocusRegion) : null,
-      rangeForDisplay: focusRegion ? rangeForFocusRegion(focusRegion) : null,
+      range: deferredFocusWindow ? rangeForFocusWindow(deferredFocusWindow) : null,
+      rangeForDisplay: focusWindow ? rangeForFocusWindow(focusWindow) : null,
       update,
       updateForTimelineImprecise,
     };
-  }, [deferredFocusRegion, dispatch, isPending, focusRegion, update, updateForTimelineImprecise]);
+  }, [deferredFocusWindow, dispatch, isPending, focusWindow, update, updateForTimelineImprecise]);
 
   return <FocusContext.Provider value={context}>{children}</FocusContext.Provider>;
 }

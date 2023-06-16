@@ -1,5 +1,5 @@
-.FocusRegionRowOff,
-.FocusRegionRowOn {
+.FocusWindowRowOff,
+.FocusWindowRowOn {
   padding: 0.25rem;
   display: flex;
   flex-direction: row;
@@ -9,7 +9,7 @@
   border-radius: 0.5rem;
   margin-left: 0.5rem;
 }
-.FocusRegionRowOn {
+.FocusWindowRowOn {
   background-color: var(--focus-mode-active-background-color);
 }
 

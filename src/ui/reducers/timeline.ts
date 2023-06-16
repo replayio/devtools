@@ -4,7 +4,7 @@ import sortBy from "lodash/sortBy";
 
 import { MAX_FOCUS_REGION_DURATION } from "ui/actions/timeline";
 import { UIState } from "ui/state";
-import { FocusRegion, HoveredItem, TimeRange, TimelineState } from "ui/state/timeline";
+import { FocusWindow, HoveredItem, TimeRange, TimelineState } from "ui/state/timeline";
 import { getPausePointParams } from "ui/utils/environment";
 import { mergeSortedPointLists } from "ui/utils/timeline";
 
@@ -12,13 +12,13 @@ function initialTimelineState(): TimelineState {
   return {
     allPaintsReceived: false,
     currentTime: 0,
-    focusRegion: getPausePointParams().focusRegion,
-    focusRegionBackup: null,
+    focusWindow: getPausePointParams().focusWindow,
+    focusWindowBackup: null,
     hoveredItem: null,
     markTimeStampedPoint: null,
     hoverTime: null,
     playback: null,
-    playbackFocusRegion: false,
+    playbackFocusWindow: false,
     playbackPrecachedTime: 0,
     paints: [{ time: 0, point: "0" }],
     points: [{ time: 0, point: "0" }],
@@ -56,11 +56,11 @@ const timelineSlice = createSlice({
     setPlaybackPrecachedTime(state, action: PayloadAction<number>) {
       state.playbackPrecachedTime = action.payload;
     },
-    setPlaybackFocusRegion(state, action: PayloadAction<boolean>) {
-      state.playbackFocusRegion = action.payload;
+    setPlaybackFocusWindow(state, action: PayloadAction<boolean>) {
+      state.playbackFocusWindow = action.payload;
     },
-    setFocusRegion(state, action: PayloadAction<FocusRegion | null>) {
-      state.focusRegion = action.payload;
+    setFocusWindow(state, action: PayloadAction<FocusWindow | null>) {
+      state.focusWindow = action.payload;
     },
     pointsReceived(state, action: PayloadAction<TimeStampedPoint[]>) {
       const mutablePoints = [...state.points];
@@ -94,9 +94,9 @@ export const {
   setHoveredItem,
   setMarkTimeStampPoint,
   setPlaybackPrecachedTime,
-  setPlaybackFocusRegion,
+  setPlaybackFocusWindow,
   setPlaybackStalled,
-  setFocusRegion,
+  setFocusWindow: setFocusWindow,
   setTimelineState,
   pointsReceived,
   paintsReceived,
@@ -130,12 +130,12 @@ export const getBasicProcessingProgress = (state: UIState) => {
   return (1.0 * (maxPaint?.time || 0)) / maxPoint.time;
 };
 export const getPlaybackPrecachedTime = (state: UIState) => state.timeline.playbackPrecachedTime;
-export const getPlaybackFocusRegion = (state: UIState) => state.timeline.playbackFocusRegion;
-export const getFocusRegion = (state: UIState) => state.timeline.focusRegion;
-export const isMaximumFocusRegion = (state: UIState) => {
-  const focusRegion = getFocusRegion(state);
-  if (focusRegion) {
-    const duration = focusRegion.end.time - focusRegion.begin.time;
+export const getPlaybackFocusWindow = (state: UIState) => state.timeline.playbackFocusWindow;
+export const getFocusWindow = (state: UIState) => state.timeline.focusWindow;
+export const isMaximumFocusWindow = (state: UIState) => {
+  const focusWindow = getFocusWindow(state);
+  if (focusWindow) {
+    const duration = focusWindow.end.time - focusWindow.begin.time;
     // JavaScript floating point numbers are not precise enough,
     // so in order to avoid occasional flickers from rounding errors, fuzz it a bit.
     return duration + 0.1 >= MAX_FOCUS_REGION_DURATION;
@@ -143,4 +143,4 @@ export const isMaximumFocusRegion = (state: UIState) => {
     return false;
   }
 };
-export const getFocusRegionBackup = (state: UIState) => state.timeline.focusRegionBackup;
+export const getFocusWindowBackup = (state: UIState) => state.timeline.focusWindowBackup;

@@ -5,8 +5,8 @@ import { UIStore } from "ui/actions";
 import * as actions from "../actions/timeline";
 import {
   getCurrentTime,
-  getFocusRegion,
-  getFocusRegionBackup,
+  getFocusWindow,
+  getFocusWindowBackup,
   getHoverTime,
   getPlayback,
   setTimelineState,
@@ -34,11 +34,11 @@ describe("Redux timeline state", () => {
   });
 
   describe("focus region", () => {
-    it("should assign a default focusRegion around the current time when toggled on", async () => {
-      expect(getFocusRegionBackup(store.getState())).toBeNull();
+    it("should assign a default focusWindow around the current time when toggled on", async () => {
+      expect(getFocusWindowBackup(store.getState())).toBeNull();
       await dispatch(actions.toggleFocusMode());
-      expect(getFocusRegionBackup(store.getState())).toBeNull();
-      expect(getFocusRegion(store.getState())).toMatchInlineSnapshot(`
+      expect(getFocusWindowBackup(store.getState())).toBeNull();
+      expect(getFocusWindow(store.getState())).toMatchInlineSnapshot(`
         Object {
           "begin": Object {
             "point": "67.5",
@@ -52,9 +52,9 @@ describe("Redux timeline state", () => {
       `);
     });
 
-    it("should not force the currentTime to be within the focusRegion as it moves around", async () => {
+    it("should not force the currentTime to be within the focusWindow as it moves around", async () => {
       await dispatch(
-        actions.updateFocusRegion({
+        actions.updateFocusWindow({
           begin: 50,
           end: 60,
         })
@@ -62,7 +62,7 @@ describe("Redux timeline state", () => {
       expect(getCurrentTime(store.getState())).toBe(75);
 
       await dispatch(
-        actions.updateFocusRegion({
+        actions.updateFocusWindow({
           begin: 75,
           end: 85,
         })
@@ -70,7 +70,7 @@ describe("Redux timeline state", () => {
       expect(getCurrentTime(store.getState())).toBe(75);
 
       await dispatch(
-        actions.updateFocusRegion({
+        actions.updateFocusWindow({
           begin: 25,
           end: 30,
         })
@@ -81,7 +81,7 @@ describe("Redux timeline state", () => {
     it("should update the hoverTime (and the time displayed in the video player) to match the handle being dragged", async () => {
       // If we are moving the whole focus region, seek to the current time.
       await dispatch(
-        actions.updateFocusRegion({
+        actions.updateFocusWindow({
           begin: 60,
           end: 80,
         })
@@ -90,7 +90,7 @@ describe("Redux timeline state", () => {
 
       // If we are moving the beginTime, seek to that point
       await dispatch(
-        actions.updateFocusRegion({
+        actions.updateFocusWindow({
           begin: 65,
           end: 80,
         })
@@ -99,7 +99,7 @@ describe("Redux timeline state", () => {
 
       // If we are moving the endTime, seek to that point
       await dispatch(
-        actions.updateFocusRegion({
+        actions.updateFocusWindow({
           begin: 65,
           end: 75,
         })
@@ -109,14 +109,14 @@ describe("Redux timeline state", () => {
       // Moving the entire range should not move the hover time,
       // unless the time would otherwise be out of the new focused region.
       await dispatch(
-        actions.updateFocusRegion({
+        actions.updateFocusWindow({
           begin: 68,
           end: 78,
         })
       );
       expect(getHoverTime(store.getState())).toBe(75);
       await dispatch(
-        actions.updateFocusRegion({
+        actions.updateFocusWindow({
           begin: 80,
           end: 90,
         })
@@ -124,15 +124,15 @@ describe("Redux timeline state", () => {
       expect(getHoverTime(store.getState())).toBe(80);
     });
 
-    it("should not allow an invalid focusRegion to be set", async () => {
+    it("should not allow an invalid focusWindow to be set", async () => {
       // Before the start of the zoom region
       await dispatch(
-        actions.updateFocusRegion({
+        actions.updateFocusWindow({
           begin: 30,
           end: 40,
         })
       );
-      expect(getFocusRegion(store.getState())).toMatchInlineSnapshot(`
+      expect(getFocusWindow(store.getState())).toMatchInlineSnapshot(`
         Object {
           "begin": Object {
             "point": "50",
@@ -147,12 +147,12 @@ describe("Redux timeline state", () => {
 
       // After the end of the zoom region
       await dispatch(
-        actions.updateFocusRegion({
+        actions.updateFocusWindow({
           begin: 110,
           end: 125,
         })
       );
-      expect(getFocusRegion(store.getState())).toMatchInlineSnapshot(`
+      expect(getFocusWindow(store.getState())).toMatchInlineSnapshot(`
         Object {
           "begin": Object {
             "point": "100",
@@ -167,18 +167,18 @@ describe("Redux timeline state", () => {
 
       // Overlapping
       await dispatch(
-        actions.updateFocusRegion({
+        actions.updateFocusWindow({
           begin: 60,
           end: 80,
         })
       );
       await dispatch(
-        actions.updateFocusRegion({
+        actions.updateFocusWindow({
           begin: 90,
           end: 80,
         })
       );
-      expect(getFocusRegion(store.getState())).toMatchInlineSnapshot(`
+      expect(getFocusWindow(store.getState())).toMatchInlineSnapshot(`
         Object {
           "begin": Object {
             "point": "80",
@@ -193,18 +193,18 @@ describe("Redux timeline state", () => {
 
       // Overlapping alternate
       await dispatch(
-        actions.updateFocusRegion({
+        actions.updateFocusWindow({
           begin: 60,
           end: 80,
         })
       );
       await dispatch(
-        actions.updateFocusRegion({
+        actions.updateFocusWindow({
           begin: 60,
           end: 50,
         })
       );
-      expect(getFocusRegion(store.getState())).toMatchInlineSnapshot(`
+      expect(getFocusWindow(store.getState())).toMatchInlineSnapshot(`
         Object {
           "begin": Object {
             "point": "60",
@@ -218,12 +218,12 @@ describe("Redux timeline state", () => {
       `);
     });
 
-    it("should stop playback before resizing focusRegion", async () => {
+    it("should stop playback before resizing focusWindow", async () => {
       dispatch(actions.startPlayback());
       expect(getPlayback(store.getState())).not.toBeNull();
 
       await dispatch(
-        actions.updateFocusRegion({
+        actions.updateFocusWindow({
           begin: 50,
           end: 60,
         })
@@ -233,8 +233,8 @@ describe("Redux timeline state", () => {
 
     describe("set start time", () => {
       it("should focus from the start time to the end of the zoom region if no focus region has been set", async () => {
-        await dispatch(actions.setFocusRegionBeginTime(65, false));
-        expect(getFocusRegion(store.getState())).toMatchInlineSnapshot(`
+        await dispatch(actions.setFocusWindowBeginTime(65, false));
+        expect(getFocusWindow(store.getState())).toMatchInlineSnapshot(`
           Object {
             "begin": Object {
               "point": "65",
@@ -250,13 +250,13 @@ describe("Redux timeline state", () => {
 
       it("should only update the start time when a region is set", async () => {
         await dispatch(
-          actions.updateFocusRegion({
+          actions.updateFocusWindow({
             begin: 50,
             end: 70,
           })
         );
-        await dispatch(actions.setFocusRegionBeginTime(65, false));
-        expect(getFocusRegion(store.getState())).toMatchInlineSnapshot(`
+        await dispatch(actions.setFocusWindowBeginTime(65, false));
+        expect(getFocusWindow(store.getState())).toMatchInlineSnapshot(`
           Object {
             "begin": Object {
               "point": "65",
@@ -273,8 +273,8 @@ describe("Redux timeline state", () => {
 
     describe("set end time", () => {
       it("should focus from the beginning of the zoom region to the specified end time if no focus region has been set", async () => {
-        await dispatch(actions.setFocusRegionEndTime(65, false));
-        expect(getFocusRegion(store.getState())).toMatchInlineSnapshot(`
+        await dispatch(actions.setFocusWindowEndTime(65, false));
+        expect(getFocusWindow(store.getState())).toMatchInlineSnapshot(`
           Object {
             "begin": Object {
               "point": "50",
@@ -290,13 +290,13 @@ describe("Redux timeline state", () => {
 
       it("should only update the end time when a region is set", async () => {
         await dispatch(
-          actions.updateFocusRegion({
+          actions.updateFocusWindow({
             begin: 50,
             end: 70,
           })
         );
-        await dispatch(actions.setFocusRegionEndTime(65, false));
-        expect(getFocusRegion(store.getState())).toMatchInlineSnapshot(`
+        await dispatch(actions.setFocusWindowEndTime(65, false));
+        expect(getFocusWindow(store.getState())).toMatchInlineSnapshot(`
           Object {
             "begin": Object {
               "point": "50",

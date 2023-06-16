@@ -19,7 +19,7 @@ import {
   getUrlParams,
   seekToTime,
   syncFocusedRegion,
-  updateFocusRegion,
+  updateFocusWindow,
 } from "ui/actions/timeline";
 import { useAppDispatch } from "ui/setup/hooks";
 import { getUrlString } from "ui/utils/environment";
@@ -27,7 +27,7 @@ import { getUrlString } from "ui/utils/environment";
 import styles from "./ContextMenu.module.css";
 
 export default function useTimelineContextMenu() {
-  const { rangeForDisplay: focusRegion } = useContext(FocusContext);
+  const { rangeForDisplay: focusWindow } = useContext(FocusContext);
   const { showCommentsPanel } = useContext(InspectorContext);
   const replayClient = useContext(ReplayClientContext);
   const { accessToken, duration, recordingId } = useContext(SessionContext);
@@ -36,8 +36,8 @@ export default function useTimelineContextMenu() {
 
   const [relativePosition, setRelativePosition] = useState(0);
 
-  const focusBeginTime = focusRegion?.begin.time;
-  const focusEndTime = focusRegion?.end.time;
+  const focusBeginTime = focusWindow?.begin.time;
+  const focusEndTime = focusWindow?.end.time;
   const currentTime = relativePosition * duration;
 
   const onShow = (event: UIEvent) => {
@@ -67,7 +67,7 @@ export default function useTimelineContextMenu() {
     let end = focusEndTime ?? duration;
     end = Math.min(end, currentTime + MAX_FOCUS_REGION_DURATION);
 
-    await dispatch(updateFocusRegion({ begin: currentTime, end }));
+    await dispatch(updateFocusWindow({ begin: currentTime, end }));
     dispatch(syncFocusedRegion());
   };
 
@@ -75,14 +75,14 @@ export default function useTimelineContextMenu() {
     let begin = focusBeginTime ?? 0;
     begin = Math.max(begin, currentTime - MAX_FOCUS_REGION_DURATION);
 
-    await dispatch(updateFocusRegion({ begin, end: currentTime }));
+    await dispatch(updateFocusWindow({ begin, end: currentTime }));
     dispatch(syncFocusedRegion());
   };
 
   const shareReplay = async () => {
     const { point, time } = await replayClient.getPointNearTime(currentTime);
 
-    const params = getUrlParams({ focusRegion, point, time });
+    const params = getUrlParams({ focusWindow, point, time });
     const urlString = getUrlString(params);
 
     copyToClipboard(urlString);

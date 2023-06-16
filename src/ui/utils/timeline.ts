@@ -4,7 +4,7 @@ import sortedIndexBy from "lodash/sortedIndexBy";
 import sortedLastIndexBy from "lodash/sortedLastIndexBy";
 
 import { assert } from "protocol/utils";
-import { FocusRegion, ZoomRegion } from "ui/state/timeline";
+import { FocusWindow, ZoomRegion } from "ui/state/timeline";
 
 import { timelineMarkerWidth } from "../constants";
 
@@ -184,8 +184,8 @@ export function isSameTimeStampedPointRange(
   return sameBegin && sameEnd;
 }
 
-export function isInFocusSpan(time: number, focusRegion: FocusRegion) {
-  return time >= focusRegion.begin.time && time <= focusRegion.end.time;
+export function isInFocusSpan(time: number, focusWindow: FocusWindow) {
+  return time >= focusWindow.begin.time && time <= focusWindow.end.time;
 }
 
 export function isPointInRegions(regions: TimeStampedPointRange[], point: string) {
@@ -198,8 +198,8 @@ export function isTimeInRegions(time: number, regions?: TimeStampedPointRange[])
   return !!regions?.some(region => time >= region.begin.time && time <= region.end.time);
 }
 
-export function rangeForFocusRegion(focusRegion: FocusRegion): TimeStampedPointRange {
-  return { begin: focusRegion.begin || { time: 0, point: "0" }, end: focusRegion.end };
+export function rangeForFocusWindow(focusWindow: FocusWindow): TimeStampedPointRange {
+  return { begin: focusWindow.begin || { time: 0, point: "0" }, end: focusWindow.end };
 }
 
 export const overlap = (a: TimeStampedPointRange[], b: TimeStampedPointRange[]) => {
@@ -235,35 +235,35 @@ export function getTimeFromPosition(
   return time;
 }
 
-export function isFocusRegionSubset(
-  prevFocusRegion: FocusRegion | null,
-  nextFocusRegion: FocusRegion | null
+export function isFocusWindowSubset(
+  prevFocusWindow: FocusWindow | null,
+  nextFocusWindow: FocusWindow | null
 ): boolean {
-  if (prevFocusRegion === null) {
+  if (prevFocusWindow === null) {
     // Previously the entire timeline was selected.
     // No matter what the new focus region is, it will be a subset.
     return true;
-  } else if (nextFocusRegion === null) {
+  } else if (nextFocusWindow === null) {
     // The new selection includes the entire timeline.
     // No matter what the previous focus region is, the new one is not a subset.
     return false;
   } else {
     return (
-      nextFocusRegion.begin.time >= prevFocusRegion.begin.time &&
-      nextFocusRegion.end.time <= prevFocusRegion.end.time
+      nextFocusWindow.begin.time >= prevFocusWindow.begin.time &&
+      nextFocusWindow.end.time <= prevFocusWindow.end.time
     );
   }
 }
 
-export function filterToFocusRegion<T extends TimeStampedPoint>(
+export function filterToFocusWindow<T extends TimeStampedPoint>(
   sortedPoints: T[],
-  focusRegion: FocusRegion | null
+  focusWindow: FocusWindow | null
 ): [filtered: T[], filteredBeforeCount: number, filteredAfterCount: number] {
-  if (!focusRegion) {
+  if (!focusWindow) {
     return [sortedPoints, 0, 0];
   }
 
-  const { begin: beginPoint, end: endPoint } = rangeForFocusRegion(focusRegion);
+  const { begin: beginPoint, end: endPoint } = rangeForFocusWindow(focusWindow);
 
   const beginIndex = sortedIndexBy(sortedPoints, beginPoint, ({ point }) => BigInt(point));
   const endIndex = sortedLastIndexBy(sortedPoints, endPoint, ({ point }) => BigInt(point));

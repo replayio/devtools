@@ -3,14 +3,14 @@ import clamp from "lodash/clamp";
 import { FC } from "react";
 
 import { getLoadedRegions } from "ui/reducers/app";
-import { getFocusRegion, getZoomRegion } from "ui/reducers/timeline";
+import { getFocusWindow, getZoomRegion } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
 import { getVisiblePosition, overlap } from "ui/utils/timeline";
 
 export const UnloadedRegions: FC = () => {
   const loadedRegions = useAppSelector(getLoadedRegions);
   const zoomRegion = useAppSelector(getZoomRegion);
-  const focusRegion = useAppSelector(getFocusRegion);
+  const focusWindow = useAppSelector(getFocusWindow);
 
   // Check loadedRegions to keep typescript happy.
   if (!loadedRegions) {
@@ -26,8 +26,8 @@ export const UnloadedRegions: FC = () => {
   const { begin, end } = loadedRegions.loaded[0];
   let beginTime = begin.time;
   let endTime = end.time;
-  if (focusRegion) {
-    const overlappingRegions = overlap([focusRegion], loadedRegions.loading);
+  if (focusWindow) {
+    const overlappingRegions = overlap([focusWindow], loadedRegions.loading);
     if (overlappingRegions.length > 0) {
       const focusedAndLoaded = overlappingRegions[0];
       beginTime = focusedAndLoaded.begin.time;

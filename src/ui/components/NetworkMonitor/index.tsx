@@ -18,7 +18,7 @@ import RequestDetails from "ui/components/NetworkMonitor/RequestDetails";
 import RequestTable from "ui/components/NetworkMonitor/RequestTable";
 import Table from "ui/components/NetworkMonitor/Table";
 import { getSelectedRequestId } from "ui/reducers/network";
-import { getCurrentTime, getFocusRegion } from "ui/reducers/timeline";
+import { getCurrentTime, getFocusWindow } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { timeMixpanelEvent } from "ui/utils/mixpanel";
 import { trackEvent } from "ui/utils/telemetry";
@@ -30,7 +30,7 @@ export default function NetworkMonitor() {
 
   const currentTime = useAppSelector(getCurrentTime);
   const context = useAppSelector(getThreadContext);
-  const focusRegion = useAppSelector(getFocusRegion);
+  const focusWindow = useAppSelector(getFocusWindow);
 
   const selectedRequestId = useAppSelector(getSelectedRequestId);
   const [types, setTypes] = useState<Set<CanonicalRequestType>>(new Set([]));
@@ -41,7 +41,7 @@ export default function NetworkMonitor() {
   const { complete, data: records = {}, value: ids = [] } = useStreamingValue(stream);
 
   const { countAfter, countBefore, filteredIds } = useMemo(() => {
-    if (focusRegion === null) {
+    if (focusWindow === null) {
       return {
         countAfter: 0,
         countBefore: 0,
@@ -59,9 +59,9 @@ export default function NetworkMonitor() {
         const record = records[id];
         const point = record.timeStampedPoint.point;
 
-        if (isExecutionPointsLessThan(point, focusRegion.begin.point)) {
+        if (isExecutionPointsLessThan(point, focusWindow.begin.point)) {
           countBefore++;
-        } else if (isExecutionPointsGreaterThan(point, focusRegion.end.point)) {
+        } else if (isExecutionPointsGreaterThan(point, focusWindow.end.point)) {
           countAfter++;
         } else {
           filteredIds.push(id);
@@ -74,7 +74,7 @@ export default function NetworkMonitor() {
       countBefore,
       filteredIds,
     };
-  }, [focusRegion, ids, records]);
+  }, [focusWindow, ids, records]);
 
   const toggleType = (type: CanonicalRequestType) => {
     dispatch(hideRequestDetails());

@@ -3,7 +3,7 @@ import React from "react";
 import { getFormattedTime } from "shared/utils/time";
 import { getNonLoadingTimeRanges } from "ui/reducers/app";
 import {
-  getFocusRegion,
+  getFocusWindow,
   getHoverTime,
   getShowFocusModeControls,
   getZoomRegion,
@@ -16,7 +16,7 @@ export default function Tooltip({ timelineWidth }: { timelineWidth: number }) {
   const zoomRegion = useAppSelector(getZoomRegion);
   const showFocusModeControls = useAppSelector(getShowFocusModeControls);
   const nonLoadingRegion = useAppSelector(getNonLoadingTimeRanges);
-  const focusRegion = useAppSelector(getFocusRegion);
+  const focusWindow = useAppSelector(getFocusWindow);
 
   if (!hoverTime || showFocusModeControls) {
     return null;
@@ -29,7 +29,7 @@ export default function Tooltip({ timelineWidth }: { timelineWidth: number }) {
   );
 
   const isHoveredOnUnFocusedRegion =
-    focusRegion && (focusRegion.begin.time > hoverTime || focusRegion.end.time < hoverTime);
+    focusWindow && (focusWindow.begin.time > hoverTime || focusWindow.end.time < hoverTime);
 
   const timestamp = getFormattedTime(hoverTime);
   const message =

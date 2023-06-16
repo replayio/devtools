@@ -3,7 +3,7 @@ import { ContextMenuCategory, ContextMenuItem, useContextMenu } from "use-contex
 
 import { Badge, Checkbox } from "design";
 import Icon from "replay-next/components/Icon";
-import { getFilteredEventsForFocusRegion } from "ui/reducers/app";
+import { getFilteredEventsForFocusWindow } from "ui/reducers/app";
 import { useAppSelector } from "ui/setup/hooks";
 
 import useEventsPreferences, { FiltersKey } from "./useEventsPreferences";
@@ -19,7 +19,7 @@ function createSelectHandler(callback: () => void): (event: UIEvent) => void {
 }
 
 export default function EventsDropDownMenu() {
-  const events = useAppSelector(getFilteredEventsForFocusRegion);
+  const events = useAppSelector(getFilteredEventsForFocusWindow);
   const eventCounts = useMemo<{ [key in FiltersKey]: number }>(
     () =>
       events.reduce(

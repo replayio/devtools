@@ -93,7 +93,7 @@ export class ReplayClient implements ReplayClientInterface {
 
   private sessionWaiter = defer<SessionId>();
 
-  private focusRange: TimeStampedPointRange | null = null;
+  private focusWindow: TimeStampedPointRange | null = null;
 
   private nextFindPointsId = 1;
   private nextRunEvaluationId = 1;
@@ -121,10 +121,11 @@ export class ReplayClient implements ReplayClientInterface {
   // Configures the client to use an already initialized session iD.
   // This method should be used for apps that use the protocol package directly.
   // Apps that only communicate with the Replay protocol through this client should use the initialize method instead.
-  configure(sessionId: string): void {
+  async configure(sessionId: string): Promise<void> {
     this._sessionId = sessionId;
     this.sessionWaiter.resolve(sessionId);
-    this.getFocusWindow();
+
+    await this.syncFocusWindow();
   }
 
   waitForSession() {
@@ -237,7 +238,8 @@ export class ReplayClient implements ReplayClientInterface {
 
     this._sessionId = sessionId;
     this.sessionWaiter.resolve(sessionId);
-    this.getFocusWindow();
+
+    await this.syncFocusWindow();
 
     return sessionId;
   }
@@ -583,11 +585,11 @@ export class ReplayClient implements ReplayClientInterface {
     return client.Pause.getExceptionValue({}, sessionId, pauseId);
   }
 
-  async getFocusWindow(): Promise<TimeStampedPointRange> {
+  private async syncFocusWindow(): Promise<TimeStampedPointRange> {
     const sessionId = this.getSessionIdThrows();
     const { window } = await client.Session.getFocusWindow({}, sessionId);
-    this.focusRange = window;
-    this._dispatchEvent("focusRangeChange", window);
+    this.focusWindow = window;
+    this._dispatchEvent("focusWindowChange", window);
     return window;
   }
 
@@ -729,11 +731,11 @@ export class ReplayClient implements ReplayClientInterface {
     return mappedLocation;
   }
 
-  async requestFocusRange(range: FocusWindowRequest): Promise<TimeStampedPointRange> {
+  async requestFocusWindow(range: FocusWindowRequest): Promise<TimeStampedPointRange> {
     const sessionId = this.getSessionIdThrows();
     const { window } = await client.Session.requestFocusRange({ range }, sessionId);
-    this.focusRange = window;
-    this._dispatchEvent("focusRangeChange", window);
+    this.focusWindow = window;
+    this._dispatchEvent("focusWindowChange", window);
     return window;
   }
 
@@ -991,18 +993,18 @@ export class ReplayClient implements ReplayClientInterface {
     return new Promise(resolve => {
       const checkFocusRange = () => {
         let isInFocusRange = false;
-        if (this.focusRange !== null) {
-          isInFocusRange = isPointInRegion(point, this.focusRange);
+        if (this.focusWindow !== null) {
+          isInFocusRange = isPointInRegion(point, this.focusWindow);
         }
 
         if (isInFocusRange) {
           resolve();
 
-          this.removeEventListener("focusRangeChange", checkFocusRange);
+          this.removeEventListener("focusWindowChange", checkFocusRange);
         }
       };
 
-      this.addEventListener("focusRangeChange", checkFocusRange);
+      this.addEventListener("focusWindowChange", checkFocusRange);
 
       checkFocusRange();
     });
@@ -1018,21 +1020,25 @@ export class ReplayClient implements ReplayClientInterface {
     return new Promise(resolve => {
       const checkFocusRange = () => {
         let isInFocusRange = false;
-        if (this.focusRange !== null) {
-          isInFocusRange = isRangeInRegions(range, [this.focusRange]);
+        if (this.focusWindow !== null) {
+          isInFocusRange = isRangeInRegions(range, [this.focusWindow]);
         }
 
         if (isInFocusRange) {
           resolve();
 
-          this.removeEventListener("focusRangeChange", checkFocusRange);
+          this.removeEventListener("focusWindowChange", checkFocusRange);
         }
       };
 
-      this.addEventListener("focusRangeChange", checkFocusRange);
+      this.addEventListener("focusWindowChange", checkFocusRange);
 
       checkFocusRange();
     });
+  }
+
+  getCurrentFocusWindow(): TimeStampedPointRange | null {
+    return this.focusWindow;
   }
 
   _dispatchEvent(type: ReplayClientEvents, ...args: any[]): void {

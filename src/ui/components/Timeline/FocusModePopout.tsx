@@ -3,12 +3,12 @@ import React, { useEffect } from "react";
 import { useNag } from "replay-next/src/hooks/useNag";
 import { Nag } from "shared/graphql/types";
 import { DebouncedOrThrottledFunction } from "shared/utils/function";
-import { exitFocusMode, syncFocusedRegion, updateFocusRegionParam } from "ui/actions/timeline";
+import { exitFocusMode, syncFocusedRegion, updateFocusWindowParam } from "ui/actions/timeline";
 import {
-  getFocusRegionBackup,
+  getFocusWindowBackup,
   getShowFocusModeControls,
-  isMaximumFocusRegion,
-  setFocusRegion,
+  isMaximumFocusWindow,
+  setFocusWindow,
 } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { AppDispatch } from "ui/setup/store";
@@ -19,9 +19,9 @@ import Icon from "../shared/Icon";
 import styles from "./FocusModePopout.module.css";
 
 export default function FocusModePopout({
-  updateFocusRegionThrottled,
+  updateFocusWindowThrottled,
 }: {
-  updateFocusRegionThrottled: DebouncedOrThrottledFunction<
+  updateFocusWindowThrottled: DebouncedOrThrottledFunction<
     (dispatch: AppDispatch, begin: number, end: number) => void
   >;
 }) {
@@ -29,17 +29,17 @@ export default function FocusModePopout({
   const showFocusModeControls = useAppSelector(getShowFocusModeControls);
 
   const dispatch = useAppDispatch();
-  const focusRegionBackup = useAppSelector(getFocusRegionBackup);
-  const showMaxFocusRegionMessage = useAppSelector(isMaximumFocusRegion);
+  const focusWindowBackup = useAppSelector(getFocusWindowBackup);
+  const showMaxFocusWindowMessage = useAppSelector(isMaximumFocusWindow);
 
   const hideModal = () => dispatch(exitFocusMode());
 
   const discardPendingChanges = (isImplicit: boolean) => {
-    if (updateFocusRegionThrottled.hasPending()) {
-      updateFocusRegionThrottled.cancel();
+    if (updateFocusWindowThrottled.hasPending()) {
+      updateFocusWindowThrottled.cancel();
     }
 
-    dispatch(setFocusRegion(focusRegionBackup));
+    dispatch(setFocusWindow(focusWindowBackup));
     dispatch(syncFocusedRegion());
 
     if (isImplicit) {
@@ -51,12 +51,12 @@ export default function FocusModePopout({
     hideModal();
   };
   const savePendingChanges = async () => {
-    if (updateFocusRegionThrottled.hasPending()) {
-      await updateFocusRegionThrottled.flush();
+    if (updateFocusWindowThrottled.hasPending()) {
+      await updateFocusWindowThrottled.flush();
     }
 
     dispatch(syncFocusedRegion());
-    dispatch(updateFocusRegionParam());
+    dispatch(updateFocusWindowParam());
     trackEvent("timeline.save_focus");
 
     hideModal();
@@ -97,7 +97,7 @@ export default function FocusModePopout({
   const timelineNode = document.querySelector(".timeline");
   const timelineHeight = timelineNode!.getBoundingClientRect().height;
 
-  const message = showMaxFocusRegionMessage ? (
+  const message = showMaxFocusWindowMessage ? (
     "Maximum window reached."
   ) : (
     <>

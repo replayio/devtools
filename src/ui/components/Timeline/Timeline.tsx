@@ -5,7 +5,7 @@ import {
   seekToTime,
   setTimelineToTime,
   stopPlayback,
-  updateFocusRegion,
+  updateFocusWindow,
 } from "ui/actions/timeline";
 import useTimelineContextMenu from "ui/components/Timeline/useTimelineContextMenu";
 import { selectors } from "ui/reducers";
@@ -128,7 +128,7 @@ export default function Timeline() {
 
   return (
     <>
-      <FocusModePopout updateFocusRegionThrottled={updateFocusRegionThrottled} />
+      <FocusModePopout updateFocusWindowThrottled={updateFocusWindowThrottled} />
       <div className="timeline">
         <div className="commands">
           <PlayPauseButton />
@@ -157,7 +157,7 @@ export default function Timeline() {
               <Focuser
                 editMode={editMode}
                 setEditMode={setEditMode}
-                updateFocusRegionThrottled={updateFocusRegionThrottled}
+                updateFocusWindowThrottled={updateFocusWindowThrottled}
               />
             </div>
           </div>
@@ -172,6 +172,6 @@ export default function Timeline() {
   );
 }
 
-const updateFocusRegionThrottled = throttle((dispatch: AppDispatch, begin: number, end: number) => {
-  return dispatch(updateFocusRegion({ begin, end }));
+const updateFocusWindowThrottled = throttle((dispatch: AppDispatch, begin: number, end: number) => {
+  return dispatch(updateFocusWindow({ begin, end }));
 }, 250);
