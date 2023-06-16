@@ -1,3 +1,4 @@
+import { captureException } from "@sentry/react";
 import Link from "next/link";
 
 import Icon from "replay-next/components/Icon";
@@ -20,6 +21,13 @@ function getModeIcon(mode: Mode): string[] {
       return ["repeat", "Stress Test Mode"];
     case "record-on-retry":
       return ["repeatone", "Record on Retry Mode"];
+    case "record":
+      return [];
+    default:
+      // Fallback in case of unexpected Test Suites metadata values
+      captureException(new Error("Unexpected test run mode").stack, { extra: { mode } });
+
+      return [];
   }
 }
 
@@ -30,6 +38,10 @@ export function ModeAttribute({ summary }: { summary: Summary }) {
   }
 
   const [modeIcon, modeText] = getModeIcon(mode);
+
+  if (modeIcon == null && modeText == null) {
+    return null;
+  }
 
   return <AttributeContainer icon={modeIcon}>{modeText}</AttributeContainer>;
 }

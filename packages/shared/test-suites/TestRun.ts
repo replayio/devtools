@@ -3,7 +3,7 @@ import { GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node as TestRuns
 import { Recording } from "shared/graphql/types";
 import { convertRecording } from "ui/hooks/recordings";
 
-export type Mode = "diagnostics" | "record-on-retry" | "stress";
+export type Mode = "diagnostics" | "record" | "record-on-retry" | "stress";
 
 export type SourceMetadata = {
   branchName: string | null;
