@@ -35,7 +35,6 @@ export function TestResultListItem({
   const testMetadata = metadata?.test;
   if (testMetadata != null) {
     if (isGroupedTestCasesV1(testMetadata)) {
-      console.log(typeof testMetadata.path, testMetadata.path);
       filePath = testMetadata.path?.[2] ?? "";
       title = testMetadata.title;
     } else if (isGroupedTestCasesV2(testMetadata)) {

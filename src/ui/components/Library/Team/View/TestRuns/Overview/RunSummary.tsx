@@ -2,7 +2,7 @@ import { captureException } from "@sentry/react";
 import Link from "next/link";
 
 import Icon from "replay-next/components/Icon";
-import { Mode, Summary, getTestRunTitle } from "shared/test-suites/TestRun";
+import { Summary, getTestRunTitle } from "shared/test-suites/TestRun";
 import { BranchIcon } from "ui/components/Library/Team/View/TestRuns/BranchIcon";
 
 import {
@@ -13,31 +13,32 @@ import { AttributeContainer } from "../AttributeContainer";
 import { RunStats } from "../RunStats";
 import { getDuration } from "../utils";
 
-function getModeIcon(mode: Mode): string[] {
+export function ModeAttribute({ summary }: { summary: Summary }) {
+  const { mode } = summary;
+
+  let modeIcon = null;
+  let modeText = null;
+
   switch (mode) {
     case "diagnostics":
-      return ["biotech", "Diagnostic Mode"];
+      modeIcon = "biotech";
+      modeText = "Diagnostic Mode";
+      break;
     case "stress":
-      return ["repeat", "Stress Test Mode"];
+      modeIcon = "repeat";
+      modeText = "Stress Test Mode";
+      break;
     case "record-on-retry":
-      return ["repeatone", "Record on Retry Mode"];
+      modeIcon = "repeatone";
+      modeText = "Record on Retry Mode";
+      break;
     case "record":
-      return [];
+      break;
     default:
       // Fallback in case of unexpected Test Suites metadata values
       captureException(new Error("Unexpected test run mode").stack, { extra: { mode } });
-
-      return [];
+      break;
   }
-}
-
-export function ModeAttribute({ summary }: { summary: Summary }) {
-  const { mode } = summary;
-  if (!mode) {
-    return null;
-  }
-
-  const [modeIcon, modeText] = getModeIcon(mode);
 
   if (modeIcon == null && modeText == null) {
     return null;
