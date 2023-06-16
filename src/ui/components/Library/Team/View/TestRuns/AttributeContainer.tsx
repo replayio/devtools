@@ -9,7 +9,7 @@ export function AttributeContainer({
   title,
 }: {
   children: ReactNode;
-  icon?: string;
+  icon?: string | null;
   title?: string | null;
   maxWidth?: string;
 }) {
