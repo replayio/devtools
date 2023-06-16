@@ -19,25 +19,29 @@ export function ModeAttribute({ summary }: { summary: Summary }) {
   let modeIcon = null;
   let modeText = null;
 
-  switch (mode) {
-    case "diagnostics":
-      modeIcon = "biotech";
-      modeText = "Diagnostic Mode";
-      break;
-    case "stress":
-      modeIcon = "repeat";
-      modeText = "Stress Test Mode";
-      break;
-    case "record-on-retry":
-      modeIcon = "repeatone";
-      modeText = "Record on Retry Mode";
-      break;
-    case "record":
-      break;
-    default:
-      // Fallback in case of unexpected Test Suites metadata values
-      captureException(new Error("Unexpected test run mode").stack, { extra: { mode } });
-      break;
+  if (mode !== null) {
+    switch (mode) {
+      case "diagnostics":
+        modeIcon = "biotech";
+        modeText = "Diagnostic Mode";
+        break;
+      case "stress":
+        modeIcon = "repeat";
+        modeText = "Stress Test Mode";
+        break;
+      case "record-on-retry":
+        modeIcon = "repeatone";
+        modeText = "Record on Retry Mode";
+        break;
+      case "record":
+        break;
+      default:
+        // Fallback in case of unexpected Test Suites metadata values
+        captureException(new Error(`Unexpected test run mode "${mode}"`).stack, {
+          extra: { mode },
+        });
+        break;
+    }
   }
 
   if (modeIcon == null && modeText == null) {
