@@ -19,6 +19,10 @@ export default function EagerEvaluationResult({
 }) {
   const { selectedPauseAndFrameId } = useContext(SelectedFrameContext);
 
+  if (expression == "") {
+    return null;
+  }
+
   let pauseId: PauseId | null = null;
   let frameId: FrameId | null = null;
   if (selectedPauseAndFrameId) {
