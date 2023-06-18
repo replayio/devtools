@@ -162,8 +162,9 @@ function RecordingPage({
 
       const isTestReplay = rec.metadata?.test && rec.metadata?.source;
       const isTestWorkspace = rec.workspace?.isTest;
+      const isCollaborator = rec.userRole == "collaborator";
 
-      if (rec.private) {
+      if (rec.private && !isCollaborator) {
         if (isTestReplay && !isTestWorkspace) {
           setExpectedError({
             content: "This recording is not available.",
