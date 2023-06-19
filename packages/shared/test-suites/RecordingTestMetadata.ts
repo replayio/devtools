@@ -314,9 +314,6 @@ export async function processCypressTestRecording(
       main: [],
     };
 
-    let beginPoint: TimeStampedPoint | null = null;
-    let endPoint: TimeStampedPoint | null = null;
-
     const navigationEvents: RecordingTestMetadataV3.NavigationEvent[] = [];
 
     // Note that event annotations may be interleaved,
@@ -358,28 +355,14 @@ export async function processCypressTestRecording(
           }
           break;
         }
-        case "test:start": {
-          beginPoint = {
-            point: annotation.point,
-            time: annotation.time,
-          };
-          break;
-        }
-        case "test:end": {
-          endPoint = {
-            point: annotation.point,
-            time: annotation.time,
-          };
-          break;
-        }
         default: {
           console.warn(`Unexpected annotation type: ${annotation.message.event}`);
         }
       }
     }
 
-    assert(beginPoint !== null, "Test must have a begin point");
-    assert(endPoint !== null, "Test must have a end point");
+    let testBeginPoint: TimeStampedPoint | null = null;
+    let testEndPoint: TimeStampedPoint | null = null;
 
     for (let sectionName in partialEvents) {
       const testEvents = events[sectionName as RecordingTestMetadataV3.TestSectionName];
@@ -426,6 +409,9 @@ export async function processCypressTestRecording(
         annotations.forEach(annotation => {
           switch (annotation.message.event) {
             case "step:end": {
+              if (!testEndPoint || comparePoints(testEndPoint.point, annotation.point) < 0) {
+                testEndPoint = { point: annotation.point, time: annotation.time };
+              }
               endPoint = {
                 point: annotation.point,
                 time: annotation.time,
@@ -439,6 +425,9 @@ export async function processCypressTestRecording(
               break;
             }
             case "step:enqueue": {
+              if (!testBeginPoint || comparePoints(testBeginPoint.point, annotation.point) > 0) {
+                testBeginPoint = { point: annotation.point, time: annotation.time };
+              }
               if (!isChaiAssertion) {
                 viewSourceTimeStampedPoint = {
                   point: annotation.point,
@@ -502,6 +491,8 @@ export async function processCypressTestRecording(
       });
     }
 
+    assert(testBeginPoint && testEndPoint, "No steps for test");
+
     // Finds the section that contains a given point
     // defaults to the main (test body) section if no matches found
     const findSection = (point: ExecutionPoint) => {
@@ -516,7 +507,11 @@ export async function processCypressTestRecording(
       return events.main;
     };
 
-    const networkRequestEvents = await processNetworkData(replayClient, beginPoint, endPoint);
+    const networkRequestEvents = await processNetworkData(
+      replayClient,
+      testBeginPoint,
+      testEndPoint
+    );
     // Now that section boundaries have been defined by user-actions,
     // merge in navigation and network events.
     navigationEvents.forEach(navigationEvent => {
@@ -538,8 +533,8 @@ export async function processCypressTestRecording(
       result,
       source,
       timeStampedPointRange: {
-        begin: beginPoint,
-        end: endPoint,
+        begin: testBeginPoint,
+        end: testEndPoint,
       },
     };
   } else if (isTestRecordingV3(testRecording)) {
@@ -564,30 +559,11 @@ export async function processGroupedTestCases(
       case "cypress": {
         const annotations = await AnnotationsCache.readAsync(replayClient);
 
-        // Annotations for the entire recording (which may include more than one test)
-        // we need to splice only the appropriate subset for each test.
-        const annotationsByTest: Annotation[][] = annotations.reduce(
-          (accumulated: Annotation[][], annotation: Annotation) => {
-            if (annotation.message.event === "test:start") {
-              // Start a new annotations array for each test
-              accumulated.push([annotation]);
-            } else if (accumulated.length > 0) {
-              // Else add new annotations to the current test
-              // (Note some recordings have annotations data before the first "test:start")
-              accumulated[accumulated.length - 1].push(annotation);
-            }
-
-            return accumulated;
-          },
-          []
-        );
-
         // GroupedTestCasesV2 and GroupedTestCases types are the same,
         // except for annotation data inside of their recorded tests
         let testRecordings: RecordingTestMetadataV3.TestRecording[] = [];
         for (let index = 0; index < partialTestRecordings.length; index++) {
           const legacyTest = partialTestRecordings[index];
-          const annotations = annotationsByTest[index];
           const test = await processCypressTestRecording(legacyTest, annotations, replayClient);
 
           testRecordings.push(test);
