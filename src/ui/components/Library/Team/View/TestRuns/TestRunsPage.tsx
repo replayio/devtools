@@ -42,11 +42,11 @@ function TestRunsContent() {
   );
 
   return (
-    <div className="flex flex-grow flex-row p-2">
+    <div className="flex flex-row flex-grow p-2">
       <PanelGroup autoSaveId="Library:TestRuns" direction="horizontal">
         <Panel minSize={20} order={1}>
-          <div className="flex h-full w-full flex-col overflow-hidden rounded-xl bg-bodyBgcolor">
-            <div className="flex flex-row items-center justify-between gap-4 border-b border-themeBorder bg-bodyBgcolor p-2">
+          <div className="flex flex-col w-full h-full overflow-hidden rounded-xl bg-bodyBgcolor">
+            <div className="flex flex-row items-center justify-between gap-4 p-2 border-b border-themeBorder bg-bodyBgcolor">
               <div
                 className="flex cursor-pointer flex-row items-center gap-2 rounded-md border-inputBorder bg-themeTextFieldBgcolor px-2.5 py-1.5 text-sm text-themeTextFieldColor focus:outline-none focus:ring focus:ring-primaryAccent"
                 onClick={onClick}
@@ -54,12 +54,12 @@ function TestRunsContent() {
                 tabIndex={0}
               >
                 {mode === "all" ? "Show all runs" : "Show only failures"}
-                <Icon className="h-5 w-5" type="chevron-down" />
+                <Icon className="w-5 h-5" type="chevron-down" />
               </div>
               {contextMenu}
               <div className="relative max-w-sm grow">
                 <input
-                  className="w-full appearance-none rounded border-none bg-black bg-opacity-10 text-xs focus:outline-none focus:ring focus:ring-primaryAccent"
+                  className="w-full text-xs bg-black border-none rounded appearance-none bg-opacity-10 focus:outline-none focus:ring focus:ring-primaryAccent"
                   onChange={event => setFilterByText(event.currentTarget.value)}
                   placeholder="Filter test runs"
                   type="text"
@@ -67,7 +67,7 @@ function TestRunsContent() {
                 />
 
                 <Icon
-                  className="absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 opacity-50"
+                  className="absolute w-4 h-4 -translate-y-1/2 opacity-50 right-4 top-1/2"
                   type="search"
                 />
               </div>
@@ -80,9 +80,9 @@ function TestRunsContent() {
 
         {focusId && (
           <>
-            <PanelResizeHandle className="h-full w-4" />
+            <PanelResizeHandle className="w-2 h-full" />
             <Panel minSize={20} order={2}>
-              <div className="h-full w-full overflow-hidden rounded-xl">
+              <div className="w-full h-full overflow-hidden rounded-xl">
                 <TestRunOverviewPage />
               </div>
             </Panel>
