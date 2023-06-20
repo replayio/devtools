@@ -1,0 +1,53 @@
+.Fallback {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  font-size: var(--font-size-regular);
+}
+
+.Header {
+  width: 100%;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 1ch;
+  padding: 0.75rem;
+}
+
+.Title {
+  flex: 1 1 auto;
+  color: var(--body-color);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-all;
+  white-space: nowrap;
+  font-size: var(--font-size-large);
+}
+
+.ErrorIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex: 0 0 1.25rem;
+}
+
+.ErrorMessage {
+  display: flex;
+  flex-direction: row;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background-color: var(--testsuites-error-bgcolor-hover);
+  color: var(--testsuites-error-color);
+  border-left: 2px solid var(--testsuites-error-border-color);
+}
+
+.ContactUsMessage {
+  padding: 0.75rem;
+}
+
+.Link {
+  color: var(--link-color);
+  text-decoration: none;
+}
+.Link:hover {
+  text-decoration: underline;
+}

@@ -828,6 +828,14 @@ export function getGroupedTestCasesFilePath(groupedTestCases: AnyGroupedTestCase
   }
 }
 
+export function getGroupedTestCasesTitle(groupedTestCases: AnyGroupedTestCases): string | null {
+  if (isGroupedTestCasesV1(groupedTestCases)) {
+    return groupedTestCases.title;
+  } else {
+    return groupedTestCases.source.title;
+  }
+}
+
 export function getTestEventExecutionPoint(
   testEvent: RecordingTestMetadataV3.TestEvent
 ): ExecutionPoint {
