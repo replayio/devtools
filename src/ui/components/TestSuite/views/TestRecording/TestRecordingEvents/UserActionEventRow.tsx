@@ -9,6 +9,7 @@ import { isExecutionPointsWithinRange } from "replay-next/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import {
   GroupedTestCases,
+  RecordingTestMetadataV3,
   TestSectionName,
   UserActionEvent,
   isUserActionTestEvent,
@@ -39,10 +40,12 @@ const cypressStepTypesToEventTypes = {
 } as const;
 
 export default memo(function UserActionEventRow({
+  groupedTestCases,
   position,
   testSectionName,
   userActionEvent,
 }: {
+  groupedTestCases: RecordingTestMetadataV3.GroupedTestCases;
   position: Position;
   testSectionName: TestSectionName;
   userActionEvent: UserActionEvent;
@@ -50,9 +53,9 @@ export default memo(function UserActionEventRow({
   const { data, timeStampedPointRange } = userActionEvent;
   const { command, error, parentId, result } = data;
 
-  const client = useContext(ReplayClientContext);
-  const { groupedTestCases, testRecording } = useContext(TestSuiteContext);
-  assert(groupedTestCases != null);
+  const replayClient = useContext(ReplayClientContext);
+
+  const { testRecording } = useContext(TestSuiteContext);
   assert(testRecording != null);
 
   const dispatch = useAppDispatch();
@@ -60,7 +63,7 @@ export default memo(function UserActionEventRow({
   const viewMode = useAppSelector(getViewMode);
   const { status: annotationsStatus, value: parsedAnnotations } = useImperativeCacheValue(
     eventListenersJumpLocationsCache,
-    client
+    replayClient
   );
 
   const [isHovered, setIsHovered] = useState(false);

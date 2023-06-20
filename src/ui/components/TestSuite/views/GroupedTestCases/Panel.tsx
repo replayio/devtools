@@ -2,23 +2,26 @@ import assert from "assert";
 import { useContext, useEffect, useMemo } from "react";
 
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
-import { GroupedTestCases, TestEnvironmentError } from "shared/test-suites/RecordingTestMetadata";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { TestEnvironmentError } from "shared/test-suites/RecordingTestMetadata";
 import { getFormattedTime } from "shared/utils/time";
 import { getTruncatedRelativeDate } from "ui/components/Library/Team/View/Recordings/RecordingListItem/RecordingListItem";
 import LabeledIcon from "ui/components/TestSuite/components/LabeledIcon";
 import { TestResultIcon } from "ui/components/TestSuite/components/TestResultIcon";
 import { RecordingCache } from "ui/components/TestSuite/suspense/RecordingCache";
+import { TestSuiteCache } from "ui/components/TestSuite/suspense/TestSuiteCache";
 import { formatTitle } from "ui/components/TestSuite/utils/formatTitle";
 import { createTestTree } from "ui/components/TestSuite/views/GroupedTestCases/createTestTree";
 import { TestRecordingTree } from "ui/components/TestSuite/views/GroupedTestCases/TestRecordingTree";
-import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext";
 import { sendTelemetryEvent } from "ui/utils/telemetry";
 
 import styles from "./Panel.module.css";
 
 export default function Panel() {
+  const replayClient = useContext(ReplayClientContext);
   const { recordingId } = useContext(SessionContext);
-  const { groupedTestCases } = useContext(TestSuiteContext);
+
+  const groupedTestCases = TestSuiteCache.read(replayClient, recordingId);
   assert(groupedTestCases != null);
 
   const { approximateDuration, environment, resultCounts, source, testRecordings } =

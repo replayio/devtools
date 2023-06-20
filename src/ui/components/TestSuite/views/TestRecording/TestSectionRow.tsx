@@ -1,7 +1,10 @@
+import assert from "assert";
 import { ReactNode, useContext, useMemo, useTransition } from "react";
 
 import { comparePoints } from "protocol/execution-point-utils";
 import Icon from "replay-next/components/Icon";
+import { SessionContext } from "replay-next/src/contexts/SessionContext";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import {
   TestEvent,
   TestSectionName,
@@ -9,6 +12,7 @@ import {
   getTestEventTime,
 } from "shared/test-suites/RecordingTestMetadata";
 import { setTimelineToTime } from "ui/actions/timeline";
+import { TestSuiteCache } from "ui/components/TestSuite/suspense/TestSuiteCache";
 import { useTestEventContextMenu } from "ui/components/TestSuite/views/TestRecording/useTestEventContextMenu";
 import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext";
 import { useAppDispatch } from "ui/setup/hooks";
@@ -26,6 +30,8 @@ export function TestSectionRow({
   testEvent: TestEvent;
   testSectionName: TestSectionName;
 }) {
+  const replayClient = useContext(ReplayClientContext);
+  const { recordingId } = useContext(SessionContext);
   const {
     setTestEvent,
     testEvent: selectedTestEvent,
@@ -55,6 +61,9 @@ export function TestSectionRow({
     return position;
   }, [selectedTestEvent, testEvent, testRecording, testSectionName]);
 
+  const groupedTestCases = TestSuiteCache.read(replayClient, recordingId);
+  assert(groupedTestCases !== null);
+
   let child: ReactNode;
   let status;
   switch (testEvent.type) {
@@ -67,6 +76,7 @@ export function TestSectionRow({
     case "user-action":
       child = (
         <UserActionEventRow
+          groupedTestCases={groupedTestCases}
           position={position}
           testSectionName={testSectionName}
           userActionEvent={testEvent}

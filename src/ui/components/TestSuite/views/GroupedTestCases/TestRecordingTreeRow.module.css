@@ -1,10 +1,16 @@
-.Row {
+.Row,
+.SkippedRow {
   display: flex;
   gap: 1ch;
-  cursor: pointer;
   transition: opacity 0.18s ease-out;
   overflow-x: hidden;
   overflow-wrap: anywhere;
+}
+.Row {
+  cursor: pointer;
+}
+.SkippedRow {
+  color: var(--color-dim);
 }
 
 .Row[data-is-pending] {
