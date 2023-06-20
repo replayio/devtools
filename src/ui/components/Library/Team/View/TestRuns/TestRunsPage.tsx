@@ -80,7 +80,7 @@ function TestRunsContent() {
 
         {focusId && (
           <>
-            <PanelResizeHandle className="h-full w-4" />
+            <PanelResizeHandle className="h-full w-2" />
             <Panel minSize={20} order={2}>
               <div className="h-full w-full overflow-hidden rounded-xl">
                 <TestRunOverviewPage />
