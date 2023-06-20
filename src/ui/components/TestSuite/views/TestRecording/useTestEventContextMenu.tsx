@@ -2,6 +2,8 @@ import { useContext } from "react";
 import { ContextMenuItem, useContextMenu } from "use-context-menu";
 
 import { assert } from "protocol/utils";
+import { SessionContext } from "replay-next/src/contexts/SessionContext";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import {
   TestEvent,
   UserActionEvent,
@@ -13,6 +15,7 @@ import { startPlayback } from "ui/actions/timeline";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { useJumpToSource } from "ui/components/TestSuite/hooks/useJumpToSource";
 import { useShowUserActionEventBoundary } from "ui/components/TestSuite/hooks/useShowUserActionEventBoundary";
+import { TestSuiteCache } from "ui/components/TestSuite/suspense/TestSuiteCache";
 import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext";
 import { useAppDispatch } from "ui/setup/hooks";
 
@@ -31,9 +34,13 @@ export function useTestEventContextMenu(testEvent: TestEvent) {
 }
 
 function JumpToSourceMenuItem({ userActionEvent }: { userActionEvent: UserActionEvent }) {
-  const { groupedTestCases, setTestEvent, testRecording } = useContext(TestSuiteContext);
-  assert(groupedTestCases != null);
+  const replayClient = useContext(ReplayClientContext);
+  const { recordingId } = useContext(SessionContext);
+  const { setTestEvent, testRecording } = useContext(TestSuiteContext);
   assert(testRecording != null);
+
+  const groupedTestCases = TestSuiteCache.read(replayClient, recordingId);
+  assert(groupedTestCases != null);
 
   const { disabled, onClick } = useJumpToSource({
     groupedTestCases,

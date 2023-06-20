@@ -22,7 +22,7 @@ export default function TestRecordingTreeRow({
 
   return (
     <li
-      className={styles.Row}
+      className={result === "skipped" ? styles.SkippedRow : styles.Row}
       data-is-pending={isPending || undefined}
       data-test-name="TestRecordingTreeRow"
       onClick={onClick}
