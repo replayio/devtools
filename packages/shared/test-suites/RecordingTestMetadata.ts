@@ -587,6 +587,16 @@ export async function processGroupedTestCases(
         const annotationsByTest: Annotation[][] = annotations.reduce(
           (accumulated: Annotation[][], annotation: Annotation) => {
             eventSwitch: switch (annotation.message.event) {
+              case "step:enqueue":
+              case "step:start": {
+                if (currentTestHasEnded) {
+                  // TODO [SCS-1186]
+                  // Ignore steps that start outside of a test boundary;
+                  // These likely correspond to beforeAll or afterAll hooks which we filter for now
+                  return accumulated;
+                }
+                break;
+              }
               case "test:start": {
                 // Tests that were skipped won't have annotations.
                 // Add empty annotations arrays for these.
@@ -613,6 +623,8 @@ export async function processGroupedTestCases(
               }
             }
 
+            // Ignore annotations that happen before the first test
+            // (These are probably beforeAll annotations, which we don't fully support yet)
             if (currentTestAnnotations) {
               currentTestAnnotations.push(annotation);
             }
