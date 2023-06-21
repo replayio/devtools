@@ -8,14 +8,13 @@ import { getThreadContext } from "devtools/client/debugger/src/reducers/pause";
 import { highlightNode, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 import { ThreadFront } from "protocol/thread";
 import { compareNumericStrings } from "protocol/utils";
-import { useCurrentFocusWindow } from "replay-next/src/hooks/useCurrentFocusWindow";
+import { useIsPointWithinFocusWindow } from "replay-next/src/hooks/useIsPointWithinFocusWindow";
 import { useNag } from "replay-next/src/hooks/useNag";
 import { RecordingTarget, recordingTargetCache } from "replay-next/src/suspense/BuildIdCache";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
 import { Nag } from "shared/graphql/types";
-import { isPointInRegion } from "shared/utils/time";
 import { UIThunkAction } from "ui/actions";
 import { fetchMouseTargetsForPause } from "ui/actions/app";
 import { enterFocusMode } from "ui/actions/timeline";
@@ -438,7 +437,7 @@ const nodePickerInstance = new NodePickerClass();
 export default function ReactDevtoolsPanel() {
   const client = useContext(ReplayClientContext);
   const currentPoint = useAppSelector(getCurrentPoint);
-  const focusWindow = useCurrentFocusWindow();
+  const isPointWithinFocusWindow = useIsPointWithinFocusWindow(currentPoint);
   const pauseId = useAppSelector(state => state.pause.id);
   const [, dismissInspectComponentNag] = useNag(Nag.INSPECT_COMPONENT);
   const [protocolCheckFailed, setProtocolCheckFailed] = useState(false);
@@ -528,7 +527,7 @@ export default function ReactDevtoolsPanel() {
     return null;
   }
 
-  if (focusWindow && !isPointInRegion(currentPoint, focusWindow)) {
+  if (!isPointWithinFocusWindow) {
     return (
       <div className="h-full bg-bodyBgcolor p-2">
         React components are unavailable because you're paused at a point outside{" "}

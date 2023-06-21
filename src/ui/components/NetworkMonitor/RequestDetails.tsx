@@ -4,8 +4,7 @@ import React, { ReactNode, useEffect, useMemo, useState } from "react";
 
 import CloseButton from "devtools/client/debugger/src/components/shared/Button/CloseButton";
 import PanelTabs from "devtools/client/shared/components/PanelTabs";
-import { useCurrentFocusWindow } from "replay-next/src/hooks/useCurrentFocusWindow";
-import { isPointInRegion } from "shared/utils/time";
+import { useIsPointWithinFocusWindow } from "replay-next/src/hooks/useIsPointWithinFocusWindow";
 import { hideRequestDetails, selectNetworkRequest } from "ui/actions/network";
 import { useAppDispatch } from "ui/setup/hooks";
 
@@ -280,7 +279,7 @@ const RequestDetails = ({
   const dispatch = useAppDispatch();
   const [activeTab, setActiveTab] = useState<NetworkTab>(DEFAULT_TAB);
 
-  const focusWindow = useCurrentFocusWindow();
+  const isRequestWithinFocusWindow = useIsPointWithinFocusWindow(request.point.point);
 
   // Keyboard shortcuts handler.
   useEffect(() => {
@@ -331,7 +330,7 @@ const RequestDetails = ({
     }
   }, [activeTab, activeTabs]);
 
-  if (focusWindow && request && !isPointInRegion(request.point.point, focusWindow)) {
+  if (!request || !isRequestWithinFocusWindow) {
     return <RequestDetailsUnavailable />;
   }
 

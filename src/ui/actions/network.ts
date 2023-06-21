@@ -53,7 +53,7 @@ export function selectNetworkRequest(requestId: RequestId): UIThunkAction {
     const focusWindow = replayClient.getCurrentFocusWindow();
 
     // Don't select a request that's not within the focus window
-    if (!record || (focusWindow && !isPointInRegion(record.timeStampedPoint.point, focusWindow))) {
+    if (!record || !focusWindow || !isPointInRegion(record.timeStampedPoint.point, focusWindow)) {
       return;
     }
 

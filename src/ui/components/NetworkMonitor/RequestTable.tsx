@@ -69,7 +69,7 @@ const RequestTable = ({
             }
 
             const isInLoadedRegion =
-              !focusWindow || isPointInRegion(row.original.point.point, focusWindow);
+              focusWindow !== null && isPointInRegion(row.original.point.point, focusWindow);
 
             prepareRow(row);
 
