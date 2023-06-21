@@ -57,7 +57,7 @@ export const ReduxDevToolsPanel = () => {
           {renderedActions}
         </div>
       </div>
-      <div className="ml-1 grow">{contents}</div>
+      <div className="ml-1 flex grow flex-col">{contents}</div>
     </div>
   );
 };

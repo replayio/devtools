@@ -141,7 +141,7 @@ export function ReduxDevToolsContents({ point, time }: RDTCProps) {
 
   return (
     <>
-      <div className={classnames("p3 flex w-full", styles.tabsContainer)}>
+      <div className={classnames("p3 flex flex w-full", styles.tabsContainer)}>
         <PanelButton
           selected={selectedTab === "action"}
           name="action"
@@ -171,7 +171,7 @@ export function ReduxDevToolsContents({ point, time }: RDTCProps) {
         </PanelButton>
       </div>
 
-      <div className="font-mono text-sm">{contents}</div>
+      <div className="overflow-y-auto font-mono text-sm">{contents}</div>
     </>
   );
 }
