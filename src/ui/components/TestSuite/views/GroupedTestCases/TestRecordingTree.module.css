@@ -18,4 +18,5 @@
   font-size: var(--font-size-medium);
   color: var(--theme-base-60);
   font-weight: bold;
+  text-transform: uppercase;
 }
