@@ -1,12 +1,11 @@
 import classNames from "classnames";
 import { Row, TableInstance } from "react-table";
 
+import { useCurrentFocusWindow } from "replay-next/src/hooks/useCurrentFocusWindow";
 import { useNag } from "replay-next/src/hooks/useNag";
 import { Nag } from "shared/graphql/types";
-import { getLoadedRegions } from "ui/reducers/app";
-import { useAppSelector } from "ui/setup/hooks";
+import { isPointInRegion } from "shared/utils/time";
 import { trackEvent } from "ui/utils/telemetry";
-import { isTimeInRegions } from "ui/utils/timeline";
 
 import { HeaderGroups } from "./HeaderGroups";
 import { RequestRow } from "./RequestRow";
@@ -36,7 +35,7 @@ const RequestTable = ({
 }) => {
   const { columns, getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = table;
 
-  const loadedRegions = useAppSelector(getLoadedRegions);
+  const focusWindow = useCurrentFocusWindow();
 
   const onSeek = (request: RequestSummary) => {
     trackEvent("net_monitor.seek_to_request");
@@ -69,9 +68,8 @@ const RequestTable = ({
               firstInFuture = true;
             }
 
-            const isInLoadedRegion = loadedRegions
-              ? isTimeInRegions(row.original.point.time, loadedRegions.loaded)
-              : false;
+            const isInLoadedRegion =
+              !focusWindow || isPointInRegion(row.original.point.point, focusWindow);
 
             prepareRow(row);
 
