@@ -25,12 +25,12 @@ export default function TestSuiteErrorFallback() {
         </div>
       </div>
       <div className={styles.ErrorMessage}>
-        <h2 className={styles.ErrorMessageHeader}>Error</h2>        
-        Test metadata could not be processed. 
+        <h2 className={styles.ErrorMessageHeader}>Error</h2>
+        Test metadata could not be processed.
         <a className={styles.Link} href="http://replay.io/discord" target="discord">
           Contact us on Discord
-        </a>       
-      </div>      
+        </a>
+      </div>
     </div>
   );
 }
