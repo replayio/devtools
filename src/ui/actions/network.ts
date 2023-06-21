@@ -9,6 +9,7 @@ import {
   networkResponseBodyCache,
 } from "replay-next/src/suspense/NetworkRequestsCache";
 import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
+import { isPointInRegion } from "shared/utils/time";
 import { RequestSummary } from "ui/components/NetworkMonitor/utils";
 import { getLoadedRegions } from "ui/reducers/app";
 import { isPointInRegions } from "ui/utils/timeline";
@@ -49,14 +50,10 @@ export function selectNetworkRequest(requestId: RequestId): UIThunkAction {
 
     const record = records[requestId];
 
-    const loadedRegions = getLoadedRegions(state);
+    const focusWindow = replayClient.getCurrentFocusWindow();
 
-    // Don't select a request that's not within a loaded region.
-    if (
-      !record ||
-      !loadedRegions ||
-      !isPointInRegions(loadedRegions.loaded, record.timeStampedPoint.point)
-    ) {
+    // Don't select a request that's not within the focus window
+    if (!record || (focusWindow && !isPointInRegion(record.timeStampedPoint.point, focusWindow))) {
       return;
     }
 

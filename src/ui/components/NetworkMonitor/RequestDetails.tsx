@@ -4,10 +4,10 @@ import React, { ReactNode, useEffect, useMemo, useState } from "react";
 
 import CloseButton from "devtools/client/debugger/src/components/shared/Button/CloseButton";
 import PanelTabs from "devtools/client/shared/components/PanelTabs";
+import { useCurrentFocusWindow } from "replay-next/src/hooks/useCurrentFocusWindow";
+import { isPointInRegion } from "shared/utils/time";
 import { hideRequestDetails, selectNetworkRequest } from "ui/actions/network";
-import { getLoadedRegions } from "ui/reducers/app";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { isPointInRegions } from "ui/utils/timeline";
+import { useAppDispatch } from "ui/setup/hooks";
 
 import AddNetworkRequestCommentButton from "./AddNetworkRequestCommentButton";
 import RequestBody from "./RequestBody";
@@ -279,7 +279,8 @@ const RequestDetails = ({
 }) => {
   const dispatch = useAppDispatch();
   const [activeTab, setActiveTab] = useState<NetworkTab>(DEFAULT_TAB);
-  const loadedRegions = useAppSelector(getLoadedRegions)?.loaded;
+
+  const focusWindow = useCurrentFocusWindow();
 
   // Keyboard shortcuts handler.
   useEffect(() => {
@@ -330,7 +331,7 @@ const RequestDetails = ({
     }
   }, [activeTab, activeTabs]);
 
-  if (!(loadedRegions && request && isPointInRegions(loadedRegions, request.point.point))) {
+  if (focusWindow && request && !isPointInRegion(request.point.point, focusWindow)) {
     return <RequestDetailsUnavailable />;
   }
 
