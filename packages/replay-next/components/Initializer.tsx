@@ -78,6 +78,8 @@ export default function Initializer({
           trackEvent: () => {},
           trackEventOnce: () => {},
         });
+
+        document.body.setAttribute("data-initialized", "true");
       };
 
       asyncInitialize();

@@ -1,7 +1,7 @@
 import { test } from "@playwright/test";
 
 import { toggleProtocolMessage, toggleProtocolMessages } from "../utils/console";
-import { getTestUrl } from "../utils/general";
+import { getTestUrl, waitForSession } from "../utils/general";
 import testSetup from "../utils/testSetup";
 
 export function beforeEach() {
@@ -13,6 +13,8 @@ export function beforeEach() {
     context.grantPermissions(["clipboard-read"]);
 
     await page.goto(getTestUrl("console"));
+
+    await waitForSession(page);
 
     await toggleProtocolMessages(page, false);
     await toggleProtocolMessage(page, "logs", true);
