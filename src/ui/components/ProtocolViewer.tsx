@@ -161,6 +161,7 @@ function ProtocolRequestDetail({
   }
 
   let reportBugLink = null;
+  let honeycombQueryLink = null;
   // If this command failed, or is hung, we might want to report it to the backend team.
   if (isInternalUser) {
     if (error != null || response == null) {
@@ -174,6 +175,25 @@ function ProtocolRequestDetail({
       reportBugLink = `${BACKEND_GITHUB_REPO_BASE_URL}/issues/new?body=${encodeURIComponent(
         body
       )}&title=${encodeURIComponent(title)}&labels=bug,bug-report`;
+
+      const qs = encodeURIComponent(
+        JSON.stringify({
+          time_range: 3600,
+          granularity: 0,
+          breakdowns: ["trace.trace_id"],
+          calculations: [{ op: "COUNT" }],
+          filters: [
+            { column: "name", op: "starts-with", value: "replayprotocol" },
+            { column: "replay.session.id", op: "=", value: window.sessionId },
+            { column: "rpc.replayprotocol.command_id", op: "=", value: request.id },
+          ],
+          filter_combination: "AND",
+          orders: [{ op: "COUNT", order: "descending" }],
+          havings: [],
+          limit: 100,
+        })
+      );
+      honeycombQueryLink = `https://ui.honeycomb.io/replay/datasets/backend?query=${qs}`;
     }
   }
 
@@ -193,6 +213,17 @@ function ProtocolRequestDetail({
                 title="Report protocol bug"
               >
                 <MaterialIcon>bug_report</MaterialIcon>
+              </a>
+            )}
+            {honeycombQueryLink != null && (
+              <a
+                className={styles.HoneycombLink}
+                href={honeycombQueryLink}
+                rel="noreferrer noopener"
+                target="_blank"
+                title="View in Honeycomb"
+              >
+                <MaterialIcon>hive</MaterialIcon>
               </a>
             )}
           </span>
