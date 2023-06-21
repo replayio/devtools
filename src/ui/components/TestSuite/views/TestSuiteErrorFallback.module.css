@@ -10,8 +10,9 @@
   flex: 0 0 auto;
   display: flex;
   align-items: center;
-  gap: 1ch;
+  gap: 0.75rem;
   padding: 0.75rem;
+  border-bottom: 1px solid var(--theme-border);
 }
 
 .Title {
@@ -24,30 +25,25 @@
   font-size: var(--font-size-large);
 }
 
-.ErrorIcon {
-  width: 1.25rem;
-  height: 1.25rem;
-  flex: 0 0 1.25rem;
+.ErrorMessageHeader {
+  font-size: var(--font-size-medium);
+  color: var(--theme-base-60);
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-bottom: .5rem;
 }
 
 .ErrorMessage {
-  display: flex;
   flex-direction: row;
   gap: 0.75rem;
-  padding: 0.75rem;
-  background-color: var(--testsuites-error-bgcolor-hover);
-  color: var(--testsuites-error-color);
-  border-left: 2px solid var(--testsuites-error-border-color);
-}
-
-.ContactUsMessage {
-  padding: 0.75rem;
+  padding: 0.75rem; 
 }
 
 .Link {
   color: var(--link-color);
   text-decoration: none;
-}
-.Link:hover {
+  display: block;
   text-decoration: underline;
 }
+
+
