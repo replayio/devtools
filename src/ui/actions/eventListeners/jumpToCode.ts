@@ -30,9 +30,9 @@ import {
 } from "ui/actions/eventListeners/eventListenerUtils";
 import { setViewMode } from "ui/actions/layout";
 import { JumpToCodeStatus } from "ui/components/shared/JumpToCodeButton";
-import { getLoadedRegions } from "ui/reducers/app";
 import { getViewMode } from "ui/reducers/layout";
 import { SourcesState, getPreferredLocation, getSourceDetailsEntities } from "ui/reducers/sources";
+import { getFocusWindow } from "ui/reducers/timeline";
 import { UIState } from "ui/state";
 import { ParsedJumpToCodeAnnotation } from "ui/suspense/annotationsCaches";
 
@@ -195,15 +195,16 @@ export function jumpToClickEventFunctionLocation(
       }
       const actualEnd = end!;
 
-      const loadedRegions = getLoadedRegions(getState());
+      const focusWindow = getFocusWindow(getState());
 
       // Safety check: don't ask for points if this time isn't loaded
-      const isEndTimeInLoadedRegion = loadedRegions?.loaded.some(
-        region => region.begin.time <= actualEnd.time && region.end.time >= actualEnd.time
-      );
+      const isEndTimeInLoadedRegion =
+        focusWindow != null &&
+        focusWindow.begin.time <= actualEnd.time &&
+        focusWindow.end.time >= actualEnd.time;
 
       if (!isEndTimeInLoadedRegion) {
-        return "not_loaded";
+        return "not_focused";
       }
 
       // Go ahead and ensure that we're on DevTools mode right away,
