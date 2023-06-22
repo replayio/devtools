@@ -13,11 +13,10 @@ import {
   useState,
 } from "react";
 
+import { useIsPointWithinFocusWindow } from "replay-next/src/hooks/useIsPointWithinFocusWindow";
 import { topFrameCache } from "replay-next/src/suspense/FrameCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { isPointInRegions } from "shared/utils/time";
 
-import useLoadedRegions from "../hooks/useRegions";
 import { pauseIdCache } from "../suspense/PauseCache";
 import { TimelineContext } from "./TimelineContext";
 
@@ -73,14 +72,13 @@ export function SelectedFrameContextRoot({
 
 function DefaultSelectedFrameContextAdapter() {
   const client = useContext(ReplayClientContext);
-  const loadedRegions = useLoadedRegions(client);
   const { executionPoint, time } = useContext(TimelineContext);
   const { setSelectedPauseAndFrameId } = useContext(SelectedFrameContext);
 
-  const isLoaded = loadedRegions !== null && isPointInRegions(executionPoint, loadedRegions.loaded);
+  const isWithinFocusWindow = useIsPointWithinFocusWindow(executionPoint);
 
   useLayoutEffect(() => {
-    if (!isLoaded) {
+    if (!isWithinFocusWindow) {
       return;
     }
 
@@ -115,7 +113,7 @@ function DefaultSelectedFrameContextAdapter() {
     return () => {
       cancelled = true;
     };
-  }, [client, executionPoint, time, isLoaded, setSelectedPauseAndFrameId]);
+  }, [client, executionPoint, isWithinFocusWindow, setSelectedPauseAndFrameId, time]);
 
   return null;
 }
