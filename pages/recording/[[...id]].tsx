@@ -1,6 +1,6 @@
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { GetServerSideProps, GetStaticProps } from "next/types";
+import { GetServerSideProps } from "next/types";
 import React, { useContext, useEffect, useState } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
@@ -161,23 +161,7 @@ function RecordingPage({
       setRecording(rec);
 
       const isTestReplay = rec.metadata?.test && rec.metadata?.source;
-      const isTestWorkspace = rec.workspace?.isTest;
-
-      if (rec.private) {
-        if (isTestReplay && !isTestWorkspace) {
-          setExpectedError({
-            content: "This recording is not available.",
-            message: "The recording must belong to a test suite",
-          });
-        } else if (!isTestReplay && isTestWorkspace) {
-          setExpectedError({
-            content: "This recording is not available.",
-            message: "The recording cannot be in a test suite",
-          });
-        }
-      }
-
-      if (rec.metadata?.test) {
+      if (isTestReplay) {
         trackEvent("session_start.test");
       }
 
