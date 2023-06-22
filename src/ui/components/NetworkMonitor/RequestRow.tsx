@@ -2,6 +2,7 @@ import classNames from "classnames";
 import React, { useLayoutEffect, useRef } from "react";
 import { Row } from "react-table";
 
+import { useIsPointWithinFocusWindow } from "replay-next/src/hooks/useIsPointWithinFocusWindow";
 import useNetworkContextMenu from "ui/components/NetworkMonitor/useNetworkContextMenu";
 
 import { RequestSummary } from "./utils";
@@ -10,7 +11,6 @@ import styles from "./RequestTable.module.css";
 export const RequestRow = ({
   currentTime,
   isFirstInFuture,
-  isInLoadedRegion,
   isInPast,
   isSelected,
   onClick,
@@ -19,7 +19,6 @@ export const RequestRow = ({
 }: {
   currentTime: number;
   isFirstInFuture: boolean;
-  isInLoadedRegion: boolean;
   isInPast: boolean;
   isSelected: boolean;
   onClick: (row: RequestSummary) => void;
@@ -28,6 +27,8 @@ export const RequestRow = ({
 }) => {
   const prevIsSelectedRef = useRef<boolean>(false);
   const ref = useRef<HTMLDivElement>(null);
+
+  const isInLoadedRegion = useIsPointWithinFocusWindow(row.original.point.point);
 
   // Make sure newly selected Network requests have been scrolled into view.
   useLayoutEffect(() => {

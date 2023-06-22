@@ -16,11 +16,10 @@ import { SelectedFrameContext } from "replay-next/src/contexts/SelectedFrameCont
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { NewTerminalExpression, TerminalContext } from "replay-next/src/contexts/TerminalContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
-import { useCurrentFocusWindow } from "replay-next/src/hooks/useCurrentFocusWindow";
+import { useIsPointWithinFocusWindow } from "replay-next/src/hooks/useIsPointWithinFocusWindow";
 import useLoadedRegions from "replay-next/src/hooks/useRegions";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
-import { isPointInRegion } from "shared/utils/time";
 
 import { ConsoleSearchContext } from "./ConsoleSearchContext";
 import EagerEvaluationResult from "./EagerEvaluationResult";
@@ -28,14 +27,14 @@ import useTerminalHistory from "./hooks/useTerminalHistory";
 import styles from "./ConsoleInput.module.css";
 
 export default function ConsoleInput({ inputRef }: { inputRef?: RefObject<ImperativeHandle> }) {
-  const focusWindow = useCurrentFocusWindow();
-
   const { executionPoint } = useContext(TimelineContext);
   const { enterFocusMode } = useContext(FocusContext);
 
+  const isPointWithinFocusWindow = useIsPointWithinFocusWindow(executionPoint);
+
   let disabledMessage = null;
   let disabledReason = undefined;
-  if (!focusWindow || !isPointInRegion(executionPoint, focusWindow)) {
+  if (!isPointWithinFocusWindow) {
     disabledReason = "not-focused";
     disabledMessage = (
       <>

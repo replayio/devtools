@@ -7,9 +7,8 @@ import LayoutApp from "devtools/client/inspector/layout/components/LayoutApp";
 import MarkupApp from "devtools/client/inspector/markup/components/MarkupApp";
 import { RulesApp } from "devtools/client/inspector/rules/components/RulesApp";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
-import { isPointInRegions } from "shared/utils/time";
+import { useIsPointWithinFocusWindow } from "replay-next/src/hooks/useIsPointWithinFocusWindow";
 import { enterFocusMode } from "ui/actions/timeline";
-import { getLoadedRegions } from "ui/reducers/app";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 import { ResponsiveTabs, Tab } from "../../shared/components/ResponsiveTabs";
@@ -35,9 +34,9 @@ export default function InspectorApp() {
   const dispatch = useAppDispatch();
   const activeTab = useAppSelector(state => state.inspector.activeTab);
   const { executionPoint } = useContext(TimelineContext);
-  const loadedRegions = useAppSelector(getLoadedRegions);
 
-  if (!isPointInRegions(executionPoint, loadedRegions?.loaded ?? [])) {
+  const isPointWithinFocusWindow = useIsPointWithinFocusWindow(executionPoint);
+  if (!isPointWithinFocusWindow) {
     return (
       <div className="inspector-responsive-container bg-bodyBgcolor p-2">
         Elements are unavailable because you're paused at a point outside{" "}
