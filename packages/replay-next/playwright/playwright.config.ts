@@ -18,6 +18,8 @@ const config: FullConfig = {
   retries: RECORD_VIDEO || VISUAL_DEBUG ? 0 : 2,
   snapshotDir: "./snapshots",
   use: {
+    // Don't allow any one action to take more than 15s
+    actionTimeout: 15_000,
     browserName: "chromium",
     launchOptions: {
       slowMo,
@@ -31,7 +33,9 @@ const config: FullConfig = {
   testDir: __dirname,
   testMatch: ["tests/**/*.ts"],
   testIgnore: ["tests/**/beforeEach.ts", "tests/**/shared.ts", "tests/utils/*"],
-  timeout: 30_000,
+
+  // Give individual tests a while to complete instead of default 30s
+  timeout: 120_000,
 };
 
 if (CI) {

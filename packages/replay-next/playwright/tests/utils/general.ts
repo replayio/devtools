@@ -261,3 +261,21 @@ export async function waitFor(
     }
   }
 }
+
+export async function waitForSession(page: Page): Promise<void> {
+  // When Replay is under heavy load, the backend may need to scale up AWS resources.
+  // This should not cause e2e tests to fail, even though it takes longer than the default 15s timeout.
+  // Relaxing only the initial check allows more time for the backend to scale up
+  // without compromising the integrity of the tests overall.
+
+  await waitFor(
+    async () => {
+      const value = await page.locator("body").getAttribute("data-initialized");
+      expect(value).toBe("true");
+    },
+    {
+      retryInterval: 1_000,
+      timeout: 60_000,
+    }
+  );
+}

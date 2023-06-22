@@ -66,6 +66,14 @@ export async function startTest(page: Page, example: string, apiKey?: string) {
 
   await page.goto(url);
 
+  // When Replay is under heavy load, the backend may need to scale up AWS resources.
+  // This should not cause e2e tests to fail, even though it takes longer than the default 15s timeout.
+  // Relaxing only the initial check allows more time for the backend to scale up
+  // without compromising the integrity of the tests overall.
+  await page.locator('[data-panel-id="Panel-SidePanel"]').waitFor({
+    timeout: 60_000,
+  });
+
   // Wait for the recording basic information to load such that the primary tabs are visible.
   if (example.startsWith("node")) {
     await page.locator('[data-panel-id="Panel-SecondaryToolbox"]').waitFor();
@@ -74,5 +82,4 @@ export async function startTest(page: Page, example: string, apiKey?: string) {
     await page.locator('[data-test-id="ViewToggle-Viewer"]').waitFor();
     await page.locator('[data-test-id="ViewToggle-DevTools"]').waitFor();
   }
-  await page.locator('[data-panel-id="Panel-SidePanel"]').waitFor();
 }
