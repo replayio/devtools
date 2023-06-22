@@ -1,10 +1,10 @@
-import { PauseId, TimeStampedPointRange } from "@replayio/protocol";
+import { PauseId } from "@replayio/protocol";
 
 import { framesCache } from "replay-next/src/suspense/FrameCache";
 import { frameStepsCache } from "replay-next/src/suspense/FrameStepsCache";
 import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientInterface } from "shared/client/types";
-import { isPointInRegions } from "ui/utils/timeline";
+import { FocusWindow } from "ui/state/timeline";
 
 // returns undefined if the async parent pause doesn't exist
 // or null if it is not in a loaded region
@@ -12,7 +12,7 @@ export function getAsyncParentPauseIdSuspense(
   replayClient: ReplayClientInterface,
   pauseId: PauseId,
   asyncIndex: number,
-  loadedRegions: TimeStampedPointRange[]
+  focusWindow: FocusWindow
 ): PauseId | null | undefined {
   while (asyncIndex > 0) {
     const frames = framesCache.read(replayClient, pauseId)!;
@@ -23,9 +23,16 @@ export function getAsyncParentPauseIdSuspense(
     if (!steps || steps.length === 0) {
       return;
     }
-    if (!isPointInRegions(loadedRegions, steps[0].point)) {
+
+    const executionPoint = steps[0].point;
+    if (
+      focusWindow === null ||
+      focusWindow.begin.point > executionPoint ||
+      focusWindow.end.point < executionPoint
+    ) {
       return null;
     }
+
     const parentPauseId = pauseIdCache.read(replayClient, steps[0].point, steps[0].time);
     if (parentPauseId === pauseId) {
       return;

@@ -17,6 +17,7 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { enterFocusMode } from "ui/actions/timeline";
 import { getLoadedRegions } from "ui/reducers/app";
 import { getSourcesLoading } from "ui/reducers/sources";
+import { getFocusWindow } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { getPauseFramesSuspense } from "ui/suspense/frameCache";
 import { getAsyncParentPauseIdSuspense } from "ui/suspense/util";
@@ -41,10 +42,10 @@ function FramesRenderer({
 }) {
   const replayClient = useContext(ReplayClientContext);
   const sourcesState = useAppSelector(state => state.sources);
-  const loadedRegions = useAppSelector(getLoadedRegions);
+  const focusWindow = useAppSelector(getFocusWindow);
   const dispatch = useAppDispatch();
 
-  if (!loadedRegions?.loaded) {
+  if (focusWindow === null) {
     return null;
   }
 
@@ -61,7 +62,7 @@ function FramesRenderer({
     replayClient,
     pauseId,
     asyncIndex,
-    loadedRegions?.loaded
+    focusWindow
   );
   if (asyncParentPauseId === null) {
     return (
