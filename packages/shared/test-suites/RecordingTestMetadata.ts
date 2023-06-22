@@ -865,14 +865,14 @@ export function isGroupedTestCasesV2(
   value: AnyGroupedTestCases
 ): value is RecordingTestMetadataV2.GroupedTestCases {
   const schemaVersion = (value as any).schemaVersion;
-  return schemaVersion != null && satisfies(schemaVersion, "~2.0.0");
+  return schemaVersion != null && satisfies(schemaVersion, "^2.0.0");
 }
 
 export function isGroupedTestCasesV3(
   value: AnyGroupedTestCases
 ): value is RecordingTestMetadataV3.GroupedTestCases {
   const schemaVersion = (value as any).schemaVersion;
-  return schemaVersion != null && satisfies(schemaVersion, "~3.0.0");
+  return schemaVersion != null && satisfies(schemaVersion, "^3.0.0");
 }
 
 export function isNavigationTestEvent(
