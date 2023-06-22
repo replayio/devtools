@@ -70,13 +70,15 @@ test("cypress-01: Basic Test Suites panel functionality", async ({ page }) => {
 
   // Test suite metadata
 
-  // Relative date will always change, so just check that it exists
-  // Also, these icons have hidden text content.
-  // Simplest way to check is just see if the text exists at the end
-  expect(await getTestSuiteDate(page).textContent()).toMatch(/ ago$/);
-  expect(await getTestSuiteUser(page).textContent()).toMatch(/ryanjduffy$/);
-  expect(await getTestSuiteBranch(page).textContent()).toMatch(/ryan\/metadata-v2$/);
-  expect(await getTestSuiteDuration(page).textContent()).toMatch(/0\:15$/);
+  // These icons have hidden text content.
+  // Simplest way to check is just see if the text exists.
+
+  // Relative dates can change over time.
+  // Check for either the "X units ago" text, or the literal date.
+  expect(await getTestSuiteDate(page).textContent()).toMatch(/ ago|(6\/5\/2023)/);
+  expect(await getTestSuiteUser(page).textContent()).toMatch("ryanjduffy");
+  expect(await getTestSuiteBranch(page).textContent()).toMatch("ryan/metadata-v2");
+  expect(await getTestSuiteDuration(page).textContent()).toMatch("0:15");
 
   // can open tests
   await firstTest.click();
