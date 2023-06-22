@@ -271,7 +271,7 @@ export async function waitForSession(page: Page): Promise<void> {
   await waitFor(
     async () => {
       const value = await page.locator("body").getAttribute("data-initialized");
-      expect(value).toBe("true", "Replay session not initialized");
+      expect(value).toBe("true");
     },
     {
       retryInterval: 1_000,
