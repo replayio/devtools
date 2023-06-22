@@ -217,7 +217,7 @@ export namespace RecordingTestMetadataV3 {
       // Used to associate chained commands
       parentId: string | null;
 
-      // This value comes from annotations and so is only avaiable for Cypress tests (for now)
+      // This value comes from annotations and so is only available for Cypress tests (for now)
       result: {
         timeStampedPoint: TimeStampedPoint;
         variable: string;
@@ -227,13 +227,13 @@ export namespace RecordingTestMetadataV3 {
       // for example, before/after actions have different scopes
       scope: string[] | null;
 
-      // This value comes from annotations and so is only avaiable for Cypress tests (for now)
+      // This value comes from annotations and so is only available for Cypress tests (for now)
       viewSourceTimeStampedPoint: TimeStampedPoint | null;
     };
 
     // Precisely defines the start/stop execution points (and times) for the action
-    // This value comes from annotations and so is only avaiable for Cypress tests (for now)
-    timeStampedPointRange: TimeStampedPointRange;
+    // This value comes from annotations and so is only available for Cypress tests (for now)
+    timeStampedPointRange: TimeStampedPointRange | null;
 
     type: "user-action";
   }
@@ -530,15 +530,11 @@ export async function processCypressTestRecording(
       // merge in navigation and network events.
       navigationEvents.forEach(navigationEvent => {
         const events = findSection(navigationEvent.timeStampedPoint.point);
-        insert(events, navigationEvent, (a, b) =>
-          comparePoints(getTestEventExecutionPoint(a), getTestEventExecutionPoint(b))
-        );
+        insert(events, navigationEvent, compareTestEventExecutionPoints);
       });
       networkRequestEvents.forEach(networkRequestEvent => {
         const events = findSection(networkRequestEvent.timeStampedPoint.point);
-        insert(events, networkRequestEvent, (a, b) =>
-          comparePoints(getTestEventExecutionPoint(a), getTestEventExecutionPoint(b))
-        );
+        insert(events, networkRequestEvent, compareTestEventExecutionPoints);
       });
     }
 
@@ -749,10 +745,7 @@ export async function processPlaywrightTestRecording(
             scope,
             viewSourceTimeStampedPoint: null,
           },
-          // HACK
-          // This will be filled in below;
-          // There are asserts to ensure it
-          timeStampedPointRange: null as any,
+          timeStampedPointRange: null,
           type: "user-action",
         });
       });
@@ -838,11 +831,13 @@ export function getGroupedTestCasesTitle(groupedTestCases: AnyGroupedTestCases):
 
 export function getTestEventExecutionPoint(
   testEvent: RecordingTestMetadataV3.TestEvent
-): ExecutionPoint {
+): ExecutionPoint | null {
   if (isNavigationTestEvent(testEvent) || isNetworkRequestTestEvent(testEvent)) {
     return testEvent.timeStampedPoint.point;
   } else {
-    return testEvent.timeStampedPointRange.begin.point;
+    return testEvent.timeStampedPointRange !== null
+      ? testEvent.timeStampedPointRange.begin.point
+      : null;
   }
 }
 
@@ -913,4 +908,25 @@ export function isUserActionTestEvent(
   value: TestEvent
 ): value is RecordingTestMetadataV3.UserActionEvent {
   return value.type === "user-action";
+}
+
+export function compareTestEventExecutionPoints(
+  a: RecordingTestMetadataV3.TestEvent,
+  b: RecordingTestMetadataV3.TestEvent
+): number {
+  const executionPointA = getTestEventExecutionPoint(a);
+  const executionPointB = getTestEventExecutionPoint(b);
+
+  // These comparisons should never actually be needed;
+  // Playwright events will always have null timestamped points
+  // and Cypress tests will always have timestamped points
+  if (executionPointA === null && executionPointB === null) {
+    return 0;
+  } else if (executionPointA === null) {
+    return 1;
+  } else if (executionPointB === null) {
+    return -1;
+  } else {
+    return comparePoints(executionPointA, executionPointB);
+  }
 }
