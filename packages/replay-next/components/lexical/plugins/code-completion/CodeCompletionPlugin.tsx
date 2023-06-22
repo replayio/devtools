@@ -1,10 +1,10 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { mergeRegister } from "@lexical/utils";
-import { ExecutionPoint, FrameId, PauseId } from "@replayio/protocol";
+import { ExecutionPoint } from "@replayio/protocol";
 import { $createTextNode, TextNode } from "lexical";
 import { useContext, useEffect } from "react";
 
-import useRegions from "replay-next/src/hooks/useRegions";
+import { useCurrentFocusWindow } from "replay-next/src/hooks/useCurrentFocusWindow";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import TypeAheadPlugin from "../typeahead/TypeAheadPlugin";
@@ -31,18 +31,10 @@ export default function CodeCompletionPlugin({
 
   const replayClient = useContext(ReplayClientContext);
 
-  const loadedRegions = useRegions(replayClient);
+  const focusWindow = useCurrentFocusWindow();
 
   const findMatchesWrapper = (query: string, queryScope: string | null) => {
-    return findMatches(
-      query,
-      queryScope,
-      replayClient,
-      executionPoint,
-      time,
-      loadedRegions,
-      context
-    );
+    return findMatches(query, queryScope, replayClient, executionPoint, time, focusWindow, context);
   };
 
   useEffect(() => {
