@@ -123,7 +123,7 @@ export const executeCommandOperation = createAsyncThunk<
   { state: UIState; extra: ThunkExtraArgs }
 >("pause/executeCommand", async ({ cx, command }, thunkApi) => {
   const { extra, getState } = thunkApi;
-  const { ThreadFront, replayClient } = extra;
+  const { replayClient } = extra;
   const state = getState();
   const loadedRegions = getLoadedRegions(state)!;
   const sourceId = getSelectedSourceId(state);

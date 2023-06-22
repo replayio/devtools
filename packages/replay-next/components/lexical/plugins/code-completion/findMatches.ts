@@ -5,7 +5,6 @@ import {
   Property,
   Scope,
   TimeStampedPointRange,
-  loadedRegions,
 } from "@replayio/protocol";
 
 import { getPauseAndFrameIdSuspends } from "replay-next/components/sources/utils/getPauseAndFrameId";
