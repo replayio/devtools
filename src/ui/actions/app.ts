@@ -1,4 +1,4 @@
-import { KeyboardEvent, NodeBounds, loadedRegions } from "@replayio/protocol";
+import { KeyboardEvent, NodeBounds } from "@replayio/protocol";
 import groupBy from "lodash/groupBy";
 
 import {
@@ -11,20 +11,15 @@ import { ThreadFront as ThreadFrontType } from "protocol/thread";
 import { ReplayClientInterface } from "shared/client/types";
 import { shallowEqual } from "shared/utils/compare";
 import { CommandKey } from "ui/components/CommandPalette/CommandPalette";
-import { getEventsForType } from "ui/reducers/app";
-import { getTheme } from "ui/reducers/app";
+import { getEventsForType, getTheme } from "ui/reducers/app";
 import { Canvas, EventKind, ReplayEvent, ReplayNavigationEvent } from "ui/state/app";
 import { boundingRectsCache } from "ui/suspense/nodeCaches";
 import { compareBigInt } from "ui/utils/helpers";
 import { getRecordingId } from "ui/utils/recording";
 
 import {
-  getIsIndexed,
-  getLoadingStatusSlow,
   loadReceivedEvents,
   setCanvas as setCanvasAction,
-  setLoadedRegions,
-  setLoadingStatusSlow,
   setModal,
   setMouseTargetsLoading,
   setSessionId,
@@ -42,16 +37,6 @@ import { UIStore, UIThunkAction } from ".";
 
 export * from "../reducers/app";
 
-const supportsPerformanceNow =
-  typeof performance !== "undefined" && typeof performance.now === "function";
-
-function now(): number {
-  if (supportsPerformanceNow) {
-    return performance.now();
-  }
-  return Date.now();
-}
-
 export async function setupApp(
   store: UIStore,
   ThreadFront: typeof ThreadFrontType,
@@ -68,48 +53,6 @@ export async function setupApp(
     replayClient.findNavigationEvents(({ events }) =>
       onNavigationEvents(events as ReplayNavigationEvent[], store)
     );
-  });
-
-  // The backend doesn't give up on loading and indexing; apparently it keeps trying until the entire session errors.
-  // Practically speaking though, there are cases where updates take so long it feels like things are broken.
-  // In that case the UI should show a visual indicator that the loading is slow.
-  //
-  // We can rely on the fact that even when loading takes a long time, we should still be getting regular progress updates.
-  // If too much time passes between these updates, we can infer that things are either slow, or we're in a stuck state (aka an "error" for all practical purposes).
-  //
-  // If another update eventually comes in we will reset the slow/timed-out flag.
-  const LOADING_STATUS_SLOW_THRESHOLD = 10000;
-  let lastLoadChangeUpdateTime = now();
-
-  function checkLoadingStatus() {
-    const isLoadingFinished = getIsIndexed(store.getState());
-    if (isLoadingFinished) {
-      return;
-    }
-
-    const loadingStatusSlow = getLoadingStatusSlow(store.getState());
-    const currentTime = now();
-    const elapsedTime = currentTime - lastLoadChangeUpdateTime;
-
-    if (elapsedTime > LOADING_STATUS_SLOW_THRESHOLD) {
-      if (!loadingStatusSlow) {
-        store.dispatch(setLoadingStatusSlow(true));
-      }
-    } else {
-      if (loadingStatusSlow) {
-        store.dispatch(setLoadingStatusSlow(false));
-      }
-    }
-
-    setTimeout(checkLoadingStatus, 1000);
-  }
-
-  checkLoadingStatus();
-
-  replayClient.addEventListener("loadedRegionsChange", (loadedRegions: loadedRegions) => {
-    lastLoadChangeUpdateTime = now();
-
-    store.dispatch(setLoadedRegions(loadedRegions));
   });
 }
 

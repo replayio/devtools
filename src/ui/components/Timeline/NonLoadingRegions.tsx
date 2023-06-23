@@ -1,30 +1,24 @@
-import { getNonLoadingTimeRanges } from "ui/reducers/app";
+import { useNonLoadingTimeRanges } from "ui/components/Timeline/useNonLoadingTimeRanges";
 import { getZoomRegion } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
-import { TimeRange } from "ui/utils/app";
-
-const NonLoadingRegion = ({ range }: { range: TimeRange }) => {
-  const { endTime } = useAppSelector(getZoomRegion)!;
-  const { start, end } = range;
-  const style = {
-    left: `${(start / endTime) * 100}%`,
-    width: `${((end - start) / endTime) * 100}%`,
-  };
-
-  return (
-    <div className="unfocused-regions-container start" style={style}>
-      <div className="unfocused-regions" />
-    </div>
-  );
-};
 
 export default function NonLoadingRegions() {
-  const timeRanges = useAppSelector(getNonLoadingTimeRanges);
+  const { endTime } = useAppSelector(getZoomRegion);
+  const nonLoadingTimeRanges = useNonLoadingTimeRanges();
 
   return (
     <>
-      {timeRanges.map((r, i) => (
-        <NonLoadingRegion key={i} range={r} />
+      {nonLoadingTimeRanges.map((timeRange, index) => (
+        <div
+          className="unfocused-regions-container start"
+          key={index}
+          style={{
+            left: `${(timeRange.start / endTime) * 100}%`,
+            width: `${((timeRange.end - timeRange.start) / endTime) * 100}%`,
+          }}
+        >
+          <div className="unfocused-regions" />
+        </div>
       ))}
     </>
   );

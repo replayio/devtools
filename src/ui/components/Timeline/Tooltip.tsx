@@ -1,7 +1,7 @@
 import React from "react";
 
 import { getFormattedTime } from "shared/utils/time";
-import { getNonLoadingTimeRanges } from "ui/reducers/app";
+import { useNonLoadingTimeRanges } from "ui/components/Timeline/useNonLoadingTimeRanges";
 import {
   getFocusWindow,
   getHoverTime,
@@ -15,7 +15,8 @@ export default function Tooltip({ timelineWidth }: { timelineWidth: number }) {
   const hoverTime = useAppSelector(getHoverTime);
   const zoomRegion = useAppSelector(getZoomRegion);
   const showFocusModeControls = useAppSelector(getShowFocusModeControls);
-  const nonLoadingRegion = useAppSelector(getNonLoadingTimeRanges);
+  const nonLoadingTimeRanges = useNonLoadingTimeRanges();
+
   const focusWindow = useAppSelector(getFocusWindow);
 
   if (!hoverTime || showFocusModeControls) {
@@ -24,7 +25,7 @@ export default function Tooltip({ timelineWidth }: { timelineWidth: number }) {
 
   let offset = getVisiblePosition({ time: hoverTime, zoom: zoomRegion }) * timelineWidth;
 
-  const isHoveredOnNonLoadingRegion = nonLoadingRegion.some(
+  const isHoveredOnNonLoadingRegion = nonLoadingTimeRanges.some(
     ({ start, end }) => start <= hoverTime && end >= hoverTime
   );
 

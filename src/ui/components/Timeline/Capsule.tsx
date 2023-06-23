@@ -2,8 +2,9 @@ import classNames from "classnames";
 import React, { useEffect, useRef, useState } from "react";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 
-import { getIndexedProgress, getLoadingStatusSlow } from "ui/actions/app";
 import ExternalLink from "ui/components/shared/ExternalLink";
+import { useIndexingProgress } from "ui/components/Timeline/useIndexingProgress";
+import { useLoadingIsSlow } from "ui/components/Timeline/useLoadingIsSlow";
 import { useFeature } from "ui/hooks/settings";
 import useModalDismissSignal from "ui/hooks/useModalDismissSignal";
 import { getBasicProcessingProgress, getShowFocusModeControls } from "ui/reducers/timeline";
@@ -21,15 +22,15 @@ export default function Capsule({
 }: {
   setShowLoadingProgress: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const indexingProgress = Math.round(useAppSelector(getIndexedProgress) * 100);
+  const indexingProgress = useIndexingProgress();
   const basicProcessingProgress = Math.round(useAppSelector(getBasicProcessingProgress) * 100);
-  let progress = indexingProgress;
   const { value: basicProcessingLoadingBar } = useFeature("basicProcessingLoadingBar");
 
+  let progress = indexingProgress;
   if (basicProcessingLoadingBar) {
     progress = Math.round((basicProcessingProgress + indexingProgress) / 2);
   }
-  const loadingStatusSlow = useAppSelector(getLoadingStatusSlow);
+
   const showFocusModeControls = useAppSelector(getShowFocusModeControls);
 
   return (
@@ -42,11 +43,7 @@ export default function Capsule({
         {showFocusModeControls || progress === 100 ? (
           <FocusInputs />
         ) : (
-          <LoadingState
-            loadingStatusSlow={loadingStatusSlow}
-            progress={progress}
-            setShowLoadingProgress={setShowLoadingProgress}
-          />
+          <LoadingState progress={progress} setShowLoadingProgress={setShowLoadingProgress} />
         )}
       </div>
       <EditFocusButton />
@@ -55,21 +52,21 @@ export default function Capsule({
 }
 
 function LoadingState({
-  loadingStatusSlow,
   progress,
   setShowLoadingProgress,
 }: {
-  loadingStatusSlow: boolean;
   progress: number;
   setShowLoadingProgress: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const onMouseEnter = () => setShowLoadingProgress(true);
   const onMouseLeave = () => setShowLoadingProgress(false);
 
+  const loadingIsSlow = useLoadingIsSlow();
+
   return (
     <>
       <div className={styles.LoadingState} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
-        {loadingStatusSlow ? <SlowLoadingIcon /> : <RadialProgress progress={progress} />}
+        {loadingIsSlow ? <SlowLoadingIcon /> : <RadialProgress progress={progress} />}
         <div className={styles.LoadingText}>{Math.round(progress)}%</div>
       </div>
     </>

@@ -1,5 +1,8 @@
 import { ExecutionPoint, PointRange, TimeStampedPointRange } from "@replayio/protocol";
 
+const supportsPerformanceNow =
+  typeof performance !== "undefined" && typeof performance.now === "function";
+
 export function isRangeInRegions(
   range: TimeStampedPointRange | PointRange,
   regions: TimeStampedPointRange[]
@@ -105,4 +108,10 @@ export function getFormattedTime(time: number, showMilliseconds: boolean = false
   } else {
     return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   }
+}
+export function now(): number {
+  if (supportsPerformanceNow) {
+    return performance.now();
+  }
+  return Date.now();
 }

@@ -200,6 +200,7 @@ export function createMockReplayClient() {
   mockClient.findNavigationEvents.mockImplementation(async () => {});
   mockClient.findSources.mockImplementation(async () => []);
   mockClient.removeEventListener.mockImplementation(() => {});
+  mockClient.getCurrentFocusWindow.mockImplementation(() => null);
 
   return mockClient;
 }
