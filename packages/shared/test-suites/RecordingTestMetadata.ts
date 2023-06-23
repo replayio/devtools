@@ -163,12 +163,20 @@ export namespace RecordingTestMetadataV3 {
   }
 
   export interface TestRecording {
+    // Useful for identifying retries of a failed test
+    attempt: number;
+
     // An error that occurred for this test that was unrelated to a specific event
     // e.g. a JS runtime error in the cypress spec file
     error: TestError | null;
 
     // Actions that were part of this test, grouped by section (or "hook")
     events: Record<TestSectionName, TestEvent[]>;
+
+    // Uniquely identifies a test within a group of tests
+    // This can be used to differentiate multiple tests with the same name (and scope)
+    // or retries of a single test after a failed attempt
+    id: number | string;
 
     // Note that the client does not necessarily have any expectations of ordering here;
     // we will likely order results lexicographically, by title.
@@ -304,7 +312,7 @@ export async function processCypressTestRecording(
   replayClient: ReplayClientInterface
 ): Promise<RecordingTestMetadataV3.TestRecording> {
   if (isTestRecordingV2(testRecording)) {
-    const { error, events: partialEvents, result, source } = testRecording;
+    const { attempt, error, events: partialEvents, id, result, source } = testRecording;
 
     const events: RecordingTestMetadataV3.TestRecording["events"] = {
       afterAll: [],
@@ -543,8 +551,10 @@ export async function processCypressTestRecording(
     }
 
     return {
+      attempt,
       error,
       events,
+      id,
       result,
       source,
       timeStampedPointRange:
@@ -615,6 +625,13 @@ export async function processGroupedTestCases(
                     }
                   }
                 }
+
+                const currentTest = partialTestRecordings[currentTestRecordingIndex];
+                assert(
+                  currentTest?.id === annotation.message.testId,
+                  `Test id should match "test:start" annotation testId`
+                );
+
                 break;
               }
               case "test:end": {
@@ -688,7 +705,7 @@ export async function processPlaywrightTestRecording(
   testRecording: RecordingTestMetadataV2.TestRecording | RecordingTestMetadataV3.TestRecording
 ): Promise<RecordingTestMetadataV3.TestRecording> {
   if (isTestRecordingV2(testRecording)) {
-    const { error, events: partialEvents, result, source } = testRecording;
+    const { attempt, error, events: partialEvents, id, result, source } = testRecording;
 
     const events: RecordingTestMetadataV3.TestRecording["events"] = {
       afterAll: [],
@@ -759,8 +776,10 @@ export async function processPlaywrightTestRecording(
     }
 
     return {
+      attempt,
       error,
       events,
+      id,
       result,
       source,
       timeStampedPointRange: null,
