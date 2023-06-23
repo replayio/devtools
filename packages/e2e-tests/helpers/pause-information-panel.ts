@@ -151,7 +151,7 @@ export async function openScopeBlocks(page: Page, text: string): Promise<void> {
 export async function resumeToLine(page: Page, line: number): Promise<void> {
   await debugPrint(page, `Resuming to line ${chalk.bold(line)}`, "resumeToLine");
 
-  await clickCommandBarButton(page, "Resume F8");
+  await clickCommandBarButton(page, "Resume");
 
   await waitForPaused(page, line);
 }
@@ -161,7 +161,7 @@ export async function clickCommandBarButton(page: Page, title: string): Promise<
 
   await openPauseInformationPanel(page);
 
-  const button = page.locator(`[title="${title}"]`);
+  const button = page.locator(`[title*="${title}"]`);
   await button.isEnabled();
   await button.click();
 }
