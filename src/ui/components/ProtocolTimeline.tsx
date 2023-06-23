@@ -2,8 +2,8 @@ import { TimeStampedPoint, TimeStampedPointRange } from "@replayio/protocol";
 import clamp from "lodash/clamp";
 
 import { gPaintPoints, hasAllPaintPoints } from "protocol/graphics";
+import useLoadedRegions from "replay-next/src/hooks/useLoadedRegions";
 import { useFeature } from "ui/hooks/settings";
-import { getLoadedRegions } from "ui/reducers/app";
 import { getZoomRegion } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
 
@@ -69,7 +69,8 @@ const Spans = ({
 };
 
 export default function ProtocolTimeline() {
-  const loadedRegions = useAppSelector(getLoadedRegions);
+  const loadedRegions = useLoadedRegions();
+
   const { value: showProtocolTimeline } = useFeature("protocolTimeline");
   const firstPaint = gPaintPoints[0];
   const lastPaint = gPaintPoints[gPaintPoints.length - 1];

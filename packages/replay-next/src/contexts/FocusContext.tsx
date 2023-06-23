@@ -10,10 +10,10 @@ import {
   useTransition,
 } from "react";
 
+import useLoadedRegions from "replay-next/src/hooks/useLoadedRegions";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import useDebouncedCallback from "../hooks/useDebouncedCallback";
-import useLoadedRegions from "../hooks/useRegions";
 import {
   imperativelyGetClosestPointForTime,
   preCacheExecutionPointForTime,
@@ -50,7 +50,7 @@ export const FocusContext = createContext<FocusContextType>(null as any);
 export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
   const client = useContext(ReplayClientContext);
   const { duration, endpoint } = useContext(SessionContext);
-  const loadedRegions = useLoadedRegions(client);
+  const loadedRegions = useLoadedRegions();
 
   // Changing the focus range may cause us to suspend (while fetching new info from the backend).
   // Wrapping it in a transition enables us to show the older set of messages (in a pending state) while new data loads.
