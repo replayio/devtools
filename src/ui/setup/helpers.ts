@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-restricted-imports
 import { client, sendMessage, triggerEvent } from "protocol/socket";
 import { UIStore } from "ui/actions";
-import { asyncStore, features, prefs } from "ui/utils/prefs";
+import { features, prefs } from "ui/utils/prefs";
 import { getRecordingId } from "ui/utils/recording";
 
 import { ReplaySession, getReplaySession } from "./prefs";
@@ -14,7 +14,6 @@ declare global {
     store: UIStore;
     prefs: typeof prefs;
     features: typeof features;
-    asyncStore: typeof asyncStore;
     dumpPrefs: () => string;
     local: () => void;
     prod: () => void;
@@ -35,7 +34,6 @@ export async function setupAppHelper(store: UIStore) {
     store,
     prefs,
     features,
-    asyncStore,
     triggerEvent,
     replaySession,
     client,

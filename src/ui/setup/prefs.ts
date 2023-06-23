@@ -1,10 +1,12 @@
 import { RecordingId } from "@replayio/protocol";
+import equals from "fast-deep-equal";
 import debounce from "lodash/debounce";
 
 import type { PartialLocation } from "devtools/client/debugger/src/actions/sources";
 import { Tab, getTabs } from "devtools/client/debugger/src/reducers/tabs";
 import { prefs as debuggerPrefs } from "devtools/client/debugger/src/utils/prefs";
 import { persistTabs } from "devtools/client/debugger/src/utils/tabs";
+import { asyncStoreHelper } from "devtools/shared/async-store-helper";
 import { UIStore } from "ui/actions";
 import { getTheme } from "ui/reducers/app";
 import {
@@ -16,7 +18,7 @@ import {
 } from "ui/reducers/layout";
 import { UIState } from "ui/state";
 import { PrimaryPanelName, SecondaryPanelName, ToolboxLayout, ViewMode } from "ui/state/layout";
-import { asyncStore, prefs } from "ui/utils/prefs";
+import { prefs } from "ui/utils/prefs";
 import { getRecordingId } from "ui/utils/recording";
 
 export interface ReplaySessions {
@@ -25,11 +27,53 @@ export interface ReplaySessions {
 export interface ReplaySession {
   viewMode: ViewMode;
   toolboxLayout: ToolboxLayout;
-  selectedPrimaryPanel: PrimaryPanelName;
+  selectedPrimaryPanel: PrimaryPanelName | null;
   selectedPanel: SecondaryPanelName;
   localNags: LocalNag[];
   tabs: Tab[];
   persistedSelectedLocation: PartialLocation | null;
+}
+
+function initializeAsyncStore() {
+  const asyncStore = asyncStoreHelper("devtools", {
+    replaySessions: ["Json", "replay-sessions", {} as Record<string, ReplaySession>],
+  });
+
+  let cachedValue: ReplaySessions | null = null;
+
+  async function readAsyncStore(): Promise<ReplaySessions> {
+    if (cachedValue !== null) {
+      return cachedValue;
+    }
+
+    cachedValue = await asyncStore.replaySessions;
+
+    return cachedValue;
+  }
+
+  function writeAsyncStore(value: ReplaySessions): void {
+    cachedValue = value;
+
+    writeAsyncStoreDebounced(value);
+  }
+
+  const writeAsyncStoreDebounced = debounce((value: ReplaySessions) => {
+    asyncStore.replaySessions = value;
+  }, 250);
+
+  return {
+    readAsyncStore,
+    writeAsyncStore,
+  };
+}
+
+const { readAsyncStore, writeAsyncStore } = initializeAsyncStore();
+
+export async function getReplaySession(
+  recordingId: RecordingId
+): Promise<ReplaySession | undefined> {
+  const replaySessions = await readAsyncStore();
+  return replaySessions[recordingId];
 }
 
 export function registerStoreObserver(
@@ -84,23 +128,8 @@ export const updatePrefs = (state: UIState, oldState: UIState) => {
     );
   }
 
-  maybeUpdateReplaySessions(state);
+  onReduxStateChange(state);
 };
-
-let replaySessions: ReplaySessions;
-async function getReplaySessions() {
-  if (replaySessions) {
-    return replaySessions;
-  }
-  replaySessions = await asyncStore.replaySessions;
-  return replaySessions;
-}
-
-export async function getReplaySession(
-  recordingId: RecordingId
-): Promise<ReplaySession | undefined> {
-  return (await asyncStore.replaySessions)[recordingId];
-}
 
 export enum LocalNag {
   // Yank the user's select left sidebar panel to show the explorer (sources + outline)
@@ -116,7 +145,7 @@ export async function isLocalNagDismissed(nag: LocalNag) {
     return;
   }
 
-  const replaySessions = await getReplaySessions();
+  const replaySessions = await readAsyncStore();
   const replaySession = replaySessions[recordingId];
 
   // If for some reason we don't have this replay session, return
@@ -129,19 +158,15 @@ export async function isLocalNagDismissed(nag: LocalNag) {
   return replaySession.localNags.includes(nag);
 }
 
-const updateReplaySessions = debounce(value => (asyncStore.replaySessions = value), 1_000);
-
-async function maybeUpdateReplaySessions(state: UIState) {
+async function onReduxStateChange(state: UIState) {
   const recordingId = getRecordingId();
-
-  // Bail if we're not in a recording.
   if (!recordingId) {
     return;
   }
 
-  const previousReplaySessions = await getReplaySessions();
-
-  const currentReplaySession = {
+  const prevReplaySessions = await readAsyncStore();
+  const prevReplaySession = prevReplaySessions[recordingId];
+  const nextReplaySession = {
     viewMode: getViewMode(state),
     toolboxLayout: getToolboxLayout(state),
     selectedPrimaryPanel: getSelectedPrimaryPanel(state),
@@ -151,6 +176,7 @@ async function maybeUpdateReplaySessions(state: UIState) {
     persistedSelectedLocation: state.sources?.persistedSelectedLocation || null,
   };
 
-  const newState = { ...previousReplaySessions, [recordingId]: currentReplaySession };
-  await updateReplaySessions(newState);
+  if (!equals(prevReplaySession, nextReplaySession)) {
+    writeAsyncStore({ ...prevReplaySessions, [recordingId]: nextReplaySession });
+  }
 }
