@@ -5,8 +5,8 @@
 import { PauseId } from "@replayio/protocol";
 
 import { framesCache } from "replay-next/src/suspense/FrameCache";
+import { isPointInRegion } from "shared/utils/time";
 import type { UIThunkAction } from "ui/actions";
-import { isPointInLoadingRegion } from "ui/reducers/app";
 import { getSelectedLocation } from "ui/reducers/sources";
 import { trackEvent } from "ui/utils/telemetry";
 
@@ -35,7 +35,9 @@ export function paused({
   return async function (dispatch, getState, { ThreadFront, replayClient }) {
     dispatch(pauseRequestedAt());
 
-    if (!isPointInLoadingRegion(getState(), executionPoint)) {
+    const focusWindow = await replayClient.getCurrentFocusWindow();
+
+    if (focusWindow === null || !isPointInRegion(executionPoint, focusWindow)) {
       dispatch(pauseCreationFailed(executionPoint));
     }
 
