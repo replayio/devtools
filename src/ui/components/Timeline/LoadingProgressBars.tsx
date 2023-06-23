@@ -1,13 +1,13 @@
 import clamp from "lodash/clamp";
 
-import { getLoadedRegions } from "ui/reducers/app";
+import useLoadedRegions from "replay-next/src/hooks/useLoadedRegions";
 import { getZoomRegion } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
 
 import styles from "./LoadingProgressBars.module.css";
 
 export default function LoadingProgressBars() {
-  const loadedRegions = useAppSelector(getLoadedRegions);
+  const loadedRegions = useLoadedRegions();
   const zoomRegion = useAppSelector(getZoomRegion);
 
   const endTime = zoomRegion ? zoomRegion.endTime : 0;

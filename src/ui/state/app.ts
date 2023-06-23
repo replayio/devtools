@@ -6,7 +6,6 @@ import {
   MouseEventKind,
   NavigationEvent,
   SessionId,
-  TimeStampedPointRange,
 } from "@replayio/protocol";
 
 import type { RecordingTarget } from "replay-next/src/suspense/BuildIdCache";
@@ -78,12 +77,6 @@ export interface UploadInfo {
 
 export type AppTheme = "light" | "dark" | "system";
 
-export interface LoadedRegions {
-  loading: TimeStampedPointRange[];
-  loaded: TimeStampedPointRange[];
-  indexed: TimeStampedPointRange[];
-}
-
 export type NodePickerType = "reactComponent" | "domElement";
 export type NodePickerStatus = "disabled" | "initializing" | "active";
 
@@ -97,11 +90,8 @@ export interface AppState {
   expectedError: ExpectedError | null;
   activeNodePicker: NodePickerType | null;
   nodePickerStatus: NodePickerStatus;
-  loadedRegions: LoadedRegions | null;
   loading: number;
   loadingFinished: boolean;
-  loadingStatusSlow: boolean;
-  loadingPageTipSeed: number;
   modal: ModalType | null;
   modalOptions: ModalOptionsType;
   recordingDuration: number;

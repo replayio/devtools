@@ -3,7 +3,7 @@ import { PayloadAction, createSelector, createSlice } from "@reduxjs/toolkit";
 import { RecordingTarget } from "replay-next/src/suspense/BuildIdCache";
 import { compareExecutionPoints, isExecutionPointsWithinRange } from "replay-next/src/utils/time";
 import { Workspace } from "shared/graphql/types";
-import { getCurrentTime, getFocusWindow, getZoomRegion } from "ui/reducers/timeline";
+import { getFocusWindow } from "ui/reducers/timeline";
 import { UIState } from "ui/state";
 import {
   AppMode,
@@ -12,7 +12,6 @@ import {
   Canvas,
   EventKind,
   ExpectedError,
-  LoadedRegions,
   ModalOptionsType,
   ModalType,
   NodePickerType,
@@ -21,10 +20,8 @@ import {
   UnexpectedError,
   UploadInfo,
 } from "ui/state/app";
-import { getNonLoadingRegionTimeRanges } from "ui/utils/app";
 import { getSystemColorSchemePreference } from "ui/utils/environment";
 import { prefs } from "ui/utils/prefs";
-import { isTimeInRegions, overlap } from "ui/utils/timeline";
 
 export const initialAppState: AppState = {
   awaitingSourcemaps: false,
@@ -36,11 +33,8 @@ export const initialAppState: AppState = {
   expectedError: null,
   activeNodePicker: null,
   nodePickerStatus: "disabled",
-  loadedRegions: null,
   loading: 4,
   loadingFinished: false,
-  loadingPageTipSeed: Math.random(),
-  loadingStatusSlow: false,
   modal: null,
   modalOptions: null,
   mode: "devtools",
@@ -70,13 +64,6 @@ const appSlice = createSlice({
     setAwaitingSourcemaps(state, action: PayloadAction<boolean>) {
       state.awaitingSourcemaps = action.payload;
     },
-    setLoadedRegions(state, action: PayloadAction<LoadedRegions>) {
-      state.loadedRegions = action.payload;
-
-      // This is inferred by an interval that checks the amount of time since the last update.
-      // Whenever a new update comes in, this state should be reset.
-      state.loadingStatusSlow = false;
-    },
     setExpectedError(state, action: PayloadAction<ExpectedError>) {
       state.expectedError = action.payload;
       state.modal = null;
@@ -98,21 +85,11 @@ const appSlice = createSlice({
     updateTheme(state, action: PayloadAction<AppTheme>) {
       state.theme = action.payload;
     },
-    setDisplayedLoadingProgress(state, action: PayloadAction<number | null>) {
-      state.displayedLoadingProgress = action.payload;
+    setSessionId(state, action: PayloadAction<string>) {
+      state.sessionId = action.payload;
     },
     setLoadingFinished(state, action: PayloadAction<boolean>) {
       state.loadingFinished = action.payload;
-
-      // This is inferred by an interval that checks the amount of time since the last update.
-      // Whenever a new update comes in, this state should be reset.
-      state.loadingStatusSlow = false;
-    },
-    setLoadingStatusSlow(state, action: PayloadAction<boolean>) {
-      state.loadingStatusSlow = action.payload;
-    },
-    setSessionId(state, action: PayloadAction<string>) {
-      state.sessionId = action.payload;
     },
     setModal: {
       reducer(
@@ -176,15 +153,12 @@ export const {
   setCanvas,
   setCurrentPoint,
   setDefaultSettingsTab,
-  setDisplayedLoadingProgress,
   loadReceivedEvents,
   setExpectedError,
   nodePickerDisabled,
   nodePickerInitializing,
   nodePickerReady,
-  setLoadedRegions,
   setLoadingFinished,
-  setLoadingStatusSlow,
   setModal,
   setMouseTargetsLoading,
   setRecordingTarget,
@@ -210,55 +184,7 @@ export const isInspectorSelected = (state: UIState) =>
   getViewMode(state) === "dev" && getSelectedPanel(state) == "inspector";
 export const getRecordingDuration = (state: UIState) => state.app.recordingDuration;
 
-export const getDisplayedLoadingProgress = (state: UIState) => state.app.displayedLoadingProgress;
 export const getLoadingFinished = (state: UIState) => state.app.loadingFinished;
-export const getLoadingPageTipSeed = (state: UIState) => state.app.loadingPageTipSeed;
-export const getLoadingStatusSlow = (state: UIState) => state.app.loadingStatusSlow;
-export const getLoadedRegions = (state: UIState) => state.app.loadedRegions;
-export const getIndexedAndLoadedRegions = createSelector(getLoadedRegions, loadedRegions => {
-  if (!loadedRegions) {
-    return [];
-  }
-  return overlap(loadedRegions.indexed, loadedRegions.loaded);
-});
-
-// Returns 1 if we have loaded at least one section of the recording. This method has been changed
-// many times and this latest version is really a temporary change while the backend team decides
-// whether to pull out `indexed` and `loaded` events completely in exchange for something more
-// meaningful. We want the client to start sending requests earlier so that we can better gauge
-// how we should change our loading algorithms, and we also want users to feel free to interact
-// with the recording as long as we're somewhat close to being able to respond to their requests.
-//
-// See https://github.com/replayio/devtools/pull/9268 for more discussion.
-export const getIndexedProgress = createSelector(getLoadedRegions, regions => {
-  if (!regions) {
-    return 0;
-  }
-
-  const { indexed, loading } = regions;
-  if (indexed == null || loading == null) {
-    return 0;
-  }
-
-  const totalLoadingTime = loading.reduce((totalTime, { begin, end }) => {
-    return totalTime + end.time - begin.time;
-  }, 0);
-
-  if (totalLoadingTime === 0) {
-    return 0;
-  }
-
-  return indexed.find(({ begin, end }) => end.time - begin.time > 0) ? 1 : 0;
-});
-
-export const getIsIndexed = createSelector(getIndexedProgress, progress => progress === 1);
-
-export const getNonLoadingTimeRanges = (state: UIState) => {
-  const loadingRegions = getLoadedRegions(state)?.loading || [];
-  const endTime = getZoomRegion(state).endTime;
-
-  return getNonLoadingRegionTimeRanges(loadingRegions, endTime);
-};
 export const getUploading = (state: UIState) => state.app.uploading;
 export const getAwaitingSourcemaps = (state: UIState) => state.app.awaitingSourcemaps;
 export const getSessionId = (state: UIState) => state.app.sessionId;
@@ -312,48 +238,5 @@ export const getVideoUrl = (state: UIState) => state.app.videoUrl;
 export const getDefaultSettingsTab = (state: UIState) => state.app.defaultSettingsTab;
 export const getRecordingTarget = (state: UIState) => state.app.recordingTarget;
 export const getRecordingWorkspace = (state: UIState) => state.app.recordingWorkspace;
-export const isRegionLoaded = (state: UIState, time: number | null | undefined) =>
-  typeof time !== "number" || isTimeInRegions(time, getLoadedRegions(state)?.loaded);
 export const getAreMouseTargetsLoading = (state: UIState) => state.app.mouseTargetsLoading;
 export const getCurrentPoint = (state: UIState) => state.app.currentPoint;
-
-export const isCurrentTimeInLoadedRegion = createSelector(
-  getCurrentTime,
-  getLoadedRegions,
-  (currentTime: number, regions: LoadedRegions | null) => {
-    return (
-      regions !== null &&
-      regions.loaded.some(({ begin, end }) => currentTime >= begin.time && currentTime <= end.time)
-    );
-  }
-);
-
-export const isPointInLoadedRegion = createSelector(
-  getLoadedRegions,
-  (_state: UIState, executionPoint: string) => executionPoint,
-  (regions: LoadedRegions | null, executionPoint: string) => {
-    return (
-      regions !== null &&
-      regions.loaded.some(
-        ({ begin, end }) =>
-          BigInt(executionPoint) >= BigInt(begin.point) &&
-          BigInt(executionPoint) <= BigInt(end.point)
-      )
-    );
-  }
-);
-
-export const isPointInLoadingRegion = createSelector(
-  getLoadedRegions,
-  (_state: UIState, executionPoint: string) => executionPoint,
-  (regions: LoadedRegions | null, executionPoint: string) => {
-    return (
-      regions !== null &&
-      regions.loading.some(
-        ({ begin, end }) =>
-          BigInt(executionPoint) >= BigInt(begin.point) &&
-          BigInt(executionPoint) <= BigInt(end.point)
-      )
-    );
-  }
-);

@@ -18,8 +18,7 @@ import { framesCache } from "replay-next/src/suspense/FrameCache";
 import { frameStepsCache } from "replay-next/src/suspense/FrameStepsCache";
 import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
 import { ReplayClientInterface } from "shared/client/types";
-import { getPreferredLocation, getSelectedSourceId } from "ui/reducers/sources";
-import { SourceDetails } from "ui/reducers/sources";
+import { SourceDetails, getPreferredLocation, getSelectedSourceId } from "ui/reducers/sources";
 import { getFocusWindow } from "ui/reducers/timeline";
 import { getContextFromAction } from "ui/setup/redux/middleware/context";
 import type { UIState } from "ui/state";
@@ -283,9 +282,6 @@ export const {
   pauseHistoryDecremented,
   pauseHistoryIncremented,
 } = pauseSlice.actions;
-
-// Copied to avoid import
-const getLoadedRegions = (state: UIState) => state.app.loadedRegions;
 
 // Selectors
 

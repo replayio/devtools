@@ -4,12 +4,13 @@ import { Suspense, useContext } from "react";
 import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import Inspector from "replay-next/components/inspector/Inspector";
 import ScopesInspector from "replay-next/components/inspector/ScopesInspector";
+import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
+import { useIsPointWithinFocusWindow } from "replay-next/src/hooks/useIsPointWithinFocusWindow";
 import { getFrameSuspense } from "replay-next/src/suspense/FrameCache";
 import { frameScopesCache } from "replay-next/src/suspense/ScopeCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { enterFocusMode } from "ui/actions/timeline";
 import { Redacted } from "ui/components/Redacted";
-import { isCurrentTimeInLoadedRegion } from "ui/reducers/app";
 import { getPreferredLocation, getPreferredSourceId } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { pickScopes } from "ui/suspense/scopeCache";
@@ -111,16 +112,18 @@ function Scope({
 
 export default function Scopes() {
   const selectedFrameId = useAppSelector(getSelectedFrameId);
-  const showUnloadedRegionError = !useAppSelector(isCurrentTimeInLoadedRegion);
   const dispatch = useAppDispatch();
 
-  if (showUnloadedRegionError) {
+  const { executionPoint } = useContext(TimelineContext);
+  const isPointWithinFocusWindow = useIsPointWithinFocusWindow(executionPoint);
+
+  if (!isPointWithinFocusWindow) {
     return (
       <div className="pane">
         <div className="pane-info empty">
-          Scope is unavailable because it is outside{" "}
+          Scope is unavailable because it is outside of the{" "}
           <span className="cursor-pointer underline" onClick={() => dispatch(enterFocusMode())}>
-            your debugging window
+            focus window
           </span>
           .
         </div>
