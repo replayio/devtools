@@ -9,7 +9,7 @@ import { resetTestUser, waitFor } from "../helpers/utils";
 
 const url = "doc_rr_console.html";
 
-test(`authenticated/passport-03: Multiplayer`, async ({ page }) => {
+test(`authenticated/passport-04: Multiplayer`, async ({ page }) => {
   await resetTestUser("frontende2e1@replay.io");
 
   await startTest(page, url, E2E_USER_1_API_KEY);
