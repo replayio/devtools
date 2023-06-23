@@ -160,7 +160,7 @@ export async function clickCommandBarButton(page: Page, title: string): Promise<
 
   await openPauseInformationPanel(page);
 
-  const button = page.locator(`[title*="${title}"]`);
+  const button = page.locator(`[title^="${title}"]`);
   await button.isEnabled();
   await button.click();
 }
