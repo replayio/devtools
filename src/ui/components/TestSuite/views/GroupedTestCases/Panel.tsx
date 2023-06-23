@@ -34,6 +34,7 @@ export default function Panel() {
   const testTree = useMemo(() => createTestTree(testRecordings), [testRecordings]);
 
   const recording = RecordingCache.read(recordingId);
+  const date = new Date(recording.date);
 
   return (
     <>
@@ -71,6 +72,7 @@ export default function Panel() {
             className={styles.Attribute}
             icon="schedule"
             label={getTruncatedRelativeDate(recording.date)}
+            title={`${date.toLocaleDateString()} ${date.toLocaleTimeString()}`}
             dataTestName="TestSuiteDate"
           />
           <Source />
