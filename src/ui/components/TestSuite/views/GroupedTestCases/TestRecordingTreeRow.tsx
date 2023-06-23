@@ -17,7 +17,7 @@ export default function TestRecordingTreeRow({
 
   const onClick = () => startTransition(onClickProp);
 
-  const { error, result, source } = testRecording;
+  const { attempt, error, result, source } = testRecording;
   const { title } = source;
 
   return (
@@ -29,7 +29,9 @@ export default function TestRecordingTreeRow({
     >
       <TestResultIcon result={result} />
       <div className={styles.Column}>
-        <div className={styles.Title}>{title}</div>
+        <div className={styles.Title}>
+          {title} {attempt > 1 && <span className={styles.Attempt}>(retry {attempt - 1})</span>}
+        </div>
         {error && (
           <div className={styles.Error}>
             <span className={styles.ErrorTitle}>Error:</span> {error.message}
