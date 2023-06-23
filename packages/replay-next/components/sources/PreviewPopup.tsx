@@ -2,14 +2,14 @@ import { Value as ProtocolValue, SourceId } from "@replayio/protocol";
 import { RefObject, Suspense, useContext, useEffect, useRef } from "react";
 
 import { SelectedFrameContext } from "replay-next/src/contexts/SelectedFrameContext";
-import useLoadedRegions from "replay-next/src/hooks/useRegions";
+import { useCurrentFocusWindow } from "replay-next/src/hooks/useCurrentFocusWindow";
 import { getFrameSuspense } from "replay-next/src/suspense/FrameCache";
 import {
   getPointAndTimeForPauseId,
   pauseEvaluationsCache,
 } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { isPointInRegions } from "shared/utils/time";
+import { isPointInRegion } from "shared/utils/time";
 
 import SourcePreviewInspector from "../inspector/SourcePreviewInspector";
 import Popup from "../Popup";
@@ -41,7 +41,7 @@ function SuspendingPreviewPopup({
   target,
 }: Props) {
   const client = useContext(ReplayClientContext);
-  const loadedRegions = useLoadedRegions(client);
+  const focusWindow = useCurrentFocusWindow();
 
   const popupRef = useRef<HTMLDivElement>(null);
 
@@ -52,7 +52,7 @@ function SuspendingPreviewPopup({
   let value: ProtocolValue | null = null;
   if (frameId !== null && pauseId !== null) {
     const [point] = getPointAndTimeForPauseId(pauseId);
-    if (point !== null && isPointInRegions(point, loadedRegions?.loaded ?? [])) {
+    if (focusWindow !== null && point !== null && isPointInRegion(point, focusWindow)) {
       const frame = getFrameSuspense(client, pauseId, frameId);
       if (frame?.location.some(location => location.sourceId === sourceId)) {
         const result = pauseEvaluationsCache.read(client, pauseId, frameId, expression, undefined);

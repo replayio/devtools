@@ -12,15 +12,17 @@ import {
 import { ThreadFront } from "protocol/thread/thread";
 import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import { copyToClipboard } from "replay-next/components/sources/utils/clipboard";
+import { useCurrentFocusWindow } from "replay-next/src/hooks/useCurrentFocusWindow";
+import { useIsPointWithinFocusWindow } from "replay-next/src/hooks/useIsPointWithinFocusWindow";
 import { getPointAndTimeForPauseId, pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { isPointInRegion } from "shared/utils/time";
 import { enterFocusMode } from "ui/actions/timeline";
-import { getLoadedRegions } from "ui/reducers/app";
 import { getSourcesLoading } from "ui/reducers/sources";
+import { getFocusWindow } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { getPauseFramesSuspense } from "ui/suspense/frameCache";
 import { getAsyncParentPauseIdSuspense } from "ui/suspense/util";
-import { isPointInRegions } from "ui/utils/timeline";
 
 import { selectFrame as selectFrameAction } from "../../../actions/pause/selectFrame";
 import { toggleFrameworkGrouping as setFrameworkGroupingAction } from "../../../reducers/ui";
@@ -41,10 +43,10 @@ function FramesRenderer({
 }) {
   const replayClient = useContext(ReplayClientContext);
   const sourcesState = useAppSelector(state => state.sources);
-  const loadedRegions = useAppSelector(getLoadedRegions);
+  const focusWindow = useAppSelector(getFocusWindow);
   const dispatch = useAppDispatch();
 
-  if (!loadedRegions?.loaded) {
+  if (focusWindow === null) {
     return null;
   }
 
@@ -61,7 +63,7 @@ function FramesRenderer({
     replayClient,
     pauseId,
     asyncIndex,
-    loadedRegions?.loaded
+    focusWindow
   );
   if (asyncParentPauseId === null) {
     return (
@@ -119,7 +121,7 @@ function PauseFrames({
 }) {
   const sourcesState = useAppSelector(state => state.sources);
   const currentPauseId = useAppSelector(getPauseId);
-  const loadedRegions = useAppSelector(getLoadedRegions);
+  const focusWindow = useCurrentFocusWindow();
   const cx = useAppSelector(getThreadContext);
   const frameworkGroupingOn = useAppSelector(getFrameworkGroupingState);
   const selectedFrameId = useAppSelector(getSelectedFrameId);
@@ -128,12 +130,7 @@ function PauseFrames({
   function selectFrame(cx: Context, frame: PauseFrame) {
     if (pauseId !== currentPauseId) {
       const [point, time] = getPointAndTimeForPauseId(pauseId);
-      if (
-        point === null ||
-        time === null ||
-        !loadedRegions ||
-        !isPointInRegions(loadedRegions.loaded, point)
-      ) {
+      if (point === null || time === null || !focusWindow || !isPointInRegion(point, focusWindow)) {
         return;
       }
       ThreadFront.timeWarpToPause({ point, time, pauseId }, true);
@@ -191,14 +188,15 @@ interface FramesProps {
 function Frames({ panel, point, time }: FramesProps) {
   const replayClient = useContext(ReplayClientContext);
   const sourcesLoading = useAppSelector(getSourcesLoading);
-  const loadedRegions = useAppSelector(getLoadedRegions);
   const dispatch = useAppDispatch();
 
-  if (sourcesLoading || !loadedRegions) {
+  const isInFocusRegion = useIsPointWithinFocusWindow(point);
+
+  if (sourcesLoading) {
     return null;
   }
 
-  if (!isPointInRegions(loadedRegions.loaded, point)) {
+  if (!isInFocusRegion) {
     return (
       <div className="pane frames">
         <div className="pane-info empty">

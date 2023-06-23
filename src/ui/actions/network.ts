@@ -11,8 +11,7 @@ import {
 import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { isPointInRegion } from "shared/utils/time";
 import { RequestSummary } from "ui/components/NetworkMonitor/utils";
-import { getLoadedRegions } from "ui/reducers/app";
-import { isPointInRegions } from "ui/utils/timeline";
+import { getFocusWindow } from "ui/reducers/timeline";
 
 import { UIThunkAction } from ".";
 
@@ -87,11 +86,11 @@ export function seekToRequestFrame(
 ): UIThunkAction {
   return async (dispatch, getState, { ThreadFront }) => {
     const state = getState();
-    const loadedRegions = getLoadedRegions(state);
+    const focusWindow = getFocusWindow(state);
     const point = request.point;
 
-    // Don't select a request that's not within a loaded region.
-    if (!request || !loadedRegions || !isPointInRegions(loadedRegions.loaded, point.point)) {
+    // Don't select a request that's not within a focus window
+    if (!request || !focusWindow || !isPointInRegion(point.point, focusWindow)) {
       return;
     }
 

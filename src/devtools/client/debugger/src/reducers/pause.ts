@@ -20,6 +20,7 @@ import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache"
 import { ReplayClientInterface } from "shared/client/types";
 import { getPreferredLocation, getSelectedSourceId } from "ui/reducers/sources";
 import { SourceDetails } from "ui/reducers/sources";
+import { getFocusWindow } from "ui/reducers/timeline";
 import { getContextFromAction } from "ui/setup/redux/middleware/context";
 import type { UIState } from "ui/state";
 import { features } from "ui/utils/prefs";
@@ -123,9 +124,9 @@ export const executeCommandOperation = createAsyncThunk<
   { state: UIState; extra: ThunkExtraArgs }
 >("pause/executeCommand", async ({ cx, command }, thunkApi) => {
   const { extra, getState } = thunkApi;
-  const { ThreadFront, replayClient } = extra;
+  const { replayClient } = extra;
   const state = getState();
-  const loadedRegions = getLoadedRegions(state)!;
+  const focusWindow = getFocusWindow(state);
   const sourceId = getSelectedSourceId(state);
   const symbols = sourceId ? await sourceOutlineCache.readAsync(replayClient, sourceId) : undefined;
   const nextPoint = await getResumePoint(replayClient, state, command);
@@ -133,7 +134,7 @@ export const executeCommandOperation = createAsyncThunk<
   const resp = await resumeOperations[command](replayClient, {
     point: nextPoint,
     sourceId,
-    loadedRegions,
+    focusWindow,
     locationsToSkip:
       // skip over points that are mapped to the beginning of a function body
       // see SCS-172

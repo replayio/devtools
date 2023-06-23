@@ -3,7 +3,7 @@ import {
   PauseDescription,
   SourceId,
   SourceLocation,
-  loadedRegions,
+  TimeStampedPointRange,
 } from "@replayio/protocol";
 
 import { ThreadFront } from "protocol/thread";
@@ -11,10 +11,11 @@ import { locationsInclude } from "protocol/utils";
 import { updateMappedLocation } from "replay-next/src/suspense/PauseCache";
 import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientInterface } from "shared/client/types";
+import { isPointInRegion } from "shared/utils/time";
 
 export interface ResumeOperationParams {
   point?: ExecutionPoint;
-  loadedRegions: loadedRegions;
+  focusWindow: TimeStampedPointRange | null;
   sourceId?: SourceId;
   locationsToSkip?: SourceLocation[];
 }
@@ -32,17 +33,12 @@ async function findResumeTarget(
   findTargetCommand: FindTargetCommand,
   {
     point,
-    loadedRegions,
+    focusWindow,
     sourceId,
     locationsToSkip,
   }: ResumeOperationParams & { point: ExecutionPoint }
 ) {
-  if (
-    loadedRegions.loaded.every(
-      region =>
-        BigInt(point) < BigInt(region.begin.point) || BigInt(point) > BigInt(region.end.point)
-    )
-  ) {
+  if (!focusWindow || !isPointInRegion(point, focusWindow)) {
     return null;
   }
 
@@ -59,13 +55,7 @@ async function findResumeTarget(
       return null;
     }
 
-    if (
-      loadedRegions.loaded.every(
-        region =>
-          BigInt(target!.point) < BigInt(region.begin.point) ||
-          BigInt(target!.point) > BigInt(region.end.point)
-      )
-    ) {
+    if (!focusWindow || !isPointInRegion(target!.point, focusWindow)) {
       return null;
     }
 
@@ -87,7 +77,7 @@ async function resumeOperation(
   {
     point: selectedPoint,
     sourceId: selectedSourceId,
-    loadedRegions,
+    focusWindow,
     locationsToSkip,
   }: ResumeOperationParams
 ) {
@@ -96,7 +86,7 @@ async function resumeOperation(
   const point = selectedPoint || ThreadFront.currentPoint;
   const resumeTarget = await findResumeTarget(client, command, {
     point,
-    loadedRegions,
+    focusWindow,
     sourceId: selectedSourceId,
     locationsToSkip,
   });

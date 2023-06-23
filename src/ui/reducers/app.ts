@@ -24,7 +24,7 @@ import {
 import { getNonLoadingRegionTimeRanges } from "ui/utils/app";
 import { getSystemColorSchemePreference } from "ui/utils/environment";
 import { prefs } from "ui/utils/prefs";
-import { isPointInRegions, isTimeInRegions, overlap } from "ui/utils/timeline";
+import { isTimeInRegions, overlap } from "ui/utils/timeline";
 
 export const initialAppState: AppState = {
   awaitingSourcemaps: false,
@@ -259,19 +259,6 @@ export const getNonLoadingTimeRanges = (state: UIState) => {
 
   return getNonLoadingRegionTimeRanges(loadingRegions, endTime);
 };
-export const getIsInLoadedRegion = createSelector(
-  getLoadedRegions,
-  (state: UIState) => state.pause.executionPoint,
-  (regions, currentPausePoint) => {
-    const loadedRegions = regions?.loaded;
-
-    if (!currentPausePoint || !loadedRegions || loadedRegions.length === 0) {
-      return false;
-    }
-
-    return isPointInRegions(loadedRegions, currentPausePoint);
-  }
-);
 export const getUploading = (state: UIState) => state.app.uploading;
 export const getAwaitingSourcemaps = (state: UIState) => state.app.awaitingSourcemaps;
 export const getSessionId = (state: UIState) => state.app.sessionId;

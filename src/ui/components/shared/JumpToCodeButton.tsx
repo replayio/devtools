@@ -5,11 +5,11 @@ import React, { useState } from "react";
 import Icon from "replay-next/components/Icon";
 import { isExecutionPointsGreaterThan } from "replay-next/src/utils/time";
 
-export type JumpToCodeFailureReason = "not_loaded" | "no_hits";
+export type JumpToCodeFailureReason = "not_focused" | "no_hits";
 export type JumpToCodeStatus = JumpToCodeFailureReason | "not_checked" | "loading" | "found";
 
 export const errorMessages: Record<JumpToCodeFailureReason, string> = {
-  not_loaded: "Not loaded",
+  not_focused: "Not focused",
   no_hits: "No results",
 };
 

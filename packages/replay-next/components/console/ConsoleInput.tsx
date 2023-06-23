@@ -1,9 +1,4 @@
-import {
-  ExecutionPoint,
-  FrameId,
-  loadedRegions as LoadedRegions,
-  PauseId,
-} from "@replayio/protocol";
+import { ExecutionPoint, FrameId, PauseId, TimeStampedPointRange } from "@replayio/protocol";
 import { RefObject, Suspense, useContext, useEffect, useRef, useState } from "react";
 
 import ErrorBoundary from "replay-next/components/ErrorBoundary";
@@ -16,8 +11,8 @@ import { SelectedFrameContext } from "replay-next/src/contexts/SelectedFrameCont
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { NewTerminalExpression, TerminalContext } from "replay-next/src/contexts/TerminalContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
+import { useCurrentFocusWindow } from "replay-next/src/hooks/useCurrentFocusWindow";
 import { useIsPointWithinFocusWindow } from "replay-next/src/hooks/useIsPointWithinFocusWindow";
-import useLoadedRegions from "replay-next/src/hooks/useRegions";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
 
@@ -77,7 +72,7 @@ function ConsoleInputSuspends({ inputRef }: { inputRef?: RefObject<ImperativeHan
   const { addMessage } = useContext(TerminalContext);
   const { executionPoint, time } = useContext(TimelineContext);
 
-  const loadedRegions = useLoadedRegions(replayClient);
+  const focusWindow = useCurrentFocusWindow();
 
   const [historyIndex, setHistoryIndex] = useState<number | null>(null);
   const [expressionHistory, addExpression] = useTerminalHistory(recordingId);
@@ -164,7 +159,7 @@ function ConsoleInputSuspends({ inputRef }: { inputRef?: RefObject<ImperativeHan
       selectedPauseAndFrameId?.frameId ?? null,
       executionPoint,
       time,
-      loadedRegions
+      focusWindow
     );
 
     setHistoryIndex(null);
@@ -223,14 +218,14 @@ async function addMessageAsync(
   frameId: FrameId | null,
   executionPoint: ExecutionPoint,
   time: number,
-  loadedRegions: LoadedRegions | null
+  focusWindow: TimeStampedPointRange | null
 ): Promise<void> {
   if (!pauseId) {
     const pauseAndFrameId = await getPauseAndFrameIdAsync(
       replayClient,
       executionPoint,
       time,
-      loadedRegions,
+      focusWindow,
       false
     );
     if (pauseAndFrameId) {

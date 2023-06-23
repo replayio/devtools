@@ -4,7 +4,7 @@ import {
   PauseId,
   Property,
   Scope,
-  loadedRegions,
+  TimeStampedPointRange,
 } from "@replayio/protocol";
 
 import { getPauseAndFrameIdSuspends } from "replay-next/components/sources/utils/getPauseAndFrameId";
@@ -38,7 +38,7 @@ export default function findMatches(
   replayClient: ReplayClientInterface,
   executionPoint: ExecutionPoint,
   time: number,
-  loadedRegions: loadedRegions | null,
+  focusWindow: TimeStampedPointRange | null,
   context: Context
 ): Match[] {
   // Remove leading "."
@@ -53,7 +53,7 @@ export default function findMatches(
     queryScope,
     executionPoint,
     time,
-    loadedRegions,
+    focusWindow,
     context
   );
 
@@ -65,7 +65,7 @@ function fetchQueryData(
   queryScope: string | null,
   executionPoint: ExecutionPoint,
   time: number,
-  loadedRegions: loadedRegions | null,
+  focusWindow: TimeStampedPointRange | null,
   context: Context
 ): {
   properties: WeightedProperty[] | null;
@@ -77,7 +77,7 @@ function fetchQueryData(
     replayClient,
     executionPoint,
     time,
-    loadedRegions,
+    focusWindow,
     false
   );
   const frameId: FrameId | null = pauseAndFrameId?.frameId ?? null;
