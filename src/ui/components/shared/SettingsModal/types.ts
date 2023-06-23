@@ -1,7 +1,5 @@
 import React from "react";
 
-import { ExperimentalUserSettings } from "shared/graphql/types";
-
 export type Settings<T extends string, P extends Record<string, unknown>> = Setting<T, P>[];
 
 export type SettingType = "checkbox" | "dropdown";
@@ -17,13 +15,3 @@ export type Setting<T extends string, P extends Record<string, unknown>> = Setti
   T,
   P
 >;
-
-export interface SettingItem<V> {
-  label: string;
-  type: SettingType;
-  key: keyof V;
-  description: string | null;
-  disabled: boolean;
-}
-
-export type SettingItemKey = keyof ExperimentalUserSettings;

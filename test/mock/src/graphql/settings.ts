@@ -20,11 +20,8 @@ export function createUserSettingsMock(): MockedResponse[] {
       __typename: "AuthenticatedUser",
       apiKeys: [],
       defaultWorkspace: null,
-      settings: {
-        __typename: "AuthenticatedUserSettings",
+      preferences: {
         disableLogRocket: false,
-        enableRepaint: false,
-        enableTeams: true,
         role: "developer",
       },
     },

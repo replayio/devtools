@@ -16,12 +16,16 @@ import {
   UpdateUserDefaultWorkspaceVariables,
 } from "shared/graphql/generated/UpdateUserDefaultWorkspace";
 import {
-  UpdateUserSettingsLogRocket,
-  UpdateUserSettingsLogRocketVariables,
-} from "shared/graphql/generated/UpdateUserSettingsLogRocket";
+  UpdateUserPreferences,
+  UpdateUserPreferencesVariables,
+} from "shared/graphql/generated/UpdateUserPreferences";
 import type { ApiKey, ExperimentalUserSettings } from "shared/graphql/types";
-import { SettingItemKey } from "ui/components/shared/SettingsModal/types";
-import { ADD_USER_API_KEY, DELETE_USER_API_KEY, GET_USER_SETTINGS } from "ui/graphql/settings";
+import {
+  ADD_USER_API_KEY,
+  DELETE_USER_API_KEY,
+  GET_USER_SETTINGS,
+  UPDATE_USER_PREFERENCES,
+} from "ui/graphql/settings";
 import { query } from "ui/utils/apolloClient";
 import { isTest } from "ui/utils/environment";
 import { maybeTrackTeamChange } from "ui/utils/mixpanel";
@@ -34,7 +38,6 @@ const emptySettings: ExperimentalUserSettings = {
   apiKeys: [],
   defaultWorkspaceId: null,
   disableLogRocket: false,
-  enableTeams: true,
   role: "developer",
 };
 
@@ -42,7 +45,6 @@ const testSettings: ExperimentalUserSettings = {
   apiKeys: [],
   defaultWorkspaceId: null,
   disableLogRocket: false,
-  enableTeams: true,
   role: "developer",
 };
 
@@ -179,53 +181,22 @@ function convertUserSettings(data: GetUserSettings | undefined): ExperimentalUse
     return emptySettings;
   }
 
-  const settings = data.viewer.settings;
+  const preferences = data.viewer.preferences;
   return {
     apiKeys: data.viewer.apiKeys as ApiKey[],
     defaultWorkspaceId: data.viewer.defaultWorkspace?.id || null,
-    disableLogRocket: settings.disableLogRocket,
-    enableTeams: settings.enableTeams,
-    role: settings.role || "developer",
+    disableLogRocket: preferences.disableLogRocket ?? false,
+    role: preferences.role ?? "developer",
   };
 }
 
-type MutableSettings = Extract<SettingItemKey, "disableLogRocket" | "role">;
+export function useUpdateUserPreferences() {
+  const [updateUserPreferences, { loading, error }] = useMutation<
+    UpdateUserPreferences,
+    UpdateUserPreferencesVariables
+  >(UPDATE_USER_PREFERENCES, { refetchQueries: ["GetUserSettings"] });
 
-type GqlPair = {
-  disableLogRocket: [UpdateUserSettingsLogRocket, UpdateUserSettingsLogRocketVariables];
-  role: [UpdateUserSettingsLogRocket, { role: string }];
-};
-
-const SETTINGS_MUTATIONS: Record<MutableSettings, DocumentNode> = {
-  disableLogRocket: gql`
-    mutation UpdateUserSettingsLogRocket($newValue: Boolean) {
-      updateUserSettings(input: { disableLogRocket: $newValue }) {
-        success
-      }
-    }
-  `,
-  role: gql`
-    mutation UpdateUserSettingsRole($role: String) {
-      updateUserSettings(input: { role: $role }) {
-        success
-      }
-    }
-  `,
-} as const;
-
-export function useUpdateUserSetting(key: MutableSettings) {
-  const [updateUserSetting, { error }] = useMutation<
-    GqlPair[typeof key][0],
-    GqlPair[typeof key][1]
-  >(SETTINGS_MUTATIONS[key], {
-    refetchQueries: ["GetUserSettings"],
-  });
-
-  if (error) {
-    console.error("Apollo error while updating a user setting:", error);
-  }
-
-  return updateUserSetting;
+  return { updateUserPreferences, loading, error };
 }
 
 export function useUpdateDefaultWorkspace() {

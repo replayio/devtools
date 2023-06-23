@@ -17,14 +17,6 @@ export interface GetUserSettings_viewer_apiKeys {
   maxRecordings: number | null;
 }
 
-export interface GetUserSettings_viewer_settings {
-  __typename: "AuthenticatedUserSettings";
-  disableLogRocket: boolean;
-  enableRepaint: boolean;
-  enableTeams: boolean;
-  role: string;
-}
-
 export interface GetUserSettings_viewer_defaultWorkspace {
   __typename: "Workspace";
   id: string;
@@ -33,7 +25,7 @@ export interface GetUserSettings_viewer_defaultWorkspace {
 export interface GetUserSettings_viewer {
   __typename: "AuthenticatedUser";
   apiKeys: GetUserSettings_viewer_apiKeys[];
-  settings: GetUserSettings_viewer_settings;
+  preferences: any;
   defaultWorkspace: GetUserSettings_viewer_defaultWorkspace | null;
 }
 

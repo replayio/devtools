@@ -11,15 +11,18 @@ export const GET_USER_SETTINGS = gql`
         recordingCount
         maxRecordings
       }
-      settings {
-        disableLogRocket
-        enableRepaint
-        enableTeams
-        role
-      }
+      preferences
       defaultWorkspace {
         id
       }
+    }
+  }
+`;
+
+export const UPDATE_USER_PREFERENCES = gql`
+  mutation UpdateUserPreferences($preferences: JSONObject!) {
+    updateUserPreferences(input: { preferences: $preferences }) {
+      success
     }
   }
 `;
