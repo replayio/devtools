@@ -5,7 +5,7 @@ import { Badge } from "shared/client/types";
 
 import { hideTypeAheadSuggestions, type as typeLexical } from "./lexical";
 import { findPoints, openPauseInformationPanel, removePoint } from "./pause-information-panel";
-import { openSource, openSourceExplorerPanel } from "./source-explorer-panel";
+import { openSource } from "./source-explorer-panel";
 import {
   clearTextArea,
   debugPrint,
@@ -36,7 +36,6 @@ export async function addBreakpoint(
   await openDevToolsTab(page);
 
   if (url) {
-    await openSourceExplorerPanel(page);
     await openSource(page, url);
   }
 
@@ -221,7 +220,6 @@ export async function addLogpoint(
   await openDevToolsTab(page);
 
   if (url) {
-    await openSourceExplorerPanel(page);
     await openSource(page, url);
   }
   if (waitForSourceOutline) {
@@ -478,7 +476,6 @@ export async function removeBreakpoint(
   await openDevToolsTab(page);
 
   if (url) {
-    await openSourceExplorerPanel(page);
     await openSource(page, url);
   }
 
@@ -523,7 +520,6 @@ export async function removeLogPoint(
   );
 
   await openDevToolsTab(page);
-  await openSourceExplorerPanel(page);
   await openSource(page, url);
 
   const line = await getSourceLine(page, lineNumber);
@@ -671,7 +667,6 @@ export async function waitForLogpoint(
   await openDevToolsTab(page);
 
   if (url) {
-    await openSourceExplorerPanel(page);
     await openSource(page, url);
   }
 
@@ -688,8 +683,6 @@ export async function verifyLogpointStep(
   }
 ): Promise<void> {
   const { lineNumber, url } = options;
-
-  await openSourceExplorerPanel(page);
 
   if (url) {
     await openSource(page, url);
