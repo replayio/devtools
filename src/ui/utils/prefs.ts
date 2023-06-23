@@ -98,7 +98,3 @@ export const features = new PrefsHelper("devtools.features", {
 });
 
 export type Features = typeof features;
-
-export const asyncStore = asyncStoreHelper("devtools", {
-  replaySessions: ["Json", "replay-sessions", {} as Record<string, ReplaySession>],
-});
