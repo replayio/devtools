@@ -1064,7 +1064,7 @@
   --theme-toolbar-highlighted-color: var(--green-60);
   --theme-toolbar-hover-active: var(--grey-20);
   --theme-toolbar-hover: #fff;
-  --theme-toolbar-panel-icon-color: #bcbcbc;
+  --theme-toolbar-panel-icon-color: var(--theme-base-60);
   --theme-toolbar-selected-color: var(--body-color);
   --theme-toolbar-separator: var(--grey-90-a10);
 
