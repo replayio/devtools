@@ -21,6 +21,7 @@ import { trackEvent } from "ui/utils/telemetry";
 import { actions } from "../actions";
 import { selectors } from "../reducers";
 import { sidePanelStorageKey } from "./DevTools";
+import styles from "./Toolbar.module.css";
 
 function CypressIcon() {
   return (
@@ -404,7 +405,7 @@ export default function Toolbar() {
   }
 
   return (
-    <div className="toolbox-toolbar-container flex flex-col items-center justify-between py-1">
+    <div className={styles.toolboxToolbarContainer}>
       <div id="toolbox-toolbar">
         {testRunner !== "cypress" && showTour ? (
           <ToolbarButton
