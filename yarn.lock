@@ -20200,13 +20200,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-resizable-panels@npm:^0.0.50":
-  version: 0.0.50
-  resolution: "react-resizable-panels@npm:0.0.50"
+"react-resizable-panels@npm:^0.0.52":
+  version: 0.0.52
+  resolution: "react-resizable-panels@npm:0.0.52"
   peerDependencies:
     react: ^16.14.0 || ^17.0.0 || ^18.0.0
     react-dom: ^16.14.0 || ^17.0.0 || ^18.0.0
-  checksum: 8c871f9a34bc03b0f5076f9f8a28d3e1065193b4fa2676207909723141d7f0aceff8db1aad247320da9562a605fd40bccb9a1ee6fb221eedfb6d558c375fac41
+  checksum: 1ef1f880b6e3c8a40b7a718d52753931bc6ac7099a13332cd0bd82e223d01c2bf3962cef68f64b5d11f2752bd209e6d8984f7a1eb67bd2be05293b77033f5edd
   languageName: node
   linkType: hard
 
@@ -20619,7 +20619,7 @@ __metadata:
     react-lazyload: ^3.2.0
     react-merge-refs: ^1.1.0
     react-redux: ^8.0.2
-    react-resizable-panels: ^0.0.50
+    react-resizable-panels: ^0.0.52
     react-table: ^7.7.0
     react-tooltip: ^4.5.1
     react-transition-group: ^4.4.2
@@ -20637,7 +20637,7 @@ __metadata:
     style-loader: ^3.3.1
     stylelint: ^14.16.0
     stylelint-config-prettier: ^9.0.4
-    suspense: ^0.0.39
+    suspense: ^0.0.40
     tailwindcss: ^3.2.4
     ts-node: ^10.7.0
     tsconfig-paths: ^3.14.1
@@ -20992,7 +20992,7 @@ __metadata:
     react-dom: 0.0.0-experimental-e7d0053e6-20220325
     react-virtualized-auto-sizer: ^1.0.19
     shared: "workspace:*"
-    suspense: ^0.0.39
+    suspense: ^0.0.40
     typescript: 5.0.2
     use-context-menu: ^0.4.10
     uuid: ^7.0.3
@@ -22811,9 +22811,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"suspense@npm:^0.0.39":
-  version: 0.0.39
-  resolution: "suspense@npm:0.0.39"
+"suspense@npm:^0.0.40":
+  version: 0.0.40
+  resolution: "suspense@npm:0.0.40"
   dependencies:
     array-sorting-utilities: ^0.0.1
     interval-utilities: ^0.0.1
@@ -22822,7 +22822,7 @@ __metadata:
   peerDependencies:
     react: ^18.0.0
     react-dom: ^18.0.0
-  checksum: 9dabe251bf2b51a43a28f7979f60ed280be32141764270b50883453ad19ccddb2bd6d0d509aa5e9d738d9407aebf4011bb7b3ea17ebaf750a226463034d7aaaf
+  checksum: 260b5d32771177dc0afd0248bf369c77660d86184daddbc535cd0f6b4d688a3c8c5b572af261df83168acbe0a7a69944b2e69697ce32c93fb36e04955f9330de
   languageName: node
   linkType: hard
 
