@@ -237,7 +237,7 @@ function ToolbarButtonTab({ active }: { active: boolean }) {
       style={{
         borderRadius: "0 2px 2px 0",
         top: "50%",
-        transform: "translateY(-40%)",
+        transform: "translateY(-45%)",
       }}
     />
   );
