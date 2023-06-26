@@ -150,6 +150,8 @@ export interface GetRecording_recording {
   operations: any | null;
   resolution: any | null;
   metadata: any | null;
+  isTest: boolean;
+  isInTestWorkspace: boolean;
   comments: GetRecording_recording_comments[];
   activeSessions: GetRecording_recording_activeSessions[] | null;
   owner: GetRecording_recording_owner | null;

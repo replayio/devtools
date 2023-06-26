@@ -247,6 +247,8 @@ export interface Recording {
   resolution?: { resolvedAt: string; resolvedBy: string };
   collaboratorRequests?: CollaboratorRequest[] | null;
   metadata?: RecordingMetadata;
+  isTest?: boolean;
+  isInTestWorkspace?: boolean;
 }
 
 export interface RecordingMetadata {
