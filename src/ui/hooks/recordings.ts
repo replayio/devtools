@@ -99,6 +99,7 @@ const GET_WORKSPACE_RECORDINGS = gql`
               isInitialized
               userRole
               metadata
+              hasCrashed
               comments {
                 user {
                   id
@@ -145,6 +146,7 @@ const GET_MY_RECORDINGS = gql`
             private
             isInitialized
             userRole
+            hasCrashed
             owner {
               id
               name
@@ -287,6 +289,7 @@ export function convertRecording(
     comments: rec.comments,
     userRole: "userRole" in rec ? (rec.userRole as RecordingRole) : undefined,
     isTest: "isTest" in rec ? rec.isTest : undefined,
+    hasCrashed: ("hasCrashed" in rec && rec.hasCrashed) || false,
   };
 
   if ("workspace" in rec) {

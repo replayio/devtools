@@ -53,6 +53,7 @@ export interface GetWorkspaceRecordings_node_Workspace_recordings_edges_node {
   isInitialized: boolean;
   userRole: string;
   metadata: any | null;
+  hasCrashed: boolean | null;
   comments: GetWorkspaceRecordings_node_Workspace_recordings_edges_node_comments[];
   owner: GetWorkspaceRecordings_node_Workspace_recordings_edges_node_owner | null;
   workspace: GetWorkspaceRecordings_node_Workspace_recordings_edges_node_workspace | null;

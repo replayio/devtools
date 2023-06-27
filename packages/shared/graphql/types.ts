@@ -248,6 +248,7 @@ export interface Recording {
   collaboratorRequests?: CollaboratorRequest[] | null;
   metadata?: RecordingMetadata;
   isTest?: boolean;
+  hasCrashed?: boolean;
 }
 
 export interface RecordingMetadata {

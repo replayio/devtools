@@ -98,8 +98,8 @@ function RowWrapper({
   recording: Recording;
   onClick: () => void;
 }) {
-  return isEditing ? (
-    <div onClick={onClick}> {children}</div>
+  return isEditing || recording.hasCrashed ? (
+    <div onClick={recording.hasCrashed ? undefined : onClick}> {children}</div>
   ) : (
     <a href={getRecordingURL(recording)} style={{ color: "inherit", textDecoration: "inherit" }}>
       {children}
@@ -147,7 +147,9 @@ function RecordingRow({
   return (
     <RowWrapper recording={recording} isEditing={isEditing} onClick={toggleChecked}>
       <div
-        className={`group flex cursor-pointer flex-row border-b border-chrome ${styles.libraryRow}`}
+        className={`group flex flex-row border-b border-chrome ${styles.libraryRow} ${
+          recording.hasCrashed ? styles.disabled : "cursor-pointer"
+        }`}
       >
         <div className="flex w-12 flex-shrink-0 flex-row items-center overflow-hidden overflow-ellipsis whitespace-pre px-4 py-3">
           {allowSelecting ? (
@@ -224,7 +226,7 @@ function RecordingRow({
           )}
         </div>
         <div
-          className="relative flex w-10 flex-shrink-0 flex-row items-center justify-center py-3 pr-4"
+          className={`${styles.menu} relative flex w-10 flex-shrink-0 flex-row items-center justify-center py-3 pr-4`}
           onClick={e => e.stopPropagation()}
         >
           {!isEditing ? <RecordingOptionsDropdown {...{ recording }} /> : null}

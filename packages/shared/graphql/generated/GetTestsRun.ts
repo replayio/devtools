@@ -34,6 +34,7 @@ export interface GetTestsRun_node_Workspace_testRuns_edges_node_results_recordin
   duration: number | null;
   createdAt: any;
   metadata: any | null;
+  hasCrashed: boolean | null;
   comments: GetTestsRun_node_Workspace_testRuns_edges_node_results_recordings_comments[];
 }
 

@@ -14,7 +14,15 @@
   background-color: var(--body-bgcolor);
 }
 
-:root:global(.theme-dark) .libraryRow:hover {
+:root:global(.theme-dark) .libraryRow.disabled > * {
+  opacity: 0.4;
+}
+
+:root:global(.theme-dark) .libraryRow.disabled > .menu {
+  opacity: 1;
+}
+
+:root:global(.theme-dark) .libraryRow:not(.disabled):hover {
   background-color: #1c2534;
 }
 
@@ -83,7 +91,15 @@
   color: var(--body-color);
 }
 
-:root:global(.theme-light) .libraryRow:hover {
+:root:global(.theme-light) .libraryRow.disabled > *  {
+  opacity: 0.4;
+}
+
+:root:global(.theme-light) .libraryRow.disabled > .menu {
+  opacity: 1;
+}
+
+:root:global(.theme-light) .libraryRow:not(.disabled):hover {
   background-color: var(--grey-10);
 }
 
