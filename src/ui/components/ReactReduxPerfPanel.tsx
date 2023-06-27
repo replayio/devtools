@@ -1,6 +1,7 @@
 import { createSelector } from "@reduxjs/toolkit";
 import {
   ExecutionPoint,
+  FunctionMatch,
   FunctionOutline,
   Location,
   TimeStampedPoint,
@@ -31,6 +32,7 @@ import { frameStepsCache } from "replay-next/src/suspense/FrameStepsCache";
 import { getHitPointsForLocationAsync } from "replay-next/src/suspense/HitPointsCache";
 import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
+import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
 import { streamingSourceContentsCache } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
@@ -39,13 +41,13 @@ import { IGNORABLE_PARTIAL_SOURCE_URLS } from "ui/actions/eventListeners/eventLi
 import { findFunctionOutlineForLocation } from "ui/actions/eventListeners/jumpToCode";
 import { seek } from "ui/actions/timeline";
 import { JumpToCodeButton, JumpToCodeStatus } from "ui/components/shared/JumpToCodeButton";
+import { getPreferredLocation } from "ui/reducers/sources";
 import {
   SourceDetails,
   SourcesState,
   getSourceIdsByUrl,
   getSourceToDisplayForUrl,
 } from "ui/reducers/sources";
-import { getPreferredLocation } from "ui/reducers/sources";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { getPauseFramesAsync } from "ui/suspense/frameCache";
@@ -73,6 +75,34 @@ const Label = ({ children }: { children: ReactNode }) => (
   <div className="overflow-hidden overflow-ellipsis whitespace-pre font-normal">{children}</div>
 );
 
+function doSomeAnalysis(): UIThunkAction {
+  return async (dispatch, getState, { replayClient }) => {
+    const sourcesState = getState().sources;
+    const useSelectorMatches: FunctionMatch[] = [];
+    console.log("Searching functions...");
+
+    const sourcesById = await sourcesByIdCache.readAsync(replayClient);
+    const reactReduxSources = Array.from(sourcesById.values()).filter(source =>
+      source.url?.includes("react-redux")
+    );
+
+    console.log("React-Redux sources: ", reactReduxSources);
+
+    await replayClient.searchFunctions(
+      { query: "useSelector", sourceIds: reactReduxSources.map(source => source.id) },
+      matches => {
+        useSelectorMatches.push(...matches);
+      }
+    );
+    console.log("Matches: ", useSelectorMatches);
+    const [firstMatch] = useSelectorMatches;
+    const preferredLocation = getPreferredLocation(sourcesState, [firstMatch.loc]);
+    console.log("Preferred location: ", preferredLocation);
+    const source = sourcesById.get(preferredLocation.sourceId);
+    console.log("Source: ", source);
+  };
+}
+
 export function ReactReduxPerfPanel() {
   const dispatch = useAppDispatch();
   const currentTime = useAppSelector(getCurrentTime);
@@ -80,15 +110,15 @@ export function ReactReduxPerfPanel() {
   const replayClient = useContext(ReplayClientContext);
   const { rangeForDisplay: focusRange } = useContext(FocusContext);
 
-  const doSomeAnalysis = () => {
-    console.log("Did something");
+  const handleDoAnalysisClick = async () => {
+    dispatch(doSomeAnalysis());
   };
 
   return (
     <div className={styles.Sidebar}>
       <div className={styles.Toolbar}>
         <div className={styles.ToolbarHeader}>React+Redux Perf</div>
-        <button className="row logout" onClick={doSomeAnalysis}>
+        <button className="row logout" onClick={handleDoAnalysisClick}>
           <span className="inline-flex w-full items-center justify-center rounded-md border border-transparent bg-primaryAccent px-3 py-1.5 text-sm font-medium leading-4 text-buttontextColor hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
             Do Something
           </span>
