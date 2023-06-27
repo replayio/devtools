@@ -61,6 +61,7 @@ import {
   getDocumentResult,
   getEventListenersResult,
   getExceptionValueResult,
+  getFrameArgumentsResult,
   getParentNodesResult,
   getScopeResult,
   getSourceOutlineResult,
@@ -227,6 +228,7 @@ export interface ReplayClientInterface {
   getEventListeners(pauseId: PauseId, nodeId: string): Promise<getEventListenersResult>;
   getExceptionValue(pauseId: PauseId): Promise<getExceptionValueResult>;
   getFrameSteps(pauseId: PauseId, frameId: FrameId): Promise<PointDescription[]>;
+  getFrameArguments(pauseId: PauseId, frameId: FrameId): Promise<getFrameArgumentsResult>;
   getMappedLocation(location: Location): Promise<MappedLocation>;
   getObjectWithPreview(
     objectId: ObjectId,

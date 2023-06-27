@@ -40,6 +40,7 @@ import {
   SourceId,
   TimeStampedPoint,
   TimeStampedPointRange,
+  Value,
   VariableMapping,
   annotations,
   createPauseResult,
@@ -54,6 +55,7 @@ import {
   getDocumentResult,
   getEventListenersResult,
   getExceptionValueResult,
+  getFrameArgumentsResult,
   getParentNodesResult,
   getScopeResult,
   getTopFrameResult,
@@ -676,6 +678,12 @@ export class ReplayClient implements ReplayClientInterface {
     this.focusWindow = window;
     this._dispatchEvent("focusWindowChange", window);
     return window;
+  }
+
+  async getFrameArguments(pauseId: PauseId, frameId: FrameId): Promise<getFrameArgumentsResult> {
+    const sessionId = this.getSessionIdThrows();
+    const res = await client.Pause.getFrameArguments({ frameId }, sessionId, pauseId);
+    return res;
   }
 
   async getFrameSteps(pauseId: PauseId, frameId: FrameId): Promise<PointDescription[]> {

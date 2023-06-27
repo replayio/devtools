@@ -1,10 +1,10 @@
-import { FrameId, Location, PauseId, PointDescription } from "@replayio/protocol";
+import { FrameId, Location, PauseId, PointDescription, Value } from "@replayio/protocol";
 import cloneDeep from "lodash/cloneDeep";
 import { Cache, createCache } from "suspense";
 
 import { ReplayClientInterface } from "shared/client/types";
 
-import { updateMappedLocation } from "./PauseCache";
+import { cachePauseData, updateMappedLocation } from "./PauseCache";
 import { sourcesByIdCache } from "./SourcesCache";
 
 export const frameStepsCache: Cache<
@@ -25,6 +25,44 @@ export const frameStepsCache: Cache<
         }
       }
       return updatedFrameSteps;
+    } catch (err) {
+      return undefined;
+    }
+  },
+});
+
+export async function getFrameStepForFrameLocation(
+  replayClient: ReplayClientInterface,
+  pauseId: string,
+  protocolFrameId: string,
+  location: Location
+) {
+  const frameSteps = await frameStepsCache.readAsync(replayClient, pauseId, protocolFrameId);
+
+  const matchingFrameStep = frameSteps?.find(step => {
+    return step.frame?.find(stepLocation => {
+      return stepLocation.sourceId === location.sourceId && stepLocation.line === location.line;
+    });
+  });
+
+  return matchingFrameStep;
+}
+
+export const frameArgumentsCache: Cache<
+  [replayClient: ReplayClientInterface, pauseId: PauseId, frameId: FrameId],
+  Value[] | undefined
+> = createCache({
+  config: { immutable: true },
+  debugLabel: "frameArgumentsCache",
+  getKey: ([client, pauseId, frameId]) => `${pauseId}:${frameId}`,
+  load: async ([client, pauseId, frameId]) => {
+    try {
+      const { data, argumentValues } = await client.getFrameArguments(pauseId, frameId);
+
+      const sources = await sourcesByIdCache.readAsync(client);
+      cachePauseData(client, sources, pauseId, data);
+
+      return argumentValues;
     } catch (err) {
       return undefined;
     }
