@@ -732,7 +732,6 @@ export function enterFocusMode(): UIThunkAction {
 
     // If there's no focus range, or it's the full recording,
     // shrink it to ~30% of the overall recording and center it around the current time.
-    let initialFocusWindow: TimeRange;
     if (
       prevFocusWindow == null ||
       (prevFocusWindow.begin.time === zoomRegion.beginTime &&
@@ -741,15 +740,13 @@ export function enterFocusMode(): UIThunkAction {
       const focusWindowSize =
         (zoomRegion.endTime - zoomRegion.beginTime) * DEFAULT_FOCUS_WINDOW_PERCENTAGE;
 
-      initialFocusWindow = {
+      const initialFocusWindow = {
         begin: Math.max(zoomRegion.beginTime, currentTime - focusWindowSize / 2),
         end: Math.min(zoomRegion.endTime, currentTime + focusWindowSize / 2),
       };
-    } else {
-      initialFocusWindow = { begin: prevFocusWindow.begin.time, end: prevFocusWindow.end.time };
-    }
 
-    await dispatch(updateFocusWindow(initialFocusWindow));
+      await dispatch(updateFocusWindow(initialFocusWindow));
+    }
 
     await dispatch(
       setTimelineState({
