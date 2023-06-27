@@ -91,6 +91,10 @@ export type FormattedEventListener = EventListenerWithFunctionInfo & {
   sourceDetails?: SourceDetails;
 };
 
+export function locationToString(location: Location) {
+  return `${location.sourceId}:${location.line}:${location.column}`;
+}
+
 export const formatEventListener = async (
   replayClient: ReplayClientInterface,
   type: string,

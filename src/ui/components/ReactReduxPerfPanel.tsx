@@ -51,6 +51,7 @@ import {
   FunctionWithPreview,
   IGNORABLE_PARTIAL_SOURCE_URLS,
   formatEventListener,
+  locationToString,
 } from "ui/actions/eventListeners/eventListenerUtils";
 import { findFunctionOutlineForLocation } from "ui/actions/eventListeners/jumpToCode";
 import { seek } from "ui/actions/timeline";
@@ -224,22 +225,31 @@ function doSomeAnalysis(range: TimeStampedPointRange | null): UIThunkAction {
     );
     console.log("Evaluation results: ", results);
 
-    const firstRes = results[0];
+    const formattedFunctions = await Promise.all(
+      results.map(async result => {
+        const functionWithPreview = result.data.objects!.find(
+          o => o.objectId === result.returned!.object!
+        ) as FunctionWithPreview;
+        const formattedPreview = await formatEventListener(
+          replayClient,
+          "someType",
+          functionWithPreview.preview,
+          sourcesState
+        )!;
+        return formattedPreview!;
+      })
+    );
 
-    if (firstRes.returned?.object) {
-      const functionWithPreview = firstRes.data.objects!.find(
-        o => o.objectId === firstRes.returned!.object!
-      ) as FunctionWithPreview;
-      console.log("Function preview: ", functionWithPreview);
-
-      const formattedPreview = await formatEventListener(
-        replayClient,
-        "someType",
-        functionWithPreview.preview,
-        sourcesState
-      );
-      console.log("Formatted preview: ", formattedPreview);
-    }
+    console.log(
+      "Formatted functions: ",
+      formattedFunctions.map(f => {
+        return {
+          name: f.functionName,
+          params: f.functionParameterNames,
+          url: f.locationUrl,
+        };
+      })
+    );
   };
 }
 
