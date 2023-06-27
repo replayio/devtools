@@ -62,10 +62,14 @@ export function TestResultListItem({
       break;
   }
 
+  const Root = recording.hasCrashed ? "div" : Link;
+
   return (
-    <Link
+    <Root
       href={`/recording/${recording.id}`}
-      className={`flex w-full flex-grow cursor-pointer flex-row items-center justify-center gap-2 truncate px-4 py-2 transition duration-150 ${styles.libraryRow}`}
+      className={`flex w-full flex-grow flex-row items-center justify-center gap-2 truncate px-4 py-2 transition duration-150 ${
+        styles.libraryRow
+      }  ${recording.hasCrashed ? styles.disabled : "cursor-pointer"}`}
       target="_blank"
       rel="noopener noreferrer"
       style={{
@@ -74,11 +78,19 @@ export function TestResultListItem({
     >
       <div className="flex flex-row items-center gap-1">
         {secondaryBadgeCount != null && <Icon className="ml-2 h-4 w-4" type="arrow-nested" />}
-        <div className="flex cursor-pointer items-center justify-center transition ">
+        <div
+          className={`flex items-center justify-center transition ${
+            recording.hasCrashed ? "" : "cursor-pointer"
+          }`}
+        >
           <motion.div
-            className="m-auto h-6 w-6 rounded-full hover:cursor-pointer"
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 1.0, boxShadow: "0px 0px 1px rgba(0,0,0,0.2)" }}
+            className="m-auto h-6 w-6 rounded-full"
+            whileHover={recording.hasCrashed ? undefined : { scale: 1.1 }}
+            whileTap={
+              recording.hasCrashed
+                ? undefined
+                : { scale: 1.0, boxShadow: "0px 0px 1px rgba(0,0,0,0.2)" }
+            }
             transition={{ duration: 0.05 }}
           >
             <MaterialIcon iconSize="2xl" outlined style={{ color }}>
@@ -101,6 +113,6 @@ export function TestResultListItem({
           <span>{numComments}</span>
         </div>
       )}
-    </Link>
+    </Root>
   );
 }
