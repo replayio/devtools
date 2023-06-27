@@ -286,6 +286,7 @@ export function convertRecording(
     date: rec.createdAt,
     comments: rec.comments,
     userRole: "userRole" in rec ? (rec.userRole as RecordingRole) : undefined,
+    isTest: "isTest" in rec ? rec.isTest : undefined,
   };
 
   if ("workspace" in rec) {
