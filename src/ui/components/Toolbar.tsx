@@ -491,6 +491,14 @@ export default function Toolbar() {
             {reactPanelExperimentEnabled && (
               <ToolbarButton icon="react" name="react" label="React" onClick={handleButtonClick} />
             )}
+            {reactPanelExperimentEnabled && (
+              <ToolbarButton
+                icon="react"
+                name="react-redux-perf"
+                label="React+Redux Perf"
+                onClick={handleButtonClick}
+              />
+            )}
           </>
         ) : null}
         {protocolPanelExperimentEnabled ? (

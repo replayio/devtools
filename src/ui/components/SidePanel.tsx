@@ -27,6 +27,7 @@ import ReplayInfo from "./Events/ReplayInfo";
 import Passport from "./Passport/Passport";
 import ProtocolViewer from "./ProtocolViewer";
 import { ReactPanel } from "./ReactPanel";
+import { ReactReduxPerfPanel } from "./ReactReduxPerfPanel";
 import Tour from "./Tour/Tour";
 import styles from "src/ui/components/SidePanel.module.css";
 
@@ -181,6 +182,9 @@ export default function SidePanel() {
         {selectedPrimaryPanel === "search" && <SearchFilesReduxAdapter />}
         <LazyOffscreen mode={selectedPrimaryPanel === "react" ? "visible" : "hidden"}>
           <ReactPanel />
+        </LazyOffscreen>
+        <LazyOffscreen mode={selectedPrimaryPanel === "react-redux-perf" ? "visible" : "hidden"}>
+          <ReactReduxPerfPanel />
         </LazyOffscreen>
       </div>
     </div>
