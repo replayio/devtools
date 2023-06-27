@@ -107,8 +107,9 @@ export function ReduxDevToolsContents({ point, time }: RDTCProps) {
           protocolValue={actionValue}
           context="console"
           expandByDefault={true}
-        ></Inspector>
+        />
       );
+
       break;
     }
     case "state": {
@@ -141,7 +142,7 @@ export function ReduxDevToolsContents({ point, time }: RDTCProps) {
 
   return (
     <>
-      <div className={classnames("p3 flex w-full", styles.tabsContainer)}>
+      <div className={classnames("p3 flex h-full w-full overflow-auto", styles.tabsContainer)}>
         <PanelButton
           selected={selectedTab === "action"}
           name="action"
@@ -171,7 +172,7 @@ export function ReduxDevToolsContents({ point, time }: RDTCProps) {
         </PanelButton>
       </div>
 
-      <div className="font-mono text-sm">{contents}</div>
+      <div className="font-mono">{contents}</div>
     </>
   );
 }

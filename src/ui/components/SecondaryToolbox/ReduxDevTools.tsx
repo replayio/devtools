@@ -1,6 +1,7 @@
 import { ExecutionPoint } from "@replayio/protocol";
 import classnames from "classnames";
 import React, { useContext, useState } from "react";
+import { PanelGroup, PanelResizeHandle, Panel as ResizablePanel } from "react-resizable-panels";
 import { useImperativeCacheValue } from "suspense";
 
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -22,44 +23,60 @@ export const ReduxDevToolsPanel = () => {
   const reduxAnnotations: ReduxActionAnnotation[] =
     annotationsStatus === "resolved" ? parsedAnnotations : [];
 
-  // TODO Right now we're going to show _all_ actions in the list.
-  // This could be a very long list, and the user may have intended
-  // to have some of them filtered out via RDT options, which we
-  // now have as `annotation.payload.shouldIgnoreAction`.
-  // We could start filtering those out if appropriate.
-  const renderedActions = reduxAnnotations.map(annotation => {
-    return (
-      <div
-        key={annotation.point}
-        className={classnames("font-mono text-sm", {
-          [styles.selected]: annotation.point === selectedPoint,
-        })}
-        role="listitem"
-        onClick={() => setSelectedPoint(annotation.point)}
-      >
-        {annotation.payload.actionType}
-      </div>
-    );
-  });
-
-  let contents: React.ReactNode;
-
-  if (selectedPoint) {
-    const annotation = reduxAnnotations.find(ann => ann.point === selectedPoint)!;
-    contents = <ReduxDevToolsContents point={selectedPoint} time={annotation.time} />;
-  }
+  const annotation = reduxAnnotations.find(ann => ann.point === selectedPoint)!;
 
   return (
-    <div className={classnames("flex min-h-full bg-bodyBgcolor p-1", styles.actions)}>
-      <div className="border-right-black max-w-s flex flex-col pr-2">
-        <h3 className="text-lg font-bold">Actions</h3>
-        <div role="list" className="overflow-auto">
-          {renderedActions}
-        </div>
-      </div>
-      <div className="ml-1 grow">{contents}</div>
+    <div className={classnames("flex min-h-full bg-bodyBgcolor p-1 text-xs", styles.actions)}>
+      <PanelGroup autoSaveId="ReduxDevTools" direction="horizontal">
+        <ResizablePanel collapsible>
+          <div role="list" className="h-100 overflow-y-auto">
+            {reduxAnnotations.map(annotation => (
+              <ActionItem
+                key={annotation.point}
+                annotation={annotation}
+                selectedPoint={selectedPoint}
+                setSelectedPoint={setSelectedPoint}
+              />
+            ))}
+          </div>
+        </ResizablePanel>
+        <PanelResizeHandle className={styles.ResizeHandle}>
+          <div className={styles.ResizeHandleBar} />
+        </PanelResizeHandle>
+
+        <ResizablePanel collapsible>
+          <div className="ml-1 grow">
+            {selectedPoint && (
+              <ReduxDevToolsContents point={selectedPoint} time={annotation.time} />
+            )}
+          </div>
+        </ResizablePanel>
+      </PanelGroup>
     </div>
   );
 };
+
+function ActionItem({
+  annotation,
+  selectedPoint,
+  setSelectedPoint,
+}: {
+  annotation: ReduxActionAnnotation;
+  selectedPoint: ExecutionPoint | null;
+  setSelectedPoint: (point: ExecutionPoint | null) => void;
+}) {
+  return (
+    <div
+      key={annotation.point}
+      className={classnames("cursor-pointer text-xs", {
+        [styles.selected]: annotation.point === selectedPoint,
+      })}
+      role="listitem"
+      onClick={() => setSelectedPoint(annotation.point)}
+    >
+      {annotation.payload.actionType}
+    </div>
+  );
+}
 
 export default ReduxDevToolsPanel;
