@@ -9,6 +9,10 @@ import {
   TimeStampedPointRange,
 } from "@replayio/protocol";
 import classnames from "classnames";
+import chunk from "lodash/chunk";
+import groupBy from "lodash/groupBy";
+import mapValues from "lodash/mapValues";
+import zip from "lodash/zip";
 import { ReactNode, useContext, useState } from "react";
 import {
   Cache,
@@ -48,6 +52,7 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
 import { UIThunkAction } from "ui/actions";
 import {
+  EventListenerWithFunctionInfo,
   FunctionWithPreview,
   IGNORABLE_PARTIAL_SOURCE_URLS,
   formatEventListener,
@@ -91,9 +96,12 @@ const Label = ({ children }: { children: ReactNode }) => (
 );
 
 function doSomeAnalysis(range: TimeStampedPointRange | null): UIThunkAction {
-  return async (dispatch, getState, { replayClient }) => {
+  return async (dispatch, getState, { replayClient, protocolClient }) => {
     const sourcesState = getState().sources;
     const useSelectorMatches: FunctionMatch[] = [];
+
+    const sessionId = getState().app.sessionId;
+
     console.log("Searching functions...");
 
     const sourcesById = await sourcesByIdCache.readAsync(replayClient);
@@ -110,7 +118,6 @@ function doSomeAnalysis(range: TimeStampedPointRange | null): UIThunkAction {
     const [firstMatch] = useSelectorMatches;
     const preferredLocation = getPreferredLocation(sourcesState, [firstMatch.loc]);
     const source = sourcesById.get(preferredLocation.sourceId)!;
-    console.log("Source: ", source);
     const fileOutline = await sourceOutlineCache.readAsync(replayClient, source.id);
     const [breakablePositions, breakablePositionsByLine] = await breakpointPositionsCache.readAsync(
       replayClient,
@@ -119,7 +126,7 @@ function doSomeAnalysis(range: TimeStampedPointRange | null): UIThunkAction {
 
     const useSelectorOutline = findFunctionOutlineForLocation(firstMatch.loc, fileOutline)!;
 
-    console.log("Function: ", useSelectorOutline);
+    const useSelectorLocation = { ...useSelectorOutline.breakpointLocation!, sourceId: source.id };
 
     const endpoint = await sessionEndPointCache.readAsync(replayClient);
 
@@ -130,11 +137,9 @@ function doSomeAnalysis(range: TimeStampedPointRange | null): UIThunkAction {
       },
       end: endpoint,
     };
-    console.log(breakablePositionsByLine);
 
     const lastLine = useSelectorOutline.location.end.line - 1;
     const lastLineBreakablePositions = breakablePositionsByLine.get(lastLine)!;
-    console.log({ lastLineBreakablePositions });
     const lastLineBreakpoint: Location = {
       sourceId: source.id,
       line: lastLine,
@@ -157,9 +162,9 @@ function doSomeAnalysis(range: TimeStampedPointRange | null): UIThunkAction {
       null
     );
 
-    console.log("Hit points: ", { firstLineHitPoints, lastLineHitPoints });
+    console.log("`useSelector` hits: ", firstLineHitPoints.length);
 
-    const NUM_POINTS_TO_ANALYZE = 10;
+    const NUM_POINTS_TO_ANALYZE = Math.min(firstLineHitPoints.length, 200);
 
     const firstTestPoint = firstLineHitPoints[0];
 
@@ -175,10 +180,9 @@ function doSomeAnalysis(range: TimeStampedPointRange | null): UIThunkAction {
       times.push(totalTime);
     }
 
-    console.log("Selector: ", times);
-
     const testResults: RunEvaluationResult[] = [];
 
+    console.log("Running test evaluation...");
     await replayClient.runEvaluation(
       {
         selector: {
@@ -195,19 +199,45 @@ function doSomeAnalysis(range: TimeStampedPointRange | null): UIThunkAction {
       }
     );
 
-    console.log("Test result: ", testResults);
+    console.log("Fetching `useSelector` source details");
     const frames = testResults[0].point.frame ?? [];
-    console.log("Frames: ", frames);
 
     const firstFrame = frames[0];
     const frameSource = sourcesById.get(firstFrame.sourceId)!;
     const sourceOutline = await sourceOutlineCache.readAsync(replayClient, frameSource.id);
     const functionOutline = findFunctionOutlineForLocation(firstFrame, sourceOutline)!;
     const firstParam = functionOutline.parameters[0];
-    console.log("First param: ", firstParam);
 
     const results: RunEvaluationResult[] = [];
 
+    console.log("Running selectors evaluation...");
+
+    const chunkedFirstPoints = chunk(firstLineHitPoints, 190);
+    console.log("Chunked points: ", chunkedFirstPoints);
+    await Promise.all(
+      chunkedFirstPoints.map(async points => {
+        await replayClient.runEvaluation(
+          {
+            selector: {
+              kind: "points",
+              points: points.map(annotation => annotation.point),
+            },
+            expression: `${firstParam}`,
+            // Run in top frame.
+            frameIndex: 0,
+            shareProcesses: true,
+            fullPropertyPreview: true,
+          },
+          result => {
+            results.push(...result);
+          }
+        );
+      })
+    );
+
+    console.log("Total results: ", results.length);
+
+    /*
     await replayClient.runEvaluation(
       {
         selector: {
@@ -218,38 +248,78 @@ function doSomeAnalysis(range: TimeStampedPointRange | null): UIThunkAction {
         // Run in top frame.
         frameIndex: 0,
         shareProcesses: true,
+        fullPropertyPreview: true,
       },
       result => {
         results.push(...result);
       }
     );
-    console.log("Evaluation results: ", results);
+    */
+
+    console.log("Formatting functions...");
 
     const formattedFunctions = await Promise.all(
       results.map(async result => {
         const functionWithPreview = result.data.objects!.find(
           o => o.objectId === result.returned!.object!
         ) as FunctionWithPreview;
-        const formattedPreview = await formatEventListener(
+        const formattedFunction = (await formatEventListener(
           replayClient,
           "someType",
           functionWithPreview.preview,
           sourcesState
-        )!;
-        return formattedPreview!;
+        ))!;
+        return { formattedFunction, functionWithPreview };
       })
+    );
+    console.log("Formatted functions: ", formattedFunctions);
+
+    interface SelectorCallDetails {
+      start: TimeStampedPoint;
+      end: TimeStampedPoint;
+      duration: number;
+      function: EventListenerWithFunctionInfo;
+    }
+
+    console.log("Summarizing hit details...");
+    const selectorCallDetails: SelectorCallDetails[] = [];
+
+    for (let i = 0; i < NUM_POINTS_TO_ANALYZE; i++) {
+      const start = slicedFirstPoints[i];
+      const end = slicedLastPoints[i];
+      const duration = end.time - start.time;
+      const functionInfo = formattedFunctions[i];
+      selectorCallDetails.push({
+        start,
+        end,
+        duration,
+        function: functionInfo.formattedFunction,
+      });
+    }
+
+    const groupedCalls = groupBy(
+      selectorCallDetails,
+      call => `${locationToString(call.function.location)}:${call.function.functionName}`
     );
 
-    console.log(
-      "Formatted functions: ",
-      formattedFunctions.map(f => {
-        return {
-          name: f.functionName,
-          params: f.functionParameterNames,
-          url: f.locationUrl,
-        };
-      })
+    const sumsPerSelector = mapValues(groupedCalls, (calls, locationString) => {
+      const numCalls = calls.length;
+      const totalDuration = calls.reduce((sum, call) => sum + call.duration, 0);
+      return {
+        locationString,
+        calls: numCalls,
+        totalDuration,
+        average: totalDuration / numCalls,
+      };
+    });
+
+    console.log(groupedCalls);
+    console.log(sumsPerSelector);
+
+    const sortedSums = Object.values(sumsPerSelector).sort(
+      (a, b) => b.totalDuration - a.totalDuration
     );
+    console.log("Sorted sums: ", sortedSums);
   };
 }
 
