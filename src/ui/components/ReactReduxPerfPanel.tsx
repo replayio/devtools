@@ -46,8 +46,9 @@ import {
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
-import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
+import { Source, sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
 import { streamingSourceContentsCache } from "replay-next/src/suspense/SourcesCache";
+import { isExecutionPointsGreaterThan } from "replay-next/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
 import { UIThunkAction } from "ui/actions";
@@ -112,6 +113,9 @@ function doSomeAnalysis(range: TimeStampedPointRange | null): UIThunkAction {
       reactDomSource,
       sourcesState
     );
+    if (!timePoints) {
+      return;
+    }
 
     console.log("React internals time points: ", timePoints);
 
@@ -143,8 +147,82 @@ function doSomeAnalysis(range: TimeStampedPointRange | null): UIThunkAction {
         f.location.begin.line >= createStoreFunction.location.begin.line &&
         f.location.end.line < createStoreFunction.location.end.line
       );
-    });
+    })!;
     console.log({ createStoreFunction, realDispatchFunction });
+
+    const endpoint = await sessionEndPointCache.readAsync(replayClient);
+
+    const finalRange: TimeStampedPointRange = range ?? {
+      begin: {
+        time: 0,
+        point: "0",
+      },
+      end: endpoint,
+    };
+
+    const reduxDispatchHits = await hitPointsCache.readAsync(
+      BigInt(finalRange.begin.point),
+      BigInt(finalRange.end.point),
+      replayClient,
+      { ...realDispatchFunction.breakpointLocation!, sourceId: source.id },
+      null
+    );
+
+    console.log("Number of dispatch hits: ", reduxDispatchHits.length);
+
+    const firstParam = await getValidFunctionParameterName(
+      replayClient,
+      reduxDispatchHits[0],
+      0,
+      sourcesById
+    );
+
+    console.log("Actual `action` variable: ", firstParam);
+
+    // console.log("Redux dispatch hits: ", reduxDispatchHits);
+    const likelyDispatchRenderCommits = reduxDispatchHits.map(dispatchHit => {
+      const nextRenderHit = timePoints.onCommitFiberHitPoints.find(commitHit =>
+        isExecutionPointsGreaterThan(commitHit.point, dispatchHit.point)
+      );
+      return {
+        dispatchHit,
+        nextRenderHit,
+      };
+    });
+
+    console.log("Likely dispatch render commits: ", likelyDispatchRenderCommits);
+
+    const results: RunEvaluationResult[] = [];
+
+    const chunkedFirstPoints = chunk(reduxDispatchHits, 190);
+    console.log("Chunked points: ", chunkedFirstPoints);
+    await Promise.all(
+      chunkedFirstPoints.map(async points => {
+        await replayClient.runEvaluation(
+          {
+            selector: {
+              kind: "points",
+              points: points.map(annotation => annotation.point),
+            },
+            expression: `${firstParam}`,
+            // Run in top frame.
+            frameIndex: 0,
+            shareProcesses: true,
+            fullPropertyPreview: true,
+          },
+          result => {
+            results.push(...result);
+          }
+        );
+      })
+    );
+
+    const actionObjects = results.map(result => {
+      const actionObject = result.data.objects!.find(o => o.objectId === result.returned!.object!);
+      return actionObject?.preview?.properties;
+    });
+
+    console.log("Action objects: ", actionObjects);
   };
 }
 
@@ -232,33 +310,13 @@ async function processAllSelectorCalls(
     times.push(totalTime);
   }
 
-  const testResults: RunEvaluationResult[] = [];
-
   console.log("Running test evaluation...");
-  await replayClient.runEvaluation(
-    {
-      selector: {
-        kind: "points",
-        points: [firstTestPoint.point],
-      },
-      expression: `selector`,
-      // Run in top frame.
-      frameIndex: 0,
-      shareProcesses: true,
-    },
-    result => {
-      testResults.push(...result);
-    }
+  const firstParam = await getValidFunctionParameterName(
+    replayClient,
+    firstTestPoint,
+    0,
+    sourcesById
   );
-
-  console.log("Fetching `useSelector` source details");
-  const frames = testResults[0].point.frame ?? [];
-
-  const firstFrame = frames[0];
-  const frameSource = sourcesById.get(firstFrame.sourceId)!;
-  const sourceOutline = await sourceOutlineCache.readAsync(replayClient, frameSource.id);
-  const functionOutline = findFunctionOutlineForLocation(firstFrame, sourceOutline)!;
-  const firstParam = functionOutline.parameters[0];
 
   const results: RunEvaluationResult[] = [];
 
@@ -353,6 +411,40 @@ async function processAllSelectorCalls(
     (a, b) => b.totalDuration - a.totalDuration
   );
   console.log("Sorted sums: ", sortedSums);
+}
+
+async function getValidFunctionParameterName(
+  replayClient: ReplayClientInterface,
+  firstTestPoint: TimeStampedPoint,
+  paramIndex: number,
+  sourcesById: Map<string, Source>
+) {
+  const testResults: RunEvaluationResult[] = [];
+  await replayClient.runEvaluation(
+    {
+      selector: {
+        kind: "points",
+        points: [firstTestPoint.point],
+      },
+      expression: `doesNotExist`,
+      // Run in top frame.
+      frameIndex: 0,
+      shareProcesses: true,
+    },
+    result => {
+      testResults.push(...result);
+    }
+  );
+
+  console.log("Fetching parameter source details");
+  const frames = testResults[0].point.frame ?? [];
+
+  const firstFrame = frames[0];
+  const frameSource = sourcesById.get(firstFrame.sourceId)!;
+  const sourceOutline = await sourceOutlineCache.readAsync(replayClient, frameSource.id);
+  const functionOutline = findFunctionOutlineForLocation(firstFrame, sourceOutline)!;
+  const firstParam = functionOutline.parameters[paramIndex];
+  return firstParam;
 }
 
 export function ReactReduxPerfPanel() {
