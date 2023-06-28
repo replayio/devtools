@@ -5,8 +5,11 @@ import { PanelGroup, PanelResizeHandle, Panel as ResizablePanel } from "react-re
 import { useImperativeCacheValue } from "suspense";
 
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { seek } from "ui/actions/timeline";
+import { useAppDispatch } from "ui/setup/hooks";
 import { reduxDevToolsAnnotationsCache } from "ui/suspense/annotationsCaches";
 
+import { JumpToCodeButton } from "../shared/JumpToCodeButton";
 import { ReduxActionAnnotation } from "./redux-devtools/redux-annotations";
 import { ReduxDevToolsContents } from "./redux-devtools/ReduxDevToolsContents";
 import styles from "./ReduxDevTools.module.css";
@@ -65,6 +68,11 @@ function ActionItem({
   selectedPoint: ExecutionPoint | null;
   setSelectedPoint: (point: ExecutionPoint | null) => void;
 }) {
+  const dispatch = useAppDispatch();
+  const onSeek = () => {
+    dispatch(seek(annotation.point, annotation.time, true));
+  };
+
   return (
     <div
       key={annotation.point}
@@ -74,7 +82,14 @@ function ActionItem({
       role="listitem"
       onClick={() => setSelectedPoint(annotation.point)}
     >
-      {annotation.payload.actionType}
+      <JumpToCodeButton
+        className={styles["jump-to-code"]}
+        currentExecutionPoint={selectedPoint}
+        targetExecutionPoint={annotation.point}
+        status="found"
+        onClick={onSeek}
+      />
+      <div className={styles.actionLabel}>{annotation.payload.actionType}</div>
     </div>
   );
 }
