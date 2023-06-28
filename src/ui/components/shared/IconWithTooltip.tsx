@@ -19,7 +19,7 @@ export default function IconWithTooltip({
 }: IconWithTooltipProps) {
   const { onMouseEnter, onMouseLeave, tooltip } = useTooltip({
     className: styles.iconTooltip,
-    delay: 250,
+    delay: 120,
     position: "right-of",
     tooltip: content,
   });

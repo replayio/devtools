@@ -22,8 +22,8 @@
 }
 
 .icon-with-tooltip img {
-  width: 124px;
-  height: 124px;
+  width: 24px;
+  height: 24px;
   mask-repeat: no-repeat;
   mask-size: cover;
   margin: var(--icon-margin);
