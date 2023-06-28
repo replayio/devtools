@@ -40,6 +40,7 @@ type CurrentTimeIndicatorPlacement = Loggable | "begin" | "end";
 
 const ErrorBoundary = ({ children }: { children: ReactNode }) => (
   <_ErrorBoundary
+    name="MessagesList"
     fallback={
       <div className={rendererStyles.Row}>
         <div className={rendererStyles.ErrorBoundaryFallback}>Something went wrong.</div>

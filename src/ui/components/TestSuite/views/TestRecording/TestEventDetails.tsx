@@ -23,7 +23,7 @@ export default function TestEventDetails({ collapsed }: { collapsed: boolean }) 
   }
 
   return (
-    <ErrorBoundary>
+    <ErrorBoundary name="TestEventDetails">
       <UserActionEventDetails
         timeStampedPoint={testEvent.data.result.timeStampedPoint}
         variable={testEvent.data.result.variable}

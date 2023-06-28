@@ -16,7 +16,7 @@ import Marker from "./Marker";
 
 export default function PreviewMarkers() {
   return (
-    <ErrorBoundary fallback={null}>
+    <ErrorBoundary fallback={null} name="PreviewMarkers">
       <Suspense fallback={null}>
         <PreviewMarkersSuspends />
       </Suspense>

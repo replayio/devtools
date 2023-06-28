@@ -1,6 +1,8 @@
 import { captureException } from "@sentry/browser";
 import React, { Component, PropsWithChildren, ReactNode } from "react";
 
+import { recordData } from "replay-next/src/utils/telemetry";
+
 import styles from "./ErrorBoundary.module.css";
 
 type ErrorBoundaryState = {
@@ -11,6 +13,7 @@ type ErrorBoundaryState = {
 type ErrorBoundaryProps = PropsWithChildren<{
   fallback?: ReactNode;
   fallbackClassName?: string;
+  name?: string;
   /**
    * If `resetKey` changes after the ErrorBoundary caught an error, it will reset its state.
    * Use `resetKey` instead of `key` if you don't want the child components to be recreated
@@ -43,8 +46,15 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
     return null;
   }
 
-  componentDidCatch(error: Error) {
+  componentDidCatch(error: Error, info: React.ErrorInfo) {
     console.error(error);
+
+    recordData("component-errorboundary", {
+      component: this.props.name || "unknown",
+      message: error.message,
+      error: error,
+      componentStack: info.componentStack,
+    });
 
     captureException(error);
   }
