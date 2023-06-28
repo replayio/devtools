@@ -41,6 +41,12 @@ export async function addBreakpoint(
 
   await scrollUntilLineIsVisible(page, lineNumber);
 
+  // Sometimes hovering over a source line produces a mouseleave event shortly after
+  // the mouseenter event, so the BreakpointToggle disappears before it can be clicked.
+  // This only seems to happen for lines that were just scrolled into view, so perhaps
+  // a little delay will fix it. See FE-1589.
+  await delay(500);
+
   const line = await getSourceLine(page, lineNumber);
   await line.locator('[data-test-id^="SourceLine-LineNumber"]').hover();
   await line.locator('[data-test-name="BreakpointToggle"]').click();
