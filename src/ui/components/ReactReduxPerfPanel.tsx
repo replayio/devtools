@@ -1,3 +1,4 @@
+import { sourceContentFor } from "@jridgewell/trace-mapping";
 import { createSelector } from "@reduxjs/toolkit";
 import {
   ExecutionPoint,
@@ -5,6 +6,8 @@ import {
   FunctionOutline,
   Location,
   RunEvaluationResult,
+  SearchSourceContentsMatch,
+  SourceLocation,
   TimeStampedPoint,
   TimeStampedPointRange,
 } from "@replayio/protocol";
@@ -45,6 +48,7 @@ import {
 } from "replay-next/src/suspense/HitPointsCache";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
+import { searchCache } from "replay-next/src/suspense/SearchCache";
 import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
 import { Source, sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
 import { streamingSourceContentsCache } from "replay-next/src/suspense/SourcesCache";
@@ -104,51 +108,7 @@ function doSomeAnalysis(range: TimeStampedPointRange | null): UIThunkAction {
     const state = getState();
     const sourcesState = state.sources;
     const reactDomSourceUrl = getReactDomSourceUrl(state);
-    const reactDomSource = getSourceToDisplayForUrl(state, reactDomSourceUrl!);
-
-    console.log("Fetching internals hits");
-    const timePoints = await reactInternalMethodsHitsCache.readAsync(
-      replayClient,
-      range,
-      reactDomSource,
-      sourcesState
-    );
-    if (!timePoints) {
-      return;
-    }
-
-    console.log("React internals time points: ", timePoints);
-
-    const dispatchMatches: FunctionMatch[] = [];
-
-    console.log("Searching functions for `dispatch`...");
-
-    const sourcesById = await sourcesByIdCache.readAsync(replayClient);
-    const reactReduxSources = Array.from(sourcesById.values()).filter(source =>
-      source.url?.includes("/redux/")
-    );
-
-    await replayClient.searchFunctions(
-      { query: "dispatch", sourceIds: reactReduxSources.map(source => source.id) },
-      matches => {
-        dispatchMatches.push(...matches);
-      }
-    );
-
-    const [firstMatch] = dispatchMatches;
-    const preferredLocation = getPreferredLocation(sourcesState, [firstMatch.loc]);
-    const source = sourcesById.get(preferredLocation.sourceId)!;
-    const fileOutline = await sourceOutlineCache.readAsync(replayClient, source.id);
-
-    const dispatchFunctions = fileOutline.functions.filter(o => o.name === "dispatch");
-    const createStoreFunction = fileOutline.functions.find(o => o.name === "createStore")!;
-    const realDispatchFunction = dispatchFunctions.find(f => {
-      return (
-        f.location.begin.line >= createStoreFunction.location.begin.line &&
-        f.location.end.line < createStoreFunction.location.end.line
-      );
-    })!;
-    console.log({ createStoreFunction, realDispatchFunction });
+    const reactDomSource = getSourceToDisplayForUrl(state, reactDomSourceUrl!)!;
 
     const endpoint = await sessionEndPointCache.readAsync(replayClient);
 
@@ -160,70 +120,259 @@ function doSomeAnalysis(range: TimeStampedPointRange | null): UIThunkAction {
       end: endpoint,
     };
 
-    const reduxDispatchHits = await hitPointsCache.readAsync(
-      BigInt(finalRange.begin.point),
-      BigInt(finalRange.end.point),
-      replayClient,
-      { ...realDispatchFunction.breakpointLocation!, sourceId: source.id },
-      null
+    const sourcesById = await sourcesByIdCache.readAsync(replayClient);
+    const reactReduxSources = Array.from(sourcesById.values()).filter(source =>
+      source.url?.includes("react-redux")
     );
 
-    console.log("Number of dispatch hits: ", reduxDispatchHits.length);
+    await processReduxDispatches(getState, replayClient, finalRange, sourcesState, reactDomSource);
+  };
+}
 
-    const firstParam = await getValidFunctionParameterName(
-      replayClient,
-      reduxDispatchHits[0],
-      0,
-      sourcesById
+async function processReduxNotifications(
+  replayClient: ReplayClientInterface,
+  range: TimeStampedPointRange,
+  reactReduxSources: Source[],
+  sourcesById: Map<string, Source>,
+  sourcesState: SourcesState
+) {
+  const subscriberNotifyMatches: FunctionMatch[] = [];
+
+  await replayClient.searchFunctions(
+    { query: "notify", sourceIds: reactReduxSources.map(source => source.id) },
+    matches => {
+      subscriberNotifyMatches.push(...matches);
+    }
+  );
+
+  // console.log("Subscriber notify matches: ", subscriberNotifyMatches);
+  const [firstMatch] = subscriberNotifyMatches;
+  const preferredLocation = getPreferredLocation(sourcesState, [firstMatch.loc]);
+  const source = sourcesById.get(preferredLocation.sourceId)!;
+  const fileOutline = await sourceOutlineCache.readAsync(replayClient, source.id);
+  const [breakablePositions, breakablePositionsByLine] = await breakpointPositionsCache.readAsync(
+    replayClient,
+    source.id
+  );
+
+  const subscriberNotifyFunction = findFunctionOutlineForLocation(firstMatch.loc, fileOutline)!;
+  console.log("Subscriber notify function: ", subscriberNotifyFunction);
+  //console.log("Subscriber breakable positions: ", breakablePositionsByLine);
+
+  const notifyHits = await hitPointsCache.readAsync(
+    BigInt(range.begin.point),
+    BigInt(range.end.point),
+    replayClient,
+    { ...subscriberNotifyFunction.breakpointLocation!, sourceId: source.id },
+    null
+  );
+  console.log("Notify hits: ", notifyHits);
+
+  const stepOutLocations = await Promise.all(
+    notifyHits.map(hit => replayClient.findStepOutTarget(hit.point))
+  );
+
+  console.log("Step out locations: ", stepOutLocations);
+
+  const notifyStartFinishPairs = zip(notifyHits, stepOutLocations).map(([start, finish]) => ({
+    start,
+    finish,
+  }));
+
+  console.log("Notify start/finish pairs: ", notifyStartFinishPairs);
+
+  const searchMatches: SearchSourceContentsMatch[] = [];
+  await replayClient.searchSources({ query: "notifyNestedSubs()" }, matches => {
+    searchMatches.push(...matches);
+  });
+
+  console.log("Search matches: ", searchMatches);
+}
+
+async function processReduxDispatches(
+  getState: () => UIState,
+  replayClient: ReplayClientInterface,
+  range: TimeStampedPointRange,
+  sourcesState: SourcesState,
+  reactDomSource: Source
+) {
+  console.log("Fetching internals hits");
+  const timePoints = await reactInternalMethodsHitsCache.readAsync(
+    replayClient,
+    range,
+    reactDomSource,
+    sourcesState
+  );
+  if (!timePoints) {
+    return;
+  }
+
+  console.log("React internals time points: ", timePoints);
+
+  const dispatchMatches: FunctionMatch[] = [];
+
+  console.log("Searching functions for `dispatch`...");
+
+  const sourcesById = await sourcesByIdCache.readAsync(replayClient);
+  const reactReduxSources = Array.from(sourcesById.values()).filter(source =>
+    source.url?.includes("/redux/")
+  );
+
+  await replayClient.searchFunctions(
+    { query: "dispatch", sourceIds: reactReduxSources.map(source => source.id) },
+    matches => {
+      dispatchMatches.push(...matches);
+    }
+  );
+
+  const [firstMatch] = dispatchMatches;
+  const preferredLocation = getPreferredLocation(sourcesState, [firstMatch.loc]);
+  const reduxSource = sourcesById.get(preferredLocation.sourceId)!;
+  const fileOutline = await sourceOutlineCache.readAsync(replayClient, reduxSource.id);
+  const streaming = streamingSourceContentsCache.stream(replayClient, reduxSource!.id);
+  await streaming.resolver;
+
+  const dispatchFunctions = fileOutline.functions.filter(o => o.name === "dispatch");
+  const createStoreFunction = fileOutline.functions.find(o => o.name === "createStore")!;
+  const realDispatchFunction = dispatchFunctions.find(f => {
+    return (
+      f.location.begin.line >= createStoreFunction.location.begin.line &&
+      f.location.end.line < createStoreFunction.location.end.line
     );
+  })!;
+  console.log({ createStoreFunction, realDispatchFunction });
 
-    console.log("Actual `action` variable: ", firstParam);
+  const [breakablePositions, breakablePositionsByLine] = await breakpointPositionsCache.readAsync(
+    replayClient,
+    reduxSource.id
+  );
 
-    // console.log("Redux dispatch hits: ", reduxDispatchHits);
-    const likelyDispatchRenderCommits = reduxDispatchHits.map(dispatchHit => {
-      const nextRenderHit = timePoints.onCommitFiberHitPoints.find(commitHit =>
-        isExecutionPointsGreaterThan(commitHit.point, dispatchHit.point)
-      );
-      return {
-        dispatchHit,
-        nextRenderHit,
-      };
-    });
+  const reduxSourceLines = streaming.value!.split("\n");
+  const beforeDispatchLine =
+    reduxSourceLines.findIndex(line => line.includes("isDispatching = true")) + 1;
+  const reducerDoneLine =
+    reduxSourceLines.findIndex(line => line.includes("currentListeners = nextListeners")) + 1;
+  const dispatchDoneLine = reduxSourceLines.findIndex(line => line.includes("return action")) + 1;
+  console.log({ reducerDoneLine, dispatchDoneLine });
 
-    console.log("Likely dispatch render commits: ", likelyDispatchRenderCommits);
+  const beforeReducerBreakpoint: SourceLocation = {
+    line: beforeDispatchLine,
+    column: breakablePositionsByLine.get(beforeDispatchLine)!.columns[0],
+  };
 
-    const results: RunEvaluationResult[] = [];
+  const reducerDoneBreakpoint: SourceLocation = {
+    line: reducerDoneLine,
+    column: breakablePositionsByLine.get(reducerDoneLine)!.columns[0],
+  };
 
-    const chunkedFirstPoints = chunk(reduxDispatchHits, 190);
-    console.log("Chunked points: ", chunkedFirstPoints);
+  const dispatchDoneBreakpoint: SourceLocation = {
+    line: dispatchDoneLine,
+    column: breakablePositionsByLine.get(dispatchDoneLine)!.columns[0],
+  };
+
+  const dispatchLocations = [
+    realDispatchFunction.breakpointLocation!,
+    beforeReducerBreakpoint,
+    reducerDoneBreakpoint,
+    dispatchDoneBreakpoint,
+  ];
+
+  const [reduxDispatchHits, beforeReducerHits, reducerDoneHits, dispatchDoneHits] =
     await Promise.all(
-      chunkedFirstPoints.map(async points => {
-        await replayClient.runEvaluation(
-          {
-            selector: {
-              kind: "points",
-              points: points.map(annotation => annotation.point),
-            },
-            expression: `${firstParam}`,
-            // Run in top frame.
-            frameIndex: 0,
-            shareProcesses: true,
-            fullPropertyPreview: true,
-          },
-          result => {
-            results.push(...result);
-          }
+      dispatchLocations.map(location => {
+        return hitPointsCache.readAsync(
+          BigInt(range.begin.point),
+          BigInt(range.end.point),
+          replayClient,
+          { ...location, sourceId: reduxSource.id },
+          null
         );
       })
     );
 
-    const actionObjects = results.map(result => {
-      const actionObject = result.data.objects!.find(o => o.objectId === result.returned!.object!);
-      return actionObject?.preview?.properties;
-    });
+  // const reduxDispatchHits = await hitPointsCache.readAsync(
+  //   BigInt(range.begin.point),
+  //   BigInt(range.end.point),
+  //   replayClient,
+  //   { ...realDispatchFunction.breakpointLocation!, sourceId: reduxSource.id },
+  //   null
+  // );
 
-    console.log("Action objects: ", actionObjects);
-  };
+  const firstParam = await getValidFunctionParameterName(
+    replayClient,
+    reduxDispatchHits[0],
+    0,
+    sourcesById
+  );
+
+  // console.log("Actual `action` variable: ", firstParam);
+
+  /*
+  // console.log("Redux dispatch hits: ", reduxDispatchHits);
+  const likelyDispatchRenderCommits = reduxDispatchHits.map(dispatchHit => {
+    const nextRenderHit = timePoints.onCommitFiberHitPoints.find(commitHit =>
+      isExecutionPointsGreaterThan(commitHit.point, dispatchHit.point)
+    );
+    return {
+      dispatchHit,
+      nextRenderHit,
+    };
+  });
+
+  console.log("Likely dispatch render commits: ", likelyDispatchRenderCommits);
+  */
+
+  const results: RunEvaluationResult[] = [];
+
+  const chunkedReduxDispatchHits = chunk(reduxDispatchHits, 190);
+  await Promise.all(
+    chunkedReduxDispatchHits.map(async points => {
+      await replayClient.runEvaluation(
+        {
+          selector: {
+            kind: "points",
+            points: points.map(annotation => annotation.point),
+          },
+          expression: `${firstParam}`,
+          // Run in top frame.
+          frameIndex: 0,
+          shareProcesses: true,
+          fullPropertyPreview: true,
+        },
+        result => {
+          results.push(...result);
+        }
+      );
+    })
+  );
+
+  const actionObjects = results.map(result => {
+    const actionObject = result.data.objects!.find(o => o.objectId === result.returned!.object!);
+    return actionObject?.preview?.properties;
+  });
+
+  const dispatchDetails = zip(
+    reduxDispatchHits,
+    beforeReducerHits,
+    reducerDoneHits,
+    dispatchDoneHits,
+    actionObjects
+  ).map(
+    ([dispatchStart, beforeReducer, afterReducer, afterNotifications, actionObjectProperties]) => {
+      const actionType = actionObjectProperties!.find(p => p.name === "type")?.value;
+      return {
+        actionType: actionType!,
+        dispatchStart: dispatchStart!,
+        beforeReducer: beforeReducer!,
+        afterReducer: afterReducer!,
+        afterNotifications: afterNotifications!,
+        reducerDuration: afterReducer!.time - beforeReducer!.time,
+        notificationDuration: afterNotifications!.time - afterReducer!.time,
+      };
+    }
+  );
+
+  console.log("Dispatch details: ", dispatchDetails);
 }
 
 async function processAllSelectorCalls(
@@ -232,7 +381,6 @@ async function processAllSelectorCalls(
   range: TimeStampedPointRange | null
 ) {
   const sourcesState = getState().sources;
-  const useSelectorMatches: FunctionMatch[] = [];
 
   console.log("Searching functions...");
 
@@ -240,6 +388,8 @@ async function processAllSelectorCalls(
   const reactReduxSources = Array.from(sourcesById.values()).filter(source =>
     source.url?.includes("react-redux")
   );
+
+  const useSelectorMatches: FunctionMatch[] = [];
 
   await replayClient.searchFunctions(
     { query: "useSelector", sourceIds: reactReduxSources.map(source => source.id) },
