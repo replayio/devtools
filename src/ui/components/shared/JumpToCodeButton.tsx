@@ -19,6 +19,7 @@ interface JumpToCodeButtonProps {
   onClick: () => void;
   status: JumpToCodeStatus;
   targetExecutionPoint: ExecutionPoint;
+  className: string;
 }
 
 export function JumpToCodeButton({
@@ -27,13 +28,14 @@ export function JumpToCodeButton({
   onClick,
   status,
   targetExecutionPoint,
+  className = "",
 }: JumpToCodeButtonProps) {
   const [isHovered, setIsHovered] = useState(false);
 
   const jumpToCodeButtonAvailable = status === "not_checked" || status === "found";
 
   const jumpToCodeButtonClassname = classnames(
-    "transition-width flex items-center justify-center rounded-full  duration-100 ease-out h-6",
+    `jump-to-code transition-width flex items-center justify-center rounded-full  duration-100 ease-out h-6 ${className}`,
     {
       "bg-primaryAccent cursor-pointer cursor-default": jumpToCodeButtonAvailable,
       "bg-gray-400 ": !jumpToCodeButtonAvailable,
