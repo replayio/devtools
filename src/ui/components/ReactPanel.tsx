@@ -12,6 +12,7 @@ import {
   Cache,
   StreamingCache,
   createCache,
+  createSingleEntryCache,
   createStreamingCache,
   useStreamingValue,
 } from "suspense";
@@ -26,7 +27,8 @@ import {
 import { simplifyDisplayName } from "devtools/client/debugger/src/utils/pause/frames/displayName";
 import IndeterminateLoader from "replay-next/components/IndeterminateLoader";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
-import { hitPointsForLocationCache } from "replay-next/src/suspense/HitPointsCache";
+import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPositionsCache";
+import { hitPointsCache, hitPointsForLocationCache } from "replay-next/src/suspense/HitPointsCache";
 import { getPointAndTimeForPauseId, pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { getPointDescriptionForFrame } from "replay-next/src/suspense/PointStackCache";
 import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
@@ -95,6 +97,143 @@ export const reactRenderQueuedJumpLocationCache: Cache<
         time: pointDescription.time,
       },
     };
+  },
+});
+
+export const reactInternalMethodsHitsCache: Cache<
+  [
+    replayClient: ReplayClientInterface,
+    range: TimeStampedPointRange | null,
+    reactDomSource: SourceDetails | undefined,
+    sourcesState: SourcesState
+  ],
+  | { scheduleUpdateHitPoints: TimeStampedPoint[]; onCommitFiberHitPoints: TimeStampedPoint[] }
+  | undefined
+> = createSingleEntryCache({
+  async load([replayClient, range, reactDomSource, sourcesState]) {
+    if (!reactDomSource || !range) {
+      return;
+    }
+
+    const [symbols, breakablePositionsResult] = await Promise.all([
+      sourceOutlineCache.readAsync(replayClient, reactDomSource.id),
+      breakpointPositionsCache.readAsync(replayClient, reactDomSource.id),
+    ]);
+
+    if (!symbols) {
+      return;
+    }
+
+    const [breakablePositions, breakablePositionsByLine] = breakablePositionsResult;
+
+    let scheduleUpdateFiberDeclaration: FunctionOutline | undefined;
+    let onCommitFiberRootDeclaration: FunctionOutline | undefined;
+
+    if (reactDomSource.url!.includes(".development")) {
+      const shouldUpdateFiberSymbol = symbols?.functions.find(
+        f => f.name === "scheduleUpdateOnFiber"
+      )!;
+      const onCommitRootSymbol = symbols?.functions.find(f => f.name === "onCommitRoot")!;
+
+      scheduleUpdateFiberDeclaration = shouldUpdateFiberSymbol;
+      onCommitFiberRootDeclaration = onCommitRootSymbol;
+    } else if (reactDomSource.url!.includes(".production")) {
+      // HACK We'll do this the hard way! This _should_ work back to React 16.14
+      // By careful inspection, we know that every minified version of `scheduleUpdateOnFiber`
+      // has a React extracted error code call of `someErrorFn(185)`. We also know that every
+      // minified version of `onCommitRoot` looks for the `.onCommitFiberRoot` function on the
+      // React DevTools global hook.
+      // By doing line-by-line string comparisons looking for these specific bits of code,
+      // we can consistently find the specific minified functions that we care about,
+      // across multiple React production builds, without needing to track minified function names.
+      // TODO Rethink this one React has sourcemaps
+
+      const streaming = streamingSourceContentsCache.stream(replayClient, reactDomSource!.id);
+      await streaming.resolver;
+
+      const reactDomSourceLines = streaming.value!.split("\n");
+
+      // A build-extracted React error code
+      const MAGIC_SCHEDULE_UPDATE_CONTENTS = "(185)";
+      // A call to the React DevTools global hook object
+      const MAGIC_ON_COMMIT_ROOT_CONTENTS = ".onCommitFiberRoot(";
+
+      // Brute-force search over all lines in the file to find the two functions that we
+      // actually care about, based on the magic strings that will exist.
+      for (let [lineZeroIndex, line] of reactDomSourceLines.entries()) {
+        const scheduleUpdateIndex = line.indexOf(MAGIC_SCHEDULE_UPDATE_CONTENTS);
+        const onCommitIndex = line.indexOf(MAGIC_ON_COMMIT_ROOT_CONTENTS);
+        if (scheduleUpdateIndex > -1) {
+          scheduleUpdateFiberDeclaration = findFunctionOutlineForLocation(
+            {
+              line: lineZeroIndex + 1,
+              column: scheduleUpdateIndex,
+            },
+            symbols
+          );
+          /*
+            const res = findClosestofSymbol(symbols.functions, {
+              line: lineZeroIndex + 1,
+              column: scheduleUpdateIndex,
+            });
+            if (res) {
+              scheduleUpdateFiberDeclaration = res.location.begin;
+            }
+            */
+        }
+        if (onCommitIndex > -1) {
+          onCommitFiberRootDeclaration = findFunctionOutlineForLocation(
+            {
+              line: lineZeroIndex + 1,
+              column: scheduleUpdateIndex,
+            },
+            symbols
+          );
+        }
+
+        if (scheduleUpdateFiberDeclaration && onCommitFiberRootDeclaration) {
+          break;
+        }
+      }
+    }
+
+    if (
+      !scheduleUpdateFiberDeclaration?.breakpointLocation ||
+      !onCommitFiberRootDeclaration?.breakpointLocation
+    ) {
+      return;
+    }
+
+    const firstScheduleUpdateFiberPosition = scheduleUpdateFiberDeclaration.breakpointLocation;
+
+    const firstOnCommitRootPosition = onCommitFiberRootDeclaration.breakpointLocation;
+
+    if (!firstScheduleUpdateFiberPosition || !firstOnCommitRootPosition) {
+      return;
+    }
+
+    const scheduleFiberUpdatePromise = hitPointsCache.readAsync(
+      BigInt(range.begin.point),
+      BigInt(range.end.point),
+      replayClient,
+      { ...firstScheduleUpdateFiberPosition, sourceId: reactDomSource.id },
+      null
+    );
+
+    const onCommitFiberHitsPromise = hitPointsCache.readAsync(
+      BigInt(range.begin.point),
+      BigInt(range.end.point),
+      replayClient,
+      { ...firstOnCommitRootPosition, sourceId: reactDomSource.id },
+      null
+    );
+
+    const [scheduleUpdateHitPoints, onCommitFiberHitPoints] = await Promise.all([
+      scheduleFiberUpdatePromise,
+      onCommitFiberHitsPromise,
+    ]);
+
+    return { scheduleUpdateHitPoints, onCommitFiberHitPoints };
   },
 });
 
@@ -371,7 +510,7 @@ function ReactQueuedRenderListItem({
   );
 }
 
-const getReactDomSourceUrl = createSelector(getSourceIdsByUrl, sourcesByUrl => {
+export const getReactDomSourceUrl = createSelector(getSourceIdsByUrl, sourcesByUrl => {
   const reactDomUrl = Object.keys(sourcesByUrl).find(key => {
     return key.includes("react-dom.");
   });
