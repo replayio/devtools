@@ -18,16 +18,15 @@ export default function IconWithTooltip({
   handleClick,
 }: IconWithTooltipProps) {
   const { onMouseEnter, onMouseLeave, tooltip } = useTooltip({
-    className: styles.iconTooltip,
     delay: 120,
     position: "right-of",
     tooltip: content,
   });
 
   return (
-    <div className={styles.iconWithTooltip}>
+    <div>
       <button
-        className={styles.iconWithTooltipButton} // changed here
+        className={styles.iconWithTooltipButton}
         data-test-name={dataTestName}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
