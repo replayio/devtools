@@ -114,6 +114,37 @@ function doSomeAnalysis(range: TimeStampedPointRange | null): UIThunkAction {
     );
 
     console.log("React internals time points: ", timePoints);
+
+    const dispatchMatches: FunctionMatch[] = [];
+
+    console.log("Searching functions for `dispatch`...");
+
+    const sourcesById = await sourcesByIdCache.readAsync(replayClient);
+    const reactReduxSources = Array.from(sourcesById.values()).filter(source =>
+      source.url?.includes("/redux/")
+    );
+
+    await replayClient.searchFunctions(
+      { query: "dispatch", sourceIds: reactReduxSources.map(source => source.id) },
+      matches => {
+        dispatchMatches.push(...matches);
+      }
+    );
+
+    const [firstMatch] = dispatchMatches;
+    const preferredLocation = getPreferredLocation(sourcesState, [firstMatch.loc]);
+    const source = sourcesById.get(preferredLocation.sourceId)!;
+    const fileOutline = await sourceOutlineCache.readAsync(replayClient, source.id);
+
+    const dispatchFunctions = fileOutline.functions.filter(o => o.name === "dispatch");
+    const createStoreFunction = fileOutline.functions.find(o => o.name === "createStore")!;
+    const realDispatchFunction = dispatchFunctions.find(f => {
+      return (
+        f.location.begin.line >= createStoreFunction.location.begin.line &&
+        f.location.end.line < createStoreFunction.location.end.line
+      );
+    });
+    console.log({ createStoreFunction, realDispatchFunction });
   };
 }
 
