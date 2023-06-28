@@ -1,7 +1,16 @@
 export interface CommandError extends Error {
   name: "CommandError";
   code: number;
+  args?: CommandArgs;
 }
+
+type CommandArgs = {
+  method: string;
+  params: Object;
+  id: number;
+  pauseId?: string;
+  sessionId?: string;
+};
 
 export enum ProtocolError {
   InternalError = 1,
@@ -24,10 +33,12 @@ export enum ProtocolError {
   FocusWindowChange = 76,
 }
 
-export const commandError = (message: string, code: number): CommandError => {
+export const commandError = (message: string, code: number, args?: CommandArgs): CommandError => {
   const err = new Error(message) as CommandError;
   err.name = "CommandError";
   err.code = code;
+  err.message = message;
+  err.args = args;
   return err;
 };
 

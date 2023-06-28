@@ -17,7 +17,7 @@ export default function CommentList() {
   const commentList = commentsCache.read(graphQLClient, accessToken, recordingId);
 
   return (
-    <ErrorBoundary>
+    <ErrorBoundary name="CommentList">
       <Suspense fallback={<Loader />}>
         <div className={styles.List}>
           <div className={styles.Header}>Comments</div>
