@@ -338,6 +338,21 @@ export async function processCypressTestRecording(
 
       for (let index = 0; index < annotations.length; index++) {
         const annotation = annotations[index];
+
+        if (!beginPoint || comparePoints(beginPoint.point, annotation.point) < 0) {
+          beginPoint = {
+            point: annotation.point,
+            time: annotation.time,
+          };
+        }
+
+        if (!endPoint || comparePoints(endPoint.point, annotation.point) > 0) {
+          endPoint = {
+            point: annotation.point,
+            time: annotation.time,
+          };
+        }
+
         switch (annotation.message.event) {
           case "event:navigation": {
             assert(annotation.message.url, "Navigation annotation must have a URL");
@@ -366,20 +381,6 @@ export async function processCypressTestRecording(
             } else {
               userActionEventIdToAnnotations[id].push(annotation);
             }
-            break;
-          }
-          case "test:start": {
-            beginPoint = {
-              point: annotation.point,
-              time: annotation.time,
-            };
-            break;
-          }
-          case "test:end": {
-            endPoint = {
-              point: annotation.point,
-              time: annotation.time,
-            };
             break;
           }
           default: {
@@ -583,64 +584,26 @@ export async function processGroupedTestCases(
       case "cypress": {
         const annotations = await AnnotationsCache.readAsync(replayClient);
 
-        let currentTestAnnotations: Annotation[] | null = null;
-        let currentTestRecording: AnyTestRecording | null = null;
-        let currentTestRecordingIndex = -1;
-        let currentTestHasEnded = true;
-
         // Annotations for the entire recording (which may include more than one test)
         // we need to splice only the appropriate subset for each test.
         const annotationsByTest: Annotation[][] = annotations.reduce(
           (accumulated: Annotation[][], annotation: Annotation) => {
-            eventSwitch: switch (annotation.message.event) {
-              case "step:enqueue":
-              case "step:start": {
-                if (currentTestHasEnded) {
-                  // TODO [SCS-1186]
-                  // Ignore steps that start outside of a test boundary;
-                  // These likely correspond to beforeAll or afterAll hooks which we filter for now
-                  return accumulated;
-                }
-                break;
-              }
-              case "test:start": {
-                // Tests that were skipped won't have annotations.
-                // Add empty annotations arrays for these.
-                if (currentTestHasEnded) {
-                  while (currentTestRecordingIndex < partialTestRecordings.length - 1) {
-                    currentTestRecordingIndex++;
-                    currentTestRecording = partialTestRecordings[currentTestRecordingIndex];
+            const { testId, attempt } = annotation.message;
 
-                    currentTestAnnotations = [];
-                    currentTestHasEnded = false;
+            assert(testId != null, "Test ID not found. Update the plugin!");
+            assert(attempt != null, "Test attempt count not found. Update the plugin!");
 
-                    accumulated.push(currentTestAnnotations);
-
-                    if (currentTestRecording.result !== "skipped") {
-                      break eventSwitch;
-                    }
-                  }
-                }
-
-                const currentTest = partialTestRecordings[currentTestRecordingIndex];
-                assert(
-                  currentTest?.id === annotation.message.testId,
-                  `Test id should match "test:start" annotation testId`
-                );
-
-                break;
-              }
-              case "test:end": {
-                currentTestHasEnded = true;
-                break;
-              }
+            // beforeAll/afterAll ... ignore
+            if (testId === -1) {
+              return accumulated;
             }
 
-            // Ignore annotations that happen before the first test
-            // (These are probably beforeAll annotations, which we don't fully support yet)
-            if (currentTestAnnotations) {
-              currentTestAnnotations.push(annotation);
-            }
+            const index = partialTestRecordings.findIndex(
+              t => t.id === testId && t.attempt === attempt
+            );
+            assert(index !== -1, "Test? What test?");
+            accumulated[index] = accumulated[index] || [];
+            accumulated[index].push(annotation);
 
             return accumulated;
           },
