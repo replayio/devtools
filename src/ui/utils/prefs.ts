@@ -1,24 +1,17 @@
 import { PrefsHelper } from "devtools/client/shared/prefs";
-import { asyncStoreHelper } from "devtools/shared/async-store-helper";
 import { pref } from "devtools/shared/services";
-import { ReplaySession } from "ui/setup/prefs";
 
 // Note: additional preferences are defined in other files,
 // including uses of `pref()`, `useLocalStorage`, and `useIndexedDB`.
 
 // app prefs.
 pref("devtools.defaultMode", "non-dev");
-pref("devtools.dev-secondary-panel-height", "375px");
 pref("devtools.disableCache", false);
 pref("devtools.disableLogRocket", false);
-pref("devtools.event-listeners-breakpoints", true);
 pref("devtools.listenForMetrics", false);
 pref("devtools.logTelemetryEvent", false);
 pref("devtools.showRedactions", false);
-pref("devtools.sidePanelSize", "240px");
 pref("devtools.theme", "system");
-pref("devtools.toolbox-size", "50%");
-pref("devtools.consoleFilterDrawerExpanded", true);
 
 // app features
 pref("devtools.features.basicProcessingLoadingBar", false);
@@ -26,15 +19,12 @@ pref("devtools.features.columnBreakpoints", false);
 pref("devtools.features.commentAttachments", false);
 pref("devtools.features.consoleFilterDrawerDefaultsToOpen", false);
 pref("devtools.features.disableScanDataCache", false);
-pref("devtools.features.disableUnHitLines", false);
 pref("devtools.features.disableStableQueryCache", false);
 pref("devtools.features.enableUnstableQueryCache", false);
 pref("devtools.features.enableLargeText", false);
-pref("devtools.features.hitCounts", true);
 pref("devtools.features.logProtocol", false);
 pref("devtools.features.logProtocolEvents", false);
 pref("devtools.features.newControllerOnRefresh", false);
-pref("devtools.features.originalClassNames", false);
 pref("devtools.features.profileWorkerThreads", false);
 pref("devtools.features.enableRoutines", false);
 pref("devtools.features.rerunRoutines", false);
@@ -58,12 +48,8 @@ export const prefs = new PrefsHelper("devtools", {
   disableLogRocket: ["Bool", "disableLogRocket"],
   listenForMetrics: ["Bool", "listenForMetrics"],
   logTelemetryEvent: ["Bool", "logTelemetryEvent"],
-  secondaryPanelHeight: ["String", "dev-secondary-panel-height"],
   showRedactions: ["Bool", "showRedactions"],
-  sidePanelSize: ["String", "sidePanelSize"],
   theme: ["String", "theme"],
-  toolboxSize: ["String", "toolbox-size"],
-  consoleFilterDrawerExpanded: ["Bool", "consoleFilterDrawerExpanded"],
 });
 
 export const features = new PrefsHelper("devtools.features", {
@@ -73,14 +59,12 @@ export const features = new PrefsHelper("devtools.features", {
   consoleFilterDrawerDefaultsToOpen: ["Bool", "consoleFilterDrawerDefaultsToOpen"],
   disableScanDataCache: ["Bool", "disableScanDataCache"],
   disableStableQueryCache: ["Bool", "disableStableQueryCache"],
-  disableUnHitLines: ["Bool", "disableUnHitLines"],
   enableLargeText: ["Bool", "enableLargeText"],
   enableRoutines: ["Bool", "enableRoutines"],
   enableUnstableQueryCache: ["Bool", "enableUnstableQueryCache"],
   logProtocol: ["Bool", "logProtocol"],
   logProtocolEvents: ["Bool", "logProtocolEvents"],
   newControllerOnRefresh: ["Bool", "newControllerOnRefresh"],
-  originalClassNames: ["Bool", "originalClassNames"],
   profileWorkerThreads: ["Bool", "profileWorkerThreads"],
   protocolTimeline: ["Bool", "protocolTimeline"],
   reactPanel: ["Bool", "reactPanel"],

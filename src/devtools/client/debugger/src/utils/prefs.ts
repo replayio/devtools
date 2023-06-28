@@ -12,15 +12,11 @@ const { prefs: prefsService } = Services;
 // Debugger prefs.
 pref("devtools.debugger.outline-expanded", true);
 pref("devtools.debugger.sources-collapsed", false);
-pref("devtools.debugger.log-exceptions", false);
 pref("devtools.debugger.call-stack-visible", true);
 pref("devtools.debugger.scopes-visible", true);
 pref("devtools.debugger.breakpoints-visible", true);
 pref("devtools.debugger.logpoints-visible", true);
-pref("devtools.debugger.event-listeners-visible", false);
 pref("devtools.debugger.ui.framework-grouping-on", true);
-pref("devtools.debugger.pending-selected-location", "{}");
-pref("devtools.debugger.features.column-breakpoints", true);
 
 export const prefs = new PrefsHelper("devtools", {
   outlineExpanded: ["Bool", "debugger.outline-expanded"],
