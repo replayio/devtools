@@ -61,8 +61,12 @@
 }
 
 .actions [role="list"] [role="listitem"].selected {
-  background-color: var(--theme-selection-background);
+  background: var(--primary-accent);
   color: white;
+}
+
+.actions [role="list"] [role="listitem"].selected:hover {
+  background: var(--primary-accent-hover);
 }
 
 .tabsContainer {
@@ -106,4 +110,20 @@
 .contentsTab:hover {
   background-color: var(--tab-hover-bgcolor);
   color: var(--tab-hover-color);
+}
+
+.list {
+  border-right: 1px solid var(--chrome);
+  height: 100%;
+  overflow-y: auto;
+}
+
+.row {
+  background: var(--body-bgcolor);
+  border-bottom: 1px solid var(--chrome);
+  padding: 0.2rem 0 0.1rem 0.5rem;
+  min-width: fit-content;
+  position: relative;
+  width: 100%;
+  cursor: pointer;
 }
