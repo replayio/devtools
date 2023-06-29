@@ -566,9 +566,14 @@ async function processAllSelectorCalls(
     end: TimeStampedPoint;
     duration: number;
     frame: PauseDescription["frame"];
+    exitLocation: Source;
   }
 
   const allHitsPerSelector: Record<string, FunctionExecutionTime[]> = {};
+
+  const allSelectorLocations = Object.values(uniqueSelectorFunctions).map(
+    fn => fn.firstBreakablePosition!
+  );
 
   console.log("Fetching all selector function hits", finalRange);
   await Promise.all(
@@ -589,11 +594,15 @@ async function processAllSelectorCalls(
       for (let i = 0; i < hits.length; i++) {
         const end = selectorCallEndTimes[i];
 
+        const endPreferredLocation = getPreferredLocation(sourcesState, end.frame!);
+        const endSource = sourcesById.get(endPreferredLocation.sourceId)!;
+
         functionExecutions.push({
           start: hits[i],
-          end: { point: end.point, time: end.time },
+          end,
           frame: end.frame,
           duration: end.time - hits[i].time,
+          exitLocation: endSource,
         });
       }
       allHitsPerSelector[formattedFunctionToString(fn)] = functionExecutions;
