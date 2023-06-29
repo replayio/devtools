@@ -2,39 +2,47 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import { asyncStorage, asyncStoreHelper } from "./async-store-helper";
-
-function mockAsyncStorage() {
-  const store = {};
-  jest.spyOn(asyncStorage, "getItem");
-  jest.spyOn(asyncStorage, "setItem");
-
-  asyncStorage.getItem.mockImplementation(key => store[key]);
-  asyncStorage.setItem.mockImplementation((key, value) => (store[key] = value));
-}
-
 describe("asycStoreHelper", () => {
+  let asyncStoreHelper;
+
+  beforeEach(() => {
+    jest.resetModules();
+
+    const store = {};
+
+    jest.mock("./async-storage", () => ({
+      getItem: async key => {
+        return store[key];
+      },
+      setItem: async (key, value) => {
+        store[key] = value;
+      },
+    }));
+
+    asyncStoreHelper = require("./async-store-helper").asyncStoreHelper;
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it("can get and set values", async () => {
-    mockAsyncStorage();
     const asyncStore = asyncStoreHelper("root", { a: "_a" });
     asyncStore.a = 3;
     await expect(await asyncStore.a).toEqual(3);
   });
 
   it("supports default values", async () => {
-    mockAsyncStorage();
     const asyncStore = asyncStoreHelper("root", { a: ["Json", "_a", {}] });
     await expect(await asyncStore.a).toEqual({});
   });
 
   it("undefined default value", async () => {
-    mockAsyncStorage();
     const asyncStore = asyncStoreHelper("root", { a: "_a" });
     await expect(await asyncStore.a).toEqual(null);
   });
 
   it("setting an undefined mapping", async () => {
-    mockAsyncStorage();
     const asyncStore = asyncStoreHelper("root", { a: "_a" });
     expect(() => {
       asyncStore.b = 3;
