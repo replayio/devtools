@@ -1,5 +1,7 @@
 import useTooltip from "replay-next/src/hooks/useTooltip";
 
+import styles from "./IconWithTooltip.module.css";
+
 interface IconWithTooltipProps {
   dataTestName?: string;
   icon: React.ReactNode;
@@ -16,16 +18,15 @@ export default function IconWithTooltip({
   handleClick,
 }: IconWithTooltipProps) {
   const { onMouseEnter, onMouseLeave, tooltip } = useTooltip({
-    className: "icon-tooltip",
-    delay: 250,
+    delay: 120,
     position: "right-of",
     tooltip: content,
   });
 
   return (
-    <div className="icon-with-tooltip text-sm">
+    <div>
       <button
-        className="icon-with-tooltip-button"
+        className={styles.iconWithTooltipButton}
         data-test-name={dataTestName}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}

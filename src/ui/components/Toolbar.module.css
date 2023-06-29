@@ -1,0 +1,8 @@
+.toolboxToolbarContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.toolboxToolbar {
+  flex: 1;
+}
