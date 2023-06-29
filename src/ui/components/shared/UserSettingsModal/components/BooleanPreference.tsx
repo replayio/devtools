@@ -39,7 +39,7 @@ export function BooleanPreference({
       htmlFor={preferencesKey}
     >
       <Checkbox
-        id={preferencesKey}
+        id={`BooleanPreference-${preferencesKey}`}
         checked={checked as boolean}
         onChange={() => {
           setChecked(!checked);
