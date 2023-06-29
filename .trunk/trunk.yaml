@@ -11,7 +11,7 @@ lint:
     - actionlint@1.6.8
     - eslint@8.13.0
     - gitleaks@8.3.0
-    - prettier@2.5.1
+    - prettier@2.8.8
     - stylelint@14.16.0
   ignore:
     - linters: [ALL]
