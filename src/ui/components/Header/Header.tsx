@@ -1,4 +1,5 @@
 import { RecordingId } from "@replayio/protocol";
+import classNames from "classnames";
 import { ClipboardEvent, KeyboardEvent, useLayoutEffect, useRef, useState } from "react";
 
 import { RecordingTarget } from "replay-next/src/suspense/BuildIdCache";
@@ -166,7 +167,8 @@ export default function Header() {
   const { isAuthenticated } = useAuth0();
   const recordingId = hooks.useGetRecordingId();
   const { recording, loading } = hooks.useGetRecording(recordingId);
-  const backIcon = <div className="img arrowhead-right" style={{ transform: "rotate(180deg)" }} />;
+  const backIcon = <div className={classNames(styles.BackButton, "img", "arrowhead-right")} />;
+
   const dashboardUrl = window.location.origin;
 
   const onNavigateBack: React.MouseEventHandler = event => {
@@ -182,7 +184,7 @@ export default function Header() {
 
   return (
     <div className={styles.Header}>
-      <div className="relative flex flex-grow flex-row items-center overflow-hidden">
+      <div className="relative flex flex-row items-center flex-grow overflow-hidden">
         {isAuthenticated && (
           <IconWithTooltip
             icon={backIcon}
