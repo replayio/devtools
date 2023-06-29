@@ -10,6 +10,7 @@ import {
 import { Immer } from "immer";
 
 import tabsReducer from "devtools/client/debugger/src/reducers/tabs";
+import { isDevelopment, skipTelemetry } from "shared/utils/environment";
 import { UIAction } from "ui/actions";
 import appReducer from "ui/reducers/app";
 import layoutReducer from "ui/reducers/layout";
@@ -17,7 +18,6 @@ import protocolMessages from "ui/reducers/protocolMessages";
 import sources from "ui/reducers/sources";
 import { context } from "ui/setup/redux/middleware/context";
 import { UIState } from "ui/state";
-import { isDevelopment, skipTelemetry } from "ui/utils/environment";
 import LogRocket from "ui/utils/logrocket";
 import { ThunkExtraArgs, extraThunkArgs } from "ui/utils/thunk";
 

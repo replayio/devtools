@@ -1,4 +1,4 @@
-import { encodeObjectToURL, getPausePointParams } from "ui/utils/environment";
+import { encodeObjectToURL, getPausePointParams } from "shared/utils/environment";
 
 describe("getPauseParams", () => {
   const urlWithFocusWindow = (focusWindow: string) => {

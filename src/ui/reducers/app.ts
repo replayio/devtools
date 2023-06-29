@@ -3,6 +3,7 @@ import { PayloadAction, createSelector, createSlice } from "@reduxjs/toolkit";
 import { RecordingTarget } from "replay-next/src/suspense/BuildIdCache";
 import { compareExecutionPoints, isExecutionPointsWithinRange } from "replay-next/src/utils/time";
 import { Workspace } from "shared/graphql/types";
+import { getSystemColorSchemePreference } from "shared/utils/environment";
 import { getFocusWindow } from "ui/reducers/timeline";
 import { UIState } from "ui/state";
 import {
@@ -20,7 +21,6 @@ import {
   UnexpectedError,
   UploadInfo,
 } from "ui/state/app";
-import { getSystemColorSchemePreference } from "ui/utils/environment";
 import { prefs } from "ui/utils/prefs";
 
 export const initialAppState: AppState = {

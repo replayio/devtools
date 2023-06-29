@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import { useEffect, useMemo } from "react";
 
 import { assert } from "protocol/utils";
+import { query } from "shared/graphql/apolloClient";
 import {
   AcceptRecordingCollaboratorRequest,
   AcceptRecordingCollaboratorRequestVariables,
@@ -72,7 +73,6 @@ import { Recording, RecordingRole, User, Workspace } from "shared/graphql/types"
 import { CollaboratorDbData } from "ui/components/shared/SharingModal/CollaboratorsList";
 import { GET_RECORDING, GET_RECORDING_USER_ID, SUBSCRIBE_RECORDING } from "ui/graphql/recordings";
 import { WorkspaceId } from "ui/state/app";
-import { query } from "ui/utils/apolloClient";
 import { extractIdAndSlug } from "ui/utils/helpers";
 import { getRecordingId } from "ui/utils/recording";
 

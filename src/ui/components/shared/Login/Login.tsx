@@ -4,11 +4,11 @@ import Link from "next/link";
 import React, { ReactNode, useEffect, useState } from "react";
 
 import Services from "devtools/shared/services";
+import { query } from "shared/graphql/apolloClient";
 import { GetConnection, GetConnectionVariables } from "shared/graphql/generated/GetConnection";
-import { query } from "ui/utils/apolloClient";
+import { getLoginReferrerParam } from "shared/utils/environment";
 import { getAuthClientId, getAuthHost } from "ui/utils/auth";
 import { requestBrowserLogin, setUserInBrowserPrefs } from "ui/utils/browser";
-import { getLoginReferrerParam } from "ui/utils/environment";
 import { isTeamMemberInvite } from "ui/utils/onboarding";
 import { sendTelemetryEvent } from "ui/utils/telemetry";
 import useAuth0 from "ui/utils/useAuth0";

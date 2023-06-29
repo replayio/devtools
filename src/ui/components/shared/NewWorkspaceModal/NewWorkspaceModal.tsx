@@ -12,10 +12,10 @@ import { ConnectedProps, connect } from "react-redux";
 
 import { CreateNewWorkspace_createWorkspace_workspace } from "shared/graphql/generated/CreateNewWorkspace";
 import { Workspace, WorkspaceUser } from "shared/graphql/types";
+import { removeUrlParameters } from "shared/utils/environment";
 import * as actions from "ui/actions/app";
 import { useRedirectToTeam } from "ui/components/Library/Team/utils";
 import hooks from "ui/hooks";
-import { removeUrlParameters } from "ui/utils/environment";
 import { isValidTeamName, validateEmail } from "ui/utils/helpers";
 
 import { useConfirm } from "../Confirm";

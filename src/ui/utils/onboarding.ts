@@ -1,5 +1,5 @@
+import { isReplayBrowser } from "shared/utils/environment";
 import { Nag } from "ui/hooks/users";
-import { isReplayBrowser } from "ui/utils/environment";
 
 import { shouldShowNag } from "./tour";
 

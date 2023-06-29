@@ -8,10 +8,10 @@ import {
   isGroupedTestCasesV1,
   isGroupedTestCasesV2,
 } from "shared/test-suites/RecordingTestMetadata";
+import { getDisplayedUrl } from "shared/utils/environment";
 import { TestResultIcon } from "ui/components/TestSuite/components/TestResultIcon";
 import hooks from "ui/hooks";
 import { useGetUserPermissions } from "ui/hooks/users";
-import { getDisplayedUrl } from "ui/utils/environment";
 import { getRecordingURL } from "ui/utils/recording";
 
 import { Redacted } from "../../../../../Redacted";

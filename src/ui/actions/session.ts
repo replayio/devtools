@@ -12,7 +12,9 @@ import {
 import { ThreadFront as ThreadFrontType } from "protocol/thread";
 import { assert } from "protocol/utils";
 import { recordingTargetCache } from "replay-next/src/suspense/BuildIdCache";
+import { extractGraphQLError } from "shared/graphql/apolloClient";
 import { Recording } from "shared/graphql/types";
+import { getPausePointParams, isMock, isTest } from "shared/utils/environment";
 import { UIThunkAction } from "ui/actions";
 import * as actions from "ui/actions/app";
 import { getRecording } from "ui/hooks/recordings";
@@ -34,8 +36,6 @@ import {
 } from "ui/reducers/protocolMessages";
 import { setFocusWindow } from "ui/reducers/timeline";
 import type { ExpectedError, UnexpectedError } from "ui/state/app";
-import { extractGraphQLError } from "ui/utils/apolloClient";
-import { getPausePointParams, isMock, isTest } from "ui/utils/environment";
 import LogRocket from "ui/utils/logrocket";
 import { endMixpanelSession } from "ui/utils/mixpanel";
 import { features, prefs } from "ui/utils/prefs";

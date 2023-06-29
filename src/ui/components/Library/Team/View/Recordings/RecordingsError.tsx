@@ -1,6 +1,6 @@
 import { ReactNode, useContext } from "react";
 
-import { isReplayBrowser } from "ui/utils/environment";
+import { isReplayBrowser } from "shared/utils/environment";
 
 import { FilterContext } from "../FilterContext";
 import styles from "../../../Library.module.css";
