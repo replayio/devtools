@@ -55,7 +55,11 @@ import { searchCache } from "replay-next/src/suspense/SearchCache";
 import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
 import { Source, sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
 import { streamingSourceContentsCache } from "replay-next/src/suspense/SourcesCache";
-import { compareExecutionPoints, isExecutionPointsGreaterThan } from "replay-next/src/utils/time";
+import {
+  compareExecutionPoints,
+  isExecutionPointsGreaterThan,
+  isExecutionPointsWithinRange,
+} from "replay-next/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
 import { UIThunkAction } from "ui/actions";
@@ -128,17 +132,88 @@ function doSomeAnalysis(range: TimeStampedPointRange | null): UIThunkAction {
       source.url?.includes("react-redux")
     );
 
-    await processReduxDispatches(getState, replayClient, finalRange, sourcesState, reactDomSource);
+    console.log("Fetching internals hits");
+    const reactInternalsHits = await reactInternalMethodsHitsCache.readAsync(
+      replayClient,
+      finalRange,
+      reactDomSource,
+      sourcesState
+    );
 
-    await processAllSelectorCalls(getState, replayClient, finalRange);
+    if (!reactInternalsHits) {
+      return;
+    }
+    const { onCommitFiberHitPoints, scheduleUpdateHitPoints } = reactInternalsHits;
 
-    await processReduxNotifications(
+    const dispatchResults = await processReduxDispatches(
+      getState,
+      replayClient,
+      finalRange,
+      sourcesState,
+      reactDomSource
+    );
+
+    const selectorResults = await processAllSelectorCalls(getState, replayClient, finalRange);
+
+    const notificationResults = await processReduxNotifications(
       replayClient,
       finalRange,
       reactReduxSources,
       sourcesById,
       sourcesState
     );
+
+    const allSelectorHitsFlattened = Object.values(selectorResults.allHitsPerSelector)
+      .flat()
+      .sort((a, b) => compareExecutionPoints(a.start.point, b.start.point));
+
+    const dispatchesToProcess = dispatchResults; //.slice(0, 5);
+
+    const processedDispatchResults = dispatchesToProcess.map(dispatchEntry => {
+      const { afterReducer, afterNotifications } = dispatchEntry;
+
+      const notificationsDuringDispatch = notificationResults.filter(n =>
+        isExecutionPointsWithinRange(n.start.point, afterReducer.point, afterNotifications.point)
+      );
+
+      const selectorCallsDuringNotifications = allSelectorHitsFlattened.filter(n =>
+        isExecutionPointsWithinRange(n.start.point, afterReducer.point, afterNotifications.point)
+      );
+
+      const sumOfSelectorDurations = selectorCallsDuringNotifications.reduce(
+        (sum, n) => sum + n.duration,
+        0
+      );
+
+      const selectorsWithExecutionGreaterThanZero = selectorCallsDuringNotifications.filter(
+        n => n.duration > 0
+      );
+
+      const scheduledUpdatesDuringDispatch = scheduleUpdateHitPoints.filter(n =>
+        isExecutionPointsWithinRange(n.point, afterReducer.point, afterNotifications.point)
+      );
+
+      const queuedRender = scheduledUpdatesDuringDispatch.length > 0;
+      let nextRenderCommit: TimeStampedPoint | undefined;
+      if (queuedRender) {
+        nextRenderCommit = onCommitFiberHitPoints.find(n =>
+          isExecutionPointsGreaterThan(n.point, afterNotifications.point)
+        );
+      }
+
+      return {
+        ...dispatchEntry,
+        notificationsDuringDispatch,
+        selectorCallsDuringNotifications,
+        sumOfSelectorDurations,
+        selectorsWithExecutionGreaterThanZero,
+        scheduledUpdatesDuringDispatch,
+        queuedRender,
+        nextRenderCommit,
+      };
+    });
+
+    console.log("Processed dispatch results: ", processedDispatchResults);
   };
 }
 
@@ -190,8 +265,8 @@ async function processReduxNotifications(
   const notifyStartFinishPairs = zip(notifyHits, stepOutLocations).map(([start, finish]) => {
     const preferredLocation = getPreferredLocation(sourcesState, finish!.frame!);
     return {
-      start,
-      finish,
+      start: start!,
+      finish: finish!,
       source: sourcesById.get(preferredLocation.sourceId)!,
     };
   });
@@ -215,19 +290,6 @@ async function processReduxDispatches(
   sourcesState: SourcesState,
   reactDomSource: Source
 ) {
-  console.log("Fetching internals hits");
-  const timePoints = await reactInternalMethodsHitsCache.readAsync(
-    replayClient,
-    range,
-    reactDomSource,
-    sourcesState
-  );
-  if (!timePoints) {
-    return [];
-  }
-
-  console.log("React internals time points: ", timePoints);
-
   const dispatchMatches: FunctionMatch[] = [];
 
   console.log("Searching functions for `dispatch`...");
@@ -577,6 +639,7 @@ async function processAllSelectorCalls(
   }
 
   interface FunctionExecutionTime {
+    locationString: string;
     start: TimeStampedPoint;
     end: TimeStampedPoint;
     duration: number;
@@ -589,6 +652,8 @@ async function processAllSelectorCalls(
   console.log("Fetching all selector function hits", finalRange);
   await Promise.all(
     Object.values(uniqueSelectorFunctions).map(async fn => {
+      const locationString = formattedFunctionToString(fn);
+
       const hits = await hitPointsCache.readAsync(
         BigInt(finalRange.begin.point),
         BigInt(finalRange.end.point),
@@ -609,6 +674,7 @@ async function processAllSelectorCalls(
         const endSource = sourcesById.get(endPreferredLocation.sourceId)!;
 
         functionExecutions.push({
+          locationString,
           start: hits[i],
           end,
           frame: end.frame,
@@ -616,7 +682,7 @@ async function processAllSelectorCalls(
           exitLocation: endSource,
         });
       }
-      allHitsPerSelector[formattedFunctionToString(fn)] = functionExecutions;
+      allHitsPerSelector[locationString] = functionExecutions;
     })
   );
 
