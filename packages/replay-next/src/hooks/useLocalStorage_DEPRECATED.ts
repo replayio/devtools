@@ -17,6 +17,9 @@ function manuallyTriggerStorageEvent() {
   window.dispatchEvent(new Event("storage"));
 }
 
+// This hook is DEPRECATED
+// Use the new preferences API (shared/preferences) which syncs local and remote preferences
+//
 // Stores value in localStorage and synchronizes it between sessions and tabs.
 // The API mirrors useState.
 // It can optionally be configured to wrap React updates in a transition.
@@ -24,7 +27,7 @@ function manuallyTriggerStorageEvent() {
 // Consider the following benefits and trade-offs of using this hook vs useIndexedDB:
 // * Local storage is synchronous which can simplify things when stored values are used during app initialization
 // * Local storage has a hard limit of ~5MB so it should not be used for values that grow over time (e.g. arrays, per-recording values)
-export default function useLocalStorage<T>(
+export default function useLocalStorage_DEPRECATED<T>(
   key: string,
   initialValue: T | (() => T),
   scheduleUpdatesAsTransitions: boolean = false

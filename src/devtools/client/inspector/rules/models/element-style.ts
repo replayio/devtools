@@ -5,10 +5,10 @@
 import { ProtocolClient } from "@replayio/protocol";
 
 import RuleModel, { NodeWithId } from "devtools/client/inspector/rules/models/rule";
-import Services from "devtools/shared/services";
 import { assert } from "protocol/utils";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientInterface } from "shared/client/types";
+import { preferences } from "shared/preferences/Preferences";
 import { appliedRulesCache } from "ui/suspense/styleCaches";
 
 import { RuleFront } from "./fronts/rule";
@@ -24,8 +24,6 @@ var IS_VARIABLE_TOKEN = new RegExp(`^--(${FIRST_CHAR})(${TRAILING_CHAR})*$`, "i"
 function isCssVariable(input: string) {
   return !!input.match(IS_VARIABLE_TOKEN);
 }
-
-const PREF_INACTIVE_CSS_ENABLED = "devtools.inspector.inactive.css.enabled";
 
 /**
  * ElementStyle is responsible for the following:
@@ -65,7 +63,7 @@ export default class ElementStyle {
 
   get unusedCssEnabled() {
     if (!this._unusedCssEnabled) {
-      this._unusedCssEnabled = Services.prefs.getBoolPref(PREF_INACTIVE_CSS_ENABLED, false);
+      this._unusedCssEnabled = preferences.get("inactiveCssEnabled");
     }
     return this._unusedCssEnabled;
   }

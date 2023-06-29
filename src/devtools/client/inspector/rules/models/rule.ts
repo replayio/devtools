@@ -5,8 +5,8 @@
 import { Node } from "@replayio/protocol";
 
 import TextProperty from "devtools/client/inspector/rules/models/text-property";
-import Services from "devtools/shared/services";
 import { assert } from "protocol/utils";
+import { isWindowsOS } from "shared/utils/os";
 import { shortSource } from "third-party/css-logic/shared-inspector-css-logic";
 import CSSProperties from "third-party/css/css-properties";
 import { parseNamedDeclarations } from "third-party/css/parsing-utils";
@@ -318,7 +318,7 @@ export default class RuleModel {
   stringifyRule() {
     const selectorText = this.selectorText;
     let cssText = "";
-    const terminator = Services.appinfo.OS === "WINNT" ? "\r\n" : "\n";
+    const terminator = isWindowsOS() ? "\r\n" : "\n";
 
     for (const textProp of this.textProps) {
       if (!textProp.invisible) {

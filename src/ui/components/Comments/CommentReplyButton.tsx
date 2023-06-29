@@ -1,10 +1,10 @@
 import { MouseEventHandler, useState } from "react";
 
+import { preferences } from "shared/preferences/Preferences";
 import { setModal } from "ui/actions/app";
 import useAddCommentReply from "ui/hooks/comments/useAddCommentReply";
 import { useAppDispatch } from "ui/setup/hooks";
 import { Comment } from "ui/state/comments";
-import { features } from "ui/utils/prefs";
 import useAuth0 from "ui/utils/useAuth0";
 
 import MaterialIcon from "../shared/MaterialIcon";
@@ -57,7 +57,7 @@ export default function CommentReplyButton({ comment }: { comment: Comment }) {
         Reply
       </button>
 
-      {features.commentAttachments && (
+      {preferences.get("commentAttachments") && (
         <MaterialIcon className={styles.AttachmentIcon} onClick={addAttachment}>
           attachment
         </MaterialIcon>

@@ -26,10 +26,10 @@ import { bootstrapApp } from "ui/setup";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { configureMockEnvironmentForTesting, isMock } from "shared/utils/environment";
 import { useLaunchDarkly } from "ui/utils/launchdarkly";
-import { features } from "ui/utils/prefs";
 import { InstallRouteListener } from "ui/utils/routeListener";
 import tokenManager from "ui/utils/tokenManager";
 
+import { preferences } from "shared/preferences/Preferences";
 import "../src/base.css";
 
 if (isMock()) {
@@ -38,7 +38,10 @@ if (isMock()) {
 }
 
 // Expose app feature flags to the protocol through an app-agnostic API.
-setFeatures(features);
+setFeatures({
+  chromiumRepaints: preferences.get("chromiumRepaints"),
+  repaintEvaluations: preferences.get("repaintEvaluations")
+});
 
 interface AuthProps {
   apiKey?: string;

@@ -14,19 +14,20 @@ import { assert } from "protocol/utils";
 import { recordingTargetCache } from "replay-next/src/suspense/BuildIdCache";
 import { extractGraphQLError } from "shared/graphql/apolloClient";
 import { Recording } from "shared/graphql/types";
+import { preferences } from "shared/preferences/Preferences";
 import { getPausePointParams, isMock, isTest } from "shared/utils/environment";
 import { UIThunkAction } from "ui/actions";
 import * as actions from "ui/actions/app";
 import { getRecording } from "ui/hooks/recordings";
-import { getFeature, getUserSettings } from "ui/hooks/settings";
+import { getUserSettings } from "ui/hooks/settings";
 import { getUserId, getUserInfo } from "ui/hooks/users";
 import {
   clearExpectedError,
   getExpectedError,
+  getUnexpectedError,
   setCurrentPoint,
   setTrialExpired,
 } from "ui/reducers/app";
-import { getUnexpectedError } from "ui/reducers/app";
 import {
   ProtocolEvent,
   errorReceived,
@@ -38,7 +39,6 @@ import { setFocusWindow } from "ui/reducers/timeline";
 import type { ExpectedError, UnexpectedError } from "ui/state/app";
 import LogRocket from "ui/utils/logrocket";
 import { endMixpanelSession } from "ui/utils/mixpanel";
-import { features, prefs } from "ui/utils/prefs";
 import { registerRecording, trackEvent } from "ui/utils/telemetry";
 import tokenManager from "ui/utils/tokenManager";
 import { subscriptionExpired } from "ui/utils/workspace";
@@ -47,7 +47,7 @@ import { setExpectedError, setUnexpectedError } from "./errors";
 import { setViewMode } from "./layout";
 import { jumpToInitialPausePoint } from "./timeline";
 
-export { setUnexpectedError, setExpectedError };
+export { setExpectedError, setUnexpectedError };
 
 declare global {
   interface Window {
@@ -197,20 +197,20 @@ export function createSocket(
       }
 
       const experimentalSettings: ExperimentalSettings = {
-        disableScanDataCache: getFeature("disableScanDataCache"),
-        disableCache: !!prefs.disableCache,
-        disableStableQueryCache: getFeature("disableStableQueryCache"),
-        disableUnstableQueryCache: !getFeature("enableUnstableQueryCache"),
-        listenForMetrics: !!prefs.listenForMetrics,
-        profileWorkerThreads: getFeature("profileWorkerThreads"),
-        enableRoutines: getFeature("enableRoutines"),
-        rerunRoutines: getFeature("rerunRoutines"),
-        disableRecordingAssetsInDatabase: getFeature("disableRecordingAssetsInDatabase"),
-        keepAllTraces: getFeature("keepAllTraces"),
-        disableIncrementalSnapshots: getFeature("disableIncrementalSnapshots"),
-        disableConcurrentControllerLoading: getFeature("disableConcurrentControllerLoading"),
+        disableScanDataCache: preferences.get("disableScanDataCache"),
+        disableCache: preferences.get("disableCache"),
+        disableStableQueryCache: preferences.get("disableStableQueryCache"),
+        disableUnstableQueryCache: !preferences.get("enableUnstableQueryCache"),
+        listenForMetrics: preferences.get("listenForMetrics"),
+        profileWorkerThreads: preferences.get("profileWorkerThreads"),
+        enableRoutines: preferences.get("enableRoutines"),
+        rerunRoutines: preferences.get("rerunRoutines"),
+        disableRecordingAssetsInDatabase: preferences.get("disableRecordingAssetsInDatabase"),
+        keepAllTraces: preferences.get("keepAllTraces"),
+        disableIncrementalSnapshots: preferences.get("disableIncrementalSnapshots"),
+        disableConcurrentControllerLoading: preferences.get("disableConcurrentControllerLoading"),
       };
-      if (features.newControllerOnRefresh) {
+      if (preferences.get("newControllerOnRefresh")) {
         experimentalSettings.controllerKey = String(Date.now());
       }
 
@@ -250,17 +250,17 @@ export function createSocket(
           : undefined,
         {
           onEvent: (event: ProtocolEvent) => {
-            if (getFeature("logProtocolEvents")) {
+            if (preferences.get("logProtocolEvents")) {
               queueAction(eventReceived({ ...event, recordedAt: window.performance.now() }));
             }
           },
           onRequest: (request: CommandRequest) => {
-            if (getFeature("logProtocol")) {
+            if (preferences.get("logProtocol")) {
               queueAction(requestSent({ ...request, recordedAt: window.performance.now() }));
             }
           },
           onResponse: (response: CommandResponse) => {
-            if (getFeature("logProtocol")) {
+            if (preferences.get("logProtocol")) {
               const clonedResponse = { ...response, recordedAt: window.performance.now() };
 
               if (isSourceContentsCommandResponse(clonedResponse)) {
@@ -276,7 +276,7 @@ export function createSocket(
             }
           },
           onResponseError: (error: CommandResponse) => {
-            if (getFeature("logProtocol")) {
+            if (preferences.get("logProtocol")) {
               queueAction(errorReceived({ ...error, recordedAt: window.performance.now() }));
             }
           },

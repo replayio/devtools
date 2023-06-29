@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 
-import { ExperimentalUserSettings } from "shared/graphql/types";
+import { UserSettings } from "shared/graphql/types";
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 import { useGetTeamRouteParams, useRedirectToTeam } from "ui/components/Library/Team/utils";
 import hooks from "ui/hooks";
@@ -10,7 +10,6 @@ import { UserInfo } from "ui/hooks/users";
 import logrocket from "ui/utils/logrocket";
 import useAuth0 from "ui/utils/useAuth0";
 
-import LoadingScreen from "../shared/LoadingScreen";
 import { LibraryNags } from "./LibraryNags";
 import Navigation from "./Navigation/Navigation";
 import { MY_LIBRARY_TEAM } from "./Team/TeamContextRoot";
@@ -67,13 +66,7 @@ export default function LibraryLoader() {
   return <Library userSettings={userSettings} userInfo={userInfo} />;
 }
 
-function Library({
-  userSettings,
-  userInfo,
-}: {
-  userSettings: ExperimentalUserSettings;
-  userInfo: UserInfo;
-}) {
+function Library({ userSettings, userInfo }: { userSettings: UserSettings; userInfo: UserInfo }) {
   const teamId = useGetTeamId(userSettings.defaultWorkspaceId);
   const isValidTeamId = useGetIsValidTeamId(teamId);
   const updateDefaultWorkspace = useUpdateDefaultWorkspace();

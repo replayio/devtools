@@ -18,6 +18,7 @@ import { locationsInclude } from "protocol/utils";
 import { frameStepsCache } from "replay-next/src/suspense/FrameStepsCache";
 import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { preferences } from "shared/preferences/Preferences";
 import { actions } from "ui/actions";
 import {
   SourcesState,
@@ -26,7 +27,6 @@ import {
   getSelectedSource,
 } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { features } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
 
 import { PartialLocation } from "../../actions/sources/select";
@@ -111,7 +111,7 @@ class FrameTimelineRenderer extends Component<FrameTimelineProps, FrameTimelineS
     // skip over steps that are mapped to the beginning of a function body
     // see SCS-172
     const bodyLocations = symbols?.functions.map(f => f.body).filter(Boolean) as SourceLocation[];
-    if (features.brokenSourcemapWorkaround && bodyLocations) {
+    if (preferences.get("brokenSourcemapWorkaround") && bodyLocations) {
       while (adjustedDisplayIndex < numberOfPositions - 2) {
         const location = frameSteps[adjustedDisplayIndex].frame?.find(
           location => location.sourceId === selectedLocation?.sourceId

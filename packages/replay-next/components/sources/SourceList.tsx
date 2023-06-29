@@ -19,7 +19,6 @@ import { findPointForLocation } from "replay-next/components/sources/utils/point
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { PointsContext } from "replay-next/src/contexts/points/PointsContext";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
-import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
 import {
   BreakpointPositionsResult,
   breakpointPositionsCache,
@@ -32,6 +31,7 @@ import { Source } from "replay-next/src/suspense/SourcesCache";
 import { StreamingParser } from "replay-next/src/suspense/SyntaxParsingCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { POINT_BEHAVIOR_DISABLED, POINT_BEHAVIOR_ENABLED } from "shared/client/types";
+import { usePreference } from "shared/preferences/usePreference";
 import { toPointRange } from "shared/utils/time";
 
 import useFontBasedListMeasurements from "./hooks/useFontBasedListMeasurements";
@@ -150,8 +150,7 @@ export default function SourceList({
     }
   }, [focusedSource, lineCount, markPendingFocusUpdateProcessed, pendingFocusUpdate, sourceId]);
 
-  const togglesLocalStorageKey = `Replay:ShowHitCounts`;
-  const [showHitCounts] = useLocalStorage<boolean>(togglesLocalStorageKey, true);
+  const [showHitCounts] = usePreference("showHitCounts");
 
   const [minHitCount, maxHitCount] = getCachedMinMaxSourceHitCounts(sourceId, focusRange);
 

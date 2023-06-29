@@ -3,10 +3,10 @@ import { Integrations } from "@sentry/tracing";
 
 import { recordData as recordTelemetryData } from "replay-next/src/utils/telemetry";
 import { Recording } from "shared/graphql/types";
+import { preferences } from "shared/preferences/Preferences";
 import { skipTelemetry } from "shared/utils/environment";
 
 import { initializeMixpanel, trackMixpanelEvent } from "./mixpanel";
-import { prefs } from "./prefs";
 
 const timings: Record<string, number> = {};
 
@@ -111,7 +111,7 @@ export function setTelemetryContext({ id, email, internal }: TelemetryUser) {
 }
 
 export function sendTelemetryEvent(event: string, tags: any = {}) {
-  if (prefs.logTelemetryEvent) {
+  if (preferences.get("logTelemetryEvent")) {
     console.log("telemetry event", { event, tags });
   }
 

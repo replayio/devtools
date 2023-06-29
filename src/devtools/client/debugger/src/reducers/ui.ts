@@ -5,10 +5,10 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import type { Location } from "@replayio/protocol";
 
+import { preferences } from "shared/preferences/Preferences";
 import { SourceDetails } from "ui/reducers/sources";
 import type { UIState } from "ui/state";
 
-import { prefs } from "../utils/prefs";
 import { closeQuickOpen } from "./quick-open";
 import type { Range } from "./types";
 
@@ -41,8 +41,8 @@ export const createUIState = (): UISliceState => ({
   fullTextSearchQuery: "",
   fullTextSearchFocus: false,
   shownSource: null,
-  sourcesCollapsed: prefs.sourcesCollapsed as boolean,
-  frameworkGroupingOn: prefs.frameworkGroupingOn as boolean,
+  sourcesCollapsed: preferences.get("sourcesCollapsed"),
+  frameworkGroupingOn: preferences.get("frameworkGroupingOn"),
   highlightedLineRange: undefined,
   viewport: null,
   cursorPosition: null,

@@ -9,13 +9,12 @@ import type {
   Location,
   getSourceOutlineResult,
 } from "@replayio/protocol";
+import memoizeOne from "memoize-one";
 
 import { truncate as truncateText } from "replay-next/src/utils/text";
 import { SourceDetails } from "ui/reducers/sources";
-import { LoadingStatus } from "ui/utils/LoadingStatus";
 
 import { SearchTypes } from "../reducers/quick-open";
-import { memoizeLast } from "./memoizeLast";
 import { getSourceClassnames, getTruncatedFileName } from "./source";
 
 export const MODIFIERS: Record<string, SearchTypes> = {
@@ -121,7 +120,7 @@ export function formatProjectFunctions(
 
 const NO_FUNCTIONS_FOUND = { functions: [] };
 
-export const formatSymbols = memoizeLast((symbols: getSourceOutlineResult | null) => {
+export const formatSymbols = memoizeOne((symbols: getSourceOutlineResult | null) => {
   if (!symbols) {
     return NO_FUNCTIONS_FOUND;
   }

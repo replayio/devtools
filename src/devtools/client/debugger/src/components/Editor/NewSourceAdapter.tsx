@@ -12,7 +12,8 @@ import { KeyboardModifiersContextRoot } from "replay-next/src/contexts/KeyboardM
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import { getSourceSuspends } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { useFeature } from "ui/hooks/settings";
+import { preferences } from "shared/preferences/Preferences";
+import { usePreference } from "shared/preferences/usePreference";
 import { getSelectedLocation, getSelectedLocationHasScrolled } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
@@ -42,7 +43,7 @@ function NewSourceAdapter() {
   const sourceSearchInputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const { value: showColumnBreakpoints } = useFeature("columnBreakpoints");
+  const [showColumnBreakpoints] = usePreference("columnBreakpoints");
 
   const dispatch = useAppDispatch();
   const location = useAppSelector(getSelectedLocation);

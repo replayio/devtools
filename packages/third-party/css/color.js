@@ -5,13 +5,11 @@
 
 "use strict";
 
-import Services from "devtools/shared/services";
-import { getCSSLexer } from "./lexer";
 import { cssColors } from "./color-db";
+import { getCSSLexer } from "./lexer";
 
-import { CSS_ANGLEUNIT }from "./constants";
-
-const COLOR_UNIT_PREF = "devtools.defaultColorUnit";
+import { preferences } from "shared/preferences/Preferences";
+import { CSS_ANGLEUNIT } from "./constants";
 
 const SPECIALVALUES = new Set(["currentcolor", "initial", "inherit", "transparent", "unset"]);
 
@@ -93,7 +91,7 @@ CssColor.prototype = {
 
   get colorUnit() {
     if (this._colorUnit === null) {
-      const defaultUnit = Services.prefs.getCharPref(COLOR_UNIT_PREF);
+      const defaultUnit = preferences.get('defaultColorUnit');
       this._colorUnit = CssColor.COLORUNIT[defaultUnit];
       this._setColorUnitUppercase(this.authored);
     }

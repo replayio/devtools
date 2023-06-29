@@ -11,18 +11,9 @@ export const GET_USER_SETTINGS = gql`
         recordingCount
         maxRecordings
       }
-      preferences
       defaultWorkspace {
         id
       }
-    }
-  }
-`;
-
-export const UPDATE_USER_PREFERENCES = gql`
-  mutation UpdateUserPreferences($preferences: JSONObject!) {
-    updateUserPreferences(input: { preferences: $preferences }) {
-      success
     }
   }
 `;

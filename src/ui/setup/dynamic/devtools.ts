@@ -1,4 +1,3 @@
-import "devtools/client/inspector/prefs";
 // Side-effectful import, has to be imported before event-listeners
 // Ordering matters here
 import { ActionCreatorWithoutPayload, bindActionCreators } from "@reduxjs/toolkit";
@@ -9,7 +8,6 @@ import debounce from "lodash/debounce";
 import { setupSourcesListeners } from "devtools/client/debugger/src/actions/sources";
 import * as dbgClient from "devtools/client/debugger/src/client";
 import debuggerReducers from "devtools/client/debugger/src/reducers";
-import { setupDebuggerHelper } from "devtools/client/debugger/src/utils/dbg";
 import { setupBoxModel } from "devtools/client/inspector/boxmodel/actions/box-model";
 import { setupMarkup } from "devtools/client/inspector/markup/actions/markup";
 import * as inspectorReducers from "devtools/client/inspector/reducers";
@@ -155,8 +153,6 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
   // @ts-expect-error complains about thunk type mismatches
   window.app.actions = bindActionCreators(actions, store.dispatch);
   window.app.selectors = bindSelectors(store, justSelectors);
-  window.app.debugger = setupDebuggerHelper();
-  window.app.prefs = window.app.prefs ?? {};
 
   const initialState = {};
 

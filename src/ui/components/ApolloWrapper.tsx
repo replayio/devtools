@@ -1,6 +1,6 @@
 import { ApolloProvider, from } from "@apollo/client";
 import { MockedProvider, MockedResponse } from "@apollo/client/testing";
-import React, { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 
 import {
   clientWaiter,

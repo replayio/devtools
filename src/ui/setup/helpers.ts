@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-restricted-imports
 import { client, sendMessage, triggerEvent } from "protocol/socket";
+import { Preferences, preferences } from "shared/preferences/Preferences";
 import { UIStore } from "ui/actions";
-import { features, prefs } from "ui/utils/prefs";
 import { getRecordingId } from "ui/utils/recording";
 
 import { ReplaySession, getReplaySession } from "./prefs";
@@ -12,12 +12,10 @@ declare global {
   }
   interface AppHelpers {
     store: UIStore;
-    prefs: typeof prefs;
-    features: typeof features;
-    dumpPrefs: () => string;
     local: () => void;
     prod: () => void;
     clearIndexedDB: () => void;
+    preferences: Preferences;
     replaySession: ReplaySession | undefined;
     triggerEvent: typeof triggerEvent;
     sendMessage: typeof sendMessage;
@@ -30,18 +28,16 @@ export async function setupAppHelper(store: UIStore) {
   const recordingId = getRecordingId();
   const replaySession = recordingId ? await getReplaySession(recordingId) : undefined;
 
+  // TODO [FE-1483] Expose new prefs and features here (somehow)
   window.app = {
     store,
-    prefs,
-    features,
+    preferences,
     triggerEvent,
     replaySession,
     client,
     sendMessage: (cmd, args = {}, pauseId) =>
       sendMessage(cmd, args, window.sessionId, pauseId as any, true),
     releaseSession: () => client.Recording.releaseSession({ sessionId: window.sessionId }),
-    dumpPrefs: () =>
-      JSON.stringify({ features: features.toJSON(), prefs: prefs.toJSON() }, null, 2),
     local: () => {
       if (recordingId) {
         window.location.href = `http://localhost:8080/recording/${recordingId}`;

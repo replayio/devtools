@@ -20,7 +20,7 @@ import { SelectedFrameContextRoot } from "replay-next/src/contexts/SelectedFrame
 import { SourcesContextRoot } from "replay-next/src/contexts/SourcesContext";
 import { TerminalContextRoot } from "replay-next/src/contexts/TerminalContext";
 import { TimelineContextRoot } from "replay-next/src/contexts/TimelineContext";
-import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
+import useLocalStorage_DEPRECATED from "replay-next/src/hooks/useLocalStorage_DEPRECATED";
 import usePreferredColorScheme from "replay-next/src/hooks/usePreferredColorScheme";
 
 import styles from "./index.module.css";
@@ -35,7 +35,13 @@ export default function HomePage({ apiKey }: { apiKey?: string }) {
   // TODO As we finalize the client implementation to interface with Replay backend,
   // we can inject a wrapper here that also reports cache hits and misses to this UI in a debug panel.
 
-  const [panel, setPanel, isPending] = useLocalStorage<Panel>("bvaughn:panel", "sources", true);
+  // It's okay to use the deprecated localStorage hook for this page
+  // because it's only used for e2e testing and local development
+  const [panel, setPanel, isPending] = useLocalStorage_DEPRECATED<Panel>(
+    "bvaughn:panel",
+    "sources",
+    true
+  );
 
   const showCommentsPanel = useCallback(() => setPanel("comments"), [setPanel]);
   const showSourcesPanel = useCallback(() => setPanel("sources"), [setPanel]);

@@ -20,10 +20,6 @@ export function createUserSettingsMock(): MockedResponse[] {
       __typename: "AuthenticatedUser",
       apiKeys: [],
       defaultWorkspace: null,
-      preferences: {
-        disableLogRocket: false,
-        role: "developer",
-      },
     },
   };
 

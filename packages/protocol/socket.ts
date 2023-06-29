@@ -120,6 +120,7 @@ const noCallerStackTracesForFailedCommands = new Set<CommandMethods>([
   "Session.createPause",
 ]);
 
+// TODO [FE-1483] Remove this type
 export type ExperimentalSettings = {
   listenForMetrics: boolean;
   controllerKey?: string;

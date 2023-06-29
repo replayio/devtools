@@ -10,11 +10,13 @@ import { preCacheExecutionPointForTime } from "replay-next/src/suspense/Executio
 import { sourcesCache } from "replay-next/src/suspense/SourcesCache";
 import { replayClient } from "shared/client/ReplayClientContext";
 import { Recording } from "shared/graphql/types";
+import { preferences } from "shared/preferences/Preferences";
+import { getSystemColorScheme } from "shared/theme/getSystemColorScheme";
 import { UIStore } from "ui/actions";
 import { getRecording } from "ui/hooks/recordings";
 import { getUserSettings } from "ui/hooks/settings";
 import { getUserInfo } from "ui/hooks/users";
-import { getTheme, initialAppState } from "ui/reducers/app";
+import { initialAppState } from "ui/reducers/app";
 import { syncInitialLayoutState } from "ui/reducers/layout";
 import { SourcesState, initialState as initialSourcesState } from "ui/reducers/sources";
 import { ReplaySession, getReplaySession } from "ui/setup/prefs";
@@ -23,8 +25,7 @@ import { setUserInBrowserPrefs } from "ui/utils/browser";
 import { initLaunchDarkly } from "ui/utils/launchdarkly";
 import { maybeSetMixpanelContext } from "ui/utils/mixpanel";
 import { getRecordingId } from "ui/utils/recording";
-import { setTelemetryContext, setupTelemetry } from "ui/utils/telemetry";
-import { trackEvent } from "ui/utils/telemetry";
+import { setTelemetryContext, setupTelemetry, trackEvent } from "ui/utils/telemetry";
 import tokenManager from "ui/utils/tokenManager";
 
 import { setupDOMHelpers } from "./dom";
@@ -169,7 +170,10 @@ export async function bootstrapApp() {
   registerStoreObserver(store, updatePrefs);
   await setupAppHelper(store);
 
-  const theme = getTheme(store.getState());
+  let theme = preferences.get("theme");
+  if (theme === "system") {
+    theme = getSystemColorScheme();
+  }
   document.body.parentElement!.className = theme || "";
 
   tokenManager.addListener(async tokenState => {
@@ -184,7 +188,7 @@ export async function bootstrapApp() {
     if (userInfo) {
       const userSettings = await getUserSettings();
       const workspaceId = userSettings.defaultWorkspaceId;
-      const role = userSettings.role;
+      const role = preferences.get("role");
 
       setTelemetryContext(userInfo);
       maybeSetMixpanelContext({ ...userInfo, workspaceId, role });

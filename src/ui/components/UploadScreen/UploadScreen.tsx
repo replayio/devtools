@@ -1,6 +1,6 @@
-import React, { Dispatch, ReactNode, SetStateAction, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
-import { ExperimentalUserSettings, Recording } from "shared/graphql/types";
+import { Recording, UserSettings } from "shared/graphql/types";
 import Modal from "ui/components/shared/NewModal";
 import hooks from "ui/hooks";
 import { useGetRecordingId } from "ui/hooks/recordings";
@@ -20,7 +20,7 @@ import { UploadRecordingTrialEnd } from "./UploadRecordingTrialEnd";
 
 type UploadScreenProps = {
   recording: Recording;
-  userSettings: ExperimentalUserSettings;
+  userSettings: UserSettings;
   onUpload: () => void;
 };
 type Status = "saving" | "deleting" | "deleted" | null;

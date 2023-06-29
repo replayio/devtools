@@ -1,25 +1,17 @@
-import "ui/setup/dynamic/inspector";
 import classnames from "classnames";
-import React, {
-  FC,
-  ReactNode,
-  RefObject,
-  Suspense,
-  useContext,
-  useEffect,
-  useLayoutEffect,
-  useState,
-} from "react";
+import React, { FC, ReactNode, RefObject, Suspense, useContext, useLayoutEffect } from "react";
 import { ImperativePanelHandle } from "react-resizable-panels";
 import { useImperativeCacheValue } from "suspense";
 
 import { EditorPane } from "devtools/client/debugger/src/components/Editor/EditorPane";
 import LazyOffscreen from "replay-next/components/LazyOffscreen";
-import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
-import { RecordingCapabilities } from "replay-next/src/suspense/BuildIdCache";
+import {
+  RecordingCapabilities,
+  recordingCapabilitiesCache,
+} from "replay-next/src/suspense/BuildIdCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { usePreference } from "shared/preferences/usePreference";
 import { setSelectedPanel } from "ui/actions/layout";
-import { useFeature } from "ui/hooks/settings";
 import { getSelectedPanel, getToolboxLayout } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { SecondaryPanelName, ToolboxLayout } from "ui/state/layout";
@@ -90,7 +82,7 @@ const PanelButtons: FC<PanelButtonsProps> = ({
 }) => {
   const { supportsElementsInspector, supportsNetworkRequests, supportsRepaintingGraphics } =
     recordingCapabilities;
-  const { value: chromiumNetMonitorEnabled } = useFeature("chromiumNetMonitor");
+  const [chromiumNetMonitorEnabled] = usePreference("chromiumNetMonitor");
 
   return (
     <div className="panel-buttons theme-tab-font-size flex flex-row items-center overflow-hidden">
@@ -185,8 +177,8 @@ function SecondaryToolbox({
     REDUX_ANNOTATIONS_KIND
   );
 
+  const chromiumNetMonitorEnabled = usePreference("chromiumNetMonitor");
   const recordingCapabilities = recordingCapabilitiesCache.read(replayClient);
-  const { value: chromiumNetMonitorEnabled } = useFeature("chromiumNetMonitor");
 
   useLayoutEffect(() => {
     if (selectedPanel === "react-components" && !hasReactAnnotations) {

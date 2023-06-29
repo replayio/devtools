@@ -1,34 +1,22 @@
 import { useRouter } from "next/router";
-import React from "react";
 
+import { preferences } from "shared/preferences/Preferences";
+import { Role } from "shared/preferences/types";
 import { getButtonClasses } from "ui/components/shared/Button";
 import {
   OnboardingActions,
   OnboardingBody,
-  OnboardingContent,
   OnboardingContentWrapper,
   OnboardingHeader,
   OnboardingModalContainer,
 } from "ui/components/shared/Onboarding";
-import { useUpdateUserPreferences } from "ui/hooks/settings";
-import { sendTelemetryEvent } from "ui/utils/telemetry";
 
 export default function ImportSettings() {
   const router = useRouter();
-  const { updateUserPreferences } = useUpdateUserPreferences();
-  const setRole = (role: string) => {
+  const setRole = async (role: Role) => {
     // TODO [ryanjduffy]: Should this route to the tutorial app?
-    updateUserPreferences({ variables: { preferences: { role } } })
-      .then(() => router.push("/"))
-      .catch(e => {
-        sendTelemetryEvent("DevtoolsGraphQLError", {
-          source: "updateUserSetting",
-          role,
-          message: e,
-        });
-
-        router.push("/");
-      });
+    await preferences.set("role", role);
+    router.push("/");
   };
 
   return (

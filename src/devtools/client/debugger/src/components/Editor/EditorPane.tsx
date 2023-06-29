@@ -1,9 +1,9 @@
 import classNames from "classnames";
-import React, { useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 
 import { IndeterminateProgressBar } from "replay-next/components/IndeterminateLoader";
+import { preferences } from "shared/preferences/Preferences";
 import { Redacted } from "ui/components/Redacted";
-import { useFeature } from "ui/hooks/settings";
 import { getToolboxLayout } from "ui/reducers/layout";
 import { getSelectedSource, getSourcesUserActionPending } from "ui/reducers/sources";
 import { useAppSelector } from "ui/setup/hooks";
@@ -19,7 +19,7 @@ export const EditorPane = () => {
   const selectedSource = useAppSelector(getSelectedSource);
   const sourcesUserActionPending = useAppSelector(getSourcesUserActionPending);
   const panelEl = useRef(null);
-  const { value: enableLargeText } = useFeature("enableLargeText");
+  const enableLargeText = preferences.get("enableLargeText");
 
   const nodeWidth = useWidthObserver(panelEl);
 

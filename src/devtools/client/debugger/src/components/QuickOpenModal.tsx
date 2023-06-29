@@ -5,6 +5,7 @@
 import { Dictionary } from "@reduxjs/toolkit";
 import fuzzyAldrin from "fuzzaldrin-plus";
 import debounce from "lodash/debounce";
+import memoizeOne from "memoize-one";
 import React, { Component } from "react";
 import { useImperativeCacheValue } from "suspense";
 
@@ -41,7 +42,6 @@ import {
   getSourcesForTabs,
   getTabs,
 } from "../selectors";
-import { memoizeLast } from "../utils/memoizeLast";
 import { basename } from "../utils/path";
 import {
   SearchResult,
@@ -130,7 +130,7 @@ class QuickOpenModal extends Component<QuickOpenModalProps, QOMState> {
     return index !== -1 ? query.slice(0, index) : query;
   };
 
-  formatSources = memoizeLast(
+  formatSources = memoizeOne(
     (
       sourcesToDisplayByUrl: Dictionary<SourceDetails>,
       tabs: { url: string }[],

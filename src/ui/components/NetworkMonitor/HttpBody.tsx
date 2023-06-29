@@ -3,8 +3,7 @@ import classNames from "classnames";
 import dynamic from "next/dynamic";
 import { useMemo, useState } from "react";
 
-import { getTheme } from "ui/reducers/app";
-import { useAppSelector } from "ui/setup/hooks";
+import { useTheme } from "shared/theme/useTheme";
 
 import MaterialIcon from "../shared/MaterialIcon";
 import BodyDownload from "./BodyDownload";
@@ -75,7 +74,7 @@ const HttpBody = ({
   contentType: string;
   filename: string;
 }) => {
-  const theme = useAppSelector(getTheme);
+  const theme = useTheme();
   const raw = useMemo(() => {
     return BodyPartsToUInt8Array(bodyParts, contentType);
   }, [contentType, bodyParts]);

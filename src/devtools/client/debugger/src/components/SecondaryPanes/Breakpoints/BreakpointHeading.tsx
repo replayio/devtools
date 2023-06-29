@@ -4,10 +4,10 @@ import { ConnectedProps, connect } from "react-redux";
 
 import type { Context } from "devtools/client/debugger/src/reducers/pause";
 import { Point } from "shared/client/types";
+import { preferences } from "shared/preferences/Preferences";
 import { Redacted } from "ui/components/Redacted";
 import { MiniSource, getHasSiblingOfSameName, getSourceDetails } from "ui/reducers/sources";
 import type { UIState } from "ui/state";
-import { features } from "ui/utils/prefs";
 
 import actions from "../../../actions";
 import { getExecutionPoint } from "../../../reducers/pause";
@@ -50,7 +50,7 @@ class BreakpointHeading extends PureComponent<BreakpointsProps> {
     const { breakpoint, source, hasSiblingOfSameName } = this.props;
     const { column, line } = breakpoint?.location ?? {};
 
-    const columnVal = features.columnBreakpoints && column != null ? `:${column}` : "";
+    const columnVal = preferences.get("columnBreakpoints") && column != null ? `:${column}` : "";
     const location = `:${line}${columnVal}`;
 
     const query = hasSiblingOfSameName ? getSourceQueryString(source) : "";

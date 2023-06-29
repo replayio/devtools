@@ -1,15 +1,14 @@
 import { Action } from "@reduxjs/toolkit";
 
+import { ActiveInspectorTab } from "shared/preferences/types";
 import { trackEvent } from "ui/utils/telemetry";
 
-import { InspectorActiveTab } from "../reducers";
-
 export type SetActiveTabAction = Action<"set_active_inspector_tab"> & {
-  activeTab: InspectorActiveTab;
+  activeTab: ActiveInspectorTab;
 };
 export type InspectorAction = SetActiveTabAction;
 
-export function setActiveTab(activeTab: InspectorActiveTab): SetActiveTabAction {
+export function setActiveTab(activeTab: ActiveInspectorTab): SetActiveTabAction {
   trackEvent("inspector.select_tab", { tab: activeTab });
   return { type: "set_active_inspector_tab", activeTab };
 }

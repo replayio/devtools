@@ -10,15 +10,15 @@ import { selectNode } from "devtools/client/inspector/markup/actions/markup";
 import { onViewSourceInDebugger } from "devtools/client/webconsole/actions";
 import { ThreadFront } from "protocol/thread";
 import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
-import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
+import { usePreference } from "shared/preferences/usePreference";
 import { setSelectedPanel, setSelectedPrimaryPanel } from "ui/actions/layout";
-import { sidePanelStorageKey } from "ui/components/DevTools";
 import { useAppDispatch } from "ui/setup/hooks";
 
 // Adapter that connects inspect-function and inspect-html-element actions with Redux.
 export default function InspectorContextReduxAdapter({ children }: { children: ReactNode }) {
   const dispatch = useAppDispatch();
-  const [, setSidePanelCollapsed] = useLocalStorage(sidePanelStorageKey, false);
+
+  const [, setSidePanelCollapsed] = usePreference("sidePanelCollapsed");
 
   const inspectFunctionDefinition = useCallback(
     (mappedLocation: MappedLocation) => {

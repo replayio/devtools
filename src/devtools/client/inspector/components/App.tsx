@@ -1,4 +1,3 @@
-import "ui/setup/dynamic/inspector";
 import { useContext } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
@@ -8,22 +7,22 @@ import MarkupApp from "devtools/client/inspector/markup/components/MarkupApp";
 import { RulesApp } from "devtools/client/inspector/rules/components/RulesApp";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { useIsPointWithinFocusWindow } from "replay-next/src/hooks/useIsPointWithinFocusWindow";
+import { ActiveInspectorTab } from "shared/preferences/types";
 import { enterFocusMode } from "ui/actions/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 import { ResponsiveTabs, Tab } from "../../shared/components/ResponsiveTabs";
 import { setActiveTab } from "../actions";
 import { EventListenersApp } from "../event-listeners/EventListenersApp";
-import { InspectorActiveTab } from "../reducers";
 
-const INSPECTOR_TAB_TITLES: Record<InspectorActiveTab, string> = {
+const INSPECTOR_TAB_TITLES: Record<ActiveInspectorTab, string> = {
   ruleview: "Rules",
   computedview: "Computed",
   layoutview: "Layout",
   eventsview: "Event Listeners",
 } as const;
 
-const availableTabs: readonly InspectorActiveTab[] = [
+const availableTabs: readonly ActiveInspectorTab[] = [
   "ruleview",
   "layoutview",
   "computedview",

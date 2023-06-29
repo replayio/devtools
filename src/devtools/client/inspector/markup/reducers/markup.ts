@@ -1,14 +1,9 @@
 // Side-effectful import - needed to initialize these prefs
-import "devtools/client/inspector/prefs";
 import { EntityState, PayloadAction, createEntityAdapter, createSlice } from "@reduxjs/toolkit";
-import { BoxModel, PseudoType } from "@replayio/protocol";
-import { Attr } from "@replayio/protocol";
+import { Attr, BoxModel, PseudoType } from "@replayio/protocol";
 
-import Services from "devtools/shared/services";
+import { preferences } from "shared/preferences/Preferences";
 import { UIState } from "ui/state";
-
-const ATTR_COLLAPSE_ENABLED_PREF = "devtools.markup.collapseAttributes";
-const ATTR_COLLAPSE_LENGTH_PREF = "devtools.markup.collapseAttributeLength";
 
 export interface NodeInfo {
   // A list of the node's attributes.
@@ -101,8 +96,8 @@ export const { selectById: getNodeBoxModelById } = boxModelAdapter.getSelectors(
 );
 
 const initialState: MarkupState = {
-  collapseAttributes: Services.prefs.getBoolPref(ATTR_COLLAPSE_ENABLED_PREF),
-  collapseAttributeLength: Services.prefs.getIntPref(ATTR_COLLAPSE_LENGTH_PREF),
+  collapseAttributes: preferences.get("collapseAttributes"),
+  collapseAttributeLength: preferences.get("collapseAttributeLength"),
   rootNode: null,
   selectedNode: null,
   selectionReason: null,

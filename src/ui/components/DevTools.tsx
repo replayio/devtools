@@ -13,13 +13,13 @@ import { ThreadFront } from "protocol/thread";
 import { ExpandablesContextRoot } from "replay-next/src/contexts/ExpandablesContext";
 import { PointsContextRoot } from "replay-next/src/contexts/points/PointsContext";
 import { SelectedFrameContextRoot } from "replay-next/src/contexts/SelectedFrameContext";
-import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
 import usePreferredFontSize from "replay-next/src/hooks/usePreferredFontSize";
+import { preferences } from "shared/preferences/Preferences";
+import { usePreference } from "shared/preferences/usePreference";
 import { clearTrialExpired, createSocket } from "ui/actions/session";
 import TerminalContextAdapter from "ui/components/SecondaryToolbox/TerminalContextAdapter";
 import { TestSuiteContextRoot } from "ui/components/TestSuite/views/TestSuiteContext";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
-import { useFeature } from "ui/hooks/settings";
 import { useTrackLoadingIdleTime } from "ui/hooks/tracking";
 import { useUserIsAuthor } from "ui/hooks/users";
 import { getViewMode } from "ui/reducers/layout";
@@ -55,8 +55,6 @@ const Viewer = React.lazy(() => import("./Viewer"));
 
 type DevToolsProps = PropsFromRedux & { apiKey?: string; uploadComplete: boolean };
 
-export const sidePanelStorageKey = "Replay:SidePanelCollapsed";
-
 function ViewLoader() {
   const [showLoader, setShowLoader] = useState(false);
   const idRef = useRef<ReturnType<typeof setTimeout>>();
@@ -84,7 +82,7 @@ function Body() {
 
   const sidePanelRef = useRef<ImperativePanelHandle>(null);
 
-  const [sidePanelCollapsed, setSidePanelCollapsed] = useLocalStorage(sidePanelStorageKey, false);
+  const [sidePanelCollapsed, setSidePanelCollapsed] = usePreference("sidePanelCollapsed");
 
   const onSidePanelCollapse = (isCollapsed: boolean) => {
     setSidePanelCollapsed(isCollapsed);
@@ -153,7 +151,8 @@ function _DevTools({
     [recording]
   );
 
-  const { value: enableLargeText } = useFeature("enableLargeText");
+  const [enableLargeText] = usePreference("enableLargeText");
+
   usePreferredFontSize(enableLargeText);
 
   useEffect(() => {
@@ -169,6 +168,12 @@ function _DevTools({
       maybeSetGuestMixpanelContext();
     }
   }, [isAuthenticated, isExternalRecording]);
+
+  useEffect(() => {
+    // Preferences cache always initializes itself from localStorage
+    // For authenticated users, this method will fetch remote preferences and merge via into the cache.
+    preferences.initialize(isAuthenticated);
+  }, [isAuthenticated]);
 
   useEffect(() => {
     if (loading) {
