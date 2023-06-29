@@ -571,10 +571,6 @@ async function processAllSelectorCalls(
 
   const allHitsPerSelector: Record<string, FunctionExecutionTime[]> = {};
 
-  const allSelectorLocations = Object.values(uniqueSelectorFunctions).map(
-    fn => fn.firstBreakablePosition!
-  );
-
   console.log("Fetching all selector function hits", finalRange);
   await Promise.all(
     Object.values(uniqueSelectorFunctions).map(async fn => {
@@ -615,14 +611,14 @@ async function processAllSelectorCalls(
     formattedFunctionToString(call.function)
   );
 
-  const sumsPerSelector = mapValues(groupedCalls, (calls, locationString) => {
+  const sumsPerSelector = mapValues(allHitsPerSelector, (calls, locationString) => {
     const numCalls = calls.length;
     const totalDuration = calls.reduce((sum, call) => sum + call.duration, 0);
     return {
       locationString,
       calls: numCalls,
       totalDuration,
-      average: totalDuration / numCalls,
+      average: numCalls > 0 ? totalDuration / numCalls : 0,
     };
   });
 
