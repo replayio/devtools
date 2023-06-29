@@ -184,7 +184,7 @@ export default function Header() {
 
   return (
     <div className={styles.Header}>
-      <div className="relative flex flex-row items-center flex-grow overflow-hidden">
+      <div className="relative flex flex-grow flex-row items-center overflow-hidden">
         {isAuthenticated && (
           <IconWithTooltip
             icon={backIcon}
