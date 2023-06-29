@@ -5,6 +5,8 @@ import {
   FunctionMatch,
   FunctionOutline,
   Location,
+  PauseDescription,
+  PointDescription,
   RunEvaluationResult,
   SearchSourceContentsMatch,
   SourceLocation,
@@ -33,6 +35,7 @@ import {
   getThreadContext,
 } from "devtools/client/debugger/src/reducers/pause";
 import { simplifyDisplayName } from "devtools/client/debugger/src/utils/pause/frames/displayName";
+import { assert } from "protocol/utils";
 import IndeterminateLoader from "replay-next/components/IndeterminateLoader";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPositionsCache";
@@ -52,7 +55,7 @@ import { searchCache } from "replay-next/src/suspense/SearchCache";
 import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
 import { Source, sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
 import { streamingSourceContentsCache } from "replay-next/src/suspense/SourcesCache";
-import { isExecutionPointsGreaterThan } from "replay-next/src/utils/time";
+import { compareExecutionPoints, isExecutionPointsGreaterThan } from "replay-next/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
 import { UIThunkAction } from "ui/actions";
@@ -126,6 +129,8 @@ function doSomeAnalysis(range: TimeStampedPointRange | null): UIThunkAction {
     );
 
     await processReduxDispatches(getState, replayClient, finalRange, sourcesState, reactDomSource);
+
+    await processAllSelectorCalls(getState, replayClient, finalRange);
   };
 }
 
@@ -448,6 +453,7 @@ async function processAllSelectorCalls(
 
   const firstTestPoint = firstLineHitPoints[0];
 
+  /*
   const slicedFirstPoints = firstLineHitPoints.slice(0, NUM_POINTS_TO_ANALYZE);
   const slicedLastPoints = lastLineHitPoints.slice(0, NUM_POINTS_TO_ANALYZE);
 
@@ -459,6 +465,7 @@ async function processAllSelectorCalls(
     const totalTime = lastTime - firstTime;
     times.push(totalTime);
   }
+  */
 
   console.log("Running test evaluation...");
   const firstParam = await getValidFunctionParameterName(
@@ -495,6 +502,8 @@ async function processAllSelectorCalls(
     })
   );
 
+  results.sort((a, b) => compareExecutionPoints(a.point.point, b.point.point));
+
   console.log("Total results: ", results.length);
 
   console.log("Formatting functions...");
@@ -513,7 +522,16 @@ async function processAllSelectorCalls(
       return { formattedFunction, functionWithPreview };
     })
   );
-  console.log("Formatted functions: ", formattedFunctions);
+
+  const uniqueSelectorFunctions: Record<string, EventListenerWithFunctionInfo> = {};
+
+  for (const entry of formattedFunctions) {
+    const fnString = formattedFunctionToString(entry.formattedFunction);
+    if (!uniqueSelectorFunctions[fnString]) {
+      uniqueSelectorFunctions[fnString] = entry.formattedFunction;
+    }
+  }
+  console.log("Formatted functions: ", uniqueSelectorFunctions);
 
   interface SelectorCallDetails {
     start: TimeStampedPoint;
@@ -525,9 +543,14 @@ async function processAllSelectorCalls(
   console.log("Summarizing hit details...");
   const selectorCallDetails: SelectorCallDetails[] = [];
 
-  for (let i = 0; i < NUM_POINTS_TO_ANALYZE; i++) {
-    const start = slicedFirstPoints[i];
-    const end = slicedLastPoints[i];
+  assert(
+    firstLineHitPoints.length === formattedFunctions.length,
+    "Should have one function per hit"
+  );
+
+  for (let i = 0; i < firstLineHitPoints.length; i++) {
+    const start = firstLineHitPoints[i];
+    const end = lastLineHitPoints[i];
     const duration = end.time - start.time;
     const functionInfo = formattedFunctions[i];
     selectorCallDetails.push({
@@ -538,9 +561,49 @@ async function processAllSelectorCalls(
     });
   }
 
-  const groupedCalls = groupBy(
-    selectorCallDetails,
-    call => `${locationToString(call.function.location)}:${call.function.functionName}`
+  interface FunctionExecutionTime {
+    start: TimeStampedPoint;
+    end: TimeStampedPoint;
+    duration: number;
+    frame: PauseDescription["frame"];
+  }
+
+  const allHitsPerSelector: Record<string, FunctionExecutionTime[]> = {};
+
+  console.log("Fetching all selector function hits", finalRange);
+  await Promise.all(
+    Object.values(uniqueSelectorFunctions).map(async fn => {
+      const hits = await hitPointsCache.readAsync(
+        BigInt(finalRange.begin.point),
+        BigInt(finalRange.end.point),
+        replayClient,
+        fn.firstBreakablePosition,
+        null
+      );
+      const selectorCallEndTimes = await Promise.all(
+        hits.map(async hit => {
+          return replayClient.findStepOutTarget(hit.point);
+        })
+      );
+      const functionExecutions: FunctionExecutionTime[] = [];
+      for (let i = 0; i < hits.length; i++) {
+        const end = selectorCallEndTimes[i];
+
+        functionExecutions.push({
+          start: hits[i],
+          end: { point: end.point, time: end.time },
+          frame: end.frame,
+          duration: end.time - hits[i].time,
+        });
+      }
+      allHitsPerSelector[formattedFunctionToString(fn)] = functionExecutions;
+    })
+  );
+
+  console.log("All selector function hits: ", allHitsPerSelector);
+
+  const groupedCalls = groupBy(selectorCallDetails, call =>
+    formattedFunctionToString(call.function)
   );
 
   const sumsPerSelector = mapValues(groupedCalls, (calls, locationString) => {
@@ -561,6 +624,10 @@ async function processAllSelectorCalls(
     (a, b) => b.totalDuration - a.totalDuration
   );
   console.log("Sorted sums: ", sortedSums);
+}
+
+function formattedFunctionToString(fn: EventListenerWithFunctionInfo) {
+  return `${locationToString(fn.location)}:${fn.functionName}`;
 }
 
 async function getValidFunctionParameterName(
