@@ -12,6 +12,7 @@ import { useImperativeCacheValue } from "suspense";
 import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
 import { streamingSourceContentsCache } from "replay-next/src/suspense/SourcesCache";
 import { replayClient } from "shared/client/ReplayClientContext";
+import { ViewMode } from "shared/user-data/GraphQL/config";
 import { setViewMode as setViewModeAction } from "ui/actions/layout";
 import { getViewMode } from "ui/reducers/layout";
 import {
@@ -22,7 +23,6 @@ import {
   getSourcesToDisplayByUrl,
 } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { ViewMode } from "ui/state/layout";
 import { trackEvent } from "ui/utils/telemetry";
 
 import actions from "../actions";

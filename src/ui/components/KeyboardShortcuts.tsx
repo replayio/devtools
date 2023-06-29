@@ -8,9 +8,9 @@ import { SHOW_GLOBAL_SEARCH_EVENT_TYPE } from "replay-next/components/search-fil
 import { createTypeDataForVisualComment } from "replay-next/components/sources/utils/comments";
 import { useNag } from "replay-next/src/hooks/useNag";
 import { Nag } from "shared/graphql/types";
-import { preferences } from "shared/preferences/Preferences";
-import { usePreference } from "shared/preferences/usePreference";
 import { getSystemColorScheme } from "shared/theme/getSystemColorScheme";
+import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
+import { userData } from "shared/user-data/GraphQL/UserData";
 import { UIThunkAction, actions } from "ui/actions";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import { selectors } from "ui/reducers";
@@ -61,7 +61,7 @@ function KeyboardShortcuts({
   const { isAuthenticated } = useAuth0();
   const [, dismissFindFileNag] = useNag(Nag.FIND_FILE);
 
-  const [protocolTimeline] = usePreference("protocolTimeline");
+  const [protocolTimeline] = useGraphQLUserData("protocolTimeline");
   const globalKeyboardShortcuts = useMemo(() => {
     const openFullTextSearch = (e: KeyboardEvent) => {
       e.preventDefault();
@@ -132,18 +132,18 @@ function KeyboardShortcuts({
       if (!e.target || !isEditableElement(e.target)) {
         e.preventDefault();
 
-        let theme = preferences.get("theme");
+        let theme = userData.get("theme");
         if (theme === "system") {
           theme = getSystemColorScheme();
         }
-        preferences.set("theme", theme === "dark" ? "light" : "dark");
+        userData.set("theme", theme === "dark" ? "light" : "dark");
       }
     };
 
     const toggleProtocolTimeline = (e: KeyboardEvent) => {
       if (!e.target || !isEditableElement(e.target)) {
         e.preventDefault();
-        preferences.set("protocolTimeline", !protocolTimeline);
+        userData.set("protocolTimeline", !protocolTimeline);
       }
     };
 

@@ -1,4 +1,4 @@
-import { usePreference } from "shared/preferences/usePreference";
+import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { getCurrentPoint } from "ui/actions/app";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
@@ -16,10 +16,10 @@ export default function SecondaryPanes() {
   const currentPoint = useAppSelector(getCurrentPoint);
   const currentTime = useAppSelector(getCurrentTime);
 
-  const [scopesVisible, setScopesVisible] = usePreference("scopesVisible");
-  const [callStackVisible, setCallStackVisible] = usePreference("callStackVisible");
-  const [breakpointsVisible, setBreakpointsVisible] = usePreference("breakpointsVisible");
-  const [logpointsVisible, setLogpointsVisible] = usePreference("logpointsVisible");
+  const [scopesVisible, setScopesVisible] = useGraphQLUserData("scopesVisible");
+  const [callStackVisible, setCallStackVisible] = useGraphQLUserData("callStackVisible");
+  const [breakpointsVisible, setBreakpointsVisible] = useGraphQLUserData("breakpointsVisible");
+  const [logpointsVisible, setLogpointsVisible] = useGraphQLUserData("logpointsVisible");
 
   return (
     <div className="secondary-panes-wrapper">

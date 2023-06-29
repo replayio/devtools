@@ -5,7 +5,7 @@ import { ConnectedProps, connect } from "react-redux";
 // Add the necessary imports for nag functionality
 import { useNag } from "replay-next/src/hooks/useNag";
 import { Nag } from "shared/graphql/types";
-import { usePreference } from "shared/preferences/usePreference";
+import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { UIState } from "ui/state";
 
 import actions from "../../actions";
@@ -17,9 +17,9 @@ import SourcesTree from "./SourcesTree";
 import { Accordion, AccordionPane } from "@recordreplay/accordion";
 
 function PrimaryPanes(props: PropsFromRedux) {
-  const [outlineExpanded, setOutlineExpanded] = usePreference("outlineExpanded");
-  const [sourcesCollapsed] = usePreference("sourcesCollapsed");
-  const [enableLargeText] = usePreference("enableLargeText");
+  const [outlineExpanded, setOutlineExpanded] = useGraphQLUserData("outlineExpanded");
+  const [sourcesCollapsed] = useGraphQLUserData("sourcesCollapsed");
+  const [enableLargeText] = useGraphQLUserData("enableLargeText");
 
   // Add the useNag hook and useEffect block
   const [, dismissInspectElementNag] = useNag(Nag.INSPECT_ELEMENT);

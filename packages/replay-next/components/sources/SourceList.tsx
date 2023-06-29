@@ -31,7 +31,7 @@ import { Source } from "replay-next/src/suspense/SourcesCache";
 import { StreamingParser } from "replay-next/src/suspense/SyntaxParsingCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { POINT_BEHAVIOR_DISABLED, POINT_BEHAVIOR_ENABLED } from "shared/client/types";
-import { usePreference } from "shared/preferences/usePreference";
+import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { toPointRange } from "shared/utils/time";
 
 import useFontBasedListMeasurements from "./hooks/useFontBasedListMeasurements";
@@ -150,7 +150,7 @@ export default function SourceList({
     }
   }, [focusedSource, lineCount, markPendingFocusUpdateProcessed, pendingFocusUpdate, sourceId]);
 
-  const [showHitCounts] = usePreference("showHitCounts");
+  const [showHitCounts] = useGraphQLUserData("showHitCounts");
 
   const [minHitCount, maxHitCount] = getCachedMinMaxSourceHitCounts(sourceId, focusRange);
 

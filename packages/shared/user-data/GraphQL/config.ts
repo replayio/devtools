@@ -1,13 +1,27 @@
-import {
-  ActiveInspectorTab,
-  CommentsFilterByPreference,
-  CommentsSortByPreference,
-  ConfigurablePreferences,
-  ConsoleEventFilterPreferences,
-  Role,
-} from "shared/preferences/types";
-import { Theme } from "shared/theme/types";
-import { ViewMode } from "ui/state/layout";
+import { ConfigurablePreferences } from "shared/user-data/GraphQL/types";
+
+export type ActiveInspectorTab = "ruleview" | "layoutview" | "computedview" | "eventsview";
+export type CommentsFilterByPreference = "current-user" | null;
+export type CommentsSortByPreference = "created-at" | "recording-time";
+export type ConsoleEventFilterPreferences = {
+  keyboard: boolean;
+  mouse: boolean;
+  navigation: boolean;
+};
+export type ConsoleEventFilterPreferencesKey = keyof ConsoleEventFilterPreferences;
+export type Role = "developer" | "other";
+export type Theme = "light" | "dark" | "system";
+export type ViewMode = "dev" | "non-dev";
+
+// The UserData service and the useGraphQLUserData() hook both use this configuration;
+// Only values explicitly listed below can be managed by those services
+//
+// This configuration can be used to manage the following types of data:
+// * Preferences: Things that are typically managed in a settings dialog
+// * Features: New or experimental things that we want to give people a way to opt-in or opt-out from
+// * History: Things we remember between sessions, e.g. the most recently selected tab
+//
+// To simplify TypeScript type-safety checks, all of the above are stored in the same, flat structure
 
 export const config = {
   activeInspectorTab: {

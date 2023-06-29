@@ -1,4 +1,4 @@
-import { ENUMS, config } from "shared/preferences/config";
+import { ENUMS, config } from "shared/user-data/GraphQL/config";
 import { BooleanPreference } from "ui/components/shared/UserSettingsModal/components/BooleanPreference";
 import { EnumPreference } from "ui/components/shared/UserSettingsModal/components/EnumPreference";
 import hooks from "ui/hooks";

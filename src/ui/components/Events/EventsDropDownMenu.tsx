@@ -3,11 +3,11 @@ import { ContextMenuCategory, ContextMenuItem, useContextMenu } from "use-contex
 
 import { Badge, Checkbox } from "design";
 import Icon from "replay-next/components/Icon";
-import { ConsoleEventFilterPreferencesKey } from "shared/preferences/types";
+import { ConsoleEventFilterPreferencesKey } from "shared/user-data/GraphQL/config";
+import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { getFilteredEventsForFocusWindow } from "ui/reducers/app";
 import { useAppSelector } from "ui/setup/hooks";
 
-import useEventsPreferences from "./useEventsPreferences";
 import styles from "./EventsDropDownMenu.module.css";
 
 function createSelectHandler(callback: () => void): (event: UIEvent) => void {
@@ -49,7 +49,7 @@ export default function EventsDropDownMenu() {
     [events]
   );
 
-  const { filters } = useEventsPreferences();
+  const [filters] = useGraphQLUserData("consoleEventFilters");
 
   const { contextMenu, onContextMenu: onClick } = useContextMenu(
     <>
@@ -90,7 +90,7 @@ function EventTypeContextMenuItem({
   category: ConsoleEventFilterPreferencesKey;
   count: number;
 }) {
-  const { filters, setFilters } = useEventsPreferences();
+  const [filters, setFilters] = useGraphQLUserData("consoleEventFilters");
   const [isPending, startTransition] = useTransition();
 
   const enabled = filters[category] !== false;

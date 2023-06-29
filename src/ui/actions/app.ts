@@ -8,8 +8,8 @@ import {
 import { openQuickOpen } from "devtools/client/debugger/src/actions/quick-open";
 import { ThreadFront as ThreadFrontType } from "protocol/thread";
 import { ReplayClientInterface } from "shared/client/types";
-import { preferences } from "shared/preferences/Preferences";
 import { getSystemColorScheme } from "shared/theme/getSystemColorScheme";
+import { userData } from "shared/user-data/GraphQL/UserData";
 import { shallowEqual } from "shared/utils/compare";
 import { CommandKey } from "ui/components/CommandPalette/CommandPalette";
 import { getEventsForType } from "ui/reducers/app";
@@ -220,7 +220,7 @@ export function executeCommand(key: CommandKey): UIThunkAction {
     } else if (key === "open_outline") {
       dispatch(setViewMode("dev"));
       dispatch(setSelectedPrimaryPanel("explorer"));
-      preferences.set("outlineExpanded", true);
+      userData.set("outlineExpanded", true);
     } else if (key === "open_viewer") {
       dispatch(setViewMode("non-dev"));
     } else if (key === "show_comments") {
@@ -237,11 +237,11 @@ export function executeCommand(key: CommandKey): UIThunkAction {
     } else if (key === "toggle_edit_focus") {
       dispatch(toggleFocusMode());
     } else if (key === "toggle_dark_mode") {
-      let theme = preferences.get("theme");
+      let theme = userData.get("theme");
       if (theme === "system") {
         theme = getSystemColorScheme();
       }
-      preferences.set("theme", theme === "dark" ? "light" : "dark");
+      userData.set("theme", theme === "dark" ? "light" : "dark");
     } else if (key === "pin_to_bottom") {
       dispatch(setToolboxLayout("bottom"));
     } else if (key === "pin_to_left") {

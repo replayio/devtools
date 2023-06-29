@@ -1,12 +1,12 @@
 import { SessionId } from "@replayio/protocol";
 import mixpanel from "mixpanel-browser";
 
-import { preferences } from "shared/preferences/Preferences";
-import { ActiveInspectorTab } from "shared/preferences/types";
+import { ActiveInspectorTab, ViewMode } from "shared/user-data/GraphQL/config";
+import { userData } from "shared/user-data/GraphQL/UserData";
 import { isReplayBrowser, skipTelemetry } from "shared/utils/environment";
 import { CanonicalRequestType } from "ui/components/NetworkMonitor/utils";
 import { WorkspaceId, WorkspaceUuid } from "ui/state/app";
-import { PrimaryPanelName, SecondaryPanelName, ViewMode } from "ui/state/layout";
+import { PrimaryPanelName, SecondaryPanelName } from "ui/state/layout";
 
 import { getRecordingId } from "./recording";
 import { TelemetryUser, trackTiming } from "./telemetry";
@@ -143,7 +143,7 @@ export function maybeSetMixpanelContext(
   userInfo: TelemetryUser & { workspaceId: string | null; role: string | null }
 ) {
   const { internal: isInternal } = userInfo;
-  const forceEnableMixpanel = preferences.get("logTelemetryEvent");
+  const forceEnableMixpanel = userData.get("logTelemetryEvent");
   const shouldEnableMixpanel = (!isInternal && !skipTelemetry()) || forceEnableMixpanel;
 
   if (shouldEnableMixpanel) {
@@ -156,7 +156,7 @@ export function maybeSetMixpanelContext(
 }
 
 export function maybeSetGuestMixpanelContext() {
-  const forceEnableMixpanel = preferences.get("logTelemetryEvent");
+  const forceEnableMixpanel = userData.get("logTelemetryEvent");
   const shouldEnableMixpanel = !skipTelemetry() || forceEnableMixpanel;
 
   if (shouldEnableMixpanel) {
@@ -184,7 +184,7 @@ const namespaceFromEventName = (event: string): string => {
 };
 
 export function trackMixpanelEvent(...[event, properties]: [...MixpanelEvent]) {
-  if (preferences.get("logTelemetryEvent")) {
+  if (userData.get("logTelemetryEvent")) {
     console.log("🔴", event, properties);
   }
 
@@ -234,7 +234,7 @@ export function setMixpanelContext({
     mixpanel.people.set({ role });
   }
 
-  if (preferences.get("logTelemetryEvent")) {
+  if (userData.get("logTelemetryEvent")) {
     mixpanel.register({ isDevEvent: true });
   }
 }

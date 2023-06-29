@@ -18,7 +18,7 @@ import { ImperativeHandle } from "replay-next/components/lexical/CodeEditor";
 import Loader from "replay-next/components/Loader";
 import { ConsoleFiltersContextRoot } from "replay-next/src/contexts/ConsoleFiltersContext";
 import { TerminalContext } from "replay-next/src/contexts/TerminalContext";
-import { usePreference } from "shared/preferences/usePreference";
+import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 
 import ConsoleActionsRow from "./ConsoleActionsRow";
 import ConsoleInput from "./ConsoleInput";
@@ -85,7 +85,7 @@ function Console({
   const { clearMessages: clearConsoleEvaluations, messages: consoleEvaluations } =
     useContext(TerminalContext);
 
-  const [isMenuOpen, setIsMenuOpen] = usePreference("consoleFilterDrawerDefaultsToOpen");
+  const [isMenuOpen, setIsMenuOpen] = useGraphQLUserData("consoleFilterDrawerDefaultsToOpen");
   const [menuValueHasBeenToggled, setMenuValueHasBeenToggled] = useState(false);
 
   // We default to having the console filters panel turned off, to minimize UI "business".

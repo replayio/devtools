@@ -1,11 +1,11 @@
 import { useMemo } from "react";
 
-import { usePreference } from "shared/preferences/usePreference";
+import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 
 export default function useUserCommentPreferences() {
-  const [filter, setFilter] = usePreference("commentFilterBy");
-  const [showPreview, setShowPreview] = usePreference("commentShowPreview");
-  const [sortBy, setSortBy] = usePreference("commentSortBy");
+  const [filter, setFilter] = useGraphQLUserData("commentFilterBy");
+  const [showPreview, setShowPreview] = useGraphQLUserData("commentShowPreview");
+  const [sortBy, setSortBy] = useGraphQLUserData("commentSortBy");
 
   return useMemo(
     () => ({

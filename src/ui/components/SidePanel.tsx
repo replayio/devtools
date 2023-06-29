@@ -4,7 +4,7 @@ import PrimaryPanes from "devtools/client/debugger/src/components/PrimaryPanes";
 import SecondaryPanes from "devtools/client/debugger/src/components/SecondaryPanes";
 import Accordion from "devtools/client/debugger/src/components/shared/Accordion";
 import LazyOffscreen from "replay-next/components/LazyOffscreen";
-import { usePreference } from "shared/preferences/usePreference";
+import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { setSelectedPrimaryPanel } from "ui/actions/layout";
 import Events from "ui/components/Events";
 import SearchFilesReduxAdapter from "ui/components/SearchFilesReduxAdapter";
@@ -63,7 +63,7 @@ function useInitialPrimaryPanel() {
 }
 
 export default function SidePanel() {
-  const [resolveRecording] = usePreference("resolveRecording");
+  const [resolveRecording] = useGraphQLUserData("resolveRecording");
   const selectedPrimaryPanel = useInitialPrimaryPanel();
   const [replayInfoCollapsed, setReplayInfoCollapsed] = useState(false);
   const [eventsCollapsed, setEventsCollapsed] = useState(false);

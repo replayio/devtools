@@ -1,5 +1,5 @@
 import { sourcesDisplayed } from "devtools/client/debugger/src/reducers/ui";
-import { preferences } from "shared/preferences/Preferences";
+import { userData } from "shared/user-data/GraphQL/UserData";
 import { LayoutAction } from "ui/actions/layout";
 import { UIState } from "ui/state";
 import { LayoutState } from "ui/state/layout";
@@ -7,7 +7,7 @@ import { LayoutState } from "ui/state/layout";
 export const syncInitialLayoutState: LayoutState = {
   showCommandPalette: false,
   selectedPrimaryPanel: null,
-  viewMode: preferences.get("defaultViewMode"),
+  viewMode: userData.get("defaultViewMode"),
   toolboxLayout: "ide",
   selectedPanel: "console",
   localNags: [],

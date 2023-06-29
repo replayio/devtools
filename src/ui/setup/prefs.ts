@@ -6,6 +6,7 @@ import type { PartialLocation } from "devtools/client/debugger/src/actions/sourc
 import { Tab, getTabs } from "devtools/client/debugger/src/reducers/tabs";
 import { persistTabs } from "devtools/client/debugger/src/utils/tabs";
 import { asyncStoreHelper } from "devtools/shared/async-store-helper";
+import { ViewMode } from "shared/user-data/GraphQL/config";
 import { UIStore } from "ui/actions";
 import {
   getLocalNags,
@@ -15,7 +16,7 @@ import {
   getViewMode,
 } from "ui/reducers/layout";
 import { UIState } from "ui/state";
-import { PrimaryPanelName, SecondaryPanelName, ToolboxLayout, ViewMode } from "ui/state/layout";
+import { PrimaryPanelName, SecondaryPanelName, ToolboxLayout } from "ui/state/layout";
 import { getRecordingId } from "ui/utils/recording";
 
 export interface ReplaySessions {

@@ -3,10 +3,10 @@ import { ConnectedProps, connect } from "react-redux";
 
 import QuickOpenModal from "devtools/client/debugger/src/components/QuickOpenModal";
 import { getQuickOpenEnabled } from "devtools/client/debugger/src/selectors";
-import { preferences } from "shared/preferences/Preferences";
 import { getSystemColorScheme } from "shared/theme/getSystemColorScheme";
 import { Theme } from "shared/theme/types";
 import { useTheme } from "shared/theme/useTheme";
+import { userData } from "shared/user-data/GraphQL/UserData";
 import { isTest } from "shared/utils/environment";
 import { actions } from "ui/actions";
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
@@ -157,9 +157,9 @@ function App({ children, hideModal, modal, quickOpenEnabled }: AppProps) {
       document.body.parentElement!.className = `theme-${theme}`;
     };
 
-    updateTheme(preferences.get("theme"));
+    updateTheme(userData.get("theme"));
 
-    preferences.subscribe("theme", updateTheme);
+    userData.subscribe("theme", updateTheme);
   }, []);
 
   if (auth.isLoading || userInfo.loading) {

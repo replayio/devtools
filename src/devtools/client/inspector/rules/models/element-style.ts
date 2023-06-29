@@ -8,7 +8,7 @@ import RuleModel, { NodeWithId } from "devtools/client/inspector/rules/models/ru
 import { assert } from "protocol/utils";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientInterface } from "shared/client/types";
-import { preferences } from "shared/preferences/Preferences";
+import { userData } from "shared/user-data/GraphQL/UserData";
 import { appliedRulesCache } from "ui/suspense/styleCaches";
 
 import { RuleFront } from "./fronts/rule";
@@ -63,7 +63,7 @@ export default class ElementStyle {
 
   get unusedCssEnabled() {
     if (!this._unusedCssEnabled) {
-      this._unusedCssEnabled = preferences.get("inactiveCssEnabled");
+      this._unusedCssEnabled = userData.get("inactiveCssEnabled");
     }
     return this._unusedCssEnabled;
   }

@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 
-import { preferences } from "shared/preferences/Preferences";
+import { userData } from "shared/user-data/GraphQL/UserData";
 import { setSelectedPrimaryPanel } from "ui/actions/layout";
 import { shouldShowDevToolsNag } from "ui/components/Header/ViewToggle";
 import { isTestSuiteReplay } from "ui/components/TestSuite/utils/isTestSuiteReplay";
@@ -142,7 +142,7 @@ const Tour: React.FC = () => {
 
   const CompletedTour: React.FC<CompletedTourProps> = ({ dismissTourNag }) => {
     useEffect(() => {
-      preferences.set("showPassport", true);
+      userData.set("showPassport", true);
     }, []);
 
     return (

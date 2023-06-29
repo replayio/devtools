@@ -5,7 +5,7 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import type { Location } from "@replayio/protocol";
 
-import { preferences } from "shared/preferences/Preferences";
+import { userData } from "shared/user-data/GraphQL/UserData";
 import { SourceDetails } from "ui/reducers/sources";
 import type { UIState } from "ui/state";
 
@@ -41,8 +41,8 @@ export const createUIState = (): UISliceState => ({
   fullTextSearchQuery: "",
   fullTextSearchFocus: false,
   shownSource: null,
-  sourcesCollapsed: preferences.get("sourcesCollapsed"),
-  frameworkGroupingOn: preferences.get("frameworkGroupingOn"),
+  sourcesCollapsed: userData.get("sourcesCollapsed"),
+  frameworkGroupingOn: userData.get("frameworkGroupingOn"),
   highlightedLineRange: undefined,
   viewport: null,
   cursorPosition: null,

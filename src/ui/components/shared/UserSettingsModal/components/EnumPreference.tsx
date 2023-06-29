@@ -1,8 +1,12 @@
 import assert from "assert";
 import { useMemo } from "react";
 
-import { ConfigurablePreference, PreferencesKey, Serializable } from "shared/preferences/types";
-import { usePreference } from "shared/preferences/usePreference";
+import {
+  ConfigurablePreference,
+  PreferencesKey,
+  Serializable,
+} from "shared/user-data/GraphQL/types";
+import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { SelectMenu } from "ui/components/shared/Forms";
 import { useGetUserInfo } from "ui/hooks/users";
 
@@ -35,7 +39,7 @@ export function EnumPreference({
     [values]
   );
 
-  const [selected, setSelected] = usePreference(preferencesKey);
+  const [selected, setSelected] = useGraphQLUserData(preferencesKey);
 
   if (internalOnly && !userInfo.internal) {
     return null;

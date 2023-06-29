@@ -1,6 +1,6 @@
 import { MouseEventHandler, useState } from "react";
 
-import { preferences } from "shared/preferences/Preferences";
+import { userData } from "shared/user-data/GraphQL/UserData";
 import { setModal } from "ui/actions/app";
 import useAddCommentReply from "ui/hooks/comments/useAddCommentReply";
 import { useAppDispatch } from "ui/setup/hooks";
@@ -57,7 +57,7 @@ export default function CommentReplyButton({ comment }: { comment: Comment }) {
         Reply
       </button>
 
-      {preferences.get("commentAttachments") && (
+      {userData.get("commentAttachments") && (
         <MaterialIcon className={styles.AttachmentIcon} onClick={addAttachment}>
           attachment
         </MaterialIcon>

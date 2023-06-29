@@ -10,7 +10,7 @@ import {
   recordingCapabilitiesCache,
 } from "replay-next/src/suspense/BuildIdCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { usePreference } from "shared/preferences/usePreference";
+import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { setSelectedPanel } from "ui/actions/layout";
 import { getSelectedPanel, getToolboxLayout } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
@@ -82,7 +82,7 @@ const PanelButtons: FC<PanelButtonsProps> = ({
 }) => {
   const { supportsElementsInspector, supportsNetworkRequests, supportsRepaintingGraphics } =
     recordingCapabilities;
-  const [chromiumNetMonitorEnabled] = usePreference("chromiumNetMonitor");
+  const [chromiumNetMonitorEnabled] = useGraphQLUserData("chromiumNetMonitor");
 
   return (
     <div className="panel-buttons theme-tab-font-size flex flex-row items-center overflow-hidden">
@@ -177,7 +177,7 @@ function SecondaryToolbox({
     REDUX_ANNOTATIONS_KIND
   );
 
-  const chromiumNetMonitorEnabled = usePreference("chromiumNetMonitor");
+  const chromiumNetMonitorEnabled = useGraphQLUserData("chromiumNetMonitor");
   const recordingCapabilities = recordingCapabilitiesCache.read(replayClient);
 
   useLayoutEffect(() => {

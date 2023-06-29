@@ -2,11 +2,11 @@ import { Location, RecordingId } from "@replayio/protocol";
 import { useContext, useEffect, useMemo } from "react";
 
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
-import useIndexedDB from "replay-next/src/hooks/useIndexedDB";
 import { Badge, PartialUser, PointBehavior } from "shared/client/types";
 import { createPointKey } from "shared/graphql/Points";
+import { POINTS_DATABASE } from "shared/user-data/IndexedDB/config";
+import useIndexedDBUserData from "shared/user-data/IndexedDB/useIndexedDBUserData";
 
-import { POINTS_DATABASE } from "../constants";
 import { LocalPointsObject } from "../types";
 
 // TODO [FE-1138] Remove this legacy type after a few weeks with the new Points storage format
@@ -35,14 +35,14 @@ export default function useLocalPoints({
   const { currentUserInfo } = useContext(SessionContext);
 
   // TODO [FE-1138] Remove this legacy load after a few weeks with the new Points storage format
-  const { setValue: setValueOld, value: valueOld } = useIndexedDB<LegacyPoint[]>({
+  const { setValue: setValueOld, value: valueOld } = useIndexedDBUserData<LegacyPoint[]>({
     database: POINTS_DATABASE,
     initialValue: [],
     recordName: recordingId,
     storeName: "high-priority",
   });
 
-  const { setValue: setValueNew, value: valueNew } = useIndexedDB<LocalPointsObject>({
+  const { setValue: setValueNew, value: valueNew } = useIndexedDBUserData<LocalPointsObject>({
     database: POINTS_DATABASE,
     initialValue: {},
     recordName: recordingId,

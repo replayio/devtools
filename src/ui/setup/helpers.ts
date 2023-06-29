@@ -1,6 +1,6 @@
 // eslint-disable-next-line no-restricted-imports
 import { client, sendMessage, triggerEvent } from "protocol/socket";
-import { Preferences, preferences } from "shared/preferences/Preferences";
+import { GraphQLService, userData } from "shared/user-data/GraphQL/UserData";
 import { UIStore } from "ui/actions";
 import { getRecordingId } from "ui/utils/recording";
 
@@ -15,7 +15,7 @@ declare global {
     local: () => void;
     prod: () => void;
     clearIndexedDB: () => void;
-    preferences: Preferences;
+    preferences: GraphQLService;
     replaySession: ReplaySession | undefined;
     triggerEvent: typeof triggerEvent;
     sendMessage: typeof sendMessage;
@@ -31,7 +31,7 @@ export async function setupAppHelper(store: UIStore) {
   // TODO [FE-1483] Expose new prefs and features here (somehow)
   window.app = {
     store,
-    preferences,
+    preferences: userData,
     triggerEvent,
     replaySession,
     client,

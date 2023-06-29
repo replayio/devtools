@@ -1,4 +1,4 @@
-import { config } from "shared/preferences/config";
+import { config } from "shared/user-data/GraphQL/config";
 
 type SerializablePrimitive = boolean | number | string | symbol | null | undefined;
 
@@ -43,14 +43,3 @@ export type ConfigurablePreferences = { [key: string]: ConfigurablePreference };
 export type UserPreferences = {
   [Key in PreferencesKey]?: (typeof config)[Key]["defaultValue"];
 };
-
-export type ActiveInspectorTab = "ruleview" | "layoutview" | "computedview" | "eventsview";
-export type Role = "developer" | "other";
-export type CommentsFilterByPreference = "current-user" | null;
-export type CommentsSortByPreference = "created-at" | "recording-time";
-export type ConsoleEventFilterPreferences = {
-  keyboard: boolean;
-  mouse: boolean;
-  navigation: boolean;
-};
-export type ConsoleEventFilterPreferencesKey = keyof ConsoleEventFilterPreferences;

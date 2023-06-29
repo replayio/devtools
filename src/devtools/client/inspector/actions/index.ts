@@ -1,6 +1,6 @@
 import { Action } from "@reduxjs/toolkit";
 
-import { ActiveInspectorTab } from "shared/preferences/types";
+import { ActiveInspectorTab } from "shared/user-data/GraphQL/config";
 import { trackEvent } from "ui/utils/telemetry";
 
 export type SetActiveTabAction = Action<"set_active_inspector_tab"> & {

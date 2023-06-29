@@ -14,7 +14,7 @@ import { assert } from "protocol/utils";
 import { recordingTargetCache } from "replay-next/src/suspense/BuildIdCache";
 import { extractGraphQLError } from "shared/graphql/apolloClient";
 import { Recording } from "shared/graphql/types";
-import { preferences } from "shared/preferences/Preferences";
+import { userData } from "shared/user-data/GraphQL/UserData";
 import { getPausePointParams, isMock, isTest } from "shared/utils/environment";
 import { UIThunkAction } from "ui/actions";
 import * as actions from "ui/actions/app";
@@ -197,20 +197,20 @@ export function createSocket(
       }
 
       const experimentalSettings: ExperimentalSettings = {
-        disableScanDataCache: preferences.get("disableScanDataCache"),
-        disableCache: preferences.get("disableCache"),
-        disableStableQueryCache: preferences.get("disableStableQueryCache"),
-        disableUnstableQueryCache: !preferences.get("enableUnstableQueryCache"),
-        listenForMetrics: preferences.get("listenForMetrics"),
-        profileWorkerThreads: preferences.get("profileWorkerThreads"),
-        enableRoutines: preferences.get("enableRoutines"),
-        rerunRoutines: preferences.get("rerunRoutines"),
-        disableRecordingAssetsInDatabase: preferences.get("disableRecordingAssetsInDatabase"),
-        keepAllTraces: preferences.get("keepAllTraces"),
-        disableIncrementalSnapshots: preferences.get("disableIncrementalSnapshots"),
-        disableConcurrentControllerLoading: preferences.get("disableConcurrentControllerLoading"),
+        disableScanDataCache: userData.get("disableScanDataCache"),
+        disableCache: userData.get("disableCache"),
+        disableStableQueryCache: userData.get("disableStableQueryCache"),
+        disableUnstableQueryCache: !userData.get("enableUnstableQueryCache"),
+        listenForMetrics: userData.get("listenForMetrics"),
+        profileWorkerThreads: userData.get("profileWorkerThreads"),
+        enableRoutines: userData.get("enableRoutines"),
+        rerunRoutines: userData.get("rerunRoutines"),
+        disableRecordingAssetsInDatabase: userData.get("disableRecordingAssetsInDatabase"),
+        keepAllTraces: userData.get("keepAllTraces"),
+        disableIncrementalSnapshots: userData.get("disableIncrementalSnapshots"),
+        disableConcurrentControllerLoading: userData.get("disableConcurrentControllerLoading"),
       };
-      if (preferences.get("newControllerOnRefresh")) {
+      if (userData.get("newControllerOnRefresh")) {
         experimentalSettings.controllerKey = String(Date.now());
       }
 
@@ -250,17 +250,17 @@ export function createSocket(
           : undefined,
         {
           onEvent: (event: ProtocolEvent) => {
-            if (preferences.get("logProtocolEvents")) {
+            if (userData.get("logProtocolEvents")) {
               queueAction(eventReceived({ ...event, recordedAt: window.performance.now() }));
             }
           },
           onRequest: (request: CommandRequest) => {
-            if (preferences.get("logProtocol")) {
+            if (userData.get("logProtocol")) {
               queueAction(requestSent({ ...request, recordedAt: window.performance.now() }));
             }
           },
           onResponse: (response: CommandResponse) => {
-            if (preferences.get("logProtocol")) {
+            if (userData.get("logProtocol")) {
               const clonedResponse = { ...response, recordedAt: window.performance.now() };
 
               if (isSourceContentsCommandResponse(clonedResponse)) {
@@ -276,7 +276,7 @@ export function createSocket(
             }
           },
           onResponseError: (error: CommandResponse) => {
-            if (preferences.get("logProtocol")) {
+            if (userData.get("logProtocol")) {
               queueAction(errorReceived({ ...error, recordedAt: window.performance.now() }));
             }
           },

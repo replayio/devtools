@@ -27,13 +27,12 @@ import {
 import { addEventListener, initSocket, client as protocolClient } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
 import { assert } from "protocol/utils";
-import { CONSOLE_SETTINGS_DATABASE } from "replay-next/src/contexts/ConsoleFiltersContext";
-import { POINTS_DATABASE } from "replay-next/src/contexts/points/constants";
-import { IDBOptions } from "replay-next/src/hooks/useIndexedDB";
 import { setPointsReceivedCallback as setAnalysisPointsReceivedCallback } from "replay-next/src/suspense/AnalysisCache";
 import { networkRequestsCache } from "replay-next/src/suspense/NetworkRequestsCache";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientInterface } from "shared/client/types";
+import { CONSOLE_SETTINGS_DATABASE, POINTS_DATABASE } from "shared/user-data/IndexedDB/config";
+import { IDBOptions } from "shared/user-data/IndexedDB/types";
 import { UIStore, actions } from "ui/actions";
 import { setCanvas } from "ui/actions/app";
 import { precacheScreenshots } from "ui/actions/timeline";

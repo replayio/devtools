@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 
-import { preferences } from "shared/preferences/Preferences";
-import { Role } from "shared/preferences/types";
+import { Role } from "shared/user-data/GraphQL/config";
+import { userData } from "shared/user-data/GraphQL/UserData";
 import { getButtonClasses } from "ui/components/shared/Button";
 import {
   OnboardingActions,
@@ -15,7 +15,7 @@ export default function ImportSettings() {
   const router = useRouter();
   const setRole = async (role: Role) => {
     // TODO [ryanjduffy]: Should this route to the tutorial app?
-    await preferences.set("role", role);
+    await userData.set("role", role);
     router.push("/");
   };
 

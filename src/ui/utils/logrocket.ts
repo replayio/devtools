@@ -3,7 +3,7 @@ import LogRocket from "logrocket";
 import setupLogRocketReact from "logrocket-react";
 
 import { Recording, UserSettings } from "shared/graphql/types";
-import { preferences } from "shared/preferences/Preferences";
+import { userData } from "shared/user-data/GraphQL/UserData";
 import { skipTelemetry } from "shared/utils/environment";
 import { UserInfo } from "ui/hooks/users";
 
@@ -23,7 +23,7 @@ export default {
   }) => {
     // Skip if the recording was either created or viewed by an internal user
     if (
-      preferences.get("disableLogRocket") ||
+      userData.get("disableLogRocket") ||
       recording?.user?.internal ||
       userInfo?.internal ||
       skipTelemetry()

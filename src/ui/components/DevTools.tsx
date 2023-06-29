@@ -14,8 +14,8 @@ import { ExpandablesContextRoot } from "replay-next/src/contexts/ExpandablesCont
 import { PointsContextRoot } from "replay-next/src/contexts/points/PointsContext";
 import { SelectedFrameContextRoot } from "replay-next/src/contexts/SelectedFrameContext";
 import usePreferredFontSize from "replay-next/src/hooks/usePreferredFontSize";
-import { preferences } from "shared/preferences/Preferences";
-import { usePreference } from "shared/preferences/usePreference";
+import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
+import { userData } from "shared/user-data/GraphQL/UserData";
 import { clearTrialExpired, createSocket } from "ui/actions/session";
 import TerminalContextAdapter from "ui/components/SecondaryToolbox/TerminalContextAdapter";
 import { TestSuiteContextRoot } from "ui/components/TestSuite/views/TestSuiteContext";
@@ -82,7 +82,7 @@ function Body() {
 
   const sidePanelRef = useRef<ImperativePanelHandle>(null);
 
-  const [sidePanelCollapsed, setSidePanelCollapsed] = usePreference("sidePanelCollapsed");
+  const [sidePanelCollapsed, setSidePanelCollapsed] = useGraphQLUserData("sidePanelCollapsed");
 
   const onSidePanelCollapse = (isCollapsed: boolean) => {
     setSidePanelCollapsed(isCollapsed);
@@ -151,7 +151,7 @@ function _DevTools({
     [recording]
   );
 
-  const [enableLargeText] = usePreference("enableLargeText");
+  const [enableLargeText] = useGraphQLUserData("enableLargeText");
 
   usePreferredFontSize(enableLargeText);
 
@@ -172,7 +172,7 @@ function _DevTools({
   useEffect(() => {
     // Preferences cache always initializes itself from localStorage
     // For authenticated users, this method will fetch remote preferences and merge via into the cache.
-    preferences.initialize(isAuthenticated);
+    userData.initialize(isAuthenticated);
   }, [isAuthenticated]);
 
   useEffect(() => {

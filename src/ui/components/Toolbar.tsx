@@ -4,8 +4,8 @@ import { useContext, useEffect, useState } from "react";
 import { getPauseId } from "devtools/client/debugger/src/selectors";
 import { framesCache } from "replay-next/src/suspense/FrameCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { usePreference } from "shared/preferences/usePreference";
 import { isGroupedTestCasesV1 } from "shared/test-suites/RecordingTestMetadata";
+import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import IconWithTooltip from "ui/components/shared/IconWithTooltip";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
@@ -369,13 +369,13 @@ export default function Toolbar() {
   const recordingId = useGetRecordingId();
   const { recording } = useGetRecording(recordingId);
   const { comments, loading } = hooks.useGetComments(recordingId);
-  const [logProtocolExperimentEnabled] = usePreference("logProtocol");
-  const [reactPanelExperimentEnabled] = usePreference("reactPanel");
-  const [showPassport] = usePreference("showPassport");
+  const [logProtocolExperimentEnabled] = useGraphQLUserData("logProtocol");
+  const [reactPanelExperimentEnabled] = useGraphQLUserData("reactPanel");
+  const [showPassport] = useGraphQLUserData("showPassport");
   const { nags } = hooks.useGetUserInfo();
   const showTour = shouldShowTour(nags);
 
-  const [sidePanelCollapsed, setSidePanelCollapsed] = usePreference("sidePanelCollapsed");
+  const [sidePanelCollapsed, setSidePanelCollapsed] = useGraphQLUserData("sidePanelCollapsed");
 
   useEffect(() => {
     if (!loading && comments.length > 0) {

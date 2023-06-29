@@ -10,7 +10,7 @@ import { selectNode } from "devtools/client/inspector/markup/actions/markup";
 import { onViewSourceInDebugger } from "devtools/client/webconsole/actions";
 import { ThreadFront } from "protocol/thread";
 import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
-import { usePreference } from "shared/preferences/usePreference";
+import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { setSelectedPanel, setSelectedPrimaryPanel } from "ui/actions/layout";
 import { useAppDispatch } from "ui/setup/hooks";
 
@@ -18,7 +18,7 @@ import { useAppDispatch } from "ui/setup/hooks";
 export default function InspectorContextReduxAdapter({ children }: { children: ReactNode }) {
   const dispatch = useAppDispatch();
 
-  const [, setSidePanelCollapsed] = usePreference("sidePanelCollapsed");
+  const [, setSidePanelCollapsed] = useGraphQLUserData("sidePanelCollapsed");
 
   const inspectFunctionDefinition = useCallback(
     (mappedLocation: MappedLocation) => {

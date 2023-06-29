@@ -6,7 +6,7 @@ import React from "react";
 import { ConnectedProps, connect } from "react-redux";
 
 import Accordion from "devtools/client/shared/components/Accordion";
-import { preferences } from "shared/preferences/Preferences";
+import { userData } from "shared/user-data/GraphQL/UserData";
 import type { UIState } from "ui/state";
 
 import { BoxModel } from "../../boxmodel/components/BoxModel";
@@ -32,9 +32,9 @@ class LayoutApp extends React.PureComponent<FinalLAProps> {
       contentClassName: "layout-content",
       header: "Box Model",
       id: "layout-section-boxmodel",
-      opened: preferences.get("boxModelOpen"),
+      opened: userData.get("boxModelOpen"),
       onToggle: (opened: boolean) => {
-        preferences.set("boxModelOpen", opened);
+        userData.set("boxModelOpen", opened);
       },
     };
   }

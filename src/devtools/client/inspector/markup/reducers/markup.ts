@@ -2,7 +2,7 @@
 import { EntityState, PayloadAction, createEntityAdapter, createSlice } from "@reduxjs/toolkit";
 import { Attr, BoxModel, PseudoType } from "@replayio/protocol";
 
-import { preferences } from "shared/preferences/Preferences";
+import { userData } from "shared/user-data/GraphQL/UserData";
 import { UIState } from "ui/state";
 
 export interface NodeInfo {
@@ -96,8 +96,8 @@ export const { selectById: getNodeBoxModelById } = boxModelAdapter.getSelectors(
 );
 
 const initialState: MarkupState = {
-  collapseAttributes: preferences.get("collapseAttributes"),
-  collapseAttributeLength: preferences.get("collapseAttributeLength"),
+  collapseAttributes: userData.get("collapseAttributes"),
+  collapseAttributeLength: userData.get("collapseAttributeLength"),
   rootNode: null,
   selectedNode: null,
   selectionReason: null,

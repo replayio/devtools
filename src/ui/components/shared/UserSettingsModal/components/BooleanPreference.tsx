@@ -1,8 +1,8 @@
 import assert from "assert";
 
-import { config } from "shared/preferences/config";
-import { ConfigurablePreference, PreferencesKey } from "shared/preferences/types";
-import { usePreference } from "shared/preferences/usePreference";
+import { config } from "shared/user-data/GraphQL/config";
+import { ConfigurablePreference, PreferencesKey } from "shared/user-data/GraphQL/types";
+import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import Checkbox from "ui/components/shared/Forms/Checkbox";
 import { useGetUserInfo } from "ui/hooks/users";
 
@@ -23,7 +23,7 @@ export function BooleanPreference({
 
   const userInfo = useGetUserInfo();
 
-  const [checked, setChecked] = usePreference(preferencesKey);
+  const [checked, setChecked] = useGraphQLUserData(preferencesKey);
 
   if (internalOnly && !userInfo.internal) {
     return null;

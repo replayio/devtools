@@ -1,6 +1,15 @@
-import { IDBOptions } from "../../hooks/useIndexedDB";
+// NOTE: If any change is made like adding a store name, bump the version number
+
+import { IDBOptions } from "shared/user-data/IndexedDB/types";
 
 // NOTE: If any change is made like adding a store name, bump the version number
+// to ensure that the database is recreated properly.
+export const CONSOLE_SETTINGS_DATABASE: IDBOptions = {
+  databaseName: "ConsoleSettings",
+  databaseVersion: 1,
+  storeNames: ["filterToggles", "showExceptions", "terminalHistory"],
+};
+
 // to ensure that the database is recreated properly.
 export const POINTS_DATABASE: IDBOptions = {
   databaseName: "Points",

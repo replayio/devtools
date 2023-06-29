@@ -1,7 +1,7 @@
 import classnames from "classnames";
 import { HTMLProps, Ref } from "react";
 
-import { usePreference } from "shared/preferences/usePreference";
+import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 
 type RefProp = {
   refToForward?: Ref<HTMLElement>;
@@ -12,7 +12,7 @@ export function Redacted({
   refToForward,
   ...rest
 }: HTMLProps<HTMLDivElement> & RefProp) {
-  const [showRedactions] = usePreference("showRedactions");
+  const [showRedactions] = useGraphQLUserData("showRedactions");
   return (
     <div
       {...rest}
@@ -28,7 +28,7 @@ export function RedactedSpan({
   refToForward,
   ...rest
 }: HTMLProps<HTMLSpanElement> & RefProp) {
-  const [showRedactions] = usePreference("showRedactions");
+  const [showRedactions] = useGraphQLUserData("showRedactions");
   return (
     <span
       {...rest}

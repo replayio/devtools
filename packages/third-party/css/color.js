@@ -8,7 +8,7 @@
 import { cssColors } from "./color-db";
 import { getCSSLexer } from "./lexer";
 
-import { preferences } from "shared/preferences/Preferences";
+import { userData } from "shared/user-data/GraphQL/UserData";
 import { CSS_ANGLEUNIT } from "./constants";
 
 const SPECIALVALUES = new Set(["currentcolor", "initial", "inherit", "transparent", "unset"]);
@@ -91,7 +91,7 @@ CssColor.prototype = {
 
   get colorUnit() {
     if (this._colorUnit === null) {
-      const defaultUnit = preferences.get('defaultColorUnit');
+      const defaultUnit = userData.get('defaultColorUnit');
       this._colorUnit = CssColor.COLORUNIT[defaultUnit];
       this._setColorUnitUppercase(this.authored);
     }

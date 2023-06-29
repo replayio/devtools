@@ -7,7 +7,7 @@ import MarkupApp from "devtools/client/inspector/markup/components/MarkupApp";
 import { RulesApp } from "devtools/client/inspector/rules/components/RulesApp";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { useIsPointWithinFocusWindow } from "replay-next/src/hooks/useIsPointWithinFocusWindow";
-import { ActiveInspectorTab } from "shared/preferences/types";
+import { ActiveInspectorTab } from "shared/user-data/GraphQL/config";
 import { enterFocusMode } from "ui/actions/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 

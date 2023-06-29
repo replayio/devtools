@@ -2,7 +2,7 @@ import classNames from "classnames";
 import { useLayoutEffect, useRef } from "react";
 
 import { IndeterminateProgressBar } from "replay-next/components/IndeterminateLoader";
-import { preferences } from "shared/preferences/Preferences";
+import { userData } from "shared/user-data/GraphQL/UserData";
 import { Redacted } from "ui/components/Redacted";
 import { getToolboxLayout } from "ui/reducers/layout";
 import { getSelectedSource, getSourcesUserActionPending } from "ui/reducers/sources";
@@ -19,7 +19,7 @@ export const EditorPane = () => {
   const selectedSource = useAppSelector(getSelectedSource);
   const sourcesUserActionPending = useAppSelector(getSourcesUserActionPending);
   const panelEl = useRef(null);
-  const enableLargeText = preferences.get("enableLargeText");
+  const enableLargeText = userData.get("enableLargeText");
 
   const nodeWidth = useWidthObserver(panelEl);
 

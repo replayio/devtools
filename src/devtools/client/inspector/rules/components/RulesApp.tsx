@@ -4,7 +4,7 @@ import { Rule } from "devtools/client/inspector/rules/components/Rule";
 import { Rules } from "devtools/client/inspector/rules/components/Rules";
 import { Toolbar } from "devtools/client/inspector/rules/components/Toolbar";
 import Accordion, { AccordionItem } from "devtools/client/shared/components/Accordion";
-import { preferences } from "shared/preferences/Preferences";
+import { userData } from "shared/user-data/GraphQL/UserData";
 import { useAppSelector } from "ui/setup/hooks";
 
 import { RuleInheritance } from "../models/rule";
@@ -65,9 +65,9 @@ export const RulesApp: FC = ({}) => {
           componentProps,
           header: "Pseudo-elements",
           id: "rules-section-pseudoelement",
-          opened: preferences.get("showPseudoElements"),
+          opened: userData.get("showPseudoElements"),
           onToggle: (opened: boolean) => {
-            preferences.set("showPseudoElements", opened);
+            userData.set("showPseudoElements", opened);
           },
         },
       ];

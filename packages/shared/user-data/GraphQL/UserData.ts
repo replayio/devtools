@@ -8,12 +8,13 @@ import {
   UpdateUserPreferences,
   UpdateUserPreferencesVariables,
 } from "shared/graphql/generated/UpdateUserPreferences";
-import { config } from "shared/preferences/config";
-import { LOCAL_STORAGE_KEY } from "shared/preferences/constants";
-import { GET_USER_PREFERENCES, UPDATE_USER_PREFERENCES } from "shared/preferences/graphql";
-import { PreferencesKey, UserPreferences } from "shared/preferences/types";
+import { config } from "shared/user-data/GraphQL/config";
+import { LOCAL_STORAGE_KEY } from "shared/user-data/GraphQL/constants";
+import { GET_USER_PREFERENCES, UPDATE_USER_PREFERENCES } from "shared/user-data/GraphQL/queries";
+import { PreferencesKey, UserPreferences } from "shared/user-data/GraphQL/types";
 
-export interface Preferences {
+// See README.md in shared/user-data for when to use this API
+export interface GraphQLService {
   initialize(authenticated: boolean): Promise<void>;
   get<Key extends PreferencesKey>(key: Key): (typeof config)[Key]["defaultValue"];
   set<Key extends PreferencesKey>(
@@ -36,21 +37,23 @@ export interface Preferences {
 //
 // Rather than a Suspense cache, an event emitter was used to model preferences
 // because better interops with imperative code (like Redux action)
-class PreferencesImplementation implements Preferences {
+class UserData implements GraphQLService {
   private authenticated: boolean = false;
-  private cached: UserPreferences;
+  private cachedJSONData: UserPreferences;
+  private cachedUserPreferences: UserPreferences;
   private eventEmitter: EventEmitter;
   private initialized: boolean = false;
   private urlOverrides: { [key in PreferencesKey]?: true } = {};
 
   constructor() {
-    this.cached = {};
+    this.cachedJSONData = {};
+    this.cachedUserPreferences = {};
     this.eventEmitter = new EventEmitter();
 
     try {
       const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (raw !== null) {
-        this.cached = JSON.parse(raw);
+        this.cachedUserPreferences = JSON.parse(raw);
       }
     } catch (error) {}
 
@@ -81,10 +84,10 @@ class PreferencesImplementation implements Preferences {
 
       const remotePreferences = data.viewer?.preferences as UserPreferences | undefined;
       if (remotePreferences) {
-        const localPreferences = this.cached;
+        const localPreferences = this.cachedUserPreferences;
 
         if (!equal(localPreferences, remotePreferences)) {
-          this.cached = remotePreferences;
+          this.cachedUserPreferences = remotePreferences;
 
           // Also update the copy in localStorage for next time
           this.saveLocal(remotePreferences);
@@ -114,13 +117,21 @@ class PreferencesImplementation implements Preferences {
     }
 
     // Favor explicit values from the modern preferences system
-    const value = this.cached[key];
+    const value = this.cachedUserPreferences[key];
     if (value !== undefined) {
       return value;
     }
 
     // Fall back to explicit values from the legacy preferences system
     if (legacyKey !== null) {
+      // Because we use JSON.parse() when reading from localStorage,
+      // we may end up creating new Objects or Arrays,
+      // so it's important to also cache those values in memory.
+      const cachedValue = this.cachedJSONData[key];
+      if (cachedValue !== undefined) {
+        return cachedValue;
+      }
+
       // Legacy Mozilla preferences all started with "devtools."
       if (legacyKey.startsWith("devtools.")) {
         try {
@@ -132,6 +143,8 @@ class PreferencesImplementation implements Preferences {
             // The legacy system stored values in an object, which it encoded to a string
             const { hasUserValue, userValue } = JSON.parse(legacyValue);
             if (hasUserValue) {
+              this.cachedJSONData[key] = userValue;
+
               return userValue;
             }
           }
@@ -140,11 +153,15 @@ class PreferencesImplementation implements Preferences {
         }
       } else {
         try {
-          // Else legacy preferences were managed via useLocalStorage()
+          // Other types of user data were managed via useLocalStorage()
           const legacyValue = localStorage.getItem(legacyKey);
           if (legacyValue !== null) {
             // That hook stored values in localStorage as JSON string
-            return JSON.parse(legacyValue);
+            const parsedValue = JSON.parse(legacyValue);
+
+            this.cachedJSONData[key] = parsedValue;
+
+            return parsedValue;
           }
         } catch (error) {
           // Ignore errors
@@ -164,14 +181,14 @@ class PreferencesImplementation implements Preferences {
       console.warn("UserPreferences updated initialization");
     }
 
-    this.cached = {
-      ...this.cached,
+    this.cachedUserPreferences = {
+      ...this.cachedUserPreferences,
       [key]: value,
     };
 
     // Preferences cache always initializes itself from localStorage,
     // so always saved an updated copy of preferences there
-    this.saveLocal(this.cached);
+    this.saveLocal(this.cachedUserPreferences);
 
     this.eventEmitter.emit(key, value);
 
@@ -212,4 +229,4 @@ class PreferencesImplementation implements Preferences {
   }
 }
 
-export const preferences = new PreferencesImplementation();
+export const userData = new UserData();

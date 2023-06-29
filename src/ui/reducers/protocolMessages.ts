@@ -3,7 +3,7 @@ import { EventMethods, EventParams } from "@replayio/protocol";
 import cloneDeep from "lodash/cloneDeep";
 
 import { CommandRequest, CommandResponse } from "protocol/socket";
-import { preferences } from "shared/preferences/Preferences";
+import { userData } from "shared/user-data/GraphQL/UserData";
 import { UIState } from "ui/state";
 
 export interface Recorded {
@@ -86,7 +86,7 @@ export const { errorReceived, eventReceived, requestSent, responseReceived } =
 export default protocolMessagesSlice.reducer;
 
 export const getProtocolEvents = (_state: UIState) => {
-  if (!preferences.get("logProtocolEvents")) {
+  if (!userData.get("logProtocolEvents")) {
     console.log("protocol events are disabled");
   }
 

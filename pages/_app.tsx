@@ -29,7 +29,7 @@ import { useLaunchDarkly } from "ui/utils/launchdarkly";
 import { InstallRouteListener } from "ui/utils/routeListener";
 import tokenManager from "ui/utils/tokenManager";
 
-import { preferences } from "shared/preferences/Preferences";
+import { userData } from "shared/user-data/GraphQL/UserData";
 import "../src/base.css";
 
 if (isMock()) {
@@ -39,8 +39,8 @@ if (isMock()) {
 
 // Expose app feature flags to the protocol through an app-agnostic API.
 setFeatures({
-  chromiumRepaints: preferences.get("chromiumRepaints"),
-  repaintEvaluations: preferences.get("repaintEvaluations")
+  chromiumRepaints: userData.get("chromiumRepaints"),
+  repaintEvaluations: userData.get("repaintEvaluations")
 });
 
 interface AuthProps {
