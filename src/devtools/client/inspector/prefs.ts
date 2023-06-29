@@ -1,8 +1,6 @@
 import { PrefsHelper } from "devtools/client/shared/prefs";
 import Services, { pref } from "devtools/shared/services";
 
-pref("devtools.inspector.sidebar-size", 700);
-pref("devtools.inspector.split-sidebar-size", 350);
 pref("devtools.inspector.active-tab", "ruleview");
 pref("devtools.markup.collapseAttributes", true);
 pref("devtools.markup.collapseAttributeLength", 120);
