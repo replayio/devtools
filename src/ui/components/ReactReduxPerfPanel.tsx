@@ -131,6 +131,14 @@ function doSomeAnalysis(range: TimeStampedPointRange | null): UIThunkAction {
     await processReduxDispatches(getState, replayClient, finalRange, sourcesState, reactDomSource);
 
     await processAllSelectorCalls(getState, replayClient, finalRange);
+
+    await processReduxNotifications(
+      replayClient,
+      finalRange,
+      reactReduxSources,
+      sourcesById,
+      sourcesState
+    );
   };
 }
 
@@ -144,7 +152,7 @@ async function processReduxNotifications(
   const subscriberNotifyMatches: FunctionMatch[] = [];
 
   await replayClient.searchFunctions(
-    { query: "notify", sourceIds: reactReduxSources.map(source => source.id) },
+    { query: "notifyNestedSubs", sourceIds: reactReduxSources.map(source => source.id) },
     matches => {
       subscriberNotifyMatches.push(...matches);
     }
@@ -171,27 +179,33 @@ async function processReduxNotifications(
     { ...subscriberNotifyFunction.breakpointLocation!, sourceId: source.id },
     null
   );
-  console.log("Notify hits: ", notifyHits);
+  // console.log("Notify hits: ", notifyHits);
 
   const stepOutLocations = await Promise.all(
     notifyHits.map(hit => replayClient.findStepOutTarget(hit.point))
   );
 
-  console.log("Step out locations: ", stepOutLocations);
+  // console.log("Step out locations: ", stepOutLocations);
 
-  const notifyStartFinishPairs = zip(notifyHits, stepOutLocations).map(([start, finish]) => ({
-    start,
-    finish,
-  }));
+  const notifyStartFinishPairs = zip(notifyHits, stepOutLocations).map(([start, finish]) => {
+    const preferredLocation = getPreferredLocation(sourcesState, finish!.frame!);
+    return {
+      start,
+      finish,
+      source: sourcesById.get(preferredLocation.sourceId)!,
+    };
+  });
 
   console.log("Notify start/finish pairs: ", notifyStartFinishPairs);
 
-  const searchMatches: SearchSourceContentsMatch[] = [];
-  await replayClient.searchSources({ query: "notifyNestedSubs()" }, matches => {
-    searchMatches.push(...matches);
-  });
+  // const searchMatches: SearchSourceContentsMatch[] = [];
+  // await replayClient.searchSources({ query: "notifyNestedSubs()" }, matches => {
+  //   searchMatches.push(...matches);
+  // });
 
-  console.log("Search matches: ", searchMatches);
+  // console.log("Search matches: ", searchMatches);
+
+  return notifyStartFinishPairs;
 }
 
 async function processReduxDispatches(
@@ -209,7 +223,7 @@ async function processReduxDispatches(
     sourcesState
   );
   if (!timePoints) {
-    return;
+    return [];
   }
 
   console.log("React internals time points: ", timePoints);
@@ -364,7 +378,7 @@ async function processReduxDispatches(
     actionObjects
   ).map(
     ([dispatchStart, beforeReducer, afterReducer, afterNotifications, actionObjectProperties]) => {
-      const actionType = actionObjectProperties!.find(p => p.name === "type")?.value;
+      const actionType: string = actionObjectProperties!.find(p => p.name === "type")?.value;
       return {
         actionType: actionType!,
         dispatchStart: dispatchStart!,
@@ -378,6 +392,7 @@ async function processReduxDispatches(
   );
 
   console.log("Dispatch details: ", dispatchDetails);
+  return dispatchDetails;
 }
 
 async function processAllSelectorCalls(
@@ -625,10 +640,16 @@ async function processAllSelectorCalls(
   console.log(groupedCalls);
   console.log(sumsPerSelector);
 
-  const sortedSums = Object.values(sumsPerSelector).sort(
+  const sortedSumsPerSelector = Object.values(sumsPerSelector).sort(
     (a, b) => b.totalDuration - a.totalDuration
   );
-  console.log("Sorted sums: ", sortedSums);
+  console.log("Sorted sums: ", sortedSumsPerSelector);
+
+  return {
+    allHitsPerSelector,
+    sumsPerSelector,
+    sortedSumsPerSelector,
+  };
 }
 
 function formattedFunctionToString(fn: EventListenerWithFunctionInfo) {
