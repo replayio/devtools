@@ -4,8 +4,8 @@ import Document, { Head, Html, Main, NextScript } from "next/document";
 import React from "react";
 
 import { setErrorHandler } from "protocol/utils";
+import { isDevelopment } from "shared/utils/environment";
 import { getAuthHost } from "ui/utils/auth";
-import { isDevelopment } from "ui/utils/environment";
 
 if (!isDevelopment()) {
   // Configure protocol to log errors to Sentry in production environments.

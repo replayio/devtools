@@ -19,7 +19,7 @@ import { createClient } from "graphql-ws";
 
 import { memoizeLast } from "devtools/client/debugger/src/utils/memoizeLast";
 import { defer } from "protocol/utils";
-import { hasApiKey, isE2ETest } from "ui/utils/environment";
+import { hasApiKey, isE2ETest } from "shared/utils/environment";
 
 export let clientWaiter = defer<ApolloClient<NormalizedCacheObject>>();
 

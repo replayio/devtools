@@ -4,7 +4,7 @@ import { ReactNode } from "react";
 
 import { Deferred, assert, defer } from "protocol/utils";
 import { recordData as recordTelemetryData } from "replay-next/src/utils/telemetry";
-import { isTest } from "ui/utils/environment";
+import { isTest } from "shared/utils/environment";
 
 import { getAuthClientId, getAuthHost } from "./auth";
 import { listenForAccessToken } from "./browser";

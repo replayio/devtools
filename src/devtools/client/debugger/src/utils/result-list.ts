@@ -4,7 +4,7 @@
 
 //
 
-import { isFirefox } from "ui/utils/environment";
+import { isFirefox } from "shared/utils/environment";
 
 export function scrollList(resultList: Record<string, HTMLElement>, index: number) {
   if (!resultList.hasOwnProperty(index)) {

@@ -26,6 +26,12 @@ import {
 } from "replay-next/src/suspense/ExecutionPointsCache";
 import { screenshotCache } from "replay-next/src/suspense/ScreenshotCache";
 import { ReplayClientInterface } from "shared/client/types";
+import {
+  encodeObjectToURL,
+  getPausePointParams,
+  isTest,
+  updateUrlWithParams,
+} from "shared/utils/environment";
 import { getFirstComment } from "ui/hooks/comments/comments";
 import {
   getCurrentTime,
@@ -43,12 +49,6 @@ import {
   setPlaybackPrecachedTime,
 } from "ui/reducers/timeline";
 import { FocusWindow, HoveredItem, PlaybackOptions, TimeRange } from "ui/state/timeline";
-import {
-  encodeObjectToURL,
-  getPausePointParams,
-  isTest,
-  updateUrlWithParams,
-} from "ui/utils/environment";
 import KeyShortcuts, { isEditableElement } from "ui/utils/key-shortcuts";
 import { features } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";

@@ -4,8 +4,8 @@ import React, { useEffect, useState } from "react";
 
 import { assert } from "protocol/utils";
 import { Subscription } from "shared/graphql/types";
+import { isDevelopment } from "shared/utils/environment";
 import hooks from "ui/hooks";
-import { isDevelopment } from "ui/utils/environment";
 import { sendTelemetryEvent } from "ui/utils/telemetry";
 
 import { SettingsHeader } from "../SettingsModal/SettingsBody";

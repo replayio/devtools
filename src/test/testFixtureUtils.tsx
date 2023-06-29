@@ -3,10 +3,10 @@ import { gql } from "@apollo/client";
 
 import { ThreadFront } from "protocol/thread";
 import { Recording } from "shared/graphql/types";
+import { getMockEnvironmentForTesting } from "shared/utils/environment";
 import { LoadedRegionsTuple, MessageTuple, SourceTuple, SourcesTuple } from "shared/utils/testing";
 import { UIStore } from "ui/actions";
 import { convertRecording } from "ui/hooks/recordings";
-import { getMockEnvironmentForTesting } from "ui/utils/environment";
 
 import { createTestStore } from "./testUtils";
 

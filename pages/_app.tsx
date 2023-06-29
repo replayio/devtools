@@ -24,7 +24,7 @@ import useAuthTelemetry from "ui/hooks/useAuthTelemetry";
 import { getUnexpectedError } from "ui/reducers/app";
 import { bootstrapApp } from "ui/setup";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { configureMockEnvironmentForTesting, isMock } from "ui/utils/environment";
+import { configureMockEnvironmentForTesting, isMock } from "shared/utils/environment";
 import { useLaunchDarkly } from "ui/utils/launchdarkly";
 import { features } from "ui/utils/prefs";
 import { InstallRouteListener } from "ui/utils/routeListener";

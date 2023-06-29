@@ -2,10 +2,10 @@ import { SessionId } from "@replayio/protocol";
 import mixpanel from "mixpanel-browser";
 
 import { InspectorActiveTab } from "devtools/client/inspector/reducers";
+import { isReplayBrowser, skipTelemetry } from "shared/utils/environment";
 import { CanonicalRequestType } from "ui/components/NetworkMonitor/utils";
 import { WorkspaceId, WorkspaceUuid } from "ui/state/app";
 import { PrimaryPanelName, SecondaryPanelName, ViewMode } from "ui/state/layout";
-import { isReplayBrowser, skipTelemetry } from "ui/utils/environment";
 
 import { prefs } from "./prefs";
 import { getRecordingId } from "./recording";

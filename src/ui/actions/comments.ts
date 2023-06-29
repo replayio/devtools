@@ -12,6 +12,7 @@ import {
 } from "replay-next/components/sources/utils/comments";
 import { topFrameCache } from "replay-next/src/suspense/FrameCache";
 import { ReplayClientInterface } from "shared/client/types";
+import { mutate } from "shared/graphql/apolloClient";
 import { CommentSourceLocation } from "shared/graphql/types";
 import { RequestSummary } from "ui/components/NetworkMonitor/utils";
 import { ADD_COMMENT_MUTATION, AddCommentMutation } from "ui/hooks/comments/useAddComment";
@@ -24,7 +25,6 @@ import {
 import { getCurrentTime } from "ui/reducers/timeline";
 import { UIState } from "ui/state";
 import { Comment, CommentOptions, Reply } from "ui/state/comments";
-import { mutate } from "ui/utils/apolloClient";
 import { trackEvent } from "ui/utils/telemetry";
 
 import type { UIThunkAction } from "./index";

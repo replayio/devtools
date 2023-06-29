@@ -3,8 +3,8 @@ import LogRocket from "logrocket";
 import setupLogRocketReact from "logrocket-react";
 
 import { ExperimentalUserSettings, Recording } from "shared/graphql/types";
+import { skipTelemetry } from "shared/utils/environment";
 import { UserInfo } from "ui/hooks/users";
-import { skipTelemetry } from "ui/utils/environment";
 
 let setup = false;
 

@@ -2,6 +2,7 @@ import { DocumentNode, gql, useMutation, useQuery } from "@apollo/client";
 import { useEffect, useMemo, useState } from "react";
 
 import Services from "devtools/shared/services";
+import { query } from "shared/graphql/apolloClient";
 import {
   CreateUserAPIKey,
   CreateUserAPIKeyVariables,
@@ -20,14 +21,13 @@ import {
   UpdateUserPreferencesVariables,
 } from "shared/graphql/generated/UpdateUserPreferences";
 import type { ApiKey, ExperimentalUserSettings } from "shared/graphql/types";
+import { isTest } from "shared/utils/environment";
 import {
   ADD_USER_API_KEY,
   DELETE_USER_API_KEY,
   GET_USER_SETTINGS,
   UPDATE_USER_PREFERENCES,
 } from "ui/graphql/settings";
-import { query } from "ui/utils/apolloClient";
-import { isTest } from "ui/utils/environment";
 import { maybeTrackTeamChange } from "ui/utils/mixpanel";
 import { features, prefs } from "ui/utils/prefs";
 import useAuth0 from "ui/utils/useAuth0";

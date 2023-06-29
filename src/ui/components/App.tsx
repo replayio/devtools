@@ -3,6 +3,7 @@ import { ConnectedProps, connect } from "react-redux";
 
 import QuickOpenModal from "devtools/client/debugger/src/components/QuickOpenModal";
 import { getQuickOpenEnabled } from "devtools/client/debugger/src/selectors";
+import { isTest } from "shared/utils/environment";
 import { actions } from "ui/actions";
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 import hooks from "ui/hooks";
@@ -11,7 +12,6 @@ import { getLoadingFinished, getModal, getTheme } from "ui/reducers/app";
 import { useAppSelector } from "ui/setup/hooks";
 import { UIState } from "ui/state";
 import { ModalType } from "ui/state/app";
-import { isTest } from "ui/utils/environment";
 import { trackEvent } from "ui/utils/telemetry";
 import { shouldShowNag } from "ui/utils/tour";
 import useAuth0 from "ui/utils/useAuth0";

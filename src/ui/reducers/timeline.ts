@@ -2,10 +2,10 @@ import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { TimeStampedPoint } from "@replayio/protocol";
 import sortBy from "lodash/sortBy";
 
+import { getPausePointParams } from "shared/utils/environment";
 import { MAX_FOCUS_REGION_DURATION } from "ui/actions/timeline";
 import { UIState } from "ui/state";
 import { FocusWindow, HoveredItem, TimeRange, TimelineState } from "ui/state/timeline";
-import { getPausePointParams } from "ui/utils/environment";
 import { mergeSortedPointLists } from "ui/utils/timeline";
 
 function initialTimelineState(): TimelineState {

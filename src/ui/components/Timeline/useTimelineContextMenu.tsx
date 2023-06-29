@@ -13,6 +13,7 @@ import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { getUrlString } from "shared/utils/environment";
 import { createFrameComment } from "ui/actions/comments";
 import {
   MAX_FOCUS_REGION_DURATION,
@@ -22,7 +23,6 @@ import {
   updateFocusWindow,
 } from "ui/actions/timeline";
 import { useAppDispatch } from "ui/setup/hooks";
-import { getUrlString } from "ui/utils/environment";
 
 import styles from "./ContextMenu.module.css";
 
