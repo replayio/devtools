@@ -328,12 +328,7 @@ function ToolbarButton({
   }
 
   const imageIcon = (
-    <MaterialIcon
-      className={classNames("toolbar-panel-icon text-themeToolbarPanelIconColor", name)}
-      iconSize="2xl"
-    >
-      {iconContents}
-    </MaterialIcon>
+    <MaterialIcon className={classNames("toolbar-panel-icon", name)}>{iconContents}</MaterialIcon>
   );
   return (
     <div className="relative px-2">
