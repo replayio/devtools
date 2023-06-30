@@ -8,6 +8,7 @@ import {
 } from "react";
 
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
+import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { TestEvent, TestRecording } from "shared/test-suites/RecordingTestMetadata";
 
@@ -22,6 +23,7 @@ export const TestSuiteContext = createContext<TestSuiteContextType>(null as any)
 
 export function TestSuiteContextRoot({ children }: PropsWithChildren) {
   const { updateForTimelineImprecise: zoom } = useContext(FocusContext);
+  const { duration } = useContext(SessionContext);
   const { update: seekToTime } = useContext(TimelineContext);
 
   const [testEvent, setTestEvent] = useState<TestEvent | null>(null);
@@ -43,9 +45,15 @@ export function TestSuiteContextRoot({ children }: PropsWithChildren) {
 
           seekToTime(timeStampedPointRange.begin.time, timeStampedPointRange.begin.point, false);
         }
+      } else {
+        await zoom([0, duration], {
+          bias: "begin",
+          debounce: false,
+          sync: true,
+        });
       }
     },
-    [seekToTime, zoom]
+    [duration, seekToTime, zoom]
   );
 
   const value = useMemo(
