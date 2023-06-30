@@ -8,7 +8,6 @@
 import { cssColors } from "./color-db";
 import { getCSSLexer } from "./lexer";
 
-import { userData } from "shared/user-data/GraphQL/UserData";
 import { CSS_ANGLEUNIT } from "./constants";
 
 const SPECIALVALUES = new Set(["currentcolor", "initial", "inherit", "transparent", "unset"]);
@@ -91,7 +90,9 @@ CssColor.prototype = {
 
   get colorUnit() {
     if (this._colorUnit === null) {
-      const defaultUnit = userData.get('defaultColorUnit');
+      // Note this used to be stored as a preference ("devtools.defaultColorUnit")
+      // but that was never exposed to the user so PR #9385 inlined the default value
+      const defaultUnit = "authored";
       this._colorUnit = CssColor.COLORUNIT[defaultUnit];
       this._setColorUnitUppercase(this.authored);
     }
