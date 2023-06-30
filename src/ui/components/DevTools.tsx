@@ -104,7 +104,7 @@ function Body() {
         <Toolbar />
         <PanelGroup autoSaveId="DevTools-horizontal" className="split-box" direction="horizontal">
           <Panel
-            className="flex=1 flex h-full overflow-hidden"
+            className="flex h-full overflow-hidden transition-[flex-grow]"
             collapsible
             defaultSize={20}
             id="Panel-SidePanel"
