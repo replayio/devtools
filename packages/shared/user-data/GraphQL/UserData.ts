@@ -48,7 +48,12 @@ class UserData implements GraphQLService {
   constructor() {
     this.cachedJSONData = {};
     this.cachedUserPreferences = {};
+
+    // See FE-1648
+    // We expect a large number of listeners for certain types of preferences
+    // For example, each rendered row in the source viewer may subscribe to "source_showHitCounts"
     this.eventEmitter = new EventEmitter();
+    this.eventEmitter.setMaxListeners(1_000);
 
     try {
       const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
