@@ -1,4 +1,4 @@
-import { config } from "shared/user-data/GraphQL/config";
+import { ConsoleEventFilterPreferences, config } from "shared/user-data/GraphQL/config";
 import { LOCAL_STORAGE_KEY } from "shared/user-data/GraphQL/constants";
 import { PreferencesKey } from "shared/user-data/GraphQL/types";
 
@@ -217,6 +217,26 @@ describe("UserData", () => {
       expect(subscription).toHaveBeenCalledTimes(1);
       expect(subscription).toHaveBeenCalledWith("dev");
     });
+
+    it("should ignore no-op updates", () => {
+      const userData = require("./UserData").userData;
+
+      const subscription = jest.fn();
+      userData.subscribe("layout_inspectorBoxModelOpen", subscription);
+
+      expect(subscription).not.toHaveBeenCalled();
+
+      userData.set("layout_inspectorBoxModelOpen", false);
+      expect(subscription).toHaveBeenCalledTimes(1);
+      expect(subscription).toHaveBeenCalledWith(false);
+
+      userData.set("layout_inspectorBoxModelOpen", false);
+      expect(subscription).toHaveBeenCalledTimes(1);
+
+      userData.set("layout_inspectorBoxModelOpen", true);
+      expect(subscription).toHaveBeenCalledTimes(2);
+      expect(subscription).toHaveBeenCalledWith(true);
+    });
   });
 
   describe("legacy preferences", () => {
@@ -251,6 +271,33 @@ describe("UserData", () => {
       const userData = require("./UserData").userData;
 
       expect(userData.get("protocol_repaintEvaluations")).toBe(true);
+    });
+
+    it("should memoize parsed legacy values", () => {
+      localStorageMock.getItem.mockImplementation((key: string) => {
+        switch (key) {
+          case config.console_eventFilters.legacyKey:
+            return JSON.stringify({
+              keyboard: true,
+              mouse: true,
+              navigation: true,
+            } as ConsoleEventFilterPreferences);
+          default:
+            return null;
+        }
+      });
+
+      const userData = require("./UserData").userData;
+
+      const value1 = userData.get("console_eventFilters");
+      expect(value1).toEqual({
+        keyboard: true,
+        mouse: true,
+        navigation: true,
+      });
+
+      const value2 = userData.get("console_eventFilters");
+      expect(value1).toBe(value2);
     });
   });
 });

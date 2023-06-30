@@ -1,4 +1,3 @@
-import EventEmitter from "events";
 import { captureException } from "@sentry/react";
 import equal from "deep-equal";
 
@@ -41,14 +40,14 @@ class UserData implements GraphQLService {
   private authenticated: boolean = false;
   private cachedJSONData: UserPreferences;
   private cachedUserPreferences: UserPreferences;
-  private eventEmitter: EventEmitter;
   private initialized: boolean = false;
+  private subscriberMap: Map<string, Set<Function>>;
   private urlOverrides: { [key in PreferencesKey]?: true } = {};
 
   constructor() {
     this.cachedJSONData = {};
     this.cachedUserPreferences = {};
-    this.eventEmitter = new EventEmitter();
+    this.subscriberMap = new Map();
 
     try {
       const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -98,11 +97,13 @@ class UserData implements GraphQLService {
           this.saveLocal(mergedPreferences);
 
           // Notify listeners of changed values
-          this.eventEmitter.eventNames().forEach(eventName => {
-            const key = eventName as PreferencesKey;
+          this.subscriberMap.forEach((...args) => {
+            const key = args[1] as PreferencesKey;
+
             if (!equal(localPreferences[key], mergedPreferences[key])) {
               const value = this.get(key as PreferencesKey);
-              this.eventEmitter.emit(key, value);
+
+              this.notifySubscribers(key, value);
             }
           });
         }
@@ -132,6 +133,8 @@ class UserData implements GraphQLService {
       // Because we use JSON.parse() when reading from localStorage,
       // we may end up creating new Objects or Arrays,
       // so it's important to also cache those values in memory.
+      //
+      // It's also nice to avoid overhead of reading localStorage and parsing unnecessarily.
       const cachedValue = this.cachedJSONData[key];
       if (cachedValue !== undefined) {
         return cachedValue;
@@ -186,6 +189,10 @@ class UserData implements GraphQLService {
       console.warn("UserPreferences should not be updated before initialization");
     }
 
+    if (equal(value, this.get(key))) {
+      return;
+    }
+
     this.cachedUserPreferences = {
       ...this.cachedUserPreferences,
       [key]: value,
@@ -195,7 +202,7 @@ class UserData implements GraphQLService {
     // so always saved an updated copy of preferences there
     this.saveLocal(this.cachedUserPreferences);
 
-    this.eventEmitter.emit(key, value);
+    this.notifySubscribers(key, value);
 
     // Authenticated users also save preferences to GraphQL so they roam between environments and devices
     if (this.authenticated) {
@@ -210,10 +217,33 @@ class UserData implements GraphQLService {
     key: Key,
     callback: (value: (typeof config)[Key]["defaultValue"]) => void
   ): () => void {
-    this.eventEmitter.on(key, callback);
+    let set = this.subscriberMap.get(key);
+    if (set) {
+      set.add(callback);
+    } else {
+      set = new Set([callback]);
+      this.subscriberMap.set(key, set);
+    }
+
     return () => {
-      this.eventEmitter.off(key, callback);
+      set!.delete(callback);
+
+      if (set!.size === 0) {
+        this.subscriberMap.delete(key);
+      }
     };
+  }
+
+  private notifySubscribers<Key extends PreferencesKey>(
+    key: Key,
+    value: (typeof config)[Key]["defaultValue"]
+  ) {
+    const set = this.subscriberMap.get(key);
+    if (set) {
+      set.forEach(callback => {
+        callback(value);
+      });
+    }
   }
 
   private saveLocal(userPreferences: UserPreferences) {
