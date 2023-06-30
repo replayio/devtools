@@ -55,7 +55,9 @@ export function TestRunListItem({
 
     attributes = (
       <div className="flex flex-row items-center gap-4 text-xs font-light">
-        <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
+        <AttributeContainer icon="schedule" title={date.toLocaleString()}>
+          {getTruncatedRelativeDate(date)}
+        </AttributeContainer>
         {user && (
           <AttributeContainer icon="person">
             <HighlightedText haystack={user} needle={filterByText} />
