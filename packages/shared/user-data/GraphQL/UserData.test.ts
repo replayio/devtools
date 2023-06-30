@@ -146,7 +146,7 @@ describe("UserData", () => {
           viewer: {
             preferences: {
               console_showFiltersByDefault: false,
-              debugger_breakpointsVisible: false,
+              layout_breakpointsPanelExpanded: false,
             },
           },
         },
@@ -157,7 +157,7 @@ describe("UserData", () => {
 
     expect(userData.get("feature_brokenSourcemapWorkaround")).toBe(false);
     expect(userData.get("console_showFiltersByDefault")).toBe(true);
-    expect(userData.get("debugger_breakpointsVisible")).toBe(true);
+    expect(userData.get("layout_breakpointsPanelExpanded")).toBe(true);
 
     await userData.initialize(true);
 
@@ -167,12 +167,12 @@ describe("UserData", () => {
     // GraphQL should be called after initialization and preferences should be merged with localStorage
     expect(userData.get("feature_brokenSourcemapWorkaround")).toBe(false);
     expect(userData.get("console_showFiltersByDefault")).toBe(false);
-    expect(userData.get("debugger_breakpointsVisible")).toBe(false);
+    expect(userData.get("layout_breakpointsPanelExpanded")).toBe(false);
 
     // Updated values should be written to both localStorage and GraphQL
     expect(localStorageMock.setItem).toHaveBeenCalledTimes(1);
     expect(mutateGraphQL).not.toHaveBeenCalled();
-    userData.set("debugger_breakpointsVisible", true);
+    userData.set("layout_breakpointsPanelExpanded", true);
     expect(localStorageMock.setItem).toHaveBeenCalledTimes(2);
     expect(mutateGraphQL).toHaveBeenCalledTimes(1);
   });
