@@ -1,6 +1,6 @@
 import { RecordingId } from "@replayio/protocol";
 import sortBy from "lodash/sortBy";
-import { useMemo, useState } from "react";
+import { memo, useMemo, useState } from "react";
 
 import { Recording } from "shared/graphql/types";
 import { SecondaryButton } from "ui/components/shared/Button";
@@ -9,7 +9,9 @@ import RecordingRow from "./RecordingListItem/RecordingListItem";
 import { RecordingsError } from "./RecordingsError";
 import styles from "../../../Library.module.css";
 
-export function Recordings({
+const NUM_ROWS_PER_PAGE = 50;
+
+export const Recordings = memo(function Recordings({
   recordings,
   selectedIds,
   setSelectedIds,
@@ -28,7 +30,7 @@ export function Recordings({
       const order = ascOrder ? 1 : -1;
       return order * new Date(recording.date).getTime();
     });
-    return showMore ? sortedRecordings : sortedRecordings.slice(0, 100);
+    return showMore ? sortedRecordings : sortedRecordings.slice(0, NUM_ROWS_PER_PAGE);
   }, [recordings, showMore]);
 
   const addSelectedId = (recordingId: RecordingId) => setSelectedIds([...selectedIds, recordingId]);
@@ -51,7 +53,7 @@ export function Recordings({
           {...{ addSelectedId, removeSelectedId, isEditing }}
         />
       ))}
-      {!showMore && recordings.length > 100 && (
+      {!showMore && recordings.length > NUM_ROWS_PER_PAGE && (
         <div className="flex justify-center p-4">
           <SecondaryButton className="" color="blue" onClick={() => toggleShowMore(!showMore)}>
             Show More
@@ -60,4 +62,4 @@ export function Recordings({
       )}
     </div>
   );
-}
+});
