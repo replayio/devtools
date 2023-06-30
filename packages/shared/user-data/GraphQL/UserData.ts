@@ -87,15 +87,20 @@ class UserData implements GraphQLService {
         const localPreferences = this.cachedUserPreferences;
 
         if (!equal(localPreferences, remotePreferences)) {
-          this.cachedUserPreferences = remotePreferences;
+          const mergedPreferences = {
+            ...localPreferences,
+            ...remotePreferences,
+          };
+
+          this.cachedUserPreferences = mergedPreferences;
 
           // Also update the copy in localStorage for next time
-          this.saveLocal(remotePreferences);
+          this.saveLocal(mergedPreferences);
 
           // Notify listeners of changed values
           this.eventEmitter.eventNames().forEach(eventName => {
             const key = eventName as PreferencesKey;
-            if (!equal(localPreferences[key], remotePreferences[key])) {
+            if (!equal(localPreferences[key], mergedPreferences[key])) {
               const value = this.get(key as PreferencesKey);
               this.eventEmitter.emit(key, value);
             }
@@ -178,7 +183,7 @@ class UserData implements GraphQLService {
     value: (typeof config)[Key]["defaultValue"]
   ): Promise<void> {
     if (!this.initialized) {
-      console.warn("UserPreferences updated initialization");
+      console.warn("UserPreferences should not be updated before initialization");
     }
 
     this.cachedUserPreferences = {
