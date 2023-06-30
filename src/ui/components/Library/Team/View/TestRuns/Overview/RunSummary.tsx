@@ -63,7 +63,9 @@ export function Attributes({ summary }: { summary: Summary }) {
 
     return (
       <div className="flex flex-row flex-wrap items-center gap-4">
-        <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
+        <AttributeContainer icon="schedule" title={date.toLocaleString()}>
+          {getTruncatedRelativeDate(date)}
+        </AttributeContainer>
         {user ? <AttributeContainer icon="person">{user}</AttributeContainer> : null}
         <BranchIcon
           branchName={branchName}
