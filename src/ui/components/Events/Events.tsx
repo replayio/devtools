@@ -41,7 +41,7 @@ function Events() {
     client
   );
 
-  const [filters] = useGraphQLUserData("consoleEventFilters");
+  const [filters] = useGraphQLUserData("console_eventFilters");
 
   const filteredEvents = useMemo(
     () =>

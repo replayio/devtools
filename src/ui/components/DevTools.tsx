@@ -82,7 +82,9 @@ function Body() {
 
   const sidePanelRef = useRef<ImperativePanelHandle>(null);
 
-  const [sidePanelCollapsed, setSidePanelCollapsed] = useGraphQLUserData("sidePanelCollapsed");
+  const [sidePanelCollapsed, setSidePanelCollapsed] = useGraphQLUserData(
+    "layout_sidePanelCollapsed"
+  );
 
   const onSidePanelCollapse = (isCollapsed: boolean) => {
     setSidePanelCollapsed(isCollapsed);
@@ -151,7 +153,7 @@ function _DevTools({
     [recording]
   );
 
-  const [enableLargeText] = useGraphQLUserData("enableLargeText");
+  const [enableLargeText] = useGraphQLUserData("global_enableLargeText");
 
   usePreferredFontSize(enableLargeText);
 

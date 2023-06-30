@@ -19,7 +19,7 @@ export const EditorPane = () => {
   const selectedSource = useAppSelector(getSelectedSource);
   const sourcesUserActionPending = useAppSelector(getSourcesUserActionPending);
   const panelEl = useRef(null);
-  const enableLargeText = userData.get("enableLargeText");
+  const enableLargeText = userData.get("global_enableLargeText");
 
   const nodeWidth = useWidthObserver(panelEl);
 

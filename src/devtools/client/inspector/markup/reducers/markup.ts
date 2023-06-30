@@ -96,8 +96,8 @@ export const { selectById: getNodeBoxModelById } = boxModelAdapter.getSelectors(
 );
 
 const initialState: MarkupState = {
-  collapseAttributes: userData.get("collapseAttributes"),
-  collapseAttributeLength: userData.get("collapseAttributeLength"),
+  collapseAttributes: userData.get("inspector_collapseAttributes"),
+  collapseAttributeLength: userData.get("inspector_collapseAttributeLength"),
   rootNode: null,
   selectedNode: null,
   selectionReason: null,

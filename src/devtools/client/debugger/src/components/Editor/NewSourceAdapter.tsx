@@ -43,7 +43,7 @@ function NewSourceAdapter() {
   const sourceSearchInputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const [showColumnBreakpoints] = useGraphQLUserData("columnBreakpoints");
+  const [showColumnBreakpoints] = useGraphQLUserData("feature_columnBreakpoints");
 
   const dispatch = useAppDispatch();
   const location = useAppSelector(getSelectedLocation);

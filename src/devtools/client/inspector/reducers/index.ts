@@ -21,7 +21,7 @@ export interface InspectorState {
 
 export function initialInspectorState(): InspectorState {
   return {
-    activeTab: userData.get("activeInspectorTab"),
+    activeTab: userData.get("inspector_activeTab"),
   };
 }
 
@@ -31,7 +31,7 @@ export function inspector(
 ): InspectorState {
   switch (action.type) {
     case "set_active_inspector_tab":
-      userData.set("activeInspectorTab", action.activeTab);
+      userData.set("inspector_activeTab", action.activeTab);
       return { ...state, activeTab: action.activeTab };
     default:
       return state;

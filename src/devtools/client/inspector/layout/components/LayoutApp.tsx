@@ -32,9 +32,9 @@ class LayoutApp extends React.PureComponent<FinalLAProps> {
       contentClassName: "layout-content",
       header: "Box Model",
       id: "layout-section-boxmodel",
-      opened: userData.get("boxModelOpen"),
+      opened: userData.get("layout_inspectorBoxModelOpen"),
       onToggle: (opened: boolean) => {
-        userData.set("boxModelOpen", opened);
+        userData.set("layout_inspectorBoxModelOpen", opened);
       },
     };
   }

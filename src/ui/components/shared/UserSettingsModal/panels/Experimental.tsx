@@ -3,20 +3,20 @@ import { PreferencesKey } from "shared/user-data/GraphQL/types";
 import { BooleanPreference } from "ui/components/shared/UserSettingsModal/components/BooleanPreference";
 
 export const PREFERENCES: PreferencesKey[] = [
-  "columnBreakpoints",
-  "profileWorkerThreads",
-  "enableUnstableQueryCache",
-  "disableStableQueryCache",
-  "basicProcessingLoadingBar",
-  "consoleFilterDrawerDefaultsToOpen",
-  "disableScanDataCache",
-  "brokenSourcemapWorkaround",
-  "enableRoutines",
-  "rerunRoutines",
-  "disableRecordingAssetsInDatabase",
-  "reactPanel",
-  "disableIncrementalSnapshots",
-  "disableConcurrentControllerLoading",
+  "feature_columnBreakpoints",
+  "backend_profileWorkerThreads",
+  "backend_enableUnstableQueryCache",
+  "backend_disableStableQueryCache",
+  "feature_basicProcessingLoadingBar",
+  "console_showFiltersByDefault",
+  "backend_disableScanDataCache",
+  "feature_brokenSourcemapWorkaround",
+  "backend_enableRoutines",
+  "backend_rerunRoutines",
+  "backend_disableRecordingAssetsInDatabase",
+  "feature_reactPanel",
+  "backend_disableIncrementalSnapshots",
+  "backend_disableConcurrentControllerLoading",
 ];
 
 export function Experimental() {

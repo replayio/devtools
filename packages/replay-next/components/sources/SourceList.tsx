@@ -150,7 +150,7 @@ export default function SourceList({
     }
   }, [focusedSource, lineCount, markPendingFocusUpdateProcessed, pendingFocusUpdate, sourceId]);
 
-  const [showHitCounts] = useGraphQLUserData("showHitCounts");
+  const [showHitCounts] = useGraphQLUserData("source_showHitCounts");
 
   const [minHitCount, maxHitCount] = getCachedMinMaxSourceHitCounts(sourceId, focusRange);
 

@@ -111,7 +111,7 @@ export function setTelemetryContext({ id, email, internal }: TelemetryUser) {
 }
 
 export function sendTelemetryEvent(event: string, tags: any = {}) {
-  if (userData.get("logTelemetryEvent")) {
+  if (userData.get("global_logTelemetryEvent")) {
     console.log("telemetry event", { event, tags });
   }
 

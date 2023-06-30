@@ -63,7 +63,7 @@ export default class ElementStyle {
 
   get unusedCssEnabled() {
     if (!this._unusedCssEnabled) {
-      this._unusedCssEnabled = userData.get("inactiveCssEnabled");
+      this._unusedCssEnabled = userData.get("inspector_inactiveCssEnabled");
     }
     return this._unusedCssEnabled;
   }

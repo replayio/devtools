@@ -28,7 +28,6 @@ export async function setupAppHelper(store: UIStore) {
   const recordingId = getRecordingId();
   const replaySession = recordingId ? await getReplaySession(recordingId) : undefined;
 
-  // TODO [FE-1483] Expose new prefs and features here (somehow)
   window.app = {
     store,
     preferences: userData,

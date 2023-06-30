@@ -169,7 +169,7 @@ export async function bootstrapApp() {
   registerStoreObserver(store, updatePrefs);
   await setupAppHelper(store);
 
-  let theme = userData.get("theme");
+  let theme = userData.get("global_theme");
   if (theme === "system") {
     theme = getSystemColorScheme();
   }
@@ -187,7 +187,7 @@ export async function bootstrapApp() {
     if (userInfo) {
       const userSettings = await getUserSettings();
       const workspaceId = userSettings.defaultWorkspaceId;
-      const role = userData.get("role");
+      const role = userData.get("global_role");
 
       setTelemetryContext(userInfo);
       maybeSetMixpanelContext({ ...userInfo, workspaceId, role });

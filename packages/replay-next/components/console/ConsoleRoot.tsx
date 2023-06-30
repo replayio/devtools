@@ -85,7 +85,7 @@ function Console({
   const { clearMessages: clearConsoleEvaluations, messages: consoleEvaluations } =
     useContext(TerminalContext);
 
-  const [isMenuOpen, setIsMenuOpen] = useGraphQLUserData("consoleFilterDrawerDefaultsToOpen");
+  const [isMenuOpen, setIsMenuOpen] = useGraphQLUserData("console_showFiltersByDefault");
   const [menuValueHasBeenToggled, setMenuValueHasBeenToggled] = useState(false);
 
   // We default to having the console filters panel turned off, to minimize UI "business".

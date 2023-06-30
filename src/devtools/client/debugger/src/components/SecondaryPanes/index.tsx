@@ -16,10 +16,12 @@ export default function SecondaryPanes() {
   const currentPoint = useAppSelector(getCurrentPoint);
   const currentTime = useAppSelector(getCurrentTime);
 
-  const [scopesVisible, setScopesVisible] = useGraphQLUserData("scopesVisible");
-  const [callStackVisible, setCallStackVisible] = useGraphQLUserData("callStackVisible");
-  const [breakpointsVisible, setBreakpointsVisible] = useGraphQLUserData("breakpointsVisible");
-  const [logpointsVisible, setLogpointsVisible] = useGraphQLUserData("logpointsVisible");
+  const [scopesVisible, setScopesVisible] = useGraphQLUserData("debugger_scopesVisible");
+  const [callStackVisible, setCallStackVisible] = useGraphQLUserData("debugger_callStackVisible");
+  const [breakpointsVisible, setBreakpointsVisible] = useGraphQLUserData(
+    "debugger_breakpointsVisible"
+  );
+  const [logpointsVisible, setLogpointsVisible] = useGraphQLUserData("debugger_logpointsVisible");
 
   return (
     <div className="secondary-panes-wrapper">

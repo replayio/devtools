@@ -63,7 +63,7 @@ function useInitialPrimaryPanel() {
 }
 
 export default function SidePanel() {
-  const [resolveRecording] = useGraphQLUserData("resolveRecording");
+  const [resolveRecording] = useGraphQLUserData("feature_resolveRecording");
   const selectedPrimaryPanel = useInitialPrimaryPanel();
   const [replayInfoCollapsed, setReplayInfoCollapsed] = useState(false);
   const [eventsCollapsed, setEventsCollapsed] = useState(false);

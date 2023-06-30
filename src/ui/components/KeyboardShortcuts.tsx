@@ -61,7 +61,7 @@ function KeyboardShortcuts({
   const { isAuthenticated } = useAuth0();
   const [, dismissFindFileNag] = useNag(Nag.FIND_FILE);
 
-  const [protocolTimeline] = useGraphQLUserData("protocolTimeline");
+  const [protocolTimeline] = useGraphQLUserData("feature_protocolTimeline");
   const globalKeyboardShortcuts = useMemo(() => {
     const openFullTextSearch = (e: KeyboardEvent) => {
       e.preventDefault();
@@ -132,18 +132,18 @@ function KeyboardShortcuts({
       if (!e.target || !isEditableElement(e.target)) {
         e.preventDefault();
 
-        let theme = userData.get("theme");
+        let theme = userData.get("global_theme");
         if (theme === "system") {
           theme = getSystemColorScheme();
         }
-        userData.set("theme", theme === "dark" ? "light" : "dark");
+        userData.set("global_theme", theme === "dark" ? "light" : "dark");
       }
     };
 
     const toggleProtocolTimeline = (e: KeyboardEvent) => {
       if (!e.target || !isEditableElement(e.target)) {
         e.preventDefault();
-        userData.set("protocolTimeline", !protocolTimeline);
+        userData.set("feature_protocolTimeline", !protocolTimeline);
       }
     };
 

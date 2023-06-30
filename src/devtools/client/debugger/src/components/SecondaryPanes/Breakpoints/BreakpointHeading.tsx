@@ -50,7 +50,8 @@ class BreakpointHeading extends PureComponent<BreakpointsProps> {
     const { breakpoint, source, hasSiblingOfSameName } = this.props;
     const { column, line } = breakpoint?.location ?? {};
 
-    const columnVal = userData.get("columnBreakpoints") && column != null ? `:${column}` : "";
+    const columnVal =
+      userData.get("feature_columnBreakpoints") && column != null ? `:${column}` : "";
     const location = `:${line}${columnVal}`;
 
     const query = hasSiblingOfSameName ? getSourceQueryString(source) : "";

@@ -369,13 +369,15 @@ export default function Toolbar() {
   const recordingId = useGetRecordingId();
   const { recording } = useGetRecording(recordingId);
   const { comments, loading } = hooks.useGetComments(recordingId);
-  const [logProtocolExperimentEnabled] = useGraphQLUserData("logProtocol");
-  const [reactPanelExperimentEnabled] = useGraphQLUserData("reactPanel");
-  const [showPassport] = useGraphQLUserData("showPassport");
+  const [logProtocolExperimentEnabled] = useGraphQLUserData("feature_logProtocol");
+  const [reactPanelExperimentEnabled] = useGraphQLUserData("feature_reactPanel");
+  const [showPassport] = useGraphQLUserData("feature_showPassport");
   const { nags } = hooks.useGetUserInfo();
   const showTour = shouldShowTour(nags);
 
-  const [sidePanelCollapsed, setSidePanelCollapsed] = useGraphQLUserData("sidePanelCollapsed");
+  const [sidePanelCollapsed, setSidePanelCollapsed] = useGraphQLUserData(
+    "layout_sidePanelCollapsed"
+  );
 
   useEffect(() => {
     if (!loading && comments.length > 0) {

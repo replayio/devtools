@@ -1,5 +1,4 @@
 import {
-  AnyAction,
   Middleware,
   Reducer,
   Store,
@@ -10,7 +9,7 @@ import {
 import { Immer } from "immer";
 
 import tabsReducer from "devtools/client/debugger/src/reducers/tabs";
-import { isDevelopment, skipTelemetry } from "shared/utils/environment";
+import { skipTelemetry } from "shared/utils/environment";
 import { UIAction } from "ui/actions";
 import appReducer from "ui/reducers/app";
 import layoutReducer from "ui/reducers/layout";

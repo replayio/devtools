@@ -157,9 +157,9 @@ function App({ children, hideModal, modal, quickOpenEnabled }: AppProps) {
       document.body.parentElement!.className = `theme-${theme}`;
     };
 
-    updateTheme(userData.get("theme"));
+    updateTheme(userData.get("global_theme"));
 
-    userData.subscribe("theme", updateTheme);
+    userData.subscribe("global_theme", updateTheme);
   }, []);
 
   if (auth.isLoading || userInfo.loading) {

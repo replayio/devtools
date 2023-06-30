@@ -31,7 +31,7 @@ export default function useSourceContextMenu({
   const { accessToken, recordingId, trackEvent } = useContext(SessionContext);
   const { executionPoint: currentExecutionPoint, time: currentTime } = useContext(TimelineContext);
 
-  const [showHitCounts, setShowHitCounts] = useGraphQLUserData("showHitCounts");
+  const [showHitCounts, setShowHitCounts] = useGraphQLUserData("source_showHitCounts");
 
   const [isPending, startTransition] = useTransition();
   const invalidateCache = useCacheRefresh();

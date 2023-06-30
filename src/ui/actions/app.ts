@@ -220,7 +220,7 @@ export function executeCommand(key: CommandKey): UIThunkAction {
     } else if (key === "open_outline") {
       dispatch(setViewMode("dev"));
       dispatch(setSelectedPrimaryPanel("explorer"));
-      userData.set("outlineExpanded", true);
+      userData.set("layout_debuggerOutlineExpanded", true);
     } else if (key === "open_viewer") {
       dispatch(setViewMode("non-dev"));
     } else if (key === "show_comments") {
@@ -237,11 +237,11 @@ export function executeCommand(key: CommandKey): UIThunkAction {
     } else if (key === "toggle_edit_focus") {
       dispatch(toggleFocusMode());
     } else if (key === "toggle_dark_mode") {
-      let theme = userData.get("theme");
+      let theme = userData.get("global_theme");
       if (theme === "system") {
         theme = getSystemColorScheme();
       }
-      userData.set("theme", theme === "dark" ? "light" : "dark");
+      userData.set("global_theme", theme === "dark" ? "light" : "dark");
     } else if (key === "pin_to_bottom") {
       dispatch(setToolboxLayout("bottom"));
     } else if (key === "pin_to_left") {

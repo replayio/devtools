@@ -17,9 +17,11 @@ import SourcesTree from "./SourcesTree";
 import { Accordion, AccordionPane } from "@recordreplay/accordion";
 
 function PrimaryPanes(props: PropsFromRedux) {
-  const [outlineExpanded, setOutlineExpanded] = useGraphQLUserData("outlineExpanded");
-  const [sourcesCollapsed] = useGraphQLUserData("sourcesCollapsed");
-  const [enableLargeText] = useGraphQLUserData("enableLargeText");
+  const [outlineExpanded, setOutlineExpanded] = useGraphQLUserData(
+    "layout_debuggerOutlineExpanded"
+  );
+  const [sourcesCollapsed] = useGraphQLUserData("layout_sourcesCollapsed");
+  const [enableLargeText] = useGraphQLUserData("global_enableLargeText");
 
   // Add the useNag hook and useEffect block
   const [, dismissInspectElementNag] = useNag(Nag.INSPECT_ELEMENT);

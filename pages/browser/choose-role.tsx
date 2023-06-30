@@ -15,7 +15,7 @@ export default function ImportSettings() {
   const router = useRouter();
   const setRole = async (role: Role) => {
     // TODO [ryanjduffy]: Should this route to the tutorial app?
-    await userData.set("role", role);
+    await userData.set("global_role", role);
     router.push("/");
   };
 

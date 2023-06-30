@@ -39,8 +39,8 @@ if (isMock()) {
 
 // Expose app feature flags to the protocol through an app-agnostic API.
 setFeatures({
-  chromiumRepaints: userData.get("chromiumRepaints"),
-  repaintEvaluations: userData.get("repaintEvaluations")
+  chromiumRepaints: userData.get("protocol_chromiumRepaints"),
+  repaintEvaluations: userData.get("protocol_repaintEvaluations")
 });
 
 interface AuthProps {

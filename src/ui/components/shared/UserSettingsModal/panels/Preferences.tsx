@@ -18,23 +18,36 @@ export function Preferences() {
     <div className="space-y-6 overflow-auto">
       <div className="mr-4 space-y-4">
         <div className="text-lg">Appearance</div>
-        <EnumPreference preference={config.theme} preferencesKey="theme" values={ENUMS.theme} />
         <EnumPreference
-          preference={config.defaultViewMode}
-          preferencesKey="defaultViewMode"
+          preference={config.global_theme}
+          preferencesKey="global_theme"
+          values={ENUMS.theme}
+        />
+        <EnumPreference
+          preference={config.layout_defaultViewMode}
+          preferencesKey="layout_defaultViewMode"
           values={ENUMS.defaultViewMode}
         />
-        <BooleanPreference preference={config.showHitCounts} preferencesKey="showHitCounts" />
-        <BooleanPreference preference={config.enableLargeText} preferencesKey="enableLargeText" />
-        <BooleanPreference preference={config.showPassport} preferencesKey="showPassport" />
+        <BooleanPreference
+          preference={config.source_showHitCounts}
+          preferencesKey="source_showHitCounts"
+        />
+        <BooleanPreference
+          preference={config.global_enableLargeText}
+          preferencesKey="global_enableLargeText"
+        />
+        <BooleanPreference
+          preference={config.feature_showPassport}
+          preferencesKey="feature_showPassport"
+        />
       </div>
 
       <div className="space-y-4">
         <div className="text-lg">Privacy</div>
         <div className="flex flex-col space-y-2">
           <BooleanPreference
-            preference={config.disableLogRocket}
-            preferencesKey="disableLogRocket"
+            preference={config.global_disableLogRocket}
+            preferencesKey="global_disableLogRocket"
           />
         </div>
       </div>

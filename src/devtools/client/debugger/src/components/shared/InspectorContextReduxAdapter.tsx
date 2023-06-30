@@ -18,7 +18,7 @@ import { useAppDispatch } from "ui/setup/hooks";
 export default function InspectorContextReduxAdapter({ children }: { children: ReactNode }) {
   const dispatch = useAppDispatch();
 
-  const [, setSidePanelCollapsed] = useGraphQLUserData("sidePanelCollapsed");
+  const [, setSidePanelCollapsed] = useGraphQLUserData("layout_sidePanelCollapsed");
 
   const inspectFunctionDefinition = useCallback(
     (mappedLocation: MappedLocation) => {

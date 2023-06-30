@@ -101,31 +101,7 @@ function createPrefsUpdater<T extends Record<string, any>>(prefObj: T) {
   };
 }
 
-// TODO [FE-1483] What the fuck is this?
-// const updateDebuggerPrefs = createPrefsUpdater(debuggerPrefs);
-
 export const updatePrefs = (state: UIState, oldState: UIState) => {
-  //updateStandardPrefs(state, oldState, "theme", getTheme);
-
-  // if (state.ui && oldState.ui) {
-  //   updateDebuggerPrefs(
-  //     state,
-  //     oldState,
-  //     "frameworkGroupingOn",
-  //     state => state.ui.frameworkGroupingOn
-  //   );
-
-  //   updateDebuggerPrefs(state, oldState, "sourcesCollapsed", state => state.ui.sourcesCollapsed);
-
-  //   updateDebuggerPrefs(
-  //     state,
-  //     oldState,
-  //     "pendingSelectedLocation",
-  //     // TS types say `null` isn't acceptable to persist, but it seems to work at runtime
-  //     state => state.sources.persistedSelectedLocation as any
-  //   );
-  // }
-
   onReduxStateChange(state);
 };
 

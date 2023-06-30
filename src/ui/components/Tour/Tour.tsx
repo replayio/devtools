@@ -142,7 +142,7 @@ const Tour: React.FC = () => {
 
   const CompletedTour: React.FC<CompletedTourProps> = ({ dismissTourNag }) => {
     useEffect(() => {
-      userData.set("showPassport", true);
+      userData.set("feature_showPassport", true);
     }, []);
 
     return (

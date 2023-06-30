@@ -143,7 +143,7 @@ export function maybeSetMixpanelContext(
   userInfo: TelemetryUser & { workspaceId: string | null; role: string | null }
 ) {
   const { internal: isInternal } = userInfo;
-  const forceEnableMixpanel = userData.get("logTelemetryEvent");
+  const forceEnableMixpanel = userData.get("global_logTelemetryEvent");
   const shouldEnableMixpanel = (!isInternal && !skipTelemetry()) || forceEnableMixpanel;
 
   if (shouldEnableMixpanel) {
@@ -156,7 +156,7 @@ export function maybeSetMixpanelContext(
 }
 
 export function maybeSetGuestMixpanelContext() {
-  const forceEnableMixpanel = userData.get("logTelemetryEvent");
+  const forceEnableMixpanel = userData.get("global_logTelemetryEvent");
   const shouldEnableMixpanel = !skipTelemetry() || forceEnableMixpanel;
 
   if (shouldEnableMixpanel) {
@@ -184,7 +184,7 @@ const namespaceFromEventName = (event: string): string => {
 };
 
 export function trackMixpanelEvent(...[event, properties]: [...MixpanelEvent]) {
-  if (userData.get("logTelemetryEvent")) {
+  if (userData.get("global_logTelemetryEvent")) {
     console.log("🔴", event, properties);
   }
 
@@ -234,7 +234,7 @@ export function setMixpanelContext({
     mixpanel.people.set({ role });
   }
 
-  if (userData.get("logTelemetryEvent")) {
+  if (userData.get("global_logTelemetryEvent")) {
     mixpanel.register({ isDevEvent: true });
   }
 }

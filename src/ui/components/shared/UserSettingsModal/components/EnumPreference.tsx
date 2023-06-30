@@ -1,27 +1,23 @@
 import assert from "assert";
 import { useMemo } from "react";
 
-import {
-  ConfigurablePreference,
-  PreferencesKey,
-  Serializable,
-} from "shared/user-data/GraphQL/types";
+import { ConfigurablePreference, PreferencesKey } from "shared/user-data/GraphQL/types";
 import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { SelectMenu } from "ui/components/shared/Forms";
 import { useGetUserInfo } from "ui/hooks/users";
 
-export function EnumPreference({
+export function EnumPreference<Value>({
   onChange,
   preference,
   preferencesKey,
   values,
 }: {
-  onChange?: (value: string) => void;
+  onChange?: (value: Value) => void;
   preference: ConfigurablePreference;
   preferencesKey: PreferencesKey;
   values: Array<{
     label: string;
-    value: Serializable;
+    value: Value;
   }>;
 }) {
   const { defaultValue, internalOnly, label } = preference;
@@ -55,10 +51,10 @@ export function EnumPreference({
           options={options}
           selected={selected as string}
           setSelected={value => {
-            setSelected(value as string);
+            setSelected(value as any);
 
             if (onChange) {
-              onChange(value as string);
+              onChange(value as Value);
             }
           }}
         />

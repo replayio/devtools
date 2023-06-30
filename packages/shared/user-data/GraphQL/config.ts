@@ -22,124 +22,28 @@ export type ViewMode = "dev" | "non-dev";
 // * History: Things we remember between sessions, e.g. the most recently selected tab
 //
 // To simplify TypeScript type-safety checks, all of the above are stored in the same, flat structure
+// Prefixes and  alphabetical sorting are used to group similar types of data,
+// and to reduce the likelihood of merge conflicts
 
 export const config = {
-  activeInspectorTab: {
-    defaultValue: "ruleview" as ActiveInspectorTab,
-    legacyKey: "devtools.inspector.active-tab",
-  },
-  basicProcessingLoadingBar: {
-    defaultValue: Boolean(false),
-    description:
-      "Split the loading bar's progress between gathering static resources from the recording and indexing runtime information",
-    label: "Detailed loading bar",
-    legacyKey: "devtools.features.basicProcessingLoadingBar",
-  },
-  boxModelOpen: {
-    defaultValue: Boolean(true),
-    legacyKey: "devtools.layout.boxmodel.opened",
-  },
-  breakpointsVisible: {
-    defaultValue: Boolean(true),
-    legacyKey: "devtools.debugger.breakpoints-visible",
-  },
-  brokenSourcemapWorkaround: {
-    defaultValue: Boolean(true),
-    description: "Skip locations that are mapped to the beginning of a function body",
-    label: "Enable workaround for broken sourcemaps",
-    legacyKey: "devtools.features.brokenSourcemapWorkaround",
-  },
-  callStackVisible: {
-    defaultValue: Boolean(true),
-    legacyKey: "devtools.debugger.call-stack-visible",
-  },
-  collapseAttributes: {
-    defaultValue: Boolean(true),
-    legacyKey: "devtools.markup.collapseAttributes",
-  },
-  collapseAttributeLength: {
-    defaultValue: 120,
-    legacyKey: "devtools.markup.collapseAttributeLength",
-  },
-  chromiumNetMonitor: {
-    defaultValue: Boolean(true),
-    legacyKey: "devtools.features.chromiumNetMonitor",
-  },
-  chromiumRepaints: {
-    defaultValue: Boolean(false),
-    label: "Allow DOM.repaintGraphics inside of Chromium recordings",
-    legacyKey: "devtools.features.chromiumRepaints",
-  },
-  columnBreakpoints: {
-    defaultValue: Boolean(false),
-    description: "Add breakpoints within a line",
-    label: "Column Breakpoints",
-    legacyKey: "devtools.features.columnBreakpoints",
-  },
-  commentAttachments: {
-    defaultValue: Boolean(false),
-    legacyKey: "devtools.features.commentAttachments",
-  },
-  commentFilterBy: {
-    defaultValue: null as CommentsFilterByPreference,
-    legacyKey: "Replay:CommentPreferences:Filter",
-  },
-  commentShowPreview: {
-    defaultValue: Boolean(true),
-    legacyKey: "Replay:CommentPreferences:ShowPreview",
-  },
-  commentSortBy: {
-    defaultValue: "recording-time" as CommentsSortByPreference,
-    legacyKey: "Replay:CommentPreferences:sortBy",
-  },
-  consoleEventFilters: {
-    defaultValue: {
-      keyboard: true,
-      mouse: true,
-      navigation: true,
-    } as ConsoleEventFilterPreferences,
-    legacyKey: "Replay:EventsPreferences:Filters",
-  },
-  consoleFilterDrawerDefaultsToOpen: {
-    defaultValue: Boolean(false),
-    description:
-      "Open the console filter settings by default when opening a Replay for the first time",
-    internalOnly: Boolean(false),
-    label: "Console filter drawer defaults to open",
-    legacyKey: "devtools.features.consoleFilterDrawerDefaultsToOpen",
-  },
-  defaultColorUnit: {
-    defaultValue: "authored",
-    legacyKey: "devtools.defaultColorUnit",
-  },
-  defaultViewMode: {
-    defaultValue: "non-dev" as ViewMode,
-    label: "Default Mode",
-    legacyKey: "devtools.defaultMode",
-  },
-  disableCache: {
+  backend_disableCache: {
     defaultValue: Boolean(false),
     legacyKey: "devtools.disableCache",
   },
-  disableConcurrentControllerLoading: {
+  backend_disableConcurrentControllerLoading: {
     defaultValue: Boolean(false),
     description: "Disable loading regions concurrently at controller startup",
     internalOnly: Boolean(true),
     label: "Disable Concurrent Controller Loading",
     legacyKey: "devtools.features.disableConcurrentControllerLoading",
   },
-  disableIncrementalSnapshots: {
+  backend_disableIncrementalSnapshots: {
     defaultValue: Boolean(false),
     description: "Disable using diffs between snapshots",
     label: "Disable using incremental snapshots",
     legacyKey: "devtools.features.disableIncrementalSnapshots",
   },
-  disableLogRocket: {
-    defaultValue: Boolean(false),
-    label: "Disable LogRocket session replay",
-    legacyKey: "devtools.disableLogRocket",
-  },
-  disableRecordingAssetsInDatabase: {
+  backend_disableRecordingAssetsInDatabase: {
     defaultValue: Boolean(false),
     description:
       "Disable writing to and reading from the backend database when storing or retrieving recording assets",
@@ -147,32 +51,27 @@ export const config = {
     label: "Disable tracking recording assets in the database",
     legacyKey: "devtools.features.disableRecordingAssetsInDatabase",
   },
-  disableScanDataCache: {
+  backend_disableScanDataCache: {
     defaultValue: Boolean(false),
     description: "Do not cache the results of indexing the recording",
     internalOnly: Boolean(true),
     label: "Disable scan data cache",
     legacyKey: "devtools.features.disableScanDataCache",
   },
-  disableStableQueryCache: {
+  backend_disableStableQueryCache: {
     defaultValue: Boolean(false),
     description: "Disable caching of previously generated responses",
     internalOnly: Boolean(true),
     label: "Disable query-level caching for stable request types",
     legacyKey: "devtools.features.disableStableQueryCache",
   },
-  enableLargeText: {
-    defaultValue: Boolean(false),
-    label: "Enable large text for Editor",
-    legacyKey: "devtools.features.enableLargeText",
-  },
-  enableRoutines: {
+  backend_enableRoutines: {
     defaultValue: Boolean(false),
     description: "Enable backend support for running processing routines (like React DevTools)",
     label: "Enable backend processing routines",
     legacyKey: "devtools.features.enableRoutines",
   },
-  enableUnstableQueryCache: {
+  backend_enableUnstableQueryCache: {
     defaultValue: Boolean(false),
     description:
       "Allow the backend to return previously generated responses without re-running the request",
@@ -180,50 +79,20 @@ export const config = {
     label: "Enable query-level caching for unstable request types",
     legacyKey: "devtools.features.enableUnstableQueryCache",
   },
-  frameworkGroupingOn: {
-    defaultValue: Boolean(true),
-    legacyKey: "devtools.debugger.ui.framework-grouping-on",
-  },
-  inactiveCssEnabled: {
-    defaultValue: Boolean(false),
-    legacyKey: "devtools.inspector.inactive.css.enabled",
-  },
-  keepAllTraces: {
+  backend_keepAllTraces: {
     defaultValue: Boolean(false),
     legacyKey: "devtools.features.keepAllTraces",
   },
-  listenForMetrics: {
+  backend_listenForMetrics: {
     defaultValue: Boolean(false),
     legacyKey: "devtools.listenForMetrics",
   },
-  logpointsVisible: {
-    defaultValue: Boolean(true),
-    legacyKey: "devtools.debugger.logpoints-visible",
-  },
-  logProtocol: {
-    defaultValue: Boolean(false),
-    label: "View protocol requests and responses in the panel",
-    legacyKey: "devtools.features.logProtocol",
-  },
-  logProtocolEvents: {
-    defaultValue: Boolean(false),
-    legacyKey: "devtools.features.logProtocolEvents",
-  },
-  logTelemetryEvent: {
-    defaultValue: Boolean(false),
-    label: "Log Mixpanel events to the console",
-    legacyKey: "devtools.logTelemetryEvent",
-  },
-  newControllerOnRefresh: {
+  backend_newControllerOnRefresh: {
     defaultValue: Boolean(false),
     label: "Get a new controller upon each page refresh",
     legacyKey: "devtools.features.newControllerOnRefresh",
   },
-  outlineExpanded: {
-    defaultValue: Boolean(true),
-    legacyKey: "devtools.debugger.outline-expanded",
-  },
-  profileWorkerThreads: {
+  backend_profileWorkerThreads: {
     defaultValue: Boolean(false),
     description:
       "Record a performance profile of the source worker and send it to Replay to help diagnose performance issues",
@@ -231,70 +100,213 @@ export const config = {
     label: "Profile Source Worker",
     legacyKey: "devtools.features.profileWorkerThreads",
   },
-  protocolTimeline: {
-    defaultValue: Boolean(false),
-    label: "Visualize protocol events in the timeline",
-    legacyKey: "devtools.features.protocolTimeline",
-  },
-  reactPanel: {
-    defaultValue: Boolean(false),
-    description: "Enable experimental React render details panel",
-    label: "Enable React Panel",
-    legacyKey: "devtools.features.reactPanel",
-  },
-  repaintEvaluations: {
-    defaultValue: Boolean(false),
-    legacyKey: "devtools.features.repaintEvaluations",
-  },
-  rerunRoutines: {
+  backend_rerunRoutines: {
     defaultValue: Boolean(false),
     description: "Always re-run routines instead of using cached results",
     internalOnly: Boolean(true),
     label: "Retry backend processing routines",
     legacyKey: "devtools.features.rerunRoutines",
   },
-  resolveRecording: {
+
+  comments_filterBy: {
+    defaultValue: null as CommentsFilterByPreference,
+    legacyKey: "Replay:CommentPreferences:Filter",
+  },
+  comments_showPreview: {
+    defaultValue: Boolean(true),
+    legacyKey: "Replay:CommentPreferences:ShowPreview",
+  },
+  comments_sortBy: {
+    defaultValue: "recording-time" as CommentsSortByPreference,
+    legacyKey: "Replay:CommentPreferences:sortBy",
+  },
+
+  console_eventFilters: {
+    defaultValue: {
+      keyboard: true,
+      mouse: true,
+      navigation: true,
+    } as ConsoleEventFilterPreferences,
+    legacyKey: "Replay:EventsPreferences:Filters",
+  },
+  console_showFiltersByDefault: {
     defaultValue: Boolean(false),
-    legacyKey: "devtools.features.resolveRecording",
+    description:
+      "Open the console filter settings by default when opening a Replay for the first time",
+    internalOnly: Boolean(false),
+    label: "Console filter drawer defaults to open",
+    legacyKey: "devtools.features.consoleFilterDrawerDefaultsToOpen",
   },
-  role: {
-    defaultValue: "other" as Role,
-    legacyKey: null,
+
+  // TODO [FE-1646] We can probably remove this preference
+  debugger_breakpointsVisible: {
+    defaultValue: Boolean(true),
+    legacyKey: "devtools.debugger.breakpoints-visible",
   },
-  scopesVisible: {
+  // TODO [FE-1646] We can probably remove this preference
+  debugger_callStackVisible: {
+    defaultValue: Boolean(true),
+    legacyKey: "devtools.debugger.call-stack-visible",
+  },
+  debugger_frameworkGroupingOn: {
+    defaultValue: Boolean(true),
+    legacyKey: "devtools.debugger.ui.framework-grouping-on",
+  },
+  // TODO [FE-1646] We can probably remove this preference
+  debugger_logpointsVisible: {
+    defaultValue: Boolean(true),
+    legacyKey: "devtools.debugger.logpoints-visible",
+  },
+  // TODO [FE-1646] We can probably remove this preference
+  debugger_scopesVisible: {
     defaultValue: Boolean(true),
     legacyKey: "devtools.debugger.scopes-visible",
   },
-  showHitCounts: {
-    defaultValue: Boolean(true),
-    label: "Show hit count numbers for each source line",
-    legacyKey: "Replay:ShowHitCounts",
+
+  feature_basicProcessingLoadingBar: {
+    defaultValue: Boolean(false),
+    description:
+      "Split the loading bar's progress between gathering static resources from the recording and indexing runtime information",
+    label: "Detailed loading bar",
+    legacyKey: "devtools.features.basicProcessingLoadingBar",
   },
-  showPassport: {
+  feature_brokenSourcemapWorkaround: {
+    defaultValue: Boolean(true),
+    description: "Skip locations that are mapped to the beginning of a function body",
+    label: "Enable workaround for broken sourcemaps",
+    legacyKey: "devtools.features.brokenSourcemapWorkaround",
+  },
+  feature_chromiumNetMonitor: {
+    defaultValue: Boolean(true),
+    legacyKey: "devtools.features.chromiumNetMonitor",
+  },
+  feature_columnBreakpoints: {
+    defaultValue: Boolean(false),
+    description: "Add breakpoints within a line",
+    label: "Column Breakpoints",
+    legacyKey: "devtools.features.columnBreakpoints",
+  },
+  feature_commentAttachments: {
+    defaultValue: Boolean(false),
+    legacyKey: "devtools.features.commentAttachments",
+  },
+  feature_logProtocol: {
+    defaultValue: Boolean(false),
+    label: "View protocol requests and responses in the panel",
+    legacyKey: "devtools.features.logProtocol",
+  },
+  feature_logProtocolEvents: {
+    defaultValue: Boolean(false),
+    legacyKey: "devtools.features.logProtocolEvents",
+  },
+  feature_showPassport: {
     defaultValue: Boolean(false),
     label: "Show Replay Passport",
     legacyKey: "devtools.features.showPassport",
   },
-  showPseudoElements: {
+  feature_protocolTimeline: {
     defaultValue: Boolean(false),
-    legacyKey: "devtools.inspector.show_pseudo_elements",
+    label: "Visualize protocol events in the timeline",
+    legacyKey: "devtools.features.protocolTimeline",
   },
-  showRedactions: {
+  feature_reactPanel: {
     defaultValue: Boolean(false),
-    legacyKey: "devtools.showRedactions",
+    description: "Enable experimental React render details panel",
+    label: "Enable React Panel",
+    legacyKey: "devtools.features.reactPanel",
   },
-  sidePanelCollapsed: {
+  // TODO [FE-1646] Should we remove this? Is it still being used?
+  feature_resolveRecording: {
     defaultValue: Boolean(false),
-    legacyKey: "Replay:SidePanelCollapsed",
+    legacyKey: "devtools.features.resolveRecording",
   },
-  sourcesCollapsed: {
+
+  global_disableLogRocket: {
     defaultValue: Boolean(false),
-    legacyKey: "devtools.debugger.sources-collapsed",
+    label: "Disable LogRocket session replay",
+    legacyKey: "devtools.disableLogRocket",
   },
-  theme: {
+  global_enableLargeText: {
+    defaultValue: Boolean(false),
+    label: "Enable large text for Editor",
+    legacyKey: "devtools.features.enableLargeText",
+  },
+  global_logTelemetryEvent: {
+    defaultValue: Boolean(false),
+    label: "Log Mixpanel events to the console",
+    legacyKey: "devtools.logTelemetryEvent",
+  },
+  global_role: {
+    defaultValue: "other" as Role,
+    legacyKey: null,
+  },
+  global_theme: {
     defaultValue: "system" as Theme,
     label: "Theme",
     legacyKey: "devtools.theme",
+  },
+  global_showRedactions: {
+    defaultValue: Boolean(false),
+    legacyKey: "devtools.showRedactions",
+  },
+
+  inspector_activeTab: {
+    defaultValue: "ruleview" as ActiveInspectorTab,
+    legacyKey: "devtools.inspector.active-tab",
+  },
+  inspector_collapseAttributes: {
+    defaultValue: Boolean(true),
+    legacyKey: "devtools.markup.collapseAttributes",
+  },
+  inspector_collapseAttributeLength: {
+    defaultValue: 120,
+    legacyKey: "devtools.markup.collapseAttributeLength",
+  },
+  inspector_inactiveCssEnabled: {
+    defaultValue: Boolean(false),
+    legacyKey: "devtools.inspector.inactive.css.enabled",
+  },
+  inspector_showPseudoElements: {
+    defaultValue: Boolean(false),
+    legacyKey: "devtools.inspector.show_pseudo_elements",
+  },
+
+  layout_defaultViewMode: {
+    defaultValue: "non-dev" as ViewMode,
+    label: "Default Mode",
+    legacyKey: "devtools.defaultMode",
+  },
+  layout_debuggerOutlineExpanded: {
+    defaultValue: Boolean(true),
+    legacyKey: "devtools.debugger.outline-expanded",
+  },
+  layout_inspectorBoxModelOpen: {
+    defaultValue: Boolean(true),
+    legacyKey: "devtools.layout.boxmodel.opened",
+  },
+  layout_sidePanelCollapsed: {
+    defaultValue: Boolean(false),
+    legacyKey: "Replay:SidePanelCollapsed",
+  },
+  layout_sourcesCollapsed: {
+    defaultValue: Boolean(false),
+    legacyKey: "devtools.debugger.sources-collapsed",
+  },
+
+  protocol_chromiumRepaints: {
+    defaultValue: Boolean(false),
+    label: "Allow DOM.repaintGraphics inside of Chromium recordings",
+    legacyKey: "devtools.features.chromiumRepaints",
+  },
+  protocol_repaintEvaluations: {
+    defaultValue: Boolean(false),
+    legacyKey: "devtools.features.repaintEvaluations",
+  },
+
+  source_showHitCounts: {
+    defaultValue: Boolean(true),
+    label: "Show hit count numbers for each source line",
+    legacyKey: "Replay:ShowHitCounts",
   },
 } satisfies ConfigurablePreferences;
 

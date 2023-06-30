@@ -12,7 +12,7 @@ export function Redacted({
   refToForward,
   ...rest
 }: HTMLProps<HTMLDivElement> & RefProp) {
-  const [showRedactions] = useGraphQLUserData("showRedactions");
+  const [showRedactions] = useGraphQLUserData("global_showRedactions");
   return (
     <div
       {...rest}
@@ -28,7 +28,7 @@ export function RedactedSpan({
   refToForward,
   ...rest
 }: HTMLProps<HTMLSpanElement> & RefProp) {
-  const [showRedactions] = useGraphQLUserData("showRedactions");
+  const [showRedactions] = useGraphQLUserData("global_showRedactions");
   return (
     <span
       {...rest}

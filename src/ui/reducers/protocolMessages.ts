@@ -86,7 +86,7 @@ export const { errorReceived, eventReceived, requestSent, responseReceived } =
 export default protocolMessagesSlice.reducer;
 
 export const getProtocolEvents = (_state: UIState) => {
-  if (!userData.get("logProtocolEvents")) {
+  if (!userData.get("feature_logProtocolEvents")) {
     console.log("protocol events are disabled");
   }
 

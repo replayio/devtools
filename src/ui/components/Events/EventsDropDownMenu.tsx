@@ -49,7 +49,7 @@ export default function EventsDropDownMenu() {
     [events]
   );
 
-  const [filters] = useGraphQLUserData("consoleEventFilters");
+  const [filters] = useGraphQLUserData("console_eventFilters");
 
   const { contextMenu, onContextMenu: onClick } = useContextMenu(
     <>
@@ -90,7 +90,7 @@ function EventTypeContextMenuItem({
   category: ConsoleEventFilterPreferencesKey;
   count: number;
 }) {
-  const [filters, setFilters] = useGraphQLUserData("consoleEventFilters");
+  const [filters, setFilters] = useGraphQLUserData("console_eventFilters");
   const [isPending, startTransition] = useTransition();
 
   const enabled = filters[category] !== false;

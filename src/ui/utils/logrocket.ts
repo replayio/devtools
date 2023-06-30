@@ -14,16 +14,14 @@ export default {
     recording,
     userInfo,
     auth0User,
-    userSettings,
   }: {
     recording?: Recording;
     userInfo?: Omit<UserInfo, "loading">;
     auth0User: any;
-    userSettings: UserSettings;
   }) => {
     // Skip if the recording was either created or viewed by an internal user
     if (
-      userData.get("disableLogRocket") ||
+      userData.get("global_disableLogRocket") ||
       recording?.user?.internal ||
       userInfo?.internal ||
       skipTelemetry()

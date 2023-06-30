@@ -7,7 +7,7 @@ import { LayoutState } from "ui/state/layout";
 export const syncInitialLayoutState: LayoutState = {
   showCommandPalette: false,
   selectedPrimaryPanel: null,
-  viewMode: userData.get("defaultViewMode"),
+  viewMode: userData.get("layout_defaultViewMode"),
   toolboxLayout: "ide",
   selectedPanel: "console",
   localNags: [],

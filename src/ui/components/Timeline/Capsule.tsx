@@ -24,7 +24,7 @@ export default function Capsule({
 }) {
   const indexingProgress = useIndexingProgress();
   const basicProcessingProgress = Math.round(useAppSelector(getBasicProcessingProgress) * 100);
-  const [basicProcessingLoadingBar] = useGraphQLUserData("basicProcessingLoadingBar");
+  const [basicProcessingLoadingBar] = useGraphQLUserData("feature_basicProcessingLoadingBar");
 
   let progress = indexingProgress;
   if (basicProcessingLoadingBar) {

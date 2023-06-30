@@ -74,8 +74,8 @@ function Library({ userSettings, userInfo }: { userSettings: UserSettings; userI
   const auth = useAuth0();
 
   useEffect(() => {
-    logrocket.createSession({ userInfo, auth0User: auth.user, userSettings });
-  }, [auth, userInfo, userSettings]);
+    logrocket.createSession({ userInfo, auth0User: auth.user });
+  }, [auth, userInfo]);
   useEffect(() => {
     if (teamId && isValidTeamId === false) {
       redirectToTeam("me");

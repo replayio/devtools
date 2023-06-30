@@ -71,7 +71,7 @@ const Spans = ({
 export default function ProtocolTimeline() {
   const loadedRegions = useLoadedRegions();
 
-  const [showProtocolTimeline] = useGraphQLUserData("protocolTimeline");
+  const [showProtocolTimeline] = useGraphQLUserData("feature_protocolTimeline");
   const firstPaint = gPaintPoints[0];
   const lastPaint = gPaintPoints[gPaintPoints.length - 1];
 

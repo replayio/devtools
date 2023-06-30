@@ -19,7 +19,6 @@ import { getPausePointParams, isMock, isTest } from "shared/utils/environment";
 import { UIThunkAction } from "ui/actions";
 import * as actions from "ui/actions/app";
 import { getRecording } from "ui/hooks/recordings";
-import { getUserSettings } from "ui/hooks/settings";
 import { getUserId, getUserInfo } from "ui/hooks/users";
 import {
   clearExpectedError,
@@ -169,11 +168,7 @@ export function createSocket(
       }
       ThreadFront.recordingId = recordingId;
 
-      const [userSettings, userInfo, recording] = await Promise.all([
-        getUserSettings(),
-        getUserInfo(),
-        getRecording(recordingId),
-      ]);
+      const [userInfo, recording] = await Promise.all([getUserInfo(), getRecording(recordingId)]);
       assert(recording, "failed to load recording");
 
       if (recording.workspace) {
@@ -184,7 +179,6 @@ export function createSocket(
         recording,
         userInfo,
         auth0User: tokenManager.auth0Client?.user,
-        userSettings,
       });
 
       registerRecording({ recording });
@@ -197,20 +191,22 @@ export function createSocket(
       }
 
       const experimentalSettings: ExperimentalSettings = {
-        disableScanDataCache: userData.get("disableScanDataCache"),
-        disableCache: userData.get("disableCache"),
-        disableStableQueryCache: userData.get("disableStableQueryCache"),
-        disableUnstableQueryCache: !userData.get("enableUnstableQueryCache"),
-        listenForMetrics: userData.get("listenForMetrics"),
-        profileWorkerThreads: userData.get("profileWorkerThreads"),
-        enableRoutines: userData.get("enableRoutines"),
-        rerunRoutines: userData.get("rerunRoutines"),
-        disableRecordingAssetsInDatabase: userData.get("disableRecordingAssetsInDatabase"),
-        keepAllTraces: userData.get("keepAllTraces"),
-        disableIncrementalSnapshots: userData.get("disableIncrementalSnapshots"),
-        disableConcurrentControllerLoading: userData.get("disableConcurrentControllerLoading"),
+        disableScanDataCache: userData.get("backend_disableScanDataCache"),
+        disableCache: userData.get("backend_disableCache"),
+        disableStableQueryCache: userData.get("backend_disableStableQueryCache"),
+        disableUnstableQueryCache: !userData.get("backend_enableUnstableQueryCache"),
+        listenForMetrics: userData.get("backend_listenForMetrics"),
+        profileWorkerThreads: userData.get("backend_profileWorkerThreads"),
+        enableRoutines: userData.get("backend_enableRoutines"),
+        rerunRoutines: userData.get("backend_rerunRoutines"),
+        disableRecordingAssetsInDatabase: userData.get("backend_disableRecordingAssetsInDatabase"),
+        keepAllTraces: userData.get("backend_keepAllTraces"),
+        disableIncrementalSnapshots: userData.get("backend_disableIncrementalSnapshots"),
+        disableConcurrentControllerLoading: userData.get(
+          "backend_disableConcurrentControllerLoading"
+        ),
       };
-      if (userData.get("newControllerOnRefresh")) {
+      if (userData.get("backend_newControllerOnRefresh")) {
         experimentalSettings.controllerKey = String(Date.now());
       }
 
@@ -250,17 +246,17 @@ export function createSocket(
           : undefined,
         {
           onEvent: (event: ProtocolEvent) => {
-            if (userData.get("logProtocolEvents")) {
+            if (userData.get("feature_logProtocolEvents")) {
               queueAction(eventReceived({ ...event, recordedAt: window.performance.now() }));
             }
           },
           onRequest: (request: CommandRequest) => {
-            if (userData.get("logProtocol")) {
+            if (userData.get("feature_logProtocol")) {
               queueAction(requestSent({ ...request, recordedAt: window.performance.now() }));
             }
           },
           onResponse: (response: CommandResponse) => {
-            if (userData.get("logProtocol")) {
+            if (userData.get("feature_logProtocol")) {
               const clonedResponse = { ...response, recordedAt: window.performance.now() };
 
               if (isSourceContentsCommandResponse(clonedResponse)) {
@@ -276,7 +272,7 @@ export function createSocket(
             }
           },
           onResponseError: (error: CommandResponse) => {
-            if (userData.get("logProtocol")) {
+            if (userData.get("feature_logProtocol")) {
               queueAction(errorReceived({ ...error, recordedAt: window.performance.now() }));
             }
           },

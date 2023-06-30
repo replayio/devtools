@@ -65,9 +65,9 @@ export const RulesApp: FC = ({}) => {
           componentProps,
           header: "Pseudo-elements",
           id: "rules-section-pseudoelement",
-          opened: userData.get("showPseudoElements"),
+          opened: userData.get("inspector_showPseudoElements"),
           onToggle: (opened: boolean) => {
-            userData.set("showPseudoElements", opened);
+            userData.set("inspector_showPseudoElements", opened);
           },
         },
       ];

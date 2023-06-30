@@ -82,7 +82,7 @@ const PanelButtons: FC<PanelButtonsProps> = ({
 }) => {
   const { supportsElementsInspector, supportsNetworkRequests, supportsRepaintingGraphics } =
     recordingCapabilities;
-  const [chromiumNetMonitorEnabled] = useGraphQLUserData("chromiumNetMonitor");
+  const [chromiumNetMonitorEnabled] = useGraphQLUserData("feature_chromiumNetMonitor");
 
   return (
     <div className="panel-buttons theme-tab-font-size flex flex-row items-center overflow-hidden">
@@ -177,7 +177,7 @@ function SecondaryToolbox({
     REDUX_ANNOTATIONS_KIND
   );
 
-  const chromiumNetMonitorEnabled = useGraphQLUserData("chromiumNetMonitor");
+  const chromiumNetMonitorEnabled = useGraphQLUserData("feature_chromiumNetMonitor");
   const recordingCapabilities = recordingCapabilitiesCache.read(replayClient);
 
   useLayoutEffect(() => {
