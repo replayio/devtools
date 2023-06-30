@@ -1,7 +1,5 @@
-import { DocumentNode, gql, useMutation, useQuery } from "@apollo/client";
-import { useEffect, useMemo, useState } from "react";
+import { gql, useMutation, useQuery } from "@apollo/client";
 
-import Services from "devtools/shared/services";
 import { query } from "shared/graphql/apolloClient";
 import {
   CreateUserAPIKey,
@@ -16,53 +14,46 @@ import {
   UpdateUserDefaultWorkspace,
   UpdateUserDefaultWorkspaceVariables,
 } from "shared/graphql/generated/UpdateUserDefaultWorkspace";
-import {
-  UpdateUserPreferences,
-  UpdateUserPreferencesVariables,
-} from "shared/graphql/generated/UpdateUserPreferences";
-import type { ApiKey, ExperimentalUserSettings } from "shared/graphql/types";
+import { UserSettings } from "shared/graphql/types";
 import { isTest } from "shared/utils/environment";
-import {
-  ADD_USER_API_KEY,
-  DELETE_USER_API_KEY,
-  GET_USER_SETTINGS,
-  UPDATE_USER_PREFERENCES,
-} from "ui/graphql/settings";
+import { ADD_USER_API_KEY, DELETE_USER_API_KEY, GET_USER_SETTINGS } from "ui/graphql/settings";
 import { maybeTrackTeamChange } from "ui/utils/mixpanel";
-import { features, prefs } from "ui/utils/prefs";
 import useAuth0 from "ui/utils/useAuth0";
 
-const { prefs: prefsService } = Services;
-
-const emptySettings: ExperimentalUserSettings = {
+const emptySettings: UserSettings = {
   apiKeys: [],
   defaultWorkspaceId: null,
-  disableLogRocket: false,
-  role: "developer",
 };
 
-const testSettings: ExperimentalUserSettings = {
+const testSettings: UserSettings = {
   apiKeys: [],
   defaultWorkspaceId: null,
-  disableLogRocket: false,
-  role: "developer",
 };
 
-export async function getUserSettings(): Promise<ExperimentalUserSettings> {
+export async function getUserSettings(): Promise<UserSettings> {
   const result = await query<GetUserSettings>({ query: GET_USER_SETTINGS });
 
   if (isTest()) {
     return testSettings;
   }
 
-  return convertUserSettings(result.data);
+  let apiKeys = [] as any[];
+  let defaultWorkspaceId: string | null = null;
+
+  if (result.data.viewer) {
+    apiKeys = result.data.viewer.apiKeys;
+    defaultWorkspaceId = result.data.viewer.defaultWorkspace?.id ?? null;
+  }
+
+  return {
+    apiKeys,
+    defaultWorkspaceId,
+  };
 }
 
 export function useGetUserSettings() {
   const { isAuthenticated } = useAuth0();
-  const { data, error, loading } = useQuery<GetUserSettings>(GET_USER_SETTINGS);
-
-  const userSettings = useMemo(() => convertUserSettings(data), [data]);
+  const { data: userSettings, error, loading } = useQuery<GetUserSettings>(GET_USER_SETTINGS);
 
   if (isTest()) {
     return { userSettings: testSettings, loading: false };
@@ -81,122 +72,22 @@ export function useGetUserSettings() {
     return { userSettings: emptySettings, error, loading };
   }
 
-  return { userSettings, error, loading };
-}
+  let apiKeys = [] as any[];
+  let defaultWorkspaceId: string | null = null;
 
-const runtimeFeatureOverrides = (() => {
-  if (typeof window === "undefined") {
-    return [];
+  if (userSettings?.viewer) {
+    apiKeys = userSettings.viewer.apiKeys;
+    defaultWorkspaceId = userSettings.viewer.defaultWorkspace?.id ?? null;
   }
-
-  const query = new URLSearchParams(window.location.search);
-  return query.get("features")?.split(",") || [];
-})();
-
-const getFullKey = (prefKey: keyof typeof features) => `devtools.features.${prefKey}`;
-
-export const getFeature = (prefKey: keyof typeof features): boolean => {
-  if (runtimeFeatureOverrides.includes(prefKey)) {
-    return true;
-  }
-
-  return prefsService.getBoolPref(getFullKey(prefKey));
-};
-
-export const useFeature = (prefKey: keyof typeof features) => {
-  const fullKey = getFullKey(prefKey);
-  const [pref, setPref] = useState(getFeature(prefKey));
-
-  useEffect(() => {
-    const onUpdate = (prefs: any) => {
-      setPref(prefs.getBoolPref(fullKey));
-    };
-
-    prefsService.addObserver(fullKey, onUpdate, false);
-    return () => prefsService.removeObserver(fullKey, onUpdate);
-  }, [fullKey]);
 
   return {
-    value: pref,
-    update: (newValue: boolean) => {
-      if (runtimeFeatureOverrides.includes(prefKey)) {
-        console.warn(`${prefKey} is force-enabled by a run-time override`);
-      } else {
-        prefsService.setBoolPref(fullKey, newValue);
-      }
+    error,
+    loading,
+    userSettings: {
+      apiKeys,
+      defaultWorkspaceId,
     },
   };
-};
-
-export const useStringPref = (prefKey: keyof typeof prefs) => {
-  const fullKey = `devtools.${prefKey}`;
-  const [pref, setPref] = useState(prefsService.getStringPref(fullKey));
-
-  const updateValue = useMemo(
-    () => (newValue: string) => prefsService.setStringPref(fullKey, newValue),
-    [fullKey]
-  );
-
-  useEffect(() => {
-    const onUpdate = (prefs: any) => {
-      setPref(prefs.getStringPref(fullKey));
-    };
-
-    prefsService.addObserver(fullKey, onUpdate, false);
-    return () => prefsService.removeObserver(fullKey, onUpdate);
-  }, [fullKey]);
-
-  return {
-    value: pref,
-    update: updateValue,
-  };
-};
-
-export const useBoolPref = (prefKey: keyof typeof prefs) => {
-  const fullKey = `devtools.${prefKey}`;
-  const [pref, setPref] = useState(prefsService.getBoolPref(fullKey));
-
-  const updateValue = useMemo(
-    () => (newValue: boolean) => prefsService.setBoolPref(fullKey, newValue),
-    [fullKey]
-  );
-
-  useEffect(() => {
-    const onUpdate = (prefs: any) => {
-      setPref(prefs.getBoolPref(fullKey));
-    };
-
-    prefsService.addObserver(fullKey, onUpdate, false);
-    return () => prefsService.removeObserver(fullKey, onUpdate);
-  }, [fullKey]);
-
-  return {
-    value: pref,
-    update: updateValue,
-  };
-};
-
-function convertUserSettings(data: GetUserSettings | undefined): ExperimentalUserSettings {
-  if (!data?.viewer) {
-    return emptySettings;
-  }
-
-  const preferences = data.viewer.preferences;
-  return {
-    apiKeys: data.viewer.apiKeys as ApiKey[],
-    defaultWorkspaceId: data.viewer.defaultWorkspace?.id || null,
-    disableLogRocket: preferences.disableLogRocket ?? false,
-    role: preferences.role ?? "developer",
-  };
-}
-
-export function useUpdateUserPreferences() {
-  const [updateUserPreferences, { loading, error }] = useMutation<
-    UpdateUserPreferences,
-    UpdateUserPreferencesVariables
-  >(UPDATE_USER_PREFERENCES, { refetchQueries: ["GetUserSettings"] });
-
-  return { updateUserPreferences, loading, error };
 }
 
 export function useUpdateDefaultWorkspace() {

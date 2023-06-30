@@ -11,9 +11,10 @@ import { GraphQLClientContext } from "replay-next/src/contexts/GraphQLClientCont
 import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
-import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { addComment as addCommentGraphQL } from "shared/graphql/Comments";
+import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
+import { userData } from "shared/user-data/GraphQL/UserData";
 
 export default function useSourceContextMenu({
   lineNumber,
@@ -30,8 +31,7 @@ export default function useSourceContextMenu({
   const { accessToken, recordingId, trackEvent } = useContext(SessionContext);
   const { executionPoint: currentExecutionPoint, time: currentTime } = useContext(TimelineContext);
 
-  const togglesLocalStorageKey = `Replay:ShowHitCounts`;
-  const [showHitCounts, setShowHitCounts] = useLocalStorage<boolean>(togglesLocalStorageKey, true);
+  const [showHitCounts, setShowHitCounts] = useGraphQLUserData("source_showHitCounts");
 
   const [isPending, startTransition] = useTransition();
   const invalidateCache = useCacheRefresh();

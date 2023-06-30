@@ -50,7 +50,6 @@ import {
 } from "ui/reducers/timeline";
 import { FocusWindow, HoveredItem, PlaybackOptions, TimeRange } from "ui/state/timeline";
 import KeyShortcuts, { isEditableElement } from "ui/utils/key-shortcuts";
-import { features } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
 import { rangeForFocusWindow } from "ui/utils/timeline";
 
@@ -505,15 +504,7 @@ export function goToNextPaint(): UIThunkAction {
 
 export function setHoveredItem(hoveredItem: HoveredItem): UIThunkAction {
   return dispatch => {
-    const { target } = hoveredItem;
-
-    const hoverEnabledForTarget = (features as any)[`${target}Hover`];
-    if (!hoverEnabledForTarget) {
-      return;
-    }
-
     dispatch(setHoveredItemAction(hoveredItem));
-
     dispatch(setTimelineToTime(hoveredItem?.time || null));
   };
 }

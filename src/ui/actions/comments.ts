@@ -24,7 +24,7 @@ import {
 } from "ui/reducers/sources";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { UIState } from "ui/state";
-import { Comment, CommentOptions, Reply } from "ui/state/comments";
+import { Comment, CommentOptions } from "ui/state/comments";
 import { trackEvent } from "ui/utils/telemetry";
 
 import type { UIThunkAction } from "./index";

@@ -11,6 +11,6 @@ export async function closeSettingsModal(page: Page) {
 
 export async function enablePassport(page: Page) {
   await openSettingsModal(page);
-  await page.locator("#show-passport").check();
+  await page.locator("#BooleanPreference-feature_showPassport").check();
   await closeSettingsModal(page);
 }

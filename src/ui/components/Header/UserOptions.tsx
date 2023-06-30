@@ -6,7 +6,6 @@ import LoginButton from "ui/components/LoginButton";
 import Dropdown from "ui/components/shared/Dropdown";
 import Icon from "ui/components/shared/Icon";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
-import { useFeature } from "ui/hooks/settings";
 import { trackEvent } from "ui/utils/telemetry";
 
 import ExternalLink from "../shared/ExternalLink";

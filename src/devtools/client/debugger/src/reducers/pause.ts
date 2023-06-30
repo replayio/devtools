@@ -18,11 +18,11 @@ import { framesCache } from "replay-next/src/suspense/FrameCache";
 import { frameStepsCache } from "replay-next/src/suspense/FrameStepsCache";
 import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
 import { ReplayClientInterface } from "shared/client/types";
+import { userData } from "shared/user-data/GraphQL/UserData";
 import { SourceDetails, getPreferredLocation, getSelectedSourceId } from "ui/reducers/sources";
 import { getFocusWindow } from "ui/reducers/timeline";
 import { getContextFromAction } from "ui/setup/redux/middleware/context";
 import type { UIState } from "ui/state";
-import { features } from "ui/utils/prefs";
 import { resumeOperations } from "ui/utils/resumeOperations";
 import { ThunkExtraArgs } from "ui/utils/thunk";
 
@@ -137,7 +137,7 @@ export const executeCommandOperation = createAsyncThunk<
     locationsToSkip:
       // skip over points that are mapped to the beginning of a function body
       // see SCS-172
-      features.brokenSourcemapWorkaround &&
+      userData.get("feature_brokenSourcemapWorkaround") &&
       (command === "stepOver" || command === "reverseStepOver")
         ? (symbols?.functions.map(f => f.body).filter(Boolean) as SourceLocation[])
         : undefined,

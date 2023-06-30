@@ -14,19 +14,19 @@ import { assert } from "protocol/utils";
 import { recordingTargetCache } from "replay-next/src/suspense/BuildIdCache";
 import { extractGraphQLError } from "shared/graphql/apolloClient";
 import { Recording } from "shared/graphql/types";
+import { userData } from "shared/user-data/GraphQL/UserData";
 import { getPausePointParams, isMock, isTest } from "shared/utils/environment";
 import { UIThunkAction } from "ui/actions";
 import * as actions from "ui/actions/app";
 import { getRecording } from "ui/hooks/recordings";
-import { getFeature, getUserSettings } from "ui/hooks/settings";
 import { getUserId, getUserInfo } from "ui/hooks/users";
 import {
   clearExpectedError,
   getExpectedError,
+  getUnexpectedError,
   setCurrentPoint,
   setTrialExpired,
 } from "ui/reducers/app";
-import { getUnexpectedError } from "ui/reducers/app";
 import {
   ProtocolEvent,
   errorReceived,
@@ -38,7 +38,6 @@ import { setFocusWindow } from "ui/reducers/timeline";
 import type { ExpectedError, UnexpectedError } from "ui/state/app";
 import LogRocket from "ui/utils/logrocket";
 import { endMixpanelSession } from "ui/utils/mixpanel";
-import { features, prefs } from "ui/utils/prefs";
 import { registerRecording, trackEvent } from "ui/utils/telemetry";
 import tokenManager from "ui/utils/tokenManager";
 import { subscriptionExpired } from "ui/utils/workspace";
@@ -47,7 +46,7 @@ import { setExpectedError, setUnexpectedError } from "./errors";
 import { setViewMode } from "./layout";
 import { jumpToInitialPausePoint } from "./timeline";
 
-export { setUnexpectedError, setExpectedError };
+export { setExpectedError, setUnexpectedError };
 
 declare global {
   interface Window {
@@ -169,11 +168,7 @@ export function createSocket(
       }
       ThreadFront.recordingId = recordingId;
 
-      const [userSettings, userInfo, recording] = await Promise.all([
-        getUserSettings(),
-        getUserInfo(),
-        getRecording(recordingId),
-      ]);
+      const [userInfo, recording] = await Promise.all([getUserInfo(), getRecording(recordingId)]);
       assert(recording, "failed to load recording");
 
       if (recording.workspace) {
@@ -184,7 +179,6 @@ export function createSocket(
         recording,
         userInfo,
         auth0User: tokenManager.auth0Client?.user,
-        userSettings,
       });
 
       registerRecording({ recording });
@@ -197,20 +191,22 @@ export function createSocket(
       }
 
       const experimentalSettings: ExperimentalSettings = {
-        disableScanDataCache: getFeature("disableScanDataCache"),
-        disableCache: !!prefs.disableCache,
-        disableStableQueryCache: getFeature("disableStableQueryCache"),
-        disableUnstableQueryCache: !getFeature("enableUnstableQueryCache"),
-        listenForMetrics: !!prefs.listenForMetrics,
-        profileWorkerThreads: getFeature("profileWorkerThreads"),
-        enableRoutines: getFeature("enableRoutines"),
-        rerunRoutines: getFeature("rerunRoutines"),
-        disableRecordingAssetsInDatabase: getFeature("disableRecordingAssetsInDatabase"),
-        keepAllTraces: getFeature("keepAllTraces"),
-        disableIncrementalSnapshots: getFeature("disableIncrementalSnapshots"),
-        disableConcurrentControllerLoading: getFeature("disableConcurrentControllerLoading"),
+        disableScanDataCache: userData.get("backend_disableScanDataCache"),
+        disableCache: userData.get("backend_disableCache"),
+        disableStableQueryCache: userData.get("backend_disableStableQueryCache"),
+        disableUnstableQueryCache: !userData.get("backend_enableUnstableQueryCache"),
+        listenForMetrics: userData.get("backend_listenForMetrics"),
+        profileWorkerThreads: userData.get("backend_profileWorkerThreads"),
+        enableRoutines: userData.get("backend_enableRoutines"),
+        rerunRoutines: userData.get("backend_rerunRoutines"),
+        disableRecordingAssetsInDatabase: userData.get("backend_disableRecordingAssetsInDatabase"),
+        keepAllTraces: userData.get("backend_keepAllTraces"),
+        disableIncrementalSnapshots: userData.get("backend_disableIncrementalSnapshots"),
+        disableConcurrentControllerLoading: userData.get(
+          "backend_disableConcurrentControllerLoading"
+        ),
       };
-      if (features.newControllerOnRefresh) {
+      if (userData.get("backend_newControllerOnRefresh")) {
         experimentalSettings.controllerKey = String(Date.now());
       }
 
@@ -250,17 +246,17 @@ export function createSocket(
           : undefined,
         {
           onEvent: (event: ProtocolEvent) => {
-            if (getFeature("logProtocolEvents")) {
+            if (userData.get("feature_logProtocolEvents")) {
               queueAction(eventReceived({ ...event, recordedAt: window.performance.now() }));
             }
           },
           onRequest: (request: CommandRequest) => {
-            if (getFeature("logProtocol")) {
+            if (userData.get("feature_logProtocol")) {
               queueAction(requestSent({ ...request, recordedAt: window.performance.now() }));
             }
           },
           onResponse: (response: CommandResponse) => {
-            if (getFeature("logProtocol")) {
+            if (userData.get("feature_logProtocol")) {
               const clonedResponse = { ...response, recordedAt: window.performance.now() };
 
               if (isSourceContentsCommandResponse(clonedResponse)) {
@@ -276,7 +272,7 @@ export function createSocket(
             }
           },
           onResponseError: (error: CommandResponse) => {
-            if (getFeature("logProtocol")) {
+            if (userData.get("feature_logProtocol")) {
               queueAction(errorReceived({ ...error, recordedAt: window.performance.now() }));
             }
           },

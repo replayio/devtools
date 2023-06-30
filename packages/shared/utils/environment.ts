@@ -211,12 +211,6 @@ export function getDisplayedUrl(url: string | undefined) {
   }
 }
 
-export function getSystemColorSchemePreference() {
-  const prefersDarkTheme = window.matchMedia("(prefers-color-scheme:dark)").matches;
-
-  return prefersDarkTheme ? "dark" : "light";
-}
-
 export async function configureMockEnvironmentForTesting() {
   const mockEnvironment = await getMockEnvironmentForTesting();
 

@@ -5,13 +5,15 @@ import { STATUS_PENDING, STATUS_RESOLVED, useImperativeCacheValue } from "suspen
 
 import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { getFilteredEventsForFocusWindow } from "ui/actions/app";
 import { seek } from "ui/actions/timeline";
-import useEventsPreferences from "ui/components/Events/useEventsPreferences";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { ParsedJumpToCodeAnnotation } from "ui/suspense/annotationsCaches";
-import { eventListenersJumpLocationsCache } from "ui/suspense/annotationsCaches";
+import {
+  ParsedJumpToCodeAnnotation,
+  eventListenersJumpLocationsCache,
+} from "ui/suspense/annotationsCaches";
 import { trackEvent } from "ui/utils/telemetry";
 
 import Event from "./Event";
@@ -39,7 +41,7 @@ function Events() {
     client
   );
 
-  const { filters } = useEventsPreferences();
+  const [filters] = useGraphQLUserData("console_eventFilters");
 
   const filteredEvents = useMemo(
     () =>

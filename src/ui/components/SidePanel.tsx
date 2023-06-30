@@ -1,9 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import PrimaryPanes from "devtools/client/debugger/src/components/PrimaryPanes";
 import SecondaryPanes from "devtools/client/debugger/src/components/SecondaryPanes";
 import Accordion from "devtools/client/debugger/src/components/shared/Accordion";
 import LazyOffscreen from "replay-next/components/LazyOffscreen";
+import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { setSelectedPrimaryPanel } from "ui/actions/layout";
 import Events from "ui/components/Events";
 import SearchFilesReduxAdapter from "ui/components/SearchFilesReduxAdapter";
@@ -12,7 +13,6 @@ import TestSuitePanel from "ui/components/TestSuite";
 import { isTestSuiteReplay } from "ui/components/TestSuite/utils/isTestSuiteReplay";
 import hooks from "ui/hooks";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
-import { useFeature } from "ui/hooks/settings";
 import { getFilteredEventsForFocusWindow } from "ui/reducers/app";
 import { getSelectedPrimaryPanel } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
@@ -63,7 +63,7 @@ function useInitialPrimaryPanel() {
 }
 
 export default function SidePanel() {
-  const { value: resolveRecording } = useFeature("resolveRecording");
+  const [resolveRecording] = useGraphQLUserData("feature_resolveRecording");
   const selectedPrimaryPanel = useInitialPrimaryPanel();
   const [replayInfoCollapsed, setReplayInfoCollapsed] = useState(false);
   const [eventsCollapsed, setEventsCollapsed] = useState(false);

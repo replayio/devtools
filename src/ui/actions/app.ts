@@ -6,12 +6,13 @@ import {
   jumpToPreviousPause,
 } from "devtools/client/debugger/src/actions/pause/jumps";
 import { openQuickOpen } from "devtools/client/debugger/src/actions/quick-open";
-import { prefs } from "devtools/client/debugger/src/utils/prefs";
 import { ThreadFront as ThreadFrontType } from "protocol/thread";
 import { ReplayClientInterface } from "shared/client/types";
+import { getSystemColorScheme } from "shared/theme/getSystemColorScheme";
+import { userData } from "shared/user-data/GraphQL/UserData";
 import { shallowEqual } from "shared/utils/compare";
 import { CommandKey } from "ui/components/CommandPalette/CommandPalette";
-import { getEventsForType, getTheme } from "ui/reducers/app";
+import { getEventsForType } from "ui/reducers/app";
 import { Canvas, EventKind, ReplayEvent, ReplayNavigationEvent } from "ui/state/app";
 import { boundingRectsCache } from "ui/suspense/nodeCaches";
 import { compareBigInt } from "ui/utils/helpers";
@@ -23,7 +24,6 @@ import {
   setModal,
   setMouseTargetsLoading,
   setSessionId,
-  updateTheme,
 } from "../reducers/app";
 import {
   hideCommandPalette,
@@ -84,14 +84,6 @@ function onNavigationEvents(events: ReplayNavigationEvent[], store: UIStore) {
   newNavEvents.sort((a, b) => compareBigInt(BigInt(a.point), BigInt(b.point)));
 
   store.dispatch(loadReceivedEvents({ navigation: newNavEvents }));
-}
-
-export function toggleTheme(): UIThunkAction {
-  return (dispatch, getState) => {
-    const theme = getTheme(getState());
-    const newTheme = theme == "dark" ? "light" : "dark";
-    dispatch(updateTheme(newTheme));
-  };
 }
 
 export function hideModal() {
@@ -228,7 +220,7 @@ export function executeCommand(key: CommandKey): UIThunkAction {
     } else if (key === "open_outline") {
       dispatch(setViewMode("dev"));
       dispatch(setSelectedPrimaryPanel("explorer"));
-      prefs.outlineExpanded = true;
+      userData.set("layout_debuggerOutlineExpanded", true);
     } else if (key === "open_viewer") {
       dispatch(setViewMode("non-dev"));
     } else if (key === "show_comments") {
@@ -245,7 +237,11 @@ export function executeCommand(key: CommandKey): UIThunkAction {
     } else if (key === "toggle_edit_focus") {
       dispatch(toggleFocusMode());
     } else if (key === "toggle_dark_mode") {
-      dispatch(toggleTheme());
+      let theme = userData.get("global_theme");
+      if (theme === "system") {
+        theme = getSystemColorScheme();
+      }
+      userData.set("global_theme", theme === "dark" ? "light" : "dark");
     } else if (key === "pin_to_bottom") {
       dispatch(setToolboxLayout("bottom"));
     } else if (key === "pin_to_left") {

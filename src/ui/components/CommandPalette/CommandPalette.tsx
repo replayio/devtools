@@ -4,12 +4,9 @@ import React, { ChangeEvent, useEffect, useState } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
 import { useNag } from "replay-next/src/hooks/useNag";
-import { ExperimentalUserSettings } from "shared/graphql/types";
 import { Nag } from "shared/graphql/types";
 import { actions } from "ui/actions";
-import hooks from "ui/hooks";
-import { selectors } from "ui/reducers";
-import { UIState } from "ui/state";
+import useAuth0 from "ui/utils/useAuth0";
 
 import CommandButton from "./CommandButton";
 import SearchInput from "./SearchInput";
@@ -120,6 +117,8 @@ function CommandPalette({
   const [searchString, setSearchString] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
   const shownCommands = getShownCommands(searchString);
+
+  const { isAuthenticated } = useAuth0();
 
   const [, dismissLaunchCommandPaletteNag] = useNag(Nag.LAUNCH_COMMAND_PALETTE);
 

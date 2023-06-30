@@ -3,18 +3,19 @@ import { loadedRegions as LoadedRegions } from "@replayio/protocol";
 import type { TabsState } from "devtools/client/debugger/src/reducers/tabs";
 import { EMPTY_TABS } from "devtools/client/debugger/src/reducers/tabs";
 import { ThreadFront } from "protocol/thread";
-import { CONSOLE_SETTINGS_DATABASE } from "replay-next/src/contexts/ConsoleFiltersContext";
-import { POINTS_DATABASE } from "replay-next/src/contexts/points/constants";
-import { preloadIDBInitialValues } from "replay-next/src/hooks/useIndexedDB";
 import { preCacheExecutionPointForTime } from "replay-next/src/suspense/ExecutionPointsCache";
 import { sourcesCache } from "replay-next/src/suspense/SourcesCache";
 import { replayClient } from "shared/client/ReplayClientContext";
 import { Recording } from "shared/graphql/types";
+import { getSystemColorScheme } from "shared/theme/getSystemColorScheme";
+import { userData } from "shared/user-data/GraphQL/UserData";
+import { CONSOLE_SETTINGS_DATABASE, POINTS_DATABASE } from "shared/user-data/IndexedDB/config";
+import { preloadIDBInitialValues } from "shared/user-data/IndexedDB/utils";
 import { UIStore } from "ui/actions";
 import { getRecording } from "ui/hooks/recordings";
 import { getUserSettings } from "ui/hooks/settings";
 import { getUserInfo } from "ui/hooks/users";
-import { getTheme, initialAppState } from "ui/reducers/app";
+import { initialAppState } from "ui/reducers/app";
 import { syncInitialLayoutState } from "ui/reducers/layout";
 import { SourcesState, initialState as initialSourcesState } from "ui/reducers/sources";
 import { ReplaySession, getReplaySession } from "ui/setup/prefs";
@@ -23,8 +24,7 @@ import { setUserInBrowserPrefs } from "ui/utils/browser";
 import { initLaunchDarkly } from "ui/utils/launchdarkly";
 import { maybeSetMixpanelContext } from "ui/utils/mixpanel";
 import { getRecordingId } from "ui/utils/recording";
-import { setTelemetryContext, setupTelemetry } from "ui/utils/telemetry";
-import { trackEvent } from "ui/utils/telemetry";
+import { setTelemetryContext, setupTelemetry, trackEvent } from "ui/utils/telemetry";
 import tokenManager from "ui/utils/tokenManager";
 
 import { setupDOMHelpers } from "./dom";
@@ -169,7 +169,10 @@ export async function bootstrapApp() {
   registerStoreObserver(store, updatePrefs);
   await setupAppHelper(store);
 
-  const theme = getTheme(store.getState());
+  let theme = userData.get("global_theme");
+  if (theme === "system") {
+    theme = getSystemColorScheme();
+  }
   document.body.parentElement!.className = theme || "";
 
   tokenManager.addListener(async tokenState => {
@@ -184,7 +187,7 @@ export async function bootstrapApp() {
     if (userInfo) {
       const userSettings = await getUserSettings();
       const workspaceId = userSettings.defaultWorkspaceId;
-      const role = userSettings.role;
+      const role = userData.get("global_role");
 
       setTelemetryContext(userInfo);
       maybeSetMixpanelContext({ ...userInfo, workspaceId, role });

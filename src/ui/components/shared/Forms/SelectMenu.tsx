@@ -49,17 +49,19 @@ export default function SelectMenu({
   options,
   label,
   className,
+  disabled,
 }: {
   selected: string | null;
   setSelected: (value: string | null) => void;
   options: MenuOption[];
   className?: string;
   label?: string;
+  disabled?: boolean;
 }) {
   const selectedName = options.find(option => option.id === selected)!.name;
 
   return (
-    <Listbox value={selected} onChange={setSelected}>
+    <Listbox disabled={disabled} value={selected} onChange={setSelected}>
       {({ open }) => (
         <>
           {label ? <Listbox.Label className="block font-medium">label</Listbox.Label> : null}

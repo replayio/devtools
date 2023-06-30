@@ -1,10 +1,10 @@
 import { KeyCodes } from "devtools/client/shared/keycodes";
 import EventEmitter from "devtools/shared/event-emitter";
-import Services from "devtools/shared/services";
+import { isMacOS } from "shared/utils/os";
 
 import { usesWindow } from "../../ssr";
 
-const isOSX = Services.appinfo.OS === "Darwin";
+const isOSX = isMacOS();
 
 // List of electron keys mapped to DOM API (DOM_VK_*) key code
 const ElectronKeysMapping: Record<string, string> = {

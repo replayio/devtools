@@ -4,11 +4,10 @@ import debounce from "lodash/debounce";
 
 import type { PartialLocation } from "devtools/client/debugger/src/actions/sources";
 import { Tab, getTabs } from "devtools/client/debugger/src/reducers/tabs";
-import { prefs as debuggerPrefs } from "devtools/client/debugger/src/utils/prefs";
 import { persistTabs } from "devtools/client/debugger/src/utils/tabs";
 import { asyncStoreHelper } from "devtools/shared/async-store-helper";
+import { ViewMode } from "shared/user-data/GraphQL/config";
 import { UIStore } from "ui/actions";
-import { getTheme } from "ui/reducers/app";
 import {
   getLocalNags,
   getSelectedPanel,
@@ -17,8 +16,7 @@ import {
   getViewMode,
 } from "ui/reducers/layout";
 import { UIState } from "ui/state";
-import { PrimaryPanelName, SecondaryPanelName, ToolboxLayout, ViewMode } from "ui/state/layout";
-import { prefs } from "ui/utils/prefs";
+import { PrimaryPanelName, SecondaryPanelName, ToolboxLayout } from "ui/state/layout";
 import { getRecordingId } from "ui/utils/recording";
 
 export interface ReplaySessions {
@@ -48,7 +46,7 @@ function initializeAsyncStore() {
 
     cachedValue = await asyncStore.replaySessions;
 
-    return cachedValue;
+    return cachedValue!;
   }
 
   function writeAsyncStore(value: ReplaySessions): void {
@@ -103,31 +101,7 @@ function createPrefsUpdater<T extends Record<string, any>>(prefObj: T) {
   };
 }
 
-const updateStandardPrefs = createPrefsUpdater(prefs);
-const updateDebuggerPrefs = createPrefsUpdater(debuggerPrefs);
-
 export const updatePrefs = (state: UIState, oldState: UIState) => {
-  updateStandardPrefs(state, oldState, "theme", getTheme);
-
-  if (state.ui && oldState.ui) {
-    updateDebuggerPrefs(
-      state,
-      oldState,
-      "frameworkGroupingOn",
-      state => state.ui.frameworkGroupingOn
-    );
-
-    updateDebuggerPrefs(state, oldState, "sourcesCollapsed", state => state.ui.sourcesCollapsed);
-
-    updateDebuggerPrefs(
-      state,
-      oldState,
-      "pendingSelectedLocation",
-      // TS types say `null` isn't acceptable to persist, but it seems to work at runtime
-      state => state.sources.persistedSelectedLocation as any
-    );
-  }
-
   onReduxStateChange(state);
 };
 

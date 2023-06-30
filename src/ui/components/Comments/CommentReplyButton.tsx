@@ -1,10 +1,11 @@
 import { MouseEventHandler, useState } from "react";
 
+import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
+import { userData } from "shared/user-data/GraphQL/UserData";
 import { setModal } from "ui/actions/app";
 import useAddCommentReply from "ui/hooks/comments/useAddCommentReply";
 import { useAppDispatch } from "ui/setup/hooks";
 import { Comment } from "ui/state/comments";
-import { features } from "ui/utils/prefs";
 import useAuth0 from "ui/utils/useAuth0";
 
 import MaterialIcon from "../shared/MaterialIcon";
@@ -15,6 +16,8 @@ export default function CommentReplyButton({ comment }: { comment: Comment }) {
   const dispatch = useAppDispatch();
 
   const addCommentReply = useAddCommentReply();
+
+  const [commentAttachments] = useGraphQLUserData("feature_commentAttachments");
 
   // This should be replaced with useTransition() once we're using Suspense for comment data.
   const [isPending, setIsPending] = useState(false);
@@ -57,7 +60,7 @@ export default function CommentReplyButton({ comment }: { comment: Comment }) {
         Reply
       </button>
 
-      {features.commentAttachments && (
+      {commentAttachments && (
         <MaterialIcon className={styles.AttachmentIcon} onClick={addAttachment}>
           attachment
         </MaterialIcon>

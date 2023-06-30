@@ -1,7 +1,7 @@
 import { Object as ProtocolObject } from "@replayio/protocol";
-import React, { useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { useLayoutEffect, useRef, useState } from "react";
 
-import Services from "devtools/shared/services";
+import { isMacOS } from "shared/utils/os";
 import type { UIThunkAction } from "ui/actions";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
@@ -86,7 +86,7 @@ export function InspectorSearch() {
 
     // Honestly I have no idea why this was in the original search logic.
     // Apparently search if you hit CTRL+G? Weird combo.
-    const modifierKey = Services.appinfo.OS === "Darwin" ? e.metaKey : e.ctrlKey;
+    const modifierKey = isMacOS() ? e.metaKey : e.ctrlKey;
     if (e.key === "g" && modifierKey) {
       startFullTextSearch(searchText, e.shiftKey);
       e.preventDefault();

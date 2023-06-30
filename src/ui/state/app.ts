@@ -75,8 +75,6 @@ export interface UploadInfo {
   total?: string;
 }
 
-export type AppTheme = "light" | "dark" | "system";
-
 export type NodePickerType = "reactComponent" | "domElement";
 export type NodePickerStatus = "disabled" | "initializing" | "active";
 
@@ -98,7 +96,6 @@ export interface AppState {
   recordingTarget: RecordingTarget | null;
   recordingWorkspace: Workspace | null;
   sessionId: SessionId | null;
-  theme: AppTheme;
   trialExpired: boolean;
   unexpectedError: UnexpectedError | null;
   uploading: UploadInfo | null;

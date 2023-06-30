@@ -3,12 +3,16 @@ import { ConnectedProps, connect } from "react-redux";
 
 import QuickOpenModal from "devtools/client/debugger/src/components/QuickOpenModal";
 import { getQuickOpenEnabled } from "devtools/client/debugger/src/selectors";
+import { getSystemColorScheme } from "shared/theme/getSystemColorScheme";
+import { Theme } from "shared/theme/types";
+import { useTheme } from "shared/theme/useTheme";
+import { userData } from "shared/user-data/GraphQL/UserData";
 import { isTest } from "shared/utils/environment";
 import { actions } from "ui/actions";
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 import hooks from "ui/hooks";
 import { Nag, useGetUserInfo } from "ui/hooks/users";
-import { getLoadingFinished, getModal, getTheme } from "ui/reducers/app";
+import { getLoadingFinished, getModal } from "ui/reducers/app";
 import { useAppSelector } from "ui/setup/hooks";
 import { UIState } from "ui/state";
 import { ModalType } from "ui/state/app";
@@ -18,7 +22,6 @@ import useAuth0 from "ui/utils/useAuth0";
 
 import { ConfirmRenderer } from "./shared/Confirm";
 import AppErrors from "./shared/Error";
-import LoadingScreen from "./shared/LoadingScreen";
 import LoginModal from "./shared/LoginModal";
 import LoomModal from "./shared/LoomModal";
 import RenameReplayModal from "./shared/Modals/RenameReplayModal";
@@ -114,7 +117,7 @@ function App({ children, hideModal, modal, quickOpenEnabled }: AppProps) {
   const auth = useAuth0();
   const dismissNag = hooks.useDismissNag();
   const userInfo = useGetUserInfo();
-  const theme = useAppSelector(getTheme);
+  const theme = useTheme();
 
   useEffect(() => {
     if (userInfo.nags && shouldShowNag(userInfo.nags, Nag.FIRST_LOG_IN)) {
@@ -147,8 +150,17 @@ function App({ children, hideModal, modal, quickOpenEnabled }: AppProps) {
   }, []);
 
   useEffect(() => {
-    document.body.parentElement!.className = `theme-${theme}`;
-  }, [theme]);
+    const updateTheme = (theme: Theme) => {
+      if (theme === "system") {
+        theme = getSystemColorScheme();
+      }
+      document.body.parentElement!.className = `theme-${theme}`;
+    };
+
+    updateTheme(userData.get("global_theme"));
+
+    userData.subscribe("global_theme", updateTheme);
+  }, []);
 
   if (auth.isLoading || userInfo.loading) {
     return (

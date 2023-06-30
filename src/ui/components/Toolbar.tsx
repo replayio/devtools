@@ -2,26 +2,25 @@ import { default as classNames, default as classnames } from "classnames";
 import { useContext, useEffect, useState } from "react";
 
 import { getPauseId } from "devtools/client/debugger/src/selectors";
-import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
 import { framesCache } from "replay-next/src/suspense/FrameCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { isGroupedTestCasesV1 } from "shared/test-suites/RecordingTestMetadata";
+import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import IconWithTooltip from "ui/components/shared/IconWithTooltip";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
-import { useFeature } from "ui/hooks/settings";
 import { getSelectedPrimaryPanel } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { PrimaryPanelName } from "ui/state/layout";
 import { shouldShowTour } from "ui/utils/onboarding";
-// TODO [ryanjduffy]: Refactor shared styling more completely
 import { trackEvent } from "ui/utils/telemetry";
 
 import { actions } from "../actions";
 import { selectors } from "../reducers";
-import { sidePanelStorageKey } from "./DevTools";
 import styles from "./Toolbar.module.css";
+
+// TODO [ryanjduffy]: Refactor shared styling more completely
 
 function CypressIcon() {
   return (
@@ -370,12 +369,15 @@ export default function Toolbar() {
   const recordingId = useGetRecordingId();
   const { recording } = useGetRecording(recordingId);
   const { comments, loading } = hooks.useGetComments(recordingId);
-  const { value: logProtocolExperimentEnabled } = useFeature("logProtocol");
-  const { value: reactPanelExperimentEnabled } = useFeature("reactPanel");
-  const { value: showPassport } = useFeature("showPassport");
-  const [sidePanelCollapsed, setSidePanelCollapsed] = useLocalStorage(sidePanelStorageKey, false);
+  const [logProtocolExperimentEnabled] = useGraphQLUserData("feature_logProtocol");
+  const [reactPanelExperimentEnabled] = useGraphQLUserData("feature_reactPanel");
+  const [showPassport] = useGraphQLUserData("feature_showPassport");
   const { nags } = hooks.useGetUserInfo();
   const showTour = shouldShowTour(nags);
+
+  const [sidePanelCollapsed, setSidePanelCollapsed] = useGraphQLUserData(
+    "layout_sidePanelCollapsed"
+  );
 
   useEffect(() => {
     if (!loading && comments.length > 0) {

@@ -9,9 +9,9 @@ import { Settings } from "./types";
 
 export default function SettingsModal<T extends string, P extends Record<string, unknown>>({
   tab,
-  hiddenTabs,
+  hiddenTabs = [] as T[],
   loading,
-  panelProps,
+  panelProps = {} as P,
   settings,
   size = "sm",
   title,
@@ -19,7 +19,7 @@ export default function SettingsModal<T extends string, P extends Record<string,
   tab?: T;
   hiddenTabs?: T[];
   loading?: boolean;
-  panelProps: P;
+  panelProps?: P;
   settings: Settings<T, P>;
   size?: "sm" | "lg";
   title?: React.ReactNode;
@@ -36,7 +36,7 @@ export default function SettingsModal<T extends string, P extends Record<string,
   if (loading) {
     return (
       <div className="settings-modal">
-        <Modal></Modal>
+        <Modal />
       </div>
     );
   }

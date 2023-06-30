@@ -1,5 +1,6 @@
 import { Action } from "@reduxjs/toolkit";
 
+import { ViewMode } from "shared/user-data/GraphQL/config";
 import {
   getLocalNags,
   getSelectedPanel,
@@ -12,7 +13,6 @@ import {
   SecondaryPanelName,
   ToolboxLayout,
   VIEWER_PANELS,
-  ViewMode,
 } from "ui/state/layout";
 import { trackEvent } from "ui/utils/telemetry";
 

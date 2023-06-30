@@ -15,12 +15,12 @@ import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
 import { Nag } from "shared/graphql/types";
+import { useTheme } from "shared/theme/useTheme";
 import { UIThunkAction } from "ui/actions";
 import { fetchMouseTargetsForPause } from "ui/actions/app";
 import { enterFocusMode } from "ui/actions/timeline";
 import {
   getCurrentPoint,
-  getTheme,
   nodePickerDisabled,
   nodePickerInitializing,
   nodePickerReady,
@@ -448,7 +448,7 @@ export default function ReactDevtoolsPanel() {
 
   const dispatch = useAppDispatch();
 
-  const theme = useAppSelector(getTheme);
+  const theme = useTheme();
   const replayClient = useContext(ReplayClientContext);
 
   // Once we've obtained the protocol version, we'll dynamically load the correct module/version.

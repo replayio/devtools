@@ -16,8 +16,8 @@ import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
 import { MockLink, MockedResponse } from "@apollo/client/testing";
 import { getMainDefinition } from "@apollo/client/utilities";
 import { createClient } from "graphql-ws";
+import memoizeOne from "memoize-one";
 
-import { memoizeLast } from "devtools/client/debugger/src/utils/memoizeLast";
 import { defer } from "protocol/utils";
 import { hasApiKey, isE2ETest } from "shared/utils/environment";
 
@@ -42,7 +42,7 @@ export async function mutate<TData = any, TVariables = OperationVariables>(
   return await apolloClient.mutate<TData, TVariables>(options);
 }
 
-export const createApolloClient = memoizeLast(function (
+export const createApolloClient = memoizeOne(function (
   token: string | undefined,
   onAuthError?: () => void
 ) {
