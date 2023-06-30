@@ -138,29 +138,9 @@ export const config = {
     legacyKey: "devtools.features.consoleFilterDrawerDefaultsToOpen",
   },
 
-  // TODO [FE-1646] We can probably remove this preference
-  debugger_breakpointsVisible: {
-    defaultValue: Boolean(true),
-    legacyKey: "devtools.debugger.breakpoints-visible",
-  },
-  // TODO [FE-1646] We can probably remove this preference
-  debugger_callStackVisible: {
-    defaultValue: Boolean(true),
-    legacyKey: "devtools.debugger.call-stack-visible",
-  },
   debugger_frameworkGroupingOn: {
     defaultValue: Boolean(true),
     legacyKey: "devtools.debugger.ui.framework-grouping-on",
-  },
-  // TODO [FE-1646] We can probably remove this preference
-  debugger_logpointsVisible: {
-    defaultValue: Boolean(true),
-    legacyKey: "devtools.debugger.logpoints-visible",
-  },
-  // TODO [FE-1646] We can probably remove this preference
-  debugger_scopesVisible: {
-    defaultValue: Boolean(true),
-    legacyKey: "devtools.debugger.scopes-visible",
   },
 
   feature_basicProcessingLoadingBar: {
@@ -271,6 +251,14 @@ export const config = {
     legacyKey: "devtools.inspector.show_pseudo_elements",
   },
 
+  layout_breakpointsPanelExpanded: {
+    defaultValue: Boolean(true),
+    legacyKey: "devtools.debugger.breakpoints-visible",
+  },
+  layout_callStackPanelExpanded: {
+    defaultValue: Boolean(true),
+    legacyKey: "devtools.debugger.call-stack-visible",
+  },
   layout_defaultViewMode: {
     defaultValue: "non-dev" as ViewMode,
     label: "Default Mode",
@@ -283,6 +271,14 @@ export const config = {
   layout_inspectorBoxModelOpen: {
     defaultValue: Boolean(true),
     legacyKey: "devtools.layout.boxmodel.opened",
+  },
+  layout_logpointsPanelExpanded: {
+    defaultValue: Boolean(true),
+    legacyKey: "devtools.debugger.logpoints-visible",
+  },
+  layout_scopesPanelExpanded: {
+    defaultValue: Boolean(true),
+    legacyKey: "devtools.debugger.scopes-visible",
   },
   layout_sidePanelCollapsed: {
     defaultValue: Boolean(false),
