@@ -4,7 +4,6 @@ import PrimaryPanes from "devtools/client/debugger/src/components/PrimaryPanes";
 import SecondaryPanes from "devtools/client/debugger/src/components/SecondaryPanes";
 import Accordion from "devtools/client/debugger/src/components/shared/Accordion";
 import LazyOffscreen from "replay-next/components/LazyOffscreen";
-import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { setSelectedPrimaryPanel } from "ui/actions/layout";
 import Events from "ui/components/Events";
 import SearchFilesReduxAdapter from "ui/components/SearchFilesReduxAdapter";
@@ -26,7 +25,6 @@ import ReplayInfo from "./Events/ReplayInfo";
 import Passport from "./Passport/Passport";
 import ProtocolViewer from "./ProtocolViewer";
 import { ReactPanel } from "./ReactPanel";
-import StatusDropdown from "./shared/StatusDropdown";
 import Tour from "./Tour/Tour";
 import styles from "src/ui/components/SidePanel.module.css";
 
@@ -63,7 +61,6 @@ function useInitialPrimaryPanel() {
 }
 
 export default function SidePanel() {
-  const [resolveRecording] = useGraphQLUserData("feature_resolveRecording");
   const selectedPrimaryPanel = useInitialPrimaryPanel();
   const [replayInfoCollapsed, setReplayInfoCollapsed] = useState(false);
   const [eventsCollapsed, setEventsCollapsed] = useState(false);
@@ -75,10 +72,9 @@ export default function SidePanel() {
   };
   const items: any[] = [];
 
-  // if (recording?.metadata?.test?.tests?.length) {
   items.push({
     header: "Info",
-    buttons: resolveRecording ? <StatusDropdown /> : null,
+    buttons: null,
     className: "replay-info",
     component: <ReplayInfo />,
     opened: !replayInfoCollapsed,
