@@ -14,6 +14,8 @@ import { ExpandablesContextRoot } from "replay-next/src/contexts/ExpandablesCont
 import { PointsContextRoot } from "replay-next/src/contexts/points/PointsContext";
 import { SelectedFrameContextRoot } from "replay-next/src/contexts/SelectedFrameContext";
 import usePreferredFontSize from "replay-next/src/hooks/usePreferredFontSize";
+import { setDefaultTags } from "replay-next/src/utils/telemetry";
+import { getTestEnvironment } from "shared/test-suites/RecordingTestMetadata";
 import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { userData } from "shared/user-data/GraphQL/UserData";
 import { clearTrialExpired, createSocket } from "ui/actions/session";
@@ -21,7 +23,7 @@ import TerminalContextAdapter from "ui/components/SecondaryToolbox/TerminalConte
 import { TestSuiteContextRoot } from "ui/components/TestSuite/views/TestSuiteContext";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { useTrackLoadingIdleTime } from "ui/hooks/tracking";
-import { useUserIsAuthor } from "ui/hooks/users";
+import { useGetUserInfo, useUserIsAuthor } from "ui/hooks/users";
 import { getViewMode } from "ui/reducers/layout";
 import { useAppSelector } from "ui/setup/hooks";
 import { UIState } from "ui/state";
@@ -148,6 +150,8 @@ function _DevTools({
   const { recording } = useGetRecording(recordingId);
   const { trackLoadingIdleTime } = useTrackLoadingIdleTime(uploadComplete, recording);
   const { userIsAuthor, loading } = useUserIsAuthor();
+  const { id: userId, email: userEmail, loading: userLoading } = useGetUserInfo();
+
   const isExternalRecording = useMemo(
     () => recording?.user && !recording.user.internal,
     [recording]
@@ -222,6 +226,27 @@ function _DevTools({
       trackLoadingIdleTime(sessionId!);
     }
   }, [loadingFinished, trackLoadingIdleTime, sessionId]);
+
+  useEffect(() => {
+    if (!userLoading && recording) {
+      const test = recording.metadata?.test;
+      const testEnvironment = test ? getTestEnvironment(test) : null;
+
+      setDefaultTags({
+        recording: {
+          id: recording.id,
+          title: recording.title,
+          url: recording.url,
+          userId: recording.user?.id,
+          workspace: recording?.workspace,
+          metadata: recording.metadata && {
+            testEnvironment,
+          },
+        },
+        session: { userId, userEmail },
+      });
+    }
+  }, [recording, userId, userEmail, userLoading]);
 
   if (!loadingFinished) {
     return <LoadingScreen fallbackMessage="Loading..." />;
