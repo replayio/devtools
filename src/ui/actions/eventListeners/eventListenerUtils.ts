@@ -7,7 +7,7 @@ import { ReplayClientInterface } from "shared/client/types";
 import { SourceDetails, SourcesState, getPreferredLocation } from "ui/reducers/sources";
 
 import { InteractionEventKind } from "./constants";
-import { findFunctionOutlineForLocation } from "./jumpToCode";
+import { findClassOutlineForLocation, findFunctionOutlineForLocation } from "./jumpToCode";
 
 export type FunctionPreview = Required<
   Pick<ObjectPreview, "functionName" | "functionLocation" | "functionParameterNames">
@@ -141,6 +141,62 @@ export const formatEventListener = async (
     },
     functionName: functionName || "Anonymous()",
     functionParameterNames,
+    framework,
+  };
+};
+
+export const formatClassComponent = async (
+  replayClient: ReplayClientInterface,
+  type: string,
+  fnPreview: FunctionPreview,
+  sourcesState: SourcesState,
+  framework?: string
+): Promise<FormattedEventListener | undefined> => {
+  const { functionLocation } = fnPreview;
+  const sources = await sourcesByIdCache.readAsync(replayClient);
+  updateMappedLocation(sources, functionLocation);
+
+  const location = getPreferredLocation(sourcesState, functionLocation);
+
+  if (!location) {
+    return;
+  }
+
+  const sourceDetails = sourcesState.sourceDetails.entities[location.sourceId];
+  if (!sourceDetails) {
+    return;
+  }
+  const locationUrl = sourceDetails.url;
+
+  // See if we can get any better details from the parsed source outline
+  const symbols = await sourceOutlineCache.readAsync(replayClient, location.sourceId);
+
+  const classOutline = findClassOutlineForLocation(location, symbols);
+
+  if (!classOutline) {
+    return;
+  }
+
+  const functionName = classOutline.name!;
+
+  const renderMethod = symbols.functions.find(
+    f =>
+      f.name === "render" &&
+      f.location.begin.line > classOutline.location.begin.line &&
+      f.location.end.line < classOutline.location.end.line
+  )!;
+
+  return {
+    type,
+    sourceDetails,
+    location,
+    locationUrl,
+    firstBreakablePosition: {
+      sourceId: sourceDetails?.id,
+      ...(renderMethod?.breakpointLocation ?? { line: 0, column: 0 }),
+    },
+    functionName: functionName || "Anonymous()",
+    functionParameterNames: [],
     framework,
   };
 };

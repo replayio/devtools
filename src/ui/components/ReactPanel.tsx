@@ -3,10 +3,12 @@ import {
   ExecutionPoint,
   FunctionOutline,
   Location,
+  SourceLocation,
   TimeStampedPoint,
   TimeStampedPointRange,
 } from "@replayio/protocol";
 import classnames from "classnames";
+import mapValues from "lodash/mapValues";
 import { ReactNode, useContext, useState } from "react";
 import {
   Cache,
@@ -100,6 +102,41 @@ export const reactRenderQueuedJumpLocationCache: Cache<
   },
 });
 
+interface ReactInternalMethodsHits {
+  scheduleUpdateHitPoints: TimeStampedPoint[];
+  renderRootSyncHitPoints: TimeStampedPoint[];
+  onCommitFiberHitPoints: TimeStampedPoint[];
+}
+
+interface ReactInternalFunctionSearchMarkers {
+  functionName: string;
+  uniqueProdMinifiedText: string;
+}
+
+const reactInternalFunctionsToFind = {
+  // A build-extracted React error code
+  scheduleUpdateOnFiber: "(185)",
+  // A build-extracted React error code
+  renderRootSync: "(261)",
+  // A call to the React DevTools global hook object
+  onCommitFiberRoot: ".onCommitFiberRoot(",
+  // The initial assignments inside the function
+  renderWithHooks: ".updateQueue = null",
+  // The only place in the codebase that calls `instance.render()`
+  finishClassComponent: ".render(",
+};
+
+interface ReactInternalFunctionDetailsEntry {
+  functionName: string;
+  functionOutline: FunctionOutline;
+  lineIndex: number;
+  hits: TimeStampedPoint[];
+}
+
+type ReactInternalFunctionDetails = {
+  [key in keyof typeof reactInternalFunctionsToFind]: ReactInternalFunctionDetailsEntry;
+};
+
 export const reactInternalMethodsHitsCache: Cache<
   [
     replayClient: ReplayClientInterface,
@@ -107,36 +144,42 @@ export const reactInternalMethodsHitsCache: Cache<
     reactDomSource: SourceDetails | undefined,
     sourcesState: SourcesState
   ],
-  | { scheduleUpdateHitPoints: TimeStampedPoint[]; onCommitFiberHitPoints: TimeStampedPoint[] }
-  | undefined
+  ReactInternalFunctionDetails | undefined
 > = createSingleEntryCache({
   async load([replayClient, range, reactDomSource, sourcesState]) {
     if (!reactDomSource || !range) {
       return;
     }
 
-    const [symbols, breakablePositionsResult] = await Promise.all([
-      sourceOutlineCache.readAsync(replayClient, reactDomSource.id),
-      breakpointPositionsCache.readAsync(replayClient, reactDomSource.id),
-    ]);
+    const symbols = await sourceOutlineCache.readAsync(replayClient, reactDomSource.id);
 
     if (!symbols) {
       return;
     }
 
-    const [breakablePositions, breakablePositionsByLine] = breakablePositionsResult;
-
-    let scheduleUpdateFiberDeclaration: FunctionOutline | undefined;
-    let onCommitFiberRootDeclaration: FunctionOutline | undefined;
+    const reactInternalFunctionDetails: ReactInternalFunctionDetails = mapValues(
+      reactInternalFunctionsToFind,
+      (regex, functionName) =>
+        ({
+          functionName,
+        } as ReactInternalFunctionDetailsEntry)
+    );
 
     if (reactDomSource.url!.includes(".development")) {
-      const shouldUpdateFiberSymbol = symbols?.functions.find(
-        f => f.name === "scheduleUpdateOnFiber"
-      )!;
-      const onCommitRootSymbol = symbols?.functions.find(f => f.name === "onCommitRoot")!;
+      for (const functionName of Object.keys(reactInternalFunctionsToFind)) {
+        reactInternalFunctionDetails[
+          functionName as keyof typeof reactInternalFunctionsToFind
+        ].functionOutline = symbols.functions.find(f => f.name === functionName)!;
+      }
+      // const shouldUpdateFiberSymbol = symbols?.functions.find(
+      //   f => f.name === "scheduleUpdateOnFiber"
+      // )!;
+      // const renderRootSyncSymbol = symbols?.functions.find(f => f.name === "renderRootSync")!;
+      // const onCommitRootSymbol = symbols?.functions.find(f => f.name === "onCommitRoot")!;
 
-      scheduleUpdateFiberDeclaration = shouldUpdateFiberSymbol;
-      onCommitFiberRootDeclaration = onCommitRootSymbol;
+      // scheduleUpdateFiberDeclaration = shouldUpdateFiberSymbol;
+      // renderRootSyncDeclaration = renderRootSyncSymbol;
+      // onCommitFiberRootDeclaration = onCommitRootSymbol;
     } else if (reactDomSource.url!.includes(".production")) {
       // HACK We'll do this the hard way! This _should_ work back to React 16.14
       // By careful inspection, we know that every minified version of `scheduleUpdateOnFiber`
@@ -153,15 +196,45 @@ export const reactInternalMethodsHitsCache: Cache<
 
       const reactDomSourceLines = streaming.value!.split("\n");
 
+      /*
       // A build-extracted React error code
       const MAGIC_SCHEDULE_UPDATE_CONTENTS = "(185)";
+      // A build-extracted React error code
+      const MAGIC_RENDER_ROOT_SYNC_CONTENTS = "(261)";
       // A call to the React DevTools global hook object
       const MAGIC_ON_COMMIT_ROOT_CONTENTS = ".onCommitFiberRoot(";
+      */
 
-      // Brute-force search over all lines in the file to find the two functions that we
+      // Brute-force search over all lines in the file to find the functions that we
       // actually care about, based on the magic strings that will exist.
       for (let [lineZeroIndex, line] of reactDomSourceLines.entries()) {
+        // if (line.includes("updateQueue = null")) {
+        //   console.log("updateQueue=null check: ", lineZeroIndex, line);
+        // }
+        for (const [functionName, searchString] of Object.entries(reactInternalFunctionsToFind)) {
+          const key = functionName as keyof typeof reactInternalFunctionsToFind;
+          let columnMatch = line.indexOf(searchString);
+          if (functionName === "renderWithHooks" && columnMatch > -1) {
+            // This shows up in a few places, check before
+            const isRightFunction =
+              reactDomSourceLines[lineZeroIndex - 1].includes("memoizedState = null") &&
+              reactDomSourceLines[lineZeroIndex + 1].includes("lanes = 0");
+            if (!isRightFunction) {
+              columnMatch = -1;
+            }
+          }
+
+          if (columnMatch > -1) {
+            const functionDetails = reactInternalFunctionDetails[key];
+            functionDetails.lineIndex = lineZeroIndex + 1;
+            const location: SourceLocation = { line: lineZeroIndex + 1, column: columnMatch };
+            console.log("Found location: ", functionName, location);
+            functionDetails.functionOutline = findFunctionOutlineForLocation(location, symbols)!;
+          }
+        }
+        /*
         const scheduleUpdateIndex = line.indexOf(MAGIC_SCHEDULE_UPDATE_CONTENTS);
+        const renderRootSyncIndex = line.indexOf(MAGIC_RENDER_ROOT_SYNC_CONTENTS);
         const onCommitIndex = line.indexOf(MAGIC_ON_COMMIT_ROOT_CONTENTS);
         if (scheduleUpdateIndex > -1) {
           scheduleUpdateFiberDeclaration = findFunctionOutlineForLocation(
@@ -171,15 +244,15 @@ export const reactInternalMethodsHitsCache: Cache<
             },
             symbols
           );
-          /*
-            const res = findClosestofSymbol(symbols.functions, {
+        }
+        if (renderRootSyncIndex > -1) {
+          renderRootSyncDeclaration = findFunctionOutlineForLocation(
+            {
               line: lineZeroIndex + 1,
-              column: scheduleUpdateIndex,
-            });
-            if (res) {
-              scheduleUpdateFiberDeclaration = res.location.begin;
-            }
-            */
+              column: renderRootSyncIndex,
+            },
+            symbols
+          );
         }
         if (onCommitIndex > -1) {
           onCommitFiberRootDeclaration = findFunctionOutlineForLocation(
@@ -191,49 +264,61 @@ export const reactInternalMethodsHitsCache: Cache<
           );
         }
 
-        if (scheduleUpdateFiberDeclaration && onCommitFiberRootDeclaration) {
+        if (
+          scheduleUpdateFiberDeclaration &&
+          renderRootSyncDeclaration &&
+          onCommitFiberRootDeclaration
+        ) {
           break;
         }
+        */
       }
     }
 
     if (
+      !Object.values(reactInternalFunctionDetails).every(f => f.functionOutline?.breakpointLocation)
+    ) {
+      console.log("Bailing out of internals check: ", reactInternalFunctionDetails);
+      return;
+    }
+
+    /*
+    if (
       !scheduleUpdateFiberDeclaration?.breakpointLocation ||
+      !renderRootSyncDeclaration?.breakpointLocation ||
       !onCommitFiberRootDeclaration?.breakpointLocation
     ) {
       return;
     }
 
     const firstScheduleUpdateFiberPosition = scheduleUpdateFiberDeclaration.breakpointLocation;
+    const firstRenderRootSyncPosition = renderRootSyncDeclaration.breakpointLocation;
+    const firstOnCommitRootPosition = onCommitFiberRootDeclaration.breakpointLocation
 
-    const firstOnCommitRootPosition = onCommitFiberRootDeclaration.breakpointLocation;
-
-    if (!firstScheduleUpdateFiberPosition || !firstOnCommitRootPosition) {
+    if (
+      !firstScheduleUpdateFiberPosition ||
+      !firstRenderRootSyncPosition ||
+      !firstOnCommitRootPosition
+    ) {
       return;
     }
 
-    const scheduleFiberUpdatePromise = hitPointsCache.readAsync(
-      BigInt(range.begin.point),
-      BigInt(range.end.point),
-      replayClient,
-      { ...firstScheduleUpdateFiberPosition, sourceId: reactDomSource.id },
-      null
+    */
+
+    await Promise.all(
+      Object.entries(reactInternalFunctionDetails).map(async ([key, details]) => {
+        const hitPoints = await hitPointsCache.readAsync(
+          BigInt(range.begin.point),
+          BigInt(range.end.point),
+          replayClient,
+          { ...details.functionOutline.breakpointLocation!, sourceId: reactDomSource.id },
+          null
+        );
+        details.hits = hitPoints;
+      })
     );
 
-    const onCommitFiberHitsPromise = hitPointsCache.readAsync(
-      BigInt(range.begin.point),
-      BigInt(range.end.point),
-      replayClient,
-      { ...firstOnCommitRootPosition, sourceId: reactDomSource.id },
-      null
-    );
-
-    const [scheduleUpdateHitPoints, onCommitFiberHitPoints] = await Promise.all([
-      scheduleFiberUpdatePromise,
-      onCommitFiberHitsPromise,
-    ]);
-
-    return { scheduleUpdateHitPoints, onCommitFiberHitPoints };
+    return reactInternalFunctionDetails;
   },
 });
 
@@ -254,119 +339,26 @@ const queuedRendersStreamingCache: StreamingCache<
       return;
     }
     try {
-      const symbols = await sourceOutlineCache.readAsync(replayClient, reactDomSource.id);
-
-      if (!symbols) {
-        return;
-      }
-
-      let scheduleUpdateFiberDeclaration: FunctionOutline | undefined;
-      let onCommitFiberRootDeclaration: FunctionOutline | undefined;
-
-      if (reactDomSource.url!.includes(".development")) {
-        const shouldUpdateFiberSymbol = symbols.functions.find(
-          f => f.name === "scheduleUpdateOnFiber"
-        )!;
-        const onCommitRootSymbol = symbols.functions.find(f => f.name === "onCommitRoot")!;
-
-        scheduleUpdateFiberDeclaration = shouldUpdateFiberSymbol;
-        onCommitFiberRootDeclaration = onCommitRootSymbol;
-      } else if (reactDomSource.url!.includes(".production")) {
-        // HACK We'll do this the hard way! This _should_ work back to React 16.14
-        // By careful inspection, we know that every minified version of `scheduleUpdateOnFiber`
-        // has a React extracted error code call of `someErrorFn(185)`. We also know that every
-        // minified version of `onCommitRoot` looks for the `.onCommitFiberRoot` function on the
-        // React DevTools global hook.
-        // By doing line-by-line string comparisons looking for these specific bits of code,
-        // we can consistently find the specific minified functions that we care about,
-        // across multiple React production builds, without needing to track minified function names.
-        // TODO Rethink this one React has sourcemaps
-
-        const streaming = streamingSourceContentsCache.stream(replayClient, reactDomSource!.id);
-        await streaming.resolver;
-
-        const reactDomSourceLines = streaming.value!.split("\n");
-
-        // A build-extracted React error code
-        const MAGIC_SCHEDULE_UPDATE_CONTENTS = "(185)";
-        // A call to the React DevTools global hook object
-        const MAGIC_ON_COMMIT_ROOT_CONTENTS = ".onCommitFiberRoot(";
-
-        // Brute-force search over all lines in the file to find the two functions that we
-        // actually care about, based on the magic strings that will exist.
-        for (let [lineZeroIndex, line] of reactDomSourceLines.entries()) {
-          const scheduleUpdateIndex = line.indexOf(MAGIC_SCHEDULE_UPDATE_CONTENTS);
-          const onCommitIndex = line.indexOf(MAGIC_ON_COMMIT_ROOT_CONTENTS);
-          if (scheduleUpdateIndex > -1) {
-            scheduleUpdateFiberDeclaration = findFunctionOutlineForLocation(
-              {
-                line: lineZeroIndex + 1,
-                column: scheduleUpdateIndex,
-              },
-              symbols
-            );
-            /*
-            const res = findClosestofSymbol(symbols.functions, {
-              line: lineZeroIndex + 1,
-              column: scheduleUpdateIndex,
-            });
-            if (res) {
-              scheduleUpdateFiberDeclaration = res.location.begin;
-            }
-            */
-          }
-          if (onCommitIndex > -1) {
-            onCommitFiberRootDeclaration = findFunctionOutlineForLocation(
-              {
-                line: lineZeroIndex + 1,
-                column: scheduleUpdateIndex,
-              },
-              symbols
-            );
-          }
-
-          if (scheduleUpdateFiberDeclaration && onCommitFiberRootDeclaration) {
-            break;
-          }
-        }
-      }
-
-      if (
-        !scheduleUpdateFiberDeclaration?.breakpointLocation ||
-        !onCommitFiberRootDeclaration?.breakpointLocation
-      ) {
-        return;
-      }
-
-      const firstScheduleUpdateFiberPosition = scheduleUpdateFiberDeclaration.breakpointLocation;
-
-      const firstOnCommitRootPosition = onCommitFiberRootDeclaration.breakpointLocation;
-
-      if (!firstScheduleUpdateFiberPosition || !firstOnCommitRootPosition) {
-        return;
-      }
-
-      const scheduleFiberUpdatePromise = hitPointsForLocationCache.readAsync(
+      const reactInternalFunctionDetails = await reactInternalMethodsHitsCache.readAsync(
         replayClient,
-        { begin: range.begin.point, end: range.end.point },
-        { ...firstScheduleUpdateFiberPosition, sourceId: reactDomSource.id },
-        null
+        range,
+        reactDomSource,
+        sourcesState
       );
 
-      const onCommitFiberHitsPromise = hitPointsForLocationCache.readAsync(
-        replayClient,
-        { begin: range.begin.point, end: range.end.point },
-        { ...firstOnCommitRootPosition, sourceId: reactDomSource.id },
-        null
-      );
-
-      const [[scheduleUpdateHitPoints], [onCommitFiberHitPoints]] = await Promise.all([
-        scheduleFiberUpdatePromise,
-        onCommitFiberHitsPromise,
-      ]);
+      if (!reactInternalFunctionDetails) {
+        return;
+      }
+      const {
+        onCommitFiberRoot,
+        scheduleUpdateOnFiber,
+        renderRootSync,
+        renderWithHooks,
+        finishClassComponent,
+      } = reactInternalFunctionDetails;
 
       // TODO Arbitrary max of 200 points here. We need to figure out a better strategy.
-      const scheduleUpdateHitPointsToCheck = scheduleUpdateHitPoints.slice(0, 200);
+      const scheduleUpdateHitPointsToCheck = scheduleUpdateOnFiber.hits.slice(0, 200);
 
       let currentResults: ReactQueuedRenderDetails[] = [];
 

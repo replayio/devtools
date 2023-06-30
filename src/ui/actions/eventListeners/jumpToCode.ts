@@ -1,4 +1,5 @@
 import {
+  ClassOutline,
   ExecutionPoint,
   FunctionOutline,
   Location,
@@ -424,6 +425,34 @@ export function findFunctionOutlineForLocation(
     }
   }
   return foundFunctionOutline;
+}
+
+export function findClassOutlineForLocation(
+  location: SourceLocation,
+  sourceOutline: getSourceOutlineResult
+): ClassOutline | undefined {
+  let foundClassOutline: ClassOutline | undefined = undefined;
+  let foundFunctionBegin: SourceLocation | undefined;
+
+  for (const classOutline of sourceOutline.classes) {
+    const functionBegin = classOutline.location.begin;
+    const functionEnd = classOutline.location.end;
+
+    const functionIsBeforeLocation = isLocationBefore(functionBegin, location);
+    const locationIsBeforeEnd = isLocationBefore(location, functionEnd);
+
+    const functionIsCloserThanFoundFunction =
+      !foundFunctionBegin || isLocationBefore(foundFunctionBegin, functionBegin);
+
+    const isMatch =
+      functionIsBeforeLocation && locationIsBeforeEnd && functionIsCloserThanFoundFunction;
+
+    if (isMatch) {
+      foundFunctionBegin = functionBegin;
+      foundClassOutline = classOutline;
+    }
+  }
+  return foundClassOutline;
 }
 
 export function jumpToKnownEventListenerHit(

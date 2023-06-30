@@ -67,6 +67,7 @@ import {
   EventListenerWithFunctionInfo,
   FunctionWithPreview,
   IGNORABLE_PARTIAL_SOURCE_URLS,
+  formatClassComponent,
   formatEventListener,
   locationToString,
 } from "ui/actions/eventListeners/eventListenerUtils";
@@ -133,17 +134,25 @@ function doSomeAnalysis(range: TimeStampedPointRange | null): UIThunkAction {
     );
 
     console.log("Fetching internals hits");
-    const reactInternalsHits = await reactInternalMethodsHitsCache.readAsync(
+    const reactInternalFunctionDetails = await reactInternalMethodsHitsCache.readAsync(
       replayClient,
       finalRange,
       reactDomSource,
       sourcesState
     );
 
-    if (!reactInternalsHits) {
+    console.log("All React internal functions: ", reactInternalFunctionDetails);
+
+    if (!reactInternalFunctionDetails) {
       return;
     }
-    const { onCommitFiberHitPoints, scheduleUpdateHitPoints } = reactInternalsHits;
+    const {
+      onCommitFiberRoot,
+      scheduleUpdateOnFiber,
+      renderRootSync,
+      renderWithHooks,
+      finishClassComponent,
+    } = reactInternalFunctionDetails;
 
     const dispatchResults = await processReduxDispatches(
       getState,
@@ -189,16 +198,33 @@ function doSomeAnalysis(range: TimeStampedPointRange | null): UIThunkAction {
         n => n.duration > 0
       );
 
-      const scheduledUpdatesDuringDispatch = scheduleUpdateHitPoints.filter(n =>
+      const scheduledUpdatesDuringDispatch = scheduleUpdateOnFiber.hits.filter(n =>
         isExecutionPointsWithinRange(n.point, afterReducer.point, afterNotifications.point)
       );
 
+      let functionComponentsRendered: TimeStampedPoint[] = [];
+      let classComponentsRendered: TimeStampedPoint[] = [];
+
       const queuedRender = scheduledUpdatesDuringDispatch.length > 0;
       let nextRenderCommit: TimeStampedPoint | undefined;
+      let nextRenderStart: TimeStampedPoint | undefined;
       if (queuedRender) {
-        nextRenderCommit = onCommitFiberHitPoints.find(n =>
+        nextRenderStart = renderRootSync.hits.find(n =>
           isExecutionPointsGreaterThan(n.point, afterNotifications.point)
         );
+        nextRenderCommit = onCommitFiberRoot.hits.find(n =>
+          isExecutionPointsGreaterThan(n.point, afterNotifications.point)
+        );
+
+        if (nextRenderStart && nextRenderCommit) {
+          functionComponentsRendered = renderWithHooks.hits.filter(n =>
+            isExecutionPointsWithinRange(n.point, nextRenderStart!.point, nextRenderCommit!.point)
+          );
+
+          classComponentsRendered = finishClassComponent.hits.filter(n =>
+            isExecutionPointsWithinRange(n.point, nextRenderStart!.point, nextRenderCommit!.point)
+          );
+        }
       }
 
       return {
@@ -209,11 +235,162 @@ function doSomeAnalysis(range: TimeStampedPointRange | null): UIThunkAction {
         selectorsWithExecutionGreaterThanZero,
         scheduledUpdatesDuringDispatch,
         queuedRender,
+        nextRenderStart,
         nextRenderCommit,
+        nextRenderDuration:
+          nextRenderStart && nextRenderCommit
+            ? nextRenderCommit.time - nextRenderStart.time
+            : undefined,
+        functionComponentsRendered,
+        classComponentsRendered,
       };
     });
 
     console.log("Processed dispatch results: ", processedDispatchResults);
+
+    const dispatchesWithQueuedRender = processedDispatchResults.filter(d => d.queuedRender);
+
+    const lastDispatchWithRender =
+      dispatchesWithQueuedRender[dispatchesWithQueuedRender.length - 1];
+    if (!lastDispatchWithRender) {
+      return;
+    }
+
+    const {
+      nextRenderStart,
+      nextRenderCommit,
+      functionComponentsRendered,
+      classComponentsRendered,
+    } = lastDispatchWithRender;
+
+    const actualFunctionComponentParamName = await getValidFunctionParameterName(
+      replayClient,
+      functionComponentsRendered[0],
+      2,
+      sourcesById
+    );
+
+    const results: RunEvaluationResult[] = [];
+
+    console.log("Running function components evaluation...");
+
+    const chunkedPoints = chunk(functionComponentsRendered, 190);
+    await Promise.all(
+      chunkedPoints.map(async points => {
+        await replayClient.runEvaluation(
+          {
+            selector: {
+              kind: "points",
+              points: points.map(annotation => annotation.point),
+            },
+            expression: `${actualFunctionComponentParamName}`,
+            // Run in top frame.
+            frameIndex: 0,
+            shareProcesses: true,
+            fullPropertyPreview: true,
+          },
+          result => {
+            results.push(...result);
+          }
+        );
+      })
+    );
+
+    results.sort((a, b) => compareExecutionPoints(a.point.point, b.point.point));
+
+    console.log("Total results: ", results.length);
+
+    console.log("Formatting functions...");
+
+    const formattedFunctions = await Promise.all(
+      results.map(async result => {
+        const functionWithPreview = result.data.objects!.find(
+          o => o.objectId === result.returned!.object!
+        ) as FunctionWithPreview;
+        const formattedFunction = (await formatEventListener(
+          replayClient,
+          "someType",
+          functionWithPreview.preview,
+          sourcesState
+        ))!;
+        return { formattedFunction, functionWithPreview };
+      })
+    );
+
+    const uniqueComponentFunctions: Record<string, EventListenerWithFunctionInfo> = {};
+
+    for (const entry of formattedFunctions) {
+      const fnString = formattedFunctionToString(entry.formattedFunction);
+      if (!uniqueComponentFunctions[fnString]) {
+        uniqueComponentFunctions[fnString] = entry.formattedFunction;
+      }
+    }
+    console.log("Formatted function components: ", uniqueComponentFunctions);
+
+    const actualClassComponentParamName = await getValidFunctionParameterName(
+      replayClient,
+      classComponentsRendered[0],
+      1,
+      sourcesById
+    );
+
+    const classComponentResults: RunEvaluationResult[] = [];
+
+    console.log("Running class components evaluation...");
+
+    const chunkedClassPoints = chunk(classComponentsRendered, 190);
+    await Promise.all(
+      chunkedClassPoints.map(async points => {
+        await replayClient.runEvaluation(
+          {
+            selector: {
+              kind: "points",
+              points: points.map(annotation => annotation.point),
+            },
+            expression: `${actualClassComponentParamName}.stateNode._reactInternals.type`,
+            // Run in top frame.
+            frameIndex: 0,
+            shareProcesses: true,
+            fullPropertyPreview: true,
+          },
+          result => {
+            classComponentResults.push(...result);
+          }
+        );
+      })
+    );
+
+    classComponentResults.sort((a, b) => compareExecutionPoints(a.point.point, b.point.point));
+
+    console.log("Total results: ", classComponentResults.length);
+
+    console.log("Formatting classes...");
+
+    const formattedClasses = await Promise.all(
+      classComponentResults.map(async result => {
+        const functionWithPreview = result.data.objects!.find(
+          o => o.objectId === result.returned!.object!
+        ) as FunctionWithPreview;
+        const formattedFunction = (await formatClassComponent(
+          replayClient,
+          "someType",
+          functionWithPreview.preview,
+          sourcesState
+        ))!;
+        return { formattedFunction, functionWithPreview };
+      })
+    );
+    console.log("Finished formatting classes");
+
+    const uniqueComponentClasses: Record<string, EventListenerWithFunctionInfo> = {};
+
+    for (const entry of formattedClasses) {
+      const fnString = formattedFunctionToString(entry.formattedFunction);
+      if (!uniqueComponentClasses[fnString]) {
+        uniqueComponentClasses[fnString] = entry.formattedFunction;
+      }
+    }
+    console.log("Formatted classes: ", uniqueComponentClasses);
   };
 }
 
