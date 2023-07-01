@@ -7687,6 +7687,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"data-uri-to-buffer@npm:^4.0.0":
+  version: 4.0.1
+  resolution: "data-uri-to-buffer@npm:4.0.1"
+  checksum: 0d0790b67ffec5302f204c2ccca4494f70b4e2d940fea3d36b09f0bb2b8539c2e86690429eb1f1dc4bcc9e4df0644193073e63d9ee48ac9fce79ec1506e4aa4c
+  languageName: node
+  linkType: hard
+
 "data-urls@npm:^3.0.1":
   version: 3.0.2
   resolution: "data-urls@npm:3.0.2"
@@ -9205,6 +9212,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fetch-blob@npm:^3.1.2, fetch-blob@npm:^3.1.4":
+  version: 3.2.0
+  resolution: "fetch-blob@npm:3.2.0"
+  dependencies:
+    node-domexception: ^1.0.0
+    web-streams-polyfill: ^3.0.3
+  checksum: f19bc28a2a0b9626e69fd7cf3a05798706db7f6c7548da657cbf5026a570945f5eeaedff52007ea35c8bcd3d237c58a20bf1543bc568ab2422411d762dd3d5bf
+  languageName: node
+  linkType: hard
+
 "figma-js@npm:^1.15.0":
   version: 1.15.0
   resolution: "figma-js@npm:1.15.0"
@@ -9478,6 +9495,15 @@ __metadata:
     node-domexception: 1.0.0
     web-streams-polyfill: 4.0.0-beta.1
   checksum: ad5f627e694a977edb1986c4b351c863196ee409e460c644adcb242bfc78ca9faa4877cba8113a71cecc0f0e21320d3c3d0acac95445817e014001ce147ba362
+  languageName: node
+  linkType: hard
+
+"formdata-polyfill@npm:^4.0.10":
+  version: 4.0.10
+  resolution: "formdata-polyfill@npm:4.0.10"
+  dependencies:
+    fetch-blob: ^3.1.2
+  checksum: 82a34df292afadd82b43d4a740ce387bc08541e0a534358425193017bf9fb3567875dc5f69564984b1da979979b70703aa73dee715a17b6c229752ae736dd9db
   languageName: node
   linkType: hard
 
@@ -13313,14 +13339,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-domexception@npm:1.0.0":
+"node-domexception@npm:1.0.0, node-domexception@npm:^1.0.0":
   version: 1.0.0
   resolution: "node-domexception@npm:1.0.0"
   checksum: ee1d37dd2a4eb26a8a92cd6b64dfc29caec72bff5e1ed9aba80c294f57a31ba4895a60fd48347cf17dd6e766da0ae87d75657dfd1f384ebfa60462c2283f5c7f
   languageName: node
   linkType: hard
 
-"node-fetch@npm:2.6.7, node-fetch@npm:2.x, node-fetch@npm:^2.0.0, node-fetch@npm:^2.6.1, node-fetch@npm:^2.6.7":
+"node-fetch@npm:2.6.7, node-fetch@npm:^2.6.1, node-fetch@npm:^2.6.7":
   version: 2.6.7
   resolution: "node-fetch@npm:2.6.7"
   dependencies:
@@ -13331,6 +13357,17 @@ __metadata:
     encoding:
       optional: true
   checksum: 8d816ffd1ee22cab8301c7756ef04f3437f18dace86a1dae22cf81db8ef29c0bf6655f3215cb0cdb22b420b6fe141e64b26905e7f33f9377a7fa59135ea3e10b
+  languageName: node
+  linkType: hard
+
+"node-fetch@npm:3.x, node-fetch@npm:^3.3.1":
+  version: 3.3.1
+  resolution: "node-fetch@npm:3.3.1"
+  dependencies:
+    data-uri-to-buffer: ^4.0.0
+    fetch-blob: ^3.1.4
+    formdata-polyfill: ^4.0.10
+  checksum: 62145fd3ba4770a76110bc31fdc0054ab2f5442b5ce96e9c4b39fc9e94a3d305560eec76e1165d9259eab866e02a8eecf9301062bb5dfc9f08a4d08b69d223dd
   languageName: node
   linkType: hard
 
@@ -15269,7 +15306,7 @@ __metadata:
     next: ^13.2
     next-compose-plugins: ^2.2.1
     next-global-css: ^1.3.1
-    node-fetch: 2.x
+    node-fetch: 3.x
     node-protocol: "workspace:*"
     parse-script-tags: ^0.1.7
     postcss: ^8.4.12
@@ -15502,7 +15539,7 @@ __metadata:
     jest-mock-extended: ^3.0.4
     lodash: ^4.17.21
     next: ^13.2
-    node-fetch: ^2.0.0
+    node-fetch: ^3.3.1
     pretty-ms: ^7.0.1
     protocol: "workspace:*"
     react: 0.0.0-experimental-e7d0053e6-20220325
@@ -17989,7 +18026,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"web-streams-polyfill@npm:^3.2.0":
+"web-streams-polyfill@npm:^3.0.3, web-streams-polyfill@npm:^3.2.0":
   version: 3.2.1
   resolution: "web-streams-polyfill@npm:3.2.1"
   checksum: b119c78574b6d65935e35098c2afdcd752b84268e18746606af149e3c424e15621b6f1ff0b42b2676dc012fc4f0d313f964b41a4b5031e525faa03997457da02

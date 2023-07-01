@@ -36,7 +36,7 @@
     "@types/uuid": "^7.0.3",
     "jest": "^28.0.2",
     "jest-environment-jsdom": "^28.0.2",
-    "node-fetch": "^2.0.0",
+    "node-fetch": "^3.3.1",
     "typescript": "5.0.2"
   },
   "scripts": {
