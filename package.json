@@ -105,7 +105,7 @@
     "use-context-menu": "^0.4.10"
   },
   "devDependencies": {
-    "@babel/core": "^7.17.8",
+    "@babel/core": "^7.22.5",
     "@babel/generator": "^7.17.7",
     "@babel/parser": "^7.17.8",
     "@babel/plugin-proposal-class-properties": "^7.14.5",
@@ -231,7 +231,7 @@
     "packages/*"
   ],
   "resolutions": {
-    "@babel/core": "7.18.5",
+    "@babel/core": "7.22.5",
     "@babel/parser": "7.18.5",
     "@babel/traverse": "7.18.5",
     "@babel/types": "7.18.4",
