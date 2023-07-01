@@ -31,7 +31,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.5.10",
-    "@auth0/auth0-react": "1.2.0",
+    "@auth0/auth0-react": "2.1.1",
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "@headlessui/react": "^1.4.3",
     "@heroicons/react": "^1.0.6",
@@ -236,7 +236,7 @@
     "@babel/traverse": "7.18.5",
     "@babel/types": "7.18.4",
     "graphql": "15.8.0",
-    "@auth0/auth0-react": "1.2.0",
+    "@auth0/auth0-react": "2.1.1",
     "react": "0.0.0-experimental-49f741046-20230305",
     "react-dom": "0.0.0-experimental-49f741046-20230305",
     "react-is": "18.2.0",
