@@ -30,7 +30,7 @@
     "gql": "yarn gql:schema && yarn gql:gen"
   },
   "dependencies": {
-    "@apollo/client": "^3.5.10",
+    "@apollo/client": "^3.7.16",
     "@auth0/auth0-react": "1.2.0",
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "@headlessui/react": "^1.4.3",
