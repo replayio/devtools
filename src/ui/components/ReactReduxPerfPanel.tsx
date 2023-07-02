@@ -147,7 +147,7 @@ function doSomeAnalysis(range: TimeStampedPointRange | null): UIThunkAction {
       return;
     }
     const {
-      onCommitFiberRoot,
+      onCommitRoot,
       scheduleUpdateOnFiber,
       renderRootSync,
       renderWithHooks,
@@ -212,7 +212,7 @@ function doSomeAnalysis(range: TimeStampedPointRange | null): UIThunkAction {
         nextRenderStart = renderRootSync.hits.find(n =>
           isExecutionPointsGreaterThan(n.point, afterNotifications.point)
         );
-        nextRenderCommit = onCommitFiberRoot.hits.find(n =>
+        nextRenderCommit = onCommitRoot.hits.find(n =>
           isExecutionPointsGreaterThan(n.point, afterNotifications.point)
         );
 

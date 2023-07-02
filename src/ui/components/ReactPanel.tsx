@@ -119,7 +119,7 @@ const reactInternalFunctionsToFind = {
   // A build-extracted React error code
   renderRootSync: "(261)",
   // A call to the React DevTools global hook object
-  onCommitFiberRoot: ".onCommitFiberRoot(",
+  onCommitRoot: ".onCommitFiberRoot(",
   // The initial assignments inside the function
   renderWithHooks: ".updateQueue = null",
   // The only place in the codebase that calls `instance.render()`
@@ -167,9 +167,10 @@ export const reactInternalMethodsHitsCache: Cache<
 
     if (reactDomSource.url!.includes(".development")) {
       for (const functionName of Object.keys(reactInternalFunctionsToFind)) {
+        const matchingFunction = symbols.functions.find(f => f.name?.startsWith(functionName))!;
         reactInternalFunctionDetails[
           functionName as keyof typeof reactInternalFunctionsToFind
-        ].functionOutline = symbols.functions.find(f => f.name === functionName)!;
+        ].functionOutline = matchingFunction;
       }
       // const shouldUpdateFiberSymbol = symbols?.functions.find(
       //   f => f.name === "scheduleUpdateOnFiber"
@@ -180,7 +181,10 @@ export const reactInternalMethodsHitsCache: Cache<
       // scheduleUpdateFiberDeclaration = shouldUpdateFiberSymbol;
       // renderRootSyncDeclaration = renderRootSyncSymbol;
       // onCommitFiberRootDeclaration = onCommitRootSymbol;
-    } else if (reactDomSource.url!.includes(".production")) {
+    } else if (
+      reactDomSource.url!.includes(".production") ||
+      reactDomSource.url!.includes(".profiling")
+    ) {
       // HACK We'll do this the hard way! This _should_ work back to React 16.14
       // By careful inspection, we know that every minified version of `scheduleUpdateOnFiber`
       // has a React extracted error code call of `someErrorFn(185)`. We also know that every
@@ -207,6 +211,7 @@ export const reactInternalMethodsHitsCache: Cache<
 
       // Brute-force search over all lines in the file to find the functions that we
       // actually care about, based on the magic strings that will exist.
+      console.log("reactDomSourceLines: ", reactDomSourceLines);
       for (let [lineZeroIndex, line] of reactDomSourceLines.entries()) {
         // if (line.includes("updateQueue = null")) {
         //   console.log("updateQueue=null check: ", lineZeroIndex, line);
@@ -305,6 +310,7 @@ export const reactInternalMethodsHitsCache: Cache<
 
     */
 
+    console.log("React internal function details: ", reactInternalFunctionDetails, reactDomSource);
     await Promise.all(
       Object.entries(reactInternalFunctionDetails).map(async ([key, details]) => {
         const hitPoints = await hitPointsCache.readAsync(
@@ -350,7 +356,7 @@ const queuedRendersStreamingCache: StreamingCache<
         return;
       }
       const {
-        onCommitFiberRoot,
+        onCommitRoot,
         scheduleUpdateOnFiber,
         renderRootSync,
         renderWithHooks,
