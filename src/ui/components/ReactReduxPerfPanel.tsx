@@ -327,70 +327,72 @@ function doSomeAnalysis(range: TimeStampedPointRange | null): UIThunkAction {
     }
     console.log("Formatted function components: ", uniqueComponentFunctions);
 
-    const actualClassComponentParamName = await getValidFunctionParameterName(
-      replayClient,
-      classComponentsRendered[0],
-      1,
-      sourcesById
-    );
+    if (classComponentsRendered.length > 0) {
+      const actualClassComponentParamName = await getValidFunctionParameterName(
+        replayClient,
+        classComponentsRendered[0],
+        1,
+        sourcesById
+      );
 
-    const classComponentResults: RunEvaluationResult[] = [];
+      const classComponentResults: RunEvaluationResult[] = [];
 
-    console.log("Running class components evaluation...");
+      console.log("Running class components evaluation...");
 
-    const chunkedClassPoints = chunk(classComponentsRendered, 190);
-    await Promise.all(
-      chunkedClassPoints.map(async points => {
-        await replayClient.runEvaluation(
-          {
-            selector: {
-              kind: "points",
-              points: points.map(annotation => annotation.point),
+      const chunkedClassPoints = chunk(classComponentsRendered, 190);
+      await Promise.all(
+        chunkedClassPoints.map(async points => {
+          await replayClient.runEvaluation(
+            {
+              selector: {
+                kind: "points",
+                points: points.map(annotation => annotation.point),
+              },
+              expression: `${actualClassComponentParamName}.stateNode._reactInternals.type`,
+              // Run in top frame.
+              frameIndex: 0,
+              shareProcesses: true,
+              fullPropertyPreview: true,
             },
-            expression: `${actualClassComponentParamName}.stateNode._reactInternals.type`,
-            // Run in top frame.
-            frameIndex: 0,
-            shareProcesses: true,
-            fullPropertyPreview: true,
-          },
-          result => {
-            classComponentResults.push(...result);
-          }
-        );
-      })
-    );
+            result => {
+              classComponentResults.push(...result);
+            }
+          );
+        })
+      );
 
-    classComponentResults.sort((a, b) => compareExecutionPoints(a.point.point, b.point.point));
+      classComponentResults.sort((a, b) => compareExecutionPoints(a.point.point, b.point.point));
 
-    console.log("Total results: ", classComponentResults.length);
+      console.log("Total results: ", classComponentResults.length);
 
-    console.log("Formatting classes...");
+      console.log("Formatting classes...");
 
-    const formattedClasses = await Promise.all(
-      classComponentResults.map(async result => {
-        const functionWithPreview = result.data.objects!.find(
-          o => o.objectId === result.returned!.object!
-        ) as FunctionWithPreview;
-        const formattedFunction = (await formatClassComponent(
-          replayClient,
-          "someType",
-          functionWithPreview.preview,
-          sourcesState
-        ))!;
-        return { formattedFunction, functionWithPreview };
-      })
-    );
-    console.log("Finished formatting classes");
+      const formattedClasses = await Promise.all(
+        classComponentResults.map(async result => {
+          const functionWithPreview = result.data.objects!.find(
+            o => o.objectId === result.returned!.object!
+          ) as FunctionWithPreview;
+          const formattedFunction = (await formatClassComponent(
+            replayClient,
+            "someType",
+            functionWithPreview.preview,
+            sourcesState
+          ))!;
+          return { formattedFunction, functionWithPreview };
+        })
+      );
+      console.log("Finished formatting classes");
 
-    const uniqueComponentClasses: Record<string, EventListenerWithFunctionInfo> = {};
+      const uniqueComponentClasses: Record<string, EventListenerWithFunctionInfo> = {};
 
-    for (const entry of formattedClasses) {
-      const fnString = formattedFunctionToString(entry.formattedFunction);
-      if (!uniqueComponentClasses[fnString]) {
-        uniqueComponentClasses[fnString] = entry.formattedFunction;
+      for (const entry of formattedClasses) {
+        const fnString = formattedFunctionToString(entry.formattedFunction);
+        if (!uniqueComponentClasses[fnString]) {
+          uniqueComponentClasses[fnString] = entry.formattedFunction;
+        }
       }
+      console.log("Formatted classes: ", uniqueComponentClasses);
     }
-    console.log("Formatted classes: ", uniqueComponentClasses);
   };
 }
 
