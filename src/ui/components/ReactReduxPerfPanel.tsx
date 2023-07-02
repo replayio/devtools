@@ -609,23 +609,34 @@ async function processReduxDispatches(
     return actionObject?.preview?.properties;
   });
 
+  const maxItems = Math.min(
+    reduxDispatchHits.length,
+    beforeReducerHits.length,
+    reducerDoneHits.length,
+    dispatchDoneHits.length,
+    actionObjects.length
+  );
+
   const dispatchDetails = zip(
-    reduxDispatchHits,
-    beforeReducerHits,
-    reducerDoneHits,
-    dispatchDoneHits,
-    actionObjects
+    reduxDispatchHits.slice(0, maxItems),
+    beforeReducerHits.slice(0, maxItems),
+    reducerDoneHits.slice(0, maxItems),
+    dispatchDoneHits.slice(0, maxItems),
+    actionObjects.slice(0, maxItems)
   ).map(
     ([dispatchStart, beforeReducer, afterReducer, afterNotifications, actionObjectProperties]) => {
       const actionType: string = actionObjectProperties!.find(p => p.name === "type")?.value;
+      const beforeReducerTime = beforeReducer?.time ?? 0;
+      const afterReducerTime: number = afterReducer?.time ?? 0;
+      const afterNotificationsTime = afterNotifications?.time ?? 0;
       return {
         actionType: actionType!,
         dispatchStart: dispatchStart!,
         beforeReducer: beforeReducer!,
         afterReducer: afterReducer!,
         afterNotifications: afterNotifications!,
-        reducerDuration: afterReducer!.time - beforeReducer!.time,
-        notificationDuration: afterNotifications!.time - afterReducer!.time,
+        reducerDuration: afterReducerTime - beforeReducerTime,
+        notificationDuration: afterNotificationsTime - afterReducerTime,
       };
     }
   );
