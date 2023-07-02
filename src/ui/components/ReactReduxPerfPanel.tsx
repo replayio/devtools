@@ -120,13 +120,15 @@ function doSomeAnalysis(range: TimeStampedPointRange | null): UIThunkAction {
 
     const endpoint = await sessionEndPointCache.readAsync(replayClient);
 
-    const finalRange: TimeStampedPointRange = range ?? {
+    const fullRange = {
       begin: {
         time: 0,
         point: "0",
       },
       end: endpoint,
     };
+
+    const finalRange: TimeStampedPointRange = range ?? fullRange;
 
     const sourcesById = await sourcesByIdCache.readAsync(replayClient);
     const reactReduxSources = Array.from(sourcesById.values()).filter(source =>
