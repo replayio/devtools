@@ -195,11 +195,6 @@ export const config = {
     label: "Enable React Panel",
     legacyKey: "devtools.features.reactPanel",
   },
-  // TODO [FE-1646] Should we remove this? Is it still being used?
-  feature_resolveRecording: {
-    defaultValue: Boolean(false),
-    legacyKey: "devtools.features.resolveRecording",
-  },
 
   global_disableLogRocket: {
     defaultValue: Boolean(false),
