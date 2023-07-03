@@ -2,6 +2,7 @@ import { ApolloError, gql, useMutation, useQuery } from "@apollo/client";
 import { RecordingId } from "@replayio/protocol";
 import { useMemo } from "react";
 
+import { query } from "shared/graphql/apolloClient";
 import { GetComments, GetCommentsVariables } from "shared/graphql/generated/GetComments";
 import {
   GetCommentsTime,
@@ -17,7 +18,6 @@ import {
 } from "shared/graphql/generated/UpdateCommentReplyContent";
 import { GET_COMMENTS, GET_COMMENTS_TIME } from "ui/graphql/comments";
 import { Comment, CommentPosition } from "ui/state/comments";
-import { query } from "ui/utils/apolloClient";
 
 export function useGetComments(recordingId: RecordingId): {
   comments: Comment[];

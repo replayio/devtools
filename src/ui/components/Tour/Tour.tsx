@@ -1,13 +1,12 @@
 import React, { useEffect } from "react";
 
+import { userData } from "shared/user-data/GraphQL/UserData";
 import { setSelectedPrimaryPanel } from "ui/actions/layout";
 import { shouldShowDevToolsNag } from "ui/components/Header/ViewToggle";
 import { isTestSuiteReplay } from "ui/components/TestSuite/utils/isTestSuiteReplay";
 import hooks from "ui/hooks";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
-import { useFeature } from "ui/hooks/settings";
-import { Nag } from "ui/hooks/users";
-import { useDismissNag } from "ui/hooks/users";
+import { Nag, useDismissNag } from "ui/hooks/users";
 import { getViewMode } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import {
@@ -40,12 +39,10 @@ interface HelloAgainProps {
 }
 
 interface CompletedTourProps {
-  setShowPassport: (newValue: boolean) => void;
   dismissTourNag: () => void;
 }
 
 const Tour: React.FC = () => {
-  const { update: setShowPassport } = useFeature("showPassport");
   const { nags } = hooks.useGetUserInfo();
   const viewMode = useAppSelector(getViewMode);
   const showDevtoolsNag = shouldShowDevToolsNag(nags, viewMode);
@@ -143,10 +140,10 @@ const Tour: React.FC = () => {
     <img src="https://vercel.replay.io/tour/editlogs.gif" className={styles.videoExample} />
   );
 
-  const CompletedTour: React.FC<CompletedTourProps> = ({ setShowPassport, dismissTourNag }) => {
+  const CompletedTour: React.FC<CompletedTourProps> = ({ dismissTourNag }) => {
     useEffect(() => {
-      setShowPassport(true);
-    }, [setShowPassport]);
+      userData.set("feature_showPassport", true);
+    }, []);
 
     return (
       <div className={styles.intro}>
@@ -212,12 +209,7 @@ const Tour: React.FC = () => {
                           editLogs}
                       </>
                     )}
-                    {hasCompletedTour && (
-                      <CompletedTour
-                        setShowPassport={setShowPassport}
-                        dismissTourNag={dismissTourNag}
-                      />
-                    )}
+                    {hasCompletedTour && <CompletedTour dismissTourNag={dismissTourNag} />}
                   </>
                 )}
               </>

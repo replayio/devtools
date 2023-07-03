@@ -3,29 +3,27 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import { FrameId, PauseId } from "@replayio/protocol";
-import React, { Suspense, useContext, useDeferredValue, useEffect, useState } from "react";
+import { Suspense, useContext, useDeferredValue, useEffect, useState } from "react";
 
 import actions from "devtools/client/debugger/src/actions/index";
 import CommandBarButton from "devtools/client/debugger/src/components/shared/Button/CommandBarButton";
 import { getSelectedFrameId, getThreadContext } from "devtools/client/debugger/src/reducers/pause";
 import { formatKeyShortcut } from "devtools/client/debugger/src/utils/text";
 import KeyShortcuts from "devtools/client/shared/key-shortcuts";
-import Services from "devtools/shared/services";
 import { framesCache } from "replay-next/src/suspense/FrameCache";
 import { frameStepsCache } from "replay-next/src/suspense/FrameStepsCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { getOS, isMacOS } from "shared/utils/os";
 import Loader from "ui/components/shared/Loader";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
 
-const { appinfo } = Services;
-
-const isMacOS = appinfo.OS === "Darwin";
+const isOSX = isMacOS();
 
 // NOTE: the "resume" command will call either the resume
 // depending on whether or not the debugger is paused or running
 const COMMANDS = ["resume", "reverseStepOver", "stepOver", "stepIn", "stepOut"] as const;
-type PossibleCommands = typeof COMMANDS[number];
+type PossibleCommands = (typeof COMMANDS)[number];
 
 const KEYS = {
   WINNT: {
@@ -53,7 +51,7 @@ const KEYS = {
 
 function getKey(action: string) {
   // @ts-expect-error could be 'Unknown', whatever
-  return getKeyForOS(appinfo.OS, action);
+  return getKeyForOS(getOS(), action);
 }
 
 function getKeyForOS(os: keyof typeof KEYS, action: string): string {
@@ -64,7 +62,7 @@ function getKeyForOS(os: keyof typeof KEYS, action: string): string {
 
 function formatKey(action: string) {
   const key = getKey(`${action}Display`) || getKey(action);
-  if (isMacOS) {
+  if (isOSX) {
     const winKey = getKeyForOS("WINNT", `${action}Display`) || getKeyForOS("WINNT", action);
     // display both Windows type and Mac specific keys
     return formatKeyShortcut([key, winKey].join(" "));
@@ -139,7 +137,7 @@ function CommandBarSuspends() {
       shortcuts.on(getKey(action), (e: KeyboardEvent) => handleEvent(e, action))
     );
 
-    if (isMacOS) {
+    if (isOSX) {
       // The Mac supports both the Windows Function keys
       // as well as the Mac non-Function keys
       COMMANDS.forEach(action =>
@@ -149,7 +147,7 @@ function CommandBarSuspends() {
 
     return () => {
       COMMANDS.forEach(action => shortcuts!.off(getKey(action)));
-      if (isMacOS) {
+      if (isOSX) {
         COMMANDS.forEach(action => shortcuts!.off(getKeyForOS("WINNT", action)));
       }
     };

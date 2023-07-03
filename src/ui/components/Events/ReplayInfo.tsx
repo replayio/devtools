@@ -2,12 +2,12 @@ import React, { ReactNode } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
 import { OperationsData } from "shared/graphql/types";
+import { getDisplayedUrl } from "shared/utils/environment";
 import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
 import { getRecordingTarget } from "ui/reducers/app";
 import { useAppSelector } from "ui/setup/hooks";
 import { formatRelativeTime } from "ui/utils/comments";
-import { getDisplayedUrl } from "ui/utils/environment";
 import { getRecordingId, showDurationWarning } from "ui/utils/recording";
 import useAuth0 from "ui/utils/useAuth0";
 

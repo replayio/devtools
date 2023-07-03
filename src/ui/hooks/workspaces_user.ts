@@ -185,7 +185,10 @@ export function useAcceptPendingInvitation(onCompleted: () => void) {
       }
     `,
     {
-      refetchQueries: ["GetNonPendingWorkspaces", "GetPendingWorkspaces"],
+      // We refetch non-pending workspaces here so that the user's newly-accepted workspace is
+      // available to be redirected to immediately. Fetching pending workspaces introduces
+      // a race condition, so we let the polling update that sometime later instead.
+      refetchQueries: ["GetNonPendingWorkspaces"],
       onCompleted,
     }
   );

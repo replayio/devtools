@@ -1,21 +1,8 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-
 "use strict";
 
 const MAX_DATA_URL_LENGTH = 40;
-/**
- * Provide access to the style information in a page.
- * CssLogic uses the standard DOM API, and the Gecko InspectorUtils API to
- * access styling information in the page, and present this to the user in a way
- * that helps them understand:
- * - why their expectations may not have been fulfilled
- * - how browsers process CSS
- * @constructor
- */
 
-import Services from "devtools/shared/services";
+import { isWindowsOS } from "shared/utils/os";
 
 /**
  * Special values for filter, in addition to an href these values can be used
@@ -192,8 +179,7 @@ function getLineCountInComments(text) {
 // eslint-disable-next-line complexity
 export function prettifyCSS(text, ruleCount) {
   if (prettifyCSS.LINE_SEPARATOR == null) {
-    const os = Services.appinfo.OS;
-    prettifyCSS.LINE_SEPARATOR = os === "WINNT" ? "\r\n" : "\n";
+    prettifyCSS.LINE_SEPARATOR = isWindowsOS() ? "\r\n" : "\n";
   }
 
   // Stylesheets may start and end with HTML comment tags (possibly with whitespaces

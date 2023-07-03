@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { getParams, updateUrlWithParams } from "ui/utils/environment";
+import { getParams, updateUrlWithParams } from "shared/utils/environment";
 
 import { View } from "./ViewContextRoot";
 

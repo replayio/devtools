@@ -28,11 +28,11 @@ import {
 import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
+import { useTheme } from "shared/theme/useTheme";
 import Icon from "ui/components/shared/Icon";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import { useGetUserInfo } from "ui/hooks/users";
-import { getTheme } from "ui/reducers/app";
 import {
   ProtocolErrorMap,
   ProtocolRequestMap,
@@ -103,7 +103,7 @@ const flattenRequests = (requestMap: { [key: number]: RequestSummary }): Request
 };
 
 function JSONViewer({ src }: { src: object }) {
-  const theme = useAppSelector(getTheme);
+  const theme = useTheme();
 
   return (
     <ReactJson

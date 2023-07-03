@@ -1,16 +1,13 @@
 import classnames from "classnames";
-import React from "react";
 
+import { ViewMode } from "shared/user-data/GraphQL/config";
+import { isTest } from "shared/utils/environment";
 import { setViewMode } from "ui/actions/layout";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
 import { getViewMode } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { ViewMode } from "ui/state/layout";
-import { isTest } from "ui/utils/environment";
 import { shouldShowNag } from "ui/utils/tour";
-
-import MaterialIcon from "../shared/MaterialIcon";
 
 const MODES = [
   {

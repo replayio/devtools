@@ -1,8 +1,8 @@
 import { RecordingId } from "@replayio/protocol";
 
-import useIndexedDB from "replay-next/src/hooks/useIndexedDB";
+import { POINTS_DATABASE } from "shared/user-data/IndexedDB/config";
+import useIndexedDBUserData from "shared/user-data/IndexedDB/useIndexedDBUserData";
 
-import { POINTS_DATABASE } from "../constants";
 import { PointBehaviorsObject } from "../types";
 
 export type SetLocalPointBehaviors = (
@@ -16,7 +16,7 @@ export default function useLocalPointBehaviors({
 }: {
   recordingId: RecordingId;
 }): [localPointBehaviors: PointBehaviorsObject, setLocalPointBehaviors: SetLocalPointBehaviors] {
-  const { setValue, value } = useIndexedDB<PointBehaviorsObject>({
+  const { setValue, value } = useIndexedDBUserData<PointBehaviorsObject>({
     database: POINTS_DATABASE,
     initialValue: {},
     recordName: recordingId,

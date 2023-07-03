@@ -1,4 +1,3 @@
-import "devtools/client/inspector/prefs";
 // Side-effectful import, has to be imported before event-listeners
 // Ordering matters here
 import { ActionCreatorWithoutPayload, bindActionCreators } from "@reduxjs/toolkit";
@@ -9,7 +8,6 @@ import debounce from "lodash/debounce";
 import { setupSourcesListeners } from "devtools/client/debugger/src/actions/sources";
 import * as dbgClient from "devtools/client/debugger/src/client";
 import debuggerReducers from "devtools/client/debugger/src/reducers";
-import { setupDebuggerHelper } from "devtools/client/debugger/src/utils/dbg";
 import { setupBoxModel } from "devtools/client/inspector/boxmodel/actions/box-model";
 import { setupMarkup } from "devtools/client/inspector/markup/actions/markup";
 import * as inspectorReducers from "devtools/client/inspector/reducers";
@@ -29,13 +27,12 @@ import {
 import { addEventListener, initSocket, client as protocolClient } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
 import { assert } from "protocol/utils";
-import { CONSOLE_SETTINGS_DATABASE } from "replay-next/src/contexts/ConsoleFiltersContext";
-import { POINTS_DATABASE } from "replay-next/src/contexts/points/constants";
-import { IDBOptions } from "replay-next/src/hooks/useIndexedDB";
 import { setPointsReceivedCallback as setAnalysisPointsReceivedCallback } from "replay-next/src/suspense/AnalysisCache";
 import { networkRequestsCache } from "replay-next/src/suspense/NetworkRequestsCache";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientInterface } from "shared/client/types";
+import { CONSOLE_SETTINGS_DATABASE, POINTS_DATABASE } from "shared/user-data/IndexedDB/config";
+import { IDBOptions } from "shared/user-data/IndexedDB/types";
 import { UIStore, actions } from "ui/actions";
 import { setCanvas } from "ui/actions/app";
 import { precacheScreenshots } from "ui/actions/timeline";
@@ -155,8 +152,6 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
   // @ts-expect-error complains about thunk type mismatches
   window.app.actions = bindActionCreators(actions, store.dispatch);
   window.app.selectors = bindSelectors(store, justSelectors);
-  window.app.debugger = setupDebuggerHelper();
-  window.app.prefs = window.app.prefs ?? {};
 
   const initialState = {};
 

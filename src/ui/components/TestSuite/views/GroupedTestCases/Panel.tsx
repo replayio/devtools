@@ -72,7 +72,7 @@ export default function Panel() {
             className={styles.Attribute}
             icon="schedule"
             label={getTruncatedRelativeDate(recording.date)}
-            title={`${date.toLocaleDateString()} ${date.toLocaleTimeString()}`}
+            title={date.toLocaleString()}
             dataTestName="TestSuiteDate"
           />
           <Source />

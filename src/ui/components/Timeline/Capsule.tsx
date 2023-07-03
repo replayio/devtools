@@ -2,10 +2,10 @@ import classNames from "classnames";
 import React, { useEffect, useRef, useState } from "react";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 
+import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import ExternalLink from "ui/components/shared/ExternalLink";
 import { useIndexingProgress } from "ui/components/Timeline/useIndexingProgress";
 import { useLoadingIsSlow } from "ui/components/Timeline/useLoadingIsSlow";
-import { useFeature } from "ui/hooks/settings";
 import useModalDismissSignal from "ui/hooks/useModalDismissSignal";
 import { getBasicProcessingProgress, getShowFocusModeControls } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
@@ -24,7 +24,7 @@ export default function Capsule({
 }) {
   const indexingProgress = useIndexingProgress();
   const basicProcessingProgress = Math.round(useAppSelector(getBasicProcessingProgress) * 100);
-  const { value: basicProcessingLoadingBar } = useFeature("basicProcessingLoadingBar");
+  const [basicProcessingLoadingBar] = useGraphQLUserData("feature_basicProcessingLoadingBar");
 
   let progress = indexingProgress;
   if (basicProcessingLoadingBar) {

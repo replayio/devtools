@@ -8,10 +8,11 @@ import { SHOW_GLOBAL_SEARCH_EVENT_TYPE } from "replay-next/components/search-fil
 import { createTypeDataForVisualComment } from "replay-next/components/sources/utils/comments";
 import { useNag } from "replay-next/src/hooks/useNag";
 import { Nag } from "shared/graphql/types";
-import { UIThunkAction } from "ui/actions";
-import { actions } from "ui/actions";
+import { getSystemColorScheme } from "shared/theme/getSystemColorScheme";
+import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
+import { userData } from "shared/user-data/GraphQL/UserData";
+import { UIThunkAction, actions } from "ui/actions";
 import { useGetRecordingId } from "ui/hooks/recordings";
-import { useFeature } from "ui/hooks/settings";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
 import { addGlobalShortcut, isEditableElement, removeGlobalShortcut } from "ui/utils/key-shortcuts";
@@ -51,7 +52,6 @@ function KeyboardShortcuts({
   toggleCommandPalette,
   toggleFocusMode,
   viewMode,
-  toggleThemeAction,
   toggleQuickOpen,
   closeOpenModalsOnEscape,
   jumpToPreviousPause,
@@ -61,8 +61,7 @@ function KeyboardShortcuts({
   const { isAuthenticated } = useAuth0();
   const [, dismissFindFileNag] = useNag(Nag.FIND_FILE);
 
-  const { value: protocolTimeline, update: updateProtocolTimeline } =
-    useFeature("protocolTimeline");
+  const [protocolTimeline] = useGraphQLUserData("feature_protocolTimeline");
   const globalKeyboardShortcuts = useMemo(() => {
     const openFullTextSearch = (e: KeyboardEvent) => {
       e.preventDefault();
@@ -132,14 +131,19 @@ function KeyboardShortcuts({
     const toggleTheme = (e: KeyboardEvent) => {
       if (!e.target || !isEditableElement(e.target)) {
         e.preventDefault();
-        toggleThemeAction();
+
+        let theme = userData.get("global_theme");
+        if (theme === "system") {
+          theme = getSystemColorScheme();
+        }
+        userData.set("global_theme", theme === "dark" ? "light" : "dark");
       }
     };
 
     const toggleProtocolTimeline = (e: KeyboardEvent) => {
       if (!e.target || !isEditableElement(e.target)) {
         e.preventDefault();
-        updateProtocolTimeline(!protocolTimeline);
+        userData.set("feature_protocolTimeline", !protocolTimeline);
       }
     };
 
@@ -189,9 +193,7 @@ function KeyboardShortcuts({
     setViewMode,
     toggleCommandPalette,
     toggleFocusMode,
-    updateProtocolTimeline,
     viewMode,
-    toggleThemeAction,
     toggleQuickOpen,
     closeOpenModalsOnEscape,
     createFrameComment,
@@ -228,7 +230,6 @@ const connector = connect(
     setViewMode: actions.setViewMode,
     toggleCommandPalette: actions.toggleCommandPalette,
     toggleFocusMode: actions.toggleFocusMode,
-    toggleThemeAction: actions.toggleTheme,
     toggleQuickOpen,
     closeOpenModalsOnEscape,
     jumpToPreviousPause: actions.jumpToPreviousPause,

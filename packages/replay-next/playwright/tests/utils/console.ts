@@ -207,8 +207,6 @@ export async function toggleSideMenu(page: Page, open: boolean) {
 }
 
 export async function toggleProtocolMessages(page: Page, on: boolean) {
-  await toggleSideMenu(page, true);
-
   await toggleProtocolMessage(page, "errors", on);
   await toggleProtocolMessage(page, "exceptions", on);
   await toggleProtocolMessage(page, "logs", on);
@@ -216,6 +214,8 @@ export async function toggleProtocolMessages(page: Page, on: boolean) {
 }
 
 export async function toggleProtocolMessage(page: Page, name: ToggleName, on: boolean) {
+  await toggleSideMenu(page, true);
+
   await page.waitForSelector(`[data-test-id="FilterToggle-${name}"] input`);
 
   const isEnabled = await page.evaluate(

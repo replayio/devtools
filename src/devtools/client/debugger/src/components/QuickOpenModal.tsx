@@ -5,12 +5,14 @@
 import { Dictionary } from "@reduxjs/toolkit";
 import fuzzyAldrin from "fuzzaldrin-plus";
 import debounce from "lodash/debounce";
+import memoizeOne from "memoize-one";
 import React, { Component } from "react";
 import { useImperativeCacheValue } from "suspense";
 
 import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
 import { streamingSourceContentsCache } from "replay-next/src/suspense/SourcesCache";
 import { replayClient } from "shared/client/ReplayClientContext";
+import { ViewMode } from "shared/user-data/GraphQL/config";
 import { setViewMode as setViewModeAction } from "ui/actions/layout";
 import { getViewMode } from "ui/reducers/layout";
 import {
@@ -21,7 +23,6 @@ import {
   getSourcesToDisplayByUrl,
 } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { ViewMode } from "ui/state/layout";
 import { trackEvent } from "ui/utils/telemetry";
 
 import actions from "../actions";
@@ -41,7 +42,6 @@ import {
   getSourcesForTabs,
   getTabs,
 } from "../selectors";
-import { memoizeLast } from "../utils/memoizeLast";
 import { basename } from "../utils/path";
 import {
   SearchResult,
@@ -130,7 +130,7 @@ class QuickOpenModal extends Component<QuickOpenModalProps, QOMState> {
     return index !== -1 ? query.slice(0, index) : query;
   };
 
-  formatSources = memoizeLast(
+  formatSources = memoizeOne(
     (
       sourcesToDisplayByUrl: Dictionary<SourceDetails>,
       tabs: { url: string }[],

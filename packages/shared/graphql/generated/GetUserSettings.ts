@@ -25,7 +25,6 @@ export interface GetUserSettings_viewer_defaultWorkspace {
 export interface GetUserSettings_viewer {
   __typename: "AuthenticatedUser";
   apiKeys: GetUserSettings_viewer_apiKeys[];
-  preferences: any;
   defaultWorkspace: GetUserSettings_viewer_defaultWorkspace | null;
 }
 

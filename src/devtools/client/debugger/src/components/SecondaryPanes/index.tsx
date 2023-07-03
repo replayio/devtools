@@ -1,16 +1,8 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
-
-//
-
-import React from "react";
-
+import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { getCurrentPoint } from "ui/actions/app";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
 
-import { useDebuggerPrefs } from "../../utils/prefs";
 import BreakpointsPane from "./BreakpointsPane";
 import CommandBar from "./CommandBar";
 import NewFrames from "./Frames/NewFrames";
@@ -24,14 +16,16 @@ export default function SecondaryPanes() {
   const currentPoint = useAppSelector(getCurrentPoint);
   const currentTime = useAppSelector(getCurrentTime);
 
-  const { value: scopesExpanded, update: updateScopesExpanded } =
-    useDebuggerPrefs("scopes-visible");
-  const { value: callstackVisible, update: updateCallstackVisible } =
-    useDebuggerPrefs("call-stack-visible");
-  const { value: breakpointsVisible, update: updateBreakpointsVisible } =
-    useDebuggerPrefs("breakpoints-visible");
-  const { value: logpointsVisible, update: updateLogpointsVisible } =
-    useDebuggerPrefs("logpoints-visible");
+  const [scopesVisible, setScopesVisible] = useGraphQLUserData("layout_scopesPanelExpanded");
+  const [callStackVisible, setCallStackVisible] = useGraphQLUserData(
+    "layout_callStackPanelExpanded"
+  );
+  const [breakpointsVisible, setBreakpointsVisible] = useGraphQLUserData(
+    "layout_breakpointsPanelExpanded"
+  );
+  const [logpointsVisible, setLogpointsVisible] = useGraphQLUserData(
+    "layout_logpointsPanelExpanded"
+  );
 
   return (
     <div className="secondary-panes-wrapper">
@@ -42,7 +36,7 @@ export default function SecondaryPanes() {
           header="Breakpoints"
           className="breakpoints-pane"
           expanded={breakpointsVisible}
-          onToggle={() => updateBreakpointsVisible(!breakpointsVisible)}
+          onToggle={() => setBreakpointsVisible(!breakpointsVisible)}
         >
           <BreakpointsPane />
         </AccordionPane>
@@ -50,23 +44,23 @@ export default function SecondaryPanes() {
           header="Print Statements"
           className="breakpoints-pane"
           expanded={logpointsVisible}
-          onToggle={() => updateLogpointsVisible(!logpointsVisible)}
+          onToggle={() => setLogpointsVisible(!logpointsVisible)}
         >
           <LogpointsPane />
         </AccordionPane>
         <AccordionPane
           header="Call Stack"
           className="call-stack-pane"
-          expanded={callstackVisible}
-          onToggle={() => updateCallstackVisible(!callstackVisible)}
+          expanded={callStackVisible}
+          onToggle={() => setCallStackVisible(!callStackVisible)}
         >
           {currentPoint && <NewFrames point={currentPoint} time={currentTime} panel="debugger" />}
         </AccordionPane>
         <AccordionPane
           header="Scopes"
           className="scopes-pane"
-          expanded={scopesExpanded}
-          onToggle={() => updateScopesExpanded(!scopesExpanded)}
+          expanded={scopesVisible}
+          onToggle={() => setScopesVisible(!scopesVisible)}
         >
           <NewScopes />
         </AccordionPane>

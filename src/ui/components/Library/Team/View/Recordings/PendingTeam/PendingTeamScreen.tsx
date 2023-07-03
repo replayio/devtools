@@ -1,7 +1,7 @@
 import React from "react";
 
 import { PendingWorkspaceInvitation } from "shared/graphql/types";
-import { getDisplayedUrl } from "ui/utils/environment";
+import { getDisplayedUrl } from "shared/utils/environment";
 
 import { getDurationString, getRelativeDate } from "../RecordingListItem/RecordingListItem";
 import PendingTeamPrompt from "./PendingTeamPrompt";

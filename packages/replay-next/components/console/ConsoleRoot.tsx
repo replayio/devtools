@@ -18,7 +18,7 @@ import { ImperativeHandle } from "replay-next/components/lexical/CodeEditor";
 import Loader from "replay-next/components/Loader";
 import { ConsoleFiltersContextRoot } from "replay-next/src/contexts/ConsoleFiltersContext";
 import { TerminalContext } from "replay-next/src/contexts/TerminalContext";
-import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
+import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 
 import ConsoleActionsRow from "./ConsoleActionsRow";
 import ConsoleInput from "./ConsoleInput";
@@ -32,7 +32,7 @@ import styles from "./ConsoleRoot.module.css";
 
 export default function ConsoleRoot({
   nagHeader = null,
-  showFiltersByDefault = true,
+  showFiltersByDefault,
   showSearchInputByDefault = true,
 }: {
   filterDrawerOpenDefault?: boolean;
@@ -71,7 +71,7 @@ function Console({
   messageListRef,
   nagHeader = null,
   searchInputRef,
-  showFiltersByDefault = true,
+  showFiltersByDefault,
 }: {
   messageListRef: RefObject<HTMLElement>;
   filterDrawerOpenDefault?: boolean;
@@ -85,18 +85,15 @@ function Console({
   const { clearMessages: clearConsoleEvaluations, messages: consoleEvaluations } =
     useContext(TerminalContext);
 
-  const [isMenuOpen, setIsMenuOpen] = useLocalStorage<boolean>(
-    `Replay:Console:MenuOpen`,
-    showFiltersByDefault
-  );
+  const [isMenuOpen, setIsMenuOpen] = useGraphQLUserData("console_showFiltersByDefault");
   const [menuValueHasBeenToggled, setMenuValueHasBeenToggled] = useState(false);
 
-  // We default to having the console filters panel turned off, to minimize UI "busyness".
+  // We default to having the console filters panel turned off, to minimize UI "business".
   // _If_ it's off initially, we want to completely skip rendering it, which
   // avoids making the "fetch events" calls during app startup to speed up loading.
   // But, if it's ever been shown and toggled off, continue rendering it
   // inside the `<Offscreen>` to preserve state.
-  const renderFilters = isMenuOpen || menuValueHasBeenToggled;
+  const renderFilters = isMenuOpen || showFiltersByDefault || menuValueHasBeenToggled;
 
   const onKeyDown = (event: KeyboardEvent) => {
     switch (event.key.toLowerCase()) {

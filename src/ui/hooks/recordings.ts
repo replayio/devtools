@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import { useEffect, useMemo } from "react";
 
 import { assert } from "protocol/utils";
+import { query } from "shared/graphql/apolloClient";
 import {
   AcceptRecordingCollaboratorRequest,
   AcceptRecordingCollaboratorRequestVariables,
@@ -72,7 +73,6 @@ import { Recording, RecordingRole, User, Workspace } from "shared/graphql/types"
 import { CollaboratorDbData } from "ui/components/shared/SharingModal/CollaboratorsList";
 import { GET_RECORDING, GET_RECORDING_USER_ID, SUBSCRIBE_RECORDING } from "ui/graphql/recordings";
 import { WorkspaceId } from "ui/state/app";
-import { query } from "ui/utils/apolloClient";
 import { extractIdAndSlug } from "ui/utils/helpers";
 import { getRecordingId } from "ui/utils/recording";
 
@@ -481,6 +481,8 @@ export function useUpdateIsPrivate() {
     updateIsPrivate({ variables: { recordingId, isPrivate } });
 }
 
+const EMPTY_ARRAY = [] as any[];
+
 export function useIsOwner() {
   const recordingId = useGetRecordingId();
   const { userId } = useGetUserId();
@@ -522,20 +524,26 @@ export function useGetPersonalRecordings(
     }
   );
 
+  const recordings: Recording[] = useMemo(() => {
+    if (loading || error) {
+      return EMPTY_ARRAY;
+    }
+
+    if (data?.viewer) {
+      return data.viewer.recordings.edges.map(({ node }) => convertRecording(node)!);
+    }
+
+    return EMPTY_ARRAY;
+  }, [data, error, loading]);
+
   if (loading) {
     return { error: null, recordings: null, loading };
-  }
-
-  if (error) {
+  } else if (error) {
     console.error("Failed to fetch recordings:", error);
     return { error, recordings: null, loading };
+  } else {
+    return { error: null, recordings, loading };
   }
-
-  let recordings: Recording[] = [];
-  if (data?.viewer) {
-    recordings = data.viewer.recordings.edges.map(({ node }) => convertRecording(node)!);
-  }
-  return { error: null, recordings, loading };
 }
 
 export function useGetWorkspaceRecordings(

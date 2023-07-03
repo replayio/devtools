@@ -2,18 +2,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
+import { isMacOS } from "shared/utils/os";
 
 /**
  * Utils for keyboard command strings
  * @module utils/text
  */
-
-import Services from "devtools/shared/services";
-
-const { appinfo } = Services;
-
-const isMacOS = appinfo.OS === "Darwin";
 
 /**
  * Formats key for use in tooltips
@@ -29,7 +23,7 @@ const isMacOS = appinfo.OS === "Darwin";
  * @static
  */
 export function formatKeyShortcut(shortcut: string) {
-  if (isMacOS) {
+  if (isMacOS()) {
     return shortcut
       .replace(/Shift\+/g, "\u21E7")
       .replace(/Command\+|Cmd\+/g, "\u2318")

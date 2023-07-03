@@ -24,12 +24,12 @@ import useAuthTelemetry from "ui/hooks/useAuthTelemetry";
 import { getUnexpectedError } from "ui/reducers/app";
 import { bootstrapApp } from "ui/setup";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { configureMockEnvironmentForTesting, isMock } from "ui/utils/environment";
+import { configureMockEnvironmentForTesting, isMock } from "shared/utils/environment";
 import { useLaunchDarkly } from "ui/utils/launchdarkly";
-import { features } from "ui/utils/prefs";
 import { InstallRouteListener } from "ui/utils/routeListener";
 import tokenManager from "ui/utils/tokenManager";
 
+import { userData } from "shared/user-data/GraphQL/UserData";
 import "../src/base.css";
 
 if (isMock()) {
@@ -38,7 +38,10 @@ if (isMock()) {
 }
 
 // Expose app feature flags to the protocol through an app-agnostic API.
-setFeatures(features);
+setFeatures({
+  chromiumRepaints: userData.get("protocol_chromiumRepaints"),
+  repaintEvaluations: userData.get("protocol_repaintEvaluations")
+});
 
 interface AuthProps {
   apiKey?: string;

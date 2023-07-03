@@ -5,19 +5,19 @@ import { formatKeyShortcut } from "devtools/client/debugger/src/utils/text";
 import { actions } from "ui/actions";
 import { useAppDispatch } from "ui/setup/hooks";
 
-import { Command } from "./CommandPalette";
+import { Command, CommandKey } from "./CommandPalette";
 import styles from "./CommandPalette.module.css";
 
 type CommandButtonProps = {
-  command: Command;
   active: boolean;
+  command: Command;
 };
 
-const CommandButton = ({ command, active }: CommandButtonProps) => {
+const CommandButton = ({ active, command }: CommandButtonProps) => {
   const dispatch = useAppDispatch();
 
   const buttonNode = useRef<HTMLButtonElement | null>(null);
-  const { label, shortcut, key } = command;
+  const { key, label, shortcut } = command;
   const onClick = () => {
     dispatch(actions.executeCommand(key));
   };

@@ -1,4 +1,3 @@
-import assert from "assert";
 import {
   ExecutionPoint,
   RequestId,
@@ -10,11 +9,16 @@ import { satisfies } from "compare-versions";
 import { comparePoints } from "protocol/execution-point-utils";
 import { networkRequestsCache } from "replay-next/src/suspense/NetworkRequestsCache";
 import { findSliceIndices, insert } from "replay-next/src/utils/array";
+import { assertWithTelemetry } from "replay-next/src/utils/telemetry";
 import { ReplayClientInterface } from "shared/client/types";
 import { Annotation } from "shared/graphql/types";
 import { AnnotationsCache } from "ui/components/TestSuite/suspense/AnnotationsCache";
 
 export type SemVer = string;
+
+function assert(value: unknown, message: string, tags: Object = {}): asserts value {
+  return assertWithTelemetry(value, "process-test-metadata", message, tags);
+}
 
 // This type is only minimally supported by the frontend
 export namespace RecordingTestMetadataV1 {
@@ -415,9 +419,20 @@ export async function processCypressTestRecording(
             scope = null,
           } = partialTestEvent.data;
 
-          assert(category, `Test event must have "category" property`);
-          assert(command, `Test event must have "command" property`);
-          assert(id, `Test event must have "id" property`);
+          assert(category, `Test event must have "category" property`, {
+            command: command.name,
+            id,
+          });
+
+          assert(command, `Test event must have "command" property`, {
+            id,
+            category,
+          });
+
+          assert(id, `Test event must have "id" property`, {
+            command: command.name,
+            category,
+          });
 
           // The client does not show certain types of chained events in the list
           // they clutter without adding much value
@@ -431,7 +446,10 @@ export async function processCypressTestRecording(
 
           const annotations = userActionEventIdToAnnotations[id];
 
-          assert(annotations != null, `Missing annotations for test event (${command.name})`);
+          assert(annotations != null, `Missing annotations for test event`, {
+            command: command.name,
+            id,
+          });
 
           let beginPoint: TimeStampedPoint | null = null;
           let endPoint: TimeStampedPoint | null = null;
@@ -483,13 +501,16 @@ export async function processCypressTestRecording(
             }
           });
 
-          assert(beginPoint !== null, `Missing "step:start" annotation for test event ${id}`);
-          assert(
-            viewSourceTimeStampedPoint !== null,
-            `Missing ${
-              isChaiAssertion ? "step:start" : "step:enqueue"
-            } annotation for test event ${id}`
-          );
+          assert(beginPoint !== null, `Missing "step:start" annotation for test event`, {
+            id,
+            isChaiAssertion,
+          });
+
+          assert(viewSourceTimeStampedPoint !== null, `Missing annotation for test event`, {
+            annotationType: isChaiAssertion ? "step:start" : "step:enqueue",
+            id,
+            isChaiAssertion,
+          });
 
           testEvents.push({
             data: {
@@ -697,9 +718,18 @@ export async function processPlaywrightTestRecording(
           scope = null,
         } = partialTestEvent.data;
 
-        assert(category, `Test event must have "category" property`);
-        assert(command, `Test event must have "command" property`);
-        assert(id, `Test event must have "id" property`);
+        assert(category, `Test event must have "category" property`, {
+          command: command?.name,
+          id,
+        });
+        assert(command, `Test event must have "command" property`, {
+          category,
+          id,
+        });
+        assert(id, `Test event must have "id" property`, {
+          command: command?.name,
+          category,
+        });
 
         // The client does not show certain types of chained events in the list
         // they clutter without adding much value
@@ -772,7 +802,9 @@ async function processNetworkData(
   return ids.slice(beginIndex, endIndex).map(id => {
     const { events, timeStampedPoint } = records[id];
 
-    assert(events.openEvent != null, `Missing RequestOpenEvent for network request ${id}`);
+    assert(events.openEvent != null, `Missing RequestOpenEvent for network request`, {
+      id,
+    });
 
     return {
       data: {
@@ -911,4 +943,13 @@ export function compareTestEventExecutionPoints(
   } else {
     return comparePoints(executionPointA, executionPointB);
   }
+}
+
+export type TestEnvironment = RecordingTestMetadataV3.GroupedTestCases["environment"];
+
+export function getTestEnvironment(groupedTestCases: AnyGroupedTestCases): TestEnvironment | null {
+  if (isGroupedTestCasesV1(groupedTestCases)) {
+    return null;
+  }
+  return groupedTestCases.environment;
 }

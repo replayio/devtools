@@ -50,3 +50,10 @@
   outline: none;
   border-color: var(--color-brand);
 }
+
+.BackButton {
+  width: 24px;
+  height: 24px;
+  transform: rotate(180deg);
+  margin: 2px 2px 0 6px;
+}

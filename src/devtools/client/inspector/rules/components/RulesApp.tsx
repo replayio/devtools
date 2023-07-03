@@ -1,16 +1,14 @@
-import React, { FC, useCallback, useMemo, useState } from "react";
+import { FC, useCallback, useMemo, useState } from "react";
 
 import { Rule } from "devtools/client/inspector/rules/components/Rule";
 import { Rules } from "devtools/client/inspector/rules/components/Rules";
 import { Toolbar } from "devtools/client/inspector/rules/components/Toolbar";
 import Accordion, { AccordionItem } from "devtools/client/shared/components/Accordion";
-import Services from "devtools/shared/services";
+import { userData } from "shared/user-data/GraphQL/UserData";
 import { useAppSelector } from "ui/setup/hooks";
 
 import { RuleInheritance } from "../models/rule";
 import { RuleState } from "../reducers/rules";
-
-const SHOW_PSEUDO_ELEMENTS_PREF = "devtools.inspector.show_pseudo_elements";
 
 type InheritedRule = RuleState & { inheritance: RuleInheritance };
 
@@ -67,9 +65,9 @@ export const RulesApp: FC = ({}) => {
           componentProps,
           header: "Pseudo-elements",
           id: "rules-section-pseudoelement",
-          opened: Services.prefs.getBoolPref(SHOW_PSEUDO_ELEMENTS_PREF),
+          opened: userData.get("inspector_showPseudoElements"),
           onToggle: (opened: boolean) => {
-            Services.prefs.setBoolPref(SHOW_PSEUDO_ELEMENTS_PREF, opened);
+            userData.set("inspector_showPseudoElements", opened);
           },
         },
       ];

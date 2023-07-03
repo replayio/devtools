@@ -3,7 +3,7 @@ import clamp from "lodash/clamp";
 
 import { gPaintPoints, hasAllPaintPoints } from "protocol/graphics";
 import useLoadedRegions from "replay-next/src/hooks/useLoadedRegions";
-import { useFeature } from "ui/hooks/settings";
+import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { getZoomRegion } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
 
@@ -71,7 +71,7 @@ const Spans = ({
 export default function ProtocolTimeline() {
   const loadedRegions = useLoadedRegions();
 
-  const { value: showProtocolTimeline } = useFeature("protocolTimeline");
+  const [showProtocolTimeline] = useGraphQLUserData("feature_protocolTimeline");
   const firstPaint = gPaintPoints[0];
   const lastPaint = gPaintPoints[gPaintPoints.length - 1];
 

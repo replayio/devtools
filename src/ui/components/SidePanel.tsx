@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import PrimaryPanes from "devtools/client/debugger/src/components/PrimaryPanes";
 import SecondaryPanes from "devtools/client/debugger/src/components/SecondaryPanes";
@@ -12,7 +12,6 @@ import TestSuitePanel from "ui/components/TestSuite";
 import { isTestSuiteReplay } from "ui/components/TestSuite/utils/isTestSuiteReplay";
 import hooks from "ui/hooks";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
-import { useFeature } from "ui/hooks/settings";
 import { getFilteredEventsForFocusWindow } from "ui/reducers/app";
 import { getSelectedPrimaryPanel } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
@@ -26,7 +25,6 @@ import ReplayInfo from "./Events/ReplayInfo";
 import Passport from "./Passport/Passport";
 import ProtocolViewer from "./ProtocolViewer";
 import { ReactPanel } from "./ReactPanel";
-import StatusDropdown from "./shared/StatusDropdown";
 import Tour from "./Tour/Tour";
 import styles from "src/ui/components/SidePanel.module.css";
 
@@ -63,7 +61,6 @@ function useInitialPrimaryPanel() {
 }
 
 export default function SidePanel() {
-  const { value: resolveRecording } = useFeature("resolveRecording");
   const selectedPrimaryPanel = useInitialPrimaryPanel();
   const [replayInfoCollapsed, setReplayInfoCollapsed] = useState(false);
   const [eventsCollapsed, setEventsCollapsed] = useState(false);
@@ -75,10 +72,9 @@ export default function SidePanel() {
   };
   const items: any[] = [];
 
-  // if (recording?.metadata?.test?.tests?.length) {
   items.push({
     header: "Info",
-    buttons: resolveRecording ? <StatusDropdown /> : null,
+    buttons: null,
     className: "replay-info",
     component: <ReplayInfo />,
     opened: !replayInfoCollapsed,

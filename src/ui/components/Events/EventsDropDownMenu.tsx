@@ -3,10 +3,11 @@ import { ContextMenuCategory, ContextMenuItem, useContextMenu } from "use-contex
 
 import { Badge, Checkbox } from "design";
 import Icon from "replay-next/components/Icon";
+import { ConsoleEventFilterPreferencesKey } from "shared/user-data/GraphQL/config";
+import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { getFilteredEventsForFocusWindow } from "ui/reducers/app";
 import { useAppSelector } from "ui/setup/hooks";
 
-import useEventsPreferences, { FiltersKey } from "./useEventsPreferences";
 import styles from "./EventsDropDownMenu.module.css";
 
 function createSelectHandler(callback: () => void): (event: UIEvent) => void {
@@ -20,7 +21,7 @@ function createSelectHandler(callback: () => void): (event: UIEvent) => void {
 
 export default function EventsDropDownMenu() {
   const events = useAppSelector(getFilteredEventsForFocusWindow);
-  const eventCounts = useMemo<{ [key in FiltersKey]: number }>(
+  const eventCounts = useMemo<{ [key in ConsoleEventFilterPreferencesKey]: number }>(
     () =>
       events.reduce(
         (counts, event) => {
@@ -48,7 +49,7 @@ export default function EventsDropDownMenu() {
     [events]
   );
 
-  const { filters, setFilters } = useEventsPreferences();
+  const [filters] = useGraphQLUserData("console_eventFilters");
 
   const { contextMenu, onContextMenu: onClick } = useContextMenu(
     <>
@@ -57,8 +58,8 @@ export default function EventsDropDownMenu() {
         return (
           <EventTypeContextMenuItem
             key={category}
-            category={category as FiltersKey}
-            count={eventCounts[category as FiltersKey]}
+            category={category as ConsoleEventFilterPreferencesKey}
+            count={eventCounts[category as ConsoleEventFilterPreferencesKey]}
           />
         );
       })}
@@ -82,8 +83,14 @@ export default function EventsDropDownMenu() {
   );
 }
 
-function EventTypeContextMenuItem({ category, count }: { category: FiltersKey; count: number }) {
-  const { filters, setFilters } = useEventsPreferences();
+function EventTypeContextMenuItem({
+  category,
+  count,
+}: {
+  category: ConsoleEventFilterPreferencesKey;
+  count: number;
+}) {
+  const [filters, setFilters] = useGraphQLUserData("console_eventFilters");
   const [isPending, startTransition] = useTransition();
 
   const enabled = filters[category] !== false;
@@ -94,10 +101,10 @@ function EventTypeContextMenuItem({ category, count }: { category: FiltersKey; c
       disabled={count === 0 || isPending}
       onSelect={createSelectHandler(() =>
         startTransition(() => {
-          setFilters(prevFilters => ({
-            ...prevFilters,
+          setFilters({
+            ...filters,
             [category]: !enabled,
-          }));
+          });
         })
       )}
     >

@@ -1,20 +1,11 @@
 import { useMemo } from "react";
 
-import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
-
-type Filter = "current-user" | null;
-type SortBy = "created-at" | "recording-time";
+import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 
 export default function useUserCommentPreferences() {
-  const [filter, setFilter] = useLocalStorage<Filter>("Replay:CommentPreferences:Filter", null);
-  const [showPreview, setShowPreview] = useLocalStorage<boolean>(
-    "Replay:CommentPreferences:ShowPreview",
-    true
-  );
-  const [sortBy, setSortBy] = useLocalStorage<SortBy>(
-    "Replay:CommentPreferences:sortBy",
-    "recording-time"
-  );
+  const [filter, setFilter] = useGraphQLUserData("comments_filterBy");
+  const [showPreview, setShowPreview] = useGraphQLUserData("comments_showPreview");
+  const [sortBy, setSortBy] = useGraphQLUserData("comments_sortBy");
 
   return useMemo(
     () => ({

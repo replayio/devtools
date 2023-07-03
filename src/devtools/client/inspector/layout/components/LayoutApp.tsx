@@ -6,14 +6,10 @@ import React from "react";
 import { ConnectedProps, connect } from "react-redux";
 
 import Accordion from "devtools/client/shared/components/Accordion";
-import Services from "devtools/shared/services";
+import { userData } from "shared/user-data/GraphQL/UserData";
 import type { UIState } from "ui/state";
 
 import { BoxModel } from "../../boxmodel/components/BoxModel";
-
-const { prefs: prefsService } = Services;
-
-const BOXMODEL_OPENED_PREF = "devtools.layout.boxmodel.opened";
 
 const mapStateToProps = (state: UIState) => ({
   boxModel: state.boxModel,
@@ -36,9 +32,9 @@ class LayoutApp extends React.PureComponent<FinalLAProps> {
       contentClassName: "layout-content",
       header: "Box Model",
       id: "layout-section-boxmodel",
-      opened: prefsService.getBoolPref(BOXMODEL_OPENED_PREF),
+      opened: userData.get("layout_inspectorBoxModelOpen"),
       onToggle: (opened: boolean) => {
-        prefsService.setBoolPref(BOXMODEL_OPENED_PREF, opened);
+        userData.set("layout_inspectorBoxModelOpen", opened);
       },
     };
   }

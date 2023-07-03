@@ -13,15 +13,17 @@ import { ThreadFront } from "protocol/thread";
 import { ExpandablesContextRoot } from "replay-next/src/contexts/ExpandablesContext";
 import { PointsContextRoot } from "replay-next/src/contexts/points/PointsContext";
 import { SelectedFrameContextRoot } from "replay-next/src/contexts/SelectedFrameContext";
-import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
 import usePreferredFontSize from "replay-next/src/hooks/usePreferredFontSize";
+import { setDefaultTags } from "replay-next/src/utils/telemetry";
+import { getTestEnvironment } from "shared/test-suites/RecordingTestMetadata";
+import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
+import { userData } from "shared/user-data/GraphQL/UserData";
 import { clearTrialExpired, createSocket } from "ui/actions/session";
 import TerminalContextAdapter from "ui/components/SecondaryToolbox/TerminalContextAdapter";
 import { TestSuiteContextRoot } from "ui/components/TestSuite/views/TestSuiteContext";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
-import { useFeature } from "ui/hooks/settings";
 import { useTrackLoadingIdleTime } from "ui/hooks/tracking";
-import { useUserIsAuthor } from "ui/hooks/users";
+import { useGetUserInfo, useUserIsAuthor } from "ui/hooks/users";
 import { getViewMode } from "ui/reducers/layout";
 import { useAppSelector } from "ui/setup/hooks";
 import { UIState } from "ui/state";
@@ -55,8 +57,6 @@ const Viewer = React.lazy(() => import("./Viewer"));
 
 type DevToolsProps = PropsFromRedux & { apiKey?: string; uploadComplete: boolean };
 
-export const sidePanelStorageKey = "Replay:SidePanelCollapsed";
-
 function ViewLoader() {
   const [showLoader, setShowLoader] = useState(false);
   const idRef = useRef<ReturnType<typeof setTimeout>>();
@@ -84,7 +84,9 @@ function Body() {
 
   const sidePanelRef = useRef<ImperativePanelHandle>(null);
 
-  const [sidePanelCollapsed, setSidePanelCollapsed] = useLocalStorage(sidePanelStorageKey, false);
+  const [sidePanelCollapsed, setSidePanelCollapsed] = useGraphQLUserData(
+    "layout_sidePanelCollapsed"
+  );
 
   const onSidePanelCollapse = (isCollapsed: boolean) => {
     setSidePanelCollapsed(isCollapsed);
@@ -148,12 +150,15 @@ function _DevTools({
   const { recording } = useGetRecording(recordingId);
   const { trackLoadingIdleTime } = useTrackLoadingIdleTime(uploadComplete, recording);
   const { userIsAuthor, loading } = useUserIsAuthor();
+  const { id: userId, email: userEmail, loading: userLoading } = useGetUserInfo();
+
   const isExternalRecording = useMemo(
     () => recording?.user && !recording.user.internal,
     [recording]
   );
 
-  const { value: enableLargeText } = useFeature("enableLargeText");
+  const [enableLargeText] = useGraphQLUserData("global_enableLargeText");
+
   usePreferredFontSize(enableLargeText);
 
   useEffect(() => {
@@ -169,6 +174,12 @@ function _DevTools({
       maybeSetGuestMixpanelContext();
     }
   }, [isAuthenticated, isExternalRecording]);
+
+  useEffect(() => {
+    // Preferences cache always initializes itself from localStorage
+    // For authenticated users, this method will fetch remote preferences and merge via into the cache.
+    userData.initialize(isAuthenticated);
+  }, [isAuthenticated]);
 
   useEffect(() => {
     if (loading) {
@@ -215,6 +226,27 @@ function _DevTools({
       trackLoadingIdleTime(sessionId!);
     }
   }, [loadingFinished, trackLoadingIdleTime, sessionId]);
+
+  useEffect(() => {
+    if (!userLoading && recording) {
+      const test = recording.metadata?.test;
+      const testEnvironment = test ? getTestEnvironment(test) : null;
+
+      setDefaultTags({
+        recording: {
+          id: recording.id,
+          title: recording.title,
+          url: recording.url,
+          userId: recording.user?.id,
+          workspace: recording?.workspace,
+          metadata: recording.metadata && {
+            testEnvironment,
+          },
+        },
+        session: { userId, userEmail },
+      });
+    }
+  }, [recording, userId, userEmail, userLoading]);
 
   if (!loadingFinished) {
     return <LoadingScreen fallbackMessage="Loading..." />;

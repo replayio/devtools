@@ -60,11 +60,12 @@
 }
 
 .toolbar-panel-icon {
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   mask-repeat: no-repeat;
   mask-size: cover;
   margin: 4px;
+  color: var(--theme-toolbar-panel-icon-color);
 }
 
 .toolbar-panel-button.active {

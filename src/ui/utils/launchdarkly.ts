@@ -1,8 +1,8 @@
 import * as LDClient from "launchdarkly-js-client-sdk";
 import { useEffect, useState } from "react";
 
+import { isDevelopment } from "shared/utils/environment";
 import { UserInfo } from "ui/hooks/users";
-import { isDevelopment } from "ui/utils/environment";
 
 const DEFAULT_FLAGS = {
   "maintenance-mode": false,
@@ -32,7 +32,9 @@ function useLaunchDarkly() {
     readyPromise.then(r => setReady(r));
   }, [setReady]);
 
-  function getFeatureFlag<F extends keyof typeof DEFAULT_FLAGS>(name: F): typeof DEFAULT_FLAGS[F] {
+  function getFeatureFlag<F extends keyof typeof DEFAULT_FLAGS>(
+    name: F
+  ): (typeof DEFAULT_FLAGS)[F] {
     if (!ready) {
       return DEFAULT_FLAGS[name];
     }

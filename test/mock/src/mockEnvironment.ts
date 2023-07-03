@@ -3,7 +3,7 @@
 import { MockedResponse } from "@apollo/client/testing";
 import { Page } from "@recordreplay/playwright";
 
-import { MockEnvironment, configureMockEnvironmentForTesting } from "ui/utils/environment";
+import { MockEnvironment, configureMockEnvironmentForTesting } from "shared/utils/environment";
 
 declare global {
   interface Window {

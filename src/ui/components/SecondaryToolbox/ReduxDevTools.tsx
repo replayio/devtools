@@ -29,7 +29,7 @@ export const ReduxDevToolsPanel = () => {
     <div className={classnames("flex min-h-full bg-bodyBgcolor p-1 text-xs", styles.actions)}>
       <PanelGroup autoSaveId="ReduxDevTools" direction="horizontal">
         <ResizablePanel collapsible>
-          <div role="list" className="h-full overflow-y-auto">
+          <div role="list" className={styles.list}>
             {reduxAnnotations.map(annotation => (
               <ActionItem
                 key={annotation.point}
@@ -68,7 +68,7 @@ function ActionItem({
   return (
     <div
       key={annotation.point}
-      className={classnames("cursor-pointer text-xs", {
+      className={classnames(styles.row, {
         [styles.selected]: annotation.point === selectedPoint,
       })}
       role="listitem"

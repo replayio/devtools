@@ -67,7 +67,6 @@ import "ui/components/Events/Events.css";
 import "ui/components/SecondaryToolbox/SecondaryToolbox.css";
 import "ui/components/shared/Dialog.css";
 import "ui/components/shared/Dropdown.css";
-import "ui/components/shared/IconWithTooltip.css";
 import "ui/components/shared/LoadingProgressBar.css";
 import "ui/components/shared/LoginModal.css";
 import "ui/components/shared/Modal.css";

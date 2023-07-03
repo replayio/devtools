@@ -5,13 +5,10 @@
 
 "use strict";
 
-import Services from "devtools/shared/services";
-import { getCSSLexer } from "./lexer";
 import { cssColors } from "./color-db";
+import { getCSSLexer } from "./lexer";
 
-import { CSS_ANGLEUNIT }from "./constants";
-
-const COLOR_UNIT_PREF = "devtools.defaultColorUnit";
+import { CSS_ANGLEUNIT } from "./constants";
 
 const SPECIALVALUES = new Set(["currentcolor", "initial", "inherit", "transparent", "unset"]);
 
@@ -93,7 +90,9 @@ CssColor.prototype = {
 
   get colorUnit() {
     if (this._colorUnit === null) {
-      const defaultUnit = Services.prefs.getCharPref(COLOR_UNIT_PREF);
+      // Note this used to be stored as a preference ("devtools.defaultColorUnit")
+      // but that was never exposed to the user so PR #9385 inlined the default value
+      const defaultUnit = "authored";
       this._colorUnit = CssColor.COLORUNIT[defaultUnit];
       this._setColorUnitUppercase(this.authored);
     }

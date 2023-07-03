@@ -8,7 +8,6 @@ import { UIState } from "ui/state";
 import {
   AppMode,
   AppState,
-  AppTheme,
   Canvas,
   EventKind,
   ExpectedError,
@@ -20,8 +19,6 @@ import {
   UnexpectedError,
   UploadInfo,
 } from "ui/state/app";
-import { getSystemColorSchemePreference } from "ui/utils/environment";
-import { prefs } from "ui/utils/prefs";
 
 export const initialAppState: AppState = {
   awaitingSourcemaps: false,
@@ -43,7 +40,6 @@ export const initialAppState: AppState = {
   recordingTarget: null,
   recordingWorkspace: null,
   sessionId: null,
-  theme: prefs.theme as AppTheme,
   trialExpired: false,
   unexpectedError: null,
   uploading: null,
@@ -81,9 +77,6 @@ const appSlice = createSlice({
     },
     setTrialExpired(state, action: PayloadAction<boolean | undefined>) {
       state.trialExpired = action.payload ?? true;
-    },
-    updateTheme(state, action: PayloadAction<AppTheme>) {
-      state.theme = action.payload;
     },
     setSessionId(state, action: PayloadAction<string>) {
       state.sessionId = action.payload;
@@ -168,7 +161,6 @@ export const {
   setUnexpectedError,
   setUploading,
   setVideoUrl,
-  updateTheme,
 } = appSlice.actions;
 
 export default appSlice.reducer;
@@ -177,9 +169,6 @@ export default appSlice.reducer;
 const getSelectedPanel = (state: UIState) => state.layout.selectedPanel;
 const getViewMode = (state: UIState) => state.layout.viewMode;
 
-export const getTheme = (state: UIState) =>
-  state.app.theme === "system" ? getSystemColorSchemePreference() : state.app.theme;
-export const getThemePreference = (state: UIState) => state.app.theme;
 export const isInspectorSelected = (state: UIState) =>
   getViewMode(state) === "dev" && getSelectedPanel(state) == "inspector";
 export const getRecordingDuration = (state: UIState) => state.app.recordingDuration;

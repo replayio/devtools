@@ -1,4 +1,4 @@
-import React, { Suspense, useCallback } from "react";
+import { Suspense, useCallback, useTransition } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
 import CommentList from "replay-next/components/comments/CommentList";
@@ -20,8 +20,9 @@ import { SelectedFrameContextRoot } from "replay-next/src/contexts/SelectedFrame
 import { SourcesContextRoot } from "replay-next/src/contexts/SourcesContext";
 import { TerminalContextRoot } from "replay-next/src/contexts/TerminalContext";
 import { TimelineContextRoot } from "replay-next/src/contexts/TimelineContext";
-import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
 import usePreferredColorScheme from "replay-next/src/hooks/usePreferredColorScheme";
+import { ReplayNextCurrentPanel } from "shared/user-data/LocalStorage/config";
+import useLocalStorageUserData from "shared/user-data/LocalStorage/useLocalStorageUserData";
 
 import styles from "./index.module.css";
 
@@ -35,10 +36,20 @@ export default function HomePage({ apiKey }: { apiKey?: string }) {
   // TODO As we finalize the client implementation to interface with Replay backend,
   // we can inject a wrapper here that also reports cache hits and misses to this UI in a debug panel.
 
-  const [panel, setPanel, isPending] = useLocalStorage<Panel>("bvaughn:panel", "sources", true);
+  const [isPending, startTransition] = useTransition();
 
-  const showCommentsPanel = useCallback(() => setPanel("comments"), [setPanel]);
-  const showSourcesPanel = useCallback(() => setPanel("sources"), [setPanel]);
+  const [panel, setPanel] = useLocalStorageUserData("replayNextCurrentPanel");
+  const setPanelTransition = useCallback(
+    (value: ReplayNextCurrentPanel) => {
+      startTransition(() => {
+        setPanel(value);
+      });
+    },
+    [setPanel]
+  );
+
+  const showCommentsPanel = useCallback(() => setPanelTransition("comments"), [setPanelTransition]);
+  const showSourcesPanel = useCallback(() => setPanelTransition("sources"), [setPanelTransition]);
 
   usePreferredColorScheme();
 
@@ -61,7 +72,7 @@ export default function HomePage({ apiKey }: { apiKey?: string }) {
                             className={panel === "comments" ? styles.TabSelected : styles.Tab}
                             data-test-id="TabButton-Comments"
                             disabled={isPending}
-                            onClick={() => setPanel("comments")}
+                            onClick={() => setPanelTransition("comments")}
                           >
                             <Icon className={styles.TabIcon} type="comments" />
                           </button>
@@ -69,7 +80,7 @@ export default function HomePage({ apiKey }: { apiKey?: string }) {
                             className={panel === "sources" ? styles.TabSelected : styles.Tab}
                             data-test-id="TabButton-Sources"
                             disabled={isPending}
-                            onClick={() => setPanel("sources")}
+                            onClick={() => setPanelTransition("sources")}
                           >
                             <Icon className={styles.TabIcon} type="source-explorer" />
                           </button>
@@ -77,7 +88,7 @@ export default function HomePage({ apiKey }: { apiKey?: string }) {
                             className={panel === "search" ? styles.TabSelected : styles.Tab}
                             data-test-id="TabButton-Search"
                             disabled={isPending}
-                            onClick={() => setPanel("search")}
+                            onClick={() => setPanelTransition("search")}
                           >
                             <Icon className={styles.TabIcon} type="search" />
                           </button>
@@ -87,7 +98,7 @@ export default function HomePage({ apiKey }: { apiKey?: string }) {
                             }
                             data-test-id="TabButton-ProtocolViewer"
                             disabled={isPending}
-                            onClick={() => setPanel("protocol-viewer")}
+                            onClick={() => setPanelTransition("protocol-viewer")}
                           >
                             <Icon className={styles.TabIcon} type="protocol-viewer" />
                           </button>

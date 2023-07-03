@@ -1,3 +1,4 @@
+import { ViewMode } from "shared/user-data/GraphQL/config";
 import { LocalNag } from "ui/setup/prefs";
 
 export type LayoutState = {
@@ -9,9 +10,8 @@ export type LayoutState = {
   localNags: LocalNag[];
 };
 
-export type ViewMode = "dev" | "non-dev";
 export const VIEWER_PANELS = ["cypress", "tour", "passport", "events", "comments"] as const;
-type ViewerPrimaryPanelName = typeof VIEWER_PANELS[number];
+type ViewerPrimaryPanelName = (typeof VIEWER_PANELS)[number];
 export type PrimaryPanelName =
   | "explorer"
   | "debugger"

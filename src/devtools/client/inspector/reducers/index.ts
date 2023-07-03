@@ -7,22 +7,21 @@
 import boxModel from "devtools/client/inspector/boxmodel/reducers/box-model";
 import computed from "devtools/client/inspector/computed/reducers";
 import markup from "devtools/client/inspector/markup/reducers/markup";
-import { prefs } from "devtools/client/inspector/prefs";
 import rules from "devtools/client/inspector/rules/reducers/rules";
+import { ActiveInspectorTab } from "shared/user-data/GraphQL/config";
+import { userData } from "shared/user-data/GraphQL/UserData";
 
 import { InspectorAction } from "../actions";
 
-export { markup, rules, computed, boxModel };
-
-export type InspectorActiveTab = "ruleview" | "layoutview" | "computedview" | "eventsview";
+export { boxModel, computed, markup, rules };
 
 export interface InspectorState {
-  activeTab: InspectorActiveTab;
+  activeTab: ActiveInspectorTab;
 }
 
 export function initialInspectorState(): InspectorState {
   return {
-    activeTab: prefs.activeTab as InspectorActiveTab,
+    activeTab: userData.get("inspector_activeTab"),
   };
 }
 
@@ -32,7 +31,7 @@ export function inspector(
 ): InspectorState {
   switch (action.type) {
     case "set_active_inspector_tab":
-      prefs.activeTab = action.activeTab;
+      userData.set("inspector_activeTab", action.activeTab);
       return { ...state, activeTab: action.activeTab };
     default:
       return state;

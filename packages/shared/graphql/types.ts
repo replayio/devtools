@@ -102,36 +102,10 @@ export interface Reply extends Remark {
 
 // Copied from src/ui/types/index
 
-export type ExperimentalUserSettings = {
+export type UserSettings = {
   apiKeys: ApiKey[];
   defaultWorkspaceId: null | string;
-  disableLogRocket: boolean;
-  role: string;
 };
-
-export type LocalExperimentalUserSettings = {
-  basicProcessingLoadingBar: boolean;
-  disableScanDataCache: boolean;
-  consoleFilterDrawerDefaultsToOpen: boolean;
-  disableStableQueryCache: boolean;
-  enableColumnBreakpoints: boolean;
-  disableIncrementalSnapshots: boolean;
-  enableUnstableQueryCache: boolean;
-  enableRoutines: boolean;
-  rerunRoutines: boolean;
-  profileWorkerThreads: boolean;
-  brokenSourcemapWorkaround: boolean;
-  disableRecordingAssetsInDatabase: boolean;
-  disableConcurrentControllerLoading: boolean;
-  reactPanel: boolean;
-};
-
-export type LocalUserSettings = LocalExperimentalUserSettings & {
-  enableDarkMode: boolean;
-};
-
-export type CombinedExperimentalUserSettings = ExperimentalUserSettings &
-  LocalExperimentalUserSettings;
 
 export type ApiKeyScope = "admin:all" | "write:sourcemap";
 

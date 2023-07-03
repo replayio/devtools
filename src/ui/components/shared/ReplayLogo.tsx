@@ -1,10 +1,4 @@
-import React from "react";
-
-import { selector } from "devtools/client/inspector/rules/types";
-import { useFeature } from "ui/hooks/settings";
-import { getTheme } from "ui/reducers/app";
-import { useAppSelector } from "ui/setup/hooks";
-import { AppTheme } from "ui/state/app";
+import { useTheme } from "shared/theme/useTheme";
 
 const logoSizes = {
   xs: "h-4",
@@ -44,7 +38,7 @@ export default function ReplayLogo({
   wide?: boolean;
   size?: keyof typeof logoSizes;
 }) {
-  const theme = useAppSelector(getTheme);
+  const theme = useTheme();
   const height = logoSizes[size];
 
   if (wide) {

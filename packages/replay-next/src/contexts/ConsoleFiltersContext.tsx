@@ -9,7 +9,9 @@ import {
   useTransition,
 } from "react";
 
-import useIndexedDB, { IDBOptions } from "../hooks/useIndexedDB";
+import { CONSOLE_SETTINGS_DATABASE } from "shared/user-data/IndexedDB/config";
+import useIndexedDBUserData from "shared/user-data/IndexedDB/useIndexedDBUserData";
+
 import { SessionContext } from "./SessionContext";
 
 // Various boolean flags to types of console messages or attributes to show/hide.
@@ -58,20 +60,12 @@ export type ConsoleFiltersContextType = Toggles & {
   ) => void;
 };
 
-// NOTE: If any change is made like adding a store name, bump the version number
-// to ensure that the database is recreated properly.
-export const CONSOLE_SETTINGS_DATABASE: IDBOptions = {
-  databaseName: "ConsoleSettings",
-  databaseVersion: 1,
-  storeNames: ["filterToggles", "showExceptions", "terminalHistory"],
-};
-
 export const ConsoleFiltersContext = createContext<ConsoleFiltersContextType>(null as any);
 
 export function ConsoleFiltersContextRoot({ children }: PropsWithChildren<{}>) {
   const { recordingId } = useContext(SessionContext);
 
-  const { value: toggles, setValue: setToggles } = useIndexedDB<Toggles>({
+  const { value: toggles, setValue: setToggles } = useIndexedDBUserData<Toggles>({
     database: CONSOLE_SETTINGS_DATABASE,
     initialValue: {
       showErrors: true,
@@ -93,7 +87,7 @@ export function ConsoleFiltersContextRoot({ children }: PropsWithChildren<{}>) {
   const [eventTypes, setEventTypes] = useState<EventTypes>({});
   const [deferredEventTypes, setDeferredEventTypes] = useState<EventTypes>({});
 
-  const { value: showExceptions, setValue: setShowExceptions } = useIndexedDB<boolean>({
+  const { value: showExceptions, setValue: setShowExceptions } = useIndexedDBUserData<boolean>({
     database: CONSOLE_SETTINGS_DATABASE,
     initialValue: false,
     recordName: recordingId,
