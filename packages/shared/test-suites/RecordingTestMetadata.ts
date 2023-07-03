@@ -17,7 +17,7 @@ import { AnnotationsCache } from "ui/components/TestSuite/suspense/AnnotationsCa
 export type SemVer = string;
 
 function assert(value: unknown, message: string, tags: Object = {}): asserts value {
-  return assertWithTelemetry(value, "process-test-metadata", message, tags);
+  return assertWithTelemetry(value, message, "process-test-metadata", tags);
 }
 
 // This type is only minimally supported by the frontend

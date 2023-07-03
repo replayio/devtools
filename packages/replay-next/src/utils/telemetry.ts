@@ -37,7 +37,10 @@ export function assertWithTelemetry(
   tags: Object = {}
 ): asserts assertion {
   if (!assertion) {
-    recordData(type, tags);
+    recordData(type, {
+      message,
+      ...tags,
+    });
   }
 
   return assert(assertion, message);
