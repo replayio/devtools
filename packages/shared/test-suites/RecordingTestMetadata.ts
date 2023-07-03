@@ -343,14 +343,14 @@ export async function processCypressTestRecording(
       for (let index = 0; index < annotations.length; index++) {
         const annotation = annotations[index];
 
-        if (!beginPoint || comparePoints(beginPoint.point, annotation.point) < 0) {
+        if (!beginPoint || comparePoints(beginPoint.point, annotation.point) > 0) {
           beginPoint = {
             point: annotation.point,
             time: annotation.time,
           };
         }
 
-        if (!endPoint || comparePoints(endPoint.point, annotation.point) > 0) {
+        if (!endPoint || comparePoints(endPoint.point, annotation.point) < 0) {
           endPoint = {
             point: annotation.point,
             time: annotation.time,
