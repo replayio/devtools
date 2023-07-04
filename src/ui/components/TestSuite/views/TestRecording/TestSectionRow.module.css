@@ -1,7 +1,7 @@
 .Row {
   display: flex;
   justify-content: space-between;
-  padding: 0.5rem 0.75rem;
+  padding: 0.5rem 0.25rem 0.5rem 0.5rem;
   gap: 1ch;
   font-family: var(--font-family-monospace);
   cursor: pointer;
@@ -63,4 +63,8 @@
   height: 1rem;
   width: 1rem;
   flex: 0 0 auto;
+}
+
+.HiddenIcon {
+  display: none;
 }
