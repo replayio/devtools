@@ -10,6 +10,7 @@ import {
   verifyConsoleMessageObjectContents,
   warpToMessage,
 } from "../helpers/console-panel";
+import { toggleExpandable } from "../helpers/utils";
 
 test(`object_preview-01: expressions in the console after time warping`, async ({ page }) => {
   await startTest(page, "doc_rr_objects.html");
@@ -43,7 +44,18 @@ test(`object_preview-01: expressions in the console after time warping`, async (
   await verifyConsoleMessage(page, "Symbol(symbol)");
   await verifyConsoleMessage(page, `{Symbol(): 42, Symbol(symbol): Symbol()}`);
 
-  await verifyConsoleMessage(page, "{_foo: C{…}, foo: ƒ()}");
+  const objectInspector = (await findConsoleMessage(page, "{_foo: C{…}, foo: ƒ()}")).locator(
+    '[data-test-name="LogContents"]'
+  );
+  await toggleExpandable(page, { scope: objectInspector, targetState: "open" });
+  await objectInspector
+    .locator(
+      '[data-test-name="GetterRenderer"]:has-text("foo") [data-test-name="InvokeGetterButton"]'
+    )
+    .click();
+  await objectInspector
+    .locator('[data-test-name="GetterRenderer"]:has-text("foo: C{…}")')
+    .waitFor();
 
   await warpToMessage(page, "Done");
 

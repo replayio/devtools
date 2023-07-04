@@ -67,7 +67,7 @@ export const objectPropertyCache: Cache<
         return removeName(getterValue);
       }
       const property = cachedObject.preview.properties?.find(p => p.name === propertyName);
-      if (property) {
+      if (property && !property.get && !property.set) {
         return removeName(property);
       }
     }
