@@ -1,10 +1,12 @@
+import { MouseEventHandler } from "react";
+
 import useTooltip from "replay-next/src/hooks/useTooltip";
 
 interface IconWithTooltipProps {
   dataTestName?: string;
   icon: React.ReactNode;
   content: string;
-  handleClick: React.MouseEventHandler;
+  handleClick?: MouseEventHandler;
 }
 
 // This component is designed only for the primary toolbox icons (24x24) to the left
