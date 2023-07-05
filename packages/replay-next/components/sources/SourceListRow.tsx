@@ -371,11 +371,7 @@ const SourceListRow = memo(
           break;
         case POINT_BEHAVIOR_DISABLED:
         default:
-          if (pointForDefaultPriority.user?.id !== currentUserInfo?.id) {
-            breakPointTestState = "off-temporarily";
-          } else {
-            breakPointTestState = "off";
-          }
+          breakPointTestState = "off";
           break;
       }
     }
