@@ -55,7 +55,8 @@ export const pauseEvaluationsCache: Cache<
     pauseId: PauseId,
     frameId: FrameId | null,
     expression: string,
-    uid?: string
+    uid?: string,
+    pure?: boolean
   ],
   Omit<Result, "data">
 > = createCache({
@@ -63,8 +64,8 @@ export const pauseEvaluationsCache: Cache<
   debugLabel: "PauseEvaluations",
   getKey: ([replayClient, pauseId, frameId, expression, uid = ""]) =>
     `${pauseId}:${frameId}:${expression}:${uid}`,
-  load: async ([replayClient, pauseId, frameId, expression, uid = ""]) => {
-    const result = await replayClient.evaluateExpression(pauseId, expression, frameId);
+  load: async ([replayClient, pauseId, frameId, expression, uid = "", pure]) => {
+    const result = await replayClient.evaluateExpression(pauseId, expression, frameId, pure);
     const sources = await sourcesByIdCache.readAsync(replayClient);
     cachePauseData(replayClient, sources, pauseId, result.data);
     return { exception: result.exception, failed: result.failed, returned: result.returned };

@@ -159,7 +159,8 @@ export interface ReplayClientInterface {
   evaluateExpression(
     pauseId: PauseId,
     expression: string,
-    frameId: FrameId | null
+    frameId: FrameId | null,
+    pure?: boolean
   ): Promise<EvaluationResult>;
   findAnnotations(kind: string, listener: AnnotationListener): Promise<void>;
   findKeyboardEvents(onKeyboardEvents: (events: keyboardEvents) => void): Promise<void>;

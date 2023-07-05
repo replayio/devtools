@@ -183,7 +183,8 @@ export class ReplayClient implements ReplayClientInterface {
   async evaluateExpression(
     pauseId: PauseId,
     expression: string,
-    frameId: FrameId | null
+    frameId: FrameId | null,
+    pure?: boolean
   ): Promise<EvaluationResult> {
     const sessionId = this.getSessionIdThrows();
 
@@ -198,7 +199,7 @@ export class ReplayClient implements ReplayClientInterface {
       const response = await client.Pause.evaluateInGlobal(
         {
           expression,
-          pure: false,
+          pure,
         },
         sessionId,
         pauseId
@@ -209,7 +210,7 @@ export class ReplayClient implements ReplayClientInterface {
         {
           frameId,
           expression,
-          pure: false,
+          pure,
           useOriginalScopes: true,
         },
         sessionId,

@@ -2,7 +2,7 @@ import { PauseId, Value } from "@replayio/protocol";
 import { useContext, useMemo } from "react";
 
 import { getSelectedFrameId } from "devtools/client/debugger/src/selectors";
-import { ThreadFront } from "protocol/thread";
+import { pauseEvaluationsCache } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
 import { useAppSelector } from "ui/setup/hooks";
@@ -18,13 +18,14 @@ export async function getEvaluatedProperties(
   fetchObject: ObjectFetcher
 ): Promise<string[]> {
   try {
-    const { returned, exception } = await ThreadFront.evaluate({
+    const { returned, exception } = await pauseEvaluationsCache.readAsync(
       replayClient,
       pauseId,
-      frameId,
-      text: expression,
-      pure: true,
-    });
+      frameId ?? null,
+      expression,
+      undefined,
+      true
+    );
     if (returned?.object && !exception) {
       const properties = await getPropertiesForObject(returned.object, fetchObject, 1);
       return properties;
@@ -47,13 +48,14 @@ async function eagerEvaluateExpression(
   frameId?: string
 ): Promise<Value | null> {
   try {
-    const { returned, exception } = await ThreadFront.evaluate({
+    const { returned, exception } = await pauseEvaluationsCache.readAsync(
       replayClient,
       pauseId,
-      frameId,
-      text: expression,
-      pure: true,
-    });
+      frameId ?? null,
+      expression,
+      undefined,
+      true
+    );
     if (returned && !exception) {
       return returned;
     }
