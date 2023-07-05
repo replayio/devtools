@@ -119,15 +119,15 @@ export function TestSectionRow({
       onMouseLeave={onMouseLeave}
     >
       {child}
-      {position === "current" && (
-        <button
-          className={styles.DropDownButton}
-          onClick={onContextMenu}
-          data-test-name="TestSectionRowMenuButton"
-        >
-          <Icon className={styles.Icon} type="dots" />
-        </button>
-      )}
+
+      <button
+        className={styles.DropDownButton}
+        onClick={onContextMenu}
+        data-test-name="TestSectionRowMenuButton"
+      >
+        <Icon className={position === "current" ? styles.Icon : styles.HiddenIcon} type="dots" />
+      </button>
+
       {contextMenu}
     </div>
   );
