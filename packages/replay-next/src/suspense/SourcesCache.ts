@@ -1,6 +1,4 @@
 import {
-  Location,
-  MappedLocation,
   ContentType as ProtocolContentType,
   Source as ProtocolSource,
   SourceId as ProtocolSourceId,

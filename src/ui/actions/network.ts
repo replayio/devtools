@@ -9,6 +9,7 @@ import {
   networkResponseBodyCache,
 } from "replay-next/src/suspense/NetworkRequestsCache";
 import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
+import { sourcesCache } from "replay-next/src/suspense/SourcesCache";
 import { isPointInRegion } from "shared/utils/time";
 import { RequestSummary } from "ui/components/NetworkMonitor/utils";
 import { getFocusWindow } from "ui/reducers/timeline";
@@ -64,7 +65,7 @@ export function selectNetworkRequest(requestId: RequestId): UIThunkAction {
       record.timeStampedPoint.time
     );
     const frames = (await framesCache.readAsync(replayClient, pauseId)) || [];
-    await ThreadFront.ensureAllSources();
+    await sourcesCache.readAsync(replayClient);
     state = getState();
     const formattedFrames = frames?.map((frame, i) =>
       createFrame(state.sources, frame, pauseId, i)

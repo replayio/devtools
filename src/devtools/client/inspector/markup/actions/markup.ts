@@ -5,6 +5,7 @@ import NodeConstants from "devtools/shared/dom-node-constants";
 import { Deferred, assert, defer } from "protocol/utils";
 import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
+import { sourcesCache } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientInterface } from "shared/client/types";
 import { ProtocolError, isCommandError } from "shared/utils/error";
 import type { UIStore, UIThunkAction } from "ui/actions";
@@ -83,7 +84,7 @@ export function setupMarkup(store: UIStore, startAppListening: AppStartListening
       dispatch(reset());
 
       async function loadNewDocument() {
-        await ThreadFront.ensureAllSources();
+        await sourcesCache.readAsync(replayClient);
 
         // Clear selection if pauses have differed
         const selectedNodeId = getSelectedDomNodeId(getState());
