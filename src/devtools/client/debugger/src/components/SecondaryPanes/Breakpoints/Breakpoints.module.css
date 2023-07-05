@@ -13,10 +13,9 @@
 }
 
 .Empty {
-  white-space: normal;
-  border-radius: 0.5rem;
-  background-color: var(--chrome);
-  font-size: var(--font-size-small);
-  padding: 0.25rem 0.5rem;
-  margin: 0 0.25rem;
+  font-style: italic;
+  text-align: center;
+  padding: 0.5em;
+  user-select: none;
+  cursor: default;
 }

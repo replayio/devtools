@@ -4,3 +4,7 @@
   flex-direction: column;
   padding: 0 0.25rem;
 }
+
+.Empty {
+  font-family: Inter;
+}
