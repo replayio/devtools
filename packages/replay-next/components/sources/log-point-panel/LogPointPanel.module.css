@@ -45,7 +45,7 @@
 .ContentWrapper,
 .ContentWrapperInvalid,
 .ContentWrapperTooManyPoints {
-  overflow: auto;
+  overflow: hidden;
   height: 100%;
   flex: 1;
   background-color: var(--point-panel-input-background-color);
