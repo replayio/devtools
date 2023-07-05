@@ -89,7 +89,7 @@ export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
     }
 
     const timeoutId = setTimeout(() => {
-      client.requestFocusWindow({ begin: range.begin.time, end: range.end.time });
+      client.requestFocusWindow({ begin: range.begin.time, bias, end: range.end.time });
     }, FOCUS_DEBOUNCE_DURATION);
 
     return () => {
@@ -109,7 +109,7 @@ export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
 
   const updateFocusRange = useCallback(
     async (range: TimeStampedPointRange | null, options: UpdateOptions) => {
-      const { bias, debounce, sync } = options;
+      const { bias, debounce } = options;
 
       setBias(bias);
       setRange(range);
