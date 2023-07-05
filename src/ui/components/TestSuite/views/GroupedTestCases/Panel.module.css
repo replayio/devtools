@@ -71,6 +71,9 @@
   border-bottom: 1px solid var(--theme-border);
   background-color: var(--background-color-warning);
   color: var(--color-warning);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .ErrorLink {
