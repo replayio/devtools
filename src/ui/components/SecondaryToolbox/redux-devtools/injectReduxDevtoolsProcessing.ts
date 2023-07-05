@@ -1,10 +1,9 @@
 import { ExecutionPoint, Value } from "@replayio/protocol";
 import { Cache, createCache } from "suspense";
 
-import type { ThreadFront as TF } from "protocol/thread";
-import { ThreadFront } from "protocol/thread";
 import { topFrameCache } from "replay-next/src/suspense/FrameCache";
 import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
+import { evaluate } from "replay-next/src/utils/evaluate";
 import { ReplayClientInterface } from "shared/client/types";
 
 import type { Delta } from "./JSONDiff";
@@ -108,13 +107,12 @@ function diffStates() {
 }
 
 async function evaluateNoArgsFunction(
-  ThreadFront: typeof TF,
   replayClient: ReplayClientInterface,
   fn: Function,
   pauseId?: string,
   frameId?: string
 ) {
-  return await ThreadFront.evaluate({
+  return await evaluate({
     replayClient,
     text: `(${fn})()`,
     pauseId,
@@ -144,7 +142,6 @@ export const actionStateValuesCache: Cache<
     }
 
     const actionRes = await evaluateNoArgsFunction(
-      ThreadFront,
       replayClient,
       getActionObjectId,
       pauseId,
@@ -152,7 +149,6 @@ export const actionStateValuesCache: Cache<
     );
 
     const stateRes = await evaluateNoArgsFunction(
-      ThreadFront,
       replayClient,
       getStateObjectId,
       pauseId,
@@ -186,14 +182,13 @@ export const diffCache: Cache<
 
     const jsondiffpatchSource = require("./jsondiffpatch.umd.slim.raw.js").default;
 
-    await ThreadFront.evaluate({
+    await evaluate({
       replayClient,
       pauseId,
       text: jsondiffpatchSource,
     });
 
     const diffResult = await evaluateNoArgsFunction(
-      ThreadFront,
       replayClient,
       diffStates,
       pauseId,
