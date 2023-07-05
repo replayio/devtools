@@ -5,6 +5,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 import { getSourceIDsToSearch } from "devtools/client/debugger/src/utils/sourceVisualizations";
+import { sourcesCache } from "replay-next/src/suspense/SourcesCache";
 import { SourceDetails, getSourceDetailsEntities } from "ui/reducers/sources";
 import { UIState } from "ui/state";
 import { LoadingStatus } from "ui/utils/LoadingStatus";
@@ -58,9 +59,9 @@ export const fetchGlobalFunctions = createAsyncThunk<
   void,
   { state: UIState; extra: ThunkExtraArgs }
 >("ast/fetchGlobalFunctions", async (_, thunkApi) => {
-  const { ThreadFront, replayClient } = thunkApi.extra;
+  const { replayClient } = thunkApi.extra;
 
-  await ThreadFront.ensureAllSources();
+  await sourcesCache.readAsync(replayClient);
 
   const sourceById = getSourceDetailsEntities(thunkApi.getState());
   // Empty query to grab all of the functions, which we can easily filter later.

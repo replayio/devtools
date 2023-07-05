@@ -54,9 +54,6 @@ class _ThreadFront {
   sessionId: SessionId | null = null;
   sessionWaiter = defer<SessionId>();
 
-  // Waiter which resolves when all sources have been loaded.
-  private allSourcesWaiter = defer<void>();
-
   // added by EventEmitter.decorate(ThreadFront)
   eventListeners!: Map<ThreadFrontEvent, ((value?: any) => void)[]>;
   on!: (name: ThreadFrontEvent, handler: (value?: any) => void) => void;
@@ -120,16 +117,6 @@ class _ThreadFront {
     this.currentTime = time;
     this.currentPauseId = pauseId;
     this.emit("paused", { point, time, openSource });
-  }
-
-  async ensureAllSources() {
-    await this.allSourcesWaiter.promise;
-  }
-
-  public markSourcesLoaded() {
-    // Called by `debugger/src/client/index`, in `setupDebugger()`.
-    // Sources are now fetched via `SourcesCache`.
-    this.allSourcesWaiter.resolve();
   }
 }
 

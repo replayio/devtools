@@ -2,28 +2,19 @@ import { Action } from "@reduxjs/toolkit";
 import { RecordingId } from "@replayio/protocol";
 
 import { selectLocation } from "devtools/client/debugger/src/actions/sources/select";
-import { getExecutionPoint, getPauseId } from "devtools/client/debugger/src/reducers/pause";
-import type { ThreadFront as ThreadFrontType } from "protocol/thread";
+import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
 import {
   COMMENT_TYPE_NETWORK_REQUEST,
   COMMENT_TYPE_VISUAL,
   VisualCommentTypeData,
   createTypeDataForNetworkRequestComment,
 } from "replay-next/components/sources/utils/comments";
-import { topFrameCache } from "replay-next/src/suspense/FrameCache";
-import { ReplayClientInterface } from "shared/client/types";
 import { mutate } from "shared/graphql/apolloClient";
 import { CommentSourceLocation } from "shared/graphql/types";
 import { RequestSummary } from "ui/components/NetworkMonitor/utils";
 import { ADD_COMMENT_MUTATION, AddCommentMutation } from "ui/hooks/comments/useAddComment";
 import { selectors } from "ui/reducers";
-import {
-  getPreferredGeneratedSources,
-  getPreferredSourceId,
-  getSourceDetailsEntities,
-} from "ui/reducers/sources";
 import { getCurrentTime } from "ui/reducers/timeline";
-import { UIState } from "ui/state";
 import { Comment, CommentOptions } from "ui/state/comments";
 import { trackEvent } from "ui/utils/telemetry";
 
@@ -165,45 +156,5 @@ export function seekToComment(
       context = selectors.getThreadContext(getState());
       dispatch(selectLocation(context, sourceLocation, openSource));
     }
-  };
-}
-
-async function getCurrentPauseSourceLocation(
-  ThreadFront: typeof ThreadFrontType,
-  replayClient: ReplayClientInterface,
-  getState: () => UIState
-) {
-  const pauseId = getPauseId(getState());
-  if (!pauseId) {
-    return;
-  }
-  const frame = await topFrameCache.readAsync(replayClient, pauseId);
-  if (!frame) {
-    return;
-  }
-  await ThreadFront.ensureAllSources();
-  const state = getState();
-  const sourcesById = getSourceDetailsEntities(state);
-  const { location } = frame;
-  const preferredSourceId = getPreferredSourceId(
-    sourcesById,
-    location.map(l => l.sourceId),
-    getPreferredGeneratedSources(state)
-  );
-  const preferredLocation = location.find(l => l.sourceId == preferredSourceId);
-  if (!preferredLocation) {
-    return;
-  }
-
-  const sourceUrl = sourcesById[preferredLocation.sourceId]?.url;
-  if (!sourceUrl) {
-    return;
-  }
-
-  return {
-    sourceUrl,
-    sourceId: preferredLocation.sourceId,
-    line: preferredLocation.line,
-    column: preferredLocation.column,
   };
 }

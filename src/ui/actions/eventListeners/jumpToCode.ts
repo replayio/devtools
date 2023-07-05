@@ -19,6 +19,7 @@ import { getHitPointsForLocationAsync } from "replay-next/src/suspense/HitPoints
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { pauseEvaluationsCache, pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
+import { sourcesCache } from "replay-next/src/suspense/SourcesCache";
 import { isLocationBefore } from "replay-next/src/utils/source";
 import { ReplayClientInterface } from "shared/client/types";
 import type { UIThunkAction } from "ui/actions";
@@ -319,7 +320,7 @@ export const eventListenerLocationCache: Cache<
     }
     const { frameId } = topFrame;
 
-    await threadFront.ensureAllSources();
+    await sourcesCache.readAsync(replayClient);
 
     const state = getState();
 
