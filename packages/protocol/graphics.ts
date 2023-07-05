@@ -143,7 +143,7 @@ export const timeIsBeyondKnownPaints = (time: number) =>
   !hasAllPaintPoints && gPaintPoints[gPaintPoints.length - 1].time < time;
 
 export function setupGraphics() {
-  ThreadFront.sessionWaiter.promise.then(async (sessionId: string) => {
+  replayClient.waitForSession().then(async (sessionId: string) => {
     let paintedGraphics = false;
     const maybePaintGraphics = async () => {
       if (!paintedGraphics) {

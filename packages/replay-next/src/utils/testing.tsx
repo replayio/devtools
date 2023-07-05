@@ -201,6 +201,7 @@ export function createMockReplayClient() {
   mockClient.findSources.mockImplementation(async () => []);
   mockClient.removeEventListener.mockImplementation(() => {});
   mockClient.getCurrentFocusWindow.mockImplementation(() => null);
+  mockClient.waitForSession.mockImplementation(() => Promise.resolve(""));
 
   return mockClient;
 }

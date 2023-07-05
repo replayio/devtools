@@ -13,7 +13,7 @@ import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientInterface } from "shared/client/types";
 
 import { client } from "../socket";
-import { EventEmitter, assert, defer } from "../utils";
+import { EventEmitter, assert } from "../utils";
 
 export interface Pause {
   point: ExecutionPoint;
@@ -52,7 +52,6 @@ class _ThreadFront {
 
   // Waiter for the associated session ID.
   sessionId: SessionId | null = null;
-  sessionWaiter = defer<SessionId>();
 
   // added by EventEmitter.decorate(ThreadFront)
   eventListeners!: Map<ThreadFrontEvent, ((value?: any) => void)[]>;
@@ -82,13 +81,8 @@ class _ThreadFront {
   async setSessionId(sessionId: SessionId) {
     this.sessionId = sessionId;
     assert(sessionId, "there should be a sessionId");
-    this.sessionWaiter.resolve(sessionId);
     // This helps when trying to debug logRocket sessions and the like
     console.debug({ sessionId });
-  }
-
-  waitForSession() {
-    return this.sessionWaiter.promise;
   }
 
   _accessToken: string | null = null;
