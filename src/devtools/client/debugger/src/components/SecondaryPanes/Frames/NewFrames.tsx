@@ -218,7 +218,7 @@ function Frames({ panel, point, time }: FramesProps) {
         key={pauseId}
         fallback={<div className="pane-info empty">Error loading frames</div>}
       >
-        <Suspense fallback={<div className="pane-info empty">Loading…</div>}>
+        <Suspense fallback={<div className="pane-info empty">Loading...</div>}>
           <div role="list">
             <FramesRenderer pauseId={pauseId} panel={panel} />
           </div>
@@ -230,7 +230,13 @@ function Frames({ panel, point, time }: FramesProps) {
 
 export default function FramesSuspenseWrapper(props: FramesProps) {
   return (
-    <Suspense fallback={<div className="pane-info empty">Loading…</div>}>
+    <Suspense
+      fallback={
+        <div className="pane">
+          <div className="pane-info empty">Loading...</div>
+        </div>
+      }
+    >
       <Frames {...props} />
     </Suspense>
   );
