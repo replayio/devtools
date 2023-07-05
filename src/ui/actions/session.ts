@@ -327,7 +327,7 @@ export function createSocket(
 
       ThreadFront.on("paused", ({ point }) => dispatch(setCurrentPoint(point)));
 
-      await ThreadFront.waitForSession();
+      await replayClient.waitForSession();
       await dispatch(jumpToInitialPausePoint());
 
       dispatch(actions.setLoadingFinished(true));

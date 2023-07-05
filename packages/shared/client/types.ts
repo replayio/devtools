@@ -154,7 +154,7 @@ export interface ReplayClientInterface {
   addEventListener(type: ReplayClientEvents, handler: Function): void;
   breakpointAdded(location: Location, condition: string | null): Promise<BreakpointId>;
   breakpointRemoved(breakpointId: BreakpointId): Promise<void>;
-  configure(sessionId: string): void;
+  configure(sessionId: string): Promise<void>;
   createPause(executionPoint: ExecutionPoint): Promise<createPauseResult>;
   evaluateExpression(
     pauseId: PauseId,
@@ -278,4 +278,5 @@ export interface ReplayClientInterface {
     }) => void,
     onSourceContentsChunk: ({ chunk, sourceId }: { chunk: string; sourceId: SourceId }) => void
   ): Promise<void>;
+  waitForSession(): Promise<string>;
 }
