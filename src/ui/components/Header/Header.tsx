@@ -1,5 +1,6 @@
 import { RecordingId } from "@replayio/protocol";
 import classNames from "classnames";
+import Link from "next/link";
 import { ClipboardEvent, KeyboardEvent, useLayoutEffect, useRef, useState } from "react";
 
 import { RecordingTarget } from "replay-next/src/suspense/BuildIdCache";
@@ -186,11 +187,9 @@ export default function Header() {
     <div className={styles.Header}>
       <div className="relative flex flex-grow flex-row items-center overflow-hidden">
         {isAuthenticated && (
-          <IconWithTooltip
-            icon={backIcon}
-            content={"Back to Library"}
-            handleClick={e => onNavigateBack(e)}
-          />
+          <Link href={dashboardUrl}>
+            <IconWithTooltip icon={backIcon} content={"Back to Library"} />
+          </Link>
         )}
         {recording && recordingId ? (
           <HeaderTitle recording={recording} recordingId={recordingId} />
