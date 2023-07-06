@@ -6,5 +6,5 @@
 }
 
 .Empty {
-  font-family: Inter;
+  font-family: var(--font-family-default);
 }
