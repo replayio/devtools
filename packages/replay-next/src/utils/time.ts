@@ -1,4 +1,4 @@
-import { ExecutionPoint, TimeStampedPointRange } from "@replayio/protocol";
+import { ExecutionPoint } from "@replayio/protocol";
 import differenceInCalendarDays from "date-fns/differenceInCalendarDays";
 import differenceInMinutes from "date-fns/differenceInMinutes";
 import differenceInMonths from "date-fns/differenceInMonths";
@@ -6,17 +6,6 @@ import differenceInWeeks from "date-fns/differenceInWeeks";
 import differenceInYears from "date-fns/differenceInYears";
 import padStart from "lodash/padStart";
 import prettyMilliseconds from "pretty-ms";
-
-export function areRangesEqual(
-  prevRanges: Array<TimeStampedPointRange>,
-  nextRanges: Array<TimeStampedPointRange>
-): boolean {
-  return (
-    prevRanges.find((prevRange, index) => {
-      return !isRangeEqual(prevRange, nextRanges[index]);
-    }) == null
-  );
-}
 
 export function compareExecutionPoints(a: ExecutionPoint, b: ExecutionPoint): number {
   return Number(BigInt(a) - BigInt(b));
@@ -81,42 +70,5 @@ export function formatTimestamp(ms: number, showHighPrecision: boolean = false) 
     return `${minutesString}:${secondsString}.${millisecondsString}`;
   } else {
     return `${minutesString}:${secondsString}`;
-  }
-}
-
-export function isRangeEqual(
-  prevRange: TimeStampedPointRange | null,
-  nextRange: TimeStampedPointRange | null
-): boolean {
-  if (prevRange === null && nextRange === null) {
-    return true;
-  } else if (prevRange !== null && nextRange !== null) {
-    return (
-      nextRange.begin.point === prevRange.begin.point && nextRange.end.point === prevRange.end.point
-    );
-  } else {
-    return false;
-  }
-}
-
-export function isRangeSubset(
-  prevRange: TimeStampedPointRange | null,
-  nextRange: TimeStampedPointRange | null
-): boolean {
-  if (prevRange === null && nextRange === null) {
-    return true;
-  } else if (prevRange === null) {
-    // There was no previous range constraint.
-    // No matter what the new range is, it will be a subset.
-    return true;
-  } else if (nextRange === null) {
-    // There is no new range constraint.
-    // No matter what the previous range was, the new one is not a subset.
-    return false;
-  } else {
-    return !(
-      isExecutionPointsLessThan(nextRange.begin.point, prevRange.begin.point) ||
-      isExecutionPointsGreaterThan(nextRange.end.point, prevRange.end.point)
-    );
   }
 }
