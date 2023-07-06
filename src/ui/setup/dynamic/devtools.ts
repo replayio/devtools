@@ -214,7 +214,7 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
 
   networkRequestsCache.prefetch(replayClient);
 
-  ThreadFront.waitForSession().then(() => {
+  replayClient.waitForSession().then(() => {
     // Precache annotations
     annotationKindsCache.prefetch(replayClient, REACT_ANNOTATIONS_KIND);
     annotationKindsCache.prefetch(replayClient, REDUX_ANNOTATIONS_KIND);

@@ -42,7 +42,7 @@ export async function setupApp(
   ThreadFront: typeof ThreadFrontType,
   replayClient: ReplayClientInterface
 ) {
-  ThreadFront.waitForSession().then(sessionId => {
+  replayClient.waitForSession().then(sessionId => {
     store.dispatch(setSessionId(sessionId));
 
     replayClient

@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-import Link from "next/link";
 
 import Icon from "replay-next/components/Icon";
 import { Recording } from "shared/graphql/types";
@@ -63,11 +62,9 @@ export function TestResultListItem({
   }
 
   return (
-    <Link
+    <a
       href={`/recording/${recording.id}`}
       className={`flex w-full flex-grow cursor-pointer flex-row items-center justify-center gap-2 truncate px-4 py-2 transition duration-150 ${styles.libraryRow}`}
-      target="_blank"
-      rel="noopener noreferrer"
       style={{
         paddingLeft: `${depth * 1}rem`,
       }}
@@ -101,6 +98,6 @@ export function TestResultListItem({
           <span>{numComments}</span>
         </div>
       )}
-    </Link>
+    </a>
   );
 }

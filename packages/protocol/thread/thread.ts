@@ -7,23 +7,13 @@
 // performed on the state at different points in the recording. This layer
 // helps with adapting the devtools to the WRP.
 
-import {
-  ExecutionPoint,
-  Frame,
-  FrameId,
-  PauseId,
-  RecordingId,
-  SessionId,
-  Value,
-} from "@replayio/protocol";
+import { ExecutionPoint, Frame, PauseId, RecordingId, SessionId } from "@replayio/protocol";
 
-import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
-import { cachePauseData, pauseIdCache } from "replay-next/src/suspense/PauseCache";
-import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
+import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientInterface } from "shared/client/types";
 
 import { client } from "../socket";
-import { EventEmitter, assert, defer } from "../utils";
+import { EventEmitter, assert } from "../utils";
 
 export interface Pause {
   point: ExecutionPoint;
@@ -62,10 +52,6 @@ class _ThreadFront {
 
   // Waiter for the associated session ID.
   sessionId: SessionId | null = null;
-  sessionWaiter = defer<SessionId>();
-
-  // Waiter which resolves when all sources have been loaded.
-  private allSourcesWaiter = defer<void>();
 
   // added by EventEmitter.decorate(ThreadFront)
   eventListeners!: Map<ThreadFrontEvent, ((value?: any) => void)[]>;
@@ -95,13 +81,8 @@ class _ThreadFront {
   async setSessionId(sessionId: SessionId) {
     this.sessionId = sessionId;
     assert(sessionId, "there should be a sessionId");
-    this.sessionWaiter.resolve(sessionId);
     // This helps when trying to debug logRocket sessions and the like
     console.debug({ sessionId });
-  }
-
-  waitForSession() {
-    return this.sessionWaiter.promise;
   }
 
   _accessToken: string | null = null;
@@ -130,72 +111,6 @@ class _ThreadFront {
     this.currentTime = time;
     this.currentPauseId = pauseId;
     this.emit("paused", { point, time, openSource });
-  }
-
-  async ensureAllSources() {
-    await this.allSourcesWaiter.promise;
-  }
-
-  public markSourcesLoaded() {
-    // Called by `debugger/src/client/index`, in `setupDebugger()`.
-    // Sources are now fetched via `SourcesCache`.
-    this.allSourcesWaiter.resolve();
-  }
-
-  // Same as evaluate, but returns the result without wrapping a ValueFront around them.
-  // TODO Replace usages of evaluate with this.
-  async evaluate({
-    replayClient,
-    pauseId,
-    text,
-    frameId,
-    pure = false,
-  }: {
-    replayClient: ReplayClientInterface;
-    pauseId?: PauseId;
-    text: string;
-    frameId?: FrameId;
-    pure?: boolean;
-  }) {
-    if (!pauseId) {
-      pauseId = await this.getCurrentPauseId(replayClient);
-    }
-    const abilities = await recordingCapabilitiesCache.readAsync(replayClient);
-    const { result } = frameId
-      ? await client.Pause.evaluateInFrame(
-          {
-            frameId,
-            expression: text,
-            useOriginalScopes: true,
-            pure: abilities.supportsPureEvaluation && pure,
-          },
-          this.sessionId!,
-          pauseId
-        )
-      : await client.Pause.evaluateInGlobal(
-          {
-            expression: text,
-            pure: abilities.supportsPureEvaluation && pure,
-          },
-          this.sessionId!,
-          pauseId
-        );
-    const sources = await sourcesByIdCache.readAsync(replayClient);
-    cachePauseData(replayClient, sources, pauseId, result.data);
-
-    if (features.repaintEvaluations) {
-      const { repaint } = await import("protocol/graphics");
-      // Fire and forget
-      repaint(true);
-    }
-
-    if (result.returned) {
-      return { exception: null, returned: result.returned as unknown as Value };
-    } else if (result.exception) {
-      return { exception: result.exception as unknown as Value, returned: null };
-    } else {
-      return { exception: null, returned: null };
-    }
   }
 }
 

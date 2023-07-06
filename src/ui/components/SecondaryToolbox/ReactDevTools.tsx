@@ -12,6 +12,7 @@ import { useIsPointWithinFocusWindow } from "replay-next/src/hooks/useIsPointWit
 import { useNag } from "replay-next/src/hooks/useNag";
 import { RecordingTarget, recordingTargetCache } from "replay-next/src/suspense/BuildIdCache";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
+import { evaluate } from "replay-next/src/utils/evaluate";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
 import { Nag } from "shared/graphql/types";
@@ -145,7 +146,7 @@ class ReplayWall implements Wall {
           }
           this.highlightedElementId = id;
 
-          const response = await ThreadFront.evaluate({
+          const response = await evaluate({
             replayClient: this.replayClient,
             text: `${getDOMNodes}(${rendererID}, ${id})[0]`,
           });
@@ -223,7 +224,7 @@ class ReplayWall implements Wall {
 
   // send a request to the backend in the recording and the reply to the frontend
   private async sendRequest(event: string, payload: any) {
-    const response = await ThreadFront.evaluate({
+    const response = await evaluate({
       replayClient: this.replayClient,
       text: ` window.__RECORD_REPLAY_REACT_DEVTOOLS_SEND_MESSAGE__("${event}", ${JSON.stringify(
         payload
@@ -248,7 +249,7 @@ class ReplayWall implements Wall {
       const rendererID = this.store!.rootIDToRendererID.get(rootID)!;
       const elementIDs = JSON.stringify(this.collectElementIDs(rootID));
       const expr = `${elementIDs}.reduce((map, id) => { for (node of ${getDOMNodes}(${rendererID}, id) || []) { map.set(node, id); } return map; }, new Map())`;
-      const response = await ThreadFront.evaluate({
+      const response = await evaluate({
         replayClient: this.replayClient,
         text: expr,
       });
@@ -313,7 +314,7 @@ class ReplayWall implements Wall {
       (${retrieveSelectedReactComponentFunction})()
     `;
 
-      const res = await ThreadFront.evaluate({
+      const res = await evaluate({
         replayClient: this.replayClient,
         text: findSavedComponentFunctionCommand,
       });
@@ -411,7 +412,7 @@ async function loadReactDevToolsInlineModuleFromProtocol(
 
   if (recordingTarget === "gecko") {
     // For Gecko recordings, introspect the page to determine what RDT version was used
-    const response = await ThreadFront.evaluate({
+    const response = await evaluate({
       replayClient,
       text: ` __RECORD_REPLAY_REACT_DEVTOOLS_SEND_MESSAGE__("getBridgeProtocol", undefined)`,
     });

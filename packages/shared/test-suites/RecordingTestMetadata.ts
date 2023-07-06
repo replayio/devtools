@@ -17,7 +17,7 @@ import { AnnotationsCache } from "ui/components/TestSuite/suspense/AnnotationsCa
 export type SemVer = string;
 
 function assert(value: unknown, message: string, tags: Object = {}): asserts value {
-  return assertWithTelemetry(value, "process-test-metadata", message, tags);
+  return assertWithTelemetry(value, message, "process-test-metadata", tags);
 }
 
 // This type is only minimally supported by the frontend
@@ -180,7 +180,7 @@ export namespace RecordingTestMetadataV3 {
     // Uniquely identifies a test within a group of tests
     // This can be used to differentiate multiple tests with the same name (and scope)
     // or retries of a single test after a failed attempt
-    id: number | string;
+    id: number;
 
     // Note that the client does not necessarily have any expectations of ordering here;
     // we will likely order results lexicographically, by title.
@@ -604,6 +604,64 @@ export async function processGroupedTestCases(
     switch (environment.testRunner.name) {
       case "cypress": {
         const annotations = await AnnotationsCache.readAsync(replayClient);
+        let clientSideEnvironmentError: TestEnvironmentError | null = null;
+
+        // If there are test(s) with completed status (passed/failed/timedOut) but no annotations,
+        // that indicates that the Cypress support plugin file wasn't included.
+        // The frontend is in a better position to detect this scenario than the plug-in,
+        // so we should add an environment error in.
+        //
+        // See FE-1645
+        if (annotations.length === 0) {
+          const hasIncompleteTest = partialTestRecordings.some(test => {
+            switch (test.result) {
+              case "failed":
+              case "passed":
+              case "timedOut":
+                break;
+              default:
+                return true;
+            }
+          });
+
+          if (!hasIncompleteTest) {
+            clientSideEnvironmentError = {
+              code: 0,
+              detail: null,
+              message: "Missing or bad plug-in configuration.",
+              name: "MissingCypressPluginError",
+            };
+
+            // HACK
+            // Subsequent validations will fail if a test doesn't have a begin and end point.
+            // In this scenario, there are no known begin or end points,
+            // so we fill in dummy data to avoid triggering assertion errors
+            //
+            // See FE-1645
+            partialTestRecordings.forEach(test => {
+              annotations.push({
+                message: {
+                  event: "test:start",
+                  titlePath: [],
+                  testId: test.id,
+                  attempt: 1,
+                },
+                point: "0",
+                time: 0,
+              });
+              annotations.push({
+                message: {
+                  event: "test:end",
+                  titlePath: [],
+                  testId: test.id,
+                  attempt: 1,
+                },
+                point: "0",
+                time: 0,
+              });
+            });
+          }
+        }
 
         // Annotations for the entire recording (which may include more than one test)
         // we need to splice only the appropriate subset for each test.
@@ -644,7 +702,13 @@ export async function processGroupedTestCases(
 
         return {
           ...rest,
-          environment,
+
+          environment: clientSideEnvironmentError
+            ? {
+                ...environment,
+                errors: [...environment.errors, clientSideEnvironmentError],
+              }
+            : environment,
           source: {
             filePath: source.path,
             title: source.title,

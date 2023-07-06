@@ -159,8 +159,6 @@ export async function bootstrapApp() {
     });
   });
 
-  Promise.resolve(sourcesCache.readAsync(replayClient)).then(() => ThreadFront.markSourcesLoaded());
-
   setupTelemetry();
   setupDOMHelpers();
 

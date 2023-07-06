@@ -7,6 +7,7 @@
  * @module actions/sources
  */
 
+import { sourcesCache } from "replay-next/src/suspense/SourcesCache";
 import { UIThunkAction } from "ui/actions";
 import { setSelectedPanel, setViewMode } from "ui/actions/layout";
 import { getToolboxLayout, getViewMode } from "ui/reducers/layout";
@@ -120,7 +121,7 @@ export function selectLocation(
   location: PartialLocation,
   openSource = true
 ): UIThunkAction<Promise<unknown>> {
-  return async (dispatch, getState, { ThreadFront }) => {
+  return async (dispatch, getState, { replayClient }) => {
     trackEvent("sources.select_location");
 
     if (openSource) {
@@ -134,7 +135,7 @@ export function selectLocation(
     let source = getSourceDetails(getState(), location.sourceId);
     if (location.sourceUrl) {
       if (!source || location.sourceUrl !== source.url) {
-        await ThreadFront.ensureAllSources();
+        await sourcesCache.readAsync(replayClient);
         const sourceId = handleUnstableSourceIds(location.sourceUrl!, getState());
         if (sourceId) {
           source = getSourceDetails(getState(), sourceId);

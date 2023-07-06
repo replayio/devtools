@@ -104,7 +104,7 @@ function RequestRecordingAccessButton() {
       setExpectedError({
         message: "Hang tight!",
         content:
-          "We've let the owner know about your request. We'll notify you by e-mail once it's been accepted",
+          "We notified the owner that you requested access and will email you when you're approved.",
         action: "library",
       })
     );

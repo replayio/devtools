@@ -1,4 +1,11 @@
-import { ChangeEvent, KeyboardEvent, RefObject, useContext, useState } from "react";
+import {
+  ChangeEvent,
+  KeyboardEvent,
+  RefObject,
+  useContext,
+  useLayoutEffect,
+  useState,
+} from "react";
 
 import Icon from "../Icon";
 import { SourceSearchContext } from "./SourceSearchContext";
@@ -16,6 +23,14 @@ export default function SourceSearch({
   const { caseSensitive, regex, wholeWord } = searchState.modifiers;
 
   const [inputFocused, setInputFocused] = useState(false);
+
+  useLayoutEffect(() => {
+    // Select all text by default to mimic browser and IDE behavior
+    const input = inputRef.current;
+    if (input) {
+      input.select();
+    }
+  }, [inputRef]);
 
   const onChange = (event: ChangeEvent<HTMLInputElement>) => {
     searchActions.search(event.currentTarget.value);

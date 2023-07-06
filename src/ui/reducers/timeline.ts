@@ -5,7 +5,7 @@ import sortBy from "lodash/sortBy";
 import { getPausePointParams } from "shared/utils/environment";
 import { MAX_FOCUS_REGION_DURATION } from "ui/actions/timeline";
 import { UIState } from "ui/state";
-import { FocusWindow, HoveredItem, TimeRange, TimelineState } from "ui/state/timeline";
+import { FocusWindow, HoveredItem, TimelineState } from "ui/state/timeline";
 import { mergeSortedPointLists } from "ui/utils/timeline";
 
 function initialTimelineState(): TimelineState {
@@ -96,7 +96,7 @@ export const {
   setPlaybackPrecachedTime,
   setPlaybackFocusWindow,
   setPlaybackStalled,
-  setFocusWindow: setFocusWindow,
+  setFocusWindow,
   setTimelineState,
   pointsReceived,
   paintsReceived,
