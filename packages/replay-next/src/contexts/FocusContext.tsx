@@ -6,11 +6,16 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   useTransition,
 } from "react";
 
 import useLoadedRegions from "replay-next/src/hooks/useLoadedRegions";
+import {
+  isTimeStampedPointRangeGreaterThan,
+  isTimeStampedPointRangeLessThan,
+} from "replay-next/src/utils/timeStampedPoints";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import useDebouncedCallback from "../hooks/useDebouncedCallback";
@@ -66,6 +71,8 @@ export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
   const [range, setRange] = useState<TimeStampedPointRange | null>(initialRange);
   const [deferredRange, setDeferredRange] = useState<TimeStampedPointRange | null>(initialRange);
 
+  const prevRangeRef = useRef(range);
+
   // Using a deferred values enables the focus UI to update quickly,
   // and the slower operation of Suspending to load points to be deferred.
   //
@@ -109,7 +116,21 @@ export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
 
   const updateFocusRange = useCallback(
     async (range: TimeStampedPointRange | null, options: UpdateOptions) => {
-      const { bias, debounce } = options;
+      let { bias, debounce } = options;
+
+      // If the caller hasn't specified an explicit bias,
+      // compare the new focus range to the previous one to infer user intent.
+      // This helps when a focus range can't be loaded in full.
+      if (bias == null && range != null) {
+        const prevRange = prevRangeRef.current;
+        if (prevRange != null) {
+          if (isTimeStampedPointRangeLessThan(prevRange, range)) {
+            bias = "begin";
+          } else if (isTimeStampedPointRangeGreaterThan(prevRange, range)) {
+            bias = "end";
+          }
+        }
+      }
 
       setBias(bias);
       setRange(range);

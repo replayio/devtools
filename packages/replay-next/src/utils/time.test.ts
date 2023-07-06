@@ -1,6 +1,6 @@
 import { TimeStampedPoint, TimeStampedPointRange } from "@replayio/protocol";
 
-import { formatDuration, formatTimestamp, isRangeEqual, isRangeSubset } from "./time";
+import { formatDuration, formatTimestamp } from "./time";
 
 describe("Time util", () => {
   function toTSP(time: number): TimeStampedPoint {
@@ -51,42 +51,6 @@ describe("Time util", () => {
     it("should round fractional values", () => {
       expect(formatTimestamp(1.3, true)).toEqual("0:00.001");
       expect(formatTimestamp(1.7, true)).toEqual("0:00.002");
-    });
-  });
-
-  describe("isRangeEqual", () => {
-    it("should properly handle combinations of null values", () => {
-      expect(isRangeEqual(null, null)).toEqual(true);
-      expect(isRangeEqual(toTSPR(1, 3), null)).toEqual(false);
-      expect(isRangeEqual(null, toTSPR(1, 3))).toEqual(false);
-    });
-
-    it("should properly handle non-null ranges", () => {
-      expect(isRangeEqual(toTSPR(1, 3), toTSPR(1, 3))).toEqual(true);
-      expect(isRangeEqual(toTSPR(1, 3), toTSPR(0, 0))).toEqual(false);
-      expect(isRangeEqual(toTSPR(1, 3), toTSPR(1, 1))).toEqual(false);
-      expect(isRangeEqual(toTSPR(1, 3), toTSPR(3, 3))).toEqual(false);
-    });
-  });
-
-  describe("isRangeSubset", () => {
-    it("should properly handle combinations of null values", () => {
-      expect(isRangeSubset(null, null)).toBe(true);
-      expect(isRangeSubset(null, toTSPR(1, 3))).toBe(true);
-      expect(isRangeSubset(toTSPR(1, 3), null)).toBe(false);
-    });
-
-    it("should properly handle non-null ranges", () => {
-      expect(isRangeSubset(toTSPR(1, 3), toTSPR(1, 3))).toBe(true);
-      expect(isRangeSubset(toTSPR(1, 3), toTSPR(2, 3))).toBe(true);
-      expect(isRangeSubset(toTSPR(1, 3), toTSPR(1, 2))).toBe(true);
-      expect(isRangeSubset(toTSPR(1, 3), toTSPR(2, 2))).toBe(true);
-
-      expect(isRangeSubset(toTSPR(1, 3), toTSPR(0, 3))).toBe(false);
-      expect(isRangeSubset(toTSPR(1, 3), toTSPR(1, 4))).toBe(false);
-      expect(isRangeSubset(toTSPR(1, 3), toTSPR(2, 4))).toBe(false);
-      expect(isRangeSubset(toTSPR(1, 3), toTSPR(0, 2))).toBe(false);
-      expect(isRangeSubset(toTSPR(1, 3), toTSPR(0, 4))).toBe(false);
     });
   });
 });
