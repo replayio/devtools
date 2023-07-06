@@ -142,11 +142,7 @@ export default memo(function UserActionEventRow({
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className={styles.Text}>
-        {eventNumber != null ? (
-          <span className={styles.Number}>{eventNumber}</span>
-        ) : (
-          <span className={styles.ChainedEvent}>.</span>
-        )}
+        {eventNumber != null ? <span className={styles.Number}>{eventNumber}</span> : null}
         <span
           className={`${styles.Name} ${styles.Name}`}
           data-name={command.name}
