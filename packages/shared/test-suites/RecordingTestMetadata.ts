@@ -331,8 +331,9 @@ export async function processCypressTestRecording(
 
     const navigationEvents: RecordingTestMetadataV3.NavigationEvent[] = [];
 
-    // Skipped tests won't contain any annotations (include begin/end point)
-    if (result !== "skipped") {
+    // Tests that were not run (skipped and unknown) won't contain any
+    // annotations (include begin/end point)
+    if (result !== "skipped" && result !== "unknown") {
       // Note that event annotations may be interleaved,
       // meaning that we can't step through both arrays in one pass.
       // Instead we have to loop over the annotations array once to group data by event id–
