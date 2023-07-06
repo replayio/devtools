@@ -104,13 +104,16 @@ function EnvironmentError({ error }: { error: TestEnvironmentError }) {
     });
   }, [error, recordingId]);
 
+  const message = error.message ?? "Something went wrong";
+
   return (
     <div className={styles.Error}>
-      Something went wrong (error code <strong>{error.code}</strong>).{" "}
+      <div>
+        Error {error.code}: {message}
+      </div>
       <a className={styles.ErrorLink} href="http://replay.io/discord" target="discord">
         Contact us on Discord
       </a>
-      .
     </div>
   );
 }

@@ -608,6 +608,62 @@ export async function processGroupedTestCases(
         let currentTestRecording: AnyTestRecording | null = null;
         let currentTestRecordingIndex = -1;
         let currentTestHasEnded = true;
+        let clientSideEnvironmentError: TestEnvironmentError | null = null;
+
+        // If there are test(s) with completed status (passed/failed/timedOut) but no annotations,
+        // that indicates that the Cypress support plugin file wasn't included.
+        // The frontend is in a better position to detect this scenario than the plug-in,
+        // so we should add an environment error in.
+        //
+        // See FE-1645
+        if (annotations.length === 0) {
+          const hasIncompleteTest = partialTestRecordings.some(test => {
+            switch (test.result) {
+              case "failed":
+              case "passed":
+              case "timedOut":
+                break;
+              default:
+                return true;
+            }
+          });
+
+          if (!hasIncompleteTest) {
+            clientSideEnvironmentError = {
+              code: 0,
+              detail: null,
+              message: "Missing or bad plug-in configuration.",
+              name: "MissingCypressPluginError",
+            };
+
+            // HACK
+            // Subsequent validations will fail if a test doesn't have a begin and end point.
+            // In this scenario, there are no known begin or end points,
+            // so we fill in dummy data to avoid triggering assertion errors
+            //
+            // See FE-1645
+            partialTestRecordings.forEach(test => {
+              annotations.push({
+                message: {
+                  event: "test:start",
+                  titlePath: [],
+                  testId: test.id,
+                },
+                point: "0",
+                time: 0,
+              });
+              annotations.push({
+                message: {
+                  event: "test:end",
+                  titlePath: [],
+                  testId: test.id,
+                },
+                point: "0",
+                time: 0,
+              });
+            });
+          }
+        }
 
         // Annotations for the entire recording (which may include more than one test)
         // we need to splice only the appropriate subset for each test.
@@ -681,7 +737,13 @@ export async function processGroupedTestCases(
 
         return {
           ...rest,
-          environment,
+
+          environment: clientSideEnvironmentError
+            ? {
+                ...environment,
+                errors: [...environment.errors, clientSideEnvironmentError],
+              }
+            : environment,
           source: {
             filePath: source.path,
             title: source.title,
