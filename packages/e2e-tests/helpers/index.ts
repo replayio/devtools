@@ -71,7 +71,7 @@ export async function startTest(page: Page, example: string, apiKey?: string) {
   // Relaxing only the initial check allows more time for the backend to scale up
   // without compromising the integrity of the tests overall.
   await page.locator('[data-panel-id="Panel-SidePanel"]').waitFor({
-    timeout: 60_000,
+    timeout: 90_000,
   });
 
   // Wait for the recording basic information to load such that the primary tabs are visible.
