@@ -884,7 +884,7 @@ function detectMissingCypressPlugin(
     return !hasIncompleteTest;
   }
 
-  return true;
+  return false;
 }
 
 async function processNetworkData(
