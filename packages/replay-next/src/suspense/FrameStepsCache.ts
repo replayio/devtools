@@ -40,8 +40,8 @@ export async function getFrameStepForFrameLocation(
   const frameSteps = await frameStepsCache.readAsync(replayClient, pauseId, protocolFrameId);
 
   const matchingFrameStep = frameSteps?.find(step => {
-    return step.frame?.find(location => {
-      return location.sourceId === location.sourceId && location.line === location.line;
+    return step.frame?.find(stepLocation => {
+      return stepLocation.sourceId === location.sourceId && stepLocation.line === location.line;
     });
   });
 
