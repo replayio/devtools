@@ -25,6 +25,11 @@ import {
   sessionEndPointCache,
 } from "replay-next/src/suspense/ExecutionPointsCache";
 import { screenshotCache } from "replay-next/src/suspense/ScreenshotCache";
+import {
+  isTimeStampedPointRangeEqual,
+  isTimeStampedPointRangeGreaterThan,
+  isTimeStampedPointRangeLessThan,
+} from "replay-next/src/utils/timeStampedPoints";
 import { ReplayClientInterface } from "shared/client/types";
 import {
   encodeObjectToURL,
@@ -36,6 +41,7 @@ import { getFirstComment } from "ui/hooks/comments/comments";
 import {
   getCurrentTime,
   getFocusWindow,
+  getFocusWindowBackup,
   getHoverTime,
   getHoveredItem,
   getPlayback,
@@ -668,15 +674,22 @@ export function syncFocusedRegion(): UIThunkAction {
       return;
     }
 
-    const currentTime = getCurrentTime(state);
+    const focusWindowBackup = getFocusWindowBackup(state);
+
     const zoomTime = getZoomRegion(state);
 
     const begin = focusWindow ? focusWindow.begin.time : zoomTime.beginTime;
     const end = focusWindow ? focusWindow.end.time : zoomTime.endTime;
 
+    // Compare the new focus range to the previous one to infer user intent.
+    // This helps when a focus range can't be loaded in full.
     let bias: FocusWindowRequestBias | undefined;
-    if (currentTime >= begin && currentTime <= end) {
-      bias = currentTime - begin < end - currentTime ? "begin" : "end";
+    if (bias == null && focusWindowBackup != null) {
+      if (isTimeStampedPointRangeLessThan(focusWindowBackup, focusWindow)) {
+        bias = "begin";
+      } else if (isTimeStampedPointRangeGreaterThan(focusWindowBackup, focusWindow)) {
+        bias = "end";
+      }
     }
 
     const window = await replayClient.requestFocusWindow({
@@ -685,29 +698,16 @@ export function syncFocusedRegion(): UIThunkAction {
       end,
     });
 
-    // If the actual region that's focused is smaller than the requested region,
-    // refine the local focus region to stay in sync.
-    // Note this may result in the current time/point being outside of the focus region.
-    if (focusWindow) {
-      if (window.begin.time > focusWindow.begin.time || window.end.time < focusWindow.end.time) {
-        dispatch(
-          setFocusWindow({
-            begin: window.begin,
-            end: window.end,
-          })
-        );
-        dispatch(setFocusWindow(window));
-      }
-    } else {
-      if (window.begin.time > zoomTime.beginTime || window.end.time < zoomTime.endTime) {
-        dispatch(
-          setFocusWindow({
-            begin: window.begin,
-            end: window.end,
-          })
-        );
-        dispatch(setFocusWindow(window));
-      }
+    // If the backend has selected a different focus window, refine our in-memory window to match.
+    // Note that this is pretty likely to happen, given the focus API currently only supports times.
+    if (!isTimeStampedPointRangeEqual(focusWindow, window)) {
+      dispatch(
+        setFocusWindow({
+          begin: window.begin,
+          end: window.end,
+        })
+      );
+      dispatch(setFocusWindow(window));
     }
   };
 }
