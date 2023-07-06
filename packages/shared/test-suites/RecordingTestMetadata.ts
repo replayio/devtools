@@ -332,239 +332,245 @@ export async function processCypressTestRecording(
     const navigationEvents: RecordingTestMetadataV3.NavigationEvent[] = [];
 
     // Skipped tests won't contain any annotations (include begin/end point)
-    if (result !== "skipped") {
-      // Note that event annotations may be interleaved,
-      // meaning that we can't step through both arrays in one pass.
-      // Instead we have to loop over the annotations array once to group data by event id–
-      // (and also find the navigation and test start/end annotations)–
-      // then we can iterate over the user-action events.
-      const userActionEventIdToAnnotations: Record<string, Annotation[]> = {};
+    switch (result) {
+      case "skipped":
+      case "unknown": {
+        break;
+      }
+      default: {
+        // Note that event annotations may be interleaved,
+        // meaning that we can't step through both arrays in one pass.
+        // Instead we have to loop over the annotations array once to group data by event id–
+        // (and also find the navigation and test start/end annotations)–
+        // then we can iterate over the user-action events.
+        const userActionEventIdToAnnotations: Record<string, Annotation[]> = {};
 
-      for (let index = 0; index < annotations.length; index++) {
-        const annotation = annotations[index];
-        switch (annotation.message.event) {
-          case "event:navigation": {
-            assert(annotation.message.url, "Navigation annotation must have a URL");
+        for (let index = 0; index < annotations.length; index++) {
+          const annotation = annotations[index];
+          switch (annotation.message.event) {
+            case "event:navigation": {
+              assert(annotation.message.url, "Navigation annotation must have a URL");
 
-            const navigationEvent: RecordingTestMetadataV3.NavigationEvent = {
-              data: {
-                url: annotation.message.url,
-              },
-              timeStampedPoint: {
+              const navigationEvent: RecordingTestMetadataV3.NavigationEvent = {
+                data: {
+                  url: annotation.message.url,
+                },
+                timeStampedPoint: {
+                  point: annotation.point,
+                  time: annotation.time,
+                },
+                type: "navigation",
+              };
+
+              navigationEvents.push(navigationEvent);
+              break;
+            }
+            case "step:end":
+            case "step:enqueue":
+            case "step:start": {
+              const id = annotation.message.id;
+              assert(id != null, "Annotation event must have an id");
+              if (userActionEventIdToAnnotations[id] == null) {
+                userActionEventIdToAnnotations[id] = [annotation];
+              } else {
+                userActionEventIdToAnnotations[id].push(annotation);
+              }
+              break;
+            }
+            case "test:start": {
+              beginPoint = {
                 point: annotation.point,
                 time: annotation.time,
-              },
-              type: "navigation",
-            };
-
-            navigationEvents.push(navigationEvent);
-            break;
-          }
-          case "step:end":
-          case "step:enqueue":
-          case "step:start": {
-            const id = annotation.message.id;
-            assert(id != null, "Annotation event must have an id");
-            if (userActionEventIdToAnnotations[id] == null) {
-              userActionEventIdToAnnotations[id] = [annotation];
-            } else {
-              userActionEventIdToAnnotations[id].push(annotation);
+              };
+              break;
             }
-            break;
-          }
-          case "test:start": {
-            beginPoint = {
-              point: annotation.point,
-              time: annotation.time,
-            };
-            break;
-          }
-          case "test:end": {
-            endPoint = {
-              point: annotation.point,
-              time: annotation.time,
-            };
-            break;
-          }
-          default: {
-            console.warn(`Unexpected annotation type: ${annotation.message.event}`);
+            case "test:end": {
+              endPoint = {
+                point: annotation.point,
+                time: annotation.time,
+              };
+              break;
+            }
+            default: {
+              console.warn(`Unexpected annotation type: ${annotation.message.event}`);
+            }
           }
         }
-      }
 
-      assert(beginPoint !== null, "Test must have a begin point");
-      assert(endPoint !== null, "Test must have a end point");
+        assert(beginPoint !== null, "Test must have a begin point");
+        assert(endPoint !== null, "Test must have a end point");
 
-      for (let sectionName in partialEvents) {
-        // TODO [SCS-1186] Ignore beforeAll/afterAll sections for now;
-        // We'll need to make some changes to both Devtools UI and the Replay plug-in to handle these
-        switch (sectionName) {
-          case "afterAll":
-          case "beforeAll":
-            continue;
-        }
-
-        const testEvents = events[sectionName as RecordingTestMetadataV3.TestSectionName];
-
-        const partialTestEvents =
-          partialEvents[sectionName as RecordingTestMetadataV3.TestSectionName];
-        partialTestEvents.forEach(partialTestEvent => {
-          const {
-            category,
-            command,
-            error = null,
-            id,
-            parentId = null,
-            scope = null,
-          } = partialTestEvent.data;
-
-          assert(category, `Test event must have "category" property`, {
-            command: command.name,
-            id,
-          });
-
-          assert(command, `Test event must have "command" property`, {
-            id,
-            category,
-          });
-
-          assert(id, `Test event must have "id" property`, {
-            command: command.name,
-            category,
-          });
-
-          // The client does not show certain types of chained events in the list
-          // they clutter without adding much value
-          if (parentId !== null) {
-            switch (command.name) {
-              case "as":
-              case "then":
-                return null;
-            }
+        for (let sectionName in partialEvents) {
+          // TODO [SCS-1186] Ignore beforeAll/afterAll sections for now;
+          // We'll need to make some changes to both Devtools UI and the Replay plug-in to handle these
+          switch (sectionName) {
+            case "afterAll":
+            case "beforeAll":
+              continue;
           }
 
-          const annotations = userActionEventIdToAnnotations[id];
+          const testEvents = events[sectionName as RecordingTestMetadataV3.TestSectionName];
 
-          assert(annotations != null, `Missing annotations for test event`, {
-            command: command.name,
-            id,
-          });
-
-          let beginPoint: TimeStampedPoint | null = null;
-          let endPoint: TimeStampedPoint | null = null;
-          let resultPoint: TimeStampedPoint | null = null;
-          let resultVariable: string | null = null;
-          let viewSourceTimeStampedPoint: TimeStampedPoint | null = null;
-
-          const isChaiAssertion = command.name === "assert";
-          // TODO [FE-1419] name === "assert" && !annotations.enqueue;
-
-          annotations.forEach(annotation => {
-            switch (annotation.message.event) {
-              case "step:end": {
-                endPoint = {
-                  point: annotation.point,
-                  time: annotation.time,
-                };
-
-                resultPoint = {
-                  point: annotation.point,
-                  time: annotation.time,
-                };
-                resultVariable = annotation.message.logVariable ?? null;
-                break;
-              }
-              case "step:enqueue": {
-                if (!isChaiAssertion) {
-                  viewSourceTimeStampedPoint = {
-                    point: annotation.point,
-                    time: annotation.time,
-                  };
-                }
-                break;
-              }
-              case "step:start": {
-                beginPoint = {
-                  point: annotation.point,
-                  time: annotation.time,
-                };
-
-                if (isChaiAssertion) {
-                  viewSourceTimeStampedPoint = {
-                    point: annotation.point,
-                    time: annotation.time,
-                  };
-                }
-                break;
-              }
-            }
-          });
-
-          assert(beginPoint !== null, `Missing "step:start" annotation for test event`, {
-            id,
-            isChaiAssertion,
-          });
-
-          assert(viewSourceTimeStampedPoint !== null, `Missing annotation for test event`, {
-            annotationType: isChaiAssertion ? "step:start" : "step:enqueue",
-            id,
-            isChaiAssertion,
-          });
-
-          testEvents.push({
-            data: {
-              category: category,
-              command: {
-                arguments: command.arguments,
-                name: command.name,
-              },
-              error,
+          const partialTestEvents =
+            partialEvents[sectionName as RecordingTestMetadataV3.TestSectionName];
+          partialTestEvents.forEach(partialTestEvent => {
+            const {
+              category,
+              command,
+              error = null,
               id,
-              parentId,
-              result:
-                resultVariable && resultPoint
-                  ? {
-                      timeStampedPoint: resultPoint,
-                      variable: resultVariable,
-                    }
-                  : null,
-              scope,
-              viewSourceTimeStampedPoint,
-            },
-            timeStampedPointRange: {
-              begin: beginPoint,
-              end: endPoint || beginPoint,
-            },
-            type: "user-action",
+              parentId = null,
+              scope = null,
+            } = partialTestEvent.data;
+
+            assert(category, `Test event must have "category" property`, {
+              command: command.name,
+              id,
+            });
+
+            assert(command, `Test event must have "command" property`, {
+              id,
+              category,
+            });
+
+            assert(id, `Test event must have "id" property`, {
+              command: command.name,
+              category,
+            });
+
+            // The client does not show certain types of chained events in the list
+            // they clutter without adding much value
+            if (parentId !== null) {
+              switch (command.name) {
+                case "as":
+                case "then":
+                  return null;
+              }
+            }
+
+            const annotations = userActionEventIdToAnnotations[id];
+
+            assert(annotations != null, `Missing annotations for test event`, {
+              command: command.name,
+              id,
+            });
+
+            let beginPoint: TimeStampedPoint | null = null;
+            let endPoint: TimeStampedPoint | null = null;
+            let resultPoint: TimeStampedPoint | null = null;
+            let resultVariable: string | null = null;
+            let viewSourceTimeStampedPoint: TimeStampedPoint | null = null;
+
+            const isChaiAssertion = command.name === "assert";
+            // TODO [FE-1419] name === "assert" && !annotations.enqueue;
+
+            annotations.forEach(annotation => {
+              switch (annotation.message.event) {
+                case "step:end": {
+                  endPoint = {
+                    point: annotation.point,
+                    time: annotation.time,
+                  };
+
+                  resultPoint = {
+                    point: annotation.point,
+                    time: annotation.time,
+                  };
+                  resultVariable = annotation.message.logVariable ?? null;
+                  break;
+                }
+                case "step:enqueue": {
+                  if (!isChaiAssertion) {
+                    viewSourceTimeStampedPoint = {
+                      point: annotation.point,
+                      time: annotation.time,
+                    };
+                  }
+                  break;
+                }
+                case "step:start": {
+                  beginPoint = {
+                    point: annotation.point,
+                    time: annotation.time,
+                  };
+
+                  if (isChaiAssertion) {
+                    viewSourceTimeStampedPoint = {
+                      point: annotation.point,
+                      time: annotation.time,
+                    };
+                  }
+                  break;
+                }
+              }
+            });
+
+            assert(beginPoint !== null, `Missing "step:start" annotation for test event`, {
+              id,
+              isChaiAssertion,
+            });
+
+            assert(viewSourceTimeStampedPoint !== null, `Missing annotation for test event`, {
+              annotationType: isChaiAssertion ? "step:start" : "step:enqueue",
+              id,
+              isChaiAssertion,
+            });
+
+            testEvents.push({
+              data: {
+                category: category,
+                command: {
+                  arguments: command.arguments,
+                  name: command.name,
+                },
+                error,
+                id,
+                parentId,
+                result:
+                  resultVariable && resultPoint
+                    ? {
+                        timeStampedPoint: resultPoint,
+                        variable: resultVariable,
+                      }
+                    : null,
+                scope,
+                viewSourceTimeStampedPoint,
+              },
+              timeStampedPointRange: {
+                begin: beginPoint,
+                end: endPoint || beginPoint,
+              },
+              type: "user-action",
+            });
           });
+        }
+
+        // Finds the section that contains a given point
+        // defaults to the main (test body) section if no matches found
+        const findSection = (point: ExecutionPoint) => {
+          const sections = Object.values(events);
+          for (let index = sections.length - 1; index >= 0; index--) {
+            const events = sections[index];
+            const firstEvent = events[0];
+            if (firstEvent && comparePoints(getTestEventExecutionPoint(firstEvent)!, point) <= 0) {
+              return events;
+            }
+          }
+          return events.main;
+        };
+
+        const networkRequestEvents = await processNetworkData(replayClient, beginPoint, endPoint);
+        // Now that section boundaries have been defined by user-actions,
+        // merge in navigation and network events.
+        navigationEvents.forEach(navigationEvent => {
+          const events = findSection(navigationEvent.timeStampedPoint.point);
+          insert(events, navigationEvent, compareTestEventExecutionPoints);
+        });
+        networkRequestEvents.forEach(networkRequestEvent => {
+          const events = findSection(networkRequestEvent.timeStampedPoint.point);
+          insert(events, networkRequestEvent, compareTestEventExecutionPoints);
         });
       }
-
-      // Finds the section that contains a given point
-      // defaults to the main (test body) section if no matches found
-      const findSection = (point: ExecutionPoint) => {
-        const sections = Object.values(events);
-        for (let index = sections.length - 1; index >= 0; index--) {
-          const events = sections[index];
-          const firstEvent = events[0];
-          if (firstEvent && comparePoints(getTestEventExecutionPoint(firstEvent)!, point) <= 0) {
-            return events;
-          }
-        }
-        return events.main;
-      };
-
-      const networkRequestEvents = await processNetworkData(replayClient, beginPoint, endPoint);
-      // Now that section boundaries have been defined by user-actions,
-      // merge in navigation and network events.
-      navigationEvents.forEach(navigationEvent => {
-        const events = findSection(navigationEvent.timeStampedPoint.point);
-        insert(events, navigationEvent, compareTestEventExecutionPoints);
-      });
-      networkRequestEvents.forEach(networkRequestEvent => {
-        const events = findSection(networkRequestEvent.timeStampedPoint.point);
-        insert(events, networkRequestEvent, compareTestEventExecutionPoints);
-      });
     }
 
     return {
@@ -608,148 +614,124 @@ export async function processGroupedTestCases(
         let currentTestRecording: AnyTestRecording | null = null;
         let currentTestRecordingIndex = -1;
         let currentTestHasEnded = true;
-        let clientSideEnvironmentError: TestEnvironmentError | null = null;
 
-        // If there are test(s) with completed status (passed/failed/timedOut) but no annotations,
-        // that indicates that the Cypress support plugin file wasn't included.
-        // The frontend is in a better position to detect this scenario than the plug-in,
-        // so we should add an environment error in.
-        //
-        // See FE-1645
-        if (annotations.length === 0) {
-          const hasIncompleteTest = partialTestRecordings.some(test => {
-            switch (test.result) {
-              case "failed":
-              case "passed":
-              case "timedOut":
-                break;
-              default:
-                return true;
-            }
-          });
+        if (detectMissingCypressPlugin(annotations, partialTestRecordings)) {
+          const testRecordings: RecordingTestMetadataV3.TestRecording[] = [];
+          for (let index = 0; index < partialTestRecordings.length; index++) {
+            const legacyTest = partialTestRecordings[index];
+            const test = await processCypressTestRecording(
+              {
+                ...legacyTest,
+                result: "unknown",
+              },
+              [],
+              replayClient
+            );
 
-          if (!hasIncompleteTest) {
-            clientSideEnvironmentError = {
-              code: 0,
-              detail: null,
-              message: "Missing or bad plug-in configuration.",
-              name: "MissingCypressPluginError",
-            };
-
-            // HACK
-            // Subsequent validations will fail if a test doesn't have a begin and end point.
-            // In this scenario, there are no known begin or end points,
-            // so we fill in dummy data to avoid triggering assertion errors
-            //
-            // See FE-1645
-            partialTestRecordings.forEach(test => {
-              annotations.push({
-                message: {
-                  event: "test:start",
-                  titlePath: [],
-                  testId: test.id,
-                },
-                point: "0",
-                time: 0,
-              });
-              annotations.push({
-                message: {
-                  event: "test:end",
-                  titlePath: [],
-                  testId: test.id,
-                },
-                point: "0",
-                time: 0,
-              });
-            });
+            testRecordings.push(test);
           }
-        }
 
-        // Annotations for the entire recording (which may include more than one test)
-        // we need to splice only the appropriate subset for each test.
-        const annotationsByTest: Annotation[][] = annotations.reduce(
-          (accumulated: Annotation[][], annotation: Annotation) => {
-            eventSwitch: switch (annotation.message.event) {
-              case "step:enqueue":
-              case "step:start": {
-                if (currentTestHasEnded) {
-                  // TODO [SCS-1186]
-                  // Ignore steps that start outside of a test boundary;
-                  // These likely correspond to beforeAll or afterAll hooks which we filter for now
-                  return accumulated;
+          return {
+            ...rest,
+            environment: {
+              ...environment,
+              errors: [
+                {
+                  code: 0,
+                  detail: null,
+                  message: "Missing or bad plug-in configuration.",
+                  name: "MissingCypressPluginError",
+                },
+                ...environment.errors,
+              ],
+            },
+            source: {
+              filePath: source.path,
+              title: source.title,
+            },
+            testRecordings,
+          };
+        } else {
+          // Annotations for the entire recording (which may include more than one test)
+          // we need to splice only the appropriate subset for each test.
+          const annotationsByTest: Annotation[][] = annotations.reduce(
+            (accumulated: Annotation[][], annotation: Annotation) => {
+              eventSwitch: switch (annotation.message.event) {
+                case "step:enqueue":
+                case "step:start": {
+                  if (currentTestHasEnded) {
+                    // TODO [SCS-1186]
+                    // Ignore steps that start outside of a test boundary;
+                    // These likely correspond to beforeAll or afterAll hooks which we filter for now
+                    return accumulated;
+                  }
+                  break;
                 }
-                break;
-              }
-              case "test:start": {
-                // Tests that were skipped won't have annotations.
-                // Add empty annotations arrays for these.
-                if (currentTestHasEnded) {
-                  while (currentTestRecordingIndex < partialTestRecordings.length - 1) {
-                    currentTestRecordingIndex++;
-                    currentTestRecording = partialTestRecordings[currentTestRecordingIndex];
+                case "test:start": {
+                  // Tests that were skipped won't have annotations.
+                  // Add empty annotations arrays for these.
+                  if (currentTestHasEnded) {
+                    while (currentTestRecordingIndex < partialTestRecordings.length - 1) {
+                      currentTestRecordingIndex++;
+                      currentTestRecording = partialTestRecordings[currentTestRecordingIndex];
 
-                    currentTestAnnotations = [];
-                    currentTestHasEnded = false;
+                      currentTestAnnotations = [];
+                      currentTestHasEnded = false;
 
-                    accumulated.push(currentTestAnnotations);
+                      accumulated.push(currentTestAnnotations);
 
-                    if (currentTestRecording.result !== "skipped") {
-                      break eventSwitch;
+                      if (currentTestRecording.result !== "skipped") {
+                        break eventSwitch;
+                      }
                     }
                   }
+
+                  const currentTest = partialTestRecordings[currentTestRecordingIndex];
+                  assert(
+                    currentTest?.id === annotation.message.testId,
+                    `Test id should match "test:start" annotation testId`
+                  );
+
+                  break;
                 }
-
-                const currentTest = partialTestRecordings[currentTestRecordingIndex];
-                assert(
-                  currentTest?.id === annotation.message.testId,
-                  `Test id should match "test:start" annotation testId`
-                );
-
-                break;
+                case "test:end": {
+                  currentTestHasEnded = true;
+                  break;
+                }
               }
-              case "test:end": {
-                currentTestHasEnded = true;
-                break;
+
+              // Ignore annotations that happen before the first test
+              // (These are probably beforeAll annotations, which we don't fully support yet)
+              if (currentTestAnnotations) {
+                currentTestAnnotations.push(annotation);
               }
-            }
 
-            // Ignore annotations that happen before the first test
-            // (These are probably beforeAll annotations, which we don't fully support yet)
-            if (currentTestAnnotations) {
-              currentTestAnnotations.push(annotation);
-            }
+              return accumulated;
+            },
+            []
+          );
 
-            return accumulated;
-          },
-          []
-        );
+          // GroupedTestCasesV2 and GroupedTestCases types are the same,
+          // except for annotation data inside of their recorded tests
+          let testRecordings: RecordingTestMetadataV3.TestRecording[] = [];
+          for (let index = 0; index < partialTestRecordings.length; index++) {
+            const legacyTest = partialTestRecordings[index];
+            const annotations = annotationsByTest[index];
+            const test = await processCypressTestRecording(legacyTest, annotations, replayClient);
 
-        // GroupedTestCasesV2 and GroupedTestCases types are the same,
-        // except for annotation data inside of their recorded tests
-        let testRecordings: RecordingTestMetadataV3.TestRecording[] = [];
-        for (let index = 0; index < partialTestRecordings.length; index++) {
-          const legacyTest = partialTestRecordings[index];
-          const annotations = annotationsByTest[index];
-          const test = await processCypressTestRecording(legacyTest, annotations, replayClient);
+            testRecordings.push(test);
+          }
 
-          testRecordings.push(test);
+          return {
+            ...rest,
+            environment,
+            source: {
+              filePath: source.path,
+              title: source.title,
+            },
+            testRecordings,
+          };
         }
-
-        return {
-          ...rest,
-
-          environment: clientSideEnvironmentError
-            ? {
-                ...environment,
-                errors: [...environment.errors, clientSideEnvironmentError],
-              }
-            : environment,
-          source: {
-            filePath: source.path,
-            title: source.title,
-          },
-          testRecordings,
-        };
       }
       case "playwright": {
         let testRecordings: RecordingTestMetadataV3.TestRecording[] = [];
@@ -875,6 +857,34 @@ export async function processPlaywrightTestRecording(
     // This function does not support the legacy TestItem format
     throw Error(`Unsupported legacy TestItem value`);
   }
+}
+
+// If there are test(s) with completed status (passed/failed/timedOut) but no annotations,
+// that indicates that the Cypress support plugin file wasn't included.
+// The frontend is in a better position to detect this scenario than the plug-in,
+// so we should add an environment error in.
+//
+// See FE-1645
+function detectMissingCypressPlugin(
+  annotations: Annotation[],
+  partialTestRecordings: RecordingTestMetadataV2.TestRecording[]
+): boolean {
+  if (annotations.length === 0) {
+    const hasIncompleteTest = partialTestRecordings.some(test => {
+      switch (test.result) {
+        case "failed":
+        case "passed":
+        case "timedOut":
+          break;
+        default:
+          return true;
+      }
+    });
+
+    return !hasIncompleteTest;
+  }
+
+  return false;
 }
 
 async function processNetworkData(
