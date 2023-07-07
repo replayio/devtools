@@ -56,7 +56,7 @@ export default function ConsoleInput({ inputRef }: { inputRef?: RefObject<Impera
   }
 
   return (
-    <ErrorBoundary resetKey={executionPoint} fallback={<ErrorFallback />}>
+    <ErrorBoundary name="ConsoleInput" resetKey={executionPoint} fallback={<ErrorFallback />}>
       <Suspense fallback={<Loader />}>
         <ConsoleInputSuspends inputRef={inputRef} />
       </Suspense>

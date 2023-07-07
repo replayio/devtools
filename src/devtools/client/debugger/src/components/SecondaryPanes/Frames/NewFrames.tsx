@@ -100,7 +100,8 @@ function FramesRenderer({
       <PauseFrames pauseId={pauseId} frames={frames} panel={panel} />
       <ErrorBoundary
         key={pauseId}
-        fallback={<div className="pane-info empty">Error loading frames</div>}
+        name="NewFrames"
+        fallback={<div className="pane-info empty">Error loading frames :(</div>}
       >
         <Suspense fallback={<div className="pane-info empty">Loading async frames…</div>}>
           <FramesRenderer panel={panel} pauseId={pauseId} asyncIndex={asyncIndex + 1} />
@@ -216,7 +217,8 @@ function Frames({ panel, point, time }: FramesProps) {
     <div className="pane frames" data-test-id="FramesPanel">
       <ErrorBoundary
         key={pauseId}
-        fallback={<div className="pane-info empty">Error loading frames</div>}
+        name="Frames"
+        fallback={<div className="pane-info empty">Error loading frames :((</div>}
       >
         <Suspense fallback={<div className="pane-info empty">Loading...</div>}>
           <div role="list">

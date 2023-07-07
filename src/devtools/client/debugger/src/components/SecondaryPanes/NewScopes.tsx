@@ -135,6 +135,7 @@ export default function Scopes() {
     <div className="scopes-content">
       <Redacted className="pane scopes-list" data-test-name="ScopesList">
         <ErrorBoundary
+          name="NewScopes"
           key={`${selectedFrameId?.pauseId}:${selectedFrameId?.frameId}`}
           fallback={<div className="pane-info">Error loading scopes</div>}
         >

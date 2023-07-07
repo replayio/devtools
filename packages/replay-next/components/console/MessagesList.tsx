@@ -24,7 +24,7 @@ import {
 } from "replay-next/src/utils/loggables";
 import { isExecutionPointsLessThan } from "replay-next/src/utils/time";
 
-import _ErrorBoundary from "../ErrorBoundary";
+import DecoratedErrorBoundary from "../ErrorBoundary";
 import { ConsoleSearchContext } from "./ConsoleSearchContext";
 import CurrentTimeIndicator from "./CurrentTimeIndicator";
 import { Loggable, LoggablesContext } from "./LoggablesContext";
@@ -39,7 +39,8 @@ import rendererStyles from "./renderers/shared.module.css";
 type CurrentTimeIndicatorPlacement = Loggable | "begin" | "end";
 
 const ErrorBoundary = ({ children }: { children: ReactNode }) => (
-  <_ErrorBoundary
+  <DecoratedErrorBoundary
+    name="MessagesList"
     fallback={
       <div className={rendererStyles.Row}>
         <div className={rendererStyles.ErrorBoundaryFallback}>Something went wrong.</div>
@@ -47,7 +48,7 @@ const ErrorBoundary = ({ children }: { children: ReactNode }) => (
     }
   >
     {children}
-  </_ErrorBoundary>
+  </DecoratedErrorBoundary>
 );
 
 // This is an approximation of the console; the UI isn't meant to be the focus of this branch.

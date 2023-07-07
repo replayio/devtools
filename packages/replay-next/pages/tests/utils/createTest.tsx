@@ -12,7 +12,7 @@ export default function createTest(Component: FunctionComponent<any>, defaultRec
     usePreferredColorScheme();
 
     return (
-      <ErrorBoundary>
+      <ErrorBoundary name="createTest">
         <Suspense fallback="Loading...">
           <Initializer recordingId={recordingId}>
             <Component />

@@ -2,7 +2,6 @@ import { PauseId, PointDescription, PointSelector, Value } from "@replayio/proto
 import { createCache } from "suspense";
 
 import { ReplayClientInterface } from "shared/client/types";
-import { ProtocolError, commandError } from "shared/utils/error";
 
 import { createInfallibleSuspenseCache } from "../utils/suspense";
 import { createAnalysisCache } from "./AnalysisCache";

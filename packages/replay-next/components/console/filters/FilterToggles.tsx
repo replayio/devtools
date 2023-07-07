@@ -1,9 +1,9 @@
-import { ErrorBoundary } from "@sentry/react";
 import camelCase from "lodash/camelCase";
 import React, { PropsWithChildren, ReactNode, Suspense, useContext, useMemo } from "react";
 import { isPromiseLike } from "suspense";
 
 import { Badge, Checkbox } from "design";
+import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import Icon from "replay-next/components/Icon";
 import { ConsoleFiltersContext } from "replay-next/src/contexts/ConsoleFiltersContext";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
@@ -167,6 +167,7 @@ function Toggle({
 function CountErrorBoundary({ children }: PropsWithChildren) {
   return (
     <ErrorBoundary
+      name="FilterToggles"
       fallback={
         <span title="Something went wrong loading message counts.">
           <Icon className={styles.ExceptionsErrorIcon} type="warning" />

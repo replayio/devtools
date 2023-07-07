@@ -12,7 +12,7 @@ import styles from "./TestSuitePanel.module.css";
 // TODO Show better/custom error fallback to failed test suites
 export default function TestSuitePanel() {
   return (
-    <ErrorBoundary fallback={<TestSuiteErrorFallback />}>
+    <ErrorBoundary name="TestSuitePanel" fallback={<TestSuiteErrorFallback />}>
       <Suspense
         fallback={
           <div className={styles.Loading} data-test-name="TestSuitePanel">

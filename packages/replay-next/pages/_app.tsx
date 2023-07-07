@@ -21,7 +21,7 @@ function Routing({ Component, pageProps }: AppProps) {
         <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
         <title>Replay</title>
       </Head>
-      <ErrorBoundary>
+      <ErrorBoundary name="Routing">
         <Component {...pageProps} />
       </ErrorBoundary>
     </>
