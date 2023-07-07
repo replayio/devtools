@@ -11,7 +11,7 @@ import { ReplayClientInterface } from "shared/client/types";
 import { isPointInRegion } from "shared/utils/time";
 import { UIThunkAction } from "ui/actions";
 import { MORE_IGNORABLE_PARTIAL_URLS } from "ui/actions/eventListeners/eventListenerUtils";
-import { seek } from "ui/actions/timeline";
+import { jumpToReduxCode, seek } from "ui/actions/timeline";
 import { SourcesState, getPreferredLocation } from "ui/reducers/sources";
 import { getCurrentTime, getFocusWindow } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
@@ -208,9 +208,10 @@ function ActionItem({
   setSelectedPoint: (point: ExecutionPoint | null) => void;
   firstAnnotationInTheFuture: boolean;
 }) {
+  const sourcesState = useAppSelector(state => state.sources);
   const dispatch = useAppDispatch();
   const onSeek = () => {
-    dispatch(jumpToLocationForReduxDispatch(annotation.point, annotation.time));
+    dispatch(jumpToReduxCode(annotation.point, annotation.time, sourcesState));
   };
 
   return (
