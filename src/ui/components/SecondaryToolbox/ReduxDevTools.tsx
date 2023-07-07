@@ -6,7 +6,7 @@ import { useImperativeCacheValue } from "suspense";
 
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { isPointInRegion } from "shared/utils/time";
-import { seek } from "ui/actions/timeline";
+import { jumpToReduxCode } from "ui/actions/timeline";
 import { getCurrentTime, getFocusWindow } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { reduxDevToolsAnnotationsCache } from "ui/suspense/annotationsCaches";
@@ -81,9 +81,10 @@ function ActionItem({
   setSelectedPoint: (point: ExecutionPoint | null) => void;
   firstAnnotationInTheFuture: boolean;
 }) {
+  const sourcesState = useAppSelector(state => state.sources);
   const dispatch = useAppDispatch();
   const onSeek = () => {
-    dispatch(seek(annotation.point, annotation.time, true));
+    dispatch(jumpToReduxCode(annotation.point, annotation.time, sourcesState));
   };
 
   return (

@@ -73,6 +73,11 @@ export const IGNORABLE_PARTIAL_SOURCE_URLS = [
   "__cypress/runner/",
 ];
 
+export const MORE_IGNORABLE_PARTIAL_URLS = IGNORABLE_PARTIAL_SOURCE_URLS.concat(
+  // Ignore _any_ 3rd-party package for now
+  "node_modules"
+);
+
 export function shouldIgnoreEventFromSource(
   sourceDetails?: SourceDetails,
   ignorableURLS = IGNORABLE_PARTIAL_SOURCE_URLS
