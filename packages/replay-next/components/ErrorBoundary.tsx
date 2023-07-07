@@ -15,12 +15,14 @@ type ErrorBoundaryState = {
 type ErrorBoundaryProps = PropsWithChildren<{
   fallback?: ReactNode;
   fallbackClassName?: string;
+
   name: string;
-  /**
-   * If `resetKey` changes after the ErrorBoundary caught an error, it will reset its state.
-   * Use `resetKey` instead of `key` if you don't want the child components to be recreated
-   * (and hence lose their state) every time the key changes.
-   */
+
+  onError?: (error: unknown) => void;
+
+  // If `resetKey` changes after the ErrorBoundary caught an error, it will reset its state.
+  // Use `resetKey` instead of `key` if you don't want the child components to be recreated
+  // (and hence lose their state) every time the key changes.
   resetKey?: string | number;
 }>;
 
@@ -90,11 +92,16 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
         message: "",
         name: "",
         stack: info.componentStack,
-      }).map(frame => ({
-        columnNumber: frame.columnNumber,
-        fileName: frame.fileName,
-        lineNumber: frame.lineNumber,
-      }));
+      })
+        .filter(frame => {
+          // Filter DOM elements from the stack trace.
+          return frame.fileName !== undefined;
+        })
+        .map(frame => ({
+          columnNumber: frame.columnNumber,
+          fileName: frame.fileName,
+          lineNumber: frame.lineNumber,
+        }));
     } catch (error) {}
 
     recordData("component-error-boundary", {
