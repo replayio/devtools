@@ -29,10 +29,6 @@ export function Preferences() {
           values={ENUMS.defaultViewMode}
         />
         <BooleanPreference
-          preference={config.source_showHitCounts}
-          preferencesKey="source_showHitCounts"
-        />
-        <BooleanPreference
           preference={config.global_enableLargeText}
           preferencesKey="global_enableLargeText"
         />

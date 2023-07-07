@@ -15,7 +15,10 @@ import { SourceSearchContext } from "./SourceSearchContext";
 import styles from "./CurrentLineHighlight.module.css";
 
 type Props = {
+  breakableColumnIndices: number[];
   lineNumber: number;
+  plainText: string | null;
+  showBreakpointMarkers: boolean;
   sourceId: SourceId;
 };
 
@@ -27,7 +30,13 @@ export default memo(function CurrentLineHighlight(props: Props) {
   );
 });
 
-function CurrentLineHighlightSuspends({ lineNumber, sourceId }: Props) {
+function CurrentLineHighlightSuspends({
+  breakableColumnIndices,
+  lineNumber,
+  plainText,
+  showBreakpointMarkers,
+  sourceId,
+}: Props) {
   const client = useContext(ReplayClientContext);
   const [sourceSearchState] = useContext(SourceSearchContext);
   const { selectedPauseAndFrameId, previewLocation } = useContext(SelectedFrameContext);
@@ -50,7 +59,10 @@ function CurrentLineHighlightSuspends({ lineNumber, sourceId }: Props) {
   const pauseId = selectedPauseAndFrameId?.pauseId || null;
 
   if (pauseId !== null && frameId !== null) {
-    let showHighlight = false;
+    let highlightColumnBegin = -1;
+    let highlightColumnEnd = -1;
+    let columnBreakpointIndex = -1;
+
     // The 95% use case is that we'll be in the top frame. Start by fetching that.
     const topFrame = topFrameCache.read(client, pauseId);
 
@@ -70,7 +82,7 @@ function CurrentLineHighlightSuspends({ lineNumber, sourceId }: Props) {
 
       // Assuming we found a frame, check to see if there's a matching location for the frame.
       // If so, we should show the highlight line.
-      showHighlight = !!selectedFrame?.location.find(location => {
+      const match = selectedFrame?.location.find(location => {
         if (correspondingSourceIds.includes(location.sourceId)) {
           const correspondingLocations = getCorrespondingLocations(sources, location);
           return (
@@ -82,15 +94,39 @@ function CurrentLineHighlightSuspends({ lineNumber, sourceId }: Props) {
           );
         }
       });
+      if (match != null) {
+        highlightColumnBegin = match.column;
+
+        columnBreakpointIndex = breakableColumnIndices.findIndex(
+          column => column === highlightColumnBegin
+        );
+        if (columnBreakpointIndex < breakableColumnIndices.length - 1) {
+          highlightColumnEnd = breakableColumnIndices[columnBreakpointIndex + 1] - 1;
+        } else if (plainText !== null) {
+          highlightColumnEnd = plainText.length - 1;
+        }
+      }
     }
 
-    if (showHighlight) {
+    if (highlightColumnBegin > 0 && highlightColumnEnd > 0) {
       return (
         <div
           className={styles.CurrentExecutionPoint}
           data-test-name="CurrentExecutionPointLineHighlight"
           data-test-type="view-source"
-        />
+        >
+          <div
+            className={styles.CurrentExecutionPointColumn}
+            style={{
+              // @ts-ignore
+              ["--highlight-char-offset"]: `${highlightColumnBegin}ch`,
+              ["--highlight-char-length"]: `${highlightColumnEnd - highlightColumnBegin}ch`,
+              ["--highlight-num-breakpoint-toggles"]: showBreakpointMarkers
+                ? columnBreakpointIndex + 1
+                : 0,
+            }}
+          />
+        </div>
       );
     }
   }
