@@ -16,7 +16,6 @@ export const framesCache: Cache<
   getKey: ([client, pauseId]) => pauseId,
   load: async ([client, pauseId]) => {
     const framesResult = await client.getAllFrames(pauseId);
-
     const sources = await sourcesByIdCache.readAsync(client);
     cachePauseData(client, sources, pauseId, framesResult.data, framesResult.frames);
     const cached = framesCache.getValueIfCached(client, pauseId);

@@ -267,7 +267,7 @@ export async function sendMessage<M extends CommandMethods>(
       captureException(callerStackTrace, { extra: { code, message, method, params } });
     }
 
-    throw commandError(finalMessage, code, { params, method, id });
+    throw commandError(finalMessage, code, { id, method, params, pauseId, sessionId });
   }
 
   return response.result as any;

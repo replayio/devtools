@@ -7,6 +7,7 @@ export function setDefaultTags(tags: Object) {
 
 export async function recordData(event: string, tags: Object = {}): Promise<void> {
   const eventTags = { ...defaultTags, ...tags };
+
   if (process.env.NODE_ENV !== "development" || process.env.NEXT_PUBLIC_RECORD_REPLAY_TELEMETRY) {
     try {
       const response = await fetch("https://telemetry.replay.io/", {
