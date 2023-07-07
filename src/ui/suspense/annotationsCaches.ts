@@ -13,7 +13,7 @@ import { processReduxAnnotations } from "ui/components/SecondaryToolbox/redux-de
 export interface ParsedReactDevToolsAnnotation extends TimeStampedPoint {
   contents: {
     event: "operations";
-    operations: number[];
+    payload: number[];
   };
 }
 
