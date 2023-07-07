@@ -195,6 +195,12 @@ export const config = {
     label: "Enable React Panel",
     legacyKey: "devtools.features.reactPanel",
   },
+  feature_reduxDevTools: {
+    defaultValue: Boolean(false),
+    description: "Enable experimental Redux DevTools panel",
+    label: "Enable Redux DevTools",
+    legacyKey: null,
+  },
 
   global_disableLogRocket: {
     defaultValue: Boolean(false),

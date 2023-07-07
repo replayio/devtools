@@ -15,6 +15,7 @@ export const PREFERENCES: PreferencesKey[] = [
   "backend_rerunRoutines",
   "backend_disableRecordingAssetsInDatabase",
   "feature_reactPanel",
+  "feature_reduxDevTools",
   "backend_disableIncrementalSnapshots",
   "backend_disableConcurrentControllerLoading",
 ];
