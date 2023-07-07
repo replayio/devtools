@@ -19,7 +19,7 @@ interface JumpToCodeButtonProps {
   onClick: () => void;
   status: JumpToCodeStatus;
   targetExecutionPoint: ExecutionPoint;
-  className: string;
+  className?: string;
 }
 
 export function JumpToCodeButton({
