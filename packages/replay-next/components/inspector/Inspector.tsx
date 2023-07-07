@@ -7,6 +7,14 @@ import {
 import KeyValueRenderer from "./KeyValueRendererWithContextMenu";
 import styles from "./Inspector.module.css";
 
+declare global {
+  var rendered: Map<string, number> | undefined;
+  var totalRendered: number | undefined;
+}
+if (typeof window !== "undefined") {
+  window.rendered = new Map();
+}
+
 export default function Inspector({
   className,
   context,
@@ -22,6 +30,12 @@ export default function Inspector({
   pauseId: PauseId;
   protocolValue: ProtocolValue | ProtocolNamedValue;
 }) {
+  if (window.rendered && "name" in protocolValue) {
+    const name = `${protocolValue.name} - ${protocolValue.object}`;
+    window.rendered.set(name, (window.rendered.get(name) ?? 0) + 1);
+    window.totalRendered = (window.totalRendered ?? 0) + 1;
+  }
+
   const keyValue = (
     <KeyValueRenderer
       context={context}

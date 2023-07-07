@@ -27,13 +27,15 @@ export default function ScopesInspector({
         <Expandable
           className={styles.Expandable}
           children={protocolValues.map((protocolValue, index) => (
-            <Inspector
-              context="default"
-              key={index}
-              path={addPathSegment(path, protocolValue.name)}
-              pauseId={pauseId}
-              protocolValue={protocolValue}
-            />
+            <Suspense key={index} fallback={<div>{protocolValue.name}: Loading...</div>}>
+              <Inspector
+                context="default"
+                key={index}
+                path={addPathSegment(path, protocolValue.name)}
+                pauseId={pauseId}
+                protocolValue={protocolValue}
+              />
+            </Suspense>
           ))}
           defaultOpen={expandByDefault}
           header={name}
