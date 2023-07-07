@@ -60,12 +60,6 @@ import {
 } from "ui/reducers/timeline";
 import { FocusWindow, HoveredItem, PlaybackOptions, TimeRange } from "ui/state/timeline";
 import { getPauseFramesAsync } from "ui/suspense/frameCache";
-import {
-  encodeObjectToURL,
-  getPausePointParams,
-  isTest,
-  updateUrlWithParams,
-} from "ui/utils/environment";
 import KeyShortcuts, { isEditableElement } from "ui/utils/key-shortcuts";
 import { trackEvent } from "ui/utils/telemetry";
 import { rangeForFocusWindow } from "ui/utils/timeline";
