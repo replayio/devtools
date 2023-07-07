@@ -40,13 +40,6 @@ const ReactDevToolsPanel = React.lazy(() => import("./ReactDevTools"));
 
 const ReduxDevToolsPanel = React.lazy(() => import("./ReduxDevTools"));
 
-interface PanelButtonsProps {
-  hasReactComponents: boolean;
-  hasReduxAnnotations: boolean;
-  toolboxLayout: ToolboxLayout;
-  recordingCapabilities: RecordingCapabilities;
-}
-
 interface PanelButtonProps {
   panel: SecondaryPanelName;
   children?: React.ReactNode;
@@ -74,15 +67,22 @@ const PanelButton = ({ panel, children }: PanelButtonProps) => {
   );
 };
 
-const PanelButtons: FC<PanelButtonsProps> = ({
+function PanelButtons({
   hasReactComponents,
   hasReduxAnnotations,
   toolboxLayout,
   recordingCapabilities,
-}) => {
+}: {
+  hasReactComponents: boolean;
+  hasReduxAnnotations: boolean;
+  toolboxLayout: ToolboxLayout;
+  recordingCapabilities: RecordingCapabilities;
+}) {
   const { supportsElementsInspector, supportsNetworkRequests, supportsRepaintingGraphics } =
     recordingCapabilities;
+
   const [chromiumNetMonitorEnabled] = useGraphQLUserData("feature_chromiumNetMonitor");
+  const [reduxDevToolsEnabled] = useGraphQLUserData("feature_reduxDevTools");
 
   return (
     <div className="panel-buttons theme-tab-font-size flex flex-row items-center overflow-hidden">
@@ -95,13 +95,15 @@ const PanelButtons: FC<PanelButtonsProps> = ({
         </PanelButton>
       )}
       {hasReactComponents && <PanelButton panel="react-components">React</PanelButton>}
-      {hasReduxAnnotations && <PanelButton panel="redux-devtools">Redux</PanelButton>}
+      {hasReduxAnnotations && reduxDevToolsEnabled && (
+        <PanelButton panel="redux-devtools">Redux</PanelButton>
+      )}
       {(chromiumNetMonitorEnabled || supportsNetworkRequests) && (
         <PanelButton panel="network">Network</PanelButton>
       )}
     </div>
   );
-};
+}
 
 function ConsolePanel() {
   return (
