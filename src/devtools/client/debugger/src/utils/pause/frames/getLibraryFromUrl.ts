@@ -88,7 +88,7 @@ const libraryMap = [
   },
   {
     label: "Redux",
-    pattern: /redux/i,
+    pattern: /node_modules\/redux/i,
   },
   {
     label: "Dojo",
