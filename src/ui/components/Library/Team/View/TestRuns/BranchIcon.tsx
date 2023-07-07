@@ -17,7 +17,7 @@ export function BranchIcon({
   return (
     <div className="flex-column flex h-4 min-w-fit items-center gap-1" title={title}>
       {svgPath !== null && (
-        <svg className="h-4 w-4" viewBox="0 0 16 16" fill="currentColor">
+        <svg className="h-4 w-4" viewBox="0 0 16 16">
           <path d="M0 0h16v16H0z" fill="none" />
           <path d={svgPath} fill={fillColor} />
         </svg>

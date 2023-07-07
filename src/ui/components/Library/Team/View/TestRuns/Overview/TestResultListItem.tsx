@@ -64,16 +64,16 @@ export function TestResultListItem({
   return (
     <a
       href={`/recording/${recording.id}`}
-      className={`flex w-full flex-grow cursor-pointer flex-row items-center justify-center gap-2 truncate px-4 py-2 transition duration-150 ${styles.libraryRow}`}
+      className={`${styles.recordingLink} ${styles.libraryRow}`}
       style={{
         paddingLeft: `${depth * 1}rem`,
       }}
     >
-      <div className="flex flex-row items-center gap-1">
-        {secondaryBadgeCount != null && <Icon className="ml-2 h-4 w-4" type="arrow-nested" />}
-        <div className="flex cursor-pointer items-center justify-center transition ">
+      <div className={styles.linkContent}>
+        {secondaryBadgeCount != null && <Icon className={`${styles.icon}`} type="arrow-nested" />}
+        <div className={styles.iconWrapper}>
           <motion.div
-            className="m-auto h-6 w-6 rounded-full hover:cursor-pointer"
+            className={styles.iconMotion}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 1.0, boxShadow: "0px 0px 1px rgba(0,0,0,0.2)" }}
             transition={{ duration: 0.05 }}
@@ -84,17 +84,17 @@ export function TestResultListItem({
           </motion.div>
         </div>
       </div>
-      <div className="flex shrink grow flex-col truncate">
-        <div className="block truncate">{title || "Test"}</div>
+      <div className={styles.fileInfo}>
+        <div className={styles.title}>{title || "Test"}</div>
         {filePath && (
-          <div className="block truncate text-xs text-gray-600">
+          <div className={styles.filePath}>
             <HighlightedText haystack={filePath} needle={filterByText} />
           </div>
         )}
       </div>
       {numComments > 0 && (
-        <div className="align-items-center flex shrink-0 flex-row space-x-1 text-gray-600">
-          <img src="/images/comment-outline.svg" className="w-3" />
+        <div className={styles.comments}>
+          <img src="/images/comment-outline.svg" className={styles.commentIcon} />
           <span>{numComments}</span>
         </div>
       )}
