@@ -22,6 +22,10 @@
   line-height: 1.5rem;
 }
 
+.actions [role="list"] [role="listitem"].future {
+  border-top: 2px solid var(--secondary-accent);
+}
+
 .actions [role="list"] [role="listitem"] .actionLabel {
   padding-left: 10px;
 }

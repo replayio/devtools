@@ -7,7 +7,7 @@ import { useImperativeCacheValue } from "suspense";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { isPointInRegion } from "shared/utils/time";
 import { seek } from "ui/actions/timeline";
-import { getFocusWindow } from "ui/reducers/timeline";
+import { getCurrentTime, getFocusWindow } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { reduxDevToolsAnnotationsCache } from "ui/suspense/annotationsCaches";
 
@@ -25,6 +25,7 @@ export const ReduxDevToolsPanel = () => {
     reduxDevToolsAnnotationsCache,
     client
   );
+  const currentTime = useAppSelector(getCurrentTime);
 
   const reduxAnnotations: ReduxActionAnnotation[] = useMemo(() => {
     const annotations = annotationsStatus === "resolved" ? parsedAnnotations : [];
@@ -34,6 +35,10 @@ export const ReduxDevToolsPanel = () => {
   }, [parsedAnnotations, annotationsStatus, focusWindow]);
 
   const annotation = reduxAnnotations.find(ann => ann.point === selectedPoint)!;
+
+  const firstAnnotationInTheFuture = reduxAnnotations.find(
+    annotation => annotation.time >= currentTime
+  );
 
   return (
     <div className={classnames("flex min-h-full bg-bodyBgcolor p-1 text-xs", styles.actions)}>
@@ -46,6 +51,7 @@ export const ReduxDevToolsPanel = () => {
                 annotation={annotation}
                 selectedPoint={selectedPoint}
                 setSelectedPoint={setSelectedPoint}
+                firstAnnotationInTheFuture={firstAnnotationInTheFuture === annotation}
               />
             ))}
           </div>
@@ -55,7 +61,9 @@ export const ReduxDevToolsPanel = () => {
         </PanelResizeHandle>
 
         <ResizablePanel collapsible>
-          {selectedPoint && <ReduxDevToolsContents point={selectedPoint} time={annotation.time} />}
+          {selectedPoint && annotation && (
+            <ReduxDevToolsContents point={selectedPoint} time={annotation.time} />
+          )}
         </ResizablePanel>
       </PanelGroup>
     </div>
@@ -66,10 +74,12 @@ function ActionItem({
   annotation,
   selectedPoint,
   setSelectedPoint,
+  firstAnnotationInTheFuture,
 }: {
   annotation: ReduxActionAnnotation;
   selectedPoint: ExecutionPoint | null;
   setSelectedPoint: (point: ExecutionPoint | null) => void;
+  firstAnnotationInTheFuture: boolean;
 }) {
   const dispatch = useAppDispatch();
   const onSeek = () => {
@@ -81,6 +91,7 @@ function ActionItem({
       key={annotation.point}
       className={classnames(styles.row, {
         [styles.selected]: annotation.point === selectedPoint,
+        [styles.future]: firstAnnotationInTheFuture,
       })}
       role="listitem"
       onClick={() => setSelectedPoint(annotation.point)}
