@@ -55,11 +55,7 @@ export const ReduxDevToolsPanel = () => {
         </PanelResizeHandle>
 
         <ResizablePanel collapsible>
-          <div className="ml-1 grow">
-            {selectedPoint && (
-              <ReduxDevToolsContents point={selectedPoint} time={annotation.time} />
-            )}
-          </div>
+          {selectedPoint && <ReduxDevToolsContents point={selectedPoint} time={annotation.time} />}
         </ResizablePanel>
       </PanelGroup>
     </div>
