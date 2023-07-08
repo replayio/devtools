@@ -1,12 +1,14 @@
 import { ExecutionPoint } from "@replayio/protocol";
 import classnames from "classnames";
-import React, { useContext, useState } from "react";
+import React, { useContext, useMemo, useState } from "react";
 import { PanelGroup, PanelResizeHandle, Panel as ResizablePanel } from "react-resizable-panels";
 import { useImperativeCacheValue } from "suspense";
 
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { isPointInRegion } from "shared/utils/time";
 import { seek } from "ui/actions/timeline";
-import { useAppDispatch } from "ui/setup/hooks";
+import { getFocusWindow } from "ui/reducers/timeline";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { reduxDevToolsAnnotationsCache } from "ui/suspense/annotationsCaches";
 
 import { JumpToCodeButton } from "../shared/JumpToCodeButton";
@@ -17,14 +19,19 @@ import styles from "./ReduxDevTools.module.css";
 export const ReduxDevToolsPanel = () => {
   const client = useContext(ReplayClientContext);
   const [selectedPoint, setSelectedPoint] = useState<ExecutionPoint | null>(null);
+  const focusWindow = useAppSelector(getFocusWindow);
 
   const { status: annotationsStatus, value: parsedAnnotations } = useImperativeCacheValue(
     reduxDevToolsAnnotationsCache,
     client
   );
 
-  const reduxAnnotations: ReduxActionAnnotation[] =
-    annotationsStatus === "resolved" ? parsedAnnotations : [];
+  const reduxAnnotations: ReduxActionAnnotation[] = useMemo(() => {
+    const annotations = annotationsStatus === "resolved" ? parsedAnnotations : [];
+    return annotations.filter(
+      annotation => focusWindow && isPointInRegion(annotation.point, focusWindow)
+    );
+  }, [parsedAnnotations, annotationsStatus, focusWindow]);
 
   const annotation = reduxAnnotations.find(ann => ann.point === selectedPoint)!;
 
