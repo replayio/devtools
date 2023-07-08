@@ -35,7 +35,7 @@ export function JumpToCodeButton({
   const jumpToCodeButtonAvailable = status === "not_checked" || status === "found";
 
   const jumpToCodeButtonClassname = classnames(
-    `jump-to-code transition-width flex items-center justify-center rounded-full  duration-100 ease-out h-6 ${className}`,
+    `transition-width flex items-center justify-center rounded-full  duration-100 ease-out h-6 ${className}`,
     {
       "bg-primaryAccent cursor-pointer cursor-default": jumpToCodeButtonAvailable,
       "bg-gray-400 ": !jumpToCodeButtonAvailable,
