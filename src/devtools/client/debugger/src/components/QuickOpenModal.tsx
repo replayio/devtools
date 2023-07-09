@@ -245,7 +245,7 @@ class QuickOpenModal extends Component<QuickOpenModalProps, QOMState> {
     }
 
     if (this.isFunctionQuery()) {
-      const start = item.location?.start;
+      const start = item.location?.begin;
       trackEvent("quick_open.select_function");
 
       return this.gotoLocation({
@@ -268,7 +268,7 @@ class QuickOpenModal extends Component<QuickOpenModalProps, QOMState> {
     if (this.isFunctionQuery() && !project) {
       return highlightLineRange({
         ...(item.location != null
-          ? { end: item.location.end!.line, start: item.location.start.line }
+          ? { end: item.location.end!.line, start: item.location.begin.line }
           : {}),
         sourceId: selectedSource.id,
       });
