@@ -109,7 +109,7 @@ export function formatProjectFunctions(
         subtitle: loc.line,
         secondaryTitle: getTruncatedFileName(source),
         value: name,
-        location: { start: loc },
+        location: { begin: loc },
       };
     })
     .flat()
