@@ -11,8 +11,8 @@ import { ReplayClientInterface } from "shared/client/types";
 import { isPointInRegion } from "shared/utils/time";
 import { UIThunkAction } from "ui/actions";
 import { MORE_IGNORABLE_PARTIAL_URLS } from "ui/actions/eventListeners/eventListenerUtils";
-import { jumpToReduxCode, seek } from "ui/actions/timeline";
-import { SourcesState, getPreferredLocation } from "ui/reducers/sources";
+import { seek } from "ui/actions/timeline";
+import { SourcesState } from "ui/reducers/sources";
 import { getCurrentTime, getFocusWindow } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { reduxDevToolsAnnotationsCache } from "ui/suspense/annotationsCaches";
@@ -141,42 +141,16 @@ const reduxDispatchJumpLocationCache = createCache<
       return !MORE_IGNORABLE_PARTIAL_URLS.some(partialUrl => source.url?.includes(partialUrl));
     });
 
-    // The first 2 elements in filtered pause frames are from replay's redux stub, so they should be ignored
-    // The 3rd element is the user function that calls it, and will most likely be the `dispatch` call
-    const preferredFrame = filteredPauseFrames[2];
     const frameSteps = await frameStepsCache.readAsync(
       replayClient,
       pauseId,
-
-      preferredFrame.protocolId
+      // The first 2 elements in filtered pause frames are from replay's redux stub, so they should be ignored
+      // The 3rd element is the user function that calls it, and will most likely be the `dispatch` call
+      filteredPauseFrames[2].protocolId
     );
 
-    const pointsWithLocations =
-      frameSteps?.flatMap(step => {
-        return step.frame
-          ?.map(l => {
-            return {
-              location: l,
-              point: step,
-            };
-          })
-          .filter(Boolean) as PointWithLocation[];
-      }) ?? [];
-
-    const preferredLocation = getPreferredLocation(sourcesState, [preferredFrame.location]);
-
-    // One of these locations should match up
-    const matchingFrameStep: PointWithLocation | undefined = pointsWithLocations.find(step => {
-      // Intentionally ignore columns for now - this seems to produce better results
-      // that line up with the hit points in a print statement
-      return (
-        step.location.sourceId === preferredLocation.sourceId &&
-        step.location.line === preferredLocation.line
-      );
-    });
-
-    if (matchingFrameStep) {
-      return matchingFrameStep.point;
+    if (frameSteps) {
+      return frameSteps[0];
     }
   },
 });
@@ -208,10 +182,9 @@ function ActionItem({
   setSelectedPoint: (point: ExecutionPoint | null) => void;
   firstAnnotationInTheFuture: boolean;
 }) {
-  const sourcesState = useAppSelector(state => state.sources);
   const dispatch = useAppDispatch();
   const onSeek = () => {
-    dispatch(jumpToReduxCode(annotation.point, annotation.time, sourcesState));
+    dispatch(jumpToLocationForReduxDispatch(annotation.point, annotation.time));
   };
 
   return (

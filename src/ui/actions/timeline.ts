@@ -31,8 +31,6 @@ import {
   pointsBoundingTimeCache,
   sessionEndPointCache,
 } from "replay-next/src/suspense/ExecutionPointsCache";
-import { frameStepsCache } from "replay-next/src/suspense/FrameStepsCache";
-import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { screenshotCache } from "replay-next/src/suspense/ScreenshotCache";
 import { isExecutionPointsLessThan } from "replay-next/src/utils/time";
 import {
@@ -47,9 +45,7 @@ import {
   isTest,
   updateUrlWithParams,
 } from "shared/utils/environment";
-import { MORE_IGNORABLE_PARTIAL_URLS } from "ui/actions/eventListeners/eventListenerUtils";
 import { getFirstComment } from "ui/hooks/comments/comments";
-import { SourcesState } from "ui/reducers/sources";
 import {
   getCurrentTime,
   getFocusWindow,
@@ -66,7 +62,6 @@ import {
   setPlaybackPrecachedTime,
 } from "ui/reducers/timeline";
 import { FocusWindow, HoveredItem, PlaybackOptions, TimeRange } from "ui/state/timeline";
-import { getPauseFramesAsync } from "ui/suspense/frameCache";
 import KeyShortcuts, { isEditableElement } from "ui/utils/key-shortcuts";
 import { trackEvent } from "ui/utils/telemetry";
 import { rangeForFocusWindow } from "ui/utils/timeline";
@@ -273,44 +268,6 @@ export function seek(
       ThreadFront.timeWarp(point, time, openSource);
     }
     return true;
-  };
-}
-
-export function jumpToReduxCode(
-  point: ExecutionPoint,
-  time: number,
-  sourcesState: SourcesState
-): UIThunkAction {
-  return async (dispatch, _, { replayClient }) => {
-    dispatch(framePositionsCleared());
-
-    const pauseId = await pauseIdCache.readAsync(replayClient, point, time);
-    const frames = (await getPauseFramesAsync(replayClient, pauseId, sourcesState)) ?? [];
-    const filteredPauseFrames = frames.filter(frame => {
-      const { source } = frame;
-      if (!source) {
-        return false;
-      }
-
-      // Filter out everything in `node_modules`, so we have just app code left
-      // TODO There may be times when we care about renders queued by lib code
-      // TODO See about just filtering out React instead?
-      return !MORE_IGNORABLE_PARTIAL_URLS.some(partialUrl => source.url?.includes(partialUrl));
-    });
-
-    const frameSteps = await frameStepsCache.readAsync(
-      replayClient,
-      pauseId,
-      // The first 2 elements in filtered pause frames are from replay's redux stub, so they should be ignored
-      // The 3rd element is the user function that calls it, and will most likely be the `dispatch` call
-      filteredPauseFrames[2].protocolId
-    );
-
-    if (frameSteps) {
-      const frameStep = frameSteps[0];
-
-      dispatch(seek(frameStep.point, frameStep.time, true));
-    }
   };
 }
 
