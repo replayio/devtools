@@ -1,15 +1,22 @@
-import { ExecutionPoint } from "@replayio/protocol";
+import { ExecutionPoint, PointDescription } from "@replayio/protocol";
 import classnames from "classnames";
 import React, { useContext, useMemo, useState } from "react";
 import { PanelGroup, PanelResizeHandle, Panel as ResizablePanel } from "react-resizable-panels";
-import { useImperativeCacheValue } from "suspense";
+import { createCache, useImperativeCacheValue } from "suspense";
 
+import { frameStepsCache } from "replay-next/src/suspense/FrameStepsCache";
+import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { ReplayClientInterface } from "shared/client/types";
 import { isPointInRegion } from "shared/utils/time";
-import { jumpToReduxCode } from "ui/actions/timeline";
+import { UIThunkAction } from "ui/actions";
+import { MORE_IGNORABLE_PARTIAL_URLS } from "ui/actions/eventListeners/eventListenerUtils";
+import { seek } from "ui/actions/timeline";
+import { SourcesState } from "ui/reducers/sources";
 import { getCurrentTime, getFocusWindow } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { reduxDevToolsAnnotationsCache } from "ui/suspense/annotationsCaches";
+import { getPauseFramesAsync } from "ui/suspense/frameCache";
 
 import { JumpToCodeButton } from "../shared/JumpToCodeButton";
 import { ReduxActionAnnotation } from "./redux-devtools/redux-annotations";
@@ -70,6 +77,63 @@ export const ReduxDevToolsPanel = () => {
   );
 };
 
+const reduxDispatchJumpLocationCache = createCache<
+  [
+    replayClient: ReplayClientInterface,
+    point: ExecutionPoint,
+    time: number,
+    sourcesState: SourcesState
+  ],
+  PointDescription | undefined
+>({
+  config: { immutable: true },
+  debugLabel: "ReduxDispatchJumpLocation",
+  getKey: ([replayClient, point, time, sourcesState]) => point,
+  load: async ([replayClient, point, time, sourcesState]) => {
+    const pauseId = await pauseIdCache.readAsync(replayClient, point, time);
+    const frames = (await getPauseFramesAsync(replayClient, pauseId, sourcesState)) ?? [];
+    const filteredPauseFrames = frames.filter(frame => {
+      const { source } = frame;
+      if (!source) {
+        return false;
+      }
+
+      // Filter out everything in `node_modules`, so we have just app code left
+      // TODO There may be times when we care about renders queued by lib code
+      // TODO See about just filtering out React instead?
+      return !MORE_IGNORABLE_PARTIAL_URLS.some(partialUrl => source.url?.includes(partialUrl));
+    });
+
+    const frameSteps = await frameStepsCache.readAsync(
+      replayClient,
+      pauseId,
+      // The first 2 elements in filtered pause frames are from replay's redux stub, so they should be ignored
+      // The 3rd element is the user function that calls it, and will most likely be the `dispatch` call
+      filteredPauseFrames[2].protocolId
+    );
+
+    if (frameSteps) {
+      return frameSteps[0];
+    }
+  },
+});
+
+function jumpToLocationForReduxDispatch(point: ExecutionPoint, time: number): UIThunkAction {
+  return async (dispatch, getState, { replayClient }) => {
+    const sourcesState = getState().sources;
+    const jumpLocation = await reduxDispatchJumpLocationCache.readAsync(
+      replayClient,
+      point,
+      time,
+      sourcesState
+    );
+
+    if (jumpLocation) {
+      dispatch(seek(jumpLocation.point, jumpLocation.time, true));
+    }
+  };
+}
+
 function ActionItem({
   annotation,
   selectedPoint,
@@ -81,10 +145,9 @@ function ActionItem({
   setSelectedPoint: (point: ExecutionPoint | null) => void;
   firstAnnotationInTheFuture: boolean;
 }) {
-  const sourcesState = useAppSelector(state => state.sources);
   const dispatch = useAppDispatch();
   const onSeek = () => {
-    dispatch(jumpToReduxCode(annotation.point, annotation.time, sourcesState));
+    dispatch(jumpToLocationForReduxDispatch(annotation.point, annotation.time));
   };
 
   return (
