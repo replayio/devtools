@@ -908,14 +908,26 @@ async function processNetworkData(
     return [];
   }
 
-  return ids.slice(beginIndex, endIndex).map(id => {
+  const networkRequestEvents: RecordingTestMetadataV3.NetworkRequestEvent[] = [];
+
+  for (let index = beginIndex; index < endIndex; index++) {
+    const id = ids[index];
+
     const { events, timeStampedPoint } = records[id];
 
     assert(events.openEvent != null, `Missing RequestOpenEvent for network request`, {
       id,
     });
 
-    return {
+    switch (events.openEvent.requestCause) {
+      case "fetch":
+      case "xhr":
+        break;
+      default:
+        continue;
+    }
+
+    networkRequestEvents.push({
       data: {
         request: {
           id,
@@ -930,8 +942,10 @@ async function processNetworkData(
       },
       timeStampedPoint,
       type: "network-request",
-    };
-  });
+    });
+  }
+
+  return networkRequestEvents;
 }
 
 export function getGroupedTestCasesFilePath(groupedTestCases: AnyGroupedTestCases): string | null {
