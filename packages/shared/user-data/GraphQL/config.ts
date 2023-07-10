@@ -43,6 +43,12 @@ export const config = {
     label: "Disable using incremental snapshots",
     legacyKey: "devtools.features.disableIncrementalSnapshots",
   },
+  backend_enableHasAnnotationKindQueryStorage: {
+    defaultValue: Boolean(false),
+    description: "Enable storage of previously generated response to `Session.hasAnnotationKind`",
+    label: "Enable query-level caching",
+    legacyKey: "devtools.features.enableHasAnnotationKindQueryStorage",
+  },
   backend_disableRecordingAssetsInDatabase: {
     defaultValue: Boolean(false),
     description:
