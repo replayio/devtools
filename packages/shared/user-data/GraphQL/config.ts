@@ -299,12 +299,6 @@ export const config = {
     defaultValue: Boolean(false),
     legacyKey: "devtools.features.repaintEvaluations",
   },
-
-  source_showHitCounts: {
-    defaultValue: Boolean(true),
-    label: "Show hit count numbers for each source line",
-    legacyKey: "Replay:ShowHitCounts",
-  },
 } satisfies ConfigurablePreferences;
 
 export const ENUMS = {

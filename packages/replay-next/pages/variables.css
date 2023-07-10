@@ -200,6 +200,7 @@
   --background-color-contrast-5: #081121;
 
   --background-color-current-execution-point: #25364e;
+  --background-color-current-execution-point-column: #2663c080;
   --background-color-current-search-result: #25364e;
   --background-color-default: #081120;
   --background-color-disabled-button: #454950;
@@ -726,6 +727,7 @@
   --background-color-secondary-button: #f02d5e;
 
   --background-color-current-execution-point: #eaf3ff;
+  --background-color-current-execution-point-column: #b8d7ff;
   --background-color-current-search-result: #eaf3ff;
   --background-color-inputs: var(--theme-text-field-bgcolor);
   --background-color-resize-handle: #cfcfcf;

@@ -67,19 +67,20 @@ describe("UserData", () => {
       switch (key) {
         case LOCAL_STORAGE_KEY:
           return JSON.stringify({
-            source_showHitCounts: false,
+            layout_sidePanelCollapsed: false,
           });
         default:
           return null;
       }
     });
 
-    window.location.search = "?features=feature_basicProcessingLoadingBar,source_showHitCounts";
+    window.location.search =
+      "?features=feature_basicProcessingLoadingBar,layout_sidePanelCollapsed";
 
     const userData = require("./UserData").userData;
 
     // false in localStorage but true in URL
-    expect(userData.get("source_showHitCounts")).toBe(true);
+    expect(userData.get("layout_sidePanelCollapsed")).toBe(true);
 
     // null in localStorage, defaults to false, but true in URL
     expect(userData.get("feature_basicProcessingLoadingBar")).toBe(true);
