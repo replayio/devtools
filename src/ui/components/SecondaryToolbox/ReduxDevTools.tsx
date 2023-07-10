@@ -1,4 +1,4 @@
-import { ExecutionPoint, PointDescription } from "@replayio/protocol";
+import { ExecutionPoint, Location, PointDescription, TimeStampedPoint } from "@replayio/protocol";
 import classnames from "classnames";
 import React, { useContext, useMemo, useState } from "react";
 import { PanelGroup, PanelResizeHandle, Panel as ResizablePanel } from "react-resizable-panels";
@@ -12,7 +12,7 @@ import { isPointInRegion } from "shared/utils/time";
 import { UIThunkAction } from "ui/actions";
 import { MORE_IGNORABLE_PARTIAL_URLS } from "ui/actions/eventListeners/eventListenerUtils";
 import { seek } from "ui/actions/timeline";
-import { SourcesState } from "ui/reducers/sources";
+import { SourcesState, getPreferredLocation } from "ui/reducers/sources";
 import { getCurrentTime, getFocusWindow } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { reduxDevToolsAnnotationsCache } from "ui/suspense/annotationsCaches";
@@ -77,6 +77,11 @@ export const ReduxDevToolsPanel = () => {
   );
 };
 
+interface PointWithLocation {
+  location: Location;
+  point?: TimeStampedPoint;
+}
+
 const reduxDispatchJumpLocationCache = createCache<
   [
     replayClient: ReplayClientInterface,
@@ -104,16 +109,42 @@ const reduxDispatchJumpLocationCache = createCache<
       return !MORE_IGNORABLE_PARTIAL_URLS.some(partialUrl => source.url?.includes(partialUrl));
     });
 
+    // The first 2 elements in filtered pause frames are from replay's redux stub, so they should be ignored
+    // The 3rd element is the user function that calls it, and will most likely be the `dispatch` call
+    const preferredFrame = filteredPauseFrames[2];
     const frameSteps = await frameStepsCache.readAsync(
       replayClient,
       pauseId,
-      // The first 2 elements in filtered pause frames are from replay's redux stub, so they should be ignored
-      // The 3rd element is the user function that calls it, and will most likely be the `dispatch` call
-      filteredPauseFrames[2].protocolId
+
+      preferredFrame.protocolId
     );
 
-    if (frameSteps) {
-      return frameSteps[0];
+    const pointsWithLocations =
+      frameSteps?.flatMap(step => {
+        return step.frame
+          ?.map(l => {
+            return {
+              location: l,
+              point: step,
+            };
+          })
+          .filter(Boolean) as PointWithLocation[];
+      }) ?? [];
+
+    const preferredLocation = getPreferredLocation(sourcesState, [preferredFrame.location]);
+
+    // One of these locations should match up
+    const matchingFrameStep: PointWithLocation | undefined = pointsWithLocations.find(step => {
+      // Intentionally ignore columns for now - this seems to produce better results
+      // that line up with the hit points in a print statement
+      return (
+        step.location.sourceId === preferredLocation.sourceId &&
+        step.location.line === preferredLocation.line
+      );
+    });
+
+    if (matchingFrameStep) {
+      return matchingFrameStep.point;
     }
   },
 });
