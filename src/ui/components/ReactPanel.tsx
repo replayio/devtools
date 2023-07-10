@@ -78,7 +78,7 @@ export const reactRenderQueuedJumpLocationCache: Cache<
   PointWithLocation | undefined
 > = createCache({
   config: { immutable: true },
-  debugLabel: "NextInteractionEvent",
+  debugLabel: "ReactRenderQueuedJumpLocation",
   getKey: ([replayClient, earliestAppCodeFrame, sourcesState]) => earliestAppCodeFrame.pauseId,
   load: async ([replayClient, earliestAppCodeFrame, sourcesState]) => {
     let userPauseFrameTime: TimeStampedPoint | undefined = undefined;
