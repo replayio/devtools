@@ -169,10 +169,15 @@ export default function Header() {
   const { recording, loading } = hooks.useGetRecording(recordingId);
   const backIcon = <div className={classNames(styles.BackButton, "img", "arrowhead-right")} />;
 
-  const dashboardUrl = window.location.origin;
-
   if (loading) {
     return <div className={styles.Header}></div>;
+  }
+
+  let dashboardUrl = window.location.origin;
+  if (recording?.workspace !== null) {
+    dashboardUrl = `/team/${recording?.workspace?.id}`;
+  } else {
+    dashboardUrl = "/team/me/recordings";
   }
 
   return (
