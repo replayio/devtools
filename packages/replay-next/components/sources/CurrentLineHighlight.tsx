@@ -100,10 +100,12 @@ function CurrentLineHighlightSuspends({
         columnBreakpointIndex = breakableColumnIndices.findIndex(
           column => column === highlightColumnBegin
         );
-        if (columnBreakpointIndex < breakableColumnIndices.length - 1) {
-          highlightColumnEnd = breakableColumnIndices[columnBreakpointIndex + 1] - 1;
-        } else if (plainText !== null) {
-          highlightColumnEnd = plainText.length - 1;
+        if (columnBreakpointIndex >= 0) {
+          if (columnBreakpointIndex < breakableColumnIndices.length - 1) {
+            highlightColumnEnd = breakableColumnIndices[columnBreakpointIndex + 1] - 1;
+          } else if (plainText !== null) {
+            highlightColumnEnd = plainText.length - 1;
+          }
         }
       }
     }
