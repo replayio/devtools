@@ -1,5 +1,27 @@
-import { parseSync, traverse } from "@babel/core";
+import { NodePath, parseSync, types as t, traverse } from "@babel/core";
 import { Location } from "@replayio/protocol";
+
+function parentReturnsChildFn(parentFn: NodePath<t.Function>, childFn: NodePath<t.Function>) {
+  // handles `{ return _ => {} }`
+  if (t.isBlockStatement(parentFn.node.body)) {
+    const returnStmt = parentFn.node.body.body.find((n): n is t.ReturnStatement =>
+      t.isReturnStatement(n)
+    );
+
+    if (returnStmt) {
+      if (returnStmt.argument === childFn.node) {
+        return true;
+      }
+    }
+  }
+
+  // handles `=> _ => {}`
+  if (t.isArrowFunctionExpression(parentFn.node.body) && parentFn.node.body === childFn.node) {
+    return true;
+  }
+
+  return false;
+}
 
 export function isReduxMiddleware(sourceContents: string, location: Location) {
   try {
@@ -18,9 +40,14 @@ export function isReduxMiddleware(sourceContents: string, location: Location) {
             const wrapDispatch = dispatch?.getFunctionParent();
             const middleware = wrapDispatch?.getFunctionParent();
 
-            if ([dispatch, wrapDispatch, middleware].every(f => f?.node.params.length === 1)) {
-              isMiddleware = true;
-              path.stop();
+            if (dispatch && wrapDispatch && middleware) {
+              if (
+                parentReturnsChildFn(wrapDispatch, dispatch) &&
+                parentReturnsChildFn(middleware, wrapDispatch)
+              ) {
+                isMiddleware = true;
+                path.stop();
+              }
             }
           }
         },
