@@ -7,10 +7,12 @@ import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext
 import styles from "./TestRecordingTree.module.css";
 
 export function TestRecordingTree({
+  flakyTestIds,
   isNested = false,
   scope = null,
   testTree,
 }: {
+  flakyTestIds: Set<string | number>;
   isNested?: boolean;
   scope?: string | null;
   testTree: TestTree;
@@ -28,6 +30,7 @@ export function TestRecordingTree({
       {Object.keys(testTree.scopes).map(scope => (
         <TestRecordingTree
           key={scope}
+          flakyTestIds={flakyTestIds}
           isNested={isNested || !!parentScope}
           scope={scope}
           testTree={testTree.scopes[scope]}
@@ -37,6 +40,7 @@ export function TestRecordingTree({
         <ol className={styles.List}>
           {testTree.testRecordings.map((testRecording, index) => (
             <TestRecordingTreeRow
+              flakyTestIds={flakyTestIds}
               key={index}
               onClick={() => setTestRecording(testRecording)}
               testRecording={testRecording}

@@ -3,7 +3,10 @@ import { useContext, useEffect, useMemo } from "react";
 
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { TestEnvironmentError } from "shared/test-suites/RecordingTestMetadata";
+import {
+  RecordingTestMetadataV3,
+  TestEnvironmentError,
+} from "shared/test-suites/RecordingTestMetadata";
 import { getFormattedTime } from "shared/utils/time";
 import { getTruncatedRelativeDate } from "ui/components/Library/Team/View/Recordings/RecordingListItem/RecordingListItem";
 import LabeledIcon from "ui/components/TestSuite/components/LabeledIcon";
@@ -29,12 +32,41 @@ export default function Panel() {
   const { errors } = environment;
   const { filePath, title } = source;
 
-  const durationString = getFormattedTime(approximateDuration);
+  // Sort recordings by test, such that flaky tests always have the passing test first
+  const [sortedTestRecordings, flakyTestIds] = useMemo(() => {
+    const sortedTestRecordings: RecordingTestMetadataV3.TestRecording[] = [];
+    const flakyTestIds = new Set<string | number>();
 
-  const testTree = useMemo(() => createTestTree(testRecordings), [testRecordings]);
+    let currentTestRecordingId = null;
+    let currentTestRecordingIdStartIndex = 0;
+
+    for (let index = 0; index < testRecordings.length; index++) {
+      const testRecording = testRecordings[index];
+
+      if (currentTestRecordingId !== testRecording.id) {
+        currentTestRecordingId = testRecording.id;
+        currentTestRecordingIdStartIndex = sortedTestRecordings.length;
+
+        sortedTestRecordings.push(testRecording);
+      } else {
+        if (testRecording.result === "passed") {
+          sortedTestRecordings.splice(currentTestRecordingIdStartIndex, 0, testRecording);
+          flakyTestIds.add(currentTestRecordingId);
+        } else {
+          sortedTestRecordings.push(testRecording);
+        }
+      }
+    }
+
+    return [sortedTestRecordings, flakyTestIds];
+  }, [testRecordings]);
+
+  const testTree = useMemo(() => createTestTree(sortedTestRecordings), [sortedTestRecordings]);
 
   const recording = RecordingCache.read(recordingId);
   const date = new Date(recording.date);
+
+  const durationString = getFormattedTime(approximateDuration);
 
   return (
     <>
@@ -88,7 +120,7 @@ export default function Panel() {
         <EnvironmentError error={error} key={index} />
       ))}
       <div className={styles.TreeContainer}>
-        <TestRecordingTree testTree={testTree} />
+        <TestRecordingTree flakyTestIds={flakyTestIds} testTree={testTree} />
       </div>
     </>
   );
