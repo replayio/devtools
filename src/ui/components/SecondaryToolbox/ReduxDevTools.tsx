@@ -149,7 +149,9 @@ const reduxDispatchJumpLocationCache = createCache<
     let preferredFrame = filteredPauseFrames[currentPreferredIndex];
     let isMiddleware = true;
 
-    while (isMiddleware) {
+    while (isMiddleware && currentPreferredIndex < filteredPauseFrames.length) {
+      preferredFrame = filteredPauseFrames[currentPreferredIndex];
+
       const sourceContentsStream = streamingSourceContentsCache.stream(
         replayClient,
         preferredFrame.location.sourceId
@@ -161,7 +163,6 @@ const reduxDispatchJumpLocationCache = createCache<
         if (isReduxMiddleware(sourceContentsStream.value, preferredFrame.location)) {
           isMiddleware = true;
           currentPreferredIndex++;
-          preferredFrame = filteredPauseFrames[currentPreferredIndex];
         } else {
           isMiddleware = false;
         }
