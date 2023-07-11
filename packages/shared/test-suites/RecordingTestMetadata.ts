@@ -64,8 +64,9 @@ export namespace RecordingTestMetadataV1 {
 export namespace RecordingTestMetadataV2 {
   export type GroupedTestCases = Omit<
     RecordingTestMetadataV3.GroupedTestCases,
-    "source" | "testRecordings"
+    "runId" | "source" | "testRecordings"
   > & {
+    run: { id: string };
     source: {
       path: string;
       title: string | null;
@@ -149,6 +150,8 @@ export namespace RecordingTestMetadataV3 {
 
     // Summarizes result of the test run
     resultCounts: Record<TestResult, number>;
+
+    runId: string;
 
     // Version for test metadata/schema
     schemaVersion: SemVer;
@@ -605,7 +608,7 @@ export async function processGroupedTestCases(
   if (isGroupedTestCasesV3(groupedTestCases)) {
     return groupedTestCases;
   } else if (isGroupedTestCasesV2(groupedTestCases)) {
-    const { environment, source, tests: partialTestRecordings, ...rest } = groupedTestCases;
+    const { environment, run, source, tests: partialTestRecordings, ...rest } = groupedTestCases;
     switch (environment.testRunner.name) {
       case "cypress": {
         const annotations = await AnnotationsCache.readAsync(replayClient);
@@ -633,6 +636,7 @@ export async function processGroupedTestCases(
 
           return {
             ...rest,
+            runId: run.id,
             environment: {
               ...environment,
               errors: [
@@ -725,6 +729,7 @@ export async function processGroupedTestCases(
           return {
             ...rest,
             environment,
+            runId: run.id,
             source: {
               filePath: source.path,
               title: source.title,
@@ -745,6 +750,7 @@ export async function processGroupedTestCases(
         return {
           ...rest,
           environment,
+          runId: run.id,
           source: {
             filePath: source.path,
             title: source.title,
@@ -1075,4 +1081,14 @@ export function getTestEnvironment(groupedTestCases: AnyGroupedTestCases): TestE
     return null;
   }
   return groupedTestCases.environment;
+}
+
+export function getTestRunId(groupedTestCases: AnyGroupedTestCases): string | null {
+  if (isGroupedTestCasesV1(groupedTestCases)) {
+    return null;
+  } else if (isGroupedTestCasesV2(groupedTestCases)) {
+    return groupedTestCases.run.id;
+  } else {
+    return groupedTestCases.runId;
+  }
 }
