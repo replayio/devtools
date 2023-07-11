@@ -24,7 +24,8 @@ export default function TestRecordingTreeRow({
   const { title } = source;
 
   const isFlaky = flakyTestIds.has(id);
-  const showTitle = isFlaky ? result === "passed" : attempt === 1;
+  // TODO [SCS-1268] Remove undefined check
+  const showTitle = isFlaky ? result === "passed" : attempt === undefined || attempt === 1;
 
   let attemptLabel;
   switch (result) {
