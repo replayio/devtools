@@ -42,6 +42,7 @@ export function isReduxMiddleware(sourceContents: string, location: Location) {
 
             if (dispatch && wrapDispatch && middleware) {
               if (
+                [dispatch, wrapDispatch, middleware].every(fn => fn.node.params.length === 1) &&
                 parentReturnsChildFn(wrapDispatch, dispatch) &&
                 parentReturnsChildFn(middleware, wrapDispatch)
               ) {
