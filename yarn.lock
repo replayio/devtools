@@ -3692,18 +3692,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/playwright@npm:^1.0.1":
-  version: 1.0.1
-  resolution: "@replayio/playwright@npm:1.0.1"
+"@replayio/playwright@npm:^1.0.4":
+  version: 1.0.4
+  resolution: "@replayio/playwright@npm:1.0.4"
   dependencies:
-    "@replayio/replay": ^0.12.12
-    "@replayio/test-utils": ^1.0.0
+    "@replayio/replay": ^0.12.13
+    "@replayio/test-utils": ^1.0.3
     uuid: ^8.3.2
   peerDependencies:
     "@playwright/test": 1.19.x
   bin:
     replayio-playwright: bin/replayio-playwright.js
-  checksum: 06fe657d8cce1b5d309ee815dce107eaec808635418d1d0fdcbd7e4b678dc0e1dd8031b5a3af1a9b117a19ae6670d8896a842935ec2270eb2346591998e1e609
+  checksum: c0dc19d36f5835e646ba339c6523263a93c9412394118543a08b16b5b167d71b549a29f0a0d0658d99834a3404b7b8ad8e047741072e08cfce0c1ffddd306c25
   languageName: node
   linkType: hard
 
@@ -3714,9 +3714,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/replay@npm:^0.12.12":
-  version: 0.12.12
-  resolution: "@replayio/replay@npm:0.12.12"
+"@replayio/replay@npm:^0.12.13":
+  version: 0.12.13
+  resolution: "@replayio/replay@npm:0.12.13"
   dependencies:
     "@replayio/sourcemap-upload": ^1.0.7
     commander: ^7.2.0
@@ -3730,7 +3730,7 @@ __metadata:
     ws: ^7.5.0
   bin:
     replay: bin/replay.js
-  checksum: eda70274815a34323e4b3313cb45bd64f8f8752831d21c818c57bfa9704e24b268e70a947c6c93c5496aae58db5485c15f400770b5365e10c824b102c2d5d3ab
+  checksum: a8bdda8bdfed5c8c1332391f721fd947ed9c034e80f9cae991137d41bfb3bab764db0d6c809ca89c7573dea161a529c38857ee067ccea3d3f591d89998370d6b
   languageName: node
   linkType: hard
 
@@ -3793,16 +3793,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/test-utils@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "@replayio/test-utils@npm:1.0.0"
+"@replayio/test-utils@npm:^1.0.3":
+  version: 1.0.3
+  resolution: "@replayio/test-utils@npm:1.0.3"
   dependencies:
-    "@replayio/replay": ^0.12.12
+    "@replayio/replay": ^0.12.13
     "@types/node-fetch": ^2.6.2
     debug: ^4.3.4
     node-fetch: ^2.6.7
     uuid: ^8.3.2
-  checksum: ec511d901575a824ed6c310e6dd34a299729c271c8afae45ace3a5989e512125035b6bdbde4db82e631e10c258f260d8ec7f0b0ed2be587d628cebff655c5310
+  checksum: d483efdb3080c6a93de81847d367e172eb74318be7d23737883921909003dd5d436508af34944872485dc4e94863d25d81ef8fdcbd6d7029e51088e4bf0f8939
   languageName: node
   linkType: hard
 
@@ -9667,7 +9667,7 @@ __metadata:
     "@playwright/test": ^1.35.0
     "@recordreplay/playwright": ^1.18.3
     "@replayio/cypress": ^0.5.0
-    "@replayio/playwright": ^1.0.1
+    "@replayio/playwright": ^1.0.4
     chalk: ^4
     cli-spinners: ^2.7.0
     cypress: ^12.5.1
