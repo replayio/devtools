@@ -6,6 +6,7 @@ import { createCache, useImperativeCacheValue } from "suspense";
 
 import { frameStepsCache } from "replay-next/src/suspense/FrameStepsCache";
 import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
+import { streamingSourceContentsCache } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
 import { isPointInRegion } from "shared/utils/time";
@@ -17,6 +18,7 @@ import { getCurrentTime, getFocusWindow } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { reduxDevToolsAnnotationsCache } from "ui/suspense/annotationsCaches";
 import { getPauseFramesAsync } from "ui/suspense/frameCache";
+import { isReduxMiddleware } from "ui/utils/redux";
 
 import { JumpToCodeButton } from "../shared/JumpToCodeButton";
 import { ReduxActionAnnotation } from "./redux-devtools/redux-annotations";
@@ -143,11 +145,32 @@ const reduxDispatchJumpLocationCache = createCache<
 
     // The first 2 elements in filtered pause frames are from replay's redux stub, so they should be ignored
     // The 3rd element is the user function that calls it, and will most likely be the `dispatch` call
-    const preferredFrame = filteredPauseFrames[2];
+    let currentPreferredIndex = 2;
+    let preferredFrame = filteredPauseFrames[currentPreferredIndex];
+    let isMiddleware = true;
+
+    while (isMiddleware) {
+      const sourceContentsStream = streamingSourceContentsCache.stream(
+        replayClient,
+        preferredFrame.location.sourceId
+      );
+
+      await sourceContentsStream.resolver;
+
+      if (sourceContentsStream.value) {
+        if (isReduxMiddleware(sourceContentsStream.value, preferredFrame.location)) {
+          isMiddleware = true;
+          currentPreferredIndex++;
+          preferredFrame = filteredPauseFrames[currentPreferredIndex];
+        } else {
+          isMiddleware = false;
+        }
+      }
+    }
+
     const frameSteps = await frameStepsCache.readAsync(
       replayClient,
       pauseId,
-
       preferredFrame.protocolId
     );
 
