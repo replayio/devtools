@@ -1,5 +1,6 @@
 import { useTransition } from "react";
 
+import Icon from "replay-next/components/Icon";
 import { TestRecording } from "shared/test-suites/RecordingTestMetadata";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { TestResultIcon } from "ui/components/TestSuite/components/TestResultIcon";
@@ -7,9 +8,11 @@ import { TestResultIcon } from "ui/components/TestSuite/components/TestResultIco
 import styles from "./TestRecordingTreeRow.module.css";
 
 export default function TestRecordingTreeRow({
+  flakyTestIds,
   onClick: onClickProp,
   testRecording,
 }: {
+  flakyTestIds: Set<string | number>;
   onClick: () => void;
   testRecording: TestRecording;
 }) {
@@ -17,8 +20,24 @@ export default function TestRecordingTreeRow({
 
   const onClick = () => startTransition(onClickProp);
 
-  const { attempt, error, result, source } = testRecording;
+  const { attempt, error, id, result, source } = testRecording;
   const { title } = source;
+
+  const isFlaky = flakyTestIds.has(id);
+  // TODO [SCS-1268] Remove undefined check
+  const showTitle = isFlaky ? result === "passed" : attempt === undefined || attempt === 1;
+
+  let attemptLabel;
+  switch (result) {
+    case "failed":
+    case "timedOut":
+      attemptLabel = "failed";
+      break;
+    case "skipped":
+    case "unknown":
+      attemptLabel = "skipped";
+      break;
+  }
 
   return (
     <li
@@ -27,12 +46,20 @@ export default function TestRecordingTreeRow({
       data-test-name="TestRecordingTreeRow"
       onClick={onClick}
     >
+      {showTitle || <Icon className={styles.NestedIcon} type="arrow-nested" />}
       <TestResultIcon result={result} />
       <div className={styles.Column}>
         <div className={styles.Title}>
-          {title} {attempt > 1 && <span className={styles.Attempt}>(retry {attempt - 1})</span>}
+          {showTitle ? (
+            title
+          ) : (
+            <>
+              <span className={styles.AttemptLabel}>{attemptLabel}</span>
+              <span className={styles.AttemptNumber}>(attempt {attempt})</span>
+            </>
+          )}
         </div>
-        {error && (
+        {showTitle && error && (
           <div className={styles.Error}>
             <span className={styles.ErrorTitle}>Error:</span> {error.message}
           </div>
