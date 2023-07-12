@@ -46,6 +46,7 @@ export const config = {
   backend_enableHasAnnotationKindQueryStorage: {
     defaultValue: Boolean(false),
     description: "Enable storage of previously generated response to Session.hasAnnotationKind",
+    internalOnly: true,
     label: "Enable query-level storage for Session.hasAnnotationKind",
     legacyKey: "devtools.features.enableHasAnnotationKindQueryStorage",
   },
