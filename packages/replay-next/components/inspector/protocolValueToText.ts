@@ -32,14 +32,6 @@ async function protocolValueToTextHelper(
   depth: number,
   includeName: boolean
 ): Promise<string | null> {
-  if (depth > MAX_DEPTH_TO_COPY) {
-    return '"[[ Truncated ]]"';
-  }
-
-  const clientValue = await clientValueCache.readAsync(client, pauseId, protocolValue);
-
-  const { objectId, type } = clientValue;
-
   let nameToCopy: string | null = null;
   let valueToCopy: string | null = null;
 
@@ -49,189 +41,201 @@ async function protocolValueToTextHelper(
     }
   }
 
-  if (objectId) {
-    if (objectIdSet.has(objectId)) {
-      valueToCopy = '"[[ Circular ]]"';
-    } else {
-      objectIdSet.add(objectId);
+  if (depth > MAX_DEPTH_TO_COPY) {
+    valueToCopy = '"[[ Truncated ]]"';
+  } else {
+    const clientValue = await clientValueCache.readAsync(client, pauseId, protocolValue);
 
-      const object = await objectCache.readAsync(client, pauseId, objectId, "full");
-      if (object && object.preview) {
-        switch (type) {
-          case "date": {
-            const dateTime = object?.preview?.dateTime;
-            const string = dateTime ? new Date(dateTime).toISOString() : "Date";
-            valueToCopy = JSON.stringify(string);
-            break;
-          }
-          case "error": {
-            valueToCopy = JSON.stringify(
-              await errorProtocolObjectToString(client, pauseId, object)
-            );
-            break;
-          }
-          case "function": {
-            valueToCopy = JSON.stringify(functionProtocolObjectToString(object));
-            break;
-          }
-          case "regexp": {
-            valueToCopy = regExpProtocolObjectToString(object);
-            break;
-          }
-          default: {
-            switch (type) {
-              case "array": {
-                const properties = object.preview.properties ?? [];
-                const mappedValues = await Promise.all(
-                  properties
-                    .filter(property => property.name !== "length")
-                    .map(property =>
-                      protocolValueToTextHelper(
+    const { objectId, type } = clientValue;
+
+    if (objectId) {
+      if (objectIdSet.has(objectId)) {
+        valueToCopy = '"[[ Circular ]]"';
+      } else {
+        objectIdSet.add(objectId);
+
+        const object = await objectCache.readAsync(client, pauseId, objectId, "full");
+        if (object && object.preview) {
+          switch (type) {
+            case "date": {
+              const dateTime = object?.preview?.dateTime;
+              const string = dateTime ? new Date(dateTime).toISOString() : "Date";
+              valueToCopy = JSON.stringify(string);
+              break;
+            }
+            case "error": {
+              valueToCopy = JSON.stringify(
+                await errorProtocolObjectToString(client, pauseId, object)
+              );
+              break;
+            }
+            case "function": {
+              valueToCopy = JSON.stringify(functionProtocolObjectToString(object));
+              break;
+            }
+            case "regexp": {
+              valueToCopy = regExpProtocolObjectToString(object);
+              break;
+            }
+            default: {
+              switch (type) {
+                case "array": {
+                  const properties = object.preview.properties ?? [];
+                  const mappedValues = await Promise.all(
+                    properties
+                      .filter(property => property.name !== "length")
+                      .map(property =>
+                        protocolValueToTextHelper(
+                          client,
+                          property,
+                          pauseId,
+                          objectIdSet,
+                          depth + 1,
+                          false
+                        )
+                      )
+                  );
+                  valueToCopy = `[${mappedValues.join(", ")}]`;
+                  break;
+                }
+                case "html-element": {
+                  const {
+                    attributes,
+                    childNodes = [],
+                    nodeName = "unknown",
+                  } = object.preview?.node ?? {};
+
+                  const tagName = nodeName.toLowerCase();
+                  const properties = filterNonEnumerableProperties(attributes ?? []);
+
+                  const mappedChildren = [];
+                  for (let i = 0; i < childNodes.length; i++) {
+                    const childNodeId = childNodes[i];
+                    const protocolValue = { object: childNodeId };
+                    mappedChildren.push(
+                      await protocolValueToTextHelper(
                         client,
-                        property,
+                        protocolValue,
                         pauseId,
                         objectIdSet,
                         depth + 1,
                         false
                       )
-                    )
-                );
-                valueToCopy = `[${mappedValues.join(", ")}]`;
-                break;
-              }
-              case "html-element": {
-                const {
-                  attributes,
-                  childNodes = [],
-                  nodeName = "unknown",
-                } = object.preview?.node ?? {};
+                    );
+                  }
 
-                const tagName = nodeName.toLowerCase();
-                const properties = filterNonEnumerableProperties(attributes ?? []);
+                  const mappedAttributes = [];
+                  if (properties.length > 0) {
+                    for (const property of properties) {
+                      const clientValue = await clientValueCache.readAsync(
+                        client,
+                        pauseId,
+                        property
+                      );
 
-                const mappedChildren = [];
-                for (let i = 0; i < childNodes.length; i++) {
-                  const childNodeId = childNodes[i];
-                  const protocolValue = { object: childNodeId };
-                  mappedChildren.push(
-                    await protocolValueToTextHelper(
+                      mappedAttributes.push(`${clientValue.name}="${clientValue.preview ?? ""}"`);
+                    }
+                  }
+
+                  const openTag =
+                    mappedAttributes.length > 0
+                      ? `<${tagName} ${mappedAttributes.join(" ")}`
+                      : `<${tagName}`;
+
+                  valueToCopy =
+                    mappedChildren.length > 0
+                      ? `${openTag}>${mappedChildren.join(" ")}</${tagName}>`
+                      : `${openTag} />`;
+                  break;
+                }
+                case "html-text": {
+                  valueToCopy = object.preview.node?.nodeValue ?? "";
+                  break;
+                }
+                case "map": {
+                  const containerEntries = object.preview.containerEntries ?? [];
+
+                  let mappedValues = [];
+                  for (const containerEntry of containerEntries) {
+                    const key = await protocolValueToTextHelper(
                       client,
-                      protocolValue,
+                      containerEntry.key!,
                       pauseId,
                       objectIdSet,
                       depth + 1,
                       false
-                    )
-                  );
-                }
-
-                const mappedAttributes = [];
-                if (properties.length > 0) {
-                  for (const property of properties) {
-                    const clientValue = await clientValueCache.readAsync(client, pauseId, property);
-
-                    mappedAttributes.push(`${clientValue.name}="${clientValue.preview ?? ""}"`);
-                  }
-                }
-
-                const openTag =
-                  mappedAttributes.length > 0
-                    ? `<${tagName} ${mappedAttributes.join(" ")}`
-                    : `<${tagName}`;
-
-                valueToCopy =
-                  mappedChildren.length > 0
-                    ? `${openTag}>${mappedChildren.join(" ")}</${tagName}>`
-                    : `${openTag} />`;
-                break;
-              }
-              case "html-text": {
-                valueToCopy = object.preview.node?.nodeValue ?? "";
-                break;
-              }
-              case "map": {
-                const containerEntries = object.preview.containerEntries ?? [];
-
-                let mappedValues = [];
-                for (const containerEntry of containerEntries) {
-                  const key = await protocolValueToTextHelper(
-                    client,
-                    containerEntry.key!,
-                    pauseId,
-                    objectIdSet,
-                    depth + 1,
-                    false
-                  );
-                  const value = await protocolValueToTextHelper(
-                    client,
-                    containerEntry.value,
-                    pauseId,
-                    objectIdSet,
-                    depth + 1,
-                    false
-                  );
-
-                  mappedValues.push(`[${key}, ${value}]`);
-                }
-
-                valueToCopy = `[${mappedValues.join(", ")}]`;
-                break;
-              }
-              case "object": {
-                const properties = object.preview.properties ?? [];
-                const mappedValues = await Promise.all(
-                  properties.map(property =>
-                    protocolValueToTextHelper(
-                      client,
-                      property,
-                      pauseId,
-                      objectIdSet,
-                      depth + 1,
-                      true
-                    )
-                  )
-                );
-                valueToCopy = `{${mappedValues.join(", ")}}`;
-                break;
-              }
-              case "set": {
-                const containerEntries = object.preview.containerEntries ?? [];
-                const mappedValues = await Promise.all(
-                  containerEntries.map(containerEntry =>
-                    protocolValueToTextHelper(
+                    );
+                    const value = await protocolValueToTextHelper(
                       client,
                       containerEntry.value,
                       pauseId,
                       objectIdSet,
                       depth + 1,
                       false
+                    );
+
+                    mappedValues.push(`[${key}, ${value}]`);
+                  }
+
+                  valueToCopy = `[${mappedValues.join(", ")}]`;
+                  break;
+                }
+                case "object": {
+                  const properties = object.preview.properties ?? [];
+                  const mappedValues = await Promise.all(
+                    properties.map(property =>
+                      protocolValueToTextHelper(
+                        client,
+                        property,
+                        pauseId,
+                        objectIdSet,
+                        depth + 1,
+                        true
+                      )
                     )
-                  )
-                );
-                valueToCopy = `[${mappedValues.join(", ")}]`;
-                break;
+                  );
+                  valueToCopy = `{${mappedValues.join(", ")}}`;
+                  break;
+                }
+                case "set": {
+                  const containerEntries = object.preview.containerEntries ?? [];
+                  const mappedValues = await Promise.all(
+                    containerEntries.map(containerEntry =>
+                      protocolValueToTextHelper(
+                        client,
+                        containerEntry.value,
+                        pauseId,
+                        objectIdSet,
+                        depth + 1,
+                        false
+                      )
+                    )
+                  );
+                  valueToCopy = `[${mappedValues.join(", ")}]`;
+                  break;
+                }
               }
+              break;
             }
-            break;
           }
         }
       }
-    }
-  } else if (clientValue.preview) {
-    switch (type) {
-      case "nan":
-        valueToCopy = "NaN";
-        break;
-      case "string":
-      case "symbol":
-        valueToCopy = JSON.stringify(clientValue.preview);
-        break;
-      case "undefined":
-        valueToCopy = "undefined";
-        break;
-      default:
-        valueToCopy = clientValue.preview;
-        break;
+    } else if (clientValue.preview) {
+      switch (type) {
+        case "nan":
+          valueToCopy = "NaN";
+          break;
+        case "string":
+        case "symbol":
+          valueToCopy = JSON.stringify(clientValue.preview);
+          break;
+        case "undefined":
+          valueToCopy = "undefined";
+          break;
+        default:
+          valueToCopy = clientValue.preview;
+          break;
+      }
     }
   }
 
