@@ -13,14 +13,14 @@ import { verifyClipboardText, verifyContextMenuCopy } from "./shared";
 beforeEach();
 
 test("should copy deep objects and their nested properties", async ({ page }, testInfo) => {
-  // Verify a deep object that gets truncated
+  // Verify that a deep object gets truncated correctly
   await verifyContextMenuCopy(
     page,
     findKeyValues,
     "filter_objectDeep",
     "level-1",
     "Copy object",
-    '{"level-1": {"level-2": {"level-3": {"level-4": {"level-5": {"[[ Truncated ]]"}}}}}}'
+    '{"level-1": {"level-2": {"level-3": {"level-4": {"level-5": {"level-6": "[[ Truncated ]]"}}}}}}'
   );
 
   // Expand properties and copy the nested value
