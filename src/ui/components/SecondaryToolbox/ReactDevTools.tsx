@@ -8,6 +8,7 @@ import { getThreadContext } from "devtools/client/debugger/src/reducers/pause";
 import { highlightNode, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 import { ThreadFront } from "protocol/thread";
 import { assert } from "protocol/utils";
+import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import { useIsPointWithinFocusWindow } from "replay-next/src/hooks/useIsPointWithinFocusWindow";
 import { useNag } from "replay-next/src/hooks/useNag";
 import { RecordingTarget, recordingTargetCache } from "replay-next/src/suspense/BuildIdCache";
@@ -435,31 +436,21 @@ const nodePickerInstance = new NodePickerClass();
 
 const EMPTY_ANNOTATIONS: ParsedReactDevToolsAnnotation[] = [];
 
-// A `usePrevious` hook that stores in `useState` instead of a ref.
-// Does double-render, but technically "safer" in theory.
-// Source: https://www.developerway.com/posts/implementing-advanced-use-previous-hook
-const usePreviousPersistent = <T,>(value: T) => {
-  const [state, setState] = useState<{ value: T; prev: T | null }>({
-    value: value,
-    prev: null,
+function usePrevious<T>(newValue: T) {
+  const previousRef = useRef<T>();
+
+  useLayoutEffect(() => {
+    previousRef.current = newValue;
   });
 
-  const current = state.value;
+  return previousRef.current;
+}
 
-  if (value !== current) {
-    setState({
-      value: value,
-      prev: current,
-    });
-  }
-
-  return state.prev;
-};
-
-export default function ReactDevtoolsPanel() {
+export function ReactDevtoolsPanel() {
   const client = useContext(ReplayClientContext);
   const currentPoint = useAppSelector(getCurrentPoint);
-  const previousPoint = usePreviousPersistent(currentPoint);
+  const previousPoint = usePrevious(currentPoint);
+  const isFirstAnnotationsInjection = useRef(true);
 
   const isPointWithinFocusWindow = useIsPointWithinFocusWindow(currentPoint);
   const pauseId = useAppSelector(state => state.pause.id);
@@ -564,7 +555,7 @@ export default function ReactDevtoolsPanel() {
 
     wall.setPauseId(pauseId);
 
-    if (previousPoint !== null) {
+    if (previousPoint && previousPoint !== currentPoint) {
       // We keep the one RDT UI component instance alive, but operations are additive over time.
       // In order to reset the displayed component tree, we first need to generate a set of fake
       // "remove this React root" operations based on where we _were_ paused, and inject those.
@@ -575,10 +566,14 @@ export default function ReactDevtoolsPanel() {
       }
     }
 
-    // Now that the displayed tree is empty, we can inject all operations up to the _current_ point in time.
-    for (const { contents, point } of annotations) {
-      if (contents.event === "operations" && isExecutionPointsLessThan(point, currentPoint)) {
-        wall.sendAnnotation(contents);
+    if (previousPoint !== currentPoint || isFirstAnnotationsInjection.current) {
+      isFirstAnnotationsInjection.current = false;
+
+      // Now that the displayed tree is empty, we can inject all operations up to the _current_ point in time.
+      for (const { contents, point } of annotations) {
+        if (contents.event === "operations" && isExecutionPointsLessThan(point, currentPoint)) {
+          wall.sendAnnotation(contents);
+        }
       }
     }
   }, [ReactDevTools, wall, previousPoint, currentPoint, annotations, pauseId]);
@@ -656,5 +651,13 @@ export default function ReactDevtoolsPanel() {
         }
       }}
     />
+  );
+}
+
+export default function ReactDevToolsWithErrorBoundary() {
+  return (
+    <ErrorBoundary name="ReactDevTools">
+      <ReactDevtoolsPanel />
+    </ErrorBoundary>
   );
 }
