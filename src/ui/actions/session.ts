@@ -205,6 +205,9 @@ export function createSocket(
         disableConcurrentControllerLoading: userData.get(
           "backend_disableConcurrentControllerLoading"
         ),
+        enableHasAnnotationKindQueryStorage: userData.get(
+          "backend_enableHasAnnotationKindQueryStorage"
+        ),
       };
       if (userData.get("backend_newControllerOnRefresh")) {
         experimentalSettings.controllerKey = String(Date.now());
