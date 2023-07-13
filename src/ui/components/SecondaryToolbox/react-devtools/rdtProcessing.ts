@@ -165,9 +165,14 @@ export function parseTreeOperations(treeOperations: number[]): ParsedReactDevtoo
   // We're now going to iterate through just the actual
   // tree operations portion of the original operations array
   let i = 0;
+  let loopCounter = 0;
 
   // Iteration logic and index comments copied from `printOperations.ts`
   while (i < treeOperations.length) {
+    if (++loopCounter > 100000) {
+      throw new Error("TREE_OPERATION_PARSING_INFINITE_LOOP");
+    }
+
     const operation = treeOperations[i];
 
     switch (operation) {
@@ -259,6 +264,8 @@ export function parseTreeOperations(treeOperations: number[]): ParsedReactDevtoo
       case TREE_OPERATION_SET_SUBTREE_MODE: {
         const rootId = treeOperations[i + 1];
         const mode = treeOperations[i + 2];
+
+        i += 3;
 
         const operation: TreeOperationSetSubtreeMode = {
           type: TREE_OPERATION_SET_SUBTREE_MODE,
