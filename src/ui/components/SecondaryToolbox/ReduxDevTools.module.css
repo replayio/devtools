@@ -10,9 +10,9 @@
 }
 
 .actions [role="list"] [role="listitem"] {
+  position: relative;
   overflow: hidden;
   display: flex;
-  justify-content: space-between;
   column-gap: 0.5em;
   flex-direction: row;
   align-items: center;
@@ -20,6 +20,22 @@
   max-width: 100%;
   flex-wrap: wrap;
   line-height: 1.5rem;
+}
+
+.actions [role="list"] [role="listitem"].future {
+  border-top: 2px solid var(--secondary-accent);
+}
+
+.actions [role="list"] [role="listitem"] .actionLabel {
+  padding-left: 10px;
+}
+
+.actions [role="list"] [role="listitem"] .jump-to-code {
+  display: none;
+  position: absolute;
+}
+.actions [role="list"] [role="listitem"]:hover .jump-to-code {
+  display: flex;
 }
 
 .actions [role="list"] [role="listitem"] * {

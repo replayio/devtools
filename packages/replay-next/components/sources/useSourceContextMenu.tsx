@@ -13,8 +13,6 @@ import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { addComment as addCommentGraphQL } from "shared/graphql/Comments";
-import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
-import { userData } from "shared/user-data/GraphQL/UserData";
 
 export default function useSourceContextMenu({
   lineNumber,
@@ -30,8 +28,6 @@ export default function useSourceContextMenu({
   const { showCommentsPanel } = useContext(InspectorContext);
   const { accessToken, recordingId, trackEvent } = useContext(SessionContext);
   const { executionPoint: currentExecutionPoint, time: currentTime } = useContext(TimelineContext);
-
-  const [showHitCounts, setShowHitCounts] = useGraphQLUserData("source_showHitCounts");
 
   const [isPending, startTransition] = useTransition();
   const invalidateCache = useCacheRefresh();
@@ -81,9 +77,6 @@ export default function useSourceContextMenu({
       )}
       <ContextMenuItem disabled={disableCopySourceUri} onSelect={copySourceUri}>
         Copy source URI
-      </ContextMenuItem>
-      <ContextMenuItem onSelect={() => setShowHitCounts(!showHitCounts)}>
-        {showHitCounts ? "Hide" : "Show"} hit counts
       </ContextMenuItem>
     </>,
     {

@@ -54,7 +54,19 @@
   font-weight: bold;
 }
 
-.Attempt {
+.NestedIcon {
+  height: 1rem;
+  width: 1rem;
+  flex: 0 0 1rem;
+  margin-left: 1rem;
+}
+
+.AttemptLabel {
+  text-transform: capitalize;
+  margin-right: 1ch;
+}
+
+.AttemptNumber {
   font-size: var(--font-size-small);
   color: var(--color-dim);
 }

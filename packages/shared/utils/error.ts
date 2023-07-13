@@ -1,7 +1,16 @@
 export interface CommandError extends Error {
   name: "CommandError";
   code: number;
+  args?: CommandErrorArgs;
 }
+
+export type CommandErrorArgs = {
+  id: number;
+  method: string;
+  params: Object;
+  pauseId: string | undefined;
+  sessionId: string | undefined;
+};
 
 export enum ProtocolError {
   InternalError = 1,
@@ -24,16 +33,28 @@ export enum ProtocolError {
   FocusWindowChange = 76,
 }
 
-export const commandError = (message: string, code: number): CommandError => {
-  const err = new Error(message) as CommandError;
-  err.name = "CommandError";
-  err.code = code;
-  return err;
+export const commandError = (
+  message: string,
+  code: number,
+  args?: CommandErrorArgs
+): CommandError => {
+  const error = new Error(message) as CommandError;
+  error.name = "CommandError";
+  error.code = code;
+  error.message = message;
+  error.args = args;
+  return error;
 };
 
-export const isCommandError = (error: unknown, code: number): boolean => {
+export function isCommandError(error: unknown, code?: number): error is CommandError {
   if (error instanceof Error) {
-    return error.name === "CommandError" && (error as CommandError).code === code;
+    if (error.name === "CommandError") {
+      if (code === undefined) {
+        return true;
+      } else {
+        return (error as CommandError).code === code;
+      }
+    }
   } else if (typeof error === "string") {
     console.error("Unexpected error type encountered (string):\n", error);
 
@@ -50,4 +71,4 @@ export const isCommandError = (error: unknown, code: number): boolean => {
   }
 
   return false;
-};
+}

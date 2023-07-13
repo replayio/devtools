@@ -120,6 +120,7 @@ function MessageRenderer({
     <span className={styles.LogContents} data-test-name="LogContents">
       {message.text && <span className={styles.MessageText}>{message.text}</span>}
       <ErrorBoundary
+        name="MessageRenderer"
         fallback={<div className={styles.ErrorBoundaryFallback}>Something went wrong.</div>}
       >
         {primaryContent}

@@ -33,20 +33,20 @@ export default function SecondaryPanes() {
       <FrameTimeline />
       <Accordion>
         <AccordionPane
-          header="Breakpoints"
-          className="breakpoints-pane"
-          expanded={breakpointsVisible}
-          onToggle={() => setBreakpointsVisible(!breakpointsVisible)}
-        >
-          <BreakpointsPane />
-        </AccordionPane>
-        <AccordionPane
           header="Print Statements"
           className="breakpoints-pane"
           expanded={logpointsVisible}
           onToggle={() => setLogpointsVisible(!logpointsVisible)}
         >
           <LogpointsPane />
+        </AccordionPane>
+        <AccordionPane
+          header="Breakpoints"
+          className="breakpoints-pane"
+          expanded={breakpointsVisible}
+          onToggle={() => setBreakpointsVisible(!breakpointsVisible)}
+        >
+          <BreakpointsPane />
         </AccordionPane>
         <AccordionPane
           header="Call Stack"

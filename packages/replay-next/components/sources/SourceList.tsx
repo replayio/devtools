@@ -31,7 +31,6 @@ import { Source } from "replay-next/src/suspense/SourcesCache";
 import { StreamingParser } from "replay-next/src/suspense/SyntaxParsingCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { POINT_BEHAVIOR_DISABLED, POINT_BEHAVIOR_ENABLED } from "shared/client/types";
-import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { toPointRange } from "shared/utils/time";
 
 import useFontBasedListMeasurements from "./hooks/useFontBasedListMeasurements";
@@ -150,8 +149,6 @@ export default function SourceList({
     }
   }, [focusedSource, lineCount, markPendingFocusUpdateProcessed, pendingFocusUpdate, sourceId]);
 
-  const [showHitCounts] = useGraphQLUserData("source_showHitCounts");
-
   const [minHitCount, maxHitCount] = getCachedMinMaxSourceHitCounts(sourceId, focusRange);
 
   useLayoutEffect(() => {
@@ -199,7 +196,6 @@ export default function SourceList({
       pointsForDefaultPriority,
       pointsForSuspense,
       showColumnBreakpoints,
-      showHitCounts,
       source,
       streamingParser,
     }),
@@ -216,7 +212,6 @@ export default function SourceList({
       pointPanelWithConditionalHeight,
       pointsForDefaultPriority,
       pointsForSuspense,
-      showHitCounts,
       showColumnBreakpoints,
       source,
       streamingParser,
@@ -290,7 +285,7 @@ export default function SourceList({
 
   const maxLineIndexStringLength = `${lineCount}`.length;
   const maxHitCountStringLength =
-    showHitCounts && maxHitCount !== null ? `${formatHitCount(maxHitCount)}`.length : 0;
+    maxHitCount !== null ? `${formatHitCount(maxHitCount)}`.length : 0;
 
   const widthMinusScrollbar = width - scrollbarWidth;
 

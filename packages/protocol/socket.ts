@@ -135,6 +135,7 @@ export type ExperimentalSettings = {
   keepAllTraces?: boolean;
   disableIncrementalSnapshots?: boolean;
   disableConcurrentControllerLoading?: boolean;
+  enableHasAnnotationKindQueryStorage?: boolean;
 };
 
 type SessionCallbacks = {
@@ -239,6 +240,7 @@ export async function sendMessage<M extends CommandMethods>(
   const response = await new Promise<CommandResponse>(resolve =>
     gMessageWaiters.set(id, { method, resolve })
   );
+
   if (response.error) {
     gSessionCallbacks?.onResponseError(response);
 
@@ -265,7 +267,8 @@ export async function sendMessage<M extends CommandMethods>(
     ) {
       captureException(callerStackTrace, { extra: { code, message, method, params } });
     }
-    throw commandError(finalMessage, code);
+
+    throw commandError(finalMessage, code, { id, method, params, pauseId, sessionId });
   }
 
   return response.result as any;

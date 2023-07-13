@@ -25,8 +25,8 @@ function ScopesRenderer() {
   const selectedFrameId = useAppSelector(getSelectedFrameId);
   if (!selectedFrameId) {
     return (
-      <div className="pane">
-        <div className="pane-info empty">Not paused at a point with any scopes</div>
+      <div className="pane pane-info">
+        <div className={styles.Empty}>Not paused at a point with any scopes</div>
       </div>
     );
   }
@@ -135,6 +135,7 @@ export default function Scopes() {
     <div className="scopes-content">
       <Redacted className="pane scopes-list" data-test-name="ScopesList">
         <ErrorBoundary
+          name="NewScopes"
           key={`${selectedFrameId?.pauseId}:${selectedFrameId?.frameId}`}
           fallback={<div className="pane-info">Error loading scopes</div>}
         >

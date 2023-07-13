@@ -62,7 +62,6 @@ export type ItemData = {
   pointsForSuspense: Point[];
   pointBehaviors: PointBehaviorsObject;
   showColumnBreakpoints: boolean;
-  showHitCounts: boolean;
   source: Source;
   streamingParser: StreamingParser;
 };
@@ -101,7 +100,6 @@ const SourceListRow = memo(
       pointsForDefaultPriority,
       pointsForSuspense,
       showColumnBreakpoints,
-      showHitCounts,
       source,
       streamingParser,
     } = data;
@@ -412,11 +410,9 @@ const SourceListRow = memo(
           </div>
 
           <div className={`${styles.LineHitCountBar} ${hitCountBarClassName}`} />
-          {showHitCounts && (
-            <div className={`${styles.LineHitCountLabel} ${hitCountLabelClassName}`}>
-              {hitCount !== null ? formatHitCount(hitCount) : ""}
-            </div>
-          )}
+          <div className={`${styles.LineHitCountLabel} ${hitCountLabelClassName}`}>
+            {hitCount !== null ? formatHitCount(hitCount) : ""}
+          </div>
 
           <div className={styles.LineSegmentsAndPointPanel} data-test-name="SourceLine-Contents">
             {searchResultsForLine?.map((result, resultIndex) => (
@@ -463,7 +459,13 @@ const SourceListRow = memo(
           )}
         </div>
 
-        <CurrentLineHighlight lineNumber={lineNumber} sourceId={sourceId} />
+        <CurrentLineHighlight
+          breakableColumnIndices={breakableColumnIndices}
+          lineNumber={lineNumber}
+          plainText={plainText}
+          showBreakpointMarkers={showBreakpointMarkers}
+          sourceId={sourceId}
+        />
 
         {contextMenu}
       </div>

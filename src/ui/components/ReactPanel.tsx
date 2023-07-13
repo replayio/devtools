@@ -35,7 +35,7 @@ import { streamingSourceContentsCache } from "replay-next/src/suspense/SourcesCa
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
 import { UIThunkAction } from "ui/actions";
-import { IGNORABLE_PARTIAL_SOURCE_URLS } from "ui/actions/eventListeners/eventListenerUtils";
+import { MORE_IGNORABLE_PARTIAL_URLS } from "ui/actions/eventListeners/eventListenerUtils";
 import { findFunctionOutlineForLocation } from "ui/actions/eventListeners/jumpToCode";
 import { seek } from "ui/actions/timeline";
 import { JumpToCodeButton, JumpToCodeStatus } from "ui/components/shared/JumpToCodeButton";
@@ -52,11 +52,6 @@ import { getPauseFramesAsync } from "ui/suspense/frameCache";
 
 import MaterialIcon from "./shared/MaterialIcon";
 import styles from "./Events/Event.module.css";
-
-const MORE_IGNORABLE_PARTIAL_URLS = IGNORABLE_PARTIAL_SOURCE_URLS.concat(
-  // Ignore _any_ 3rd-party package for now
-  "node_modules"
-);
 
 interface ReactQueuedRenderDetails extends TimeStampedPoint {
   pauseFrames: PauseFrame[];
@@ -78,7 +73,7 @@ export const reactRenderQueuedJumpLocationCache: Cache<
   PointWithLocation | undefined
 > = createCache({
   config: { immutable: true },
-  debugLabel: "NextInteractionEvent",
+  debugLabel: "ReactRenderQueuedJumpLocation",
   getKey: ([replayClient, earliestAppCodeFrame, sourcesState]) => earliestAppCodeFrame.pauseId,
   load: async ([replayClient, earliestAppCodeFrame, sourcesState]) => {
     let userPauseFrameTime: TimeStampedPoint | undefined = undefined;

@@ -80,6 +80,7 @@ function LogPointRenderer({
       <span className={styles.LogContents} data-test-name="LogContents">
         <BadgeRenderer badge={logPointInstance.point.badge} showNewBadgeFlash={showNewBadgeFlash} />
         <ErrorBoundary
+          name="LogPointRenderer"
           fallback={<div className={styles.ErrorBoundaryFallback}>Something went wrong.</div>}
         >
           <Suspense key={logPointInstance.point.content} fallback={<Loader />}>

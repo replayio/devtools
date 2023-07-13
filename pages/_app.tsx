@@ -1,6 +1,5 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { Store } from "@reduxjs/toolkit";
-import * as Sentry from "@sentry/react";
 import type { AppContext, AppProps } from "next/app";
 import NextApp from "next/app";
 import Head from "next/head";
@@ -10,6 +9,7 @@ import { Provider } from "react-redux";
 import "../src/global-css";
 import "../src/test-prep";
 
+import DecoratedErrorBoundary from "replay-next/components/ErrorBoundary";
 import { SystemProvider } from "design";
 import { setFeatures } from "protocol/thread/thread";
 import { recordData as recordTelemetryData } from "replay-next/src/utils/telemetry";
@@ -18,7 +18,7 @@ import { ApolloWrapper } from "ui/components/ApolloWrapper";
 import _App from "ui/components/App";
 import MaintenanceModeScreen from "ui/components/MaintenanceMode";
 import { ConfirmProvider } from "ui/components/shared/Confirm";
-import Error from "ui/components/shared/Error";
+import ErrorRenderer from "ui/components/shared/Error";
 import LoadingScreen from "ui/components/shared/LoadingScreen";
 import useAuthTelemetry from "ui/hooks/useAuthTelemetry";
 import { getUnexpectedError } from "ui/reducers/app";
@@ -171,8 +171,8 @@ function ErrorBoundary({ children }: { children: ReactNode }) {
   const unexpectedError = useAppSelector(getUnexpectedError);
   const dispatch = useAppDispatch();
 
-  const onError = (error: Error) => {
-    if (error.name === "ChunkLoadError") {
+  const onError = (error: unknown) => {
+    if (error instanceof Error && error.name === "ChunkLoadError") {
       return dispatch(setUnexpectedError({
         message: "Replay updated",
         content: "Replay was updated since you opened it. Please refresh the page.",
@@ -193,9 +193,9 @@ function ErrorBoundary({ children }: { children: ReactNode }) {
   };
 
   return (
-    <Sentry.ErrorBoundary onError={onError} fallback={<Error />}>
-      {unexpectedError ? <Error /> : children}
-    </Sentry.ErrorBoundary>
+    <DecoratedErrorBoundary onError={onError} fallback={<ErrorRenderer />} name="Routing">
+      {unexpectedError ? <ErrorRenderer /> : children}
+    </DecoratedErrorBoundary>
   );
 }
 

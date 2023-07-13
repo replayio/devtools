@@ -1,10 +1,11 @@
+import assert from "assert";
 import { RecordingId } from "@replayio/protocol";
 import classNames from "classnames";
-import Link from "next/link";
 import { ClipboardEvent, KeyboardEvent, useLayoutEffect, useRef, useState } from "react";
 
 import { RecordingTarget } from "replay-next/src/suspense/BuildIdCache";
 import { Recording } from "shared/graphql/types";
+import { AnyTestRecording, getTestRunId } from "shared/test-suites/RecordingTestMetadata";
 import { selectAll } from "shared/utils/selection";
 import { getRecordingTarget } from "ui/actions/app";
 import Avatar from "ui/components/Avatar";
@@ -170,26 +171,33 @@ export default function Header() {
   const { recording, loading } = hooks.useGetRecording(recordingId);
   const backIcon = <div className={classNames(styles.BackButton, "img", "arrowhead-right")} />;
 
-  const dashboardUrl = window.location.origin;
-
-  const onNavigateBack: React.MouseEventHandler = event => {
-    if (event.metaKey) {
-      return window.open(dashboardUrl, "library-tab");
-    }
-    window.open(dashboardUrl, "library-tab");
-  };
-
   if (loading) {
     return <div className={styles.Header}></div>;
+  }
+
+  assert(recording != null);
+
+  let dashboardUrl = window.location.origin;
+  if (recording.workspace !== null) {
+    dashboardUrl = `/team/${recording.workspace?.id}`;
+
+    if (recording.isTest && recording.metadata?.test !== undefined) {
+      const runId = getTestRunId(recording.metadata.test);
+      if (runId != null) {
+        dashboardUrl += `/runs/${runId}`;
+      }
+    }
+  } else {
+    dashboardUrl = "/team/me/recordings";
   }
 
   return (
     <div className={styles.Header}>
       <div className="relative flex flex-grow flex-row items-center overflow-hidden">
         {isAuthenticated && (
-          <Link href={dashboardUrl}>
+          <a href={dashboardUrl}>
             <IconWithTooltip icon={backIcon} content={"Back to Library"} />
-          </Link>
+          </a>
         )}
         {recording && recordingId ? (
           <HeaderTitle recording={recording} recordingId={recordingId} />

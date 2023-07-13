@@ -75,10 +75,10 @@ test("cypress-01: Basic Test Suites panel functionality", async ({ page }) => {
 
   // Relative dates can change over time.
   // Check for either the "X units ago" text, or the literal date.
-  expect(await getTestSuiteDate(page).textContent()).toMatch(/ ago|(6\/5\/2023)/);
+  expect(await getTestSuiteDate(page).textContent()).toMatch(/ ago|(7\/12\/2023)/);
   expect(await getTestSuiteUser(page).textContent()).toMatch("ryanjduffy");
-  expect(await getTestSuiteBranch(page).textContent()).toMatch("ryan/metadata-v2");
-  expect(await getTestSuiteDuration(page).textContent()).toMatch("0:15");
+  expect(await getTestSuiteBranch(page).textContent()).toMatch("main");
+  expect(await getTestSuiteDuration(page).textContent()).toMatch("0:12");
 
   // can open tests
   await firstTest.click();
@@ -88,13 +88,12 @@ test("cypress-01: Basic Test Suites panel functionality", async ({ page }) => {
     expect(selectedRow).toHaveCount(1);
   });
 
-  // This recording has a "beforeEach" and a body,
-  // but not "after" hooks
+  // This recording only has a "test body" section
   const sections = getTestSections(selectedRow);
-  await expect(sections).toHaveCount(2);
+  await expect(sections).toHaveCount(1);
+
   // These are CSS-transformed to uppercase
-  expect(await sections.nth(0).textContent()).toMatch(/before each/i);
-  expect(await sections.nth(1).textContent()).toMatch(/test body/i);
+  expect(await sections.nth(0).textContent()).toMatch(/test body/i);
 
   const steps = getTestCaseSteps(selectedRow);
   await expect(steps).toHaveCount(17);

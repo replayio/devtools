@@ -44,7 +44,7 @@ export default function ConsoleRoot({
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   return (
-    <ErrorBoundary>
+    <ErrorBoundary name="ConsoleRoot">
       <Suspense fallback={<IndeterminateLoader />}>
         <ConsoleFiltersContextRoot>
           <LoggablesContextRoot messageListRef={messageListRef}>
@@ -211,7 +211,7 @@ function Console({
               </div>
             }
           >
-            <ErrorBoundary fallbackClassName={styles.ErrorBoundaryFallback}>
+            <ErrorBoundary name="ConsoleRoot" fallbackClassName={styles.ErrorBoundaryFallback}>
               <div className={styles.MessageColumn} onClick={onClick}>
                 {nagHeader}
 

@@ -114,7 +114,13 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       throw new AuthError(authErrorMessage);
     }
 
-    if (!code || !state || !browserAuth) {
+    if (!browserAuth) {
+      throw new AuthError(
+        "Failed to find a required browser cookies. Are cookies enabled for replay.io?"
+      );
+    }
+
+    if (!code || !state) {
       throw new AuthError("A required parameter was missing. Please try again.");
     }
 

@@ -1,6 +1,6 @@
 import { Locator, Page, expect } from "@playwright/test";
 
-import { debugPrint, delay, waitFor } from "./general";
+import { debugPrint, waitFor } from "./general";
 
 export async function findClientValues(
   page: Page,

@@ -194,7 +194,7 @@ export default function SourceOutlineWrapper() {
   }
 
   return (
-    <ErrorBoundary key={selectedSource?.id}>
+    <ErrorBoundary name="SourceOutlineWrapper" key={selectedSource?.id}>
       <Suspense fallback={null}>
         <SourceOutline
           cursorPosition={cursorPosition || null}

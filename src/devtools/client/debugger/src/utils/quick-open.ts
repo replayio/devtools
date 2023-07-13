@@ -29,7 +29,7 @@ export interface SearchResult {
   value: string;
   title: string;
   secondaryTitle?: string;
-  location?: { start: Location; end?: Location };
+  location?: { begin: Location; end?: Location };
   icon?: string;
   url?: string;
   subtitle?: string | number;
@@ -109,7 +109,7 @@ export function formatProjectFunctions(
         subtitle: loc.line,
         secondaryTitle: getTruncatedFileName(source),
         value: name,
-        location: { start: loc },
+        location: { begin: loc },
       };
     })
     .flat()

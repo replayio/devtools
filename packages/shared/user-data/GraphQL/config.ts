@@ -65,6 +65,13 @@ export const config = {
     label: "Disable query-level caching for stable request types",
     legacyKey: "devtools.features.disableStableQueryCache",
   },
+  backend_enableHasAnnotationKindQueryStorage: {
+    defaultValue: Boolean(false),
+    description: "Enable storage of previously generated response to Session.hasAnnotationKind",
+    internalOnly: true,
+    label: "Enable query-level storage for Session.hasAnnotationKind",
+    legacyKey: "devtools.features.enableHasAnnotationKindQueryStorage",
+  },
   backend_enableRoutines: {
     defaultValue: Boolean(false),
     description: "Enable backend support for running processing routines (like React DevTools)",
@@ -195,6 +202,12 @@ export const config = {
     label: "Enable React Panel",
     legacyKey: "devtools.features.reactPanel",
   },
+  feature_reduxDevTools: {
+    defaultValue: Boolean(false),
+    description: "Enable experimental Redux DevTools panel",
+    label: "Enable Redux DevTools",
+    legacyKey: null,
+  },
 
   global_disableLogRocket: {
     defaultValue: Boolean(false),
@@ -292,12 +305,6 @@ export const config = {
   protocol_repaintEvaluations: {
     defaultValue: Boolean(false),
     legacyKey: "devtools.features.repaintEvaluations",
-  },
-
-  source_showHitCounts: {
-    defaultValue: Boolean(true),
-    label: "Show hit count numbers for each source line",
-    legacyKey: "Replay:ShowHitCounts",
   },
 } satisfies ConfigurablePreferences;
 
