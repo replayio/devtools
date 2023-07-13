@@ -26,7 +26,7 @@
     "react-virtualized-auto-sizer": "^1.0.19",
     "shared": "workspace:*",
     "suspense": "^0.0.44",
-    "use-context-menu": "^0.4.10",
+    "use-context-menu": "^0.4.11",
     "uuid": "^7.0.3"
   },
   "devDependencies": {
