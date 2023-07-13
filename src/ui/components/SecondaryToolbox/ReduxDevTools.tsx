@@ -1,24 +1,31 @@
-import { ExecutionPoint, Location, PointDescription, TimeStampedPoint } from "@replayio/protocol";
+import {
+  ExecutionPoint,
+  FunctionMatch,
+  Location,
+  PointDescription,
+  TimeStampedPoint,
+} from "@replayio/protocol";
 import classnames from "classnames";
 import React, { useContext, useMemo, useState } from "react";
 import { PanelGroup, PanelResizeHandle, Panel as ResizablePanel } from "react-resizable-panels";
 import { createCache, useImperativeCacheValue } from "suspense";
 
+import { PauseFrame } from "devtools/client/debugger/src/selectors";
 import { frameStepsCache } from "replay-next/src/suspense/FrameStepsCache";
 import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
-import { streamingSourceContentsCache } from "replay-next/src/suspense/SourcesCache";
+import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
+import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
 import { isPointInRegion } from "shared/utils/time";
 import { UIThunkAction } from "ui/actions";
-import { MORE_IGNORABLE_PARTIAL_URLS } from "ui/actions/eventListeners/eventListenerUtils";
+import { IGNORABLE_PARTIAL_SOURCE_URLS } from "ui/actions/eventListeners/eventListenerUtils";
 import { seek } from "ui/actions/timeline";
 import { SourcesState, getPreferredLocation } from "ui/reducers/sources";
 import { getCurrentTime, getFocusWindow } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { reduxDevToolsAnnotationsCache } from "ui/suspense/annotationsCaches";
 import { getPauseFramesAsync } from "ui/suspense/frameCache";
-import { isReduxMiddleware } from "ui/utils/redux";
 
 import { JumpToCodeButton } from "../shared/JumpToCodeButton";
 import { ReduxActionAnnotation } from "./redux-devtools/redux-annotations";
@@ -111,6 +118,41 @@ function ActionFilter({
   );
 }
 
+async function isInsideApplyMiddlwareFn(
+  replayClient: ReplayClientInterface,
+  sourcesState: SourcesState,
+  frame: PauseFrame
+) {
+  const dispatchMatches: FunctionMatch[] = [];
+
+  const sourcesById = await sourcesByIdCache.readAsync(replayClient);
+  const reactReduxSources = Array.from(sourcesById.values()).filter(source =>
+    source.url?.includes("/redux/")
+  );
+
+  await replayClient.searchFunctions(
+    { query: "dispatch", sourceIds: reactReduxSources.map(source => source.id) },
+    matches => {
+      dispatchMatches.push(...matches);
+    }
+  );
+
+  const [firstMatch] = dispatchMatches;
+  const preferredLocation = getPreferredLocation(sourcesState, [firstMatch.loc]);
+  const reduxSource = sourcesById.get(preferredLocation.sourceId)!;
+  const fileOutline = await sourceOutlineCache.readAsync(replayClient, reduxSource.id);
+
+  const applyMiddlwareFunction = fileOutline.functions.find(o => o.name === "applyMiddleware")!;
+
+  const { location, source } = frame;
+
+  return (
+    location.line >= applyMiddlwareFunction.location.begin.line &&
+    location.line < applyMiddlwareFunction.location.end.line &&
+    source?.url === reduxSource.url
+  );
+}
+
 interface PointWithLocation {
   location: Location;
   point?: TimeStampedPoint;
@@ -137,38 +179,25 @@ const reduxDispatchJumpLocationCache = createCache<
         return false;
       }
 
-      // Filter out everything in `node_modules`, so we have just app code left
-      // TODO There may be times when we care about renders queued by lib code
-      // TODO See about just filtering out React instead?
-      return !MORE_IGNORABLE_PARTIAL_URLS.some(partialUrl => source.url?.includes(partialUrl));
+      return !IGNORABLE_PARTIAL_SOURCE_URLS.some(partialUrl => source.url?.includes(partialUrl));
     });
 
     // The first 2 elements in filtered pause frames are from replay's redux stub, so they should be ignored
     // The 3rd element is the user function that calls it, and will most likely be the `dispatch` call
-    let currentPreferredIndex = 2;
-    let preferredFrame = filteredPauseFrames[currentPreferredIndex];
-    let isMiddleware = true;
+    let preferredFrameIdx = 2;
+    for (let frameIdx = 2; frameIdx < filteredPauseFrames.length; frameIdx++) {
+      const frame = filteredPauseFrames[frameIdx];
 
-    while (isMiddleware && currentPreferredIndex < filteredPauseFrames.length) {
-      preferredFrame = filteredPauseFrames[currentPreferredIndex];
-
-      const sourceContentsStream = streamingSourceContentsCache.stream(
-        replayClient,
-        preferredFrame.location.sourceId
-      );
-
-      await sourceContentsStream.resolver;
-
-      if (sourceContentsStream.value) {
-        if (isReduxMiddleware(sourceContentsStream.value, preferredFrame.location)) {
-          isMiddleware = true;
-          currentPreferredIndex++;
-        } else {
-          isMiddleware = false;
-        }
+      console.log("doing ", frameIdx);
+      if (await isInsideApplyMiddlwareFn(replayClient, sourcesState, frame)) {
+        // this is the frame inside `applyMiddleware` where the initial dispatch occurs
+        // the frame just before this one is the user `dispatch`
+        preferredFrameIdx = frameIdx + 1;
+        break;
       }
     }
 
+    const preferredFrame = filteredPauseFrames[preferredFrameIdx];
     const frameSteps = await frameStepsCache.readAsync(
       replayClient,
       pauseId,
