@@ -76,9 +76,11 @@ function SuspendingPreviewPopup({
     };
 
     document.body.addEventListener("click", onClick);
+    document.body.addEventListener("contextmenu", onClick);
 
     return () => {
       document.body.removeEventListener("click", onClick);
+      document.body.removeEventListener("contextmenu", onClick);
     };
   });
 
