@@ -188,7 +188,6 @@ const reduxDispatchJumpLocationCache = createCache<
     for (let frameIdx = 2; frameIdx < filteredPauseFrames.length; frameIdx++) {
       const frame = filteredPauseFrames[frameIdx];
 
-      console.log("doing ", frameIdx);
       if (await isInsideApplyMiddlwareFn(replayClient, sourcesState, frame)) {
         // this is the frame inside `applyMiddleware` where the initial dispatch occurs
         // the frame just before this one is the user `dispatch`
