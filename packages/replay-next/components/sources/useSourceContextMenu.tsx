@@ -18,7 +18,7 @@ import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { hitPointsForLocationCache } from "replay-next/src/suspense/HitPointsCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { HitPointStatus, LineHitCounts } from "shared/client/types";
+import { LineHitCounts } from "shared/client/types";
 import { addComment as addCommentGraphQL } from "shared/graphql/Comments";
 
 export default function useSourceContextMenu({
@@ -37,7 +37,11 @@ export default function useSourceContextMenu({
   const { showCommentsPanel } = useContext(InspectorContext);
   const replayClient = useContext(ReplayClientContext);
   const { accessToken, endpoint, recordingId, trackEvent } = useContext(SessionContext);
-  const { executionPoint: currentExecutionPoint, time: currentTime } = useContext(TimelineContext);
+  const {
+    executionPoint: currentExecutionPoint,
+    time: currentTime,
+    update,
+  } = useContext(TimelineContext);
 
   // Don't Suspend during mount; the context menu should show immediately
   // even if we're still fetching hit points
@@ -93,7 +97,22 @@ export default function useSourceContextMenu({
     copyToClipboard(sourceUrl!);
   };
 
-  const disableCopySourceUri = sourceUrl == null;
+  let fastForwardToExecutionPoint: TimeStampedPoint | null = null;
+  let rewindToExecutionPoint: TimeStampedPoint | null = null;
+  if (hitPoints !== null && hitPointStatus !== "too-many-points-to-find") {
+    fastForwardToExecutionPoint = findNextHitPoint(hitPoints, currentExecutionPoint);
+    rewindToExecutionPoint = findLastHitPoint(hitPoints, currentExecutionPoint);
+  }
+
+  const fastForward = () => {
+    assert(fastForwardToExecutionPoint != null);
+    update(fastForwardToExecutionPoint.time, fastForwardToExecutionPoint.point, false);
+  };
+
+  const rewind = () => {
+    assert(rewindToExecutionPoint != null);
+    update(rewindToExecutionPoint.time, rewindToExecutionPoint.point, false);
+  };
 
   return useContextMenu(
     <>
@@ -109,81 +128,21 @@ export default function useSourceContextMenu({
           <ContextMenuDivider />
         </>
       )}
-      <ContextMenuItem disabled={disableCopySourceUri} onSelect={copySourceUri}>
+      <ContextMenuItem disabled={sourceUrl == null} onSelect={copySourceUri}>
         Copy source URI
       </ContextMenuItem>
       <ContextMenuDivider />
-      <StepBackToLineMenuItem
-        hitPoints={hitPoints}
-        hitPointStatus={hitPointStatus}
-        lineNumber={lineNumber}
-      />
-      <StepForwardToLineMenuItem
-        hitPoints={hitPoints}
-        hitPointStatus={hitPointStatus}
-        lineNumber={lineNumber}
-      />
+      <ContextMenuItem disabled={rewindToExecutionPoint == null} onSelect={rewind}>
+        Rewind to line {lineNumber}
+      </ContextMenuItem>
+      <ContextMenuItem disabled={fastForwardToExecutionPoint == null} onSelect={fastForward}>
+        Fast forward to line {lineNumber}
+      </ContextMenuItem>
     </>,
     {
       requireClickToShow: true,
       dataTestId: `ContextMenu-Source-${lineNumber}`,
       dataTestName: "ContextMenu-Source",
     }
-  );
-}
-
-function StepBackToLineMenuItem({
-  hitPoints,
-  hitPointStatus,
-  lineNumber,
-}: {
-  hitPoints: TimeStampedPoint[] | null;
-  hitPointStatus: HitPointStatus | null;
-  lineNumber: number;
-}) {
-  const { executionPoint, update } = useContext(TimelineContext);
-
-  let targetPoint: TimeStampedPoint | null = null;
-  if (hitPoints !== null && hitPointStatus !== "too-many-points-to-find") {
-    targetPoint = findLastHitPoint(hitPoints, executionPoint);
-  }
-
-  const onSelect = () => {
-    assert(targetPoint != null);
-    update(targetPoint.time, targetPoint.point, false);
-  };
-
-  return (
-    <ContextMenuItem disabled={targetPoint == null} onSelect={onSelect}>
-      Rewind to line {lineNumber}
-    </ContextMenuItem>
-  );
-}
-
-function StepForwardToLineMenuItem({
-  hitPoints,
-  hitPointStatus,
-  lineNumber,
-}: {
-  hitPoints: TimeStampedPoint[] | null;
-  hitPointStatus: HitPointStatus | null;
-  lineNumber: number;
-}) {
-  const { executionPoint, update } = useContext(TimelineContext);
-
-  let targetPoint: TimeStampedPoint | null = null;
-  if (hitPoints !== null && hitPointStatus !== "too-many-points-to-find") {
-    targetPoint = findNextHitPoint(hitPoints, executionPoint);
-  }
-
-  const onSelect = () => {
-    assert(targetPoint != null);
-    update(targetPoint.time, targetPoint.point, false);
-  };
-
-  return (
-    <ContextMenuItem disabled={targetPoint == null} onSelect={onSelect}>
-      Fast forward to line {lineNumber}
-    </ContextMenuItem>
   );
 }
