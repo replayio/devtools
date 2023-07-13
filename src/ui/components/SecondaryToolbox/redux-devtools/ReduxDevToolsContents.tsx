@@ -1,8 +1,15 @@
-import { ExecutionPoint, Value } from "@replayio/protocol";
+import {
+  ExecutionPoint,
+  PauseId,
+  NamedValue as ProtocolNamedValue,
+  Value as ProtocolValue,
+} from "@replayio/protocol";
 import classnames from "classnames";
-import React, { useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { Suspense, useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
 
-import Inspector from "replay-next/components/inspector/Inspector";
+import PropertiesRenderer from "replay-next/components/inspector/PropertiesRenderer";
+import Loader from "replay-next/components/Loader";
+import { clientValueCache, objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import {
@@ -56,6 +63,34 @@ const PanelButton = ({ selected, children, name, onClick }: PanelButtonProps) =>
   );
 };
 
+function RDTInspector({
+  pauseId,
+  protocolValue,
+  path,
+}: {
+  path?: string;
+  pauseId: PauseId;
+  protocolValue: ProtocolValue | ProtocolNamedValue;
+}) {
+  const client = useContext(ReplayClientContext);
+  const clientValue = clientValueCache.read(client, pauseId, protocolValue);
+
+  const { objectId } = clientValue;
+
+  const objectWithPreview = objectCache.read(client, pauseId, objectId!, "canOverflow");
+  if (objectWithPreview == null) {
+    throw Error(`Could not find object with ID "${objectId!}"`);
+  }
+
+  return (
+    <div className={styles.RDTInspector}>
+      <Suspense fallback={<Loader />}>
+        <PropertiesRenderer path={path} object={objectWithPreview} pauseId={pauseId} />
+      </Suspense>
+    </div>
+  );
+}
+
 interface RDTCProps {
   point: ExecutionPoint;
   time: number;
@@ -101,26 +136,14 @@ export function ReduxDevToolsContents({ point, time }: RDTCProps) {
   switch (selectedTab) {
     case "action": {
       contents = actionValue && (
-        <Inspector
-          hidePreview
-          key={point + "action"}
-          pauseId={pauseId!}
-          protocolValue={actionValue}
-          context="console"
-        />
+        <RDTInspector key={point + "action"} pauseId={pauseId!} protocolValue={actionValue} />
       );
 
       break;
     }
     case "state": {
       contents = stateValue && (
-        <Inspector
-          hidePreview
-          key={point + "state"}
-          pauseId={pauseId!}
-          protocolValue={stateValue}
-          context="console"
-        ></Inspector>
+        <RDTInspector key={point + "state"} pauseId={pauseId!} protocolValue={stateValue} />
       );
       break;
     }
