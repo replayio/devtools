@@ -102,11 +102,11 @@ export function ReduxDevToolsContents({ point, time }: RDTCProps) {
     case "action": {
       contents = actionValue && (
         <Inspector
+          hidePreview
           key={point + "action"}
           pauseId={pauseId!}
           protocolValue={actionValue}
           context="console"
-          expandByDefault={true}
         />
       );
 
@@ -115,11 +115,11 @@ export function ReduxDevToolsContents({ point, time }: RDTCProps) {
     case "state": {
       contents = stateValue && (
         <Inspector
+          hidePreview
           key={point + "state"}
           pauseId={pauseId!}
           protocolValue={stateValue}
           context="console"
-          expandByDefault={true}
         ></Inspector>
       );
       break;

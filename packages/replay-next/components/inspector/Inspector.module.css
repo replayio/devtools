@@ -4,3 +4,10 @@
   white-space: nowrap;
   overflow: hidden;
 }
+
+.InspectorWrapper {
+  padding: 0.25rem;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
