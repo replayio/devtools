@@ -25,7 +25,7 @@ import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { useNag } from "replay-next/src/hooks/useNag";
 import useSuspendAfterMount from "replay-next/src/hooks/useSuspendAfterMount";
-import { getHitPointsForLocationSuspense } from "replay-next/src/suspense/HitPointsCache";
+import { hitPointsForLocationCache } from "replay-next/src/suspense/HitPointsCache";
 import { getSourceSuspends } from "replay-next/src/suspense/SourcesCache";
 import { findIndexBigInt } from "replay-next/src/utils/array";
 import { validate } from "replay-next/src/utils/points";
@@ -92,11 +92,11 @@ function PointPanel(props: ExternalProps) {
     if (!focusRange) {
       return null;
     }
-    return getHitPointsForLocationSuspense(
+    return hitPointsForLocationCache.read(
       client,
+      { begin: focusRange.begin.point, end: focusRange.end.point },
       pointForSuspense.location,
-      pointForSuspense.condition,
-      { begin: focusRange.begin.point, end: focusRange.end.point }
+      pointForSuspense.condition
     );
   }) ?? [[], null];
 

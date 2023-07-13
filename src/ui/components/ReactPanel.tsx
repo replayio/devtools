@@ -28,7 +28,7 @@ import IndeterminateLoader from "replay-next/components/IndeterminateLoader";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPositionsCache";
 import { frameStepsCache } from "replay-next/src/suspense/FrameStepsCache";
-import { getHitPointsForLocationAsync } from "replay-next/src/suspense/HitPointsCache";
+import { hitPointsForLocationCache } from "replay-next/src/suspense/HitPointsCache";
 import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
 import { streamingSourceContentsCache } from "replay-next/src/suspense/SourcesCache";
@@ -42,10 +42,10 @@ import { JumpToCodeButton, JumpToCodeStatus } from "ui/components/shared/JumpToC
 import {
   SourceDetails,
   SourcesState,
+  getPreferredLocation,
   getSourceIdsByUrl,
   getSourceToDisplayForUrl,
 } from "ui/reducers/sources";
-import { getPreferredLocation } from "ui/reducers/sources";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { getPauseFramesAsync } from "ui/suspense/frameCache";
@@ -279,18 +279,18 @@ const queuedRendersStreamingCache: StreamingCache<
         return;
       }
 
-      const scheduleFiberUpdatePromise = getHitPointsForLocationAsync(
+      const scheduleFiberUpdatePromise = hitPointsForLocationCache.readAsync(
         replayClient,
+        { begin: range.begin.point, end: range.end.point },
         { ...firstScheduleUpdateFiberPosition, sourceId: reactDomSource.id },
-        null,
-        { begin: range.begin.point, end: range.end.point }
+        null
       );
 
-      const onCommitFiberHitsPromise = getHitPointsForLocationAsync(
+      const onCommitFiberHitsPromise = hitPointsForLocationCache.readAsync(
         replayClient,
+        { begin: range.begin.point, end: range.end.point },
         { ...firstOnCommitRootPosition, sourceId: reactDomSource.id },
-        null,
-        { begin: range.begin.point, end: range.end.point }
+        null
       );
 
       const [[scheduleUpdateHitPoints], [onCommitFiberHitPoints]] = await Promise.all([

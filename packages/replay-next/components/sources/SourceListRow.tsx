@@ -336,6 +336,7 @@ const SourceListRow = memo(
     };
 
     const { contextMenu, onContextMenu } = useSourceContextMenu({
+      lineHitCounts,
       lineNumber,
       sourceId: source.sourceId,
       sourceUrl: source.url ?? null,

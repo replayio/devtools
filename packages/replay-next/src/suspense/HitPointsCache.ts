@@ -1,9 +1,8 @@
 import { Location, PointRange, TimeStampedPoint } from "@replayio/protocol";
-import { isPromiseLike } from "suspense";
+import { createCache } from "suspense";
 
 import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPositionsCache";
 import { compareNumericStrings } from "replay-next/src/utils/string";
-import { createFetchAsyncFromFetchSuspense } from "replay-next/src/utils/suspense";
 import { MAX_POINTS_TO_RUN_EVALUATION } from "shared/client/ReplayClient";
 import {
   HitPointStatus,
@@ -74,39 +73,43 @@ export const hitPointsCache = createFocusIntervalCacheForExecutionPoints<
   },
 });
 
-export function getHitPointsForLocationSuspense(
-  client: ReplayClientInterface,
-  location: Location,
-  condition: string | null,
-  range: PointRange
-): HitPointsAndStatusTuple {
-  let hitPoints: TimeStampedPoint[] = [];
-  let status: HitPointStatus = "complete";
-  try {
-    hitPoints = hitPointsCache.read(
-      BigInt(range.begin),
-      BigInt(range.end),
-      client,
-      location,
-      condition
-    );
-    if (hitPoints.length > MAX_POINTS_TO_RUN_EVALUATION) {
-      status = "too-many-points-to-run-analysis";
-    }
-  } catch (errorOrPromise) {
-    if (isPromiseLike(errorOrPromise)) {
-      throw errorOrPromise;
-    }
-    if (isCommandError(errorOrPromise, ProtocolError.TooManyPoints)) {
-      status = "too-many-points-to-find";
-    } else {
-      console.error(errorOrPromise);
-      status = "unknown-error";
-    }
-  }
-  return [hitPoints, status];
-}
+export const hitPointsForLocationCache = createCache<
+  [
+    replayClient: ReplayClientInterface,
+    range: PointRange,
+    location: Location,
+    condition: string | null
+  ],
+  HitPointsAndStatusTuple
+>({
+  debugLabel: "HitPointsForLocationCache",
+  debugLogging: true,
+  getKey: ([replayClient, range, location, condition]) =>
+    `[${range.begin}-${range.end}]:${location.sourceId}:${location.line}:${location.column}:${condition}`,
+  load: async ([replayClient, range, location, condition]) => {
+    let hitPoints: TimeStampedPoint[] = [];
+    let status: HitPointStatus = "complete";
+    try {
+      hitPoints = await hitPointsCache.readAsync(
+        BigInt(range.begin),
+        BigInt(range.end),
+        replayClient,
+        location,
+        condition
+      );
+      if (hitPoints.length > MAX_POINTS_TO_RUN_EVALUATION) {
+        status = "too-many-points-to-run-analysis";
+      }
+    } catch (error) {
+      if (isCommandError(error, ProtocolError.TooManyPoints)) {
+        status = "too-many-points-to-find";
+      } else {
+        console.error(error);
 
-export const getHitPointsForLocationAsync = createFetchAsyncFromFetchSuspense(
-  getHitPointsForLocationSuspense
-);
+        status = "unknown-error";
+      }
+    }
+
+    return [hitPoints, status];
+  },
+});

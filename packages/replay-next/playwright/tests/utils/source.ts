@@ -1,6 +1,12 @@
 import { Locator, Page, expect } from "@playwright/test";
 import chalk from "chalk";
 
+import {
+  findContextMenuItem,
+  hideContextMenu,
+  showContextMenu,
+} from "replay-next/playwright/tests/utils/context-menu";
+
 import { getConsoleSearchInput } from "./console";
 import {
   clearTextArea,
@@ -104,17 +110,18 @@ export async function continueTo(
     direction: "next" | "previous";
     lineNumber: number;
     sourceId: string;
+    use: "hover-button" | "context-menu";
   }
 ) {
-  const { direction, lineNumber, sourceId } = options;
+  const { direction, lineNumber, sourceId, use } = options;
 
   await debugPrint(
     page,
     sourceId == null
-      ? `Continuing to ${chalk.bold(direction)} line ${chalk.bold(lineNumber)}`
+      ? `Continuing to ${chalk.bold(direction)} line ${chalk.bold(lineNumber)} via ${use}`
       : `Continuing to ${chalk.bold(direction)} line ${chalk.bold(
           lineNumber
-        )} for source "${chalk.bold(sourceId)}"`,
+        )} for source "${chalk.bold(sourceId)}" via ${use}`,
     "continueToNext"
   );
 
@@ -125,20 +132,35 @@ export async function continueTo(
 
   const lineLocator = page.locator(`[data-test-id="SourceLine-${lineNumber}"]`);
 
-  const stopHovering = await hoverOverLine(page, {
-    lineNumber,
-    sourceId,
-    withMetaKey: true,
-    withShiftKey: direction === "previous",
-  });
+  switch (use) {
+    case "context-menu": {
+      await showContextMenu(page, lineLocator);
+      const menuItem = await findContextMenuItem(
+        page,
+        direction === "next" ? "Fast forward" : "Rewind"
+      );
+      await menuItem.click();
 
-  const button = lineLocator.locator('[data-test-name="ContinueToButton"]');
-  const state = await button.getAttribute("data-test-state");
-  if (direction === state) {
-    await button.click();
+      break;
+    }
+    case "hover-button": {
+      const stopHovering = await hoverOverLine(page, {
+        lineNumber,
+        sourceId,
+        withMetaKey: true,
+        withShiftKey: direction === "previous",
+      });
+
+      const button = lineLocator.locator('[data-test-name="ContinueToButton"]');
+      const state = await button.getAttribute("data-test-state");
+      if (direction === state) {
+        await button.click();
+      }
+
+      await stopHovering();
+      break;
+    }
   }
-
-  await stopHovering();
 }
 
 export async function editLogPoint(
@@ -521,7 +543,7 @@ export async function hoverOverLine(
   };
 }
 
-export async function isContinueToButtonEnabled(
+export async function isSeekOptionEnabled(
   page: Page,
   options: {
     direction: "previous" | "next";
@@ -531,6 +553,8 @@ export async function isContinueToButtonEnabled(
 ): Promise<boolean> {
   const { direction, lineNumber, sourceId } = options;
 
+  const lineLocator = page.locator(`[data-test-id="SourceLine-${lineNumber}"]`);
+
   const stopHovering = await hoverOverLine(page, {
     lineNumber,
     sourceId,
@@ -538,29 +562,37 @@ export async function isContinueToButtonEnabled(
     withShiftKey: direction === "previous",
   });
 
-  const lineLocator = page.locator(`[data-test-id="SourceLine-${lineNumber}"]`);
   const button = lineLocator.locator('[data-test-name="ContinueToButton"]');
-  const isEnabled = await button.isEnabled();
+  const isHoverButtonEnabled = await button.isEnabled();
 
   await stopHovering();
 
-  return isEnabled;
+  await showContextMenu(page, lineLocator);
+  const menuItem = await findContextMenuItem(
+    page,
+    direction === "next" ? "Fast forward" : "Rewind"
+  );
+  const isContextMenuItemEnabled = await menuItem.isEnabled();
+
+  await hideContextMenu(page);
+
+  return isContextMenuItemEnabled && isHoverButtonEnabled;
 }
 
-export async function isContinueToNextButtonEnabled(
+export async function isContinueToNextOptionEnabled(
   page: Page,
   sourceId: string,
   lineNumber: number
 ): Promise<boolean> {
-  return isContinueToButtonEnabled(page, { direction: "next", lineNumber, sourceId });
+  return isSeekOptionEnabled(page, { direction: "next", lineNumber, sourceId });
 }
 
-export async function isContinueToPreviousButtonEnabled(
+export async function isContinueToPreviousOptionEnabled(
   page: Page,
   sourceId: string,
   lineNumber: number
 ): Promise<boolean> {
-  return isContinueToButtonEnabled(page, { direction: "previous", lineNumber, sourceId });
+  return isSeekOptionEnabled(page, { direction: "previous", lineNumber, sourceId });
 }
 
 export async function isLineCurrentSearchResult(page: Page, lineNumber: number): Promise<boolean> {
