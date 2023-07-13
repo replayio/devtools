@@ -9,7 +9,7 @@ import { clientValueCache, objectCache } from "replay-next/src/suspense/ObjectPr
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import Loader from "../Loader";
-import KeyValueRenderer from "./KeyValueRenderer";
+import KeyValueRenderer from "./KeyValueRendererWithContextMenu";
 import PropertiesRenderer from "./PropertiesRenderer";
 import styles from "./Inspector.module.css";
 
