@@ -83,7 +83,6 @@ export const hitPointsForLocationCache = createCache<
   HitPointsAndStatusTuple
 >({
   debugLabel: "HitPointsForLocationCache",
-  debugLogging: true,
   getKey: ([replayClient, range, location, condition]) =>
     `[${range.begin}-${range.end}]:${location.sourceId}:${location.line}:${location.column}:${condition}`,
   load: async ([replayClient, range, location, condition]) => {
