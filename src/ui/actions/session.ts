@@ -205,6 +205,9 @@ export function createSocket(
         disableConcurrentControllerLoading: userData.get(
           "backend_disableConcurrentControllerLoading"
         ),
+        enableFindAnnotationsQueryStorage: userData.get(
+          "backend_enableFindAnnotationsQueryStorage"
+        ),
         enableHasAnnotationKindQueryStorage: userData.get(
           "backend_enableHasAnnotationKindQueryStorage"
         ),
