@@ -7,6 +7,7 @@ import {
 import classnames from "classnames";
 import React, { Suspense, useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
 
+import Inspector from "replay-next/components/Inspector";
 import PropertiesRenderer from "replay-next/components/inspector/PropertiesRenderer";
 import Loader from "replay-next/components/Loader";
 import { clientValueCache, objectCache } from "replay-next/src/suspense/ObjectPreviews";
@@ -75,20 +76,49 @@ function RDTInspector({
   const client = useContext(ReplayClientContext);
   const clientValue = clientValueCache.read(client, pauseId, protocolValue);
 
-  const { objectId } = clientValue;
+  switch (clientValue.type) {
+    case "array":
+    case "function":
+    case "html-element":
+    case "html-text":
+    case "map":
+    case "object":
+    case "regexp":
+    case "set": {
+      const objectWithPreview = objectCache.read(
+        client,
+        pauseId,
+        clientValue.objectId!,
+        "canOverflow"
+      );
+      if (objectWithPreview == null) {
+        throw Error(`Could not find object with ID "${clientValue.objectId!}"`);
+      }
 
-  const objectWithPreview = objectCache.read(client, pauseId, objectId!, "canOverflow");
-  if (objectWithPreview == null) {
-    throw Error(`Could not find object with ID "${objectId!}"`);
+      return (
+        <div className={styles.RDTInspector}>
+          <Suspense fallback={<Loader />}>
+            <PropertiesRenderer path={path} object={objectWithPreview} pauseId={pauseId} />
+          </Suspense>
+        </div>
+      );
+    }
+    default: {
+      return (
+        <div className={styles.RDTInspector}>
+          <Suspense fallback={<Loader />}>
+            <Inspector
+              className={styles.Inspector}
+              context="default"
+              expandByDefault={true}
+              pauseId={pauseId!}
+              protocolValue={protocolValue}
+            />
+          </Suspense>
+        </div>
+      );
+    }
   }
-
-  return (
-    <div className={styles.RDTInspector}>
-      <Suspense fallback={<Loader />}>
-        <PropertiesRenderer path={path} object={objectWithPreview} pauseId={pauseId} />
-      </Suspense>
-    </div>
-  );
 }
 
 interface RDTCProps {

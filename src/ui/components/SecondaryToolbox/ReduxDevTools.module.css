@@ -150,3 +150,7 @@
   flex-direction: column;
   overflow-x: hidden;
 }
+
+.Inspector {
+  overflow: initial;
+}
