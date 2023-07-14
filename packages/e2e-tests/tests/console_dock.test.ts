@@ -1,6 +1,4 @@
-import test, { expect } from "@playwright/test";
-
-import { openDevToolsTab, startTest } from "../helpers";
+import { openDevToolsTab, openRecording, startTest } from "../helpers";
 import {
   getConsoleDockButton,
   getConsoleDockToBottomButton,
@@ -8,13 +6,14 @@ import {
   getConsoleDockToLeftButton,
   verifyConsoleLayout,
 } from "../helpers/dock";
+import test, { expect } from "../testFixtureCloneRecording";
 
-const url = "doc_rr_basic.html";
+test.use({ recordingUrl: "doc_rr_basic.html" });
 
 test("console_dock: Should show the correct docking behavior for recordings with video", async ({
-  page,
+  pageWithMeta: { page, recordingId },
 }) => {
-  await startTest(page, url);
+  await openRecording(page, recordingId);
   await openDevToolsTab(page);
 
   // Verify default docking position

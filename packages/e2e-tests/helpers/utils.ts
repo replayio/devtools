@@ -179,3 +179,43 @@ export async function resetTestUser(email: string) {
     },
   });
 }
+
+export async function cloneTestRecording(recordingId: string): Promise<string> {
+  const variables = { recordingId, secret: process.env.AUTOMATED_TEST_SECRET };
+
+  const clonedRecording = await axios({
+    url: config.graphqlUrl,
+    method: "POST",
+    data: {
+      query: `
+        mutation cloneTestRecording($recordingId: String!, $secret: String!) {
+          cloneTestRecording(input: { recordingId: $recordingId, secret: $secret }) {
+            recordingId
+          }
+        }
+      `,
+      variables,
+    },
+  });
+
+  return clonedRecording.data.data.cloneTestRecording.recordingId;
+}
+
+export async function deleteTestRecording(recordingId: string) {
+  const variables = { recordingId, secret: process.env.AUTOMATED_TEST_SECRET };
+
+  return axios({
+    url: config.graphqlUrl,
+    method: "POST",
+    data: {
+      query: `
+          mutation deleteTestRecording($recordingId: String!, $secret: String!) {
+            deleteTestRecording(input: { recordingId: $recordingId, secret: $secret }) {
+              success
+            }
+          }
+        `,
+      variables,
+    },
+  });
+}

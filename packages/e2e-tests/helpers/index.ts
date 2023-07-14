@@ -53,8 +53,12 @@ export async function isDevToolsTabActive(page: Page) {
   return classes.includes("active");
 }
 
-export async function startTest(page: Page, example: string, apiKey?: string) {
-  const recordingId = exampleRecordings[example];
+export async function openRecording(
+  page: Page,
+  recordingId: string,
+  node?: boolean,
+  apiKey?: string
+) {
   const base = process.env.PLAYWRIGHT_TEST_BASE_URL || "http://localhost:8080";
 
   let url = `${base}/recording/${recordingId}?e2e=1`;
@@ -75,11 +79,17 @@ export async function startTest(page: Page, example: string, apiKey?: string) {
   });
 
   // Wait for the recording basic information to load such that the primary tabs are visible.
-  if (example.startsWith("node")) {
+  if (node) {
     await page.locator('[data-panel-id="Panel-SecondaryToolbox"]').waitFor();
   } else {
     // Node recordings don't have the "Viewer/DevTools" toggle
     await page.locator('[data-test-id="ViewToggle-Viewer"]').waitFor();
     await page.locator('[data-test-id="ViewToggle-DevTools"]').waitFor();
   }
+}
+
+export async function startTest(page: Page, example: string, apiKey?: string) {
+  const recordingId = exampleRecordings[example];
+
+  openRecording(page, recordingId, example.startsWith("node"), apiKey);
 }
