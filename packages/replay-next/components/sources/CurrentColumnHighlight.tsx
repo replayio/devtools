@@ -131,6 +131,5 @@ function CurrentColumnHighlightSuspends({
     }
   }
 
-  console.log("BAIL 2");
   return null;
 }
