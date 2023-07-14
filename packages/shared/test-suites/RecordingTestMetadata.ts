@@ -351,6 +351,9 @@ export async function processCypressTestRecording(
         for (let index = 0; index < annotations.length; index++) {
           const annotation = annotations[index];
 
+          // TODO [SCS-1177] test:start and test:end annotations are unreliable
+          // so we find start and end points based on the first and last events
+          // for a given test
           if (!beginPoint || comparePoints(beginPoint.point, annotation.point) > 0) {
             beginPoint = {
               point: annotation.point,
@@ -393,20 +396,6 @@ export async function processCypressTestRecording(
               } else {
                 userActionEventIdToAnnotations[id].push(annotation);
               }
-              break;
-            }
-            case "test:start": {
-              beginPoint = {
-                point: annotation.point,
-                time: annotation.time,
-              };
-              break;
-            }
-            case "test:end": {
-              endPoint = {
-                point: annotation.point,
-                time: annotation.time,
-              };
               break;
             }
             default: {
@@ -673,18 +662,22 @@ export async function processGroupedTestCases(
             (accumulated: Annotation[][], annotation: Annotation) => {
               const { testId, attempt } = annotation.message;
 
-              assert(testId != null, "Annotation is missing `testId`. Plugin update required.");
+              // TODO [SCS-1284] Remove the -1 condition when users have
+              // migrated to a newer plugin version
+              if (testId == null || testId === -1) {
+                // beforeAll/afterAll have an -1 testId (for <= 1.0.6) or null
+                // testId (for > 1.0.6) and can be ignored for now
+                return accumulated;
+              }
+
               assert(attempt != null, "Annotation is missing `attempt`. Plugin update required.");
 
-              // beforeAll/afterAll have -1 testId and can be ignored for now
-              if (testId !== -1) {
-                const index = partialTestRecordings.findIndex(
-                  t => t.id === testId && t.attempt === attempt
-                );
-                assert(index !== -1, "Unable to find test for annotation", { annotation });
-                accumulated[index] = accumulated[index] || [];
-                accumulated[index].push(annotation);
-              }
+              const index = partialTestRecordings.findIndex(
+                t => t.id === testId && t.attempt === attempt
+              );
+              assert(index !== -1, "Unable to find test for annotation", { annotation });
+              accumulated[index] = accumulated[index] || [];
+              accumulated[index].push(annotation);
 
               return accumulated;
             },

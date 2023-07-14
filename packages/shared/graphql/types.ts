@@ -231,13 +231,7 @@ export interface RecordingMetadata {
 
 export type TestResult = "passed" | "failed" | "timedOut" | "skipped" | "unknown";
 
-type TestEvents =
-  | "event:navigation"
-  | "step:end"
-  | "step:enqueue"
-  | "step:start"
-  | "test:end"
-  | "test:start";
+type TestEvents = "event:navigation" | "step:end" | "step:enqueue" | "step:start";
 
 export type CypressAnnotationMessage = {
   event: TestEvents;
@@ -246,7 +240,7 @@ export type CypressAnnotationMessage = {
   logVariable?: "cmd" | "log";
   id?: string;
   url?: string;
-  testId: number;
+  testId: number | null;
   attempt: number;
 };
 export interface Annotation {
