@@ -1,14 +1,13 @@
 import {
   ExecutionPoint,
   FunctionMatch,
-  Location,
   PointDescription,
-  TimeStampedPoint,
+  SourceLocationRange,
 } from "@replayio/protocol";
 import classnames from "classnames";
 import React, { useContext, useMemo, useState } from "react";
 import { PanelGroup, PanelResizeHandle, Panel as ResizablePanel } from "react-resizable-panels";
-import { createCache, useImperativeCacheValue } from "suspense";
+import { createCache, createSingleEntryCache, useImperativeCacheValue } from "suspense";
 
 import { PauseFrame } from "devtools/client/debugger/src/selectors";
 import { frameStepsCache } from "replay-next/src/suspense/FrameStepsCache";
@@ -26,6 +25,7 @@ import { getCurrentTime, getFocusWindow } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { reduxDevToolsAnnotationsCache } from "ui/suspense/annotationsCaches";
 import { getPauseFramesAsync } from "ui/suspense/frameCache";
+import { getMatchingFrameStep } from "ui/utils/frame";
 
 import { JumpToCodeButton } from "../shared/JumpToCodeButton";
 import { ReduxActionAnnotation } from "./redux-devtools/redux-annotations";
@@ -117,45 +117,51 @@ function ActionFilter({
     </div>
   );
 }
-
-async function isInsideApplyMiddlwareFn(
-  replayClient: ReplayClientInterface,
-  sourcesState: SourcesState,
-  frame: PauseFrame
-) {
-  const dispatchMatches: FunctionMatch[] = [];
-
-  const sourcesById = await sourcesByIdCache.readAsync(replayClient);
-  const reactReduxSources = Array.from(sourcesById.values()).filter(source =>
-    source.url?.includes("/redux/")
-  );
-
-  await replayClient.searchFunctions(
-    { query: "dispatch", sourceIds: reactReduxSources.map(source => source.id) },
-    matches => {
-      dispatchMatches.push(...matches);
-    }
-  );
-
-  const [firstMatch] = dispatchMatches;
-  const preferredLocation = getPreferredLocation(sourcesState, [firstMatch.loc]);
-  const reduxSource = sourcesById.get(preferredLocation.sourceId)!;
-  const fileOutline = await sourceOutlineCache.readAsync(replayClient, reduxSource.id);
-
-  const applyMiddlwareFunction = fileOutline.functions.find(o => o.name === "applyMiddleware")!;
-
-  const { location, source } = frame;
-
-  return (
-    location.line >= applyMiddlwareFunction.location.begin.line &&
-    location.line < applyMiddlwareFunction.location.end.line &&
-    source?.url === reduxSource.url
-  );
+interface ApplyMiddlewareDecl {
+  location: SourceLocationRange;
+  sourceId: string;
 }
 
-interface PointWithLocation {
-  location: Location;
-  point?: TimeStampedPoint;
+const applyMiddlwareDeclCache = createSingleEntryCache<
+  [replayClient: ReplayClientInterface, sourcesState: SourcesState],
+  ApplyMiddlewareDecl
+>({
+  debugLabel: "ApplyMiddlwareDecl",
+  load: async ([replayClient, sourcesState]) => {
+    const dispatchMatches: FunctionMatch[] = [];
+
+    const sourcesById = await sourcesByIdCache.readAsync(replayClient);
+    const reactReduxSources = Array.from(sourcesById.values()).filter(source =>
+      source.url?.includes("/redux/")
+    );
+
+    await replayClient.searchFunctions(
+      { query: "dispatch", sourceIds: reactReduxSources.map(source => source.id) },
+      matches => {
+        dispatchMatches.push(...matches);
+      }
+    );
+
+    const [firstMatch] = dispatchMatches;
+    const preferredLocation = getPreferredLocation(sourcesState, [firstMatch.loc]);
+    const reduxSource = sourcesById.get(preferredLocation.sourceId)!;
+    const fileOutline = await sourceOutlineCache.readAsync(replayClient, reduxSource.id);
+
+    const applyMiddlwareFunction = fileOutline.functions.find(o => o.name === "applyMiddleware")!;
+
+    return {
+      sourceId: reduxSource.sourceId,
+      location: applyMiddlwareFunction.location,
+    };
+  },
+});
+
+function isFrameInDecl(decl: ApplyMiddlewareDecl, frame: PauseFrame) {
+  return (
+    frame.location.line >= decl.location.begin.line &&
+    frame.location.line < decl.location.end.line &&
+    frame.location.sourceId === decl.sourceId
+  );
 }
 
 const reduxDispatchJumpLocationCache = createCache<
@@ -182,13 +188,15 @@ const reduxDispatchJumpLocationCache = createCache<
       return !IGNORABLE_PARTIAL_SOURCE_URLS.some(partialUrl => source.url?.includes(partialUrl));
     });
 
+    const applyMiddlwareDecl = await applyMiddlwareDeclCache.readAsync(replayClient, sourcesState);
+
     // The first 2 elements in filtered pause frames are from replay's redux stub, so they should be ignored
     // The 3rd element is the user function that calls it, and will most likely be the `dispatch` call
     let preferredFrameIdx = 2;
     for (let frameIdx = 2; frameIdx < filteredPauseFrames.length; frameIdx++) {
       const frame = filteredPauseFrames[frameIdx];
 
-      if (await isInsideApplyMiddlwareFn(replayClient, sourcesState, frame)) {
+      if (isFrameInDecl(applyMiddlwareDecl, frame)) {
         // this is the frame inside `applyMiddleware` where the initial dispatch occurs
         // the frame just before this one is the user `dispatch`
         preferredFrameIdx = frameIdx + 1;
@@ -197,35 +205,13 @@ const reduxDispatchJumpLocationCache = createCache<
     }
 
     const preferredFrame = filteredPauseFrames[preferredFrameIdx];
-    const frameSteps = await frameStepsCache.readAsync(
-      replayClient,
-      pauseId,
-      preferredFrame.protocolId
-    );
-
-    const pointsWithLocations =
-      frameSteps?.flatMap(step => {
-        return step.frame
-          ?.map(l => {
-            return {
-              location: l,
-              point: step,
-            };
-          })
-          .filter(Boolean) as PointWithLocation[];
-      }) ?? [];
-
     const preferredLocation = getPreferredLocation(sourcesState, [preferredFrame.location]);
 
-    // One of these locations should match up
-    const matchingFrameStep: PointWithLocation | undefined = pointsWithLocations.find(step => {
-      // Intentionally ignore columns for now - this seems to produce better results
-      // that line up with the hit points in a print statement
-      return (
-        step.location.sourceId === preferredLocation.sourceId &&
-        step.location.line === preferredLocation.line
-      );
-    });
+    const matchingFrameStep = await getMatchingFrameStep(
+      replayClient,
+      preferredFrame,
+      preferredLocation
+    );
 
     if (matchingFrameStep) {
       return matchingFrameStep.point;
@@ -244,7 +230,7 @@ function jumpToLocationForReduxDispatch(point: ExecutionPoint, time: number): UI
     );
 
     if (jumpLocation) {
-      dispatch(seek(jumpLocation.point, jumpLocation.time, true));
+      dispatch(seek(point, time, true));
     }
   };
 }

@@ -49,6 +49,7 @@ import {
 import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { getPauseFramesAsync } from "ui/suspense/frameCache";
+import { PointWithLocation, getMatchingFrameStep } from "ui/utils/frame";
 
 import MaterialIcon from "./shared/MaterialIcon";
 import styles from "./Events/Event.module.css";
@@ -57,11 +58,6 @@ interface ReactQueuedRenderDetails extends TimeStampedPoint {
   pauseFrames: PauseFrame[];
   filteredPauseFrames: PauseFrame[];
   userPauseFrame: PauseFrame;
-}
-
-interface PointWithLocation {
-  location: Location;
-  point?: TimeStampedPoint;
 }
 
 export const reactRenderQueuedJumpLocationCache: Cache<
@@ -121,33 +117,11 @@ export const reactRenderQueuedJumpLocationCache: Cache<
 
       const searchLocation: Location = { sourceId, line, column };
 
-      const frameSteps = await frameStepsCache.readAsync(
+      const matchingFrameStep = await getMatchingFrameStep(
         replayClient,
-        earliestAppCodeFrame.pauseId,
-        earliestAppCodeFrame.protocolId
+        earliestAppCodeFrame,
+        searchLocation
       );
-
-      const pointsWithLocations =
-        frameSteps?.flatMap(step => {
-          return step.frame
-            ?.map(l => {
-              return {
-                location: l,
-                point: step,
-              };
-            })
-            .filter(Boolean) as PointWithLocation[];
-        }) ?? [];
-
-      // One of these locations should match up
-      const matchingFrameStep: PointWithLocation | undefined = pointsWithLocations.find(step => {
-        // Intentionally ignore columns for now - this seems to produce better results
-        // that line up with the hit points in a print statement
-        return (
-          step.location.sourceId === searchLocation.sourceId &&
-          step.location.line === searchLocation.line
-        );
-      });
 
       if (matchingFrameStep) {
         userPauseFrameTime = matchingFrameStep.point;
