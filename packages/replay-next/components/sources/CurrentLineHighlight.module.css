@@ -23,16 +23,3 @@
 .ViewSourceHighlight {
   background: var(--background-color-current-execution-point);
 }
-
-.CurrentExecutionPointColumn {
-  margin-left: calc(
-    var(--line-number-size) + 2ch + var(--line-hit-count-size) + 2ch +
-      (var(--highlight-num-breakpoint-toggles) * var(--column-breakpoint-width)) +
-      var(--highlight-char-offset)
-  );
-  height: 100%;
-  width: var(--highlight-char-length);
-  background: var(--background-color-current-execution-point-column);
-  font-family: var(--font-family-monospace);
-  font-size: var(--font-size-regular);
-}

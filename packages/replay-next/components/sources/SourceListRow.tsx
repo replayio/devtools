@@ -13,6 +13,7 @@ import {
 import { areEqual } from "react-window";
 import { useStreamingValue } from "suspense";
 
+import CurrentColumnHighlight from "replay-next/components/sources/CurrentColumnHighlight";
 import useGetDefaultLogPointContent from "replay-next/components/sources/hooks/useGetDefaultLogPointContent";
 import SearchResultHighlight from "replay-next/components/sources/SearchResultHighlight";
 import { SourceSearchContext } from "replay-next/components/sources/SourceSearchContext";
@@ -426,6 +427,14 @@ const SourceListRow = memo(
               />
             ))}
 
+            <CurrentColumnHighlight
+              breakableColumnIndices={breakableColumnIndices}
+              lineNumber={lineNumber}
+              plainText={plainText}
+              showColumnBreakpoints={showColumnBreakpoints && pointsForLine.length > 0}
+              sourceId={sourceId}
+            />
+
             {lineSegments}
 
             {/* Workaround for FE-1025 */}
@@ -459,13 +468,7 @@ const SourceListRow = memo(
           )}
         </div>
 
-        <CurrentLineHighlight
-          breakableColumnIndices={breakableColumnIndices}
-          lineNumber={lineNumber}
-          plainText={plainText}
-          showBreakpointMarkers={showBreakpointMarkers}
-          sourceId={sourceId}
-        />
+        <CurrentLineHighlight lineNumber={lineNumber} sourceId={sourceId} />
 
         {contextMenu}
       </div>

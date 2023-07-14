@@ -1,7 +1,6 @@
 import { Frame, SourceId } from "@replayio/protocol";
-import { Suspense, memo, useContext } from "react";
+import { ReactNode, Suspense, memo, useContext } from "react";
 
-import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import { framesCache, topFrameCache } from "replay-next/src/suspense/FrameCache";
 import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
 import {
@@ -11,46 +10,42 @@ import {
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import { SelectedFrameContext } from "../../src/contexts/SelectedFrameContext";
-import { SourceSearchContext } from "./SourceSearchContext";
-import styles from "./CurrentLineHighlight.module.css";
+import styles from "./CurrentColumnHighlight.module.css";
 
 type Props = {
+  breakableColumnIndices: number[];
   lineNumber: number;
+  plainText: string | null;
+  showColumnBreakpoints: boolean;
   sourceId: SourceId;
 };
 
-export default memo(function CurrentLineHighlight(props: Props) {
+export default memo(function CurrentColumnHighlight(props: Props) {
   return (
     <Suspense>
-      <CurrentLineHighlightSuspends {...props} />
+      <CurrentColumnHighlightSuspends {...props} />
     </Suspense>
   );
 });
 
-function CurrentLineHighlightSuspends({ lineNumber, sourceId }: Props) {
+function CurrentColumnHighlightSuspends({
+  breakableColumnIndices,
+  lineNumber,
+  plainText,
+  showColumnBreakpoints,
+  sourceId,
+}: Props) {
   const client = useContext(ReplayClientContext);
-  const [sourceSearchState] = useContext(SourceSearchContext);
-  const { selectedPauseAndFrameId, previewLocation } = useContext(SelectedFrameContext);
-  const { focusedSource } = useContext(SourcesContext);
-
-  if (previewLocation?.sourceId === sourceId) {
-    if (previewLocation.line === lineNumber) {
-      return (
-        <div
-          className={styles.CurrentExecutionPoint}
-          data-test-name="CurrentExecutionPointLineHighlight"
-          data-test-type="preview-location"
-        />
-      );
-    }
-    return null;
-  }
+  const { selectedPauseAndFrameId } = useContext(SelectedFrameContext);
 
   const frameId = selectedPauseAndFrameId?.frameId || null;
   const pauseId = selectedPauseAndFrameId?.pauseId || null;
 
   if (pauseId !== null && frameId !== null) {
-    let showHighlight = false;
+    let highlightColumnBegin = -1;
+    let highlightColumnEnd = -1;
+    let columnBreakpointIndex = -1;
+
     // The 95% use case is that we'll be in the top frame. Start by fetching that.
     const topFrame = topFrameCache.read(client, pauseId);
 
@@ -70,7 +65,7 @@ function CurrentLineHighlightSuspends({ lineNumber, sourceId }: Props) {
 
       // Assuming we found a frame, check to see if there's a matching location for the frame.
       // If so, we should show the highlight line.
-      showHighlight = !!selectedFrame?.location.find(location => {
+      const match = selectedFrame?.location.find(location => {
         if (correspondingSourceIds.includes(location.sourceId)) {
           const correspondingLocations = getCorrespondingLocations(sources, location);
           return (
@@ -82,49 +77,60 @@ function CurrentLineHighlightSuspends({ lineNumber, sourceId }: Props) {
           );
         }
       });
-    }
+      if (match != null) {
+        highlightColumnBegin = match.column;
 
-    if (showHighlight) {
-      return (
-        <div
-          className={styles.CurrentExecutionPoint}
-          data-test-name="CurrentExecutionPointLineHighlight"
-          data-test-type="view-source"
-        />
-      );
-    }
-  }
-
-  if (focusedSource !== null) {
-    const { endLineIndex, mode, startLineIndex, sourceId } = focusedSource;
-
-    if (endLineIndex !== null && startLineIndex !== null) {
-      const lineIndex = lineNumber - 1;
-
-      if (
-        sourceId === sourceSearchState.currentScopeId &&
-        lineIndex <= endLineIndex &&
-        lineIndex >= startLineIndex
-      ) {
-        switch (mode) {
-          case "search-result": {
-            return (
-              <div
-                className={styles.CurrentSearchResult}
-                data-test-name="CurrentSearchResultHighlight"
-                data-test-type="search-result"
-              />
-            );
-          }
-          case "view-source": {
-            return (
-              <div className={styles.ViewSourceHighlight} data-test-name="ViewSourceHighlight" />
-            );
+        columnBreakpointIndex = breakableColumnIndices.findIndex(
+          column => column === highlightColumnBegin
+        );
+        if (columnBreakpointIndex >= 0) {
+          if (columnBreakpointIndex < breakableColumnIndices.length - 1) {
+            highlightColumnEnd = breakableColumnIndices[columnBreakpointIndex + 1] - 1;
+          } else if (plainText !== null) {
+            highlightColumnEnd = plainText.length - 1;
           }
         }
       }
     }
+
+    if (highlightColumnBegin > 0 && highlightColumnEnd > 0) {
+      let children: ReactNode[] = [
+        <div
+          className={styles.LeadingSpacer}
+          key={0}
+          style={{
+            width: `${highlightColumnBegin}ch`,
+          }}
+        />,
+      ];
+
+      if (showColumnBreakpoints) {
+        for (let index = 0; index < breakableColumnIndices.length; index++) {
+          const breakableColumnIndex = breakableColumnIndices[index];
+
+          if (breakableColumnIndex <= highlightColumnBegin) {
+            children.push(<div className={styles.ColumnBreakpointSpacer} key={children.length} />);
+          } else {
+            break;
+          }
+        }
+      }
+
+      children.push(
+        <div
+          className={styles.Highlight}
+          key={children.length}
+          style={{
+            // @ts-ignore
+            width: `${highlightColumnEnd - highlightColumnBegin}ch`,
+          }}
+        />
+      );
+
+      return <div className={styles.Container}>{children}</div>;
+    }
   }
 
+  console.log("BAIL 2");
   return null;
 }
