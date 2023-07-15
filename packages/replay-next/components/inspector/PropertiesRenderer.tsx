@@ -30,10 +30,12 @@ export default function PropertiesRenderer({
   object,
   path,
   pauseId,
+  hidePrototype = false,
 }: {
   object: ProtocolObject;
   path?: string;
   pauseId: ProtocolPauseId;
+  hidePrototype?: boolean;
 }) {
   const client = useContext(ReplayClientContext);
 
@@ -119,7 +121,7 @@ export default function PropertiesRenderer({
   }
 
   let renderedPrototype: ReactNode = null;
-  if (prototype != null) {
+  if (prototype != null && !hidePrototype) {
     const prototypePath = addPathSegment(path, "[[Prototype]]");
     renderedPrototype = (
       <Expandable
