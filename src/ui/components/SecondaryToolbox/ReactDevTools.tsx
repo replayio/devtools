@@ -1,5 +1,5 @@
 import { ExecutionPoint, NodeBounds, ObjectId, Object as ProtocolObject } from "@replayio/protocol";
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import React, { useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { SerializedElement, Store, Wall } from "react-devtools-inline/frontend";
 import { useImperativeCacheValue } from "suspense";
 
@@ -7,12 +7,14 @@ import { selectLocation } from "devtools/client/debugger/src/actions/sources";
 import { getThreadContext } from "devtools/client/debugger/src/reducers/pause";
 import { highlightNode, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 import { ThreadFront } from "protocol/thread";
-import { compareNumericStrings } from "protocol/utils";
+import { assert } from "protocol/utils";
+import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import { useIsPointWithinFocusWindow } from "replay-next/src/hooks/useIsPointWithinFocusWindow";
 import { useNag } from "replay-next/src/hooks/useNag";
 import { RecordingTarget, recordingTargetCache } from "replay-next/src/suspense/BuildIdCache";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { evaluate } from "replay-next/src/utils/evaluate";
+import { isExecutionPointsLessThan } from "replay-next/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
 import { Nag } from "shared/graphql/types";
@@ -38,6 +40,7 @@ import { getJSON } from "ui/utils/objectFetching";
 import { trackEvent } from "ui/utils/telemetry";
 
 import { injectReactDevtoolsBackend } from "./react-devtools/injectReactDevtoolsBackend";
+import { generateTreeResetOpsForPoint } from "./react-devtools/rdtProcessing";
 
 type ReactDevToolsInlineModule = typeof import("react-devtools-inline/frontend");
 
@@ -61,6 +64,7 @@ class ReplayWall implements Wall {
   private highlightedElementId?: number;
   private recordingTarget: RecordingTarget | null = null;
   store?: StoreWithInternals;
+  pauseId?: string;
 
   constructor(
     private enablePicker: (opts: NodeOptsWithoutBounds) => void,
@@ -71,9 +75,12 @@ class ReplayWall implements Wall {
     private setProtocolCheckFailed: (failed: boolean) => void,
     private fetchMouseTargetsForPause: () => Promise<NodeBounds[] | undefined>,
     private replayClient: ReplayClientInterface,
-    private dismissInspectComponentNag: () => void,
-    private pauseId: string | undefined
+    private dismissInspectComponentNag: () => void
   ) {}
+
+  setPauseId(pauseId: string) {
+    this.pauseId = pauseId;
+  }
 
   // called by the frontend to register a listener for receiving backend messages
   listen(listener: (msg: any) => void) {
@@ -232,7 +239,8 @@ class ReplayWall implements Wall {
     });
 
     if (response.returned) {
-      const result: any = await getJSON(this.replayClient, this.pauseId!, response.returned);
+      assert(this.pauseId, "Must have a pause ID to handle a response!");
+      const result: any = await getJSON(this.replayClient, this.pauseId, response.returned);
 
       if (result) {
         this._listener?.({ event: result.event, payload: result.data });
@@ -346,8 +354,6 @@ function jumpToComponentPreferredSource(componentPreview: ProtocolObject): UIThu
 
 function createReactDevTools(
   reactDevToolsInlineModule: ReactDevToolsInlineModule,
-  annotations: ParsedReactDevToolsAnnotation[],
-  currentPoint: ExecutionPoint,
   enablePicker: (opts: NodeOptsWithoutBounds) => void,
   initializePicker: () => void,
   disablePicker: () => void,
@@ -356,8 +362,7 @@ function createReactDevTools(
   setProtocolCheckFailed: (failed: boolean) => void,
   fetchMouseTargetsForPause: () => Promise<NodeBounds[] | undefined>,
   replayClient: ReplayClientInterface,
-  dismissInspectComponentNag: () => void,
-  pauseId: string | undefined
+  dismissInspectComponentNag: () => void
 ) {
   const { createBridge, createStore, initialize } = reactDevToolsInlineModule;
 
@@ -371,9 +376,9 @@ function createReactDevTools(
     setProtocolCheckFailed,
     fetchMouseTargetsForPause,
     replayClient,
-    dismissInspectComponentNag,
-    pauseId
+    dismissInspectComponentNag
   );
+
   const bridge = createBridge(target, wall);
   const store = createStore(bridge, {
     checkBridgeProtocolCompatibility: false,
@@ -381,12 +386,6 @@ function createReactDevTools(
   });
   wall.store = store as StoreWithInternals;
   const ReactDevTools = initialize(target, { bridge, store });
-
-  for (const { contents, point } of annotations) {
-    if (contents.event === "operations" && compareNumericStrings(point, currentPoint) <= 0) {
-      wall.sendAnnotation(contents);
-    }
-  }
 
   return [ReactDevTools, wall] as const;
 }
@@ -435,11 +434,27 @@ async function loadReactDevToolsInlineModuleFromProtocol(
 
 const nodePickerInstance = new NodePickerClass();
 
-export default function ReactDevtoolsPanel() {
+const EMPTY_ANNOTATIONS: ParsedReactDevToolsAnnotation[] = [];
+
+function usePrevious<T>(newValue: T) {
+  const previousRef = useRef<T>();
+
+  useLayoutEffect(() => {
+    previousRef.current = newValue;
+  });
+
+  return previousRef.current;
+}
+
+export function ReactDevtoolsPanel() {
   const client = useContext(ReplayClientContext);
   const currentPoint = useAppSelector(getCurrentPoint);
+  const previousPoint = usePrevious(currentPoint);
+  const isFirstAnnotationsInjection = useRef(true);
+
   const isPointWithinFocusWindow = useIsPointWithinFocusWindow(currentPoint);
   const pauseId = useAppSelector(state => state.pause.id);
+
   const [, dismissInspectComponentNag] = useNag(Nag.INSPECT_COMPONENT);
   const [protocolCheckFailed, setProtocolCheckFailed] = useState(false);
   const { status: annotationsStatus, value: parsedAnnotations } = useImperativeCacheValue(
@@ -457,7 +472,7 @@ export default function ReactDevtoolsPanel() {
     useState<ReactDevToolsInlineModule | null>(null);
 
   const annotations: ParsedReactDevToolsAnnotation[] =
-    annotationsStatus === "resolved" ? parsedAnnotations : [];
+    annotationsStatus === "resolved" ? parsedAnnotations : EMPTY_ANNOTATIONS;
 
   // Try to load the DevTools module whenever the current point changes.
   // Eventually we'll reach a point that has the DevTools protocol embedded.
@@ -472,14 +487,11 @@ export default function ReactDevtoolsPanel() {
     }
   });
 
-  const {
-    dispatchHighlightNode,
-    dispatchUnhighlightNode,
-    dispatchFetchMouseTargets,
-    initializePicker,
-    enablePicker,
-    disablePicker,
-  } = useMemo(() => {
+  const [ReactDevTools, wall] = useMemo(() => {
+    if (!reactDevToolsInlineModule) {
+      return [null, null] as const;
+    }
+
     function dispatchHighlightNode(nodeId: string) {
       dispatch(highlightNode(nodeId));
     }
@@ -514,15 +526,57 @@ export default function ReactDevtoolsPanel() {
       dispatch(nodePickerDisabled());
     }
 
-    return {
+    const [ReactDevTools, wall] = createReactDevTools(
+      reactDevToolsInlineModule,
+      enablePicker,
+      initializePicker,
+      disablePicker,
       dispatchHighlightNode,
       dispatchUnhighlightNode,
+      setProtocolCheckFailed,
       dispatchFetchMouseTargets,
-      initializePicker,
-      enablePicker,
-      disablePicker,
-    };
-  }, [dispatch]);
+      replayClient,
+      dismissInspectComponentNag
+    );
+    return [ReactDevTools, wall] as const;
+  }, [dispatch, reactDevToolsInlineModule, replayClient, dismissInspectComponentNag]);
+
+  useLayoutEffect(() => {
+    if (
+      !ReactDevTools ||
+      !wall ||
+      !currentPoint ||
+      !pauseId ||
+      !annotations ||
+      !annotations.length
+    ) {
+      return;
+    }
+
+    wall.setPauseId(pauseId);
+
+    if (previousPoint && previousPoint !== currentPoint) {
+      // We keep the one RDT UI component instance alive, but operations are additive over time.
+      // In order to reset the displayed component tree, we first need to generate a set of fake
+      // "remove this React root" operations based on where we _were_ paused, and inject those.
+      const clearTreeOperations = generateTreeResetOpsForPoint(previousPoint, annotations);
+
+      for (const rootRemovalOp of clearTreeOperations) {
+        wall.sendAnnotation({ event: "operations", payload: rootRemovalOp });
+      }
+    }
+
+    if (previousPoint !== currentPoint || isFirstAnnotationsInjection.current) {
+      isFirstAnnotationsInjection.current = false;
+
+      // Now that the displayed tree is empty, we can inject all operations up to the _current_ point in time.
+      for (const { contents, point } of annotations) {
+        if (contents.event === "operations" && isExecutionPointsLessThan(point, currentPoint)) {
+          wall.sendAnnotation(contents);
+        }
+      }
+    }
+  }, [ReactDevTools, wall, previousPoint, currentPoint, annotations, pauseId]);
 
   if (currentPoint === null) {
     return null;
@@ -555,12 +609,13 @@ export default function ReactDevtoolsPanel() {
   const firstOperation = annotations.find(annotation => annotation.contents.event == "operations");
   const reactInitPoint = firstOperation?.point ?? null;
 
-  const isReactDevToolsReady = reactDevToolsInlineModule !== null;
+  const isReactDevToolsReady =
+    reactDevToolsInlineModule !== null && ReactDevTools !== null && wall !== null;
   const isReady =
     isReactDevToolsReady &&
     reactInitPoint !== null &&
     currentPoint !== null &&
-    compareNumericStrings(reactInitPoint, currentPoint) <= 0;
+    isExecutionPointsLessThan(reactInitPoint, currentPoint);
 
   if (!isReady) {
     return (
@@ -577,24 +632,6 @@ export default function ReactDevtoolsPanel() {
       </div>
     );
   }
-
-  // Still not sure on the entire behavior here, but apparently wrapping
-  // this in a `useMemo` is a _bad_ idea and breaks the E2E test
-  const [ReactDevTools, wall] = createReactDevTools(
-    reactDevToolsInlineModule,
-    annotations,
-    currentPoint,
-    enablePicker,
-    initializePicker,
-    disablePicker,
-    dispatchHighlightNode,
-    dispatchUnhighlightNode,
-    setProtocolCheckFailed,
-    dispatchFetchMouseTargets,
-    replayClient,
-    dismissInspectComponentNag,
-    pauseId
-  );
 
   return (
     <ReactDevTools
@@ -614,5 +651,13 @@ export default function ReactDevtoolsPanel() {
         }
       }}
     />
+  );
+}
+
+export default function ReactDevToolsWithErrorBoundary() {
+  return (
+    <ErrorBoundary name="ReactDevTools">
+      <ReactDevtoolsPanel />
+    </ErrorBoundary>
   );
 }
