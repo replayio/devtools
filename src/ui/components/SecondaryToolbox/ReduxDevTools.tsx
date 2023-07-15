@@ -230,7 +230,7 @@ function jumpToLocationForReduxDispatch(point: ExecutionPoint, time: number): UI
     );
 
     if (jumpLocation) {
-      dispatch(seek(point, time, true));
+      dispatch(seek(jumpLocation.point, jumpLocation.time, true));
     }
   };
 }
