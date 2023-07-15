@@ -7,7 +7,7 @@ import {
 import classnames from "classnames";
 import React, { Suspense, useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
 
-import Inspector from "replay-next/components/Inspector";
+import Inspector from "replay-next/components/inspector";
 import PropertiesRenderer from "replay-next/components/inspector/PropertiesRenderer";
 import Loader from "replay-next/components/Loader";
 import { clientValueCache, objectCache } from "replay-next/src/suspense/ObjectPreviews";
