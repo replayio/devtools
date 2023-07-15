@@ -678,8 +678,8 @@ export function syncFocusedRegion(): UIThunkAction {
 
     const zoomTime = getZoomRegion(state);
 
-    const begin = focusWindow ? focusWindow.begin.time : zoomTime.beginTime;
-    const end = focusWindow ? focusWindow.end.time : zoomTime.endTime;
+    const requestedBeginTime = focusWindow ? focusWindow.begin.time : zoomTime.beginTime;
+    const requestedEndTime = focusWindow ? focusWindow.end.time : zoomTime.endTime;
 
     // Compare the new focus range to the previous one to infer user intent.
     // This helps when a focus range can't be loaded in full.
@@ -693,10 +693,29 @@ export function syncFocusedRegion(): UIThunkAction {
     }
 
     const window = await replayClient.requestFocusWindow({
-      begin,
+      begin: requestedBeginTime,
       bias,
-      end,
+      end: requestedEndTime,
     });
+
+    // If the backend has selected a different focus window, refine our in-memory window to match.
+    // Note that this is pretty likely to happen, given the focus API currently only supports times.
+    //
+    // TODO Update this once BAC-3527 has shipped
+    const actualBeginTime = Math.max(focusWindow.begin.time, window.begin.time);
+    const actualEndTime = Math.min(focusWindow.end.time, window.end.time);
+    if (actualBeginTime !== requestedBeginTime && actualEndTime !== requestedEndTime) {
+      // Only shrink the region; expanding it makes for a bad user experience.
+      if (actualBeginTime >= requestedBeginTime && requestedEndTime <= requestedEndTime) {
+        dispatch(
+          setFocusWindow({
+            begin: window.begin,
+            end: window.end,
+          })
+        );
+        dispatch(setFocusWindow(window));
+      }
+    }
 
     // If the backend has selected a different focus window, refine our in-memory window to match.
     // Note that this is pretty likely to happen, given the focus API currently only supports times.
