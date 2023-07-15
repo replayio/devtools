@@ -143,3 +143,14 @@
   width: 100%;
   cursor: pointer;
 }
+
+.RDTInspector {
+  padding: 0.25rem;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+.Inspector {
+  overflow: initial;
+}
