@@ -380,6 +380,12 @@ function createReactDevTools(
   );
 
   const bridge = createBridge(target, wall);
+
+  // Override shutdown behavior to avoid the RDT UI from closing the bridge connection
+  bridge.shutdown = function () {
+    // no-op
+  };
+
   const store = createStore(bridge, {
     checkBridgeProtocolCompatibility: false,
     supportsNativeInspection: true,
