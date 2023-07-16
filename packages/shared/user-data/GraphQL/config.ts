@@ -298,8 +298,8 @@ export const config = {
   },
 
   protocol_chromiumRepaints: {
-    defaultValue: Boolean(false),
-    label: "Allow DOM.repaintGraphics inside of Chromium recordings",
+    defaultValue: Boolean(true),
+    label: "Enable repaintGraphics for Chrome.",
     legacyKey: "devtools.features.chromiumRepaints",
   },
   protocol_repaintEvaluations: {
