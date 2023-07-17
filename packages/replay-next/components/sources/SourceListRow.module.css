@@ -204,6 +204,7 @@
   width: 100%;
   height: var(--line-height);
   padding-left: 1ch;
+  z-index: 1;
 }
 
 .CurrentLine {
