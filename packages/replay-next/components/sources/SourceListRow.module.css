@@ -195,6 +195,7 @@
 
 .LineSegment {
   margin: 0;
+  z-index: 1;
 }
 
 .LineSegmentsAndPointPanel {
@@ -204,7 +205,6 @@
   width: 100%;
   height: var(--line-height);
   padding-left: 1ch;
-  z-index: 1;
 }
 
 .CurrentLine {
