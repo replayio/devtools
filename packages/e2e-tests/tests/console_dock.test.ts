@@ -12,8 +12,9 @@ test.use({ recordingUrl: "doc_rr_basic.html" });
 
 test("console_dock: Should show the correct docking behavior for recordings with video", async ({
   pageWithMeta: { page, recordingId },
+  recordingUrl,
 }) => {
-  await openRecording(page, recordingId);
+  await openRecording(page, recordingUrl, recordingId);
   await openDevToolsTab(page);
 
   // Verify default docking position
