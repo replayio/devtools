@@ -333,14 +333,19 @@ export function getSearchSourceLocator(page: Page): Locator {
   return page.locator(`[data-test-id="SourceSearch"]`);
 }
 
-export async function goToLine(page: Page, sourceId: string, lineNumber: number) {
-  const lineLocator = getSourceLineLocator(page, sourceId, lineNumber);
-  const lineIsVisible = await lineLocator.isVisible();
-  if (lineIsVisible) {
-    return;
-  }
-
-  await debugPrint(page, `Going to source line ${chalk.bold(lineNumber)}`, "goToLine");
+export async function goToLine(
+  page: Page,
+  sourceId: string,
+  lineNumber: number,
+  columnNumber?: number
+) {
+  await debugPrint(
+    page,
+    columnNumber != null
+      ? `Going to source line ${chalk.bold(lineNumber)} and column ${chalk.bold(columnNumber)}`
+      : `Going to source line ${chalk.bold(lineNumber)}`,
+    "goToLine"
+  );
 
   await focusOnSource(page);
 
@@ -350,9 +355,14 @@ export async function goToLine(page: Page, sourceId: string, lineNumber: number)
   await expect(input).toBeFocused();
 
   await clearTextArea(page, input);
-  await page.keyboard.type(`:${lineNumber}`);
+  await page.keyboard.type(
+    columnNumber != null ? `:${lineNumber}:${columnNumber}` : `:${lineNumber}`
+  );
   await page.keyboard.press("Enter");
 
+  await delay(100);
+
+  const lineLocator = getSourceLineLocator(page, sourceId, lineNumber);
   await expect(lineLocator).toBeVisible();
 }
 
