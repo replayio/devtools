@@ -111,7 +111,6 @@ export default function ViewerHeader({
       </span>
     </ViewerHeaderLeft>
   );
-  
 
   return (
     <div className={`m-2 flex flex-row items-center justify-between ${styles.libraryHeaderButton}`}>
