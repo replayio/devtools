@@ -152,6 +152,7 @@ jobs:
           RECORD_REPLAY_WEBHOOK_URL: ${{ secrets.RECORD_REPLAY_WEBHOOK_URL }}
           RECORD_REPLAY_TEST_METRICS: 1
           AUTOMATED_TEST_SECRET: ${{ secrets.AUTOMATED_TEST_SECRET }}
+          AUTHENTICATED_TESTS_WORKSPACE_API_KEY: ${{ secrets.AUTHENTICATED_TESTS_WORKSPACE_API_KEY }}
   e2etest-jail:
     name: End-to-end tests - Jail
     runs-on: ubuntu-latest
