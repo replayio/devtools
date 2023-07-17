@@ -44,7 +44,7 @@ export async function debugPrint(page: Page | null, message: string, scope?: str
   if (page !== null) {
     await page.evaluate(
       ({ message, scope }) => {
-        console.log(`${message} %c${scope || ""}`, "color: #999;");
+        console.log(`${message} %c${scope || ""}`);
       },
       { message, scope }
     );

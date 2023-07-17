@@ -508,9 +508,10 @@ export async function hoverOverLine(
     }
     suffix = `with ${chalk.bold(keys.join(" and "))}`;
   }
+
   await debugPrint(
     page,
-    `Hovering over source "${chalk.bold(sourceId)}" line ${chalk.bold(lineNumber)} ${suffix}`,
+    `Start hovering over source "${chalk.bold(sourceId)}" line ${chalk.bold(lineNumber)} ${suffix}`,
     "hoverOverLine"
   );
 
@@ -533,6 +534,14 @@ export async function hoverOverLine(
   await numberLocator.hover({ force: true });
 
   return async () => {
+    await debugPrint(
+      page,
+      `Stop hovering over source "${chalk.bold(sourceId)}" line ${chalk.bold(
+        lineNumber
+      )} ${suffix}`,
+      "hoverOverLine"
+    );
+
     await stopHovering(page);
     if (withMetaKey) {
       await page.keyboard.up(getCommandKey());
@@ -552,6 +561,12 @@ export async function isSeekOptionEnabled(
   }
 ): Promise<boolean> {
   const { direction, lineNumber, sourceId } = options;
+
+  await debugPrint(
+    page,
+    `Is continue to ${chalk.bold(direction)} enabled for line ${chalk.bold(lineNumber)}?`,
+    "isContinueToButtonEnabled"
+  );
 
   const lineLocator = page.locator(`[data-test-id="SourceLine-${lineNumber}"]`);
 
