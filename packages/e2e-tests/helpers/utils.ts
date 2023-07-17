@@ -183,12 +183,13 @@ export async function resetTestUser(email: string) {
 export async function cloneTestRecording(recordingId: string): Promise<string> {
   const variables = { recordingId, secret: process.env.AUTOMATED_TEST_SECRET };
 
+  var startTime = performance.now();
   const clonedRecording = await axios({
     url: config.graphqlUrl,
     method: "POST",
     data: {
       query: `
-        mutation cloneTestRecording($recordingId: String!, $secret: String!) {
+        mutation cloneTestRecording($recordingId: UUID!, $secret: String!) {
           cloneTestRecording(input: { recordingId: $recordingId, secret: $secret }) {
             recordingId
           }
@@ -197,6 +198,9 @@ export async function cloneTestRecording(recordingId: string): Promise<string> {
       variables,
     },
   });
+  var endTime = performance.now();
+  const timeInSecs = (endTime - startTime) / 1000;
+  console.log(`Cloning took ${timeInSecs} seconds.`);
 
   return clonedRecording.data.data.cloneTestRecording.recordingId;
 }
@@ -209,7 +213,7 @@ export async function deleteTestRecording(recordingId: string) {
     method: "POST",
     data: {
       query: `
-          mutation deleteTestRecording($recordingId: String!, $secret: String!) {
+          mutation deleteTestRecording($recordingId: UUID!, $secret: String!) {
             deleteTestRecording(input: { recordingId: $recordingId, secret: $secret }) {
               success
             }
