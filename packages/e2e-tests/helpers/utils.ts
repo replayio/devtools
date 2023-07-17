@@ -187,6 +187,9 @@ export async function cloneTestRecording(recordingId: string): Promise<string> {
   const clonedRecording = await axios({
     url: config.graphqlUrl,
     method: "POST",
+    headers: {
+      Authorization: `Bearer ${process.env.AUTHENTICATED_TESTS_WORKSPACE_API_KEY}`,
+    },
     data: {
       query: `
         mutation cloneTestRecording($recordingId: UUID!, $secret: String!) {
@@ -211,6 +214,9 @@ export async function deleteTestRecording(recordingId: string) {
   return axios({
     url: config.graphqlUrl,
     method: "POST",
+    headers: {
+      Authorization: `Bearer ${process.env.AUTHENTICATED_TESTS_WORKSPACE_API_KEY}`,
+    },
     data: {
       query: `
           mutation deleteTestRecording($recordingId: UUID!, $secret: String!) {
