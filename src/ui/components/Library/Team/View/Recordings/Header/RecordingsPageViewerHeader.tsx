@@ -107,10 +107,11 @@ export default function ViewerHeader({
     <ViewerHeaderLeft>
       <span className={styles.workspaceName}>{workspaceName}</span>
       <span className={styles.workspaceName}>
-        {recordings.length != 0 ? <>({recordings.length})</> : <></>}
+        {recordings.length != 0 ? <>({recordings.length.toLocaleString()})</> : <></>}
       </span>
     </ViewerHeaderLeft>
   );
+  
 
   return (
     <div className={`m-2 flex flex-row items-center justify-between ${styles.libraryHeaderButton}`}>
