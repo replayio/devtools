@@ -6,8 +6,8 @@ import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import { Source } from "replay-next/src/suspense/SourcesCache";
 import { getSourceFileName } from "replay-next/src/utils/source";
 
-import useSearch from "./useSearch";
 import type { Actions as SearchActions, State as SearchState } from "./useSearch";
+import useSearch from "./useSearch";
 
 export type Item = Source;
 export type Result = {
@@ -73,12 +73,13 @@ export type Actions = SearchActions & {
   setSources: (sources: Source[]) => void;
 };
 
-export type GoToLineState = {
-  goToLineMode: boolean;
-  goToLineNumber: number | null;
+export type JumpToState = {
+  columnNumber: number | undefined;
+  jumpTo: boolean;
+  lineNumber: number | undefined;
 };
 
-export type State = SearchState<Item, Result> & GoToLineState;
+export type State = SearchState<Item, Result> & JumpToState;
 
 export default function useSourceFileNameSearch(): [State, Actions] {
   const { focusedSource, openSource } = useContext(SourcesContext);
@@ -89,9 +90,10 @@ export default function useSourceFileNameSearch(): [State, Actions] {
   const [sources, setSources] = useState<Source[]>([]);
 
   const [state, dispatch] = useSearch<Source, Result>(sources, search);
-  const [goToLineState, setGoToLineState] = useState<GoToLineState>({
-    goToLineMode: false,
-    goToLineNumber: null,
+  const [jumpToState, setJumpToState] = useState<JumpToState>({
+    columnNumber: undefined,
+    jumpTo: false,
+    lineNumber: undefined,
   });
 
   useLayoutEffect(() => {
@@ -104,25 +106,45 @@ export default function useSourceFileNameSearch(): [State, Actions] {
       search: (query: string) => {
         dispatch.search(query);
 
-        const goToLineMode = query.startsWith(":");
-        let goToLineNumber: number | null = null;
-        if (goToLineMode) {
-          const parsed = parseInt(query.slice(1), 10);
-          if (!Number.isNaN(parsed)) {
-            goToLineNumber = parsed;
+        const jumpTo = query.startsWith(":");
+
+        let columnNumber: number | undefined = undefined;
+        let lineNumber: number | undefined = undefined;
+        if (jumpTo) {
+          const pieces = query.slice(1).split(":");
+          switch (pieces.length) {
+            case 1:
+              lineNumber = parseInt(pieces[0], 10);
+              if (Number.isNaN(lineNumber)) {
+                lineNumber = undefined;
+              }
+              break;
+            case 2:
+              columnNumber = parseInt(pieces[1], 10);
+              if (Number.isNaN(columnNumber)) {
+                columnNumber = undefined;
+              }
+
+              lineNumber = parseInt(pieces[0], 10);
+              if (Number.isNaN(lineNumber)) {
+                columnNumber = undefined;
+                lineNumber = undefined;
+              }
+              break;
           }
         }
 
-        setGoToLineState({
-          goToLineMode,
-          goToLineNumber,
+        setJumpToState({
+          columnNumber: columnNumber ?? 0,
+          jumpTo,
+          lineNumber,
         });
 
-        if (goToLineNumber !== null) {
+        if (lineNumber != null) {
           const sourceId = focusedSourceIdRef.current;
           if (sourceId != null) {
-            const lineIndex = goToLineNumber - 1;
-            openSource("view-source", sourceId, lineIndex, lineIndex);
+            const lineIndex = lineNumber - 1;
+            openSource("view-source", sourceId, lineIndex, lineIndex, columnNumber);
           }
         }
       },
@@ -134,9 +156,9 @@ export default function useSourceFileNameSearch(): [State, Actions] {
   const externalState = useMemo(
     () => ({
       ...state,
-      ...goToLineState,
+      ...jumpToState,
     }),
-    [goToLineState, state]
+    [jumpToState, state]
   );
 
   return [externalState, externalActions];

@@ -22,7 +22,6 @@
   height: 1.75rem;
   padding: 0.25rem;
   flex: 0 0 1.75rem;
-  border-top: 1px solid var(--background-color-default);
   display: inline-block;
 }
 
@@ -71,5 +70,4 @@
 
 .GoToLinePrefix {
   color: var(--color-dim);
-  margin-right: 1ch;
 }

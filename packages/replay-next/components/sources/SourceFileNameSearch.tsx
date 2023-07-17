@@ -69,10 +69,16 @@ export default function SourceFileNameSearch({
       case "NumpadEnter": {
         event.preventDefault();
 
-        if (searchState.goToLineNumber === null) {
+        if (searchState.lineNumber === null) {
           const result = searchState.results[searchState.index];
           if (result) {
-            openSource("view-source", result.source.sourceId);
+            openSource(
+              "view-source",
+              result.source.sourceId,
+              searchState.lineNumber,
+              searchState.lineNumber,
+              searchState.columnNumber
+            );
           }
         }
 
@@ -95,13 +101,20 @@ export default function SourceFileNameSearch({
     }
   };
 
+  const { columnNumber, jumpTo, lineNumber } = searchState;
+
   let results = null;
-  if (searchState.goToLineMode) {
+  if (jumpTo) {
     results = (
       <div className={styles.Results} data-test-id="SourceFileNameSearchResults">
         <div className={styles.Result}>
           <span className={styles.GoToLinePrefix}>Go to line</span>
-          {searchState.goToLineNumber || ""}
+          {lineNumber != null && <> {lineNumber}</>}
+          {columnNumber != null && (
+            <>
+              , <span className={styles.GoToLinePrefix}>column</span> {columnNumber}
+            </>
+          )}
         </div>
       </div>
     );

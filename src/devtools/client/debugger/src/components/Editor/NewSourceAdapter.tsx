@@ -13,7 +13,6 @@ import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import { getSourceSuspends } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
-import { userData } from "shared/user-data/GraphQL/UserData";
 import { getSelectedLocation, getSelectedLocationHasScrolled } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
@@ -64,13 +63,15 @@ function NewSourceAdapter() {
     const lineNumber = location?.line ?? 0;
     const lineIndex = lineNumber > 0 ? lineNumber - 1 : undefined;
 
+    const columnNumber = location?.column ?? 1;
+
     // Sync focused state from Redux to React context,
     if (
       focusedSource?.sourceId !== location.sourceId ||
       focusedSource?.startLineIndex !== lineIndex ||
       !locationHasScrolled
     ) {
-      openSource("view-source", location.sourceId, lineIndex, lineIndex);
+      openSource("view-source", location.sourceId, lineIndex, lineIndex, columnNumber);
     }
   }, [focusedSource, location, locationHasScrolled, openSource]);
 
