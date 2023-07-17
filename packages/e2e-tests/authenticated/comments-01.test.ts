@@ -1,6 +1,4 @@
-import test from "@playwright/test";
-
-import { openDevToolsTab, startTest } from "../helpers";
+import { openDevToolsTab, openRecording, startTest } from "../helpers";
 import { E2E_USER_1_API_KEY } from "../helpers/authentication";
 import {
   addSourceCodeComment,
@@ -9,16 +7,18 @@ import {
   editComment,
 } from "../helpers/comments";
 import { openSource } from "../helpers/source-explorer-panel";
+import test from "../testFixtureCloneRecording";
 
 // Each authenticated e2e test must use a unique recording id;
 // else shared state from one test could impact another test running in parallel.
 // TODO [SCS-1066] Share recordings between other tests
-const url = "authenticated_comments_1.html";
+test.use({ recordingUrl: "authenticated_comments_1.html" });
 
 test(`authenticated/comments-01: Test add, edit, and delete comment functionality`, async ({
-  page,
+  pageWithMeta: { page, recordingId },
+  recordingUrl: url,
 }) => {
-  await startTest(page, url, E2E_USER_1_API_KEY);
+  await openRecording(page, url, recordingId, E2E_USER_1_API_KEY);
   await openDevToolsTab(page);
   await openSource(page, url);
 
