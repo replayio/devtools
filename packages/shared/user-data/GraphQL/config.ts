@@ -65,19 +65,13 @@ export const config = {
     label: "Disable query-level caching for stable request types",
     legacyKey: "devtools.features.disableStableQueryCache",
   },
-  backend_enableFindAnnotationsQueryStorage: {
+  backend_enableProtocolQueryCache: {
     defaultValue: Boolean(false),
-    description: "Enable storage of previously generated response to Session.findAnnotations",
+    description:
+      "Enable storage of previously generated response for a subset of protocol commands",
     internalOnly: true,
-    label: "Enable query-level storage for Session.findAnnotations",
-    legacyKey: "devtools.features.enableFindAnnotationsQueryStorage",
-  },
-  backend_enableHasAnnotationKindQueryStorage: {
-    defaultValue: Boolean(false),
-    description: "Enable storage of previously generated response to Session.hasAnnotationKind",
-    internalOnly: true,
-    label: "Enable query-level storage for Session.hasAnnotationKind",
-    legacyKey: "devtools.features.enableHasAnnotationKindQueryStorage",
+    label: "Enable query-level storage for a subset of protocol commands",
+    legacyKey: "devtools.hafeatures.enableProtocolQueryCache",
   },
   backend_enableRoutines: {
     defaultValue: Boolean(false),

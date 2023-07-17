@@ -135,8 +135,7 @@ export type ExperimentalSettings = {
   keepAllTraces?: boolean;
   disableIncrementalSnapshots?: boolean;
   disableConcurrentControllerLoading?: boolean;
-  enableHasAnnotationKindQueryStorage?: boolean;
-  enableFindAnnotationsQueryStorage?: boolean;
+  enableProtocolQueryCache?: boolean;
 };
 
 type SessionCallbacks = {
