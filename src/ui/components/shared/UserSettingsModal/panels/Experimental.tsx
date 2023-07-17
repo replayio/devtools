@@ -18,8 +18,7 @@ export const PREFERENCES: PreferencesKey[] = [
   "feature_reduxDevTools",
   "backend_disableIncrementalSnapshots",
   "backend_disableConcurrentControllerLoading",
-  "backend_enableFindAnnotationsQueryStorage",
-  "backend_enableHasAnnotationKindQueryStorage",
+  "backend_enableProtocolQueryCache",
 ];
 
 export function Experimental() {
