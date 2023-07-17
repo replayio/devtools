@@ -64,13 +64,13 @@ export default function Expandable({
     const newIsOpen = !isOpen;
 
     // In case this change triggers a re-render that suspends, it should be in a transition.
-    startTransition(() => {
+    // startTransition(() => {
       onChange(newIsOpen);
       setIsOpen(newIsOpen);
       if (persistenceKey !== undefined) {
         persistIsExpanded(persistenceKey, newIsOpen);
       }
-    });
+    // });
   };
 
   const onKeyDown = (event: KeyboardEvent) => {
@@ -83,13 +83,13 @@ export default function Expandable({
         const newIsOpen = !isOpen;
 
         // In case this change triggers a re-render that suspends, it should be in a transition.
-        startTransition(() => {
+        // startTransition(() => {
           onChange(newIsOpen);
           setIsOpen(newIsOpen);
           if (persistenceKey !== undefined) {
             persistIsExpanded(persistenceKey, newIsOpen);
           }
-        });
+        // });
         break;
     }
   };

@@ -1,8 +1,11 @@
 import { NamedValue, PauseId } from "@replayio/protocol";
-import { Suspense } from "react";
+import { Suspense, useContext } from "react";
 
 import Expandable from "replay-next/components/Expandable";
 import Loader from "replay-next/components/Loader";
+import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
+import { suspendInParallel } from "replay-next/src/utils/suspense";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import Inspector from "./Inspector";
 import { addPathSegment } from "./PropertiesRenderer";
@@ -21,6 +24,15 @@ export default function ScopesInspector({
   pauseId: PauseId;
   protocolValues: NamedValue[];
 }) {
+  const client = useContext(ReplayClientContext);
+  suspendInParallel(
+    ...protocolValues.map(value => () => {
+      if (value.object) {
+        objectCache.read(client, pauseId, value.object, "full");
+      }
+    })
+  );
+
   return (
     <div className={styles.ScopesInspector} data-test-name="ScopesInspector">
       <Suspense fallback={<Loader />}>
