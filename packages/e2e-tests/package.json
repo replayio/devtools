@@ -20,7 +20,7 @@
     "@playwright/test": "^1.35.0",
     "@recordreplay/playwright": "^1.18.3",
     "@replayio/cypress": "^0.5.0",
-    "@replayio/playwright": "^1.0.4",
+    "@replayio/playwright": "latest",
     "cli-spinners": "^2.7.0",
     "cypress": "^12.5.1",
     "log-update": "^4",
