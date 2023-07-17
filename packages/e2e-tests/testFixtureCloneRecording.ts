@@ -18,17 +18,15 @@ export default base.extend<TestIsolatedRecordingFixture>({
       throw new Error("Invalid recording");
     }
 
-    console.log("Cloning recording", recordingUrl);
-    const newRecordingId = "testing";
-    // const newRecordingId = await cloneTestRecording(exampleRecordings[recordingUrl]);
+    const newRecordingId = await cloneTestRecording(exampleRecordings[recordingUrl]);
 
     await use({
       page,
       recordingId: newRecordingId,
     });
 
-    console.log("Deleting recording", newRecordingId);
-    // await deleteTestRecording(newRecordingId);
+    console.log("Deleting cloned recording", newRecordingId);
+    await deleteTestRecording(newRecordingId);
   },
 });
 
