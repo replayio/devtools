@@ -208,6 +208,7 @@ export function createSocket(
         enableHasAnnotationKindQueryStorage: userData.get(
           "backend_enableHasAnnotationKindQueryStorage"
         ),
+        enableFindPaintsQueryStorage: userData.get("backend_enableFindPaintsQueryStorage"),
       };
       if (userData.get("backend_newControllerOnRefresh")) {
         experimentalSettings.controllerKey = String(Date.now());

@@ -19,6 +19,8 @@ export const PREFERENCES: PreferencesKey[] = [
   "backend_disableIncrementalSnapshots",
   "backend_disableConcurrentControllerLoading",
   "backend_enableHasAnnotationKindQueryStorage",
+  "backend_enableFindPaintsQueryStorage",
+
 ];
 
 export function Experimental() {

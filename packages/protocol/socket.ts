@@ -136,6 +136,7 @@ export type ExperimentalSettings = {
   disableIncrementalSnapshots?: boolean;
   disableConcurrentControllerLoading?: boolean;
   enableHasAnnotationKindQueryStorage?: boolean;
+  enableFindPaintsQueryStorage?: boolean;
 };
 
 type SessionCallbacks = {
