@@ -16,6 +16,7 @@ import {
 } from "suspense";
 
 import { findPointForLocation } from "replay-next/components/sources/utils/points";
+import { scrollToLineAndColumn } from "replay-next/components/sources/utils/scrollToLineAndColumn";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { PointsContext } from "replay-next/src/contexts/points/PointsContext";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
@@ -59,6 +60,7 @@ export default function SourceList({
   const scrollbarWidth = useMemo(getScrollbarWidth, []);
 
   const innerRef = useRef<HTMLDivElement>(null);
+  const outerRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<List>(null);
 
   const { range: focusRange } = useContext(FocusContext);
@@ -122,7 +124,9 @@ export default function SourceList({
 
   useEffect(() => {
     const focusedSourceId = focusedSource?.sourceId ?? null;
+    const endLineIndex = focusedSource?.endLineIndex ?? null;
     const startLineIndex = focusedSource?.startLineIndex ?? null;
+    const columnNumber = startLineIndex === endLineIndex ? focusedSource?.columnNumber ?? 0 : 0;
 
     const hasMounted = hasMountedRef.current;
     hasMountedRef.current = true;
@@ -140,7 +144,14 @@ export default function SourceList({
     if (list) {
       // If this source has just been opened, try center-aligning the focused line.
       // Otherwise use react-window's "smart" scroll, which will mimic how VS Code works.
-      list.scrollToItem(startLineIndex, hasMounted ? "smart" : "center");
+      const mode = hasMounted ? "smart" : "center";
+      scrollToLineAndColumn({
+        columnNumber: columnNumber != null ? columnNumber : 0,
+        containerElement: outerRef.current!,
+        lineNumber: startLineIndex + 1,
+        list,
+        mode,
+      });
 
       // Important!
       // Don't mark the update processed until we have actually scrolled to the line.
@@ -308,6 +319,7 @@ export default function SourceList({
       itemData={itemData}
       itemSize={getItemSize}
       onItemsRendered={onItemsRendered}
+      outerRef={outerRef}
       ref={listRef}
       style={style as CSSProperties}
       width={width}

@@ -5,13 +5,16 @@ import { goToLine, openSourceFile, waitForSourceContentsToStream } from "../util
 import testSetup from "../utils/testSetup";
 import { sourceId } from "./shared";
 
-export function beforeEach(recordingId = "c9fffa00-ac71-48bc-adb2-52ae81588e85") {
+export function beforeEach(
+  recordingId = "c9fffa00-ac71-48bc-adb2-52ae81588e85",
+  additionalQueryParams: string[] = []
+) {
   testSetup(recordingId);
 
   test.beforeEach(async ({ page }) => {
     page.setDefaultTimeout(5000);
 
-    await page.goto(getTestUrl("source-and-console"));
+    await page.goto(getTestUrl("source-and-console", additionalQueryParams));
 
     await waitForSession(page);
 
