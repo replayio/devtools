@@ -210,7 +210,7 @@ export async function cloneTestRecording(recordingId: string): Promise<string> {
   var endTime = performance.now();
   const timeInSecs = (endTime - startTime) / 1000;
   if (timeInSecs > 10) {
-    console.log(`Cloning took ${timeInSecs} seconds.`);
+    console.warn(`Cloning took ${timeInSecs} seconds.`);
   }
 
   return clonedRecording.data.data.cloneTestRecording.recordingId;
