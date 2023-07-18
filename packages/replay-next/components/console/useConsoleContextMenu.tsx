@@ -35,7 +35,11 @@ export default function useConsoleContextMenu(loggable: Loggable) {
           time: duration,
         },
       },
-      { debounce: true }
+      {
+        bias: "begin",
+        debounce: false,
+        sync: true,
+      }
     );
   };
 
@@ -51,7 +55,11 @@ export default function useConsoleContextMenu(loggable: Loggable) {
           time: getLoggableTime(loggable),
         },
       },
-      { debounce: true }
+      {
+        bias: "end",
+        debounce: false,
+        sync: true,
+      }
     );
   };
 

@@ -31,7 +31,7 @@ const FOCUS_DEBOUNCE_DURATION = 250;
 export type UpdateOptions = {
   bias?: FocusWindowRequestBias;
   debounce: boolean;
-  sync?: boolean;
+  sync: boolean;
 };
 
 export type FocusContextType = {

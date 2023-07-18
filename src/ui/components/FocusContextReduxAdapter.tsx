@@ -5,7 +5,8 @@ import { FocusContext, UpdateOptions } from "replay-next/src/contexts/FocusConte
 import { TimeRange } from "replay-next/src/types";
 import {
   enterFocusMode,
-  setFocusWindowFromTimeRange,
+  setFocusWindow,
+  setFocusWindowImprecise,
   syncFocusedRegion,
   updateFocusWindowParam,
 } from "ui/actions/timeline";
@@ -25,16 +26,7 @@ export default function FocusContextReduxAdapter({ children }: PropsWithChildren
     async (value: TimeStampedPointRange | null, options: UpdateOptions) => {
       const { sync } = options;
 
-      await dispatch(
-        setFocusWindowFromTimeRange(
-          value !== null
-            ? {
-                begin: value.begin.time,
-                end: value.end.time,
-              }
-            : null
-        )
-      );
+      await dispatch(setFocusWindow(value));
 
       if (sync) {
         await dispatch(syncFocusedRegion());
@@ -49,7 +41,7 @@ export default function FocusContextReduxAdapter({ children }: PropsWithChildren
       const { sync } = options;
 
       await dispatch(
-        setFocusWindowFromTimeRange(
+        setFocusWindowImprecise(
           value !== null
             ? {
                 begin: value[0],

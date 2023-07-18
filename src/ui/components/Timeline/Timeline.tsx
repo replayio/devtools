@@ -3,9 +3,9 @@ import { MouseEvent, useLayoutEffect, useRef, useState } from "react";
 import { throttle } from "shared/utils/function";
 import {
   seekToTime,
+  setFocusWindowImprecise,
   setTimelineToTime,
   stopPlayback,
-  updateFocusWindow,
 } from "ui/actions/timeline";
 import useTimelineContextMenu from "ui/components/Timeline/useTimelineContextMenu";
 import { selectors } from "ui/reducers";
@@ -173,5 +173,5 @@ export default function Timeline() {
 }
 
 const updateFocusWindowThrottled = throttle((dispatch: AppDispatch, begin: number, end: number) => {
-  return dispatch(updateFocusWindow({ begin, end }));
+  return dispatch(setFocusWindowImprecise({ begin, end }));
 }, 250);

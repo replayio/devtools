@@ -1,4 +1,11 @@
-import { ExecutionPoint, FocusWindowRequestBias, PauseId, ScreenShot } from "@replayio/protocol";
+import assert from "assert";
+import {
+  ExecutionPoint,
+  FocusWindowRequestBias,
+  PauseId,
+  ScreenShot,
+  TimeStampedPointRange,
+} from "@replayio/protocol";
 import clamp from "lodash/clamp";
 
 import { framePositionsCleared, resumed } from "devtools/client/debugger/src/reducers/pause";
@@ -25,6 +32,7 @@ import {
   sessionEndPointCache,
 } from "replay-next/src/suspense/ExecutionPointsCache";
 import { screenshotCache } from "replay-next/src/suspense/ScreenshotCache";
+import { isExecutionPointsLessThan } from "replay-next/src/utils/time";
 import {
   isTimeStampedPointRangeEqual,
   isTimeStampedPointRangeGreaterThan,
@@ -51,7 +59,6 @@ import {
   getShowFocusModeControls,
   getZoomRegion,
   pointsReceived,
-  setFocusWindow,
   setPlaybackPrecachedTime,
 } from "ui/reducers/timeline";
 import { FocusWindow, HoveredItem, PlaybackOptions, TimeRange } from "ui/state/timeline";
@@ -526,9 +533,7 @@ export function clearHoveredItem(): UIThunkAction {
   };
 }
 
-export function setFocusWindowFromTimeRange(
-  timeRange: TimeRange | null
-): UIThunkAction<Promise<void>> {
+export function setFocusWindowImprecise(timeRange: TimeRange | null): UIThunkAction<Promise<void>> {
   return async (dispatch, getState, { replayClient }) => {
     if (timeRange === null) {
       dispatch(newFocusWindow(null));
@@ -542,14 +547,14 @@ export function setFocusWindowFromTimeRange(
     const begin = pointsBoundingBegin.before;
     const end = pointsBoundingEnd.after;
 
-    dispatch(newFocusWindow({ begin, end }));
+    dispatch(setFocusWindow({ begin, end }));
   };
 }
 
-export function updateFocusWindow(
-  focusWindow: { begin: number; end: number } | null
+export function setFocusWindow(
+  focusWindow: TimeStampedPointRange | null
 ): UIThunkAction<Promise<void>> {
-  return async (dispatch, getState) => {
+  return async (dispatch, getState, { replayClient }) => {
     const state = getState();
     const currentTime = getCurrentTime(state);
 
@@ -564,64 +569,35 @@ export function updateFocusWindow(
       return;
     }
 
-    let { begin: beginTime, end: endTime } = focusWindow;
+    let { begin, end } = focusWindow;
 
-    const zoomRegion = getZoomRegion(state);
     const prevFocusWindow = getFocusWindow(state);
     const prevBeginTime = prevFocusWindow?.begin.time;
     const prevEndTime = prevFocusWindow?.end.time;
 
-    // Basic bounds check.
-    if (beginTime < zoomRegion.beginTime) {
-      beginTime = zoomRegion.beginTime;
-      if (endTime < beginTime) {
-        endTime = beginTime;
-      }
-    }
-    if (endTime > zoomRegion.endTime) {
-      endTime = zoomRegion.endTime;
-      if (beginTime > endTime) {
-        beginTime = endTime;
-      }
-    }
-
     // Make sure our region is valid.
-    if (endTime < beginTime) {
-      // If we need to adjust a dimension, it's the most intuitive to adjust the one that's being updated.
-      if (prevEndTime === endTime) {
-        beginTime = endTime;
-      } else {
-        endTime = beginTime;
-      }
-    }
+    assert(isExecutionPointsLessThan(begin.point, end.point));
 
-    // Cap time to fit within max focus region size.
-    if (endTime === prevEndTime) {
-      endTime = Math.min(endTime, beginTime + MAX_FOCUS_REGION_DURATION);
-    } else {
-      beginTime = Math.max(beginTime, endTime - MAX_FOCUS_REGION_DURATION);
-    }
-
-    // Update the previous to match the handle that's being dragged.
-    if (beginTime !== prevBeginTime && endTime === prevEndTime) {
-      dispatch(setTimelineToTime(beginTime));
-    } else if (beginTime === prevBeginTime && endTime !== prevEndTime) {
-      dispatch(setTimelineToTime(endTime));
+    // Update the paint preview to match the handle that's being dragged.
+    if (begin.time !== prevBeginTime && end.time === prevEndTime) {
+      dispatch(setTimelineToTime(begin.time));
+    } else if (begin.time === prevBeginTime && end.time !== prevEndTime) {
+      dispatch(setTimelineToTime(end.time));
     } else {
       // Else just make sure the preview time stays within the moving window.
       const hoverTime = getHoverTime(state);
       if (hoverTime !== null) {
-        if (hoverTime < beginTime) {
-          dispatch(setTimelineToTime(beginTime));
-        } else if (hoverTime > endTime) {
-          dispatch(setTimelineToTime(endTime));
+        if (hoverTime < begin.time) {
+          dispatch(setTimelineToTime(begin.time));
+        } else if (hoverTime > end.time) {
+          dispatch(setTimelineToTime(end.time));
         }
       } else {
         dispatch(setTimelineToTime(currentTime));
       }
     }
 
-    await dispatch(setFocusWindowFromTimeRange({ begin: beginTime, end: endTime }));
+    await dispatch(newFocusWindow({ begin, end }));
   };
 }
 
@@ -634,7 +610,7 @@ export function setFocusWindowEndTime(end: number, sync: boolean): UIThunkAction
     // Let the focus action/reducer will handle cropping for us.
     const begin = focusWindow?.begin.time ?? 0;
 
-    await dispatch(updateFocusWindow({ begin, end }));
+    await dispatch(setFocusWindowImprecise({ begin, end }));
 
     if (sync) {
       await dispatch(syncFocusedRegion());
@@ -655,7 +631,7 @@ export function setFocusWindowBeginTime(
     // Let the focus action/reducer will handle cropping for us.
     const end = focusWindow?.end.time ?? Number.POSITIVE_INFINITY;
 
-    await dispatch(updateFocusWindow({ begin, end }));
+    await dispatch(setFocusWindowImprecise({ begin, end }));
 
     if (sync) {
       await dispatch(syncFocusedRegion());
@@ -755,7 +731,7 @@ export function enterFocusMode(): UIThunkAction {
         end: Math.min(zoomRegion.endTime, currentTime + focusWindowSize / 2),
       };
 
-      await dispatch(updateFocusWindow(initialFocusWindow));
+      await dispatch(setFocusWindowImprecise(initialFocusWindow));
     }
 
     await dispatch(

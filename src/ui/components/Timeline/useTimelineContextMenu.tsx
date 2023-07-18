@@ -1,4 +1,4 @@
-import { MouseEvent, UIEvent, useContext, useState } from "react";
+import { UIEvent, useContext, useState } from "react";
 import {
   ContextMenuDivider,
   ContextMenuItem,
@@ -19,8 +19,8 @@ import {
   MAX_FOCUS_REGION_DURATION,
   getUrlParams,
   seekToTime,
+  setFocusWindowImprecise,
   syncFocusedRegion,
-  updateFocusWindow,
 } from "ui/actions/timeline";
 import { useAppDispatch } from "ui/setup/hooks";
 
@@ -67,7 +67,7 @@ export default function useTimelineContextMenu() {
     let end = focusEndTime ?? duration;
     end = Math.min(end, currentTime + MAX_FOCUS_REGION_DURATION);
 
-    await dispatch(updateFocusWindow({ begin: currentTime, end }));
+    await dispatch(setFocusWindowImprecise({ begin: currentTime, end }));
     dispatch(syncFocusedRegion());
   };
 
@@ -75,7 +75,7 @@ export default function useTimelineContextMenu() {
     let begin = focusBeginTime ?? 0;
     begin = Math.max(begin, currentTime - MAX_FOCUS_REGION_DURATION);
 
-    await dispatch(updateFocusWindow({ begin, end: currentTime }));
+    await dispatch(setFocusWindowImprecise({ begin, end: currentTime }));
     dispatch(syncFocusedRegion());
   };
 

@@ -54,7 +54,7 @@ describe("Redux timeline state", () => {
 
     it("should not force the currentTime to be within the focusWindow as it moves around", async () => {
       await dispatch(
-        actions.updateFocusWindow({
+        actions.setFocusWindowImprecise({
           begin: 50,
           end: 60,
         })
@@ -62,7 +62,7 @@ describe("Redux timeline state", () => {
       expect(getCurrentTime(store.getState())).toBe(75);
 
       await dispatch(
-        actions.updateFocusWindow({
+        actions.setFocusWindowImprecise({
           begin: 75,
           end: 85,
         })
@@ -70,7 +70,7 @@ describe("Redux timeline state", () => {
       expect(getCurrentTime(store.getState())).toBe(75);
 
       await dispatch(
-        actions.updateFocusWindow({
+        actions.setFocusWindowImprecise({
           begin: 25,
           end: 30,
         })
@@ -81,7 +81,7 @@ describe("Redux timeline state", () => {
     it("should update the hoverTime (and the time displayed in the video player) to match the handle being dragged", async () => {
       // If we are moving the whole focus region, seek to the current time.
       await dispatch(
-        actions.updateFocusWindow({
+        actions.setFocusWindowImprecise({
           begin: 60,
           end: 80,
         })
@@ -90,7 +90,7 @@ describe("Redux timeline state", () => {
 
       // If we are moving the beginTime, seek to that point
       await dispatch(
-        actions.updateFocusWindow({
+        actions.setFocusWindowImprecise({
           begin: 65,
           end: 80,
         })
@@ -99,7 +99,7 @@ describe("Redux timeline state", () => {
 
       // If we are moving the endTime, seek to that point
       await dispatch(
-        actions.updateFocusWindow({
+        actions.setFocusWindowImprecise({
           begin: 65,
           end: 75,
         })
@@ -109,14 +109,14 @@ describe("Redux timeline state", () => {
       // Moving the entire range should not move the hover time,
       // unless the time would otherwise be out of the new focused region.
       await dispatch(
-        actions.updateFocusWindow({
+        actions.setFocusWindowImprecise({
           begin: 68,
           end: 78,
         })
       );
       expect(getHoverTime(store.getState())).toBe(75);
       await dispatch(
-        actions.updateFocusWindow({
+        actions.setFocusWindowImprecise({
           begin: 80,
           end: 90,
         })
@@ -127,7 +127,7 @@ describe("Redux timeline state", () => {
     it("should not allow an invalid focusWindow to be set", async () => {
       // Before the start of the zoom region
       await dispatch(
-        actions.updateFocusWindow({
+        actions.setFocusWindowImprecise({
           begin: 30,
           end: 40,
         })
@@ -147,7 +147,7 @@ describe("Redux timeline state", () => {
 
       // After the end of the zoom region
       await dispatch(
-        actions.updateFocusWindow({
+        actions.setFocusWindowImprecise({
           begin: 110,
           end: 125,
         })
@@ -167,13 +167,13 @@ describe("Redux timeline state", () => {
 
       // Overlapping
       await dispatch(
-        actions.updateFocusWindow({
+        actions.setFocusWindowImprecise({
           begin: 60,
           end: 80,
         })
       );
       await dispatch(
-        actions.updateFocusWindow({
+        actions.setFocusWindowImprecise({
           begin: 90,
           end: 80,
         })
@@ -193,13 +193,13 @@ describe("Redux timeline state", () => {
 
       // Overlapping alternate
       await dispatch(
-        actions.updateFocusWindow({
+        actions.setFocusWindowImprecise({
           begin: 60,
           end: 80,
         })
       );
       await dispatch(
-        actions.updateFocusWindow({
+        actions.setFocusWindowImprecise({
           begin: 60,
           end: 50,
         })
@@ -223,7 +223,7 @@ describe("Redux timeline state", () => {
       expect(getPlayback(store.getState())).not.toBeNull();
 
       await dispatch(
-        actions.updateFocusWindow({
+        actions.setFocusWindowImprecise({
           begin: 50,
           end: 60,
         })
@@ -250,7 +250,7 @@ describe("Redux timeline state", () => {
 
       it("should only update the start time when a region is set", async () => {
         await dispatch(
-          actions.updateFocusWindow({
+          actions.setFocusWindowImprecise({
             begin: 50,
             end: 70,
           })
@@ -290,7 +290,7 @@ describe("Redux timeline state", () => {
 
       it("should only update the end time when a region is set", async () => {
         await dispatch(
-          actions.updateFocusWindow({
+          actions.setFocusWindowImprecise({
             begin: 50,
             end: 70,
           })
