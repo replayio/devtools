@@ -50,6 +50,10 @@ function Focuser({ editMode, setEditMode, updateFocusWindowThrottled }: Props) {
     beginTime: focusWindow?.begin.time ?? zoomRegion.beginTime,
     endTime: focusWindow?.end.time ?? zoomRegion.endTime,
   });
+  const displayedFocusWindowRef = useRef(displayedFocusWindow);
+  useEffect(() => {
+    displayedFocusWindowRef.current = displayedFocusWindow;
+  });
 
   const containerRef = useRef<HTMLDivElement>(null);
   const draggableAreaRef = useRef<HTMLDivElement>(null);
@@ -95,8 +99,10 @@ function Focuser({ editMode, setEditMode, updateFocusWindowThrottled }: Props) {
           container.getBoundingClientRect(),
           zoomRegion
         );
-        const beginTime = focusWindow.begin.time;
-        const endTime = focusWindow.end.time;
+
+        const displayedFocusWindow = displayedFocusWindowRef.current;
+        const beginTime = displayedFocusWindow.beginTime;
+        const endTime = displayedFocusWindow.endTime;
 
         switch (editMode.type) {
           case "drag": {
