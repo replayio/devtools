@@ -31,8 +31,7 @@
 }
 .Row[data-status="success"][data-position="before"],
 .Row[data-type="navigation"][data-position="before"],
-.Row[data-type="network-request"][data-position="before"],
-.Row[data-type="network"][data-position="before"] {
+.Row[data-type="network-request"][data-position="before"] {
   --border-left-color: var(--primary-accent);
 }
 .Row[data-status="success"][data-position="current"],
