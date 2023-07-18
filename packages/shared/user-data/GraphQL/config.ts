@@ -45,10 +45,9 @@ export const config = {
   },
   backend_disableProtocolQueryCache: {
     defaultValue: Boolean(false),
-    description:
-      "Disable storage of previously generated response for a subset of protocol commands",
+    description: "Disable storage of previously generated response for protocol commands",
     internalOnly: false,
-    label: "Disable query-level storage for a subset of protocol commands",
+    label: "Disable query-level storage for protocol commands",
     legacyKey: "devtools.features.disableProtocolQueryCache",
   },
   backend_disableRecordingAssetsInDatabase: {
