@@ -47,14 +47,16 @@ export const TestStepSourceLocationCache = createCacheWithTelemetry<
             const isChaiAssertion = testEvent.data.command.name === "assert";
             // TODO [FE-1419] const isChaiAssertion = testStep.data.name === "assert" && !annotations?.enqueue;
 
-            const frame = userFrames.find((f, i, l) => {
+            const frame = userFrames.find((currentFrame, currentFrameIndex) => {
               if (isChaiAssertion) {
                 // if this is a chai assertion, the invocation was synchronous in this
                 // call stack so we're looking from the top for the first frame that
                 // isn't from the same source as the marker to identify the user frame
                 // that invoke it
-                return f.functionLocation?.every(fl => fl.sourceId !== markerSourceId);
-              } else if (!f.functionLocation?.some(fl => fl.sourceId === markerSourceId)) {
+                return currentFrame.functionLocation?.every(fl => fl.sourceId !== markerSourceId);
+              } else if (
+                !currentFrame.functionLocation?.some(fl => fl.sourceId === markerSourceId)
+              ) {
                 // for enqueued assertions, the source will generally be the
                 // first location that isn't the same as the marker (which is
                 // the cypress_runner).
@@ -79,7 +81,9 @@ export const TestStepSourceLocationCache = createCacheWithTelemetry<
                 // first entry that isn't from the cypress_runner where the
                 // _next_ frame is from the cypress_runner.
 
-                return l[i + 1]?.functionLocation?.some(fl => fl.sourceId === markerSourceId);
+                return userFrames[currentFrameIndex + 1]?.functionLocation?.some(
+                  fl => fl.sourceId === markerSourceId
+                );
               } else {
                 return false;
               }
