@@ -181,8 +181,10 @@ export async function resetTestUser(email: string) {
 }
 
 export async function cloneTestRecording(recordingId: string): Promise<string> {
-  if (!process.env.AUTOMATED_TEST_SECRET) {
-    throw new Error("AUTOMATED_TEST_SECRET must be set in order to clone test recordings.");
+  if (!process.env.AUTHENTICATED_TESTS_WORKSPACE_API_KEY) {
+    throw new Error(
+      "AUTHENTICATED_TESTS_WORKSPACE_API_KEY must be set in order to clone test recordings."
+    );
   }
 
   const variables = { recordingId, secret: process.env.AUTOMATED_TEST_SECRET };
@@ -215,8 +217,10 @@ export async function cloneTestRecording(recordingId: string): Promise<string> {
 }
 
 export async function deleteTestRecording(recordingId: string) {
-  if (!process.env.AUTOMATED_TEST_SECRET) {
-    throw new Error("AUTOMATED_TEST_SECRET must be set in order to delete test recordings.");
+  if (!process.env.AUTHENTICATED_TESTS_WORKSPACE_API_KEY) {
+    throw new Error(
+      "AUTHENTICATED_TESTS_WORKSPACE_API_KEY must be set in order to delete test recordings."
+    );
   }
 
   const variables = { recordingId, secret: process.env.AUTOMATED_TEST_SECRET };
