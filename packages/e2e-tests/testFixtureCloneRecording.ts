@@ -1,24 +1,25 @@
 import { Page, test as base } from "@playwright/test";
 
+import { TestRecordingKey } from "./helpers";
 import { cloneTestRecording, deleteTestRecording } from "./helpers/utils";
 
 type TestIsolatedRecordingFixture = {
-  recordingUrl: string;
+  exampleKey: TestRecordingKey;
   pageWithMeta: {
     page: Page;
     recordingId: string;
   };
 };
 
-export default base.extend<TestIsolatedRecordingFixture>({
-  recordingUrl: undefined,
-  pageWithMeta: async ({ page, recordingUrl }, use) => {
+const testWithCloneRecording = base.extend<TestIsolatedRecordingFixture>({
+  exampleKey: undefined,
+  pageWithMeta: async ({ page, exampleKey }, use) => {
     const exampleRecordings = require("./examples.json");
-    if (!exampleRecordings[recordingUrl]) {
+    if (!exampleRecordings[exampleKey]) {
       throw new Error("Invalid recording");
     }
 
-    const newRecordingId = await cloneTestRecording(exampleRecordings[recordingUrl]);
+    const newRecordingId = await cloneTestRecording(exampleRecordings[exampleKey]);
 
     await use({
       page,
@@ -29,5 +30,6 @@ export default base.extend<TestIsolatedRecordingFixture>({
     await deleteTestRecording(newRecordingId);
   },
 });
-
-export { expect } from "@playwright/test";
+export default testWithCloneRecording;
+export { testWithCloneRecording as test };
+export { expect, Page } from "@playwright/test";
