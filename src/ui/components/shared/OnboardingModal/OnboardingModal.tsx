@@ -13,9 +13,7 @@ const slides = [
     header: "Welcome to Replay! 👋",
     content: (
       <>
-        <div
-          className={styles.content}
-        >{`This is your library, where replays from your team live. Click on one to view it, or click "Launch Replay" at the top right to record your own.`}</div>
+        <div className={styles.content}>{`This is your library, where replays live.`}</div>
       </>
     ),
   },
