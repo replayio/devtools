@@ -517,6 +517,11 @@ export async function hoverOverLine(
 
   await goToLine(page, sourceId, lineNumber);
 
+  // Hover over the line number itself, not the line, to avoid triggering protocol preview requests.
+  const lineLocator = page.locator(`[data-test-id="SourceLine-${lineNumber}"]`);
+  const numberLocator = lineLocator.locator(`[data-test-id="SourceLine-LineNumber-${lineNumber}"]`);
+  await numberLocator.hover({ force: true });
+
   if (withShiftKey) {
     await page.keyboard.down("Shift");
   } else {
@@ -527,11 +532,6 @@ export async function hoverOverLine(
   } else {
     await page.keyboard.up(getCommandKey());
   }
-
-  // Hover over the line number itself, not the line, to avoid triggering protocol preview requests.
-  const lineLocator = page.locator(`[data-test-id="SourceLine-${lineNumber}"]`);
-  const numberLocator = lineLocator.locator(`[data-test-id="SourceLine-LineNumber-${lineNumber}"]`);
-  await numberLocator.hover({ force: true });
 
   return async () => {
     await debugPrint(
