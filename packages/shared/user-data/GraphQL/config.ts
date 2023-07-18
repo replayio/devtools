@@ -43,6 +43,14 @@ export const config = {
     label: "Disable using incremental snapshots",
     legacyKey: "devtools.features.disableIncrementalSnapshots",
   },
+  backend_disableProtocolQueryCache: {
+    defaultValue: Boolean(false),
+    description:
+      "Disable storage of previously generated response for a subset of protocol commands",
+    internalOnly: false,
+    label: "Disable query-level storage for a subset of protocol commands",
+    legacyKey: "devtools.features.disableProtocolQueryCache",
+  },
   backend_disableRecordingAssetsInDatabase: {
     defaultValue: Boolean(false),
     description:
@@ -64,14 +72,6 @@ export const config = {
     internalOnly: Boolean(true),
     label: "Disable query-level caching for stable request types",
     legacyKey: "devtools.features.disableStableQueryCache",
-  },
-  backend_enableProtocolQueryCache: {
-    defaultValue: Boolean(false),
-    description:
-      "Enable storage of previously generated response for a subset of protocol commands",
-    internalOnly: true,
-    label: "Enable query-level storage for a subset of protocol commands",
-    legacyKey: "devtools.hafeatures.enableProtocolQueryCache",
   },
   backend_enableRoutines: {
     defaultValue: Boolean(false),

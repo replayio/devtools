@@ -205,7 +205,7 @@ export function createSocket(
         disableConcurrentControllerLoading: userData.get(
           "backend_disableConcurrentControllerLoading"
         ),
-        enableProtocolQueryCache: userData.get("backend_enableProtocolQueryCache"),
+        disableProtocolQueryCache: userData.get("backend_disableProtocolQueryCache"),
       };
       if (userData.get("backend_newControllerOnRefresh")) {
         experimentalSettings.controllerKey = String(Date.now());
