@@ -102,7 +102,7 @@
     "shared": "workspace:*",
     "slugify": "^1.6.5",
     "suspense": "^0.0.44",
-    "use-context-menu": "^0.4.11"
+    "use-context-menu": "0.4.10"
   },
   "devDependencies": {
     "@babel/core": "^7.17.8",

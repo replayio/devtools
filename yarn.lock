@@ -15325,7 +15325,7 @@ __metadata:
     ts-node: ^10.7.0
     tsconfig-paths: ^3.14.1
     typescript: ^5.0.4
-    use-context-menu: ^0.4.11
+    use-context-menu: 0.4.10
     utf-8-validate: ^5.0.8
     uuid: ^7.0.3
     v8-to-istanbul: ^9.0.1
@@ -15521,7 +15521,7 @@ __metadata:
     shared: "workspace:*"
     suspense: ^0.0.44
     typescript: 5.0.2
-    use-context-menu: ^0.4.11
+    use-context-menu: 0.4.10
     uuid: ^7.0.3
   languageName: unknown
   linkType: soft
@@ -17712,13 +17712,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"use-context-menu@npm:^0.4.11":
-  version: 0.4.11
-  resolution: "use-context-menu@npm:0.4.11"
+"use-context-menu@npm:0.4.10":
+  version: 0.4.10
+  resolution: "use-context-menu@npm:0.4.10"
   peerDependencies:
     react: ^16.14.0 || ^17 || ^18
     react-dom: ^16.14.0 || ^17 || ^18
-  checksum: 5ddfc243ae794690a7dc8a3afeff999dacee188bfea1287df31861763ac0c1065aff5d23d7ab9da782100b79cbaa590a2bdcdd8eb073a066cdbcfd1f9c864744
+  checksum: 7d6732b86efe75d164a998ecaaec261d3e73b991de62ba0af68241aef4fe7b6c4e35956a144f71b963f1333e6a53353f947fbeed36016c6ba57f758b2ed6cd5c
   languageName: node
   linkType: hard
 
