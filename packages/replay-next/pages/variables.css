@@ -513,8 +513,8 @@
   --testsuites-capsule-error-color: white;
   --testsuites-capsule-success-bgcolor: var(--testsuites-success-color);
   --testsuites-capsule-success-color: rgb(16, 114, 0);
-  --testsuites-error-bgcolor-hover: rgba(237, 36, 36, 0.672);
-  --testsuites-error-bgcolor: rgba(237, 36, 36, 0.672);
+  --testsuites-error-bgcolor-hover: rgba(88, 58, 80, 1);
+  --testsuites-error-bgcolor: rgba(88, 58, 80, 1);
   --testsuites-error-border-color: var(--testsuites-error-icon-bgcolor);
   --testsuites-error-color: #ffe0e0;
   --testsuites-error-icon-bgcolor: rgb(237, 36, 36);
