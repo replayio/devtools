@@ -32,7 +32,10 @@ import {
   sessionEndPointCache,
 } from "replay-next/src/suspense/ExecutionPointsCache";
 import { screenshotCache } from "replay-next/src/suspense/ScreenshotCache";
-import { isExecutionPointsLessThan } from "replay-next/src/utils/time";
+import {
+  isExecutionPointsGreaterThan,
+  isExecutionPointsLessThan,
+} from "replay-next/src/utils/time";
 import {
   isTimeStampedPointRangeEqual,
   isTimeStampedPointRangeGreaterThan,
@@ -558,6 +561,9 @@ export function setFocusWindow(
     const state = getState();
     const currentTime = getCurrentTime(state);
 
+    const endpoint = await replayClient.getSessionEndpoint();
+    const zoomTime = getZoomRegion(state);
+
     // Stop playback (if we're playing) to avoid the currentTime from getting out of bounds.
     const playback = getPlayback(state);
     if (playback !== null) {
@@ -575,8 +581,13 @@ export function setFocusWindow(
     const prevBeginTime = prevFocusWindow?.begin.time;
     const prevEndTime = prevFocusWindow?.end.time;
 
-    // Make sure our region is valid.
-    assert(isExecutionPointsLessThan(begin.point, end.point));
+    // Ignore invalid requested focus windows.
+    try {
+      assert(isExecutionPointsLessThan(begin.point, end.point), "Invalid focus window");
+    } catch (error) {
+      console.error(error);
+      return;
+    }
 
     // Update the paint preview to match the handle that's being dragged.
     if (begin.time !== prevBeginTime && end.time === prevEndTime) {

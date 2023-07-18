@@ -171,6 +171,10 @@ export function setupWindow(): void {
   globalThis.fetch = fetch;
 }
 
+function timeToFakeExecutionPoint(time: number): string {
+  return String(Math.round(time * 1_000));
+}
+
 // This mock client is mostly useless by itself,
 // but its methods can be overridden individually (or observed/inspected) by test code.
 export function createMockReplayClient() {
@@ -183,13 +187,16 @@ export function createMockReplayClient() {
   mockClient.getAllFrames.mockImplementation(async () => ({ frames: [], data: {} }));
   mockClient.getBreakpointPositions.mockImplementation(async () => []);
   mockClient.getPointsBoundingTime.mockImplementation(async time => ({
-    before: { point: String(time), time },
-    after: { point: String(time), time },
+    before: { point: timeToFakeExecutionPoint(time), time },
+    after: { point: timeToFakeExecutionPoint(time), time },
   }));
-  mockClient.getPointNearTime.mockImplementation(async time => ({ point: String(time), time }));
+  mockClient.getPointNearTime.mockImplementation(async time => ({
+    point: timeToFakeExecutionPoint(time),
+    time,
+  }));
   mockClient.getSessionEndpoint.mockImplementation(async () => ({
-    point: "1000",
-    time: 1000,
+    point: timeToFakeExecutionPoint(1_000),
+    time: 1_000,
   }));
   mockClient.findKeyboardEvents.mockImplementation(async () => {});
   mockClient.findMessages.mockImplementation(async () => ({ messages: [], overflow: false }));

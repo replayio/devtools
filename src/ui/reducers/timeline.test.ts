@@ -41,11 +41,11 @@ describe("Redux timeline state", () => {
       expect(getFocusWindow(store.getState())).toMatchInlineSnapshot(`
         Object {
           "begin": Object {
-            "point": "67.5",
+            "point": "67500",
             "time": 67.5,
           },
           "end": Object {
-            "point": "82.5",
+            "point": "82500",
             "time": 82.5,
           },
         }
@@ -125,45 +125,7 @@ describe("Redux timeline state", () => {
     });
 
     it("should not allow an invalid focusWindow to be set", async () => {
-      // Before the start of the zoom region
-      await dispatch(
-        actions.setFocusWindowImprecise({
-          begin: 30,
-          end: 40,
-        })
-      );
-      expect(getFocusWindow(store.getState())).toMatchInlineSnapshot(`
-        Object {
-          "begin": Object {
-            "point": "50",
-            "time": 50,
-          },
-          "end": Object {
-            "point": "50",
-            "time": 50,
-          },
-        }
-      `);
-
-      // After the end of the zoom region
-      await dispatch(
-        actions.setFocusWindowImprecise({
-          begin: 110,
-          end: 125,
-        })
-      );
-      expect(getFocusWindow(store.getState())).toMatchInlineSnapshot(`
-        Object {
-          "begin": Object {
-            "point": "100",
-            "time": 100,
-          },
-          "end": Object {
-            "point": "100",
-            "time": 100,
-          },
-        }
-      `);
+      console.error = jest.fn();
 
       // Overlapping
       await dispatch(
@@ -181,15 +143,16 @@ describe("Redux timeline state", () => {
       expect(getFocusWindow(store.getState())).toMatchInlineSnapshot(`
         Object {
           "begin": Object {
-            "point": "80",
-            "time": 80,
+            "point": "60000",
+            "time": 60,
           },
           "end": Object {
-            "point": "80",
+            "point": "80000",
             "time": 80,
           },
         }
       `);
+      expect(console.error).toHaveBeenCalledTimes(1);
 
       // Overlapping alternate
       await dispatch(
@@ -207,15 +170,16 @@ describe("Redux timeline state", () => {
       expect(getFocusWindow(store.getState())).toMatchInlineSnapshot(`
         Object {
           "begin": Object {
-            "point": "60",
+            "point": "60000",
             "time": 60,
           },
           "end": Object {
-            "point": "60",
-            "time": 60,
+            "point": "80000",
+            "time": 80,
           },
         }
       `);
+      expect(console.error).toHaveBeenCalledTimes(2);
     });
 
     it("should stop playback before resizing focusWindow", async () => {
@@ -232,17 +196,17 @@ describe("Redux timeline state", () => {
     });
 
     describe("set start time", () => {
-      it("should focus from the start time to the end of the zoom region if no focus region has been set", async () => {
+      it("should focus from the start time to the end of the recording if no focus region has been set", async () => {
         await dispatch(actions.setFocusWindowBeginTime(65, false));
         expect(getFocusWindow(store.getState())).toMatchInlineSnapshot(`
           Object {
             "begin": Object {
-              "point": "65",
+              "point": "65000",
               "time": 65,
             },
             "end": Object {
-              "point": "100",
-              "time": 100,
+              "point": "1000000",
+              "time": 1000,
             },
           }
         `);
@@ -259,11 +223,11 @@ describe("Redux timeline state", () => {
         expect(getFocusWindow(store.getState())).toMatchInlineSnapshot(`
           Object {
             "begin": Object {
-              "point": "65",
+              "point": "65000",
               "time": 65,
             },
             "end": Object {
-              "point": "70",
+              "point": "70000",
               "time": 70,
             },
           }
@@ -272,16 +236,16 @@ describe("Redux timeline state", () => {
     });
 
     describe("set end time", () => {
-      it("should focus from the beginning of the zoom region to the specified end time if no focus region has been set", async () => {
+      it("should focus from the beginning of the recording to the specified end time if no focus region has been set", async () => {
         await dispatch(actions.setFocusWindowEndTime(65, false));
         expect(getFocusWindow(store.getState())).toMatchInlineSnapshot(`
           Object {
             "begin": Object {
-              "point": "50",
-              "time": 50,
+              "point": "0",
+              "time": 0,
             },
             "end": Object {
-              "point": "65",
+              "point": "65000",
               "time": 65,
             },
           }
@@ -299,11 +263,11 @@ describe("Redux timeline state", () => {
         expect(getFocusWindow(store.getState())).toMatchInlineSnapshot(`
           Object {
             "begin": Object {
-              "point": "50",
+              "point": "50000",
               "time": 50,
             },
             "end": Object {
-              "point": "65",
+              "point": "65000",
               "time": 65,
             },
           }
