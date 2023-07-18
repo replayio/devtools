@@ -32,4 +32,5 @@ const testWithCloneRecording = base.extend<TestIsolatedRecordingFixture>({
 });
 export default testWithCloneRecording;
 export { testWithCloneRecording as test };
-export { expect, Page } from "@playwright/test";
+export { expect } from "@playwright/test";
+export type { Page } from "@playwright/test";
