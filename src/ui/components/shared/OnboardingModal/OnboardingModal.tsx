@@ -6,13 +6,16 @@ import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
 
 import Modal from "../NewModal";
+import styles from "./OnboardingModal.module.css";
 
 const slides = [
   {
     header: "Welcome to Replay! 👋",
     content: (
       <>
-        <div className="pb-6 text-lg">{`This is your library, where replays from your team live. Click on one to view it, or click "Launch Replay" at the top right to record your own.`}</div>
+        <div
+          className={styles.content}
+        >{`This is your library, where replays from your team live. Click on one to view it, or click "Launch Replay" at the top right to record your own.`}</div>
       </>
     ),
   },
@@ -26,9 +29,9 @@ function SlideContent({
   children: React.ReactElement | React.ReactElement[];
 }) {
   return (
-    <div className="space-y-9">
-      <h2 className="text-2xl font-bold ">{headerText}</h2>
-      <div className="text-gray-500">{children}</div>
+    <div className={styles.content}>
+      <h2 className={styles.header}>{headerText}</h2>
+      <div className={styles.children}>{children}</div>
     </div>
   );
 }
@@ -52,23 +55,12 @@ function Navigation({
   };
 
   return (
-    <div className="items-right text-base">
-      {/* <div className="flex flex-row items-center space-x-2">
-        <input
-          type="checkbox"
-          id="keep-showing"
-          checked={checked}
-          onChange={() => setChecked(!checked)}
-        />
-        <label htmlFor="keep-showing" className="text-gray-500 select-none">
-          Show this on startup
-        </label>
-      </div> */}
+    <div className={styles.navigation}>
       <div>
         <button
           onClick={onSkipOrDone}
           type="button"
-          className="float-right inline-flex items-center rounded-md border border-transparent bg-primaryAccent px-3 py-1.5 text-base font-medium text-white shadow-sm hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-primaryAccent focus:ring-offset-2"
+          className={current == total ? styles.doneButton : styles.skipButton}
         >
           {current == total ? "Got it!" : "Skip"}
         </button>
@@ -84,10 +76,7 @@ function OnboardingModal({ hideModal }: PropsFromRedux) {
 
   return (
     <Modal options={{ maskTransparency: "translucent" }}>
-      <div
-        className="relative flex flex-col justify-between space-y-6 rounded-lg bg-white p-9 text-lg shadow-xl"
-        style={{ width: "520px" }}
-      >
+      <div className={styles.modalContent} style={{ width: "520px" }}>
         <SlideContent headerText={header}>{content}</SlideContent>
         <Navigation
           current={current}
@@ -96,7 +85,7 @@ function OnboardingModal({ hideModal }: PropsFromRedux) {
           hideModal={hideModal}
         />
         <div
-          className="absolute bottom-0 left-0 h-1.5 rounded-md bg-white"
+          className={styles.absoluteBottom}
           style={{ width: `${(current / slides.length) * 100}%` }}
         />
       </div>
