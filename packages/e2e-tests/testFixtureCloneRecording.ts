@@ -26,7 +26,6 @@ const testWithCloneRecording = base.extend<TestIsolatedRecordingFixture>({
       recordingId: newRecordingId,
     });
 
-    console.log("Deleting cloned recording", newRecordingId);
     await deleteTestRecording(newRecordingId);
   },
 });
