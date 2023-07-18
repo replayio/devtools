@@ -15,7 +15,7 @@ const slides = [
       <>
         <div
           className={styles.content}
-        >{`This is your library, where replays live. Take a look around!`}</div>
+        >{`This is your library, where replays live. Click one to play it!`}</div>
       </>
     ),
   },
