@@ -423,7 +423,8 @@ export default function Toolbar() {
         {testRunner !== "cypress" && showTour ? (
           <ToolbarButton icon="tour" name="tour" label="Replay Tour" onClick={handleButtonClick} />
         ) : null}
-        {showPassport ? (
+
+        {showPassport && testRunner === null ? (
           <ToolbarButton
             icon="passport"
             name="passport"
@@ -431,6 +432,7 @@ export default function Toolbar() {
             onClick={handleButtonClick}
           />
         ) : null}
+
         {testRunner !== null ? (
           testRunner === "cypress" ? (
             <ToolbarButton
@@ -455,6 +457,7 @@ export default function Toolbar() {
             onClick={handleButtonClick}
           />
         )}
+
         <ToolbarButton
           icon="forum"
           label="Comments"
@@ -462,6 +465,7 @@ export default function Toolbar() {
           showBadge={showCommentsBadge}
           onClick={handleButtonClick}
         />
+
         {viewMode == "dev" ? (
           <>
             <ToolbarButton
@@ -483,6 +487,7 @@ export default function Toolbar() {
             )}
           </>
         ) : null}
+
         {logProtocolExperimentEnabled && viewMode === "dev" ? (
           <ToolbarButton icon="code" label="Protocol" name="protocol" onClick={handleButtonClick} />
         ) : null}
