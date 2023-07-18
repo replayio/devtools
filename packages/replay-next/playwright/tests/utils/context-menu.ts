@@ -12,6 +12,15 @@ export async function findContextMenuItem(page: Page, partialText: string): Prom
   return page.locator(`[data-test-name="ContextMenuItem"]`, { hasText: partialText });
 }
 
+export async function hideContextMenu(page: Page) {
+  const contextMenu = page.locator("[data-context-menu]");
+  if ((await contextMenu.count()) > 0) {
+    await debugPrint(page, "Hiding context menu", "hideContextMenu");
+
+    await page.keyboard.press("Escape");
+  }
+}
+
 export async function showContextMenu(page: Page, locator: Locator) {
   const textContent = await locator.textContent();
 
@@ -23,7 +32,7 @@ export async function showContextMenu(page: Page, locator: Locator) {
 
   await locator.click({ button: "right", force: true });
 
-  const contextMenu = page.locator('[data-test-name="ContextMenu"]');
+  const contextMenu = page.locator("[data-context-menu]");
 
   await waitFor(async () => {
     const count = await contextMenu.count();

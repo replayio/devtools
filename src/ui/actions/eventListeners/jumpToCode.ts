@@ -15,7 +15,7 @@ import type { ThreadFront as TF } from "protocol/thread";
 import { RecordingTarget, recordingTargetCache } from "replay-next/src/suspense/BuildIdCache";
 import { eventCountsCache, eventPointsCache } from "replay-next/src/suspense/EventsCache";
 import { topFrameCache } from "replay-next/src/suspense/FrameCache";
-import { getHitPointsForLocationAsync } from "replay-next/src/suspense/HitPointsCache";
+import { hitPointsForLocationCache } from "replay-next/src/suspense/HitPointsCache";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { pauseEvaluationsCache, pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
@@ -269,11 +269,11 @@ export function jumpToClickEventFunctionLocation(
         if (nextBreakablePosition) {
           // We think we know the first position _inside_ the function.
           // Run analysis to find the next time this position got hit.
-          const [hitPoints] = await getHitPointsForLocationAsync(
+          const [hitPoints] = await hitPointsForLocationCache.readAsync(
             replayClient,
+            { begin: executionPoint, end: end.point },
             nextBreakablePosition,
-            null,
-            { begin: executionPoint, end: end.point }
+            null
           );
 
           const [firstHitPoint] = hitPoints;

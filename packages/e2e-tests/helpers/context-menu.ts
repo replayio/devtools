@@ -24,11 +24,9 @@ export async function selectContextMenuItem(
   } else if (contextMenuTestName) {
     contextMenuLocator = scope.locator(`[data-test-name="${contextMenuTestName}"]`);
   } else if (contextMenuItemText) {
-    contextMenuLocator = scope.locator(
-      `[data-test-name="ContextMenu"]:has-text("${contextMenuItemText}")`
-    );
+    contextMenuLocator = scope.locator(`[data-context-menu]:has-text("${contextMenuItemText}")`);
   } else {
-    contextMenuLocator = scope.locator('[data-test-name="ContextMenu"]');
+    contextMenuLocator = scope.locator("[data-context-menu]");
   }
 
   let contextMenuItemLocator: Locator;
