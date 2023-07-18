@@ -76,7 +76,7 @@ import {
 } from "./types";
 
 export const MAX_POINTS_TO_FIND = 10_000;
-export const MAX_POINTS_TO_RUN_EVALUATION = 1_500;
+export const MAX_POINTS_TO_RUN_EVALUATION = 200;
 
 const STREAMING_THROTTLE_DURATION = 100;
 
