@@ -181,6 +181,10 @@ export async function resetTestUser(email: string) {
 }
 
 export async function cloneTestRecording(recordingId: string): Promise<string> {
+  if (!process.env.AUTOMATED_TEST_SECRET) {
+    throw new Error("AUTOMATED_TEST_SECRET must be set in order to clone test recordings.");
+  }
+
   const variables = { recordingId, secret: process.env.AUTOMATED_TEST_SECRET };
 
   var startTime = performance.now();
@@ -203,12 +207,18 @@ export async function cloneTestRecording(recordingId: string): Promise<string> {
   });
   var endTime = performance.now();
   const timeInSecs = (endTime - startTime) / 1000;
-  console.log(`Cloning took ${timeInSecs} seconds.`);
+  if (timeInSecs > 10) {
+    console.log(`Cloning took ${timeInSecs} seconds.`);
+  }
 
   return clonedRecording.data.data.cloneTestRecording.recordingId;
 }
 
 export async function deleteTestRecording(recordingId: string) {
+  if (!process.env.AUTOMATED_TEST_SECRET) {
+    throw new Error("AUTOMATED_TEST_SECRET must be set in order to delete test recordings.");
+  }
+
   const variables = { recordingId, secret: process.env.AUTOMATED_TEST_SECRET };
 
   return axios({
