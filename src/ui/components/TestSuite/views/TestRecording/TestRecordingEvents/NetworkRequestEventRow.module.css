@@ -14,7 +14,7 @@
   width: 0.75rem;
 }
 .StatusBadge[data-status-badge="error"] {
-  background-color: var(--testsuites-error-color);
+  background-color: var(--testsuites-error-icon-bgcolor);
 }
 .StatusBadge[data-status-badge="success"] {
   background-color: var(--testsuites-success-color);
