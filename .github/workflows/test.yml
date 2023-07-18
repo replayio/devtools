@@ -100,6 +100,8 @@ jobs:
           INPUT_STRIPE: ${{ matrix.shard }}/10
           RECORD_REPLAY_WEBHOOK_URL: ${{ secrets.RECORD_REPLAY_WEBHOOK_URL }}
           RECORD_REPLAY_TEST_METRICS: 1
+          AUTOMATED_TEST_SECRET: ${{ secrets.AUTOMATED_TEST_SECRET }}
+          AUTHENTICATED_TESTS_WORKSPACE_API_KEY: ${{ secrets.AUTHENTICATED_TESTS_WORKSPACE_API_KEY }}
   authenticated-e2etest:
     name: Authenticated end-to-end tests (${{ matrix.shard }})
     runs-on: ubuntu-latest
@@ -197,6 +199,8 @@ jobs:
           RECORD_REPLAY_METADATA_TEST_RUN_ID: ${{ needs.generate-test-run-id.outputs.testRunId }}
           PLAYWRIGHT_TEST_BASE_URL: ${{ needs.preview-branch.outputs.url }}
           RECORD_REPLAY_TEST_METRICS: 1
+          AUTOMATED_TEST_SECRET: ${{ secrets.AUTOMATED_TEST_SECRET }}
+          AUTHENTICATED_TESTS_WORKSPACE_API_KEY: ${{ secrets.AUTHENTICATED_TESTS_WORKSPACE_API_KEY }}
   mock-test:
     name: Mock Tests
     runs-on: macos-latest
