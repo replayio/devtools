@@ -1,5 +1,3 @@
-import test, { expect } from "@playwright/test";
-
 import { openDevToolsTab, startTest } from "../helpers";
 import { verifyConsoleMessage } from "../helpers/console-panel";
 import {
@@ -14,18 +12,22 @@ import {
   removeLogPoint,
   toggleShouldLog,
 } from "../helpers/source-panel";
+import test, { expect } from "../testFixtureCloneRecording";
 
 const lineNumber = 5;
-const url = "log_points_and_block_scope.html";
+test.use({ exampleKey: "log_points_and_block_scope.html" });
 
-test(`logpoints-06: should be temporarily disabled`, async ({ page }) => {
-  await startTest(page, url);
+test(`logpoints-06: should be temporarily disabled`, async ({
+  pageWithMeta: { page, recordingId },
+  exampleKey,
+}) => {
+  await startTest(page, exampleKey, recordingId);
   await openDevToolsTab(page);
 
   let MESSAGE = "Test log point";
 
   // Add log point and verify text in console
-  await addLogpoint(page, { content: `"${MESSAGE}"`, lineNumber, url });
+  await addLogpoint(page, { content: `"${MESSAGE}"`, lineNumber, url: exampleKey });
   await verifyConsoleMessage(page, MESSAGE, "log-point", 1);
 
   // Find the newly added point in the side panel
@@ -44,11 +46,21 @@ test(`logpoints-06: should be temporarily disabled`, async ({ page }) => {
   MESSAGE = "Test log point: edit";
 
   // Editing and cancelling should not re-enable the log point
-  await editLogPoint(page, { content: `"${MESSAGE}"`, lineNumber, saveAfterEdit: false, url });
+  await editLogPoint(page, {
+    content: `"${MESSAGE}"`,
+    lineNumber,
+    saveAfterEdit: false,
+    url: exampleKey,
+  });
   await verifyConsoleMessage(page, MESSAGE, "log-point", 0);
 
   // Editing and saving should re-enable the log point
-  await editLogPoint(page, { content: `"${MESSAGE}"`, lineNumber, url, saveAfterEdit: true });
+  await editLogPoint(page, {
+    content: `"${MESSAGE}"`,
+    lineNumber,
+    url: exampleKey,
+    saveAfterEdit: true,
+  });
   await verifyConsoleMessage(page, MESSAGE, "log-point", 1);
 
   // Now disable and re-enable the log point using the context menu
@@ -58,6 +70,6 @@ test(`logpoints-06: should be temporarily disabled`, async ({ page }) => {
   await verifyConsoleMessage(page, MESSAGE, "log-point", 1);
 
   // Delete the logpoint and verify that it's no longer in the side panel
-  await removeLogPoint(page, { lineNumber, url });
+  await removeLogPoint(page, { lineNumber, url: exampleKey });
   await expect(await logpoints.count()).toBe(0);
 });

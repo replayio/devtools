@@ -1,18 +1,20 @@
-import test, { expect } from "@playwright/test";
-
 import { openDevToolsTab, startTest } from "../helpers";
 import {
   addEventListenerLogpoints,
   expandConsoleMessage,
   findConsoleMessage,
 } from "../helpers/console-panel";
+import test, { expect } from "../testFixtureCloneRecording";
 
 // This test file is identical to `logpoints-03.test`, except for the example filename
 // and the event type string. We've copy-pasted it to simplify getting _any_ E2E test working.
-const url = "doc_events_chromium.html";
+test.use({ exampleKey: "doc_events_chromium.html" });
 
-test(`logpoints-03_chromium: should display event properties in the console`, async ({ page }) => {
-  await startTest(page, url);
+test(`logpoints-03_chromium: should display event properties in the console`, async ({
+  pageWithMeta: { page, recordingId },
+  exampleKey,
+}) => {
+  await startTest(page, exampleKey, recordingId);
   await openDevToolsTab(page);
 
   // WARNING: Our Chromium events logic does _not_ actually use the `event.x.y` naming convention.

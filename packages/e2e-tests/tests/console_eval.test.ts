@@ -1,16 +1,18 @@
-import test from "@playwright/test";
-
 import { openDevToolsTab, startTest } from "../helpers";
 import {
   executeAndVerifyTerminalExpression,
   openConsolePanel,
   warpToMessage,
 } from "../helpers/console-panel";
+import test from "../testFixtureCloneRecording";
 
-const url = "doc_rr_basic.html";
+test.use({ exampleKey: "doc_rr_basic.html" });
 
-test("console_eval: support console evaluations", async ({ page }) => {
-  await startTest(page, url);
+test("console_eval: support console evaluations", async ({
+  pageWithMeta: { page, recordingId },
+  exampleKey,
+}) => {
+  await startTest(page, exampleKey, recordingId);
   await openDevToolsTab(page);
   await openConsolePanel(page);
 

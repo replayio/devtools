@@ -1,5 +1,3 @@
-import test, { expect } from "@playwright/test";
-
 import { startTest } from "../helpers";
 import {
   getConsoleDockButton,
@@ -7,13 +5,15 @@ import {
   getConsoleDockSplitViewButton,
   verifyConsoleLayout,
 } from "../helpers/dock";
+import test, { expect } from "../testFixtureCloneRecording";
 
-const url = "node/basic.js";
+test.use({ exampleKey: "node/basic.js" });
 
 test("console_dock_node: Should show the correct docking behavior for recordings without video", async ({
-  page,
+  pageWithMeta: { page, recordingId },
+  exampleKey,
 }) => {
-  await startTest(page, url);
+  await startTest(page, exampleKey, recordingId);
 
   // Verify default docking position
   await verifyConsoleLayout(page, "ide");

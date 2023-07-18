@@ -1,11 +1,15 @@
-import test, { expect } from "@playwright/test";
-
 import { openDevToolsTab, startTest } from "../helpers";
 import { openConsolePanel, warpToMessage } from "../helpers/console-panel";
 import { selectElementsRowWithText } from "../helpers/elements-panel";
+import test, { expect } from "../testFixtureCloneRecording";
 
-test("highlighter: element highlighter works everywhere", async ({ page }) => {
-  await startTest(page, "doc_inspector_basic.html");
+test.use({ exampleKey: "doc_inspector_basic.html" });
+
+test("highlighter: element highlighter works everywhere", async ({
+  pageWithMeta: { page, recordingId },
+  exampleKey,
+}) => {
+  await startTest(page, exampleKey, recordingId);
 
   await openDevToolsTab(page);
   await openConsolePanel(page);

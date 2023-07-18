@@ -1,14 +1,18 @@
-import test, { expect } from "@playwright/test";
-
 import { startTest } from "../helpers";
 import {
   findConsoleMessage,
   openConsolePanel,
   verifyConsoleMessage,
 } from "../helpers/console-panel";
+import test, { expect } from "../testFixtureCloneRecording";
 
-test("node_object_preview: Showing console objects in node", async ({ page }) => {
-  await startTest(page, "node/objects.js");
+test.use({ exampleKey: "node/objects.js" });
+
+test("node_object_preview: Showing console objects in node", async ({
+  pageWithMeta: { page, recordingId },
+  exampleKey,
+}) => {
+  await startTest(page, exampleKey, recordingId);
 
   await openConsolePanel(page);
 

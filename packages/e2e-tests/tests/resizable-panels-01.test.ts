@@ -1,7 +1,6 @@
-import test, { Page, expect } from "@playwright/test";
-
 import { startTest } from "../helpers";
 import { delay, waitFor } from "../helpers/utils";
+import test, { Page } from "../testFixtureCloneRecording";
 
 async function waitForPanelSize(page: Page, expectedSize: number) {
   const sidePanel = page.locator('[data-panel-id="Panel-SidePanel"]');
@@ -13,8 +12,13 @@ async function waitForPanelSize(page: Page, expectedSize: number) {
   });
 }
 
-test("resizable-panels-01: Left side Toolbar should be collapsible", async ({ page }) => {
-  await startTest(page, "doc_rr_basic.html");
+test.use({ exampleKey: "doc_rr_basic.html" });
+
+test("resizable-panels-01: Left side Toolbar should be collapsible", async ({
+  pageWithMeta: { page, recordingId },
+  exampleKey,
+}) => {
+  await startTest(page, exampleKey, recordingId);
 
   const button = page.locator('[data-test-name="ToolbarButton-ExpandSidePanel"]');
   const resizeHandle = page.locator('[data-panel-resize-handle-id="PanelResizeHandle-SidePanel"]');

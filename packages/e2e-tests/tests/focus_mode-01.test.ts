@@ -1,5 +1,3 @@
-import test from "@playwright/test";
-
 import { openDevToolsTab, startTest } from "../helpers";
 import {
   findConsoleMessage,
@@ -12,20 +10,22 @@ import {
 import { openSource } from "../helpers/source-explorer-panel";
 import { addLogpoint } from "../helpers/source-panel";
 import { clearFocusRange, setFocusRange } from "../helpers/timeline";
+import test from "../testFixtureCloneRecording";
 
-const url = "doc_rr_region_loading.html";
+test.use({ exampleKey: "doc_rr_region_loading.html" });
 
 test("focus_mode-01: should filter messages as regions based on the active focus mode", async ({
-  page,
+  pageWithMeta: { page, recordingId },
+  exampleKey,
 }) => {
-  await startTest(page, url);
+  await startTest(page, exampleKey, recordingId);
   await openDevToolsTab(page);
 
-  await openSource(page, url);
+  await openSource(page, exampleKey);
   await addLogpoint(page, {
     content: `"Log point", number`,
     lineNumber: 20,
-    url,
+    url: exampleKey,
   });
 
   await openConsolePanel(page);

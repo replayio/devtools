@@ -1,5 +1,3 @@
-import test from "@playwright/test";
-
 import { openDevToolsTab, startTest } from "../helpers";
 import {
   executeAndVerifyTerminalExpression,
@@ -9,15 +7,19 @@ import {
 } from "../helpers/console-panel";
 import { selectFrame, verifyFramesCount } from "../helpers/pause-information-panel";
 import { addLogpoint } from "../helpers/source-panel";
+import test from "../testFixtureCloneRecording";
 
-const url = "doc_async.html";
+test.use({ exampleKey: "doc_async.html" });
 
-test("console_async: support console evaluations in async frames", async ({ page }) => {
-  await startTest(page, url);
+test("console_async: support console evaluations in async frames", async ({
+  pageWithMeta: { page, recordingId },
+  exampleKey,
+}) => {
+  await startTest(page, exampleKey, recordingId);
   await openDevToolsTab(page);
   await openConsolePanel(page);
 
-  await addLogpoint(page, { content: '"qux", n', lineNumber: 20, url });
+  await addLogpoint(page, { content: '"qux", n', lineNumber: 20, url: exampleKey });
   await warpToMessage(page, "qux 2", 20);
   await verifyFramesCount(page, 5);
 

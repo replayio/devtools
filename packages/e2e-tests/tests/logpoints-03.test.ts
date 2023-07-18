@@ -1,12 +1,14 @@
-import test, { expect } from "@playwright/test";
-
 import { openDevToolsTab, startTest } from "../helpers";
 import { addEventListenerLogpoints, findConsoleMessage } from "../helpers/console-panel";
+import test, { expect } from "../testFixtureCloneRecording";
 
-const url = "doc_events.html";
+test.use({ exampleKey: "doc_events.html" });
 
-test(`logpoints-03: should display event properties in the console`, async ({ page }) => {
-  await startTest(page, url);
+test(`logpoints-03: should display event properties in the console`, async ({
+  pageWithMeta: { page, recordingId },
+  exampleKey,
+}) => {
+  await startTest(page, exampleKey, recordingId);
   await openDevToolsTab(page);
 
   await addEventListenerLogpoints(page, [{ eventType: "event.mouse.click", categoryKey: "mouse" }]);

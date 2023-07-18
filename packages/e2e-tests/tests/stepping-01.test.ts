@@ -1,5 +1,3 @@
-import test from "@playwright/test";
-
 import { openDevToolsTab, startTest } from "../helpers";
 import { executeAndVerifyTerminalExpression } from "../helpers/console-panel";
 import {
@@ -9,20 +7,24 @@ import {
 } from "../helpers/pause-information-panel";
 import { clickSourceTreeNode } from "../helpers/source-explorer-panel";
 import { addBreakpoint } from "../helpers/source-panel";
+import test from "../testFixtureCloneRecording";
 
-const url = "doc_rr_basic.html";
+test.use({ exampleKey: "doc_rr_basic.html" });
 
-test("stepping-01: Test basic step-over/back functionality", async ({ page }) => {
-  await startTest(page, url);
+test("stepping-01: Test basic step-over/back functionality", async ({
+  pageWithMeta: { page, recordingId },
+  exampleKey,
+}) => {
+  await startTest(page, exampleKey, recordingId);
   await openDevToolsTab(page);
 
   // Open doc_rr_basic.html
   await clickSourceTreeNode(page, "test");
   await clickSourceTreeNode(page, "examples");
-  await clickSourceTreeNode(page, url);
+  await clickSourceTreeNode(page, exampleKey);
 
   // Pause on line 20
-  await addBreakpoint(page, { lineNumber: 20, url });
+  await addBreakpoint(page, { lineNumber: 20, url: exampleKey });
   await rewindToLine(page, 20);
 
   // Should get ten when evaluating number.

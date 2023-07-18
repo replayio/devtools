@@ -1,5 +1,3 @@
-import test, { expect } from "@playwright/test";
-
 import { openDevToolsTab, startTest } from "../helpers";
 import {
   findPoints,
@@ -8,15 +6,19 @@ import {
   togglePoint,
 } from "../helpers/pause-information-panel";
 import { addBreakpoint, removeBreakpoint } from "../helpers/source-panel";
+import test, { expect } from "../testFixtureCloneRecording";
 
-const url = "doc_navigate.html";
+test.use({ exampleKey: "doc_navigate.html" });
 
-test(`breakpoints-08: should be temporarily disabled`, async ({ page }) => {
-  await startTest(page, url);
+test(`breakpoints-08: should be temporarily disabled`, async ({
+  pageWithMeta: { page, recordingId },
+  exampleKey,
+}) => {
+  await startTest(page, exampleKey, recordingId);
   await openDevToolsTab(page);
 
   // Add breakpoint and verify text in console
-  await addBreakpoint(page, { lineNumber: 5, url });
+  await addBreakpoint(page, { lineNumber: 5, url: exampleKey });
 
   // Find the newly added point in the side panel
   await openPauseInformationPanel(page);
@@ -33,6 +35,6 @@ test(`breakpoints-08: should be temporarily disabled`, async ({ page }) => {
   await togglePoint(page, breakpoint, true);
 
   // Delete the breakpoint and verify that it's no longer in the side panel
-  await removeBreakpoint(page, { lineNumber: 5, url });
+  await removeBreakpoint(page, { lineNumber: 5, url: exampleKey });
   await expect(await breakpoints.count()).toBe(0);
 });

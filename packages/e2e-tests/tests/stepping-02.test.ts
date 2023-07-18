@@ -1,5 +1,3 @@
-import test from "@playwright/test";
-
 import { openDevToolsTab, startTest } from "../helpers";
 import {
   reverseStepOverToLine,
@@ -11,19 +9,23 @@ import {
 } from "../helpers/pause-information-panel";
 import { clickSourceTreeNode } from "../helpers/source-explorer-panel";
 import { addBreakpoint } from "../helpers/source-panel";
+import test from "../testFixtureCloneRecording";
 
-const url = "doc_rr_basic.html";
+test.use({ exampleKey: "doc_rr_basic.html" });
 
-test("stepping-02: Test fixes for some simple stepping bugs", async ({ page }) => {
-  await startTest(page, url);
+test("stepping-02: Test fixes for some simple stepping bugs", async ({
+  pageWithMeta: { page, recordingId },
+  exampleKey,
+}) => {
+  await startTest(page, exampleKey, recordingId);
   await openDevToolsTab(page);
 
   // Open doc_rr_basic.html
   await clickSourceTreeNode(page, "test");
   await clickSourceTreeNode(page, "examples");
-  await clickSourceTreeNode(page, url);
+  await clickSourceTreeNode(page, exampleKey);
 
-  await addBreakpoint(page, { lineNumber: 21, url });
+  await addBreakpoint(page, { lineNumber: 21, url: exampleKey });
   await rewindToLine(page, 21);
 
   await stepInToLine(page, 24);

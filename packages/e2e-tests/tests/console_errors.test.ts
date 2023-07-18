@@ -1,5 +1,3 @@
-import test from "@playwright/test";
-
 import { openDevToolsTab, startTest } from "../helpers";
 import {
   enableConsoleMessageType,
@@ -7,11 +5,15 @@ import {
   toggleSideFilters,
   verifyConsoleMessage,
 } from "../helpers/console-panel";
+import test from "../testFixtureCloneRecording";
+
+test.use({ exampleKey: "doc_exceptions_bundle.html" });
 
 test("console_errors: Test that errors and warnings from various sources are shown in the console", async ({
-  page,
+  pageWithMeta: { page, recordingId },
+  exampleKey,
 }) => {
-  await startTest(page, "doc_exceptions_bundle.html");
+  await startTest(page, exampleKey, recordingId);
   await openDevToolsTab(page);
   await openConsolePanel(page);
 

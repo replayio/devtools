@@ -1,5 +1,3 @@
-import test, { expect } from "@playwright/test";
-
 import { openDevToolsTab, startTest } from "../helpers";
 import {
   executeAndVerifyTerminalExpression,
@@ -9,11 +7,15 @@ import {
   toggleSideFilters,
 } from "../helpers/console-panel";
 import { reverseStepOverToLine, waitForFrameTimeline } from "../helpers/pause-information-panel";
+import test, { expect } from "../testFixtureCloneRecording";
 
-const url = "doc_exceptions.html";
+test.use({ exampleKey: "doc_exceptions.html" });
 
-test(`logpoints-04: should display exceptions in the console`, async ({ page }) => {
-  await startTest(page, url);
+test(`logpoints-04: should display exceptions in the console`, async ({
+  pageWithMeta: { page, recordingId },
+  exampleKey,
+}) => {
+  await startTest(page, exampleKey, recordingId);
   await openDevToolsTab(page);
 
   await openConsolePanel(page);

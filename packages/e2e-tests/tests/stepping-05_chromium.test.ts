@@ -1,5 +1,3 @@
-import test from "@playwright/test";
-
 import { openDevToolsTab, startTest } from "../helpers";
 import {
   addEventListenerLogpoints,
@@ -14,12 +12,16 @@ import {
   stepOverToLine,
 } from "../helpers/pause-information-panel";
 import { addBreakpoint } from "../helpers/source-panel";
+import test from "../testFixtureCloneRecording";
 
-const url = "doc_minified_chromium.html";
+test.use({ exampleKey: "doc_minified_chromium.html" });
 
-test(`stepping-05_chromium: Test stepping in pretty-printed code`, async ({ page }) => {
+test(`stepping-05_chromium: Test stepping in pretty-printed code`, async ({
+  pageWithMeta: { page, recordingId },
+  exampleKey,
+}) => {
   page.setDefaultTimeout(120000);
-  await startTest(page, url);
+  await startTest(page, exampleKey, recordingId);
   await openDevToolsTab(page);
 
   await addBreakpoint(page, { url: "bundle_input.js", lineNumber: 4 });
@@ -27,7 +29,7 @@ test(`stepping-05_chromium: Test stepping in pretty-printed code`, async ({ page
   await stepInToLine(page, 1);
 
   // Add a breakpoint in minified.html and resume to there
-  await addBreakpoint(page, { url, lineNumber: 8 });
+  await addBreakpoint(page, { url: exampleKey, lineNumber: 8 });
   await resumeToLine(page, 8);
   await stepOverToLine(page, 8);
 

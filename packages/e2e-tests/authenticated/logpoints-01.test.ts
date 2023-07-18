@@ -1,5 +1,3 @@
-import test, { Page, expect } from "@playwright/test";
-
 import { openDevToolsTab, startTest } from "../helpers";
 import { E2E_USER_1_API_KEY, E2E_USER_2_API_KEY } from "../helpers/authentication";
 import { disableAllConsoleMessageTypes, verifyConsoleMessage } from "../helpers/console-panel";
@@ -11,6 +9,7 @@ import {
 } from "../helpers/pause-information-panel";
 import { openSource } from "../helpers/source-explorer-panel";
 import { addLogpoint, editLogPoint, removeAllLogpoints } from "../helpers/source-panel";
+import test, { Page, expect } from "../testFixtureCloneRecording";
 
 // Each authenticated e2e test must use a unique recording id;
 // else shared state from one test could impact another test running in parallel.
@@ -18,8 +17,8 @@ import { addLogpoint, editLogPoint, removeAllLogpoints } from "../helpers/source
 const url = "authenticated_logpoints_1.html";
 const lineNumber = 14;
 
-async function load(page: Page, apiKey: string) {
-  await startTest(page, url, apiKey);
+async function load(page: Page, recordingId: string, apiKey: string) {
+  await startTest(page, url, recordingId, apiKey);
 
   await openDevToolsTab(page);
   await openSource(page, url);
@@ -28,7 +27,12 @@ async function load(page: Page, apiKey: string) {
   await disableAllConsoleMessageTypes(page);
 }
 
-test(`authenticated/logpoints-01: Shared logpoints functionality`, async ({ browser }) => {
+test.use({ exampleKey: url });
+
+test(`authenticated/logpoints-01: Shared logpoints functionality`, async ({
+  browser,
+  pageWithMeta: { recordingId },
+}) => {
   let pageOne: Page;
   let pageTwo: Page;
 
@@ -38,7 +42,7 @@ test(`authenticated/logpoints-01: Shared logpoints functionality`, async ({ brow
     // User 1
     const context = await browser.newContext();
     const page = await context.newPage();
-    await load(page, E2E_USER_1_API_KEY);
+    await load(page, recordingId, E2E_USER_1_API_KEY);
 
     // Clean up from previous tests
     // TODO [SCS-1066] Ideally we would create a fresh recording for each test run
@@ -62,7 +66,7 @@ test(`authenticated/logpoints-01: Shared logpoints functionality`, async ({ brow
     // User 2
     const context = await browser.newContext();
     const page = await context.newPage();
-    await load(page, E2E_USER_2_API_KEY);
+    await load(page, recordingId, E2E_USER_2_API_KEY);
 
     const locator = await findPoints(page, "logpoint", { lineNumber });
 

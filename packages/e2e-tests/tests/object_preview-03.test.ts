@@ -1,5 +1,3 @@
-import test from "@playwright/test";
-
 import { getRecordingTarget, openDevToolsTab, startTest } from "../helpers";
 import {
   expandAllScopesBlocks,
@@ -15,21 +13,23 @@ import {
 } from "../helpers/pause-information-panel";
 import { addBreakpoint } from "../helpers/source-panel";
 import { toggleExpandable } from "../helpers/utils";
+import test from "../testFixtureCloneRecording";
 
-const url = "doc_rr_preview.html";
+test.use({ exampleKey: "doc_rr_preview.html" });
 
 // Note: Because stepping works differently between gecko and chromium,
 // frame timeline percentages are different in the test below.
 
 test(`object_preview-03: Test previews when switching between frames and stepping`, async ({
-  page,
+  pageWithMeta: { page, recordingId },
+  exampleKey,
 }) => {
-  await startTest(page, url);
+  await startTest(page, exampleKey, recordingId);
   await openDevToolsTab(page);
 
   const target = await getRecordingTarget(page);
 
-  await addBreakpoint(page, { lineNumber: 17, url });
+  await addBreakpoint(page, { lineNumber: 17, url: exampleKey });
   await rewindToLine(page, 17);
 
   await expandAllScopesBlocks(page);

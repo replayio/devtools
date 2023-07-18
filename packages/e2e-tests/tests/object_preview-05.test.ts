@@ -1,16 +1,18 @@
-import test from "@playwright/test";
-
 import { openDevToolsTab, startTest } from "../helpers";
 import {
   executeTerminalExpression,
   verifyConsoleMessage,
   warpToMessage,
 } from "../helpers/console-panel";
+import test from "../testFixtureCloneRecording";
 
-const url = "doc_prod_bundle.html";
+test.use({ exampleKey: "doc_prod_bundle.html" });
 
-test(`object_preview-05: Should support logging objects as values`, async ({ page }) => {
-  await startTest(page, url);
+test(`object_preview-05: Should support logging objects as values`, async ({
+  pageWithMeta: { page, recordingId },
+  exampleKey,
+}) => {
+  await startTest(page, exampleKey, recordingId);
   await openDevToolsTab(page);
 
   await warpToMessage(page, "ExampleFinished");

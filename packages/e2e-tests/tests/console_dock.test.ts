@@ -1,4 +1,4 @@
-import { openDevToolsTab, openRecording, startTest } from "../helpers";
+import { openDevToolsTab, startTest } from "../helpers";
 import {
   getConsoleDockButton,
   getConsoleDockToBottomButton,
@@ -8,13 +8,13 @@ import {
 } from "../helpers/dock";
 import test, { expect } from "../testFixtureCloneRecording";
 
-test.use({ recordingUrl: "doc_rr_basic.html" });
+test.use({ exampleKey: "doc_rr_basic.html" });
 
 test("console_dock: Should show the correct docking behavior for recordings with video", async ({
   pageWithMeta: { page, recordingId },
-  recordingUrl,
+  exampleKey,
 }) => {
-  await openRecording(page, recordingUrl, recordingId);
+  await startTest(page, exampleKey, recordingId);
   await openDevToolsTab(page);
 
   // Verify default docking position

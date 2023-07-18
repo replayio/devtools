@@ -1,19 +1,19 @@
-import test from "@playwright/test";
-
 import { openDevToolsTab, startTest } from "../helpers";
 import { executeAndVerifyTerminalExpression } from "../helpers/console-panel";
 import { rewindToLine } from "../helpers/pause-information-panel";
 import { addBreakpoint } from "../helpers/source-panel";
+import test from "../testFixtureCloneRecording";
 
-const url = "doc_rr_basic.html";
+test.use({ exampleKey: "doc_rr_basic.html" });
 
 test(`breakpoints-02: Test unhandled divergence while evaluating at a breakpoint`, async ({
-  page,
+  pageWithMeta: { page, recordingId },
+  exampleKey,
 }) => {
-  await startTest(page, url);
+  await startTest(page, exampleKey, recordingId);
   await openDevToolsTab(page);
 
-  await addBreakpoint(page, { lineNumber: 21, url });
+  await addBreakpoint(page, { lineNumber: 21, url: exampleKey });
 
   await rewindToLine(page, 21);
 

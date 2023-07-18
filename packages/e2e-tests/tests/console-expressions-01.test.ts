@@ -1,5 +1,3 @@
-import test from "@playwright/test";
-
 import { openDevToolsTab, startTest } from "../helpers";
 import {
   executeAndVerifyTerminalExpression,
@@ -12,14 +10,15 @@ import {
   warpToMessage,
 } from "../helpers/console-panel";
 import { selectFrame, verifyFramesCount } from "../helpers/pause-information-panel";
-import { addLogpoint } from "../helpers/source-panel";
+import test from "../testFixtureCloneRecording";
 
-const url = "doc_async.html";
+test.use({ exampleKey: "doc_async.html" });
 
 test("console-expressions-01: should cache input eager eval and terminal expressions per instance", async ({
-  page,
+  pageWithMeta: { page, recordingId },
+  exampleKey,
 }) => {
-  await startTest(page, url);
+  await startTest(page, exampleKey, recordingId);
   await openDevToolsTab(page);
   await openConsolePanel(page);
 

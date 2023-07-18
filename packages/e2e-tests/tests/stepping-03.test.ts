@@ -1,5 +1,3 @@
-import test from "@playwright/test";
-
 import { openDevToolsTab, startTest } from "../helpers";
 import { executeAndVerifyTerminalExpression } from "../helpers/console-panel";
 import {
@@ -9,21 +7,23 @@ import {
 } from "../helpers/pause-information-panel";
 import { clickSourceTreeNode } from "../helpers/source-explorer-panel";
 import { addBreakpoint } from "../helpers/source-panel";
+import test from "../testFixtureCloneRecording";
 
-const url = "doc_rr_basic.html";
+test.use({ exampleKey: "doc_rr_basic.html" });
 
 test(`stepping-03: Stepping past the beginning or end of a frame should act like a step-out`, async ({
-  page,
+  pageWithMeta: { page, recordingId },
+  exampleKey,
 }) => {
-  await startTest(page, url);
+  await startTest(page, exampleKey, recordingId);
   await openDevToolsTab(page);
 
   // Open doc_rr_basic.html
   await clickSourceTreeNode(page, "test");
   await clickSourceTreeNode(page, "examples");
-  await clickSourceTreeNode(page, url);
+  await clickSourceTreeNode(page, exampleKey);
 
-  await addBreakpoint(page, { lineNumber: 20, url });
+  await addBreakpoint(page, { lineNumber: 20, url: exampleKey });
 
   await rewindToLine(page, 20);
   await executeAndVerifyTerminalExpression(page, "number", "10");
