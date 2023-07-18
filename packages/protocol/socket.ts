@@ -135,7 +135,7 @@ export type ExperimentalSettings = {
   keepAllTraces?: boolean;
   disableIncrementalSnapshots?: boolean;
   disableConcurrentControllerLoading?: boolean;
-  enableProtocolQueryCache?: boolean;
+  disableProtocolQueryCache?: boolean;
 };
 
 type SessionCallbacks = {
