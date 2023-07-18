@@ -36,8 +36,7 @@
 }
 .Row[data-status="success"][data-position="current"],
 .Row[data-type="navigation"][data-position="current"],
-.Row[data-type="network-request"][data-position="current"],
-.Row[data-type="network"][data-position="current"] {
+.Row[data-type="network-request"][data-position="current"] {
   --border-left-color: var(--primary-accent);
   --row-background-color: var(--testsuites-active-bgcolor);
   --row-background-color-hover: var(--testsuites-active-bgcolor);
