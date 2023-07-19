@@ -1,17 +1,16 @@
 import assert from "assert";
 import { ReactNode, useContext, useMemo, useTransition } from "react";
 
-import { comparePoints } from "protocol/execution-point-utils";
 import Icon from "replay-next/components/Icon";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import {
   TestEvent,
   TestSectionName,
-  getTestEventExecutionPoint,
   getTestEventTime,
+  isUserActionTestEvent,
 } from "shared/test-suites/RecordingTestMetadata";
-import { setTimelineToTime } from "ui/actions/timeline";
+import { seek, setTimelineToTime } from "ui/actions/timeline";
 import { TestSuiteCache } from "ui/components/TestSuite/suspense/TestSuiteCache";
 import { useTestEventContextMenu } from "ui/components/TestSuite/views/TestRecording/useTestEventContextMenu";
 import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext";
@@ -88,6 +87,22 @@ export function TestSectionRow({
       throw Error(`Unknown test step type: "${(testEvent as any).type}"`);
   }
 
+  const onClick = () => {
+    startTransition(() => {
+      setTestEvent(testEvent);
+    });
+
+    if (isUserActionTestEvent(testEvent)) {
+      const timeStampedPoint = testEvent.timeStampedPointRange?.begin ?? null;
+      if (timeStampedPoint) {
+        dispatch(seek(timeStampedPoint.point, timeStampedPoint.time, false));
+      }
+    } else {
+      const { point, time } = testEvent.timeStampedPoint;
+      dispatch(seek(point, time, false));
+    }
+  };
+
   const onMouseEnter = async () => {
     if (selectedTestEvent !== testEvent) {
       dispatch(setTimelineToTime(getTestEventTime(testEvent)));
@@ -109,11 +124,7 @@ export function TestSectionRow({
       data-status={status}
       data-type={testEvent.type}
       data-test-name="TestSectionRow"
-      onClick={() => {
-        startTransition(() => {
-          setTestEvent(testEvent);
-        });
-      }}
+      onClick={onClick}
       onContextMenu={onContextMenu}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
