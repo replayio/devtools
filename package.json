@@ -101,8 +101,8 @@
     "reselect": "^4.1.5",
     "shared": "workspace:*",
     "slugify": "^1.6.5",
-    "suspense": "^0.0.44",
-    "use-context-menu": "0.4.10"
+    "suspense": "^0.0.45",
+    "use-context-menu": "0.4.12"
   },
   "devDependencies": {
     "@babel/core": "^7.17.8",

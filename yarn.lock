@@ -15320,12 +15320,12 @@ __metadata:
     style-loader: ^3.3.1
     stylelint: ^14.16.0
     stylelint-config-prettier: ^9.0.5
-    suspense: ^0.0.44
+    suspense: ^0.0.45
     tailwindcss: ^3.2.4
     ts-node: ^10.7.0
     tsconfig-paths: ^3.14.1
     typescript: ^5.0.4
-    use-context-menu: 0.4.10
+    use-context-menu: 0.4.12
     utf-8-validate: ^5.0.8
     uuid: ^7.0.3
     v8-to-istanbul: ^9.0.1
@@ -15519,9 +15519,9 @@ __metadata:
     react-dom: 0.0.0-experimental-e7d0053e6-20220325
     react-virtualized-auto-sizer: ^1.0.19
     shared: "workspace:*"
-    suspense: ^0.0.44
+    suspense: ^0.0.45
     typescript: 5.0.2
-    use-context-menu: 0.4.10
+    use-context-menu: 0.4.12
     uuid: ^7.0.3
   languageName: unknown
   linkType: soft
@@ -16862,9 +16862,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"suspense@npm:^0.0.44":
-  version: 0.0.44
-  resolution: "suspense@npm:0.0.44"
+"suspense@npm:^0.0.45":
+  version: 0.0.45
+  resolution: "suspense@npm:0.0.45"
   dependencies:
     "@types/deep-equal": ^1.0.1
     array-sorting-utilities: ^0.0.1
@@ -16875,7 +16875,7 @@ __metadata:
   peerDependencies:
     react: ^18.0.0
     react-dom: ^18.0.0
-  checksum: ab2041294914d3c45a28cebd23807bb6ae88893b4c9e8f3e7afe2b95128bf7a3d10103d7b4da7cd8a43c28480069321b93d5e736d64f2efd3bc043b786fd352e
+  checksum: ec5997c6d0cf37d15f99103dee3ed8837c5e945738da494da7cda8ccba3bc076ad8892ad8f86029f43a7662bb352bb076a4be32098f060f98f32f279d3066fcc
   languageName: node
   linkType: hard
 
@@ -17712,13 +17712,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"use-context-menu@npm:0.4.10":
-  version: 0.4.10
-  resolution: "use-context-menu@npm:0.4.10"
+"use-context-menu@npm:0.4.12":
+  version: 0.4.12
+  resolution: "use-context-menu@npm:0.4.12"
   peerDependencies:
     react: ^16.14.0 || ^17 || ^18
     react-dom: ^16.14.0 || ^17 || ^18
-  checksum: 7d6732b86efe75d164a998ecaaec261d3e73b991de62ba0af68241aef4fe7b6c4e35956a144f71b963f1333e6a53353f947fbeed36016c6ba57f758b2ed6cd5c
+  checksum: dba046bc95248512a6f698aae8e5c6997e6afb9b8da5e6d2199614d6d1f13ba640d4abd0201babf80ecc92f51115e58651c967b62e065691ec1158ef080b6b1d
   languageName: node
   linkType: hard
 
