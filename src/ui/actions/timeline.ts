@@ -32,10 +32,7 @@ import {
   sessionEndPointCache,
 } from "replay-next/src/suspense/ExecutionPointsCache";
 import { screenshotCache } from "replay-next/src/suspense/ScreenshotCache";
-import {
-  isExecutionPointsGreaterThan,
-  isExecutionPointsLessThan,
-} from "replay-next/src/utils/time";
+import { isExecutionPointsLessThan } from "replay-next/src/utils/time";
 import {
   isTimeStampedPointRangeEqual,
   isTimeStampedPointRangeGreaterThan,
@@ -671,7 +668,7 @@ export function syncFocusedRegion(): UIThunkAction {
           point: "0",
           time: zoomTime.beginTime,
         };
-    const end = focusWindow ? focusWindow.end : await replayClient.getSessionEndpoint();
+    const end = focusWindow ? focusWindow.end : await sessionEndPointCache.readAsync(replayClient);
 
     // Compare the new focus range to the previous one to infer user intent.
     // This helps when a focus range can't be loaded in full.
@@ -690,23 +687,8 @@ export function syncFocusedRegion(): UIThunkAction {
       end,
     });
 
-    // If the backend has selected a different focus window, refine our in-memory window to match.
-    // Note that this is pretty likely to happen, given the focus API currently only supports times.
-    //
-    // TODO Update this once BAC-3527 has shipped
+    // If the backend has selected a different focus window, refine our in-memory window to match
     if (begin.point !== window.begin.point || end.point !== window.end.point) {
-      dispatch(
-        setFocusWindow({
-          begin: window.begin,
-          end: window.end,
-        })
-      );
-      dispatch(setFocusWindow(window));
-    }
-
-    // If the backend has selected a different focus window, refine our in-memory window to match.
-    // Note that this is pretty likely to happen, given the focus API currently only supports times.
-    if (!isTimeStampedPointRangeEqual(focusWindow, window)) {
       dispatch(
         setFocusWindow({
           begin: window.begin,
