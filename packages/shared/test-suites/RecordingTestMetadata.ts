@@ -386,6 +386,10 @@ export async function processCypressTestRecording(
               navigationEvents.push(navigationEvent);
               break;
             }
+            case "test:end":
+            case "test:start": {
+              break;
+            }
             case "step:end":
             case "step:enqueue":
             case "step:start": {
