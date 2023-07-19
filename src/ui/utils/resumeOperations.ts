@@ -1,3 +1,4 @@
+import assert from "assert";
 import {
   ExecutionPoint,
   PauseDescription,
@@ -9,7 +10,7 @@ import {
 import { ThreadFront } from "protocol/thread";
 import { locationsInclude } from "protocol/utils";
 import { updateMappedLocation } from "replay-next/src/suspense/PauseCache";
-import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
+import { sourcesCache } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientInterface } from "shared/client/types";
 import { isPointInRegion } from "shared/utils/time";
 
@@ -42,14 +43,15 @@ async function findResumeTarget(
     return null;
   }
 
-  const sources = await sourcesByIdCache.readAsync(client);
+  const { value: { idToSource } = {} } = await sourcesCache.readAsync(client);
+  assert(idToSource != null);
 
   while (true) {
     let target: PauseDescription;
     try {
       target = await client[findTargetCommand](point);
       if (target.frame) {
-        updateMappedLocation(sources, target.frame);
+        updateMappedLocation(idToSource, target.frame);
       }
     } catch {
       return null;

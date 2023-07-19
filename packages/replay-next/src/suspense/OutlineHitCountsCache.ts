@@ -1,3 +1,4 @@
+import assert from "assert";
 import {
   ClassOutline,
   FunctionOutline,
@@ -10,9 +11,8 @@ import { Cache, createCache } from "suspense";
 import { ReplayClientInterface } from "shared/client/types";
 import { ProtocolError, isCommandError } from "shared/utils/error";
 
-import { getCorrespondingSourceIds } from "../utils/sources";
 import { sourceOutlineCache } from "./SourceOutlineCache";
-import { sourcesByIdCache } from "./SourcesCache";
+import { sourcesCache } from "./SourcesCache";
 
 export interface FunctionOutlineWithHitCount extends FunctionOutline {
   hits?: number;
@@ -50,12 +50,15 @@ export const outlineHitCountsCache: Cache<
       }
     }
 
-    const sources = await sourcesByIdCache.readAsync(replayClient);
-    const correspondingSourceIds = getCorrespondingSourceIds(sources, sourceId);
+    const { value: { idToSource } = {} } = await sourcesCache.readAsync(replayClient);
+    assert(idToSource != null);
+
+    const source = idToSource.get(sourceId);
+    assert(source != null);
 
     const hitCountsByLocationKey = new Map<string, number>();
     await Promise.all(
-      correspondingSourceIds.map(async sourceId => {
+      source.correspondingSourceIds.map(async sourceId => {
         try {
           const hitCounts = await replayClient.getSourceHitCounts(sourceId, locations, focusRange);
 

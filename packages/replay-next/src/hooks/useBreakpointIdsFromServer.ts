@@ -1,12 +1,17 @@
+import assert from "assert";
 import { BreakpointId, Location } from "@replayio/protocol";
 import { useContext, useEffect, useRef } from "react";
 
 import { PointBehaviorsObject } from "replay-next/src/contexts/points/types";
 import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPositionsCache";
-import { sourcesByIdCache, sourcesCache } from "replay-next/src/suspense/SourcesCache";
+import { sourcesCache } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { POINT_BEHAVIOR_ENABLED, Point, PointKey } from "shared/client/types";
-import { ReplayClientInterface } from "shared/client/types";
+import {
+  POINT_BEHAVIOR_ENABLED,
+  Point,
+  PointKey,
+  ReplayClientInterface,
+} from "shared/client/types";
 
 import { getCorrespondingLocations } from "../utils/sources";
 
@@ -42,7 +47,10 @@ export default function useBreakpointIdsFromServer(
           // There's no point (hah!) in restoring breakpoints until after
           // we have sources to work with, and it's also possible that
           // some persisted points have obsolete source IDs.
-          const allSources = await sourcesCache.readAsync(replayClient);
+          const { value: { sources: allSources } = {} } = await sourcesCache.readAsync(
+            replayClient
+          );
+          assert(allSources != null);
 
           const allSourceIds = new Set<string>();
           for (let source of allSources) {
@@ -155,8 +163,10 @@ async function breakpointAdded(
   location: Location,
   condition: string | null
 ): Promise<BreakpointId[]> {
-  const sources = await sourcesByIdCache.readAsync(replayClient);
-  const correspondingLocations = getCorrespondingLocations(sources, location);
+  const { value: { idToSource } = {} } = await sourcesCache.readAsync(replayClient);
+  assert(idToSource != null);
+
+  const correspondingLocations = getCorrespondingLocations(idToSource, location);
 
   return await Promise.all(
     correspondingLocations.map(async location => replayClient.breakpointAdded(location, condition))

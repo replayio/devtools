@@ -1,13 +1,11 @@
-import { Frame, SourceId } from "@replayio/protocol";
+import assert from "assert";
+import { Frame } from "@replayio/protocol";
 import { Suspense, memo, useContext } from "react";
 
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import { framesCache, topFrameCache } from "replay-next/src/suspense/FrameCache";
-import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
-import {
-  getCorrespondingLocations,
-  getCorrespondingSourceIds,
-} from "replay-next/src/utils/sources";
+import { Source, sourcesCache } from "replay-next/src/suspense/SourcesCache";
+import { getCorrespondingLocations } from "replay-next/src/utils/sources";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import { SelectedFrameContext } from "../../src/contexts/SelectedFrameContext";
@@ -16,7 +14,7 @@ import styles from "./CurrentLineHighlight.module.css";
 
 type Props = {
   lineNumber: number;
-  sourceId: SourceId;
+  source: Source;
 };
 
 export default memo(function CurrentLineHighlight(props: Props) {
@@ -27,13 +25,13 @@ export default memo(function CurrentLineHighlight(props: Props) {
   );
 });
 
-function CurrentLineHighlightSuspends({ lineNumber, sourceId }: Props) {
+function CurrentLineHighlightSuspends({ lineNumber, source }: Props) {
   const client = useContext(ReplayClientContext);
   const [sourceSearchState] = useContext(SourceSearchContext);
   const { selectedPauseAndFrameId, previewLocation } = useContext(SelectedFrameContext);
   const { focusedSource } = useContext(SourcesContext);
 
-  if (previewLocation?.sourceId === sourceId) {
+  if (previewLocation?.sourceId === source.id) {
     if (previewLocation.line === lineNumber) {
       return (
         <div
@@ -65,19 +63,19 @@ function CurrentLineHighlightSuspends({ lineNumber, sourceId }: Props) {
         selectedFrame = allFrames?.find(frame => frame.frameId === frameId);
       }
 
-      const sources = sourcesByIdCache.read(client);
-      const correspondingSourceIds = getCorrespondingSourceIds(sources, sourceId);
+      const { value: { idToSource } = {} } = sourcesCache.read(client);
+      assert(idToSource != null);
 
       // Assuming we found a frame, check to see if there's a matching location for the frame.
       // If so, we should show the highlight line.
       showHighlight = !!selectedFrame?.location.find(location => {
-        if (correspondingSourceIds.includes(location.sourceId)) {
-          const correspondingLocations = getCorrespondingLocations(sources, location);
+        if (source.correspondingSourceIds.includes(location.sourceId)) {
+          const correspondingLocations = getCorrespondingLocations(idToSource, location);
           return (
             correspondingLocations.findIndex(
               correspondingLocation =>
                 correspondingLocation.line === lineNumber &&
-                correspondingLocation.sourceId === sourceId
+                correspondingLocation.sourceId === source.id
             ) >= 0
           );
         }

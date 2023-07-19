@@ -1,3 +1,4 @@
+import assert from "assert";
 import { ReactNode, createContext, useContext, useEffect, useMemo } from "react";
 
 import { Source, sourcesCache } from "replay-next/src/suspense/SourcesCache";
@@ -17,7 +18,8 @@ export function SourceFileNameSearchContextRoot({ children }: { children: ReactN
   // Keep source search state in sync with the focused source.
   useEffect(() => {
     async function updateSources(setSources: (sources: Source[]) => void) {
-      const sources = await sourcesCache.readAsync(client);
+      const { value: { sources } = {} } = await sourcesCache.readAsync(client);
+      assert(sources);
       setSources(sources);
     }
 

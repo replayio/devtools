@@ -15,6 +15,7 @@ import { PointsContext } from "replay-next/src/contexts/points/PointsContext";
 import { PointInstance } from "replay-next/src/contexts/points/types";
 import { TerminalContext, TerminalExpression } from "replay-next/src/contexts/TerminalContext";
 import { useStreamingMessages } from "replay-next/src/hooks/useStreamingMessages";
+import { useStreamingSources } from "replay-next/src/hooks/useStreamingSources";
 import { EventLog, getInfallibleEventPointsSuspense } from "replay-next/src/suspense/EventsCache";
 import {
   UncaughtException,
@@ -105,6 +106,7 @@ function LoggablesContextInner({
     showWarnings,
   } = useContext(ConsoleFiltersContext);
   const { range: focusRange } = useContext(FocusContext);
+  const { idToSource } = useStreamingSources();
 
   // Find the set of event type handlers we should be displaying in the console.
   const eventTypesToLoad = useMemo<EventHandlerType[]>(() => {
@@ -165,14 +167,14 @@ function LoggablesContextInner({
 
       // TODO This seems expensive; can we cache the message-to-node-modules relationship?
       if (!showNodeModules) {
-        if (isInNodeModules(message)) {
+        if (isInNodeModules(message, idToSource)) {
           return false;
         }
       }
 
       return true;
     });
-  }, [messages, showErrors, showLogs, showNodeModules, showWarnings]);
+  }, [idToSource, messages, showErrors, showLogs, showNodeModules, showWarnings]);
 
   // We may suspend based on this value, so let's this value changes at sync priority,
   let exceptions: UncaughtException[] = EMPTY_ARRAY;

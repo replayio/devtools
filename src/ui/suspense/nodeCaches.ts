@@ -1,3 +1,4 @@
+import assert from "assert";
 import {
   BoxModel,
   EventListener,
@@ -11,7 +12,7 @@ import { Cache, createCache } from "suspense";
 
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { cachePauseData } from "replay-next/src/suspense/PauseCache";
-import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
+import { sourcesCache } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientInterface } from "shared/client/types";
 
 type NodeFetchOptions =
@@ -157,8 +158,10 @@ export const nodeDataCache: Cache<
     }
 
     if (pauseData) {
-      const sources = await sourcesByIdCache.readAsync(replayClient);
-      cachePauseData(replayClient, sources, pauseId, pauseData);
+      const { value: { idToSource } = {} } = await sourcesCache.readAsync(replayClient);
+      assert(idToSource != null);
+
+      cachePauseData(replayClient, idToSource, pauseId, pauseData);
     }
 
     if (!nodeIds.length) {
@@ -194,8 +197,11 @@ export const nodeEventListenersCache: Cache<
       sessionId,
       pauseId
     );
-    const sources = await sourcesByIdCache.readAsync(replayClient);
-    cachePauseData(replayClient, sources, pauseId, data);
+
+    const { value: { idToSource } = {} } = await sourcesCache.readAsync(replayClient);
+    assert(idToSource != null);
+
+    cachePauseData(replayClient, idToSource, pauseId, data);
 
     return listeners;
   },

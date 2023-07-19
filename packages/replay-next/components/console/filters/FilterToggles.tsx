@@ -9,6 +9,7 @@ import { ConsoleFiltersContext } from "replay-next/src/contexts/ConsoleFiltersCo
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { useStreamingMessages } from "replay-next/src/hooks/useStreamingMessages";
+import { useStreamingSources } from "replay-next/src/hooks/useStreamingSources";
 import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
 import { exceptionsCache } from "replay-next/src/suspense/ExceptionsCache";
 import { CategoryCounts } from "replay-next/src/suspense/MessagesCache";
@@ -192,10 +193,11 @@ function ToggleCategoryCount({ category }: { category: keyof CategoryCounts }) {
 
 function NodeModulesCount() {
   const { messages } = useStreamingMessages();
+  const { idToSource } = useStreamingSources();
 
   const count = useMemo(() => {
-    return messages ? messages.filter(message => isInNodeModules(message)).length : 0;
-  }, [messages]);
+    return messages ? messages.filter(message => isInNodeModules(message, idToSource)).length : 0;
+  }, [idToSource, messages]);
 
   if (count > 0) {
     return <Badge label={count} />;

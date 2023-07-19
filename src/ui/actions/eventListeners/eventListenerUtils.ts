@@ -1,8 +1,9 @@
+import assert from "assert";
 import type { Location, ObjectPreview, Object as ProtocolObject } from "@replayio/protocol";
 
 import { updateMappedLocation } from "replay-next/src/suspense/PauseCache";
 import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
-import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
+import { sourcesCache } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientInterface } from "shared/client/types";
 import { SourceDetails, SourcesState, getPreferredLocation } from "ui/reducers/sources";
 
@@ -99,8 +100,10 @@ export const formatEventListener = async (
   framework?: string
 ): Promise<FormattedEventListener | undefined> => {
   const { functionLocation } = fnPreview;
-  const sources = await sourcesByIdCache.readAsync(replayClient);
-  updateMappedLocation(sources, functionLocation);
+
+  const { value: { idToSource } = {} } = await sourcesCache.readAsync(replayClient);
+  assert(idToSource != null);
+  updateMappedLocation(idToSource, functionLocation);
 
   const location = getPreferredLocation(sourcesState, functionLocation);
 

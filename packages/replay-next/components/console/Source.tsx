@@ -1,11 +1,10 @@
-import { MappedLocation, Location as ProtocolLocation, SourceId } from "@replayio/protocol";
-import { MouseEvent, useContext, useMemo } from "react";
+import { Location as ProtocolLocation } from "@replayio/protocol";
+import { MouseEvent, useContext } from "react";
 
 import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
-import { getSourceSuspends, sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
-import { Source as SourceType } from "replay-next/src/suspense/SourcesCache";
+import { useStreamingSources } from "replay-next/src/hooks/useStreamingSources";
 import { getPreferredLocationWorkaround } from "replay-next/src/utils/sources";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
@@ -23,9 +22,10 @@ export default function Source({
   const { trackEvent } = useContext(SessionContext);
   const { preferredGeneratedSourceIds } = useContext(SourcesContext);
 
-  const sourcesById = sourcesByIdCache.read(client);
+  const { idToSource } = useStreamingSources();
+
   const location = getPreferredLocationWorkaround(
-    sourcesById,
+    idToSource,
     preferredGeneratedSourceIds,
     locations
   );
@@ -33,7 +33,7 @@ export default function Source({
     return null;
   }
 
-  const source = getSourceSuspends(client, location.sourceId);
+  const source = idToSource.get(location.sourceId);
   if (source == null) {
     return null;
   }

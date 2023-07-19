@@ -13,17 +13,18 @@ import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList as List } from "react-window";
 
 import Icon from "replay-next/components/Icon";
+import { useStreamingSources } from "replay-next/src/hooks/useStreamingSources";
 import {
   SourceSearchResult,
   StreamingSourceSearchResults,
   isSourceSearchResultLocation,
   searchCache,
 } from "replay-next/src/suspense/SearchCache";
-import { Source, sourcesCache } from "replay-next/src/suspense/SourcesCache";
+import { Source } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
-import ResultsListRow from "./ResultsListRow";
 import type { ItemData } from "./ResultsListRow";
+import ResultsListRow from "./ResultsListRow";
 import styles from "./ResultsList.module.css";
 
 const ROW_HEIGHT = 18;
@@ -46,12 +47,13 @@ export default function ResultsList({
 }) {
   const client = useContext(ReplayClientContext);
 
+  const { sources } = useStreamingSources();
+
   if (query.trim() === "") {
     return null;
   }
 
   const streamingResults = searchCache.read(client, query, includeNodeModules, limit);
-  const sources = sourcesCache.read(client);
 
   return (
     <StreamingResults

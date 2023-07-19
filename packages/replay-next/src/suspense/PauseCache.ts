@@ -1,3 +1,4 @@
+import assert from "assert";
 import {
   CallStack,
   ExecutionPoint,
@@ -15,11 +16,10 @@ import { Cache, createCache } from "suspense";
 
 import { ReplayClientInterface } from "shared/client/types";
 
-import { getCorrespondingSourceIds } from "../utils/sources";
 import { framesCache } from "./FrameCache";
 import { preCacheObjects } from "./ObjectPreviews";
 import { scopesCache } from "./ScopeCache";
-import { Source, sourcesByIdCache } from "./SourcesCache";
+import { Source, sourcesCache } from "./SourcesCache";
 
 const pauseIdToPointAndTimeMap: Map<PauseId, [ExecutionPoint, number]> = new Map();
 
@@ -66,8 +66,11 @@ export const pauseEvaluationsCache: Cache<
     `${pauseId}:${frameId}:${expression}:${uid}`,
   load: async ([replayClient, pauseId, frameId, expression, uid = "", pure]) => {
     const result = await replayClient.evaluateExpression(pauseId, expression, frameId, pure);
-    const sources = await sourcesByIdCache.readAsync(replayClient);
-    cachePauseData(replayClient, sources, pauseId, result.data);
+
+    const { value: { idToSource } = {} } = await sourcesCache.readAsync(replayClient);
+    assert(idToSource != null);
+
+    cachePauseData(replayClient, idToSource, pauseId, result.data);
     return { exception: result.exception, failed: result.failed, returned: result.returned };
   },
 });
@@ -114,10 +117,13 @@ export function sortFramesAndUpdateLocations(
 }
 
 export function updateMappedLocation(
-  sources: Map<SourceId, Source>,
+  idToSource: Map<SourceId, Source>,
   mappedLocation: MappedLocation
 ) {
   for (const location of mappedLocation) {
-    location.sourceId = getCorrespondingSourceIds(sources, location.sourceId)[0];
+    const source = idToSource.get(location.sourceId);
+    if (source && source.correspondingSourceIds.length > 0) {
+      location.sourceId = source.correspondingSourceIds[0];
+    }
   }
 }

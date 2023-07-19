@@ -1,3 +1,4 @@
+import assert from "assert";
 import { PointDescription, PointRange, PointSelector } from "@replayio/protocol";
 import { EventHandlerType } from "@replayio/protocol";
 import isEmpty from "lodash/isEmpty";
@@ -14,7 +15,7 @@ import { createInfallibleSuspenseCache } from "../utils/suspense";
 import { createAnalysisCache } from "./AnalysisCache";
 import { createFocusIntervalCacheForExecutionPoints } from "./FocusIntervalCache";
 import { updateMappedLocation } from "./PauseCache";
-import { sourcesByIdCache } from "./SourcesCache";
+import { sourcesCache } from "./SourcesCache";
 
 export type Event = {
   count: number;
@@ -69,10 +70,11 @@ export const eventPointsCache = createFocusIntervalCacheForExecutionPoints<
   getPointForValue: pointDescription => pointDescription.point,
   load: async (begin, end, client, eventTypes) => {
     const points = await client.findPoints(createPointSelector(eventTypes), { begin, end });
-    const sources = await sourcesByIdCache.readAsync(client);
+    const { value: { idToSource } = {} } = await sourcesCache.readAsync(client);
+    assert(idToSource != null);
     points.forEach(p => {
       if (p?.frame?.length) {
-        updateMappedLocation(sources, p.frame);
+        updateMappedLocation(idToSource, p.frame);
       }
     });
     return points;

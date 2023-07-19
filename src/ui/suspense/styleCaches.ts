@@ -1,3 +1,4 @@
+import assert from "assert";
 import { PauseId, ProtocolClient, Object as ProtocolObject } from "@replayio/protocol";
 import uniqBy from "lodash/uniqBy";
 import { Cache, createCache } from "suspense";
@@ -5,7 +6,7 @@ import { Cache, createCache } from "suspense";
 import { RuleFront } from "devtools/client/inspector/rules/models/fronts/rule";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { cachePauseData } from "replay-next/src/suspense/PauseCache";
-import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
+import { sourcesCache } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientInterface } from "shared/client/types";
 
 export interface WiredAppliedRule {
@@ -35,8 +36,10 @@ export const appliedRulesCache: Cache<
 
     const uniqueRules = uniqBy(rules, rule => `${rule.rule}|${rule.pseudoElement}`);
 
-    const sources = await sourcesByIdCache.readAsync(replayClient);
-    cachePauseData(replayClient, sources, pauseId, data);
+    const { value: { idToSource } = {} } = await sourcesCache.readAsync(replayClient);
+    assert(idToSource != null);
+
+    cachePauseData(replayClient, idToSource, pauseId, data);
 
     const stylePromises: Promise<ProtocolObject>[] = [];
 

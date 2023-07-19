@@ -5,13 +5,7 @@ import {
   SourceKind as ProtocolSourceKind,
   SourceId,
 } from "@replayio/protocol";
-import {
-  Cache,
-  StreamingCache,
-  StreamingValue,
-  createSingleEntryCache,
-  createStreamingCache,
-} from "suspense";
+import { StreamingCache, StreamingValue, createStreamingCache } from "suspense";
 
 import { ArrayMap, assert } from "protocol/utils";
 import { ReplayClientInterface } from "shared/client/types";
@@ -21,6 +15,7 @@ export type ProtocolSourceContents = {
   contentType: ProtocolContentType;
 };
 
+// TODO Move this to "replay-next/src/types"
 export interface Source {
   //TODO [FE-1493] remove this duplicate ID once the Source migration is done
   id: ProtocolSourceId;
@@ -39,88 +34,108 @@ export interface Source {
   prettyPrintedFrom?: ProtocolSourceId;
 }
 
-export const sourcesCache: Cache<[client: ReplayClientInterface], Source[]> =
-  createSingleEntryCache({
-    debugLabel: "Sources",
-    load: async ([client]) => {
-      const protocolSources = await client.findSources();
-      return processSources(protocolSources);
-    },
-  });
-
-// sources with the same key will be grouped as corresponding sources
-const keyForSource = (source: ProtocolSource, sources: Map<ProtocolSourceId, ProtocolSource>) => {
-  const { sourceId, kind, url, generatedSourceIds } = source;
-
-  let contentHash = source.contentHash;
-  if (kind === "prettyPrinted") {
-    assert(
-      generatedSourceIds?.length === 1,
-      `pretty-printed source ${sourceId} should have exactly one generated source`
-    );
-    const minifiedSource = sources.get(generatedSourceIds[0]);
-    assert(minifiedSource, `couldn't find minified source for ${sourceId}`);
-    contentHash = minifiedSource.contentHash;
-  }
-  assert(contentHash, `couldn't determine contentHash for ${sourceId}`);
-
-  return `${kind}:${url}:${contentHash}`;
+export type SourcesCacheValue = {
+  idToSource: Map<SourceId, Source>;
+  sources: Source[];
+  urlToSources: Map<string, Source[]>;
 };
 
-function processSources(protocolSources: ProtocolSource[]): Source[] {
-  const protocolSourcesById = new Map<ProtocolSourceId, ProtocolSource>(
-    protocolSources.map(source => [source.sourceId, source])
-  );
-  const corresponding = new ArrayMap<string, ProtocolSourceId>();
-  // the ProtocolSource objects link original to generated sources, here we collect the links in the other direction
-  const original = new ArrayMap<ProtocolSourceId, ProtocolSourceId>();
-  // same as above, but only for the links from pretty-printed to minified sources
-  const prettyPrinted = new Map<ProtocolSourceId, ProtocolSourceId>();
+export const sourcesCache = createStreamingCache<
+  [client: ReplayClientInterface],
+  SourcesCacheValue
+>({
+  debugLabel: "StreamingSourceContents",
+  getKey: () => "sources",
+  load: async ({ update, reject, resolve }, client) => {
+    try {
+      const idToSource: Map<SourceId, Source> = new Map();
+      const sources: Source[] = [];
+      const urlToSources: Map<string, Source[]> = new Map();
 
-  const urlToFirstSource: Map<ProtocolSourceId, ProtocolSource> = new Map();
-  const urlsThatChange: Set<ProtocolSourceId> = new Set();
+      const mapSource = createSourceMapper();
 
-  protocolSources.forEach(source => {
-    const { contentId, generatedSourceIds, kind, sourceId, url } = source;
-    const key = keyForSource(source, protocolSourcesById);
+      await client.findSources((newSources: ProtocolSource[]) => {
+        newSources.forEach(newSource => {
+          const source = mapSource(newSource);
+          sources.push(source);
 
-    corresponding.add(key, sourceId);
+          idToSource.set(source.sourceId, source);
 
-    for (const generatedSourceId of generatedSourceIds || []) {
-      original.add(generatedSourceId, sourceId);
+          if (source.url) {
+            const sourceArray = urlToSources.get(source.url);
+            if (sourceArray) {
+              sourceArray.push(source);
+            } else {
+              urlToSources.set(source.url, [source]);
+            }
+          }
+        });
+
+        update({ idToSource, sources, urlToSources });
+
+        return true;
+      });
+
+      resolve();
+    } catch (error) {
+      reject(error);
     }
+  },
+});
+
+function createSourceMapper(): (protocolSource: ProtocolSource) => Source {
+  const idToProtocolSourceMap = new Map<ProtocolSourceId, ProtocolSource>();
+  const keyToCorrespondingSourceIdsMap = new ArrayMap<string, ProtocolSourceId>();
+  // The ProtocolSource links original source to generated sources; this map tracks the reverse
+  const generatedIdToOriginalIdMap = new ArrayMap<ProtocolSourceId, ProtocolSourceId>();
+  const generatedIdToPrettyPrintedIdMap = new Map<ProtocolSourceId, ProtocolSourceId>();
+  const urlToFirstProtocolSourceMap: Map<ProtocolSourceId, ProtocolSource> = new Map();
+  const urlsThatChangeSet: Set<ProtocolSourceId> = new Set();
+
+  return function mapSource(protocolSource: ProtocolSource): Source {
+    let { contentHash, contentId, generatedSourceIds, kind, sourceId, url } = protocolSource;
 
     if (kind === "prettyPrinted") {
       assert(
         generatedSourceIds?.length === 1,
-        "a pretty-printed source should have exactly one generated source"
+        `pretty-printed source ${sourceId} should have exactly one generated source`
       );
-      prettyPrinted.set(generatedSourceIds[0], sourceId);
+
+      const minifiedSource = idToProtocolSourceMap.get(generatedSourceIds[0]);
+      assert(minifiedSource, `couldn't find minified source for ${sourceId}`);
+      contentHash = minifiedSource.contentHash;
+
+      generatedIdToPrettyPrintedIdMap.set(generatedSourceIds[0], sourceId);
+    }
+    assert(contentHash, `couldn't determine contentHash for ${sourceId}`);
+
+    // Sources with the same key should be grouped as corresponding sources
+    const key = `${kind}:${url}:${contentHash}`;
+
+    keyToCorrespondingSourceIdsMap.add(key, sourceId);
+
+    for (const generatedSourceId of generatedSourceIds || []) {
+      generatedIdToOriginalIdMap.add(generatedSourceId, sourceId);
     }
 
     if (url) {
-      if (urlToFirstSource.has(url)) {
-        const firstSource = urlToFirstSource.get(url)!;
+      if (urlToFirstProtocolSourceMap.has(url)) {
+        const firstSource = urlToFirstProtocolSourceMap.get(url)!;
         const { contentId: prevContentId, kind: prevKind } = firstSource;
         if (kind === prevKind && contentId !== prevContentId) {
-          urlsThatChange.add(url);
+          urlsThatChangeSet.add(url);
         }
       } else {
-        urlToFirstSource.set(url, source);
+        urlToFirstProtocolSourceMap.set(url, protocolSource);
       }
     }
-  });
 
-  const urlToIndex: Map<string, number> = new Map();
-
-  return protocolSources.map(source => {
-    const { contentId, generatedSourceIds, kind, sourceId, url } = source;
-    const key = keyForSource(source, protocolSourcesById);
+    const urlToIndex: Map<string, number> = new Map();
 
     let contentIdIndex = 0;
     let doesContentIdChange = false;
     if (url) {
-      doesContentIdChange = urlsThatChange.has(url);
+      doesContentIdChange = urlsThatChangeSet.has(url);
 
       const index = urlToIndex.get(url) || 0;
       contentIdIndex = index;
@@ -129,10 +144,10 @@ function processSources(protocolSources: ProtocolSource[]): Source[] {
 
     const isSourceMapped =
       kind === "prettyPrinted"
-        ? protocolSourcesById.get(generatedSourceIds![0])!.kind === "sourceMapped"
-        : source.kind === "sourceMapped";
+        ? idToProtocolSourceMap.get(generatedSourceIds![0])!.kind === "sourceMapped"
+        : kind === "sourceMapped";
 
-    return {
+    const source: Source = {
       id: sourceId,
       sourceId,
       kind,
@@ -141,50 +156,16 @@ function processSources(protocolSources: ProtocolSource[]): Source[] {
       contentIdIndex,
       doesContentIdChange,
       isSourceMapped,
-      correspondingSourceIds: corresponding.map.get(key)!,
+      correspondingSourceIds: keyToCorrespondingSourceIdsMap.map.get(key)!,
       generated: generatedSourceIds ?? [],
-      generatedFrom: original.map.get(sourceId) ?? [],
-      prettyPrinted: prettyPrinted.get(sourceId),
-      prettyPrintedFrom: source.kind === "prettyPrinted" ? generatedSourceIds![0] : undefined,
+      generatedFrom: generatedIdToOriginalIdMap.map.get(sourceId) ?? [],
+      prettyPrinted: generatedIdToPrettyPrintedIdMap.get(sourceId),
+      prettyPrintedFrom: kind === "prettyPrinted" ? generatedSourceIds![0] : undefined,
     };
-  });
+
+    return source;
+  };
 }
-
-export const sourcesByUrlCache: Cache<
-  [client: ReplayClientInterface],
-  Map<string, Source[]>
-> = createSingleEntryCache({
-  debugLabel: "SourcesByUrl",
-  load: async ([client]) => {
-    const sources = await sourcesCache.readAsync(client);
-
-    const sourcesByUrl = new Map<string, Source[]>();
-
-    for (let source of sources) {
-      if (!source.url) {
-        continue;
-      }
-
-      if (!sourcesByUrl.has(source.url)) {
-        sourcesByUrl.set(source.url, []);
-      }
-      sourcesByUrl.get(source.url)!.push(source);
-    }
-
-    return sourcesByUrl;
-  },
-});
-
-export const sourcesByIdCache = createSingleEntryCache<
-  [client: ReplayClientInterface],
-  Map<SourceId, Source>
->({
-  debugLabel: "SourcesById",
-  load: async ([client]) => {
-    const sources = await sourcesCache.readAsync(client);
-    return new Map(sources.map(source => [source.sourceId, source]));
-  },
-});
 
 type StreamingSourceContentsParams = [client: ReplayClientInterface, sourceId: ProtocolSourceId];
 type StreamingSourceContentsData = {
@@ -233,24 +214,3 @@ export const streamingSourceContentsCache = createStreamingCache<
     }
   },
 });
-
-export async function getSourceAsync(
-  client: ReplayClientInterface,
-  sourceId: ProtocolSourceId
-): Promise<Source | null> {
-  const sources = await sourcesByIdCache.readAsync(client);
-  return sources.get(sourceId) ?? null;
-}
-
-export function getSourceIfCached(sourceId: ProtocolSourceId): Source | null {
-  const sources = sourcesByIdCache.getValueIfCached(null as any);
-  return sources?.get(sourceId) ?? null;
-}
-
-export function getSourceSuspends(
-  client: ReplayClientInterface,
-  sourceId: ProtocolSourceId
-): Source | null {
-  const sources = sourcesByIdCache.read(client);
-  return sources.get(sourceId) ?? null;
-}

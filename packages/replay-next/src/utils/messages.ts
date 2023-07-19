@@ -1,5 +1,7 @@
+import { SourceId } from "@replayio/protocol";
+
 import { ProtocolMessage } from "replay-next/components/console/LoggablesContext";
-import { getSourceIfCached } from "replay-next/src/suspense/SourcesCache";
+import { Source } from "replay-next/src/suspense/SourcesCache";
 
 // Messages with pages that match this expression are internal Firefox errors and we should not display them.
 const FIREFOX_INTERNAL_REGEX = /resource:\/\/\/modules\/\S+\.jsm/;
@@ -10,7 +12,10 @@ export function isFirefoxInternalMessage(message: ProtocolMessage): boolean {
 
 const messageToNodeModuleCache: WeakMap<ProtocolMessage, boolean> = new WeakMap();
 
-export function isInNodeModules(message: ProtocolMessage): boolean {
+export function isInNodeModules(
+  message: ProtocolMessage,
+  idToSourceMap: Map<SourceId, Source>
+): boolean {
   if (messageToNodeModuleCache.has(message)) {
     return messageToNodeModuleCache.get(message)!;
   } else {
@@ -22,7 +27,7 @@ export function isInNodeModules(message: ProtocolMessage): boolean {
     let returnValue = false;
     if (topFrame) {
       const sourceId = topFrame.location?.[0].sourceId;
-      const source = sourceId ? getSourceIfCached(sourceId) : null;
+      const source = idToSourceMap.get(sourceId);
       if (source) {
         returnValue = !!(source.url?.includes("node_modules") || source.url?.includes("unpkg.com"));
 

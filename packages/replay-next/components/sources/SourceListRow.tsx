@@ -446,7 +446,7 @@ const SourceListRow = memo(
               lineNumber={lineNumber}
               plainText={plainText}
               showColumnBreakpoints={showColumnBreakpoints && pointsForLine.length > 0}
-              sourceId={sourceId}
+              source={source}
             />
 
             {lineSegments}
@@ -482,7 +482,7 @@ const SourceListRow = memo(
           )}
         </div>
 
-        <CurrentLineHighlight lineNumber={lineNumber} sourceId={sourceId} />
+        <CurrentLineHighlight lineNumber={lineNumber} source={source} />
 
         {contextMenu}
       </div>

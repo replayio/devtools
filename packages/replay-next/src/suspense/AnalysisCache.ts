@@ -1,5 +1,12 @@
-import { ExecutionPoint, PauseId, PointDescription, TimeStampedPoint } from "@replayio/protocol";
-import { PointSelector, Value } from "@replayio/protocol";
+import assert from "assert";
+import {
+  ExecutionPoint,
+  PauseId,
+  PointDescription,
+  PointSelector,
+  TimeStampedPoint,
+  Value,
+} from "@replayio/protocol";
 import { ExternallyManagedCache, IntervalCache, createExternallyManagedCache } from "suspense";
 
 import { MAX_POINTS_TO_RUN_EVALUATION } from "shared/client/ReplayClient";
@@ -9,7 +16,7 @@ import { ProtocolError, commandError, isCommandError } from "shared/utils/error"
 import { createFocusIntervalCacheForExecutionPoints } from "./FocusIntervalCache";
 import { objectPropertyCache } from "./ObjectPreviews";
 import { cachePauseData, setPointAndTimeForPauseId } from "./PauseCache";
-import { sourcesByIdCache } from "./SourcesCache";
+import { sourcesCache } from "./SourcesCache";
 
 export interface AnalysisParams {
   selector: PointSelector;
@@ -83,7 +90,9 @@ export function createAnalysisCache<
       }
 
       const evaluationParams = await createEvaluationParams(client, points, ...params);
-      const sources = await sourcesByIdCache.readAsync(client);
+
+      const { value: { idToSource } = {} } = await sourcesCache.readAsync(client);
+      assert(idToSource != null);
 
       client
         .runEvaluation(
@@ -97,7 +106,7 @@ export function createAnalysisCache<
           async results => {
             for (const result of results) {
               setPointAndTimeForPauseId(result.pauseId, result.point);
-              cachePauseData(client, sources, result.pauseId, result.data);
+              cachePauseData(client, idToSource, result.pauseId, result.data);
 
               let values: Value[] = [];
               if (result.exception) {

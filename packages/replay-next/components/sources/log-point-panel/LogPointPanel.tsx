@@ -24,9 +24,9 @@ import { PointsContext } from "replay-next/src/contexts/points/PointsContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { useNag } from "replay-next/src/hooks/useNag";
+import { useStreamingSources } from "replay-next/src/hooks/useStreamingSources";
 import useSuspendAfterMount from "replay-next/src/hooks/useSuspendAfterMount";
 import { hitPointsForLocationCache } from "replay-next/src/suspense/HitPointsCache";
-import { getSourceSuspends } from "replay-next/src/suspense/SourcesCache";
 import { findIndexBigInt } from "replay-next/src/utils/array";
 import { validate } from "replay-next/src/utils/points";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -168,13 +168,15 @@ function PointPanelWithHitPoints({
   const executionPoint = closestHitPoint ? closestHitPoint.point : currentExecutionPoint;
   const time = closestHitPoint ? closestHitPoint.time : currentTime;
 
-  let source = getSourceSuspends(client, location.sourceId);
+  const { idToSource } = useStreamingSources();
+
+  let source = idToSource.get(location.sourceId);
   if (source?.kind === "prettyPrinted") {
     assert(
       source.generated.length > 0,
       `pretty-printed source ${location.sourceId} has no generatedSourceIds`
     );
-    source = getSourceSuspends(client, source.generated[0]);
+    source = idToSource.get(source.generated[0]);
   }
   const context =
     source?.kind === "sourceMapped" ? "logpoint-original-source" : "logpoint-generated-source";

@@ -186,7 +186,7 @@ export interface ReplayClientInterface {
   findStepOutTarget(point: ExecutionPoint): Promise<PauseDescription>;
   findStepOverTarget(point: ExecutionPoint): Promise<PauseDescription>;
   findReverseStepOverTarget(point: ExecutionPoint): Promise<PauseDescription>;
-  findSources(): Promise<Source[]>;
+  findSources(onSources: (sources: Source[]) => void): Promise<Source[]>;
   getAllEventHandlerCounts(range: PointRange | null): Promise<Record<string, number>>;
   getAllFrames(pauseId: PauseId): Promise<getAllFramesResult>;
   getAnnotationKinds(): Promise<string[]>;

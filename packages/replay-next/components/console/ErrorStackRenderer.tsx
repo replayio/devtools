@@ -5,10 +5,10 @@ import { ReactNode, Suspense, useContext } from "react";
 import { assert } from "protocol/utils";
 import Loader from "replay-next/components/Loader";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
+import { useStreamingSources } from "replay-next/src/hooks/useStreamingSources";
 import { mappedLocationCache } from "replay-next/src/suspense/MappedLocationCache";
 import { objectPropertyCache } from "replay-next/src/suspense/ObjectPreviews";
 import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
-import { sourcesByIdCache, sourcesByUrlCache } from "replay-next/src/suspense/SourcesCache";
 import { findFunctionNameForLocation, isSourceMappedSource } from "replay-next/src/utils/source";
 import { getPreferredLocationWorkaround } from "replay-next/src/utils/sources";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -59,16 +59,16 @@ function ErrorStackRendererSuspends({
 
 function ErrorFrameRendererSuspends({ frame }: { frame: StackFrame }) {
   const { lineNumber, columnNumber, fileName } = frame;
-  const client = useContext(ReplayClientContext);
+  const replayClient = useContext(ReplayClientContext);
   const { preferredGeneratedSourceIds } = useContext(SourcesContext);
 
-  const sourcesByUrl = sourcesByUrlCache.read(client);
-  let sources = fileName ? sourcesByUrl.get(fileName) || [] : [];
+  const { idToSource, urlToSources } = useStreamingSources();
+
+  let sources = fileName ? urlToSources.get(fileName) || [] : [];
   // Ignore original and pretty-printed sources because we're looking
   // for a source that the browser actually executed
   sources = sources.filter(source => !source.generated.length);
 
-  const sourcesById = sourcesByIdCache.read(client);
   let originalFunctionName: string | undefined = undefined;
   let renderedSource: ReactNode;
   if (sources.length >= 1 && lineNumber !== undefined && columnNumber !== undefined) {
@@ -77,14 +77,14 @@ function ErrorFrameRendererSuspends({ frame }: { frame: StackFrame }) {
       line: lineNumber,
       column: columnNumber,
     };
-    const mappedLocation = mappedLocationCache.read(client, location);
+    const mappedLocation = mappedLocationCache.read(replayClient, location);
     const preferredLocation = getPreferredLocationWorkaround(
-      sourcesById,
+      idToSource,
       preferredGeneratedSourceIds,
       mappedLocation
     );
-    if (preferredLocation && isSourceMappedSource(preferredLocation.sourceId, sourcesById)) {
-      const sourceOutline = sourceOutlineCache.read(client, preferredLocation.sourceId);
+    if (preferredLocation && isSourceMappedSource(preferredLocation.sourceId, idToSource)) {
+      const sourceOutline = sourceOutlineCache.read(replayClient, preferredLocation.sourceId);
       originalFunctionName = findFunctionNameForLocation(preferredLocation, sourceOutline);
     }
     renderedSource = <Source className={styles.Source} locations={mappedLocation} />;

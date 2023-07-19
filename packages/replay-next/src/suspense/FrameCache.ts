@@ -2,10 +2,10 @@ import { Frame, FrameId, PauseId } from "@replayio/protocol";
 import { Cache, createCache } from "suspense";
 
 import { assert } from "protocol/utils";
+import { sourcesCache } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientInterface } from "shared/client/types";
 
 import { cachePauseData, sortFramesAndUpdateLocations } from "./PauseCache";
-import { sourcesByIdCache } from "./SourcesCache";
 
 export const framesCache: Cache<
   [replayClient: ReplayClientInterface, pauseId: PauseId],
@@ -16,10 +16,15 @@ export const framesCache: Cache<
   getKey: ([client, pauseId]) => pauseId,
   load: async ([client, pauseId]) => {
     const framesResult = await client.getAllFrames(pauseId);
-    const sources = await sourcesByIdCache.readAsync(client);
-    cachePauseData(client, sources, pauseId, framesResult.data, framesResult.frames);
+
+    const { value: { idToSource } = {} } = await sourcesCache.readAsync(client);
+    assert(idToSource != null);
+
+    cachePauseData(client, idToSource, pauseId, framesResult.data, framesResult.frames);
+
     const cached = framesCache.getValueIfCached(client, pauseId);
     assert(cached, `Frames for pause ${pauseId} not found in cache`);
+
     return cached;
   },
 });
@@ -56,15 +61,21 @@ export const topFrameCache: Cache<
     if (frameId === undefined) {
       return;
     }
-    const sources = await sourcesByIdCache.readAsync(client);
+
+    const { value: { idToSource } = {} } = await sourcesCache.readAsync(client);
+    assert(idToSource != null);
+
     // We _don't_ want to pass in a `stack` arg here. That will result in this frame
     // being added to the "all frames cache" as the cached value for this pause ID.
     // If someone asks for _all_ frames for the pause later, that would prevent the
     // full list of frames from being fetched.
-    cachePauseData(client, sources, pauseId, framesResult.data);
-    const updatedFrames = sortFramesAndUpdateLocations(sources, framesResult.data?.frames ?? [], [
-      frameId,
-    ]);
+    cachePauseData(client, idToSource, pauseId, framesResult.data);
+
+    const updatedFrames = sortFramesAndUpdateLocations(
+      idToSource,
+      framesResult.data?.frames ?? [],
+      [frameId]
+    );
 
     // Instead, we'll update the locations in this frame ourselves.
     const topFrame = updatedFrames?.find(frame => frame.frameId === frameId);

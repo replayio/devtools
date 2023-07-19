@@ -20,7 +20,7 @@ import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { useNag } from "replay-next/src/hooks/useNag";
-import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
+import { useStreamingSources } from "replay-next/src/hooks/useStreamingSources";
 import { getPreferredLocationWorkaround } from "replay-next/src/utils/sources";
 import { isExecutionPointsGreaterThan } from "replay-next/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -59,11 +59,10 @@ export default function MessageHoverButton({
   const client = useContext(ReplayClientContext);
   const { preferredGeneratedSourceIds } = useContext(SourcesContext);
 
-  const sourcesById = sourcesByIdCache.getValueIfCached(client);
-  const location =
-    locations && sourcesById
-      ? getPreferredLocationWorkaround(sourcesById, preferredGeneratedSourceIds, locations)
-      : null;
+  const { idToSource } = useStreamingSources();
+  const location = locations
+    ? getPreferredLocationWorkaround(idToSource, preferredGeneratedSourceIds, locations)
+    : null;
 
   let button = null;
   if (isCurrentlyPausedAt) {

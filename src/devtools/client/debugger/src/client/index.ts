@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
+import assert from "assert";
 import { Frame } from "@replayio/protocol";
 
 import type { ThreadFront as TF } from "protocol/thread";
@@ -15,7 +16,8 @@ import { paused, resumed } from "../actions/pause";
 let store: UIStore;
 
 async function setupDebugger(ThreadFront: typeof TF, replayClient: ReplayClientInterface) {
-  const sources = await sourcesCache.readAsync(replayClient);
+  const { value: { sources } = {} } = await sourcesCache.readAsync(replayClient);
+  assert(sources);
 
   store.dispatch(allSourcesReceived(sources));
 }

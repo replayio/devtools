@@ -1,3 +1,4 @@
+import assert from "assert";
 import { Location, SearchSourceContentsMatch, SourceId } from "@replayio/protocol";
 import { Cache, createCache } from "suspense";
 
@@ -10,8 +11,7 @@ import {
 } from "replay-next/src/utils/source";
 import { ReplayClientInterface } from "shared/client/types";
 
-import { getCorrespondingSourceIds } from "../utils/sources";
-import { sourcesByIdCache } from "./SourcesCache";
+import { sourcesCache } from "./SourcesCache";
 
 // TODO Create a generic cache variant that
 // (1) supports streaming data and
@@ -137,12 +137,13 @@ async function initializeSourceIds(client: ReplayClientInterface) {
   sourceIdsWithNodeModules = [];
   sourceIdsWithoutNodeModules = [];
 
-  const sources = await sourcesByIdCache.readAsync(client);
+  const { value: { idToSource } = {} } = await sourcesCache.readAsync(client);
+  assert(idToSource != null);
 
   // Insert sources in order so that original sources are first.
   const compareSources = (a: SourceId, b: SourceId) => {
-    const aIsOriginal = isSourceMappedSource(a, sources);
-    const bIsOriginal = isSourceMappedSource(b, sources);
+    const aIsOriginal = isSourceMappedSource(a, idToSource);
+    const bIsOriginal = isSourceMappedSource(b, idToSource);
     if (aIsOriginal === bIsOriginal) {
       return 0;
     } else if (aIsOriginal) {
@@ -153,20 +154,20 @@ async function initializeSourceIds(client: ReplayClientInterface) {
   };
 
   const minifiedSources = new Set<SourceId>();
-  sources.forEach(source => {
+  idToSource.forEach(source => {
     if (source.kind === "prettyPrinted" && source.generated.length) {
       minifiedSources.add(source.generated[0]);
     }
   });
 
-  sources.forEach(source => {
+  idToSource.forEach(source => {
     const sourceId = source.sourceId;
 
     if (minifiedSources.has(sourceId)) {
       return;
     }
 
-    const correspondingSourceId = getCorrespondingSourceIds(sources, source.sourceId)[0];
+    const correspondingSourceId = source.correspondingSourceIds[0];
     if (correspondingSourceId !== sourceId) {
       return;
     }

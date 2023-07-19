@@ -8,24 +8,16 @@ export function shouldSourceBeDisplayed(source: Source): boolean {
   return source.kind !== "inlineScript";
 }
 
-export function getCorrespondingSourceIds(
-  sourcesById: Map<SourceId, Source>,
-  sourceId: SourceId
-): SourceId[] {
-  const source = sourcesById.get(sourceId);
-  // TODO [hbenl] disabled for now because the sources we receive from the backend
-  // are incomplete for node recordings, see RUN-508
-  // assert(source, `unknown source ${id}`);
-  return source?.correspondingSourceIds ?? [sourceId];
-}
-
 export function getCorrespondingLocations(
   sourcesById: Map<SourceId, Source>,
   location: Location
 ): Location[] {
   const { column, line, sourceId } = location;
-  const sourceIds = getCorrespondingSourceIds(sourcesById, sourceId);
-  return sourceIds.map(sourceId => ({
+
+  const source = sourcesById.get(sourceId);
+  assert(source);
+
+  return source.correspondingSourceIds.map(sourceId => ({
     column,
     line,
     sourceId,
@@ -121,7 +113,7 @@ export function getPreferredLocationWorkaround(
   // subsequently complains about
   const correspondingLocations = locations.map(location => ({
     ...location,
-    sourceId: getCorrespondingSourceIds(sourcesById, location.sourceId)[0],
+    sourceId: sourcesById.get(location.sourceId)!.correspondingSourceIds[0],
   }));
   return getPreferredLocation(sourcesById, preferredGeneratedSourceIds, correspondingLocations);
 }

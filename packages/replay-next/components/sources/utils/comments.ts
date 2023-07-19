@@ -1,7 +1,7 @@
 import { SourceId } from "@replayio/protocol";
 
 import { assert } from "protocol/utils";
-import { getSourceAsync } from "replay-next/src/suspense/SourcesCache";
+import { sourcesCache } from "replay-next/src/suspense/SourcesCache";
 import { streamingSyntaxParsingCache } from "replay-next/src/suspense/SyntaxParsingCache";
 import { getBase64Png } from "replay-next/src/utils/canvas";
 import { getSourceFileName } from "replay-next/src/utils/source";
@@ -80,7 +80,10 @@ export async function createTypeDataForSourceCodeComment(
   let parsedTokens: ParsedToken[] | null = null;
   let plainText: string | null = null;
 
-  const source = await getSourceAsync(replayClient, sourceId);
+  const { value: { idToSource } = {} } = await sourcesCache.readAsync(replayClient);
+  assert(idToSource);
+
+  const source = idToSource.get(sourceId);
   const sourceUrl = source?.url ?? null;
   const fileName = source ? getSourceFileName(source) : null;
 

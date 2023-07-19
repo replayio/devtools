@@ -1,12 +1,10 @@
-import { Frame, SourceId } from "@replayio/protocol";
+import assert from "assert";
+import { Frame } from "@replayio/protocol";
 import { ReactNode, Suspense, memo, useContext } from "react";
 
 import { framesCache, topFrameCache } from "replay-next/src/suspense/FrameCache";
-import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
-import {
-  getCorrespondingLocations,
-  getCorrespondingSourceIds,
-} from "replay-next/src/utils/sources";
+import { Source, sourcesCache } from "replay-next/src/suspense/SourcesCache";
+import { getCorrespondingLocations } from "replay-next/src/utils/sources";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import { SelectedFrameContext } from "../../src/contexts/SelectedFrameContext";
@@ -17,7 +15,7 @@ type Props = {
   lineNumber: number;
   plainText: string | null;
   showColumnBreakpoints: boolean;
-  sourceId: SourceId;
+  source: Source;
 };
 
 export default memo(function CurrentColumnHighlight(props: Props) {
@@ -33,7 +31,7 @@ function CurrentColumnHighlightSuspends({
   lineNumber,
   plainText,
   showColumnBreakpoints,
-  sourceId,
+  source,
 }: Props) {
   const client = useContext(ReplayClientContext);
   const { selectedPauseAndFrameId } = useContext(SelectedFrameContext);
@@ -60,19 +58,19 @@ function CurrentColumnHighlightSuspends({
         selectedFrame = allFrames?.find(frame => frame.frameId === frameId);
       }
 
-      const sources = sourcesByIdCache.read(client);
-      const correspondingSourceIds = getCorrespondingSourceIds(sources, sourceId);
+      const { value: { idToSource } = {} } = sourcesCache.read(client);
+      assert(idToSource != null);
 
       // Assuming we found a frame, check to see if there's a matching location for the frame.
       // If so, we should show the highlight line.
       const match = selectedFrame?.location.find(location => {
-        if (correspondingSourceIds.includes(location.sourceId)) {
-          const correspondingLocations = getCorrespondingLocations(sources, location);
+        if (source.correspondingSourceIds.includes(location.sourceId)) {
+          const correspondingLocations = getCorrespondingLocations(idToSource, location);
           return (
             correspondingLocations.findIndex(
               correspondingLocation =>
                 correspondingLocation.line === lineNumber &&
-                correspondingLocation.sourceId === sourceId
+                correspondingLocation.sourceId === source.id
             ) >= 0
           );
         }

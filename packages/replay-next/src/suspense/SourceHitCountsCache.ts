@@ -1,14 +1,15 @@
+import assert from "assert";
 import { PointRange, SourceId, TimeStampedPointRange } from "@replayio/protocol";
 
 import { binarySearch } from "protocol/utils";
+import { replayClient } from "shared/client/ReplayClientContext";
 import { LineHitCounts, LineNumberToHitCountMap, ReplayClientInterface } from "shared/client/types";
 import { ProtocolError, isCommandError } from "shared/utils/error";
 import { toPointRange } from "shared/utils/time";
 
-import { getCorrespondingSourceIds } from "../utils/sources";
 import { breakpointPositionsCache } from "./BreakpointPositionsCache";
 import { createFocusIntervalCache } from "./FocusIntervalCache";
-import { sourcesByIdCache } from "./SourcesCache";
+import { sourcesCache } from "./SourcesCache";
 
 type MinMaxHitCountTuple = [minHitCount: number, maxHitCount: number];
 
@@ -52,13 +53,17 @@ export const sourceHitCountsCache = createFocusIntervalCache<
         ...location,
         columns: location.columns.slice(0, 1),
       }));
-      const sources = await sourcesByIdCache.readAsync(client);
-      const correspondingSourceIds = getCorrespondingSourceIds(sources, sourceId);
+
+      const { value: { idToSource } = {} } = await sourcesCache.readAsync(replayClient);
+      assert(idToSource != null);
+
+      const source = idToSource.get(sourceId);
+      assert(source != null);
 
       const hitCounts: LineNumberToHitCountMap = new Map();
 
       await Promise.all(
-        correspondingSourceIds.map(async sourceId => {
+        source.correspondingSourceIds.map(async sourceId => {
           const protocolHitCounts = await client.getSourceHitCounts(
             sourceId,
             firstColumnLocations,

@@ -1,3 +1,4 @@
+import assert from "assert";
 import { KeyboardEvent, useContext, useEffect, useLayoutEffect, useRef } from "react";
 
 import LazyOffscreen from "replay-next/components/LazyOffscreen";
@@ -10,7 +11,7 @@ import {
 } from "replay-next/components/sources/SourceSearchContext";
 import { KeyboardModifiersContextRoot } from "replay-next/src/contexts/KeyboardModifiersContext";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
-import { getSourceSuspends } from "replay-next/src/suspense/SourcesCache";
+import { useStreamingSources } from "replay-next/src/hooks/useStreamingSources";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { getSelectedLocation, getSelectedLocationHasScrolled } from "ui/reducers/sources";
@@ -90,6 +91,8 @@ function NewSourceAdapter() {
     }
   }, [focusedSourceId]);
 
+  const { idToSource } = useStreamingSources();
+
   const onKeyDown = (event: KeyboardEvent) => {
     switch (event.key.toLowerCase()) {
       case "f": {
@@ -140,12 +143,20 @@ function NewSourceAdapter() {
     >
       <NewSourceNag />
       {openSourceIds.map(sourceId => {
-        const source = getSourceSuspends(replayClient, sourceId);
-        return (
-          <LazyOffscreen key={sourceId} mode={sourceId === focusedSourceId ? "visible" : "hidden"}>
-            <Source source={source!} showColumnBreakpoints={showColumnBreakpoints} />
-          </LazyOffscreen>
-        );
+        const source = idToSource.get(sourceId);
+
+        if (source == null) {
+          return null;
+        } else {
+          return (
+            <LazyOffscreen
+              key={sourceId}
+              mode={sourceId === focusedSourceId ? "visible" : "hidden"}
+            >
+              <Source source={source} showColumnBreakpoints={showColumnBreakpoints} />
+            </LazyOffscreen>
+          );
+        }
       })}
       {sourceSearchState.enabled && (
         <SourceSearch containerRef={containerRef} inputRef={sourceSearchInputRef} />

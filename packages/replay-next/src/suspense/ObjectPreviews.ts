@@ -15,7 +15,7 @@ import { assert } from "protocol/utils";
 import { ReplayClientInterface } from "../../../shared/client/types";
 import { Value as ClientValue, protocolValueToClientValue } from "../utils/protocol";
 import { cachePauseData } from "./PauseCache";
-import { sourcesByIdCache } from "./SourcesCache";
+import { sourcesCache } from "./SourcesCache";
 
 export const objectCache: Cache<
   [
@@ -32,8 +32,10 @@ export const objectCache: Cache<
   load: async ([client, pauseId, objectId, previewLevel]) => {
     const data = await client.getObjectWithPreview(objectId, pauseId, previewLevel);
 
-    const sources = await sourcesByIdCache.readAsync(client);
-    cachePauseData(client, sources, pauseId, data);
+    const { value: { idToSource } = {} } = await sourcesCache.readAsync(client);
+    assert(idToSource != null);
+
+    cachePauseData(client, idToSource, pauseId, data);
 
     // cachePauseData() calls preCacheObjects()
     // so the object should be in the cache now
@@ -74,8 +76,10 @@ export const objectPropertyCache: Cache<
 
     const { data, returned } = await client.getObjectProperty(objectId, pauseId, propertyName);
 
-    const sources = await sourcesByIdCache.readAsync(client);
-    cachePauseData(client, sources, pauseId, data);
+    const { value: { idToSource } = {} } = await sourcesCache.readAsync(client);
+    assert(idToSource != null);
+
+    cachePauseData(client, idToSource, pauseId, data);
 
     return returned ?? null;
   },

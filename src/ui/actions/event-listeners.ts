@@ -1,7 +1,9 @@
 // Routines for finding framework-specific event listeners within a pause.
 
+import assert from "assert";
+
 import { cachePauseData } from "replay-next/src/suspense/PauseCache";
-import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
+import { sourcesCache } from "replay-next/src/suspense/SourcesCache";
 import { getSourceDetailsEntities } from "ui/reducers/sources";
 
 import {
@@ -52,8 +54,9 @@ export function getNodeEventListeners(
       pauseId
     );
 
-    const sources = await sourcesByIdCache.readAsync(replayClient);
-    cachePauseData(replayClient, sources, pauseId, data);
+    const { value: { idToSource } = {} } = await sourcesCache.readAsync(replayClient);
+    assert(idToSource != null);
+    cachePauseData(replayClient, idToSource, pauseId, data);
 
     // Reformat those entries to add location/name/params data
     const initialEventListenerEntries = await Promise.all(

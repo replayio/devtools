@@ -460,7 +460,7 @@ export class ReplayClient implements ReplayClientInterface {
     return target;
   }
 
-  async findSources(): Promise<Source[]> {
+  async findSources(onSources: (sources: Source[]) => void): Promise<Source[]> {
     const sources: Source[] = [];
 
     await this.waitForSession();
@@ -474,6 +474,8 @@ export class ReplayClient implements ReplayClientInterface {
       for (const source of sourcesList) {
         sources.push(source);
       }
+
+      onSources(sourcesList);
     };
 
     client.Debugger.addNewSourceListener(newSourceListener);

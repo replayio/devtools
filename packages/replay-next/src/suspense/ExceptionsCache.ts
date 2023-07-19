@@ -1,3 +1,4 @@
+import assert from "assert";
 import { PauseId, PointDescription, PointSelector, Value } from "@replayio/protocol";
 import { createCache } from "suspense";
 
@@ -6,7 +7,7 @@ import { ReplayClientInterface } from "shared/client/types";
 import { createInfallibleSuspenseCache } from "../utils/suspense";
 import { createAnalysisCache } from "./AnalysisCache";
 import { cachePauseData } from "./PauseCache";
-import { sourcesByIdCache } from "./SourcesCache";
+import { sourcesCache } from "./SourcesCache";
 
 export type UncaughtException = PointDescription & {
   type: "UncaughtException";
@@ -39,8 +40,12 @@ export const exceptionValueCache = createCache<
   getKey: ([client, pauseId]) => pauseId,
   load: async ([client, pauseId]) => {
     const result = await client.getExceptionValue(pauseId);
-    const sources = await sourcesByIdCache.readAsync(client);
-    cachePauseData(client, sources, pauseId, result.data);
+
+    const { value: { idToSource } = {} } = await sourcesCache.readAsync(client);
+    assert(idToSource != null);
+
+    cachePauseData(client, idToSource, pauseId, result.data);
+
     return result.exception;
   },
 });

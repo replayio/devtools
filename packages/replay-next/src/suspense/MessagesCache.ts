@@ -1,3 +1,4 @@
+import assert from "assert";
 import { Message, PointRange } from "@replayio/protocol";
 import {
   IntervalCacheLoadOptions,
@@ -13,7 +14,7 @@ import {
 import type { ReplayClientInterface } from "shared/client/types";
 
 import { cachePauseData } from "./PauseCache";
-import { sourcesByIdCache } from "./SourcesCache";
+import { sourcesCache } from "./SourcesCache";
 
 export type CategoryCounts = {
   errors: number;
@@ -66,9 +67,11 @@ const findMessagesStreamingCache = createStreamingCache<
     let messages: Message[] = [];
 
     try {
-      const sources = await sourcesByIdCache.readAsync(client);
+      const { value: { idToSource } = {} } = await sourcesCache.readAsync(client);
+      assert(idToSource != null);
+
       const { overflow } = await client.findMessages(message => {
-        cachePauseData(client, sources, message.pauseId, message.data);
+        cachePauseData(client, idToSource, message.pauseId, message.data);
 
         if (signal.aborted) {
           return false;

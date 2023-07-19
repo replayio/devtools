@@ -1,3 +1,4 @@
+import assert from "assert";
 import { FrameId, PauseId } from "@replayio/protocol";
 
 import { ThreadFront } from "protocol/thread/thread";
@@ -5,7 +6,7 @@ import { ReplayClientInterface } from "shared/client/types";
 
 import { recordingCapabilitiesCache } from "../suspense/BuildIdCache";
 import { cachePauseData } from "../suspense/PauseCache";
-import { sourcesByIdCache } from "../suspense/SourcesCache";
+import { sourcesCache } from "../suspense/SourcesCache";
 
 export async function evaluate({
   replayClient,
@@ -30,8 +31,10 @@ export async function evaluate({
     frameId ?? null,
     abilities.supportsPureEvaluation && pure
   );
-  const sources = await sourcesByIdCache.readAsync(replayClient);
-  cachePauseData(replayClient, sources, pauseId, result.data);
+  const { value: { idToSource } = {} } = await sourcesCache.readAsync(replayClient);
+  assert(idToSource != null);
+
+  cachePauseData(replayClient, idToSource, pauseId, result.data);
 
   if (result.returned) {
     return { exception: null, returned: result.returned };

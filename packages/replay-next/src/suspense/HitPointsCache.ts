@@ -1,3 +1,4 @@
+import assert from "assert";
 import { Location, PointRange, TimeStampedPoint } from "@replayio/protocol";
 import { createCache } from "suspense";
 
@@ -15,7 +16,7 @@ import { getCorrespondingLocations } from "../utils/sources";
 import { createFocusIntervalCacheForExecutionPoints } from "./FocusIntervalCache";
 import { mappedExpressionCache } from "./MappedExpressionCache";
 import { cachePauseData, setPointAndTimeForPauseId } from "./PauseCache";
-import { sourcesByIdCache } from "./SourcesCache";
+import { sourcesCache } from "./SourcesCache";
 
 export const hitPointsCache = createFocusIntervalCacheForExecutionPoints<
   [replayClient: ReplayClientInterface, location: Location, condition: string | null],
@@ -26,8 +27,10 @@ export const hitPointsCache = createFocusIntervalCacheForExecutionPoints<
     `${location.sourceId}:${location.line}:${location.column}:${condition}`,
   getPointForValue: timeStampedPoint => timeStampedPoint.point,
   load: async (begin, end, replayClient, location, condition) => {
-    const sources = await sourcesByIdCache.readAsync(replayClient);
-    const locations = getCorrespondingLocations(sources, location);
+    const { value: { idToSource } = {} } = await sourcesCache.readAsync(replayClient);
+    assert(idToSource != null);
+
+    const locations = getCorrespondingLocations(idToSource, location);
     await Promise.all(
       locations.map(location => breakpointPositionsCache.readAsync(replayClient, location.sourceId))
     );
@@ -53,7 +56,7 @@ export const hitPointsCache = createFocusIntervalCacheForExecutionPoints<
         results => {
           for (const result of results) {
             setPointAndTimeForPauseId(result.pauseId, result.point);
-            cachePauseData(replayClient, sources, result.pauseId, result.data);
+            cachePauseData(replayClient, idToSource, result.pauseId, result.data);
           }
           hitPoints = hitPoints.concat(
             results.filter(result => result.returned?.value).map(result => result.point)
