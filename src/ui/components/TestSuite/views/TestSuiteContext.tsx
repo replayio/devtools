@@ -22,7 +22,7 @@ type TestSuiteContextType = {
 export const TestSuiteContext = createContext<TestSuiteContextType>(null as any);
 
 export function TestSuiteContextRoot({ children }: PropsWithChildren) {
-  const { updateForTimelineImprecise: zoom } = useContext(FocusContext);
+  const { update, updateForTimelineImprecise } = useContext(FocusContext);
   const { duration } = useContext(SessionContext);
   const { update: seekToTime } = useContext(TimelineContext);
 
@@ -31,29 +31,36 @@ export function TestSuiteContextRoot({ children }: PropsWithChildren) {
 
   const setTestRecordingWrapper = useCallback(
     async (testRecording: TestRecording | null) => {
+      console.log("setTestRecording()", testRecording);
       setTestRecording(testRecording);
 
       if (testRecording != null) {
         const { timeStampedPointRange } = testRecording;
 
         if (timeStampedPointRange !== null) {
-          await zoom([timeStampedPointRange.begin.time, timeStampedPointRange.end.time], {
-            bias: "begin",
-            debounce: false,
-            sync: true,
-          });
+          await update(
+            {
+              begin: timeStampedPointRange.begin,
+              end: timeStampedPointRange.end,
+            },
+            {
+              bias: "begin",
+              debounce: false,
+              sync: true,
+            }
+          );
 
           seekToTime(timeStampedPointRange.begin.time, timeStampedPointRange.begin.point, false);
         }
       } else {
-        await zoom([0, duration], {
+        await updateForTimelineImprecise([0, duration], {
           bias: "begin",
           debounce: false,
           sync: true,
         });
       }
     },
-    [duration, seekToTime, zoom]
+    [duration, seekToTime, update, updateForTimelineImprecise]
   );
 
   const value = useMemo(
