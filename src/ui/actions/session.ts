@@ -239,12 +239,7 @@ export function createSocket(
         recordingId,
         loadPoint,
         experimentalSettings,
-        focusWindowFromParams
-          ? {
-              begin: focusWindowFromParams.begin.time,
-              end: focusWindowFromParams.end.time,
-            }
-          : undefined,
+        focusWindowFromParams !== null ? focusWindowFromParams : undefined,
         {
           onEvent: (event: ProtocolEvent) => {
             if (userData.get("feature_logProtocolEvents")) {

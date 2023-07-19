@@ -1,6 +1,7 @@
 import classNames from "classnames";
 import React, { useEffect, useRef, useState } from "react";
 
+import { MAX_FOCUS_REGION_DURATION } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
 import { AppDispatch } from "ui/setup";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
@@ -50,6 +51,10 @@ function Focuser({ editMode, setEditMode, updateFocusWindowThrottled }: Props) {
     beginTime: focusWindow?.begin.time ?? zoomRegion.beginTime,
     endTime: focusWindow?.end.time ?? zoomRegion.endTime,
   });
+  const displayedFocusWindowRef = useRef(displayedFocusWindow);
+  useEffect(() => {
+    displayedFocusWindowRef.current = displayedFocusWindow;
+  });
 
   const containerRef = useRef<HTMLDivElement>(null);
   const draggableAreaRef = useRef<HTMLDivElement>(null);
@@ -95,8 +100,10 @@ function Focuser({ editMode, setEditMode, updateFocusWindowThrottled }: Props) {
           container.getBoundingClientRect(),
           zoomRegion
         );
-        const beginTime = focusWindow.begin.time;
-        const endTime = focusWindow.end.time;
+
+        const displayedFocusWindow = displayedFocusWindowRef.current;
+        let beginTime = displayedFocusWindow.beginTime;
+        let endTime = displayedFocusWindow.endTime;
 
         switch (editMode.type) {
           case "drag": {
@@ -118,10 +125,20 @@ function Focuser({ editMode, setEditMode, updateFocusWindowThrottled }: Props) {
             break;
           }
           case "resize-end": {
+            // If we're resizing the window, make sure we honor the max focus window size
+            if (mouseTime - beginTime > MAX_FOCUS_REGION_DURATION) {
+              beginTime = mouseTime - MAX_FOCUS_REGION_DURATION;
+            }
+
             updateDisplayedFocusWindow(beginTime, mouseTime);
             break;
           }
           case "resize-start": {
+            // If we're resizing the window, make sure we honor the max focus window size
+            if (endTime - mouseTime > MAX_FOCUS_REGION_DURATION) {
+              endTime = mouseTime + MAX_FOCUS_REGION_DURATION;
+            }
+
             updateDisplayedFocusWindow(mouseTime, endTime);
             break;
           }

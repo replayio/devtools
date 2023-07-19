@@ -1,7 +1,7 @@
 import React from "react";
 
 import { getFormattedTime } from "shared/utils/time";
-import { updateFocusWindow } from "ui/actions/timeline";
+import { setFocusWindowImprecise } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { getSecondsFromFormattedTime } from "ui/utils/timeline";
@@ -36,7 +36,7 @@ export default function FocusInputs() {
             newBeginTime <= focusWindow.end.time ? focusWindow.end.time : newBeginTime;
 
           await dispatch(
-            updateFocusWindow({
+            setFocusWindowImprecise({
               begin: newBeginTime,
               end: newEndTime,
             })
@@ -56,7 +56,7 @@ export default function FocusInputs() {
             newEndTime >= focusWindow.begin.time ? focusWindow.begin.time : newEndTime;
 
           await dispatch(
-            updateFocusWindow({
+            setFocusWindowImprecise({
               begin: newBeginTime,
               end: newEndTime,
             })

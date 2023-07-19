@@ -4,7 +4,7 @@ import {
   CommandResult,
   EventMethods,
   EventParams,
-  FocusWindowRequest as FocusWindow,
+  PointRangeFocusRequest as FocusWindow,
   PauseId,
   ProtocolClient,
   SessionId,
@@ -169,7 +169,7 @@ export async function createSession(
     recordingId,
     loadPoint: loadPoint || undefined,
     experimentalSettings,
-    focusWindow,
+    focusRequest: focusWindow,
   });
 
   setSessionCallbacks(sessionCallbacks);

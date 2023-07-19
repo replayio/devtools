@@ -5,7 +5,6 @@ import {
   Result as EvaluationResult,
   EventHandlerType,
   ExecutionPoint,
-  FocusWindowRequest,
   FrameId,
   FunctionMatch,
   HitCount,
@@ -24,6 +23,7 @@ import {
   PointDescription,
   PointLimits,
   PointRange,
+  PointRangeFocusRequest,
   PointSelector,
   getPointsBoundingTimeResult as PointsBoundingTime,
   RecordingId,
@@ -234,7 +234,7 @@ export interface ReplayClientInterface {
   hasAnnotationKind(kind: string): Promise<boolean>;
   initialize(recordingId: string, accessToken: string | null): Promise<SessionId>;
   mapExpressionToGeneratedScope(expression: string, location: Location): Promise<string>;
-  requestFocusWindow(range: FocusWindowRequest): Promise<TimeStampedPointRange>;
+  requestFocusWindow(params: PointRangeFocusRequest): Promise<TimeStampedPointRange>;
   getCurrentFocusWindow(): TimeStampedPointRange | null;
   removeEventListener(type: ReplayClientEvents, handler: Function): void;
   repaintGraphics(pauseId: PauseId): Promise<repaintGraphicsResult>;
