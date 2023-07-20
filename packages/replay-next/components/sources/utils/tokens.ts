@@ -21,6 +21,8 @@ export function isTokenInspectable(token: ParsedToken): boolean {
         case "variableName":
         case "variableName2":
           return true;
+        case "keyword":
+          return token.value === "this";
       }
       return false;
     })

@@ -116,4 +116,9 @@ describe("getExpressionForTokenElement", () => {
     expect(getExpressionHelper("const foo = b|ar(baz) || 0")).toBe("bar");
     expect(getExpressionHelper("const foo = bar(b|az) || 0")).toBe("baz");
   });
+
+  // FE-1735
+  it("should support instance properties", () => {
+    expect(getExpressionHelper("this.ar|ray")).toBe("this.array");
+  });
 });
