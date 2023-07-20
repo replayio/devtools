@@ -7,6 +7,8 @@
  * @module actions/sources
  */
 
+import { Location } from "@replayio/protocol";
+
 import { sourcesCache } from "replay-next/src/suspense/SourcesCache";
 import { UIThunkAction } from "ui/actions";
 import { setSelectedPanel, setViewMode } from "ui/actions/layout";
@@ -21,13 +23,14 @@ import {
   preferSource,
 } from "ui/reducers/sources";
 import { UIState } from "ui/state";
+import { getPauseFrameAsync } from "ui/suspense/frameCache";
 import { trackEvent } from "ui/utils/telemetry";
 
 import { Context } from "../../reducers/pause";
 import { getTabExists } from "../../reducers/tabs";
 import { closeActiveSearch } from "../../reducers/ui";
 import { setShownSource } from "../../reducers/ui";
-import { getActiveSearch, getContext, getThreadContext } from "../../selectors";
+import { getActiveSearch, getContext, getSelectedFrameId, getThreadContext } from "../../selectors";
 import { createLocation } from "../../utils/location";
 
 export type PartialLocation = Parameters<typeof createLocation>[0];
@@ -196,13 +199,29 @@ export function showAlternateSource(
   oldSourceId: string,
   newSourceId: string
 ): UIThunkAction<Promise<void>> {
-  return async (dispatch, getState) => {
+  return async (dispatch, getState, { replayClient }) => {
     const state = getState();
     if (getSourceDetails(state, oldSourceId)?.isSourceMapped) {
       dispatch(preferSource({ sourceId: newSourceId, preferred: true }));
     } else {
       dispatch(preferSource({ sourceId: oldSourceId, preferred: false }));
     }
-    await dispatch(selectSource(getContext(state), newSourceId));
+
+    let location: Location = {
+      sourceId: newSourceId,
+      line: 0,
+      column: 0,
+    };
+    const selectedFrameId = getSelectedFrameId(state);
+    if (selectedFrameId) {
+      const selectedFrame = await getPauseFrameAsync(replayClient, selectedFrameId, state.sources);
+      if (selectedFrame?.location.sourceId === newSourceId) {
+        location = selectedFrame.location;
+      } else if (selectedFrame?.alternateLocation?.sourceId === newSourceId) {
+        location = selectedFrame.alternateLocation;
+      }
+    }
+
+    await dispatch(selectLocation(getContext(state), location));
   };
 }
