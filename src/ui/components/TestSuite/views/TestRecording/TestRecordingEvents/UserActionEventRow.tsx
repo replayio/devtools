@@ -41,12 +41,12 @@ const cypressStepTypesToEventTypes = {
 
 export default memo(function UserActionEventRow({
   groupedTestCases,
-  position,
+  isSelected,
   testSectionName,
   userActionEvent,
 }: {
   groupedTestCases: RecordingTestMetadataV3.GroupedTestCases;
-  position: Position;
+  isSelected: boolean;
   testSectionName: TestSectionName;
   userActionEvent: UserActionEvent;
 }) {
@@ -99,9 +99,8 @@ export default memo(function UserActionEventRow({
     dispatch(jumpToKnownEventListenerHit(onSeek, jumpToCodeAnnotation));
   };
 
-  const isCurrent = position === "current";
-  const showBadge = isCurrent && command.name === "get" && result != null;
-  const showJumpToCode = (isHovered || isCurrent) && canShowJumpToCode;
+  const showBadge = isSelected && command.name === "get" && result != null;
+  const showJumpToCode = (isHovered || isSelected) && canShowJumpToCode;
 
   let jumpToCodeStatus: JumpToCodeStatus = "loading";
   if (annotationsStatus !== STATUS_PENDING) {
@@ -157,7 +156,7 @@ export default memo(function UserActionEventRow({
       {showBadge && (
         <Suspense fallback={<Loader />}>
           <Badge
-            position={position}
+            isSelected={isSelected}
             timeStampedPoint={result!.timeStampedPoint}
             variable={result!.variable}
           />
@@ -178,11 +177,11 @@ export default memo(function UserActionEventRow({
 });
 
 function Badge({
-  position,
+  isSelected,
   timeStampedPoint,
   variable,
 }: {
-  position: Position;
+  isSelected: boolean;
   timeStampedPoint: TimeStampedPoint;
   variable: string;
 }) {
@@ -198,11 +197,7 @@ function Badge({
     return null;
   }
 
-  return (
-    <div className={position === "current" ? styles.SelectedBadge : styles.Badge}>
-      {value?.count}
-    </div>
-  );
+  return <div className={isSelected ? styles.SelectedBadge : styles.Badge}>{value?.count}</div>;
 }
 
 function findJumpToCodeDetailsIfAvailable(

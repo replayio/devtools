@@ -1,1 +1,1 @@
-export type Position = "before" | "current" | "after";
+export type Position = "after" | "before";
