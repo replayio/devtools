@@ -1,17 +1,20 @@
 import assert from "assert";
+import { TimeStampedPoint } from "@replayio/protocol";
 import { ReactNode, useContext, useMemo, useTransition } from "react";
 
-import { comparePoints } from "protocol/execution-point-utils";
 import Icon from "replay-next/components/Icon";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
+import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
+import { isExecutionPointsGreaterThan } from "replay-next/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import {
   TestEvent,
+  TestRunnerName,
   TestSectionName,
-  getTestEventExecutionPoint,
   getTestEventTime,
+  isUserActionTestEvent,
 } from "shared/test-suites/RecordingTestMetadata";
-import { setTimelineToTime } from "ui/actions/timeline";
+import { seek, setTimelineToTime } from "ui/actions/timeline";
 import { TestSuiteCache } from "ui/components/TestSuite/suspense/TestSuiteCache";
 import { useTestEventContextMenu } from "ui/components/TestSuite/views/TestRecording/useTestEventContextMenu";
 import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext";
@@ -25,11 +28,14 @@ import styles from "./TestSectionRow.module.css";
 
 export function TestSectionRow({
   testEvent,
+  testRunnerName,
   testSectionName,
 }: {
   testEvent: TestEvent;
+  testRunnerName: TestRunnerName | null;
   testSectionName: TestSectionName;
 }) {
+  const { executionPoint: currentExecutionPoint } = useContext(TimelineContext);
   const replayClient = useContext(ReplayClientContext);
   const { recordingId } = useContext(SessionContext);
   const {
@@ -37,6 +43,8 @@ export function TestSectionRow({
     testEvent: selectedTestEvent,
     testRecording,
   } = useContext(TestSuiteContext);
+
+  const isSelected = testEvent === selectedTestEvent;
 
   const dispatch = useAppDispatch();
 
@@ -47,19 +55,41 @@ export function TestSectionRow({
   const position = useMemo(() => {
     let position: Position = "after";
     if (selectedTestEvent) {
-      if (selectedTestEvent === testEvent) {
-        position = "current";
-      } else {
-        // Compare using indices rather than execution points
-        // because Playwright tests don't have annotations (or execution points)
-        const index = testRecording!.events[testSectionName].indexOf(testEvent);
-        const selectedIndex = testRecording!.events[testSectionName].indexOf(selectedTestEvent);
-        position = index < selectedIndex ? "before" : "after";
+      switch (testRunnerName) {
+        case "cypress": {
+          let timeStampedPoint: TimeStampedPoint | null = null;
+          if (isUserActionTestEvent(testEvent)) {
+            timeStampedPoint = testEvent.timeStampedPointRange?.begin ?? null;
+          } else {
+            timeStampedPoint = testEvent.timeStampedPoint;
+          }
+
+          if (timeStampedPoint) {
+            position = isExecutionPointsGreaterThan(timeStampedPoint.point, currentExecutionPoint)
+              ? "after"
+              : "before";
+          }
+          break;
+        }
+        default: {
+          // Playwright tests don't have annotations (or execution points)
+          const index = testRecording!.events[testSectionName].indexOf(testEvent);
+          const selectedIndex = testRecording!.events[testSectionName].indexOf(selectedTestEvent);
+          position = index <= selectedIndex ? "before" : "after";
+          break;
+        }
       }
     }
 
     return position;
-  }, [selectedTestEvent, testEvent, testRecording, testSectionName]);
+  }, [
+    currentExecutionPoint,
+    selectedTestEvent,
+    testEvent,
+    testRecording,
+    testRunnerName,
+    testSectionName,
+  ]);
 
   const groupedTestCases = TestSuiteCache.read(replayClient, recordingId);
   assert(groupedTestCases !== null);
@@ -77,7 +107,7 @@ export function TestSectionRow({
       child = (
         <UserActionEventRow
           groupedTestCases={groupedTestCases}
-          position={position}
+          isSelected={isSelected}
           testSectionName={testSectionName}
           userActionEvent={testEvent}
         />
@@ -88,14 +118,30 @@ export function TestSectionRow({
       throw Error(`Unknown test step type: "${(testEvent as any).type}"`);
   }
 
+  const onClick = () => {
+    startTransition(() => {
+      setTestEvent(testEvent);
+    });
+
+    if (isUserActionTestEvent(testEvent)) {
+      const timeStampedPoint = testEvent.timeStampedPointRange?.begin ?? null;
+      if (timeStampedPoint) {
+        dispatch(seek(timeStampedPoint.point, timeStampedPoint.time, false));
+      }
+    } else {
+      const { point, time } = testEvent.timeStampedPoint;
+      dispatch(seek(point, time, false));
+    }
+  };
+
   const onMouseEnter = async () => {
-    if (selectedTestEvent !== testEvent) {
+    if (!isSelected) {
       dispatch(setTimelineToTime(getTestEventTime(testEvent)));
     }
   };
 
   const onMouseLeave = () => {
-    if (selectedTestEvent !== testEvent) {
+    if (!isSelected) {
       dispatch(setTimelineToTime(null));
     }
   };
@@ -106,14 +152,11 @@ export function TestSectionRow({
       data-context-menu-active={contextMenu !== null || undefined}
       data-is-pending={isPending || undefined}
       data-position={position}
+      data-selected={isSelected || undefined}
       data-status={status}
       data-type={testEvent.type}
       data-test-name="TestSectionRow"
-      onClick={() => {
-        startTransition(() => {
-          setTestEvent(testEvent);
-        });
-      }}
+      onClick={onClick}
       onContextMenu={onContextMenu}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
@@ -125,7 +168,7 @@ export function TestSectionRow({
         onClick={onContextMenu}
         data-test-name="TestSectionRowMenuButton"
       >
-        <Icon className={position === "current" ? styles.Icon : styles.HiddenIcon} type="dots" />
+        <Icon className={isSelected ? styles.Icon : styles.HiddenIcon} type="dots" />
       </button>
 
       {contextMenu}

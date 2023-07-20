@@ -43,6 +43,12 @@ export const config = {
     label: "Disable using incremental snapshots",
     legacyKey: "devtools.features.disableIncrementalSnapshots",
   },
+  backend_disableProtocolQueryCache: {
+    defaultValue: Boolean(false),
+    description: "Disable storage of previously generated response for protocol commands",
+    label: "Disable query-level storage for protocol commands",
+    legacyKey: "devtools.features.disableProtocolQueryCache",
+  },
   backend_disableRecordingAssetsInDatabase: {
     defaultValue: Boolean(false),
     description:
@@ -64,13 +70,6 @@ export const config = {
     internalOnly: Boolean(true),
     label: "Disable query-level caching for stable request types",
     legacyKey: "devtools.features.disableStableQueryCache",
-  },
-  backend_enableHasAnnotationKindQueryStorage: {
-    defaultValue: Boolean(false),
-    description: "Enable storage of previously generated response to Session.hasAnnotationKind",
-    internalOnly: true,
-    label: "Enable query-level storage for Session.hasAnnotationKind",
-    legacyKey: "devtools.features.enableHasAnnotationKindQueryStorage",
   },
   backend_enableRoutines: {
     defaultValue: Boolean(false),
@@ -298,8 +297,8 @@ export const config = {
   },
 
   protocol_chromiumRepaints: {
-    defaultValue: Boolean(false),
-    label: "Allow DOM.repaintGraphics inside of Chromium recordings",
+    defaultValue: Boolean(true),
+    label: "Enable repaintGraphics for Chrome.",
     legacyKey: "devtools.features.chromiumRepaints",
   },
   protocol_repaintEvaluations: {

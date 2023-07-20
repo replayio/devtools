@@ -202,22 +202,16 @@ class QuickOpenModal extends Component<QuickOpenModalProps, QOMState> {
   getUpdateResultsCallback = () =>
     debounce(query => {
       if (this.isGotoQuery()) {
-        return;
+        this.setResults([]);
+      } else if (query == "" && !this.isShortcutQuery()) {
+        this.showTopSources();
+      } else if (this.isFunctionQuery()) {
+        this.searchFunctions(query);
+      } else if (this.isShortcutQuery()) {
+        this.searchShortcuts(query);
+      } else {
+        this.searchSources(query);
       }
-
-      if (query == "" && !this.isShortcutQuery()) {
-        return this.showTopSources();
-      }
-
-      if (this.isFunctionQuery()) {
-        return this.searchFunctions(query);
-      }
-
-      if (this.isShortcutQuery()) {
-        return this.searchShortcuts(query);
-      }
-
-      return this.searchSources(query);
     }, this.getDebounceMs());
 
   updateResults = this.getUpdateResultsCallback();
@@ -410,16 +404,25 @@ class QuickOpenModal extends Component<QuickOpenModalProps, QOMState> {
   shouldShowErrorEmoji() {
     const { query } = this.props;
     if (this.isGotoQuery()) {
-      return !/^:\d*$/.test(query);
+      return !/^:\d*:*\d*$/.test(query);
     }
     return !!query && !this.getResultCount();
   }
 
   getSummaryMessage() {
-    const { symbolsLoading, project, globalFunctionsLoading } = this.props;
+    const { symbolsLoading, project, globalFunctionsLoading, query } = this.props;
 
     if (this.isGotoQuery()) {
-      return "Go to line";
+      const isValid = /^:\d*:*\d*$/.test(query);
+
+      const [_, line, column] = query.split(":");
+      if (!isValid || line == null || line == "") {
+        return "Type a line number to navigate to";
+      } else if (column != null && column !== "") {
+        return `Go to line ${line} and column ${column}`;
+      } else {
+        return `Go to line ${line}`;
+      }
     }
 
     if (project && globalFunctionsLoading) {

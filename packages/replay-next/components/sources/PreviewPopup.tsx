@@ -11,6 +11,7 @@ import {
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { isPointInRegion } from "shared/utils/time";
 
+import ErrorBoundary from "../ErrorBoundary";
 import SourcePreviewInspector from "../inspector/SourcePreviewInspector";
 import Popup from "../Popup";
 import styles from "./PreviewPopup.module.css";
@@ -26,9 +27,11 @@ type Props = {
 
 export default function PreviewPopup(props: Props) {
   return (
-    <Suspense fallback={null}>
-      <SuspendingPreviewPopup {...props} />
-    </Suspense>
+    <ErrorBoundary name="PreviewPopup">
+      <Suspense fallback={null}>
+        <SuspendingPreviewPopup {...props} />
+      </Suspense>
+    </ErrorBoundary>
   );
 }
 

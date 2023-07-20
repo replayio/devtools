@@ -195,6 +195,7 @@
 
 .LineSegment {
   margin: 0;
+  z-index: 1;
 }
 
 .LineSegmentsAndPointPanel {

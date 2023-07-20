@@ -20,7 +20,7 @@ import { ThreadFront } from "protocol/thread";
 import Loader from "replay-next/components/Loader";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPositionsCache";
-import { getHitPointsForLocationAsync } from "replay-next/src/suspense/HitPointsCache";
+import { hitPointsForLocationCache } from "replay-next/src/suspense/HitPointsCache";
 import {
   LogPointAnalysisResult,
   getLogPointAnalysisResultAsync,
@@ -580,7 +580,12 @@ export const recordedProtocolMessagesCache: Cache<
         };
 
         // Get all the times that first line was hit
-        const [hitPoints] = await getHitPointsForLocationAsync(replayClient, position, null, range);
+        const [hitPoints] = await hitPointsForLocationCache.readAsync(
+          replayClient,
+          range,
+          position,
+          null
+        );
 
         // For every hit, grab the first arg, which should be the `event`
         // that is either the request, response, or error data

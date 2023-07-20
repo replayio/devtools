@@ -205,9 +205,7 @@ export function createSocket(
         disableConcurrentControllerLoading: userData.get(
           "backend_disableConcurrentControllerLoading"
         ),
-        enableHasAnnotationKindQueryStorage: userData.get(
-          "backend_enableHasAnnotationKindQueryStorage"
-        ),
+        disableProtocolQueryCache: userData.get("backend_disableProtocolQueryCache"),
       };
       if (userData.get("backend_newControllerOnRefresh")) {
         experimentalSettings.controllerKey = String(Date.now());
@@ -241,12 +239,7 @@ export function createSocket(
         recordingId,
         loadPoint,
         experimentalSettings,
-        focusWindowFromParams
-          ? {
-              begin: focusWindowFromParams.begin.time,
-              end: focusWindowFromParams.end.time,
-            }
-          : undefined,
+        focusWindowFromParams !== null ? focusWindowFromParams : undefined,
         {
           onEvent: (event: ProtocolEvent) => {
             if (userData.get("feature_logProtocolEvents")) {

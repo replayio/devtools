@@ -2,7 +2,6 @@ import {
   BreakpointId,
   Result as EvaluationResult,
   ExecutionPoint,
-  FocusWindowRequest,
   FrameId,
   FunctionMatch,
   loadedRegions as LoadedRegions,
@@ -17,6 +16,7 @@ import {
   PointDescription,
   PointPageLimits,
   PointRange,
+  PointRangeFocusRequest,
   PointSelector,
   getPointsBoundingTimeResult as PointsBoundingTime,
   RecordingId,
@@ -732,11 +732,19 @@ export class ReplayClient implements ReplayClientInterface {
     return mappedLocation;
   }
 
-  async requestFocusWindow(range: FocusWindowRequest): Promise<TimeStampedPointRange> {
+  async requestFocusWindow(params: PointRangeFocusRequest): Promise<TimeStampedPointRange> {
     const sessionId = this.getSessionIdThrows();
-    const { window } = await client.Session.requestFocusRange({ range }, sessionId);
+
+    const { window } = await client.Session.requestFocusWindow(
+      {
+        request: params,
+      },
+      sessionId
+    );
+
     this.focusWindow = window;
     this._dispatchEvent("focusWindowChange", window);
+
     return window;
   }
 

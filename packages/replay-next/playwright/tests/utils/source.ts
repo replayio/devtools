@@ -1,5 +1,13 @@
+import assert from "assert";
 import { Locator, Page, expect } from "@playwright/test";
 import chalk from "chalk";
+
+import { getSourcePreview } from "replay-next/playwright/tests/source-preview/shared";
+import {
+  findContextMenuItem,
+  hideContextMenu,
+  showContextMenu,
+} from "replay-next/playwright/tests/utils/context-menu";
 
 import { getConsoleSearchInput } from "./console";
 import {
@@ -104,17 +112,18 @@ export async function continueTo(
     direction: "next" | "previous";
     lineNumber: number;
     sourceId: string;
+    use: "hover-button" | "context-menu";
   }
 ) {
-  const { direction, lineNumber, sourceId } = options;
+  const { direction, lineNumber, sourceId, use } = options;
 
   await debugPrint(
     page,
     sourceId == null
-      ? `Continuing to ${chalk.bold(direction)} line ${chalk.bold(lineNumber)}`
+      ? `Continuing to ${chalk.bold(direction)} line ${chalk.bold(lineNumber)} via ${use}`
       : `Continuing to ${chalk.bold(direction)} line ${chalk.bold(
           lineNumber
-        )} for source "${chalk.bold(sourceId)}"`,
+        )} for source "${chalk.bold(sourceId)}" via ${use}`,
     "continueToNext"
   );
 
@@ -125,20 +134,37 @@ export async function continueTo(
 
   const lineLocator = page.locator(`[data-test-id="SourceLine-${lineNumber}"]`);
 
-  const stopHovering = await hoverOverLine(page, {
-    lineNumber,
-    sourceId,
-    withMetaKey: true,
-    withShiftKey: direction === "previous",
-  });
+  switch (use) {
+    case "context-menu": {
+      await showContextMenu(page, lineLocator);
+      const menuItem = await findContextMenuItem(
+        page,
+        direction === "next" ? "Fast forward" : "Rewind"
+      );
+      await expect(menuItem).toBeEnabled();
+      await menuItem.click();
 
-  const button = lineLocator.locator('[data-test-name="ContinueToButton"]');
-  const state = await button.getAttribute("data-test-state");
-  if (direction === state) {
-    await button.click();
+      break;
+    }
+    case "hover-button": {
+      const stopHovering = await hoverOverLine(page, {
+        lineNumber,
+        sourceId,
+        withMetaKey: true,
+        withShiftKey: direction === "previous",
+      });
+
+      const button = lineLocator.locator('[data-test-name="ContinueToButton"]');
+      const state = await button.getAttribute("data-test-state");
+      if (direction === state) {
+        await expect(button).toBeEnabled();
+        await button.click();
+      }
+
+      await stopHovering();
+      break;
+    }
   }
-
-  await stopHovering();
 }
 
 export async function editLogPoint(
@@ -333,14 +359,19 @@ export function getSearchSourceLocator(page: Page): Locator {
   return page.locator(`[data-test-id="SourceSearch"]`);
 }
 
-export async function goToLine(page: Page, sourceId: string, lineNumber: number) {
-  const lineLocator = getSourceLineLocator(page, sourceId, lineNumber);
-  const lineIsVisible = await lineLocator.isVisible();
-  if (lineIsVisible) {
-    return;
-  }
-
-  await debugPrint(page, `Going to source line ${chalk.bold(lineNumber)}`, "goToLine");
+export async function goToLine(
+  page: Page,
+  sourceId: string,
+  lineNumber: number,
+  columnNumber?: number
+) {
+  await debugPrint(
+    page,
+    columnNumber != null
+      ? `Going to source line ${chalk.bold(lineNumber)} and column ${chalk.bold(columnNumber)}`
+      : `Going to source line ${chalk.bold(lineNumber)}`,
+    "goToLine"
+  );
 
   await focusOnSource(page);
 
@@ -350,9 +381,14 @@ export async function goToLine(page: Page, sourceId: string, lineNumber: number)
   await expect(input).toBeFocused();
 
   await clearTextArea(page, input);
-  await page.keyboard.type(`:${lineNumber}`);
+  await page.keyboard.type(
+    columnNumber != null ? `:${lineNumber}:${columnNumber}` : `:${lineNumber}`
+  );
   await page.keyboard.press("Enter");
 
+  await delay(100);
+
+  const lineLocator = getSourceLineLocator(page, sourceId, lineNumber);
   await expect(lineLocator).toBeVisible();
 }
 
@@ -467,13 +503,14 @@ export async function goToPreviousSourceSearchResult(page: Page) {
 export async function hoverOverLine(
   page: Page,
   options: {
+    columnNumber?: number;
     lineNumber: number;
     sourceId: string;
     withMetaKey?: boolean;
     withShiftKey?: boolean;
   }
 ): Promise<AsyncFunction> {
-  const { lineNumber, sourceId, withMetaKey, withShiftKey } = options;
+  const { columnNumber, lineNumber, sourceId, withMetaKey, withShiftKey } = options;
 
   let suffix = "";
   if (withMetaKey || withShiftKey) {
@@ -486,13 +523,38 @@ export async function hoverOverLine(
     }
     suffix = `with ${chalk.bold(keys.join(" and "))}`;
   }
+
   await debugPrint(
     page,
-    `Hovering over source "${chalk.bold(sourceId)}" line ${chalk.bold(lineNumber)} ${suffix}`,
+    `Start hovering over source "${chalk.bold(sourceId)}" line ${chalk.bold(lineNumber)} ${suffix}`,
     "hoverOverLine"
   );
 
   await goToLine(page, sourceId, lineNumber);
+
+  // Hover over the line number itself, not the line, to avoid triggering protocol preview requests.
+  const lineLocator = page.locator(`[data-test-id="SourceLine-${lineNumber}"]`);
+
+  if (columnNumber !== undefined) {
+    let match = null;
+
+    const inspectableTokens = lineLocator.locator("[data-inspectable-token]");
+    for (let i = 0; i < (await inspectableTokens.count()); i++) {
+      const inspectableToken = inspectableTokens.nth(i);
+      const dataColumnIndex = await inspectableToken.getAttribute("data-column-index");
+      if (dataColumnIndex !== null && columnNumber === parseInt(dataColumnIndex) + 1) {
+        match = inspectableToken;
+        break;
+      }
+    }
+    assert(match !== null);
+    await match.hover({ force: true });
+  } else {
+    const numberLocator = lineLocator.locator(
+      `[data-test-id="SourceLine-LineNumber-${lineNumber}"]`
+    );
+    await numberLocator.hover({ force: true });
+  }
 
   if (withShiftKey) {
     await page.keyboard.down("Shift");
@@ -505,12 +567,15 @@ export async function hoverOverLine(
     await page.keyboard.up(getCommandKey());
   }
 
-  // Hover over the line number itself, not the line, to avoid triggering protocol preview requests.
-  const lineLocator = page.locator(`[data-test-id="SourceLine-${lineNumber}"]`);
-  const numberLocator = lineLocator.locator(`[data-test-id="SourceLine-LineNumber-${lineNumber}"]`);
-  await numberLocator.hover({ force: true });
-
   return async () => {
+    await debugPrint(
+      page,
+      `Stop hovering over source "${chalk.bold(sourceId)}" line ${chalk.bold(
+        lineNumber
+      )} ${suffix}`,
+      "hoverOverLine"
+    );
+
     await stopHovering(page);
     if (withMetaKey) {
       await page.keyboard.up(getCommandKey());
@@ -521,7 +586,7 @@ export async function hoverOverLine(
   };
 }
 
-export async function isContinueToButtonEnabled(
+export async function isSeekOptionEnabled(
   page: Page,
   options: {
     direction: "previous" | "next";
@@ -531,6 +596,14 @@ export async function isContinueToButtonEnabled(
 ): Promise<boolean> {
   const { direction, lineNumber, sourceId } = options;
 
+  await debugPrint(
+    page,
+    `Is continue to ${chalk.bold(direction)} enabled for line ${chalk.bold(lineNumber)}?`,
+    "isContinueToButtonEnabled"
+  );
+
+  const lineLocator = page.locator(`[data-test-id="SourceLine-${lineNumber}"]`);
+
   const stopHovering = await hoverOverLine(page, {
     lineNumber,
     sourceId,
@@ -538,29 +611,37 @@ export async function isContinueToButtonEnabled(
     withShiftKey: direction === "previous",
   });
 
-  const lineLocator = page.locator(`[data-test-id="SourceLine-${lineNumber}"]`);
   const button = lineLocator.locator('[data-test-name="ContinueToButton"]');
-  const isEnabled = await button.isEnabled();
+  const isHoverButtonEnabled = await button.isEnabled();
 
   await stopHovering();
 
-  return isEnabled;
+  await showContextMenu(page, lineLocator);
+  const menuItem = await findContextMenuItem(
+    page,
+    direction === "next" ? "Fast forward" : "Rewind"
+  );
+  const isContextMenuItemEnabled = await menuItem.isEnabled();
+
+  await hideContextMenu(page);
+
+  return isContextMenuItemEnabled && isHoverButtonEnabled;
 }
 
-export async function isContinueToNextButtonEnabled(
+export async function isContinueToNextOptionEnabled(
   page: Page,
   sourceId: string,
   lineNumber: number
 ): Promise<boolean> {
-  return isContinueToButtonEnabled(page, { direction: "next", lineNumber, sourceId });
+  return isSeekOptionEnabled(page, { direction: "next", lineNumber, sourceId });
 }
 
-export async function isContinueToPreviousButtonEnabled(
+export async function isContinueToPreviousOptionEnabled(
   page: Page,
   sourceId: string,
   lineNumber: number
 ): Promise<boolean> {
-  return isContinueToButtonEnabled(page, { direction: "previous", lineNumber, sourceId });
+  return isSeekOptionEnabled(page, { direction: "previous", lineNumber, sourceId });
 }
 
 export async function isLineCurrentSearchResult(page: Page, lineNumber: number): Promise<boolean> {
@@ -1004,6 +1085,29 @@ export async function waitForSourceContentsToStream(page: Page, sourceId: string
       throw Error(`Waiting for source to be "resolved" but is "${status}"`);
     }
   });
+}
+
+export async function showPreview(
+  page: Page,
+  options: {
+    columnNumber: number;
+    lineNumber: number;
+    partialText?: string;
+    sourceId: string;
+  }
+) {
+  const { columnNumber, lineNumber, partialText, sourceId } = options;
+
+  await debugPrint(
+    page,
+    `Showing preview for token at ${chalk.bold(`${lineNumber}:${columnNumber}`)}"`,
+    "showPreview"
+  );
+
+  await hoverOverLine(page, { columnNumber, lineNumber, sourceId });
+
+  const sourcePreview = await getSourcePreview(page, partialText);
+  await expect(sourcePreview).toBeVisible();
 }
 
 async function waitForTimelineToUpdate(timelineLocator: Locator) {

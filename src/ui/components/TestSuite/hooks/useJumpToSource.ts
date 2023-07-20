@@ -78,11 +78,6 @@ export function useJumpToSource({
       if (location) {
         dispatch(selectLocation(context, location, openSourceAutomatically));
       }
-
-      const timeStampedPoint = timeStampedPointRange.begin;
-      if (timeStampedPoint.point && timeStampedPoint.time) {
-        dispatch(seek(timeStampedPoint.point, timeStampedPoint.time, false));
-      }
     }
 
     dispatch(setSourcesUserActionPending(false));

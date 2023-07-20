@@ -46,9 +46,20 @@ import styles from "./SourceListRow.module.css";
 
 // Primarily exists as a way for e2e tests to disable syntax highlighting
 // to simulate large files that aren't fully parsed.
-const disableSyntaxHighlightingForTests =
-  typeof window !== "undefined" &&
-  new URL(window?.location?.href).searchParams.get("disableSyntaxHighlighting") != null;
+let disableSyntaxHighlighting = false;
+let disableSyntaxHighlightingOverLength = 500;
+if (typeof window !== "undefined") {
+  const url = new URL(window?.location?.href);
+  let param = url.searchParams.get("disableSyntaxHighlightingOverLength");
+  if (param != null) {
+    disableSyntaxHighlightingOverLength = parseInt(param, 10);
+  }
+
+  param = param = url.searchParams.get("disableSyntaxHighlighting");
+  if (param != null) {
+    disableSyntaxHighlighting = true;
+  }
+}
 
 export type ItemData = {
   breakablePositionsByLine: Map<number, SameLineSourceLocations>;
@@ -120,7 +131,9 @@ const SourceListRow = memo(
       testStateContents = "loaded";
     }
 
-    if (disableSyntaxHighlightingForTests) {
+    if (disableSyntaxHighlighting) {
+      tokens = null;
+    } else if (plainText === null || plainText.length > disableSyntaxHighlightingOverLength) {
       tokens = null;
     }
 
@@ -336,6 +349,7 @@ const SourceListRow = memo(
     };
 
     const { contextMenu, onContextMenu } = useSourceContextMenu({
+      lineHitCounts,
       lineNumber,
       sourceId: source.sourceId,
       sourceUrl: source.url ?? null,

@@ -38,7 +38,7 @@ const Vertical = () => {
         </div>
       </Panel>
       <PanelResizeHandle
-        className={videoPanelCollapsed ? "" : "h-2 w-full"}
+        className={videoPanelCollapsed ? "" : "h-2 w-full shrink-0"}
         id="PanelResizeHandle-Video"
       />
       <Panel
@@ -71,13 +71,13 @@ const Horizontal = () => {
         minSize={30}
         order={1}
       >
-        <div className="flex flex-1 flex-row">
+        <div className="flex w-full flex-1 flex-row">
           <SecondaryToolbox
             videoPanelCollapsed={videoPanelCollapsed}
             videoPanelRef={videoPanelRef}
           />
           <PanelResizeHandle
-            className={videoPanelCollapsed ? "" : "w-2"}
+            className={videoPanelCollapsed ? "" : "h-full w-2 shrink-0"}
             id="PanelResizeHandle-Video"
           />
         </div>

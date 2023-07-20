@@ -42,7 +42,9 @@ export default function useLogPointPanelContextMenu({
         },
       },
       {
-        debounce: true,
+        bias: "begin",
+        debounce: false,
+        sync: true,
       }
     );
   };
@@ -60,7 +62,11 @@ export default function useLogPointPanelContextMenu({
         },
         end: currentHitPoint,
       },
-      { debounce: true }
+      {
+        bias: "end",
+        debounce: false,
+        sync: true,
+      }
     );
   };
 

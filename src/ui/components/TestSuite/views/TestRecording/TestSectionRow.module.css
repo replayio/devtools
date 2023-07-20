@@ -31,19 +31,18 @@
 }
 .Row[data-status="success"][data-position="before"],
 .Row[data-type="navigation"][data-position="before"],
-.Row[data-type="network"][data-position="before"] {
+.Row[data-type="network-request"][data-position="before"] {
   --border-left-color: var(--primary-accent);
 }
-.Row[data-status="success"][data-position="current"],
-.Row[data-type="navigation"][data-position="current"],
-.Row[data-type="network"][data-position="current"] {
+.Row[data-status="success"][data-selected],
+.Row[data-type="navigation"][data-selected],
+.Row[data-type="network-request"][data-selected] {
   --border-left-color: var(--primary-accent);
   --row-background-color: var(--testsuites-active-bgcolor);
   --row-background-color-hover: var(--testsuites-active-bgcolor);
 }
 
-.Row[data-position="before"],
-.Row[data-position="current"] {
+.Row[data-position="before"] {
   border-left-color: var(--border-left-color);
 }
 

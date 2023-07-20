@@ -20,7 +20,7 @@ import {
   UncaughtException,
   getInfallibleExceptionPointsSuspense,
 } from "replay-next/src/suspense/ExceptionsCache";
-import { getHitPointsForLocationSuspense } from "replay-next/src/suspense/HitPointsCache";
+import { hitPointsForLocationCache } from "replay-next/src/suspense/HitPointsCache";
 import { loggableSort } from "replay-next/src/utils/loggables";
 import { isInNodeModules } from "replay-next/src/utils/messages";
 import { suspendInParallel } from "replay-next/src/utils/suspense";
@@ -197,11 +197,11 @@ function LoggablesContextInner({
       const pointBehavior = pointBehaviors[point.key];
       if (pointBehavior?.shouldLog === POINT_BEHAVIOR_ENABLED) {
         // TODO This isn't a safe time to suspend (inside of useMemo())
-        const [hitPoints, status] = getHitPointsForLocationSuspense(
+        const [hitPoints, status] = hitPointsForLocationCache.read(
           client,
+          toPointRange(focusRange),
           point.location,
-          point.condition,
-          toPointRange(focusRange)
+          point.condition
         );
 
         switch (status) {

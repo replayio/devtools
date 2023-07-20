@@ -20,6 +20,8 @@ function assert(value: unknown, message: string, tags: Object = {}): asserts val
   return assertWithTelemetry(value, message, "process-test-metadata", tags);
 }
 
+export type TestRunnerName = "cypress" | "playwright";
+
 // This type is only minimally supported by the frontend
 export namespace RecordingTestMetadataV1 {
   export type GroupedTestCases = {
@@ -27,7 +29,7 @@ export namespace RecordingTestMetadataV1 {
     path?: string[];
     result: RecordingTestMetadataV3.TestResult;
     run?: { id: string; title?: string };
-    runner?: { name: string; version: string; plugin: string };
+    runner?: { name: TestRunnerName; version: string; plugin: string };
     tests?: TestRecording[];
     title: string;
     version: 1;
@@ -139,7 +141,7 @@ export namespace RecordingTestMetadataV3 {
 
       // Cypress or Playwright
       testRunner: {
-        name: string;
+        name: TestRunnerName;
         version: SemVer;
       };
     };
@@ -384,6 +386,10 @@ export async function processCypressTestRecording(
               };
 
               navigationEvents.push(navigationEvent);
+              break;
+            }
+            case "test:end":
+            case "test:start": {
               break;
             }
             case "step:end":

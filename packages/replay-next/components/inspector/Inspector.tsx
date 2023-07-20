@@ -10,17 +10,17 @@ import styles from "./Inspector.module.css";
 export default function Inspector({
   className,
   context,
-  expandByDefault,
   path,
   pauseId,
   protocolValue,
+  expandByDefault,
 }: {
   className?: string;
   context: "console" | "default";
-  expandByDefault?: boolean;
   path?: string;
   pauseId: PauseId;
   protocolValue: ProtocolValue | ProtocolNamedValue;
+  expandByDefault?: boolean;
 }) {
   const keyValue = (
     <KeyValueRenderer

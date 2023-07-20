@@ -19,6 +19,7 @@ export type FindClosestFunctionName = (sourceId: string, location: SourceLocatio
 export type FocusedSourceMode = "search-result" | "view-source";
 
 export type FocusedSource = {
+  columnNumber: number | null;
   endLineIndex: number | null;
   mode: FocusedSourceMode;
   sourceId: SourceId;
@@ -38,7 +39,8 @@ type SourcesContextType = {
     mode: FocusedSourceMode,
     sourceId: SourceId,
     startLineIndex?: number,
-    endLineIndex?: number
+    endLineIndex?: number,
+    columnNumber?: number
   ) => void;
   openSourceIds: SourceId[];
   pendingFocusUpdate: boolean;
@@ -140,6 +142,7 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
 
           if (index > 0) {
             focusedSource = {
+              columnNumber: null,
               endLineIndex: null,
               mode: "view-source",
               sourceId: openSourceIds[index - 1],
@@ -147,6 +150,7 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
             };
           } else if (index < openSourceIds.length - 1) {
             focusedSource = {
+              columnNumber: null,
               endLineIndex: null,
               mode: "view-source",
               sourceId: openSourceIds[index + 1],
@@ -195,7 +199,8 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
         // If sources are equal we may be able to bail out.
         if (
           focusedSource.startLineIndex === prevFocusedSource?.startLineIndex &&
-          focusedSource.endLineIndex === prevFocusedSource?.endLineIndex
+          focusedSource.endLineIndex === prevFocusedSource?.endLineIndex &&
+          focusedSource.columnNumber === prevFocusedSource?.columnNumber
         ) {
           // If the same line was specified (or no line) we may be able to bail out.
           if (prevPendingFocusUpdate) {
@@ -377,12 +382,14 @@ export function SourcesContextRoot({
       mode: FocusedSourceMode,
       sourceId: SourceId,
       startLineIndex: number | null = null,
-      endLineIndex: number | null = null
+      endLineIndex: number | null = null,
+      columnNumber: number | null = null
     ) => {
       startTransition(() => {
         dispatch({
           type: "open_source",
           focusedSource: {
+            columnNumber,
             endLineIndex,
             mode,
             sourceId,

@@ -1,8 +1,16 @@
-import { ExecutionPoint, Value } from "@replayio/protocol";
+import {
+  ExecutionPoint,
+  PauseId,
+  NamedValue as ProtocolNamedValue,
+  Value as ProtocolValue,
+} from "@replayio/protocol";
 import classnames from "classnames";
-import React, { useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { Suspense, useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
 
-import Inspector from "replay-next/components/inspector/Inspector";
+import Inspector from "replay-next/components/inspector";
+import PropertiesRenderer from "replay-next/components/inspector/PropertiesRenderer";
+import Loader from "replay-next/components/Loader";
+import { clientValueCache, objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import {
@@ -56,6 +64,63 @@ const PanelButton = ({ selected, children, name, onClick }: PanelButtonProps) =>
   );
 };
 
+function RDTInspector({
+  pauseId,
+  protocolValue,
+  path,
+}: {
+  path?: string;
+  pauseId: PauseId;
+  protocolValue: ProtocolValue | ProtocolNamedValue;
+}) {
+  const client = useContext(ReplayClientContext);
+  const clientValue = clientValueCache.read(client, pauseId, protocolValue);
+
+  switch (clientValue.type) {
+    case "array":
+    case "function":
+    case "html-element":
+    case "html-text":
+    case "map":
+    case "object":
+    case "regexp":
+    case "set": {
+      const objectWithPreview = objectCache.read(
+        client,
+        pauseId,
+        clientValue.objectId!,
+        "canOverflow"
+      );
+      if (objectWithPreview == null) {
+        throw Error(`Could not find object with ID "${clientValue.objectId!}"`);
+      }
+
+      return (
+        <div className={styles.RDTInspector}>
+          <Suspense fallback={<Loader />}>
+            <PropertiesRenderer path={path} object={objectWithPreview} pauseId={pauseId} />
+          </Suspense>
+        </div>
+      );
+    }
+    default: {
+      return (
+        <div className={styles.RDTInspector}>
+          <Suspense fallback={<Loader />}>
+            <Inspector
+              className={styles.Inspector}
+              context="default"
+              expandByDefault={true}
+              pauseId={pauseId!}
+              protocolValue={protocolValue}
+            />
+          </Suspense>
+        </div>
+      );
+    }
+  }
+}
+
 interface RDTCProps {
   point: ExecutionPoint;
   time: number;
@@ -101,26 +166,14 @@ export function ReduxDevToolsContents({ point, time }: RDTCProps) {
   switch (selectedTab) {
     case "action": {
       contents = actionValue && (
-        <Inspector
-          key={point + "action"}
-          pauseId={pauseId!}
-          protocolValue={actionValue}
-          context="console"
-          expandByDefault={true}
-        />
+        <RDTInspector key={point + "action"} pauseId={pauseId!} protocolValue={actionValue} />
       );
 
       break;
     }
     case "state": {
       contents = stateValue && (
-        <Inspector
-          key={point + "state"}
-          pauseId={pauseId!}
-          protocolValue={stateValue}
-          context="console"
-          expandByDefault={true}
-        ></Inspector>
+        <RDTInspector key={point + "state"} pauseId={pauseId!} protocolValue={stateValue} />
       );
       break;
     }

@@ -3,9 +3,9 @@
   "packageManager": "yarn@3.2.1",
   "devDependencies": {
     "@playwright/test": "^1.35.0",
-    "@replayio/playwright": "^0.3.21",
+    "@replayio/playwright": "latest",
     "chalk": "^4"
-  }, 
+  },
   "scripts": {
     "playwright:install": "playwright install chromium",
     "test": "playwright test tests",

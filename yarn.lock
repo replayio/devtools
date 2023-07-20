@@ -3692,45 +3692,25 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/playwright@npm:^1.0.4":
-  version: 1.0.4
-  resolution: "@replayio/playwright@npm:1.0.4"
+"@replayio/playwright@npm:latest":
+  version: 1.0.6
+  resolution: "@replayio/playwright@npm:1.0.6"
   dependencies:
-    "@replayio/replay": ^0.12.13
-    "@replayio/test-utils": ^1.0.3
+    "@replayio/replay": ^0.13.1
+    "@replayio/test-utils": ^1.0.5
     uuid: ^8.3.2
   peerDependencies:
     "@playwright/test": 1.19.x
   bin:
     replayio-playwright: bin/replayio-playwright.js
-  checksum: c0dc19d36f5835e646ba339c6523263a93c9412394118543a08b16b5b167d71b549a29f0a0d0658d99834a3404b7b8ad8e047741072e08cfce0c1ffddd306c25
+  checksum: 01c7452775f217a32f37acd8e374da6b06253c32be2ed262053b27b7d651a983bb07545c3cff19f6ec053f149ac7b3a1a7c57fb2ab0d5fa0065d2a3d57fe4a64
   languageName: node
   linkType: hard
 
-"@replayio/protocol@npm:^0.54.0":
-  version: 0.54.0
-  resolution: "@replayio/protocol@npm:0.54.0"
-  checksum: 595a235105492fe47d655c32a2d8318e9ae29e012985dc93ddcaf985dffbebdc26d8ddb0c9221667e2024afab26d429779af3113449dda287324a74d5e886441
-  languageName: node
-  linkType: hard
-
-"@replayio/replay@npm:^0.12.13":
-  version: 0.12.13
-  resolution: "@replayio/replay@npm:0.12.13"
-  dependencies:
-    "@replayio/sourcemap-upload": ^1.0.7
-    commander: ^7.2.0
-    debug: ^4.3.4
-    is-uuid: ^1.0.2
-    jsonata: ^1.8.6
-    node-fetch: ^2.6.8
-    p-map: ^4.0.0
-    superstruct: ^0.15.4
-    text-table: ^0.2.0
-    ws: ^7.5.0
-  bin:
-    replay: bin/replay.js
-  checksum: a8bdda8bdfed5c8c1332391f721fd947ed9c034e80f9cae991137d41bfb3bab764db0d6c809ca89c7573dea161a529c38857ee067ccea3d3f591d89998370d6b
+"@replayio/protocol@npm:^0.55.0":
+  version: 0.55.0
+  resolution: "@replayio/protocol@npm:0.55.0"
+  checksum: 287f25a2303920247fc87309f8ad28159e92cc05c22a8902a5fa22e074cbf8da2d591adc96dc7e6c42105cfbe8a56538f6550460699df35f43369850508eff57
   languageName: node
   linkType: hard
 
@@ -3751,6 +3731,26 @@ __metadata:
   bin:
     replay: bin/replay.js
   checksum: bb2b6c7a2bb6f9167352f4ce29eb532cd8d788679782d6bebb49655d86dd785d3c6be2e7c6292b3be9d50401dfedda1b4367f10bfe62e96143cd327c642012a5
+  languageName: node
+  linkType: hard
+
+"@replayio/replay@npm:^0.13.1":
+  version: 0.13.1
+  resolution: "@replayio/replay@npm:0.13.1"
+  dependencies:
+    "@replayio/sourcemap-upload": ^1.0.7
+    commander: ^7.2.0
+    debug: ^4.3.4
+    is-uuid: ^1.0.2
+    jsonata: ^1.8.6
+    node-fetch: ^2.6.8
+    p-map: ^4.0.0
+    superstruct: ^0.15.4
+    text-table: ^0.2.0
+    ws: ^7.5.0
+  bin:
+    replay: bin/replay.js
+  checksum: d3aec605a2e924367164d71518a47a34ea990a80a6dbde8284878357312065811b71907ba61ba273534bfd7da50299104bce8db6f697b7ddf253b6588d59a142
   languageName: node
   linkType: hard
 
@@ -3793,16 +3793,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/test-utils@npm:^1.0.3":
-  version: 1.0.3
-  resolution: "@replayio/test-utils@npm:1.0.3"
+"@replayio/test-utils@npm:^1.0.5":
+  version: 1.0.5
+  resolution: "@replayio/test-utils@npm:1.0.5"
   dependencies:
-    "@replayio/replay": ^0.12.13
+    "@replayio/replay": ^0.13.1
     "@types/node-fetch": ^2.6.2
     debug: ^4.3.4
     node-fetch: ^2.6.7
     uuid: ^8.3.2
-  checksum: d483efdb3080c6a93de81847d367e172eb74318be7d23737883921909003dd5d436508af34944872485dc4e94863d25d81ef8fdcbd6d7029e51088e4bf0f8939
+  checksum: ea1e91017fde8856c9e30734138ce2a911dc135d427b26fff945ee95abbcd4c1c9ca94a591aa36e563f02c6d797ba7ce215d20f648bf18e7a0dabda901853ab0
   languageName: node
   linkType: hard
 
@@ -9667,7 +9667,7 @@ __metadata:
     "@playwright/test": ^1.35.0
     "@recordreplay/playwright": ^1.18.3
     "@replayio/cypress": ^0.5.0
-    "@replayio/playwright": ^1.0.4
+    "@replayio/playwright": latest
     chalk: ^4
     cli-spinners: ^2.7.0
     cypress: ^12.5.1
@@ -14783,13 +14783,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-devtools-inline@npm:^4.24.5":
+"react-devtools-inline@npm:4.24.7":
   version: 4.24.7
   resolution: "react-devtools-inline@npm:4.24.7"
   dependencies:
     source-map-js: ^0.6.2
     sourcemap-codec: ^1.4.8
   checksum: 94c60252d78f4ce3544cd067f1d9d50b75c1c948f37f95484e24e5229705d02113398ce43ac95d7baa3cd2f7a4f1fa5094bd97bb0c0e52f74e0f33b2d43314f7
+  languageName: node
+  linkType: hard
+
+"react-devtools-inline@patch:react-devtools-inline@npm:4.24.7#.yarn/patches/react-devtools-inline-npm-4.24.7-9582a0f8d6.patch::locator=recordreplay-devtools%40workspace%3A.":
+  version: 4.24.7
+  resolution: "react-devtools-inline@patch:react-devtools-inline@npm%3A4.24.7#.yarn/patches/react-devtools-inline-npm-4.24.7-9582a0f8d6.patch::version=4.24.7&hash=16cfed&locator=recordreplay-devtools%40workspace%3A."
+  dependencies:
+    source-map-js: ^0.6.2
+    sourcemap-codec: ^1.4.8
+  checksum: 619eef6d9027c231daeb18a7229153d01b3e7e5c0a8881411a861c18f19703aac1cf56209683eed54411c0f93bda46effab96c30b47a20c11ecbf21886909624
   languageName: node
   linkType: hard
 
@@ -15170,7 +15180,7 @@ __metadata:
     "@recordreplay/sourcemap-upload-cli": ^0.1.1
     "@reduxjs/toolkit": ^1.8.4
     "@replayio/overboard": ^0.4.1
-    "@replayio/protocol": ^0.54.0
+    "@replayio/protocol": ^0.55.0
     "@replayio/replay": ^0.12.4
     "@sentry/react": ^7.9.0
     "@sentry/tracing": ^7.9.0
@@ -15284,7 +15294,7 @@ __metadata:
     react: 0.0.0-experimental-49f741046-20230305
     react-canvas-confetti: ^1.3.0
     react-circular-progressbar: ^2.0.4
-    react-devtools-inline: ^4.24.5
+    react-devtools-inline: 4.24.7
     react-devtools-inline_4_18_0: "npm:react-devtools-inline@4.18.0"
     react-dom: 0.0.0-experimental-49f741046-20230305
     react-error-boundary: ^4.0.10
@@ -15310,12 +15320,12 @@ __metadata:
     style-loader: ^3.3.1
     stylelint: ^14.16.0
     stylelint-config-prettier: ^9.0.5
-    suspense: ^0.0.44
+    suspense: ^0.0.45
     tailwindcss: ^3.2.4
     ts-node: ^10.7.0
     tsconfig-paths: ^3.14.1
     typescript: ^5.0.4
-    use-context-menu: ^0.4.10
+    use-context-menu: 0.4.12
     utf-8-validate: ^5.0.8
     uuid: ^7.0.3
     v8-to-istanbul: ^9.0.1
@@ -15489,7 +15499,7 @@ __metadata:
     "@lezer/common_replay_next": "npm:@lezer/common@1.0.1"
     "@lezer/highlight_replay_next": "npm:@lezer/highlight@1.1.1"
     "@playwright/test": ^1.35.0
-    "@replayio/protocol": ^0.54.0
+    "@replayio/protocol": ^0.55.0
     "@testing-library/jest-dom": ^5.16.3
     "@testing-library/react": ^13.2.0
     "@types/uuid": ^7.0.3
@@ -15509,9 +15519,9 @@ __metadata:
     react-dom: 0.0.0-experimental-e7d0053e6-20220325
     react-virtualized-auto-sizer: ^1.0.19
     shared: "workspace:*"
-    suspense: ^0.0.44
+    suspense: ^0.0.45
     typescript: 5.0.2
-    use-context-menu: ^0.4.10
+    use-context-menu: 0.4.12
     uuid: ^7.0.3
   languageName: unknown
   linkType: soft
@@ -16852,9 +16862,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"suspense@npm:^0.0.44":
-  version: 0.0.44
-  resolution: "suspense@npm:0.0.44"
+"suspense@npm:^0.0.45":
+  version: 0.0.45
+  resolution: "suspense@npm:0.0.45"
   dependencies:
     "@types/deep-equal": ^1.0.1
     array-sorting-utilities: ^0.0.1
@@ -16865,7 +16875,7 @@ __metadata:
   peerDependencies:
     react: ^18.0.0
     react-dom: ^18.0.0
-  checksum: ab2041294914d3c45a28cebd23807bb6ae88893b4c9e8f3e7afe2b95128bf7a3d10103d7b4da7cd8a43c28480069321b93d5e736d64f2efd3bc043b786fd352e
+  checksum: ec5997c6d0cf37d15f99103dee3ed8837c5e945738da494da7cda8ccba3bc076ad8892ad8f86029f43a7662bb352bb076a4be32098f060f98f32f279d3066fcc
   languageName: node
   linkType: hard
 
@@ -17702,13 +17712,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"use-context-menu@npm:^0.4.10":
-  version: 0.4.10
-  resolution: "use-context-menu@npm:0.4.10"
+"use-context-menu@npm:0.4.12":
+  version: 0.4.12
+  resolution: "use-context-menu@npm:0.4.12"
   peerDependencies:
     react: ^16.14.0 || ^17 || ^18
     react-dom: ^16.14.0 || ^17 || ^18
-  checksum: 7d6732b86efe75d164a998ecaaec261d3e73b991de62ba0af68241aef4fe7b6c4e35956a144f71b963f1333e6a53353f947fbeed36016c6ba57f758b2ed6cd5c
+  checksum: dba046bc95248512a6f698aae8e5c6997e6afb9b8da5e6d2199614d6d1f13ba640d4abd0201babf80ecc92f51115e58651c967b62e065691ec1158ef080b6b1d
   languageName: node
   linkType: hard
 
