@@ -27,15 +27,15 @@ const PROPERTY_BUCKET_SIZE = 100;
 //
 // https://static.replay.io/protocol/tot/Pause/#type-Property
 export default function PropertiesRenderer({
+  hidePrototype = false,
   object,
   path,
   pauseId,
-  hidePrototype = false,
 }: {
+  hidePrototype?: boolean;
   object: ProtocolObject;
   path?: string;
   pauseId: ProtocolPauseId;
-  hidePrototype?: boolean;
 }) {
   const client = useContext(ReplayClientContext);
 
