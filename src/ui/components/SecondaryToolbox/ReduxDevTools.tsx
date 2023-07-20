@@ -41,7 +41,7 @@ export const ReduxDevToolsPanel = () => {
       annotation =>
         focusWindow &&
         isPointInRegion(annotation.point, focusWindow) &&
-        annotation.payload.actionType.match(searchValue)
+        annotation.payload.actionType.toLowerCase().match(searchValue)
     );
   }, [parsedAnnotations, annotationsStatus, focusWindow, searchValue]);
 
