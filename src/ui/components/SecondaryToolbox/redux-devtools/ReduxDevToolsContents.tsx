@@ -1,17 +1,21 @@
 import {
   ExecutionPoint,
   PauseId,
+  PointDescription,
   NamedValue as ProtocolNamedValue,
   Value as ProtocolValue,
 } from "@replayio/protocol";
 import classnames from "classnames";
 import React, { Suspense, useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
 
+import NewFrames from "devtools/client/debugger/src/components/SecondaryPanes/Frames/NewFrames";
 import Inspector from "replay-next/components/inspector";
 import PropertiesRenderer from "replay-next/components/inspector/PropertiesRenderer";
 import Loader from "replay-next/components/Loader";
 import { clientValueCache, objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { useAppSelector } from "ui/setup/hooks";
+import { reduxDispatchJumpLocationCache } from "ui/suspense/jumpToLocationCache";
 
 import {
   ReduxActionStateValues,
@@ -131,7 +135,7 @@ interface RDTCProps {
   time: number;
 }
 
-type SelectedContentsTab = "action" | "state" | "diff";
+type SelectedContentsTab = "action" | "state" | "diff" | "trace";
 
 // TODO This UI layout doesn't distinguish between multiple "instances" in a page.
 // The backend data _ought_ to be set up so that each unique instance has its own
@@ -144,6 +148,8 @@ export function ReduxDevToolsContents({ point, time }: RDTCProps) {
   const [reduxValues, setReduxValues] = useState<ReduxActionStateValues | null>(null);
   const [diff, setDiff] = useState<Record<string, unknown> | null>(null);
   const [selectedTab, setSelectedTab] = useState<SelectedContentsTab>("action");
+  const sourcesState = useAppSelector(state => state.sources);
+  const [jumpLocation, setJumpLocation] = useState<PointDescription | null>(null);
 
   useLayoutEffect(() => {
     async function fetchAction() {
@@ -159,10 +165,20 @@ export function ReduxDevToolsContents({ point, time }: RDTCProps) {
           setDiff(diffRes ?? null);
           break;
         }
+        case "trace": {
+          const jumpLocation = await reduxDispatchJumpLocationCache.readAsync(
+            replayClient,
+            point,
+            time,
+            sourcesState
+          );
+          setJumpLocation(jumpLocation ?? null);
+          break;
+        }
       }
     }
     fetchAction();
-  }, [replayClient, point, time, selectedTab]);
+  }, [replayClient, point, time, selectedTab, sourcesState]);
 
   const [pauseId, actionValue, stateValue] = reduxValues ?? [];
 
@@ -196,6 +212,11 @@ export function ReduxDevToolsContents({ point, time }: RDTCProps) {
       );
       break;
     }
+    case "trace": {
+      contents = jumpLocation && (
+        <NewFrames panel="debugger" point={jumpLocation.point} time={jumpLocation.time} />
+      );
+    }
   }
 
   return (
@@ -227,6 +248,15 @@ export function ReduxDevToolsContents({ point, time }: RDTCProps) {
           }}
         >
           Diff
+        </PanelButton>
+        <PanelButton
+          selected={selectedTab === "trace"}
+          name="trace"
+          onClick={() => {
+            setSelectedTab("trace");
+          }}
+        >
+          Trace
         </PanelButton>
       </div>
 
