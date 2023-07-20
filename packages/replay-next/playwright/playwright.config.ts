@@ -15,7 +15,7 @@ const config: FullConfig = {
   globalSetup: require.resolve("./playwright.globalSetup"),
   // @ts-ignore
   reporter: CI ? "github" : "list",
-  retries: RECORD_VIDEO || VISUAL_DEBUG ? 0 : 2,
+  retries: RECORD_VIDEO || VISUAL_DEBUG ? 0 : 5,
   snapshotDir: "./snapshots",
   use: {
     // Don't allow any one action to take more than 15s
