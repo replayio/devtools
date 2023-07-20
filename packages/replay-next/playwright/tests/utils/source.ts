@@ -1,6 +1,8 @@
+import assert from "assert";
 import { Locator, Page, expect } from "@playwright/test";
 import chalk from "chalk";
 
+import { getSourcePreview } from "replay-next/playwright/tests/source-preview/shared";
 import {
   findContextMenuItem,
   hideContextMenu,
@@ -139,6 +141,7 @@ export async function continueTo(
         page,
         direction === "next" ? "Fast forward" : "Rewind"
       );
+      await expect(menuItem).toBeEnabled();
       await menuItem.click();
 
       break;
@@ -154,6 +157,7 @@ export async function continueTo(
       const button = lineLocator.locator('[data-test-name="ContinueToButton"]');
       const state = await button.getAttribute("data-test-state");
       if (direction === state) {
+        await expect(button).toBeEnabled();
         await button.click();
       }
 
@@ -499,13 +503,14 @@ export async function goToPreviousSourceSearchResult(page: Page) {
 export async function hoverOverLine(
   page: Page,
   options: {
+    columnNumber?: number;
     lineNumber: number;
     sourceId: string;
     withMetaKey?: boolean;
     withShiftKey?: boolean;
   }
 ): Promise<AsyncFunction> {
-  const { lineNumber, sourceId, withMetaKey, withShiftKey } = options;
+  const { columnNumber, lineNumber, sourceId, withMetaKey, withShiftKey } = options;
 
   let suffix = "";
   if (withMetaKey || withShiftKey) {
@@ -529,8 +534,27 @@ export async function hoverOverLine(
 
   // Hover over the line number itself, not the line, to avoid triggering protocol preview requests.
   const lineLocator = page.locator(`[data-test-id="SourceLine-${lineNumber}"]`);
-  const numberLocator = lineLocator.locator(`[data-test-id="SourceLine-LineNumber-${lineNumber}"]`);
-  await numberLocator.hover({ force: true });
+
+  if (columnNumber !== undefined) {
+    let match = null;
+
+    const inspectableTokens = lineLocator.locator("[data-inspectable-token]");
+    for (let i = 0; i < (await inspectableTokens.count()); i++) {
+      const inspectableToken = inspectableTokens.nth(i);
+      const dataColumnIndex = await inspectableToken.getAttribute("data-column-index");
+      if (dataColumnIndex !== null && columnNumber === parseInt(dataColumnIndex) + 1) {
+        match = inspectableToken;
+        break;
+      }
+    }
+    assert(match !== null);
+    await match.hover({ force: true });
+  } else {
+    const numberLocator = lineLocator.locator(
+      `[data-test-id="SourceLine-LineNumber-${lineNumber}"]`
+    );
+    await numberLocator.hover({ force: true });
+  }
 
   if (withShiftKey) {
     await page.keyboard.down("Shift");
@@ -1061,6 +1085,29 @@ export async function waitForSourceContentsToStream(page: Page, sourceId: string
       throw Error(`Waiting for source to be "resolved" but is "${status}"`);
     }
   });
+}
+
+export async function showPreview(
+  page: Page,
+  options: {
+    columnNumber: number;
+    lineNumber: number;
+    partialText?: string;
+    sourceId: string;
+  }
+) {
+  const { columnNumber, lineNumber, partialText, sourceId } = options;
+
+  await debugPrint(
+    page,
+    `Showing preview for token at ${chalk.bold(`${lineNumber}:${columnNumber}`)}"`,
+    "showPreview"
+  );
+
+  await hoverOverLine(page, { columnNumber, lineNumber, sourceId });
+
+  const sourcePreview = await getSourcePreview(page, partialText);
+  await expect(sourcePreview).toBeVisible();
 }
 
 async function waitForTimelineToUpdate(timelineLocator: Locator) {

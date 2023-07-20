@@ -41,17 +41,27 @@ export default function getExpressionForTokenElement(
     }
 
     switch (tokenType) {
+      case "keyword": {
+        if (code !== "this") {
+          break outer;
+        }
+        break;
+      }
       case "operator":
-      case "punctuation":
+      case "punctuation": {
         if (code !== ".") {
           break outer;
         }
+        break;
+      }
       case "propertyName":
       case "variableName":
-      case "variableName2":
+      case "variableName2": {
         break;
-      default:
+      }
+      default: {
         break outer;
+      }
     }
 
     expression = code + expression;

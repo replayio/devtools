@@ -2,7 +2,7 @@ import { Page, TestInfo } from "@playwright/test";
 
 import { takeScreenshot } from "../utils/general";
 
-export function getSourcePreview(page: Page, partialText: string) {
+export function getSourcePreview(page: Page, partialText?: string) {
   return page.locator("[data-test-name=SourcePreviewInspector]", { hasText: partialText });
 }
 

@@ -6,7 +6,7 @@ import testSetup from "../utils/testSetup";
 import { sourceId } from "./shared";
 
 export function beforeEach(
-  recordingId = "c9fffa00-ac71-48bc-adb2-52ae81588e85",
+  recordingId = "ecc98f8d-5c5b-4218-a329-2168276164d1",
   additionalQueryParams: string[] = []
 ) {
   testSetup(recordingId);
