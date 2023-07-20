@@ -95,6 +95,9 @@ const defaultMessaging: UnexpectedError = {
   message: "Our apologies!",
 };
 
+const isWindows = window.navigator.platform.indexOf('Win') > -1;
+const isFirefox = window.navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+
 // Reported reasons why a session can be destroyed.
 const SessionErrorMessages: Record<number, Partial<UnexpectedError>> = {
   [SessionError.BackendDeploy]: {
@@ -104,7 +107,9 @@ const SessionErrorMessages: Record<number, Partial<UnexpectedError>> = {
     content: "Our servers hiccuped but things should be back to normal soon.",
   },
   [SessionError.UnknownFatalError]: {
-    content: "Refreshing should help.\nIf not, please try recording again.",
+    content: isWindows && isFirefox 
+      ? "Our Windows support is currently in beta and will be improved soon. Thanks for your patience!"
+      : "Refreshing should help.\nIf not, please try recording again.",
   },
   [SessionError.KnownFatalError]: {
     content:
