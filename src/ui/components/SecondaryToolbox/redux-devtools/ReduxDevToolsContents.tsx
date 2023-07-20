@@ -256,7 +256,7 @@ export function ReduxDevToolsContents({ point, time }: RDTCProps) {
             setSelectedTab("trace");
           }}
         >
-          Trace
+          Stack
         </PanelButton>
       </div>
 
