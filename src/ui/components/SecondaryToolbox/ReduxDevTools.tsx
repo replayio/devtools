@@ -27,6 +27,7 @@ export const ReduxDevToolsPanel = () => {
   const client = useContext(ReplayClientContext);
   const [selectedPoint, setSelectedPoint] = useState<ExecutionPoint | null>(null);
   const focusWindow = useAppSelector(getFocusWindow);
+  const [searchValue, setSearchValue] = useState("");
 
   const { status: annotationsStatus, value: parsedAnnotations } = useImperativeCacheValue(
     reduxDevToolsAnnotationsCache,
@@ -37,9 +38,12 @@ export const ReduxDevToolsPanel = () => {
   const reduxAnnotations: ReduxActionAnnotation[] = useMemo(() => {
     const annotations = annotationsStatus === "resolved" ? parsedAnnotations : [];
     return annotations.filter(
-      annotation => focusWindow && isPointInRegion(annotation.point, focusWindow)
+      annotation =>
+        focusWindow &&
+        isPointInRegion(annotation.point, focusWindow) &&
+        annotation.payload.actionType.match(searchValue)
     );
-  }, [parsedAnnotations, annotationsStatus, focusWindow]);
+  }, [parsedAnnotations, annotationsStatus, focusWindow, searchValue]);
 
   const annotation = reduxAnnotations.find(ann => ann.point === selectedPoint)!;
 
@@ -48,9 +52,10 @@ export const ReduxDevToolsPanel = () => {
   );
 
   return (
-    <div className={classnames("flex min-h-full bg-bodyBgcolor p-1 text-xs", styles.actions)}>
+    <div className={classnames("flex min-h-full bg-bodyBgcolor text-xs", styles.actions)}>
       <PanelGroup autoSaveId="ReduxDevTools" direction="horizontal">
         <ResizablePanel collapsible>
+          <ActionFilter searchValue={searchValue} onSearch={setSearchValue} />
           <div role="list" className={styles.list}>
             {reduxAnnotations.map(annotation => (
               <ActionItem
@@ -63,10 +68,7 @@ export const ReduxDevToolsPanel = () => {
             ))}
           </div>
         </ResizablePanel>
-        <PanelResizeHandle className={styles.ResizeHandle}>
-          <div className={styles.ResizeHandleBar} />
-        </PanelResizeHandle>
-
+        <PanelResizeHandle className="h-full w-1 bg-chrome" />
         <ResizablePanel collapsible>
           {selectedPoint && annotation && (
             <ReduxDevToolsContents point={selectedPoint} time={annotation.time} />
@@ -76,6 +78,36 @@ export const ReduxDevToolsPanel = () => {
     </div>
   );
 };
+
+function ActionFilter({
+  searchValue,
+  onSearch,
+}: {
+  searchValue: string;
+  onSearch: (value: string) => void;
+}) {
+  return (
+    <div className="inspector devtools-toolbar devtools-input-toolbar">
+      <div
+        id="redux-search"
+        className={classnames(
+          "devtools-searchbox grow text-themeTextFieldColor",
+          styles.ActionFilter
+        )}
+      >
+        <input
+          id="redux-searchbox"
+          className="devtools-searchinput"
+          type="input"
+          placeholder="Filter..."
+          autoComplete="off"
+          value={searchValue}
+          onChange={e => onSearch(e.target.value)}
+        />
+      </div>
+    </div>
+  );
+}
 
 interface PointWithLocation {
   location: Location;
