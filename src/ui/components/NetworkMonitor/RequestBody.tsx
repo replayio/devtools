@@ -1,5 +1,6 @@
 import { useNetworkRequestBody } from "replay-next/src/hooks/useNetworkRequestBody";
 
+import LoadingProgressBar from "../shared/LoadingProgressBar";
 import HttpBody from "./HttpBody";
 import { RequestSummary, findHeader } from "./utils";
 
@@ -14,7 +15,7 @@ export default function RequestBodyWrapper({ request }: { request: RequestSummar
 function RequestBody({ request }: { request: RequestSummary }) {
   const requestBody = useNetworkRequestBody(request.id);
   if (!requestBody) {
-    return null;
+    return <LoadingProgressBar />;
   }
 
   return (
