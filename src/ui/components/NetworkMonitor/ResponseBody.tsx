@@ -2,6 +2,7 @@ import { ResponseBodyData } from "@replayio/protocol";
 
 import { useNetworkResponseBody } from "replay-next/src/hooks/useNetworkResponseBody";
 
+import LoadingProgressBar from "../shared/LoadingProgressBar";
 import HttpBody from "./HttpBody";
 import { RequestSummary, findHeader } from "./utils";
 
@@ -30,7 +31,7 @@ export function _ResponseBody({
 function ResponseBody({ request }: { request: RequestSummary }) {
   const responseBody = useNetworkResponseBody(request.id);
   if (!responseBody) {
-    return null;
+    return <LoadingProgressBar />;
   }
 
   return <_ResponseBody request={request} responseBodyParts={responseBody} />;
