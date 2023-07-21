@@ -1,5 +1,3 @@
-import test, { expect } from "@playwright/test";
-
 import { openDevToolsTab, startTest } from "../helpers";
 import {
   getErrorRows,
@@ -21,11 +19,15 @@ import {
   openCypressTestPanel,
 } from "../helpers/testsuites";
 import { debugPrint, delay, waitFor } from "../helpers/utils";
+import test, { expect } from "../testFixtureCloneRecording";
 
-const url = "flake/adding-spec.ts";
+test.use({ exampleKey: "flake/adding-spec.ts" });
 
-test("cypress-01: Basic Test Suites panel functionality", async ({ page }) => {
-  await startTest(page, url);
+test("cypress-01: Basic Test Suites panel functionality", async ({
+  pageWithMeta: { page, recordingId },
+  exampleKey,
+}) => {
+  await startTest(page, exampleKey, recordingId);
   await openDevToolsTab(page);
 
   await openCypressTestPanel(page);

@@ -1,5 +1,3 @@
-import test, { expect } from "@playwright/test";
-
 import { openDevToolsTab, startTest } from "../helpers";
 import { E2E_USER_1_API_KEY } from "../helpers/authentication";
 import { warpToMessage } from "../helpers/console-panel";
@@ -7,13 +5,17 @@ import { isPassportItemCompleted, showPassport } from "../helpers/passport";
 import { enablePassport } from "../helpers/settings";
 import { addLogpoint, removeAllLogpoints } from "../helpers/source-panel";
 import { resetTestUser, waitFor } from "../helpers/utils";
+import test, { expect } from "../testFixtureCloneRecording";
 
-const url = "doc_rr_console.html";
+test.use({ exampleKey: "doc_rr_console.html" });
 
-test(`authenticated/passport-01: Time travel`, async ({ page }) => {
+test(`authenticated/passport-01: Time travel`, async ({
+  pageWithMeta: { page, recordingId },
+  exampleKey,
+}) => {
   await resetTestUser("frontende2e1@replay.io");
 
-  await startTest(page, url, E2E_USER_1_API_KEY);
+  await startTest(page, exampleKey, recordingId, E2E_USER_1_API_KEY);
 
   await enablePassport(page);
   await showPassport(page);

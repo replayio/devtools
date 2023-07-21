@@ -48,26 +48,29 @@ Replay, in turn, is a debugger, and we have to load recordings into the UI.
 
 Our tests need to work with known data, and we also want to exercise specific aspects of Replay's behavior. To do this, we have a set of pre-written example files that demonstrates various aspects of JS behavior (control flow, exceptions, async, sourcemaps, etc). These files are pre-recorded as you would any other app, and then the tests themselves open up a specific example file recording in Replay and programmatically drive our UI to debug the recording.
 
-Our old E2E test suite re-recorded those examples every time the test suite ran. To speed up the tests, we now make a single set of "golden recordings" ahead of time, and save the known recording IDs in `examples.json`. Then, every time we run the tests, we look up the corresponding recording ID for a given example file, and open up that existing recording.
+Our old E2E test suite re-recorded those examples every time the test suite ran. To speed up the tests, we now make a single set of "golden recordings" ahead of time, and save the known recording IDs in `examples.json`. Then, every time we run the tests, we look up the corresponding recording ID, for a given example file, clone it to keep test execution isolated and open up that clone recording.
 
 The tests themselves are written using a set of "page object"-style helper functions that abstract specific pieces of DOM interaction. This allows the tests themselves to be written in a more readable style and focus on the sequence of operations:
 
 ```ts
+import test from "../testFixtureCloneRecording";
+
 test(`Test stepping forward through breakpoints when rewound before the first one.`, async ({
-  page,
+  pageWithMeta: { page, recordingId },
+  exampleKey,
 }) => {
-  await startTest(page, url);
+  await startTest(page, exampleKey, recordingId);
   await openDevToolsTab(page);
 
-  await addBreakpoint(page, { lineNumber: 8, url });
+  await addBreakpoint(page, { lineNumber: 8, url: exampleKey });
   // Rewind to when the point was hit
   await rewindToLine(page, { lineNumber: 8 });
   // Rewind further (past the first hit)
   await rewindToLine(page);
 
-  await removeBreakpoint(page, { lineNumber: 8, url });
+  await removeBreakpoint(page, { lineNumber: 8, url: exampleKey });
 
-  await addBreakpoint(page, { lineNumber: 21, url });
+  await addBreakpoint(page, { lineNumber: 21, url: exampleKey });
   await resumeToLine(page, { lineNumber: 21 });
   await executeAndVerifyTerminalExpression(page, "number", "1");
   await resumeToLine(page, { lineNumber: 21 });

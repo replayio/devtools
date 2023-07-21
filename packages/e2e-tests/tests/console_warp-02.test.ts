@@ -1,5 +1,3 @@
-import test from "@playwright/test";
-
 import { openDevToolsTab, startTest } from "../helpers";
 import {
   executeAndVerifyTerminalExpression,
@@ -8,13 +6,15 @@ import {
   warpToMessage,
 } from "../helpers/console-panel";
 import { reverseStepOverToLine, stepOverToLine } from "../helpers/pause-information-panel";
+import test from "../testFixtureCloneRecording";
 
-const url = "doc_rr_logs.html";
+test.use({ exampleKey: "doc_rr_logs.html" });
 
 test("console_warp-02: support pausing, warping, stepping and evaluating console messages", async ({
-  page,
+  pageWithMeta: { page, recordingId },
+  exampleKey,
 }) => {
-  await startTest(page, url);
+  await startTest(page, exampleKey, recordingId);
   await openDevToolsTab(page);
   await openConsolePanel(page);
 

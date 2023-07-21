@@ -1,5 +1,3 @@
-import test from "@playwright/test";
-
 import { openDevToolsTab, startTest } from "../helpers";
 import { quickOpen } from "../helpers/commands";
 import {
@@ -17,9 +15,15 @@ import {
   waitForBreakpoint,
   waitForLogpoint,
 } from "../helpers/source-panel";
+import test from "../testFixtureCloneRecording";
 
-test(`breakpoints-07: rewind and seek using command bar and console messages`, async ({ page }) => {
-  await startTest(page, "doc_navigate.html");
+test.use({ exampleKey: "doc_navigate.html" });
+
+test(`breakpoints-07: rewind and seek using command bar and console messages`, async ({
+  pageWithMeta: { page, recordingId },
+  exampleKey,
+}) => {
+  await startTest(page, exampleKey, recordingId);
   await openDevToolsTab(page);
 
   await quickOpen(page, "bundle_input.js");

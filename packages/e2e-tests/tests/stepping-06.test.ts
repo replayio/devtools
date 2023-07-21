@@ -1,5 +1,3 @@
-import test from "@playwright/test";
-
 import { getRecordingTarget, openDevToolsTab, startTest } from "../helpers";
 import { executeAndVerifyTerminalExpression, warpToMessage } from "../helpers/console-panel";
 import {
@@ -11,13 +9,17 @@ import {
   waitForFrameTimeline,
   waitForScopeValue,
 } from "../helpers/pause-information-panel";
+import test from "../testFixtureCloneRecording";
 
-const url = "doc_async.html";
+test.use({ exampleKey: "doc_async.html" });
 
 // Because stepping works differently between gecko and chromium,
 // frame timeline percentages are different in this test.
-test(`stepping-06: Test stepping in async frames and async call stacks`, async ({ page }) => {
-  await startTest(page, url);
+test(`stepping-06: Test stepping in async frames and async call stacks`, async ({
+  pageWithMeta: { page, recordingId },
+  exampleKey,
+}) => {
+  await startTest(page, exampleKey, recordingId);
   await openDevToolsTab(page);
 
   const target = await getRecordingTarget(page);

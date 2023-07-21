@@ -1,11 +1,15 @@
-import test from "@playwright/test";
-
 import { openDevToolsTab, startTest } from "../helpers";
 import { openConsolePanel, warpToMessage } from "../helpers/console-panel";
 import { selectFrame, waitForScopeValue } from "../helpers/pause-information-panel";
+import test from "../testFixtureCloneRecording";
 
-test("scopes_rerender: Test that scopes are rerendered", async ({ page }) => {
-  await startTest(page, "doc_recursion.html");
+test.use({ exampleKey: "doc_recursion.html" });
+
+test("scopes_rerender: Test that scopes are rerendered", async ({
+  pageWithMeta: { page, recordingId },
+  exampleKey,
+}) => {
+  await startTest(page, exampleKey, recordingId);
   await openDevToolsTab(page);
   await openConsolePanel(page);
 

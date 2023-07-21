@@ -1,5 +1,3 @@
-import test from "@playwright/test";
-
 import { openDevToolsTab, startTest } from "../helpers";
 import { openConsolePanel, warpToMessage } from "../helpers/console-panel";
 import {
@@ -7,9 +5,15 @@ import {
   checkAppliedRules,
   selectElementsRowWithText,
 } from "../helpers/elements-panel";
+import test from "../testFixtureCloneRecording";
 
-test("inspector-05: Test that styles for elements can be viewed", async ({ page }) => {
-  await startTest(page, "doc_inspector_sourcemapped.html");
+test.use({ exampleKey: "doc_inspector_sourcemapped.html" });
+
+test("inspector-05: Test that styles for elements can be viewed", async ({
+  pageWithMeta: { page, recordingId },
+  exampleKey,
+}) => {
+  await startTest(page, exampleKey, recordingId);
   await openDevToolsTab(page);
   await openConsolePanel(page);
   await warpToMessage(page, "ExampleFinished");

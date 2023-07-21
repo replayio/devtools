@@ -1,23 +1,25 @@
-import test from "@playwright/test";
-
 import { openDevToolsTab, startTest } from "../helpers";
 import { warpToMessage } from "../helpers/console-panel";
 import { selectFrame, stepOutToLine, stepOverToLine } from "../helpers/pause-information-panel";
 import { clickSourceTreeNode } from "../helpers/source-explorer-panel";
 import { addLogpoint } from "../helpers/source-panel";
+import test from "../testFixtureCloneRecording";
 
-const url = "doc_rr_basic.html";
+test.use({ exampleKey: "doc_rr_basic.html" });
 
-test("stepping-04: Test stepping in a frame other than the top frame", async ({ page }) => {
-  await startTest(page, url);
+test("stepping-04: Test stepping in a frame other than the top frame", async ({
+  pageWithMeta: { page, recordingId },
+  exampleKey,
+}) => {
+  await startTest(page, exampleKey, recordingId);
   await openDevToolsTab(page);
 
   // Open doc_rr_basic.html
   await clickSourceTreeNode(page, "test");
   await clickSourceTreeNode(page, "examples");
-  await clickSourceTreeNode(page, url);
+  await clickSourceTreeNode(page, exampleKey);
 
-  await addLogpoint(page, { lineNumber: 24, url, content: "'logpoint', number" });
+  await addLogpoint(page, { lineNumber: 24, url: exampleKey, content: "'logpoint', number" });
 
   await warpToMessage(page, "logpoint 5");
   await selectFrame(page, 1);

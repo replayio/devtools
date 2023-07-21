@@ -1,8 +1,7 @@
-import test, { Page, expect } from "@playwright/test";
-
 import { openDevToolsTab, startTest } from "../helpers";
 import { findConsoleMessage } from "../helpers/console-panel";
 import { addLogpoint } from "../helpers/source-panel";
+import test, { Page, expect } from "../testFixtureCloneRecording";
 
 async function checkMessageLocation(page: Page, text: string, location: string) {
   const message = await findConsoleMessage(page, text, "log-point");
@@ -10,8 +9,13 @@ async function checkMessageLocation(page: Page, text: string, location: string) 
   expect(textContent!.includes(location)).toBeTruthy();
 }
 
-test(`breakpoints-06: Test log point in a sourcemapped file`, async ({ page }) => {
-  await startTest(page, "doc_prod_bundle.html");
+test.use({ exampleKey: "doc_prod_bundle.html" });
+
+test(`breakpoints-06: Test log point in a sourcemapped file`, async ({
+  pageWithMeta: { page, recordingId },
+  exampleKey,
+}) => {
+  await startTest(page, exampleKey, recordingId);
   await openDevToolsTab(page);
 
   // Log point added to line 15 should map to line 15

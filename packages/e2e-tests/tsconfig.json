@@ -2,6 +2,7 @@
   "compilerOptions": {
     "downlevelIteration": true,
     "esModuleInterop": true,
+    "resolveJsonModule": true,
     "types": ["cypress"]
   }
 }

@@ -1,4 +1,3 @@
-import test from "@playwright/test";
 import { Locator, Page, expect } from "@playwright/test";
 
 import { openDevToolsTab, startTest } from "../helpers";
@@ -10,6 +9,7 @@ import {
 } from "../helpers/elements-panel";
 import { getBreakpointsAccordionPane } from "../helpers/pause-information-panel";
 import { mapLocators, waitFor } from "../helpers/utils";
+import test from "../testFixtureCloneRecording";
 
 interface StackingTestCase {
   id: string;
@@ -219,10 +219,13 @@ async function readCanvasTransformScale(canvas: Locator) {
   return scale;
 }
 
+test.use({ exampleKey: "doc_stacking.html" });
+
 test("stacking: Element highlighter selects the correct element when they overlap", async ({
-  page,
+  pageWithMeta: { page, recordingId },
+  exampleKey,
 }) => {
-  await startTest(page, "doc_stacking.html");
+  await startTest(page, exampleKey, recordingId);
   await openDevToolsTab(page);
 
   await warpToMessage(page, "ExampleFinished");

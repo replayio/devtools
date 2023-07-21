@@ -1,5 +1,3 @@
-import test, { expect } from "@playwright/test";
-
 import { openDevToolsTab, startTest } from "../helpers";
 import {
   executeTerminalExpression,
@@ -19,9 +17,15 @@ import {
 } from "../helpers/react-devtools-panel";
 import { hoverScreenshot } from "../helpers/screenshot";
 import { waitFor } from "../helpers/utils";
+import test, { expect } from "../testFixtureCloneRecording";
 
-test("react_devtools: Test React DevTools.", async ({ page }) => {
-  await startTest(page, "cra/dist/index.html");
+test.use({ exampleKey: "cra/dist/index.html" });
+
+test("react_devtools: Test React DevTools.", async ({
+  pageWithMeta: { page, recordingId },
+  exampleKey,
+}) => {
+  await startTest(page, exampleKey, recordingId);
   await openDevToolsTab(page);
 
   // General behavior: should show a React component tree

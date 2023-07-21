@@ -1,11 +1,15 @@
-import test from "@playwright/test";
-
 import { openDevToolsTab, startTest } from "../helpers";
 import { openSource } from "../helpers/source-explorer-panel";
 import { getCommandKey } from "../helpers/utils";
+import test from "../testFixtureCloneRecording";
 
-test("quick_open_modal-01: Test basic searching functionality", async ({ page }) => {
-  await startTest(page, "node/basic.js");
+test.use({ exampleKey: "node/basic.js" });
+
+test("quick_open_modal-01: Test basic searching functionality", async ({
+  pageWithMeta: { page, recordingId },
+  exampleKey,
+}) => {
+  await startTest(page, exampleKey, recordingId);
   await openDevToolsTab(page);
 
   await openSource(page, "basic.js");

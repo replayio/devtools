@@ -1,14 +1,16 @@
-import test, { Page } from "@playwright/test";
-
 import { openDevToolsTab, startTest } from "../helpers";
 import { resumeToLine, rewindToLine } from "../helpers/pause-information-panel";
 import { addBreakpoint } from "../helpers/source-panel";
+import test, { Page } from "../testFixtureCloneRecording";
 
-const url = "doc_control_flow.html";
+test.use({ exampleKey: "doc_control_flow.html" });
 
 // Test hitting breakpoints when using tricky control flow constructs:
-test(`breakpoints-04: catch, finally, generators, and async/await`, async ({ page }) => {
-  await startTest(page, url);
+test(`breakpoints-04: catch, finally, generators, and async/await`, async ({
+  pageWithMeta: { page, recordingId },
+  exampleKey,
+}) => {
+  await startTest(page, exampleKey, recordingId);
   await openDevToolsTab(page);
 
   await rewindToBreakpoint(page, 10);
@@ -27,12 +29,12 @@ test(`breakpoints-04: catch, finally, generators, and async/await`, async ({ pag
   await resumeToBreakpoint(page, 72);
 
   async function rewindToBreakpoint(page: Page, lineNumber: number) {
-    await addBreakpoint(page, { lineNumber, url });
+    await addBreakpoint(page, { lineNumber, url: exampleKey });
     await rewindToLine(page, lineNumber);
   }
 
   async function resumeToBreakpoint(page: Page, lineNumber: number) {
-    await addBreakpoint(page, { lineNumber, url });
+    await addBreakpoint(page, { lineNumber, url: exampleKey });
     await resumeToLine(page, lineNumber);
   }
 });

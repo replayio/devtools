@@ -1,5 +1,3 @@
-import test, { expect } from "@playwright/test";
-
 import { openDevToolsTab, startTest } from "../helpers";
 import { E2E_USER_1_API_KEY } from "../helpers/authentication";
 import {
@@ -11,14 +9,19 @@ import {
 } from "../helpers/comments";
 import { openNetworkPanel } from "../helpers/network-panel";
 import { openSource } from "../helpers/source-explorer-panel";
+import test, { expect } from "../testFixtureCloneRecording";
 
 // Each authenticated e2e test must use a unique recording id;
 // else shared state from one test could impact another test running in parallel.
 // TODO [SCS-1066] Share recordings between other tests
-const url = "authenticated_comments_3.html";
 
-test(`authenticated/comments-03: Comment previews`, async ({ page }) => {
-  await startTest(page, url, E2E_USER_1_API_KEY);
+test.use({ exampleKey: "authenticated_comments_3.html" });
+
+test(`authenticated/comments-03: Comment previews`, async ({
+  pageWithMeta: { page, recordingId },
+  exampleKey: url,
+}) => {
+  await startTest(page, url, recordingId, E2E_USER_1_API_KEY);
   await openDevToolsTab(page);
 
   // Clean up from previous tests

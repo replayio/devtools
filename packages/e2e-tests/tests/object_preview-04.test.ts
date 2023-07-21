@@ -1,5 +1,3 @@
-import test from "@playwright/test";
-
 import { openDevToolsTab, startTest } from "../helpers";
 import { executeAndVerifyTerminalExpression, warpToMessage } from "../helpers/console-panel";
 import {
@@ -8,13 +6,15 @@ import {
   waitForScopeValue,
 } from "../helpers/pause-information-panel";
 import { addBreakpoint, addLogpoint, toggleMappedSources } from "../helpers/source-panel";
+import test from "../testFixtureCloneRecording";
 
-const url = "doc_prod_bundle.html";
+test.use({ exampleKey: "doc_prod_bundle.html" });
 
 test(`object_preview-04: Test scope mapping and switching between generated/original sources`, async ({
-  page,
+  pageWithMeta: { page, recordingId },
+  exampleKey,
 }) => {
-  await startTest(page, url);
+  await startTest(page, exampleKey, recordingId);
   await openDevToolsTab(page);
 
   await addBreakpoint(page, { lineNumber: 15, url: "bundle_input.js" });

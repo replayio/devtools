@@ -1,5 +1,3 @@
-import test, { expect } from "@playwright/test";
-
 import { openDevToolsTab, startTest } from "../helpers";
 import {
   executeAndVerifyTerminalExpression,
@@ -9,32 +7,34 @@ import {
 } from "../helpers/console-panel";
 import { resumeToLine, reverseStepOverToLine } from "../helpers/pause-information-panel";
 import { addBreakpoint, addLogpoint } from "../helpers/source-panel";
+import test, { expect } from "../testFixtureCloneRecording";
 
-const url = "doc_rr_basic.html";
+test.use({ exampleKey: "doc_rr_basic.html" });
 
 test(`logpoints-01: log-points appear in the correct order and allow time warping`, async ({
-  page,
+  pageWithMeta: { page, recordingId },
+  exampleKey,
 }) => {
-  await startTest(page, url);
+  await startTest(page, exampleKey, recordingId);
   await openDevToolsTab(page);
 
-  await addBreakpoint(page, { lineNumber: 20, url });
+  await addBreakpoint(page, { lineNumber: 20, url: exampleKey });
   await addLogpoint(page, {
     content: '"Logpoint Number " + number',
     lineNumber: 20,
-    url,
+    url: exampleKey,
   });
 
   await addLogpoint(page, {
     content: '"Logpoint Beginning"',
     lineNumber: 9,
-    url,
+    url: exampleKey,
   });
 
   await addLogpoint(page, {
     content: '"Logpoint Ending"',
     lineNumber: 7,
-    url,
+    url: exampleKey,
   });
 
   await openConsolePanel(page);

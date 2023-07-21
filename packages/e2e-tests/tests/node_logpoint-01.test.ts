@@ -1,5 +1,3 @@
-import test from "@playwright/test";
-
 import { startTest } from "../helpers";
 import {
   executeAndVerifyTerminalExpression,
@@ -9,9 +7,15 @@ import {
 import { reverseStepOverToLine } from "../helpers/pause-information-panel";
 import { openSource } from "../helpers/source-explorer-panel";
 import { addLogpoint } from "../helpers/source-panel";
+import test from "../testFixtureCloneRecording";
 
-test("node_logpoint-01: Basic node logpoints", async ({ page }) => {
-  await startTest(page, "node/basic.js");
+test.use({ exampleKey: "node/basic.js" });
+
+test("node_logpoint-01: Basic node logpoints", async ({
+  pageWithMeta: { page, recordingId },
+  exampleKey,
+}) => {
+  await startTest(page, exampleKey, recordingId);
 
   await openConsolePanel(page);
 

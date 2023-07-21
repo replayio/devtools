@@ -1,5 +1,3 @@
-import test, { expect } from "@playwright/test";
-
 import { isViewerTabActive, openDevToolsTab, openViewerTab, startTest } from "../helpers";
 import { closeSource, getSelectedLineNumber, waitForSelectedSource } from "../helpers/source-panel";
 import {
@@ -14,11 +12,15 @@ import {
 } from "../helpers/testsuites";
 import { waitForTimelineAdvanced } from "../helpers/timeline";
 import { getByTestName, waitFor } from "../helpers/utils";
+import test, { expect } from "../testFixtureCloneRecording";
 
-const url = "flake/adding-spec.ts";
+test.use({ exampleKey: "flake/adding-spec.ts" });
 
-test("cypress-03: Test Step interactions", async ({ page }) => {
-  await startTest(page, url);
+test("cypress-03: Test Step interactions", async ({
+  pageWithMeta: { page, recordingId },
+  exampleKey,
+}) => {
+  await startTest(page, exampleKey, recordingId);
   await openViewerTab(page);
 
   await openCypressTestPanel(page);

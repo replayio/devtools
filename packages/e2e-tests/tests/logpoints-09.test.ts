@@ -1,25 +1,27 @@
-import test from "@playwright/test";
-
 import { openDevToolsTab, startTest } from "../helpers";
 import { addLogpoint, editLogPoint, verifyLogPointPanelContent } from "../helpers/source-panel";
+import test from "../testFixtureCloneRecording";
 
-const url = "doc_rr_basic.html";
 const lineNumber = 20;
+test.use({ exampleKey: "doc_rr_basic.html" });
 
-test(`logpoints-09: should support pending edits`, async ({ page }) => {
-  await startTest(page, url);
+test(`logpoints-09: should support pending edits`, async ({
+  pageWithMeta: { page, recordingId },
+  exampleKey,
+}) => {
+  await startTest(page, exampleKey, recordingId);
   await openDevToolsTab(page);
 
   await addLogpoint(page, {
     content: '"initial"',
     lineNumber,
-    url,
+    url: exampleKey,
   });
   await verifyLogPointPanelContent(page, {
     badge: null,
     content: '"initial"',
     lineNumber,
-    url,
+    url: exampleKey,
   });
 
   // Edit badge; should not impact content or conditional
@@ -27,13 +29,13 @@ test(`logpoints-09: should support pending edits`, async ({ page }) => {
     badge: "purple",
     lineNumber,
     saveAfterEdit: false,
-    url,
+    url: exampleKey,
   });
   await verifyLogPointPanelContent(page, {
     badge: "purple",
     content: '"initial"',
     lineNumber,
-    url,
+    url: exampleKey,
   });
 
   // Edit content; should not impact badge or conditional
@@ -41,13 +43,13 @@ test(`logpoints-09: should support pending edits`, async ({ page }) => {
     content: '"new"',
     lineNumber,
     saveAfterEdit: false,
-    url,
+    url: exampleKey,
   });
   await verifyLogPointPanelContent(page, {
     badge: "purple",
     content: '"new"',
     lineNumber,
-    url,
+    url: exampleKey,
   });
 
   // Edit badge; should not impact content or conditional
@@ -56,13 +58,13 @@ test(`logpoints-09: should support pending edits`, async ({ page }) => {
     badge: "orange",
     lineNumber,
     saveAfterEdit: false,
-    url,
+    url: exampleKey,
   });
   await verifyLogPointPanelContent(page, {
     badge: "orange",
     content: '"new"',
     lineNumber,
-    url,
+    url: exampleKey,
   });
 
   // Edit conditional; should not impact badge or content
@@ -70,14 +72,14 @@ test(`logpoints-09: should support pending edits`, async ({ page }) => {
     condition: "true",
     lineNumber,
     saveAfterEdit: false,
-    url,
+    url: exampleKey,
   });
   await verifyLogPointPanelContent(page, {
     badge: "orange",
     condition: "true",
     content: '"new"',
     lineNumber,
-    url,
+    url: exampleKey,
   });
 
   // Edit badge; should not impact conditional or content
@@ -85,20 +87,20 @@ test(`logpoints-09: should support pending edits`, async ({ page }) => {
     badge: "yellow",
     lineNumber,
     saveAfterEdit: false,
-    url,
+    url: exampleKey,
   });
   await verifyLogPointPanelContent(page, {
     badge: "yellow",
     condition: "true",
     content: '"new"',
     lineNumber,
-    url,
+    url: exampleKey,
   });
 
   // Saving should update
   await editLogPoint(page, {
     lineNumber,
     saveAfterEdit: true,
-    url,
+    url: exampleKey,
   });
 });

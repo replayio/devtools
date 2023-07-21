@@ -1,5 +1,3 @@
-import test from "@playwright/test";
-
 import { openDevToolsTab, startTest } from "../helpers";
 import {
   executeTerminalExpression,
@@ -13,9 +11,15 @@ import {
   verifyLogPointContentTypeAheadSuggestions,
 } from "../helpers/source-panel";
 import { delay } from "../helpers/utils";
+import test from "../testFixtureCloneRecording";
 
-test(`logpoints-07: should use the correct scope in auto-complete`, async ({ page }) => {
-  await startTest(page, "cra/dist/index.html");
+test.use({ exampleKey: "cra/dist/index.html" });
+
+test(`logpoints-07: should use the correct scope in auto-complete`, async ({
+  pageWithMeta: { page, recordingId },
+  exampleKey,
+}) => {
+  await startTest(page, exampleKey, recordingId);
   await openDevToolsTab(page);
 
   let url = "App.js";

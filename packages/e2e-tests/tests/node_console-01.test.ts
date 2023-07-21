@@ -1,5 +1,3 @@
-import test from "@playwright/test";
-
 import { startTest } from "../helpers";
 import {
   executeAndVerifyTerminalExpression,
@@ -7,9 +5,15 @@ import {
   warpToMessage,
 } from "../helpers/console-panel";
 import { reverseStepOverToLine, waitForScopeValue } from "../helpers/pause-information-panel";
+import test from "../testFixtureCloneRecording";
 
-test("node_console-01: Basic node console behavior", async ({ page }) => {
-  await startTest(page, "node/basic.js");
+test.use({ exampleKey: "node/basic.js" });
+
+test("node_console-01: Basic node console behavior", async ({
+  pageWithMeta: { page, recordingId },
+  exampleKey,
+}) => {
+  await startTest(page, exampleKey, recordingId);
   await openConsolePanel(page);
 
   await warpToMessage(page, "HELLO 1");

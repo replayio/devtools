@@ -1,19 +1,19 @@
-import { Page, test } from "@playwright/test";
-
 import { openDevToolsTab, startTest } from "../helpers";
 import { rewindToLine, stepOver, waitForPaused } from "../helpers/pause-information-panel";
 import { addBreakpoint } from "../helpers/source-panel";
 import { waitFor } from "../helpers/utils";
+import { Page, test } from "../testFixtureCloneRecording";
 
-const url = "doc_control_flow.html";
+test.use({ exampleKey: "doc_control_flow.html" });
 
 test("repaint: repaints the screen screen when stepping over code that modifies the DOM", async ({
-  page,
+  pageWithMeta: { page, recordingId },
+  exampleKey,
 }) => {
-  await startTest(page, url);
+  await startTest(page, exampleKey, recordingId);
   await openDevToolsTab(page);
 
-  await addBreakpoint(page, { lineNumber: 50, url });
+  await addBreakpoint(page, { lineNumber: 50, url: exampleKey });
   await rewindToLine(page, 50);
 
   const prevDataUrl = await getCanvasDataUrl(page);

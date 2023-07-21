@@ -1,5 +1,3 @@
-import test from "@playwright/test";
-
 import { getRecordingTarget, openDevToolsTab, startTest } from "../helpers";
 import {
   executeAndVerifyTerminalExpression,
@@ -12,18 +10,22 @@ import {
   rewindToLine,
 } from "../helpers/pause-information-panel";
 import { addBreakpoint } from "../helpers/source-panel";
+import test from "../testFixtureCloneRecording";
 
-const url = "doc_rr_error.html";
+test.use({ exampleKey: "doc_rr_error.html" });
 
-test(`console_warp-01: should support warping to console messages`, async ({ page }) => {
-  await startTest(page, url);
+test(`console_warp-01: should support warping to console messages`, async ({
+  pageWithMeta: { page, recordingId },
+  exampleKey,
+}) => {
+  await startTest(page, exampleKey, recordingId);
   await openDevToolsTab(page);
   await openConsolePanel(page);
 
   await warpToMessage(page, "Number 5", 19);
   await executeAndVerifyTerminalExpression(page, "number", 5);
 
-  await addBreakpoint(page, { lineNumber: 12, url });
+  await addBreakpoint(page, { lineNumber: 12, url: exampleKey });
   await rewindToLine(page, 12);
   await executeAndVerifyTerminalExpression(page, "number", 4);
   await resumeToLine(page, 12);

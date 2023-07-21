@@ -1,11 +1,15 @@
-import test from "@playwright/test";
-
 import { startTest } from "../helpers";
 import { openConsolePanel, warpToMessage } from "../helpers/console-panel";
 import { waitForPaused, waitForScopeValue } from "../helpers/pause-information-panel";
+import test from "../testFixtureCloneRecording";
 
-test("node_spawn: Basic subprocess spawning", async ({ page }) => {
-  await startTest(page, "node/spawn.js");
+test.use({ exampleKey: "node/spawn.js" });
+
+test("node_spawn: Basic subprocess spawning", async ({
+  pageWithMeta: { page, recordingId },
+  exampleKey,
+}) => {
+  await startTest(page, exampleKey, recordingId);
 
   await openConsolePanel(page);
 

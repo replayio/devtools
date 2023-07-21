@@ -1,21 +1,21 @@
-import test, { expect } from "@playwright/test";
-
 import { openDevToolsTab, startTest } from "../helpers";
 import { findConsoleMessage } from "../helpers/console-panel";
 import { addLogpoint, jumpToLogPointHit, verifyLogpointStep } from "../helpers/source-panel";
+import test, { expect } from "../testFixtureCloneRecording";
 
-const url = "doc_rr_basic.html";
+test.use({ exampleKey: "doc_rr_basic.html" });
 
 test(`logpoints-08: should support jumping directly to a hit point via the capsule input`, async ({
-  page,
+  pageWithMeta: { page, recordingId },
+  exampleKey,
 }) => {
-  await startTest(page, url);
+  await startTest(page, exampleKey, recordingId);
   await openDevToolsTab(page);
 
   await addLogpoint(page, {
     content: '"Logpoint"',
     lineNumber: 20,
-    url,
+    url: exampleKey,
   });
 
   const logPointMessages = await findConsoleMessage(page, "Logpoint", "log-point");

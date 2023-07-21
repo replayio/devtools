@@ -1,5 +1,3 @@
-import test, { expect } from "@playwright/test";
-
 import { openDevToolsTab, startTest } from "../helpers";
 import { waitForTerminal, warpToMessage } from "../helpers/console-panel";
 import {
@@ -12,11 +10,15 @@ import {
   openScopesAccordionPane,
 } from "../helpers/pause-information-panel";
 import { toggleExpandable } from "../helpers/utils";
+import test, { expect } from "../testFixtureCloneRecording";
 
-const url = "doc_rr_objects.html";
+test.use({ exampleKey: "doc_rr_objects.html" });
 
-test(`object_preview-02: should allow objects in scope to be inspected`, async ({ page }) => {
-  await startTest(page, url);
+test(`object_preview-02: should allow objects in scope to be inspected`, async ({
+  pageWithMeta: { page, recordingId },
+  exampleKey,
+}) => {
+  await startTest(page, exampleKey, recordingId);
   await openDevToolsTab(page);
   await waitForTerminal(page);
 

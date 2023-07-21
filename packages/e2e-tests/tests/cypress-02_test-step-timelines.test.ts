@@ -1,5 +1,3 @@
-import test, { expect } from "@playwright/test";
-
 import { isViewerTabActive, openViewerTab, startTest } from "../helpers";
 import {
   getSelectedTestCase,
@@ -10,11 +8,15 @@ import {
 } from "../helpers/testsuites";
 import { getTimelineCurrentHoverPercent, waitForTimelineAdvanced } from "../helpers/timeline";
 import { waitFor } from "../helpers/utils";
+import test, { expect } from "../testFixtureCloneRecording";
 
-const url = "flake/adding-spec.ts";
+test.use({ exampleKey: "flake/adding-spec.ts" });
 
-test("cypress-02: Test Step timeline behavior", async ({ page }) => {
-  await startTest(page, url);
+test("cypress-02: Test Step timeline behavior", async ({
+  pageWithMeta: { page, recordingId },
+  exampleKey,
+}) => {
+  await startTest(page, exampleKey, recordingId);
   await openViewerTab(page);
 
   await openCypressTestPanel(page);

@@ -1,5 +1,3 @@
-import test, { expect } from "@playwright/test";
-
 import { openDevToolsTab, startTest } from "../helpers";
 import {
   findConsoleMessage,
@@ -8,9 +6,15 @@ import {
   openConsolePanel,
 } from "../helpers/console-panel";
 import { waitFor } from "../helpers/utils";
+import test, { expect } from "../testFixtureCloneRecording";
 
-test("sourcemap_stacktrace: Test that stacktraces are sourcemapped", async ({ page }) => {
-  await startTest(page, "cra/dist/index.html");
+test.use({ exampleKey: "cra/dist/index.html" });
+
+test("sourcemap_stacktrace: Test that stacktraces are sourcemapped", async ({
+  pageWithMeta: { page, recordingId },
+  exampleKey,
+}) => {
+  await startTest(page, exampleKey, recordingId);
   await openDevToolsTab(page);
   await openConsolePanel(page);
 

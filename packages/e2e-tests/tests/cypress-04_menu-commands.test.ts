@@ -1,5 +1,3 @@
-import test, { expect } from "@playwright/test";
-
 import { openDevToolsTab, openViewerTab, startTest } from "../helpers";
 import { closeSource, getSelectedLineNumber, waitForSelectedSource } from "../helpers/source-panel";
 import {
@@ -11,11 +9,15 @@ import {
 } from "../helpers/testsuites";
 import { getTimelineCurrentPercent, waitForTimelineAdvanced } from "../helpers/timeline";
 import { getByTestName, waitFor } from "../helpers/utils";
+import test, { expect } from "../testFixtureCloneRecording";
 
-const url = "cypress-realworld/bankaccounts.spec.js";
+test.use({ exampleKey: "cypress-realworld/bankaccounts.spec.js" });
 
-test("cypress-04: Test Step buttons and menu item", async ({ page }) => {
-  await startTest(page, url);
+test("cypress-04: Test Step buttons and menu item", async ({
+  pageWithMeta: { page, recordingId },
+  exampleKey,
+}) => {
+  await startTest(page, exampleKey, recordingId);
   await openViewerTab(page);
 
   await openCypressTestPanel(page);

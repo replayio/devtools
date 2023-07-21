@@ -4,11 +4,10 @@ import dotenv from "dotenv";
 
 import { RecordingTarget } from "replay-next/src/suspense/BuildIdCache";
 
+import exampleRecordings from "../examples.json";
 import { debugPrint, getElementClasses } from "./utils";
 
 dotenv.config({ path: "../../.env" });
-
-const exampleRecordings = require("../examples.json");
 
 export async function getRecordingTarget(page: Page): Promise<RecordingTarget> {
   return page.evaluate(async () => {
@@ -53,8 +52,13 @@ export async function isDevToolsTabActive(page: Page) {
   return classes.includes("active");
 }
 
-export async function startTest(page: Page, example: string, apiKey?: string) {
-  const recordingId = exampleRecordings[example];
+export type TestRecordingKey = keyof typeof exampleRecordings;
+export async function startTest(
+  page: Page,
+  exampleKey: TestRecordingKey,
+  recordingId: string,
+  apiKey?: string
+) {
   const base = process.env.PLAYWRIGHT_TEST_BASE_URL || "http://localhost:8080";
 
   let url = `${base}/recording/${recordingId}?e2e=1`;
@@ -75,7 +79,7 @@ export async function startTest(page: Page, example: string, apiKey?: string) {
   });
 
   // Wait for the recording basic information to load such that the primary tabs are visible.
-  if (example.startsWith("node")) {
+  if (exampleKey.startsWith("node")) {
     await page.locator('[data-panel-id="Panel-SecondaryToolbox"]').waitFor();
   } else {
     // Node recordings don't have the "Viewer/DevTools" toggle

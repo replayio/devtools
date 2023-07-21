@@ -1,5 +1,3 @@
-import test from "@playwright/test";
-
 import { openDevToolsTab, startTest } from "../helpers";
 import {
   openPauseInformationPanel,
@@ -7,13 +5,15 @@ import {
   rewindToLine,
 } from "../helpers/pause-information-panel";
 import { addBreakpoint, removeBreakpoint } from "../helpers/source-panel";
+import test from "../testFixtureCloneRecording";
 
-const url = "doc_debugger_statements.html";
+test.use({ exampleKey: "doc_debugger_statements.html" });
 
 test(`breakpoints-05: Test interaction of breakpoints with debugger statements`, async ({
-  page,
+  pageWithMeta: { page, recordingId },
+  exampleKey,
 }) => {
-  await startTest(page, url);
+  await startTest(page, exampleKey, recordingId);
   await openDevToolsTab(page);
   await openPauseInformationPanel(page);
   // wait for the recording to be fully loaded
@@ -25,7 +25,7 @@ test(`breakpoints-05: Test interaction of breakpoints with debugger statements`,
   // Without a breakpoints being the next nearest thing, we should rewind to it.
   await addBreakpoint(page, {
     lineNumber: 8,
-    url,
+    url: exampleKey,
   });
   await rewindToLine(page, 8);
   await resumeToLine(page, 9);
@@ -33,7 +33,7 @@ test(`breakpoints-05: Test interaction of breakpoints with debugger statements`,
   // Without any breakpoints (again), we should rewind to debugger statements.
   await removeBreakpoint(page, {
     lineNumber: 8,
-    url,
+    url: exampleKey,
   });
 
   await rewindToLine(page, 7);

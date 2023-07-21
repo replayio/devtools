@@ -1,5 +1,3 @@
-import test, { Page } from "@playwright/test";
-
 import { openDevToolsTab, startTest } from "../helpers";
 import { E2E_USER_1_API_KEY, E2E_USER_2_API_KEY } from "../helpers/authentication";
 import {
@@ -9,20 +7,26 @@ import {
   replyToComment,
 } from "../helpers/comments";
 import { openSource } from "../helpers/source-explorer-panel";
+import test, { Page } from "../testFixtureCloneRecording";
 
 // Each authenticated e2e test must use a unique recording id;
 // else shared state from one test could impact another test running in parallel.
 // TODO [SCS-1066] Share recordings between other tests
 const url = "authenticated_comments_2.html";
 
-async function load(page: Page, apiKey: string) {
-  await startTest(page, url, apiKey);
+async function load(page: Page, recordingId: string, apiKey: string) {
+  await startTest(page, url, recordingId, apiKey);
 
   await openDevToolsTab(page);
   await openSource(page, url);
 }
 
-test(`authenticated/comments-02: Test shared comments and replies`, async ({ browser }) => {
+test.use({ exampleKey: url });
+
+test(`authenticated/comments-02: Test shared comments and replies`, async ({
+  browser,
+  pageWithMeta: { recordingId },
+}) => {
   let pageOne: Page;
   let pageTwo: Page;
 
@@ -32,7 +36,7 @@ test(`authenticated/comments-02: Test shared comments and replies`, async ({ bro
     // User 1
     const context = await browser.newContext();
     const page = await context.newPage();
-    await load(page, E2E_USER_1_API_KEY);
+    await load(page, recordingId, E2E_USER_1_API_KEY);
 
     // Clean up from previous tests
     // TODO [SCS-1066] Ideally we would create a fresh recording for each test run
@@ -53,7 +57,7 @@ test(`authenticated/comments-02: Test shared comments and replies`, async ({ bro
     // User 2
     const context = await browser.newContext();
     const page = await context.newPage();
-    await load(page, E2E_USER_2_API_KEY);
+    await load(page, recordingId, E2E_USER_2_API_KEY);
 
     const commentLocator = await getComments(page, {
       text: "This is a test comment from user 1",

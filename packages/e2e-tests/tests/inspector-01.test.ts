@@ -1,5 +1,3 @@
-import test from "@playwright/test";
-
 import { openDevToolsTab, startTest } from "../helpers";
 import { openConsolePanel, warpToMessage } from "../helpers/console-panel";
 import {
@@ -12,9 +10,15 @@ import {
 } from "../helpers/elements-panel";
 import { rewindToLine } from "../helpers/pause-information-panel";
 import { addBreakpoint } from "../helpers/source-panel";
+import test from "../testFixtureCloneRecording";
 
-test("inspector-01: Test that scopes are rerendered", async ({ page }) => {
-  await startTest(page, "doc_inspector_basic.html");
+test.use({ exampleKey: "doc_inspector_basic.html" });
+
+test("inspector-01: Test that scopes are rerendered", async ({
+  pageWithMeta: { page, recordingId },
+  exampleKey,
+}) => {
+  await startTest(page, exampleKey, recordingId);
   await openDevToolsTab(page);
 
   await openConsolePanel(page);

@@ -1,5 +1,3 @@
-import test, { Page, expect } from "@playwright/test";
-
 import { startTest } from "../helpers";
 import { executeAndVerifyTerminalExpression, warpToMessage } from "../helpers/console-panel";
 import {
@@ -12,9 +10,15 @@ import {
   waitForFrameTimeline,
   waitForScopeValue,
 } from "../helpers/pause-information-panel";
+import test, { Page, expect } from "../testFixtureCloneRecording";
 
-test("node_stepping-01: Test stepping in async frames and async call stacks", async ({ page }) => {
-  await startTest(page, "node/async.js");
+test.use({ exampleKey: "node/async.js" });
+
+test("node_stepping-01: Test stepping in async frames and async call stacks", async ({
+  pageWithMeta: { page, recordingId },
+  exampleKey,
+}) => {
+  await startTest(page, exampleKey, recordingId);
 
   await openPauseInformationPanel(page);
 

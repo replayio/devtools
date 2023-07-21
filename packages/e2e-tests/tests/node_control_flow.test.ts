@@ -1,19 +1,23 @@
-import test, { Page } from "@playwright/test";
-
 import { startTest } from "../helpers";
 import { resumeToLine, rewindToLine } from "../helpers/pause-information-panel";
 import { openSource, openSourceExplorerPanel } from "../helpers/source-explorer-panel";
 import { addBreakpoint } from "../helpers/source-panel";
+import test, { Page } from "../testFixtureCloneRecording";
 
 async function resumeToBreakpoint(page: Page, line: number) {
   await addBreakpoint(page, { url: "control_flow.js", lineNumber: line });
   await resumeToLine(page, line);
 }
 
-test("node_control_flow: catch, finally, generators, and async/await", async ({ page }) => {
+test.use({ exampleKey: "node/control_flow.js" });
+
+test("node_control_flow: catch, finally, generators, and async/await", async ({
+  pageWithMeta: { page, recordingId },
+  exampleKey,
+}) => {
   // Default timeout is 30s. Mostly taking 40s in local dev. Bump to 120s.
   test.setTimeout(120000);
-  await startTest(page, "node/control_flow.js");
+  await startTest(page, exampleKey, recordingId);
 
   await openSource(page, "control_flow.js");
 
