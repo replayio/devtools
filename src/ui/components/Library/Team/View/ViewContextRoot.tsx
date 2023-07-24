@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import { ReactNode, createContext, useContext, useEffect } from "react";
 
-import { useGetTeamRouteParams } from "ui/components/Library/Team/utils";
+import { pushRoute, useGetTeamRouteParams } from "ui/components/Library/Team/utils";
 
 import { TeamContext } from "../TeamContextRoot";
 import { FilterContext } from "./FilterContext";
@@ -30,12 +30,12 @@ export function ViewContextRoot({
   // Initialize the view to whatever the appropriate default view is for that team.
   useEffect(() => {
     if (!view) {
-      router.push(`${router.asPath}/${defaultView}`);
+      pushRoute(router, `${router.asPath}/${defaultView}`);
     }
   }, [view, router, defaultView]);
 
   const setView = (view: View) => {
-    router.push(`/team/${teamId}/${view}`);
+    pushRoute(router, `/team/${teamId}/${view}`);
   };
 
   return (

@@ -487,9 +487,11 @@ export async function waitForTerminal(page: Page) {
   await page.locator('[data-test-id="ConsoleTerminalInput"]').waitFor();
 }
 
-export async function openContextMenu(listItem: Locator) {
+export async function openContextMenu(listItem: Locator, options: { useLeftClick?: boolean } = {}) {
+  const { useLeftClick = false } = options;
+
   // Click to the left of the list item to avoid accidentally clicking on an Inspector instance
   // Inspector has its own context menu with "copy object"
   await listItem.hover();
-  await listItem.click({ button: "right", position: { x: 10, y: 10 } });
+  await listItem.click({ button: useLeftClick ? "left" : "right", position: { x: 10, y: 10 } });
 }

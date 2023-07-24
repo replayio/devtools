@@ -1,23 +1,12 @@
-import { useMemo } from "react";
+import { useTestRunRecordingsSuspends } from "ui/components/Library/Team/View/TestRuns/hooks/useTestRunRecordingsSuspends";
 
-import { Summary } from "shared/test-suites/TestRun";
-import { groupRecordings } from "ui/utils/testRuns";
+export function RunStats({ testRunId }: { testRunId: string }) {
+  const { groupedRecordings } = useTestRunRecordingsSuspends(testRunId);
+  if (groupedRecordings === null) {
+    return null;
+  }
 
-function Pill({ styles, value }: { styles: string; value: number }) {
-  return (
-    <div
-      className={`flex h-[1.35rem] min-w-[1.35rem] items-center justify-center rounded-md text-xs font-bold ${styles}`}
-    >
-      {value}
-    </div>
-  );
-}
-export function RunStats({ summary }: { summary: Summary }) {
-  // TODO Don't keep re-computing this; it's expensive
-  const { passedRecordings, failedRecordings, flakyRecordings } = useMemo(
-    () => groupRecordings(summary.results.recordings),
-    [summary.results.recordings]
-  );
+  const { passedRecordings, failedRecordings, flakyRecordings } = groupedRecordings;
 
   const passed = passedRecordings.count;
   const failed = failedRecordings.count;
@@ -30,6 +19,16 @@ export function RunStats({ summary }: { summary: Summary }) {
       {passed > 0 && (
         <Pill styles="border border-[#219653] border-2 text-[#219653]" value={passed} />
       )}
+    </div>
+  );
+}
+
+function Pill({ styles, value }: { styles: string; value: number }) {
+  return (
+    <div
+      className={`flex h-[1.35rem] min-w-[1.35rem] items-center justify-center rounded-md text-xs font-bold ${styles}`}
+    >
+      {value}
     </div>
   );
 }

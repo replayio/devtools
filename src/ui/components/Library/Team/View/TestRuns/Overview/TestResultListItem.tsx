@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { useRouter } from "next/router";
 
 import Icon from "replay-next/components/Icon";
 import { Recording } from "shared/graphql/types";
@@ -25,6 +26,8 @@ export function TestResultListItem({
   secondaryBadgeCount: number | null;
 }) {
   const { comments, metadata } = recording;
+
+  const { apiKey, e2e } = useRouter().query;
 
   const numComments = comments?.length ?? 0;
 
@@ -63,8 +66,10 @@ export function TestResultListItem({
 
   return (
     <a
-      href={`/recording/${recording.id}`}
+      href={`/recording/${recording.id}?e2e=${e2e}&apiKey=${apiKey}`}
       className={`${styles.recordingLink} ${styles.libraryRow}`}
+      data-test-id="TestRunResultsListItem"
+      data-test-status={label}
       style={{
         paddingLeft: `${depth * 1}rem`,
       }}

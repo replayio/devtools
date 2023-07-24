@@ -1,53 +1,52 @@
-import Link from "next/link";
 import { useContext } from "react";
 
-import { Summary, getTestRunTitle } from "shared/test-suites/TestRun";
+import { TestRun, getTestRunTitle } from "shared/test-suites/TestRun";
 import { BranchIcon } from "ui/components/Library/Team/View/TestRuns/BranchIcon";
 import HighlightedText from "ui/components/Library/Team/View/TestRuns/HighlightedText";
 import Icon from "ui/components/shared/Icon";
 
-import { TeamContext } from "../../TeamContextRoot";
 import { getTruncatedRelativeDate } from "../Recordings/RecordingListItem/RecordingListItem";
 import { AttributeContainer } from "./AttributeContainer";
 import { ModeAttribute } from "./Overview/RunSummary";
-import { RunStats } from "./RunStats";
 import { TestRunsContext } from "./TestRunsContextRoot";
 import styles from "../../../Library.module.css";
 
 function Status({ failCount }: { failCount: number }) {
+  const status = failCount > 0 ? "fail" : "success";
+
   if (failCount > 0) {
     return (
-      <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-[#EB5757] text-xs font-bold text-chrome">
+      <div
+        className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-[#EB5757] text-xs font-bold text-chrome"
+        data-test-status={status}
+      >
         {failCount}
       </div>
     );
   } else {
     return (
-      <Icon
-        filename={failCount > 0 ? "testsuites-fail" : "testsuites-success"}
-        size="medium"
-        className={failCount > 0 ? "bg-[#EB5757]" : "bg-[#219653]"}
-      />
+      <div data-test-status={status}>
+        <Icon className={"bg-[#219653]"} filename={"testsuites-success"} size="medium" />
+      </div>
     );
   }
 }
 
 export function TestRunListItem({
   filterByText,
-  summary,
+  testRun,
 }: {
   filterByText: string;
-  summary: Summary;
+  testRun: TestRun;
 }) {
-  const { date, source } = summary;
+  const { date, source } = testRun;
 
-  const { focusId } = useContext(TestRunsContext);
-  const { teamId } = useContext(TeamContext);
+  const { selectTestRun, testRunIdForDisplay } = useContext(TestRunsContext);
 
-  const title = getTestRunTitle(summary);
+  const title = getTestRunTitle(testRun);
 
-  const failCount = summary.results.counts.failed;
-  const isSelected = focusId === summary.id;
+  const failCount = testRun.results.counts.failed;
+  const isSelected = testRunIdForDisplay === testRun.id;
 
   let attributes;
   if (source) {
@@ -55,11 +54,11 @@ export function TestRunListItem({
 
     attributes = (
       <div className="flex flex-row items-center gap-4 text-xs font-light">
-        <AttributeContainer icon="schedule" title={date.toLocaleString()}>
+        <AttributeContainer dataTestId="TestRun-Date" icon="schedule" title={date.toLocaleString()}>
           {getTruncatedRelativeDate(date)}
         </AttributeContainer>
         {user && (
-          <AttributeContainer icon="person">
+          <AttributeContainer dataTestId="TestRun-Username" icon="person">
             <HighlightedText haystack={user} needle={filterByText} />
           </AttributeContainer>
         )}
@@ -68,36 +67,46 @@ export function TestRunListItem({
           isPrimaryBranch={isPrimaryBranch}
           title={title}
         />
-        <ModeAttribute summary={summary} />
+        <ModeAttribute testRun={testRun} />
       </div>
     );
   } else {
     attributes = (
       <div className="flex flex-row items-center gap-4 text-xs font-light">
-        <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
+        <AttributeContainer dataTestId="TestRun-Date" icon="schedule">
+          {getTruncatedRelativeDate(date)}
+        </AttributeContainer>
       </div>
     );
   }
 
+  const onClick = () => {
+    selectTestRun(testRun.id);
+  };
+
   return (
-    <Link
-      href={`/team/${teamId}/runs/${summary.id}`}
+    <div
+      data-test-id="TestRunListItem"
       className={`flex h-full cursor-pointer flex-row items-center space-x-3 rounded-sm border-b border-chrome bg-themeBase-100 px-3 ${
         styles.libraryRow
       }
       ${isSelected ? styles.libraryRowSelected : ""}
       `}
+      onClick={onClick}
     >
       <Status failCount={failCount} />
+
       <div className="flex h-full flex-grow flex-col justify-evenly overflow-hidden">
         <div className="flex flex-row justify-between space-x-3">
-          <div className="wrap flex shrink grow-0 overflow-hidden text-ellipsis whitespace-nowrap pr-2 font-medium">
+          <div
+            className="wrap flex shrink grow-0 overflow-hidden text-ellipsis whitespace-nowrap pr-2 font-medium"
+            data-test-id="TestRun-Title"
+          >
             <HighlightedText haystack={title} needle={filterByText} />
           </div>
-          <RunStats summary={summary} />
         </div>
         {attributes}
       </div>
-    </Link>
+    </div>
   );
 }

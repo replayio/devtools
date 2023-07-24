@@ -52,6 +52,19 @@ export async function isDevToolsTabActive(page: Page) {
   return classes.includes("active");
 }
 
+export async function startLibraryTest(page: Page, apiKey: string, teamId: string) {
+  const base = process.env.PLAYWRIGHT_TEST_BASE_URL || "http://localhost:8080";
+
+  const url = `${base}/team/${teamId}/runs?e2e=1&apiKey=${apiKey}`;
+
+  await debugPrint(page, `Navigating to ${chalk.bold(url)}`, "startLibraryTest");
+
+  await page.goto(url);
+
+  await page.locator('[data-test-id="TestRunResults"]').waitFor();
+  await page.locator('[data-test-id="TestRunList"]').waitFor();
+}
+
 export type TestRecordingKey = keyof typeof exampleRecordings;
 export async function startTest(
   page: Page,

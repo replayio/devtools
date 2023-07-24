@@ -3,7 +3,11 @@ import { useEffect } from "react";
 
 import { UserSettings } from "shared/graphql/types";
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
-import { useGetTeamRouteParams, useRedirectToTeam } from "ui/components/Library/Team/utils";
+import {
+  pushRoute,
+  useGetTeamRouteParams,
+  useRedirectToTeam,
+} from "ui/components/Library/Team/utils";
 import hooks from "ui/hooks";
 import { useUpdateDefaultWorkspace } from "ui/hooks/settings";
 import { UserInfo } from "ui/hooks/users";
@@ -26,9 +30,9 @@ const useGetTeamId = (defaultTeamId: string | null) => {
     // by pushing a new route.
     if (teamId === undefined) {
       if (defaultTeamId) {
-        router.push(`/team/${defaultTeamId}`);
+        pushRoute(router, `/team/${defaultTeamId}`);
       } else {
-        router.push(`/team/me/recordings`);
+        pushRoute(router, `/team/me/recordings`);
       }
     }
   }, [router, defaultTeamId, teamId]);
@@ -52,10 +56,10 @@ function useGetIsValidTeamId(teamId: string | null) {
 }
 
 export default function LibraryLoader() {
-  const { userSettings, loading: userSettingsLoading } = hooks.useGetUserSettings();
-  const { loading: userInfoLoading, ...userInfo } = hooks.useGetUserInfo();
+  const { loading: userSettingsLoading, userSettings } = hooks.useGetUserSettings();
+  const userInfo = hooks.useGetUserInfo();
 
-  if (userSettingsLoading || userInfoLoading) {
+  if (userSettingsLoading || userInfo.loading) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
         <LibrarySpinner />
@@ -76,8 +80,9 @@ function Library({ userSettings, userInfo }: { userSettings: UserSettings; userI
   useEffect(() => {
     logrocket.createSession({ userInfo, auth0User: auth.user });
   }, [auth, userInfo]);
+
   useEffect(() => {
-    if (teamId && isValidTeamId === false) {
+    if (teamId && isValidTeamId === false && MY_LIBRARY_TEAM.databaseId !== null) {
       redirectToTeam("me");
       updateDefaultWorkspace({ variables: { workspaceId: MY_LIBRARY_TEAM.databaseId } });
     }

@@ -1,35 +1,100 @@
 import { useRouter } from "next/router";
-import { ReactNode, createContext, useContext, useEffect } from "react";
+import {
+  Dispatch,
+  ReactNode,
+  SetStateAction,
+  createContext,
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
-import { Summary } from "shared/test-suites/TestRun";
+import { TestRun, getTestRunTitle } from "shared/test-suites/TestRun";
 import { useGetTeamRouteParams } from "ui/components/Library/Team/utils";
-import { useGetTestRunsForWorkspace } from "ui/hooks/tests";
-
-import { TeamContext } from "../../TeamContextRoot";
+import { useSyncTestRunIdToUrl } from "ui/components/Library/Team/View/TestRuns/hooks/useSyncTestIdToUrl";
+import { useTestRuns } from "ui/components/Library/Team/View/TestRuns/hooks/useTestRuns";
 
 type TestRunsContextType = {
-  focusId: string;
-  loading: boolean;
-  summaries: Summary[];
+  filterByStatus: "all" | "failed";
+  filterByText: string;
+  filterByTextForDisplay: string;
+  selectTestRun: Dispatch<SetStateAction<string | null>>;
+  setFilterByStatus: Dispatch<SetStateAction<"all" | "failed">>;
+  setFilterByText: Dispatch<SetStateAction<string>>;
+  testRunId: string | null;
+  testRunIdForDisplay: string | null;
+  testRuns: TestRun[];
 };
 
 export const TestRunsContext = createContext<TestRunsContextType>(null as any);
 
-export function TestRunsContainer({ children }: { children: ReactNode }) {
-  const router = useRouter();
-  const { focusId } = useGetTeamRouteParams();
-  const { teamId } = useContext(TeamContext);
-  const { loading, summaries } = useGetTestRunsForWorkspace(teamId);
+export function TestRunsContextRoot({ children }: { children: ReactNode }) {
+  const { teamId, testRunId: defaultTestRunId } = useGetTeamRouteParams();
 
-  // Initialize the focused test run to the first/most recent test run in the list
-  useEffect(() => {
-    if (summaries.length > 0 && !focusId) {
-      router.push(`/team/${teamId}/runs/${summaries[0].id}`);
+  const testRuns = useTestRuns();
+
+  const [testRunId, setTestRunId] = useState<string | null>(defaultTestRunId);
+
+  const [filterByStatus, setFilterByStatus] = useState<"all" | "failed">("all");
+
+  const [filterByText, setFilterByText] = useState("");
+  const filterByTextDeferred = useDeferredValue(filterByText);
+
+  const router = useRouter();
+
+  const filteredTestRuns = useMemo(() => {
+    let filteredTestRuns = testRuns;
+
+    if (filterByStatus === "failed") {
+      filteredTestRuns = filteredTestRuns.filter(testRun => testRun.results.counts.failed > 0);
     }
-  }, [router, focusId, summaries, teamId]);
+
+    if (filterByText !== "") {
+      const lowerCaseText = filterByText.toLowerCase();
+
+      filteredTestRuns = filteredTestRuns.filter(testRun => {
+        const branchName = testRun.source?.branchName ?? "";
+        const user = testRun.source?.user ?? "";
+
+        const title = getTestRunTitle(testRun);
+
+        return (
+          branchName.toLowerCase().includes(lowerCaseText) ||
+          user.toLowerCase().includes(lowerCaseText) ||
+          title.toLowerCase().includes(lowerCaseText)
+        );
+      });
+    }
+
+    return filteredTestRuns;
+  }, [filterByStatus, filterByText, testRuns]);
+
+  useEffect(() => {
+    if (testRunId == null) {
+      // Select the first test run by default if nothing is selected.
+      setTestRunId(testRuns[0]?.id ?? null);
+    }
+  }, [router, teamId, testRunId, testRuns]);
+
+  useSyncTestRunIdToUrl(teamId, testRunId, setTestRunId);
+
+  const deferredTestRunId = useDeferredValue(testRunId);
 
   return (
-    <TestRunsContext.Provider value={{ focusId, loading, summaries }}>
+    <TestRunsContext.Provider
+      value={{
+        filterByStatus,
+        filterByText: filterByTextDeferred,
+        filterByTextForDisplay: filterByText,
+        testRunId: deferredTestRunId,
+        testRunIdForDisplay: testRunId,
+        selectTestRun: setTestRunId,
+        setFilterByStatus,
+        setFilterByText,
+        testRuns: filteredTestRuns,
+      }}
+    >
       {children}
     </TestRunsContext.Provider>
   );

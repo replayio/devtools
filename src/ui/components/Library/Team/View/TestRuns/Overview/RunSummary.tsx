@@ -2,7 +2,8 @@ import { captureException } from "@sentry/react";
 import Link from "next/link";
 
 import Icon from "replay-next/components/Icon";
-import { Summary, getTestRunTitle } from "shared/test-suites/TestRun";
+import { Recording } from "shared/graphql/types";
+import { TestRun, getTestRunTitle } from "shared/test-suites/TestRun";
 import { BranchIcon } from "ui/components/Library/Team/View/TestRuns/BranchIcon";
 
 import {
@@ -13,8 +14,8 @@ import { AttributeContainer } from "../AttributeContainer";
 import { RunStats } from "../RunStats";
 import { getDuration } from "../utils";
 
-export function ModeAttribute({ summary }: { summary: Summary }) {
-  const { mode } = summary;
+export function ModeAttribute({ testRun }: { testRun: TestRun }) {
+  const { mode } = testRun;
 
   let modeIcon = null;
   let modeText = null;
@@ -51,9 +52,8 @@ export function ModeAttribute({ summary }: { summary: Summary }) {
   return <AttributeContainer icon={modeIcon}>{modeText}</AttributeContainer>;
 }
 
-export function Attributes({ summary }: { summary: Summary }) {
-  const { date, results, source } = summary;
-  const { recordings } = results;
+export function Attributes({ recordings, testRun }: { recordings: Recording[]; testRun: TestRun }) {
+  const { date, source } = testRun;
 
   const duration = getDuration(recordings);
   const durationString = getDurationString(duration);
@@ -63,17 +63,23 @@ export function Attributes({ summary }: { summary: Summary }) {
 
     return (
       <div className="flex flex-row flex-wrap items-center gap-4">
-        <AttributeContainer icon="schedule" title={date.toLocaleString()}>
+        <AttributeContainer dataTestId="TestRun-Date" icon="schedule" title={date.toLocaleString()}>
           {getTruncatedRelativeDate(date)}
         </AttributeContainer>
-        {user ? <AttributeContainer icon="person">{user}</AttributeContainer> : null}
+        {user ? (
+          <AttributeContainer dataTestId="TestRun-Username" icon="person">
+            {user}
+          </AttributeContainer>
+        ) : null}
         <BranchIcon
           branchName={branchName}
           isPrimaryBranch={isPrimaryBranch}
-          title={getTestRunTitle(summary)}
+          title={getTestRunTitle(testRun)}
         />
-        <AttributeContainer icon="timer">{durationString}</AttributeContainer>
-        <ModeAttribute summary={summary} />
+        <AttributeContainer dataTestId="TestRun-Duration" icon="timer">
+          {durationString}
+        </AttributeContainer>
+        <ModeAttribute testRun={testRun} />
       </div>
     );
   } else {
@@ -85,8 +91,8 @@ export function Attributes({ summary }: { summary: Summary }) {
   }
 }
 
-function PullRequestLink({ summary }: { summary: Summary }) {
-  const { source } = summary;
+function PullRequestLink({ testRun }: { testRun: TestRun }) {
+  const { source } = testRun;
   if (!source) {
     return null;
   }
@@ -104,19 +110,19 @@ function PullRequestLink({ summary }: { summary: Summary }) {
       className="flex flex-row items-center gap-1 hover:underline"
     >
       <Icon className="h-4 w-4" type="open" />
-      <span>PR {prNumber}</span>
+      <span data-test-id="TestRun-PullRequest">PR {prNumber}</span>
     </Link>
   );
 }
 
-function RunnerLink({ summary }: { summary: Summary }) {
-  if (!summary.source?.triggerUrl) {
+function RunnerLink({ testRun }: { testRun: TestRun }) {
+  if (!testRun.source?.triggerUrl) {
     return null;
   }
 
   return (
     <Link
-      href={summary.source.triggerUrl}
+      href={testRun.source.triggerUrl}
       target="_blank"
       rel="noreferrer noopener"
       className="flex flex-row items-center gap-1 hover:underline"
@@ -127,16 +133,29 @@ function RunnerLink({ summary }: { summary: Summary }) {
   );
 }
 
-export function RunSummary({ summary }: { summary: Summary }) {
-  const { source } = summary;
+export function RunSummary({
+  isPending,
+  recordings,
+  testRun,
+}: {
+  isPending: boolean;
+  recordings: Recording[];
+  testRun: TestRun;
+}) {
+  const { source } = testRun;
 
   return (
-    <div className="flex flex-col gap-1 border-b border-themeBorder p-4">
+    <div
+      className={`flex flex-col gap-1 border-b border-themeBorder p-4 ${
+        isPending ? "opacity-50" : ""
+      }`}
+      data-test-id="TestRunSummary"
+    >
       <div className="flex flex-row items-center justify-between gap-1">
         <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-xl font-medium">
-          {getTestRunTitle(summary)}
+          {getTestRunTitle(testRun)}
         </div>
-        <RunStats summary={summary} />
+        <RunStats testRunId={testRun.id} />
       </div>
       {source?.groupLabel && (
         <div className="text overflow-hidden overflow-ellipsis whitespace-nowrap font-medium text-bodySubColor">
@@ -144,10 +163,10 @@ export function RunSummary({ summary }: { summary: Summary }) {
         </div>
       )}
       <div className="mt-1 flex w-full flex-row items-center gap-4 text-xs">
-        <Attributes summary={summary} />
+        <Attributes recordings={recordings} testRun={testRun} />
         <div className="grow" />
-        <PullRequestLink summary={summary} />
-        <RunnerLink summary={summary} />
+        <PullRequestLink testRun={testRun} />
+        <RunnerLink testRun={testRun} />
       </div>
     </div>
   );
