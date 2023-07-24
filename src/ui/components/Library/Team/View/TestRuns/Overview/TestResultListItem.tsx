@@ -66,7 +66,7 @@ export function TestResultListItem({
 
   return (
     <a
-      href={`/recording/${recording.id}?e2e=${e2e}&apiKey=${apiKey}`}
+      href={`/recording/${recording.id}?e2e=${e2e ?? ""}&apiKey=${apiKey ?? ""}`}
       className={`${styles.recordingLink} ${styles.libraryRow}`}
       data-test-id="TestRunResultsListItem"
       data-test-status={label}
