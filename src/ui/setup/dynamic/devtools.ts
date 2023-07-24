@@ -95,8 +95,17 @@ const defaultMessaging: UnexpectedError = {
   message: "Our apologies!",
 };
 
-const isWindows = window.navigator.platform.indexOf('Win') > -1;
-const isFirefox = window.navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+let isWindows: boolean;
+let isFirefox: boolean;
+
+function setPlatform() {
+  if (typeof window !== 'undefined') {
+    isWindows = window.navigator.platform.toLowerCase().indexOf('win') > -1;
+    isFirefox = window.navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+  }
+}
+
+setPlatform();
 
 // Reported reasons why a session can be destroyed.
 const SessionErrorMessages: Record<number, Partial<UnexpectedError>> = {
@@ -108,9 +117,11 @@ const SessionErrorMessages: Record<number, Partial<UnexpectedError>> = {
   },
   [SessionError.UnknownFatalError]: {
     content: isWindows && isFirefox 
-      ? "Our Windows support is currently in beta and will be improved soon. Thanks for your patience!"
+      ? "Our Windows browser is currently being upgraded to Chrome, which will reduce errors like these. Thanks for your patience!"
       : "Refreshing should help.\nIf not, please try recording again.",
-  },
+    action: "Retry",
+    message: isWindows ? "Windows browser error" : "Browser error"
+},
   [SessionError.KnownFatalError]: {
     content:
       "This error has been fixed in an updated version of Replay. Please try upgrading Replay and trying a new recording.",
