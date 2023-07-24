@@ -95,6 +95,13 @@ const defaultMessaging: UnexpectedError = {
   message: "Our apologies!",
 };
 
+let isWindows: boolean = false;
+let isFirefox: boolean = false;
+if (typeof window !== "undefined") {
+  isWindows = window.navigator.platform.toLowerCase().indexOf("win") > -1;
+  isFirefox = window.navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
+}
+
 // Reported reasons why a session can be destroyed.
 const SessionErrorMessages: Record<number, Partial<UnexpectedError>> = {
   [SessionError.BackendDeploy]: {
@@ -104,7 +111,12 @@ const SessionErrorMessages: Record<number, Partial<UnexpectedError>> = {
     content: "Our servers hiccuped but things should be back to normal soon.",
   },
   [SessionError.UnknownFatalError]: {
-    content: "Refreshing should help.\nIf not, please try recording again.",
+    content:
+      isWindows && isFirefox
+        ? "The browser replayed an event out of order. We are hoping to release a new Chrome based browser in a couple of months which will be more reliable. Thanks for your patience 🙏"
+        : "Refreshing should help.\nIf not, please try recording again.",
+    action: "refresh",
+    message: isWindows ? "Windows replaying error" : "Replaying error",
   },
   [SessionError.KnownFatalError]: {
     content:
