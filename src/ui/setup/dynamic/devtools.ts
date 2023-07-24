@@ -97,15 +97,10 @@ const defaultMessaging: UnexpectedError = {
 
 let isWindows: boolean = false;
 let isFirefox: boolean = false;
-
-function checkBetaStatus() {
-  if (typeof window !== "undefined") {
-    isWindows = window.navigator.platform.toLowerCase().indexOf("win") > -1;
-    isFirefox = window.navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
-  }
+if (typeof window !== "undefined") {
+  isWindows = window.navigator.platform.toLowerCase().indexOf("win") > -1;
+  isFirefox = window.navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
 }
-
-checkBetaStatus();
 
 // Reported reasons why a session can be destroyed.
 const SessionErrorMessages: Record<number, Partial<UnexpectedError>> = {
