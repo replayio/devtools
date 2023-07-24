@@ -547,7 +547,7 @@ export function setFocusWindowImprecise(timeRange: TimeRange | null): UIThunkAct
     const begin = pointsBoundingBegin.before;
     const end = pointsBoundingEnd.after;
 
-    dispatch(setFocusWindow({ begin, end }));
+    await dispatch(setFocusWindow({ begin, end }));
   };
 }
 
@@ -689,13 +689,7 @@ export function syncFocusedRegion(): UIThunkAction {
 
     // If the backend has selected a different focus window, refine our in-memory window to match
     if (begin.point !== window.begin.point || end.point !== window.end.point) {
-      dispatch(
-        setFocusWindow({
-          begin: window.begin,
-          end: window.end,
-        })
-      );
-      dispatch(setFocusWindow(window));
+      await dispatch(setFocusWindow(window));
     }
   };
 }
