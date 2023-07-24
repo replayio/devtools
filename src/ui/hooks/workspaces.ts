@@ -146,7 +146,7 @@ export function useGetPendingWorkspaces() {
     console.error("Apollo error while fetching pending workspace invitations:", error);
   }
 
-  let pendingWorkspaces: PendingWorkspaceInvitation[] | undefined = undefined;
+  let pendingWorkspaces: PendingWorkspaceInvitation[] = [];
   if (data?.viewer) {
     pendingWorkspaces = data.viewer.workspaceInvitations.edges.map(
       ({ node: { workspace, inviterEmail } }) => ({

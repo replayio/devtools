@@ -11,6 +11,12 @@ export type RecordingGroup = {
   fileNameToRecordings: { [fileName: string]: Recording[] };
 };
 
+export type RecordingGroups = {
+  passedRecordings: RecordingGroup;
+  failedRecordings: RecordingGroup;
+  flakyRecordings: RecordingGroup;
+};
+
 function testPassed(recording: Recording) {
   const testMetadata = recording.metadata?.test;
   if (testMetadata == null) {
@@ -35,7 +41,7 @@ function testFailed(recording: Recording) {
   }
 }
 
-export function groupRecordings(recordings: Recording[]) {
+export function groupRecordings(recordings: Recording[]): RecordingGroups {
   const passedRecordings: RecordingGroup = {
     count: 0,
     fileNameToRecordings: {},

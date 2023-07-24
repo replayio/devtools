@@ -2,8 +2,7 @@ import { useContext, useMemo, useState } from "react";
 import ReactVirtualizedAutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 
-import { Summary, getTestRunTitle } from "shared/test-suites/TestRun";
-import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
+import { TestRun } from "shared/test-suites/TestRun";
 import { TestRunListItem } from "ui/components/Library/Team/View/TestRuns/TestRunListItem";
 import { SecondaryButton } from "ui/components/shared/Button";
 
@@ -16,61 +15,24 @@ type ItemData = {
   countToRender: number;
   filterByText: string;
   loadMore: () => void;
-  summaries: Summary[];
+  testRuns: TestRun[];
 };
 
-export function TestRunList({
-  filterByText,
-  mode,
-}: {
-  filterByText: string;
-  mode: "all" | "failed";
-}) {
-  const { loading, summaries } = useContext(TestRunsContext);
+export function TestRunList() {
+  const { filterByText, testRuns } = useContext(TestRunsContext);
   const [countToRender, setCountToRender] = useState(PAGE_SIZE);
-
-  const filteredSummaries = useMemo(() => {
-    let filteredSummaries = summaries;
-
-    if (mode === "failed") {
-      filteredSummaries = filteredSummaries.filter(summary => summary.results.counts.failed > 0);
-    }
-
-    if (filterByText !== "") {
-      const lowerCaseText = filterByText.toLowerCase();
-
-      filteredSummaries = filteredSummaries.filter(summary => {
-        const branchName = summary.source?.branchName ?? "";
-        const user = summary.source?.user ?? "";
-
-        const title = getTestRunTitle(summary);
-
-        return (
-          branchName.toLowerCase().includes(lowerCaseText) ||
-          user.toLowerCase().includes(lowerCaseText) ||
-          title.toLowerCase().includes(lowerCaseText)
-        );
-      });
-    }
-
-    return filteredSummaries;
-  }, [filterByText, mode, summaries]);
 
   const itemData = useMemo<ItemData>(
     () => ({
       countToRender,
       filterByText,
       loadMore: () => setCountToRender(countToRender + PAGE_SIZE),
-      summaries: filteredSummaries,
+      testRuns,
     }),
-    [countToRender, filterByText, filteredSummaries]
+    [countToRender, filterByText, testRuns]
   );
 
-  if (loading) {
-    return <LibrarySpinner />;
-  }
-
-  const itemCount = Math.min(countToRender + 1, filteredSummaries.length);
+  const itemCount = Math.min(countToRender + 1, testRuns.length);
 
   return (
     <ReactVirtualizedAutoSizer
@@ -90,7 +52,7 @@ export function TestRunList({
 }
 
 function TestRunListRow({ data, index, style }: ListChildComponentProps<ItemData>) {
-  const { countToRender, filterByText, loadMore, summaries: summary } = data;
+  const { countToRender, filterByText, loadMore, testRuns } = data;
 
   if (index === countToRender) {
     return (
@@ -104,7 +66,7 @@ function TestRunListRow({ data, index, style }: ListChildComponentProps<ItemData
 
   return (
     <div style={style}>
-      <TestRunListItem filterByText={filterByText} summary={summary[index]} />
+      <TestRunListItem filterByText={filterByText} testRun={testRuns[index]} />
     </div>
   );
 }

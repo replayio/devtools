@@ -1,7 +1,4 @@
-import { GetTestsRun_node_Workspace_testRuns_edges_node as TestRunGraphQL } from "shared/graphql/generated/GetTestsRun";
 import { GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node as TestRunsForWorkspaceGraphQL } from "shared/graphql/generated/GetTestsRunsForWorkspace";
-import { Recording } from "shared/graphql/types";
-import { convertRecording } from "ui/hooks/recordings";
 
 export type Mode = "diagnostics" | "record" | "record-on-retry" | "stress";
 
@@ -18,7 +15,7 @@ export type SourceMetadata = {
   user: string | null;
 };
 
-export interface Summary {
+export type TestRun = {
   date: string;
   id: string;
   mode: Mode | null;
@@ -28,30 +25,21 @@ export interface Summary {
       flaky: number;
       passed: number;
     };
-    recordings: Recording[];
   };
   source: SourceMetadata | null;
-}
+};
 
-export function processSummary(summary: TestRunGraphQL | TestRunsForWorkspaceGraphQL): Summary {
-  const { mode, results, ...rest } = summary;
-
-  let recordings: Recording[] = [];
-  if ("recordings" in results) {
-    recordings = results.recordings.map(convertRecording);
-  }
+export function processTestRun(testRun: TestRunsForWorkspaceGraphQL): TestRun {
+  const { mode, results, ...rest } = testRun;
 
   return {
     ...rest,
     mode: mode as Mode | null,
-    results: {
-      ...results,
-      recordings,
-    },
+    results,
   };
 }
 
-export function getTestRunTitle(groupedTestCases: Summary): string {
+export function getTestRunTitle(groupedTestCases: TestRun): string {
   const { source } = groupedTestCases;
   if (source) {
     const { commitTitle, prTitle } = source;

@@ -5,41 +5,44 @@ import {
   memo,
   useContext,
   useDeferredValue,
-  useMemo,
   useState,
 } from "react";
 
 import Icon from "replay-next/components/Icon";
+import { useTestRunRecordingsSuspends } from "ui/components/Library/Team/View/TestRuns/hooks/useTestRunRecordingsSuspends";
 import {
   FileNode,
   PathNode,
   isPathNode,
   useFileNameTree,
 } from "ui/components/Library/Team/View/TestRuns/Overview/useFileNameTree";
-import { RecordingGroup, groupRecordings } from "ui/utils/testRuns";
+import { TestRunsContext } from "ui/components/Library/Team/View/TestRuns/TestRunsContextRoot";
+import { RecordingGroup } from "ui/utils/testRuns";
 
 import { TestResultListItem } from "./TestResultListItem";
-import { TestRunOverviewContext } from "./TestRunOverviewContainerContextType";
 import styles from "../../../../Library.module.css";
 
-export function RunResults() {
-  const { summary } = useContext(TestRunOverviewContext);
-  assert(summary !== null);
+export function RunResults({ isPending }: { isPending: boolean }) {
+  const { testRunId } = useContext(TestRunsContext);
 
   const [filterByText, setFilterByText] = useState("");
   const filterByTextDeferred = useDeferredValue(filterByText);
 
-  // TODO Don't keep re-computing this; it's expensive
-  const { passedRecordings, failedRecordings, flakyRecordings } = useMemo(
-    () => groupRecordings(summary.results.recordings),
-    [summary.results.recordings]
-  );
+  const { groupedRecordings } = useTestRunRecordingsSuspends(testRunId);
+  assert(groupedRecordings !== null);
+
+  const { passedRecordings, failedRecordings, flakyRecordings } = groupedRecordings;
 
   return (
     <>
-      <div className="relative mb-2 border-b border-themeBorder bg-bodyBgcolor p-2">
+      <div
+        className={`relative mb-2 border-b border-themeBorder bg-bodyBgcolor p-2 ${
+          isPending ? "opacity-50" : ""
+        }`}
+      >
         <input
           className="w-full appearance-none rounded border-none bg-black bg-opacity-10 text-xs focus:outline-none focus:ring focus:ring-primaryAccent"
+          data-test-id="TestRunResults-FilterInput"
           onChange={event => setFilterByText(event.currentTarget.value)}
           placeholder="Filter tests"
           type="text"
@@ -51,7 +54,11 @@ export function RunResults() {
           type="search"
         />
       </div>
-      <div className="no-scrollbar flex flex-col overflow-y-auto">
+      <div
+        className={`no-scrollbar flex flex-col overflow-y-auto ${isPending ? "opacity-50" : ""}`}
+        data-filtered-by-text={filterByTextDeferred}
+        data-test-id="TestRunResults"
+      >
         <TestStatusGroup
           filterByText={filterByTextDeferred}
           label="Failed"
@@ -91,13 +98,17 @@ function TestStatusGroup({
   }
 
   return (
-    <div className="flex flex-col">
+    <div
+      className="flex flex-col"
+      data-test-id={`TestRunResults-StatusGroup-${label.toLowerCase()}`}
+    >
       <div
         className={`top-0 flex grow flex-row p-2 pl-4 font-medium hover:cursor-pointer ${styles.libraryRowHeader}`}
         onClick={() => setExpanded(!expanded)}
       >
         <div className="grow">
-          {count} {label} Test{count > 1 ? "s" : ""}
+          <span data-test-id="TestRunResults-StatusGroup-Count">{count}</span> {label} Test
+          {count > 1 ? "s" : ""}
         </div>
         <div className="flex">
           <Icon
@@ -136,6 +147,8 @@ const FileNodeRenderer = memo(function FileNodeRenderer({
     <>
       <div
         className={`flex cursor-pointer items-center gap-2 truncate  py-2  pr-4 ${styles.libraryRow}`}
+        data-test-id="TestRunResult-FileNode"
+        data-test-state={expanded ? "expanded" : "collapsed"}
         onClick={onClick}
         style={{
           paddingLeft: `${depth * 1}rem`,
@@ -196,6 +209,8 @@ function PathNodeRenderer({
       {name && (
         <div
           className={`flex cursor-pointer items-center gap-2 truncate py-2 pr-4 ${styles.libraryRow}`}
+          data-test-id="TestRunResult-PathNode"
+          data-test-state={expanded ? "expanded" : "collapsed"}
           onClick={onClick}
           style={{
             paddingLeft: `${depth * 1}rem`,
