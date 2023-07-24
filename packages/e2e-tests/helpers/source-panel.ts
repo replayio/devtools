@@ -226,6 +226,8 @@ export async function addLogpoint(
     await page.locator(".outline-list").waitFor();
   }
 
+  await scrollUntilLineIsVisible(page, lineNumber);
+
   const line = await getSourceLine(page, lineNumber);
   const numberLocator = line.locator(`[data-test-id="SourceLine-LineNumber-${lineNumber}"]`);
   await numberLocator.waitFor();
