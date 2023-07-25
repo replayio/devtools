@@ -1,7 +1,11 @@
 import assert from "assert";
 import { SourceId, TimeStampedPoint } from "@replayio/protocol";
-import { unstable_useCacheRefresh as useCacheRefresh, useContext, useTransition } from "react";
-import { useImperativeCacheValue } from "suspense";
+import {
+  Suspense,
+  unstable_useCacheRefresh as useCacheRefresh,
+  useContext,
+  useTransition,
+} from "react";
 import { ContextMenuDivider, ContextMenuItem, useContextMenu } from "use-context-menu";
 
 import { copyToClipboard } from "replay-next/components/sources/utils/clipboard";
@@ -32,35 +36,11 @@ export default function useSourceContextMenu({
   sourceId: SourceId;
   sourceUrl: string | null;
 }) {
-  const { range: focusRange } = useContext(FocusContext);
   const graphQLClient = useContext(GraphQLClientContext);
   const { showCommentsPanel } = useContext(InspectorContext);
   const replayClient = useContext(ReplayClientContext);
-  const { accessToken, endpoint, recordingId, trackEvent } = useContext(SessionContext);
-  const {
-    executionPoint: currentExecutionPoint,
-    time: currentTime,
-    update,
-  } = useContext(TimelineContext);
-
-  // Don't Suspend during mount; the context menu should show immediately
-  // even if we're still fetching hit points
-  const { value } = useImperativeCacheValue(
-    hitPointsForLocationCache,
-    replayClient,
-    {
-      begin: focusRange ? focusRange.begin.point : "0",
-      end: focusRange ? focusRange.end.point : endpoint,
-    },
-    {
-      column: lineHitCounts?.firstBreakableColumnIndex ?? 0,
-      line: lineNumber,
-      sourceId,
-    },
-    null
-  );
-
-  const [hitPoints, hitPointStatus] = value ?? [null, null];
+  const { accessToken, recordingId, trackEvent } = useContext(SessionContext);
+  const { executionPoint: currentExecutionPoint, time: currentTime } = useContext(TimelineContext);
 
   const [isPending, startTransition] = useTransition();
   const invalidateCache = useCacheRefresh();
@@ -97,23 +77,6 @@ export default function useSourceContextMenu({
     copyToClipboard(sourceUrl!);
   };
 
-  let fastForwardToExecutionPoint: TimeStampedPoint | null = null;
-  let rewindToExecutionPoint: TimeStampedPoint | null = null;
-  if (hitPoints !== null && hitPointStatus !== "too-many-points-to-find") {
-    fastForwardToExecutionPoint = findNextHitPoint(hitPoints, currentExecutionPoint);
-    rewindToExecutionPoint = findLastHitPoint(hitPoints, currentExecutionPoint);
-  }
-
-  const fastForward = () => {
-    assert(fastForwardToExecutionPoint != null);
-    update(fastForwardToExecutionPoint.time, fastForwardToExecutionPoint.point, false);
-  };
-
-  const rewind = () => {
-    assert(rewindToExecutionPoint != null);
-    update(rewindToExecutionPoint.time, rewindToExecutionPoint.point, false);
-  };
-
   return useContextMenu(
     <>
       {accessToken !== null && (
@@ -132,17 +95,122 @@ export default function useSourceContextMenu({
         Copy source URI
       </ContextMenuItem>
       <ContextMenuDivider />
-      <ContextMenuItem disabled={rewindToExecutionPoint == null} onSelect={rewind}>
-        Rewind to line {lineNumber}
-      </ContextMenuItem>
-      <ContextMenuItem disabled={fastForwardToExecutionPoint == null} onSelect={fastForward}>
-        Fast forward to line {lineNumber}
-      </ContextMenuItem>
+      <Suspense
+        fallback={<ContextMenuItem disabled={true}>Rewind to line {lineNumber}</ContextMenuItem>}
+      >
+        <RewindButton lineHitCounts={lineHitCounts} lineNumber={lineNumber} sourceId={sourceId} />
+      </Suspense>{" "}
+      <Suspense
+        fallback={
+          <ContextMenuItem disabled={true}>Fast forward to line {lineNumber}</ContextMenuItem>
+        }
+      >
+        <FastForwardButton
+          lineHitCounts={lineHitCounts}
+          lineNumber={lineNumber}
+          sourceId={sourceId}
+        />
+      </Suspense>
     </>,
     {
       requireClickToShow: true,
       dataTestId: `ContextMenu-Source-${lineNumber}`,
       dataTestName: "ContextMenu-Source",
     }
+  );
+}
+
+function FastForwardButton({
+  lineHitCounts,
+  lineNumber,
+  sourceId,
+}: {
+  lineHitCounts: LineHitCounts | null;
+  lineNumber: number;
+  sourceId: SourceId;
+}) {
+  const { executionPoint: currentExecutionPoint, update } = useContext(TimelineContext);
+
+  const [hitPoints, hitPointStatus] = useDeferredHitCounts({
+    lineHitCounts,
+    lineNumber,
+    sourceId,
+  });
+
+  let fastForwardToExecutionPoint: TimeStampedPoint | null = null;
+  if (hitPoints !== null && hitPointStatus !== "too-many-points-to-find") {
+    fastForwardToExecutionPoint = findNextHitPoint(hitPoints, currentExecutionPoint);
+  }
+
+  const fastForward = () => {
+    assert(fastForwardToExecutionPoint != null);
+    update(fastForwardToExecutionPoint.time, fastForwardToExecutionPoint.point, false);
+  };
+
+  return (
+    <ContextMenuItem disabled={fastForwardToExecutionPoint == null} onSelect={fastForward}>
+      Fast forward to line {lineNumber}
+    </ContextMenuItem>
+  );
+}
+
+function RewindButton({
+  lineHitCounts,
+  lineNumber,
+  sourceId,
+}: {
+  lineHitCounts: LineHitCounts | null;
+  lineNumber: number;
+  sourceId: SourceId;
+}) {
+  const { executionPoint: currentExecutionPoint, update } = useContext(TimelineContext);
+
+  const [hitPoints, hitPointStatus] = useDeferredHitCounts({
+    lineHitCounts,
+    lineNumber,
+    sourceId,
+  });
+
+  let rewindToExecutionPoint: TimeStampedPoint | null = null;
+  if (hitPoints !== null && hitPointStatus !== "too-many-points-to-find") {
+    rewindToExecutionPoint = findLastHitPoint(hitPoints, currentExecutionPoint);
+  }
+
+  const rewind = () => {
+    assert(rewindToExecutionPoint != null);
+    update(rewindToExecutionPoint.time, rewindToExecutionPoint.point, false);
+  };
+
+  return (
+    <ContextMenuItem disabled={rewindToExecutionPoint == null} onSelect={rewind}>
+      Rewind to line {lineNumber}
+    </ContextMenuItem>
+  );
+}
+function useDeferredHitCounts({
+  lineHitCounts,
+  lineNumber,
+  sourceId,
+}: {
+  lineHitCounts: LineHitCounts | null;
+  lineNumber: number;
+  sourceId: SourceId;
+}) {
+  const { range: focusRange } = useContext(FocusContext);
+  const replayClient = useContext(ReplayClientContext);
+  const { endpoint } = useContext(SessionContext);
+
+  return hitPointsForLocationCache.read(
+    replayClient,
+    {
+      begin: focusRange ? focusRange.begin.point : "0",
+      end: focusRange ? focusRange.end.point : endpoint,
+    },
+    {
+      column: lineHitCounts?.firstBreakableColumnIndex ?? 0,
+      line: lineNumber,
+      sourceId,
+    },
+    null
   );
 }

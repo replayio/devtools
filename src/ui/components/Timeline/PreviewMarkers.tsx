@@ -1,12 +1,12 @@
 import type { PointDescription, SourceId } from "@replayio/protocol";
 import { Suspense, useContext } from "react";
-import { useImperativeCacheValue } from "suspense";
 
 import { binarySearch } from "protocol/utils";
 import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
+import { useDebounce } from "replay-next/src/hooks/useDebounce";
 import { hitPointsForLocationCache } from "replay-next/src/suspense/HitPointsCache";
 import { sourceHitCountsCache } from "replay-next/src/suspense/SourceHitCountsCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -22,7 +22,10 @@ export default function PreviewMarkers() {
 
   const sourceId = focusedSource?.sourceId ?? null;
 
-  if (hoveredLineIndex == null || sourceId == null || visibleLines == null) {
+  // Avoid sending a lot of protocol requests by debouncing a little while the user is mousing over lines
+  const debouncedHoveredLineIndex = useDebounce(hoveredLineIndex, 100);
+
+  if (debouncedHoveredLineIndex == null || sourceId == null || visibleLines == null) {
     return <div className="preview-markers-container" />;
   }
 
@@ -30,7 +33,7 @@ export default function PreviewMarkers() {
     <ErrorBoundary fallback={null} name="PreviewMarkers">
       <Suspense fallback={null}>
         <PreviewMarkersSuspends
-          lineNumber={hoveredLineIndex + 1}
+          lineNumber={debouncedHoveredLineIndex + 1}
           sourceId={sourceId}
           visibleLines={visibleLines}
         />
@@ -78,8 +81,7 @@ function PreviewMarkersSuspends({
     firstColumnWithHitCounts = hitCountsForLine[1].firstBreakableColumnIndex;
   }
 
-  const { value } = useImperativeCacheValue(
-    hitPointsForLocationCache,
+  const [hitPoints, hitPointStatus] = hitPointsForLocationCache.read(
     replayClient,
     {
       begin: focusRange ? focusRange.begin.point : "0",
@@ -92,8 +94,6 @@ function PreviewMarkersSuspends({
     },
     null
   );
-
-  const [hitPoints, hitPointStatus] = value ?? [null, null];
 
   const showHitPointMarkers =
     hitPoints != null &&
