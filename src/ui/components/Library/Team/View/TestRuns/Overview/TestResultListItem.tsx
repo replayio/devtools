@@ -74,7 +74,7 @@ export function TestResultListItem({
         paddingLeft: `${depth * 1}rem`,
       }}
     >
-      <div className={styles.linkContent}>
+      <div className={styles.linkContent} title={isProcessed ? "Processed" : ""}>
         {secondaryBadgeCount != null && <Icon className={`${styles.icon}`} type="arrow-nested" />}
         <div className={styles.iconWrapper}>
           <motion.div
@@ -87,6 +87,7 @@ export function TestResultListItem({
               {["passed", "flaky"].includes(label) ? "play_circle" : "play_circle_filled"}
             </MaterialIcon>
           </motion.div>
+          {isProcessed ? <div className={styles.processedIndicator} /> : null}
         </div>
       </div>
       <div className={styles.fileInfo}>

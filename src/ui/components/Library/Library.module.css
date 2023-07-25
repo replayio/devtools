@@ -160,11 +160,22 @@
 }
 
 .iconWrapper {
+  position: relative;
   display: flex;
   cursor: pointer;
   align-items: center;
   justify-content: center;
   transition: all 0.15s ease-in-out;
+}
+
+.processedIndicator {
+  position: absolute;
+  height: 0.5rem;
+  width: 0.5rem;
+  bottom: 0px;
+  right: 0px;
+  border-radius: 100%;
+  background: #219653;
 }
 
 .iconMotion {

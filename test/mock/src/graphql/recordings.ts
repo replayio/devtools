@@ -99,6 +99,7 @@ export function createGetRecordingMock(opts: {
     workspace: null as any, // TypeScript fail
     metadata: null,
     isTest: false,
+    isProcessed: false,
 
     ...opts.recording,
   };
