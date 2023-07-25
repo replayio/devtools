@@ -6,7 +6,6 @@ import {
   useContext,
   useTransition,
 } from "react";
-import { useImperativeCacheValue } from "suspense";
 import { ContextMenuDivider, ContextMenuItem, useContextMenu } from "use-context-menu";
 
 import { copyToClipboard } from "replay-next/components/sources/utils/clipboard";
@@ -37,16 +36,11 @@ export default function useSourceContextMenu({
   sourceId: SourceId;
   sourceUrl: string | null;
 }) {
-  const { range: focusRange } = useContext(FocusContext);
   const graphQLClient = useContext(GraphQLClientContext);
   const { showCommentsPanel } = useContext(InspectorContext);
   const replayClient = useContext(ReplayClientContext);
-  const { accessToken, endpoint, recordingId, trackEvent } = useContext(SessionContext);
-  const {
-    executionPoint: currentExecutionPoint,
-    time: currentTime,
-    update,
-  } = useContext(TimelineContext);
+  const { accessToken, recordingId, trackEvent } = useContext(SessionContext);
+  const { executionPoint: currentExecutionPoint, time: currentTime } = useContext(TimelineContext);
 
   const [isPending, startTransition] = useTransition();
   const invalidateCache = useCacheRefresh();
@@ -206,8 +200,7 @@ function useDeferredHitCounts({
   const replayClient = useContext(ReplayClientContext);
   const { endpoint } = useContext(SessionContext);
 
-  const { value } = useImperativeCacheValue(
-    hitPointsForLocationCache,
+  return hitPointsForLocationCache.read(
     replayClient,
     {
       begin: focusRange ? focusRange.begin.point : "0",
@@ -220,6 +213,4 @@ function useDeferredHitCounts({
     },
     null
   );
-
-  return value ?? [null, null];
 }
