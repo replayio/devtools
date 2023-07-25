@@ -1,4 +1,4 @@
-import { TimeStampedPoint } from "@replayio/protocol";
+import { TimeStampedPoint, TimeStampedPointRange } from "@replayio/protocol";
 import {
   MouseEvent,
   Suspense,
@@ -24,7 +24,6 @@ import { PointsContext } from "replay-next/src/contexts/points/PointsContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { useNag } from "replay-next/src/hooks/useNag";
-import useSuspendAfterMount from "replay-next/src/hooks/useSuspendAfterMount";
 import { hitPointsForLocationCache } from "replay-next/src/suspense/HitPointsCache";
 import { getSourceSuspends } from "replay-next/src/suspense/SourcesCache";
 import { findIndexBigInt } from "replay-next/src/utils/array";
@@ -32,7 +31,6 @@ import { validate } from "replay-next/src/utils/points";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import {
   HitPointStatus,
-  HitPointsAndStatusTuple,
   POINT_BEHAVIOR_DISABLED_TEMPORARILY,
   POINT_BEHAVIOR_ENABLED,
   Point,
@@ -63,6 +61,12 @@ type InternalProps = ExternalProps & {
 
 export default function PointPanelWrapper(props: ExternalProps) {
   const { className, pointForDefaultPriority } = props;
+
+  const { range: focusRange } = useContext(FocusContext);
+  if (!focusRange) {
+    return null;
+  }
+
   return (
     <Suspense
       fallback={
@@ -76,29 +80,24 @@ export default function PointPanelWrapper(props: ExternalProps) {
         />
       }
     >
-      <PointPanel {...props} />
+      <PointPanel focusRange={focusRange} {...props} />
     </Suspense>
   );
 }
 
-function PointPanel(props: ExternalProps) {
-  const { pointForSuspense } = props;
+function PointPanel(props: ExternalProps & { focusRange: TimeStampedPointRange }) {
+  const { focusRange, pointForSuspense } = props;
 
-  const { enterFocusMode, range: focusRange } = useContext(FocusContext);
+  const { enterFocusMode } = useContext(FocusContext);
 
   const client = useContext(ReplayClientContext);
 
-  const [hitPoints, hitPointStatus] = useSuspendAfterMount<HitPointsAndStatusTuple | null>(() => {
-    if (!focusRange) {
-      return null;
-    }
-    return hitPointsForLocationCache.read(
-      client,
-      { begin: focusRange.begin.point, end: focusRange.end.point },
-      pointForSuspense.location,
-      pointForSuspense.condition
-    );
-  }) ?? [[], null];
+  const [hitPoints, hitPointStatus] = hitPointsForLocationCache.read(
+    client,
+    { begin: focusRange.begin.point, end: focusRange.end.point },
+    pointForSuspense.location,
+    pointForSuspense.condition
+  );
 
   return (
     <PointPanelWithHitPoints
