@@ -103,26 +103,39 @@ function LoadingScreen({
   const longWaitMessage =
     "<div><p>This is taking longer than expected.</p><p><a href='http://replay.io/discord' target='discord'>Contact us on Discord</a></p>";
 
+  const processingMessage = "Processing...";
+
   const [message, setMessage] = useState(fallbackMessage);
+  const [processing, setProcessing] = useState(isProcessed);
 
   useEffect(() => {
-    const changeMessage = () => {
-      const randomIndex = Math.floor(Math.random() * phrases.length);
-      setMessage(phrases[randomIndex]);
-    };
-    const phraseTimeout = setTimeout(changeMessage, 5000);
-    // swap to cutesy phrase after 5 seconds
-    // note: this should only be called a single time
-    return () => clearTimeout(phraseTimeout);
-  }, []);
+    setProcessing(isProcessed);
+  }, [isProcessed]);
 
   useEffect(() => {
-    const stalledTimeoutId = setTimeout(() => {
-      // after 15 seconds, switch to stalled message
-      setMessage(longWaitMessage);
-    }, stalledTimeout);
-    return () => clearTimeout(stalledTimeoutId);
-  }, [isProcessed, stalledTimeout]);
+    if (!processing) {
+      const changeMessage = () => {
+        const randomIndex = Math.floor(Math.random() * phrases.length);
+        setMessage(phrases[randomIndex]);
+      };
+      const phraseTimeout = setTimeout(changeMessage, 5000);
+      // swap to cutesy phrase after 5 seconds
+      // note: this should only be called a single time
+      return () => clearTimeout(phraseTimeout);
+    } else {
+      setMessage(processingMessage);
+    }
+  }, [processing]);
+
+  useEffect(() => {
+    if (!processing) {
+      const stalledTimeoutId = setTimeout(() => {
+        // after 15 seconds, switch to stalled message
+        setMessage(longWaitMessage);
+      }, stalledTimeout);
+      return () => clearTimeout(stalledTimeoutId);
+    }
+  }, [isProcessed, stalledTimeout, processing]);
 
   const waitingForMessage =
     awaitingSourcemaps || uploading ? (
