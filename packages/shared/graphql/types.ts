@@ -203,25 +203,26 @@ export enum RecordingRole {
 }
 
 export interface Recording {
-  id: string;
-  url?: string;
-  title?: string | null;
-  duration: number | null;
+  collaborators?: string[];
+  collaboratorRequests?: CollaboratorRequest[] | null;
+  comments?: any;
   date: string;
-  private?: boolean;
+  duration: number | null;
+  id: string;
+  isInitialized?: boolean;
+  isProcessed?: boolean;
+  isTest?: boolean;
+  metadata?: RecordingMetadata;
+  operations?: OperationsData;
   ownerNeedsInvite?: boolean;
+  private?: boolean;
+  resolution?: { resolvedAt: string; resolvedBy: string };
+  title?: string | null;
+  url?: string;
   user?: User | null;
   userId?: string;
-  isInitialized?: boolean;
-  workspace?: Workspace;
-  collaborators?: string[];
-  comments?: any;
   userRole?: RecordingRole;
-  operations?: OperationsData;
-  resolution?: { resolvedAt: string; resolvedBy: string };
-  collaboratorRequests?: CollaboratorRequest[] | null;
-  metadata?: RecordingMetadata;
-  isTest?: boolean;
+  workspace?: Workspace;
 }
 
 export interface RecordingMetadata {

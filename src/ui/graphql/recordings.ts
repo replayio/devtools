@@ -27,6 +27,7 @@ export const GET_RECORDING = gql`
       resolution
       metadata
       isTest
+      isProcessed
       comments {
         id
         isPublished

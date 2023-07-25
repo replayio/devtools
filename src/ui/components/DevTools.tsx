@@ -248,8 +248,10 @@ function _DevTools({
     }
   }, [recording, userId, userEmail, userLoading]);
 
+  console.log(recording);
+
   if (!loadingFinished) {
-    return <LoadingScreen fallbackMessage="Loading..." />;
+    return <LoadingScreen isProcessed={recording?.isProcessed} fallbackMessage="Loading..." />;
   }
 
   const title = recording?.title;

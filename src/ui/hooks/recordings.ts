@@ -143,7 +143,7 @@ const GET_MY_RECORDINGS = gql`
             duration
             createdAt
             private
-            isInitialized
+            isInitialized            
             userRole
             owner {
               id
@@ -282,6 +282,7 @@ export function convertRecording(
     title: "title" in rec ? rec.title : undefined,
     duration: rec.duration,
     private: "private" in rec ? rec.private : undefined,
+    isProcessed: "isProcessed" in rec ? rec.isProcessed : undefined,
     isInitialized: "isInitialized" in rec ? rec.isInitialized : undefined,
     date: rec.createdAt,
     comments: rec.comments,

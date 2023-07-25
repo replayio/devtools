@@ -145,6 +145,7 @@ export interface GetRecording_recording {
   createdAt: any;
   private: boolean;
   isInitialized: boolean;
+  isProcessed: boolean;
   ownerNeedsInvite: boolean;
   userRole: string;
   operations: any | null;
