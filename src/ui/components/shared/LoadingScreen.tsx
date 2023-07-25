@@ -103,9 +103,7 @@ function LoadingScreen({
   const longWaitMessage =
     "<div><p>This is taking longer than expected.</p><p><a href='http://replay.io/discord' target='discord'>Contact us on Discord</a></p>";
 
-  const processingMessage = "Processing...";
-
-  const [message, setMessage] = useState(fallbackMessage);
+  const [message, setMessage] = useState(isProcessed ? fallbackMessage : "Processing...");
   const [processing, setProcessing] = useState(isProcessed);
 
   useEffect(() => {
