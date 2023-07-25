@@ -26,6 +26,7 @@ const GET_TEST_RUN_RECORDINGS = gql`
                   duration
                   createdAt
                   metadata
+                  isProcessed
                   comments {
                     user {
                       id

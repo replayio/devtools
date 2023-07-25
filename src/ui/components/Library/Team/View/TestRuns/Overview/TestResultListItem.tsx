@@ -25,7 +25,7 @@ export function TestResultListItem({
   recording: Recording;
   secondaryBadgeCount: number | null;
 }) {
-  const { comments, metadata } = recording;
+  const { comments, metadata, isProcessed } = recording;
 
   const { apiKey, e2e } = useRouter().query;
 

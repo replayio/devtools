@@ -222,6 +222,7 @@ export interface Recording {
   collaboratorRequests?: CollaboratorRequest[] | null;
   metadata?: RecordingMetadata;
   isTest?: boolean;
+  isProcessed?: boolean;
 }
 
 export interface RecordingMetadata {

@@ -33,6 +33,8 @@ export function RunResults({ isPending }: { isPending: boolean }) {
 
   const { passedRecordings, failedRecordings, flakyRecordings } = groupedRecordings;
 
+  console.log({ groupedRecordings });
+
   return (
     <>
       <div
