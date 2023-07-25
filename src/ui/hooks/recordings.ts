@@ -143,7 +143,7 @@ const GET_MY_RECORDINGS = gql`
             duration
             createdAt
             private
-            isInitialized            
+            isInitialized
             userRole
             owner {
               id
