@@ -121,7 +121,7 @@ function LoadingScreen({
       // note: this should only be called a single time
       return () => clearTimeout(phraseTimeout);
     } else {
-      setMessage(processingMessage);
+      setMessage(message);
     }
   }, [processing]);
 
