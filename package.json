@@ -4,7 +4,7 @@
   "description": "Web app with developer tools built on the Record Replay Protocol",
   "main": "postcss.config.js",
   "scripts": {
-    "dev": "next dev -p 8080",
+    "dev": "next dev -p 8080 ",
     "preprod": "NEXT_PUBLIC_API_URL=http://graphql-api.pre-prod.replay.prod/v1/graphql NEXT_PUBLIC_DISPATCH_URL=ws://agent.pre-prod.replay.prod next dev -p 8080",
     "export": "next build && next export -o dist",
     "test": "jest",
@@ -69,7 +69,7 @@
     "logrocket-react": "^5.0.1",
     "memoize-one": "^6.0.0",
     "mixpanel-browser": "^2.43.0",
-    "next": "^13.4.12",
+    "next": "^13.2",
     "next-global-css": "^1.3.1",
     "node-fetch": "2.x",
     "node-protocol": "workspace:*",
@@ -90,7 +90,7 @@
     "react-lazyload": "^3.2.0",
     "react-merge-refs": "^1.1.0",
     "react-redux": "^8.0.2",
-    "react-resizable-panels": "^0.0.54",
+    "react-resizable-panels": "^0.0.53",
     "react-table": "^7.7.0",
     "react-tooltip": "^4.5.1",
     "react-transition-group": "^4.4.2",
@@ -101,7 +101,7 @@
     "reselect": "^4.1.5",
     "shared": "workspace:*",
     "slugify": "^1.6.5",
-    "suspense": "^0.0.47",
+    "suspense": "^0.0.45",
     "use-context-menu": "0.4.12"
   },
   "devDependencies": {
