@@ -26,7 +26,6 @@ const phrases = [
   "Finding the right hourglass grain...",
   "Warming up the Epoch...",
   "Reversing the polarity of the JavaScript flow...",
-  "Reducing temporal latencies in the React lifecycles...",
   "Wrapping time loops in async functions...",
   "Implementing the Grandfather Paradox resolver...",
   "Patching the Bootstrap Paradox...",
