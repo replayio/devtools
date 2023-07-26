@@ -60,12 +60,10 @@ const phrases = [
   "Charging the time displacement equipment...",
   "Ensuring John Connor's safety...",
   "Calibrating the time levers...",
-  "Making clever references to The Time Machine, by H.G. Wells...",
   "Spinning the time dials...",
   "Avoiding temporal ripples...",
   "Dodging paradoxical time loops...",
   "Routing power to the warp coils...",
-  "Synchronizing with the Starfleet Time Directive...",
   "Preparing the transporter room...",
   "Leaping into another time period...",
   "Ensuring we're not seen by our past selves...",
@@ -82,15 +80,13 @@ const phrases = [
   "Applying middleware to the Fourth Dimension...",
   "Preventing cross-origin requests to the past...",
   "Running Cron job for temporal recalibration...",
-  "Loading Schrödinger's CSS (it's both formatted and not until observed)...",
+  "Loading Schrödinger's CSS (both formatted and not until observed)...",
   "Wrapping dimensions in higher-order components...",
   "Throwing promise to future self (hope they catch it)...",
   "Flattening the time-space array...",
-  "Precompiling 4th dimensional SASS...",
   "Chrono-optimizing the runtime environment...",
   "Checking quantum entanglement of state variables...",
   "Compiling tachyonic antitelephone scripts...",
-  "Ensuring the time-travel GC isn't causing a stack overflow...",
 ];
 
 function LoadingScreen({
@@ -117,13 +113,11 @@ function LoadingScreen({
         setMessage(phrases[randomIndex]);
       };
       const phraseTimeout = setTimeout(changeMessage, 5000);
-      // swap to cutesy phrase after 5 seconds
-      // note: this should only be called a single time
       return () => clearTimeout(phraseTimeout);
     } else {
-      setMessage(message);
+      setMessage(fallbackMessage);
     }
-  }, [processing]);
+  }, [processing, fallbackMessage]);
 
   useEffect(() => {
     if (!processing) {
