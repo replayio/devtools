@@ -56,6 +56,4 @@ test("redux_devtools: Test Redux DevTools.", async ({ page }) => {
   );
   await assertTabValue(page, tabState, "State", "counter: {value: 0}\n[[Prototype]]: Object");
   await assertTabValue(page, tabState, "Diff", "▶\ncounter\nvalue:1 => 0");
-
-  await new Promise(r => setTimeout(r, 10_000));
 });
