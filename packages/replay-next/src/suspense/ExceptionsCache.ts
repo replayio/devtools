@@ -20,7 +20,7 @@ export const exceptionsCache = createAnalysisCache<
   ]
 >(
   "ExceptionsCache",
-  () => "",
+  enabled => `${enabled}`,
   (client, begin, end, enabled) =>
     enabled ? client.findPoints(pointSelector, { begin, end }) : [],
   () => ({ selector: pointSelector, expression: "[]" }),
