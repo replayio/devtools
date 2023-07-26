@@ -48,32 +48,31 @@ const phrases = [
 const longWaitMessage =
   "<div><p>This is taking longer than expected.</p><p><a href='http://replay.io/discord' target='discord'>Contact us on Discord</a></p>";
 
-  export function useDynamicLoadingMessage(
-    isProcessed: boolean,
-    initialMessage: string,
-    stalledTimeout: number
-  ) {
-    const [message, setMessage] = useState(isProcessed ? initialMessage : "Processing...");
-  
-    useEffect(() => {
-      if (isProcessed) {
-        const changeMessage = () => {
-          const randomIndex = Math.floor(Math.random() * phrases.length);
-          setMessage(phrases[randomIndex]);
-        };
-        const phraseTimeout = setTimeout(changeMessage, 8000);
-  
-        const stalledTimeoutId = setTimeout(() => {
-          setMessage(longWaitMessage);
-        }, stalledTimeout);
-  
-        return () => {
-          clearTimeout(phraseTimeout);
-          clearTimeout(stalledTimeoutId);
-        };
-      }
-    }, [isProcessed, initialMessage, stalledTimeout]);
-  
-    return message;
-  }
-  
+export function useDynamicLoadingMessage(
+  isProcessed: boolean,
+  initialMessage: string,
+  stalledTimeout: number
+) {
+  const [message, setMessage] = useState(isProcessed ? initialMessage : "Processing...");
+
+  useEffect(() => {
+    if (isProcessed) {
+      const changeMessage = () => {
+        const randomIndex = Math.floor(Math.random() * phrases.length);
+        setMessage(phrases[randomIndex]);
+      };
+      const phraseTimeout = setTimeout(changeMessage, 8000);
+
+      const stalledTimeoutId = setTimeout(() => {
+        setMessage(longWaitMessage);
+      }, stalledTimeout);
+
+      return () => {
+        clearTimeout(phraseTimeout);
+        clearTimeout(stalledTimeoutId);
+      };
+    }
+  }, [isProcessed, initialMessage, stalledTimeout]);
+
+  return message;
+}
