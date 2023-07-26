@@ -19,7 +19,7 @@ function UploadScreenWrapper({ onUpload }: { onUpload: () => void }) {
   });
 
   if (loading) {
-    return <LoadingScreen fallbackMessage="Loading settings..." />;
+    return <LoadingScreen message="Loading settings..." />;
   }
 
   return recording ? (

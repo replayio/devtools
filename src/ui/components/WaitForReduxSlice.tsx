@@ -13,7 +13,7 @@ function WaitForReduxSlice({ hasSlice, children, loading }: PropsFromParent & Pr
   return hasSlice ? (
     <>{children}</>
   ) : (
-    <>{loading}</> || <LoadingScreen fallbackMessage="Booting the debugger..." />
+    <>{loading}</> || <LoadingScreen message="Booting the debugger..." />
   );
 }
 

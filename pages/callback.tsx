@@ -26,5 +26,5 @@ export default function Connection() {
     );
   }, [auth0, connection, router]);
 
-  return <LoadingScreen fallbackMessage="Authenticating..." />;
+  return <LoadingScreen message="Authenticating..." />;
 }
