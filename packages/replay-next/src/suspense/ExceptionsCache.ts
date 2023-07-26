@@ -3,7 +3,6 @@ import { createCache } from "suspense";
 
 import { ReplayClientInterface } from "shared/client/types";
 
-import { createInfallibleSuspenseCache } from "../utils/suspense";
 import { createAnalysisCache } from "./AnalysisCache";
 import { cachePauseData } from "./PauseCache";
 import { sourcesByIdCache } from "./SourcesCache";
@@ -12,10 +11,18 @@ export type UncaughtException = PointDescription & {
   type: "UncaughtException";
 };
 
-export const exceptionsCache = createAnalysisCache<UncaughtException, []>(
+export const exceptionsCache = createAnalysisCache<
+  UncaughtException,
+  [
+    // This param enables the useImperativeIntervalCacheValues() hook to be called unconditionally
+    // without requiring the client to fetch exceptions data unnecessarily
+    enabled: boolean
+  ]
+>(
   "ExceptionsCache",
   () => "",
-  (client, begin, end) => client.findPoints(pointSelector, { begin, end }),
+  (client, begin, end, enabled) =>
+    enabled ? client.findPoints(pointSelector, { begin, end }) : [],
   () => ({ selector: pointSelector, expression: "[]" }),
   transformPoint
 );
@@ -25,10 +32,6 @@ const pointSelector: PointSelector = { kind: "exceptions" };
 function transformPoint(pointDescription: PointDescription): UncaughtException {
   return { type: "UncaughtException", ...pointDescription };
 }
-
-export const getInfallibleExceptionPointsSuspense = createInfallibleSuspenseCache(
-  exceptionsCache.pointsIntervalCache.read
-);
 
 export const exceptionValueCache = createCache<
   [client: ReplayClientInterface, pauseId: PauseId],
