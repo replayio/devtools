@@ -94,40 +94,33 @@ function LoadingScreen({
   awaitingSourcemaps,
   fallbackMessage,
   isProcessed,
-  stalledTimeout = 15000,
+  stalledTimeout = 20000,
 }: PropsFromRedux & { fallbackMessage: string; isProcessed?: boolean; stalledTimeout?: number }) {
   const longWaitMessage =
     "<div><p>This is taking longer than expected.</p><p><a href='http://replay.io/discord' target='discord'>Contact us on Discord</a></p>";
 
   const [message, setMessage] = useState(isProcessed ? fallbackMessage : "Processing...");
-  const [processing, setProcessing] = useState(isProcessed);
 
   useEffect(() => {
-    setProcessing(isProcessed);
-  }, [isProcessed]);
-
-  useEffect(() => {
-    if (!processing) {
+    if (isProcessed) {
       const changeMessage = () => {
         const randomIndex = Math.floor(Math.random() * phrases.length);
         setMessage(phrases[randomIndex]);
       };
       const phraseTimeout = setTimeout(changeMessage, 5000);
-      return () => clearTimeout(phraseTimeout);
-    } else {
-      setMessage(fallbackMessage);
-    }
-  }, [processing, fallbackMessage]);
 
-  useEffect(() => {
-    if (!processing) {
       const stalledTimeoutId = setTimeout(() => {
-        // after 15 seconds, switch to stalled message
         setMessage(longWaitMessage);
       }, stalledTimeout);
-      return () => clearTimeout(stalledTimeoutId);
+
+      return () => {
+        clearTimeout(phraseTimeout);
+        clearTimeout(stalledTimeoutId);
+      };
+    } else {
+      setMessage("Processing...");
     }
-  }, [isProcessed, stalledTimeout, processing]);
+  }, [isProcessed, fallbackMessage, stalledTimeout]);
 
   const waitingForMessage =
     awaitingSourcemaps || uploading ? (
