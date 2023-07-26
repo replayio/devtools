@@ -147,6 +147,7 @@ function ActionItem({
       })}
       role="listitem"
       onClick={() => setSelectedPoint(annotation.point)}
+      data-test-id="ReduxActionItem"
     >
       <JumpToCodeButton
         className={styles["jump-to-code"]}

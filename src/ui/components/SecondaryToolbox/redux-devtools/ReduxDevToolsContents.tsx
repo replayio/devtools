@@ -221,7 +221,10 @@ export function ReduxDevToolsContents({ point, time }: RDTCProps) {
 
   return (
     <div className="flex h-full flex-col overflow-auto">
-      <div className={classnames("p3 flex w-full  overflow-auto", styles.tabsContainer)}>
+      <div
+        className={classnames("p3 flex w-full  overflow-auto", styles.tabsContainer)}
+        data-test-id="ReduxTabsContainer"
+      >
         <PanelButton
           selected={selectedTab === "action"}
           name="action"
@@ -260,7 +263,9 @@ export function ReduxDevToolsContents({ point, time }: RDTCProps) {
         </PanelButton>
       </div>
 
-      <div className="h-full overflow-auto font-mono">{contents}</div>
+      <div className="h-full overflow-auto font-mono" data-test-id="ReduxInspector">
+        {contents}
+      </div>
     </div>
   );
 }
