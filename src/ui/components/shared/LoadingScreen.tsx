@@ -95,7 +95,7 @@ function LoadingScreen({
   fallbackMessage,
   isProcessed,
   stalledTimeout = 20000,
-}: PropsFromRedux & { fallbackMessage: string; isProcessed?: boolean; stalledTimeout?: number }) {
+}: PropsFromRedux & { fallbackMessage: string; isProcessed: boolean; stalledTimeout?: number }) {
   const longWaitMessage =
     "<div><p>This is taking longer than expected.</p><p><a href='http://replay.io/discord' target='discord'>Contact us on Discord</a></p>";
 
@@ -117,8 +117,6 @@ function LoadingScreen({
         clearTimeout(phraseTimeout);
         clearTimeout(stalledTimeoutId);
       };
-    } else {
-      setMessage("Processing...");
     }
   }, [isProcessed, fallbackMessage, stalledTimeout]);
 
