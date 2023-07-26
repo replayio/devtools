@@ -284,7 +284,7 @@ function TeamOnboarding(props: { organization?: boolean } & PropsFromRedux) {
 
   return (
     <OnboardingModalContainer {...{ randomNumber }} theme="light">
-      <OnboardingContentWrapper>{slide}</OnboardingContentWrapper>
+      <OnboardingContentWrapper noLogo>{slide}</OnboardingContentWrapper>
     </OnboardingModalContainer>
   );
 }
