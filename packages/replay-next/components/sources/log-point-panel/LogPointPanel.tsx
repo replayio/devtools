@@ -8,6 +8,7 @@ import {
   useState,
   useTransition,
 } from "react";
+import { useImperativeCacheValue } from "suspense";
 
 import { assert } from "protocol/utils";
 import AvatarImage from "replay-next/components/AvatarImage";
@@ -85,6 +86,8 @@ export default function PointPanelWrapper(props: ExternalProps) {
   );
 }
 
+const EMPTY_ARRAY: any[] = [];
+
 function PointPanel(props: ExternalProps & { focusRange: TimeStampedPointRange }) {
   const { focusRange, pointForSuspense } = props;
 
@@ -92,12 +95,16 @@ function PointPanel(props: ExternalProps & { focusRange: TimeStampedPointRange }
 
   const client = useContext(ReplayClientContext);
 
-  const [hitPoints, hitPointStatus] = hitPointsForLocationCache.read(
+  const { value } = useImperativeCacheValue(
+    hitPointsForLocationCache,
     client,
     { begin: focusRange.begin.point, end: focusRange.end.point },
     pointForSuspense.location,
     pointForSuspense.condition
   );
+
+  const hitPoints = value?.[0] ?? EMPTY_ARRAY;
+  const hitPointStatus = value?.[1] ?? null;
 
   return (
     <PointPanelWithHitPoints
