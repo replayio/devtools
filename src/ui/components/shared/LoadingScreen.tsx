@@ -2,7 +2,6 @@ import dynamic from "next/dynamic";
 import React, { ReactNode, useCallback, useEffect, useState } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
-import { useDynamicLoadingMessage } from "ui/hooks/useDynamicLoadingMessage";
 import { getAwaitingSourcemaps, getUploading } from "ui/reducers/app";
 import { UIState } from "ui/state";
 
@@ -48,12 +47,8 @@ export function LoadingScreenTemplate({ children }: { children?: ReactNode }) {
 function LoadingScreen({
   uploading,
   awaitingSourcemaps,
-  fallbackMessage,
-  isProcessed,
-  stalledTimeout = 20000,
-}: PropsFromRedux & { fallbackMessage: string; isProcessed: boolean; stalledTimeout?: number }) {
-  const message = useDynamicLoadingMessage(isProcessed, fallbackMessage, stalledTimeout);
-
+  message,
+}: PropsFromRedux & { message: string }) {
   const waitingForMessage =
     awaitingSourcemaps || uploading ? (
       <span>Uploading {Math.round(uploading?.amount ? Number(uploading.amount) : 0)}Mb</span>
