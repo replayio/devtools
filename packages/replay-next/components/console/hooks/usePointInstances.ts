@@ -152,7 +152,7 @@ function getMemoizationToken({
           point.condition
         );
         if (cachedValue != null) {
-          keys.push(point.key);
+          keys.push(`${point.key}-${point.condition === null ? false : true}`);
         }
       }
     });
