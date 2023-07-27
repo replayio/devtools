@@ -152,7 +152,7 @@ export default function SourceMapLoader() {
   }, [recordingId, sourceId, store]);
 
   if (!sourcemapResult) {
-    return <LoadingScreen fallbackMessage="Loading source information..." />;
+    return <LoadingScreen message="Loading source information..." />;
   }
 
   if ("error" in sourcemapResult) {

@@ -164,10 +164,10 @@ export default function UploadScreen({ recording, userSettings, onUpload }: Uplo
   };
 
   if (loading1) {
-    return <LoadingScreen fallbackMessage="Loading recording metadata..." />;
+    return <LoadingScreen message="Loading recording metadata..." />;
   }
   if (loading2) {
-    return <LoadingScreen fallbackMessage="Loading team info..." />;
+    return <LoadingScreen message="Loading team info..." />;
   }
 
   if (status === "deleted") {

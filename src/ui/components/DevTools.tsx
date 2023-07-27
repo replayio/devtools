@@ -23,6 +23,7 @@ import TerminalContextAdapter from "ui/components/SecondaryToolbox/TerminalConte
 import { TestSuiteContextRoot } from "ui/components/TestSuite/views/TestSuiteContext";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { useTrackLoadingIdleTime } from "ui/hooks/tracking";
+import { useDynamicLoadingMessage } from "ui/hooks/useDynamicLoadingMessage";
 import { useGetUserInfo, useUserIsAuthor } from "ui/hooks/users";
 import { getViewMode } from "ui/reducers/layout";
 import { useAppSelector } from "ui/setup/hooks";
@@ -248,8 +249,10 @@ function _DevTools({
     }
   }, [recording, userId, userEmail, userLoading]);
 
+  const message = useDynamicLoadingMessage(recording?.isProcessed || false, "Loading...", 20000);
+
   if (!loadingFinished) {
-    return <LoadingScreen fallbackMessage="Loading..." />;
+    return <LoadingScreen message={message} />;
   }
 
   const title = recording?.title;

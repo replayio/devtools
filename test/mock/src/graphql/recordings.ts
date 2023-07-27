@@ -78,6 +78,7 @@ export function createGetRecordingMock(opts: {
     createdAt: "2021-07-05T10:03:13.466Z",
     duration: 10,
     isInitialized: true,
+    isProcessed: true,
     operations: { scriptDomains: [] },
     activeSessions: null,
     owner: {

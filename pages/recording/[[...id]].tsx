@@ -190,7 +190,7 @@ function RecordingPage({
     return (
       <>
         {head}
-        <LoadingScreen fallbackMessage="Finding recording..." />
+        <LoadingScreen message="Finding recording..." />
       </>
     );
   }
