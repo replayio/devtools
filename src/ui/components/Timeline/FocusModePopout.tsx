@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 import { useNag } from "replay-next/src/hooks/useNag";
 import { Nag } from "shared/graphql/types";
@@ -14,7 +14,7 @@ import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { AppDispatch } from "ui/setup/store";
 import { trackEvent } from "ui/utils/telemetry";
 
-import { PrimaryButton, SecondaryButton } from "../shared/Button";
+import { Button, SecondaryButton } from "../shared/Button";
 import Icon from "../shared/Icon";
 import styles from "./FocusModePopout.module.css";
 
@@ -25,6 +25,8 @@ export default function FocusModePopout({
     (dispatch: AppDispatch, begin: number, end: number) => void
   >;
 }) {
+  const [isSavePending, setIsSavePending] = useState(false);
+
   const [, dismissUseFocusModeNag] = useNag(Nag.USE_FOCUS_MODE);
   const showFocusModeControls = useAppSelector(getShowFocusModeControls);
 
@@ -34,30 +36,36 @@ export default function FocusModePopout({
 
   const hideModal = () => dispatch(exitFocusMode());
 
-  const discardPendingChanges = (isImplicit: boolean) => {
+  const discardPendingChanges = async (isImplicit: boolean) => {
+    hideModal();
+
     if (updateFocusWindowThrottled.hasPending()) {
       updateFocusWindowThrottled.cancel();
     }
 
-    dispatch(setFocusWindow(focusWindowBackup));
-    dispatch(syncFocusedRegion());
+    await dispatch(setFocusWindow(focusWindowBackup));
+    await dispatch(syncFocusedRegion());
 
     if (isImplicit) {
       trackEvent("timeline.discard_focus_implicit");
     } else {
       trackEvent("timeline.discard_focus_explicit");
     }
-
-    hideModal();
   };
+
   const savePendingChanges = async () => {
+    setIsSavePending(true);
+
     if (updateFocusWindowThrottled.hasPending()) {
       await updateFocusWindowThrottled.flush();
     }
 
-    dispatch(syncFocusedRegion());
-    dispatch(updateFocusWindowParam());
+    await dispatch(syncFocusedRegion());
+    await dispatch(updateFocusWindowParam());
+
     trackEvent("timeline.save_focus");
+
+    setIsSavePending(false);
 
     hideModal();
   };
@@ -125,12 +133,20 @@ export default function FocusModePopout({
           </a>
         </div>
 
-        <SecondaryButton color="pink" onClick={() => discardPendingChanges(false)}>
-          Cancel
-        </SecondaryButton>
-        <PrimaryButton color="blue" dataTestId="SaveFocusModeButton" onClick={savePendingChanges}>
-          Save
-        </PrimaryButton>
+        {isSavePending || (
+          <SecondaryButton color="pink" onClick={() => discardPendingChanges(false)}>
+            Cancel
+          </SecondaryButton>
+        )}
+        <Button
+          color="blue"
+          dataTestId="SaveFocusModeButton"
+          onClick={savePendingChanges}
+          size="md"
+          style={isSavePending ? "disabled" : "primary"}
+        >
+          {isSavePending ? "Saving" : "Save"}
+        </Button>
       </div>
     </div>
   );
