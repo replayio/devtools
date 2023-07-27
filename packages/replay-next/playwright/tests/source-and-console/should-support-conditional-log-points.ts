@@ -15,8 +15,7 @@ test("should support conditional log points", async ({ page }, testInfo) => {
   const messages = page.locator("[data-test-name=Messages]");
 
   await editLogPoint(page, { sourceId, lineNumber: 28, content: `"logsToPrint", logsToPrint` });
-  // wait for the logpoint messages to load
-  await verifyConsoleMessage(page, "logsToPrint", "log-point", 8);
+  await verifyConsoleMessage(page, "logsToPrint", "log-point", 10);
   await takeScreenshot(page, testInfo, messages, "log-point-multi-hits-console");
 
   await editLogPoint(page, {
@@ -25,7 +24,6 @@ test("should support conditional log points", async ({ page }, testInfo) => {
     content: `"logsToPrint", logsToPrint`,
     condition: "logsToPrint <= 5",
   });
-  // wait for the logpoint messages to load
-  await verifyConsoleMessage(page, "logsToPrint", "log-point", 3);
+  await verifyConsoleMessage(page, "logsToPrint", "log-point", 5);
   await takeScreenshot(page, testInfo, messages, "log-point-multi-hits-with-conditional-console");
 });

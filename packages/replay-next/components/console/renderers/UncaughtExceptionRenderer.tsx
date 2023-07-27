@@ -24,8 +24,6 @@ import Source from "../Source";
 import StackRenderer from "../StackRenderer";
 import styles from "./shared.module.css";
 
-const EMPTY_ARRAY: any[] = [];
-
 function UncaughtExceptionRenderer({
   index,
   isFocused,
@@ -103,7 +101,7 @@ function UncaughtExceptionRenderer({
 
 function AnalyzedContent({ uncaughtException }: { uncaughtException: UncaughtException }) {
   const client = useContext(ReplayClientContext);
-  const { pauseId } = exceptionsCache.resultsCache.read(uncaughtException.point);
+  const { pauseId } = exceptionsCache.resultsCache.read(uncaughtException.point, true);
   const exceptionValue = exceptionValueCache.read(client, pauseId);
   const frames = framesCache.read(client, pauseId) ?? [];
   const showExpandable = frames.length > 0;
