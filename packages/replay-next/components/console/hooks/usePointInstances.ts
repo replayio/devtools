@@ -11,8 +11,6 @@ const EMPTY_ARRAY: PointInstance[] = [];
 
 // Transform Points (source location) to PointInstances (hit points / execution points for the source location)
 // Each Point maps to zero or more hit points
-//
-// This information needs to be
 export function usePointInstances({
   focusRange,
   pointBehaviors,
@@ -70,15 +68,18 @@ export function usePointInstances({
   useEffect(() => {
     if (focusRange !== null) {
       points.forEach(point => {
-        hitPointsForLocationCache.readAsync(
-          client,
-          toPointRange(focusRange),
-          point.location,
-          point.condition
-        );
+        const pointBehavior = pointBehaviors[point.key];
+        if (pointBehavior?.shouldLog === POINT_BEHAVIOR_ENABLED) {
+          hitPointsForLocationCache.readAsync(
+            client,
+            toPointRange(focusRange),
+            point.location,
+            point.condition
+          );
+        }
       });
     }
-  });
+  }, [client, focusRange, pointBehaviors, points]);
 
   return useMemo<PointInstance[]>(() => {
     const pointInstances: PointInstance[] = [];
