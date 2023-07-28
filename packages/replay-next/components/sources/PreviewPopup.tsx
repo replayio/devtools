@@ -1,5 +1,5 @@
 import { Value as ProtocolValue, SourceId } from "@replayio/protocol";
-import { RefObject, Suspense, useContext, useEffect, useRef } from "react";
+import { ReactNode, RefObject, Suspense, useContext, useEffect, useRef } from "react";
 
 import { SelectedFrameContext } from "replay-next/src/contexts/SelectedFrameContext";
 import { useCurrentFocusWindow } from "replay-next/src/hooks/useCurrentFocusWindow";
@@ -53,13 +53,26 @@ function SuspendingPreviewPopup({
   const pauseId = selectedPauseAndFrameId?.pauseId ?? null;
 
   let value: ProtocolValue | null = null;
+  let valueUnavailableMessage: string | null = null;
   if (frameId !== null && pauseId !== null) {
     const [point] = getPointAndTimeForPauseId(pauseId);
-    if (focusWindow !== null && point !== null && isPointInRegion(point, focusWindow)) {
-      const frame = getFrameSuspense(client, pauseId, frameId);
-      if (frame?.location.some(location => location.sourceId === sourceId)) {
-        const result = pauseEvaluationsCache.read(client, pauseId, frameId, expression, undefined);
-        value = result.returned || null;
+    if (focusWindow !== null && point !== null) {
+      if (isPointInRegion(point, focusWindow)) {
+        const frame = getFrameSuspense(client, pauseId, frameId);
+        if (frame?.location.some(location => location.sourceId === sourceId)) {
+          const result = pauseEvaluationsCache.read(
+            client,
+            pauseId,
+            frameId,
+            expression,
+            undefined
+          );
+          value = result.returned || null;
+        } else {
+          valueUnavailableMessage = "Value cannot be inspected";
+        }
+      } else {
+        valueUnavailableMessage = "Value is outside of focus range";
       }
     }
   }
@@ -87,7 +100,22 @@ function SuspendingPreviewPopup({
     };
   });
 
-  if (pauseId !== null && value !== null) {
+  let children: ReactNode = null;
+  if (valueUnavailableMessage !== null) {
+    return (
+      <Popup
+        clientX={clientX}
+        containerRef={containerRef}
+        dismiss={dismiss}
+        target={target}
+        showTail={true}
+      >
+        <div className={styles.Popup}>
+          <div className={styles.UnavailableMessage}>{valueUnavailableMessage}</div>
+        </div>
+      </Popup>
+    );
+  } else if (pauseId !== null && value !== null) {
     return (
       <Popup
         clientX={clientX}
@@ -104,7 +132,17 @@ function SuspendingPreviewPopup({
         />
       </Popup>
     );
-  } else {
-    return null;
   }
+
+  return children !== null ? (
+    <Popup
+      clientX={clientX}
+      containerRef={containerRef}
+      dismiss={dismiss}
+      target={target}
+      showTail={true}
+    >
+      {children}
+    </Popup>
+  ) : null;
 }
