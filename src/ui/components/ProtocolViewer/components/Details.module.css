@@ -1,13 +1,19 @@
 .Details {
-  height: 65%;
-  min-height: 65%;
-  max-height: 65%;
+  height: 100%;
   overflow: auto;
-  border-top: 1px solid var(--theme-border);
 }
 
 .LoadRemainingDetails {
   display: flex;
   justify-content: center;
   margin: 0.5rem;
+}
+
+.NoSelection {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-dim);
+  font-size: var(--font-size-regular);
 }

@@ -24,7 +24,11 @@ export function Details({
   const [loadAll, setLoadAll] = useState(false);
 
   if (selectedChunk === null) {
-    return null;
+    return (
+      <div className={styles.Details}>
+        <div className={styles.NoSelection}>Select a request to view its details</div>
+      </div>
+    );
   }
 
   const ids = loadAll ? selectedChunk.ids : selectedChunk.ids.slice(0, MAX_DETAILS_TO_RENDER);

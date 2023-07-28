@@ -42,14 +42,14 @@
   background-color: var(--theme-text-field-bgcolor);
 }
 
-.Panel,
+.ProtocolCommands,
 .SubPanel {
   flex: 1 1 auto;
   overflow: auto;
   overflow-x: hidden;
   overflow-y: auto;
 }
-.Panel {
+.ProtocolCommands {
   user-select: none;
 }
 .SubPanel {
@@ -149,4 +149,16 @@
   align-items: center;
   justify-content: space-between;
   user-select: none;
+}
+
+.PanelResizeHandle {
+  height: 0.5rem;
+  background-color: var(--chrome);
+}
+
+.ListPanel {
+  height: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }

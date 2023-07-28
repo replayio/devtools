@@ -1,4 +1,5 @@
 import React, { useDeferredValue, useMemo, useState } from "react";
+import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
 import { ThreadFront } from "protocol/thread";
 import { Details } from "ui/components/ProtocolViewer/components/Details";
@@ -69,58 +70,72 @@ export function ProtocolViewer({
   }
 
   return (
-    <div className={styles.Container}>
-      <h3 className={styles.Header}>
-        Protocol Info
-        {viewLogLink != null && (
-          <a href={viewLogLink} rel="noreferrer noopener" target="_blank" title="View session logs">
-            <MaterialIcon>launch</MaterialIcon>
-          </a>
-        )}
-      </h3>
+    <PanelGroup autoSaveId="ProtocolViewer" className={styles.Container} direction="vertical">
+      <Panel id="list" minSize={20}>
+        <div className={styles.ListPanel}>
+          <h3 className={styles.Header}>
+            Protocol Info
+            {viewLogLink != null && (
+              <a
+                href={viewLogLink}
+                rel="noreferrer noopener"
+                target="_blank"
+                title="View session logs"
+              >
+                <MaterialIcon>launch</MaterialIcon>
+              </a>
+            )}
+          </h3>
 
-      <div className={styles.HeaderControls}>
-        <input
-          className={styles.FilterInput}
-          placeholder="Filter"
-          value={filterText}
-          onChange={onFilterTextInputChange}
-        />
+          <div className={styles.HeaderControls}>
+            <input
+              className={styles.FilterInput}
+              placeholder="Filter"
+              value={filterText}
+              onChange={onFilterTextInputChange}
+            />
 
-        <button
-          className={styles.ClearButton}
-          disabled={filteredChunks.length === 0}
-          title="Clear protocol log"
-          onClick={onClearButtonClick}
-        >
-          <Icon
-            filename="trash"
-            className={filteredChunks.length === 0 ? styles.ClearIconDisabled : styles.ClearIcon}
-          />
-        </button>
-      </div>
+            <button
+              className={styles.ClearButton}
+              disabled={filteredChunks.length === 0}
+              title="Clear protocol log"
+              onClick={onClearButtonClick}
+            >
+              <Icon
+                filename="trash"
+                className={
+                  filteredChunks.length === 0 ? styles.ClearIconDisabled : styles.ClearIcon
+                }
+              />
+            </button>
+          </div>
 
-      <div className={styles.Panel}>
-        {filteredChunks.map(chunk => (
-          <ProtocolChunk
-            key={chunk.ids[0]}
-            chunk={chunk}
-            responseMap={responseMap}
-            requestMap={requestMap}
-            selectedChunk={selectedChunk}
-            setSelectedChunk={setSelectedChunk}
-          />
-        ))}
-      </div>
-      {selectedChunk !== null && doesFilteredChunksContainSelectedChunk && (
+          <div className={styles.ProtocolCommands}>
+            {filteredChunks.map(chunk => (
+              <ProtocolChunk
+                key={chunk.ids[0]}
+                chunk={chunk}
+                responseMap={responseMap}
+                requestMap={requestMap}
+                selectedChunk={selectedChunk}
+                setSelectedChunk={setSelectedChunk}
+              />
+            ))}
+          </div>
+        </div>
+      </Panel>
+      <PanelResizeHandle className={styles.PanelResizeHandle} />
+      <Panel id="details" minSize={20}>
         <Details
-          key={selectedChunk.ids[0]}
+          key={selectedChunk?.ids[0]}
           errorMap={errorMap}
           requestMap={requestMap}
           responseMap={responseMap}
-          selectedChunk={selectedChunk}
+          selectedChunk={
+            selectedChunk && doesFilteredChunksContainSelectedChunk ? selectedChunk : null
+          }
         />
-      )}
-    </div>
+      </Panel>
+    </PanelGroup>
   );
 }
