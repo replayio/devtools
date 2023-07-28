@@ -70,14 +70,6 @@ export const config = {
     label: "Enable backend processing routines",
     legacyKey: "devtools.features.enableRoutines",
   },
-  backend_enableUnstableQueryCache: {
-    defaultValue: Boolean(false),
-    description:
-      "Allow the backend to return previously generated responses without re-running the request",
-    internalOnly: Boolean(true),
-    label: "Enable query-level caching for unstable request types",
-    legacyKey: "devtools.features.enableUnstableQueryCache",
-  },
   backend_keepAllTraces: {
     defaultValue: Boolean(false),
     legacyKey: "devtools.features.keepAllTraces",

@@ -193,7 +193,6 @@ export function createSocket(
       const experimentalSettings: ExperimentalSettings = {
         disableScanDataCache: userData.get("backend_disableScanDataCache"),
         disableCache: userData.get("backend_disableCache"),
-        disableUnstableQueryCache: !userData.get("backend_enableUnstableQueryCache"),
         listenForMetrics: userData.get("backend_listenForMetrics"),
         profileWorkerThreads: userData.get("backend_profileWorkerThreads"),
         enableRoutines: userData.get("backend_enableRoutines"),
