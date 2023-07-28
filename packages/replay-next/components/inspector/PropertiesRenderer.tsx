@@ -27,10 +27,12 @@ const PROPERTY_BUCKET_SIZE = 100;
 //
 // https://static.replay.io/protocol/tot/Pause/#type-Property
 export default function PropertiesRenderer({
+  hidePrototype = false,
   object,
   path,
   pauseId,
 }: {
+  hidePrototype?: boolean;
   object: ProtocolObject;
   path?: string;
   pauseId: ProtocolPauseId;
@@ -119,7 +121,7 @@ export default function PropertiesRenderer({
   }
 
   let renderedPrototype: ReactNode = null;
-  if (prototype != null) {
+  if (prototype != null && !hidePrototype) {
     const prototypePath = addPathSegment(path, "[[Prototype]]");
     renderedPrototype = (
       <Expandable

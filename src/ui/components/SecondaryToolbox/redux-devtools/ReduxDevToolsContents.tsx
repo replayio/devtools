@@ -98,7 +98,12 @@ function RDTInspector({
       return (
         <div className={styles.RDTInspector}>
           <Suspense fallback={<Loader />}>
-            <PropertiesRenderer path={path} object={objectWithPreview} pauseId={pauseId} />
+            <PropertiesRenderer
+              hidePrototype
+              path={path}
+              object={objectWithPreview}
+              pauseId={pauseId}
+            />
           </Suspense>
         </div>
       );
