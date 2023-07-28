@@ -24,6 +24,7 @@ const GET_TEST_RUN_RECORDINGS = gql`
                 recordings {
                   uuid
                   duration
+                  isProcessed
                   createdAt
                   metadata
                   comments {

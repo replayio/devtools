@@ -8,7 +8,6 @@ import {
   isGroupedTestCasesV2,
 } from "shared/test-suites/RecordingTestMetadata";
 import HighlightedText from "ui/components/Library/Team/View/TestRuns/HighlightedText";
-import MaterialIcon from "ui/components/shared/MaterialIcon";
 
 import styles from "../../../../Library.module.css";
 
@@ -25,7 +24,7 @@ export function TestResultListItem({
   recording: Recording;
   secondaryBadgeCount: number | null;
 }) {
-  const { comments, metadata } = recording;
+  const { comments, metadata, isProcessed } = recording;
 
   const { apiKey, e2e } = useRouter().query;
 
@@ -50,19 +49,21 @@ export function TestResultListItem({
 
   label = label.toLowerCase();
 
-  let color;
+  let iconClass;
   switch (label) {
     case "failed":
-      color = "#EB5757";
+      iconClass = "failed";
       break;
     case "flaky":
-      color = "#FDBA00";
+      iconClass = "flaky";
       break;
     case "passed":
     default:
-      color = "#219653";
+      iconClass = "passed";
       break;
   }
+
+  const iconType = isProcessed ? "play-processed" : "play-unprocessed";
 
   return (
     <a
@@ -83,9 +84,7 @@ export function TestResultListItem({
             whileTap={{ scale: 1.0, boxShadow: "0px 0px 1px rgba(0,0,0,0.2)" }}
             transition={{ duration: 0.05 }}
           >
-            <MaterialIcon iconSize="2xl" outlined style={{ color }}>
-              {["passed", "flaky"].includes(label) ? "play_circle" : "play_circle_filled"}
-            </MaterialIcon>
+            <Icon className={styles[iconClass]} type={iconType} />
           </motion.div>
         </div>
       </div>

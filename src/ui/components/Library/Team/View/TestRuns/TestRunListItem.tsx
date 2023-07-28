@@ -17,7 +17,7 @@ function Status({ failCount }: { failCount: number }) {
   if (failCount > 0) {
     return (
       <div
-        className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-[#EB5757] text-xs font-bold text-chrome"
+        className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-[#F02D5E] text-xs font-bold text-chrome"
         data-test-status={status}
       >
         {failCount}
@@ -26,7 +26,7 @@ function Status({ failCount }: { failCount: number }) {
   } else {
     return (
       <div data-test-status={status}>
-        <Icon className={"bg-[#219653]"} filename={"testsuites-success"} size="medium" />
+        <Icon className={styles.testsuitesSuccess} filename={"testsuites-success"} size="medium" />
       </div>
     );
   }
@@ -87,7 +87,7 @@ export function TestRunListItem({
   return (
     <div
       data-test-id="TestRunListItem"
-      className={`flex h-full cursor-pointer flex-row items-center space-x-3 rounded-sm border-b border-chrome bg-themeBase-100 px-3 ${
+      className={`flex cursor-pointer flex-row items-center space-x-3 rounded-sm border-b border-chrome bg-themeBase-100 p-3 ${
         styles.libraryRow
       }
       ${isSelected ? styles.libraryRowSelected : ""}

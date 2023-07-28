@@ -1,5 +1,7 @@
 import { useTestRunRecordingsSuspends } from "ui/components/Library/Team/View/TestRuns/hooks/useTestRunRecordingsSuspends";
 
+import styles from "../../../Library.module.css";
+
 export function RunStats({ testRunId }: { testRunId: string }) {
   const { groupedRecordings } = useTestRunRecordingsSuspends(testRunId);
   if (groupedRecordings === null) {
@@ -14,19 +16,17 @@ export function RunStats({ testRunId }: { testRunId: string }) {
 
   return (
     <div className="flex shrink space-x-2">
-      {failed > 0 && <Pill styles="text-chrome bg-[#EB5757]" value={failed} />}
-      {flakyCount > 0 && <Pill styles="text-chrome bg-[#FDBA00]" value={flakyCount} />}
-      {passed > 0 && (
-        <Pill styles="border border-[#219653] border-2 text-[#219653]" value={passed} />
-      )}
+      {failed > 0 && <Pill className={styles.failedPill} value={failed} />}
+      {flakyCount > 0 && <Pill className={styles.flakyPill} value={flakyCount} />}
+      {passed > 0 && <Pill className={styles.successPill} value={passed} />}
     </div>
   );
 }
 
-function Pill({ styles, value }: { styles: string; value: number }) {
+function Pill({ className, value }: { className: string; value: number }) {
   return (
     <div
-      className={`flex h-[1.35rem] min-w-[1.35rem] items-center justify-center rounded-md text-xs font-bold ${styles}`}
+      className={`flex h-[1.35rem] min-w-[1.35rem] items-center justify-center rounded-md text-xs font-bold ${className}`}
     >
       {value}
     </div>
