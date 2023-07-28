@@ -48,7 +48,7 @@ import { useAppSelector } from "ui/setup/hooks";
 import { getJSON } from "ui/utils/objectFetching";
 import { formatDuration, formatTimestamp } from "ui/utils/time";
 
-import { PrimarySmButton } from "./shared/Button";
+import { PrimarySmButton } from "../shared/Button";
 import styles from "./ProtocolViewer.module.css";
 
 const ReactJson = dynamic(() => import("react-json-view"), {
