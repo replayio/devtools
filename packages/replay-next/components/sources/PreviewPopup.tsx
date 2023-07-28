@@ -67,7 +67,12 @@ function SuspendingPreviewPopup({
             expression,
             undefined
           );
-          value = result.returned || null;
+
+          if (result.failed || result.exception) {
+            valueUnavailableMessage = "Value cannot be inspected";
+          } else {
+            value = result.returned || null;
+          }
         } else {
           valueUnavailableMessage = "Value cannot be inspected";
         }
