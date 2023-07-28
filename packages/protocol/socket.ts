@@ -125,7 +125,6 @@ export type ExperimentalSettings = {
   controllerKey?: string;
   disableCache?: boolean;
   disableScanDataCache?: boolean;
-  disableQueryCache?: boolean;
   enableRoutines?: boolean;
   rerunRoutines?: boolean;
   profileWorkerThreads?: boolean;
