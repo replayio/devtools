@@ -126,7 +126,6 @@ export type ExperimentalSettings = {
   disableCache?: boolean;
   disableScanDataCache?: boolean;
   disableQueryCache?: boolean;
-  disableUnstableQueryCache?: boolean;
   enableRoutines?: boolean;
   rerunRoutines?: boolean;
   profileWorkerThreads?: boolean;
