@@ -43,7 +43,7 @@ export default function Video() {
   const [showDelayedSpinner, setShowDelayedSpinner] = useState(false);
 
   useEffect(() => {
-    let timerId;
+    let timerId: NodeJS.Timeout | undefined;
     if (highlightedNodesLoading || (isNodePickerActive && mouseTargetsLoading) || stalled) {
       timerId = setTimeout(() => {
         setShowDelayedSpinner(true);
