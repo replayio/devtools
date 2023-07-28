@@ -6,7 +6,7 @@ import {
 } from "ui/reducers/protocolMessages";
 import { useAppSelector } from "ui/setup/hooks";
 
-export function LiveAppProtocolViewer() {
+export function LiveProtocolRequests() {
   const requestMap = useAppSelector(getProtocolRequestMap);
   const responseMap = useAppSelector(getProtocolResponseMap);
   const errorMap = useAppSelector(getProtocolErrorMap);

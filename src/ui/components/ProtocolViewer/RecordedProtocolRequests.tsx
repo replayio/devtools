@@ -1,4 +1,4 @@
-import React, { Suspense, useContext, useMemo } from "react";
+import { Suspense, useContext } from "react";
 
 import Loader from "replay-next/components/Loader";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
@@ -8,35 +8,14 @@ import { recordedProtocolMessagesCache } from "ui/components/ProtocolViewer/susp
 import { SourceDetails, getAllSourceDetails } from "ui/reducers/sources";
 import { useAppSelector } from "ui/setup/hooks";
 
-export function RecordedAppProtocolViewer() {
+export function RecordedProtocolRequests() {
   const sourceDetails = useAppSelector(getAllSourceDetails);
 
-  const isRecordingOfReplay = useMemo(() => {
-    const hasKnownReplaySources = sourceDetails.some(source => {
-      return (
-        source.url?.includes("src/ui/setup/store.ts") ||
-        source.url?.includes("src/ui/setup/dynamic/devtools.ts")
-      );
-    });
-
-    return hasKnownReplaySources;
-  }, [sourceDetails]);
-
-  let content: React.ReactNode;
-
-  if (sourceDetails.length === 0) {
-    content = <h3>Loading sources...</h3>;
-  } else if (!isRecordingOfReplay) {
-    content = <h3>Not a recording of Replay</h3>;
-  } else {
-    content = (
-      <Suspense fallback={<Loader />}>
-        <RecordedAppProtocolViewerSuspends sourceDetails={sourceDetails} />
-      </Suspense>
-    );
-  }
-
-  return content;
+  return (
+    <Suspense fallback={<Loader />}>
+      <RecordedAppProtocolViewerSuspends sourceDetails={sourceDetails} />
+    </Suspense>
+  );
 }
 
 function RecordedAppProtocolViewerSuspends({ sourceDetails }: { sourceDetails: SourceDetails[] }) {
