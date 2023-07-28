@@ -213,3 +213,35 @@
 
 .libraryRow {
 }
+
+.testsuitesSuccess {
+  background-color: var(--testsuites-success-color);
+}
+
+.failed {
+  color: var(--testsuites-failed-color);
+}
+
+.flaky {
+  color: var(--testsuites-flaky-color);
+}
+
+.passed {
+  color: var(--testsuites-success-color);
+}
+
+.flakyPill {
+  color: var(--theme-base-100);
+  background-color: var(--testsuites-flaky-color);
+}
+
+.failedPill {
+  color: var(--theme-base-100);
+  background-color: var(--testsuites-failed-color);
+}
+
+.successPill {
+  color: var(--theme-base-100);
+  background-color: var(--testsuites-success-color);
+  border-radius: 50%;
+}

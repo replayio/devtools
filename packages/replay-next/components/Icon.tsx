@@ -43,6 +43,8 @@ export type IconType =
   | "open"
   | "pause"
   | "play"
+  | "play-processed"
+  | "play-unprocessed"
   | "preview"
   | "print"
   | "prompt"
@@ -274,6 +276,54 @@ export default function Icon({
     case "play":
       path =
         "M8 6.82v10.36c0 .79.87 1.27 1.54.84l8.14-5.18c.62-.39.62-1.29 0-1.69L9.54 5.98C8.87 5.55 8 6.03 8 6.82z";
+      break;
+    case "play-processed":
+      path = (
+        <>
+          <svg
+            width="21"
+            height="21"
+            viewBox="0 0 21 21"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M0.699805 10.7657C0.699805 5.60188 4.88594 1.41575 10.0498 1.41575C15.2137 1.41575 19.3998 5.60188 19.3998 10.7657C19.3998 15.9296 15.2137 20.1157 10.0498 20.1157C4.88594 20.1157 0.699805 15.9296 0.699805 10.7657ZM8.57474 15.0503L13.6135 11.8179C14.3803 11.326 14.3803 10.2055 13.6135 9.71362L8.57474 6.48124C7.74279 5.94755 6.6498 6.54495 6.6498 7.53337V13.9981C6.6498 14.9865 7.7428 15.5839 8.57474 15.0503Z"
+              fill="currentColor"
+              stroke="currentColor"
+              strokeWidth="2"
+            />
+          </svg>
+        </>
+      );
+      break;
+    case "play-unprocessed":
+      path = (
+        <>
+          <svg
+            width="21"
+            height="21"
+            viewBox="0 0 21 21"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <rect
+              x="1.58408"
+              y="0.97196"
+              width="18.7"
+              height="18.7"
+              rx="9.35"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M14.1468 9.81694C14.5149 10.053 14.5149 10.5909 14.1468 10.827L9.10805 14.0594C8.70872 14.3155 8.18408 14.0288 8.18408 13.5543V7.08958C8.18408 6.61514 8.70872 6.32839 9.10805 6.58456L14.1468 9.81694Z"
+              fill="currentColor"
+            />
+          </svg>
+        </>
+      );
       break;
     case "preview":
       path =

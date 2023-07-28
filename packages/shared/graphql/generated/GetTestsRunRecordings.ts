@@ -25,6 +25,7 @@ export interface GetTestsRunRecordings_node_Workspace_testRuns_edges_node_result
   __typename: "Recording";
   uuid: any;
   duration: number | null;
+  isProcessed: boolean;
   createdAt: any;
   metadata: any | null;
   comments: GetTestsRunRecordings_node_Workspace_testRuns_edges_node_results_recordings_comments[];

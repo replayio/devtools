@@ -1,14 +1,13 @@
 import { motion } from "framer-motion";
 import { useRouter } from "next/router";
 
-import Icon from "replay-next/components/Icon";
+import Icon, { IconType } from "replay-next/components/Icon";
 import { Recording } from "shared/graphql/types";
 import {
   isGroupedTestCasesV1,
   isGroupedTestCasesV2,
 } from "shared/test-suites/RecordingTestMetadata";
 import HighlightedText from "ui/components/Library/Team/View/TestRuns/HighlightedText";
-import MaterialIcon from "ui/components/shared/MaterialIcon";
 
 import styles from "../../../../Library.module.css";
 
@@ -25,7 +24,7 @@ export function TestResultListItem({
   recording: Recording;
   secondaryBadgeCount: number | null;
 }) {
-  const { comments, metadata } = recording;
+  const { comments, metadata, isProcessed } = recording;
 
   const { apiKey, e2e } = useRouter().query;
 
@@ -50,17 +49,21 @@ export function TestResultListItem({
 
   label = label.toLowerCase();
 
-  let color;
+  let iconClass;
+  let iconType;
   switch (label) {
     case "failed":
-      color = "#EB5757";
+      iconClass = "failed";
+      iconType = "play-processed";
       break;
     case "flaky":
-      color = "#FDBA00";
+      iconClass = "flaky";
+      iconType = "play-unprocessed";
       break;
     case "passed":
     default:
-      color = "#219653";
+      iconClass = "passed";
+      iconType = "play-unprocessed";
       break;
   }
 
@@ -83,9 +86,7 @@ export function TestResultListItem({
             whileTap={{ scale: 1.0, boxShadow: "0px 0px 1px rgba(0,0,0,0.2)" }}
             transition={{ duration: 0.05 }}
           >
-            <MaterialIcon iconSize="2xl" outlined style={{ color }}>
-              {["passed", "flaky"].includes(label) ? "play_circle" : "play_circle_filled"}
-            </MaterialIcon>
+            <Icon className={styles[iconClass]} type={iconType as IconType} />
           </motion.div>
         </div>
       </div>
