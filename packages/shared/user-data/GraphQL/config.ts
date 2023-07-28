@@ -64,13 +64,6 @@ export const config = {
     label: "Disable scan data cache",
     legacyKey: "devtools.features.disableScanDataCache",
   },
-  backend_disableStableQueryCache: {
-    defaultValue: Boolean(false),
-    description: "Disable caching of previously generated responses",
-    internalOnly: Boolean(true),
-    label: "Disable query-level caching for stable request types",
-    legacyKey: "devtools.features.disableStableQueryCache",
-  },
   backend_enableRoutines: {
     defaultValue: Boolean(false),
     description: "Enable backend support for running processing routines (like React DevTools)",
