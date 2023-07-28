@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { useRouter } from "next/router";
 
-import Icon, { IconType } from "replay-next/components/Icon";
+import Icon from "replay-next/components/Icon";
 import { Recording } from "shared/graphql/types";
 import {
   isGroupedTestCasesV1,
@@ -50,22 +50,20 @@ export function TestResultListItem({
   label = label.toLowerCase();
 
   let iconClass;
-  let iconType;
   switch (label) {
     case "failed":
       iconClass = "failed";
-      iconType = "play-processed";
       break;
     case "flaky":
       iconClass = "flaky";
-      iconType = "play-unprocessed";
       break;
     case "passed":
     default:
       iconClass = "passed";
-      iconType = "play-unprocessed";
       break;
   }
+
+  const iconType = isProcessed ? "play-processed" : "play-unprocessed";
 
   return (
     <a
@@ -86,7 +84,7 @@ export function TestResultListItem({
             whileTap={{ scale: 1.0, boxShadow: "0px 0px 1px rgba(0,0,0,0.2)" }}
             transition={{ duration: 0.05 }}
           >
-            <Icon className={styles[iconClass]} type={iconType as IconType} />
+            <Icon className={styles[iconClass]} type={iconType} />
           </motion.div>
         </div>
       </div>
