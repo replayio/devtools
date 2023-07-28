@@ -8,3 +8,10 @@
   border-radius: 0.25rem;
   filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.1)) drop-shadow(0 1px 1px rgb(0 0 0 / 0.06));
 }
+
+.UnavailableMessage {
+  padding: 0.5rem;
+  color: var(--color-default);
+  font-family: var(--font-family-default);
+  font-size: var(--font-size-regular);
+}
