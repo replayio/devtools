@@ -1,3 +1,3 @@
-import ProtocolViewer from "./ProtocolViewer";
+import { ProtocolViewerPanel } from "./ProtocolViewerPanel";
 
-export default ProtocolViewer;
+export default ProtocolViewerPanel;

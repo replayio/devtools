@@ -6,31 +6,6 @@
   overflow: hidden;
 }
 
-.Header {
-  font-size: 1rem;
-  line-height: 1rem;
-  flex: 0 0 auto;
-  padding: 0.5rem;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  user-select: none;
-}
-
-.AccordionHeader {
-  font-size: 1rem;
-  line-height: 1rem;
-  flex: 0 0 auto;
-  padding: 0.5rem 0;
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  border-bottom: 1px solid var(--theme-border);
-  gap: 0.25rem;
-  user-select: none;
-}
-
 .HeaderControls {
   display: flex;
   flex-direction: row;
@@ -79,13 +54,6 @@
 }
 .SubPanel {
   padding: 0 0.5rem;
-}
-
-.ColorErrored {
-  color: var(--console-error-color);
-}
-.ColorPending {
-  color: var(--light-grey);
 }
 
 .Chunk,
@@ -161,72 +129,6 @@
   background-color: var(--red-50);
 }
 
-.Details {
-  height: 65%;
-  min-height: 65%;
-  max-height: 65%;
-  overflow: auto;
-  border-top: 1px solid var(--theme-border);
-}
-
-.LoadRemainingDetails {
-  display: flex;
-  justify-content: center;
-  margin: 0.5rem;
-}
-
-.AccordionArrowCollapsed,
-.AccordionArrowExpanded {
-  mask-size: 10px;
-  vertical-align: -1px;
-  width: 10px;
-  height: 10px;
-  border: 0;
-  padding: 0;
-  margin-inline-end: 4px;
-  transform-origin: center center;
-  transition: transform 125ms var(--animation-curve);
-  background-color: var(--theme-icon-dimmed-color);
-}
-.AccordionArrowCollapsed {
-  transform: rotate(-90deg);
-}
-.AccordionArrowExpanded {
-}
-
-.DetailPanel {
-  padding: 0 0.5rem;
-  border-bottom: 1px solid var(--theme-border);
-}
-:root:global(.theme-dark) .DetailPanel {
-  background-color: #232938;
-}
-:root:global(.theme-light) .DetailPanel {
-  background-color: var(--grey-20);
-}
-.DetailPanelHeaderPrimary {
-  flex: 1 1 auto;
-  text-overflow: ellipsis;
-  white-space: pre;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 1ch;
-}
-.DetailPanelHeaderSecondary {
-  flex: 0 0 auto;
-  padding-right: 0.5rem;
-}
-.DetailPanelHeader {
-  font-size: 0.9rem;
-  line-height: 0.9rem;
-  padding: 0.5rem 0;
-}
-
-.JSONViewerContainer {
-  margin: 0.5rem 0;
-}
-
 .RowButton {
   color: white;
   border-radius: 0.25rem;
@@ -237,21 +139,14 @@
   justify-content: center;
 }
 
-.BugReportLink,
-.HoneycombLink {
-  color: white;
-  border-radius: 0.25rem;
-  width: 1.25rem;
-  height: 1.25rem;
+.Header {
+  font-size: 1rem;
+  line-height: 1rem;
+  flex: 0 0 auto;
+  padding: 0.5rem;
   display: flex;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
-}
-
-.BugReportLink {
-  background-color: var(--red-50);
-}
-
-.HoneycombLink {
-  background-color: var(--blue-50);
+  justify-content: space-between;
+  user-select: none;
 }

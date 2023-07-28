@@ -1,0 +1,13 @@
+.Details {
+  height: 65%;
+  min-height: 65%;
+  max-height: 65%;
+  overflow: auto;
+  border-top: 1px solid var(--theme-border);
+}
+
+.LoadRemainingDetails {
+  display: flex;
+  justify-content: center;
+  margin: 0.5rem;
+}
