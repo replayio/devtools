@@ -5,6 +5,7 @@ import { ConnectedProps, connect } from "react-redux";
 import { getAwaitingSourcemaps, getUploading } from "ui/reducers/app";
 import { UIState } from "ui/state";
 
+import ProtocolViewer from "../ProtocolViewer";
 import { DefaultViewportWrapper } from "./Viewport";
 import styles from "./LoadingScreen.module.css";
 
@@ -31,6 +32,10 @@ export function LoadingScreenTemplate({ children }: { children?: ReactNode }) {
   return (
     <div className={styles.loadingScreenWrapper}>
       <DefaultViewportWrapper>
+        <div className="fixed top-0 left-0 h-full bg-black p-2 text-sm">
+          <ProtocolViewer />
+        </div>
+
         <div className={styles.loadingScreenWrapper}>
           <div className="flex flex-col items-center space-y-2">
             <div className={styles.hoverboardWrapper} onClick={changeHoverboardColor}>
