@@ -128,6 +128,25 @@ function InfoIcon() {
   );
 }
 
+function ProtocolIcon() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M8.00033 7L1.70716 13.2929C1.31661 13.6834 1.31661 14.3166 1.70716 14.7071L8.00033 21"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M16 21L22.2929 14.7071C22.6834 14.3166 22.6834 13.6834 22.2929 13.2929L16 7"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 function CommentIcon() {
   return (
     <svg
@@ -291,8 +310,8 @@ function ToolbarButton({
       break;
     }
 
-    case "info": {
-      iconContents = <InfoIcon />;
+    case "protocol": {
+      iconContents = <ProtocolIcon />;
       break;
     }
 
@@ -483,8 +502,13 @@ export default function Toolbar() {
             )}
           </>
         ) : null}
-        {logProtocolExperimentEnabled && viewMode === "dev" ? (
-          <ToolbarButton icon="code" label="Protocol" name="protocol" onClick={handleButtonClick} />
+        {logProtocolExperimentEnabled ? (
+          <ToolbarButton
+            icon="protocol"
+            label="Protocol"
+            name="protocol"
+            onClick={handleButtonClick}
+          />
         ) : null}
 
         <div className="flex-grow"></div>
