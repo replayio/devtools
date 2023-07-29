@@ -1,0 +1,63 @@
+.Request,
+.RequestSelected,
+.RequestErrored,
+.RequestPending {
+  display: flex;
+  align-items: center;
+  gap: 1ch;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+}
+.RequestSelected {
+  background-color: var(--theme-selection-background);
+  color: var(--theme-selection-color);
+}
+.RequestPending {
+  color: var(--light-grey);
+}
+.RequestErrored {
+  color: var(--console-error-color);
+}
+
+.Request:not(.RequestSelected):hover {
+  background-color: var(--badge-hover-background-color);
+}
+
+.RequestMethod {
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: pre;
+}
+.RequestStartTime {
+  flex: 0 0 4ch;
+  font-size: var(--font-size-small);
+}
+
+.RelativeDurationContainer {
+  width: 1.5rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.RelativeDurationBlockSelected,
+.RelativeDurationBlockFast,
+.RelativeDurationBlockMedium,
+.RelativeDurationBlockSlow {
+  border-radius: 0.25rem;
+  height: 0.5rem;
+}
+.RelativeDurationBlockSelected {
+  background-color: var(--theme-toolbar-selected-color);
+}
+.RelativeDurationBlockFast {
+  background-color: var(--green-60);
+}
+.RelativeDurationBlockMedium {
+  background-color: var(--yellow-65);
+}
+.RelativeDurationBlockSlow {
+  background-color: var(--red-50);
+}

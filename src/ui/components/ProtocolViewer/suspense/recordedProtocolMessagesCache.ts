@@ -9,19 +9,21 @@ import {
 } from "replay-next/src/suspense/LogPointAnalysisCache";
 import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
 import { ReplayClientInterface } from "shared/client/types";
-import { AllProtocolMessages, ProtocolMessageCommon } from "ui/components/ProtocolViewer/types";
+import {
+  ProtocolErrorMap,
+  ProtocolRequestMap,
+  ProtocolResponseMap,
+} from "ui/reducers/protocolMessages";
 import { SourceDetails } from "ui/reducers/sources";
 import { getJSON } from "ui/utils/objectFetching";
 
-const NO_PROTOCOL_MESSAGES: AllProtocolMessages = {
-  requestMap: {},
-  responseMap: {},
-  errorMap: {},
-};
-
 export const recordedProtocolMessagesCache: Cache<
   [replayClient: ReplayClientInterface, sourceDetails: SourceDetails[], range: PointRange],
-  AllProtocolMessages
+  {
+    errorMap: ProtocolErrorMap;
+    requestMap: ProtocolRequestMap;
+    responseMap: ProtocolResponseMap;
+  }
 > = createCache({
   config: { immutable: true },
   debugLabel: "RecordedPotocolMessages",
@@ -30,7 +32,11 @@ export const recordedProtocolMessagesCache: Cache<
     const sessionSource = sourceDetails.find(source => source.url?.includes("ui/actions/session"));
 
     if (!sessionSource) {
-      return NO_PROTOCOL_MESSAGES;
+      return {
+        errorMap: {},
+        requestMap: {},
+        responseMap: {},
+      };
     }
 
     const [breakablePositionsSorted] = await breakpointPositionsCache.readAsync(
@@ -39,13 +45,17 @@ export const recordedProtocolMessagesCache: Cache<
     );
     const symbols = await sourceOutlineCache.readAsync(replayClient, sessionSource.id);
 
-    const mapNamesToCallbackNames: Record<keyof AllProtocolMessages, string> = {
+    const mapNamesToCallbackNames = {
       requestMap: "onRequest",
       responseMap: "onResponse",
       errorMap: "onResponseError",
     };
 
-    const results = { ...NO_PROTOCOL_MESSAGES };
+    const results = {
+      errorMap: {},
+      requestMap: {},
+      responseMap: {},
+    };
 
     const promises = Object.entries(mapNamesToCallbackNames).map(
       async ([fieldName, functionName]) => {
@@ -105,14 +115,17 @@ export const recordedProtocolMessagesCache: Cache<
             const [eventValue] = values;
 
             // @ts-ignore
-            let parsedObject: ProtocolMessageCommon = {};
+            let parsedObject: {
+              id: number;
+              recordedAt: number;
+            } = {};
 
             if (eventValue?.object) {
               parsedObject = (await getJSON(
                 replayClient,
                 analysisResult.pauseId!,
                 eventValue
-              )) as unknown as ProtocolMessageCommon;
+              )) as any;
             }
 
             parsedObject.recordedAt = analysisResult.time;
@@ -121,7 +134,7 @@ export const recordedProtocolMessagesCache: Cache<
           })
         );
 
-        const eventsById: Record<string, ProtocolMessageCommon> = {};
+        const eventsById: Record<string, Object> = {};
 
         // The `<ProtocolViewer>` wants these normalized by ID
         events.forEach(event => {

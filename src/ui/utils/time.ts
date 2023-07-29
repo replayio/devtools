@@ -1,8 +1,8 @@
 import padStart from "lodash/padStart";
 import prettyMilliseconds from "pretty-ms";
 
-export function formatDuration(ms: number) {
-  return prettyMilliseconds(ms, { millisecondsDecimalDigits: 1 });
+export function formatDuration(ms: number, digits = 1) {
+  return prettyMilliseconds(ms, { millisecondsDecimalDigits: digits });
 }
 
 export function formatTimestamp(ms: number) {
