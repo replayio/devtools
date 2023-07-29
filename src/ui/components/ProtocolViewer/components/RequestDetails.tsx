@@ -1,8 +1,9 @@
-import dynamic from "next/dynamic";
-import { useContext } from "react";
+import { useContext, useMemo } from "react";
 
+import { formatExpressionToken } from "replay-next/components/console/utils/formatExpressionToken";
 import Expandable from "replay-next/components/Expandable";
-import { useTheme } from "shared/theme/useTheme";
+import SyntaxHighlightedLine from "replay-next/components/sources/SyntaxHighlightedLine";
+import { parse } from "replay-next/src/suspense/SyntaxParsingCache";
 import { ProtocolViewerContext } from "ui/components/ProtocolViewer/components/ProtocolViewerContext";
 import { useBugReportLink } from "ui/components/ProtocolViewer/hooks/useBugReportLink";
 import { useHoneycombQueryLink } from "ui/components/ProtocolViewer/hooks/useHoneycombQueryLink";
@@ -72,10 +73,6 @@ export function RequestDetails() {
   );
 }
 
-const ReactJson = dynamic(() => import("react-json-view"), {
-  ssr: false,
-});
-
 function Section({
   content,
   header,
@@ -85,27 +82,13 @@ function Section({
   header: string;
   time: number | null;
 }) {
-  const theme = useTheme();
-
   if (content == null) {
     return content;
   }
 
-  // TODO Replace ReactJson with our own viewer
   return (
     <Expandable
-      children={
-        <div className={styles.JsonContainer}>
-          <ReactJson
-            displayDataTypes={false}
-            displayObjectSize={false}
-            shouldCollapse={false}
-            src={content}
-            style={{ backgroundColor: "transparent" }}
-            theme={theme == "light" ? "rjv-default" : "tube"}
-          />
-        </div>
-      }
+      children={<SyntaxHighlightedExpression value={content} />}
       childrenClassName={styles.SectionChildren}
       className={styles.SectionExpandable}
       defaultOpen={true}
@@ -117,5 +100,22 @@ function Section({
       }
       headerClassName={styles.SectionHeader}
     />
+  );
+}
+
+function SyntaxHighlightedExpression({ value }: { value: object }) {
+  const jsonText = JSON.stringify(value, null, 2);
+  const parsedTokens = parse(jsonText, "json");
+  const formattedTokens = useMemo(
+    () => parsedTokens.map(tokens => tokens.map(formatExpressionToken)),
+    [parsedTokens]
+  );
+
+  return (
+    <div className={styles.JsonPreview}>
+      {formattedTokens.map((tokens, index) => (
+        <SyntaxHighlightedLine code={jsonText} fileExtension="json" key={index} tokens={tokens} />
+      ))}
+    </div>
   );
 }

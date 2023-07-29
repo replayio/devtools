@@ -19,6 +19,8 @@ import {
 } from "./content";
 import styles from "./HttpBody.module.css";
 
+// TODO Replace with our own JSON viewer;
+// see Protocol Viewer RequestDetails for an example
 const ReactJson = dynamic(() => import("react-json-view"), {
   ssr: false,
 });

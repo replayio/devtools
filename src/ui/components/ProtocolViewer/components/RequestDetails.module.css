@@ -59,10 +59,6 @@
   font-size: var(--font-size-regular);
 }
 
-.JsonContainer {
-  margin: 0.5rem 0;
-}
-
 .ColorErrored {
   color: var(--console-error-color);
 }
@@ -70,13 +66,18 @@
   color: var(--light-grey);
 }
 
+.Sections {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+
 .SectionExpandable {
-  padding: 0.5rem 0;
-  border-bottom: 1px solid var(--theme-border);
 }
 
 .SectionHeader {
-  padding: 0 0.5rem;
+  padding: 0.5rem;
   display: flex;
   flex-direction: row;
   gap: 1ch;
@@ -92,19 +93,22 @@
 }
 
 .SectionChildren {
+  width: 100%;
+  overflow-x: hidden;
   margin-left: 0;
-  margin-top: 0.5rem;
 }
-
-.Sections {
-  flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
-  overflow: auto;
-}
-:root:global(.theme-dark) .Sections {
+:root:global(.theme-dark) .SectionChildren {
   background-color: #232938;
 }
-:root:global(.theme-light) .Sections {
+:root:global(.theme-light) .SectionChildren {
   background-color: var(--grey-20);
+}
+
+.JsonPreview {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-family-monospace);
+  font-size: var(--font-size-regular);
+  white-space: pre;
+  padding: 0.5rem 0;
 }
