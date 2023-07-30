@@ -20,7 +20,13 @@ export function JsonViewer({ jsonText }: { jsonText: string }) {
     <>
       <div className={styles.JsonViewer} onContextMenu={onContextMenu}>
         {formattedTokens.map((tokens, index) => (
-          <SyntaxHighlightedLine code={jsonText} fileExtension="json" key={index} tokens={tokens} />
+          <SyntaxHighlightedLine
+            className={styles.Line}
+            code={jsonText}
+            fileExtension="json"
+            key={index}
+            tokens={tokens}
+          />
         ))}
       </div>
       {contextMenu}

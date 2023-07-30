@@ -6,3 +6,8 @@
   white-space: pre;
   padding: 0.5rem 0;
 }
+
+.Line {
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+}

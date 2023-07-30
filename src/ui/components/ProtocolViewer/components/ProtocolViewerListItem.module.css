@@ -38,7 +38,7 @@
   height: 0.5rem;
   border-radius: 0.25rem;
   overflow: hidden;
-  background-color: var(--background-color-high-contrast-button);
+  background-color: var(--chrome);
 }
 
 .RelativeDurationBlockSelected,
