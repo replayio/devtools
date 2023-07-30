@@ -1,8 +1,8 @@
 import { BodyData } from "@replayio/protocol";
 import classNames from "classnames";
-import dynamic from "next/dynamic";
 import { useMemo, useState } from "react";
 
+import { JsonViewer } from "replay-next/components/JsonViewer/JsonViewer";
 import { useTheme } from "shared/theme/useTheme";
 
 import MaterialIcon from "../shared/MaterialIcon";
@@ -18,12 +18,6 @@ import {
   URLEncodedToPlaintext,
 } from "./content";
 import styles from "./HttpBody.module.css";
-
-// TODO Replace with our own JSON viewer;
-// see Protocol Viewer RequestDetails for an example
-const ReactJson = dynamic(() => import("react-json-view"), {
-  ssr: false,
-});
 
 const TextBodyComponent = ({ raw, text }: { raw: RawBody; text: string }) => {
   const [copied, setCopied] = useState(false);
@@ -86,17 +80,9 @@ const HttpBody = ({
   }, [raw]);
 
   if (displayable.as === Displayable.JSON) {
-    return (
-      <ReactJson
-        style={{ backgroundColor: "none" }}
-        theme={theme == "light" ? "rjv-default" : "tube"}
-        name={false}
-        src={displayable.content}
-        shouldCollapse={false}
-        displayDataTypes={false}
-        displayObjectSize={false}
-      />
-    );
+    const jsonText = JSON.stringify(displayable.content, null, 2);
+
+    return <JsonViewer jsonText={jsonText} />;
   }
   if (displayable.as === Displayable.Image) {
     return (

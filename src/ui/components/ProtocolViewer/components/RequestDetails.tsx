@@ -1,13 +1,10 @@
-import { useContext, useMemo } from "react";
+import { useContext } from "react";
 
-import { formatExpressionToken } from "replay-next/components/console/utils/formatExpressionToken";
 import Expandable from "replay-next/components/Expandable";
-import SyntaxHighlightedLine from "replay-next/components/sources/SyntaxHighlightedLine";
-import { parse } from "replay-next/src/suspense/SyntaxParsingCache";
+import { JsonViewer } from "replay-next/components/JsonViewer/JsonViewer";
 import { ProtocolViewerContext } from "ui/components/ProtocolViewer/components/ProtocolViewerContext";
 import { useBugReportLink } from "ui/components/ProtocolViewer/hooks/useBugReportLink";
 import { useHoneycombQueryLink } from "ui/components/ProtocolViewer/hooks/useHoneycombQueryLink";
-import { useRequestDetailsContextMenu } from "ui/components/ProtocolViewer/hooks/useRequestDetailsContextMenu";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { formatDuration, formatTimestamp } from "ui/utils/time";
 
@@ -87,9 +84,11 @@ function Section({
     return content;
   }
 
+  const jsonText = JSON.stringify(content, null, 2);
+
   return (
     <Expandable
-      children={<SyntaxHighlightedExpression value={content} />}
+      children={<JsonViewer jsonText={jsonText} />}
       childrenClassName={styles.SectionChildren}
       className={styles.SectionExpandable}
       defaultOpen={true}
@@ -101,27 +100,5 @@ function Section({
       }
       headerClassName={styles.SectionHeader}
     />
-  );
-}
-
-function SyntaxHighlightedExpression({ value }: { value: object }) {
-  const jsonText = JSON.stringify(value, null, 2);
-  const parsedTokens = parse(jsonText, "json");
-  const formattedTokens = useMemo(
-    () => parsedTokens.map(tokens => tokens.map(formatExpressionToken)),
-    [parsedTokens]
-  );
-
-  const { contextMenu, onContextMenu } = useRequestDetailsContextMenu(jsonText);
-
-  return (
-    <>
-      <div className={styles.JsonPreview} onContextMenu={onContextMenu}>
-        {formattedTokens.map((tokens, index) => (
-          <SyntaxHighlightedLine code={jsonText} fileExtension="json" key={index} tokens={tokens} />
-        ))}
-      </div>
-      {contextMenu}
-    </>
   );
 }

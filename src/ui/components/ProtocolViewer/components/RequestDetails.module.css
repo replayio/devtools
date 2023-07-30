@@ -104,12 +104,3 @@
 :root:global(.theme-light) .SectionChildren {
   background-color: var(--grey-20);
 }
-
-.JsonPreview {
-  display: flex;
-  flex-direction: column;
-  font-family: var(--font-family-monospace);
-  font-size: var(--font-size-regular);
-  white-space: pre;
-  padding: 0.5rem 0;
-}
