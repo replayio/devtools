@@ -37,6 +37,7 @@
   width: 1.5rem;
   height: 0.5rem;
   border-radius: 0.25rem;
+  overflow: hidden;
   background-color: var(--background-color-high-contrast-button);
 }
 
@@ -44,8 +45,8 @@
 .RelativeDurationBlockFast,
 .RelativeDurationBlockMedium,
 .RelativeDurationBlockSlow {
-  border-radius: 0.25rem;
   height: 100%;
+  border-radius: 0.125rem;
 }
 .RelativeDurationBlockSelected {
   background-color: var(--theme-toolbar-selected-color);
