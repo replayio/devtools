@@ -7,6 +7,7 @@ import { parse } from "replay-next/src/suspense/SyntaxParsingCache";
 import { ProtocolViewerContext } from "ui/components/ProtocolViewer/components/ProtocolViewerContext";
 import { useBugReportLink } from "ui/components/ProtocolViewer/hooks/useBugReportLink";
 import { useHoneycombQueryLink } from "ui/components/ProtocolViewer/hooks/useHoneycombQueryLink";
+import { useRequestDetailsContextMenu } from "ui/components/ProtocolViewer/hooks/useRequestDetailsContextMenu";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { formatDuration, formatTimestamp } from "ui/utils/time";
 
@@ -111,11 +112,16 @@ function SyntaxHighlightedExpression({ value }: { value: object }) {
     [parsedTokens]
   );
 
+  const { contextMenu, onContextMenu } = useRequestDetailsContextMenu(jsonText);
+
   return (
-    <div className={styles.JsonPreview}>
-      {formattedTokens.map((tokens, index) => (
-        <SyntaxHighlightedLine code={jsonText} fileExtension="json" key={index} tokens={tokens} />
-      ))}
-    </div>
+    <>
+      <div className={styles.JsonPreview} onContextMenu={onContextMenu}>
+        {formattedTokens.map((tokens, index) => (
+          <SyntaxHighlightedLine code={jsonText} fileExtension="json" key={index} tokens={tokens} />
+        ))}
+      </div>
+      {contextMenu}
+    </>
   );
 }
