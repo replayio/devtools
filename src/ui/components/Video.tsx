@@ -98,7 +98,6 @@ export default function Video() {
 
   const showCommentTool =
     isPaused && !isNodeTarget && !isNodePickerActive && !isNodePickerInitializing;
-  const showSpinner = showDelayedSpinner;
 
   return (
     <div id="video" className="relative bg-toolbarBackground">
@@ -117,7 +116,7 @@ export default function Video() {
       {contextMenu}
       {showCommentTool ? (
         <CommentsOverlay>
-          {showSpinner && (
+          {showDelayedSpinner && (
             <div className="absolute bottom-5 right-5 z-20 flex opacity-100">
               <Spinner className="w-5 animate-spin text-black" />
             </div>
