@@ -8,6 +8,8 @@
 }
 
 .Line {
+  font-size: inherit;
+  font-family: var(--font-family-monospace);
   overflow-x: hidden;
   text-overflow: ellipsis;
 }
