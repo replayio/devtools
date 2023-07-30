@@ -1,0 +1,106 @@
+.Details {
+  height: 100%;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.LoadRemainingDetails {
+  display: flex;
+  justify-content: center;
+  margin: 0.5rem;
+}
+
+.HeaderRow {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: row;
+  gap: 1ch;
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--chrome);
+}
+
+.HeaderTitle {
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: var(--font-family-monospace);
+}
+
+.HeaderTimestamp {
+  flex: 0 0 auto;
+  font-size: var(--font-size-small);
+}
+
+.BugReportLink,
+.HoneycombLink {
+  color: white;
+  border-radius: 0.25rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.BugReportLink {
+  background-color: var(--red-50);
+}
+
+.HoneycombLink {
+  background-color: var(--blue-50);
+}
+
+.NoSelection {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-dim);
+  font-size: var(--font-size-regular);
+}
+
+.ColorErrored {
+  color: var(--console-error-color);
+}
+.ColorPending {
+  color: var(--light-grey);
+}
+
+.Sections {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+
+.SectionExpandable {
+}
+
+.SectionHeader {
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: row;
+  gap: 1ch;
+}
+.SectionHeaderTitle {
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.SectionHeaderTime {
+  flex: 0 0 auto;
+  font-size: var(--font-size-small);
+}
+
+.SectionChildren {
+  width: 100%;
+  overflow-x: hidden;
+  margin-left: 0;
+}
+:root:global(.theme-dark) .SectionChildren {
+  background-color: #232938;
+}
+:root:global(.theme-light) .SectionChildren {
+  background-color: var(--grey-20);
+}

@@ -1,0 +1,12 @@
+.Container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+.PanelResizeHandle {
+  height: 0.5rem;
+  background-color: var(--chrome);
+}
