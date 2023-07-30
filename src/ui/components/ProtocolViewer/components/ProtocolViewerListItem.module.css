@@ -28,6 +28,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: pre;
+  font-family: var(--font-family-monospace);
 }
 .RequestStartTime {
   flex: 0 0 4ch;
