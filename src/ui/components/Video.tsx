@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { PreviewNodeHighlighter } from "devtools/client/inspector/markup/components/PreviewNodeHighlighter";
 import { getHighlightedNodesLoading } from "devtools/client/inspector/markup/selectors/markup";
@@ -40,11 +40,25 @@ export default function Video() {
 
   const { contextMenu, onContextMenu } = useVideoContextMenu({ canvasRef });
 
+  const [showDelayedSpinner, setShowDelayedSpinner] = useState(false);
+
+  useEffect(() => {
+    if (highlightedNodesLoading || (isNodePickerActive && mouseTargetsLoading) || stalled) {
+      const timerId = setTimeout(() => {
+        setShowDelayedSpinner(true);
+      }, 700);
+      return () => {
+        clearTimeout(timerId);
+      };
+    } else {
+      setShowDelayedSpinner(false);
+    }
+  }, [highlightedNodesLoading, isNodePickerActive, mouseTargetsLoading, stalled]);
+
   useEffect(() => {
     installObserver();
   }, []);
 
-  // Seek and resume playback if playing when swapping between Viewer and DevTools
   const didSeekOnMountRef = useRef(false);
   useEffect(() => {
     if (didSeekOnMountRef.current) {
@@ -62,9 +76,6 @@ export default function Video() {
     };
   });
 
-  // This is intentionally mousedown. Otherwise, the NodePicker's mouseup callback fires
-  // first. This updates the isNodePickerActive value and makes it look like the node picker is
-  // inactive when we check it here.
   const onMouseDown = () => {
     if (isNodePickerActive || isNodePickerInitializing) {
       return;
@@ -72,7 +83,6 @@ export default function Video() {
   };
 
   const onClick = (e: React.MouseEvent) => {
-    // User was trying to select something from the video preview, not add a comment
     if (isNodePickerActive || isNodePickerInitializing) {
       return;
     }
@@ -82,8 +92,6 @@ export default function Video() {
 
   const showCommentTool =
     isPaused && !isNodeTarget && !isNodePickerActive && !isNodePickerInitializing;
-  const showSpinner =
-    highlightedNodesLoading || (isNodePickerActive && mouseTargetsLoading) || stalled;
 
   return (
     <div id="video" className="relative bg-toolbarBackground">
@@ -102,9 +110,9 @@ export default function Video() {
       {contextMenu}
       {showCommentTool ? (
         <CommentsOverlay>
-          {showSpinner && (
-            <div className="absolute bottom-5 right-5 z-20 flex opacity-50">
-              <Spinner className="w-4 animate-spin" />
+          {showDelayedSpinner && (
+            <div className="absolute bottom-5 right-5 z-20 flex opacity-100">
+              <Spinner className="w-5 animate-spin text-black" />
             </div>
           )}
         </CommentsOverlay>
