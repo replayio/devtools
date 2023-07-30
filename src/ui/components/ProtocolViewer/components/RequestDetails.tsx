@@ -1,7 +1,7 @@
 import { useContext } from "react";
 
 import Expandable from "replay-next/components/Expandable";
-import { JsonViewer } from "replay-next/components/JsonViewer/JsonViewer";
+import { JsonViewer } from "replay-next/components/SyntaxHighlighter/JsonViewer";
 import { ProtocolViewerContext } from "ui/components/ProtocolViewer/components/ProtocolViewerContext";
 import { useBugReportLink } from "ui/components/ProtocolViewer/hooks/useBugReportLink";
 import { useHoneycombQueryLink } from "ui/components/ProtocolViewer/hooks/useHoneycombQueryLink";

@@ -18,6 +18,7 @@ import {
   COMMENT_TYPE_SOURCE_CODE,
   createTypeDataForSourceCodeComment,
 } from "replay-next/components/sources/utils/comments";
+import { SyntaxHighlighter } from "replay-next/components/SyntaxHighlighter/SyntaxHighlighter";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { GraphQLClientContext } from "replay-next/src/contexts/GraphQLClientContext";
 import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
@@ -40,7 +41,6 @@ import { addComment as addCommentGraphQL } from "shared/graphql/Comments";
 import { Nag } from "shared/graphql/types";
 
 import Loader from "../../Loader";
-import SyntaxHighlightedLine from "../SyntaxHighlightedLine";
 import BadgePicker from "./BadgePicker";
 import CommentButton from "./CommentButton";
 import HitPointTimeline from "./HitPointTimeline";
@@ -368,7 +368,7 @@ function PointPanelWithHitPoints({
               ) : (
                 <>
                   <div className={styles.Content}>
-                    <SyntaxHighlightedLine code={condition!} />
+                    <SyntaxHighlighter code={condition!} fileExtension=".js" />
                   </div>
 
                   <RemoveConditionalButton
@@ -437,7 +437,7 @@ function PointPanelWithHitPoints({
             ) : (
               <>
                 <div className={styles.Content}>
-                  <SyntaxHighlightedLine code={content} />
+                  <SyntaxHighlighter code={content} fileExtension=".js" />
                 </div>
                 <div className={styles.DisabledIconAndAvatar}>
                   {shouldLog || (
