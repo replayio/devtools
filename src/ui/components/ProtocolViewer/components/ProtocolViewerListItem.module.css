@@ -12,9 +12,6 @@
   background-color: var(--theme-selection-background);
   color: var(--theme-selection-color);
 }
-.RequestPending {
-  color: var(--light-grey);
-}
 .RequestErrored {
   color: var(--console-error-color);
 }
@@ -30,6 +27,7 @@
   white-space: pre;
   font-family: var(--font-family-monospace);
 }
+
 .RequestStartTime {
   flex: 0 0 4ch;
   font-size: var(--font-size-small);
@@ -37,10 +35,9 @@
 
 .RelativeDurationContainer {
   width: 1.5rem;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-end;
+  height: 0.5rem;
+  border-radius: 0.25rem;
+  background-color: var(--background-color-high-contrast-button);
 }
 
 .RelativeDurationBlockSelected,
@@ -48,7 +45,7 @@
 .RelativeDurationBlockMedium,
 .RelativeDurationBlockSlow {
   border-radius: 0.25rem;
-  height: 0.5rem;
+  height: 100%;
 }
 .RelativeDurationBlockSelected {
   background-color: var(--theme-toolbar-selected-color);

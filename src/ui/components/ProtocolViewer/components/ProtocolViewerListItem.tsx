@@ -36,8 +36,6 @@ export function ProtocolViewerListItem({ id }: { id: number }) {
     className = styles.RequestSelected;
   } else if (didError) {
     className = styles.RequestErrored;
-  } else if (isPending) {
-    className = styles.RequestPending;
   }
 
   const duration = response ? response.recordedAt - request.recordedAt : 0;
@@ -55,17 +53,17 @@ export function ProtocolViewerListItem({ id }: { id: number }) {
   return (
     <div ref={ref} className={className} onClick={() => selectRequest(id)}>
       <div className={styles.RequestStartTime}>{formatTimestamp(request.recordedAt)}</div>
-      <div className={styles.RequestMethod} title={`${request.class}.${request.method}`}>
-        {request.method}
-      </div>
-      {duration > 0 && (
-        <div className={styles.RelativeDurationContainer}>
+      <div className={styles.RelativeDurationContainer} title={formatDuration(duration)}>
+        {duration > 0 && (
           <div
             className={durationClassName}
             style={{ width: `${relativeDurationPercentage * 100}%` }}
           />
-        </div>
-      )}
+        )}
+      </div>
+      <div className={styles.RequestMethod} title={`${request.class}.${request.method}`}>
+        {request.method}
+      </div>
     </div>
   );
 }
