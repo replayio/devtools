@@ -10,18 +10,16 @@ import {
 } from "react";
 
 import useConsoleContextMenu from "replay-next/components/console/useConsoleContextMenu";
-import { formatExpressionToken } from "replay-next/components/console/utils/formatExpressionToken";
 import Icon from "replay-next/components/Icon";
 import Inspector from "replay-next/components/inspector";
 import ClientValueValueRenderer from "replay-next/components/inspector/values/ClientValueValueRenderer";
 import Loader from "replay-next/components/Loader";
-import SyntaxHighlightedLine from "replay-next/components/sources/SyntaxHighlightedLine";
+import { SyntaxHighlighter } from "replay-next/components/SyntaxHighlighter/SyntaxHighlighter";
 import { ConsoleFiltersContext } from "replay-next/src/contexts/ConsoleFiltersContext";
 import { InspectableTimestampedPointContext } from "replay-next/src/contexts/InspectorContext";
 import { TerminalExpression } from "replay-next/src/contexts/TerminalContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { pauseEvaluationsCache } from "replay-next/src/suspense/PauseCache";
-import { parse } from "replay-next/src/suspense/SyntaxParsingCache";
 import { primitiveToClientValue } from "replay-next/src/utils/protocol";
 import { formatTimestamp } from "replay-next/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -95,7 +93,9 @@ function TerminalExpressionRenderer({
             <span className={styles.LogContents} data-test-name="TerminalExpression-Expression">
               <Icon className={styles.PromptIcon} type="prompt" />
               <Suspense fallback={<Loader />}>
-                <SyntaxHighlightedExpression terminalExpression={terminalExpression} />
+                <div className={styles.TerminalExpressionLines}>
+                  <SyntaxHighlighter code={terminalExpression.expression} fileExtension=".js" />
+                </div>
               </Suspense>
             </span>
             <span className={styles.LogContents} data-test-name="TerminalExpression-Result">
@@ -120,32 +120,6 @@ function TerminalExpressionRenderer({
     </>
   );
 }
-
-function SyntaxHighlightedExpression({
-  terminalExpression,
-}: {
-  terminalExpression: TerminalExpression;
-}) {
-  const parsedTokens = parse(terminalExpression.expression, "js");
-  const formattedTokens = useMemo(
-    () => parsedTokens.map(tokens => tokens.map(formatExpressionToken)),
-    [parsedTokens]
-  );
-
-  return (
-    <div className={styles.TerminalExpressionLines}>
-      {formattedTokens.map((tokens, index) => (
-        <SyntaxHighlightedLine
-          code={terminalExpression.expression}
-          fileExtension="js"
-          key={index}
-          tokens={tokens}
-        />
-      ))}
-    </div>
-  );
-}
-
 function EvaluatedContent({ terminalExpression }: { terminalExpression: TerminalExpression }) {
   const client = useContext(ReplayClientContext);
 

@@ -2,7 +2,7 @@ import { BodyData } from "@replayio/protocol";
 import classNames from "classnames";
 import { useMemo, useState } from "react";
 
-import { JsonViewer } from "replay-next/components/JsonViewer/JsonViewer";
+import { JsonViewer } from "replay-next/components/SyntaxHighlighter/JsonViewer";
 import { useTheme } from "shared/theme/useTheme";
 
 import MaterialIcon from "../shared/MaterialIcon";

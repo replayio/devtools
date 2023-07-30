@@ -1,0 +1,10 @@
+.JsonViewer {
+  padding: 0.5rem 0;
+}
+
+.Line {
+  font-size: inherit;
+  font-family: var(--font-family-monospace);
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+}

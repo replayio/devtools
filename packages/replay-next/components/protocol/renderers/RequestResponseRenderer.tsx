@@ -1,6 +1,6 @@
-import { ReactNode, useMemo } from "react";
+import { useMemo } from "react";
 
-import SyntaxHighlightedLine from "replay-next/components/sources/SyntaxHighlightedLine";
+import JsonViewer from "replay-next/components/SyntaxHighlighter";
 import { formatDuration } from "replay-next/src/utils/time";
 
 import { RequestResponse } from "../ProtocolMessagesStore";
@@ -34,24 +34,22 @@ export function RequestResponseRenderer({ message }: { message: RequestResponse 
 
   return (
     <>
-      <Section code={requestCode} header="Request" />
-      <Section code={responseCode} header="Response" />
-      <Section code={errorCode} header="Error" />
+      <Section jsonText={requestCode} header="Request" />
+      <Section jsonText={responseCode} header="Response" />
+      <Section jsonText={errorCode} header="Error" />
     </>
   );
 }
 
-function Section({ code, header }: { code: string | null; header: string }) {
-  if (code === null || code === "{}") {
+function Section({ header, jsonText }: { header: string; jsonText: string | null }) {
+  if (jsonText === null || jsonText === "{}") {
     return null;
   }
 
   return (
     <>
       <div className={styles.SubHeader}>{header}</div>
-      <pre className={styles.Pre}>
-        <SyntaxHighlightedLine code={code} fileExtension=".json" />
-      </pre>
+      <JsonViewer jsonText={jsonText} />
     </>
   );
 }
