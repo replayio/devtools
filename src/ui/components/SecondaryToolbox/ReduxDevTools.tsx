@@ -1,6 +1,7 @@
 import {
   ExecutionPoint,
   FunctionMatch,
+  FunctionOutline,
   Location,
   PointDescription,
   SourceLocationRange,
@@ -204,6 +205,24 @@ async function searchingCallstackForDispatch(
   return null;
 }
 
+// Check for all the functions before the fnIndex in the array
+// and find the one that wraps the function at fnIndex
+function findFunctionParent(functions: FunctionOutline[], fnIndex: number) {
+  let step = 1;
+
+  while (fnIndex - step >= 0) {
+    let maybeParentFn = functions[fnIndex - step];
+
+    if (isNestedInside(functions[fnIndex].location, maybeParentFn.location)) {
+      return maybeParentFn;
+    }
+
+    step += 1;
+  }
+
+  return null;
+}
+
 async function isReduxMiddleware(location: Location) {
   const sourceOutline = await sourceOutlineCache.readAsync(replayClient, location.sourceId);
   const dispatchFn = findFunctionOutlineForLocation(location, sourceOutline);
@@ -212,16 +231,20 @@ async function isReduxMiddleware(location: Location) {
   if (dispatchFn && dispatchFn.parameters.length === 1) {
     const index = functions.indexOf(dispatchFn);
     if (index >= 2) {
-      const wrapDispatchFn = functions[index - 1];
-      const middlewareFn = functions[index - 2];
+      const wrapDispatchFn = findFunctionParent(functions, index);
 
-      if (
-        wrapDispatchFn.parameters.length === 1 &&
-        middlewareFn.parameters.length <= 1 &&
-        isNestedInside(dispatchFn.location, wrapDispatchFn.location) &&
-        isNestedInside(wrapDispatchFn.location, middlewareFn.location)
-      ) {
-        return true;
+      if (wrapDispatchFn) {
+        const middlewareFn = findFunctionParent(functions, functions.indexOf(wrapDispatchFn));
+        if (middlewareFn) {
+          if (
+            wrapDispatchFn.parameters.length === 1 &&
+            middlewareFn.parameters.length <= 1 &&
+            isNestedInside(dispatchFn.location, wrapDispatchFn.location) &&
+            isNestedInside(wrapDispatchFn.location, middlewareFn.location)
+          ) {
+            return true;
+          }
+        }
       }
     }
   }
