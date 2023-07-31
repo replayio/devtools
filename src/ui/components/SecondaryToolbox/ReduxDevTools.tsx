@@ -209,15 +209,17 @@ async function isReduxMiddleware(sourceContents: string, location: Location) {
   const dispatchFn = findFunctionOutlineForLocation(location, sourceOutline);
   const functions = sourceOutline.functions;
 
-  if (dispatchFn) {
+  if (dispatchFn && dispatchFn.parameters.length === 1) {
     const index = functions.indexOf(dispatchFn);
     if (index >= 2) {
-      const wrapDispatch = functions[index - 1];
+      const wrapDispatchFn = functions[index - 1];
       const middlewareFn = functions[index - 2];
 
       if (
-        isNestedInside(dispatchFn.location, wrapDispatch.location) &&
-        isNestedInside(wrapDispatch.location, middlewareFn.location)
+        wrapDispatchFn.parameters.length === 1 &&
+        middlewareFn.parameters.length === 1 &&
+        isNestedInside(dispatchFn.location, wrapDispatchFn.location) &&
+        isNestedInside(wrapDispatchFn.location, middlewareFn.location)
       ) {
         return true;
       }
