@@ -204,7 +204,7 @@ async function searchingCallstackForDispatch(
   return null;
 }
 
-async function isReduxMiddleware(sourceContents: string, location: Location) {
+async function isReduxMiddleware(location: Location) {
   const sourceOutline = await sourceOutlineCache.readAsync(replayClient, location.sourceId);
   const dispatchFn = findFunctionOutlineForLocation(location, sourceOutline);
   const functions = sourceOutline.functions;
@@ -241,20 +241,11 @@ async function searchSourceOutlineForDispatch(
   while (isMiddleware && preferredFrameIdx < pauseFrames.length) {
     let preferredFrame = pauseFrames[preferredFrameIdx];
 
-    const sourceContentsStream = streamingSourceContentsCache.stream(
-      replayClient,
-      preferredFrame.location.sourceId
-    );
-
-    await sourceContentsStream.resolver;
-
-    if (sourceContentsStream.value) {
-      if (await isReduxMiddleware(sourceContentsStream.value, preferredFrame.location)) {
-        isMiddleware = true;
-        preferredFrameIdx++;
-      } else {
-        isMiddleware = false;
-      }
+    if (await isReduxMiddleware(preferredFrame.location)) {
+      isMiddleware = true;
+      preferredFrameIdx++;
+    } else {
+      isMiddleware = false;
     }
   }
 
