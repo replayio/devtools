@@ -1,11 +1,11 @@
 import { useContext } from "react";
 
 import Expandable from "replay-next/components/Expandable";
+import Icon from "replay-next/components/Icon";
 import { JsonViewer } from "replay-next/components/SyntaxHighlighter/JsonViewer";
 import { ProtocolViewerContext } from "ui/components/ProtocolViewer/components/ProtocolViewerContext";
 import { useBugReportLink } from "ui/components/ProtocolViewer/hooks/useBugReportLink";
 import { useHoneycombQueryLink } from "ui/components/ProtocolViewer/hooks/useHoneycombQueryLink";
-import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { formatDuration, formatTimestamp } from "ui/utils/time";
 
 import styles from "./RequestDetails.module.css";
@@ -35,24 +35,22 @@ export function RequestDetails() {
         <div className={styles.HeaderTitle}>{request.method}</div>
         {bugReportLink != null && (
           <a
-            className={styles.BugReportLink}
             href={bugReportLink}
             rel="noreferrer noopener"
             target="_blank"
             title="Report protocol bug"
           >
-            <MaterialIcon>bug_report</MaterialIcon>
+            <Icon className={styles.BugReportIcon} type="bug" />
           </a>
         )}
         {honeycombQueryLink != null && (
           <a
-            className={styles.HoneycombLink}
             href={honeycombQueryLink}
             rel="noreferrer noopener"
             target="_blank"
             title="View in Honeycomb"
           >
-            <MaterialIcon>hive</MaterialIcon>
+            <Icon className={styles.HoneycombIcon} type="chart" />
           </a>
         )}
         {response && (
@@ -88,7 +86,7 @@ function Section({
 
   return (
     <Expandable
-      children={<JsonViewer jsonText={jsonText} />}
+      children={<JsonViewer className={styles.JsonViewer} jsonText={jsonText} />}
       childrenClassName={styles.SectionChildren}
       className={styles.SectionExpandable}
       defaultOpen={true}
