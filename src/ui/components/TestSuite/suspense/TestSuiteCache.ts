@@ -26,13 +26,19 @@ export const TestSuiteCache = createSingleEntryCacheWithTelemetry<
     assert(metadata != null);
     assert(metadata.test != null);
 
+    const testSources = metadata["x-replay-playwright"];
+
     const testMetadata = metadata.test;
     if (isGroupedTestCasesV1(testMetadata)) {
       return null;
     }
 
     // Migrate intermediate test data to the final format used by the client
-    const groupedTestCases = await processGroupedTestCases(testMetadata, replayClient);
+    const groupedTestCases = await processGroupedTestCases(
+      replayClient,
+      testMetadata,
+      testSources?.sources ?? null
+    );
 
     return groupedTestCases;
   },

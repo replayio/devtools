@@ -12,6 +12,9 @@ export function SyntaxHighlighterLine({
   const html = parsedTokensToHtml(tokens);
 
   return (
-    <div className={`${styles.Line} ${className}`} dangerouslySetInnerHTML={{ __html: html }} />
+    <div
+      className={`${styles.Line} ${className}`}
+      dangerouslySetInnerHTML={{ __html: html || "&nbsp;" }}
+    />
   );
 }
