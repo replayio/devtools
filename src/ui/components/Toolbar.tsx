@@ -20,8 +20,6 @@ import { actions } from "../actions";
 import { selectors } from "../reducers";
 import styles from "./Toolbar.module.css";
 
-// TODO [ryanjduffy]: Refactor shared styling more completely
-
 function CypressIcon() {
   return (
     <svg
@@ -132,16 +130,8 @@ function ProtocolIcon() {
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path
-        d="M8.00033 7L1.70716 13.2929C1.31661 13.6834 1.31661 14.3166 1.70716 14.7071L8.00033 21"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-      <path
-        d="M16 21L22.2929 14.7071C22.6834 14.3166 22.6834 13.6834 22.2929 13.2929L16 7"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
+        d="M14.6,16.6L19.2,12L14.6,7.4L16,6L22,12L16,18L14.6,16.6M9.4,16.6L4.8,12L9.4,7.4L8,6L2,12L8,18L9.4,16.6Z"
+        fill="currentColor"
       />
     </svg>
   );
@@ -291,6 +281,10 @@ function ToolbarButton({
   let iconContents: string | JSX.Element = icon;
 
   switch (icon) {
+    case "info": {
+      iconContents = <InfoIcon />;
+      break;
+    }
     case "cypress": {
       iconContents = <CypressIcon />;
       break;
@@ -344,7 +338,9 @@ function ToolbarButton({
   }
 
   const imageIcon = (
-    <MaterialIcon className={classNames("toolbar-panel-icon", name)}>{iconContents}</MaterialIcon>
+    <MaterialIcon className={classNames("toolbar-panel-icon", name, styles.MaterialIcon)}>
+      {iconContents}
+    </MaterialIcon>
   );
   return (
     <div className="relative px-2">
@@ -358,7 +354,7 @@ function ToolbarButton({
           icon={imageIcon}
           content={label}
           dataTestName={`ToolbarButton-${label.replace(/ /g, "")}`}
-          handleClick={() => onClick(name)}
+          onClick={() => onClick(name)}
         />
       </div>
       {showBadge ? (
@@ -527,7 +523,7 @@ export default function Toolbar() {
             }
             content={sidePanelCollapsed ? "Expand side panel" : "Collapse side panel"}
             dataTestName={`ToolbarButton-ExpandSidePanel`}
-            handleClick={togglePanel}
+            onClick={togglePanel}
           />
         </div>
       </div>

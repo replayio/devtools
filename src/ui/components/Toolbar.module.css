@@ -6,3 +6,9 @@
 .toolboxToolbar {
   flex: 1;
 }
+
+.MaterialIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
