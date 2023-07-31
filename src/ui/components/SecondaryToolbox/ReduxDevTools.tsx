@@ -217,7 +217,7 @@ async function isReduxMiddleware(location: Location) {
 
       if (
         wrapDispatchFn.parameters.length === 1 &&
-        middlewareFn.parameters.length === 1 &&
+        middlewareFn.parameters.length <= 1 &&
         isNestedInside(dispatchFn.location, wrapDispatchFn.location) &&
         isNestedInside(wrapDispatchFn.location, middlewareFn.location)
       ) {
