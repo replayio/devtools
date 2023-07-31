@@ -156,12 +156,6 @@ export function setupGraphics() {
     };
 
     const { client } = await import("./socket");
-    client.Graphics.findPaints({}, sessionId).then(async () => {
-      initialPaintsReceivedWaiter.resolve(null);
-      hasAllPaintPoints = true;
-      onAllPaintsReceived(true);
-      maybePaintGraphics();
-    });
     client.Graphics.addPaintPointsListener(async ({ paints }) => {
       onPaints(paints);
       if (gPaintPoints.length >= INITIAL_PAINT_COUNT) {
@@ -173,9 +167,15 @@ export function setupGraphics() {
         maybePaintGraphics();
       }
     });
+    client.Graphics.findPaints({}, sessionId).then(async () => {
+      initialPaintsReceivedWaiter.resolve(null);
+      hasAllPaintPoints = true;
+      onAllPaintsReceived(true);
+      maybePaintGraphics();
+    });
 
-    client.Session.findMouseEvents({}, sessionId);
     client.Session.addMouseEventsListener(({ events }) => onMouseEvents(events));
+    client.Session.findMouseEvents({}, sessionId);
 
     const recordingTarget = await recordingTargetCache.readAsync(replayClient);
     if (recordingTarget === "node") {
