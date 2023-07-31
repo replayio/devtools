@@ -208,16 +208,12 @@ async function searchingCallstackForDispatch(
 // Check for all the functions before the fnIndex in the array
 // and find the one that wraps the function at fnIndex
 function findFunctionParent(functions: FunctionOutline[], fnIndex: number) {
-  let step = 1;
-
-  while (fnIndex - step >= 0) {
-    let maybeParentFn = functions[fnIndex - step];
+  for (let i = fnIndex - 1; i >= 0; i--) {
+    let maybeParentFn = functions[i];
 
     if (isNestedInside(functions[fnIndex].location, maybeParentFn.location)) {
       return maybeParentFn;
     }
-
-    step += 1;
   }
 
   return null;
@@ -299,7 +295,8 @@ const reduxDispatchJumpLocationCache = createCache<
       return !IGNORABLE_PARTIAL_SOURCE_URLS.concat(
         "serializableStateInvariantMiddleware",
         "immutableStateInvariantMiddleware",
-        "redux-thunk"
+        "redux-thunk",
+        "bindActionCreators"
       ).some(partialUrl => source.url?.includes(partialUrl));
     });
 
