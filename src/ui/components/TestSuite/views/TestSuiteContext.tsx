@@ -31,7 +31,6 @@ export function TestSuiteContextRoot({ children }: PropsWithChildren) {
 
   const setTestRecordingWrapper = useCallback(
     async (testRecording: TestRecording | null) => {
-      console.log("setTestRecording()", testRecording);
       setTestRecording(testRecording);
 
       if (testRecording != null) {
