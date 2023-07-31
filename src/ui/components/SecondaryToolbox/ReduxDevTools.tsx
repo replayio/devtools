@@ -273,7 +273,11 @@ const reduxDispatchJumpLocationCache = createCache<
         return false;
       }
 
-      return !IGNORABLE_PARTIAL_SOURCE_URLS.some(partialUrl => source.url?.includes(partialUrl));
+      return !IGNORABLE_PARTIAL_SOURCE_URLS.concat(
+        "serializableStateInvariantMiddleware",
+        "immutableStateInvariantMiddleware",
+        "redux-thunk"
+      ).some(partialUrl => source.url?.includes(partialUrl));
     });
 
     let preferredFrameIdx = await searchingCallstackForDispatch(
