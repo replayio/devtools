@@ -1,7 +1,8 @@
-import { MutableRefObject, useContext, useRef } from "react";
+import { MutableRefObject, memo, useContext, useRef } from "react";
 
 import { ProtocolViewerContext } from "ui/components/ProtocolViewer/components/ProtocolViewerContext";
 import { useScrollSelectedRequestIntoView } from "ui/components/ProtocolViewer/hooks/useScrollSelectedRequestIntoView";
+import { ProtocolError, ProtocolRequest, ProtocolResponse } from "ui/reducers/protocolMessages";
 import { formatDuration, formatTimestamp } from "ui/utils/time";
 
 import styles from "./ProtocolViewerListItem.module.css";
@@ -19,16 +20,44 @@ export function ProtocolViewerListItem({ id }: { id: number }) {
     selectRequest,
   } = useContext(ProtocolViewerContext);
 
-  const ref = useRef<HTMLDivElement>() as MutableRefObject<HTMLDivElement>;
-
   const error = errorMap[id];
   const request = requestMap[id];
   const response = responseMap[id];
 
-  const didError = error != null;
   const isSelected = id === selectedRequestId;
 
-  useScrollSelectedRequestIntoView(ref, id);
+  return (
+    <MemoizedProtocolViewerListItem
+      error={error}
+      isSelected={isSelected}
+      longestRequestDuration={longestRequestDuration}
+      request={request}
+      response={response}
+      selectRequest={selectRequest}
+    />
+  );
+}
+
+const MemoizedProtocolViewerListItem = memo(function MemoizedProtocolViewerListItem({
+  error,
+  isSelected,
+  longestRequestDuration,
+  request,
+  response,
+  selectRequest,
+}: {
+  error: ProtocolError;
+  isSelected: boolean;
+  longestRequestDuration: number;
+  request: ProtocolRequest;
+  response: ProtocolResponse;
+  selectRequest: (id: number | null) => void;
+}) {
+  const ref = useRef<HTMLDivElement>() as MutableRefObject<HTMLDivElement>;
+
+  const didError = error != null;
+
+  useScrollSelectedRequestIntoView(ref, isSelected);
 
   let className = styles.Request;
   if (isSelected) {
@@ -50,7 +79,7 @@ export function ProtocolViewerListItem({ id }: { id: number }) {
   const relativeDurationPercentage = Math.cbrt(duration) / Math.cbrt(longestRequestDuration);
 
   return (
-    <div ref={ref} className={className} onClick={() => selectRequest(id)}>
+    <div ref={ref} className={className} onClick={() => selectRequest(request.id)}>
       <div className={styles.RequestStartTime}>{formatTimestamp(request.recordedAt)}</div>
       <div className={styles.RelativeDurationContainer} title={formatDuration(duration)}>
         {duration > 0 && (
@@ -65,4 +94,4 @@ export function ProtocolViewerListItem({ id }: { id: number }) {
       </div>
     </div>
   );
-}
+});

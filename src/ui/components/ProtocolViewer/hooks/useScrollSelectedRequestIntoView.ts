@@ -4,11 +4,8 @@ import { ProtocolViewerContext } from "ui/components/ProtocolViewer/components/P
 
 export function useScrollSelectedRequestIntoView(
   divRef: MutableRefObject<HTMLDivElement>,
-  id: number
+  isSelected: boolean
 ) {
-  const { selectedRequestId } = useContext(ProtocolViewerContext);
-
-  const isSelected = id === selectedRequestId;
   const prevIsSelectedRef = useRef<boolean>(false);
 
   useLayoutEffect(() => {
