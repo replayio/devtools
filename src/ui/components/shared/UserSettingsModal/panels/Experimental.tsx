@@ -5,8 +5,6 @@ import { BooleanPreference } from "ui/components/shared/UserSettingsModal/compon
 export const PREFERENCES: PreferencesKey[] = [
   "feature_columnBreakpoints",
   "backend_profileWorkerThreads",
-  "backend_enableUnstableQueryCache",
-  "backend_disableStableQueryCache",
   "feature_basicProcessingLoadingBar",
   "console_showFiltersByDefault",
   "backend_disableScanDataCache",

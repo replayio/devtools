@@ -121,21 +121,18 @@ const noCallerStackTracesForFailedCommands = new Set<CommandMethods>([
 ]);
 
 export type ExperimentalSettings = {
-  listenForMetrics: boolean;
   controllerKey?: string;
   disableCache?: boolean;
-  disableScanDataCache?: boolean;
-  disableQueryCache?: boolean;
-  disableStableQueryCache?: boolean;
-  disableUnstableQueryCache?: boolean;
-  enableRoutines?: boolean;
-  rerunRoutines?: boolean;
-  profileWorkerThreads?: boolean;
-  disableRecordingAssetsInDatabase?: boolean;
-  keepAllTraces?: boolean;
-  disableIncrementalSnapshots?: boolean;
   disableConcurrentControllerLoading?: boolean;
+  disableIncrementalSnapshots?: boolean;
   disableProtocolQueryCache?: boolean;
+  disableRecordingAssetsInDatabase?: boolean;
+  disableScanDataCache?: boolean;
+  enableRoutines?: boolean;
+  keepAllTraces?: boolean;
+  listenForMetrics: boolean;
+  profileWorkerThreads?: boolean;
+  rerunRoutines?: boolean;
 };
 
 type SessionCallbacks = {
