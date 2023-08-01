@@ -26,7 +26,6 @@ export function ProtocolViewerListItem({ id }: { id: number }) {
   const response = responseMap[id];
 
   const didError = error != null;
-  const isPending = response == null;
   const isSelected = id === selectedRequestId;
 
   useScrollSelectedRequestIntoView(ref, id);

@@ -18,10 +18,17 @@ export default function ProtocolViewer() {
     if (!filterByText) {
       return messages;
     } else {
-      const needle = filterByText.toLowerCase();
+      const isInverse = filterByText.startsWith("!") || filterByText.startsWith("-");
+      const needle = isInverse
+        ? filterByText.substring(1).toLowerCase()
+        : filterByText.toLowerCase();
+      console.log("isInverse?", isInverse, 'needle "' + needle + '"');
 
       // This is a really heavy-handed search but it's a DEV only feature so that's fine.
-      return messages.filter(message => JSON.stringify(message).toLowerCase().includes(needle));
+      return messages.filter(message => {
+        const match = JSON.stringify(message).toLowerCase().includes(needle);
+        return isInverse ? !match : match;
+      });
     }
   }, [filterByText, messages]);
 
