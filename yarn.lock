@@ -4691,10 +4691,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^18.0.0":
-  version: 18.0.0
-  resolution: "@types/node@npm:18.0.0"
-  checksum: aab2b325727a2599f6d25ebe0dedf58c40fb66a51ce4ca9c0226ceb70fcda2d3afccdca29db5942eb48b158ee8585a274a1e3750c718bbd5399d7f41d62dfdcc
+"@types/node@npm:^20.4.5":
+  version: 20.4.5
+  resolution: "@types/node@npm:20.4.5"
+  checksum: 36a0304a8dc346a1b2d2edac4c4633eecf70875793d61a5274d0df052d7a7af7a8e34f29884eac4fbd094c4f0201477dcb39c0ecd3307ca141688806538d1138
   languageName: node
   linkType: hard
 
@@ -15205,7 +15205,7 @@ __metadata:
     "@types/lodash": ^4.14.181
     "@types/logrocket-react": ^3.0.0
     "@types/mixpanel-browser": ^2.35.6
-    "@types/node": ^18.0.0
+    "@types/node": ^20.4.5
     "@types/react": ^18.0.12
     "@types/react-devtools-inline": ^4.24.3
     "@types/react-dom": ^18.0.5
