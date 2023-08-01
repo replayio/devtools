@@ -22,7 +22,6 @@ export default function ProtocolViewer() {
       const needle = isInverse
         ? filterByText.substring(1).toLowerCase()
         : filterByText.toLowerCase();
-      console.log("isInverse?", isInverse, 'needle "' + needle + '"');
 
       // This is a really heavy-handed search but it's a DEV only feature so that's fine.
       return messages.filter(message => {
