@@ -94,18 +94,12 @@ function Section({
   }
 
   return (
-    <Expandable
-      children={children}
-      childrenClassName={styles.SectionChildren}
-      className={styles.SectionExpandable}
-      defaultOpen={true}
-      header={
-        <>
-          <div className={styles.SectionHeaderTitle}>{header}</div>
-          {time !== null && <div className={styles.SectionHeaderTime}>{formatTimestamp(time)}</div>}
-        </>
-      }
-      headerClassName={styles.SectionHeader}
-    />
+    <>
+      <div className={styles.SectionHeader}>
+        <div className={styles.SectionHeaderTitle}>{header}</div>
+        {time !== null && <div className={styles.SectionHeaderTime}>{formatTimestamp(time)}</div>}
+      </div>
+      {children}
+    </>
   );
 }

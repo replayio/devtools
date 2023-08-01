@@ -65,9 +65,7 @@
   display: flex;
   flex-direction: column;
   overflow: auto;
-}
-
-.SectionExpandable {
+  padding-bottom: 0.5rem;
 }
 
 .SectionHeader {
@@ -95,12 +93,13 @@
 }
 
 .JsonViewer {
-  background-color: var(--background-color-default);
+  min-height: 25%;
   padding: 0.5rem;
+  margin: 0 0.5rem;
   border-radius: 0.25rem;
-  display: flex;
-  flex-direction: column;
+  background-color: var(--background-color-default);
   font-family: var(--font-family-monospace);
   font-size: var(--font-size-regular);
   white-space: pre;
+  overflow: auto;
 }

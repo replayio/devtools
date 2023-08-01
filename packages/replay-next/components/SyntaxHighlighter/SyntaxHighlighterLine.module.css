@@ -1,4 +1,5 @@
 .Line {
   font-size: inherit;
   font-family: var(--font-family-monospace);
+  display: block;
 }
