@@ -57,7 +57,7 @@
     "error-stack-parser": "^2.1.4",
     "escape-html": "^1.0.3",
     "fluent-ffmpeg": "^2.1.2",
-    "framer-motion": "^6.3.6",
+    "framer-motion": "^10.15.0",
     "fuzzaldrin-plus": "^0.6.0",
     "graphql-ws": "^5.9.0",
     "immer": "^9.0.7",
