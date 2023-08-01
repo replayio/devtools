@@ -502,12 +502,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/parser@npm:7.18.5":
-  version: 7.18.5
-  resolution: "@babel/parser@npm:7.18.5"
+"@babel/parser@npm:7.22.7":
+  version: 7.22.7
+  resolution: "@babel/parser@npm:7.22.7"
   bin:
     parser: ./bin/babel-parser.js
-  checksum: 4976349d8681af215fd5771bd5b74568cc95a2e8bf2afcf354bf46f73f3d6f08d54705f354b1d0012f914dd02a524b7d37c5c1204ccaafccb9db3c37dba96a9b
+  checksum: 02209ddbd445831ee8bf966fdf7c29d189ed4b14343a68eb2479d940e7e3846340d7cc6bd654a5f3d87d19dc84f49f50a58cf9363bee249dc5409ff3ba3dab54
   languageName: node
   linkType: hard
 
@@ -15155,7 +15155,7 @@ __metadata:
     "@auth0/auth0-react": 1.2.0
     "@babel/core": ^7.17.8
     "@babel/generator": ^7.17.7
-    "@babel/parser": ^7.17.8
+    "@babel/parser": ^7.22.7
     "@babel/plugin-proposal-class-properties": ^7.14.5
     "@babel/plugin-proposal-logical-assignment-operators": ^7.14.5
     "@babel/plugin-proposal-nullish-coalescing-operator": ^7.14.5
