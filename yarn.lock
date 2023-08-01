@@ -15317,7 +15317,7 @@ __metadata:
     sharp: ^0.30.3
     slugify: ^1.6.5
     source-map-loader: ^4.0.1
-    style-loader: ^3.3.1
+    style-loader: ^3.3.3
     stylelint: ^14.16.0
     stylelint-config-prettier: ^9.0.5
     suspense: ^0.0.45
@@ -16650,12 +16650,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"style-loader@npm:^3.3.1":
-  version: 3.3.1
-  resolution: "style-loader@npm:3.3.1"
+"style-loader@npm:^3.3.3":
+  version: 3.3.3
+  resolution: "style-loader@npm:3.3.3"
   peerDependencies:
     webpack: ^5.0.0
-  checksum: 470feef680f59e2fce4d6601b5c55b88c01ad8d1dd693c528ffd591ff5fd7c01a4eff3bdbe62f26f847d6bd2430c9ab594be23307cfe7a3446ab236683f0d066
+  checksum: f59c953f56f6a935bd6a1dfa409f1128fed2b66b48ce4a7a75b85862a7156e5e90ab163878962762f528ec4d510903d828da645e143fbffd26f055dc1c094078
   languageName: node
   linkType: hard
 
