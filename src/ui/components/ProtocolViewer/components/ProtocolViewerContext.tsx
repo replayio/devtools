@@ -71,7 +71,11 @@ export function ProtocolViewerContextRoot({
   const filteredRequestIds = useMemo(() => {
     const filteredIds: number[] = [];
 
-    const lowerCaseFilterText = deferredFilterText.toLowerCase();
+    const isInverseSearch =
+      deferredFilterText.startsWith("!") || deferredFilterText.startsWith("-");
+    const lowerCaseFilterText = isInverseSearch
+      ? deferredFilterText.substring(1).toLowerCase()
+      : deferredFilterText.toLowerCase();
 
     Array.from(Object.values(requestMap)).forEach((request, index) => {
       if (index < clearBeforeIndex) {
@@ -80,8 +84,8 @@ export function ProtocolViewerContextRoot({
 
       if (deferredFilterText) {
         const text = `${request.class}.${request.method}`.toLowerCase();
-
-        if (!text.includes(lowerCaseFilterText)) {
+        const match = text.includes(lowerCaseFilterText);
+        if (match === isInverseSearch) {
           return;
         }
       }
