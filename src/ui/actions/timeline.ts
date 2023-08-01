@@ -34,7 +34,6 @@ import {
 import { screenshotCache } from "replay-next/src/suspense/ScreenshotCache";
 import { isExecutionPointsLessThan } from "replay-next/src/utils/time";
 import {
-  isTimeStampedPointRangeEqual,
   isTimeStampedPointRangeGreaterThan,
   isTimeStampedPointRangeLessThan,
 } from "replay-next/src/utils/timeStampedPoints";
@@ -558,9 +557,6 @@ export function setFocusWindow(
     const state = getState();
     const currentTime = getCurrentTime(state);
 
-    const endpoint = await replayClient.getSessionEndpoint();
-    const zoomTime = getZoomRegion(state);
-
     // Stop playback (if we're playing) to avoid the currentTime from getting out of bounds.
     const playback = getPlayback(state);
     if (playback !== null) {
@@ -648,7 +644,7 @@ export function setFocusWindowBeginTime(
   };
 }
 
-export function syncFocusedRegion(): UIThunkAction {
+export function syncFocusedRegion(bias?: FocusWindowRequestBias): UIThunkAction {
   return async (dispatch, getState, { replayClient }) => {
     const state = getState();
 
@@ -672,7 +668,6 @@ export function syncFocusedRegion(): UIThunkAction {
 
     // Compare the new focus range to the previous one to infer user intent.
     // This helps when a focus range can't be loaded in full.
-    let bias: FocusWindowRequestBias | undefined;
     if (bias == null && focusWindowBackup != null) {
       if (isTimeStampedPointRangeLessThan(focusWindowBackup, focusWindow)) {
         bias = "begin";

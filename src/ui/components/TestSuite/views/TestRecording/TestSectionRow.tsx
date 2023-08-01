@@ -1,11 +1,15 @@
 import assert from "assert";
-import { TimeStampedPoint } from "@replayio/protocol";
+import { ExecutionPoint, TimeStampedPoint } from "@replayio/protocol";
 import { ReactNode, useContext, useMemo, useTransition } from "react";
 
 import Icon from "replay-next/components/Icon";
+import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
-import { isExecutionPointsGreaterThan } from "replay-next/src/utils/time";
+import {
+  isExecutionPointsGreaterThan,
+  isExecutionPointsLessThan,
+} from "replay-next/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import {
   TestEvent,
@@ -14,7 +18,8 @@ import {
   getTestEventTime,
   isUserActionTestEvent,
 } from "shared/test-suites/RecordingTestMetadata";
-import { seek, setTimelineToTime } from "ui/actions/timeline";
+import { isPointInRegion } from "shared/utils/time";
+import { seek, setFocusWindow, setTimelineToTime, syncFocusedRegion } from "ui/actions/timeline";
 import { TestSuiteCache } from "ui/components/TestSuite/suspense/TestSuiteCache";
 import { useTestEventContextMenu } from "ui/components/TestSuite/views/TestRecording/useTestEventContextMenu";
 import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext";
@@ -35,6 +40,7 @@ export function TestSectionRow({
   testRunnerName: TestRunnerName | null;
   testSectionName: TestSectionName;
 }) {
+  const { range: focusWindow } = useContext(FocusContext);
   const { executionPoint: currentExecutionPoint } = useContext(TimelineContext);
   const replayClient = useContext(ReplayClientContext);
   const { recordingId } = useContext(SessionContext);
@@ -118,19 +124,51 @@ export function TestSectionRow({
       throw Error(`Unknown test step type: "${(testEvent as any).type}"`);
   }
 
-  const onClick = () => {
+  const onClick = async () => {
     startTransition(() => {
       setTestEvent(testEvent);
     });
 
+    let executionPoint: ExecutionPoint | null = null;
+    let time: number | null = null;
+
     if (isUserActionTestEvent(testEvent)) {
       const timeStampedPoint = testEvent.timeStampedPointRange?.begin ?? null;
       if (timeStampedPoint) {
-        dispatch(seek(timeStampedPoint.point, timeStampedPoint.time, false));
+        executionPoint = timeStampedPoint.point;
+        time = timeStampedPoint.time;
       }
     } else {
-      const { point, time } = testEvent.timeStampedPoint;
-      dispatch(seek(point, time, false));
+      executionPoint = testEvent.timeStampedPoint.point;
+      time = testEvent.timeStampedPoint.time;
+    }
+
+    // It's possible that this step is outside of the current focus window
+    // In order to show details below, we need to adjust the focus window
+    // See FE-1756
+    if (executionPoint !== null && time !== null) {
+      if (focusWindow && !isPointInRegion(executionPoint, focusWindow)) {
+        const timeStampedPoint = { point: executionPoint, time };
+        if (isExecutionPointsLessThan(executionPoint, focusWindow.begin.point)) {
+          await dispatch(
+            setFocusWindow({
+              begin: timeStampedPoint,
+              end: focusWindow.end,
+            })
+          );
+          await dispatch(syncFocusedRegion("begin"));
+        } else {
+          await dispatch(
+            setFocusWindow({
+              begin: focusWindow.begin,
+              end: timeStampedPoint,
+            })
+          );
+          await dispatch(syncFocusedRegion("end"));
+        }
+      }
+
+      await dispatch(seek(executionPoint, time, false));
     }
   };
 
