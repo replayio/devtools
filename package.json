@@ -185,7 +185,7 @@
     "import-sort-style-replay": "workspace:*",
     "isomorphic-fetch": "^3.0.0",
     "istanbul-lib-coverage": "^3.2.0",
-    "istanbul-lib-report": "^3.0.0",
+    "istanbul-lib-report": "^3.0.1",
     "istanbul-reports": "^3.1.4",
     "jest": "^28.0.2",
     "jest-environment-jsdom": "^28.0.2",
