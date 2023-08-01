@@ -341,12 +341,12 @@ export function parseTreeOperations(treeOperations: number[]): ParsedReactDevtoo
 
 // Given the deconstructed pieces that comprised an operations array
 // in readable form, reconstruct the original numeric operations array.
-export function reconstructOperationsArray(
-  rendererId: number,
-  rootId: number,
-  stringTable: string[],
-  treeOperations: ParsedReactDevtoolsTreeOperations[]
-) {
+export function reconstructOperationsArray({
+  rendererId,
+  rootId,
+  stringTable,
+  treeOperations,
+}: DeconstructedOperationsPieces) {
   const finalStringTable = stringTable.slice();
   // The string table likely has the extra `null` placeholder.
   // We need to remove it before encoding.
@@ -525,7 +525,12 @@ export function generateTreeResetOpsForPoint(
     // TODO [FE-1667] This doesn't deal with iframes yet - not sure how to handle iframe navs?
     for (const [rendererId, activeRootsForRenderer] of activeRoots.entries()) {
       for (const _activeRoot of activeRootsForRenderer) {
-        const removalOp = reconstructOperationsArray(rendererId, rootId, [], [removeRootOp]);
+        const removalOp = reconstructOperationsArray({
+          rendererId,
+          rootId,
+          stringTable: [],
+          treeOperations: [removeRootOp],
+        });
         removalOperations.push(removalOp);
       }
     }
