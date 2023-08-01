@@ -65,7 +65,7 @@
     "launchdarkly-js-client-sdk": "^2.21.0",
     "lexical": "^0.6.5",
     "lodash": "^4.17.21",
-    "logrocket": "^2.2.1",
+    "logrocket": "^5.0.0",
     "logrocket-react": "^5.0.1",
     "memoize-one": "^6.0.0",
     "mixpanel-browser": "^2.43.0",
