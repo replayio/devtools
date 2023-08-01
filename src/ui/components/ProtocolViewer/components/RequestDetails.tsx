@@ -1,14 +1,16 @@
 import { useContext } from "react";
 
-import Expandable from "replay-next/components/Expandable";
 import Icon from "replay-next/components/Icon";
 import { JsonViewer } from "replay-next/components/SyntaxHighlighter/JsonViewer";
+import { useJsonViewerContextMenu } from "replay-next/components/SyntaxHighlighter/useJsonViewerContextMenu";
 import { ProtocolViewerContext } from "ui/components/ProtocolViewer/components/ProtocolViewerContext";
 import { useBugReportLink } from "ui/components/ProtocolViewer/hooks/useBugReportLink";
 import { useHoneycombQueryLink } from "ui/components/ProtocolViewer/hooks/useHoneycombQueryLink";
 import { formatDuration, formatTimestamp } from "ui/utils/time";
 
 import styles from "./RequestDetails.module.css";
+
+const SYNTAX_HIGHLIGHT_MAX_LENGTH = 1_000;
 
 export function RequestDetails() {
   const { errorMap, requestMap, responseMap, selectedRequestId } =
@@ -84,19 +86,33 @@ function Section({
 
   const jsonText = JSON.stringify(content, null, 2);
 
+  let children = null;
+  if (jsonText.length > SYNTAX_HIGHLIGHT_MAX_LENGTH) {
+    children = <PlainTextJson jsonText={jsonText} />;
+  } else {
+    children = <JsonViewer className={styles.JsonViewer} jsonText={jsonText} />;
+  }
+
   return (
-    <Expandable
-      children={<JsonViewer className={styles.JsonViewer} jsonText={jsonText} />}
-      childrenClassName={styles.SectionChildren}
-      className={styles.SectionExpandable}
-      defaultOpen={true}
-      header={
-        <>
-          <div className={styles.SectionHeaderTitle}>{header}</div>
-          {time !== null && <div className={styles.SectionHeaderTime}>{formatTimestamp(time)}</div>}
-        </>
-      }
-      headerClassName={styles.SectionHeader}
-    />
+    <>
+      <div className={styles.SectionHeader}>
+        <div className={styles.SectionHeaderTitle}>{header}</div>
+        {time !== null && <div className={styles.SectionHeaderTime}>{formatTimestamp(time)}</div>}
+      </div>
+      {children}
+    </>
+  );
+}
+
+function PlainTextJson({ jsonText }: { jsonText: string }) {
+  const { contextMenu, onContextMenu } = useJsonViewerContextMenu(jsonText);
+
+  return (
+    <>
+      <div className={styles.JsonViewer} onContextMenu={onContextMenu}>
+        {jsonText}
+      </div>
+      {contextMenu}
+    </>
   );
 }
