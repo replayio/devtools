@@ -98,4 +98,9 @@
   background-color: var(--background-color-default);
   padding: 0.5rem;
   border-radius: 0.25rem;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-family-monospace);
+  font-size: var(--font-size-regular);
+  white-space: pre;
 }

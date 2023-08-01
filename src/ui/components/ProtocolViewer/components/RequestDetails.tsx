@@ -10,6 +10,8 @@ import { formatDuration, formatTimestamp } from "ui/utils/time";
 
 import styles from "./RequestDetails.module.css";
 
+const SYNTAX_HIGHLIGHT_MAX_LENGTH = 1_000;
+
 export function RequestDetails() {
   const { errorMap, requestMap, responseMap, selectedRequestId } =
     useContext(ProtocolViewerContext);
@@ -84,9 +86,16 @@ function Section({
 
   const jsonText = JSON.stringify(content, null, 2);
 
+  let children = null;
+  if (jsonText.length > SYNTAX_HIGHLIGHT_MAX_LENGTH) {
+    children = <div className={styles.JsonViewer}>{jsonText}</div>;
+  } else {
+    children = <JsonViewer className={styles.JsonViewer} jsonText={jsonText} />;
+  }
+
   return (
     <Expandable
-      children={<JsonViewer className={styles.JsonViewer} jsonText={jsonText} />}
+      children={children}
       childrenClassName={styles.SectionChildren}
       className={styles.SectionExpandable}
       defaultOpen={true}
