@@ -11,7 +11,7 @@ import { networkRequestsCache } from "replay-next/src/suspense/NetworkRequestsCa
 import { findSliceIndices, insert } from "replay-next/src/utils/array";
 import { assertWithTelemetry } from "replay-next/src/utils/telemetry";
 import { ReplayClientInterface } from "shared/client/types";
-import { Annotation } from "shared/graphql/types";
+import { Annotation, PlaywrightTestSources } from "shared/graphql/types";
 import { AnnotationsCache } from "ui/components/TestSuite/suspense/AnnotationsCache";
 
 export type SemVer = string;
@@ -89,6 +89,13 @@ export namespace RecordingTestMetadataV2 {
     };
   };
 
+  export type UserActionEventStack = Array<{
+    column: number;
+    file: string;
+    function: string;
+    line: number;
+  }>;
+
   export type UserActionEvent = Omit<
     RecordingTestMetadataV3.UserActionEvent,
     "data" | "timeStampedPointRange"
@@ -103,6 +110,9 @@ export namespace RecordingTestMetadataV2 {
       id: string;
       parentId: string | null;
       scope: string[] | null;
+
+      // Playwright only
+      stack: UserActionEventStack | null;
     };
   };
 
@@ -169,6 +179,9 @@ export namespace RecordingTestMetadataV3 {
     // If a test fails, it may be executed multiple times (e.g. retries);
     // each of these attempts is tracked in the testRecordings array
     testRecordings: TestRecording[];
+
+    // Playwright only
+    testSources: PlaywrightTestSources | null;
   }
 
   export interface TestRecording {
@@ -216,6 +229,13 @@ export namespace RecordingTestMetadataV3 {
     timeStampedPointRange: TimeStampedPointRange | null;
   }
 
+  export type UserActionEventStack = Array<{
+    columnNumber: number;
+    fileName: string;
+    functionName: string;
+    lineNumber: number;
+  }>;
+
   export interface UserActionEvent {
     data: {
       category: "assertion" | "command" | "other";
@@ -243,6 +263,9 @@ export namespace RecordingTestMetadataV3 {
       // If an action is somewhere other than the main test body;
       // for example, before/after actions have different scopes
       scope: string[] | null;
+
+      // Playwright only
+      testSourceCallStack: UserActionEventStack | null;
 
       // This value comes from annotations and so is only available for Cypress tests (for now)
       viewSourceTimeStampedPoint: TimeStampedPoint | null;
@@ -314,6 +337,7 @@ export type TestEvent = RecordingTestMetadataV3.TestEvent;
 export type TestRecording = RecordingTestMetadataV3.TestRecording;
 export type TestSectionName = RecordingTestMetadataV3.TestSectionName;
 export type UserActionEvent = RecordingTestMetadataV3.UserActionEvent;
+export type UserActionEventStack = RecordingTestMetadataV3.UserActionEventStack;
 
 export async function processCypressTestRecording(
   testRecording: RecordingTestMetadataV2.TestRecording | RecordingTestMetadataV3.TestRecording,
@@ -531,11 +555,8 @@ export async function processCypressTestRecording(
 
             testEvents.push({
               data: {
-                category: category,
-                command: {
-                  arguments: command.arguments,
-                  name: command.name,
-                },
+                category,
+                command,
                 error,
                 id,
                 parentId,
@@ -547,6 +568,7 @@ export async function processCypressTestRecording(
                       }
                     : null,
                 scope,
+                testSourceCallStack: null,
                 viewSourceTimeStampedPoint,
               },
               timeStampedPointRange: {
@@ -610,10 +632,11 @@ export async function processCypressTestRecording(
 }
 
 export async function processGroupedTestCases(
+  replayClient: ReplayClientInterface,
   groupedTestCases:
     | RecordingTestMetadataV2.GroupedTestCases
     | RecordingTestMetadataV3.GroupedTestCases,
-  replayClient: ReplayClientInterface
+  testSources: PlaywrightTestSources | null
 ): Promise<RecordingTestMetadataV3.GroupedTestCases> {
   if (isGroupedTestCasesV3(groupedTestCases)) {
     return groupedTestCases;
@@ -622,7 +645,6 @@ export async function processGroupedTestCases(
     switch (environment.testRunner.name) {
       case "cypress": {
         const annotations = await AnnotationsCache.readAsync(replayClient);
-        let clientSideEnvironmentError: TestEnvironmentError | null = null;
 
         if (detectMissingCypressPlugin(annotations, partialTestRecordings)) {
           const testRecordings: RecordingTestMetadataV3.TestRecording[] = [];
@@ -660,6 +682,7 @@ export async function processGroupedTestCases(
               title: source.title,
             },
             testRecordings,
+            testSources: null,
           };
         } else {
           // Annotations for the entire recording (which may include more than one test)
@@ -710,6 +733,7 @@ export async function processGroupedTestCases(
               title: source.title,
             },
             testRecordings,
+            testSources: null,
           };
         }
       }
@@ -731,6 +755,7 @@ export async function processGroupedTestCases(
             title: source.title,
           },
           testRecordings,
+          testSources,
         };
       }
       default: {
@@ -778,6 +803,7 @@ export async function processPlaywrightTestRecording(
           id,
           parentId = null,
           scope = null,
+          stack = null,
         } = partialTestEvent.data;
 
         assert(category, `Test event must have "category" property`, {
@@ -805,16 +831,21 @@ export async function processPlaywrightTestRecording(
 
         testEvents.push({
           data: {
-            category: category,
-            command: {
-              arguments: command.arguments,
-              name: command.name,
-            },
+            category,
+            command,
             error,
             id,
             parentId,
             result: null,
             scope,
+            testSourceCallStack: stack
+              ? stack.map(frame => ({
+                  columnNumber: frame.column,
+                  fileName: frame.file,
+                  functionName: frame.function,
+                  lineNumber: frame.line,
+                }))
+              : null,
             viewSourceTimeStampedPoint: null,
           },
           timeStampedPointRange: null,

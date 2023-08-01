@@ -526,6 +526,9 @@
   --testsuites-flaky-color: #fdba00;
   --testsuites-skipped-color: var(--theme-base-70);
   --testsuites-unresolved-color: var(--background-color-contrast-1);
+  --testsuites-stack-frame-background-color: transparent;
+  --testsuites-stack-frame-background-color-active: #25364e;
+  --testsuites-stack-frame-background-color-hover: #252d3b;
 
   --circular-progress-bar-trail-color: var(--testsuites-steps-bgcolor);
 
@@ -1047,6 +1050,9 @@
   --testsuites-flaky-color: #fdba00;
   --testsuites-skipped-color: var(--theme-base-70);
   --testsuites-unresolved-color: var(--background-color-contrast-1);
+  --testsuites-stack-frame-background-color: transparent;
+  --testsuites-stack-frame-background-color-active: #ebf3ff;
+  --testsuites-stack-frame-background-color-hover: #f7f7f7;
 
   --circular-progress-bar-trail-color: var(--testsuites-steps-bgcolor);
 

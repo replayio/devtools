@@ -225,9 +225,17 @@ export interface Recording {
   workspace?: Workspace;
 }
 
+export type PlaywrightTestSources = {
+  [fileName: string]: string;
+};
+
 export interface RecordingMetadata {
   test?: AnyGroupedTestCases;
   source?: SourceMetadata;
+
+  "x-replay-playwright"?: {
+    sources: PlaywrightTestSources;
+  };
 }
 
 export type TestResult = "passed" | "failed" | "timedOut" | "skipped" | "unknown";

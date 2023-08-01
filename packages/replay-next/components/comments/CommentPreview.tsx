@@ -110,7 +110,10 @@ function SourceCodePreview({
     const html = parsedTokensToHtml(parsedTokens);
 
     codePreview = (
-      <pre className={styles.SecondaryLabel} dangerouslySetInnerHTML={{ __html: html }} />
+      <pre
+        className={styles.SecondaryLabel}
+        dangerouslySetInnerHTML={{ __html: html || "&nbsp;" }}
+      />
     );
   } else if (rawText) {
     codePreview = <pre className={styles.SecondaryLabel}>{rawText}</pre>;
