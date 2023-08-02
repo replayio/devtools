@@ -74,7 +74,7 @@ function ViewLoader() {
   }
 
   return (
-    <div className="absolute flex h-full w-full items-center justify-center bg-chrome">
+    <div className="absolute flex items-center justify-center w-full h-full bg-chrome">
       <ReplayLogo size="md" color="gray" />
     </div>
   );
@@ -102,8 +102,8 @@ function Body() {
   }, [sidePanelCollapsed]);
 
   return (
-    <div className="vertical-panels pr-2">
-      <div className="flex h-full flex-row overflow-hidden bg-chrome">
+    <div className="pr-2 vertical-panels">
+      <div className="flex flex-row h-full overflow-hidden bg-chrome">
         <Toolbar />
         <PanelGroup autoSaveId="DevTools-horizontal" className="split-box" direction="horizontal">
           <Panel
@@ -249,10 +249,14 @@ function _DevTools({
     }
   }, [recording, userId, userEmail, userLoading]);
 
-  const message = useDynamicLoadingMessage(recording?.isProcessed || false, "Loading...", 20000);
+  const { message, additionalInfo } = useDynamicLoadingMessage(
+    recording?.isProcessed || false,
+    "Loading...",
+    20000
+  );
 
   if (!loadingFinished) {
-    return <LoadingScreen message={message} />;
+    return <LoadingScreen message={message} additionalInfo={additionalInfo} />;
   }
 
   const title = recording?.title;
