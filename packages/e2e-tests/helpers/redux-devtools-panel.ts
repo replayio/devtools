@@ -6,22 +6,19 @@ export function getReduxActions(page: Page) {
   return page.locator('[data-test-id="ReduxActionItem"]');
 }
 
-export async function assertTabValue(
-  page: Page,
-  tabState: Record<string, string>,
-  tab: string,
-  expectedValue: string
-) {
+export async function assertTabValue(page: Page, tab: string, expectedValue: string) {
   await page.locator(`[data-test-id="ReduxTabsContainer"] div:has-text("${tab}")`).click();
-  const inspector = page.locator('[data-test-id="ReduxInspector"] > *');
+  const inspector = page.locator('[data-test-id="ReduxDevToolsContents"] > *');
 
   await inspector.waitFor();
 
-  // remove once redux devtools get loading screen
-  await waitFor(async () => expect(await inspector.innerText()).not.toBe(tabState[tab]));
-  await waitFor(async () => expect(await inspector.innerText()).not.toBe("Loading…"));
+  const currentPointContents = page.locator(`[data-test-id="ReduxDevtools"]`);
 
-  tabState[tab] = await inspector.innerText();
+  await waitFor(async () =>
+    expect(await currentPointContents.getAttribute("data-contents-pending")).toBe("false")
+  );
+
+  await waitFor(async () => expect(await inspector.innerText()).not.toBe("Loading…"));
 
   expect(await inspector.innerText()).toBe(expectedValue);
 }
