@@ -3707,10 +3707,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/protocol@npm:^0.55.0":
-  version: 0.55.0
-  resolution: "@replayio/protocol@npm:0.55.0"
-  checksum: 287f25a2303920247fc87309f8ad28159e92cc05c22a8902a5fa22e074cbf8da2d591adc96dc7e6c42105cfbe8a56538f6550460699df35f43369850508eff57
+"@replayio/protocol@npm:^0.58.0":
+  version: 0.58.0
+  resolution: "@replayio/protocol@npm:0.58.0"
+  checksum: df261b4d1de7b739e40803e809cd4af2395b1ed0f39910affae697cfba65bc6f05812fd7410f68acd893d29634614295a2fa998bf688ea786a35f7bfc221cb8a
   languageName: node
   linkType: hard
 
@@ -15180,7 +15180,7 @@ __metadata:
     "@recordreplay/sourcemap-upload-cli": ^0.1.1
     "@reduxjs/toolkit": ^1.8.4
     "@replayio/overboard": ^0.4.1
-    "@replayio/protocol": ^0.55.0
+    "@replayio/protocol": ^0.58.0
     "@replayio/replay": ^0.12.4
     "@sentry/react": ^7.9.0
     "@sentry/tracing": ^7.9.0
@@ -15499,7 +15499,7 @@ __metadata:
     "@lezer/common_replay_next": "npm:@lezer/common@1.0.1"
     "@lezer/highlight_replay_next": "npm:@lezer/highlight@1.1.1"
     "@playwright/test": ^1.35.0
-    "@replayio/protocol": ^0.55.0
+    "@replayio/protocol": ^0.58.0
     "@testing-library/jest-dom": ^5.16.3
     "@testing-library/react": ^13.2.0
     "@types/uuid": ^7.0.3
