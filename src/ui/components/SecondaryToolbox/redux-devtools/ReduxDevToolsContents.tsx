@@ -176,7 +176,6 @@ export function ReduxDevToolsContents({ point, time }: RDTCProps) {
   }
 
   const [pauseId, actionValue, stateValue] = reduxValues ?? [];
-  const changeTab = (tab: SelectedContentsTab) => {};
 
   let contents: React.ReactNode;
 
