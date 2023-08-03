@@ -218,6 +218,7 @@ export const streamingSourceContentsCache = createStreamingCache<
         sourceId,
         ({ codeUnitCount, contentType, lineCount }) => {
           data = { codeUnitCount, contentType, lineCount };
+
           update("", 0, data);
         },
         ({ chunk }) => {
