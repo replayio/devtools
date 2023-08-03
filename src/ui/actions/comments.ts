@@ -149,7 +149,13 @@ export function seekToComment(
 ): UIThunkAction {
   return (dispatch, getState) => {
     let context = selectors.getThreadContext(getState());
-    dispatch(seek(comment.point, comment.time, false));
+    dispatch(
+      seek({
+        executionPoint: comment.point,
+        openSource: false,
+        time: comment.time,
+      })
+    );
     dispatch(setSelectedPrimaryPanel("comments"));
 
     if (sourceLocation) {

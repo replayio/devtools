@@ -11,7 +11,6 @@ import {
   isUserActionTestEvent,
 } from "shared/test-suites/RecordingTestMetadata";
 import { setViewMode } from "ui/actions/layout";
-import { seek } from "ui/actions/timeline";
 import { TestStepSourceLocationCache } from "ui/components/TestSuite/suspense/TestStepSourceLocationCache";
 import { setSourcesUserActionPending } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";

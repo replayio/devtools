@@ -253,43 +253,49 @@ function encodeFocusWindow(focusWindow: FocusWindow | null) {
   return focusWindow ? encodeObjectToURL(rangeForFocusWindow(focusWindow)) : undefined;
 }
 
-export function seek(
-  point: ExecutionPoint,
-  time: number,
-  openSource: boolean,
-  pauseId?: PauseId
-): UIThunkAction<boolean> {
-  return (dispatch, getState, { ThreadFront }) => {
+export function seek({
+  autoPlay = false,
+  executionPoint,
+  openSource = false,
+  pauseId,
+  time,
+}: {
+  autoPlay?: boolean;
+  executionPoint?: ExecutionPoint;
+  openSource?: boolean;
+  pauseId?: PauseId;
+  time: number;
+}): UIThunkAction<void> {
+  return async (dispatch, getState, { replayClient, ThreadFront }) => {
+    // If no ExecutionPoint provided, map time to nearest ExecutionPoint
+    if (executionPoint == null) {
+      time = await clampTime(replayClient, time);
+
+      // getPointNearTime could take time while we're processing the recording
+      // so we optimistically set the timeline to the target time
+      dispatch(setTimelineToTime(time));
+
+      const nearestEvent = mostRecentPaintOrMouseEvent(time);
+      const timeStampedPoint = await replayClient.getPointNearTime(time);
+      if (
+        nearestEvent &&
+        Math.abs(nearestEvent.time - time) < Math.abs(timeStampedPoint.time - time)
+      ) {
+        executionPoint = nearestEvent.point;
+      } else {
+        executionPoint = timeStampedPoint.point;
+      }
+    }
+
+    assert(executionPoint != null, `Could not find execution point for time ${time}`);
+
     dispatch(framePositionsCleared());
+
     if (pauseId) {
-      ThreadFront.timeWarpToPause({ point, time, pauseId }, openSource);
+      ThreadFront.timeWarpToPause({ point: executionPoint, time, pauseId }, openSource);
     } else {
-      ThreadFront.timeWarp(point, time, openSource);
+      ThreadFront.timeWarp(executionPoint, time, openSource);
     }
-    return true;
-  };
-}
-
-export function seekToTime(targetTime: number, autoPlay?: boolean): UIThunkAction {
-  return async (dispatch, _, { replayClient }) => {
-    if (targetTime == null) {
-      return;
-    }
-
-    targetTime = await clampTime(replayClient, targetTime);
-
-    // getPointNearTime could take time while we're processing the recording
-    // so we optimistically set the timeline to the target time
-    dispatch(setTimelineToTime(targetTime));
-
-    const nearestEvent = mostRecentPaintOrMouseEvent(targetTime) || { point: "", time: Infinity };
-    let bestPoint = nearestEvent;
-    const point = await replayClient.getPointNearTime(targetTime);
-    if (Math.abs(point.time - targetTime) < Math.abs(nearestEvent.time - targetTime)) {
-      bestPoint = point;
-    }
-
-    dispatch(seek(bestPoint.point, targetTime, false));
 
     if (autoPlay) {
       dispatch(startPlayback());
@@ -361,7 +367,7 @@ export function stopPlayback(updateTime: boolean = true): UIThunkAction {
       const playback = getPlayback(getState());
 
       if (playback) {
-        dispatch(seekToTime(playback.time));
+        dispatch(seek({ time: playback.time }));
       }
     }
 
@@ -373,7 +379,7 @@ export function replayPlayback(): UIThunkAction {
   return (dispatch, getState) => {
     const beginTime = 0;
 
-    dispatch(seekToTime(beginTime, true));
+    dispatch(seek({ openSource: true, time: beginTime }));
   };
 }
 
@@ -423,9 +429,9 @@ export function playbackPoints(
       if (currentTime > end.time) {
         if (end.point) {
           await endPointScreenPromise;
-          dispatch(seek(end.point, end.time, false));
+          dispatch(seek({ executionPoint: end.point, openSource: false, time: end.time }));
         } else {
-          dispatch(seekToTime(end.time));
+          dispatch(seek({ time: end.time }));
         }
         return dispatch(setTimelineState({ currentTime: end.time, playback: null }));
       }
@@ -491,7 +497,9 @@ export function goToPrevPaint(): UIThunkAction {
       return;
     }
 
-    dispatch(seekToTime(Math.max(previous.time, beginTime)));
+    const time = Math.max(previous.time, beginTime);
+
+    dispatch(seek({ time }));
   };
 }
 
@@ -510,7 +518,9 @@ export function goToNextPaint(): UIThunkAction {
       return;
     }
 
-    dispatch(seekToTime(Math.min(next.time, endTime)));
+    const time = Math.min(next.time, endTime);
+
+    dispatch(seek({ time }));
   };
 }
 

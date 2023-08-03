@@ -18,7 +18,7 @@ import { createFrameComment } from "ui/actions/comments";
 import {
   MAX_FOCUS_REGION_DURATION,
   getUrlParams,
-  seekToTime,
+  seek,
   setFocusWindowImprecise,
   syncFocusedRegion,
 } from "ui/actions/timeline";
@@ -54,7 +54,12 @@ export default function useTimelineContextMenu() {
 
     const typeData = await createTypeDataForVisualComment(canvas as HTMLCanvasElement, null, null);
 
-    await dispatch(seekToTime(currentTime, false));
+    await dispatch(
+      seek({
+        openSource: false,
+        time: currentTime,
+      })
+    );
 
     dispatch(createFrameComment(null, recordingId, typeData));
 

@@ -75,9 +75,9 @@ function Events() {
     return jumpToCodeEntriesByPoint;
   }, [jumpToCodeAnnotations]);
 
-  const onSeek = (point: string, time: number) => {
+  const onSeek = (executionPoint: string, time: number) => {
     trackEvent("events_timeline.select");
-    dispatch(seek(point, time, false));
+    dispatch(seek({ executionPoint, openSource: false, time }));
   };
 
   const currentEventIndex = sortedLastIndex(

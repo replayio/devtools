@@ -137,7 +137,7 @@ export default function NetworkMonitor() {
                         trackEvent("net_monitor.select_request_row");
                         dispatch(selectNetworkRequest(row.id));
                       }}
-                      seek={(...args) => dispatch(seek(...args))}
+                      seek={params => dispatch(seek(params))}
                       selectedRequest={selectedRequest}
                     />
                   </Panel>

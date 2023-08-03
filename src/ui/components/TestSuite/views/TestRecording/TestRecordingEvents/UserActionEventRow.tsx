@@ -19,7 +19,6 @@ import { seek } from "ui/actions/timeline";
 import { JumpToCodeButton, JumpToCodeStatus } from "ui/components/shared/JumpToCodeButton";
 import { useJumpToSource } from "ui/components/TestSuite/hooks/useJumpToSource";
 import { TestEventDetailsCache } from "ui/components/TestSuite/suspense/TestEventDetailsCache";
-import { Position } from "ui/components/TestSuite/views/TestRecording/types";
 import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext";
 import { getViewMode } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
@@ -94,7 +93,14 @@ export default memo(function UserActionEventRow({
   const onJumpToClickEvent = async () => {
     assert(jumpToCodeAnnotation != null);
 
-    const onSeek = (point: string, time: number) => dispatch(seek(point, time, true));
+    const onSeek = (executionPoint: string, time: number) =>
+      dispatch(
+        seek({
+          executionPoint,
+          openSource: true,
+          time,
+        })
+      );
 
     dispatch(jumpToKnownEventListenerHit(onSeek, jumpToCodeAnnotation));
   };

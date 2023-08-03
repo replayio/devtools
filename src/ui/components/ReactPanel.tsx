@@ -472,9 +472,8 @@ export function ReactPanel() {
     }
   }
 
-  const onSeek = (point: string, time: number) => {
-    // trackEvent("events_timeline.select");
-    dispatch(seek(point, time, false));
+  const onSeek = (executionPoint: string, time: number) => {
+    dispatch(seek({ executionPoint, time }));
   };
 
   const queuedRenders = streamingRenderData?.filter(entry => entry.userPauseFrame) ?? [];
