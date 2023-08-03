@@ -34,7 +34,7 @@ export function verifySerialization(operationsArrays: number[][]) {
 }
 
 export type Destroy = () => void;
-export type GetOperations = (callback: Function) => number[];
+export type GetOperations = (callback: Function) => number[][];
 
 export function reactDevToolsBeforeEach() {
   jest.spyOn(console, "error").mockImplementation(message => {
@@ -114,23 +114,24 @@ export function reactDevToolsBeforeEach() {
   // Reset modules so that importing/requiring react-dom below will register with the DevTools hook
   jest.resetModules();
 
-  let mostRecentOperations: number[] = [];
+  let operations: number[][] = [];
   wall.listen(({ event, payload }: any) => {
     if (event === "operations") {
-      mostRecentOperations = payload;
+      operations.push(payload);
     }
   });
 
   // Import ReactDOM after DevTools has been initialized/configured so that it connects
-  const ReactDOM = require("react-dom/client");
+  const ReactDOMClient = require("react-dom/client");
   const ReactDOMTestUtils = require("react-dom/test-utils");
 
-  const testAppRoot = ReactDOM.createRoot(document.createElement("div"));
+  const testAppRoot = ReactDOMClient.createRoot(document.createElement("div"));
 
   const api: {
     destroy: Destroy;
     getOperations: GetOperations;
     root: ReturnType<typeof createRoot>;
+    store: Store;
   } = {
     destroy: () => {
       testAppRoot.unmount();
@@ -144,14 +145,17 @@ export function reactDevToolsBeforeEach() {
       delete target.__REACT_DEVTOOLS_GLOBAL_HOOK__;
     },
     getOperations: (callback: Function) => {
+      operations.splice(0);
+
       ReactDOMTestUtils.act(callback);
 
       // Flush pending DevTools postMessage() calls
       jest.runAllTimers();
 
-      return mostRecentOperations;
+      return operations;
     },
     root: testAppRoot,
+    store,
   };
 
   return api;
