@@ -4,7 +4,7 @@
 // Use the API key for the "Frontend E2E Test Team" that we have set up in admin,
 // as that should let us mark these recordings as public.
 
-import { existsSync, readFileSync, readdirSync, writeFileSync } from "fs";
+import { existsSync, readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 import { Page } from "@playwright/test";
 import { listAllRecordings, removeRecording, uploadRecording } from "@replayio/replay";
@@ -15,15 +15,12 @@ import logUpdate from "log-update";
 import { v4 as uuidv4 } from "uuid";
 import yargs from "yargs";
 
-import config from "../config";
+import config, { BrowserName } from "../config";
 import { recordNodeExample } from "./record-node";
 import { recordPlaywright, uploadLastRecording } from "./record-playwright";
 
-const playwright = require("@recordreplay/playwright");
+type Target = "all" | "browser" | "node";
 
-type Target = "all" | "browser" | "node" | "cypress";
-
-// TODO [FE-626] Support target "cra"
 const argv = yargs
   .option("example", {
     alias: "e",
@@ -34,22 +31,268 @@ const argv = yargs
     alias: "t",
     default: "all",
     description: "Only re-generate tests for this target",
-    choices: ["all", "browser", "node", "cypress"],
+    choices: ["all", "browser", "node"],
   })
   .help()
   .alias("help", "h")
   .parseSync();
 
-const exampleFilename = argv.example || null;
-const target: Target = argv.target as Target;
+type TestExampleFile = {
+  filename: string;
+  folder: string;
+  category: "browser" | "node";
+  runtime: "firefox" | "chromium" | "node";
+};
+
+const knownExamples: TestExampleFile[] = [
+  {
+    filename: "authenticated_comments_1.html",
+    folder: config.browserExamplesPath,
+    category: "browser",
+    runtime: "firefox",
+  },
+  {
+    filename: "authenticated_comments_2.html",
+    folder: config.browserExamplesPath,
+    category: "browser",
+    runtime: "firefox",
+  },
+  {
+    filename: "authenticated_comments_3.html",
+    folder: config.browserExamplesPath,
+    category: "browser",
+    runtime: "firefox",
+  },
+  {
+    filename: "authenticated_logpoints_1.html",
+    folder: config.browserExamplesPath,
+    category: "browser",
+    runtime: "firefox",
+  },
+  {
+    filename: "cra/dist/index.html",
+    folder: config.browserExamplesPath,
+    category: "browser",
+    runtime: "firefox",
+  },
+  {
+    filename: "doc_async.html",
+    folder: config.browserExamplesPath,
+    category: "browser",
+    runtime: "firefox",
+  },
+  {
+    filename: "doc_control_flow.html",
+    folder: config.browserExamplesPath,
+    category: "browser",
+    runtime: "firefox",
+  },
+  {
+    filename: "doc_debugger_statements.html",
+    folder: config.browserExamplesPath,
+    category: "browser",
+    runtime: "firefox",
+  },
+  {
+    filename: "doc_events.html",
+    folder: config.browserExamplesPath,
+    category: "browser",
+    runtime: "firefox",
+  },
+  {
+    filename: "doc_events_chromium.html",
+    folder: config.browserExamplesPath,
+    category: "browser",
+    runtime: "chromium",
+  },
+  {
+    filename: "doc_exceptions.html",
+    folder: config.browserExamplesPath,
+    category: "browser",
+    runtime: "firefox",
+  },
+  {
+    filename: "doc_exceptions_bundle.html",
+    folder: config.browserExamplesPath,
+    category: "browser",
+    runtime: "firefox",
+  },
+  {
+    filename: "doc_inspector_basic.html",
+    folder: config.browserExamplesPath,
+    category: "browser",
+    runtime: "firefox",
+  },
+  {
+    filename: "doc_inspector_shorthand.html",
+    folder: config.browserExamplesPath,
+    category: "browser",
+    runtime: "firefox",
+  },
+  {
+    filename: "doc_inspector_sourcemapped.html",
+    folder: config.browserExamplesPath,
+    category: "browser",
+    runtime: "firefox",
+  },
+  {
+    filename: "doc_inspector_styles.html",
+    folder: config.browserExamplesPath,
+    category: "browser",
+    runtime: "firefox",
+  },
+  {
+    filename: "doc_minified.html",
+    folder: config.browserExamplesPath,
+    category: "browser",
+    runtime: "firefox",
+  },
+  {
+    filename: "doc_minified_chromium.html",
+    folder: config.browserExamplesPath,
+    category: "browser",
+    runtime: "chromium",
+  },
+  {
+    filename: "doc_navigate.html",
+    folder: config.browserExamplesPath,
+    category: "browser",
+    runtime: "firefox",
+  },
+  {
+    filename: "doc_prod_bundle.html",
+    folder: config.browserExamplesPath,
+    category: "browser",
+    runtime: "firefox",
+  },
+  {
+    filename: "doc_recursion.html",
+    folder: config.browserExamplesPath,
+    category: "browser",
+    runtime: "firefox",
+  },
+  {
+    filename: "doc_rr_basic.html",
+    folder: config.browserExamplesPath,
+    category: "browser",
+    runtime: "firefox",
+  },
+  {
+    filename: "doc_rr_blackbox.html",
+    folder: config.browserExamplesPath,
+    category: "browser",
+    runtime: "firefox",
+  },
+  {
+    filename: "doc_rr_console.html",
+    folder: config.browserExamplesPath,
+    category: "browser",
+    runtime: "firefox",
+  },
+  {
+    filename: "doc_rr_error.html",
+    folder: config.browserExamplesPath,
+    category: "browser",
+    runtime: "firefox",
+  },
+  {
+    filename: "doc_rr_logs.html",
+    folder: config.browserExamplesPath,
+    category: "browser",
+    runtime: "firefox",
+  },
+  {
+    filename: "doc_rr_objects.html",
+    folder: config.browserExamplesPath,
+    category: "browser",
+    runtime: "firefox",
+  },
+  {
+    filename: "doc_rr_preview.html",
+    folder: config.browserExamplesPath,
+    category: "browser",
+    runtime: "firefox",
+  },
+  {
+    filename: "doc_rr_region_loading.html",
+    folder: config.browserExamplesPath,
+    category: "browser",
+    runtime: "firefox",
+  },
+  {
+    filename: "doc_rr_worker.html",
+    folder: config.browserExamplesPath,
+    category: "browser",
+    runtime: "firefox",
+  },
+  {
+    filename: "doc_stacking.html",
+    folder: config.browserExamplesPath,
+    category: "browser",
+    runtime: "firefox",
+  },
+  {
+    filename: "log_points_and_block_scope.html",
+    folder: config.browserExamplesPath,
+    category: "browser",
+    runtime: "firefox",
+  },
+  {
+    filename: "node/control_flow.js",
+    folder: config.nodeExamplesPath,
+    category: "node",
+    runtime: "node",
+  },
+  {
+    filename: "node/async.js",
+    folder: config.nodeExamplesPath,
+    category: "node",
+    runtime: "node",
+  },
+  {
+    filename: "node/basic.js",
+    folder: config.nodeExamplesPath,
+    category: "node",
+    runtime: "node",
+  },
+  {
+    filename: "node/error.js",
+    folder: config.nodeExamplesPath,
+    category: "node",
+    runtime: "node",
+  },
+  {
+    filename: "node/exceptions.js",
+    folder: config.nodeExamplesPath,
+    category: "node",
+    runtime: "node",
+  },
+  {
+    filename: "node/objects.js",
+    folder: config.nodeExamplesPath,
+    category: "node",
+    runtime: "node",
+  },
+  {
+    filename: "node/run_worker.js",
+    folder: config.nodeExamplesPath,
+    category: "node",
+    runtime: "node",
+  },
+  {
+    filename: "node/spawn.js",
+    folder: config.nodeExamplesPath,
+    category: "node",
+    runtime: "node",
+  },
+  // The two separate Cypress examples from "cypress-realworld"
+  // and "flake" are not listed here. We don't re-record those
+  // ourselves. Instead we use specific recordings from CI runs
+  // in those benchmark repos.
+  // See README.md for instructions on updating those recording IDs.
+];
 
 const examplesJsonPath = join(__dirname, "..", "examples.json");
-
-async function getExampleFileNames(path: string, fileExtension: string): Promise<string[]> {
-  return readdirSync(path).filter(file => {
-    return file.endsWith(fileExtension);
-  });
-}
 
 function logAnimated(text: string): () => void {
   let index = 0;
@@ -68,7 +311,7 @@ function logAnimated(text: string): () => void {
   };
 }
 
-async function saveRecording(example: string, recordingId?: string) {
+async function saveRecording(example: string, apiKey: string, recordingId?: string) {
   if (recordingId) {
   } else {
     const recordings = listAllRecordings();
@@ -82,12 +325,12 @@ async function saveRecording(example: string, recordingId?: string) {
 
   const done = logAnimated(`Saving ${chalk.bold(example)} with recording id ${recordingId}`);
   const id = await uploadRecording(recordingId, {
-    apiKey: config.replayApiKey,
+    apiKey,
     server: config.backendUrl,
     verbose: true,
   });
 
-  await makeReplayPublic(config.replayApiKey, recordingId);
+  await makeReplayPublic(apiKey, recordingId);
 
   const text = "" + readFileSync(examplesJsonPath);
   const json = JSON.parse(text);
@@ -96,62 +339,50 @@ async function saveRecording(example: string, recordingId?: string) {
   done();
 }
 
+interface TestRunCallbackArgs {
+  example: TestExampleFile;
+  examplePath: string;
+}
+
 async function saveExamples(
   examplesTarget: Target,
-  examplesBasePath: string,
-  examplesFileExtension: string,
-  callback: (options: { exampleFilename: string; examplePath: string }) => Promise<void>
+  callback: (args: TestRunCallbackArgs) => Promise<void>
 ) {
-  switch (target) {
-    case "all":
-    case examplesTarget:
-      const exampleFilenames =
-        exampleFilename !== null
-          ? [exampleFilename]
-          : await getExampleFileNames(examplesBasePath, examplesFileExtension);
+  let examplesToRun = knownExamples.filter(example => example.category === examplesTarget);
 
-      for (let exampleFilename of exampleFilenames) {
-        exampleFilename = exampleFilename.endsWith(examplesFileExtension)
-          ? exampleFilename
-          : `${exampleFilename}${examplesFileExtension}`;
+  const specificExample = argv.example;
 
-        const examplePath = join(examplesBasePath, exampleFilename);
-        if (existsSync(examplePath)) {
-          await callback({ exampleFilename, examplePath });
-        } else if (target === examplesTarget) {
-          // Only error if this was a specific target + example combination.
-          // Otherwise assume this is a different type of target.
-          throw `Could not find example ${chalk.bold(exampleFilename)}:\n  ${chalk.dim(
-            examplePath
-          )}`;
-        }
-      }
-      break;
+  if (specificExample) {
+    examplesToRun = examplesToRun.filter(example => example.filename === specificExample);
+  }
+
+  console.log(
+    "Running examples for target: ",
+    examplesTarget,
+    examplesToRun.map(e => e.filename)
+  );
+
+  for (const example of examplesToRun) {
+    const examplePath = join(example.folder, example.filename);
+    if (existsSync(examplePath)) {
+      await callback({ example, examplePath });
+    } else {
+      throw new Error("Could not find example: " + examplePath);
+    }
   }
 }
 
 async function saveBrowserExamples() {
-  await saveExamples("browser", config.browserExamplesPath, ".html", saveBrowserExample);
-
-  // This example is in a subdirectory so we can't look it up as easily, so we just do it manually.
-  if (
-    (target === "all" || target === "browser") &&
-    (exampleFilename === null || exampleFilename === "cra/dist/index.html")
-  ) {
-    await saveBrowserExample({ exampleFilename: "cra/dist/index.html" });
-  }
+  await saveExamples("browser", saveBrowserExample);
 }
-async function saveBrowserExample({ exampleFilename }: { exampleFilename: string }) {
-  if (exampleFilename === "iframe.html") {
-    // This one example is used within another one.
-    return;
-  }
 
-  const done = logAnimated(`Recording example ${chalk.bold(exampleFilename)}`);
+async function saveBrowserExample({ example }: TestRunCallbackArgs) {
+  const done = logAnimated(`Recording example ${chalk.bold(example.filename)}`);
 
-  const exampleUrl = `${config.devtoolsUrl}/test/examples/${exampleFilename}`;
+  const exampleUrl = `${config.devtoolsUrl}/test/examples/${example.filename}`;
 
-  await recordPlaywright(config.browserName, async page => {
+  // Shouldn't be "node" by this point
+  await recordPlaywright(example.runtime as BrowserName, async page => {
     await page.goto(exampleUrl);
     await waitUntilMessage(page as Page, "ExampleFinished");
   });
@@ -160,7 +391,7 @@ async function saveBrowserExample({ exampleFilename }: { exampleFilename: string
   done();
 
   if (config.useExampleFile && recordingId) {
-    await saveRecording(exampleFilename, recordingId);
+    await saveRecording(example.filename, config.replayApiKey, recordingId);
   }
   if (recordingId) {
     removeRecording(recordingId);
@@ -168,56 +399,27 @@ async function saveBrowserExample({ exampleFilename }: { exampleFilename: string
 }
 
 async function saveNodeExamples() {
-  await saveExamples(
-    "node",
-    config.nodeExamplesPath,
-    ".js",
-    async ({ exampleFilename, examplePath }) => {
-      const done = logAnimated(`Recording example ${chalk.bold(exampleFilename)}`);
+  await saveExamples("node", async ({ example, examplePath }: TestRunCallbackArgs) => {
+    const done = logAnimated(`Recording example ${chalk.bold(example.filename)}`);
 
-      process.env.RECORD_REPLAY_METADATA_TEST_RUN_ID = uuidv4();
+    process.env.RECORD_REPLAY_METADATA_TEST_RUN_ID = uuidv4();
 
-      const recordingId = await recordNodeExample(examplePath);
-      if (recordingId) {
-        await saveRecording(`node/${exampleFilename}`, recordingId!);
-        removeRecording(recordingId);
+    const recordingId = await recordNodeExample(examplePath);
+    if (recordingId) {
+      await saveRecording(example.filename, config.nodeWorkspaceApiKey, recordingId!);
+      removeRecording(recordingId);
 
-        done();
+      done();
 
-        console.log(
-          `Saved recording ${chalk.bold(exampleFilename)} with id ${chalk.bold(recordingId)}`
-        );
-      } else {
-        done();
+      console.log(
+        `Saved recording ${chalk.bold(example.filename)} with id ${chalk.bold(recordingId)}`
+      );
+    } else {
+      done();
 
-        throw `Unable to save recording for ${chalk.bold(exampleFilename)}`;
-      }
+      throw `Unable to save recording for ${chalk.bold(example.filename)}`;
     }
-  );
-}
-
-async function saveCypressExamples() {
-  if (target === "all" || target === "cypress") {
-    await saveCypressExample("doc_inspector_styles");
-  }
-}
-
-async function saveCypressExample(exampleFilename: string) {
-  const done = logAnimated(`Recording cypress example ${chalk.bold(exampleFilename)}`);
-
-  const recordingId = await require("./record-cypress").recordCypress(
-    config.browserName,
-    exampleFilename
-  );
-
-  done();
-
-  if (config.useExampleFile && recordingId) {
-    await saveRecording(`cypress/${exampleFilename}`, recordingId);
-  }
-  if (recordingId) {
-    removeRecording(recordingId);
-  }
+  });
 }
 
 async function makeReplayPublic(apiKey: string, recordingId: string) {
@@ -281,9 +483,26 @@ async function waitUntilMessage(
 
 (async () => {
   try {
-    await saveBrowserExamples();
-    await saveNodeExamples();
-    await saveCypressExamples();
+    const functionsForTarget = {
+      browser: saveBrowserExamples,
+      node: saveNodeExamples,
+    };
+
+    const target: Target = argv.target as Target;
+    if (Array.isArray(target)) {
+      // prevent `--target` from being used multiple times
+      throw new Error("Only one target value is allowed");
+    }
+
+    let targetsToRun: Target[] = ["browser", "node"];
+    if (target !== "all") {
+      targetsToRun = [target];
+    }
+
+    for (const target of targetsToRun) {
+      const saveExamplesForTarget = functionsForTarget[target as keyof typeof functionsForTarget];
+      await saveExamplesForTarget();
+    }
 
     process.exit(0);
   } catch (error) {
