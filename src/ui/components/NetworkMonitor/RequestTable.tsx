@@ -27,7 +27,12 @@ const RequestTable = ({
   filteredAfterCount: number;
   filteredBeforeCount: number;
   onRowSelect: (request: RequestSummary) => void;
-  seek: (point: string, time: number, openSource: boolean, pauseId?: string | undefined) => boolean;
+  seek: (params: {
+    executionPoint: string;
+    openSource: boolean;
+    pauseId?: string | undefined;
+    time: number;
+  }) => void;
   selectedRequest?: RequestSummary;
   table: TableInstance<RequestSummary>;
 }) => {
@@ -35,7 +40,11 @@ const RequestTable = ({
 
   const onSeek = (request: RequestSummary) => {
     trackEvent("net_monitor.seek_to_request");
-    seek(request.point.point, request.point.time, true);
+    seek({
+      executionPoint: request.point.point,
+      openSource: true,
+      time: request.point.time,
+    });
     onRowSelect(request);
   };
 

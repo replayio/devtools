@@ -168,7 +168,7 @@ export function TestSectionRow({
         }
       }
 
-      await dispatch(seek(executionPoint, time, false));
+      await dispatch(seek({ executionPoint, openSource: false, time }));
     }
   };
 

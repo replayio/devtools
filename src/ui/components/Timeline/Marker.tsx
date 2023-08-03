@@ -48,12 +48,13 @@ class Marker extends React.Component<MarkerProps> {
 
   onClick: MouseEventHandler = e => {
     const { seek, point, time, pauseId } = this.props;
+
     trackEvent("timeline.marker_select");
 
     e.preventDefault();
     e.stopPropagation();
 
-    seek(point, time, true, pauseId);
+    seek({ executionPoint: point, openSource: true, pauseId, time });
   };
 
   onMouseEnter = () => {

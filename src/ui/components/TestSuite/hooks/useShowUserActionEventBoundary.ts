@@ -30,7 +30,13 @@ export function useShowUserActionEventBoundary({
   const disabled = timeStampedPoint.point === currentPoint;
 
   const onClick = () => {
-    dispatch(seek(timeStampedPoint.point, timeStampedPoint.time, false));
+    dispatch(
+      seek({
+        executionPoint: timeStampedPoint.point,
+        openSource: false,
+        time: timeStampedPoint.time,
+      })
+    );
   };
 
   return { disabled, onClick };

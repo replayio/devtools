@@ -12,7 +12,14 @@ export function jumpToPreviousPause(): UIThunkAction {
       const pause = pauseHistory[pauseHistoryIndex - 1];
       if (pause) {
         dispatch(pauseHistoryDecremented());
-        dispatch(seek(pause.executionPoint, pause.time, pause.hasFrames, pause.pauseId));
+        dispatch(
+          seek({
+            executionPoint: pause.executionPoint,
+            openSource: pause.hasFrames,
+            pauseId: pause.pauseId,
+            time: pause.time,
+          })
+        );
       }
     }
   };
@@ -26,7 +33,14 @@ export function jumpToNextPause(): UIThunkAction {
       const pause = pauseHistory[pauseHistoryIndex + 1];
       if (pause) {
         dispatch(pauseHistoryIncremented());
-        dispatch(seek(pause.executionPoint, pause.time, pause.hasFrames, pause.pauseId));
+        dispatch(
+          seek({
+            executionPoint: pause.executionPoint,
+            openSource: pause.hasFrames,
+            pauseId: pause.pauseId,
+            time: pause.time,
+          })
+        );
       }
     }
   };

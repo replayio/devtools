@@ -2,7 +2,7 @@ import { MouseEvent, useLayoutEffect, useRef, useState } from "react";
 
 import { throttle } from "shared/utils/function";
 import {
-  seekToTime,
+  seek,
   setFocusWindowImprecise,
   setTimelineToTime,
   stopPlayback,
@@ -111,7 +111,7 @@ export default function Timeline() {
 
     if (!editMode) {
       // If we're editing focus mode, don't update the current time marker.
-      dispatch(seekToTime(mouseTime, resumePlaybackOnMouseUp));
+      dispatch(seek({ autoPlay: resumePlaybackOnMouseUp, time: mouseTime }));
     }
 
     dispatch(setDragging(false));

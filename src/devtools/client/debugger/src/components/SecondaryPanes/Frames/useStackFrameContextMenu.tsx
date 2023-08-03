@@ -35,7 +35,13 @@ export function useStackFrameContextMenu({
       const matchingFrameStep = await getMatchingFramestep();
 
       if (matchingFrameStep) {
-        dispatch(seek(matchingFrameStep.point, matchingFrameStep.time, true));
+        dispatch(
+          seek({
+            executionPoint: matchingFrameStep.point,
+            openSource: true,
+            time: matchingFrameStep.time,
+          })
+        );
       }
     };
 

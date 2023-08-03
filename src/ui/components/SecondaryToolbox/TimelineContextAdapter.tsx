@@ -32,7 +32,7 @@ export default function TimelineContextAdapter({ children }: PropsWithChildren) 
 
   const update = useCallback(
     async (time: number, executionPoint: ExecutionPoint, openSource: boolean) => {
-      dispatch(seek(executionPoint, time, openSource));
+      dispatch(seek({ executionPoint, time, openSource }));
     },
     [dispatch]
   );
