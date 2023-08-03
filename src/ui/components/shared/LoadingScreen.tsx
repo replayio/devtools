@@ -48,15 +48,15 @@ function LoadingScreen({
   uploading,
   awaitingSourcemaps,
   message,
-  additionalInfo,
-}: PropsFromRedux & { message: string; additionalInfo?: string }) {
+  secondaryMessage,
+}: PropsFromRedux & { message: string; secondaryMessage?: string }) {
   const waitingForMessage =
     awaitingSourcemaps || uploading ? (
       <span>Uploading {Math.round(uploading?.amount ? Number(uploading.amount) : 0)}Mb</span>
     ) : (
       <>
         <div className={styles.message} dangerouslySetInnerHTML={{ __html: message }} />
-        {additionalInfo && <div className={styles.additionalInfo}>{additionalInfo}</div>}
+        {secondaryMessage && <div className={styles.secondaryMessage}>{secondaryMessage}</div>}
       </>
     );
 
