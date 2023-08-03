@@ -13,16 +13,20 @@ export function useIndexingProgress() {
   };
 
   return useMemo(() => {
-    let totalLoadingTime = 0;
-
-    loading.forEach(({ begin, end }) => {
-      totalLoadingTime += end.time - begin.time;
+    let totalTimeIndexed = 0;
+    indexed.forEach(({ begin, end }) => {
+      totalTimeIndexed += end.time - begin.time;
     });
 
-    if (totalLoadingTime === 0) {
-      return 0;
-    }
+    let totalTimeLoading = 0;
+    loading.forEach(({ begin, end }) => {
+      totalTimeLoading += end.time - begin.time;
+    });
 
-    return 100 * (indexed.find(({ begin, end }) => end.time - begin.time > 0) ? 1 : 0);
+    if (totalTimeLoading === 0) {
+      return 0;
+    } else {
+      return Math.round((100 * totalTimeIndexed) / totalTimeLoading);
+    }
   }, [indexed, loading]);
 }
