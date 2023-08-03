@@ -48,7 +48,7 @@ export interface DeconstructedOperationsPieces {
 interface TreeOperationAddRootContents {
   nodeType: "root";
   isStrictModeCompliant: boolean;
-  supportsProfiling: boolean;
+  profilingFlags: number;
   supportsStrictMode: boolean;
   hasOwnerMetadata: boolean;
 }
@@ -185,7 +185,7 @@ export function parseTreeOperations(treeOperations: number[]): ParsedReactDevtoo
         if (type === ElementTypeRoot) {
           // Booleans are encoded as 1 or 0
           const isStrictModeCompliant = treeOperations[i++] === 1;
-          const supportsProfiling = treeOperations[i++] === 1;
+          const profilingFlags = treeOperations[i++];
           const supportsStrictMode = treeOperations[i++] === 1;
           const hasOwnerMetadata = treeOperations[i++] === 1;
 
@@ -197,7 +197,7 @@ export function parseTreeOperations(treeOperations: number[]): ParsedReactDevtoo
             contents: {
               nodeType: "root",
               isStrictModeCompliant,
-              supportsProfiling,
+              profilingFlags,
               supportsStrictMode,
               hasOwnerMetadata,
             },
@@ -371,16 +371,12 @@ export function reconstructOperationsArray({
           instructions.push(nodeId, nodeType);
 
           if (contents.nodeType === "root") {
-            const {
-              isStrictModeCompliant,
-              supportsProfiling,
-              supportsStrictMode,
-              hasOwnerMetadata,
-            } = contents;
+            const { isStrictModeCompliant, profilingFlags, supportsStrictMode, hasOwnerMetadata } =
+              contents;
 
             instructions.push(
               isStrictModeCompliant ? 1 : 0,
-              supportsProfiling ? 1 : 0,
+              profilingFlags,
               supportsStrictMode ? 1 : 0,
               hasOwnerMetadata ? 1 : 0
             );
@@ -521,8 +517,6 @@ export function generateTreeResetOpsForPoint(
       name: "removeRoot",
     };
 
-    // Assume that every nav wipes out the page entirely.
-    // TODO [FE-1667] This doesn't deal with iframes yet - not sure how to handle iframe navs?
     for (const [rendererId, activeRootsForRenderer] of activeRoots.entries()) {
       for (const _activeRoot of activeRootsForRenderer) {
         const removalOp = reconstructOperationsArray({

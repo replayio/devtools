@@ -2,8 +2,6 @@
 
 // React DevTools routine result processing logic tests
 
-import { NavigationEvent as ReplayNavigationEvent } from "@replayio/protocol";
-
 import {
   ElementTypeFunction,
   ElementTypeRoot,
@@ -17,7 +15,6 @@ import {
 } from "../printOperations";
 import {
   DeconstructedOperationsPieces,
-  OperationsInfo,
   ParsedReactDevtoolsTreeOperations,
   deconstructOperationsArray,
   reconstructOperationsArray,
@@ -81,8 +78,8 @@ const exampleOperationsArray = [
   ElementTypeRoot,
   // Strict mode compliant: false
   0,
-  // supports profiling: false
-  0,
+  // supports profiling: BASIC + TIMELINE
+  3,
   // supports strict mode: true
   1,
   // has owner metadata: true
@@ -198,7 +195,7 @@ const expectedTreeOperations: ParsedReactDevtoolsTreeOperations[] = [
     contents: {
       nodeType: "root",
       isStrictModeCompliant: false,
-      supportsProfiling: false,
+      profilingFlags: 3,
       supportsStrictMode: true,
       hasOwnerMetadata: true,
     },
