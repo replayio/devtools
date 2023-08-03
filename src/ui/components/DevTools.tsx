@@ -249,10 +249,14 @@ function _DevTools({
     }
   }, [recording, userId, userEmail, userLoading]);
 
-  const message = useDynamicLoadingMessage(recording?.isProcessed || false, "Loading...", 20000);
+  const { message, secondaryMessage } = useDynamicLoadingMessage(
+    recording?.isProcessed || false,
+    "Loading...",
+    20000
+  );
 
   if (!loadingFinished) {
-    return <LoadingScreen message={message} />;
+    return <LoadingScreen message={message} secondaryMessage={secondaryMessage} />;
   }
 
   const title = recording?.title;

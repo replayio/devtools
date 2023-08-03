@@ -24,6 +24,15 @@
   color: var(--primary-accent);
 }
 
+.message {
+  margin-bottom: 1rem;
+}
+
+.secondaryMessage {
+  color: var(--color-dim);
+  width: 18rem;
+}
+
 .viewportWrapper {
   position: relative;
   display: flex;

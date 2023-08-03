@@ -54,6 +54,10 @@ export function useDynamicLoadingMessage(
 ) {
   const [message, setMessage] = useState(isProcessed ? initialMessage : "Processing...");
 
+  const secondaryMessage = isProcessed
+    ? ""
+    : "This could take a while, depending on the complexity and length of the replay.";
+
   useEffect(() => {
     if (isProcessed) {
       const changeMessage = () => {
@@ -73,5 +77,5 @@ export function useDynamicLoadingMessage(
     }
   }, [isProcessed, initialMessage, stalledTimeout]);
 
-  return message;
+  return { message, secondaryMessage };
 }
