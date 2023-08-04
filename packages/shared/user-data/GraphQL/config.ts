@@ -151,12 +151,6 @@ export const config = {
     defaultValue: Boolean(true),
     legacyKey: "devtools.features.chromiumNetMonitor",
   },
-  feature_columnBreakpoints: {
-    defaultValue: Boolean(false),
-    description: "Add breakpoints within a line",
-    label: "Column Breakpoints",
-    legacyKey: "devtools.features.columnBreakpoints",
-  },
   feature_commentAttachments: {
     defaultValue: Boolean(false),
     legacyKey: "devtools.features.commentAttachments",

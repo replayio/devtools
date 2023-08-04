@@ -120,7 +120,7 @@ describe("UserData", () => {
     const warn = jest.spyOn(console, "warn").mockImplementation(() => {});
 
     const userData = require("./UserData").userData;
-    userData.set("feature_columnBreakpoints", true);
+    userData.set("feature_reactPanel", true);
 
     expect(warn).toHaveBeenCalledTimes(1);
     expect(warn).toHaveBeenCalledWith(
