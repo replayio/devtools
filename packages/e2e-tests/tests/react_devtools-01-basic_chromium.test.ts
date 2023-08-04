@@ -35,7 +35,8 @@ test.only("react_devtools 01: Basic RDT behavior (Chromium)", async ({
 
   const queryParams = new URLSearchParams();
   // Force this test to always re-run the RDT (and other) routines
-  queryParams.set("features", "rerunRoutines");
+  // See pref names in packages/shared/user-data/GraphQL/config.ts
+  queryParams.set("features", "backend_rerunRoutines");
 
   await startTest(page, exampleKey, recordingId, undefined, queryParams);
 
