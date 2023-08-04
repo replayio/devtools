@@ -152,7 +152,7 @@ function NewSourceAdapter() {
         const source = getSourceSuspends(replayClient, sourceId);
         return (
           <LazyOffscreen key={sourceId} mode={sourceId === focusedSourceId ? "visible" : "hidden"}>
-            <Source source={source!} showColumnBreakpoints={false} />
+            <Source source={source!} />
           </LazyOffscreen>
         );
       })}

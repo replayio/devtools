@@ -1,21 +1,8 @@
-.Container {
-  position: absolute;
-  height: 100%;
-}
-
 .Highlight {
+  position: absolute;
   display: inline-block;
   height: 100%;
   font-family: var(--font-family-monospace);
   font-size: var(--font-size-regular);
   background: var(--background-color-current-execution-point-column);
-}
-
-.ColumnBreakpointSpacer {
-  display: inline-block;
-  width: var(--column-breakpoint-width);
-}
-
-.LeadingSpacer {
-  display: inline-block;
 }

@@ -16,7 +16,6 @@ type Props = {
   breakableColumnIndices: number[];
   lineNumber: number;
   plainText: string | null;
-  showColumnBreakpoints: boolean;
   sourceId: SourceId;
 };
 
@@ -32,7 +31,6 @@ function CurrentColumnHighlightSuspends({
   breakableColumnIndices,
   lineNumber,
   plainText,
-  showColumnBreakpoints,
   sourceId,
 }: Props) {
   const client = useContext(ReplayClientContext);
@@ -77,6 +75,7 @@ function CurrentColumnHighlightSuspends({
           );
         }
       });
+
       if (match != null) {
         highlightColumnBegin = match.column;
 
@@ -94,40 +93,15 @@ function CurrentColumnHighlightSuspends({
     }
 
     if (highlightColumnBegin > 0 && highlightColumnEnd > 0) {
-      let children: ReactNode[] = [
-        <div
-          className={styles.LeadingSpacer}
-          key={0}
-          style={{
-            width: `${highlightColumnBegin}ch`,
-          }}
-        />,
-      ];
-
-      if (showColumnBreakpoints) {
-        for (let index = 0; index < breakableColumnIndices.length; index++) {
-          const breakableColumnIndex = breakableColumnIndices[index];
-
-          if (breakableColumnIndex <= highlightColumnBegin) {
-            children.push(<div className={styles.ColumnBreakpointSpacer} key={children.length} />);
-          } else {
-            break;
-          }
-        }
-      }
-
-      children.push(
+      return (
         <div
           className={styles.Highlight}
-          key={children.length}
           style={{
-            // @ts-ignore
+            marginLeft: `${highlightColumnBegin}ch`,
             width: `${highlightColumnEnd - highlightColumnBegin}ch`,
           }}
         />
       );
-
-      return <div className={styles.Container}>{children}</div>;
     }
   }
 

@@ -3,7 +3,6 @@ import {
   CSSProperties,
   MouseEvent,
   ReactElement,
-  ReactNode,
   Suspense,
   memo,
   useContext,
@@ -35,7 +34,6 @@ import {
   Point,
 } from "shared/client/types";
 
-import ColumnBreakpointMarker from "./ColumnBreakpointMarker";
 import CurrentLineHighlight from "./CurrentLineHighlight";
 import HoverButton from "./HoverButton";
 import LogPointPanel from "./log-point-panel/LogPointPanel";
@@ -73,7 +71,6 @@ export type ItemData = {
   pointsForDefaultPriority: Point[];
   pointsForSuspense: Point[];
   pointBehaviors: PointBehaviorsObject;
-  showColumnBreakpoints: boolean;
   source: Source;
   streamingParser: StreamingParser;
 };
@@ -111,7 +108,6 @@ const SourceListRow = memo(
       pointBehaviors,
       pointsForDefaultPriority,
       pointsForSuspense,
-      showColumnBreakpoints,
       source,
       streamingParser,
     } = data;
@@ -192,98 +188,22 @@ const SourceListRow = memo(
       hitCountLabelClassName = `${hitCountLabelClassName} ${styles.LineHitCountLabelPending}`;
     }
 
-    const showBreakpointMarkers = showColumnBreakpoints && pointForDefaultPriority != null;
     const breakableColumnIndices = breakablePositionsByLine.get(lineNumber)?.columns ?? [];
-
-    const renderBetween = (
-      rendered: ReactNode[],
-      columnIndexStart: number,
-      columnIndexEnd: number
-    ) => {
-      if (tokens) {
-        for (let index = 0; index < tokens.length; index++) {
-          const token = tokens[index];
-          if (token.columnIndex >= columnIndexEnd) {
-            break;
-          } else if (token.columnIndex >= columnIndexStart) {
-            rendered.push(
-              <pre className={styles.LineSegment} key={rendered.length}>
-                {renderToken(token)}
-              </pre>
-            );
-          }
-        }
-      } else if (plainText) {
-        rendered.push(
-          <pre
-            className={styles.LineSegment}
-            data-test-name="SourceListRow-LineSegment-PlainText"
-            key={rendered.length}
-          >
-            {plainText.substring(columnIndexStart, columnIndexEnd)}
-          </pre>
-        );
-      }
-    };
 
     let lineSegments = null;
     if (plainText !== null) {
-      if (showBreakpointMarkers) {
-        lineSegments = [];
-
-        let lastColumnIndex = 0;
-
-        for (let i = 0; i < breakableColumnIndices.length; i++) {
-          const columnIndex = breakableColumnIndices[i];
-
-          if (columnIndex > lastColumnIndex) {
-            renderBetween(lineSegments, lastColumnIndex, columnIndex);
-          }
-
-          const pointForDefaultPriority =
-            pointsForLine.find(point => point.location.column === columnIndex) ?? null;
-          const pointBehavior = pointForDefaultPriority
-            ? pointBehaviors[pointForDefaultPriority.key] ?? null
-            : null;
-
-          lineSegments.push(
-            <ColumnBreakpointMarker
-              addPoint={addPoint}
-              columnIndex={columnIndex}
-              currentUserInfo={currentUserInfo}
-              deletePoints={deletePoints}
-              editPointBehavior={editPointBehavior}
-              key={lineSegments.length}
-              lineNumber={lineNumber}
-              point={pointsForLine.find(point => point.location.column === columnIndex) ?? null}
-              pointBehavior={pointBehavior}
-              sourceId={sourceId}
-            />
-          );
-
-          lastColumnIndex = columnIndex;
-        }
-
-        if (lastColumnIndex < plainText.length - 1) {
-          renderBetween(lineSegments, lastColumnIndex, plainText.length);
-        }
+      if (tokens !== null) {
+        lineSegments = (
+          <pre className={styles.LineSegment}>
+            {tokens.map((token, index) => renderToken(token, index))}
+          </pre>
+        );
       } else {
-        if (tokens !== null) {
-          lineSegments = (
-            <pre className={styles.LineSegment}>
-              {tokens.map((token, index) => renderToken(token, index))}
-            </pre>
-          );
-        } else {
-          lineSegments = (
-            <pre
-              className={styles.LineSegment}
-              data-test-name="SourceListRow-LineSegment-PlainText"
-            >
-              {plainText}
-            </pre>
-          );
-        }
+        lineSegments = (
+          <pre className={styles.LineSegment} data-test-name="SourceListRow-LineSegment-PlainText">
+            {plainText}
+          </pre>
+        );
       }
     } else {
       lineSegments = <SourceLineLoadingPlaceholder width={loadingPlaceholderWidth} />;
@@ -432,12 +352,10 @@ const SourceListRow = memo(
           <div className={styles.LineSegmentsAndPointPanel} data-test-name="SourceLine-Contents">
             {searchResultsForLine?.map((result, resultIndex) => (
               <SearchResultHighlight
-                breakableColumnIndices={breakableColumnIndices}
                 key={resultIndex}
                 isActive={result === currentSearchResult}
                 searchResultColumnIndex={result.columnIndex}
                 searchText={result.text}
-                showColumnBreakpoints={showColumnBreakpoints && pointsForLine.length > 0}
               />
             ))}
 
@@ -445,7 +363,6 @@ const SourceListRow = memo(
               breakableColumnIndices={breakableColumnIndices}
               lineNumber={lineNumber}
               plainText={plainText}
-              showColumnBreakpoints={showColumnBreakpoints && pointsForLine.length > 0}
               sourceId={sourceId}
             />
 

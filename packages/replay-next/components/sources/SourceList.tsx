@@ -49,13 +49,11 @@ const STREAMING_IN_PROGRESS_PLACEHOLDER_MAX_HIT_COUNT = 1;
 
 export default function SourceList({
   height,
-  showColumnBreakpoints,
   source,
   streamingParser,
   width,
 }: {
   height: number;
-  showColumnBreakpoints: boolean;
   source: Source;
   streamingParser: StreamingParser;
   width: number;
@@ -215,7 +213,6 @@ export default function SourceList({
       pointPanelWithConditionalHeight,
       pointsForDefaultPriority,
       pointsForSuspense,
-      showColumnBreakpoints,
       source,
       streamingParser,
     }),
@@ -232,7 +229,6 @@ export default function SourceList({
       pointPanelWithConditionalHeight,
       pointsForDefaultPriority,
       pointsForSuspense,
-      showColumnBreakpoints,
       source,
       streamingParser,
     ]
