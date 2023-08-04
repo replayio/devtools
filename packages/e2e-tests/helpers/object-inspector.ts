@@ -17,6 +17,26 @@ export async function getPropertyValue(objectInspector: Locator, propertyName: s
   return await propertyValue.innerText();
 }
 
+export async function getGetterValue(objectInspector: Locator, propertyName: string) {
+  const expander = objectInspector.locator('[data-test-name="Expandable"]').first();
+  const state = await expander.getAttribute("data-test-state");
+  if (state === "closed") {
+    expander.click();
+  }
+
+  const property = objectInspector.locator(
+    `[data-test-name="ExpandableChildren"] [data-test-name="GetterRenderer"]:has([class^="GetterRenderer_Name"]:text-is("${propertyName}"))`
+  );
+  await property.waitFor();
+  const getterButton = property.locator('[data-test-name="InvokeGetterButton"]');
+
+  if (await getterButton.isVisible({ timeout: 250 })) {
+    await getterButton.click();
+  }
+  const propertyValue = property.locator('[data-test-name="ClientValue"]');
+  return await propertyValue.innerText();
+}
+
 export async function getKeyValueEntry(
   locator: Locator,
   header: string
