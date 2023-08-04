@@ -14,6 +14,7 @@ import { useNag } from "replay-next/src/hooks/useNag";
 import { RecordingTarget, recordingTargetCache } from "replay-next/src/suspense/BuildIdCache";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { evaluate } from "replay-next/src/utils/evaluate";
+import { recordData } from "replay-next/src/utils/telemetry";
 import { isExecutionPointsLessThan } from "replay-next/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
@@ -88,6 +89,9 @@ class ReplayWall implements Wall {
       try {
         listener(msg);
       } catch (err) {
+        recordData("react-devtools-frontend-error", {
+          errorMessage: (err as Error).message,
+        });
         console.warn("Error in ReactDevTools frontend", err);
       }
     };
