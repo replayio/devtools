@@ -692,24 +692,6 @@ export function setFocusWindowBegin({
   };
 }
 
-export function setFocusWindowEndTime_TODO_FE_1779(
-  time: number,
-  sync: boolean
-): UIThunkAction<Promise<void>> {
-  return async dispatch => {
-    dispatch(setFocusWindowEnd({ time, sync }));
-  };
-}
-
-export function setFocusWindowBeginTime_TODO_FE_1779(
-  time: number,
-  sync: boolean
-): UIThunkAction<Promise<void>> {
-  return async (dispatch, getState) => {
-    dispatch(setFocusWindowBegin({ time, sync }));
-  };
-}
-
 export function syncFocusedRegion(bias?: FocusWindowRequestBias): UIThunkAction {
   return async (dispatch, getState, { replayClient }) => {
     const state = getState();

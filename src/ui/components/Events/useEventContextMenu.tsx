@@ -2,10 +2,7 @@ import { ContextMenuDivider, ContextMenuItem, useContextMenu } from "use-context
 
 import Icon from "replay-next/components/Icon";
 import { copyToClipboard as copyTextToClipboard } from "replay-next/components/sources/utils/clipboard";
-import {
-  setFocusWindowBeginTime_TODO_FE_1779,
-  setFocusWindowEndTime_TODO_FE_1779,
-} from "ui/actions/timeline";
+import { setFocusWindowBegin, setFocusWindowEnd } from "ui/actions/timeline";
 import { useAppDispatch } from "ui/setup/hooks";
 import { ReplayEvent } from "ui/state/app";
 
@@ -13,11 +10,23 @@ export default function useEventContextMenu(event: ReplayEvent) {
   const dispatch = useAppDispatch();
 
   const setFocusEnd = () => {
-    dispatch(setFocusWindowEndTime_TODO_FE_1779(event.time, true));
+    dispatch(
+      setFocusWindowEnd({
+        executionPoint: event.point,
+        time: event.time,
+        sync: true,
+      })
+    );
   };
 
   const setFocusStart = () => {
-    dispatch(setFocusWindowBeginTime_TODO_FE_1779(event.time!, true));
+    dispatch(
+      setFocusWindowBegin({
+        executionPoint: event.point,
+        time: event.time,
+        sync: true,
+      })
+    );
   };
 
   const onCopyUrl = () => {
