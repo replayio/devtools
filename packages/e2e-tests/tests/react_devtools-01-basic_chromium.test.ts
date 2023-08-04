@@ -33,7 +33,11 @@ test.only("react_devtools 01: Basic RDT behavior (Chromium)", async ({
     console.log("Console: ", msg);
   });
 
-  await startTest(page, exampleKey, recordingId);
+  const queryParams = new URLSearchParams();
+  // Force this test to always re-run the RDT (and other) routines
+  queryParams.set("features", "rerunRoutines");
+
+  await startTest(page, exampleKey, recordingId, undefined, queryParams);
 
   await openDevToolsTab(page);
 

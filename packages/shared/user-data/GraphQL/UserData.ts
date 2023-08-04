@@ -61,11 +61,13 @@ class UserData implements GraphQLService {
       const query = new URLSearchParams(window.location.search);
       const overrideString = query.get("features");
       if (overrideString) {
+        console.log("URL overrides:", overrideString);
         const tokens = overrideString.split(",");
         tokens.forEach(token => {
           const key = token as PreferencesKey;
           const configurablePreference = config[key];
           if (typeof configurablePreference.defaultValue === "boolean") {
+            console.log("Overriding feature:", key, "to true");
             this.urlOverrides[key as PreferencesKey] = true;
           }
         });
