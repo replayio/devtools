@@ -5,6 +5,10 @@ import { StreamingParser } from "replay-next/src/suspense/SyntaxParsingCache";
 
 import styles from "./StreamingSourceLoadingProgressHeader.module.css";
 
+// In case the initial source contents request hangs,
+// render some minimal amount of progress so that the source viewer isn't empty
+const STREAMING_IN_PROGRESS_MIN_LOADING_PERCENTAGE = 0.05;
+
 export default function StreamingSourceLoadingProgressHeader({
   streamingParser,
   streamingSourceContents,
@@ -12,7 +16,8 @@ export default function StreamingSourceLoadingProgressHeader({
   streamingParser: StreamingParser;
   streamingSourceContents: StreamingSourceContentsValue;
 }) {
-  const { progress: rawTextPercentage = 0 } = useStreamingValue(streamingSourceContents);
+  const { progress: rawTextPercentage = STREAMING_IN_PROGRESS_MIN_LOADING_PERCENTAGE } =
+    useStreamingValue(streamingSourceContents);
   const { progress: parsedTokensPercentage = 0 } = useStreamingValue(streamingParser);
 
   const loadedProgressBarWidth = Math.round(rawTextPercentage * 100);

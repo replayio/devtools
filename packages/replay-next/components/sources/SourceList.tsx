@@ -42,6 +42,11 @@ import styles from "./SourceList.module.css";
 
 const NO_BREAKABLE_POSITIONS: BreakpointPositionsResult = [[], new Map()];
 
+// In case the initial source contents request hangs,
+// render a few placeholder lines of text so that the source viewer isn't empty.
+const STREAMING_IN_PROGRESS_PLACEHOLDER_LINE_COUNT = 10;
+const STREAMING_IN_PROGRESS_PLACEHOLDER_MAX_HIT_COUNT = 1;
+
 export default function SourceList({
   height,
   showColumnBreakpoints,
@@ -85,7 +90,7 @@ export default function SourceList({
     useFontBasedListMeasurements(listRef);
 
   const { data } = useStreamingValue(streamingParser);
-  const lineCount = data?.lineCount ?? 0;
+  const lineCount = data?.lineCount;
 
   // Both hit counts and breakable positions are key info,
   // but neither should actually _block_ us from showing source text.
@@ -103,6 +108,7 @@ export default function SourceList({
     if (hitCountsValue.status !== "resolved") {
       return null;
     }
+
     return new Map(hitCountsValue.value);
   }, [hitCountsValue]);
 
@@ -160,7 +166,10 @@ export default function SourceList({
     }
   }, [focusedSource, lineCount, markPendingFocusUpdateProcessed, pendingFocusUpdate, sourceId]);
 
-  const [minHitCount, maxHitCount] = getCachedMinMaxSourceHitCounts(sourceId, focusRange);
+  const [
+    minHitCount = STREAMING_IN_PROGRESS_PLACEHOLDER_MAX_HIT_COUNT,
+    maxHitCount = STREAMING_IN_PROGRESS_PLACEHOLDER_MAX_HIT_COUNT,
+  ] = getCachedMinMaxSourceHitCounts(sourceId, focusRange);
 
   useLayoutEffect(() => {
     // TODO
@@ -294,9 +303,9 @@ export default function SourceList({
     [setVisibleLines]
   );
 
-  const maxLineIndexStringLength = `${lineCount}`.length;
-  const maxHitCountStringLength =
-    maxHitCount !== null ? `${formatHitCount(maxHitCount)}`.length : 0;
+  const maxLineIndexStringLength = `${lineCount ?? STREAMING_IN_PROGRESS_PLACEHOLDER_LINE_COUNT}`
+    .length;
+  const maxHitCountStringLength = maxHitCount != null ? `${formatHitCount(maxHitCount)}`.length : 0;
 
   const widthMinusScrollbar = width - scrollbarWidth;
 
@@ -315,7 +324,7 @@ export default function SourceList({
       estimatedItemSize={lineHeight}
       height={height}
       innerRef={innerRef}
-      itemCount={lineCount || 0}
+      itemCount={lineCount ?? STREAMING_IN_PROGRESS_PLACEHOLDER_LINE_COUNT}
       itemData={itemData}
       itemSize={getItemSize}
       onItemsRendered={onItemsRendered}

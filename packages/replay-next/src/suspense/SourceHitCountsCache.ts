@@ -120,7 +120,7 @@ export const sourceHitCountsCache = createFocusIntervalCache<
 export function getCachedMinMaxSourceHitCounts(
   sourceId: SourceId,
   focusRange: TimeStampedPointRange | PointRange | null
-): MinMaxHitCountTuple | [null, null] {
+): MinMaxHitCountTuple | [undefined, undefined] {
   const key = getKey(null as any, sourceId, focusRange ? toPointRange(focusRange) : null);
-  return minMaxHitCountsMap.get(key) || [null, null];
+  return minMaxHitCountsMap.get(key) || [undefined, undefined];
 }

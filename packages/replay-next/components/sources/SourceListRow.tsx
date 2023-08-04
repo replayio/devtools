@@ -64,8 +64,8 @@ if (typeof window !== "undefined") {
 export type ItemData = {
   breakablePositionsByLine: Map<number, SameLineSourceLocations>;
   hitCounts: LineNumberToHitCountMap | null;
-  maxHitCount: number | null;
-  minHitCount: number | null;
+  maxHitCount: number | undefined;
+  minHitCount: number | undefined;
   onLineMouseEnter: (lineIndex: number, lineNumberNode: HTMLElement) => void;
   onLineMouseLeave: (lineIndex: number, lineNumberNode: HTMLElement) => void;
   pointPanelHeight: number;
@@ -176,7 +176,7 @@ const SourceListRow = memo(
     let hitCountBarClassName = styles.LineHitCountBar0;
     let hitCountLabelClassName = styles.LineHitCountLabel0;
     let hitCountIndex = NUM_GRADIENT_COLORS - 1;
-    if (hitCount !== null && minHitCount !== null && maxHitCount !== null) {
+    if (hitCount != null && minHitCount != null && maxHitCount != null) {
       if (minHitCount !== maxHitCount) {
         hitCountIndex = Math.min(
           NUM_GRADIENT_COLORS - 1,
