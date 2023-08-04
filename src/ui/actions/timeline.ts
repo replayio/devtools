@@ -4,6 +4,7 @@ import {
   FocusWindowRequestBias,
   PauseId,
   ScreenShot,
+  TimeStampedPoint,
   TimeStampedPointRange,
 } from "@replayio/protocol";
 import clamp from "lodash/clamp";
@@ -615,42 +616,97 @@ export function setFocusWindow(
   };
 }
 
-export function setFocusWindowEndTime(end: number, sync: boolean): UIThunkAction<Promise<void>> {
-  return async (dispatch, getState) => {
+export function setFocusWindowEnd({
+  executionPoint,
+  sync,
+  time,
+}: {
+  executionPoint?: string;
+  sync: boolean;
+  time: number;
+}): UIThunkAction<Promise<void>> {
+  return async (dispatch, getState, { replayClient }) => {
     const state = getState();
+
+    let end: TimeStampedPoint;
+    if (executionPoint != null) {
+      end = { point: executionPoint, time };
+    } else {
+      const timeStampedPoint = await pointsBoundingTimeCache.readAsync(replayClient, time);
+      end = timeStampedPoint.after;
+    }
+
+    // If this is the first time the user is focusing, begin at the beginning of the recording
     const focusWindow = getFocusWindow(state);
+    const begin = focusWindow?.begin ?? {
+      point: "0",
+      time: 0,
+    };
 
-    // If this is the first time the user is focusing, begin at the beginning of the recording (or zoom region).
-    // Let the focus action/reducer will handle cropping for us.
-    const begin = focusWindow?.begin.time ?? 0;
-
-    await dispatch(setFocusWindowImprecise({ begin, end }));
+    await dispatch(
+      setFocusWindow({
+        begin,
+        end,
+      })
+    );
 
     if (sync) {
-      await dispatch(syncFocusedRegion());
+      await dispatch(syncFocusedRegion("end"));
+
       dispatch(updateFocusWindowParam());
     }
   };
 }
 
-export function setFocusWindowBeginTime(
-  begin: number,
+export function setFocusWindowBegin({
+  executionPoint,
+  sync,
+  time,
+}: {
+  executionPoint?: string;
+  sync: boolean;
+  time: number;
+}): UIThunkAction<Promise<void>> {
+  return async (dispatch, getState, { replayClient }) => {
+    const state = getState();
+
+    let begin: TimeStampedPoint;
+    if (executionPoint != null) {
+      begin = { point: executionPoint, time };
+    } else {
+      const timeStampedPoint = await pointsBoundingTimeCache.readAsync(replayClient, time);
+      begin = timeStampedPoint.before;
+    }
+
+    // If this is the first time the user is focusing, extend to the end of the recording
+    const focusWindow = getFocusWindow(state);
+    const end = focusWindow?.end ?? (await sessionEndPointCache.readAsync(replayClient));
+
+    await dispatch(setFocusWindow({ begin, end }));
+
+    if (sync) {
+      await dispatch(syncFocusedRegion("begin"));
+
+      dispatch(updateFocusWindowParam());
+    }
+  };
+}
+
+export function setFocusWindowEndTime_TODO_FE_1779(
+  time: number,
+  sync: boolean
+): UIThunkAction<Promise<void>> {
+  return async dispatch => {
+    dispatch(setFocusWindowEnd({ time, sync }));
+  };
+}
+
+export function setFocusWindowBeginTime_TODO_FE_1779(
+  time: number,
   sync: boolean
 ): UIThunkAction<Promise<void>> {
   return async (dispatch, getState) => {
-    const state = getState();
-    const focusWindow = getFocusWindow(state);
-
-    // If this is the first time the user is focusing, extend to the end of the recording (or zoom region).
-    // Let the focus action/reducer will handle cropping for us.
-    const end = focusWindow?.end.time ?? Number.POSITIVE_INFINITY;
-
-    await dispatch(setFocusWindowImprecise({ begin, end }));
-
-    if (sync) {
-      await dispatch(syncFocusedRegion());
-      dispatch(updateFocusWindowParam());
-    }
+    dispatch(setFocusWindowBegin({ time, sync }));
   };
 }
 

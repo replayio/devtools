@@ -4,7 +4,10 @@ import { ContextMenuDivider, ContextMenuItem, useContextMenu } from "use-context
 
 import Icon from "replay-next/components/Icon";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
-import { setFocusWindowBeginTime, setFocusWindowEndTime } from "ui/actions/timeline";
+import {
+  setFocusWindowBeginTime_TODO_FE_1779,
+  setFocusWindowEndTime_TODO_FE_1779,
+} from "ui/actions/timeline";
 import { useAppDispatch } from "ui/setup/hooks";
 import type { Remark } from "ui/state/comments";
 import { trackEvent } from "ui/utils/telemetry";
@@ -58,11 +61,11 @@ export default function useCommentContextMenu({
   };
 
   const setFocusEnd = () => {
-    dispatch(setFocusWindowEndTime(remark.time, true));
+    dispatch(setFocusWindowEndTime_TODO_FE_1779(remark.time, true));
   };
 
   const setFocusStart = () => {
-    dispatch(setFocusWindowBeginTime(remark.time!, true));
+    dispatch(setFocusWindowBeginTime_TODO_FE_1779(remark.time!, true));
   };
 
   const contextMenuItems: ReactNode[] = [];

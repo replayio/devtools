@@ -6,7 +6,11 @@ import Icon from "replay-next/components/Icon";
 import { copyToClipboard } from "replay-next/components/sources/utils/clipboard";
 import { getFrameStepForFrameLocation } from "replay-next/src/suspense/FrameStepsCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { seek, setFocusWindowBeginTime, setFocusWindowEndTime } from "ui/actions/timeline";
+import {
+  seek,
+  setFocusWindowBeginTime_TODO_FE_1779,
+  setFocusWindowEndTime_TODO_FE_1779,
+} from "ui/actions/timeline";
 import { useAppDispatch } from "ui/setup/hooks";
 
 interface StackFrameContextMenuOptions {
@@ -49,7 +53,7 @@ export function useStackFrameContextMenu({
       const matchingFrameStep = await getMatchingFramestep();
 
       if (matchingFrameStep) {
-        dispatch(setFocusWindowBeginTime(matchingFrameStep.time, true));
+        dispatch(setFocusWindowBeginTime_TODO_FE_1779(matchingFrameStep.time, true));
       }
     };
 
@@ -57,7 +61,7 @@ export function useStackFrameContextMenu({
       const matchingFrameStep = await getMatchingFramestep();
 
       if (matchingFrameStep) {
-        dispatch(setFocusWindowEndTime(matchingFrameStep.time, true));
+        dispatch(setFocusWindowEndTime_TODO_FE_1779(matchingFrameStep.time, true));
       }
     };
 

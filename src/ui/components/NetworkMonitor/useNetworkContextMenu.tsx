@@ -11,7 +11,10 @@ import { GraphQLClientContext } from "replay-next/src/contexts/GraphQLClientCont
 import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { addComment as addCommentGraphQL } from "shared/graphql/Comments";
-import { setFocusWindowBeginTime, setFocusWindowEndTime } from "ui/actions/timeline";
+import {
+  setFocusWindowBeginTime_TODO_FE_1779,
+  setFocusWindowEndTime_TODO_FE_1779,
+} from "ui/actions/timeline";
 import useCopyAsCURL from "ui/components/NetworkMonitor/useCopyAsCURL";
 import { useAppDispatch } from "ui/setup/hooks";
 
@@ -37,11 +40,11 @@ export default function useNetworkContextMenu({ row }: { row: Row<RequestSummary
   const endTime = requestSummary.end;
 
   const setFocusEnd = () => {
-    dispatch(setFocusWindowEndTime(endTime!, true));
+    dispatch(setFocusWindowEndTime_TODO_FE_1779(endTime!, true));
   };
 
   const setFocusStart = () => {
-    dispatch(setFocusWindowBeginTime(beginTime!, true));
+    dispatch(setFocusWindowBeginTime_TODO_FE_1779(beginTime!, true));
   };
 
   const addComment = () => {
