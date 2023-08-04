@@ -70,14 +70,24 @@ export async function startTest(
   page: Page,
   exampleKey: TestRecordingKey,
   recordingId: string,
-  apiKey?: string
+  apiKey?: string,
+  additionalQueryParams?: URLSearchParams
 ) {
   const base = process.env.PLAYWRIGHT_TEST_BASE_URL || "http://localhost:8080";
 
-  let url = `${base}/recording/${recordingId}?e2e=1`;
+  const params = new URLSearchParams();
+  params.append("e2e", "1");
   if (apiKey) {
-    url += `&apiKey=${apiKey}`;
+    params.append("apiKey", apiKey);
   }
+
+  if (additionalQueryParams) {
+    for (const [key, value] of additionalQueryParams) {
+      params.append(key, value);
+    }
+  }
+
+  let url = `${base}/recording/${recordingId}?${params.toString()}`;
 
   await debugPrint(page, `Navigating to ${chalk.bold(url)}`, "startTest");
 
