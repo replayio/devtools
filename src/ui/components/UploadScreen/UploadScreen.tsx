@@ -112,7 +112,10 @@ export default function UploadScreen({ recording, userSettings, onUpload }: Uplo
   const recordingId = useGetRecordingId();
   // This is pre-loaded in the parent component.
   const { screenData, loading: loading1 } = hooks.useGetRecordingPhoto(recordingId!);
-  const { workspaces, loading: loading2 } = hooks.useGetNonPendingWorkspaces();
+  const { workspaces: allWorkspaces, loading: loading2 } = hooks.useGetNonPendingWorkspaces();
+
+  const workspaces = allWorkspaces.filter(workspace => workspace.isTest === recording.isTest);
+
   const [showPrivacy, setShowPrivacy] = useState(false);
 
   const [status, setStatus] = useState<Status>(null);
@@ -121,9 +124,15 @@ export default function UploadScreen({ recording, userSettings, onUpload }: Uplo
   // Before being initialized, public/private behaves similarly since non-authors
   // can't view the replay.
   const [isPublic, setIsPublic] = useState(false);
-  const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string>(
-    userSettings?.defaultWorkspaceId || MY_LIBRARY
-  );
+  const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string>(() => {
+    let workspaceId = userSettings?.defaultWorkspaceId;
+
+    if (workspaceId && workspaces.find(workspace => workspace.id === workspaceId)) {
+      return workspaceId;
+    }
+
+    return workspaces[0]?.id ?? MY_LIBRARY;
+  });
 
   const initializeRecording = hooks.useInitializeRecording();
   const updateIsPrivate = hooks.useUpdateIsPrivate();
