@@ -46,11 +46,11 @@ export default function SettingsPreview({
       onClick={canEdit ? onClick : undefined}
       style={{ minHeight: "38px" }}
     >
-      <div className="flex flex-row items-center space-x-2.5">
+      <div className="flex flex-row items-center space-x-2.5 truncate">
         <span className="material-icons" style={{ fontSize: "24px" }}>
           {icon}
         </span>
-        <div className="font-medium">{text}</div>
+        <div className="truncate font-medium">{text}</div>
       </div>
       {canEdit ? (
         <div className="flex flex-row items-center space-x-2">
