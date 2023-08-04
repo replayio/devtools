@@ -76,6 +76,12 @@ const knownExamples: TestExampleFile[] = [
     runtime: "firefox",
   },
   {
+    filename: "cra/dist/index_chromium.html",
+    folder: config.browserExamplesPath,
+    category: "browser",
+    runtime: "chromium",
+  },
+  {
     filename: "doc_async.html",
     folder: config.browserExamplesPath,
     category: "browser",
