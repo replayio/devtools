@@ -34,8 +34,8 @@ export async function recordNodeExample(scriptPath: string) {
   spawnSync(nodePath, [scriptPath], {
     env: {
       ...process.env,
-      RECORD_REPLAY_API_KEY: config.replayApiKey,
-      RECORD_REPLAY_DISPATCH: config.backendUrl,
+      // Note that we _don't_ pass in an API key or dispatch URL - we don't want
+      // replay-node to upload automatically. Instead, we'll upload manually.
       RECORD_REPLAY_DRIVER: config.driverPath,
       RECORD_REPLAY_NODE: nodePath,
       RECORD_REPLAY_RECORDING_ID_FILE: recordingIdFile,
