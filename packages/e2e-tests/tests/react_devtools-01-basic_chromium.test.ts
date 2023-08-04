@@ -5,7 +5,7 @@ import {
   openConsolePanel,
   warpToMessage,
 } from "../helpers/console-panel";
-import { getGetterValue, getPropertyValue } from "../helpers/object-inspector";
+import { getGetterValue } from "../helpers/object-inspector";
 import {
   enableComponentPicker,
   getInspectedItem,
@@ -21,11 +21,20 @@ import test, { expect } from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "cra/dist/index_chromium.html" });
 
-test("react_devtools 01: Basic RDT behavior (Chromium)", async ({
+test.only("react_devtools 01: Basic RDT behavior (Chromium)", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
+  page.on("console", msg => {
+    const text = msg.text();
+    if (/(The resource)|(Download the)/.test(text)) {
+      return;
+    }
+    console.log("Console: ", msg);
+  });
+
   await startTest(page, exampleKey, recordingId);
+
   await openDevToolsTab(page);
 
   // General behavior: should show a React component tree
@@ -46,6 +55,7 @@ test("react_devtools 01: Basic RDT behavior (Chromium)", async ({
   // and hovering over the translated DOM node coordinates.
   await executeTerminalExpression(page, "document.querySelector('li').getBoundingClientRect()");
   const message = await findConsoleMessage(page, "DOMRect");
+  // These show up as getters in Chromium, not properties
   const left = +(await getGetterValue(message, "left"));
   const right = +(await getGetterValue(message, "right"));
   const top = +(await getGetterValue(message, "top"));
@@ -57,7 +67,7 @@ test("react_devtools 01: Basic RDT behavior (Chromium)", async ({
   await enableComponentPicker(page);
   await waitFor(async () => {
     await hoverScreenshot(page, x, y);
-    await expect(await page.locator("[class^=InactiveSelectedElement]").count()).toBeGreaterThan(0);
+    expect(await page.locator("[class^=InactiveSelectedElement]").count()).toBeGreaterThan(0);
   });
 
   await waitForAndCheckInspectedItem(getInspectedItem(page, "Props", "text"), '"Foo"');
@@ -73,7 +83,7 @@ test("react_devtools 01: Basic RDT behavior (Chromium)", async ({
   const highlighter = page.locator("#box-model-content");
   await highlighter.waitFor();
   const expectedHighlighterShape = `M${left},${top} L${right},${top} L${right},${bottom} L${left},${bottom}`;
-  await expect(await highlighter.getAttribute("d")).toEqual(expectedHighlighterShape);
+  expect(await highlighter.getAttribute("d")).toEqual(expectedHighlighterShape);
 
   // React component props inspector works
   component = getReactComponents(page).nth(0);

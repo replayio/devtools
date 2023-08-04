@@ -57,6 +57,8 @@ type StoreWithInternals = Store & {
   _idToElement: Map<number, ElementWithChildren>;
 };
 
+console.log("RDT file executing");
+
 // used by the frontend to communicate with the backend
 class ReplayWall implements Wall {
   private _listener?: (msg: any) => void;
@@ -184,6 +186,7 @@ class ReplayWall implements Wall {
           }
 
           const nodeToElementId = await this.mapNodesToElements();
+          console.log("Enabling node picker");
 
           this.enablePicker({
             name: "reactComponent",
@@ -197,6 +200,7 @@ class ReplayWall implements Wall {
             onHighlightNode: this.highlightNode,
             onUnhighlightNode: this.unhighlightNode,
             onClickOutsideCanvas: () => {
+              console.log("RDT canceling picker");
               // Need to both cancel the Redux logic _and_
               // tell the RDT component to stop inspecting
               this.internalDisablePicker();
