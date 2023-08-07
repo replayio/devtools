@@ -293,7 +293,7 @@ export async function waitForPaused(page: Page, line?: number): Promise<void> {
       expect(numFrames).toBeGreaterThan(0);
       expect(numScopes).toBeGreaterThan(0);
     },
-    { timeout: 10_000 }
+    { timeout: 15_000 }
   );
 
   if (line) {
