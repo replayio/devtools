@@ -76,6 +76,7 @@ import type { UIStore, UIThunkAction } from "./index";
 
 const DEFAULT_FOCUS_WINDOW_PERCENTAGE = 0.3;
 export const MAX_FOCUS_REGION_DURATION = 60_000;
+export const MIN_FOCUS_REGION_DURATION = 10;
 
 export async function setupTimeline(store: UIStore) {
   const dispatch = store.dispatch;
