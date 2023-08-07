@@ -88,12 +88,12 @@ test("react_devtools 01: Basic RDT behavior (FF)", async ({
 
   // Component picker should cancel if you click outside the video
   const componentPicker = await enableComponentPicker(page);
-  expect(await isComponentPickerEnabled(componentPicker)).toBe(true);
+  expect(await isComponentPickerEnabled(page)).toBe(true);
 
   // Click on the "Console" tab should cancel the component picker
   await openConsolePanel(page);
   await openReactDevtoolsPanel(page);
-  await waitFor(async () => expect(await isComponentPickerEnabled(componentPicker)).toBe(false));
+  await waitFor(async () => expect(await isComponentPickerEnabled(page)).toBe(false));
 
   // Jumping to a point before React has initialized
   // should show a message in the React DevTools panel

@@ -16,7 +16,7 @@ import {
   waitForReactComponentCount,
 } from "../helpers/react-devtools-panel";
 import { hoverScreenshot } from "../helpers/screenshot";
-import { waitFor } from "../helpers/utils";
+import { delay, waitFor } from "../helpers/utils";
 import test, { expect } from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "cra/dist/index_chromium.html" });
@@ -25,14 +25,6 @@ test.only("react_devtools 01: Basic RDT behavior (Chromium)", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  page.on("console", msg => {
-    const text = msg.text();
-    if (/(The resource)|(Download the)/.test(text)) {
-      return;
-    }
-    console.log("Console: ", msg);
-  });
-
   const queryParams = new URLSearchParams();
   // Force this test to always re-run the RDT (and other) routines
   // See pref names in packages/shared/user-data/GraphQL/config.ts
@@ -103,13 +95,14 @@ test.only("react_devtools 01: Basic RDT behavior (Chromium)", async ({
   await waitForAndCheckInspectedItem(getInspectedItem(page, "Hooks", "text"), '"Bar"');
 
   // Component picker should cancel if you click outside the video
-  const componentPicker = await enableComponentPicker(page);
-  expect(await isComponentPickerEnabled(componentPicker)).toBe(true);
+  await enableComponentPicker(page);
+  expect(await isComponentPickerEnabled(page)).toBe(true);
 
   // Click on the "Console" tab should cancel the component picker
   await openConsolePanel(page);
   await openReactDevtoolsPanel(page);
-  await waitFor(async () => expect(await isComponentPickerEnabled(componentPicker)).toBe(false));
+  // await delay(10000);
+  await waitFor(async () => expect(await isComponentPickerEnabled(page)).toBe(false));
 
   // Jumping to a point before React has initialized
   // should show a message in the React DevTools panel

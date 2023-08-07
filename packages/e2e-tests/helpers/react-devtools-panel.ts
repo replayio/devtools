@@ -13,18 +13,42 @@ export function getComponentPickerButton(page: Page) {
   );
 }
 
-export async function isComponentPickerEnabled(componentPicker: Locator) {
-  const classes = await getElementClasses(componentPicker);
-  return classes.some(c => c.startsWith("ToggleOn"));
+async function isReactPanelComponentPickerEnabled(page: Page) {
+  const locator = page.locator("[data-testname=ReactPanelPickerStatus]");
+  const statusString = await locator.getAttribute("data-component-picker-active");
+  return statusString === "true";
+}
+
+async function isRDTInternalComponentPickerEnabled(page: Page) {
+  const componentPicker = getComponentPickerButton(page);
+  const internalToggleClasses = await getElementClasses(componentPicker);
+  const internalToggleEnabled = internalToggleClasses.some(c => c.startsWith("ToggleOn"));
+  return internalToggleEnabled;
+}
+
+export async function isComponentPickerEnabled(page: Page) {
+  const internalToggleEnabled = await isRDTInternalComponentPickerEnabled(page);
+
+  let panelPickerEnabled: boolean = false;
+  await waitFor(async () => {
+    // It takes time for our parent panel to receive the message.
+    // Wait until they agree on the status.
+    panelPickerEnabled = await isReactPanelComponentPickerEnabled(page);
+
+    expect(internalToggleEnabled).toBe(panelPickerEnabled);
+  });
+  return internalToggleEnabled && panelPickerEnabled;
 }
 
 export async function enableComponentPicker(page: Page) {
   const componentPicker = getComponentPickerButton(page);
-  if (await isComponentPickerEnabled(componentPicker)) {
+  // Check just the toggle button here, not the outer panel status
+  if (await isRDTInternalComponentPickerEnabled(page)) {
     await componentPicker.click();
+    await waitFor(async () => expect(await isComponentPickerEnabled(page)).toBe(false));
   }
   await componentPicker.click();
-  await waitFor(async () => expect(await isComponentPickerEnabled(componentPicker)).toBe(true));
+  await waitFor(async () => expect(await isComponentPickerEnabled(page)).toBe(true));
 
   return componentPicker;
 }
