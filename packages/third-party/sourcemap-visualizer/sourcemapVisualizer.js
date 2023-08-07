@@ -390,6 +390,7 @@ export default function renderSourcemap(source, sourcemap, url, document) {
 
     generatedTextArea = createTextArea({
       sourceIndex: null,
+      unsortedSources: sm.sources,
       text: code,
       mappings: sm.data,
       mappingsOffset: 0,
@@ -613,7 +614,7 @@ export default function renderSourcemap(source, sourcemap, url, document) {
     return { lines, longestLineInColumns };
   }
 
-  function createTextArea({ sourceIndex, unsortedSourceIndex, text, mappings, mappingsOffset, otherSource, originalName, bounds }) {
+  function createTextArea({ sourceIndex, unsortedSourceIndex, unsortedSources, text, mappings, mappingsOffset, otherSource, originalName, bounds }) {
     const shadowWidth = 16;
     const textPaddingX = 5;
     const textPaddingY = 1;
@@ -941,7 +942,9 @@ export default function renderSourcemap(source, sourcemap, url, document) {
               generatedTextArea.scrollTo(hover.mapping.generatedColumn, hover.mapping.generatedLine);
             } else {
               if (originalTextArea.unsortedSourceIndex !== hover.mapping.originalSource) {
-                fileList.selectedIndex = hover.mapping.originalSource;
+                const source = unsortedSources[hover.mapping.originalSource];
+                const sortedIndex = [...fileList.options].findIndex(option => option.text === source.name);
+                fileList.selectedIndex = sortedIndex;
                 fileList.onchange();
               }
               originalTextArea.scrollTo(hover.mapping.originalColumn, hover.mapping.originalLine);
