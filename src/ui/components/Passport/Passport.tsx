@@ -40,7 +40,7 @@ const Passport = () => {
   const showShareNag = shouldShowShareNag(nags);
   const showUseFocusMode = shouldShowUseFocusMode(nags);
 
-  type StepNames = typeof stepNames[number];
+  type StepNames = (typeof stepNames)[number];
   const videoExampleRef = useRef<HTMLImageElement>(null);
   const [videoHeight, setVideoHeight] = useState<number | null>(null);
 
@@ -255,7 +255,7 @@ const Passport = () => {
       <div className={styles.section}>
         <div className={classnames("flex", styles.headerItem)}>
           <Icon className={styles.stepIcon} type={stepNames[sectionIndex]} />
-          <span className={`${styles.ml2}`}>{section.title}</span>
+          <span className={`${styles.title}`}>{section.title}</span>
         </div>
         <div className={styles.checklist}>
           {section.items.map((item: ItemType, itemIndex: number) => (
@@ -268,7 +268,7 @@ const Passport = () => {
               data-test-completed={item.completed}
             >
               <Icon className={styles.stepIcon} type={renderCheckmarkIcon(item.completed)} />
-              <span className={styles.ml2}>{item.label}</span>
+              <span className={styles.title}>{item.label}</span>
             </div>
           ))}
         </div>
@@ -296,9 +296,8 @@ const Passport = () => {
           }}
         />
       )}
-      <div className="my-2 p-2">
-        <img src={`/images/passport/passportHeader.svg`} className={`w-full px-1`} />
-      </div>
+      <div className={styles.ToolbarHeader}>Passport</div>
+
       <div className="flex-grow overflow-auto">
         <div className="p-2">
           <div className={styles.sectionsContainer}>

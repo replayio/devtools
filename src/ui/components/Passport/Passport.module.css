@@ -11,9 +11,21 @@
   overflow-x: hidden;
 }
 
+.ToolbarHeader {
+  font-size: 14px;
+  line-height: 1.25rem;
+  font-weight: 600;
+  color: #4584e1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid #4583e184;
+}
+
 .checklist {
   padding: 6px 0 12px;
-  font-size: 16px;
+  font-size: 14px;
   height: 100%;
   flex: 1;
   overflow-y: auto;
@@ -24,9 +36,7 @@
 .headerItem {
   display: flex;
   align-items: center;
-  padding: 0.2rem;
   padding-left: 0.4rem;
-  border-radius: 3rem;
   margin-bottom: 1px;
   z-index: var(--z-index-1);
   white-space: nowrap;
@@ -48,7 +58,7 @@
 
 .headerItem {
   font-weight: 600;
-  font-size: 16px;
+  font-size: 14px;
   display: flex;
   align-items: center;
   position: relative;
@@ -56,7 +66,7 @@
 
 .checklistItem.selectedItem,
 .checklistItem.selectedItem:hover {
-  background-color: rgba(63, 150, 238, 0.4);
+  background-color: rgba(63, 150, 238, 0.3);
   z-index: var(--z-index-1);
 }
 
@@ -70,7 +80,7 @@
   border-bottom-right-radius: 6px;
   z-index: var(--z-index-1);
   width: 100%;
-  margin-bottom: 115px;
+  margin-bottom: 105px;
 }
 
 .largeCompletedImage {
@@ -93,8 +103,8 @@
   vertical-align: middle;
 }
 
-.ml2 {
-  margin-left: 0.5rem;
+.title {
+  margin-left: 0.25rem;
 }
 
 .checklist div:hover {
