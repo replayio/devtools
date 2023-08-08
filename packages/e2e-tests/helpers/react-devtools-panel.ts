@@ -1,5 +1,6 @@
 import { Locator, Page, expect } from "@playwright/test";
 
+import { openConsolePanel, warpToMessage } from "./console-panel";
 import { getElementClasses, waitFor } from "./utils";
 
 export async function checkInspectedItemValue(item: Locator, expectedValue: string) {
@@ -79,4 +80,15 @@ export async function waitForReactComponentCount(page: Page, expected: number) {
 export async function waitForAndCheckInspectedItem(item: Locator, expectedValue: string) {
   await item.waitFor();
   await checkInspectedItemValue(item, expectedValue);
+}
+
+export async function jumpToMessageAndCheckComponents(
+  page: Page,
+  message: string,
+  componentCount: number
+) {
+  await openConsolePanel(page);
+  await warpToMessage(page, message);
+  await openReactDevtoolsPanel(page);
+  await waitForReactComponentCount(page, componentCount);
 }

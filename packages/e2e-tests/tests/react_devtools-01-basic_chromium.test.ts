@@ -3,7 +3,6 @@ import {
   executeTerminalExpression,
   findConsoleMessage,
   openConsolePanel,
-  warpToMessage,
 } from "../helpers/console-panel";
 import { getGetterValue } from "../helpers/object-inspector";
 import {
@@ -11,13 +10,13 @@ import {
   getInspectedItem,
   getReactComponents,
   isComponentPickerEnabled,
+  jumpToMessageAndCheckComponents,
   openReactDevtoolsPanel,
   waitForAndCheckInspectedItem,
-  waitForReactComponentCount,
 } from "../helpers/react-devtools-panel";
 import { hoverScreenshot } from "../helpers/screenshot";
 import { delay, waitFor } from "../helpers/utils";
-import test, { expect } from "../testFixtureCloneRecording";
+import test, { Page, expect } from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "cra/dist/index_chromium.html" });
 
@@ -35,16 +34,25 @@ test.only("react_devtools 01: Basic RDT behavior (Chromium)", async ({
   await openDevToolsTab(page);
 
   // General behavior: should show a React component tree
-  await openConsolePanel(page);
-  await warpToMessage(page, "Initial list");
-  await openReactDevtoolsPanel(page);
-  await waitForReactComponentCount(page, 3);
+  await jumpToMessageAndCheckComponents(page, "Initial list", 3);
 
   // and should update the tree based on time
-  await openConsolePanel(page);
-  await warpToMessage(page, "Added an entry");
-  await openReactDevtoolsPanel(page);
-  await waitForReactComponentCount(page, 4);
+  await jumpToMessageAndCheckComponents(page, "Added an entry", 4);
+
+  // Should be able to jump backwards okay
+  await jumpToMessageAndCheckComponents(page, "Initial list", 3);
+
+  // Jumping to a point before React has initialized
+  // should show a message in the React DevTools panel
+  await page.locator(".progress-bar").click({ position: { x: 0, y: 16 } });
+  await page
+    .locator(
+      ".secondary-toolbox-content:has-text('Try picking a different point on the timeline.')"
+    )
+    .waitFor();
+
+  // And back to a later point should still work
+  await jumpToMessageAndCheckComponents(page, "Added an entry", 4);
 
   // Verify that the React component picker
   // works, by manually calculating the coordinates of
@@ -69,10 +77,7 @@ test.only("react_devtools 01: Basic RDT behavior (Chromium)", async ({
 
   await waitForAndCheckInspectedItem(getInspectedItem(page, "Props", "text"), '"Foo"');
 
-  await openConsolePanel(page);
-  await warpToMessage(page, "Removed an entry");
-  await openReactDevtoolsPanel(page);
-  await waitForReactComponentCount(page, 3);
+  await jumpToMessageAndCheckComponents(page, "Removed an entry", 3);
 
   // Hovering components should highlight in the video preview
   let component = getReactComponents(page).nth(2);
@@ -101,15 +106,5 @@ test.only("react_devtools 01: Basic RDT behavior (Chromium)", async ({
   // Click on the "Console" tab should cancel the component picker
   await openConsolePanel(page);
   await openReactDevtoolsPanel(page);
-  // await delay(10000);
   await waitFor(async () => expect(await isComponentPickerEnabled(page)).toBe(false));
-
-  // Jumping to a point before React has initialized
-  // should show a message in the React DevTools panel
-  await page.locator(".progress-bar").click({ position: { x: 0, y: 16 } });
-  await page
-    .locator(
-      ".secondary-toolbox-content:has-text('Try picking a different point on the timeline.')"
-    )
-    .waitFor();
 });
