@@ -27,7 +27,7 @@ const testWithCloneRecording = base.extend<TestIsolatedRecordingFixture>({
       // recordingId: exampleRecordings[exampleKey],
     });
 
-    // await deleteTestRecording(newRecordingId);
+    await deleteTestRecording(newRecordingId);
   },
 });
 export default testWithCloneRecording;
