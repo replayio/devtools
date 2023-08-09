@@ -6,6 +6,7 @@ import { userData } from "shared/user-data/GraphQL/UserData";
 import * as actions from "ui/actions/app";
 import { setSelectedPrimaryPanel } from "ui/actions/layout";
 import { isTestSuiteReplay } from "ui/components/TestSuite/utils/isTestSuiteReplay";
+import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { getSelectedSource } from "ui/reducers/sources";
 import { UIState } from "ui/state";
 
@@ -13,22 +14,23 @@ import { PrimaryButton, SecondaryButton } from "../Button";
 import { Dialog, DialogActions, DialogDescription, DialogLogo, DialogTitle } from "../Dialog";
 import Modal from "../NewModal";
 
-const isNextUrl = (url: string | undefined) => url && url.includes("/_next/");
-
 function SourcemapSetupModal({
   hideModal,
-  selectedSource,
   setSelectedPrimaryPanel,
-  setModal,
+  selectedSource,
 }: PropsFromRedux) {
-  const { url } = selectedSource;
-  const isNext = isNextUrl(url);
+  const recordingId = useGetRecordingId();
+  const { recording } = useGetRecording(recordingId);
 
   const onClickOk = () => {
+    let initialPrimaryPanel;
     userData.set("feature_showPassport", false);
-    const initialPrimaryPanel = "events";
+    if (recording && isTestSuiteReplay(recording)) {
+      initialPrimaryPanel = "cypress";
+    } else {
+      initialPrimaryPanel = "events";
+    }
     setSelectedPrimaryPanel(initialPrimaryPanel);
-    setModal("settings", { view: "preferences" });
     hideModal();
   };
 
@@ -62,7 +64,11 @@ const connector = connect(
   (state: UIState) => ({
     selectedSource: getSelectedSource(state)!,
   }),
-  { hideModal: actions.hideModal, setSelectedPrimaryPanel, setModal: actions.setModal }
+  {
+    hideModal: actions.hideModal,
+    setSelectedPrimaryPanel,
+  }
 );
+
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(SourcemapSetupModal);
