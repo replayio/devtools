@@ -8,6 +8,7 @@ import { isTestSuiteReplay } from "ui/components/TestSuite/utils/isTestSuiteRepl
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { getSelectedSource } from "ui/reducers/sources";
 import { UIState } from "ui/state";
+import { PrimaryPanelName } from "ui/state/layout";
 
 import { PrimaryButton, SecondaryButton } from "../Button";
 import { Dialog, DialogActions, DialogDescription, DialogLogo, DialogTitle } from "../Dialog";
@@ -23,7 +24,7 @@ function PassportDismissModal({
   const { recording } = useGetRecording(recordingId);
 
   const confirmDismiss = () => {
-    let initialPrimaryPanel;
+    let initialPrimaryPanel: PrimaryPanelName;
     userData.set("feature_showPassport", false);
     if (recording && isTestSuiteReplay(recording)) {
       initialPrimaryPanel = "cypress";
@@ -51,7 +52,11 @@ function PassportDismissModal({
             <PrimaryButton color="blue" onClick={confirmDismiss}>
               OK
             </PrimaryButton>
-            <SecondaryButton onClick={cancelDismiss} className={styles.secondaryButton}>
+            <SecondaryButton
+              color="gray"
+              onClick={cancelDismiss}
+              className={styles.secondaryButton}
+            >
               Cancel
             </SecondaryButton>
           </div>
