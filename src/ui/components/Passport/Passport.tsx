@@ -4,6 +4,7 @@ import { ConnectedProps, connect } from "react-redux";
 
 import Icon from "replay-next/components/Icon";
 import * as actions from "ui/actions/app";
+import { isTestSuiteReplay } from "ui/components/TestSuite/utils/isTestSuiteReplay";
 import hooks from "ui/hooks";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
@@ -317,7 +318,7 @@ const Passport = (props: PropsFromRedux) => {
         />
       )}
 
-      {showWelcome ? (
+      {showWelcome && recording && isTestSuiteReplay(recording) ? (
         <div className={styles.TestsuitesPassportWelcome}>
           <h2>Passport</h2>
           <p>
