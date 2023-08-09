@@ -29,6 +29,8 @@ type PrimaryPanelName = "events" | "cypress" | string;
 const stepNames = ["step-one", "step-two", "step-three", "step-four"] as const;
 
 const Passport = (props: PropsFromRedux) => {
+  const [showWelcome, setShowWelcome] = useState(localStorage.getItem("passportNUX") !== "true");
+
   const recordingId = useGetRecordingId();
   const { recording } = useGetRecording(recordingId);
   const [selectedIndices, setSelectedIndices] = useState({ sectionIndex: 0, itemIndex: 0 });
@@ -51,6 +53,12 @@ const Passport = (props: PropsFromRedux) => {
   type StepNames = (typeof stepNames)[number];
   const videoExampleRef = useRef<HTMLImageElement>(null);
   const [videoHeight, setVideoHeight] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (showWelcome) {
+      localStorage.setItem("passportNUX", "true");
+    }
+  }, [showWelcome]);
 
   useLayoutEffect(() => {
     const videoExample = videoExampleRef.current;
@@ -308,12 +316,23 @@ const Passport = (props: PropsFromRedux) => {
           }}
         />
       )}
-      <div className={styles.ToolbarHeader}>
-        Passport
-        <button className={styles.close} onClick={hideFeatureShowPassport}>
-          <Icon type="close" />
-        </button>
-      </div>
+
+      {showWelcome ? (
+        <div className={styles.TestsuitesPassportWelcome}>
+          <h2>Passport</h2>
+          <p>
+            This sidebar shows some of our most helpful features alongside a little video. Try
+            clicking around to learn more!
+          </p>
+        </div>
+      ) : (
+        <div className={styles.ToolbarHeader}>
+          Passport
+          <button className={styles.close} onClick={hideFeatureShowPassport}>
+            <Icon type="close" />
+          </button>
+        </div>
+      )}
 
       <div className="flex-grow overflow-auto">
         <div className="p-2">
