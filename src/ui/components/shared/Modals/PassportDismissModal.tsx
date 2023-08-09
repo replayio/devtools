@@ -1,4 +1,3 @@
-import classNames from "classnames";
 import React from "react";
 import { ConnectedProps, connect } from "react-redux";
 
@@ -13,8 +12,9 @@ import { UIState } from "ui/state";
 import { PrimaryButton, SecondaryButton } from "../Button";
 import { Dialog, DialogActions, DialogDescription, DialogLogo, DialogTitle } from "../Dialog";
 import Modal from "../NewModal";
+import styles from "./modal.module.css";
 
-function SourcemapSetupModal({
+function PassportDismissModal({
   hideModal,
   setSelectedPrimaryPanel,
   selectedSource,
@@ -22,7 +22,7 @@ function SourcemapSetupModal({
   const recordingId = useGetRecordingId();
   const { recording } = useGetRecording(recordingId);
 
-  const onClickOk = () => {
+  const confirmDismiss = () => {
     let initialPrimaryPanel;
     userData.set("feature_showPassport", false);
     if (recording && isTestSuiteReplay(recording)) {
@@ -34,23 +34,24 @@ function SourcemapSetupModal({
     hideModal();
   };
 
-  const onClickDismiss = () => {
+  const cancelDismiss = () => {
     hideModal();
   };
 
   return (
     <Modal options={{ maskTransparency: "translucent" }} onMaskClick={hideModal}>
-      <Dialog showFooterLinks={false}>
-        <DialogTitle>Dismiss Passport? </DialogTitle>
-        <DialogDescription>
-          Passport can be re-enabled from settings if you'd like.
+      <Dialog className={styles.passportBackground} showFooterLinks={false}>
+        <div className={styles.stamp}></div>
+        <DialogTitle>Dismiss Passport?</DialogTitle>
+        <DialogDescription className={styles.buttonContainer}>
+          This feature can be re-enabled from settings.
         </DialogDescription>
         <DialogActions>
-          <div className="flex w-full flex-col items-center">
-            <PrimaryButton color="blue" onClick={onClickOk}>
+          <div className={styles.buttonContainer}>
+            <PrimaryButton color="blue" onClick={confirmDismiss}>
               OK
             </PrimaryButton>
-            <SecondaryButton color="gray" onClick={onClickDismiss}>
+            <SecondaryButton onClick={cancelDismiss} className={styles.secondaryButton}>
               Cancel
             </SecondaryButton>
           </div>
@@ -71,4 +72,4 @@ const connector = connect(
 );
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
-export default connector(SourcemapSetupModal);
+export default connector(PassportDismissModal);
