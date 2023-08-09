@@ -23,21 +23,22 @@ export type ModalOptionsType = {
 } | null;
 
 export type ModalType =
-  | "sharing"
-  | "login"
-  | "settings"
-  | "new-workspace"
-  | "workspace-settings"
-  | "onboarding"
-  | "single-invite"
-  | "browser-launch"
-  | "first-replay"
-  | "download-replay"
-  | "privacy"
-  | "loom"
   | "attachment"
+  | "browser-launch"
+  | "download-replay"
+  | "first-replay"
+  | "login"
+  | "loom"
+  | "new-workspace"
+  | "onboarding"
+  | "passport-dismiss"
+  | "privacy"
+  | "rename-replay"
+  | "settings"
+  | "sharing"
+  | "single-invite"
   | "sourcemap-setup"
-  | "rename-replay";
+  | "workspace-settings";
 export type WorkspaceId = string;
 export type WorkspaceUuid = string;
 export type SettingsTabTitle =

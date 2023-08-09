@@ -98,7 +98,7 @@ export const DialogDescription = ({
   ...props
 }: HTMLProps<HTMLParagraphElement>) => {
   return (
-    <p {...props} className="break-word mb-2 whitespace-pre-wrap px-6 text-center text-sm">
+    <p {...props} className="break-word z-40 mb-2 whitespace-pre-wrap px-6 text-center text-sm">
       {children}
     </p>
   );

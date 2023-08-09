@@ -12,6 +12,9 @@
 }
 
 .ToolbarHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   font-size: 14px;
   line-height: 1.25rem;
   font-weight: 600;
@@ -23,6 +26,13 @@
   border-bottom: 1px solid #4583e184;
 }
 
+.close {
+  cursor: pointer;
+}
+
+.close:hover {
+  opacity: 0.7;
+}
 .checklist {
   padding: 6px 0 12px;
   font-size: 14px;

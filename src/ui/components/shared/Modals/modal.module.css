@@ -1,0 +1,30 @@
+.passportBackground {
+  position: relative;
+  background-image: url(/images/passport/passportBG.png);
+  background-repeat: repeat;
+  color: #38383d;
+  padding-top: 2rem;
+}
+
+.stamp {
+  background-image: url(/images/passport/tour_grad-default.png);
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 100px;
+  width: 100px;
+  bottom: 4px;
+  right: 9px;
+  position: absolute;
+  rotate: 9deg;
+}
+
+.buttonContainer {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.secondaryButton {
+  background-color: #dde5ed;
+  border: 1px solid #3c9ff8;
+}

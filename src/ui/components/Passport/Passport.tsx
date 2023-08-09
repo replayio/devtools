@@ -1,8 +1,12 @@
 import classnames from "classnames";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { ConnectedProps, connect } from "react-redux";
 
 import Icon from "replay-next/components/Icon";
+import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
+import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import {
   shouldShowAddComment,
   shouldShowAddUnicornBadge,
@@ -21,9 +25,12 @@ import {
 
 import styles from "./Passport.module.css";
 
+type PrimaryPanelName = "events" | "cypress" | string;
 const stepNames = ["step-one", "step-two", "step-three", "step-four"] as const;
 
-const Passport = () => {
+const Passport = (props: PropsFromRedux) => {
+  const recordingId = useGetRecordingId();
+  const { recording } = useGetRecording(recordingId);
   const [selectedIndices, setSelectedIndices] = useState({ sectionIndex: 0, itemIndex: 0 });
   const { nags } = hooks.useGetUserInfo();
   const showAddComment = shouldShowAddComment(nags);
@@ -39,6 +46,7 @@ const Passport = () => {
   const showSearchSourceText = shouldShowSearchSourceText(nags);
   const showShareNag = shouldShowShareNag(nags);
   const showUseFocusMode = shouldShowUseFocusMode(nags);
+  const dispatch = useAppDispatch();
 
   type StepNames = (typeof stepNames)[number];
   const videoExampleRef = useRef<HTMLImageElement>(null);
@@ -78,6 +86,10 @@ const Passport = () => {
 
   const handleClick = (sectionIndex: number, itemIndex: number) => {
     setSelectedIndices({ sectionIndex, itemIndex });
+  };
+
+  const hideFeatureShowPassport = () => {
+    props.setModal("passport-dismiss");
   };
 
   const timeTravelItems = [
@@ -296,7 +308,12 @@ const Passport = () => {
           }}
         />
       )}
-      <div className={styles.ToolbarHeader}>Passport</div>
+      <div className={styles.ToolbarHeader}>
+        Passport
+        <button className={styles.close} onClick={hideFeatureShowPassport}>
+          <Icon type="close" />
+        </button>
+      </div>
 
       <div className="flex-grow overflow-auto">
         <div className="p-2">
@@ -328,4 +345,8 @@ const Passport = () => {
   );
 };
 
-export default Passport;
+const connector = connect(null, {
+  setModal: actions.setModal,
+});
+type PropsFromRedux = ConnectedProps<typeof connector>;
+export default connector(Passport);

@@ -24,6 +24,7 @@ import { ConfirmRenderer } from "./shared/Confirm";
 import AppErrors from "./shared/Error";
 import LoginModal from "./shared/LoginModal";
 import LoomModal from "./shared/LoomModal";
+import PassportDismissModal from "./shared/Modals/PassportDismissModal";
 import RenameReplayModal from "./shared/Modals/RenameReplayModal";
 import NewAttachment from "./shared/NewAttachment";
 import PrivacyModal from "./shared/PrivacyModal";
@@ -106,6 +107,9 @@ function AppModal({ hideModal, modal }: { hideModal: () => void; modal: ModalTyp
     }
     case "rename-replay": {
       return <RenameReplayModal />;
+    }
+    case "passport-dismiss": {
+      return <PassportDismissModal />;
     }
     default: {
       return null;
