@@ -1,7 +1,7 @@
 import { Locator, Page, expect } from "@playwright/test";
 
 import { openConsolePanel, warpToMessage } from "./console-panel";
-import { getElementClasses, waitFor } from "./utils";
+import { getByTestName, getElementClasses, waitFor } from "./utils";
 
 export async function checkInspectedItemValue(item: Locator, expectedValue: string) {
   const value = await getInspectedItemValue(item);
@@ -15,7 +15,7 @@ export function getComponentPickerButton(page: Page) {
 }
 
 async function isReactPanelComponentPickerEnabled(page: Page) {
-  const locator = page.locator("[data-testname=ReactPanelPickerStatus]");
+  const locator = getByTestName(page, "ReactPanelPickerStatus");
   const statusString = await locator.getAttribute("data-component-picker-active");
   return statusString === "true";
 }
@@ -68,6 +68,13 @@ export function getReactComponents(page: Page) {
   return page.locator(`[class^=Tree] [data-testname="ComponentTreeListItem"]`);
 }
 
+export function getSelectedComponent(page: Page) {
+  // might be either "SelectedElement" or "InactiveSelectedElement"
+  return page.locator(
+    `[class^=Tree] [data-testname="ComponentTreeListItem"][class*=SelectedElement]`
+  );
+}
+
 export async function openReactDevtoolsPanel(page: Page) {
   await page.locator('[data-test-id="PanelButton-react-components"]').click();
 }
@@ -94,16 +101,57 @@ export async function jumpToMessageAndCheckComponents(
 }
 
 export async function getComponentName(componentLocator: Locator): Promise<string> {
+  const wrapper = componentLocator.locator("[class^=Wrapper]");
   // The RDT tree list item has a child text node with the component name.
   // I can't find a way to get literally just the text node via Playwright locators,
   // so we'll do this the hard way.
-  const childName = await componentLocator.evaluate(el => {
-    for (const child of Array.from(el.childNodes)) {
-      if (child.nodeType === Node.TEXT_NODE) {
-        return child.textContent ?? "";
+  const childName = await wrapper.evaluate(el => {
+    const childNodes = Array.from(el.childNodes);
+    const textNode = childNodes.find(node => node.nodeType === Node.TEXT_NODE);
+    if (textNode) {
+      return textNode.textContent ?? "";
+    } else {
+      // When selected or highlighted, the component name is wrapped in
+      // combination of `<span>` and  <mark> tags, like this search for "zyOff":
+      // <span>La</span><mark>zyOff</mark><span>screen</span>
+      let name = "";
+      for (const child of childNodes) {
+        if (child.nodeName === "SPAN" || child.nodeName === "MARK") {
+          console.log("Found partial name: ", (child as HTMLElement).textContent, child.nodeName);
+          name += (child as HTMLElement).textContent ?? "";
+        }
       }
+      return name;
     }
+
     return "";
   });
   return childName;
+}
+
+export async function getComponentSearchResultsCount(
+  page: Page
+): Promise<{ current: number; total: number } | null> {
+  const resultsCount = getByTestName(page, "ComponentSearchInput-ResultsCount");
+  if (!(await resultsCount.isVisible())) {
+    return null;
+  }
+  const text = await resultsCount.textContent();
+  if (!text) {
+    return null;
+  }
+  const [currentString, totalString] = text.split(" |");
+  return { current: parseInt(currentString), total: parseInt(totalString) };
+}
+
+export async function getAllVisibleComponentNames(components: Locator) {
+  const numComponents = await components.count();
+  const componentNames: string[] = await Promise.all(
+    Array.from({ length: numComponents }).map(async (_, i) => {
+      const component = components.nth(i);
+      const name = await getComponentName(component);
+      return name;
+    })
+  );
+  return componentNames;
 }

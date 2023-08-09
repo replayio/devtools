@@ -148,7 +148,10 @@ export async function waitFor(
 export const getElementClasses = (loc: Locator) => loc.evaluate(el => Array.from(el.classList));
 
 export const getByTestName = (parent: Page | Locator, testName: string) => {
-  return parent.locator(`[data-test-name="${testName}"]`);
+  // Sometimes there's a space, sometimes not
+  return parent
+    .locator(`[data-test-name="${testName}"]`)
+    .or(parent.locator(`[data-testname="${testName}"]`));
 };
 
 export async function locatorTextToNumber(locator: Locator): Promise<number | null> {
