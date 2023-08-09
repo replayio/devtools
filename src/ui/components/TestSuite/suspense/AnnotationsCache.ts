@@ -28,6 +28,30 @@ export const AnnotationsCache = createSingleEntryCacheWithTelemetry<
   },
 });
 
+export const PlaywrightAnnotationsCache = createSingleEntryCacheWithTelemetry<
+  [client: ReplayClientInterface],
+  Annotation[]
+>({
+  debugLabel: "PlaywrightAnnotationsCache",
+  load: async ([client]) => {
+    const sortedAnnotations: Annotation[] = [];
+
+    await client.findAnnotations("replay-playwright", annotation => {
+      const processedAnnotation = {
+        point: annotation.point,
+        time: annotation.time,
+        message: JSON.parse(annotation.contents).message,
+      };
+
+      insert(sortedAnnotations, processedAnnotation, (a, b) =>
+        compareNumericStrings(a.point, b.point)
+      );
+    });
+
+    return sortedAnnotations;
+  },
+});
+
 function parseContents(contents: string) {
   const parsed = JSON.parse(contents);
 
