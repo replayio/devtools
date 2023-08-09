@@ -65,7 +65,7 @@ export function getInspectedItemValue(item: Locator) {
 }
 
 export function getReactComponents(page: Page) {
-  return page.locator("[class^=Tree] [class^=Wrapper]");
+  return page.locator(`[class^=Tree] [data-testname="ComponentTreeListItem"]`);
 }
 
 export async function openReactDevtoolsPanel(page: Page) {
@@ -91,4 +91,19 @@ export async function jumpToMessageAndCheckComponents(
   await warpToMessage(page, message);
   await openReactDevtoolsPanel(page);
   await waitForReactComponentCount(page, componentCount);
+}
+
+export async function getComponentName(componentLocator: Locator): Promise<string> {
+  // The RDT tree list item has a child text node with the component name.
+  // I can't find a way to get literally just the text node via Playwright locators,
+  // so we'll do this the hard way.
+  const childName = await componentLocator.evaluate(el => {
+    for (const child of Array.from(el.childNodes)) {
+      if (child.nodeType === Node.TEXT_NODE) {
+        return child.textContent ?? "";
+      }
+    }
+    return "";
+  });
+  return childName;
 }

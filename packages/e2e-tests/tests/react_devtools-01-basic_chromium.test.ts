@@ -33,6 +33,9 @@ test.only("react_devtools 01: Basic RDT behavior (Chromium)", async ({
 
   await openDevToolsTab(page);
 
+  // If the "React" tab shows up, we know that the routine ran
+  await openReactDevtoolsPanel(page);
+
   // General behavior: should show a React component tree
   await jumpToMessageAndCheckComponents(page, "Initial list", 3);
 

@@ -295,6 +295,7 @@ const knownExamples: TestExampleFile[] = [
   // and "flake" are not listed here. We don't re-record those
   // ourselves. Instead we use specific recordings from CI runs
   // in those benchmark repos.
+  // Similarly, the "breakpoints-01" recording is not listed here.
   // See README.md for instructions on updating those recording IDs.
 ];
 
