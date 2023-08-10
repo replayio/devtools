@@ -24,7 +24,7 @@ export default function Collaborators({ recordingId }: CollaboratorsProps) {
         <div className="border border-transparent">
           <EmailForm recordingId={recordingId} />
         </div>
-        <CollaboratorsList {...{ owner, collaborators }} />
+        {owner ? <CollaboratorsList owner={owner} collaborators={collaborators} /> : null}
       </section>
     </>
   );
