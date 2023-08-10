@@ -280,6 +280,10 @@ export const config = {
     defaultValue: Boolean(false),
     legacyKey: "devtools.debugger.sources-collapsed",
   },
+  layout_testsuitesPassportFirstRun: {
+    defaultValue: Boolean(true),
+    legacyKey: null,
+  },
 
   protocol_chromiumRepaints: {
     defaultValue: Boolean(true),

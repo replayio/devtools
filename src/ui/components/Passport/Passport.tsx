@@ -3,6 +3,8 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
 import Icon from "replay-next/components/Icon";
+import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
+import { userData } from "shared/user-data/GraphQL/UserData";
 import * as actions from "ui/actions/app";
 import { isTestSuiteReplay } from "ui/components/TestSuite/utils/isTestSuiteReplay";
 import hooks from "ui/hooks";
@@ -30,8 +32,8 @@ type PrimaryPanelName = "events" | "cypress" | string;
 const stepNames = ["step-one", "step-two", "step-three", "step-four"] as const;
 
 const Passport = (props: PropsFromRedux) => {
-  const [showTestsuitesPassportWelcome, setshowTestsuitesPassportWelcome] = useState(
-    localStorage.getItem("TestsuitesPassportWelcome") !== "true"
+  const [showTestsuitesPassportFirstRun, setShowTestsuitesPassportFirstRun] = useState(
+    userData.get("layout_testsuitesPassportFirstRun") !== false
   );
 
   const recordingId = useGetRecordingId();
@@ -58,10 +60,10 @@ const Passport = (props: PropsFromRedux) => {
   const [videoHeight, setVideoHeight] = useState<number | null>(null);
 
   useEffect(() => {
-    if (showTestsuitesPassportWelcome) {
-      localStorage.setItem("TestsuitesPassportWelcome", "true");
+    if (showTestsuitesPassportFirstRun) {
+      userData.set("layout_testsuitesPassportFirstRun", false);
     }
-  }, [showTestsuitesPassportWelcome]);
+  }, [showTestsuitesPassportFirstRun]);
 
   useLayoutEffect(() => {
     const videoExample = videoExampleRef.current;
@@ -320,7 +322,7 @@ const Passport = (props: PropsFromRedux) => {
         />
       )}
 
-      {showTestsuitesPassportWelcome && recording && isTestSuiteReplay(recording) ? (
+      {showTestsuitesPassportFirstRun && recording && isTestSuiteReplay(recording) ? (
         <div className={styles.TestsuitesPassportWelcome}>
           <h2>Passport</h2>
           <p>
