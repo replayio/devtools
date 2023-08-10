@@ -3,7 +3,10 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
 import Icon from "replay-next/components/Icon";
+import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
+import { userData } from "shared/user-data/GraphQL/UserData";
 import * as actions from "ui/actions/app";
+import { isTestSuiteReplay } from "ui/components/TestSuite/utils/isTestSuiteReplay";
 import hooks from "ui/hooks";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
@@ -29,6 +32,10 @@ type PrimaryPanelName = "events" | "cypress" | string;
 const stepNames = ["step-one", "step-two", "step-three", "step-four"] as const;
 
 const Passport = (props: PropsFromRedux) => {
+  const [showTestsuitesPassportFirstRun, setShowTestsuitesPassportFirstRun] = useState(
+    userData.get("layout_testsuitesPassportFirstRun") !== false
+  );
+
   const recordingId = useGetRecordingId();
   const { recording } = useGetRecording(recordingId);
   const [selectedIndices, setSelectedIndices] = useState({ sectionIndex: 0, itemIndex: 0 });
@@ -51,6 +58,12 @@ const Passport = (props: PropsFromRedux) => {
   type StepNames = (typeof stepNames)[number];
   const videoExampleRef = useRef<HTMLImageElement>(null);
   const [videoHeight, setVideoHeight] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (showTestsuitesPassportFirstRun) {
+      userData.set("layout_testsuitesPassportFirstRun", false);
+    }
+  }, [showTestsuitesPassportFirstRun]);
 
   useLayoutEffect(() => {
     const videoExample = videoExampleRef.current;
@@ -308,12 +321,23 @@ const Passport = (props: PropsFromRedux) => {
           }}
         />
       )}
-      <div className={styles.ToolbarHeader}>
-        Passport
-        <button className={styles.close} onClick={hideFeatureShowPassport}>
-          <Icon type="close" />
-        </button>
-      </div>
+
+      {showTestsuitesPassportFirstRun && recording && isTestSuiteReplay(recording) ? (
+        <div className={styles.TestsuitesPassportWelcome}>
+          <h2>Passport</h2>
+          <p>
+            This sidebar shows some of our most helpful features alongside a little video. Try
+            clicking around to learn more!
+          </p>
+        </div>
+      ) : (
+        <div className={styles.ToolbarHeader}>
+          Passport
+          <button className={styles.close} onClick={hideFeatureShowPassport}>
+            <Icon type="close" />
+          </button>
+        </div>
+      )}
 
       <div className="flex-grow overflow-auto">
         <div className="p-2">
