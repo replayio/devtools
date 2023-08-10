@@ -13,7 +13,7 @@ type CollaboratorsProps = {
 export default function Collaborators({ recordingId }: CollaboratorsProps) {
   const { collaborators, owner, loading } = hooks.useGetOwnersAndCollaborators(recordingId!);
 
-  if (loading || !collaborators || !owner) {
+  if (loading || !collaborators) {
     return null;
   }
 
@@ -24,7 +24,7 @@ export default function Collaborators({ recordingId }: CollaboratorsProps) {
         <div className="border border-transparent">
           <EmailForm recordingId={recordingId} />
         </div>
-        <CollaboratorsList {...{ owner, collaborators }} />
+        {owner ? <CollaboratorsList owner={owner} collaborators={collaborators} /> : null}
       </section>
     </>
   );
