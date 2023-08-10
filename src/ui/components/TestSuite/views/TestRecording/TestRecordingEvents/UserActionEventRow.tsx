@@ -242,6 +242,31 @@ function findJumpToCodeDetailsIfAvailable(
         }
       }
     }
+  } else if (groupedTestCases.environment.testRunner.name === "playwright") {
+    const { data, timeStampedPointRange } = userActionEvent;
+    const { category, command } = data;
+    const { name } = command;
+
+    if (timeStampedPointRange !== null) {
+      canShowJumpToCode =
+        category === "command" && (
+          name.startsWith("locator.click") ||
+          name.startsWith("locator.type") ||
+          name.startsWith("keyboard.down") ||
+          name.startsWith("keyboard.press") ||
+          name.startsWith("keyboard.type")
+        );
+
+      if (canShowJumpToCode) {
+        jumpToCodeAnnotation = jumpToCodeAnnotations.find(a =>
+          isExecutionPointsWithinRange(
+            a.point,
+            timeStampedPointRange.begin.point,
+            timeStampedPointRange.end.point
+          )
+        );
+      }
+    }
   }
 
   return [canShowJumpToCode, jumpToCodeAnnotation] as const;
