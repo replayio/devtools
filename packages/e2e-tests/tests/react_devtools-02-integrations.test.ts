@@ -12,26 +12,14 @@ import { getSelectedLineNumber, waitForSelectedSource } from "../helpers/source-
 import { getByTestName, waitFor } from "../helpers/utils";
 import test, { expect } from "../testFixtureCloneRecording";
 
-// WUT
+// Why is this even getting confused as an API key?
 // trunk-ignore(gitleaks/generic-api-key)
 test.use({ exampleKey: "breakpoints-01" });
 
-test.only("react_devtools 02: RDT integrations (Chromium)", async ({
+test("react_devtools 02: RDT integrations (Chromium)", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  page.on("console", msg => {
-    const text = msg.text();
-    if (
-      /(The resource)|(Download the)|(Warning: Encountered two children)|(Refused to load plugin data)/.test(
-        text
-      )
-    ) {
-      return;
-    }
-    console.log("Console: ", msg);
-  });
-
   const queryParams = new URLSearchParams();
   // Force this test to always re-run the RDT (and other) routines
   // See pref names in packages/shared/user-data/GraphQL/config.ts
@@ -150,9 +138,9 @@ test.only("react_devtools 02: RDT integrations (Chromium)", async ({
 
   // Test "Jump to Component Source" behavior
   const componentSearchInput = getByTestName(page, "ComponentSearchInput-Input");
-  const previousSearchResultButton = getByTestName(page, "ComponentSearchInput-PreviousButton");
   const nextSearchResultButton = getByTestName(page, "ComponentSearchInput-NextButton");
   const resetSearchButton = getByTestName(page, "ComponentSearchInput-ResetButton");
+
   await componentSearchInput.focus();
   await componentSearchInput.type("SourcesTree");
   // Should end up selecting "WrappedSourcesTree" - need the next result

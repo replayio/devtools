@@ -26,12 +26,10 @@ export class NodePicker {
       this.canvas.addEventListener("mousemove", this.onMouseMove);
       this.canvas.addEventListener("click", this.onMouseClick);
       document.addEventListener("click", this.onDocumentClicked);
-      console.log("Added document click listener");
     }
   }
 
   disable() {
-    console.log("Disabling node picker");
     if (this.canvas) {
       this.canvas.removeEventListener("mousemove", this.onMouseMove);
       this.canvas.removeEventListener("click", this.onMouseClick);
@@ -79,7 +77,6 @@ export class NodePicker {
   };
 
   private onDocumentClicked = (event: MouseEvent) => {
-    console.log("Document clicked: " + event.defaultPrevented);
     if (event.defaultPrevented) {
       return;
     }

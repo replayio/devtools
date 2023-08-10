@@ -15,12 +15,12 @@ import {
   waitForAndCheckInspectedItem,
 } from "../helpers/react-devtools-panel";
 import { hoverScreenshot } from "../helpers/screenshot";
-import { delay, waitFor } from "../helpers/utils";
-import test, { Page, expect } from "../testFixtureCloneRecording";
+import { waitFor } from "../helpers/utils";
+import test, { expect } from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "cra/dist/index_chromium.html" });
 
-test.only("react_devtools 01: Basic RDT behavior (Chromium)", async ({
+test("react_devtools 01: Basic RDT behavior (Chromium)", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {

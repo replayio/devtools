@@ -50,7 +50,6 @@ const PanelButton = ({ panel, children }: PanelButtonProps) => {
   const dispatch = useAppDispatch();
 
   const onClick = (panel: SecondaryPanelName) => {
-    console.log("Panel button clicked: ", panel);
     dispatch(setSelectedPanel(panel));
     trackEvent(`toolbox.secondary.${panel}_select`);
   };

@@ -24,7 +24,6 @@ const testWithCloneRecording = base.extend<TestIsolatedRecordingFixture>({
     await use({
       page,
       recordingId: newRecordingId,
-      // recordingId: exampleRecordings[exampleKey],
     });
 
     await deleteTestRecording(newRecordingId);
