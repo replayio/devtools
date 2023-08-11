@@ -285,11 +285,13 @@ function _DevTools({
                       <ExpandablesContextRoot>
                         <LayoutContextAdapter>
                           <KeyModifiers>
-                            <Head>
-                              <title>
-                                {emoji} {title}
-                              </title>
-                            </Head>
+                            {title && (
+                              <Head>
+                                <title>
+                                  {emoji} {title}
+                                </title>
+                              </Head>
+                            )}
                             <Header />
                             <Body />
                             {showCommandPalette ? <CommandPaletteModal /> : null}
