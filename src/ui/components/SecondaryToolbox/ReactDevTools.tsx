@@ -1,5 +1,13 @@
 import { ExecutionPoint, NodeBounds, ObjectId, Object as ProtocolObject } from "@replayio/protocol";
-import React, { useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 import type { SerializedElement, Store, Wall } from "react-devtools-inline/frontend";
 import { useImperativeCacheValue } from "suspense";
 
@@ -30,7 +38,8 @@ import {
   nodePickerReady,
 } from "ui/reducers/app";
 import { getPreferredLocation } from "ui/reducers/sources";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { useAppDispatch, useAppSelector, useAppStore } from "ui/setup/hooks";
+import { UIState } from "ui/state";
 import {
   ParsedReactDevToolsAnnotation,
   reactDevToolsAnnotationsCache,
@@ -70,7 +79,7 @@ class ReplayWall implements Wall {
   constructor(
     private enablePicker: (opts: NodeOptsWithoutBounds) => void,
     private initializePicker: () => void,
-    private disablePicker: () => void,
+    public disablePickerInParentPanel: () => void,
     private highlightNode: (nodeId: string) => void,
     private unhighlightNode: () => void,
     private setProtocolCheckFailed: (failed: boolean) => void,
@@ -105,8 +114,12 @@ class ReplayWall implements Wall {
     this._listener?.(message);
   }
 
-  internalDisablePicker() {
-    this.disablePicker();
+  disablePickerParentAndInternal() {
+    this.disablePickerInParentPanel();
+    this.disablePickerInsideRDTComponent();
+  }
+
+  disablePickerInsideRDTComponent() {
     this._listener?.({ event: "stopInspectingNative", payload: true });
   }
 
@@ -178,12 +191,14 @@ class ReplayWall implements Wall {
         }
 
         case "startInspectingNative": {
+          // Note that this message takes time to percolate upwards from the RDT internals
+          // up to here. This makes coordination of "is the picker active" tricky.
           this.initializePicker();
 
           const boundingRects = await this.fetchMouseTargetsForPause();
 
           if (!boundingRects?.length) {
-            this.internalDisablePicker();
+            this.disablePickerParentAndInternal();
             break;
           }
 
@@ -203,7 +218,7 @@ class ReplayWall implements Wall {
             onClickOutsideCanvas: () => {
               // Need to both cancel the Redux logic _and_
               // tell the RDT component to stop inspecting
-              this.internalDisablePicker();
+              this.disablePickerParentAndInternal();
             },
             enabledNodeIds: [...nodeToElementId.keys()],
           });
@@ -212,7 +227,7 @@ class ReplayWall implements Wall {
         }
 
         case "stopInspectingNative": {
-          this.disablePicker();
+          this.disablePickerInParentPanel();
           break;
         }
       }
@@ -397,7 +412,7 @@ function createReactDevTools(
   wall.store = store as StoreWithInternals;
   const ReactDevTools = initialize(target, { bridge, store });
 
-  return [ReactDevTools, wall] as const;
+  return [ReactDevTools, wall, bridge] as const;
 }
 
 // React DevTools (RD) changed its internal data structure slightly in a minor update.
@@ -456,11 +471,23 @@ function usePrevious<T>(newValue: T) {
   return previousRef.current;
 }
 
+const getIsReactComponentPickerActive = (state: UIState) => {
+  const { activeNodePicker, nodePickerStatus } = state.app;
+  const isReactComponentPickerActive =
+    activeNodePicker === "reactComponent" && nodePickerStatus === "active";
+  return isReactComponentPickerActive;
+};
+
 export function ReactDevtoolsPanel() {
-  const client = useContext(ReplayClientContext);
+  const dispatch = useAppDispatch();
+  const store = useAppStore();
+  const theme = useTheme();
+  const replayClient = useContext(ReplayClientContext);
+  const componentPickerActive = useAppSelector(getIsReactComponentPickerActive);
   const currentPoint = useAppSelector(getCurrentPoint);
   const previousPoint = usePrevious(currentPoint);
   const isFirstAnnotationsInjection = useRef(true);
+  const [, forceRender] = useReducer(c => c + 1, 0);
 
   const isPointWithinFocusWindow = useIsPointWithinFocusWindow(currentPoint);
   const pauseId = useAppSelector(state => state.pause.id);
@@ -469,13 +496,8 @@ export function ReactDevtoolsPanel() {
   const [protocolCheckFailed, setProtocolCheckFailed] = useState(false);
   const { status: annotationsStatus, value: parsedAnnotations } = useImperativeCacheValue(
     reactDevToolsAnnotationsCache,
-    client
+    replayClient
   );
-
-  const dispatch = useAppDispatch();
-
-  const theme = useTheme();
-  const replayClient = useContext(ReplayClientContext);
 
   // Once we've obtained the protocol version, we'll dynamically load the correct module/version.
   const [reactDevToolsInlineModule, setReactDevToolsInlineModule] =
@@ -499,7 +521,7 @@ export function ReactDevtoolsPanel() {
 
   const [ReactDevTools, wall] = useMemo(() => {
     if (!reactDevToolsInlineModule) {
-      return [null, null] as const;
+      return [null, null, null] as const;
     }
 
     function dispatchHighlightNode(nodeId: string) {
@@ -525,6 +547,13 @@ export function ReactDevtoolsPanel() {
         },
       };
       nodePickerInstance.enable(actualOpts);
+      // HACK There _may_ be an issue with React's `<Offscreen>` and dispatched Redux actions.
+      // I can see the "picker active" selector re-running afterwards, but the component doesn't re-render.
+      // It seems like it thinks the value is _already_ `true`, when it shouldn't have changed yet.
+      // To work around this, we force a re-render of the component after enabling the picker.
+      // This is incredibly hacky and I don't feel like it actually _solves_ whatever issue
+      // may actually be there... but it does at least let the E2E test pass.
+      forceRender();
     }
 
     function initializePicker() {
@@ -536,7 +565,7 @@ export function ReactDevtoolsPanel() {
       dispatch(nodePickerDisabled());
     }
 
-    const [ReactDevTools, wall] = createReactDevTools(
+    const [ReactDevTools, wall, bridge] = createReactDevTools(
       reactDevToolsInlineModule,
       enablePicker,
       initializePicker,
@@ -548,7 +577,7 @@ export function ReactDevtoolsPanel() {
       replayClient,
       dismissInspectComponentNag
     );
-    return [ReactDevTools, wall] as const;
+    return [ReactDevTools, wall, bridge] as const;
   }, [dispatch, reactDevToolsInlineModule, replayClient, dismissInspectComponentNag]);
 
   useLayoutEffect(() => {
@@ -587,6 +616,19 @@ export function ReactDevtoolsPanel() {
       }
     }
   }, [ReactDevTools, wall, previousPoint, currentPoint, annotations, pauseId]);
+
+  useLayoutEffect(() => {
+    return () => {
+      // If the component picker is active when this tab is hidden, ensure that this
+      // is disabled so that we don't interfere with the video or node picker.
+      // We specifically do this in a layout effect, so that it happens before
+      // the `<InspectHostNodesToggle>` inside the RDT component stops listening
+      // for `"stopInspectingNative"` in a `useEffect`.
+      if (wall && getIsReactComponentPickerActive(store.getState())) {
+        wall.disablePickerParentAndInternal();
+      }
+    };
+  }, [wall, store]);
 
   if (currentPoint === null) {
     return null;
@@ -644,23 +686,30 @@ export function ReactDevtoolsPanel() {
   }
 
   return (
-    <ReactDevTools
-      browserTheme={theme}
-      enabledInspectedElementContextMenu={false}
-      overrideTab="components"
-      showTabBar={false}
-      readOnly={true}
-      hideSettings={true}
-      hideToggleErrorAction={true}
-      hideToggleSuspenseAction={true}
-      hideLogAction={true}
-      viewElementSourceFunction={async (id, inspectedElement) => {
-        const componentPreview = await wall.getComponentLocation(id);
-        if (componentPreview?.preview?.functionLocation) {
-          dispatch(jumpToComponentPreferredSource(componentPreview));
-        }
-      }}
-    />
+    <>
+      <ReactDevTools
+        browserTheme={theme}
+        enabledInspectedElementContextMenu={false}
+        overrideTab="components"
+        showTabBar={false}
+        readOnly={true}
+        hideSettings={true}
+        hideToggleErrorAction={true}
+        hideToggleSuspenseAction={true}
+        hideLogAction={true}
+        viewElementSourceFunction={async (id, inspectedElement) => {
+          const componentPreview = await wall.getComponentLocation(id);
+          if (componentPreview?.preview?.functionLocation) {
+            dispatch(jumpToComponentPreferredSource(componentPreview));
+          }
+        }}
+      />
+      {/* Solely for E2E test usage - need to track our app picker status vs internal RDT status*/}
+      <span
+        data-testname="ReactPanelPickerStatus"
+        data-component-picker-active={`${componentPickerActive}`}
+      />
+    </>
   );
 }
 

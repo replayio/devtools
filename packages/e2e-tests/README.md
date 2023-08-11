@@ -98,7 +98,7 @@ For example, to re-record the _control flow_ test using _node_ you would run:
 ./scripts/save-examples.ts --target=node --example=control_flow
 ```
 
-### Updating Cypress Test Examples
+### Updating Other Test Examples
 
 Most of our E2E tests work by having "golden recordings" of the small HTML+JS example files in `public/test`. However, for our Cypress Test Panel E2E tests, we need to work with existing Cypress test recordings as the "golden recordings" that our UI is checked against.
 
@@ -114,6 +114,8 @@ Each repo has a link to the Replay dashboard workspace + an invite.
 If you want to update those to fresher recording IDs, open up the team workspace for that repo, find a recent test suite run, copy the recording ID for that test's recording, and overwrite the recording ID in `examples.json`.
 
 You'll also probably need to specifically share that recording as "Public", especially since it's in a Test Suites workspace that would normally not allow anonymous users to view recordings.
+
+We also now have a "golden recording" of one of our own `breakpoints-01` E2E test runs. This serves as a testbed for checking more advanced behaviors like the React and Redux routines. If we ever need to update this, just copy-paste the recording ID from a test run in our "Frontend E2E tests" workspace.
 
 ### Folder Structure
 

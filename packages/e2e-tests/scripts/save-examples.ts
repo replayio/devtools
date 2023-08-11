@@ -76,6 +76,12 @@ const knownExamples: TestExampleFile[] = [
     runtime: "firefox",
   },
   {
+    filename: "cra/dist/index_chromium.html",
+    folder: config.browserExamplesPath,
+    category: "browser",
+    runtime: "chromium",
+  },
+  {
     filename: "doc_async.html",
     folder: config.browserExamplesPath,
     category: "browser",
@@ -289,6 +295,7 @@ const knownExamples: TestExampleFile[] = [
   // and "flake" are not listed here. We don't re-record those
   // ourselves. Instead we use specific recordings from CI runs
   // in those benchmark repos.
+  // Similarly, the "breakpoints-01" recording is not listed here.
   // See README.md for instructions on updating those recording IDs.
 ];
 

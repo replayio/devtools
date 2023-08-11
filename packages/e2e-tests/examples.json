@@ -4,6 +4,7 @@
   "authenticated_comments_3.html": "0cd75bf9-78a8-4c1b-9982-7290e7743c03",
   "authenticated_logpoints_1.html": "f7e69589-ddb8-4a0e-b517-f393d225991e",
   "cra/dist/index.html": "19fe1893-b9ea-41a5-a90a-90a209064c0b",
+  "cra/dist/index_chromium.html": "055805c4-2557-43b5-977b-2875c51f72d7",
   "doc_async.html": "8c2257d9-6857-4640-8755-b219f286061c",
   "doc_control_flow.html": "8b024e1a-1e84-4424-97bd-3c2c528642fd",
   "doc_debugger_statements.html": "31dc0307-dfd6-4497-b4c9-11f12d6fa995",
@@ -38,8 +39,8 @@
   "node/run_worker.js": "b41107df-8d0e-488f-bad3-a7d26c183043",
   "node/spawn.js": "c9d0539d-fde0-4949-a9f7-acdb5b56d4a6",
   "log_points_and_block_scope.html": "ad8f5490-0b9f-4488-bd3c-4f2824bc21ce",
-  "cypress/doc_inspector_styles": "aa6201d2-1e83-408b-8247-cf3d26ac421a",
   "doc_minified_chromium.html": "5cdb2ffe-beff-4d35-9689-9242bd277f2d",
   "cypress-realworld/bankaccounts.spec.js": "6d4abbe1-2fcb-47d9-92d5-f7b45760b01a",
-  "flake/adding-spec.ts": "7b0db00a-d9a9-4d2d-b816-af14a1b682a6"
+  "flake/adding-spec.ts": "7b0db00a-d9a9-4d2d-b816-af14a1b682a6",
+  "breakpoints-01": "f5fa8af9-70a4-4c9c-811f-1388b62c0b15"
 }

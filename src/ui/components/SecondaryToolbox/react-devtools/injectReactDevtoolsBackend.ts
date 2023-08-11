@@ -1,10 +1,13 @@
+import type { RendererInterface } from "react-devtools-inline";
+
 import { pauseEvaluationsCache } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientInterface } from "shared/client/types";
 
-// Cache this at the module level, because the backend records all evaluations
-// applied to a given pause in a session. So, we only need to do this once for
-// a given Pause, and we want to retain the info even if the RDT component unmounts.
-const pausesWithDevtoolsInjected = new Set<string>();
+// Our modified RDT bundle exports some additional methods
+type RendererInterfaceWithAdditions = RendererInterface & {
+  getOrGenerateFiberID: (fiber: any) => number;
+  setRootPseudoKey: (id: number, fiber: any) => void;
+};
 
 declare global {
   interface Window {
@@ -54,6 +57,16 @@ function installReactDevToolsIntoPause() {
   // @ts-ignore
   DEVTOOLS_PLACEHOLDER();
 
+  function traverseComponentTree(fiberNode: any, callback: (fiber: any) => void) {
+    callback(fiberNode);
+
+    let child = fiberNode.child;
+    while (child) {
+      traverseComponentTree(child, callback);
+      child = child.sibling;
+    }
+  }
+
   window.__REACT_DEVTOOLS_SAVED_RENDERERS__.forEach(renderer => {
     window.logMessage("Injecting renderer");
     // Similarly, we need to take the real renderer references, and attach them
@@ -65,8 +78,15 @@ function installReactDevToolsIntoPause() {
     rendererID,
     renderer,
   ] of window.__REACT_DEVTOOLS_GLOBAL_HOOK__.rendererInterfaces.entries()) {
+    const rendererWithAdditions = renderer as RendererInterfaceWithAdditions;
     const hookRoots = window.__REACT_DEVTOOLS_GLOBAL_HOOK__.getFiberRoots(rendererID);
     for (let root of hookRoots) {
+      const rootID = rendererWithAdditions.getOrGenerateFiberID(root.current);
+      rendererWithAdditions.setRootPseudoKey(rootID, root.current);
+      traverseComponentTree(root.current, fiber => {
+        rendererWithAdditions.getOrGenerateFiberID(fiber);
+      });
+
       // Force the extension to crawl the current DOM contents so it knows what nodes exist
       window.__REACT_DEVTOOLS_GLOBAL_HOOK__.onCommitFiberRoot(
         rendererID,
@@ -77,22 +97,19 @@ function installReactDevToolsIntoPause() {
   }
 }
 
+const injectGlobalHookSource = require("./installHook.raw.js").default;
+const reactDevtoolsBackendSource = require("./react_devtools_backend.raw.js").default;
+
+const expression = `(${installReactDevToolsIntoPause})()`
+  .replace("INSTALL_HOOK_PLACEHOLDER", `(${injectGlobalHookSource})`)
+  .replace("DEVTOOLS_PLACEHOLDER", `(${reactDevtoolsBackendSource})`);
+
 export async function injectReactDevtoolsBackend(
   replayClient: ReplayClientInterface,
   pauseId?: string
 ) {
-  if (!pauseId || pausesWithDevtoolsInjected.has(pauseId)) {
+  if (!pauseId) {
     return;
   }
-
-  pausesWithDevtoolsInjected.add(pauseId);
-
-  const injectGlobalHookSource = require("./installHook.raw.js").default;
-  const reactDevtoolsBackendSource = require("./react_devtools_backend.raw.js").default;
-
-  const expression = `(${installReactDevToolsIntoPause})()`
-    .replace("INSTALL_HOOK_PLACEHOLDER", `(${injectGlobalHookSource})`)
-    .replace("DEVTOOLS_PLACEHOLDER", `(${reactDevtoolsBackendSource})`);
-
-  const evalRes = await pauseEvaluationsCache.readAsync(replayClient, pauseId, null, expression);
+  await pauseEvaluationsCache.readAsync(replayClient, pauseId, null, expression);
 }
