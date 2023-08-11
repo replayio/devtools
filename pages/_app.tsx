@@ -110,7 +110,7 @@ function Routing({ Component, pageProps }: AppProps) {
       <Head>
         <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
         <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
-        <title>⏱️ Loading…</title>
+        <title>Replay</title>
       </Head>
       <ErrorBoundary>
         <_App>
