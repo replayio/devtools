@@ -1,36 +1,30 @@
 import { PlaywrightTestConfig, devices } from "@playwright/test";
 import { devices as replayDevices } from "@replayio/playwright";
 
-const { CHROMIUM_ONLY, CI, SLOW_MO } = process.env;
+const { CI, SLOW_MO, TRACE, HEADLESS } = process.env;
 
-let projects;
-if (!CHROMIUM_ONLY) {
-  if (CI) {
-    projects = [
-      {
-        name: "replay-chromium",
-        use: { ...(replayDevices["Replay Chromium"] as any) },
-      },
-      {
-        name: "chromium",
-        use: { ...devices["Desktop Chromium"] },
-      },
-    ];
-  } else {
-    projects = [
-      {
-        name: "chromium",
-        use: { ...devices["Desktop Chromium"] },
-      },
-    ];
-  }
+function isTruthy(value) {
+  return value === "true" || value == "1";
 }
+
+const projects = [
+  {
+    name: "replay-chromium",
+    use: { ...(replayDevices["Replay Chromium"] as any) },
+  },
+  {
+    name: "chromium",
+    use: { ...devices["Desktop Chromium"] },
+  },
+];
 
 const config: PlaywrightTestConfig = {
   use: {
     launchOptions: {
+      headless: isTruthy(HEADLESS),
       slowMo: SLOW_MO ? parseInt(SLOW_MO, 10) : 0,
     },
+    trace: isTruthy(TRACE) ? "on" : "off",
     viewport: {
       width: 1280,
       height: 1024,

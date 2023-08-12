@@ -231,6 +231,9 @@ export function createSocket(
         }
       }
 
+      console.log("pausePointParams", getPausePointParams());
+      console.log("experimentalSettings", experimentalSettings);
+
       const focusWindowFromParams = getPausePointParams().focusWindow;
 
       const sessionId = await createSession(

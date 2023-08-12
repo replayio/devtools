@@ -238,6 +238,7 @@ export async function sendMessage<M extends CommandMethods>(
     gMessageWaiters.set(id, { method, resolve })
   );
 
+  console.log("sendMessage", id, msg, params, pauseId, response);
   if (response.error) {
     gSessionCallbacks?.onResponseError(response);
 
