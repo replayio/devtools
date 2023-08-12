@@ -73,7 +73,10 @@ const testWithCloneRecording = base.extend<TestIsolatedRecordingFixture>({
                   apiName,
                 });
                 // @ts-ignore
-                window.top.__RECORD_REPLAY_ANNOTATION__?.("replay-playwright");
+                window.__RECORD_REPLAY_ANNOTATION_HOOK__?.("replay-playwright", {
+                  event: "step:start",
+                  id,
+                });
               },
               [id, apiName]
             )
@@ -98,7 +101,10 @@ const testWithCloneRecording = base.extend<TestIsolatedRecordingFixture>({
             .evaluate(() => {
               console.log("Page:: onApiCallEnd");
               // @ts-ignore
-              window.top.__RECORD_REPLAY_ANNOTATION__?.("replay-playwright");
+              window.__RECORD_REPLAY_ANNOTATION_HOOK__?.("replay-playwright", {
+                event: "step:end",
+                id,
+              });
             })
             .then()
             .catch(e => console.error);

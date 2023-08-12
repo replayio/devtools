@@ -238,7 +238,7 @@ export async function sendMessage<M extends CommandMethods>(
     gMessageWaiters.set(id, { method, resolve })
   );
 
-  console.log("sendMessage", id, msg, params, pauseId, response);
+  // console.log("sendMessage", id, msg, params, pauseId, response);
   if (response.error) {
     gSessionCallbacks?.onResponseError(response);
 
@@ -249,7 +249,7 @@ export async function sendMessage<M extends CommandMethods>(
       return {};
     }
 
-    console.warn("Message failed", method, { code, id, message }, data);
+    // console.warn("Message failed", method, { code, id, message }, data);
 
     let finalMessage = message;
     if (process.env.NODE_ENV === "development") {
