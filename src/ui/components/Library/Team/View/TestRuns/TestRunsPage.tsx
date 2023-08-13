@@ -8,6 +8,7 @@ import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 import { TestRunOverviewPage } from "./Overview/TestRunOverviewContextRoot";
 import { TestRunList } from "./TestRunList";
 import { TestRunsContext, TestRunsContextRoot } from "./TestRunsContextRoot";
+import styles from "./TestRunsPage.module.css";
 
 export function TestRunsPage() {
   return (
@@ -48,9 +49,9 @@ function TestRunsContent() {
       <PanelGroup autoSaveId="Library:TestRuns" direction="horizontal">
         <Panel minSize={20} order={1}>
           <div className="flex h-full w-full flex-col overflow-hidden rounded-xl bg-bodyBgcolor">
-            <div className="flex flex-row items-center justify-between gap-4 border-b border-themeBorder bg-bodyBgcolor p-2">
+            <div className="flex flex-row items-center justify-between gap-2 border-b border-themeBorder bg-bodyBgcolor p-2">
               <div
-                className="flex cursor-pointer flex-row items-center gap-2 rounded-md border-inputBorder bg-themeTextFieldBgcolor px-2.5 py-1.5 text-sm text-themeTextFieldColor focus:outline-none focus:ring focus:ring-primaryAccent"
+                className={styles.dropdownTrigger}
                 data-test-id="TestRunsPage-DropdownTrigger"
                 onClick={onClick}
                 onKeyDown={onKeyDown}
@@ -60,20 +61,16 @@ function TestRunsContent() {
                 <Icon className="h-5 w-5" type="chevron-down" />
               </div>
               {contextMenu}
-              <div className="relative max-w-sm grow">
+              <div className={styles.filterContainer}>
                 <input
-                  className="w-full appearance-none rounded border-none bg-black bg-opacity-10 text-xs focus:outline-none focus:ring focus:ring-primaryAccent"
+                  className={styles.filterInput}
                   data-test-id="TestRunsPage-FilterInput"
                   onChange={event => setFilterByText(event.currentTarget.value)}
                   placeholder="Filter test runs"
                   type="text"
                   value={filterByTextForDisplay}
                 />
-
-                <Icon
-                  className="absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 opacity-50"
-                  type="search"
-                />
+                <Icon className={styles.searchIcon} type="search" />
               </div>
             </div>
             <div
