@@ -1,212 +1,239 @@
-import assert from "assert";
-import { RecordingId } from "@replayio/protocol";
-import classNames from "classnames";
-import { ClipboardEvent, KeyboardEvent, useLayoutEffect, useRef, useState } from "react";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import { GetServerSideProps, GetStaticProps } from "next/types";
+import React, { useContext, useEffect, useState } from "react";
+import { ConnectedProps, connect } from "react-redux";
 
-import { RecordingTarget } from "replay-next/src/suspense/BuildIdCache";
-import { Recording } from "shared/graphql/types";
-import { AnyTestRecording, getTestRunId } from "shared/test-suites/RecordingTestMetadata";
-import { selectAll } from "shared/utils/selection";
-import { getRecordingTarget } from "ui/actions/app";
-import Avatar from "ui/components/Avatar";
-import UserOptions from "ui/components/Header/UserOptions";
-import ViewToggle, { shouldShowDevToolsNag } from "ui/components/Header/ViewToggle";
-import IconWithTooltip from "ui/components/shared/IconWithTooltip";
-import hooks from "ui/hooks";
-import { useGetActiveSessions } from "ui/hooks/sessions";
-import { getViewMode } from "ui/reducers/layout";
-import { useAppSelector } from "ui/setup/hooks";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { Recording as RecordingInfo } from "shared/graphql/types";
+import { isTest } from "shared/utils/environment";
+import { setModal } from "ui/actions/app";
+import { setExpectedError } from "ui/actions/errors";
+import { getAccessibleRecording } from "ui/actions/session";
+import DevTools from "ui/components/DevTools";
+import LoadingScreen from "ui/components/shared/LoadingScreen";
+import {
+  getRecordingMetadata,
+  useGetRawRecordingIdWithSlug,
+  useGetRecording,
+  useGetRecordingId,
+  useSubscribeRecording,
+} from "ui/hooks/recordings";
+import setupDevtools, { migratePerRecordingPersistedSettings } from "ui/setup/dynamic/devtools";
+import { useAppDispatch, useAppStore } from "ui/setup/hooks";
+import { extractIdAndSlug } from "ui/utils/helpers";
+import { startUploadWaitTracking } from "ui/utils/mixpanel";
+import { getRecordingURL } from "ui/utils/recording";
 import { trackEvent } from "ui/utils/telemetry";
-import useAuth0 from "ui/utils/useAuth0";
+import useToken from "ui/utils/useToken";
 
-import { RecordingTrialEnd } from "./RecordingTrialEnd";
-import ShareButton from "./ShareButton";
-import styles from "./Header.module.css";
+import Upload from "./upload";
 
-function pasteText(event: ClipboardEvent) {
-  event.preventDefault();
-  const text = event.clipboardData.getData("text/plain");
-  document.execCommand("insertText", false, text);
+migratePerRecordingPersistedSettings();
+
+interface MetadataProps {
+  metadata?: {
+    id: string;
+    title?: string;
+    url?: string;
+    duration?: number;
+    owner?: string;
+  };
 }
 
-function Avatars({ recordingId }: { recordingId: RecordingId | null }) {
-  const { users, loading, error } = useGetActiveSessions(
-    recordingId || "00000000-0000-0000-0000-000000000000"
-  );
-
-  if (loading || error || !users?.length) {
+function RecordingHead({ metadata }: MetadataProps) {
+  if (!metadata) {
     return null;
   }
 
+  let title = metadata.title;
+  let description = "Replay";
+  try {
+    const url = new URL(metadata.url || "");
+    if (url.protocol !== "file:") {
+      description += ` of ${url.hostname}`;
+    }
+  } catch {
+    // ignore invalid URLs
+  } finally {
+    if (metadata.owner) {
+      description += ` by ${metadata.owner}`;
+    }
+  }
+
+  if (!title && description) {
+    title = description;
+    description = "";
+  }
+
+  const pageTitle = title ? `⏱️ ${title}` : "⏱️";
+
+  const image = `${process.env.NEXT_PUBLIC_IMAGE_URL}${metadata.id}.png`;
+
   return (
-    <div className={styles.Avatars}>
-      {users!.map((player, i) => (
-        <Avatar player={player} isFirstPlayer={false} key={i} index={i} />
-      ))}
-    </div>
+    <Head>
+      <title>{pageTitle}</title>
+      {/* nosemgrep typescript.react.security.audit.react-http-leak.react-http-leak */}
+      <meta property="og:title" content={title} />
+      <meta property="og:type" content="website" />
+      {/* nosemgrep typescript.react.security.audit.react-http-leak.react-http-leak */}
+      <meta property="og:description" content={description} />
+      {/* nosemgrep typescript.react.security.audit.react-http-leak.react-http-leak */}
+      <meta property="og:image" content={image} />
+      <meta name="twitter:card" content="summary_large_image" />
+      {/* nosemgrep typescript.react.security.audit.react-http-leak.react-http-leak */}
+      <meta property="twitter:image" content={image} />
+      {/* nosemgrep typescript.react.security.audit.react-http-leak.react-http-leak */}
+      <meta property="twitter:title" content={title} />
+      <meta name="twitter:site" content="@replayio" />
+      {/* nosemgrep typescript.react.security.audit.react-http-leak.react-http-leak */}
+      <meta property="twitter:description" content={description} />
+    </Head>
   );
 }
 
-function Links({ recordingTarget }: { recordingTarget: RecordingTarget | null }) {
-  const recordingId = hooks.useGetRecordingId();
-  const { isAuthenticated } = useAuth0();
-  const { nags } = hooks.useGetUserInfo();
+function useRecordingSlug(recordingId: string) {
+  const router = useRouter();
+  const { recording } = useGetRecording(recordingId);
 
-  const viewMode = useAppSelector(getViewMode);
+  useEffect(() => {
+    if (recording?.title) {
+      const url = getRecordingURL(recording);
+      const currentURL = new URL(window.location.origin + router.asPath).pathname;
+      if (url !== currentURL) {
+        // clone the query object to remove the id parameter
+        const query = {
+          ...router.query,
+        };
+        delete query.id;
 
-  const showViewToggle = recordingTarget != "node";
-  const showDevtoolsNag = showViewToggle && shouldShowDevToolsNag(nags, viewMode);
+        router.replace(
+          {
+            pathname: url,
+            query,
+          },
+          undefined,
+          { shallow: true }
+        );
+      }
+    }
+  }, [router, recording, recording?.title]);
 
-  const showShareButton = isAuthenticated && !showDevtoolsNag;
-
-  return (
-    <div className={styles.Links} data-test-name="Header">
-      <RecordingTrialEnd />
-      {showShareButton ? <ShareButton /> : null}
-      <Avatars recordingId={recordingId} />
-      {showViewToggle && <ViewToggle />}
-      <UserOptions />
-    </div>
-  );
+  return { recording };
 }
 
-enum EditState {
-  Inactive,
-  Active,
-  Saving,
-}
+function RecordingPage({
+  apiKey,
+  getAccessibleRecording,
+  setExpectedError,
+  head,
+}: PropsFromRedux & { apiKey?: string; head?: React.ReactNode }) {
+  const token = useToken();
+  const store = useAppStore();
+  const { query } = useRouter();
+  const dispatch = useAppDispatch();
+  const recordingId = useGetRecordingId();
+  const rawRecordingId = useGetRawRecordingIdWithSlug();
+  useRecordingSlug(recordingId);
+  useSubscribeRecording(recordingId);
+  const [recording, setRecording] = useState<RecordingInfo | null>();
+  const [uploadComplete, setUploadComplete] = useState(false);
 
-// This is a workaround for getting an automatically-resizing horizontal text input
-// so that switching between the editing and non-editing states is smooth.
-// https://stackoverflow.com/questions/45306325/react-contenteditable-and-cursor-position
-function HeaderTitle({
-  recording,
-  recordingId,
-}: {
-  recording: Recording;
-  recordingId: RecordingId;
-}) {
-  const [editState, setEditState] = useState(EditState.Inactive);
-  const contentEditableRef = useRef<HTMLSpanElement>(null);
-  const updateRecordingTitle = hooks.useUpdateRecordingTitle();
+  const replayClient = useContext(ReplayClientContext);
 
-  const { title, userRole } = recording;
-
-  const canEditTitle = userRole !== "none";
-  const hasTitle = title && title.length > 0;
-  const displayTitle = hasTitle ? title : "Untitled";
-
-  useLayoutEffect(() => {
-    if (!contentEditableRef.current) {
+  useEffect(() => {
+    if (!store) {
+      return;
+    }
+    if (!recordingId) {
+      setExpectedError({
+        content: `"${rawRecordingId}" is not a valid recording ID`,
+        message: "Invalid ID",
+      });
       return;
     }
 
-    if (!editState) {
-      contentEditableRef.current.innerText = hasTitle ? title! : "Untitled";
-    } else if (editState === EditState.Active && !hasTitle) {
-      contentEditableRef.current.innerText = "";
-    } else if (editState === EditState.Saving && !contentEditableRef.current.innerText) {
-      contentEditableRef.current.innerText = "Untitled";
-    }
-  }, [editState, hasTitle, title]);
+    async function getRecording() {
+      await setupDevtools(store, replayClient);
+      const rec = await getAccessibleRecording(recordingId);
+      if (!rec) {
+        return;
+      }
 
-  if (!canEditTitle) {
+      setRecording(rec);
+
+      if (rec.isTest) {
+        trackEvent("session_start.test");
+      }
+
+      if (Array.isArray(query.id) && query.id[query.id.length - 1] === "share") {
+        dispatch(setModal("sharing", { recordingId }));
+      }
+    }
+
+    getRecording();
+  }, [
+    dispatch,
+    getAccessibleRecording,
+    query.id,
+    rawRecordingId,
+    recordingId,
+    setExpectedError,
+    store,
+    token.token,
+    replayClient,
+  ]);
+  const onUpload = () => {
+    startUploadWaitTracking();
+    setUploadComplete(true);
+  };
+
+  if (!recording || typeof window === "undefined") {
     return (
-      <span className={styles.ReadOnlyTitle} data-testid="Header-Title">
-        {displayTitle}
-      </span>
+      <>
+        {head}
+        <LoadingScreen message="Finding recording..." />
+      </>
     );
   }
 
-  const onKeyDownOrKeyPress = (event: KeyboardEvent) => {
-    if (event.code == "Enter" || event.code == "Escape") {
-      event.preventDefault();
-      contentEditableRef.current!.blur();
-    }
-  };
-  const onFocus = () => {
-    trackEvent("header.edit_title");
-    setEditState(EditState.Active);
-
-    const contentEditable = contentEditableRef.current;
-    if (contentEditable) {
-      selectAll(contentEditable);
-    }
-  };
-  const onBlur = () => {
-    const contentEditable = contentEditableRef.current;
-    if (editState !== EditState.Active || !contentEditable) {
-      return;
-    }
-    const currentValue = contentEditable.textContent || "";
-
-    setEditState(EditState.Saving);
-    updateRecordingTitle(recordingId, currentValue).then(() => {
-      setEditState(EditState.Inactive);
-    });
-  };
-
-  return (
-    <span
-      data-testid="Header-Title"
-      className={styles.EditableTitle}
-      contentEditable
-      onBlur={onBlur}
-      onFocus={onFocus}
-      onKeyDown={onKeyDownOrKeyPress}
-      onKeyPress={onKeyDownOrKeyPress}
-      onPaste={pasteText}
-      ref={contentEditableRef}
-      role="textbox"
-      spellCheck="false"
-      tabIndex={0}
-    />
-  );
+  // Add a check to make sure the recording has an associated user ID.
+  // We skip the upload step if there's no associated user ID, which
+  // is the case for CI test recordings.
+  if (!uploadComplete && recording.isInitialized === false && !isTest() && recording.userId) {
+    return <Upload onUpload={onUpload} />;
+  } else {
+    return (
+      <>
+        {head}
+        <DevTools apiKey={apiKey} uploadComplete={uploadComplete} />
+      </>
+    );
+  }
 }
 
-export default function Header() {
-  const recordingTarget = useAppSelector(getRecordingTarget);
-  const { isAuthenticated } = useAuth0();
-  const recordingId = hooks.useGetRecordingId();
-  const { recording, loading } = hooks.useGetRecording(recordingId);
-  const backIcon = <div className={classNames(styles.BackButton, "img", "arrowhead-right")} />;
+const connector = connect(null, { getAccessibleRecording, setExpectedError });
+type PropsFromRedux = ConnectedProps<typeof connector>;
 
-  if (loading) {
-    return <div className={styles.Header}></div>;
+const ConnectedRecordingPage = connector(RecordingPage);
+
+export const getServerSideProps: GetServerSideProps = async function ({ params }) {
+  const { id } = extractIdAndSlug(params?.id);
+  return {
+    props: {
+      metadata: id ? await getRecordingMetadata(id) : null,
+    },
+  };
+};
+
+type SSRProps = MetadataProps & { apiKey?: string; headOnly?: boolean };
+
+export default function SSRRecordingPage({ apiKey, headOnly, metadata }: SSRProps) {
+  let head: React.ReactNode = <RecordingHead metadata={metadata} />;
+
+  if (headOnly) {
+    return head;
   }
 
-  assert(recording != null);
-
-  let dashboardUrl = window.location.origin;
-  if (recording.workspace !== null) {
-    dashboardUrl = `/team/${recording.workspace?.id}`;
-
-    if (recording.isTest && recording.metadata?.test !== undefined) {
-      const runId = getTestRunId(recording.metadata.test);
-      if (runId != null) {
-        dashboardUrl += `/runs/${runId}`;
-      }
-    }
-  } else {
-    dashboardUrl = "/team/me/recordings";
-  }
-
-  return (
-    <div className={styles.Header}>
-      <div className="relative flex flex-grow flex-row items-center overflow-hidden">
-        {isAuthenticated && (
-          <a href={dashboardUrl}>
-            <IconWithTooltip icon={backIcon} content={"Back to Library"} />
-          </a>
-        )}
-        {recording && recordingId ? (
-          <HeaderTitle recording={recording} recordingId={recordingId} />
-        ) : (
-          <div className={styles.ReadOnlyTitle}>Recordings</div>
-        )}
-        <div className="flex-grow">&nbsp;</div>
-      </div>
-      <Links recordingTarget={recordingTarget} />
-    </div>
-  );
+  return <ConnectedRecordingPage apiKey={apiKey} head={head} />;
 }
