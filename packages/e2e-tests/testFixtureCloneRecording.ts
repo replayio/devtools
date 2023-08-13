@@ -5,33 +5,35 @@ import { cloneTestRecording, deleteTestRecording } from "./helpers/utils";
 
 type TestIsolatedRecordingFixture = {
   exampleKey: TestRecordingKey;
-  pageWithMeta: {
-    page: Page;
-    recordingId: string;
-  };
-  _replay: any;
+  pageWithMeta: any;
 };
 
-const testWithCloneRecording = base.extend<TestIsolatedRecordingFixture>({
+let testWithCloneRecording = base.extend<TestIsolatedRecordingFixture>({
   exampleKey: undefined,
-  pageWithMeta: async ({ page, exampleKey }, use) => {
-    const exampleRecordings = require("./examples.json");
-    if (!exampleRecordings[exampleKey]) {
-      throw new Error("Invalid recording");
-    }
+  pageWithMeta: [
+    async ({ page, exampleKey }, use) => {
+      const exampleRecordings = require("./examples.json");
+      if (!exampleRecordings[exampleKey]) {
+        throw new Error("Invalid recording");
+      }
 
-    const newRecordingId = await cloneTestRecording(exampleRecordings[exampleKey]);
+      const newRecordingId = await cloneTestRecording(exampleRecordings[exampleKey]);
 
-    await use({
-      page,
-      recordingId: newRecordingId,
-    });
+      await use({
+        page,
+        recordingId: newRecordingId,
+      });
 
-    await deleteTestRecording(newRecordingId);
-  },
+      await deleteTestRecording(newRecordingId);
+    },
+    { auto: true, _title: "Clone recording" },
+  ],
+});
 
+testWithCloneRecording = testWithCloneRecording.extend<any>({
   _replay: [
     async ({ playwright, page }, use, testInfo) => {
+      console.log("Replay Fixture is run");
       page.on("console", async msg => {
         const values = [];
         for (const arg of msg.args()) {
@@ -58,6 +60,7 @@ const testWithCloneRecording = base.extend<TestIsolatedRecordingFixture>({
             "onApiCallBegin",
             id,
             apiName,
+            userData,
             stackTrace.frames
               .map(f => f.function)
               .filter(Boolean)
@@ -118,7 +121,7 @@ const testWithCloneRecording = base.extend<TestIsolatedRecordingFixture>({
 
       clientInstrumentation.removeListener(csiListener);
     },
-    { auto: "all-hooks-included", _title: "trace recording" },
+    { auto: "all-hooks-included", _title: "Replay fixture" },
   ],
 });
 

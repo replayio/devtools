@@ -12,7 +12,10 @@ import { findSliceIndices, insert } from "replay-next/src/utils/array";
 import { assertWithTelemetry } from "replay-next/src/utils/telemetry";
 import { ReplayClientInterface } from "shared/client/types";
 import { Annotation, PlaywrightTestSources } from "shared/graphql/types";
-import { AnnotationsCache, PlaywrightAnnotationsCache } from "ui/components/TestSuite/suspense/AnnotationsCache";
+import {
+  AnnotationsCache,
+  PlaywrightAnnotationsCache,
+} from "ui/components/TestSuite/suspense/AnnotationsCache";
 
 export type SemVer = string;
 
@@ -290,6 +293,19 @@ export namespace RecordingTestMetadataV3 {
     type: "navigation";
   }
 
+  export interface FunctionEvent {
+    // Data needed to render this event
+    data: {
+      function: string;
+      events: TestEvent[];
+    };
+
+    // The precise time this event occurred; not that events have no duration
+    timeStampedPoint: TimeStampedPoint;
+
+    type: "function";
+  }
+
   export interface NetworkRequestEvent {
     // Data needed to render this event
     data: {
@@ -309,7 +325,7 @@ export namespace RecordingTestMetadataV3 {
     type: "network-request";
   }
 
-  export type TestEvent = UserActionEvent | NavigationEvent | NetworkRequestEvent;
+  export type TestEvent = UserActionEvent | NavigationEvent | NetworkRequestEvent | FunctionEvent;
 
   export type TestError = {
     name: string;
@@ -743,8 +759,8 @@ export async function processGroupedTestCases(
         for (let index = 0; index < partialTestRecordings.length; index++) {
           const legacyTest = partialTestRecordings[index];
           const test = await processPlaywrightTestRecording(legacyTest, annotations);
-
-          testRecordings.push(test);
+          const groupedTest = true ? groupTestStepsByCallStack(test) : test;
+          testRecordings.push(groupedTest);
         }
 
         return {
@@ -795,12 +811,11 @@ export async function processPlaywrightTestRecording(
 
       const testEvents = events[sectionName as RecordingTestMetadataV3.TestSectionName];
 
-      const partialTestEvents =
-        partialEvents[sectionName as RecordingTestMetadataV3.TestSectionName];
+      let partialTestEvents = partialEvents[sectionName as RecordingTestMetadataV3.TestSectionName];
+
       partialTestEvents.forEach(partialTestEvent => {
         const {
           category,
-          command,
           error = null,
           id,
           parentId = null,
@@ -808,6 +823,13 @@ export async function processPlaywrightTestRecording(
           stack = null,
           rrId,
         } = partialTestEvent.data as any;
+
+        const [_, name, args] = partialTestEvent.data.command.name.match(/(.*)\((.*)\)/) || [];
+
+        const command = {
+          name: name || partialTestEvent.data.command.name,
+          arguments: args?.split(","),
+        };
 
         assert(category, `Test event must have "category" property`, {
           command: command?.name,
@@ -832,8 +854,12 @@ export async function processPlaywrightTestRecording(
           }
         }
 
-        let startAnnotation = annotations.find(annotation => annotation.message.event === "step:start" && annotation.message.id === rrId);
-        let endAnnotation = annotations.find(annotation => annotation.message.event === "step:end" && annotation.message.id === rrId);
+        let startAnnotation = annotations.find(
+          annotation => annotation.message.event === "step:start" && annotation.message.id === rrId
+        );
+        let endAnnotation = annotations.find(
+          annotation => annotation.message.event === "step:end" && annotation.message.id === rrId
+        );
         let timeStampedPointRange = null;
         if (startAnnotation || endAnnotation) {
           startAnnotation = startAnnotation ?? endAnnotation!;
@@ -884,6 +910,64 @@ export async function processPlaywrightTestRecording(
     // This function does not support the legacy TestItem format
     throw Error(`Unsupported legacy TestItem value`);
   }
+}
+
+class FunctionNode {
+  functionName: string;
+  events: TestEvent[];
+  children: { [key: string]: FunctionNode };
+
+  constructor(functionName = "") {
+    this.functionName = functionName;
+    this.events = [];
+    this.children = {};
+  }
+
+  findOrAddChild(functionName: string) {
+    if (!this.children.hasOwnProperty(functionName)) {
+      this.children[functionName] = new FunctionNode(functionName);
+    }
+    return this.children[functionName];
+  }
+
+  toDict(): any {
+    // Convert the children to a list of dictionaries
+    const childList = Object.values(this.children).map(childNode => childNode.toDict());
+
+    // Combine events and children
+    const combined = this.events.concat(childList);
+
+    return {
+      function: this.functionName,
+      events: combined,
+      type: "function",
+    };
+  }
+}
+
+function groupTestStepsByCallStack(test: RecordingTestMetadataV3.TestRecording) {
+  // Initialize the root of the tree
+  const rootNode = new FunctionNode();
+
+  // Sample events_data for demonstration purposes
+  // Make sure to define your `events_data` before this loop
+  // let events_data = [ ... ];
+
+  for (let event of test.events.main) {
+    let currentNode = rootNode;
+    // @ts-ignore
+    const callStack = event.data.testSourceCallStack || [];
+    for (let call of callStack.reverse()) {
+      const functionName = call.functionName || call.fileName;
+      currentNode = currentNode.findOrAddChild(functionName);
+    }
+    currentNode.events.push(event);
+  }
+
+  // Convert the tree to the desired dict structure
+  test.events.main = rootNode.toDict().events;
+
+  return test;
 }
 
 // If there are test(s) with completed status (passed/failed/timedOut) but no annotations,

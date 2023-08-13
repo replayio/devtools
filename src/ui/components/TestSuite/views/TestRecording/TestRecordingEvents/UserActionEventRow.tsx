@@ -50,7 +50,8 @@ export default memo(function UserActionEventRow({
   userActionEvent: UserActionEvent;
 }) {
   const { data, timeStampedPointRange } = userActionEvent;
-  const { command, error, parentId, result } = data;
+  const { command, error, parentId, result, testSourceCallStack } = data;
+  console.log(testSourceCallStack)
 
   const replayClient = useContext(ReplayClientContext);
 
