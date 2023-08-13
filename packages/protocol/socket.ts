@@ -11,6 +11,7 @@ import {
 } from "@replayio/protocol";
 import { captureException } from "@sentry/react";
 
+import { isDevelopment } from "shared/utils/environment";
 import { ProtocolError, commandError } from "shared/utils/error";
 
 import { makeInfallible } from "./utils";

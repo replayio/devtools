@@ -694,13 +694,17 @@ export class ReplayClient implements ReplayClientInterface {
     locations: SameLineSourceLocations[],
     focusRange: PointRange | null
   ) {
-    const sessionId = this.getSessionIdThrows();
-    await this.waitForRangeToBeInFocusRange(focusRange);
-    const { hits } = await client.Debugger.getHitCounts(
-      { sourceId, locations, maxHits: TOO_MANY_POINTS_TO_FIND, range: focusRange || undefined },
-      sessionId
-    );
-    return hits;
+    try {
+      const sessionId = this.getSessionIdThrows();
+      await this.waitForRangeToBeInFocusRange(focusRange);
+      const { hits } = await client.Debugger.getHitCounts(
+        { sourceId, locations, maxHits: TOO_MANY_POINTS_TO_FIND, range: focusRange || undefined },
+        sessionId
+      );
+      return hits;
+    } catch (e) {
+      return [];
+    }
   }
 
   getSourceOutline(sourceId: SourceId) {

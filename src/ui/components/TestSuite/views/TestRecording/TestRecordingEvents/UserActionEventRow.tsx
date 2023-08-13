@@ -51,7 +51,6 @@ export default memo(function UserActionEventRow({
 }) {
   const { data, timeStampedPointRange } = userActionEvent;
   const { command, error, parentId, result, testSourceCallStack } = data;
-  console.log(testSourceCallStack)
 
   const replayClient = useContext(ReplayClientContext);
 
@@ -250,13 +249,12 @@ function findJumpToCodeDetailsIfAvailable(
 
     if (timeStampedPointRange !== null) {
       canShowJumpToCode =
-        category === "command" && (
-          name.startsWith("locator.click") ||
+        category === "command" &&
+        (name.startsWith("locator.click") ||
           name.startsWith("locator.type") ||
           name.startsWith("keyboard.down") ||
           name.startsWith("keyboard.press") ||
-          name.startsWith("keyboard.type")
-        );
+          name.startsWith("keyboard.type"));
 
       if (canShowJumpToCode) {
         jumpToCodeAnnotation = jumpToCodeAnnotations.find(a =>

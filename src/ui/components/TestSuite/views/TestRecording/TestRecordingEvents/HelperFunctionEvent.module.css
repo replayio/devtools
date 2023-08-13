@@ -6,9 +6,9 @@
   position: relative;
 }
 
-.Text {
+.FunctionRow {
   flex: 1;
-  /* color: var(--color-dim); */
+  width: 100%;
 }
 
 .Name {
@@ -16,5 +16,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
   word-break: break-all;
-  /* color: var(--color-link); */
+  font-weight: 600;
+  color: var(--color-dim);
 }

@@ -222,14 +222,16 @@ export const boxModelCache: Cache<
   debugLabel: "BoxModel",
   getKey: ([protocolClient, sessionId, pauseId, nodeId]) => `${pauseId}:${nodeId}`,
   load: async ([protocolClient, sessionId, pauseId, nodeId]) => {
-    const { model: nodeBoxModel } = await protocolClient.DOM.getBoxModel(
-      {
-        node: nodeId,
-      },
-      sessionId,
-      pauseId
-    );
-    return nodeBoxModel;
+    try {
+      const { model: nodeBoxModel } = await protocolClient.DOM.getBoxModel(
+        {
+          node: nodeId,
+        },
+        sessionId,
+        pauseId
+      );
+      return nodeBoxModel;
+    } catch (e) {}
   },
 });
 

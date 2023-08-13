@@ -16,6 +16,7 @@ import {
   TestRunnerName,
   TestSectionName,
   getTestEventTime,
+  isFunctionEvent,
   isUserActionTestEvent,
 } from "shared/test-suites/RecordingTestMetadata";
 import { isPointInRegion } from "shared/utils/time";
@@ -36,10 +37,12 @@ export function TestSectionRow({
   testEvent,
   testRunnerName,
   testSectionName,
+  nestingLevel = 0,
 }: {
   testEvent: TestEvent;
   testRunnerName: TestRunnerName | null;
   testSectionName: TestSectionName;
+  nestingLevel: number;
 }) {
   const { range: focusWindow } = useContext(FocusContext);
   const { executionPoint: currentExecutionPoint } = useContext(TimelineContext);
@@ -116,8 +119,10 @@ export function TestSectionRow({
           functionEvent={testEvent}
           testRunnerName={testRunnerName}
           testSectionName={testSectionName}
+          nestingLevel={nestingLevel + 1}
         />
       );
+      status = "success";
       break;
     case "user-action":
       child = (
@@ -135,13 +140,11 @@ export function TestSectionRow({
   }
 
   const onClick = async () => {
-    if (testEvent.type === "function") {
-      return false;
+    if (!isFunctionEvent(testEvent)) {
+      startTransition(() => {
+        setTestEvent(testEvent);
+      });
     }
-
-    startTransition(() => {
-      setTestEvent(testEvent);
-    });
 
     let executionPoint: ExecutionPoint | null = null;
     let time: number | null = null;
@@ -151,6 +154,15 @@ export function TestSectionRow({
       if (timeStampedPoint) {
         executionPoint = timeStampedPoint.point;
         time = timeStampedPoint.time;
+      }
+    } else if (isFunctionEvent(testEvent)) {
+      const event = testEvent.events[0];
+      if (event.type === "navigation") {
+        executionPoint = event.timeStampedPoint.point;
+        time = event.timeStampedPoint.time;
+      } else if (event.type === "user-action") {
+        executionPoint = event.timeStampedPointRange?.begin?.point ?? null;
+        time = event.timeStampedPointRange?.begin?.time ?? null;
       }
     } else {
       executionPoint = testEvent.timeStampedPoint.point;
@@ -187,8 +199,9 @@ export function TestSectionRow({
   };
 
   const onMouseEnter = async () => {
+    const event = testEvent.type == "function" ? testEvent.events[0] : testEvent;
     if (!isSelected) {
-      dispatch(setTimelineToTime(getTestEventTime(testEvent)));
+      dispatch(setTimelineToTime(getTestEventTime(event)));
     }
   };
 
@@ -206,6 +219,7 @@ export function TestSectionRow({
       data-position={position}
       data-selected={isSelected || undefined}
       data-status={status}
+      data-nesting-level={nestingLevel}
       data-type={testEvent.type}
       data-test-name="TestSectionRow"
       onClick={onClick}

@@ -48,8 +48,6 @@ export const PlaywrightAnnotationsCache = createSingleEntryCacheWithTelemetry<
       );
     });
 
-    console.log("playwright", sortedAnnotations);
-
     return sortedAnnotations;
   },
 });

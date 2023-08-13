@@ -3,7 +3,7 @@ import { devices as replayDevices } from "@replayio/playwright";
 
 const { CI, SLOW_MO, TRACE, HEADLESS } = process.env;
 
-function isTruthy(value) {
+function isTruthy(value: any) {
   return value === "true" || value == "1";
 }
 

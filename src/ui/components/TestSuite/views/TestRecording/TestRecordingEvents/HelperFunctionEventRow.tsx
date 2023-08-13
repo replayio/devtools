@@ -10,21 +10,22 @@ export default memo(function HelperFunctionEventRow({
   functionEvent,
   testRunnerName,
   testSectionName,
+  nestingLevel,
 }: {
   functionEvent: FunctionEvent;
   testRunnerName: string | null;
   testSectionName: string;
+  nestingLevel: number;
 }) {
   const [collapsed, toggleCollapsed] = useState(true);
   const formattedName = truncateMiddle(functionEvent.function, 150);
   const events = functionEvent.events;
-  console.log(`>>>`, functionEvent, events);
 
   return (
     <div className={styles.Row}>
       <div
         style={{}}
-        className={styles.Text}
+        className={styles.FunctionRow}
         onClick={e => {
           e.stopPropagation();
           e.preventDefault();
@@ -33,15 +34,27 @@ export default memo(function HelperFunctionEventRow({
       >
         <span className={styles.Name}>{formattedName || "Outer function"}</span>
       </div>
-      {!collapsed &&
-        events.map((testEvent, index) => (
-          <TestSectionRow
-            key={index}
-            testEvent={testEvent}
-            testRunnerName={testRunnerName}
-            testSectionName={testSectionName}
-          />
-        ))}
+      <div
+        style={{
+          display: "flex",
+          flex: 1,
+          flexDirection: "column",
+          justifyContent: "space-between",
+          width: "100%",
+          marginTop: collapsed ? 0 : "1rem",
+        }}
+      >
+        {!collapsed &&
+          events.map((testEvent, index) => (
+            <TestSectionRow
+              key={index}
+              testEvent={testEvent}
+              testRunnerName={testRunnerName}
+              testSectionName={testSectionName}
+              nestingLevel={nestingLevel + 1}
+            />
+          ))}
+      </div>
     </div>
   );
 });

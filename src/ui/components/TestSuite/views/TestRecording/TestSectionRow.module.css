@@ -31,15 +31,34 @@
 }
 .Row[data-status="success"][data-position="before"],
 .Row[data-type="navigation"][data-position="before"],
-.Row[data-type="network-request"][data-position="before"] {
+.Row[data-type="network-request"][data-position="before"],
+.Row[data-type="function"][data-position="before"] {
   --border-left-color: var(--primary-accent);
 }
+
+.Row[data-position="before"]:not([data-nesting-level="2"]) {
+  --border-left-color: transparent;
+}
+
 .Row[data-status="success"][data-selected],
 .Row[data-type="navigation"][data-selected],
 .Row[data-type="network-request"][data-selected] {
-  --border-left-color: var(--primary-accent);
   --row-background-color: var(--testsuites-active-bgcolor);
   --row-background-color-hover: var(--testsuites-active-bgcolor);
+}
+
+.Row[data-status="success"][data-selected]:not([data-nesting-level="2"]),
+.Row[data-type="navigation"][data-selected]:not([data-nesting-level="2"]),
+.Row[data-type="network-request"][data-selected]:not([data-nesting-level="2"]) {
+  --border-left-color: transparent;
+}
+
+.Row[data-type="function"] {
+  --row-background-color-hover: "blue";
+}
+
+.Row[data-nesting-level="0"][data-status="success"] {
+  --border-left-color: transparent;
 }
 
 .Row[data-position="before"] {

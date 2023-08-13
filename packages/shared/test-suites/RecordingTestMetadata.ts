@@ -824,7 +824,8 @@ export async function processPlaywrightTestRecording(
           rrId,
         } = partialTestEvent.data as any;
 
-        const [_, name, args] = partialTestEvent.data.command.name.match(/(.*)\((.*)\)/) || [];
+        const commandName = partialTestEvent.data.command.name;
+        const [_, name, args] = commandName.match(/^(.+?)\((.+)\)$/) || [];
 
         const command = {
           name: name || partialTestEvent.data.command.name,
@@ -1156,6 +1157,12 @@ export function isUserActionTestEvent(
   value: TestEvent
 ): value is RecordingTestMetadataV3.UserActionEvent {
   return value.type === "user-action";
+}
+
+export function isFunctionEvent(
+  value: TestEvent
+): value is RecordingTestMetadataV3.UserActionEvent {
+  return value.type === "function";
 }
 
 export function compareTestEventExecutionPoints(
