@@ -108,7 +108,7 @@ function CollaboratorsSection({
           <div>
             <div className="mb-2 font-bold">Team</div>
 
-            <div className="rounded-md border border border-inputBorder bg-themeTextFieldBgcolor p-2 hover:bg-themeTextFieldBgcolorHover">
+            <div className="rounded-md border border-inputBorder bg-themeTextFieldBgcolor p-2 hover:bg-themeTextFieldBgcolorHover">
               <PrivacyDropdown recording={recording} />
             </div>
 
@@ -167,7 +167,7 @@ function SharingSection({
         showPrivacy={showPrivacy}
         setShowPrivacy={setShowPrivacy}
       />
-      <section className="flex flex-col bg-menuHoverBgcolor px-4 pb-5 pt-3">
+      <section className="flex flex-col bg-menuHoverBgcolor px-4 pt-3 pb-5">
         <div className="mb-2 font-bold">Sharing Options</div>
 
         <div className="flex">
@@ -290,7 +290,7 @@ function SharingModal({ recording, hideModal }: SharingModalProps) {
   return (
     <Modal options={{ maskTransparency: "translucent" }} onMaskClick={hideModal}>
       <div
-        className="sharing-modal relative flex flex-row overflow-hidden rounded-lg text-sm shadow-xl"
+        className="sharing-modal relative flex flex-row overflow-hidden rounded-lg border border-inputBorder text-sm shadow-xl"
         style={{ width: showPrivacy ? 720 : 390 }}
       >
         <div className="flex flex-col space-y-0" style={{ width: 390 }}>
