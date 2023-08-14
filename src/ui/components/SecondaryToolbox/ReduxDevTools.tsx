@@ -1,6 +1,6 @@
 import { ExecutionPoint } from "@replayio/protocol";
 import classnames from "classnames";
-import React, { useContext, useMemo, useState } from "react";
+import React, { Suspense, useContext, useMemo, useState, useTransition } from "react";
 import { PanelGroup, PanelResizeHandle, Panel as ResizablePanel } from "react-resizable-panels";
 import { useImperativeCacheValue } from "suspense";
 
@@ -14,15 +14,23 @@ import { reduxDevToolsAnnotationsCache } from "ui/suspense/annotationsCaches";
 import { reduxDispatchJumpLocationCache } from "ui/suspense/jumpToLocationCache";
 
 import { JumpToCodeButton } from "../shared/JumpToCodeButton";
+import Loader from "../shared/Loader";
 import { ReduxActionAnnotation } from "./redux-devtools/redux-annotations";
 import { ReduxDevToolsContents } from "./redux-devtools/ReduxDevToolsContents";
 import styles from "./ReduxDevTools.module.css";
 
 export const ReduxDevToolsPanel = () => {
+  const [isPending, startTransition] = useTransition();
   const client = useContext(ReplayClientContext);
   const [selectedPoint, setSelectedPoint] = useState<ExecutionPoint | null>(null);
   const focusWindow = useAppSelector(getFocusWindow);
   const [searchValue, setSearchValue] = useState("");
+
+  const setSelectedTransition = (point: ExecutionPoint | null) => {
+    startTransition(() => {
+      setSelectedPoint(point);
+    });
+  };
 
   const { status: annotationsStatus, value: parsedAnnotations } = useImperativeCacheValue(
     reduxDevToolsAnnotationsCache,
@@ -47,7 +55,11 @@ export const ReduxDevToolsPanel = () => {
   );
 
   return (
-    <div className={classnames("flex min-h-full bg-bodyBgcolor text-xs", styles.actions)}>
+    <div
+      className={classnames("flex min-h-full bg-bodyBgcolor text-xs", styles.actions)}
+      data-test-id="ReduxDevtools"
+      data-contents-pending={isPending}
+    >
       <PanelGroup autoSaveId="ReduxDevTools" direction="horizontal">
         <ResizablePanel collapsible>
           <ActionFilter searchValue={searchValue} onSearch={setSearchValue} />
@@ -57,7 +69,7 @@ export const ReduxDevToolsPanel = () => {
                 key={annotation.point}
                 annotation={annotation}
                 selectedPoint={selectedPoint}
-                setSelectedPoint={setSelectedPoint}
+                setSelectedPoint={setSelectedTransition}
                 firstAnnotationInTheFuture={firstAnnotationInTheFuture === annotation}
               />
             ))}
@@ -66,7 +78,9 @@ export const ReduxDevToolsPanel = () => {
         <PanelResizeHandle className="h-full w-1 bg-chrome" />
         <ResizablePanel collapsible>
           {selectedPoint && annotation && (
-            <ReduxDevToolsContents point={selectedPoint} time={annotation.time} />
+            <Suspense fallback={<Loader />}>
+              <ReduxDevToolsContents point={selectedPoint} time={annotation.time} />
+            </Suspense>
           )}
         </ResizablePanel>
       </PanelGroup>
@@ -148,6 +162,7 @@ function ActionItem({
       })}
       role="listitem"
       onClick={() => setSelectedPoint(annotation.point)}
+      data-test-id="ReduxActionItem"
     >
       <JumpToCodeButton
         className={styles["jump-to-code"]}

@@ -145,40 +145,35 @@ type SelectedContentsTab = "action" | "state" | "diff" | "trace";
 
 export function ReduxDevToolsContents({ point, time }: RDTCProps) {
   const replayClient = useContext(ReplayClientContext);
-  const [reduxValues, setReduxValues] = useState<ReduxActionStateValues | null>(null);
-  const [diff, setDiff] = useState<Record<string, unknown> | null>(null);
+  let reduxValues: ReduxActionStateValues | null = null;
+  let diff: Record<string, unknown> | null = null;
+  let jumpLocation: PointDescription | null = null;
   const [selectedTab, setSelectedTab] = useState<SelectedContentsTab>("action");
   const sourcesState = useAppSelector(state => state.sources);
-  const [jumpLocation, setJumpLocation] = useState<PointDescription | null>(null);
 
-  useLayoutEffect(() => {
-    async function fetchAction() {
-      switch (selectedTab) {
-        case "action":
-        case "state": {
-          const res = await actionStateValuesCache.readAsync(replayClient, point, time);
-          setReduxValues(res ?? null);
-          break;
-        }
-        case "diff": {
-          const diffRes = await diffCache.readAsync(replayClient, point, time);
-          setDiff(diffRes ?? null);
-          break;
-        }
-        case "trace": {
-          const jumpLocation = await reduxDispatchJumpLocationCache.readAsync(
-            replayClient,
-            point,
-            time,
-            sourcesState
-          );
-          setJumpLocation(jumpLocation ?? null);
-          break;
-        }
-      }
+  switch (selectedTab) {
+    case "action":
+    case "state": {
+      const res = actionStateValuesCache.read(replayClient, point, time);
+      reduxValues = res ?? null;
+      break;
     }
-    fetchAction();
-  }, [replayClient, point, time, selectedTab, sourcesState]);
+    case "diff": {
+      const diffRes = diffCache.read(replayClient, point, time);
+      diff = diffRes ?? null;
+      break;
+    }
+    case "trace": {
+      const jumpLocationRes = reduxDispatchJumpLocationCache.read(
+        replayClient,
+        point,
+        time,
+        sourcesState
+      );
+      jumpLocation = jumpLocationRes ?? null;
+      break;
+    }
+  }
 
   const [pauseId, actionValue, stateValue] = reduxValues ?? [];
 
@@ -221,7 +216,10 @@ export function ReduxDevToolsContents({ point, time }: RDTCProps) {
 
   return (
     <div className="flex h-full flex-col overflow-auto">
-      <div className={classnames("p3 flex w-full  overflow-auto", styles.tabsContainer)}>
+      <div
+        className={classnames("p3 flex w-full  overflow-auto", styles.tabsContainer)}
+        data-test-id="ReduxTabsContainer"
+      >
         <PanelButton
           selected={selectedTab === "action"}
           name="action"
@@ -260,7 +258,9 @@ export function ReduxDevToolsContents({ point, time }: RDTCProps) {
         </PanelButton>
       </div>
 
-      <div className="h-full overflow-auto font-mono">{contents}</div>
+      <div className="h-full overflow-auto font-mono" data-test-id="ReduxDevToolsContents">
+        {contents}
+      </div>
     </div>
   );
 }

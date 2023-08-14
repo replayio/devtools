@@ -82,6 +82,12 @@ const knownExamples: TestExampleFile[] = [
     runtime: "chromium",
   },
   {
+    filename: "redux/dist/index.html",
+    folder: config.browserExamplesPath,
+    category: "browser",
+    runtime: "chromium",
+  },
+  {
     filename: "doc_async.html",
     folder: config.browserExamplesPath,
     category: "browser",
