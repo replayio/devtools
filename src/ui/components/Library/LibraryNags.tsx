@@ -36,9 +36,6 @@ function NagSwitcher({
     if (singleInvitation(pendingWorkspaces?.length || 0, workspaces.length)) {
       trackEvent("onboarding.team_invite");
       dispatch(setModal("single-invite"));
-    } else if (downloadReplay(userInfo.nags, dismissNag)) {
-      trackEvent("onboarding.download_replay_prompt");
-      dispatch(setModal("download-replay"));
     } else if (firstReplay(userInfo.nags)) {
       trackEvent("onboarding.demo_replay_prompt");
       dispatch(setModal("first-replay"));
