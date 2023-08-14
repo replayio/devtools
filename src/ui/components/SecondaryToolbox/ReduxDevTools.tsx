@@ -135,6 +135,7 @@ function ActionItem({
 }) {
   const dispatch = useAppDispatch();
   const onSeek = () => {
+    setSelectedPoint(annotation.point);
     dispatch(jumpToLocationForReduxDispatch(annotation.point, annotation.time));
   };
 
