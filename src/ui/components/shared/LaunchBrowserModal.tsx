@@ -20,23 +20,18 @@ function LaunchBrowser({
   }, [path]);
 
   return (
-    <section className="relative m-auto w-full max-w-xl overflow-hidden rounded-lg bg-modalBgcolor text-sm text-bodyColor shadow-lg">
+    <section className="relative m-auto w-full max-w-xl overflow-hidden rounded-lg border border-inputBorder bg-modalBgcolor text-sm text-bodyColor shadow-lg">
       <div className="flex flex-col items-center space-y-9 p-6">
         <div className="place-content-center space-y-3">
           <img className="mx-auto h-12 w-12" src="/images/logo.svg" />
         </div>
         <div className="flex flex-col items-center space-y-4 text-center">
-          <div className="text-lg font-bold">Launching Replay ...</div>
-          <div className="space-y-6">
-            <p>
-              Click <strong>Open Replay</strong> in the dialog shown by your browser
-            </p>
-            {children}
-          </div>
+          <div className="text-lg font-bold">Launching Replay...</div>
+          <div className="space-y-6">{children}</div>
           <div className="w-full" />
-          <div className="flex flex-row text-xs text-gray-500">
+          <div className="flex flex-row text-xs text-gray-400">
             <p>
-              {`Don't have Replay yet? Download it on `}
+              {`Download it for `}
               <a
                 href="https://static.replay.io/downloads/replay.dmg"
                 onClick={() => trackEvent("launch.download_replay", { OS: "mac" })}
@@ -54,7 +49,7 @@ function LaunchBrowser({
               >
                 Linux
               </a>
-              {`, and `}
+              {`, or `}
               <a
                 href="https://static.replay.io/downloads/windows-replay.zip"
                 onClick={() => trackEvent("launch.download_replay", { OS: "windows" })}
