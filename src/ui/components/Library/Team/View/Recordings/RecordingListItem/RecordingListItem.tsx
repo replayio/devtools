@@ -13,6 +13,7 @@ import { TestResultIcon } from "ui/components/TestSuite/components/TestResultIco
 import hooks from "ui/hooks";
 import { useGetUserPermissions } from "ui/hooks/users";
 import { getRecordingURL } from "ui/utils/recording";
+import { formatDuration } from "ui/utils/time";
 
 import { Redacted } from "../../../../../Redacted";
 import RecordingOptionsDropdown from "./RecordingOptionsDropdown";
@@ -22,8 +23,8 @@ export function getDurationString(durationMs: number | null | undefined) {
   if (typeof durationMs !== "number") {
     return "";
   }
-  const seconds = Math.round(durationMs / 1000);
-  return `${seconds} sec`;
+
+  return formatDuration(durationMs);
 }
 
 function shortenRelativeDate(date: string) {
