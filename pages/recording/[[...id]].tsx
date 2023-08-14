@@ -66,13 +66,11 @@ function RecordingHead({ metadata }: MetadataProps) {
     description = "";
   }
 
-  const pageTitle = title ? `⏱️ ${title}` : "⏱️";
-
   const image = `${process.env.NEXT_PUBLIC_IMAGE_URL}${metadata.id}.png`;
 
   return (
     <Head>
-      <title>{pageTitle}</title>
+      <title>{title}</title>
       {/* nosemgrep typescript.react.security.audit.react-http-leak.react-http-leak */}
       <meta property="og:title" content={title} />
       <meta property="og:type" content="website" />
