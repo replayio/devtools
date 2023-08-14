@@ -24,7 +24,6 @@ function TestRunsContent() {
     filterByTextForDisplay,
     setFilterByStatus,
     setFilterByText,
-    testRunId,
   } = useContext(TestRunsContext);
 
   const {
