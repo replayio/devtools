@@ -187,7 +187,7 @@ export const config = {
     legacyKey: "devtools.features.reactPanel",
   },
   feature_reduxDevTools: {
-    defaultValue: Boolean(false),
+    defaultValue: Boolean(true),
     description: "Enable experimental Redux DevTools panel",
     label: "Enable Redux DevTools",
     legacyKey: null,
