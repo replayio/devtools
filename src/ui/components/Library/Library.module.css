@@ -28,7 +28,7 @@
 
 :root:global(.theme-dark) .teamRow:hover,
 :root:global(.theme-dark) .teamRowActive {
-  background-color: var(--theme-base-90);
+  background-color: var(--team-row-active);
   color: #fff;
 }
 
@@ -97,7 +97,7 @@
 
 :root:global(.theme-light) .teamRow:hover,
 :root:global(.theme-light) .teamRowActive {
-  background-color: #303030;
+  background-color: var(--team-row-active);
   color: #fff;
 }
 
@@ -244,4 +244,9 @@
   color: var(--theme-base-100);
   background-color: var(--testsuites-success-color);
   border-radius: 50%;
+}
+
+.FilterTestsFilter {
+  border: 1px solid var(--input-border);
+  background-color: var(--body-bgcolor);
 }

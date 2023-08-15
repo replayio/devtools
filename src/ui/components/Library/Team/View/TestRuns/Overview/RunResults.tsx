@@ -41,7 +41,7 @@ export function RunResults({ isPending }: { isPending: boolean }) {
         }`}
       >
         <input
-          className="w-full appearance-none rounded border-none bg-black bg-opacity-10 text-xs focus:outline-none focus:ring focus:ring-primaryAccent"
+          className={`w-full appearance-none rounded border-none text-xs focus:outline-none focus:ring focus:ring-primaryAccent ${styles.FilterTestsFilter}`}
           data-test-id="TestRunResults-FilterInput"
           onChange={event => setFilterByText(event.currentTarget.value)}
           placeholder="Filter tests"
