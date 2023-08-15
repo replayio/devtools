@@ -168,7 +168,7 @@ function _DevTools({
     let step = 0;
     const steps = 3;
     const pauseInterval = 750; // Pause time in milliseconds
-    let intervalId;
+    let intervalId: NodeJS.Timeout;
 
     const updateTitle = () => {
       const characters = Array(steps).fill("○");
@@ -192,7 +192,9 @@ function _DevTools({
     }
 
     return () => {
-      if (intervalId) clearTimeout(intervalId);
+      if (intervalId) {
+        clearTimeout(intervalId);
+      }
     };
   }, [loadingFinished, title]);
 
