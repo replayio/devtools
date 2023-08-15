@@ -90,9 +90,6 @@ function AppModal({ hideModal, modal }: { hideModal: () => void; modal: ModalTyp
     case "first-replay": {
       return <FirstReplayModal />;
     }
-    case "download-replay": {
-      return <DownloadReplayPromptModal />;
-    }
     case "privacy": {
       return <PrivacyModal />;
     }

@@ -14,3 +14,10 @@ export async function enablePassport(page: Page) {
   await page.locator("#BooleanPreference-feature_showPassport").check();
   await closeSettingsModal(page);
 }
+
+export async function enableReduxDevtools(page: Page) {
+  await openSettingsModal(page);
+  await page.locator('.modal-content li:has-text("Experimental")').click();
+  await page.locator("#BooleanPreference-feature_reduxDevTools").check();
+  await closeSettingsModal(page);
+}

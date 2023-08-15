@@ -10,7 +10,7 @@ function PrivacyModal({ hideModal }: PropsFromRedux) {
   return (
     <Modal options={{ maskTransparency: "translucent" }} onMaskClick={hideModal}>
       <div
-        className="relative flex overflow-hidden rounded-xl border bg-themeBase-100"
+        className="relative flex overflow-hidden rounded-xl border border-inputBorder bg-themeBase-100"
         style={{ width: "440px", height: "480px" }}
       >
         <Privacy />
