@@ -49,7 +49,8 @@ function LoadingScreen({
   awaitingSourcemaps,
   message,
   secondaryMessage,
-}: PropsFromRedux & { message: string; secondaryMessage?: string }) {
+  children,
+}: PropsFromRedux & { message: string; secondaryMessage?: string; children?: ReactNode }) {
   const waitingForMessage =
     awaitingSourcemaps || uploading ? (
       <span>Uploading {Math.round(uploading?.amount ? Number(uploading.amount) : 0)}Mb</span>
@@ -62,7 +63,10 @@ function LoadingScreen({
 
   return (
     <LoadingScreenTemplate>
-      <div className={styles.messageWrapper}>{waitingForMessage}</div>
+      <div className={styles.messageWrapper}>
+        {waitingForMessage}
+        {children}
+      </div>
     </LoadingScreenTemplate>
   );
 }

@@ -162,6 +162,47 @@ function _DevTools({
   const [enableLargeText] = useGraphQLUserData("global_enableLargeText");
 
   usePreferredFontSize(enableLargeText);
+  const notificationShownRef = useRef(false);
+
+  function showNotification() {
+    if (notificationShownRef.current) {
+      console.log("Notification already shown.");
+      return;
+    }
+
+    if (document.visibilityState === "visible") {
+      console.log("Tab is in view, not showing notification.");
+      return;
+    }
+
+    if (!("Notification" in window)) {
+      console.log("This browser does not support notifications.");
+      return;
+    }
+
+    if (Notification.permission !== "granted") {
+      console.log("Notification permission not granted.");
+      return;
+    }
+
+    new Notification("Replay", {
+      body: "Your replay has successfully loaded",
+    });
+
+    notificationShownRef.current = true;
+  }
+
+  useEffect(() => {
+    if (loadingFinished) {
+      showNotification();
+    }
+  }, [recordingId, loadingFinished, Date.now()]);
+
+  useEffect(() => {
+    return () => {
+      notificationShownRef.current = false;
+    };
+  }, []);
 
   useEffect(() => {
     import("./Viewer");
@@ -226,6 +267,7 @@ function _DevTools({
   useEffect(() => {
     if (loadingFinished) {
       trackLoadingIdleTime(sessionId!);
+      showNotification();
     }
   }, [loadingFinished, trackLoadingIdleTime, sessionId]);
 
@@ -256,8 +298,38 @@ function _DevTools({
     20000
   );
 
+  function requestNotificationPermission() {
+    if (!("Notification" in window)) {
+      console.log("This browser does not support notifications.");
+      return;
+    }
+
+    if (Notification.permission === "granted") {
+      console.log("Notification permission already granted.");
+      return;
+    }
+
+    Notification.requestPermission().then(permission => {
+      if (permission === "granted") {
+        console.log("Notification permission granted.");
+      } else {
+        console.log("Notification permission denied.");
+      }
+    });
+  }
+
   if (!loadingFinished) {
-    return <LoadingScreen message={message} secondaryMessage={secondaryMessage} />;
+    return (
+      <LoadingScreen message={message} secondaryMessage={secondaryMessage}>
+        <div>
+          {recording?.isProcessed === false && (
+            <a href="#" onClick={requestNotificationPermission}>
+              Enable notifications
+            </a>
+          )}
+        </div>
+      </LoadingScreen>
+    );
   }
 
   const title = recording?.title;
