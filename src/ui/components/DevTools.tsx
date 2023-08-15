@@ -150,6 +150,7 @@ function _DevTools({
   const { isAuthenticated } = useAuth0();
   const recordingId = useGetRecordingId();
   const { recording } = useGetRecording(recordingId);
+  const title = recording?.title || "Replay";
   const { trackLoadingIdleTime } = useTrackLoadingIdleTime(uploadComplete, recording);
   const { userIsAuthor, loading } = useUserIsAuthor();
   const { id: userId, email: userEmail, loading: userLoading } = useGetUserInfo();
@@ -162,6 +163,40 @@ function _DevTools({
   const [enableLargeText] = useGraphQLUserData("global_enableLargeText");
 
   usePreferredFontSize(enableLargeText);
+
+  useEffect(() => {
+    let step = 0;
+    const steps = 3;
+    const pauseInterval = 750; // Pause time in milliseconds
+    let intervalId;
+    let pauseTimeoutId;
+
+    const updateTitle = () => {
+      if (step % steps === 0 && step !== 0) {
+        pauseTimeoutId = setTimeout(() => {
+          step = 0; // Reset the step after pausing
+          updateTitle();
+        }, pauseInterval);
+      } else {
+        const characters = Array(steps).fill("·");
+        characters[step % steps] = "◦";
+        document.title = `${characters.join("")} ${title}`;
+        step++;
+        intervalId = setTimeout(updateTitle, 750);
+      }
+    };
+
+    if (!loadingFinished) {
+      updateTitle(); // Start the animation
+    } else {
+      document.title = title;
+    }
+
+    return () => {
+      if (intervalId) clearTimeout(intervalId);
+      if (pauseTimeoutId) clearTimeout(pauseTimeoutId);
+    };
+  }, [loadingFinished, title]);
 
   useEffect(() => {
     import("./Viewer");
@@ -260,7 +295,7 @@ function _DevTools({
     return <LoadingScreen message={message} secondaryMessage={secondaryMessage} />;
   }
 
-  const title = recording?.title;
+  const recordingTitle = recording?.title; // New variable for the recording title
   const testResult = recording?.metadata?.test?.result;
   let emoji = "";
   switch (testResult) {
@@ -285,10 +320,10 @@ function _DevTools({
                       <ExpandablesContextRoot>
                         <LayoutContextAdapter>
                           <KeyModifiers>
-                            {title && (
+                            {recordingTitle && (
                               <Head>
                                 <title>
-                                  {emoji} {title}
+                                  {emoji} {recordingTitle}
                                 </title>
                               </Head>
                             )}

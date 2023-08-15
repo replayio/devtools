@@ -66,7 +66,7 @@ function RecordingHead({ metadata }: MetadataProps) {
     description = "";
   }
 
-  const pageTitle = title ? `⏱️ ${title}` : "⏱️";
+  const pageTitle = title;
 
   const image = `${process.env.NEXT_PUBLIC_IMAGE_URL}${metadata.id}.png`;
 
