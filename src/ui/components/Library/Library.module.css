@@ -247,5 +247,6 @@
 }
 
 .FilterTestsFilter {
-  background-color: var(--theme-text-field-bgcolor);
+  border: 1px solid var(--input-border);
+  background-color: var(--body-bgcolor);
 }

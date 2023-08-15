@@ -27,18 +27,19 @@
 
 .filterInput {
   width: 100%;
-  padding: 0.3rem 0.625rem;
+  padding: 0.25rem 0.625rem;
   appearance: none;
-  border-radius: 0.25rem;
+  border-radius: 0.5rem;
   border: none;
-  background-color: var(--theme-text-field-bgcolor);
-  font-size: 0.75rem; /* Equivalent to text-xs */
+  background-color: var(--body-bgcolor);
+  border: 1px solid var(--input-border);
+  font-size: 0.75rem;
   outline: none;
   padding-right: 1.55rem;
 }
 
 .filterInput:focus {
-  box-shadow: 0 0 0 2px var(--primary-accent); /* Equivalent to focus:ring-primaryAccent */
+  box-shadow: 0 0 0 2px var(--primary-accent);
 }
 
 .searchIcon {
