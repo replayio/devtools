@@ -169,20 +169,19 @@ function _DevTools({
     const steps = 3;
     const pauseInterval = 750; // Pause time in milliseconds
     let intervalId;
-    let pauseTimeoutId;
 
     const updateTitle = () => {
-      if (step % steps === 0 && step !== 0) {
-        pauseTimeoutId = setTimeout(() => {
-          step = 0; // Reset the step after pausing
-          updateTitle();
-        }, pauseInterval);
-      } else {
-        const characters = Array(steps).fill("·");
-        characters[step % steps] = "◦";
-        document.title = `${characters.join("")} ${title}`;
+      const characters = Array(steps).fill("○");
+      if (step < steps) {
+        characters[step % steps] = "●";
+      }
+      document.title = `${characters.join("")} ${title}`;
+      if (step < steps + 1) {
         step++;
         intervalId = setTimeout(updateTitle, 750);
+      } else {
+        step = 0;
+        intervalId = setTimeout(updateTitle, pauseInterval);
       }
     };
 
@@ -194,7 +193,6 @@ function _DevTools({
 
     return () => {
       if (intervalId) clearTimeout(intervalId);
-      if (pauseTimeoutId) clearTimeout(pauseTimeoutId);
     };
   }, [loadingFinished, title]);
 
