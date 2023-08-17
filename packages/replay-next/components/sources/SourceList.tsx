@@ -15,6 +15,7 @@ import {
 } from "suspense";
 
 import { useLineHighlights } from "replay-next/components/sources/hooks/useLineHighlights";
+import { useMaxStringLengths } from "replay-next/components/sources/hooks/useMaxStringLengths";
 import { useSourceListCssVariables } from "replay-next/components/sources/hooks/useSourceListCssVariables";
 import { findPointForLocation } from "replay-next/components/sources/utils/points";
 import { scrollToLineAndColumn } from "replay-next/components/sources/utils/scrollToLineAndColumn";
@@ -37,13 +38,11 @@ import { toPointRange } from "shared/utils/time";
 
 import useFontBasedListMeasurements from "./hooks/useFontBasedListMeasurements";
 import SourceListRow from "./SourceListRow";
-import { formatHitCount } from "./utils/formatHitCount";
 import getScrollbarWidth from "./utils/getScrollbarWidth";
 import styles from "./SourceList.module.css";
 
 const NO_BREAKABLE_POSITIONS: BreakpointPositionsResult = [[], new Map()];
 
-// In case the initial source contents request hangs,
 // render a few placeholder lines of text so that the source viewer isn't empty.
 const STREAMING_IN_PROGRESS_PLACEHOLDER_LINE_COUNT = 10;
 const STREAMING_IN_PROGRESS_PLACEHOLDER_MAX_HIT_COUNT = 1;
@@ -238,14 +237,13 @@ export default function SourceList({
     [setVisibleLines]
   );
 
-  const [
-    minHitCount = STREAMING_IN_PROGRESS_PLACEHOLDER_MAX_HIT_COUNT,
-    maxHitCount = STREAMING_IN_PROGRESS_PLACEHOLDER_MAX_HIT_COUNT,
-  ] = getCachedMinMaxSourceHitCounts(sourceId, focusRange);
+  const [minHitCount, maxHitCount] = getCachedMinMaxSourceHitCounts(sourceId, focusRange);
 
-  const maxLineIndexStringLength = `${lineCount ?? STREAMING_IN_PROGRESS_PLACEHOLDER_LINE_COUNT}`
-    .length;
-  const maxHitCountStringLength = maxHitCount != null ? `${formatHitCount(maxHitCount)}`.length : 0;
+  const { maxLineIndexStringLength, maxHitCountStringLength } = useMaxStringLengths({
+    lineCount: lineCount ?? STREAMING_IN_PROGRESS_PLACEHOLDER_LINE_COUNT,
+    maxHitCount,
+    maxHitCountDefault: STREAMING_IN_PROGRESS_PLACEHOLDER_MAX_HIT_COUNT,
+  });
 
   useSourceListCssVariables({
     elementRef: outerRef,
@@ -261,8 +259,8 @@ export default function SourceList({
     executionPointLineHighlight,
     hitCounts,
     lineHeight,
-    maxHitCount,
-    minHitCount,
+    maxHitCount: maxHitCount ?? STREAMING_IN_PROGRESS_PLACEHOLDER_MAX_HIT_COUNT,
+    minHitCount: minHitCount ?? 0,
     plainText: streamingData?.plainText ?? null,
     parsedTokens: streamingValue ?? null,
     pointBehaviors,

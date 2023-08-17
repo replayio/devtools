@@ -14,6 +14,7 @@ import { SourceListRowFormattedText } from "replay-next/components/sources/Sourc
 import { SourceListRowLineHighlight } from "replay-next/components/sources/SourceListRowLineHighlight";
 import { SourceListRowMouseEvents } from "replay-next/components/sources/SourceListRowMouseEvents";
 import { SourceSearchContext } from "replay-next/components/sources/SourceSearchContext";
+import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { PointBehaviorsObject } from "replay-next/src/contexts/points/types";
 import { Source } from "replay-next/src/suspense/SourcesCache";
 import { find } from "replay-next/src/utils/array";
@@ -72,6 +73,7 @@ export default function SourceListRow({
   const lineNumber = lineIndex + 1;
   const { sourceId } = source;
 
+  const { isTransitionPending: isFocusRangePending } = useContext(FocusContext);
   const [{ enabled: searchEnabled, index: searchResultIndex, results: searchResults }] =
     useContext(SourceSearchContext);
 
@@ -109,7 +111,10 @@ export default function SourceListRow({
     }
   }
 
-  const hitCountClassName = getHitCountClassName(hitCount ?? 0, maxHitCount, minHitCount);
+  let hitCountClassName = getHitCountClassName(hitCount ?? 0, maxHitCount, minHitCount);
+  if (isFocusRangePending) {
+    hitCountClassName = `${hitCountClassName} ${styles.LineHitCountPending}`;
+  }
 
   let lineHighlight: LineHighlight | null = null;
   if (executionPointLineHighlight?.lineIndex === lineIndex) {

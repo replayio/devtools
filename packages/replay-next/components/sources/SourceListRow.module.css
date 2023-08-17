@@ -75,3 +75,7 @@
   background-color: var(--color-hit-counts-label-background-3);
   border-left-color: var(--color-hit-counts-bar-3);
 }
+
+.LineHitCountPending {
+  opacity: 0.75;
+}
