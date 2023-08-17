@@ -152,26 +152,26 @@ export class ProtocolSession {
       window.addEventListener("beforeunload", () => {
         this.willClose = true;
       });
-    }
 
-    (window as any).disconnect = () => {
-      this.socket?.close();
-    };
-
-    (window as any).protocolClient = this.client;
-
-    (window as any).outstanding = () => {
-      const messages = Array.from(this.messageWaiters.entries()).map(([id, { method }]) => ({
-        id,
-        method,
-      }));
-      return {
-        messages,
-        received: this.receivedBytes,
-        sent: this.sentBytes,
-        time: Date.now() - this.startTime,
+      (window as any).disconnect = () => {
+        this.socket?.close();
       };
-    };
+
+      (window as any).protocolClient = this.client;
+
+      (window as any).outstanding = () => {
+        const messages = Array.from(this.messageWaiters.entries()).map(([id, { method }]) => ({
+          id,
+          method,
+        }));
+        return {
+          messages,
+          received: this.receivedBytes,
+          sent: this.sentBytes,
+          time: Date.now() - this.startTime,
+        };
+      };
+    }
   }
 
   flushQueuedMessages() {
