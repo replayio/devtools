@@ -41,6 +41,7 @@ async function fulfillAuthRequest(id: string, token: string) {
         mutation FulfillAutRequest($secret: String!, $id: String!, $token: String!) {
           fulfillAuthRequest(input: {secret: $secret, id: $id, token: $token}) {
             success
+            source
           }
         }
       `,
@@ -62,7 +63,7 @@ async function fulfillAuthRequest(id: string, token: string) {
     throw new Error("Failed to fulfill authentication request");
   }
 
-  return true;
+  return json.data.fulfillAuthRequest.source;
 }
 
 async function fetchToken(code: string, verifier: string): Promise<Token> {
@@ -133,7 +134,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     }
 
     const token = await fetchToken(code, verifier);
-    await fulfillAuthRequest(state, token.refresh_token);
+    const source = await fulfillAuthRequest(state, token.refresh_token);
 
     const decodedToken = jwtDecode<{ sub: string }>(token.access_token);
     const authId = decodedToken.sub;
@@ -147,7 +148,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       authId,
     });
 
-    res.redirect("/browser/auth");
+    res.redirect(`/browser/auth?source=${source}`);
   } catch (e: any) {
     console.error(e);
 
