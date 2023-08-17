@@ -16,7 +16,7 @@ import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData"
 import { getSelectedLocation, getSelectedLocationHasScrolled } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
-import { setViewport } from "../../selectors";
+import { getTabs, setViewport } from "../../selectors";
 import NewSourceNag from "./NewSourceNag";
 import "replay-next/components/sources/CodeMirror.css";
 
@@ -34,7 +34,8 @@ export default function NewSourceAdapterRoot() {
 
 function NewSourceAdapter() {
   const replayClient = useContext(ReplayClientContext);
-  const { focusedSource, openSource, openSourceIds, visibleLines } = useContext(SourcesContext);
+  const { closeSource, focusedSource, openSource, openSourceIds, visibleLines } =
+    useContext(SourcesContext);
   const [sourceSearchState, sourceSearchActions] = useContext(SourceSearchContext);
 
   const focusedSourceId = focusedSource?.sourceId ?? null;
@@ -47,6 +48,7 @@ function NewSourceAdapter() {
   const dispatch = useAppDispatch();
   const location = useAppSelector(getSelectedLocation);
   const locationHasScrolled = useAppSelector(getSelectedLocationHasScrolled);
+  const tabs = useAppSelector(getTabs);
 
   // Sync the selected location that's in Redux to the new SourcesContext.
   // This makes the CMD+O and CMD+G menus work.
@@ -74,6 +76,15 @@ function NewSourceAdapter() {
       openSource("view-source", location.sourceId, lineIndex, lineIndex, columnNumber);
     }
   }, [focusedSource, location, locationHasScrolled, openSource]);
+
+  useLayoutEffect(() => {
+    openSourceIds.forEach(sourceId => {
+      const openTab = tabs.find(tab => tab.sourceId === sourceId);
+      if (!openTab) {
+        closeSource(sourceId);
+      }
+    });
+  }, [closeSource, openSourceIds, tabs]);
 
   // Sync the lines currently rendered by the new Source list to Redux.
   // This updates Redux state to mark certain actions as "processed".
