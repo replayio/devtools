@@ -646,6 +646,7 @@ export async function isContinueToPreviousOptionEnabled(
 
 export async function isLineCurrentSearchResult(page: Page, lineNumber: number): Promise<boolean> {
   const lineLocator = page.locator(`[data-test-id="SourceLine-${lineNumber}"]`);
+  // TODO Search for current marker within line instead
   const currentHighlight = lineLocator.locator('[data-test-name="CurrentSearchResultHighlight"]');
   const isVisible = await currentHighlight.isVisible();
   return isVisible;
@@ -977,6 +978,7 @@ export async function verifyCurrentSearchResult(
 
   await waitFor(async () => {
     const lineLocator = page.locator(`[data-test-id="SourceLine-${lineNumber}"]`);
+    // TODO Search for current marker within line instead
     const currentHighlight = lineLocator.locator('[data-test-name="CurrentSearchResultHighlight"]');
     const isVisible = await currentHighlight.isVisible();
     if (isVisible !== expected) {

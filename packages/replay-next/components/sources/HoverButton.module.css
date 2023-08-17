@@ -1,10 +1,15 @@
 .Button,
 .ButtonWithNag {
+  position: absolute;
+  left: calc(var(--source-line-number-offset) + var(--source-hit-count-offset));
+
   border-radius: 0.25rem;
 
-  display: none;
+  display: flex;
   align-items: center;
   justify-content: center;
+  height: 1rem;
+  width: 1rem;
 
   outline: none;
   border: none;
@@ -14,6 +19,11 @@
 .Button {
   background-color: var(--background-color-primary-button);
   color: var(--color-primary-button);
+}
+.Button[disabled] {
+  background-color: var(--background-color-disabled-button);
+  color: var(--color-disabled-button);
+  cursor: default;
 }
 
 .ButtonWithNag {

@@ -122,7 +122,7 @@ function SourceCodePreview({
   const onClick = () => {
     const lineIndex = lineNumber - 1;
 
-    openSource("view-source", sourceId, lineIndex, lineIndex);
+    openSource(sourceId, lineIndex, lineIndex);
   };
 
   return (

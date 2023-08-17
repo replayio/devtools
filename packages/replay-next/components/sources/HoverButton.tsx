@@ -34,7 +34,6 @@ import styles from "./HoverButton.module.css";
 
 export default function HoverButton({
   addPoint,
-  buttonClassName,
   deletePoints,
   editPendingPointText,
   editPointBehavior,
@@ -46,7 +45,6 @@ export default function HoverButton({
   source,
 }: {
   addPoint: AddPoint;
-  buttonClassName: string;
   deletePoints: DeletePoints;
   editPendingPointText: EditPendingPointText;
   editPointBehavior: EditPointBehavior;
@@ -67,7 +65,6 @@ export default function HoverButton({
   if (isMetaKeyActive) {
     return (
       <MetaHoverButton
-        buttonClassName={buttonClassName}
         iconClassName={iconClassName}
         lineHitCounts={lineHitCounts}
         lineNumber={lineNumber}
@@ -78,7 +75,6 @@ export default function HoverButton({
     return (
       <NormalHoverButton
         addPoint={addPoint}
-        buttonClassName={buttonClassName}
         deletePoints={deletePoints}
         editPendingPointText={editPendingPointText}
         editPointBehavior={editPointBehavior}
@@ -94,13 +90,11 @@ export default function HoverButton({
 }
 
 function MetaHoverButton({
-  buttonClassName,
   iconClassName,
   lineHitCounts,
   lineNumber,
   source,
 }: {
-  buttonClassName: string;
   iconClassName: string;
   lineHitCounts: LineHitCounts | null;
   lineNumber: number;
@@ -148,7 +142,7 @@ function MetaHoverButton({
 
   return (
     <button
-      className={`${buttonClassName} ${styles.Button}`}
+      className={styles.Button}
       data-test-name="ContinueToButton"
       data-test-state={isShiftKeyActive ? "previous" : "next"}
       disabled={disabled}
@@ -164,7 +158,6 @@ function MetaHoverButton({
 
 function NormalHoverButton({
   addPoint,
-  buttonClassName,
   deletePoints,
   editPendingPointText,
   editPointBehavior,
@@ -176,7 +169,6 @@ function NormalHoverButton({
   source,
 }: {
   addPoint: AddPoint;
-  buttonClassName: string;
   deletePoints: DeletePoints;
   editPendingPointText: EditPendingPointText;
   editPointBehavior: EditPointBehavior;
@@ -264,7 +256,7 @@ function NormalHoverButton({
 
   return (
     <button
-      className={`${buttonClassName} ${showNag ? styles.ButtonWithNag : styles.Button}`}
+      className={showNag ? styles.ButtonWithNag : styles.Button}
       data-test-name="LogPointToggle"
       data-test-state={hasOrDidLog ? "on" : "off"}
       onClick={hasOrDidLog ? togglePoint : addLogPoint}

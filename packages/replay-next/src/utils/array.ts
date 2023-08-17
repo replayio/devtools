@@ -10,6 +10,16 @@ function compareStrings(a: string, b: string): number {
   return a.localeCompare(b);
 }
 
+export function find<T>(
+  sortedItems: T[],
+  targetItem: T,
+  comparisonFunction: ComparisonFunction<T>,
+  exactMatch = true
+): T | null {
+  const index = findIndex(sortedItems, targetItem, comparisonFunction, exactMatch);
+  return index >= 0 ? sortedItems[index] : null;
+}
+
 // Note that for non-exact matches to work
 // the comparison function should return more fine-grained delta values than the typical -1, 0, or 1.
 export function findIndex<T>(

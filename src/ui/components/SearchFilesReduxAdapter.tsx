@@ -16,17 +16,15 @@ export default function SearchFilesReduxAdapter() {
   // When a user clicks on a search in the file-search panel, open it in Redux as well.
   useLayoutEffect(() => {
     if (focusedSource != null) {
-      const { mode, startLineIndex, sourceId } = focusedSource;
-      if (mode === "search-result") {
-        dispatch(
-          onViewSourceInDebugger({
-            column: 0,
-            line: startLineIndex !== null ? startLineIndex + 1 : undefined,
-            openSource: true,
-            sourceId,
-          })
-        );
-      }
+      const { startLineIndex, sourceId } = focusedSource;
+      dispatch(
+        onViewSourceInDebugger({
+          column: 0,
+          line: startLineIndex !== null ? startLineIndex + 1 : undefined,
+          openSource: true,
+          sourceId,
+        })
+      );
     }
   }, [dispatch, focusedSource, sourcesById]);
 

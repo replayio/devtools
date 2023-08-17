@@ -23,3 +23,14 @@
 .ViewSourceHighlight {
   background: var(--background-color-current-execution-point);
 }
+
+.CurrentExecutionPointColumn {
+  z-index: -1;
+  position: absolute;
+  left: calc(var(--source-line-number-offset) + var(--source-hit-count-offset));
+  display: inline-block;
+  height: 100%;
+  font-family: var(--font-family-monospace);
+  font-size: var(--font-size-regular);
+  background: var(--background-color-current-execution-point-column);
+}

@@ -1,8 +1,7 @@
-.Highlight {
+.ActiveMark,
+.InactiveMark {
   position: absolute;
-  left: 0;
-  z-index: 2;
-  pointer-events: none;
+  left: calc(var(--source-line-number-offset) + var(--source-hit-count-offset));
   white-space: pre;
 }
 
@@ -13,13 +12,4 @@
 .InactiveMark {
   background-color: var(--search-result-inactive-background-color);
   color: var(--search-result-inactive-color);
-}
-
-.ColumnBreakpointSpacer {
-  display: inline-block;
-  width: var(--column-breakpoint-width);
-}
-
-.LeadingSpacer {
-  display: inline-block;
 }
