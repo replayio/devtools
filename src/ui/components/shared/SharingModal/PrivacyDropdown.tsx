@@ -46,6 +46,30 @@ function DropdownButton({ disabled, children }: { disabled?: boolean; children: 
   );
 }
 
+function filterByWorkspaceType(recording: Recording, workspace: Workspace) {
+  if (workspace.isTest && recording.metadata?.test) {
+    return true;
+  } else if (!workspace.isTest && !recording.metadata?.test) {
+    return true;
+  }
+
+  return false;
+}
+
+function sortWorkspaces(recording: Recording, a: Workspace, b: Workspace) {
+  if (a.id === recording.workspace?.id) {
+    return -1;
+  } else if (a.name && b.name) {
+    return a.name.localeCompare(b.name);
+  } else if (a.name) {
+    return -1;
+  } else if (b.name) {
+    1;
+  }
+
+  return 0;
+}
+
 function useGetPrivacyOptions(
   recording: Recording,
   setExpanded: Dispatch<SetStateAction<boolean>>
@@ -97,9 +121,10 @@ function useGetPrivacyOptions(
     );
   }
 
-  if (isOwner) {
-    // This gives the user who owns the recording the option to move the recording
-    // to their library, or any team they belong to.
+  if (userBelongsToTeam || isOwner) {
+    // This gives the user who owns the recording or is a member of the team
+    // that owns the recording the option to move the recording to their
+    // library, or any team they belong to.
     options.push(
       <DropdownItem onClick={() => handleMoveToTeam(null)} key="option-private">
         <DropdownItemContent icon="lock" selected={!!isPrivate && !workspaceId}>
@@ -109,28 +134,19 @@ function useGetPrivacyOptions(
         </DropdownItemContent>
       </DropdownItem>,
       <div key="option-team">
-        {workspaces.map(({ id, name }) => (
-          <DropdownItem onClick={() => handleMoveToTeam(id)} key={id}>
-            <DropdownItemContent icon="group" selected={!!isPrivate && id === workspaceId}>
-              <span className="overflow-hidden overflow-ellipsis whitespace-pre text-xs">
-                {name}
-              </span>
-            </DropdownItemContent>
-          </DropdownItem>
-        ))}
+        {workspaces
+          .filter(w => filterByWorkspaceType(recording, w))
+          .sort((a, b) => sortWorkspaces(recording, a, b))
+          .map(({ id, name }) => (
+            <DropdownItem onClick={() => handleMoveToTeam(id)} key={id}>
+              <DropdownItemContent icon="group" selected={!!isPrivate && id === workspaceId}>
+                <span className="overflow-hidden overflow-ellipsis whitespace-pre text-xs">
+                  {name}
+                </span>
+              </DropdownItemContent>
+            </DropdownItem>
+          ))}
       </div>
-    );
-  } else if (userBelongsToTeam) {
-    // This gives a user who belongs to the replay's team an option to set it to private
-    // without moving the replay's team.
-    options.push(
-      <DropdownItem onClick={setPrivate} key="option-private">
-        <DropdownItemContent icon="group" selected={!!isPrivate}>
-          <span className="overflow-hidden overflow-ellipsis whitespace-pre text-xs">
-            Members of {recording.workspace?.name || "this team"}
-          </span>
-        </DropdownItemContent>
-      </DropdownItem>
     );
   }
 
