@@ -37,8 +37,11 @@ yarn test some_test_name
 yarn test:debug
 ```
 
-- chromium
-- replay firefox
+And to record replays of the tests.
+
+```bash
+yarn test:replay-chromium
+```
 
 ### Concepts
 
