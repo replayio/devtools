@@ -97,9 +97,10 @@ function useGetPrivacyOptions(
     );
   }
 
-  if (isOwner) {
-    // This gives the user who owns the recording the option to move the recording
-    // to their library, or any team they belong to.
+  if (userBelongsToTeam || isOwner) {
+    // This gives the user who owns the recording or is a member of the team
+    // that owns the recording the option to move the recording to their
+    // library, or any team they belong to.
     options.push(
       <DropdownItem onClick={() => handleMoveToTeam(null)} key="option-private">
         <DropdownItemContent icon="lock" selected={!!isPrivate && !workspaceId}>
@@ -109,28 +110,19 @@ function useGetPrivacyOptions(
         </DropdownItemContent>
       </DropdownItem>,
       <div key="option-team">
-        {workspaces.map(({ id, name }) => (
-          <DropdownItem onClick={() => handleMoveToTeam(id)} key={id}>
-            <DropdownItemContent icon="group" selected={!!isPrivate && id === workspaceId}>
-              <span className="overflow-hidden overflow-ellipsis whitespace-pre text-xs">
-                {name}
-              </span>
-            </DropdownItemContent>
-          </DropdownItem>
-        ))}
+        {workspaces
+          .filter(w => w.name && !!w.isTest == !!recording.isTest)
+          .sort((a, b) => a.name!.localeCompare(b.name!))
+          .map(({ id, name }) => (
+            <DropdownItem onClick={() => handleMoveToTeam(id)} key={id}>
+              <DropdownItemContent icon="group" selected={!!isPrivate && id === workspaceId}>
+                <span className="overflow-hidden overflow-ellipsis whitespace-pre text-xs">
+                  {name}
+                </span>
+              </DropdownItemContent>
+            </DropdownItem>
+          ))}
       </div>
-    );
-  } else if (userBelongsToTeam) {
-    // This gives a user who belongs to the replay's team an option to set it to private
-    // without moving the replay's team.
-    options.push(
-      <DropdownItem onClick={setPrivate} key="option-private">
-        <DropdownItemContent icon="group" selected={!!isPrivate}>
-          <span className="overflow-hidden overflow-ellipsis whitespace-pre text-xs">
-            Members of {recording.workspace?.name || "this team"}
-          </span>
-        </DropdownItemContent>
-      </DropdownItem>
     );
   }
 
