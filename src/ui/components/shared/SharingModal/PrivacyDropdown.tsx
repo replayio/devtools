@@ -46,30 +46,6 @@ function DropdownButton({ disabled, children }: { disabled?: boolean; children: 
   );
 }
 
-function filterByWorkspaceType(recording: Recording, workspace: Workspace) {
-  if (workspace.isTest && recording.metadata?.test) {
-    return true;
-  } else if (!workspace.isTest && !recording.metadata?.test) {
-    return true;
-  }
-
-  return false;
-}
-
-function sortWorkspaces(recording: Recording, a: Workspace, b: Workspace) {
-  if (a.id === recording.workspace?.id) {
-    return -1;
-  } else if (a.name && b.name) {
-    return a.name.localeCompare(b.name);
-  } else if (a.name) {
-    return -1;
-  } else if (b.name) {
-    1;
-  }
-
-  return 0;
-}
-
 function useGetPrivacyOptions(
   recording: Recording,
   setExpanded: Dispatch<SetStateAction<boolean>>
@@ -135,8 +111,8 @@ function useGetPrivacyOptions(
       </DropdownItem>,
       <div key="option-team">
         {workspaces
-          .filter(w => filterByWorkspaceType(recording, w))
-          .sort((a, b) => sortWorkspaces(recording, a, b))
+          .filter(w => w.name && !!w.isTest == !!recording.isTest)
+          .sort((a, b) => a.name!.localeCompare(b.name!))
           .map(({ id, name }) => (
             <DropdownItem onClick={() => handleMoveToTeam(id)} key={id}>
               <DropdownItemContent icon="group" selected={!!isPrivate && id === workspaceId}>
