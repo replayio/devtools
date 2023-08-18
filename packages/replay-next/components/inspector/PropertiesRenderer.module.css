@@ -27,3 +27,23 @@
 .Separator {
   color: var(--object-inspector-separator-color);
 }
+
+.KeyValue {
+  display: inline;
+  text-align: start;
+  vertical-align: top;
+}
+
+.ToggleAlignmentPadding {
+  margin-left: 1.25rem;
+}
+
+.SourceLocationLink {
+  color: var(--link-color);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.SourceLocationLink:hover {
+  color: var(--link-color-active);
+}

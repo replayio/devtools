@@ -11,11 +11,17 @@ import { FC, Fragment, ReactNode, Suspense, useContext, useMemo } from "react";
 
 import Expandable from "replay-next/components/Expandable";
 import Loader from "replay-next/components/Loader";
+import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
+import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
+import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
 import { mergePropertiesAndGetterValues } from "replay-next/src/utils/protocol";
+import { getSourceFileName } from "replay-next/src/utils/source";
+import { getPreferredLocation } from "replay-next/src/utils/sources";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import GetterRenderer from "./GetterRenderer";
+import { KeyValueHeader } from "./KeyValueRenderer";
 import KeyValueRenderer from "./KeyValueRendererWithContextMenu";
 import ValueRenderer from "./ValueRenderer";
 import styles from "./PropertiesRenderer.module.css";
@@ -37,7 +43,9 @@ export default function PropertiesRenderer({
   path?: string;
   pauseId: ProtocolPauseId;
 }) {
+  const { inspectFunctionDefinition } = useContext(InspectorContext);
   const client = useContext(ReplayClientContext);
+  const { preferredGeneratedSourceIds } = useContext(SourcesContext);
 
   // If we have an ObjectPreview already, use it.
   // If we just have an Object, then Suspend while we fetch preview data.
@@ -137,6 +145,41 @@ export default function PropertiesRenderer({
     );
   }
 
+  let renderedFunctionLocation: ReactNode = null;
+  if (preview && object.className == "Function" && preview.functionLocation) {
+    const sourcesById = sourcesByIdCache.read(client);
+    const functionDefinition = preview.functionLocation;
+    const preferredFunctionLocation = getPreferredLocation(
+      sourcesById,
+      preferredGeneratedSourceIds,
+      functionDefinition
+    );
+    const source = sourcesById.get(preferredFunctionLocation.sourceId);
+    const fileName = source ? getSourceFileName(source) : preferredFunctionLocation.sourceId;
+    const fnLocation = `${fileName}:${preferredFunctionLocation.line}`;
+
+    renderedFunctionLocation = (
+      <KeyValueHeader
+        value={
+          <span
+            onClick={() => {
+              if (inspectFunctionDefinition !== null) {
+                inspectFunctionDefinition(functionDefinition);
+              }
+            }}
+            className={styles.SourceLocationLink}
+            data-test-name="ClientValue"
+          >
+            {fnLocation}
+          </span>
+        }
+        nameClass={styles.BucketLabel}
+        layout="vertical"
+        name="[[FunctionLocation]]"
+      />
+    );
+  }
+
   return (
     <>
       <EntriesRenderer containerEntries={containerEntries} pauseId={pauseId} />
@@ -201,6 +244,7 @@ export default function PropertiesRenderer({
         </Suspense>
       )}
 
+      {renderedFunctionLocation}
       {renderedPrototype}
     </>
   );
