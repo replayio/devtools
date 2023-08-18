@@ -1,6 +1,7 @@
 import { ReactNode, createContext } from "react";
 
 import { Workspace } from "shared/graphql/types";
+import { hasApiKey } from "shared/utils/environment";
 import { useGetTeamRouteParams } from "ui/components/Library/Team/utils";
 import { TeamNotFound } from "ui/components/Library/Team/View/TeamNotFound";
 import hooks from "ui/hooks";
@@ -22,14 +23,13 @@ export function TeamContextRoot({ children }: { children: ReactNode }) {
   const { workspace, loading: workspaceLoading } = useGetWorkspace(teamId);
   const { pendingWorkspaces, loading: pendingWorkspacesLoading } = hooks.useGetPendingWorkspaces();
 
-  console.log({ workspaceLoading, workspace });
   if (workspaceLoading || pendingWorkspacesLoading || !pendingWorkspaces) {
     return <LibrarySpinner />;
   }
 
   const isPendingTeam = pendingWorkspaces?.some(w => w.id === teamId);
 
-  if (workspace == null && !isPendingTeam) {
+  if (workspace == null && !isPendingTeam && !hasApiKey()) {
     // Either the Workspace ID is invalid or the current user does not have access to this Workspace
     return <TeamNotFound />;
   }

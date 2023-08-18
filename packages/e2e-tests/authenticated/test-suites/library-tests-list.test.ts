@@ -33,7 +33,7 @@ test(`authenticated/test-suites/library-tests-list`, async ({ page }) => {
   await expect(await getTestRunAttribute(runSummary, "Branch").textContent()).toBe("main");
   await expect(await getTestRunAttribute(runSummary, "Date").textContent()).toContain("6/14/2023");
   await expect(await getTestRunAttribute(runSummary, "Duration").textContent()).toContain(
-    "4744 sec"
+    "1h 19m 3.6s"
   );
   await expect(await getTestRunAttribute(runSummary, "Username").textContent()).toContain(
     "jazzdan"
