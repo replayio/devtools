@@ -240,17 +240,17 @@ export function createSocket(
         focusWindowFromParams !== null ? focusWindowFromParams : undefined,
         {
           onEvent: (event: ProtocolEvent) => {
-            if (userData.get("feature_logProtocolEvents")) {
+            if (userData.get("feature_protocolPanelEvents")) {
               queueAction(eventReceived({ ...event, recordedAt: window.performance.now() }));
             }
           },
           onRequest: (request: CommandRequest) => {
-            if (userData.get("feature_logProtocol")) {
+            if (userData.get("feature_protocolPanel")) {
               queueAction(requestSent({ ...request, recordedAt: window.performance.now() }));
             }
           },
           onResponse: (response: CommandResponse) => {
-            if (userData.get("feature_logProtocol")) {
+            if (userData.get("feature_protocolPanel")) {
               const clonedResponse = { ...response, recordedAt: window.performance.now() };
 
               if (isSourceContentsCommandResponse(clonedResponse)) {
@@ -266,7 +266,7 @@ export function createSocket(
             }
           },
           onResponseError: (error: CommandResponse) => {
-            if (userData.get("feature_logProtocol")) {
+            if (userData.get("feature_protocolPanel")) {
               queueAction(errorReceived({ ...error, recordedAt: window.performance.now() }));
             }
           },

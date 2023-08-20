@@ -213,6 +213,11 @@ class UserData implements GraphQLService {
     }
   }
 
+  async toggle<Key extends PreferencesKey>(key: Key) {
+    const value = this.get(key);
+    return this.set(key, !value);
+  }
+
   subscribe<Key extends PreferencesKey>(
     key: Key,
     callback: (value: (typeof config)[Key]["defaultValue"]) => void
