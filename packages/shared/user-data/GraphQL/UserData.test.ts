@@ -133,7 +133,7 @@ describe("UserData", () => {
       switch (key) {
         case LOCAL_STORAGE_KEY:
           return JSON.stringify({
-            feature_brokenSourcemapWorkaround: false,
+            debugger_frameworkGroupingOn: false,
             console_showFiltersByDefault: true,
           });
         default:
@@ -156,7 +156,7 @@ describe("UserData", () => {
 
     const userData = require("./UserData").userData;
 
-    expect(userData.get("feature_brokenSourcemapWorkaround")).toBe(false);
+    expect(userData.get("debugger_frameworkGroupingOn")).toBe(false);
     expect(userData.get("console_showFiltersByDefault")).toBe(true);
     expect(userData.get("layout_breakpointsPanelExpanded")).toBe(true);
 
@@ -166,7 +166,7 @@ describe("UserData", () => {
     expect(localStorageMock.setItem).toHaveBeenCalledTimes(1);
 
     // GraphQL should be called after initialization and preferences should be merged with localStorage
-    expect(userData.get("feature_brokenSourcemapWorkaround")).toBe(false);
+    expect(userData.get("debugger_frameworkGroupingOn")).toBe(false);
     expect(userData.get("console_showFiltersByDefault")).toBe(false);
     expect(userData.get("layout_breakpointsPanelExpanded")).toBe(false);
 

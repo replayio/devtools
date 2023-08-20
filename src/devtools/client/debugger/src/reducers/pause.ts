@@ -137,8 +137,7 @@ export const executeCommandOperation = createAsyncThunk<
     locationsToSkip:
       // skip over points that are mapped to the beginning of a function body
       // see SCS-172
-      userData.get("feature_brokenSourcemapWorkaround") &&
-      (command === "stepOver" || command === "reverseStepOver")
+      command === "stepOver" || command === "reverseStepOver"
         ? (symbols?.functions.map(f => f.body).filter(Boolean) as SourceLocation[])
         : undefined,
   });

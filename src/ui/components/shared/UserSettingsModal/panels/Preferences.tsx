@@ -36,6 +36,10 @@ export function Preferences() {
           preference={config.feature_showPassport}
           preferencesKey="feature_showPassport"
         />
+        <BooleanPreference
+          preference={config.console_showFiltersByDefault}
+          preferencesKey="console_showFiltersByDefault"
+        />
       </div>
 
       <div className="space-y-4">
