@@ -5,7 +5,7 @@ import { BooleanPreference } from "ui/components/shared/UserSettingsModal/compon
 export const PREFERENCES: PreferencesKey[] = [
   "global_logTelemetryEvent",
   "feature_protocolTimeline",
-  "feature_logProtocol",
+  "feature_protocolPanel",
   "backend_newControllerOnRefresh",
   "protocol_chromiumRepaints",
 ];

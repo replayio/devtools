@@ -6,7 +6,7 @@ import { ConnectedProps, connect } from "react-redux";
 import { useNag } from "replay-next/src/hooks/useNag";
 import { Nag } from "shared/graphql/types";
 import { actions } from "ui/actions";
-import useAuth0 from "ui/utils/useAuth0";
+import { UserInfo, useGetUserInfo } from "ui/hooks/users";
 
 import CommandButton from "./CommandButton";
 import SearchInput from "./SearchInput";
@@ -16,6 +16,7 @@ export type Command = {
   key: CommandKey;
   label: string;
   shortcut?: string;
+  internalOnly?: boolean;
 };
 export type CommandKey =
   // | "copy_points"
@@ -44,7 +45,9 @@ export type CommandKey =
   | "toggle_dark_mode"
   | "toggle_edit_focus"
   | "jump_to_next_pause"
-  | "jump_to_previous_pause";
+  | "jump_to_previous_pause"
+  | "toggle_protocol_panel"
+  | "toggle_protocol_timeline";
 
 const COMMANDS: readonly Command[] = [
   { key: "open_console", label: "Open Console" },
@@ -73,6 +76,8 @@ const COMMANDS: readonly Command[] = [
   { key: "pin_to_bottom", label: "Pin Toolbox To Bottom" },
   { key: "pin_to_left", label: "Pin Toolbox To Left" },
   { key: "pin_to_bottom_right", label: "Pin Toolbox To Bottom Right" },
+  { key: "toggle_protocol_panel", label: "Toggle Protocol Panel", internalOnly: true },
+  { key: "toggle_protocol_timeline", label: "Toggle Protocol timeline", internalOnly: true },
   // { key: "copy_points", label: "Copy Print Statement Settings to Clipboard" },
   // { key: "set_points", label: "Overwrite Print Statement Settings From Clipboard" },
 ] as const;
@@ -87,10 +92,11 @@ const DEFAULT_COMMANDS: readonly CommandKey[] = [
 const COMMAND_HEIGHT = 36;
 const ITEMS_TO_SHOW = 7;
 
-function getShownCommands(searchString: string) {
+function getShownCommands(searchString: string, userInfo: UserInfo) {
+  const availableCommands = COMMANDS.filter(command => !command.internalOnly || userInfo.internal);
   const commands: readonly Command[] = searchString
-    ? filter(COMMANDS as Command[], searchString, { key: "label" })
-    : COMMANDS;
+    ? filter(availableCommands as Command[], searchString, { key: "label" })
+    : availableCommands;
 
   // This puts the default commands at the top of the list.
   const sortedCommands = [...commands].sort(
@@ -116,9 +122,9 @@ function CommandPalette({
 }: { autoFocus?: boolean } & PropsFromRedux) {
   const [searchString, setSearchString] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
-  const shownCommands = getShownCommands(searchString);
 
-  const { isAuthenticated } = useAuth0();
+  const userInfo = useGetUserInfo();
+  const shownCommands = getShownCommands(searchString, userInfo);
 
   const [, dismissLaunchCommandPaletteNag] = useNag(Nag.LAUNCH_COMMAND_PALETTE);
 

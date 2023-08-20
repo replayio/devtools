@@ -384,7 +384,7 @@ export default function Toolbar() {
   const recordingId = useGetRecordingId();
   const { recording } = useGetRecording(recordingId);
   const { comments, loading } = hooks.useGetComments(recordingId);
-  const [logProtocolExperimentEnabled] = useGraphQLUserData("feature_logProtocol");
+  const [protocolPanelExperimentEnabled] = useGraphQLUserData("feature_protocolPanel");
   const [reactPanelExperimentEnabled] = useGraphQLUserData("feature_reactPanel");
   const [showPassport] = useGraphQLUserData("feature_showPassport");
   const { nags } = hooks.useGetUserInfo();
@@ -498,7 +498,7 @@ export default function Toolbar() {
             )}
           </>
         ) : null}
-        {logProtocolExperimentEnabled ? (
+        {protocolPanelExperimentEnabled ? (
           <ToolbarButton
             icon="protocol"
             label="Protocol"

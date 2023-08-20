@@ -155,12 +155,12 @@ export const config = {
     defaultValue: Boolean(false),
     legacyKey: "devtools.features.commentAttachments",
   },
-  feature_logProtocol: {
+  feature_protocolPanel: {
     defaultValue: Boolean(false),
     label: "View protocol requests and responses in the panel",
     legacyKey: "devtools.features.logProtocol",
   },
-  feature_logProtocolEvents: {
+  feature_protocolPanelEvents: {
     defaultValue: Boolean(false),
     legacyKey: "devtools.features.logProtocolEvents",
   },
