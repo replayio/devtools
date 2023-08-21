@@ -9,7 +9,7 @@ import { useGetUserInfo } from "ui/hooks/users";
 
 import styles from "./ProtocolViewerList.module.css";
 
-const ADMIN_APP_BASE_URL = "http://admin.replay.prod/controllers";
+const ADMIN_APP_BASE_URL = "http://admin.replay.prod/sessions";
 
 export function ProtocolViewerList() {
   const { clearCurrentRequests, filteredRequestIds, filterText, updateFilterText } =
@@ -20,12 +20,7 @@ export function ProtocolViewerList() {
   let viewLogLink = null;
   if (isInternalUser) {
     const sessionId = ThreadFront.sessionId;
-    const sessionIdPieces = sessionId?.split("/");
-    if (sessionIdPieces?.length === 2) {
-      const controllerId = sessionIdPieces[0];
-
-      viewLogLink = `${ADMIN_APP_BASE_URL}/${controllerId}`;
-    }
+    viewLogLink = `${ADMIN_APP_BASE_URL}/${sessionId}`;
   }
 
   return (
