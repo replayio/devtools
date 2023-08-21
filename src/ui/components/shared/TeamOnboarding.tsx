@@ -121,6 +121,7 @@ function TeamNamePage({
           onChange={onChange}
           textSize="2xl"
           center={true}
+          theme="dark"
           ref={textInputRef}
         />
         {inputError ? <div className="text-red-500">{inputError}</div> : null}
