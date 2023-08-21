@@ -3,12 +3,12 @@ import { ContextMenuDivider, ContextMenuItem, useContextMenu } from "use-context
 import { closeTab, closeTabs } from "devtools/client/debugger/src/actions/tabs";
 import {
   copyToClipboard as copySourceToClipboard,
-  ensureSourcesIsVisible,
   showSource,
 } from "devtools/client/debugger/src/actions/ui";
 import { Tab, getContext, getTabs } from "devtools/client/debugger/src/selectors";
 import { getRawSourceURL } from "devtools/client/debugger/src/utils/source";
 import { copyToClipboard as copyTextToClipboard } from "replay-next/components/sources/utils/clipboard";
+import { userData } from "shared/user-data/GraphQL/UserData";
 import { MiniSource, getSelectedSource } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
@@ -52,8 +52,9 @@ export default function useTabContextMenu({ source }: { source: MiniSource }) {
     }
   };
 
-  const onRevealInTreeClick = () => {
-    dispatch(ensureSourcesIsVisible());
+  const onRevealInTreeClick = async () => {
+    await userData.set("layout_sourcesCollapsed", false);
+
     dispatch(showSource(cx, source.id));
   };
 

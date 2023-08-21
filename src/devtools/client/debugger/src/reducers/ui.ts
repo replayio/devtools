@@ -28,7 +28,6 @@ export interface UISliceState {
   fullTextSearchQuery: string;
   fullTextSearchFocus: boolean;
   shownSource?: SourceDetails | null;
-  sourcesCollapsed: boolean;
   frameworkGroupingOn: boolean;
   viewport?: Range | null;
   cursorPosition?: Location | null;
@@ -41,7 +40,6 @@ export const createUIState = (): UISliceState => ({
   fullTextSearchQuery: "",
   fullTextSearchFocus: false,
   shownSource: null,
-  sourcesCollapsed: userData.get("layout_sourcesCollapsed"),
   frameworkGroupingOn: userData.get("debugger_frameworkGroupingOn"),
   highlightedLineRange: undefined,
   viewport: null,
@@ -60,12 +58,6 @@ const uiSlice = createSlice({
     },
     setShownSource(state, action: PayloadAction<SourceDetails | null>) {
       state.shownSource = action.payload;
-    },
-    toggleSources(state) {
-      state.sourcesCollapsed = !state.sourcesCollapsed;
-    },
-    sourcesPanelExpanded(state) {
-      state.sourcesCollapsed = false;
     },
     highlightLineRange(state, action: PayloadAction<HighlightedRange>) {
       const { start, end, sourceId } = action.payload;
@@ -99,12 +91,6 @@ const uiSlice = createSlice({
     setCursorPosition(state, action: PayloadAction<Location | null>) {
       state.cursorPosition = action.payload;
     },
-    // Need to ensure three pieces of UI are updated:
-    // Here: pause info panel is open, sources are open
-    // Layout reducer: selected primary panel is "explorer"
-    sourcesDisplayed(state) {
-      state.sourcesCollapsed = false;
-    },
   },
   extraReducers: builder => {
     builder.addCase(closeQuickOpen, state => {
@@ -123,11 +109,8 @@ export const {
   setPrimaryPaneTab,
   setShownSource,
   setViewport,
-  sourcesDisplayed,
-  sourcesPanelExpanded,
   toggleActiveSearch,
   toggleFrameworkGrouping,
-  toggleSources,
 } = uiSlice.actions;
 
 export function closeActiveSearch() {
@@ -140,7 +123,6 @@ export const getSelectedPrimaryPaneTab = (state: UIState) => state.ui.selectedPr
 export const getActiveSearch = (state: UIState) => state.ui.activeSearch;
 export const getFrameworkGroupingState = (state: UIState) => state.ui.frameworkGroupingOn;
 export const getShownSource = (state: UIState) => state.ui.shownSource;
-export const getSourcesCollapsed = (state: UIState) => state.ui.sourcesCollapsed;
 export const getHighlightedLineRange = (state: UIState) => state.ui.highlightedLineRange;
 export const getViewport = (state: UIState) => state.ui.viewport;
 export const getCursorPosition = (state: UIState) => state.ui.cursorPosition;

@@ -1,4 +1,3 @@
-import { sourcesDisplayed } from "devtools/client/debugger/src/reducers/ui";
 import { userData } from "shared/user-data/GraphQL/UserData";
 import { LayoutAction } from "ui/actions/layout";
 import { UIState } from "ui/state";
@@ -28,10 +27,6 @@ export default function update(state = syncInitialLayoutState, action: LayoutAct
 
     case "set_selected_primary_panel": {
       return { ...state, selectedPrimaryPanel: action.panel };
-    }
-
-    case sourcesDisplayed.type: {
-      return { ...state, selectedPrimaryPanel: "explorer" };
     }
 
     case "set_view_mode": {

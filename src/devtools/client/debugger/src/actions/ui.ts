@@ -18,10 +18,7 @@ import {
   highlightLineRange,
   setCursorPosition,
   setPrimaryPaneTab,
-  sourcesDisplayed,
-  sourcesPanelExpanded,
   toggleActiveSearch,
-  toggleSources,
 } from "../reducers/ui";
 import { getActiveSearch, getContext, getQuickOpenEnabled } from "../selectors";
 import { selectSource } from "./sources/select";
@@ -37,11 +34,8 @@ export {
   setPrimaryPaneTab,
   setShownSource,
   setViewport,
-  sourcesDisplayed,
-  sourcesPanelExpanded,
   toggleActiveSearch,
   toggleFrameworkGrouping,
-  toggleSources,
 } from "../reducers/ui";
 
 export function setActiveSearch(activeSearch: ActiveSearchType): UIThunkAction {
@@ -60,9 +54,6 @@ export function setActiveSearch(activeSearch: ActiveSearchType): UIThunkAction {
 }
 
 // Preserve existing export names
-export const ensureSourcesIsVisible = sourcesDisplayed;
-export const toggleSourcesCollapse = toggleSources;
-export const expandSourcesPane = sourcesPanelExpanded;
 export const updateCursorPosition = setCursorPosition;
 
 export function openSourceLink(sourceId: string, line?: number, column?: number): UIThunkAction {
