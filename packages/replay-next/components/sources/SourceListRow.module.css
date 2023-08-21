@@ -20,9 +20,7 @@
   --hit-count-bar-size: 6px;
 }
 
-.LineNumber,
-.LineNumberNoHits {
-  background-color: var(--body-bgcolor);
+.LineNumber {
   height: var(--line-height);
   width: calc(var(--line-number-size) + 2ch);
   display: flex;
@@ -36,10 +34,12 @@
   position: relative;
   overflow: visible;
 }
-.LineNumber {
+.Row[data-test-line-has-hits="true"] .LineNumber {
   cursor: pointer;
 }
-.LineNumberNoHits {
+.Row[data-test-line-has-hits="false"] .LineNumber,
+.Row:not([data-test-line-has-hits]) .LineNumber {
+  cursor: default;
   color: var(--color-line-number-without-hits);
 }
 

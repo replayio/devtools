@@ -16,9 +16,12 @@ const VISIBLE_LINES_BUCKET_SIZE = 100;
 
 export type FindClosestFunctionName = (sourceId: string, location: SourceLocation) => string | null;
 
+export type FocusedSourceMode = "search-result" | "view-source";
+
 export type FocusedSource = {
   columnNumber: number | null;
   endLineIndex: number | null;
+  mode: FocusedSourceMode;
   sourceId: SourceId;
   startLineIndex: number | null;
 };
@@ -32,6 +35,7 @@ type SourcesContextType = {
   isPending: boolean;
   markPendingFocusUpdateProcessed: () => void;
   openSource: (
+    mode: FocusedSourceMode,
     sourceId: SourceId,
     startLineIndex?: number,
     endLineIndex?: number,
@@ -133,6 +137,7 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
             focusedSource = {
               columnNumber: null,
               endLineIndex: null,
+              mode: "view-source",
               sourceId: openSourceIds[index - 1],
               startLineIndex: null,
             };
@@ -140,6 +145,7 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
             focusedSource = {
               columnNumber: null,
               endLineIndex: null,
+              mode: "view-source",
               sourceId: openSourceIds[index + 1],
               startLineIndex: null,
             };
@@ -362,6 +368,7 @@ export function SourcesContextRoot({
 
   const openSource = useCallback(
     (
+      mode: FocusedSourceMode,
       sourceId: SourceId,
       startLineIndex: number | null = null,
       endLineIndex: number | null = null,
@@ -373,6 +380,7 @@ export function SourcesContextRoot({
           focusedSource: {
             columnNumber,
             endLineIndex,
+            mode,
             sourceId,
             startLineIndex,
           },

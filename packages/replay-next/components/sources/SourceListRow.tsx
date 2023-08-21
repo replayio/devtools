@@ -87,7 +87,7 @@ export default function SourceListRow({
   let hitCount = 0;
   let lineHitCounts: LineHitCounts | null = null;
 
-  if (hitCounts) {
+  if (hitCounts != null) {
     const hitCountTuple = find(hitCounts, [lineNumber] as any, (a, b) => a[0] - b[0]);
     if (hitCountTuple) {
       hitCount = hitCountTuple[1].count;
@@ -128,7 +128,9 @@ export default function SourceListRow({
   return (
     <div
       className={styles.Row}
+      data-test-line-has-hits={lineHitCounts != null ? hitCount > 0 : undefined}
       data-test-line-number={lineNumber}
+      data-test-id={`SourceLine-${lineNumber}`}
       data-test-name="SourceLine"
       style={style}
     >
@@ -157,10 +159,7 @@ export default function SourceListRow({
         />
       )}
 
-      <div
-        className={hitCount > 0 ? styles.LineNumber : styles.LineNumberNoHits}
-        data-test-name="SourceLine-LineNumber"
-      >
+      <div className={styles.LineNumber} data-test-name="SourceLine-LineNumber">
         {lineNumber}
       </div>
       <div className={hitCountClassName} data-test-name="SourceLine-HitCount">

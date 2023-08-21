@@ -139,7 +139,7 @@ function MatchRow({
       data-test-type="Match"
       onClick={() => {
         const lineIndex = match.location.line - 1;
-        openSource(match.location.sourceId, lineIndex, lineIndex);
+        openSource("search-result", match.location.sourceId, lineIndex, lineIndex);
       }}
       style={style}
     >

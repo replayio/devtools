@@ -20,7 +20,6 @@ if (typeof window !== "undefined") {
   }
 }
 
-// TODO [FE-1790] Can we speed this up by handling tokens in a layout effect?
 export const SourceListRowFormattedText = memo(
   ({
     parsedTokens,

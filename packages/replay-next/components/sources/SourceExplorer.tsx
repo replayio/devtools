@@ -67,7 +67,7 @@ export default function SourceExplorer() {
                   data-test-id={`SourceExplorerSource-${sourceId}`}
                   onClick={() => {
                     setSelectedIndex(index);
-                    openSource(sourceId);
+                    openSource("view-source", sourceId);
                   }}
                 >
                   <Icon className={styles.Icon} type="document" />

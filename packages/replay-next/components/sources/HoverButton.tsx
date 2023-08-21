@@ -37,7 +37,6 @@ export default function HoverButton({
   deletePoints,
   editPendingPointText,
   editPointBehavior,
-  iconClassName,
   lineHitCounts,
   lineNumber,
   point,
@@ -48,7 +47,6 @@ export default function HoverButton({
   deletePoints: DeletePoints;
   editPendingPointText: EditPendingPointText;
   editPointBehavior: EditPointBehavior;
-  iconClassName: string;
   lineHitCounts: LineHitCounts | null;
   lineNumber: number;
   point: Point | null;
@@ -64,12 +62,7 @@ export default function HoverButton({
 
   if (isMetaKeyActive) {
     return (
-      <MetaHoverButton
-        iconClassName={iconClassName}
-        lineHitCounts={lineHitCounts}
-        lineNumber={lineNumber}
-        source={source}
-      />
+      <MetaHoverButton lineHitCounts={lineHitCounts} lineNumber={lineNumber} source={source} />
     );
   } else {
     return (
@@ -78,7 +71,6 @@ export default function HoverButton({
         deletePoints={deletePoints}
         editPendingPointText={editPendingPointText}
         editPointBehavior={editPointBehavior}
-        iconClassName={iconClassName}
         lineHitCounts={lineHitCounts}
         lineNumber={lineNumber}
         point={point}
@@ -90,12 +82,10 @@ export default function HoverButton({
 }
 
 function MetaHoverButton({
-  iconClassName,
   lineHitCounts,
   lineNumber,
   source,
 }: {
-  iconClassName: string;
   lineHitCounts: LineHitCounts | null;
   lineNumber: number;
   source: Source;
@@ -148,10 +138,7 @@ function MetaHoverButton({
       disabled={disabled}
       onClick={onClick}
     >
-      <Icon
-        className={iconClassName}
-        type={isShiftKeyActive ? "continue-to-previous" : "continue-to-next"}
-      />
+      <Icon type={isShiftKeyActive ? "continue-to-previous" : "continue-to-next"} />
     </button>
   );
 }
@@ -161,7 +148,6 @@ function NormalHoverButton({
   deletePoints,
   editPendingPointText,
   editPointBehavior,
-  iconClassName,
   lineHitCounts,
   lineNumber,
   point,
@@ -172,7 +158,6 @@ function NormalHoverButton({
   deletePoints: DeletePoints;
   editPendingPointText: EditPendingPointText;
   editPointBehavior: EditPointBehavior;
-  iconClassName: string;
   lineHitCounts: LineHitCounts;
   lineNumber: number;
   point: Point | null;
@@ -261,7 +246,7 @@ function NormalHoverButton({
       data-test-state={hasOrDidLog ? "on" : "off"}
       onClick={hasOrDidLog ? togglePoint : addLogPoint}
     >
-      <Icon className={iconClassName} type={hasOrDidLog ? "remove" : "add"} />
+      <Icon type={hasOrDidLog ? "remove" : "add"} />
     </button>
   );
 }

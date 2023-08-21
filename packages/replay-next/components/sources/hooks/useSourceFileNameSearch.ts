@@ -144,7 +144,7 @@ export default function useSourceFileNameSearch(): [State, Actions] {
           const sourceId = focusedSourceIdRef.current;
           if (sourceId != null) {
             const lineIndex = lineNumber - 1;
-            openSource(sourceId, lineIndex, lineIndex, columnNumber);
+            openSource("view-source", sourceId, lineIndex, lineIndex, columnNumber);
           }
         }
       },

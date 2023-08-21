@@ -27,23 +27,29 @@ export async function addBreakpoint(
 ): Promise<void> {
   const { lineNumber, url } = options;
 
-  await debugPrint(
-    page,
-    `Adding breakpoint at ${chalk.bold(`${url}:${lineNumber}`)}`,
-    "addBreakpoint"
-  );
-
   await openDevToolsTab(page);
 
   if (url) {
     await openSource(page, url);
   }
 
-  await scrollUntilLineIsVisible(page, lineNumber);
+  await debugPrint(
+    page,
+    `Adding breakpoint at ${chalk.bold(`${url}:${lineNumber}`)}`,
+    "addBreakpoint"
+  );
 
-  const line = await getSourceLine(page, lineNumber);
-  await line.locator('[data-test-id^="SourceLine-LineNumber"]').hover();
-  await line.locator('[data-test-name="BreakpointToggle"]').click();
+  await scrollUntilLineIsVisible(page, lineNumber);
+  await waitForSourceLineHitCounts(page, lineNumber);
+
+  const lineLocator = await getSourceLine(page, lineNumber);
+  await lineLocator.locator('[data-test-name="SourceLine-LineNumber"]').hover({ force: true });
+  const state = await lineLocator
+    .locator('[data-test-name="BreakpointToggle"]')
+    .getAttribute("data-test-state");
+  if (state === "off") {
+    await lineLocator.locator('[data-test-name="SourceLine-LineNumber"]').click({ force: true });
+  }
 
   await waitForBreakpoint(page, options);
 }
@@ -184,7 +190,7 @@ export async function getVisibleLineNumbers(page: Page): Promise<number[]> {
 
   const visibleLines: number[] = [];
 
-  const lineNumbersLocator = source.locator('[data-test-id^="SourceLine-LineNumber"]');
+  const lineNumbersLocator = source.locator('[data-test-name="SourceLine-LineNumber"]');
   for (let index = 0; index < (await lineNumbersLocator.count()); index++) {
     const lineNumberLocator = lineNumbersLocator.nth(index);
     if (await lineNumberLocator.isVisible()) {
@@ -227,11 +233,12 @@ export async function addLogpoint(
   }
 
   await scrollUntilLineIsVisible(page, lineNumber);
+  await waitForSourceLineHitCounts(page, lineNumber);
 
   const line = await getSourceLine(page, lineNumber);
-  const numberLocator = line.locator(`[data-test-id="SourceLine-LineNumber-${lineNumber}"]`);
-  await numberLocator.waitFor();
-  await numberLocator.hover({ force: true });
+  const hitCountLocator = line.locator(`[data-test-name="SourceLine-HitCount"]`);
+  await hitCountLocator.waitFor();
+  await hitCountLocator.hover({ force: true });
   const toggle = line.locator('[data-test-name="LogPointToggle"]');
   await toggle.waitFor();
   const state = await toggle.getAttribute("data-test-state");
@@ -392,7 +399,7 @@ export async function getSelectedLineNumber(
     return null;
   }
 
-  const lineNumberLocator = getByTestName(lineLocator, "SourceRowLineNumber");
+  const lineNumberLocator = getByTestName(lineLocator, "SourceLine-LineNumber");
   const textContent = await lineNumberLocator.textContent();
 
   if (textContent === null) {
@@ -482,9 +489,14 @@ export async function removeBreakpoint(
   }
 
   const lineLocator = await getSourceLine(page, lineNumber);
-  const numberLocator = lineLocator.locator(`[data-test-id="SourceLine-LineNumber-${lineNumber}"]`);
+  const numberLocator = lineLocator.locator(`[data-test-name="SourceLine-LineNumber"]`);
   await numberLocator.hover({ force: true });
-  await numberLocator.click({ force: true });
+  const state = await lineLocator
+    .locator('[data-test-name="BreakpointToggle"]')
+    .getAttribute("data-test-state");
+  if (state !== "off") {
+    await numberLocator.click({ force: true });
+  }
 
   // We want to add a slight delay after removing a breakpoint so that the
   // breakpoint logic will have time to send protocol commands to the server,
@@ -525,9 +537,9 @@ export async function removeLogPoint(
   await openSource(page, url);
 
   const line = await getSourceLine(page, lineNumber);
-  const numberLocator = line.locator(`[data-test-id="SourceLine-LineNumber-${lineNumber}"]`);
-  await numberLocator.waitFor();
-  await numberLocator.hover({ force: true });
+  const hitCountLocator = line.locator(`[data-test-name="SourceLine-HitCount"]`);
+  await hitCountLocator.waitFor();
+  await hitCountLocator.hover({ force: true });
   const toggle = line.locator('[data-test-name="LogPointToggle"]');
   await toggle.waitFor();
   const state = await toggle.getAttribute("data-test-state");
@@ -752,6 +764,19 @@ export async function verifyLogPointPanelContent(
     await expect(await input.textContent()).toBe(content);
   }
 }
+
+export async function waitForSourceLineHitCounts(page: Page, lineNumber: number) {
+  const lineLocator = await getSourceLine(page, lineNumber);
+  await lineLocator.isVisible();
+
+  await waitFor(async () => {
+    const haveHitCountsLoaded = (await lineLocator.getAttribute("data-test-line-has-hits")) != null;
+    if (!haveHitCountsLoaded) {
+      throw Error(`Waiting for line ${lineNumber} to have hit counts loaded`);
+    }
+  });
+}
+
 // TODO [FE-626] Rewrite this helper to reduce complexity.
 export async function waitForSelectedSource(page: Page, url: string) {
   await waitFor(async () => {
@@ -768,7 +793,7 @@ export async function waitForSelectedSource(page: Page, url: string) {
 
     // HACK Assume that the source file has loaded when the combined text of the first
     // 10 lines is no longer an empty string
-    const lines = editorPanel.locator(`[data-test-id^=SourceLine]`);
+    const lines = editorPanel.locator(`[data-test-name="SourceLine"]`);
 
     const lineTexts = await mapLocators(lines, lineLocator => lineLocator.textContent());
     const numLines = await lines.count();

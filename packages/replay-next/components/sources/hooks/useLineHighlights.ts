@@ -56,6 +56,7 @@ export function useLineHighlights(sourceId: SourceId): {
   const visibleLineIndexEnd = visibleLines?.end.line ?? null;
   const {
     columnNumber: focusedColumnNumber,
+    mode: focusedSourceMode,
     startLineIndex: focusedLineIndex,
     sourceId: focusedSourceId,
   } = focusedSource ?? {};
@@ -143,12 +144,26 @@ export function useLineHighlights(sourceId: SourceId): {
       }
 
       if (searchSourceId === sourceId && focusedLineIndex != null) {
-        // TODO Search result?
-        setViewSourceLineHighlight({
-          columnIndex: focusedColumnNumber != null ? focusedColumnNumber - 1 : 0,
-          lineIndex: focusedLineIndex,
-          type: "view-source",
-        });
+        switch (focusedSourceMode) {
+          case "search-result":
+            setSearchResultLineHighlight({
+              columnIndex: focusedColumnNumber != null ? focusedColumnNumber - 1 : 0,
+              lineIndex: focusedLineIndex,
+              type: "search-result",
+            });
+            {
+              break;
+            }
+          case "view-source":
+            setViewSourceLineHighlight({
+              columnIndex: focusedColumnNumber != null ? focusedColumnNumber - 1 : 0,
+              lineIndex: focusedLineIndex,
+              type: "view-source",
+            });
+            {
+              break;
+            }
+        }
       }
     }
 
@@ -162,6 +177,7 @@ export function useLineHighlights(sourceId: SourceId): {
     focusedColumnNumber,
     focusedLineIndex,
     focusedSourceId,
+    focusedSourceMode,
     previewColumnIndex,
     previewLineNumber,
     previewSourceId,

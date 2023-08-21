@@ -124,7 +124,7 @@ export function SourceListRowMouseEvents({
   // Use a layout effect rather than a passive effect so event listeners will be removed if the parent Offscreen is hidden
   useLayoutEffect(() => {
     const rowElement = document.querySelector(
-      `[data-test-name="SourceLine"][data-test-line-number="${lineNumber}"]`
+      `[data-test-source-id="${sourceId}"] [data-test-name="SourceLine"][data-test-line-number="${lineNumber}"]`
     ) as HTMLElement;
     if (rowElement) {
       const lineIndex = lineNumber - 1;
@@ -200,7 +200,7 @@ export function SourceListRowMouseEvents({
         }
       };
     }
-  }, [lineHasHits, lineNumber, setCursorLocation, setHoveredLocation]);
+  }, [lineHasHits, lineNumber, setCursorLocation, setHoveredLocation, sourceId]);
 
   let breakPointTestState = "off";
   if (pointForDefaultPriority !== null) {
@@ -238,7 +238,6 @@ export function SourceListRowMouseEvents({
           deletePoints={deletePoints}
           editPendingPointText={editPendingPointText}
           editPointBehavior={editPointBehavior}
-          iconClassName={styles.HoverButtonIcon}
           lineHitCounts={lineHitCounts}
           lineNumber={lineNumber}
           point={pointForDefaultPriority}
