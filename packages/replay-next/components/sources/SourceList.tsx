@@ -211,32 +211,6 @@ export default function SourceList({
     ]
   );
 
-  const longestLineWidthRef = useRef<number>(0);
-
-  const onItemsRendered = useCallback(
-    ({ visibleStartIndex, visibleStopIndex }: ListOnItemsRenderedProps) => {
-      setVisibleLines(visibleStartIndex, visibleStopIndex);
-
-      // Ensure that the list remains wide enough to horizontally scroll to the largest line we've rendered.
-      // This won't quite work the same as a non-windowed solution; it's an approximation.
-      const container = innerRef.current;
-      if (container) {
-        let longestLineWidth = 0;
-        for (let index = 0; index < container.children.length; index++) {
-          const child = container.children[index];
-          longestLineWidth = Math.max(longestLineWidth, child.clientWidth);
-        }
-
-        if (longestLineWidth > longestLineWidthRef.current) {
-          longestLineWidthRef.current = longestLineWidth;
-
-          container.style.setProperty("--longest-line-width", `${longestLineWidth}px`);
-        }
-      }
-    },
-    [setVisibleLines]
-  );
-
   const [minHitCount, maxHitCount] = getCachedMinMaxSourceHitCounts(sourceId, focusRange);
 
   const { maxLineIndexStringLength, maxHitCountStringLength } = useMaxStringLengths({
@@ -245,11 +219,20 @@ export default function SourceList({
     maxHitCountDefault: STREAMING_IN_PROGRESS_PLACEHOLDER_MAX_HIT_COUNT,
   });
 
-  useSourceListCssVariables({
+  const { cssVariablesRef, itemsRenderedCallback } = useSourceListCssVariables({
     elementRef: outerRef,
     maxHitCountStringLength,
     maxLineIndexStringLength,
   });
+
+  const onItemsRendered = useCallback(
+    ({ visibleStartIndex, visibleStopIndex }: ListOnItemsRenderedProps) => {
+      setVisibleLines(visibleStartIndex, visibleStopIndex);
+
+      itemsRenderedCallback();
+    },
+    [itemsRenderedCallback, setVisibleLines]
+  );
 
   // Note that we don't useMemo for this value
   // because scrolling causes hit counts and max hit count values to change
@@ -292,6 +275,7 @@ export default function SourceList({
             "--list-width": `${width - scrollbarWidth}px`,
             "--point-panel-height": `${pointPanelHeight}px`,
             "--point-panel-with-conditional-height": `${pointPanelWithConditionalHeight}px`,
+            ...cssVariablesRef.current,
           } as CSSProperties
         }
         useIsScrolling

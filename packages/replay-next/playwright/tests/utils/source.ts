@@ -645,7 +645,9 @@ export async function isContinueToPreviousOptionEnabled(
 
 export async function isLineCurrentSearchResult(page: Page, lineNumber: number): Promise<boolean> {
   const lineLocator = page.locator(`[data-test-id="SourceLine-${lineNumber}"]`);
-  const currentHighlight = lineLocator.locator('[data-test-name="SourceSearchResultHighlight"]');
+  const currentHighlight = lineLocator.locator(
+    '[data-test-name="SourceSearchResultColumnHighlight"]'
+  );
   const isVisible = await currentHighlight.isVisible();
   return isVisible;
 }
@@ -976,7 +978,9 @@ export async function verifyCurrentSearchResult(
 
   await waitFor(async () => {
     const lineLocator = page.locator(`[data-test-id="SourceLine-${lineNumber}"]`);
-    const currentHighlight = lineLocator.locator('[data-test-name="SourceSearchResultHighlight"]');
+    const currentHighlight = lineLocator.locator(
+      '[data-test-name="CurrentSearchResultLineHighlight"]'
+    );
     const isVisible = await currentHighlight.isVisible();
     if (isVisible !== expected) {
       throw new Error(`Expected line ${lineNumber} to be the current search result`);

@@ -1,11 +1,3 @@
 .List {
   overscroll-behavior: none;
 }
-
-.List > div {
-  /**
-   * The source width should expand to the width of the largest (rendered) line
-   * so that horizontal scroll doesn't doesn't jump or bounce when scrolling from long lines to short lines
-   */
-  min-width: var(--longest-line-width);
-}

@@ -2,11 +2,10 @@
 .CurrentSearchResult,
 .ViewSourceHighlight {
   position: absolute;
-  left: 0;
+  left: var(--source-line-number-offset);
   right: 0;
   top: 0;
   height: var(--line-height);
-  width: 100%;
   z-index: -1;
 }
 

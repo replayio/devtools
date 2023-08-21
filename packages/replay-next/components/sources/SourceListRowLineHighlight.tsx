@@ -55,7 +55,7 @@ export const SourceListRowLineHighlight = memo(function SourceListRowLineHighlig
       return (
         <div
           className={styles.CurrentExecutionPoint}
-          data-test-name="SourceSearchResultHighlight"
+          data-test-name="CurrentSearchResultLineHighlight"
           data-test-type="search-result"
         />
       );

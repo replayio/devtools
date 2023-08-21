@@ -23,7 +23,7 @@ export default function SearchResultHighlight({
   return (
     <mark
       className={isActive ? styles.ActiveMark : styles.InactiveMark}
-      data-test-name="SourceSearchResultHighlight"
+      data-test-name="SourceSearchResultColumnHighlight"
       data-test-search-state={isActive ? "active" : "inactive"}
       style={{
         marginLeft: `${searchResultColumnStartIndex}ch`,
