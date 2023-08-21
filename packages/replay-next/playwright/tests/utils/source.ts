@@ -43,13 +43,13 @@ export async function addBreakPoint(
   await goToLine(page, sourceId, lineNumber);
 
   const lineLocator = getSourceLineLocator(page, sourceId, lineNumber);
+  await lineLocator.locator('[data-test-name="SourceLine-LineNumber"]').hover({ force: true });
 
-  await hoverOverLine(page, { lineNumber, sourceId });
-
-  const toggle = lineLocator.locator('[data-test-name="BreakpointToggle"]');
-  const state = await toggle.getAttribute("data-test-state");
+  const state = await lineLocator
+    .locator('[data-test-name="BreakpointToggle"]')
+    .getAttribute("data-test-state");
   if (state === "off") {
-    await toggle.click({ force: true });
+    await lineLocator.locator('[data-test-name="SourceLine-LineNumber"]').click({ force: true });
   }
 
   await stopHovering(page);
@@ -550,10 +550,9 @@ export async function hoverOverLine(
     assert(match !== null);
     await match.hover({ force: true });
   } else {
-    const numberLocator = lineLocator.locator(
-      `[data-test-id="SourceLine-LineNumber-${lineNumber}"]`
-    );
-    await numberLocator.hover({ force: true });
+    const hitCountLocator = lineLocator.locator(`[data-test-name="SourceLine-HitCount"]`);
+    await hitCountLocator.waitFor();
+    await hitCountLocator.hover({ force: true });
   }
 
   if (withShiftKey) {
@@ -646,7 +645,9 @@ export async function isContinueToPreviousOptionEnabled(
 
 export async function isLineCurrentSearchResult(page: Page, lineNumber: number): Promise<boolean> {
   const lineLocator = page.locator(`[data-test-id="SourceLine-${lineNumber}"]`);
-  const currentHighlight = lineLocator.locator('[data-test-name="CurrentSearchResultHighlight"]');
+  const currentHighlight = lineLocator.locator(
+    '[data-test-name="SourceSearchResultColumnHighlight"]'
+  );
   const isVisible = await currentHighlight.isVisible();
   return isVisible;
 }
@@ -703,13 +704,13 @@ export async function removeBreakPoint(
   await goToLine(page, sourceId, lineNumber);
 
   const lineLocator = getSourceLineLocator(page, sourceId, lineNumber);
+  await lineLocator.locator('[data-test-name="SourceLine-LineNumber"]').hover({ force: true });
 
-  await hoverOverLine(page, { lineNumber, sourceId });
-
-  const toggle = lineLocator.locator('[data-test-name="BreakpointToggle"]');
-  const state = await toggle.getAttribute("data-test-state");
+  const state = await lineLocator
+    .locator('[data-test-name="BreakpointToggle"]')
+    .getAttribute("data-test-state");
   if (state === "on") {
-    await toggle.click({ force: true });
+    await lineLocator.locator('[data-test-name="SourceLine-LineNumber"]').click({ force: true });
   }
 
   await stopHovering(page);
@@ -977,7 +978,9 @@ export async function verifyCurrentSearchResult(
 
   await waitFor(async () => {
     const lineLocator = page.locator(`[data-test-id="SourceLine-${lineNumber}"]`);
-    const currentHighlight = lineLocator.locator('[data-test-name="CurrentSearchResultHighlight"]');
+    const currentHighlight = lineLocator.locator(
+      '[data-test-name="CurrentSearchResultLineHighlight"]'
+    );
     const isVisible = await currentHighlight.isVisible();
     if (isVisible !== expected) {
       throw new Error(`Expected line ${lineNumber} to be the current search result`);
@@ -1068,8 +1071,8 @@ export async function waitForSourceLineHitCounts(page: Page, sourceId: string, l
   await lineLocator.isVisible();
 
   await waitFor(async () => {
-    const hitCountsState = await lineLocator.getAttribute("data-test-hit-counts-state");
-    if (hitCountsState !== "loaded") {
+    const haveHitCountsLoaded = (await lineLocator.getAttribute("data-test-line-has-hits")) != null;
+    if (!haveHitCountsLoaded) {
       throw Error(`Waiting for line ${lineNumber} to have hit counts loaded`);
     }
   });

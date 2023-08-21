@@ -151,7 +151,7 @@ function Sources() {
                 key={sourceId}
                 mode={sourceId === focusedSourceId ? "visible" : "hidden"}
               >
-                <Source source={source!} showColumnBreakpoints={true} />
+                <Source source={source!} />
               </LazyOffscreen>
             );
           })}

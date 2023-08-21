@@ -1,4 +1,3 @@
-import debounce from "lodash/debounce";
 import {
   CSSProperties,
   useCallback,
@@ -15,6 +14,9 @@ import {
   useStreamingValue,
 } from "suspense";
 
+import { useLineHighlights } from "replay-next/components/sources/hooks/useLineHighlights";
+import { useMaxStringLengths } from "replay-next/components/sources/hooks/useMaxStringLengths";
+import { useSourceListCssVariables } from "replay-next/components/sources/hooks/useSourceListCssVariables";
 import { findPointForLocation } from "replay-next/components/sources/utils/points";
 import { scrollToLineAndColumn } from "replay-next/components/sources/utils/scrollToLineAndColumn";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
@@ -35,27 +37,23 @@ import { POINT_BEHAVIOR_DISABLED, POINT_BEHAVIOR_ENABLED } from "shared/client/t
 import { toPointRange } from "shared/utils/time";
 
 import useFontBasedListMeasurements from "./hooks/useFontBasedListMeasurements";
-import SourceListRow, { ItemData } from "./SourceListRow";
-import { formatHitCount } from "./utils/formatHitCount";
+import SourceListRow from "./SourceListRow";
 import getScrollbarWidth from "./utils/getScrollbarWidth";
 import styles from "./SourceList.module.css";
 
 const NO_BREAKABLE_POSITIONS: BreakpointPositionsResult = [[], new Map()];
 
-// In case the initial source contents request hangs,
 // render a few placeholder lines of text so that the source viewer isn't empty.
 const STREAMING_IN_PROGRESS_PLACEHOLDER_LINE_COUNT = 10;
 const STREAMING_IN_PROGRESS_PLACEHOLDER_MAX_HIT_COUNT = 1;
 
 export default function SourceList({
   height,
-  showColumnBreakpoints,
   source,
   streamingParser,
   width,
 }: {
   height: number;
-  showColumnBreakpoints: boolean;
   source: Source;
   streamingParser: StreamingParser;
   width: number;
@@ -79,7 +77,6 @@ export default function SourceList({
     focusedSource,
     markPendingFocusUpdateProcessed,
     pendingFocusUpdate,
-    setHoveredLocation,
     setVisibleLines,
     visibleLines,
   } = useContext(SourcesContext);
@@ -89,6 +86,9 @@ export default function SourceList({
   const { lineHeight, pointPanelHeight, pointPanelWithConditionalHeight } =
     useFontBasedListMeasurements(listRef);
 
+  const { executionPointLineHighlight, searchResultLineHighlight, viewSourceLineHighlight } =
+    useLineHighlights(sourceId);
+
   const { data } = useStreamingValue(streamingParser);
   const lineCount = data?.lineCount;
 
@@ -96,7 +96,7 @@ export default function SourceList({
   // but neither should actually _block_ us from showing source text.
   // Fetch those in the background via the caches,
   // and re-render once that data is available.
-  const hitCountsValue = useImperativeIntervalCacheValues(
+  const { value: hitCounts } = useImperativeIntervalCacheValues(
     sourceHitCountsCache,
     visibleLines?.start.line ?? 0,
     visibleLines?.end.line ?? 0,
@@ -104,13 +104,6 @@ export default function SourceList({
     sourceId,
     focusRange ? toPointRange(focusRange) : null
   );
-  const hitCountsMap = useMemo(() => {
-    if (hitCountsValue.status !== "resolved") {
-      return null;
-    }
-
-    return new Map(hitCountsValue.value);
-  }, [hitCountsValue]);
 
   const { value: breakablePositionsValue = NO_BREAKABLE_POSITIONS } = useImperativeCacheValue(
     breakpointPositionsCache,
@@ -166,11 +159,6 @@ export default function SourceList({
     }
   }, [focusedSource, lineCount, markPendingFocusUpdateProcessed, pendingFocusUpdate, sourceId]);
 
-  const [
-    minHitCount = STREAMING_IN_PROGRESS_PLACEHOLDER_MAX_HIT_COUNT,
-    maxHitCount = STREAMING_IN_PROGRESS_PLACEHOLDER_MAX_HIT_COUNT,
-  ] = getCachedMinMaxSourceHitCounts(sourceId, focusRange);
-
   useLayoutEffect(() => {
     // TODO
     // This is overly expensive; ideally we'd only reset this...
@@ -182,61 +170,7 @@ export default function SourceList({
     }
   }, [pointBehaviors, pointsForDefaultPriority]);
 
-  // React's rules-of-hooks doesn't like useCallback(debounce(...))
-  // It will error with a false positive: seCallback received a function whose dependencies are unknown
-  const onLineMouseLeaveDebounced = useMemo(
-    () =>
-      debounce(() => {
-        setHoveredLocation(null, null);
-      }, 50),
-    [setHoveredLocation]
-  );
-
-  const onLineMouseEnter = useCallback(
-    (lineIndex: number, lineNode: HTMLElement) => {
-      onLineMouseLeaveDebounced.cancel();
-
-      setHoveredLocation(lineIndex, lineNode);
-    },
-    [onLineMouseLeaveDebounced, setHoveredLocation]
-  );
-
-  const itemData = useMemo<ItemData>(
-    () => ({
-      breakablePositionsByLine,
-      hitCounts: hitCountsMap,
-      lineHeight,
-      maxHitCount,
-      minHitCount,
-      onLineMouseEnter,
-      onLineMouseLeave: onLineMouseLeaveDebounced,
-      pointBehaviors,
-      pointPanelHeight,
-      pointPanelWithConditionalHeight,
-      pointsForDefaultPriority,
-      pointsForSuspense,
-      showColumnBreakpoints,
-      source,
-      streamingParser,
-    }),
-    [
-      breakablePositionsByLine,
-      hitCountsMap,
-      lineHeight,
-      maxHitCount,
-      minHitCount,
-      onLineMouseEnter,
-      onLineMouseLeaveDebounced,
-      pointBehaviors,
-      pointPanelHeight,
-      pointPanelWithConditionalHeight,
-      pointsForDefaultPriority,
-      pointsForSuspense,
-      showColumnBreakpoints,
-      source,
-      streamingParser,
-    ]
-  );
+  const { data: streamingData, value: streamingValue } = useStreamingValue(streamingParser);
 
   const getItemSize = useCallback(
     (index: number) => {
@@ -277,63 +211,78 @@ export default function SourceList({
     ]
   );
 
-  const longestLineWidthRef = useRef<number>(0);
+  const [minHitCount, maxHitCount] = getCachedMinMaxSourceHitCounts(sourceId, focusRange);
+
+  const { maxLineIndexStringLength, maxHitCountStringLength } = useMaxStringLengths({
+    lineCount: lineCount ?? STREAMING_IN_PROGRESS_PLACEHOLDER_LINE_COUNT,
+    maxHitCount,
+    maxHitCountDefault: STREAMING_IN_PROGRESS_PLACEHOLDER_MAX_HIT_COUNT,
+  });
+
+  const { cssVariablesRef, itemsRenderedCallback } = useSourceListCssVariables({
+    elementRef: outerRef,
+    maxHitCountStringLength,
+    maxLineIndexStringLength,
+  });
 
   const onItemsRendered = useCallback(
     ({ visibleStartIndex, visibleStopIndex }: ListOnItemsRenderedProps) => {
       setVisibleLines(visibleStartIndex, visibleStopIndex);
 
-      // Ensure that the list remains wide enough to horizontally scroll to the largest line we've rendered.
-      // This won't quite work the same as a non-windowed solution; it's an approximation.
-      const container = innerRef.current;
-      if (container) {
-        let longestLineWidth = 0;
-        for (let index = 0; index < container.children.length; index++) {
-          const child = container.children[index];
-          longestLineWidth = Math.max(longestLineWidth, child.clientWidth);
-        }
-
-        if (longestLineWidth > longestLineWidthRef.current) {
-          longestLineWidthRef.current = longestLineWidth;
-
-          container.style.setProperty("--longest-line-width", `${longestLineWidth}px`);
-        }
-      }
+      itemsRenderedCallback();
     },
-    [setVisibleLines]
+    [itemsRenderedCallback, setVisibleLines]
   );
 
-  const maxLineIndexStringLength = `${lineCount ?? STREAMING_IN_PROGRESS_PLACEHOLDER_LINE_COUNT}`
-    .length;
-  const maxHitCountStringLength = maxHitCount != null ? `${formatHitCount(maxHitCount)}`.length : 0;
-
-  const widthMinusScrollbar = width - scrollbarWidth;
-
-  const style = {
-    "--hit-count-size": `${maxHitCountStringLength}ch`,
-    "--line-height": `${lineHeight}px`,
-    "--line-number-size": `${maxLineIndexStringLength + 1}ch`,
-    "--list-width": `${widthMinusScrollbar}px`,
-    "--point-panel-height": `${pointPanelHeight}px`,
-    "--point-panel-with-conditional-height": `${pointPanelWithConditionalHeight}px`,
+  // Note that we don't useMemo for this value
+  // because scrolling causes hit counts and max hit count values to change
+  // which mostly bypasses the memoization anyway
+  const itemData = {
+    breakablePositionsByLine,
+    executionPointLineHighlight,
+    hitCounts,
+    lineHeight,
+    maxHitCount: maxHitCount ?? STREAMING_IN_PROGRESS_PLACEHOLDER_MAX_HIT_COUNT,
+    minHitCount: minHitCount ?? 0,
+    plainText: streamingData?.plainText ?? null,
+    parsedTokens: streamingValue ?? null,
+    pointBehaviors,
+    pointsForDefaultPriority,
+    pointsForSuspense,
+    searchResultLineHighlight,
+    source,
+    viewSourceLineHighlight,
   };
 
   return (
-    <List
-      className={styles.List}
-      estimatedItemSize={lineHeight}
-      height={height}
-      innerRef={innerRef}
-      itemCount={lineCount ?? STREAMING_IN_PROGRESS_PLACEHOLDER_LINE_COUNT}
-      itemData={itemData}
-      itemSize={getItemSize}
-      onItemsRendered={onItemsRendered}
-      outerRef={outerRef}
-      ref={listRef}
-      style={style as CSSProperties}
-      width={width}
-    >
-      {SourceListRow}
-    </List>
+    <>
+      <List
+        className={styles.List}
+        estimatedItemSize={lineHeight}
+        height={height}
+        innerRef={innerRef}
+        itemCount={lineCount ?? STREAMING_IN_PROGRESS_PLACEHOLDER_LINE_COUNT}
+        itemData={itemData}
+        itemSize={getItemSize}
+        onItemsRendered={onItemsRendered}
+        outerRef={outerRef}
+        ref={listRef}
+        style={
+          {
+            "--hit-count-size": `${maxHitCountStringLength}ch`,
+            "--line-height": `${lineHeight}px`,
+            "--line-number-size": `${maxLineIndexStringLength + 1}ch`,
+            "--list-width": `${width - scrollbarWidth}px`,
+            "--point-panel-height": `${pointPanelHeight}px`,
+            "--point-panel-with-conditional-height": `${pointPanelWithConditionalHeight}px`,
+            ...cssVariablesRef.current,
+          } as CSSProperties
+        }
+        useIsScrolling
+        width={width}
+      >
+        {SourceListRow}
+      </List>
+    </>
   );
 }

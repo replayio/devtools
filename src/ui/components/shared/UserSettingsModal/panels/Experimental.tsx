@@ -3,7 +3,6 @@ import { PreferencesKey } from "shared/user-data/GraphQL/types";
 import { BooleanPreference } from "ui/components/shared/UserSettingsModal/components/BooleanPreference";
 
 export const PREFERENCES: PreferencesKey[] = [
-  "feature_columnBreakpoints",
   "backend_profileWorkerThreads",
   "feature_basicProcessingLoadingBar",
   "console_showFiltersByDefault",

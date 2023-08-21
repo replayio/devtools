@@ -43,8 +43,6 @@ function NewSourceAdapter() {
   const sourceSearchInputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const [showColumnBreakpoints] = useGraphQLUserData("feature_columnBreakpoints");
-
   const dispatch = useAppDispatch();
   const location = useAppSelector(getSelectedLocation);
   const locationHasScrolled = useAppSelector(getSelectedLocationHasScrolled);
@@ -154,7 +152,7 @@ function NewSourceAdapter() {
         const source = getSourceSuspends(replayClient, sourceId);
         return (
           <LazyOffscreen key={sourceId} mode={sourceId === focusedSourceId ? "visible" : "hidden"}>
-            <Source source={source!} showColumnBreakpoints={showColumnBreakpoints} />
+            <Source source={source!} />
           </LazyOffscreen>
         );
       })}

@@ -36,27 +36,15 @@ export type HoveredState = {
 /**
  * Rendered in the main app by `<NewSourceAdapter>`
  */
-export default function Source({
-  source,
-  showColumnBreakpoints,
-}: {
-  source: SourceDetails;
-  showColumnBreakpoints: boolean;
-}) {
+export default function Source({ source }: { source: SourceDetails }) {
   return (
     <Suspense fallback={<Loader className={styles.Loader} />}>
-      <SourceLoader source={source} showColumnBreakpoints={showColumnBreakpoints} />
+      <SourceLoader source={source} />
     </Suspense>
   );
 }
 
-function SourceLoader({
-  source,
-  showColumnBreakpoints,
-}: {
-  source: SourceDetails;
-  showColumnBreakpoints: boolean;
-}) {
+function SourceLoader({ source }: { source: SourceDetails }) {
   const client = useContext(ReplayClientContext);
 
   if (source === null) {
@@ -69,7 +57,6 @@ function SourceLoader({
 
   return (
     <SourceRenderer
-      showColumnBreakpoints={showColumnBreakpoints}
       source={source}
       streamingParser={streamingParser}
       streamingSourceContents={streamingSourceContents}
@@ -78,12 +65,10 @@ function SourceLoader({
 }
 
 function SourceRenderer({
-  showColumnBreakpoints,
   source,
   streamingParser,
   streamingSourceContents,
 }: {
-  showColumnBreakpoints: boolean;
   source: SourceDetails;
   streamingParser: StreamingParser;
   streamingSourceContents: StreamingSourceContentsValue;
@@ -163,7 +148,6 @@ function SourceRenderer({
           children={({ height, width }) => (
             <SourceList
               height={height}
-              showColumnBreakpoints={showColumnBreakpoints}
               source={source}
               streamingParser={streamingParser}
               width={width}
