@@ -38,7 +38,7 @@ module.exports = {
   },
   testEnvironment: "jsdom",
   testMatch: [
-    "**/__tests__/**/*.[jt]s?(x)",
+    "**/__tests__/**/*.test.[jt]s?(x)",
     "**/?(*.)+(test).[jt]s?(x)",
     "!**/fixtures/**",
     // The old unit tests in src/devtools are named with ".spec.js".
