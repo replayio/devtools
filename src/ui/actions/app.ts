@@ -214,9 +214,6 @@ export function executeCommand(key: CommandKey): UIThunkAction {
     } else if (key === "open_sources") {
       dispatch(setViewMode("dev"));
       dispatch(setSelectedPrimaryPanel("explorer"));
-      // Someday we'll fix circular dependencies. Today is not that day.
-      const { expandSourcesPane } = await import("devtools/client/debugger/src/actions/ui");
-      dispatch(expandSourcesPane());
     } else if (key === "open_outline") {
       dispatch(setViewMode("dev"));
       dispatch(setSelectedPrimaryPanel("explorer"));

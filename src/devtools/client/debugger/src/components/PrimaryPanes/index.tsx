@@ -1,26 +1,22 @@
 import classnames from "classnames";
 import { useEffect } from "react";
-import { ConnectedProps, connect } from "react-redux";
 
 // Add the necessary imports for nag functionality
 import { useNag } from "replay-next/src/hooks/useNag";
 import { Nag } from "shared/graphql/types";
 import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
-import { UIState } from "ui/state";
 
-import actions from "../../actions";
-import { getContext, getSelectedPrimaryPaneTab, getSourcesCollapsed } from "../../selectors";
 import Outline from "../SourceOutline/SourceOutline";
 import QuickOpenButton from "./QuickOpenButton";
 import SourcesTree from "./SourcesTree";
 
 import { Accordion, AccordionPane } from "@recordreplay/accordion";
 
-function PrimaryPanes(props: PropsFromRedux) {
+export default function PrimaryPanes() {
   const [outlineExpanded, setOutlineExpanded] = useGraphQLUserData(
     "layout_debuggerOutlineExpanded"
   );
-  const [sourcesCollapsed] = useGraphQLUserData("layout_sourcesCollapsed");
+  const [sourcesCollapsed, setSourcesCollapsed] = useGraphQLUserData("layout_sourcesCollapsed");
   const [enableLargeText] = useGraphQLUserData("global_enableLargeText");
 
   // Add the useNag hook and useEffect block
@@ -37,7 +33,7 @@ function PrimaryPanes(props: PropsFromRedux) {
         // ExperimentFeature: LargeText Logic
         className={classnames("sources-pane", enableLargeText ? "text-base" : "text-xs")}
         expanded={!sourcesCollapsed}
-        onToggle={() => props.toggleSourcesCollapse()}
+        onToggle={() => setSourcesCollapsed(!sourcesCollapsed)}
         initialHeight={400}
         button={<QuickOpenButton />}
       >
@@ -54,22 +50,3 @@ function PrimaryPanes(props: PropsFromRedux) {
     </Accordion>
   );
 }
-
-const mapStateToProps = (state: UIState) => {
-  return {
-    cx: getContext(state),
-    selectedTab: getSelectedPrimaryPaneTab(state),
-    sourcesCollapsed: getSourcesCollapsed(state),
-  };
-};
-
-const connector = connect(mapStateToProps, {
-  setPrimaryPaneTab: actions.setPrimaryPaneTab,
-  setActiveSearch: actions.setActiveSearch,
-  closeActiveSearch: actions.closeActiveSearch,
-  toggleSourcesCollapse: actions.toggleSourcesCollapse,
-});
-
-type PropsFromRedux = ConnectedProps<typeof connector>;
-
-export default connector(PrimaryPanes);
