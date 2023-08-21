@@ -705,7 +705,7 @@
   --theme-sidebar-background: var(--theme-base-100);
   --theme-text-field-bgcolor-hover: var(--theme-base-95);
   --theme-text-field-bgcolor: #f6f6f6;
-  --theme-text-field-color: var(--theme-body-color);
+  --theme-text-field-color: var(--body-color);
   --theme-text-field-placeholder-color: #a9a9b1;
   --team-row-active: #3f434a;
   --tooltip-bgcolor: #38383d;

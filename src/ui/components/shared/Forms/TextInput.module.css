@@ -29,7 +29,7 @@
 .dark .textInput {
   background-color: #3e434b; /* Dark: --theme-text-field-bgcolor */
   color: #fff; /* --theme-text-field-color: */
-  border-color: var(--theme-base-85); /* --input-border */
+  border-color: #3e434b; /* Dark: --input-border */
 }
 
 .dark .textInput:hover {
@@ -40,7 +40,7 @@
 
 .light .textInput {
   background-color: #f6f6f6; /* --theme-text-field-bgcolor */
-  color: #fff; /* --theme-text-field-color: */
+  color: #38383d; /* Light: var(--body-color); */
   border-color: var(--cool-gray-200); /* --input-border */
 }
 
