@@ -18,6 +18,9 @@
 
 .default .textInput {
   background-color: var(--theme-text-field-bgcolor);
+  color: var(--theme-text-field-color);
+  border-color: var(--input-border);
+  caret-color: var(--theme-text-field-color);
 }
 
 .default .textInput:hover {
@@ -30,6 +33,7 @@
   background-color: #3e434b; /* Dark: --theme-text-field-bgcolor */
   color: #fff; /* --theme-text-field-color: */
   border-color: #3e434b; /* Dark: --input-border */
+  caret-color: #fff;
 }
 
 .dark .textInput:hover {
@@ -42,6 +46,7 @@
   background-color: #f6f6f6; /* --theme-text-field-bgcolor */
   color: #38383d; /* Light: var(--body-color); */
   border-color: var(--cool-gray-200); /* --input-border */
+  caret-color: #38383d;
 }
 
 .light .textInput:hover {
