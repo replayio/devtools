@@ -33,7 +33,7 @@ import { setViewMode } from "ui/actions/layout";
 import { JumpToCodeStatus } from "ui/components/shared/JumpToCodeButton";
 import { getViewMode } from "ui/reducers/layout";
 import { SourcesState, getPreferredLocation, getSourceDetailsEntities } from "ui/reducers/sources";
-import { getFocusWindow } from "ui/reducers/timeline";
+import { getActiveFocusWindow } from "ui/reducers/timeline";
 import { UIState } from "ui/state";
 import { ParsedJumpToCodeAnnotation } from "ui/suspense/annotationsCaches";
 
@@ -196,7 +196,7 @@ export function jumpToClickEventFunctionLocation(
       }
       const actualEnd = end!;
 
-      const focusWindow = getFocusWindow(getState());
+      const focusWindow = getActiveFocusWindow(getState());
 
       // Safety check: don't ask for points if this time isn't loaded
       const isEndTimeInLoadedRegion =

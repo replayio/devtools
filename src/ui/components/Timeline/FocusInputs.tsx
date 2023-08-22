@@ -12,7 +12,7 @@ import styles from "./FocusInputs.module.css";
 export default function FocusInputs() {
   const dispatch = useAppDispatch();
   const currentTime = useAppSelector(selectors.getCurrentTime);
-  const focusWindow = useAppSelector(selectors.getFocusWindow);
+  const focusWindow = useAppSelector(selectors.getDisplayedFocusWindow);
   const showFocusModeControls = useAppSelector(selectors.getShowFocusModeControls);
   const recordingDuration = useAppSelector(selectors.getRecordingDuration);
 

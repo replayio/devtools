@@ -5,10 +5,11 @@ import { UIStore } from "ui/actions";
 import * as actions from "../actions/timeline";
 import {
   getCurrentTime,
-  getFocusWindow,
-  getFocusWindowBackup,
+  getDisplayedFocusWindow,
+  getDisplayedFocusWindowBackup,
   getHoverTime,
   getPlayback,
+  setActiveFocusWindow,
   setTimelineState,
 } from "./timeline";
 
@@ -35,10 +36,10 @@ describe("Redux timeline state", () => {
 
   describe("focus region", () => {
     it("should assign a default focusWindow around the current time when toggled on", async () => {
-      expect(getFocusWindowBackup(store.getState())).toBeNull();
+      expect(getDisplayedFocusWindowBackup(store.getState())).toBeNull();
       await dispatch(actions.toggleFocusMode());
-      expect(getFocusWindowBackup(store.getState())).toBeNull();
-      expect(getFocusWindow(store.getState())).toMatchInlineSnapshot(`
+      expect(getDisplayedFocusWindowBackup(store.getState())).toBeNull();
+      expect(getDisplayedFocusWindow(store.getState())).toMatchInlineSnapshot(`
         Object {
           "begin": Object {
             "point": "67500",
@@ -140,7 +141,7 @@ describe("Redux timeline state", () => {
           end: 80,
         })
       );
-      expect(getFocusWindow(store.getState())).toMatchInlineSnapshot(`
+      expect(getDisplayedFocusWindow(store.getState())).toMatchInlineSnapshot(`
         Object {
           "begin": Object {
             "point": "60000",
@@ -167,7 +168,7 @@ describe("Redux timeline state", () => {
           end: 50,
         })
       );
-      expect(getFocusWindow(store.getState())).toMatchInlineSnapshot(`
+      expect(getDisplayedFocusWindow(store.getState())).toMatchInlineSnapshot(`
         Object {
           "begin": Object {
             "point": "60000",
@@ -198,7 +199,7 @@ describe("Redux timeline state", () => {
     describe("set start time", () => {
       it("should focus from the start time to the end of the recording if no focus region has been set", async () => {
         await dispatch(actions.setFocusWindowBegin({ time: 65, sync: false }));
-        expect(getFocusWindow(store.getState())).toMatchInlineSnapshot(`
+        expect(getDisplayedFocusWindow(store.getState())).toMatchInlineSnapshot(`
           Object {
             "begin": Object {
               "point": "65000",
@@ -219,8 +220,9 @@ describe("Redux timeline state", () => {
             end: 70,
           })
         );
+        dispatch(setActiveFocusWindow(getDisplayedFocusWindow(store.getState())));
         await dispatch(actions.setFocusWindowBegin({ time: 65, sync: false }));
-        expect(getFocusWindow(store.getState())).toMatchInlineSnapshot(`
+        expect(getDisplayedFocusWindow(store.getState())).toMatchInlineSnapshot(`
           Object {
             "begin": Object {
               "point": "65000",
@@ -238,7 +240,7 @@ describe("Redux timeline state", () => {
     describe("set end time", () => {
       it("should focus from the beginning of the recording to the specified end time if no focus region has been set", async () => {
         await dispatch(actions.setFocusWindowEnd({ time: 65, sync: false }));
-        expect(getFocusWindow(store.getState())).toMatchInlineSnapshot(`
+        expect(getDisplayedFocusWindow(store.getState())).toMatchInlineSnapshot(`
           Object {
             "begin": Object {
               "point": "0",
@@ -259,8 +261,9 @@ describe("Redux timeline state", () => {
             end: 70,
           })
         );
+        dispatch(setActiveFocusWindow(getDisplayedFocusWindow(store.getState())));
         await dispatch(actions.setFocusWindowEnd({ time: 65, sync: false }));
-        expect(getFocusWindow(store.getState())).toMatchInlineSnapshot(`
+        expect(getDisplayedFocusWindow(store.getState())).toMatchInlineSnapshot(`
           Object {
             "begin": Object {
               "point": "50000",

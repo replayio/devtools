@@ -5,7 +5,7 @@ import { useAppSelector } from "ui/setup/hooks";
 import { getVisiblePosition } from "ui/utils/timeline";
 
 export default function UnfocusedRegion() {
-  const focusWindow = useAppSelector(selectors.getFocusWindow);
+  const focusWindow = useAppSelector(selectors.getDisplayedFocusWindow);
   const zoomRegion = useAppSelector(selectors.getZoomRegion);
 
   if (!focusWindow) {

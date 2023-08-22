@@ -11,7 +11,6 @@ import { SelectedFrameContext } from "replay-next/src/contexts/SelectedFrameCont
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { NewTerminalExpression, TerminalContext } from "replay-next/src/contexts/TerminalContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
-import { useCurrentFocusWindow } from "replay-next/src/hooks/useCurrentFocusWindow";
 import { useIsPointWithinFocusWindow } from "replay-next/src/hooks/useIsPointWithinFocusWindow";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
@@ -72,7 +71,7 @@ function ConsoleInputSuspends({ inputRef }: { inputRef?: RefObject<ImperativeHan
   const { addMessage } = useContext(TerminalContext);
   const { executionPoint, time } = useContext(TimelineContext);
 
-  const focusWindow = useCurrentFocusWindow();
+  const { activeRange: focusWindow } = useContext(FocusContext);
 
   const [historyIndex, setHistoryIndex] = useState<number | null>(null);
   const [expressionHistory, addExpression] = useTerminalHistory(recordingId);

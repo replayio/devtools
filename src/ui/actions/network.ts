@@ -12,7 +12,7 @@ import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { sourcesCache } from "replay-next/src/suspense/SourcesCache";
 import { isPointInRegion } from "shared/utils/time";
 import { RequestSummary } from "ui/components/NetworkMonitor/utils";
-import { getFocusWindow } from "ui/reducers/timeline";
+import { getActiveFocusWindow } from "ui/reducers/timeline";
 
 import { UIThunkAction } from ".";
 
@@ -87,7 +87,7 @@ export function seekToRequestFrame(
 ): UIThunkAction {
   return async (dispatch, getState, { ThreadFront }) => {
     const state = getState();
-    const focusWindow = getFocusWindow(state);
+    const focusWindow = getActiveFocusWindow(state);
     const point = request.point;
 
     // Don't select a request that's not within a focus window

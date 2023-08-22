@@ -26,7 +26,7 @@ export default function ConditionalFocuser({
   setEditMode,
   updateFocusWindowThrottled,
 }: Props) {
-  const focusWindow = useAppSelector(selectors.getFocusWindow);
+  const focusWindow = useAppSelector(selectors.getDisplayedFocusWindow);
   const showFocusModeControls = useAppSelector(selectors.getShowFocusModeControls);
 
   if (!focusWindow || !showFocusModeControls) {
@@ -44,7 +44,7 @@ export default function ConditionalFocuser({
 
 function Focuser({ editMode, setEditMode, updateFocusWindowThrottled }: Props) {
   const dispatch = useAppDispatch();
-  const focusWindow = useAppSelector(selectors.getFocusWindow)!;
+  const focusWindow = useAppSelector(selectors.getDisplayedFocusWindow)!;
   const zoomRegion = useAppSelector(selectors.getZoomRegion);
 
   // Mirror focus state so we can re-render immediately and dispatch throttled Redux updates

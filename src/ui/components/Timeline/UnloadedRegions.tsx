@@ -1,16 +1,15 @@
-import { TimeStampedPointRange } from "@replayio/protocol";
 import clamp from "lodash/clamp";
 import { FC } from "react";
 
 import useLoadedRegions from "replay-next/src/hooks/useLoadedRegions";
-import { getFocusWindow, getZoomRegion } from "ui/reducers/timeline";
+import { getDisplayedFocusWindow, getZoomRegion } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
 import { getVisiblePosition, overlap } from "ui/utils/timeline";
 
 export const UnloadedRegions: FC = () => {
   const loadedRegions = useLoadedRegions();
   const zoomRegion = useAppSelector(getZoomRegion);
-  const focusWindow = useAppSelector(getFocusWindow);
+  const focusWindow = useAppSelector(getDisplayedFocusWindow);
 
   // Check loadedRegions to keep typescript happy.
   if (!loadedRegions) {

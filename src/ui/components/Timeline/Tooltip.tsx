@@ -3,7 +3,7 @@ import React from "react";
 import { getFormattedTime } from "shared/utils/time";
 import { useNonLoadingTimeRanges } from "ui/components/Timeline/useNonLoadingTimeRanges";
 import {
-  getFocusWindow,
+  getDisplayedFocusWindow,
   getHoverTime,
   getShowFocusModeControls,
   getZoomRegion,
@@ -17,7 +17,7 @@ export default function Tooltip({ timelineWidth }: { timelineWidth: number }) {
   const showFocusModeControls = useAppSelector(getShowFocusModeControls);
   const nonLoadingTimeRanges = useNonLoadingTimeRanges();
 
-  const focusWindow = useAppSelector(getFocusWindow);
+  const focusWindow = useAppSelector(getDisplayedFocusWindow);
 
   if (!hoverTime || showFocusModeControls) {
     return null;

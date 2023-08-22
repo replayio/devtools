@@ -1,19 +1,20 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { TimeStampedPoint } from "@replayio/protocol";
+import { TimeStampedPoint, TimeStampedPointRange } from "@replayio/protocol";
 import sortBy from "lodash/sortBy";
 
 import { getPausePointParams } from "shared/utils/environment";
 import { MAX_FOCUS_REGION_DURATION } from "ui/actions/timeline";
 import { UIState } from "ui/state";
-import { FocusWindow, HoveredItem, TimelineState } from "ui/state/timeline";
+import { HoveredItem, TimelineState } from "ui/state/timeline";
 import { mergeSortedPointLists } from "ui/utils/timeline";
 
 function initialTimelineState(): TimelineState {
   return {
     allPaintsReceived: false,
     currentTime: 0,
-    focusWindow: getPausePointParams().focusWindow,
-    focusWindowBackup: null,
+    activeFocusWindow: getPausePointParams().focusWindow,
+    displayedFocusWindow: getPausePointParams().focusWindow,
+    displayedFocusWindowBackup: null,
     hoveredItem: null,
     markTimeStampedPoint: null,
     hoverTime: null,
@@ -59,8 +60,11 @@ const timelineSlice = createSlice({
     setPlaybackFocusWindow(state, action: PayloadAction<boolean>) {
       state.playbackFocusWindow = action.payload;
     },
-    setFocusWindow(state, action: PayloadAction<FocusWindow | null>) {
-      state.focusWindow = action.payload;
+    setActiveFocusWindow(state, action: PayloadAction<TimeStampedPointRange | null>) {
+      state.activeFocusWindow = action.payload;
+    },
+    setDisplayedFocusWindow(state, action: PayloadAction<TimeStampedPointRange | null>) {
+      state.displayedFocusWindow = action.payload;
     },
     pointsReceived(state, action: PayloadAction<TimeStampedPoint[]>) {
       const mutablePoints = [...state.points];
@@ -82,12 +86,6 @@ const timelineSlice = createSlice({
   },
 });
 
-// If abs(A - B) > EPSILON, then A and B are considered different.
-// If abs(A - B) < EPSILON, then A and B are considered equal.
-const EPSILON = 0.0001;
-// returns true is A is less than B, and the difference is greater than EPSILON
-const lessThan = (a: number, b: number) => b - a > EPSILON;
-
 export const {
   allPaintsReceived,
   setDragging,
@@ -96,7 +94,8 @@ export const {
   setPlaybackPrecachedTime,
   setPlaybackFocusWindow,
   setPlaybackStalled,
-  setFocusWindow,
+  setActiveFocusWindow,
+  setDisplayedFocusWindow,
   setTimelineState,
   pointsReceived,
   paintsReceived,
@@ -131,9 +130,10 @@ export const getBasicProcessingProgress = (state: UIState) => {
 };
 export const getPlaybackPrecachedTime = (state: UIState) => state.timeline.playbackPrecachedTime;
 export const getPlaybackFocusWindow = (state: UIState) => state.timeline.playbackFocusWindow;
-export const getFocusWindow = (state: UIState) => state.timeline.focusWindow;
+export const getActiveFocusWindow = (state: UIState) => state.timeline.activeFocusWindow;
+export const getDisplayedFocusWindow = (state: UIState) => state.timeline.displayedFocusWindow;
 export const isMaximumFocusWindow = (state: UIState) => {
-  const focusWindow = getFocusWindow(state);
+  const focusWindow = getDisplayedFocusWindow(state);
   if (focusWindow) {
     const duration = focusWindow.end.time - focusWindow.begin.time;
     // JavaScript floating point numbers are not precise enough,
@@ -143,4 +143,5 @@ export const isMaximumFocusWindow = (state: UIState) => {
     return false;
   }
 };
-export const getFocusWindowBackup = (state: UIState) => state.timeline.focusWindowBackup;
+export const getDisplayedFocusWindowBackup = (state: UIState) =>
+  state.timeline.displayedFocusWindowBackup;

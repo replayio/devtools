@@ -18,7 +18,7 @@ import RequestDetails from "ui/components/NetworkMonitor/RequestDetails";
 import RequestTable from "ui/components/NetworkMonitor/RequestTable";
 import Table from "ui/components/NetworkMonitor/Table";
 import { getSelectedRequestId } from "ui/reducers/network";
-import { getCurrentTime, getFocusWindow } from "ui/reducers/timeline";
+import { getActiveFocusWindow, getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { timeMixpanelEvent } from "ui/utils/mixpanel";
 import { trackEvent } from "ui/utils/telemetry";
@@ -30,7 +30,7 @@ export default function NetworkMonitor() {
 
   const currentTime = useAppSelector(getCurrentTime);
   const context = useAppSelector(getThreadContext);
-  const focusWindow = useAppSelector(getFocusWindow);
+  const focusWindow = useAppSelector(getActiveFocusWindow);
 
   const selectedRequestId = useAppSelector(getSelectedRequestId);
   const [types, setTypes] = useState<Set<CanonicalRequestType>>(new Set([]));

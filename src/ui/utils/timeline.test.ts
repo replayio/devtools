@@ -1,4 +1,6 @@
-import { FocusWindow, ZoomRegion } from "ui/state/timeline";
+import { TimeStampedPointRange } from "@replayio/protocol";
+
+import { ZoomRegion } from "ui/state/timeline";
 
 import {
   filterToFocusWindow,
@@ -11,7 +13,7 @@ import {
 } from "./timeline";
 
 const point = (time: number) => ({ time, point: `${time}` });
-const focusWindow = (from: number, to: number): FocusWindow => ({
+const focusWindow = (from: number, to: number): TimeStampedPointRange => ({
   begin: point(from),
   end: point(to),
 });

@@ -1,10 +1,13 @@
 import { ExecutionPoint } from "@replayio/protocol";
+import { useContext } from "react";
 
-import { useCurrentFocusWindow } from "replay-next/src/hooks/useCurrentFocusWindow";
 import { isPointInRegion } from "shared/utils/time";
 
+import { FocusContext } from "../contexts/FocusContext";
+
 export function useIsPointWithinFocusWindow(executionPoint: ExecutionPoint | null): boolean {
-  const focusWindow = useCurrentFocusWindow();
+  const focusContext = useContext(FocusContext);
+  const focusWindow = focusContext?.activeRange ?? null;
 
   return (
     executionPoint !== null && focusWindow !== null && isPointInRegion(executionPoint, focusWindow)

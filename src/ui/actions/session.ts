@@ -1,6 +1,6 @@
 import { ApolloError } from "@apollo/client";
 import { Action } from "@reduxjs/toolkit";
-import { uploadedData } from "@replayio/protocol";
+import { TimeStampedPointRange, uploadedData } from "@replayio/protocol";
 import * as Sentry from "@sentry/react";
 
 import {
@@ -34,7 +34,7 @@ import {
   requestSent,
   responseReceived,
 } from "ui/reducers/protocolMessages";
-import { setFocusWindow } from "ui/reducers/timeline";
+import { setActiveFocusWindow, setDisplayedFocusWindow } from "ui/reducers/timeline";
 import type { ExpectedError, UnexpectedError } from "ui/state/app";
 import LogRocket from "ui/utils/logrocket";
 import { endMixpanelSession } from "ui/utils/mixpanel";
@@ -311,6 +311,10 @@ export function createSocket(
       const recordingTarget = await recordingTargetCache.readAsync(replayClient);
       dispatch(actions.setRecordingTarget(recordingTarget));
 
+      replayClient.addEventListener("focusWindowChange", (window: TimeStampedPointRange) => {
+        dispatch(setActiveFocusWindow(window));
+      });
+
       // We don't want to show the non-dev version of the app for node replays.
       if (recordingTarget === "node") {
         dispatch(setViewMode("dev"));
@@ -333,7 +337,8 @@ export function createSocket(
         focusWindowFromParams.begin.point !== focusWindow.begin.point ||
         focusWindowFromParams.end.point !== focusWindow.end.point
       ) {
-        dispatch(setFocusWindow(focusWindow));
+        dispatch(setDisplayedFocusWindow(focusWindow));
+        dispatch(setActiveFocusWindow(focusWindow));
       }
     } catch (e: any) {
       const currentError = getUnexpectedError(getState());

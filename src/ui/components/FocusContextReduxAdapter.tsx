@@ -10,14 +10,15 @@ import {
   syncFocusedRegion,
   updateFocusWindowParam,
 } from "ui/actions/timeline";
-import { getFocusWindow } from "ui/reducers/timeline";
+import { getActiveFocusWindow, getDisplayedFocusWindow } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { rangeForFocusWindow } from "ui/utils/timeline";
 
 // Adapter that reads focus region (from Redux) and passes it to the FocusContext.
 export default function FocusContextReduxAdapter({ children }: PropsWithChildren) {
   const dispatch = useAppDispatch();
-  const focusWindow = useAppSelector(getFocusWindow);
+  const focusWindow = useAppSelector(getDisplayedFocusWindow);
+  const activeFocusWindow = useAppSelector(getActiveFocusWindow);
 
   const deferredFocusWindow = useDeferredValue(focusWindow);
   const isPending = deferredFocusWindow !== focusWindow;
@@ -67,10 +68,19 @@ export default function FocusContextReduxAdapter({ children }: PropsWithChildren
       isTransitionPending: isPending,
       range: deferredFocusWindow ? rangeForFocusWindow(deferredFocusWindow) : null,
       rangeForDisplay: focusWindow ? rangeForFocusWindow(focusWindow) : null,
+      activeRange: activeFocusWindow,
       update,
       updateForTimelineImprecise,
     };
-  }, [deferredFocusWindow, dispatch, isPending, focusWindow, update, updateForTimelineImprecise]);
+  }, [
+    activeFocusWindow,
+    deferredFocusWindow,
+    dispatch,
+    isPending,
+    focusWindow,
+    update,
+    updateForTimelineImprecise,
+  ]);
 
   return <FocusContext.Provider value={context}>{children}</FocusContext.Provider>;
 }

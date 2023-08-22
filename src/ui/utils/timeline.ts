@@ -4,7 +4,7 @@ import sortedIndexBy from "lodash/sortedIndexBy";
 import sortedLastIndexBy from "lodash/sortedLastIndexBy";
 
 import { assert } from "protocol/utils";
-import { FocusWindow, ZoomRegion } from "ui/state/timeline";
+import { ZoomRegion } from "ui/state/timeline";
 
 import { timelineMarkerWidth } from "../constants";
 
@@ -184,7 +184,7 @@ export function isSameTimeStampedPointRange(
   return sameBegin && sameEnd;
 }
 
-export function isInFocusSpan(time: number, focusWindow: FocusWindow) {
+export function isInFocusSpan(time: number, focusWindow: TimeStampedPointRange) {
   return time >= focusWindow.begin.time && time <= focusWindow.end.time;
 }
 
@@ -198,7 +198,7 @@ export function isTimeInRegions(time: number, regions?: TimeStampedPointRange[])
   return !!regions?.some(region => time >= region.begin.time && time <= region.end.time);
 }
 
-export function rangeForFocusWindow(focusWindow: FocusWindow): TimeStampedPointRange {
+export function rangeForFocusWindow(focusWindow: TimeStampedPointRange): TimeStampedPointRange {
   return { begin: focusWindow.begin || { time: 0, point: "0" }, end: focusWindow.end };
 }
 
@@ -236,8 +236,8 @@ export function getTimeFromPosition(
 }
 
 export function isFocusWindowSubset(
-  prevFocusWindow: FocusWindow | null,
-  nextFocusWindow: FocusWindow | null
+  prevFocusWindow: TimeStampedPointRange | null,
+  nextFocusWindow: TimeStampedPointRange | null
 ): boolean {
   if (prevFocusWindow === null) {
     // Previously the entire timeline was selected.
@@ -257,7 +257,7 @@ export function isFocusWindowSubset(
 
 export function filterToFocusWindow<T extends TimeStampedPoint>(
   sortedPoints: T[],
-  focusWindow: FocusWindow | null
+  focusWindow: TimeStampedPointRange | null
 ): [filtered: T[], filteredBeforeCount: number, filteredAfterCount: number] {
   if (!focusWindow) {
     return [sortedPoints, 0, 0];

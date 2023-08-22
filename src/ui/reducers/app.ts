@@ -3,7 +3,7 @@ import { PayloadAction, createSelector, createSlice } from "@reduxjs/toolkit";
 import { RecordingTarget } from "replay-next/src/suspense/BuildIdCache";
 import { compareExecutionPoints, isExecutionPointsWithinRange } from "replay-next/src/utils/time";
 import { Workspace } from "shared/graphql/types";
-import { getFocusWindow } from "ui/reducers/timeline";
+import { getActiveFocusWindow } from "ui/reducers/timeline";
 import { UIState } from "ui/state";
 import {
   AppMode,
@@ -205,7 +205,7 @@ export const getSortedEventsForDisplay = createSelector(
 );
 
 export const getFilteredEventsForFocusWindow = createSelector(
-  getFocusWindow,
+  getActiveFocusWindow,
   getSortedEventsForDisplay,
   (focusWindow, sortedEvents) => {
     if (!focusWindow) {

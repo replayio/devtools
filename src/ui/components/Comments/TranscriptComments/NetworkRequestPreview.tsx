@@ -7,7 +7,7 @@ import { networkRequestsCache } from "replay-next/src/suspense/NetworkRequestsCa
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { setSelectedPanel } from "ui/actions/layout";
 import { selectNetworkRequest } from "ui/actions/network";
-import { getFocusWindow } from "ui/reducers/timeline";
+import { getActiveFocusWindow } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { Comment } from "ui/state/comments";
 import { trackEvent } from "ui/utils/telemetry";
@@ -79,7 +79,7 @@ function ModernNetworkRequestPreview({
   time: number;
 }) {
   const dispatch = useAppDispatch();
-  const focusWindow = useAppSelector(getFocusWindow);
+  const focusWindow = useAppSelector(getActiveFocusWindow);
 
   const onClick = () => {
     trackEvent("comments.select_request");

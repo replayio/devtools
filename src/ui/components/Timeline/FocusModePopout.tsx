@@ -5,10 +5,10 @@ import { Nag } from "shared/graphql/types";
 import { DebouncedOrThrottledFunction } from "shared/utils/function";
 import { exitFocusMode, syncFocusedRegion, updateFocusWindowParam } from "ui/actions/timeline";
 import {
-  getFocusWindowBackup,
+  getDisplayedFocusWindowBackup,
   getShowFocusModeControls,
   isMaximumFocusWindow,
-  setFocusWindow,
+  setDisplayedFocusWindow,
 } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { AppDispatch } from "ui/setup/store";
@@ -31,7 +31,7 @@ export default function FocusModePopout({
   const showFocusModeControls = useAppSelector(getShowFocusModeControls);
 
   const dispatch = useAppDispatch();
-  const focusWindowBackup = useAppSelector(getFocusWindowBackup);
+  const focusWindowBackup = useAppSelector(getDisplayedFocusWindowBackup);
   const showMaxFocusWindowMessage = useAppSelector(isMaximumFocusWindow);
 
   const hideModal = () => dispatch(exitFocusMode());
@@ -43,7 +43,7 @@ export default function FocusModePopout({
       updateFocusWindowThrottled.cancel();
     }
 
-    await dispatch(setFocusWindow(focusWindowBackup));
+    await dispatch(setDisplayedFocusWindow(focusWindowBackup));
     await dispatch(syncFocusedRegion());
 
     if (isImplicit) {

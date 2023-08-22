@@ -41,6 +41,7 @@ export type FocusContextType = {
   isTransitionPending: boolean;
   range: TimeStampedPointRange | null;
   rangeForDisplay: TimeStampedPointRange | null;
+  activeRange: TimeStampedPointRange | null;
 
   // Set focus window to a range of execution points (or null to clear).
   update: (value: TimeStampedPointRange | null, options: UpdateOptions) => Promise<void>;
@@ -70,6 +71,7 @@ export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
   const [bias, setBias] = useState<FocusWindowRequestBias | undefined>(undefined);
   const [range, setRange] = useState<TimeStampedPointRange | null>(initialRange);
   const [deferredRange, setDeferredRange] = useState<TimeStampedPointRange | null>(initialRange);
+  const [activeRange, setActiveRange] = useState<TimeStampedPointRange | null>(initialRange);
 
   const prevRangeRef = useRef(range);
 
@@ -95,8 +97,13 @@ export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
       return;
     }
 
-    const timeoutId = setTimeout(() => {
-      client.requestFocusWindow({ begin: range.begin, bias, end: range.end });
+    const timeoutId = setTimeout(async () => {
+      const activeRange = await client.requestFocusWindow({
+        begin: range.begin,
+        bias,
+        end: range.end,
+      });
+      setActiveRange(activeRange);
     }, FOCUS_DEBOUNCE_DURATION);
 
     return () => {
@@ -179,6 +186,7 @@ export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
 
   const focusContext = useMemo<FocusContextType>(
     () => ({
+      activeRange,
       enterFocusMode: () => {},
       isTransitionPending,
       rangeForDisplay: range,
@@ -186,7 +194,14 @@ export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
       update: updateFocusRange,
       updateForTimelineImprecise,
     }),
-    [deferredRange, isTransitionPending, range, updateFocusRange, updateForTimelineImprecise]
+    [
+      activeRange,
+      deferredRange,
+      isTransitionPending,
+      range,
+      updateFocusRange,
+      updateForTimelineImprecise,
+    ]
   );
 
   return <FocusContext.Provider value={focusContext}>{children}</FocusContext.Provider>;

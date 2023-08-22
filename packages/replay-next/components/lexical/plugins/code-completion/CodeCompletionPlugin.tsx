@@ -4,7 +4,7 @@ import { ExecutionPoint } from "@replayio/protocol";
 import { $createTextNode, TextNode } from "lexical";
 import { useContext, useEffect } from "react";
 
-import { useCurrentFocusWindow } from "replay-next/src/hooks/useCurrentFocusWindow";
+import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import TypeAheadPlugin from "../typeahead/TypeAheadPlugin";
@@ -31,7 +31,7 @@ export default function CodeCompletionPlugin({
 
   const replayClient = useContext(ReplayClientContext);
 
-  const focusWindow = useCurrentFocusWindow();
+  const { activeRange: focusWindow } = useContext(FocusContext);
 
   const findMatchesWrapper = (query: string, queryScope: string | null) => {
     return findMatches(query, queryScope, replayClient, executionPoint, time, focusWindow, context);

@@ -1,8 +1,8 @@
 import { Value as ProtocolValue, SourceId } from "@replayio/protocol";
 import { ReactNode, RefObject, Suspense, useContext, useEffect, useRef } from "react";
 
+import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { SelectedFrameContext } from "replay-next/src/contexts/SelectedFrameContext";
-import { useCurrentFocusWindow } from "replay-next/src/hooks/useCurrentFocusWindow";
 import { getFrameSuspense } from "replay-next/src/suspense/FrameCache";
 import {
   getPointAndTimeForPauseId,
@@ -44,7 +44,7 @@ function SuspendingPreviewPopup({
   target,
 }: Props) {
   const client = useContext(ReplayClientContext);
-  const focusWindow = useCurrentFocusWindow();
+  const { activeRange: focusWindow } = useContext(FocusContext);
 
   const popupRef = useRef<HTMLDivElement>(null);
 

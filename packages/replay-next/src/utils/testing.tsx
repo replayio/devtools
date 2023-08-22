@@ -112,6 +112,7 @@ export async function renderFocused(
     isTransitionPending: false,
     range: null,
     rangeForDisplay: null,
+    activeRange: null,
     update: jest.fn(),
     updateForTimelineImprecise: jest.fn(),
     ...options?.focusContext,
