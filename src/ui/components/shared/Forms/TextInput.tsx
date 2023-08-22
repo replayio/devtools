@@ -15,10 +15,27 @@ export default React.forwardRef<
   const { textSize, center, theme, className, ...otherProps } = props;
 
   const themeClass = theme || "default";
-  const textSizeClass = textSize ? `text-${textSize}` : "text-sm"; // Tailwind class for textSize
-  const centerClass = center ? styles.textCenter : ""; // CSS module class for center
+  let textSizeClass = "text-sm"; // Default Tailwind class for textSize
 
-  const inputClass = classNames(styles.textInput, textSizeClass, centerClass, className);
+  // Explicitly map textSize prop to Tailwind classes
+  switch (textSize) {
+    case "base":
+      textSizeClass = "text-base";
+      break;
+    case "lg":
+      textSizeClass = "text-lg";
+      break;
+    case "2xl":
+      textSizeClass = "text-2xl";
+      break;
+  }
+
+  const inputClass = classNames(
+    styles.textInput,
+    textSizeClass,
+    center ? styles.textCenter : "",
+    className
+  );
 
   return (
     <div className={styles[themeClass]}>
