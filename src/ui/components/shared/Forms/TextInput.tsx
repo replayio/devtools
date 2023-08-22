@@ -14,7 +14,7 @@ export default React.forwardRef<
 >(function TextInput(props, ref) {
   const { textSize, center, theme, className, ...otherProps } = props;
 
-  const themeClass = theme || "default";
+  const themeClass = theme || "system";
   let textSizeClass = "text-sm"; // Default Tailwind class for textSize
 
   // Explicitly map textSize prop to Tailwind classes
