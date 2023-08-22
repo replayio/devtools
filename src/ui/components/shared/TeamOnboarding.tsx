@@ -121,6 +121,7 @@ function TeamNamePage({
           onChange={onChange}
           textSize="2xl"
           center={true}
+          theme="dark" // we force onboarding into dark theme
           ref={textInputRef}
         />
         {inputError ? <div className="text-red-500">{inputError}</div> : null}

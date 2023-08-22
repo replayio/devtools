@@ -1,0 +1,54 @@
+.textInput {
+  text-align: left;
+  display: block;
+  width: 100%;
+  border-radius: 0.375rem;
+  border-color: transparent;
+  padding: 0.5rem;
+  outline: 0;
+}
+
+.textInput:focus {
+  box-shadow: 0 0 0 3px var(--primary-accent);
+}
+
+.textCenter {
+  text-align: center;
+}
+
+.system .textInput {
+  background-color: var(--theme-text-field-bgcolor);
+  color: var(--theme-text-field-color);
+  border-color: var(--input-border);
+  caret-color: var(--theme-text-field-color);
+}
+
+.system .textInput:hover {
+  background-color: var(--theme-text-field-bgcolor-hover);
+}
+
+/* Dark theme */
+
+.dark .textInput {
+  background-color: #3e434b; /* Dark: --theme-text-field-bgcolor */
+  color: #fff; /* --theme-text-field-color: */
+  border-color: #3e434b; /* Dark: --input-border */
+  caret-color: #fff;
+}
+
+.dark .textInput:hover {
+  background-color: #192230; /* Dark: --theme-text-field-bgcolor-hover: */
+}
+
+/* Light theme */
+
+.light .textInput {
+  background-color: #f6f6f6; /* --theme-text-field-bgcolor */
+  color: #38383d; /* Light: var(--body-color); */
+  border-color: var(--cool-gray-200); /* --input-border */
+  caret-color: #38383d;
+}
+
+.light .textInput:hover {
+  background-color: var(--theme-base-95); /* --theme-text-field-bgcolor-hover: */
+}
