@@ -104,14 +104,15 @@ export class ReplayClient implements ReplayClientInterface {
   constructor(dispatchURL: string) {
     this._dispatchURL = dispatchURL;
 
-    this.waitForSession().then(sessionId => {
+    this.waitForSession().then(async sessionId => {
       client.Session.addLoadedRegionsListener(this._onLoadChanges);
       client.Session.listenForLoadChanges({}, sessionId);
 
-      client.Session.addProcessingProgressListener(this._onProcessingProgress);
-      client.Session.listenForProcessingProgress({}, sessionId);
-
       client.Session.addAnnotationsListener(this.onAnnotations);
+
+      client.Session.addProcessingProgressListener(this._onProcessingProgress);
+      await client.Session.listenForProcessingProgress({}, sessionId);
+      client.Session.removeProcessingProgressListener(this._onProcessingProgress);
     });
   }
 
