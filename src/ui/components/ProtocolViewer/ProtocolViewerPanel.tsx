@@ -46,11 +46,11 @@ export function ProtocolViewerPanel() {
         <Offscreen mode={tab === "live" ? "visible" : "hidden"}>
           <LiveProtocolRequests />
         </Offscreen>
-        <Offscreen mode={tab === "recorded" ? "visible" : "hidden"}>
+        {isRecordingOfReplay && tab === "recorded" ? (
           <Suspense fallback={<Loader />}>
             <RecordedProtocolRequests />
           </Suspense>
-        </Offscreen>
+        ) : null}
       </div>
     </div>
   );
