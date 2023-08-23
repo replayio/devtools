@@ -19,9 +19,9 @@ test("should support continue to next and previous functionality", async ({ page
   await expect(await isContinueToPreviousOptionEnabled(page, sourceId, 14)).toBe(false);
 
   // Go to line 14.
-  await verifyCurrentExecutionPoint(page, fileName, 14, false);
+  await verifyCurrentExecutionPoint(page, { expected: false, fileName, lineNumber: 14, sourceId });
   await continueTo(page, { lineNumber: 14, direction: "next", sourceId, use: "hover-button" });
-  await verifyCurrentExecutionPoint(page, fileName, 14);
+  await verifyCurrentExecutionPoint(page, { fileName, lineNumber: 14, sourceId });
 
   // Continue to next and previous buttons should both now be disabled for line 14.
   // Continue to previous should be enabled for line 13
@@ -36,14 +36,14 @@ test("should support continue to next and previous functionality", async ({ page
   // Verify the same things but using the context menu.
 
   await continueTo(page, { lineNumber: 13, direction: "previous", sourceId, use: "context-menu" });
-  await verifyCurrentExecutionPoint(page, fileName, 13);
+  await verifyCurrentExecutionPoint(page, { fileName, lineNumber: 13, sourceId });
 
   await continueTo(page, { lineNumber: 14, direction: "next", sourceId, use: "context-menu" });
-  await verifyCurrentExecutionPoint(page, fileName, 14);
+  await verifyCurrentExecutionPoint(page, { fileName, lineNumber: 14, sourceId });
 
   await continueTo(page, { lineNumber: 15, direction: "next", sourceId, use: "context-menu" });
-  await verifyCurrentExecutionPoint(page, fileName, 15);
+  await verifyCurrentExecutionPoint(page, { fileName, lineNumber: 15, sourceId });
 
   await continueTo(page, { lineNumber: 14, direction: "previous", sourceId, use: "context-menu" });
-  await verifyCurrentExecutionPoint(page, fileName, 14);
+  await verifyCurrentExecutionPoint(page, { fileName, lineNumber: 14, sourceId });
 });

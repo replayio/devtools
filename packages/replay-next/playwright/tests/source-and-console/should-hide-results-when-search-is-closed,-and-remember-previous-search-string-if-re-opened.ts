@@ -21,7 +21,11 @@ test("should hide results when search is closed, and remember previous search st
   const sourceSearchLocator = getSearchSourceLocator(page);
   await expect(sourceSearchLocator).not.toBeVisible();
   await searchSourceText(page, "function");
-  await verifyCurrentSearchResult(page, { fileName: "source-and-console.html", lineNumber: 17 });
+  await verifyCurrentSearchResult(page, {
+    fileName: "source-and-console.html",
+    lineNumber: 17,
+    sourceId,
+  });
 
   const sourceLocator = getSourceLocator(page, sourceId);
   await takeScreenshot(page, testInfo, sourceLocator, "source-search-highlights");
@@ -32,6 +36,10 @@ test("should hide results when search is closed, and remember previous search st
   await focusOnSource(page);
   await typeCommandKey(page, "f");
 
-  await verifyCurrentSearchResult(page, { fileName: "source-and-console.html", lineNumber: 17 });
+  await verifyCurrentSearchResult(page, {
+    fileName: "source-and-console.html",
+    lineNumber: 17,
+    sourceId,
+  });
   await takeScreenshot(page, testInfo, sourceLocator, "source-search-highlights");
 });
