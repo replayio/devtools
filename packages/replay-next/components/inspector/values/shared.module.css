@@ -22,7 +22,7 @@
   color: var(--value-type-date);
 }
 .Error {
-  color: var(--value-type-error);
+  color: var(--value-typeˀ-error);
 }
 .NaN {
   color: var(--value-type-nan);
@@ -46,7 +46,7 @@
   color: var(--value-type-undefined);
 }
 
-.IconButton {
+.Iconˀtton {
   height: 1rem;
   width: 1rem;
   outline: none;
@@ -147,4 +147,24 @@
 
   font-size: var(--font-size-small);
   font-family: var(--font-family-default);
+}
+
+.SourceLocationLink {
+  color: var(--link-color);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.SourceLocationLink:hover {
+  color: var(--link-color-active);
+}
+
+.BucketLabel {
+  color: var(--object-inspector-bucket-color);
+}
+
+.Prototype {
+  color: var(--object-inspector-prototype-color);
+  display: inline;
+  min-height: 1rem;
 }

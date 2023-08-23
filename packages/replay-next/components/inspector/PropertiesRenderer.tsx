@@ -24,6 +24,8 @@ import GetterRenderer from "./GetterRenderer";
 import { KeyValueHeader } from "./KeyValueRenderer";
 import KeyValueRenderer from "./KeyValueRendererWithContextMenu";
 import ValueRenderer from "./ValueRenderer";
+import { FunctionLocationRenderer } from "./values/FunctionRenderer";
+import PrototypeRenderer from "./values/PrototypeRenderer";
 import styles from "./PropertiesRenderer.module.css";
 
 const PROPERTY_BUCKET_SIZE = 100;
@@ -43,9 +45,7 @@ export default function PropertiesRenderer({
   path?: string;
   pauseId: ProtocolPauseId;
 }) {
-  const { inspectFunctionDefinition } = useContext(InspectorContext);
   const client = useContext(ReplayClientContext);
-  const { preferredGeneratedSourceIds } = useContext(SourcesContext);
 
   // If we have an ObjectPreview already, use it.
   // If we just have an Object, then Suspend while we fetch preview data.
@@ -89,12 +89,6 @@ export default function PropertiesRenderer({
     return properties;
   }, [preview]);
 
-  const prototypeId = preview?.prototypeId ?? null;
-  let prototype = null;
-  if (prototypeId) {
-    prototype = objectCache.read(client, pauseId, prototypeId, "canOverflow");
-  }
-
   let EntriesRenderer: FC<EntriesRendererProps> = ContainerEntriesRenderer;
   switch (className) {
     case "Map":
@@ -128,56 +122,17 @@ export default function PropertiesRenderer({
     }
   }
 
-  let renderedPrototype: ReactNode = null;
-  if (prototype != null && !hidePrototype) {
-    const prototypePath = addPathSegment(path, "[[Prototype]]");
-    renderedPrototype = (
-      <Expandable
-        children={<PropertiesRenderer object={prototype} path={prototypePath} pauseId={pauseId} />}
-        header={
-          <span className={styles.Prototype}>
-            <span className={styles.PrototypeName}>[[Prototype]]: </span>
-            {prototype.className}
-          </span>
-        }
-        persistenceKey={prototypePath}
-      />
-    );
-  }
+  let specialPropertiesRenderer: ReactNode[] = [];
 
-  let renderedFunctionLocation: ReactNode = null;
-  if (preview && object.className == "Function" && preview.functionLocation) {
-    const sourcesById = sourcesByIdCache.read(client);
-    const functionDefinition = preview.functionLocation;
-    const preferredFunctionLocation = getPreferredLocation(
-      sourcesById,
-      preferredGeneratedSourceIds,
-      functionDefinition
-    );
-    const source = sourcesById.get(preferredFunctionLocation.sourceId);
-    const fileName = source ? getSourceFileName(source) : preferredFunctionLocation.sourceId;
-    const fnLocation = `${fileName}:${preferredFunctionLocation.line}`;
-
-    renderedFunctionLocation = (
-      <KeyValueHeader
-        value={
-          <span
-            onClick={() => {
-              if (inspectFunctionDefinition !== null) {
-                inspectFunctionDefinition(functionDefinition);
-              }
-            }}
-            className={styles.SourceLocationLink}
-            data-test-name="ClientValue"
-          >
-            {fnLocation}
-          </span>
-        }
-        nameClass={styles.BucketLabel}
-        layout="vertical"
-        name="[[FunctionLocation]]"
-      />
-    );
+  switch (object.className) {
+    case "Function":
+      specialPropertiesRenderer.push(<FunctionLocationRenderer object={object} />);
+    default:
+      if (!hidePrototype) {
+        specialPropertiesRenderer.push(
+          <PrototypeRenderer object={object} path={path} pauseId={pauseId} />
+        );
+      }
   }
 
   return (
@@ -244,8 +199,7 @@ export default function PropertiesRenderer({
         </Suspense>
       )}
 
-      {renderedFunctionLocation}
-      {renderedPrototype}
+      {specialPropertiesRenderer}
     </>
   );
 }

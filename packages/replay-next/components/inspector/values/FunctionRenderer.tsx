@@ -3,7 +3,13 @@ import { MouseEvent, useContext } from "react";
 
 import Icon from "replay-next/components/Icon";
 import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
+import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
+import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
+import { getSourceFileName } from "replay-next/src/utils/source";
+import { getPreferredLocation } from "replay-next/src/utils/sources";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
+import { KeyValueHeader } from "../KeyValueRenderer";
 import { ObjectPreviewRendererProps } from "./types";
 import styles from "./shared.module.css";
 
@@ -72,4 +78,51 @@ export function functionProtocolObjectToString(protocolObject: ProtocolObject) {
   const { functionName, functionParameterNames = [] } = preview ?? {};
 
   return `${functionName}(${functionParameterNames.join(", ")}) {}`;
+}
+
+type FunctionLocationRendererProps = {
+  object: ProtocolObject;
+};
+
+export function FunctionLocationRenderer({ object }: FunctionLocationRendererProps) {
+  const client = useContext(ReplayClientContext);
+  const { inspectFunctionDefinition } = useContext(InspectorContext);
+  const { preferredGeneratedSourceIds } = useContext(SourcesContext);
+
+  const sourcesById = sourcesByIdCache.read(client);
+  const functionLocation = object?.preview?.functionLocation;
+
+  if (!functionLocation) {
+    return null;
+  }
+
+  const preferredFunctionLocation = getPreferredLocation(
+    sourcesById,
+    preferredGeneratedSourceIds,
+    functionLocation
+  );
+  const source = sourcesById.get(preferredFunctionLocation.sourceId);
+  const fileName = source ? getSourceFileName(source) : preferredFunctionLocation.sourceId;
+  const fnLocation = `${fileName}:${preferredFunctionLocation.line}`;
+
+  return (
+    <KeyValueHeader
+      value={
+        <span
+          onClick={() => {
+            if (inspectFunctionDefinition !== null) {
+              inspectFunctionDefinition(functionLocation);
+            }
+          }}
+          className={styles.SourceLocationLink}
+          data-test-name="ClientValue"
+        >
+          {fnLocation}
+        </span>
+      }
+      nameClass={styles.BucketLabel}
+      layout="vertical"
+      name="[[FunctionLocation]]"
+    />
+  );
 }
