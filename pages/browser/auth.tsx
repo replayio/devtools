@@ -2,7 +2,6 @@ import { useRouter } from "next/router";
 import React from "react";
 
 import { LaunchBrowser } from "ui/components/shared/LaunchBrowserModal";
-import Modal from "ui/components/shared/NewModal";
 import { DefaultViewportWrapper } from "ui/components/shared/Viewport";
 
 const BrowserAuth = () => {
@@ -27,8 +26,20 @@ const BrowserAuth = () => {
           </p>
         </LaunchBrowser>
       ) : (
-        /* this is probably not the right component. used as a placeholder */
-        <Modal>You have successfully logged in. You may close this window.</Modal>
+        <section className="relative m-auto w-full max-w-xl overflow-hidden rounded-lg bg-modalBgcolor text-sm text-bodyColor shadow-lg">
+          <div className="flex flex-col items-center space-y-9 p-6">
+            <div className="place-content-center space-y-3">
+              <img className="mx-auto h-12 w-12" src="/images/logo.svg" />
+            </div>
+            <div className="flex flex-col items-center space-y-4 text-center">
+              <div className="text-lg font-bold">Authentication Complete</div>
+              <div className="space-y-6">
+                <p>You have successfully logged in. You may close this window.</p>
+              </div>
+              <div className="w-full" />
+            </div>
+          </div>
+        </section>
       )}
     </DefaultViewportWrapper>
   );
