@@ -66,7 +66,10 @@ export const hitPointsCache = createFocusIntervalCacheForExecutionPoints<
         { kind: "locations", locations },
         { begin, end }
       );
-      hitPoints = pointDescriptions.map(({ point, time }) => ({ point, time }));
+      // Note that PointDescriptions include the current frame.
+      // Type-wise we're going to return `TimeStampedPoint`s,
+      // but the extra frame data is there in this case.
+      hitPoints = pointDescriptions;
     }
 
     return hitPoints;
