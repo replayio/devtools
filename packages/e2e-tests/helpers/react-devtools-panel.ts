@@ -117,7 +117,6 @@ export async function getComponentName(componentLocator: Locator): Promise<strin
       let name = "";
       for (const child of childNodes) {
         if (child.nodeName === "SPAN" || child.nodeName === "MARK") {
-          console.log("Found partial name: ", (child as HTMLElement).textContent, child.nodeName);
           name += (child as HTMLElement).textContent ?? "";
         }
       }
