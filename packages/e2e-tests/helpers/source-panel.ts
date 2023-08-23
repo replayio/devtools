@@ -389,7 +389,12 @@ export async function getSelectedLineNumber(
     ? "CurrentExecutionPointLineHighlight"
     : "ViewSourceHighlight";
 
-  const lineLocator = page.locator(`[data-test-id^=SourceLine]`, {
+  const sourceLocator = await getCurrentSource(page);
+  if (sourceLocator == null) {
+    return null;
+  }
+
+  const lineLocator = sourceLocator.locator(`[data-test-id^=SourceLine]`, {
     has: getByTestName(page, highlightLineTestName),
   });
 
@@ -409,9 +414,17 @@ export async function getSelectedLineNumber(
   return parseInt(textContent, 10);
 }
 
+export function getSourceLocator(page: Page, sourceId: string): Locator {
+  return page.locator(getSourceSelector(sourceId));
+}
+
 export async function getSourceLine(page: Page, lineNumber: number): Promise<Locator> {
-  const source = await getCurrentSource(page);
-  return source!.locator(`[data-test-id=SourceLine-${lineNumber}]`);
+  const sourceLocator = await getCurrentSource(page);
+  return sourceLocator!.locator(getSourceLineSelector(lineNumber));
+}
+
+export function getSourceSelector(sourceId: string): string {
+  return `[data-test-id="Source-${sourceId}"]`;
 }
 
 export function getSourceLineSelector(lineNumber: number): string {
