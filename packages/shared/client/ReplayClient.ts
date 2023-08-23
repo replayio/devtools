@@ -891,6 +891,7 @@ export class ReplayClient implements ReplayClientInterface {
       frameIndex?: number;
       fullPropertyPreview?: boolean;
       limits?: PointPageLimits;
+      shareProcesses?: boolean;
     },
     onResults: (results: RunEvaluationResult[]) => void
   ): Promise<void> {
@@ -925,6 +926,7 @@ export class ReplayClient implements ReplayClientInterface {
           pointLimits,
           pointSelector: opts.selector,
           runEvaluationId,
+          shareProcesses: opts.shareProcesses,
         },
         sessionId
       );
