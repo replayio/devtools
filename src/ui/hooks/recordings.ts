@@ -196,11 +196,15 @@ export function useGetRecording(recordingId: RecordingId | null | undefined): {
   recording: Recording | undefined;
   isAuthorized: boolean;
   loading: boolean;
+  refetch: () => void;
 } {
-  const { data, error, loading } = useQuery<GetRecording, GetRecordingVariables>(GET_RECORDING, {
-    variables: { recordingId },
-    skip: !recordingId,
-  });
+  const { data, error, loading, refetch } = useQuery<GetRecording, GetRecordingVariables>(
+    GET_RECORDING,
+    {
+      variables: { recordingId },
+      skip: !recordingId,
+    }
+  );
 
   if (error) {
     console.error("Apollo error while getting the recording", error);
@@ -214,7 +218,7 @@ export function useGetRecording(recordingId: RecordingId | null | undefined): {
   // Tests don't have an associated user so we just let it bypass the check here.
   const isAuthorized = isTest() || recording;
 
-  return { recording, isAuthorized: !!isAuthorized, loading };
+  return { recording, isAuthorized: !!isAuthorized, loading, refetch };
 }
 
 export function useSubscribeRecording(recordingId: RecordingId | null | undefined) {

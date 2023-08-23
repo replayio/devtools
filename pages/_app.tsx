@@ -4,7 +4,7 @@ import type { AppContext, AppProps } from "next/app";
 import NextApp from "next/app";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import React, { ReactNode, useEffect, useState } from "react";
+import React, { ReactNode, memo, useEffect, useState } from "react";
 import { Provider } from "react-redux";
 import "../src/global-css";
 import "../src/test-prep";
@@ -107,11 +107,7 @@ function Routing({ Component, pageProps }: AppProps) {
 
   return (
     <Provider store={store}>
-      <Head>
-        <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
-        <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
-        <title>Replay</title>
-      </Head>
+      <MemoizedHeader />
       <ErrorBoundary>
         <_App>
           <InstallRouteListener />
@@ -123,6 +119,19 @@ function Routing({ Component, pageProps }: AppProps) {
     </Provider>
   );
 }
+
+// Ensure this component only renders once even if the parent component re-renders
+// Otherwise it can temporarily override titles set by child components,
+// causing the document title to flicker.
+const MemoizedHeader = memo(function MemoizedHeader() {
+  return (
+    <Head>
+      <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
+      <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
+      <title>Replay</title>
+    </Head>
+  );
+});
 
 const App = ({ apiKey, ...props }: AppProps & AuthProps) => {
   useAuthTelemetry();

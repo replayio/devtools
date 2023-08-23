@@ -1,7 +1,7 @@
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { GetServerSideProps, GetStaticProps } from "next/types";
-import React, { useContext, useEffect, useState } from "react";
+import { GetServerSideProps } from "next/types";
+import React, { memo, useContext, useEffect, useState } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -66,31 +66,38 @@ function RecordingHead({ metadata }: MetadataProps) {
     description = "";
   }
 
-  const pageTitle = title ? `⏲ ${title}` : "⏲";
-
   const image = `${process.env.NEXT_PUBLIC_IMAGE_URL}${metadata.id}.png`;
 
   return (
-    <Head>
-      <title>{pageTitle}</title>
-      {/* nosemgrep typescript.react.security.audit.react-http-leak.react-http-leak */}
-      <meta property="og:title" content={title} />
-      <meta property="og:type" content="website" />
-      {/* nosemgrep typescript.react.security.audit.react-http-leak.react-http-leak */}
-      <meta property="og:description" content={description} />
-      {/* nosemgrep typescript.react.security.audit.react-http-leak.react-http-leak */}
-      <meta property="og:image" content={image} />
-      <meta name="twitter:card" content="summary_large_image" />
-      {/* nosemgrep typescript.react.security.audit.react-http-leak.react-http-leak */}
-      <meta property="twitter:image" content={image} />
-      {/* nosemgrep typescript.react.security.audit.react-http-leak.react-http-leak */}
-      <meta property="twitter:title" content={title} />
-      <meta name="twitter:site" content="@replayio" />
-      {/* nosemgrep typescript.react.security.audit.react-http-leak.react-http-leak */}
-      <meta property="twitter:description" content={description} />
-    </Head>
+    <>
+      <Head>
+        {/* nosemgrep typescript.react.security.audit.react-http-leak.react-http-leak */}
+        <meta property="og:title" content={title} />
+        <meta property="og:type" content="website" />
+        {/* nosemgrep typescript.react.security.audit.react-http-leak.react-http-leak */}
+        <meta property="og:description" content={description} />
+        {/* nosemgrep typescript.react.security.audit.react-http-leak.react-http-leak */}
+        <meta property="og:image" content={image} />
+        <meta name="twitter:card" content="summary_large_image" />
+        {/* nosemgrep typescript.react.security.audit.react-http-leak.react-http-leak */}
+        <meta property="twitter:image" content={image} />
+        {/* nosemgrep typescript.react.security.audit.react-http-leak.react-http-leak */}
+        <meta property="twitter:title" content={title} />
+        <meta name="twitter:site" content="@replayio" />
+        {/* nosemgrep typescript.react.security.audit.react-http-leak.react-http-leak */}
+        <meta property="twitter:description" content={description} />
+      </Head>
+      <MemoizedTitle title={title} />
+    </>
   );
 }
+
+// Ensure this component only renders once even if the parent component re-renders
+// Otherwise it can temporarily override titles set by child components,
+// causing the document title to flicker.
+const MemoizedTitle = memo(function MemoizedHeader({ title }: { title: string | undefined }) {
+  return <Head>{<title>{title}</title>}</Head>;
+});
 
 function useRecordingSlug(recordingId: string) {
   const router = useRouter();

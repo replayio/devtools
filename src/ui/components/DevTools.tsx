@@ -1,4 +1,3 @@
-import Head from "next/head";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ConnectedProps, connect } from "react-redux";
 import {
@@ -15,7 +14,6 @@ import { PointsContextRoot } from "replay-next/src/contexts/points/PointsContext
 import { SelectedFrameContextRoot } from "replay-next/src/contexts/SelectedFrameContext";
 import usePreferredFontSize from "replay-next/src/hooks/usePreferredFontSize";
 import { setDefaultTags } from "replay-next/src/utils/telemetry";
-import { TestRecording } from "shared/test-suites/RecordingTestMetadata";
 import { getTestEnvironment } from "shared/test-suites/RecordingTestMetadata";
 import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { userData } from "shared/user-data/GraphQL/UserData";
@@ -25,6 +23,7 @@ import { TestSuiteContextRoot } from "ui/components/TestSuite/views/TestSuiteCon
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { useTrackLoadingIdleTime } from "ui/hooks/tracking";
 import { useDynamicLoadingMessage } from "ui/hooks/useDynamicLoadingMessage";
+import { useRecordingDocumentTitle } from "ui/hooks/useRecordingDocumentTitle";
 import { useGetUserInfo, useUserIsAuthor } from "ui/hooks/users";
 import { getViewMode } from "ui/reducers/layout";
 import { useAppSelector } from "ui/setup/hooks";
@@ -256,20 +255,11 @@ function _DevTools({
     20000
   );
 
-  if (!loadingFinished) {
-    return <LoadingScreen message={message} secondaryMessage={secondaryMessage} />;
-  }
+  const head = useRecordingDocumentTitle();
 
-  const title = recording?.title;
-  const testResult = recording?.metadata?.test?.result;
-  let emoji = "";
-  switch (testResult) {
-    case "passed":
-      emoji = "✅";
-      break;
-    case "failed":
-      emoji = "❌";
-      break;
+  if (!loadingFinished) {
+    // TODO isProcessed===false needs to be handled here
+    return <LoadingScreen message={message} secondaryMessage={secondaryMessage} />;
   }
 
   return (
@@ -285,13 +275,7 @@ function _DevTools({
                       <ExpandablesContextRoot>
                         <LayoutContextAdapter>
                           <KeyModifiers>
-                            {title && (
-                              <Head>
-                                <title>
-                                  {emoji} {title}
-                                </title>
-                              </Head>
-                            )}
+                            {head}
                             <Header />
                             <Body />
                             {showCommandPalette ? <CommandPaletteModal /> : null}
