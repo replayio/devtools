@@ -19,17 +19,27 @@ export function RequestDetails() {
   const bugReportLink = useBugReportLink();
   const honeycombQueryLink = useHoneycombQueryLink();
 
+  const nothingSelected = (
+    <div className={styles.Details}>
+      <div className={styles.NoSelection}>Select a request to view its details</div>
+    </div>
+  );
+
   if (selectedRequestId === null) {
-    return (
-      <div className={styles.Details}>
-        <div className={styles.NoSelection}>Select a request to view its details</div>
-      </div>
-    );
+    return nothingSelected;
   }
 
   const error = errorMap[selectedRequestId];
   const request = requestMap[selectedRequestId];
   const response = responseMap[selectedRequestId];
+
+  // Every entry must have a request.
+  // But, if the focus window has slide around, the selected
+  // request ID may be out of date and we don't have anything
+  // available to show for the focus range.
+  if (!request) {
+    return nothingSelected;
+  }
 
   return (
     <div className={styles.Details}>
