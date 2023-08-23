@@ -1,0 +1,9 @@
+.Container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.ListWrapper {
+  flex: 1 1 auto;
+}

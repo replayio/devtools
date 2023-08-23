@@ -1,0 +1,104 @@
+.HeaderRow,
+.FooterRow,
+.Row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background-color: var(--body-bgcolor);
+  border-bottom: 1px solid var(--theme-toolbar-background);
+  padding: 0 1ch;
+}
+.Row {
+  cursor: pointer;
+}
+.Row:focus,
+.Row:hover {
+  background-color: var(--theme-table-selection-background-hover);
+  outline: none;
+}
+.Row[data-current-time="first-after"] {
+  border-top: 2px solid var(--secondary-accent);
+  color: var(--theme-base-80);
+}
+.Row[data-current-time="after"] {
+  color: var(--theme-base-80);
+}
+.Row[data-selected],
+.Row[data-selected]:focus,
+.Row[data-selected]:hover {
+  background: var(--primary-accent-hover);
+  color: var(--color-default);
+}
+
+/* These styles should stay in sync with NetworkMonitorListHeader */
+.StatusColumn,
+.NameColumn,
+.MethodColumn,
+.TypeColumn,
+.DomainColumn {
+  white-space: pre;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.StatusColumn {
+  flex: 0 0 60px;
+}
+.NameColumn {
+  flex: 1 1 200px;
+}
+.MethodColumn {
+  flex: 0 0 60px;
+}
+.TypeColumn {
+  flex: 1 1 100px;
+}
+.DomainColumn {
+  flex: 1 1 100px;
+}
+
+.SeekButton {
+  display: none;
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+
+  padding: 0.25rem;
+  padding-right: 1ch;
+  border-top-right-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
+
+  flex-direction: row;
+  align-items: center;
+  gap: 1ch;
+
+  background: linear-gradient(0deg, var(--primary-accent) 0, var(--primary-accent) 100%);
+  color: var(--color-default);
+  font-weight: bold;
+}
+.Row:focus .SeekButton,
+.Row:hover .SeekButton {
+  display: flex;
+}
+.SeekButton:focus,
+.SeekButton:hover {
+  background: linear-gradient(
+    0deg,
+    var(--primary-accent-hover) 0,
+    var(--primary-accent-hover) 100%
+  );
+  outline: none;
+}
+
+.SeekButtonIcon {
+  flex: 0 0 auto;
+  color: currentColor;
+  width: 1rem;
+  height: 1rem;
+}
+.SeekButtonText {
+  display: none;
+}
+.SeekButton:hover .SeekButtonText {
+  display: block;
+}

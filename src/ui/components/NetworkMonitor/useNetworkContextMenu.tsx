@@ -1,5 +1,4 @@
 import { unstable_useCacheRefresh as useCacheRefresh, useContext, useTransition } from "react";
-import { Row } from "react-table";
 import { ContextMenuDivider, ContextMenuItem, useContextMenu } from "use-context-menu";
 
 import Icon from "replay-next/components/Icon";
@@ -18,7 +17,11 @@ import { useAppDispatch } from "ui/setup/hooks";
 import { RequestSummary } from "./utils";
 import styles from "./NetworkContextMenu.module.css";
 
-export default function useNetworkContextMenu({ row }: { row: Row<RequestSummary> }) {
+export default function useNetworkContextMenu({
+  requestSummary,
+}: {
+  requestSummary: RequestSummary;
+}) {
   const graphQLClient = useContext(GraphQLClientContext);
   const { showCommentsPanel } = useContext(InspectorContext);
   const { accessToken, recordingId } = useContext(SessionContext);
@@ -27,9 +30,6 @@ export default function useNetworkContextMenu({ row }: { row: Row<RequestSummary
 
   const [isPending, startTransition] = useTransition();
   const invalidateCache = useCacheRefresh();
-
-  const requestSummary = row.original;
-  requestSummary.status;
 
   const { copy: copyAsCURL, state } = useCopyAsCURL(requestSummary);
 

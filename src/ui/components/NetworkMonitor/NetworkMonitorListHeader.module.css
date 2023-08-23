@@ -1,0 +1,34 @@
+.HeaderRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background-color: var(--theme-toolbar-background);
+  padding: 0 1ch;
+  border-bottom: 1px solid var(--theme-splitter-color);
+}
+
+/* These styles should stay in sync with NetworkMonitorListRow */
+.StatusColumn,
+.NameColumn,
+.MethodColumn,
+.TypeColumn,
+.DomainColumn {
+  white-space: pre;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.StatusColumn {
+  flex: 0 0 60px;
+}
+.NameColumn {
+  flex: 1 1 200px;
+}
+.MethodColumn {
+  flex: 0 0 60px;
+}
+.TypeColumn {
+  flex: 1 1 100px;
+}
+.DomainColumn {
+  flex: 1 1 100px;
+}
