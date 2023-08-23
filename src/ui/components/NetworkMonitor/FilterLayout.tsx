@@ -6,13 +6,13 @@ import MaterialIcon from "../shared/MaterialIcon";
 import { CanonicalRequestType, RequestTypeOptions } from "./utils";
 
 export const FilterLayout = ({
-  setFilterValue,
-  table,
+  filterByText,
+  setFilterByText,
   toggleType,
   types,
 }: {
-  setFilterValue: (value: string) => void;
-  table: React.ReactNode;
+  filterByText: string;
+  setFilterByText: (value: string) => void;
   toggleType: (type: CanonicalRequestType) => void;
   types: Set<CanonicalRequestType>;
 }) => {
@@ -40,8 +40,9 @@ export const FilterLayout = ({
 
           <input
             placeholder="Filter requests"
-            onChange={event => setFilterValue(event.target.value)}
+            onChange={event => setFilterByText(event.target.value)}
             className="w-full bg-transparent px-1 text-themeTextFieldColor focus:outline-none"
+            value={filterByText}
           />
         </div>
       </div>
@@ -60,8 +61,6 @@ export const FilterLayout = ({
             ))}
           </div>
         ) : null}
-
-        {table}
       </div>
     </>
   );

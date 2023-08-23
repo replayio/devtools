@@ -4791,15 +4791,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-table@npm:^7.7.10":
-  version: 7.7.12
-  resolution: "@types/react-table@npm:7.7.12"
-  dependencies:
-    "@types/react": "*"
-  checksum: 287ea68e75b56c2e70e6d6491cd172348c7302b032789047eb2dca1b25b240684e48a60f58140575828b790f95724b9f3ec4d3adce82fc1c05d994def1449009
-  languageName: node
-  linkType: hard
-
 "@types/react-transition-group@npm:^4.4.5":
   version: 4.4.5
   resolution: "@types/react-transition-group@npm:4.4.5"
@@ -14961,15 +14952,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-table@npm:^7.7.0":
-  version: 7.8.0
-  resolution: "react-table@npm:7.8.0"
-  peerDependencies:
-    react: ^16.8.3 || ^17.0.0-0 || ^18.0.0
-  checksum: 44ca0fb848c6869cd793cede8dc33072b38ebb8f8d2833565afe7cf3eac5d1fa455ac5fb9d06838b16fab0523d5d03e3e82f7645032f71245096e67b892313b9
-  languageName: node
-  linkType: hard
-
 "react-textarea-autosize@npm:^8.3.2":
   version: 8.4.0
   resolution: "react-textarea-autosize@npm:8.4.0"
@@ -15211,7 +15193,6 @@ __metadata:
     "@types/react-dom": ^18.0.5
     "@types/react-lazyload": ^3.2.0
     "@types/react-router-dom": ^5.1.7
-    "@types/react-table": ^7.7.10
     "@types/react-transition-group": ^4.4.5
     "@types/react-virtualized-auto-sizer": ^1.0.1
     "@types/react-window": ^1.8.5
@@ -15305,7 +15286,6 @@ __metadata:
     react-merge-refs: ^1.1.0
     react-redux: ^8.0.2
     react-resizable-panels: ^0.0.53
-    react-table: ^7.7.0
     react-tooltip: ^4.5.1
     react-transition-group: ^4.4.2
     react-virtualized-auto-sizer: ^1.0.19

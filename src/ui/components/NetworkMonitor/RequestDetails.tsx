@@ -5,7 +5,7 @@ import React, { ReactNode, useEffect, useMemo, useState } from "react";
 import CloseButton from "devtools/client/debugger/src/components/shared/Button/CloseButton";
 import PanelTabs from "devtools/client/shared/components/PanelTabs";
 import { useIsPointWithinFocusWindow } from "replay-next/src/hooks/useIsPointWithinFocusWindow";
-import { hideRequestDetails, selectNetworkRequest } from "ui/actions/network";
+import { hideRequestDetails } from "ui/actions/network";
 import { useAppDispatch } from "ui/setup/hooks";
 
 import AddNetworkRequestCommentButton from "./AddNetworkRequestCommentButton";
@@ -266,43 +266,21 @@ const DEFAULT_TAB = "headers";
 export type NetworkTab = "headers" | "cookies" | "response" | "request" | "stackTrace" | "timings";
 
 const RequestDetails = ({
-  cx,
-  request,
-  previousRequestId,
-  nextRequestId,
+  requests,
+  selectedRequestId,
 }: {
-  cx: any;
-  request: RequestSummary;
-  previousRequestId: string | null;
-  nextRequestId: string | null;
+  requests: RequestSummary[];
+  selectedRequestId: string;
 }) => {
   const dispatch = useAppDispatch();
   const [activeTab, setActiveTab] = useState<NetworkTab>(DEFAULT_TAB);
 
+  const request = useMemo(
+    () => requests.find(request => request.id === selectedRequestId)!,
+    [requests, selectedRequestId]
+  );
+
   const isRequestWithinFocusWindow = useIsPointWithinFocusWindow(request.point.point);
-
-  // Keyboard shortcuts handler.
-  useEffect(() => {
-    const onDocumentKeyDown = (event: KeyboardEvent) => {
-      switch (event.key) {
-        case "ArrowUp": {
-          event.preventDefault();
-          previousRequestId !== null && dispatch(selectNetworkRequest(previousRequestId));
-          break;
-        }
-        case "ArrowDown": {
-          event.preventDefault();
-          nextRequestId !== null && dispatch(selectNetworkRequest(nextRequestId));
-          break;
-        }
-      }
-    };
-
-    document.addEventListener("keydown", onDocumentKeyDown);
-    return () => {
-      document.removeEventListener("keydown", onDocumentKeyDown);
-    };
-  }, [previousRequestId, nextRequestId, dispatch]);
 
   const tabs: readonly { id: NetworkTab; title: string; visible: boolean }[] = [
     { id: "headers", title: "Headers", visible: true },

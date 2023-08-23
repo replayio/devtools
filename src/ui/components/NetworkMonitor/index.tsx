@@ -1,35 +1,36 @@
-import { RequestId } from "@replayio/protocol";
-import { useMemo, useRef, useState } from "react";
+import { useDeferredValue, useMemo, useRef, useState } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { useStreamingValue } from "suspense";
 
-import { getThreadContext } from "devtools/client/debugger/src/selectors";
 import IndeterminateLoader from "replay-next/components/IndeterminateLoader";
+import { useNag } from "replay-next/src/hooks/useNag";
 import { networkRequestsCache } from "replay-next/src/suspense/NetworkRequestsCache";
 import {
   isExecutionPointsGreaterThan,
   isExecutionPointsLessThan,
 } from "replay-next/src/utils/time";
 import { replayClient } from "shared/client/ReplayClientContext";
+import { Nag } from "shared/graphql/types";
 import { hideRequestDetails, selectNetworkRequest } from "ui/actions/network";
 import { seek } from "ui/actions/timeline";
 import { FilterLayout } from "ui/components/NetworkMonitor/FilterLayout";
+import { NetworkMonitorList } from "ui/components/NetworkMonitor/NetworkMonitorList";
 import RequestDetails from "ui/components/NetworkMonitor/RequestDetails";
-import RequestTable from "ui/components/NetworkMonitor/RequestTable";
-import Table from "ui/components/NetworkMonitor/Table";
 import { getSelectedRequestId } from "ui/reducers/network";
 import { getCurrentTime, getFocusWindow } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { timeMixpanelEvent } from "ui/utils/mixpanel";
 import { trackEvent } from "ui/utils/telemetry";
 
-import { CanonicalRequestType, RequestSummary } from "./utils";
+import { CanonicalRequestType, RequestSummary, partialRequestsToCompleteSummaries } from "./utils";
 
 export default function NetworkMonitor() {
   const dispatch = useAppDispatch();
 
+  const [filterByText, setFilterByText] = useState<string>("");
+  const deferredFilterByText = useDeferredValue(filterByText);
+
   const currentTime = useAppSelector(getCurrentTime);
-  const context = useAppSelector(getThreadContext);
   const focusWindow = useAppSelector(getFocusWindow);
 
   const selectedRequestId = useAppSelector(getSelectedRequestId);
@@ -39,42 +40,6 @@ export default function NetworkMonitor() {
 
   const stream = networkRequestsCache.stream(replayClient);
   const { complete, data: records = {}, value: ids = [] } = useStreamingValue(stream);
-
-  const { countAfter, countBefore, filteredIds } = useMemo(() => {
-    if (focusWindow === null) {
-      return {
-        countAfter: 0,
-        countBefore: 0,
-        filteredIds: ids,
-      };
-    }
-
-    const filteredIds: RequestId[] = [];
-
-    let countBefore = 0;
-    let countAfter = 0;
-
-    if (records != null) {
-      for (const id of ids) {
-        const record = records[id];
-        const point = record.timeStampedPoint.point;
-
-        if (isExecutionPointsLessThan(point, focusWindow.begin.point)) {
-          countBefore++;
-        } else if (isExecutionPointsGreaterThan(point, focusWindow.end.point)) {
-          countAfter++;
-        } else {
-          filteredIds.push(id);
-        }
-      }
-    }
-
-    return {
-      countAfter,
-      countBefore,
-      filteredIds,
-    };
-  }, [focusWindow, ids, records]);
 
   const toggleType = (type: CanonicalRequestType) => {
     dispatch(hideRequestDetails());
@@ -90,6 +55,64 @@ export default function NetworkMonitor() {
     setTypes(newTypes);
   };
 
+  const requests = useMemo(
+    () => partialRequestsToCompleteSummaries(ids, records, types),
+    [ids, records, types]
+  );
+
+  const { countAfter, countBefore, filteredRequests } = useMemo(() => {
+    if (focusWindow === null) {
+      return {
+        countAfter: 0,
+        countBefore: 0,
+        filteredRequests: [],
+      };
+    }
+
+    const filteredRequests: RequestSummary[] = [];
+
+    let countBefore = 0;
+    let countAfter = 0;
+
+    for (const request of requests) {
+      const point = request.point.point;
+
+      let match = true;
+      if (deferredFilterByText !== "") {
+        const searchText = deferredFilterByText.toLowerCase();
+
+        const { cause, documentType, domain, method, name, status } = request;
+        let type = documentType || cause || "";
+        if (type === "unknown") {
+          type = "";
+        }
+        match =
+          [domain, method, name, `${status}`, type].find(string =>
+            string.toLowerCase().includes(searchText)
+          ) != null;
+      }
+
+      if (match) {
+        if (isExecutionPointsLessThan(point, focusWindow.begin.point)) {
+          countBefore++;
+        } else if (isExecutionPointsGreaterThan(point, focusWindow.end.point)) {
+          countAfter++;
+        } else {
+          filteredRequests.push(request);
+        }
+      }
+    }
+
+    return {
+      countAfter,
+      countBefore,
+      deferredFilterByText,
+      filteredRequests,
+    };
+  }, [deferredFilterByText, focusWindow, requests]);
+
+  const [, dismissInspectNetworkRequestNag] = useNag(Nag.INSPECT_NETWORK_REQUEST);
+
   if (!complete) {
     timeMixpanelEvent("net_monitor.open_network_monitor");
     return <IndeterminateLoader />;
@@ -98,72 +121,58 @@ export default function NetworkMonitor() {
   trackEvent("net_monitor.open_network_monitor");
 
   return (
-    <Table ids={filteredIds} records={records} types={types}>
-      {({ table, data }: { table: any; data: RequestSummary[] }) => {
-        let selectedRequest;
-        let previousRequestId = null;
-        let nextRequestId = null;
-        if (selectedRequestId) {
-          selectedRequest = data.find((request, i) => {
-            if (request.id === selectedRequestId) {
-              previousRequestId = i > 0 ? data[i - 1].id : null;
-              nextRequestId = i + 1 < data.length ? data[i + 1].id : null;
-              return true;
-            }
-          });
-        }
+    <div className="flex h-full min-h-0 flex-col" ref={container}>
+      <FilterLayout
+        filterByText={filterByText}
+        setFilterByText={setFilterByText}
+        toggleType={toggleType}
+        types={types}
+      />
 
-        return (
-          <div className="flex h-full min-h-0 flex-col" ref={container}>
-            <FilterLayout
-              setFilterValue={table.setGlobalFilter}
-              toggleType={toggleType}
-              types={types}
-              table={
-                <PanelGroup
-                  autoSaveId="NetworkMonitor"
-                  className="h-full w-full"
-                  direction="vertical"
-                >
-                  <Panel>
-                    <RequestTable
-                      className="h-full w-full"
-                      table={table}
-                      currentTime={currentTime}
-                      data={data}
-                      filteredAfterCount={countAfter}
-                      filteredBeforeCount={countBefore}
-                      onRowSelect={row => {
-                        trackEvent("net_monitor.select_request_row");
-                        dispatch(selectNetworkRequest(row.id));
-                      }}
-                      seek={params => dispatch(seek(params))}
-                      selectedRequest={selectedRequest}
-                    />
-                  </Panel>
-                  {selectedRequestId && (
-                    <>
-                      <PanelResizeHandle className="h-2 w-full" />
-                      <Panel defaultSize={50}>
-                        {selectedRequest ? (
-                          <RequestDetails
-                            cx={context}
-                            request={selectedRequest}
-                            previousRequestId={previousRequestId}
-                            nextRequestId={nextRequestId}
-                          />
-                        ) : (
-                          <div>Loading…</div>
-                        )}
-                      </Panel>
-                    </>
-                  )}
-                </PanelGroup>
-              }
-            />
-          </div>
-        );
-      }}
-    </Table>
+      <PanelGroup autoSaveId="NetworkMonitor" className="h-full w-full" direction="vertical">
+        <Panel>
+          <NetworkMonitorList
+            currentTime={currentTime}
+            filteredAfterCount={countAfter}
+            filteredBeforeCount={countBefore}
+            requests={filteredRequests}
+            seekToRequest={request => {
+              trackEvent("net_monitor.seek_to_request");
+              dispatch(
+                seek({
+                  executionPoint: request.point.point,
+                  openSource: true,
+                  time: request.point.time,
+                })
+              );
+
+              dismissInspectNetworkRequestNag();
+
+              trackEvent("net_monitor.select_request_row");
+              dispatch(selectNetworkRequest(request.id));
+            }}
+            selectedRequestId={selectedRequestId}
+            selectRequest={request => {
+              dismissInspectNetworkRequestNag();
+
+              trackEvent("net_monitor.select_request_row");
+              dispatch(selectNetworkRequest(request.id));
+            }}
+          />
+        </Panel>
+        {selectedRequestId && (
+          <>
+            <PanelResizeHandle className="h-2 w-full" />
+            <Panel defaultSize={50}>
+              {selectedRequestId ? (
+                <RequestDetails requests={requests} selectedRequestId={selectedRequestId} />
+              ) : (
+                <div>Loading…</div>
+              )}
+            </Panel>
+          </>
+        )}
+      </PanelGroup>
+    </div>
   );
 }
