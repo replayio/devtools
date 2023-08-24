@@ -31,15 +31,12 @@ export default React.forwardRef<
   }
 
   const inputClass = classNames(
+    styles[themeClass],
     styles.textInput,
     textSizeClass,
     center ? styles.textCenter : "",
     className
   );
 
-  return (
-    <div className={styles[themeClass]}>
-      <input {...otherProps} ref={ref} type="text" className={inputClass} />
-    </div>
-  );
+  return <input {...otherProps} ref={ref} type="text" className={inputClass} />;
 });
