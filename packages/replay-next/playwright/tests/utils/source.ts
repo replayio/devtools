@@ -132,7 +132,7 @@ export async function continueTo(
   }
   await goToLine(page, sourceId, lineNumber);
 
-  const lineLocator = page.locator(`[data-test-id="SourceLine-${lineNumber}"]`);
+  const lineLocator = getSourceLineLocator(page, sourceId, lineNumber);
 
   switch (use) {
     case "context-menu": {
@@ -533,7 +533,7 @@ export async function hoverOverLine(
   await goToLine(page, sourceId, lineNumber);
 
   // Hover over the line number itself, not the line, to avoid triggering protocol preview requests.
-  const lineLocator = page.locator(`[data-test-id="SourceLine-${lineNumber}"]`);
+  const lineLocator = getSourceLineLocator(page, sourceId, lineNumber);
 
   if (columnNumber !== undefined) {
     let match = null;
@@ -601,7 +601,7 @@ export async function isSeekOptionEnabled(
     "isContinueToButtonEnabled"
   );
 
-  const lineLocator = page.locator(`[data-test-id="SourceLine-${lineNumber}"]`);
+  const lineLocator = getSourceLineLocator(page, sourceId, lineNumber);
 
   const stopHovering = await hoverOverLine(page, {
     lineNumber,
@@ -643,8 +643,17 @@ export async function isContinueToPreviousOptionEnabled(
   return isSeekOptionEnabled(page, { direction: "previous", lineNumber, sourceId });
 }
 
-export async function isLineCurrentSearchResult(page: Page, lineNumber: number): Promise<boolean> {
-  const lineLocator = page.locator(`[data-test-id="SourceLine-${lineNumber}"]`);
+export async function isLineCurrentSearchResult(
+  page: Page,
+  {
+    lineNumber,
+    sourceId,
+  }: {
+    lineNumber: number;
+    sourceId: string;
+  }
+): Promise<boolean> {
+  const lineLocator = getSourceLineLocator(page, sourceId, lineNumber);
   const currentHighlight = lineLocator.locator(
     '[data-test-name="SourceSearchResultColumnHighlight"]'
   );
@@ -930,17 +939,23 @@ export async function toggleShouldLog(
 
 export async function verifyCurrentExecutionPoint(
   page: Page,
-  fileName: string,
-  lineNumber: number,
-  expected: boolean = true
+  options: {
+    expected?: boolean;
+    fileName: string;
+    lineNumber: number;
+    sourceId: string;
+  }
 ) {
+  const { expected = true, fileName, lineNumber, sourceId } = options;
+
   const selectedSourceTab = page.locator(
     `[data-test-id^="SourceTab-"][data-test-state="selected"]`
   );
   await expect(await selectedSourceTab.textContent()).toBe(fileName);
 
   await waitFor(async () => {
-    const lineLocator = page.locator(`[data-test-id="SourceLine-${lineNumber}"]`);
+    const sourceLocator = getSourceLocator(page, sourceId);
+    const lineLocator = sourceLocator.locator(`[data-test-id="SourceLine-${lineNumber}"]`);
     const currentHighlight = lineLocator.locator(
       '[data-test-name="CurrentExecutionPointLineHighlight"]'
     );
@@ -956,7 +971,7 @@ export async function verifyCurrentSearchResult(
   options: {
     fileName?: string;
     lineNumber: number;
-    sourceId?: string;
+    sourceId: string;
   },
   expected: boolean = true
 ) {
@@ -977,7 +992,7 @@ export async function verifyCurrentSearchResult(
   }
 
   await waitFor(async () => {
-    const lineLocator = page.locator(`[data-test-id="SourceLine-${lineNumber}"]`);
+    const lineLocator = getSourceLineLocator(page, sourceId, lineNumber);
     const currentHighlight = lineLocator.locator(
       '[data-test-name="CurrentSearchResultLineHighlight"]'
     );

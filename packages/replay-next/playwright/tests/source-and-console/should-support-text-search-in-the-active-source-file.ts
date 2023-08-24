@@ -17,13 +17,25 @@ test("should support text search in the active source file", async ({ page }, te
   const sourceSearchLocator = getSearchSourceLocator(page);
   await expect(sourceSearchLocator).not.toBeVisible();
   await searchSourceText(page, "function");
-  await verifyCurrentSearchResult(page, { fileName: "source-and-console.html", lineNumber: 17 });
+  await verifyCurrentSearchResult(page, {
+    fileName: "source-and-console.html",
+    lineNumber: 17,
+    sourceId,
+  });
   await takeScreenshot(page, testInfo, sourceSearchLocator, "source-search-results");
   await page.keyboard.press("Shift+Enter");
-  await verifyCurrentSearchResult(page, { fileName: "source-and-console.html", lineNumber: 51 });
+  await verifyCurrentSearchResult(page, {
+    fileName: "source-and-console.html",
+    lineNumber: 51,
+    sourceId,
+  });
   await takeScreenshot(page, testInfo, sourceSearchLocator, "source-search-last-result-active");
   await page.keyboard.press("Enter");
-  await verifyCurrentSearchResult(page, { fileName: "source-and-console.html", lineNumber: 17 });
+  await verifyCurrentSearchResult(page, {
+    fileName: "source-and-console.html",
+    lineNumber: 17,
+    sourceId,
+  });
   await takeScreenshot(page, testInfo, sourceSearchLocator, "source-search-first-result-active");
   await page.keyboard.press("Escape");
   await expect(sourceSearchLocator).not.toBeVisible();
