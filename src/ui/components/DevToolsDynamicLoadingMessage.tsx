@@ -1,6 +1,31 @@
 import { useEffect, useState } from "react";
 
-const phrases = [
+import LoadingScreen from "ui/components/shared/LoadingScreen";
+
+export function DevToolsDynamicLoadingMessage() {
+  const [message, setMessage] = useState<string>("Loading...");
+
+  useEffect(() => {
+    const changeMessage = () => {
+      const randomIndex = Math.floor(Math.random() * FILLER_PHRASES.length);
+      setMessage(FILLER_PHRASES[randomIndex]);
+    };
+
+    const phraseTimeoutId = setTimeout(changeMessage, 8000);
+    const stalledTimeoutId = setTimeout(() => {
+      setMessage(LONG_WAIT_MESSAGE);
+    }, LONG_WAIT_DURATION);
+
+    return () => {
+      clearTimeout(phraseTimeoutId);
+      clearTimeout(stalledTimeoutId);
+    };
+  }, []);
+
+  return <LoadingScreen message={message} />;
+}
+
+const FILLER_PHRASES = [
   "Tuning the flux capacitor...",
   "Prepping DeLorean for time travel...",
   "Revving up to 88 miles per hour...",
@@ -44,38 +69,7 @@ const phrases = [
   "Compiling tachyonic antitelephone scripts...",
 ];
 
-const longWaitMessage =
+const LONG_WAIT_MESSAGE =
   "<div><p>This is taking longer than expected.</p><p><a href='http://replay.io/discord' target='discord'>Contact us on Discord</a></p>";
 
-export function useDynamicLoadingMessage(
-  isProcessed: boolean,
-  initialMessage: string,
-  stalledTimeout: number
-) {
-  const [message, setMessage] = useState(isProcessed ? initialMessage : "Processing...");
-
-  const secondaryMessage = isProcessed
-    ? ""
-    : "This could take a while, depending on the complexity and length of the replay.";
-
-  useEffect(() => {
-    if (isProcessed) {
-      const changeMessage = () => {
-        const randomIndex = Math.floor(Math.random() * phrases.length);
-        setMessage(phrases[randomIndex]);
-      };
-      const phraseTimeout = setTimeout(changeMessage, 8000);
-
-      const stalledTimeoutId = setTimeout(() => {
-        setMessage(longWaitMessage);
-      }, stalledTimeout);
-
-      return () => {
-        clearTimeout(phraseTimeout);
-        clearTimeout(stalledTimeoutId);
-      };
-    }
-  }, [isProcessed, initialMessage, stalledTimeout]);
-
-  return { message, secondaryMessage };
-}
+const LONG_WAIT_DURATION = 20_000;
