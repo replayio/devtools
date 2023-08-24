@@ -13,9 +13,10 @@ import { replayClient } from "shared/client/ReplayClientContext";
 import { Nag } from "shared/graphql/types";
 import { hideRequestDetails, selectNetworkRequest } from "ui/actions/network";
 import { seek } from "ui/actions/timeline";
-import { FilterLayout } from "ui/components/NetworkMonitor/FilterLayout";
 import { NetworkMonitorList } from "ui/components/NetworkMonitor/NetworkMonitorList";
 import RequestDetails from "ui/components/NetworkMonitor/RequestDetails";
+import { TextFilterRow } from "ui/components/NetworkMonitor/TextFilterRow";
+import { TypeFiltersColumn } from "ui/components/NetworkMonitor/TypeFiltersColumn";
 import { getSelectedRequestId } from "ui/reducers/network";
 import { getCurrentTime, getFocusWindow } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
@@ -35,6 +36,7 @@ export default function NetworkMonitor() {
 
   const selectedRequestId = useAppSelector(getSelectedRequestId);
   const [types, setTypes] = useState<Set<CanonicalRequestType>>(new Set([]));
+  const [showTypeFilters, setShowTypeFilters] = useState(false);
 
   const container = useRef<HTMLDivElement>(null);
 
@@ -122,57 +124,61 @@ export default function NetworkMonitor() {
 
   return (
     <div className="flex h-full min-h-0 flex-col" ref={container}>
-      <FilterLayout
+      <TextFilterRow
         filterByText={filterByText}
         setFilterByText={setFilterByText}
-        toggleType={toggleType}
+        setShowTypeFilters={setShowTypeFilters}
+        showTypeFilters={showTypeFilters}
         types={types}
       />
 
-      <PanelGroup autoSaveId="NetworkMonitor" className="h-full w-full" direction="vertical">
-        <Panel>
-          <NetworkMonitorList
-            currentTime={currentTime}
-            filteredAfterCount={countAfter}
-            filteredBeforeCount={countBefore}
-            requests={filteredRequests}
-            seekToRequest={request => {
-              trackEvent("net_monitor.seek_to_request");
-              dispatch(
-                seek({
-                  executionPoint: request.point.point,
-                  openSource: true,
-                  time: request.point.time,
-                })
-              );
+      <div className="flex h-full w-full flex-row">
+        {showTypeFilters && <TypeFiltersColumn toggleType={toggleType} types={types} />}
+        <PanelGroup autoSaveId="NetworkMonitor" className="h-full shrink grow" direction="vertical">
+          <Panel>
+            <NetworkMonitorList
+              currentTime={currentTime}
+              filteredAfterCount={countAfter}
+              filteredBeforeCount={countBefore}
+              requests={filteredRequests}
+              seekToRequest={request => {
+                trackEvent("net_monitor.seek_to_request");
+                dispatch(
+                  seek({
+                    executionPoint: request.point.point,
+                    openSource: true,
+                    time: request.point.time,
+                  })
+                );
 
-              dismissInspectNetworkRequestNag();
+                dismissInspectNetworkRequestNag();
 
-              trackEvent("net_monitor.select_request_row");
-              dispatch(selectNetworkRequest(request.id));
-            }}
-            selectedRequestId={selectedRequestId}
-            selectRequest={request => {
-              dismissInspectNetworkRequestNag();
+                trackEvent("net_monitor.select_request_row");
+                dispatch(selectNetworkRequest(request.id));
+              }}
+              selectedRequestId={selectedRequestId}
+              selectRequest={request => {
+                dismissInspectNetworkRequestNag();
 
-              trackEvent("net_monitor.select_request_row");
-              dispatch(selectNetworkRequest(request.id));
-            }}
-          />
-        </Panel>
-        {selectedRequestId && (
-          <>
-            <PanelResizeHandle className="h-2 w-full" />
-            <Panel defaultSize={50}>
-              {selectedRequestId ? (
-                <RequestDetails requests={requests} selectedRequestId={selectedRequestId} />
-              ) : (
-                <div>Loading…</div>
-              )}
-            </Panel>
-          </>
-        )}
-      </PanelGroup>
+                trackEvent("net_monitor.select_request_row");
+                dispatch(selectNetworkRequest(request.id));
+              }}
+            />
+          </Panel>
+          {selectedRequestId && (
+            <>
+              <PanelResizeHandle className="h-2 w-full" />
+              <Panel defaultSize={50}>
+                {selectedRequestId ? (
+                  <RequestDetails requests={requests} selectedRequestId={selectedRequestId} />
+                ) : (
+                  <div>Loading…</div>
+                )}
+              </Panel>
+            </>
+          )}
+        </PanelGroup>
+      </div>
     </div>
   );
 }
