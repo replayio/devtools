@@ -89,7 +89,13 @@ export async function getGraphqlMocksForTesting(): Promise<MockedResponse[]> {
 }
 
 export function skipTelemetry() {
-  return isTest() || isDevelopment() || isDeployPreview();
+  const isTestValue = isTest();
+  const isDevelopmentValue = isDevelopment()
+  const isDeployPreviewValue = process ? isDeployPreview() : false;
+
+  console.log({isDeployPreviewValue});
+
+  return isTestValue || isDevelopmentValue || isDeployPreviewValue;
 }
 
 export function isDeployPreview() {

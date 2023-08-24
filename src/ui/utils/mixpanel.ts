@@ -144,7 +144,8 @@ export function maybeSetMixpanelContext(
 ) {
   const { internal: isInternal } = userInfo;
   const forceEnableMixpanel = userData.get("global_logTelemetryEvent");
-  const shouldEnableMixpanel = (!isInternal && !skipTelemetry()) || forceEnableMixpanel;
+  const skipTelemetryValue = skipTelemetry();
+  const shouldEnableMixpanel = (!isInternal && !skipTelemetryValue) || forceEnableMixpanel;
 
   if (shouldEnableMixpanel) {
     setMixpanelContext(userInfo);
