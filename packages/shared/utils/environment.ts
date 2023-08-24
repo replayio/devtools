@@ -93,7 +93,7 @@ export function skipTelemetry() {
 }
 
 export function isDeployPreview() {
-  return process.env.NEXT_PUBLIC_VERCEL_ENV === "preview";
+  return process?.env.NEXT_PUBLIC_VERCEL_ENV === "preview";
 }
 
 // The loading param is currently used to wait for resources
