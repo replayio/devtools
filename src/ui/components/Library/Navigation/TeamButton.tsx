@@ -81,7 +81,7 @@ export function SettingsButton() {
   return (
     <button
       onClick={onClick}
-      className="material-icons w-5 text-sm text-gray-200 transition duration-200"
+      className="material-icons w-5 flex-shrink-0 text-sm text-gray-200 transition duration-200"
     >
       settings
     </button>
