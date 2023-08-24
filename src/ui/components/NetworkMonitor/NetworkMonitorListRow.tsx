@@ -68,7 +68,8 @@ function RequestRow({
     selectedRequestId,
   } = itemData;
 
-  const { cause, documentType, domain, id, method, name, point, status, triggerPoint } = request;
+  const { cause, documentType, domain, id, method, name, point, status, triggerPoint, url } =
+    request;
 
   let type = documentType || cause;
   if (type === "unknown") {
@@ -103,7 +104,9 @@ function RequestRow({
         <div className={styles.NameColumn}>{name}</div>
         <div className={styles.MethodColumn}>{method}</div>
         <div className={styles.TypeColumn}>{type}</div>
-        <div className={styles.DomainColumn}>{domain}</div>
+        <div className={styles.DomainColumn} title={url}>
+          {domain}
+        </div>
 
         {triggerPoint && triggerPoint.time !== currentTime && (
           <button className={styles.SeekButton} onClick={() => seekToRequest(request)} tabIndex={0}>

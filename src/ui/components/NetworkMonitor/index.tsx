@@ -81,13 +81,13 @@ export default function NetworkMonitor() {
       if (deferredFilterByText !== "") {
         const searchText = deferredFilterByText.toLowerCase();
 
-        const { cause, documentType, domain, method, name, status } = request;
+        const { cause, documentType, method, name, status, url } = request;
         let type = documentType || cause || "";
         if (type === "unknown") {
           type = "";
         }
         match =
-          [domain, method, name, `${status}`, type].find(string =>
+          [method, name, `${status}`, type, url].find(string =>
             string.toLowerCase().includes(searchText)
           ) != null;
       }
