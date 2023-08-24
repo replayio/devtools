@@ -22,6 +22,7 @@ import {
   PauseId,
   PointDescription,
   PointLimits,
+  PointPageLimits,
   PointRange,
   PointRangeFocusRequest,
   PointSelector,
@@ -244,7 +245,8 @@ export interface ReplayClientInterface {
       expression: string;
       frameIndex?: number;
       fullPropertyPreview?: boolean;
-      limits?: PointLimits;
+      limits?: PointPageLimits;
+      shareProcesses?: boolean;
     },
     onResults: (results: RunEvaluationResult[]) => void
   ): Promise<void>;

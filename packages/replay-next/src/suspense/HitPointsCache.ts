@@ -1,4 +1,4 @@
-import { Location, PointRange, TimeStampedPoint } from "@replayio/protocol";
+import { Location, PointDescription, PointRange, TimeStampedPoint } from "@replayio/protocol";
 import { createCache } from "suspense";
 
 import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPositionsCache";
@@ -14,12 +14,12 @@ import { ProtocolError, isCommandError } from "shared/utils/error";
 import { getCorrespondingLocations } from "../utils/sources";
 import { createFocusIntervalCacheForExecutionPoints } from "./FocusIntervalCache";
 import { mappedExpressionCache } from "./MappedExpressionCache";
-import { cachePauseData, setPointAndTimeForPauseId } from "./PauseCache";
+import { cachePauseData, setPointAndTimeForPauseId, updateMappedLocation } from "./PauseCache";
 import { sourcesByIdCache } from "./SourcesCache";
 
 export const hitPointsCache = createFocusIntervalCacheForExecutionPoints<
   [replayClient: ReplayClientInterface, location: Location, condition: string | null],
-  TimeStampedPoint
+  PointDescription
 >({
   debugLabel: "HitPointsCache",
   getKey: (replayClient, location, condition) =>
@@ -32,7 +32,7 @@ export const hitPointsCache = createFocusIntervalCacheForExecutionPoints<
       locations.map(location => breakpointPositionsCache.readAsync(replayClient, location.sourceId))
     );
 
-    let hitPoints: TimeStampedPoint[] = [];
+    let hitPoints: PointDescription[] = [];
 
     if (condition) {
       const mappedCondition = await mappedExpressionCache.readAsync(
@@ -66,7 +66,16 @@ export const hitPointsCache = createFocusIntervalCacheForExecutionPoints<
         { kind: "locations", locations },
         { begin, end }
       );
-      hitPoints = pointDescriptions.map(({ point, time }) => ({ point, time }));
+      // Note that PointDescriptions include the current frame.
+      // Type-wise we're going to return `TimeStampedPoint`s,
+      // but the extra frame data is there in this case.
+      hitPoints = pointDescriptions;
+    }
+
+    for (const point of hitPoints) {
+      if (point.frame) {
+        updateMappedLocation(sources, point.frame);
+      }
     }
 
     return hitPoints;
