@@ -14786,11 +14786,11 @@ __metadata:
 
 "react-devtools-inline@patch:react-devtools-inline@npm:4.24.7#.yarn/patches/react-devtools-inline-npm-4.24.7-9582a0f8d6.patch::locator=recordreplay-devtools%40workspace%3A.":
   version: 4.24.7
-  resolution: "react-devtools-inline@patch:react-devtools-inline@npm%3A4.24.7#.yarn/patches/react-devtools-inline-npm-4.24.7-9582a0f8d6.patch::version=4.24.7&hash=16cfed&locator=recordreplay-devtools%40workspace%3A."
+  resolution: "react-devtools-inline@patch:react-devtools-inline@npm%3A4.24.7#.yarn/patches/react-devtools-inline-npm-4.24.7-9582a0f8d6.patch::version=4.24.7&hash=b2b58f&locator=recordreplay-devtools%40workspace%3A."
   dependencies:
     source-map-js: ^0.6.2
     sourcemap-codec: ^1.4.8
-  checksum: 619eef6d9027c231daeb18a7229153d01b3e7e5c0a8881411a861c18f19703aac1cf56209683eed54411c0f93bda46effab96c30b47a20c11ecbf21886909624
+  checksum: 459c911eb486b5f0f654bca557ea3d12c1d88c57c0f1e0488ea34b596a87c7cd0f864fed7bd8188a0d1a93acd0bdb159b2f7b3ca16942b3ecf6b68ad88abaa03
   languageName: node
   linkType: hard
 
