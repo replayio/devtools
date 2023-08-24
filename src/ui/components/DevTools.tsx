@@ -18,12 +18,12 @@ import { getTestEnvironment } from "shared/test-suites/RecordingTestMetadata";
 import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { userData } from "shared/user-data/GraphQL/UserData";
 import { clearTrialExpired, createSocket } from "ui/actions/session";
+import { RecordingDocumentTitle } from "ui/components/RecordingDocumentTitle";
 import TerminalContextAdapter from "ui/components/SecondaryToolbox/TerminalContextAdapter";
 import { TestSuiteContextRoot } from "ui/components/TestSuite/views/TestSuiteContext";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { useTrackLoadingIdleTime } from "ui/hooks/tracking";
 import { useDynamicLoadingMessage } from "ui/hooks/useDynamicLoadingMessage";
-import { useRecordingDocumentTitle } from "ui/hooks/useRecordingDocumentTitle";
 import { useGetUserInfo, useUserIsAuthor } from "ui/hooks/users";
 import { getViewMode } from "ui/reducers/layout";
 import { useAppSelector } from "ui/setup/hooks";
@@ -255,10 +255,7 @@ function _DevTools({
     20000
   );
 
-  const head = useRecordingDocumentTitle();
-
   if (!loadingFinished) {
-    // TODO isProcessed===false needs to be handled here
     return <LoadingScreen message={message} secondaryMessage={secondaryMessage} />;
   }
 
@@ -275,7 +272,7 @@ function _DevTools({
                       <ExpandablesContextRoot>
                         <LayoutContextAdapter>
                           <KeyModifiers>
-                            {head}
+                            <RecordingDocumentTitle />
                             <Header />
                             <Body />
                             {showCommandPalette ? <CommandPaletteModal /> : null}

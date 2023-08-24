@@ -1,8 +1,8 @@
 import dynamic from "next/dynamic";
-import React, { ReactNode, useCallback, useEffect, useState } from "react";
+import { ReactNode, useCallback, useEffect, useState } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
-import { useRecordingDocumentTitle } from "ui/hooks/useRecordingDocumentTitle";
+import { RecordingDocumentTitle } from "ui/components/RecordingDocumentTitle";
 import { getAwaitingSourcemaps, getUploading } from "ui/reducers/app";
 import { UIState } from "ui/state";
 
@@ -51,8 +51,6 @@ function LoadingScreen({
   message,
   secondaryMessage,
 }: PropsFromRedux & { message: string; secondaryMessage?: string }) {
-  const head = useRecordingDocumentTitle();
-
   const waitingForMessage =
     awaitingSourcemaps || uploading ? (
       <span>Uploading {Math.round(uploading?.amount ? Number(uploading.amount) : 0)}Mb</span>
@@ -65,7 +63,7 @@ function LoadingScreen({
 
   return (
     <LoadingScreenTemplate>
-      {head}
+      <RecordingDocumentTitle />
       <div className={styles.messageWrapper}>{waitingForMessage}</div>
     </LoadingScreenTemplate>
   );
