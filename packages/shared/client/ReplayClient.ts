@@ -88,6 +88,7 @@ export class ReplayClient implements ReplayClientInterface {
   private _dispatchURL: string;
   private _eventHandlers: Map<ReplayClientEvents, Function[]> = new Map();
   private _loadedRegions: LoadedRegions | null = null;
+  private _processingProgress: number | null = null;
   private _recordingId: RecordingId | null = null;
   private _sessionId: SessionId | null = null;
 
@@ -103,10 +104,15 @@ export class ReplayClient implements ReplayClientInterface {
   constructor(dispatchURL: string) {
     this._dispatchURL = dispatchURL;
 
-    this.waitForSession().then(sessionId => {
+    this.waitForSession().then(async sessionId => {
       client.Session.addLoadedRegionsListener(this._onLoadChanges);
       client.Session.listenForLoadChanges({}, sessionId);
+
       client.Session.addAnnotationsListener(this.onAnnotations);
+
+      client.Session.addProcessingProgressListener(this._onProcessingProgress);
+      await client.Session.listenForProcessingProgress({}, sessionId);
+      client.Session.removeProcessingProgressListener(this._onProcessingProgress);
     });
   }
 
@@ -134,6 +140,10 @@ export class ReplayClient implements ReplayClientInterface {
 
   get loadedRegions(): LoadedRegions | null {
     return this._loadedRegions;
+  }
+
+  get processingProgress(): number | null {
+    return this._processingProgress;
   }
 
   addEventListener(type: ReplayClientEvents, handler: Function): void {
@@ -1065,6 +1075,12 @@ export class ReplayClient implements ReplayClientInterface {
     this._loadedRegions = loadedRegions;
 
     this._dispatchEvent("loadedRegionsChange", loadedRegions);
+  };
+
+  _onProcessingProgress = ({ progressPercent }: { progressPercent: number }) => {
+    this._processingProgress = progressPercent;
+
+    this._dispatchEvent("processingProgressChange", progressPercent);
   };
 
   private onAnnotations = (annotations: annotations) => {

@@ -1,4 +1,3 @@
-import Head from "next/head";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ConnectedProps, connect } from "react-redux";
 import {
@@ -15,11 +14,11 @@ import { PointsContextRoot } from "replay-next/src/contexts/points/PointsContext
 import { SelectedFrameContextRoot } from "replay-next/src/contexts/SelectedFrameContext";
 import usePreferredFontSize from "replay-next/src/hooks/usePreferredFontSize";
 import { setDefaultTags } from "replay-next/src/utils/telemetry";
-import { TestRecording } from "shared/test-suites/RecordingTestMetadata";
 import { getTestEnvironment } from "shared/test-suites/RecordingTestMetadata";
 import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { userData } from "shared/user-data/GraphQL/UserData";
 import { clearTrialExpired, createSocket } from "ui/actions/session";
+import { RecordingDocumentTitle } from "ui/components/RecordingDocumentTitle";
 import TerminalContextAdapter from "ui/components/SecondaryToolbox/TerminalContextAdapter";
 import { TestSuiteContextRoot } from "ui/components/TestSuite/views/TestSuiteContext";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
@@ -260,18 +259,6 @@ function _DevTools({
     return <LoadingScreen message={message} secondaryMessage={secondaryMessage} />;
   }
 
-  const title = recording?.title;
-  const testResult = recording?.metadata?.test?.result;
-  let emoji = "";
-  switch (testResult) {
-    case "passed":
-      emoji = "✅";
-      break;
-    case "failed":
-      emoji = "❌";
-      break;
-  }
-
   return (
     <SessionContextAdapter apiKey={apiKey ?? null}>
       <SourcesContextAdapter>
@@ -285,13 +272,7 @@ function _DevTools({
                       <ExpandablesContextRoot>
                         <LayoutContextAdapter>
                           <KeyModifiers>
-                            {title && (
-                              <Head>
-                                <title>
-                                  {emoji} {title}
-                                </title>
-                              </Head>
-                            )}
+                            <RecordingDocumentTitle />
                             <Header />
                             <Body />
                             {showCommandPalette ? <CommandPaletteModal /> : null}

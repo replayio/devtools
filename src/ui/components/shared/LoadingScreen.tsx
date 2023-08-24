@@ -1,7 +1,8 @@
 import dynamic from "next/dynamic";
-import React, { ReactNode, useCallback, useEffect, useState } from "react";
+import { ReactNode, useCallback, useEffect, useState } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
+import { RecordingDocumentTitle } from "ui/components/RecordingDocumentTitle";
 import { getAwaitingSourcemaps, getUploading } from "ui/reducers/app";
 import { UIState } from "ui/state";
 
@@ -62,6 +63,7 @@ function LoadingScreen({
 
   return (
     <LoadingScreenTemplate>
+      <RecordingDocumentTitle />
       <div className={styles.messageWrapper}>{waitingForMessage}</div>
     </LoadingScreenTemplate>
   );
