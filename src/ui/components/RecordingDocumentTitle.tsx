@@ -1,6 +1,7 @@
 import Head from "next/head";
 import { useEffect, useRef, useState } from "react";
 
+import { useIsRecordingProcessed } from "replay-next/src/hooks/useIsRecordingProcessed";
 import { useRecordingProcessingProgress } from "replay-next/src/hooks/useRecordingProcessingProgress";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 
@@ -13,9 +14,10 @@ export function RecordingDocumentTitle() {
 
   const [prefix, setPrefix] = useState("");
 
+  const isProcessed = useIsRecordingProcessed(recording);
   const processingProgress = useRecordingProcessingProgress();
 
-  const { isProcessed, metadata = {}, title = "" } = recording ?? {};
+  const { metadata = {}, title = "" } = recording ?? {};
 
   const testResult = metadata.test?.result;
 
@@ -24,23 +26,11 @@ export function RecordingDocumentTitle() {
   const animationFrameCounterRef = useRef(0);
 
   useEffect(() => {
-    if (isProcessed == null && processingProgress == null) {
-      // Wait until we have a signal one way or another about whether this is still processing
-      // This avoids title flickers if we were to set a ✅/❌ prefix for test suites,
-      // and then replacing it a moment later with a loading spinner
-    } else {
-      // Use GraphQL as an early signal if we haven't received the first progress event yet
-      // (Sometimes there is a noticeable delay before the first processing progress event is received)
-      // Ignore GraphQL once we've received the first progress event though,
-      // because GraphQL updates will lag behind in-memory controller processed state
-      let isProcessing = false;
-      if (processingProgress == null) {
-        isProcessing = isProcessed === false;
-      } else {
-        isProcessing = processingProgress < 100;
-      }
-
-      if (isProcessing) {
+    // Wait until we have a signal one way or another about whether this is still processing
+    // This avoids title flickers if we were to set a ✅/❌ prefix for test suites,
+    // and then replacing it a moment later with a loading spinner
+    if (isProcessed != null) {
+      if (isProcessed === false) {
         // Set the first animation frame immediately (and update it in the interval below)
         setPrefix(ANIMATION_FRAMES[0]);
 

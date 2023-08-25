@@ -12,18 +12,20 @@ import { ThreadFront } from "protocol/thread";
 import { ExpandablesContextRoot } from "replay-next/src/contexts/ExpandablesContext";
 import { PointsContextRoot } from "replay-next/src/contexts/points/PointsContext";
 import { SelectedFrameContextRoot } from "replay-next/src/contexts/SelectedFrameContext";
+import { useIsRecordingProcessed } from "replay-next/src/hooks/useIsRecordingProcessed";
 import usePreferredFontSize from "replay-next/src/hooks/usePreferredFontSize";
 import { setDefaultTags } from "replay-next/src/utils/telemetry";
 import { getTestEnvironment } from "shared/test-suites/RecordingTestMetadata";
 import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { userData } from "shared/user-data/GraphQL/UserData";
 import { clearTrialExpired, createSocket } from "ui/actions/session";
+import { DevToolsDynamicLoadingMessage } from "ui/components/DevToolsDynamicLoadingMessage";
+import { DevToolsProcessingScreen } from "ui/components/DevToolsProcessingScreen";
 import { RecordingDocumentTitle } from "ui/components/RecordingDocumentTitle";
 import TerminalContextAdapter from "ui/components/SecondaryToolbox/TerminalContextAdapter";
 import { TestSuiteContextRoot } from "ui/components/TestSuite/views/TestSuiteContext";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { useTrackLoadingIdleTime } from "ui/hooks/tracking";
-import { useDynamicLoadingMessage } from "ui/hooks/useDynamicLoadingMessage";
 import { useGetUserInfo, useUserIsAuthor } from "ui/hooks/users";
 import { getViewMode } from "ui/reducers/layout";
 import { useAppSelector } from "ui/setup/hooks";
@@ -46,7 +48,6 @@ import LayoutContextAdapter from "./LayoutContextAdapter";
 import TimelineContextAdapter from "./SecondaryToolbox/TimelineContextAdapter";
 import SelectedFrameContextAdapter from "./SelectedFrameContextAdapter";
 import SessionContextAdapter from "./SessionContextAdapter";
-import LoadingScreen from "./shared/LoadingScreen";
 import ReplayLogo from "./shared/ReplayLogo";
 import SidePanel from "./SidePanel";
 import SourcesContextAdapter from "./SourcesContextAdapter";
@@ -153,6 +154,8 @@ function _DevTools({
   const { userIsAuthor, loading } = useUserIsAuthor();
   const { id: userId, email: userEmail, loading: userLoading } = useGetUserInfo();
 
+  const isProcessed = useIsRecordingProcessed(recording);
+
   const isExternalRecording = useMemo(
     () => recording?.user && !recording.user.internal,
     [recording]
@@ -249,14 +252,8 @@ function _DevTools({
     }
   }, [recording, userId, userEmail, userLoading]);
 
-  const { message, secondaryMessage } = useDynamicLoadingMessage(
-    recording?.isProcessed || false,
-    "Loading...",
-    20000
-  );
-
   if (!loadingFinished) {
-    return <LoadingScreen message={message} secondaryMessage={secondaryMessage} />;
+    return isProcessed ? <DevToolsDynamicLoadingMessage /> : <DevToolsProcessingScreen />;
   }
 
   return (
