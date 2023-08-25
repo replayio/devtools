@@ -72,7 +72,6 @@ class ReplayWall implements Wall {
   private _listener?: (msg: any) => void;
   private inspectedElements = new Set();
   private highlightedElementId?: number;
-  private recordingTarget: RecordingTarget | null = null;
   store?: StoreWithInternals;
   pauseId?: string;
 
@@ -90,6 +89,7 @@ class ReplayWall implements Wall {
 
   setPauseId(pauseId: string) {
     this.pauseId = pauseId;
+    this.inspectedElements.clear();
   }
 
   // called by the frontend to register a listener for receiving backend messages
@@ -237,12 +237,10 @@ class ReplayWall implements Wall {
     }
   }
 
-  private async ensureReactDevtoolsBackendLoaded() {
-    if (this.recordingTarget === null) {
-      this.recordingTarget = await recordingTargetCache.readAsync(this.replayClient);
-    }
+  public async ensureReactDevtoolsBackendLoaded() {
+    const recordingTarget = await recordingTargetCache.readAsync(this.replayClient);
 
-    if (this.recordingTarget === "chromium") {
+    if (recordingTarget === "chromium") {
       const pauseId = await ThreadFront.getCurrentPauseId(this.replayClient);
       await injectReactDevtoolsBackend(this.replayClient, pauseId);
     }
@@ -250,6 +248,7 @@ class ReplayWall implements Wall {
 
   // send a request to the backend in the recording and the reply to the frontend
   private async sendRequest(event: string, payload: any) {
+    const originalPauseId = this.pauseId;
     const response = await evaluate({
       replayClient: this.replayClient,
       text: ` window.__RECORD_REPLAY_REACT_DEVTOOLS_SEND_MESSAGE__("${event}", ${JSON.stringify(
@@ -261,7 +260,7 @@ class ReplayWall implements Wall {
       assert(this.pauseId, "Must have a pause ID to handle a response!");
       const result: any = await getJSON(this.replayClient, this.pauseId, response.returned);
 
-      if (result) {
+      if (result && this.pauseId === originalPauseId) {
         this._listener?.({ event: result.event, payload: result.data });
       }
       return result;
@@ -629,6 +628,12 @@ export function ReactDevtoolsPanel() {
       }
     };
   }, [wall, store]);
+
+  useEffect(() => {
+    if (wall && currentPoint !== null) {
+      wall.ensureReactDevtoolsBackendLoaded();
+    }
+  }, [currentPoint, wall]);
 
   if (currentPoint === null) {
     return null;
