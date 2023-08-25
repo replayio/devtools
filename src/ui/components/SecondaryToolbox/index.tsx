@@ -203,7 +203,6 @@ function SecondaryToolbox({
             videoPanelCollapsed={videoPanelCollapsed}
             videoPanelRef={videoPanelRef}
           />
-          <ToolboxOptions />
         </div>
       </header>
       <Redacted className="secondary-toolbox-content bg-chrome text-xs">

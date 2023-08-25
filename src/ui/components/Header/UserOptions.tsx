@@ -2,19 +2,28 @@ import React, { useState } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
 import * as actions from "ui/actions/app";
+import { setToolboxLayout } from "ui/actions/layout";
 import LoginButton from "ui/components/LoginButton";
 import Dropdown from "ui/components/shared/Dropdown";
 import Icon from "ui/components/shared/Icon";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
+import { getToolboxLayout } from "ui/reducers/layout";
+import { getViewMode } from "ui/reducers/layout";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
 
 import ExternalLink from "../shared/ExternalLink";
+import styles from "./UserOptions.module.css";
 
 interface UserOptionsProps extends PropsFromRedux {
   noBrowserItem?: boolean;
 }
 
 function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
+  const dispatch = useAppDispatch();
+  const toolboxLayout = useAppSelector(getToolboxLayout);
+  const viewMode = useAppSelector(getViewMode);
+
   const [expanded, setExpanded] = useState(false);
   const onDocsClick: React.MouseEventHandler = event => {
     trackEvent("user_options.select_docs");
@@ -34,8 +43,19 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
   const onSettingsClick = () => {
     setExpanded(false);
     trackEvent("user_options.select_settings");
-
     setModal("settings");
+  };
+
+  const onLayoutDockBottomRightClick = () => {
+    dispatch(setToolboxLayout("ide"));
+  };
+
+  const onLayoutDockLeftClick = () => {
+    dispatch(setToolboxLayout("left"));
+  };
+
+  const onLayoutDockBottomClick = () => {
+    dispatch(setToolboxLayout("bottom"));
   };
 
   return (
@@ -53,25 +73,57 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
           expanded={expanded}
           orientation="bottom"
         >
+          {viewMode === "dev" && ( // only show layout options in devtools
+            <>
+              <div className="row group">
+                <span className="flex-1 text-left">Layout</span>
+
+                <div className="flex space-x-1">
+                  <div onClick={onLayoutDockBottomRightClick}>
+                    <Icon
+                      filename="dock-bottom-right"
+                      className={`${styles.icon} ${toolboxLayout === "ide" ? styles.selected : ""}`}
+                    />
+                  </div>
+
+                  <div onClick={onLayoutDockLeftClick}>
+                    <Icon
+                      filename="dock-left"
+                      className={`${styles.icon} ${
+                        toolboxLayout === "left" ? styles.selected : ""
+                      }`}
+                    />
+                  </div>
+                  <div onClick={onLayoutDockBottomClick}>
+                    <Icon
+                      filename="dock-bottom"
+                      className={`${styles.icon} ${
+                        toolboxLayout === "bottom" ? styles.selected : ""
+                      }`}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className={styles.divider}></div>
+            </>
+          )}
+
+          <button className="row group" onClick={onSettingsClick}>
+            <span className="flex-1 text-left">Settings</span>
+            <Icon filename="settings" className="bg-iconColor" />
+          </button>
+
           <button className="row group" onClick={onDocsClick}>
+            <span className="flex-1 text-left">Docs</span>
             <Icon filename="docs" className="bg-iconColor" />
-            <span>Docs</span>
           </button>
           <ExternalLink className="row group" href="https://discord.gg/n2dTK6kcRX">
+            <span className="flex-1 text-left">Chat with us</span>
             <Icon filename="help" className="bg-iconColor" />
-            <span>Chat with us</span>
           </ExternalLink>
-          <button className="row group" onClick={onSettingsClick}>
-            <Icon filename="settings" className="bg-iconColor" />
-            <span>Settings</span>
-          </button>
-          {window.__IS_RECORD_REPLAY_RUNTIME__ || noBrowserItem ? null : (
-            <button className="row group" onClick={onLaunchClick}>
-              <Icon filename="replay-logo" className="bg-iconColor" />
-              <span>Launch Replay</span>
-            </button>
-          )}
-          <LoginButton />
+
+          <LoginButton iconPosition="right" />
         </Dropdown>
       </div>
     </>

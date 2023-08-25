@@ -1,0 +1,20 @@
+.icon {
+  background-color: var(--icon-color);
+}
+
+.icon:hover {
+  background-color: var(--primary-accent);
+}
+
+.icon.selected {
+  background-color: var(--primary-accent);
+}
+
+.icon.selected:hover {
+  background-color: var(--primary-accent-hover);
+}
+
+.divider {
+  border-top: 1px solid var(--theme-base-90);
+  margin: 0.5rem 0;
+}
