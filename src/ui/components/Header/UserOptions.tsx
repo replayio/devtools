@@ -46,16 +46,8 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
     setModal("settings");
   };
 
-  const onLayoutDockBottomRightClick = () => {
-    dispatch(setToolboxLayout("ide"));
-  };
-
-  const onLayoutDockLeftClick = () => {
-    dispatch(setToolboxLayout("left"));
-  };
-
-  const onLayoutDockBottomClick = () => {
-    dispatch(setToolboxLayout("bottom"));
+  const onLayoutChange = orientation => {
+    dispatch(setToolboxLayout(orientation));
   };
 
   return (
@@ -79,14 +71,14 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
                 <span className="flex-1 text-left">Layout</span>
 
                 <div className="flex space-x-1">
-                  <div onClick={onLayoutDockBottomRightClick}>
+                  <div onClick={() => onLayoutChange("ide")}>
                     <Icon
                       filename="dock-bottom-right"
                       className={`${styles.icon} ${toolboxLayout === "ide" ? styles.selected : ""}`}
                     />
                   </div>
 
-                  <div onClick={onLayoutDockLeftClick}>
+                  <div onClick={() => onLayoutChange("left")}>
                     <Icon
                       filename="dock-left"
                       className={`${styles.icon} ${
@@ -94,7 +86,8 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
                       }`}
                     />
                   </div>
-                  <div onClick={onLayoutDockBottomClick}>
+
+                  <div onClick={() => onLayoutChange("bottom")}>
                     <Icon
                       filename="dock-bottom"
                       className={`${styles.icon} ${
