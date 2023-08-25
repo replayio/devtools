@@ -46,7 +46,7 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
     setModal("settings");
   };
 
-  const onLayoutChange = orientation => {
+  const onLayoutChange = (orientation: "ide" | "left" | "bottom") => {
     dispatch(setToolboxLayout(orientation));
   };
 
