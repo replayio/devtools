@@ -10,7 +10,7 @@ const getQueryValue = (query: string | string[]) => (Array.isArray(query) ? quer
 const getAppUrl = (path: string) =>
   `${process.env.NEXT_PUBLIC_APP_URL || `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`}${path}`;
 
-async function initAuthRequest(key: string) {
+async function initAuthRequest(key: string, source: string) {
   const api = process.env.NEXT_PUBLIC_API_URL;
 
   if (!api) {
@@ -24,8 +24,8 @@ async function initAuthRequest(key: string) {
     },
     body: JSON.stringify({
       query: `
-        mutation InitAutRequest($key: String!) {
-          initAuthRequest(input: {key: $key}) {
+        mutation InitAutRequest($key: String!, $source: String = "browser") {
+          initAuthRequest(input: {key: $key, source: $source}) {
             id
             challenge
             serverKey
@@ -34,6 +34,7 @@ async function initAuthRequest(key: string) {
       `,
       variables: {
         key,
+        source,
       },
     }),
   });
@@ -49,6 +50,8 @@ async function initAuthRequest(key: string) {
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const key = getQueryValue(req.query.key!);
+  const source = getQueryValue(req.query.source || "browser");
+
   if (!key) {
     res.statusCode = 400;
     res.statusMessage = "Missing parameter";
@@ -59,7 +62,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   try {
     const redirectUri = getAppUrl("/api/browser/callback");
-    const { id, challenge, serverKey } = await initAuthRequest(key);
+    const { id, challenge, serverKey } = await initAuthRequest(key, source);
     const url = `/login?challenge=${challenge}&returnTo=${redirectUri}&state=${id}`;
 
     res.setHeader(
@@ -76,7 +79,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   } catch (e: any) {
     console.error(e);
 
-    recordTelemetryData("devtools-api-browser-auth", { error: e.message });
+    recordTelemetryData("devtools-api-browser-auth", { error: e.message, source });
 
     res.statusCode = 500;
     res.send("");
