@@ -72,7 +72,6 @@ class ReplayWall implements Wall {
   private _listener?: (msg: any) => void;
   private inspectedElements = new Set();
   private highlightedElementId?: number;
-  private recordingTarget: RecordingTarget | null = null;
   store?: StoreWithInternals;
   pauseId?: string;
 
@@ -239,11 +238,9 @@ class ReplayWall implements Wall {
   }
 
   public async ensureReactDevtoolsBackendLoaded() {
-    if (this.recordingTarget === null) {
-      this.recordingTarget = await recordingTargetCache.readAsync(this.replayClient);
-    }
+    const recordingTarget = await recordingTargetCache.readAsync(this.replayClient);
 
-    if (this.recordingTarget === "chromium") {
+    if (recordingTarget === "chromium") {
       const pauseId = await ThreadFront.getCurrentPauseId(this.replayClient);
       await injectReactDevtoolsBackend(this.replayClient, pauseId);
     }
@@ -634,7 +631,6 @@ export function ReactDevtoolsPanel() {
 
   useEffect(() => {
     if (wall && currentPoint !== null) {
-      console.log("Starting RDT injection from effect");
       wall.ensureReactDevtoolsBackendLoaded();
     }
   }, [currentPoint, wall]);
