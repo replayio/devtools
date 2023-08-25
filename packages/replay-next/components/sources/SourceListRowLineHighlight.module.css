@@ -3,7 +3,7 @@
 .ViewSourceHighlight {
   position: absolute;
   left: var(--source-line-number-offset);
-  right: 0;
+  width: calc(var(--longest-line-width) - var(--source-line-number-offset));
   top: 0;
   height: var(--line-height);
   z-index: -1;

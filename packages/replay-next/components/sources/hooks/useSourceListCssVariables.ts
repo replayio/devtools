@@ -60,7 +60,7 @@ export function useSourceListCssVariables({
         let longestLineWidth = 0;
         for (let index = 0; index < innerElement.children.length; index++) {
           const child = innerElement.children[index];
-          longestLineWidth = Math.max(longestLineWidth, child.clientWidth);
+          longestLineWidth = Math.max(longestLineWidth, child.clientWidth, child.scrollWidth);
         }
 
         if (longestLineWidth > longestLineWidthRef.current) {
