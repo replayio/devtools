@@ -9,6 +9,7 @@
 .sectionsContainer {
   width: 100%;
   overflow-x: hidden;
+  padding-top: 0.5rem;
 }
 
 .ToolbarHeader {

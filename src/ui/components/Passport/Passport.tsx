@@ -124,6 +124,17 @@ const Passport = (props: PropsFromRedux) => {
         "https://replayio.notion.site/Adding-print-statements-18a7d1f85b434706b46af0a8d5d298fe?pvs=4",
       blurb: "When looking at a source, click the plus sign.",
     },
+  ];
+
+  const jumpItems = [
+    {
+      label: "Jump to code",
+      completed: !showJumpToCode,
+      videoUrl: "https://vercel.replay.io/passport/jump_to_code.gif",
+      imageBaseName: "jump_to_code",
+      docsLink: "https://replayio.notion.site/Jump-to-code-45026e5087014475a52dc4a8024dc850?pvs=4",
+      blurb: "Click the info icon on the left nav, then look for the blue button.",
+    },
     {
       label: "Jump to event",
       completed: !showJumpToEvent,
@@ -162,17 +173,18 @@ const Passport = (props: PropsFromRedux) => {
         "https://replayio.notion.site/Inspect-React-elements-5e4ae5b2a8fb4b6bba8ca5167ce94eb0?pvs=4",
       blurb: "The React tab is in the same area as console, elements, and network events.",
     },
-    {
-      label: "Jump to code",
-      completed: !showJumpToCode,
-      videoUrl: "https://vercel.replay.io/passport/jump_to_code.gif",
-      imageBaseName: "jump_to_code",
-      docsLink: "https://replayio.notion.site/Jump-to-code-45026e5087014475a52dc4a8024dc850?pvs=4",
-      blurb: "Click the info icon on the left nav, then look for the blue button.",
-    },
   ];
 
   const swissArmyItems = [
+    {
+      label: "Add a comment",
+      completed: !showAddComment,
+      videoUrl: "https://vercel.replay.io/passport/add_a_comment.gif",
+      imageBaseName: "add_a_comment",
+      docsLink: "https://replayio.notion.site/Add-a-comment-1b042007d9874ad6880af1dea7dd1e42?pvs=4",
+      blurb:
+        "Click in the video region to set a comment. It's also possible to add comments to console logs, print statements, and network monitor requests.",
+    },
     {
       label: "Add a unicorn badge",
       completed: !showAddUnicornBadge,
@@ -207,18 +219,7 @@ const Passport = (props: PropsFromRedux) => {
       docsLink: "https://replayio.notion.site/Go-to-file-4e867dc10f7d4db3be78e9bfc53c97f9?pvs=4",
       blurb: "Press command-P on your keyboard.",
     },
-  ];
 
-  const multiplayerItems = [
-    {
-      label: "Add a comment",
-      completed: !showAddComment,
-      videoUrl: "https://vercel.replay.io/passport/add_a_comment.gif",
-      imageBaseName: "add_a_comment",
-      docsLink: "https://replayio.notion.site/Add-a-comment-1b042007d9874ad6880af1dea7dd1e42?pvs=4",
-      blurb:
-        "Click in the video region to set a comment. It's also possible to add comments to console logs, print statements, and network monitor requests.",
-    },
     {
       label: "Share",
       completed: !showShareNag,
@@ -231,20 +232,20 @@ const Passport = (props: PropsFromRedux) => {
 
   const sections: Section[] = [
     {
-      title: "TIME TRAVEL",
+      title: "TIME TRAVELLER",
       items: timeTravelItems,
     },
     {
-      title: "INFRARED INSPECTION",
+      title: "JUMP EXPERT",
+      items: jumpItems,
+    },
+    {
+      title: "INSPECTOR",
       items: inspectionItems,
     },
     {
-      title: "SWISS ARMY KNIFE",
+      title: "ADVENTURER",
       items: swissArmyItems,
-    },
-    {
-      title: "MULTIPLAYER",
-      items: multiplayerItems,
     },
   ];
 
@@ -332,7 +333,7 @@ const Passport = (props: PropsFromRedux) => {
         </div>
       ) : (
         <div className={styles.ToolbarHeader}>
-          Passport
+          Time Traveller Passport
           <button className={styles.close} onClick={hideFeatureShowPassport}>
             <Icon type="close" />
           </button>
