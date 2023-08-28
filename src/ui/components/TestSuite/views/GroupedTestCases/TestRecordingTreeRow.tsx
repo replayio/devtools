@@ -49,15 +49,18 @@ export default function TestRecordingTreeRow({
       {showTitle || <Icon className={styles.NestedIcon} type="arrow-nested" />}
       <TestResultIcon result={result} />
       <div className={styles.Column}>
-        <div className={styles.Title}>
-          {showTitle ? (
-            title
-          ) : (
-            <>
-              <span className={styles.AttemptLabel}>{attemptLabel}</span>
-              <span className={styles.AttemptNumber}>(attempt {attempt})</span>
-            </>
-          )}
+        <div className={styles.HeaderRow}>
+          <div className={styles.Title}>
+            {showTitle ? (
+              title
+            ) : (
+              <>
+                <span className={styles.AttemptLabel}>{attemptLabel}</span>
+                <span className={styles.AttemptNumber}>(attempt {attempt})</span>
+              </>
+            )}
+          </div>
+          <MaterialIcon className={styles.Chevron}>chevron_right</MaterialIcon>
         </div>
         {showTitle && error && (
           <div className={styles.Error}>
@@ -65,7 +68,6 @@ export default function TestRecordingTreeRow({
           </div>
         )}
       </div>
-      <MaterialIcon className={styles.Chevron}>chevron_right</MaterialIcon>
     </li>
   );
 }

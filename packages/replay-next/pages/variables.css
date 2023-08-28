@@ -513,7 +513,7 @@
   --testsuites-capsule-error-color: white;
   --testsuites-capsule-success-bgcolor: var(--testsuites-success-color);
   --testsuites-capsule-success-color: rgb(16, 114, 0);
-  --testsuites-error-bgcolor-hover: #4f1615;
+  --testsuites-error-bgcolor-hover: #591716;
   --testsuites-error-bgcolor: #4f1615;
   --testsuites-error-border-color: var(--testsuites-error-icon-bgcolor);
   --testsuites-error-color: #ffe0e0;

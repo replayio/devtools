@@ -5,6 +5,7 @@
   transition: opacity 0.18s ease-out;
   overflow-x: hidden;
   overflow-wrap: anywhere;
+  padding: 0.25rem;
 }
 .Row {
   cursor: pointer;
@@ -21,17 +22,25 @@
   flex: 0 0 auto;
 }
 
-.Title {
-  flex: 0 1 auto;
+.HeaderRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
-.Row:hover .Title {
-  text-decoration: underline;
+
+.Title {
+  flex: 1 1 auto;
+}
+
+.Row:hover {
+  background-color: var(--testsuites-steps-bgcolor-hover);
+  border-radius: 0.25rem;
 }
 
 .Chevron {
-  flex: 0 0 auto;
   visibility: hidden;
 }
+
 .Row:hover .Chevron {
   visibility: visible;
 }
@@ -39,15 +48,19 @@
 .Column {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  width: 100%;
 }
 
 .Error {
   padding: 0.5rem 0.75rem;
-  border-radius: 0.5rem;
+  border-radius: 0.25rem;
   font-family: var(--font-family-monospace);
   background-color: var(--testsuites-error-bgcolor);
   color: var(--testsuites-error-color);
+}
+
+.Row:hover .Error {
+  background-color: var(--testsuites-error-bgcolor-hover);
 }
 
 .ErrorTitle {
