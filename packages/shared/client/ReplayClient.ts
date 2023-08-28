@@ -44,13 +44,23 @@ import {
   createPauseResult,
   findPointsResults,
   functionsMatches,
+  getAllBoundingClientRectsResult,
   getAllFramesResult,
+  getAppliedRulesResult,
+  getBoundingClientRectResult,
+  getBoxModelResult,
+  getComputedStyleResult,
+  getDocumentResult,
+  getEventListenersResult,
   getExceptionValueResult,
+  getParentNodesResult,
   getScopeResult,
   getTopFrameResult,
   keyboardEvents,
   navigationEvents,
   newSources,
+  performSearchResult,
+  querySelectorResult,
   repaintGraphicsResult,
   runEvaluationResults,
   searchSourceContentsMatches,
@@ -567,6 +577,63 @@ export class ReplayClient implements ReplayClientInterface {
     const sessionId = this.getSessionIdThrows();
     const { kinds } = await client.Session.getAnnotationKinds({}, sessionId);
     return kinds;
+  }
+
+  async getAllBoundingClientRects(pauseId: string): Promise<getAllBoundingClientRectsResult> {
+    const sessionId = this.getSessionIdThrows();
+    return client.DOM.getAllBoundingClientRects({}, sessionId, pauseId);
+  }
+
+  async getAppliedRules(pauseId: string, nodeId: string): Promise<getAppliedRulesResult> {
+    const sessionId = this.getSessionIdThrows();
+    return client.CSS.getAppliedRules({ node: nodeId }, sessionId, pauseId);
+  }
+
+  async getBoundingClientRect(
+    pauseId: string,
+    nodeId: string
+  ): Promise<getBoundingClientRectResult> {
+    const sessionId = this.getSessionIdThrows();
+    return client.DOM.getBoundingClientRect({ node: nodeId }, sessionId, pauseId);
+  }
+
+  async getBoxModel(pauseId: string, nodeId: string): Promise<getBoxModelResult> {
+    const sessionId = this.getSessionIdThrows();
+    return client.DOM.getBoxModel({ node: nodeId }, sessionId, pauseId);
+  }
+
+  async getComputedStyle(pauseId: PauseId, nodeId: string): Promise<getComputedStyleResult> {
+    const sessionId = this.getSessionIdThrows();
+    return client.CSS.getComputedStyle({ node: nodeId }, sessionId, pauseId);
+  }
+
+  async getDocument(pauseId: string): Promise<getDocumentResult> {
+    const sessionId = this.getSessionIdThrows();
+    return client.DOM.getDocument({}, sessionId, pauseId);
+  }
+
+  async getEventListeners(pauseId: string, nodeId: string): Promise<getEventListenersResult> {
+    const sessionId = this.getSessionIdThrows();
+    return client.DOM.getEventListeners({ node: nodeId }, sessionId, pauseId);
+  }
+
+  async getParentNodes(pauseId: string, nodeId: string): Promise<getParentNodesResult> {
+    const sessionId = this.getSessionIdThrows();
+    return client.DOM.getParentNodes({ node: nodeId }, sessionId, pauseId);
+  }
+
+  async performSearch(pauseId: string, query: string): Promise<performSearchResult> {
+    const sessionId = this.getSessionIdThrows();
+    return client.DOM.performSearch({ query }, sessionId, pauseId);
+  }
+
+  async querySelector(
+    pauseId: string,
+    nodeId: string,
+    selector: string
+  ): Promise<querySelectorResult> {
+    const sessionId = this.getSessionIdThrows();
+    return client.DOM.querySelector({ node: nodeId, selector }, sessionId, pauseId);
   }
 
   async getEventCountForTypes(

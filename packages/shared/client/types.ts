@@ -1,6 +1,8 @@
 import {
   Annotation,
+  AppliedRule,
   BreakpointId,
+  ComputedStyleProperty,
   ContentType,
   Result as EvaluationResult,
   EventHandlerType,
@@ -49,13 +51,23 @@ import {
   TimeStampedPointRange,
   VariableMapping,
   createPauseResult,
+  getAllBoundingClientRectsResult,
   getAllFramesResult,
+  getAppliedRulesResult,
+  getBoundingClientRectResult,
+  getBoxModelResult,
+  getComputedStyleResult,
+  getDocumentResult,
+  getEventListenersResult,
   getExceptionValueResult,
+  getParentNodesResult,
   getScopeResult,
   getSourceOutlineResult,
   getTopFrameResult,
   keyboardEvents,
   navigationEvents,
+  performSearchResult,
+  querySelectorResult,
   repaintGraphicsResult,
 } from "@replayio/protocol";
 
@@ -192,18 +204,25 @@ export interface ReplayClientInterface {
   findStepOverTarget(point: ExecutionPoint): Promise<PauseDescription>;
   findReverseStepOverTarget(point: ExecutionPoint): Promise<PauseDescription>;
   findSources(): Promise<Source[]>;
+  getAllBoundingClientRects(pauseId: PauseId): Promise<getAllBoundingClientRectsResult>;
   getAllEventHandlerCounts(range: PointRange | null): Promise<Record<string, number>>;
   getAllFrames(pauseId: PauseId): Promise<getAllFramesResult>;
   getAnnotationKinds(): Promise<string[]>;
+  getAppliedRules(pauseId: PauseId, nodeId: string): Promise<getAppliedRulesResult>;
+  getBoundingClientRect(pauseId: PauseId, nodeId: string): Promise<getBoundingClientRectResult>;
+  getBoxModel(pauseId: PauseId, nodeId: string): Promise<getBoxModelResult>;
   getBreakpointPositions(
     sourceId: SourceId,
     range: SourceLocationRange | null
   ): Promise<SameLineSourceLocations[]>;
   getBuildId(): Promise<string>;
+  getComputedStyle(pauseId: PauseId, nodeId: string): Promise<getComputedStyleResult>;
+  getDocument(pauseId: PauseId): Promise<getDocumentResult>;
   getEventCountForTypes(
     eventTypes: EventHandlerType[],
     focusRange: PointRange | null
   ): Promise<Record<string, number>>;
+  getEventListeners(pauseId: PauseId, nodeId: string): Promise<getEventListenersResult>;
   getExceptionValue(pauseId: PauseId): Promise<getExceptionValueResult>;
   getFrameSteps(pauseId: PauseId, frameId: FrameId): Promise<PointDescription[]>;
   getMappedLocation(location: Location): Promise<MappedLocation>;
@@ -213,6 +232,7 @@ export interface ReplayClientInterface {
     level?: ObjectPreviewLevel
   ): Promise<PauseData>;
   getObjectProperty(objectId: ObjectId, pauseId: PauseId, propertyName: string): Promise<Result>;
+  getParentNodes(pauseId: PauseId, nodeId: string): Promise<getParentNodesResult>;
   getPointNearTime(time: number): Promise<TimeStampedPoint>;
   getPointsBoundingTime(time: number): Promise<PointsBoundingTime>;
   getRecordingId(): RecordingId | null;
@@ -241,6 +261,8 @@ export interface ReplayClientInterface {
   mapExpressionToGeneratedScope(expression: string, location: Location): Promise<string>;
   requestFocusWindow(params: PointRangeFocusRequest): Promise<TimeStampedPointRange>;
   getCurrentFocusWindow(): TimeStampedPointRange | null;
+  performSearch(pauseId: PauseId, query: string): Promise<performSearchResult>;
+  querySelector(pauseId: PauseId, nodeId: string, selector: string): Promise<querySelectorResult>;
   removeEventListener(type: ReplayClientEvents, handler: Function): void;
   repaintGraphics(pauseId: PauseId): Promise<repaintGraphicsResult>;
   runEvaluation(
