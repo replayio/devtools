@@ -187,13 +187,7 @@ export function newRoot(): UIThunkAction<Promise<void>> {
     if (!rootNodeData || ThreadFront.currentPauseIdUnsafe !== originalPauseId) {
       return;
     }
-    const rootNode = await convertNode(
-      rootNodeData.objectId,
-      replayClient,
-      protocolClient,
-      ThreadFront.sessionId!,
-      originalPauseId
-    );
+    const rootNode = await convertNode(rootNodeData.objectId, replayClient, originalPauseId);
 
     if (ThreadFront.currentPauseIdUnsafe !== originalPauseId) {
       return;
@@ -229,24 +223,10 @@ export function addChildren(
     const originalPauseId = await ThreadFront.getCurrentPauseId(replayClient);
 
     // Always ensure we have a parent
-    const parent = await convertNode(
-      parentNodeId,
-      replayClient,
-      protocolClient,
-      ThreadFront.sessionId!,
-      originalPauseId!
-    );
+    const parent = await convertNode(parentNodeId, replayClient, originalPauseId!);
 
     const children = await Promise.all(
-      childrenToAdd.map(node =>
-        convertNode(
-          node.objectId,
-          replayClient,
-          protocolClient,
-          ThreadFront.sessionId!,
-          originalPauseId!
-        )
-      )
+      childrenToAdd.map(node => convertNode(node.objectId, replayClient, originalPauseId!))
     );
 
     if (ThreadFront.currentPauseIdUnsafe !== originalPauseId) {
@@ -680,21 +660,13 @@ export const HTML_NS = "http://www.w3.org/1999/xhtml";
 async function convertNode(
   nodeId: string,
   replayClient: ReplayClientInterface,
-  client: ProtocolClient,
-  sessionId: string,
   pauseId: string,
   { isExpanded = false } = {}
 ): Promise<NodeInfo> {
-  const [nodeObject, computedStyle, eventListeners] = await Promise.all([
-    objectCache.readAsync(replayClient, pauseId, nodeId, "canOverflow"),
-    computedStyleCache.readAsync(client, sessionId, pauseId, nodeId),
-    nodeEventListenersCache.readAsync(client, replayClient, sessionId, pauseId, nodeId),
-  ]);
+  const nodeObject = await objectCache.readAsync(replayClient, pauseId, nodeId, "canOverflow");
 
   const node = nodeObject?.preview?.node;
   assert(node, "No preview for node: " + nodeId);
-
-  const displayType = computedStyle?.get("display");
 
   return {
     attributes: node.attributes || [],
@@ -703,12 +675,9 @@ async function convertNode(
       node.nodeType === NodeConstants.DOCUMENT_TYPE_NODE
         ? `<!DOCTYPE ${node.nodeName}>`
         : node.nodeName.toLowerCase(),
-    displayType,
     hasChildren: !!node.childNodes?.length,
-    hasEventListeners: !!eventListeners,
     id: nodeId,
     isConnected: node.isConnected,
-    isDisplayed: !!displayType && displayType !== "none",
     isElement: node.nodeType === NodeConstants.ELEMENT_NODE,
     isExpanded,
     namespaceURI: HTML_NS,

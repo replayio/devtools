@@ -145,25 +145,6 @@ class _Node extends PureComponent<FinalNodeProps> {
     return component;
   }
 
-  renderEventBadge() {
-    if (!this.props.node.hasEventListeners) {
-      return null;
-    }
-
-    return (
-      <button
-        type="button"
-        title="Open event listeners"
-        className="inspector-badge interactive relative inline-block w-auto py-0 px-0.5 leading-2"
-        onClick={() => {
-          this.props.setActiveTab("eventsview");
-        }}
-      >
-        event
-      </button>
-    );
-  }
-
   render() {
     const { node, rootNodeId, isSelectedNode, isScrollIntoViewNode } = this.props;
 
@@ -179,7 +160,6 @@ class _Node extends PureComponent<FinalNodeProps> {
         data-testid="Inspector-Nodes-Node"
         className={classnames("child", {
           collapsed: !node.isExpanded,
-          "not-displayed": !node.isDisplayed,
           expandable: showExpander,
         })}
         role="presentation"
@@ -203,7 +183,6 @@ class _Node extends PureComponent<FinalNodeProps> {
             ></span>
           ) : null}
           {this.renderComponent()}
-          {this.renderEventBadge()}
         </div>
         {this.renderChildren()}
         {this.renderClosingTag()}

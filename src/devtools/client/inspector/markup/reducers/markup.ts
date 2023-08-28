@@ -10,21 +10,15 @@ export interface NodeInfo {
   attributes: Attr[];
   // Array of child node object ids.
   children: string[];
-  // The display name for the UI. This is either the lower casee of the node's tag
+  // The display name for the UI. This is either the lower case of the node's tag
   // name or the doctype string for a document type node.
   displayName: string;
-  // The computed display style property value of the node.
-  displayType: string | undefined;
   // Whether or not the node has child nodes.
   hasChildren: boolean;
-  // Whether or not the node has event listeners.
-  hasEventListeners: boolean;
-  // An unique NodeFront object id.
+  // An unique object id.
   id: string;
-  // Whether or not the node is displayed. If a node has the attribute
-  // `display: none`, it is not displayed (faded in the markup view).
+  // Whether or not the node is attached to the document (?)
   isConnected: boolean;
-  isDisplayed: boolean;
   isElement: boolean;
   // Whether or not the node is expanded.
   isExpanded: boolean;

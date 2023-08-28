@@ -25,22 +25,6 @@ const HTML_VOID_ELEMENTS = [
   "wbr",
 ];
 
-// Contains only valid computed display property types of the node to display in the
-// element markup and their respective title tooltip text.
-const DISPLAY_TYPES: { [key: string]: string | undefined } = {
-  flex: "This element behaves like a block element and lays out its content according to the flexbox model. Click to toggle the flexbox overlay for this element.",
-  "inline-flex":
-    "This element behaves like an inline element and lays out its content according to the flexbox model. Click to toggle the flexbox overlay for this element.",
-  grid: "This element behaves like a block element and lays out its content according to the grid model. Click to toggle the grid overlay for this element.",
-  "inline-grid":
-    "This element behaves like an inline element and lays out its content according to the grid model. Click to toggle the grid overlay for this element.",
-  subgrid:
-    "This element lays out its content according to the grid model but defers the definition of its rows and/or columns to its parent grid container.",
-  "flow-root":
-    "This element generates a block element box that establishes a new block formatting context.",
-  contents: "This element doesn’t produce a specific box by itself, but renders its contents.",
-};
-
 interface ElementNodeProps {
   node: NodeInfo;
   onToggleNodeExpanded: (nodeId: string, isExpanded: boolean) => void;
@@ -92,20 +76,6 @@ class ElementNode extends PureComponent<ElementNodeProps> {
     );
   }
 
-  renderDisplayBadge() {
-    const { displayType } = this.props.node;
-
-    if (!displayType || !(displayType in DISPLAY_TYPES)) {
-      return null;
-    }
-
-    return (
-      <div className="inspector-badge" title={DISPLAY_TYPES[displayType]}>
-        {displayType}
-      </div>
-    );
-  }
-
   renderOpenTag() {
     const { displayName } = this.props.node;
 
@@ -127,7 +97,6 @@ class ElementNode extends PureComponent<ElementNodeProps> {
         {this.renderOpenTag()}
         <span className="markup-expand-badge" onClick={this.onExpandBadgeClick}></span>
         {this.renderCloseTag()}
-        {this.renderDisplayBadge()}
       </span>
     );
   }

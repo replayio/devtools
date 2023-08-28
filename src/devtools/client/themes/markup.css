@@ -396,21 +396,6 @@ ul.children + .tag-line::before {
   z-index: 1;
 }
 
-.not-displayed {
-  color: var(--markup-hidden-punctuation-color);
-}
-
-.not-displayed .attr-name {
-  color: var(--markup-hidden-attr-name-color);
-}
-
-.not-displayed .attr-value {
-  color: var(--markup-hidden-attr-value-color);
-}
-
-.not-displayed .tag {
-  color: var(--markup-hidden-tag-color);
-}
 
 #markup-box:focus-within .theme-selected {
   background-color: var(--theme-selection-background);
