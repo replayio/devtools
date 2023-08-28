@@ -1,11 +1,15 @@
-import React, { Suspense, useEffect, useRef } from "react";
+import React, { Suspense, useContext, useEffect, useRef } from "react";
 import { ConnectedProps, connect } from "react-redux";
+import { useImperativeCacheValue } from "suspense";
 
+import { getPauseId } from "devtools/client/debugger/src/selectors";
 import KeyShortcuts from "devtools/client/shared/key-shortcuts";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import LoadingProgressBar from "ui/components/shared/LoadingProgressBar";
+import { useAppSelector } from "ui/setup/hooks";
 import { UIState } from "ui/state";
+import { processedNodeDataCache } from "ui/suspense/nodeCaches";
 
-import { getNodeInfo } from "../selectors/markup";
 import { HTMLBreadcrumbs } from "./HTMLBreadcrumbs";
 import { InspectorSearch } from "./InspectorSearch";
 import Nodes from "./Nodes";
@@ -14,8 +18,15 @@ export interface MarkupProps {}
 
 type PropsFromParent = {};
 
-function MarkupApp({ loadingFailed, markupRootNode }: PropsFromRedux & PropsFromParent) {
-  const isMarkupEmpty = (markupRootNode?.children?.length || 0) == 0;
+function MarkupApp({ loadingFailed, rootNodeId }: PropsFromRedux & PropsFromParent) {
+  const replayClient = useContext(ReplayClientContext);
+  const pauseId = useAppSelector(getPauseId);
+  const { value: markupRootNode, status } = useImperativeCacheValue(
+    processedNodeDataCache,
+    replayClient,
+    pauseId!,
+    rootNodeId!
+  );
 
   const contentRef = useRef<HTMLDivElement>(null);
   const searchBoxShortcutsRef = useRef<KeyShortcuts | null>(null);
@@ -42,6 +53,7 @@ function MarkupApp({ loadingFailed, markupRootNode }: PropsFromRedux & PropsFrom
     };
   }, []);
 
+  const isMarkupEmpty = status !== "resolved" || (markupRootNode?.children?.length || 0) == 0;
   const showLoadingProgressBar = isMarkupEmpty && !loadingFailed;
   const showLoadingFailedMessage = loadingFailed;
 
@@ -66,7 +78,7 @@ function MarkupApp({ loadingFailed, markupRootNode }: PropsFromRedux & PropsFrom
         <div id="markup-box" className="devtools-monospace bg-bodyBgcolor">
           <div id="markup-root-wrapper" role="presentation">
             <div id="markup-root" role="presentation">
-              {<Nodes />}
+              {<Nodes key={pauseId} pauseId={pauseId} />}
             </div>
           </div>
           {showLoadingProgressBar && <LoadingProgressBar />}
@@ -82,7 +94,7 @@ function MarkupApp({ loadingFailed, markupRootNode }: PropsFromRedux & PropsFrom
 
 const connector = connect((state: UIState) => ({
   loadingFailed: state.markup.loadingFailed,
-  markupRootNode: getNodeInfo(state, state.markup.rootNode!),
+  rootNodeId: state.markup.rootNode,
 }));
 type PropsFromRedux = ConnectedProps<typeof connector>;
 

@@ -8,7 +8,7 @@ import { UIState } from "ui/state";
 export interface NodeInfo {
   // A list of the node's attributes.
   attributes: Attr[];
-  // Array of child node object ids.
+  // All child nodes, regardless of type or loaded status
   children: string[];
   // The display name for the UI. This is either the lower case of the node's tag
   // name or the doctype string for a document type node.
@@ -70,10 +70,6 @@ export interface MarkupState {
   // the client is fetching the data required
   highlightedNodesLoading: boolean;
   nodeBoxModels: EntityState<BoxModel>;
-  // An object representing the markup tree. The key to the object represents the object
-  // ID of a given node. The value of each item in the object contains
-  // an object representing the properties of the given node.
-  tree: EntityState<NodeInfo>;
   // The document could not be loaded at the current execution point.
   loadingFailed: boolean;
   expandedNodes: ExpandedNodes;
@@ -83,10 +79,6 @@ const nodeAdapter = createEntityAdapter<NodeInfo>();
 const boxModelAdapter = createEntityAdapter<BoxModel>({
   selectId: boxModel => boxModel.node,
 });
-
-export const { selectById: getMarkupNodeById } = nodeAdapter.getSelectors(
-  (state: UIState) => state.markup.tree
-);
 
 export const { selectById: getNodeBoxModelById } = boxModelAdapter.getSelectors(
   (state: UIState) => state.markup.nodeBoxModels
@@ -104,7 +96,6 @@ const initialState: MarkupState = {
   highlightedNodesLoading: false,
   loadingFailed: false,
   nodeBoxModels: boxModelAdapter.getInitialState(),
-  tree: nodeAdapter.getInitialState(),
 };
 
 const markupSlice = createSlice({
@@ -115,30 +106,16 @@ const markupSlice = createSlice({
       return initialState;
     },
     newRootAdded(state, action: PayloadAction<NodeInfo>) {
-      nodeAdapter.setAll(state.tree, [action.payload]);
       state.rootNode = action.payload.id;
-    },
-    childrenAdded(state, action: PayloadAction<{ parent: NodeInfo; children: NodeInfo[] }>) {
-      const { parent, children } = action.payload;
-
-      nodeAdapter.addMany(state.tree, children);
-      if (!state.tree.entities[parent.id]) {
-        // If by chance the parent doesn't exist yet, add it
-        nodeAdapter.upsertOne(state.tree, parent);
-      }
-      let parentNodeInfo = state.tree.entities[parent.id]!;
-      parentNodeInfo.children = children.map(child => child.id);
     },
     updateNodeExpanded(state, action: PayloadAction<{ nodeId: string; isExpanded: boolean }>) {
       const { nodeId, isExpanded } = action.payload;
       state.expandedNodes[nodeId] = isExpanded;
     },
-    updateChildrenLoading(
-      state,
-      action: PayloadAction<{ nodeId: string; isLoadingChildren: boolean }>
-    ) {
-      const { nodeId, isLoadingChildren } = action.payload;
-      nodeAdapter.updateOne(state.tree, { id: nodeId, changes: { isLoadingChildren } });
+    expandMultipleNodes(state, action: PayloadAction<string[]>) {
+      action.payload.forEach(nodeId => {
+        state.expandedNodes[nodeId] = true;
+      });
     },
     nodeSelected: {
       reducer(
@@ -194,9 +171,8 @@ const markupSlice = createSlice({
 export const {
   newRootAdded,
   resetMarkup,
-  childrenAdded,
   updateNodeExpanded,
-  updateChildrenLoading,
+  expandMultipleNodes,
   nodeSelected,
   updateScrollIntoViewNode,
   nodesHighlighted,

@@ -180,12 +180,15 @@ export const nodeDataCache: Cache<
 
 export const processedNodeDataCache: Cache<
   [replayClient: ReplayClientInterface, pauseId: PauseId, nodeId: string],
-  NodeInfo
+  NodeInfo | null
 > = createCache({
   config: { immutable: true },
   debugLabel: "ProcessedNodeData",
   getKey: ([replayClient, pauseId, nodeId]) => `${pauseId}:${nodeId}`,
-  load: async ([replayClient, pauseId, nodeId]): Promise<NodeInfo> => {
+  load: async ([replayClient, pauseId, nodeId]): Promise<NodeInfo | null> => {
+    if (!pauseId) {
+      return null;
+    }
     const nodeObject = await objectCache.readAsync(replayClient, pauseId, nodeId, "canOverflow");
 
     const node = nodeObject?.preview?.node;

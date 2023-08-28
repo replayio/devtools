@@ -1,15 +1,18 @@
 import classnames from "classnames";
-import React, { ReactElement, useCallback } from "react";
+import React, { ReactElement, useCallback, useContext } from "react";
 import { shallowEqual } from "react-redux";
+import { useImperativeCacheValue } from "suspense";
 
+import { getPauseId } from "devtools/client/debugger/src/selectors";
 import NodeConstants from "devtools/shared/dom-node-constants";
 import { assert } from "protocol/utils";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { processedNodeDataCache } from "ui/suspense/nodeCaches";
 
 import { highlightNode, selectNode, toggleNodeExpanded, unhighlightNode } from "../actions/markup";
 import {
   getIsNodeExpanded,
-  getNode,
   getRootNodeId,
   getScrollIntoViewNodeId,
   getSelectedNodeId,
@@ -22,42 +25,24 @@ interface NodeProps {
   nodeId: string;
 }
 
+const reIsEmptyValue = /[^\s]/;
+
 function Node({ nodeId }: NodeProps) {
   const dispatch = useAppDispatch();
-  const { node, rootNodeId, isSelectedNode, isScrollIntoViewNode, isExpanded } = useAppSelector(
+  const replayClient = useContext(ReplayClientContext);
+
+  // Do these as one big object, with a shallow comparison,
+  // to minimize the number of Redux subscriptions
+  const { rootNodeId, isSelectedNode, isScrollIntoViewNode, isExpanded, pauseId } = useAppSelector(
     state => ({
-      node: getNode(state, nodeId)!,
       rootNodeId: getRootNodeId(state),
       isSelectedNode: nodeId === getSelectedNodeId(state),
       isScrollIntoViewNode: nodeId === getScrollIntoViewNodeId(state),
       isExpanded: getIsNodeExpanded(state, nodeId),
+      pauseId: getPauseId(state),
     }),
     shallowEqual
   );
-
-  const onExpanderToggle = (event: React.MouseEvent) => {
-    event.stopPropagation();
-    dispatch(toggleNodeExpanded(node.id, isExpanded));
-  };
-
-  const onSelectNodeClick = (event: React.MouseEvent) => {
-    event.stopPropagation();
-
-    // Don't reselect the same selected node.
-    if (isSelectedNode) {
-      return;
-    }
-
-    dispatch(selectNode(node.id));
-  };
-
-  const onMouseEnter = () => {
-    dispatch(highlightNode(node.id));
-  };
-
-  const onMouseLeave = () => {
-    dispatch(unhighlightNode());
-  };
 
   const scrollIntoView = useCallback((el: HTMLElement | null) => {
     if (!el) {
@@ -74,13 +59,46 @@ function Node({ nodeId }: NodeProps) {
     }
   }, []);
 
+  const { value: node, status: nodeStatus } = useImperativeCacheValue(
+    processedNodeDataCache,
+    replayClient,
+    pauseId!,
+    nodeId
+  );
+
+  if (nodeStatus === "rejected" || !node) {
+    return null;
+  }
+
+  const onExpanderToggle = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    dispatch(toggleNodeExpanded(nodeId, isExpanded));
+  };
+
+  const onSelectNodeClick = (event: React.MouseEvent) => {
+    event.stopPropagation();
+
+    // Don't reselect the same selected node.
+    if (isSelectedNode) {
+      return;
+    }
+
+    dispatch(selectNode(nodeId));
+  };
+
+  const onMouseEnter = () => {
+    dispatch(highlightNode(nodeId));
+  };
+
+  const onMouseLeave = () => {
+    dispatch(unhighlightNode());
+  };
+
   let renderedChildren: ReactElement | null = null;
   let renderedClosingTag: ReactElement | null = null;
   let renderedComponent: ReactElement | null = null;
 
-  if (node.isLoadingChildren) {
-    renderedChildren = <span>Loading…</span>;
-  } else if (node.children?.length) {
+  if (isExpanded && node.children.length) {
     renderedChildren = (
       <ul className="children" role={node.hasChildren ? "group" : ""}>
         {node.children.map(nodeId => (
@@ -90,10 +108,9 @@ function Node({ nodeId }: NodeProps) {
     );
   }
 
-  // Whether or not the node can be expanded.
-  // True if node has children and child is not an inline text node.
   const { hasChildren, displayName } = node;
   const canExpand = hasChildren;
+  const showExpander = canExpand && node.parentNodeId !== rootNodeId;
 
   if (canExpand) {
     renderedClosingTag = (
@@ -108,9 +125,15 @@ function Node({ nodeId }: NodeProps) {
     );
   }
 
-  if (node.type === NodeConstants.ELEMENT_NODE) {
+  if (nodeStatus === "pending") {
+    renderedComponent = <span>Loading…</span>;
+  } else if (node.type === NodeConstants.ELEMENT_NODE) {
     renderedComponent = <ElementNode node={node} />;
-  } else if (node.type === NodeConstants.COMMENT_NODE || node.type === NodeConstants.TEXT_NODE) {
+  } else if (
+    node.type === NodeConstants.COMMENT_NODE ||
+    node.type === NodeConstants.TEXT_NODE ||
+    (typeof node.value === "string" && reIsEmptyValue.exec(node.value!))
+  ) {
     renderedComponent = <TextNode type={node.type} value={node.value} />;
   } else {
     renderedComponent = (
@@ -121,10 +144,6 @@ function Node({ nodeId }: NodeProps) {
       />
     );
   }
-
-  // Whether or not to the show the expander.
-  // True if node can expand and the parent node is not the root node.
-  const showExpander = canExpand && node.parentNodeId !== rootNodeId;
 
   return (
     <li
