@@ -1,9 +1,10 @@
 import classnames from "classnames";
 import React, { MouseEvent, PureComponent, ReactElement } from "react";
-import { ConnectedProps, connect } from "react-redux";
+import { ConnectedProps, connect, shallowEqual } from "react-redux";
 
 import NodeConstants from "devtools/shared/dom-node-constants";
 import { assert } from "protocol/utils";
+import { useAppSelector } from "ui/setup/hooks";
 import { UIState } from "ui/state";
 
 import { setActiveTab } from "../../actions";
@@ -16,6 +17,7 @@ import {
   unhighlightNode,
 } from "../actions/markup";
 import {
+  getIsNodeExpanded,
   getNode,
   getRootNodeId,
   getScrollIntoViewNodeId,
@@ -34,9 +36,9 @@ type FinalNodeProps = NodeProps & PropsFromRedux;
 class _Node extends PureComponent<FinalNodeProps> {
   onExpanderToggle = (event: MouseEvent) => {
     event.stopPropagation();
-    const { node } = this.props;
+    const { node, isExpanded } = this.props;
 
-    this.props.toggleNodeExpanded(node.id, node.isExpanded);
+    this.props.toggleNodeExpanded(node.id, isExpanded);
   };
 
   onSelectNodeClick = (event: MouseEvent) => {
@@ -146,7 +148,7 @@ class _Node extends PureComponent<FinalNodeProps> {
   }
 
   render() {
-    const { node, rootNodeId, isSelectedNode, isScrollIntoViewNode } = this.props;
+    const { node, isExpanded, rootNodeId, isSelectedNode, isScrollIntoViewNode } = this.props;
 
     // Whether or not the node can be expanded - True if node has children and child is
     // not an inline text node.
@@ -159,7 +161,7 @@ class _Node extends PureComponent<FinalNodeProps> {
       <li
         data-testid="Inspector-Nodes-Node"
         className={classnames("child", {
-          collapsed: !node.isExpanded,
+          collapsed: !isExpanded,
           expandable: showExpander,
         })}
         role="presentation"
@@ -178,7 +180,7 @@ class _Node extends PureComponent<FinalNodeProps> {
           ></span>
           {showExpander ? (
             <span
-              className={"theme-twisty expander" + (node.isExpanded ? " open" : "")}
+              className={"theme-twisty expander" + (isExpanded ? " open" : "")}
               onClick={this.onExpanderToggle}
             ></span>
           ) : null}
@@ -196,6 +198,7 @@ const mapStateToProps = (state: UIState, { nodeId }: NodeProps) => ({
   rootNodeId: getRootNodeId(state),
   isSelectedNode: nodeId === getSelectedNodeId(state),
   isScrollIntoViewNode: nodeId === getScrollIntoViewNodeId(state),
+  isExpanded: getIsNodeExpanded(state, nodeId),
 });
 const connector = connect(mapStateToProps, {
   setActiveTab,

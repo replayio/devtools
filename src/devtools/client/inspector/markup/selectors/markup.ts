@@ -13,8 +13,8 @@ export const getScrollIntoViewNodeId = (state: UIState) => state.markup.scrollIn
 
 export const getNodeInfo = (state: UIState, nodeId: string) => state.markup.tree.entities[nodeId];
 
-export const isNodeExpanded = (state: UIState, nodeId: string) =>
-  getNodeInfo(state, nodeId)?.isExpanded;
+export const getIsNodeExpanded = (state: UIState, nodeId: string) =>
+  state.markup.expandedNodes[nodeId] ?? false;
 
 export const getParentNodeId = (state: UIState, nodeId: string) =>
   getNodeInfo(state, nodeId)?.parentNodeId;

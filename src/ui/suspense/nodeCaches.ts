@@ -185,7 +185,7 @@ export const processedNodeDataCache: Cache<
   config: { immutable: true },
   debugLabel: "ProcessedNodeData",
   getKey: ([replayClient, pauseId, nodeId]) => `${pauseId}:${nodeId}`,
-  load: async ([replayClient, pauseId, nodeId]) => {
+  load: async ([replayClient, pauseId, nodeId]): Promise<NodeInfo> => {
     const nodeObject = await objectCache.readAsync(replayClient, pauseId, nodeId, "canOverflow");
 
     const node = nodeObject?.preview?.node;
@@ -209,7 +209,6 @@ export const processedNodeDataCache: Cache<
       tagName: node.nodeType === Node.ELEMENT_NODE ? node.nodeName : undefined,
       type: node.nodeType,
       value: node.nodeValue,
-      isExpanded: false,
       isLoadingChildren: false,
     };
   },

@@ -21,7 +21,7 @@ export interface NodeInfo {
   isConnected: boolean;
   isElement: boolean;
   // Whether or not the node is expanded.
-  isExpanded: boolean;
+  // isExpanded: boolean;
   // The namespace URI of the node. NYI
   namespaceURI: string;
   // The object id of the parent node.
@@ -49,6 +49,8 @@ export type SelectionReason =
   | "keyboard"
   | "unknown";
 
+type ExpandedNodes = Record<string, boolean | undefined>;
+
 // export type MarkupTree = { [key: string]: NodeInfo | undefined };
 
 export interface MarkupState {
@@ -74,6 +76,7 @@ export interface MarkupState {
   tree: EntityState<NodeInfo>;
   // The document could not be loaded at the current execution point.
   loadingFailed: boolean;
+  expandedNodes: ExpandedNodes;
 }
 
 const nodeAdapter = createEntityAdapter<NodeInfo>();
@@ -96,6 +99,7 @@ const initialState: MarkupState = {
   selectedNode: null,
   selectionReason: null,
   scrollIntoViewNode: null,
+  expandedNodes: {},
   highlightedNodes: null,
   highlightedNodesLoading: false,
   loadingFailed: false,
@@ -127,7 +131,7 @@ const markupSlice = createSlice({
     },
     updateNodeExpanded(state, action: PayloadAction<{ nodeId: string; isExpanded: boolean }>) {
       const { nodeId, isExpanded } = action.payload;
-      nodeAdapter.updateOne(state.tree, { id: nodeId, changes: { isExpanded } });
+      state.expandedNodes[nodeId] = isExpanded;
     },
     updateChildrenLoading(
       state,

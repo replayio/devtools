@@ -30,10 +30,10 @@ import {
   updateScrollIntoViewNode,
 } from "../reducers/markup";
 import {
+  getIsNodeExpanded,
   getNodeInfo,
   getParentNodeId,
   getSelectedNodeId,
-  isNodeExpanded,
 } from "../selectors/markup";
 
 let rootNodeWaiter: Deferred<void> | undefined;
@@ -271,9 +271,10 @@ export function expandNode(
 ): UIThunkAction<Promise<void>> {
   return async (dispatch, getState, { ThreadFront, replayClient, protocolClient }) => {
     const node = getNodeInfo(getState(), nodeId);
+    const isExpanded = getIsNodeExpanded(getState(), nodeId);
     assert(node, "node not found in markup state");
 
-    if (node.isExpanded && !node.isLoadingChildren) {
+    if (isExpanded && !node.isLoadingChildren) {
       return;
     }
 
@@ -406,7 +407,8 @@ export function selectNode(nodeId: string, reason?: SelectionReason): UIThunkAct
 function getLastNodeId(state: UIState, nodeId: string) {
   while (true) {
     const nodeInfo = getNodeInfo(state, nodeId);
-    if (!nodeInfo?.isExpanded || nodeInfo.children.length === 0) {
+    const isExpanded = getIsNodeExpanded(state, nodeId);
+    if (isExpanded || !nodeInfo || nodeInfo.children.length === 0) {
       return nodeId;
     }
     nodeId = nodeInfo.children[nodeInfo.children.length - 1];
@@ -439,7 +441,7 @@ function getPreviousNodeId(state: UIState, nodeId: string) {
  * immediately after the specified node and return its ID.
  */
 function getNextNodeId(state: UIState, nodeId: string) {
-  if (isNodeExpanded(state, nodeId)) {
+  if (getIsNodeExpanded(state, nodeId)) {
     const nodeInfo = getNodeInfo(state, nodeId);
     if (nodeInfo && nodeInfo.children.length > 0) {
       return nodeInfo.children[0];
@@ -471,7 +473,7 @@ export function onLeftKey(): UIThunkAction {
       return;
     }
 
-    if (isNodeExpanded(state, selectedNodeId)) {
+    if (getIsNodeExpanded(state, selectedNodeId)) {
       dispatch(updateNodeExpanded({ nodeId: selectedNodeId, isExpanded: false }));
     } else {
       const parentNodeId = getParentNodeId(state, selectedNodeId);
@@ -494,8 +496,9 @@ export function onRightKey(): UIThunkAction {
     }
 
     const selectedNodeInfo = getNodeInfo(state, selectedNodeId);
+    const isExpanded = getIsNodeExpanded(state, selectedNodeId);
     assert(selectedNodeInfo, "selected node not found in markup state");
-    if (!selectedNodeInfo.isExpanded || selectedNodeInfo.isLoadingChildren) {
+    if (!isExpanded || selectedNodeInfo.isLoadingChildren) {
       dispatch(expandNode(selectedNodeId, true));
     } else {
       const firstChildId = selectedNodeInfo.children[0];
