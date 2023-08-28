@@ -1,9 +1,11 @@
 import { Attr } from "@replayio/protocol";
-import React, { MouseEvent, PureComponent } from "react";
+import React, { MouseEvent, useMemo } from "react";
 
+import { useAppDispatch } from "ui/setup/hooks";
+
+import { toggleNodeExpanded } from "../actions/markup";
 import { NodeInfo } from "../reducers/markup";
 import NodeAttribute from "./NodeAttribute";
-import TextNode from "./TextNode";
 
 // Contains only void (without end tag) HTML elements.
 const HTML_VOID_ELEMENTS = [
@@ -25,49 +27,38 @@ const HTML_VOID_ELEMENTS = [
   "wbr",
 ];
 
-interface ElementNodeProps {
-  node: NodeInfo;
-  onToggleNodeExpanded: (nodeId: string, isExpanded: boolean) => void;
-}
+function ElementNode({ node }: { node: NodeInfo }) {
+  const dispatch = useAppDispatch();
 
-class ElementNode extends PureComponent<ElementNodeProps> {
-  constructor(props: ElementNodeProps) {
-    super(props);
-
-    this.onExpandBadgeClick = this.onExpandBadgeClick.bind(this);
-  }
-
-  onExpandBadgeClick(event: MouseEvent) {
+  const onExpandBadgeClick = (event: MouseEvent) => {
     event.stopPropagation();
-    this.props.onToggleNodeExpanded(this.props.node.id, false);
-  }
+    dispatch(toggleNodeExpanded(node.id, false));
+  };
 
-  renderAttributes() {
-    const { node } = this.props;
-    const attributes = node.attributes.slice().sort(compareAttributeNames);
+  const { displayName } = node;
 
-    return (
+  const renderedAttributes = useMemo(() => {
+    const sortedAttributes = node.attributes.slice().sort(compareAttributeNames);
+
+    const renderedAttributes = (
       <span>
-        {attributes.map(attribute => (
+        {sortedAttributes.map(attribute => (
           <NodeAttribute
             key={`${node.id}-${attribute.name}`}
             attribute={attribute}
-            attributes={attributes}
+            attributes={node.attributes}
             node={node}
           />
         ))}
       </span>
     );
-  }
+    return renderedAttributes;
+  }, [node]);
 
-  renderCloseTag() {
-    const { displayName } = this.props.node;
+  let renderedCloseTag: React.ReactNode = null;
 
-    if (HTML_VOID_ELEMENTS.includes(displayName)) {
-      return null;
-    }
-
-    return (
+  if (!HTML_VOID_ELEMENTS.includes(displayName)) {
+    renderedCloseTag = (
       <span className="close">
         {"</"}
         <span className="tag theme-fg-color3">{displayName}</span>
@@ -76,30 +67,24 @@ class ElementNode extends PureComponent<ElementNodeProps> {
     );
   }
 
-  renderOpenTag() {
-    const { displayName } = this.props.node;
-
-    return (
-      <span className="open">
-        &lt;
-        <span className="tag theme-fg-color3" tabIndex={-1}>
-          {displayName}
-        </span>
-        {this.renderAttributes()}
-        <span className="closing-bracket">&gt;</span>
+  const renderedOpenTag = (
+    <span className="open">
+      &lt;
+      <span className="tag theme-fg-color3" tabIndex={-1}>
+        {displayName}
       </span>
-    );
-  }
+      {renderedAttributes}
+      <span className="closing-bracket">&gt;</span>
+    </span>
+  );
 
-  render() {
-    return (
-      <span className="editor">
-        {this.renderOpenTag()}
-        <span className="markup-expand-badge" onClick={this.onExpandBadgeClick}></span>
-        {this.renderCloseTag()}
-      </span>
-    );
-  }
+  return (
+    <span className="editor">
+      {renderedOpenTag}
+      <span className="markup-expand-badge" onClick={onExpandBadgeClick}></span>
+      {renderedCloseTag}
+    </span>
+  );
 }
 
 /**

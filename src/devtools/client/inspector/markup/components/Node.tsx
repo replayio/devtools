@@ -1,21 +1,12 @@
 import classnames from "classnames";
-import React, { MouseEvent, PureComponent, ReactElement } from "react";
-import { ConnectedProps, connect, shallowEqual } from "react-redux";
+import React, { ReactElement, useCallback } from "react";
+import { shallowEqual } from "react-redux";
 
 import NodeConstants from "devtools/shared/dom-node-constants";
 import { assert } from "protocol/utils";
-import { useAppSelector } from "ui/setup/hooks";
-import { UIState } from "ui/state";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
-import { setActiveTab } from "../../actions";
-import {
-  collapseNode,
-  expandNode,
-  highlightNode,
-  selectNode,
-  toggleNodeExpanded,
-  unhighlightNode,
-} from "../actions/markup";
+import { highlightNode, selectNode, toggleNodeExpanded, unhighlightNode } from "../actions/markup";
 import {
   getIsNodeExpanded,
   getNode,
@@ -31,38 +22,44 @@ interface NodeProps {
   nodeId: string;
 }
 
-type FinalNodeProps = NodeProps & PropsFromRedux;
+function Node({ nodeId }: NodeProps) {
+  const dispatch = useAppDispatch();
+  const { node, rootNodeId, isSelectedNode, isScrollIntoViewNode, isExpanded } = useAppSelector(
+    state => ({
+      node: getNode(state, nodeId)!,
+      rootNodeId: getRootNodeId(state),
+      isSelectedNode: nodeId === getSelectedNodeId(state),
+      isScrollIntoViewNode: nodeId === getScrollIntoViewNodeId(state),
+      isExpanded: getIsNodeExpanded(state, nodeId),
+    }),
+    shallowEqual
+  );
 
-class _Node extends PureComponent<FinalNodeProps> {
-  onExpanderToggle = (event: MouseEvent) => {
+  const onExpanderToggle = (event: React.MouseEvent) => {
     event.stopPropagation();
-    const { node, isExpanded } = this.props;
-
-    this.props.toggleNodeExpanded(node.id, isExpanded);
+    dispatch(toggleNodeExpanded(node.id, isExpanded));
   };
 
-  onSelectNodeClick = (event: MouseEvent) => {
+  const onSelectNodeClick = (event: React.MouseEvent) => {
     event.stopPropagation();
-
-    const { node, isSelectedNode } = this.props;
 
     // Don't reselect the same selected node.
     if (isSelectedNode) {
       return;
     }
 
-    this.props.onSelectNode(node.id);
+    dispatch(selectNode(node.id));
   };
 
-  onMouseEnter = () => {
-    this.props.highlightNode(this.props.node.id);
+  const onMouseEnter = () => {
+    dispatch(highlightNode(node.id));
   };
 
-  onMouseLeave = () => {
-    this.props.unhighlightNode();
+  const onMouseLeave = () => {
+    dispatch(unhighlightNode());
   };
 
-  scrollIntoView = (el: HTMLElement | null) => {
+  const scrollIntoView = useCallback((el: HTMLElement | null) => {
     if (!el) {
       return;
     }
@@ -75,46 +72,31 @@ class _Node extends PureComponent<FinalNodeProps> {
       // calling it with a little delay fixes it
       setTimeout(() => el.scrollIntoView({ behavior: "smooth", block: "center" }));
     }
-  };
+  }, []);
 
-  /**
-   * Renders the children of the current node.
-   */
-  renderChildren(): ReactElement | null {
-    const { node } = this.props;
-    const children = node.children || [];
+  let renderedChildren: ReactElement | null = null;
+  let renderedClosingTag: ReactElement | null = null;
+  let renderedComponent: ReactElement | null = null;
 
-    if (node.isLoadingChildren) {
-      return <span>Loading…</span>;
-    }
-
-    if (!children.length) {
-      return null;
-    }
-
-    return (
+  if (node.isLoadingChildren) {
+    renderedChildren = <span>Loading…</span>;
+  } else if (node.children?.length) {
+    renderedChildren = (
       <ul className="children" role={node.hasChildren ? "group" : ""}>
-        {children.map(nodeId => (
+        {node.children.map(nodeId => (
           <Node key={nodeId} nodeId={nodeId} />
         ))}
       </ul>
     );
   }
 
-  /**
-   * Renders the closing tag of the current node.
-   */
-  renderClosingTag() {
-    const { hasChildren, displayName } = this.props.node;
-    // Whether or not the node can be expander - True if node has children and child is
-    // not an inline text node.
-    const canExpand = hasChildren;
+  // Whether or not the node can be expanded.
+  // True if node has children and child is not an inline text node.
+  const { hasChildren, displayName } = node;
+  const canExpand = hasChildren;
 
-    if (!canExpand) {
-      return null;
-    }
-
-    return (
+  if (canExpand) {
+    renderedClosingTag = (
       <div className="tag-line" role="presentation">
         <div className="tag-state"></div>
         <span className="close">
@@ -126,90 +108,57 @@ class _Node extends PureComponent<FinalNodeProps> {
     );
   }
 
-  renderComponent() {
-    const { node } = this.props;
-
-    let component = null;
-    if (node.type === NodeConstants.ELEMENT_NODE) {
-      component = <ElementNode node={node} onToggleNodeExpanded={this.props.toggleNodeExpanded} />;
-    } else if (node.type === NodeConstants.COMMENT_NODE || node.type === NodeConstants.TEXT_NODE) {
-      component = <TextNode type={node.type} value={node.value} />;
-    } else {
-      component = (
-        <ReadOnlyNode
-          displayName={node.displayName}
-          isDocType={node.type === NodeConstants.DOCUMENT_TYPE_NODE}
-          pseudoType={!!node.pseudoType}
-        />
-      );
-    }
-
-    return component;
-  }
-
-  render() {
-    const { node, isExpanded, rootNodeId, isSelectedNode, isScrollIntoViewNode } = this.props;
-
-    // Whether or not the node can be expanded - True if node has children and child is
-    // not an inline text node.
-    const canExpand = node.hasChildren;
-    // Whether or not to the show the expanded - True if node can expand and the parent
-    // node is not the root node.
-    const showExpander = canExpand && node.parentNodeId !== rootNodeId;
-
-    return (
-      <li
-        data-testid="Inspector-Nodes-Node"
-        className={classnames("child", {
-          collapsed: !isExpanded,
-          expandable: showExpander,
-        })}
-        role="presentation"
-        onClick={this.onSelectNodeClick}
-      >
-        <div
-          className={"tag-line" + (isSelectedNode ? " selected" : "")}
-          role="treeitem"
-          onMouseEnter={this.onMouseEnter}
-          onMouseLeave={this.onMouseLeave}
-          ref={isScrollIntoViewNode ? this.scrollIntoView : null}
-        >
-          <span
-            className={"tag-state" + (isSelectedNode ? " theme-selected" : "")}
-            role="presentation"
-          ></span>
-          {showExpander ? (
-            <span
-              className={"theme-twisty expander" + (isExpanded ? " open" : "")}
-              onClick={this.onExpanderToggle}
-            ></span>
-          ) : null}
-          {this.renderComponent()}
-        </div>
-        {this.renderChildren()}
-        {this.renderClosingTag()}
-      </li>
+  if (node.type === NodeConstants.ELEMENT_NODE) {
+    renderedComponent = <ElementNode node={node} />;
+  } else if (node.type === NodeConstants.COMMENT_NODE || node.type === NodeConstants.TEXT_NODE) {
+    renderedComponent = <TextNode type={node.type} value={node.value} />;
+  } else {
+    renderedComponent = (
+      <ReadOnlyNode
+        displayName={node.displayName}
+        isDocType={node.type === NodeConstants.DOCUMENT_TYPE_NODE}
+        pseudoType={!!node.pseudoType}
+      />
     );
   }
+
+  // Whether or not to the show the expander.
+  // True if node can expand and the parent node is not the root node.
+  const showExpander = canExpand && node.parentNodeId !== rootNodeId;
+
+  return (
+    <li
+      data-testid="Inspector-Nodes-Node"
+      className={classnames("child", {
+        collapsed: !isExpanded,
+        expandable: showExpander,
+      })}
+      role="presentation"
+      onClick={onSelectNodeClick}
+    >
+      <div
+        className={"tag-line" + (isSelectedNode ? " selected" : "")}
+        role="treeitem"
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+        ref={isScrollIntoViewNode ? scrollIntoView : null}
+      >
+        <span
+          className={"tag-state" + (isSelectedNode ? " theme-selected" : "")}
+          role="presentation"
+        ></span>
+        {showExpander ? (
+          <span
+            className={"theme-twisty expander" + (isExpanded ? " open" : "")}
+            onClick={onExpanderToggle}
+          ></span>
+        ) : null}
+        {renderedComponent}
+      </div>
+      {renderedChildren}
+      {renderedClosingTag}
+    </li>
+  );
 }
 
-const mapStateToProps = (state: UIState, { nodeId }: NodeProps) => ({
-  node: getNode(state, nodeId)!,
-  rootNodeId: getRootNodeId(state),
-  isSelectedNode: nodeId === getSelectedNodeId(state),
-  isScrollIntoViewNode: nodeId === getScrollIntoViewNodeId(state),
-  isExpanded: getIsNodeExpanded(state, nodeId),
-});
-const connector = connect(mapStateToProps, {
-  setActiveTab,
-  onSelectNode: selectNode,
-  expandNode,
-  collapseNode,
-  highlightNode,
-  unhighlightNode,
-  toggleNodeExpanded,
-});
-type PropsFromRedux = ConnectedProps<typeof connector>;
-const Node = connector(_Node);
-
-export default Node;
+export default React.memo(Node);
