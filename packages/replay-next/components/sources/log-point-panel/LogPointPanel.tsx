@@ -222,12 +222,16 @@ function PointPanelWithHitPoints({
     toggleShouldLog();
   };
 
-  let showTooManyPointsMessage = false;
+  let showTooManyPointsErrorMessage = false;
+  let showUnknownErrorMessage = false;
   switch (hitPointStatus) {
     case "too-many-points-to-find":
     case "too-many-points-to-run-analysis":
+      showTooManyPointsErrorMessage = true;
+      break;
     case "unknown-error":
-      showTooManyPointsMessage = true;
+      showUnknownErrorMessage = true;
+      // What to do here?
       break;
   }
 
@@ -324,9 +328,7 @@ function PointPanelWithHitPoints({
               data-state-editable={editable}
               data-state-logging-enabled={shouldLog}
               data-test-name="PointPanel-ConditionalWrapper"
-              onClick={
-                showTooManyPointsMessage && editable ? undefined : () => startEditing("condition")
-              }
+              onClick={() => startEditing("condition")}
             >
               <div
                 className={styles.ConditionalIconWrapper}
@@ -386,7 +388,7 @@ function PointPanelWithHitPoints({
       }
 
       <div className={styles.EditableContentWrapperRow}>
-        {showTooManyPointsMessage ? (
+        {showTooManyPointsErrorMessage ? (
           <div className={styles.ContentWrapperTooManyPoints}>
             Use{""}
             <span className={styles.FocusModeLink} onClick={enterFocusMode}>
@@ -394,15 +396,15 @@ function PointPanelWithHitPoints({
             </span>{" "}
             to reduce the number of hits.
           </div>
+        ) : showUnknownErrorMessage ? (
+          <div className={styles.ContentWrapperTooManyPoints}>Failed to calculate hit points.</div>
         ) : (
           <div
             className={isContentValid ? styles.ContentWrapper : styles.ContentWrapperInvalid}
             data-state-editable={editable}
             data-state-logging-enabled={shouldLog}
             data-test-name="PointPanel-ContentWrapper"
-            onClick={
-              showTooManyPointsMessage && editable ? undefined : () => startEditing("content")
-            }
+            onClick={() => startEditing("content")}
           >
             <BadgePicker
               disabled={!editable}
