@@ -3,6 +3,8 @@ import { ReactNode, memo } from "react";
 import { getClassNames, isTokenInspectable } from "replay-next/components/sources/utils/tokens";
 import { ParsedToken } from "replay-next/src/utils/syntax-parser";
 
+import styles from "./SourceListRowFormattedText.module.css";
+
 // Primarily exists as a way for e2e tests to disable syntax highlighting
 // to simulate large files that aren't fully parsed.
 let disableSyntaxHighlighting = false;
@@ -29,7 +31,7 @@ export const SourceListRowFormattedText = memo(
     plainText: string | null;
   }) => {
     if (plainText === null || parsedTokens === null || disableSyntaxHighlighting) {
-      return plainText;
+      return <div className={styles.Text}>{plainText}</div>;
     }
 
     let renderedTextLength = 0;
@@ -59,7 +61,7 @@ export const SourceListRowFormattedText = memo(
       renderedTextLength += token.value.length;
     }
 
-    return renderedTokens as any;
+    return <div className={styles.Text}>{renderedTokens}</div>;
   }
 );
 

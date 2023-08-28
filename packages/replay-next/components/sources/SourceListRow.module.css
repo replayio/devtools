@@ -1,13 +1,4 @@
 .Row {
-  /**
-  * Each row should grow as much as needed to fit its code/content.
-  * The parent list will measure rows after render and adjust the min-width of the list.
-  * This prevents horizontal scrolling from jumping as new rows are rendered.
-  */
-  min-width: var(--longest-line-width);
-  width: unset !important;
-
-  white-space: pre;
   font-family: var(--font-family-monospace);
   font-size: var(--font-size-regular);
   display: flex;

@@ -136,7 +136,11 @@ export async function continueTo(
 
   switch (use) {
     case "context-menu": {
-      await showContextMenu(page, lineLocator);
+      // It's safer to hover over this locator to avoid accidentally triggering a preview popup
+      // (which might block a context-menu click)
+      const hitCountLocator = lineLocator.locator(`[data-test-name="SourceLine-HitCount"]`);
+
+      await showContextMenu(page, hitCountLocator);
       const menuItem = await findContextMenuItem(
         page,
         direction === "next" ? "Fast forward" : "Rewind"
