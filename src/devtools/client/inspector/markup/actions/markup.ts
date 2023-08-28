@@ -1,4 +1,4 @@
-import { ProtocolClient, Object as ProtocolObject } from "@replayio/protocol";
+import { Object as ProtocolObject } from "@replayio/protocol";
 
 import { paused } from "devtools/client/debugger/src/reducers/pause";
 import NodeConstants from "devtools/shared/dom-node-constants";
@@ -6,17 +6,15 @@ import { Deferred, assert, defer } from "protocol/utils";
 import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { sourcesCache } from "replay-next/src/suspense/SourcesCache";
-import { ReplayClientInterface } from "shared/client/types";
 import { ProtocolError, isCommandError } from "shared/utils/error";
 import type { UIStore, UIThunkAction } from "ui/actions";
 import { isInspectorSelected } from "ui/reducers/app";
 import { AppStartListening } from "ui/setup/listenerMiddleware";
 import { UIState } from "ui/state";
-import { boxModelCache, nodeDataCache, nodeEventListenersCache } from "ui/suspense/nodeCaches";
-import { boundingRectCache, computedStyleCache } from "ui/suspense/styleCaches";
+import { boxModelCache, nodeDataCache, processedNodeDataCache } from "ui/suspense/nodeCaches";
+import { boundingRectCache } from "ui/suspense/styleCaches";
 
 import {
-  NodeInfo,
   SelectionReason,
   childrenAdded,
   getSelectedDomNodeId,
@@ -187,7 +185,11 @@ export function newRoot(): UIThunkAction<Promise<void>> {
     if (!rootNodeData || ThreadFront.currentPauseIdUnsafe !== originalPauseId) {
       return;
     }
-    const rootNode = await convertNode(rootNodeData.objectId, replayClient, originalPauseId);
+    const rootNode = await processedNodeDataCache.readAsync(
+      replayClient,
+      originalPauseId,
+      rootNodeData.objectId
+    );
 
     if (ThreadFront.currentPauseIdUnsafe !== originalPauseId) {
       return;
@@ -223,10 +225,16 @@ export function addChildren(
     const originalPauseId = await ThreadFront.getCurrentPauseId(replayClient);
 
     // Always ensure we have a parent
-    const parent = await convertNode(parentNodeId, replayClient, originalPauseId!);
+    const parent = await processedNodeDataCache.readAsync(
+      replayClient,
+      originalPauseId!,
+      parentNodeId
+    );
 
     const children = await Promise.all(
-      childrenToAdd.map(node => convertNode(node.objectId, replayClient, originalPauseId!))
+      childrenToAdd.map(node =>
+        processedNodeDataCache.readAsync(replayClient, originalPauseId!, node.objectId)
+      )
     );
 
     if (ThreadFront.currentPauseIdUnsafe !== originalPauseId) {
@@ -344,6 +352,8 @@ export function selectionChanged(
       ? latestSelectedNodeId
       : selectedNode.preview?.node?.parentNode;
 
+    // This part _should_ run quickly, because we should have fetched
+    // parent nodes over in `selectNode()`
     while (ancestorId) {
       ancestors.unshift(ancestorId);
 
@@ -654,38 +664,3 @@ export const getNodeBoundingRect = (
     return boundingRectCache.readAsync(protocolClient, sessionId!, pauseId!, nodeId);
   };
 };
-
-export const HTML_NS = "http://www.w3.org/1999/xhtml";
-
-async function convertNode(
-  nodeId: string,
-  replayClient: ReplayClientInterface,
-  pauseId: string,
-  { isExpanded = false } = {}
-): Promise<NodeInfo> {
-  const nodeObject = await objectCache.readAsync(replayClient, pauseId, nodeId, "canOverflow");
-
-  const node = nodeObject?.preview?.node;
-  assert(node, "No preview for node: " + nodeId);
-
-  return {
-    attributes: node.attributes || [],
-    children: [],
-    displayName:
-      node.nodeType === NodeConstants.DOCUMENT_TYPE_NODE
-        ? `<!DOCTYPE ${node.nodeName}>`
-        : node.nodeName.toLowerCase(),
-    hasChildren: !!node.childNodes?.length,
-    id: nodeId,
-    isConnected: node.isConnected,
-    isElement: node.nodeType === NodeConstants.ELEMENT_NODE,
-    isExpanded,
-    namespaceURI: HTML_NS,
-    parentNodeId: node.parentNode,
-    pseudoType: node.pseudoType!,
-    tagName: node.nodeType === Node.ELEMENT_NODE ? node.nodeName : undefined,
-    type: node.nodeType,
-    value: node.nodeValue,
-    isLoadingChildren: false,
-  };
-}

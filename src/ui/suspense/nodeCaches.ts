@@ -9,6 +9,9 @@ import {
 } from "@replayio/protocol";
 import { Cache, createCache } from "suspense";
 
+import { NodeInfo } from "devtools/client/inspector/markup/reducers/markup";
+import NodeConstants from "devtools/shared/dom-node-constants";
+import { Deferred, assert, defer } from "protocol/utils";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { cachePauseData } from "replay-next/src/suspense/PauseCache";
 import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
@@ -39,6 +42,8 @@ type NodeFetchOptions =
       type: "childNodes";
       nodeId: string;
     };
+
+export const HTML_NS = "http://www.w3.org/1999/xhtml";
 
 function assertUnreachable(_x: never): never {
   throw new Error("Didn't expect to get here");
@@ -170,6 +175,43 @@ export const nodeDataCache: Cache<
     );
 
     return Promise.all(nodePromises);
+  },
+});
+
+export const processedNodeDataCache: Cache<
+  [replayClient: ReplayClientInterface, pauseId: PauseId, nodeId: string],
+  NodeInfo
+> = createCache({
+  config: { immutable: true },
+  debugLabel: "ProcessedNodeData",
+  getKey: ([replayClient, pauseId, nodeId]) => `${pauseId}:${nodeId}`,
+  load: async ([replayClient, pauseId, nodeId]) => {
+    const nodeObject = await objectCache.readAsync(replayClient, pauseId, nodeId, "canOverflow");
+
+    const node = nodeObject?.preview?.node;
+    assert(node, "No preview for node: " + nodeId);
+
+    return {
+      attributes: node.attributes || [],
+      children: [],
+      displayName:
+        node.nodeType === NodeConstants.DOCUMENT_TYPE_NODE
+          ? `<!DOCTYPE ${node.nodeName}>`
+          : node.nodeName.toLowerCase(),
+      hasChildren: !!node.childNodes?.length,
+      // hasEventListeners: !!eventListeners,
+      id: nodeId,
+      isConnected: node.isConnected,
+      isElement: node.nodeType === NodeConstants.ELEMENT_NODE,
+      namespaceURI: HTML_NS,
+      parentNodeId: node.parentNode,
+      pseudoType: node.pseudoType!,
+      tagName: node.nodeType === Node.ELEMENT_NODE ? node.nodeName : undefined,
+      type: node.nodeType,
+      value: node.nodeValue,
+      isExpanded: false,
+      isLoadingChildren: false,
+    };
   },
 });
 
