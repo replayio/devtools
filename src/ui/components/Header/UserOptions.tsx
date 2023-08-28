@@ -34,12 +34,7 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
     }
     window.open(docsUrl, "replaydocs");
   };
-  const onLaunchClick: React.MouseEventHandler = event => {
-    setExpanded(false);
-    trackEvent("user_options.launch_replay");
 
-    setModal("browser-launch");
-  };
   const onSettingsClick = () => {
     setExpanded(false);
     trackEvent("user_options.select_settings");
@@ -48,6 +43,7 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
 
   const onLayoutChange = (orientation: "ide" | "left" | "bottom") => {
     dispatch(setToolboxLayout(orientation));
+    trackEvent(`layout.settings.set_${orientation}`);
   };
 
   return (

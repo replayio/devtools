@@ -32,7 +32,6 @@ import WaitForReduxSlice from "../WaitForReduxSlice";
 import NewConsoleRoot from "./NewConsole";
 import SourcesTabLabel from "./SourcesTabLabel";
 import { ShowVideoButton } from "./ToolboxButton";
-import ToolboxOptions from "./ToolboxOptions";
 
 const InspectorApp = React.lazy(() => import("devtools/client/inspector/components/App"));
 
