@@ -75,7 +75,7 @@ export interface MarkupState {
   highlightedNodesLoading: boolean;
   nodeBoxModels: EntityState<BoxModel>;
   // An object representing the markup tree. The key to the object represents the object
-  // ID of a NodeFront of a given node. The value of each item in the object contains
+  // ID of a given node. The value of each item in the object contains
   // an object representing the properties of the given node.
   tree: EntityState<NodeInfo>;
   // The document could not be loaded at the current execution point.

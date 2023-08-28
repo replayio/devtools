@@ -148,7 +148,7 @@ export const rule = {
 
   // An object containing information about the CSS rule's inheritance.
   inheritance: PropTypes.shape({
-    // The object id of the NodeFront this rule was inherited from.
+    // The object id of the node this rule was inherited from.
     inheritedNodeId: PropTypes.string,
     // A header label for where the element this rule was inherited from.
     inheritedSource: PropTypes.string,
