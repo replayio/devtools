@@ -11,7 +11,7 @@ import {
   openCypressTestPanel,
 } from "../helpers/testsuites";
 import { waitForTimelineAdvanced } from "../helpers/timeline";
-import { getByTestName, waitFor } from "../helpers/utils";
+import { getByTestName, waitFor, waitForRecordingToFinishIndexing } from "../helpers/utils";
 import test, { expect } from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "flake/adding-spec.ts" });
@@ -21,6 +21,8 @@ test("cypress-03: Test Step interactions", async ({
   exampleKey,
 }) => {
   await startTest(page, exampleKey, recordingId);
+  await waitForRecordingToFinishIndexing(page);
+
   await openViewerTab(page);
 
   await openCypressTestPanel(page);
@@ -47,8 +49,8 @@ test("cypress-03: Test Step interactions", async ({
   });
 
   const steps = getTestCaseSteps(selectedRow);
-
   const numSteps = await steps.count();
+  expect(numSteps).toBe(17);
 
   // We should be in Viewer Mode to start with
   expect(await isViewerTabActive(page)).toBe(true);
@@ -56,8 +58,6 @@ test("cypress-03: Test Step interactions", async ({
   const clickableSteps = steps.filter({
     hasText: /get|eq|visit|type|click|find/,
   });
-
-  const numClickableSteps = await clickableSteps.count();
 
   let prevPercent = 0;
   await clickableSteps.nth(0).click();
@@ -86,6 +86,15 @@ test("cypress-03: Test Step interactions", async ({
   // Buttons get hidden for network request steps
   await waitFor(async () => {
     expect(await beforeAfterButtons.isVisible()).toBe(false);
+  });
+  // Network requests have no details
+  await waitFor(async () => {
+    const detailsPane = getUserActionEventDetails(page);
+    expect(await detailsPane.isVisible()).toBe(false);
+
+    const message = getByTestName(page, "TestEventDetailsMessage");
+    const messageContents = await message.textContent();
+    expect(messageContents).toMatch("Select an action above to view its details");
   });
 
   const SPEC_FILE_NAME = "adding-spec.ts";
@@ -120,32 +129,34 @@ test("cypress-03: Test Step interactions", async ({
 
   // Clicking each step should change the details pane
   await firstGet.click();
-  const detailsPane = getUserActionEventDetails(page);
-
-  const firstGetDetails = await getDetailsPaneContents(detailsPane);
-  expect(firstGetDetails).toBeTruthy();
-  expect(firstGetDetails["Command"]).toBe(`"get"`);
-  expect(firstGetDetails["Selector"]).toBe(`".new-todo"`);
-
-  await steps.nth(3).click();
-  const firstTypeDetails = await getDetailsPaneContents(detailsPane);
-  expect(firstTypeDetails).toBeTruthy();
-  expect(firstTypeDetails["Command"]).toBe(`"type"`);
-  expect(firstTypeDetails["Typed"]).toMatch("buy some cheese");
-
-  await steps.nth(4).click();
-  // Network request entry, no details
   await waitFor(async () => {
-    expect(await detailsPane.isVisible()).toBe(false);
-    const message = getByTestName(page, "TestEventDetailsMessage");
-    const messageContents = await message.textContent();
-    expect(messageContents).toMatch("Select an action above to view its details");
+    const detailsPane = getUserActionEventDetails(page);
+    const detailsPaneContents = await getDetailsPaneContents(detailsPane);
+    expect(detailsPaneContents["Command"]).toBe(`"get"`);
+    expect(detailsPaneContents["Selector"]).toBe(`".new-todo"`);
   });
 
-  // Next chained entry should have details
+  await steps.nth(3).click();
+  await waitFor(async () => {
+    const detailsPane = getUserActionEventDetails(page);
+    const detailsPaneContents = await getDetailsPaneContents(detailsPane);
+    expect(detailsPaneContents["Command"]).toBe(`"type"`);
+    expect(detailsPaneContents["Typed"]).toMatch("buy some cheese");
+  });
+
+  await steps.nth(4).click();
+  await waitFor(async () => {
+    const detailsPane = getUserActionEventDetails(page);
+    const detailsPaneContents = await getDetailsPaneContents(detailsPane);
+    expect(detailsPaneContents["Command"]).toBe(`"type"`);
+    expect(detailsPaneContents["Typed"]).toMatch("{enter}");
+  });
+
   await steps.nth(5).click();
-  const secondTypeDetails = await getDetailsPaneContents(detailsPane);
-  expect(secondTypeDetails).toBeTruthy();
-  expect(secondTypeDetails["Command"]).toBe(`"type"`);
-  expect(secondTypeDetails["Typed"]).toMatch("{enter}");
+  await waitFor(async () => {
+    const detailsPane = getUserActionEventDetails(page);
+    const detailsPaneContents = await getDetailsPaneContents(detailsPane);
+    expect(detailsPaneContents["Command"]).toBe(`"get"`);
+    expect(detailsPaneContents["Selector"]).toBe(`".todo-list li"`);
+  });
 });

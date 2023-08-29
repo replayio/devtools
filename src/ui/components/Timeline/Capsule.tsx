@@ -34,7 +34,7 @@ export default function Capsule({
   const showFocusModeControls = useAppSelector(getShowFocusModeControls);
 
   return (
-    <div className={styles.Capsule}>
+    <div className={styles.Capsule} data-test-id="Timeline-Capsule" data-test-progress={progress}>
       <div
         className={
           showFocusModeControls || progress === 100 ? styles.LeftSideLoaded : styles.LeftSideLoading
