@@ -169,10 +169,6 @@ function RecordingPage({
 
       setRecording(rec);
 
-      if (rec.isTest) {
-        trackEvent("session_start.test");
-      }
-
       if (Array.isArray(query.id) && query.id[query.id.length - 1] === "share") {
         dispatch(setModal("sharing", { recordingId }));
       }
