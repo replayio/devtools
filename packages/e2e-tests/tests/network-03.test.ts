@@ -1,5 +1,4 @@
 import { openDevToolsTab, startTest } from "../helpers";
-import { quickOpen } from "../helpers/commands";
 import {
   openNetworkPanel,
   seekToRequestRow,
@@ -7,7 +6,6 @@ import {
   verifyRequestRowTimelineState,
 } from "../helpers/network-panel";
 import { fastForwardToLine, waitForSourceContentsToFinishStreaming } from "../helpers/source-panel";
-import { waitForRecordingToFinishIndexing } from "../helpers/utils";
 import test from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "flake/adding-spec.ts" });
@@ -19,9 +17,6 @@ test(`network-03: should sync and display the current time in relation to the ne
   await startTest(page, exampleKey, recordingId);
   await openDevToolsTab(page);
   await openNetworkPanel(page);
-
-  // Fetching Source contents can be slow for recordings that aren't fully indexed
-  await waitForRecordingToFinishIndexing(page);
 
   await selectRequestRow(page, {
     name: "cypress_runner.js",

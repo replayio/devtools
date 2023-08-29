@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 import { RecordingTarget } from "replay-next/src/suspense/BuildIdCache";
 
 import exampleRecordings from "../examples.json";
-import { debugPrint, getElementClasses } from "./utils";
+import { debugPrint, getElementClasses, waitForRecordingToFinishIndexing } from "./utils";
 
 dotenv.config({ path: "../../.env" });
 
@@ -93,20 +93,8 @@ export async function startTest(
 
   await page.goto(url);
 
-  // When Replay is under heavy load, the backend may need to scale up AWS resources.
-  // This should not cause e2e tests to fail, even though it takes longer than the default 15s timeout.
-  // Relaxing only the initial check allows more time for the backend to scale up
-  // without compromising the integrity of the tests overall.
-  await page.locator('[data-panel-id="Panel-SidePanel"]').waitFor({
-    timeout: 60_000,
-  });
-
-  // Wait for the recording basic information to load such that the primary tabs are visible.
-  if (exampleKey.startsWith("node")) {
-    await page.locator('[data-panel-id="Panel-SecondaryToolbox"]').waitFor();
-  } else {
-    // Node recordings don't have the "Viewer/DevTools" toggle
-    await page.locator('[data-test-id="ViewToggle-Viewer"]').waitFor();
-    await page.locator('[data-test-id="ViewToggle-DevTools"]').waitFor();
-  }
+  // Wait until the backend has finished loading and indexing a recording
+  // This reduces the likelihood of unexpectedly slow API calls,
+  // which might otherwise cause the test to fail in misleading ways
+  await waitForRecordingToFinishIndexing(page);
 }

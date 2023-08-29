@@ -7,7 +7,6 @@ import {
   verifyNetworkDetailsPanelContains,
   verifyNetworkDetailsTabsVisible,
 } from "../helpers/network-panel";
-import { waitForRecordingToFinishIndexing } from "../helpers/utils";
 import test from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "flake/adding-spec.ts" });
@@ -19,9 +18,6 @@ test(`network-02: should show details for the selected request`, async ({
   await startTest(page, exampleKey, recordingId);
   await openDevToolsTab(page);
   await openNetworkPanel(page);
-
-  // Fetching Network requests/details can be slow for recordings that aren't fully indexed
-  await waitForRecordingToFinishIndexing(page);
 
   // Select a font element and verify the correct detail headers are shown
   await filterByText(page, "fa-regular-400");

@@ -11,7 +11,7 @@ import {
   openCypressTestPanel,
 } from "../helpers/testsuites";
 import { waitForTimelineAdvanced } from "../helpers/timeline";
-import { getByTestName, waitFor, waitForRecordingToFinishIndexing } from "../helpers/utils";
+import { getByTestName, waitFor } from "../helpers/utils";
 import test, { expect } from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "flake/adding-spec.ts" });
@@ -21,8 +21,6 @@ test("cypress-03: Test Step interactions", async ({
   exampleKey,
 }) => {
   await startTest(page, exampleKey, recordingId);
-  await waitForRecordingToFinishIndexing(page);
-
   await openViewerTab(page);
 
   await openCypressTestPanel(page);
