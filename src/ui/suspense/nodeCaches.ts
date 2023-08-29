@@ -6,6 +6,7 @@ import {
   PauseId,
   ProtocolClient,
   Object as ProtocolObject,
+  Quads,
 } from "@replayio/protocol";
 import { Cache, createCache } from "suspense";
 
@@ -224,6 +225,23 @@ export const boundingRectsCache: Cache<
   },
 });
 
+const TAGS_WITHOUT_BOX_MODELS = ["head", "link", "title", "meta", "script", "noscript", "style"];
+
+const EMPTY_QUADS: Quads = [0, 0, 0, 0, 0, 0, 0, 0];
+const NO_BOX_MODEL: BoxModel = {
+  node: "",
+  border: EMPTY_QUADS,
+  content: EMPTY_QUADS,
+  margin: EMPTY_QUADS,
+  padding: EMPTY_QUADS,
+};
+
+export function canHighlightNode(node: NodeInfo) {
+  const canHighlight =
+    node.type === NodeConstants.ELEMENT_NODE && !TAGS_WITHOUT_BOX_MODELS.includes(node.displayName);
+  return canHighlight;
+}
+
 export const boxModelCache: Cache<
   [replayClient: ReplayClientInterface, pauseId: PauseId, nodeId: string],
   BoxModel
@@ -232,6 +250,16 @@ export const boxModelCache: Cache<
   debugLabel: "BoxModel",
   getKey: ([replayClient, pauseId, nodeId]) => `${pauseId}:${nodeId}`,
   load: async ([replayClient, pauseId, nodeId]) => {
+    const nodeObject = processedNodeDataCache.getValueIfCached(replayClient, pauseId, nodeId);
+
+    if (nodeObject && !canHighlightNode(nodeObject)) {
+      // Return a fake entry with no size
+      return {
+        ...NO_BOX_MODEL,
+        node: nodeId,
+      };
+    }
+
     const { model: nodeBoxModel } = await replayClient.getBoxModel(pauseId, nodeId);
     return nodeBoxModel;
   },

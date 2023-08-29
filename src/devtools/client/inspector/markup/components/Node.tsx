@@ -9,9 +9,9 @@ import { assert } from "protocol/utils";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { processedNodeDataCache } from "ui/suspense/nodeCaches";
+import { canHighlightNode } from "ui/suspense/nodeCaches";
 
 import { highlightNode, selectNode, toggleNodeExpanded, unhighlightNode } from "../actions/markup";
-import { NodeInfo } from "../reducers/markup";
 import {
   getIsNodeExpanded,
   getRootNodeId,
@@ -27,14 +27,6 @@ interface NodeProps {
 }
 
 const reIsEmptyValue = /[^\s]/;
-
-const TAGS_WITHOUT_BOX_MODELS = ["head", "link", "title", "meta", "script", "noscript", "style"];
-
-function canHighlightNode(node: NodeInfo) {
-  const canHighlight =
-    node.type === NodeConstants.ELEMENT_NODE && !TAGS_WITHOUT_BOX_MODELS.includes(node.displayName);
-  return canHighlight;
-}
 
 function Node({ nodeId }: NodeProps) {
   const dispatch = useAppDispatch();
