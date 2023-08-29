@@ -822,3 +822,73 @@ export async function waitForSelectedSource(page: Page, url: string) {
     expect(combinedLineText).not.toBe("");
   });
 }
+
+export async function rewindToLine(
+  page: Page,
+  options: {
+    lineNumber: number;
+  }
+): Promise<void> {
+  const { lineNumber } = options;
+
+  await scrollUntilLineIsVisible(page, lineNumber);
+  await waitForSourceLineHitCounts(page, lineNumber);
+
+  await debugPrint(page, `Rewinding to line ${chalk.bold(lineNumber)}`, "rewindToLine");
+
+  const lineLocator = await getSourceLine(page, lineNumber);
+  const buttonLocator = lineLocator.locator('[data-test-name="ContinueToButton"]');
+
+  await lineLocator.locator('[data-test-name="SourceLine-HitCount"]').hover({ force: true });
+  await page.keyboard.down(getCommandKey());
+
+  const state = await buttonLocator.getAttribute("data-test-state");
+  expect(state).toBe("previous");
+
+  await buttonLocator.click({ force: true });
+}
+
+export async function fastForwardToLine(
+  page: Page,
+  options: {
+    lineNumber: number;
+  }
+): Promise<void> {
+  const { lineNumber } = options;
+
+  await scrollUntilLineIsVisible(page, lineNumber);
+  await waitForSourceLineHitCounts(page, lineNumber);
+
+  await debugPrint(page, `Fast forwarding to line ${chalk.bold(lineNumber)}`, "fastForwardToLine");
+
+  const lineLocator = await getSourceLine(page, lineNumber);
+  const buttonLocator = lineLocator.locator('[data-test-name="ContinueToButton"]');
+
+  await lineLocator.locator('[data-test-name="SourceLine-HitCount"]').hover({ force: true });
+  await page.keyboard.down(getCommandKey());
+
+  const state = await buttonLocator.getAttribute("data-test-state");
+  expect(state).toBe("next");
+
+  await buttonLocator.click({ force: true });
+}
+
+export async function waitForSourceContentsToFinishStreaming(
+  page: Page,
+  options: {
+    sourceId: string;
+  }
+): Promise<void> {
+  const { sourceId } = options;
+
+  await debugPrint(page, `Waiting on streaming content for source "${sourceId}"`, "quickOpen");
+  await page.waitForSelector(`[data-test-id="Source-${sourceId}"]`);
+  await waitFor(
+    async () => {
+      const sourceLocator = page.locator(`[data-test-id="Source-${sourceId}"]`);
+      const status = await sourceLocator.getAttribute("data-test-source-contents-status");
+      expect(status).toBe("resolved");
+    },
+    { retryInterval: 1_000, timeout: 15_000 }
+  );
+}

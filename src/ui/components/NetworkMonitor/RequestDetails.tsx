@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import sortBy from "lodash/sortBy";
-import React, { ReactNode, useEffect, useMemo, useState } from "react";
+import React, { ReactNode, useDeferredValue, useEffect, useMemo, useState } from "react";
 
 import CloseButton from "devtools/client/debugger/src/components/shared/Button/CloseButton";
 import PanelTabs from "devtools/client/shared/components/PanelTabs";
@@ -274,6 +274,7 @@ const RequestDetails = ({
 }) => {
   const dispatch = useAppDispatch();
   const [activeTab, setActiveTab] = useState<NetworkTab>(DEFAULT_TAB);
+  const activeTabDeferred = useDeferredValue(activeTab);
 
   const request = useMemo(
     () => requests.find(request => request.id === selectedRequestId)!,
@@ -303,7 +304,7 @@ const RequestDetails = ({
   const closePanel = () => dispatch(hideRequestDetails());
 
   useEffect(() => {
-    if (!activeTabs.find(t => t.id === activeTab)) {
+    if (!activeTabs.find(tab => tab.id === activeTab)) {
       setActiveTab(DEFAULT_TAB);
     }
   }, [activeTab, activeTabs]);
@@ -313,22 +314,33 @@ const RequestDetails = ({
   }
 
   return (
-    <div className="no-scrollbar h-full w-full overflow-y-scroll bg-bodyBgcolor">
+    <div
+      className="no-scrollbar h-full w-full overflow-y-scroll bg-bodyBgcolor"
+      data-test-id="Network-DetailsPanel"
+    >
       <RequestDetailsTabs>
-        <PanelTabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
+        <PanelTabs
+          activeTab={activeTab}
+          dataTestName="Network-DetailsPanel-Tab"
+          setActiveTab={setActiveTab}
+          tabs={tabs}
+        />
         <CloseButton buttonClass="mr-2" handleClick={closePanel} tooltip={"Close tab"} />
       </RequestDetailsTabs>
-      <div className={classNames("requestDetails relative", styles.requestDetails)}>
+      <div
+        className={classNames("requestDetails relative", styles.requestDetails)}
+        data-test-id="Network-Details"
+      >
         <div>
           <div className="absolute top-1 right-1">
             <AddNetworkRequestCommentButton request={request} />
           </div>
-          {activeTab === "headers" && <HeadersPanel request={request} />}
-          {activeTab === "cookies" && <Cookies request={request} />}
-          {activeTab === "response" && <ResponseBody request={request} />}
-          {activeTab === "request" && <RequestBody request={request} />}
-          {activeTab === "stackTrace" && <StackTrace request={request} />}
-          {activeTab === "timings" && <Timing request={request} />}
+          {activeTabDeferred === "headers" && <HeadersPanel request={request} />}
+          {activeTabDeferred === "cookies" && <Cookies request={request} />}
+          {activeTabDeferred === "response" && <ResponseBody request={request} />}
+          {activeTabDeferred === "request" && <RequestBody request={request} />}
+          {activeTabDeferred === "stackTrace" && <StackTrace request={request} />}
+          {activeTabDeferred === "timings" && <Timing request={request} />}
         </div>
       </div>
     </div>

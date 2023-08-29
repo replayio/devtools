@@ -27,6 +27,8 @@ export function TextFilterRow({
               "text-primaryAccent hover:text-primaryAccentHover focus:text-primaryAccentHover":
                 types.size > 0,
             })}
+            data-test-id="Network-ToggleFilterByTypePanelButton"
+            data-test-state={showTypeFilters ? "open" : "closed"}
           >
             <MaterialIcon iconSize="lg" outlined={true}>
               filter_alt
@@ -37,9 +39,10 @@ export function TextFilterRow({
           <MaterialIcon iconSize="lg">search</MaterialIcon>
 
           <input
-            placeholder="Filter requests"
-            onChange={event => setFilterByText(event.target.value)}
             className="w-full bg-transparent px-1 text-themeTextFieldColor focus:outline-none"
+            data-test-id="Network-TextFilterInput"
+            onChange={event => setFilterByText(event.target.value)}
+            placeholder="Filter requests"
             value={filterByText}
           />
         </div>

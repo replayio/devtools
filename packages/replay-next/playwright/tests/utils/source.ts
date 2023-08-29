@@ -1102,7 +1102,7 @@ export async function waitForSourceContentsToStream(page: Page, sourceId: string
   await expect(sourceLocator).toBeVisible();
 
   await waitFor(async () => {
-    const status = await sourceLocator.getAttribute("data-test-source-status");
+    const status = await sourceLocator.getAttribute("data-test-source-contents-status");
     if (status !== "resolved") {
       throw Error(`Waiting for source to be "resolved" but is "${status}"`);
     }

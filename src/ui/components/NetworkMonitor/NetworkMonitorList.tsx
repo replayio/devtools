@@ -77,7 +77,7 @@ export function NetworkMonitorList({
 
                 // Move focus to the newly selected item
                 const listItem = listWrapper.querySelector(
-                  `[data-test-id="NetworkMonitor-RequestRow-${request.id}"]`
+                  `[data-test-id="Network-RequestRow-${request.id}"]`
                 );
                 if (listItem) {
                   (listItem as HTMLDivElement).focus();
@@ -111,7 +111,12 @@ export function NetworkMonitorList({
   return (
     <div className={styles.Container}>
       <NetworkMonitorListHeader />
-      <div className={styles.ListWrapper} ref={listWrapperRef}>
+      <div
+        className={styles.ListWrapper}
+        ref={listWrapperRef}
+        data-test-id="Network-List"
+        data-visible-items-count={itemCount}
+      >
         <AutoSizer disableWidth>
           {({ height }: { height: number }) => (
             <List
