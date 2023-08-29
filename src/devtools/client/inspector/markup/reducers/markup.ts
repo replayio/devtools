@@ -67,9 +67,6 @@ export interface MarkupState {
   // A node that should be scrolled into view.
   scrollIntoViewNode: string | null;
   highlightedNodes: string[] | null;
-  // True when the user has taken an action to highlight nodes in the video and
-  // the client is fetching the data required
-  highlightedNodesLoading: boolean;
   nodeBoxModels: EntityState<BoxModel>;
   // The document could not be loaded at the current execution point.
   loadingFailed: boolean;
@@ -94,7 +91,6 @@ const initialState: MarkupState = {
   scrollIntoViewNode: null,
   expandedNodes: {},
   highlightedNodes: null,
-  highlightedNodesLoading: false,
   loadingFailed: false,
   nodeBoxModels: boxModelAdapter.getInitialState(),
 };
@@ -142,9 +138,7 @@ const markupSlice = createSlice({
     nodeBoxModelsLoaded(state, action: PayloadAction<BoxModel[]>) {
       boxModelAdapter.setAll(state.nodeBoxModels, action);
     },
-    setHighlightedNodesLoading(state, action: PayloadAction<boolean>) {
-      state.highlightedNodesLoading = action.payload;
-    },
+
     nodeHighlightingCleared(state) {
       state.highlightedNodes = null;
     },
@@ -187,7 +181,6 @@ export const {
   nodesHighlighted,
   nodeBoxModelsLoaded,
   nodeHighlightingCleared,
-  setHighlightedNodesLoading,
   updateLoadingFailed,
 } = markupSlice.actions;
 
