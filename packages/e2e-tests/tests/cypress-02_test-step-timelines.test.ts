@@ -7,7 +7,7 @@ import {
   openCypressTestPanel,
 } from "../helpers/testsuites";
 import { getTimelineCurrentHoverPercent, getTimelineCurrentPercent } from "../helpers/timeline";
-import { waitFor, waitForRecordingToFinishIndexing } from "../helpers/utils";
+import { waitFor } from "../helpers/utils";
 import test, { expect } from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "flake/adding-spec.ts" });
@@ -17,8 +17,6 @@ test("cypress-02: Test Step timeline behavior", async ({
   exampleKey,
 }) => {
   await startTest(page, exampleKey, recordingId);
-  await waitForRecordingToFinishIndexing(page);
-
   await openViewerTab(page);
 
   await openCypressTestPanel(page);
