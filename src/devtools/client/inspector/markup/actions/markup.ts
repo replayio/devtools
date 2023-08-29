@@ -544,7 +544,10 @@ export function highlightNode(nodeId: string, duration?: number): UIThunkAction 
 
 export function unhighlightNode(): UIThunkAction {
   return async (dispatch, getState) => {
-    dispatch(nodeHighlightingCleared());
+    const { highlightedNodes } = getState().markup;
+    if (highlightedNodes && highlightedNodes.length > 0) {
+      dispatch(nodeHighlightingCleared());
+    }
   };
 }
 
