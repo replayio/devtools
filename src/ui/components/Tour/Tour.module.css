@@ -15,7 +15,7 @@
 }
 
 .TourBox {
-  color: #fff;
+  color: var(--tour-body-color);
   padding: 0.5rem;
   height: 100vh;
 }
@@ -23,12 +23,12 @@
 .stepCallout {
   display: flex;
   align-items: top;
-  color: #ff0;
+  color: var(--tour-callout-body-color);
 }
 
 .stepCallout .Icon {
   width: 16px;
-  color: #ff0;
+  color: var(--tour-callout-body-color);
 }
 
 .stepCalloutText {
@@ -36,7 +36,7 @@
 }
 
 .h1 {
-  color: #fff;
+  color: var(--tour-body-color);
   margin-bottom: 20px;
   font-size: 18px;
   font-weight: 500;
@@ -47,7 +47,7 @@
 }
 
 .intro {
-  color: #fff;
+  color: var(--tour-body-color);
   font-size: 14px;
   font-weight: 300;
   margin-bottom: 1rem;
