@@ -32,7 +32,6 @@ import WaitForReduxSlice from "../WaitForReduxSlice";
 import NewConsoleRoot from "./NewConsole";
 import SourcesTabLabel from "./SourcesTabLabel";
 import { ShowVideoButton } from "./ToolboxButton";
-import ToolboxOptions from "./ToolboxOptions";
 
 const InspectorApp = React.lazy(() => import("devtools/client/inspector/components/App"));
 
@@ -203,7 +202,6 @@ function SecondaryToolbox({
             videoPanelCollapsed={videoPanelCollapsed}
             videoPanelRef={videoPanelRef}
           />
-          <ToolboxOptions />
         </div>
       </header>
       <Redacted className="secondary-toolbox-content bg-chrome text-xs">

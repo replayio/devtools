@@ -61,10 +61,6 @@
   align-items: center;
 }
 
-.user-options .row > :not(:first-child) {
-  margin-left: 8px;
-}
-
 .user-options a.logout {
   width: 100%;
   text-decoration: none;
