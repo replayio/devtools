@@ -212,13 +212,13 @@ export const nodeEventListenersCache: Cache<
 });
 
 export const boundingRectsCache: Cache<
-  [replayClient: ReplayClientInterface, sessionId: string, pauseId: PauseId],
+  [replayClient: ReplayClientInterface, pauseId: PauseId],
   NodeBounds[]
 > = createCache({
   config: { immutable: true },
   debugLabel: "BoundingRects",
-  getKey: ([replayClient, sessionId, pauseId]) => pauseId,
-  load: async ([replayClient, sessionId, pauseId]) => {
+  getKey: ([replayClient, pauseId]) => pauseId,
+  load: async ([replayClient, pauseId]) => {
     const { elements } = await replayClient.getAllBoundingClientRects(pauseId);
     return elements;
   },
