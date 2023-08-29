@@ -1,3 +1,4 @@
+import { TaskAbortError } from "@reduxjs/toolkit";
 import { Object as ProtocolObject } from "@replayio/protocol";
 
 import { paused } from "devtools/client/debugger/src/reducers/pause";
@@ -5,7 +6,6 @@ import NodeConstants from "devtools/shared/dom-node-constants";
 import { Deferred, assert, defer } from "protocol/utils";
 import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
-import { sourcesCache } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientInterface } from "shared/client/types";
 import { ProtocolError, isCommandError } from "shared/utils/error";
 import type { UIStore, UIThunkAction } from "ui/actions";
@@ -67,30 +67,41 @@ export function setupMarkup(store: UIStore, startAppListening: AppStartListening
     actionCreator: paused,
     effect: async (action, listenerApi) => {
       const { condition, dispatch, getState, cancelActiveListeners, extra } = listenerApi;
-      const { ThreadFront, replayClient, protocolClient } = extra;
+      const { ThreadFront, replayClient } = extra;
 
       cancelActiveListeners();
 
+      // Our `state.markup` section has already been cleared out
+      // by the time we get here, from the `pauseRequestedAt` action.
+
       const originalPauseId = await ThreadFront.getCurrentPauseId(replayClient);
 
-      // every time we pause, clear the existing DOM node info
-      dispatch(reset());
+      async function throwIfCanceled() {
+        // Cancel-aware - see if this is still the current pause
+        // We'll have this added to RTK at some point
+        await listenerApi.delay(0);
+      }
 
       async function loadNewDocument() {
-        await sourcesCache.readAsync(replayClient);
+        // Get the document node object preview so we know its object ID
+        const [rootNodePreview] = await nodeDataCache.readAsync(replayClient, originalPauseId, {
+          type: "document",
+        });
+        // Also pre-fetch the formatted root node data
+        const rootNode = (await processedNodeDataCache.readAsync(
+          replayClient,
+          originalPauseId,
+          rootNodePreview.objectId
+        ))!;
 
-        // Clear selection if pauses have differed
-        const selectedNodeId = getSelectedDomNodeId(getState());
+        console.log("Root node data fetched: ", rootNodePreview, rootNode);
 
-        if (selectedNodeId && ThreadFront.currentPauseIdUnsafe !== originalPauseId) {
-          dispatch(nodeSelected(null));
-          return;
-        }
+        await throwIfCanceled();
 
-        // Clear out and reset all the node tree data
-        await dispatch(newRoot());
-        if (ThreadFront.currentPauseIdUnsafe !== originalPauseId) {
-          return;
+        dispatch(newRootAdded(rootNode.id));
+        if (rootNodeWaiter) {
+          rootNodeWaiter.resolve();
+          rootNodeWaiter = undefined;
         }
 
         const latestSelectedNodeId = getSelectedDomNodeId(getState());
@@ -98,26 +109,19 @@ export function setupMarkup(store: UIStore, startAppListening: AppStartListening
         if (latestSelectedNodeId) {
           dispatch(selectionChanged(false));
         } else {
-          const [rootNode] = await nodeDataCache.readAsync(replayClient, originalPauseId!, {
-            type: "document",
-          });
-
-          if (!rootNode || ThreadFront.currentPauseIdUnsafe !== originalPauseId) {
-            return;
-          }
-
-          const selectedNodeId = getSelectedDomNodeId(getState());
+          // We don't know _which_ node should be selected by default.
+          // Load the body and select it.
           const [defaultNode] = await nodeDataCache.readAsync(replayClient, originalPauseId!, {
             type: "querySelector",
-            nodeId: rootNode.objectId,
+            nodeId: rootNode.id,
             selector: "body",
           });
 
-          if (
-            defaultNode &&
-            !selectedNodeId &&
-            ThreadFront.currentPauseIdUnsafe === originalPauseId
-          ) {
+          await throwIfCanceled();
+
+          const selectedNodeId = getSelectedDomNodeId(getState());
+
+          if (defaultNode && !selectedNodeId) {
             dispatch(nodeSelected(defaultNode.objectId, "navigateaway"));
           }
         }
@@ -130,14 +134,19 @@ export function setupMarkup(store: UIStore, startAppListening: AppStartListening
       }
 
       try {
-        await loadNewDocument();
+        // Cancel-aware - see if this is still the current pause
+        await listenerApi.pause(loadNewDocument());
       } catch (error) {
+        // RTK listeners can be canceled and will throw,
+        // so we can use that as an indicator the pause changed.
+        const listenerWasCanceled = error instanceof TaskAbortError;
+
         if (isCommandError(error, ProtocolError.DocumentIsUnavailable)) {
           // The document is not available at the current execution point.
           // We should inform the user (rather than remaining in a visual loading state).
           // When the execution point changes we will try again.
           dispatch(updateLoadingFailed(true));
-        } else {
+        } else if (!listenerWasCanceled) {
           throw error;
         }
       }
@@ -154,38 +163,6 @@ export function reset() {
   }
   rootNodeWaiter = defer();
   return resetMarkup();
-}
-
-/**
- * Clears the tree and adds the new root node.
- */
-export function newRoot(): UIThunkAction<Promise<void>> {
-  return async (dispatch, getState, { ThreadFront, replayClient, protocolClient }) => {
-    const originalPauseId = await ThreadFront.getCurrentPauseId(replayClient);
-
-    const [rootNodeData] = await nodeDataCache.readAsync(replayClient, originalPauseId, {
-      type: "document",
-    });
-
-    if (!rootNodeData || ThreadFront.currentPauseIdUnsafe !== originalPauseId) {
-      return;
-    }
-    const rootNode = (await processedNodeDataCache.readAsync(
-      replayClient,
-      originalPauseId,
-      rootNodeData.objectId
-    ))!;
-
-    if (ThreadFront.currentPauseIdUnsafe !== originalPauseId) {
-      return;
-    }
-
-    dispatch(newRootAdded(rootNode));
-    if (rootNodeWaiter) {
-      rootNodeWaiter.resolve();
-      rootNodeWaiter = undefined;
-    }
-  };
 }
 
 export function collapseNode(nodeId: string) {

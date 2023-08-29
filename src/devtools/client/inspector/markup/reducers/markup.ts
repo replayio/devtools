@@ -106,8 +106,8 @@ const markupSlice = createSlice({
     resetMarkup() {
       return initialState;
     },
-    newRootAdded(state, action: PayloadAction<NodeInfo>) {
-      state.rootNode = action.payload.id;
+    newRootAdded(state, action: PayloadAction<string>) {
+      state.rootNode = action.payload;
     },
     updateNodeExpanded(state, action: PayloadAction<{ nodeId: string; isExpanded: boolean }>) {
       const { nodeId, isExpanded } = action.payload;
