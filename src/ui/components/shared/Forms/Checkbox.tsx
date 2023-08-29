@@ -2,11 +2,12 @@ import classNames from "classnames";
 import React from "react";
 
 export default function Checkbox({
-  id,
   checked,
-  disabled,
-  onChange,
   className,
+  disabled,
+  id,
+  onChange,
+  ...rest
 }: React.HTMLProps<HTMLInputElement>) {
   return (
     <input
@@ -20,6 +21,7 @@ export default function Checkbox({
       )}
       id={id}
       onChange={onChange}
+      {...rest}
     />
   );
 }

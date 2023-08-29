@@ -11,10 +11,12 @@ type Tab = {
 
 export default function PanelTabs({
   activeTab,
+  dataTestName = "PanelTabs",
   setActiveTab,
   tabs,
 }: {
   activeTab: string;
+  dataTestName?: string;
   setActiveTab: (tab: NetworkTab) => void;
   tabs: readonly Tab[];
 }) {
@@ -34,6 +36,8 @@ export default function PanelTabs({
                   <span className="devtools-tab-line"></span>
                   <button
                     id={`${tab.id}-tab`}
+                    data-test-name={dataTestName}
+                    data-test-selected={activeTab == tab.id || undefined}
                     onClick={() => setActiveTab(tab.id)}
                     role="tab"
                     tabIndex={0}

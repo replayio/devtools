@@ -87,7 +87,7 @@ function SourceRenderer({
 
   const sourceRef = useRef<HTMLDivElement>(null);
 
-  const { status } = useStreamingValue(streamingParser);
+  const { status: sourceContentsStatus } = useStreamingValue(streamingSourceContents);
 
   const trackMouseHover = () => {
     // Analytics for onboarding
@@ -139,7 +139,7 @@ function SourceRenderer({
       className={styles.Source}
       data-test-id={`Source-${source.sourceId}`}
       data-test-name="Source"
-      data-test-source-status={status}
+      data-test-source-contents-status={sourceContentsStatus}
       data-test-source-id={source.sourceId}
       onMouseEnter={trackMouseHover}
     >

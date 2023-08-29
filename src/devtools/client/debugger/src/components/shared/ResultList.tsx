@@ -39,7 +39,7 @@ export default class ResultList extends Component<ResultListProps> {
       item.title = "(index)";
     }
 
-    const { selectItem, selected } = this.props;
+    const { dataTestId, selectItem, selected } = this.props;
     const props: React.ComponentPropsWithRef<"li"> = {
       onClick: (event: any) => selectItem(event, item),
       ref: element => {
@@ -50,6 +50,7 @@ export default class ResultList extends Component<ResultListProps> {
           delete this.listItemNodes[index];
         }
       },
+
       title: item.value,
       "aria-labelledby": `${item.id}-title`,
       "aria-describedby": `${item.id}-subtitle`,
@@ -60,7 +61,12 @@ export default class ResultList extends Component<ResultListProps> {
     };
 
     return (
-      <li key={`${item.id}${item.value}${index}`} {...props}>
+      <li
+        key={`${item.id}${item.value}${index}`}
+        data-test-id={item.id}
+        data-test-name={`${dataTestId}-Row`}
+        {...props}
+      >
         {item.icon && (
           <div className="icon">
             <AccessibleImage className={item.icon} />

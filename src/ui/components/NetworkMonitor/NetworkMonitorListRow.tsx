@@ -93,8 +93,8 @@ function RequestRow({
         className={styles.Row}
         data-current-time={dataCurrentTime}
         data-selected={selectedRequestId === id || undefined}
-        data-test-id={`NetworkMonitor-RequestRow-${id}`}
-        data-test-name="NetworkMonitor-RequestRow"
+        data-test-id={`Network-RequestRow-${id}`}
+        data-test-name="Network-RequestRow"
         onClick={() => selectRequest(request)}
         onContextMenu={onContextMenu}
         style={style}
@@ -109,7 +109,12 @@ function RequestRow({
         </div>
 
         {triggerPoint && triggerPoint.time !== currentTime && (
-          <button className={styles.SeekButton} onClick={() => seekToRequest(request)} tabIndex={0}>
+          <button
+            className={styles.SeekButton}
+            data-test-name="Network-RequestRow-SeekButton"
+            onClick={() => seekToRequest(request)}
+            tabIndex={0}
+          >
             <Icon
               className={styles.SeekButtonIcon}
               type={isAfterCurrentTime ? "fast-forward" : "rewind"}
