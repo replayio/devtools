@@ -1,12 +1,12 @@
 .Outer {
-  width: 100%;
   padding: 0.25rem 0;
-  background-color: var(--color-contrast);
+  margin: 1px 5px 4px 5px;
 }
 
 .Container,
 .ContainerFocused {
   width: 100%;
+  border: 1px solid var(--background-color-contrast-2);
   height: 1.75rem;
   border: 2px solid var(--background-color-contrast-2);
   overflow: hidden;
