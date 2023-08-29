@@ -2,6 +2,7 @@
 import { EntityState, PayloadAction, createEntityAdapter, createSlice } from "@reduxjs/toolkit";
 import { Attr, BoxModel, PseudoType } from "@replayio/protocol";
 
+import { pauseRequestedAt } from "devtools/client/debugger/src/reducers/pause";
 import { userData } from "shared/user-data/GraphQL/UserData";
 import { UIState } from "ui/state";
 
@@ -154,6 +155,14 @@ const markupSlice = createSlice({
   },
   extraReducers: builder => {
     // dispatched by actions/timeline.ts, in `playback()`
+    builder.addCase(pauseRequestedAt, () => {
+      console.log("Resetting markup state");
+      // We need to reset this whenever the timeline is paused,
+      // and do so as early in the pause processing sequence as possible
+      // (before the UI really starts rendering).
+      // This will avoid mismatches in fetching node data.
+      return initialState;
+    });
     builder.addCase("pause/resumed", (state, action) => {
       // Clear out the DOM nodes data whenever the user hits "Play" in the timeline.
       // However, preserve whatever nodes may be highlighted at the time,

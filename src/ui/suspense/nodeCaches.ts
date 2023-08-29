@@ -181,7 +181,6 @@ export const processedNodeDataCache: Cache<
           ? `<!DOCTYPE ${node.nodeName}>`
           : node.nodeName.toLowerCase(),
       hasChildren: !!node.childNodes?.length,
-      // hasEventListeners: !!eventListeners,
       id: nodeId,
       isConnected: node.isConnected,
       isElement: node.nodeType === NodeConstants.ELEMENT_NODE,
