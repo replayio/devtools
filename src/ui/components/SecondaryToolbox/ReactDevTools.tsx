@@ -47,7 +47,7 @@ import {
 import { getMouseTarget } from "ui/suspense/nodeCaches";
 import { NodePicker as NodePickerClass, NodePickerOpts } from "ui/utils/nodePicker";
 import { getJSON } from "ui/utils/objectFetching";
-import { trackEvent } from "ui/utils/telemetry";
+import { sendTelemetryEvent, trackEvent } from "ui/utils/telemetry";
 
 import { injectReactDevtoolsBackend } from "./react-devtools/injectReactDevtoolsBackend";
 import { generateTreeResetOpsForPoint } from "./react-devtools/rdtProcessing";
@@ -157,6 +157,7 @@ class ReplayWall implements Wall {
           const response = await this.sendRequest(event, payload);
           if (response === undefined) {
             trackEvent("error.reactdevtools.set_protocol_failed");
+            sendTelemetryEvent("reactdevtools.set_protocol_failed");
             this.setProtocolCheckFailed(true);
           }
           break;
@@ -177,6 +178,7 @@ class ReplayWall implements Wall {
 
           const nodeId = response.returned?.object;
           if (!nodeId || this.highlightedElementId !== id) {
+            sendTelemetryEvent("reactdevtools.node_not_found", payload);
             return;
           }
 
@@ -198,6 +200,7 @@ class ReplayWall implements Wall {
           const boundingRects = await this.fetchMouseTargetsForPause();
 
           if (!boundingRects?.length) {
+            sendTelemetryEvent("reactdevtools.bounding_client_rects_failed");
             this.disablePickerParentAndInternal();
             break;
           }
