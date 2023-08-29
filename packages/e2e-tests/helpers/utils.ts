@@ -1,4 +1,4 @@
-import { Locator, Page } from "@playwright/test";
+import { Locator, Page, expect } from "@playwright/test";
 import axios from "axios";
 import chalk from "chalk";
 import stripAnsi from "strip-ansi";
@@ -81,6 +81,25 @@ export async function mapLocators<T>(
     Array.from({ length: count }).map((_, i) => {
       return callback(locatorList.nth(i), i);
     })
+  );
+}
+
+export async function waitForRecordingToFinishIndexing(page: Page): Promise<void> {
+  await debugPrint(
+    page,
+    "Waiting for recording to finish loading",
+    "waitForRecordingToFinishIndexing"
+  );
+
+  const timelineCapsuleLocator = page.locator('[data-test-id="Timeline-Capsule"]');
+  await waitFor(
+    async () => {
+      await expect(await timelineCapsuleLocator.getAttribute("data-test-progress")).toBe("100");
+    },
+    {
+      retryInterval: 1_000,
+      timeout: 30_000,
+    }
   );
 }
 

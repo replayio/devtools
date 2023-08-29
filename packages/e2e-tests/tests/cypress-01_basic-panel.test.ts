@@ -18,7 +18,7 @@ import {
   getTestSuiteUser,
   openCypressTestPanel,
 } from "../helpers/testsuites";
-import { debugPrint, delay, waitFor } from "../helpers/utils";
+import { waitFor, waitForRecordingToFinishIndexing } from "../helpers/utils";
 import test, { expect } from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "flake/adding-spec.ts" });
@@ -28,6 +28,8 @@ test("cypress-01: Basic Test Suites panel functionality", async ({
   exampleKey,
 }) => {
   await startTest(page, exampleKey, recordingId);
+  await waitForRecordingToFinishIndexing(page);
+
   await openDevToolsTab(page);
 
   await openCypressTestPanel(page);

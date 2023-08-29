@@ -8,7 +8,7 @@ import {
   openCypressTestPanel,
 } from "../helpers/testsuites";
 import { getTimelineCurrentPercent, waitForTimelineAdvanced } from "../helpers/timeline";
-import { getByTestName, waitFor } from "../helpers/utils";
+import { getByTestName, waitFor, waitForRecordingToFinishIndexing } from "../helpers/utils";
 import test, { expect } from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "cypress-realworld/bankaccounts.spec.js" });
@@ -18,6 +18,8 @@ test("cypress-04: Test Step buttons and menu item", async ({
   exampleKey,
 }) => {
   await startTest(page, exampleKey, recordingId);
+  await waitForRecordingToFinishIndexing(page);
+
   await openViewerTab(page);
 
   await openCypressTestPanel(page);
