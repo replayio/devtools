@@ -435,7 +435,7 @@ export default function Toolbar() {
   return (
     <div className={styles.toolboxToolbarContainer}>
       <div className={styles.toolboxToolbar}>
-        {testRunner !== "cypress" && showTour ? (
+        {showTour ? (
           <ToolbarButton icon="tour" name="tour" label="Replay Tour" onClick={handleButtonClick} />
         ) : null}
         {showPassport ? (

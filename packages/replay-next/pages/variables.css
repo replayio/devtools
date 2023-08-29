@@ -650,6 +650,10 @@
   --loading-background: var(--theme-base-100);
   --loading-boxes: var(--chrome);
 
+  /* Tour */
+  --tour-body-color: #fff;
+  --tour-callout-body-color: #ff0;
+
   /* Focus mode editor (dark) */
   --focus-mode-capsule-bgcolor-hover: #232938;
   --focus-mode-capsule-bgcolor: var(--theme-base-90);
@@ -1172,6 +1176,10 @@
   /* Loading screen */
   --loading-background: var(--chrome);
   --loading-boxes: white;
+
+  /* Tour */
+  --tour-body-color: #fff;
+  --tour-callout-body-color: #ff0;
 
   /* Focus mode editor (light) */
   --focus-mode-capsule-bgcolor-hover: #d8d8d8;

@@ -323,22 +323,12 @@ const Passport = (props: PropsFromRedux) => {
         />
       )}
 
-      {showTestsuitesPassportFirstRun && recording && isTestSuiteReplay(recording) ? (
-        <div className={styles.TestsuitesPassportWelcome}>
-          <h2>Passport</h2>
-          <p>
-            This sidebar shows some of our most helpful features alongside a little video. Try
-            clicking around to learn more!
-          </p>
-        </div>
-      ) : (
-        <div className={styles.ToolbarHeader}>
-          Time Traveller Passport
-          <button className={styles.close} onClick={hideFeatureShowPassport}>
-            <Icon type="close" />
-          </button>
-        </div>
-      )}
+      <div className={styles.ToolbarHeader}>
+        Time Traveller Passport
+        <button className={styles.close} onClick={hideFeatureShowPassport}>
+          <Icon type="close" />
+        </button>
+      </div>
 
       <div className="flex-grow overflow-auto">
         <div className="p-2">
