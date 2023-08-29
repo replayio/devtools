@@ -127,7 +127,7 @@ function LogPointRenderer({
 
 function AnalyzedContent({ logPointInstance }: { logPointInstance: PointInstance }) {
   const client = useContext(ReplayClientContext);
-  const { range: focusRange } = useContext(FocusContext);
+  const { rangeForSuspense: focusRange } = useContext(FocusContext);
 
   const { point, timeStampedHitPoint } = logPointInstance;
 

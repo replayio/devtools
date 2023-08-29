@@ -1,3 +1,4 @@
+import { TimeStampedPointRange } from "@replayio/protocol";
 import { RenderResult, act, render as rtlRender } from "@testing-library/react";
 import fetch from "isomorphic-fetch";
 import { mock } from "jest-mock-extended";
@@ -112,6 +113,7 @@ export async function renderFocused(
     isTransitionPending: false,
     range: null,
     rangeForDisplay: null,
+    rangeForSuspense: null,
     update: jest.fn(),
     updateForTimelineImprecise: jest.fn(),
     ...options?.focusContext,
@@ -178,6 +180,7 @@ function timeToFakeExecutionPoint(time: number): string {
 // This mock client is mostly useless by itself,
 // but its methods can be overridden individually (or observed/inspected) by test code.
 export function createMockReplayClient() {
+  let focusWindow: TimeStampedPointRange | null = null;
   const mockClient = mock<ReplayClientInterface>();
   mockClient.addEventListener.mockImplementation(() => {});
   mockClient.createPause.mockImplementation(async () => ({
@@ -209,6 +212,11 @@ export function createMockReplayClient() {
   mockClient.removeEventListener.mockImplementation(() => {});
   mockClient.getCurrentFocusWindow.mockImplementation(() => null);
   mockClient.waitForSession.mockImplementation(() => Promise.resolve(""));
+  mockClient.requestFocusWindow.mockImplementation(({ begin, end }) => {
+    focusWindow = { begin: begin!, end: end! };
+    return Promise.resolve(focusWindow);
+  });
+  mockClient.getCurrentFocusWindow.mockImplementation(() => focusWindow);
 
   return mockClient;
 }

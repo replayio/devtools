@@ -31,7 +31,7 @@ function CommentCard({
   comment: Comment;
   pauseOverlayPosition: PauseOverlayPosition | null;
 }) {
-  const { rangeForDisplay: focusRange } = useContext(FocusContext);
+  const { range: focusRange } = useContext(FocusContext);
   const { currentUserInfo } = useContext(SessionContext);
 
   const viewMode = useAppSelector(getViewMode);

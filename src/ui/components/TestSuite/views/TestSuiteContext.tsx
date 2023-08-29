@@ -44,7 +44,6 @@ export function TestSuiteContextRoot({ children }: PropsWithChildren) {
             },
             {
               bias: "begin",
-              debounce: false,
               sync: true,
             }
           );
@@ -54,7 +53,6 @@ export function TestSuiteContextRoot({ children }: PropsWithChildren) {
       } else {
         await updateForTimelineImprecise([0, duration], {
           bias: "begin",
-          debounce: false,
           sync: true,
         });
       }

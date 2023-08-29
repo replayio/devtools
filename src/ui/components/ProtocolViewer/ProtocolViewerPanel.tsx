@@ -74,7 +74,7 @@ const NO_MESSAGES: RecordedProtocolData[] = [];
 
 function RecordedProtocolRequests() {
   const replayClient = useContext(ReplayClientContext);
-  const { range: focusRange } = useContext(FocusContext);
+  const { rangeForSuspense: focusRange } = useContext(FocusContext);
 
   const sourceDetails = useAppSelector(getAllSourceDetails);
   const sources = useAppSelector(state => state.sources);

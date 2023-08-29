@@ -4,11 +4,12 @@ import React, { Suspense, useContext, useMemo, useState, useTransition } from "r
 import { PanelGroup, PanelResizeHandle, Panel as ResizablePanel } from "react-resizable-panels";
 import { useImperativeCacheValue } from "suspense";
 
+import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { isPointInRegion } from "shared/utils/time";
 import { UIThunkAction } from "ui/actions";
 import { seek } from "ui/actions/timeline";
-import { getCurrentTime, getFocusWindow } from "ui/reducers/timeline";
+import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { reduxDevToolsAnnotationsCache } from "ui/suspense/annotationsCaches";
 import { reduxDispatchJumpLocationCache } from "ui/suspense/jumpToLocationCache";
@@ -23,7 +24,7 @@ export const ReduxDevToolsPanel = () => {
   const [isPending, startTransition] = useTransition();
   const client = useContext(ReplayClientContext);
   const [selectedPoint, setSelectedPoint] = useState<ExecutionPoint | null>(null);
-  const focusWindow = useAppSelector(getFocusWindow);
+  const { range: focusWindow } = useContext(FocusContext);
   const [searchValue, setSearchValue] = useState("");
 
   const setSelectedTransition = (point: ExecutionPoint | null) => {

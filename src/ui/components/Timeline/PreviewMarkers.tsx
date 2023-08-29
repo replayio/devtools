@@ -60,7 +60,7 @@ function PreviewMarkersSuspends({
   const { endpoint } = useContext(SessionContext);
   const replayClient = useContext(ReplayClientContext);
 
-  const { range: focusRange } = useContext(FocusContext);
+  const { rangeForSuspense: focusRange } = useContext(FocusContext);
 
   const hitCounts = sourceHitCountsCache.read(
     visibleLines.start.line ?? 0,

@@ -1,8 +1,9 @@
-import { useDeferredValue, useMemo, useRef, useState } from "react";
+import { useContext, useDeferredValue, useMemo, useRef, useState } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { useStreamingValue } from "suspense";
 
 import IndeterminateLoader from "replay-next/components/IndeterminateLoader";
+import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { useNag } from "replay-next/src/hooks/useNag";
 import { networkRequestsCache } from "replay-next/src/suspense/NetworkRequestsCache";
 import {
@@ -18,7 +19,7 @@ import RequestDetails from "ui/components/NetworkMonitor/RequestDetails";
 import { TextFilterRow } from "ui/components/NetworkMonitor/TextFilterRow";
 import { TypeFiltersColumn } from "ui/components/NetworkMonitor/TypeFiltersColumn";
 import { getSelectedRequestId } from "ui/reducers/network";
-import { getCurrentTime, getFocusWindow } from "ui/reducers/timeline";
+import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { timeMixpanelEvent } from "ui/utils/mixpanel";
 import { trackEvent } from "ui/utils/telemetry";
@@ -32,7 +33,7 @@ export default function NetworkMonitor() {
   const deferredFilterByText = useDeferredValue(filterByText);
 
   const currentTime = useAppSelector(getCurrentTime);
-  const focusWindow = useAppSelector(getFocusWindow);
+  const { range: focusWindow } = useContext(FocusContext);
 
   const selectedRequestId = useAppSelector(getSelectedRequestId);
   const [types, setTypes] = useState<Set<CanonicalRequestType>>(new Set([]));

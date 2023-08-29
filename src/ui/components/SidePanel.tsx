@@ -1,9 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 
 import PrimaryPanes from "devtools/client/debugger/src/components/PrimaryPanes";
 import SecondaryPanes from "devtools/client/debugger/src/components/SecondaryPanes";
 import Accordion from "devtools/client/debugger/src/components/shared/Accordion";
 import LazyOffscreen from "replay-next/components/LazyOffscreen";
+import { FocusContext } from "replay-next/src/contexts/FocusContext";
+import { isExecutionPointsWithinRange } from "replay-next/src/utils/time";
 import { setSelectedPrimaryPanel } from "ui/actions/layout";
 import Events from "ui/components/Events";
 import SearchFilesReduxAdapter from "ui/components/SearchFilesReduxAdapter";
@@ -12,7 +14,7 @@ import TestSuitePanel from "ui/components/TestSuite";
 import { isTestSuiteReplay } from "ui/components/TestSuite/utils/isTestSuiteReplay";
 import hooks from "ui/hooks";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
-import { getFilteredEventsForFocusWindow } from "ui/reducers/app";
+import { getSortedEventsForDisplay } from "ui/reducers/app";
 import { getSelectedPrimaryPanel } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { PrimaryPanelName } from "ui/state/layout";
@@ -61,11 +63,22 @@ function useInitialPrimaryPanel() {
 }
 
 export default function SidePanel() {
+  const { range: focusWindow } = useContext(FocusContext);
   const selectedPrimaryPanel = useInitialPrimaryPanel();
   const [replayInfoCollapsed, setReplayInfoCollapsed] = useState(false);
   const [eventsCollapsed, setEventsCollapsed] = useState(false);
-  const events = useAppSelector(getFilteredEventsForFocusWindow);
+  const events = useAppSelector(getSortedEventsForDisplay);
   const { isAuthenticated } = useAuth0();
+
+  const hasEventsInFocusWindow = useMemo(
+    () =>
+      events.some(
+        event =>
+          !focusWindow ||
+          isExecutionPointsWithinRange(event.point, focusWindow.begin.point, focusWindow.end.point)
+      ),
+    [events, focusWindow]
+  );
 
   const launchQuickstart = (url: string) => {
     window.open(url, "_blank");
@@ -81,7 +94,7 @@ export default function SidePanel() {
     onToggle: () => setReplayInfoCollapsed(!replayInfoCollapsed),
   });
 
-  if (events.length > 0) {
+  if (hasEventsInFocusWindow) {
     items.push({
       header: (
         <div className={styles.EventsHeader}>

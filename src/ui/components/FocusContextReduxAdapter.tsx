@@ -2,31 +2,32 @@ import { TimeStampedPointRange } from "@replayio/protocol";
 import { PropsWithChildren, useCallback, useDeferredValue, useMemo } from "react";
 
 import { FocusContext, UpdateOptions } from "replay-next/src/contexts/FocusContext";
+import { useCurrentFocusWindow } from "replay-next/src/hooks/useCurrentFocusWindow";
 import { TimeRange } from "replay-next/src/types";
 import {
   enterFocusMode,
-  setFocusWindow,
-  setFocusWindowImprecise,
+  setFocusWindow as setDisplayedRange,
+  setFocusWindowImprecise as setDisplayedRangeImprecise,
   syncFocusedRegion,
   updateFocusWindowParam,
 } from "ui/actions/timeline";
 import { getFocusWindow } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { rangeForFocusWindow } from "ui/utils/timeline";
 
 // Adapter that reads focus region (from Redux) and passes it to the FocusContext.
 export default function FocusContextReduxAdapter({ children }: PropsWithChildren) {
   const dispatch = useAppDispatch();
-  const focusWindow = useAppSelector(getFocusWindow);
+  const range = useCurrentFocusWindow();
+  const rangeForDisplay = useAppSelector(getFocusWindow);
 
-  const deferredFocusWindow = useDeferredValue(focusWindow);
-  const isPending = deferredFocusWindow !== focusWindow;
+  const rangeForSuspense = useDeferredValue(range);
+  const isPending = rangeForSuspense !== range;
 
   const update = useCallback(
     async (value: TimeStampedPointRange | null, options: UpdateOptions) => {
       const { sync } = options;
 
-      await dispatch(setFocusWindow(value));
+      await dispatch(setDisplayedRange(value));
 
       if (sync) {
         await dispatch(syncFocusedRegion());
@@ -41,7 +42,7 @@ export default function FocusContextReduxAdapter({ children }: PropsWithChildren
       const { sync } = options;
 
       await dispatch(
-        setFocusWindowImprecise(
+        setDisplayedRangeImprecise(
           value !== null
             ? {
                 begin: value[0],
@@ -65,12 +66,21 @@ export default function FocusContextReduxAdapter({ children }: PropsWithChildren
         dispatch(enterFocusMode());
       },
       isTransitionPending: isPending,
-      range: deferredFocusWindow ? rangeForFocusWindow(deferredFocusWindow) : null,
-      rangeForDisplay: focusWindow ? rangeForFocusWindow(focusWindow) : null,
+      range,
+      rangeForDisplay,
+      rangeForSuspense,
       update,
       updateForTimelineImprecise,
     };
-  }, [deferredFocusWindow, dispatch, isPending, focusWindow, update, updateForTimelineImprecise]);
+  }, [
+    dispatch,
+    isPending,
+    range,
+    rangeForDisplay,
+    rangeForSuspense,
+    update,
+    updateForTimelineImprecise,
+  ]);
 
   return <FocusContext.Provider value={context}>{children}</FocusContext.Provider>;
 }
