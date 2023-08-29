@@ -165,7 +165,7 @@ export const processedNodeDataCache: Cache<
   debugLabel: "ProcessedNodeData",
   getKey: ([replayClient, pauseId, nodeId]) => `${pauseId}:${nodeId}`,
   load: async ([replayClient, pauseId, nodeId]): Promise<NodeInfo | null> => {
-    if (!pauseId) {
+    if (!pauseId || typeof nodeId !== "string") {
       return null;
     }
     const nodeObject = await objectCache.readAsync(replayClient, pauseId, nodeId, "canOverflow");
@@ -175,7 +175,7 @@ export const processedNodeDataCache: Cache<
 
     return {
       attributes: node.attributes || [],
-      children: [],
+      children: node.childNodes ?? [],
       displayName:
         node.nodeType === NodeConstants.DOCUMENT_TYPE_NODE
           ? `<!DOCTYPE ${node.nodeName}>`
