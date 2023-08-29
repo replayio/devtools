@@ -21,16 +21,24 @@
 }
 
 .stepCallout {
-  border: 1px solid #fff;
-  background-color: rgba(255, 255, 255, 0.05);
-  padding: 0.5em 0.5em;
-  border-radius: 4px;
+  display: flex;
+  align-items: top;
+  color: #ff0;
+}
+
+.stepCallout .Icon {
+  width: 16px;
+  color: #ff0;
+}
+
+.stepCalloutText {
+  padding-top: 1px;
 }
 
 .h1 {
   color: #fff;
   margin-bottom: 20px;
-  font-size: 22px;
+  font-size: 18px;
   font-weight: 500;
   border-bottom: 1px solid rgba(255, 255, 255, 0.3);
   padding-bottom: 1rem;
@@ -40,7 +48,7 @@
 
 .intro {
   color: #fff;
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 300;
   margin-bottom: 1rem;
   height: 100%;

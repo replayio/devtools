@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 
+import Icon from "replay-next/components/Icon";
 import { userData } from "shared/user-data/GraphQL/UserData";
 import { setSelectedPrimaryPanel } from "ui/actions/layout";
 import { shouldShowDevToolsNag } from "ui/components/Header/ViewToggle";
@@ -63,15 +64,31 @@ const Tour: React.FC = () => {
 
   const intro = (
     <div className={styles.intro}>
-      <p className={styles.h1}>Hello and welcome!</p>
+      <p className={styles.h1}>Welcome!</p>
       {typeOfReplay === "events" ? (
         <>
           <p>Replay is the first time-travel enabled DevTools. Let's get started!</p>
+          <div className={styles.stepCallout}>
+            <Icon className={styles.Icon} type="error" />
+
+            <div className={styles.stepCalloutText}>Click on DevTools in the top right</div>
+          </div>
+        </>
+      ) : (
+        <>
           <p>
-            <div className={styles.stepCallout}>Click on DevTools in the top right.</div>
+            Replay lets you debug flaky tests in a familiar DevTools environment. When you’re ready
+            to see our best feature, please click DevTools at the top right.
+          </p>
+          <p>
+            <div className={styles.stepCallout}>
+              <Icon className={styles.Icon} type="error" />
+
+              <div className={styles.stepCalloutText}>Click on DevTools in the top right</div>
+            </div>
           </p>
         </>
-      ) : null}
+      )}
     </div>
   );
 
@@ -82,17 +99,39 @@ const Tour: React.FC = () => {
     </div>
   );
 
-  const timeTravel = (
-    <div className={styles.intro}>
-      <div className={styles.h1}>Time travel 🚀</div>
-      <p>In DevTools, look underneath the video to find the Replay console.</p>
-      <p>
-        <div className={styles.stepCallout}>
-          Hover in the console and click a button to time travel!
-        </div>
-      </p>
-    </div>
-  );
+  const timeTravel =
+    typeOfReplay === "events" ? (
+      <div className={styles.intro}>
+        <div className={styles.h1}>Time travel 🚀</div>
+        <p>In DevTools, look underneath the video to find the Replay console.</p>
+        <p>
+          <div className={styles.stepCallout}>
+            <Icon className={styles.Icon} type="error" />
+            <div className={styles.stepCalloutText}>
+              Hover in the console and click a button to time travel!
+            </div>
+          </div>
+        </p>
+      </div>
+    ) : (
+      <div className={styles.intro}>
+        <div className={styles.h1}>Time travel 🚀</div>
+
+        <p>
+          Now look underneath the video to find the Replay console, which should have messages you
+          can time travel to.
+        </p>
+
+        <p>If your console is empty, open the console menu to enable a mouse event to track.</p>
+
+        <p>
+          <div className={styles.stepCallout}>
+            <Icon className={styles.Icon} type="error" />
+            <div className={styles.stepCalloutText}>Click a time travel button in the console</div>
+          </div>
+        </p>
+      </div>
+    );
 
   const TimeTravelGif = () => (
     <img src="https://vercel.replay.io/tour/fast-forward.gif" className={styles.videoExample} />
@@ -110,11 +149,14 @@ const Tour: React.FC = () => {
 
       <p>
         Now a file should be open in the Source Viewer. (If not, you can open a file by pressing
-        command-P or clicking Sources Explorer from the left-nav)
+        command-P or clicking Sources Explorer from the left nav)
       </p>
       <p>
         <div className={styles.stepCallout}>
-          Click the plus button on a line of code to set a print statement.
+          <Icon className={styles.Icon} type="error" />
+          <div className={styles.stepCalloutText}>
+            Click the plus button on a line of code to set a print statement.
+          </div>
         </div>
       </p>
     </div>
@@ -130,7 +172,8 @@ const Tour: React.FC = () => {
       <p>You can pass anything you want into print statements, including objects and variables.</p>
       <p>
         <div className={styles.stepCallout}>
-          Type something, then hit enter or click the check button.
+          <Icon className={styles.Icon} type="error" />
+          <div className={styles.stepCalloutText}>Type something and hit enter to save</div>
         </div>
       </p>
     </div>
@@ -219,7 +262,7 @@ const Tour: React.FC = () => {
       </div>
       <div className="absolute bottom-28 p-3">
         {(isNewUser || viewMode === "non-dev") && (
-          <div className="relative -bottom-3">
+          <div className="relative -bottom-6">
             <img src="/images/illustrations/larry_wave.png" className="z-1 w-full" />
           </div>
         )}
