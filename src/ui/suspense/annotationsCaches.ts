@@ -32,6 +32,7 @@ export interface ParsedJumpToCodeAnnotation extends TimeStampedPoint {
 }
 
 export const REACT_ANNOTATIONS_KIND = "react-devtools-bridge";
+export const REDUX_SETUP_ANNOTATIONS_KIND = "redux-devtools-setup";
 export const REDUX_ANNOTATIONS_KIND = "redux-devtools-data";
 export const JUMP_ANNOTATION_KIND = "event-listeners-jump-location";
 

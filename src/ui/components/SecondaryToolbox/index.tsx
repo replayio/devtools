@@ -17,7 +17,7 @@ import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { SecondaryPanelName, ToolboxLayout } from "ui/state/layout";
 import {
   REACT_ANNOTATIONS_KIND,
-  REDUX_ANNOTATIONS_KIND,
+  REDUX_SETUP_ANNOTATIONS_KIND,
   annotationKindsCache,
 } from "ui/suspense/annotationsCaches";
 import { trackEvent } from "ui/utils/telemetry";
@@ -175,7 +175,7 @@ function SecondaryToolbox({
   const { value: hasReduxAnnotations = false } = useImperativeCacheValue(
     annotationKindsCache,
     replayClient,
-    REDUX_ANNOTATIONS_KIND
+    REDUX_SETUP_ANNOTATIONS_KIND
   );
 
   const chromiumNetMonitorEnabled = useGraphQLUserData("feature_chromiumNetMonitor");
