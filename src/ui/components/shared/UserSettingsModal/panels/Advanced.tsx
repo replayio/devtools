@@ -8,11 +8,20 @@ export const PREFERENCES: PreferencesKey[] = [
   "feature_protocolPanel",
   "backend_newControllerOnRefresh",
   "protocol_chromiumRepaints",
+  "backend_profileWorkerThreads",
+  "feature_basicProcessingLoadingBar",
+  "backend_disableScanDataCache",
+  "backend_enableRoutines",
+  "backend_rerunRoutines",
+  "backend_disableRecordingAssetsInDatabase",
+  "backend_disableIncrementalSnapshots",
+  "backend_disableConcurrentControllerLoading",
+  "backend_disableProtocolQueryCache",
 ];
 
 export function Advanced() {
   return (
-    <div className="flex flex-col space-y-2 p-1">
+    <div className="flex flex-col space-y-2 overflow-y-auto p-1">
       {PREFERENCES.map(key => (
         <BooleanPreference key={key} preference={config[key]} preferencesKey={key} />
       ))}

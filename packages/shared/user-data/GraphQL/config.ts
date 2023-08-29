@@ -39,12 +39,14 @@ export const config = {
   },
   backend_disableIncrementalSnapshots: {
     defaultValue: Boolean(false),
+    internalOnly: Boolean(true),
     description: "Disable using diffs between snapshots",
     label: "Disable using incremental snapshots",
     legacyKey: "devtools.features.disableIncrementalSnapshots",
   },
   backend_disableProtocolQueryCache: {
     defaultValue: Boolean(false),
+    internalOnly: Boolean(true),
     description: "Disable storage of previously generated response for protocol commands",
     label: "Disable query-level storage for protocol commands",
     legacyKey: "devtools.features.disableProtocolQueryCache",
@@ -66,16 +68,19 @@ export const config = {
   },
   backend_enableRoutines: {
     defaultValue: Boolean(false),
+    internalOnly: Boolean(true),
     description: "Enable backend support for running processing routines (like React DevTools)",
     label: "Enable backend processing routines",
     legacyKey: "devtools.features.enableRoutines",
   },
   backend_keepAllTraces: {
     defaultValue: Boolean(false),
+    internalOnly: Boolean(true),
     legacyKey: "devtools.features.keepAllTraces",
   },
   backend_listenForMetrics: {
     defaultValue: Boolean(false),
+    internalOnly: Boolean(true),
     legacyKey: "devtools.listenForMetrics",
   },
   backend_newControllerOnRefresh: {
@@ -122,8 +127,6 @@ export const config = {
   },
   console_showFiltersByDefault: {
     defaultValue: Boolean(false),
-    description:
-      "Open the console filter settings by default when opening a Replay for the first time",
     internalOnly: Boolean(false),
     label: "Console filter drawer defaults to open",
     legacyKey: "devtools.features.consoleFilterDrawerDefaultsToOpen",
@@ -141,12 +144,7 @@ export const config = {
     label: "Detailed loading bar",
     legacyKey: "devtools.features.basicProcessingLoadingBar",
   },
-  feature_brokenSourcemapWorkaround: {
-    defaultValue: Boolean(true),
-    description: "Skip locations that are mapped to the beginning of a function body",
-    label: "Enable workaround for broken sourcemaps",
-    legacyKey: "devtools.features.brokenSourcemapWorkaround",
-  },
+
   feature_chromiumNetMonitor: {
     defaultValue: Boolean(true),
     legacyKey: "devtools.features.chromiumNetMonitor",
@@ -278,7 +276,6 @@ export const config = {
     defaultValue: Boolean(true),
     legacyKey: null,
   },
-
   protocol_chromiumRepaints: {
     defaultValue: Boolean(true),
     label: "Enable repaintGraphics for Chrome.",

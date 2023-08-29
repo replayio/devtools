@@ -111,7 +111,7 @@ class FrameTimelineRenderer extends Component<FrameTimelineProps, FrameTimelineS
     // skip over steps that are mapped to the beginning of a function body
     // see SCS-172
     const bodyLocations = symbols?.functions.map(f => f.body).filter(Boolean) as SourceLocation[];
-    if (userData.get("feature_brokenSourcemapWorkaround") && bodyLocations) {
+    if (bodyLocations) {
       while (adjustedDisplayIndex < numberOfPositions - 2) {
         const location = frameSteps[adjustedDisplayIndex].frame?.find(
           location => location.sourceId === selectedLocation?.sourceId

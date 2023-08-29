@@ -37,18 +37,15 @@ export function BooleanPreference({
       style={{ gridTemplateColumns: "auto minmax(0, 1fr)", gap: "0 0.5rem" }}
       data-private
       htmlFor={preferencesKey}
-    >
-      <Checkbox
-        id={`BooleanPreference-${preferencesKey}`}
-        checked={checked as boolean}
-        onChange={() => {
-          setChecked(!checked);
+      onClick={() => {
+        setChecked(!checked);
 
-          if (onChange) {
-            onChange(!checked);
-          }
-        }}
-      />
+        if (onChange) {
+          onChange(!checked);
+        }
+      }}
+    >
+      <Checkbox id={`BooleanPreference-${preferencesKey}`} checked={checked as boolean} />
       <div>{label}</div>
       {description ? (
         <div className="mb-1 text-xs text-bodySubColor" style={{ gridColumnStart: "2" }}>

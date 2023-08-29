@@ -2,21 +2,7 @@ import { config } from "shared/user-data/GraphQL/config";
 import { PreferencesKey } from "shared/user-data/GraphQL/types";
 import { BooleanPreference } from "ui/components/shared/UserSettingsModal/components/BooleanPreference";
 
-export const PREFERENCES: PreferencesKey[] = [
-  "backend_profileWorkerThreads",
-  "feature_basicProcessingLoadingBar",
-  "console_showFiltersByDefault",
-  "backend_disableScanDataCache",
-  "feature_brokenSourcemapWorkaround",
-  "backend_enableRoutines",
-  "backend_rerunRoutines",
-  "backend_disableRecordingAssetsInDatabase",
-  "feature_reactPanel",
-  "feature_reduxDevTools",
-  "backend_disableIncrementalSnapshots",
-  "backend_disableConcurrentControllerLoading",
-  "backend_disableProtocolQueryCache",
-];
+export const PREFERENCES: PreferencesKey[] = ["feature_reactPanel", "feature_reduxDevTools"];
 
 export function Experimental() {
   return (
