@@ -25,7 +25,6 @@ export type ModalOptionsType = {
 export type ModalType =
   | "attachment"
   | "browser-launch"
-  | "download-replay"
   | "first-replay"
   | "login"
   | "loom"
