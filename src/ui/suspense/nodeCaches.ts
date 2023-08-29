@@ -50,18 +50,12 @@ function assertUnreachable(_x: never): never {
 }
 
 export const nodeDataCache: Cache<
-  [
-    protocolClient: ProtocolClient,
-    replayClient: ReplayClientInterface,
-    sessionId: string,
-    pauseId: PauseId,
-    options: NodeFetchOptions
-  ],
+  [replayClient: ReplayClientInterface, pauseId: PauseId, options: NodeFetchOptions],
   ProtocolObject[]
 > = createCache({
   config: { immutable: true },
   debugLabel: "NodeData",
-  getKey: ([protocolClient, replayClient, sessionId, pauseId, options]) => {
+  getKey: ([replayClient, pauseId, options]) => {
     let typeKey = "";
 
     switch (options.type) {
@@ -89,7 +83,7 @@ export const nodeDataCache: Cache<
 
     return `${pauseId}:${options.type}:${typeKey}`;
   },
-  load: async ([protocolClient, replayClient, sessionId, pauseId, options]) => {
+  load: async ([replayClient, pauseId, options]) => {
     let nodeIds: string[] = [];
     let pauseData = null as PauseData | null;
 
@@ -99,19 +93,13 @@ export const nodeDataCache: Cache<
         break;
       }
       case "document": {
-        const { document, data } = await protocolClient.DOM.getDocument({}, sessionId, pauseId);
+        const { document, data } = await replayClient.getDocument(pauseId);
         nodeIds.push(document);
         pauseData = data;
         break;
       }
       case "parentNodes": {
-        const { data } = await protocolClient.DOM.getParentNodes(
-          {
-            node: options.nodeId,
-          },
-          sessionId,
-          pauseId
-        );
+        const { data } = await replayClient.getParentNodes(pauseId, options.nodeId);
         pauseData = data;
         // Ancestor nodes will be cached too, but we'll just return
         nodeIds.push(options.nodeId);
@@ -130,13 +118,10 @@ export const nodeDataCache: Cache<
         break;
       }
       case "querySelector": {
-        const { result, data } = await protocolClient.DOM.querySelector(
-          {
-            node: options.nodeId,
-            selector: options.selector,
-          },
-          sessionId,
-          pauseId
+        const { result, data } = await replayClient.querySelector(
+          pauseId,
+          options.nodeId,
+          options.selector
         );
         pauseData = data;
         if (result) {
@@ -145,13 +130,7 @@ export const nodeDataCache: Cache<
         break;
       }
       case "searchDOM": {
-        const { nodes, data } = await protocolClient.DOM.performSearch(
-          {
-            query: options.query,
-          },
-          sessionId,
-          pauseId
-        );
+        const { nodes, data } = await replayClient.performSearch(pauseId, options.query);
         pauseData = data;
         nodeIds = nodes;
         break;
@@ -218,26 +197,14 @@ export const processedNodeDataCache: Cache<
 });
 
 export const nodeEventListenersCache: Cache<
-  [
-    protocolClient: ProtocolClient,
-    replayClient: ReplayClientInterface,
-    sessionId: string,
-    pauseId: PauseId,
-    nodeId: string
-  ],
+  [replayClient: ReplayClientInterface, sessionId: string, pauseId: PauseId, nodeId: string],
   EventListener[] | undefined
 > = createCache({
   config: { immutable: true },
   debugLabel: "NodeEventListeners",
-  getKey: ([protocolClient, replayClient, sessionId, pauseId, nodeId]) => `${pauseId}:${nodeId}`,
-  load: async ([protocolClient, replayClient, sessionId, pauseId, nodeId]) => {
-    const { listeners, data } = await protocolClient.DOM.getEventListeners(
-      {
-        node: nodeId,
-      },
-      sessionId,
-      pauseId
-    );
+  getKey: ([replayClient, sessionId, pauseId, nodeId]) => `${pauseId}:${nodeId}`,
+  load: async ([replayClient, sessionId, pauseId, nodeId]) => {
+    const { listeners, data } = await replayClient.getEventListeners(pauseId, nodeId);
     const sources = await sourcesByIdCache.readAsync(replayClient);
     cachePauseData(replayClient, sources, pauseId, data);
 
@@ -246,33 +213,27 @@ export const nodeEventListenersCache: Cache<
 });
 
 export const boundingRectsCache: Cache<
-  [protocolClient: ProtocolClient, sessionId: string, pauseId: PauseId],
+  [replayClient: ReplayClientInterface, sessionId: string, pauseId: PauseId],
   NodeBounds[]
 > = createCache({
   config: { immutable: true },
   debugLabel: "BoundingRects",
-  getKey: ([protocolClient, sessionId, pauseId]) => pauseId,
-  load: async ([protocolClient, sessionId, pauseId]) => {
-    const { elements } = await protocolClient.DOM.getAllBoundingClientRects({}, sessionId, pauseId);
+  getKey: ([replayClient, sessionId, pauseId]) => pauseId,
+  load: async ([replayClient, sessionId, pauseId]) => {
+    const { elements } = await replayClient.getAllBoundingClientRects(pauseId);
     return elements;
   },
 });
 
 export const boxModelCache: Cache<
-  [protocolClient: ProtocolClient, sessionId: string, pauseId: PauseId, nodeId: string],
+  [replayClient: ReplayClientInterface, pauseId: PauseId, nodeId: string],
   BoxModel
 > = createCache({
   config: { immutable: true },
   debugLabel: "BoxModel",
-  getKey: ([protocolClient, sessionId, pauseId, nodeId]) => `${pauseId}:${nodeId}`,
-  load: async ([protocolClient, sessionId, pauseId, nodeId]) => {
-    const { model: nodeBoxModel } = await protocolClient.DOM.getBoxModel(
-      {
-        node: nodeId,
-      },
-      sessionId,
-      pauseId
-    );
+  getKey: ([replayClient, pauseId, nodeId]) => `${pauseId}:${nodeId}`,
+  load: async ([replayClient, pauseId, nodeId]) => {
+    const { model: nodeBoxModel } = await replayClient.getBoxModel(pauseId, nodeId);
     return nodeBoxModel;
   },
 });

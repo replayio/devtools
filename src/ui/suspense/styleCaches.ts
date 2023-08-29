@@ -1,4 +1,4 @@
-import { PauseId, ProtocolClient, Object as ProtocolObject } from "@replayio/protocol";
+import { PauseId, Object as ProtocolObject } from "@replayio/protocol";
 import uniqBy from "lodash/uniqBy";
 import { Cache, createCache } from "suspense";
 
@@ -14,24 +14,14 @@ export interface WiredAppliedRule {
 }
 
 export const appliedRulesCache: Cache<
-  [
-    protocolClient: ProtocolClient,
-    replayClient: ReplayClientInterface,
-    sessionId: string,
-    pauseId: PauseId,
-    nodeId: string
-  ],
+  [replayClient: ReplayClientInterface, pauseId: PauseId, nodeId: string],
   WiredAppliedRule[]
 > = createCache({
   config: { immutable: true },
   debugLabel: "AppliedRules",
-  getKey: ([protocolClient, replayClient, sessionId, pauseId, nodeId]) => `${pauseId}:${nodeId}`,
-  load: async ([protocolClient, replayClient, sessionId, pauseId, nodeId]) => {
-    const { rules, data } = await protocolClient.CSS.getAppliedRules(
-      { node: nodeId },
-      sessionId,
-      pauseId
-    );
+  getKey: ([replayClient, pauseId, nodeId]) => `${pauseId}:${nodeId}`,
+  load: async ([replayClient, pauseId, nodeId]) => {
+    const { rules, data } = await replayClient.getAppliedRules(pauseId, nodeId);
 
     const uniqueRules = uniqBy(rules, rule => `${rule.rule}|${rule.pseudoElement}`);
 
@@ -85,21 +75,15 @@ export const appliedRulesCache: Cache<
 });
 
 export const computedStyleCache: Cache<
-  [client: ProtocolClient, sessionId: string, pauseId: PauseId, nodeId: string],
+  [replayClient: ReplayClientInterface, sessionId: string, pauseId: PauseId, nodeId: string],
   Map<string, string> | undefined
 > = createCache({
   config: { immutable: true },
   debugLabel: "ComputedStyle",
-  getKey: ([protocolClient, sessionId, pauseId, nodeId]) => `${pauseId}:${nodeId}`,
-  load: async ([protocolClient, sessionId, pauseId, nodeId]) => {
+  getKey: ([replayClient, pauseId, nodeId]) => `${pauseId}:${nodeId}`,
+  load: async ([replayClient, pauseId, nodeId]) => {
     try {
-      const { computedStyle } = await protocolClient.CSS.getComputedStyle(
-        {
-          node: nodeId,
-        },
-        sessionId,
-        pauseId
-      );
+      const { computedStyle } = await replayClient.getComputedStyle(pauseId, nodeId);
 
       const computedStyleMap = new Map();
       for (const { name, value } of computedStyle) {
@@ -114,21 +98,15 @@ export const computedStyleCache: Cache<
 });
 
 export const boundingRectCache: Cache<
-  [protocolClient: ProtocolClient, sessionId: string, pauseId: PauseId, nodeId: string],
+  [replayClient: ReplayClientInterface, pauseId: PauseId, nodeId: string],
   DOMRect | undefined
 > = createCache({
   config: { immutable: true },
   debugLabel: "BoundingRect",
-  getKey: ([protocolClient, sessionId, pauseId, nodeId]) => `${pauseId}:${nodeId}`,
-  load: async ([protocolClient, sessionId, pauseId, nodeId]) => {
+  getKey: ([replayClient, pauseId, nodeId]) => `${pauseId}:${nodeId}`,
+  load: async ([replayClient, pauseId, nodeId]) => {
     try {
-      const { rect } = await protocolClient.DOM.getBoundingClientRect(
-        {
-          node: nodeId,
-        },
-        sessionId,
-        pauseId
-      );
+      const { rect } = await replayClient.getBoundingClientRect(pauseId, nodeId);
       const [left, top, right, bottom] = rect;
       return new DOMRect(left, top, right - left, bottom - top);
     } catch (err) {

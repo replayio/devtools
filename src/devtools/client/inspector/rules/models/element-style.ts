@@ -2,8 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { ProtocolClient } from "@replayio/protocol";
-
 import RuleModel, { NodeWithId } from "devtools/client/inspector/rules/models/rule";
 import { assert } from "protocol/utils";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
@@ -34,9 +32,7 @@ export default class ElementStyle {
   /** The element whose style we're viewing */
   nodeId: string;
   pauseId: string;
-  sessionId: string;
   replayClient: ReplayClientInterface;
-  client: ProtocolClient;
   pseudoElements: string[];
   rules: RuleModel[] | null;
   variablesMap: Map<string, Map<string, string>>;
@@ -44,18 +40,10 @@ export default class ElementStyle {
 
   private _unusedCssEnabled?: boolean;
 
-  constructor(
-    nodeId: string,
-    pauseId: string,
-    sessionId: string,
-    replayClient: ReplayClientInterface,
-    client: ProtocolClient
-  ) {
+  constructor(nodeId: string, pauseId: string, replayClient: ReplayClientInterface) {
     this.nodeId = nodeId;
     this.pauseId = pauseId;
-    this.sessionId = sessionId;
     this.replayClient = replayClient;
-    this.client = client;
     this.pseudoElements = [];
     this.rules = [];
     this.variablesMap = new Map<string, Map<string, string>>();
@@ -91,9 +79,7 @@ export default class ElementStyle {
     }
 
     const wiredRules = await appliedRulesCache.readAsync(
-      this.client,
       this.replayClient,
-      this.sessionId,
       this.pauseId,
       this.nodeId
     );
@@ -155,9 +141,7 @@ export default class ElementStyle {
         }
 
         const parentApplied = await appliedRulesCache.readAsync(
-          this.client,
           this.replayClient,
-          this.sessionId,
           this.pauseId,
           parentNodeId
         );

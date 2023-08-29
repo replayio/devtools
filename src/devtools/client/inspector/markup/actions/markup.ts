@@ -98,26 +98,20 @@ export function setupMarkup(store: UIStore, startAppListening: AppStartListening
         if (latestSelectedNodeId) {
           dispatch(selectionChanged(false));
         } else {
-          const [rootNode] = await nodeDataCache.readAsync(
-            protocolClient,
-            replayClient,
-            ThreadFront.sessionId!,
-            originalPauseId!,
-            { type: "document" }
-          );
+          const [rootNode] = await nodeDataCache.readAsync(replayClient, originalPauseId!, {
+            type: "document",
+          });
 
           if (!rootNode || ThreadFront.currentPauseIdUnsafe !== originalPauseId) {
             return;
           }
 
           const selectedNodeId = getSelectedDomNodeId(getState());
-          const [defaultNode] = await nodeDataCache.readAsync(
-            protocolClient,
-            replayClient,
-            ThreadFront.sessionId!,
-            originalPauseId!,
-            { type: "querySelector", nodeId: rootNode.objectId, selector: "body" }
-          );
+          const [defaultNode] = await nodeDataCache.readAsync(replayClient, originalPauseId!, {
+            type: "querySelector",
+            nodeId: rootNode.objectId,
+            selector: "body",
+          });
 
           if (
             defaultNode &&
@@ -169,13 +163,9 @@ export function newRoot(): UIThunkAction<Promise<void>> {
   return async (dispatch, getState, { ThreadFront, replayClient, protocolClient }) => {
     const originalPauseId = await ThreadFront.getCurrentPauseId(replayClient);
 
-    const [rootNodeData] = await nodeDataCache.readAsync(
-      protocolClient,
-      replayClient,
-      ThreadFront.sessionId!,
-      originalPauseId,
-      { type: "document" }
-    );
+    const [rootNodeData] = await nodeDataCache.readAsync(replayClient, originalPauseId, {
+      type: "document",
+    });
 
     if (!rootNodeData || ThreadFront.currentPauseIdUnsafe !== originalPauseId) {
       return;
@@ -301,13 +291,10 @@ export function selectNode(nodeId: string, reason?: SelectionReason): UIThunkAct
   return async (dispatch, getState, { ThreadFront, replayClient, protocolClient }) => {
     // Ensure we have the data loaded
     const originalPauseId = await ThreadFront.getCurrentPauseId(replayClient);
-    const nodes = await nodeDataCache.readAsync(
-      protocolClient,
-      replayClient,
-      ThreadFront.sessionId!,
-      originalPauseId,
-      { type: "parentNodes", nodeId }
-    );
+    const nodes = await nodeDataCache.readAsync(replayClient, originalPauseId, {
+      type: "parentNodes",
+      nodeId,
+    });
 
     if (nodes.length && ThreadFront.currentPauseIdUnsafe === originalPauseId) {
       dispatch(highlightNode(nodeId, 1000));
@@ -555,12 +542,7 @@ export function highlightNodes(
 
       const boxModels = await Promise.all(
         nodeIds.map(async nodeId => {
-          const boxModel = await boxModelCache.readAsync(
-            protocolClient,
-            ThreadFront.sessionId!,
-            pauseId!,
-            nodeId
-          );
+          const boxModel = await boxModelCache.readAsync(replayClient, pauseId!, nodeId);
           return boxModel;
         })
       );
@@ -598,16 +580,10 @@ export const searchDOM = (query: string): UIThunkAction<Promise<ProtocolObject[]
       return [];
     }
 
-    const results = await nodeDataCache.readAsync(
-      protocolClient,
-      replayClient,
-      sessionId,
-      pauseIdBefore,
-      {
-        type: "searchDOM",
-        query,
-      }
-    );
+    const results = await nodeDataCache.readAsync(replayClient, pauseIdBefore, {
+      type: "searchDOM",
+      query,
+    });
 
     return results;
   };
@@ -616,11 +592,11 @@ export const searchDOM = (query: string): UIThunkAction<Promise<ProtocolObject[]
 export const getNodeBoundingRect = (
   nodeId: string
 ): UIThunkAction<Promise<DOMRect | undefined>> => {
-  return async (dispatch, getState, { protocolClient }) => {
+  return async (dispatch, getState, { replayClient }) => {
     const state = getState();
     const pauseId = state.pause.id;
     const sessionId = state.app.sessionId;
 
-    return boundingRectCache.readAsync(protocolClient, sessionId!, pauseId!, nodeId);
+    return boundingRectCache.readAsync(replayClient, pauseId!, nodeId);
   };
 };
