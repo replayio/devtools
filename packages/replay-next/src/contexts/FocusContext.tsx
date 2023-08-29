@@ -18,7 +18,6 @@ import {
 } from "replay-next/src/utils/timeStampedPoints";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
-import useDebouncedCallback from "../hooks/useDebouncedCallback";
 import {
   imperativelyGetClosestPointForTime,
   preCacheExecutionPointForTime,
@@ -30,7 +29,6 @@ const FOCUS_DEBOUNCE_DURATION = 250;
 
 export type UpdateOptions = {
   bias?: FocusWindowRequestBias;
-  debounce: boolean;
   sync: boolean;
 };
 
@@ -39,8 +37,13 @@ export type FocusContextType = {
   // UI that consumes the focus for Suspense purposes may wish want reflect the temporary pending state.
   enterFocusMode: () => void;
   isTransitionPending: boolean;
+
+  // The currently active range - use this for backend requests that don't cause components to suspend
   range: TimeStampedPointRange | null;
+  // The range to be displayed in the Timeline - don't use this for backend requests
   rangeForDisplay: TimeStampedPointRange | null;
+  // The deferred value of the currently active range - use this for backend requests that may cause components to suspend
+  rangeForSuspense: TimeStampedPointRange | null;
 
   // Set focus window to a range of execution points (or null to clear).
   update: (value: TimeStampedPointRange | null, options: UpdateOptions) => Promise<void>;
@@ -69,7 +72,12 @@ export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
   );
   const [bias, setBias] = useState<FocusWindowRequestBias | undefined>(undefined);
   const [range, setRange] = useState<TimeStampedPointRange | null>(initialRange);
-  const [deferredRange, setDeferredRange] = useState<TimeStampedPointRange | null>(initialRange);
+  const [rangeForDisplay, setRangeForDisplay] = useState<TimeStampedPointRange | null>(
+    initialRange
+  );
+  const [rangeForSuspense, setRangeForSuspense] = useState<TimeStampedPointRange | null>(
+    initialRange
+  );
 
   const prevRangeRef = useRef(range);
 
@@ -80,29 +88,35 @@ export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
   // to indicate that what's currently being showed is stale.
   const [isTransitionPending, startTransition] = useTransition();
 
-  const debouncedSetDeferredRange = useDebouncedCallback(
-    (newRange: TimeStampedPointRange | null) => {
-      startTransition(() => {
-        setDeferredRange(newRange);
-      });
-    },
-    FOCUS_DEBOUNCE_DURATION
-  );
-
   // Refine the loaded ranges based on the focus window.
   useEffect(() => {
-    if (range === null || range === initialRange) {
+    if (rangeForDisplay === null || rangeForDisplay === initialRange) {
       return;
     }
 
-    const timeoutId = setTimeout(() => {
-      client.requestFocusWindow({ begin: range.begin, bias, end: range.end });
+    let cancelled = false;
+
+    const timeoutId = setTimeout(async () => {
+      const range = await client.requestFocusWindow({
+        begin: rangeForDisplay.begin,
+        bias,
+        end: rangeForDisplay.end,
+      });
+
+      if (!cancelled) {
+        setRange(range);
+        startTransition(() => {
+          setRangeForSuspense(range);
+        });
+      }
     }, FOCUS_DEBOUNCE_DURATION);
 
     return () => {
+      cancelled = true;
+
       clearTimeout(timeoutId);
     };
-  }, [bias, client, duration, initialRange, range]);
+  }, [bias, client, duration, initialRange, rangeForDisplay]);
 
   // Feed loaded regions into the time-to-execution-point cache in case we need them later.
   useEffect(() => {
@@ -116,7 +130,7 @@ export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
 
   const updateFocusRange = useCallback(
     async (range: TimeStampedPointRange | null, options: UpdateOptions) => {
-      let { bias, debounce } = options;
+      let { bias } = options;
 
       // If the caller hasn't specified an explicit bias,
       // compare the new focus range to the previous one to infer user intent.
@@ -133,27 +147,16 @@ export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
       }
 
       setBias(bias);
-      setRange(range);
-
-      // Focus values may change rapidly (e.g. during a click-and-drag)
-      // In this case, React's default high/low priority split is helpful, but we can do more.
-      // Debouncing a little before starting the transition helps avoid sending a lot of unused requests to the backend.
-      if (debounce) {
-        debouncedSetDeferredRange(range);
-      } else {
-        startTransition(() => {
-          setDeferredRange(range);
-        });
-      }
+      setRangeForDisplay(range);
 
       // Sync is a no-op
     },
-    [debouncedSetDeferredRange]
+    []
   );
 
   const updateForTimelineImprecise = useCallback(
     async (value: TimeRange | null, options: UpdateOptions) => {
-      const { bias, debounce, sync } = options;
+      const { bias, sync } = options;
 
       if (value) {
         const [timeBegin, timeEnd] = value;
@@ -168,10 +171,10 @@ export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
             begin: { point: pointBegin, time: timeBegin },
             end: { point: pointEnd, time: timeEnd },
           },
-          { bias, debounce, sync }
+          { bias, sync }
         );
       } else {
-        updateFocusRange(null, { bias, debounce, sync });
+        updateFocusRange(null, { bias, sync });
       }
     },
     [client, updateFocusRange]
@@ -181,12 +184,20 @@ export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
     () => ({
       enterFocusMode: () => {},
       isTransitionPending,
-      rangeForDisplay: range,
-      range: deferredRange,
+      range,
+      rangeForDisplay,
+      rangeForSuspense,
       update: updateFocusRange,
       updateForTimelineImprecise,
     }),
-    [deferredRange, isTransitionPending, range, updateFocusRange, updateForTimelineImprecise]
+    [
+      isTransitionPending,
+      range,
+      rangeForDisplay,
+      rangeForSuspense,
+      updateFocusRange,
+      updateForTimelineImprecise,
+    ]
   );
 
   return <FocusContext.Provider value={focusContext}>{children}</FocusContext.Provider>;

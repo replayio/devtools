@@ -436,7 +436,7 @@ export function ReactPanel() {
   const currentTime = useAppSelector(getCurrentTime);
   const executionPoint = useAppSelector(getExecutionPoint);
   const replayClient = useContext(ReplayClientContext);
-  const { rangeForDisplay: focusRange } = useContext(FocusContext);
+  const { range: focusRange } = useContext(FocusContext);
 
   const reactDomSourceUrl = useAppSelector(getReactDomSourceUrl);
   const sourcesState = useAppSelector(state => state.sources);

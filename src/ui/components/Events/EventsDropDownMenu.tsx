@@ -1,11 +1,13 @@
-import { MouseEvent, UIEvent, useMemo, useTransition } from "react";
+import { MouseEvent, UIEvent, useContext, useMemo, useTransition } from "react";
 import { ContextMenuCategory, ContextMenuItem, useContextMenu } from "use-context-menu";
 
 import { Badge, Checkbox } from "design";
 import Icon from "replay-next/components/Icon";
+import { FocusContext } from "replay-next/src/contexts/FocusContext";
+import { isExecutionPointsWithinRange } from "replay-next/src/utils/time";
 import { ConsoleEventFilterPreferencesKey } from "shared/user-data/GraphQL/config";
 import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
-import { getFilteredEventsForFocusWindow } from "ui/reducers/app";
+import { getSortedEventsForDisplay } from "ui/reducers/app";
 import { useAppSelector } from "ui/setup/hooks";
 
 import styles from "./EventsDropDownMenu.module.css";
@@ -20,11 +22,23 @@ function createSelectHandler(callback: () => void): (event: UIEvent) => void {
 }
 
 export default function EventsDropDownMenu() {
-  const events = useAppSelector(getFilteredEventsForFocusWindow);
+  const { range: focusWindow } = useContext(FocusContext);
+  const events = useAppSelector(getSortedEventsForDisplay);
   const eventCounts = useMemo<{ [key in ConsoleEventFilterPreferencesKey]: number }>(
     () =>
       events.reduce(
         (counts, event) => {
+          if (
+            focusWindow &&
+            !isExecutionPointsWithinRange(
+              event.point,
+              focusWindow.begin.point,
+              focusWindow.end.point
+            )
+          ) {
+            return counts;
+          }
+
           switch (event.kind) {
             case "keydown":
             case "keyup":
@@ -46,7 +60,7 @@ export default function EventsDropDownMenu() {
           navigation: 0,
         }
       ),
-    [events]
+    [events, focusWindow]
   );
 
   const [filters] = useGraphQLUserData("console_eventFilters");

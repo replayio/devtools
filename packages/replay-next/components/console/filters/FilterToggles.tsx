@@ -206,7 +206,7 @@ function NodeModulesCount() {
 
 function ExceptionsBadgeSuspends() {
   const replayClient = useContext(ReplayClientContext);
-  const { rangeForDisplay: focusRange } = useContext(FocusContext);
+  const { rangeForSuspense: focusRange } = useContext(FocusContext);
   const { showExceptionsForDisplay: showExceptions } = useContext(ConsoleFiltersContext);
 
   if (!focusRange || !showExceptions) {

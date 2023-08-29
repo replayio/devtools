@@ -71,7 +71,6 @@ describe("Focuser", () => {
     fireEvent.click(screen.getByText("Focus off"));
 
     expect(updateForTimelineImprecise).toHaveBeenCalledWith([0, 60_000], {
-      debounce: false,
       sync: false,
     });
   });

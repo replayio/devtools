@@ -12,6 +12,7 @@ import {
 import { ThreadFront } from "protocol/thread/thread";
 import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import { copyToClipboard } from "replay-next/components/sources/utils/clipboard";
+import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { useCurrentFocusWindow } from "replay-next/src/hooks/useCurrentFocusWindow";
 import { useIsPointWithinFocusWindow } from "replay-next/src/hooks/useIsPointWithinFocusWindow";
 import { getPointAndTimeForPauseId, pauseIdCache } from "replay-next/src/suspense/PauseCache";
@@ -19,7 +20,6 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { isPointInRegion } from "shared/utils/time";
 import { enterFocusMode } from "ui/actions/timeline";
 import { getSourcesLoading } from "ui/reducers/sources";
-import { getFocusWindow } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { getPauseFramesSuspense } from "ui/suspense/frameCache";
 import { getAsyncParentPauseIdSuspense } from "ui/suspense/util";
@@ -43,7 +43,7 @@ function FramesRenderer({
 }) {
   const replayClient = useContext(ReplayClientContext);
   const sourcesState = useAppSelector(state => state.sources);
-  const focusWindow = useAppSelector(getFocusWindow);
+  const { rangeForSuspense: focusWindow } = useContext(FocusContext);
   const dispatch = useAppDispatch();
 
   if (focusWindow === null) {

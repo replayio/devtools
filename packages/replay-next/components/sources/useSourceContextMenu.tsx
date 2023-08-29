@@ -196,7 +196,7 @@ function useDeferredHitCounts({
   lineNumber: number;
   sourceId: SourceId;
 }) {
-  const { range: focusRange } = useContext(FocusContext);
+  const { rangeForSuspense: focusRange } = useContext(FocusContext);
   const replayClient = useContext(ReplayClientContext);
   const { endpoint } = useContext(SessionContext);
 

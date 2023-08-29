@@ -152,8 +152,8 @@ export async function getInitialPausePoint(recordingId: string) {
 }
 
 function onPaused({ point, time }: PauseEventArgs): UIThunkAction {
-  return async (dispatch, getState) => {
-    const focusWindow = getFocusWindow(getState());
+  return async (dispatch, getState, { replayClient }) => {
+    const focusWindow = replayClient.getCurrentFocusWindow();
     const params: Omit<PauseEventArgs, "openSource"> & { focusWindow: FocusWindow | null } = {
       focusWindow,
       point,
@@ -245,8 +245,8 @@ export function updatePausePointParams({
 }
 
 export function updateFocusWindowParam(): UIThunkAction<void> {
-  return (dispatch, getState) => {
-    const focusWindow = getFocusWindow(getState());
+  return (dispatch, getState, { replayClient }) => {
+    const focusWindow = replayClient.getCurrentFocusWindow();
     updateUrlWithParams({ focusWindow: encodeFocusWindow(focusWindow) });
   };
 }
@@ -330,7 +330,7 @@ export function startPlayback(
     endTime: null,
   }
 ): UIThunkAction {
-  return (dispatch, getState) => {
+  return (dispatch, getState, { replayClient }) => {
     const state = getState();
     const currentTime = getCurrentTime(state);
 
@@ -340,14 +340,14 @@ export function startPlayback(
 
     const endTime =
       optEndTime ||
-      (getPlaybackFocusWindow(state) && getFocusWindow(state)?.end.time) ||
+      (getPlaybackFocusWindow(state) && replayClient.getCurrentFocusWindow()?.end.time) ||
       getZoomRegion(state).endTime;
 
     const beginDate = Date.now();
     const beginTime =
       optBeginTime ||
       (currentTime >= endTime
-        ? (getPlaybackFocusWindow(state) && getFocusWindow(state)?.begin.time) || 0
+        ? (getPlaybackFocusWindow(state) && replayClient.getCurrentFocusWindow()?.begin.time) || 0
         : currentTime);
 
     dispatch(
@@ -638,7 +638,7 @@ export function setFocusWindowEnd({
     }
 
     // If this is the first time the user is focusing, begin at the beginning of the recording
-    const focusWindow = getFocusWindow(state);
+    const focusWindow = replayClient.getCurrentFocusWindow();
     const begin = focusWindow?.begin ?? {
       point: "0",
       time: 0,
@@ -680,7 +680,7 @@ export function setFocusWindowBegin({
     }
 
     // If this is the first time the user is focusing, extend to the end of the recording
-    const focusWindow = getFocusWindow(state);
+    const focusWindow = replayClient.getCurrentFocusWindow();
     const end = focusWindow?.end ?? (await sessionEndPointCache.readAsync(replayClient));
 
     await dispatch(setFocusWindow({ begin, end }));

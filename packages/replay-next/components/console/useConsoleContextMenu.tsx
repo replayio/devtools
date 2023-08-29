@@ -19,7 +19,7 @@ import styles from "./ContextMenu.module.css";
 const BADGES: Badge[] = ["green", "yellow", "orange", "purple"];
 
 export default function useConsoleContextMenu(loggable: Loggable) {
-  const { rangeForDisplay, update } = useContext(FocusContext);
+  const { range, update } = useContext(FocusContext);
   const { editPointBadge, editPointBehavior } = useContext(PointsContext);
   const { currentUserInfo, duration, endpoint } = useContext(SessionContext);
 
@@ -30,14 +30,13 @@ export default function useConsoleContextMenu(loggable: Loggable) {
           point: getLoggableExecutionPoint(loggable),
           time: getLoggableTime(loggable),
         },
-        end: rangeForDisplay?.end ?? {
+        end: range?.end ?? {
           point: endpoint,
           time: duration,
         },
       },
       {
         bias: "begin",
-        debounce: false,
         sync: true,
       }
     );
@@ -46,7 +45,7 @@ export default function useConsoleContextMenu(loggable: Loggable) {
   const setFocusEnd = () => {
     update(
       {
-        begin: rangeForDisplay?.begin ?? {
+        begin: range?.begin ?? {
           point: "0",
           time: 0,
         },
@@ -57,7 +56,6 @@ export default function useConsoleContextMenu(loggable: Loggable) {
       },
       {
         bias: "end",
-        debounce: false,
         sync: true,
       }
     );

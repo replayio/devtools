@@ -1,7 +1,7 @@
 import { Locator, Page, expect } from "@playwright/test";
 import chalk from "chalk";
 
-import { debugPrint, getByTestName, waitFor } from "./utils";
+import { debugPrint, delay, getByTestName, waitFor } from "./utils";
 
 export async function clearFocusRange(page: Page): Promise<void> {
   await debugPrint(page, `Clearing focus range`, "clearFocusRange");
@@ -78,6 +78,10 @@ export async function setFocusRangeEndTime(page: Page, timeString: string): Prom
   await input.focus();
   await clearTimeInput(page, input);
   await input.fill(timeString);
+  await input.blur();
+  // TODO [FE-1854] setting the focus window takes some time
+  // because we need to fetch execution points first
+  await delay(200);
 }
 
 export async function setFocusRangeStartTime(page: Page, timeString: string): Promise<void> {
@@ -91,6 +95,10 @@ export async function setFocusRangeStartTime(page: Page, timeString: string): Pr
   await input.focus();
   await clearTimeInput(page, input);
   await input.fill(timeString);
+  await input.blur();
+  // TODO [FE-1854] setting the focus window takes some time
+  // because we need to fetch execution points first
+  await delay(200);
 }
 
 export function getTimeline(page: Page) {

@@ -4,9 +4,11 @@ import { memo, useContext, useMemo } from "react";
 import { STATUS_PENDING, STATUS_RESOLVED, useImperativeCacheValue } from "suspense";
 
 import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
+import { FocusContext } from "replay-next/src/contexts/FocusContext";
+import { isExecutionPointsWithinRange } from "replay-next/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
-import { getFilteredEventsForFocusWindow } from "ui/actions/app";
+import { getSortedEventsForDisplay } from "ui/actions/app";
 import { seek } from "ui/actions/timeline";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
@@ -34,7 +36,8 @@ function Events() {
   const dispatch = useAppDispatch();
   const currentTime = useAppSelector(getCurrentTime);
   const executionPoint = useAppSelector(getExecutionPoint);
-  const events = useAppSelector(getFilteredEventsForFocusWindow);
+  const events = useAppSelector(getSortedEventsForDisplay);
+  const { range: focusWindow } = useContext(FocusContext);
 
   const { status: annotationsStatus, value: parsedAnnotations } = useImperativeCacheValue(
     eventListenersJumpLocationsCache,
@@ -46,6 +49,13 @@ function Events() {
   const filteredEvents = useMemo(
     () =>
       events.filter(event => {
+        if (
+          focusWindow &&
+          !isExecutionPointsWithinRange(event.point, focusWindow.begin.point, focusWindow.end.point)
+        ) {
+          return false;
+        }
+
         switch (event.kind) {
           case "keydown":
           case "keyup":
@@ -59,7 +69,7 @@ function Events() {
 
         return true;
       }),
-    [events, filters]
+    [events, filters, focusWindow]
   );
 
   const jumpToCodeAnnotations: ParsedJumpToCodeAnnotation[] =

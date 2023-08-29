@@ -90,7 +90,7 @@ function MetaHoverButton({
   lineNumber: number;
   source: Source;
 }) {
-  const { range: focusRange } = useContext(FocusContext);
+  const { rangeForSuspense: focusRange } = useContext(FocusContext);
   const { isShiftKeyActive } = useContext(KeyboardModifiersContext);
   const replayClient = useContext(ReplayClientContext);
   const { executionPoint, update } = useContext(TimelineContext);

@@ -62,7 +62,7 @@ function EventsListCategories({
   isPending: boolean;
 }) {
   const client = useContext(ReplayClientContext);
-  const { range } = useContext(FocusContext);
+  const { rangeForSuspense: range } = useContext(FocusContext);
   const { trackEvent } = useContext(SessionContext);
 
   const pointRange = range ? { begin: range.begin.point, end: range.end.point } : null;

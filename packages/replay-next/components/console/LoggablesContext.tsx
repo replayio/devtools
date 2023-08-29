@@ -103,7 +103,7 @@ function LoggablesContextInner({
     showNodeModules,
     showWarnings,
   } = useContext(ConsoleFiltersContext);
-  const { range: focusRange } = useContext(FocusContext);
+  const { rangeForSuspense: focusRange } = useContext(FocusContext);
   const { endpoint } = useContext(SessionContext);
 
   // Find the set of event type handlers we should be displaying in the console.
