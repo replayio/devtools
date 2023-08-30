@@ -10,6 +10,16 @@
 }
 .Row {
   cursor: pointer;
+
+  --status-background-color: var(--testsuites-success-color);
+  --status-color: var(--body-color);
+}
+.Row[data-status-category="redirect"] {
+  --status-background-color: var(--testsuites-flaky-color);
+}
+.Row[data-status-category="error"] {
+  --status-background-color: var(--testsuites-failed-color);
+  --status-color: var(--testsuites-error-color);
 }
 .Row:focus,
 .Row:hover {
@@ -28,20 +38,28 @@
 .Row[data-selected]:hover {
   background: var(--primary-accent-hover);
   color: var(--color-default);
+
+  --status-background-color: var(--color-default);
+  --status-color: var(--color-default);
 }
 
 /* These styles should stay in sync with NetworkMonitorListHeader */
-.StatusColumn,
-.NameColumn,
+.DomainColumn,
 .MethodColumn,
-.TypeColumn,
-.DomainColumn {
+.NameColumn,
+.StatusColumn,
+.TimingColumn,
+.TypeColumn {
   white-space: pre;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.TimingColumn {
+  flex: 0 0 40px;
+}
 .StatusColumn {
   flex: 0 0 60px;
+  color: var(--status-color);
 }
 .NameColumn {
   flex: 1 1 200px;
@@ -101,4 +119,26 @@
 }
 .SeekButton:hover .SeekButtonText {
   display: block;
+}
+
+.NoResponseMarker {
+  color: var(--color-dimmer);
+}
+
+.TimingContainer {
+  position: relative;
+  height: 0.75rem;
+  border-radius: 0.25rem;
+  background-color: transparent;
+  border: 1px solid var(--theme-toolbar-background);
+  margin-right: 1ch;
+  overflow: hidden;
+}
+
+.Timing {
+  position: absolute;
+  border-radius: 0.125rem;
+  background-color: var(--status-background-color);
+  height: 100%;
+  min-width: 1px;
 }

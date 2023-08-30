@@ -52,11 +52,11 @@
   background-color: var(--theme-toolbar-selected-color);
 }
 .RelativeDurationBlockFast {
-  background-color: var(--green-60);
+  background-color: var(--testsuites-success-color);
 }
 .RelativeDurationBlockMedium {
   background-color: var(--yellow-65);
 }
 .RelativeDurationBlockSlow {
-  background-color: var(--red-50);
+  background-color: var(--testsuites-flaky-color);
 }

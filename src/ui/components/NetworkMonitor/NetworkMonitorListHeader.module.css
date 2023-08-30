@@ -8,14 +8,18 @@
 }
 
 /* These styles should stay in sync with NetworkMonitorListRow */
-.StatusColumn,
-.NameColumn,
+.DomainColumn,
 .MethodColumn,
-.TypeColumn,
-.DomainColumn {
+.NameColumn,
+.StatusColumn,
+.TimingColumn,
+.TypeColumn {
   white-space: pre;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.TimingColumn {
+  flex: 0 0 40px;
 }
 .StatusColumn {
   flex: 0 0 60px;

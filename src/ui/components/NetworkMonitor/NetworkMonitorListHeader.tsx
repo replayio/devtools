@@ -10,6 +10,7 @@ export function NetworkMonitorListHeader() {
         height: LIST_ROW_HEIGHT,
       }}
     >
+      <div className={styles.TimingColumn}>Time</div>
       <div className={styles.StatusColumn}>Status</div>
       <div className={styles.NameColumn}>Name</div>
       <div className={styles.MethodColumn}>Method</div>

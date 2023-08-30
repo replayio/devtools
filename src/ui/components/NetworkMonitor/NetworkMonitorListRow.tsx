@@ -1,6 +1,7 @@
-import { CSSProperties } from "react";
+import { CSSProperties, ReactNode, useContext } from "react";
 
 import Icon from "replay-next/components/Icon";
+import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import useNetworkContextMenu from "ui/components/NetworkMonitor/useNetworkContextMenu";
 import { RequestSummary } from "ui/components/NetworkMonitor/utils";
 
@@ -68,8 +69,22 @@ function RequestRow({
     selectedRequestId,
   } = itemData;
 
-  const { cause, documentType, domain, id, method, name, point, status, triggerPoint, url } =
-    request;
+  const { duration: recordingDuration } = useContext(SessionContext);
+
+  const {
+    cause,
+    documentType,
+    domain,
+    end: endTime,
+    id,
+    method,
+    name,
+    point,
+    start: startTime,
+    status,
+    triggerPoint,
+    url,
+  } = request;
 
   let type = documentType || cause;
   if (type === "unknown") {
@@ -87,12 +102,41 @@ function RequestRow({
     dataCurrentTime = "after";
   }
 
+  let statusCategory: string | undefined;
+  if (status != null) {
+    if (status >= 400) {
+      statusCategory = "error";
+    } else if (status >= 300) {
+      statusCategory = "redirect";
+    }
+  }
+
+  let time: ReactNode = null;
+  if (endTime == null) {
+    time = <div className={styles.NoResponseMarker}>-</div>;
+  } else {
+    const requestDuration = endTime - startTime;
+
+    time = (
+      <div className={styles.TimingContainer}>
+        <div
+          className={styles.Timing}
+          style={{
+            left: `${(startTime / recordingDuration) * 100}%`,
+            width: `${(requestDuration / recordingDuration) * 100}%`,
+          }}
+        />
+      </div>
+    );
+  }
+
   return (
     <>
       <div
         className={styles.Row}
         data-current-time={dataCurrentTime}
         data-selected={selectedRequestId === id || undefined}
+        data-status-category={statusCategory}
         data-test-id={`Network-RequestRow-${id}`}
         data-test-name="Network-RequestRow"
         onClick={() => selectRequest(request)}
@@ -100,6 +144,7 @@ function RequestRow({
         style={style}
         tabIndex={0}
       >
+        <div className={styles.TimingColumn}>{time}</div>
         <div className={styles.StatusColumn}>{status}</div>
         <div className={styles.NameColumn}>{name}</div>
         <div className={styles.MethodColumn}>{method}</div>

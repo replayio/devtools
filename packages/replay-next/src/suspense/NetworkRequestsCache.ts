@@ -22,18 +22,22 @@ import { comparePoints } from "protocol/execution-point-utils";
 import { assert } from "protocol/utils";
 import { ReplayClientInterface } from "shared/client/types";
 
+export type NetworkEventWithTime<EventType> = EventType & {
+  time: number;
+};
+
 export type NetworkRequestsData = {
   id: RequestId;
   events: {
-    bodyEvent: RequestBodyEvent | null;
-    destinationEvent: RequestDestinationEvent | null;
-    doneEvent: RequestDoneEvent | null;
-    failedEvent: RequestFailedEvent | null;
-    openEvent: RequestOpenEvent | null;
-    rawHeaderEvent: RequestRawHeaderEvent | null;
-    responseBodyEvent: RequestResponseBodyEvent | null;
-    responseEvent: RequestResponseEvent | null;
-    responseRawHeaderEvent: RequestResponseRawHeaderEvent | null;
+    bodyEvent: NetworkEventWithTime<RequestBodyEvent> | null;
+    destinationEvent: NetworkEventWithTime<RequestDestinationEvent> | null;
+    doneEvent: NetworkEventWithTime<RequestDoneEvent> | null;
+    failedEvent: NetworkEventWithTime<RequestFailedEvent> | null;
+    openEvent: NetworkEventWithTime<RequestOpenEvent> | null;
+    rawHeaderEvent: NetworkEventWithTime<RequestRawHeaderEvent> | null;
+    responseBodyEvent: NetworkEventWithTime<RequestResponseBodyEvent> | null;
+    responseEvent: NetworkEventWithTime<RequestResponseEvent> | null;
+    responseRawHeaderEvent: NetworkEventWithTime<RequestResponseRawHeaderEvent> | null;
   };
   timeStampedPoint: TimeStampedPoint;
   triggerPoint: TimeStampedPoint | null;
@@ -98,36 +102,65 @@ export const networkRequestsCache = createStreamingCache<
         } as NetworkRequestsData;
       });
 
-      data.events.forEach(({ id, event }) => {
+      data.events.forEach(({ event, id, time }) => {
         const record = records[id];
         const events = record.events;
         switch (event.kind) {
           case "request":
-            events.openEvent = event;
+            events.openEvent = {
+              ...event,
+              time,
+            };
             break;
           case "request-body":
-            events.bodyEvent = event;
+            events.bodyEvent = {
+              ...event,
+              time,
+            };
             break;
           case "request-destination":
-            events.destinationEvent = event;
+            events.destinationEvent = {
+              ...event,
+              time,
+            };
             break;
           case "request-done":
-            events.doneEvent = event;
+            events.doneEvent = {
+              ...event,
+              time,
+            };
+            // TODO
             break;
           case "request-failed":
-            events.failedEvent = event;
+            events.failedEvent = {
+              ...event,
+              time,
+            };
             break;
           case "request-raw-headers":
-            events.rawHeaderEvent = event;
+            events.rawHeaderEvent = {
+              ...event,
+              time,
+            };
             break;
           case "response":
-            events.responseEvent = event;
+            events.responseEvent = {
+              ...event,
+              time,
+            };
             break;
           case "response-body":
-            events.responseBodyEvent = event;
+            events.responseBodyEvent = {
+              ...event,
+              time,
+            };
+            // TODO
             break;
           case "response-raw-headers":
-            events.responseRawHeaderEvent = event;
+            events.responseRawHeaderEvent = {
+              ...event,
+              time,
+            };
             break;
         }
       });
