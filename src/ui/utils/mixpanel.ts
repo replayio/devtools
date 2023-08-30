@@ -144,9 +144,9 @@ export function initializeMixpanel() {
 }
 
 export function maybeSetMixpanelContext(
-  userInfo: TelemetryUser & { workspaceId: string | null; role: string | null }
+  userInfo: TelemetryUser & { workspaceId: string | null; role: string | null; isTest?: boolean }
 ) {
-  const { internal: isInternal } = userInfo;
+  const { internal: isInternal, isTest } = userInfo;
   const forceEnableMixpanel = userData.get("global_logTelemetryEvent");
   const shouldEnableMixpanel = (!isInternal && !skipTelemetry()) || forceEnableMixpanel;
 
@@ -155,6 +155,11 @@ export function maybeSetMixpanelContext(
     enableMixpanel();
     trackMixpanelEvent("session_start", { workspaceId: userInfo.workspaceId });
     timeMixpanelEvent("session.devtools_start");
+
+    if (isTest) {
+      trackMixpanelEvent("session_start.test");
+    }
+
     setupSessionEndListener();
   }
 }
