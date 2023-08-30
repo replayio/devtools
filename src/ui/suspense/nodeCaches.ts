@@ -196,6 +196,34 @@ export const processedNodeDataCache: Cache<
   },
 });
 
+export const ancestorNodesCache: Cache<
+  [replayClient: ReplayClientInterface, pauseId: PauseId, nodeId: string],
+  NodeInfo[] | null
+> = createCache({
+  config: { immutable: true },
+  debugLabel: "AncestorNodesData",
+  getKey: ([replayClient, pauseId, nodeId]) => `${pauseId}:${nodeId}`,
+  load: async ([replayClient, pauseId, nodeId]): Promise<NodeInfo[] | null> => {
+    if (!pauseId || typeof nodeId !== "string") {
+      return null;
+    }
+
+    const nodes: NodeInfo[] = [];
+
+    let ancestorId: string | null = nodeId;
+
+    while (ancestorId) {
+      const node = await processedNodeDataCache.readAsync(replayClient, pauseId, ancestorId);
+      ancestorId = node?.parentNodeId ?? null;
+      if (node) {
+        nodes.unshift(node);
+      }
+    }
+
+    return nodes;
+  },
+});
+
 export const nodeEventListenersCache: Cache<
   [replayClient: ReplayClientInterface, sessionId: string, pauseId: PauseId, nodeId: string],
   EventListener[] | undefined

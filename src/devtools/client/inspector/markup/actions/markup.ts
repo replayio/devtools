@@ -12,7 +12,12 @@ import type { UIStore, UIThunkAction } from "ui/actions";
 import { isInspectorSelected } from "ui/reducers/app";
 import { AppStartListening } from "ui/setup/listenerMiddleware";
 import { UIState } from "ui/state";
-import { boxModelCache, nodeDataCache, processedNodeDataCache } from "ui/suspense/nodeCaches";
+import {
+  ancestorNodesCache,
+  boxModelCache,
+  nodeDataCache,
+  processedNodeDataCache,
+} from "ui/suspense/nodeCaches";
 import { boundingRectCache } from "ui/suspense/styleCaches";
 
 import {
@@ -234,29 +239,23 @@ export function selectionChanged(
 
     dispatch(nodeSelected(latestSelectedNodeId));
 
-    // collect the selected node's ancestors in top-down order
-    const selectedNode = await objectCache.readAsync(
-      replayClient,
-      pauseId,
-      latestSelectedNodeId,
-      "canOverflow"
-    );
-    let ancestors: string[] = [];
-
-    let ancestorId = expandSelectedNode
-      ? latestSelectedNodeId
-      : selectedNode.preview?.node?.parentNode;
-
     // This part _should_ run quickly, because we should have fetched
     // parent nodes over in `selectNode()`
-    while (ancestorId) {
-      ancestors.unshift(ancestorId);
+    // Note that this list includes the selected node itself
+    const parsedNodeAncestors = await ancestorNodesCache.readAsync(
+      replayClient,
+      pauseId,
+      latestSelectedNodeId
+    );
 
-      const node = await objectCache.readAsync(replayClient, pauseId, ancestorId, "canOverflow");
-      ancestorId = node?.preview?.node?.parentNode;
+    // These should be in top-down order
+    let ancestorIds = parsedNodeAncestors?.map(node => node.id) ?? [];
+
+    if (!expandSelectedNode) {
+      ancestorIds = ancestorIds.filter(id => id !== latestSelectedNodeId);
     }
 
-    dispatch(expandMultipleNodes(ancestors));
+    dispatch(expandMultipleNodes(ancestorIds));
 
     if (shouldScrollIntoView) {
       dispatch(updateScrollIntoViewNode(latestSelectedNodeId));
@@ -272,6 +271,10 @@ export function selectNode(nodeId: string, reason?: SelectionReason): UIThunkAct
       type: "parentNodes",
       nodeId,
     });
+
+    // We cached all the plain object data for the ancestors,
+    // but we really need the parsed data.  Preload that.
+    await ancestorNodesCache.readAsync(replayClient, originalPauseId, nodeId);
 
     if (nodes.length && ThreadFront.currentPauseIdUnsafe === originalPauseId) {
       dispatch(highlightNode(nodeId, 1000));
