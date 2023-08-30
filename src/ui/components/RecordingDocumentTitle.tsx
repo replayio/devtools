@@ -17,9 +17,9 @@ export function RecordingDocumentTitle() {
   const isProcessed = useIsRecordingProcessed(recording);
   const processingProgress = useRecordingProcessingProgress();
 
-  const { metadata = {}, title = "" } = recording ?? {};
+  const { metadata, title = "" } = recording ?? {};
 
-  const testResult = metadata.test?.result;
+  const testResult = metadata?.test?.result;
 
   // Track the animation counter with a ref so that it doesn't reset to 0 when the effect re-runs
   // (The effect will re-run when the processing progress changes, for example)
