@@ -28,18 +28,8 @@ export function setupBoxModel(store: UIStore, startAppListening: AppStartListeni
 
       const [bounds, style] = await pause(
         Promise.all([
-          boundingRectCache.readAsync(
-            protocolClient,
-            ThreadFront.sessionId!,
-            originalPauseId,
-            selectedNode
-          ),
-          computedStyleCache.readAsync(
-            protocolClient,
-            ThreadFront.sessionId!,
-            originalPauseId,
-            selectedNode
-          ),
+          boundingRectCache.readAsync(replayClient, originalPauseId, selectedNode),
+          computedStyleCache.readAsync(replayClient, originalPauseId, selectedNode),
         ])
       );
 
