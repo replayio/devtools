@@ -3,17 +3,12 @@ import { ComputedAction } from "../actions";
 import { ComputedState } from "../state";
 
 const INITIAL_COMPUTED: ComputedState = {
-  properties: [],
   search: "",
   showBrowserStyles: false,
   expandedProperties: new Set<string>(),
 };
 
 const reducers: ReducerObject<ComputedState, ComputedAction> = {
-  set_computed_properties(state, { properties }) {
-    return { ...state, properties };
-  },
-
   set_computed_property_search(state, { search }) {
     return { ...state, search };
   },
