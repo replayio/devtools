@@ -7,6 +7,7 @@ import {
   openElementsPanel,
   selectElementsRowWithText,
 } from "../helpers/elements-panel";
+import { toggleToolboxLayout } from "../helpers/layout";
 import { getBreakpointsAccordionPane } from "../helpers/pause-information-panel";
 import { mapLocators, waitFor } from "../helpers/utils";
 import test from "../testFixtureCloneRecording";
@@ -236,8 +237,7 @@ test("stacking: Element highlighter selects the correct element when they overla
   await openConsolePanel(page);
 
   // Dock the console to the _left_ side, to make the video preview as big as possible
-  await page.locator('[data-test-id="consoleDockButton"]').click();
-  await page.locator('[data-test-id="DockToLeftButton"]').click();
+  await toggleToolboxLayout(page, "left");
 
   const canvas = page.locator("canvas#graphics");
   const rulesContainer = page.locator("#ruleview-container");

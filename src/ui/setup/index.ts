@@ -2,9 +2,7 @@ import { loadedRegions as LoadedRegions } from "@replayio/protocol";
 
 import type { TabsState } from "devtools/client/debugger/src/reducers/tabs";
 import { EMPTY_TABS } from "devtools/client/debugger/src/reducers/tabs";
-import { ThreadFront } from "protocol/thread";
 import { preCacheExecutionPointForTime } from "replay-next/src/suspense/ExecutionPointsCache";
-import { sourcesCache } from "replay-next/src/suspense/SourcesCache";
 import { replayClient } from "shared/client/ReplayClientContext";
 import { Recording } from "shared/graphql/types";
 import { getSystemColorScheme } from "shared/theme/getSystemColorScheme";

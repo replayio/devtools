@@ -2,10 +2,6 @@
   position: relative;
 }
 
-.dropdown-wrapper:hover {
-  cursor: pointer;
-}
-
 .dropdown-wrapper button.secondary {
   padding: 5px 10px 5px 5px;
   background: none;
@@ -62,6 +58,14 @@
   top: 40px;
 }
 
+.dropdown-container .inactive-row {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  right: -4px;
+  top: 48px;
+}
+
 .dropdown-container .row {
   display: flex;
   align-items: center;
@@ -69,6 +73,7 @@
   border-radius: 4px;
   right: -4px;
   top: 48px;
+  cursor: pointer;
 }
 
 .dropdown-container .row-flat {

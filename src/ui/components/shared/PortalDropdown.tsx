@@ -53,7 +53,6 @@ export default function PortalDropdown(props: PortalDropdownProps) {
         className={`expand-dropdown mr-1 flex w-full ${buttonStyle}`}
         disabled={props.disabled}
         id="portal-dropdown-button"
-        data-test-id="consoleDockButton"
         data-test-state={toolboxLayout}
         onMouseDown={expand}
         ref={buttonRef}
