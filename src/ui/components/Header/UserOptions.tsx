@@ -40,13 +40,18 @@ export default function UserOptions() {
 
             <div className="flex flex-row items-center space-x-1">
               <div
-                className="flex flex-row items-center"
+                className={styles.LayoutButton}
                 data-test-id="ToggleVideoPlayerButton"
-                data-test-state={videoPanelCollapsed ? "collapsed" : "expanded"}
+                data-test-video-collapsed={videoPanelCollapsed ? "collapsed" : "expanded"}
                 onClick={() => onVideoPanelCollapseChange(!videoPanelCollapsed)}
                 title={videoPanelCollapsed ? "Show Video" : "Hide Video"}
               >
-                <MaterialIcon>{videoPanelCollapsed ? "videocam_on" : "videocam_off"}</MaterialIcon>
+                <MaterialIcon
+                  className={styles.VideoIcon}
+                  data-icon-selected={!videoPanelCollapsed ? "" : undefined}
+                >
+                  {videoPanelCollapsed ? "videocam_off" : "videocam_on"}
+                </MaterialIcon>
               </div>
 
               <div>
@@ -54,45 +59,36 @@ export default function UserOptions() {
               </div>
 
               <div
-                className="flex flex-row items-center"
+                className={styles.LayoutButton}
                 data-layout-option="ide"
                 data-layout-option-selected={toolboxLayout === "ide" || undefined}
                 data-test-id="DockToBottomRightButton"
                 onClick={() => onLayoutChange("ide")}
                 title="Console on bottom-right"
               >
-                <Icon
-                  filename="dock-bottom-right"
-                  className={`${styles.icon} ${toolboxLayout === "ide" ? styles.selected : ""}`}
-                />
+                <Icon filename="dock-bottom-right" className={styles.LayoutIcon} />
               </div>
 
               <div
-                className="flex flex-row items-center"
+                className={styles.LayoutButton}
                 data-layout-option="left"
                 data-layout-option-selected={toolboxLayout === "left" || undefined}
                 data-test-id="DockToLeftButton"
                 onClick={() => onLayoutChange("left")}
                 title="Console on left"
               >
-                <Icon
-                  filename="dock-left"
-                  className={`${styles.icon} ${toolboxLayout === "left" ? styles.selected : ""}`}
-                />
+                <Icon filename="dock-left" className={styles.LayoutIcon} />
               </div>
 
               <div
-                className="flex flex-row items-center"
+                className={styles.LayoutButton}
                 data-layout-option="bottom"
                 data-layout-option-selected={toolboxLayout === "bottom" || undefined}
                 data-test-id="DockToBottomButton"
                 onClick={() => onLayoutChange("bottom")}
                 title="Console on bottom"
               >
-                <Icon
-                  filename="dock-bottom"
-                  className={`${styles.icon} ${toolboxLayout === "bottom" ? styles.selected : ""}`}
-                />
+                <Icon filename="dock-bottom" className={styles.LayoutIcon} />
               </div>
             </div>
           </div>
@@ -108,31 +104,25 @@ export default function UserOptions() {
 
             <div className="flex space-x-1">
               <div
-                className="flex flex-row items-center"
+                className={styles.LayoutButton}
                 data-layout-option="left"
                 data-layout-option-selected={toolboxLayout === "left" || undefined}
                 data-test-id="DockToLeftButton"
                 onClick={() => onLayoutChange("left")}
                 title="Split view"
               >
-                <Icon
-                  filename="dock-left"
-                  className={`${styles.icon} ${toolboxLayout === "left" ? styles.selected : ""}`}
-                />
+                <Icon filename="dock-left" className={styles.LayoutIcon} />
               </div>
 
               <div
-                className="flex flex-row items-center"
+                className={styles.LayoutButton}
                 data-layout-option="full"
                 data-layout-option-selected={toolboxLayout === "full" || undefined}
                 data-test-id="DockToBottomButton"
                 onClick={() => onLayoutChange("full")}
                 title="Full view"
               >
-                <Icon
-                  filename="dock-full"
-                  className={`${styles.icon} ${toolboxLayout === "full" ? styles.selected : ""}`}
-                />
+                <Icon filename="dock-full" className={styles.LayoutIcon} />
               </div>
             </div>
           </div>
@@ -168,6 +158,7 @@ export default function UserOptions() {
 
   const onVideoPanelCollapseChange = (collapsed: boolean) => {
     setVideoPanelCollapsed(collapsed);
+    trackEvent(collapsed ? "video.settings.set_collapsed" : "video.settings.set_expanded");
     setExpanded(false);
   };
 

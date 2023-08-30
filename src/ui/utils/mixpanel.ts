@@ -126,7 +126,9 @@ type MixpanelEvent =
   | ["upload.discard"]
   | ["user_options.launch_replay"]
   | ["user_options.select_docs"]
-  | ["user_options.select_settings"];
+  | ["user_options.select_settings"]
+  | ["video.settings.set_collapsed"]
+  | ["video.settings.set_expanded"];
 
 // Keep mixpanel disabled until we know we have the user's info
 // to send along with events. This keeps events from tests from being
