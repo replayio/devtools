@@ -60,7 +60,7 @@ export function setComputedPropertyExpanded(
   return { type: "set_computed_property_expanded", property, expanded };
 }
 
-async function createComputedProperties(
+export async function createComputedProperties(
   elementStyle: ElementStyle,
   computed: Map<string, string> | undefined
 ): Promise<ComputedPropertyState[]> {

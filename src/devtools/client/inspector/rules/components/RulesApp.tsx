@@ -1,12 +1,19 @@
-import { FC, useCallback, useMemo, useState } from "react";
+import { FC, useCallback, useContext, useMemo, useState } from "react";
+import { shallowEqual } from "react-redux";
+import { useImperativeCacheValue } from "suspense";
 
+import { getPauseId } from "devtools/client/debugger/src/selectors";
 import { Rule } from "devtools/client/inspector/rules/components/Rule";
 import { Rules } from "devtools/client/inspector/rules/components/Rules";
 import { Toolbar } from "devtools/client/inspector/rules/components/Toolbar";
 import Accordion, { AccordionItem } from "devtools/client/shared/components/Accordion";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { userData } from "shared/user-data/GraphQL/UserData";
 import { useAppSelector } from "ui/setup/hooks";
+import { processedNodeDataCache } from "ui/suspense/nodeCaches";
+import { cssRulesCache } from "ui/suspense/styleCaches";
 
+import { getSelectedNodeId } from "../../markup/selectors/markup";
 import { RuleInheritance } from "../models/rule";
 import { RuleState } from "../reducers/rules";
 
@@ -15,7 +22,30 @@ type InheritedRule = RuleState & { inheritance: RuleInheritance };
 const NO_RULES_AVAILABLE: RuleState[] = [];
 
 export const RulesApp: FC = ({}) => {
-  const rules = useAppSelector(state => state.rules.rules ?? NO_RULES_AVAILABLE);
+  const replayClient = useContext(ReplayClientContext);
+  const { pauseId, selectedNodeId } = useAppSelector(
+    state => ({
+      pauseId: getPauseId(state),
+      selectedNodeId: getSelectedNodeId(state),
+    }),
+    shallowEqual
+  );
+
+  const { value: node, status: nodeStatus } = useImperativeCacheValue(
+    processedNodeDataCache,
+    replayClient,
+    pauseId!,
+    selectedNodeId!
+  );
+
+  const canHaveRules = nodeStatus === "resolved" ? node?.isElement : false;
+
+  const { value: cachedStyles, status } = useImperativeCacheValue(
+    cssRulesCache,
+    replayClient,
+    canHaveRules ? pauseId : undefined,
+    canHaveRules ? selectedNodeId : undefined
+  );
 
   const [rulesQuery, setRulesQuery] = useState("");
 
@@ -50,6 +80,11 @@ export const RulesApp: FC = ({}) => {
     },
     [rulesQuery]
   );
+
+  let rules = NO_RULES_AVAILABLE;
+  if (status === "resolved" && cachedStyles) {
+    rules = cachedStyles.rules;
+  }
 
   const renderPseudoElementRules = useCallback(
     (rules: RuleState[]) => {
