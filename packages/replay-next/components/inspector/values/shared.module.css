@@ -22,7 +22,7 @@
   color: var(--value-type-date);
 }
 .Error {
-  color: var(--value-typeˀ-error);
+  color: var(--value-type-error);
 }
 .NaN {
   color: var(--value-type-nan);
@@ -46,7 +46,7 @@
   color: var(--value-type-undefined);
 }
 
-.IconButton {
+.IconBuʔtton {
   height: 1rem;
   width: 1rem;
   outline: none;
