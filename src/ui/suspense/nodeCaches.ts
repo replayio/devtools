@@ -18,6 +18,8 @@ import { cachePauseData } from "replay-next/src/suspense/PauseCache";
 import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientInterface } from "shared/client/types";
 
+import { computedStyleCache } from "./styleCaches";
+
 type NodeFetchOptions =
   | {
       type: "node";
@@ -280,7 +282,22 @@ export const boxModelCache: Cache<
   load: async ([replayClient, pauseId, nodeId]) => {
     const nodeObject = processedNodeDataCache.getValueIfCached(replayClient, pauseId, nodeId);
 
-    if (nodeObject && !canHighlightNode(nodeObject)) {
+    const computedStyle = await computedStyleCache.readAsync(replayClient, pauseId, nodeId);
+    const displayValue = computedStyle?.get("display");
+
+    const nodeMayBeHighlightable = nodeObject && canHighlightNode(nodeObject);
+    let nodeIsVisible = true;
+
+    if (nodeMayBeHighlightable) {
+      const computedStyle = await computedStyleCache.readAsync(replayClient, pauseId, nodeId);
+      const displayValue = computedStyle?.get("display");
+      nodeIsVisible = displayValue !== "none";
+
+    }
+
+    const canFetchBoxModel = nodeMayBeHighlightable && nodeIsVisible;
+
+    if (!canFetchBoxModel) {
       // Return a fake entry with no size
       return {
         ...NO_BOX_MODEL,
