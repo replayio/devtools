@@ -280,19 +280,20 @@ export const boxModelCache: Cache<
   debugLabel: "BoxModel",
   getKey: ([replayClient, pauseId, nodeId]) => `${pauseId}:${nodeId}`,
   load: async ([replayClient, pauseId, nodeId]) => {
+    if (!pauseId || !nodeId) {
+      return NO_BOX_MODEL;
+    }
     const nodeObject = processedNodeDataCache.getValueIfCached(replayClient, pauseId, nodeId);
-
-    const computedStyle = await computedStyleCache.readAsync(replayClient, pauseId, nodeId);
-    const displayValue = computedStyle?.get("display");
 
     const nodeMayBeHighlightable = nodeObject && canHighlightNode(nodeObject);
     let nodeIsVisible = true;
 
     if (nodeMayBeHighlightable) {
+      // Only do the computed style check once we know
+      // if you can even highlight this node
       const computedStyle = await computedStyleCache.readAsync(replayClient, pauseId, nodeId);
       const displayValue = computedStyle?.get("display");
       nodeIsVisible = displayValue !== "none";
-
     }
 
     const canFetchBoxModel = nodeMayBeHighlightable && nodeIsVisible;

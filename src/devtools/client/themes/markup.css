@@ -396,7 +396,6 @@ ul.children + .tag-line::before {
   z-index: 1;
 }
 
-
 #markup-box:focus-within .theme-selected {
   background-color: var(--theme-selection-background);
 }

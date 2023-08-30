@@ -4,7 +4,7 @@ import { NodeWithPreview } from "ui/actions/eventListeners/eventListenerUtils";
 
 type XHTMLNodeProps = {
   node: NodeWithPreview;
-  truncateClasses?: boolean
+  truncateClasses?: boolean;
 };
 
 const getAttribute = (node: NodeWithPreview, name: string) => {
