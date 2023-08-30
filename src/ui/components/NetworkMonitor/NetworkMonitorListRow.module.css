@@ -55,7 +55,7 @@
   text-overflow: ellipsis;
 }
 .TimingColumn {
-  flex: 0 0 40px;
+  flex: 0 0 35px;
 }
 .StatusColumn {
   flex: 0 0 60px;
@@ -129,10 +129,12 @@
   position: relative;
   height: 0.75rem;
   border-radius: 0.25rem;
-  background-color: transparent;
-  border: 1px solid var(--theme-toolbar-background);
+  background-color: var(--chrome);
   margin-right: 1ch;
   overflow: hidden;
+}
+.TimingContainer[data-incomplete] {
+  opacity: 0.65;
 }
 
 .Timing {

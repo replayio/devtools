@@ -81,7 +81,11 @@ const MemoizedProtocolViewerListItem = memo(function MemoizedProtocolViewerListI
   return (
     <div ref={ref} className={className} onClick={() => selectRequest(request.id)}>
       <div className={styles.RequestStartTime}>{formatTimestamp(request.recordedAt)}</div>
-      <div className={styles.RelativeDurationContainer} title={formatDuration(duration)}>
+      <div
+        className={styles.RelativeDurationContainer}
+        data-incomplete={response == null || undefined}
+        title={formatDuration(duration)}
+      >
         {duration > 0 && (
           <div
             className={durationClassName}

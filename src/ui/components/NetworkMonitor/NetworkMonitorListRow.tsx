@@ -111,25 +111,6 @@ function RequestRow({
     }
   }
 
-  let time: ReactNode = null;
-  if (endTime == null) {
-    time = <div className={styles.NoResponseMarker}>-</div>;
-  } else {
-    const requestDuration = endTime - startTime;
-
-    time = (
-      <div className={styles.TimingContainer}>
-        <div
-          className={styles.Timing}
-          style={{
-            left: `${(startTime / recordingDuration) * 100}%`,
-            width: `${(requestDuration / recordingDuration) * 100}%`,
-          }}
-        />
-      </div>
-    );
-  }
-
   return (
     <>
       <div
@@ -144,7 +125,19 @@ function RequestRow({
         style={style}
         tabIndex={0}
       >
-        <div className={styles.TimingColumn}>{time}</div>
+        <div className={styles.TimingColumn}>
+          <div className={styles.TimingContainer} data-incomplete={endTime == null || undefined}>
+            {endTime != null && (
+              <div
+                className={styles.Timing}
+                style={{
+                  left: `${(startTime / recordingDuration) * 100}%`,
+                  width: `${((endTime - startTime) / recordingDuration) * 100}%`,
+                }}
+              />
+            )}
+          </div>
+        </div>
         <div className={styles.StatusColumn}>{status}</div>
         <div className={styles.NameColumn}>{name}</div>
         <div className={styles.MethodColumn}>{method}</div>

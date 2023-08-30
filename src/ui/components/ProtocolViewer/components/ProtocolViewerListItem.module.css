@@ -35,10 +35,13 @@
 
 .RelativeDurationContainer {
   width: 1.5rem;
-  height: 0.5rem;
+  height: 0.75rem;
   border-radius: 0.25rem;
   overflow: hidden;
   background-color: var(--chrome);
+}
+.RelativeDurationContainer[data-incomplete] {
+  opacity: 0.65;
 }
 
 .RelativeDurationBlockSelected,
@@ -55,8 +58,8 @@
   background-color: var(--testsuites-success-color);
 }
 .RelativeDurationBlockMedium {
-  background-color: var(--yellow-65);
+  background-color: var(--testsuites-flaky-color);
 }
 .RelativeDurationBlockSlow {
-  background-color: var(--testsuites-flaky-color);
+  background-color: var(--testsuites-failed-color);
 }

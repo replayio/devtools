@@ -19,7 +19,7 @@
   text-overflow: ellipsis;
 }
 .TimingColumn {
-  flex: 0 0 40px;
+  flex: 0 0 35px;
 }
 .StatusColumn {
   flex: 0 0 60px;
