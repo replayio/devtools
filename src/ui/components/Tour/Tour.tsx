@@ -50,14 +50,14 @@ const Tour: React.FC = () => {
 
   const recordingId = useGetRecordingId();
   const { recording } = useGetRecording(recordingId);
-  const isTestReplay = recording ? isTestSuiteReplay(recording) : false;
+  const isTest = recording ? isTestSuiteReplay(recording) : false;
 
   const { dismissTourNag } = useNagDismissal();
 
   const intro = (
     <div className={styles.intro}>
       <p className={styles.h1}>Welcome!</p>
-      {isTestReplay ? (
+      {isTest ? (
         <>
           <p>
             Replay lets you debug flaky tests in a familiar DevTools environment. When you’re ready
@@ -91,7 +91,7 @@ const Tour: React.FC = () => {
     </div>
   );
 
-  const timeTravel = isTestReplay ? (
+  const timeTravel = isTest ? (
     <div className={styles.intro}>
       <div className={styles.h1}>Time travel 🚀</div>
 
