@@ -1,7 +1,12 @@
 import classnames from "classnames";
-import React, { useEffect, useRef } from "react";
+import React, { useContext, useEffect, useRef } from "react";
+import { shallowEqual } from "react-redux";
+import { useImperativeCacheValue } from "suspense";
 
+import { getPauseId } from "devtools/client/debugger/src/selectors";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { processedNodeDataCache } from "ui/suspense/nodeCaches";
 
 import { highlightNode, selectNode, unhighlightNode } from "../actions/markup";
 import { NodeInfo } from "../reducers/markup";
@@ -9,22 +14,29 @@ import { getMarkupNodes, getRootNodeId, getSelectedNodeId } from "../selectors/m
 
 export function HTMLBreadcrumbs() {
   const dispatch = useAppDispatch();
-  const markupNodes = useAppSelector(getMarkupNodes);
-  const selectedNodeId = useAppSelector(getSelectedNodeId);
-  const rootNodeId = useAppSelector(getRootNodeId);
+  const replayClient = useContext(ReplayClientContext);
+  const { pauseId, rootNodeId, selectedNodeId } = useAppSelector(
+    state => ({
+      pauseId: getPauseId(state),
+      rootNodeId: getRootNodeId(state),
+      selectedNodeId: getSelectedNodeId(state),
+    }),
+    shallowEqual
+  );
+
   const containerRef = useRef<HTMLDivElement>(null);
 
   // By default, the breadcrumbs list is empty
   let breadcrumbsContent: React.ReactNode[] = [];
 
-  if (rootNodeId && markupNodes.ids.length > 0 && selectedNodeId) {
+  if (rootNodeId && selectedNodeId) {
     let currentNodeId: string | undefined = selectedNodeId;
     let nodeHierarchy: NodeInfo[] = [];
 
     // Assuming we have markup node data and a valid selected node, traverse up
     // the node tree to find all ancestors (minus the `<document>`)
     while (currentNodeId && currentNodeId !== rootNodeId) {
-      const node: NodeInfo | undefined = markupNodes.entities[currentNodeId];
+      const node = processedNodeDataCache.getValueIfCached(replayClient, pauseId!, currentNodeId!);
       if (!node) {
         breadcrumbsContent = ["Loading..."];
         break;
