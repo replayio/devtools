@@ -1,5 +1,5 @@
 import classnames from "classnames";
-import React, { FC, ReactNode, RefObject, Suspense, useContext, useLayoutEffect } from "react";
+import React, { ReactNode, RefObject, Suspense, useContext, useLayoutEffect } from "react";
 import { ImperativePanelHandle } from "react-resizable-panels";
 import { useImperativeCacheValue } from "suspense";
 
@@ -14,7 +14,7 @@ import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData"
 import { setSelectedPanel } from "ui/actions/layout";
 import { getSelectedPanel, getToolboxLayout } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { SecondaryPanelName, ToolboxLayout } from "ui/state/layout";
+import { SecondaryPanelName } from "ui/state/layout";
 import {
   REACT_ANNOTATIONS_KIND,
   REDUX_SETUP_ANNOTATIONS_KIND,
@@ -69,13 +69,13 @@ const PanelButton = ({ panel, children }: PanelButtonProps) => {
 function PanelButtons({
   hasReactComponents,
   hasReduxAnnotations,
-  toolboxLayout,
   recordingCapabilities,
+  showDebuggerTab,
 }: {
   hasReactComponents: boolean;
   hasReduxAnnotations: boolean;
-  toolboxLayout: ToolboxLayout;
   recordingCapabilities: RecordingCapabilities;
+  showDebuggerTab: boolean;
 }) {
   const { supportsElementsInspector, supportsNetworkRequests, supportsRepaintingGraphics } =
     recordingCapabilities;
@@ -88,7 +88,7 @@ function PanelButtons({
       {supportsRepaintingGraphics && <NodePicker />}
       <PanelButton panel="console">Console</PanelButton>
       {supportsElementsInspector && <PanelButton panel="inspector">Elements</PanelButton>}
-      {toolboxLayout !== "ide" && (
+      {showDebuggerTab && (
         <PanelButton panel="debugger">
           <SourcesTabLabel />
         </PanelButton>
@@ -180,6 +180,9 @@ function SecondaryToolbox({
 
   const chromiumNetMonitorEnabled = useGraphQLUserData("feature_chromiumNetMonitor");
   const recordingCapabilities = recordingCapabilitiesCache.read(replayClient);
+  const showDebuggerTab = recordingCapabilities.supportsRepaintingGraphics
+    ? toolboxLayout !== "ide"
+    : toolboxLayout === "full";
 
   useLayoutEffect(() => {
     if (selectedPanel === "react-components" && !hasReactAnnotations) {
@@ -194,7 +197,7 @@ function SecondaryToolbox({
           hasReactComponents={hasReactAnnotations}
           hasReduxAnnotations={hasReduxAnnotations}
           recordingCapabilities={recordingCapabilities}
-          toolboxLayout={toolboxLayout}
+          showDebuggerTab={showDebuggerTab}
         />
         <div className="secondary-toolbox-right-buttons-container flex">
           <PanelButtonsScrollOverflowGradient />
@@ -222,9 +225,11 @@ function SecondaryToolbox({
         <Panel isActive={selectedPanel === "redux-devtools"}>
           <ReduxDevToolsPanel />
         </Panel>
-        <Panel isActive={selectedPanel === "debugger"}>
-          <EditorPane />
-        </Panel>
+        {showDebuggerTab && (
+          <Panel isActive={selectedPanel === "debugger"}>
+            <EditorPane />
+          </Panel>
+        )}
       </Redacted>
     </div>
   );

@@ -5,7 +5,7 @@ import { ClipboardEvent, KeyboardEvent, useLayoutEffect, useRef, useState } from
 
 import { RecordingTarget } from "replay-next/src/suspense/BuildIdCache";
 import { Recording } from "shared/graphql/types";
-import { AnyTestRecording, getTestRunId } from "shared/test-suites/RecordingTestMetadata";
+import { getTestRunId } from "shared/test-suites/RecordingTestMetadata";
 import { selectAll } from "shared/utils/selection";
 import { getRecordingTarget } from "ui/actions/app";
 import Avatar from "ui/components/Avatar";

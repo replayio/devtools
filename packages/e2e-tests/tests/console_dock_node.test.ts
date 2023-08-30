@@ -1,11 +1,10 @@
-import { startTest } from "../helpers";
+import { openDevToolsTab, startTest } from "../helpers";
 import {
-  getConsoleDockButton,
-  getConsoleDockFullViewButton,
-  getConsoleDockSplitViewButton,
-  verifyConsoleLayout,
-} from "../helpers/dock";
-import test, { expect } from "../testFixtureCloneRecording";
+  toggleToolboxLayout,
+  verifyToolboxLayout,
+  verifyToolboxLayoutOptions,
+} from "../helpers/layout";
+import test from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "node/basic.js" });
 
@@ -14,21 +13,19 @@ test("console_dock_node: Should show the correct docking behavior for recordings
   exampleKey,
 }) => {
   await startTest(page, exampleKey, recordingId);
+  await openDevToolsTab(page);
 
   // Verify default docking position
-  await verifyConsoleLayout(page, "ide");
+  await verifyToolboxLayout(page, "left");
 
   // Verify docking options
-  await getConsoleDockButton(page).click();
-  await expect(getConsoleDockFullViewButton(page)).toBeVisible();
-  await expect(getConsoleDockSplitViewButton(page)).toBeVisible();
+  await verifyToolboxLayoutOptions(page, ["left", "full"]);
 
   // Toggle full view and verify
-  await getConsoleDockFullViewButton(page).click();
-  await verifyConsoleLayout(page, "full");
+  await toggleToolboxLayout(page, "full");
+  await verifyToolboxLayout(page, "full");
 
   // Toggle back to split view and verify
-  await getConsoleDockButton(page).click();
-  await getConsoleDockSplitViewButton(page).click();
-  await verifyConsoleLayout(page, "ide");
+  await toggleToolboxLayout(page, "left");
+  await verifyToolboxLayout(page, "left");
 });

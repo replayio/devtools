@@ -1,5 +1,6 @@
 .icon {
   background-color: var(--icon-color);
+  cursor: pointer;
 }
 
 .icon:hover {

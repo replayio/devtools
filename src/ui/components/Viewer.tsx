@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import {
   ImperativePanelHandle,
   Panel,
@@ -6,14 +6,17 @@ import {
   PanelResizeHandle,
 } from "react-resizable-panels";
 
+import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import Video from "ui/components/Video";
 import { getToolboxLayout } from "ui/reducers/layout";
 import { useAppSelector } from "ui/setup/hooks";
+import { ToolboxLayout } from "ui/state/layout";
 
 import SecondaryToolbox from "./SecondaryToolbox";
 import Toolbox from "./Toolbox";
 
-const Vertical = () => {
+const Vertical = ({ toolboxLayout }: { toolboxLayout: ToolboxLayout }) => {
   const videoPanelRef = useRef<ImperativePanelHandle>(null);
   const [videoPanelCollapsed, setVideoPanelCollapsed] = useState(false);
 
@@ -23,24 +26,25 @@ const Vertical = () => {
       className="w-full overflow-hidden"
       direction="vertical"
     >
-      <Panel
-        className="flex-column flex flex-1"
-        collapsible
-        defaultSize={50}
-        id="Panel-Video"
-        minSize={10}
-        onCollapse={setVideoPanelCollapsed}
-        order={1}
-        ref={videoPanelRef}
-      >
-        <div className="flex-column flex flex-1">
-          <Video />
-        </div>
-      </Panel>
-      <PanelResizeHandle
-        className={videoPanelCollapsed ? "" : "h-2 w-full shrink-0"}
-        id="PanelResizeHandle-Video"
-      />
+      {toolboxLayout !== "full" && (
+        <>
+          <Panel
+            className="flex-column flex flex-1"
+            collapsible
+            defaultSize={50}
+            id="Panel-Video"
+            minSize={10}
+            onCollapse={setVideoPanelCollapsed}
+            order={1}
+            ref={videoPanelRef}
+          >
+            <div className="flex-column flex flex-1">
+              <Video />
+            </div>
+          </Panel>
+          <PanelResizeHandle className={videoPanelCollapsed ? "" : "h-2 w-full shrink-0"} />
+        </>
+      )}
       <Panel
         className="flex-column flex flex-1"
         defaultSize={50}
@@ -54,7 +58,10 @@ const Vertical = () => {
   );
 };
 
-const Horizontal = () => {
+const Horizontal = ({ toolboxLayout }: { toolboxLayout: ToolboxLayout }) => {
+  const replayClient = useContext(ReplayClientContext);
+  const recordingCapabilities = recordingCapabilitiesCache.read(replayClient);
+
   const videoPanelRef = useRef<ImperativePanelHandle>(null);
   const [videoPanelCollapsed, setVideoPanelCollapsed] = useState(false);
 
@@ -67,32 +74,48 @@ const Horizontal = () => {
       <Panel
         className="flex flex-1 flex-row"
         defaultSize={50}
-        id="Panel-SecondaryToolbox"
+        id={
+          recordingCapabilities.supportsRepaintingGraphics
+            ? "Panel-SecondaryToolbox"
+            : "Panel-Toolbox"
+        }
         minSize={30}
         order={1}
       >
         <div className="flex w-full flex-1 flex-row">
-          <SecondaryToolbox
-            videoPanelCollapsed={videoPanelCollapsed}
-            videoPanelRef={videoPanelRef}
-          />
-          <PanelResizeHandle
-            className={videoPanelCollapsed ? "" : "h-full w-2 shrink-0"}
-            id="PanelResizeHandle-Video"
-          />
+          {recordingCapabilities.supportsRepaintingGraphics ? (
+            <SecondaryToolbox
+              videoPanelCollapsed={videoPanelCollapsed}
+              videoPanelRef={videoPanelRef}
+            />
+          ) : (
+            <Toolbox />
+          )}
+          <PanelResizeHandle className={videoPanelCollapsed ? "" : "h-full w-2 shrink-0"} />
         </div>
       </Panel>
       <Panel
         className="flex flex-1 flex-row"
         collapsible
         defaultSize={50}
-        id="Panel-Video"
+        id={
+          recordingCapabilities.supportsRepaintingGraphics
+            ? "Panel-Video"
+            : "Panel-SecondaryToolbox"
+        }
         minSize={10}
         onCollapse={setVideoPanelCollapsed}
         order={2}
         ref={videoPanelRef}
       >
-        <Video />
+        {recordingCapabilities.supportsRepaintingGraphics ? (
+          <Video />
+        ) : (
+          <SecondaryToolbox
+            videoPanelCollapsed={videoPanelCollapsed}
+            videoPanelRef={videoPanelRef}
+          />
+        )}
       </Panel>
     </PanelGroup>
   );
@@ -112,7 +135,11 @@ export default function Viewer() {
         </>
       )}
       <Panel minSize={25} order={2}>
-        {toolboxLayout === "left" ? <Horizontal /> : <Vertical />}
+        {toolboxLayout === "left" ? (
+          <Horizontal toolboxLayout={toolboxLayout} />
+        ) : (
+          <Vertical toolboxLayout={toolboxLayout} />
+        )}
       </Panel>
     </PanelGroup>
   );

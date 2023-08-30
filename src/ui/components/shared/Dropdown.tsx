@@ -4,6 +4,7 @@ import React, { ReactNode } from "react";
 export interface DropdownProps {
   buttonContent: ReactNode;
   children: ReactNode;
+  dataTestId?: string;
   setExpanded: (expanded: boolean) => void;
   expanded: boolean;
   position?: "top-right" | "bottom-right" | "top-left" | "bottom-left";
@@ -19,6 +20,7 @@ const orientations = {
 export default function Dropdown({
   buttonContent,
   children,
+  dataTestId,
   setExpanded,
   expanded,
   position = "bottom-left",
@@ -27,11 +29,16 @@ export default function Dropdown({
 }: DropdownProps) {
   return (
     <div className="dropdown-wrapper">
-      <button className={`expand-dropdown ${buttonStyle}`} onClick={() => setExpanded(true)}>
+      <button
+        className={`expand-dropdown ${buttonStyle}`}
+        onClick={() => setExpanded(true)}
+        data-dropdown-state={expanded ? "open" : "closed"}
+        data-test-id={`${dataTestId}-DropdownButton`}
+      >
         {buttonContent}
       </button>
       {expanded ? (
-        <div className="dropdown-container">
+        <div className="dropdown-container" data-test-id={`${dataTestId}-Dropdown`}>
           <div className="mask" onClick={() => setExpanded(false)} />
           <motion.div
             initial={{ scale: 0.8 }}

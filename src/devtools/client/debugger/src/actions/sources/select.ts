@@ -9,6 +9,7 @@
 
 import { Location } from "@replayio/protocol";
 
+import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
 import { sourcesCache } from "replay-next/src/suspense/SourcesCache";
 import { UIThunkAction } from "ui/actions";
 import { setSelectedPanel, setViewMode } from "ui/actions/layout";
@@ -168,9 +169,12 @@ export function selectLocation(
 
     const layout = getToolboxLayout(getState());
 
-    // Yank the user to the editor tab in case the debugger/editor is tucked in
-    // the toolbox.
-    if (layout !== "ide") {
+    // If the Source viewer is docked inside of the secondary toolbox, focus it
+    const recordingCapabilities = await recordingCapabilitiesCache.getValueIfCached(replayClient);
+    const showDebuggerTab = recordingCapabilities?.supportsRepaintingGraphics
+      ? layout !== "ide"
+      : layout === "full";
+    if (showDebuggerTab) {
       dispatch(setSelectedPanel("debugger"));
     }
 

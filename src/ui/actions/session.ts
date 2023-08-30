@@ -12,6 +12,7 @@ import {
 import { ThreadFront as ThreadFrontType } from "protocol/thread";
 import { assert } from "protocol/utils";
 import { recordingTargetCache } from "replay-next/src/suspense/BuildIdCache";
+import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
 import { extractGraphQLError } from "shared/graphql/apolloClient";
 import { Recording } from "shared/graphql/types";
 import { userData } from "shared/user-data/GraphQL/UserData";
@@ -27,6 +28,7 @@ import {
   setCurrentPoint,
   setTrialExpired,
 } from "ui/reducers/app";
+import { getToolboxLayout } from "ui/reducers/layout";
 import {
   ProtocolEvent,
   errorReceived,
@@ -43,7 +45,7 @@ import tokenManager from "ui/utils/tokenManager";
 import { subscriptionExpired } from "ui/utils/workspace";
 
 import { setExpectedError, setUnexpectedError } from "./errors";
-import { setViewMode } from "./layout";
+import { setToolboxLayout, setViewMode } from "./layout";
 import { jumpToInitialPausePoint } from "./timeline";
 
 export { setExpectedError, setUnexpectedError };
@@ -314,6 +316,21 @@ export function createSocket(
       // We don't want to show the non-dev version of the app for node replays.
       if (recordingTarget === "node") {
         dispatch(setViewMode("dev"));
+      }
+
+      // We don't want to show the wrong default layout for recordings that don't have graphics.
+      const recordingCapabilities = await recordingCapabilitiesCache.readAsync(replayClient);
+      if (!recordingCapabilities.supportsRepaintingGraphics) {
+        const toolboxLayout = getToolboxLayout(getState());
+        switch (toolboxLayout) {
+          case "full":
+          case "left":
+            // The current layout is okay.
+            break;
+          default:
+            dispatch(setToolboxLayout("left"));
+            break;
+        }
       }
 
       dispatch(actions.setUploading(null));

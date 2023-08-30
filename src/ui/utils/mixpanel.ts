@@ -56,6 +56,7 @@ type MixpanelEvent =
   | ["layout.default_viewer"]
   | ["layout.devtools"]
   | ["layout.settings.set_bottom"]
+  | ["layout.settings.set_full"]
   | ["layout.settings.set_ide"]
   | ["layout.settings.set_left"]
   | ["layout.viewer"]
