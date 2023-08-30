@@ -10,7 +10,7 @@ import { processedNodeDataCache } from "ui/suspense/nodeCaches";
 
 import { highlightNode, selectNode, unhighlightNode } from "../actions/markup";
 import { NodeInfo } from "../reducers/markup";
-import { getMarkupNodes, getRootNodeId, getSelectedNodeId } from "../selectors/markup";
+import { getRootNodeId, getSelectedNodeId } from "../selectors/markup";
 
 export function HTMLBreadcrumbs() {
   const dispatch = useAppDispatch();

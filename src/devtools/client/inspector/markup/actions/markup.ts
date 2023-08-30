@@ -5,7 +5,6 @@ import { paused } from "devtools/client/debugger/src/reducers/pause";
 import NodeConstants from "devtools/shared/dom-node-constants";
 import { Deferred, assert, defer } from "protocol/utils";
 import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
-import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientInterface } from "shared/client/types";
 import { ProtocolError, isCommandError } from "shared/utils/error";
 import type { UIStore, UIThunkAction } from "ui/actions";
@@ -34,7 +33,7 @@ import {
   updateNodeExpanded,
   updateScrollIntoViewNode,
 } from "../reducers/markup";
-import { getIsNodeExpanded, getParentNodeId, getSelectedNodeId } from "../selectors/markup";
+import { getIsNodeExpanded, getSelectedNodeId } from "../selectors/markup";
 
 let rootNodeWaiter: Deferred<void> | undefined;
 
@@ -307,6 +306,11 @@ function getLastNodeId(
   }
 }
 
+function getParentNodeId(replayClient: ReplayClientInterface, pauseId: string, nodeId: string) {
+  const nodeInfo = processedNodeDataCache.getValueIfCached(replayClient, pauseId, nodeId);
+  return nodeInfo?.parentNodeId;
+}
+
 /**
  * Find the node that is displayed in the markup tree
  * immediately before the specified node and return its ID.
@@ -317,7 +321,7 @@ function getPreviousNodeId(
   pauseId: string,
   nodeId: string
 ) {
-  const parentNodeId = getParentNodeId(state, nodeId);
+  const parentNodeId = getParentNodeId(replayClient, pauseId, nodeId);
   if (!parentNodeId) {
     return nodeId;
   }
@@ -355,7 +359,7 @@ function getNextNodeId(
   }
 
   let currentNodeId = nodeId;
-  let parentNodeId = getParentNodeId(state, currentNodeId);
+  let parentNodeId = getParentNodeId(replayClient, pauseId, currentNodeId);
   while (parentNodeId) {
     const siblingIds = processedNodeDataCache.getValueIfCached(
       replayClient,
@@ -369,7 +373,7 @@ function getNextNodeId(
       return siblingIds[index + 1];
     }
     currentNodeId = parentNodeId;
-    parentNodeId = getParentNodeId(state, currentNodeId);
+    parentNodeId = getParentNodeId(replayClient, pauseId, currentNodeId);
   }
 
   return nodeId;
@@ -387,7 +391,7 @@ export function onLeftKey(): UIThunkAction {
     if (getIsNodeExpanded(state, selectedNodeId)) {
       dispatch(updateNodeExpanded({ nodeId: selectedNodeId, isExpanded: false }));
     } else {
-      const parentNodeId = getParentNodeId(state, selectedNodeId);
+      const parentNodeId = getParentNodeId(replayClient, pauseId, selectedNodeId);
       if (parentNodeId != null) {
         const parentNodeInfo = processedNodeDataCache.getValueIfCached(
           replayClient,
