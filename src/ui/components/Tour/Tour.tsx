@@ -31,14 +31,6 @@ const useNagDismissal = () => {
   return { dismissTourNag };
 };
 
-interface IntroProps {
-  typeOfReplay: string;
-}
-
-interface HelloAgainProps {
-  typeOfReplay: string;
-}
-
 interface CompletedTourProps {
   dismissTourNag: () => void;
 }
@@ -58,23 +50,14 @@ const Tour: React.FC = () => {
 
   const recordingId = useGetRecordingId();
   const { recording } = useGetRecording(recordingId);
-  const typeOfReplay = recording && isTestSuiteReplay(recording) ? "cypress" : "events";
+  const isTest = recording ? isTestSuiteReplay(recording) : false;
 
   const { dismissTourNag } = useNagDismissal();
 
   const intro = (
     <div className={styles.intro}>
       <p className={styles.h1}>Welcome!</p>
-      {typeOfReplay === "events" ? (
-        <>
-          <p>Replay is the first time-travel enabled DevTools. Let's get started!</p>
-          <div className={styles.stepCallout}>
-            <Icon className={styles.Icon} type="error" />
-
-            <div className={styles.stepCalloutText}>Click on DevTools in the top right</div>
-          </div>
-        </>
-      ) : (
+      {isTest ? (
         <>
           <p>
             Replay lets you debug flaky tests in a familiar DevTools environment. When you’re ready
@@ -88,6 +71,15 @@ const Tour: React.FC = () => {
             </div>
           </p>
         </>
+      ) : (
+        <>
+          <p>Replay is the first time-travel enabled DevTools. Let's get started!</p>
+          <div className={styles.stepCallout}>
+            <Icon className={styles.Icon} type="error" />
+
+            <div className={styles.stepCalloutText}>Click on DevTools in the top right</div>
+          </div>
+        </>
       )}
     </div>
   );
@@ -99,39 +91,38 @@ const Tour: React.FC = () => {
     </div>
   );
 
-  const timeTravel =
-    typeOfReplay === "events" ? (
-      <div className={styles.intro}>
-        <div className={styles.h1}>Time travel 🚀</div>
-        <p>In DevTools, look underneath the video to find the Replay console.</p>
-        <p>
-          <div className={styles.stepCallout}>
-            <Icon className={styles.Icon} type="error" />
-            <div className={styles.stepCalloutText}>
-              Hover in the console and click a button to time travel!
-            </div>
+  const timeTravel = isTest ? (
+    <div className={styles.intro}>
+      <div className={styles.h1}>Time travel 🚀</div>
+
+      <p>
+        Now look underneath the video to find the Replay console, which should have messages you can
+        time travel to.
+      </p>
+
+      <p>If your console is empty, open the console menu to enable a mouse event to track.</p>
+
+      <p>
+        <div className={styles.stepCallout}>
+          <Icon className={styles.Icon} type="error" />
+          <div className={styles.stepCalloutText}>Click a time travel button in the console</div>
+        </div>
+      </p>
+    </div>
+  ) : (
+    <div className={styles.intro}>
+      <div className={styles.h1}>Time travel 🚀</div>
+      <p>In DevTools, look underneath the video to find the Replay console.</p>
+      <p>
+        <div className={styles.stepCallout}>
+          <Icon className={styles.Icon} type="error" />
+          <div className={styles.stepCalloutText}>
+            Hover in the console and click a button to time travel!
           </div>
-        </p>
-      </div>
-    ) : (
-      <div className={styles.intro}>
-        <div className={styles.h1}>Time travel 🚀</div>
-
-        <p>
-          Now look underneath the video to find the Replay console, which should have messages you
-          can time travel to.
-        </p>
-
-        <p>If your console is empty, open the console menu to enable a mouse event to track.</p>
-
-        <p>
-          <div className={styles.stepCallout}>
-            <Icon className={styles.Icon} type="error" />
-            <div className={styles.stepCalloutText}>Click a time travel button in the console</div>
-          </div>
-        </p>
-      </div>
-    );
+        </div>
+      </p>
+    </div>
+  );
 
   const TimeTravelGif = () => (
     <img src="https://vercel.replay.io/tour/fast-forward.gif" className={styles.videoExample} />
