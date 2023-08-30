@@ -11,21 +11,15 @@ import { FC, Fragment, ReactNode, Suspense, useContext, useMemo } from "react";
 
 import Expandable from "replay-next/components/Expandable";
 import Loader from "replay-next/components/Loader";
-import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
-import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
-import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
 import { mergePropertiesAndGetterValues } from "replay-next/src/utils/protocol";
-import { getSourceFileName } from "replay-next/src/utils/source";
-import { getPreferredLocation } from "replay-next/src/utils/sources";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import GetterRenderer from "./GetterRenderer";
-import { KeyValueHeader } from "./KeyValueRenderer";
 import KeyValueRenderer from "./KeyValueRendererWithContextMenu";
+import FunctionLocationRenderer from "./properties/FunctionLocationRenderer";
+import PrototypeRenderer from "./properties/PrototypeRenderer";
 import ValueRenderer from "./ValueRenderer";
-import { FunctionLocationRenderer } from "./values/FunctionRenderer";
-import PrototypeRenderer from "./values/PrototypeRenderer";
 import styles from "./PropertiesRenderer.module.css";
 
 const PROPERTY_BUCKET_SIZE = 100;

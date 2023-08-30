@@ -30,7 +30,7 @@ export default function PrototypeRenderer({ object, pauseId, path }: PropertiesR
       children={<PropertiesRenderer object={prototype} path={prototypePath} pauseId={pauseId} />}
       header={
         <span className={styles.Prototype}>
-          <span className={styles.PrototypeName}>[[Prototype]]: </span>
+          <span>[[Prototype]]: </span>
           {prototype.className}
         </span>
       }

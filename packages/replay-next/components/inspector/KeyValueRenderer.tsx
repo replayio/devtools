@@ -24,47 +24,6 @@ export type Props = {
   protocolValue: ProtocolValue;
 };
 
-export function KeyValueHeader({
-  before,
-  showExpandableView,
-  layout,
-  onContextMenu,
-  nameClass,
-  name,
-  value,
-}: {
-  before?: ReactNode;
-  layout?: "horizontal" | "vertical";
-  onContextMenu?: (event: MouseEvent) => void;
-  showExpandableView?: boolean;
-  nameClass?: string;
-  name?: string | null;
-  value: ReactNode;
-}) {
-  return (
-    <span
-      className={classNames(
-        styles.KeyValue,
-        !showExpandableView && layout === "vertical" ? styles.ToggleAlignmentPadding : null
-      )}
-      data-test-name="KeyValue"
-      onContextMenu={onContextMenu}
-    >
-      {before}
-      {name != null ? (
-        <>
-          <span className={nameClass} data-test-name="KeyValue-Header">
-            {name}
-          </span>
-          <span className={styles.Separator}>: </span>
-        </>
-      ) : null}
-
-      {value}
-    </span>
-  );
-}
-
 // Renders a protocol Object/ObjectPreview as a key+value pair.
 //
 // This renderer supports two layouts: "horizontal" and "vertical".
@@ -189,15 +148,26 @@ export default function KeyValueRenderer({
   }
 
   const header = (
-    <KeyValueHeader
-      value={value}
-      before={before}
-      showExpandableView={showExpandableView}
-      layout={layout}
+    <span
+      className={classNames(
+        styles.KeyValue,
+        !showExpandableView && layout === "vertical" ? styles.ToggleAlignmentPadding : null
+      )}
+      data-test-name="KeyValue"
       onContextMenu={onContextMenu}
-      nameClass={nameClass}
-      name={name}
-    />
+    >
+      {before}
+      {name != null ? (
+        <>
+          <span className={nameClass} data-test-name="KeyValue-Header">
+            {name}
+          </span>
+          <span className={styles.Separator}>: </span>
+        </>
+      ) : null}
+
+      {value}
+    </span>
   );
 
   if (showExpandableView) {
