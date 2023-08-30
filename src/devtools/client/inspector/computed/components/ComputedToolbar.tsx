@@ -3,22 +3,24 @@ import React, { FormEvent, useRef } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
 import Checkbox from "ui/components/shared/Forms/Checkbox";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 import { setComputedPropertySearch, setShowBrowserStyles } from "../actions";
 
-function ComputedToolbar(props: PropsFromRedux) {
-  const { setComputedPropertySearch, setShowBrowserStyles } = props;
+function ComputedToolbar() {
+  const dispatch = useAppDispatch();
+  const showBrowserStyles = useAppSelector(state => state.computed.showBrowserStyles);
 
   const searchFieldRef = useRef<HTMLInputElement>(null);
 
   const setSearch = debounce(() => {
     if (searchFieldRef.current) {
-      setComputedPropertySearch(searchFieldRef.current.value);
+      dispatch(setComputedPropertySearch(searchFieldRef.current.value));
     }
   }, 150);
 
   function setShowAll(event: FormEvent<HTMLInputElement>) {
-    setShowBrowserStyles(event.currentTarget.checked);
+    dispatch(setShowBrowserStyles(event.currentTarget.checked));
   }
 
   return (
@@ -35,7 +37,7 @@ function ComputedToolbar(props: PropsFromRedux) {
         />
       </div>
       <div className="devtools-separator"></div>
-      <Checkbox id="browser-style-checkbox" onChange={setShowAll} />
+      <Checkbox id="browser-style-checkbox" onChange={setShowAll} checked={showBrowserStyles} />
       <label id="browser-style-checkbox-label" htmlFor="browser-style-checkbox">
         Browser Styles
       </label>
@@ -43,11 +45,4 @@ function ComputedToolbar(props: PropsFromRedux) {
   );
 }
 
-const mapDispatchToProps = {
-  setComputedPropertySearch,
-  setShowBrowserStyles,
-};
-const connector = connect(undefined, mapDispatchToProps);
-type PropsFromRedux = ConnectedProps<typeof connector>;
-
-export default connector(ComputedToolbar);
+export default React.memo(ComputedToolbar);
