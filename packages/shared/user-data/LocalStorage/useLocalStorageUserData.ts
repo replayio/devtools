@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 
 import { config } from "shared/user-data/LocalStorage/config";
 import { PreferencesKey } from "shared/user-data/LocalStorage/types";
@@ -21,11 +21,44 @@ export default function useLocalStorageUserData<Key extends PreferencesKey>(
     }
   });
 
-  // Sync changes to local storage
-  useEffect(() => {
-    const string = JSON.stringify(value);
+  const committedValuesRef = useRef<{
+    prevValue: string | null;
+    value: string;
+  }>({
+    prevValue: null,
+    value: JSON.stringify(value),
+  });
+  useLayoutEffect(() => {
+    committedValuesRef.current.prevValue = committedValuesRef.current.value;
+    committedValuesRef.current.value = JSON.stringify(value);
+  });
 
-    localStorageSetItem(key, string);
+  // Sync changes from local storage
+  useLayoutEffect(() => {
+    const onStorage = (event: StorageEvent) => {
+      if (key === event.key && event.newValue && event.newValue !== JSON.stringify(value)) {
+        setValue(JSON.parse(event.newValue));
+      }
+    };
+
+    window.addEventListener("storage", onStorage);
+
+    return () => {
+      window.removeEventListener("storage", onStorage);
+    };
+  }, [key, value]);
+
+  // Sync changes to local storage
+  useLayoutEffect(() => {
+    window.dispatchEvent(
+      new StorageEvent("storage", {
+        key,
+        newValue: committedValuesRef.current.value || "",
+        oldValue: committedValuesRef.current.prevValue || "",
+      })
+    );
+
+    localStorageSetItem(key, committedValuesRef.current.value);
   }, [key, value]);
 
   return [value, setValue];

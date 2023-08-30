@@ -1,9 +1,9 @@
 import React, { ReactNode, useContext, useState } from "react";
-import { ConnectedProps, connect } from "react-redux";
 
 import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import * as actions from "ui/actions/app";
+import useLocalStorageUserData from "shared/user-data/LocalStorage/useLocalStorageUserData";
+import { setModal } from "ui/actions/app";
 import { setToolboxLayout } from "ui/actions/layout";
 import LoginButton from "ui/components/LoginButton";
 import Dropdown from "ui/components/shared/Dropdown";
@@ -16,16 +16,16 @@ import { trackEvent } from "ui/utils/telemetry";
 import ExternalLink from "../shared/ExternalLink";
 import styles from "./UserOptions.module.css";
 
-interface UserOptionsProps extends PropsFromRedux {
-  noBrowserItem?: boolean;
-}
-
-function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
+export default function UserOptions() {
   const replayClient = useContext(ReplayClientContext);
 
   const dispatch = useAppDispatch();
   const toolboxLayout = useAppSelector(getToolboxLayout);
   const viewMode = useAppSelector(getViewMode);
+
+  const [videoPanelCollapsed, setVideoPanelCollapsed] = useLocalStorageUserData(
+    "replayVideoPanelCollapsed"
+  );
 
   // only show layout options in devtools
   let devLayoutOptions: ReactNode = null;
@@ -38,8 +38,23 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
           <div className="inactive-row group">
             <span className="flex-1 text-left">Layout</span>
 
-            <div className="flex space-x-1">
+            <div className="flex flex-row items-center space-x-1">
               <div
+                className="flex flex-row items-center"
+                data-test-id="ToggleVideoPlayerButton"
+                data-test-state={videoPanelCollapsed ? "collapsed" : "expanded"}
+                onClick={() => onVideoPanelCollapseChange(!videoPanelCollapsed)}
+                title={videoPanelCollapsed ? "Show Video" : "Hide Video"}
+              >
+                <MaterialIcon>{videoPanelCollapsed ? "videocam_on" : "videocam_off"}</MaterialIcon>
+              </div>
+
+              <div>
+                <div className={styles.VerticalDivider} />
+              </div>
+
+              <div
+                className="flex flex-row items-center"
                 data-layout-option="ide"
                 data-layout-option-selected={toolboxLayout === "ide" || undefined}
                 data-test-id="DockToBottomRightButton"
@@ -53,6 +68,7 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
               </div>
 
               <div
+                className="flex flex-row items-center"
                 data-layout-option="left"
                 data-layout-option-selected={toolboxLayout === "left" || undefined}
                 data-test-id="DockToLeftButton"
@@ -66,6 +82,7 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
               </div>
 
               <div
+                className="flex flex-row items-center"
                 data-layout-option="bottom"
                 data-layout-option-selected={toolboxLayout === "bottom" || undefined}
                 data-test-id="DockToBottomButton"
@@ -80,7 +97,7 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
             </div>
           </div>
 
-          <div className={styles.divider}></div>
+          <div className={styles.HorizontalDivider}></div>
         </>
       );
     } else {
@@ -91,6 +108,7 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
 
             <div className="flex space-x-1">
               <div
+                className="flex flex-row items-center"
                 data-layout-option="left"
                 data-layout-option-selected={toolboxLayout === "left" || undefined}
                 data-test-id="DockToLeftButton"
@@ -104,6 +122,7 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
               </div>
 
               <div
+                className="flex flex-row items-center"
                 data-layout-option="full"
                 data-layout-option-selected={toolboxLayout === "full" || undefined}
                 data-test-id="DockToBottomButton"
@@ -138,12 +157,17 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
   const onSettingsClick = () => {
     setExpanded(false);
     trackEvent("user_options.select_settings");
-    setModal("settings");
+    dispatch(setModal("settings"));
   };
 
   const onLayoutChange = (orientation: "bottom" | "full" | "ide" | "left") => {
     dispatch(setToolboxLayout(orientation));
     trackEvent(`layout.settings.set_${orientation}`);
+    setExpanded(false);
+  };
+
+  const onVideoPanelCollapseChange = (collapsed: boolean) => {
+    setVideoPanelCollapsed(collapsed);
     setExpanded(false);
   };
 
@@ -185,10 +209,3 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
     </>
   );
 }
-
-const connector = connect(null, {
-  setModal: actions.setModal,
-});
-type PropsFromRedux = ConnectedProps<typeof connector>;
-
-export default connector(UserOptions);

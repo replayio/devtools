@@ -1,6 +1,5 @@
 import classnames from "classnames";
-import React, { ReactNode, RefObject, Suspense, useContext, useLayoutEffect } from "react";
-import { ImperativePanelHandle } from "react-resizable-panels";
+import React, { ReactNode, Suspense, useContext, useLayoutEffect } from "react";
 import { useImperativeCacheValue } from "suspense";
 
 import { EditorPane } from "devtools/client/debugger/src/components/Editor/EditorPane";
@@ -31,7 +30,6 @@ import ReplayLogo from "../shared/ReplayLogo";
 import WaitForReduxSlice from "../WaitForReduxSlice";
 import NewConsoleRoot from "./NewConsole";
 import SourcesTabLabel from "./SourcesTabLabel";
-import { ShowVideoButton } from "./ToolboxButton";
 
 const InspectorApp = React.lazy(() => import("devtools/client/inspector/components/App"));
 
@@ -140,27 +138,15 @@ function PanelButtonsScrollOverflowGradient() {
   return <div className="secondary-toolbox-scroll-overflow-gradient"></div>;
 }
 
-export default function SecondaryToolboxSuspenseWrapper({
-  videoPanelCollapsed,
-  videoPanelRef,
-}: {
-  videoPanelCollapsed: Boolean;
-  videoPanelRef: RefObject<ImperativePanelHandle>;
-}) {
+export default function SecondaryToolboxSuspenseWrapper() {
   return (
     <Suspense fallback={<Loader />}>
-      <SecondaryToolbox videoPanelCollapsed={videoPanelCollapsed} videoPanelRef={videoPanelRef} />
+      <SecondaryToolbox />
     </Suspense>
   );
 }
 
-function SecondaryToolbox({
-  videoPanelCollapsed,
-  videoPanelRef,
-}: {
-  videoPanelCollapsed: Boolean;
-  videoPanelRef: RefObject<ImperativePanelHandle>;
-}) {
+function SecondaryToolbox() {
   const selectedPanel = useAppSelector(getSelectedPanel);
   const toolboxLayout = useAppSelector(getToolboxLayout);
   const dispatch = useAppDispatch();
@@ -201,10 +187,6 @@ function SecondaryToolbox({
         />
         <div className="secondary-toolbox-right-buttons-container flex">
           <PanelButtonsScrollOverflowGradient />
-          <ShowVideoButton
-            videoPanelCollapsed={videoPanelCollapsed}
-            videoPanelRef={videoPanelRef}
-          />
         </div>
       </header>
       <Redacted className="secondary-toolbox-content bg-chrome text-xs">

@@ -2,4 +2,5 @@ export type ReplayNextCurrentPanel = "comments" | "protocol-viewer" | "search" |
 
 export const config = {
   replayNextCurrentPanel: "sources" as ReplayNextCurrentPanel,
+  replayVideoPanelCollapsed: false,
 };

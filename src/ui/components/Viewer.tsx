@@ -1,4 +1,4 @@
-import { useContext, useRef, useState } from "react";
+import { useContext, useLayoutEffect, useRef, useState } from "react";
 import {
   ImperativePanelHandle,
   Panel,
@@ -8,6 +8,7 @@ import {
 
 import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import useLocalStorageUserData from "shared/user-data/LocalStorage/useLocalStorageUserData";
 import Video from "ui/components/Video";
 import { getToolboxLayout } from "ui/reducers/layout";
 import { useAppSelector } from "ui/setup/hooks";
@@ -18,7 +19,27 @@ import Toolbox from "./Toolbox";
 
 const Vertical = ({ toolboxLayout }: { toolboxLayout: ToolboxLayout }) => {
   const videoPanelRef = useRef<ImperativePanelHandle>(null);
-  const [videoPanelCollapsed, setVideoPanelCollapsed] = useState(false);
+
+  const [videoPanelCollapsed, setVideoPanelCollapsed] = useLocalStorageUserData(
+    "replayVideoPanelCollapsed"
+  );
+
+  const onVideoPanelCollapse = (collapsed: boolean) => {
+    setVideoPanelCollapsed(collapsed);
+  };
+
+  useLayoutEffect(() => {
+    const videoPanel = videoPanelRef.current;
+    if (videoPanel) {
+      if (videoPanel.getCollapsed() !== videoPanelCollapsed) {
+        if (videoPanelCollapsed) {
+          videoPanel.collapse();
+        } else {
+          videoPanel.expand();
+        }
+      }
+    }
+  }, [videoPanelCollapsed]);
 
   return (
     <PanelGroup
@@ -34,7 +55,7 @@ const Vertical = ({ toolboxLayout }: { toolboxLayout: ToolboxLayout }) => {
             defaultSize={50}
             id="Panel-Video"
             minSize={10}
-            onCollapse={setVideoPanelCollapsed}
+            onCollapse={onVideoPanelCollapse}
             order={1}
             ref={videoPanelRef}
           >
@@ -52,7 +73,7 @@ const Vertical = ({ toolboxLayout }: { toolboxLayout: ToolboxLayout }) => {
         minSize={30}
         order={2}
       >
-        <SecondaryToolbox videoPanelCollapsed={videoPanelCollapsed} videoPanelRef={videoPanelRef} />
+        <SecondaryToolbox />
       </Panel>
     </PanelGroup>
   );
@@ -83,14 +104,7 @@ const Horizontal = ({ toolboxLayout }: { toolboxLayout: ToolboxLayout }) => {
         order={1}
       >
         <div className="flex w-full flex-1 flex-row">
-          {recordingCapabilities.supportsRepaintingGraphics ? (
-            <SecondaryToolbox
-              videoPanelCollapsed={videoPanelCollapsed}
-              videoPanelRef={videoPanelRef}
-            />
-          ) : (
-            <Toolbox />
-          )}
+          {recordingCapabilities.supportsRepaintingGraphics ? <SecondaryToolbox /> : <Toolbox />}
           <PanelResizeHandle className={videoPanelCollapsed ? "" : "h-full w-2 shrink-0"} />
         </div>
       </Panel>
@@ -108,14 +122,7 @@ const Horizontal = ({ toolboxLayout }: { toolboxLayout: ToolboxLayout }) => {
         order={2}
         ref={videoPanelRef}
       >
-        {recordingCapabilities.supportsRepaintingGraphics ? (
-          <Video />
-        ) : (
-          <SecondaryToolbox
-            videoPanelCollapsed={videoPanelCollapsed}
-            videoPanelRef={videoPanelRef}
-          />
-        )}
+        {recordingCapabilities.supportsRepaintingGraphics ? <Video /> : <SecondaryToolbox />}
       </Panel>
     </PanelGroup>
   );
