@@ -4,6 +4,7 @@ import { NodeWithPreview } from "ui/actions/eventListeners/eventListenerUtils";
 
 type XHTMLNodeProps = {
   node: NodeWithPreview;
+  truncateClasses?: boolean
 };
 
 const getAttribute = (node: NodeWithPreview, name: string) => {
@@ -13,7 +14,7 @@ const getAttribute = (node: NodeWithPreview, name: string) => {
 
 // Show a stringified DOM node representation, like:
 // button#someId.class1.class2
-export const XHTMLNode: FC<XHTMLNodeProps> = ({ node }) => {
+export const XHTMLNode: FC<XHTMLNodeProps> = ({ node, truncateClasses = true }) => {
   const { nodeName, pseudoType, attributes } = node.preview.node;
 
   const id = getAttribute(node, "id");
@@ -23,7 +24,11 @@ export const XHTMLNode: FC<XHTMLNodeProps> = ({ node }) => {
   const tagText = `${nodeName.toLowerCase()}${pseudoType ? "::" + pseudoType : ""}`;
   const idText = id ? `#${id}` : "";
   // Add a preceding `.` if there are any classes, plus in-between each
-  const classesText = [""].concat(classList).join(".");
+  let classesText = [""].concat(classList).join(".");
+
+  if (truncateClasses && classesText.length > 25) {
+    classesText = classesText.slice(0, 25) + "...";
+  }
 
   return (
     <span>
