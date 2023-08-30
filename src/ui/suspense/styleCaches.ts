@@ -2,6 +2,10 @@ import { PauseId, Object as ProtocolObject } from "@replayio/protocol";
 import uniqBy from "lodash/uniqBy";
 import { Cache, createCache } from "suspense";
 
+import {
+  LAYOUT_NUMERIC_FIELDS,
+  Layout,
+} from "devtools/client/inspector/boxmodel/reducers/box-model";
 import { createComputedProperties } from "devtools/client/inspector/computed/actions";
 import { ComputedPropertyState } from "devtools/client/inspector/computed/state";
 import ElementStyle from "devtools/client/inspector/rules/models/element-style";
@@ -221,5 +225,43 @@ export const boundingRectCache: Cache<
     } catch (err) {
       return;
     }
+  },
+});
+
+export const layoutCache: Cache<
+  [
+    replayClient: ReplayClientInterface,
+    pauseId: PauseId | undefined,
+    nodeId: string | undefined | null
+  ],
+  Layout | null
+> = createCache({
+  config: { immutable: true },
+  debugLabel: "BoundingRect",
+  getKey: ([replayClient, pauseId, nodeId]) => `${pauseId}:${nodeId}`,
+  load: async ([replayClient, pauseId, nodeId]) => {
+    if (!pauseId || !nodeId) {
+      return null;
+    }
+    const [bounds, style] = await Promise.all([
+      boundingRectCache.readAsync(replayClient, pauseId, nodeId),
+      computedStyleCache.readAsync(replayClient, pauseId, nodeId),
+    ]);
+
+    if (!bounds || !style) {
+      return null;
+    }
+
+    const layout = {
+      width: parseFloat(bounds.width.toPrecision(6)),
+      height: parseFloat(bounds.height.toPrecision(6)),
+      autoMargins: {},
+    } as Layout;
+
+    for (const prop of LAYOUT_NUMERIC_FIELDS) {
+      layout[prop] = style.get(prop)!;
+    }
+
+    return layout;
   },
 });
