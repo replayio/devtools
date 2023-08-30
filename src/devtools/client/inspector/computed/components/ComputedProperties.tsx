@@ -1,8 +1,14 @@
-import React from "react";
-import { ConnectedProps, connect } from "react-redux";
+import React, { useContext } from "react";
+import { shallowEqual } from "react-redux";
+import { useImperativeCacheValue } from "suspense";
 
-import { UIState } from "ui/state";
+import { getPauseId } from "devtools/client/debugger/src/selectors";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { processedNodeDataCache } from "ui/suspense/nodeCaches";
+import { cssRulesCache } from "ui/suspense/styleCaches";
 
+import { getSelectedNodeId } from "../../markup/selectors/markup";
 import { setComputedPropertyExpanded } from "../actions";
 import { ComputedPropertyState } from "../state";
 import ComputedProperty from "./ComputedProperty";
@@ -24,9 +30,38 @@ function isHidden(property: ComputedPropertyState, search: string, showBrowserSt
   return false;
 }
 
-function ComputedProperties(props: PropsFromRedux) {
-  const { properties, expandedProperties, setComputedPropertyExpanded, search, showBrowserStyles } =
-    props;
+function ComputedProperties() {
+  const dispatch = useAppDispatch();
+  const { pauseId, selectedNodeId, expandedProperties, search, showBrowserStyles } = useAppSelector(
+    state => ({
+      pauseId: getPauseId(state),
+      selectedNodeId: getSelectedNodeId(state),
+      expandedProperties: state.computed.expandedProperties,
+      search: state.computed.search,
+      showBrowserStyles: state.computed.showBrowserStyles,
+    }),
+    shallowEqual
+  );
+
+  const replayClient = useContext(ReplayClientContext);
+
+  const { value: node, status: nodeStatus } = useImperativeCacheValue(
+    processedNodeDataCache,
+    replayClient,
+    pauseId!,
+    selectedNodeId!
+  );
+
+  const canHaveRules = nodeStatus === "resolved" ? node?.isElement : false;
+
+  const { value: cachedStyles, status } = useImperativeCacheValue(
+    cssRulesCache,
+    replayClient,
+    canHaveRules ? pauseId : undefined,
+    canHaveRules ? selectedNodeId : undefined
+  );
+
+  const properties = status === "resolved" ? cachedStyles?.computedProperties ?? [] : [];
 
   let dark = false;
   let allPropertiesHidden = true;
@@ -38,7 +73,7 @@ function ComputedProperties(props: PropsFromRedux) {
     dark = !dark;
     allPropertiesHidden = false;
     const isExpanded = expandedProperties.has(property.name);
-    const toggleExpanded = () => setComputedPropertyExpanded(property.name, !isExpanded);
+    const toggleExpanded = () => dispatch(setComputedPropertyExpanded(property.name, !isExpanded));
 
     return (
       <ComputedProperty
@@ -62,23 +97,11 @@ function ComputedProperties(props: PropsFromRedux) {
           className="devtools-sidepanel-no-result"
           hidden={!allPropertiesHidden}
         >
-          No CSS properties found.
+          {status === "pending" ? "Loading..." : "No CSS properties found"}
         </div>
       </div>
     </div>
   );
 }
 
-const mapStateToProps = (state: UIState) => ({
-  properties: state.computed.properties,
-  expandedProperties: state.computed.expandedProperties,
-  search: state.computed.search,
-  showBrowserStyles: state.computed.showBrowserStyles,
-});
-const mapDispatchToProps = {
-  setComputedPropertyExpanded,
-};
-const connector = connect(mapStateToProps, mapDispatchToProps);
-type PropsFromRedux = ConnectedProps<typeof connector>;
-
-export default connector(ComputedProperties);
+export default React.memo(ComputedProperties);
