@@ -80,12 +80,11 @@ test("inspector-elements-03: Keyboard shortcuts should select the right DOM node
   await waitForElementsToLoad(page);
   await waitForSelectedElementsRow(page, "body");
   const bodyTag = await getElementsPanelSelection(page);
-  console.log("Waiting for body children to load...");
+  debugPrint(page, "Waiting for body children to load...");
   const elementsTree = getElementsTree(page);
   await waitFor(async () => {
     const loadingChildren = elementsTree.getByText("Loading");
     const numChildren = await loadingChildren.count();
-    console.log("Num loading children: ", numChildren);
     expect(numChildren).toBe(0);
   });
 
@@ -122,4 +121,15 @@ test("inspector-elements-03: Keyboard shortcuts should select the right DOM node
   await waitFor(async () => {
     expect(await div0Box1.isVisible()).toBe(false);
   });
+
+  // PageDown should jump down 10 rows
+  await typeKeyAndVerifySelectedElement(page, "PageDown", bodyChildDomNodes[11]);
+
+  // PageUp should jump up 10 rows
+  await typeKeyAndVerifySelectedElement(page, "PageUp", bodyChildDomNodes[1]);
+
+  // If we expand the first child, it should still jump 10 rows total
+  await typeKeyAndVerifySelectedElement(page, "ArrowRight", bodyChildDomNodes[1]);
+  await typeKeyAndVerifySelectedElement(page, "PageDown", bodyChildDomNodes[9]);
+  await typeKeyAndVerifySelectedElement(page, "PageUp", bodyChildDomNodes[1]);
 });
