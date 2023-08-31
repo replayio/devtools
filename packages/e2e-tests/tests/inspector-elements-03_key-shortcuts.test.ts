@@ -3,9 +3,13 @@ import { Locator, Page, expect } from "@playwright/test";
 import { openDevToolsTab, startTest } from "../helpers";
 import { openConsolePanel, warpToMessage } from "../helpers/console-panel";
 import {
+  getElementsPanelSelection,
+  getElementsTree,
   openAppliedRulesTab,
   openElementsPanel,
   selectElementsRowWithText,
+  waitForElementsToLoad,
+  waitForSelectedElementsRow,
 } from "../helpers/elements-panel";
 import { toggleToolboxLayout } from "../helpers/layout";
 import { getBreakpointsAccordionPane } from "../helpers/pause-information-panel";
@@ -40,5 +44,23 @@ test("inspector-elements-03: Keyboard shortcuts should select the right DOM node
 
   await openElementsPanel(page);
 
-  await delay(15000);
+  await waitForElementsToLoad(page);
+  await waitForSelectedElementsRow(page, "body");
+  const bodyTag = await getElementsPanelSelection(page);
+  console.log("Waiting for body children to load...");
+  const elementsTree = getElementsTree(page);
+  await waitFor(async () => {
+    const loadingChildren = elementsTree.getByText("Loading");
+    const numChildren = await loadingChildren.count();
+    console.log("Num loading children: ", numChildren);
+    expect(numChildren).toBe(0);
+  });
+
+  await bodyTag.click();
+  console.log("Typing ArrowDown 1");
+  await page.keyboard.press("ArrowDown");
+  await waitForSelectedElementsRow(page, `<style`);
+  console.log("Typing ArrowDown 1");
+  await page.keyboard.press("ArrowDown");
+  await waitForSelectedElementsRow(page, `<div style="left: 0px; top: 0px;"`);
 });

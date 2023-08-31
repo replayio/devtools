@@ -267,6 +267,10 @@ export async function selectNextElementsPanelSearchResult(page: Page): Promise<v
   await input.press("Enter");
 }
 
+export function getElementsTree(page: Page) {
+  return page.locator(`#markup-box [role="tree"]`);
+}
+
 export async function waitForElementsToLoad(page: Page): Promise<void> {
   await debugPrint(page, "Waiting for elements to load", "waitForElementsToLoad");
 
