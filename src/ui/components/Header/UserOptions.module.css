@@ -1,18 +1,34 @@
-.icon {
+.LayoutButton {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.LayoutIcon {
   background-color: var(--icon-color);
   cursor: pointer;
 }
-
-.icon:hover {
+.LayoutIcon:hover {
   background-color: var(--primary-accent);
 }
-
-.icon.selected {
+.LayoutButton[data-layout-option-selected] .LayoutIcon {
   background-color: var(--primary-accent);
 }
-
-.icon.selected:hover {
+.LayoutButton[data-layout-option-selected] .LayoutIcon:hover {
   background-color: var(--primary-accent-hover);
+}
+
+.VideoIcon {
+  cursor: pointer;
+}
+.VideoIcon[data-icon-selected] {
+  color: var(--primary-accent);
+}
+.VideoIcon:hover {
+  color: var(--primary-accent);
+}
+.VideoIcon[data-icon-selected]:hover {
+  color: var(--primary-accent-hover);
 }
 
 .HorizontalDivider {
