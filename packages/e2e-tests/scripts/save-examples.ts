@@ -244,6 +244,12 @@ const knownExamples: TestExampleFile[] = [
     runtime: "firefox",
   },
   {
+    filename: "doc_stacking_chromium.html",
+    folder: config.browserExamplesPath,
+    category: "browser",
+    runtime: "chromium",
+  },
+  {
     filename: "log_points_and_block_scope.html",
     folder: config.browserExamplesPath,
     category: "browser",
