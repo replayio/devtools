@@ -4,6 +4,7 @@ import { openDevToolsTab, startTest } from "../helpers";
 import { openConsolePanel, warpToMessage } from "../helpers/console-panel";
 import {
   getElementsPanelSelection,
+  getElementsRowWithText,
   getElementsTree,
   openAppliedRulesTab,
   openElementsPanel,
@@ -13,7 +14,7 @@ import {
 } from "../helpers/elements-panel";
 import { toggleToolboxLayout } from "../helpers/layout";
 import { getBreakpointsAccordionPane } from "../helpers/pause-information-panel";
-import { delay, mapLocators, waitFor } from "../helpers/utils";
+import { debugPrint, delay, mapLocators, waitFor } from "../helpers/utils";
 import test from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "doc_stacking.html" });
@@ -28,6 +29,38 @@ async function ensureSidePanelClosed(page: Page) {
   if (isVisible) {
     await pauseButton.click();
   }
+}
+
+// ref: `doc_stacking.html`
+// note the lack of a `>` on each tag string, due to how
+// the elements tree constructs the text for each node
+const bodyChildDomNodes = [
+  `<style`,
+  `<div style="left: 0px; top: 0px;"`,
+  `<div style="left: 100px; top: 0px;"`,
+  `<div style="left: 200px; top: 0px;"`,
+  `<div style="left: 300px; top: 0px;"`,
+  `<div style="left: 0px; top: 100px;"`,
+  `<div style="left: 100px; top: 100px;"`,
+  `<div style="left: 200px; top: 100px;"`,
+  `<div style="left: 300px; top: 100px;"`,
+  `<div style="left: 0px; top: 200px; display: flex;"`,
+  `<div style="left: 100px; top: 200px; display: grid;"`,
+  `<div style="left: 200px; top: 200px;"`,
+  `<div style="left: 200px; top: 200px;"`,
+  `<div style="left: 300px; top: 200px;"`,
+  `<div style="left: 0px; top: 300px;"`,
+  `<div style="left: 100px; top: 300px;"`,
+  `<div style="left: 200px; top: 300px;"`,
+  `<div style="left: 300px; top: 300px;"`,
+];
+
+const div0ChildDomNodes = [`<div class="box1"`, `<div class="box2"`];
+
+async function typeKeyAndVerifySelectedElement(page: Page, key: string, expectedElement: string) {
+  debugPrint(page, `Typing ${key}...`);
+  await page.keyboard.press(key);
+  await waitForSelectedElementsRow(page, expectedElement);
 }
 
 test("inspector-elements-03: Keyboard shortcuts should select the right DOM nodes", async ({
@@ -57,10 +90,36 @@ test("inspector-elements-03: Keyboard shortcuts should select the right DOM node
   });
 
   await bodyTag.click();
-  console.log("Typing ArrowDown 1");
-  await page.keyboard.press("ArrowDown");
-  await waitForSelectedElementsRow(page, `<style`);
-  console.log("Typing ArrowDown 1");
-  await page.keyboard.press("ArrowDown");
-  await waitForSelectedElementsRow(page, `<div style="left: 0px; top: 0px;"`);
+
+  // Basic up/down selects the next element in the tree
+  await typeKeyAndVerifySelectedElement(page, "ArrowDown", bodyChildDomNodes[0]);
+  await typeKeyAndVerifySelectedElement(page, "ArrowDown", bodyChildDomNodes[1]);
+  await typeKeyAndVerifySelectedElement(page, "ArrowDown", bodyChildDomNodes[2]);
+  await typeKeyAndVerifySelectedElement(page, "ArrowUp", bodyChildDomNodes[1]);
+
+  const div0Box1 = await getElementsRowWithText(page, div0ChildDomNodes[0]);
+  const div0Box2 = await getElementsRowWithText(page, div0ChildDomNodes[1]);
+
+  expect(await div0Box1.isVisible()).toBe(false);
+
+  // Right arrow expands the currently selected element
+  await typeKeyAndVerifySelectedElement(page, "ArrowRight", bodyChildDomNodes[1]);
+
+  // Children should now be visible
+  await waitFor(async () => {
+    expect(await div0Box1.isVisible()).toBe(true);
+  });
+
+  // Pressing Down should select the first child, as it's the next row
+  await typeKeyAndVerifySelectedElement(page, "ArrowDown", div0ChildDomNodes[0]);
+  await typeKeyAndVerifySelectedElement(page, "ArrowDown", div0ChildDomNodes[1]);
+
+  // Pressing Left jumps back to the parent
+  await typeKeyAndVerifySelectedElement(page, "ArrowLeft", bodyChildDomNodes[1]);
+
+  // Pressing Left again collapses the node
+  await typeKeyAndVerifySelectedElement(page, "ArrowLeft", bodyChildDomNodes[1]);
+  await waitFor(async () => {
+    expect(await div0Box1.isVisible()).toBe(false);
+  });
 });
