@@ -1,20 +1,11 @@
-import { Locator, Page, expect } from "@playwright/test";
-
 import { openDevToolsTab, startTest } from "../helpers";
 import { openConsolePanel, warpToMessage } from "../helpers/console-panel";
 import {
-  openAppliedRulesTab,
-  openElementsPanel,
-  selectElementsRowWithText,
   stackingTestCases,
   verifyStackingTestCaseSelectedElementUnderCursor,
 } from "../helpers/elements-panel";
 import { toggleToolboxLayout } from "../helpers/layout";
-import {
-  ensureSidePanelClosed,
-  getBreakpointsAccordionPane,
-} from "../helpers/pause-information-panel";
-import { delay, mapLocators, waitFor } from "../helpers/utils";
+import { ensureSidePanelClosed } from "../helpers/pause-information-panel";
 import test from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "doc_stacking_chromium.html" });

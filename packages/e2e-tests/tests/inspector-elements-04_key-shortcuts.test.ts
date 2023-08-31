@@ -53,7 +53,7 @@ async function typeKeyAndVerifySelectedElement(page: Page, key: string, expected
   await waitForSelectedElementsRow(page, expectedElement);
 }
 
-test("inspector-elements-03: Keyboard shortcuts should select the right DOM nodes", async ({
+test("inspector-elements-04: Keyboard shortcuts should select the right DOM nodes", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
