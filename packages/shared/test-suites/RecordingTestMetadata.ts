@@ -517,13 +517,6 @@ export async function processCypressTestRecording(
                   break;
                 }
                 case "step:enqueue": {
-                  if (!beginPoint || comparePoints(beginPoint.point, annotation.point) > 0) {
-                    beginPoint = {
-                      point: annotation.point,
-                      time: annotation.time,
-                    };
-                  }
-
                   if (!isChaiAssertion) {
                     viewSourceTimeStampedPoint = {
                       point: annotation.point,
@@ -533,12 +526,10 @@ export async function processCypressTestRecording(
                   break;
                 }
                 case "step:start": {
-                  if (!beginPoint || comparePoints(beginPoint.point, annotation.point) > 0) {
-                    beginPoint = {
-                      point: annotation.point,
-                      time: annotation.time,
-                    };
-                  }
+                  beginPoint = {
+                    point: annotation.point,
+                    time: annotation.time,
+                  };
 
                   if (isChaiAssertion) {
                     viewSourceTimeStampedPoint = {
