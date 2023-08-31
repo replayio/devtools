@@ -11,7 +11,7 @@ import test, { expect } from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "doc_inspector_basic.html" });
 
-test(`inspector-02: element picker and iframe behavior`, async ({
+test(`inspector-elements-02_node-picker: element picker and iframe behavior`, async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {

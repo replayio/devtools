@@ -10,7 +10,7 @@ import test from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "doc_inspector_shorthand.html" });
 
-test("inspector-06: Test that styles for elements can be viewed", async ({
+test("inspector-rules-03: Shorthand CSS rules should be viewed", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {

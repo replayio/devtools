@@ -11,7 +11,7 @@ import test from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "doc_inspector_shorthand.html" });
 
-test("inspector-07: Test that styles for elements can be viewed", async ({
+test("inspector-computed-02: Complex computed styles can be viewed", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
