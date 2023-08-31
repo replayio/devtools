@@ -13,24 +13,14 @@ import {
   waitForSelectedElementsRow,
 } from "../helpers/elements-panel";
 import { toggleToolboxLayout } from "../helpers/layout";
-import { getBreakpointsAccordionPane } from "../helpers/pause-information-panel";
+import {
+  ensureSidePanelClosed,
+  getBreakpointsAccordionPane,
+} from "../helpers/pause-information-panel";
 import { debugPrint, delay, mapLocators, waitFor } from "../helpers/utils";
 import test from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "doc_stacking.html" });
-
-async function ensureSidePanelClosed(page: Page) {
-  // Clicks that aren't directly on an element can cause the "Comments" pane to open.
-  // Ensure that it's closed by forcing the "Pause" pane to open instead...
-  const pane = getBreakpointsAccordionPane(page);
-  const pauseButton = page.locator('[data-test-name="ToolbarButton-PauseInformation"]');
-  await pauseButton.click();
-  const isVisible = await pane.isVisible();
-  if (isVisible) {
-    await pauseButton.click();
-  }
-}
-
 // ref: `doc_stacking.html`
 // note the lack of a `>` on each tag string, due to how
 // the elements tree constructs the text for each node
