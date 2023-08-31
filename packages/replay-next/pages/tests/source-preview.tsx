@@ -2,6 +2,7 @@ import { Suspense, useContext } from "react";
 
 import SourcePreviewInspector from "replay-next/components/inspector/SourcePreviewInspector";
 import Loader from "replay-next/components/Loader";
+import { SourcesContextRoot } from "replay-next/src/contexts/SourcesContext";
 import { getClosestPointForTimeSuspense } from "replay-next/src/suspense/ExecutionPointsCache";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { pauseEvaluationsCache, pauseIdCache } from "replay-next/src/suspense/PauseCache";
@@ -14,13 +15,15 @@ const DEFAULT_RECORDING_ID = "b1849642-40a3-445c-96f8-4bcd2c35586e";
 
 function SourcePreview() {
   return (
-    <div className={styles.Grid1Column}>
-      <div className={styles.Block}>
-        <Suspense fallback={<Loader />}>
-          <Suspender />
-        </Suspense>
+    <SourcesContextRoot>
+      <div className={styles.Grid1Column}>
+        <div className={styles.Block}>
+          <Suspense fallback={<Loader />}>
+            <Suspender />
+          </Suspense>
+        </div>
       </div>
-    </div>
+    </SourcesContextRoot>
   );
 }
 

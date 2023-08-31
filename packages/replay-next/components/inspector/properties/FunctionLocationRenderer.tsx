@@ -18,7 +18,7 @@ type FunctionLocationRendererProps = {
 export default function FunctionLocationRenderer({ object }: FunctionLocationRendererProps) {
   const client = useContext(ReplayClientContext);
   const { inspectFunctionDefinition } = useContext(InspectorContext);
-  const { preferredGeneratedSourceIds } = useContext(SourcesContext) ?? {};
+  const { preferredGeneratedSourceIds } = useContext(SourcesContext);
 
   const sourcesById = sourcesByIdCache.read(client);
   const functionLocation = object?.preview?.functionLocation;
