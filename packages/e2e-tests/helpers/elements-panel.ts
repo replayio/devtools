@@ -267,6 +267,10 @@ export async function selectNextElementsPanelSearchResult(page: Page): Promise<v
   await input.press("Enter");
 }
 
+export function getElementsTree(page: Page) {
+  return page.locator(`#markup-box [role="tree"]`);
+}
+
 export async function waitForElementsToLoad(page: Page): Promise<void> {
   await debugPrint(page, "Waiting for elements to load", "waitForElementsToLoad");
 
@@ -293,7 +297,18 @@ export async function toggleMarkupNode(page: Page, locator: Locator, open: boole
   }
 }
 
-export async function waitForSelectedElementsRow(page: Page, text: string): Promise<void> {
+export async function waitForSelectedElementsRow(page: Page, text: string): Promise<Locator> {
   const locator = await getElementsRowWithText(page, text, true);
   await locator.waitFor();
+  return locator;
+}
+
+export async function typeKeyAndVerifySelectedElement(
+  page: Page,
+  key: string,
+  expectedElement: string
+) {
+  debugPrint(page, `Typing ${key}...`);
+  await page.keyboard.press(key);
+  await waitForSelectedElementsRow(page, expectedElement);
 }

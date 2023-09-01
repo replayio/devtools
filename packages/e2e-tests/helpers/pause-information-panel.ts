@@ -45,6 +45,17 @@ export async function expandAllScopesBlocks(page: Page): Promise<void> {
   });
 }
 
+export async function closeSidePanel(page: Page) {
+  // Ensure that it's closed by forcing the "Pause" pane to open instead...
+  const pane = getBreakpointsAccordionPane(page);
+  const pauseButton = page.locator('[data-test-name="ToolbarButton-PauseInformation"]');
+  await pauseButton.click();
+  const isVisible = await pane.isVisible();
+  if (isVisible) {
+    await pauseButton.click();
+  }
+}
+
 export function getBreakpointsAccordionPane(page: Page): Locator {
   return page.locator('[data-test-id="AccordionPane-Breakpoints"]');
 }

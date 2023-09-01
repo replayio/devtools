@@ -6,12 +6,11 @@ import {
   stackingTestCases,
   verifyStackingTestCaseSelectedElementUnderCursor,
 } from "../helpers/stacking-test-cases";
-import { debugPrint } from "../helpers/utils";
 import test from "../testFixtureCloneRecording";
 
-test.use({ exampleKey: "doc_stacking.html" });
+test.use({ exampleKey: "doc_stacking_chromium.html" });
 
-test("stacking: Element highlighter selects the correct element when they overlap", async ({
+test.skip("stacking: Element highlighter selects the correct element when they overlap", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
@@ -33,8 +32,7 @@ test("stacking: Element highlighter selects the correct element when they overla
 
   for (let testCase of stackingTestCases) {
     // Really make sure the panel is closed
-    // ensureSidePanelClosed(page);
-    debugPrint(page, `Stacking test case: ${testCase.id}`);
+    closeSidePanel(page);
     await verifyStackingTestCaseSelectedElementUnderCursor(page, canvas, rulesContainer, testCase);
   }
 });

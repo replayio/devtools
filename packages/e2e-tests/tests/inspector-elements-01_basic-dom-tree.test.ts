@@ -14,7 +14,7 @@ import test from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "doc_inspector_basic.html" });
 
-test("inspector-01: Test that scopes are rerendered", async ({
+test("inspector-elements-01: Basic DOM tree node display", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
