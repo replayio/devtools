@@ -16,6 +16,7 @@ import {
   boxModelCache,
   nodeDataCache,
   processedNodeDataCache,
+  renderableChildNodesCache,
 } from "ui/suspense/nodeCaches";
 import { boundingRectCache } from "ui/suspense/styleCaches";
 
@@ -200,6 +201,14 @@ export function expandNode(
       return;
     }
 
+    const pauseId = ThreadFront.currentPauseIdUnsafe;
+    if (pauseId) {
+      // Start loading the child nodes even before we
+      // try to render the expanded node.
+      // Note that we DO NOT wait for this to complete!
+      renderableChildNodesCache.readAsync(replayClient, pauseId, nodeId);
+    }
+
     dispatch(updateNodeExpanded({ nodeId, isExpanded: true }));
     if (shouldScrollIntoView) {
       dispatch(updateScrollIntoViewNode(nodeId));
@@ -253,6 +262,13 @@ export function selectionChanged(
     if (!expandSelectedNode) {
       ancestorIds = ancestorIds.filter(id => id !== latestSelectedNodeId);
     }
+
+    ancestorIds.map(nodeId => {
+      // Start loading the child nodes even before we
+      // try to render the expanded node.
+      // Note that we DO NOT wait for this to complete!
+      renderableChildNodesCache.readAsync(replayClient, pauseId, nodeId);
+    });
 
     dispatch(expandMultipleNodes(ancestorIds));
 

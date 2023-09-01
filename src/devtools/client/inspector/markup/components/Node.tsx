@@ -3,21 +3,19 @@ import React, { ReactElement, useCallback, useContext } from "react";
 import { shallowEqual } from "react-redux";
 import { useImperativeCacheValue } from "suspense";
 
-import { getPauseId } from "devtools/client/debugger/src/selectors";
 import NodeConstants from "devtools/shared/dom-node-constants";
 import { assert } from "protocol/utils";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { processedNodeDataCache } from "ui/suspense/nodeCaches";
+import {
+  canRenderNodeInfo,
+  processedNodeDataCache,
+  renderableChildNodesCache,
+} from "ui/suspense/nodeCaches";
 import { canHighlightNode } from "ui/suspense/nodeCaches";
 
 import { highlightNode, selectNode, toggleNodeExpanded, unhighlightNode } from "../actions/markup";
-import {
-  getIsNodeExpanded,
-  getRootNodeId,
-  getScrollIntoViewNodeId,
-  getSelectedNodeId,
-} from "../selectors/markup";
+import { getIsNodeExpanded, getScrollIntoViewNodeId, getSelectedNodeId } from "../selectors/markup";
 import ElementNode from "./ElementNode";
 import { MarkupContext } from "./MarkupContext";
 import ReadOnlyNode from "./ReadOnlyNode";
@@ -60,6 +58,7 @@ function Node({ nodeId }: NodeProps) {
     }
   }, []);
 
+  // Ensure that we have the processed node data for _this_ node.
   const { value: node, status: nodeStatus } = useImperativeCacheValue(
     processedNodeDataCache,
     replayClient,
@@ -67,7 +66,22 @@ function Node({ nodeId }: NodeProps) {
     nodeId
   );
 
-  if (nodeStatus === "rejected" || !node) {
+  // Fetching "renderable" child node data here serves two purposes:
+  // 1) It allows us to only render meaningful child nodes,
+  //    omitting whitespace and empty text nodes.
+  //    (We currently have no way to filter that list in the backend.)
+  // 2) We actually pre-fetch these children regardless of whether the
+  //    node is expanded or not. That means that when the user does expand
+  //    this node, we already have the data for each child and it will
+  //    render the content immediately.
+  const { value: renderableChildNodes, status: childNodesStatus } = useImperativeCacheValue(
+    renderableChildNodesCache,
+    replayClient,
+    pauseId!,
+    nodeId
+  );
+
+  if (nodeStatus === "rejected" || !node || !canRenderNodeInfo(node)) {
     return null;
   }
 
@@ -101,10 +115,30 @@ function Node({ nodeId }: NodeProps) {
   let renderedClosingTag: ReactElement | null = null;
   let renderedComponent: ReactElement | null = null;
 
-  if (isExpanded && node.children.length) {
+  let childNodeIds: string[] = [];
+  if (childNodesStatus === "resolved" && renderableChildNodes) {
+    // We have the complete list of all _renderable_ child nodes.
+    childNodeIds = renderableChildNodes.map(node => node.id);
+  } else {
+    // Only try to render children that are already in cache.
+    // This should only happen when the user selects a deeply nested node,
+    // in which case we have _some_ children available but may not have all.
+    // The renderable cache request should resolve shortly and then
+    // we'll use that list instead.
+    childNodeIds = node.children.filter(childNodeId => {
+      const maybeNode = processedNodeDataCache.getValueIfCached(
+        replayClient,
+        pauseId!,
+        childNodeId
+      );
+      return !!maybeNode && canRenderNodeInfo(maybeNode);
+    });
+  }
+
+  if (isExpanded && childNodeIds.length) {
     renderedChildren = (
       <ul className="children" role={node.hasChildren ? "group" : ""}>
-        {node.children.map(nodeId => (
+        {childNodeIds.map(nodeId => (
           <Node key={nodeId} nodeId={nodeId} />
         ))}
       </ul>

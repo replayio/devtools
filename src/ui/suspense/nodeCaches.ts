@@ -226,6 +226,56 @@ export const ancestorNodesCache: Cache<
   },
 });
 
+export const reIsNotWhiteSpace = /[^\s]/;
+
+export const canRenderNodeInfo = (childNode: NodeInfo | null): childNode is NodeInfo => {
+  if (!childNode) {
+    return false;
+  }
+
+  const canRender = !!(
+    childNode.type !== NodeConstants.TEXT_NODE || reIsNotWhiteSpace.exec(childNode.value!)
+  );
+  return canRender;
+};
+
+// TODO [FE-1846???] The backend returns _all_ child nodes in the preview,
+// and we have no way of knowing which ones are renderable..
+// We've asked for a way to filter out the ones that aren't renderable on the server.
+// Until then, we'll filter them out here.
+// ref: https://linear.app/replay/issue/FE-1846/investigate-honeycomb-telemetry-that-can-help-us-see-which-getboxmodel#comment-0fb1c7e6
+// TODO [BAC-3918]Similarly, this would _really_ benefit from
+// a way to bulk-fetch object previews
+export const renderableChildNodesCache: Cache<
+  [replayClient: ReplayClientInterface, pauseId: PauseId, nodeId: string],
+  NodeInfo[] | null
+> = createCache({
+  config: { immutable: true },
+  debugLabel: "ChildNodesData",
+  getKey: ([replayClient, pauseId, nodeId]) => `${pauseId}:${nodeId}`,
+  load: async ([replayClient, pauseId, nodeId]): Promise<NodeInfo[] | null> => {
+    if (!pauseId || typeof nodeId !== "string") {
+      return null;
+    }
+
+    const parentNode = await processedNodeDataCache.readAsync(replayClient, pauseId, nodeId);
+
+    if (!parentNode) {
+      return null;
+    }
+
+    const childNodes: (NodeInfo | null)[] = await Promise.all(
+      parentNode.children.map(childNodeId => {
+        return processedNodeDataCache.readAsync(replayClient, pauseId, childNodeId);
+      })
+    );
+
+    const renderableChildNodes: NodeInfo[] = childNodes.filter(canRenderNodeInfo);
+
+    return renderableChildNodes;
+  },
+});
+
 export const nodeEventListenersCache: Cache<
   [replayClient: ReplayClientInterface, sessionId: string, pauseId: PauseId, nodeId: string],
   EventListener[] | undefined
