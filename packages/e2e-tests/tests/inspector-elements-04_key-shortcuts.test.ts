@@ -76,7 +76,6 @@ test("inspector-elements-04: Keyboard shortcuts should select the right DOM node
   await typeKeyAndVerifySelectedElement(page, "ArrowUp", bodyChildDomNodes[1]);
 
   const div0Box1 = await getElementsRowWithText(page, div0ChildDomNodes[0]);
-  const div0Box2 = await getElementsRowWithText(page, div0ChildDomNodes[1]);
 
   expect(await div0Box1.isVisible()).toBe(false);
 
@@ -94,8 +93,11 @@ test("inspector-elements-04: Keyboard shortcuts should select the right DOM node
 
   // Pressing Left jumps back to the parent
   await typeKeyAndVerifySelectedElement(page, "ArrowLeft", bodyChildDomNodes[1]);
+  // and Right while it's open goes  to the child
+  await typeKeyAndVerifySelectedElement(page, "ArrowRight", div0ChildDomNodes[0]);
 
-  // Pressing Left again collapses the node
+  // Going back to the parent and Left again collapses the node
+  await typeKeyAndVerifySelectedElement(page, "ArrowUp", bodyChildDomNodes[1]);
   await typeKeyAndVerifySelectedElement(page, "ArrowLeft", bodyChildDomNodes[1]);
   await waitFor(async () => {
     expect(await div0Box1.isVisible()).toBe(false);
