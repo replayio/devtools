@@ -558,9 +558,6 @@ export async function processCypressTestRecording(
             assert(stepStartPoint !== null, `Missing "step:start" annotation for test event`, {
               id,
             });
-            assert(stepEnqueuePoint !== null, `Missing "step:enqueue" annotation for test event`, {
-              id,
-            });
             assert(viewSourcePoint !== null, `Missing annotation for test event`, {
               annotationType: isChaiAssertion ? "step:start" : "step:enqueue",
               id,
@@ -585,7 +582,7 @@ export async function processCypressTestRecording(
                 },
               },
               timeStampedPointRange: {
-                begin: stepEnqueuePoint,
+                begin: stepEnqueuePoint ?? stepStartPoint,
                 end: stepEndPoint ?? stepStartPoint,
               },
               type: "user-action",
