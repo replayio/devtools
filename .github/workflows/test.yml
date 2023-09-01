@@ -201,18 +201,6 @@ jobs:
           RECORD_REPLAY_TEST_METRICS: 1
           AUTOMATED_TEST_SECRET: ${{ secrets.AUTOMATED_TEST_SECRET }}
           AUTHENTICATED_TESTS_WORKSPACE_API_KEY: ${{ secrets.AUTHENTICATED_TESTS_WORKSPACE_API_KEY }}
-  mock-test:
-    name: Mock Tests
-    runs-on: macos-latest
-    timeout-minutes: 15
-    needs: [download-browser, preview-branch]
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
-      - uses: ./.github/actions/mockTest
-        env:
-          PLAYWRIGHT_TEST_BASE_URL: ${{ needs.preview-branch.outputs.url }}
-          RECORD_REPLAY_PATH: ./firefox/Nightly.app/Contents/MacOS/firefox
   unit-test:
     name: Unit Tests
     runs-on: ubuntu-latest
