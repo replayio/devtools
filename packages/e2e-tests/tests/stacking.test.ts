@@ -1,7 +1,7 @@
 import { openDevToolsTab, startTest } from "../helpers";
 import { openConsolePanel, warpToMessage } from "../helpers/console-panel";
 import { toggleToolboxLayout } from "../helpers/layout";
-import { ensureSidePanelClosed } from "../helpers/pause-information-panel";
+import { closeSidePanel } from "../helpers/pause-information-panel";
 import {
   stackingTestCases,
   verifyStackingTestCaseSelectedElementUnderCursor,
@@ -21,7 +21,7 @@ test("stacking: Element highlighter selects the correct element when they overla
   await warpToMessage(page, "ExampleFinished");
 
   // Ensure that the left sidebar is collapsed
-  await ensureSidePanelClosed(page);
+  await closeSidePanel(page);
 
   await openConsolePanel(page);
 

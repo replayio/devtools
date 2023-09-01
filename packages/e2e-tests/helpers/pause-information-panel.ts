@@ -45,8 +45,7 @@ export async function expandAllScopesBlocks(page: Page): Promise<void> {
   });
 }
 
-export async function ensureSidePanelClosed(page: Page) {
-  // Clicks that aren't directly on an element can cause the "Comments" pane to open.
+export async function closeSidePanel(page: Page) {
   // Ensure that it's closed by forcing the "Pause" pane to open instead...
   const pane = getBreakpointsAccordionPane(page);
   const pauseButton = page.locator('[data-test-name="ToolbarButton-PauseInformation"]');

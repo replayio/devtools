@@ -11,7 +11,7 @@ import {
   waitForElementsToLoad,
   waitForSelectedElementsRow,
 } from "../helpers/elements-panel";
-import { ensureSidePanelClosed } from "../helpers/pause-information-panel";
+import { closeSidePanel } from "../helpers/pause-information-panel";
 import {
   stackingTestCases,
   verifyStackingTestCaseSelectedElementUnderCursor,
@@ -54,7 +54,7 @@ test("inspector-elements-03: Nested node picker and selection behavior", async (
   await warpToMessage(page, "ExampleFinished");
 
   // Ensure that the left sidebar is collapsed
-  await ensureSidePanelClosed(page);
+  await closeSidePanel(page);
 
   await openElementsPanel(page);
 
