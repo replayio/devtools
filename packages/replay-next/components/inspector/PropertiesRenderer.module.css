@@ -1,5 +1,4 @@
-.Bucket,
-.Prototype {
+.Bucket {
   color: var(--object-inspector-prototype-color);
   display: inline;
   min-height: 1rem;

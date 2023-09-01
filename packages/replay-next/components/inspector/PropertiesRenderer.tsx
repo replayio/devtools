@@ -17,6 +17,8 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import GetterRenderer from "./GetterRenderer";
 import KeyValueRenderer from "./KeyValueRendererWithContextMenu";
+import FunctionLocationRenderer from "./properties/FunctionLocationRenderer";
+import PrototypeRenderer from "./properties/PrototypeRenderer";
 import ValueRenderer from "./ValueRenderer";
 import styles from "./PropertiesRenderer.module.css";
 
@@ -81,12 +83,6 @@ export default function PropertiesRenderer({
     return properties;
   }, [preview]);
 
-  const prototypeId = preview?.prototypeId ?? null;
-  let prototype = null;
-  if (prototypeId) {
-    prototype = objectCache.read(client, pauseId, prototypeId, "canOverflow");
-  }
-
   let EntriesRenderer: FC<EntriesRendererProps> = ContainerEntriesRenderer;
   switch (className) {
     case "Map":
@@ -120,21 +116,17 @@ export default function PropertiesRenderer({
     }
   }
 
-  let renderedPrototype: ReactNode = null;
-  if (prototype != null && !hidePrototype) {
-    const prototypePath = addPathSegment(path, "[[Prototype]]");
-    renderedPrototype = (
-      <Expandable
-        children={<PropertiesRenderer object={prototype} path={prototypePath} pauseId={pauseId} />}
-        header={
-          <span className={styles.Prototype}>
-            <span className={styles.PrototypeName}>[[Prototype]]: </span>
-            {prototype.className}
-          </span>
-        }
-        persistenceKey={prototypePath}
-      />
-    );
+  let specialPropertiesRenderer: ReactNode[] = [];
+
+  switch (object.className) {
+    case "Function":
+      specialPropertiesRenderer.push(<FunctionLocationRenderer object={object} />);
+    default:
+      if (!hidePrototype) {
+        specialPropertiesRenderer.push(
+          <PrototypeRenderer object={object} path={path} pauseId={pauseId} />
+        );
+      }
   }
 
   return (
@@ -201,7 +193,7 @@ export default function PropertiesRenderer({
         </Suspense>
       )}
 
-      {renderedPrototype}
+      {specialPropertiesRenderer}
     </>
   );
 }
