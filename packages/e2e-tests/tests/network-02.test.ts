@@ -31,14 +31,14 @@ test(`network-02: should show details for the selected request`, async ({
   await selectRequestRow(page, {
     name: "image/svg+xml",
   });
-  await verifyNetworkDetailsTabsVisible(page, ["Headers", "Response"]);
+  await verifyNetworkDetailsTabsVisible(page, ["Headers", "Response", "Timings"]);
 
   // Select a JavaScript file request
   await filterByText(page, "SpecPatterns");
   await selectRequestRow(page, {
     name: "SpecPatterns",
   });
-  await verifyNetworkDetailsTabsVisible(page, ["Headers", "Response", "Stack Trace"]);
+  await verifyNetworkDetailsTabsVisible(page, ["Headers", "Response", "Stack Trace", "Timings"]);
 
   // Verify Header tails
   await verifyNetworkDetailsPanelContains(
