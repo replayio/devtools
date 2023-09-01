@@ -1,5 +1,13 @@
 import { Value as ProtocolValue, SourceId } from "@replayio/protocol";
-import { ReactNode, RefObject, Suspense, useContext, useEffect, useRef } from "react";
+import {
+  PropsWithChildren,
+  ReactNode,
+  RefObject,
+  Suspense,
+  useContext,
+  useEffect,
+  useRef,
+} from "react";
 
 import { SelectedFrameContext } from "replay-next/src/contexts/SelectedFrameContext";
 import { useCurrentFocusWindow } from "replay-next/src/hooks/useCurrentFocusWindow";
@@ -28,7 +36,15 @@ type Props = {
 export default function PreviewPopup(props: Props) {
   return (
     <ErrorBoundary name="PreviewPopup">
-      <Suspense fallback={null}>
+      <Suspense
+        fallback={
+          <PopupWithChildren {...props}>
+            <div className={styles.Popup}>
+              <div className={styles.LoadingMessage}>Loading...</div>
+            </div>
+          </PopupWithChildren>
+        }
+      >
         <SuspendingPreviewPopup {...props} />
       </Suspense>
     </ErrorBoundary>
@@ -108,26 +124,24 @@ function SuspendingPreviewPopup({
   let children: ReactNode = null;
   if (valueUnavailableMessage !== null) {
     return (
-      <Popup
+      <PopupWithChildren
         clientX={clientX}
         containerRef={containerRef}
         dismiss={dismiss}
         target={target}
-        showTail={true}
       >
         <div className={styles.Popup}>
           <div className={styles.UnavailableMessage}>{valueUnavailableMessage}</div>
         </div>
-      </Popup>
+      </PopupWithChildren>
     );
   } else if (pauseId !== null && value !== null) {
     return (
-      <Popup
+      <PopupWithChildren
         clientX={clientX}
         containerRef={containerRef}
         dismiss={dismiss}
         target={target}
-        showTail={true}
       >
         <SourcePreviewInspector
           className={styles.Popup}
@@ -135,19 +149,41 @@ function SuspendingPreviewPopup({
           protocolValue={value}
           ref={popupRef}
         />
-      </Popup>
+      </PopupWithChildren>
     );
   }
 
   return children !== null ? (
+    <PopupWithChildren
+      children={children}
+      clientX={clientX}
+      containerRef={containerRef}
+      dismiss={dismiss}
+      target={target}
+    />
+  ) : null;
+}
+
+function PopupWithChildren({
+  children,
+  clientX,
+  containerRef,
+  dismiss,
+  target,
+}: PropsWithChildren & {
+  clientX?: number | null;
+  containerRef: RefObject<HTMLElement>;
+  dismiss: () => void;
+  target: HTMLElement;
+}) {
+  return (
     <Popup
+      children={children}
       clientX={clientX}
       containerRef={containerRef}
       dismiss={dismiss}
       target={target}
       showTail={true}
-    >
-      {children}
-    </Popup>
-  ) : null;
+    />
+  );
 }

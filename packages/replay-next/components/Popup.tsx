@@ -186,6 +186,10 @@ export default function Popup({
     observer.observe(popover);
     observer.observe(target);
 
+    // Call this synchronously to avoid a flash of the popover in the wrong position.
+    // ResizeObserver will automatically call the method, but seemingly only after paint.
+    reposition();
+
     return () => {
       scrollTargets.forEach(target => {
         target.removeEventListener("scroll", onScroll);
