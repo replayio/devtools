@@ -20,14 +20,10 @@ export const TestStepSourceLocationCache = createCacheWithTelemetry<
     const runnerVersion = groupedTestCases.environment.testRunner.version;
 
     if (runner === "cypress" && runnerVersion) {
-      const { viewSourceTimeStampedPoint } = testEvent.data;
-      assert(viewSourceTimeStampedPoint !== null);
+      const { viewSource } = testEvent.data.timeStampedPoints;
+      assert(viewSource !== null);
 
-      const pauseId = await pauseIdCache.readAsync(
-        client,
-        viewSourceTimeStampedPoint.point,
-        viewSourceTimeStampedPoint.time
-      );
+      const pauseId = await pauseIdCache.readAsync(client, viewSource.point, viewSource.time);
       const frames = await framesCache.readAsync(client, pauseId);
 
       if (frames) {

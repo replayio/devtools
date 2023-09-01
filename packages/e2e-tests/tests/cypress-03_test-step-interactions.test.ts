@@ -145,17 +145,16 @@ test("cypress-03: Test Step interactions", async ({
   await steps.nth(4).click();
   await waitFor(async () => {
     const detailsPane = getUserActionEventDetails(page);
-    expect(await detailsPane.isVisible()).toBe(false);
-    const message = getByTestName(page, "TestEventDetailsMessage");
-    const messageContents = await message.textContent();
-    expect(messageContents).toMatch("Select an action above to view its details");
+    const detailsPaneContents = await getDetailsPaneContents(detailsPane);
+    expect(detailsPaneContents["Command"]).toBe(`"type"`);
+    expect(detailsPaneContents["Typed"]).toMatch("{enter}");
   });
 
   await steps.nth(5).click();
   await waitFor(async () => {
     const detailsPane = getUserActionEventDetails(page);
     const detailsPaneContents = await getDetailsPaneContents(detailsPane);
-    expect(detailsPaneContents["Command"]).toBe(`"type"`);
-    expect(detailsPaneContents["Typed"]).toMatch("{enter}");
+    expect(detailsPaneContents["Command"]).toBe(`"get"`);
+    expect(detailsPaneContents["Selector"]).toBe(`".todo-list li"`);
   });
 });
