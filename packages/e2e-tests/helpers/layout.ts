@@ -1,5 +1,7 @@
 import { Page, expect } from "@playwright/test";
 
+import { waitFor } from "./utils";
+
 type ToolboxLayout = "bottom" | "full" | "ide" | "left";
 
 export async function getToolboxLayout(page: Page): Promise<ToolboxLayout | null> {
@@ -11,6 +13,19 @@ export async function getToolboxLayout(page: Page): Promise<ToolboxLayout | null
   expect(layout).not.toBeNull();
 
   return layout as ToolboxLayout;
+}
+
+export async function hideUserOptionsDropdown(page: Page) {
+  const button = await page.waitForSelector('[data-test-id="UserOptions-DropdownButton"]');
+  const state = await button.getAttribute("data-dropdown-state");
+  if (state !== "closed") {
+    await page.keyboard.press("Escape");
+
+    await waitFor(async () => {
+      const state = await button.getAttribute("data-dropdown-state");
+      expect(state).toBe("closed");
+    });
+  }
 }
 
 export async function showUserOptionsDropdown(page: Page) {
@@ -28,6 +43,9 @@ export async function toggleToolboxLayout(page: Page, layout: ToolboxLayout): Pr
 
   const element = await page.waitForSelector(`[data-layout-option="${layout}"]`);
   await element.click();
+
+  // Changing layout options will not close the menu
+  await hideUserOptionsDropdown(page);
 }
 
 export async function verifyToolboxLayout(page: Page, expected: ToolboxLayout): Promise<void> {

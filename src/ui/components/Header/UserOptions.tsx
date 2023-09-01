@@ -1,4 +1,4 @@
-import React, { ReactNode, useContext, useState } from "react";
+import React, { ReactNode, useContext, useEffect, useState } from "react";
 
 import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -26,6 +26,22 @@ export default function UserOptions() {
   const [videoPanelCollapsed, setVideoPanelCollapsed] = useLocalStorageUserData(
     "replayVideoPanelCollapsed"
   );
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      switch (event.key) {
+        case "Escape":
+          setExpanded(false);
+          break;
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, []);
 
   // only show layout options in devtools
   let devLayoutOptions: ReactNode = null;
@@ -153,13 +169,11 @@ export default function UserOptions() {
   const onLayoutChange = (orientation: "bottom" | "full" | "ide" | "left") => {
     dispatch(setToolboxLayout(orientation));
     trackEvent(`layout.settings.set_${orientation}`);
-    setExpanded(false);
   };
 
   const onVideoPanelCollapseChange = (collapsed: boolean) => {
     setVideoPanelCollapsed(collapsed);
     trackEvent(collapsed ? "video.settings.set_collapsed" : "video.settings.set_expanded");
-    setExpanded(false);
   };
 
   return (
