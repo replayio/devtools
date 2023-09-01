@@ -14,6 +14,7 @@ import { UIState } from "ui/state";
 import {
   ancestorNodesCache,
   boxModelCache,
+  getCurrentRenderableChildNodeIds,
   nodeDataCache,
   processedNodeDataCache,
   renderableChildNodesCache,
@@ -98,8 +99,6 @@ export function setupMarkup(store: UIStore, startAppListening: AppStartListening
           originalPauseId,
           rootNodePreview.objectId
         ))!;
-
-        console.log("Root node data fetched: ", rootNodePreview, rootNode);
 
         await throwIfCanceled();
 
@@ -312,13 +311,33 @@ function getLastNodeId(
   pauseId: string,
   nodeId: string
 ) {
+  // Keep recursing through nested children as long as possible
   while (true) {
-    const nodeInfo = processedNodeDataCache.getValueIfCached(replayClient, pauseId, nodeId); // getNodeInfo(state, nodeId);
+    const nodeInfo = processedNodeDataCache.getValueIfCached(replayClient, pauseId, nodeId);
     const isExpanded = getIsNodeExpanded(state, nodeId);
-    if (isExpanded || !nodeInfo || nodeInfo.children.length === 0) {
+    // If it's not expanded, stop here
+    if (!isExpanded || !nodeInfo) {
       return nodeId;
     }
-    nodeId = nodeInfo.children[nodeInfo.children.length - 1];
+    const renderableChildren = renderableChildNodesCache.getValueIfCached(
+      replayClient,
+      pauseId,
+      nodeId
+    );
+    const renderableChildIds = getCurrentRenderableChildNodeIds(
+      replayClient,
+      pauseId,
+      nodeInfo,
+      renderableChildren
+    );
+
+    // If there's no children, we're at a stopping point
+    if (renderableChildIds.length === 0) {
+      return nodeId;
+    }
+    // Otherwise, use the last child
+    const lastChild = renderableChildIds[renderableChildIds.length - 1];
+    nodeId = lastChild;
   }
 }
 
@@ -346,13 +365,29 @@ function getPreviousNodeId(
     pauseId,
     parentNodeId
   );
-  assert(parentNodeInfo, "parent node not found in markup state");
+  assert(parentNodeInfo, "parent node not found in cache");
   if (parentNodeInfo.type === NodeConstants.DOCUMENT_TYPE_NODE) {
     return nodeId;
   }
-  const index = parentNodeInfo.children.indexOf(nodeId);
+  const renderableChildren = renderableChildNodesCache.getValueIfCached(
+    replayClient,
+    pauseId,
+    parentNodeId
+  );
+
+  const renderableChildIds = getCurrentRenderableChildNodeIds(
+    replayClient,
+    pauseId,
+    parentNodeInfo,
+    renderableChildren
+  );
+
+  if (renderableChildIds.length === 0) {
+    return nodeId;
+  }
+  const index = renderableChildIds.indexOf(nodeId);
   if (index >= 1) {
-    return getLastNodeId(state, replayClient, pauseId, parentNodeInfo.children[index - 1]);
+    return getLastNodeId(state, replayClient, pauseId, renderableChildIds[index - 1]);
   }
   return parentNodeId;
 }
@@ -369,20 +404,51 @@ function getNextNodeId(
 ) {
   if (getIsNodeExpanded(state, nodeId)) {
     const nodeInfo = processedNodeDataCache.getValueIfCached(replayClient, pauseId, nodeId);
+
     if (nodeInfo && nodeInfo.children.length > 0) {
-      return nodeInfo.children[0];
+      const renderableChildren = renderableChildNodesCache.getValueIfCached(
+        replayClient,
+        pauseId,
+        nodeId
+      );
+
+      const renderableChildIds = getCurrentRenderableChildNodeIds(
+        replayClient,
+        pauseId,
+        nodeInfo,
+        renderableChildren
+      );
+
+      const firstChildId = renderableChildIds[0];
+      if (firstChildId) {
+        return firstChildId;
+      }
     }
   }
 
   let currentNodeId = nodeId;
   let parentNodeId = getParentNodeId(replayClient, pauseId, currentNodeId);
   while (parentNodeId) {
-    const siblingIds = processedNodeDataCache.getValueIfCached(
+    const parentNode = processedNodeDataCache.getValueIfCached(
       replayClient,
       pauseId,
       parentNodeId
-    )?.children;
-    assert(siblingIds, "sibling nodes not found in markup state");
+    )!;
+    const renderableChildren = renderableChildNodesCache.getValueIfCached(
+      replayClient,
+      pauseId,
+      parentNodeId
+    );
+
+    const siblingIds = getCurrentRenderableChildNodeIds(
+      replayClient,
+      pauseId,
+      parentNode,
+      renderableChildren
+    );
+
+    // assert(siblings, "sibling nodes not found in cache");
+    // const siblingIds = siblings.map(node => node.id);
     const index = siblingIds.indexOf(currentNodeId);
     assert(index >= 0, "current node not found among siblings");
     if (index + 1 < siblingIds.length) {
@@ -395,7 +461,9 @@ function getNextNodeId(
   return nodeId;
 }
 
-export function onLeftKey(): UIThunkAction {
+export type ElementsTreeKeyboardKeys = "Up" | "Down" | "Left" | "Right" | "PageUp" | "PageDown";
+
+export function onElementsTreeKeyboardNavigation(key: ElementsTreeKeyboardKeys): UIThunkAction {
   return (dispatch, getState, { replayClient, ThreadFront }) => {
     const state = getState();
     const selectedNodeId = getSelectedNodeId(state);
@@ -404,113 +472,100 @@ export function onLeftKey(): UIThunkAction {
       return;
     }
 
-    if (getIsNodeExpanded(state, selectedNodeId)) {
-      dispatch(updateNodeExpanded({ nodeId: selectedNodeId, isExpanded: false }));
-    } else {
-      const parentNodeId = getParentNodeId(replayClient, pauseId, selectedNodeId);
-      if (parentNodeId != null) {
-        const parentNodeInfo = processedNodeDataCache.getValueIfCached(
+    let nodeIdToSelect: string | null = null;
+
+    switch (key) {
+      case "Up": {
+        // Always find the node row directly above this one,
+        // even if it's deeply nested
+        nodeIdToSelect = getPreviousNodeId(state, replayClient, pauseId, selectedNodeId);
+        break;
+      }
+      case "Down": {
+        // ALways find the node row directly below this one
+        nodeIdToSelect = getNextNodeId(state, replayClient, pauseId, selectedNodeId);
+        break;
+      }
+      case "Left": {
+        // If the node is expanded, toggle it closed
+        if (getIsNodeExpanded(state, selectedNodeId)) {
+          dispatch(updateNodeExpanded({ nodeId: selectedNodeId, isExpanded: false }));
+        } else {
+          // Otherwise, try to select the parent node
+          const parentNodeId = getParentNodeId(replayClient, pauseId, selectedNodeId);
+          if (parentNodeId != null) {
+            const parentNodeInfo = processedNodeDataCache.getValueIfCached(
+              replayClient,
+              pauseId,
+              parentNodeId
+            );
+            if (parentNodeInfo && parentNodeInfo.type !== NodeConstants.DOCUMENT_TYPE_NODE) {
+              nodeIdToSelect = parentNodeId;
+            }
+          }
+        }
+        break;
+      }
+      case "Right": {
+        const selectedNodeInfo = processedNodeDataCache.getValueIfCached(
           replayClient,
           pauseId,
-          parentNodeId
+          selectedNodeId
         );
-        if (parentNodeInfo && parentNodeInfo.type !== NodeConstants.DOCUMENT_TYPE_NODE) {
-          dispatch(selectNode(parentNodeId, "keyboard"));
+        const isExpanded = getIsNodeExpanded(state, selectedNodeId);
+        assert(selectedNodeInfo, "selected node not found in markup state");
+
+        // If the node is _not_ expanded, open it
+        if (!isExpanded || selectedNodeInfo.isLoadingChildren) {
+          dispatch(expandNode(selectedNodeId, true));
+        } else {
+          // Otherwise, try to select the first child (equivalent to "Down")
+          const renderableChildren = renderableChildNodesCache.getValueIfCached(
+            replayClient,
+            pauseId,
+            selectedNodeId
+          );
+          const renderableChildIds = getCurrentRenderableChildNodeIds(
+            replayClient,
+            pauseId,
+            selectedNodeInfo,
+            renderableChildren
+          );
+          const firstChildId = renderableChildIds?.[0];
+          if (firstChildId != null) {
+            dispatch(selectNode(firstChildId, "keyboard"));
+            return;
+          }
+          // If there weren't any children, find the next row
+          const nextNodeId = getNextNodeId(state, replayClient, pauseId, selectedNodeId);
+          nodeIdToSelect = nextNodeId;
         }
+        break;
+      }
+
+      case "PageUp": {
+        // Go upwards up to 10 rows
+        let previousNodeId = selectedNodeId;
+        for (let i = 0; i < 10; i++) {
+          previousNodeId = getPreviousNodeId(state, replayClient, pauseId, previousNodeId);
+        }
+        nodeIdToSelect = previousNodeId;
+        break;
+      }
+      case "PageDown": {
+        // Go down up to 10 rows
+        let nextNodeId: string | undefined = selectedNodeId;
+        for (let i = 0; i < 10; i++) {
+          nextNodeId = getNextNodeId(state, replayClient, pauseId, nextNodeId);
+        }
+        nodeIdToSelect = nextNodeId;
+        break;
       }
     }
-  };
-}
 
-export function onRightKey(): UIThunkAction {
-  return (dispatch, getState, { replayClient, ThreadFront }) => {
-    const state = getState();
-    const selectedNodeId = getSelectedNodeId(state);
-    const pauseId = ThreadFront.currentPauseIdUnsafe;
-    if (selectedNodeId == null || !pauseId) {
-      return;
+    if (nodeIdToSelect !== null) {
+      dispatch(selectNode(nodeIdToSelect, "keyboard"));
     }
-
-    const selectedNodeInfo = processedNodeDataCache.getValueIfCached(
-      replayClient,
-      pauseId,
-      selectedNodeId
-    );
-    const isExpanded = getIsNodeExpanded(state, selectedNodeId);
-    assert(selectedNodeInfo, "selected node not found in markup state");
-    if (!isExpanded || selectedNodeInfo.isLoadingChildren) {
-      dispatch(expandNode(selectedNodeId, true));
-    } else {
-      const firstChildId = selectedNodeInfo.children[0];
-      if (firstChildId != null) {
-        dispatch(selectNode(firstChildId, "keyboard"));
-        return;
-      }
-      const nextNodeId = getNextNodeId(state, replayClient, pauseId, selectedNodeId);
-      dispatch(selectNode(nextNodeId, "keyboard"));
-    }
-  };
-}
-
-export function onUpKey(): UIThunkAction {
-  return (dispatch, getState, { replayClient, ThreadFront }) => {
-    const state = getState();
-    const selectedNodeId = getSelectedNodeId(state);
-    const pauseId = ThreadFront.currentPauseIdUnsafe;
-    if (selectedNodeId == null || !pauseId) {
-      return;
-    }
-
-    const previousNodeId = getPreviousNodeId(state, replayClient, pauseId, selectedNodeId);
-    dispatch(selectNode(previousNodeId, "keyboard"));
-  };
-}
-
-export function onDownKey(): UIThunkAction {
-  return (dispatch, getState, { replayClient, ThreadFront }) => {
-    const state = getState();
-    const selectedNodeId = getSelectedNodeId(state);
-    const pauseId = ThreadFront.currentPauseIdUnsafe;
-    if (selectedNodeId == null || !pauseId) {
-      return;
-    }
-
-    const nextNodeId = getNextNodeId(state, replayClient, pauseId, selectedNodeId);
-    dispatch(selectNode(nextNodeId, "keyboard"));
-  };
-}
-
-export function onPageUpKey(): UIThunkAction {
-  return (dispatch, getState, { replayClient, ThreadFront }) => {
-    const state = getState();
-    const selectedNodeId = getSelectedNodeId(state);
-    const pauseId = ThreadFront.currentPauseIdUnsafe;
-    if (selectedNodeId == null || !pauseId) {
-      return;
-    }
-
-    let previousNodeId = selectedNodeId;
-    for (let i = 0; i < 10; i++) {
-      previousNodeId = getPreviousNodeId(state, replayClient, pauseId, previousNodeId);
-    }
-    dispatch(selectNode(previousNodeId, "keyboard"));
-  };
-}
-
-export function onPageDownKey(): UIThunkAction {
-  return (dispatch, getState, { replayClient, ThreadFront }) => {
-    const state = getState();
-    const selectedNodeId = getSelectedNodeId(state);
-    const pauseId = ThreadFront.currentPauseIdUnsafe;
-    if (selectedNodeId == null || !pauseId) {
-      return;
-    }
-
-    let nextNodeId: string | undefined = selectedNodeId;
-    for (let i = 0; i < 10; i++) {
-      nextNodeId = getNextNodeId(state, replayClient, pauseId, nextNodeId);
-    }
-    dispatch(selectNode(nextNodeId, "keyboard"));
   };
 }
 

@@ -239,6 +239,32 @@ export const canRenderNodeInfo = (childNode: NodeInfo | null): childNode is Node
   return canRender;
 };
 
+export const getCurrentRenderableChildNodeIds = (
+  replayClient: ReplayClientInterface,
+  pauseId: string,
+  parentNode: NodeInfo,
+  renderableChildNodes: NodeInfo[] | null | undefined
+) => {
+  let childNodeIds: string[] = [];
+
+  if (renderableChildNodes) {
+    // We have the complete list of all _renderable_ child nodes.
+    childNodeIds = renderableChildNodes.map(node => node.id);
+  } else {
+    // Only try to render children that are already in cache.
+    // This should only happen when the user selects a deeply nested node,
+    // in which case we have _some_ children available but may not have all.
+    // The renderable cache request should resolve shortly and then
+    // we'll use that list instead.
+    childNodeIds = parentNode.children.filter(childNodeId => {
+      const maybeNode = processedNodeDataCache.getValueIfCached(replayClient, pauseId, childNodeId);
+      return !!maybeNode && canRenderNodeInfo(maybeNode);
+    });
+  }
+
+  return childNodeIds;
+};
+
 // TODO [FE-1846???] The backend returns _all_ child nodes in the preview,
 // and we have no way of knowing which ones are renderable..
 // We've asked for a way to filter out the ones that aren't renderable on the server.

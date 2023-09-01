@@ -9,6 +9,7 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import {
   canRenderNodeInfo,
+  getCurrentRenderableChildNodeIds,
   processedNodeDataCache,
   renderableChildNodesCache,
 } from "ui/suspense/nodeCaches";
@@ -115,25 +116,14 @@ function Node({ nodeId }: NodeProps) {
   let renderedClosingTag: ReactElement | null = null;
   let renderedComponent: ReactElement | null = null;
 
-  let childNodeIds: string[] = [];
-  if (childNodesStatus === "resolved" && renderableChildNodes) {
-    // We have the complete list of all _renderable_ child nodes.
-    childNodeIds = renderableChildNodes.map(node => node.id);
-  } else {
-    // Only try to render children that are already in cache.
-    // This should only happen when the user selects a deeply nested node,
-    // in which case we have _some_ children available but may not have all.
-    // The renderable cache request should resolve shortly and then
-    // we'll use that list instead.
-    childNodeIds = node.children.filter(childNodeId => {
-      const maybeNode = processedNodeDataCache.getValueIfCached(
-        replayClient,
-        pauseId!,
-        childNodeId
-      );
-      return !!maybeNode && canRenderNodeInfo(maybeNode);
-    });
-  }
+  // This will be either _all_ child nodes if we have them
+  // available, or a filtered list of non-text nodes
+  const childNodeIds = getCurrentRenderableChildNodeIds(
+    replayClient,
+    pauseId!,
+    node,
+    childNodesStatus === "resolved" ? renderableChildNodes : null
+  );
 
   if (isExpanded && childNodeIds.length) {
     renderedChildren = (

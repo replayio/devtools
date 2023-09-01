@@ -8,14 +8,7 @@ import { processedNodeDataCache } from "ui/suspense/nodeCaches";
 import { cancelBubbling, preventDefault } from "ui/utils/key-shortcuts";
 import useKeyShortcuts from "ui/utils/use-key-shortcuts";
 
-import {
-  onDownKey,
-  onLeftKey,
-  onPageDownKey,
-  onPageUpKey,
-  onRightKey,
-  onUpKey,
-} from "../actions/markup";
+import { ElementsTreeKeyboardKeys, onElementsTreeKeyboardNavigation } from "../actions/markup";
 import { getRootNodeId } from "../selectors/markup";
 import { MarkupContext } from "./MarkupContext";
 import Node from "./Node";
@@ -27,17 +20,20 @@ function Nodes() {
   const { pauseId } = useContext(MarkupContext);
 
   const boundKeyHandlers = useMemo(() => {
-    const initialKeyHandlers = {
-      Up: onUpKey,
-      Down: onDownKey,
-      Left: onLeftKey,
-      Right: onRightKey,
-      PageUp: onPageUpKey,
-      PageDown: onPageDownKey,
+    const getDispatchHandler = (key: ElementsTreeKeyboardKeys) => {
+      return () => {
+        dispatch(onElementsTreeKeyboardNavigation(key));
+      };
     };
-    const dispatchKeyHandlers = mapValues(initialKeyHandlers, handler => {
-      return () => dispatch(handler());
-    });
+    const dispatchKeyHandlers = {
+      Up: getDispatchHandler("Up"),
+      Down: getDispatchHandler("Down"),
+      Left: getDispatchHandler("Left"),
+      Right: getDispatchHandler("Right"),
+      PageUp: getDispatchHandler("PageUp"),
+      PageDown: getDispatchHandler("PageDown"),
+    };
+
     const dispatchLeftKey = dispatchKeyHandlers.Left;
 
     function onLeftKeyEnsureFocus() {
@@ -49,7 +45,7 @@ function Nodes() {
 
     dispatchKeyHandlers.Left = onLeftKeyEnsureFocus;
 
-    const finalKeyHandlers = mapValues(initialKeyHandlers, handler => {
+    const finalKeyHandlers = mapValues(dispatchKeyHandlers, handler => {
       return cancelBubbling(preventDefault(handler));
     });
     return finalKeyHandlers;
