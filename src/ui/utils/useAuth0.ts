@@ -1,7 +1,7 @@
 import { Auth0ContextInterface, LogoutOptions, useAuth0 as useOrigAuth0 } from "@auth0/auth0-react";
 import { useRouter } from "next/router";
 
-import { isMock, isTest } from "shared/utils/environment";
+import { isTest } from "shared/utils/environment";
 import { useGetUserInfo } from "ui/hooks/users";
 
 import { setAccessTokenInBrowserPrefs } from "./browser";
@@ -66,7 +66,7 @@ export default function useAuth0() {
     };
   }
 
-  if (isTest() || isMock()) {
+  if (isTest()) {
     return TEST_AUTH;
   }
 

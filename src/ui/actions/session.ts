@@ -16,7 +16,7 @@ import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCach
 import { extractGraphQLError } from "shared/graphql/apolloClient";
 import { Recording } from "shared/graphql/types";
 import { userData } from "shared/user-data/GraphQL/UserData";
-import { getPausePointParams, isMock, isTest } from "shared/utils/environment";
+import { getPausePointParams, isTest } from "shared/utils/environment";
 import { UIThunkAction } from "ui/actions";
 import * as actions from "ui/actions/app";
 import { getRecording } from "ui/hooks/recordings";
@@ -101,8 +101,8 @@ function getRecordingNotAccessibleError(
   recording?: Recording,
   userId?: string
 ): ExpectedError | undefined {
-  const isAuthorized = !!((isTest() && !isMock()) || recording);
-  const isAuthenticated = !!(isTest() || isMock() || !!tokenManager.getState()?.token);
+  const isAuthorized = !!(isTest() || recording);
+  const isAuthenticated = !!(isTest() || !!tokenManager.getState()?.token);
 
   if (isAuthorized) {
     return undefined;

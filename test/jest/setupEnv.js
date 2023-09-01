@@ -1,9 +1,5 @@
-// Mock out indexedDB
 require("fake-indexeddb/auto");
 require("@testing-library/jest-dom");
-
-import { basicBindings, basicMessageHandlers } from "../../test/mock/src/handlers";
-import { installMockEnvironment } from "../../test/mock/src/mockEnvironment";
 
 // Code throws if there's no dispatchUrl set
 process.env.NEXT_PUBLIC_DISPATCH_URL = "wss://dummy.example.com";
@@ -16,12 +12,6 @@ globalThis.Worker = function () {};
 // Replace `window.location` to fake this: https://stackoverflow.com/a/60697570/62937
 delete window.location;
 window.location = new URL("http://localhost?mock=true");
-
-// Reuse additional environment handling from the E2E tests
-installMockEnvironment({
-  bindings: basicBindings(),
-  messageHandlers: basicMessageHandlers(),
-});
 
 delete window.performance;
 window.performance = {
