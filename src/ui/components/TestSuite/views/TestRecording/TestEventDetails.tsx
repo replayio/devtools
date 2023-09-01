@@ -32,15 +32,15 @@ export default function TestEventDetails({ collapsed }: { collapsed: boolean }) 
         stack={testEvent.data.testSourceCallStack}
       />
     );
-  } else if (testEvent.data.result == null) {
+  } else if (!testEvent.data.resultVariable || !testEvent.data.timeStampedPoints.result) {
     return <LoadingFailedMessage />;
   }
 
   return (
     <ErrorBoundary name="TestEventDetails">
       <UserActionEventDetails
-        timeStampedPoint={testEvent.data.result.timeStampedPoint}
-        variable={testEvent.data.result.variable}
+        timeStampedPoint={testEvent.data.timeStampedPoints.result}
+        variable={testEvent.data.resultVariable}
       />
     </ErrorBoundary>
   );

@@ -255,10 +255,7 @@ export namespace RecordingTestMetadataV3 {
       parentId: string | null;
 
       // This value comes from annotations and so is only available for Cypress tests (for now)
-      result: {
-        timeStampedPoint: TimeStampedPoint;
-        variable: string;
-      } | null;
+      resultVariable: string | null;
 
       // If an action is somewhere other than the main test body;
       // for example, before/after actions have different scopes
@@ -267,11 +264,21 @@ export namespace RecordingTestMetadataV3 {
       // Playwright only
       testSourceCallStack: UserActionEventStack | null;
 
-      // This value comes from annotations and so is only available for Cypress tests (for now)
-      viewSourceTimeStampedPoint: TimeStampedPoint | null;
+      // These values come from annotations and so is only available for Cypress tests (for now)
+      timeStampedPoints: {
+        // Determines the graphics we display in reaction to the before/after step buttons
+        afterStep: TimeStampedPoint | null;
+        beforeStep: TimeStampedPoint | null;
+
+        // Used when evaluating the result of an assertion
+        result: TimeStampedPoint | null;
+
+        // Jump to source for the step
+        viewSource: TimeStampedPoint | null;
+      };
     };
 
-    // Precisely defines the start/stop execution points (and times) for the action
+    // Precisely defines the boundary execution points (and times) for the action
     // This value comes from annotations and so is only available for Cypress tests (for now)
     timeStampedPointRange: TimeStampedPointRange | null;
 
@@ -355,8 +362,8 @@ export async function processCypressTestRecording(
       main: [],
     };
 
-    let beginPoint: TimeStampedPoint | null = null;
-    let endPoint: TimeStampedPoint | null = null;
+    let testBeginPoint: TimeStampedPoint | null = null;
+    let testEndPoint: TimeStampedPoint | null = null;
 
     const navigationEvents: RecordingTestMetadataV3.NavigationEvent[] = [];
 
@@ -378,17 +385,16 @@ export async function processCypressTestRecording(
           const annotation = annotations[index];
 
           // TODO [SCS-1177] test:start and test:end annotations are unreliable
-          // so we find start and end points based on the first and last events
-          // for a given test
-          if (!beginPoint || comparePoints(beginPoint.point, annotation.point) > 0) {
-            beginPoint = {
+          // so we find start and end points based on the first and last events for a given test
+          if (!testBeginPoint || comparePoints(testBeginPoint.point, annotation.point) > 0) {
+            testBeginPoint = {
               point: annotation.point,
               time: annotation.time,
             };
           }
 
-          if (!endPoint || comparePoints(endPoint.point, annotation.point) < 0) {
-            endPoint = {
+          if (!testEndPoint || comparePoints(testEndPoint.point, annotation.point) < 0) {
+            testEndPoint = {
               point: annotation.point,
               time: annotation.time,
             };
@@ -434,8 +440,8 @@ export async function processCypressTestRecording(
           }
         }
 
-        assert(beginPoint !== null, "Test must have a begin point");
-        assert(endPoint !== null, "Test must have a end point");
+        assert(testBeginPoint !== null, "Test must have a begin point");
+        assert(testEndPoint !== null, "Test must have a end point");
 
         for (let sectionName in partialEvents) {
           // TODO [SCS-1186] Ignore beforeAll/afterAll sections for now;
@@ -492,11 +498,12 @@ export async function processCypressTestRecording(
               id,
             });
 
-            let beginPoint: TimeStampedPoint | null = null;
-            let endPoint: TimeStampedPoint | null = null;
             let resultPoint: TimeStampedPoint | null = null;
             let resultVariable: string | null = null;
-            let viewSourceTimeStampedPoint: TimeStampedPoint | null = null;
+            let stepStartPoint: TimeStampedPoint | null = null;
+            let stepEnqueuePoint: TimeStampedPoint | null = null;
+            let stepEndPoint: TimeStampedPoint | null = null;
+            let viewSourcePoint: TimeStampedPoint | null = null;
 
             const isChaiAssertion = command.name === "assert";
             // TODO [FE-1419] name === "assert" && !annotations.enqueue;
@@ -504,7 +511,7 @@ export async function processCypressTestRecording(
             annotations.forEach(annotation => {
               switch (annotation.message.event) {
                 case "step:end": {
-                  endPoint = {
+                  stepEndPoint = {
                     point: annotation.point,
                     time: annotation.time,
                   };
@@ -513,12 +520,18 @@ export async function processCypressTestRecording(
                     point: annotation.point,
                     time: annotation.time,
                   };
+
                   resultVariable = annotation.message.logVariable ?? null;
                   break;
                 }
                 case "step:enqueue": {
+                  stepEnqueuePoint = {
+                    point: annotation.point,
+                    time: annotation.time,
+                  };
+
                   if (!isChaiAssertion) {
-                    viewSourceTimeStampedPoint = {
+                    viewSourcePoint = {
                       point: annotation.point,
                       time: annotation.time,
                     };
@@ -526,13 +539,13 @@ export async function processCypressTestRecording(
                   break;
                 }
                 case "step:start": {
-                  beginPoint = {
+                  stepStartPoint = {
                     point: annotation.point,
                     time: annotation.time,
                   };
 
                   if (isChaiAssertion) {
-                    viewSourceTimeStampedPoint = {
+                    viewSourcePoint = {
                       point: annotation.point,
                       time: annotation.time,
                     };
@@ -542,12 +555,13 @@ export async function processCypressTestRecording(
               }
             });
 
-            assert(beginPoint !== null, `Missing "step:start" annotation for test event`, {
+            assert(stepStartPoint !== null, `Missing "step:start" annotation for test event`, {
               id,
-              isChaiAssertion,
             });
-
-            assert(viewSourceTimeStampedPoint !== null, `Missing annotation for test event`, {
+            assert(stepEnqueuePoint !== null, `Missing "step:enqueue" annotation for test event`, {
+              id,
+            });
+            assert(viewSourcePoint !== null, `Missing annotation for test event`, {
               annotationType: isChaiAssertion ? "step:start" : "step:enqueue",
               id,
               isChaiAssertion,
@@ -560,20 +574,19 @@ export async function processCypressTestRecording(
                 error,
                 id,
                 parentId,
-                result:
-                  resultVariable && resultPoint
-                    ? {
-                        timeStampedPoint: resultPoint,
-                        variable: resultVariable,
-                      }
-                    : null,
+                resultVariable,
                 scope,
                 testSourceCallStack: null,
-                viewSourceTimeStampedPoint,
+                timeStampedPoints: {
+                  afterStep: stepEndPoint,
+                  beforeStep: stepStartPoint,
+                  result: resultPoint,
+                  viewSource: viewSourcePoint,
+                },
               },
               timeStampedPointRange: {
-                begin: beginPoint,
-                end: endPoint || beginPoint,
+                begin: stepEnqueuePoint,
+                end: stepEndPoint ?? stepStartPoint,
               },
               type: "user-action",
             });
@@ -594,7 +607,11 @@ export async function processCypressTestRecording(
           return events.main;
         };
 
-        const networkRequestEvents = await processNetworkData(replayClient, beginPoint, endPoint);
+        const networkRequestEvents = await processNetworkData(
+          replayClient,
+          testBeginPoint,
+          testEndPoint
+        );
         // Now that section boundaries have been defined by user-actions,
         // merge in navigation and network events.
         navigationEvents.forEach(navigationEvent => {
@@ -616,10 +633,10 @@ export async function processCypressTestRecording(
       result,
       source,
       timeStampedPointRange:
-        beginPoint && endPoint
+        testBeginPoint && testEndPoint
           ? {
-              begin: beginPoint,
-              end: endPoint,
+              begin: testBeginPoint,
+              end: testEndPoint,
             }
           : null,
     };
@@ -836,7 +853,7 @@ export async function processPlaywrightTestRecording(
             error,
             id,
             parentId,
-            result: null,
+            resultVariable: null,
             scope,
             testSourceCallStack: stack
               ? stack.map(frame => ({
@@ -846,7 +863,12 @@ export async function processPlaywrightTestRecording(
                   lineNumber: frame.line,
                 }))
               : null,
-            viewSourceTimeStampedPoint: null,
+            timeStampedPoints: {
+              afterStep: null,
+              beforeStep: null,
+              result: null,
+              viewSource: null,
+            },
           },
           timeStampedPointRange: null,
           type: "user-action",
@@ -994,7 +1016,7 @@ export function getTestEventTime(testEvent: RecordingTestMetadataV3.TestEvent): 
   if (isNavigationTestEvent(testEvent) || isNetworkRequestTestEvent(testEvent)) {
     return testEvent.timeStampedPoint.time;
   } else {
-    return testEvent.timeStampedPointRange ? testEvent.timeStampedPointRange.begin.time : null;
+    return testEvent.data.timeStampedPoints.beforeStep?.time ?? null;
   }
 }
 

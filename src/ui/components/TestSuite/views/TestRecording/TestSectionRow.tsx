@@ -133,7 +133,7 @@ export function TestSectionRow({
     let time: number | null = null;
 
     if (isUserActionTestEvent(testEvent)) {
-      const timeStampedPoint = testEvent.timeStampedPointRange?.begin ?? null;
+      const timeStampedPoint = testEvent.data.timeStampedPoints.beforeStep ?? null;
       if (timeStampedPoint) {
         executionPoint = timeStampedPoint.point;
         time = timeStampedPoint.time;

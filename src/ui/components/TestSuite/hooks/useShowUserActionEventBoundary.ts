@@ -12,20 +12,23 @@ export function useShowUserActionEventBoundary({
   boundary: "before" | "after";
   userActionEvent: UserActionEvent;
 }) {
-  const { timeStampedPointRange } = userActionEvent;
+  const {
+    data: {
+      timeStampedPoints: { afterStep, beforeStep },
+    },
+  } = userActionEvent;
   const { executionPoint: currentPoint } = useContext(TimelineContext);
 
   const dispatch = useAppDispatch();
 
-  if (timeStampedPointRange === null) {
+  if (afterStep == null || beforeStep == null) {
     return {
       disabled: true,
       onClick: () => {},
     };
   }
 
-  const timeStampedPoint =
-    boundary === "before" ? timeStampedPointRange.begin : timeStampedPointRange.end;
+  const timeStampedPoint = boundary === "before" ? beforeStep : afterStep;
 
   const disabled = timeStampedPoint.point === currentPoint;
 
