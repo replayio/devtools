@@ -1,4 +1,3 @@
-import { MockedProvider } from "@apollo/client/testing";
 import type { RenderOptions } from "@testing-library/react";
 import * as rtl from "@testing-library/react";
 import React, { PropsWithChildren } from "react";
@@ -76,7 +75,6 @@ export const filterCommonTestWarnings = () => {
 // future dependencies, such as wanting to test with react-router, you can extend
 // this interface to accept a path and route and use those in a <MemoryRouter />
 interface ExtendedRenderOptions extends Omit<RenderOptions, "queries"> {
-  graphqlMocks?: any[];
   preloadedState?: Partial<UIState>;
   store?: UIStore;
 }
@@ -90,28 +88,15 @@ export async function createTestStore(preloadedState: Partial<UIState> = {}) {
 
 async function render(
   ui: React.ReactElement,
-  {
-    graphqlMocks: graphqlMockOverrides,
-    preloadedState = {},
-    store,
-    ...renderOptions
-  }: ExtendedRenderOptions = {}
+  { preloadedState = {}, store, ...renderOptions }: ExtendedRenderOptions = {}
 ) {
   if (!store) {
     // Can't await as a param initializer
     store = await createTestStore(preloadedState);
   }
 
-  const mocks = graphqlMockOverrides;
-
   function Wrapper({ children }: PropsWithChildren<{}>): JSX.Element {
-    return (
-      <Provider store={store!}>
-        <MockedProvider mocks={mocks} addTypename={false}>
-          {children}
-        </MockedProvider>
-      </Provider>
-    );
+    return <Provider store={store!}>{children}</Provider>;
   }
 
   const rtlData = rtl.render(ui, { wrapper: Wrapper, ...renderOptions });

@@ -25,28 +25,8 @@ export interface Request<T extends CommandMethods> {
 
 export type CommandRequest = Request<CommandMethods>;
 
-type SendMessageMethod = (message: string) => void;
-
-let customSocketSendMessageForTesting: SendMessageMethod | null = null;
 let socket: WebSocket;
 let gSocketOpen = false;
-
-type customSocketSendMessageForTestingResponse = {
-  flushQueuedMessages: () => void;
-  responseDataHandler: (data: string) => void;
-};
-
-// Enables test code to mock out the WebSocket used to send protocol messages.
-export function injectCustomSocketSendMessageForTesting(
-  sendMessage: SendMessageMethod
-): customSocketSendMessageForTestingResponse {
-  customSocketSendMessageForTesting = sendMessage;
-
-  return {
-    flushQueuedMessages,
-    responseDataHandler: socketDataHandler,
-  };
-}
 
 let gPendingMessages: Request<CommandMethods>[] = [];
 let gNextMessageId = 1;
@@ -175,11 +155,6 @@ export async function createSession(
 }
 
 export function initSocket(address: string): WebSocket | null {
-  if (customSocketSendMessageForTesting !== null) {
-    // Test environment; a custom WebSocket is being used.
-    return null;
-  }
-
   const onopen = makeInfallible(flushQueuedMessages);
 
   const onclose = makeInfallible(() => {
@@ -278,11 +253,7 @@ const doSend = makeInfallible(message => {
 
   gSessionCallbacks?.onRequest(message);
 
-  if (customSocketSendMessageForTesting !== null) {
-    customSocketSendMessageForTesting(stringified);
-  } else {
-    socket.send(stringified);
-  }
+  socket.send(stringified);
 });
 
 function flushQueuedMessages() {

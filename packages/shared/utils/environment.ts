@@ -1,20 +1,7 @@
-import { MockedResponse } from "@apollo/client/testing";
 import { ExecutionPoint, TimeStampedPointRange } from "@replayio/protocol";
-
-import { injectCustomSocketSendMessageForTesting } from "protocol/socket";
-
-export interface MockEnvironment {
-  graphqlMocks?: MockedResponse[];
-  setSocketDataHandler(callback: (data: string) => unknown): void;
-  sendSocketMessage(str: string): void;
-}
 
 declare global {
   var __IS_RECORD_REPLAY_RUNTIME__: boolean;
-  interface Window {
-    // Injected by test runner during e2e tests.
-    __mockEnvironmentForTesting?: MockEnvironment;
-  }
 }
 
 function getURL(): URL {
@@ -57,35 +44,7 @@ export function isE2ETest() {
 }
 
 export function isTest() {
-  return isMock() || isE2ETest();
-}
-
-// Return whether we are running a mock test.
-// The backend servers which we connect to will be mocked,
-// and we can test behaviors we can't easily replicate when connected to a live backend.
-export function isMock() {
-  return !!getURL().searchParams.get("mock");
-}
-
-// Helper method to retrieve the mock environment that was injected by a test runner.
-export async function getMockEnvironmentForTesting(): Promise<MockEnvironment> {
-  if (!isTest()) {
-    throw Error("Not a mock/test environment");
-  }
-
-  // The mock test runner will install a "mockEnvironment" on the window.
-  while (!window.__mockEnvironmentForTesting) {
-    await new Promise(resolve => setTimeout(resolve, 50));
-  }
-
-  return window.__mockEnvironmentForTesting!;
-}
-
-// Helper method to retrieve GraphQL mock data that was injected by a test runner.
-export async function getGraphqlMocksForTesting(): Promise<MockedResponse[]> {
-  const mockEnvironment = await getMockEnvironmentForTesting();
-
-  return mockEnvironment.graphqlMocks!;
+  return isE2ETest();
 }
 
 export function skipTelemetry() {
@@ -209,19 +168,4 @@ export function getDisplayedUrl(url: string | undefined) {
   } catch (e) {
     return "";
   }
-}
-
-export async function configureMockEnvironmentForTesting() {
-  const mockEnvironment = await getMockEnvironmentForTesting();
-
-  // Configure the protocol to use our mock WebSocket message method.
-  const { flushQueuedMessages, responseDataHandler } = injectCustomSocketSendMessageForTesting(
-    mockEnvironment.sendSocketMessage
-  );
-
-  // Configure the protocol's default socket message handler to receive messages from the mocked WebSocket.
-  mockEnvironment.setSocketDataHandler(responseDataHandler);
-
-  // Now that the mock environment has been configured, flush any pending messages.
-  flushQueuedMessages();
 }

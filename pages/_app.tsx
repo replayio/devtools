@@ -9,9 +9,9 @@ import { Provider } from "react-redux";
 import "../src/global-css";
 import "../src/test-prep";
 
-import DecoratedErrorBoundary from "replay-next/components/ErrorBoundary";
 import { SystemProvider } from "design";
 import { setFeatures } from "protocol/thread/thread";
+import DecoratedErrorBoundary from "replay-next/components/ErrorBoundary";
 import { recordData as recordTelemetryData } from "replay-next/src/utils/telemetry";
 import { setUnexpectedError } from "ui/actions/errors";
 import { ApolloWrapper } from "ui/components/ApolloWrapper";
@@ -24,18 +24,12 @@ import useAuthTelemetry from "ui/hooks/useAuthTelemetry";
 import { getUnexpectedError } from "ui/reducers/app";
 import { bootstrapApp } from "ui/setup";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { configureMockEnvironmentForTesting, isMock } from "shared/utils/environment";
 import { useLaunchDarkly } from "ui/utils/launchdarkly";
 import { InstallRouteListener } from "ui/utils/routeListener";
 import tokenManager from "ui/utils/tokenManager";
 
 import { userData } from "shared/user-data/GraphQL/UserData";
 import "../src/base.css";
-
-if (isMock()) {
-  // If this is an end to end test, bootstrap the mock environment.
-  configureMockEnvironmentForTesting();
-}
 
 // Expose app feature flags to the protocol through an app-agnostic API.
 setFeatures({
