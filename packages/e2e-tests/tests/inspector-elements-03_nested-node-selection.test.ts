@@ -1,29 +1,22 @@
-import { Locator, Page, expect } from "@playwright/test";
+import { expect } from "@playwright/test";
 
 import { openDevToolsTab, startTest } from "../helpers";
-import { openConsolePanel, warpToMessage } from "../helpers/console-panel";
+import { warpToMessage } from "../helpers/console-panel";
 import {
   getElementsPanelSelection,
-  getElementsRowWithText,
   getElementsTree,
-  openAppliedRulesTab,
   openElementsPanel,
   searchElementsPanel,
-  selectElementsRowWithText,
   typeKeyAndVerifySelectedElement,
   waitForElementsToLoad,
   waitForSelectedElementsRow,
 } from "../helpers/elements-panel";
+import { ensureSidePanelClosed } from "../helpers/pause-information-panel";
 import {
   stackingTestCases,
   verifyStackingTestCaseSelectedElementUnderCursor,
-} from "../helpers/elements-panel";
-import { toggleToolboxLayout } from "../helpers/layout";
-import {
-  ensureSidePanelClosed,
-  getBreakpointsAccordionPane,
-} from "../helpers/pause-information-panel";
-import { debugPrint, delay, mapLocators, waitFor } from "../helpers/utils";
+} from "../helpers/stacking-test-cases";
+import { debugPrint, waitFor } from "../helpers/utils";
 import test from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "doc_stacking.html" });
@@ -50,8 +43,6 @@ const bodyChildDomNodes = [
   `<div style="left: 200px; top: 300px;"`,
   `<div style="left: 300px; top: 300px;"`,
 ];
-
-const div0ChildDomNodes = [`<div class="box1"`, `<div class="box2"`];
 
 test("inspector-elements-03: Nested node picker and selection behavior", async ({
   pageWithMeta: { page, recordingId },

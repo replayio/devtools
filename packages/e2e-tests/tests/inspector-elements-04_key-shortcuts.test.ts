@@ -1,24 +1,18 @@
-import { Locator, Page, expect } from "@playwright/test";
+import { expect } from "@playwright/test";
 
 import { openDevToolsTab, startTest } from "../helpers";
-import { openConsolePanel, warpToMessage } from "../helpers/console-panel";
+import { warpToMessage } from "../helpers/console-panel";
 import {
   getElementsPanelSelection,
   getElementsRowWithText,
   getElementsTree,
-  openAppliedRulesTab,
   openElementsPanel,
-  selectElementsRowWithText,
   typeKeyAndVerifySelectedElement,
   waitForElementsToLoad,
   waitForSelectedElementsRow,
 } from "../helpers/elements-panel";
-import { toggleToolboxLayout } from "../helpers/layout";
-import {
-  ensureSidePanelClosed,
-  getBreakpointsAccordionPane,
-} from "../helpers/pause-information-panel";
-import { debugPrint, delay, mapLocators, waitFor } from "../helpers/utils";
+import { ensureSidePanelClosed } from "../helpers/pause-information-panel";
+import { debugPrint, waitFor } from "../helpers/utils";
 import test from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "doc_stacking.html" });

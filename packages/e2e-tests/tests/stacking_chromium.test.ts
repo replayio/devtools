@@ -1,11 +1,11 @@
 import { openDevToolsTab, startTest } from "../helpers";
 import { openConsolePanel, warpToMessage } from "../helpers/console-panel";
+import { toggleToolboxLayout } from "../helpers/layout";
+import { ensureSidePanelClosed } from "../helpers/pause-information-panel";
 import {
   stackingTestCases,
   verifyStackingTestCaseSelectedElementUnderCursor,
-} from "../helpers/elements-panel";
-import { toggleToolboxLayout } from "../helpers/layout";
-import { ensureSidePanelClosed } from "../helpers/pause-information-panel";
+} from "../helpers/stacking-test-cases";
 import test from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "doc_stacking_chromium.html" });

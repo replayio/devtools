@@ -1,11 +1,12 @@
 import { openDevToolsTab, startTest } from "../helpers";
 import { openConsolePanel, warpToMessage } from "../helpers/console-panel";
+import { toggleToolboxLayout } from "../helpers/layout";
+import { ensureSidePanelClosed } from "../helpers/pause-information-panel";
 import {
   stackingTestCases,
   verifyStackingTestCaseSelectedElementUnderCursor,
-} from "../helpers/elements-panel";
-import { toggleToolboxLayout } from "../helpers/layout";
-import { ensureSidePanelClosed } from "../helpers/pause-information-panel";
+} from "../helpers/stacking-test-cases";
+import { debugPrint } from "../helpers/utils";
 import test from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "doc_stacking.html" });
@@ -32,7 +33,8 @@ test("stacking: Element highlighter selects the correct element when they overla
 
   for (let testCase of stackingTestCases) {
     // Really make sure the panel is closed
-    ensureSidePanelClosed(page);
+    // ensureSidePanelClosed(page);
+    debugPrint(page, `Stacking test case: ${testCase.id}`);
     await verifyStackingTestCaseSelectedElementUnderCursor(page, canvas, rulesContainer, testCase);
   }
 });
