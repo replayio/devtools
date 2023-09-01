@@ -308,7 +308,7 @@ export async function typeKeyAndVerifySelectedElement(
   key: string,
   expectedElement: string
 ) {
-  debugPrint(page, `Typing ${key}...`);
+  debugPrint(page, `Typing ${key}...`, "typeKeyAndVerifySelectedElement");
   await page.keyboard.press(key);
   await waitForSelectedElementsRow(page, expectedElement);
 }
