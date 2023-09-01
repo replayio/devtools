@@ -12,6 +12,7 @@
   "ignorePatterns": [
     "!.storybook",
     "packages/replay-next/playwright/protocol-fixtures/",
+    "test/jest/setupEnv.js",
     "**/*.config.js",
     "**/*.json"
   ],
