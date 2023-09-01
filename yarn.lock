@@ -7350,7 +7350,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"core-js@npm:^3.0.1, core-js@npm:^3.4":
+"core-js@npm:^3.0.1":
   version: 3.23.1
   resolution: "core-js@npm:3.23.1"
   checksum: 460328e0b743900d48fc744aab475f6dabdae498cc73f6d038321b0ae1488cb5e73d1670b5914abfe7dd84d0843a828b5d4dd3eba0a5b6a4450f0d7094cda2a5
@@ -9038,12 +9038,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fake-indexeddb@npm:^3.1.7":
-  version: 3.1.8
-  resolution: "fake-indexeddb@npm:3.1.8"
+"fake-indexeddb@npm:^4.0.2":
+  version: 4.0.2
+  resolution: "fake-indexeddb@npm:4.0.2"
   dependencies:
-    realistic-structured-clone: ^2.0.1
-  checksum: cea9905f5e134952a6471e73c3a69dc79935dc221741a518df7010114a482c900b872c855215e1163e063ce9aab3e8f01a660684cd5c0e8ff11e30bf47892de9
+    realistic-structured-clone: ^3.0.0
+  checksum: ad257e5cc6273d9ea667b4129d8b0798830d56a68c7c77ddba752b3fd0088cb33e34b9569b218d16dfc8a78733d360d325f89c2ce352b70a0587c1f46f6f881d
   languageName: node
   linkType: hard
 
@@ -15087,15 +15087,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"realistic-structured-clone@npm:^2.0.1":
-  version: 2.0.4
-  resolution: "realistic-structured-clone@npm:2.0.4"
+"realistic-structured-clone@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "realistic-structured-clone@npm:3.0.0"
   dependencies:
-    core-js: ^3.4
     domexception: ^1.0.1
     typeson: ^6.1.0
     typeson-registry: ^1.0.0-alpha.20
-  checksum: 0174efd3a3046bd084b8f459b2ce718750a1d90099a9e502fd6ec88483d92b4e784143cdbb7e7d1b7daef2d2d2ced6eaebf0f54f0f4a143eef9b03e1c4f13982
+  checksum: b4521b299c8dc320a5e3ef44678f80a92b0f1837901a5fbd1c7be06808110fb0b591b417114306ec55b44ef47fd17968aacca079afc9665afbe1c528026295ec
   languageName: node
   linkType: hard
 
@@ -15227,7 +15226,7 @@ __metadata:
     eslint-plugin-react: ^7.29.2
     eslint-plugin-react-hooks: ^4.4.0
     eslint-plugin-sort-keys-fix: ^1.1.2
-    fake-indexeddb: ^3.1.7
+    fake-indexeddb: ^4.0.2
     file-loader: ^6.2.0
     fluent-ffmpeg: ^2.1.2
     framer-motion: ^6.3.6
