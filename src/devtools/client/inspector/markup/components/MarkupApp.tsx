@@ -1,5 +1,5 @@
 import React, { Suspense, useContext, useEffect, useRef } from "react";
-import { ConnectedProps, connect } from "react-redux";
+import { ConnectedProps, connect, shallowEqual } from "react-redux";
 import { useImperativeCacheValue } from "suspense";
 
 import { getPauseId } from "devtools/client/debugger/src/selectors";
@@ -12,15 +12,22 @@ import { processedNodeDataCache } from "ui/suspense/nodeCaches";
 
 import { HTMLBreadcrumbs } from "./HTMLBreadcrumbs";
 import { InspectorSearch } from "./InspectorSearch";
+import { MarkupContext, MarkupContextValue } from "./MarkupContext";
 import Nodes from "./Nodes";
 
-export interface MarkupProps {}
-
-type PropsFromParent = {};
-
-function MarkupApp({ loadingFailed, rootNodeId }: PropsFromRedux & PropsFromParent) {
+function MarkupApp() {
   const replayClient = useContext(ReplayClientContext);
-  const pauseId = useAppSelector(getPauseId);
+  const markupContextValue: MarkupContextValue = useAppSelector(
+    state => ({
+      loadingFailed: state.markup.loadingFailed,
+      rootNodeId: state.markup.rootNode,
+      pauseId: getPauseId(state),
+      collapseAttributes: state.markup.collapseAttributes,
+      collapseAttributeLength: state.markup.collapseAttributeLength,
+    }),
+    shallowEqual
+  );
+  const { rootNodeId, pauseId, loadingFailed } = markupContextValue;
   const { value: markupRootNode, status } = useImperativeCacheValue(
     processedNodeDataCache,
     replayClient,
@@ -78,7 +85,9 @@ function MarkupApp({ loadingFailed, rootNodeId }: PropsFromRedux & PropsFromPare
         <div id="markup-box" className="devtools-monospace bg-bodyBgcolor">
           <div id="markup-root-wrapper" role="presentation">
             <div id="markup-root" role="presentation">
-              {<Nodes key={pauseId} pauseId={pauseId} />}
+              <MarkupContext.Provider value={markupContextValue}>
+                {<Nodes key={pauseId} />}
+              </MarkupContext.Provider>
             </div>
           </div>
           {showLoadingProgressBar && <LoadingProgressBar />}
@@ -92,10 +101,4 @@ function MarkupApp({ loadingFailed, rootNodeId }: PropsFromRedux & PropsFromPare
   );
 }
 
-const connector = connect((state: UIState) => ({
-  loadingFailed: state.markup.loadingFailed,
-  rootNodeId: state.markup.rootNode,
-}));
-type PropsFromRedux = ConnectedProps<typeof connector>;
-
-export default connector(MarkupApp);
+export default React.memo(MarkupApp);

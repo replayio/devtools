@@ -17,12 +17,14 @@ import {
   onUpKey,
 } from "../actions/markup";
 import { getRootNodeId } from "../selectors/markup";
+import { MarkupContext } from "./MarkupContext";
 import Node from "./Node";
 
-function Nodes({ pauseId }: { pauseId: string | undefined }) {
+function Nodes() {
   const dispatch = useAppDispatch();
   const rootNodeId = useAppSelector(getRootNodeId);
   const replayClient = useContext(ReplayClientContext);
+  const { pauseId } = useContext(MarkupContext);
 
   const boundKeyHandlers = useMemo(() => {
     const initialKeyHandlers = {

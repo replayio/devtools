@@ -19,6 +19,7 @@ import {
   getSelectedNodeId,
 } from "../selectors/markup";
 import ElementNode from "./ElementNode";
+import { MarkupContext } from "./MarkupContext";
 import ReadOnlyNode from "./ReadOnlyNode";
 import TextNode from "./TextNode";
 
@@ -31,16 +32,15 @@ const reIsEmptyValue = /[^\s]/;
 function Node({ nodeId }: NodeProps) {
   const dispatch = useAppDispatch();
   const replayClient = useContext(ReplayClientContext);
+  const { rootNodeId, pauseId } = useContext(MarkupContext);
 
   // Do these as one big object, with a shallow comparison,
   // to minimize the number of Redux subscriptions
-  const { rootNodeId, isSelectedNode, isScrollIntoViewNode, isExpanded, pauseId } = useAppSelector(
+  const { isSelectedNode, isScrollIntoViewNode, isExpanded } = useAppSelector(
     state => ({
-      rootNodeId: getRootNodeId(state),
       isSelectedNode: nodeId === getSelectedNodeId(state),
       isScrollIntoViewNode: nodeId === getScrollIntoViewNodeId(state),
       isExpanded: getIsNodeExpanded(state, nodeId),
-      pauseId: getPauseId(state),
     }),
     shallowEqual
   );
