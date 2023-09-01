@@ -43,13 +43,31 @@ export async function addBreakpoint(
   await waitForSourceLineHitCounts(page, lineNumber);
 
   const lineLocator = await getSourceLine(page, lineNumber);
-  await lineLocator.locator('[data-test-name="SourceLine-LineNumber"]').hover({ force: true });
-  const state = await lineLocator
-    .locator('[data-test-name="BreakpointToggle"]')
-    .getAttribute("data-test-state");
-  if (state === "off") {
-    await lineLocator.locator('[data-test-name="SourceLine-LineNumber"]').click({ force: true });
-  }
+
+  // Account for the fact that SourceListRow doesn't render SourceListRowMouseEvents while scrolling
+  await waitFor(async () => {
+    const isScrolling = await lineLocator.getAttribute("data-test-is-scrolling");
+    expect(isScrolling).toBe(null);
+  });
+
+  const lineNumberLocator = lineLocator.locator('[data-test-name="SourceLine-LineNumber"]');
+  await lineNumberLocator.waitFor();
+
+  const breakpointToggleLocator = lineLocator.locator('[data-test-name="BreakpointToggle"]');
+
+  await waitFor(async () => {
+    // Mouse out then back over
+    await page.mouse.move(0, 0);
+    await lineNumberLocator.hover({ force: true });
+
+    // Wait for breakpoint toggle from mouse over
+    await breakpointToggleLocator.waitFor();
+
+    const state = await breakpointToggleLocator.getAttribute("data-test-state");
+    if (state === "off") {
+      await lineLocator.locator('[data-test-name="SourceLine-LineNumber"]').click({ force: true });
+    }
+  });
 
   await waitForBreakpoint(page, options);
 }

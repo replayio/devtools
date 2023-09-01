@@ -131,6 +131,7 @@ export default function SourceListRow({
       data-test-line-has-hits={lineHitCounts != null ? hitCount > 0 : undefined}
       data-test-line-number={lineNumber}
       data-test-id={`SourceLine-${lineNumber}`}
+      data-test-is-scrolling={isScrolling || undefined}
       data-test-name="SourceLine"
       style={style}
     >
