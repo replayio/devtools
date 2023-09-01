@@ -27,8 +27,12 @@ const config: PlaywrightTestConfig = {
     actionTimeout: 15_000,
   },
 
+  expect: {
+    timeout: 10_000,
+  },
+
   // Retry failed tests on CI to account for some basic flakiness.
-  retries: CI ? 5 : 0,
+  retries: CI ? 3 : 0,
 
   // Give individual tests a while to complete instead of default 30s
   timeout: 120_000,
