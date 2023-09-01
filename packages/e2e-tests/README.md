@@ -33,14 +33,14 @@ yarn test
 # Run a subset of tests by matching filenames
 yarn test some_test_name
 
+# Record tests with Replay.io
+yarn test:replay
+
 # Run tests with a visible browser
 yarn test:debug
-```
 
-And to record replays of the tests.
-
-```bash
-yarn test:replay-chromium
+# Run tests in UI mode
+yarn test:ui
 ```
 
 ### Concepts
