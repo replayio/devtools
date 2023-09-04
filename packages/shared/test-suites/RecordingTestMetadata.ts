@@ -9,7 +9,7 @@ import { satisfies } from "compare-versions";
 import { comparePoints } from "protocol/execution-point-utils";
 import { networkRequestsCache } from "replay-next/src/suspense/NetworkRequestsCache";
 import { findSliceIndices, insert } from "replay-next/src/utils/array";
-import { assertWithTelemetry } from "replay-next/src/utils/telemetry";
+import { assertWithTelemetry, recordData } from "replay-next/src/utils/telemetry";
 import { ReplayClientInterface } from "shared/client/types";
 import { Annotation, PlaywrightTestSources } from "shared/graphql/types";
 import { AnnotationsCache } from "ui/components/TestSuite/suspense/AnnotationsCache";
@@ -661,6 +661,7 @@ export async function processGroupedTestCases(
         const annotations = await AnnotationsCache.readAsync(replayClient);
 
         if (detectMissingCypressPlugin(annotations, partialTestRecordings)) {
+          recordData("process-test-metadata", { message: "missing-cypress-plugin" });
           const testRecordings: RecordingTestMetadataV3.TestRecording[] = [];
           for (let index = 0; index < partialTestRecordings.length; index++) {
             const legacyTest = partialTestRecordings[index];
