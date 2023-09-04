@@ -149,7 +149,7 @@ const Passport = (props: PropsFromRedux) => {
       label: "Jump to network request",
       completed: !showJumpToNetworkRequest,
       videoUrl: "https://vercel.replay.io/passport/jump_to_network_request.gif",
-      imageBaseName: "jump_to_event",
+      imageBaseName: "jump_to_network_request",
       docsLink:
         "https://www.notion.so/replayio/Jump-to-network-request-8fc5dadc78274ca68a91714226ca165d?pvs=4",
       blurb: "In the network pane, you can jump to some requests.",
