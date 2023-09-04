@@ -21,6 +21,7 @@ import {
   shouldShowInspectReactComponent,
   shouldShowJumpToCode,
   shouldShowJumpToEvent,
+  shouldShowJumpToNetworkRequest,
   shouldShowSearchSourceText,
   shouldShowShareNag,
   shouldShowUseFocusMode,
@@ -50,6 +51,7 @@ const Passport = (props: PropsFromRedux) => {
   const showInspectReactComponent = shouldShowInspectReactComponent(nags);
   const showJumpToCode = shouldShowJumpToCode(nags);
   const showJumpToEvent = shouldShowJumpToEvent(nags);
+  const showJumpToNetworkRequest = shouldShowJumpToNetworkRequest(nags);
   const showSearchSourceText = shouldShowSearchSourceText(nags);
   const showShareNag = shouldShowShareNag(nags);
   const showUseFocusMode = shouldShowUseFocusMode(nags);
@@ -142,6 +144,15 @@ const Passport = (props: PropsFromRedux) => {
       imageBaseName: "jump_to_event",
       docsLink: "https://replayio.notion.site/Jump-to-event-199d592b0ff1458bac0f27a7c2a9f78d?pvs=4",
       blurb: "Click the info icon on the left nav to see all events in your replay.",
+    },
+    {
+      label: "Jump to network request",
+      completed: !showJumpToNetworkRequest,
+      videoUrl: "https://vercel.replay.io/passport/jump_to_network_request.gif",
+      imageBaseName: "jump_to_event",
+      docsLink:
+        "https://www.notion.so/replayio/Jump-to-network-request-8fc5dadc78274ca68a91714226ca165d?pvs=4",
+      blurb: "In the network pane, you can jump to some requests.",
     },
   ];
 

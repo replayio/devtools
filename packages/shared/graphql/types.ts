@@ -23,6 +23,7 @@ export enum Nag {
   INSPECT_NETWORK_REQUEST = "inspect_network_request",
   JUMP_TO_CODE = "jump_to_code",
   JUMP_TO_EVENT = "jump_to_event",
+  JUMP_TO_NETWORK_REQUEST = "jump_to_network_request",
   LAUNCH_COMMAND_PALETTE = "launch_command_palette",
   QUICK_OPEN_FILE = "quick_open_file",
   RECORD_REPLAY = "record_replay",
