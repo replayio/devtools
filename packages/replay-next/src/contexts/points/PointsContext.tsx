@@ -125,20 +125,24 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
     Map<PointKey, Pick<Point, "condition" | "content">>
   >(new Map());
 
-  // Merge saved points with local edits;
-  // Local edits should take precedence so they're reflected in the Source viewer.
-  const pointForDefaultPriority = useMemo<Point[]>(
+  // TRICKY
+  // Don't merge pending condition or content edits with the saved points until/unless they're explicitly saved,
+  // else we'll run too many analysis (e.g. conditions would run a new analysis on every keystroke).
+  // The log point panel uses the Lexical CodeEditor plug-in, which manages its own "pending" state, so we don't need to worry about it.
+  // However the context menu to add/remove condition presents an interesting edge case;
+  // for that reason, we us a local, in-memory only attribute (showPendingCondition) to control the panel's behavior.
+  const pointsForDefaultPriority = useMemo<Point[]>(
     () =>
       savedPoints.map(point => {
         const partialPoint = pendingPointText.get(point.key);
-        if (partialPoint) {
+        if (partialPoint?.condition !== undefined) {
           return {
             ...point,
-            ...partialPoint,
+            showPendingCondition: partialPoint.condition != null,
           };
-        } else {
-          return point;
         }
+
+        return point;
       }),
     [pendingPointText, savedPoints]
   );
@@ -243,7 +247,7 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
       pointBehaviorsForSuspense: deferredPointBehaviors,
       pointBehaviorsForDefaultPriority: localPointBehaviors,
       pointsForSuspense: deferredPoints,
-      pointsForDefaultPriority: pointForDefaultPriority,
+      pointsForDefaultPriority,
       pointsTransitionPending,
       savePendingPointText,
     }),
@@ -257,7 +261,7 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
       editPointBadge,
       editPointBehavior,
       localPointBehaviors,
-      pointForDefaultPriority,
+      pointsForDefaultPriority,
       pointsTransitionPending,
       savePendingPointText,
     ]

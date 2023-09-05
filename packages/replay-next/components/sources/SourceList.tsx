@@ -192,7 +192,13 @@ export default function SourceList({
         pointBehavior?.shouldLog ??
         (point.content ? POINT_BEHAVIOR_ENABLED : POINT_BEHAVIOR_DISABLED);
       if (shouldLog !== POINT_BEHAVIOR_DISABLED) {
-        if (point.condition !== null) {
+        // TRICKY
+        // Refer to comments for "showPendingCondition" in the Point type definition
+        if (
+          point.showPendingCondition !== undefined
+            ? point.showPendingCondition
+            : point.condition !== null
+        ) {
           return lineHeight + pointPanelWithConditionalHeight;
         } else {
           return lineHeight + pointPanelHeight;

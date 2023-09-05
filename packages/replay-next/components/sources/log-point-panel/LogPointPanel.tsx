@@ -139,7 +139,7 @@ function PointPanelWithHitPoints({
 
   // Most of this component should use default priority Point values.
   // Only parts that may suspend should use lower priority values.
-  const { condition, content, key, location, user } = pointForDefaultPriority;
+  const { condition, content, key, location, showPendingCondition, user } = pointForDefaultPriority;
 
   const editable = user?.id === currentUserInfo?.id;
 
@@ -188,7 +188,10 @@ function PointPanelWithHitPoints({
   const pointBehavior = pointBehaviors[key];
   const shouldLog = pointBehavior?.shouldLog === POINT_BEHAVIOR_ENABLED;
 
-  const hasCondition = condition !== null;
+  // TRICKY
+  // Refer to comments for "showPendingCondition" in the Point type definition
+  const hasCondition =
+    showPendingCondition !== undefined ? showPendingCondition : condition !== null;
 
   const toggleCondition = () => {
     if (!editable) {
@@ -197,6 +200,8 @@ function PointPanelWithHitPoints({
 
     if (hasCondition) {
       editPendingPointText(key, { condition: null });
+
+      // TODO [FE-1886] Also save the point; otherwise this change won't be applied on reload
     } else {
       if (!isEditing) {
         startEditing("condition");

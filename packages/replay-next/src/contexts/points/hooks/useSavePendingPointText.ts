@@ -1,6 +1,5 @@
 import { Dispatch, SetStateAction, useCallback } from "react";
 
-import { pointEquals } from "protocol/execution-point-utils";
 import { SetLocalPointBehaviors } from "replay-next/src/contexts/points/hooks/useLocalPointBehaviors";
 import { POINT_BEHAVIOR_ENABLED, Point, PointKey } from "shared/client/types";
 
@@ -26,23 +25,26 @@ export default function useSavePendingPointText({
       const pendingPoint = pendingPointText.get(key);
       if (pendingPoint) {
         saveLocalAndRemotePoints(key, pendingPoint);
-      }
 
-      setPendingPointText(prev => {
-        const cloned = new Map(prev.entries());
-        cloned.delete(key);
-        return cloned;
-      });
+        // Clear pending edits from the Map once they've been saved
+        setPendingPointText(prev => {
+          const cloned = new Map(prev.entries());
+          cloned.delete(key);
+          return cloned;
+        });
+      }
 
       setPointBehaviors(prev => {
         const pointBehavior = prev[key];
-        return {
-          ...prev,
-          [key]: {
-            ...pointBehavior,
-            shouldLog: POINT_BEHAVIOR_ENABLED,
-          },
-        };
+        return prev[key].shouldLog === POINT_BEHAVIOR_ENABLED
+          ? prev
+          : {
+              ...prev,
+              [key]: {
+                ...pointBehavior,
+                shouldLog: POINT_BEHAVIOR_ENABLED,
+              },
+            };
       });
     },
     [committedValuesRef, saveLocalAndRemotePoints, setPendingPointText, setPointBehaviors]
