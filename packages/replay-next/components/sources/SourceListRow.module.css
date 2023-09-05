@@ -67,6 +67,9 @@
   border-left-color: var(--color-hit-counts-bar-3);
 }
 
-.LineHitCountPending {
-  opacity: 0.75;
+.LineHitCountPendingMarker {
+  width: 0.75rem;
+  height: 0.75rem;
+  line-height: 0.75rem;
+  color: var(--color-dimmer);
 }

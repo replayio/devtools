@@ -1,6 +1,8 @@
 import { SameLineSourceLocations } from "@replayio/protocol";
 import { CSSProperties, useContext, useMemo } from "react";
+import { STATUS_PENDING, Status } from "suspense";
 
+import Icon from "replay-next/components/Icon";
 import {
   ExecutionPointLineHighlight,
   LineHighlight,
@@ -30,6 +32,7 @@ export type ItemData = {
   breakablePositionsByLine: Map<number, SameLineSourceLocations>;
   executionPointLineHighlight: ExecutionPointLineHighlight | null;
   hitCounts: Array<[lineNumber: number, lineHitCounts: LineHitCounts]> | null;
+  hitCountsStatus: Status;
   lineHeight: number;
   maxHitCount: number | undefined;
   minHitCount: number | undefined;
@@ -58,6 +61,7 @@ export default function SourceListRow({
     breakablePositionsByLine,
     executionPointLineHighlight,
     hitCounts,
+    hitCountsStatus,
     maxHitCount,
     minHitCount,
     parsedTokens,
@@ -164,7 +168,13 @@ export default function SourceListRow({
         {lineNumber}
       </div>
       <div className={hitCountClassName} data-test-name="SourceLine-HitCount">
-        {hitCount > 0 ? formatHitCount(hitCount) : ""}
+        {hitCountsStatus === STATUS_PENDING ? (
+          <div className={styles.LineHitCountPendingMarker}>•••</div>
+        ) : hitCount > 0 ? (
+          formatHitCount(hitCount)
+        ) : (
+          ""
+        )}
       </div>
       {visibleSearchResults.map(searchResult => (
         <SearchResultHighlight
