@@ -1,6 +1,5 @@
 import { Dispatch, SetStateAction, useCallback } from "react";
 
-import { pointEquals } from "protocol/execution-point-utils";
 import { SetLocalPointBehaviors } from "replay-next/src/contexts/points/hooks/useLocalPointBehaviors";
 import { POINT_BEHAVIOR_ENABLED, Point, PointKey } from "shared/client/types";
 

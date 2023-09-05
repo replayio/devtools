@@ -125,24 +125,6 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
     Map<PointKey, Pick<Point, "condition" | "content">>
   >(new Map());
 
-  // Merge saved points with local edits;
-  // Local edits should take precedence so they're reflected in the Source viewer.
-  const pointForDefaultPriority = useMemo<Point[]>(
-    () =>
-      savedPoints.map(point => {
-        const partialPoint = pendingPointText.get(point.key);
-        if (partialPoint) {
-          return {
-            ...point,
-            ...partialPoint,
-          };
-        } else {
-          return point;
-        }
-      }),
-    [pendingPointText, savedPoints]
-  );
-
   // Track the latest committed values for e.g. the editPointBadge function.
   const committedValuesRef = useRef<CommittedValuesRef["current"]>({
     pendingPointText: new Map(),
@@ -243,7 +225,7 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
       pointBehaviorsForSuspense: deferredPointBehaviors,
       pointBehaviorsForDefaultPriority: localPointBehaviors,
       pointsForSuspense: deferredPoints,
-      pointsForDefaultPriority: pointForDefaultPriority,
+      pointsForDefaultPriority: savedPoints,
       pointsTransitionPending,
       savePendingPointText,
     }),
@@ -257,8 +239,8 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
       editPointBadge,
       editPointBehavior,
       localPointBehaviors,
-      pointForDefaultPriority,
       pointsTransitionPending,
+      savedPoints,
       savePendingPointText,
     ]
   );

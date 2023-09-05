@@ -44,7 +44,6 @@ export function ProtocolViewerContextRoot({
 
   const clearCurrentRequests = useCallback(() => {
     const length = Object.keys(requestMap).length;
-    console.log("clearCurrentRequests", length);
     setClearBeforeIndex(length);
   }, [requestMap]);
 
