@@ -220,17 +220,34 @@ export const reduxDispatchJumpLocationCache = createCache<
       preferredFrameIdx = await searchSourceOutlineForDispatch(filteredPauseFrames, replayClient);
     }
 
-    const preferredFrame = filteredPauseFrames[preferredFrameIdx];
-    const preferredLocation = getPreferredLocation(sourcesState, [preferredFrame.location]);
-
-    const matchingFrameStep = await getMatchingFrameStep(
+    const matchingFrameStep = await getFrameStepForFrame(
+      filteredPauseFrames[preferredFrameIdx],
       replayClient,
-      preferredFrame,
-      preferredLocation
+      sourcesState
     );
 
     if (matchingFrameStep) {
       return matchingFrameStep.point;
+    } else {
+      const initialFrameStep = await getFrameStepForFrame(
+        filteredPauseFrames[2],
+        replayClient,
+        sourcesState
+      );
+
+      return initialFrameStep!.point;
     }
   },
 });
+
+async function getFrameStepForFrame(
+  frame: PauseFrame,
+  replayClient: ReplayClientInterface,
+  sourcesState: SourcesState
+) {
+  const preferredLocation = getPreferredLocation(sourcesState, [frame.location]);
+
+  const matchingFrameStep = await getMatchingFrameStep(replayClient, frame, preferredLocation);
+
+  return matchingFrameStep;
+}
