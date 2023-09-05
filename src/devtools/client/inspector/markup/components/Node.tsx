@@ -54,8 +54,11 @@ function Node({ nodeId }: NodeProps) {
     const { top: containerTop, bottom: containerBottom } = container.getBoundingClientRect();
     if (top < containerTop || bottom > containerBottom) {
       // Chrome sometimes ignores element.scrollIntoView() here,
-      // calling it with a little delay fixes it
-      setTimeout(() => el.scrollIntoView({ behavior: "smooth", block: "center" }));
+      // calling it with a little delay fixes it.
+      // Also, increase the delay to account for siblings/ancestors
+      // popping in when a deeply nested node item is picked,
+      // and we have its direct ancestor data but fetch others.
+      setTimeout(() => el.scrollIntoView({ behavior: "smooth", block: "center" }), 500);
     }
   }, []);
 
@@ -82,7 +85,7 @@ function Node({ nodeId }: NodeProps) {
     nodeId
   );
 
-  if (nodeStatus === "rejected" || !node || !canRenderNodeInfo(node)) {
+  if (nodeStatus === "rejected" || (node && !canRenderNodeInfo(node))) {
     return null;
   }
 
@@ -103,7 +106,7 @@ function Node({ nodeId }: NodeProps) {
   };
 
   const onMouseEnter = () => {
-    if (canHighlightNode(node)) {
+    if (node && canHighlightNode(node)) {
       dispatch(highlightNode(nodeId));
     }
   };
@@ -112,63 +115,93 @@ function Node({ nodeId }: NodeProps) {
     dispatch(unhighlightNode());
   };
 
-  let renderedChildren: ReactElement | null = null;
-  let renderedClosingTag: ReactElement | null = null;
-  let renderedComponent: ReactElement | null = null;
+  let renderedNodeContent: ReactElement | null = null;
 
-  // This will be either _all_ child nodes if we have them
-  // available, or a filtered list of non-text nodes
-  const childNodeIds = getCurrentRenderableChildNodeIds(
-    replayClient,
-    pauseId!,
-    node,
-    childNodesStatus === "resolved" ? renderableChildNodes : null
-  );
-
-  if (isExpanded && childNodeIds.length) {
-    renderedChildren = (
-      <ul className="children" role={node.hasChildren ? "group" : ""}>
-        {childNodeIds.map(nodeId => (
-          <Node key={nodeId} nodeId={nodeId} />
-        ))}
-      </ul>
-    );
-  }
-
-  const { hasChildren, displayName } = node;
-  const canExpand = hasChildren;
+  const canExpand = !!node?.hasChildren;
   const showExpander = canExpand && node.parentNodeId !== rootNodeId;
 
-  if (canExpand) {
-    renderedClosingTag = (
-      <div className="tag-line" role="presentation">
-        <div className="tag-state"></div>
-        <span className="close">
-          {"</"}
-          <span className="tag theme-fg-color3">{displayName}</span>
-          {">"}
-        </span>
-      </div>
-    );
-  }
-
   if (nodeStatus === "pending") {
-    renderedComponent = <span>Loading…</span>;
-  } else if (node.type === NodeConstants.ELEMENT_NODE) {
-    renderedComponent = <ElementNode node={node} />;
-  } else if (
-    node.type === NodeConstants.COMMENT_NODE ||
-    node.type === NodeConstants.TEXT_NODE ||
-    (typeof node.value === "string" && reIsEmptyValue.exec(node.value!))
-  ) {
-    renderedComponent = <TextNode type={node.type} value={node.value} />;
-  } else {
-    renderedComponent = (
-      <ReadOnlyNode
-        displayName={node.displayName}
-        isDocType={node.type === NodeConstants.DOCUMENT_TYPE_NODE}
-        pseudoType={!!node.pseudoType}
-      />
+    console.log("Rendering pending: ", nodeId);
+    renderedNodeContent = <span>Loading…</span>;
+  } else if (node) {
+    let renderedChildren: ReactElement | null = null;
+    let renderedClosingTag: ReactElement | null = null;
+    let renderedComponent: ReactElement | null = null;
+
+    // This will be either _all_ child nodes if we have them
+    // available, or a filtered list of non-text nodes
+    const childNodeIds = getCurrentRenderableChildNodeIds(
+      replayClient,
+      pauseId!,
+      node,
+      childNodesStatus === "resolved" ? renderableChildNodes : null
+    );
+
+    if (isExpanded && childNodeIds.length) {
+      renderedChildren = (
+        <ul className="children" role={node.hasChildren ? "group" : ""}>
+          {childNodeIds.map(nodeId => (
+            <Node key={nodeId} nodeId={nodeId} />
+          ))}
+        </ul>
+      );
+    }
+
+    if (canExpand) {
+      renderedClosingTag = (
+        <div className="tag-line" role="presentation">
+          <div className="tag-state"></div>
+          <span className="close">
+            {"</"}
+            <span className="tag theme-fg-color3">{node.displayName}</span>
+            {">"}
+          </span>
+        </div>
+      );
+    }
+
+    if (node.type === NodeConstants.ELEMENT_NODE) {
+      renderedComponent = <ElementNode node={node} />;
+    } else if (
+      node.type === NodeConstants.COMMENT_NODE ||
+      node.type === NodeConstants.TEXT_NODE ||
+      (typeof node.value === "string" && reIsEmptyValue.exec(node.value!))
+    ) {
+      renderedComponent = <TextNode type={node.type} value={node.value} />;
+    } else {
+      renderedComponent = (
+        <ReadOnlyNode
+          displayName={node.displayName}
+          isDocType={node.type === NodeConstants.DOCUMENT_TYPE_NODE}
+          pseudoType={!!node.pseudoType}
+        />
+      );
+    }
+
+    renderedNodeContent = (
+      <>
+        <div
+          className={"tag-line" + (isSelectedNode ? " selected" : "")}
+          role="treeitem"
+          onMouseEnter={onMouseEnter}
+          onMouseLeave={onMouseLeave}
+          ref={isScrollIntoViewNode ? scrollIntoView : null}
+        >
+          <span
+            className={"tag-state" + (isSelectedNode ? " theme-selected" : "")}
+            role="presentation"
+          ></span>
+          {showExpander ? (
+            <span
+              className={"theme-twisty expander" + (isExpanded ? " open" : "")}
+              onClick={onExpanderToggle}
+            ></span>
+          ) : null}
+          {renderedComponent}
+        </div>
+        {renderedChildren}
+        {renderedClosingTag}
+      </>
     );
   }
 
@@ -182,27 +215,7 @@ function Node({ nodeId }: NodeProps) {
       role="presentation"
       onClick={onSelectNodeClick}
     >
-      <div
-        className={"tag-line" + (isSelectedNode ? " selected" : "")}
-        role="treeitem"
-        onMouseEnter={onMouseEnter}
-        onMouseLeave={onMouseLeave}
-        ref={isScrollIntoViewNode ? scrollIntoView : null}
-      >
-        <span
-          className={"tag-state" + (isSelectedNode ? " theme-selected" : "")}
-          role="presentation"
-        ></span>
-        {showExpander ? (
-          <span
-            className={"theme-twisty expander" + (isExpanded ? " open" : "")}
-            onClick={onExpanderToggle}
-          ></span>
-        ) : null}
-        {renderedComponent}
-      </div>
-      {renderedChildren}
-      {renderedClosingTag}
+      {renderedNodeContent}
     </li>
   );
 }
