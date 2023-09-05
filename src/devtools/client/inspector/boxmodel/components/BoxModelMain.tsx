@@ -7,9 +7,9 @@ import { ConnectedProps, connect } from "react-redux";
 
 import { highlightNode, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 import { UIState } from "ui/state";
+import type { Layout, LayoutNumericFields } from "ui/suspense/styleCaches";
 
 import { getSelectedNodeId } from "../../markup/selectors/markup";
-import { Layout, LayoutNumericFields } from "../reducers/box-model";
 import { BoxModelSideLabel } from "./BoxModelSideLabel";
 
 interface BMMProps {

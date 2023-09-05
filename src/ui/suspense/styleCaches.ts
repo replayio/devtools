@@ -2,17 +2,20 @@ import { PauseId, Object as ProtocolObject } from "@replayio/protocol";
 import uniqBy from "lodash/uniqBy";
 import { Cache, createCache } from "suspense";
 
-import {
-  LAYOUT_NUMERIC_FIELDS,
-  Layout,
-} from "devtools/client/inspector/boxmodel/reducers/box-model";
 import { createComputedProperties } from "devtools/client/inspector/computed/actions";
 import { ComputedPropertyState } from "devtools/client/inspector/computed/state";
 import ElementStyle from "devtools/client/inspector/rules/models/element-style";
 import { RuleFront } from "devtools/client/inspector/rules/models/fronts/rule";
 import RuleModel from "devtools/client/inspector/rules/models/rule";
-import TextProperty from "devtools/client/inspector/rules/models/text-property";
-import { DeclarationState, RuleState } from "devtools/client/inspector/rules/reducers/rules";
+import type {
+  RuleInheritance,
+  RuleSelector,
+  SourceLink,
+} from "devtools/client/inspector/rules/models/rule";
+import TextProperty, {
+  ComputedPropertyInfo,
+  Priority,
+} from "devtools/client/inspector/rules/models/text-property";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { cachePauseData } from "replay-next/src/suspense/PauseCache";
 import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
@@ -28,6 +31,100 @@ export interface WiredAppliedRule {
 export interface ParsedCSSRules {
   rules: RuleState[];
   computedProperties: ComputedPropertyState[];
+}
+
+export const LAYOUT_NUMERIC_FIELDS = [
+  "position",
+  "top",
+  "right",
+  "bottom",
+  "left",
+  "margin-top",
+  "margin-right",
+  "margin-bottom",
+  "margin-left",
+  "padding-top",
+  "padding-right",
+  "padding-bottom",
+  "padding-left",
+  "border-top-width",
+  "border-right-width",
+  "border-bottom-width",
+  "border-left-width",
+  "z-index",
+  "box-sizing",
+  "display",
+  "float",
+  "line-height",
+] as const;
+
+// https://stackoverflow.com/a/67942573/62937
+type ObjectFromList<T extends ReadonlyArray<string>, V = string> = {
+  [K in T extends ReadonlyArray<infer U> ? U : never]: V;
+};
+
+export type LayoutNumericFields = ObjectFromList<typeof LAYOUT_NUMERIC_FIELDS>;
+
+export type Layout = LayoutNumericFields & {
+  width: number;
+  height: number;
+  autoMargins?: Record<string, number>;
+};
+
+export interface DeclarationState {
+  /** Array of the computed properties for a CSS declaration. */
+  computedProperties: ComputedPropertyInfo[];
+  /** An unique CSS declaration id. */
+  id: string;
+  /** Whether or not the declaration is valid. (Does it make sense for this value
+   * to be assigned to this property name?) */
+  isDeclarationValid: boolean;
+  /** Whether or not the declaration is enabled. */
+  isEnabled: boolean;
+  /** Whether or not the declaration is invisible. In an inherited rule, only the
+   * inherited declarations are shown and the rest are considered invisible. */
+  isInvisible: boolean | null;
+  /** Whether or not the declaration's property name is known. */
+  isKnownProperty: boolean;
+  /** Whether or not the property name is valid. */
+  isNameValid: boolean;
+  /** Whether or not the the declaration is overridden. */
+  isOverridden: boolean;
+  /** Whether or not the declaration is changed by the user. */
+  isPropertyChanged: boolean;
+  /** The declaration's property name. */
+  name: string;
+  /** The declaration's parsed property value. */
+  parsedValue: (string | { type: string; value: string })[];
+  /** The declaration's priority (either "important" or an empty string). */
+  priority: Priority;
+  /** The CSS rule id that is associated with this CSS declaration. */
+  ruleId: string;
+  /** The declaration's property value. */
+  value: string;
+}
+
+export interface RuleState {
+  /** Array of CSS declarations. */
+  declarations: DeclarationState[];
+  /** An unique CSS rule id. */
+  id: string;
+  /** An object containing information about the CSS rule's inheritance. */
+  inheritance: RuleInheritance | null | undefined;
+  /** Whether or not the rule does not match the current selected element. */
+  isUnmatched: boolean;
+  /* Whether or not the rule is an user agent style. */
+  isUserAgentStyle: boolean | null;
+  /** An object containing information about the CSS keyframes rules. */
+  // keyframesRule: rule.keyframesRule,
+  /** The pseudo-element keyword used in the rule. */
+  pseudoElement: string;
+  /** An object containing information about the CSS rule's selector. */
+  selector: RuleSelector;
+  /** An object containing information about the CSS rule's stylesheet source. */
+  sourceLink: SourceLink;
+  /** The type of CSS rule. */
+  type: number;
 }
 
 export const appliedRulesCache: Cache<

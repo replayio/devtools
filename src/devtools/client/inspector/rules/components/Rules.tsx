@@ -1,8 +1,7 @@
 import React from "react";
 
 import { Rule } from "devtools/client/inspector/rules/components/Rule";
-
-import { RuleState } from "../reducers/rules";
+import { RuleState } from "ui/suspense/styleCaches";
 
 type RulesProps = {
   rules: RuleState[];

@@ -12,10 +12,10 @@ import { userData } from "shared/user-data/GraphQL/UserData";
 import { useAppSelector } from "ui/setup/hooks";
 import { processedNodeDataCache } from "ui/suspense/nodeCaches";
 import { cssRulesCache } from "ui/suspense/styleCaches";
+import type { RuleState } from "ui/suspense/styleCaches";
 
 import { getSelectedNodeId } from "../../markup/selectors/markup";
 import { RuleInheritance } from "../models/rule";
-import { RuleState } from "../reducers/rules";
 
 type InheritedRule = RuleState & { inheritance: RuleInheritance };
 

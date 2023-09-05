@@ -4,16 +4,14 @@
 
 "use strict";
 
-import boxModel from "devtools/client/inspector/boxmodel/reducers/box-model";
 import computed from "devtools/client/inspector/computed/reducers";
 import markup from "devtools/client/inspector/markup/reducers/markup";
-import rules from "devtools/client/inspector/rules/reducers/rules";
 import { ActiveInspectorTab } from "shared/user-data/GraphQL/config";
 import { userData } from "shared/user-data/GraphQL/UserData";
 
 import { InspectorAction } from "../actions";
 
-export { boxModel, computed, markup, rules };
+export { computed, markup };
 
 export interface InspectorState {
   activeTab: ActiveInspectorTab;

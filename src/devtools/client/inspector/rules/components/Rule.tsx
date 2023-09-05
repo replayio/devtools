@@ -1,7 +1,8 @@
 import classNames from "classnames";
 import React, { FC } from "react";
 
-import { RuleState } from "../reducers/rules";
+import { RuleState } from "ui/suspense/styleCaches";
+
 import { Declarations } from "./Declarations";
 import Selector from "./Selector";
 import { SourceLink } from "./SourceLink";

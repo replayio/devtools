@@ -6,7 +6,8 @@
 
 import React from "react";
 
-import type { Layout } from "../reducers/box-model";
+import type { Layout } from "ui/suspense/styleCaches";
+
 import BoxModelMain from "./BoxModelMain";
 import { BoxModelProperties } from "./BoxModelProperties";
 
