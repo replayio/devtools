@@ -35,8 +35,8 @@ export type ItemData = {
   minHitCount: number | undefined;
   parsedTokens: ParsedToken[][] | null;
   plainText: string[] | null;
-  pointsForDefaultPriority: Point[];
   pointsForSuspense: Point[];
+  pointsWithPendingEdits: Point[];
   pointBehaviors: PointBehaviorsObject;
   searchResultLineHighlight: SearchResultLineHighlight | null;
   source: Source;
@@ -63,8 +63,8 @@ export default function SourceListRow({
     parsedTokens,
     plainText,
     pointBehaviors,
-    pointsForDefaultPriority,
     pointsForSuspense,
+    pointsWithPendingEdits,
     searchResultLineHighlight,
     source,
     viewSourceLineHighlight,
@@ -96,18 +96,18 @@ export default function SourceListRow({
   }
 
   const pointForSuspense = findPointForLocation(pointsForSuspense, sourceId, lineNumber);
-  const pointsForLine = findPointsForLocation(pointsForDefaultPriority, sourceId, lineNumber);
-  const pointForDefaultPriority = pointsForLine[0] ?? null;
-  const pointBehavior = pointForDefaultPriority
-    ? pointBehaviors[pointForDefaultPriority.key] ?? null
+  const pointsForLine = findPointsForLocation(pointsWithPendingEdits, sourceId, lineNumber);
+  const pointWithPendingEdits = pointsForLine[0] ?? null;
+  const pointBehavior = pointWithPendingEdits
+    ? pointBehaviors[pointWithPendingEdits.key] ?? null
     : null;
 
   let showPointPanel = false;
-  if (pointForDefaultPriority && pointForSuspense) {
+  if (pointWithPendingEdits && pointForSuspense) {
     if (pointBehavior) {
       showPointPanel = pointBehavior.shouldLog !== POINT_BEHAVIOR_DISABLED;
     } else {
-      showPointPanel = !!pointForDefaultPriority.content;
+      showPointPanel = !!pointWithPendingEdits.content;
     }
   }
 
@@ -184,7 +184,7 @@ export default function SourceListRow({
       {showPointPanel && (
         <LogPointPanel
           className={styles.PointPanel}
-          pointForDefaultPriority={pointForDefaultPriority}
+          pointWithPendingEdits={pointWithPendingEdits}
           pointForSuspense={pointForSuspense!}
         />
       )}

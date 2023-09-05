@@ -122,11 +122,6 @@ export type Point = {
   badge: Badge | null;
   condition: string | null;
   content: string;
-
-  // Local/in-memory only attributes
-  // Whether the condition row should be shown for a point;
-  // If this attribute is defined, it should override the value of the condition attribute
-  showPendingCondition?: boolean;
 };
 
 // Point behaviors are saved to IndexedDB.

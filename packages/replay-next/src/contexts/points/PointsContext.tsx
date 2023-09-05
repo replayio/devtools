@@ -68,6 +68,12 @@ export type PointsContextType = {
   pointBehaviorsForDefaultPriority: PointBehaviorsObject;
   pointsForDefaultPriority: Point[];
 
+  /************************************
+   * Intended for use within the Source viewer only (e.g. the log point panel and the source code viewer)
+   */
+
+  pointsWithPendingEdits: Point[];
+
   // These methods make pending changes to point text.
   // They must be explicitly saved or discarded once editing has finished.
   // Changes update SourceList points at normal priority (for editing UI)
@@ -125,24 +131,21 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
     Map<PointKey, Pick<Point, "condition" | "content">>
   >(new Map());
 
-  // TRICKY
-  // Don't merge pending condition or content edits with the saved points until/unless they're explicitly saved,
-  // else we'll run too many analysis (e.g. conditions would run a new analysis on every keystroke).
-  // The log point panel uses the Lexical CodeEditor plug-in, which manages its own "pending" state, so we don't need to worry about it.
-  // However the context menu to add/remove condition presents an interesting edge case;
-  // for that reason, we us a local, in-memory only attribute (showPendingCondition) to control the panel's behavior.
-  const pointsForDefaultPriority = useMemo<Point[]>(
+  // Pending point text edits should be exposed to the Source viewer
+  // so the LogPointPanel knows whether to show the condition row,
+  // and so the SourceList knows what height a row should be
+  const pointsWithPendingEdits = useMemo<Point[]>(
     () =>
       savedPoints.map(point => {
         const partialPoint = pendingPointText.get(point.key);
-        if (partialPoint?.condition !== undefined) {
+        if (partialPoint) {
           return {
             ...point,
-            showPendingCondition: partialPoint.condition != null,
+            ...partialPoint,
           };
+        } else {
+          return point;
         }
-
-        return point;
       }),
     [pendingPointText, savedPoints]
   );
@@ -247,8 +250,9 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
       pointBehaviorsForSuspense: deferredPointBehaviors,
       pointBehaviorsForDefaultPriority: localPointBehaviors,
       pointsForSuspense: deferredPoints,
-      pointsForDefaultPriority,
+      pointsForDefaultPriority: savedPoints,
       pointsTransitionPending,
+      pointsWithPendingEdits,
       savePendingPointText,
     }),
     [
@@ -261,8 +265,9 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
       editPointBadge,
       editPointBehavior,
       localPointBehaviors,
-      pointsForDefaultPriority,
       pointsTransitionPending,
+      pointsWithPendingEdits,
+      savedPoints,
       savePendingPointText,
     ]
   );

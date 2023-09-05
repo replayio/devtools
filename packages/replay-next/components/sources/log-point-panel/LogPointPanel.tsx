@@ -50,7 +50,7 @@ type EditReason = "condition" | "content";
 
 type ExternalProps = {
   className: string;
-  pointForDefaultPriority: Point;
+  pointWithPendingEdits: Point;
   pointForSuspense: Point;
 };
 
@@ -61,7 +61,7 @@ type InternalProps = ExternalProps & {
 };
 
 export default function PointPanelWrapper(props: ExternalProps) {
-  const { className, pointForDefaultPriority } = props;
+  const { className, pointWithPendingEdits } = props;
 
   const { range: focusRange } = useContext(FocusContext);
   if (!focusRange) {
@@ -74,7 +74,7 @@ export default function PointPanelWrapper(props: ExternalProps) {
         <Loader
           className={`${styles.Loader} ${className}`}
           style={{
-            height: pointForDefaultPriority.condition
+            height: pointWithPendingEdits.condition
               ? "var(--point-panel-with-conditional-height)"
               : "var(--point-panel-height)",
           }}
@@ -89,7 +89,7 @@ export default function PointPanelWrapper(props: ExternalProps) {
 const EMPTY_ARRAY: any[] = [];
 
 function PointPanel(props: ExternalProps & { focusRange: TimeStampedPointRange }) {
-  const { focusRange, pointForDefaultPriority } = props;
+  const { focusRange, pointWithPendingEdits } = props;
 
   const { enterFocusMode } = useContext(FocusContext);
 
@@ -99,8 +99,8 @@ function PointPanel(props: ExternalProps & { focusRange: TimeStampedPointRange }
     hitPointsForLocationCache,
     client,
     { begin: focusRange.begin.point, end: focusRange.end.point },
-    pointForDefaultPriority.location,
-    pointForDefaultPriority.condition
+    pointWithPendingEdits.location,
+    pointWithPendingEdits.condition
   );
 
   const hitPoints = value?.[0] ?? EMPTY_ARRAY;
@@ -121,7 +121,7 @@ function PointPanelWithHitPoints({
   enterFocusMode,
   hitPoints,
   hitPointStatus,
-  pointForDefaultPriority,
+  pointWithPendingEdits,
   pointForSuspense,
 }: InternalProps) {
   const graphQLClient = useContext(GraphQLClientContext);
@@ -139,7 +139,7 @@ function PointPanelWithHitPoints({
 
   // Most of this component should use default priority Point values.
   // Only parts that may suspend should use lower priority values.
-  const { condition, content, key, location, showPendingCondition, user } = pointForDefaultPriority;
+  const { condition, content, key, location, user } = pointWithPendingEdits;
 
   const editable = user?.id === currentUserInfo?.id;
 
@@ -188,10 +188,7 @@ function PointPanelWithHitPoints({
   const pointBehavior = pointBehaviors[key];
   const shouldLog = pointBehavior?.shouldLog === POINT_BEHAVIOR_ENABLED;
 
-  // TRICKY
-  // Refer to comments for "showPendingCondition" in the Point type definition
-  const hasCondition =
-    showPendingCondition !== undefined ? showPendingCondition : condition !== null;
+  const hasCondition = condition !== null;
 
   const toggleCondition = () => {
     if (!editable) {
@@ -414,7 +411,7 @@ function PointPanelWithHitPoints({
             <BadgePicker
               disabled={!editable}
               invalid={!isContentValid}
-              point={pointForDefaultPriority}
+              point={pointWithPendingEdits}
             />
 
             {isEditing ? (
