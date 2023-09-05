@@ -150,7 +150,6 @@ const markupSlice = createSlice({
   extraReducers: builder => {
     // dispatched by actions/timeline.ts, in `playback()`
     builder.addCase(pauseRequestedAt, () => {
-      console.log("Resetting markup state");
       // We need to reset this whenever the timeline is paused,
       // and do so as early in the pause processing sequence as possible
       // (before the UI really starts rendering).

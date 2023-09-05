@@ -285,7 +285,7 @@ export const cssRulesCache: Cache<
   debugLabel: "CSSRules",
   getKey: ([replayClient, pauseId, nodeId]) => `${pauseId}:${nodeId}`,
   load: async ([replayClient, pauseId, nodeId]) => {
-    if (!pauseId || !nodeId) {
+    if (!pauseId || typeof nodeId !== "string") {
       return null;
     }
     const nodeInfo = await processedNodeDataCache.readAsync(replayClient, pauseId, nodeId);
@@ -337,7 +337,7 @@ export const layoutCache: Cache<
   debugLabel: "BoundingRect",
   getKey: ([replayClient, pauseId, nodeId]) => `${pauseId}:${nodeId}`,
   load: async ([replayClient, pauseId, nodeId]) => {
-    if (!pauseId || !nodeId) {
+    if (!pauseId || typeof nodeId !== "string") {
       return null;
     }
     const [bounds, style] = await Promise.all([

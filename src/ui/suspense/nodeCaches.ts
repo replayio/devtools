@@ -161,7 +161,7 @@ export const nodeDataCache: Cache<
 });
 
 export const processedNodeDataCache: Cache<
-  [replayClient: ReplayClientInterface, pauseId: PauseId, nodeId: string],
+  [replayClient: ReplayClientInterface, pauseId: PauseId | undefined, nodeId: string | undefined],
   NodeInfo | null
 > = createCache({
   config: { immutable: true },
@@ -199,7 +199,7 @@ export const processedNodeDataCache: Cache<
 });
 
 export const ancestorNodesCache: Cache<
-  [replayClient: ReplayClientInterface, pauseId: PauseId, nodeId: string],
+  [replayClient: ReplayClientInterface, pauseId: PauseId | undefined, nodeId: string | undefined],
   NodeInfo[] | null
 > = createCache({
   config: { immutable: true },
@@ -273,7 +273,7 @@ export const getCurrentRenderableChildNodeIds = (
 // TODO [BAC-3918]Similarly, this would _really_ benefit from
 // a way to bulk-fetch object previews
 export const renderableChildNodesCache: Cache<
-  [replayClient: ReplayClientInterface, pauseId: PauseId, nodeId: string],
+  [replayClient: ReplayClientInterface, pauseId: PauseId | undefined, nodeId: string | undefined],
   NodeInfo[] | null
 > = createCache({
   config: { immutable: true },
@@ -356,7 +356,7 @@ export const boxModelCache: Cache<
   debugLabel: "BoxModel",
   getKey: ([replayClient, pauseId, nodeId]) => `${pauseId}:${nodeId}`,
   load: async ([replayClient, pauseId, nodeId]) => {
-    if (!pauseId || !nodeId) {
+    if (!pauseId || typeof nodeId !== "string") {
       return NO_BOX_MODEL;
     }
     const nodeObject = await processedNodeDataCache.readAsync(replayClient, pauseId, nodeId);
