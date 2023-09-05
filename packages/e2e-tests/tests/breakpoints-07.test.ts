@@ -15,6 +15,7 @@ import {
   waitForBreakpoint,
   waitForLogpoint,
 } from "../helpers/source-panel";
+import { debugPrint } from "../helpers/utils";
 import test from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "doc_navigate.html" });
@@ -56,6 +57,7 @@ test(`breakpoints-07: rewind and seek using command bar and console messages`, a
   await sourceTab.waitFor({ state: "visible" });
 
   // Verify that the active source and breakpoints/logpoints are restored after a reload.
+  debugPrint(page, "Reloading page to check that breakpoints/logpoints are restored");
   await page.reload();
   await openDevToolsTab(page); // Should be unnecessary but sometimes "Viewer" tab is selected
   await quickOpen(page, "bundle_input.js"); // Should be unnecessary
