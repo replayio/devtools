@@ -68,6 +68,12 @@ export type PointsContextType = {
   pointBehaviorsForDefaultPriority: PointBehaviorsObject;
   pointsForDefaultPriority: Point[];
 
+  /************************************
+   * Intended for use within the Source viewer only (e.g. the log point panel and the source code viewer)
+   */
+
+  pointsWithPendingEdits: Point[];
+
   // These methods make pending changes to point text.
   // They must be explicitly saved or discarded once editing has finished.
   // Changes update SourceList points at normal priority (for editing UI)
@@ -125,9 +131,10 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
     Map<PointKey, Pick<Point, "condition" | "content">>
   >(new Map());
 
-  // Merge saved points with local edits;
-  // Local edits should take precedence so they're reflected in the Source viewer.
-  const pointForDefaultPriority = useMemo<Point[]>(
+  // Pending point text edits should be exposed to the Source viewer
+  // so the LogPointPanel knows whether to show the condition row,
+  // and so the SourceList knows what height a row should be
+  const pointsWithPendingEdits = useMemo<Point[]>(
     () =>
       savedPoints.map(point => {
         const partialPoint = pendingPointText.get(point.key);
@@ -243,8 +250,9 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
       pointBehaviorsForSuspense: deferredPointBehaviors,
       pointBehaviorsForDefaultPriority: localPointBehaviors,
       pointsForSuspense: deferredPoints,
-      pointsForDefaultPriority: pointForDefaultPriority,
+      pointsForDefaultPriority: savedPoints,
       pointsTransitionPending,
+      pointsWithPendingEdits,
       savePendingPointText,
     }),
     [
@@ -257,8 +265,9 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
       editPointBadge,
       editPointBehavior,
       localPointBehaviors,
-      pointForDefaultPriority,
       pointsTransitionPending,
+      pointsWithPendingEdits,
+      savedPoints,
       savePendingPointText,
     ]
   );

@@ -10,7 +10,7 @@
     "test": "playwright test",
     "test:chromium": "playwright test --project chromium --reporter=@replayio/playwright/reporter,line",
     "test:replay-chromium": "playwright test --project replay-chromium --reporter=@replayio/playwright/reporter,line",
-    "test:debug": "playwright test --workers 1 --headed",
+    "test:debug": "playwright test --project chromium --workers 1 --headed",
     "test:install": "playwright install",
     "ts-node": "ts-node --project ../../tsconfig.json"
   },

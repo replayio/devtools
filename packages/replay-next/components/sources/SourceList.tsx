@@ -69,8 +69,8 @@ export default function SourceList({
   const { range: focusRange } = useContext(FocusContext);
   const {
     pointBehaviorsForDefaultPriority: pointBehaviors,
-    pointsForDefaultPriority,
     pointsForSuspense,
+    pointsWithPendingEdits,
   } = useContext(PointsContext);
   const client = useContext(ReplayClientContext);
   const {
@@ -168,14 +168,14 @@ export default function SourceList({
     if (list) {
       list.resetAfterIndex(0);
     }
-  }, [pointBehaviors, pointsForDefaultPriority]);
+  }, [pointBehaviors, pointsWithPendingEdits]);
 
   const { data: streamingData, value: streamingValue } = useStreamingValue(streamingParser);
 
   const getItemSize = useCallback(
     (index: number) => {
       const lineNumber = index + 1;
-      const point = findPointForLocation(pointsForDefaultPriority, sourceId, lineNumber);
+      const point = findPointForLocation(pointsWithPendingEdits, sourceId, lineNumber);
       if (!point) {
         // If the Point has been removed by some external action,
         // e.g. the Pause Information side panel,
@@ -206,7 +206,7 @@ export default function SourceList({
       pointBehaviors,
       pointPanelHeight,
       pointPanelWithConditionalHeight,
-      pointsForDefaultPriority,
+      pointsWithPendingEdits,
       sourceId,
     ]
   );
@@ -247,8 +247,8 @@ export default function SourceList({
     plainText: streamingData?.plainText ?? null,
     parsedTokens: streamingValue ?? null,
     pointBehaviors,
-    pointsForDefaultPriority,
     pointsForSuspense,
+    pointsWithPendingEdits,
     searchResultLineHighlight,
     source,
     viewSourceLineHighlight,
