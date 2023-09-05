@@ -100,6 +100,10 @@ export function shouldShowJumpToEvent(nags: Nag[]): boolean {
   return shouldShowNag(nags, Nag.JUMP_TO_EVENT);
 }
 
+export function shouldShowJumpToNetworkRequest(nags: Nag[]): boolean {
+  return shouldShowNag(nags, Nag.JUMP_TO_NETWORK_REQUEST);
+}
+
 export function shouldShowInspectElement(nags: Nag[]): boolean {
   return shouldShowNag(nags, Nag.INSPECT_ELEMENT);
 }

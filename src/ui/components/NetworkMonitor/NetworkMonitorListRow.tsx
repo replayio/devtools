@@ -2,6 +2,8 @@ import { CSSProperties, ReactNode, useContext } from "react";
 
 import Icon from "replay-next/components/Icon";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
+import { useNag } from "replay-next/src/hooks/useNag";
+import { Nag } from "shared/graphql/types";
 import useNetworkContextMenu from "ui/components/NetworkMonitor/useNetworkContextMenu";
 import { RequestSummary } from "ui/components/NetworkMonitor/utils";
 
@@ -92,7 +94,6 @@ function RequestRow({
   }
 
   const { contextMenu, onContextMenu } = useNetworkContextMenu({ requestSummary: request });
-
   const isAfterCurrentTime = point.time >= currentTime;
 
   let dataCurrentTime = undefined;
@@ -110,6 +111,13 @@ function RequestRow({
       statusCategory = "redirect";
     }
   }
+
+  const [, dismissJumpToNetworkRequestNag] = useNag(Nag.JUMP_TO_NETWORK_REQUEST);
+
+  const seekToRequestWrapper = (request: RequestSummary) => {
+    seekToRequest(request);
+    dismissJumpToNetworkRequestNag(); // Replay Passport
+  };
 
   return (
     <>
@@ -150,7 +158,7 @@ function RequestRow({
           <button
             className={styles.SeekButton}
             data-test-name="Network-RequestRow-SeekButton"
-            onClick={() => seekToRequest(request)}
+            onClick={() => seekToRequestWrapper(request)}
             tabIndex={0}
           >
             <Icon
