@@ -2,7 +2,7 @@ import { Page, expect } from "@playwright/test";
 import chalk from "chalk";
 
 import { waitForSourceContentsToFinishStreaming } from "./source-panel";
-import { debugPrint, getCommandKey, waitFor } from "./utils";
+import { debugPrint, delay, getCommandKey, waitFor } from "./utils";
 
 export async function quickOpen(page: Page, url: string): Promise<void> {
   await debugPrint(page, "Opening quick-open dialog", "quickOpen");
@@ -12,10 +12,13 @@ export async function quickOpen(page: Page, url: string): Promise<void> {
   await debugPrint(page, `Filtering files by "${chalk.bold(url)}"`, "quickOpen");
   await page.keyboard.type(url);
 
+  await page.getByText("Loading results...").waitFor({ state: "hidden" });
+
   await debugPrint(page, `Opening file "${chalk.bold(url)}"`, "quickOpen");
   const sourceRow = await page.waitForSelector(
-    `[data-test-name="QuickOpenResultsList-Row"]:has-text("${url}")`
+    `[data-test-name="QuickOpenResultsList-Row"].selected:has-text("${url}")`
   );
+
   const sourceId = await sourceRow.getAttribute("data-test-id");
 
   await page.keyboard.press("Enter");

@@ -1,11 +1,11 @@
-import { Page } from "@playwright/test";
+import { Page, expect } from "@playwright/test";
 import chalk from "chalk";
 import dotenv from "dotenv";
 
 import { RecordingTarget } from "replay-next/src/suspense/BuildIdCache";
 
 import exampleRecordings from "../examples.json";
-import { debugPrint, getElementClasses, waitForRecordingToFinishIndexing } from "./utils";
+import { debugPrint, getElementClasses, waitFor, waitForRecordingToFinishIndexing } from "./utils";
 
 dotenv.config({ path: "../../.env" });
 
@@ -23,7 +23,15 @@ export async function openDevToolsTab(page: Page) {
   // The DevTools tab won't exist if it's a Node recording.
   const tab = getDevToolsTab(page);
   if (await tab.isVisible()) {
+    const isAlreadyActive = await isDevToolsTabActive(page);
+    if (isAlreadyActive) {
+      return;
+    }
     await tab.click();
+    await waitFor(async () => {
+      const isActive = await isDevToolsTabActive(page);
+      expect(isActive).toBe(true);
+    });
   }
 }
 
@@ -38,6 +46,10 @@ export async function openViewerTab(page: Page) {
 
   const tab = getViewerTab(page);
   await tab.click();
+  await waitFor(async () => {
+    const isActive = await isViewerTabActive(page);
+    expect(isActive).toBe(true);
+  });
 }
 
 export async function isViewerTabActive(page: Page) {
