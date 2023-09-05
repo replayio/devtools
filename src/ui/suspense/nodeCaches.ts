@@ -359,7 +359,7 @@ export const boxModelCache: Cache<
     if (!pauseId || !nodeId) {
       return NO_BOX_MODEL;
     }
-    const nodeObject = processedNodeDataCache.getValueIfCached(replayClient, pauseId, nodeId);
+    const nodeObject = await processedNodeDataCache.readAsync(replayClient, pauseId, nodeId);
 
     const nodeMayBeHighlightable = nodeObject && canHighlightNode(nodeObject);
     let nodeIsVisible = true;
