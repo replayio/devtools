@@ -28,7 +28,7 @@ test.skip("stacking: Element highlighter selects the correct element when they o
   await toggleToolboxLayout(page, "left");
 
   const canvas = page.locator("canvas#graphics");
-  const rulesContainer = page.locator("#ruleview-container");
+  const rulesContainer = page.locator('[data-test-id="RulesPanel"]');
 
   for (let testCase of stackingTestCases) {
     // Really make sure the panel is closed

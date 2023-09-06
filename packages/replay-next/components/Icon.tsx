@@ -34,6 +34,7 @@ export type IconType =
   | "error"
   | "fast-forward"
   | "file"
+  | "filter"
   | "folder"
   | "folder-closed"
   | "folder-open"
@@ -243,6 +244,10 @@ export default function Icon({
     case "file":
       path =
         "M6 22q-.825 0-1.412-.587Q4 20.825 4 20V4q0-.825.588-1.413Q5.175 2 6 2h8l6 6v12q0 .825-.587 1.413Q18.825 22 18 22Zm7-13V4H6v16h12V9ZM6 4v5-5 16V4Z";
+      break;
+    case "filter":
+      path =
+        "M15,19.88C15.04,20.18 14.94,20.5 14.71,20.71C14.32,21.1 13.69,21.1 13.3,20.71L9.29,16.7C9.06,16.47 8.96,16.16 9,15.87V10.75L4.21,4.62C3.87,4.19 3.95,3.56 4.38,3.22C4.57,3.08 4.78,3 5,3V3H19V3C19.22,3 19.43,3.08 19.62,3.22C20.05,3.56 20.13,4.19 19.79,4.62L15,10.75V19.88M7.04,5L11,10.06V15.58L13,17.58V10.05L16.96,5H7.04Z";
       break;
     case "folder":
     case "folder-closed":

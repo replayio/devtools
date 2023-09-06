@@ -50,39 +50,84 @@ export async function expandPseudoElementRules(page: Page) {
   }
 }
 
-export async function getAppliedRules(page: Page) {
+type AppliedRules = {
+  properties: Array<{
+    overridden: boolean;
+    text: string;
+  }>;
+  selector: string;
+  source: string;
+};
+
+export async function getAppliedRules(page: Page): Promise<AppliedRules[]> {
   await openAppliedRulesTab(page);
   await expandPseudoElementRules(page);
-  return await page.evaluate(() => {
-    const rules = document.querySelectorAll<HTMLElement>(".ruleview-rule");
-    return [...rules].map(rule => {
-      const selector = rule
-        .querySelector<HTMLElement>(".ruleview-selectorcontainer")!
-        .innerText.trim();
-      const source = rule.querySelector<HTMLElement>(".ruleview-rule-source")!.innerText.trim();
-      const properties = [...rule.querySelectorAll<HTMLElement>(".ruleview-propertycontainer")].map(
-        prop => {
-          let longhandProps;
-          if (prop.nextSibling) {
-            longhandProps = [
-              ...(prop.nextSibling as HTMLElement).querySelectorAll<HTMLElement>("li"),
-            ].map(longhand => ({
-              text: longhand.innerText,
-              overridden: longhand.classList.contains("ruleview-overridden"),
-            }));
+
+  await debugPrint(page, `Gathering CSS rules`, "getAppliedRules");
+
+  return await page.evaluate(async () => {
+    const listElement = document.querySelector<HTMLElement>('[data-test-id="RulesList"]')!;
+    const { clientHeight } = listElement;
+
+    listElement.scrollTop = 0;
+
+    // Give the list time to re-render after scrolling
+    await new Promise(resolve => setTimeout(resolve, 250));
+
+    let currentSelector: AppliedRules | null = null;
+    let maxListIndex = -1;
+    let results: AppliedRules[] = [];
+
+    while (true) {
+      const listItems = listElement.querySelectorAll<HTMLElement>("[data-list-index]")!;
+      for (let index = 0; index < listItems.length; index++) {
+        const listItem = listItems[index];
+        const listIndex = parseInt(listItem.getAttribute("data-list-index")!);
+        if (listIndex > maxListIndex) {
+          maxListIndex = listIndex;
+
+          switch (listItem.getAttribute("data-test-name")) {
+            case "RuleListItem-DeclarationState": {
+              if (currentSelector) {
+                currentSelector.properties.push({
+                  overridden: listItem.getAttribute("data-overridden") === "true",
+                  text: listItem.textContent!,
+                });
+              }
+              break;
+            }
+            case "RuleListItem-RuleState": {
+              const source = listItem.querySelector(
+                '[data-test-name="RuleListItem-RuleState-Source"]'
+              )!;
+              const selector = listItem.querySelector(
+                '[data-test-name="RuleListItem-RuleState-Selector"]'
+              )!;
+              currentSelector = {
+                properties: [],
+                selector: selector.textContent!,
+                source: source.textContent!,
+              };
+
+              results.push(currentSelector);
+              break;
+            }
           }
-          const result: any = {
-            text: prop.innerText.trim(),
-            overridden: (prop.parentNode as HTMLElement).className.includes("overridden"),
-          };
-          if (longhandProps) {
-            result.longhandProps = longhandProps;
-          }
-          return result;
         }
-      );
-      return { selector, source, properties };
-    });
+      }
+
+      // Scroll until we reach the end of the Rules list
+      let prevScrollTop = listElement.scrollTop;
+      listElement.scrollTop += clientHeight;
+      if (prevScrollTop === listElement.scrollTop) {
+        break;
+      }
+
+      // Give the list time to re-render after scrolling
+      await new Promise(resolve => setTimeout(resolve, 250));
+    }
+
+    return results;
   });
 }
 

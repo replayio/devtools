@@ -8,12 +8,12 @@ import { assert } from "protocol/utils";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import {
+  canHighlightNode,
   canRenderNodeInfo,
   getCurrentRenderableChildNodeIds,
   processedNodeDataCache,
   renderableChildNodesCache,
 } from "ui/suspense/nodeCaches";
-import { canHighlightNode } from "ui/suspense/nodeCaches";
 
 import { highlightNode, selectNode, toggleNodeExpanded, unhighlightNode } from "../actions/markup";
 import { getIsNodeExpanded, getScrollIntoViewNodeId, getSelectedNodeId } from "../selectors/markup";
@@ -121,7 +121,6 @@ function Node({ nodeId }: NodeProps) {
   const showExpander = canExpand && node.parentNodeId !== rootNodeId;
 
   if (nodeStatus === "pending") {
-    console.log("Rendering pending: ", nodeId);
     renderedNodeContent = <span>Loading…</span>;
   } else if (node) {
     let renderedChildren: ReactElement | null = null;

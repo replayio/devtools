@@ -51,7 +51,6 @@ import "devtools/client/themes/common.css";
 import "devtools/client/themes/computed.css";
 import "devtools/client/themes/inspector.css";
 import "devtools/client/themes/layout.css";
-import "devtools/client/themes/rules.css";
 import "devtools/client/themes/splitters.css";
 import "devtools/client/themes/toolbars.css";
 import "devtools/client/themes/tooltips.css";
