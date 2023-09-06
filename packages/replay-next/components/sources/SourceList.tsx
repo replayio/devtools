@@ -96,7 +96,7 @@ export default function SourceList({
   // but neither should actually _block_ us from showing source text.
   // Fetch those in the background via the caches,
   // and re-render once that data is available.
-  const { value: hitCounts } = useImperativeIntervalCacheValues(
+  const { status: hitCountsStatus, value: hitCounts } = useImperativeIntervalCacheValues(
     sourceHitCountsCache,
     visibleLines?.start.line ?? 0,
     visibleLines?.end.line ?? 0,
@@ -241,6 +241,7 @@ export default function SourceList({
     breakablePositionsByLine,
     executionPointLineHighlight,
     hitCounts,
+    hitCountsStatus,
     lineHeight,
     maxHitCount: maxHitCount ?? STREAMING_IN_PROGRESS_PLACEHOLDER_MAX_HIT_COUNT,
     minHitCount: minHitCount ?? 0,
