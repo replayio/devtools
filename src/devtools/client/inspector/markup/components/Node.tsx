@@ -121,7 +121,6 @@ function Node({ nodeId }: NodeProps) {
   const showExpander = canExpand && node.parentNodeId !== rootNodeId;
 
   if (nodeStatus === "pending") {
-    console.log("Rendering pending: ", nodeId);
     renderedNodeContent = <span>Loading…</span>;
   } else if (node) {
     let renderedChildren: ReactElement | null = null;
