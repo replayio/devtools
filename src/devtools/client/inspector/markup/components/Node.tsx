@@ -58,7 +58,7 @@ function Node({ nodeId }: NodeProps) {
       // Also, increase the delay to account for siblings/ancestors
       // popping in when a deeply nested node item is picked,
       // and we have its direct ancestor data but fetch others.
-      setTimeout(() => el.scrollIntoView({ behavior: "smooth", block: "center" }), 500);
+      setTimeout(() => el.scrollIntoView({ behavior: "smooth", block: "center" }), 1000);
     }
   }, []);
 
