@@ -4,7 +4,7 @@ import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import ComputedApp from "devtools/client/inspector/computed/components/ComputedApp";
 import LayoutApp from "devtools/client/inspector/layout/components/LayoutApp";
 import MarkupApp from "devtools/client/inspector/markup/components/MarkupApp";
-import { RulesPanel } from "devtools/client/inspector/markup/components/rules/RulesPanel";
+import { RulesPanel } from "devtools/client/inspector/markup/components/rules";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { useIsPointWithinFocusWindow } from "replay-next/src/hooks/useIsPointWithinFocusWindow";
 import { ActiveInspectorTab } from "shared/user-data/GraphQL/config";

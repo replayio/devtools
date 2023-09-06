@@ -1,6 +1,5 @@
-import { useContext, useState } from "react";
+import { useContext, useDeferredValue, useState } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
-import { useImperativeCacheValue } from "suspense";
 
 import { getPauseId } from "devtools/client/debugger/src/selectors";
 import { RulesList } from "devtools/client/inspector/markup/components/rules/RulesList";
@@ -10,14 +9,13 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { shallowEqual } from "shared/utils/compare";
 import { useAppSelector } from "ui/setup/hooks";
 import { processedNodeDataCache } from "ui/suspense/nodeCaches";
-import { RuleState } from "ui/suspense/styleCaches";
-import { cssRulesCache } from "ui/suspense/styleCaches";
+import { RuleState, cssRulesCache } from "ui/suspense/styleCaches";
 
 import styles from "./RulesPanel.module.css";
 
 const NO_RULES_AVAILABLE: RuleState[] = [];
 
-export function RulesPanel() {
+export function RulesPanelSuspends() {
   const replayClient = useContext(ReplayClientContext);
   const { pauseId, selectedNodeId } = useAppSelector(
     state => ({
@@ -27,32 +25,33 @@ export function RulesPanel() {
     shallowEqual
   );
 
-  const { value: node, status: nodeStatus } = useImperativeCacheValue(
-    processedNodeDataCache,
+  const deferredPauseId = useDeferredValue(pauseId);
+  const deferredSelectedNodeId = useDeferredValue(selectedNodeId);
+
+  const isPending = pauseId !== deferredPauseId || selectedNodeId !== deferredSelectedNodeId;
+
+  const node = processedNodeDataCache.read(
     replayClient,
-    pauseId!,
-    selectedNodeId!
+    deferredPauseId,
+    deferredSelectedNodeId ?? undefined
   );
 
-  const canHaveRules = nodeStatus === "resolved" ? node?.isElement : false;
+  const canHaveRules = !!node?.isElement;
 
-  // TODO [FE-1862] Use deferred value and Suspend for a better transition between rows
-  const { value: cachedStyles, status } = useImperativeCacheValue(
-    cssRulesCache,
+  const cachedStyles = cssRulesCache.read(
     replayClient,
-    canHaveRules ? pauseId : undefined,
-    canHaveRules ? selectedNodeId : undefined
+    canHaveRules ? deferredPauseId : undefined,
+    canHaveRules ? deferredSelectedNodeId : undefined
   );
-
-  let rules = NO_RULES_AVAILABLE;
-  if (status === "resolved" && cachedStyles) {
-    rules = cachedStyles.rules;
-  }
 
   const [searchText, setSearchText] = useState("");
 
   return (
-    <div className={styles.RulesPanel} data-test-id="RulesPanel">
+    <div
+      className={styles.RulesPanel}
+      data-test-id="RulesPanel"
+      data-is-pending={isPending || undefined}
+    >
       <div className={styles.FilterRow}>
         <Icon className={styles.FilterIcon} type="filter" />
         <input
@@ -68,7 +67,7 @@ export function RulesPanel() {
             <RulesList
               height={height}
               noContentFallback={<div className={styles.NoStyles}>No styles to display</div>}
-              rules={rules}
+              rules={cachedStyles?.rules ?? NO_RULES_AVAILABLE}
               searchText={searchText}
             />
           )}
