@@ -43,14 +43,8 @@ export function getNodeEventListeners(
     }
 
     const state = getState();
-    const sourcesById = getSourceDetailsEntities(state);
-
     // We need to fetch "basic" event listeners from the protocol API
-    const { listeners, data } = await protocolClient.DOM.getEventListeners(
-      { node: nodeId },
-      ThreadFront.sessionId!,
-      pauseId
-    );
+    const { listeners, data } = await replayClient.getEventListeners(pauseId, nodeId);
 
     const sources = await sourcesByIdCache.readAsync(replayClient);
     cachePauseData(replayClient, sources, pauseId, data);

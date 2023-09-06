@@ -1,27 +1,24 @@
 import classnames from "classnames";
-import React, { MouseEvent, PureComponent, ReactElement } from "react";
-import { ConnectedProps, connect } from "react-redux";
+import React, { ReactElement, useCallback, useContext } from "react";
+import { shallowEqual } from "react-redux";
+import { useImperativeCacheValue } from "suspense";
 
 import NodeConstants from "devtools/shared/dom-node-constants";
 import { assert } from "protocol/utils";
-import { UIState } from "ui/state";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import {
+  canRenderNodeInfo,
+  getCurrentRenderableChildNodeIds,
+  processedNodeDataCache,
+  renderableChildNodesCache,
+} from "ui/suspense/nodeCaches";
+import { canHighlightNode } from "ui/suspense/nodeCaches";
 
-import { setActiveTab } from "../../actions";
-import {
-  collapseNode,
-  expandNode,
-  highlightNode,
-  selectNode,
-  toggleNodeExpanded,
-  unhighlightNode,
-} from "../actions/markup";
-import {
-  getNode,
-  getRootNodeId,
-  getScrollIntoViewNodeId,
-  getSelectedNodeId,
-} from "../selectors/markup";
+import { highlightNode, selectNode, toggleNodeExpanded, unhighlightNode } from "../actions/markup";
+import { getIsNodeExpanded, getScrollIntoViewNodeId, getSelectedNodeId } from "../selectors/markup";
 import ElementNode from "./ElementNode";
+import { MarkupContext } from "./MarkupContext";
 import ReadOnlyNode from "./ReadOnlyNode";
 import TextNode from "./TextNode";
 
@@ -29,38 +26,25 @@ interface NodeProps {
   nodeId: string;
 }
 
-type FinalNodeProps = NodeProps & PropsFromRedux;
+const reIsEmptyValue = /[^\s]/;
 
-class _Node extends PureComponent<FinalNodeProps> {
-  onExpanderToggle = (event: MouseEvent) => {
-    event.stopPropagation();
-    const { node } = this.props;
+function Node({ nodeId }: NodeProps) {
+  const dispatch = useAppDispatch();
+  const replayClient = useContext(ReplayClientContext);
+  const { rootNodeId, pauseId } = useContext(MarkupContext);
 
-    this.props.toggleNodeExpanded(node.id, node.isExpanded);
-  };
+  // Do these as one big object, with a shallow comparison,
+  // to minimize the number of Redux subscriptions
+  const { isSelectedNode, isScrollIntoViewNode, isExpanded } = useAppSelector(
+    state => ({
+      isSelectedNode: nodeId === getSelectedNodeId(state),
+      isScrollIntoViewNode: nodeId === getScrollIntoViewNodeId(state),
+      isExpanded: getIsNodeExpanded(state, nodeId),
+    }),
+    shallowEqual
+  );
 
-  onSelectNodeClick = (event: MouseEvent) => {
-    event.stopPropagation();
-
-    const { node, isSelectedNode } = this.props;
-
-    // Don't reselect the same selected node.
-    if (isSelectedNode) {
-      return;
-    }
-
-    this.props.onSelectNode(node.id);
-  };
-
-  onMouseEnter = () => {
-    this.props.highlightNode(this.props.node.id);
-  };
-
-  onMouseLeave = () => {
-    this.props.unhighlightNode();
-  };
-
-  scrollIntoView = (el: HTMLElement | null) => {
+  const scrollIntoView = useCallback((el: HTMLElement | null) => {
     if (!el) {
       return;
     }
@@ -70,70 +54,122 @@ class _Node extends PureComponent<FinalNodeProps> {
     const { top: containerTop, bottom: containerBottom } = container.getBoundingClientRect();
     if (top < containerTop || bottom > containerBottom) {
       // Chrome sometimes ignores element.scrollIntoView() here,
-      // calling it with a little delay fixes it
-      setTimeout(() => el.scrollIntoView({ behavior: "smooth", block: "center" }));
+      // calling it with a little delay fixes it.
+      // Also, increase the delay to account for siblings/ancestors
+      // popping in when a deeply nested node item is picked,
+      // and we have its direct ancestor data but fetch others.
+      setTimeout(() => el.scrollIntoView({ behavior: "smooth", block: "center" }), 1000);
+    }
+  }, []);
+
+  // Ensure that we have the processed node data for _this_ node.
+  const { value: node, status: nodeStatus } = useImperativeCacheValue(
+    processedNodeDataCache,
+    replayClient,
+    pauseId!,
+    nodeId
+  );
+
+  // Fetching "renderable" child node data here serves two purposes:
+  // 1) It allows us to only render meaningful child nodes,
+  //    omitting whitespace and empty text nodes.
+  //    (We currently have no way to filter that list in the backend.)
+  // 2) We actually pre-fetch these children regardless of whether the
+  //    node is expanded or not. That means that when the user does expand
+  //    this node, we already have the data for each child and it will
+  //    render the content immediately.
+  const { value: renderableChildNodes, status: childNodesStatus } = useImperativeCacheValue(
+    renderableChildNodesCache,
+    replayClient,
+    pauseId!,
+    nodeId
+  );
+
+  if (nodeStatus === "rejected" || (node && !canRenderNodeInfo(node))) {
+    return null;
+  }
+
+  const onExpanderToggle = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    dispatch(toggleNodeExpanded(nodeId, isExpanded));
+  };
+
+  const onSelectNodeClick = (event: React.MouseEvent) => {
+    event.stopPropagation();
+
+    // Don't reselect the same selected node.
+    if (isSelectedNode) {
+      return;
+    }
+
+    dispatch(selectNode(nodeId));
+  };
+
+  const onMouseEnter = () => {
+    if (node && canHighlightNode(node)) {
+      dispatch(highlightNode(nodeId));
     }
   };
 
-  /**
-   * Renders the children of the current node.
-   */
-  renderChildren(): ReactElement | null {
-    const { node } = this.props;
-    const children = node.children || [];
+  const onMouseLeave = () => {
+    dispatch(unhighlightNode());
+  };
 
-    if (node.isLoadingChildren) {
-      return <span>Loading…</span>;
-    }
+  let renderedNodeContent: ReactElement | null = null;
 
-    if (!children.length) {
-      return null;
-    }
+  const canExpand = !!node?.hasChildren;
+  const showExpander = canExpand && node.parentNodeId !== rootNodeId;
 
-    return (
-      <ul className="children" role={node.hasChildren ? "group" : ""}>
-        {children.map(nodeId => (
-          <Node key={nodeId} nodeId={nodeId} />
-        ))}
-      </ul>
+  if (nodeStatus === "pending") {
+    console.log("Rendering pending: ", nodeId);
+    renderedNodeContent = <span>Loading…</span>;
+  } else if (node) {
+    let renderedChildren: ReactElement | null = null;
+    let renderedClosingTag: ReactElement | null = null;
+    let renderedComponent: ReactElement | null = null;
+
+    // This will be either _all_ child nodes if we have them
+    // available, or a filtered list of non-text nodes
+    const childNodeIds = getCurrentRenderableChildNodeIds(
+      replayClient,
+      pauseId!,
+      node,
+      childNodesStatus === "resolved" ? renderableChildNodes : null
     );
-  }
 
-  /**
-   * Renders the closing tag of the current node.
-   */
-  renderClosingTag() {
-    const { hasChildren, displayName } = this.props.node;
-    // Whether or not the node can be expander - True if node has children and child is
-    // not an inline text node.
-    const canExpand = hasChildren;
-
-    if (!canExpand) {
-      return null;
+    if (isExpanded && childNodeIds.length) {
+      renderedChildren = (
+        <ul className="children" role={node.hasChildren ? "group" : ""}>
+          {childNodeIds.map(nodeId => (
+            <Node key={nodeId} nodeId={nodeId} />
+          ))}
+        </ul>
+      );
     }
 
-    return (
-      <div className="tag-line" role="presentation">
-        <div className="tag-state"></div>
-        <span className="close">
-          {"</"}
-          <span className="tag theme-fg-color3">{displayName}</span>
-          {">"}
-        </span>
-      </div>
-    );
-  }
+    if (canExpand) {
+      renderedClosingTag = (
+        <div className="tag-line" role="presentation">
+          <div className="tag-state"></div>
+          <span className="close">
+            {"</"}
+            <span className="tag theme-fg-color3">{node.displayName}</span>
+            {">"}
+          </span>
+        </div>
+      );
+    }
 
-  renderComponent() {
-    const { node } = this.props;
-
-    let component = null;
     if (node.type === NodeConstants.ELEMENT_NODE) {
-      component = <ElementNode node={node} onToggleNodeExpanded={this.props.toggleNodeExpanded} />;
-    } else if (node.type === NodeConstants.COMMENT_NODE || node.type === NodeConstants.TEXT_NODE) {
-      component = <TextNode type={node.type} value={node.value} />;
+      renderedComponent = <ElementNode node={node} />;
+    } else if (
+      node.type === NodeConstants.COMMENT_NODE ||
+      node.type === NodeConstants.TEXT_NODE ||
+      (typeof node.value === "string" && reIsEmptyValue.exec(node.value!))
+    ) {
+      renderedComponent = <TextNode type={node.type} value={node.value} />;
     } else {
-      component = (
+      renderedComponent = (
         <ReadOnlyNode
           displayName={node.displayName}
           isDocType={node.type === NodeConstants.DOCUMENT_TYPE_NODE}
@@ -142,55 +178,14 @@ class _Node extends PureComponent<FinalNodeProps> {
       );
     }
 
-    return component;
-  }
-
-  renderEventBadge() {
-    if (!this.props.node.hasEventListeners) {
-      return null;
-    }
-
-    return (
-      <button
-        type="button"
-        title="Open event listeners"
-        className="inspector-badge interactive relative inline-block w-auto py-0 px-0.5 leading-2"
-        onClick={() => {
-          this.props.setActiveTab("eventsview");
-        }}
-      >
-        event
-      </button>
-    );
-  }
-
-  render() {
-    const { node, rootNodeId, isSelectedNode, isScrollIntoViewNode } = this.props;
-
-    // Whether or not the node can be expanded - True if node has children and child is
-    // not an inline text node.
-    const canExpand = node.hasChildren;
-    // Whether or not to the show the expanded - True if node can expand and the parent
-    // node is not the root node.
-    const showExpander = canExpand && node.parentNodeId !== rootNodeId;
-
-    return (
-      <li
-        data-testid="Inspector-Nodes-Node"
-        className={classnames("child", {
-          collapsed: !node.isExpanded,
-          "not-displayed": !node.isDisplayed,
-          expandable: showExpander,
-        })}
-        role="presentation"
-        onClick={this.onSelectNodeClick}
-      >
+    renderedNodeContent = (
+      <>
         <div
           className={"tag-line" + (isSelectedNode ? " selected" : "")}
           role="treeitem"
-          onMouseEnter={this.onMouseEnter}
-          onMouseLeave={this.onMouseLeave}
-          ref={isScrollIntoViewNode ? this.scrollIntoView : null}
+          onMouseEnter={onMouseEnter}
+          onMouseLeave={onMouseLeave}
+          ref={isScrollIntoViewNode ? scrollIntoView : null}
         >
           <span
             className={"tag-state" + (isSelectedNode ? " theme-selected" : "")}
@@ -198,36 +193,31 @@ class _Node extends PureComponent<FinalNodeProps> {
           ></span>
           {showExpander ? (
             <span
-              className={"theme-twisty expander" + (node.isExpanded ? " open" : "")}
-              onClick={this.onExpanderToggle}
+              className={"theme-twisty expander" + (isExpanded ? " open" : "")}
+              onClick={onExpanderToggle}
             ></span>
           ) : null}
-          {this.renderComponent()}
-          {this.renderEventBadge()}
+          {renderedComponent}
         </div>
-        {this.renderChildren()}
-        {this.renderClosingTag()}
-      </li>
+        {renderedChildren}
+        {renderedClosingTag}
+      </>
     );
   }
+
+  return (
+    <li
+      data-testid="Inspector-Nodes-Node"
+      className={classnames("child", {
+        collapsed: !isExpanded,
+        expandable: showExpander,
+      })}
+      role="presentation"
+      onClick={onSelectNodeClick}
+    >
+      {renderedNodeContent}
+    </li>
+  );
 }
 
-const mapStateToProps = (state: UIState, { nodeId }: NodeProps) => ({
-  node: getNode(state, nodeId)!,
-  rootNodeId: getRootNodeId(state),
-  isSelectedNode: nodeId === getSelectedNodeId(state),
-  isScrollIntoViewNode: nodeId === getScrollIntoViewNodeId(state),
-});
-const connector = connect(mapStateToProps, {
-  setActiveTab,
-  onSelectNode: selectNode,
-  expandNode,
-  collapseNode,
-  highlightNode,
-  unhighlightNode,
-  toggleNodeExpanded,
-});
-type PropsFromRedux = ConnectedProps<typeof connector>;
-const Node = connector(_Node);
-
-export default Node;
+export default React.memo(Node);

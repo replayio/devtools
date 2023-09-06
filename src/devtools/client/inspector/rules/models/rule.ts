@@ -21,7 +21,7 @@ export interface NodeWithId {
 }
 
 export interface RuleInheritance {
-  // The NodeFront object id for the element in which the rule is inherited from.
+  // The object id for the element in which the rule is inherited from.
   inheritedNodeId: string;
   // The display name for the element in which the rule is inherited from.
   inheritedSource: string | undefined;
@@ -119,7 +119,7 @@ export default class RuleModel {
     }
 
     return {
-      // The NodeFront object id for the element in which the rule is inherited from.
+      // The object id for the element in which the rule is inherited from.
       inheritedNodeId: this.inherited.nodeId,
       // The display name for the element in which the rule is inherited from.
       inheritedSource: this.inheritedSource,

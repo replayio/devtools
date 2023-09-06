@@ -6,7 +6,8 @@
 
 import React from "react";
 
-import type { Layout } from "../reducers/box-model";
+import type { Layout } from "ui/suspense/styleCaches";
+
 import BoxModelMain from "./BoxModelMain";
 import { BoxModelProperties } from "./BoxModelProperties";
 
@@ -26,19 +27,16 @@ function BoxModelInfo({ layout }: { layout: Layout }) {
 
 interface BMProps {
   boxModel: { layout: Layout };
-  showBoxModelProperties: boolean;
 }
 
-export function BoxModel({ boxModel, showBoxModelProperties }: BMProps) {
+export function BoxModel({ boxModel }: BMProps) {
   const { layout } = boxModel;
-
-  const boxModelProperties = showBoxModelProperties ? <BoxModelProperties layout={layout} /> : null;
 
   return (
     <div className="boxmodel-container" tabIndex={0}>
       <BoxModelMain layout={layout} />
       <BoxModelInfo layout={layout} />
-      {boxModelProperties}
+      <BoxModelProperties layout={layout} />
     </div>
   );
 }

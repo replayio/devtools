@@ -65,6 +65,10 @@ test("inspector-elements-04: Keyboard shortcuts should select the right DOM node
     const loadingChildren = elementsTree.getByText("Loading");
     const numChildren = await loadingChildren.count();
     expect(numChildren).toBe(0);
+
+    const divChildren = elementsTree.getByText("div");
+    const numDivChildren = await divChildren.count();
+    expect(numDivChildren).toBeGreaterThan(10);
   });
 
   await bodyTag.click();

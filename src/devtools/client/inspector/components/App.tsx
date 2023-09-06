@@ -89,9 +89,7 @@ export default function InspectorApp() {
                         <div className="tab-panel-box" role="tabpanel">
                           {activeTab === "computedview" && <ComputedApp />}
                           {activeTab === "eventsview" && <EventListenersApp />}
-                          {activeTab === "layoutview" && (
-                            <LayoutApp showBoxModelProperties={true} />
-                          )}
+                          {activeTab === "layoutview" && <LayoutApp />}
                           {activeTab === "ruleview" && <RulesApp />}
                         </div>
                       </div>

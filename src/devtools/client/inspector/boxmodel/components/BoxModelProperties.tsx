@@ -6,7 +6,8 @@
 
 import React, { useState } from "react";
 
-import type { Layout } from "../reducers/box-model";
+import type { Layout } from "ui/suspense/styleCaches";
+
 import { ComputedProperty } from "./ComputedProperty";
 
 interface BMProps {

@@ -103,16 +103,15 @@ export function setCanvas(canvas: Canvas): UIThunkAction {
 }
 
 export function fetchMouseTargetsForPause(): UIThunkAction<Promise<NodeBounds[] | undefined>> {
-  return async (dispatch, getState, { protocolClient }) => {
+  return async (dispatch, getState, { replayClient, protocolClient }) => {
     const state = getState();
     const pauseId = state.pause.id;
-    const sessionId = state.app.sessionId;
 
-    if (!sessionId || !pauseId) {
+    if (!pauseId) {
       return;
     }
 
-    return boundingRectsCache.readAsync(protocolClient, sessionId, pauseId);
+    return boundingRectsCache.readAsync(replayClient, pauseId);
   };
 }
 

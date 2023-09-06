@@ -2,6 +2,7 @@ import React, { PureComponent } from "react";
 
 import NodeConstants from "devtools/shared/dom-node-constants";
 import { assert } from "protocol/utils";
+import { reIsNotWhiteSpace } from "ui/suspense/nodeCaches";
 
 interface TextNodeProps {
   type: number;
@@ -13,7 +14,7 @@ class TextNode extends PureComponent<TextNodeProps> {
     const { type, value } = this.props;
     assert(typeof value === "string", "value not set in TextNode props");
     const isComment = type === NodeConstants.COMMENT_NODE;
-    const isWhiteSpace = !/[^\s]/.exec(value);
+    const isWhiteSpace = !reIsNotWhiteSpace.exec(value);
 
     return (
       <span className={"editor" + (isComment ? " comment" : " text ")}>

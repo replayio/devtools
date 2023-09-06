@@ -2,54 +2,42 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import React from "react";
-import { ConnectedProps, connect } from "react-redux";
+import React, { useContext } from "react";
+import { shallowEqual } from "react-redux";
+import { useImperativeCacheValue } from "suspense";
 
-import Accordion from "devtools/client/shared/components/Accordion";
-import { userData } from "shared/user-data/GraphQL/UserData";
-import type { UIState } from "ui/state";
+import { getPauseId } from "devtools/client/debugger/src/selectors";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { useAppSelector } from "ui/setup/hooks";
+import { layoutCache } from "ui/suspense/styleCaches";
 
 import { BoxModel } from "../../boxmodel/components/BoxModel";
+import { getSelectedNodeId } from "../../markup/selectors/markup";
 
-const mapStateToProps = (state: UIState) => ({
-  boxModel: state.boxModel,
-});
+function LayoutApp() {
+  const replayClient = useContext(ReplayClientContext);
+  const { pauseId, selectedNodeId } = useAppSelector(
+    state => ({
+      pauseId: getPauseId(state),
+      selectedNodeId: getSelectedNodeId(state),
+    }),
+    shallowEqual
+  );
 
-const connector = connect(mapStateToProps);
-type PropsFromRedux = ConnectedProps<typeof connector>;
+  const { value: layout, status: nodeStatus } = useImperativeCacheValue(
+    layoutCache,
+    replayClient,
+    pauseId,
+    selectedNodeId
+  );
 
-interface LayoutAppProps {
-  showBoxModelProperties: boolean;
+  const content = nodeStatus === "resolved" && layout ? <BoxModel boxModel={{ layout }} /> : null;
+
+  return (
+    <div className="layout-container">
+      <div className="h-full overflow-y-auto">{content}</div>
+    </div>
+  );
 }
 
-type FinalLAProps = PropsFromRedux & LayoutAppProps;
-
-class LayoutApp extends React.PureComponent<FinalLAProps> {
-  getBoxModelSection() {
-    return {
-      component: BoxModel,
-      componentProps: this.props,
-      contentClassName: "layout-content",
-      header: "Box Model",
-      id: "layout-section-boxmodel",
-      opened: userData.get("layout_inspectorBoxModelOpen"),
-      onToggle: (opened: boolean) => {
-        userData.set("layout_inspectorBoxModelOpen", opened);
-      },
-    };
-  }
-
-  render() {
-    const items = [this.getBoxModelSection()];
-
-    return (
-      <div className="layout-container">
-        <div className="h-full overflow-y-auto">
-          <Accordion items={items} style={{ overflow: "auto" }} />
-        </div>
-      </div>
-    );
-  }
-}
-
-export default connector(LayoutApp);
+export default React.memo(LayoutApp);

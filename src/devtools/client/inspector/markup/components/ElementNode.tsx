@@ -1,9 +1,11 @@
 import { Attr } from "@replayio/protocol";
-import React, { MouseEvent, PureComponent } from "react";
+import React, { MouseEvent, useMemo } from "react";
 
+import { useAppDispatch } from "ui/setup/hooks";
+
+import { toggleNodeExpanded } from "../actions/markup";
 import { NodeInfo } from "../reducers/markup";
 import NodeAttribute from "./NodeAttribute";
-import TextNode from "./TextNode";
 
 // Contains only void (without end tag) HTML elements.
 const HTML_VOID_ELEMENTS = [
@@ -25,65 +27,38 @@ const HTML_VOID_ELEMENTS = [
   "wbr",
 ];
 
-// Contains only valid computed display property types of the node to display in the
-// element markup and their respective title tooltip text.
-const DISPLAY_TYPES: { [key: string]: string | undefined } = {
-  flex: "This element behaves like a block element and lays out its content according to the flexbox model. Click to toggle the flexbox overlay for this element.",
-  "inline-flex":
-    "This element behaves like an inline element and lays out its content according to the flexbox model. Click to toggle the flexbox overlay for this element.",
-  grid: "This element behaves like a block element and lays out its content according to the grid model. Click to toggle the grid overlay for this element.",
-  "inline-grid":
-    "This element behaves like an inline element and lays out its content according to the grid model. Click to toggle the grid overlay for this element.",
-  subgrid:
-    "This element lays out its content according to the grid model but defers the definition of its rows and/or columns to its parent grid container.",
-  "flow-root":
-    "This element generates a block element box that establishes a new block formatting context.",
-  contents: "This element doesn’t produce a specific box by itself, but renders its contents.",
-};
+function ElementNode({ node }: { node: NodeInfo }) {
+  const dispatch = useAppDispatch();
 
-interface ElementNodeProps {
-  node: NodeInfo;
-  onToggleNodeExpanded: (nodeId: string, isExpanded: boolean) => void;
-}
-
-class ElementNode extends PureComponent<ElementNodeProps> {
-  constructor(props: ElementNodeProps) {
-    super(props);
-
-    this.onExpandBadgeClick = this.onExpandBadgeClick.bind(this);
-  }
-
-  onExpandBadgeClick(event: MouseEvent) {
+  const onExpandBadgeClick = (event: MouseEvent) => {
     event.stopPropagation();
-    this.props.onToggleNodeExpanded(this.props.node.id, false);
-  }
+    dispatch(toggleNodeExpanded(node.id, false));
+  };
 
-  renderAttributes() {
-    const { node } = this.props;
-    const attributes = node.attributes.slice().sort(compareAttributeNames);
+  const { displayName } = node;
 
-    return (
+  const renderedAttributes = useMemo(() => {
+    const sortedAttributes = node.attributes.slice().sort(compareAttributeNames);
+
+    const renderedAttributes = (
       <span>
-        {attributes.map(attribute => (
+        {sortedAttributes.map(attribute => (
           <NodeAttribute
             key={`${node.id}-${attribute.name}`}
             attribute={attribute}
-            attributes={attributes}
+            attributes={node.attributes}
             node={node}
           />
         ))}
       </span>
     );
-  }
+    return renderedAttributes;
+  }, [node]);
 
-  renderCloseTag() {
-    const { displayName } = this.props.node;
+  let renderedCloseTag: React.ReactNode = null;
 
-    if (HTML_VOID_ELEMENTS.includes(displayName)) {
-      return null;
-    }
-
-    return (
+  if (!HTML_VOID_ELEMENTS.includes(displayName)) {
+    renderedCloseTag = (
       <span className="close">
         {"</"}
         <span className="tag theme-fg-color3">{displayName}</span>
@@ -92,45 +67,24 @@ class ElementNode extends PureComponent<ElementNodeProps> {
     );
   }
 
-  renderDisplayBadge() {
-    const { displayType } = this.props.node;
-
-    if (!displayType || !(displayType in DISPLAY_TYPES)) {
-      return null;
-    }
-
-    return (
-      <div className="inspector-badge" title={DISPLAY_TYPES[displayType]}>
-        {displayType}
-      </div>
-    );
-  }
-
-  renderOpenTag() {
-    const { displayName } = this.props.node;
-
-    return (
-      <span className="open">
-        &lt;
-        <span className="tag theme-fg-color3" tabIndex={-1}>
-          {displayName}
-        </span>
-        {this.renderAttributes()}
-        <span className="closing-bracket">&gt;</span>
+  const renderedOpenTag = (
+    <span className="open">
+      &lt;
+      <span className="tag theme-fg-color3" tabIndex={-1}>
+        {displayName}
       </span>
-    );
-  }
+      {renderedAttributes}
+      <span className="closing-bracket">&gt;</span>
+    </span>
+  );
 
-  render() {
-    return (
-      <span className="editor">
-        {this.renderOpenTag()}
-        <span className="markup-expand-badge" onClick={this.onExpandBadgeClick}></span>
-        {this.renderCloseTag()}
-        {this.renderDisplayBadge()}
-      </span>
-    );
-  }
+  return (
+    <span className="editor">
+      {renderedOpenTag}
+      <span className="markup-expand-badge" onClick={onExpandBadgeClick}></span>
+      {renderedCloseTag}
+    </span>
+  );
 }
 
 /**

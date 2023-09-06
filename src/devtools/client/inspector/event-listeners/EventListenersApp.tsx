@@ -94,9 +94,9 @@ export const EventListenersApp = () => {
                       <ExpandableItem
                         key={i}
                         header={
-                          <div className="flex gap-2">
+                          <div className="flex flex-col ">
                             <XHTMLNode node={nodeWithPreview} />
-                            <span>
+                            <div>
                               {location && locationUrl ? (
                                 <span
                                   className="cursor-pointer underline hover:text-gray-500"
@@ -118,7 +118,7 @@ export const EventListenersApp = () => {
                               ) : (
                                 "[native code]"
                               )}
-                            </span>
+                            </div>
                           </div>
                         }
                       >

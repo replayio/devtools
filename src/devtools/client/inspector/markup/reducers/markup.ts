@@ -2,32 +2,27 @@
 import { EntityState, PayloadAction, createEntityAdapter, createSlice } from "@reduxjs/toolkit";
 import { Attr, BoxModel, PseudoType } from "@replayio/protocol";
 
+import { pauseRequestedAt } from "devtools/client/debugger/src/reducers/pause";
 import { userData } from "shared/user-data/GraphQL/UserData";
 import { UIState } from "ui/state";
 
 export interface NodeInfo {
   // A list of the node's attributes.
   attributes: Attr[];
-  // Array of child node object ids.
+  // All child nodes, regardless of type or loaded status
   children: string[];
-  // The display name for the UI. This is either the lower casee of the node's tag
+  // The display name for the UI. This is either the lower case of the node's tag
   // name or the doctype string for a document type node.
   displayName: string;
-  // The computed display style property value of the node.
-  displayType: string | undefined;
   // Whether or not the node has child nodes.
   hasChildren: boolean;
-  // Whether or not the node has event listeners.
-  hasEventListeners: boolean;
-  // An unique NodeFront object id.
+  // An unique object id.
   id: string;
-  // Whether or not the node is displayed. If a node has the attribute
-  // `display: none`, it is not displayed (faded in the markup view).
+  // Whether or not the node is attached to the document (?)
   isConnected: boolean;
-  isDisplayed: boolean;
   isElement: boolean;
   // Whether or not the node is expanded.
-  isExpanded: boolean;
+  // isExpanded: boolean;
   // The namespace URI of the node. NYI
   namespaceURI: string;
   // The object id of the parent node.
@@ -55,6 +50,8 @@ export type SelectionReason =
   | "keyboard"
   | "unknown";
 
+type ExpandedNodes = Record<string, boolean | undefined>;
+
 // export type MarkupTree = { [key: string]: NodeInfo | undefined };
 
 export interface MarkupState {
@@ -70,26 +67,16 @@ export interface MarkupState {
   // A node that should be scrolled into view.
   scrollIntoViewNode: string | null;
   highlightedNodes: string[] | null;
-  // True when the user has taken an action to highlight nodes in the video and
-  // the client is fetching the data required
-  highlightedNodesLoading: boolean;
   nodeBoxModels: EntityState<BoxModel>;
-  // An object representing the markup tree. The key to the object represents the object
-  // ID of a NodeFront of a given node. The value of each item in the object contains
-  // an object representing the properties of the given node.
-  tree: EntityState<NodeInfo>;
   // The document could not be loaded at the current execution point.
   loadingFailed: boolean;
+  expandedNodes: ExpandedNodes;
 }
 
 const nodeAdapter = createEntityAdapter<NodeInfo>();
 const boxModelAdapter = createEntityAdapter<BoxModel>({
   selectId: boxModel => boxModel.node,
 });
-
-export const { selectById: getMarkupNodeById } = nodeAdapter.getSelectors(
-  (state: UIState) => state.markup.tree
-);
 
 export const { selectById: getNodeBoxModelById } = boxModelAdapter.getSelectors(
   (state: UIState) => state.markup.nodeBoxModels
@@ -102,11 +89,10 @@ const initialState: MarkupState = {
   selectedNode: null,
   selectionReason: null,
   scrollIntoViewNode: null,
+  expandedNodes: {},
   highlightedNodes: null,
-  highlightedNodesLoading: false,
   loadingFailed: false,
   nodeBoxModels: boxModelAdapter.getInitialState(),
-  tree: nodeAdapter.getInitialState(),
 };
 
 const markupSlice = createSlice({
@@ -116,31 +102,17 @@ const markupSlice = createSlice({
     resetMarkup() {
       return initialState;
     },
-    newRootAdded(state, action: PayloadAction<NodeInfo>) {
-      nodeAdapter.setAll(state.tree, [action.payload]);
-      state.rootNode = action.payload.id;
-    },
-    childrenAdded(state, action: PayloadAction<{ parent: NodeInfo; children: NodeInfo[] }>) {
-      const { parent, children } = action.payload;
-
-      nodeAdapter.addMany(state.tree, children);
-      if (!state.tree.entities[parent.id]) {
-        // If by chance the parent doesn't exist yet, add it
-        nodeAdapter.upsertOne(state.tree, parent);
-      }
-      let parentNodeInfo = state.tree.entities[parent.id]!;
-      parentNodeInfo.children = children.map(child => child.id);
+    newRootAdded(state, action: PayloadAction<string>) {
+      state.rootNode = action.payload;
     },
     updateNodeExpanded(state, action: PayloadAction<{ nodeId: string; isExpanded: boolean }>) {
       const { nodeId, isExpanded } = action.payload;
-      nodeAdapter.updateOne(state.tree, { id: nodeId, changes: { isExpanded } });
+      state.expandedNodes[nodeId] = isExpanded;
     },
-    updateChildrenLoading(
-      state,
-      action: PayloadAction<{ nodeId: string; isLoadingChildren: boolean }>
-    ) {
-      const { nodeId, isLoadingChildren } = action.payload;
-      nodeAdapter.updateOne(state.tree, { id: nodeId, changes: { isLoadingChildren } });
+    expandMultipleNodes(state, action: PayloadAction<string[]>) {
+      action.payload.forEach(nodeId => {
+        state.expandedNodes[nodeId] = true;
+      });
     },
     nodeSelected: {
       reducer(
@@ -166,9 +138,7 @@ const markupSlice = createSlice({
     nodeBoxModelsLoaded(state, action: PayloadAction<BoxModel[]>) {
       boxModelAdapter.setAll(state.nodeBoxModels, action);
     },
-    setHighlightedNodesLoading(state, action: PayloadAction<boolean>) {
-      state.highlightedNodesLoading = action.payload;
-    },
+
     nodeHighlightingCleared(state) {
       state.highlightedNodes = null;
     },
@@ -179,6 +149,13 @@ const markupSlice = createSlice({
   },
   extraReducers: builder => {
     // dispatched by actions/timeline.ts, in `playback()`
+    builder.addCase(pauseRequestedAt, () => {
+      // We need to reset this whenever the timeline is paused,
+      // and do so as early in the pause processing sequence as possible
+      // (before the UI really starts rendering).
+      // This will avoid mismatches in fetching node data.
+      return initialState;
+    });
     builder.addCase("pause/resumed", (state, action) => {
       // Clear out the DOM nodes data whenever the user hits "Play" in the timeline.
       // However, preserve whatever nodes may be highlighted at the time,
@@ -196,15 +173,13 @@ const markupSlice = createSlice({
 export const {
   newRootAdded,
   resetMarkup,
-  childrenAdded,
   updateNodeExpanded,
-  updateChildrenLoading,
+  expandMultipleNodes,
   nodeSelected,
   updateScrollIntoViewNode,
   nodesHighlighted,
   nodeBoxModelsLoaded,
   nodeHighlightingCleared,
-  setHighlightedNodesLoading,
   updateLoadingFailed,
 } = markupSlice.actions;
 

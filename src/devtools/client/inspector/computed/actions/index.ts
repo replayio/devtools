@@ -1,17 +1,11 @@
-import { Action, ThunkAction } from "@reduxjs/toolkit";
+import { Action } from "@reduxjs/toolkit";
 
 import CSSProperties from "third-party/css/css-properties";
 import { OutputParser } from "third-party/css/output-parser";
-import { computedStyleCache } from "ui/suspense/styleCaches";
-import { ThunkExtraArgs } from "ui/utils/thunk";
 
 import ElementStyle from "../../rules/models/element-style";
 import { ComputedPropertyState, MatchedSelectorState } from "../state";
-import { InspectorState } from "../state";
 
-type SetComputedPropertiesAction = Action<"set_computed_properties"> & {
-  properties: ComputedPropertyState[];
-};
 type SetComputedPropertySearchAction = Action<"set_computed_property_search"> & { search: string };
 type SetShowBrowserStylesAction = Action<"set_show_browser_styles"> & { show: boolean };
 type SetComputedPropertyExpandedAction = Action<"set_computed_property_expanded"> & {
@@ -19,31 +13,9 @@ type SetComputedPropertyExpandedAction = Action<"set_computed_property_expanded"
   expanded: boolean;
 };
 export type ComputedAction =
-  | SetComputedPropertiesAction
   | SetComputedPropertySearchAction
   | SetShowBrowserStylesAction
   | SetComputedPropertyExpandedAction;
-
-export type InspectorThunkAction<TReturn = void> = ThunkAction<
-  TReturn,
-  InspectorState,
-  ThunkExtraArgs,
-  ComputedAction
->;
-
-export function setComputedProperties(elementStyle: ElementStyle): InspectorThunkAction {
-  return async (dispatch, getState, { protocolClient, ThreadFront, replayClient }) => {
-    const pauseId = await ThreadFront.getCurrentPauseId(replayClient);
-    const computed = await computedStyleCache.readAsync(
-      protocolClient,
-      ThreadFront.sessionId!,
-      pauseId,
-      elementStyle.nodeId
-    );
-    const properties = await createComputedProperties(elementStyle, computed);
-    return dispatch({ type: "set_computed_properties", properties });
-  };
-}
 
 export function setComputedPropertySearch(search: string): SetComputedPropertySearchAction {
   return { type: "set_computed_property_search", search };
@@ -60,7 +32,7 @@ export function setComputedPropertyExpanded(
   return { type: "set_computed_property_expanded", property, expanded };
 }
 
-async function createComputedProperties(
+export async function createComputedProperties(
   elementStyle: ElementStyle,
   computed: Map<string, string> | undefined
 ): Promise<ComputedPropertyState[]> {

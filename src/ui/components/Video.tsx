@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
 import { PreviewNodeHighlighter } from "devtools/client/inspector/markup/components/PreviewNodeHighlighter";
-import { getHighlightedNodesLoading } from "devtools/client/inspector/markup/selectors/markup";
 import { installObserver, refreshGraphics } from "protocol/graphics";
 import {
   getAreMouseTargetsLoading,
@@ -31,7 +30,6 @@ export default function Video() {
   const videoUrl = useAppSelector(getVideoUrl);
   const stalled = useAppSelector(isPlaybackStalled);
   const mouseTargetsLoading = useAppSelector(getAreMouseTargetsLoading);
-  const highlightedNodesLoading = useAppSelector(getHighlightedNodesLoading);
 
   const isPaused = !playback;
   const isNodeTarget = recordingTarget == "node";
@@ -43,7 +41,7 @@ export default function Video() {
   const [showDelayedSpinner, setShowDelayedSpinner] = useState(false);
 
   useEffect(() => {
-    if (highlightedNodesLoading || (isNodePickerActive && mouseTargetsLoading) || stalled) {
+    if ((isNodePickerActive && mouseTargetsLoading) || stalled) {
       const timerId = setTimeout(() => {
         setShowDelayedSpinner(true);
       }, 700);
@@ -53,7 +51,7 @@ export default function Video() {
     } else {
       setShowDelayedSpinner(false);
     }
-  }, [highlightedNodesLoading, isNodePickerActive, mouseTargetsLoading, stalled]);
+  }, [isNodePickerActive, mouseTargetsLoading, stalled]);
 
   useEffect(() => {
     installObserver();

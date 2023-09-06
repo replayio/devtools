@@ -1,8 +1,9 @@
 import classnames from "classnames";
 import React, { FC, useState } from "react";
 
+import { DeclarationState } from "ui/suspense/styleCaches";
+
 import DeclarationValue from "../../rules/components/DeclarationValue";
-import { DeclarationState } from "../reducers/rules";
 
 type DeclarationProps = {
   declaration: DeclarationState;

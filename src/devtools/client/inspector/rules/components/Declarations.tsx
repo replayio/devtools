@@ -1,8 +1,7 @@
 import React, { FC } from "react";
 
 import { Declaration } from "devtools/client/inspector/rules/components/Declaration";
-
-import { DeclarationState } from "../reducers/rules";
+import { DeclarationState } from "ui/suspense/styleCaches";
 
 type DeclarationsProps = {
   declarations: DeclarationState[];

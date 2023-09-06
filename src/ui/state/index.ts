@@ -7,11 +7,9 @@ import type { SourceTreeState } from "devtools/client/debugger/src/reducers/sour
 import type { TabsState } from "devtools/client/debugger/src/reducers/tabs";
 import type { ThreadsState } from "devtools/client/debugger/src/reducers/threads";
 import type { UISliceState } from "devtools/client/debugger/src/reducers/ui";
-import { BoxModelState } from "devtools/client/inspector/boxmodel/reducers/box-model";
 import { ComputedState } from "devtools/client/inspector/computed/state";
 import { MarkupState } from "devtools/client/inspector/markup/reducers/markup";
 import { InspectorState } from "devtools/client/inspector/reducers";
-import { RulesState } from "devtools/client/inspector/rules/reducers/rules";
 import { NetworkState } from "ui/reducers/network";
 import { ProtocolMessagesState } from "ui/reducers/protocolMessages";
 import type { SourcesState as NewSourcesState } from "ui/reducers/sources";
@@ -26,7 +24,6 @@ export interface UIState {
   app: AppState;
   ast: ASTState;
   asyncRequests: AsyncRequestsState;
-  boxModel: BoxModelState;
   computed: ComputedState;
   sources: NewSourcesState;
   inspector: InspectorState;
@@ -38,7 +35,6 @@ export interface UIState {
   protocolMessages: ProtocolMessagesState;
   quickOpen: QuickOpenState;
   reactDevTools: ReactDevToolsState;
-  rules: RulesState;
   sourceTree: SourceTreeState;
   tabs: TabsState;
   threads: ThreadsState;

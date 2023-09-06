@@ -1,12 +1,11 @@
 import { Attr } from "@replayio/protocol";
-import React, { PureComponent } from "react";
-import { ConnectedProps, connect } from "react-redux";
+import React, { useContext } from "react";
 
 import { truncateString } from "devtools/shared/inspector/utils";
 import { parseAttribute } from "third-party/node-attribute-parser";
-import { UIState } from "ui/state";
 
 import { NodeInfo } from "../reducers/markup";
+import { MarkupContext } from "./MarkupContext";
 
 const COLLAPSE_DATA_URL_REGEX = /^data.+base64/;
 const COLLAPSE_DATA_URL_LENGTH = 60;
@@ -17,69 +16,62 @@ interface NodeAttributeProps {
   node: NodeInfo;
 }
 
-class NodeAttribute extends PureComponent<NodeAttributeProps & PropsFromRedux> {
-  /**
-   * Truncates the given attribute value if it is a base65 data URL or the
-   * collapse attributes pref is enabled.
-   *
-   * @param  {String} value
-   *         Attribute value.
-   * @return {String} truncated attribute value.
-   */
-  truncateValue(value: string) {
-    if (value && value.match(COLLAPSE_DATA_URL_REGEX)) {
-      return truncateString(value, COLLAPSE_DATA_URL_LENGTH);
-    }
-
-    const { collapseAttributes, collapseAttributeLength } = this.props;
-    return collapseAttributes ? truncateString(value, collapseAttributeLength) : value;
+/**
+ * Truncates the given attribute value if it is a base65 data URL or the
+ * collapse attributes pref is enabled.
+ *
+ * @param  {String} value
+ *         Attribute value.
+ * @return {String} truncated attribute value.
+ */
+function truncateValue(
+  value: string,
+  collapseAttributes: boolean,
+  collapseAttributeLength: number
+) {
+  if (value && value.match(COLLAPSE_DATA_URL_REGEX)) {
+    return truncateString(value, COLLAPSE_DATA_URL_LENGTH);
   }
 
-  render() {
-    const { attribute, attributes, node } = this.props;
-    // Parse the attribute value to detect whether there are linkable parts in it
-    const parsedLinksData = parseAttribute(
-      node.namespaceURI,
-      node.tagName!,
-      attributes,
-      attribute.name,
-      attribute.value
-    );
-    const values = [];
-
-    for (const token of parsedLinksData) {
-      if (token.type === "string") {
-        values.push(this.truncateValue(token.value));
-      } else {
-        values.push(
-          <span key={token.value} className="link" data-link={token.value} data-type={token.type}>
-            {this.truncateValue(token.value)}
-          </span>
-        );
-      }
-    }
-
-    return (
-      <span className="attreditor" data-attr={attribute.name} data-value={attribute.value}>
-        {" "}
-        <span className="editable" tabIndex={0}>
-          <span className="attr-name theme-fg-color1">{attribute.name}</span>
-          {'="'}
-          <span className="attr-value theme-fg-color2">{values}</span>
-          {'"'}
-        </span>
-      </span>
-    );
-  }
+  return collapseAttributes ? truncateString(value, collapseAttributeLength) : value;
 }
 
-const mapStateToProps = (state: UIState) => {
-  return {
-    collapseAttributes: state.markup.collapseAttributes,
-    collapseAttributeLength: state.markup.collapseAttributeLength,
-  };
-};
-const connector = connect(mapStateToProps);
-type PropsFromRedux = ConnectedProps<typeof connector>;
+function NodeAttribute({ attribute, attributes, node }: NodeAttributeProps) {
+  const { collapseAttributes, collapseAttributeLength } = useContext(MarkupContext);
 
-export default connector(NodeAttribute);
+  // Parse the attribute value to detect whether there are linkable parts in it
+  const parsedLinksData = parseAttribute(
+    node.namespaceURI,
+    node.tagName!,
+    attributes,
+    attribute.name,
+    attribute.value
+  );
+  const values = [];
+
+  for (const token of parsedLinksData) {
+    if (token.type === "string") {
+      values.push(truncateValue(token.value, collapseAttributes, collapseAttributeLength));
+    } else {
+      values.push(
+        <span key={token.value} className="link" data-link={token.value} data-type={token.type}>
+          {truncateValue(token.value, collapseAttributes, collapseAttributeLength)}
+        </span>
+      );
+    }
+  }
+
+  return (
+    <span className="attreditor" data-attr={attribute.name} data-value={attribute.value}>
+      {" "}
+      <span className="editable" tabIndex={0}>
+        <span className="attr-name theme-fg-color1">{attribute.name}</span>
+        {'="'}
+        <span className="attr-value theme-fg-color2">{values}</span>
+        {'"'}
+      </span>
+    </span>
+  );
+}
+
+export default React.memo(NodeAttribute);
