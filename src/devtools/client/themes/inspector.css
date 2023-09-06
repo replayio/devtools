@@ -177,10 +177,6 @@ window {
   height: 100%;
 }
 
-#ruleview-container .accordion {
-  height: auto;
-}
-
 /* Override `-moz-user-focus:ignore;` from toolkit/content/minimal-xul.css */
 .inspector-tabpanel > * {
   -moz-user-focus: normal;
@@ -214,13 +210,11 @@ iframe {
 }
 
 #inspector-search,
-#ruleview-search,
 #computed-search {
   flex-grow: 1;
 }
 
 #inspector-searchbox,
-#ruleview-searchbox,
 #computed-searchbox {
   width: 100%;
 }

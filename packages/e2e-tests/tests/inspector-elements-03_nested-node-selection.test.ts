@@ -70,7 +70,7 @@ test("inspector-elements-03: Nested node picker and selection behavior", async (
   });
 
   const canvas = page.locator("canvas#graphics");
-  const rulesContainer = page.locator("#ruleview-container");
+  const rulesContainer = page.locator('[data-test-id="RulesPanel"]');
 
   await bodyTag.click();
 

@@ -6,12 +6,12 @@ import { createComputedProperties } from "devtools/client/inspector/computed/act
 import { ComputedPropertyState } from "devtools/client/inspector/computed/state";
 import ElementStyle from "devtools/client/inspector/rules/models/element-style";
 import { RuleFront } from "devtools/client/inspector/rules/models/fronts/rule";
-import RuleModel from "devtools/client/inspector/rules/models/rule";
 import type {
   RuleInheritance,
   RuleSelector,
   SourceLink,
 } from "devtools/client/inspector/rules/models/rule";
+import RuleModel from "devtools/client/inspector/rules/models/rule";
 import TextProperty, {
   ComputedPropertyInfo,
   Priority,

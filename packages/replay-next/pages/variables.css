@@ -128,6 +128,7 @@
 :root.prefers-default-font-size {
   --font-size-large: 16px;
   --font-size-regular: 12px;
+  --font-size-regular-monospace: 11px;
   --font-size-small: 10px;
   --font-size-tiny: 8px;
 }
@@ -135,6 +136,7 @@
 :root.prefers-large-font-size {
   --font-size-large: 20px;
   --font-size-regular: 14px;
+  --font-size-regular-monospace: 13px;
   --font-size-small: 12px;
   --font-size-tiny: 10px;
 }
@@ -417,15 +419,6 @@
   --marginbox-color: #73764a;
   --paddingbox-color: #6657a6;
   --position-border-color: var(--grey-40);
-
-  /* src/devtools/client/themes/rules.css */
-  --rule-header-background-color: #222225;
-  --rule-highlight-background-color: #521c76;
-  --rule-overridden-name-text-color: var(--grey-45);
-  --rule-overridden-value-text-color: #787878;
-  --rule-pseudo-class-text-color: var(--yellow-50);
-  --rule-unused-name-text-color: var(--grey-45);
-  --rule-unused-value-text-color: #787878;
 
   /* src/devtools/client/themes/changes.css */
   --diff-add-background-color: rgba(18, 188, 0, 0.15);
@@ -946,15 +939,6 @@
   --marginbox-color: #fdffdf;
   --paddingbox-color: #e3dcff;
   --position-border-color: var(--grey-50);
-
-  /* src/devtools/client/themes/rules.css */
-  --rule-header-background-color: var(--theme-toolbar-background);
-  --rule-highlight-background-color: var(--theme-highlight-yellow);
-  --rule-overridden-name-text-color: var(--grey-50);
-  --rule-overridden-value-text-color: var(--grey-45);
-  --rule-pseudo-class-text-color: var(--yellow-70);
-  --rule-unused-name-text-color: var(--grey-50);
-  --rule-unused-value-text-color: var(--grey-45);
 
   /* src/devtools/client/themes/changes.css */
   --diff-add-background-color: #f1feec;

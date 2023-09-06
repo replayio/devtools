@@ -1,0 +1,88 @@
+.DeclarationState,
+.Inheritance,
+.PseudoElement,
+.RuleStateFooter,
+.RuleStateHeader {
+  font-family: var(--font-family-monospace);
+  font-size: var(--font-size-regular-monospace);
+  white-space: pre;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0 1ch;
+  line-height: 22px;
+}
+
+.Inheritance,
+.PseudoElement {
+  background: var(--theme-toolbar-background);
+  border-bottom: 1px solid var(--theme-splitter-color);
+  color: var(--theme-toolbar-color);
+  user-select: none;
+}
+
+.PseudoElementExpandableHeader {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.RuleStateHeader {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--theme-splitter-color);
+}
+
+.SelectorText,
+.SourceLink {
+  display: inline;
+  white-space: pre;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.SelectorText {
+  flex: 0 1 auto;
+}
+.SourceLink {
+  flex: 1 1 auto;
+  color: var(--color-dim);
+  text-align: right;
+  direction: rtl;
+  user-select: none;
+}
+
+.DeclarationName {
+  display: inline;
+  color: var(--theme-highlight-blue);
+  margin-left: 2ch;
+}
+.DeclarationValue {
+  display: inline;
+}
+
+.ColorToken {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  margin-right: 1ch;
+}
+
+.DeclarationState[data-overridden],
+.DeclarationState[data-overridden] .DeclarationName,
+.DeclarationState[data-overridden] .DeclarationValue {
+  color: var(--color-dim);
+  text-decoration: line-through solid var(--color-dim);
+}
+.DeclarationState[data-overridden] .ColorToken {
+  display: none;
+}
+
+.SelectorText[data-highlight],
+.DeclarationName[data-highlight],
+.DeclarationValue[data-highlight] {
+  background-color: mark;
+  color: markText;
+}

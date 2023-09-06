@@ -186,15 +186,16 @@ export async function verifyStackingTestCaseSelectedElementUnderCursor(
   // Now, grab the updated list entries from the "Rules" panel,
   // and parse out the name of each rule.
   await waitFor(async () => {
-    const rulesEntries = rulesContainer.locator(".ruleview-rule");
+    const ruleSelectors = rulesContainer.locator('[data-test-name="RuleListItem-RuleState"]');
+    const count = await ruleSelectors.count();
+    expect(count).toEqual(testCase.expectedRules.length);
 
-    const ruleSelectors = await mapLocators(rulesEntries, entryLocator =>
-      entryLocator.locator(".ruleview-selectorcontainer").textContent()
-    );
+    for (let index = 0; index < count; index++) {
+      const ruleSelector = ruleSelectors.nth(index);
+      const textContent = await ruleSelector.textContent();
 
-    expect(ruleSelectors, `Incorrect rules found for test case: ${testCase.id}`).toEqual(
-      testCase.expectedRules
-    );
+      expect(textContent?.startsWith(testCase.expectedRules[index])).toBe(true);
+    }
   });
 }
 

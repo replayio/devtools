@@ -88,10 +88,6 @@
 #inspector-search.devtools-searchbox::before {
   -webkit-mask-image: url(~devtools/client/themes/images/search.svg) !important;
 }
-.inspector #computed-search.devtools-searchbox::before,
-.inspector #ruleview-search.devtools-searchbox::before {
-  -webkit-mask-image: url(~devtools/client/themes/images/filter-small.svg) !important;
-}
 .devtools-searchinput-clear {
   background-image: url(~devtools/client/themes/images/search-clear.svg) !important;
 }

@@ -8,12 +8,12 @@ import { assert } from "protocol/utils";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import {
+  canHighlightNode,
   canRenderNodeInfo,
   getCurrentRenderableChildNodeIds,
   processedNodeDataCache,
   renderableChildNodesCache,
 } from "ui/suspense/nodeCaches";
-import { canHighlightNode } from "ui/suspense/nodeCaches";
 
 import { highlightNode, selectNode, toggleNodeExpanded, unhighlightNode } from "../actions/markup";
 import { getIsNodeExpanded, getScrollIntoViewNodeId, getSelectedNodeId } from "../selectors/markup";
