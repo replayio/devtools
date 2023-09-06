@@ -1,6 +1,5 @@
 import { Locator, Page, expect } from "@playwright/test";
 import chalk from "chalk";
-import { string } from "yargs";
 
 import { debugPrint, waitFor } from "./utils";
 
