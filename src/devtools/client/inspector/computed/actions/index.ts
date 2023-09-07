@@ -4,6 +4,8 @@ import CSSProperties from "third-party/css/css-properties";
 import { OutputParser } from "third-party/css/output-parser";
 
 import ElementStyle from "../../rules/models/element-style";
+import RuleModel from "../../rules/models/rule";
+import { ComputedProperty } from "../../rules/models/text-property";
 import { ComputedPropertyState, MatchedSelectorState } from "../state";
 
 type SetComputedPropertySearchAction = Action<"set_computed_property_search"> & { search: string };
@@ -32,6 +34,8 @@ export function setComputedPropertyExpanded(
   return { type: "set_computed_property_expanded", property, expanded };
 }
 
+const cachedParsedProperties = new Map<string, (string | Record<string, unknown>)[]>();
+
 export async function createComputedProperties(
   elementStyle: ElementStyle,
   computed: Map<string, string> | undefined
@@ -41,6 +45,9 @@ export async function createComputedProperties(
   }
 
   const outputParser = new OutputParser(document, CSSProperties);
+
+  const NO_RULES: RuleModel[] = [];
+  const NO_COMPUTEDS: ComputedProperty[] = [];
 
   const properties: ComputedPropertyState[] = [];
   for (const [name, value] of computed) {
@@ -52,7 +59,7 @@ export async function createComputedProperties(
 
     let inheritanceCounter = 1;
     const selectors: MatchedSelectorState[] = [];
-    for (const rule of elementStyle.rules || []) {
+    for (const rule of elementStyle.rules || NO_RULES) {
       if (rule.isUnmatched) {
         continue;
       }
@@ -83,10 +90,18 @@ export async function createComputedProperties(
         stylesheetURL = "#";
       }
 
+      // TODO [FE-1895+] This is an O(n^4) loop, which is _awful_.
+      // We should find a better way to do this.
       for (const declaration of rule.declarations) {
-        for (const property of declaration.computed || []) {
+        for (const property of declaration.computed || NO_COMPUTEDS) {
           if (property.name === name) {
-            const parsedValue = outputParser.parseCssProperty(name, property.value);
+            const combinedNameValue = `${name}:${property.value}`;
+            let parsedValue = cachedParsedProperties.get(combinedNameValue)!;
+            if (!parsedValue) {
+              parsedValue = outputParser.parseCssProperty(name, property.value);
+              cachedParsedProperties.set(combinedNameValue, parsedValue);
+            }
+
             selectors.push({
               value: property.value,
               parsedValue,
