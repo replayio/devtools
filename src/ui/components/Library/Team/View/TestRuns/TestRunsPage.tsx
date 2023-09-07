@@ -20,24 +20,45 @@ export function TestRunsPage() {
 
 function TestRunsContent() {
   const {
+    filterByBranch,
     filterByStatus,
     filterByText,
     filterByTextForDisplay,
+    setFilterByBranch,
     setFilterByStatus,
     setFilterByText,
   } = useContext(TestRunsContext);
 
   const {
-    contextMenu,
-    onContextMenu: onClick,
-    onKeyDown,
+    contextMenu: contextMenuStatusFilter,
+    onContextMenu: onClickStatusFilter,
+    onKeyDown: onKeyDownStatusFilter,
   } = useContextMenu(
     <>
       <ContextMenuItem dataTestId="show-all-runs" onSelect={() => setFilterByStatus("all")}>
-        Show all runs
+        All runs
       </ContextMenuItem>
       <ContextMenuItem dataTestId="show-only-failures" onSelect={() => setFilterByStatus("failed")}>
-        Show only failures
+        Only failures
+      </ContextMenuItem>
+    </>,
+    { alignTo: "auto-target" }
+  );
+
+  const {
+    contextMenu: contextMenuBranchFilter,
+    onContextMenu: onClickBranchFilter,
+    onKeyDown: onKeyDownBranchFilter,
+  } = useContextMenu(
+    <>
+      <ContextMenuItem dataTestId="show-all-branches" onSelect={() => setFilterByBranch("all")}>
+        All branches
+      </ContextMenuItem>
+      <ContextMenuItem
+        dataTestId="show-only-primary-branch"
+        onSelect={() => setFilterByBranch("primary")}
+      >
+        Only primary branch
       </ContextMenuItem>
     </>,
     { alignTo: "auto-target" }
@@ -51,19 +72,30 @@ function TestRunsContent() {
             <div className="flex flex-row items-center justify-between gap-2 border-b border-themeBorder bg-bodyBgcolor p-2">
               <div
                 className={styles.dropdownTrigger}
-                data-test-id="TestRunsPage-DropdownTrigger"
-                onClick={onClick}
-                onKeyDown={onKeyDown}
+                data-test-id="TestRunsPage-ResultFilter-DropdownTrigger"
+                onClick={onClickStatusFilter}
+                onKeyDown={onKeyDownStatusFilter}
                 tabIndex={0}
               >
-                {filterByStatus === "all" ? "Show all runs" : "Show only failures"}
+                {filterByStatus === "all" ? "All runs" : "Only failures"}
                 <Icon className="h-5 w-5" type="chevron-down" />
               </div>
-              {contextMenu}
+              {contextMenuStatusFilter}
+              <div
+                className={styles.dropdownTrigger}
+                data-test-id="TestRunsPage-BranchFilter-DropdownTrigger"
+                onClick={onClickBranchFilter}
+                onKeyDown={onKeyDownBranchFilter}
+                tabIndex={0}
+              >
+                {filterByBranch === "all" ? "All branches" : "Only primary branch"}
+                <Icon className="h-5 w-5" type="chevron-down" />
+              </div>
+              {contextMenuBranchFilter}
               <div className={styles.filterContainer}>
                 <input
                   className={styles.filterInput}
-                  data-test-id="TestRunsPage-FilterInput"
+                  data-test-id="TestRunsPage-FilterByText-Input"
                   onChange={event => setFilterByText(event.currentTarget.value)}
                   placeholder="Filter test runs"
                   type="text"

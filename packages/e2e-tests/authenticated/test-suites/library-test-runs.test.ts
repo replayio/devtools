@@ -6,10 +6,15 @@ import {
   filterTestRunsList,
   findTestRunsInList,
   getTestRunAttribute,
+  getVisibleBranchNames,
 } from "../../helpers/test-suites";
 
 test(`authenticated/test-suites/library-test-runs`, async ({ page }) => {
   await startLibraryTest(page, E2E_USER_3_API_KEY, E2E_USER_3_TEAM_ID);
+
+  await filterTestRunsList(page, { branch: "primary" });
+  await expect(await getVisibleBranchNames(page)).toEqual(["main"]);
+  await filterTestRunsList(page, { branch: "all" });
 
   await filterTestRunsList(page, { status: "failed" });
   await expect(await findTestRunsInList(page, { status: "success" }).count()).toBe(0);
