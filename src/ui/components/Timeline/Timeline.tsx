@@ -1,5 +1,6 @@
-import { MouseEvent, useLayoutEffect, useRef, useState } from "react";
+import { MouseEvent, useContext, useLayoutEffect, useRef, useState } from "react";
 
+import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { throttle } from "shared/utils/function";
 import {
   seek,
@@ -43,6 +44,8 @@ export default function Timeline() {
   const timelineDimensions = useAppSelector(selectors.getTimelineDimensions);
   const zoomRegion = useAppSelector(selectors.getZoomRegion);
   const isPlaying = useAppSelector(isPlayingSelector);
+
+  const { rangeForDisplay } = useContext(FocusContext);
 
   const progressBarRef = useRef<HTMLDivElement>(null);
 
@@ -129,7 +132,12 @@ export default function Timeline() {
   return (
     <>
       <FocusModePopout updateFocusWindowThrottled={updateFocusWindowThrottled} />
-      <div className="timeline">
+      <div
+        className="timeline"
+        data-test-id="Timeline"
+        data-test-focus-begin-time={rangeForDisplay?.begin?.time}
+        data-test-focus-end-time={rangeForDisplay?.end?.time}
+      >
         <div className="commands">
           <PlayPauseButton />
         </div>
@@ -144,7 +152,7 @@ export default function Timeline() {
         >
           <div className="progress-bar-stack" onContextMenu={onContextMenu}>
             <ProtocolTimeline />
-            <div className="progress-bar" ref={progressBarRef}>
+            <div className="progress-bar" data-test-id="Timeline-ProgressBar" ref={progressBarRef}>
               <ProgressBars />
               <PreviewMarkers />
               <div className="comments-container">

@@ -762,11 +762,13 @@ export async function verifyLogPointPanelContent(
     badge?: Badge | null;
     content?: string;
     condition?: string;
+    errorMessage?: string;
+    hitPointsBadge?: string;
     lineNumber: number;
     url?: string;
   }
 ) {
-  const { badge, condition, content, lineNumber, url } = options;
+  const { badge, condition, content, errorMessage, hitPointsBadge, lineNumber, url } = options;
 
   await debugPrint(
     page,
@@ -778,22 +780,37 @@ export async function verifyLogPointPanelContent(
 
   const line = await getSourceLine(page, lineNumber);
 
-  if (badge !== undefined) {
-    const button = await line.locator('[data-test-name="BadgePickerButton"]');
-    await expect(await button.getAttribute("data-test-state")).toBe(
-      badge === null ? "default" : badge
-    );
-  }
+  await waitFor(async () => {
+    if (badge !== undefined) {
+      const button = await line.locator('[data-test-name="BadgePickerButton"]');
+      await expect(await button.getAttribute("data-test-state")).toBe(
+        badge === null ? "default" : badge
+      );
+    }
 
-  if (condition != null) {
-    const input = await line.locator('[data-test-name="PointPanel-ConditionalWrapper"]');
-    await expect(await input.textContent()).toBe(condition);
-  }
+    if (condition != null) {
+      const input = await line.locator('[data-test-name="PointPanel-ConditionalWrapper"]');
+      await expect(await input.textContent()).toBe(condition);
+    }
 
-  if (content != null) {
-    const input = await line.locator('[data-test-name="PointPanel-ContentWrapper"]');
-    await expect(await input.textContent()).toBe(content);
-  }
+    if (content != null) {
+      const input = await line.locator('[data-test-name="PointPanel-ContentWrapper"]');
+      await expect(await input.textContent()).toBe(content);
+    }
+
+    if (errorMessage != null) {
+      const element = await line.locator('[data-test-name="PointPanel-ErrorMessage"]');
+      await expect(await element.textContent()).toBe(errorMessage);
+    }
+
+    if (hitPointsBadge != null) {
+      const input = line.locator('[data-test-name="LogPointCurrentStepInput"]');
+      const inputValue = await input.getAttribute("value");
+      const capsule = await line.locator('[data-test-name="LogPointDenominator"]');
+      const capsuleText = await capsule.textContent();
+      await expect(`${inputValue}/${capsuleText}`).toBe(hitPointsBadge);
+    }
+  });
 }
 
 export async function waitForSourceLineHitCounts(page: Page, lineNumber: number) {

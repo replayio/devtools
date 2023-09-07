@@ -431,11 +431,18 @@ function PointPanelWithHitPoints({
 
       <div className={styles.EditableContentWrapperRow}>
         {showTooManyPointsErrorMessage ? (
-          <div className={styles.ContentWrapperTooManyPoints}>
+          <div
+            className={styles.ContentWrapperTooManyPoints}
+            data-test-name="PointPanel-ErrorMessage"
+          >
             {hitPointStatus === "too-many-points-to-find" ? (
               <div>
                 Use{" "}
-                <span className={styles.FocusModeLink} onClick={enterFocusMode}>
+                <span
+                  className={styles.FocusModeLink}
+                  data-test-name="LogPointPanel-FocusModeLink"
+                  onClick={enterFocusMode}
+                >
                   Focus Mode
                 </span>{" "}
                 to reduce the number of hits.
@@ -443,11 +450,19 @@ function PointPanelWithHitPoints({
             ) : (
               <div>
                 Too many hits.{" "}
-                <span className={styles.FocusModeLink} onClick={setFocusToBeginning}>
+                <span
+                  className={styles.FocusModeLink}
+                  data-test-name="LogPointPanel-FocusOnStartLink"
+                  onClick={setFocusToBeginning}
+                >
                   Focus at start
                 </span>{" "}
                 or{" "}
-                <span className={styles.FocusModeLink} onClick={setFocusToEnd}>
+                <span
+                  className={styles.FocusModeLink}
+                  data-test-name="LogPointPanel-FocusOnEndLink"
+                  onClick={setFocusToEnd}
+                >
                   focus on end
                 </span>
                 .

@@ -51,7 +51,7 @@ export async function saveFocusRange(page: Page): Promise<void> {
 
 export async function setFocusRange(
   page: Page,
-  options: { endTimeString: string; startTimeString: string }
+  options: { endTimeString?: string; startTimeString?: string }
 ): Promise<void> {
   const { endTimeString, startTimeString } = options;
 
@@ -62,8 +62,12 @@ export async function setFocusRange(
   );
 
   await enterFocusMode(page);
-  await setFocusRangeStartTime(page, startTimeString);
-  await setFocusRangeEndTime(page, endTimeString);
+  if (startTimeString != null) {
+    await setFocusRangeStartTime(page, startTimeString);
+  }
+  if (endTimeString != null) {
+    await setFocusRangeEndTime(page, endTimeString);
+  }
   await saveFocusRange(page);
 }
 
@@ -102,11 +106,27 @@ export async function setFocusRangeStartTime(page: Page, timeString: string): Pr
 }
 
 export function getTimeline(page: Page) {
-  return page.locator(".timeline .progress-bar");
+  return page.locator('[data-test-id="Timeline"]');
+}
+
+export async function getFocusBeginTime(page: Page) {
+  const timelineLocator = getTimeline(page);
+  const value = await timelineLocator.getAttribute("data-test-focus-begin-time");
+  return value ? parseInt(value) : null;
+}
+
+export async function getFocusEndTime(page: Page) {
+  const timelineLocator = getTimeline(page);
+  const value = await timelineLocator.getAttribute("data-test-focus-end-time");
+  return value ? parseInt(value) : null;
+}
+
+export function getTimelineProgressBar(page: Page) {
+  return page.locator('[data-test-id="Timeline-ProgressBar"]');
 }
 
 export async function getTimelineCurrentHoverPercent(page: Page) {
-  const timeline = getTimeline(page);
+  const timeline = getTimelineProgressBar(page);
   const previewLine = timeline.locator(".progress-line.preview-min");
   // 0..100, not 0..1
   const previewLinePercent = Number(await previewLine.getAttribute("data-hover-value"));
@@ -130,4 +150,8 @@ export async function waitForTimelineAdvanced(page: Page, prevPercent: number) {
   });
 
   return currentPercent;
+}
+
+export async function verifyFocusModeVisible(page: Page) {
+  await page.waitForSelector('[data-test-id="SaveFocusModeButton"]');
 }
