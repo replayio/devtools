@@ -237,7 +237,7 @@ export default class ElementStyle {
     let computedProps: ComputedProperty[] = [];
     for (const textProp of textProps) {
       assert(textProp.computed, "TextProperty has no computed properties");
-      computedProps = computedProps.concat(textProp.computed);
+      computedProps.push(...textProp.computed);
     }
 
     // CSS Variables inherits from the normal element in case of pseudo element.
@@ -302,12 +302,12 @@ export default class ElementStyle {
     }
 
     // Find the CSS variables that have been updated.
-    const previousVariablesMap = new Map<string, string>(this.variablesMap.get(pseudo) || []);
-    const changedVariableNamesSet = new Set<string>(
-      [...variables.keys(), ...previousVariablesMap.keys()].filter(
-        k => variables.get(k) !== previousVariablesMap.get(k)
-      )
-    );
+    // const previousVariablesMap = new Map<string, string>(this.variablesMap.get(pseudo) || []);
+    // const changedVariableNamesSet = new Set<string>(
+    //   [...variables.keys(), ...previousVariablesMap.keys()].filter(
+    //     k => variables.get(k) !== previousVariablesMap.get(k)
+    //   )
+    // );
 
     this.variablesMap.set(pseudo, variables);
 
@@ -406,11 +406,9 @@ export default class ElementStyle {
 
       // Collect all relevant CSS declarations (aka TextProperty instances).
       if (filterCondition) {
-        for (const textProp of rule.textProps.slice(0).reverse()) {
-          if (textProp.enabled) {
-            textProps.push(textProp);
-          }
-        }
+        const enabledTextProps = rule.textProps.filter(textProp => textProp.enabled);
+        enabledTextProps.reverse();
+        textProps.push(...enabledTextProps);
       }
     }
 
