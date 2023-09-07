@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { PreviewNodeHighlighter } from "devtools/client/inspector/markup/components/PreviewNodeHighlighter";
 import { installObserver, refreshGraphics } from "protocol/graphics";
+import Spinner from "replay-next/components/Spinner";
 import {
   getAreMouseTargetsLoading,
   getIsNodePickerActive,
@@ -17,7 +18,6 @@ import { getPlayback, isPlaybackStalled } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
 
 import ReplayLogo from "./shared/ReplayLogo";
-import Spinner from "./shared/Spinner";
 import Tooltip from "./shared/Tooltip";
 
 export default function Video() {

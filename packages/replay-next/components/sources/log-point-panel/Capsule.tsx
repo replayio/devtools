@@ -1,6 +1,7 @@
 import { TimeStampedPoint } from "@replayio/protocol";
-import { CSSProperties, ChangeEvent, FocusEvent, KeyboardEvent, useMemo, useRef } from "react";
+import { CSSProperties, ChangeEvent, FocusEvent, KeyboardEvent, useRef } from "react";
 
+import Spinner from "replay-next/components/Spinner";
 import { HitPointStatus, Point } from "shared/client/types";
 import { deselect, selectAll } from "shared/utils/selection";
 
@@ -126,7 +127,7 @@ export default function Capsule({
         data-test-name="LogPointCapsule"
         style={badgeStyle as CSSProperties}
       >
-        –
+        <Spinner className={styles.Spinner} />
       </div>
     );
   }
