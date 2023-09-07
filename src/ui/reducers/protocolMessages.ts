@@ -1,9 +1,7 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { EventMethods, EventParams } from "@replayio/protocol";
-import cloneDeep from "lodash/cloneDeep";
 
 import { CommandRequest, CommandResponse } from "protocol/socket";
-import { userData } from "shared/user-data/GraphQL/UserData";
 import { UIState } from "ui/state";
 
 export interface Recorded {
@@ -27,8 +25,21 @@ export type ProtocolResponseMap = { [id: number]: ProtocolResponse };
 export type ProtocolRequestMap = { [id: number]: ProtocolRequest };
 export type ProtocolErrorMap = { [id: number]: ProtocolError };
 
+export type ReceivedProtocolMessage =
+  | {
+      type: "request";
+      value: ProtocolRequest;
+    }
+  | {
+      type: "response";
+      value: ProtocolResponse;
+    }
+  | {
+      type: "error";
+      value: ProtocolError;
+    };
+
 export interface ProtocolMessagesState {
-  events: (ProtocolEvent & Recorded)[];
   idToResponseMap: ProtocolResponseMap;
   idToRequestMap: ProtocolRequestMap;
   idToErrorMap: ProtocolErrorMap;
@@ -36,65 +47,60 @@ export interface ProtocolMessagesState {
 
 const protocolMessagesSlice = createSlice({
   initialState: {
-    events: [],
     idToResponseMap: {},
     idToRequestMap: {},
     idToErrorMap: {},
   } as ProtocolMessagesState,
   name: "protocolMessages",
   reducers: {
-    eventReceived(state, action: PayloadAction<ProtocolEvent & Recorded>) {
-      state.events.push(cloneDeep(action.payload));
-    },
-    responseReceived(state, action: PayloadAction<CommandResponse & Recorded>) {
-      // Pre-freeze a copy of the top object, so that Immer doesn't recurse.
-      // This avoids errors with `ValueFront` and other object types being frozen,
-      // and then mutated by other app code later, but also avoids a costly
-      // deep clone of the entire message structure here.
-      const frozenMessage = Object.freeze({ ...action.payload });
-      state.idToResponseMap[frozenMessage.id] = frozenMessage;
+    protocolMessagesReceived(state, action: PayloadAction<ReceivedProtocolMessage[]>) {
+      for (const message of action.payload) {
+        switch (message.type) {
+          case "request": {
+            const { value: request } = message;
+            const [requestClass, requestMethod] = request.method.split(".");
 
-      const request = state.idToRequestMap[frozenMessage.id];
-      if (request) {
-        request.pending = false;
+            const clonedRequest = {
+              ...request,
+              class: requestClass,
+              method: requestMethod,
+              pending: !state.idToResponseMap[request.id],
+              errored: !!state.idToErrorMap[request.id],
+            };
+
+            state.idToRequestMap[clonedRequest.id] = clonedRequest;
+            break;
+          }
+          case "response": {
+            const { value: response } = message;
+            state.idToResponseMap[response.id] = response;
+
+            const request = state.idToRequestMap[response.id];
+            if (request) {
+              request.pending = false;
+            }
+            break;
+          }
+          case "error": {
+            const { value: error } = message;
+            state.idToErrorMap[error.id] = error;
+            const request = state.idToRequestMap[error.id];
+            if (request) {
+              request.pending = false;
+              request.errored = true;
+            }
+            break;
+          }
+        }
       }
-    },
-    errorReceived(state, action: PayloadAction<CommandResponse & Recorded>) {
-      state.idToErrorMap[action.payload.id] = action.payload;
-      const request = state.idToRequestMap[action.payload.id];
-      if (request) {
-        request.pending = false;
-        request.errored = true;
-      }
-    },
-    requestSent(state, action: PayloadAction<CommandRequest & Recorded>) {
-      const [requestClass, requestMethod] = action.payload.method.split(".");
-
-      const clonedRequest = {
-        ...action.payload,
-        class: requestClass,
-        method: requestMethod,
-        pending: !state.idToResponseMap[action.payload.id],
-        errored: !!state.idToErrorMap[action.payload.id],
-      };
-
-      state.idToRequestMap[clonedRequest.id] = clonedRequest;
     },
   },
 });
 
-export const { errorReceived, eventReceived, requestSent, responseReceived } =
-  protocolMessagesSlice.actions;
+export const { protocolMessagesReceived } = protocolMessagesSlice.actions;
 
 export default protocolMessagesSlice.reducer;
 
-export const getProtocolEvents = (_state: UIState) => {
-  if (!userData.get("feature_protocolPanelEvents")) {
-    console.log("protocol events are disabled");
-  }
-
-  return [];
-};
 export const getProtocolErrorMap = (state: UIState) => state.protocolMessages.idToErrorMap;
 export const getProtocolRequestMap = (state: UIState) => state.protocolMessages.idToRequestMap;
 export const getProtocolResponseMap = (state: UIState) => state.protocolMessages.idToResponseMap;
