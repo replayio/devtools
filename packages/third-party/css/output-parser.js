@@ -49,6 +49,8 @@ export const TIMING_FUNCTION = "timing-function";
 export const URI = "url";
 export const VARIABLE_FUNCTION = "variable-function";
 
+const supportsValueMap = new Map();
+
 /**
  * This module is used to process CSS text declarations and output DOM fragments (to be
  * appended to panels in DevTools) for CSS values decorated with additional UI and
@@ -95,7 +97,7 @@ OutputParser.prototype = {
    *         CSS Property value
    * @param  {Object} [options]
    *         Optional options object.
-   * @return {Array<Object|String>}
+   * @return {Array<Record|String>}
    *         An array containing a mix of objects and plain strings. The object contains
    *         parsed information about the type and value.
    */
@@ -540,11 +542,20 @@ OutputParser.prototype = {
    *         CSS Property name to check
    * @param  {String} value
    *         CSS Property value to check
+   * 
+   * @return {boolean}
    */
   _cssPropertySupportsValue: function (name, value) {
     // Checking pair as a CSS declaration string to account for "!important" in value.
     const declaration = `${name}:${value}`;
-    return this.doc.defaultView.CSS.supports(declaration);
+    if (supportsValueMap.has(declaration)) {
+      return supportsValueMap.get(declaration);
+    }
+    
+    const supportsValue = this.doc.defaultView.CSS.supports(declaration);
+    supportsValueMap.set(declaration, supportsValue);
+
+    return supportsValue;
   },
 
   /**

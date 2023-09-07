@@ -167,6 +167,8 @@ function ensureValidChar(c) {
   return c;
 }
 
+const cachedCodes = new Map();
+
 /**
  * Turn a string into an array of character codes.
  *
@@ -175,7 +177,13 @@ function ensureValidChar(c) {
  *         the input string.
  */
 function stringToCodes(str) {
-  return Array.prototype.map.call(str, c => c.charCodeAt(0));
+  if (cachedCodes.has(str)) {
+    return cachedCodes.get(str);
+  }
+
+  const codes = Array.prototype.map.call(str, c => c.charCodeAt(0));
+  cachedCodes.set(str, codes);
+  return codes;
 }
 
 const IS_HEX_DIGIT = 0x01;

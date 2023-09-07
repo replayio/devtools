@@ -188,7 +188,7 @@ export default class RuleModel {
   }
 
   get selectorText() {
-    return this.domRule.selectors ? this.domRule.selectors.join(", ") : "element";
+    return this.domRule.selectors ? this.domRule.cleanedSelectorText : "element";
   }
 
   /**
@@ -264,7 +264,7 @@ export default class RuleModel {
 
     if (this.domRule.selectors) {
       // This is a style rule with a selector.
-      selector = this.domRule.selectors.join(", ");
+      selector = this.domRule.cleanedSelectorText;
     }
 
     return selector;

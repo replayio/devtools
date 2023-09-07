@@ -6,6 +6,9 @@ import { getCachedObject } from "replay-next/src/suspense/ObjectPreviews";
 import { StyleFront } from "./style";
 import { StyleSheetFront } from "./styleSheet";
 
+const cachedSelectorStrings: Map<string, string[]> = new Map();
+const cachedSelectorText: Map<string, string> = new Map();
+
 // Manages interaction with a CSSRule.
 export class RuleFront {
   private pauseId: string;
@@ -41,12 +44,24 @@ export class RuleFront {
     return this._rule.cssText;
   }
 
-  get selectorText() {
-    return this._rule.selectorText;
+  get cleanedSelectorText() {
+    if (cachedSelectorText.has(this._rule.selectorText!)) {
+      return cachedSelectorText.get(this._rule.selectorText!)!;
+    }
+
+    const selectorText = this.selectors.join(", ");
+    cachedSelectorText.set(this._rule.selectorText!, selectorText);
+    return selectorText;
   }
 
   get selectors() {
-    return this._rule.selectorText!.split(",").map(s => s.trim());
+    if (cachedSelectorStrings.has(this._rule.selectorText!)) {
+      return cachedSelectorStrings.get(this._rule.selectorText!)!;
+    }
+
+    const selectors = this._rule.selectorText!.split(",").map(s => s.trim());
+    cachedSelectorStrings.set(this._rule.selectorText!, selectors);
+    return selectors;
   }
 
   get style() {
