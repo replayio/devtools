@@ -14,6 +14,8 @@
 
 "use strict";
 
+import QuickLRU from 'shared/utils/quick-lru';
+
 // White space of any kind.  No value fields are used.  Note that
 // comments do *not* count as white space; comments separate tokens
 // but are not themselves tokens.
@@ -167,7 +169,7 @@ function ensureValidChar(c) {
   return c;
 }
 
-const cachedCodes = new Map();
+const cachedCodes = new QuickLRU({maxSize: 3000});
 
 /**
  * Turn a string into an array of character codes.

@@ -4,6 +4,7 @@
 
 "use strict";
 
+import QuickLRU from "shared/utils/quick-lru";
 import * as angleUtils  from "./css-angle";
 import * as colorUtils from "./color";
 import { getCSSLexer } from "./lexer";
@@ -49,7 +50,9 @@ export const TIMING_FUNCTION = "timing-function";
 export const URI = "url";
 export const VARIABLE_FUNCTION = "variable-function";
 
-const supportsValueMap = new Map();
+const cachedSupportsValue = new QuickLRU({
+  maxSize: 3000,
+});
 
 /**
  * This module is used to process CSS text declarations and output DOM fragments (to be
@@ -548,12 +551,12 @@ OutputParser.prototype = {
   _cssPropertySupportsValue: function (name, value) {
     // Checking pair as a CSS declaration string to account for "!important" in value.
     const declaration = `${name}:${value}`;
-    if (supportsValueMap.has(declaration)) {
-      return supportsValueMap.get(declaration);
+    if (cachedSupportsValue.has(declaration)) {
+      return cachedSupportsValue.get(declaration);
     }
     
     const supportsValue = this.doc.defaultView.CSS.supports(declaration);
-    supportsValueMap.set(declaration, supportsValue);
+    cachedSupportsValue.set(declaration, supportsValue);
 
     return supportsValue;
   },

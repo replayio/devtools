@@ -1,4 +1,5 @@
 import { Action } from "@reduxjs/toolkit";
+import QuickLRU from "shared/utils/quick-lru";
 
 import CSSProperties from "third-party/css/css-properties";
 import { OutputParser } from "third-party/css/output-parser";
@@ -34,7 +35,9 @@ export function setComputedPropertyExpanded(
   return { type: "set_computed_property_expanded", property, expanded };
 }
 
-const cachedParsedProperties = new Map<string, (string | Record<string, unknown>)[]>();
+const cachedParsedProperties = new QuickLRU<string, (string | Record<string, unknown>)[]>({
+  maxSize: 3000,
+});
 
 export async function createComputedProperties(
   elementStyle: ElementStyle,
