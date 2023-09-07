@@ -30,9 +30,11 @@ import { hitPointsForLocationCache } from "replay-next/src/suspense/HitPointsCac
 import { getSourceSuspends } from "replay-next/src/suspense/SourcesCache";
 import { findIndexBigInt } from "replay-next/src/utils/array";
 import { validate } from "replay-next/src/utils/points";
+import { MAX_POINTS_TO_RUN_EVALUATION } from "shared/client/ReplayClient";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import {
   HitPointStatus,
+  HitPointsAndStatusTuple,
   POINT_BEHAVIOR_DISABLED_TEMPORARILY,
   POINT_BEHAVIOR_ENABLED,
   Point,
@@ -58,6 +60,8 @@ type InternalProps = ExternalProps & {
   enterFocusMode: () => void;
   hitPoints: TimeStampedPoint[];
   hitPointStatus: HitPointStatus | null;
+  setFocusToBeginning: () => void;
+  setFocusToEnd: () => void;
 };
 
 export default function PointPanelWrapper(props: ExternalProps) {
@@ -91,7 +95,7 @@ const EMPTY_ARRAY: any[] = [];
 function PointPanel(props: ExternalProps & { focusRange: TimeStampedPointRange }) {
   const { focusRange, pointWithPendingEdits } = props;
 
-  const { enterFocusMode } = useContext(FocusContext);
+  const { enterFocusMode, update } = useContext(FocusContext);
 
   const client = useContext(ReplayClientContext);
 
@@ -103,8 +107,40 @@ function PointPanel(props: ExternalProps & { focusRange: TimeStampedPointRange }
     pointWithPendingEdits.condition
   );
 
-  const hitPoints = value?.[0] ?? EMPTY_ARRAY;
+  const hitPoints = (value?.[0] ?? EMPTY_ARRAY) as HitPointsAndStatusTuple[0];
   const hitPointStatus = value?.[1] ?? null;
+
+  const setFocusToBeginning = () => {
+    const hitPoint = hitPoints[MAX_POINTS_TO_RUN_EVALUATION - 1];
+    if (hitPoint) {
+      update(
+        {
+          begin: focusRange.begin,
+          end: hitPoint,
+        },
+        {
+          bias: "begin",
+          sync: true,
+        }
+      );
+    }
+  };
+
+  const setFocusToEnd = () => {
+    const hitPoint = hitPoints[hitPoints.length - MAX_POINTS_TO_RUN_EVALUATION];
+    if (hitPoint) {
+      update(
+        {
+          begin: hitPoint,
+          end: focusRange.end,
+        },
+        {
+          bias: "end",
+          sync: true,
+        }
+      );
+    }
+  };
 
   return (
     <PointPanelWithHitPoints
@@ -112,6 +148,8 @@ function PointPanel(props: ExternalProps & { focusRange: TimeStampedPointRange }
       enterFocusMode={enterFocusMode}
       hitPoints={hitPoints}
       hitPointStatus={hitPointStatus}
+      setFocusToBeginning={setFocusToBeginning}
+      setFocusToEnd={setFocusToEnd}
     />
   );
 }
@@ -123,6 +161,8 @@ function PointPanelWithHitPoints({
   hitPointStatus,
   pointWithPendingEdits,
   pointForSuspense,
+  setFocusToBeginning,
+  setFocusToEnd,
 }: InternalProps) {
   const graphQLClient = useContext(GraphQLClientContext);
   const { showCommentsPanel } = useContext(InspectorContext);
@@ -392,11 +432,27 @@ function PointPanelWithHitPoints({
       <div className={styles.EditableContentWrapperRow}>
         {showTooManyPointsErrorMessage ? (
           <div className={styles.ContentWrapperTooManyPoints}>
-            Use{""}
-            <span className={styles.FocusModeLink} onClick={enterFocusMode}>
-              Focus Mode
-            </span>{" "}
-            to reduce the number of hits.
+            {hitPointStatus === "too-many-points-to-find" ? (
+              <div>
+                Use{" "}
+                <span className={styles.FocusModeLink} onClick={enterFocusMode}>
+                  Focus Mode
+                </span>{" "}
+                to reduce the number of hits.
+              </div>
+            ) : (
+              <div>
+                Too many hits.{" "}
+                <span className={styles.FocusModeLink} onClick={setFocusToBeginning}>
+                  Focus at start
+                </span>{" "}
+                or{" "}
+                <span className={styles.FocusModeLink} onClick={setFocusToEnd}>
+                  focus on end
+                </span>
+                .
+              </div>
+            )}
           </div>
         ) : showUnknownErrorMessage ? (
           <div className={styles.ContentWrapperTooManyPoints}>Failed to calculate hit points.</div>

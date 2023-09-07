@@ -62,7 +62,6 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 1ch;
 }
 .ContentWrapper[data-state-editable="true"]:hover {
   border-color: var(--point-panel-input-border-color-hover);
