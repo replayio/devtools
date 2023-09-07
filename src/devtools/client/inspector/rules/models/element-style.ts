@@ -366,9 +366,14 @@ export default class ElementStyle {
 
       // Collect all relevant CSS declarations (aka TextProperty instances).
       if (filterCondition) {
-        const enabledTextProps = rule.textProps.filter(textProp => textProp.enabled);
-        enabledTextProps.reverse();
-        textProps.push(...enabledTextProps);
+        // Order apparently matters here, so iterate backwards.
+        // Also do this without creating new arrays, for perf reasons.
+        for (let index = rule.textProps.length - 1; index >= 0; index--) {
+          const textProp = rule.textProps[index];
+          if (textProp.enabled) {
+            textProps.push(textProp);
+          }
+        }
       }
     }
 
