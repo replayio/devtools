@@ -101,3 +101,8 @@
 .CaretContainer:hover .CaretIcon {
   color: var(--point-panel-timeline-label-hover-color);
 }
+
+.Spinner {
+  width: 0.75rem;
+  height: 0.75rem;
+}

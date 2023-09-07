@@ -1,12 +1,12 @@
 import { CheckCircleIcon, ExclamationCircleIcon, PaperAirplaneIcon } from "@heroicons/react/solid";
 import { RecordingId } from "@replayio/protocol";
-import React, { Dispatch, SetStateAction, useState } from "react";
+import React, { useState } from "react";
 
+import Spinner from "replay-next/components/Spinner";
 import hooks from "ui/hooks";
 import { validateEmail } from "ui/utils/helpers";
 
 import { TextInput } from "../Forms";
-import Spinner from "../Spinner";
 
 type ActionStatus = "pending" | "loading" | "error" | "completed";
 

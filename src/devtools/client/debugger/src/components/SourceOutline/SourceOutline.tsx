@@ -1,24 +1,12 @@
-import {
-  ClassOutline,
-  FunctionOutline,
-  Location,
-  getSourceOutlineResult,
-} from "@replayio/protocol";
+import { ClassOutline, FunctionOutline, Location } from "@replayio/protocol";
 import classnames from "classnames";
-import React, {
-  Suspense,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { Suspense, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList as List } from "react-window";
 import { useImperativeCacheValue } from "suspense";
 
 import ErrorBoundary from "replay-next/components/ErrorBoundary";
+import Spinner from "replay-next/components/Spinner";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import {
   SourceOutlineWithHitCounts,
@@ -26,7 +14,6 @@ import {
 } from "replay-next/src/suspense/OutlineHitCountsCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { toPointRange } from "shared/utils/time";
-import Spinner from "ui/components/shared/Spinner";
 import { SourceDetails, getSelectedSource } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 

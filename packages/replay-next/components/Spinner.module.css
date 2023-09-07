@@ -1,0 +1,23 @@
+.Spinner {
+  width: 1rem;
+  height: 1rem;
+  color: var(--color-dim);
+  animation: spin 1s linear infinite;
+}
+
+.Circle {
+  opacity: 0.2;
+}
+
+.Path {
+  opacity: 0.85;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

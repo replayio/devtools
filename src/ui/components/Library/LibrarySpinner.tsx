@@ -1,4 +1,4 @@
-import Spinner from "../shared/Spinner";
+import Spinner from "replay-next/components/Spinner";
 
 // This is not the final way for us to indicate that we're loading some data.
 // But for now, I'm using this for all of the Library's loading states so that
