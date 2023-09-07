@@ -30,7 +30,7 @@ export interface WiredAppliedRule {
 
 export interface ParsedCSSRules {
   rules: RuleState[];
-  computedProperties: ComputedPropertyState[];
+  elementStyle: ElementStyle;
 }
 
 export const LAYOUT_NUMERIC_FIELDS = [
@@ -297,13 +297,44 @@ export const cssRulesCache: Cache<
     const elementStyle = new ElementStyle(nodeId, pauseId, replayClient);
     await elementStyle.populate();
 
+    return {
+      elementStyle,
+      rules: elementStyle.rules?.map(rule => getRuleState(rule)) ?? [],
+    };
+  },
+});
+
+export const computedPropertiesCache: Cache<
+  [
+    replayClient: ReplayClientInterface,
+    pauseId: PauseId | undefined,
+    nodeId: string | null | undefined
+  ],
+  ComputedPropertyState[] | null
+> = createCache({
+  config: { immutable: true },
+  debugLabel: "ComputedProperties",
+  getKey: ([replayClient, pauseId, nodeId]) => `${pauseId}:${nodeId}`,
+  load: async ([replayClient, pauseId, nodeId]) => {
+    if (!pauseId || typeof nodeId !== "string") {
+      return null;
+    }
+    const nodeInfo = await processedNodeDataCache.readAsync(replayClient, pauseId, nodeId);
+
+    if (!nodeInfo?.isConnected || !nodeInfo?.isElement) {
+      return null;
+    }
+
+    const parsedRules = await cssRulesCache.readAsync(replayClient, pauseId, nodeId);
+    if (!parsedRules) {
+      return null;
+    }
+    const { elementStyle } = parsedRules;
+
     const computed = await computedStyleCache.readAsync(replayClient, pauseId, nodeId);
     const properties = await createComputedProperties(elementStyle, computed);
 
-    return {
-      rules: elementStyle.rules?.map(rule => getRuleState(rule)) ?? [],
-      computedProperties: properties,
-    };
+    return properties;
   },
 });
 
