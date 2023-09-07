@@ -301,14 +301,6 @@ export default class ElementStyle {
       }
     }
 
-    // Find the CSS variables that have been updated.
-    // const previousVariablesMap = new Map<string, string>(this.variablesMap.get(pseudo) || []);
-    // const changedVariableNamesSet = new Set<string>(
-    //   [...variables.keys(), ...previousVariablesMap.keys()].filter(
-    //     k => variables.get(k) !== previousVariablesMap.get(k)
-    //   )
-    // );
-
     this.variablesMap.set(pseudo, variables);
 
     // For each TextProperty, mark it overridden if all of its computed
@@ -319,40 +311,8 @@ export default class ElementStyle {
     for (const textProp of textProps) {
       // _updatePropertyOverridden will return true if the
       // overridden state has changed for the text property.
-      // _hasUpdatedCSSVariable will return true if the declaration contains any
-      // of the updated CSS variable names.
-      // if (
-      //   this._updatePropertyOverridden(textProp) ||
-      //   this._hasUpdatedCSSVariable(textProp, changedVariableNamesSet)
-      // ) {
-      //   textProp.updateEditor();
-      // }
       this._updatePropertyOverridden(textProp);
-
-      // For each editor show or hide the inactive CSS icon as needed.
-      // if (textProp.editor && this.unusedCssEnabled) {
-      //   textProp.editor.updatePropertyState();
-      // }
     }
-  }
-
-  /**
-   * Returns true if the given declaration's property value contains a CSS variable
-   * matching any of the updated CSS variable names.
-   *
-   * @param {TextProperty} declaration
-   *        A TextProperty of a rule.
-   * @param {Set<String>} variableNamesSet
-   *        A Set of CSS variable names that have been updated.
-   */
-  private _hasUpdatedCSSVariable(declaration: TextProperty, variableNamesSet: Set<string>) {
-    for (const variableName of variableNamesSet) {
-      if (declaration.hasCSSVariable(variableName)) {
-        return true;
-      }
-    }
-
-    return false;
   }
 
   /**
