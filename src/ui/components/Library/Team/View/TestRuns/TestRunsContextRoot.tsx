@@ -16,10 +16,12 @@ import { useSyncTestRunIdToUrl } from "ui/components/Library/Team/View/TestRuns/
 import { useTestRuns } from "ui/components/Library/Team/View/TestRuns/hooks/useTestRuns";
 
 type TestRunsContextType = {
+  filterByBranch: "all" | "primary";
   filterByStatus: "all" | "failed";
   filterByText: string;
   filterByTextForDisplay: string;
   selectTestRun: Dispatch<SetStateAction<string | null>>;
+  setFilterByBranch: Dispatch<SetStateAction<"all" | "primary">>;
   setFilterByStatus: Dispatch<SetStateAction<"all" | "failed">>;
   setFilterByText: Dispatch<SetStateAction<string>>;
   testRunId: string | null;
@@ -36,6 +38,7 @@ export function TestRunsContextRoot({ children }: { children: ReactNode }) {
 
   const [testRunId, setTestRunId] = useState<string | null>(defaultTestRunId);
 
+  const [filterByBranch, setFilterByBranch] = useState<"all" | "primary">("all");
   const [filterByStatus, setFilterByStatus] = useState<"all" | "failed">("all");
 
   const [filterByText, setFilterByText] = useState("");
@@ -46,29 +49,44 @@ export function TestRunsContextRoot({ children }: { children: ReactNode }) {
   const filteredTestRuns = useMemo(() => {
     let filteredTestRuns = testRuns;
 
-    if (filterByStatus === "failed") {
-      filteredTestRuns = filteredTestRuns.filter(testRun => testRun.results.counts.failed > 0);
-    }
-
-    if (filterByText !== "") {
+    if (filterByBranch === "primary" || filterByStatus === "failed" || filterByText !== "") {
       const lowerCaseText = filterByText.toLowerCase();
 
       filteredTestRuns = filteredTestRuns.filter(testRun => {
+        if (filterByStatus === "failed") {
+          if (testRun.results.counts.failed === 0) {
+            return false;
+          }
+        }
+
         const branchName = testRun.source?.branchName ?? "";
-        const user = testRun.source?.user ?? "";
 
-        const title = getTestRunTitle(testRun);
+        if (filterByBranch === "primary") {
+          // TODO This should be configurable by Workspace
+          if (branchName !== "main" && branchName !== "master") {
+            return false;
+          }
+        }
 
-        return (
-          branchName.toLowerCase().includes(lowerCaseText) ||
-          user.toLowerCase().includes(lowerCaseText) ||
-          title.toLowerCase().includes(lowerCaseText)
-        );
+        if (filterByText !== "") {
+          const user = testRun.source?.user ?? "";
+          const title = getTestRunTitle(testRun);
+
+          if (
+            !branchName.toLowerCase().includes(lowerCaseText) &&
+            !user.toLowerCase().includes(lowerCaseText) &&
+            !title.toLowerCase().includes(lowerCaseText)
+          ) {
+            return false;
+          }
+        }
+
+        return true;
       });
     }
 
     return filteredTestRuns;
-  }, [filterByStatus, filterByText, testRuns]);
+  }, [filterByBranch, filterByStatus, filterByText, testRuns]);
 
   useEffect(() => {
     if (testRunId == null) {
@@ -84,14 +102,16 @@ export function TestRunsContextRoot({ children }: { children: ReactNode }) {
   return (
     <TestRunsContext.Provider
       value={{
+        filterByBranch,
         filterByStatus,
         filterByText: filterByTextDeferred,
         filterByTextForDisplay: filterByText,
-        testRunId: deferredTestRunId,
-        testRunIdForDisplay: testRunId,
         selectTestRun: setTestRunId,
+        setFilterByBranch,
         setFilterByStatus,
         setFilterByText,
+        testRunId: deferredTestRunId,
+        testRunIdForDisplay: testRunId,
         testRuns: filteredTestRuns,
       }}
     >

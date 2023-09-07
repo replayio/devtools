@@ -28,9 +28,9 @@ export async function filterTestRecordingList(page: Page, options: { text: strin
 
 export async function filterTestRunsList(
   page: Page,
-  options: { status?: "all" | "failed"; text?: string } = {}
+  options: { branch?: "all" | "primary"; status?: "all" | "failed"; text?: string } = {}
 ) {
-  const { status = "all", text = "" } = options;
+  const { branch = "all", status = "all", text = "" } = options;
 
   await debugPrint(
     page,
@@ -38,14 +38,24 @@ export async function filterTestRunsList(
     "filterTestRunsList"
   );
 
-  const dropDownMenu = page.locator('[data-test-id="TestRunsPage-DropdownTrigger"]');
-  await openContextMenu(dropDownMenu, { useLeftClick: true });
+  const filterByBranchDropDownMenu = page.locator(
+    '[data-test-id="TestRunsPage-BranchFilter-DropdownTrigger"]'
+  );
+  await openContextMenu(filterByBranchDropDownMenu, { useLeftClick: true });
+  await selectContextMenuItem(page, {
+    contextMenuItemTestId: branch == "primary" ? "show-only-primary-branch" : "show-all-branches",
+  });
+
+  const filterByStatusDropDownMenu = page.locator(
+    '[data-test-id="TestRunsPage-ResultFilter-DropdownTrigger"]'
+  );
+  await openContextMenu(filterByStatusDropDownMenu, { useLeftClick: true });
   await selectContextMenuItem(page, {
     contextMenuItemTestId: status == "failed" ? "show-only-failures" : "show-all-runs",
   });
 
-  const input = page.locator('[data-test-id="TestRunsPage-FilterInput"]');
-  await input.fill(text);
+  const filterByTextInput = page.locator('[data-test-id="TestRunsPage-FilterByText-Input"]');
+  await filterByTextInput.fill(text);
 
   const list = page.locator('[data-test-id="TestRunList"]');
 
@@ -155,4 +165,15 @@ export function getTestRunAttribute(
 
 export function getTestRunSummary(page: Page) {
   return page.locator('[data-test-id="TestRunSummary"]');
+}
+
+export async function getVisibleBranchNames(page: Page): Promise<string[]> {
+  const locator = page.locator('[data-test-id="TestRun-Branch"]');
+  const count = await locator.count();
+  const branchNames = new Set<string>();
+  for (let index = 0; index < count; index++) {
+    const branchName = await locator.nth(index).textContent();
+    branchNames.add(branchName ?? "");
+  }
+  return Array.from(branchNames);
 }
