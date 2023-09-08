@@ -2,6 +2,7 @@ import {
   ComponentType,
   ReactElement,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
   useSyncExternalStore,
@@ -101,19 +102,27 @@ export function GenericList<Item, ItemData extends Object>({
     }
   }, [itemCount, selectedItemIndex]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     // react-window doesn't provide a way to declaratively set data-* attributes
     // but they're very useful for our e2e tests
+    // We use an effect without dependencies to set these so that we'll always (re)set them after a render,
+    // even if the name/id values haven't changed,
+    // so that other declarative updates don't erase these values
     const element = outerRef.current;
     if (element) {
       if (dataTestId) {
         element.setAttribute("data-test-id", dataTestId);
+      } else {
+        element.removeAttribute("data-test-id");
       }
+
       if (dataTestName) {
         element.setAttribute("data-test-name", dataTestName);
+      } else {
+        element.removeAttribute("data-test-name");
       }
     }
-  }, [dataTestId, dataTestName]);
+  });
 
   const internalItemData = {
     itemData,
