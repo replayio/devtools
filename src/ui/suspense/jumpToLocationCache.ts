@@ -24,11 +24,11 @@ interface ApplyMiddlewareDecl {
   sourceId: string;
 }
 
-const applyMiddlwareDeclCache = createSingleEntryCache<
+const applyMiddlewareDeclCache = createSingleEntryCache<
   [replayClient: ReplayClientInterface, sourcesState: SourcesState],
-  ApplyMiddlewareDecl
+  ApplyMiddlewareDecl | null
 >({
-  debugLabel: "ApplyMiddlwareDecl",
+  debugLabel: "ApplyMiddlewareDecl",
   load: async ([replayClient, sourcesState]) => {
     const dispatchMatches: FunctionMatch[] = [];
 
@@ -36,6 +36,10 @@ const applyMiddlwareDeclCache = createSingleEntryCache<
     const reactReduxSources = Array.from(sourcesById.values()).filter(source =>
       source.url?.includes("/redux/")
     );
+
+    if (reactReduxSources.length === 0) {
+      return null;
+    }
 
     await replayClient.searchFunctions(
       { query: "dispatch", sourceIds: reactReduxSources.map(source => source.id) },
@@ -45,6 +49,9 @@ const applyMiddlwareDeclCache = createSingleEntryCache<
     );
 
     const [firstMatch] = dispatchMatches;
+    if (!firstMatch) {
+      return null;
+    }
     const preferredLocation = getPreferredLocation(sourcesState, [firstMatch.loc]);
     const reduxSource = sourcesById.get(preferredLocation.sourceId)!;
     const fileOutline = await sourceOutlineCache.readAsync(replayClient, reduxSource.id);
@@ -85,12 +92,16 @@ async function searchingCallstackForDispatch(
   // The first 2 elements in filtered pause frames are from replay's redux stub, so they should be ignored
   // The 3rd element is the user function that calls it, and will most likely be the `dispatch` call
   let preferredFrameIdx = 2;
-  const applyMiddlwareDecl = await applyMiddlwareDeclCache.readAsync(replayClient, sourcesState);
+  const applyMiddlewareDecl = await applyMiddlewareDeclCache.readAsync(replayClient, sourcesState);
+
+  if (!applyMiddlewareDecl) {
+    return null;
+  }
 
   for (let frameIdx = 2; frameIdx < pauseFrames.length; frameIdx++) {
     const frame = pauseFrames[frameIdx];
 
-    if (isFrameInDecl(applyMiddlwareDecl, frame)) {
+    if (isFrameInDecl(applyMiddlewareDecl, frame)) {
       // this is the frame inside `applyMiddleware` where the initial dispatch occurs
       // the frame just before this one is the user `dispatch`
       preferredFrameIdx = frameIdx + 1;
@@ -209,17 +220,34 @@ export const reduxDispatchJumpLocationCache = createCache<
       preferredFrameIdx = await searchSourceOutlineForDispatch(filteredPauseFrames, replayClient);
     }
 
-    const preferredFrame = filteredPauseFrames[preferredFrameIdx];
-    const preferredLocation = getPreferredLocation(sourcesState, [preferredFrame.location]);
-
-    const matchingFrameStep = await getMatchingFrameStep(
+    const matchingFrameStep = await getFrameStepForFrame(
+      filteredPauseFrames[preferredFrameIdx],
       replayClient,
-      preferredFrame,
-      preferredLocation
+      sourcesState
     );
 
     if (matchingFrameStep) {
       return matchingFrameStep.point;
+    } else {
+      const initialFrameStep = await getFrameStepForFrame(
+        filteredPauseFrames[2],
+        replayClient,
+        sourcesState
+      );
+
+      return initialFrameStep!.point;
     }
   },
 });
+
+async function getFrameStepForFrame(
+  frame: PauseFrame,
+  replayClient: ReplayClientInterface,
+  sourcesState: SourcesState
+) {
+  const preferredLocation = getPreferredLocation(sourcesState, [frame.location]);
+
+  const matchingFrameStep = await getMatchingFrameStep(replayClient, frame, preferredLocation);
+
+  return matchingFrameStep;
+}
