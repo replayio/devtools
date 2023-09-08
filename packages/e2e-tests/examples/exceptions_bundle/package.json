@@ -1,0 +1,9 @@
+{
+  "name": "exceptions_bundle",
+  "scripts": {
+    "build": "webpack"
+  },
+  "devDependencies": {
+    "webpack": "^5.88.2"
+  }
+}

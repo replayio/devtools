@@ -5,9 +5,8 @@ module.exports = {
   entry: "./bundle_input.js",
   output: {
     filename: "exceptions_bundle.js",
-    path: path.resolve(__dirname, "../..")
+    path: path.resolve(__dirname, "./dist"),
   },
   devtool: "source-map",
-  mode: "development"
+  mode: "development",
 };
-
