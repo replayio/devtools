@@ -629,15 +629,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"exceptions_bundle@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "exceptions_bundle@workspace:."
-  dependencies:
-    "@replayio/replay": ^0.15.0
-    webpack: ^5.88.2
-  languageName: unknown
-  linkType: soft
-
 "fast-deep-equal@npm:^3.1.1":
   version: 3.1.3
   resolution: "fast-deep-equal@npm:3.1.3"
@@ -1021,6 +1012,15 @@ __metadata:
   checksum: a90e00dee9a16be118ea43fec3192d0b491fe03a32ed48a4132eb61d498f5536a03a1315531c19d284392a8726a4ecad71d82044c28d7f22ef62e029bf761569
   languageName: node
   linkType: hard
+
+"mapped_minified@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "mapped_minified@workspace:."
+  dependencies:
+    "@replayio/replay": ^0.15.0
+    webpack: ^5.88.2
+  languageName: unknown
+  linkType: soft
 
 "merge-stream@npm:^2.0.0":
   version: 2.0.0

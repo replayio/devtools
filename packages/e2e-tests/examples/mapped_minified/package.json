@@ -1,5 +1,5 @@
 {
-  "name": "exceptions_bundle",
+  "name": "mapped_minified",
   "scripts": {
     "build": "webpack",
     "updateExample": "node updateExample.js"

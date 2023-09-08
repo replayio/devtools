@@ -629,15 +629,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"exceptions_bundle@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "exceptions_bundle@workspace:."
-  dependencies:
-    "@replayio/replay": ^0.15.0
-    webpack: ^5.88.2
-  languageName: unknown
-  linkType: soft
-
 "fast-deep-equal@npm:^3.1.1":
   version: 3.1.3
   resolution: "fast-deep-equal@npm:3.1.3"
@@ -1146,6 +1137,15 @@ __metadata:
   checksum: a2e8092dd86c8396bdba9f2b5481032848525b3dc295ce9b57896f931e63fc16f79805144321f72976383fc249584672a75cc18d6777c6b757603f372f745981
   languageName: node
   linkType: hard
+
+"prod_bundle@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "prod_bundle@workspace:."
+  dependencies:
+    "@replayio/replay": ^0.15.0
+    webpack: ^5.88.2
+  languageName: unknown
+  linkType: soft
 
 "punycode@npm:^2.1.0":
   version: 2.3.0

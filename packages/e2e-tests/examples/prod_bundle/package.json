@@ -1,5 +1,5 @@
 {
-  "name": "exceptions_bundle",
+  "name": "prod_bundle",
   "scripts": {
     "build": "webpack",
     "updateExample": "node updateExample.js"

@@ -1,5 +1,5 @@
 {
-  "name": "exceptions_bundle",
+  "name": "mapped_styles",
   "scripts": {
     "build": "webpack",
     "updateExample": "node updateExample.js"
