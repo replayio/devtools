@@ -160,7 +160,6 @@ async function uploadSnapshot({ metadata, url, variants }) {
   });
   if (response.status !== 200) {
     const text = await response.text();
-    console.error(`Upload failed (server status ${response.status})\n${text}`);
-    process.exit(1);
+    throw new Error(`Upload failed (server status ${response.status})\n${text}`);
   }
 }
