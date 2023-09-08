@@ -163,10 +163,8 @@ export async function jumpToLogPointHit(
 
 async function scrollUntilLineIsVisible(page: Page, lineNumber: number) {
   const lineLocator = await getSourceLine(page, lineNumber);
-  const lineIsVisible = await lineLocator.isVisible();
-  if (lineIsVisible) {
-    return;
-  }
+
+  // Don't rely on lineLocator.isVisible() because it can give false positives for partially visible rows
 
   await debugPrint(page, `Scrolling to source line ${chalk.bold(lineNumber)}`, "goToLine");
 
