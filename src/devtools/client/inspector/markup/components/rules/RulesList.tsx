@@ -1,10 +1,10 @@
-import { ReactElement, useEffect, useMemo, useRef, useState } from "react";
-import { FixedSizeList as List } from "react-window";
+import { ReactElement, useMemo, useState } from "react";
 
-import { getItemCount } from "devtools/client/inspector/markup/components/rules/utils/getItemCount";
+import { RulesListData } from "devtools/client/inspector/markup/components/rules/RulesListData";
+import { GenericList } from "replay-next/components/windowing/GenericList";
 import { RuleState } from "ui/suspense/styleCaches";
 
-import { ITEM_SIZE, ItemData, RulesListItem } from "./RulesListItem";
+import { ITEM_SIZE, RulesListItem, RulesListItemData } from "./RulesListItem";
 
 export function RulesList({
   height,
@@ -19,14 +19,7 @@ export function RulesList({
 }) {
   const [showPseudoElements, setShowPseudoElements] = useState(true);
 
-  const outerRef = useRef<HTMLDivElement>(null);
-
-  const itemCount = useMemo(
-    () => getItemCount(rules, showPseudoElements),
-    [rules, showPseudoElements]
-  );
-
-  const itemData = useMemo<ItemData>(
+  const itemData = useMemo<RulesListItemData>(
     () => ({
       rules,
       searchText,
@@ -36,26 +29,15 @@ export function RulesList({
     [rules, showPseudoElements, searchText]
   );
 
-  // react-window doesn't provide a way to declaratively set data-* attributes
-  useEffect(() => {
-    const element = outerRef.current;
-    if (element) {
-      element.setAttribute("data-test-id", "RulesList");
-    }
-  });
-
-  if (itemCount === 0) {
-    return noContentFallback;
-  }
-
   return (
-    <List
-      children={RulesListItem}
+    <GenericList
+      dataTestId="RulesList"
+      fallbackForEmptyList={noContentFallback}
       height={height}
-      itemCount={itemCount}
       itemData={itemData}
+      itemRendererComponent={RulesListItem}
       itemSize={ITEM_SIZE}
-      outerRef={outerRef}
+      listDataImplementation={RulesListData}
       width="100%"
     />
   );
