@@ -198,31 +198,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@recordreplay/sourcemap-upload-cli@npm:^0.1.1":
-  version: 0.1.1
-  resolution: "@recordreplay/sourcemap-upload-cli@npm:0.1.1"
-  dependencies:
-    "@recordreplay/sourcemap-upload": ^0.1.0
-    commander: ^7.2.0
-  bin:
-    replay-sourcemap-upload: bin/sourcemap-upload
-  checksum: 98e1c507f2654aff83e2b044f1250e0262cd9f1e6a889336b9f84a10fbcbb7086ad9ba809ed5e8f2abf1cc69fdb86a1e223332b97b0be60f70a8abe7a08d0c82
-  languageName: node
-  linkType: hard
-
-"@recordreplay/sourcemap-upload@npm:^0.1.0":
-  version: 0.1.4
-  resolution: "@recordreplay/sourcemap-upload@npm:0.1.4"
-  dependencies:
-    commander: ^7.2.0
-    debug: ^4.3.1
-    glob: ^7.1.6
-    node-fetch: ^2.6.1
-    string.prototype.matchall: ^4.0.5
-  checksum: cc15129f3e16832a7d6241575d7dcafe7db9c4f927b96f7e9042592ee77272b82100b3d3860b7d58ec7f10487d1879bf66bff64c87bb2fe83b97f7ff2e010c7a
-  languageName: node
-  linkType: hard
-
 "@reduxjs/toolkit@npm:^1.9.5":
   version: 1.9.5
   resolution: "@reduxjs/toolkit@npm:1.9.5"
@@ -240,6 +215,39 @@ __metadata:
     react-redux:
       optional: true
   checksum: 54672c5593d05208af577e948a338f23128d3aa01ef056ab0d40bcfa14400cf6566be99e11715388f12c1d7655cdf7c5c6b63cb92eb0fecf996c454a46a3914c
+  languageName: node
+  linkType: hard
+
+"@replayio/replay@npm:^0.15.0":
+  version: 0.15.0
+  resolution: "@replayio/replay@npm:0.15.0"
+  dependencies:
+    "@replayio/sourcemap-upload": ^1.1.1
+    commander: ^7.2.0
+    debug: ^4.3.4
+    is-uuid: ^1.0.2
+    jsonata: ^1.8.6
+    node-fetch: ^2.6.8
+    p-map: ^4.0.0
+    superstruct: ^0.15.4
+    text-table: ^0.2.0
+    ws: ^7.5.0
+  bin:
+    replay: bin/replay.js
+  checksum: 45a155b9472dd4c9b30bada56827d3d0d9f044bb3bb1d2b4b9e21e5fa67c42a778444b03878f577d699f2ea8d23fe0973ec48a91e9084665a740415f697dafe0
+  languageName: node
+  linkType: hard
+
+"@replayio/sourcemap-upload@npm:^1.1.1":
+  version: 1.1.1
+  resolution: "@replayio/sourcemap-upload@npm:1.1.1"
+  dependencies:
+    commander: ^7.2.0
+    debug: ^4.3.1
+    glob: ^7.1.6
+    node-fetch: ^2.6.1
+    string.prototype.matchall: ^4.0.5
+  checksum: e47252d133fc34b87a5a7b68e3c792120ff51e12082f45bbf2f91286df39cefd6b6c647e9111c2f3fd89743f7fc30867644ae3647dd1ddb6e83146d12711e9b5
   languageName: node
   linkType: hard
 
@@ -491,7 +499,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"debug@npm:4, debug@npm:^4.3.1, debug@npm:^4.3.3":
+"debug@npm:4, debug@npm:^4.3.1, debug@npm:^4.3.3, debug@npm:^4.3.4":
   version: 4.3.4
   resolution: "debug@npm:4.3.4"
   dependencies:
@@ -1177,6 +1185,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"is-uuid@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "is-uuid@npm:1.0.2"
+  checksum: 53eb3544e4416ee2f170e204a319bf686768087d2de1f061f7261decd6b8e2cc16c83687fb081d3aac398c657c8e461ad43e3f664d3155b866db4016697624a3
+  languageName: node
+  linkType: hard
+
 "is-weakref@npm:^1.0.2":
   version: 1.0.2
   resolution: "is-weakref@npm:1.0.2"
@@ -1210,6 +1225,13 @@ __metadata:
     "@pkgjs/parseargs":
       optional: true
   checksum: 4313a7c0cc44c7753c4cb9869935f0b06f4cf96827515f63f58ff46b3d2f6e29aba6b3b5151778397c3f5ae67ef8bfc48871967bd10343c27e90cff198ec7808
+  languageName: node
+  linkType: hard
+
+"jsonata@npm:^1.8.6":
+  version: 1.8.6
+  resolution: "jsonata@npm:1.8.6"
+  checksum: 748e052aa1d848ba263918603a5e7e872c26fbd63fbb3330dd28cb9fa9aed0478730732fe03149fddcb1b1b4963f5eb359f06da6e17ef84734f2067b1841b995
   languageName: node
   linkType: hard
 
@@ -1400,7 +1422,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-fetch@npm:^2.6.1":
+"node-fetch@npm:^2.6.1, node-fetch@npm:^2.6.8":
   version: 2.7.0
   resolution: "node-fetch@npm:2.7.0"
   dependencies:
@@ -1569,8 +1591,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "redux-e2e-test-app@workspace:."
   dependencies:
-    "@recordreplay/sourcemap-upload-cli": ^0.1.1
     "@reduxjs/toolkit": ^1.9.5
+    "@replayio/replay": ^0.15.0
     vite: ^4.3.9
   languageName: unknown
   linkType: soft
@@ -1888,6 +1910,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"superstruct@npm:^0.15.4":
+  version: 0.15.5
+  resolution: "superstruct@npm:0.15.5"
+  checksum: 6d1f5249fee789424b7178fa0a1ffb2ace629c5480c39505885bd8c0046a4ff8b267569a3442fa53b8c560a7ba6599cf3f8af94225aebeb2cf6023f7dd911050
+  languageName: node
+  linkType: hard
+
 "tar@npm:^6.1.11, tar@npm:^6.1.2":
   version: 6.2.0
   resolution: "tar@npm:6.2.0"
@@ -1899,6 +1928,13 @@ __metadata:
     mkdirp: ^1.0.3
     yallist: ^4.0.0
   checksum: db4d9fe74a2082c3a5016630092c54c8375ff3b280186938cfd104f2e089c4fd9bad58688ef6be9cf186a889671bf355c7cda38f09bbf60604b281715ca57f5c
+  languageName: node
+  linkType: hard
+
+"text-table@npm:^0.2.0":
+  version: 0.2.0
+  resolution: "text-table@npm:0.2.0"
+  checksum: b6937a38c80c7f84d9c11dd75e49d5c44f71d95e810a3250bd1f1797fc7117c57698204adf676b71497acc205d769d65c16ae8fa10afad832ae1322630aef10a
   languageName: node
   linkType: hard
 
@@ -2122,6 +2158,21 @@ __metadata:
   version: 1.0.2
   resolution: "wrappy@npm:1.0.2"
   checksum: 159da4805f7e84a3d003d8841557196034155008f817172d4e986bd591f74aa82aa7db55929a54222309e01079a65a92a9e6414da5a6aa4b01ee44a511ac3ee5
+  languageName: node
+  linkType: hard
+
+"ws@npm:^7.5.0":
+  version: 7.5.9
+  resolution: "ws@npm:7.5.9"
+  peerDependencies:
+    bufferutil: ^4.0.1
+    utf-8-validate: ^5.0.2
+  peerDependenciesMeta:
+    bufferutil:
+      optional: true
+    utf-8-validate:
+      optional: true
+  checksum: c3c100a181b731f40b7f2fddf004aa023f79d64f489706a28bc23ff88e87f6a64b3c6651fbec3a84a53960b75159574d7a7385709847a62ddb7ad6af76f49138
   languageName: node
   linkType: hard
 

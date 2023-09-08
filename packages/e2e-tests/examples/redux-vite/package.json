@@ -9,7 +9,7 @@
     "updateExample": "node updateExample.js"
   },
   "devDependencies": {
-    "@recordreplay/sourcemap-upload-cli": "^0.1.1",
+    "@replayio/replay": "^0.15.0",
     "vite": "^4.3.9"
   },
   "dependencies": {

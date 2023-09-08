@@ -28,10 +28,12 @@ console.log("Uploading sourcemaps...");
 spawnSync(
   "yarn",
   [
-    "replay-sourcemap-upload",
+    "replay",
+    "upload-sourcemaps",
+    //"--dry-run",
     "--group",
     "e2e-test",
-    "--key",
+    "--api-key",
     "rwk_7XPbO5fhz0bkhANYXtN2dkm74wNQCchXf2OxVgAerTQ",
     staticJsFolder,
   ],
