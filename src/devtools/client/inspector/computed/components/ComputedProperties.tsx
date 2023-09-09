@@ -6,7 +6,7 @@ import { getPauseId } from "devtools/client/debugger/src/selectors";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { processedNodeDataCache } from "ui/suspense/nodeCaches";
-import { cssRulesCache } from "ui/suspense/styleCaches";
+import { computedPropertiesCache, cssRulesCache } from "ui/suspense/styleCaches";
 
 import { getSelectedNodeId } from "../../markup/selectors/markup";
 import { setComputedPropertyExpanded } from "../actions";
@@ -54,14 +54,14 @@ function ComputedProperties() {
 
   const canHaveRules = nodeStatus === "resolved" ? node?.isElement : false;
 
-  const { value: cachedStyles, status } = useImperativeCacheValue(
-    cssRulesCache,
+  const { value: computedProperties, status } = useImperativeCacheValue(
+    computedPropertiesCache,
     replayClient,
     canHaveRules ? pauseId : undefined,
     canHaveRules ? selectedNodeId : undefined
   );
 
-  const properties = status === "resolved" ? cachedStyles?.computedProperties ?? [] : [];
+  const properties = status === "resolved" ? computedProperties ?? [] : [];
 
   let dark = false;
   let allPropertiesHidden = true;

@@ -1,10 +1,18 @@
 import { Object as ProtocolObject, Rule } from "@replayio/protocol";
+import QuickLRU from "shared/utils/quick-lru";
 
 import { assert } from "protocol/utils";
 import { getCachedObject } from "replay-next/src/suspense/ObjectPreviews";
 
 import { StyleFront } from "./style";
 import { StyleSheetFront } from "./styleSheet";
+
+const cachedSelectorStrings = new QuickLRU<string, string[]>({
+  maxSize: 3000,
+});
+const cachedSelectorText = new QuickLRU<string, string>({
+  maxSize: 3000,
+});
 
 // Manages interaction with a CSSRule.
 export class RuleFront {
@@ -41,12 +49,24 @@ export class RuleFront {
     return this._rule.cssText;
   }
 
-  get selectorText() {
-    return this._rule.selectorText;
+  get cleanedSelectorText() {
+    if (cachedSelectorText.has(this._rule.selectorText!)) {
+      return cachedSelectorText.get(this._rule.selectorText!)!;
+    }
+
+    const selectorText = this.selectors.join(", ");
+    cachedSelectorText.set(this._rule.selectorText!, selectorText);
+    return selectorText;
   }
 
   get selectors() {
-    return this._rule.selectorText!.split(",").map(s => s.trim());
+    if (cachedSelectorStrings.has(this._rule.selectorText!)) {
+      return cachedSelectorStrings.get(this._rule.selectorText!)!;
+    }
+
+    const selectors = this._rule.selectorText!.split(",").map(s => s.trim());
+    cachedSelectorStrings.set(this._rule.selectorText!, selectors);
+    return selectors;
   }
 
   get style() {

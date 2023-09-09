@@ -4,6 +4,7 @@
 
 "use strict";
 
+import QuickLRU from "shared/utils/quick-lru";
 import * as angleUtils  from "./css-angle";
 import * as colorUtils from "./color";
 import { getCSSLexer } from "./lexer";
@@ -48,6 +49,10 @@ export const GRID = "grid";
 export const TIMING_FUNCTION = "timing-function";
 export const URI = "url";
 export const VARIABLE_FUNCTION = "variable-function";
+
+const cachedSupportsValue = new QuickLRU({
+  maxSize: 3000,
+});
 
 /**
  * This module is used to process CSS text declarations and output DOM fragments (to be
@@ -95,7 +100,7 @@ OutputParser.prototype = {
    *         CSS Property value
    * @param  {Object} [options]
    *         Optional options object.
-   * @return {Array<Object|String>}
+   * @return {Array<Record|String>}
    *         An array containing a mix of objects and plain strings. The object contains
    *         parsed information about the type and value.
    */
@@ -540,11 +545,20 @@ OutputParser.prototype = {
    *         CSS Property name to check
    * @param  {String} value
    *         CSS Property value to check
+   * 
+   * @return {boolean}
    */
   _cssPropertySupportsValue: function (name, value) {
     // Checking pair as a CSS declaration string to account for "!important" in value.
     const declaration = `${name}:${value}`;
-    return this.doc.defaultView.CSS.supports(declaration);
+    if (cachedSupportsValue.has(declaration)) {
+      return cachedSupportsValue.get(declaration);
+    }
+    
+    const supportsValue = this.doc.defaultView.CSS.supports(declaration);
+    cachedSupportsValue.set(declaration, supportsValue);
+
+    return supportsValue;
   },
 
   /**

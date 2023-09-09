@@ -158,10 +158,6 @@ export const config = {
     label: "View protocol requests and responses in the panel",
     legacyKey: "devtools.features.logProtocol",
   },
-  feature_protocolPanelEvents: {
-    defaultValue: Boolean(false),
-    legacyKey: "devtools.features.logProtocolEvents",
-  },
   feature_showPassport: {
     defaultValue: Boolean(false),
     label: "Show Replay Passport",

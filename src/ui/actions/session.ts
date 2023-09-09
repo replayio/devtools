@@ -1,5 +1,4 @@
 import { ApolloError } from "@apollo/client";
-import { Action } from "@reduxjs/toolkit";
 import { uploadedData } from "@replayio/protocol";
 import * as Sentry from "@sentry/react";
 
@@ -31,10 +30,9 @@ import {
 import { getToolboxLayout } from "ui/reducers/layout";
 import {
   ProtocolEvent,
-  errorReceived,
-  eventReceived,
-  requestSent,
-  responseReceived,
+  ReceivedProtocolMessage,
+  RequestSummary,
+  protocolMessagesReceived,
 } from "ui/reducers/protocolMessages";
 import { setFocusWindow } from "ui/reducers/timeline";
 import type { ExpectedError, UnexpectedError } from "ui/state/app";
@@ -213,23 +211,23 @@ export function createSocket(
 
       const loadPoint = new URL(window.location.href).searchParams.get("point") || undefined;
 
-      const queuedActions: Array<Action | UIThunkAction> = [];
+      const queuedProtocolMessages: ReceivedProtocolMessage[] = [];
       let flushTimeoutId: NodeJS.Timeout | null = null;
 
-      function flushQueuedActions() {
+      function flushQueuedProtocolMessages() {
         flushTimeoutId = null;
 
-        const actions = queuedActions.splice(0);
-        actions.forEach(action => dispatch(action));
+        const messages = queuedProtocolMessages.splice(0);
+        dispatch(protocolMessagesReceived(messages));
       }
 
       // WebSocket messages may be sent by a component that Suspends during render.
       // Dispatching these Redux actions after a tick avoids potentially scheduling a React update while another component is rendering.
-      function queueAction(action: Action | UIThunkAction) {
-        queuedActions.push(action);
+      function queueProtocolMessage(message: ReceivedProtocolMessage) {
+        queuedProtocolMessages.push(message);
 
         if (flushTimeoutId === null) {
-          flushTimeoutId = setTimeout(flushQueuedActions, 0);
+          flushTimeoutId = setTimeout(flushQueuedProtocolMessages, 250);
         }
       }
 
@@ -242,13 +240,15 @@ export function createSocket(
         focusWindowFromParams !== null ? focusWindowFromParams : undefined,
         {
           onEvent: (event: ProtocolEvent) => {
-            if (userData.get("feature_protocolPanelEvents")) {
-              queueAction(eventReceived({ ...event, recordedAt: window.performance.now() }));
-            }
+            // no-op but required, apparently
           },
           onRequest: (request: CommandRequest) => {
             if (userData.get("feature_protocolPanel")) {
-              queueAction(requestSent({ ...request, recordedAt: window.performance.now() }));
+              queueProtocolMessage({
+                type: "request",
+                // a couple fields will be filled in on the reducer side
+                value: { ...request, recordedAt: window.performance.now() } as RequestSummary,
+              });
             }
           },
           onResponse: (response: CommandResponse) => {
@@ -264,18 +264,24 @@ export function createSocket(
                   contents: clonedResponse.result.contents.slice(0, 1000),
                 };
               }
-              queueAction(responseReceived(clonedResponse));
+              queueProtocolMessage({
+                type: "response",
+                value: clonedResponse,
+              });
             }
           },
           onResponseError: (error: CommandResponse) => {
             if (userData.get("feature_protocolPanel")) {
-              queueAction(errorReceived({ ...error, recordedAt: window.performance.now() }));
+              queueProtocolMessage({
+                type: "error",
+                value: { ...error, recordedAt: window.performance.now() },
+              });
             }
           },
           onSocketError: (evt: Event, initial: boolean) => {
             console.error("Socket Error", evt);
             if (initial) {
-              queueAction(
+              dispatch(
                 setUnexpectedError({
                   action: "refresh",
                   content:
@@ -285,7 +291,7 @@ export function createSocket(
                 })
               );
             } else {
-              queueAction(
+              dispatch(
                 setUnexpectedError({
                   action: "refresh",
                   content: "The socket has closed due to an error. Please refresh the page.",
@@ -297,7 +303,7 @@ export function createSocket(
           },
           onSocketClose: (willClose: boolean) => {
             if (!willClose) {
-              queueAction(setUnexpectedError(getDisconnectionError(), true));
+              dispatch(setUnexpectedError(getDisconnectionError(), true));
             }
           },
         }
