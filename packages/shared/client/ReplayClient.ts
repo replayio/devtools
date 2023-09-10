@@ -57,6 +57,7 @@ import {
   getExceptionValueResult,
   getFrameArgumentsResult,
   getParentNodesResult,
+  getPointStackResult,
   getScopeResult,
   getTopFrameResult,
   keyboardEvents,
@@ -734,6 +735,13 @@ export class ReplayClient implements ReplayClientInterface {
     const sessionId = this.getSessionIdThrows();
 
     const result = await client.Session.getPointsBoundingTime({ time }, sessionId);
+    return result;
+  }
+
+  async getPointStack(point: string, maxCount = 15): Promise<getPointStackResult> {
+    const sessionId = this.getSessionIdThrows();
+
+    const result = await client.Session.getPointStack({ point, maxCount }, sessionId);
     return result;
   }
 
