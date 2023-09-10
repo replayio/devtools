@@ -3,6 +3,7 @@ import {
   ExecutionPoint,
   FunctionOutline,
   Location,
+  PointDescription,
   SourceLocation,
   TimeStampedPoint,
   TimeStampedPointRange,
@@ -30,6 +31,7 @@ import { simplifyDisplayName } from "devtools/client/debugger/src/utils/pause/fr
 import IndeterminateLoader from "replay-next/components/IndeterminateLoader";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPositionsCache";
+import { createFocusIntervalCacheForExecutionPoints } from "replay-next/src/suspense/FocusIntervalCache";
 import { hitPointsCache, hitPointsForLocationCache } from "replay-next/src/suspense/HitPointsCache";
 import { getPointAndTimeForPauseId, pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { getPointDescriptionForFrame } from "replay-next/src/suspense/PointStackCache";
@@ -113,7 +115,7 @@ interface ReactInternalFunctionSearchMarkers {
   uniqueProdMinifiedText: string;
 }
 
-const reactInternalFunctionsToFind = {
+export const reactInternalFunctionsToFind = {
   // A build-extracted React error code
   scheduleUpdateOnFiber: "(185)",
   // A build-extracted React error code
@@ -126,16 +128,173 @@ const reactInternalFunctionsToFind = {
   finishClassComponent: ".render(",
 };
 
+export type ReactInternalFunctionName = keyof typeof reactInternalFunctionsToFind;
+
+interface ReactInternalFunctionDetailsEntry2 {
+  functionName: string;
+  functionOutline: FunctionOutline;
+  lineIndex?: number;
+}
+
 interface ReactInternalFunctionDetailsEntry {
   functionName: string;
   functionOutline: FunctionOutline;
-  lineIndex: number;
-  hits: TimeStampedPoint[];
+  lineIndex?: number;
+  hits?: TimeStampedPoint[];
 }
 
 type ReactInternalFunctionDetails = {
-  [key in keyof typeof reactInternalFunctionsToFind]: ReactInternalFunctionDetailsEntry;
+  [key in ReactInternalFunctionName]: ReactInternalFunctionDetailsEntry;
 };
+
+const reactInternalMethodsDetailsCache: Cache<
+  [
+    replayClient: ReplayClientInterface,
+    functionName: ReactInternalFunctionName,
+    reactDomSource: SourceDetails | undefined
+  ],
+  ReactInternalFunctionDetailsEntry2 | undefined
+> = createCache({
+  config: { immutable: true },
+  debugLabel: "ReactInternalMethodsDetails",
+  getKey: ([replayClient, functionName, reactDomSource]) => functionName,
+  load: async ([replayClient, functionName, reactDomSource]) => {
+    let functionDetails: ReactInternalFunctionDetailsEntry2 | undefined = undefined;
+    if (!reactDomSource) {
+      return;
+    }
+
+    const symbols = await sourceOutlineCache.readAsync(replayClient, reactDomSource.id);
+
+    if (!symbols) {
+      return;
+    }
+
+    // Start by seeing if we can find the function in the outline.
+    function getFunctionDetailsFromOutline() {
+      const matchingFunction = symbols.functions.find(f => f.name?.startsWith(functionName));
+
+      if (matchingFunction) {
+        functionDetails = {
+          functionName,
+          functionOutline: matchingFunction,
+        };
+      }
+    }
+
+    if (!functionDetails) {
+      const reactDomSourceLines = await reactDomLinesCache.readAsync(
+        replayClient,
+        functionName,
+        reactDomSource
+      );
+
+      const searchString = reactInternalFunctionsToFind[functionName];
+
+      // HACK We'll do this the hard way! This _should_ mostly work back to React 16.14
+      // By careful inspection, we know that every minified version of `scheduleUpdateOnFiber`
+      // has a React extracted error code call of `someErrorFn(185)`. We also know that every
+      // minified version of `onCommitRoot` looks for the `.onCommitFiberRoot` function on the
+      // React DevTools global hook.
+      // By doing line-by-line string comparisons looking for these specific bits of code,
+      // we can consistently find the specific minified functions that we care about,
+      // across multiple React production builds, without needing to track minified function names.
+      // TODO Rethink this one React has sourcemaps
+
+      for (let [lineZeroIndex, line] of reactDomSourceLines.entries()) {
+        let columnMatch = line.indexOf(searchString);
+        if (functionName === "renderWithHooks" && columnMatch > -1) {
+          // This shows up in a few places, check before
+          // TODO This is probably only accurate for React 18.x?
+          const isRightFunction =
+            reactDomSourceLines[lineZeroIndex - 1].includes("memoizedState = null") &&
+            reactDomSourceLines[lineZeroIndex + 1].includes("lanes = 0");
+          if (!isRightFunction) {
+            columnMatch = -1;
+          }
+        }
+
+        if (columnMatch > -1) {
+          const location: SourceLocation = { line: lineZeroIndex + 1, column: columnMatch };
+          const functionOutline = findFunctionOutlineForLocation(location, symbols);
+
+          if (functionOutline) {
+            functionDetails = {
+              functionName,
+              functionOutline,
+              lineIndex: lineZeroIndex + 1,
+            };
+          }
+        }
+      }
+    }
+
+    console.log("React internal method lookup: ", functionName, functionDetails);
+    return functionDetails;
+  },
+});
+
+const reactDomLinesCache: Cache<
+  [
+    replayClient: ReplayClientInterface,
+    functionName: ReactInternalFunctionName,
+    reactDomSource: SourceDetails
+  ],
+  string[]
+> = createSingleEntryCache({
+  debugLabel: "ReactDomLines",
+  async load([replayClient, functionName, reactDomSource]) {
+    const streaming = streamingSourceContentsCache.stream(replayClient, reactDomSource!.id);
+    await streaming.resolver;
+
+    const reactDomSourceContents = streaming.value!;
+    return reactDomSourceContents.split("\n");
+  },
+});
+
+export const reactInternalMethodsHitsIntervalCache = createFocusIntervalCacheForExecutionPoints<
+  [
+    replayClient: ReplayClientInterface,
+    functionName: ReactInternalFunctionName,
+    reactDomSource: SourceDetails | undefined
+  ],
+  PointDescription
+>({
+  debugLabel: "RecordedProtocolMessages",
+  getPointForValue: data => data.point,
+  async load(rangeStart, rangeEnd, replayClient, functionName, reactDomSource) {
+    if (!rangeStart || !rangeEnd || !reactDomSource) {
+      return [];
+    }
+
+    const symbols = await sourceOutlineCache.readAsync(replayClient, reactDomSource.id);
+
+    if (!symbols) {
+      return [];
+    }
+
+    const functionDetails = await reactInternalMethodsDetailsCache.readAsync(
+      replayClient,
+      functionName,
+      reactDomSource
+    );
+
+    if (!functionDetails) {
+      return [];
+    }
+
+    // We found a function outline, so we can use that to get the hits.
+    const hitPoints = await hitPointsCache.readAsync(
+      BigInt(rangeStart),
+      BigInt(rangeEnd),
+      replayClient,
+      { ...functionDetails.functionOutline.breakpointLocation!, sourceId: reactDomSource.id },
+      null
+    );
+
+    return hitPoints;
+  },
+});
 
 export const reactInternalMethodsHitsCache: Cache<
   [
@@ -364,7 +523,7 @@ const queuedRendersStreamingCache: StreamingCache<
       } = reactInternalFunctionDetails;
 
       // TODO Arbitrary max of 200 points here. We need to figure out a better strategy.
-      const scheduleUpdateHitPointsToCheck = scheduleUpdateOnFiber.hits.slice(0, 200);
+      const scheduleUpdateHitPointsToCheck = scheduleUpdateOnFiber.hits!.slice(0, 200);
 
       let currentResults: ReactQueuedRenderDetails[] = [];
 

@@ -7,6 +7,7 @@ import {
   Location,
   PauseDescription,
   PointDescription,
+  PointStackFrame,
   RunEvaluationResult,
   SearchSourceContentsMatch,
   SourceLocation,
@@ -23,6 +24,7 @@ import {
   Cache,
   StreamingCache,
   createCache,
+  createSingleEntryCache,
   createStreamingCache,
   useStreamingValue,
 } from "suspense";
@@ -43,18 +45,18 @@ import {
   pointsBoundingTimeCache,
   sessionEndPointCache,
 } from "replay-next/src/suspense/ExecutionPointsCache";
+import { createFocusIntervalCacheForExecutionPoints } from "replay-next/src/suspense/FocusIntervalCache";
 import { frameArgumentsCache } from "replay-next/src/suspense/FrameStepsCache";
 import { frameStepsCache } from "replay-next/src/suspense/FrameStepsCache";
-import {
-  getHitPointsForLocationAsync,
-  hitPointsCache,
-} from "replay-next/src/suspense/HitPointsCache";
+import { hitPointsCache } from "replay-next/src/suspense/HitPointsCache";
+import { mappedExpressionCache } from "replay-next/src/suspense/MappedExpressionCache";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
-import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
+import { pauseIdCache, updateMappedLocation } from "replay-next/src/suspense/PauseCache";
 import { searchCache } from "replay-next/src/suspense/SearchCache";
 import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
 import { Source, sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
 import { streamingSourceContentsCache } from "replay-next/src/suspense/SourcesCache";
+import { getPreferredLocation as getPreferredLocationNext } from "replay-next/src/utils/sources";
 import {
   compareExecutionPoints,
   isExecutionPointsGreaterThan,
@@ -84,9 +86,18 @@ import {
 import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { UIState } from "ui/state";
+import {
+  REDUX_ANNOTATIONS_KIND,
+  annotationKindsCache,
+  reduxDevToolsAnnotationsCache,
+} from "ui/suspense/annotationsCaches";
 import { getPauseFramesAsync } from "ui/suspense/frameCache";
 
-import { getReactDomSourceUrl, reactInternalMethodsHitsCache } from "./ReactPanel";
+import {
+  getReactDomSourceUrl,
+  reactInternalMethodsHitsCache,
+  reactInternalMethodsHitsIntervalCache,
+} from "./ReactPanel";
 import MaterialIcon from "./shared/MaterialIcon";
 import styles from "ui/components/Comments/CommentCardsList.module.css";
 
@@ -135,7 +146,20 @@ function doSomeAnalysis(range: TimeStampedPointRange | null): UIThunkAction {
       source.url?.includes("react-redux")
     );
 
-    console.log("Fetching internals hits");
+    // console.log("Fetching internals hits");
+
+    reduxDispatchFunctionCache.evictAll();
+    // const reduxDispatchStack = await reduxDispatchFunctionCache.readAsync(replayClient);
+
+    const reduxDispatches = await reduxDispatchesCache.readAsync(
+      BigInt(finalRange.begin.point),
+      BigInt(finalRange.end.point),
+      replayClient
+    );
+
+    console.log("Redux dispatches: ", reduxDispatches);
+
+    /*
     const reactInternalFunctionDetails = await reactInternalMethodsHitsCache.readAsync(
       replayClient,
       finalRange,
@@ -148,6 +172,7 @@ function doSomeAnalysis(range: TimeStampedPointRange | null): UIThunkAction {
     if (!reactInternalFunctionDetails) {
       return;
     }
+
     const {
       onCommitRoot,
       scheduleUpdateOnFiber,
@@ -155,7 +180,9 @@ function doSomeAnalysis(range: TimeStampedPointRange | null): UIThunkAction {
       renderWithHooks,
       finishClassComponent,
     } = reactInternalFunctionDetails;
+    */
 
+    /*
     const dispatchResults = await processReduxDispatches(
       getState,
       replayClient,
@@ -180,76 +207,81 @@ function doSomeAnalysis(range: TimeStampedPointRange | null): UIThunkAction {
 
     const dispatchesToProcess = dispatchResults; //.slice(0, 5);
 
-    const processedDispatchResults = dispatchesToProcess.map(dispatchEntry => {
-      const { afterReducer, afterNotifications } = dispatchEntry;
+      */
 
-      const notificationsDuringDispatch = notificationResults.filter(n =>
-        isExecutionPointsWithinRange(n.start.point, afterReducer.point, afterNotifications.point)
-      );
+    // const processedDispatchResults = dispatchesToProcess.map(dispatchEntry => {
+    //   const { afterReducer, afterNotifications } = dispatchEntry;
 
-      const selectorCallsDuringNotifications = allSelectorHitsFlattened.filter(n =>
-        isExecutionPointsWithinRange(n.start.point, afterReducer.point, afterNotifications.point)
-      );
+    //   const notificationsDuringDispatch = notificationResults.filter(n =>
+    //     isExecutionPointsWithinRange(n.start.point, afterReducer.point, afterNotifications.point)
+    //   );
 
-      const sumOfSelectorDurations = selectorCallsDuringNotifications.reduce(
-        (sum, n) => sum + n.duration,
-        0
-      );
+    //   const selectorCallsDuringNotifications = allSelectorHitsFlattened.filter(n =>
+    //     isExecutionPointsWithinRange(n.start.point, afterReducer.point, afterNotifications.point)
+    //   );
 
-      const selectorsWithExecutionGreaterThanZero = selectorCallsDuringNotifications.filter(
-        n => n.duration > 0
-      );
+    //   const sumOfSelectorDurations = selectorCallsDuringNotifications.reduce(
+    //     (sum, n) => sum + n.duration,
+    //     0
+    //   );
 
-      const scheduledUpdatesDuringDispatch = scheduleUpdateOnFiber.hits.filter(n =>
-        isExecutionPointsWithinRange(n.point, afterReducer.point, afterNotifications.point)
-      );
+    //   const selectorsWithExecutionGreaterThanZero = selectorCallsDuringNotifications.filter(
+    //     n => n.duration > 0
+    //   );
 
-      let functionComponentsRendered: TimeStampedPoint[] = [];
-      let classComponentsRendered: TimeStampedPoint[] = [];
+    //   /*
+    //   const scheduledUpdatesDuringDispatch = scheduleUpdateOnFiber.hits.filter(n =>
+    //     isExecutionPointsWithinRange(n.point, afterReducer.point, afterNotifications.point)
+    //   );
 
-      const queuedRender = scheduledUpdatesDuringDispatch.length > 0;
-      let nextRenderCommit: TimeStampedPoint | undefined;
-      let nextRenderStart: TimeStampedPoint | undefined;
-      if (queuedRender) {
-        nextRenderStart = renderRootSync.hits.find(n =>
-          isExecutionPointsGreaterThan(n.point, afterNotifications.point)
-        );
-        nextRenderCommit = onCommitRoot.hits.find(n =>
-          isExecutionPointsGreaterThan(n.point, afterNotifications.point)
-        );
+    //   let functionComponentsRendered: TimeStampedPoint[] = [];
+    //   let classComponentsRendered: TimeStampedPoint[] = [];
 
-        if (nextRenderStart && nextRenderCommit) {
-          functionComponentsRendered = renderWithHooks.hits.filter(n =>
-            isExecutionPointsWithinRange(n.point, nextRenderStart!.point, nextRenderCommit!.point)
-          );
+    //   const queuedRender = scheduledUpdatesDuringDispatch.length > 0;
+    //   let nextRenderCommit: TimeStampedPoint | undefined;
+    //   let nextRenderStart: TimeStampedPoint | undefined;
+    //   if (queuedRender) {
+    //     nextRenderStart = renderRootSync.hits.find(n =>
+    //       isExecutionPointsGreaterThan(n.point, afterNotifications.point)
+    //     );
+    //     nextRenderCommit = onCommitRoot.hits.find(n =>
+    //       isExecutionPointsGreaterThan(n.point, afterNotifications.point)
+    //     );
 
-          classComponentsRendered = finishClassComponent.hits.filter(n =>
-            isExecutionPointsWithinRange(n.point, nextRenderStart!.point, nextRenderCommit!.point)
-          );
-        }
-      }
+    //     if (nextRenderStart && nextRenderCommit) {
+    //       functionComponentsRendered = renderWithHooks.hits.filter(n =>
+    //         isExecutionPointsWithinRange(n.point, nextRenderStart!.point, nextRenderCommit!.point)
+    //       );
 
-      return {
-        ...dispatchEntry,
-        notificationsDuringDispatch,
-        selectorCallsDuringNotifications,
-        sumOfSelectorDurations,
-        selectorsWithExecutionGreaterThanZero,
-        scheduledUpdatesDuringDispatch,
-        queuedRender,
-        nextRenderStart,
-        nextRenderCommit,
-        nextRenderDuration:
-          nextRenderStart && nextRenderCommit
-            ? nextRenderCommit.time - nextRenderStart.time
-            : undefined,
-        functionComponentsRendered,
-        classComponentsRendered,
-      };
-    });
+    //       classComponentsRendered = finishClassComponent.hits.filter(n =>
+    //         isExecutionPointsWithinRange(n.point, nextRenderStart!.point, nextRenderCommit!.point)
+    //       );
+    //     }
+    //   }
+    //   */
 
-    console.log("Processed dispatch results: ", processedDispatchResults);
+    //   return {
+    //     ...dispatchEntry,
+    //     notificationsDuringDispatch,
+    //     selectorCallsDuringNotifications,
+    //     sumOfSelectorDurations,
+    //     selectorsWithExecutionGreaterThanZero,
+    //     // scheduledUpdatesDuringDispatch,
+    //     // queuedRender,
+    //     // nextRenderStart,
+    //     // nextRenderCommit,
+    //     // nextRenderDuration:
+    //     //   nextRenderStart && nextRenderCommit
+    //     //     ? nextRenderCommit.time - nextRenderStart.time
+    //     //     : undefined,
+    //     // functionComponentsRendered,
+    //     // classComponentsRendered,
+    //   };
+    // });
 
+    // console.log("Processed dispatch results: ", processedDispatchResults);
+
+    /*
     const dispatchesWithQueuedRender = processedDispatchResults.filter(d => d.queuedRender);
 
     const lastDispatchWithRender =
@@ -395,6 +427,7 @@ function doSomeAnalysis(range: TimeStampedPointRange | null): UIThunkAction {
       }
       console.log("Formatted classes: ", uniqueComponentClasses);
     }
+    */
   };
 }
 
@@ -464,6 +497,245 @@ async function processReduxNotifications(
   return notifyStartFinishPairs;
 }
 
+function formatPointStackFrame(frame: PointStackFrame, sourcesById: Map<string, Source>) {
+  updateMappedLocation(sourcesById, frame.functionLocation);
+  updateMappedLocation(sourcesById, frame.point.frame ?? []);
+  const functionLocation = getPreferredLocationNext(sourcesById, [], frame.functionLocation);
+  const executionLocation = getPreferredLocationNext(sourcesById, [], frame.point.frame ?? []);
+
+  const source = sourcesById.get(functionLocation.sourceId)!;
+
+  return {
+    url: source.url,
+    functionLocation,
+    executionLocation,
+    point: frame.point,
+  };
+}
+
+export const reduxDispatchFunctionCache: Cache<
+  [replayClient: ReplayClientInterface, rangeStart: string, rangeEnd: string],
+  | {
+      dispatch: FunctionOutline;
+      reduxSource: Source;
+      breakpoints: {
+        dispatchStart: Location;
+        beforeReducer: Location;
+        reducerDone: Location;
+        dispatchDone: Location;
+      };
+    }
+  | undefined
+> = createCache({
+  debugLabel: "ReduxDispatchFunction",
+  async load([replayClient, rangeStart, rangeEnd]) {
+    // TODO This relies on having a reasonably sourcemapped version of Redux.
+    // This won't work otherwise.
+    // There's some stupid tricks we could pull to find this in minified sources,
+    // like looking for the `ActionTypes.REPLACE` variable
+    const sourcesById = await sourcesByIdCache.readAsync(replayClient);
+    const reactReduxSources = Array.from(sourcesById.values()).filter(source =>
+      source.url?.includes("/redux/")
+    );
+
+    const dispatchMatches: FunctionMatch[] = [];
+    await replayClient.searchFunctions(
+      { query: "dispatch", sourceIds: reactReduxSources.map(source => source.id) },
+      matches => {
+        dispatchMatches.push(...matches);
+      }
+    );
+
+    const [firstMatch] = dispatchMatches;
+
+    const preferredLocation = getPreferredLocationNext(sourcesById, [], [firstMatch.loc]);
+    const reduxSource = sourcesById.get(preferredLocation.sourceId)!;
+    const fileOutline = await sourceOutlineCache.readAsync(replayClient, reduxSource.id);
+
+    const dispatchFunctions = fileOutline.functions.filter(o => o.name === "dispatch");
+    const createStoreFunction = fileOutline.functions.find(o => o.name === "createStore")!;
+    const realDispatchFunction = dispatchFunctions.find(f => {
+      return (
+        f.location.begin.line >= createStoreFunction.location.begin.line &&
+        f.location.end.line < createStoreFunction.location.end.line
+      );
+    })!;
+
+    if (!realDispatchFunction) {
+      return;
+    }
+
+    const [breakablePositions, breakablePositionsByLine] = await breakpointPositionsCache.readAsync(
+      replayClient,
+      reduxSource.id
+    );
+
+    const streaming = streamingSourceContentsCache.stream(replayClient, reduxSource!.id);
+    await streaming.resolver;
+    const reduxSourceLines = streaming.value!.split("\n");
+    const beforeReducerLine =
+      reduxSourceLines.findIndex(line => line.includes("isDispatching = true")) + 1;
+    const reducerDoneLine =
+      reduxSourceLines.findIndex(line => line.includes("currentListeners = nextListeners")) + 1;
+    const dispatchDoneLine = reduxSourceLines.findIndex(line => line.includes("return action")) + 1;
+    console.log({ reducerDoneLine, dispatchDoneLine });
+
+    const [beforeReducer, reducerDone, dispatchDone]: Location[] = [
+      beforeReducerLine,
+      reducerDoneLine,
+      dispatchDoneLine,
+    ].map(line => {
+      return {
+        sourceId: reduxSource.id,
+        line,
+        column: breakablePositionsByLine.get(line)!.columns[0],
+      };
+    });
+
+    const dispatchStart: Location = {
+      ...realDispatchFunction.breakpointLocation!,
+      sourceId: reduxSource.id,
+    };
+
+    return {
+      dispatch: realDispatchFunction,
+      reduxSource,
+      breakpoints: {
+        dispatchStart,
+        beforeReducer,
+        reducerDone,
+        dispatchDone,
+      },
+    };
+  },
+});
+
+interface ReduxDispatchDetails {
+  actionType: string;
+  dispatchStart: PointDescription;
+  beforeReducer: PointDescription;
+  afterReducer: PointDescription;
+  afterNotifications: PointDescription;
+  reducerDuration: number;
+  notificationDuration: number;
+}
+
+export const reduxDispatchesCache = createFocusIntervalCacheForExecutionPoints<
+  [replayClient: ReplayClientInterface],
+  ReduxDispatchDetails
+>({
+  debugLabel: "RecordedProtocolMessages",
+  getPointForValue: data => data.dispatchStart.point,
+  async load(rangeStart, rangeEnd, replayClient) {
+    const dispatchFunctionDetails = await reduxDispatchFunctionCache.readAsync(replayClient);
+
+    if (!dispatchFunctionDetails) {
+      return [];
+    }
+
+    const { dispatch, reduxSource, breakpoints } = dispatchFunctionDetails;
+
+    const sourcesById = await sourcesByIdCache.readAsync(replayClient);
+
+    const dispatchLocations = [
+      { ...dispatch.breakpointLocation!, sourceId: reduxSource.id },
+      breakpoints.beforeReducer,
+      breakpoints.reducerDone,
+      breakpoints.dispatchDone,
+    ];
+
+    const [reduxDispatchHits, beforeReducerHits, reducerDoneHits, dispatchDoneHits] =
+      await Promise.all(
+        dispatchLocations.map(location => {
+          return hitPointsCache.readAsync(
+            BigInt(rangeStart),
+            BigInt(rangeEnd),
+            replayClient,
+            location,
+            null
+          );
+        })
+      );
+
+    if (!reduxDispatchHits.length) {
+      return [];
+    }
+
+    const [firstHit] = reduxDispatchHits;
+    const frames = firstHit.frame ?? [];
+
+    const possibleParamNames = await Promise.all(
+      frames.map(async frame => {
+        const sourceOutline = await sourceOutlineCache.readAsync(replayClient, frame.sourceId);
+        const functionOutline = findFunctionOutlineForLocation(frame, sourceOutline);
+        return functionOutline?.parameters[0];
+      })
+    );
+    console.log("Possible param names: ", possibleParamNames);
+
+    const paramName = possibleParamNames.find(name => name !== "action") ?? "action";
+
+    const results: RunEvaluationResult[] = [];
+
+    const chunkedReduxDispatchHits = chunk(reduxDispatchHits, 190);
+    await Promise.all(
+      chunkedReduxDispatchHits.map(async points => {
+        await replayClient.runEvaluation(
+          {
+            selector: {
+              kind: "points",
+              points: points.map(annotation => annotation.point),
+            },
+            expression: `${paramName}.type`,
+            // Run in top frame.
+            frameIndex: 0,
+            shareProcesses: true,
+            fullPropertyPreview: true,
+          },
+          result => {
+            results.push(...result);
+          }
+        );
+      })
+    );
+
+    const actionTypes: string[] = results.map(result => {
+      return result.returned!.value;
+    });
+
+    const maxItems = Math.min(
+      reduxDispatchHits.length,
+      beforeReducerHits.length,
+      reducerDoneHits.length,
+      dispatchDoneHits.length,
+      actionTypes.length
+    );
+
+    const dispatchDetails = zip(
+      reduxDispatchHits.slice(0, maxItems),
+      beforeReducerHits.slice(0, maxItems),
+      reducerDoneHits.slice(0, maxItems),
+      dispatchDoneHits.slice(0, maxItems),
+      actionTypes.slice(0, maxItems)
+    ).map(([dispatchStart, beforeReducer, afterReducer, afterNotifications, actionType]) => {
+      const beforeReducerTime = beforeReducer?.time ?? 0;
+      const afterReducerTime: number = afterReducer?.time ?? 0;
+      const afterNotificationsTime = afterNotifications?.time ?? 0;
+      return {
+        actionType: actionType!,
+        dispatchStart: dispatchStart!,
+        beforeReducer: beforeReducer!,
+        afterReducer: afterReducer!,
+        afterNotifications: afterNotifications!,
+        reducerDuration: afterReducerTime - beforeReducerTime,
+        notificationDuration: afterNotificationsTime - afterReducerTime,
+      };
+    });
+
+    return dispatchDetails;
+  },
+});
+
 async function processReduxDispatches(
   getState: () => UIState,
   replayClient: ReplayClientInterface,
@@ -471,72 +743,25 @@ async function processReduxDispatches(
   sourcesState: SourcesState,
   reactDomSource: Source
 ) {
-  const dispatchMatches: FunctionMatch[] = [];
-
   console.log("Searching functions for `dispatch`...");
 
+  const dispatchFunctionDetails = await reduxDispatchFunctionCache.readAsync(replayClient);
+
+  if (!dispatchFunctionDetails) {
+    return;
+  }
+
+  const { dispatch, reduxSource, breakpoints } = dispatchFunctionDetails;
+
   const sourcesById = await sourcesByIdCache.readAsync(replayClient);
-  const reactReduxSources = Array.from(sourcesById.values()).filter(source =>
-    source.url?.includes("/redux/")
-  );
 
-  await replayClient.searchFunctions(
-    { query: "dispatch", sourceIds: reactReduxSources.map(source => source.id) },
-    matches => {
-      dispatchMatches.push(...matches);
-    }
-  );
-
-  const [firstMatch] = dispatchMatches;
-  const preferredLocation = getPreferredLocation(sourcesState, [firstMatch.loc]);
-  const reduxSource = sourcesById.get(preferredLocation.sourceId)!;
-  const fileOutline = await sourceOutlineCache.readAsync(replayClient, reduxSource.id);
-  const streaming = streamingSourceContentsCache.stream(replayClient, reduxSource!.id);
-  await streaming.resolver;
-
-  const dispatchFunctions = fileOutline.functions.filter(o => o.name === "dispatch");
-  const createStoreFunction = fileOutline.functions.find(o => o.name === "createStore")!;
-  const realDispatchFunction = dispatchFunctions.find(f => {
-    return (
-      f.location.begin.line >= createStoreFunction.location.begin.line &&
-      f.location.end.line < createStoreFunction.location.end.line
-    );
-  })!;
-  console.log({ createStoreFunction, realDispatchFunction });
-
-  const [breakablePositions, breakablePositionsByLine] = await breakpointPositionsCache.readAsync(
-    replayClient,
-    reduxSource.id
-  );
-
-  const reduxSourceLines = streaming.value!.split("\n");
-  const beforeDispatchLine =
-    reduxSourceLines.findIndex(line => line.includes("isDispatching = true")) + 1;
-  const reducerDoneLine =
-    reduxSourceLines.findIndex(line => line.includes("currentListeners = nextListeners")) + 1;
-  const dispatchDoneLine = reduxSourceLines.findIndex(line => line.includes("return action")) + 1;
-  console.log({ reducerDoneLine, dispatchDoneLine });
-
-  const beforeReducerBreakpoint: SourceLocation = {
-    line: beforeDispatchLine,
-    column: breakablePositionsByLine.get(beforeDispatchLine)!.columns[0],
-  };
-
-  const reducerDoneBreakpoint: SourceLocation = {
-    line: reducerDoneLine,
-    column: breakablePositionsByLine.get(reducerDoneLine)!.columns[0],
-  };
-
-  const dispatchDoneBreakpoint: SourceLocation = {
-    line: dispatchDoneLine,
-    column: breakablePositionsByLine.get(dispatchDoneLine)!.columns[0],
-  };
+  // console.log({ createStoreFunction, realDispatchFunction });
 
   const dispatchLocations = [
-    realDispatchFunction.breakpointLocation!,
-    beforeReducerBreakpoint,
-    reducerDoneBreakpoint,
-    dispatchDoneBreakpoint,
+    dispatch.breakpointLocation!,
+    breakpoints.beforeReducer,
+    breakpoints.reducerDone,
+    breakpoints.dispatchDone,
   ];
 
   const [reduxDispatchHits, beforeReducerHits, reducerDoneHits, dispatchDoneHits] =
@@ -567,7 +792,7 @@ async function processReduxDispatches(
     sourcesById
   );
 
-  // console.log("Actual `action` variable: ", firstParam);
+  console.log("Actual `action` variable: ", firstParam);
 
   /*
   // console.log("Redux dispatch hits: ", reduxDispatchHits);
