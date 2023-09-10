@@ -59,12 +59,7 @@ export function getNodeEventListeners(
           "canOverflow"
         ) as FunctionWithPreview;
 
-        return formatEventListener(
-          replayClient,
-          listener.type,
-          listenerHandler.preview,
-          state.sources
-        );
+        return formatEventListener(replayClient, listener.type, listenerHandler.preview);
       })
     );
 
@@ -139,7 +134,6 @@ export function getNodeEventListeners(
                 replayClient,
                 obj.name,
                 obj.value.preview,
-                state.sources,
                 // We're only finding React-specific event handlers atm
                 "react"
               );

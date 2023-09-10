@@ -778,17 +778,8 @@ async function processAllSelectorCalls(
   console.log("Formatting functions...");
 
   const formattedFunctions = await Promise.all(
-    results.map(async result => {
-      const functionWithPreview = result.data.objects!.find(
-        o => o.objectId === result.returned!.object!
-      ) as FunctionWithPreview;
-      const formattedFunction = (await formatEventListener(
-        replayClient,
-        "someType",
-        functionWithPreview.preview,
-        sourcesState
-      ))!;
-      return { formattedFunction, functionWithPreview };
+    results.map(result => {
+      return formatFunctionEvaluationResult(replayClient, result);
     })
   );
 
@@ -908,6 +899,21 @@ async function processAllSelectorCalls(
     sumsPerSelector,
     sortedSumsPerSelector,
   };
+}
+
+async function formatFunctionEvaluationResult(
+  replayClient: ReplayClientInterface,
+  result: RunEvaluationResult
+) {
+  const functionWithPreview = result.data.objects!.find(
+    o => o.objectId === result.returned!.object!
+  ) as FunctionWithPreview;
+  const formattedFunction = (await formatEventListener(
+    replayClient,
+    "someType",
+    functionWithPreview.preview
+  ))!;
+  return { formattedFunction, functionWithPreview };
 }
 
 function formattedFunctionToString(fn: EventListenerWithFunctionInfo) {

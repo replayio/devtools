@@ -368,7 +368,6 @@ export const eventListenerLocationCache: Cache<
           replayClient,
           replayEventType,
           onClickPreview.preview,
-          state.sources,
           "react"
         );
 

@@ -3,6 +3,7 @@ import type { Location, ObjectPreview, Object as ProtocolObject } from "@replayi
 import { updateMappedLocation } from "replay-next/src/suspense/PauseCache";
 import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
 import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
+import { getPreferredLocation as getPreferredLocationNext } from "replay-next/src/utils/sources";
 import { ReplayClientInterface } from "shared/client/types";
 import { SourceDetails, SourcesState, getPreferredLocation } from "ui/reducers/sources";
 
@@ -99,20 +100,19 @@ export const formatEventListener = async (
   replayClient: ReplayClientInterface,
   type: string,
   fnPreview: FunctionPreview,
-  sourcesState: SourcesState,
   framework?: string
 ): Promise<FormattedEventListener | undefined> => {
   const { functionLocation } = fnPreview;
-  const sources = await sourcesByIdCache.readAsync(replayClient);
-  updateMappedLocation(sources, functionLocation);
+  const sourcesById = await sourcesByIdCache.readAsync(replayClient);
+  updateMappedLocation(sourcesById, functionLocation);
 
-  const location = getPreferredLocation(sourcesState, functionLocation);
+  const location = getPreferredLocationNext(sourcesById, [], functionLocation);
 
   if (!location) {
     return;
   }
 
-  const sourceDetails = sourcesState.sourceDetails.entities[location.sourceId];
+  const sourceDetails = sourcesById.get(location.sourceId);
   if (!sourceDetails) {
     return;
   }
