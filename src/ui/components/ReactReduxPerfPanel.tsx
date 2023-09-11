@@ -647,7 +647,11 @@ export const reduxDispatchesCache = createFocusIntervalCacheForExecutionPoints<
   debugLabel: "RecordedProtocolMessages",
   getPointForValue: data => data.dispatchStart.point,
   async load(rangeStart, rangeEnd, replayClient) {
-    const dispatchFunctionDetails = await reduxDispatchFunctionCache.readAsync(replayClient);
+    const dispatchFunctionDetails = await reduxDispatchFunctionCache.readAsync(
+      replayClient,
+      rangeStart,
+      rangeEnd
+    );
 
     if (!dispatchFunctionDetails) {
       return [];
@@ -773,7 +777,11 @@ async function processReduxDispatches(
 ) {
   console.log("Searching functions for `dispatch`...");
 
-  const dispatchFunctionDetails = await reduxDispatchFunctionCache.readAsync(replayClient);
+  const dispatchFunctionDetails = await reduxDispatchFunctionCache.readAsync(
+    replayClient,
+    range.begin.point,
+    range.end.point
+  );
 
   if (!dispatchFunctionDetails) {
     return;
