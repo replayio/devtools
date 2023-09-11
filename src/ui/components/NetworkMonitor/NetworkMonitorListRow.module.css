@@ -37,10 +37,9 @@
 .Row[data-selected]:focus,
 .Row[data-selected]:hover {
   background: var(--primary-accent-hover);
-  color: #fff;
+  color: var(--primary-accent-foreground-text);
 
-  --status-background-color: #fff;
-  --status-color: #fff;
+  --status-color: var(--primary-accent-foreground-text);
 }
 
 /* These styles should stay in sync with NetworkMonitorListHeader */
