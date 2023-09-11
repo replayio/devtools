@@ -114,7 +114,7 @@ async function searchingCallstackForDispatch(
 
 // Check for all the functions before the fnIndex in the array
 // and find the one that wraps the function at fnIndex
-function findFunctionParent(functions: FunctionOutline[], fnIndex: number) {
+export function findFunctionParent(functions: FunctionOutline[], fnIndex: number) {
   for (let i = fnIndex - 1; i >= 0; i--) {
     let maybeParentFn = functions[i];
 

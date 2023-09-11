@@ -11,6 +11,7 @@ import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
 import { getPreferredLocation as getPreferredLocationNext } from "replay-next/src/utils/sources";
 import { ReplayClientInterface } from "shared/client/types";
 import { SourceDetails, SourcesState, getPreferredLocation } from "ui/reducers/sources";
+import { findFunctionParent } from "ui/suspense/jumpToLocationCache";
 
 import { InteractionEventKind } from "./constants";
 import { findClassOutlineForLocation, findFunctionOutlineForLocation } from "./jumpToCode";
@@ -136,8 +137,21 @@ export const formatEventListener = async (
     return;
   }
 
-  const functionName = functionOutline.name!;
+  let functionName = functionOutline.name!;
   const functionParameterNames = functionOutline.parameters;
+
+  if (!functionName) {
+    // Might be an anonymous callback. This annoyingly happens with thunks.
+    // Let's see if we can find a parent with a reasonable name.
+    const currentIndex = symbols.functions.indexOf(functionOutline);
+    if (currentIndex > -1) {
+      const maybeParent = findFunctionParent(symbols.functions, currentIndex);
+
+      if (maybeParent?.name) {
+        functionName = maybeParent.name;
+      }
+    }
+  }
 
   return {
     type,
