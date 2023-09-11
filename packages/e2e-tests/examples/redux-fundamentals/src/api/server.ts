@@ -61,12 +61,16 @@ const generateTodoText = () => {
 
 let nextId = 0
 
-let todos: Todo[] = Array.from({ length: 5 }).map((_, index) => ({
-  id: nextId++,
-  text: generateTodoText(),
-  completed: false,
-  color: '',
-}))
+const createTodo = (text: string = generateTodoText()): Todo => {
+  return {
+    id: nextId++,
+    text,
+    completed: false,
+    color: '',
+  }
+}
+
+let todos: Todo[] = Array.from({ length: 5 }).map((_, index) => createTodo())
 
 export const handlers = [
   rest.get('/fakeApi/todos', (req, res, ctx) => {
@@ -80,7 +84,7 @@ export const handlers = [
       throw new Error('Could not save the todo!')
     }
 
-    const todo: Todo = { ...body, id: nextId++ }
+    const todo: Todo = createTodo(body.text)
     todos.push(todo)
     return res(ctx.status(200), ctx.json(todo))
   }),

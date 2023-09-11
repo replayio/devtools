@@ -199,6 +199,10 @@ main {
   flex-grow: 2;
 }
 
+nav section h1 {
+  margin: 0.5em;
+}
+
 main h1,
 main h2 {
   width: 100%;
