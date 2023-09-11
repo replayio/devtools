@@ -1,4 +1,9 @@
-import type { Location, ObjectPreview, Object as ProtocolObject } from "@replayio/protocol";
+import type {
+  Location,
+  MappedLocation,
+  ObjectPreview,
+  Object as ProtocolObject,
+} from "@replayio/protocol";
 
 import { updateMappedLocation } from "replay-next/src/suspense/PauseCache";
 import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
@@ -99,14 +104,18 @@ export function locationToString(location: Location) {
 export const formatEventListener = async (
   replayClient: ReplayClientInterface,
   type: string,
-  fnPreview: FunctionPreview,
+  locationInFunction: Location | MappedLocation,
   framework?: string
 ): Promise<FormattedEventListener | undefined> => {
-  const { functionLocation } = fnPreview;
+  // const { functionLocation } = fnPreview;
   const sourcesById = await sourcesByIdCache.readAsync(replayClient);
-  updateMappedLocation(sourcesById, functionLocation);
-
-  const location = getPreferredLocationNext(sourcesById, [], functionLocation);
+  let location: Location | undefined;
+  if (Array.isArray(locationInFunction)) {
+    updateMappedLocation(sourcesById, locationInFunction);
+    location = getPreferredLocationNext(sourcesById, [], locationInFunction);
+  } else {
+    location = locationInFunction;
+  }
 
   if (!location) {
     return;

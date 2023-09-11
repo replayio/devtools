@@ -1136,7 +1136,7 @@ async function formatFunctionEvaluationResult(
   const formattedFunction = (await formatEventListener(
     replayClient,
     "someType",
-    functionWithPreview.preview
+    functionWithPreview.preview.functionLocation
   ))!;
   return { formattedFunction, functionWithPreview };
 }

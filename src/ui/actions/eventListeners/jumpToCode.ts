@@ -367,7 +367,7 @@ export const eventListenerLocationCache: Cache<
         const formattedEventListener = await formatEventListener(
           replayClient,
           replayEventType,
-          onClickPreview.preview,
+          onClickPreview.preview.functionLocation,
           "react"
         );
 
