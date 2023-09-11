@@ -4,7 +4,10 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",
-    "build": "vite build"
+    "build": "vite build",
+    "test": "playwright test",
+    "test:debug": "playwright test --workers 1 --headed",
+    "test:install": "playwright install"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^1.9.5",
