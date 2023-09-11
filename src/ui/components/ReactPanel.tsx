@@ -10,7 +10,7 @@ import {
 } from "@replayio/protocol";
 import classnames from "classnames";
 import mapValues from "lodash/mapValues";
-import { ReactNode, Suspense, useContext, useState } from "react";
+import { CSSProperties, ReactNode, Suspense, useContext, useMemo, useState } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList as List } from "react-window";
 import {
@@ -636,21 +636,21 @@ interface QueuedRenderItemData {
   currentTime: number;
   executionPoint: string;
   onSeek: (point: string, time: number) => void;
-  renderDetails: ReactUpdateScheduled;
+  entries: ReactUpdateScheduled[];
 }
 
 function ReactQueuedRenderListItem({
-  currentTime,
-  renderDetails,
-  executionPoint,
-  onSeek,
+  data,
+  index,
+  style,
 }: {
-  currentTime: number;
-  executionPoint: string;
-  onSeek: (point: string, time: number) => void;
-  renderDetails: ReactUpdateScheduled;
+  data: QueuedRenderItemData;
+  index: number;
+  style: CSSProperties;
 }) {
   const dispatch = useAppDispatch();
+  const renderDetails = data.entries[index];
+  const { executionPoint, onSeek, currentTime } = data;
   const { point, frame, functionName } = renderDetails;
   const isPaused = point.time === currentTime && executionPoint === point.point;
   const [jumpToCodeStatus] = useState<JumpToCodeStatus>("not_checked");
@@ -684,7 +684,7 @@ function ReactQueuedRenderListItem({
   }
 
   return (
-    <>
+    <div style={style}>
       <div
         className={classnames(styles.eventRow, "group block w-full", {
           "text-lightGrey": currentTime < point.time,
@@ -713,7 +713,7 @@ function ReactQueuedRenderListItem({
           }
         </div>
       </div>
-    </>
+    </div>
   );
 }
 
@@ -742,39 +742,32 @@ export function ReactPanelSuspends({ reactDomSource }: RPSProps) {
     reactDomSource
   );
 
-  const onSeek = (executionPoint: string, time: number) => {
-    dispatch(seek({ executionPoint, time }));
-  };
+  const itemData: QueuedRenderItemData = useMemo(() => {
+    const allScheduledEntries = reactRenderEntries.filter(
+      (entry): entry is ReactUpdateScheduled => entry.type === "scheduled"
+    );
+    const onlyUserEntries = allScheduledEntries.filter(entry => entry.cause === "user");
+    const onSeek = (executionPoint: string, time: number) => {
+      dispatch(seek({ executionPoint, time }));
+    };
 
-  const allScheduledEntries = reactRenderEntries.filter(
-    (entry): entry is ReactUpdateScheduled => entry.type === "scheduled"
-  );
-  const onlyUserEntries = allScheduledEntries.filter(entry => entry.cause === "user");
+    return {
+      executionPoint: executionPoint!,
+      currentTime,
+      entries: onlyUserEntries,
+      onSeek,
+    };
+  }, [reactRenderEntries, dispatch, currentTime, executionPoint]);
+
+  console.log("Item data: ", itemData);
 
   // TODO Add the red "current time" line from `Events.tsx`
 
   /*
-  <AutoSizer disableWidth>
-      {({ height }: { height: number }) => (
-        <List
-          children={RulesListItem}
-          height={height}
-          itemCount={itemCount}
-          itemData={itemData}
-          itemSize={ITEM_SIZE}
-          outerRef={outerRef}
-          width="100%"
-        />
-      )}
-      </AutoSizer>
+  
       */
   /*
-   
-  */
-
-  return (
-    <>
-      {onlyUserEntries.map((entry, i) => (
+    {onlyUserEntries.map((entry, i) => (
         <div key={entry.point.point}>
           <div className="px-1.5">
             <ReactQueuedRenderListItem
@@ -787,7 +780,27 @@ export function ReactPanelSuspends({ reactDomSource }: RPSProps) {
           </div>
         </div>
       ))}
-    </>
+  */
+
+  return (
+    <div style={{ flex: "1 1 auto", height: "100%" }}>
+      <AutoSizer disableWidth>
+        {({ height }: { height: number }) => {
+          console.log("Autosizer children()");
+          return (
+            <List
+              children={ReactQueuedRenderListItem}
+              height={height}
+              itemCount={itemData.entries.length}
+              itemData={itemData}
+              itemSize={30}
+              // outerRef={outerRef}
+              width="100%"
+            />
+          );
+        }}
+      </AutoSizer>
+    </div>
   );
 }
 
