@@ -1,0 +1,589 @@
+:root {
+  --redux-color: #764abc;
+}
+
+html {
+  height: 100%;
+}
+body {
+  height: 100vh;
+  min-height: 100vh;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+div#root {
+  height: 100%;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+p {
+  font-size: 1.1rem;
+}
+
+button {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: 100%;
+  vertical-align: baseline;
+  font-family: inherit;
+  font-weight: inherit;
+  color: inherit;
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Navbar */
+
+.App {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+nav {
+  display: flex;
+  padding: 0;
+  background: var(--redux-color);
+}
+
+nav section {
+  width: 100%;
+}
+
+nav section h1,
+nav section {
+  color: white;
+}
+
+/* Main content */
+
+section {
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 1.5rem;
+}
+
+section h1 {
+  font-size: 3rem;
+}
+
+.button {
+  display: inline-block;
+  background: #1976d2;
+  color: white;
+  border-radius: 4px;
+  font-weight: 700;
+  padding: 0.75rem 1.5rem;
+}
+
+button:disabled,
+button:disabled:hover {
+  opacity: 0.5;
+}
+
+/* https://projects.lukehaas.me/css-loaders/ , Loader #3 */
+.loader {
+  font-size: 10px;
+  margin: 50px auto;
+  text-indent: -9999em;
+  width: 5em;
+  height: 5em;
+  border-radius: 50%;
+  background: var(--redux-color);
+  background: -moz-linear-gradient(
+    left,
+    var(--redux-color) 10%,
+    rgba(128, 0, 255, 0) 42%
+  );
+  background: -webkit-linear-gradient(
+    left,
+    var(--redux-color) 10%,
+    rgba(128, 0, 255, 0) 42%
+  );
+  background: -o-linear-gradient(
+    left,
+    var(--redux-color) 10%,
+    rgba(128, 0, 255, 0) 42%
+  );
+  background: -ms-linear-gradient(
+    left,
+    var(--redux-color) 10%,
+    rgba(128, 0, 255, 0) 42%
+  );
+  background: linear-gradient(
+    to right,
+    var(--redux-color) 10%,
+    rgba(128, 0, 255, 0) 42%
+  );
+  position: relative;
+  -webkit-animation: load3 1.4s infinite linear;
+  animation: load3 1.4s infinite linear;
+  -webkit-transform: translateZ(0);
+  -ms-transform: translateZ(0);
+  transform: translateZ(0);
+}
+
+.loader:before {
+  width: 50%;
+  height: 50%;
+  background: var(--redux-color);
+  border-radius: 100% 0 0 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  content: '';
+}
+
+.loader:after {
+  background: #ffffff;
+  width: 75%;
+  height: 75%;
+  border-radius: 50%;
+  content: '';
+  margin: auto;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
+
+@-webkit-keyframes load3 {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes load3 {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+
+/* TodoMVC App CSS */
+
+main {
+  background: #f5f5f5;
+  color: #111111;
+  min-width: 230px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-grow: 2;
+}
+
+main h1,
+main h2 {
+  width: 100%;
+  font-size: 50px;
+  font-weight: 200;
+  text-align: center;
+  color: #b83f45;
+  margin-top: 0;
+  -webkit-text-rendering: optimizeLegibility;
+  -moz-text-rendering: optimizeLegibility;
+  text-rendering: optimizeLegibility;
+}
+
+:focus {
+  outline: 0;
+}
+
+.hidden {
+  display: none;
+}
+
+.todoapp {
+  background: #fff;
+  min-width: 800px;
+  position: relative;
+  display: flex;
+  text-align: left;
+  flex-direction: column;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 25px 50px 0 rgba(0, 0, 0, 0.1);
+}
+
+.todoapp input::input-placeholder,
+.todoapp input::-webkit-input-placeholder,
+.todoapp input::-moz-placeholder {
+  font-style: italic;
+  font-weight: 300;
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.todoapp header.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.todoapp header.header .loader {
+  width: 2em;
+  height: 2em;
+  margin: 0 20px 0 0;
+}
+
+.todoapp h1 {
+  position: absolute;
+  top: -140px;
+  width: 100%;
+  font-size: 80px;
+  font-weight: 200;
+  text-align: center;
+  color: #b83f45;
+  -webkit-text-rendering: optimizeLegibility;
+  -moz-text-rendering: optimizeLegibility;
+  text-rendering: optimizeLegibility;
+}
+
+.new-todo,
+.edit {
+  position: relative;
+  margin: 0;
+  width: 100%;
+  font-size: 24px;
+  font-family: inherit;
+  font-weight: inherit;
+  line-height: 1.4em;
+  color: inherit;
+  padding: 6px;
+  border: 1px solid #999;
+  box-shadow: inset 0 -1px 5px 0 rgba(0, 0, 0, 0.2);
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.new-todo {
+  padding: 16px 16px 16px 60px;
+  border: none;
+  background: rgba(0, 0, 0, 0.003);
+  box-shadow: inset 0 -2px 1px rgba(0, 0, 0, 0.03);
+}
+
+.main {
+  position: relative;
+  z-index: 2;
+  border-top: 1px solid #e6e6e6;
+}
+
+.todoapp section.todo-list {
+  margin: 0;
+}
+
+.toggle-all:checked + label:before {
+  color: #737373;
+}
+
+.todo-list {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  height: 400px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+ul.todo-list {
+  list-style: none;
+}
+
+.todo-list li {
+  position: relative;
+  font-size: 24px;
+  border-bottom: 1px solid #ededed;
+}
+
+.todo-list li:last-child {
+  border-bottom: none;
+}
+
+.todo-list li .view {
+  display: flex;
+  align-items: center;
+}
+
+.todo-list li .segment {
+  display: flex;
+  align-items: center;
+}
+
+.todo-list li .segment.label {
+  flex-grow: 2;
+}
+
+.todo-list li .toggle {
+  text-align: center;
+  width: 40px;
+  /* auto, since non-WebKit browsers doesn't support input styling */
+  height: auto;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  margin: auto 0;
+  border: none; /* Mobile Safari */
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.todo-list li .toggle {
+  opacity: 0;
+}
+
+.todo-list li .toggle + .todo-text {
+  /*
+		Firefox requires `#` to be escaped - https://bugzilla.mozilla.org/show_bug.cgi?id=922433
+		IE and Edge requires *everything* to be escaped to render, so we do that instead of just the `#` - https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/7157459/
+	*/
+  background-image: url('data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2240%22%20height%3D%2240%22%20viewBox%3D%22-10%20-18%20100%20135%22%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2250%22%20r%3D%2250%22%20fill%3D%22none%22%20stroke%3D%22%23ededed%22%20stroke-width%3D%223%22/%3E%3C/svg%3E');
+  background-repeat: no-repeat;
+  background-position: center left;
+}
+
+.todo-list li .toggle:checked + .todo-text {
+  background-image: url('data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2240%22%20height%3D%2240%22%20viewBox%3D%22-10%20-18%20100%20135%22%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2250%22%20r%3D%2250%22%20fill%3D%22none%22%20stroke%3D%22%23bddad5%22%20stroke-width%3D%223%22/%3E%3Cpath%20fill%3D%22%235dc2af%22%20d%3D%22M72%2025L42%2071%2027%2056l-4%204%2020%2020%2034-52z%22/%3E%3C/svg%3E');
+}
+
+.todo-list li .todo-text {
+  margin: 5px;
+  word-break: break-all;
+  padding: 5px 5px 5px 60px;
+  display: block;
+  line-height: 1.2;
+  transition: color 0.4s;
+  font-weight: 400;
+  color: black;
+  flex-grow: 2;
+}
+
+.todo-list li.completed label {
+  color: #cdcdcd;
+  text-decoration: line-through;
+}
+
+.todo-list li select.colorPicker {
+  width: 90px !important;
+  padding: 0.1rem 0 0.1rem 0.4rem;
+  margin: 0 10px;
+  height: 30px;
+  line-height: 24px;
+  font-weight: 700;
+}
+
+.todo-list li select.colorPicker option {
+  font-weight: 700;
+}
+
+.todo-list li select.colorPicker option[value='green'] {
+  color: green;
+}
+
+.todo-list li select.colorPicker option[value='blue'] {
+  color: blue;
+}
+
+.todo-list li select.colorPicker option[value='orange'] {
+  color: orange;
+}
+
+.todo-list li select.colorPicker option[value='purple'] {
+  color: purple;
+}
+
+.todo-list li select.colorPicker option[value='red'] {
+  color: red;
+}
+
+.todo-list li .destroy {
+  width: 30px;
+  height: 30px;
+  margin-right: 10px;
+  font-size: 30px;
+  line-height: 30px;
+  color: #cc9a9a;
+  transition: color 0.2s ease-out;
+  background: unset !important;
+  border: unset !important;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+}
+
+.todo-list li .destroy:hover {
+  color: #af5b5e;
+}
+
+/* Font-Awesome base icon rules */
+.svg-inline--fa.fa-w-11 {
+  width: 0.6875em;
+}
+
+.footer {
+  padding: 10px 15px;
+  text-align: center;
+  font-size: 15px;
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid #e6e6e6;
+}
+
+.footer h5 {
+  font-size: 1rem;
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.footer .actions {
+  display: flex;
+  flex-direction: column;
+}
+
+.footer .actions button {
+  padding: 5px 10px;
+  margin: 5px 6px 10px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.todo-count strong {
+  font-weight: 600;
+}
+
+.filters {
+  text-align: left;
+}
+
+.filters ul {
+  margin: 0;
+  padding: 0;
+  text-align: left;
+  list-style: none;
+}
+
+.filters.statusFilters li button {
+  color: inherit;
+  margin: 3px;
+  padding: 3px 7px;
+  text-decoration: none;
+  border: 2px solid transparent;
+  border-radius: 3px;
+  cursor: pointer;
+  background: unset !important;
+}
+
+.filters.statusFilters li button:hover {
+  border-color: rgba(175, 47, 47, 0.1);
+}
+
+.filters.statusFilters li button.selected {
+  border-color: rgba(175, 47, 47, 0.3);
+}
+
+.filters.colorFilters .color-block {
+  display: inline-block;
+  width: 20px;
+  height: 12px;
+  border-radius: 3;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.info {
+  margin: 65px auto 0;
+  color: #4d4d4d;
+  font-size: 11px;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+  text-align: center;
+}
+
+.info p {
+  line-height: 1;
+}
+
+.info a {
+  color: inherit;
+  text-decoration: none;
+  font-weight: 400;
+}
+
+.info a:hover {
+  text-decoration: underline;
+}
+
+/*
+	Hack to remove background from Mobile Safari.
+	Can't use it globally since it destroys checkboxes in Firefox
+*/
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  .toggle-all,
+  .todo-list li .toggle {
+    background: none;
+  }
+
+  .todo-list li .toggle {
+    height: 40px;
+  }
+}
+
+@media (max-width: 840px) {
+  .footer {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .todoapp {
+    min-width: inherit;
+  }
+
+  .todo-list li .view {
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    padding-bottom: 5px;
+  }
+
+  .todo-list li .segment.buttons {
+    justify-content: flex-end;
+  }
+
+  .filters {
+    bottom: 10px;
+  }
+}
+
+form.colorSelection label {
+  margin: 0;
+}
+
+form.colorSelection input[type='checkbox'] {
+  margin-right: 5px;
+}
