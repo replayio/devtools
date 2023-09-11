@@ -97,6 +97,7 @@ import {
   getReactDomSourceUrl,
   reactInternalMethodsHitsCache,
   reactInternalMethodsHitsIntervalCache,
+  reactRendersIntervalCache,
 } from "./ReactPanel";
 import MaterialIcon from "./shared/MaterialIcon";
 import styles from "ui/components/Comments/CommentCardsList.module.css";
@@ -158,6 +159,13 @@ function doSomeAnalysis(range: TimeStampedPointRange | null): UIThunkAction {
     );
 
     console.log("Redux dispatches: ", reduxDispatches);
+
+    const reactRenders = await reactRendersIntervalCache.readAsync(
+      BigInt(finalRange.begin.point),
+      BigInt(finalRange.end.point),
+      replayClient,
+      reactDomSource
+    );
 
     /*
     const reactInternalFunctionDetails = await reactInternalMethodsHitsCache.readAsync(
@@ -497,7 +505,18 @@ async function processReduxNotifications(
   return notifyStartFinishPairs;
 }
 
-function formatPointStackFrame(frame: PointStackFrame, sourcesById: Map<string, Source>) {
+export interface FormattedPointStackFrame {
+  url?: string;
+  source: Source;
+  functionLocation: Location;
+  executionLocation: Location;
+  point: PointDescription;
+}
+
+export function formatPointStackFrame(
+  frame: PointStackFrame,
+  sourcesById: Map<string, Source>
+): FormattedPointStackFrame {
   updateMappedLocation(sourcesById, frame.functionLocation);
   updateMappedLocation(sourcesById, frame.point.frame ?? []);
   const functionLocation = getPreferredLocationNext(sourcesById, [], frame.functionLocation);
@@ -507,6 +526,7 @@ function formatPointStackFrame(frame: PointStackFrame, sourcesById: Map<string, 
 
   return {
     url: source.url,
+    source,
     functionLocation,
     executionLocation,
     point: frame.point,
@@ -702,6 +722,14 @@ export const reduxDispatchesCache = createFocusIntervalCacheForExecutionPoints<
     const actionTypes: string[] = results.map(result => {
       return result.returned!.value;
     });
+
+    console.log("Fetching point stacks...");
+    const pointStacks = await Promise.all(
+      reduxDispatchHits.map(hit => {
+        return replayClient.getPointStack(hit.point, 5);
+      })
+    );
+    console.log("Point stacks: ", pointStacks);
 
     const maxItems = Math.min(
       reduxDispatchHits.length,

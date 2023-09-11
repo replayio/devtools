@@ -738,13 +738,6 @@ export class ReplayClient implements ReplayClientInterface {
     return result;
   }
 
-  async getPointStack(point: string, maxCount = 15): Promise<getPointStackResult> {
-    const sessionId = this.getSessionIdThrows();
-
-    const result = await client.Session.getPointStack({ point, maxCount }, sessionId);
-    return result;
-  }
-
   getRecordingId(): RecordingId | null {
     return this._recordingId;
   }

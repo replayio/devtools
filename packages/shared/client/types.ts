@@ -240,7 +240,6 @@ export interface ReplayClientInterface {
   getParentNodes(pauseId: PauseId, nodeId: string): Promise<getParentNodesResult>;
   getPointNearTime(time: number): Promise<TimeStampedPoint>;
   getPointsBoundingTime(time: number): Promise<PointsBoundingTime>;
-  getPointStack(point: ExecutionPoint, maxCount?: number): Promise<getPointStackResult>;
   getRecordingId(): RecordingId | null;
   getNetworkRequestBody(
     requestId: RequestId,

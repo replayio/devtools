@@ -10,13 +10,16 @@ import {
 } from "@replayio/protocol";
 import classnames from "classnames";
 import mapValues from "lodash/mapValues";
-import { ReactNode, useContext, useState } from "react";
+import { ReactNode, Suspense, useContext, useState } from "react";
+import AutoSizer from "react-virtualized-auto-sizer";
+import { FixedSizeList as List } from "react-window";
 import {
   Cache,
   StreamingCache,
   createCache,
   createSingleEntryCache,
   createStreamingCache,
+  useImperativeCacheValue,
   useStreamingValue,
 } from "suspense";
 
@@ -37,15 +40,20 @@ import { getPointAndTimeForPauseId, pauseIdCache } from "replay-next/src/suspens
 import { getPointDescriptionForFrame } from "replay-next/src/suspense/PointStackCache";
 import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
 import {
+  sourcesByIdCache,
   streamingSourceContentsCache,
   useSourcesById,
   useSourcesByUrl,
 } from "replay-next/src/suspense/SourcesCache";
+import { Source } from "replay-next/src/suspense/SourcesCache";
 import { getSourceToDisplayForUrl } from "replay-next/src/utils/sources";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
 import { UIThunkAction } from "ui/actions";
-import { MORE_IGNORABLE_PARTIAL_URLS } from "ui/actions/eventListeners/eventListenerUtils";
+import {
+  MORE_IGNORABLE_PARTIAL_URLS,
+  formatEventListener,
+} from "ui/actions/eventListeners/eventListenerUtils";
 import { findFunctionOutlineForLocation } from "ui/actions/eventListeners/jumpToCode";
 import { seek } from "ui/actions/timeline";
 import { JumpToCodeButton, JumpToCodeStatus } from "ui/components/shared/JumpToCodeButton";
@@ -54,6 +62,7 @@ import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { getPauseFramesAsync } from "ui/suspense/frameCache";
 
+import { FormattedPointStackFrame, formatPointStackFrame } from "./ReactReduxPerfPanel";
 import MaterialIcon from "./shared/MaterialIcon";
 import styles from "./Events/Event.module.css";
 
@@ -296,6 +305,112 @@ export const reactInternalMethodsHitsIntervalCache = createFocusIntervalCacheFor
   },
 });
 
+type ReactUpdateScheduled = {
+  type: "scheduled";
+  point: PointDescription;
+  frame?: FormattedPointStackFrame;
+  allFrames: FormattedPointStackFrame[];
+  filteredFrames: FormattedPointStackFrame[];
+  functionName?: string;
+  cause: "user" | "internal" | "unknown";
+};
+
+type ReactSyncUpdatedStarted = {
+  type: "sync_started";
+  point: PointDescription;
+};
+
+type ReactRenderCommitted = {
+  type: "render_committed";
+  point: PointDescription;
+};
+
+type ReactRenderEntry = ReactUpdateScheduled | ReactSyncUpdatedStarted | ReactRenderCommitted;
+
+export const reactRendersIntervalCache = createFocusIntervalCacheForExecutionPoints<
+  [replayClient: ReplayClientInterface, reactDomSource: SourceDetails | undefined],
+  ReactRenderEntry
+>({
+  debugLabel: "ReactRenders",
+  getPointForValue: data => data.point.point,
+  async load(rangeStart, rangeEnd, replayClient, reactDomSource) {
+    if (!rangeStart || !rangeEnd || !reactDomSource) {
+      return [];
+    }
+
+    console.log("Getting React renders");
+
+    const methodNames: ReactInternalFunctionName[] = [
+      "scheduleUpdateOnFiber",
+      "renderRootSync",
+      "onCommitRoot",
+    ];
+
+    const sourcesById = await sourcesByIdCache.readAsync(replayClient);
+
+    const [scheduleUpdateHits, renderRootSyncHits, onCommitRootHits] = await Promise.all(
+      methodNames.map(methodName => {
+        return reactInternalMethodsHitsIntervalCache.readAsync(
+          BigInt(rangeStart),
+          BigInt(rangeEnd),
+          replayClient,
+          methodName,
+          reactDomSource
+        );
+      })
+    );
+
+    const scheduleUpdateEntries: ReactUpdateScheduled[] = await Promise.all(
+      scheduleUpdateHits.map(async hit => {
+        const pointStack = await replayClient.getPointStack(hit.point, 15);
+        const formattedFrames = pointStack.map(frame => {
+          return formatPointStackFrame(frame, sourcesById);
+        });
+
+        const filteredPauseFrames = formattedFrames.filter(frame => {
+          const { source } = frame;
+          // Filter out everything in `node_modules`, so we have just app code left
+          // TODO There may be times when we care about renders queued by lib code
+          // TODO See about just filtering out React instead?
+          return !MORE_IGNORABLE_PARTIAL_URLS.some(partialUrl => source.url?.includes(partialUrl));
+        });
+
+        // We want the oldest app stack frame, which should be what called `setState()`
+        // But, React also calls `scheduleUpdate` frequently _internally_.
+        // So, there may not be any app code frames at all.
+        let earliestAppCodeFrame: FormattedPointStackFrame | undefined =
+          filteredPauseFrames.slice(-1)[0];
+
+        const cause = earliestAppCodeFrame ? "user" : "unknown";
+        const point = earliestAppCodeFrame ? earliestAppCodeFrame.point : hit;
+        let functionName;
+
+        if (earliestAppCodeFrame) {
+          const formattedFunction = await formatEventListener(
+            replayClient,
+            "unknown",
+            earliestAppCodeFrame.executionLocation
+          );
+          functionName = formattedFunction?.functionName;
+        }
+
+        return {
+          type: "scheduled",
+          point,
+          cause,
+          functionName,
+          frame: earliestAppCodeFrame!,
+          allFrames: formattedFrames,
+          filteredFrames: filteredPauseFrames,
+        };
+      })
+    );
+
+    console.log("Schedule update entries: ", scheduleUpdateEntries);
+    return scheduleUpdateEntries;
+  },
+});
+
 export const reactInternalMethodsHitsCache: Cache<
   [
     replayClient: ReplayClientInterface,
@@ -487,105 +602,28 @@ export const reactInternalMethodsHitsCache: Cache<
   },
 });
 
-const queuedRendersStreamingCache: StreamingCache<
-  [
-    replayClient: ReplayClientInterface,
-    range: TimeStampedPointRange | null,
-    reactDomSource: SourceDetails | undefined,
-    sourcesState: SourcesState
-  ],
-  ReactQueuedRenderDetails[] | undefined
-> = createStreamingCache({
-  getKey: (replayClient, range, reactDomSource, sourcesState) =>
-    `${range?.begin.point}:${range?.end.point}`,
-  load: async ({ update, resolve, reject }, replayClient, range, reactDomSource, sourcesState) => {
-    if (!reactDomSource || !range) {
-      resolve();
-      return;
-    }
-    try {
-      const reactInternalFunctionDetails = await reactInternalMethodsHitsCache.readAsync(
-        replayClient,
-        range,
-        reactDomSource,
-        sourcesState
-      );
-
-      if (!reactInternalFunctionDetails) {
-        return;
-      }
-      const {
-        onCommitRoot,
-        scheduleUpdateOnFiber,
-        renderRootSync,
-        renderWithHooks,
-        finishClassComponent,
-      } = reactInternalFunctionDetails;
-
-      // TODO Arbitrary max of 200 points here. We need to figure out a better strategy.
-      const scheduleUpdateHitPointsToCheck = scheduleUpdateOnFiber.hits!.slice(0, 200);
-
-      let currentResults: ReactQueuedRenderDetails[] = [];
-
-      for (let [index, hitPoint] of scheduleUpdateHitPointsToCheck.entries()) {
-        // We know a time that React's internal "schedule a render" logic ran. Start with that time.
-        const pauseId = await pauseIdCache.readAsync(replayClient, hitPoint.point, hitPoint.time);
-
-        // Get the stack frames for that call.
-        const pauseFrames = (await getPauseFramesAsync(replayClient, pauseId, sourcesState)) ?? [];
-        const filteredPauseFrames = pauseFrames.filter(frame => {
-          const { source } = frame;
-          if (!source) {
-            return false;
-          }
-          // Filter out everything in `node_modules`, so we have just app code left
-          // TODO There may be times when we care about renders queued by lib code
-          // TODO See about just filtering out React instead?
-          return !MORE_IGNORABLE_PARTIAL_URLS.some(partialUrl => source.url?.includes(partialUrl));
-        });
-
-        // We want the oldest app stack frame, which should be what called `setState()`
-        let earliestAppCodeFrame: PauseFrame | undefined = filteredPauseFrames.slice(-1)[0];
-
-        const result: ReactQueuedRenderDetails = {
-          ...hitPoint,
-          pauseFrames,
-          filteredPauseFrames,
-          userPauseFrame: earliestAppCodeFrame,
-        };
-
-        currentResults = currentResults.concat(result);
-
-        update(currentResults);
-      }
-
-      resolve();
-    } catch (err) {
-      console.error("Error getting React render data: ", err);
-      reject(err);
-    }
-  },
-});
-
 function jumpToTimeAndLocationForQueuedRender(
-  earliestAppCodeFrame: PauseFrame,
+  hitPoint: TimeStampedPoint,
+  location: Location | undefined,
   jumpBehavior: "timeOnly" | "timeAndLocation",
   onSeek: (point: ExecutionPoint, time: number) => void
 ): UIThunkAction {
   return async (dispatch, getState, { replayClient }) => {
-    const jumpLocation = await reactRenderQueuedJumpLocationCache.readAsync(
-      replayClient,
-      earliestAppCodeFrame
-    );
-    if (jumpLocation) {
-      if (jumpLocation.point) {
-        onSeek(jumpLocation.point.point, jumpLocation.point.time);
-      }
+    onSeek(hitPoint.point, hitPoint.time);
+    // const sourcesState = getState().sources;
+    // const jumpLocation = await reactRenderQueuedJumpLocationCache.readAsync(
+    //   replayClient,
+    //   earliestAppCodeFrame,
+    //   sourcesState
+    // );
+    // if (jumpLocation) {
+    //   if (jumpLocation.point) {
+    //     onSeek(jumpLocation.point.point, jumpLocation.point.time);
+    //   }
 
-      if (jumpBehavior === "timeAndLocation") {
-        const cx = getThreadContext(getState());
-        dispatch(selectLocation(cx, jumpLocation.location));
-      }
+    if (jumpBehavior === "timeAndLocation" && location) {
+      const cx = getThreadContext(getState());
+      dispatch(selectLocation(cx, location));
     }
   };
 }
@@ -593,6 +631,13 @@ function jumpToTimeAndLocationForQueuedRender(
 const Label = ({ children }: { children: ReactNode }) => (
   <div className="overflow-hidden overflow-ellipsis whitespace-pre font-normal">{children}</div>
 );
+
+interface QueuedRenderItemData {
+  currentTime: number;
+  executionPoint: string;
+  onSeek: (point: string, time: number) => void;
+  renderDetails: ReactUpdateScheduled;
+}
 
 function ReactQueuedRenderListItem({
   currentTime,
@@ -603,16 +648,12 @@ function ReactQueuedRenderListItem({
   currentTime: number;
   executionPoint: string;
   onSeek: (point: string, time: number) => void;
-  renderDetails: ReactQueuedRenderDetails;
+  renderDetails: ReactUpdateScheduled;
 }) {
   const dispatch = useAppDispatch();
-  const { userPauseFrame, point, time } = renderDetails;
-  const isPaused = time === currentTime && executionPoint === point;
+  const { point, frame, functionName } = renderDetails;
+  const isPaused = point.time === currentTime && executionPoint === point.point;
   const [jumpToCodeStatus] = useState<JumpToCodeStatus>("not_checked");
-
-  if (!userPauseFrame) {
-    return null;
-  }
 
   const onMouseEnter = () => {};
 
@@ -621,15 +662,24 @@ function ReactQueuedRenderListItem({
   const onClickSeek = (e: React.MouseEvent) => {
     e.stopPropagation();
 
-    dispatch(jumpToTimeAndLocationForQueuedRender(userPauseFrame, "timeOnly", onSeek));
+    dispatch(
+      jumpToTimeAndLocationForQueuedRender(point, frame?.executionLocation, "timeOnly", onSeek)
+    );
   };
 
   const onClickJumpToCode = async () => {
-    dispatch(jumpToTimeAndLocationForQueuedRender(userPauseFrame, "timeAndLocation", onSeek));
+    dispatch(
+      jumpToTimeAndLocationForQueuedRender(
+        point,
+        frame?.executionLocation,
+        "timeAndLocation",
+        onSeek
+      )
+    );
   };
 
   let eventType = "react";
-  if (renderDetails.pauseFrames.some(frame => frame.source?.url?.includes("react-redux"))) {
+  if (renderDetails.allFrames.some(frame => frame.source?.url?.includes("react-redux"))) {
     eventType = "redux";
   }
 
@@ -637,7 +687,7 @@ function ReactQueuedRenderListItem({
     <>
       <div
         className={classnames(styles.eventRow, "group block w-full", {
-          "text-lightGrey": currentTime < time,
+          "text-lightGrey": currentTime < point.time,
           "font-semibold text-primaryAccent": isPaused,
         })}
         onMouseEnter={onMouseEnter}
@@ -650,7 +700,7 @@ function ReactQueuedRenderListItem({
           ) : (
             <MaterialIcon iconSize="xl">ads_click</MaterialIcon>
           )}
-          <Label>{simplifyDisplayName(userPauseFrame!.displayName)}</Label>
+          <Label>{functionName ?? "Unknown"}</Label>
         </div>
         <div className="flex space-x-2 opacity-0 group-hover:opacity-100">
           {
@@ -658,7 +708,7 @@ function ReactQueuedRenderListItem({
               onClick={onClickJumpToCode}
               status={jumpToCodeStatus}
               currentExecutionPoint={executionPoint}
-              targetExecutionPoint={renderDetails.point}
+              targetExecutionPoint={renderDetails.point.point}
             />
           }
         </div>
@@ -674,12 +724,76 @@ export const getReactDomSourceUrl = createSelector(getSourceIdsByUrl, sourcesByU
   return reactDomUrl;
 });
 
-export function ReactPanel() {
+interface RPSProps {
+  reactDomSource: Source;
+}
+
+export function ReactPanelSuspends({ reactDomSource }: RPSProps) {
   const dispatch = useAppDispatch();
   const currentTime = useAppSelector(getCurrentTime);
   const executionPoint = useAppSelector(getExecutionPoint);
-  const replayClient = useContext(ReplayClientContext);
   const { range: focusRange } = useContext(FocusContext);
+  const replayClient = useContext(ReplayClientContext);
+
+  const reactRenderEntries = reactRendersIntervalCache.read(
+    BigInt(focusRange!.begin.point),
+    BigInt(focusRange!.end.point),
+    replayClient,
+    reactDomSource
+  );
+
+  const onSeek = (executionPoint: string, time: number) => {
+    dispatch(seek({ executionPoint, time }));
+  };
+
+  const allScheduledEntries = reactRenderEntries.filter(
+    (entry): entry is ReactUpdateScheduled => entry.type === "scheduled"
+  );
+  const onlyUserEntries = allScheduledEntries.filter(entry => entry.cause === "user");
+
+  // TODO Add the red "current time" line from `Events.tsx`
+
+  /*
+  <AutoSizer disableWidth>
+      {({ height }: { height: number }) => (
+        <List
+          children={RulesListItem}
+          height={height}
+          itemCount={itemCount}
+          itemData={itemData}
+          itemSize={ITEM_SIZE}
+          outerRef={outerRef}
+          width="100%"
+        />
+      )}
+      </AutoSizer>
+      */
+  /*
+   
+  */
+
+  return (
+    <>
+      {onlyUserEntries.map((entry, i) => (
+        <div key={entry.point.point}>
+          <div className="px-1.5">
+            <ReactQueuedRenderListItem
+              currentTime={currentTime}
+              executionPoint={executionPoint!}
+              renderDetails={entry}
+              onSeek={onSeek}
+              key={entry.point.point}
+            />
+          </div>
+        </div>
+      ))}
+    </>
+  );
+}
+
+export function ReactPanel() {
+  const { range: focusRange } = useContext(FocusContext);
+  const replayClient = useContext(ReplayClientContext);
   const sourcesById = useSourcesById(replayClient);
   const sourcesByUrl = useSourcesByUrl(replayClient);
 
@@ -698,15 +812,6 @@ export function ReactPanel() {
     return reactDomSource;
   });
 
-  const streamingValue = queuedRendersStreamingCache.stream(
-    replayClient,
-    focusRange,
-    reactDomSource,
-    sourcesState
-  );
-  const streamingRes = useStreamingValue(streamingValue);
-  const { data, progress, value: streamingRenderData } = streamingRes;
-
   if (!focusRange?.begin) {
     return <div>No focus range</div>;
   } else if (!reactDomSource) {
@@ -717,34 +822,15 @@ export function ReactPanel() {
     }
   }
 
-  const onSeek = (executionPoint: string, time: number) => {
-    dispatch(seek({ executionPoint, time }));
-  };
-
-  const queuedRenders = streamingRenderData?.filter(entry => entry.userPauseFrame) ?? [];
-
-  // TODO Add the red "curent time" line from `Events.tsx`
-
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column", overflowY: "auto" }}>
-      {streamingRes.status === "pending" && (
+    <Suspense
+      fallback={
         <div style={{ flexShrink: 1 }}>
           <IndeterminateLoader />
         </div>
-      )}
-      {queuedRenders.map((entry, i) => (
-        <div key={entry.point}>
-          <div className="px-1.5">
-            <ReactQueuedRenderListItem
-              currentTime={currentTime}
-              executionPoint={executionPoint!}
-              renderDetails={entry}
-              onSeek={onSeek}
-              key={entry.point}
-            />
-          </div>
-        </div>
-      ))}
-    </div>
+      }
+    >
+      <ReactPanelSuspends reactDomSource={reactDomSource} />
+    </Suspense>
   );
 }
