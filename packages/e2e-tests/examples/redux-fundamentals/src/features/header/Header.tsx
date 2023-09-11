@@ -1,18 +1,18 @@
 import React, { useState } from 'react'
-import { useDispatch } from 'react-redux'
 
+import { useAppDispatch } from '../../hooks'
 import { saveNewTodo } from '../todos/todosSlice'
 
 const Header = () => {
   const [text, setText] = useState('')
   const [status, setStatus] = useState('idle')
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setText(e.target.value)
   }
 
-  const handleKeyDown = async (e) => {
+  const handleKeyDown = async (e: React.KeyboardEvent) => {
     // If the user pressed the Enter key:
     const trimmedText = text.trim()
     if (e.which === 13 && trimmedText) {

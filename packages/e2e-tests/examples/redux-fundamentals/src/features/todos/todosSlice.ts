@@ -1,13 +1,23 @@
 import {
-  createSlice,
-  createSelector,
+  PayloadAction,
   createAsyncThunk,
   createEntityAdapter,
+  createSelector,
+  createSlice,
 } from '@reduxjs/toolkit'
+
 import { client } from '../../api/client'
+import { RootState } from '../../store'
 import { StatusFilters } from '../filters/filtersSlice'
 
-const todosAdapter = createEntityAdapter()
+interface Todo {
+  id: string
+  text: string
+  completed: boolean
+  color?: string
+}
+
+const todosAdapter = createEntityAdapter<Todo>()
 
 const initialState = todosAdapter.getInitialState({
   status: 'idle',
@@ -21,7 +31,7 @@ export const fetchTodos = createAsyncThunk('todos/fetchTodos', async () => {
 
 export const saveNewTodo = createAsyncThunk(
   'todos/saveNewTodo',
-  async (text) => {
+  async (text: string) => {
     const initialTodo = { text }
     const response = await client.post('/fakeApi/todos', { todo: initialTodo })
     return response.todo
@@ -34,36 +44,36 @@ const todosSlice = createSlice({
   reducers: {
     todoToggled(state, action) {
       const todoId = action.payload
-      const todo = state.entities[todoId]
+      const todo = state.entities[todoId]!
       todo.completed = !todo.completed
     },
     todoColorSelected: {
-      reducer(state, action) {
+      reducer(state, action: PayloadAction<{ color: string; todoId: string }>) {
         const { color, todoId } = action.payload
-        state.entities[todoId].color = color
+        state.entities[todoId]!.color = color
       },
-      prepare(todoId, color) {
+      prepare(todoId: string, color: string) {
         return {
           payload: { todoId, color },
         }
       },
     },
     todoDeleted: todosAdapter.removeOne,
-    allTodosCompleted(state, action) {
+    allTodosCompleted(state) {
       Object.values(state.entities).forEach((todo) => {
-        todo.completed = true
+        todo!.completed = true
       })
     },
-    completedTodosCleared(state, action) {
+    completedTodosCleared(state) {
       const completedIds = Object.values(state.entities)
-        .filter((todo) => todo.completed)
-        .map((todo) => todo.id)
+        .filter((todo) => todo!.completed)
+        .map((todo) => todo!.id)
       todosAdapter.removeMany(state, completedIds)
     },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchTodos.pending, (state, action) => {
+      .addCase(fetchTodos.pending, (state) => {
         state.status = 'loading'
       })
       .addCase(fetchTodos.fulfilled, (state, action) => {
@@ -77,7 +87,6 @@ const todosSlice = createSlice({
 export const {
   allTodosCompleted,
   completedTodosCleared,
-  todoAdded,
   todoColorSelected,
   todoDeleted,
   todoToggled,
@@ -85,10 +94,8 @@ export const {
 
 export default todosSlice.reducer
 
-export const {
-  selectAll: selectTodos,
-  selectById: selectTodoById,
-} = todosAdapter.getSelectors((state) => state.todos)
+export const { selectAll: selectTodos, selectById: selectTodoById } =
+  todosAdapter.getSelectors((state: RootState) => state.todos)
 
 export const selectTodoIds = createSelector(
   // First, pass one or more "input selector" functions:
@@ -102,7 +109,7 @@ export const selectFilteredTodos = createSelector(
   // First input selector: all todos
   selectTodos,
   // Second input selector: all filter values
-  (state) => state.filters,
+  (state: RootState) => state.filters,
   // Output selector: receives both values
   (todos, filters) => {
     const { status, colors } = filters
@@ -116,7 +123,7 @@ export const selectFilteredTodos = createSelector(
     return todos.filter((todo) => {
       const statusMatches =
         showAllCompletions || todo.completed === completedStatus
-      const colorMatches = colors.length === 0 || colors.includes(todo.color)
+      const colorMatches = colors.length === 0 || colors.includes(todo.color!)
       return statusMatches && colorMatches
     })
   }

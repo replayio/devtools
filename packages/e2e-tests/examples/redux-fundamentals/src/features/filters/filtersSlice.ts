@@ -1,12 +1,17 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 
 export const StatusFilters = {
   All: 'all',
   Active: 'active',
   Completed: 'completed',
+} as const
+
+interface FiltersState {
+  status: 'all' | 'active' | 'completed'
+  colors: string[]
 }
 
-const initialState = {
+const initialState: FiltersState = {
   status: StatusFilters.All,
   colors: [],
 }
@@ -19,7 +24,13 @@ const filtersSlice = createSlice({
       state.status = action.payload
     },
     colorFilterChanged: {
-      reducer(state, action) {
+      reducer(
+        state,
+        action: PayloadAction<{
+          color: string
+          changeType: 'added' | 'removed'
+        }>
+      ) {
         let { color, changeType } = action.payload
         const { colors } = state
         switch (changeType) {
@@ -33,6 +44,7 @@ const filtersSlice = createSlice({
             state.colors = colors.filter(
               (existingColor) => existingColor !== color
             )
+            break
           }
           default:
             return

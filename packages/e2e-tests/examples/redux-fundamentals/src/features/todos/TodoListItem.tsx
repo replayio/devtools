@@ -1,30 +1,28 @@
 import React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
 
-import TimesSolid from './times-solid.svg'
-
+import { useAppDispatch, useAppSelector } from '../../hooks'
 import { availableColors, capitalize } from '../filters/colors'
 import {
+  selectTodoById,
   todoColorSelected,
   todoDeleted,
   todoToggled,
-  selectTodoById,
 } from './todosSlice'
-
+import TimesSolid from './times-solid.svg'
 
 // Destructure `props.id`, since we just need the ID value
-const TodoListItem = ({ id }) => {
+const TodoListItem = ({ id }: { id: string }) => {
   // Call our `selectTodoById` with the state _and_ the ID value
-  const todo = useSelector((state) => selectTodoById(state, id))
+  const todo = useAppSelector((state) => selectTodoById(state, id))!
   const { text, completed, color } = todo
 
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   const handleCompletedChanged = () => {
     dispatch(todoToggled(todo.id))
   }
 
-  const handleColorChanged = (e) => {
+  const handleColorChanged = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const color = e.target.value
     dispatch(todoColorSelected(todo.id, color))
   }
@@ -62,7 +60,7 @@ const TodoListItem = ({ id }) => {
             {colorOptions}
           </select>
           <button className="destroy" onClick={onDelete}>
-            <img src={TimesSolid} class="svg-inline--fa fa-w-11"/>
+            <img src={TimesSolid} className="svg-inline--fa fa-w-11" />
           </button>
         </div>
       </div>

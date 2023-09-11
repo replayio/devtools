@@ -1,6 +1,4 @@
-import React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-
+import { useAppDispatch, useAppSelector } from '../../hooks'
 import { availableColors, capitalize } from '../filters/colors'
 import {
   StatusFilters,
@@ -8,12 +6,12 @@ import {
   statusFilterChanged,
 } from '../filters/filtersSlice'
 import {
-  completedTodosCleared,
   allTodosCompleted,
+  completedTodosCleared,
   selectTodos,
 } from '../todos/todosSlice'
 
-const RemainingTodos = ({ count }) => {
+const RemainingTodos = ({ count }: { count: number }) => {
   const suffix = count === 1 ? '' : 's'
 
   return (
@@ -24,9 +22,14 @@ const RemainingTodos = ({ count }) => {
   )
 }
 
-const StatusFilter = ({ value: status, onChange }) => {
+interface StatusFilterProps {
+  value: string
+  onChange: (value: string) => void
+}
+
+const StatusFilter = ({ value: status, onChange }: StatusFilterProps) => {
   const renderedFilters = Object.keys(StatusFilters).map((key) => {
-    const value = StatusFilters[key]
+    const value = StatusFilters[key as keyof typeof StatusFilters]
     const handleClick = () => onChange(value)
     const className = value === status ? 'selected' : ''
 
@@ -47,7 +50,12 @@ const StatusFilter = ({ value: status, onChange }) => {
   )
 }
 
-const ColorFilters = ({ value: colors, onChange }) => {
+interface ColorFiltersProps {
+  value: string[]
+  onChange: (value: string, changeType: 'added' | 'removed') => void
+}
+
+const ColorFilters = ({ value: colors, onChange }: ColorFiltersProps) => {
   const renderedColors = availableColors.map((color) => {
     const checked = colors.includes(color)
     const handleChange = () => {
@@ -83,24 +91,25 @@ const ColorFilters = ({ value: colors, onChange }) => {
 }
 
 const Footer = () => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
-  const todosRemaining = useSelector((state) => {
+  const todosRemaining = useAppSelector((state) => {
     const uncompletedTodos = selectTodos(state).filter(
       (todo) => !todo.completed
     )
     return uncompletedTodos.length
   })
 
-  const { status, colors } = useSelector((state) => state.filters)
+  const { status, colors } = useAppSelector((state) => state.filters)
 
   const onMarkCompletedClicked = () => dispatch(allTodosCompleted())
   const onClearCompletedClicked = () => dispatch(completedTodosCleared())
 
-  const onColorChange = (color, changeType) =>
+  const onColorChange = (color: string, changeType: 'added' | 'removed') =>
     dispatch(colorFilterChanged(color, changeType))
 
-  const onStatusChange = (status) => dispatch(statusFilterChanged(status))
+  const onStatusChange = (status: string) =>
+    dispatch(statusFilterChanged(status))
 
   return (
     <footer className="footer">
