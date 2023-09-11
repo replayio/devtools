@@ -20,6 +20,7 @@ fse.copyFileSync(
   path.join(buildFolder, "index_chromium.html")
 );
 
+fse.mkdirpSync(craExampleDist);
 fse.emptyDirSync(craExampleDist);
 fse.copySync(buildFolder, craExampleDist);
 

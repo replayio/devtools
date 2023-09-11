@@ -10,7 +10,15 @@ import { store } from './store'
 import './index.css'
 
 async function bootstrap() {
-  await worker.start()
+  const baseUrl =
+    process.env.NODE_ENV === 'production'
+      ? '/test/examples/redux-fundamentals/dist'
+      : ''
+  await worker.start({
+    serviceWorker: {
+      url: baseUrl + '/mockServiceWorker.js',
+    },
+  })
 
   store.dispatch(fetchTodos())
 

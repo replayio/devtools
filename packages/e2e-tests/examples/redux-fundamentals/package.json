@@ -7,7 +7,8 @@
     "build": "vite build",
     "test": "playwright test",
     "test:debug": "playwright test --workers 1 --headed",
-    "test:install": "playwright install"
+    "test:install": "playwright install",
+    "updateExample": "node updateExample.js"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^1.9.5",
