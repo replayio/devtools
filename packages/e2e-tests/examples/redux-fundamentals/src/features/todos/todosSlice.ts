@@ -26,15 +26,15 @@ const initialState = todosAdapter.getInitialState({
 // Thunk functions
 export const fetchTodos = createAsyncThunk('todos/fetchTodos', async () => {
   const response = await client.get('/fakeApi/todos')
-  return response.todos
+  return response
 })
 
 export const saveNewTodo = createAsyncThunk(
   'todos/saveNewTodo',
   async (text: string) => {
     const initialTodo = { text }
-    const response = await client.post('/fakeApi/todos', { todo: initialTodo })
-    return response.todo
+    const response = await client.post('/fakeApi/todos', { body: initialTodo })
+    return response
   }
 )
 

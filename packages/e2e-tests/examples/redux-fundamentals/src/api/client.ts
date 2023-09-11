@@ -3,7 +3,12 @@
 
 export async function client(
   endpoint: string,
-  { body, ...customConfig }: Partial<RequestInit> = {}
+  {
+    body,
+    ...customConfig
+  }: Omit<Partial<RequestInit>, 'body'> & {
+    body?: string | Record<string, unknown>
+  }
 ) {
   const headers = { 'Content-Type': 'application/json' }
 
@@ -33,16 +38,18 @@ export async function client(
   }
 }
 
-client.get = function (
-  endpoint: string,
-  { body, ...customConfig }: Partial<RequestInit> = {}
-) {
+client.get = function (endpoint: string, customConfig = {}) {
   return client(endpoint, { ...customConfig, method: 'GET' })
 }
 
 client.post = function (
   endpoint: string,
-  { body, ...customConfig }: Partial<RequestInit> = {}
+  {
+    body,
+    ...customConfig
+  }: Omit<Partial<RequestInit>, 'body'> & {
+    body?: string | Record<string, unknown>
+  }
 ) {
   return client(endpoint, { ...customConfig, body })
 }
