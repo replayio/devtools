@@ -4,6 +4,7 @@ import React, { Suspense, useContext, useMemo, useState } from "react";
 import { PanelGroup, PanelResizeHandle, Panel as ResizablePanel } from "react-resizable-panels";
 import { useImperativeCacheValue } from "suspense";
 
+import IndeterminateLoader from "replay-next/components/IndeterminateLoader";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { isPointInRegion } from "shared/utils/time";
@@ -57,15 +58,19 @@ export const ReduxDevToolsPanel = () => {
         <ResizablePanel collapsible>
           <ActionFilter searchValue={searchValue} onSearch={setSearchValue} />
           <div role="list" className={styles.list}>
-            {reduxAnnotations.map(annotation => (
-              <ActionItem
-                key={annotation.point}
-                annotation={annotation}
-                selectedPoint={selectedPoint}
-                setSelectedPoint={setSelectedPoint}
-                firstAnnotationInTheFuture={firstAnnotationInTheFuture === annotation}
-              />
-            ))}
+            {annotationsStatus === "pending" ? (
+              <IndeterminateLoader />
+            ) : (
+              reduxAnnotations.map(annotation => (
+                <ActionItem
+                  key={annotation.point}
+                  annotation={annotation}
+                  selectedPoint={selectedPoint}
+                  setSelectedPoint={setSelectedPoint}
+                  firstAnnotationInTheFuture={firstAnnotationInTheFuture === annotation}
+                />
+              ))
+            )}
           </div>
         </ResizablePanel>
         <PanelResizeHandle className="h-full w-1 bg-chrome" />
