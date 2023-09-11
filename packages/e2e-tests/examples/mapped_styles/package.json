@@ -1,0 +1,11 @@
+{
+  "name": "mapped_styles",
+  "scripts": {
+    "build": "webpack",
+    "updateExample": "node updateExample.js"
+  },
+  "devDependencies": {
+    "@replayio/replay": "^0.15.0",
+    "webpack": "^5.88.2"
+  }
+}

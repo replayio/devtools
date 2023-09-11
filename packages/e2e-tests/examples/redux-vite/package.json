@@ -1,0 +1,18 @@
+{
+  "name": "redux-e2e-test-app",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "updateExample": "node updateExample.js"
+  },
+  "devDependencies": {
+    "@replayio/replay": "^0.15.0",
+    "vite": "^4.3.9"
+  },
+  "dependencies": {
+    "@reduxjs/toolkit": "^1.9.5"
+  }
+}

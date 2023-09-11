@@ -25,3 +25,4 @@ lint:
         - packages/import-sort-style-replay
         - "./.trunk"
         - "./test"
+        - packages/e2e-tests/examples

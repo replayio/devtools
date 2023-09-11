@@ -5,7 +5,7 @@ module.exports = {
   entry: "./bundle_input.js",
   output: {
     filename: "mapped_styles.js",
-    path: path.resolve(__dirname, "../..")
+    path: path.resolve(__dirname, "dist"),
   },
   devtool: "source-map",
   mode: "production",
@@ -16,6 +16,5 @@ module.exports = {
         use: ["style-loader", "css-loader"],
       },
     ],
-  }
+  },
 };
-

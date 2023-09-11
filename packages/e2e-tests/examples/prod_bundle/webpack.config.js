@@ -4,10 +4,9 @@ module.exports = {
   context: __dirname,
   entry: "./bundle_input.js",
   output: {
-    filename: "mapped_minified.js",
-    path: path.resolve(__dirname, "../..")
+    filename: "prod_bundle.js",
+    path: path.resolve(__dirname, "dist"),
   },
   devtool: "source-map",
-  mode: "development"
+  mode: "production",
 };
-

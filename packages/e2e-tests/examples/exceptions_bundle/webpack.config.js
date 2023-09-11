@@ -4,10 +4,9 @@ module.exports = {
   context: __dirname,
   entry: "./bundle_input.js",
   output: {
-    filename: "prod_bundle.js",
-    path: path.resolve(__dirname, "../..")
+    filename: "exceptions_bundle.js",
+    path: path.resolve(__dirname, "./dist"),
   },
   devtool: "source-map",
-  mode: "production"
+  mode: "development",
 };
-

@@ -1,4 +1,4 @@
-import { createSlice, configureStore } from "@reduxjs/toolkit";
+import { configureStore, createSlice } from "@reduxjs/toolkit";
 
 export const counterSlice = createSlice({
   name: "counter",
@@ -6,10 +6,10 @@ export const counterSlice = createSlice({
     value: 0,
   },
   reducers: {
-    increment: (state) => {
+    increment: state => {
       state.value += 1;
     },
-    decrement: (state) => {
+    decrement: state => {
       state.value -= 1;
     },
     incrementByAmount: (state, action) => {
@@ -20,7 +20,7 @@ export const counterSlice = createSlice({
 
 // this example contains some delays for now to work around RecordReplay/gecko-dev#349
 function waitForTime(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 const { increment, decrement, incrementByAmount } = counterSlice.actions;
