@@ -14,6 +14,8 @@ import { userData } from "shared/user-data/GraphQL/UserData";
 import { UIThunkAction, actions } from "ui/actions";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import { selectors } from "ui/reducers";
+import { getSelectedSource } from "ui/reducers/sources";
+import { useAppSelector } from "ui/setup/hooks";
 import { UIState } from "ui/state";
 import { addGlobalShortcut, isEditableElement, removeGlobalShortcut } from "ui/utils/key-shortcuts";
 import { trackEvent } from "ui/utils/telemetry";
@@ -61,6 +63,8 @@ function KeyboardShortcuts({
   const { isAuthenticated } = useAuth0();
   const [, dismissFindFileNag] = useNag(Nag.FIND_FILE);
 
+  const selectedSource = useAppSelector(getSelectedSource);
+
   const [protocolTimeline] = useGraphQLUserData("feature_protocolTimeline");
   const globalKeyboardShortcuts = useMemo(() => {
     const openFullTextSearch = (e: KeyboardEvent) => {
@@ -84,6 +88,12 @@ function KeyboardShortcuts({
 
     const toggleFunctionQuickOpenModal = (e: KeyboardEvent) => {
       toggleQuickOpenModal(e, "@");
+    };
+
+    const toggleGoToLine = (e: KeyboardEvent) => {
+      if (selectedSource) {
+        toggleQuickOpenModal(e, ":");
+      }
     };
 
     const toggleQuickOpenModal = (e: KeyboardEvent, query = "", project = false) => {
@@ -172,8 +182,11 @@ function KeyboardShortcuts({
 
       // Quick Open-related toggles
       "CmdOrCtrl+Shift+P": toggleQuickOpenModal,
-      // We apparently accept this with or without a Shift key currently
       "CmdOrCtrl+P": toggleQuickOpenModal,
+
+      // Go to line
+      "Ctrl+K": toggleGoToLine,
+
       // Can pre-fill the dialog with specific filter prefixes
       "CmdOrCtrl+Shift+O": toggleFunctionQuickOpenModal,
       "CmdOrCtrl+O": toggleProjectFunctionQuickOpenModal,
@@ -201,6 +214,7 @@ function KeyboardShortcuts({
     jumpToPreviousPause,
     jumpToNextPause,
     dismissFindFileNag,
+    selectedSource,
   ]);
 
   useEffect(() => {

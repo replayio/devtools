@@ -12,7 +12,7 @@ import { KeyboardModifiersContextRoot } from "replay-next/src/contexts/KeyboardM
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import { getSourceSuspends } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
+import { isMacOS } from "shared/utils/os";
 import { getSelectedLocation, getSelectedLocationHasScrolled } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
@@ -122,7 +122,9 @@ function NewSourceAdapter() {
         break;
       }
       case "g": {
-        if (event.ctrlKey || event.metaKey) {
+        // CMD+G should continue an in-progress search
+        // CTRL+G is for go-to-line though
+        if (isMacOS() ? event.metaKey : event.ctrlKey) {
           // Unlike Enter / Shift+Enter, this event handler is external to the Search input
           // so that we can mirror UIs like Chrome and Code and re-open the search UI if it's been closed
           sourceSearchActions.enable();
