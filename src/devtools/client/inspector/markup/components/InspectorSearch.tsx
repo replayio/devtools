@@ -84,8 +84,8 @@ export function InspectorSearch() {
       startFullTextSearch(searchText, e.shiftKey);
     }
 
-    // Honestly I have no idea why this was in the original search logic.
-    // Apparently search if you hit CTRL+G? Weird combo.
+    // CMD+G should continue an in-progress search
+    // CTRL+G is for go-to-line though
     const modifierKey = isMacOS() ? e.metaKey : e.ctrlKey;
     if (e.key === "g" && modifierKey) {
       startFullTextSearch(searchText, e.shiftKey);
