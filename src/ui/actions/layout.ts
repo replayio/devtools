@@ -22,6 +22,7 @@ type SetSelectedPrimaryPanelAction = Action<"set_selected_primary_panel"> & {
   panel: PrimaryPanelName;
 };
 type SetShowCommandPaletteAction = Action<"set_show_command_palette"> & { value: boolean };
+type SetShowSupportForm = Action<"set_show_support_form"> & { value: boolean };
 
 type SetToolboxLayoutAction = Action<"set_toolbox_layout"> & {
   layout: ToolboxLayout;
@@ -33,9 +34,14 @@ export type LayoutAction =
   | SetSelectedPanelAction
   | SetSelectedPrimaryPanelAction
   | SetShowCommandPaletteAction
+  | SetShowSupportForm
   | SetToolboxLayoutAction
   | SetViewModeAction
   | DismissLocalNagAction;
+
+export function setShowSupportForm(value: boolean): SetShowSupportForm {
+  return { type: "set_show_support_form", value };
+}
 
 export function setShowCommandPalette(value: boolean): SetShowCommandPaletteAction {
   return { type: "set_show_command_palette", value };

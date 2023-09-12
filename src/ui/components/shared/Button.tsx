@@ -82,12 +82,24 @@ export const Button = forwardRef<
   HTMLButtonElement,
   ButtonProps & {
     color: Colors;
+    disabled?: boolean;
     size: ButtonSizes;
     style: ButtonStyles;
   }
 >(
   (
-    { size, children, dataTestId, dataTestName, style, color, className, onClick = () => {}, type },
+    {
+      size,
+      children,
+      dataTestId,
+      dataTestName,
+      disabled,
+      style,
+      color,
+      className,
+      onClick = () => {},
+      type,
+    },
     ref
   ) => {
     const buttonClasses = getButtonClasses(color, style, size);
@@ -97,7 +109,7 @@ export const Button = forwardRef<
         onClick={onClick}
         data-test-id={dataTestId}
         data-test-name={dataTestName}
-        disabled={style === "disabled"}
+        disabled={disabled || style === "disabled"}
         className={classNames(buttonClasses, className)}
         ref={ref}
         type={type}
@@ -114,6 +126,7 @@ interface ButtonProps {
   className?: string;
   dataTestId?: string;
   dataTestName?: string;
+  disabled?: boolean;
   onClick?: () => void;
   type?: "button" | "submit";
 }

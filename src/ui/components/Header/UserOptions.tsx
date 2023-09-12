@@ -4,7 +4,7 @@ import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCach
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import useLocalStorageUserData from "shared/user-data/LocalStorage/useLocalStorageUserData";
 import { setModal } from "ui/actions/app";
-import { setToolboxLayout } from "ui/actions/layout";
+import { setShowSupportForm, setToolboxLayout } from "ui/actions/layout";
 import LoginButton from "ui/components/LoginButton";
 import Dropdown from "ui/components/shared/Dropdown";
 import Icon from "ui/components/shared/Icon";
@@ -171,6 +171,11 @@ export default function UserOptions() {
     trackEvent(`layout.settings.set_${orientation}`);
   };
 
+  const onSupportClick = () => {
+    dispatch(setShowSupportForm(true));
+    setExpanded(false);
+  };
+
   const onVideoPanelCollapseChange = (collapsed: boolean) => {
     setVideoPanelCollapsed(collapsed);
     trackEvent(collapsed ? "video.settings.set_collapsed" : "video.settings.set_expanded");
@@ -203,10 +208,11 @@ export default function UserOptions() {
             <span className="flex-1 text-left">Docs</span>
             <Icon filename="docs" className="bg-iconColor" />
           </button>
-          <ExternalLink className="row group" href="https://discord.gg/n2dTK6kcRX">
-            <span className="flex-1 text-left">Chat with us</span>
+
+          <button className="row group" onClick={onSupportClick}>
+            <span className="flex-1 text-left">Support</span>
             <Icon filename="help" className="bg-iconColor" />
-          </ExternalLink>
+          </button>
 
           <LoginButton iconPosition="right" />
         </Dropdown>
