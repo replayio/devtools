@@ -1,6 +1,6 @@
 #popup-root .popup-content {
   background: var(--theme-popup-color);
-  color: var(--theme-popup-background);
+  color: var(--theme-popup-background-color);
   font-family: "Inter", sans-serif;
   font-size: 12px;
   width: auto;

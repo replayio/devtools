@@ -12,6 +12,7 @@ import {
 import { SelectedFrameContext } from "replay-next/src/contexts/SelectedFrameContext";
 import { useCurrentFocusWindow } from "replay-next/src/hooks/useCurrentFocusWindow";
 import { getFrameSuspense } from "replay-next/src/suspense/FrameCache";
+import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import {
   getPointAndTimeForPauseId,
   pauseEvaluationsCache,
@@ -21,7 +22,7 @@ import { isPointInRegion } from "shared/utils/time";
 
 import ErrorBoundary from "../ErrorBoundary";
 import SourcePreviewInspector from "../inspector/SourcePreviewInspector";
-import Popup from "../Popup";
+import Popup, { PopupStyle } from "../Popup";
 import styles from "./PreviewPopup.module.css";
 
 type Props = {
@@ -84,10 +85,29 @@ function SuspendingPreviewPopup({
             undefined
           );
 
-          if (result.failed || result.exception) {
-            valueUnavailableMessage = "Value cannot be inspected";
-          } else {
-            value = result.returned || null;
+          if (result.exception?.object) {
+            const exceptionPreview = objectCache.read(
+              client,
+              pauseId,
+              result.exception.object,
+              "canOverflow"
+            );
+            if (exceptionPreview?.preview?.properties) {
+              const message = exceptionPreview.preview.properties.find(
+                property => property.name === "message"
+              );
+              if (message) {
+                valueUnavailableMessage = `${exceptionPreview.className}: ${message.value}`;
+              }
+            }
+          }
+
+          if (!valueUnavailableMessage) {
+            if (result.failed || result.exception) {
+              valueUnavailableMessage = "Value cannot be inspected";
+            } else {
+              value = result.returned || null;
+            }
           }
         } else {
           valueUnavailableMessage = "Value cannot be inspected";
@@ -128,6 +148,7 @@ function SuspendingPreviewPopup({
         clientX={clientX}
         containerRef={containerRef}
         dismiss={dismiss}
+        style="error"
         target={target}
       >
         <div className={styles.Popup}>
@@ -169,11 +190,13 @@ function PopupWithChildren({
   clientX,
   containerRef,
   dismiss,
+  style,
   target,
 }: PropsWithChildren & {
   clientX?: number | null;
   containerRef: RefObject<HTMLElement>;
   dismiss: () => void;
+  style?: PopupStyle;
   target: HTMLElement;
 }) {
   return (
@@ -182,6 +205,7 @@ function PopupWithChildren({
       clientX={clientX}
       containerRef={containerRef}
       dismiss={dismiss}
+      style={style}
       target={target}
       showTail={true}
     />

@@ -3,8 +3,8 @@
   max-height: 400px;
   height: auto;
   overflow: hidden;
-  background-color: var(--menu-bgcolor);
-  border: 1px solid var(--theme-base-80);
+  background-color: var(--theme-popup-background-color);
+  border: 1px solid var(--theme-popup-border-color);
   border-radius: 0.25rem;
   filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.1)) drop-shadow(0 1px 1px rgb(0 0 0 / 0.06));
 }
@@ -12,7 +12,7 @@
 .LoadingMessage,
 .UnavailableMessage {
   padding: 0.5rem;
-  color: var(--color-default);
+  color: var(--theme-popup-color);
   font-family: var(--font-family-default);
   font-size: var(--font-size-regular);
 }
