@@ -631,19 +631,22 @@ export const reduxDispatchFunctionCache: Cache<
     // There's some stupid tricks we could pull to find this in minified sources,
     // like looking for the `ActionTypes.REPLACE` variable
     const sourcesById = await sourcesByIdCache.readAsync(replayClient);
-    const reactReduxSources = Array.from(sourcesById.values()).filter(source =>
+    const reduxSources = Array.from(sourcesById.values()).filter(source =>
       source.url?.includes("/redux/")
     );
 
     const dispatchMatches: FunctionMatch[] = [];
     await replayClient.searchFunctions(
-      { query: "dispatch", sourceIds: reactReduxSources.map(source => source.id) },
+      { query: "dispatch", sourceIds: reduxSources.map(source => source.id) },
       matches => {
         dispatchMatches.push(...matches);
       }
     );
 
     const [firstMatch] = dispatchMatches;
+    if (!firstMatch) {
+      return;
+    }
 
     const preferredLocation = getPreferredLocationNext(sourcesById, [], [firstMatch.loc]);
     const reduxSource = sourcesById.get(preferredLocation.sourceId)!;
