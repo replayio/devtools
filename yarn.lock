@@ -14786,11 +14786,11 @@ __metadata:
 
 "react-devtools-inline@patch:react-devtools-inline@npm:4.24.7#.yarn/patches/react-devtools-inline-npm-4.24.7-9582a0f8d6.patch::locator=recordreplay-devtools%40workspace%3A.":
   version: 4.24.7
-  resolution: "react-devtools-inline@patch:react-devtools-inline@npm%3A4.24.7#.yarn/patches/react-devtools-inline-npm-4.24.7-9582a0f8d6.patch::version=4.24.7&hash=b2b58f&locator=recordreplay-devtools%40workspace%3A."
+  resolution: "react-devtools-inline@patch:react-devtools-inline@npm%3A4.24.7#.yarn/patches/react-devtools-inline-npm-4.24.7-9582a0f8d6.patch::version=4.24.7&hash=303352&locator=recordreplay-devtools%40workspace%3A."
   dependencies:
     source-map-js: ^0.6.2
     sourcemap-codec: ^1.4.8
-  checksum: 459c911eb486b5f0f654bca557ea3d12c1d88c57c0f1e0488ea34b596a87c7cd0f864fed7bd8188a0d1a93acd0bdb159b2f7b3ca16942b3ecf6b68ad88abaa03
+  checksum: d773307f4970396747a41d58d19f1c75ad393fe182bf34eab4b0d27e001bb97ac1b452a1a91322f3e91e44763e015e975287277f7fff742dc8cbb573787531fc
   languageName: node
   linkType: hard
 
@@ -15305,7 +15305,7 @@ __metadata:
     ts-node: ^10.7.0
     tsconfig-paths: ^3.14.1
     typescript: ^5.0.4
-    use-context-menu: 0.4.12
+    use-context-menu: 0.4.13
     utf-8-validate: ^5.0.8
     uuid: ^7.0.3
     v8-to-istanbul: ^9.0.1
@@ -15501,7 +15501,7 @@ __metadata:
     shared: "workspace:*"
     suspense: ^0.0.45
     typescript: 5.0.2
-    use-context-menu: 0.4.12
+    use-context-menu: 0.4.13
     uuid: ^7.0.3
   languageName: unknown
   linkType: soft
@@ -17692,13 +17692,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"use-context-menu@npm:0.4.12":
-  version: 0.4.12
-  resolution: "use-context-menu@npm:0.4.12"
+"use-context-menu@npm:0.4.13":
+  version: 0.4.13
+  resolution: "use-context-menu@npm:0.4.13"
   peerDependencies:
     react: ^16.14.0 || ^17 || ^18
     react-dom: ^16.14.0 || ^17 || ^18
-  checksum: dba046bc95248512a6f698aae8e5c6997e6afb9b8da5e6d2199614d6d1f13ba640d4abd0201babf80ecc92f51115e58651c967b62e065691ec1158ef080b6b1d
+  checksum: f74756f57dd5eefbe46c9a7c6a8b7b24be626cf4f35cdc4a4212ddcf8f3a2ad3ae7a09a1aa7a27121a2b697b65f4eb137f45a8d4ace591a04954960e34d2d181
   languageName: node
   linkType: hard
 
