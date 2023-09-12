@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useMemo } from "react";
 
 import Icon from "replay-next/components/Icon";
 import { JsonViewer } from "replay-next/components/SyntaxHighlighter/JsonViewer";
@@ -11,6 +11,7 @@ import { formatDuration, formatTimestamp } from "ui/utils/time";
 import styles from "./RequestDetails.module.css";
 
 const SYNTAX_HIGHLIGHT_MAX_LENGTH = 1_000;
+const PLAIN_TEXT_MAX_LENGTH = 100_000;
 
 export function RequestDetails() {
   const { errorMap, requestMap, responseMap, selectedRequestId } =
@@ -90,15 +91,26 @@ function Section({
   header: string;
   time: number | null;
 }) {
+  const [jsonText, isTruncated] = useMemo(() => {
+    if (content == null) {
+      return ["", false];
+    }
+
+    const string = JSON.stringify(content, null, 2);
+    if (string.length > PLAIN_TEXT_MAX_LENGTH) {
+      return [string.substring(0, PLAIN_TEXT_MAX_LENGTH), true];
+    } else {
+      return [string, false];
+    }
+  }, [content]);
+
   if (content == null) {
     return content;
   }
 
-  const jsonText = JSON.stringify(content, null, 2);
-
   let children = null;
   if (jsonText.length > SYNTAX_HIGHLIGHT_MAX_LENGTH) {
-    children = <PlainTextJson jsonText={jsonText} />;
+    children = <PlainTextJson jsonText={jsonText} isTruncated={isTruncated} />;
   } else {
     children = <JsonViewer className={styles.JsonViewer} jsonText={jsonText} />;
   }
@@ -114,13 +126,14 @@ function Section({
   );
 }
 
-function PlainTextJson({ jsonText }: { jsonText: string }) {
+function PlainTextJson({ jsonText, isTruncated }: { jsonText: string; isTruncated: boolean }) {
   const { contextMenu, onContextMenu } = useJsonViewerContextMenu(jsonText);
 
   return (
     <>
       <div className={styles.JsonViewer} onContextMenu={onContextMenu}>
         {jsonText}
+        {isTruncated ? "…" : ""}
       </div>
       {contextMenu}
     </>
