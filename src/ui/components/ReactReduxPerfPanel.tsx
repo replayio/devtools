@@ -170,7 +170,7 @@ function doSomeAnalysis(range: TimeStampedPointRange | null): UIThunkAction {
       replayClient
     );
 
-    console.log("Redux dispatches: ", reduxDispatches);
+    // console.log("Redux dispatches: ", reduxDispatches);
 
     const reactRenders = await reactRendersIntervalCache.readAsync(
       BigInt(finalRange.begin.point),
@@ -477,7 +477,7 @@ async function processReduxNotifications(
   );
 
   const subscriberNotifyFunction = findFunctionOutlineForLocation(firstMatch.loc, fileOutline)!;
-  console.log("Subscriber notify function: ", subscriberNotifyFunction);
+  // console.log("Subscriber notify function: ", subscriberNotifyFunction);
   //console.log("Subscriber breakable positions: ", breakablePositionsByLine);
 
   const notifyHits = await hitPointsCache.readAsync(
@@ -504,7 +504,7 @@ async function processReduxNotifications(
     };
   });
 
-  console.log("Notify start/finish pairs: ", notifyStartFinishPairs);
+  // console.log("Notify start/finish pairs: ", notifyStartFinishPairs);
 
   // const searchMatches: SearchSourceContentsMatch[] = [];
   // await replayClient.searchSources({ query: "notifyNestedSubs()" }, matches => {
@@ -522,6 +522,14 @@ export interface FormattedPointStackFrame {
   functionLocation: Location;
   executionLocation: Location;
   point: PointDescription;
+}
+
+export interface FormattedPointStack {
+  point: PointDescription;
+  frame?: FormattedPointStackFrame;
+  allFrames: FormattedPointStackFrame[];
+  filteredFrames: FormattedPointStackFrame[];
+  functionName?: string;
 }
 
 export function formatPointStackFrame(
@@ -544,10 +552,21 @@ export function formatPointStackFrame(
   };
 }
 
+export const formattedPointStackCache: Cache<
+  [replayClient: ReplayClientInterface, point: TimeStampedPoint],
+  FormattedPointStack
+> = createCache({
+  debugLabel: "FormattedPointStack",
+  getKey: ([replayClient, point]) => point.point,
+  async load([replayClient, point]) {
+    return formatPointStackForPoint(replayClient, point);
+  },
+});
+
 export async function formatPointStackForPoint(
   replayClient: ReplayClientInterface,
   point: TimeStampedPoint
-) {
+): Promise<FormattedPointStack> {
   const sourcesById = await sourcesByIdCache.readAsync(replayClient);
   const pointStack = await replayClient.getPointStack(point.point, 30);
   const formattedFrames = pointStack.map(frame => {
@@ -656,7 +675,7 @@ export const reduxDispatchFunctionCache: Cache<
     const reducerDoneLine =
       reduxSourceLines.findIndex(line => line.includes("currentListeners = nextListeners")) + 1;
     const dispatchDoneLine = reduxSourceLines.findIndex(line => line.includes("return action")) + 1;
-    console.log({ reducerDoneLine, dispatchDoneLine });
+    // console.log({ reducerDoneLine, dispatchDoneLine });
 
     const [beforeReducer, reducerDone, dispatchDone]: Location[] = [
       beforeReducerLine,
@@ -753,7 +772,7 @@ export const reduxDispatchesCache = createFocusIntervalCacheForExecutionPoints<
         return functionOutline?.parameters[0];
       })
     );
-    console.log("Possible param names: ", possibleParamNames);
+    // console.log("Possible param names: ", possibleParamNames);
 
     const paramName = possibleParamNames.find(name => name !== "action") ?? "action";
 
@@ -785,13 +804,13 @@ export const reduxDispatchesCache = createFocusIntervalCacheForExecutionPoints<
       return result.returned!.value;
     });
 
-    console.log("Fetching point stacks...");
+    // console.log("Fetching point stacks...");
     const pointStacks = await Promise.all(
       reduxDispatchHits.map(hit => {
         return replayClient.getPointStack(hit.point, 5);
       })
     );
-    console.log("Point stacks: ", pointStacks);
+    // console.log("Point stacks: ", pointStacks);
 
     const maxItems = Math.min(
       reduxDispatchHits.length,
@@ -1277,6 +1296,7 @@ interface ReduxDispatchItemData {
   currentTime: number;
   executionPoint: string;
   onSeek: (point: string, time: number) => void;
+  onEntrySelected: (point: ExecutionPoint) => void;
   entries: ReduxDispatchDetailsEntry[];
 }
 
@@ -1292,9 +1312,8 @@ function ReduxDispatchListItem({
   const dispatch = useAppDispatch();
   const replayClient = useContext(ReplayClientContext);
   const dispatchDetails = data.entries[index];
-  const { executionPoint, onSeek, currentTime } = data;
+  const { executionPoint, onSeek, currentTime, onEntrySelected } = data;
   const { actionType, dispatchStart } = dispatchDetails;
-  // const { point, frame, functionName } = renderDetails;
   const isPaused = dispatchStart.time === currentTime && executionPoint === dispatchStart.point;
   const [jumpToCodeStatus] = useState<JumpToCodeStatus>("not_checked");
 
@@ -1303,7 +1322,10 @@ function ReduxDispatchListItem({
   const onMouseLeave = () => {};
 
   const onClickJumpToCode = async () => {
-    const formattedPointStack = await formatPointStackForPoint(replayClient, dispatchStart);
+    const formattedPointStack = await formattedPointStackCache.readAsync(
+      replayClient,
+      dispatchStart
+    );
 
     dispatch(
       jumpToTimeAndLocationForQueuedRender(
@@ -1324,6 +1346,7 @@ function ReduxDispatchListItem({
         })}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
+        onClick={() => onEntrySelected(dispatchStart.point)}
       >
         <div className="flex flex-row items-center space-x-2 overflow-hidden">
           <AccessibleImage className="redux" />
@@ -1350,6 +1373,7 @@ function ReactReduxPerfPanelSuspends() {
   const executionPoint = useAppSelector(getExecutionPoint);
   const { range: focusRange } = useContext(FocusContext);
   const replayClient = useContext(ReplayClientContext);
+  const [selectedPoint, setSelectedPoint] = useState<ExecutionPoint | null>(null);
 
   const handleDoAnalysisClick = async () => {
     dispatch(doSomeAnalysis(focusRange));
@@ -1371,40 +1395,57 @@ function ReactReduxPerfPanelSuspends() {
       currentTime,
       entries: reduxDispatchEntries,
       onSeek,
+      onEntrySelected: setSelectedPoint,
     };
   }, [reduxDispatchEntries, dispatch, currentTime, executionPoint]);
 
-  // return (
-  //   <div className={styles.Sidebar}>
-  //     <div className={styles.Toolbar}>
-  //       <div className={styles.ToolbarHeader}>React+Redux Perf</div>
-  //       <button className="row logout" onClick={handleDoAnalysisClick}>
-  //         <span className="inline-flex w-full items-center justify-center rounded-md border border-transparent bg-primaryAccent px-3 py-1.5 text-sm font-medium leading-4 text-buttontextColor hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-  //           Do Something
-  //         </span>
-  //       </button>
-  //     </div>
-  //     <div className={styles.List}>{
+  const selectedEntry = reduxDispatchEntries.find(
+    entry => entry.dispatchStart.point === selectedPoint
+  );
 
-  //     }</div>
-  //   </div>
-  // );
   return (
-    <div style={{ flex: "1 1 auto", height: "100%" }}>
-      <AutoSizer disableWidth>
-        {({ height }: { height: number }) => {
-          return (
-            <List
-              children={ReduxDispatchListItem}
-              height={height}
-              itemCount={itemData.entries.length}
-              itemData={itemData}
-              itemSize={30}
-              width="100%"
-            />
-          );
-        }}
-      </AutoSizer>
+    <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+      <div style={{ flex: "1 1 auto", height: "100%", position: "relative" }}>
+        <AutoSizer disableWidth>
+          {({ height }: { height: number }) => {
+            return (
+              <List
+                children={ReduxDispatchListItem}
+                height={height}
+                itemCount={itemData.entries.length}
+                itemData={itemData}
+                itemSize={30}
+                width="100%"
+              />
+            );
+          }}
+        </AutoSizer>
+      </div>
+      {selectedEntry ? <SelectedReduxDispatchDetails entry={selectedEntry} /> : null}
+    </div>
+  );
+}
+
+const formatTimeMs = (time: number) => {
+  return `${time.toFixed(1)}ms`;
+};
+
+function SelectedReduxDispatchDetails({ entry }: { entry: ReduxDispatchDetailsEntry }) {
+  return (
+    <div style={{ minHeight: 200 }}>
+      <b>{entry.actionType}</b>
+      <ul>
+        <li>
+          Time: {formatTimeMs(entry.dispatchStart.time)} 🡒{" "}
+          {formatTimeMs(entry.afterNotifications.time)}
+        </li>
+        <li>
+          Durations:
+          <li>Reducer: {formatTimeMs(entry.reducerDuration)}</li>
+          <li>Subscribers: {formatTimeMs(entry.notificationDuration)}</li>
+          <li>Total: {formatTimeMs(entry.afterNotifications.time - entry.dispatchStart.time)}</li>
+        </li>
+      </ul>
     </div>
   );
 }
@@ -1422,16 +1463,25 @@ export function ReactReduxPerfPanel() {
     <div className={cardsListStyles.Sidebar}>
       <div className={cardsListStyles.Toolbar}>
         <div className={cardsListStyles.ToolbarHeader}>Redux Dispatch Perf</div>
+        {/* <div>
+          <button className="row logout" onClick={() => {}}>
+            <span className="inline-flex w-full items-center justify-center rounded-md border border-transparent bg-primaryAccent px-3 py-1.5 text-sm font-medium leading-4 text-buttontextColor hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+              Do Stuff
+            </span>
+          </button>
+        </div> */}
       </div>
-      <Suspense
-        fallback={
-          <div style={{ flexShrink: 1 }}>
-            <IndeterminateLoader />
-          </div>
-        }
-      >
-        <ReactReduxPerfPanelSuspends />
-      </Suspense>
+      <div style={{ flexGrow: 2 }}>
+        <Suspense
+          fallback={
+            <div style={{ flexShrink: 1 }}>
+              <IndeterminateLoader />
+            </div>
+          }
+        >
+          <ReactReduxPerfPanelSuspends />
+        </Suspense>
+      </div>
     </div>
   );
 }

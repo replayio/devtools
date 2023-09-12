@@ -63,6 +63,7 @@ import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { getPauseFramesAsync } from "ui/suspense/frameCache";
 
 import {
+  FormattedPointStack,
   FormattedPointStackFrame,
   formatPointStackForPoint,
   formatPointStackFrame,
@@ -311,13 +312,8 @@ export const reactInternalMethodsHitsIntervalCache = createFocusIntervalCacheFor
 
 type ReactUpdateScheduled = {
   type: "scheduled";
-  point: PointDescription;
-  frame?: FormattedPointStackFrame;
-  allFrames: FormattedPointStackFrame[];
-  filteredFrames: FormattedPointStackFrame[];
-  functionName?: string;
   cause: "user" | "internal" | "unknown";
-};
+} & FormattedPointStack;
 
 type ReactSyncUpdatedStarted = {
   type: "sync_started";
