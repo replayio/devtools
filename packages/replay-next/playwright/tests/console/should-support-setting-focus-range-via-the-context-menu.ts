@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 import { locateMessage, messageLocator, openContextMenu } from "../utils/console";
-import { stopHovering, takeScreenshot } from "../utils/general";
+import { stopHovering, takeScreenshot, waitFor } from "../utils/general";
 import { beforeEach } from "./beforeEach";
 import { setup } from "./shared";
 
@@ -12,6 +12,9 @@ test("should support setting focus range via the context menu", async ({ page },
 
   const list = page.locator("[data-test-name=Messages]");
   let listItem;
+
+  const messages = list.locator("[data-test-name=Message]");
+  await waitFor(async () => expect(await messages.count()).toBe(11));
 
   listItem = await locateMessage(page, "console-warning", "This is a warning");
   await openContextMenu(page, listItem);

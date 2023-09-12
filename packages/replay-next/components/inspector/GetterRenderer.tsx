@@ -87,12 +87,14 @@ export default function GetterRenderer({
   if (getterValue) {
     if (!isExpanded) {
       value = (
-        <ValueRenderer
-          context="nested"
-          layout="vertical"
-          pauseId={pauseId}
-          protocolValue={getterValue}
-        />
+        <span data-test-name="GetterValue">
+          <ValueRenderer
+            context="nested"
+            layout="vertical"
+            pauseId={pauseId}
+            protocolValue={getterValue}
+          />
+        </span>
       );
     }
   } else {
