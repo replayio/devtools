@@ -132,12 +132,22 @@ function SuspendingPreviewPopup({
       }
     };
 
+    const onKeyDown = ({ key }: KeyboardEvent) => {
+      switch (key) {
+        case "Escape":
+          dismiss();
+          break;
+      }
+    };
+
     document.body.addEventListener("click", onClick);
     document.body.addEventListener("contextmenu", onClick);
+    document.body.addEventListener("keydown", onKeyDown);
 
     return () => {
       document.body.removeEventListener("click", onClick);
       document.body.removeEventListener("contextmenu", onClick);
+      document.body.removeEventListener("keydown", onKeyDown);
     };
   });
 
