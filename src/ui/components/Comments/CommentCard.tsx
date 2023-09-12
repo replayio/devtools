@@ -10,6 +10,12 @@ import { isPointInRegion } from "shared/utils/time";
 import { seekToComment } from "ui/actions/comments";
 import { setViewMode } from "ui/actions/layout";
 import useUserCommentPreferences from "ui/components/Comments/useUserCommentPreferences";
+import {
+  getHoveredCommentId,
+  getSelectedCommentId,
+  setHoveredCommentId,
+  setSelectedCommentId,
+} from "ui/reducers/app";
 import { getViewMode } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { Comment } from "ui/state/comments";
@@ -22,19 +28,23 @@ import EditableRemark from "./EditableRemark";
 import ReplyCard from "./ReplyCard";
 import styles from "./CommentCard.module.css";
 
-export type PauseOverlayPosition = "after" | "before" | "current";
+export type PauseOverlayPosition = "after" | "before";
 
 function CommentCard({
   comment,
   pauseOverlayPosition,
+  pauseOverlayTime,
 }: {
   comment: Comment;
   pauseOverlayPosition: PauseOverlayPosition | null;
+  pauseOverlayTime: number | null;
 }) {
   const { range: focusRange } = useContext(FocusContext);
   const { currentUserInfo } = useContext(SessionContext);
 
   const viewMode = useAppSelector(getViewMode);
+  const hoveredCommentId = useAppSelector(getHoveredCommentId);
+  const selectedCommentId = useAppSelector(getSelectedCommentId);
 
   const context = useAppSelector(getThreadContext);
   const dispatch = useAppDispatch();
@@ -43,6 +53,8 @@ function CommentCard({
 
   const onClick = (event: MouseEvent) => {
     event.stopPropagation();
+
+    dispatch(setSelectedCommentId(comment.id));
 
     const openSource = viewMode === "dev";
     dispatch(seekToComment(comment, comment.sourceLocation, openSource));
@@ -63,6 +75,14 @@ function CommentCard({
     }
   };
 
+  const onMouseEnter = () => {
+    dispatch(setHoveredCommentId(comment.id));
+  };
+
+  const onMouseLeave = () => {
+    dispatch(setHoveredCommentId(null));
+  };
+
   const onPreviewClick = (event: MouseEvent) => {
     event.stopPropagation();
     dispatch(seekToComment(comment, comment.sourceLocation, true));
@@ -77,6 +97,11 @@ function CommentCard({
 
   const isFocused = focusRange == null || isPointInRegion(comment.point, focusRange);
 
+  let isHighlighted = false;
+  if (comment.time === pauseOverlayTime) {
+    isHighlighted = hoveredCommentId === comment.id || selectedCommentId === comment.id;
+  }
+
   return (
     <div
       className={classNames(
@@ -84,11 +109,14 @@ function CommentCard({
         !comment.isPublished && styles.Unpublished,
         isFocused || styles.UnfocusedDimmed
       )}
+      data-highlighted={isHighlighted || undefined}
       data-test-comment-id={comment.id}
       data-test-comment-type={comment.type}
       data-test-id={`CommentCard-${comment.id}`}
       data-test-name="CommentCard"
       onClick={onClick}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
     >
       {pauseOverlayPosition !== null && (
         <div className={styles.PausedOverlay} data-position={pauseOverlayPosition} />

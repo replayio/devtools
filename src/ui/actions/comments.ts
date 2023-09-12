@@ -1,4 +1,3 @@
-import { Action } from "@reduxjs/toolkit";
 import { RecordingId } from "@replayio/protocol";
 
 import { selectLocation } from "devtools/client/debugger/src/actions/sources/select";
@@ -21,12 +20,6 @@ import { trackEvent } from "ui/utils/telemetry";
 import type { UIThunkAction } from "./index";
 import { setSelectedPrimaryPanel } from "./layout";
 import { seek } from "./timeline";
-
-type SetHoveredComment = Action<"set_hovered_comment"> & { comment: any };
-
-export function setHoveredComment(comment: any): SetHoveredComment {
-  return { type: "set_hovered_comment", comment };
-}
 
 export function createComment(
   time: number,

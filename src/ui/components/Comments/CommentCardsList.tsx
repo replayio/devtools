@@ -72,13 +72,11 @@ export default function CommentCardsList() {
       displayedComments.forEach((comment, index) => {
         let pauseOverlayPosition: PauseOverlayPosition | null = null;
         if (showPauseOverlayAtTime !== null && !hasShownPauseOverlay) {
-          if (comment.time >= showPauseOverlayAtTime) {
+          if (comment.time == showPauseOverlayAtTime) {
             hasShownPauseOverlay = true;
-            if (showPauseOverlayAtTime === comment.time) {
-              pauseOverlayPosition = "current";
-            } else {
-              pauseOverlayPosition = "before";
-            }
+          } else if (comment.time > showPauseOverlayAtTime) {
+            hasShownPauseOverlay = true;
+            pauseOverlayPosition = "before";
           } else if (index === displayedComments.length - 1) {
             hasShownPauseOverlay = true;
             pauseOverlayPosition = "after";
@@ -90,6 +88,7 @@ export default function CommentCardsList() {
             key={comment.id}
             comment={comment}
             pauseOverlayPosition={pauseOverlayPosition}
+            pauseOverlayTime={showPauseOverlayAtTime ? currentTime : null}
           />
         );
       });
@@ -115,7 +114,7 @@ export default function CommentCardsList() {
         </div>
       );
     }
-  }, [displayedComments, isAuthenticated, showPauseOverlayAtTime]);
+  }, [currentTime, displayedComments, isAuthenticated, showPauseOverlayAtTime]);
 
   if (loading || auth.isLoading || recording.loading) {
     return null;

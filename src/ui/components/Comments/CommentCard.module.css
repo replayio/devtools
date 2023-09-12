@@ -4,8 +4,12 @@
   flex-direction: column;
   cursor: pointer;
   padding: 0.5rem 0;
+  border-left: 2px solid transparent;
   border-bottom: 1px solid var(--theme-splitter-color);
   position: relative;
+}
+.CommentCard[data-highlighted] {
+  border-left-color: var(--secondary-accent);
 }
 
 .Unpublished {
@@ -22,21 +26,15 @@
 }
 .PausedOverlay[data-position="after"] {
   bottom: 0;
-  left: 0;
+  left: -2px;
   right: 0;
   height: 2px;
 }
 .PausedOverlay[data-position="before"] {
   top: 0;
-  left: 0;
+  left: -2px;
   right: 0;
   height: 2px;
-}
-.PausedOverlay[data-position="current"] {
-  top: 0;
-  bottom: 0;
-  left: 0;
-  width: 2px;
 }
 
 .CommentCard :global(code) {

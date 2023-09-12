@@ -3,6 +3,8 @@ import { ConnectedProps, connect } from "react-redux";
 
 import hooks from "ui/hooks";
 import { selectors } from "ui/reducers";
+import { getHoveredCommentId, getSelectedCommentId } from "ui/reducers/app";
+import { useAppSelector } from "ui/setup/hooks";
 import { UIState } from "ui/state";
 import { Comment } from "ui/state/comments";
 
@@ -22,11 +24,15 @@ function CommentsOverlay({
   const recordingId = hooks.useGetRecordingId();
   const { comments: allComments } = hooks.useGetComments(recordingId);
 
+  const hoveredCommentId = useAppSelector(getHoveredCommentId);
+  const selectedCommentId = useAppSelector(getSelectedCommentId);
+
   if (!canvas) {
     return null;
   }
 
   const { top, left, width, height, scale } = canvas;
+
   const commentsAtTime = findComment({ comments: allComments, currentTime });
 
   return (
@@ -40,9 +46,15 @@ function CommentsOverlay({
       }}
     >
       <div className="canvas-comments">
-        {commentsAtTime.map(comment => (
-          <VideoComment comment={comment} key={comment.id} />
-        ))}
+        {commentsAtTime.map(comment => {
+          return (
+            <VideoComment
+              comment={comment}
+              isHighlighted={hoveredCommentId === comment.id || selectedCommentId === comment.id}
+              key={comment.id}
+            />
+          );
+        })}
       </div>
       {children}
     </div>
