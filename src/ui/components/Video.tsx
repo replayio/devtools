@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 
 import { PreviewNodeHighlighter } from "devtools/client/inspector/markup/components/PreviewNodeHighlighter";
 import { installObserver, refreshGraphics } from "protocol/graphics";
 import Spinner from "replay-next/components/Spinner";
+import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import {
   getAreMouseTargetsLoading,
   getIsNodePickerActive,
@@ -10,17 +11,23 @@ import {
   getRecordingTarget,
   getVideoUrl,
 } from "ui/actions/app";
+import { stopPlayback } from "ui/actions/timeline";
 import CommentsOverlay from "ui/components/Comments/VideoComments/index";
 import ToggleButton from "ui/components/TestSuite/views/Toggle/ToggleButton";
 import useVideoContextMenu from "ui/components/useVideoContextMenu";
 import { getSelectedPrimaryPanel } from "ui/reducers/layout";
 import { getPlayback, isPlaybackStalled } from "ui/reducers/timeline";
-import { useAppSelector } from "ui/setup/hooks";
+import { isPlaying as isPlayingSelector } from "ui/reducers/timeline";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 import ReplayLogo from "./shared/ReplayLogo";
 import Tooltip from "./shared/Tooltip";
 
 export default function Video() {
+  const { accessToken } = useContext(SessionContext);
+
+  const dispatch = useAppDispatch();
+
   const panel = useAppSelector(getSelectedPrimaryPanel);
   const highlightedNodeIds = useAppSelector(state => state.markup.highlightedNodes);
   const isNodePickerActive = useAppSelector(getIsNodePickerActive);
@@ -30,13 +37,14 @@ export default function Video() {
   const videoUrl = useAppSelector(getVideoUrl);
   const stalled = useAppSelector(isPlaybackStalled);
   const mouseTargetsLoading = useAppSelector(getAreMouseTargetsLoading);
+  const isPlaying = useAppSelector(isPlayingSelector);
 
   const isPaused = !playback;
   const isNodeTarget = recordingTarget == "node";
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const { contextMenu, onContextMenu } = useVideoContextMenu({ canvasRef });
+  const { addComment, contextMenu, onContextMenu } = useVideoContextMenu({ canvasRef });
 
   const [showDelayedSpinner, setShowDelayedSpinner] = useState(false);
 
@@ -81,11 +89,15 @@ export default function Video() {
   };
 
   const onClick = (e: React.MouseEvent) => {
-    if (isNodePickerActive || isNodePickerInitializing) {
+    if (isPlaying) {
+      dispatch(stopPlayback());
+    }
+
+    if (isNodePickerActive || isNodePickerInitializing || accessToken == null) {
       return;
     }
 
-    onContextMenu(e);
+    addComment();
   };
 
   const showCommentTool =

@@ -1,4 +1,4 @@
-import { MouseEvent, RefObject, UIEvent, useContext, useRef } from "react";
+import { MouseEvent, RefObject, UIEvent, useContext, useEffect, useRef } from "react";
 import { ContextMenuItem, assertMouseEvent, useContextMenu } from "use-context-menu";
 
 import {
@@ -48,6 +48,10 @@ export default function useVideoContextMenu({
   });
 
   const addComment = async () => {
+    if (accessToken === null) {
+      return;
+    }
+
     const { pageX, pageY, position } = mouseEventDataRef.current;
 
     const canvas = document.querySelector("canvas#graphics");
@@ -116,14 +120,8 @@ export default function useVideoContextMenu({
     }
   };
 
-  return useContextMenu(
+  const { contextMenu, hideMenu, onContextMenu } = useContextMenu(
     <>
-      <ContextMenuItem onSelect={inspectElement}>
-        <>
-          <Icon className={styles.Icon} type="inspect" />
-          Inspect element
-        </>
-      </ContextMenuItem>
       {accessToken !== null && (
         <ContextMenuItem dataTestName="ContextMenuItem-AddComment" onSelect={addComment}>
           <>
@@ -132,6 +130,12 @@ export default function useVideoContextMenu({
           </>
         </ContextMenuItem>
       )}
+      <ContextMenuItem onSelect={inspectElement}>
+        <>
+          <Icon className={styles.Icon} type="inspect" />
+          Inspect element
+        </>
+      </ContextMenuItem>
     </>,
     {
       dataTestName: "ContextMenu-Video",
@@ -141,6 +145,18 @@ export default function useVideoContextMenu({
       requireClickToShow: true,
     }
   );
+
+  useEffect(() => {
+    if (contextMenu && isPlaying) {
+      hideMenu();
+    }
+  }, [contextMenu, hideMenu, isPlaying]);
+
+  return {
+    addComment,
+    contextMenu,
+    onContextMenu,
+  };
 }
 
 function getPositionForAddingComment(event: MouseEvent): { x: number; y: number } {
