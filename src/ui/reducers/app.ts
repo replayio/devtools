@@ -20,6 +20,7 @@ import {
 } from "ui/state/app";
 
 export const initialAppState: AppState = {
+  activeNodePicker: null,
   awaitingSourcemaps: false,
   canvas: null,
   currentPoint: null,
@@ -27,10 +28,10 @@ export const initialAppState: AppState = {
   displayedLoadingProgress: null,
   events: {},
   expectedError: null,
-  activeNodePicker: null,
-  nodePickerStatus: "disabled",
+  hoveredCommentId: null,
   loading: 4,
   loadingFinished: false,
+  nodePickerStatus: "disabled",
   modal: null,
   modalOptions: null,
   mode: "devtools",
@@ -38,6 +39,7 @@ export const initialAppState: AppState = {
   recordingDuration: 0,
   recordingTarget: null,
   recordingWorkspace: null,
+  selectedCommentId: null,
   sessionId: null,
   trialExpired: false,
   unexpectedError: null,
@@ -135,6 +137,12 @@ const appSlice = createSlice({
     setAppMode(state, action: PayloadAction<AppMode>) {
       state.mode = action.payload;
     },
+    setHoveredCommentId(state, action: PayloadAction<string | null>) {
+      state.hoveredCommentId = action.payload;
+    },
+    setSelectedCommentId(state, action: PayloadAction<string | null>) {
+      state.selectedCommentId = action.payload;
+    },
   },
 });
 
@@ -160,6 +168,8 @@ export const {
   setUnexpectedError,
   setUploading,
   setVideoUrl,
+  setHoveredCommentId,
+  setSelectedCommentId,
 } = appSlice.actions;
 
 export default appSlice.reducer;
@@ -181,6 +191,8 @@ export const getUnexpectedError = (state: UIState) => state.app.unexpectedError;
 export const getTrialExpired = (state: UIState) => state.app.trialExpired;
 export const getModal = (state: UIState) => state.app.modal;
 export const getModalOptions = (state: UIState) => state.app.modalOptions;
+export const getHoveredCommentId = (state: UIState) => state.app.hoveredCommentId;
+export const getSelectedCommentId = (state: UIState) => state.app.selectedCommentId;
 
 const NO_EVENTS: MouseEvent[] = [];
 export const getEventsForType = (state: UIState, type: string) =>

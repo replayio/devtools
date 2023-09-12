@@ -79,30 +79,32 @@ export type NodePickerType = "reactComponent" | "domElement";
 export type NodePickerStatus = "disabled" | "initializing" | "active";
 
 export interface AppState {
-  mode: AppMode;
+  activeNodePicker: NodePickerType | null;
   awaitingSourcemaps: boolean;
   canvas: Canvas | null;
+  currentPoint: ExecutionPoint | null;
   defaultSettingsTab: SettingsTabTitle;
   displayedLoadingProgress: number | null;
   events: Events;
   expectedError: ExpectedError | null;
-  activeNodePicker: NodePickerType | null;
-  nodePickerStatus: NodePickerStatus;
+  hoveredCommentId: string | null;
   loading: number;
   loadingFinished: boolean;
+  nodePickerStatus: NodePickerStatus;
   modal: ModalType | null;
   modalOptions: ModalOptionsType;
+  mode: AppMode;
+  mouseTargetsLoading: boolean;
   recordingDuration: number;
   recordingTarget: RecordingTarget | null;
   recordingWorkspace: Workspace | null;
+  selectedCommentId: string | null;
   sessionId: SessionId | null;
   trialExpired: boolean;
   unexpectedError: UnexpectedError | null;
   uploading: UploadInfo | null;
   videoUrl: string | null;
   workspaceId: WorkspaceId | null;
-  mouseTargetsLoading: boolean;
-  currentPoint: ExecutionPoint | null;
 }
 
 export type AppMode = "devtools" | "sourcemap-visualizer";
