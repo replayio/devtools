@@ -211,7 +211,7 @@ button::selection {
 .CodeMirror-hints,
 .CodeMirror-Tern-tooltip {
   border: 1px solid var(--theme-popup-border-color);
-  background-color: var(--theme-popup-background);
+  background-color: var(--theme-popup-background-color);
   color: var(--theme-popup-color);
 }
 

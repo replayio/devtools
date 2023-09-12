@@ -580,6 +580,7 @@ export async function hoverOverLine(
     );
 
     await stopHovering(page);
+
     if (withMetaKey) {
       await page.keyboard.up(getCommandKey());
     }
@@ -613,6 +614,9 @@ export async function isSeekOptionEnabled(
     withMetaKey: true,
     withShiftKey: direction === "previous",
   });
+
+  // If there is a preview popup, hide it so it isn't obscuring the hover action
+  await page.keyboard.press("Escape");
 
   const button = lineLocator.locator('[data-test-name="ContinueToButton"]');
   const isHoverButtonEnabled = await button.isEnabled();

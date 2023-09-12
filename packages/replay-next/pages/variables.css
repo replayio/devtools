@@ -395,11 +395,11 @@
 
   /* src/devtools/client/themes/tooltips.css */
 
-  --theme-tooltip-background: var(--theme-popup-background);
+  --theme-tooltip-background: var(--theme-popup-background-color);
   --theme-tooltip-color: var(--theme-text-color-strong);
   --theme-tooltip-shadow: rgba(25, 25, 25, 0.76);
 
-  --theme-arrowpanel-background: var(--theme-popup-background);
+  --theme-arrowpanel-background: var(--theme-popup-background-color);
   --theme-arrowpanel-border-color: var(--theme-popup-border-color);
   --theme-arrowpanel-color: var(--theme-popup-color);
   --theme-arrowpanel-dimmed-further: rgba(249, 249, 250, 0.15);
@@ -607,10 +607,9 @@
   /* Colors used in Graphs, like performance tools. */
 
   /* Common popup styles(used by HTMLTooltip and autocomplete) */
-  --theme-popup-background: var(--grey-60);
-  --theme-popup-border-color: #27272b;
-  --theme-popup-color: rgb(249, 249, 250);
-  --theme-popup-dimmed: rgba(249, 249, 250, 0.1);
+  --theme-popup-background-color: var(--menu-bgcolor);
+  --theme-popup-border-color: var(--theme-base-80);
+  --theme-popup-color: var(--color-default);
 
   /* Styling for devtool buttons */
   --theme-toolbarbutton-active-background: var(--grey-10-a30);
@@ -915,11 +914,11 @@
 
   /* src/devtools/client/themes/tooltips.css */
 
-  --theme-tooltip-background: var(--theme-popup-background);
+  --theme-tooltip-background: var(--theme-popup-background-color);
   --theme-tooltip-color: var(--theme-text-color-strong);
   --theme-tooltip-shadow: rgba(25, 25, 25, 0.76);
 
-  --theme-arrowpanel-background: var(--theme-popup-background);
+  --theme-arrowpanel-background: var(--theme-popup-background-color);
   --theme-arrowpanel-border-color: var(--theme-popup-border-color);
   --theme-arrowpanel-color: var(--theme-popup-color);
   --theme-arrowpanel-dimmed-further: rgba(249, 249, 250, 0.15);
@@ -1125,7 +1124,7 @@
   --theme-focus-outline-color: #000000;
 
   /* Common popup styles(used by HTMLTooltip and autocomplete) */
-  --theme-popup-background: white;
+  --theme-popup-background-color: white;
   --theme-popup-border-color: ThreeDShadow;
   --theme-popup-color: var(--grey-70);
   --theme-popup-dimmed: hsla(0, 0%, 80%, 0.3);

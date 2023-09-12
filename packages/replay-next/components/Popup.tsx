@@ -6,6 +6,8 @@ import styles from "./Popup.module.css";
 const MOUSE_LEAVE_DEBOUNCE_TIMER = 250;
 const RESIZE_DEBOUNCE_TIMER = 100;
 
+export type PopupStyle = "default" | "error";
+
 type Dismiss = () => void;
 
 export default function Popup({
@@ -18,6 +20,7 @@ export default function Popup({
   dismissOnMouseLeave = false,
   horizontalAlignment = "center",
   showTail = false,
+  style = "default",
   target,
 }: {
   children: ReactNode;
@@ -29,6 +32,7 @@ export default function Popup({
   dismissOnMouseLeave?: boolean;
   horizontalAlignment?: "left" | "center" | "right";
   showTail?: boolean;
+  style?: PopupStyle;
   target: HTMLElement;
 }) {
   const arrowRef = useRef<SVGElement>(null);
@@ -215,6 +219,7 @@ export default function Popup({
   return createPortal(
     <div
       className={styles.Popup}
+      data-style={style}
       data-test-id={dataTestId}
       data-test-name={dataTestName}
       onClick={blockEvent}
