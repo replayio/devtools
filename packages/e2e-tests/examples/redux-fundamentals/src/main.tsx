@@ -15,6 +15,7 @@ async function bootstrap() {
       ? '/test/examples/redux-fundamentals/dist'
       : ''
   await worker.start({
+    waitUntilReady: true,
     serviceWorker: {
       url: baseUrl + '/mockServiceWorker.js',
     },

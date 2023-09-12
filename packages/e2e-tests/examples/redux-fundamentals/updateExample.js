@@ -25,7 +25,7 @@ spawnSync(
   [
     'replay',
     'upload-sourcemaps',
-    '--dry-run',
+    //'--dry-run',
     '--group',
     'e2e-test',
     '--api-key',

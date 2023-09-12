@@ -1,13 +1,8 @@
 import { PlaywrightTestConfig, devices } from '@playwright/test'
-import { devices as replayDevices } from '@replayio/playwright'
 
 const { CI, SLOW_MO } = process.env
 
 const projects = [
-  // {
-  //   name: "replay-chromium",
-  //   use: { ...(replayDevices["Replay Chromium"] as any) },
-  // },
   {
     name: 'chromium',
     use: { ...devices['Desktop Chromium'] },
@@ -15,7 +10,7 @@ const projects = [
 ]
 
 const config: PlaywrightTestConfig = {
-  testDir: 'src',
+  testDir: 'tests',
   use: {
     launchOptions: {
       slowMo: SLOW_MO ? parseInt(SLOW_MO, 10) : 0,

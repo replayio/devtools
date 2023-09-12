@@ -18,6 +18,6 @@
     "strict": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"],
+  "include": ["src", "tests/playwright-example.test.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
