@@ -1198,11 +1198,8 @@
   /* menu styles */
   --context-menu-background-color: var(--context-menu-bgcolor);
   --context-menu-border-color: var(--context-menu-border-color);
-  --context-menu-border-radius: 0.5rem;
-  --context-menu-border-size: 1px;
   --context-menu-filter: drop-shadow(1px 2px 3px rgba(0, 0, 0, 0.5));
   --context-menu-font-family: var(--font-family-default);
-  --context-menu-padding: 0.25rem 0;
   --context-menu-transition-duration: 250ms;
   --context-menu-z-index: 25;
 

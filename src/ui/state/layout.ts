@@ -3,6 +3,7 @@ import { LocalNag } from "ui/setup/prefs";
 
 export type LayoutState = {
   showCommandPalette: boolean;
+  showSupportForm: boolean;
   selectedPrimaryPanel: PrimaryPanelName | null;
   selectedPanel: SecondaryPanelName;
   viewMode: ViewMode;

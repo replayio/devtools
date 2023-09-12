@@ -23,6 +23,7 @@ import { DevToolsDynamicLoadingMessage } from "ui/components/DevToolsDynamicLoad
 import { DevToolsProcessingScreen } from "ui/components/DevToolsProcessingScreen";
 import { RecordingDocumentTitle } from "ui/components/RecordingDocumentTitle";
 import TerminalContextAdapter from "ui/components/SecondaryToolbox/TerminalContextAdapter";
+import { SupportForm } from "ui/components/SupportForm";
 import { TestSuiteContextRoot } from "ui/components/TestSuite/views/TestSuiteContext";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { useTrackLoadingIdleTime } from "ui/hooks/tracking";
@@ -145,6 +146,7 @@ function _DevTools({
   loadingFinished,
   sessionId,
   showCommandPalette,
+  showSupportForm,
   uploadComplete,
 }: DevToolsProps) {
   const { isAuthenticated } = useAuth0();
@@ -273,6 +275,7 @@ function _DevTools({
                             <Header />
                             <Body />
                             {showCommandPalette ? <CommandPaletteModal /> : null}
+                            {showSupportForm ? <SupportForm /> : null}
                             <KeyboardShortcuts />
                           </KeyModifiers>
                         </LayoutContextAdapter>
@@ -294,6 +297,7 @@ const connector = connect(
     loadingFinished: selectors.getLoadingFinished(state),
     sessionId: selectors.getSessionId(state),
     showCommandPalette: selectors.getShowCommandPalette(state),
+    showSupportForm: selectors.getShowSupportForm(state),
   }),
   {
     createSocket,
