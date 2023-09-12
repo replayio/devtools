@@ -13,7 +13,7 @@ export async function recordPlaywright(
   const browserEntry = playwright[browserName];
   let executablePath: string | undefined = undefined;
   if (config.shouldRecordTest) {
-    executablePath = config.browserPath || getExecutablePath(browserName);
+    executablePath = config.browserPath || getExecutablePath(browserName)!;
   }
 
   const browser = await browserEntry.launch({
