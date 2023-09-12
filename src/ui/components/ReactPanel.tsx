@@ -62,8 +62,13 @@ import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { getPauseFramesAsync } from "ui/suspense/frameCache";
 
-import { FormattedPointStackFrame, formatPointStackFrame } from "./ReactReduxPerfPanel";
+import {
+  FormattedPointStackFrame,
+  formatPointStackForPoint,
+  formatPointStackFrame,
+} from "./ReactReduxPerfPanel";
 import MaterialIcon from "./shared/MaterialIcon";
+import cardsListStyles from "ui/components/Comments/CommentCardsList.module.css";
 import styles from "./Events/Event.module.css";
 
 interface PointWithLocation {
@@ -360,46 +365,14 @@ export const reactRendersIntervalCache = createFocusIntervalCacheForExecutionPoi
 
     const scheduleUpdateEntries: ReactUpdateScheduled[] = await Promise.all(
       scheduleUpdateHits.map(async hit => {
-        const pointStack = await replayClient.getPointStack(hit.point, 15);
-        const formattedFrames = pointStack.map(frame => {
-          return formatPointStackFrame(frame, sourcesById);
-        });
+        const mostlyFormattedPointStack = await formatPointStackForPoint(replayClient, hit);
 
-        const filteredPauseFrames = formattedFrames.filter(frame => {
-          const { source } = frame;
-          // Filter out everything in `node_modules`, so we have just app code left
-          // TODO There may be times when we care about renders queued by lib code
-          // TODO See about just filtering out React instead?
-          return !MORE_IGNORABLE_PARTIAL_URLS.some(partialUrl => source.url?.includes(partialUrl));
-        });
-
-        // We want the oldest app stack frame, which should be what called `setState()`
-        // But, React also calls `scheduleUpdate` frequently _internally_.
-        // So, there may not be any app code frames at all.
-        let earliestAppCodeFrame: FormattedPointStackFrame | undefined =
-          filteredPauseFrames.slice(-1)[0];
-
-        const cause = earliestAppCodeFrame ? "user" : "unknown";
-        const point = earliestAppCodeFrame ? earliestAppCodeFrame.point : hit;
-        let functionName;
-
-        if (earliestAppCodeFrame) {
-          const formattedFunction = await formatEventListener(
-            replayClient,
-            "unknown",
-            earliestAppCodeFrame.executionLocation
-          );
-          functionName = formattedFunction?.functionName;
-        }
+        const cause = mostlyFormattedPointStack.frame ? "user" : "unknown";
 
         return {
           type: "scheduled",
-          point,
           cause,
-          functionName,
-          frame: earliestAppCodeFrame!,
-          allFrames: formattedFrames,
-          filteredFrames: filteredPauseFrames,
+          ...mostlyFormattedPointStack,
         };
       })
     );
@@ -600,7 +573,7 @@ export const reactInternalMethodsHitsCache: Cache<
   },
 });
 
-function jumpToTimeAndLocationForQueuedRender(
+export function jumpToTimeAndLocationForQueuedRender(
   hitPoint: TimeStampedPoint,
   location: Location | undefined,
   jumpBehavior: "timeOnly" | "timeAndLocation",
@@ -800,24 +773,8 @@ export function ReactPanelSuspends() {
 export function ReactPanel() {
   const { range: focusRange } = useContext(FocusContext);
   const replayClient = useContext(ReplayClientContext);
-  const sourcesById = useSourcesById(replayClient);
-  const sourcesByUrl = useSourcesByUrl(replayClient);
 
-  const reactDomSourceUrl = useAppSelector(getReactDomSourceUrl);
   const allSourcesReceived = useAppSelector(state => state.sources.allSourcesReceived);
-  // const reactDomSource = useAppSelector(state => {
-  //   if (!reactDomSourceUrl) {
-  //     return undefined;
-  //   }
-
-  //   const reactDomSource = getSourceToDisplayForUrl(state, reactDomSourceUrl);
-  //   if (!reactDomSource || !reactDomSource.url) {
-  //     return;
-  //   }
-
-  //   return reactDomSource;
-  // });
-
   if (!focusRange?.begin) {
     return <div>No focus range</div>;
   } else if (!allSourcesReceived) {
@@ -825,14 +782,19 @@ export function ReactPanel() {
   }
 
   return (
-    <Suspense
-      fallback={
-        <div style={{ flexShrink: 1 }}>
-          <IndeterminateLoader />
-        </div>
-      }
-    >
-      <ReactPanelSuspends />
-    </Suspense>
+    <div className={cardsListStyles.Sidebar}>
+      <div className={cardsListStyles.Toolbar}>
+        <div className={cardsListStyles.ToolbarHeader}>React State Updates</div>
+      </div>
+      <Suspense
+        fallback={
+          <div style={{ flexShrink: 1 }}>
+            <IndeterminateLoader />
+          </div>
+        }
+      >
+        <ReactPanelSuspends />
+      </Suspense>
+    </div>
   );
 }

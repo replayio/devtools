@@ -19,7 +19,15 @@ import chunk from "lodash/chunk";
 import groupBy from "lodash/groupBy";
 import mapValues from "lodash/mapValues";
 import zip from "lodash/zip";
-import { ReactNode, Suspense, useContext, useReducer, useState } from "react";
+import {
+  CSSProperties,
+  ReactNode,
+  Suspense,
+  useContext,
+  useMemo,
+  useReducer,
+  useState,
+} from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList as List } from "react-window";
 import {
@@ -97,12 +105,14 @@ import { getPauseFramesAsync } from "ui/suspense/frameCache";
 
 import {
   getReactDomSourceUrl,
+  jumpToTimeAndLocationForQueuedRender,
   reactInternalMethodsHitsCache,
   reactInternalMethodsHitsIntervalCache,
   reactRendersIntervalCache,
 } from "./ReactPanel";
 import MaterialIcon from "./shared/MaterialIcon";
-import styles from "ui/components/Comments/CommentCardsList.module.css";
+import cardsListStyles from "ui/components/Comments/CommentCardsList.module.css";
+import styles from "./Events/Event.module.css";
 
 const MORE_IGNORABLE_PARTIAL_URLS = IGNORABLE_PARTIAL_SOURCE_URLS.concat(
   // Ignore _any_ 3rd-party package for now
@@ -534,19 +544,66 @@ export function formatPointStackFrame(
   };
 }
 
+export async function formatPointStackForPoint(
+  replayClient: ReplayClientInterface,
+  point: TimeStampedPoint
+) {
+  const sourcesById = await sourcesByIdCache.readAsync(replayClient);
+  const pointStack = await replayClient.getPointStack(point.point, 30);
+  const formattedFrames = pointStack.map(frame => {
+    return formatPointStackFrame(frame, sourcesById);
+  });
+
+  const filteredPauseFrames = formattedFrames.filter(frame => {
+    const { source } = frame;
+    // Filter out everything in `node_modules`, so we have just app code left
+    // TODO There may be times when we care about renders queued by lib code
+    // TODO See about just filtering out React instead?
+    return !MORE_IGNORABLE_PARTIAL_URLS.some(partialUrl => source.url?.includes(partialUrl));
+  });
+
+  // We want the oldest app stack frame.
+  // If this is a React update, that should be what called `setState()`
+  // But, React also calls `scheduleUpdate` frequently _internally_.
+  // So, there may not be any app code frames at all.
+  let earliestAppCodeFrame: FormattedPointStackFrame | undefined = filteredPauseFrames.slice(-1)[0];
+
+  let functionName;
+
+  let resultPoint = point;
+  if (earliestAppCodeFrame) {
+    resultPoint = earliestAppCodeFrame.point;
+    const formattedFunction = await formatEventListener(
+      replayClient,
+      "unknown",
+      earliestAppCodeFrame.executionLocation
+    );
+    functionName = formattedFunction?.functionName;
+  }
+
+  return {
+    point: resultPoint,
+    functionName,
+    frame: earliestAppCodeFrame!,
+    allFrames: formattedFrames,
+    filteredFrames: filteredPauseFrames,
+  };
+}
+
+interface ReduxDispatchLocations {
+  dispatch: FunctionOutline;
+  reduxSource: Source;
+  breakpoints: {
+    dispatchStart: Location;
+    beforeReducer: Location;
+    reducerDone: Location;
+    dispatchDone: Location;
+  };
+}
+
 export const reduxDispatchFunctionCache: Cache<
   [replayClient: ReplayClientInterface, rangeStart: string, rangeEnd: string],
-  | {
-      dispatch: FunctionOutline;
-      reduxSource: Source;
-      breakpoints: {
-        dispatchStart: Location;
-        beforeReducer: Location;
-        reducerDone: Location;
-        dispatchDone: Location;
-      };
-    }
-  | undefined
+  ReduxDispatchLocations | undefined
 > = createCache({
   debugLabel: "ReduxDispatchFunction",
   async load([replayClient, rangeStart, rangeEnd]) {
@@ -631,7 +688,7 @@ export const reduxDispatchFunctionCache: Cache<
   },
 });
 
-interface ReduxDispatchDetails {
+interface ReduxDispatchDetailsEntry {
   actionType: string;
   dispatchStart: PointDescription;
   beforeReducer: PointDescription;
@@ -643,7 +700,7 @@ interface ReduxDispatchDetails {
 
 export const reduxDispatchesCache = createFocusIntervalCacheForExecutionPoints<
   [replayClient: ReplayClientInterface],
-  ReduxDispatchDetails
+  ReduxDispatchDetailsEntry
 >({
   debugLabel: "RecordedProtocolMessages",
   getPointForValue: data => data.dispatchStart.point,
@@ -1216,6 +1273,77 @@ async function getValidFunctionParameterName(
   return firstParam;
 }
 
+interface ReduxDispatchItemData {
+  currentTime: number;
+  executionPoint: string;
+  onSeek: (point: string, time: number) => void;
+  entries: ReduxDispatchDetailsEntry[];
+}
+
+function ReduxDispatchListItem({
+  data,
+  index,
+  style,
+}: {
+  data: ReduxDispatchItemData;
+  index: number;
+  style: CSSProperties;
+}) {
+  const dispatch = useAppDispatch();
+  const replayClient = useContext(ReplayClientContext);
+  const dispatchDetails = data.entries[index];
+  const { executionPoint, onSeek, currentTime } = data;
+  const { actionType, dispatchStart } = dispatchDetails;
+  // const { point, frame, functionName } = renderDetails;
+  const isPaused = dispatchStart.time === currentTime && executionPoint === dispatchStart.point;
+  const [jumpToCodeStatus] = useState<JumpToCodeStatus>("not_checked");
+
+  const onMouseEnter = () => {};
+
+  const onMouseLeave = () => {};
+
+  const onClickJumpToCode = async () => {
+    const formattedPointStack = await formatPointStackForPoint(replayClient, dispatchStart);
+
+    dispatch(
+      jumpToTimeAndLocationForQueuedRender(
+        dispatchStart,
+        formattedPointStack?.frame?.executionLocation,
+        "timeAndLocation",
+        onSeek
+      )
+    );
+  };
+
+  return (
+    <div style={style}>
+      <div
+        className={classnames(styles.eventRow, "group block w-full", {
+          "text-lightGrey": currentTime < dispatchStart.time,
+          "font-semibold text-primaryAccent": isPaused,
+        })}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+      >
+        <div className="flex flex-row items-center space-x-2 overflow-hidden">
+          <AccessibleImage className="redux" />
+          <Label>{actionType}</Label>
+        </div>
+        <div className="flex space-x-2 opacity-0 group-hover:opacity-100">
+          {
+            <JumpToCodeButton
+              onClick={onClickJumpToCode}
+              status={jumpToCodeStatus}
+              currentExecutionPoint={executionPoint}
+              targetExecutionPoint={dispatchStart.point}
+            />
+          }
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ReactReduxPerfPanelSuspends() {
   const dispatch = useAppDispatch();
   const currentTime = useAppSelector(getCurrentTime);
@@ -1227,59 +1355,83 @@ function ReactReduxPerfPanelSuspends() {
     dispatch(doSomeAnalysis(focusRange));
   };
 
+  const reduxDispatchEntries = reduxDispatchesCache.read(
+    BigInt(focusRange!.begin.point),
+    BigInt(focusRange!.end.point),
+    replayClient
+  );
+
+  const itemData: ReduxDispatchItemData = useMemo(() => {
+    const onSeek = (executionPoint: string, time: number) => {
+      dispatch(seek({ executionPoint, time }));
+    };
+
+    return {
+      executionPoint: executionPoint!,
+      currentTime,
+      entries: reduxDispatchEntries,
+      onSeek,
+    };
+  }, [reduxDispatchEntries, dispatch, currentTime, executionPoint]);
+
+  // return (
+  //   <div className={styles.Sidebar}>
+  //     <div className={styles.Toolbar}>
+  //       <div className={styles.ToolbarHeader}>React+Redux Perf</div>
+  //       <button className="row logout" onClick={handleDoAnalysisClick}>
+  //         <span className="inline-flex w-full items-center justify-center rounded-md border border-transparent bg-primaryAccent px-3 py-1.5 text-sm font-medium leading-4 text-buttontextColor hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+  //           Do Something
+  //         </span>
+  //       </button>
+  //     </div>
+  //     <div className={styles.List}>{
+
+  //     }</div>
+  //   </div>
+  // );
   return (
-    <div className={styles.Sidebar}>
-      <div className={styles.Toolbar}>
-        <div className={styles.ToolbarHeader}>React+Redux Perf</div>
-        <button className="row logout" onClick={handleDoAnalysisClick}>
-          <span className="inline-flex w-full items-center justify-center rounded-md border border-transparent bg-primaryAccent px-3 py-1.5 text-sm font-medium leading-4 text-buttontextColor hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-            Do Something
-          </span>
-        </button>
-      </div>
-      <div className={styles.List}>{}</div>
+    <div style={{ flex: "1 1 auto", height: "100%" }}>
+      <AutoSizer disableWidth>
+        {({ height }: { height: number }) => {
+          return (
+            <List
+              children={ReduxDispatchListItem}
+              height={height}
+              itemCount={itemData.entries.length}
+              itemData={itemData}
+              itemSize={30}
+              width="100%"
+            />
+          );
+        }}
+      </AutoSizer>
     </div>
   );
 }
 
 export function ReactReduxPerfPanel() {
   const { range: focusRange } = useContext(FocusContext);
-
-  const [, forceRender] = useReducer(c => c + 1, 0);
-  const reactDomSourceUrl = useAppSelector(getReactDomSourceUrl);
-  const sourcesState = useAppSelector(state => state.sources);
-  const reactDomSource = useAppSelector(state => {
-    if (!reactDomSourceUrl) {
-      return undefined;
-    }
-
-    const reactDomSource = getSourceToDisplayForUrl(state, reactDomSourceUrl);
-    if (!reactDomSource || !reactDomSource.url) {
-      return;
-    }
-
-    return reactDomSource;
-  });
-
+  const allSourcesReceived = useAppSelector(state => state.sources.allSourcesReceived);
   if (!focusRange?.begin) {
     return <div>No focus range</div>;
-  } else if (!reactDomSource) {
-    if (sourcesState.allSourcesReceived) {
-      return <div>ReactDOM not found</div>;
-    } else {
-      return <div>Loading sources...</div>;
-    }
+  } else if (!allSourcesReceived) {
+    return <div>Loading sources...</div>;
   }
 
   return (
-    <Suspense
-      fallback={
-        <div style={{ flexShrink: 1 }}>
-          <IndeterminateLoader />
-        </div>
-      }
-    >
-      <ReactReduxPerfPanelSuspends />
-    </Suspense>
+    <div className={cardsListStyles.Sidebar}>
+      <div className={cardsListStyles.Toolbar}>
+        <div className={cardsListStyles.ToolbarHeader}>Redux Dispatch Perf</div>
+      </div>
+      <Suspense
+        fallback={
+          <div style={{ flexShrink: 1 }}>
+            <IndeterminateLoader />
+          </div>
+        }
+      >
+        <ReactReduxPerfPanelSuspends />
+      </Suspense>
+    </div>
   );
 }
