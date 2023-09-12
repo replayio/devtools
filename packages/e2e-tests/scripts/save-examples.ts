@@ -6,7 +6,7 @@
 
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import { join } from "path";
-import { Page } from "@playwright/test";
+import { Page, expect as expectFunction } from "@playwright/test";
 import { listAllRecordings, removeRecording, uploadRecording } from "@replayio/replay";
 import axios from "axios";
 import chalk from "chalk";
@@ -16,6 +16,7 @@ import { v4 as uuidv4 } from "uuid";
 import yargs from "yargs";
 
 import config, { BrowserName } from "../config";
+import { testFunction as reduxFundamentalsScript } from "../examples/redux-fundamentals/tests/example-script";
 import { recordNodeExample } from "./record-node";
 import { recordPlaywright, uploadLastRecording } from "./record-playwright";
 
@@ -37,11 +38,14 @@ const argv = yargs
   .alias("help", "h")
   .parseSync();
 
+type PlaywrightScript = (page: Page, expect: typeof expectFunction) => Promise<void>;
+
 type TestExampleFile = {
   filename: string;
   folder: string;
   category: "browser" | "node";
   runtime: "firefox" | "chromium" | "node";
+  playwrightScript?: PlaywrightScript;
 };
 
 const knownExamples: TestExampleFile[] = [
@@ -256,6 +260,13 @@ const knownExamples: TestExampleFile[] = [
     runtime: "firefox",
   },
   {
+    filename: "redux-fundamentals/dist/index.html",
+    folder: config.browserExamplesPath,
+    category: "browser",
+    runtime: "chromium",
+    playwrightScript: reduxFundamentalsScript,
+  },
+  {
     filename: "node/control_flow.js",
     folder: config.nodeExamplesPath,
     category: "node",
@@ -399,11 +410,15 @@ async function saveBrowserExample({ example }: TestRunCallbackArgs) {
   const done = logAnimated(`Recording example ${chalk.bold(example.filename)}`);
 
   const exampleUrl = `${config.devtoolsUrl}/test/examples/${example.filename}`;
+  async function defaultPlaywrightScript(page: Page) {
+    await waitUntilMessage(page as Page, "ExampleFinished");
+  }
+  const playwrightScript: PlaywrightScript = example.playwrightScript ?? defaultPlaywrightScript;
 
   // Shouldn't be "node" by this point
   await recordPlaywright(example.runtime as BrowserName, async page => {
     await page.goto(exampleUrl);
-    await waitUntilMessage(page as Page, "ExampleFinished");
+    await playwrightScript(page, expectFunction);
   });
   const recordingId = await uploadLastRecording(exampleUrl);
 
