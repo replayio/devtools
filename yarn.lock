@@ -3555,6 +3555,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@playwright/test@npm:^1.37.0":
+  version: 1.37.1
+  resolution: "@playwright/test@npm:1.37.1"
+  dependencies:
+    "@types/node": "*"
+    fsevents: 2.3.2
+    playwright-core: 1.37.1
+  dependenciesMeta:
+    fsevents:
+      optional: true
+  bin:
+    playwright: cli.js
+  checksum: b7038f29000289103c08b215eff7aabdda70cdc1375fa7dad0e81651be71086a1e2fc0e0e29dc70348037c366cf0cc69f762373fda34ba1a74aa1658741d9195
+  languageName: node
+  linkType: hard
+
 "@polka/url@npm:^1.0.0-next.20":
   version: 1.0.0-next.21
   resolution: "@polka/url@npm:1.0.0-next.21"
@@ -3589,57 +3605,6 @@ __metadata:
     lodash: ^4.17.21
   languageName: unknown
   linkType: soft
-
-"@recordreplay/playwright@npm:^1.18.3":
-  version: 1.18.3
-  resolution: "@recordreplay/playwright@npm:1.18.3"
-  dependencies:
-    commander: ^8.2.0
-    debug: ^4.1.1
-    extract-zip: ^2.0.1
-    https-proxy-agent: ^5.0.0
-    jpeg-js: ^0.4.2
-    mime: ^2.4.6
-    pngjs: ^5.0.0
-    progress: ^2.0.3
-    proper-lockfile: ^4.1.1
-    proxy-from-env: ^1.1.0
-    rimraf: ^3.0.2
-    socks-proxy-agent: ^6.1.0
-    stack-utils: ^2.0.3
-    ws: ^7.4.6
-    yauzl: ^2.10.0
-    yazl: ^2.5.1
-  bin:
-    replay-playwright: cli.js
-  checksum: d03fe46250a779bb62b539765a7f294df7cdca7677e445e8b1a820693a0394b8a26b7da8bafd8db36c516aa1280c7e032b2208682e239c92c8d2610d475b12bb
-  languageName: node
-  linkType: hard
-
-"@recordreplay/sourcemap-upload-cli@npm:^0.1.1":
-  version: 0.1.1
-  resolution: "@recordreplay/sourcemap-upload-cli@npm:0.1.1"
-  dependencies:
-    "@recordreplay/sourcemap-upload": ^0.1.0
-    commander: ^7.2.0
-  bin:
-    replay-sourcemap-upload: bin/sourcemap-upload
-  checksum: 98e1c507f2654aff83e2b044f1250e0262cd9f1e6a889336b9f84a10fbcbb7086ad9ba809ed5e8f2abf1cc69fdb86a1e223332b97b0be60f70a8abe7a08d0c82
-  languageName: node
-  linkType: hard
-
-"@recordreplay/sourcemap-upload@npm:^0.1.0":
-  version: 0.1.4
-  resolution: "@recordreplay/sourcemap-upload@npm:0.1.4"
-  dependencies:
-    commander: ^7.2.0
-    debug: ^4.3.1
-    glob: ^7.1.6
-    node-fetch: ^2.6.1
-    string.prototype.matchall: ^4.0.5
-  checksum: cc15129f3e16832a7d6241575d7dcafe7db9c4f927b96f7e9042592ee77272b82100b3d3860b7d58ec7f10487d1879bf66bff64c87bb2fe83b97f7ff2e010c7a
-  languageName: node
-  linkType: hard
 
 "@reduxjs/toolkit@npm:^1.8.4":
   version: 1.8.4
@@ -3692,18 +3657,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/playwright@npm:latest":
-  version: 1.0.6
-  resolution: "@replayio/playwright@npm:1.0.6"
+"@replayio/playwright@npm:^1.0.14":
+  version: 1.0.14
+  resolution: "@replayio/playwright@npm:1.0.14"
   dependencies:
-    "@replayio/replay": ^0.13.1
-    "@replayio/test-utils": ^1.0.5
+    "@replayio/replay": ^0.15.0
+    "@replayio/test-utils": ^1.1.4
     uuid: ^8.3.2
   peerDependencies:
     "@playwright/test": 1.19.x
   bin:
     replayio-playwright: bin/replayio-playwright.js
-  checksum: 01c7452775f217a32f37acd8e374da6b06253c32be2ed262053b27b7d651a983bb07545c3cff19f6ec053f149ac7b3a1a7c57fb2ab0d5fa0065d2a3d57fe4a64
+  checksum: 5af0233833c43bc9ba0287d3be54e1706687f11bd914fad3cdd92bc7100a262354bbb19dfa5f76256597497b9768b64817dae17671257ff46aebf583d95b0439
   languageName: node
   linkType: hard
 
@@ -3734,11 +3699,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/replay@npm:^0.13.1":
-  version: 0.13.1
-  resolution: "@replayio/replay@npm:0.13.1"
+"@replayio/replay@npm:^0.15.0":
+  version: 0.15.0
+  resolution: "@replayio/replay@npm:0.15.0"
   dependencies:
-    "@replayio/sourcemap-upload": ^1.0.7
+    "@replayio/sourcemap-upload": ^1.1.1
     commander: ^7.2.0
     debug: ^4.3.4
     is-uuid: ^1.0.2
@@ -3750,7 +3715,7 @@ __metadata:
     ws: ^7.5.0
   bin:
     replay: bin/replay.js
-  checksum: d3aec605a2e924367164d71518a47a34ea990a80a6dbde8284878357312065811b71907ba61ba273534bfd7da50299104bce8db6f697b7ddf253b6588d59a142
+  checksum: 45a155b9472dd4c9b30bada56827d3d0d9f044bb3bb1d2b4b9e21e5fa67c42a778444b03878f577d699f2ea8d23fe0973ec48a91e9084665a740415f697dafe0
   languageName: node
   linkType: hard
 
@@ -3767,16 +3732,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/sourcemap-upload@npm:^1.0.7":
-  version: 1.0.7
-  resolution: "@replayio/sourcemap-upload@npm:1.0.7"
+"@replayio/sourcemap-upload@npm:^1.1.1":
+  version: 1.1.1
+  resolution: "@replayio/sourcemap-upload@npm:1.1.1"
   dependencies:
     commander: ^7.2.0
     debug: ^4.3.1
     glob: ^7.1.6
     node-fetch: ^2.6.1
     string.prototype.matchall: ^4.0.5
-  checksum: 29b37ce15bf348720748a46f7d27b445531bc52074eb88087a0ae1bf958b3bf8fcd19637612b4ec293c8cd82175977d5b3e87377456e7ae724d456aa385e2a69
+  checksum: e47252d133fc34b87a5a7b68e3c792120ff51e12082f45bbf2f91286df39cefd6b6c647e9111c2f3fd89743f7fc30867644ae3647dd1ddb6e83146d12711e9b5
   languageName: node
   linkType: hard
 
@@ -3793,16 +3758,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/test-utils@npm:^1.0.5":
-  version: 1.0.5
-  resolution: "@replayio/test-utils@npm:1.0.5"
+"@replayio/test-utils@npm:^1.1.4":
+  version: 1.1.4
+  resolution: "@replayio/test-utils@npm:1.1.4"
   dependencies:
-    "@replayio/replay": ^0.13.1
+    "@replayio/replay": ^0.15.0
     "@types/node-fetch": ^2.6.2
     debug: ^4.3.4
     node-fetch: ^2.6.7
     uuid: ^8.3.2
-  checksum: ea1e91017fde8856c9e30734138ce2a911dc135d427b26fff945ee95abbcd4c1c9ca94a591aa36e563f02c6d797ba7ce215d20f648bf18e7a0dabda901853ab0
+  checksum: 2aef2eb5e4ff17fe18378f618fd46e22811cbba53ef4ef02f96966f5ee849f0399df78fbfffd65d907f6046b84b26cc982d75e9d3ff8ff6afaf33337c7310d24
   languageName: node
   linkType: hard
 
@@ -7229,13 +7194,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"commander@npm:^8.2.0":
-  version: 8.3.0
-  resolution: "commander@npm:8.3.0"
-  checksum: 0f82321821fc27b83bd409510bb9deeebcfa799ff0bf5d102128b500b7af22872c0c92cb6a0ebc5a4cf19c6b550fba9cedfa7329d18c6442a625f851377bacf0
-  languageName: node
-  linkType: hard
-
 "common-tags@npm:^1.5.1, common-tags@npm:^1.8.0":
   version: 1.8.2
   resolution: "common-tags@npm:1.8.2"
@@ -9007,7 +8965,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"extract-zip@npm:2.0.1, extract-zip@npm:^2.0.1":
+"extract-zip@npm:2.0.1":
   version: 2.0.1
   resolution: "extract-zip@npm:2.0.1"
   dependencies:
@@ -9655,14 +9613,14 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "functional-tests@workspace:packages/e2e-tests"
   dependencies:
-    "@playwright/test": ^1.35.0
-    "@recordreplay/playwright": ^1.18.3
+    "@playwright/test": ^1.37.0
     "@replayio/cypress": ^0.5.0
-    "@replayio/playwright": latest
+    "@replayio/playwright": ^1.0.14
     chalk: ^4
     cli-spinners: ^2.7.0
     cypress: ^12.5.1
     log-update: ^4
+    playwright: ^1.37.1
     strip-ansi: ^6.0.0
     ts-node: ^10.7.0
     yargs: ^17.6.0
@@ -11906,7 +11864,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jpeg-js@npm:^0.4.1, jpeg-js@npm:^0.4.2":
+"jpeg-js@npm:^0.4.1":
   version: 0.4.4
   resolution: "jpeg-js@npm:0.4.4"
   checksum: bd7cb61aa8df40a9ee2c2106839c3df6054891e56cfc22c0ac581402e06c6295f962a4754b0b2ac50a401789131b1c6dc9df8d24400f1352168be1894833c590
@@ -12841,15 +12799,6 @@ __metadata:
   bin:
     mime: cli.js
   checksum: 14c9de5c801ddad82619b66049f3314bbced9667689eed769fab64a323e79b3535ab650e9607670e52371b16436a49af3c0473d965ec743de931cb5d73d3adba
-  languageName: node
-  linkType: hard
-
-"mime@npm:^2.4.6":
-  version: 2.6.0
-  resolution: "mime@npm:2.6.0"
-  bin:
-    mime: cli.js
-  checksum: 1497ba7b9f6960694268a557eae24b743fd2923da46ec392b042469f4b901721ba0adcf8b0d3c2677839d0e243b209d76e5edcbd09cfdeffa2dfb6bb4df4b862
   languageName: node
   linkType: hard
 
@@ -14080,6 +14029,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"playwright-core@npm:1.37.1":
+  version: 1.37.1
+  resolution: "playwright-core@npm:1.37.1"
+  bin:
+    playwright-core: cli.js
+  checksum: 69f818da2230057584140d5b3af7778a4f4a822b5b18d133abfc5d259128becb943c343a2ddf6b0635277a69f28983e83e2bc3fce23595ececb1e410475b6368
+  languageName: node
+  linkType: hard
+
+"playwright@npm:^1.37.1":
+  version: 1.37.1
+  resolution: "playwright@npm:1.37.1"
+  dependencies:
+    playwright-core: 1.37.1
+  bin:
+    playwright: cli.js
+  checksum: 99406ef3e15b83a659cb23ef1d92d9935789aad430580d1e0371087dfdf266891483c6f97cfa06bf5f49f081eacd44245d05d20714f98531edef4cc317044d6b
+  languageName: node
+  linkType: hard
+
 "pngjs@npm:^5.0.0":
   version: 5.0.0
   resolution: "pngjs@npm:5.0.0"
@@ -14467,13 +14436,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"progress@npm:^2.0.3":
-  version: 2.0.3
-  resolution: "progress@npm:2.0.3"
-  checksum: f67403fe7b34912148d9252cb7481266a354bd99ce82c835f79070643bb3c6583d10dbcfda4d41e04bbc1d8437e9af0fb1e1f2135727878f5308682a579429b7
-  languageName: node
-  linkType: hard
-
 "promise-inflight@npm:^1.0.1":
   version: 1.0.1
   resolution: "promise-inflight@npm:1.0.1"
@@ -14528,17 +14490,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"proper-lockfile@npm:^4.1.1":
-  version: 4.1.2
-  resolution: "proper-lockfile@npm:4.1.2"
-  dependencies:
-    graceful-fs: ^4.2.4
-    retry: ^0.12.0
-    signal-exit: ^3.0.2
-  checksum: 00078ee6a61c216a56a6140c7d2a98c6c733b3678503002dc073ab8beca5d50ca271de4c85fca13b9b8ee2ff546c36674d1850509b84a04a5d0363bcb8638939
-  languageName: node
-  linkType: hard
-
 "protocol@workspace:*, protocol@workspace:packages/protocol":
   version: 0.0.0-use.local
   resolution: "protocol@workspace:packages/protocol"
@@ -14566,13 +14517,6 @@ __metadata:
   version: 1.0.0
   resolution: "proxy-from-env@npm:1.0.0"
   checksum: 292e28d1de0c315958d71d8315eb546dd3cd8c8cbc2dab7c54eeb9f5c17f421771964ad0b5e1f77011bab2305bdae42e1757ce33bdb1ccc3e87732322a8efcf1
-  languageName: node
-  linkType: hard
-
-"proxy-from-env@npm:^1.1.0":
-  version: 1.1.0
-  resolution: "proxy-from-env@npm:1.1.0"
-  checksum: ed7fcc2ba0a33404958e34d95d18638249a68c430e30fcb6c478497d72739ba64ce9810a24f53a7d921d0c065e5b78e3822759800698167256b04659366ca4d4
   languageName: node
   linkType: hard
 
@@ -14786,11 +14730,11 @@ __metadata:
 
 "react-devtools-inline@patch:react-devtools-inline@npm:4.24.7#.yarn/patches/react-devtools-inline-npm-4.24.7-9582a0f8d6.patch::locator=recordreplay-devtools%40workspace%3A.":
   version: 4.24.7
-  resolution: "react-devtools-inline@patch:react-devtools-inline@npm%3A4.24.7#.yarn/patches/react-devtools-inline-npm-4.24.7-9582a0f8d6.patch::version=4.24.7&hash=b2b58f&locator=recordreplay-devtools%40workspace%3A."
+  resolution: "react-devtools-inline@patch:react-devtools-inline@npm%3A4.24.7#.yarn/patches/react-devtools-inline-npm-4.24.7-9582a0f8d6.patch::version=4.24.7&hash=303352&locator=recordreplay-devtools%40workspace%3A."
   dependencies:
     source-map-js: ^0.6.2
     sourcemap-codec: ^1.4.8
-  checksum: 459c911eb486b5f0f654bca557ea3d12c1d88c57c0f1e0488ea34b596a87c7cd0f864fed7bd8188a0d1a93acd0bdb159b2f7b3ca16942b3ecf6b68ad88abaa03
+  checksum: d773307f4970396747a41d58d19f1c75ad393fe182bf34eab4b0d27e001bb97ac1b452a1a91322f3e91e44763e015e975287277f7fff742dc8cbb573787531fc
   languageName: node
   linkType: hard
 
@@ -15158,8 +15102,6 @@ __metadata:
     "@lexical/mark": ^0.6.5
     "@lexical/react": ^0.6.5
     "@next/bundle-analyzer": ^12.2.0
-    "@recordreplay/playwright": ^1.18.3
-    "@recordreplay/sourcemap-upload-cli": ^0.1.1
     "@reduxjs/toolkit": ^1.8.4
     "@replayio/overboard": ^0.4.1
     "@replayio/protocol": ^0.59.0
@@ -16196,17 +16138,6 @@ __metadata:
     dot-case: ^3.0.4
     tslib: ^2.0.3
   checksum: 0a7a79900bbb36f8aaa922cf111702a3647ac6165736d5dc96d3ef367efc50465cac70c53cd172c382b022dac72ec91710608e5393de71f76d7142e6fd80e8a3
-  languageName: node
-  linkType: hard
-
-"socks-proxy-agent@npm:^6.1.0":
-  version: 6.2.1
-  resolution: "socks-proxy-agent@npm:6.2.1"
-  dependencies:
-    agent-base: ^6.0.2
-    debug: ^4.3.3
-    socks: ^2.6.2
-  checksum: 9ca089d489e5ee84af06741135c4b0d2022977dad27ac8d649478a114cdce87849e8d82b7c22b51501a4116e231241592946fc7fae0afc93b65030ee57084f58
   languageName: node
   linkType: hard
 
@@ -18382,7 +18313,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ws@npm:^7.3.1, ws@npm:^7.4.6, ws@npm:^7.5.0":
+"ws@npm:^7.3.1, ws@npm:^7.5.0":
   version: 7.5.8
   resolution: "ws@npm:7.5.8"
   peerDependencies:
@@ -18534,15 +18465,6 @@ __metadata:
     buffer-crc32: ~0.2.3
     fd-slicer: ~1.1.0
   checksum: 7f21fe0bbad6e2cb130044a5d1d0d5a0e5bf3d8d4f8c4e6ee12163ce798fee3de7388d22a7a0907f563ac5f9d40f8699a223d3d5c1718da90b0156da6904022b
-  languageName: node
-  linkType: hard
-
-"yazl@npm:^2.5.1":
-  version: 2.5.1
-  resolution: "yazl@npm:2.5.1"
-  dependencies:
-    buffer-crc32: ~0.2.3
-  checksum: daec5154b5485d8621bfea359e905ddca0b2f068430a4aa0a802bf5d67391157a383e0c2767acccbf5964264851da643bc740155a9458e2d8dce55b94c1cc2ed
   languageName: node
   linkType: hard
 
