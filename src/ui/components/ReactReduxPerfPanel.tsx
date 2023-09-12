@@ -19,7 +19,9 @@ import chunk from "lodash/chunk";
 import groupBy from "lodash/groupBy";
 import mapValues from "lodash/mapValues";
 import zip from "lodash/zip";
-import { ReactNode, useContext, useState } from "react";
+import { ReactNode, Suspense, useContext, useReducer, useState } from "react";
+import AutoSizer from "react-virtualized-auto-sizer";
+import { FixedSizeList as List } from "react-window";
 import {
   Cache,
   StreamingCache,
@@ -163,8 +165,7 @@ function doSomeAnalysis(range: TimeStampedPointRange | null): UIThunkAction {
     const reactRenders = await reactRendersIntervalCache.readAsync(
       BigInt(finalRange.begin.point),
       BigInt(finalRange.end.point),
-      replayClient,
-      reactDomSource
+      replayClient
     );
 
     /*
@@ -1215,12 +1216,12 @@ async function getValidFunctionParameterName(
   return firstParam;
 }
 
-export function ReactReduxPerfPanel() {
+function ReactReduxPerfPanelSuspends() {
   const dispatch = useAppDispatch();
   const currentTime = useAppSelector(getCurrentTime);
   const executionPoint = useAppSelector(getExecutionPoint);
+  const { range: focusRange } = useContext(FocusContext);
   const replayClient = useContext(ReplayClientContext);
-  const { rangeForDisplay: focusRange } = useContext(FocusContext);
 
   const handleDoAnalysisClick = async () => {
     dispatch(doSomeAnalysis(focusRange));
@@ -1238,5 +1239,47 @@ export function ReactReduxPerfPanel() {
       </div>
       <div className={styles.List}>{}</div>
     </div>
+  );
+}
+
+export function ReactReduxPerfPanel() {
+  const { range: focusRange } = useContext(FocusContext);
+
+  const [, forceRender] = useReducer(c => c + 1, 0);
+  const reactDomSourceUrl = useAppSelector(getReactDomSourceUrl);
+  const sourcesState = useAppSelector(state => state.sources);
+  const reactDomSource = useAppSelector(state => {
+    if (!reactDomSourceUrl) {
+      return undefined;
+    }
+
+    const reactDomSource = getSourceToDisplayForUrl(state, reactDomSourceUrl);
+    if (!reactDomSource || !reactDomSource.url) {
+      return;
+    }
+
+    return reactDomSource;
+  });
+
+  if (!focusRange?.begin) {
+    return <div>No focus range</div>;
+  } else if (!reactDomSource) {
+    if (sourcesState.allSourcesReceived) {
+      return <div>ReactDOM not found</div>;
+    } else {
+      return <div>Loading sources...</div>;
+    }
+  }
+
+  return (
+    <Suspense
+      fallback={
+        <div style={{ flexShrink: 1 }}>
+          <IndeterminateLoader />
+        </div>
+      }
+    >
+      <ReactReduxPerfPanelSuspends />
+    </Suspense>
   );
 }

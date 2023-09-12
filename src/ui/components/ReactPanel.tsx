@@ -45,7 +45,7 @@ import {
   useSourcesById,
   useSourcesByUrl,
 } from "replay-next/src/suspense/SourcesCache";
-import { Source } from "replay-next/src/suspense/SourcesCache";
+import { Source, sourcesByPartialUrlCache } from "replay-next/src/suspense/SourcesCache";
 import { getSourceToDisplayForUrl } from "replay-next/src/utils/sources";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
@@ -157,21 +157,22 @@ type ReactInternalFunctionDetails = {
 };
 
 const reactInternalMethodsDetailsCache: Cache<
-  [
-    replayClient: ReplayClientInterface,
-    functionName: ReactInternalFunctionName,
-    reactDomSource: SourceDetails | undefined
-  ],
+  [replayClient: ReplayClientInterface, functionName: ReactInternalFunctionName],
   ReactInternalFunctionDetailsEntry2 | undefined
 > = createCache({
   config: { immutable: true },
   debugLabel: "ReactInternalMethodsDetails",
-  getKey: ([replayClient, functionName, reactDomSource]) => functionName,
-  load: async ([replayClient, functionName, reactDomSource]) => {
+  getKey: ([replayClient, functionName]) => functionName,
+  load: async ([replayClient, functionName]) => {
     let functionDetails: ReactInternalFunctionDetailsEntry2 | undefined = undefined;
-    if (!reactDomSource) {
+
+    const reactDomSources = await sourcesByPartialUrlCache.readAsync(replayClient, "react-dom.");
+    if (!reactDomSources.length) {
       return;
     }
+
+    // TODO There could be more than one here. We'll take the first.
+    const reactDomSource = reactDomSources[0];
 
     const symbols = await sourceOutlineCache.readAsync(replayClient, reactDomSource.id);
 
@@ -253,7 +254,7 @@ const reactDomLinesCache: Cache<
 > = createSingleEntryCache({
   debugLabel: "ReactDomLines",
   async load([replayClient, functionName, reactDomSource]) {
-    const streaming = streamingSourceContentsCache.stream(replayClient, reactDomSource!.id);
+    const streaming = streamingSourceContentsCache.stream(replayClient, reactDomSource.id);
     await streaming.resolver;
 
     const reactDomSourceContents = streaming.value!;
@@ -262,35 +263,33 @@ const reactDomLinesCache: Cache<
 });
 
 export const reactInternalMethodsHitsIntervalCache = createFocusIntervalCacheForExecutionPoints<
-  [
-    replayClient: ReplayClientInterface,
-    functionName: ReactInternalFunctionName,
-    reactDomSource: SourceDetails | undefined
-  ],
+  [replayClient: ReplayClientInterface, functionName: ReactInternalFunctionName],
   PointDescription
 >({
   debugLabel: "RecordedProtocolMessages",
   getPointForValue: data => data.point,
-  async load(rangeStart, rangeEnd, replayClient, functionName, reactDomSource) {
-    if (!rangeStart || !rangeEnd || !reactDomSource) {
-      return [];
-    }
-
-    const symbols = await sourceOutlineCache.readAsync(replayClient, reactDomSource.id);
-
-    if (!symbols) {
+  async load(rangeStart, rangeEnd, replayClient, functionName) {
+    if (!rangeStart || !rangeEnd) {
       return [];
     }
 
     const functionDetails = await reactInternalMethodsDetailsCache.readAsync(
       replayClient,
-      functionName,
-      reactDomSource
+      functionName
     );
 
     if (!functionDetails) {
       return [];
     }
+
+    const reactDomSources = await sourcesByPartialUrlCache.readAsync(replayClient, "react-dom.");
+
+    if (!reactDomSources.length) {
+      return [];
+    }
+
+    // TODO There could be more than one here. We'll take the first.
+    const reactDomSource = reactDomSources[0];
 
     // We found a function outline, so we can use that to get the hits.
     const hitPoints = await hitPointsCache.readAsync(
@@ -328,13 +327,13 @@ type ReactRenderCommitted = {
 type ReactRenderEntry = ReactUpdateScheduled | ReactSyncUpdatedStarted | ReactRenderCommitted;
 
 export const reactRendersIntervalCache = createFocusIntervalCacheForExecutionPoints<
-  [replayClient: ReplayClientInterface, reactDomSource: SourceDetails | undefined],
+  [replayClient: ReplayClientInterface],
   ReactRenderEntry
 >({
   debugLabel: "ReactRenders",
   getPointForValue: data => data.point.point,
-  async load(rangeStart, rangeEnd, replayClient, reactDomSource) {
-    if (!rangeStart || !rangeEnd || !reactDomSource) {
+  async load(rangeStart, rangeEnd, replayClient) {
+    if (!rangeStart || !rangeEnd) {
       return [];
     }
 
@@ -354,8 +353,7 @@ export const reactRendersIntervalCache = createFocusIntervalCacheForExecutionPoi
           BigInt(rangeStart),
           BigInt(rangeEnd),
           replayClient,
-          methodName,
-          reactDomSource
+          methodName
         );
       })
     );
@@ -724,11 +722,7 @@ export const getReactDomSourceUrl = createSelector(getSourceIdsByUrl, sourcesByU
   return reactDomUrl;
 });
 
-interface RPSProps {
-  reactDomSource: Source;
-}
-
-export function ReactPanelSuspends({ reactDomSource }: RPSProps) {
+export function ReactPanelSuspends() {
   const dispatch = useAppDispatch();
   const currentTime = useAppSelector(getCurrentTime);
   const executionPoint = useAppSelector(getExecutionPoint);
@@ -738,8 +732,7 @@ export function ReactPanelSuspends({ reactDomSource }: RPSProps) {
   const reactRenderEntries = reactRendersIntervalCache.read(
     BigInt(focusRange!.begin.point),
     BigInt(focusRange!.end.point),
-    replayClient,
-    reactDomSource
+    replayClient
   );
 
   const itemData: QueuedRenderItemData = useMemo(() => {
@@ -811,28 +804,24 @@ export function ReactPanel() {
   const sourcesByUrl = useSourcesByUrl(replayClient);
 
   const reactDomSourceUrl = useAppSelector(getReactDomSourceUrl);
-  const sourcesState = useAppSelector(state => state.sources);
-  const reactDomSource = useAppSelector(state => {
-    if (!reactDomSourceUrl) {
-      return undefined;
-    }
+  const allSourcesReceived = useAppSelector(state => state.sources.allSourcesReceived);
+  // const reactDomSource = useAppSelector(state => {
+  //   if (!reactDomSourceUrl) {
+  //     return undefined;
+  //   }
 
-    const reactDomSource = getSourceToDisplayForUrl(sourcesById, sourcesByUrl, reactDomSourceUrl);
-    if (!reactDomSource || !reactDomSource.url) {
-      return;
-    }
+  //   const reactDomSource = getSourceToDisplayForUrl(state, reactDomSourceUrl);
+  //   if (!reactDomSource || !reactDomSource.url) {
+  //     return;
+  //   }
 
-    return reactDomSource;
-  });
+  //   return reactDomSource;
+  // });
 
   if (!focusRange?.begin) {
     return <div>No focus range</div>;
-  } else if (!reactDomSource) {
-    if (sourcesState.allSourcesReceived) {
-      return <div>ReactDOM not found</div>;
-    } else {
-      return <div>Loading sources...</div>;
-    }
+  } else if (!allSourcesReceived) {
+    return <div>Loading sources...</div>;
   }
 
   return (
@@ -843,7 +832,7 @@ export function ReactPanel() {
         </div>
       }
     >
-      <ReactPanelSuspends reactDomSource={reactDomSource} />
+      <ReactPanelSuspends />
     </Suspense>
   );
 }
