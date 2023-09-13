@@ -6,6 +6,16 @@ export function getEventsPanel(page: Page) {
   return getByTestName(page, "EventsList");
 }
 
+export function getEventListItems(page: Page) {
+  const eventsPanel = getEventsPanel(page);
+  const events = getByTestName(eventsPanel, "Event");
+  return events;
+}
+
+export function getEventJumpButton(locator: Locator) {
+  return getByTestName(locator, "JumpToCode");
+}
+
 export async function openEventsPanel(page: Page): Promise<void> {
   const pane = getEventsPanel(page);
 
