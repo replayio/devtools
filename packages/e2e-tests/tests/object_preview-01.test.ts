@@ -54,7 +54,7 @@ test(`object_preview-01: expressions in the console after time warping`, async (
   await toggleExpandable(page, { scope: objectInspector, targetState: "open" });
   await objectInspector
     .locator(
-      '[data-test-name="GetterRenderer"]:has-text("foo") [data-test-name="InvokeGetterButton"]'
+      '[data-test-name="GetterRenderer"]:has-text("foo") [data-test-name="GetterRenderer-LoadValueButton"]'
     )
     .click();
   await objectInspector

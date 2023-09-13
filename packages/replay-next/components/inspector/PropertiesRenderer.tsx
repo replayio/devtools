@@ -120,11 +120,18 @@ export default function PropertiesRenderer({
 
   switch (object.className) {
     case "Function":
-      specialPropertiesRenderer.push(<FunctionLocationRenderer object={object} />);
+      specialPropertiesRenderer.push(
+        <FunctionLocationRenderer key="FunctionLocation" object={object} />
+      );
     default:
       if (!hidePrototype) {
         specialPropertiesRenderer.push(
-          <PrototypeRenderer object={object} path={path} pauseId={pauseId} />
+          <PrototypeRenderer
+            key="PrototypeRenderer"
+            object={object}
+            path={path}
+            pauseId={pauseId}
+          />
         );
       }
   }

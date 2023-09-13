@@ -25,10 +25,10 @@ export async function getGetterValue(objectInspector: Locator, propertyName: str
   }
 
   const property = objectInspector.locator(
-    `[data-test-name="ExpandableChildren"] [data-test-name="GetterRenderer"]:has([class^="GetterRenderer_Name"]:text-is("${propertyName}"))`
+    `[data-test-name="ExpandableChildren"] [data-test-name="GetterRenderer-Name"]:text-is("${propertyName}"))`
   );
   await property.waitFor();
-  const getterButton = property.locator('[data-test-name="InvokeGetterButton"]');
+  const getterButton = property.locator('[data-test-name="GetterRenderer-LoadValueButton"]');
 
   if (await getterButton.isVisible({ timeout: 250 })) {
     await getterButton.click();

@@ -47,7 +47,7 @@ export async function toggleExpandable<T>(
     partialText?: string;
     scope?: Locator;
   }
-): Promise<void> {
+): Promise<Locator> {
   const { expanded: nextExpanded = true, scope = page, partialText } = options;
 
   let { expandableLocator } = options;
@@ -87,4 +87,6 @@ export async function toggleExpandable<T>(
       });
     }
   }
+
+  return expandableLocator;
 }

@@ -1,5 +1,7 @@
 import { test } from "@playwright/test";
 
+import { toggleExpandable } from "replay-next/playwright/tests/utils/inspector";
+
 import { filterByText } from "../utils/console";
 import { takeScreenshot } from "../utils/general";
 import { beforeEach } from "./beforeEach";
@@ -24,15 +26,22 @@ test("should render getters and setters correctly", async ({ page }, testInfo) =
   await inspectGetter(page, testInfo, "array");
 
   // Further inspect object and array
-  const objectRow = await page
-    .locator('[data-test-name="ExpandablePreview"]', { hasText: "objectGetter" })
-    .first();
-  await objectRow.click();
-  await takeScreenshot(page, testInfo, objectRow, "inspect-getter-nested-object");
 
-  const arrayRow = await page
-    .locator('[data-test-name="ExpandablePreview"]', { hasText: "arrayGetter" })
-    .first();
-  await arrayRow.click();
-  await takeScreenshot(page, testInfo, arrayRow, "inspect-getter-nested-array");
+  const objectRow = await toggleExpandable(page, {
+    expanded: true,
+    expandableLocator: page
+      .locator(`[data-test-name="Expandable"] `, { hasText: "objectGetter" })
+      .nth(1),
+    partialText: "objectGetter",
+  });
+  await takeScreenshot(page, testInfo, objectRow.first(), "inspect-getter-nested-object");
+
+  const arrayRow = await toggleExpandable(page, {
+    expanded: true,
+    expandableLocator: page
+      .locator(`[data-test-name="Expandable"]`, { hasText: "arrayGetter" })
+      .nth(1),
+    partialText: "arrayGetter",
+  });
+  await takeScreenshot(page, testInfo, arrayRow.first(), "inspect-getter-nested-array");
 });
