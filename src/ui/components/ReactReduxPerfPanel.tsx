@@ -38,6 +38,7 @@ import {
   createStreamingCache,
   useStreamingValue,
 } from "suspense";
+import { ContextMenuDivider, ContextMenuItem, useContextMenu } from "use-context-menu";
 
 import { selectLocation } from "devtools/client/debugger/src/actions/sources/select";
 import AccessibleImage from "devtools/client/debugger/src/components/shared/AccessibleImage";
@@ -48,6 +49,7 @@ import {
 } from "devtools/client/debugger/src/reducers/pause";
 import { simplifyDisplayName } from "devtools/client/debugger/src/utils/pause/frames/displayName";
 import { assert } from "protocol/utils";
+import Icon from "replay-next/components/Icon";
 import IndeterminateLoader from "replay-next/components/IndeterminateLoader";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPositionsCache";
@@ -84,6 +86,7 @@ import {
   locationToString,
 } from "ui/actions/eventListeners/eventListenerUtils";
 import { findFunctionOutlineForLocation } from "ui/actions/eventListeners/jumpToCode";
+import { setFocusWindowBegin, setFocusWindowEnd } from "ui/actions/timeline";
 import { seek } from "ui/actions/timeline";
 import { JumpToCodeButton, JumpToCodeStatus } from "ui/components/shared/JumpToCodeButton";
 import { getPreferredLocation } from "ui/reducers/sources";
@@ -526,6 +529,7 @@ export interface FormattedPointStackFrame {
 
 export interface FormattedPointStack {
   point: PointDescription;
+  resultPoint: PointDescription;
   frame?: FormattedPointStackFrame;
   allFrames: FormattedPointStackFrame[];
   filteredFrames: FormattedPointStackFrame[];
@@ -601,8 +605,9 @@ export async function formatPointStackForPoint(
   }
 
   return {
-    point: resultPoint,
+    point,
     functionName,
+    resultPoint,
     frame: earliestAppCodeFrame!,
     allFrames: formattedFrames,
     filteredFrames: filteredPauseFrames,
@@ -1429,26 +1434,106 @@ function ReactReduxPerfPanelSuspends() {
   );
 }
 
+interface RDDEntryProps {
+  entry: ReduxDispatchDetailsEntry;
+}
+
+function ReactRenderQueuedSuspends({ entry }: RDDEntryProps) {
+  const replayClient = useContext(ReplayClientContext);
+
+  const { afterReducer, afterNotifications } = entry;
+
+  const queuedRenders = reactRendersIntervalCache.read(
+    BigInt(afterReducer.point),
+    BigInt(afterNotifications.point),
+    replayClient
+  );
+
+  return <b>{queuedRenders.length > 0 ? queuedRenders.length : "None"}</b>;
+}
+
 const formatTimeMs = (time: number) => {
   return `${time.toFixed(1)}ms`;
 };
 
-function SelectedReduxDispatchDetails({ entry }: { entry: ReduxDispatchDetailsEntry }) {
+function useDispatchContextMenu(point: TimeStampedPoint) {
+  const dispatch = useAppDispatch();
+
+  const setFocusEnd = () => {
+    dispatch(
+      setFocusWindowEnd({
+        executionPoint: point.point,
+        time: point.time,
+        sync: true,
+      })
+    );
+  };
+
+  const setFocusStart = () => {
+    dispatch(
+      setFocusWindowBegin({
+        executionPoint: point.point,
+        time: point.time,
+        sync: true,
+      })
+    );
+  };
+
+  return useContextMenu(
+    <>
+      <ContextMenuItem dataTestId="ConsoleContextMenu-SetFocusStartButton" onSelect={setFocusStart}>
+        <>
+          <Icon type="set-focus-start" />
+          Set focus start
+        </>
+      </ContextMenuItem>
+      <ContextMenuItem dataTestId="ConsoleContextMenu-SetFocusEndButton" onSelect={setFocusEnd}>
+        <>
+          <Icon type="set-focus-end" />
+          Set focus end
+        </>
+      </ContextMenuItem>
+    </>
+  );
+}
+
+function SelectedReduxDispatchDetails({ entry }: RDDEntryProps) {
+  const { contextMenu: dispatchStartContextMenu, onContextMenu: onDispatchStartContextMenu } =
+    useDispatchContextMenu(entry.dispatchStart);
+  const { contextMenu: dispatchEndContextMenu, onContextMenu: onDispatchEndContextMenu } =
+    useDispatchContextMenu(entry.afterNotifications);
+
   return (
-    <div style={{ minHeight: 200 }}>
+    <div style={{ minHeight: 400 }}>
       <b>{entry.actionType}</b>
-      <ul>
+      <ul className="ml-2 list-inside list-disc">
         <li>
-          Time: {formatTimeMs(entry.dispatchStart.time)} 🡒{" "}
-          {formatTimeMs(entry.afterNotifications.time)}
+          Time:{" "}
+          <span onContextMenu={onDispatchStartContextMenu}>
+            {formatTimeMs(entry.dispatchStart.time)}
+          </span>{" "}
+          🡒{" "}
+          <span onContextMenu={onDispatchEndContextMenu}>
+            {formatTimeMs(entry.afterNotifications.time)}
+          </span>
         </li>
         <li>
           Durations:
-          <li>Reducer: {formatTimeMs(entry.reducerDuration)}</li>
-          <li>Subscribers: {formatTimeMs(entry.notificationDuration)}</li>
-          <li>Total: {formatTimeMs(entry.afterNotifications.time - entry.dispatchStart.time)}</li>
+          <ul className="ml-2 list-inside  list-disc">
+            <li>Reducer: {formatTimeMs(entry.reducerDuration)}</li>
+            <li>Subscribers: {formatTimeMs(entry.notificationDuration)}</li>
+            <li>Total: {formatTimeMs(entry.afterNotifications.time - entry.dispatchStart.time)}</li>
+          </ul>
+        </li>
+        <li>
+          Component renders queued:{" "}
+          <Suspense fallback={<i>Loading...</i>}>
+            <ReactRenderQueuedSuspends entry={entry} />
+          </Suspense>
         </li>
       </ul>
+      {dispatchStartContextMenu}
+      {dispatchEndContextMenu}
     </div>
   );
 }
