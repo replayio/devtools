@@ -1,8 +1,7 @@
-import { Page } from "@playwright/test";
+import playwright, { Page } from "@playwright/test";
 import { getExecutablePath } from "@replayio/playwright";
 import * as cli from "@replayio/replay";
 import findLast from "lodash/findLast";
-import playwright from "playwright";
 
 import config, { BrowserName } from "../config";
 
