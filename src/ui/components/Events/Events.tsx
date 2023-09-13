@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import sortedLastIndex from "lodash/sortedLastIndex";
-import { memo, useContext, useMemo } from "react";
+import React, { memo, useContext, useMemo } from "react";
 import { STATUS_PENDING, STATUS_RESOLVED, useImperativeCacheValue } from "suspense";
 
 import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
@@ -95,9 +95,11 @@ function Events() {
     currentTime
   );
 
+  let content: React.ReactNode = null;
+
   if (filteredEvents.length > 0) {
-    return (
-      <div className="bg-bodyBgcolor py-1.5 text-xs">
+    content = (
+      <>
         {filteredEvents.map((event, index) => {
           return (
             <div key={event.point}>
@@ -120,11 +122,15 @@ function Events() {
         <CurrentTimeLine
           isActive={currentEventIndex === filteredEvents.length && !!filteredEvents.length}
         />
-      </div>
+      </>
     );
-  } else {
-    return null;
   }
+
+  return (
+    <div className="bg-bodyBgcolor py-1.5 text-xs" data-test-name="EventsList">
+      {content}
+    </div>
+  );
 }
 
 export default memo(Events);
