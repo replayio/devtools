@@ -25,6 +25,9 @@ export interface ConfigurablePreference {
   // Sentence form description of preference
   readonly description?: string;
 
+  // Display warning message if this setting is enabled
+  readonly highRisk?: boolean;
+
   // Only display this preference to authenticated Replay users
   readonly internalOnly?: boolean;
 

@@ -13,6 +13,7 @@ import { Experimental } from "./panels/Experimental";
 import { Legal } from "./panels/Legal";
 import { Personal } from "./panels/Personal";
 import { Preferences } from "./panels/Preferences";
+import { Advanced as AdvancedTitle } from "./titles/Advanced";
 
 const PANELS: Settings<SettingsTabTitle, {}> = [
   {
@@ -48,6 +49,7 @@ const PANELS: Settings<SettingsTabTitle, {}> = [
   },
   {
     title: "Advanced",
+    titleComponent: AdvancedTitle,
     icon: "api",
     component: Advanced,
   },

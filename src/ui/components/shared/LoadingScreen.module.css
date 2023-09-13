@@ -42,3 +42,14 @@
   margin: 0.5rem;
   border-radius: 0.5rem;
 }
+
+.HighRiskWarning {
+  width: 40ch;
+  padding: 1rem 2rem;
+  border-radius: 1rem;
+  margin: 3rem 0;
+  text-align: center;
+  font-size: var(--font-size-regular);
+  background-color: var(--background-color-high-risk-setting);
+  color: var(--color-high-risk-setting);
+}
