@@ -348,7 +348,7 @@
 
 .perf-photon-button-primary {
   background-color: var(--blue-60);
-  color: #fff;
+  color: var(--primary-accent-foreground-text);
 }
 
 .perf-photon-button-primary:hover:not([disabled]) {

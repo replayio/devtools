@@ -147,7 +147,7 @@
 /* these are made to match the styles of the SidePanel.module.css */
 .TestsuitesPassportWelcome {
   padding: 0.5em;
-  color: #fff;
+  color: var(--primary-accent-foreground-text);
   background: linear-gradient(116.71deg, #ff2f86 21.74%, #ec275d 83.58%),
     linear-gradient(133.71deg, #01acfd 3.31%, #f155ff 106.39%, #f477f8 157.93%, #f33685 212.38%),
     #007aff;

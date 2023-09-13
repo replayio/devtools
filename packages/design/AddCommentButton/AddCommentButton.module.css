@@ -23,11 +23,11 @@
   height: 26px;
   padding-left: 3px;
   border-radius: 3rem;
-  color: #fff;
   overflow: hidden;
   transition: width 180ms ease-out;
   width: 26px;
   background-color: var(--primary-accent);
+  color: var(--primary-accent-foreground-text);
   position: absolute;
   top: 0;
   right: 0;

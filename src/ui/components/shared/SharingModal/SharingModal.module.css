@@ -24,7 +24,7 @@
 .copyURL:hover,
 .downloadVideo:hover {
   background-color: var(--primary-accent);
-  color: #fff;
+  color: var(--primary-accent-foreground-text);
 }
 
 .copyIcon {
