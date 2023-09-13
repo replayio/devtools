@@ -1,16 +1,15 @@
-import { expect } from "@playwright/test";
+import { Locator, expect } from "@playwright/test";
 
 import { openDevToolsTab, startTest } from "../helpers";
-import { executeAndVerifyTerminalExpression } from "../helpers/console-panel";
 import {
   getEventJumpButton,
   getEventListItems,
   openEventsPanel,
 } from "../helpers/info-event-panel";
-import { resumeToLine, rewindToLine } from "../helpers/pause-information-panel";
 import { openSourceExplorerPanel } from "../helpers/source-explorer-panel";
-import { addBreakpoint } from "../helpers/source-panel";
-import { debugPrint, delay, getByTestName, waitFor } from "../helpers/utils";
+import { getSelectedLineNumber, waitForSelectedSource } from "../helpers/source-panel";
+import { getTimelineCurrentPercent } from "../helpers/timeline";
+import { debugPrint, getByTestName, waitFor } from "../helpers/utils";
 import test from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "redux-fundamentals/dist/index.html" });
@@ -46,11 +45,28 @@ const expectedEvents: Event[] = (
   ] as const
 ).flat();
 
+async function checkForJumpButton(eventLocator: Locator, shouldBeEnabled: boolean) {
+  const jumpButton = getEventJumpButton(eventLocator);
+  expect(await jumpButton.isVisible()).toBe(true);
+  await jumpButton.hover({});
+
+  const buttonText = await getByTestName(jumpButton, "JumpToCodeButtonLabel").innerText();
+  const expectedText = shouldBeEnabled ? "Jump to code" : "No results";
+  expect(buttonText).toBe(expectedText);
+
+  return jumpButton;
+}
+
 test(`jump-to-code-01: Test basic jumping functionality`, async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  const queryParams = new URLSearchParams();
+  // Force this test to always re-run the Event Listeners (and other) routines
+  // See pref names in packages/shared/user-data/GraphQL/config.ts
+  // queryParams.set("features", "backend_rerunRoutines");
+
+  await startTest(page, recordingId, undefined, queryParams);
   await openDevToolsTab(page);
 
   await openSourceExplorerPanel(page);
@@ -64,7 +80,7 @@ test(`jump-to-code-01: Test basic jumping functionality`, async ({
     expect(numListItems).toBe(expectedEvents.length);
   });
 
-  // // Check that all the expected event items are present
+  // Check that all the expected event items are present
   for (const [index, event] of expectedEvents.entries()) {
     const eventLocator = eventListItems.nth(index);
 
@@ -92,25 +108,63 @@ test(`jump-to-code-01: Test basic jumping functionality`, async ({
     expect(labelText).toBe(expectedText);
   }
 
-  debugPrint(page, "Checking for a disabled 'Jump' button");
+  debugPrint(page, "Checking for a disabled click 'Jump' button");
+  // First two clicks were at the margins of the page, so no handlers
+  const firstInvalidClick = eventListItems.nth(1);
+  await checkForJumpButton(firstInvalidClick, false);
+
+  debugPrint(page, "Checking for a disabled keypress 'Jump' button");
   // The text "test" was typed with no input focused, so no handlers
   const firstInvalidKeypress = eventListItems.nth(3);
-  const firstInvalidJumpButton = getEventJumpButton(firstInvalidKeypress);
-  expect(await firstInvalidJumpButton.isVisible()).toBe(true);
-  await firstInvalidJumpButton.hover({});
-
-  const firstInvalidButtonText = await getByTestName(
-    firstInvalidJumpButton,
-    "ButtonLabel"
-  ).innerText();
-  expect(firstInvalidButtonText).toBe("No results");
+  await checkForJumpButton(firstInvalidKeypress, false);
 
   // the text "Watch Bengals" was typed into an input, so there is a handler
-  debugPrint(page, "Checking for an enabled 'Jump' button");
+  debugPrint(page, "Checking for an enabled keypress 'Jump' button");
   const firstValidKeypress = eventListItems.nth(7);
-  const firstValidJumpButton = getEventJumpButton(firstValidKeypress);
-  expect(await firstValidJumpButton.isVisible()).toBe(true);
-  await firstValidJumpButton.hover();
-  const firstValidButtonText = await getByTestName(firstValidJumpButton, "ButtonLabel").innerText();
-  expect(firstValidButtonText).toBe("Jump to code");
+  const firstValidKeypressJumpButton = await checkForJumpButton(firstValidKeypress, true);
+
+  // Check interactions
+  const navigationEvent = eventListItems.nth(0);
+  await navigationEvent.click();
+  await waitFor(async () => {
+    const timelinePercent = await getTimelineCurrentPercent(page);
+    expect(Math.round(timelinePercent)).toBe(0);
+  });
+
+  debugPrint(page, "Checking that the first keypress J2C jumps to the correct line");
+  await firstValidKeypressJumpButton.click();
+  await waitForSelectedSource(page, "Header.tsx");
+  // Should highlight the line that ran
+  await waitFor(async () => {
+    const lineNumber = await getSelectedLineNumber(page, false);
+    expect(lineNumber).toBe(12);
+  });
+
+  // Should also have jumped in time
+  await waitFor(async () => {
+    const timelinePercent = await getTimelineCurrentPercent(page);
+    expect(Math.round(timelinePercent)).toBe(32);
+  });
+
+  // And should have
+
+  // the next clicks were on real buttons, so there is a handler
+  debugPrint(page, "Checking for an enabled click 'Jump' button");
+  const firstValidClick = eventListItems.nth(31);
+  const firstValidClickJumpButton = await checkForJumpButton(firstValidClick, true);
+
+  debugPrint(page, "Checking that the first click J2C jumps to the correct line");
+  await firstValidClickJumpButton.click();
+  await waitForSelectedSource(page, "TodoListItem.tsx");
+  // Should highlight the line that ran
+  await waitFor(async () => {
+    const lineNumber = await getSelectedLineNumber(page, false);
+    expect(lineNumber).toBe(22);
+  });
+
+  // Should also have jumped in time
+  await waitFor(async () => {
+    const timelinePercent = await getTimelineCurrentPercent(page);
+    expect(Math.round(timelinePercent)).toBe(68);
+  });
 });
