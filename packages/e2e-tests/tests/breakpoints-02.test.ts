@@ -10,7 +10,7 @@ test(`breakpoints-02: Test unhandled divergence while evaluating at a breakpoint
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
 
   await addBreakpoint(page, { lineNumber: 21, url: exampleKey });

@@ -18,7 +18,7 @@ test("node_stepping-01: Test stepping in async frames and async call stacks", as
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
 
   await openPauseInformationPanel(page);
 

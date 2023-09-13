@@ -15,7 +15,7 @@ test(`inspector-elements-02_node-picker: element picker and iframe behavior`, as
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
 
   // DOM/document may not be available at the end of the recording;

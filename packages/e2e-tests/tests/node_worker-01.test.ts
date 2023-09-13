@@ -10,7 +10,7 @@ test("node_worker-01: make sure node workers don't cause crashes", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
 
   await openConsolePanel(page);
 

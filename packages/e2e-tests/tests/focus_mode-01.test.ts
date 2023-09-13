@@ -18,7 +18,7 @@ test("focus_mode-01: should filter messages as regions based on the active focus
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
 
   await openSource(page, exampleKey);

@@ -15,7 +15,7 @@ test("stepping-01: Test basic step-over/back functionality", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
 
   // Open doc_rr_basic.html

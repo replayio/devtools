@@ -18,7 +18,7 @@ test("resizable-panels-01: Left side Toolbar should be collapsible", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
 
   const button = page.locator('[data-test-name="ToolbarButton-ExpandSidePanel"]');
   const resizeHandle = page.locator('[data-panel-resize-handle-id="PanelResizeHandle-SidePanel"]');

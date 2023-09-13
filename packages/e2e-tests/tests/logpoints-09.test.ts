@@ -9,7 +9,7 @@ test(`logpoints-09: should support pending edits`, async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
 
   await addLogpoint(page, {

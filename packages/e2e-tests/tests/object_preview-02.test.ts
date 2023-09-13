@@ -18,7 +18,7 @@ test(`object_preview-02: should allow objects in scope to be inspected`, async (
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
   await waitForTerminal(page);
 

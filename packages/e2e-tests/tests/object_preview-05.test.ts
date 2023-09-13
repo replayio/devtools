@@ -12,7 +12,7 @@ test(`object_preview-05: Should support logging objects as values`, async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
 
   await warpToMessage(page, "ExampleFinished");

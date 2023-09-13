@@ -13,7 +13,7 @@ test("node_console-01: Basic node console behavior", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openConsolePanel(page);
 
   await warpToMessage(page, "HELLO 1");

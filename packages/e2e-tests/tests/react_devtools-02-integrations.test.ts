@@ -25,7 +25,7 @@ test("react_devtools 02: RDT integrations (Chromium)", async ({
   // See pref names in packages/shared/user-data/GraphQL/config.ts
   queryParams.set("features", "backend_rerunRoutines");
 
-  await startTest(page, exampleKey, recordingId, undefined, queryParams);
+  await startTest(page, recordingId, undefined, queryParams);
 
   await openDevToolsTab(page);
 

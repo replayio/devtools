@@ -15,7 +15,7 @@ test(`stepping-03: Stepping past the beginning or end of a frame should act like
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
 
   // Open doc_rr_basic.html

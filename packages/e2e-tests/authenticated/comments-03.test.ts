@@ -21,7 +21,7 @@ test(`authenticated/comments-03: Comment previews`, async ({
   pageWithMeta: { page, recordingId },
   exampleKey: url,
 }) => {
-  await startTest(page, url, recordingId, E2E_USER_1_API_KEY);
+  await startTest(page, recordingId, E2E_USER_1_API_KEY);
   await openDevToolsTab(page);
 
   // Clean up from previous tests

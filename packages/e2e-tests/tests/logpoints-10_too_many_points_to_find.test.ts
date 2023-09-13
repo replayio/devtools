@@ -20,7 +20,7 @@ test(`logpoints-10: too-many-points-to-find UX`, async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
 
   await quickOpen(page, sourceUrl);

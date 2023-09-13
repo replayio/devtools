@@ -15,7 +15,7 @@ test("stacking: Element highlighter selects the correct element when they overla
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
 
   await warpToMessage(page, "ExampleFinished");

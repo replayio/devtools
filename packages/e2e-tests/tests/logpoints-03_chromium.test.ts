@@ -14,7 +14,7 @@ test(`logpoints-03_chromium: should display event properties in the console`, as
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
 
   // WARNING: Our Chromium events logic does _not_ actually use the `event.x.y` naming convention.

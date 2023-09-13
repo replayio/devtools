@@ -9,7 +9,7 @@ test("node_console-02: uncaught exceptions should show up", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openConsolePanel(page);
 
   await warpToMessage(page, "ReferenceError: b is not defined");

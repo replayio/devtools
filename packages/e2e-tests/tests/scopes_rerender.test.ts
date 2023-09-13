@@ -9,7 +9,7 @@ test("scopes_rerender: Test that scopes are rerendered", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
   await openConsolePanel(page);
 

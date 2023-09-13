@@ -12,7 +12,7 @@ test("console_eval: support console evaluations", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
   await openConsolePanel(page);
 

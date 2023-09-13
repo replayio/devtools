@@ -17,7 +17,7 @@ test("stepping-02: Test fixes for some simple stepping bugs", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
 
   // Open doc_rr_basic.html

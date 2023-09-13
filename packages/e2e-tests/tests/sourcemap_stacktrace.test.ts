@@ -14,7 +14,7 @@ test("sourcemap_stacktrace: Test that stacktraces are sourcemapped", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
   await openConsolePanel(page);
 

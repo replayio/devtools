@@ -46,7 +46,7 @@ test("inspector-elements-04: Keyboard shortcuts should select the right DOM node
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
 
   await warpToMessage(page, "ExampleFinished");

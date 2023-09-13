@@ -11,7 +11,7 @@ test("stepping-04: Test stepping in a frame other than the top frame", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
 
   // Open doc_rr_basic.html

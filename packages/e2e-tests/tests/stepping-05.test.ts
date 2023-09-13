@@ -21,7 +21,7 @@ test(`stepping-05: Test stepping in pretty-printed code`, async ({
   exampleKey,
 }) => {
   page.setDefaultTimeout(120000);
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
 
   await addBreakpoint(page, { url: "bundle_input.js", lineNumber: 4 });

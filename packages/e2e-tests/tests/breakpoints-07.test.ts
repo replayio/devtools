@@ -24,7 +24,7 @@ test(`breakpoints-07: rewind and seek using command bar and console messages`, a
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
 
   await quickOpen(page, "bundle_input.js");

@@ -15,7 +15,7 @@ test(`authenticated/passport-01: Time travel`, async ({
 }) => {
   await resetTestUser("frontende2e1@replay.io");
 
-  await startTest(page, exampleKey, recordingId, E2E_USER_1_API_KEY);
+  await startTest(page, recordingId, E2E_USER_1_API_KEY);
 
   await enablePassport(page);
   await showPassport(page);

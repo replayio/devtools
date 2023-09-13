@@ -15,7 +15,7 @@ test(`logpoints-04: should display exceptions in the console`, async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
 
   await openConsolePanel(page);

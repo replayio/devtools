@@ -15,7 +15,7 @@ test(`network-02: should show details for the selected request`, async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
   await openNetworkPanel(page);
 

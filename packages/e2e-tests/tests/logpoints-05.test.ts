@@ -12,7 +12,7 @@ test(`logpoints-05: should auto-complete based on log point location`, async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
 
   await addLogpoint(page, { lineNumber: 5, url: exampleKey });
