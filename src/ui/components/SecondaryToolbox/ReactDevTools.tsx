@@ -21,6 +21,8 @@ import { useIsPointWithinFocusWindow } from "replay-next/src/hooks/useIsPointWit
 import { useNag } from "replay-next/src/hooks/useNag";
 import { RecordingTarget, recordingTargetCache } from "replay-next/src/suspense/BuildIdCache";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
+import { updateMappedLocation } from "replay-next/src/suspense/PauseCache";
+import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
 import { evaluate } from "replay-next/src/utils/evaluate";
 import { recordData } from "replay-next/src/utils/telemetry";
 import { isExecutionPointsLessThan } from "replay-next/src/utils/time";
@@ -355,6 +357,12 @@ class ReplayWall implements Wall {
           res.returned.object,
           "canOverflow"
         );
+        const sources = await sourcesByIdCache.readAsync(this.replayClient);
+
+        if (componentFunctionPreview.preview?.functionLocation) {
+          updateMappedLocation(sources, componentFunctionPreview.preview.functionLocation);
+        }
+
         return componentFunctionPreview;
       }
     }
