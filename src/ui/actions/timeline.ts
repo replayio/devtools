@@ -128,7 +128,7 @@ export function jumpToInitialPausePoint(): UIThunkAction<Promise<void>> {
     if (initialPausePoint?.time) {
       time = initialPausePoint.time;
     }
-    ThreadFront.timeWarp(point, time, false);
+    ThreadFront.timeWarp(point, time, true);
   };
 }
 
