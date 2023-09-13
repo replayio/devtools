@@ -80,7 +80,6 @@ export async function startLibraryTest(page: Page, apiKey: string, teamId: strin
 export type TestRecordingKey = keyof typeof exampleRecordings;
 export async function startTest(
   page: Page,
-  exampleKey: TestRecordingKey,
   recordingId: string,
   apiKey?: string,
   additionalQueryParams?: URLSearchParams

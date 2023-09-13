@@ -13,7 +13,7 @@ test(`breakpoints-05: Test interaction of breakpoints with debugger statements`,
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
   await openPauseInformationPanel(page);
   // wait for the recording to be fully loaded

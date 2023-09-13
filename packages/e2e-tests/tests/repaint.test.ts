@@ -10,7 +10,7 @@ test("repaint: repaints the screen screen when stepping over code that modifies 
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
 
   await addBreakpoint(page, { lineNumber: 50, url: exampleKey });

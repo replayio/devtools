@@ -14,7 +14,7 @@ test(`breakpoints-08: should be temporarily disabled`, async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
 
   // Add breakpoint and verify text in console

@@ -48,7 +48,7 @@ test("inspector-elements-03: Nested node picker and selection behavior", async (
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
 
   await warpToMessage(page, "ExampleFinished");

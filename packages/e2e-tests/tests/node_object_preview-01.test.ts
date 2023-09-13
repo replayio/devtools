@@ -12,7 +12,7 @@ test("node_object_preview: Showing console objects in node", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
 
   await openConsolePanel(page);
 

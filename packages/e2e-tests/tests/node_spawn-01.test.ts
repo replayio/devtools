@@ -9,7 +9,7 @@ test("node_spawn: Basic subprocess spawning", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
 
   await openConsolePanel(page);
 

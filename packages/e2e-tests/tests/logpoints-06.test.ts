@@ -21,7 +21,7 @@ test(`logpoints-06: should be temporarily disabled`, async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
 
   let MESSAGE = "Test log point";

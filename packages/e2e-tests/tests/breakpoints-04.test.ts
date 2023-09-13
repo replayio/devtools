@@ -10,7 +10,7 @@ test(`breakpoints-04: catch, finally, generators, and async/await`, async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
 
   await rewindToBreakpoint(page, 10);

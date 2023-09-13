@@ -15,7 +15,7 @@ test(`logpoints-01: log-points appear in the correct order and allow time warpin
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
 
   await addBreakpoint(page, { lineNumber: 20, url: exampleKey });

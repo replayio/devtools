@@ -10,7 +10,7 @@ test(`breakpoints-01: Test basic breakpoint functionality`, async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
 
   await addBreakpoint(page, { lineNumber: 21, url: exampleKey });

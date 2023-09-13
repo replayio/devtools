@@ -14,7 +14,7 @@ test(`object_preview-04: Test scope mapping and switching between generated/orig
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
 
   await addBreakpoint(page, { lineNumber: 15, url: "bundle_input.js" });

@@ -18,7 +18,7 @@ test(`authenticated/comments-01: Test add, edit, and delete comment functionalit
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId, E2E_USER_1_API_KEY);
+  await startTest(page, recordingId, E2E_USER_1_API_KEY);
   await openDevToolsTab(page);
   await openSource(page, exampleKey);
 

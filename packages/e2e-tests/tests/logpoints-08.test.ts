@@ -9,7 +9,7 @@ test(`logpoints-08: should support jumping directly to a hit point via the capsu
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
 
   await addLogpoint(page, {

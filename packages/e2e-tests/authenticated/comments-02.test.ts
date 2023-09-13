@@ -15,7 +15,7 @@ import test, { Page } from "../testFixtureCloneRecording";
 const url = "authenticated_comments_2.html";
 
 async function load(page: Page, recordingId: string, apiKey: string) {
-  await startTest(page, url, recordingId, apiKey);
+  await startTest(page, recordingId, apiKey);
 
   await openDevToolsTab(page);
   await openSource(page, url);

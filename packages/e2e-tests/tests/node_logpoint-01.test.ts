@@ -15,7 +15,7 @@ test("node_logpoint-01: Basic node logpoints", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
 
   await openConsolePanel(page);
 

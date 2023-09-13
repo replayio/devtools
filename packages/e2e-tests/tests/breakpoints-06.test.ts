@@ -15,7 +15,7 @@ test(`breakpoints-06: Test log point in a sourcemapped file`, async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
 
   // Log point added to line 15 should map to line 15

@@ -14,7 +14,7 @@ test("redux_devtools: Test Redux DevTools.", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
 
   await enableReduxDevtools(page);

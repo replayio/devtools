@@ -26,7 +26,7 @@ test(`logpoints-10: too-many-points-to-run-analysis UX`, async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
 
   await quickOpen(page, "react-dom.production.min.js");

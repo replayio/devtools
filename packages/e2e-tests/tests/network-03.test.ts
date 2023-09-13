@@ -14,7 +14,7 @@ test(`network-03: should sync and display the current time in relation to the ne
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
   await openNetworkPanel(page);
 

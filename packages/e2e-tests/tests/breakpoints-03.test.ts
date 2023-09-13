@@ -10,7 +10,7 @@ test(`breakpoints-03: Test stepping forward through breakpoints when rewound bef
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
 
   await addBreakpoint(page, { lineNumber: 9, url: exampleKey });

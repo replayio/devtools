@@ -17,7 +17,7 @@ test("cypress-04: Test Step buttons and menu item", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openViewerTab(page);
 
   await openCypressTestPanel(page);

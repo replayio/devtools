@@ -24,7 +24,7 @@ test(`object_preview-03: Test previews when switching between frames and steppin
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
 
   const target = await getRecordingTarget(page);

@@ -19,7 +19,7 @@ test(`stepping-06: Test stepping in async frames and async call stacks`, async (
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
 
   const target = await getRecordingTarget(page);

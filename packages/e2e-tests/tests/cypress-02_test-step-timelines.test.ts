@@ -16,7 +16,7 @@ test("cypress-02: Test Step timeline behavior", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openViewerTab(page);
 
   await openCypressTestPanel(page);

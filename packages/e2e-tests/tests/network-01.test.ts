@@ -14,7 +14,7 @@ test(`network-01: should filter requests by type and text`, async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
   await openNetworkPanel(page);
 

@@ -17,7 +17,7 @@ test("node_control_flow: catch, finally, generators, and async/await", async ({
 }) => {
   // Default timeout is 30s. Mostly taking 40s in local dev. Bump to 120s.
   test.setTimeout(120000);
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
 
   await openSource(page, "control_flow.js");
 

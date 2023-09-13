@@ -12,7 +12,7 @@ test("console_dock: Should show the correct docking behavior for recordings with
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
 
   // Verify default docking position

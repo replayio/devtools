@@ -14,7 +14,7 @@ test.skip("stacking: Element highlighter selects the correct element when they o
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
 
   await warpToMessage(page, "ExampleFinished");

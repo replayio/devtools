@@ -9,7 +9,7 @@ test("quick_open_modal-01: Test basic searching functionality", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
 
   await openSource(page, "basic.js");

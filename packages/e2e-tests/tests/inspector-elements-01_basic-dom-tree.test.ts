@@ -18,7 +18,7 @@ test("inspector-elements-01: Basic DOM tree node display", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
 
   await openConsolePanel(page);

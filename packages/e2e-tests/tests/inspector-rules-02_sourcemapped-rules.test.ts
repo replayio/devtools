@@ -13,7 +13,7 @@ test("inspector-rules-02: Sourcemapped rules should be viewed", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
   await openConsolePanel(page);
   await warpToMessage(page, "ExampleFinished");

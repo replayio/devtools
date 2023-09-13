@@ -13,7 +13,7 @@ test(`logpoints-02: conditional log-points`, async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
 
   await addLogpoint(page, {

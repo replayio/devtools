@@ -24,7 +24,7 @@ test("react_devtools 01: Basic RDT behavior (FF)", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
 
   // General behavior: should show a React component tree

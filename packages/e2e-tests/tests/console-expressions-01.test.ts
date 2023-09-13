@@ -18,7 +18,7 @@ test("console-expressions-01: should cache input eager eval and terminal express
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
   await openConsolePanel(page);
 

@@ -14,7 +14,7 @@ test("console_warp-02: support pausing, warping, stepping and evaluating console
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
   await openConsolePanel(page);
 

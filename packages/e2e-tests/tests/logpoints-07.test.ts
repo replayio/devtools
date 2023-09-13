@@ -19,7 +19,7 @@ test(`logpoints-07: should use the correct scope in auto-complete`, async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, exampleKey, recordingId);
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
 
   let url = "App.js";
