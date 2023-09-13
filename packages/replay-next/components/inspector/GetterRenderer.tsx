@@ -87,7 +87,7 @@ export default function GetterRenderer({
   if (getterValue) {
     if (!isExpanded) {
       value = (
-        <span data-test-name="GetterValue">
+        <span data-test-name="GetterRenderer-Value">
           <ValueRenderer
             context="nested"
             layout="vertical"
@@ -101,7 +101,7 @@ export default function GetterRenderer({
     value = (
       <button
         className={styles.InvokeGetterButton}
-        data-test-name="InvokeGetterButton"
+        data-test-name="GetterRenderer-LoadValueButton"
         disabled={isPending}
         onClick={(event: MouseEvent) => {
           event.stopPropagation();
@@ -124,7 +124,9 @@ export default function GetterRenderer({
       )}
       data-test-name="GetterRenderer"
     >
-      <span className={styles.Name}>{name}</span>
+      <span className={styles.Name} data-test-name="GetterRenderer-Name">
+        {name}
+      </span>
       <span className={styles.Separator}>: </span>
       {value}
     </span>

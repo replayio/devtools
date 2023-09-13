@@ -30,9 +30,9 @@ export async function inspectGetter(page: Page, testInfo: TestInfo, partialText:
     hasText: partialText,
   });
   await takeScreenshot(page, testInfo, getter, `${partialText}-getter-before-inspection`);
-  const invokeGetterButton = getter.locator('[data-test-name="InvokeGetterButton"]');
+  const invokeGetterButton = getter.locator('[data-test-name="GetterRenderer-LoadValueButton"]');
   await invokeGetterButton.click();
-  await getter.locator('[data-test-name="GetterValue"]').waitFor();
+  await getter.locator('[data-test-name="GetterRenderer-Value"]').waitFor();
   await takeScreenshot(page, testInfo, getter, `${partialText}-getter-after-inspection`);
 }
 
