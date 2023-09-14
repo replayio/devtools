@@ -90,10 +90,6 @@ export function isInFocusSpan(time: number, focusWindow: TimeStampedPointRange) 
   return time >= focusWindow.begin.time && time <= focusWindow.end.time;
 }
 
-export function rangeForFocusWindow(focusWindow: TimeStampedPointRange): TimeStampedPointRange {
-  return { begin: focusWindow.begin || { time: 0, point: "0" }, end: focusWindow.end };
-}
-
 export function getPositionFromTime(time: number, zoomRegion: ZoomRegion) {
   const position = getVisiblePosition({ time, zoom: zoomRegion }) * 100;
   const clampedPosition = clamp(position, 0, 100);

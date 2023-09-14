@@ -58,7 +58,6 @@ import {
 import { HoveredItem, PlaybackOptions, TimeRange } from "ui/state/timeline";
 import KeyShortcuts, { isEditableElement } from "ui/utils/key-shortcuts";
 import { trackEvent } from "ui/utils/telemetry";
-import { rangeForFocusWindow } from "ui/utils/timeline";
 
 import {
   setFocusWindow as newFocusWindow,
@@ -241,7 +240,7 @@ export function updatePausePointParams({
 }
 
 function encodeFocusWindow(focusWindow: TimeStampedPointRange | null) {
-  return focusWindow ? encodeObjectToURL(rangeForFocusWindow(focusWindow)) : undefined;
+  return focusWindow ? encodeObjectToURL(focusWindow) : undefined;
 }
 
 export function seek({

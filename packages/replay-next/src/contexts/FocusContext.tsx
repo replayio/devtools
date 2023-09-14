@@ -141,14 +141,12 @@ export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
       // If the caller hasn't specified an explicit bias,
       // compare the new focus range to the previous one to infer user intent.
       // This helps when a focus range can't be loaded in full.
-      if (bias == null && range != null) {
+      if (bias == null) {
         const prevRange = prevRangeRef.current;
-        if (prevRange != null) {
-          if (isTimeStampedPointRangeLessThan(prevRange, range)) {
-            bias = "begin";
-          } else if (isTimeStampedPointRangeGreaterThan(prevRange, range)) {
-            bias = "end";
-          }
+        if (isTimeStampedPointRangeLessThan(prevRange, range)) {
+          bias = "begin";
+        } else if (isTimeStampedPointRangeGreaterThan(prevRange, range)) {
+          bias = "end";
         }
       }
 
