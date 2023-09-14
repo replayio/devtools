@@ -1,3 +1,4 @@
+import type { Store } from "@replayio/react-devtools-inline";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
 import type { Root } from "react-dom/client";
 
@@ -20,8 +21,6 @@ import {
   TREE_OPERATION_UPDATE_ERRORS_OR_WARNINGS,
   TREE_OPERATION_UPDATE_TREE_BASE_DURATION,
 } from "../printOperations";
-
-import type { Store } from "@replayio/react-devtools-inline";
 
 const Component = ({ children = null }: { children?: ReactNode }) => children as any;
 

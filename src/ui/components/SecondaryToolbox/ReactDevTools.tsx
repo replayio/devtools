@@ -454,9 +454,9 @@ async function loadReactDevToolsInlineModuleFromProtocol(
   // If we don't have a version yet, it probably means we're too early in the Replay session.
   if (backendBridgeProtocolVersion >= 2) {
     stateUpdaterCallback(await import("@replayio/react-devtools-inline/frontend"));
-  } else if (backendBridgeProtocolVersion === 1) {
-    stateUpdaterCallback(await import("react-devtools-inline_4_18_0/frontend"));
   }
+  // We no longer support loading a version of `react-devtools-inline`
+  // that only knows about protocol version 1.
 }
 
 const nodePickerInstance = new NodePickerClass();

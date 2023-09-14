@@ -1,7 +1,7 @@
+import type { RendererInterface } from "@replayio/react-devtools-inline";
+
 import { pauseEvaluationsCache } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientInterface } from "shared/client/types";
-
-import type { RendererInterface } from "@replayio/react-devtools-inline";
 
 // Our modified RDT bundle exports some additional methods
 type RendererInterfaceWithAdditions = RendererInterface & {
