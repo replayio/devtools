@@ -9620,7 +9620,6 @@ __metadata:
     cli-spinners: ^2.7.0
     cypress: ^12.5.1
     log-update: ^4
-    playwright: ^1.37.1
     strip-ansi: ^6.0.0
     ts-node: ^10.7.0
     yargs: ^17.6.0
@@ -14038,17 +14037,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"playwright@npm:^1.37.1":
-  version: 1.37.1
-  resolution: "playwright@npm:1.37.1"
-  dependencies:
-    playwright-core: 1.37.1
-  bin:
-    playwright: cli.js
-  checksum: 99406ef3e15b83a659cb23ef1d92d9935789aad430580d1e0371087dfdf266891483c6f97cfa06bf5f49f081eacd44245d05d20714f98531edef4cc317044d6b
-  languageName: node
-  linkType: hard
-
 "pngjs@npm:^5.0.0":
   version: 5.0.0
   resolution: "pngjs@npm:5.0.0"
@@ -14768,17 +14756,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-error-boundary@npm:^4.0.10":
-  version: 4.0.10
-  resolution: "react-error-boundary@npm:4.0.10"
-  dependencies:
-    "@babel/runtime": ^7.12.5
-  peerDependencies:
-    react: ">=16.13.1"
-  checksum: 4ad4864d2a5fc2264a24d03e83176e6a70d7adbe3c1edbdc5b0bd452a695104bc59456e23b5aea1b9729220672fe46614221daa8b3bd59327968d4aa7eb8bc71
-  languageName: node
-  linkType: hard
-
 "react-is@npm:18.2.0":
   version: 18.2.0
   resolution: "react-is@npm:18.2.0"
@@ -15220,7 +15197,6 @@ __metadata:
     react-devtools-inline: 4.24.7
     react-devtools-inline_4_18_0: "npm:react-devtools-inline@4.18.0"
     react-dom: 0.0.0-experimental-49f741046-20230305
-    react-error-boundary: ^4.0.10
     react-is: ^18.2.0
     react-json-tree: ^0.18.0
     react-json-view: 1.21.3
