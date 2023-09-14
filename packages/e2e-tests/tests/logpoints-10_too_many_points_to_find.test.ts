@@ -11,7 +11,7 @@ import test, { expect } from "../testFixtureCloneRecording";
 
 // We need > 10k hits
 const sourceUrl = "react-dom.production.min.js";
-const lineNumber = 36;
+const lineNumber = 38;
 
 // trunk-ignore(gitleaks/generic-api-key)
 test.use({ exampleKey: "breakpoints-01" });

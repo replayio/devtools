@@ -37,10 +37,13 @@ test(`logpoints-07: should use the correct scope in auto-complete`, async ({
   await verifyConsoleTerminalTypeAheadSuggestions(page, ["setInterval", "setList"]);
 
   // Log point should use generated source (if we're viewing that)
+  // Toggling this will switch from the sourcemapped `App.js` to the minified bundle
+  // that contained it (`main.XYZ.js`).
   await toggleMappedSources(page, "off");
   await delay(1000);
 
-  lineNumber = 19;
+  // We expect that this line in the minified bundle will have hits.
+  lineNumber = 20;
 
   await addLogpoint(page, { lineNumber });
   await editLogPoint(page, { content: "set", lineNumber, saveAfterEdit: false });

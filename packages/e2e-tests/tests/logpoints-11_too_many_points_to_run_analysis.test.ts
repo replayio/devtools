@@ -15,14 +15,14 @@ import {
 import test, { expect } from "../testFixtureCloneRecording";
 
 // We need 500...10k hits
-// Line 43 has 4.9k hits
+// Line 44 has 4.9k hits
 const sourceUrl = "react-dom.production.min.js";
-const lineNumber = 43;
+const lineNumber = 44;
 
 // trunk-ignore(gitleaks/generic-api-key)
 test.use({ exampleKey: "breakpoints-01" });
 
-test(`logpoints-10: too-many-points-to-run-analysis UX`, async ({
+test(`logpoints-11: too-many-points-to-run-analysis UX`, async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {

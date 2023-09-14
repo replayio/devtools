@@ -26,7 +26,7 @@ test(`stepping-05_chromium: Test stepping in pretty-printed code`, async ({
 
   await addBreakpoint(page, { url: "bundle_input.js", lineNumber: 4 });
   await rewindToLine(page, 4);
-  await stepInToLine(page, 1);
+  await stepInToLine(page, 2);
 
   // Add a breakpoint in minified.html and resume to there
   await addBreakpoint(page, { url: exampleKey, lineNumber: 8 });
@@ -38,7 +38,7 @@ test(`stepping-05_chromium: Test stepping in pretty-printed code`, async ({
 
   await openConsolePanel(page);
   await addEventListenerLogpoints(page, [{ eventType: "click", categoryKey: "mouse" }]);
-  await warpToMessage(page, "PointerEvent", 14);
+  await warpToMessage(page, "PointerEvent", 15);
 
   await stepInToLine(page, 2);
   await stepOutToLine(page, 15);
