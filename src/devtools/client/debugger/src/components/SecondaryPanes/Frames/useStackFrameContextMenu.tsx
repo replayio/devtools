@@ -6,7 +6,7 @@ import Icon from "replay-next/components/Icon";
 import { copyToClipboard } from "replay-next/components/sources/utils/clipboard";
 import { getFrameStepForFrameLocation } from "replay-next/src/suspense/FrameStepsCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { seek, setFocusWindowBegin, setFocusWindowEnd } from "ui/actions/timeline";
+import { requestFocusWindow, seek } from "ui/actions/timeline";
 import { useAppDispatch } from "ui/setup/hooks";
 
 interface StackFrameContextMenuOptions {
@@ -50,10 +50,11 @@ export function useStackFrameContextMenu({
 
       if (matchingFrameStep) {
         dispatch(
-          setFocusWindowBegin({
-            executionPoint: matchingFrameStep.point,
-            time: matchingFrameStep.time,
-            sync: true,
+          requestFocusWindow({
+            begin: {
+              point: matchingFrameStep.point,
+              time: matchingFrameStep.time,
+            },
           })
         );
       }
@@ -64,10 +65,11 @@ export function useStackFrameContextMenu({
 
       if (matchingFrameStep) {
         dispatch(
-          setFocusWindowEnd({
-            executionPoint: matchingFrameStep.point,
-            time: matchingFrameStep.time,
-            sync: true,
+          requestFocusWindow({
+            end: {
+              point: matchingFrameStep.point,
+              time: matchingFrameStep.time,
+            },
           })
         );
       }

@@ -1,4 +1,8 @@
-import { FocusWindowRequestBias, TimeStampedPointRange } from "@replayio/protocol";
+import {
+  FocusWindowRequestBias,
+  PointRangeFocusRequest,
+  TimeStampedPointRange,
+} from "@replayio/protocol";
 import {
   PropsWithChildren,
   createContext,
@@ -22,10 +26,15 @@ import {
   imperativelyGetClosestPointForTime,
   preCacheExecutionPointForTime,
 } from "../suspense/ExecutionPointsCache";
-import { TimeRange } from "../types";
+import { TimeRange as TimeRangeArray } from "../types";
 import { SessionContext } from "./SessionContext";
 
 const FOCUS_DEBOUNCE_DURATION = 250;
+
+interface TimeRange {
+  begin: number;
+  end: number;
+}
 
 export type UpdateOptions = {
   bias?: FocusWindowRequestBias;
@@ -41,16 +50,19 @@ export type FocusContextType = {
   // The currently active range - use this for backend requests that don't cause components to suspend
   range: TimeStampedPointRange | null;
   // The range to be displayed in the Timeline - don't use this for backend requests
-  rangeForDisplay: TimeStampedPointRange | null;
+  rangeForDisplay: TimeRange | null;
   // The deferred value of the currently active range - use this for backend requests that may cause components to suspend
   rangeForSuspense: TimeStampedPointRange | null;
 
-  // Set focus window to a range of execution points (or null to clear).
-  update: (value: TimeStampedPointRange | null, options: UpdateOptions) => Promise<void>;
+  // Set focus window to a range of execution points.
+  update: (value: TimeStampedPointRange, options: UpdateOptions) => Promise<void>;
 
-  // Set focus window to a range of times (or null to clear).
+  // Set focus window to a range of times.
   // Note this value is imprecise and should only be used by the Timeline focuser UI.
-  updateForTimelineImprecise: (value: TimeRange | null, options: UpdateOptions) => Promise<void>;
+  updateForTimelineImprecise: (
+    value: TimeRangeArray | null,
+    options: UpdateOptions
+  ) => Promise<void>;
 };
 
 export const FocusContext = createContext<FocusContextType>(null as any);
@@ -63,21 +75,19 @@ export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
   // Changing the focus range may cause us to suspend (while fetching new info from the backend).
   // Wrapping it in a transition enables us to show the older set of messages (in a pending state) while new data loads.
   // This is less jarring than the alternative of unmounting all messages and rendering a fallback loader.
-  const initialRange: TimeStampedPointRange = useMemo(
-    () => ({
-      begin: { point: "0", time: 0 },
-      end: { point: endpoint, time: duration },
-    }),
-    [endpoint, duration]
+  const initialRange = {
+    begin: { point: "0", time: 0 },
+    end: { point: endpoint, time: duration },
+  };
+  const [requestedRange, setRequestedRange] = useState<PointRangeFocusRequest | undefined>(
+    undefined
   );
-  const [bias, setBias] = useState<FocusWindowRequestBias | undefined>(undefined);
-  const [range, setRange] = useState<TimeStampedPointRange | null>(initialRange);
-  const [rangeForDisplay, setRangeForDisplay] = useState<TimeStampedPointRange | null>(
-    initialRange
-  );
-  const [rangeForSuspense, setRangeForSuspense] = useState<TimeStampedPointRange | null>(
-    initialRange
-  );
+  const [range, setRange] = useState<TimeStampedPointRange>(initialRange);
+  const [rangeForDisplay, setRangeForDisplay] = useState<TimeRange | null>({
+    begin: 0,
+    end: duration,
+  });
+  const [rangeForSuspense, setRangeForSuspense] = useState<TimeStampedPointRange>(initialRange);
 
   const prevRangeRef = useRef(range);
 
@@ -88,22 +98,18 @@ export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
   // to indicate that what's currently being showed is stale.
   const [isTransitionPending, startTransition] = useTransition();
 
-  // Refine the loaded ranges based on the focus window.
   useEffect(() => {
-    if (rangeForDisplay === null || rangeForDisplay === initialRange) {
+    if (!requestedRange) {
       return;
     }
 
     let cancelled = false;
 
     const timeoutId = setTimeout(async () => {
-      const range = await client.requestFocusWindow({
-        begin: rangeForDisplay.begin,
-        bias,
-        end: rangeForDisplay.end,
-      });
+      const range = await client.requestFocusWindow(requestedRange);
 
       if (!cancelled) {
+        setRangeForDisplay({ begin: range.begin.time, end: range.end.time });
         setRange(range);
         startTransition(() => {
           setRangeForSuspense(range);
@@ -116,7 +122,7 @@ export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
 
       clearTimeout(timeoutId);
     };
-  }, [bias, client, duration, initialRange, rangeForDisplay]);
+  }, [requestedRange, client]);
 
   // Feed loaded regions into the time-to-execution-point cache in case we need them later.
   useEffect(() => {
@@ -129,7 +135,7 @@ export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
   }, [loadedRegions]);
 
   const updateFocusRange = useCallback(
-    async (range: TimeStampedPointRange | null, options: UpdateOptions) => {
+    async (range: TimeStampedPointRange, options: UpdateOptions) => {
       let { bias } = options;
 
       // If the caller hasn't specified an explicit bias,
@@ -146,8 +152,8 @@ export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
         }
       }
 
-      setBias(bias);
-      setRangeForDisplay(range);
+      setRangeForDisplay({ begin: range.begin.time, end: range.end.time });
+      setRequestedRange({ ...range, bias });
 
       // Sync is a no-op
     },
@@ -155,27 +161,28 @@ export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
   );
 
   const updateForTimelineImprecise = useCallback(
-    async (value: TimeRange | null, options: UpdateOptions) => {
+    async (value: TimeRangeArray | null, options: UpdateOptions) => {
+      if (!value) {
+        setRangeForDisplay(null);
+        return;
+      }
+
       const { bias, sync } = options;
 
-      if (value) {
-        const [timeBegin, timeEnd] = value;
+      const [timeBegin, timeEnd] = value;
 
-        const [pointBegin, pointEnd] = await Promise.all([
-          imperativelyGetClosestPointForTime(client, timeBegin),
-          imperativelyGetClosestPointForTime(client, timeEnd),
-        ]);
+      const [pointBegin, pointEnd] = await Promise.all([
+        imperativelyGetClosestPointForTime(client, timeBegin),
+        imperativelyGetClosestPointForTime(client, timeEnd),
+      ]);
 
-        updateFocusRange(
-          {
-            begin: { point: pointBegin, time: timeBegin },
-            end: { point: pointEnd, time: timeEnd },
-          },
-          { bias, sync }
-        );
-      } else {
-        updateFocusRange(null, { bias, sync });
-      }
+      updateFocusRange(
+        {
+          begin: { point: pointBegin, time: timeBegin },
+          end: { point: pointEnd, time: timeEnd },
+        },
+        { bias, sync }
+      );
     },
     [client, updateFocusRange]
   );

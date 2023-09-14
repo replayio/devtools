@@ -11,17 +11,11 @@ export interface ZoomRegion {
   scale: number;
 }
 
-export interface FocusWindow {
-  end: TimeStampedPoint;
-  begin: TimeStampedPoint;
-}
-
 export interface TimelineState {
   allPaintsReceived: boolean;
   currentTime: number;
   dragging: boolean;
-  focusWindow: FocusWindow | null;
-  focusWindowBackup: FocusWindow | null;
+  focusWindow: TimeRange | null;
   hoveredItem: HoveredItem | null;
   hoverTime: number | null;
   markTimeStampedPoint: TimeStampedPoint | null;

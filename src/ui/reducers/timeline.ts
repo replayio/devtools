@@ -5,15 +5,18 @@ import sortBy from "lodash/sortBy";
 import { getPausePointParams } from "shared/utils/environment";
 import { MAX_FOCUS_REGION_DURATION } from "ui/actions/timeline";
 import { UIState } from "ui/state";
-import { FocusWindow, HoveredItem, TimelineState } from "ui/state/timeline";
+import { HoveredItem, TimeRange, TimelineState } from "ui/state/timeline";
 import { mergeSortedPointLists } from "ui/utils/timeline";
+
+const initialFocusWindow = getPausePointParams().focusWindow;
 
 function initialTimelineState(): TimelineState {
   return {
     allPaintsReceived: false,
     currentTime: 0,
-    focusWindow: getPausePointParams().focusWindow,
-    focusWindowBackup: null,
+    focusWindow: initialFocusWindow
+      ? { begin: initialFocusWindow.begin.time, end: initialFocusWindow.end.time }
+      : null,
     hoveredItem: null,
     markTimeStampedPoint: null,
     hoverTime: null,
@@ -59,7 +62,7 @@ const timelineSlice = createSlice({
     setPlaybackFocusWindow(state, action: PayloadAction<boolean>) {
       state.playbackFocusWindow = action.payload;
     },
-    setFocusWindow(state, action: PayloadAction<FocusWindow | null>) {
+    setFocusWindow(state, action: PayloadAction<TimeRange | null>) {
       state.focusWindow = action.payload;
     },
     pointsReceived(state, action: PayloadAction<TimeStampedPoint[]>) {
@@ -81,12 +84,6 @@ const timelineSlice = createSlice({
     },
   },
 });
-
-// If abs(A - B) > EPSILON, then A and B are considered different.
-// If abs(A - B) < EPSILON, then A and B are considered equal.
-const EPSILON = 0.0001;
-// returns true is A is less than B, and the difference is greater than EPSILON
-const lessThan = (a: number, b: number) => b - a > EPSILON;
 
 export const {
   allPaintsReceived,
@@ -135,7 +132,7 @@ export const getFocusWindow = (state: UIState) => state.timeline.focusWindow;
 export const isMaximumFocusWindow = (state: UIState) => {
   const focusWindow = getFocusWindow(state);
   if (focusWindow) {
-    const duration = focusWindow.end.time - focusWindow.begin.time;
+    const duration = focusWindow.end - focusWindow.begin;
     // JavaScript floating point numbers are not precise enough,
     // so in order to avoid occasional flickers from rounding errors, fuzz it a bit.
     return duration + 0.1 >= MAX_FOCUS_REGION_DURATION;
@@ -143,4 +140,3 @@ export const isMaximumFocusWindow = (state: UIState) => {
     return false;
   }
 };
-export const getFocusWindowBackup = (state: UIState) => state.timeline.focusWindowBackup;

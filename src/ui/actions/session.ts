@@ -353,10 +353,10 @@ export function createSocket(
       assert(focusWindow !== null); // replayClient.configure() sets this value
       if (
         !focusWindowFromParams ||
-        focusWindowFromParams.begin.point !== focusWindow.begin.point ||
-        focusWindowFromParams.end.point !== focusWindow.end.point
+        focusWindowFromParams.begin.time !== focusWindow.begin.time ||
+        focusWindowFromParams.end.time !== focusWindow.end.time
       ) {
-        dispatch(setFocusWindow(focusWindow));
+        dispatch(setFocusWindow({ begin: focusWindow.begin.time, end: focusWindow.end.time }));
       }
     } catch (e: any) {
       const currentError = getUnexpectedError(getState());

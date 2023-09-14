@@ -1,22 +1,18 @@
 import { TimeStampedPointRange } from "@replayio/protocol";
-import { PropsWithChildren, useCallback, useDeferredValue, useMemo } from "react";
+import { PropsWithChildren, useCallback, useContext, useDeferredValue, useMemo } from "react";
 
 import { FocusContext, UpdateOptions } from "replay-next/src/contexts/FocusContext";
+import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { useCurrentFocusWindow } from "replay-next/src/hooks/useCurrentFocusWindow";
 import { TimeRange } from "replay-next/src/types";
-import {
-  enterFocusMode,
-  setFocusWindow as setDisplayedRange,
-  setFocusWindowImprecise as setDisplayedRangeImprecise,
-  syncFocusedRegion,
-  updateFocusWindowParam,
-} from "ui/actions/timeline";
+import { enterFocusMode, requestFocusWindow, setDisplayedFocusWindow } from "ui/actions/timeline";
 import { getFocusWindow } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 // Adapter that reads focus region (from Redux) and passes it to the FocusContext.
 export default function FocusContextReduxAdapter({ children }: PropsWithChildren) {
   const dispatch = useAppDispatch();
+  const { duration } = useContext(SessionContext);
   const range = useCurrentFocusWindow();
   const rangeForDisplay = useAppSelector(getFocusWindow);
 
@@ -24,14 +20,14 @@ export default function FocusContextReduxAdapter({ children }: PropsWithChildren
   const isPending = rangeForSuspense !== range;
 
   const update = useCallback(
-    async (value: TimeStampedPointRange | null, options: UpdateOptions) => {
+    async (value: TimeStampedPointRange, options: UpdateOptions) => {
       const { sync } = options;
-
-      await dispatch(setDisplayedRange(value));
-
       if (sync) {
-        await dispatch(syncFocusedRegion());
-        dispatch(updateFocusWindowParam());
+        await dispatch(requestFocusWindow(value));
+      } else {
+        await dispatch(
+          setDisplayedFocusWindow(value ? { begin: value.begin.time, end: value.end.time } : null)
+        );
       }
     },
     [dispatch]
@@ -40,24 +36,15 @@ export default function FocusContextReduxAdapter({ children }: PropsWithChildren
   const updateForTimelineImprecise = useCallback(
     async (value: TimeRange | null, options: UpdateOptions) => {
       const { sync } = options;
-
-      await dispatch(
-        setDisplayedRangeImprecise(
-          value !== null
-            ? {
-                begin: value[0],
-                end: value[1],
-              }
-            : null
-        )
-      );
-
       if (sync) {
-        await dispatch(syncFocusedRegion());
-        dispatch(updateFocusWindowParam());
+        const beginTime = value ? value[0] : 0;
+        const endTime = value ? value[1] : duration;
+        await dispatch(requestFocusWindow({ begin: { time: beginTime }, end: { time: endTime } }));
+      } else {
+        await dispatch(setDisplayedFocusWindow(value ? { begin: value[0], end: value[1] } : null));
       }
     },
-    [dispatch]
+    [dispatch, duration]
   );
 
   const context = useMemo(() => {

@@ -19,7 +19,7 @@ import {
   isUserActionTestEvent,
 } from "shared/test-suites/RecordingTestMetadata";
 import { isPointInRegion } from "shared/utils/time";
-import { seek, setFocusWindow, setTimelineToTime, syncFocusedRegion } from "ui/actions/timeline";
+import { requestFocusWindow, seek, setTimelineToTime } from "ui/actions/timeline";
 import { TestSuiteCache } from "ui/components/TestSuite/suspense/TestSuiteCache";
 import { useTestEventContextMenu } from "ui/components/TestSuite/views/TestRecording/useTestEventContextMenu";
 import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext";
@@ -151,20 +151,24 @@ export function TestSectionRow({
         const timeStampedPoint = { point: executionPoint, time };
         if (isExecutionPointsLessThan(executionPoint, focusWindow.begin.point)) {
           await dispatch(
-            setFocusWindow({
-              begin: timeStampedPoint,
-              end: focusWindow.end,
-            })
+            requestFocusWindow(
+              {
+                begin: timeStampedPoint,
+                end: focusWindow.end,
+              },
+              "begin"
+            )
           );
-          await dispatch(syncFocusedRegion("begin"));
         } else {
           await dispatch(
-            setFocusWindow({
-              begin: focusWindow.begin,
-              end: timeStampedPoint,
-            })
+            requestFocusWindow(
+              {
+                begin: focusWindow.begin,
+                end: timeStampedPoint,
+              },
+              "end"
+            )
           );
-          await dispatch(syncFocusedRegion("end"));
         }
       }
 

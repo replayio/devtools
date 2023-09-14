@@ -1,30 +1,8 @@
 import { TimeStampedPoint, TimeStampedPointRange } from "@replayio/protocol";
 import clamp from "lodash/clamp";
-import sortedIndexBy from "lodash/sortedIndexBy";
-import sortedLastIndexBy from "lodash/sortedLastIndexBy";
 
 import { assert } from "protocol/utils";
-import { FocusWindow, ZoomRegion } from "ui/state/timeline";
-
-import { timelineMarkerWidth } from "../constants";
-
-// calculate pixel distance from two times
-export function getPixelDistance({
-  to,
-  from,
-  zoom,
-  overlayWidth,
-}: {
-  to: number;
-  from: number;
-  zoom: ZoomRegion;
-  overlayWidth: number;
-}) {
-  const toPos = getVisiblePosition({ time: to, zoom });
-  const fromPos = getVisiblePosition({ time: from, zoom });
-
-  return Math.abs((toPos - fromPos) * overlayWidth);
-}
+import { ZoomRegion } from "ui/state/timeline";
 
 // Get the position of a time on the visible part of the timeline,
 // in the range [0, 1] if the timeline is fully zommed out.
@@ -42,32 +20,6 @@ interface GetOffsetParams {
   zoom: ZoomRegion;
 }
 
-// Get the pixel offset for a time.
-export function getPixelOffset({ time, overlayWidth, zoom }: GetOffsetParams) {
-  return getVisiblePosition({ time, zoom }) * overlayWidth;
-}
-
-// Get the percent value for the left offset of a message.
-export function getLeftOffset({ overlayWidth, time, zoom }: GetOffsetParams) {
-  const position = getVisiblePosition({ time, zoom }) * 100;
-  const messageWidth = (timelineMarkerWidth / overlayWidth) * 100;
-
-  return Math.max(position - messageWidth / 2, 0);
-}
-
-// Get the percent value for the left offset of a comment.
-export function getCommentLeftOffset({
-  overlayWidth,
-  time,
-  zoom,
-  commentWidth,
-}: GetOffsetParams & { commentWidth: number }) {
-  const position = getVisiblePosition({ time, zoom }) * 100;
-  const messageWidth = (commentWidth / overlayWidth) * 100;
-
-  return Math.min(Math.max(position, 0), 100 - messageWidth);
-}
-
 // Get the percent value for the left offset of a comment marker.
 export function getMarkerLeftOffset({
   overlayWidth,
@@ -79,45 +31,6 @@ export function getMarkerLeftOffset({
   const commentMarkerWidth = (markerWidth / overlayWidth) * 100;
 
   return position - commentMarkerWidth / 2;
-}
-
-// Get the percent value for the midpoint of a time in the timeline.
-export function getTimeMidpoint({ overlayWidth, time, zoom }: GetOffsetParams) {
-  const position = getVisiblePosition({ time, zoom }) * 100;
-  const pausedLocationMarkerWidth = (1 / overlayWidth) * 100;
-
-  return Math.max(position + pausedLocationMarkerWidth / 2, 0);
-}
-
-export function getNewZoomRegion({
-  hoverTime,
-  newScale,
-  zoomRegion,
-  recordingDuration,
-}: {
-  hoverTime: number;
-  newScale: number;
-  zoomRegion: ZoomRegion;
-  recordingDuration: number;
-}) {
-  let scale = zoomRegion.scale;
-  let length = zoomRegion.endTime - zoomRegion.beginTime;
-  let leftToHover = hoverTime - zoomRegion.beginTime;
-  let rightToHover = zoomRegion.endTime - hoverTime;
-
-  let newLength = recordingDuration / newScale;
-  let newBegin = zoomRegion.beginTime - (newLength - length) * (leftToHover / length);
-  let newEnd = zoomRegion.endTime + (newLength - length) * (rightToHover / length);
-
-  if (newBegin < 0) {
-    newBegin = 0;
-    newEnd = newLength;
-  } else if (newEnd > recordingDuration) {
-    newEnd = recordingDuration;
-    newBegin = recordingDuration - newLength;
-  }
-
-  return { begin: newBegin, end: newEnd };
 }
 
 const TIME_REGEX = /^([0-9]+)(:[0-9]{0,2}){0,1}(\.[0-9]{0,3}){0,1}$/;
@@ -173,49 +86,13 @@ export function getSecondsFromFormattedTime(formatted: string) {
   return minutes * 60 * 1000 + seconds * 1000 + milliseconds;
 }
 
-export function isSameTimeStampedPointRange(
-  range1: TimeStampedPointRange,
-  range2: TimeStampedPointRange
-) {
-  const sameBegin =
-    range1.begin.point === range2.begin.point && range1.begin.time === range2.begin.time;
-  const sameEnd = range1.end.point === range2.end.point && range1.end.time === range2.end.time;
-
-  return sameBegin && sameEnd;
-}
-
-export function isInFocusSpan(time: number, focusWindow: FocusWindow) {
+export function isInFocusSpan(time: number, focusWindow: TimeStampedPointRange) {
   return time >= focusWindow.begin.time && time <= focusWindow.end.time;
 }
 
-export function isPointInRegions(regions: TimeStampedPointRange[], point: string) {
-  return regions.find(
-    r => BigInt(point) >= BigInt(r.begin.point) && BigInt(point) <= BigInt(r.end.point)
-  );
-}
-
-export function isTimeInRegions(time: number, regions?: TimeStampedPointRange[]): boolean {
-  return !!regions?.some(region => time >= region.begin.time && time <= region.end.time);
-}
-
-export function rangeForFocusWindow(focusWindow: FocusWindow): TimeStampedPointRange {
+export function rangeForFocusWindow(focusWindow: TimeStampedPointRange): TimeStampedPointRange {
   return { begin: focusWindow.begin || { time: 0, point: "0" }, end: focusWindow.end };
 }
-
-export const overlap = (a: TimeStampedPointRange[], b: TimeStampedPointRange[]) => {
-  const overlapping: TimeStampedPointRange[] = [];
-  a.forEach(aRegion => {
-    b.forEach(bRegion => {
-      if (aRegion.begin.time <= bRegion.end.time && aRegion.end.time >= bRegion.begin.time) {
-        overlapping.push({
-          begin: aRegion.begin.time > bRegion.begin.time ? aRegion.begin : bRegion.begin,
-          end: aRegion.end.time < bRegion.end.time ? aRegion.end : bRegion.end,
-        });
-      }
-    });
-  });
-  return overlapping;
-};
 
 export function getPositionFromTime(time: number, zoomRegion: ZoomRegion) {
   const position = getVisiblePosition({ time, zoom: zoomRegion }) * 100;
@@ -233,46 +110,6 @@ export function getTimeFromPosition(
   const percentage = clamp(x / targetRect.width, 0, 1);
   const time = zoomRegion.beginTime + percentage * zoomRegionDuration;
   return time;
-}
-
-export function isFocusWindowSubset(
-  prevFocusWindow: FocusWindow | null,
-  nextFocusWindow: FocusWindow | null
-): boolean {
-  if (prevFocusWindow === null) {
-    // Previously the entire timeline was selected.
-    // No matter what the new focus region is, it will be a subset.
-    return true;
-  } else if (nextFocusWindow === null) {
-    // The new selection includes the entire timeline.
-    // No matter what the previous focus region is, the new one is not a subset.
-    return false;
-  } else {
-    return (
-      nextFocusWindow.begin.time >= prevFocusWindow.begin.time &&
-      nextFocusWindow.end.time <= prevFocusWindow.end.time
-    );
-  }
-}
-
-export function filterToFocusWindow<T extends TimeStampedPoint>(
-  sortedPoints: T[],
-  focusWindow: FocusWindow | null
-): [filtered: T[], filteredBeforeCount: number, filteredAfterCount: number] {
-  if (!focusWindow) {
-    return [sortedPoints, 0, 0];
-  }
-
-  const { begin: beginPoint, end: endPoint } = rangeForFocusWindow(focusWindow);
-
-  const beginIndex = sortedIndexBy(sortedPoints, beginPoint, ({ point }) => BigInt(point));
-  const endIndex = sortedLastIndexBy(sortedPoints, endPoint, ({ point }) => BigInt(point));
-
-  const filteredBeforeCount = beginIndex;
-  const filteredAfterCount = sortedPoints.length - endIndex;
-  const filtered = sortedPoints.slice(beginIndex, endIndex);
-
-  return [filtered, filteredBeforeCount, filteredAfterCount];
 }
 
 function assertSorted(a: TimeStampedPoint[]) {

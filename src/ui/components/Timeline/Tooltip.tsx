@@ -30,7 +30,7 @@ export default function Tooltip({ timelineWidth }: { timelineWidth: number }) {
   );
 
   const isHoveredOnUnFocusedRegion =
-    focusWindow && (focusWindow.begin.time > hoverTime || focusWindow.end.time < hoverTime);
+    focusWindow && (focusWindow.begin > hoverTime || focusWindow.end < hoverTime);
 
   const timestamp = getFormattedTime(hoverTime);
   const message =

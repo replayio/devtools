@@ -12,9 +12,7 @@ export default function PlayPauseButton() {
   const playback = useAppSelector(selectors.getPlayback);
   const recordingDuration = useAppSelector(selectors.getRecordingDuration);
 
-  const isAtEnd = focusWindow
-    ? currentTime === focusWindow.end.time
-    : currentTime == recordingDuration;
+  const isAtEnd = focusWindow ? currentTime === focusWindow.end : currentTime == recordingDuration;
 
   let onClick;
   let icon;

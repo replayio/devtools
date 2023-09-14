@@ -49,8 +49,8 @@ function Focuser({ editMode, setEditMode, updateFocusWindowThrottled }: Props) {
 
   // Mirror focus state so we can re-render immediately and dispatch throttled Redux updates
   const [displayedFocusWindow, setDisplayedFocusWindow] = useState({
-    beginTime: focusWindow?.begin.time ?? zoomRegion.beginTime,
-    endTime: focusWindow?.end.time ?? zoomRegion.endTime,
+    beginTime: focusWindow?.begin ?? zoomRegion.beginTime,
+    endTime: focusWindow?.end ?? zoomRegion.endTime,
   });
   const displayedFocusWindowRef = useRef(displayedFocusWindow);
   useEffect(() => {

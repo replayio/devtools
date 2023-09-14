@@ -12,8 +12,8 @@ export default function UnfocusedRegion() {
     return null;
   }
 
-  const beginTime = focusWindow!.begin.time;
-  const endTime = focusWindow!.end.time;
+  const beginTime = focusWindow!.begin;
+  const endTime = focusWindow!.end;
   const duration = zoomRegion.endTime - zoomRegion.beginTime;
 
   const start = getVisiblePosition({ time: beginTime, zoom: zoomRegion }) * 100;

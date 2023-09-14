@@ -1,20 +1,13 @@
-import { FocusWindow, ZoomRegion } from "ui/state/timeline";
+import { ZoomRegion } from "ui/state/timeline";
 
 import {
-  filterToFocusWindow,
   getSecondsFromFormattedTime,
   getTimeFromPosition,
-  isFocusWindowSubset,
   isValidTimeString,
   mergeSortedPointLists,
-  overlap,
 } from "./timeline";
 
 const point = (time: number) => ({ time, point: `${time}` });
-const focusWindow = (from: number, to: number): FocusWindow => ({
-  begin: point(from),
-  end: point(to),
-});
 
 describe("getSecondsFromFormattedTime", () => {
   it("should parse standalone seconds", () => {
@@ -100,30 +93,6 @@ describe("getTimeFromPosition", () => {
   });
 });
 
-describe("isFocusWindowSubset", () => {
-  it("should always be true when previous focus region was null", () => {
-    expect(isFocusWindowSubset(null, null)).toBe(true);
-    expect(isFocusWindowSubset(null, focusWindow(0, 0))).toBe(true);
-    expect(isFocusWindowSubset(null, focusWindow(0, 1000))).toBe(true);
-    expect(isFocusWindowSubset(null, focusWindow(1000, 1000))).toBe(true);
-  });
-
-  it("should never be true when new focus region was null (unless previous one was also)", () => {
-    expect(isFocusWindowSubset(focusWindow(0, 0), null)).toBe(false);
-    expect(isFocusWindowSubset(focusWindow(0, 1000), null)).toBe(false);
-    expect(isFocusWindowSubset(focusWindow(1000, 1000), null)).toBe(false);
-  });
-
-  it("should correctly differentiate between overlapping and non-overlapping focus regions", () => {
-    expect(isFocusWindowSubset(focusWindow(0, 0), focusWindow(0, 0))).toBe(true);
-    expect(isFocusWindowSubset(focusWindow(100, 200), focusWindow(0, 50))).toBe(false);
-    expect(isFocusWindowSubset(focusWindow(100, 200), focusWindow(50, 150))).toBe(false);
-    expect(isFocusWindowSubset(focusWindow(100, 200), focusWindow(100, 200))).toBe(true);
-    expect(isFocusWindowSubset(focusWindow(100, 200), focusWindow(125, 175))).toBe(true);
-    expect(isFocusWindowSubset(focusWindow(100, 200), focusWindow(150, 250))).toBe(false);
-    expect(isFocusWindowSubset(focusWindow(100, 200), focusWindow(200, 300))).toBe(false);
-  });
-});
 describe("isValidTimeString", () => {
   it("should recognized valid time strings", () => {
     expect(isValidTimeString("0")).toBe(true);
@@ -151,59 +120,6 @@ describe("isValidTimeString", () => {
     expect(isValidTimeString("a:1")).toBe(false);
     expect(isValidTimeString("a:b")).toBe(false);
     expect(isValidTimeString("1:b")).toBe(false);
-  });
-});
-
-describe("overlap", () => {
-  const point = (time: number) => {
-    return { point: "", time };
-  };
-
-  const range = (begin: number, end: number) => {
-    return {
-      begin: point(begin),
-      end: point(end),
-    };
-  };
-
-  it("correctly merges overlapping regions when the second begins during the first", () => {
-    expect(overlap([range(0, 5)], [range(2, 7)])).toStrictEqual([range(2, 5)]);
-  });
-
-  it("correctly merges overlapping regions when the first begins during the second", () => {
-    expect(overlap([range(2, 7)], [range(0, 5)])).toStrictEqual([range(2, 5)]);
-  });
-
-  it("leaves non-overlapping regions alone", () => {
-    expect(overlap([range(0, 2)], [range(3, 5)])).toStrictEqual([]);
-  });
-
-  it("does not blow up with empty inputs", () => {
-    expect(overlap([range(0, 2)], [])).toStrictEqual([]);
-    expect(overlap([], [range(0, 2)])).toStrictEqual([]);
-  });
-});
-
-describe("filterToFocusWindow", () => {
-  it("will not include points before the region", () => {
-    expect(filterToFocusWindow([point(5)], focusWindow(10, 20))).toEqual([[], 1, 0]);
-  });
-  it("will not include points after the region", () => {
-    expect(filterToFocusWindow([point(25)], focusWindow(10, 20))).toEqual([[], 0, 1]);
-  });
-  it("will include points inside the region", () => {
-    expect(filterToFocusWindow([point(5), point(15), point(25)], focusWindow(10, 20))).toEqual([
-      [point(15)],
-      1,
-      1,
-    ]);
-  });
-  it("will include points on the boundaries the region", () => {
-    expect(filterToFocusWindow([point(10), point(15), point(20)], focusWindow(10, 20))).toEqual([
-      [point(10), point(15), point(20)],
-      0,
-      0,
-    ]);
   });
 });
 

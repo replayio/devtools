@@ -4,7 +4,7 @@ import { ContextMenuDivider, ContextMenuItem, useContextMenu } from "use-context
 
 import Icon from "replay-next/components/Icon";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
-import { setFocusWindowBegin, setFocusWindowEnd } from "ui/actions/timeline";
+import { requestFocusWindow } from "ui/actions/timeline";
 import { useAppDispatch } from "ui/setup/hooks";
 import type { Remark } from "ui/state/comments";
 import { trackEvent } from "ui/utils/telemetry";
@@ -59,20 +59,22 @@ export default function useCommentContextMenu({
 
   const setFocusEnd = () => {
     dispatch(
-      setFocusWindowEnd({
-        executionPoint: remark.point,
-        time: remark.time,
-        sync: true,
+      requestFocusWindow({
+        end: {
+          point: remark.point,
+          time: remark.time,
+        },
       })
     );
   };
 
   const setFocusStart = () => {
     dispatch(
-      setFocusWindowBegin({
-        executionPoint: remark.point,
-        time: remark.time,
-        sync: true,
+      requestFocusWindow({
+        begin: {
+          point: remark.point,
+          time: remark.time,
+        },
       })
     );
   };
