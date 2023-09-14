@@ -14716,13 +14716,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-devtools-inline_4_18_0@npm:react-devtools-inline@4.18.0":
-  version: 4.18.0
-  resolution: "react-devtools-inline@npm:4.18.0"
-  checksum: f7ce6ea90bb2bf3b554927fd34f36eb3f6d458ad4ba9b7c4c6070b4f9601e9765bcdc8348715f58e29157ffb6020d298f3d0b5bef77c930ed397ecda450168c2
-  languageName: node
-  linkType: hard
-
 "react-dom@npm:0.0.0-experimental-49f741046-20230305":
   version: 0.0.0-experimental-49f741046-20230305
   resolution: "react-dom@npm:0.0.0-experimental-49f741046-20230305"
@@ -15185,7 +15178,6 @@ __metadata:
     react: 0.0.0-experimental-49f741046-20230305
     react-canvas-confetti: ^1.3.0
     react-circular-progressbar: ^2.0.4
-    react-devtools-inline_4_18_0: "npm:react-devtools-inline@4.18.0"
     react-dom: 0.0.0-experimental-49f741046-20230305
     react-is: ^18.2.0
     react-json-tree: ^0.18.0
