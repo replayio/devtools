@@ -127,10 +127,11 @@ export default React.memo(function Event({
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
         data-test-name="Event"
+        data-test-type={event.kind}
       >
         <div className="flex flex-row items-center space-x-2 overflow-hidden">
           <MaterialIcon iconSize="xl">{icon}</MaterialIcon>
-          <Label>{label}</Label>
+          <Label dataTestName="EventLabel">{label}</Label>
         </div>
         <div className="flex space-x-2 opacity-0 group-hover:opacity-100">
           {renderedJumpToCodeButton}
@@ -141,6 +142,11 @@ export default React.memo(function Event({
   );
 });
 
-const Label = ({ children }: { children: ReactNode }) => (
-  <div className="overflow-hidden overflow-ellipsis whitespace-pre font-normal">{children}</div>
+const Label = ({ children, dataTestName }: { children: ReactNode; dataTestName?: string }) => (
+  <div
+    className="overflow-hidden overflow-ellipsis whitespace-pre font-normal"
+    data-test-name={dataTestName}
+  >
+    {children}
+  </div>
 );

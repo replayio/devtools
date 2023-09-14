@@ -85,7 +85,11 @@ export function JumpToCodeButton({
       data-test-name="JumpToCode"
     >
       <div className="flex items-center space-x-1">
-        {isHovered && <span className="truncate text-white ">{jumpButtonText}</span>}
+        {isHovered && (
+          <span className="truncate text-white" data-test-name="JumpToCodeButtonLabel">
+            {jumpButtonText}
+          </span>
+        )}
         <Icon type={timeLabel} className="w-3.5 text-white" />
       </div>
     </div>
