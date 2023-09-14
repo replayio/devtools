@@ -21,6 +21,7 @@
   cursor: pointer;
   display: flex;
   align-items: center;
+  gap: 8px;
 }
 
 .settings-modal nav li .material-icons {
@@ -35,10 +36,7 @@
   color: var(--primary-accent);
 }
 
-.settings-modal nav li > :not(:first-child) {
-  margin-left: 8px;
-}
-
-.settings-modal nav li span {
-  vertical-align: bottom;
+.settings-modal nav li.selected .material-warning-icon,
+.settings-modal nav li .material-warning-icon {
+  color: var(--color-high-risk-setting);
 }

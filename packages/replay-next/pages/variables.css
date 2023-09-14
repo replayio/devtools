@@ -217,6 +217,7 @@
   --background-color-secondary-button: #f02d5e;
   --background-color-source-search: #25364e;
   --background-color-warning: #42381f;
+  --background-color-high-risk-setting: #310f21;
 
   --border-color-current-execution-point: #2563be;
   --border-color-error: #724543;
@@ -239,6 +240,7 @@
   --color-high-contrast-button: #ffffff;
   --color-warning: #fce2a1;
   --color-search-results: #d7d7db;
+  --color-high-risk-setting: #ff7190;
 
   --color-hit-counts-bar-0: #465062;
   --color-hit-counts-bar-1: #0284c3;
@@ -736,6 +738,7 @@
   --background-color-resize-handle: #cfcfcf;
   --background-color-source-search: #eaf3ff;
   --background-color-warning: #fffac8;
+  --background-color-high-risk-setting: #fbf2f5;
 
   --border-color-current-execution-point: #69a6ff;
   --border-color-error: #f4d8d8;
@@ -758,6 +761,7 @@
   --color-search-results: #47628b;
   --color-secondary-button: #ffffff;
   --color-warning: #6c5914;
+  --color-high-risk-setting: #df4c50;
 
   --color-hit-counts-bar-0: #f3f4f6;
   --color-hit-counts-bar-1: #c4e6f7;

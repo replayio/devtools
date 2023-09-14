@@ -39,6 +39,7 @@ export const config = {
   },
   backend_disableIncrementalSnapshots: {
     defaultValue: Boolean(false),
+    highRisk: Boolean(true),
     internalOnly: Boolean(true),
     description: "Disable using diffs between snapshots",
     label: "Disable using incremental snapshots",
@@ -46,6 +47,7 @@ export const config = {
   },
   backend_disableProtocolQueryCache: {
     defaultValue: Boolean(false),
+    highRisk: Boolean(true),
     internalOnly: Boolean(true),
     description: "Disable storage of previously generated response for protocol commands",
     label: "Disable query-level storage for protocol commands",
@@ -62,6 +64,7 @@ export const config = {
   backend_disableScanDataCache: {
     defaultValue: Boolean(false),
     description: "Do not cache the results of indexing the recording",
+    highRisk: Boolean(true),
     internalOnly: Boolean(true),
     label: "Disable scan data cache",
     legacyKey: "devtools.features.disableScanDataCache",
@@ -85,6 +88,7 @@ export const config = {
   },
   backend_newControllerOnRefresh: {
     defaultValue: Boolean(false),
+    highRisk: Boolean(true),
     label: "Get a new controller upon each page refresh",
     legacyKey: "devtools.features.newControllerOnRefresh",
   },
@@ -99,6 +103,7 @@ export const config = {
   backend_rerunRoutines: {
     defaultValue: Boolean(false),
     description: "Always re-run routines instead of using cached results",
+    highRisk: Boolean(true),
     internalOnly: Boolean(true),
     label: "Retry backend processing routines",
     legacyKey: "devtools.features.rerunRoutines",

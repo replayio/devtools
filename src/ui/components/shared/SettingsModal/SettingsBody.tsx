@@ -23,11 +23,15 @@ export default function SettingsBody<T extends string, P extends Record<string, 
   panelProps,
   selectedSetting,
 }: SettingsBodyProps<T, P>) {
-  const { title } = selectedSetting;
+  const { noTitle, title, titleComponent: TitleComponent } = selectedSetting;
 
   return (
     <SettingsBodyWrapper>
-      {selectedSetting.noTitle ? null : <SettingsHeader>{title}</SettingsHeader>}
+      {noTitle ? null : (
+        <SettingsHeader>
+          {TitleComponent ? <TitleComponent location="body" /> : title}
+        </SettingsHeader>
+      )}
       <selectedSetting.component {...panelProps} />
     </SettingsBodyWrapper>
   );

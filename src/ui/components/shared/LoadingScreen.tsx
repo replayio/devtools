@@ -2,6 +2,7 @@ import dynamic from "next/dynamic";
 import { ReactNode, useCallback, useEffect, useState } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
+import { useHighRiskSettingCount } from "shared/user-data/GraphQL/useHighRiskSettingCount";
 import { RecordingDocumentTitle } from "ui/components/RecordingDocumentTitle";
 import { getAwaitingSourcemaps, getUploading } from "ui/reducers/app";
 import { UIState } from "ui/state";
@@ -61,10 +62,17 @@ function LoadingScreen({
       </>
     );
 
+  const showHighRiskWarning = useHighRiskSettingCount() > 0;
+
   return (
     <LoadingScreenTemplate>
       <RecordingDocumentTitle />
       <div className={styles.messageWrapper}>{waitingForMessage}</div>
+      {showHighRiskWarning && (
+        <div className={styles.HighRiskWarning}>
+          You have advanced settings enabled that may negatively affect performance
+        </div>
+      )}
     </LoadingScreenTemplate>
   );
 }

@@ -15,7 +15,7 @@ interface SettingNavigationProps<T extends string, P extends Record<string, unkn
   settings: Settings<T, P>;
   selectedTab?: T;
   setSelectedTab: (title: T) => void;
-  title?: React.ReactNode;
+  title: React.ReactNode;
   hiddenTabs?: T[];
 }
 
@@ -24,15 +24,16 @@ function SettingNavigationItem<T extends string, P extends Record<string, unknow
   selectedTab,
   setSelectedTab,
 }: SettingNavigationItemProps<T, P>) {
-  const { title, icon } = setting;
+  const { icon, title, titleComponent: TitleComponent } = setting;
+
   const onClick = () => {
     setSelectedTab(title);
   };
 
   return (
     <li onClick={onClick} className={classnames({ selected: title === selectedTab })}>
-      <MaterialIcon iconSize="lg">{icon!}</MaterialIcon>
-      <span>{title}</span>
+      <MaterialIcon iconSize="lg">{icon}</MaterialIcon>
+      {TitleComponent ? <TitleComponent location="navigation" /> : title}
     </li>
   );
 }

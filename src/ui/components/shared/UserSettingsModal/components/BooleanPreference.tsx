@@ -31,9 +31,11 @@ export function BooleanPreference({
     return null;
   }
 
+  const showWarningIcon = preference.highRisk && checked;
+
   return (
     <label
-      className="grid cursor-pointer items-center transition-opacity"
+      className="flex cursor-pointer flex-col transition-opacity"
       style={{ gridTemplateColumns: "auto minmax(0, 1fr)", gap: "0 0.5rem" }}
       data-private
       htmlFor={preferencesKey}
@@ -45,13 +47,23 @@ export function BooleanPreference({
         }
       }}
     >
-      <Checkbox id={`BooleanPreference-${preferencesKey}`} checked={checked as boolean} />
-      <div>{label}</div>
-      {description ? (
-        <div className="mb-1 text-xs text-bodySubColor" style={{ gridColumnStart: "2" }}>
-          {description}
-        </div>
-      ) : null}
+      <div className="flex flex-row items-center gap-2">
+        <Checkbox id={`BooleanPreference-${preferencesKey}`} checked={checked as boolean} />
+        <div>{label}</div>
+      </div>
+
+      <div className="ml-6">
+        {description ? (
+          <div className="mb-1 text-xs text-bodySubColor" style={{ gridColumnStart: "2" }}>
+            {description}
+          </div>
+        ) : null}
+        {showWarningIcon && (
+          <div className="mb-1 text-xs text-highRiskColor">
+            <strong>Warning</strong>: this can significantly affect performance
+          </div>
+        )}
+      </div>
     </label>
   );
 }
