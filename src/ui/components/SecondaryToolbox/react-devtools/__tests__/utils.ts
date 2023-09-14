@@ -4,6 +4,10 @@ import { createRoot } from "react-dom/client";
 
 import { deconstructOperationsArray, reconstructOperationsArray } from "../rdtProcessing";
 
+if (typeof window.URL.revokeObjectURL !== "function") {
+  window.URL.revokeObjectURL = () => {};
+}
+
 export function assertContainsOperationType(operationsArrays: number[][], type: number) {
   for (let index = 0; index < operationsArrays.length; index++) {
     const operationsArray = operationsArrays[index];
