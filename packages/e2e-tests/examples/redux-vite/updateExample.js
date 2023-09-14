@@ -12,6 +12,7 @@ const exampleDist = path.join(publicExamplesFolder, "redux/dist");
 
 console.log("Copying build output to: ", exampleDist);
 
+fse.mkdirpSync(exampleDist);
 fse.emptyDirSync(exampleDist);
 fse.copySync(buildFolder, exampleDist);
 

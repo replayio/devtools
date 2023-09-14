@@ -1,4 +1,5 @@
-import replayPlaywright, { BrowserType, Page } from "@recordreplay/playwright";
+import playwright, { Page } from "@playwright/test";
+import { getExecutablePath } from "@replayio/playwright";
 import * as cli from "@replayio/replay";
 import findLast from "lodash/findLast";
 
@@ -8,15 +9,12 @@ export async function recordPlaywright(
   browserName: BrowserName,
   script: (page: Page) => Promise<void>
 ) {
-  let playwrightBrowsers = replayPlaywright;
-
-  if (!config.shouldRecordTest) {
-    // Playwright only gets installed if we install the `test` folder
-    playwrightBrowsers = require("playwright");
+  const browserEntry = playwright[browserName];
+  let executablePath: string | undefined = undefined;
+  if (config.shouldRecordTest) {
+    executablePath = config.browserPath || getExecutablePath(browserName)!;
   }
 
-  // @ts-ignore `browserName` key mismatch
-  const browserEntry = playwrightBrowsers[browserName] as BrowserType<any>;
   const browser = await browserEntry.launch({
     env: {
       ...process.env,
@@ -25,7 +23,7 @@ export async function recordPlaywright(
       // @ts-ignore
       RECORD_REPLAY_VERBOSE: config.driverPath ? "1" : undefined,
     },
-    executablePath: config.browserPath,
+    executablePath, //: config.browserPath,
     headless: config.headless,
   });
 
@@ -35,6 +33,8 @@ export async function recordPlaywright(
   const page = await context.newPage();
   try {
     return await script(page);
+  } catch (err) {
+    console.log("PLAYWRIGHT ERROR", err);
   } finally {
     await page.close();
     await context.close();
