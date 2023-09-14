@@ -3679,13 +3679,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/react-devtools-inline@npm:4.28.5":
-  version: 4.28.5
-  resolution: "@replayio/react-devtools-inline@npm:4.28.5"
+"@replayio/react-devtools-inline@npm:4.28.6":
+  version: 4.28.6
+  resolution: "@replayio/react-devtools-inline@npm:4.28.6"
   dependencies:
     source-map-js: ^0.6.2
     sourcemap-codec: ^1.4.8
-  checksum: 5c176f9dea450fd52890e6954822ddb5eef185ade41b86710cf563494f1fed243aa66f4e236ab3ece44b6acd4abcdfcde80351a27645c9d9377eb93aade17c65
+  checksum: 1b7ebbfd0c309792a3680ef783912dafa6ea3b2aafa98ffe89265818614ec7aa872772c13102fde8d64e568344dbdb0b3052e5584e97b9cc06b9a1aa6007fd49
   languageName: node
   linkType: hard
 
@@ -15072,7 +15072,7 @@ __metadata:
     "@reduxjs/toolkit": ^1.8.4
     "@replayio/overboard": ^0.4.1
     "@replayio/protocol": ^0.59.0
-    "@replayio/react-devtools-inline": 4.28.5
+    "@replayio/react-devtools-inline": 4.28.6
     "@replayio/replay": ^0.12.4
     "@sentry/react": ^7.9.0
     "@sentry/tracing": ^7.9.0
