@@ -3679,6 +3679,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@replayio/react-devtools-inline@npm:4.28.5":
+  version: 4.28.5
+  resolution: "@replayio/react-devtools-inline@npm:4.28.5"
+  dependencies:
+    source-map-js: ^0.6.2
+    sourcemap-codec: ^1.4.8
+  checksum: 5c176f9dea450fd52890e6954822ddb5eef185ade41b86710cf563494f1fed243aa66f4e236ab3ece44b6acd4abcdfcde80351a27645c9d9377eb93aade17c65
+  languageName: node
+  linkType: hard
+
 "@replayio/replay@npm:^0.12.4":
   version: 0.12.4
   resolution: "@replayio/replay@npm:0.12.4"
@@ -14706,16 +14716,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-devtools-inline@npm:4.28.0":
-  version: 4.28.0
-  resolution: "react-devtools-inline@npm:4.28.0"
-  dependencies:
-    source-map-js: ^0.6.2
-    sourcemap-codec: ^1.4.8
-  checksum: 6461df0a8c0ac5e4fec71e692cc5ef8ee3602c4185ed644f57ab1d4861ce3105bd53f4e244a992815177d8e6f72e67302d367e36b90684057f26ec1f701deb37
-  languageName: node
-  linkType: hard
-
 "react-devtools-inline_4_18_0@npm:react-devtools-inline@4.18.0":
   version: 4.18.0
   resolution: "react-devtools-inline@npm:4.18.0"
@@ -15072,6 +15072,7 @@ __metadata:
     "@reduxjs/toolkit": ^1.8.4
     "@replayio/overboard": ^0.4.1
     "@replayio/protocol": ^0.59.0
+    "@replayio/react-devtools-inline": 4.28.5
     "@replayio/replay": ^0.12.4
     "@sentry/react": ^7.9.0
     "@sentry/tracing": ^7.9.0
@@ -15184,7 +15185,6 @@ __metadata:
     react: 0.0.0-experimental-49f741046-20230305
     react-canvas-confetti: ^1.3.0
     react-circular-progressbar: ^2.0.4
-    react-devtools-inline: 4.28.0
     react-devtools-inline_4_18_0: "npm:react-devtools-inline@4.18.0"
     react-dom: 0.0.0-experimental-49f741046-20230305
     react-is: ^18.2.0
