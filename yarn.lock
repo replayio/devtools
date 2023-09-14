@@ -14706,23 +14706,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-devtools-inline@npm:4.24.7":
-  version: 4.24.7
-  resolution: "react-devtools-inline@npm:4.24.7"
+"react-devtools-inline@npm:4.28.0":
+  version: 4.28.0
+  resolution: "react-devtools-inline@npm:4.28.0"
   dependencies:
     source-map-js: ^0.6.2
     sourcemap-codec: ^1.4.8
-  checksum: 94c60252d78f4ce3544cd067f1d9d50b75c1c948f37f95484e24e5229705d02113398ce43ac95d7baa3cd2f7a4f1fa5094bd97bb0c0e52f74e0f33b2d43314f7
-  languageName: node
-  linkType: hard
-
-"react-devtools-inline@patch:react-devtools-inline@npm:4.24.7#.yarn/patches/react-devtools-inline-npm-4.24.7-9582a0f8d6.patch::locator=recordreplay-devtools%40workspace%3A.":
-  version: 4.24.7
-  resolution: "react-devtools-inline@patch:react-devtools-inline@npm%3A4.24.7#.yarn/patches/react-devtools-inline-npm-4.24.7-9582a0f8d6.patch::version=4.24.7&hash=303352&locator=recordreplay-devtools%40workspace%3A."
-  dependencies:
-    source-map-js: ^0.6.2
-    sourcemap-codec: ^1.4.8
-  checksum: d773307f4970396747a41d58d19f1c75ad393fe182bf34eab4b0d27e001bb97ac1b452a1a91322f3e91e44763e015e975287277f7fff742dc8cbb573787531fc
+  checksum: 6461df0a8c0ac5e4fec71e692cc5ef8ee3602c4185ed644f57ab1d4861ce3105bd53f4e244a992815177d8e6f72e67302d367e36b90684057f26ec1f701deb37
   languageName: node
   linkType: hard
 
@@ -15194,7 +15184,7 @@ __metadata:
     react: 0.0.0-experimental-49f741046-20230305
     react-canvas-confetti: ^1.3.0
     react-circular-progressbar: ^2.0.4
-    react-devtools-inline: 4.24.7
+    react-devtools-inline: 4.28.0
     react-devtools-inline_4_18_0: "npm:react-devtools-inline@4.18.0"
     react-dom: 0.0.0-experimental-49f741046-20230305
     react-is: ^18.2.0
