@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
+import { assert } from "protocol/utils";
 import { useNag } from "replay-next/src/hooks/useNag";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Nag } from "shared/graphql/types";
 import { DebouncedOrThrottledFunction } from "shared/utils/function";
-import { exitFocusMode, syncFocusedRegion, updateFocusWindowParam } from "ui/actions/timeline";
+import { exitFocusMode, requestFocusWindow } from "ui/actions/timeline";
 import {
-  getFocusWindowBackup,
+  getFocusWindow,
   getShowFocusModeControls,
   isMaximumFocusWindow,
   setFocusWindow,
@@ -25,13 +27,15 @@ export default function FocusModePopout({
     (dispatch: AppDispatch, begin: number, end: number) => void
   >;
 }) {
+  const replayClient = useContext(ReplayClientContext);
+
   const [isSavePending, setIsSavePending] = useState(false);
 
   const [, dismissUseFocusModeNag] = useNag(Nag.USE_FOCUS_MODE);
   const showFocusModeControls = useAppSelector(getShowFocusModeControls);
 
   const dispatch = useAppDispatch();
-  const focusWindowBackup = useAppSelector(getFocusWindowBackup);
+  const focusWindow = useAppSelector(getFocusWindow);
   const showMaxFocusWindowMessage = useAppSelector(isMaximumFocusWindow);
 
   const hideModal = () => dispatch(exitFocusMode());
@@ -43,8 +47,11 @@ export default function FocusModePopout({
       updateFocusWindowThrottled.cancel();
     }
 
-    await dispatch(setFocusWindow(focusWindowBackup));
-    await dispatch(syncFocusedRegion());
+    const currentFocusWindow = replayClient.getCurrentFocusWindow();
+    assert(currentFocusWindow);
+    dispatch(
+      setFocusWindow({ begin: currentFocusWindow.begin.time, end: currentFocusWindow.end.time })
+    );
 
     if (isImplicit) {
       trackEvent("timeline.discard_focus_implicit");
@@ -60,8 +67,13 @@ export default function FocusModePopout({
       await updateFocusWindowThrottled.flush();
     }
 
-    await dispatch(syncFocusedRegion());
-    await dispatch(updateFocusWindowParam());
+    assert(focusWindow);
+    await dispatch(
+      requestFocusWindow({
+        begin: { time: focusWindow.begin },
+        end: { time: focusWindow.end },
+      })
+    );
 
     trackEvent("timeline.save_focus");
 

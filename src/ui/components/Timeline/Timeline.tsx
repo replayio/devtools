@@ -4,7 +4,7 @@ import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { throttle } from "shared/utils/function";
 import {
   seek,
-  setFocusWindowImprecise,
+  setDisplayedFocusWindow,
   setTimelineToTime,
   stopPlayback,
 } from "ui/actions/timeline";
@@ -135,8 +135,8 @@ export default function Timeline() {
       <div
         className="timeline"
         data-test-id="Timeline"
-        data-test-focus-begin-time={rangeForDisplay?.begin?.time}
-        data-test-focus-end-time={rangeForDisplay?.end?.time}
+        data-test-focus-begin-time={rangeForDisplay?.begin}
+        data-test-focus-end-time={rangeForDisplay?.end}
       >
         <div className="commands">
           <PlayPauseButton />
@@ -181,5 +181,5 @@ export default function Timeline() {
 }
 
 const updateFocusWindowThrottled = throttle((dispatch: AppDispatch, begin: number, end: number) => {
-  return dispatch(setFocusWindowImprecise({ begin, end }));
+  return dispatch(setDisplayedFocusWindow({ begin, end }));
 }, 250);

@@ -1,7 +1,7 @@
 import React from "react";
 
 import { getFormattedTime } from "shared/utils/time";
-import { setFocusWindowImprecise } from "ui/actions/timeline";
+import { setDisplayedFocusWindow } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { getSecondsFromFormattedTime } from "ui/utils/timeline";
@@ -23,8 +23,8 @@ export default function FocusInputs() {
   const inputSize = formattedDuration.length;
 
   if (showFocusModeControls && focusWindow !== null) {
-    const formattedEndTime = getFormattedTime(focusWindow.end.time);
-    const formattedBeginTime = getFormattedTime(focusWindow.begin.time);
+    const formattedEndTime = getFormattedTime(focusWindow.end);
+    const formattedBeginTime = getFormattedTime(focusWindow.begin);
 
     const validateAndSaveBeginTime = async (pending: string) => {
       try {
@@ -32,11 +32,10 @@ export default function FocusInputs() {
         if (!isNaN(newBeginTime)) {
           // If the new end time is less than the current start time, the user is probably trying to move the whole range.
           // We can simplify this operation by resetting both the start and end time to the same value.
-          const newEndTime =
-            newBeginTime <= focusWindow.end.time ? focusWindow.end.time : newBeginTime;
+          const newEndTime = newBeginTime <= focusWindow.end ? focusWindow.end : newBeginTime;
 
           await dispatch(
-            setFocusWindowImprecise({
+            setDisplayedFocusWindow({
               begin: newBeginTime,
               end: newEndTime,
             })
@@ -52,11 +51,10 @@ export default function FocusInputs() {
         if (!isNaN(newEndTime)) {
           // If the new start time is greater than the current end time, the user is probably trying to move the whole range.
           // We can simplify this operation by resetting both the start and end time to the same value.
-          const newBeginTime =
-            newEndTime >= focusWindow.begin.time ? focusWindow.begin.time : newEndTime;
+          const newBeginTime = newEndTime >= focusWindow.begin ? focusWindow.begin : newEndTime;
 
           await dispatch(
-            setFocusWindowImprecise({
+            setDisplayedFocusWindow({
               begin: newBeginTime,
               end: newEndTime,
             })

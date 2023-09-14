@@ -18,16 +18,15 @@ import { createFrameComment } from "ui/actions/comments";
 import {
   MAX_FOCUS_REGION_DURATION,
   getUrlParams,
+  requestFocusWindow,
   seek,
-  setFocusWindowImprecise,
-  syncFocusedRegion,
 } from "ui/actions/timeline";
 import { useAppDispatch } from "ui/setup/hooks";
 
 import styles from "./ContextMenu.module.css";
 
 export default function useTimelineContextMenu() {
-  const { rangeForDisplay: focusWindow } = useContext(FocusContext);
+  const { range: focusWindow } = useContext(FocusContext);
   const { showCommentsPanel } = useContext(InspectorContext);
   const replayClient = useContext(ReplayClientContext);
   const { accessToken, duration, recordingId } = useContext(SessionContext);
@@ -72,16 +71,14 @@ export default function useTimelineContextMenu() {
     let end = focusEndTime ?? duration;
     end = Math.min(end, currentTime + MAX_FOCUS_REGION_DURATION);
 
-    await dispatch(setFocusWindowImprecise({ begin: currentTime, end }));
-    dispatch(syncFocusedRegion());
+    await dispatch(requestFocusWindow({ begin: { time: currentTime }, end: { time: end } }));
   };
 
   const setFocusEnd = async () => {
     let begin = focusBeginTime ?? 0;
     begin = Math.max(begin, currentTime - MAX_FOCUS_REGION_DURATION);
 
-    await dispatch(setFocusWindowImprecise({ begin, end: currentTime }));
-    dispatch(syncFocusedRegion());
+    await dispatch(requestFocusWindow({ begin: { time: begin }, end: { time: currentTime } }));
   };
 
   const shareReplay = async () => {

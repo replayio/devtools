@@ -181,7 +181,10 @@ function timeToFakeExecutionPoint(time: number): string {
 // This mock client is mostly useless by itself,
 // but its methods can be overridden individually (or observed/inspected) by test code.
 export function createMockReplayClient() {
-  let focusWindow: TimeStampedPointRange | null = null;
+  let focusWindow: TimeStampedPointRange = {
+    begin: { time: 0, point: "0" },
+    end: { time: 1_000, point: timeToFakeExecutionPoint(1_000) },
+  };
   const mockClient = mock<ReplayClientInterface>();
   mockClient.addEventListener.mockImplementation(() => {});
   mockClient.createPause.mockImplementation(async () => ({

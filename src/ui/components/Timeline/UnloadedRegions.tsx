@@ -5,7 +5,8 @@ import { FC } from "react";
 import useLoadedRegions from "replay-next/src/hooks/useLoadedRegions";
 import { getFocusWindow, getZoomRegion } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
-import { getVisiblePosition, overlap } from "ui/utils/timeline";
+import { TimeRange } from "ui/state/timeline";
+import { getVisiblePosition } from "ui/utils/timeline";
 
 export const UnloadedRegions: FC = () => {
   const loadedRegions = useLoadedRegions();
@@ -27,11 +28,10 @@ export const UnloadedRegions: FC = () => {
   let beginTime = begin.time;
   let endTime = end.time;
   if (focusWindow) {
-    const overlappingRegions = overlap([focusWindow], loadedRegions.loading);
-    if (overlappingRegions.length > 0) {
-      const focusedAndLoaded = overlappingRegions[0];
-      beginTime = focusedAndLoaded.begin.time;
-      endTime = focusedAndLoaded.end.time;
+    const overlappingRegion = getOverlappingRegion(focusWindow, loadedRegions.loading);
+    if (overlappingRegion) {
+      beginTime = overlappingRegion.begin;
+      endTime = overlappingRegion.end;
     }
   }
   const { endTime: recordingEndTime } = zoomRegion;
@@ -52,3 +52,22 @@ export const UnloadedRegions: FC = () => {
     </>
   );
 };
+
+function getOverlappingRegion(
+  focusWindow: TimeRange | null,
+  loadedRegions: TimeStampedPointRange[]
+) {
+  if (!focusWindow) {
+    const loadedRegion = loadedRegions[0];
+    return loadedRegion ? { begin: loadedRegion.begin.time, end: loadedRegion.end.time } : null;
+  }
+  for (const region of loadedRegions) {
+    if (region.end.time >= focusWindow.begin && region.begin.time <= focusWindow.end) {
+      return {
+        begin: Math.max(region.begin.time, focusWindow.begin),
+        end: Math.min(region.end.time, focusWindow.end),
+      };
+    }
+  }
+  return null;
+}
