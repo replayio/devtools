@@ -1,12 +1,8 @@
+import type { Store } from "@replayio/react-devtools-inline";
 import { createElement } from "react";
-import type { Store } from "react-devtools-inline";
 import { createRoot } from "react-dom/client";
 
 import { deconstructOperationsArray, reconstructOperationsArray } from "../rdtProcessing";
-
-if (typeof window.URL.revokeObjectURL !== "function") {
-  window.URL.revokeObjectURL = () => {};
-}
 
 export function assertContainsOperationType(operationsArrays: number[][], type: number) {
   for (let index = 0; index < operationsArrays.length; index++) {
@@ -51,6 +47,7 @@ export function reactDevToolsBeforeEach() {
 
   // Stub global APIs required by react-devtools-inline (or its dependencies)
   window.URL.createObjectURL = jest.fn();
+  window.URL.revokeObjectURL = jest.fn();
   window.Worker = class Worker {
     constructor() {}
     addEventListener() {}
@@ -70,12 +67,12 @@ export function reactDevToolsBeforeEach() {
     activate: activateBackend,
     createBridge: createBackendBridge,
     initialize: initializeBackend,
-  } = require("react-devtools-inline/backend");
+  } = require("@replayio/react-devtools-inline/backend");
   const {
     initialize: createDevTools,
     createBridge: createFrontendBridge,
     createStore,
-  } = require("react-devtools-inline/frontend");
+  } = require("@replayio/react-devtools-inline/frontend");
 
   const listeners: Set<Function> = new Set();
   const wall = {

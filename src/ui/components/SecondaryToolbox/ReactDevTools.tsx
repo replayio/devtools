@@ -1,4 +1,5 @@
 import { ExecutionPoint, NodeBounds, ObjectId, Object as ProtocolObject } from "@replayio/protocol";
+import type { SerializedElement, Store, Wall } from "@replayio/react-devtools-inline/frontend";
 import React, {
   useContext,
   useEffect,
@@ -8,7 +9,6 @@ import React, {
   useRef,
   useState,
 } from "react";
-import type { SerializedElement, Store, Wall } from "react-devtools-inline/frontend";
 import { useImperativeCacheValue } from "suspense";
 
 import { selectLocation } from "devtools/client/debugger/src/actions/sources";
@@ -52,7 +52,7 @@ import { sendTelemetryEvent, trackEvent } from "ui/utils/telemetry";
 import { injectReactDevtoolsBackend } from "./react-devtools/injectReactDevtoolsBackend";
 import { generateTreeResetOpsForPoint } from "./react-devtools/rdtProcessing";
 
-type ReactDevToolsInlineModule = typeof import("react-devtools-inline/frontend");
+type ReactDevToolsInlineModule = typeof import("@replayio/react-devtools-inline/frontend");
 
 type NodeOptsWithoutBounds = Omit<NodePickerOpts, "onCheckNodeBounds">;
 
@@ -453,7 +453,7 @@ async function loadReactDevToolsInlineModuleFromProtocol(
   // We should only load the DevTools module once we know which protocol version it requires.
   // If we don't have a version yet, it probably means we're too early in the Replay session.
   if (backendBridgeProtocolVersion >= 2) {
-    stateUpdaterCallback(await import("react-devtools-inline/frontend"));
+    stateUpdaterCallback(await import("@replayio/react-devtools-inline/frontend"));
   } else if (backendBridgeProtocolVersion === 1) {
     stateUpdaterCallback(await import("react-devtools-inline_4_18_0/frontend"));
   }
