@@ -1455,6 +1455,69 @@ function ReactRenderQueuedSuspends({ entry }: RDDEntryProps) {
   return <b>{queuedRenders.length > 0 ? queuedRenders.length : "None"}</b>;
 }
 
+function ReactRenderDetailsSuspends({ entry }: RDDEntryProps) {
+  const replayClient = useContext(ReplayClientContext);
+  const { range: focusRange } = useContext(FocusContext);
+
+  const { contextMenu: renderStartContextMenu, onContextMenu: onRenderStartContextMenu } =
+    useDispatchContextMenu(entry.dispatchStart);
+  const { contextMenu: renderCommitContextMenu, onContextMenu: onRenderEndContextMenu } =
+    useDispatchContextMenu(entry.afterNotifications);
+
+  const allRenderDataInRange = reactRendersIntervalCache.read(
+    BigInt(focusRange!.begin.point),
+    BigInt(focusRange!.end.point),
+    replayClient
+  );
+
+  // TODO Looking for the next render after the dispatch is a horrible heuristic,
+  // but we'll go with it for now to prove the concept.
+  const nextRender = allRenderDataInRange.findIndex(
+    r =>
+      r.type === "sync_started" &&
+      isExecutionPointsGreaterThan(r.point.point, entry.afterNotifications.point)
+  );
+
+  if (nextRender === -1) {
+    console.log("No potential render found", entry.afterNotifications, allRenderDataInRange);
+    return <i>None</i>;
+  }
+
+  const nextRenderStart = allRenderDataInRange[nextRender];
+  const nextRenderCommitted = allRenderDataInRange[nextRender + 1];
+  const isValidRenderPair =
+    nextRenderStart.type === "sync_started" && nextRenderCommitted.type === "render_committed";
+  if (!isValidRenderPair) {
+    console.log(
+      "No valid render pair found",
+      entry.afterNotifications,
+      nextRender,
+      nextRenderStart,
+      nextRenderCommitted,
+      allRenderDataInRange
+    );
+    return <i>None</i>;
+  }
+
+  return (
+    <ul className="ml-2 list-inside list-disc">
+      <li>
+        Time:{" "}
+        <span onContextMenu={onRenderStartContextMenu}>
+          {formatTimeMs(nextRenderStart.point.time)}
+        </span>{" "}
+        🡒{" "}
+        <span onContextMenu={onRenderEndContextMenu}>
+          {formatTimeMs(nextRenderCommitted.point.time)}
+        </span>
+      </li>
+      <li>Duration: {formatTimeMs(nextRenderCommitted.point.time - nextRenderStart.point.time)}</li>
+      {renderStartContextMenu}
+      {renderCommitContextMenu}
+    </ul>
+  );
+}
+
 const formatTimeMs = (time: number) => {
   return `${time.toFixed(1)}ms`;
 };
@@ -1527,7 +1590,13 @@ function SelectedReduxDispatchDetails({ entry }: RDDEntryProps) {
         <li>
           Component renders queued:{" "}
           <Suspense fallback={<i>Loading...</i>}>
-            <ReactRenderQueuedSuspends entry={entry} />
+            <ReactRenderQueuedSuspends entry={entry} key={entry.dispatchStart.point} />
+          </Suspense>
+        </li>
+        <li>
+          Probable render details:{" "}
+          <Suspense fallback={<i>Loading...</i>}>
+            <ReactRenderDetailsSuspends entry={entry} key={entry.dispatchStart.point} />
           </Suspense>
         </li>
       </ul>
