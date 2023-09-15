@@ -80,7 +80,7 @@ export function cachePauseData(
   stack?: CallStack
 ) {
   if (pauseData.objects) {
-    preCacheObjects(pauseId, pauseData.objects);
+    preCacheObjects(sources, pauseId, pauseData.objects);
   }
   if (stack) {
     const frames = sortFramesAndUpdateLocations(sources, pauseData.frames || [], stack);
