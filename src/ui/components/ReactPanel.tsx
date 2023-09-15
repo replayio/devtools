@@ -47,6 +47,7 @@ import {
 } from "replay-next/src/suspense/SourcesCache";
 import { Source, sourcesByPartialUrlCache } from "replay-next/src/suspense/SourcesCache";
 import { getSourceToDisplayForUrl } from "replay-next/src/utils/sources";
+import { compareExecutionPoints } from "replay-next/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
 import { UIThunkAction } from "ui/actions";
@@ -317,13 +318,11 @@ type ReactUpdateScheduled = {
 
 type ReactSyncUpdatedStarted = {
   type: "sync_started";
-  point: PointDescription;
-};
+} & FormattedPointStack;
 
 type ReactRenderCommitted = {
   type: "render_committed";
-  point: PointDescription;
-};
+} & FormattedPointStack;
 
 type ReactRenderEntry = ReactUpdateScheduled | ReactSyncUpdatedStarted | ReactRenderCommitted;
 
@@ -373,8 +372,40 @@ export const reactRendersIntervalCache = createFocusIntervalCacheForExecutionPoi
       })
     );
 
+    const renderRootSyncEntries: ReactSyncUpdatedStarted[] = await Promise.all(
+      renderRootSyncHits.map(async hit => {
+        const mostlyFormattedPointStack = await formatPointStackForPoint(replayClient, hit);
+
+        return {
+          type: "sync_started",
+          ...mostlyFormattedPointStack,
+        };
+      })
+    );
+
+    const onCommitRootEntries: ReactRenderCommitted[] = await Promise.all(
+      onCommitRootHits.map(async hit => {
+        const mostlyFormattedPointStack = await formatPointStackForPoint(replayClient, hit);
+
+        return {
+          type: "render_committed",
+          ...mostlyFormattedPointStack,
+        };
+      })
+    );
+
     console.log("Schedule update entries: ", scheduleUpdateEntries);
-    return scheduleUpdateEntries;
+    console.log("Sync Root entries: ", renderRootSyncEntries);
+    console.log("On commit root entries: ", onCommitRootEntries);
+
+    const allEntries: ReactRenderEntry[] = [
+      ...scheduleUpdateEntries,
+      ...renderRootSyncEntries,
+      ...onCommitRootEntries,
+    ];
+
+    allEntries.sort((a, b) => compareExecutionPoints(a.point.point, b.point.point));
+    return allEntries;
   },
 });
 
@@ -618,7 +649,7 @@ function ReactQueuedRenderListItem({
   const dispatch = useAppDispatch();
   const renderDetails = data.entries[index];
   const { executionPoint, onSeek, currentTime } = data;
-  const { point, frame, functionName } = renderDetails;
+  const { point, frame, functionName, resultPoint } = renderDetails;
   const isPaused = point.time === currentTime && executionPoint === point.point;
   const [jumpToCodeStatus] = useState<JumpToCodeStatus>("not_checked");
 
@@ -630,14 +661,19 @@ function ReactQueuedRenderListItem({
     e.stopPropagation();
 
     dispatch(
-      jumpToTimeAndLocationForQueuedRender(point, frame?.executionLocation, "timeOnly", onSeek)
+      jumpToTimeAndLocationForQueuedRender(
+        resultPoint,
+        frame?.executionLocation,
+        "timeOnly",
+        onSeek
+      )
     );
   };
 
   const onClickJumpToCode = async () => {
     dispatch(
       jumpToTimeAndLocationForQueuedRender(
-        point,
+        resultPoint,
         frame?.executionLocation,
         "timeAndLocation",
         onSeek
@@ -698,14 +734,14 @@ export function ReactPanelSuspends() {
   const { range: focusRange } = useContext(FocusContext);
   const replayClient = useContext(ReplayClientContext);
 
-  const reactRenderEntries = reactRendersIntervalCache.read(
+  const allReactRenderEntries = reactRendersIntervalCache.read(
     BigInt(focusRange!.begin.point),
     BigInt(focusRange!.end.point),
     replayClient
   );
 
   const itemData: QueuedRenderItemData = useMemo(() => {
-    const allScheduledEntries = reactRenderEntries.filter(
+    const allScheduledEntries = allReactRenderEntries.filter(
       (entry): entry is ReactUpdateScheduled => entry.type === "scheduled"
     );
     const onlyUserEntries = allScheduledEntries.filter(entry => entry.cause === "user");
@@ -719,7 +755,7 @@ export function ReactPanelSuspends() {
       entries: onlyUserEntries,
       onSeek,
     };
-  }, [reactRenderEntries, dispatch, currentTime, executionPoint]);
+  }, [allReactRenderEntries, dispatch, currentTime, executionPoint]);
 
   // TODO Add the red "current time" line from `Events.tsx`
 
