@@ -52,9 +52,11 @@ export const ReduxDevToolsPanel = () => {
 
   const annotation = reduxAnnotations.find(ann => ann.point === selectedPoint)!;
 
-  const firstAnnotationInTheFuture = reduxAnnotations.find(currAnnotation =>
-    isExecutionPointsGreaterThan(currAnnotation.point, annotation.point)
-  );
+  const firstAnnotationInTheFuture =
+    annotation &&
+    reduxAnnotations.find(currAnnotation =>
+      isExecutionPointsGreaterThan(currAnnotation.point, annotation.point)
+    );
 
   return (
     <div
