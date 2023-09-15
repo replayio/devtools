@@ -78,6 +78,8 @@ export const IGNORABLE_PARTIAL_SOURCE_URLS = [
   "webpack:////home/circleci/codesandbox-client",
   // or Cypress
   "__cypress/runner/",
+  // or probably Playwright
+  "SOURCE ",
 ];
 
 export const MORE_IGNORABLE_PARTIAL_URLS = IGNORABLE_PARTIAL_SOURCE_URLS.concat(

@@ -579,6 +579,9 @@ export async function formatPointStackForPoint(
 
   const filteredPauseFrames = formattedFrames.filter(frame => {
     const { source } = frame;
+    if (!source.url) {
+      return false;
+    }
     // Filter out everything in `node_modules`, so we have just app code left
     // TODO There may be times when we care about renders queued by lib code
     // TODO See about just filtering out React instead?
