@@ -721,8 +721,6 @@ export function ReactPanelSuspends() {
     };
   }, [reactRenderEntries, dispatch, currentTime, executionPoint]);
 
-  console.log("Item data: ", itemData);
-
   // TODO Add the red "current time" line from `Events.tsx`
 
   /*
@@ -748,7 +746,6 @@ export function ReactPanelSuspends() {
     <div style={{ flex: "1 1 auto", height: "100%" }}>
       <AutoSizer disableWidth>
         {({ height }: { height: number }) => {
-          console.log("Autosizer children()");
           return (
             <List
               children={ReactQueuedRenderListItem}

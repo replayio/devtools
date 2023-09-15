@@ -86,7 +86,7 @@ import {
   locationToString,
 } from "ui/actions/eventListeners/eventListenerUtils";
 import { findFunctionOutlineForLocation } from "ui/actions/eventListeners/jumpToCode";
-import { setFocusWindowBegin, setFocusWindowEnd } from "ui/actions/timeline";
+import { requestFocusWindow } from "ui/actions/timeline";
 import { seek } from "ui/actions/timeline";
 import { JumpToCodeButton, JumpToCodeStatus } from "ui/components/shared/JumpToCodeButton";
 import { getPreferredLocation } from "ui/reducers/sources";
@@ -1461,20 +1461,16 @@ function useDispatchContextMenu(point: TimeStampedPoint) {
 
   const setFocusEnd = () => {
     dispatch(
-      setFocusWindowEnd({
-        executionPoint: point.point,
-        time: point.time,
-        sync: true,
+      requestFocusWindow({
+        end: point,
       })
     );
   };
 
   const setFocusStart = () => {
     dispatch(
-      setFocusWindowBegin({
-        executionPoint: point.point,
-        time: point.time,
-        sync: true,
+      requestFocusWindow({
+        begin: point,
       })
     );
   };
