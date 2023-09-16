@@ -1,4 +1,4 @@
-import type { RendererInterface } from "react-devtools-inline";
+import type { RendererInterface } from "@replayio/react-devtools-inline";
 
 import { pauseEvaluationsCache } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientInterface } from "shared/client/types";

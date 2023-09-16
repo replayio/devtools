@@ -1,5 +1,5 @@
+import type { Store } from "@replayio/react-devtools-inline";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
-import type { Store } from "react-devtools-inline";
 import type { Root } from "react-dom/client";
 
 import {
