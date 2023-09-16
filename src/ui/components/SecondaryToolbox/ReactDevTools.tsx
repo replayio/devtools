@@ -355,6 +355,7 @@ class ReplayWall implements Wall {
           res.returned.object,
           "canOverflow"
         );
+
         return componentFunctionPreview;
       }
     }

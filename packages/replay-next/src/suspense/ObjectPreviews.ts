@@ -6,6 +6,7 @@ import {
   PauseId,
   Property,
   Value as ProtocolValue,
+  SourceId,
 } from "@replayio/protocol";
 import * as Sentry from "@sentry/react";
 import { Cache, createCache } from "suspense";
@@ -14,8 +15,8 @@ import { assert } from "protocol/utils";
 
 import { ReplayClientInterface } from "../../../shared/client/types";
 import { Value as ClientValue, protocolValueToClientValue } from "../utils/protocol";
-import { cachePauseData } from "./PauseCache";
-import { sourcesByIdCache } from "./SourcesCache";
+import { cachePauseData, updateMappedLocation } from "./PauseCache";
+import { Source, sourcesByIdCache } from "./SourcesCache";
 
 export const objectCache: Cache<
   [
@@ -94,11 +95,19 @@ export function getCachedObject(pauseId: PauseId, objectId: ObjectId): Object | 
   );
 }
 
-export function preCacheObjects(pauseId: PauseId, objects: Object[]): void {
-  objects.forEach(object => preCacheObject(pauseId, object));
+export function preCacheObjects(
+  sources: Map<SourceId, Source>,
+  pauseId: PauseId,
+  objects: Object[]
+): void {
+  objects.forEach(object => preCacheObject(sources, pauseId, object));
 }
 
-export function preCacheObject(pauseId: PauseId, object: Object): void {
+export function preCacheObject(
+  sources: Map<SourceId, Source>,
+  pauseId: PauseId,
+  object: Object
+): void {
   const { objectId } = object;
 
   // Always cache basic object data
@@ -110,6 +119,10 @@ export function preCacheObject(pauseId: PauseId, object: Object): void {
 
     if (!object.preview.overflow) {
       objectCache.cache(object, null as any, pauseId, objectId, "full");
+    }
+
+    if (object.preview.functionLocation) {
+      updateMappedLocation(sources, object.preview.functionLocation);
     }
   }
 }
