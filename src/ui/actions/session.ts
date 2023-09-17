@@ -205,7 +205,15 @@ export function createSocket(
         ),
         disableProtocolQueryCache: userData.get("backend_disableProtocolQueryCache"),
       };
-      if (userData.get("backend_newControllerOnRefresh")) {
+
+      const restartParam = new URL(window.location.href).searchParams.get("restart") || undefined;
+      if (restartParam) {
+        const url = new URL(window.location.href);
+        url.searchParams.delete("restart");
+        window.history.replaceState({}, "", url.toString());
+      }
+
+      if (restartParam || userData.get("backend_newControllerOnRefresh")) {
         experimentalSettings.controllerKey = String(Date.now());
       }
 

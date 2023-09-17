@@ -47,7 +47,8 @@ export type CommandKey =
   | "jump_to_next_pause"
   | "jump_to_previous_pause"
   | "toggle_protocol_panel"
-  | "toggle_protocol_timeline";
+  | "toggle_protocol_timeline"
+  | "restart_session";
 
 const COMMANDS: readonly Command[] = [
   { key: "open_console", label: "Open Console" },
@@ -76,6 +77,7 @@ const COMMANDS: readonly Command[] = [
   { key: "pin_to_bottom", label: "Pin Toolbox To Bottom" },
   { key: "pin_to_left", label: "Pin Toolbox To Left" },
   { key: "pin_to_bottom_right", label: "Pin Toolbox To Bottom Right" },
+  { key: "restart_session", label: "Restart debugging session" },
   { key: "toggle_protocol_panel", label: "Toggle Protocol Panel", internalOnly: true },
   { key: "toggle_protocol_timeline", label: "Toggle Protocol timeline", internalOnly: true },
   // { key: "copy_points", label: "Copy Print Statement Settings to Clipboard" },
