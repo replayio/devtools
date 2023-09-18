@@ -5,9 +5,9 @@ __metadata:
   version: 6
   cacheKey: 8
 
-"@acemarke/react-prod-sourcemaps@npm:0.0.4":
-  version: 0.0.4
-  resolution: "@acemarke/react-prod-sourcemaps@npm:0.0.4"
+"@acemarke/react-prod-sourcemaps@npm:0.1.0":
+  version: 0.1.0
+  resolution: "@acemarke/react-prod-sourcemaps@npm:0.1.0"
   dependencies:
     "@ampproject/remapping": ^2.2.1
     "@jridgewell/resolve-uri": ^3.1.1
@@ -16,8 +16,8 @@ __metadata:
     unplugin: ^1.4.0
     yargs: ^17.7.2
   bin:
-    react-prod-sourcemaps: lib/main.js
-  checksum: 728176091314834d1a1b92db0c7e7529dc6b4a0e84089e32880db218132fdcb9a775282ad26bd0ec9629e8cf5d8739bd0a9db33b52def58d021d8b7cc0d96d0d
+    react-prod-sourcemaps: lib/index.cjs
+  checksum: 9d293e64ce57584eca43bce8d89d880f2a5d0da000575d790036421ffba5d1680d754281943b67d67c86d2f1aaa40f3181554b5f1dd7181154f90cc9d89ba172
   languageName: node
   linkType: hard
 
@@ -15215,7 +15215,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "recordreplay-devtools@workspace:."
   dependencies:
-    "@acemarke/react-prod-sourcemaps": 0.0.4
+    "@acemarke/react-prod-sourcemaps": 0.1.0
     "@apollo/client": ^3.5.10
     "@auth0/auth0-react": 1.2.0
     "@babel/core": ^7.17.8

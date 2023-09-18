@@ -20,7 +20,7 @@
     "gql": "yarn gql:schema && yarn gql:gen"
   },
   "dependencies": {
-    "@acemarke/react-prod-sourcemaps": "0.0.4",
+    "@acemarke/react-prod-sourcemaps": "0.1.0",
     "@apollo/client": "^3.5.10",
     "@auth0/auth0-react": "1.2.0",
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
