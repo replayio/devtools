@@ -7,9 +7,11 @@ export default defineConfig({
   plugins: [
     react(),
     federation({
-      name: "host-app",
-      remotes: {
-        react17: "./public/react17/assets/react17.js",
+      name: "react17",
+      filename: "react17.js",
+
+      exposes: {
+        "./appInjector": "./src/appInjector",
       },
     }),
   ],

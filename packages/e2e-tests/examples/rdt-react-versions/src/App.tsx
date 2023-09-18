@@ -1,4 +1,4 @@
-import type { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 // this example contains some delays for now to work around RecordReplay/gecko-dev#349
 function waitForTime(ms: number) {
@@ -14,13 +14,9 @@ interface Item {
   text: string;
 }
 
-interface AppProps {
-  version: string;
-  useState: typeof useState;
-  useEffect: typeof useEffect;
-}
+const version = "18.2.0";
 
-function App({ version = "unknown", useState, useEffect }: AppProps) {
+function App() {
   const [list, setList] = useState<Item[]>([]);
 
   useEffect(() => {
