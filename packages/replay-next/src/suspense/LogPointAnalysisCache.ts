@@ -121,6 +121,9 @@ export function canRunLocalAnalysis(code: string, condition: string | null): boo
     if (types && types.length > 0) {
       const type = types[0];
       switch (type) {
+        case "propertyName": {
+          return false;
+        }
         case "variableName":
         case "variableName2": {
           switch (value) {
