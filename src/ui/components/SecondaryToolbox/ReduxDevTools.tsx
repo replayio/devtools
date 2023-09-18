@@ -6,6 +6,7 @@ import { useImperativeCacheValue } from "suspense";
 
 import IndeterminateLoader from "replay-next/components/IndeterminateLoader";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
+import { isExecutionPointsGreaterThan } from "replay-next/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { isPointInRegion } from "shared/utils/time";
 import { UIThunkAction } from "ui/actions";
@@ -45,9 +46,11 @@ export const ReduxDevToolsPanel = () => {
 
   const annotation = reduxAnnotations.find(ann => ann.point === selectedPoint)!;
 
-  const firstAnnotationInTheFuture = reduxAnnotations.find(
-    annotation => annotation.time >= currentTime
-  );
+  const firstAnnotationInTheFuture =
+    annotation &&
+    reduxAnnotations.find(currAnnotation =>
+      isExecutionPointsGreaterThan(currAnnotation.point, annotation.point)
+    );
 
   return (
     <div
