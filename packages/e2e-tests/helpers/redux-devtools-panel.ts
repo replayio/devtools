@@ -8,17 +8,14 @@ export function getReduxActions(page: Page) {
 
 export async function assertTabValue(page: Page, tab: string, expectedValue: string) {
   await page.locator(`[data-test-id="ReduxTabsContainer"] div:has-text("${tab}")`).click();
-  const inspector = page.locator('[data-test-id="ReduxDevToolsContents"] > *');
 
+  const inspector = page.locator('[data-test-id="ReduxDevToolsContents"]');
   await inspector.waitFor();
 
   const currentPointContents = page.locator(`[data-test-id="ReduxDevtools"]`);
-
-  await waitFor(async () =>
-    expect(await currentPointContents.getAttribute("data-contents-pending")).toBe("false")
+  await waitFor(() =>
+    expect(currentPointContents.getByTestId("indeterminate-loader")).toHaveCount(0)
   );
-
-  await waitFor(async () => expect(await inspector.innerText()).not.toBe("Loading…"));
 
   expect(await inspector.innerText()).toBe(expectedValue);
 }

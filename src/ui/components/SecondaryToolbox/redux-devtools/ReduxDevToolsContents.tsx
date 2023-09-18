@@ -6,9 +6,10 @@ import {
   Value as ProtocolValue,
 } from "@replayio/protocol";
 import classnames from "classnames";
-import React, { Suspense, useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { Suspense, useContext, useState } from "react";
 
 import NewFrames from "devtools/client/debugger/src/components/SecondaryPanes/Frames/NewFrames";
+import IndeterminateLoader from "replay-next/components/IndeterminateLoader";
 import Inspector from "replay-next/components/inspector";
 import PropertiesRenderer from "replay-next/components/inspector/PropertiesRenderer";
 import Loader from "replay-next/components/Loader";
@@ -144,75 +145,7 @@ type SelectedContentsTab = "action" | "state" | "diff" | "trace";
 // Figure out a way to present that info in this UI - a dropdown next to the buttons?
 
 export function ReduxDevToolsContents({ point, time }: RDTCProps) {
-  const replayClient = useContext(ReplayClientContext);
-  let reduxValues: ReduxActionStateValues | null = null;
-  let diff: Record<string, unknown> | null = null;
-  let jumpLocation: PointDescription | null = null;
   const [selectedTab, setSelectedTab] = useState<SelectedContentsTab>("action");
-  const sourcesState = useAppSelector(state => state.sources);
-
-  switch (selectedTab) {
-    case "action":
-    case "state": {
-      const res = actionStateValuesCache.read(replayClient, point, time);
-      reduxValues = res ?? null;
-      break;
-    }
-    case "diff": {
-      const diffRes = diffCache.read(replayClient, point, time);
-      diff = diffRes ?? null;
-      break;
-    }
-    case "trace": {
-      const jumpLocationRes = reduxDispatchJumpLocationCache.read(
-        replayClient,
-        point,
-        time,
-        sourcesState
-      );
-      jumpLocation = jumpLocationRes ?? null;
-      break;
-    }
-  }
-
-  const [pauseId, actionValue, stateValue] = reduxValues ?? [];
-
-  let contents: React.ReactNode;
-
-  switch (selectedTab) {
-    case "action": {
-      contents = actionValue && (
-        <RDTInspector key={point + "action"} pauseId={pauseId!} protocolValue={actionValue} />
-      );
-
-      break;
-    }
-    case "state": {
-      contents = stateValue && (
-        <RDTInspector key={point + "state"} pauseId={pauseId!} protocolValue={stateValue} />
-      );
-      break;
-    }
-    case "diff": {
-      contents = diff && (
-        <JSONDiff
-          delta={diff}
-          base16Theme={replayBase16Theme}
-          styling={() => ({})}
-          invertTheme={false}
-          isWideLayout={false}
-          dataTypeKey=""
-          labelRenderer={labelRenderer}
-        />
-      );
-      break;
-    }
-    case "trace": {
-      contents = jumpLocation && (
-        <NewFrames panel="debugger" point={jumpLocation.point} time={jumpLocation.time} />
-      );
-    }
-  }
 
   return (
     <div className="flex h-full flex-col overflow-auto">
@@ -259,8 +192,86 @@ export function ReduxDevToolsContents({ point, time }: RDTCProps) {
       </div>
 
       <div className="h-full overflow-auto font-mono" data-test-id="ReduxDevToolsContents">
-        {contents}
+        <Suspense fallback={<IndeterminateLoader />}>
+          <TabContents selectedTab={selectedTab} point={point} time={time} />
+        </Suspense>
       </div>
     </div>
   );
+}
+
+function TabContents({
+  selectedTab,
+  point,
+  time,
+}: RDTCProps & { selectedTab: SelectedContentsTab }) {
+  const replayClient = useContext(ReplayClientContext);
+  let reduxValues: ReduxActionStateValues | null = null;
+  let diff: Record<string, unknown> | null = null;
+  let jumpLocation: PointDescription | null = null;
+  const sourcesState = useAppSelector(state => state.sources);
+
+  switch (selectedTab) {
+    case "action":
+    case "state": {
+      const res = actionStateValuesCache.read(replayClient, point, time);
+      reduxValues = res ?? null;
+      break;
+    }
+    case "diff": {
+      const diffRes = diffCache.read(replayClient, point, time);
+      diff = diffRes ?? null;
+      break;
+    }
+    case "trace": {
+      const jumpLocationRes = reduxDispatchJumpLocationCache.read(
+        replayClient,
+        point,
+        time,
+        sourcesState
+      );
+      jumpLocation = jumpLocationRes ?? null;
+      break;
+    }
+  }
+
+  const [pauseId, actionValue, stateValue] = reduxValues ?? [];
+  let contents: React.ReactNode;
+
+  switch (selectedTab) {
+    case "action": {
+      contents = actionValue && (
+        <RDTInspector key={point + "action"} pauseId={pauseId!} protocolValue={actionValue} />
+      );
+      break;
+    }
+    case "state": {
+      contents = stateValue && (
+        <RDTInspector key={point + "state"} pauseId={pauseId!} protocolValue={stateValue} />
+      );
+      break;
+    }
+    case "diff": {
+      contents = diff && (
+        <JSONDiff
+          delta={diff}
+          base16Theme={replayBase16Theme}
+          styling={() => ({})}
+          invertTheme={false}
+          isWideLayout={false}
+          dataTypeKey=""
+          labelRenderer={labelRenderer}
+        />
+      );
+      break;
+    }
+    case "trace": {
+      contents = jumpLocation && (
+        <NewFrames panel="debugger" point={jumpLocation.point} time={jumpLocation.time} />
+      );
+      break;
+    }
+  }
+
+  return contents ?? null;
 }

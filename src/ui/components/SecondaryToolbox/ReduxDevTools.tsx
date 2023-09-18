@@ -1,9 +1,10 @@
 import { ExecutionPoint } from "@replayio/protocol";
 import classnames from "classnames";
-import React, { Suspense, useContext, useMemo, useState, useTransition } from "react";
+import React, { Suspense, useContext, useMemo, useState } from "react";
 import { PanelGroup, PanelResizeHandle, Panel as ResizablePanel } from "react-resizable-panels";
 import { useImperativeCacheValue } from "suspense";
 
+import IndeterminateLoader from "replay-next/components/IndeterminateLoader";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { isPointInRegion } from "shared/utils/time";
@@ -21,17 +22,10 @@ import { ReduxDevToolsContents } from "./redux-devtools/ReduxDevToolsContents";
 import styles from "./ReduxDevTools.module.css";
 
 export const ReduxDevToolsPanel = () => {
-  const [isPending, startTransition] = useTransition();
   const client = useContext(ReplayClientContext);
   const [selectedPoint, setSelectedPoint] = useState<ExecutionPoint | null>(null);
   const { range: focusWindow } = useContext(FocusContext);
   const [searchValue, setSearchValue] = useState("");
-
-  const setSelectedTransition = (point: ExecutionPoint | null) => {
-    startTransition(() => {
-      setSelectedPoint(point);
-    });
-  };
 
   const { status: annotationsStatus, value: parsedAnnotations } = useImperativeCacheValue(
     reduxDevToolsAnnotationsCache,
@@ -59,21 +53,24 @@ export const ReduxDevToolsPanel = () => {
     <div
       className={classnames("flex min-h-full bg-bodyBgcolor text-xs", styles.actions)}
       data-test-id="ReduxDevtools"
-      data-contents-pending={isPending}
     >
       <PanelGroup autoSaveId="ReduxDevTools" direction="horizontal">
         <ResizablePanel collapsible>
           <ActionFilter searchValue={searchValue} onSearch={setSearchValue} />
           <div role="list" className={styles.list}>
-            {reduxAnnotations.map(annotation => (
-              <ActionItem
-                key={annotation.point}
-                annotation={annotation}
-                selectedPoint={selectedPoint}
-                setSelectedPoint={setSelectedTransition}
-                firstAnnotationInTheFuture={firstAnnotationInTheFuture === annotation}
-              />
-            ))}
+            {annotationsStatus === "pending" ? (
+              <IndeterminateLoader />
+            ) : (
+              reduxAnnotations.map(annotation => (
+                <ActionItem
+                  key={annotation.point}
+                  annotation={annotation}
+                  selectedPoint={selectedPoint}
+                  setSelectedPoint={setSelectedPoint}
+                  firstAnnotationInTheFuture={firstAnnotationInTheFuture === annotation}
+                />
+              ))
+            )}
           </div>
         </ResizablePanel>
         <PanelResizeHandle className="h-full w-1 bg-chrome" />
