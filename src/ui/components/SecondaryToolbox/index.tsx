@@ -15,7 +15,7 @@ import { getSelectedPanel, getToolboxLayout } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { SecondaryPanelName } from "ui/state/layout";
 import {
-  REACT_ANNOTATIONS_KIND,
+  REACT_ANNOTATIONS_COMMIT_KIND,
   REDUX_SETUP_ANNOTATIONS_KIND,
   annotationKindsCache,
 } from "ui/suspense/annotationsCaches";
@@ -155,7 +155,7 @@ function SecondaryToolbox() {
   const { value: hasReactAnnotations = false } = useImperativeCacheValue(
     annotationKindsCache,
     replayClient,
-    REACT_ANNOTATIONS_KIND
+    REACT_ANNOTATIONS_COMMIT_KIND
   );
 
   const { value: hasReduxAnnotations = false } = useImperativeCacheValue(
