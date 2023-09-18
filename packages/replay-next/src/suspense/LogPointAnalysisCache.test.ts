@@ -54,5 +54,33 @@ describe("AnalysisCache", () => {
     test("should fail if there is a condition", () => {
       expect(canRunLocalAnalysis("null", "null")).toBe(false);
     });
+
+    test("should fail for inline arrays", () => {
+      expect(canRunLocalAnalysis('[123, "abc"]', null)).toBe(true);
+      expect(canRunLocalAnalysis("[123, foo]", null)).toBe(false);
+      expect(canRunLocalAnalysis("[foo, 123]", null)).toBe(false);
+      expect(canRunLocalAnalysis('"abc", [123, "abc"]', null)).toBe(true);
+      expect(canRunLocalAnalysis('"abc", [123, foo]', null)).toBe(false);
+      expect(canRunLocalAnalysis('[123, ["abc"]]', null)).toBe(true);
+      expect(canRunLocalAnalysis("[123, [foo]]", null)).toBe(false);
+
+      // Ideally these cases would be true but detecting them via a syntax parser is complex,
+      // and our parser should err on the side of caution
+      expect(canRunLocalAnalysis("[123, {foo: 123}]", null)).toBe(false);
+    });
+
+    test("should properly handle inline objects", () => {
+      expect(canRunLocalAnalysis("{foo}", null)).toBe(false);
+      expect(canRunLocalAnalysis("{foo: 123}", null)).toBe(true);
+      expect(canRunLocalAnalysis("{foo: bar}", null)).toBe(false);
+      expect(canRunLocalAnalysis("123, {foo}", null)).toBe(false);
+      expect(canRunLocalAnalysis("123, {foo: bar}", null)).toBe(false);
+      expect(canRunLocalAnalysis("{foo: {bar}}", null)).toBe(false);
+
+      // Ideally these cases would be true but detecting them via a syntax parser is complex,
+      // and our parser should err on the side of caution
+      expect(canRunLocalAnalysis("123, {foo: 123}", null)).toBe(false);
+      expect(canRunLocalAnalysis("123, {foo: [1,2,3]}", null)).toBe(false);
+    });
   });
 });
