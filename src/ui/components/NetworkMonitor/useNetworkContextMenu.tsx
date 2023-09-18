@@ -102,12 +102,14 @@ export default function useNetworkContextMenu({
           </ContextMenuItem>
         </>
       )}
-      <ContextMenuItem disabled={state !== "ready"} onSelect={copyAsCURL}>
-        <>
-          <Icon type="copy" />
-          Copy as CURL
-        </>
-      </ContextMenuItem>
+      {copyAsCURL && (
+        <ContextMenuItem disabled={state !== "ready"} onSelect={copyAsCURL}>
+          <>
+            <Icon type="copy" />
+            Copy as CURL
+          </>
+        </ContextMenuItem>
+      )}
     </>,
     {
       dataTestName: "ContextMenu-NetworkRequest",
