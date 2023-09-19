@@ -28,6 +28,7 @@ import {
   PointRange,
   PointRangeFocusRequest,
   PointSelector,
+  PointStackFrame,
   getPointsBoundingTimeResult as PointsBoundingTime,
   RecordingId,
   RequestBodyData,
@@ -207,6 +208,7 @@ export interface ReplayClientInterface {
   getAllBoundingClientRects(pauseId: PauseId): Promise<getAllBoundingClientRectsResult>;
   getAllEventHandlerCounts(range: PointRange | null): Promise<Record<string, number>>;
   getAllFrames(pauseId: PauseId): Promise<getAllFramesResult>;
+  getPointStack(point: ExecutionPoint, maxCount: number): Promise<PointStackFrame[]>;
   getAnnotationKinds(): Promise<string[]>;
   getAppliedRules(pauseId: PauseId, nodeId: string): Promise<getAppliedRulesResult>;
   getBoundingClientRect(pauseId: PauseId, nodeId: string): Promise<getBoundingClientRectResult>;

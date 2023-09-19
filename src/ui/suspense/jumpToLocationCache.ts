@@ -10,6 +10,7 @@ import { createCache, createSingleEntryCache } from "suspense";
 
 import { PauseFrame } from "devtools/client/debugger/src/selectors";
 import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
+import { getPointDescriptionForFrame } from "replay-next/src/suspense/PointStackCache";
 import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
 import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientInterface } from "shared/client/types";
@@ -17,7 +18,6 @@ import { IGNORABLE_PARTIAL_SOURCE_URLS } from "ui/actions/eventListeners/eventLi
 import { findFunctionOutlineForLocation } from "ui/actions/eventListeners/jumpToCode";
 import { SourcesState, getPreferredLocation } from "ui/reducers/sources";
 import { getPauseFramesAsync } from "ui/suspense/frameCache";
-import { getMatchingFrameStep } from "ui/utils/frame";
 
 interface ApplyMiddlewareDecl {
   location: SourceLocationRange;
@@ -220,34 +220,12 @@ export const reduxDispatchJumpLocationCache = createCache<
       preferredFrameIdx = await searchSourceOutlineForDispatch(filteredPauseFrames, replayClient);
     }
 
-    const matchingFrameStep = await getFrameStepForFrame(
-      filteredPauseFrames[preferredFrameIdx],
-      replayClient,
-      sourcesState
-    );
+    const matchingPoint = await getPointDescriptionForFrame(replayClient, point, preferredFrameIdx);
 
-    if (matchingFrameStep) {
-      return matchingFrameStep.point;
+    if (matchingPoint) {
+      return matchingPoint;
     } else {
-      const initialFrameStep = await getFrameStepForFrame(
-        filteredPauseFrames[2],
-        replayClient,
-        sourcesState
-      );
-
-      return initialFrameStep!.point;
+      return getPointDescriptionForFrame(replayClient, point, 2);
     }
   },
 });
-
-async function getFrameStepForFrame(
-  frame: PauseFrame,
-  replayClient: ReplayClientInterface,
-  sourcesState: SourcesState
-) {
-  const preferredLocation = getPreferredLocation(sourcesState, [frame.location]);
-
-  const matchingFrameStep = await getMatchingFrameStep(replayClient, frame, preferredLocation);
-
-  return matchingFrameStep;
-}

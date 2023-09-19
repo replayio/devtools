@@ -4,7 +4,8 @@ import { ContextMenuDivider, ContextMenuItem, useContextMenu } from "use-context
 import type { PauseFrame } from "devtools/client/debugger/src/reducers/pause";
 import Icon from "replay-next/components/Icon";
 import { copyToClipboard } from "replay-next/components/sources/utils/clipboard";
-import { getFrameStepForFrameLocation } from "replay-next/src/suspense/FrameStepsCache";
+import { getPointAndTimeForPauseId } from "replay-next/src/suspense/PauseCache";
+import { getPointDescriptionForFrame } from "replay-next/src/suspense/PointStackCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { requestFocusWindow, seek } from "ui/actions/timeline";
 import { useAppDispatch } from "ui/setup/hooks";
@@ -28,32 +29,37 @@ export function useStackFrameContextMenu({
   let frameDependentContextMenus: React.ReactNode = null;
 
   if (frame) {
-    const getMatchingFramestep = () =>
-      getFrameStepForFrameLocation(replayClient, frame.pauseId, frame.protocolId, frame.location);
+    const getFramePoint = async () => {
+      const [point] = getPointAndTimeForPauseId(frame.pauseId);
+      if (!point) {
+        return null;
+      }
+      return await getPointDescriptionForFrame(replayClient, point, frame.index);
+    };
 
     const jumpToFrame = async () => {
-      const matchingFrameStep = await getMatchingFramestep();
+      const framePoint = await getFramePoint();
 
-      if (matchingFrameStep) {
+      if (framePoint) {
         dispatch(
           seek({
-            executionPoint: matchingFrameStep.point,
+            executionPoint: framePoint.point,
             openSource: true,
-            time: matchingFrameStep.time,
+            time: framePoint.time,
           })
         );
       }
     };
 
     const setFocusStart = async () => {
-      const matchingFrameStep = await getMatchingFramestep();
+      const framePoint = await getFramePoint();
 
-      if (matchingFrameStep) {
+      if (framePoint) {
         dispatch(
           requestFocusWindow({
             begin: {
-              point: matchingFrameStep.point,
-              time: matchingFrameStep.time,
+              point: framePoint.point,
+              time: framePoint.time,
             },
           })
         );
@@ -61,14 +67,14 @@ export function useStackFrameContextMenu({
     };
 
     const setFocusEnd = async () => {
-      const matchingFrameStep = await getMatchingFramestep();
+      const framePoint = await getFramePoint();
 
-      if (matchingFrameStep) {
+      if (framePoint) {
         dispatch(
           requestFocusWindow({
             end: {
-              point: matchingFrameStep.point,
-              time: matchingFrameStep.time,
+              point: framePoint.point,
+              time: framePoint.time,
             },
           })
         );
@@ -90,19 +96,19 @@ export function useStackFrameContextMenu({
             Copy source URI
           </>
         </ContextMenuItem>
-        <ContextMenuItem dataTestId="CallStackContextMenu-CopyStackTrace" onSelect={setFocusStart}>
+        <ContextMenuItem dataTestId="CallStackContextMenu-SetFocusStart" onSelect={setFocusStart}>
           <>
             <Icon type="set-focus-start" />
             Set focus start at frame
           </>
         </ContextMenuItem>
-        <ContextMenuItem dataTestId="CallStackContextMenu-CopyStackTrace" onSelect={setFocusEnd}>
+        <ContextMenuItem dataTestId="CallStackContextMenu-SetFocusEnd" onSelect={setFocusEnd}>
           <>
             <Icon type="set-focus-end" />
             Set focus end at frame
           </>
         </ContextMenuItem>
-        <ContextMenuItem dataTestId="CallStackContextMenu-CopyStackTrace" onSelect={jumpToFrame}>
+        <ContextMenuItem dataTestId="CallStackContextMenu-JumpToFrame" onSelect={jumpToFrame}>
           <>
             <Icon type="view-function-source" />
             Jump to frame

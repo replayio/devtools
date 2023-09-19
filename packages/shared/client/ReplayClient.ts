@@ -18,6 +18,7 @@ import {
   PointRange,
   PointRangeFocusRequest,
   PointSelector,
+  PointStackFrame,
   getPointsBoundingTimeResult as PointsBoundingTime,
   RecordingId,
   RequestBodyData,
@@ -509,6 +510,12 @@ export class ReplayClient implements ReplayClientInterface {
     const sessionId = this.getSessionIdThrows();
     const result = await client.Pause.getAllFrames({}, sessionId, pauseId);
     return result;
+  }
+
+  async getPointStack(point: ExecutionPoint, maxCount: number): Promise<PointStackFrame[]> {
+    const sessionId = this.getSessionIdThrows();
+    const result = await client.Session.getPointStack({ point, maxCount }, sessionId);
+    return result.frames;
   }
 
   async getNetworkRequestBody(
