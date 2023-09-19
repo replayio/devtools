@@ -31,6 +31,14 @@ body {
   min-height: 100vh;
 }
 
+.itemsContainer {
+  display: flex;
+}
+
+.itemsContainer > div:not(:first-child) {
+  margin-left: 10px;
+}
+
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
