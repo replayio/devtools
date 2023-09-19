@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 // this example contains some delays for now to work around RecordReplay/gecko-dev#349
 function waitForTime(ms: number) {
@@ -14,25 +14,33 @@ interface Item {
   text: string;
 }
 
-const version = "17.0.2";
+interface AppState {
+  list: Item[];
+}
 
-function React17App() {
-  const [list, setList] = useState<Item[]>([]);
+const version = "15.7.0";
 
-  useEffect(() => {
-    async function update() {
-      setList([{ key: "1", text: "Foo" }]);
+class React15App extends React.Component<any, AppState> {
+  state = {
+    list: [],
+  };
+
+  componentDidMount = () => {
+    const update = async () => {
+      this.setState({ list: [{ key: "1", text: "Foo" }] });
       await waitForTime(2000);
       console.log(`[${version}] Initial list`);
 
-      setList([
-        { key: "1", text: "Foo" },
-        { key: "2", text: "Bar" },
-      ]);
+      this.setState({
+        list: [
+          { key: "1", text: "Foo" },
+          { key: "2", text: "Bar" },
+        ],
+      });
       await waitForTime(100);
       console.log(`[${version}] Added an entry`);
 
-      setList([{ key: "2", text: "Bar" }]);
+      this.setState({ list: [{ key: "2", text: "Bar" }] });
       await waitForTime(100);
       console.log(`[${version}] Removed an entry`);
 
@@ -44,17 +52,20 @@ function React17App() {
 
       // eslint-disable-next-line no-undef
       console.log(`[${version}] ExampleFinished`);
-    }
+    };
     update();
-  }, []);
+  };
 
-  return (
-    <div>
-      <h2>Version: {version}</h2>
-      <React17List list={list} />
-      <React17FizzBuzzCounterClass version={version} />
-    </div>
-  );
+  render() {
+    const { list } = this.state;
+    return (
+      <div style={{ display: "flex", flexDirection: "column" }}>
+        <h2>Version: {version}</h2>
+        <React15List list={list} />
+        <React15FizzBuzzCounterClass version={version} />
+      </div>
+    );
+  }
 }
 
 function IsEven() {
@@ -109,7 +120,7 @@ interface FizzBuzzCounter {
   counter: number;
 }
 
-class React17FizzBuzzCounterClass extends React.Component<FizzBuzzCounterProps, FizzBuzzCounter> {
+class React15FizzBuzzCounterClass extends React.Component<FizzBuzzCounterProps, FizzBuzzCounter> {
   state = {
     counter: 0,
   };
@@ -148,7 +159,7 @@ class React17FizzBuzzCounterClass extends React.Component<FizzBuzzCounterProps, 
   }
 }
 
-function React17List({ list }: { list: Item[] }) {
+function React15List({ list }: { list: Item[] }) {
   return (
     <ul style={{ width: "100px" }}>
       {list.map(data => (
@@ -162,4 +173,4 @@ function Item({ text }: { text: string }) {
   return <li>{text}</li>;
 }
 
-export default React17App;
+export default React15App;

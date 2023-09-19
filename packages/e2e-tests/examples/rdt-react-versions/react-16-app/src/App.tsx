@@ -14,9 +14,9 @@ interface Item {
   text: string;
 }
 
-const version = "17.0.2";
+const version = "16.14.0";
 
-function React17App() {
+function React16App() {
   const [list, setList] = useState<Item[]>([]);
 
   useEffect(() => {
@@ -51,8 +51,8 @@ function React17App() {
   return (
     <div>
       <h2>Version: {version}</h2>
-      <React17List list={list} />
-      <React17FizzBuzzCounterClass version={version} />
+      <React16List list={list} />
+      <React16FizzBuzzCounterClass version={version} />
     </div>
   );
 }
@@ -109,7 +109,7 @@ interface FizzBuzzCounter {
   counter: number;
 }
 
-class React17FizzBuzzCounterClass extends React.Component<FizzBuzzCounterProps, FizzBuzzCounter> {
+class React16FizzBuzzCounterClass extends React.Component<FizzBuzzCounterProps, FizzBuzzCounter> {
   state = {
     counter: 0,
   };
@@ -148,7 +148,7 @@ class React17FizzBuzzCounterClass extends React.Component<FizzBuzzCounterProps, 
   }
 }
 
-function React17List({ list }: { list: Item[] }) {
+function React16List({ list }: { list: Item[] }) {
   return (
     <ul style={{ width: "100px" }}>
       {list.map(data => (
@@ -162,4 +162,4 @@ function Item({ text }: { text: string }) {
   return <li>{text}</li>;
 }
 
-export default React17App;
+export default React16App;
