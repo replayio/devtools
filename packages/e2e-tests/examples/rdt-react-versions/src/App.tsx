@@ -42,12 +42,15 @@ function React18App() {
         console.error(error);
       }
 
+      // eslint-disable-next-line no-undef
+      console.log(`[${version}] ExampleFinished`);
+
       // Add extra time for the React 18 example to print the final message.
       // We'll use this as a signal for the recording to complete.
       await waitForTime(2000);
 
-      // eslint-disable-next-line no-undef
-      console.log(`[${version}] ExampleFinished`);
+      // The default Playwright recording script looks for this specific message
+      console.log("ExampleFinished");
     }
     update();
   }, []);
