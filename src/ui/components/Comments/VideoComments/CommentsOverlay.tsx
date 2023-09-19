@@ -20,7 +20,8 @@ function CommentsOverlay({
   canvas,
   currentTime,
   children,
-}: PropsFromRedux & { children: React.ReactNode }) {
+  showComments,
+}: PropsFromRedux & { children: React.ReactNode; showComments: boolean }) {
   const recordingId = hooks.useGetRecordingId();
   const { comments: allComments } = hooks.useGetComments(recordingId);
 
@@ -45,17 +46,19 @@ function CommentsOverlay({
         height: height * scale - 2,
       }}
     >
-      <div className="canvas-comments">
-        {commentsAtTime.map(comment => {
-          return (
-            <VideoComment
-              comment={comment}
-              isHighlighted={hoveredCommentId === comment.id || selectedCommentId === comment.id}
-              key={comment.id}
-            />
-          );
-        })}
-      </div>
+      {showComments && (
+        <div className="canvas-comments">
+          {commentsAtTime.map(comment => {
+            return (
+              <VideoComment
+                comment={comment}
+                isHighlighted={hoveredCommentId === comment.id || selectedCommentId === comment.id}
+                key={comment.id}
+              />
+            );
+          })}
+        </div>
+      )}
       {children}
     </div>
   );

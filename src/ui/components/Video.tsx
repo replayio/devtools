@@ -49,7 +49,7 @@ export default function Video() {
   const [showDelayedSpinner, setShowDelayedSpinner] = useState(false);
 
   useEffect(() => {
-    if ((isNodePickerActive && mouseTargetsLoading) || stalled) {
+    if (isNodePickerActive && mouseTargetsLoading) {
       const timerId = setTimeout(() => {
         setShowDelayedSpinner(true);
       }, 700);
@@ -100,7 +100,7 @@ export default function Video() {
     addComment();
   };
 
-  const showCommentTool =
+  const showComments =
     isPaused && !isNodeTarget && !isNodePickerActive && !isNodePickerInitializing;
 
   return (
@@ -118,15 +118,13 @@ export default function Video() {
         ref={canvasRef}
       />
       {contextMenu}
-      {showCommentTool ? (
-        <CommentsOverlay>
-          {showDelayedSpinner && (
-            <div className="absolute bottom-5 right-5 z-20 flex opacity-100">
-              <Spinner className="w-5 animate-spin text-black" />
-            </div>
-          )}
-        </CommentsOverlay>
-      ) : null}
+      <CommentsOverlay showComments={showComments}>
+        {(showDelayedSpinner || stalled) && (
+          <div className="absolute bottom-5 right-5 z-20 flex opacity-100">
+            <Spinner className="w-5 animate-spin text-black" />
+          </div>
+        )}
+      </CommentsOverlay>
       {isNodePickerInitializing ? <Tooltip label="Loading…" targetID="video" /> : null}
       {panel === "cypress" && <ToggleButton />}
       <div id="highlighter-root">
