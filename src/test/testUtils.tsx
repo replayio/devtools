@@ -80,6 +80,7 @@ interface ExtendedRenderOptions extends Omit<RenderOptions, "queries"> {
 }
 
 export async function createTestStore(preloadedState: Partial<UIState> = {}) {
+  window.hasAlreadyBootstrapped = false;
   const store = bootstrapStore(preloadedState);
   await setupDevtools(store, createMockReplayClient());
 

@@ -204,19 +204,15 @@ describe("Redux timeline state", () => {
     });
 
     describe("set end time", () => {
-      // TODO for some reason the test setup doesn't seem to work: it should create a new mock replayClient
-      // with its focusWindow set to null for every test but for some reason this test gets a mock replayClient
-      // with a focusWindow left over from another test: the test works when run separately but not when run
-      // together with the other tests in this file.
-      // it("should focus from the beginning of the recording to the specified end time if no focus region has been set", async () => {
-      //   await dispatch(actions.requestFocusWindow({ end: { time: 65 } }));
-      //   expect(getFocusWindow(store.getState())).toMatchInlineSnapshot(`
-      //     Object {
-      //       "begin": 0,
-      //       "end": 65,
-      //     }
-      //   `);
-      // });
+      it("should focus from the beginning of the recording to the specified end time if no focus region has been set", async () => {
+        await dispatch(actions.requestFocusWindow({ end: { time: 65 } }));
+        expect(getFocusWindow(store.getState())).toMatchInlineSnapshot(`
+          Object {
+            "begin": 0,
+            "end": 65,
+          }
+        `);
+      });
 
       it("should only update the end time when a region is set", async () => {
         await dispatch(
