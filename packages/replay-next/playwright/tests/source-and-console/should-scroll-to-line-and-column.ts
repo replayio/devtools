@@ -1,8 +1,13 @@
 import { Page, TestInfo, test } from "@playwright/test";
 import { SourceId } from "@replayio/protocol";
 
-import { delay, takeScreenshot } from "../utils/general";
-import { getSourceLineLocator, goToLine, openSourceFile } from "../utils/source";
+import { takeScreenshot } from "../utils/general";
+import {
+  getSourceLineLocator,
+  goToLine,
+  openSourceFile,
+  waitForSourceLineHitCounts,
+} from "../utils/source";
 import { beforeEach } from "./beforeEach";
 import { sourceId } from "./shared";
 
@@ -20,6 +25,8 @@ async function goToLineAndTakeScreenshot(
   const { columnNumber, lineNumber, sourceId } = options;
 
   await goToLine(page, sourceId, lineNumber, columnNumber);
+
+  await waitForSourceLineHitCounts(page, sourceId, lineNumber);
 
   const lineLocator = getSourceLineLocator(page, sourceId, lineNumber);
 
