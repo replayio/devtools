@@ -11,7 +11,7 @@ import { onViewSourceInDebugger } from "devtools/client/webconsole/actions";
 import { ThreadFront } from "protocol/thread";
 import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
 import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
-import { setSelectedPanel, setSelectedPrimaryPanel } from "ui/actions/layout";
+import { setSelectedPanel, setSelectedPrimaryPanel, setViewMode } from "ui/actions/layout";
 import { useAppDispatch } from "ui/setup/hooks";
 
 // Adapter that connects inspect-function and inspect-html-element actions with Redux.
@@ -49,6 +49,7 @@ export default function InspectorContextReduxAdapter({ children }: { children: R
         ThreadFront.timeWarpToPause({ point, time, pauseId }, false);
       }
       dispatch(selectNode(protocolValue.object!));
+      dispatch(setViewMode("dev"));
       dispatch(setSelectedPanel("inspector"));
     },
     [dispatch]
