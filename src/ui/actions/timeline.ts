@@ -10,6 +10,7 @@ import {
 import clamp from "lodash/clamp";
 
 import { framePositionsCleared, resumed } from "devtools/client/debugger/src/reducers/pause";
+import { unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 import {
   addLastScreen,
   addScreenForPoint,
@@ -383,7 +384,9 @@ export function playbackPoints(
   begin: { time: number; point?: string },
   end: { time: number; point?: string }
 ): UIThunkAction {
-  return async (dispatch, getState, { replayClient }) => {
+  return async (dispatch, getState) => {
+    dispatch(unhighlightNode());
+
     let beginDate = Date.now();
     let currentDate = beginDate;
     let currentTime = begin.time;
