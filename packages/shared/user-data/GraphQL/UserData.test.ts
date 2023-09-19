@@ -59,7 +59,7 @@ describe("UserData", () => {
     const userData = require("./UserData").userData;
 
     expect(userData.get("feature_basicProcessingLoadingBar")).toBe(false);
-    expect(userData.get("inspector_collapseAttributes")).toBe(true);
+    expect(userData.get("layout_breakpointsPanelExpanded")).toBe(true);
   });
 
   it("should support URL overrides for boolean preferences", () => {

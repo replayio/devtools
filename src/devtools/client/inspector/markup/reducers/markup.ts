@@ -55,10 +55,6 @@ type ExpandedNodes = Record<string, boolean | undefined>;
 // export type MarkupTree = { [key: string]: NodeInfo | undefined };
 
 export interface MarkupState {
-  // Whether or not to collapse the attributes for nodes.
-  collapseAttributes: boolean;
-  // The max length of the attribute value prior to truncating the attributes.
-  collapseAttributeLength: number;
   // The root node to display in the DOM view.
   rootNode: string | null;
   // The selected node to display in the DOM view.
@@ -83,8 +79,6 @@ export const { selectById: getNodeBoxModelById } = boxModelAdapter.getSelectors(
 );
 
 const initialState: MarkupState = {
-  collapseAttributes: userData.get("inspector_collapseAttributes"),
-  collapseAttributeLength: userData.get("inspector_collapseAttributeLength"),
   rootNode: null,
   selectedNode: null,
   selectionReason: null,

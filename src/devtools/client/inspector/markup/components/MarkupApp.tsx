@@ -22,8 +22,6 @@ function MarkupApp() {
       loadingFailed: state.markup.loadingFailed,
       rootNodeId: state.markup.rootNode,
       pauseId: getPauseId(state),
-      collapseAttributes: state.markup.collapseAttributes,
-      collapseAttributeLength: state.markup.collapseAttributeLength,
     }),
     shallowEqual
   );

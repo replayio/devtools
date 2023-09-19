@@ -219,14 +219,6 @@ export const config = {
     defaultValue: "ruleview" as ActiveInspectorTab,
     legacyKey: "devtools.inspector.active-tab",
   },
-  inspector_collapseAttributes: {
-    defaultValue: Boolean(true),
-    legacyKey: "devtools.markup.collapseAttributes",
-  },
-  inspector_collapseAttributeLength: {
-    defaultValue: 120,
-    legacyKey: "devtools.markup.collapseAttributeLength",
-  },
   inspector_inactiveCssEnabled: {
     defaultValue: Boolean(false),
     legacyKey: "devtools.inspector.inactive.css.enabled",
