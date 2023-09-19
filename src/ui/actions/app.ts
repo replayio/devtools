@@ -252,6 +252,11 @@ export function executeCommand(key: CommandKey): UIThunkAction {
       dispatch(jumpToPreviousPause());
     } else if (key === "jump_to_next_pause") {
       dispatch(jumpToNextPause());
+    } else if (key == "restart_session") {
+      // navigate to the url with an additional search param
+      const url = new URL(window.location.href);
+      url.searchParams.append("restart", "true");
+      window.location.href = url.toString();
     }
     // else if (key === "copy_points") {
     //   dispatch(copyBreakpointsToClipboard());

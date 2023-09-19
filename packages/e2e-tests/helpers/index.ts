@@ -5,7 +5,13 @@ import dotenv from "dotenv";
 import { RecordingTarget } from "replay-next/src/suspense/BuildIdCache";
 
 import exampleRecordings from "../examples.json";
-import { debugPrint, getElementClasses, waitFor, waitForRecordingToFinishIndexing } from "./utils";
+import {
+  debugPrint,
+  getCommandKey,
+  getElementClasses,
+  waitFor,
+  waitForRecordingToFinishIndexing,
+} from "./utils";
 
 dotenv.config({ path: "../../.env" });
 
@@ -75,6 +81,12 @@ export async function startLibraryTest(page: Page, apiKey: string, teamId: strin
 
   await page.locator('[data-test-id="TestRunResults"]').waitFor();
   await page.locator('[data-test-id="TestRunList"]').waitFor();
+}
+
+export async function commandPalette(page: Page, query: string) {
+  await page.keyboard.press(`${getCommandKey()}+K`);
+  await page.keyboard.type(query);
+  await page.keyboard.press("Enter");
 }
 
 export type TestRecordingKey = keyof typeof exampleRecordings;
