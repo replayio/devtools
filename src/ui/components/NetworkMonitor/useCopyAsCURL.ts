@@ -18,12 +18,16 @@ export default function useCopyAsCURL(
   requestSummary: RequestSummary,
   resetAfterDelay: number = 2_500
 ): {
-  copy: () => void;
+  copy: (() => void) | null;
   state: State;
 } {
   const replayClient = useContext(ReplayClientContext);
 
   const [state, setState] = useState<State>("ready");
+
+  if (!requestSummary.hasRequestBody) {
+    return { copy: null, state };
+  }
 
   const copy = async () => {
     try {

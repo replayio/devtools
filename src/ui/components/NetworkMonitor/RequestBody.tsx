@@ -5,7 +5,7 @@ import HttpBody from "./HttpBody";
 import { RequestSummary, findHeader } from "./utils";
 
 export default function RequestBodyWrapper({ request }: { request: RequestSummary | undefined }) {
-  if (!request) {
+  if (!request || !request.hasRequestBody) {
     return null;
   }
 

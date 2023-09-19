@@ -1,31 +1,15 @@
-import { ResponseBodyData } from "@replayio/protocol";
-
 import { useNetworkResponseBody } from "replay-next/src/hooks/useNetworkResponseBody";
 
 import LoadingProgressBar from "../shared/LoadingProgressBar";
 import HttpBody from "./HttpBody";
 import { RequestSummary, findHeader } from "./utils";
 
-// Keep the internal implementation separate so we can mock it easily in storybook.
-export function _ResponseBody({
-  request,
-  responseBodyParts,
-}: {
-  request: RequestSummary;
-  responseBodyParts: ResponseBodyData[];
-}) {
-  return (
-    <>
-      <div className="flex items-center justify-between px-4 py-2 font-bold">Response body:</div>
-      <div className="pl-4">
-        <HttpBody
-          bodyParts={responseBodyParts}
-          contentType={findHeader(request.responseHeaders, "content-type") || "unknown"}
-          filename={request.name}
-        />
-      </div>
-    </>
-  );
+export default function ResponseBodyWrapper({ request }: { request: RequestSummary | undefined }) {
+  if (!request || !request.hasResponseBody) {
+    return null;
+  }
+
+  return <ResponseBody request={request} />;
 }
 
 function ResponseBody({ request }: { request: RequestSummary }) {
@@ -34,7 +18,16 @@ function ResponseBody({ request }: { request: RequestSummary }) {
     return <LoadingProgressBar />;
   }
 
-  return <_ResponseBody request={request} responseBodyParts={responseBody} />;
+  return (
+    <>
+      <div className="flex items-center justify-between px-4 py-2 font-bold">Response body:</div>
+      <div className="pl-4">
+        <HttpBody
+          bodyParts={responseBody}
+          contentType={findHeader(request.responseHeaders, "content-type") || "unknown"}
+          filename={request.name}
+        />
+      </div>
+    </>
+  );
 }
-
-export default ResponseBody;
