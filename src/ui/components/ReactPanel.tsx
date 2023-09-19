@@ -26,10 +26,9 @@ import {
 import { simplifyDisplayName } from "devtools/client/debugger/src/utils/pause/frames/displayName";
 import IndeterminateLoader from "replay-next/components/IndeterminateLoader";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
-import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPositionsCache";
-import { frameStepsCache } from "replay-next/src/suspense/FrameStepsCache";
 import { hitPointsForLocationCache } from "replay-next/src/suspense/HitPointsCache";
-import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
+import { getPointAndTimeForPauseId, pauseIdCache } from "replay-next/src/suspense/PauseCache";
+import { getPointDescriptionForFrame } from "replay-next/src/suspense/PointStackCache";
 import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
 import { streamingSourceContentsCache } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -42,17 +41,20 @@ import { JumpToCodeButton, JumpToCodeStatus } from "ui/components/shared/JumpToC
 import {
   SourceDetails,
   SourcesState,
-  getPreferredLocation,
   getSourceIdsByUrl,
   getSourceToDisplayForUrl,
 } from "ui/reducers/sources";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { getPauseFramesAsync } from "ui/suspense/frameCache";
-import { PointWithLocation, getMatchingFrameStep } from "ui/utils/frame";
 
 import MaterialIcon from "./shared/MaterialIcon";
 import styles from "./Events/Event.module.css";
+
+interface PointWithLocation {
+  location: Location;
+  point: TimeStampedPoint;
+}
 
 interface ReactQueuedRenderDetails extends TimeStampedPoint {
   pauseFrames: PauseFrame[];
@@ -61,81 +63,38 @@ interface ReactQueuedRenderDetails extends TimeStampedPoint {
 }
 
 export const reactRenderQueuedJumpLocationCache: Cache<
-  [
-    replayClient: ReplayClientInterface,
-    earliestAppCodeFrame: PauseFrame,
-    sourcesState: SourcesState
-  ],
+  [replayClient: ReplayClientInterface, earliestAppCodeFrame: PauseFrame],
   PointWithLocation | undefined
 > = createCache({
   config: { immutable: true },
   debugLabel: "ReactRenderQueuedJumpLocation",
-  getKey: ([replayClient, earliestAppCodeFrame, sourcesState]) => earliestAppCodeFrame.pauseId,
-  load: async ([replayClient, earliestAppCodeFrame, sourcesState]) => {
-    let userPauseFrameTime: TimeStampedPoint | undefined = undefined;
-
+  getKey: ([replayClient, earliestAppCodeFrame]) =>
+    `${earliestAppCodeFrame.pauseId}:${earliestAppCodeFrame.index}`,
+  load: async ([replayClient, earliestAppCodeFrame]) => {
     if (!earliestAppCodeFrame) {
       return;
     }
 
     // This should already be a "preferred" location thanks to it being a `PauseFrame`
     const { location } = earliestAppCodeFrame;
-
-    const initialPreferredLocation = getPreferredLocation(sourcesState, [location]);
-
-    let { line, sourceId, column } = initialPreferredLocation;
-
-    const [breakablePositions, breakablePositionsByLine] = await breakpointPositionsCache.readAsync(
-      replayClient,
-      sourceId
-    );
-    const breakablePositionsForLine = breakablePositionsByLine.get(line);
-
-    try {
-      // TODO Need a _much_ better way of identifying the exact point of the earlier frame!
-      // This also doesn't seem to consistently work with the _first_ render.
-      // const arbitraryStartPoint = hitPoint.time - 50;
-      // const pointNearTime = await replayClient.getPointNearTime(arbitraryStartPoint);
-      // const functionHits: AnalysisInput[] = await replayClient.runAnalysis<AnalysisInput>({
-      //   effectful: false,
-      //   mapper: getFunctionBody(hitMapper),
-      //   location,
-      //   range: {
-      //     begin: pointNearTime.point,
-      //     end: hitPoint.point,
-      //   },
-      // });
-      // [userPauseFrameTime] = functionHits.slice(-1);
-
-      // We know the pause + point _inside_ of React.
-      // We now need to find the right execution point within that earlier frame.
-
-      // TODO [BAC-2915] Frame step locations and times don't consistently line up right!
-      if (breakablePositionsForLine) {
-        column = breakablePositionsForLine.columns[0];
-      }
-
-      const searchLocation: Location = { sourceId, line, column };
-
-      const matchingFrameStep = await getMatchingFrameStep(
-        replayClient,
-        earliestAppCodeFrame,
-        searchLocation
-      );
-
-      if (matchingFrameStep) {
-        userPauseFrameTime = matchingFrameStep.point;
-      }
-
-      return {
-        location: searchLocation,
-        point: userPauseFrameTime,
-      };
-
-      // TODO Use scope mapping ala `event-listeners.ts` to get better function names
-    } catch (err) {
-      console.error(err);
+    const [executionPoint] = getPointAndTimeForPauseId(earliestAppCodeFrame.pauseId);
+    if (!executionPoint) {
+      return;
     }
+
+    const pointDescription = await getPointDescriptionForFrame(
+      replayClient,
+      executionPoint,
+      earliestAppCodeFrame.index
+    );
+
+    return {
+      location,
+      point: {
+        point: pointDescription.point,
+        time: pointDescription.time,
+      },
+    };
   },
 });
 
@@ -156,25 +115,20 @@ const queuedRendersStreamingCache: StreamingCache<
       return;
     }
     try {
-      const [symbols, breakablePositionsResult] = await Promise.all([
-        sourceOutlineCache.readAsync(replayClient, reactDomSource.id),
-        breakpointPositionsCache.readAsync(replayClient, reactDomSource.id),
-      ]);
+      const symbols = await sourceOutlineCache.readAsync(replayClient, reactDomSource.id);
 
       if (!symbols) {
         return;
       }
 
-      const [breakablePositions, breakablePositionsByLine] = breakablePositionsResult;
-
       let scheduleUpdateFiberDeclaration: FunctionOutline | undefined;
       let onCommitFiberRootDeclaration: FunctionOutline | undefined;
 
       if (reactDomSource.url!.includes(".development")) {
-        const shouldUpdateFiberSymbol = symbols?.functions.find(
+        const shouldUpdateFiberSymbol = symbols.functions.find(
           f => f.name === "scheduleUpdateOnFiber"
         )!;
-        const onCommitRootSymbol = symbols?.functions.find(f => f.name === "onCommitRoot")!;
+        const onCommitRootSymbol = symbols.functions.find(f => f.name === "onCommitRoot")!;
 
         scheduleUpdateFiberDeclaration = shouldUpdateFiberSymbol;
         onCommitFiberRootDeclaration = onCommitRootSymbol;
@@ -319,16 +273,13 @@ const queuedRendersStreamingCache: StreamingCache<
 
 function jumpToTimeAndLocationForQueuedRender(
   earliestAppCodeFrame: PauseFrame,
-  hitPoint: TimeStampedPoint,
   jumpBehavior: "timeOnly" | "timeAndLocation",
   onSeek: (point: ExecutionPoint, time: number) => void
 ): UIThunkAction {
   return async (dispatch, getState, { replayClient }) => {
-    const sourcesState = getState().sources;
     const jumpLocation = await reactRenderQueuedJumpLocationCache.readAsync(
       replayClient,
-      earliestAppCodeFrame,
-      sourcesState
+      earliestAppCodeFrame
     );
     if (jumpLocation) {
       if (jumpLocation.point) {
@@ -367,8 +318,6 @@ function ReactQueuedRenderListItem({
     return null;
   }
 
-  const hitPoint: TimeStampedPoint = { point, time };
-
   const onMouseEnter = () => {};
 
   const onMouseLeave = () => {};
@@ -376,13 +325,11 @@ function ReactQueuedRenderListItem({
   const onClickSeek = (e: React.MouseEvent) => {
     e.stopPropagation();
 
-    dispatch(jumpToTimeAndLocationForQueuedRender(userPauseFrame, hitPoint, "timeOnly", onSeek));
+    dispatch(jumpToTimeAndLocationForQueuedRender(userPauseFrame, "timeOnly", onSeek));
   };
 
   const onClickJumpToCode = async () => {
-    dispatch(
-      jumpToTimeAndLocationForQueuedRender(userPauseFrame, hitPoint, "timeAndLocation", onSeek)
-    );
+    dispatch(jumpToTimeAndLocationForQueuedRender(userPauseFrame, "timeAndLocation", onSeek));
   };
 
   let eventType = "react";

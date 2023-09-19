@@ -3672,10 +3672,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/protocol@npm:^0.59.0":
-  version: 0.59.0
-  resolution: "@replayio/protocol@npm:0.59.0"
-  checksum: d14a8d8bc1fb9f412d38875f0b8e76444a553341102360448388267aebfa5cee72f9ea597cea571c49a5ed41ec10658232471fa50ae93c97d35d75f1c6074803
+"@replayio/protocol@npm:^0.60.0":
+  version: 0.60.0
+  resolution: "@replayio/protocol@npm:0.60.0"
+  checksum: 5b50218fda4357551006ee61076ba3fe3f24ad877a937d787dcd4cdd3deae21fcd84a1e1c75b23520c84d7281b5c75e9096b84fed3725d2e9fce63dca0e552f4
   languageName: node
   linkType: hard
 
@@ -15064,7 +15064,7 @@ __metadata:
     "@next/bundle-analyzer": ^12.2.0
     "@reduxjs/toolkit": ^1.8.4
     "@replayio/overboard": ^0.4.1
-    "@replayio/protocol": ^0.59.0
+    "@replayio/protocol": ^0.60.0
     "@replayio/react-devtools-inline": 4.28.6
     "@replayio/replay": ^0.12.4
     "@sentry/react": ^7.9.0
@@ -15379,7 +15379,7 @@ __metadata:
     "@lezer/common_replay_next": "npm:@lezer/common@1.0.1"
     "@lezer/highlight_replay_next": "npm:@lezer/highlight@1.1.1"
     "@playwright/test": ^1.35.0
-    "@replayio/protocol": ^0.59.0
+    "@replayio/protocol": ^0.60.0
     "@testing-library/jest-dom": ^5.16.3
     "@testing-library/react": ^13.2.0
     "@types/uuid": ^7.0.3
