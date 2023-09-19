@@ -1113,6 +1113,15 @@ export async function waitForSourceContentsToStream(page: Page, sourceId: string
   });
 }
 
+export async function waitForLogpointResults(page: Page, sourceId: string, lineNumber: number) {
+  const lineLocator = getSourceLineLocator(page, sourceId, lineNumber);
+  const labelLocator = lineLocator.locator('[data-test-name="LogPointCapsule-Label"]');
+  await waitFor(async () => {
+    const state = await labelLocator.getAttribute("data-test-state");
+    expect(state).toBe("valid");
+  });
+}
+
 export async function showPreview(
   page: Page,
   options: {
