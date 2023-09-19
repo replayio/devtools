@@ -141,6 +141,7 @@ export default function Capsule({
       >
         <div
           className={styles.Label}
+          data-test-name="LogPointCapsule-Label"
           data-test-state={tooManyPointsToFind ? "too-many-points" : "valid"}
           onClick={onLabelClick}
         >

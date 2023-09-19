@@ -1094,7 +1094,7 @@ export async function waitForSourceLineHitCounts(page: Page, sourceId: string, l
   await lineLocator.isVisible();
 
   await waitFor(async () => {
-    const haveHitCountsLoaded = (await lineLocator.getAttribute("data-test-line-has-hits")) != null;
+    const haveHitCountsLoaded = (await lineLocator.getAttribute("data-test-hitcounts-loaded")) != null;
     if (!haveHitCountsLoaded) {
       throw Error(`Waiting for line ${lineNumber} to have hit counts loaded`);
     }
@@ -1110,6 +1110,15 @@ export async function waitForSourceContentsToStream(page: Page, sourceId: string
     if (status !== "resolved") {
       throw Error(`Waiting for source to be "resolved" but is "${status}"`);
     }
+  });
+}
+
+export async function waitForLogpointResults(page: Page, sourceId: string, lineNumber: number) {
+  const lineLocator = getSourceLineLocator(page, sourceId, lineNumber);
+  const labelLocator = lineLocator.locator('[data-test-name="LogPointCapsule-Label"]');
+  await waitFor(async () => {
+    const state = await labelLocator.getAttribute("data-test-state");
+    expect(state).toBe("valid");
   });
 }
 
