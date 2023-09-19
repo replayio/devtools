@@ -17,28 +17,21 @@ interface NodeAttributeProps {
 }
 
 /**
- * Truncates the given attribute value if it is a base65 data URL or the
- * collapse attributes pref is enabled.
+ * Truncates the given attribute value if it is a base65 data URL.
  *
  * @param  {String} value
  *         Attribute value.
  * @return {String} truncated attribute value.
  */
-function truncateValue(
-  value: string,
-  collapseAttributes: boolean,
-  collapseAttributeLength: number
-) {
+function truncateBase64Values(value: string) {
   if (value && value.match(COLLAPSE_DATA_URL_REGEX)) {
     return truncateString(value, COLLAPSE_DATA_URL_LENGTH);
   }
 
-  return collapseAttributes ? truncateString(value, collapseAttributeLength) : value;
+  return value;
 }
 
 function NodeAttribute({ attribute, attributes, node }: NodeAttributeProps) {
-  const { collapseAttributes, collapseAttributeLength } = useContext(MarkupContext);
-
   // Parse the attribute value to detect whether there are linkable parts in it
   const parsedLinksData = parseAttribute(
     node.namespaceURI,
@@ -51,11 +44,11 @@ function NodeAttribute({ attribute, attributes, node }: NodeAttributeProps) {
 
   for (const token of parsedLinksData) {
     if (token.type === "string") {
-      values.push(truncateValue(token.value, collapseAttributes, collapseAttributeLength));
+      values.push(truncateBase64Values(token.value));
     } else {
       values.push(
         <span key={token.value} className="link" data-link={token.value} data-type={token.type}>
-          {truncateValue(token.value, collapseAttributes, collapseAttributeLength)}
+          {truncateBase64Values(token.value)}
         </span>
       );
     }
