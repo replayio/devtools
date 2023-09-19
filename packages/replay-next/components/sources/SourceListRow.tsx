@@ -132,6 +132,7 @@ export default function SourceListRow({
   return (
     <div
       className={styles.Row}
+      data-test-hitcounts-loaded={hitCounts != null ? true : undefined}
       data-test-line-has-hits={lineHitCounts != null ? hitCount > 0 : undefined}
       data-test-line-number={lineNumber}
       data-test-id={`SourceLine-${lineNumber}`}

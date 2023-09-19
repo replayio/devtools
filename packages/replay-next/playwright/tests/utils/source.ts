@@ -1094,7 +1094,8 @@ export async function waitForSourceLineHitCounts(page: Page, sourceId: string, l
   await lineLocator.isVisible();
 
   await waitFor(async () => {
-    const haveHitCountsLoaded = (await lineLocator.getAttribute("data-test-line-has-hits")) != null;
+    const haveHitCountsLoaded =
+      (await lineLocator.getAttribute("data-test-hitcounts-loaded")) != null;
     if (!haveHitCountsLoaded) {
       throw Error(`Waiting for line ${lineNumber} to have hit counts loaded`);
     }
@@ -1111,6 +1112,11 @@ export async function waitForSourceContentsToStream(page: Page, sourceId: string
       throw Error(`Waiting for source to be "resolved" but is "${status}"`);
     }
   });
+}
+
+export async function waitForLogpointResults(page: Page, sourceId: string, lineNumber: number) {
+  const lineLocator = getSourceLineLocator(page, sourceId, lineNumber);
+  await lineLocator.locator('[data-test-name="LogPointCurrentStepInput"]').waitFor();
 }
 
 export async function showPreview(
