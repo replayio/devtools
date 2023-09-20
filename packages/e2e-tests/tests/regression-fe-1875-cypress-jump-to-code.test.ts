@@ -26,10 +26,23 @@ test("fe-1875 :: verify that steps go to the right point in time", async ({
 
   await clickableSteps.nth(0).click();
 
-  const timelinePercent = await waitForTimelineAdvanced(page, 0);
+  let timelinePercent = await waitForTimelineAdvanced(page, 0);
   expect(Math.round(timelinePercent)).toBe(67);
 
   page.click('[data-test-name="JumpToCode"]');
 
   await waitForPaused(page, 658);
+
+  await openCypressTestPanel(page);
+  await clickableSteps.nth(2).click();
+
+  timelinePercent = await waitForTimelineAdvanced(page, timelinePercent + 1);
+  expect(Math.round(timelinePercent)).toBe(74);
+
+  await waitForPaused(page, 201);
+
+  await openCypressTestPanel(page);
+  page.click('[data-test-name="JumpToCode"]');
+
+  await waitForPaused(page, 1060);
 });

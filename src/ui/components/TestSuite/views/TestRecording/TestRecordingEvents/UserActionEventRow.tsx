@@ -49,7 +49,7 @@ export default memo(function UserActionEventRow({
   testSectionName: TestSectionName;
   userActionEvent: UserActionEvent;
 }) {
-  const { data, timeStampedPointRange } = userActionEvent;
+  const { data } = userActionEvent;
   const { command, error, parentId, timeStampedPoints, resultVariable } = data;
   const { result: resultTimeStampedPoint } = timeStampedPoints;
 
@@ -173,13 +173,13 @@ export default memo(function UserActionEventRow({
           />
         </Suspense>
       )}
-      {showJumpToCode && timeStampedPointRange !== null && (
+      {showJumpToCode && jumpToCodeAnnotation && (
         <div className={styles.JumpToCodeButton}>
           <JumpToCodeButton
             currentExecutionPoint={executionPoint}
             onClick={onJumpToClickEvent}
             status={jumpToCodeStatus}
-            targetExecutionPoint={timeStampedPointRange.begin.point}
+            targetExecutionPoint={jumpToCodeAnnotation.point}
           />
         </div>
       )}
@@ -220,11 +220,11 @@ function findJumpToCodeDetailsIfAvailable(
   let jumpToCodeAnnotation: ParsedJumpToCodeAnnotation | undefined = undefined;
 
   if (groupedTestCases.environment.testRunner.name === "cypress") {
-    const { data, timeStampedPointRange } = userActionEvent;
-    const { category, command } = data;
+    const { data } = userActionEvent;
+    const { category, command, timeStampedPoints } = data;
     const { name } = command;
 
-    if (timeStampedPointRange !== null) {
+    if (timeStampedPoints.beforeStep !== null && timeStampedPoints.afterStep !== null) {
       // TODO This is very Cypress-specific.
       // Playwright steps have a `name` like `locator.click("blah")`.
       // We only care about click events and keyboard events. Keyboard events appear to be a "type" command,
@@ -240,8 +240,8 @@ function findJumpToCodeDetailsIfAvailable(
           jumpToCodeAnnotation = jumpToCodeAnnotations.find(a =>
             isExecutionPointsWithinRange(
               a.point,
-              timeStampedPointRange.begin.point,
-              timeStampedPointRange.end.point
+              timeStampedPoints.beforeStep!.point,
+              timeStampedPoints.afterStep!.point
             )
           );
         }
