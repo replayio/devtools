@@ -135,18 +135,19 @@ test(`jump-to-code-01: Test basic jumping functionality`, async ({
   await firstValidKeypressJumpButton.click();
   await waitForSelectedSource(page, "Header.tsx");
   // Should highlight the line that ran
-  await waitFor(async () => {
-    const lineNumber = await getSelectedLineNumber(page, false);
-    expect(lineNumber).toBe(12);
-  });
+  await waitFor(
+    async () => {
+      const lineNumber = await getSelectedLineNumber(page, true);
+      expect(lineNumber).toBe(12);
+    },
+    { timeout: 10_000 }
+  );
 
   // Should also have jumped in time
   await waitFor(async () => {
     const timelinePercent = await getTimelineCurrentPercent(page);
     expect(Math.round(timelinePercent)).toBe(32);
   });
-
-  // And should have
 
   // the next clicks were on real buttons, so there is a handler
   debugPrint(page, "Checking for an enabled click 'Jump' button");
@@ -157,10 +158,13 @@ test(`jump-to-code-01: Test basic jumping functionality`, async ({
   await firstValidClickJumpButton.click();
   await waitForSelectedSource(page, "TodoListItem.tsx");
   // Should highlight the line that ran
-  await waitFor(async () => {
-    const lineNumber = await getSelectedLineNumber(page, false);
-    expect(lineNumber).toBe(22);
-  });
+  await waitFor(
+    async () => {
+      const lineNumber = await getSelectedLineNumber(page, true);
+      expect(lineNumber).toBe(22);
+    },
+    { timeout: 10_000 }
+  );
 
   // Should also have jumped in time
   await waitFor(async () => {
