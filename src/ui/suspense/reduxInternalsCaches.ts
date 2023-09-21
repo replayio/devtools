@@ -88,7 +88,6 @@ export const reduxDispatchFunctionCache: Cache<
     const reducerDoneLine =
       reduxSourceLines.findIndex(line => line.includes("currentListeners = nextListeners")) + 1;
     const dispatchDoneLine = reduxSourceLines.findIndex(line => line.includes("return action")) + 1;
-    // console.log({ reducerDoneLine, dispatchDoneLine });
 
     const [beforeReducer, reducerDone, dispatchDone]: Location[] = [
       beforeReducerLine,
@@ -185,7 +184,6 @@ export const reduxDispatchesCache = createFocusIntervalCacheForExecutionPoints<
         return functionOutline?.parameters[0];
       })
     );
-    // console.log("Possible param names: ", possibleParamNames);
 
     const paramName = possibleParamNames.find(name => name !== "action") ?? "action";
 
@@ -216,14 +214,6 @@ export const reduxDispatchesCache = createFocusIntervalCacheForExecutionPoints<
     const actionTypes: string[] = results.map(result => {
       return result.returned!.value;
     });
-
-    // console.log("Fetching point stacks...");
-    const pointStacks = await Promise.all(
-      reduxDispatchHits.map(hit => {
-        return replayClient.getPointStack(hit.point, 5);
-      })
-    );
-    // console.log("Point stacks: ", pointStacks);
 
     const maxItems = Math.min(
       reduxDispatchHits.length,

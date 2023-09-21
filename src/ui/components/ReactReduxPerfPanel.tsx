@@ -24,9 +24,10 @@ import { JumpToCodeButton, JumpToCodeStatus } from "ui/components/shared/JumpToC
 import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { formattedPointStackCache } from "ui/suspense/frameCache";
+import { reactRendersIntervalCache } from "ui/suspense/reactInternalsCaches";
 import { ReduxDispatchDetailsEntry, reduxDispatchesCache } from "ui/suspense/reduxInternalsCaches";
 
-import { jumpToTimeAndLocationForQueuedRender, reactRendersIntervalCache } from "./ReactPanel";
+import { jumpToTimeAndLocationForQueuedRender } from "./ReactPanel";
 import cardsListStyles from "ui/components/Comments/CommentCardsList.module.css";
 import eventStyles from "./Events/Event.module.css";
 import panelStyles from "./ReactReduxPanels.module.css";
