@@ -12,7 +12,7 @@ import { findSliceIndices, insert } from "replay-next/src/utils/array";
 import { assertWithTelemetry, recordData } from "replay-next/src/utils/telemetry";
 import { ReplayClientInterface } from "shared/client/types";
 import { Annotation, PlaywrightTestSources } from "shared/graphql/types";
-import { AnnotationsCache } from "ui/components/TestSuite/suspense/AnnotationsCache";
+import { AnnotationsCache, PlaywrightAnnotationsCache } from "ui/components/TestSuite/suspense/AnnotationsCache";
 
 export type SemVer = string;
 
@@ -753,10 +753,11 @@ export async function processGroupedTestCases(
         }
       }
       case "playwright": {
+        const annotations = await PlaywrightAnnotationsCache.readAsync(replayClient);
         let testRecordings: RecordingTestMetadataV3.TestRecording[] = [];
         for (let index = 0; index < partialTestRecordings.length; index++) {
           const legacyTest = partialTestRecordings[index];
-          const test = await processPlaywrightTestRecording(legacyTest);
+          const test = await processPlaywrightTestRecording(legacyTest, annotations);
 
           testRecordings.push(test);
         }
@@ -784,7 +785,8 @@ export async function processGroupedTestCases(
 }
 
 export async function processPlaywrightTestRecording(
-  testRecording: RecordingTestMetadataV2.TestRecording | RecordingTestMetadataV3.TestRecording
+  testRecording: RecordingTestMetadataV2.TestRecording | RecordingTestMetadataV3.TestRecording,
+  annotations: Annotation[]
 ): Promise<RecordingTestMetadataV3.TestRecording> {
   if (isTestRecordingV2(testRecording)) {
     const { attempt, error, events: partialEvents, id, result, source } = testRecording;
@@ -819,7 +821,8 @@ export async function processPlaywrightTestRecording(
           parentId = null,
           scope = null,
           stack = null,
-        } = partialTestEvent.data;
+          rrId,
+        } = partialTestEvent.data as any;
 
         assert(category, `Test event must have "category" property`, {
           command: command?.name,
@@ -844,6 +847,18 @@ export async function processPlaywrightTestRecording(
           }
         }
 
+        let startAnnotation = annotations.find(annotation => annotation.message.event === "step:start" && annotation.message.id === rrId);
+        let endAnnotation = annotations.find(annotation => annotation.message.event === "step:end" && annotation.message.id === rrId);
+        let timeStampedPointRange = null;
+        if (startAnnotation || endAnnotation) {
+          startAnnotation = startAnnotation ?? endAnnotation!;
+          endAnnotation = endAnnotation ?? startAnnotation!;
+          timeStampedPointRange = {
+            begin: { point: startAnnotation.point, time: startAnnotation.time },
+            end: { point: endAnnotation.point, time: endAnnotation.time },
+          };
+        }
+
         testEvents.push({
           data: {
             category,
@@ -854,7 +869,7 @@ export async function processPlaywrightTestRecording(
             resultVariable: null,
             scope,
             testSourceCallStack: stack
-              ? stack.map(frame => ({
+              ? stack.map((frame: any) => ({
                   columnNumber: frame.column,
                   fileName: frame.file,
                   functionName: frame.function,
@@ -868,7 +883,7 @@ export async function processPlaywrightTestRecording(
               viewSource: null,
             },
           },
-          timeStampedPointRange: null,
+          timeStampedPointRange,
           type: "user-action",
         });
       });
