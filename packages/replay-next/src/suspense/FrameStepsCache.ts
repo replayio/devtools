@@ -31,23 +31,6 @@ export const frameStepsCache: Cache<
   },
 });
 
-export async function getFrameStepForFrameLocation(
-  replayClient: ReplayClientInterface,
-  pauseId: string,
-  protocolFrameId: string,
-  location: Location
-) {
-  const frameSteps = await frameStepsCache.readAsync(replayClient, pauseId, protocolFrameId);
-
-  const matchingFrameStep = frameSteps?.find(step => {
-    return step.frame?.find(stepLocation => {
-      return stepLocation.sourceId === location.sourceId && stepLocation.line === location.line;
-    });
-  });
-
-  return matchingFrameStep;
-}
-
 export const frameArgumentsCache: Cache<
   [replayClient: ReplayClientInterface, pauseId: PauseId, frameId: FrameId],
   Value[] | undefined
