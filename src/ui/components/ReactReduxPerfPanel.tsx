@@ -26,8 +26,15 @@ import {
   useContext,
   useMemo,
   useReducer,
+  useRef,
   useState,
 } from "react";
+import {
+  ImperativePanelHandle,
+  PanelGroup,
+  PanelResizeHandle,
+  Panel as ResizablePanel,
+} from "react-resizable-panels";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList as List } from "react-window";
 import {
@@ -115,7 +122,8 @@ import {
 } from "./ReactPanel";
 import MaterialIcon from "./shared/MaterialIcon";
 import cardsListStyles from "ui/components/Comments/CommentCardsList.module.css";
-import styles from "./Events/Event.module.css";
+import eventStyles from "./Events/Event.module.css";
+import panelStyles from "./ReactReduxPanels.module.css";
 
 const MORE_IGNORABLE_PARTIAL_URLS = IGNORABLE_PARTIAL_SOURCE_URLS.concat(
   // Ignore _any_ 3rd-party package for now
@@ -1351,7 +1359,7 @@ function ReduxDispatchListItem({
   return (
     <div style={style}>
       <div
-        className={classnames(styles.eventRow, "group block w-full", {
+        className={classnames(eventStyles.eventRow, "group block w-full", {
           "text-lightGrey": currentTime < dispatchStart.time,
           "font-semibold text-primaryAccent": isPaused,
         })}
@@ -1386,6 +1394,22 @@ function ReactReduxPerfPanelSuspends() {
   const replayClient = useContext(ReplayClientContext);
   const [selectedPoint, setSelectedPoint] = useState<ExecutionPoint | null>(null);
 
+  const detailsPanelRef = useRef<ImperativePanelHandle>(null);
+
+  const [detailsPanelCollapsed, setDetailsPanelCollapsed] = useState(false);
+
+  const toggleDetailsPanel = () => {
+    const panel = detailsPanelRef.current;
+    if (panel) {
+      const collapsed = panel.getCollapsed();
+      if (collapsed) {
+        panel.expand();
+      } else {
+        panel.collapse();
+      }
+    }
+  };
+
   const handleDoAnalysisClick = async () => {
     dispatch(doSomeAnalysis(focusRange));
   };
@@ -1406,7 +1430,16 @@ function ReactReduxPerfPanelSuspends() {
       currentTime,
       entries: reduxDispatchEntries,
       onSeek,
-      onEntrySelected: setSelectedPoint,
+      onEntrySelected: (point: ExecutionPoint) => {
+        setSelectedPoint(point);
+        const panel = detailsPanelRef.current;
+        if (panel) {
+          const collapsed = panel.getCollapsed();
+          if (collapsed) {
+            panel.expand();
+          }
+        }
+      },
     };
   }, [reduxDispatchEntries, dispatch, currentTime, executionPoint]);
 
@@ -1415,26 +1448,51 @@ function ReactReduxPerfPanelSuspends() {
   );
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-      <div style={{ flex: "1 1 auto", height: "100%", position: "relative" }}>
-        <AutoSizer disableWidth>
-          {({ height }: { height: number }) => {
-            return (
-              <List
-                children={ReduxDispatchListItem}
-                height={height}
-                itemCount={itemData.entries.length}
-                itemData={itemData}
-                itemSize={30}
-                width="100%"
-              />
-            );
-          }}
-        </AutoSizer>
-      </div>
-      {selectedEntry ? <SelectedReduxDispatchDetails entry={selectedEntry} /> : null}
-    </div>
+    <PanelGroup autoSaveId="TestRecordingPanel" direction="vertical">
+      <ResizablePanel className={panelStyles.DispatchDetails} collapsible>
+        <div className={panelStyles.ListContainer}>
+          <AutoSizer disableWidth>
+            {({ height }: { height: number }) => {
+              return (
+                <List
+                  children={ReduxDispatchListItem}
+                  height={height}
+                  itemCount={itemData.entries.length}
+                  itemData={itemData}
+                  itemSize={30}
+                  width="100%"
+                />
+              );
+            }}
+          </AutoSizer>
+        </div>
+      </ResizablePanel>
+      <PanelResizeHandle className={panelStyles.ResizeHandle}>
+        <div className={panelStyles.ResizeHandleBar} />
+      </PanelResizeHandle>
+      <ResizablePanel
+        className={panelStyles.DispatchDetailsPanel}
+        collapsible
+        defaultSize={35}
+        minSize={35}
+        onCollapse={collapsed => setDetailsPanelCollapsed(collapsed)}
+        ref={detailsPanelRef}
+      >
+        <div className={panelStyles.DispatchDetailsContainer}>
+          <div className={panelStyles.DispatchDetailsHeader} onClick={toggleDetailsPanel}>
+            <CollapseExpandArrow collapsed={detailsPanelCollapsed} /> Details
+          </div>
+          {selectedEntry ? <SelectedReduxDispatchDetails entry={selectedEntry} /> : null}
+        </div>
+      </ResizablePanel>
+    </PanelGroup>
   );
+}
+
+// TODO This should be a shared component;
+// we use this style in a bunch of places.
+function CollapseExpandArrow({ collapsed }: { collapsed: boolean }) {
+  return <div className={`img arrow ${collapsed ? "" : "expanded"}`} />;
 }
 
 interface RDDEntryProps {
@@ -1566,7 +1624,7 @@ function SelectedReduxDispatchDetails({ entry }: RDDEntryProps) {
     useDispatchContextMenu(entry.afterNotifications);
 
   return (
-    <div style={{ minHeight: 400 }}>
+    <div style={{ minHeight: 200 }}>
       <b>{entry.actionType}</b>
       <ul className="ml-2 list-inside list-disc">
         <li>
