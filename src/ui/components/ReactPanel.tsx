@@ -62,13 +62,13 @@ import { SourceDetails, SourcesState, getSourceIdsByUrl } from "ui/reducers/sour
 import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { getPauseFramesAsync } from "ui/suspense/frameCache";
-
 import {
   FormattedPointStack,
   FormattedPointStackFrame,
   formatPointStackForPoint,
   formatPointStackFrame,
-} from "./ReactReduxPerfPanel";
+} from "ui/suspense/frameCache";
+
 import MaterialIcon from "./shared/MaterialIcon";
 import cardsListStyles from "ui/components/Comments/CommentCardsList.module.css";
 import styles from "./Events/Event.module.css";
