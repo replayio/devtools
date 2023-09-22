@@ -9,7 +9,7 @@
   "scripts": {
     "test": "playwright test",
     "test:chromium": "playwright test --project chromium --reporter=@replayio/playwright/reporter,line",
-    "test:replay-chromium": "REPLAY_PLAYWRIGHT_FIXTURE=1 playwright test --project replay-chromium --reporter=@replayio/playwright/reporter,line",
+    "test:replay-chromium": "playwright test --project replay-chromium --reporter=@replayio/playwright/reporter,line",
     "test:debug": "playwright test --project chromium --workers 1 --headed",
     "test:ui": "playwright test --ui",
     "test:install": "playwright install",
