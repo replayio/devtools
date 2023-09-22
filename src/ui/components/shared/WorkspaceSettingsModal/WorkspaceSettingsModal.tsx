@@ -37,7 +37,8 @@ export function WorkspaceMembers({
   }, [members]);
 
   const canLeave = members.length > 1;
-  const canAdminLeave = canLeave && members.filter(a => a.roles?.includes("admin")).length > 1;
+  const canAdminLeave =
+    canLeave && members.filter(a => a.roles?.includes("admin") && !a.pending).length > 1;
 
   return (
     <ul className="flex flex-col space-y-2.5">
