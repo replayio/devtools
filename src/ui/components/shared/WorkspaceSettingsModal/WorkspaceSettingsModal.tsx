@@ -64,11 +64,7 @@ export function WorkspaceMembers({
   );
 }
 
-type WorkspaceFormProps = {
-  members?: WorkspaceUser[];
-};
-
-function WorkspaceForm({ members = [] }: WorkspaceFormProps) {
+function WorkspaceForm() {
   const workspaceId = useGetTeamIdFromRoute();
   const [inputValue, setInputValue] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -90,7 +86,6 @@ function WorkspaceForm({ members = [] }: WorkspaceFormProps) {
     }
   );
 
-  const memberEmails = members.filter(m => m.email).map(m => m.email!);
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
   };
@@ -100,20 +95,16 @@ function WorkspaceForm({ members = [] }: WorkspaceFormProps) {
     if (!validateEmail(inputValue)) {
       setErrorMessage("Invalid email address");
       return;
-    } else if (memberEmails.includes(inputValue)) {
-      setErrorMessage("Address has already been invited");
-      return;
     }
 
     setErrorMessage(null);
     setIsLoading(true);
-    const resp = await inviteNewWorkspaceMember({
+    await inviteNewWorkspaceMember({
       variables: { workspaceId: workspaceId!, email: inputValue, roles: ["viewer", "debugger"] },
     });
   };
 
   const canSubmit = inputValue.length > 0;
-  console.log(canSubmit);
 
   return (
     <form className="flex flex-col" onSubmit={handleAddMember}>
@@ -172,7 +163,7 @@ const settings: Settings<
       return (
         <div className="flex flex-grow flex-col space-y-3">
           <div>{`Manage members here so that everyone who belongs to this team can see each other's replays.`}</div>
-          <WorkspaceForm members={members} />
+          <WorkspaceForm />
           <div className="text-xs font-semibold uppercase">{`Members`}</div>
           <div className="flex-grow overflow-y-auto">
             <div className="workspace-members-container flex flex-col space-y-1.5">
