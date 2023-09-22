@@ -254,13 +254,12 @@ function findJumpToCodeDetailsIfAvailable(
 
     if (timeStampedPointRange !== null) {
       canShowJumpToCode =
-        category === "command" && (
-          name.startsWith("locator.click") ||
+        category === "command" &&
+        (name.startsWith("locator.click") ||
           name.startsWith("locator.type") ||
           name.startsWith("keyboard.down") ||
           name.startsWith("keyboard.press") ||
-          name.startsWith("keyboard.type")
-        );
+          name.startsWith("keyboard.type"));
 
       if (canShowJumpToCode) {
         jumpToCodeAnnotation = jumpToCodeAnnotations.find(a =>
