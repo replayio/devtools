@@ -37,7 +37,8 @@ export const TestSuiteCache = createSingleEntryCacheWithTelemetry<
     const groupedTestCases = await processGroupedTestCases(
       replayClient,
       testMetadata,
-      testSources?.sources ?? null
+      testSources?.sources ?? null,
+      testSources?.stacks ?? null
     );
 
     return groupedTestCases;

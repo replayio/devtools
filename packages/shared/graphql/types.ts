@@ -230,12 +230,22 @@ export type PlaywrightTestSources = {
   [fileName: string]: string;
 };
 
+export type PlaywrightTestStacks = {
+  [fileName: string]: {
+    file: string;
+    line: number;
+    column: number;
+    function?: string;
+  }[];
+};
+
 export interface RecordingMetadata {
   test?: AnyGroupedTestCases;
   source?: SourceMetadata;
 
   "x-replay-playwright"?: {
     sources: PlaywrightTestSources;
+    stacks: PlaywrightTestStacks;
   };
 }
 

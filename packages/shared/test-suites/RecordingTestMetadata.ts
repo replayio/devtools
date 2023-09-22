@@ -11,8 +11,11 @@ import { networkRequestsCache } from "replay-next/src/suspense/NetworkRequestsCa
 import { findSliceIndices, insert } from "replay-next/src/utils/array";
 import { assertWithTelemetry, recordData } from "replay-next/src/utils/telemetry";
 import { ReplayClientInterface } from "shared/client/types";
-import { Annotation, PlaywrightTestSources } from "shared/graphql/types";
-import { AnnotationsCache, PlaywrightAnnotationsCache } from "ui/components/TestSuite/suspense/AnnotationsCache";
+import { Annotation, PlaywrightTestSources, PlaywrightTestStacks } from "shared/graphql/types";
+import {
+  AnnotationsCache,
+  PlaywrightAnnotationsCache,
+} from "ui/components/TestSuite/suspense/AnnotationsCache";
 
 export type SemVer = string;
 
@@ -110,9 +113,6 @@ export namespace RecordingTestMetadataV2 {
       id: string;
       parentId: string | null;
       scope: string[] | null;
-
-      // Playwright only
-      stack: UserActionEventStack | null;
     };
   };
 
@@ -232,7 +232,7 @@ export namespace RecordingTestMetadataV3 {
   export type UserActionEventStack = Array<{
     columnNumber: number;
     fileName: string;
-    functionName: string;
+    functionName?: string;
     lineNumber: number;
   }>;
 
@@ -650,7 +650,8 @@ export async function processGroupedTestCases(
   groupedTestCases:
     | RecordingTestMetadataV2.GroupedTestCases
     | RecordingTestMetadataV3.GroupedTestCases,
-  testSources: PlaywrightTestSources | null
+  testSources: PlaywrightTestSources | null,
+  testStacks: PlaywrightTestStacks | null
 ): Promise<RecordingTestMetadataV3.GroupedTestCases> {
   if (isGroupedTestCasesV3(groupedTestCases)) {
     return groupedTestCases;
@@ -757,7 +758,7 @@ export async function processGroupedTestCases(
         let testRecordings: RecordingTestMetadataV3.TestRecording[] = [];
         for (let index = 0; index < partialTestRecordings.length; index++) {
           const legacyTest = partialTestRecordings[index];
-          const test = await processPlaywrightTestRecording(legacyTest, annotations);
+          const test = await processPlaywrightTestRecording(legacyTest, annotations, testStacks);
 
           testRecordings.push(test);
         }
@@ -786,7 +787,8 @@ export async function processGroupedTestCases(
 
 export async function processPlaywrightTestRecording(
   testRecording: RecordingTestMetadataV2.TestRecording | RecordingTestMetadataV3.TestRecording,
-  annotations: Annotation[]
+  annotations: Annotation[],
+  stacks: PlaywrightTestStacks | null
 ): Promise<RecordingTestMetadataV3.TestRecording> {
   if (isTestRecordingV2(testRecording)) {
     const { attempt, error, events: partialEvents, id, result, source } = testRecording;
@@ -820,9 +822,7 @@ export async function processPlaywrightTestRecording(
           id,
           parentId = null,
           scope = null,
-          stack = null,
-          rrId,
-        } = partialTestEvent.data as any;
+        } = partialTestEvent.data;
 
         assert(category, `Test event must have "category" property`, {
           command: command?.name,
@@ -847,8 +847,14 @@ export async function processPlaywrightTestRecording(
           }
         }
 
-        let startAnnotation = annotations.find(annotation => annotation.message.event === "step:start" && annotation.message.id === rrId);
-        let endAnnotation = annotations.find(annotation => annotation.message.event === "step:end" && annotation.message.id === rrId);
+        const stack = stacks?.[id];
+
+        let startAnnotation = annotations.find(
+          annotation => annotation.message.event === "step:start" && annotation.message.id === id
+        );
+        let endAnnotation = annotations.find(
+          annotation => annotation.message.event === "step:end" && annotation.message.id === id
+        );
         let timeStampedPointRange = null;
         if (startAnnotation || endAnnotation) {
           startAnnotation = startAnnotation ?? endAnnotation!;
@@ -869,7 +875,7 @@ export async function processPlaywrightTestRecording(
             resultVariable: null,
             scope,
             testSourceCallStack: stack
-              ? stack.map((frame: any) => ({
+              ? stack.map(frame => ({
                   columnNumber: frame.column,
                   fileName: frame.file,
                   functionName: frame.function,
