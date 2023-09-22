@@ -883,8 +883,8 @@ export async function processPlaywrightTestRecording(
                 }))
               : null,
             timeStampedPoints: {
-              afterStep: null,
-              beforeStep: null,
+              afterStep: timeStampedPointRange?.end ?? null,
+              beforeStep: timeStampedPointRange?.begin ?? null,
               result: null,
               viewSource: null,
             },
