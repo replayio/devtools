@@ -1,4 +1,4 @@
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { ApolloError, gql, useMutation, useQuery } from "@apollo/client";
 
 import {
   AcceptPendingInvitation,
@@ -109,12 +109,10 @@ export function useGetWorkspaceMembers(workspaceId: string) {
   return { members: workspaceUsers, loading };
 }
 
-export function useInviteNewWorkspaceMember(onCompleted: () => void) {
-  // Eventually we should handle error states better. For now, this is sufficient
-  // to handle error cases where a user tries to add an already invited/existing
-  // user to a team.
-  const onError = onCompleted;
-
+export function useInviteNewWorkspaceMember(
+  onCompleted: () => void,
+  onError: (err: ApolloError) => void = onCompleted
+) {
   const [inviteNewWorkspaceMember] = useMutation<
     InviteNewWorkspaceMember,
     InviteNewWorkspaceMemberVariables

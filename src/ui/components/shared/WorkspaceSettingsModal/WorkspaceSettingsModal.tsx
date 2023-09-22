@@ -4,6 +4,7 @@ import { WorkspaceUser } from "shared/graphql/types";
 import * as actions from "ui/actions/app";
 import { useRedirectToTeam } from "ui/components/Library/Team/utils";
 import { useGetTeamIdFromRoute } from "ui/components/Library/Team/utils";
+import { getBackendErrorMessage } from "ui/graphql/utils";
 import hooks from "ui/hooks";
 import { getModalOptions } from "ui/reducers/app";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
@@ -22,6 +23,8 @@ import OrganizationSettings from "./OrganizationSettings";
 import WorkspaceAPIKeys from "./WorkspaceAPIKeys";
 import WorkspaceMember, { NonRegisteredWorkspaceMember } from "./WorkspaceMember";
 import WorkspaceSubscription from "./WorkspaceSubscription";
+
+const USER_ALREADY_INVITED_MESSAGE = "User has already been invited";
 
 export function WorkspaceMembers({
   members,
@@ -70,10 +73,22 @@ function WorkspaceForm({ members = [] }: WorkspaceFormProps) {
   const [inputValue, setInputValue] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const inviteNewWorkspaceMember = hooks.useInviteNewWorkspaceMember(() => {
-    setInputValue("");
-    setIsLoading(false);
-  });
+  const inviteNewWorkspaceMember = hooks.useInviteNewWorkspaceMember(
+    () => {
+      setInputValue("");
+      setIsLoading(false);
+    },
+    err => {
+      trackEvent("error.add_member_error");
+      if (getBackendErrorMessage(err) === USER_ALREADY_INVITED_MESSAGE) {
+        setErrorMessage(USER_ALREADY_INVITED_MESSAGE);
+      } else {
+        setErrorMessage(
+          "We're unable to add a member to your team at this time. We're looking into this and will be in touch soon."
+        );
+      }
+    }
+  );
 
   const memberEmails = members.filter(m => m.email).map(m => m.email!);
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -95,13 +110,6 @@ function WorkspaceForm({ members = [] }: WorkspaceFormProps) {
     const resp = await inviteNewWorkspaceMember({
       variables: { workspaceId: workspaceId!, email: inputValue, roles: ["viewer", "debugger"] },
     });
-
-    if (resp.errors) {
-      trackEvent("error.add_member_error");
-      setErrorMessage(
-        "We're unable to add a member to your team at this time. We're looking into this and will be in touch soon."
-      );
-    }
   };
 
   const canSubmit = inputValue.length > 0;
