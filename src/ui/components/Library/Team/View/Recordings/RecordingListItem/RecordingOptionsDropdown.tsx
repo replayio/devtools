@@ -5,6 +5,7 @@ import React, { useState } from "react";
 import { Recording } from "shared/graphql/types";
 import { setModal } from "ui/actions/app";
 import { useGetTeamIdFromRoute } from "ui/components/Library/Team/utils";
+import { isTestSuiteReplay } from "ui/components/TestSuite/utils/isTestSuiteReplay";
 import hooks from "ui/hooks";
 import { useGetUserPermissions } from "ui/hooks/users";
 import { useAppDispatch } from "ui/setup/hooks";
@@ -132,6 +133,7 @@ function MoveRecordingOption({
 
   return (
     <MoveRecordingMenu
+      isTestSuiteReplay={isTestSuiteReplay(recording)}
       workspaces={workspaces}
       onMoveRecording={updateRecording}
       disableLibrary={!permissions.moveToLibrary}

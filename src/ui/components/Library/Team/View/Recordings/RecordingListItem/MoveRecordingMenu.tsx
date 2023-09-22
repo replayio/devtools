@@ -1,7 +1,8 @@
 import React from "react";
 
-import { Workspace } from "shared/graphql/types";
+import { Recording, Workspace } from "shared/graphql/types";
 import { useGetTeamIdFromRoute } from "ui/components/Library/Team/utils";
+import { isTestSuiteReplay } from "ui/components/TestSuite/utils/isTestSuiteReplay";
 import hooks from "ui/hooks";
 import { WorkspaceId } from "ui/state/app";
 import { subscriptionExpired } from "ui/utils/workspace";
@@ -12,17 +13,21 @@ type RecordingOptionsDropdownProps = {
   onMoveRecording: (targetWorkspaceId: WorkspaceId | null) => void;
   workspaces: Workspace[];
   disableLibrary: boolean;
+  isTestSuiteReplay: boolean;
 };
 
 export default function MoveRecordingMenu({
   onMoveRecording,
   workspaces,
   disableLibrary,
+  isTestSuiteReplay = false,
 }: RecordingOptionsDropdownProps) {
   const currentWorkspaceId = useGetTeamIdFromRoute();
   const { workspace, loading } = hooks.useGetWorkspace(currentWorkspaceId || "");
 
-  const availableWorkspaces = workspaces.filter(w => w.id !== currentWorkspaceId);
+  const availableWorkspaces = workspaces.filter(
+    w => w.id !== currentWorkspaceId && isTestSuiteReplay === !!w.isTest
+  );
 
   if (
     availableWorkspaces.length === 0 ||

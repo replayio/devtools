@@ -4,6 +4,7 @@ import React, { useState } from "react";
 
 import { Recording } from "shared/graphql/types";
 import { useGetTeamIdFromRoute } from "ui/components/Library/Team/utils";
+import { isTestSuiteReplay } from "ui/components/TestSuite/utils/isTestSuiteReplay";
 import hooks from "ui/hooks";
 import { WorkspaceId } from "ui/state/app";
 import { useIsPublicEnabled } from "ui/utils/org";
@@ -114,11 +115,16 @@ export default function BatchActionDropdown({
       <span>{`${selectedIds.length} item${selectedIds.length > 1 ? "s" : ""} selected`}</span>
     </span>
   );
+
+  const selectedRecordings = selectedIds.map(id => recordings.find(r => r.id === id));
   // Disable moving the selected recordings to the library if the user is not the author of
   // all the selected recordings.
-  const enableLibrary = selectedIds
-    .map(id => recordings.find(r => r.id === id))
-    .every(recording => userId === recording?.user?.id);
+  const enableLibrary = selectedRecordings.every(recording => userId === recording?.user?.id);
+  const testSuiteReplayFlags = selectedRecordings
+    .filter(r => r != null)
+    .map(r => isTestSuiteReplay(r!));
+  const allTestSuiteReplays = testSuiteReplayFlags.every(isTest => isTest === true);
+  const enableMove = allTestSuiteReplays || testSuiteReplayFlags.every(isTest => isTest === false);
 
   return (
     <PortalDropdown
@@ -138,11 +144,14 @@ export default function BatchActionDropdown({
         <DropdownItem onClick={deleteSelectedIds}>{`Delete ${selectedIds.length} item${
           selectedIds.length > 1 ? "s" : ""
         }`}</DropdownItem>
-        <MoveRecordingMenu
-          workspaces={workspaces}
-          onMoveRecording={updateRecordings}
-          disableLibrary={!enableLibrary}
-        />
+        {enableMove ? (
+          <MoveRecordingMenu
+            isTestSuiteReplay={allTestSuiteReplays}
+            workspaces={workspaces}
+            onMoveRecording={updateRecordings}
+            disableLibrary={!enableLibrary}
+          />
+        ) : null}
       </Dropdown>
     </PortalDropdown>
   );
