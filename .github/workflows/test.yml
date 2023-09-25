@@ -86,7 +86,7 @@ jobs:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
       - name: Install Replay Playwright
         run: npx @replayio/playwright install
-      - uses: replayio/action-playwright@main
+      - uses: replayio/action-playwright@ryan/debug-sourcemap-upload
         with:
           command: npx playwright test --shard ${{ matrix.shard }}/10 --reporter=@replayio/playwright/reporter,line tests/*.ts
           working-directory: ./packages/e2e-tests
@@ -139,7 +139,7 @@ jobs:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
       - name: Install Replay Playwright
         run: npx @replayio/playwright install
-      - uses: replayio/action-playwright@ryan/debug-sourcemap-upload
+      - uses: replayio/action-playwright@main
         with:
           command: npx playwright test --shard ${{ matrix.shard }}/1 --reporter=@replayio/playwright/reporter,line authenticated/**/*.ts
           working-directory: ./packages/e2e-tests
