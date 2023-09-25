@@ -127,7 +127,7 @@ function PlaywrightUserActionEventDetails({ stack }: { stack: UserActionEventSta
   }
 
   return (
-    <div className={styles.UserActionEventDetails} data-test-name="TestEventDetailsSource">
+    <div className={styles.UserActionEventDetails} data-test-name="UserActionEventDetails">
       <div className={styles.DetailsTitle}>Call stack</div>
       <div className={styles.CallStack}>
         {stack.map((frame, index) => (
