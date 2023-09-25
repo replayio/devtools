@@ -213,6 +213,7 @@ export interface Recording {
   isInitialized?: boolean;
   isProcessed?: boolean;
   isTest?: boolean;
+  isInTestWorkspace?: boolean;
   metadata?: RecordingMetadata | null;
   operations?: OperationsData;
   ownerNeedsInvite?: boolean;

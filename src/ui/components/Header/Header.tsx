@@ -19,6 +19,7 @@ import { useAppSelector } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
 import useAuth0 from "ui/utils/useAuth0";
 
+import { isTestSuiteReplay } from "../TestSuite/utils/isTestSuiteReplay";
 import { RecordingTrialEnd } from "./RecordingTrialEnd";
 import ShareButton from "./ShareButton";
 import styles from "./Header.module.css";
@@ -181,7 +182,7 @@ export default function Header() {
   if (recording.workspace !== null) {
     dashboardUrl = `/team/${recording.workspace?.id}`;
 
-    if (recording.isTest && recording.metadata?.test !== undefined) {
+    if (isTestSuiteReplay(recording) && recording.metadata?.test) {
       const runId = getTestRunId(recording.metadata.test);
       if (runId != null) {
         dashboardUrl += `/runs/${runId}`;
