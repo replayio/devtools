@@ -39,8 +39,7 @@ export function WorkspaceMembers({
       .sort((a: WorkspaceUser, b: WorkspaceUser) => Number(b.pending) - Number(a.pending));
   }, [members]);
 
-  const canLeave = members.length > 1;
-  const canAdminLeave = canLeave && members.filter(a => a.roles?.includes("admin")).length > 1;
+  const adminCount = members.filter(a => a.roles?.includes("admin") && !a.pending).length;
 
   return (
     <ul className="flex flex-col space-y-2.5">
@@ -56,7 +55,7 @@ export function WorkspaceMembers({
             member={member}
             key={`registered-${member.userId}`}
             isAdmin={isAdmin}
-            canLeave={member.roles?.includes("admin") ? canAdminLeave : canLeave}
+            canLeave={member.roles?.includes("admin") ? adminCount > 1 : members.length > 1}
           />
         )
       )}
