@@ -2,8 +2,10 @@ import { RecordingId } from "@replayio/protocol";
 import classNames from "classnames";
 import React, { useState } from "react";
 
+import { assert } from "protocol/utils";
 import { Recording } from "shared/graphql/types";
 import { useGetTeamIdFromRoute } from "ui/components/Library/Team/utils";
+import { isTestSuiteReplay } from "ui/components/TestSuite/utils/isTestSuiteReplay";
 import hooks from "ui/hooks";
 import { WorkspaceId } from "ui/state/app";
 import { useIsPublicEnabled } from "ui/utils/org";
@@ -114,11 +116,33 @@ export default function BatchActionDropdown({
       <span>{`${selectedIds.length} item${selectedIds.length > 1 ? "s" : ""} selected`}</span>
     </span>
   );
+
+  let allRecordingsOwnedByCurrentUser = true;
+  let hasTestSuiteRecordings = false;
+  let hasNonTestSuiteRecordings = false;
+
+  selectedIds.forEach(id => {
+    const recording = recordings.find(recording => recording.id === id);
+    assert(recording);
+
+    if (userId !== recording.user?.id) {
+      allRecordingsOwnedByCurrentUser = false;
+    }
+
+    if (isTestSuiteReplay(recording)) {
+      hasTestSuiteRecordings = true;
+    } else {
+      hasNonTestSuiteRecordings = true;
+    }
+  });
+
   // Disable moving the selected recordings to the library if the user is not the author of
   // all the selected recordings.
-  const enableLibrary = selectedIds
-    .map(id => recordings.find(r => r.id === id))
-    .every(recording => userId === recording?.user?.id);
+  const enableLibrary = allRecordingsOwnedByCurrentUser;
+
+  // Disable moving the selected recordings if they are not all test suite
+  // replays or not all regular replays.
+  const enableMove = !(hasTestSuiteRecordings && hasNonTestSuiteRecordings);
 
   return (
     <PortalDropdown
@@ -138,11 +162,14 @@ export default function BatchActionDropdown({
         <DropdownItem onClick={deleteSelectedIds}>{`Delete ${selectedIds.length} item${
           selectedIds.length > 1 ? "s" : ""
         }`}</DropdownItem>
-        <MoveRecordingMenu
-          workspaces={workspaces}
-          onMoveRecording={updateRecordings}
-          disableLibrary={!enableLibrary}
-        />
+        {enableMove ? (
+          <MoveRecordingMenu
+            isTestSuiteReplay={hasTestSuiteRecordings}
+            workspaces={workspaces}
+            onMoveRecording={updateRecordings}
+            disableLibrary={!enableLibrary}
+          />
+        ) : null}
       </Dropdown>
     </PortalDropdown>
   );
