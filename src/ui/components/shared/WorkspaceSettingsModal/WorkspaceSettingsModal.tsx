@@ -75,10 +75,13 @@ function WorkspaceForm() {
       setIsLoading(false);
     },
     err => {
-      trackEvent("error.add_member_error");
+      setInputValue("");
+      setIsLoading(false);
+
       if (getBackendErrorMessage(err) === USER_ALREADY_INVITED_MESSAGE) {
-        setErrorMessage(USER_ALREADY_INVITED_MESSAGE);
+        setErrorMessage(`${inputValue} is already a member of this team.`);
       } else {
+        trackEvent("error.add_member_error");
         setErrorMessage(
           "We're unable to add a member to your team at this time. We're looking into this and will be in touch soon."
         );
