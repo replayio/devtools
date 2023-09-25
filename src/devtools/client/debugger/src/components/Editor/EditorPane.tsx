@@ -5,7 +5,7 @@ import { IndeterminateProgressBar } from "replay-next/components/IndeterminateLo
 import { userData } from "shared/user-data/GraphQL/UserData";
 import { Redacted } from "ui/components/Redacted";
 import { getToolboxLayout } from "ui/reducers/layout";
-import { getSelectedSource, getSourcesUserActionPending } from "ui/reducers/sources";
+import { getSelectedSourceId, getSourcesUserActionPending } from "ui/reducers/sources";
 import { useAppSelector } from "ui/setup/hooks";
 import useWidthObserver from "ui/utils/useWidthObserver";
 
@@ -16,7 +16,7 @@ import EditorTabs from "./Tabs";
 
 export const EditorPane = () => {
   const toolboxLayout = useAppSelector(getToolboxLayout);
-  const selectedSource = useAppSelector(getSelectedSource);
+  const selectedSourceId = useAppSelector(getSelectedSourceId);
   const sourcesUserActionPending = useAppSelector(getSourcesUserActionPending);
   const panelEl = useRef(null);
   const enableLargeText = userData.get("global_enableLargeText");
@@ -44,14 +44,14 @@ export const EditorPane = () => {
       <div className="editor-container relative">
         {sourcesUserActionPending ? <IndeterminateProgressBar /> : null}
         <EditorTabs />
-        {selectedSource ? (
+        {selectedSourceId ? (
           <Redacted className="h-full">
             <NewSourceAdapter />
           </Redacted>
         ) : (
           <WelcomeBox />
         )}
-        {selectedSource && <EditorFooter />}
+        {selectedSourceId && <EditorFooter />}
       </div>
     </div>
   );

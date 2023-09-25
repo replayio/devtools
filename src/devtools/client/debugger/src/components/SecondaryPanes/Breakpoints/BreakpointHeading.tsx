@@ -5,7 +5,7 @@ import { ConnectedProps, connect } from "react-redux";
 import type { Context } from "devtools/client/debugger/src/reducers/pause";
 import { Point } from "shared/client/types";
 import { Redacted } from "ui/components/Redacted";
-import { MiniSource, getHasSiblingOfSameName, getSourceDetails } from "ui/reducers/sources";
+import { MiniSource, getSourceDetails } from "ui/reducers/sources";
 import type { UIState } from "ui/state";
 
 import actions from "../../../actions";
@@ -27,7 +27,6 @@ const mapStateToProps = (state: UIState, { sourceId }: BHExtraProps) => {
   return {
     cx: getContext(state),
     executionPoint: getExecutionPoint(state),
-    hasSiblingOfSameName: getHasSiblingOfSameName(state, source),
     source,
   };
 };
@@ -46,13 +45,13 @@ class BreakpointHeading extends PureComponent<BreakpointsProps> {
   };
 
   getLabel() {
-    const { breakpoint, source, hasSiblingOfSameName } = this.props;
+    const { breakpoint, source } = this.props;
     const { column, line } = breakpoint?.location ?? {};
 
     const columnVal = column != null ? `:${column}` : "";
     const location = `:${line}${columnVal}`;
 
-    const query = hasSiblingOfSameName ? getSourceQueryString(source) : "";
+    const query = getSourceQueryString(source);
     const fileName = getTruncatedFileName(source, query);
 
     return `${fileName}${location}`;
@@ -72,9 +71,9 @@ class BreakpointHeading extends PureComponent<BreakpointsProps> {
   };
 
   render() {
-    const { allBreakpointsAreShared, source, hasSiblingOfSameName } = this.props;
+    const { allBreakpointsAreShared, source } = this.props;
 
-    const query = hasSiblingOfSameName ? getSourceQueryString(source) : "";
+    const query = getSourceQueryString(source);
     const fileName = getTruncatedFileName(source, query);
 
     return (

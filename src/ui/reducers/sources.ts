@@ -6,13 +6,12 @@ import {
   createSelector,
   createSlice,
 } from "@reduxjs/toolkit";
-import { Location, MappedLocation } from "@replayio/protocol";
+import { MappedLocation } from "@replayio/protocol";
 
 import type { PartialLocation } from "devtools/client/debugger/src/actions/sources";
 import { assert } from "protocol/utils";
 import { Source } from "replay-next/src/suspense/SourcesCache";
 import { UIState } from "ui/state";
-import { LoadingStatus } from "ui/utils/LoadingStatus";
 
 export type SourceDetails = Source;
 
@@ -143,12 +142,6 @@ export const getSelectedSource = (state: UIState) => {
   const selectedSourceId = getSelectedSourceId(state);
   return selectedSourceId ? getSourceDetails(state, selectedSourceId) : null;
 };
-export const getSourcesById = (state: UIState, ids: string[]) => {
-  return ids.map(id => getSourceDetails(state, id)!);
-};
-export const getCorrespondingSourceIds = (state: UIState, id: string) => {
-  return getCorrespondingSourceIdsFromSourcesState(state.sources, id);
-};
 export const getCorrespondingSourceIdsFromSourcesState = (sources: SourcesState, id: string) => {
   const source = sources.sourceDetails.entities[id];
   // TODO [hbenl] disabled for now because the sources we receive from the backend
@@ -159,39 +152,6 @@ export const getCorrespondingSourceIdsFromSourcesState = (sources: SourcesState,
 
 export const getSelectedLocationHasScrolled = (state: UIState) =>
   state.sources.selectedLocationHasScrolled;
-
-// This is useful if you are displaying a bunch of sources and want them to
-// ensure they all have unique names, even though some of them might have been
-// loaded from the same URL. If that's the case, and either of the original URLs
-// had a query string, then we will add that query string back.
-export const getUniqueUrlForSource = (state: UIState, sourceId: string) => {
-  const sourceDetails = getSourceDetails(state, sourceId);
-  if (!sourceDetails || !sourceDetails.url) {
-    return null;
-  }
-  if (state.sources.sourcesByUrl[sourceDetails.url].length > 1) {
-    // I was going to put the query string back here...
-    // But I'm not sure we're actually *removing* query strings in the first
-    // place yet!
-    // TODO @jcmorrow - actually remove query strings, then add them back here.
-    const queryString = "";
-    return sourceDetails.url + queryString;
-  } else {
-    return sourceDetails.url;
-  }
-};
-
-export const isFulfilled = (item?: { status: LoadingStatus }) => {
-  return item?.status === LoadingStatus.LOADED;
-};
-
-export const isOriginalSource = (sd: SourceDetails) => {
-  return sd.isSourceMapped;
-};
-
-export const isPrettyPrintedSource = (sd: SourceDetails) => {
-  return !!sd.prettyPrintedFrom;
-};
 
 export function getBestSourceMappedSourceId(
   sourcesById: Dictionary<SourceDetails>,
@@ -303,35 +263,6 @@ export function getAlternateLocation(sources: SourcesState, locations: MappedLoc
   return null;
 }
 
-export function getGeneratedLocation(
-  sourcesById: Dictionary<SourceDetails>,
-  locations: MappedLocation
-): Location {
-  const location = locations.find(location => {
-    const source = sourcesById[location.sourceId];
-    return source?.generated.length === 0;
-  });
-  assert(location, "no generated location found");
-  return location || locations[0];
-}
-
-export function getHasSiblingOfSameName(state: UIState, source: MiniSource) {
-  if (!source || !source.url) {
-    return false;
-  }
-
-  return state.sources.sourcesByUrl[source.url]?.length > 0;
-}
-
-export function getSourceIdToDisplayById(state: UIState, sourceId: string) {
-  return getCorrespondingSourceIds(state, sourceId)[0];
-}
-
-export const getSourceToDisplayById = (state: UIState, sourceId: string) => {
-  const sourceIdToDisplay = getSourceIdToDisplayById(state, sourceId);
-  return sourceIdToDisplay ? getSourceDetails(state, sourceIdToDisplay) : undefined;
-};
-
 export function getSourceIdsByUrl(state: UIState) {
   return state.sources.sourcesByUrl;
 }
@@ -352,20 +283,6 @@ export const getSourcesToDisplayByUrl = createSelector(
   }
 );
 
-export function getSourceIdToDisplayForUrl(state: UIState, url: string) {
-  const sourceIds = state.sources.sourcesByUrl[url];
-  if (!sourceIds) {
-    return;
-  }
-  const preferred = getPreferredSourceId(state.sources.sourceDetails.entities, sourceIds)!;
-  return getCorrespondingSourceIds(state, preferred)[0];
-}
-
-export const getSourceToDisplayForUrl = (state: UIState, url: string) => {
-  const sourceId = getSourceIdToDisplayForUrl(state, url);
-  return sourceId ? getSourceDetails(state, sourceId) : undefined;
-};
-
 export const getPreviousPersistedLocation = (state: UIState) =>
   state.sources.persistedSelectedLocation;
 
@@ -376,7 +293,6 @@ export const getSourcesUserActionPending = (state: UIState) =>
   state.sources.sourcesUserActionPending;
 
 export const selectors = {
-  getAllSourceDetails,
   getSourceDetails,
   getSourceDetailsEntities,
   getSourceDetailsCount,
@@ -384,16 +300,8 @@ export const selectors = {
   getSelectedLocation,
   getSelectedSourceId,
   getSelectedSource,
-  getSourcesById,
-  getCorrespondingSourceIds,
   getSelectedLocationHasScrolled,
-  getUniqueUrlForSource,
-  getHasSiblingOfSameName,
   getPreviousPersistedLocation,
-  getSourceToDisplayById,
-  getSourceIdToDisplayById,
-  getSourceToDisplayForUrl,
-  getSourceIdToDisplayForUrl,
   getSourceIdsByUrl,
   getSourcesToDisplayByUrl,
   getPreferredGeneratedSources,

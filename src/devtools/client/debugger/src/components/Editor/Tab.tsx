@@ -1,13 +1,15 @@
 import { SourceId } from "@replayio/protocol";
 import classnames from "classnames";
-import { DragEventHandler, MouseEvent } from "react";
+import { DragEventHandler, MouseEvent, useContext } from "react";
 
 import { selectSource } from "devtools/client/debugger/src/actions/sources";
 import { closeTab } from "devtools/client/debugger/src/actions/tabs";
 import useTabContextMenu from "devtools/client/debugger/src/components/Editor/useTabContextMenu";
 import useTooltip from "replay-next/src/hooks/useTooltip";
+import { useSourcesById } from "replay-next/src/suspense/SourcesCache";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Redacted } from "ui/components/Redacted";
-import { SourceDetails, getHasSiblingOfSameName, getSelectedSource } from "ui/reducers/sources";
+import { SourceDetails, getSelectedSourceId } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
 
@@ -36,10 +38,12 @@ export default function Tab({
 }) {
   const dispatch = useAppDispatch();
 
+  const replayClient = useContext(ReplayClientContext);
   const cx = useAppSelector(getContext);
-  const selectedSource = useAppSelector(getSelectedSource);
+  const selectedSourceId = useAppSelector(getSelectedSourceId);
+  const sourcesById = useSourcesById(replayClient);
+  const selectedSource = selectedSourceId ? sourcesById.get(selectedSourceId) : undefined;
   const activeSearch = useAppSelector(getActiveSearch);
-  const hasSiblingOfSameName = useAppSelector(state => getHasSiblingOfSameName(state, source));
 
   // @ts-expect-error activeSearch possible values mismatch
   const isSourceSearchEnabled = activeSearch === "source";
@@ -66,7 +70,7 @@ export default function Tab({
     pretty: isPrettyCode,
   });
 
-  const query = hasSiblingOfSameName ? getSourceQueryString(source) : "";
+  const query = getSourceQueryString(source);
 
   const { contextMenu, onContextMenu } = useTabContextMenu({
     source,

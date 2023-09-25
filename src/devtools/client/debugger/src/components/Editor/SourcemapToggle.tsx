@@ -1,8 +1,9 @@
 import React, { useContext } from "react";
 
+import { useSourcesById } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { setModal } from "ui/actions/app";
-import { getSelectedSource } from "ui/reducers/sources";
+import { getSelectedSourceId } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 import { showAlternateSource } from "../../actions/sources/select";
@@ -44,7 +45,9 @@ export default function SourcemapToggleSuspends({
 }) {
   const dispatch = useAppDispatch();
   const client = useContext(ReplayClientContext);
-  const selectedSource = useAppSelector(getSelectedSource);
+  const selectedSourceId = useAppSelector(getSelectedSourceId);
+  const sourcesById = useSourcesById(client);
+  const selectedSource = selectedSourceId ? sourcesById.get(selectedSourceId) : undefined;
   const selectedFrameId = useAppSelector(getSelectedFrameId);
   const sourcesState = useAppSelector(state => state.sources);
   const alternateSourceIdResult = getAlternateSourceIdSuspense(

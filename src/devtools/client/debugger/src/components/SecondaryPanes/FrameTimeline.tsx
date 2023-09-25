@@ -2,8 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
-
 import {
   Location,
   PointDescription,
@@ -17,14 +15,14 @@ import ReactTooltip from "react-tooltip";
 import { locationsInclude } from "protocol/utils";
 import { frameStepsCache } from "replay-next/src/suspense/FrameStepsCache";
 import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
+import { getSourceSuspends } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { userData } from "shared/user-data/GraphQL/UserData";
 import { actions } from "ui/actions";
 import {
   SourcesState,
   getPreferredLocation,
   getSelectedLocation,
-  getSelectedSource,
+  getSelectedSourceId,
 } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
@@ -232,7 +230,8 @@ function FrameTimeline() {
   const executionPoint = useAppSelector(getExecutionPoint);
   const selectedLocation = useAppSelector(getSelectedLocation);
   const selectedFrame = useAppSelector(state => getSelectedFrameSuspense(replayClient, state));
-  const source = useAppSelector(getSelectedSource);
+  const sourceId = useAppSelector(getSelectedSourceId);
+  const source = sourceId ? getSourceSuspends(replayClient, sourceId) : null;
   const symbols = source ? sourceOutlineCache.read(replayClient, source.id) : null;
   const frameSteps = selectedFrame
     ? frameStepsCache.read(replayClient, selectedFrame.pauseId, selectedFrame.protocolId)
