@@ -4,6 +4,7 @@ import { WorkspaceUser } from "shared/graphql/types";
 import * as actions from "ui/actions/app";
 import { useRedirectToTeam } from "ui/components/Library/Team/utils";
 import { useGetTeamIdFromRoute } from "ui/components/Library/Team/utils";
+import { getBackendErrorMessage } from "ui/graphql/utils";
 import hooks from "ui/hooks";
 import { getModalOptions } from "ui/reducers/app";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
@@ -22,6 +23,8 @@ import OrganizationSettings from "./OrganizationSettings";
 import WorkspaceAPIKeys from "./WorkspaceAPIKeys";
 import WorkspaceMember, { NonRegisteredWorkspaceMember } from "./WorkspaceMember";
 import WorkspaceSubscription from "./WorkspaceSubscription";
+
+const USER_ALREADY_INVITED_MESSAGE = "User has already been invited";
 
 export function WorkspaceMembers({
   members,
@@ -62,21 +65,31 @@ export function WorkspaceMembers({
   );
 }
 
-type WorkspaceFormProps = {
-  members?: WorkspaceUser[];
-};
-
-function WorkspaceForm({ members = [] }: WorkspaceFormProps) {
+function WorkspaceForm() {
   const workspaceId = useGetTeamIdFromRoute();
   const [inputValue, setInputValue] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const inviteNewWorkspaceMember = hooks.useInviteNewWorkspaceMember(() => {
-    setInputValue("");
-    setIsLoading(false);
-  });
+  const inviteNewWorkspaceMember = hooks.useInviteNewWorkspaceMember(
+    () => {
+      setInputValue("");
+      setIsLoading(false);
+    },
+    err => {
+      setInputValue("");
+      setIsLoading(false);
 
-  const memberEmails = members.filter(m => m.email).map(m => m.email!);
+      if (getBackendErrorMessage(err) === USER_ALREADY_INVITED_MESSAGE) {
+        setErrorMessage(`${inputValue} is already a member of this team.`);
+      } else {
+        trackEvent("error.add_member_error");
+        setErrorMessage(
+          "We're unable to add a member to your team at this time. We're looking into this and will be in touch soon."
+        );
+      }
+    }
+  );
+
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
   };
@@ -86,27 +99,16 @@ function WorkspaceForm({ members = [] }: WorkspaceFormProps) {
     if (!validateEmail(inputValue)) {
       setErrorMessage("Invalid email address");
       return;
-    } else if (memberEmails.includes(inputValue)) {
-      setErrorMessage("Address has already been invited");
-      return;
     }
 
     setErrorMessage(null);
     setIsLoading(true);
-    const resp = await inviteNewWorkspaceMember({
+    await inviteNewWorkspaceMember({
       variables: { workspaceId: workspaceId!, email: inputValue, roles: ["viewer", "debugger"] },
     });
-
-    if (resp.errors) {
-      trackEvent("error.add_member_error");
-      setErrorMessage(
-        "We're unable to add a member to your team at this time. We're looking into this and will be in touch soon."
-      );
-    }
   };
 
   const canSubmit = inputValue.length > 0;
-  console.log(canSubmit);
 
   return (
     <form className="flex flex-col" onSubmit={handleAddMember}>
@@ -165,7 +167,7 @@ const settings: Settings<
       return (
         <div className="flex flex-grow flex-col space-y-3">
           <div>{`Manage members here so that everyone who belongs to this team can see each other's replays.`}</div>
-          <WorkspaceForm members={members} />
+          <WorkspaceForm />
           <div className="text-xs font-semibold uppercase">{`Members`}</div>
           <div className="flex-grow overflow-y-auto">
             <div className="workspace-members-container flex flex-col space-y-1.5">
