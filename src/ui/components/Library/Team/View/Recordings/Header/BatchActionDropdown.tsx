@@ -2,6 +2,7 @@ import { RecordingId } from "@replayio/protocol";
 import classNames from "classnames";
 import React, { useState } from "react";
 
+import { assert } from "protocol/utils";
 import { Recording } from "shared/graphql/types";
 import { useGetTeamIdFromRoute } from "ui/components/Library/Team/utils";
 import { isTestSuiteReplay } from "ui/components/TestSuite/utils/isTestSuiteReplay";
@@ -116,15 +117,32 @@ export default function BatchActionDropdown({
     </span>
   );
 
-  const selectedRecordings = selectedIds.map(id => recordings.find(r => r.id === id));
+  let allRecordingsOwnedByCurrentUser = true;
+  let hasTestSuiteRecordings = false;
+  let hasNonTestSuiteRecordings = false;
+
+  selectedIds.forEach(id => {
+    const recording = recordings.find(recording => recording.id === id);
+    assert(recording);
+
+    if (userId !== recording.user?.id) {
+      allRecordingsOwnedByCurrentUser = false;
+    }
+
+    if (isTestSuiteReplay(recording)) {
+      hasTestSuiteRecordings = true;
+    } else {
+      hasNonTestSuiteRecordings = true;
+    }
+  });
+
   // Disable moving the selected recordings to the library if the user is not the author of
   // all the selected recordings.
-  const enableLibrary = selectedRecordings.every(recording => userId === recording?.user?.id);
-  const testSuiteReplayFlags = selectedRecordings
-    .filter(r => r != null)
-    .map(r => isTestSuiteReplay(r!));
-  const allTestSuiteReplays = testSuiteReplayFlags.every(isTest => isTest === true);
-  const enableMove = allTestSuiteReplays || testSuiteReplayFlags.every(isTest => isTest === false);
+  const enableLibrary = allRecordingsOwnedByCurrentUser;
+
+  // Disable moving the selected recordings if they are not all test suite
+  // replays or not all regular replays.
+  const enableMove = !(hasTestSuiteRecordings && hasNonTestSuiteRecordings);
 
   return (
     <PortalDropdown
@@ -146,7 +164,7 @@ export default function BatchActionDropdown({
         }`}</DropdownItem>
         {enableMove ? (
           <MoveRecordingMenu
-            isTestSuiteReplay={allTestSuiteReplays}
+            isTestSuiteReplay={hasTestSuiteRecordings}
             workspaces={workspaces}
             onMoveRecording={updateRecordings}
             disableLibrary={!enableLibrary}
