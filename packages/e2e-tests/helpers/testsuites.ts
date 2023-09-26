@@ -27,6 +27,17 @@ export async function openCypressTestPanel(page: Page): Promise<void> {
   }
 }
 
+export async function openPlaywrightTestPanel(page: Page): Promise<void> {
+  // Only click if it's not already open; clicking again will collapse the side bar.
+  const pane = getTestSuitePanel(page);
+
+  let isVisible = await pane.isVisible();
+
+  if (!isVisible) {
+    await getByTestName(page, "ToolbarButton-TestInfo").click();
+  }
+}
+
 export function getTestRows(page: Page) {
   return getByTestName(page, "TestRecordingTreeRow");
 }
