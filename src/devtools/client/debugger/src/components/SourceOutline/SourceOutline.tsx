@@ -12,9 +12,10 @@ import {
   SourceOutlineWithHitCounts,
   outlineHitCountsCache,
 } from "replay-next/src/suspense/OutlineHitCountsCache";
+import { useSourcesById } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { toPointRange } from "shared/utils/time";
-import { SourceDetails, getSelectedSource } from "ui/reducers/sources";
+import { SourceDetails, getSelectedSourceId } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 import { selectLocation } from "../../actions/sources";
@@ -164,9 +165,11 @@ export function SourceOutline({
 
 export default function SourceOutlineWrapper() {
   // This goofy outer selection is so that SourceOutline.stories can inject fake values.
-  const cursorPosition = useAppSelector(getCursorPosition);
-  const selectedSource = useAppSelector(getSelectedSource);
   const replayClient = useContext(ReplayClientContext);
+  const cursorPosition = useAppSelector(getCursorPosition);
+  const selectedSourceId = useAppSelector(getSelectedSourceId);
+  const sourcesById = useSourcesById(replayClient);
+  const selectedSource = selectedSourceId ? sourcesById.get(selectedSourceId) : undefined;
   const { range: focusRange } = useContext(FocusContext);
 
   let symbols: SourceOutlineWithHitCounts | null = null;

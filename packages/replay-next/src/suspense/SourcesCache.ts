@@ -11,6 +11,7 @@ import {
   StreamingValue,
   createSingleEntryCache,
   createStreamingCache,
+  useImperativeCacheValue,
 } from "suspense";
 
 import { ArrayMap, assert } from "protocol/utils";
@@ -254,4 +255,22 @@ export function getSourceSuspends(
 ): Source | null {
   const sources = sourcesByIdCache.read(client);
   return sources.get(sourceId) ?? null;
+}
+
+const emptySources: Source[] = [];
+export function useSources(client: ReplayClientInterface) {
+  const cached = useImperativeCacheValue(sourcesCache, client);
+  return cached.status === "resolved" ? cached.value : emptySources;
+}
+
+const emptySourcesById = new Map<SourceId, Source>();
+export function useSourcesById(client: ReplayClientInterface) {
+  const cached = useImperativeCacheValue(sourcesByIdCache, client);
+  return cached.status === "resolved" ? cached.value : emptySourcesById;
+}
+
+const emptySourcesByUrl = new Map<SourceId, Source[]>();
+export function useSourcesByUrl(client: ReplayClientInterface) {
+  const cached = useImperativeCacheValue(sourcesByUrlCache, client);
+  return cached.status === "resolved" ? cached.value : emptySourcesByUrl;
 }

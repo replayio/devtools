@@ -18,6 +18,7 @@ import { trackEvent } from "ui/utils/telemetry";
 
 import { actions } from "../actions";
 import { selectors } from "../reducers";
+import { isTestSuiteReplay } from "./TestSuite/utils/isTestSuiteReplay";
 import styles from "./Toolbar.module.css";
 
 function CypressIcon() {
@@ -425,11 +426,12 @@ export default function Toolbar() {
     }
   };
 
-  const testMetadata = recording?.metadata?.test;
-
   let testRunner = null;
-  if (testMetadata && !isGroupedTestCasesV1(testMetadata)) {
-    testRunner = testMetadata.environment.testRunner.name;
+  if (recording && isTestSuiteReplay(recording)) {
+    const testMetadata = recording.metadata?.test;
+    if (testMetadata && !isGroupedTestCasesV1(testMetadata)) {
+      testRunner = testMetadata.environment.testRunner.name;
+    }
   }
 
   return (

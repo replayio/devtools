@@ -6,9 +6,12 @@
 
 import type { Context } from "devtools/client/debugger/src/reducers/pause";
 import { copyToClipboard as copyTextToClipboard } from "replay-next/components/sources/utils/clipboard";
-import { streamingSourceContentsCache } from "replay-next/src/suspense/SourcesCache";
+import {
+  Source,
+  sourcesByIdCache,
+  streamingSourceContentsCache,
+} from "replay-next/src/suspense/SourcesCache";
 import type { UIThunkAction } from "ui/actions";
-import { SourceDetails, getSourceDetails } from "ui/reducers/sources";
 
 import { closeQuickOpen } from "../reducers/quick-open";
 import {
@@ -67,8 +70,9 @@ export function openSourceLink(sourceId: string, line?: number, column?: number)
 }
 
 export function showSource(cx: Context, sourceId: string, openSource = true): UIThunkAction {
-  return (dispatch, getState) => {
-    const source = getSourceDetails(getState(), sourceId);
+  return (dispatch, getState, { replayClient }) => {
+    const sourcesById = sourcesByIdCache.getValueIfCached(replayClient);
+    const source = sourcesById?.get(sourceId);
 
     if (!source) {
       return;
@@ -87,7 +91,7 @@ export function flashLineRange(location: HighlightedRange): UIThunkAction {
   };
 }
 
-export function copyToClipboard(source: SourceDetails): UIThunkAction {
+export function copyToClipboard(source: Source): UIThunkAction {
   return (dispatch, getState, { replayClient }) => {
     const streaming = streamingSourceContentsCache.stream(replayClient, source.id);
     if (streaming?.complete) {

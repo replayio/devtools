@@ -60,7 +60,6 @@ export interface GetMyRecordings_viewer_recordings_edges_node {
   createdAt: any;
   private: boolean;
   isInitialized: boolean;
-  isProcessed: boolean;
   userRole: string;
   owner: GetMyRecordings_viewer_recordings_edges_node_owner | null;
   comments: GetMyRecordings_viewer_recordings_edges_node_comments[];

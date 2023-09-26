@@ -10,18 +10,15 @@ import React, { Component } from "react";
 import { useImperativeCacheValue } from "suspense";
 
 import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
-import { streamingSourceContentsCache } from "replay-next/src/suspense/SourcesCache";
+import {
+  streamingSourceContentsCache,
+  useSourcesById,
+} from "replay-next/src/suspense/SourcesCache";
 import { replayClient } from "shared/client/ReplayClientContext";
 import { ViewMode } from "shared/user-data/GraphQL/config";
 import { setViewMode as setViewModeAction } from "ui/actions/layout";
 import { getViewMode } from "ui/reducers/layout";
-import {
-  SourceDetails,
-  getAllSourceDetails,
-  getSelectedSource,
-  getSourcesLoading,
-  getSourcesToDisplayByUrl,
-} from "ui/reducers/sources";
+import { SourceDetails, getSelectedSourceId, getSourcesToDisplayByUrl } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
 
@@ -517,8 +514,9 @@ interface QuickOpenModalProps {
 }
 
 export default function QuickOpenModalWrapper() {
-  const sourceList = useAppSelector(getAllSourceDetails);
-  const selectedSource = useAppSelector(getSelectedSource);
+  const selectedSourceId = useAppSelector(getSelectedSourceId);
+  const sourcesById = useSourcesById(replayClient);
+  const selectedSource = selectedSourceId ? sourcesById.get(selectedSourceId) : undefined;
   const symbolsCacheValue = useImperativeCacheValue(
     sourceOutlineCache,
     replayClient,
@@ -535,9 +533,9 @@ export default function QuickOpenModalWrapper() {
     searchType: useAppSelector(getQuickOpenType),
     selectedSource,
     showOnlyOpenSources: useAppSelector(getShowOnlyOpenSources),
-    sourceCount: sourceList.length,
+    sourceCount: sourcesById.size,
     sourcesForTabs: useAppSelector(getSourcesForTabs),
-    sourcesLoading: useAppSelector(getSourcesLoading),
+    sourcesLoading: sourcesById.size === 0,
     sourcesToDisplayByUrl: useAppSelector(getSourcesToDisplayByUrl),
     symbols:
       symbolsCacheValue.status === "resolved"

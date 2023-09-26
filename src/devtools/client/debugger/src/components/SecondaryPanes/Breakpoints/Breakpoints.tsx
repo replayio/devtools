@@ -3,9 +3,9 @@ import { ReactNode, useContext, useMemo } from "react";
 
 import { PointsContext } from "replay-next/src/contexts/points/PointsContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
+import { useSourcesById } from "replay-next/src/suspense/SourcesCache";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { POINT_BEHAVIOR_DISABLED, Point } from "shared/client/types";
-import { getSourceDetailsEntities } from "ui/reducers/sources";
-import { useAppSelector } from "ui/setup/hooks";
 
 import Breakpoint from "./Breakpoint";
 import BreakpointHeading from "./BreakpointHeading";
@@ -20,6 +20,7 @@ export default function Breakpoints({
   emptyContent: ReactNode;
   type: "breakpoint" | "logpoint";
 }) {
+  const replayClient = useContext(ReplayClientContext);
   const {
     deletePoints,
     editPointBehavior,
@@ -28,7 +29,7 @@ export default function Breakpoints({
   } = useContext(PointsContext);
   const { currentUserInfo } = useContext(SessionContext);
 
-  const sourceDetailsEntities = useAppSelector(getSourceDetailsEntities);
+  const sourceDetailsEntities = useSourcesById(replayClient);
 
   const filteredAndSortedPoints = useMemo(
     () =>
@@ -38,7 +39,7 @@ export default function Breakpoints({
           // Either we might not have sources fetched yet,
           // or there could be obsolete persisted source IDs for points.
           // Ensure we only show points that have valid sources available.
-          const sourceExists = !!sourceDetailsEntities[point.location.sourceId];
+          const sourceExists = sourceDetailsEntities.has(point.location.sourceId);
 
           const { shouldBreak, shouldLog } = pointBehaviors[point.key] ?? {};
 

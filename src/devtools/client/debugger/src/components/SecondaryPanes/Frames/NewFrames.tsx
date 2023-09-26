@@ -1,5 +1,6 @@
 import { ExecutionPoint, PauseId } from "@replayio/protocol";
 import { Suspense, useContext, useMemo } from "react";
+import { useImperativeCacheValue } from "suspense";
 
 import {
   Context,
@@ -16,10 +17,10 @@ import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { useCurrentFocusWindow } from "replay-next/src/hooks/useCurrentFocusWindow";
 import { useIsPointWithinFocusWindow } from "replay-next/src/hooks/useIsPointWithinFocusWindow";
 import { getPointAndTimeForPauseId, pauseIdCache } from "replay-next/src/suspense/PauseCache";
+import { sourcesCache } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { isPointInRegion } from "shared/utils/time";
 import { enterFocusMode } from "ui/actions/timeline";
-import { getSourcesLoading } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { getPauseFramesSuspense } from "ui/suspense/frameCache";
 import { getAsyncParentPauseIdSuspense } from "ui/suspense/util";
@@ -188,7 +189,8 @@ interface FramesProps {
 
 function Frames({ panel, point, time }: FramesProps) {
   const replayClient = useContext(ReplayClientContext);
-  const sourcesLoading = useAppSelector(getSourcesLoading);
+  const cachedSources = useImperativeCacheValue(sourcesCache, replayClient);
+  const sourcesLoading = cachedSources.status !== "resolved";
   const dispatch = useAppDispatch();
 
   const isInFocusRegion = useIsPointWithinFocusWindow(point);

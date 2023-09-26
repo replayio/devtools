@@ -706,11 +706,9 @@ export async function processGroupedTestCases(
             (accumulated: Annotation[][], annotation: Annotation) => {
               const { testId, attempt } = annotation.message;
 
-              // TODO [SCS-1284] Remove the -1 condition when users have
-              // migrated to a newer plugin version
-              if (testId == null || testId === -1) {
-                // beforeAll/afterAll have an -1 testId (for <= 1.0.6) or null
-                // testId (for > 1.0.6) and can be ignored for now
+              if (testId == null) {
+                // beforeAll/afterAll have a null testId (for > 1.0.6) and can
+                // be ignored for now
                 return accumulated;
               }
 

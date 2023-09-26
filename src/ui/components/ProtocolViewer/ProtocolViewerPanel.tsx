@@ -2,6 +2,7 @@ import { unstable_Offscreen as Offscreen, Suspense, useContext, useMemo, useStat
 
 import Loader from "replay-next/components/Loader";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
+import { useSources } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ProtocolViewer } from "ui/components/ProtocolViewer/components/ProtocolViewer";
 import { useIsRecordingOfReplay } from "ui/components/ProtocolViewer/hooks/useIsRecordingOfReplay";
@@ -17,7 +18,6 @@ import {
   getProtocolRequestMap,
   getProtocolResponseMap,
 } from "ui/reducers/protocolMessages";
-import { getAllSourceDetails } from "ui/reducers/sources";
 import { useAppSelector } from "ui/setup/hooks";
 
 import styles from "./ProtocolViewerPanel.module.css";
@@ -76,7 +76,7 @@ function RecordedProtocolRequests() {
   const replayClient = useContext(ReplayClientContext);
   const { rangeForSuspense: focusRange } = useContext(FocusContext);
 
-  const sourceDetails = useAppSelector(getAllSourceDetails);
+  const sourceDetails = useSources(replayClient);
   const sources = useAppSelector(state => state.sources);
   const sessionSource = sourceDetails?.find(source => source.url?.includes("ui/actions/session"));
 

@@ -7,23 +7,23 @@
  * @module actions/sources
  */
 
-import { Location } from "@replayio/protocol";
+import { Location, SourceId } from "@replayio/protocol";
 
 import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
-import { sourcesCache } from "replay-next/src/suspense/SourcesCache";
+import { Source, sourcesByIdCache, sourcesByUrlCache } from "replay-next/src/suspense/SourcesCache";
+import {
+  getSourceIdToDisplayForUrl,
+  getSourceToDisplayForUrl,
+} from "replay-next/src/utils/sources";
 import { UIThunkAction } from "ui/actions";
 import { setSelectedPanel, setViewMode } from "ui/actions/layout";
 import { getToolboxLayout, getViewMode } from "ui/reducers/layout";
 import {
   SourceDetails,
   clearSelectedLocation,
-  getSourceDetails,
-  getSourceIdToDisplayForUrl,
-  getSourceToDisplayForUrl,
   locationSelected,
   preferSource,
 } from "ui/reducers/sources";
-import { UIState } from "ui/state";
 import { getPauseFrameAsync } from "ui/suspense/frameCache";
 import { trackEvent } from "ui/utils/telemetry";
 
@@ -57,8 +57,10 @@ export function selectSourceURL(
   url: string,
   options: PendingSelectedLocationOptions
 ): UIThunkAction<Promise<unknown>> {
-  return async (dispatch, getState) => {
-    const sourceId = getSourceIdToDisplayForUrl(getState(), url);
+  return async (dispatch, getState, { replayClient }) => {
+    const sourcesById = await sourcesByIdCache.readAsync(replayClient);
+    const sourcesByUrl = await sourcesByUrlCache.readAsync(replayClient);
+    const sourceId = getSourceIdToDisplayForUrl(sourcesById, sourcesByUrl, url);
     if (!sourceId) {
       return;
     }
@@ -109,8 +111,12 @@ export function addTab(source: SourceDetails) {
 // change or because we are persisting locations across replays.  We try to work
 // around this by comparing source URLs and, if they don't match, use the
 // preferred source for the location's URL.
-export function handleUnstableSourceIds(sourceUrl: string, state: UIState): string | undefined {
-  const sourceByUrl = getSourceToDisplayForUrl(state, sourceUrl);
+export function handleUnstableSourceIds(
+  sourceUrl: string,
+  sourcesById: Map<SourceId, Source>,
+  sourcesByUrl: Map<string, Source[]>
+): string | undefined {
+  const sourceByUrl = getSourceToDisplayForUrl(sourcesById, sourcesByUrl, sourceUrl);
   if (sourceByUrl) {
     return sourceByUrl.id;
   }
@@ -136,13 +142,14 @@ export function selectLocation(
       }
     }
 
-    let source = getSourceDetails(getState(), location.sourceId);
+    const sourcesById = await sourcesByIdCache.readAsync(replayClient);
+    const sourcesByUrl = await sourcesByUrlCache.readAsync(replayClient);
+    let source = sourcesById.get(location.sourceId);
     if (location.sourceUrl) {
       if (!source || location.sourceUrl !== source.url) {
-        await sourcesCache.readAsync(replayClient);
-        const sourceId = handleUnstableSourceIds(location.sourceUrl!, getState());
+        const sourceId = handleUnstableSourceIds(location.sourceUrl!, sourcesById, sourcesByUrl);
         if (sourceId) {
-          source = getSourceDetails(getState(), sourceId);
+          source = sourcesById.get(sourceId);
         }
       }
     }
@@ -183,7 +190,7 @@ export function selectLocation(
     dispatch(setShownSource(null));
     dispatch(setShownSource(source));
 
-    const loadedSource = getSourceDetails(getState(), source.id);
+    const loadedSource = sourcesById.get(source.id);
 
     if (!loadedSource) {
       // If there was a navigation while we were loading the loadedSource
@@ -205,7 +212,8 @@ export function showAlternateSource(
 ): UIThunkAction<Promise<void>> {
   return async (dispatch, getState, { replayClient }) => {
     const state = getState();
-    if (getSourceDetails(state, oldSourceId)?.isSourceMapped) {
+    const sourcesById = await sourcesByIdCache.readAsync(replayClient);
+    if (sourcesById.get(oldSourceId)?.isSourceMapped) {
       dispatch(preferSource({ sourceId: newSourceId, preferred: true }));
     } else {
       dispatch(preferSource({ sourceId: oldSourceId, preferred: false }));

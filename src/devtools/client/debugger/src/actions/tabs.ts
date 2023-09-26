@@ -9,14 +9,10 @@
  * @module actions/tabs
  */
 
+import { sourcesByIdCache, sourcesByUrlCache } from "replay-next/src/suspense/SourcesCache";
+import { getSourceToDisplayForUrl } from "replay-next/src/utils/sources";
 import { UIThunkAction } from "ui/actions";
-import {
-  MiniSource,
-  SourceDetails,
-  clearSelectedLocation,
-  getSourceToDisplayForUrl,
-  isOriginalSource,
-} from "ui/reducers/sources";
+import { MiniSource, SourceDetails, clearSelectedLocation } from "ui/reducers/sources";
 
 import type { Context } from "../reducers/pause";
 import { getNewSelectedSourceId, getTabs } from "../selectors";
@@ -24,7 +20,7 @@ import { selectSource } from "./sources";
 
 export function updateTab(source: SourceDetails, framework: string) {
   const { url, id: sourceId } = source;
-  const isOriginal = isOriginalSource(source);
+  const isOriginal = source.isSourceMapped;
 
   return {
     type: "UPDATE_TAB",
@@ -66,8 +62,15 @@ export function closeTab(cx: Context, source: MiniSource): UIThunkAction {
  * @static
  */
 export function closeTabs(cx: Context, urls: string[]): UIThunkAction {
-  return (dispatch, getState) => {
-    const sources = urls.map(url => getSourceToDisplayForUrl(getState(), url)!).filter(Boolean);
+  return (dispatch, getState, { replayClient }) => {
+    const sourcesById = sourcesByIdCache.getValueIfCached(replayClient);
+    const sourcesByUrl = sourcesByUrlCache.getValueIfCached(replayClient);
+    if (!sourcesById || !sourcesByUrl) {
+      return;
+    }
+    const sources = urls
+      .map(url => getSourceToDisplayForUrl(sourcesById, sourcesByUrl, url))
+      .filter(Boolean);
 
     const tabs = getTabs(getState());
     dispatch({ type: "CLOSE_TABS", sources });

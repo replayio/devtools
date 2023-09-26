@@ -30,7 +30,12 @@ import { hitPointsForLocationCache } from "replay-next/src/suspense/HitPointsCac
 import { getPointAndTimeForPauseId, pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { getPointDescriptionForFrame } from "replay-next/src/suspense/PointStackCache";
 import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
-import { streamingSourceContentsCache } from "replay-next/src/suspense/SourcesCache";
+import {
+  streamingSourceContentsCache,
+  useSourcesById,
+  useSourcesByUrl,
+} from "replay-next/src/suspense/SourcesCache";
+import { getSourceToDisplayForUrl } from "replay-next/src/utils/sources";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
 import { UIThunkAction } from "ui/actions";
@@ -38,12 +43,7 @@ import { MORE_IGNORABLE_PARTIAL_URLS } from "ui/actions/eventListeners/eventList
 import { findFunctionOutlineForLocation } from "ui/actions/eventListeners/jumpToCode";
 import { seek } from "ui/actions/timeline";
 import { JumpToCodeButton, JumpToCodeStatus } from "ui/components/shared/JumpToCodeButton";
-import {
-  SourceDetails,
-  SourcesState,
-  getSourceIdsByUrl,
-  getSourceToDisplayForUrl,
-} from "ui/reducers/sources";
+import { SourceDetails, SourcesState, getSourceIdsByUrl } from "ui/reducers/sources";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { getPauseFramesAsync } from "ui/suspense/frameCache";
@@ -384,6 +384,8 @@ export function ReactPanel() {
   const executionPoint = useAppSelector(getExecutionPoint);
   const replayClient = useContext(ReplayClientContext);
   const { range: focusRange } = useContext(FocusContext);
+  const sourcesById = useSourcesById(replayClient);
+  const sourcesByUrl = useSourcesByUrl(replayClient);
 
   const reactDomSourceUrl = useAppSelector(getReactDomSourceUrl);
   const sourcesState = useAppSelector(state => state.sources);
@@ -392,7 +394,7 @@ export function ReactPanel() {
       return undefined;
     }
 
-    const reactDomSource = getSourceToDisplayForUrl(state, reactDomSourceUrl);
+    const reactDomSource = getSourceToDisplayForUrl(sourcesById, sourcesByUrl, reactDomSourceUrl);
     if (!reactDomSource || !reactDomSource.url) {
       return;
     }

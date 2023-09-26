@@ -12,7 +12,6 @@ import {
   SourcesState,
   getBestNonSourceMappedSourceId,
   getBestSourceMappedSourceId,
-  isOriginalSource,
 } from "ui/reducers/sources";
 import { getPauseFrameSuspense } from "ui/suspense/frameCache";
 
@@ -23,12 +22,13 @@ import { isBowerComponent, isNodeModule } from "./source";
 type CursorPosition = any;
 
 export function getSourceIDsToSearch(
-  sourcesById: Record<string, SourceDetails>,
+  sourcesById: Map<string, SourceDetails>,
   includeNodeModules: boolean = false
 ) {
   const sourceIds = [];
   for (const sourceId in sourcesById) {
-    const source = sourcesById[sourceId];
+    const source = sourcesById.get(sourceId);
+    assert(source);
     if (source.prettyPrinted) {
       continue;
     }
@@ -45,8 +45,9 @@ export function getSourceIDsToSearch(
     sourceIds.push(sourceId);
   }
   return sortBy(sourceIds, sourceId => {
-    const source = sourcesById[sourceId];
-    const isOriginal = isOriginalSource(source);
+    const source = sourcesById.get(sourceId);
+    assert(source);
+    const isOriginal = source.isSourceMapped;
     return [isOriginal ? 0 : 1, source.url];
   });
 }
@@ -62,7 +63,7 @@ function getSourceIdToVisualizeSuspense(
   if (!selectedSource) {
     return undefined;
   }
-  if (isOriginalSource(selectedSource)) {
+  if (selectedSource.isSourceMapped) {
     return selectedSource.id;
   }
 
@@ -83,7 +84,7 @@ function getSourceIdToVisualizeSuspense(
   if (alternateSourceId) {
     const alternateSource = sourcesState.sourceDetails.entities[alternateSourceId];
     assert(
-      alternateSource && isOriginalSource(alternateSource),
+      alternateSource && alternateSource.isSourceMapped,
       "either selected or alternate source must be original"
     );
     return alternateSourceId;

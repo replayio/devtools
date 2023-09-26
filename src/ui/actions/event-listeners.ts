@@ -2,7 +2,6 @@
 
 import { cachePauseData } from "replay-next/src/suspense/PauseCache";
 import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
-import { getSourceDetailsEntities } from "ui/reducers/sources";
 
 import {
   REACT_16_EVENT_LISTENER_PROP_KEY,
