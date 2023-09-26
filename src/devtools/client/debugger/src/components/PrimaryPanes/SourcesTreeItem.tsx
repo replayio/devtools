@@ -12,8 +12,6 @@ import Icon from "replay-next/components/Icon";
 import { copyToClipboard } from "replay-next/components/sources/utils/clipboard";
 import { Redacted } from "ui/components/Redacted";
 import type { SourceDetails } from "ui/reducers/sources";
-import { getHasSiblingOfSameName } from "ui/reducers/sources";
-import { useAppSelector } from "ui/setup/hooks";
 
 import { getSourceQueryString } from "../../utils/source";
 import { getPathWithoutThread, isDirectory } from "../../utils/sources-tree";
@@ -143,8 +141,6 @@ function SourceTreeItem2({
   selectItem,
   setExpanded,
 }: STIProps) {
-  const hasSiblingOfSameName = useAppSelector(state => getHasSiblingOfSameName(state, source));
-
   const { contextMenu, onContextMenu } = useSourceTreeItemContextMenu({
     item,
     source,
@@ -173,13 +169,9 @@ function SourceTreeItem2({
     }
   };
 
-  let querystring;
-  if (hasSiblingOfSameName) {
-    querystring = getSourceQueryString(source);
-  }
+  const querystring = getSourceQueryString(source);
 
-  const query =
-    hasSiblingOfSameName && querystring ? <span className="query">{querystring}</span> : null;
+  const query = querystring ? <span className="query">{querystring}</span> : null;
 
   const tooltip =
     item.type === "source" ? unescape(item.contents.url!) : getPathWithoutThread(item.path);

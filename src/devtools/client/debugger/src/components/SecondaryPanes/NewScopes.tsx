@@ -8,10 +8,12 @@ import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { useIsPointWithinFocusWindow } from "replay-next/src/hooks/useIsPointWithinFocusWindow";
 import { getFrameSuspense } from "replay-next/src/suspense/FrameCache";
 import { frameScopesCache } from "replay-next/src/suspense/ScopeCache";
+import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
+import { getPreferredLocation, getPreferredSourceId } from "replay-next/src/utils/sources";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { enterFocusMode } from "ui/actions/timeline";
 import { Redacted } from "ui/components/Redacted";
-import { getPreferredLocation, getPreferredSourceId } from "ui/reducers/sources";
+import { getPreferredGeneratedSources } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { pickScopes } from "ui/suspense/scopeCache";
 
@@ -21,7 +23,8 @@ import styles from "./NewObjectInspector.module.css";
 
 function ScopesRenderer() {
   const replayClient = useContext(ReplayClientContext);
-  const sourcesState = useAppSelector(state => state.sources);
+  const sourcesById = sourcesByIdCache.read(replayClient);
+  const preferredGeneratedSources = useAppSelector(getPreferredGeneratedSources);
   const selectedFrameId = useAppSelector(getSelectedFrameId);
   if (!selectedFrameId) {
     return (
@@ -38,11 +41,15 @@ function ScopesRenderer() {
 
   let path = "scope:";
   if (frame.functionLocation) {
-    const functionLocation = getPreferredLocation(sourcesState, frame.functionLocation);
+    const functionLocation = getPreferredLocation(
+      sourcesById,
+      preferredGeneratedSources,
+      frame.functionLocation
+    );
     path += `${functionLocation.sourceId}:${functionLocation.line}:${functionLocation.column}`;
   } else if (frame.type !== "global") {
     const sourceId = getPreferredSourceId(
-      sourcesState.sourceDetails.entities,
+      sourcesById,
       frame.location.map(l => l.sourceId)
     );
     path += `${sourceId}:`;
@@ -50,7 +57,7 @@ function ScopesRenderer() {
 
   const { scopes: protocolScopes, originalScopesUnavailable } = pickScopes(
     frameScopesCache.read(replayClient, selectedFrameId.pauseId, selectedFrameId.frameId),
-    sourcesState.preferredGeneratedSources
+    preferredGeneratedSources
   );
   const scopes = convertScopes(protocolScopes, frame, selectedFrameId.pauseId);
 

@@ -11,8 +11,8 @@ import type {
 } from "@replayio/protocol";
 import memoizeOne from "memoize-one";
 
+import { Source } from "replay-next/src/suspense/SourcesCache";
 import { truncate as truncateText } from "replay-next/src/utils/text";
-import { SourceDetails } from "ui/reducers/sources";
 
 import { SearchTypes } from "../reducers/quick-open";
 import { getSourceClassnames, getTruncatedFileName } from "./source";
@@ -65,7 +65,7 @@ export function parseLineColumn(query: string) {
   }
 }
 
-function formatSourceForList(source: SourceDetails, tabUrls: Set<string>) {
+function formatSourceForList(source: Source, tabUrls: Set<string>) {
   const title = getTruncatedFileName(source);
   // `source.url` now includes query strings already
   const subtitle = truncateText(source.url!, { maxLength: 100, position: "start" });
@@ -94,11 +94,11 @@ export function formatSymbol(symbol: FunctionOutline) {
 
 export function formatProjectFunctions(
   functions: FunctionMatch[],
-  displayedSources: Dictionary<SourceDetails>
+  displayedSources: Map<string, Source>
 ) {
   const sourceFunctions = functions
     .map(({ name, loc }) => {
-      const source = displayedSources[loc.sourceId];
+      const source = displayedSources.get(loc.sourceId);
       if (!source?.url) {
         return [];
       }
@@ -151,7 +151,7 @@ export function formatShortcutResults() {
 }
 
 export function formatSources(
-  sourcesToDisplayByUrl: Dictionary<SourceDetails>,
+  sourcesToDisplayByUrl: Dictionary<Source>,
   tabUrls: Set<string>,
   onlySourcesInTabs: boolean
 ) {
