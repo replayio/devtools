@@ -1,78 +1,53 @@
-import { useContext, useSyncExternalStore } from "react";
+import { ReactNode } from "react";
+import { STATUS_PENDING, STATUS_REJECTED, useStreamingValue } from "suspense";
 
 import Icon from "replay-next/components/Icon";
-import { StreamingSourceSearchResults, searchCache } from "replay-next/src/suspense/SearchCache";
-import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { StreamingSearchValue } from "replay-next/src/suspense/SearchCache";
 
 import styles from "./InlineResultsCount.module.css";
 
-export default function InlineResultsCount({
-  includeNodeModules,
-  isPending,
-  limit,
-  query,
-}: {
-  includeNodeModules: boolean;
-  isPending: boolean;
-  limit?: number;
-  query: string;
-}) {
-  const client = useContext(ReplayClientContext);
+export default function InlineResultsCount({ streaming }: { streaming: StreamingSearchValue }) {
+  const { data, error, status } = useStreamingValue(streaming);
 
-  if (query.trim() === "") {
-    return null;
-  }
+  const didOverflow = data?.didOverflow ?? false;
+  const fetchedCount = data?.fetchedCount ?? 0;
 
-  const streamingResults = searchCache.read(client, query, includeNodeModules, limit);
-
-  return <StreamingInlineResultsCount isPending={isPending} streamingResults={streamingResults} />;
-}
-
-function StreamingInlineResultsCount({
-  isPending,
-  streamingResults,
-}: {
-  isPending: boolean;
-  streamingResults: StreamingSourceSearchResults;
-}) {
-  const isComplete = useSyncExternalStore(
-    streamingResults.subscribe,
-    () => streamingResults.complete,
-    () => streamingResults.complete
-  );
-
-  const fetchedCount = useSyncExternalStore(
-    streamingResults.subscribe,
-    () => streamingResults.fetchedCount,
-    () => streamingResults.fetchedCount
-  );
-
-  const didOverflow = useSyncExternalStore(
-    streamingResults.subscribe,
-    () => streamingResults.didOverflow,
-    () => streamingResults.didOverflow
-  );
-
-  if (!isComplete) {
-    return <Icon className={styles.SpinnerIcon} type="spinner" />;
-  }
-
-  let label = "";
-  switch (fetchedCount) {
-    case 0:
-      label = "No matches";
+  let rendered: ReactNode = null;
+  switch (status) {
+    case STATUS_PENDING: {
+      rendered = <Icon className={styles.SpinnerIcon} type="spinner" />;
       break;
-    case 1:
-      label = "1 result";
+    }
+    case STATUS_REJECTED: {
+      const errorMessage = (typeof error === "string" ? error : error?.message) ?? "Unknown error";
+
+      rendered = (
+        <div title={errorMessage}>
+          <Icon className={styles.ErrorIcon} type="error" />
+        </div>
+      );
       break;
-    default:
-      if (didOverflow) {
-        label = `first ${fetchedCount} results`;
-      } else {
-        label = `${fetchedCount} results`;
+    }
+    default: {
+      switch (fetchedCount) {
+        case 0:
+          rendered = "No matches";
+          break;
+        case 1:
+          rendered = "1 result";
+          break;
+        default:
+          if (didOverflow) {
+            rendered = `first ${fetchedCount} results`;
+          } else {
+            rendered = `${fetchedCount} results`;
+          }
+          break;
       }
-      break;
+    }
   }
+
+  const isPending = status === STATUS_PENDING;
 
   return (
     <div
@@ -80,7 +55,7 @@ function StreamingInlineResultsCount({
       data-test-id="SearchFiles-SummaryLabel"
       data-test-state={isPending ? "pending" : "complete"}
     >
-      {label}
+      {rendered}
     </div>
   );
 }

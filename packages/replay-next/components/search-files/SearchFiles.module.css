@@ -36,6 +36,11 @@
 .InputWrapper:focus-within {
   border-color: var(--color-brand);
 }
+.InputWrapper[data-error],
+.InputWrapper[data-error]:focus-within {
+  background-color: var(--background-color-error);
+  border-color: var(--border-color-error);
+}
 
 .Icon {
   flex: 0 0 1.75rem;
