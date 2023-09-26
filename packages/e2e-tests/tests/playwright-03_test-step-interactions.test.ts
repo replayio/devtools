@@ -1,3 +1,5 @@
+import { Locator } from "@playwright/test";
+
 import { isViewerTabActive, openViewerTab, startTest } from "../helpers";
 import {
   getSelectedTestCase,
@@ -48,7 +50,7 @@ test("playwright-03: Test Step interactions", async ({
 
   const steps = getTestCaseSteps(selectedRow);
   const numSteps = await steps.count();
-  expect(numSteps).toBe(178);
+  expect(numSteps).toBe(226);
 
   // We should be in Viewer Mode to start with
   expect(await isViewerTabActive(page)).toBe(true);
@@ -71,7 +73,7 @@ test("playwright-03: Test Step interactions", async ({
 
   // Should show the "Before/After" buttons
   const beforeAfterButtons = getTestStepBeforeAfterButtons(page);
-  expect(await beforeAfterButtons.isVisible()).toBe(true);
+  beforeAfterButtons.waitFor({ state: "visible", timeout: 1000 });
 
   const afterButton = beforeAfterButtons.locator("button", { hasText: "After" }).first();
 

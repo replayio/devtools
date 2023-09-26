@@ -3657,12 +3657,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/playwright@npm:2.0.0-alpha.0":
-  version: 2.0.0-alpha.0
-  resolution: "@replayio/playwright@npm:2.0.0-alpha.0"
+"@replayio/playwright@npm:2.0.0-alpha.2":
+  version: 2.0.0-alpha.2
+  resolution: "@replayio/playwright@npm:2.0.0-alpha.2"
   dependencies:
-    "@replayio/replay": ^0.17.0
-    "@replayio/test-utils": ^1.1.7
+    "@replayio/replay": ^0.17.2
+    "@replayio/test-utils": ^1.1.9
     debug: ^4.3.4
     uuid: ^8.3.2
     ws: ^8.13.0
@@ -3670,7 +3670,7 @@ __metadata:
     "@playwright/test": 1.19.x
   bin:
     replayio-playwright: bin/replayio-playwright.js
-  checksum: fdc4645262e7dc24e497c7407cda5b0b7d29b5a576b64e5d3dca58fd663513182c63b79eb0987c75ba6d3a0bd144885277f2a6f43c0fa4ba69a6e460b1963107
+  checksum: 6b897b2921d82a9d421adddfcc37e3d4e473da3d5db25e707fc80f0740620cca704bdf8f54f0ce943b13b6ea72830ce3a419eda383f01d0d37418e71023cb7ed
   languageName: node
   linkType: hard
 
@@ -3711,9 +3711,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/replay@npm:^0.17.0":
-  version: 0.17.0
-  resolution: "@replayio/replay@npm:0.17.0"
+"@replayio/replay@npm:^0.17.2":
+  version: 0.17.2
+  resolution: "@replayio/replay@npm:0.17.2"
   dependencies:
     "@replayio/sourcemap-upload": ^1.1.1
     commander: ^7.2.0
@@ -3727,7 +3727,7 @@ __metadata:
     ws: ^7.5.0
   bin:
     replay: bin/replay.js
-  checksum: 3e000219c2dd16f56b8f7e6a91390cf7cb06f4896daae0daef06623217a68105cc30aac68e4c62bb97a8b4b894afb3713a686bc877d6f7591f1d03f452776f65
+  checksum: f6f8fc3c6e43a400f0cd6b226375e8f9071707bfdddd6dc47a9ff2a04fb608c623356da1bb53428f10dd4a801c09c4541a8e6230c526559d4ccc4977d792eeb3
   languageName: node
   linkType: hard
 
@@ -3770,16 +3770,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/test-utils@npm:^1.1.7":
-  version: 1.1.7
-  resolution: "@replayio/test-utils@npm:1.1.7"
+"@replayio/test-utils@npm:^1.1.9":
+  version: 1.1.9
+  resolution: "@replayio/test-utils@npm:1.1.9"
   dependencies:
-    "@replayio/replay": ^0.17.0
+    "@replayio/replay": ^0.17.2
     "@types/node-fetch": ^2.6.2
     debug: ^4.3.4
     node-fetch: ^2.6.7
     uuid: ^8.3.2
-  checksum: ea56a714bd036cd88cebc76cb3cbeadf64088badf2133048d770882dcbbfc7d9cb594d36c8eb8aa8db65d5f11ad1f2fffa793209461b4fe1da8a9c9da96eb320
+  checksum: 1fe789c4e68a97aee27e2a072e88e1460568342a6e112b5b4e202f8f1cc6a5074558808dbfd7d53102a0ec39214fc36965b2946abf8710b87f7d0889d01f02e6
   languageName: node
   linkType: hard
 
@@ -9627,7 +9627,7 @@ __metadata:
   dependencies:
     "@playwright/test": ^1.37.0
     "@replayio/cypress": ^0.5.0
-    "@replayio/playwright": 2.0.0-alpha.0
+    "@replayio/playwright": 2.0.0-alpha.2
     chalk: ^4
     cli-spinners: ^2.7.0
     cypress: ^12.5.1

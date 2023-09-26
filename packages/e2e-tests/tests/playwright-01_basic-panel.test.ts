@@ -81,7 +81,7 @@ test("playwright-01: Basic Test Suites panel functionality", async ({
   expect(await getTestSuiteBranch(page).textContent()).toMatch(
     "ryan/playwright-plugin-annotations"
   );
-  expect(await getTestSuiteDuration(page).textContent()).toMatch("0:35");
+  expect(await getTestSuiteDuration(page).textContent()).toMatch("0:49");
 
   // can open tests
   await firstTest.click();
@@ -99,7 +99,7 @@ test("playwright-01: Basic Test Suites panel functionality", async ({
   expect(await sections.nth(0).textContent()).toMatch(/test body/i);
 
   const steps = getTestCaseSteps(selectedRow);
-  await expect(steps).toHaveCount(178);
+  await expect(steps).toHaveCount(226);
 
   const backButton = getTestRecordingBackButton(page);
   await backButton.click();
