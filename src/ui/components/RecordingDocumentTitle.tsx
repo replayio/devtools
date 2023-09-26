@@ -5,6 +5,8 @@ import { useIsRecordingProcessed } from "replay-next/src/hooks/useIsRecordingPro
 import { useRecordingProcessingProgress } from "replay-next/src/hooks/useRecordingProcessingProgress";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 
+import { isTestSuiteReplay } from "./TestSuite/utils/isTestSuiteReplay";
+
 const ANIMATION_INTERVAL = 100;
 const ANIMATION_FRAMES = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
 
@@ -19,7 +21,7 @@ export function RecordingDocumentTitle() {
 
   const { metadata, title = "" } = recording ?? {};
 
-  const testResult = metadata?.test?.result;
+  const testResult = recording && isTestSuiteReplay(recording) ? metadata?.test?.result : undefined;
 
   // Track the animation counter with a ref so that it doesn't reset to 0 when the effect re-runs
   // (The effect will re-run when the processing progress changes, for example)

@@ -28,6 +28,7 @@ export const GET_RECORDING = gql`
       metadata
       isTest
       isProcessed
+      isInTestWorkspace
       comments {
         id
         isPublished

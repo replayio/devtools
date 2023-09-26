@@ -145,13 +145,14 @@ export interface GetRecording_recording {
   createdAt: any;
   private: boolean;
   isInitialized: boolean;
-  isProcessed: boolean;
   ownerNeedsInvite: boolean;
   userRole: string;
   operations: any | null;
   resolution: any | null;
   metadata: any | null;
   isTest: boolean;
+  isProcessed: boolean | null;
+  isInTestWorkspace: boolean;
   comments: GetRecording_recording_comments[];
   activeSessions: GetRecording_recording_activeSessions[] | null;
   owner: GetRecording_recording_owner | null;
