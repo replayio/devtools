@@ -3,11 +3,13 @@ import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
 import ComputedApp from "devtools/client/inspector/computed/components/ComputedApp";
 import LayoutApp from "devtools/client/inspector/layout/components/LayoutApp";
+import { ElementsPanelAdapter } from "devtools/client/inspector/markup/components/ElementsPanelAdapter";
 import MarkupApp from "devtools/client/inspector/markup/components/MarkupApp";
 import { RulesPanel } from "devtools/client/inspector/markup/components/rules";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { useIsPointWithinFocusWindow } from "replay-next/src/hooks/useIsPointWithinFocusWindow";
 import { ActiveInspectorTab } from "shared/user-data/GraphQL/config";
+import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { enterFocusMode } from "ui/actions/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
@@ -34,6 +36,8 @@ export default function InspectorApp() {
   const activeTab = useAppSelector(state => state.inspector.activeTab);
   const { executionPoint } = useContext(TimelineContext);
 
+  const [enableNewElementsPanel] = useGraphQLUserData("feature_newElementsPanel");
+
   const isPointWithinFocusWindow = useIsPointWithinFocusWindow(executionPoint);
   if (!isPointWithinFocusWindow) {
     return (
@@ -52,7 +56,7 @@ export default function InspectorApp() {
       <div id="inspector-splitter-box">
         <PanelGroup autoSaveId="App" className="inspector-sidebar-splitter" direction="horizontal">
           <Panel minSize={20}>
-            <MarkupApp />
+            {enableNewElementsPanel ? <ElementsPanelAdapter /> : <MarkupApp />}
           </Panel>
           <PanelResizeHandle className="h-full w-1" />
           <Panel defaultSize={40} minSize={20}>

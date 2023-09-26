@@ -1,45 +1,39 @@
 import { DeclarationState, RuleState } from "ui/suspense/styleCaches";
 
-export type DeclarationStateItemData = {
+export type DeclarationStateItem = {
   declaration: DeclarationState;
   type: "declaration";
 };
 
-export type InheritanceItemData = {
+export type InheritanceItem = {
   inheritedSource: string;
   type: "inheritance";
 };
 
-export type PseudoElementItemData = {
+export type PseudoElementItem = {
   isPseudoElement: boolean;
   type: "pseudo";
 };
 
-export type RuleStateItemData = {
+export type RuleStateItem = {
   rule: RuleState;
   type: "header" | "footer";
 };
 
-export type ItemData =
-  | DeclarationStateItemData
-  | InheritanceItemData
-  | PseudoElementItemData
-  | RuleStateItemData;
+export type Item = DeclarationStateItem | InheritanceItem | PseudoElementItem | RuleStateItem;
 
-export function isDeclarationStateItemData(
-  itemData: ItemData
-): itemData is DeclarationStateItemData {
+export function isDeclarationStateItem(itemData: Item): itemData is DeclarationStateItem {
   return itemData.type === "declaration";
 }
 
-export function isInheritanceItemData(itemData: ItemData): itemData is InheritanceItemData {
+export function isInheritanceItem(itemData: Item): itemData is InheritanceItem {
   return itemData.type === "inheritance";
 }
 
-export function isPseudoElementItemData(itemData: ItemData): itemData is PseudoElementItemData {
+export function isPseudoElementItem(itemData: Item): itemData is PseudoElementItem {
   return itemData.type === "pseudo";
 }
 
-export function isRuleStateItemData(itemData: ItemData): itemData is RuleStateItemData {
+export function isRuleStateItem(itemData: Item): itemData is RuleStateItem {
   return itemData.type === "header" || itemData.type === "footer";
 }

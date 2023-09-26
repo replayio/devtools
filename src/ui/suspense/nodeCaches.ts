@@ -4,7 +4,6 @@ import {
   NodeBounds,
   PauseData,
   PauseId,
-  ProtocolClient,
   Object as ProtocolObject,
   Quads,
 } from "@replayio/protocol";
@@ -12,7 +11,7 @@ import { Cache, createCache } from "suspense";
 
 import { NodeInfo } from "devtools/client/inspector/markup/reducers/markup";
 import NodeConstants from "devtools/shared/dom-node-constants";
-import { Deferred, assert, defer } from "protocol/utils";
+import { assert } from "protocol/utils";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { cachePauseData } from "replay-next/src/suspense/PauseCache";
 import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
@@ -52,6 +51,7 @@ function assertUnreachable(_x: never): never {
   throw new Error("Didn't expect to get here");
 }
 
+// TODO [FE-1885] Delete this cache once new ElementsPanel ships
 export const nodeDataCache: Cache<
   [replayClient: ReplayClientInterface, pauseId: PauseId, options: NodeFetchOptions],
   ProtocolObject[]
@@ -160,6 +160,7 @@ export const nodeDataCache: Cache<
   },
 });
 
+// TODO [FE-1855] Delete this cache once the MarkupApp has been deleted?
 export const processedNodeDataCache: Cache<
   [replayClient: ReplayClientInterface, pauseId: PauseId | undefined, nodeId: string | undefined],
   NodeInfo | null

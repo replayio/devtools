@@ -93,8 +93,7 @@
   color: var(--object-inspector-separator-color);
 }
 
-.HTMLClosingTag,
-.HTMLOpeningTag {
+.HTMLTag {
   color: var(--value-type-html-tag);
   line-height: 1rem;
 }
