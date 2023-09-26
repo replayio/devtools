@@ -2,29 +2,29 @@ import {
   CSSProperties,
   useCallback,
   useContext,
-  useEffect,
   useLayoutEffect,
   useMemo,
   useRef,
   useState,
-  useSyncExternalStore,
 } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList as List } from "react-window";
+import { STATUS_PENDING, STATUS_RESOLVED, useStreamingValue } from "suspense";
 
 import Icon from "replay-next/components/Icon";
 import {
   SourceSearchResult,
-  StreamingSourceSearchResults,
+  StreamingSearchValue,
   isSourceSearchResultLocation,
-  searchCache,
 } from "replay-next/src/suspense/SearchCache";
-import { Source, sourcesCache } from "replay-next/src/suspense/SourcesCache";
+import { sourcesCache } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
-import ResultsListRow from "./ResultsListRow";
 import type { ItemData } from "./ResultsListRow";
+import ResultsListRow from "./ResultsListRow";
 import styles from "./ResultsList.module.css";
+
+const EMPTY_ARRAY = [] as SourceSearchResult[];
 
 const ROW_HEIGHT = 18;
 
@@ -34,56 +34,13 @@ type CollapsedState = {
 };
 
 export default function ResultsList({
-  includeNodeModules,
-  isPending,
-  limit,
   query,
+  streaming,
 }: {
-  includeNodeModules: boolean;
-  isPending: boolean;
-  limit?: number;
   query: string;
+  streaming: StreamingSearchValue;
 }) {
-  const client = useContext(ReplayClientContext);
-
-  if (query.trim() === "") {
-    return null;
-  }
-
-  const streamingResults = searchCache.read(client, query, includeNodeModules, limit);
-  const sources = sourcesCache.read(client);
-
-  return (
-    <StreamingResults
-      isPending={isPending}
-      query={query}
-      sources={sources}
-      streamingResults={streamingResults}
-    />
-  );
-}
-
-function StreamingResults({
-  isPending,
-  query,
-  sources,
-  streamingResults,
-}: {
-  isPending: boolean;
-  query: string;
-  sources: Source[];
-  streamingResults: StreamingSourceSearchResults;
-}) {
-  const listRef = useRef<List>(null);
-  const prevQueryRef = useRef<string>(query);
-
-  useLayoutEffect(() => {
-    const list = listRef.current;
-    if (list !== null) {
-      // Reset the scroll position when a new query is run.
-      list.scrollToItem(0);
-    }
-  }, [query]);
+  const replayClient = useContext(ReplayClientContext);
 
   const [{ collapsedResultIndices, collapsedRowCount }, setCollapsedState] =
     useState<CollapsedState>({
@@ -91,41 +48,30 @@ function StreamingResults({
       collapsedRowCount: 0,
     });
 
-  // Reset collapsed state when query changes.
-  useEffect(() => {
-    if (prevQueryRef.current != query) {
-      prevQueryRef.current = query;
+  const listRef = useRef<List>(null);
 
-      setCollapsedState({
-        collapsedResultIndices: new Set(),
-        collapsedRowCount: 0,
-      });
+  const { data, status, value } = useStreamingValue(streaming);
+
+  const isPending = status === STATUS_PENDING;
+
+  const sources = sourcesCache.read(replayClient);
+
+  const orderedResults = value ?? EMPTY_ARRAY;
+  const didOverflow = data?.didOverflow ?? false;
+
+  useLayoutEffect(() => {
+    const list = listRef.current;
+    if (list !== null) {
+      // Reset the scroll position when a new query is run.
+      list.scrollToItem(0);
     }
-  }, [query]);
 
-  const isComplete = useSyncExternalStore(
-    streamingResults.subscribe,
-    () => streamingResults.complete,
-    () => streamingResults.complete
-  );
-
-  const orderedResults = useSyncExternalStore<SourceSearchResult[]>(
-    streamingResults.subscribe,
-    () => streamingResults.orderedResults,
-    () => streamingResults.orderedResults
-  );
-
-  const fetchedCount = useSyncExternalStore<number>(
-    streamingResults.subscribe,
-    () => streamingResults.fetchedCount,
-    () => streamingResults.fetchedCount
-  );
-
-  const didOverflow = useSyncExternalStore<boolean>(
-    streamingResults.subscribe,
-    () => streamingResults.didOverflow,
-    () => streamingResults.didOverflow
-  );
+    // Reset collapsed state when query changes.
+    setCollapsedState({
+      collapsedResultIndices: new Set(),
+      collapsedRowCount: 0,
+    });
+  }, [streaming]);
 
   const getResultIndexFromRowIndex = useCallback(
     (rowIndex: number) => {
@@ -235,7 +181,7 @@ function StreamingResults({
     [getResultAtIndex, isLocationCollapsed, query, sources, toggleLocation]
   );
 
-  if (isComplete && orderedResults.length === 0) {
+  if (status === STATUS_RESOLVED && orderedResults.length === 0) {
     return (
       <div className={styles.Results}>
         <div className={styles.NoResults}>No results found</div>
