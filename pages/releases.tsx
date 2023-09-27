@@ -5,7 +5,7 @@ export default function Releases() {
   const [releases, setReleases] = useState([]);
   const [showAll, setShowAll] = useState(true);
   useEffect(() => {
-    fetch("/api/releases").then(async res => setReleases(JSON.parse(await res.text())));
+    fetch("/api/releases").then(async res => setReleases(JSON.parse(await res.text()) as any));
   }, []);
 
   const latestReleases = useMemo(() => {

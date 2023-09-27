@@ -65,7 +65,7 @@ export const reactDevToolsAnnotationsCache = createSingleEntryCache<
       ({ point, time, contents }) => ({
         point,
         time,
-        contents: JSON.parse(contents),
+        contents: JSON.parse(contents) as any,
       })
     );
 
@@ -111,7 +111,7 @@ export const eventListenersJumpLocationsCache = createSingleEntryCache<
       ({ point, time, contents }) => ({
         point,
         time,
-        ...JSON.parse(contents),
+        ...(JSON.parse(contents) as any),
       })
     );
 

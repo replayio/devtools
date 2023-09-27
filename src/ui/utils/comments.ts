@@ -50,7 +50,7 @@ export function parseCommentContent(content: string | object): Object {
   }
 
   try {
-    return JSON.parse(content);
+    return JSON.parse(content) as any;
   } catch {
     // Our comments were not always JSON; they used to be stored as markdown.
     // In that case, we just render the raw markdown.

@@ -45,7 +45,7 @@ function LegacyVisualPreview({
   let scaledX: number | null = null;
   let scaledY: number | null = null;
   try {
-    const coordinates = JSON.parse(primaryLabel);
+    const coordinates = JSON.parse(primaryLabel) as any;
 
     scaledX = coordinates.x;
     scaledY = coordinates.y;

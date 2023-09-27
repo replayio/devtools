@@ -233,8 +233,10 @@ export const recordedProtocolMessagesCache = createFocusIntervalCacheForExecutio
             });
 
             const fullString = deserializeChunkedString(remainingProperties);
-            const parsedObject: ProtocolRequest | ProtocolResponse | ProtocolError =
-              JSON.parse(fullString);
+            const parsedObject = JSON.parse(fullString) as
+              | ProtocolRequest
+              | ProtocolResponse
+              | ProtocolError;
 
             parsedObject.recordedAt = point.time;
 
