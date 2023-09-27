@@ -52,7 +52,7 @@ export async function getSourceMap(
 
   switch (resolved.protocol) {
     case "file:":
-      return JSON.parse(await fs.readFile(resolved, "utf8"));
+      return JSON.parse(await fs.readFile(resolved, "utf8")) as any;
     case "data:": {
       if (!/^application\/json[,;]/.test(resolved.pathname)) {
         return undefined;
@@ -66,7 +66,7 @@ export async function getSourceMap(
         ? Buffer.from(rawData, "base64url").toString("utf8")
         : rawData;
 
-      return JSON.parse(dataString);
+      return JSON.parse(dataString) as any;
     }
     default: {
       const response = await (

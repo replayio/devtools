@@ -138,7 +138,7 @@ export function encodeObjectToURL(obj: Object): string | undefined {
 
 export function decodeBase64FromURL(urlParam: string): Object | undefined {
   try {
-    return JSON.parse(atob(decodeURIComponent(urlParam)));
+    return JSON.parse(atob(decodeURIComponent(urlParam))) as any;
   } catch (e) {
     return undefined;
   }

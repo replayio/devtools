@@ -49,7 +49,7 @@ export async function getCurrentUserInfo(accessToken: string | null): Promise<Us
       variables: {},
     }),
   });
-  const json = await response.json();
+  const json: any = await response.json();
 
   // TODO GraphQL types
   const viewer = json.data?.viewer;

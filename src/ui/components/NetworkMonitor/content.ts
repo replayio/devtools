@@ -125,7 +125,7 @@ export const StringToObjectMaybe = (input: DisplayableBody): DisplayableBody => 
       return {
         ...input,
         as: Displayable.JSON,
-        content: JSON.parse(input.content),
+        content: JSON.parse(input.content) as any,
       };
     } catch (e) {
       return input;

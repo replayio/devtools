@@ -719,7 +719,7 @@ export async function getRecordingMetadata(id: string) {
   const json: {
     data: { recording: Recording & { owner?: { name: string } } };
     error: any;
-  } = await resp.json();
+  } = (await resp.json()) as any;
 
   if (json.error || !json.data.recording) {
     return null;

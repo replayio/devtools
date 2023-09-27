@@ -319,7 +319,7 @@ export const client = new ProtocolClient({
 
 function socketDataHandler(data: string) {
   gReceivedBytes += data.length;
-  const msg = JSON.parse(data);
+  const msg = JSON.parse(data) as any;
 
   if (msg.id) {
     const { method, resolve } = gMessageWaiters.get(msg.id)!;

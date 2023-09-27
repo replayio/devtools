@@ -29,14 +29,14 @@ export const AnnotationsCache = createSingleEntryCacheWithTelemetry<
 });
 
 function parseContents(contents: string) {
-  const parsed = JSON.parse(contents);
+  const parsed = JSON.parse(contents) as any;
 
   // HACK These values have been stringified multiple times
   // HACK Cypress annotation format differs between Chromium and Gecko runners
   // TODO https://linear.app/replay/issue/SCS-256
   if (typeof parsed === "object") {
-    return JSON.parse(JSON.parse(parsed.message));
+    return JSON.parse(JSON.parse(parsed.message) as any);
   } else {
-    return JSON.parse(JSON.parse(parsed));
+    return JSON.parse(JSON.parse(parsed) as any);
   }
 }

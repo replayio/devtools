@@ -37,7 +37,7 @@ export class GraphQLClient implements GraphQLClientInterface {
       body: JSON.stringify(data),
     });
 
-    const json = await response.json();
+    const json: any = await response.json();
 
     return json.data as T;
   }

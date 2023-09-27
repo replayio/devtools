@@ -32,7 +32,7 @@ export default function useCommentContextMenu({
   const { confirmDestructive } = useConfirm();
 
   const publishRemark = () => {
-    saveRemark(JSON.parse(remark.content));
+    saveRemark(JSON.parse(remark.content) as any);
   };
 
   const confirmDelete = () => {

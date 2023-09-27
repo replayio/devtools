@@ -196,7 +196,7 @@ export const diffCache: Cache<
     );
 
     if (diffResult.returned?.value) {
-      const diff = JSON.parse(diffResult.returned.value);
+      const diff = JSON.parse(diffResult.returned.value) as any;
       return diff;
     }
   },

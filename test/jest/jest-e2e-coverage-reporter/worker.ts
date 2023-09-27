@@ -131,7 +131,7 @@ function isScriptCovArray(obj: unknown): obj is ScriptCovWithSource[] {
     typeof obj === "object" &&
     obj != null &&
     Array.isArray(obj) &&
-    obj.every(item => "scriptId" in item)
+    obj.every(item => "scriptId" in (item as any))
   );
 }
 

@@ -64,7 +64,7 @@ export function createClient({
   socket.onerror = () => console.log("onerror");
 
   socket.onmessage = evt => {
-    const msg = JSON.parse(evt.data as any);
+    const msg = JSON.parse(evt.data as any) as any;
     if (msg.id) {
       const { method, resolve, reject } = gMessageWaiters.get(msg.id)!;
 

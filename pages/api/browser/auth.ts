@@ -39,7 +39,7 @@ async function initAuthRequest(key: string, source: string) {
     }),
   });
 
-  const json = await resp.json();
+  const json: any = await resp.json();
 
   if (json.errors) {
     throw new Error(json.errors[0].message);

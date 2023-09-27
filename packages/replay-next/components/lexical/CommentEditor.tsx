@@ -116,7 +116,7 @@ export default function CommentEditor({
         return [initialValue, null];
       }
 
-      const json = JSON.parse(initialValue);
+      const json = JSON.parse(initialValue) as any;
       if (json.type === "doc") {
         // Legacy (TipTap) JSON content format.
         // Convert to Markdown string for initial parse.
