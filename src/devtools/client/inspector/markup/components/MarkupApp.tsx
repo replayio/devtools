@@ -1,5 +1,5 @@
-import React, { Suspense, useContext, useEffect, useRef } from "react";
-import { ConnectedProps, connect, shallowEqual } from "react-redux";
+import React, { useContext, useEffect, useRef } from "react";
+import { shallowEqual } from "react-redux";
 import { useImperativeCacheValue } from "suspense";
 
 import { getPauseId } from "devtools/client/debugger/src/selectors";
@@ -7,7 +7,6 @@ import KeyShortcuts from "devtools/client/shared/key-shortcuts";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import LoadingProgressBar from "ui/components/shared/LoadingProgressBar";
 import { useAppSelector } from "ui/setup/hooks";
-import { UIState } from "ui/state";
 import { processedNodeDataCache } from "ui/suspense/nodeCaches";
 
 import { HTMLBreadcrumbs } from "./HTMLBreadcrumbs";
@@ -15,6 +14,7 @@ import { InspectorSearch } from "./InspectorSearch";
 import { MarkupContext, MarkupContextValue } from "./MarkupContext";
 import Nodes from "./Nodes";
 
+// TODO [FE-1855] Delete this component and its children once the new ElementsPanel has shipped
 function MarkupApp() {
   const replayClient = useContext(ReplayClientContext);
   const markupContextValue: MarkupContextValue = useAppSelector(

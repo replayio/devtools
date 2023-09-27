@@ -1,19 +1,20 @@
 import { CSSProperties, Dispatch, Fragment, ReactNode, SetStateAction } from "react";
 
 import {
-  isInheritanceItemData,
-  isPseudoElementItemData,
-  isRuleStateItemData,
+  Item,
+  isInheritanceItem,
+  isPseudoElementItem,
+  isRuleStateItem,
 } from "devtools/client/inspector/markup/components/rules/types";
-import { getItemDataForIndex } from "devtools/client/inspector/markup/components/rules/utils/getItemDataForIndex";
 import Expandable from "replay-next/components/Expandable";
+import { GenericListItemData } from "replay-next/components/windowing/GenericList";
 import { DeclarationState, RuleState } from "ui/suspense/styleCaches";
 
 import styles from "./RulesListItem.module.css";
 
 export const ITEM_SIZE = 20;
 
-export type ItemData = {
+export type RulesListItemData = {
   rules: RuleState[];
   searchText: string;
   setShowPseudoElements: Dispatch<SetStateAction<boolean>>;
@@ -25,34 +26,35 @@ export function RulesListItem({
   index,
   style,
 }: {
-  data: ItemData;
+  data: GenericListItemData<Item, RulesListItemData>;
   index: number;
   style: CSSProperties;
 }) {
-  const { rules, searchText, setShowPseudoElements, showPseudoElements } = data;
+  const { itemData, listData } = data;
+  const { searchText, setShowPseudoElements, showPseudoElements } = itemData;
 
-  const itemData = getItemDataForIndex(index, rules, showPseudoElements);
+  const item = listData.getItemAtIndex(index);
 
-  if (isInheritanceItemData(itemData)) {
+  if (isInheritanceItem(item)) {
     return (
-      <InheritanceRenderer index={index} inheritedSource={itemData.inheritedSource} style={style} />
+      <InheritanceRenderer index={index} inheritedSource={item.inheritedSource} style={style} />
     );
-  } else if (isRuleStateItemData(itemData)) {
-    return itemData.type === "header" ? (
+  } else if (isRuleStateItem(item)) {
+    return item.type === "header" ? (
       <RuleStateHeaderRenderer
         index={index}
-        rule={itemData.rule}
+        rule={item.rule}
         searchText={searchText}
         style={style}
       />
     ) : (
       <RuleStateFooterRenderer index={index} style={style} />
     );
-  } else if (isPseudoElementItemData(itemData)) {
+  } else if (isPseudoElementItem(item)) {
     return (
       <PseudoElementRenderer
         index={index}
-        isPseudoElement={itemData.isPseudoElement}
+        isPseudoElement={item.isPseudoElement}
         setShowPseudoElements={setShowPseudoElements}
         showPseudoElements={showPseudoElements}
         style={style}
@@ -61,7 +63,7 @@ export function RulesListItem({
   } else {
     return (
       <DeclarationStateRenderer
-        declaration={itemData.declaration}
+        declaration={item.declaration}
         index={index}
         searchText={searchText}
         style={style}
