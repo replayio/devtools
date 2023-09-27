@@ -3,6 +3,7 @@
   position: absolute;
   left: calc(var(--source-line-number-offset) + var(--source-hit-count-offset));
   white-space: pre;
+  pointer-events: none;
 }
 
 .ActiveMark {
