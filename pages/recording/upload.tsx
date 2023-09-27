@@ -11,8 +11,8 @@ function UploadScreenWrapper({ onUpload }: { onUpload: () => void }) {
   const recordingId = useGetRecordingId();
   const { recording } = useGetRecording(recordingId);
   // Make sure to get the user's settings and workspaces before showing the upload screen.
-  const { userSettings, loading } = useGetUserSettings();
-  const { workspaces, loading: loading2 } = useGetNonPendingWorkspaces();
+  const { userSettings, loading: userSettingsLoading } = useGetUserSettings();
+  const { workspaces, loading: pendingWorkspacesLoading } = useGetNonPendingWorkspaces();
 
   useEffect(() => {
     if (recording?.isInitialized) {
@@ -20,11 +20,8 @@ function UploadScreenWrapper({ onUpload }: { onUpload: () => void }) {
     }
   });
 
-  if (loading) {
-    return <LoadingScreen message="Loading settings..." />;
-  }
-  if (loading2) {
-    return <LoadingScreen message="Loading team info..." />;
+  if (userSettingsLoading || pendingWorkspacesLoading) {
+    return <LoadingScreen message="Loading..." />;
   }
 
   return recording ? (
