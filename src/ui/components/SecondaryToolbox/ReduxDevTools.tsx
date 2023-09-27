@@ -4,6 +4,7 @@ import React, { Suspense, useContext, useMemo, useState } from "react";
 import { PanelGroup, PanelResizeHandle, Panel as ResizablePanel } from "react-resizable-panels";
 import { useImperativeCacheValue } from "suspense";
 
+import Icon from "replay-next/components/Icon";
 import IndeterminateLoader from "replay-next/components/IndeterminateLoader";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { isExecutionPointsGreaterThan } from "replay-next/src/utils/time";
@@ -59,21 +60,23 @@ export const ReduxDevToolsPanel = () => {
     >
       <PanelGroup autoSaveId="ReduxDevTools" direction="horizontal">
         <ResizablePanel collapsible>
-          <ActionFilter searchValue={searchValue} onSearch={setSearchValue} />
-          <div role="list" className={styles.list}>
-            {annotationsStatus === "pending" ? (
-              <IndeterminateLoader />
-            ) : (
-              reduxAnnotations.map(annotation => (
-                <ActionItem
-                  key={annotation.point}
-                  annotation={annotation}
-                  selectedPoint={selectedPoint}
-                  setSelectedPoint={setSelectedPoint}
-                  firstAnnotationInTheFuture={firstAnnotationInTheFuture === annotation}
-                />
-              ))
-            )}
+          <div className={styles.LeftPanel}>
+            <ActionFilter searchValue={searchValue} onSearch={setSearchValue} />
+            <div role="list" className={styles.list}>
+              {annotationsStatus === "pending" ? (
+                <IndeterminateLoader />
+              ) : (
+                reduxAnnotations.map(annotation => (
+                  <ActionItem
+                    key={annotation.point}
+                    annotation={annotation}
+                    selectedPoint={selectedPoint}
+                    setSelectedPoint={setSelectedPoint}
+                    firstAnnotationInTheFuture={firstAnnotationInTheFuture === annotation}
+                  />
+                ))
+              )}
+            </div>
           </div>
         </ResizablePanel>
         <PanelResizeHandle className="h-full w-1 bg-chrome" />
@@ -97,24 +100,19 @@ function ActionFilter({
   onSearch: (value: string) => void;
 }) {
   return (
-    <div className="inspector devtools-toolbar devtools-input-toolbar">
-      <div
-        id="redux-search"
-        className={classnames(
-          "devtools-searchbox grow text-themeTextFieldColor",
-          styles.ActionFilter
-        )}
-      >
+    <div className={styles.SearchRow}>
+      <label className={styles.SearchIconAndInput} id="redux-search">
+        <Icon className={styles.SearchIcon} type="search" />
         <input
-          id="redux-searchbox"
-          className="devtools-searchinput"
-          type="input"
-          placeholder="Filter..."
           autoComplete="off"
-          value={searchValue}
+          className={styles.SearchInput}
+          id="redux-searchbox"
           onChange={e => onSearch(e.target.value)}
+          placeholder="Filter actions"
+          type="text"
+          value={searchValue}
         />
-      </div>
+      </label>
     </div>
   );
 }

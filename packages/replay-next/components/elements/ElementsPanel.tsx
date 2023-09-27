@@ -123,7 +123,7 @@ export function ElementsPanel({
             onKeyDown={onSearchInputKeyDown}
             placeholder="Search DOM"
             ref={searchInputRef}
-            type="search"
+            type="text"
             value={query}
           />
         </label>

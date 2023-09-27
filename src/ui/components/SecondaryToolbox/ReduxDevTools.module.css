@@ -2,11 +2,18 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
+.LeftPanel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+
 .actions [role="list"] {
   list-style: none;
   margin: 0;
-  padding: 4px 0;
   overflow: auto;
+  overflow-x: hidden;
 }
 
 .actions [role="list"] [role="listitem"] {
@@ -51,6 +58,7 @@
   font-weight: normal;
   margin: 0;
   flex-grow: 1;
+  width: 100%;
   max-width: 100%;
   overflow: hidden;
   white-space: nowrap;
@@ -154,10 +162,6 @@
   overflow: initial;
 }
 
-.ActionFilter::before {
-  -webkit-mask-image: url(/_next/static/media/search.d93aff58.svg) !important;
-}
-
 .ResizeHandle {
   height: 0.75rem;
 }
@@ -165,4 +169,51 @@
   width: 100%;
   height: 1px;
   background-color: var(--theme-border);
+}
+
+.SearchRow {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  border-bottom: 1px solid var(--theme-splitter-color);
+}
+
+.SearchIconAndInput {
+  flex: 1 1 auto;
+  height: 1.25rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  font-size: var(--font-size-regular);
+  background-color: var(--background-color-inputs);
+  color: var(--color-default);
+  padding: 0 0.25rem 0 0;
+  border: 2px solid #0000;
+  border-radius: 0.25rem;
+}
+.SearchIconAndInput:focus-within {
+  border-color: var(--color-brand);
+}
+
+.SearchInput {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  padding: 0;
+  font-size: var(--font-size-regular);
+}
+.SearchInput:focus {
+  outline: none;
+  border: none;
+  box-shadow: none;
+}
+
+.SearchIcon {
+  width: 1rem;
+  height: 1rem;
+  margin: 0.25rem;
 }
