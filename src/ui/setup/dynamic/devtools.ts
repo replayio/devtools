@@ -8,7 +8,6 @@ import debounce from "lodash/debounce";
 import { setupSourcesListeners } from "devtools/client/debugger/src/actions/sources";
 import * as dbgClient from "devtools/client/debugger/src/client";
 import debuggerReducers from "devtools/client/debugger/src/reducers";
-import { setupMarkup } from "devtools/client/inspector/markup/actions/markup";
 import * as inspectorReducers from "devtools/client/inspector/reducers";
 import {
   Canvas,
@@ -186,7 +185,6 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
   extendStore(store, initialState, { ...reducers, ...inspectorReducers }, extraThunkArgs);
 
   setupSourcesListeners(startAppListening);
-  setupMarkup(store, startAppListening);
 
   dbgClient.bootstrap(store, ThreadFront, replayClient);
 

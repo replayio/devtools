@@ -158,11 +158,6 @@ export const config = {
     defaultValue: Boolean(false),
     legacyKey: "devtools.features.commentAttachments",
   },
-  feature_newElementsPanel: {
-    defaultValue: Boolean(false),
-    label: "Enable new Elements panel",
-    legacyKey: null,
-  },
   feature_protocolPanel: {
     defaultValue: Boolean(false),
     label: "View protocol requests and responses in the panel",
