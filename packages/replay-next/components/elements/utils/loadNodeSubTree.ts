@@ -27,7 +27,7 @@ export function loadNodeSubTree(
     // Also add before loading non-cached results to preserve the order of the tree
     loadedIds.add(id);
 
-    let element = elementCache.getValueIfCached(replayClient, pauseId, id);
+    let element = await elementCache.readAsync(replayClient, pauseId, id);
     if (element == null) {
       try {
         element = await elementCache.readAsync(replayClient, pauseId, id);

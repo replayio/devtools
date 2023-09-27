@@ -17,7 +17,7 @@ export function loadNodePathToRoot(
   ) => {
     ids.unshift(id);
 
-    let element = elementCache.getValueIfCached(replayClient, pauseId, id);
+    let element = await elementCache.readAsync(replayClient, pauseId, id);
     if (element == null) {
       try {
         element = await elementCache.readAsync(replayClient, pauseId, id);

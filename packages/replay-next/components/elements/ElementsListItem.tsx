@@ -1,4 +1,4 @@
-import { Node } from "@replayio/protocol";
+import { Node as ProtocolNode } from "@replayio/protocol";
 import {
   CSSProperties,
   KeyboardEvent,
@@ -9,7 +9,6 @@ import {
   useState,
 } from "react";
 
-import { DOM_NODE_CONSTANTS } from "replay-next/components/elements/constants";
 import { ElementsListData } from "replay-next/components/elements/ElementsListData";
 import { useElementsListItemContextMenu } from "replay-next/components/elements/hooks/useElementsListItemContextMenu";
 import { Item } from "replay-next/components/elements/types";
@@ -25,8 +24,8 @@ export type ElementsListItemData = {};
 
 const COLLAPSE_DATA_URL_REGEX = /^data.+base64/;
 const COLLAPSE_DATA_URL_LENGTH = 60;
+const MAX_ATTRIBUTE_LENGTH = 50;
 
-// TODO [FE-1885] Account for font-size preferences like Source viewer does
 export const ITEM_SIZE = 16;
 
 export function ElementsListItem({
@@ -39,7 +38,6 @@ export function ElementsListItem({
   style: CSSProperties;
 }) {
   const { itemData, listData, selectedItemIndex, selectItemAtIndex } = data;
-  const {} = itemData;
 
   const elementsListData = listData as ElementsListData;
 
@@ -70,7 +68,7 @@ export function ElementsListItem({
   // IMPORTANT
   // Keep this in sync with the toString logic in useElementsListItemContextMenu
   switch (node.nodeType) {
-    case DOM_NODE_CONSTANTS.COMMENT_NODE: {
+    case Node.COMMENT_NODE: {
       let nodeValue = node.nodeValue ?? "";
       nodeValue = nodeValue.trim();
       nodeValue = nodeValue.replace(/\n\s+/g, " ");
@@ -79,17 +77,17 @@ export function ElementsListItem({
       rendered = `<!-- ${nodeValue} -->`;
       break;
     }
-    case DOM_NODE_CONSTANTS.DOCUMENT_NODE: {
+    case Node.DOCUMENT_NODE: {
       dataType = "document";
       rendered = node.nodeName;
       break;
     }
-    case DOM_NODE_CONSTANTS.DOCUMENT_TYPE_NODE: {
+    case Node.DOCUMENT_TYPE_NODE: {
       dataType = "doctype";
       rendered = `<!DOCTYPE ${node.nodeName}>`;
       break;
     }
-    case DOM_NODE_CONSTANTS.TEXT_NODE: {
+    case Node.TEXT_NODE: {
       dataType = "text";
       rendered = (node.nodeValue ?? "").trim().replace(/[\n\r]/g, "\\n");
       break;
@@ -194,7 +192,7 @@ function HTMLNodeRenderer({
   node,
 }: {
   mode: "collapsed-with-content" | "collapsed-no-content" | "head" | "tail";
-  node: Node;
+  node: ProtocolNode;
 }) {
   const nodeName = node.nodeName.toLowerCase();
 
@@ -309,8 +307,7 @@ function HtmlAttributeRenderer({ name, value }: { name: string; value: string })
     // Truncates base64 attribute values
     displayValue = truncateMiddle(value, COLLAPSE_DATA_URL_LENGTH, "…");
   } else {
-    // TODO [FE-1885] Truncate values longer than X
-    displayValue = value;
+    displayValue = truncateMiddle(value, MAX_ATTRIBUTE_LENGTH, "…");
   }
 
   return (
@@ -321,6 +318,7 @@ function HtmlAttributeRenderer({ name, value }: { name: string; value: string })
       onClick={onClick}
       onKeyDown={onKeyDown}
       tabIndex={0}
+      title={`${name}="${value}"`}
     >
       <span
         className={styles.HtmlAttributeName}

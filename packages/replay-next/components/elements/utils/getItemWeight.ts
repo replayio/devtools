@@ -1,4 +1,3 @@
-import { DOM_NODE_CONSTANTS } from "replay-next/components/elements/constants";
 import { Metadata } from "replay-next/components/elements/types";
 
 export function getItemWeight(metadata: Metadata): number {

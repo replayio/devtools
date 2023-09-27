@@ -1,6 +1,5 @@
 import { ContextMenuItem, useContextMenu } from "use-context-menu";
 
-import { DOM_NODE_CONSTANTS } from "replay-next/components/elements/constants";
 import { ElementsListData } from "replay-next/components/elements/ElementsListData";
 import { Item } from "replay-next/components/elements/types";
 import Icon from "replay-next/components/Icon";
@@ -26,7 +25,7 @@ export function useElementsListItemContextMenu({
     // IMPORTANT
     // Keep this in sync with the rendering logic in ElementsListItem
     switch (node.nodeType) {
-      case DOM_NODE_CONSTANTS.COMMENT_NODE: {
+      case Node.COMMENT_NODE: {
         let nodeValue = node.nodeValue ?? "";
         nodeValue = nodeValue.trim();
         nodeValue = nodeValue.replace(/\n\s+/g, " ");
@@ -34,15 +33,15 @@ export function useElementsListItemContextMenu({
         string = `<!-- ${nodeValue} -->`;
         break;
       }
-      case DOM_NODE_CONSTANTS.DOCUMENT_NODE: {
+      case Node.DOCUMENT_NODE: {
         string = node.nodeName;
         break;
       }
-      case DOM_NODE_CONSTANTS.DOCUMENT_TYPE_NODE: {
+      case Node.DOCUMENT_TYPE_NODE: {
         string = `<!DOCTYPE ${node.nodeName}>`;
         break;
       }
-      case DOM_NODE_CONSTANTS.TEXT_NODE: {
+      case Node.TEXT_NODE: {
         string = (node.nodeValue ?? "").trim().replace(/[\n\r]/g, "\\n");
         break;
       }

@@ -1,7 +1,6 @@
 import assert from "assert";
-import { Node, ObjectId, PauseId } from "@replayio/protocol";
+import { ObjectId, PauseId, Node as ProtocolNode } from "@replayio/protocol";
 
-import { DOM_NODE_CONSTANTS } from "replay-next/components/elements/constants";
 import { Element, elementCache } from "replay-next/components/elements/suspense/ElementCache";
 import { getDistanceFromRoot } from "replay-next/components/elements/utils/getDistanceFromRoot";
 import { getItemWeight } from "replay-next/components/elements/utils/getItemWeight";
@@ -224,7 +223,7 @@ export class ElementsListData extends GenericListData<Item> {
         nodeValue = nodeValue.trim();
         nodeValue = nodeValue.replace(/\n\s+/g, " ");
 
-        if (node.nodeType === DOM_NODE_CONSTANTS.COMMENT_NODE) {
+        if (node.nodeType === Node.COMMENT_NODE) {
           rendered = `<!-- ${nodeValue} -->`;
         } else {
           rendered = nodeValue || nodeName;
@@ -257,8 +256,8 @@ export class ElementsListData extends GenericListData<Item> {
     return this.getIndexForNode(item.id, item.element.node);
   }
 
-  protected getIndexForNode(id: ObjectId, node: Node): number {
-    let currentNode: Node | undefined = node;
+  protected getIndexForNode(id: ObjectId, node: ProtocolNode): number {
+    let currentNode: ProtocolNode | undefined = node;
     let currentNodeId: ObjectId | undefined = id;
     if (currentNode.parentNode == null) {
       return 0;
@@ -443,7 +442,7 @@ export class ElementsListData extends GenericListData<Item> {
           depth = parentMetadata.depth + 1;
         }
 
-        const hasTail = element.node.nodeType !== DOM_NODE_CONSTANTS.DOCUMENT_NODE;
+        const hasTail = element.node.nodeType !== Node.DOCUMENT_NODE;
 
         const { childrenCanBeRendered, subTreeIsFullyLoaded } =
           this.getSubTreeLoadedStatus(element);
@@ -497,7 +496,7 @@ function createLoadingPlaceholderElement(parentId: ObjectId): Element {
     id: `loading-placeholder-element-${parentId}`,
     node: {
       isConnected: true,
-      nodeType: DOM_NODE_CONSTANTS.TEXT_NODE,
+      nodeType: Node.TEXT_NODE,
       nodeName: "#text",
       nodeValue: "Loading…",
       parentNode: parentId,
