@@ -15200,7 +15200,7 @@ __metadata:
     style-loader: ^3.3.1
     stylelint: ^14.16.0
     stylelint-config-prettier: ^9.0.5
-    suspense: ^0.0.47
+    suspense: ^0.0.48
     tailwindcss: ^3.2.4
     ts-node: ^10.7.0
     tsconfig-paths: ^3.14.1
@@ -15399,7 +15399,7 @@ __metadata:
     react-dom: 0.0.0-experimental-e7d0053e6-20220325
     react-virtualized-auto-sizer: ^1.0.19
     shared: "workspace:*"
-    suspense: ^0.0.47
+    suspense: ^0.0.48
     typescript: 5.0.2
     use-context-menu: 0.4.13
     uuid: ^7.0.3
@@ -16731,9 +16731,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"suspense@npm:^0.0.47":
-  version: 0.0.47
-  resolution: "suspense@npm:0.0.47"
+"suspense@npm:^0.0.48":
+  version: 0.0.48
+  resolution: "suspense@npm:0.0.48"
   dependencies:
     "@types/deep-equal": ^1.0.1
     array-sorting-utilities: ^0.0.1
@@ -16744,7 +16744,7 @@ __metadata:
   peerDependencies:
     react: ^18.0.0
     react-dom: ^18.0.0
-  checksum: d3bec377b5d3775779c60332b3313ecebf8ccf3eab7dc267ef2495bced55dc9bbfbf2561172b61d6a7c1777caf19e31c5c347234cbd35a9355c9981c9d3dfcaf
+  checksum: 7d4fe856bffbf3a548cfbff52a1752a5b19608745e03bee073b81fc8d0f24a9949e6c2590562e7e38d3a9896dea0667fa39eede32cbcbcf696755cbdb34c4aac
   languageName: node
   linkType: hard
 
