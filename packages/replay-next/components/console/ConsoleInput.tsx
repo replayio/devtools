@@ -1,5 +1,5 @@
 import { ExecutionPoint, FrameId, PauseId, TimeStampedPointRange } from "@replayio/protocol";
-import { RefObject, Suspense, useContext, useEffect, useRef, useState } from "react";
+import { RefObject, Suspense, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import Icon from "replay-next/components/Icon";
@@ -13,6 +13,7 @@ import { NewTerminalExpression, TerminalContext } from "replay-next/src/contexts
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { useCurrentFocusWindow } from "replay-next/src/hooks/useCurrentFocusWindow";
 import { useIsPointWithinFocusWindow } from "replay-next/src/hooks/useIsPointWithinFocusWindow";
+import { validate } from "replay-next/src/utils/points";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
 
@@ -83,6 +84,8 @@ function ConsoleInputSuspends({ inputRef }: { inputRef?: RefObject<ImperativeHan
 
   const [expression, setExpression] = useState<string>("");
 
+  const isExpressionValid = useMemo(() => validate(expression), [expression]);
+
   useEffect(() => {
     if (!searchState.visible && searchStateVisibleRef.current) {
       ref?.current?.focus();
@@ -145,6 +148,10 @@ function ConsoleInputSuspends({ inputRef }: { inputRef?: RefObject<ImperativeHan
   };
 
   const onSubmit = async (expression: string) => {
+    if (!isExpressionValid) {
+      return;
+    }
+
     const trimmedExpression = expression.trim();
     if (trimmedExpression === "") {
       return;
@@ -174,7 +181,7 @@ function ConsoleInputSuspends({ inputRef }: { inputRef?: RefObject<ImperativeHan
   const autoFocus = incrementedKey > 0;
 
   return (
-    <div className={styles.Container}>
+    <div className={styles.Container} data-invalid-expression={!isExpressionValid || undefined}>
       <div className={styles.PromptRow} onKeyDown={onKeyDown}>
         <Icon className={styles.Icon} type="terminal-prompt" />
         <div className={styles.Input}>
