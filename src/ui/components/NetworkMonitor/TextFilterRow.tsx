@@ -1,7 +1,7 @@
-import classNames from "classnames";
+import Icon from "replay-next/components/Icon";
 
-import MaterialIcon from "../shared/MaterialIcon";
 import { CanonicalRequestType } from "./utils";
+import styles from "./TestFilterRow.module.css";
 
 export function TextFilterRow({
   filterByText,
@@ -18,34 +18,26 @@ export function TextFilterRow({
 }) {
   return (
     <>
-      <div className="flex items-center bg-bodyBgcolor p-1 pl-0">
-        <div className={classNames("pl-1", showTypeFilters && "basis-32")}>
-          <button
-            onClick={() => setShowTypeFilters(!showTypeFilters)}
-            className={classNames("flex items-center", {
-              "mr-1": !showTypeFilters,
-              "text-primaryAccent hover:text-primaryAccentHover focus:text-primaryAccentHover":
-                types.size > 0,
-            })}
-            data-test-id="Network-ToggleFilterByTypePanelButton"
-            data-test-state={showTypeFilters ? "open" : "closed"}
-          >
-            <MaterialIcon iconSize="lg" outlined={true}>
-              filter_alt
-            </MaterialIcon>
-          </button>
-        </div>
-        <div className="flex flex-1 items-center rounded-md bg-themeTextFieldBgcolor p-1">
-          <MaterialIcon iconSize="lg">search</MaterialIcon>
+      <div className={styles.Row}>
+        <button
+          onClick={() => setShowTypeFilters(!showTypeFilters)}
+          className={styles.FilterButton}
+          data-test-id="Network-ToggleFilterByTypePanelButton"
+          data-test-state={showTypeFilters ? "open" : "closed"}
+        >
+          <Icon className={styles.FilterIcon} type="filter" />
+        </button>
+        <label className={styles.SearchIconAndInput}>
+          <Icon className={styles.SearchIcon} type="search" />
 
           <input
-            className="w-full bg-transparent px-1 text-themeTextFieldColor focus:outline-none"
+            className={styles.SearchInput}
             data-test-id="Network-TextFilterInput"
             onChange={event => setFilterByText(event.target.value)}
             placeholder="Filter requests"
             value={filterByText}
           />
-        </div>
+        </label>
       </div>
     </>
   );
