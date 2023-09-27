@@ -40,8 +40,8 @@ test(`stepping-05_chromium: Test stepping in pretty-printed code`, async ({
   await addEventListenerLogpoints(page, [{ eventType: "click", categoryKey: "mouse" }]);
   await warpToMessage(page, "PointerEvent", 15);
 
-  await stepInToLine(page, 2);
-  await stepOutToLine(page, 15);
+  await stepInToLine(page, 15);
+  await stepOutToLine(page, 12);
 
   // TODO Stepping here hangs
   // await stepInToLine(page, 10);

@@ -41,7 +41,7 @@ test(`object_preview-01: expressions in the console after time warping`, async (
 
   await verifyConsoleMessageObjectContents(page, "Proxy{}", [
     "<target>: {a: 0}",
-    "<handler>: {get: ƒget(target, prop, receiver)}",
+    "<handler>: {get: ƒ()}",
   ]);
 
   await verifyConsoleMessage(page, "Symbol()");
