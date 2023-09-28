@@ -22,7 +22,11 @@ import { compareExecutionPoints } from "replay-next/src/utils/time";
 import { ReplayClientInterface } from "shared/client/types";
 import { findFunctionOutlineForLocation } from "ui/actions/eventListeners/jumpToCode";
 import { SourceDetails } from "ui/reducers/sources";
-import { FormattedPointStack, formatPointStackForPoint } from "ui/suspense/frameCache";
+import {
+  FormattedPointStack,
+  formatPointStackForPoint,
+  formattedPointStackCache,
+} from "ui/suspense/frameCache";
 
 interface PointWithLocation {
   location: Location;
@@ -163,6 +167,7 @@ const reactInternalMethodsDetailsCache: Cache<
   },
 });
 
+// TODO This only handles a single ReactDOM source file.
 const reactDomLinesCache: Cache<
   [
     replayClient: ReplayClientInterface,
@@ -271,7 +276,10 @@ export const reactRendersIntervalCache = createFocusIntervalCacheForExecutionPoi
 
     const scheduleUpdateEntries: ReactUpdateScheduled[] = await Promise.all(
       scheduleUpdateHits.map(async hit => {
-        const mostlyFormattedPointStack = await formatPointStackForPoint(replayClient, hit);
+        const mostlyFormattedPointStack = await formattedPointStackCache.readAsync(
+          replayClient,
+          hit
+        );
 
         const cause = mostlyFormattedPointStack.frame ? "user" : "unknown";
 
@@ -285,7 +293,10 @@ export const reactRendersIntervalCache = createFocusIntervalCacheForExecutionPoi
 
     const renderRootSyncEntries: ReactSyncUpdatedStarted[] = await Promise.all(
       renderRootSyncHits.map(async hit => {
-        const mostlyFormattedPointStack = await formatPointStackForPoint(replayClient, hit);
+        const mostlyFormattedPointStack = await formattedPointStackCache.readAsync(
+          replayClient,
+          hit
+        );
 
         return {
           type: "sync_started",
@@ -296,7 +307,10 @@ export const reactRendersIntervalCache = createFocusIntervalCacheForExecutionPoi
 
     const onCommitRootEntries: ReactRenderCommitted[] = await Promise.all(
       onCommitRootHits.map(async hit => {
-        const mostlyFormattedPointStack = await formatPointStackForPoint(replayClient, hit);
+        const mostlyFormattedPointStack = await formattedPointStackCache.readAsync(
+          replayClient,
+          hit
+        );
 
         return {
           type: "render_committed",

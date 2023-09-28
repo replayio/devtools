@@ -1,6 +1,7 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { ExecutionPoint, Location, TimeStampedPoint } from "@replayio/protocol";
 import classnames from "classnames";
+import uniqueBy from "lodash/uniqBy";
 import { CSSProperties, ReactNode, Suspense, useContext, useMemo, useState } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList as List } from "react-window";
@@ -23,8 +24,7 @@ import { getSourceIdsByUrl } from "ui/reducers/sources";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
-import cardsListStyles from "ui/components/Comments/CommentCardsList.module.css";
-import styles from "ui/components/Events/Event.module.css";
+import styles from "./ReactReduxPanels.module.css";
 
 export function jumpToTimeAndLocationForQueuedRender(
   hitPoint: TimeStampedPoint,
@@ -154,7 +154,9 @@ export function ReactPanelSuspends() {
     const allScheduledEntries = allReactRenderEntries.filter(
       (entry): entry is ReactUpdateScheduled => entry.type === "scheduled"
     );
-    const onlyUserEntries = allScheduledEntries.filter(entry => entry.cause === "user");
+    const uniqueScheduledEntries = uniqueBy(allScheduledEntries, entry => entry.resultPoint.point);
+
+    const onlyUserEntries = uniqueScheduledEntries.filter(entry => entry.cause === "user");
     const onSeek = (executionPoint: string, time: number) => {
       dispatch(seek({ executionPoint, time }));
     };
@@ -200,9 +202,9 @@ export function ReactPanel() {
   }
 
   return (
-    <div className={cardsListStyles.Sidebar}>
-      <div className={cardsListStyles.Toolbar}>
-        <div className={cardsListStyles.ToolbarHeader}>React State Updates</div>
+    <div className={styles.Sidebar}>
+      <div className={styles.Toolbar}>
+        <div className={styles.ToolbarHeader}>React State Updates</div>
       </div>
       <Suspense
         fallback={

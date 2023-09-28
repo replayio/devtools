@@ -109,7 +109,6 @@ export const formatFunctionDetailsFromLocation = async (
   locationInFunction: Location | MappedLocation,
   framework?: string
 ): Promise<FormattedEventListener | undefined> => {
-  // const { functionLocation } = fnPreview;
   const sourcesById = await sourcesByIdCache.readAsync(replayClient);
   let location: Location | undefined;
   if (Array.isArray(locationInFunction)) {

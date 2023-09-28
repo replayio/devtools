@@ -23,6 +23,7 @@ import { Source, sourcesByIdCache } from "replay-next/src/suspense/SourcesCache"
 import { getPreferredLocation } from "replay-next/src/utils/sources";
 import { ReplayClientInterface } from "shared/client/types";
 import {
+  FormattedEventListener,
   MORE_IGNORABLE_PARTIAL_URLS,
   formatFunctionDetailsFromLocation,
 } from "ui/actions/eventListeners/eventListenerUtils";
@@ -88,6 +89,7 @@ export interface FormattedPointStackFrame {
   functionLocation: Location;
   executionLocation: Location;
   point: PointDescription;
+  functionDetails?: FormattedEventListener;
 }
 
 export interface FormattedPointStack {
@@ -99,10 +101,11 @@ export interface FormattedPointStack {
   functionName?: string;
 }
 
-export function formatPointStackFrame(
+export async function formatPointStackFrame(
+  replayClient: ReplayClientInterface,
   frame: PointStackFrame,
   sourcesById: Map<string, Source>
-): FormattedPointStackFrame {
+): Promise<FormattedPointStackFrame> {
   updateMappedLocationForPointStackFrame(sourcesById, frame);
   const functionLocation = getPreferredLocation(sourcesById, [], frame.functionLocation);
   const executionLocation = getPreferredLocation(sourcesById, [], frame.point.frame ?? []);
@@ -115,6 +118,11 @@ export function formatPointStackFrame(
     functionLocation,
     executionLocation,
     point: frame.point,
+    functionDetails: await formatFunctionDetailsFromLocation(
+      replayClient,
+      "unknown",
+      functionLocation
+    ),
   };
 }
 
@@ -136,9 +144,11 @@ export async function formatPointStackForPoint(
 ): Promise<FormattedPointStack> {
   const sourcesById = await sourcesByIdCache.readAsync(replayClient);
   const pointStack = await replayClient.getPointStack(point.point, 30);
-  const formattedFrames = pointStack.map(frame => {
-    return formatPointStackFrame(frame, sourcesById);
-  });
+  const formattedFrames = await Promise.all(
+    pointStack.map(frame => {
+      return formatPointStackFrame(replayClient, frame, sourcesById);
+    })
+  );
 
   const filteredPauseFrames = formattedFrames.filter(frame => {
     const { source } = frame;
