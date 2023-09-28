@@ -52,6 +52,7 @@
         "node_modules/*"
       ],
       "replay-next": ["packages/replay-next/*"],
+      "replay-experimental/*": ["packages/replay-experimental/*"],
       "@recordreplay/accordion": ["packages/accordion/index.tsx"],
       "components": ["packages/design/index.ts"],
       "components/*": ["packages/design/*"],
