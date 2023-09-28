@@ -52,7 +52,7 @@ class UserData implements GraphQLService {
     try {
       const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (raw !== null) {
-        this.cachedUserPreferences = JSON.parse(raw);
+        this.cachedUserPreferences = JSON.parse(raw) as any;
       }
     } catch (error) {}
 
@@ -149,7 +149,7 @@ class UserData implements GraphQLService {
           const legacyValue = localStorage.getItem(`Services.prefs:${legacyKey}`);
           if (legacyValue !== null) {
             // The legacy system stored values in an object, which it encoded to a string
-            const { hasUserValue, userValue } = JSON.parse(legacyValue);
+            const { hasUserValue, userValue } = JSON.parse(legacyValue) as any;
             if (hasUserValue) {
               this.cachedJSONData[key] = userValue;
 
@@ -165,7 +165,7 @@ class UserData implements GraphQLService {
           const legacyValue = localStorage.getItem(legacyKey);
           if (legacyValue !== null) {
             // That hook stored values in localStorage as JSON string
-            const parsedValue = JSON.parse(legacyValue);
+            const parsedValue = JSON.parse(legacyValue) as any;
 
             this.cachedJSONData[key] = parsedValue;
 

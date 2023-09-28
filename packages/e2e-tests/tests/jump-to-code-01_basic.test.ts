@@ -7,7 +7,12 @@ import {
   openEventsPanel,
 } from "../helpers/info-event-panel";
 import { openSourceExplorerPanel } from "../helpers/source-explorer-panel";
-import { getSelectedLineNumber, waitForSelectedSource } from "../helpers/source-panel";
+import {
+  addLogpoint,
+  getSelectedLineNumber,
+  verifyLogpointStep,
+  waitForSelectedSource,
+} from "../helpers/source-panel";
 import { getTimelineCurrentPercent } from "../helpers/timeline";
 import { debugPrint, getByTestName, waitFor } from "../helpers/utils";
 import test from "../testFixtureCloneRecording";
@@ -143,11 +148,15 @@ test(`jump-to-code-01: Test basic jumping functionality`, async ({
     { timeout: 10_000 }
   );
 
-  // Should also have jumped in time
-  await waitFor(async () => {
-    const timelinePercent = await getTimelineCurrentPercent(page);
-    expect(Math.round(timelinePercent)).toBe(32);
+  // Should also have jumped in time. Since this can vary (slightly different progress %
+  // based on timing differences), we'll add a log statement and verify _which_ hit we're at.
+  await addLogpoint(page, {
+    url: "Header.tsx",
+    lineNumber: 12,
   });
+
+  // Should have paused on the handler for the first valid keystroke
+  await verifyLogpointStep(page, "1/22", { url: "Header.tsx", lineNumber: 12 });
 
   // the next clicks were on real buttons, so there is a handler
   debugPrint(page, "Checking for an enabled click 'Jump' button");
@@ -167,8 +176,16 @@ test(`jump-to-code-01: Test basic jumping functionality`, async ({
   );
 
   // Should also have jumped in time
-  await waitFor(async () => {
-    const timelinePercent = await getTimelineCurrentPercent(page);
-    expect(Math.round(timelinePercent)).toBe(68);
+  // Should also have jumped in time. Since this can vary (slightly different progress %
+  // based on timing differences), we'll add a log statement and verify _which_ hit we're at.
+  await addLogpoint(page, {
+    url: "TodoListItem.tsx",
+    lineNumber: 22,
+  });
+
+  // Should have paused on the handler for the first valid click
+  await verifyLogpointStep(page, "1/2", {
+    url: "TodoListItem.tsx",
+    lineNumber: 22,
   });
 });

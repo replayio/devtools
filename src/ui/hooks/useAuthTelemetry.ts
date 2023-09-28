@@ -20,7 +20,7 @@ export default function useAuthTelemetry() {
       for (let key in localStorage) {
         if (key.includes("auth0spajs")) {
           const value = localStorage.getItem(key);
-          auth0Obj = value && JSON.parse(value);
+          auth0Obj = value && (JSON.parse(value) as any);
         }
       }
 

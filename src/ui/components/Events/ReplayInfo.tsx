@@ -17,6 +17,7 @@ import MaterialIcon from "../shared/MaterialIcon";
 import { getPrivacySummaryAndIcon } from "../shared/SharingModal/PrivacyDropdown";
 import PrivacyDropdown from "../shared/SharingModal/PrivacyDropdown";
 import LabeledIcon from "../TestSuite/components/LabeledIcon";
+import { isTestSuiteReplay } from "../TestSuite/utils/isTestSuiteReplay";
 import { getUniqueDomains } from "../UploadScreen/Privacy";
 import styles from "./ReplayInfo.module.css";
 
@@ -53,7 +54,7 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
     setModal("privacy");
   };
 
-  const isTest = recording.metadata?.test;
+  const isTest = isTestSuiteReplay(recording);
   return (
     <div className="flex-column flex items-center overflow-hidden border-splitter bg-bodyBgcolor">
       <div className="mt-.5 mb-2 flex w-full cursor-default flex-col self-stretch overflow-hidden px-1.5 pb-0 text-xs">

@@ -19,14 +19,22 @@ const testWithCloneRecording = base.extend<TestIsolatedRecordingFixture>({
       throw new Error("Invalid recording");
     }
 
-    const newRecordingId = await cloneTestRecording(exampleRecordings[exampleKey]);
+    let newRecordingId: string | undefined = undefined;
+    try {
+      newRecordingId = await cloneTestRecording(exampleRecordings[exampleKey]);
 
-    await use({
-      page,
-      recordingId: newRecordingId,
-    });
-
-    await deleteTestRecording(newRecordingId);
+      await use({
+        page,
+        recordingId: newRecordingId,
+      });
+    } catch (err: any) {
+      console.error(err);
+      throw err;
+    } finally {
+      if (newRecordingId) {
+        await deleteTestRecording(newRecordingId);
+      }
+    }
   },
 });
 export default testWithCloneRecording;

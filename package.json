@@ -88,7 +88,7 @@
     "reselect": "^4.1.5",
     "shared": "workspace:*",
     "slugify": "^1.6.5",
-    "suspense": "^0.0.45",
+    "suspense": "^0.0.48",
     "use-context-menu": "0.4.13"
   },
   "devDependencies": {
@@ -114,6 +114,7 @@
     "@testing-library/jest-dom": "^5.16.3",
     "@testing-library/react": "^13.3.0",
     "@testing-library/user-event": "^14.1.0",
+    "@total-typescript/ts-reset": "^0.5.1",
     "@trunkio/launcher": "^1.2.4",
     "@types/classnames": "^2.2.11",
     "@types/cookie": "^0.4.1",

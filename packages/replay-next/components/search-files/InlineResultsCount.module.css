@@ -9,6 +9,12 @@
   opacity: 0.5;
 }
 
+.ErrorIcon {
+  color: var(--color-error);
+  width: 1rem;
+  height: 1rem;
+}
+
 .SpinnerIcon {
   color: var(--color-dim);
   width: 1rem;

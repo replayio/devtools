@@ -286,12 +286,13 @@ export function convertRecording(
     title: "title" in rec ? rec.title : undefined,
     duration: rec.duration,
     private: "private" in rec ? rec.private : undefined,
-    isProcessed: "isProcessed" in rec ? rec.isProcessed : undefined,
+    isProcessed: "isProcessed" in rec ? rec.isProcessed ?? undefined : undefined,
     isInitialized: "isInitialized" in rec ? rec.isInitialized : undefined,
     date: rec.createdAt,
     comments: rec.comments,
     userRole: "userRole" in rec ? (rec.userRole as RecordingRole) : undefined,
     isTest: "isTest" in rec ? rec.isTest : undefined,
+    isInTestWorkspace: "isInTestWorkspace" in rec ? rec.isInTestWorkspace : undefined,
   };
 
   if ("workspace" in rec) {
@@ -718,7 +719,7 @@ export async function getRecordingMetadata(id: string) {
   const json: {
     data: { recording: Recording & { owner?: { name: string } } };
     error: any;
-  } = await resp.json();
+  } = (await resp.json()) as any;
 
   if (json.error || !json.data.recording) {
     return null;

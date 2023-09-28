@@ -1,0 +1,24 @@
+.Container {
+  width: 100%;
+  height: 100%;
+  background-color: var(--body-bgcolor);
+  border-bottom-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+}
+
+.LeftPanel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+
+.ResizeHandle {
+  width: 0.25rem;
+  background-color: var(--chrome);
+}
+
+.ListContainer {
+  height: 100%;
+  overflow-y: auto;
+}

@@ -19,25 +19,25 @@ export type RenderChildrenFunction = () => ReactNode;
 function noopOnChange(value: boolean) {}
 
 export default function Expandable({
-  arrowClassName = "",
   children,
   childrenClassName = "",
   className = "",
   defaultOpen = false,
   header,
   headerClassName = "",
+  iconClassName = "",
   onChange = noopOnChange,
   persistenceKey,
   style,
   useBlockLayoutWhenExpanded = true,
 }: {
-  arrowClassName?: string;
   children: ReactNode;
   childrenClassName?: string;
   className?: string;
   defaultOpen?: boolean;
   header: ReactNode;
   headerClassName?: string;
+  iconClassName?: string;
   onChange?: (value: boolean) => void;
   persistenceKey?: string;
   style?: CSSProperties;
@@ -111,10 +111,8 @@ export default function Expandable({
         role="button"
         tabIndex={0}
       >
-        <span
-          className={`${isOpen ? styles.ArrowExpanded : styles.ArrowCollapsed} ${arrowClassName}`}
-        >
-          <Icon className={styles.ArrowIcon} type="arrow" />
+        <span className={isOpen ? styles.ArrowExpanded : styles.ArrowCollapsed}>
+          <Icon className={`${styles.ArrowIcon} ${iconClassName}`} type="arrow" />
         </span>
         {header}
       </span>

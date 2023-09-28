@@ -1,0 +1,42 @@
+.Container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.TabsContainer {
+  flex: 0 0 auto;
+  background-color: var(--theme-toolbar-background);
+  border-bottom: 1px solid var(--theme-toolbar-background);
+}
+
+.Tab {
+  background-color: var(--theme-toolbar-background);
+  color: var(--tab-color);
+  padding: 0.5rem;
+}
+.Tab:hover {
+  background-color: var(--tab-hover-bgcolor);
+  color: var(--tab-hover-color);
+}
+
+.SelectedTab {
+  background-color: var(--tab-selected-bgcolor);
+  color: var(--tab-selected-color);
+}
+
+.ContentsContainer {
+  flex: 1 1 auto;
+  overflow: auto;
+}
+
+.RDTInspector {
+  padding: 0.25rem;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+.Inspector {
+  overflow: initial;
+}

@@ -89,7 +89,7 @@ export default function HTMLElementRenderer({
   return (
     <>
       {showOpeningTag && (
-        <span className={styles.HTMLOpeningTag}>
+        <span className={styles.HTMLTag}>
           <span className={styles.Bracket}>&lt;</span>
           {tagName}
           {properties.slice(0, MAX_PROPERTIES_TO_PREVIEW).map((property, index) => (
@@ -101,7 +101,7 @@ export default function HTMLElementRenderer({
       )}
       {showInlineText && <span className={styles.HtmlText}>{inlineText || "…"}</span>}
       {showClosingTag && (
-        <span className={styles.HTMLClosingTag}>
+        <span className={styles.HTMLTag}>
           <span className={styles.Bracket}>&lt;</span>
           {tagName}
           <span className={styles.Bracket}>&gt;</span>
@@ -120,7 +120,7 @@ export default function HTMLElementRenderer({
   );
 }
 
-function HTMLAttributeRenderer({
+export function HTMLAttributeRenderer({
   pauseId,
   protocolValue,
 }: {

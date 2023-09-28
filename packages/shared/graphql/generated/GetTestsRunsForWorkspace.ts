@@ -41,7 +41,6 @@ export interface GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node {
   __typename: "TestRun";
   id: string;
   date: any;
-  isProcessed: boolean;
   mode: string | null;
   results: GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node_results;
   source: GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node_source | null;

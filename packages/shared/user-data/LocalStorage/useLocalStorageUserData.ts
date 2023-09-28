@@ -15,7 +15,7 @@ export default function useLocalStorageUserData<Key extends PreferencesKey>(
   const [value, setValue] = useState<Config[Key]>(() => {
     const storedValue = localStorageGetItem(key);
     if (storedValue != null) {
-      return JSON.parse(storedValue);
+      return JSON.parse(storedValue) as any;
     } else {
       return config[key];
     }
@@ -37,7 +37,7 @@ export default function useLocalStorageUserData<Key extends PreferencesKey>(
   useLayoutEffect(() => {
     const onStorage = (event: StorageEvent) => {
       if (key === event.key && event.newValue && event.newValue !== JSON.stringify(value)) {
-        setValue(JSON.parse(event.newValue));
+        setValue(JSON.parse(event.newValue) as any);
       }
     };
 

@@ -1,8 +1,9 @@
 import React, { useContext } from "react";
 
+import { useSourcesById } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import Icon from "ui/components/shared/Icon";
-import { getSelectedSource } from "ui/reducers/sources";
+import { getSelectedSourceId } from "ui/reducers/sources";
 import { useAppSelector } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
 
@@ -16,7 +17,9 @@ export default function SourcemapVisualizerLinkSuspends({
   cursorPosition: CursorPosition;
 }) {
   const client = useContext(ReplayClientContext);
-  const selectedSource = useAppSelector(getSelectedSource);
+  const selectedSourceId = useAppSelector(getSelectedSourceId);
+  const sourcesById = useSourcesById(client);
+  const selectedSource = selectedSourceId ? sourcesById.get(selectedSourceId) : undefined;
   const selectedFrameId = useAppSelector(getSelectedFrameId);
   const sourcesState = useAppSelector(state => state.sources);
   const visualizerURL = getSourcemapVisualizerURLSuspense(

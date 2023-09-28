@@ -32,6 +32,53 @@ export function getCorrespondingLocations(
   }));
 }
 
+export function getSourceToDisplayById(
+  sourcesById: Map<SourceId, Source>,
+  sourceId: SourceId
+): Source | undefined {
+  const sourceIdToDisplay = getCorrespondingSourceIds(sourcesById, sourceId)[0];
+  return sourcesById.get(sourceIdToDisplay);
+}
+
+export function getSourceIdToDisplayForUrl(
+  sourcesById: Map<SourceId, Source>,
+  sourcesByUrl: Map<string, Source[]>,
+  url: string,
+  preferredGeneratedSourceIds?: SourceId[]
+): SourceId | undefined {
+  const sources = sourcesByUrl.get(url);
+  if (!sources) {
+    return;
+  }
+  const preferred = getPreferredSourceId(
+    sourcesById,
+    sources.map(s => s.sourceId),
+    preferredGeneratedSourceIds
+  );
+  if (!preferred) {
+    return;
+  }
+  return getCorrespondingSourceIds(sourcesById, preferred)[0];
+}
+
+export function getSourceToDisplayForUrl(
+  sourcesById: Map<SourceId, Source>,
+  sourcesByUrl: Map<string, Source[]>,
+  url: string,
+  preferredGeneratedSourceIds?: SourceId[]
+): Source | undefined {
+  const sourceId = getSourceIdToDisplayForUrl(
+    sourcesById,
+    sourcesByUrl,
+    url,
+    preferredGeneratedSourceIds
+  );
+  if (!sourceId) {
+    return;
+  }
+  return sourcesById.get(sourceId);
+}
+
 export function getBestSourceMappedSourceId(
   sourcesById: Map<SourceId, Source>,
   sourceIds: SourceId[]
