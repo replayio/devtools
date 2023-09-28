@@ -58,8 +58,9 @@ export function ReduxDevToolsListItem({
   return (
     <div
       className={styles.ListItem}
-      data-selected={annotation === selectedAnnotation || undefined}
       data-relative-position={relativePosition}
+      data-selected={annotation === selectedAnnotation || undefined}
+      data-test-id="ReduxDevToolsListItem"
       onClick={() => selectAnnotation(annotation)}
       style={style}
     >

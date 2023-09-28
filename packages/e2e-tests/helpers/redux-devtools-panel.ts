@@ -3,7 +3,7 @@ import { Locator, Page, expect } from "@playwright/test";
 import { waitFor } from "./utils";
 
 export function getReduxActions(page: Page) {
-  return page.locator('[data-test-id="ReduxActionItem"]');
+  return page.locator('[data-test-id="ReduxDevToolsListItem"]');
 }
 
 export async function assertTabValue(page: Page, tab: string, expectedValue: string) {
