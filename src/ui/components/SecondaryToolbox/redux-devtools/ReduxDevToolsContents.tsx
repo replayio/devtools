@@ -24,7 +24,7 @@ import {
   diffCache,
 } from "./injectReduxDevtoolsProcessing";
 import { JSONDiff, labelRenderer } from "./JSONDiff";
-import styles from "../ReduxDevTools.module.css";
+import styles from "./ReduxDevToolsContents.module.css";
 
 // TODO Get the rest of these replaced with intentional colors
 // `react-json-tree` uses specific field names to look up its colors.
@@ -59,8 +59,8 @@ interface PanelButtonProps {
 const PanelButton = ({ selected, children, name, onClick }: PanelButtonProps) => {
   return (
     <button
-      className={classnames(styles.contentsTab, {
-        [styles.selectedTab]: selected,
+      className={classnames(styles.Tab, {
+        [styles.SelectedTab]: selected,
       })}
       onClick={() => onClick(name)}
     >
@@ -148,11 +148,8 @@ export function ReduxDevToolsContents({ point, time }: RDTCProps) {
   const [selectedTab, setSelectedTab] = useState<SelectedContentsTab>("action");
 
   return (
-    <div className="flex h-full flex-col overflow-auto">
-      <div
-        className={classnames("p3 flex w-full  overflow-auto", styles.tabsContainer)}
-        data-test-id="ReduxTabsContainer"
-      >
+    <div className={styles.Container}>
+      <div className={styles.TabsContainer} data-test-id="ReduxTabsContainer">
         <PanelButton
           selected={selectedTab === "action"}
           name="action"
@@ -191,7 +188,7 @@ export function ReduxDevToolsContents({ point, time }: RDTCProps) {
         </PanelButton>
       </div>
 
-      <div className="h-full overflow-auto font-mono" data-test-id="ReduxDevToolsContents">
+      <div className={styles.ContentsContainer} data-test-id="ReduxDevToolsContents">
         <Suspense fallback={<IndeterminateLoader />}>
           <TabContents selectedTab={selectedTab} point={point} time={time} />
         </Suspense>

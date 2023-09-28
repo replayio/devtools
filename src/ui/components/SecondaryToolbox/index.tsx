@@ -34,8 +34,7 @@ import SourcesTabLabel from "./SourcesTabLabel";
 const InspectorApp = React.lazy(() => import("devtools/client/inspector/components/App"));
 
 const ReactDevToolsPanel = React.lazy(() => import("./ReactDevTools"));
-
-const ReduxDevToolsPanel = React.lazy(() => import("./ReduxDevTools"));
+const ReduxDevToolsPanel = React.lazy(() => import("./redux-devtools/ReduxDevToolsPanel"));
 
 interface PanelButtonProps {
   panel: SecondaryPanelName;

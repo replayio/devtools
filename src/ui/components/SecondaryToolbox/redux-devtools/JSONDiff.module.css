@@ -1,0 +1,36 @@
+.Container {
+  height: 100%;
+  overflow: auto;
+  padding: 0.25rem;
+}
+.Container ul {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.Container li {
+  padding-top: 0 !important;
+  height: 1.5rem;
+  line-height: 1.5rem;
+}
+
+.diffWrap {
+  position: relative;
+  z-index: 1;
+}
+
+.diffAdd,
+.diffUpdateTo {
+  background-color: var(--diff-add-background-color);
+  color: var(--diff-add-text-color);
+}
+
+.diffRemove,
+.diffUpdateFrom {
+  text-decoration: line-through;
+  background-color: var(--diff-remove-background-color);
+  color: var(--diff-remove-text-color);
+}
+
+.NoDiff {
+  color: var(--body-sub-color);
+}
