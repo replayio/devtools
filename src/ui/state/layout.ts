@@ -19,6 +19,7 @@ export type PrimaryPanelName =
   | "protocol"
   | "search"
   | "react"
+  | "react-redux-perf"
   | ViewerPrimaryPanelName;
 export type SecondaryPanelName =
   | "console"
