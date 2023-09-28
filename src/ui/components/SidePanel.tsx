@@ -3,6 +3,7 @@ import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import PrimaryPanes from "devtools/client/debugger/src/components/PrimaryPanes";
 import SecondaryPanes from "devtools/client/debugger/src/components/SecondaryPanes";
 import Accordion from "devtools/client/debugger/src/components/shared/Accordion";
+import { ReactPanel } from "replay-experimental/src/components/ReactPanel";
 import LazyOffscreen from "replay-next/components/LazyOffscreen";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { isExecutionPointsWithinRange } from "replay-next/src/utils/time";
@@ -26,7 +27,6 @@ import EventsDropDownMenu from "./Events/EventsDropDownMenu";
 import ReplayInfo from "./Events/ReplayInfo";
 import Passport from "./Passport/Passport";
 import ProtocolViewer from "./ProtocolViewer";
-import { ReactPanel } from "./ReactPanel";
 import Tour from "./Tour/Tour";
 import styles from "src/ui/components/SidePanel.module.css";
 

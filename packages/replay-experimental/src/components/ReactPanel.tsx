@@ -18,13 +18,13 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { UIThunkAction } from "ui/actions";
 import { seek } from "ui/actions/timeline";
 import { JumpToCodeButton, JumpToCodeStatus } from "ui/components/shared/JumpToCodeButton";
+import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { getSourceIdsByUrl } from "ui/reducers/sources";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
-import MaterialIcon from "./shared/MaterialIcon";
 import cardsListStyles from "ui/components/Comments/CommentCardsList.module.css";
-import styles from "./Events/Event.module.css";
+import styles from "ui/components/Events/Event.module.css";
 
 export function jumpToTimeAndLocationForQueuedRender(
   hitPoint: TimeStampedPoint,
