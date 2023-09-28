@@ -180,7 +180,7 @@ export default function SidePanel() {
         {selectedPrimaryPanel === "cypress" && <TestSuitePanel />}
         {selectedPrimaryPanel === "protocol" && <ProtocolViewer />}
         {selectedPrimaryPanel === "search" && <SearchFilesReduxAdapter />}
-        {selectedPrimaryPanel === "react" && <ReactPanel />} 
+        {selectedPrimaryPanel === "react" && <ReactPanel />}
         {selectedPrimaryPanel === "react-redux-perf" && <ReactReduxPerfPanel />}
       </div>
     </div>

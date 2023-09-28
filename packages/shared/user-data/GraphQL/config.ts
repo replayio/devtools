@@ -180,8 +180,8 @@ export const config = {
   },
   feature_reactPanel: {
     defaultValue: Boolean(false),
-    description: "Enable experimental React render details panel",
-    label: "Enable React Panel",
+    description: "Enable experimental React render details and Redux dispatch perf panels",
+    label: "Enable React and Redux Panels",
     legacyKey: "devtools.features.reactPanel",
   },
   feature_reduxDevTools: {
