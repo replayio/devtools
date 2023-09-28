@@ -43,7 +43,7 @@
   display: inline-block;
   height: 1rem;
   width: 1px;
-  background: var(--background-color-contrast-1);
+  background: var(--border-color-elements-subtree);
 }
 .SelectedSubTreeLine[data-is-selected-node] {
   height: 0.5rem;
