@@ -1,0 +1,33 @@
+.ListItem {
+  line-height: 1.5rem;
+  padding: 0 1ch;
+  border-bottom: 1px solid var(--theme-toolbar-background);
+}
+.ListItem[data-relative-position="after"] {
+  opacity: 0.5;
+}
+.ListItem[data-relative-position="first-after"] {
+  border-bottom-color: var(--color-current);
+  border-bottom-width: 2px;
+}
+.ListItem:hover {
+  background-color: var(--theme-table-selection-background-hover);
+  cursor: pointer;
+  opacity: 1;
+}
+.ListItem[data-selected] {
+  background-color: var(--theme-selection-background);
+  color: var(--theme-selection-color);
+  opacity: 1;
+}
+
+.JumpToCodeButton {
+  display: none;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  box-shadow: 0 0 1px var(--theme-tooltip-shadow);
+}
+.ListItem:hover .JumpToCodeButton {
+  display: flex;
+}
