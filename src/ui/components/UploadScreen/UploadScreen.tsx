@@ -132,7 +132,11 @@ export default function UploadScreen({
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string>(() => {
     let workspaceId = userSettings?.defaultWorkspaceId;
 
-    if (workspaceId && workspaces.find(workspace => workspace.id === workspaceId)) {
+    if (!workspaceId) {
+      return MY_LIBRARY;
+    }
+
+    if (workspaces.find(workspace => workspace.id === workspaceId)) {
       return workspaceId;
     }
 
