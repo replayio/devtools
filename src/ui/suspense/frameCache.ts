@@ -1,10 +1,31 @@
-import { Frame, PauseId } from "@replayio/protocol";
+import {
+  ExecutionPoint,
+  Frame,
+  FunctionMatch,
+  FunctionOutline,
+  Location,
+  PauseDescription,
+  PauseId,
+  PointDescription,
+  PointStackFrame,
+  RunEvaluationResult,
+  TimeStampedPoint,
+  TimeStampedPointRange,
+} from "@replayio/protocol";
+import { Cache, createCache } from "suspense";
 
 import { createFrame } from "devtools/client/debugger/src/client/create";
 import { PauseAndFrameId } from "devtools/client/debugger/src/selectors";
 import { formatCallStackFrames } from "devtools/client/debugger/src/selectors/getCallStackFrames";
 import { framesCache, getFrameSuspense } from "replay-next/src/suspense/FrameCache";
+import { updateMappedLocationForPointStackFrame } from "replay-next/src/suspense/PointStackCache";
+import { Source, sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
+import { getPreferredLocation } from "replay-next/src/utils/sources";
 import { ReplayClientInterface } from "shared/client/types";
+import {
+  MORE_IGNORABLE_PARTIAL_URLS,
+  formatFunctionDetailsFromLocation,
+} from "ui/actions/eventListeners/eventListenerUtils";
 import { SourcesState } from "ui/reducers/sources";
 
 export function getPauseFramesSuspense(
@@ -59,4 +80,100 @@ function createPauseFrames(pauseId: PauseId, frames: Frame[], sourcesState: Sour
     frames.map((frame, index) => createFrame(sourcesState, frame, pauseId, index)),
     sourcesState.sourceDetails.entities
   )!;
+}
+
+export interface FormattedPointStackFrame {
+  url?: string;
+  source: Source;
+  functionLocation: Location;
+  executionLocation: Location;
+  point: PointDescription;
+}
+
+export interface FormattedPointStack {
+  point: PointDescription;
+  resultPoint: PointDescription;
+  frame?: FormattedPointStackFrame;
+  allFrames: FormattedPointStackFrame[];
+  filteredFrames: FormattedPointStackFrame[];
+  functionName?: string;
+}
+
+export function formatPointStackFrame(
+  frame: PointStackFrame,
+  sourcesById: Map<string, Source>
+): FormattedPointStackFrame {
+  updateMappedLocationForPointStackFrame(sourcesById, frame);
+  const functionLocation = getPreferredLocation(sourcesById, [], frame.functionLocation);
+  const executionLocation = getPreferredLocation(sourcesById, [], frame.point.frame ?? []);
+
+  const source = sourcesById.get(functionLocation.sourceId)!;
+
+  return {
+    url: source.url,
+    source,
+    functionLocation,
+    executionLocation,
+    point: frame.point,
+  };
+}
+
+export const formattedPointStackCache: Cache<
+  [replayClient: ReplayClientInterface, point: TimeStampedPoint],
+  FormattedPointStack
+> = createCache({
+  debugLabel: "FormattedPointStack",
+  getKey: ([replayClient, point]) => point.point,
+  async load([replayClient, point]) {
+    return formatPointStackForPoint(replayClient, point);
+  },
+});
+
+export async function formatPointStackForPoint(
+  replayClient: ReplayClientInterface,
+  point: TimeStampedPoint,
+  ignoreFileUrls = MORE_IGNORABLE_PARTIAL_URLS
+): Promise<FormattedPointStack> {
+  const sourcesById = await sourcesByIdCache.readAsync(replayClient);
+  const pointStack = await replayClient.getPointStack(point.point, 30);
+  const formattedFrames = pointStack.map(frame => {
+    return formatPointStackFrame(frame, sourcesById);
+  });
+
+  const filteredPauseFrames = formattedFrames.filter(frame => {
+    const { source } = frame;
+    if (!source.url) {
+      return false;
+    }
+    // Filter out stack frames we might not care about, such as React or Redux internals
+    return !ignoreFileUrls.some(partialUrl => source.url?.includes(partialUrl));
+  });
+
+  // We want the oldest app stack frame.
+  // If this is a React update, that should be what called `setState()`
+  // But, React also calls `scheduleUpdate` frequently _internally_.
+  // So, there may not be any app code frames at all.
+  let earliestAppCodeFrame: FormattedPointStackFrame | undefined = filteredPauseFrames.slice(-1)[0];
+
+  let functionName;
+
+  let resultPoint = point;
+  if (earliestAppCodeFrame) {
+    resultPoint = earliestAppCodeFrame.point;
+    const formattedFunction = await formatFunctionDetailsFromLocation(
+      replayClient,
+      "unknown",
+      earliestAppCodeFrame.executionLocation
+    );
+    functionName = formattedFunction?.functionName;
+  }
+
+  return {
+    point,
+    functionName,
+    resultPoint,
+    frame: earliestAppCodeFrame!,
+    allFrames: formattedFrames,
+    filteredFrames: filteredPauseFrames,
+  };
 }

@@ -4,7 +4,7 @@ import { IntervalCache, createIntervalCache } from "suspense";
 import { ReplayClientInterface } from "shared/client/types";
 
 import { updateMappedLocation } from "./PauseCache";
-import { sourcesByIdCache } from "./SourcesCache";
+import { Source, sourcesByIdCache } from "./SourcesCache";
 
 export const pointStackCache: IntervalCache<
   number,
@@ -18,14 +18,21 @@ export const pointStackCache: IntervalCache<
     const pointStack = await client.getPointStack(point, end + 1);
     const sources = await sourcesByIdCache.readAsync(client);
     return pointStack.slice(start).map((frame, index) => {
-      updateMappedLocation(sources, frame.functionLocation);
-      if (frame.point.frame) {
-        updateMappedLocation(sources, frame.point.frame);
-      }
+      updateMappedLocationForPointStackFrame(sources, frame);
       return { ...frame, index: index + start };
     });
   },
 });
+
+export function updateMappedLocationForPointStackFrame(
+  sources: Map<string, Source>,
+  frame: PointStackFrame
+) {
+  updateMappedLocation(sources, frame.functionLocation);
+  if (frame.point.frame) {
+    updateMappedLocation(sources, frame.point.frame);
+  }
+}
 
 export async function getPointDescriptionForFrame(
   replayClient: ReplayClientInterface,
