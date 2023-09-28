@@ -1,6 +1,8 @@
 .ListItem {
   line-height: 1.5rem;
   padding: 0 1ch;
+  text-overflow: ellipsis;
+  overflow: hidden;
   border-bottom: 1px solid var(--theme-toolbar-background);
 }
 .ListItem[data-relative-position="after"] {

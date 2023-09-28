@@ -63,6 +63,7 @@ export function ReduxDevToolsListItem({
       data-test-id="ReduxDevToolsListItem"
       onClick={() => selectAnnotation(annotation)}
       style={style}
+      title={annotation.payload.actionType}
     >
       <JumpToCodeButton
         className={styles.JumpToCodeButton}
