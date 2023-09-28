@@ -77,7 +77,7 @@ div[hidetabs="true"] .tabs .tabs-navigation {
 
 .tabs .tabs-menu-item {
   color: var(--tab-color);
-  background: var(--tab-bgcolor);
+  background: var(--theme-toolbar-background);
 }
 
 .tabs .tabs-menu-item:hover:not(.is-active) {

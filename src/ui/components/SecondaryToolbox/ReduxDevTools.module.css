@@ -94,7 +94,7 @@
 }
 
 .tabsContainer {
-  background-color: var(--tab-bgcolor);
+  background-color: var(--theme-toolbar-background);
 }
 
 .diffWrap {
@@ -121,7 +121,7 @@
 }
 
 .contentsTab {
-  background-color: var(--tab-bgcolor);
+  background-color: var(--theme-toolbar-background);
   color: var(--tab-color);
   padding: 0.5rem;
 }
