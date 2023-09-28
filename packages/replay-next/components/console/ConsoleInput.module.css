@@ -9,6 +9,10 @@
   color: var(--color-default);
   border-bottom-right-radius: 0.5rem;
   border-top: 1px solid var(--theme-splitter-color);
+  transition: 100ms background-color;
+}
+.Container[data-invalid-expression] {
+  background-color: var(--background-color-error);
 }
 
 .PromptRow,
@@ -35,9 +39,6 @@
 }
 .Input p {
   margin: 0;
-}
-.Input[data-disabled-reason="loading"] {
-  opacity: 0.5;
 }
 .Input[data-disabled-reason="not-focused"] {
   color: var(--color-error);
