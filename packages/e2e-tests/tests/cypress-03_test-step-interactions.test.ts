@@ -16,10 +16,7 @@ import test, { expect } from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "flake/adding-spec.ts" });
 
-test("cypress-03: Test Step interactions", async ({
-  pageWithMeta: { page, recordingId },
-  exampleKey,
-}) => {
+test("cypress-03: Test Step interactions", async ({ pageWithMeta: { page, recordingId } }) => {
   await startTest(page, recordingId);
   await openViewerTab(page);
 
@@ -48,7 +45,7 @@ test("cypress-03: Test Step interactions", async ({
 
   const steps = getTestCaseSteps(selectedRow);
   const numSteps = await steps.count();
-  expect(numSteps).toBe(17);
+  expect(numSteps).toBe(20);
 
   // We should be in Viewer Mode to start with
   expect(await isViewerTabActive(page)).toBe(true);
@@ -134,7 +131,7 @@ test("cypress-03: Test Step interactions", async ({
     expect(detailsPaneContents["Selector"]).toBe(`".new-todo"`);
   });
 
-  await steps.nth(3).click();
+  await steps.nth(6).click();
   await waitFor(async () => {
     const detailsPane = getUserActionEventDetails(page);
     const detailsPaneContents = await getDetailsPaneContents(detailsPane);
@@ -142,7 +139,7 @@ test("cypress-03: Test Step interactions", async ({
     expect(detailsPaneContents["Typed"]).toMatch("buy some cheese");
   });
 
-  await steps.nth(4).click();
+  await steps.nth(7).click();
   await waitFor(async () => {
     const detailsPane = getUserActionEventDetails(page);
     const detailsPaneContents = await getDetailsPaneContents(detailsPane);
@@ -150,7 +147,7 @@ test("cypress-03: Test Step interactions", async ({
     expect(detailsPaneContents["Typed"]).toMatch("{enter}");
   });
 
-  await steps.nth(5).click();
+  await steps.nth(8).click();
   await waitFor(async () => {
     const detailsPane = getUserActionEventDetails(page);
     const detailsPaneContents = await getDetailsPaneContents(detailsPane);

@@ -25,7 +25,6 @@ test.use({ exampleKey: "flake/adding-spec.ts" });
 
 test("cypress-01: Basic Test Suites panel functionality", async ({
   pageWithMeta: { page, recordingId },
-  exampleKey,
 }) => {
   await startTest(page, recordingId);
   await openDevToolsTab(page);
@@ -98,7 +97,7 @@ test("cypress-01: Basic Test Suites panel functionality", async ({
   expect(await sections.nth(0).textContent()).toMatch(/test body/i);
 
   const steps = getTestCaseSteps(selectedRow);
-  await expect(steps).toHaveCount(17);
+  await expect(steps).toHaveCount(20);
 
   const backButton = getTestRecordingBackButton(page);
   await backButton.click();
