@@ -7,8 +7,9 @@ import {
 import { satisfies } from "compare-versions";
 
 import { comparePoints } from "protocol/execution-point-utils";
+import { binarySearch } from "protocol/utils";
 import { networkRequestsCache } from "replay-next/src/suspense/NetworkRequestsCache";
-import { findSliceIndices, insert } from "replay-next/src/utils/array";
+import { insert } from "replay-next/src/utils/array";
 import { assertWithTelemetry, recordData } from "replay-next/src/utils/telemetry";
 import { ReplayClientInterface } from "shared/client/types";
 import { Annotation, PlaywrightTestSources } from "shared/graphql/types";
@@ -929,13 +930,16 @@ async function processNetworkData(
 
   // Filter by RequestInfo (because they have execution points)
   // then map RequestInfo to RequestEventInfo using ids
-  const [beginIndex, endIndex] = findSliceIndices(ids, begin.point, end.point, (id, point) => {
-    const requestData = records[id];
-    return comparePoints(requestData.timeStampedPoint.point, point);
+  const beginIndex = binarySearch(0, ids.length, index => {
+    const currentItem = records[ids[index]];
+    return comparePoints(begin.point, currentItem.timeStampedPoint.point);
   });
-
-  if (beginIndex < 0 || endIndex < 0) {
-    return [];
+  let endIndex = binarySearch(beginIndex, ids.length, index => {
+    const currentItem = records[ids[index]];
+    return comparePoints(end.point, currentItem.timeStampedPoint.point);
+  });
+  if (comparePoints(end.point, records[ids[endIndex]].timeStampedPoint.point) >= 0) {
+    endIndex++;
   }
 
   const networkRequestEvents: RecordingTestMetadataV3.NetworkRequestEvent[] = [];
