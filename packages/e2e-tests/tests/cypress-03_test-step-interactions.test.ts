@@ -16,10 +16,7 @@ import test, { expect } from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "flake/adding-spec.ts" });
 
-test("cypress-03: Test Step interactions", async ({
-  pageWithMeta: { page, recordingId },
-  exampleKey,
-}) => {
+test("cypress-03: Test Step interactions", async ({ pageWithMeta: { page, recordingId } }) => {
   await startTest(page, recordingId);
   await openViewerTab(page);
 
@@ -48,7 +45,7 @@ test("cypress-03: Test Step interactions", async ({
 
   const steps = getTestCaseSteps(selectedRow);
   const numSteps = await steps.count();
-  expect(numSteps).toBe(17);
+  expect(numSteps).toBe(20);
 
   // We should be in Viewer Mode to start with
   expect(await isViewerTabActive(page)).toBe(true);
@@ -63,7 +60,10 @@ test("cypress-03: Test Step interactions", async ({
   // Clicking in viewer mode shouldn't switch to DevTools mode
   expect(await isViewerTabActive(page)).toBe(true);
 
-  const firstGet = clickableSteps.filter({ hasText: /get/ }).first();
+  const firstGet = clickableSteps
+    .and(page.locator("[data-type='user-action']"))
+    .filter({ hasText: /get/ })
+    .first();
 
   // Jump to the first `get` step
   await firstGet.click();
