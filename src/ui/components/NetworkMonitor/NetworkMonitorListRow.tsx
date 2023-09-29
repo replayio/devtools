@@ -1,10 +1,11 @@
-import { CSSProperties, ReactNode, useContext } from "react";
+import { CSSProperties, useContext } from "react";
 
 import Icon from "replay-next/components/Icon";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { useNag } from "replay-next/src/hooks/useNag";
 import { Nag } from "shared/graphql/types";
 import useNetworkContextMenu from "ui/components/NetworkMonitor/useNetworkContextMenu";
+import { EnabledColumns } from "ui/components/NetworkMonitor/useNetworkMonitorColumns";
 import { RequestSummary } from "ui/components/NetworkMonitor/utils";
 
 import styles from "./NetworkMonitorListRow.module.css";
@@ -12,6 +13,7 @@ import styles from "./NetworkMonitorListRow.module.css";
 export const LIST_ROW_HEIGHT = 27;
 
 export type ItemData = {
+  columns: EnabledColumns;
   currentTime: number;
   filteredAfterCount: number;
   filteredBeforeCount: number;
@@ -64,6 +66,7 @@ function RequestRow({
   style: CSSProperties;
 }) {
   const {
+    columns,
     currentTime,
     firstRequestIdAfterCurrentTime,
     seekToRequest,
@@ -81,6 +84,7 @@ function RequestRow({
     id,
     method,
     name,
+    path,
     point,
     start: startTime,
     status,
@@ -133,7 +137,7 @@ function RequestRow({
         style={style}
         tabIndex={0}
       >
-        <div className={styles.TimingColumn}>
+        <div className={styles.Column} data-name="time">
           <div className={styles.TimingContainer} data-incomplete={endTime == null || undefined}>
             {endTime != null && (
               <div
@@ -146,13 +150,42 @@ function RequestRow({
             )}
           </div>
         </div>
-        <div className={styles.StatusColumn}>{status}</div>
-        <div className={styles.NameColumn}>{name}</div>
-        <div className={styles.MethodColumn}>{method}</div>
-        <div className={styles.TypeColumn}>{type}</div>
-        <div className={styles.DomainColumn} title={url}>
-          {domain}
-        </div>
+
+        {columns.status && (
+          <div className={styles.Column} data-name="status">
+            {status}
+          </div>
+        )}
+        {columns.name && (
+          <div className={styles.Column} data-name="name">
+            {name}
+          </div>
+        )}
+        {columns.method && (
+          <div className={styles.Column} data-name="method">
+            {method}
+          </div>
+        )}
+        {columns.type && (
+          <div className={styles.Column} data-name="type">
+            {type}
+          </div>
+        )}
+        {columns.domain && (
+          <div className={styles.Column} data-name="domain" title={domain}>
+            {domain}
+          </div>
+        )}
+        {columns.path && (
+          <div className={styles.Column} data-name="path" title={path}>
+            {path}
+          </div>
+        )}
+        {columns.url && (
+          <div className={styles.Column} data-name="url" title={url}>
+            {url}
+          </div>
+        )}
 
         {triggerPoint && triggerPoint.time !== currentTime && (
           <button

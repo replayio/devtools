@@ -1,6 +1,10 @@
 import { RequestEventInfo, RequestInfo } from "@replayio/protocol";
 
-import { CanonicalRequestType, RequestSummary } from "ui/components/NetworkMonitor/utils";
+import {
+  CanonicalRequestType,
+  RequestSummary,
+  getPathFromUrl,
+} from "ui/components/NetworkMonitor/utils";
 
 export const eventsFor = (
   id: string,
@@ -90,6 +94,7 @@ export const requestSummary = (
     id,
     method,
     name: "replay.io",
+    path: getPathFromUrl(url),
     point: { point: "0", time: 0 },
     queryParams: [["foo", "bar"]],
     triggerPoint: { point: "0", time: 0 },

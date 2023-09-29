@@ -42,34 +42,33 @@
 }
 
 /* These styles should stay in sync with NetworkMonitorListHeader */
-.DomainColumn,
-.MethodColumn,
-.NameColumn,
-.StatusColumn,
-.TimingColumn,
-.TypeColumn {
+.Column {
   white-space: pre;
   overflow: hidden;
   text-overflow: ellipsis;
+  flex: 1 1 100px;
 }
-.TimingColumn {
-  flex: 0 0 35px;
+.Column[data-name="domain"] {
+  flex: 1 1 100px;
 }
-.StatusColumn {
+.Column[data-name="method"] {
+  flex: 0 0 60px;
+}
+.Column[data-name="name"] {
+  flex: 1 1 200px;
+}
+.Column[data-name="status"] {
   flex: 0 0 60px;
   color: var(--status-color);
 }
-.NameColumn {
+.Column[data-name="time"] {
+  flex: 0 0 35px;
+}
+.Column[data-name="type"] {
+  flex: 1 1 100px;
+}
+.Column[data-name="url"] {
   flex: 1 1 200px;
-}
-.MethodColumn {
-  flex: 0 0 60px;
-}
-.TypeColumn {
-  flex: 1 1 100px;
-}
-.DomainColumn {
-  flex: 1 1 100px;
 }
 
 .SeekButton {
