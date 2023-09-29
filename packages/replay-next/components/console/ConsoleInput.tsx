@@ -13,7 +13,7 @@ import { NewTerminalExpression, TerminalContext } from "replay-next/src/contexts
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { useCurrentFocusWindow } from "replay-next/src/hooks/useCurrentFocusWindow";
 import { useIsPointWithinFocusWindow } from "replay-next/src/hooks/useIsPointWithinFocusWindow";
-import { validate } from "replay-next/src/utils/points";
+import { validateCode } from "replay-next/src/utils/code";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
 
@@ -84,7 +84,7 @@ function ConsoleInputSuspends({ inputRef }: { inputRef?: RefObject<ImperativeHan
 
   const [expression, setExpression] = useState<string>("");
 
-  const isExpressionValid = useMemo(() => validate(expression), [expression]);
+  const isExpressionValid = useMemo(() => validateCode(expression), [expression]);
 
   useEffect(() => {
     if (!searchState.visible && searchStateVisibleRef.current) {
