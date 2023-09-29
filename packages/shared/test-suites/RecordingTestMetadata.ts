@@ -1006,8 +1006,8 @@ export function getTestEventExecutionPoint(
   if (isNavigationTestEvent(testEvent) || isNetworkRequestTestEvent(testEvent)) {
     return testEvent.timeStampedPoint.point;
   } else {
-    return testEvent.timeStampedPointRange !== null
-      ? testEvent.timeStampedPointRange.begin.point
+    return testEvent.data.timeStampedPoints.beforeStep !== null
+      ? testEvent.data.timeStampedPoints.beforeStep.point
       : null;
   }
 }
