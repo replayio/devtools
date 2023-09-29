@@ -17,7 +17,7 @@ export type RecordingGroups = {
   flakyRecordings: RecordingGroup;
 };
 
-function testPassed(recording: Recording) {
+export function testPassed(recording: Recording) {
   const testMetadata = recording.metadata?.test;
   if (testMetadata == null) {
     return false;
@@ -77,33 +77,44 @@ export function groupRecordings(recordings: Recording[]): RecordingGroups {
   for (const filePath in recordingsMap) {
     const recordings = recordingsMap[filePath];
 
+    const didAnyTestFail = recordings.some(testFailed);
     const didAnyTestPass = recordings.some(testPassed);
+
+    function addToRecordingGroup(group: RecordingGroup, recording: Recording) {
+      if (group.fileNameToRecordings[filePath]) {
+        group.fileNameToRecordings[filePath].push(recording);
+      } else {
+        group.count++;
+        group.fileNameToRecordings[filePath] = [recording];
+      }
+    }
 
     for (const recording of recordings) {
       if (testPassed(recording)) {
-        if (passedRecordings.fileNameToRecordings[filePath]) {
-          passedRecordings.fileNameToRecordings[filePath].push(recording);
+        if (didAnyTestFail) {
+          addToRecordingGroup(flakyRecordings, recording);
         } else {
-          passedRecordings.count++;
-          passedRecordings.fileNameToRecordings[filePath] = [recording];
+          addToRecordingGroup(passedRecordings, recording);
         }
       } else if (testFailed(recording)) {
         if (didAnyTestPass) {
-          if (flakyRecordings.fileNameToRecordings[filePath]) {
-            flakyRecordings.fileNameToRecordings[filePath].push(recording);
-          } else {
-            flakyRecordings.count++;
-            flakyRecordings.fileNameToRecordings[filePath] = [recording];
-          }
+          addToRecordingGroup(flakyRecordings, recording);
         } else {
-          if (failedRecordings.fileNameToRecordings[filePath]) {
-            failedRecordings.fileNameToRecordings[filePath].push(recording);
-          } else {
-            failedRecordings.count++;
-            failedRecordings.fileNameToRecordings[filePath] = [recording];
-          }
+          addToRecordingGroup(failedRecordings, recording);
         }
       }
+    }
+
+    if (didAnyTestFail && didAnyTestPass) {
+      flakyRecordings.fileNameToRecordings[filePath].sort((recordingA, recordingB) => {
+        if (testPassed(recordingA) && testFailed(recordingB)) {
+          return 1;
+        } else if (testFailed(recordingA) && testPassed(recordingB)) {
+          return -1;
+        } else {
+          return 0;
+        }
+      });
     }
   }
 
