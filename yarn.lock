@@ -4609,12 +4609,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/logrocket-react@npm:^3.0.0":
-  version: 3.0.0
-  resolution: "@types/logrocket-react@npm:3.0.0"
+"@types/logrocket-react@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "@types/logrocket-react@npm:3.0.1"
   dependencies:
     logrocket: 1.0.1
-  checksum: 6a7e865e11d28fea0ddd06f22676e5f795ba2a4d783bc3ae407f9282e137bc11eb052e2edf7be930c28c588af97cc184b0158973750f4f398ac05ca93c7bf95e
+  checksum: 2b85b95beca4b6ad06f4e2ab97dbe52653d8c3ffe9980f38dc71c230419086c12d55f5ead7e824b2e30c62f66efb692a274557124513fa3a2158478542b473f7
   languageName: node
   linkType: hard
 
@@ -15096,7 +15096,7 @@ __metadata:
     "@types/isomorphic-fetch": ^0.0.36
     "@types/jest": ^27.4.1
     "@types/lodash": ^4.14.181
-    "@types/logrocket-react": ^3.0.0
+    "@types/logrocket-react": ^3.0.1
     "@types/mixpanel-browser": ^2.35.6
     "@types/node": ^18.0.0
     "@types/react": ^18.0.12
