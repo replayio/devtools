@@ -83,7 +83,7 @@
     "react-transition-group": "^4.4.2",
     "react-virtualized-auto-sizer": "^1.0.19",
     "react-window": "^1.8.8",
-    "reactjs-popup": "^2.0.5",
+    "reactjs-popup": "^2.0.6",
     "replay-next": "workspace:*",
     "reselect": "^4.1.5",
     "shared": "workspace:*",

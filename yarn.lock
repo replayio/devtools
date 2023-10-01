@@ -14936,13 +14936,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"reactjs-popup@npm:^2.0.5":
-  version: 2.0.5
-  resolution: "reactjs-popup@npm:2.0.5"
+"reactjs-popup@npm:^2.0.6":
+  version: 2.0.6
+  resolution: "reactjs-popup@npm:2.0.6"
   peerDependencies:
     react: ">=16"
     react-dom: ">=16"
-  checksum: 7b9ebd49e66fb936e85cd4e7a3713cdf903e95f802e5783963f1f9c000d2f8bdb7e4b9967756677238b2fcd9c07637282f2a037403374931ba42865ffffe60e6
+  checksum: 3c9af4670529ebea6bdfe8423e30eb7a74025df1e589c5ef96a7da05165dc63015959c5ffb60cd3e5cadfd0d3b6a807b75ed5f80543629f530fab1433c3986d0
   languageName: node
   linkType: hard
 
@@ -15198,7 +15198,7 @@ __metadata:
     react-transition-group: ^4.4.2
     react-virtualized-auto-sizer: ^1.0.19
     react-window: ^1.8.8
-    reactjs-popup: ^2.0.5
+    reactjs-popup: ^2.0.6
     replay-next: "workspace:*"
     reselect: ^4.1.5
     shared: "workspace:*"
