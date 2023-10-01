@@ -4839,14 +4839,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/styled-components@npm:^5.1.25":
-  version: 5.1.25
-  resolution: "@types/styled-components@npm:5.1.25"
+"@types/styled-components@npm:^5.1.28":
+  version: 5.1.28
+  resolution: "@types/styled-components@npm:5.1.28"
   dependencies:
     "@types/hoist-non-react-statics": "*"
     "@types/react": "*"
     csstype: ^3.0.2
-  checksum: 60ce64f13283b01da54fd3a4c5703769d8575c979d5ec6b67ad124c2d4df980c9b96bb91af87e03f6447a816a5d2b0270c63eefad60cfa885091b594984525f5
+  checksum: 2e12be4fdc2d60f63e16f8f5cac98d8305e0686b3332a160fec39df2a277f16715b878e25384ddda29e48acf101110a29ca108b716296e9a06bf2740f1257385
   languageName: node
   linkType: hard
 
@@ -15107,7 +15107,7 @@ __metadata:
     "@types/react-transition-group": ^4.4.5
     "@types/react-virtualized-auto-sizer": ^1.0.1
     "@types/react-window": ^1.8.5
-    "@types/styled-components": ^5.1.25
+    "@types/styled-components": ^5.1.28
     "@types/uuid": ^7.0.3
     "@typescript-eslint/parser": ^5.38.1
     apollo: ^2.33.10
