@@ -4208,14 +4208,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tailwindcss/forms@npm:^0.5.0":
-  version: 0.5.2
-  resolution: "@tailwindcss/forms@npm:0.5.2"
+"@tailwindcss/forms@npm:^0.5.6":
+  version: 0.5.6
+  resolution: "@tailwindcss/forms@npm:0.5.6"
   dependencies:
     mini-svg-data-uri: ^1.2.3
   peerDependencies:
     tailwindcss: ">=3.0.0 || >= 3.0.0-alpha.1"
-  checksum: 3c4df23491d14b37d8cef88d0f3df80f92b684b801d59c23d600773a4ccac11353a555ca36bea68ae4a82134f9c030d1353c05890a5f0085c1c40c649f806640
+  checksum: 2bbbe3ffd1f1c80cf610780e94520863f6265f1b30cd3235a54391e0a02a35f16ae3a3132f7a5eb9367a14c27f53a96828538616dca5bd9ca3b7ecad804e9a2d
   languageName: node
   linkType: hard
 
@@ -15081,7 +15081,7 @@ __metadata:
     "@svgr/webpack": ^6.2.1
     "@swc/core": ^1.3.67
     "@swc/jest": ^0.2.26
-    "@tailwindcss/forms": ^0.5.0
+    "@tailwindcss/forms": ^0.5.6
     "@testing-library/jest-dom": ^5.16.3
     "@testing-library/react": ^13.3.0
     "@testing-library/user-event": ^14.1.0
