@@ -12557,10 +12557,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"logrocket@npm:^2.2.1":
-  version: 2.2.1
-  resolution: "logrocket@npm:2.2.1"
-  checksum: 23d2880b921e940a17bc711bdd7eef2a87cd607decb98c1e5659bea017baf1ac8225dda7cde9e45ab9b02fcf7a205faed9693db0dc79d77780c45ba4bdd23122
+"logrocket@npm:^5.0.1":
+  version: 5.0.1
+  resolution: "logrocket@npm:5.0.1"
+  checksum: 7cd49d04d1842549d8e84ecc0c0378bf355f7b3e6e2a26a5a56ef6be178a3ceece2e7fad665125b11dc4d6eeb7240eac7ae4aba2a936d7c28d6125ee08e5d83b
   languageName: node
   linkType: hard
 
@@ -15163,7 +15163,7 @@ __metadata:
     launchdarkly-js-client-sdk: ^2.21.0
     lexical: ^0.6.5
     lodash: ^4.17.21
-    logrocket: ^2.2.1
+    logrocket: ^5.0.1
     logrocket-react: ^5.0.1
     memoize-one: ^6.0.0
     mini-css-extract-plugin: ^2.6.0
