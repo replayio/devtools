@@ -25,7 +25,7 @@
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "@headlessui/react": "^1.4.3",
     "@heroicons/react": "^1.0.6",
-    "@lexical/link": "^0.6.5",
+    "@lexical/link": "^0.12.2",
     "@lexical/mark": "^0.6.5",
     "@lexical/react": "^0.6.5",
     "@reduxjs/toolkit": "^1.8.4",
