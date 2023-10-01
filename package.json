@@ -81,7 +81,7 @@
     "react-resizable-panels": "^0.0.53",
     "react-tooltip": "^4.5.1",
     "react-transition-group": "^4.4.2",
-    "react-virtualized-auto-sizer": "^1.0.19",
+    "react-virtualized-auto-sizer": "^1.0.20",
     "react-window": "^1.8.8",
     "reactjs-popup": "^2.0.5",
     "replay-next": "workspace:*",
