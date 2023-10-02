@@ -1,7 +1,7 @@
 .LocationRow,
 .MatchRow {
-  height: var(--list-row-line-height);
-  line-height: var(--list-row-line-height);
+  height: 1.25rem;
+  line-height: 1.25rem;
 
   white-space: pre;
   overflow: hidden;
@@ -18,6 +18,7 @@
 .MatchRow {
   white-space: pre;
   padding: 0 0.5rem;
+  transition: opacity 250ms;
 }
 .LocationRow:hover,
 .MatchRow:hover {
@@ -31,10 +32,13 @@
   font-size: var(--font-size-small);
   color: var(--color-search-results);
 }
+.MatchRow[data-hit-count="0"] {
+  color: var(--color-dimmer);
+}
 
 .GroupLine {
   display: inline-block;
-  height: var(--list-row-line-height);
+  height: 1.25rem;
   border-left: 1px solid var(--collapsible-toggle-color);
   font-size: var(--font-size-regular);
   margin: 0 0.5rem;

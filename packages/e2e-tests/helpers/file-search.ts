@@ -1,23 +1,19 @@
 import { Locator, Page, expect } from "@playwright/test";
 
-import { clearTextArea, stopHovering, waitFor } from "./general";
+import { clearTextArea, waitFor } from "./utils";
 
-export function getSourceSearchResultsLocator(page: Page): Locator {
-  return page.locator('[data-test-id="SourceSearch-Results"]');
+export function getFileSearchPanel(page: Page): Locator {
+  return page.locator('[data-test-id="FileSearch-Panel"]');
 }
 
-export async function clickSearchResultRow(page: Page, rowNumber: number) {
-  const rows = page.locator('[data-test-name="SearchFiles-ResultRow"]');
-  const row = rows.nth(rowNumber - 1);
-  const type = await row.getAttribute("data-test-type");
-  if (type !== "Match") {
-    throw `Row ${rowNumber} does not contain a match`;
+export async function openFileSearchPanel(page: Page): Promise<void> {
+  // Only click if it's not already open; clicking again will collapse the side bar.
+  const pane = getFileSearchPanel(page);
+
+  let isVisible = await pane.isVisible();
+  if (!isVisible) {
+    await page.locator('[data-test-name="ToolbarButton-Search"]').click();
   }
-
-  await row.click();
-
-  // Clean up hover state in case of screenshot testing
-  await stopHovering(page);
 }
 
 export async function searchSources(page: Page, text: string) {
@@ -37,7 +33,6 @@ export async function toggleIncludeNodeModulesCheckbox(page: Page, checked: bool
     await checkbox.click();
   }
 }
-
 export async function toggleSearchResultsForFileName(
   page: Page,
   isOpen: boolean,
@@ -77,44 +72,24 @@ export async function toggleSearchResultsForFileName(
       );
     }
   }
-
-  // Clean up hover state in case of screenshot testing
-  await stopHovering(page);
 }
 
-export async function waitForSearchToFinish(page: Page) {
-  const summary = page.locator('[data-test-id="SearchFiles-SummaryLabel"]');
-  await waitFor(async () => {
-    const state = await summary.getAttribute("data-test-state");
-    if (state === "pending") {
-      throw `Waiting for search to finish`;
-    }
-  });
-}
-
-export async function verifySourceSearchMatchingLocations(page: Page, expectSourceIds: string[]) {
+export async function verifyMatchExecuted(
+  page: Page,
+  lineNumber: number,
+  expectedExecuted: boolean
+) {
   await waitForSearchToFinish(page);
 
-  const locationRows = page.locator(
-    '[data-test-name="SearchFiles-ResultRow"][data-test-type="Location"]'
-  );
+  const line = page.locator('[data-test-name="SearchFiles-ResultRow"]').nth(lineNumber - 1);
 
   await waitFor(async () => {
-    const count = await locationRows.count();
-    if (count !== expectSourceIds.length) {
-      throw `Expected ${expectSourceIds.length} file names but found ${count}`;
-    }
-
-    for (let i = 0; i < count; i++) {
-      const locationRow = locationRows.nth(i);
-      const testId = await locationRow.getAttribute("data-test-id");
-      const sourceId = testId!.split("-").pop();
-      const index = expectSourceIds.indexOf(sourceId!);
-      if (index < 0) {
-        throw `No match for source "${sourceId}"`;
-      }
-
-      expectSourceIds.splice(index, 1);
+    const hitCountString = await line.getAttribute("data-hit-count");
+    const actualExecuted = !!hitCountString && hitCountString !== "0";
+    if (actualExecuted !== expectedExecuted) {
+      throw `Expected result ${lineNumber} to ${
+        expectedExecuted ? "be executed" : "not be executed"
+      } but was wrong`;
     }
   });
 }
@@ -152,6 +127,16 @@ export async function verifyVisibleResultsCount(page: Page, expectedCount: numbe
     const actualCount = await rows.count();
     if (actualCount !== expectedCount) {
       throw `Expected ${expectedCount} visible results but found ${actualCount}`;
+    }
+  });
+}
+
+export async function waitForSearchToFinish(page: Page) {
+  const summary = page.locator('[data-test-id="SearchFiles-SummaryLabel"]');
+  await waitFor(async () => {
+    const state = await summary.getAttribute("data-test-state");
+    if (state === "pending") {
+      throw `Waiting for search to finish`;
     }
   });
 }

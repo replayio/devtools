@@ -32,7 +32,7 @@ export function findMatches(
         pendingMatch = "";
       }
     } else {
-      pendingNonMatch = pendingNonMatch + textCharacter;
+      pendingNonMatch = pendingNonMatch + pendingMatch + textCharacter;
       pendingMatch = "";
     }
 

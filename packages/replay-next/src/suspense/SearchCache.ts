@@ -1,3 +1,4 @@
+import assert from "assert";
 import { Location, SearchSourceContentsMatch, SourceId } from "@replayio/protocol";
 import { StreamingCacheLoadOptions, StreamingValue, createStreamingCache } from "suspense";
 
@@ -20,7 +21,10 @@ import { sourcesByIdCache } from "./SourcesCache";
 export type Subscriber = () => void;
 export type UnsubscribeFunction = () => void;
 
+let idCounter = 0;
+
 export type SourceSearchResultLocation = {
+  id: number;
   location: Location;
   matchCount: number;
   type: "location";
@@ -50,6 +54,18 @@ export function isSourceSearchResultMatch(
   result: SourceSearchResult
 ): result is SourceSearchResultMatch {
   return result.type === "match";
+}
+
+export function assertSourceSearchResultLocation(
+  result: SourceSearchResult
+): asserts result is SourceSearchResultLocation {
+  assert(isSourceSearchResultLocation(result));
+}
+
+export function assertSourceSearchResultMatch(
+  result: SourceSearchResult
+): asserts result is SourceSearchResultMatch {
+  assert(isSourceSearchResultLocation(result));
 }
 
 export const searchCache = createStreamingCache<
@@ -101,7 +117,12 @@ export const searchCache = createStreamingCache<
               currentResultLocation === null ||
               currentResultLocation.location.sourceId !== match.location.sourceId
             ) {
-              currentResultLocation = { location: match.location, matchCount: 0, type: "location" };
+              currentResultLocation = {
+                id: ++idCounter,
+                location: match.location,
+                matchCount: 0,
+                type: "location",
+              };
 
               orderedResults.push(currentResultLocation);
             }

@@ -35,7 +35,7 @@ test(`authenticated/passport-03: Swiss army knife`, async ({
   );
 
   await page.locator('[data-test-name="ToolbarButton-Search"]').click();
-  const searchInput = page.locator('[data-test-id="SearchFiles-Input"]');
+  const searchInput = page.locator('[data-test-id="FileSearch-Input"]');
   await searchInput.focus();
   await clearTextArea(page, searchInput);
   await searchInput.fill("iteration");
