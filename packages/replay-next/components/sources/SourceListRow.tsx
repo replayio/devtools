@@ -1,8 +1,7 @@
 import { SameLineSourceLocations } from "@replayio/protocol";
 import { CSSProperties, useContext, useMemo } from "react";
-import { STATUS_PENDING, Status } from "suspense";
+import { STATUS_PENDING, useImperativeIntervalCacheValues } from "suspense";
 
-import Icon from "replay-next/components/Icon";
 import {
   ExecutionPointLineHighlight,
   LineHighlight,
@@ -18,10 +17,14 @@ import { SourceListRowMouseEvents } from "replay-next/components/sources/SourceL
 import { SourceSearchContext } from "replay-next/components/sources/SourceSearchContext";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { PointBehaviorsObject } from "replay-next/src/contexts/points/types";
+import { sourceHitCountsCache } from "replay-next/src/suspense/SourceHitCountsCache";
 import { Source } from "replay-next/src/suspense/SourcesCache";
 import { find } from "replay-next/src/utils/array";
+import { bucketVisibleLines } from "replay-next/src/utils/source";
 import { ParsedToken } from "replay-next/src/utils/syntax-parser";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { LineHitCounts, POINT_BEHAVIOR_DISABLED, Point } from "shared/client/types";
+import { toPointRange } from "shared/utils/time";
 
 import LogPointPanel from "./log-point-panel/LogPointPanel";
 import { formatHitCount } from "./utils/formatHitCount";
@@ -31,8 +34,6 @@ import styles from "./SourceListRow.module.css";
 export type ItemData = {
   breakablePositionsByLine: Map<number, SameLineSourceLocations>;
   executionPointLineHighlight: ExecutionPointLineHighlight | null;
-  hitCounts: Array<[lineNumber: number, lineHitCounts: LineHitCounts]> | null;
-  hitCountsStatus: Status;
   lineHeight: number;
   maxHitCount: number | undefined;
   minHitCount: number | undefined;
@@ -60,8 +61,6 @@ export default function SourceListRow({
   const {
     breakablePositionsByLine,
     executionPointLineHighlight,
-    hitCounts,
-    hitCountsStatus,
     maxHitCount,
     minHitCount,
     parsedTokens,
@@ -77,7 +76,8 @@ export default function SourceListRow({
   const lineNumber = lineIndex + 1;
   const { sourceId } = source;
 
-  const { isTransitionPending: isFocusRangePending } = useContext(FocusContext);
+  const { isTransitionPending: isFocusRangePending, range: focusRange } = useContext(FocusContext);
+  const client = useContext(ReplayClientContext);
   const [{ enabled: searchEnabled, index: searchResultIndex, results: searchResults }] =
     useContext(SourceSearchContext);
 
@@ -90,6 +90,28 @@ export default function SourceListRow({
 
   let hitCount = 0;
   let lineHitCounts: LineHitCounts | null = null;
+
+  // We fetch hit count information as a user scrolls,
+  // but naively fetching each line individually would result in a lot of requests,
+  // so we batch requests up into chunks of 100 lines.
+  //
+  // Because we use an interval cache for this,
+  // there is a potential issue on the boundaries where it's possible for hit counts to appear and disappear
+  // because a batch of lines is only partially loaded (e.g. first we fetch lines 100-200 and then lines 100-300).
+  //
+  // We don't want loaded hit counts to disappear when a user scrolls,
+  // so the easiest way to avoid that is to always request (cached) hit counts for the bucket the current line falls in.
+  //
+  // TRICKY (See FE-1956 for more detail)
+  const bucket = bucketVisibleLines(lineIndex, lineIndex);
+  const { status: hitCountsStatus, value: hitCounts } = useImperativeIntervalCacheValues(
+    sourceHitCountsCache,
+    bucket[0],
+    bucket[1],
+    client,
+    sourceId,
+    focusRange ? toPointRange(focusRange) : null
+  );
 
   if (hitCounts != null) {
     const hitCountTuple = find(hitCounts, [lineNumber] as any, (a, b) => a[0] - b[0]);
