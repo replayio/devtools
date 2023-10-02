@@ -144,7 +144,7 @@ function MatchRow({
       style={style}
     >
       <span className={styles.GroupLine}>&nbsp;&nbsp;</span>
-      <HighlightMatch needle={query} text={match.context.trim()} />
+      <HighlightMatch caseSensitive={false} needle={query} text={match.context.trim()} />
     </div>
   );
 }
