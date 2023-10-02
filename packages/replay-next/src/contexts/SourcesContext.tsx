@@ -10,9 +10,8 @@ import {
   useTransition,
 } from "react";
 
+import { bucketVisibleLines } from "replay-next/src/utils/source";
 import { SourceLocationRange } from "shared/client/types";
-
-const VISIBLE_LINES_BUCKET_SIZE = 100;
 
 export type FindClosestFunctionName = (sourceId: string, location: SourceLocation) => string | null;
 
@@ -269,15 +268,15 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
         prevStopIndex = prevVisibleLines.start.line;
       }
 
-      // Automatically bucket lines to avoid triggering too many updates.
+      // We need to fetch hit counts as a user scrolls,
+      // but naively fetching each line individually would result in a lot of requests,
+      // so we batch requests up into chunks of 100 lines.
       let bucketedStartIndex = null;
       let bucketedStopIndex = null;
       if (startIndex !== null && stopIndex !== null) {
-        const startBucket = Math.floor(startIndex / VISIBLE_LINES_BUCKET_SIZE);
-        const stopBucket = Math.floor(stopIndex / VISIBLE_LINES_BUCKET_SIZE) + 1;
-
-        bucketedStartIndex = startBucket * VISIBLE_LINES_BUCKET_SIZE;
-        bucketedStopIndex = stopBucket * VISIBLE_LINES_BUCKET_SIZE - 1;
+        const bucket = bucketVisibleLines(startIndex, stopIndex);
+        bucketedStartIndex = bucket[0];
+        bucketedStopIndex = bucket[1];
       }
 
       if (prevStartIndex === bucketedStartIndex && prevStopIndex === bucketedStopIndex) {

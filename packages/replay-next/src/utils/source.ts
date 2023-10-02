@@ -4,6 +4,18 @@ import { assert } from "protocol/utils";
 
 import { Source } from "../suspense/SourcesCache";
 
+const VISIBLE_LINES_BUCKET_SIZE = 100;
+
+export function bucketVisibleLines(
+  startLineIndex: number,
+  stopLineIndex: number
+): [startLineIndex: number, stopLineIndex: number] {
+  const startBucket = Math.floor(startLineIndex / VISIBLE_LINES_BUCKET_SIZE);
+  const stopBucket = Math.floor(stopLineIndex / VISIBLE_LINES_BUCKET_SIZE) + 1;
+
+  return [startBucket * VISIBLE_LINES_BUCKET_SIZE, stopBucket * VISIBLE_LINES_BUCKET_SIZE - 1];
+}
+
 export function getSourceFileName(source: Source, appendIndex: boolean = false): string | null {
   const { url } = source;
   if (!url) {
