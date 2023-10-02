@@ -1,4 +1,6 @@
 import { Page, test as base } from "@playwright/test";
+import type { AxiosError } from "axios";
+import axios from "axios";
 
 import { TestRecordingKey } from "./helpers";
 import { cloneTestRecording, deleteTestRecording } from "./helpers/utils";
@@ -28,7 +30,14 @@ const testWithCloneRecording = base.extend<TestIsolatedRecordingFixture>({
         recordingId: newRecordingId,
       });
     } catch (err: any) {
-      console.error(err);
+      if (axios.isAxiosError(err)) {
+        console.error("Axios error cloning recording: ", {
+          errors: err.response?.data?.errors,
+          details: err.toJSON(),
+        });
+      } else {
+        console.error("Error cloning recording: ", err);
+      }
       throw err;
     } finally {
       if (newRecordingId) {
