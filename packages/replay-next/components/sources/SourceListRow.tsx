@@ -1,6 +1,6 @@
 import { SameLineSourceLocations } from "@replayio/protocol";
 import { CSSProperties, useContext, useMemo } from "react";
-import { STATUS_PENDING, STATUS_RESOLVED, Status } from "suspense";
+import { STATUS_PENDING, useImperativeIntervalCacheValues } from "suspense";
 
 import {
   ExecutionPointLineHighlight,
@@ -34,8 +34,6 @@ import styles from "./SourceListRow.module.css";
 export type ItemData = {
   breakablePositionsByLine: Map<number, SameLineSourceLocations>;
   executionPointLineHighlight: ExecutionPointLineHighlight | null;
-  hitCounts: Array<[lineNumber: number, lineHitCounts: LineHitCounts]> | null;
-  hitCountsStatus: Status;
   lineHeight: number;
   maxHitCount: number | undefined;
   minHitCount: number | undefined;
@@ -101,14 +99,14 @@ export default function SourceListRow({
   // We don't want loaded hit counts to disappear when a user scrolls,
   // so the easiest way to avoid that is to always request (cached) hit counts for the bucket the current line falls in.
   const bucket = bucketVisibleLines(lineIndex, lineIndex);
-  const hitCounts = sourceHitCountsCache.getValueIfCached(
+  const { status: hitCountsStatus, value: hitCounts } = useImperativeIntervalCacheValues(
+    sourceHitCountsCache,
     bucket[0],
     bucket[1],
     client,
     sourceId,
     focusRange ? toPointRange(focusRange) : null
   );
-  const hitCountsStatus = hitCounts == null ? STATUS_PENDING : STATUS_RESOLVED;
 
   if (hitCounts != null) {
     const hitCountTuple = find(hitCounts, [lineNumber] as any, (a, b) => a[0] - b[0]);
