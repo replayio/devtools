@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import { useEffect, useMemo } from "react";
 
 import { assert } from "protocol/utils";
-import { query } from "shared/graphql/apolloClient";
+import { mutate, query } from "shared/graphql/apolloClient";
 import {
   AcceptRecordingCollaboratorRequest,
   AcceptRecordingCollaboratorRequestVariables,
@@ -190,6 +190,35 @@ export async function getRecording(recordingId: RecordingId) {
   });
 
   return result.data?.recording ? convertRecording(result.data.recording) : undefined;
+}
+
+export async function maybeAcceptInviteAndGetRecording(recordingId: RecordingId) {
+  const recording = await getRecording(recordingId);
+
+  if (!recording) {
+    const result = await mutate({
+      mutation: gql`
+        mutation MaybeAcceptWorkspaceMembershipForRecording($recordingId: ID!) {
+          maybeAcceptWorkspaceMembershipForRecording(input: { recordingId: $recordingId }) {
+            success
+          }
+        }
+      `,
+      variables: { recordingId },
+      refetchQueries: ["GetRecording"],
+      // we need to ensure GetRecording has been refetched since it will be
+      // immediately called when this method returns if it was successful
+      awaitRefetchQueries: true,
+    });
+
+    const success = !!result?.data?.maybeAcceptWorkspaceMembershipForRecording.success;
+
+    if (success) {
+      return await getRecording(recordingId);
+    }
+  }
+
+  return undefined;
 }
 
 export function useGetRecording(recordingId: RecordingId | null | undefined): {

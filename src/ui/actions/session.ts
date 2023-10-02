@@ -18,7 +18,7 @@ import { userData } from "shared/user-data/GraphQL/UserData";
 import { getPausePointParams, isTest } from "shared/utils/environment";
 import { UIThunkAction } from "ui/actions";
 import * as actions from "ui/actions/app";
-import { getRecording } from "ui/hooks/recordings";
+import { getRecording, maybeAcceptInviteAndGetRecording } from "ui/hooks/recordings";
 import { getUserId, getUserInfo } from "ui/hooks/users";
 import {
   clearExpectedError,
@@ -60,7 +60,11 @@ export function getAccessibleRecording(
 ): UIThunkAction<Promise<Recording | null>> {
   return async dispatch => {
     try {
-      const [recording, userId] = await Promise.all([getRecording(recordingId), getUserId()]);
+      let [recording, userId] = await Promise.all([
+        maybeAcceptInviteAndGetRecording(recordingId),
+        getUserId(),
+      ]);
+
       if (!recording || recording.isInitialized) {
         const expectedError = getRecordingNotAccessibleError(recording, userId);
         if (expectedError) {
