@@ -91,13 +91,18 @@ export default function SourceListRow({
   let hitCount = 0;
   let lineHitCounts: LineHitCounts | null = null;
 
-  // TRICKY (See FE-1956 for more detail)
-  // sourceHitCountsCache is an interval cache;
-  // It fetches hit counts in batches of 100 lines to avoid lots of small requests every time we scroll.
-  // This creates a potential issue on the boundaries where it's possible for hit counts to appear and disappear
-  // because a batch of lines is partially loaded (e.g. first we fetch lines 100-200 and then lines 100-300).
+  // We fetch hit count information as a user scrolls,
+  // but naively fetching each line individually would result in a lot of requests,
+  // so we batch requests up into chunks of 100 lines.
+  //
+  // Because we use an interval cache for this,
+  // there is a potential issue on the boundaries where it's possible for hit counts to appear and disappear
+  // because a batch of lines is only partially loaded (e.g. first we fetch lines 100-200 and then lines 100-300).
+  //
   // We don't want loaded hit counts to disappear when a user scrolls,
   // so the easiest way to avoid that is to always request (cached) hit counts for the bucket the current line falls in.
+  //
+  // TRICKY (See FE-1956 for more detail)
   const bucket = bucketVisibleLines(lineIndex, lineIndex);
   const { status: hitCountsStatus, value: hitCounts } = useImperativeIntervalCacheValues(
     sourceHitCountsCache,
