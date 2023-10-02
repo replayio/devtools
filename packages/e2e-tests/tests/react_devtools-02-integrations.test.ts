@@ -9,7 +9,7 @@ import {
   openReactDevtoolsPanel,
 } from "../helpers/react-devtools-panel";
 import { getSelectedLineNumber, waitForSelectedSource } from "../helpers/source-panel";
-import { getByTestName, waitFor } from "../helpers/utils";
+import { debugPrint, getByTestName, waitFor } from "../helpers/utils";
 import test, { expect } from "../testFixtureCloneRecording";
 
 // Why is this even getting confused as an API key?
@@ -33,6 +33,8 @@ test("react_devtools 02: RDT integrations (Chromium)", async ({
 
   // If the "React" tab shows up, we know that the routine ran
   await openReactDevtoolsPanel(page);
+
+  debugPrint(page, "Checking initial list of React components");
 
   const components = getReactComponents(page);
   await waitFor(async () => {
@@ -101,6 +103,7 @@ test("react_devtools 02: RDT integrations (Chromium)", async ({
       'Head',
       'SideEffect'
     ]
+    
 
     In practice, the routine's name processing currently lose the specific context names, 
     and a couple components aren't getting their names mapped.
@@ -132,6 +135,8 @@ test("react_devtools 02: RDT integrations (Chromium)", async ({
     "SideEffect",
   ];
 
+  debugPrint(page, "Checking list of rewritten component names");
+
   for (let i = 0; i < Math.min(expectedComponentNames.length, componentNames.length); i++) {
     expect(componentNames[i]).toBe(expectedComponentNames[i]);
   }
@@ -141,6 +146,7 @@ test("react_devtools 02: RDT integrations (Chromium)", async ({
   const nextSearchResultButton = getByTestName(page, "ComponentSearchInput-NextButton");
   const resetSearchButton = getByTestName(page, "ComponentSearchInput-ResetButton");
 
+  debugPrint(page, `Checking "Jump to Component Source" for class component <SourcesTree>`);
   await componentSearchInput.focus();
   await componentSearchInput.type("SourcesTree");
   // Should end up selecting "WrappedSourcesTree" - need the next result
@@ -168,46 +174,59 @@ test("react_devtools 02: RDT integrations (Chromium)", async ({
   // in `React.memo()`, and for some reason we're _not_ getting a real name for it (likely
   // due to use of `export default React.memo()`).
   // Still, this is a reasonable example to check "Jump to Component Source" behavior.
+
+  debugPrint(page, `Checking "Jump to Component Source" for function component <SourcesTreeItem>`);
+  const list = page.locator("[class^=DevTools] [class^=Tree] [class^=List]");
+  list.evaluate(el => (el.scrollTop = 0));
+  await getReactComponents(page).first().click();
   await componentSearchInput.type("Anonymous");
-  const anonymousResults = await getComponentSearchResultsCount(page);
-  expect(anonymousResults).toEqual({ current: 1, total: 88 });
+  const anonymousResults1 = await getComponentSearchResultsCount(page);
+  expect(anonymousResults1).toEqual({ current: 1, total: 17 });
+
+  await nextSearchResultButton.click();
+  await nextSearchResultButton.click();
+  await nextSearchResultButton.click();
+  const anonymousResults2 = await getComponentSearchResultsCount(page);
+  // The `<SourcesTreeItem>` should be the fourth "Anonymous" component in this recording
+  expect(anonymousResults2).toEqual({ current: 4, total: 17 });
   await viewComponentSourceButton.click();
 
   // Should jump to `function SourceTreeItem2()`, which is a function component
   await waitForSelectedSource(page, "SourcesTreeItem.tsx");
   await waitFor(async () => {
     const lineNumber = await getSelectedLineNumber(page, false);
-    expect(lineNumber).toBe(135);
+    expect(lineNumber).toBe(133);
   });
-
-  const list = page.locator("[class^=DevTools] [class^=Tree] [class^=List]");
 
   list.evaluate(el => (el.scrollTop = 0));
 
   // Re-select "App" just so we're back at the top
-  await getReactComponents(page).nth(0).click();
+  await getReactComponents(page).first().click();
 
   // Should render `<Suspense>` components
+
+  debugPrint(page, `Checking rendering of <Suspense> components`);
   await resetSearchButton.click();
   await componentSearchInput.focus();
   await componentSearchInput.type("Suspense");
 
   const suspenseResults = await getComponentSearchResultsCount(page);
-  expect(suspenseResults).toEqual({ current: 1, total: 89 });
+  expect(suspenseResults).toEqual({ current: 1, total: 17 });
 
   list.evaluate(el => (el.scrollTop = 0));
 
   // Re-select "App" just so we're back at the top
-  await getReactComponents(page).nth(0).click();
+  await getReactComponents(page).first().click();
 
   // Should render our `<LazyOffscreen>` components, but _not_ `<Offscreen>`,
   // because RDT already filters those out by default
+  debugPrint(page, `Checking rendering of <Offscreen> components`);
   await resetSearchButton.click();
   await componentSearchInput.focus();
   await componentSearchInput.type("Offscreen");
 
   const offscreenResults = await getComponentSearchResultsCount(page);
-  expect(offscreenResults).toEqual({ current: 1, total: 8 });
+  expect(offscreenResults).toEqual({ current: 1, total: 7 });
 
   const offscreenSearchVisibleComponents = getReactComponents(page);
   const offscreenSearchComponentNames = await getAllVisibleComponentNames(
