@@ -37,15 +37,19 @@ export const PlaywrightAnnotationsCache = createSingleEntryCacheWithTelemetry<
     const sortedAnnotations: Annotation[] = [];
 
     await client.findAnnotations("replay-playwright", annotation => {
-      const processedAnnotation = {
-        point: annotation.point,
-        time: annotation.time,
-        message: JSON.parse(annotation.contents).message,
-      };
+      const contents = JSON.parse(annotation.contents);
 
-      insert(sortedAnnotations, processedAnnotation, (a, b) =>
-        compareNumericStrings(a.point, b.point)
-      );
+      if (contents && typeof contents === "object" && "message" in contents) {
+        const processedAnnotation = {
+          point: annotation.point,
+          time: annotation.time,
+          message: contents.message,
+        };
+
+        insert(sortedAnnotations, processedAnnotation, (a, b) =>
+          compareNumericStrings(a.point, b.point)
+        );
+      }
     });
 
     return sortedAnnotations;
