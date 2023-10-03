@@ -29,7 +29,7 @@ spawnSync(
     '--group',
     'e2e-test',
     '--api-key',
-    'rwk_7XPbO5fhz0bkhANYXtN2dkm74wNQCchXf2OxVgAerTQ',
+    'rwk_7o3q05qOwAXoYHWiVLra5cuOilLIghqDRMWyd8ObPac',
     staticJsFolder,
   ],
   { stdio: 'inherit', cwd: currentFolder }
