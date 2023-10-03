@@ -4,7 +4,7 @@ import LoadingProgressBar from "ui/components/shared/LoadingProgressBar";
 
 export default function Loader() {
   return (
-    <div className="relative">
+    <div className="relative w-full">
       <LoadingProgressBar />
     </div>
   );

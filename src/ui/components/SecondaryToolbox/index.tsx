@@ -189,29 +189,40 @@ function SecondaryToolbox() {
         </div>
       </header>
       <Redacted className="secondary-toolbox-content bg-chrome text-xs">
-        {(chromiumNetMonitorEnabled || recordingCapabilities.supportsNetworkRequests) && (
-          <Panel isActive={selectedPanel === "network"}>
-            <NetworkMonitor />
+        <Suspense fallback={<LoadingPanel />}>
+          {(chromiumNetMonitorEnabled || recordingCapabilities.supportsNetworkRequests) && (
+            <Panel isActive={selectedPanel === "network"}>
+              <NetworkMonitor />
+            </Panel>
+          )}
+          <Panel isActive={selectedPanel === "console"}>
+            <ConsolePanel />
           </Panel>
-        )}
-        <Panel isActive={selectedPanel === "console"}>
-          <ConsolePanel />
-        </Panel>
-        <Panel isActive={selectedPanel === "inspector"}>
-          <InspectorPanel />
-        </Panel>
-        <Panel isActive={selectedPanel === "react-components"}>
-          <ReactDevToolsPanel />
-        </Panel>
-        <Panel isActive={selectedPanel === "redux-devtools"}>
-          <ReduxDevToolsPanel />
-        </Panel>
-        {showDebuggerTab && (
-          <Panel isActive={selectedPanel === "debugger"}>
-            <EditorPane />
+          <Panel isActive={selectedPanel === "inspector"}>
+            <InspectorPanel />
           </Panel>
-        )}
+          <Panel isActive={selectedPanel === "react-components"}>
+            <ReactDevToolsPanel />
+          </Panel>
+          <Panel isActive={selectedPanel === "redux-devtools"}>
+            <ReduxDevToolsPanel />
+          </Panel>
+          {showDebuggerTab && (
+            <Panel isActive={selectedPanel === "debugger"}>
+              <EditorPane />
+            </Panel>
+          )}
+        </Suspense>
       </Redacted>
+    </div>
+  );
+}
+
+function LoadingPanel() {
+  return (
+    <div className="toolbox-bottom-loading-panel">
+      <Loader />
+      <div className="toolbox-bottom-loading-panel-text">Loading...</div>
     </div>
   );
 }
