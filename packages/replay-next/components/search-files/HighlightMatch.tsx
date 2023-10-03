@@ -1,24 +1,36 @@
 import { ReactNode, useMemo } from "react";
 
+import { findMatches } from "replay-next/components/search-files/findMatches";
+
 import styles from "./HighlightMatch.module.css";
 
-export default function HighlightMatch({ needle, text }: { needle: string; text: string }) {
-  const pieces = useMemo(() => text.split(needle), [needle, text]);
+export default function HighlightMatch({
+  caseSensitive,
+  needle,
+  text,
+}: {
+  caseSensitive: boolean;
+  needle: string;
+  text: string;
+}) {
+  const tuples = useMemo(
+    () => findMatches(text, needle, caseSensitive),
+    [caseSensitive, needle, text]
+  );
 
   let children: ReactNode[] = [];
-  for (let index = 0; index < pieces.length; index++) {
-    const piece = pieces[index];
-
-    children.push(<span key={index}>{piece}</span>);
-
-    if (index < pieces.length - 1) {
+  tuples.forEach(([nonMatch, match]) => {
+    if (nonMatch) {
+      children.push(<span key={children.length}>{nonMatch}</span>);
+    }
+    if (match) {
       children.push(
-        <span className={styles.Match} key={`${index}-needle`}>
-          {needle}
-        </span>
+        <mark className={styles.Match} key={children.length}>
+          {match}
+        </mark>
       );
     }
-  }
+  });
 
   return children as any;
 }

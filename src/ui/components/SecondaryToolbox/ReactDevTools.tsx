@@ -680,7 +680,7 @@ export function ReactDevtoolsPanel() {
 
   if (!isReady) {
     return (
-      <div className="flex flex-col items-center gap-4 p-4">
+      <div className="flex grow flex-col items-center justify-center gap-4 p-4">
         <img src="/images/react.svg" className="mt-2 w-8" />
         {isReactDevToolsReady ? (
           <>

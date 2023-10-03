@@ -225,6 +225,7 @@
   --border-color-source-search: #2563be;
   --border-color-warning: #6f5920;
   --border-color: #e1e6ed;
+  --border-color-elements-subtree: var(--background-color-contrast-1);
 
   --color-brand: #02acfd;
   --color-contrast: #081121;
@@ -746,6 +747,7 @@
   --border-color-source-search: #69a6ff;
   --border-color-warning: #fce2a1;
   --border-color: #081121;
+  --border-color-elements-subtree: var(--background-color-contrast-3);
 
   --color-brand: #05acfd;
   --color-contrast: #ffffff;

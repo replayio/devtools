@@ -2,11 +2,11 @@
 
 import classnames from "classnames";
 import React, { Component } from "react";
-import { JSONTree } from "react-json-tree";
 import type { LabelRenderer, ShouldExpandNodeInitially } from "react-json-tree";
+import { JSONTree } from "react-json-tree";
 
 import getItemString from "./getItemString";
-import styles from "../ReduxDevTools.module.css";
+import styles from "./JSONDiff.module.css";
 
 export interface Delta {
   [key: string]: any;
@@ -161,21 +161,23 @@ export class JSONDiff extends Component<Props, State> {
     const { styling, base16Theme, ...props } = this.props;
 
     if (!this.state.data) {
-      return <div {...styling("stateDiffEmpty")}>(states are equal)</div>;
+      return <div className={styles.NoDiff}>(states are equal)</div>;
     }
 
     return (
-      <JSONTree
-        {...props}
-        theme={getJsonTreeTheme(base16Theme)}
-        data={this.state.data}
-        getItemString={this.getItemString}
-        valueRenderer={this.valueRenderer}
-        postprocessValue={prepareDelta}
-        isCustomNode={Array.isArray}
-        shouldExpandNodeInitially={expandFirstLevel}
-        hideRoot
-      />
+      <div className={styles.Container}>
+        <JSONTree
+          {...props}
+          theme={getJsonTreeTheme(base16Theme)}
+          data={this.state.data}
+          getItemString={this.getItemString}
+          valueRenderer={this.valueRenderer}
+          postprocessValue={prepareDelta}
+          isCustomNode={Array.isArray}
+          shouldExpandNodeInitially={expandFirstLevel}
+          hideRoot
+        />
+      </div>
     );
   }
 
@@ -194,7 +196,7 @@ export class JSONDiff extends Component<Props, State> {
 
     function renderSpan(name: string, body: string) {
       return (
-        <span key={name} className={classnames("a", styles.diff, styles[name])}>
+        <span key={name} className={classnames(styles.diff, styles[name])}>
           {body}
         </span>
       );

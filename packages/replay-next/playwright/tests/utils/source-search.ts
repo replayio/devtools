@@ -21,7 +21,7 @@ export async function clickSearchResultRow(page: Page, rowNumber: number) {
 }
 
 export async function searchSources(page: Page, text: string) {
-  const input = page.locator('[data-test-id="SearchFiles-Input"]');
+  const input = page.locator('[data-test-id="FileSearch-Input"]');
   await input.focus();
 
   await clearTextArea(page, input);
@@ -31,7 +31,7 @@ export async function searchSources(page: Page, text: string) {
 }
 
 export async function toggleIncludeNodeModulesCheckbox(page: Page, checked: boolean) {
-  const checkbox = page.locator('[data-test-id="SearchFiles-IncludeNodeModules-Checkbox"]');
+  const checkbox = page.locator('[data-test-id="FileSearch-IncludeNodeModules-Checkbox"]');
   const currentChecked = await checkbox.isChecked();
   if (checked !== currentChecked) {
     await checkbox.click();

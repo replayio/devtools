@@ -29,7 +29,7 @@ import { useNag } from "replay-next/src/hooks/useNag";
 import { hitPointsForLocationCache } from "replay-next/src/suspense/HitPointsCache";
 import { getSourceSuspends } from "replay-next/src/suspense/SourcesCache";
 import { findIndexBigInt } from "replay-next/src/utils/array";
-import { validate } from "replay-next/src/utils/points";
+import { validateCode } from "replay-next/src/utils/code";
 import { MAX_POINTS_TO_RUN_EVALUATION } from "shared/client/ReplayClient";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import {
@@ -192,9 +192,9 @@ function PointPanelWithHitPoints({
 
   const [isPending, startTransition] = useTransition();
 
-  const isContentValid = useMemo(() => !isEditing || validate(content), [isEditing, content]);
+  const isContentValid = useMemo(() => !isEditing || validateCode(content), [isEditing, content]);
   const isConditionValid = useMemo(
-    () => !isEditing || condition === null || validate(condition),
+    () => !isEditing || condition === null || validateCode(condition),
     [isEditing, condition]
   );
 

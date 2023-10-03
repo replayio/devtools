@@ -14,7 +14,7 @@ import { userData } from "shared/user-data/GraphQL/UserData";
 import { UIThunkAction, actions } from "ui/actions";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import { selectors } from "ui/reducers";
-import { getSelectedSource } from "ui/reducers/sources";
+import { getSelectedSourceId } from "ui/reducers/sources";
 import { useAppSelector } from "ui/setup/hooks";
 import { UIState } from "ui/state";
 import { addGlobalShortcut, isEditableElement, removeGlobalShortcut } from "ui/utils/key-shortcuts";
@@ -63,7 +63,7 @@ function KeyboardShortcuts({
   const { isAuthenticated } = useAuth0();
   const [, dismissFindFileNag] = useNag(Nag.FIND_FILE);
 
-  const selectedSource = useAppSelector(getSelectedSource);
+  const selectedSourceId = useAppSelector(getSelectedSourceId);
 
   const [protocolTimeline] = useGraphQLUserData("feature_protocolTimeline");
   const globalKeyboardShortcuts = useMemo(() => {
@@ -91,7 +91,7 @@ function KeyboardShortcuts({
     };
 
     const toggleGoToLine = (e: KeyboardEvent) => {
-      if (selectedSource) {
+      if (selectedSourceId) {
         toggleQuickOpenModal(e, ":");
       }
     };
@@ -214,7 +214,7 @@ function KeyboardShortcuts({
     jumpToPreviousPause,
     jumpToNextPause,
     dismissFindFileNag,
-    selectedSource,
+    selectedSourceId,
   ]);
 
   useEffect(() => {

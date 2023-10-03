@@ -1,80 +1,84 @@
-import { CSSProperties, memo, useContext, useMemo } from "react";
-import { areEqual } from "react-window";
+import { CSSProperties, useContext, useMemo } from "react";
+import { useImperativeIntervalCacheValues } from "suspense";
 
 import Expandable from "replay-next/components/Expandable";
 import Icon from "replay-next/components/Icon";
+import { FileSearchListData, Item } from "replay-next/components/search-files/FileSearchListData";
 import HighlightMatch from "replay-next/components/search-files/HighlightMatch";
+import { GenericListItemData } from "replay-next/components/windowing/GenericList";
+import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import {
-  SourceSearchResult,
   SourceSearchResultLocation,
   SourceSearchResultMatch,
   isSourceSearchResultLocation,
   isSourceSearchResultMatch,
 } from "replay-next/src/suspense/SearchCache";
+import { sourceHitCountsCache } from "replay-next/src/suspense/SourceHitCountsCache";
 import { Source } from "replay-next/src/suspense/SourcesCache";
 import { getSourceFileName } from "replay-next/src/utils/source";
 import { getRelativePathWithoutFile } from "replay-next/src/utils/url";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { toPointRange } from "shared/utils/time";
 
 import styles from "./ResultsListRow.module.css";
 
+export const ITEM_SIZE = 20;
+
 export type ItemData = {
-  getResultAtIndex(index: number): SourceSearchResult | null;
-  isLocationCollapsed(index: number): boolean;
+  listData: FileSearchListData;
   query: string;
   sources: Source[];
-  toggleLocation(rowIndex: number, isOpen: boolean): void;
 };
 
-const MemoizedResultsListRow = memo(
-  ({ data, index, style }: { data: ItemData; index: number; style: CSSProperties }) => {
-    const { getResultAtIndex, isLocationCollapsed, query, sources, toggleLocation } = data;
+export default function ResultsListItem({
+  data,
+  index,
+  style,
+}: {
+  data: GenericListItemData<Item, ItemData>;
+  index: number;
+  style: CSSProperties;
+}) {
+  const { itemData, listData: genericListData } = data;
 
-    const result = getResultAtIndex(index);
-    if (result == null) {
-      console.error(`No result for row ${index}`);
-      return null;
-    }
+  const listData = genericListData as FileSearchListData;
+  const { isCollapsed, result } = listData.getItemAtIndex(index);
 
-    if (isSourceSearchResultLocation(result)) {
-      const isCollapsed = isLocationCollapsed(index);
-      return (
-        <LocationRow
-          isCollapsed={isCollapsed}
-          result={result}
-          rowIndex={index}
-          sources={sources}
-          style={style}
-          toggleLocation={toggleLocation}
-        />
-      );
-    } else if (isSourceSearchResultMatch(result)) {
-      return <MatchRow result={result} query={query} style={style} />;
-    } else {
-      console.error("Unexpected result type:", result);
-      return null;
-    }
-  },
-  areEqual
-);
-MemoizedResultsListRow.displayName = "ResultsListRow";
+  if (isSourceSearchResultLocation(result)) {
+    return (
+      <LocationRow
+        index={index}
+        isCollapsed={isCollapsed}
+        listData={listData}
+        result={result}
+        sources={itemData.sources}
+        style={style}
+      />
+    );
+  } else if (isSourceSearchResultMatch(result)) {
+    return <MatchRow query={itemData.query} result={result} style={style} />;
+  } else {
+    throw Error("Unexpected result type");
+  }
+}
 
 function LocationRow({
+  index,
   isCollapsed,
+  listData,
   result,
-  rowIndex,
   sources,
   style,
-  toggleLocation,
 }: {
+  index: number;
   isCollapsed: boolean;
+  listData: FileSearchListData;
   result: SourceSearchResultLocation;
-  rowIndex: number;
   sources: Source[];
   style: CSSProperties;
-  toggleLocation: (rowIndex: number, isOpen: boolean) => void;
 }) {
-  const { location, matchCount } = result;
+  const { id, location, matchCount } = result;
 
   const [fileName, path] = useMemo(() => {
     const source = sources.find(({ sourceId }) => sourceId === location.sourceId);
@@ -113,40 +117,51 @@ function LocationRow({
           </>
         }
         headerClassName={styles.LocationRow}
-        onChange={isOpen => toggleLocation(rowIndex, isOpen)}
+        key={id /* Re-apply defaultCollapsed if row content changes */}
+        onChange={collapsed => listData.toggleCollapsed(index, !collapsed)}
       />
     </div>
   );
 }
 
 function MatchRow({
-  result,
   query,
+  result,
   style,
 }: {
-  result: SourceSearchResultMatch;
   query: string;
+  result: SourceSearchResultMatch;
   style: CSSProperties;
 }) {
-  const { match } = result;
-
+  const { range } = useContext(FocusContext);
+  const replayClient = useContext(ReplayClientContext);
   const { openSource } = useContext(SourcesContext);
+
+  const { context, location } = result.match;
+
+  const { value: hitCounts } = useImperativeIntervalCacheValues(
+    sourceHitCountsCache,
+    result.match.location.line,
+    result.match.location.line,
+    replayClient,
+    result.match.location.sourceId,
+    range ? toPointRange(range) : null
+  );
 
   return (
     <div
       className={styles.MatchRow}
+      data-hit-count={hitCounts?.length}
       data-test-name="SearchFiles-ResultRow"
       data-test-type="Match"
       onClick={() => {
-        const lineIndex = match.location.line - 1;
-        openSource("search-result", match.location.sourceId, lineIndex, lineIndex);
+        const lineIndex = location.line - 1;
+        openSource("search-result", location.sourceId, lineIndex, lineIndex);
       }}
       style={style}
     >
       <span className={styles.GroupLine}>&nbsp;&nbsp;</span>
-      <HighlightMatch needle={query} text={match.context.trim()} />
+      <HighlightMatch caseSensitive={false} needle={query} text={context.trim()} />
     </div>
   );
 }
-
-export default MemoizedResultsListRow;

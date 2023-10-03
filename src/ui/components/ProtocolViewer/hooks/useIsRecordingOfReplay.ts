@@ -1,10 +1,11 @@
-import { useMemo } from "react";
+import { useContext, useMemo } from "react";
 
-import { getAllSourceDetails } from "ui/reducers/sources";
-import { useAppSelector } from "ui/setup/hooks";
+import { useSources } from "replay-next/src/suspense/SourcesCache";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 export function useIsRecordingOfReplay() {
-  const sourceDetails = useAppSelector(getAllSourceDetails);
+  const replayClient = useContext(ReplayClientContext);
+  const sourceDetails = useSources(replayClient);
 
   return useMemo(() => {
     const hasKnownReplaySources = sourceDetails.some(source => {

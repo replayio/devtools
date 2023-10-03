@@ -8,11 +8,7 @@ import {
   useRef,
 } from "react";
 import { VariableSizeList as List, ListOnItemsRenderedProps } from "react-window";
-import {
-  useImperativeCacheValue,
-  useImperativeIntervalCacheValues,
-  useStreamingValue,
-} from "suspense";
+import { useImperativeCacheValue, useStreamingValue } from "suspense";
 
 import { useLineHighlights } from "replay-next/components/sources/hooks/useLineHighlights";
 import { useMaxStringLengths } from "replay-next/components/sources/hooks/useMaxStringLengths";
@@ -26,15 +22,11 @@ import {
   BreakpointPositionsResult,
   breakpointPositionsCache,
 } from "replay-next/src/suspense/BreakpointPositionsCache";
-import {
-  getCachedMinMaxSourceHitCounts,
-  sourceHitCountsCache,
-} from "replay-next/src/suspense/SourceHitCountsCache";
+import { getCachedMinMaxSourceHitCounts } from "replay-next/src/suspense/SourceHitCountsCache";
 import { Source } from "replay-next/src/suspense/SourcesCache";
 import { StreamingParser } from "replay-next/src/suspense/SyntaxParsingCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { POINT_BEHAVIOR_DISABLED, POINT_BEHAVIOR_ENABLED } from "shared/client/types";
-import { toPointRange } from "shared/utils/time";
 
 import useFontBasedListMeasurements from "./hooks/useFontBasedListMeasurements";
 import SourceListRow from "./SourceListRow";
@@ -91,19 +83,6 @@ export default function SourceList({
 
   const { data } = useStreamingValue(streamingParser);
   const lineCount = data?.lineCount;
-
-  // Both hit counts and breakable positions are key info,
-  // but neither should actually _block_ us from showing source text.
-  // Fetch those in the background via the caches,
-  // and re-render once that data is available.
-  const { status: hitCountsStatus, value: hitCounts } = useImperativeIntervalCacheValues(
-    sourceHitCountsCache,
-    visibleLines?.start.line ?? 0,
-    visibleLines?.end.line ?? 0,
-    client,
-    sourceId,
-    focusRange ? toPointRange(focusRange) : null
-  );
 
   const { value: breakablePositionsValue = NO_BREAKABLE_POSITIONS } = useImperativeCacheValue(
     breakpointPositionsCache,
@@ -240,8 +219,6 @@ export default function SourceList({
   const itemData = {
     breakablePositionsByLine,
     executionPointLineHighlight,
-    hitCounts,
-    hitCountsStatus,
     lineHeight,
     maxHitCount: maxHitCount ?? STREAMING_IN_PROGRESS_PLACEHOLDER_MAX_HIT_COUNT,
     minHitCount: minHitCount ?? 0,

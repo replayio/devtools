@@ -6,7 +6,7 @@
 
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import { join } from "path";
-import { Page, expect as expectFunction } from "@playwright/test";
+import type { Page, expect as expectFunction } from "@playwright/test";
 import { listAllRecordings, removeRecording, uploadRecording } from "@replayio/replay";
 import axios from "axios";
 import chalk from "chalk";
@@ -15,6 +15,8 @@ import logUpdate from "log-update";
 import { v4 as uuidv4 } from "uuid";
 import yargs from "yargs";
 
+import { SetRecordingIsPrivateVariables } from "../../shared/graphql/generated/SetRecordingIsPrivate";
+import { UpdateRecordingTitleVariables } from "../../shared/graphql/generated/UpdateRecordingTitle";
 import config, { BrowserName } from "../config";
 import { testFunction as reduxFundamentalsScript } from "../examples/redux-fundamentals/tests/example-script";
 import { recordNodeExample } from "./record-node";
@@ -361,6 +363,7 @@ async function saveRecording(example: string, apiKey: string, recordingId?: stri
   });
 
   await makeReplayPublic(apiKey, recordingId);
+  await updateRecordingTitle(apiKey, recordingId, `E2E Example: ${example}`);
 
   const text = "" + readFileSync(examplesJsonPath);
   const json = JSON.parse(text);
@@ -416,10 +419,11 @@ async function saveBrowserExample({ example }: TestRunCallbackArgs) {
   const playwrightScript: PlaywrightScript = example.playwrightScript ?? defaultPlaywrightScript;
 
   // Shouldn't be "node" by this point
-  await recordPlaywright(example.runtime as BrowserName, async page => {
+  await recordPlaywright(example.runtime as BrowserName, async (page, expect) => {
     await page.goto(exampleUrl);
-    await playwrightScript(page, expectFunction);
+    await playwrightScript(page, expect);
   });
+  console.log("Recording completed");
   const recordingId = await uploadLastRecording(exampleUrl);
 
   done();
@@ -440,7 +444,7 @@ async function saveNodeExamples() {
 
     const recordingId = await recordNodeExample(examplePath);
     if (recordingId) {
-      await saveRecording(example.filename, config.nodeWorkspaceApiKey, recordingId!);
+      await saveRecording(example.filename, config.replayApiKey, recordingId!);
       removeRecording(recordingId);
 
       done();
@@ -456,8 +460,19 @@ async function saveNodeExamples() {
   });
 }
 
+function logError(e: any, variables: any) {
+  if (e.response) {
+    console.log("Parameters");
+    console.log(JSON.stringify(variables, undefined, 2));
+    console.log("Response");
+    console.log(JSON.stringify(e.response.data, undefined, 2));
+  }
+
+  throw e.message;
+}
+
 async function makeReplayPublic(apiKey: string, recordingId: string) {
-  const variables = {
+  const variables: SetRecordingIsPrivateVariables = {
     recordingId: recordingId,
     isPrivate: false,
   };
@@ -479,14 +494,38 @@ async function makeReplayPublic(apiKey: string, recordingId: string) {
       variables,
     },
   }).catch(e => {
-    if (e.response) {
-      console.log("Parameters");
-      console.log(JSON.stringify(variables, undefined, 2));
-      console.log("Response");
-      console.log(JSON.stringify(e.response.data, undefined, 2));
-    }
+    logError(e, variables);
+  });
+}
 
-    throw e.message;
+async function updateRecordingTitle(apiKey: string, recordingId: string, title: string) {
+  const variables: UpdateRecordingTitleVariables = {
+    recordingId: recordingId,
+    title,
+  };
+
+  return axios({
+    url: config.graphqlUrl,
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+    },
+    data: {
+      query: `
+        mutation UpdateRecordingTitle($recordingId: ID!, $title: String!) {
+          updateRecordingTitle(input: { id: $recordingId, title: $title }) {
+            success
+            recording {
+              uuid
+              title
+            }
+          }
+        }
+      `,
+      variables,
+    },
+  }).catch(e => {
+    logError(e, variables);
   });
 }
 

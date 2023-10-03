@@ -7,8 +7,9 @@ import {
 import { satisfies } from "compare-versions";
 
 import { comparePoints } from "protocol/execution-point-utils";
+import { binarySearch } from "protocol/utils";
 import { networkRequestsCache } from "replay-next/src/suspense/NetworkRequestsCache";
-import { findSliceIndices, insert } from "replay-next/src/utils/array";
+import { insert } from "replay-next/src/utils/array";
 import { assertWithTelemetry, recordData } from "replay-next/src/utils/telemetry";
 import { ReplayClientInterface } from "shared/client/types";
 import { Annotation, PlaywrightTestSources, PlaywrightTestStacks } from "shared/graphql/types";
@@ -707,11 +708,9 @@ export async function processGroupedTestCases(
             (accumulated: Annotation[][], annotation: Annotation) => {
               const { testId, attempt } = annotation.message;
 
-              // TODO [SCS-1284] Remove the -1 condition when users have
-              // migrated to a newer plugin version
-              if (testId == null || testId === -1) {
-                // beforeAll/afterAll have an -1 testId (for <= 1.0.6) or null
-                // testId (for > 1.0.6) and can be ignored for now
+              if (testId == null) {
+                // beforeAll/afterAll have a null testId (for > 1.0.6) and can
+                // be ignored for now
                 return accumulated;
               }
 
@@ -952,13 +951,16 @@ async function processNetworkData(
 
   // Filter by RequestInfo (because they have execution points)
   // then map RequestInfo to RequestEventInfo using ids
-  const [beginIndex, endIndex] = findSliceIndices(ids, begin.point, end.point, (id, point) => {
-    const requestData = records[id];
-    return comparePoints(requestData.timeStampedPoint.point, point);
+  const beginIndex = binarySearch(0, ids.length, index => {
+    const currentItem = records[ids[index]];
+    return comparePoints(begin.point, currentItem.timeStampedPoint.point);
   });
-
-  if (beginIndex < 0 || endIndex < 0) {
-    return [];
+  let endIndex = binarySearch(beginIndex, ids.length, index => {
+    const currentItem = records[ids[index]];
+    return comparePoints(end.point, currentItem.timeStampedPoint.point);
+  });
+  if (comparePoints(end.point, records[ids[endIndex]].timeStampedPoint.point) >= 0) {
+    endIndex++;
   }
 
   const networkRequestEvents: RecordingTestMetadataV3.NetworkRequestEvent[] = [];

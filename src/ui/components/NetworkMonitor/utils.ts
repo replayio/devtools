@@ -39,6 +39,7 @@ export type RequestSummary = {
   id: string;
   method: string;
   name: string;
+  path: string;
   point: TimeStampedPoint;
   queryParams: [string, string][];
   triggerPoint: TimeStampedPoint | null;
@@ -116,14 +117,14 @@ const name = (url: string): string =>
     .filter(f => f.length)
     .pop() || "/";
 
-const path = (url: string): string => {
+export function getPathFromUrl(url: string) {
   let path = new URL(url).pathname;
   if (path.startsWith("/")) {
     path = path.substring(1);
   }
 
   return path;
-};
+}
 
 const queryParams = (url: string): [string, string][] => {
   //@ts-ignore
@@ -159,7 +160,7 @@ export const partialRequestsToCompleteSummaries = (
         id: record.id,
         method: openEvent.requestMethod,
         name: name(openEvent.requestUrl),
-        path: path(openEvent.requestUrl),
+        path: getPathFromUrl(openEvent.requestUrl),
         point: record.timeStampedPoint,
         queryParams: queryParams(openEvent.requestUrl),
         requestHeaders: openEvent.requestHeaders,

@@ -9,6 +9,7 @@ import {
   LIST_ROW_HEIGHT,
   NetworkMonitorListRow,
 } from "ui/components/NetworkMonitor/NetworkMonitorListRow";
+import { useNetworkMonitorColumns } from "ui/components/NetworkMonitor/useNetworkMonitorColumns";
 import { RequestSummary } from "ui/components/NetworkMonitor/utils";
 
 import styles from "./NetworkMonitorList.module.css";
@@ -30,6 +31,8 @@ export function NetworkMonitorList({
   selectedRequestId: string | null;
   selectRequest: (request: RequestSummary) => void;
 }) {
+  const [enabledColumns] = useNetworkMonitorColumns();
+
   let itemCount = requests.length;
   if (filteredBeforeCount > 0) {
     itemCount++;
@@ -98,6 +101,7 @@ export function NetworkMonitorList({
   }, [requests, selectRequest, selectedRequestId]);
 
   const itemData: ItemData = {
+    columns: enabledColumns,
     currentTime,
     filteredAfterCount,
     filteredBeforeCount,
@@ -110,7 +114,7 @@ export function NetworkMonitorList({
 
   return (
     <div className={styles.Container}>
-      <NetworkMonitorListHeader />
+      <NetworkMonitorListHeader columns={enabledColumns} />
       <div
         className={styles.ListWrapper}
         ref={listWrapperRef}

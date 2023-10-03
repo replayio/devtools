@@ -7,8 +7,8 @@ import { compareNumericStrings } from "protocol/utils";
 import { ReplayClientInterface } from "shared/client/types";
 import { InteractionEventKind } from "ui/actions/eventListeners/constants";
 import { EventListenerWithFunctionInfo } from "ui/actions/eventListeners/eventListenerUtils";
-import type { ReduxActionAnnotation } from "ui/components/SecondaryToolbox/redux-devtools/redux-annotations";
-import { processReduxAnnotations } from "ui/components/SecondaryToolbox/redux-devtools/redux-annotations";
+import type { ReduxActionAnnotation } from "ui/components/SecondaryToolbox/redux-devtools/annotations";
+import { processReduxAnnotations } from "ui/components/SecondaryToolbox/redux-devtools/annotations";
 
 export interface ParsedReactDevToolsAnnotation extends TimeStampedPoint {
   contents: {
@@ -65,7 +65,7 @@ export const reactDevToolsAnnotationsCache = createSingleEntryCache<
       ({ point, time, contents }) => ({
         point,
         time,
-        contents: JSON.parse(contents),
+        contents: JSON.parse(contents) as any,
       })
     );
 
@@ -111,7 +111,7 @@ export const eventListenersJumpLocationsCache = createSingleEntryCache<
       ({ point, time, contents }) => ({
         point,
         time,
-        ...JSON.parse(contents),
+        ...(JSON.parse(contents) as any),
       })
     );
 

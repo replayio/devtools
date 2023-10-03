@@ -53,7 +53,7 @@ async function fulfillAuthRequest(id: string, token: string) {
     }),
   });
 
-  const json = await resp.json();
+  const json: any = await resp.json();
 
   if (json.errors) {
     throw new Error(json.errors[0].message);
@@ -84,7 +84,7 @@ async function fetchToken(code: string, verifier: string): Promise<Token> {
     }),
   });
 
-  const token = await resp.json();
+  const token: any = await resp.json();
 
   if (token && token.refresh_token) {
     return token;
@@ -125,7 +125,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       throw new AuthError("A required parameter was missing. Please try again.");
     }
 
-    const { verifier, id } = JSON.parse(browserAuth);
+    const { verifier, id } = JSON.parse(browserAuth) as any;
 
     if (id !== state) {
       // This shouldn't occur and we don't need to broadcast this to the user so

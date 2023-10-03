@@ -2,14 +2,18 @@ import {
   ChangeEvent,
   KeyboardEvent,
   Suspense,
+  startTransition,
+  useContext,
   useEffect,
   useRef,
   useState,
-  useTransition,
 } from "react";
+import { STATUS_REJECTED, useStreamingValue } from "suspense";
 
 import { Checkbox } from "design";
 import { useNag } from "replay-next/src/hooks/useNag";
+import { searchCache } from "replay-next/src/suspense/SearchCache";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Nag } from "shared/graphql/types";
 
 import Icon from "../Icon";
@@ -20,13 +24,20 @@ import styles from "./SearchFiles.module.css";
 export const SHOW_GLOBAL_SEARCH_EVENT_TYPE = "show-global-search";
 
 export default function SearchFiles({ limit }: { limit?: number }) {
+  const client = useContext(ReplayClientContext);
+
   const [includeNodeModules, setIncludeNodeModules] = useState(false);
   const [queryForDisplay, setQueryForDisplay] = useState("");
   const [queryForSuspense, setQueryForSuspense] = useState("");
-  const [isPending, startTransition] = useTransition();
   const [, dismissSearchSourceTextNag] = useNag(Nag.SEARCH_SOURCE_TEXT);
 
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const streaming = searchCache.stream(client, queryForSuspense, includeNodeModules, limit);
+
+  const { status } = useStreamingValue(streaming);
+
+  const didError = status === STATUS_REJECTED;
 
   const onChange = (event: ChangeEvent<HTMLInputElement>) => {
     setQueryForDisplay(event.target.value);
@@ -59,14 +70,18 @@ export default function SearchFiles({ limit }: { limit?: number }) {
   }, [dismissSearchSourceTextNag]);
 
   return (
-    <div className={styles.SearchFiles}>
+    <div className={styles.SearchFiles} data-test-id="FileSearch-Pane">
       <div className={styles.Content}>
-        <div className={styles.InputWrapper} data-test-id="SearchFiles-SearchInput">
+        <div
+          className={styles.InputWrapper}
+          data-error={didError || undefined}
+          data-test-id="SearchFiles-SearchInput"
+        >
           <Icon className={styles.Icon} type="search" />
           <input
             autoFocus
             className={styles.Input}
-            data-test-id="SearchFiles-Input"
+            data-test-id="FileSearch-Input"
             onChange={onChange}
             onKeyDown={onKeyDown}
             placeholder="Find in files..."
@@ -75,18 +90,13 @@ export default function SearchFiles({ limit }: { limit?: number }) {
             value={queryForDisplay}
           />
           <Suspense>
-            <InlineResultsCount
-              includeNodeModules={includeNodeModules}
-              isPending={isPending}
-              limit={limit}
-              query={queryForSuspense}
-            />
+            <InlineResultsCount streaming={streaming} />
           </Suspense>
         </div>
 
         <div className={styles.CheckboxWrapper}>
           <Checkbox
-            dataTestId="SearchFiles-IncludeNodeModules"
+            dataTestId="FileSearch-IncludeNodeModules"
             label="Include node modules"
             checked={includeNodeModules}
             onChange={() => setIncludeNodeModules(!includeNodeModules)}
@@ -94,12 +104,7 @@ export default function SearchFiles({ limit }: { limit?: number }) {
         </div>
 
         <Suspense>
-          <ResultsList
-            includeNodeModules={includeNodeModules}
-            isPending={isPending}
-            limit={limit}
-            query={queryForSuspense}
-          />
+          <ResultsList query={queryForSuspense} streaming={streaming} />
         </Suspense>
       </div>
     </div>

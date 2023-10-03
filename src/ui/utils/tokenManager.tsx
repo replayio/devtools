@@ -35,7 +35,7 @@ function unstable_getAuth0Token() {
   const value = key && localStorage.getItem(key);
 
   if (value) {
-    const accessToken: string | undefined = JSON.parse(value)?.body?.access_token;
+    const accessToken: string | undefined = (JSON.parse(value) as any)?.body?.access_token;
 
     return accessToken;
   }
@@ -197,7 +197,7 @@ class TokenManager {
 
     const item = window.localStorage.getItem("__cypress");
     if (item) {
-      const token = JSON.parse(item).body.access_token;
+      const token = (JSON.parse(item) as any).body.access_token;
       this.setState({ token }, deferredState);
       return;
     }

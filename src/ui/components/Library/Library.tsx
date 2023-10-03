@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 
+import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import { UserSettings } from "shared/graphql/types";
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 import {
@@ -100,7 +101,9 @@ function Library({ userSettings, userInfo }: { userSettings: UserSettings; userI
   return (
     <div className="flex h-screen w-screen flex-row">
       <Navigation />
-      <TeamPage />
+      <ErrorBoundary key={teamId} name="Library">
+        <TeamPage />
+      </ErrorBoundary>
       <LibraryNags />
     </div>
   );

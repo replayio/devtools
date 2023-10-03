@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import { Recording, UserSettings } from "shared/graphql/types";
+import { Recording, UserSettings, Workspace } from "shared/graphql/types";
 import Modal from "ui/components/shared/NewModal";
 import hooks from "ui/hooks";
 import { useGetRecordingId } from "ui/hooks/recordings";
@@ -20,6 +20,7 @@ import { UploadRecordingTrialEnd } from "./UploadRecordingTrialEnd";
 
 type UploadScreenProps = {
   recording: Recording;
+  workspaces: Workspace[];
   userSettings: UserSettings;
   onUpload: () => void;
 };
@@ -108,11 +109,15 @@ function ReplayScreenshot({
   );
 }
 
-export default function UploadScreen({ recording, userSettings, onUpload }: UploadScreenProps) {
+export default function UploadScreen({
+  recording,
+  userSettings,
+  workspaces: allWorkspaces,
+  onUpload,
+}: UploadScreenProps) {
   const recordingId = useGetRecordingId();
   // This is pre-loaded in the parent component.
   const { screenData, loading: loading1 } = hooks.useGetRecordingPhoto(recordingId!);
-  const { workspaces: allWorkspaces, loading: loading2 } = hooks.useGetNonPendingWorkspaces();
 
   const workspaces = allWorkspaces.filter(workspace => workspace.isTest === recording.isTest);
 
@@ -127,7 +132,11 @@ export default function UploadScreen({ recording, userSettings, onUpload }: Uplo
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string>(() => {
     let workspaceId = userSettings?.defaultWorkspaceId;
 
-    if (workspaceId && workspaces.find(workspace => workspace.id === workspaceId)) {
+    if (!workspaceId) {
+      return MY_LIBRARY;
+    }
+
+    if (workspaces.find(workspace => workspace.id === workspaceId)) {
       return workspaceId;
     }
 
@@ -174,9 +183,6 @@ export default function UploadScreen({ recording, userSettings, onUpload }: Uplo
 
   if (loading1) {
     return <LoadingScreen message="Loading recording metadata..." />;
-  }
-  if (loading2) {
-    return <LoadingScreen message="Loading team info..." />;
   }
 
   if (status === "deleted") {
