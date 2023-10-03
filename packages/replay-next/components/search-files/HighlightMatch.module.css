@@ -1,6 +1,6 @@
 .Match {
   background-color: var(--background-color-source-search);
   border-bottom: 1px solid var(--border-color-source-search);
-  color: var(--color-default);
+  color: inherit;
   font-weight: bold;
 }

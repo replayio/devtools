@@ -70,7 +70,7 @@ export default function SearchFiles({ limit }: { limit?: number }) {
   }, [dismissSearchSourceTextNag]);
 
   return (
-    <div className={styles.SearchFiles}>
+    <div className={styles.SearchFiles} data-test-id="FileSearch-Pane">
       <div className={styles.Content}>
         <div
           className={styles.InputWrapper}
@@ -81,7 +81,7 @@ export default function SearchFiles({ limit }: { limit?: number }) {
           <input
             autoFocus
             className={styles.Input}
-            data-test-id="SearchFiles-Input"
+            data-test-id="FileSearch-Input"
             onChange={onChange}
             onKeyDown={onKeyDown}
             placeholder="Find in files..."
@@ -96,7 +96,7 @@ export default function SearchFiles({ limit }: { limit?: number }) {
 
         <div className={styles.CheckboxWrapper}>
           <Checkbox
-            dataTestId="SearchFiles-IncludeNodeModules"
+            dataTestId="FileSearch-IncludeNodeModules"
             label="Include node modules"
             checked={includeNodeModules}
             onChange={() => setIncludeNodeModules(!includeNodeModules)}

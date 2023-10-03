@@ -24,7 +24,7 @@ describe("findMatches", () => {
           "the",
         ],
         Array [
-          " THE E ",
+          " THE thE ",
           "the",
         ],
       ]
@@ -72,6 +72,15 @@ describe("findMatches", () => {
         ],
       ]
     `);
+
+    expect(findMatches("export const", "render", false)).toMatchInlineSnapshot(`
+      Array [
+        Array [
+          "export const",
+          "",
+        ],
+      ]
+    `);
   });
 
   it("should handle consecutive matches", () => {
@@ -86,7 +95,7 @@ describe("findMatches", () => {
           "bar",
         ],
         Array [
-          "z",
+          "baz",
           "",
         ],
       ]
