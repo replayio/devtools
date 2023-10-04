@@ -18,7 +18,7 @@ test(`authenticated/test-suites/library-test-runs`, async ({ page }) => {
 
   await filterTestRunsList(page, { status: "failed" });
   await expect(await findTestRunsInList(page, { status: "success" }).count()).toBe(0);
-  await filterTestRunsList(page, { status: "all" });
+  await filterTestRunsList(page, { text: "something that would never exist" });
 
   await expect(await findTestRunsInList(page, { title: "#9332" }).count()).toBe(0);
   await filterTestRunsList(page, { text: "#9332" });
