@@ -3,7 +3,7 @@ import { FC, memo, useContext } from "react";
 
 import {
   clientValueCache,
-  getCachedObject,
+  getCachedObjectWithPreview,
   objectCache,
 } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -82,7 +82,7 @@ function ValueRenderer({
     // The downside is that value renderers won't be able to display as much information (e.g. "Array" rather than "Array(3)")
     // but this is how the old console works and each value renderer should be able to downgrade like this.
     const object =
-      getCachedObject(pauseId, clientValue.objectId!) ||
+      getCachedObjectWithPreview(pauseId, clientValue.objectId!) ||
       objectCache.read(client, pauseId, clientValue.objectId!, noOverflow ? "full" : "canOverflow");
 
     if (object == null) {

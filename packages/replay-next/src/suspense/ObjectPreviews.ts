@@ -95,6 +95,18 @@ export function getCachedObject(pauseId: PauseId, objectId: ObjectId): Object | 
   );
 }
 
+// This method is safe to call outside of render.
+// The preview information of Objects it returns may overflow.
+export function getCachedObjectWithPreview(pauseId: PauseId, objectId: ObjectId): Object | null {
+  // The objectCache only uses the "client" param for fetching values, not caching them
+  const nullClient = null as any;
+  return (
+    objectCache.getValueIfCached(nullClient, pauseId, objectId, "full") ??
+    objectCache.getValueIfCached(nullClient, pauseId, objectId, "canOverflow") ??
+    null
+  );
+}
+
 export function preCacheObjects(
   sources: Map<SourceId, Source>,
   pauseId: PauseId,
