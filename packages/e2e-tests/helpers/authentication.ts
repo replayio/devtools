@@ -14,7 +14,7 @@ export const E2E_USER_2_API_KEY = "ruk_K77rBZ4FuPyfj5ocfpPpTXJx7WGVesSySInnCJ4sS
 // Can view the "FE Test Golden Recording" (Test Suites) workspace
 // but cannot upload new recordings nor source-maps
 // trunk-ignore(gitleaks/generic-api-key)
-export const E2E_USER_3_API_KEY = "rwk_4kYcBCHQFtZycxMOng4PyOUrqgOnt7W53Iw9iC4ilF8";
+export const E2E_USER_3_API_KEY = "rwk_8AhV0ieAaWYXXXSPiQ3Dag4K8JUZWvsh2PtLra3idwi";
 export const E2E_USER_3_TEAM_ID = "dzoxNzlkZGU4Mi00MmVhLTRkZTctYmI1OC04ZWY0NDQxZTcyYTg=";
 
 // Can view the "Replay Devtools Snapshots" (Test Suites) workspace
