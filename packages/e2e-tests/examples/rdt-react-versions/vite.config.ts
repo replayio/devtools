@@ -3,9 +3,9 @@ import react from "@vitejs/plugin-react-swc";
 import federation, { Remotes } from "@originjs/vite-plugin-federation";
 
 // https://vitejs.dev/config/
-export default defineConfig(config => {
+export default defineConfig(({ command }) => {
   const remotes: Remotes =
-    config.command === "serve"
+    command === "serve"
       ? {
           react15: "./public/react15/assets/react15.js",
           react16: "./public/react16/assets/react16.js",
@@ -17,7 +17,11 @@ export default defineConfig(config => {
           react16: "../react16/assets/react16.js",
           react17: "../react17/assets/react17.js",
         };
+
+  const base = command === "serve" ? "" : "/test/examples/rdt-react-versions/dist/";
+
   return {
+    base,
     plugins: [
       react(),
       federation({
