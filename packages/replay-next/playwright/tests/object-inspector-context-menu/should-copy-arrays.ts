@@ -23,7 +23,7 @@ test("should copy arrays", async ({ page }, testInfo) => {
     page,
     findKeyValues,
     "arrayWithObjects",
-    "[{…}, Array]",
+    "[{…}, Array(2)]",
     "Copy array",
     '[{"foo": 123, "bar": "abc"}, [1, 2]]'
   );

@@ -41,14 +41,14 @@ test(`object_preview-01: expressions in the console after time warping`, async (
 
   await verifyConsoleMessageObjectContents(page, "Proxy{}", [
     "<target>: {a: 0}",
-    "<handler>: {get: ƒ()}",
+    "<handler>: {get: ƒget(target, prop, receiver)}",
   ]);
 
   await verifyConsoleMessage(page, "Symbol()");
   await verifyConsoleMessage(page, "Symbol(symbol)");
   await verifyConsoleMessage(page, `{Symbol(): 42, Symbol(symbol): Symbol()}`);
 
-  const objectInspector = (await findConsoleMessage(page, "{_foo: C{…}, foo: ƒ()}")).locator(
+  const objectInspector = (await findConsoleMessage(page, "{_foo: C{…}, foo: ƒget foo()}")).locator(
     '[data-test-name="LogContents"]'
   );
   await toggleExpandable(page, { scope: objectInspector, targetState: "open" });

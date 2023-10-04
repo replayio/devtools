@@ -21,7 +21,7 @@ test("should copy deep arrays", async ({ page }, testInfo) => {
     page,
     findKeyValues,
     "deepArray",
-    '["level-1", Array]',
+    '["level-1", Array(2)]',
     "Copy array",
     '["level-1", ["level-2", ["level-3", ["level-4", ["level-5", ["[[ Truncated ]]", "[[ Truncated ]]"]]]]]]'
   );
