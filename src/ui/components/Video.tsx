@@ -97,7 +97,7 @@ export default function Video() {
       return;
     }
 
-    addComment();
+    addComment(e);
   };
 
   const showComments =
