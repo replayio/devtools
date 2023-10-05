@@ -1,10 +1,11 @@
 import { TimeStampedPoint } from "@replayio/protocol";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { STATUS_PENDING, useImperativeCacheValue } from "suspense";
 
 import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import PropertiesRenderer from "replay-next/components/inspector/PropertiesRenderer";
 import { SyntaxHighlighter } from "replay-next/components/SyntaxHighlighter/SyntaxHighlighter";
+import { InspectableTimestampedPointContext } from "replay-next/src/contexts/InspectorContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { ParsedToken, parsedTokensToHtml } from "replay-next/src/utils/syntax-parser";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -62,6 +63,14 @@ function UserActionEventDetails({
     variable
   );
 
+  const context = useMemo(
+    () => ({
+      executionPoint: timeStampedPoint.point,
+      time: timeStampedPoint.time,
+    }),
+    [timeStampedPoint]
+  );
+
   if (status === STATUS_PENDING) {
     return <LoadingInProgress />;
   } else if (value?.props == null || value?.pauseId == null) {
@@ -70,7 +79,9 @@ function UserActionEventDetails({
 
   return (
     <div className={styles.UserActionEventDetails} data-test-name="UserActionEventDetails">
-      <PropertiesRenderer pauseId={value.pauseId} object={value.props} />
+      <InspectableTimestampedPointContext.Provider value={context}>
+        <PropertiesRenderer pauseId={value.pauseId} object={value.props} />
+      </InspectableTimestampedPointContext.Provider>
     </div>
   );
 }
