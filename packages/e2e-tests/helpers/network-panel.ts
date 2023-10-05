@@ -41,7 +41,7 @@ export async function findNetworkRequestRow(
 
   const locator = page.locator(selector);
 
-  await expect(await locator.count()).toBe(1);
+  await waitFor(async () => expect(await locator.count()).toBe(1));
 
   return locator;
 }

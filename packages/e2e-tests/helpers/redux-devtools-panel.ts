@@ -12,12 +12,7 @@ export async function assertTabValue(page: Page, tab: string, expectedValue: str
   const inspector = page.locator('[data-test-id="ReduxDevToolsContents"]');
   await inspector.waitFor();
 
-  const currentPointContents = page.locator(`[data-test-id="ReduxDevtools"]`);
-  await waitFor(() =>
-    expect(currentPointContents.getByTestId("indeterminate-loader")).toHaveCount(0)
-  );
-
-  expect(await inspector.innerText()).toBe(expectedValue);
+  await waitFor(async () => expect(await inspector.innerText()).toBe(expectedValue));
 }
 
 export async function waitForReduxActionCount(page: Page, expected: number) {
