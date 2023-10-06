@@ -72,6 +72,7 @@ export default function HTMLElementRenderer({
   const properties = filterNonEnumerableProperties(object.preview?.node?.attributes ?? []);
   const showOverflowMarker = properties.length > MAX_PROPERTIES_TO_PREVIEW;
   const showInlineText = showChildrenIndicator && (inlineText || childNodes.length > 0);
+  const disableInspectButton = !object.preview?.node?.isConnected;
 
   const viewHtmlElement = (event: MouseEvent) => {
     event.preventDefault();
@@ -109,9 +110,14 @@ export default function HTMLElementRenderer({
       )}
       {inspectHTMLElement !== null && (
         <button
-          className={styles.IconButton}
+          className={disableInspectButton ? styles.DisabledIconButton : styles.IconButton}
+          disabled={disableInspectButton}
           onClick={viewHtmlElement}
-          title="Click to select the node in the inspector"
+          title={
+            disableInspectButton
+              ? "This node can't be selected in the inspector because it isn't connected to the document"
+              : "Click to select the node in the inspector"
+          }
         >
           <Icon className={styles.Icon} type="view-html-element" />
         </button>
