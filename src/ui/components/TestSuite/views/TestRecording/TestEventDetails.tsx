@@ -13,7 +13,10 @@ import {
   UserActionEventStack,
   isUserActionTestEvent,
 } from "shared/test-suites/RecordingTestMetadata";
-import { TestEventDetailsCache } from "ui/components/TestSuite/suspense/TestEventDetailsCache";
+import {
+  TestEventDetailsCache,
+  testEventDetailsCache2,
+} from "ui/components/TestSuite/suspense/TestEventDetailsCache";
 import { TestSuiteCache } from "ui/components/TestSuite/suspense/TestSuiteCache";
 import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext";
 
@@ -57,7 +60,7 @@ function UserActionEventDetails({
   const replayClient = useContext(ReplayClientContext);
 
   const { status, value } = useImperativeCacheValue(
-    TestEventDetailsCache,
+    testEventDetailsCache2,
     replayClient,
     timeStampedPoint,
     variable

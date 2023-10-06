@@ -18,7 +18,10 @@ import { jumpToKnownEventListenerHit } from "ui/actions/eventListeners/jumpToCod
 import { seek } from "ui/actions/timeline";
 import { JumpToCodeButton, JumpToCodeStatus } from "ui/components/shared/JumpToCodeButton";
 import { useJumpToSource } from "ui/components/TestSuite/hooks/useJumpToSource";
-import { TestEventDetailsCache } from "ui/components/TestSuite/suspense/TestEventDetailsCache";
+import {
+  TestEventDetailsCache,
+  testEventDetailsCache2,
+} from "ui/components/TestSuite/suspense/TestEventDetailsCache";
 import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext";
 import { getViewMode } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
@@ -64,6 +67,13 @@ export default memo(function UserActionEventRow({
   const { status: annotationsStatus, value: parsedAnnotations } = useImperativeCacheValue(
     eventListenersJumpLocationsCache,
     replayClient
+  );
+
+  const { status: hitPointStatus, value: resultData } = useImperativeCacheValue(
+    testEventDetailsCache2,
+    replayClient,
+    userActionEvent.data.timeStampedPoints.result,
+    userActionEvent.data.resultVariable
   );
 
   const [isHovered, setIsHovered] = useState(false);
@@ -199,7 +209,7 @@ function Badge({
   const client = useContext(ReplayClientContext);
 
   const { value } = useImperativeCacheValue(
-    TestEventDetailsCache,
+    testEventDetailsCache2,
     client,
     timeStampedPoint,
     variable
