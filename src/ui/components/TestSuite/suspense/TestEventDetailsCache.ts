@@ -1,4 +1,10 @@
-import { Frame, PauseId, Object as ProtocolObject, TimeStampedPoint } from "@replayio/protocol";
+import {
+  Frame,
+  PauseId,
+  Property,
+  Object as ProtocolObject,
+  TimeStampedPoint,
+} from "@replayio/protocol";
 import cloneDeep from "lodash/cloneDeep";
 import { Cache, createCache } from "suspense";
 
@@ -49,7 +55,8 @@ export const testEventDetailsCache2: Cache<
       return null;
     }
 
-    const variableNameInArray = `[${variable}]`;
+    // const variableNameInArray = variable; // `[${variable}]`;
+    const variableNameWithConsoleProps = `${variable}.consoleProps`;
 
     try {
       console.log("testEventDetailsCache2 fetching: ", timeStampedPoint, variable);
@@ -59,37 +66,39 @@ export const testEventDetailsCache2: Cache<
         BigInt(timeStampedPoint.point),
         client,
         timeStampedPoint,
-        variableNameInArray
+        variableNameWithConsoleProps
       );
 
       const result = await testEventDetailsCache2Internal.resultsCache.readAsync(
         timeStampedPoint.point,
         timeStampedPoint,
-        variableNameInArray
+        variableNameWithConsoleProps
       );
 
       console.timeEnd(`testEventDetails2:pointsAndResult:${timeStampedPoint.point}}`);
       console.log("Actual result: ", result);
 
       const { pauseId } = result;
-      const [firstValue] = result.values;
+      const [consolePropsValue] = result.values;
+      // const [firstValue] = result.values;
 
-      if (firstValue?.object) {
-        const logObject = await objectCache.readAsync(
-          client,
-          pauseId,
-          firstValue.object,
-          "canOverflow"
-        );
-        const consolePropsProperty = logObject.preview?.properties?.find(
-          ({ name }) => name === "consoleProps"
-        );
+      if (consolePropsValue?.object) {
+        // if (firstValue?.object) {
+        // const logObject = await objectCache.readAsync(
+        //   client,
+        //   pauseId,
+        //   firstValue.object,
+        //   "canOverflow"
+        // );
+        // const consolePropsProperty = logObject.preview?.properties?.find(
+        //   ({ name }) => name === "consoleProps"
+        // );
 
-        if (consolePropsProperty?.object) {
+        if (consolePropsValue?.object) {
           const consoleProps = await objectCache.readAsync(
             client,
             pauseId,
-            consolePropsProperty.object,
+            consolePropsValue.object,
             "full"
           );
 
@@ -104,6 +113,26 @@ export const testEventDetailsCache2: Cache<
             // suppress the prototype entry in the properties output
             sanitized.preview.prototypeId = undefined;
           }
+
+          const propNamesWithPotentialElements = ["Yielded", "Applied To"] as const;
+          const propsWithPotentialElements =
+            sanitized.preview?.properties?.filter(({ name }) =>
+              propNamesWithPotentialElements.includes(name)
+            ) ?? [];
+
+          propsWithPotentialElements.map(async prop => {
+            // kick this off now, but don't wait for it
+            if (prop?.object) {
+              // console.log("Fetching element preview: ", prop);
+              const cached = await objectCache.readAsync(
+                client,
+                pauseId,
+                prop.object,
+                "canOverflow"
+              );
+              console.log("Cached preview: ", prop, cached);
+            }
+          });
 
           const elementsProp = sanitized.preview?.properties?.find(
             ({ name }) => name === "Elements"
