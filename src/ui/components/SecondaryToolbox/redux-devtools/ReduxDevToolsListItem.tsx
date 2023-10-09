@@ -1,4 +1,4 @@
-import { CSSProperties } from "react";
+import { CSSProperties, useEffect, useRef } from "react";
 
 import { isExecutionPointsGreaterThan } from "replay-next/src/utils/time";
 import { ReduxActionAnnotation } from "ui/components/SecondaryToolbox/redux-devtools/annotations";
@@ -7,6 +7,7 @@ import { JumpToCodeButton } from "ui/components/shared/JumpToCodeButton";
 import { getCurrentPoint } from "ui/reducers/app";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
+import useReduxDevtoolsContextMenu from "./useReduxDevtoolsContextMenu";
 import styles from "./ReduxDevToolsListItem.module.css";
 
 export const ITEM_SIZE = 24;
@@ -18,12 +19,16 @@ export type ItemData = {
   selectAnnotation: (annotation: ReduxActionAnnotation | null) => void;
 };
 
+export type ItemDataWithScroll = ItemData & {
+  scrollToPause: () => void;
+};
+
 export function ReduxDevToolsListItem({
   data,
   index,
   style,
 }: {
-  data: ItemData;
+  data: ItemDataWithScroll;
   index: number;
   style: CSSProperties;
 }) {
@@ -33,8 +38,12 @@ export function ReduxDevToolsListItem({
     selectedAnnotation,
     selectAnnotation,
   } = data;
-
   const annotation = annotations[index];
+
+  const { contextMenu, onContextMenu } = useReduxDevtoolsContextMenu(
+    annotation,
+    data.scrollToPause
+  );
 
   const dispatch = useAppDispatch();
   const currentExecutionPoint = useAppSelector(getCurrentPoint);
@@ -64,6 +73,7 @@ export function ReduxDevToolsListItem({
       onClick={() => selectAnnotation(annotation)}
       style={style}
       title={annotation.payload.actionType}
+      onContextMenu={onContextMenu}
     >
       <JumpToCodeButton
         className={styles.JumpToCodeButton}
@@ -73,6 +83,7 @@ export function ReduxDevToolsListItem({
         onClick={onSeek}
       />
       {annotation.payload.actionType}
+      {contextMenu}
     </div>
   );
 }
