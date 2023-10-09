@@ -55,9 +55,9 @@ test("playwright-01: Basic Test Suites panel functionality", async ({
 
   // displays the nav chevron on hover
   const chevron = getTestRowChevron(firstTest);
-  await chevron.isHidden();
+  await expect(chevron).not.toBeVisible({ timeout: 5000 });
   await firstTest.hover();
-  await chevron.isVisible();
+  await expect(chevron).toBeVisible({ timeout: 5000 });
 
   // This recording has 1 passing, 0 failing, 0 skipped tests
   const passedCount = await getTestSuiteResultsPassedCount(page);

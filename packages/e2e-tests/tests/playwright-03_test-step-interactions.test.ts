@@ -73,7 +73,7 @@ test("playwright-03: Test Step interactions", async ({
 
   // Should show the "Before/After" buttons
   const beforeAfterButtons = getTestStepBeforeAfterButtons(page);
-  beforeAfterButtons.waitFor({ state: "visible", timeout: 1000 });
+  await beforeAfterButtons.waitFor({ state: "visible", timeout: 1000 });
 
   const afterButton = beforeAfterButtons.locator("button", { hasText: "After" }).first();
 
