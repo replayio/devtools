@@ -232,7 +232,7 @@ export type PlaywrightTestSources = {
 };
 
 export type PlaywrightTestStacks = {
-  [fileName: string]: {
+  [id: string]: {
     file: string;
     line: number;
     column: number;
