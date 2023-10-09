@@ -46,7 +46,8 @@
   color: var(--value-type-undefined);
 }
 
-.IconButton {
+.IconButton,
+.DisabledIconButton {
   height: 1rem;
   width: 1rem;
   outline: none;
@@ -55,6 +56,10 @@
   border: none;
   cursor: pointer;
   vertical-align: top;
+}
+
+.DisabledIconButton svg {
+  color: var(--color-dimmer);
 }
 
 .Icon {

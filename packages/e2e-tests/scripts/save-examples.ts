@@ -269,6 +269,12 @@ const knownExamples: TestExampleFile[] = [
     playwrightScript: reduxFundamentalsScript,
   },
   {
+    filename: "rdt-react-versions/dist/index.html",
+    folder: config.browserExamplesPath,
+    category: "browser",
+    runtime: "chromium",
+  },
+  {
     filename: "node/control_flow.js",
     folder: config.nodeExamplesPath,
     category: "node",
