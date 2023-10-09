@@ -877,7 +877,7 @@ export async function processPlaywrightTestRecording(
               ? stack.map(frame => ({
                   columnNumber: frame.column,
                   fileName: frame.file,
-                  functionName: frame.function,
+                  functionName: frame.functionName,
                   lineNumber: frame.line,
                 }))
               : null,

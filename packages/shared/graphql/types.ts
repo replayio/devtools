@@ -236,7 +236,7 @@ export type PlaywrightTestStacks = {
     file: string;
     line: number;
     column: number;
-    function?: string;
+    functionName?: string;
   }[];
 };
 
