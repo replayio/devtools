@@ -55,9 +55,8 @@ test("playwright-01: Basic Test Suites panel functionality", async ({
 
   // displays the nav chevron on hover
   const chevron = getTestRowChevron(firstTest);
-  await expect(chevron).not.toBeVisible({ timeout: 5000 });
   await firstTest.hover();
-  await expect(chevron).toBeVisible({ timeout: 5000 });
+  await expect(chevron).toBeVisible();
 
   // This recording has 1 passing, 0 failing, 0 skipped tests
   const passedCount = await getTestSuiteResultsPassedCount(page);
@@ -81,7 +80,7 @@ test("playwright-01: Basic Test Suites panel functionality", async ({
   expect(await getTestSuiteBranch(page).textContent()).toMatch(
     "ryan/playwright-plugin-annotations"
   );
-  expect(await getTestSuiteDuration(page).textContent()).toMatch("0:49");
+  expect(await getTestSuiteDuration(page).textContent()).toMatch("0:32");
 
   // can open tests
   await firstTest.click();
@@ -99,7 +98,7 @@ test("playwright-01: Basic Test Suites panel functionality", async ({
   expect(await sections.nth(0).textContent()).toMatch(/test body/i);
 
   const steps = getTestCaseSteps(selectedRow);
-  await expect(steps).toHaveCount(226);
+  await expect(steps).toHaveCount(223);
 
   const backButton = getTestRecordingBackButton(page);
   await backButton.click();

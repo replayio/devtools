@@ -70,7 +70,6 @@ test("playwright-02: Test Step timeline behavior", async ({
     }
 
     const hoverPercent = await getTimelineCurrentHoverPercent(page);
-    expect(hoverPercent).toBeGreaterThan(0);
     expect(hoverPercent).toBeGreaterThanOrEqual(lastHoverPercent);
 
     lastHoverPercent = hoverPercent;

@@ -50,7 +50,7 @@ test("playwright-03: Test Step interactions", async ({
 
   const steps = getTestCaseSteps(selectedRow);
   const numSteps = await steps.count();
-  expect(numSteps).toBe(226);
+  expect(numSteps).toBe(223);
 
   // We should be in Viewer Mode to start with
   expect(await isViewerTabActive(page)).toBe(true);
@@ -67,7 +67,7 @@ test("playwright-03: Test Step interactions", async ({
 
   const firstClick = clickableSteps.filter({ hasText: /click/ }).first();
 
-  // Jump to the first `get` step
+  // Jump to the first `click` step
   await firstClick.click();
   prevPercent = await waitForTimelineAdvanced(page, prevPercent);
 

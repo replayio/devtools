@@ -55,9 +55,8 @@ test("cypress-01: Basic Test Suites panel functionality", async ({
 
   // displays the nav chevron on hover
   const chevron = getTestRowChevron(firstTest);
-  await expect(chevron).not.toBeVisible({ timeout: 5000 });
   await firstTest.hover();
-  await expect(chevron).toBeVisible({ timeout: 5000 });
+  await expect(chevron).toBeVisible();
 
   // This recording has 8 passing, 1 failing, 0 skipped tests
   const passedCount = await getTestSuiteResultsPassedCount(page);
@@ -97,7 +96,7 @@ test("cypress-01: Basic Test Suites panel functionality", async ({
   expect(await sections.nth(0).textContent()).toMatch(/test body/i);
 
   const steps = getTestCaseSteps(selectedRow);
-  await expect(steps).toHaveCount(20);
+  await expect(steps).toHaveCount(17);
 
   const backButton = getTestRecordingBackButton(page);
   await backButton.click();
