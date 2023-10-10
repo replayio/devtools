@@ -16,6 +16,7 @@ import {
   TestRunnerName,
   TestSectionName,
   getTestEventTime,
+  getTestEventTimeStampedPoint,
   isUserActionTestEvent,
 } from "shared/test-suites/RecordingTestMetadata";
 import { isPointInRegion } from "shared/utils/time";
@@ -63,12 +64,7 @@ export function TestSectionRow({
     if (selectedTestEvent) {
       switch (testRunnerName) {
         case "cypress": {
-          let timeStampedPoint: TimeStampedPoint | null = null;
-          if (isUserActionTestEvent(testEvent)) {
-            timeStampedPoint = testEvent.timeStampedPointRange?.begin ?? null;
-          } else {
-            timeStampedPoint = testEvent.timeStampedPoint;
-          }
+          const timeStampedPoint = getTestEventTimeStampedPoint(testEvent);
 
           if (timeStampedPoint) {
             position = isExecutionPointsGreaterThan(timeStampedPoint.point, currentExecutionPoint)

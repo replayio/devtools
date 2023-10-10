@@ -50,8 +50,7 @@ export function useJumpToSource({
     }
 
     if (testRecording && isUserActionTestEvent(testEvent)) {
-      const { timeStampedPointRange } = testEvent;
-      if (timeStampedPointRange === null) {
+      if (testEvent.data.timeStampedPoints.viewSource === null) {
         return;
       }
 

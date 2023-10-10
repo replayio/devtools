@@ -267,7 +267,7 @@ export namespace RecordingTestMetadataV3 {
 
       // These values come from annotations and so is only available for Cypress tests (for now)
       timeStampedPoints: {
-        // Determines the graphics we display in reaction to the before/after step buttons
+        // The time/point range during which the step was executed
         afterStep: TimeStampedPoint | null;
         beforeStep: TimeStampedPoint | null;
 
@@ -278,10 +278,6 @@ export namespace RecordingTestMetadataV3 {
         viewSource: TimeStampedPoint | null;
       };
     };
-
-    // Precisely defines the boundary execution points (and times) for the action
-    // This value comes from annotations and so is only available for Cypress tests (for now)
-    timeStampedPointRange: TimeStampedPointRange | null;
 
     type: "user-action";
   }
@@ -581,10 +577,6 @@ export async function processCypressTestRecording(
                   result: resultPoint,
                   viewSource: viewSourcePoint,
                 },
-              },
-              timeStampedPointRange: {
-                begin: stepEnqueuePoint ?? stepStartPoint,
-                end: stepEndPoint ?? stepStartPoint,
               },
               type: "user-action",
             });
@@ -888,7 +880,6 @@ export async function processPlaywrightTestRecording(
               viewSource: null,
             },
           },
-          timeStampedPointRange,
           type: "user-action",
         });
       });
@@ -1021,24 +1012,24 @@ export function getGroupedTestCasesTitle(groupedTestCases: AnyGroupedTestCases):
   }
 }
 
-export function getTestEventExecutionPoint(
+export function getTestEventTimeStampedPoint(
   testEvent: RecordingTestMetadataV3.TestEvent
-): ExecutionPoint | null {
+): TimeStampedPoint | null {
   if (isNavigationTestEvent(testEvent) || isNetworkRequestTestEvent(testEvent)) {
-    return testEvent.timeStampedPoint.point;
+    return testEvent.timeStampedPoint;
   } else {
-    return testEvent.timeStampedPointRange !== null
-      ? testEvent.timeStampedPointRange.begin.point
-      : null;
+    return testEvent.data.timeStampedPoints.beforeStep ?? null;
   }
 }
 
+export function getTestEventExecutionPoint(
+  testEvent: RecordingTestMetadataV3.TestEvent
+): ExecutionPoint | null {
+  return getTestEventTimeStampedPoint(testEvent)?.point ?? null;
+}
+
 export function getTestEventTime(testEvent: RecordingTestMetadataV3.TestEvent): number | null {
-  if (isNavigationTestEvent(testEvent) || isNetworkRequestTestEvent(testEvent)) {
-    return testEvent.timeStampedPoint.time;
-  } else {
-    return testEvent.data.timeStampedPoints.beforeStep?.time ?? null;
-  }
+  return getTestEventTimeStampedPoint(testEvent)?.time ?? null;
 }
 
 export function isGroupedTestCasesV1(

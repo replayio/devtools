@@ -248,11 +248,11 @@ function findJumpToCodeDetailsIfAvailable(
       }
     }
   } else if (groupedTestCases.environment.testRunner.name === "playwright") {
-    const { data, timeStampedPointRange } = userActionEvent;
-    const { category, command } = data;
+    const { data } = userActionEvent;
+    const { category, command, timeStampedPoints } = data;
     const { name } = command;
 
-    if (timeStampedPointRange !== null) {
+    if (timeStampedPoints.beforeStep !== null && timeStampedPoints.afterStep !== null) {
       canShowJumpToCode =
         category === "command" &&
         (name.startsWith("locator.click") ||
@@ -265,8 +265,8 @@ function findJumpToCodeDetailsIfAvailable(
         jumpToCodeAnnotation = jumpToCodeAnnotations.find(a =>
           isExecutionPointsWithinRange(
             a.point,
-            timeStampedPointRange.begin.point,
-            timeStampedPointRange.end.point
+            timeStampedPoints.beforeStep!.point,
+            timeStampedPoints.afterStep!.point
           )
         );
       }
