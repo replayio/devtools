@@ -1,7 +1,7 @@
 import assert from "assert";
-import { TimeStampedPoint } from "@replayio/protocol";
-import { Suspense, memo, useContext, useMemo, useState } from "react";
-import { STATUS_PENDING, STATUS_RESOLVED, useImperativeCacheValue } from "suspense";
+import { ExecutionPoint, TimeStampedPoint } from "@replayio/protocol";
+import { Suspense, memo, useContext, useEffect, useMemo, useState } from "react";
+import { Cache, STATUS_PENDING, STATUS_RESOLVED, useImperativeCacheValue } from "suspense";
 
 import { getExecutionPoint } from "devtools/client/debugger/src/selectors";
 import Loader from "replay-next/components/Loader";
@@ -20,7 +20,10 @@ import { JumpToCodeButton, JumpToCodeStatus } from "ui/components/shared/JumpToC
 import { useJumpToSource } from "ui/components/TestSuite/hooks/useJumpToSource";
 import {
   TestEventDetailsCache,
+  TestEventDetailsEntry,
+  TestEventDomNodeDetails,
   testEventDetailsCache2,
+  testEventDomNodeCache,
 } from "ui/components/TestSuite/suspense/TestEventDetailsCache";
 import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext";
 import { getViewMode } from "ui/reducers/layout";
@@ -69,12 +72,29 @@ export default memo(function UserActionEventRow({
     replayClient
   );
 
-  const { status: hitPointStatus, value: resultData } = useImperativeCacheValue(
-    testEventDetailsCache2,
-    replayClient,
-    userActionEvent.data.timeStampedPoints.result,
-    userActionEvent.data.resultVariable
+  const { value: domNode, status: domNodeStatus } = useImperativeCacheValue(
+    testEventDomNodeCache as unknown as Cache<
+      [executionPoint: ExecutionPoint],
+      TestEventDomNodeDetails
+    >,
+    userActionEvent.data.timeStampedPoints.result?.point ?? "0"
   );
+
+  // useEffect(() => {
+  //   console.log(
+  //     "Event row DOM node: ",
+  //     userActionEvent.data.timeStampedPoints.result?.point,
+  //     domNodeStatus,
+  //     domNode
+  //   );
+  // }, [userActionEvent, domNodeStatus, domNode]);
+
+  // const { status: hitPointStatus, value: resultData } = useImperativeCacheValue(
+  //   testEventDetailsCache2,
+  //   replayClient,
+  //   userActionEvent.data.timeStampedPoints.result,
+  //   userActionEvent.data.resultVariable
+  // );
 
   const [isHovered, setIsHovered] = useState(false);
 

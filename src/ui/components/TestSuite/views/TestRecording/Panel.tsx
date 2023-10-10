@@ -6,8 +6,11 @@ import {
   PanelResizeHandle,
   Panel as ResizablePanel,
 } from "react-resizable-panels";
+import { useImperativeIntervalCacheValues } from "suspense";
 
+import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import {
   TestEvent,
   TestSectionName,
@@ -21,11 +24,14 @@ import TestEventDetails from "ui/components/TestSuite/views/TestRecording/TestEv
 import TestSection from "ui/components/TestSuite/views/TestRecording/TestSection";
 import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext";
 
+import { testEventDetailsCache3IntervalCache } from "../../suspense/TestEventDetailsCache";
 import styles from "./Panel.module.css";
 
 export default function Panel() {
   const { setTestEvent, setTestRecording, testEvent, testRecording } = useContext(TestSuiteContext);
   const { update } = useContext(TimelineContext);
+  const { range: focusWindow } = useContext(FocusContext);
+  const replayClient = useContext(ReplayClientContext);
 
   assert(testRecording != null);
 
@@ -39,6 +45,15 @@ export default function Panel() {
   useEffect(() => {
     committedValuesRef.current.testEvent = testEvent;
   });
+
+  useImperativeIntervalCacheValues(
+    testEventDetailsCache3IntervalCache,
+    BigInt(focusWindow ? focusWindow.begin.point : "0"),
+    BigInt(focusWindow ? focusWindow.end.point : "0"),
+    replayClient,
+    testRecording,
+    !!focusWindow
+  );
 
   // Select a test step and update the current time
   const selectTestEvent = useCallback(

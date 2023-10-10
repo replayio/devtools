@@ -2,6 +2,11 @@ import assert from "assert";
 import { ExecutionPoint, TimeStampedPoint } from "@replayio/protocol";
 import { ReactNode, useContext, useMemo, useTransition } from "react";
 
+import {
+  highlightNode,
+  highlightNodes,
+  unhighlightNode,
+} from "devtools/client/inspector/markup/actions/markup";
 import Icon from "replay-next/components/Icon";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
@@ -26,6 +31,7 @@ import { useTestEventContextMenu } from "ui/components/TestSuite/views/TestRecor
 import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext";
 import { useAppDispatch } from "ui/setup/hooks";
 
+import { testEventDomNodeCache } from "../../suspense/TestEventDetailsCache";
 import NavigationEventRow from "./TestRecordingEvents/NavigationEventRow";
 import NetworkRequestEventRow from "./TestRecordingEvents/NetworkRequestEventRow";
 import UserActionEventRow from "./TestRecordingEvents/UserActionEventRow";
@@ -175,12 +181,31 @@ export function TestSectionRow({
   const onMouseEnter = async () => {
     if (!isSelected) {
       dispatch(setTimelineToTime(getTestEventTime(testEvent)));
+
+      if (isUserActionTestEvent(testEvent)) {
+        const resultPoint = testEvent.data.timeStampedPoints.result ?? null;
+        console.log("Test row result point", resultPoint);
+        if (resultPoint) {
+          const firstDomNodeDetails = testEventDomNodeCache.getValueIfCached(resultPoint.point);
+
+          console.log("First DOM node details: ", firstDomNodeDetails);
+          if (firstDomNodeDetails?.domNode?.isConnected) {
+            const { domNode, pauseId } = firstDomNodeDetails;
+            console.log("Highlighting DOM node: ", domNode, pauseId);
+            dispatch(highlightNodes([domNode.id], pauseId));
+          }
+        }
+      }
     }
   };
 
   const onMouseLeave = () => {
     if (!isSelected) {
       dispatch(setTimelineToTime(null));
+
+      if (isUserActionTestEvent(testEvent)) {
+        dispatch(unhighlightNode());
+      }
     }
   };
 
