@@ -95,6 +95,7 @@ jobs:
           upload-all: true
           project: replay-chromium
         env:
+          REPLAY_PLAYWRIGHT_FIXTURE: 1
           RECORD_REPLAY_METADATA_TEST_RUN_ID: ${{ needs.generate-test-run-id.outputs.testRunId }}
           PLAYWRIGHT_TEST_BASE_URL: ${{ needs.preview-branch.outputs.url }}
           INPUT_STRIPE: ${{ matrix.shard }}/10

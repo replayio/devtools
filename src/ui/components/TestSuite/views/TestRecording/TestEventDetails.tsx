@@ -138,7 +138,7 @@ function PlaywrightUserActionEventDetails({ stack }: { stack: UserActionEventSta
   }
 
   return (
-    <div className={styles.UserActionEventDetails} data-test-name="TestEventDetailsMessage">
+    <div className={styles.UserActionEventDetails} data-test-name="UserActionEventDetails">
       <div className={styles.DetailsTitle}>Call stack</div>
       <div className={styles.CallStack}>
         {stack.map((frame, index) => (
@@ -149,20 +149,24 @@ function PlaywrightUserActionEventDetails({ stack }: { stack: UserActionEventSta
             onClick={() => setStackFrameIndex(index)}
           >
             <div
+              data-test-name="TestEventDetailsCallStackFrame"
               className={
                 frame.functionName ? styles.StackFrameFunction : styles.StackFrameAnonymousFunction
               }
             >
               {frame.functionName ?? "(anonymous)"}
             </div>
-            <div className={styles.StackFrameLocation}>
+            <div
+              className={styles.StackFrameLocation}
+              data-test-name="TestEventDetailsCallStackFile"
+            >
               {frame.fileName}:{frame.lineNumber}:{frame.columnNumber}
             </div>
           </div>
         ))}
       </div>
       <div className={styles.DetailsTitle}>Test code</div>
-      <div className={styles.SourceCodeContainer}>
+      <div className={styles.SourceCodeContainer} data-test-name="TestEventDetailsCode">
         <SyntaxHighlighter code={sourceCode} lineRenderer={lineRenderer} fileExtension=".js" />
       </div>
     </div>

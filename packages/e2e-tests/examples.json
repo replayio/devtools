@@ -47,5 +47,6 @@
   "redux/dist/index.html": "72ffbc74-ea61-492f-af66-cb8302b89c8d",
   "React Hook Form/conditionalField.cy.ts": "122c4fe7-8a58-4c5c-9639-16b35b5f2ef1",
   "redux-fundamentals/dist/index.html": "76c9a8db-5e05-40c1-89e6-70053248041e",
-  "rdt-react-versions/dist/index.html": "5b5422d9-e530-4d1f-a65e-1228700c112c"
+  "rdt-react-versions/dist/index.html": "5b5422d9-e530-4d1f-a65e-1228700c112c",
+  "playwright/breakpoints-05": "b6960dee-90e0-45dc-a021-8189a171e521"
 }

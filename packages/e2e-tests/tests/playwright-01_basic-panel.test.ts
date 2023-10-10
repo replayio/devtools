@@ -1,6 +1,5 @@
 import { openDevToolsTab, startTest } from "../helpers";
 import {
-  getErrorRows,
   getSelectedTestCase,
   getTestCaseSteps,
   getTestRecordingBackButton,
@@ -21,10 +20,11 @@ import {
 import { waitFor } from "../helpers/utils";
 import test, { expect } from "../testFixtureCloneRecording";
 
-test.use({ exampleKey: "flake/adding-spec.ts" });
+test.use({ exampleKey: "playwright/breakpoints-05" });
 
-test("cypress-01: Basic Test Suites panel functionality", async ({
+test("playwright-01: Basic Test Suites panel functionality", async ({
   pageWithMeta: { page, recordingId },
+  exampleKey,
 }) => {
   await startTest(page, recordingId);
   await openDevToolsTab(page);
@@ -45,10 +45,10 @@ test("cypress-01: Basic Test Suites panel functionality", async ({
     expect(initialRecordingTreesCount).toBeGreaterThanOrEqual(1);
   });
 
-  // has 9 tests
+  // has 1 test
   const rows = getTestRows(page);
   await waitFor(async () => {
-    await expect(rows).toHaveCount(9);
+    await expect(rows).toHaveCount(1);
   });
 
   const firstTest = rows.first();
@@ -58,12 +58,12 @@ test("cypress-01: Basic Test Suites panel functionality", async ({
   await firstTest.hover();
   await expect(chevron).toBeVisible();
 
-  // This recording has 8 passing, 1 failing, 0 skipped tests
+  // This recording has 1 passing, 0 failing, 0 skipped tests
   const passedCount = await getTestSuiteResultsPassedCount(page);
-  expect(passedCount).toBe(8);
+  expect(passedCount).toBe(1);
 
   const failedCount = await getTestSuiteResultsFailedCount(page);
-  expect(failedCount).toBe(1);
+  expect(failedCount).toBe(0);
 
   const skippedCount = await getTestSuiteResultsSkippedCount(page);
   expect(skippedCount).toBe(null);
@@ -75,10 +75,12 @@ test("cypress-01: Basic Test Suites panel functionality", async ({
 
   // Relative dates can change over time.
   // Check for either the "X units ago" text, or the literal date.
-  expect(await getTestSuiteDate(page).textContent()).toMatch(/ ago|(7\/14\/2023)/);
+  expect(await getTestSuiteDate(page).textContent()).toMatch(/ ago|(9\/22\/2023)/);
   expect(await getTestSuiteUser(page).textContent()).toMatch("ryanjduffy");
-  expect(await getTestSuiteBranch(page).textContent()).toMatch("main");
-  expect(await getTestSuiteDuration(page).textContent()).toMatch("0:12");
+  expect(await getTestSuiteBranch(page).textContent()).toMatch(
+    "ryan/playwright-plugin-annotations"
+  );
+  expect(await getTestSuiteDuration(page).textContent()).toMatch("0:32");
 
   // can open tests
   await firstTest.click();
@@ -96,7 +98,7 @@ test("cypress-01: Basic Test Suites panel functionality", async ({
   expect(await sections.nth(0).textContent()).toMatch(/test body/i);
 
   const steps = getTestCaseSteps(selectedRow);
-  await expect(steps).toHaveCount(20);
+  await expect(steps).toHaveCount(223);
 
   const backButton = getTestRecordingBackButton(page);
   await backButton.click();
@@ -108,13 +110,4 @@ test("cypress-01: Basic Test Suites panel functionality", async ({
     expect(secondRecordingTreesCount).toBeGreaterThanOrEqual(1);
     expect(initialRecordingTreesCount).toBe(secondRecordingTreesCount);
   });
-
-  // Can show error rows
-  await rows.filter({ hasText: "should fail on this test" }).first().click();
-  const errorRows = getErrorRows(page);
-  await waitFor(async () => {
-    expect(await errorRows.count()).toBe(1);
-  });
-  const text = await errorRows.first().textContent();
-  expect(text).toMatch(/Sorry, something went wrong/);
 });
