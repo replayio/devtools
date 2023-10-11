@@ -49,7 +49,7 @@ export default function Panel() {
 
   // We only want to cache the test event details when the focus window has been updated
   // to match the range of the test recording.  Experimentation shows there can be some renders
-  // where the focus range and test range ar mismatched, so try to avoid caching in those cases.
+  // where the focus range and test range are mismatched, so try to avoid caching in those cases.
   const enableCache =
     focusWindow &&
     testRecording.timeStampedPointRange?.begin &&
@@ -58,22 +58,6 @@ export default function Panel() {
       testRecording.timeStampedPointRange.begin.point,
       testRecording.timeStampedPointRange.begin.point
     );
-  console.log(
-    "Panel focus window: ",
-    {
-      fbp: focusWindow?.begin.point,
-      fbt: focusWindow?.begin.time,
-      fep: focusWindow?.end.point,
-      fet: focusWindow?.end.time,
-      enableCache,
-    },
-    {
-      tbp: testRecording.timeStampedPointRange?.begin.point,
-      tbt: testRecording.timeStampedPointRange?.begin.time,
-      tep: testRecording.timeStampedPointRange?.end.point,
-      tet: testRecording.timeStampedPointRange?.end.time,
-    }
-  );
 
   useImperativeIntervalCacheValues(
     testEventDetailsIntervalCache,

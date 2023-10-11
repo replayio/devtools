@@ -43,12 +43,18 @@ export const testEventDetailsIntervalCache = createFocusIntervalCacheForExecutio
   debugLabel: "TestEventDetailsCache3",
   getPointForValue: (event: TestEventDetailsEntry) => event.point,
   getKey(client, testRecording, enabled) {
+    // It's _possible_ that all these values are unnecessary?
+    // In theory the entire recording is one big interval.
+    // Generating a separate key per test actually makes these
+    // entirely different datasets. But, we only show one test
+    // at a time, and there's never a case where we'd try to fetch
+    // all details for all tests simultaneously, so there's no
+    // sense of "fetch this smaller segment" or "reuse" here.
     const key = `${testRecording.id}-${testRecording.timeStampedPointRange?.begin.point}-${testRecording.timeStampedPointRange?.end.point}-${enabled}`;
-    // console.log("Event details key: ", key);
+
     return key;
   },
   async load(begin, end, replayClient, testRecording, enabled, options) {
-    console.log("Test event details load: ", begin, end, enabled);
     if (!enabled) {
       return options.returnAsPartial([]);
     }
@@ -86,9 +92,6 @@ export const testEventDetailsIntervalCache = createFocusIntervalCacheForExecutio
     const variableNameWithConsoleProps = `${stepDetailsVariable}.consoleProps`;
     const testResultPoints = filteredEvents.map(e => e.data.timeStampedPoints.result!);
 
-    const readPointsTimeLabel = `Fetching all points and results (${begin}-${end})`;
-    console.time(readPointsTimeLabel);
-
     const sources = await sourcesByIdCache.readAsync(replayClient);
 
     const evalResults: RunEvaluationResult[] = [];
@@ -116,7 +119,6 @@ export const testEventDetailsIntervalCache = createFocusIntervalCacheForExecutio
         }
       );
     } catch (err) {
-      console.error("Caught interval cache error, returning partial points: ", err);
       // Handle errors here by telling the cache "nothing got loaded".
       // This will cause the cache to retry the load if requested later.
       // Not 100% sure that _both_ the `.abort()` and `returnAsPartial()` are
@@ -125,8 +127,6 @@ export const testEventDetailsIntervalCache = createFocusIntervalCacheForExecutio
       testEventDetailsIntervalCache.abort(replayClient, testRecording, enabled);
       return options.returnAsPartial([]);
     }
-
-    console.timeEnd(readPointsTimeLabel);
 
     evalResults.sort((a, b) => compareExecutionPoints(a.point.point, b.point.point));
 
@@ -148,7 +148,6 @@ export const testEventDetailsIntervalCache = createFocusIntervalCacheForExecutio
           // We're going to reformat this to filter out a couple properties and displayed values
           const sanitized = cloneDeep(consoleProps);
 
-          // console.log("Console props: ", timeStampedPoint.point, sanitized);
           if (sanitized?.preview?.properties) {
             sanitized.preview.properties = sanitized.preview.properties.filter(
               ({ name }) => name !== "Snapshot"
@@ -197,7 +196,7 @@ export const testEventDetailsResultsCache: ExternallyManagedCache<
   [executionPoint: ExecutionPoint],
   TestEventDetailsEntry
 > = createExternallyManagedCache({
-  debugLabel: `TestEventDetails3ResultsCache`,
+  debugLabel: `TestEventDetailsResultsCache`,
   getKey: ([executionPoint, ...params]) => {
     return executionPoint;
   },
@@ -207,12 +206,15 @@ export const testEventDomNodeCache: ExternallyManagedCache<
   [executionPoint: ExecutionPoint],
   TestEventDomNodeDetails
 > = createExternallyManagedCache({
-  debugLabel: `TestEventDetails3ResultsCache`,
+  debugLabel: `TestEventDetailsResultsCache`,
   getKey: ([executionPoint, ...params]) => {
     return executionPoint;
   },
 });
 
+// Pre-fetch the DOM node for this step, if possible.
+// Note this runs somewhat in the background and is not awaited,
+// and mutates the `testEventDomNodeCache` with the results.
 async function fetchAndCachePossibleDomNode(
   replayClient: ReplayClientInterface,
   sanitized: ProtocolObject,
@@ -247,7 +249,6 @@ async function fetchAndCachePossibleDomNode(
 
         const yieldedDomNodes = await Promise.all(
           yieldedPropsWithObjects.map(async (prop: Property) => {
-            // console.log("Fetching element preview: ", prop);
             const cachedPropObject = await objectCache.readAsync(
               replayClient,
               pauseId,
