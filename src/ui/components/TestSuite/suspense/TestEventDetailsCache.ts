@@ -1,28 +1,20 @@
 import {
   ExecutionPoint,
-  Frame,
   PauseId,
   Property,
   Object as ProtocolObject,
+  RunEvaluationResult,
   TimeStampedPoint,
 } from "@replayio/protocol";
 import cloneDeep from "lodash/cloneDeep";
-import {
-  Cache,
-  ExternallyManagedCache,
-  IntervalCache,
-  createCache,
-  createExternallyManagedCache,
-} from "suspense";
+import { ExternallyManagedCache, createExternallyManagedCache } from "suspense";
 
 import { NodeInfo } from "devtools/client/inspector/markup/reducers/markup";
-import { createAnalysisCache } from "replay-next/src/suspense/AnalysisCache";
 import { createFocusIntervalCacheForExecutionPoints } from "replay-next/src/suspense/FocusIntervalCache";
-import { framesCache } from "replay-next/src/suspense/FrameCache";
-import { hitPointsCache } from "replay-next/src/suspense/HitPointsCache";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
-import { pauseEvaluationsCache, pauseIdCache } from "replay-next/src/suspense/PauseCache";
-import { isExecutionPointsWithinRange } from "replay-next/src/utils/time";
+import { cachePauseData, setPointAndTimeForPauseId } from "replay-next/src/suspense/PauseCache";
+import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
+import { compareExecutionPoints, isExecutionPointsWithinRange } from "replay-next/src/utils/time";
 import { ReplayClientInterface } from "shared/client/types";
 import {
   TestRecording,
@@ -42,28 +34,6 @@ export type TestEventDomNodeDetails = TimeStampedPoint & {
   domNode: NodeInfo | null;
 };
 
-// We use an analysis cache for the internal implementation,
-// because that already knows how to call `runEvaluation` with an expression,
-// run that at multiple points, save the pause IDs for each point,
-// and cache the results.
-export const testEventDetailsAnalysisCache = createAnalysisCache<
-  TimeStampedPoint,
-  [timeStampedPoints: TimeStampedPoint[], variable: string]
->(
-  "TestEventDetailsCache2Internal",
-  (timeStampedPoint, variable) => `${variable}`,
-  (client, begin, end, timeStampedPoints, variable) => timeStampedPoints,
-  (client, points, timeStampedPoints, variable) => ({
-    selector: {
-      kind: "points",
-      points: points.map(p => p.point),
-    },
-    expression: variable,
-    frameIndex: 1,
-  }),
-  point => point
-);
-
 // The interval cache is used by `<Panel>` to fetch all of the step details and DOM node data for a single test.
 // `<Panel>` will kick this off when it renders, and then the cache will fetch all of the data in the background.
 export const testEventDetailsIntervalCache = createFocusIntervalCacheForExecutionPoints<
@@ -72,9 +42,15 @@ export const testEventDetailsIntervalCache = createFocusIntervalCacheForExecutio
 >({
   debugLabel: "TestEventDetailsCache3",
   getPointForValue: (event: TestEventDetailsEntry) => event.point,
-  async load(begin, end, replayClient, testRecording, enabled) {
+  getKey(client, testRecording, enabled) {
+    const key = `${testRecording.id}-${testRecording.timeStampedPointRange?.begin.point}-${testRecording.timeStampedPointRange?.end.point}-${enabled}`;
+    // console.log("Event details key: ", key);
+    return key;
+  },
+  async load(begin, end, replayClient, testRecording, enabled, options) {
+    console.log("Test event details load: ", begin, end, enabled);
     if (!enabled) {
-      return [];
+      return options.returnAsPartial([]);
     }
 
     // This should be the same ordering used by `<Panel>` to render the steps.
@@ -112,38 +88,53 @@ export const testEventDetailsIntervalCache = createFocusIntervalCacheForExecutio
 
     const readPointsTimeLabel = `Fetching all points and results (${begin}-${end})`;
     console.time(readPointsTimeLabel);
-    await testEventDetailsAnalysisCache.pointsIntervalCache.readAsync(
-      BigInt(begin),
-      BigInt(end),
-      replayClient,
-      testResultPoints,
-      variableNameWithConsoleProps
-    );
+
+    const sources = await sourcesByIdCache.readAsync(replayClient);
+
+    const evalResults: RunEvaluationResult[] = [];
+    try {
+      await replayClient.runEvaluation(
+        {
+          selector: {
+            kind: "points",
+            points: testResultPoints.map(p => p.point),
+          },
+          expression: variableNameWithConsoleProps,
+          frameIndex: 1,
+          fullPropertyPreview: true,
+          limits: { begin, end },
+        },
+        results => {
+          // This logic copy-pasted from AnalysisCache.ts
+          for (const result of results) {
+            // Immediately cache pause ID and data so we have it available for reuse
+            setPointAndTimeForPauseId(result.pauseId, result.point);
+            cachePauseData(replayClient, sources, result.pauseId, result.data);
+          }
+          // Collect them all so we process them in a single batch
+          evalResults.push(...results);
+        }
+      );
+    } catch (err) {
+      console.error("Caught interval cache error, returning partial points: ", err);
+      // Handle errors here by telling the cache "nothing got loaded".
+      // This will cause the cache to retry the load if requested later.
+      // Not 100% sure that _both_ the `.abort()` and `returnAsPartial()` are
+      // needed here, but it didn't work with _just_ `returnAsPartial()` and
+      // we need `.load()` to return an array for TS to be happy.
+      testEventDetailsIntervalCache.abort(replayClient, testRecording, enabled);
+      return options.returnAsPartial([]);
+    }
+
     console.timeEnd(readPointsTimeLabel);
 
-    const readResultsTimeLabel = `Reading all results (${begin}-${end})`;
-    console.time(readResultsTimeLabel);
-    const allEvalResults = await Promise.all(
-      testResultPoints.map(async timeStampedPoint => {
-        return await testEventDetailsAnalysisCache.resultsCache.readAsync(
-          timeStampedPoint.point,
-          // I _think_ we don't need or care about this array to read one value
-          [],
-          variableNameWithConsoleProps
-        );
-      })
-    );
-    console.timeEnd(readResultsTimeLabel);
-
-    const processedLabel = `Processing all results (${begin}-${end})`;
-    console.time(processedLabel);
+    evalResults.sort((a, b) => compareExecutionPoints(a.point.point, b.point.point));
 
     // We need to reformat the raw analysis data to extract details on the "step details" object.
     const processedResults: TestEventDetailsEntry[] = await Promise.all(
-      allEvalResults.map(async result => {
-        const { pauseId, point, time } = result;
-        const timeStampedPoint = { point, time };
-        const [consolePropsValue] = result.values;
+      evalResults.map(async result => {
+        const { pauseId, point: timeStampedPoint, returned } = result;
+        const consolePropsValue = returned;
 
         if (consolePropsValue?.object) {
           // This should already be cached because of `runEvaluation` returned nested previews.
@@ -191,19 +182,18 @@ export const testEventDetailsIntervalCache = createFocusIntervalCacheForExecutio
         };
       })
     );
-    console.timeEnd(processedLabel);
 
     for (const processedResult of processedResults) {
       // Store each result in the externally managed cache, to make it easy for the UI
       // to look up a single cache entry by point without needing all the other arguments.
-      testEventDetailsCache3ResultsCache.cacheValue(processedResult, processedResult.point);
+      testEventDetailsResultsCache.cacheValue(processedResult, processedResult.point);
     }
 
     return processedResults;
   },
 });
 
-export const testEventDetailsCache3ResultsCache: ExternallyManagedCache<
+export const testEventDetailsResultsCache: ExternallyManagedCache<
   [executionPoint: ExecutionPoint],
   TestEventDetailsEntry
 > = createExternallyManagedCache({

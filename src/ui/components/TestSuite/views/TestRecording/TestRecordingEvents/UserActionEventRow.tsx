@@ -21,7 +21,7 @@ import { useJumpToSource } from "ui/components/TestSuite/hooks/useJumpToSource";
 import {
   TestEventDetailsEntry,
   TestEventDomNodeDetails,
-  testEventDetailsCache3ResultsCache,
+  testEventDetailsResultsCache,
   testEventDomNodeCache,
 } from "ui/components/TestSuite/suspense/TestEventDetailsCache";
 import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext";
@@ -206,7 +206,7 @@ function Badge({
   const client = useContext(ReplayClientContext);
 
   const { status, value } = useImperativeCacheValue(
-    testEventDetailsCache3ResultsCache as unknown as Cache<
+    testEventDetailsResultsCache as unknown as Cache<
       [executionPoint: ExecutionPoint],
       TestEventDetailsEntry
     >,

@@ -15,7 +15,7 @@ import {
 } from "shared/test-suites/RecordingTestMetadata";
 import {
   TestEventDetailsEntry,
-  testEventDetailsCache3ResultsCache,
+  testEventDetailsResultsCache,
 } from "ui/components/TestSuite/suspense/TestEventDetailsCache";
 import { TestSuiteCache } from "ui/components/TestSuite/suspense/TestSuiteCache";
 import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext";
@@ -76,7 +76,7 @@ function UserActionEventDetails({
   // );
 
   const { status, value } = useImperativeCacheValue(
-    testEventDetailsCache3ResultsCache as unknown as Cache<
+    testEventDetailsResultsCache as unknown as Cache<
       [executionPoint: ExecutionPoint],
       TestEventDetailsEntry
     >,

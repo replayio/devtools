@@ -10,6 +10,7 @@ import { useImperativeIntervalCacheValues } from "suspense";
 
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
+import { isExecutionPointsWithinRange } from "replay-next/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import {
   TestEvent,
@@ -46,13 +47,41 @@ export default function Panel() {
     committedValuesRef.current.testEvent = testEvent;
   });
 
+  // We only want to cache the test event details when the focus window has been updated
+  // to match the range of the test recording.  Experimentation shows there can be some renders
+  // where the focus range and test range ar mismatched, so try to avoid caching in those cases.
+  const enableCache =
+    focusWindow &&
+    testRecording.timeStampedPointRange?.begin &&
+    isExecutionPointsWithinRange(
+      focusWindow.begin.point,
+      testRecording.timeStampedPointRange.begin.point,
+      testRecording.timeStampedPointRange.begin.point
+    );
+  console.log(
+    "Panel focus window: ",
+    {
+      fbp: focusWindow?.begin.point,
+      fbt: focusWindow?.begin.time,
+      fep: focusWindow?.end.point,
+      fet: focusWindow?.end.time,
+      enableCache,
+    },
+    {
+      tbp: testRecording.timeStampedPointRange?.begin.point,
+      tbt: testRecording.timeStampedPointRange?.begin.time,
+      tep: testRecording.timeStampedPointRange?.end.point,
+      tet: testRecording.timeStampedPointRange?.end.time,
+    }
+  );
+
   useImperativeIntervalCacheValues(
     testEventDetailsIntervalCache,
     BigInt(focusWindow ? focusWindow.begin.point : "0"),
     BigInt(focusWindow ? focusWindow.end.point : "0"),
     replayClient,
     testRecording,
-    !!focusWindow
+    enableCache
   );
 
   // Select a test step and update the current time
