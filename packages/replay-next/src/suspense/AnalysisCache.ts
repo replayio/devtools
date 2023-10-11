@@ -102,8 +102,6 @@ export function createAnalysisCache<
               setPointAndTimeForPauseId(result.pauseId, result.point);
               cachePauseData(client, sources, result.pauseId, result.data);
 
-              console.log("Analysis result: ", result);
-
               let values: Value[] = [];
               if (result.exception) {
                 values.push(result.exception);

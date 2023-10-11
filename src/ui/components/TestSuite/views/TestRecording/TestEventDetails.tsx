@@ -1,11 +1,6 @@
 import { ExecutionPoint, TimeStampedPoint } from "@replayio/protocol";
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import {
-  Cache,
-  STATUS_PENDING,
-  useImperativeCacheValue,
-  useImperativeIntervalCacheValues,
-} from "suspense";
+import { Cache, STATUS_PENDING, useImperativeCacheValue } from "suspense";
 
 import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import PropertiesRenderer from "replay-next/components/inspector/PropertiesRenderer";
@@ -19,10 +14,7 @@ import {
   isUserActionTestEvent,
 } from "shared/test-suites/RecordingTestMetadata";
 import {
-  TestEventDetailsCache,
   TestEventDetailsEntry,
-  testEventDetailsCache2,
-  testEventDetailsCache3IntervalCache,
   testEventDetailsCache3ResultsCache,
 } from "ui/components/TestSuite/suspense/TestEventDetailsCache";
 import { TestSuiteCache } from "ui/components/TestSuite/suspense/TestSuiteCache";

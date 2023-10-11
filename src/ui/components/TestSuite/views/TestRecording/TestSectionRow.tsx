@@ -183,17 +183,16 @@ export function TestSectionRow({
       dispatch(setTimelineToTime(getTestEventTime(testEvent)));
 
       if (isUserActionTestEvent(testEvent)) {
-        const resultPoint = testEvent.data.timeStampedPoints.result ?? null;
-        console.log("Test row result point", resultPoint);
-        if (resultPoint) {
-          const firstDomNodeDetails = testEventDomNodeCache.getValueIfCached(resultPoint.point);
+        // We hope to have details on the relevant DOM node cached by now.
+        // If we do, go ahead and read that synchronously so we can highlight the node.
+        // Otherwise, nothing to do here.
+        const firstDomNodeDetails = testEventDomNodeCache.getValueIfCached(
+          testEvent.data.timeStampedPoints.result?.point ?? ""
+        );
 
-          console.log("First DOM node details: ", firstDomNodeDetails);
-          if (firstDomNodeDetails?.domNode?.isConnected) {
-            const { domNode, pauseId } = firstDomNodeDetails;
-            console.log("Highlighting DOM node: ", domNode, pauseId);
-            dispatch(highlightNodes([domNode.id], pauseId));
-          }
+        if (firstDomNodeDetails?.domNode?.isConnected) {
+          const { domNode, pauseId } = firstDomNodeDetails;
+          dispatch(highlightNodes([domNode.id], pauseId));
         }
       }
     }

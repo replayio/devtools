@@ -1,6 +1,6 @@
 import assert from "assert";
 import { ExecutionPoint, TimeStampedPoint } from "@replayio/protocol";
-import { Suspense, memo, useContext, useEffect, useMemo, useState } from "react";
+import { Suspense, memo, useContext, useMemo, useState } from "react";
 import { Cache, STATUS_PENDING, STATUS_RESOLVED, useImperativeCacheValue } from "suspense";
 
 import { getExecutionPoint } from "devtools/client/debugger/src/selectors";
@@ -19,10 +19,9 @@ import { seek } from "ui/actions/timeline";
 import { JumpToCodeButton, JumpToCodeStatus } from "ui/components/shared/JumpToCodeButton";
 import { useJumpToSource } from "ui/components/TestSuite/hooks/useJumpToSource";
 import {
-  TestEventDetailsCache,
   TestEventDetailsEntry,
   TestEventDomNodeDetails,
-  testEventDetailsCache2,
+  testEventDetailsCache3ResultsCache,
   testEventDomNodeCache,
 } from "ui/components/TestSuite/suspense/TestEventDetailsCache";
 import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext";
@@ -79,22 +78,6 @@ export default memo(function UserActionEventRow({
     >,
     userActionEvent.data.timeStampedPoints.result?.point ?? "0"
   );
-
-  // useEffect(() => {
-  //   console.log(
-  //     "Event row DOM node: ",
-  //     userActionEvent.data.timeStampedPoints.result?.point,
-  //     domNodeStatus,
-  //     domNode
-  //   );
-  // }, [userActionEvent, domNodeStatus, domNode]);
-
-  // const { status: hitPointStatus, value: resultData } = useImperativeCacheValue(
-  //   testEventDetailsCache2,
-  //   replayClient,
-  //   userActionEvent.data.timeStampedPoints.result,
-  //   userActionEvent.data.resultVariable
-  // );
 
   const [isHovered, setIsHovered] = useState(false);
 
@@ -196,11 +179,7 @@ export default memo(function UserActionEventRow({
       </div>
       {showBadge && (
         <Suspense fallback={<Loader />}>
-          <Badge
-            isSelected={isSelected}
-            timeStampedPoint={resultTimeStampedPoint}
-            variable={resultVariable}
-          />
+          <Badge isSelected={isSelected} timeStampedPoint={resultTimeStampedPoint} />
         </Suspense>
       )}
       {showJumpToCode && jumpToCodeAnnotation && (
@@ -220,20 +199,20 @@ export default memo(function UserActionEventRow({
 function Badge({
   isSelected,
   timeStampedPoint,
-  variable,
 }: {
   isSelected: boolean;
   timeStampedPoint: TimeStampedPoint;
-  variable: string;
 }) {
   const client = useContext(ReplayClientContext);
 
-  const { value } = useImperativeCacheValue(
-    testEventDetailsCache2,
-    client,
-    timeStampedPoint,
-    variable
+  const { status, value } = useImperativeCacheValue(
+    testEventDetailsCache3ResultsCache as unknown as Cache<
+      [executionPoint: ExecutionPoint],
+      TestEventDetailsEntry
+    >,
+    timeStampedPoint.point
   );
+
   if (value?.count === null) {
     return null;
   }

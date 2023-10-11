@@ -24,7 +24,7 @@ import TestEventDetails from "ui/components/TestSuite/views/TestRecording/TestEv
 import TestSection from "ui/components/TestSuite/views/TestRecording/TestSection";
 import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext";
 
-import { testEventDetailsCache3IntervalCache } from "../../suspense/TestEventDetailsCache";
+import { testEventDetailsIntervalCache } from "../../suspense/TestEventDetailsCache";
 import styles from "./Panel.module.css";
 
 export default function Panel() {
@@ -47,7 +47,7 @@ export default function Panel() {
   });
 
   useImperativeIntervalCacheValues(
-    testEventDetailsCache3IntervalCache,
+    testEventDetailsIntervalCache,
     BigInt(focusWindow ? focusWindow.begin.point : "0"),
     BigInt(focusWindow ? focusWindow.end.point : "0"),
     replayClient,
