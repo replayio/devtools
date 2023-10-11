@@ -78,6 +78,9 @@ export function createAnalysisCache<
       const points = await findPoints(client, begin, end, ...params);
       onPointsReceived?.(points);
 
+      if (points.length === 0) {
+        return [];
+      }
       if (points.length > MAX_POINTS_TO_RUN_EVALUATION) {
         throw commandError("Too many points to run evaluation", ProtocolError.TooManyPoints);
       }
