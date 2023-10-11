@@ -11,6 +11,21 @@ export interface GetTestsRunsForWorkspace_node_Recording {
   __typename: "Recording";
 }
 
+export interface GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node_tests {
+  __typename: "TestRunTest";
+  id: string;
+  testId: string;
+  index: number;
+  attempt: number;
+  title: string;
+  scope: string[];
+  sourcePath: string;
+  result: string;
+  error: string | null;
+  durationMs: number;
+  recordingId: string | null;
+}
+
 export interface GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node_results_counts {
   __typename: "TestRunStats";
   failed: number;
@@ -42,6 +57,7 @@ export interface GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node {
   id: string;
   date: any;
   mode: string | null;
+  tests: GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node_tests[];
   results: GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node_results;
   source: GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node_source | null;
 }
@@ -62,7 +78,9 @@ export interface GetTestsRunsForWorkspace_node_Workspace {
   testRuns: GetTestsRunsForWorkspace_node_Workspace_testRuns | null;
 }
 
-export type GetTestsRunsForWorkspace_node = GetTestsRunsForWorkspace_node_Recording | GetTestsRunsForWorkspace_node_Workspace;
+export type GetTestsRunsForWorkspace_node =
+  | GetTestsRunsForWorkspace_node_Recording
+  | GetTestsRunsForWorkspace_node_Workspace;
 
 export interface GetTestsRunsForWorkspace {
   node: GetTestsRunsForWorkspace_node | null;

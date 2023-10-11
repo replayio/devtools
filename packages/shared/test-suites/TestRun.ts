@@ -15,6 +15,20 @@ export type SourceMetadata = {
   user: string | null;
 };
 
+export type TestRunTest = {
+  id: string;
+  testId: string;
+  index: number;
+  attempt: number;
+  title: string;
+  scope: string[];
+  sourcePath: string;
+  result: string;
+  error: string | null;
+  durationMs: number;
+  recordingId: string | null;
+};
+
 export type TestRun = {
   date: string;
   id: string;
@@ -27,6 +41,7 @@ export type TestRun = {
     };
   };
   source: SourceMetadata | null;
+  tests: TestRunTest[];
 };
 
 export function processTestRun(testRun: TestRunsForWorkspaceGraphQL): TestRun {
