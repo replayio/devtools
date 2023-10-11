@@ -139,7 +139,7 @@ test("cypress-03: Test Step interactions", async ({ pageWithMeta: { page, record
     expect(detailsPaneContents["Typed"]).toMatch("buy some cheese");
   });
 
-  await steps.nth(7).click();
+  await steps.nth(8).click();
   await waitFor(async () => {
     const detailsPane = getUserActionEventDetails(page);
     const detailsPaneContents = await getDetailsPaneContents(detailsPane);
@@ -147,7 +147,7 @@ test("cypress-03: Test Step interactions", async ({ pageWithMeta: { page, record
     expect(detailsPaneContents["Typed"]).toMatch("{enter}");
   });
 
-  await steps.nth(8).click();
+  await steps.nth(9).click();
   await waitFor(async () => {
     const detailsPane = getUserActionEventDetails(page);
     const detailsPaneContents = await getDetailsPaneContents(detailsPane);
