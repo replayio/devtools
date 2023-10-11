@@ -1,4 +1,5 @@
 import { GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node as TestRunsForWorkspaceGraphQL } from "shared/graphql/generated/GetTestsRunsForWorkspace";
+import { Recording } from "shared/graphql/types";
 
 export type Mode = "diagnostics" | "record" | "record-on-retry" | "stress";
 
@@ -27,6 +28,7 @@ export type TestRunTest = {
   error: string | null;
   durationMs: number;
   recordingId: string | null;
+  recordings: Recording[];
 };
 
 export type TestRun = {
@@ -45,12 +47,14 @@ export type TestRun = {
 };
 
 export function processTestRun(testRun: TestRunsForWorkspaceGraphQL): TestRun {
-  const { mode, results, ...rest } = testRun;
+  const { mode, results, tests, ...rest } = testRun;
 
   return {
     ...rest,
     mode: mode as Mode | null,
     results,
+    // TODO(ryanjduffy) temp
+    tests: tests.map(t => ({ ...t, recordings: [] })),
   };
 }
 

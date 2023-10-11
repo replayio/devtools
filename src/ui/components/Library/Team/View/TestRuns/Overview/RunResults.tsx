@@ -17,7 +17,7 @@ import {
   useFileNameTree,
 } from "ui/components/Library/Team/View/TestRuns/Overview/useFileNameTree";
 import { TestRunsContext } from "ui/components/Library/Team/View/TestRuns/TestRunsContextRoot";
-import { RecordingGroup, testPassed } from "ui/utils/testRuns";
+import { TestGroup, testPassed } from "ui/utils/testRuns";
 
 import { TestResultListItem } from "./TestResultListItem";
 import styles from "../../../../Library.module.css";
@@ -86,7 +86,7 @@ function TestStatusGroup({
 }: {
   filterByText: string;
   label: string;
-  recordingGroup: RecordingGroup;
+  recordingGroup: TestGroup;
 }) {
   const [expanded, setExpanded] = useState(true);
 
@@ -137,7 +137,7 @@ const FileNodeRenderer = memo(function FileNodeRenderer({
   label: string;
   fileNode: FileNode;
 }) {
-  const { name, recordings } = fileNode;
+  const { name, tests } = fileNode;
 
   const [expanded, setExpanded] = useState(true);
 
@@ -156,19 +156,22 @@ const FileNodeRenderer = memo(function FileNodeRenderer({
       >
         <Icon className="h-5 w-5 shrink-0" type="file" />
         <div className="truncate">{name}</div>
-        {!expanded && <div className="text-xs text-bodySubColor">({recordings.length} tests)</div>}
+        {!expanded && <div className="text-xs text-bodySubColor">({tests.length} tests)</div>}
       </div>
       <Offscreen mode={expanded ? "visible" : "hidden"}>
-        {recordings.map(recording => (
-          <TestResultListItem
-            depth={depth + 1}
-            filterByText={filterByText}
-            key={recording.id}
-            label={testPassed(recording) ? "Passed" : label}
-            recording={recording}
-            secondaryBadgeCount={/* index > 0 ? index + 1 : null */ null}
-          />
-        ))}
+        {tests.flatMap(test =>
+          test.recordings.map(recording => (
+            <TestResultListItem
+              depth={depth + 1}
+              filterByText={filterByText}
+              key={test.recordingId}
+              label={test.result === "passed" ? "Passed" : label}
+              recording={recording}
+              test={test}
+              secondaryBadgeCount={/* index > 0 ? index + 1 : null */ null}
+            />
+          ))
+        )}
       </Offscreen>
     </>
   );

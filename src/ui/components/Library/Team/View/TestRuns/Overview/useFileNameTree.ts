@@ -3,16 +3,17 @@ import { useMemo } from "react";
 
 import { insert, insertString } from "replay-next/src/utils/array";
 import { Recording } from "shared/graphql/types";
-import { RecordingGroup } from "ui/utils/testRuns";
+import { TestRunTest } from "shared/test-suites/TestRun";
+import { TestGroup } from "ui/utils/testRuns";
 
-export function useFileNameTree(recordingGroup: RecordingGroup, filterByText: string = "") {
-  const { fileNameToRecordings } = recordingGroup;
+export function useFileNameTree(recordingGroup: TestGroup, filterByText: string = "") {
+  const { fileNameToTests } = recordingGroup;
 
   filterByText = filterByText.toLowerCase();
 
   const tree = useMemo<Tree>(() => {
     const sortedFileNames: string[] = [];
-    for (let fileName in fileNameToRecordings) {
+    for (let fileName in fileNameToTests) {
       if (filterByText === "" || fileName.toLowerCase().includes(filterByText)) {
         insertString(sortedFileNames, fileName);
       }
@@ -27,7 +28,7 @@ export function useFileNameTree(recordingGroup: RecordingGroup, filterByText: st
     };
 
     for (let fileName of sortedFileNames) {
-      const recordings = fileNameToRecordings[fileName];
+      const tests = fileNameToTests[fileName];
 
       const parts = fileName.split("/");
 
@@ -69,16 +70,16 @@ export function useFileNameTree(recordingGroup: RecordingGroup, filterByText: st
       } else {
         node = {
           name: part,
-          recordings: [],
+          tests: [],
           type: "file",
         };
 
         insert(currentNode.children, node, (a, b) => a.name.localeCompare(b.name));
       }
-      node.recordings.push(...recordings);
+      node.tests.push(...tests);
 
       ancestors.forEach(ancestor => {
-        ancestor.nestedRecordingCount += recordings.length;
+        ancestor.nestedRecordingCount += tests.length;
       });
     }
 
@@ -117,7 +118,7 @@ export function useFileNameTree(recordingGroup: RecordingGroup, filterByText: st
     }
 
     return root;
-  }, [fileNameToRecordings, filterByText]);
+  }, [fileNameToTests, filterByText]);
 
   return tree;
 }
@@ -135,7 +136,7 @@ export type PathNode = {
 
 export type FileNode = {
   name: string;
-  recordings: Recording[];
+  tests: TestRunTest[];
   type: "file";
 };
 

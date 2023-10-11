@@ -7,6 +7,7 @@ import {
   isGroupedTestCasesV1,
   isGroupedTestCasesV2,
 } from "shared/test-suites/RecordingTestMetadata";
+import { TestRunTest } from "shared/test-suites/TestRun";
 import HighlightedText from "ui/components/Library/Team/View/TestRuns/HighlightedText";
 
 import styles from "../../../../Library.module.css";
@@ -17,35 +18,21 @@ export function TestResultListItem({
   label,
   recording,
   secondaryBadgeCount,
+  test,
 }: {
   depth: number;
   filterByText: string;
   label: string;
   recording: Recording;
   secondaryBadgeCount: number | null;
+  test: TestRunTest;
 }) {
-  const { comments, metadata, isProcessed } = recording;
+  const { comments, isProcessed, id: recordingId } = recording;
+  const { sourcePath, title } = test;
 
   const { apiKey, e2e } = useRouter().query;
 
   const numComments = comments?.length ?? 0;
-
-  let filePath = "";
-  let title = "";
-
-  const testMetadata = metadata?.test;
-  if (testMetadata != null) {
-    if (isGroupedTestCasesV1(testMetadata)) {
-      filePath = testMetadata.path?.[2] ?? "";
-      title = testMetadata.title;
-    } else if (isGroupedTestCasesV2(testMetadata)) {
-      filePath = testMetadata.source.path;
-      title = testMetadata.source.title || "";
-    } else {
-      filePath = testMetadata.source.filePath;
-      title = testMetadata.source.title || "";
-    }
-  }
 
   label = label.toLowerCase();
 
@@ -67,7 +54,7 @@ export function TestResultListItem({
 
   return (
     <a
-      href={`/recording/${recording.id}?e2e=${e2e ?? ""}&apiKey=${apiKey ?? ""}`}
+      href={`/recording/${recordingId}?e2e=${e2e ?? ""}&apiKey=${apiKey ?? ""}`}
       className={`${styles.recordingLink} ${styles.libraryRow}`}
       data-test-id="TestRunResultsListItem"
       data-test-status={label}
@@ -90,9 +77,9 @@ export function TestResultListItem({
       </div>
       <div className={styles.fileInfo}>
         <div className={styles.title}>{title || "Test"}</div>
-        {filePath && (
+        {sourcePath && (
           <div className={styles.filePath}>
-            <HighlightedText haystack={filePath} needle={filterByText} />
+            <HighlightedText haystack={sourcePath} needle={filterByText} />
           </div>
         )}
       </div>

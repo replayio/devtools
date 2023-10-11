@@ -27,7 +27,6 @@ export interface GetTestsRunRecordings_node_Workspace_testRuns_edges_node_result
   duration: number | null;
   isProcessed: boolean;
   createdAt: any;
-  metadata: any | null;
   comments: GetTestsRunRecordings_node_Workspace_testRuns_edges_node_results_recordings_comments[];
 }
 
@@ -57,7 +56,9 @@ export interface GetTestsRunRecordings_node_Workspace {
   testRuns: GetTestsRunRecordings_node_Workspace_testRuns | null;
 }
 
-export type GetTestsRunRecordings_node = GetTestsRunRecordings_node_Recording | GetTestsRunRecordings_node_Workspace;
+export type GetTestsRunRecordings_node =
+  | GetTestsRunRecordings_node_Recording
+  | GetTestsRunRecordings_node_Workspace;
 
 export interface GetTestsRunRecordings {
   node: GetTestsRunRecordings_node | null;
