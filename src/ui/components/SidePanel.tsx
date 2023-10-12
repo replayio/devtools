@@ -179,9 +179,7 @@ export default function SidePanel() {
         {selectedPrimaryPanel === "cypress" && <TestSuitePanel />}
         {selectedPrimaryPanel === "protocol" && <ProtocolViewer />}
         {selectedPrimaryPanel === "search" && <SearchFilesReduxAdapter />}
-        <LazyOffscreen mode={selectedPrimaryPanel === "react" ? "visible" : "hidden"}>
-          <ReactPanel />
-        </LazyOffscreen>
+        {selectedPrimaryPanel === "react" && <ReactPanel />}
       </div>
     </div>
   );
