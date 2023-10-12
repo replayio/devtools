@@ -43,20 +43,13 @@ export const testEventDetailsIntervalCache = createFocusIntervalCacheForExecutio
   debugLabel: "TestEventDetailsCache3",
   getPointForValue: (event: TestEventDetailsEntry) => event.point,
   getKey(client, testRecording, enabled) {
-    // It's _possible_ that all these values are unnecessary?
-    // In theory the entire recording is one big interval.
-    // Generating a separate key per test actually makes these
-    // entirely different datasets. But, we only show one test
-    // at a time, and there's never a case where we'd try to fetch
-    // all details for all tests simultaneously, so there's no
-    // sense of "fetch this smaller segment" or "reuse" here.
-    const key = `${testRecording.id}-${testRecording.timeStampedPointRange?.begin.point}-${testRecording.timeStampedPointRange?.end.point}-${enabled}`;
+    const key = `${testRecording.id}-${enabled}`;
 
     return key;
   },
   async load(begin, end, replayClient, testRecording, enabled, options) {
     if (!enabled) {
-      return options.returnAsPartial([]);
+      return [];
     }
 
     // This should be the same ordering used by `<Panel>` to render the steps.
@@ -95,38 +88,31 @@ export const testEventDetailsIntervalCache = createFocusIntervalCacheForExecutio
     const sources = await sourcesByIdCache.readAsync(replayClient);
 
     const evalResults: RunEvaluationResult[] = [];
-    try {
-      await replayClient.runEvaluation(
-        {
-          selector: {
-            kind: "points",
-            points: testResultPoints.map(p => p.point),
-          },
-          expression: variableNameWithConsoleProps,
-          frameIndex: 1,
-          fullPropertyPreview: true,
-          limits: { begin, end },
+
+    // Any focus range errors here will bubble up to the parent focus cache,
+    // which will retry the load if needed later.
+    await replayClient.runEvaluation(
+      {
+        selector: {
+          kind: "points",
+          points: testResultPoints.map(p => p.point),
         },
-        results => {
-          // This logic copy-pasted from AnalysisCache.ts
-          for (const result of results) {
-            // Immediately cache pause ID and data so we have it available for reuse
-            setPointAndTimeForPauseId(result.pauseId, result.point);
-            cachePauseData(replayClient, sources, result.pauseId, result.data);
-          }
-          // Collect them all so we process them in a single batch
-          evalResults.push(...results);
+        expression: variableNameWithConsoleProps,
+        frameIndex: 1,
+        fullPropertyPreview: true,
+        limits: { begin, end },
+      },
+      results => {
+        // This logic copy-pasted from AnalysisCache.ts
+        for (const result of results) {
+          // Immediately cache pause ID and data so we have it available for reuse
+          setPointAndTimeForPauseId(result.pauseId, result.point);
+          cachePauseData(replayClient, sources, result.pauseId, result.data);
         }
-      );
-    } catch (err) {
-      // Handle errors here by telling the cache "nothing got loaded".
-      // This will cause the cache to retry the load if requested later.
-      // Not 100% sure that _both_ the `.abort()` and `returnAsPartial()` are
-      // needed here, but it didn't work with _just_ `returnAsPartial()` and
-      // we need `.load()` to return an array for TS to be happy.
-      testEventDetailsIntervalCache.abort(replayClient, testRecording, enabled);
-      return options.returnAsPartial([]);
-    }
+        // Collect them all so we process them in a single batch
+        evalResults.push(...results);
+      }
+    );
 
     evalResults.sort((a, b) => compareExecutionPoints(a.point.point, b.point.point));
 
@@ -192,6 +178,9 @@ export const testEventDetailsIntervalCache = createFocusIntervalCacheForExecutio
   },
 });
 
+// We use externally managed caches for the step details and DOM node data
+// to make it easy for the Details and StepRow components to look up the right
+// item via just the execution point, without needing any of the other args.
 export const testEventDetailsResultsCache: ExternallyManagedCache<
   [executionPoint: ExecutionPoint],
   TestEventDetailsEntry
