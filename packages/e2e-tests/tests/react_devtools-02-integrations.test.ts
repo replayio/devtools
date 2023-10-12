@@ -9,7 +9,7 @@ import {
   openReactDevtoolsPanel,
 } from "../helpers/react-devtools-panel";
 import { getSelectedLineNumber, waitForSelectedSource } from "../helpers/source-panel";
-import { debugPrint, getByTestName, waitFor } from "../helpers/utils";
+import { debugPrint, getByTestNameNoSpace, waitFor } from "../helpers/utils";
 import test, { expect } from "../testFixtureCloneRecording";
 
 // Why is this even getting confused as an API key?
@@ -142,9 +142,9 @@ test("react_devtools 02: RDT integrations (Chromium)", async ({
   }
 
   // Test "Jump to Component Source" behavior
-  const componentSearchInput = getByTestName(page, "ComponentSearchInput-Input");
-  const nextSearchResultButton = getByTestName(page, "ComponentSearchInput-NextButton");
-  const resetSearchButton = getByTestName(page, "ComponentSearchInput-ResetButton");
+  const componentSearchInput = getByTestNameNoSpace(page, "ComponentSearchInput-Input");
+  const nextSearchResultButton = getByTestNameNoSpace(page, "ComponentSearchInput-NextButton");
+  const resetSearchButton = getByTestNameNoSpace(page, "ComponentSearchInput-ResetButton");
 
   debugPrint(page, `Checking "Jump to Component Source" for class component <SourcesTree>`);
   await componentSearchInput.focus();
@@ -156,7 +156,7 @@ test("react_devtools 02: RDT integrations (Chromium)", async ({
   const sourcesTreeName = await getComponentName(selectedSourcesTreeComponent);
   expect(sourcesTreeName).toBe("SourcesTree");
 
-  const inspectedElementPanel = getByTestName(page, "InspectedElement-Title");
+  const inspectedElementPanel = getByTestNameNoSpace(page, "InspectedElement-Title");
   // Two buttons, "inspect DOM node" and "view component source". neither has a label or text.
   const viewComponentSourceButton = inspectedElementPanel.getByRole("button").nth(1);
   await viewComponentSourceButton.click();

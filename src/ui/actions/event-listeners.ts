@@ -12,7 +12,7 @@ import {
   FormattedEventListener,
   FunctionWithPreview,
   NodeWithPreview,
-  formatEventListener,
+  formatFunctionDetailsFromLocation,
 } from "./eventListeners/eventListenerUtils";
 import { UIThunkAction } from "./index";
 
@@ -59,11 +59,10 @@ export function getNodeEventListeners(
           "canOverflow"
         ) as FunctionWithPreview;
 
-        return formatEventListener(
+        return formatFunctionDetailsFromLocation(
           replayClient,
           listener.type,
-          listenerHandler.preview,
-          state.sources
+          listenerHandler.preview.functionLocation
         );
       })
     );
@@ -135,11 +134,10 @@ export function getNodeEventListeners(
             .filter(obj => obj.value.className === "Function")
             .map(obj => {
               // Add an entry like `{name: "onClick", location, locationUrl}
-              return formatEventListener(
+              return formatFunctionDetailsFromLocation(
                 replayClient,
                 obj.name,
-                obj.value.preview,
-                state.sources,
+                obj.value.preview.functionLocation,
                 // We're only finding React-specific event handlers atm
                 "react"
               );

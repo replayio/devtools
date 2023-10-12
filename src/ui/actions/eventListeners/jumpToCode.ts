@@ -1,4 +1,5 @@
 import {
+  ClassOutline,
   ExecutionPoint,
   FunctionOutline,
   Location,
@@ -25,7 +26,7 @@ import { ReplayClientInterface } from "shared/client/types";
 import type { UIThunkAction } from "ui/actions";
 import { InteractionEventKind } from "ui/actions/eventListeners/constants";
 import {
-  formatEventListener,
+  formatFunctionDetailsFromLocation,
   isFunctionPreview,
   shouldIgnoreEventFromSource,
 } from "ui/actions/eventListeners/eventListenerUtils";
@@ -363,11 +364,10 @@ export const eventListenerLocationCache: Cache<
           return undefined;
         }
 
-        const formattedEventListener = await formatEventListener(
+        const formattedEventListener = await formatFunctionDetailsFromLocation(
           replayClient,
           replayEventType,
-          onClickPreview.preview,
-          state.sources,
+          onClickPreview.preview.functionLocation,
           "react"
         );
 
@@ -410,6 +410,41 @@ export function findFunctionOutlineForLocation(
     const functionEnd = functionOutline.location.end;
 
     const functionIsBeforeLocation = isLocationBefore(functionBegin, location);
+    // We sometimes seem to have a column off by one mismatch
+    // between preview function locations and source outline
+    // function locations, so we'll allow that.
+    const functionBeginLooksSameLineAndCloseEnough =
+      functionBegin.line === location.line && Math.abs(functionBegin.column - location.column) <= 1;
+    const locationIsBeforeEnd = isLocationBefore(location, functionEnd);
+
+    const functionIsCloserThanFoundFunction =
+      !foundFunctionBegin || isLocationBefore(foundFunctionBegin, functionBegin);
+
+    const isMatch =
+      (functionIsBeforeLocation || functionBeginLooksSameLineAndCloseEnough) &&
+      locationIsBeforeEnd &&
+      functionIsCloserThanFoundFunction;
+
+    if (isMatch) {
+      foundFunctionBegin = functionBegin;
+      foundFunctionOutline = functionOutline;
+    }
+  }
+  return foundFunctionOutline;
+}
+
+export function findClassOutlineForLocation(
+  location: SourceLocation,
+  sourceOutline: getSourceOutlineResult
+): ClassOutline | undefined {
+  let foundClassOutline: ClassOutline | undefined = undefined;
+  let foundFunctionBegin: SourceLocation | undefined;
+
+  for (const classOutline of sourceOutline.classes) {
+    const functionBegin = classOutline.location.begin;
+    const functionEnd = classOutline.location.end;
+
+    const functionIsBeforeLocation = isLocationBefore(functionBegin, location);
     const locationIsBeforeEnd = isLocationBefore(location, functionEnd);
 
     const functionIsCloserThanFoundFunction =
@@ -420,10 +455,10 @@ export function findFunctionOutlineForLocation(
 
     if (isMatch) {
       foundFunctionBegin = functionBegin;
-      foundFunctionOutline = functionOutline;
+      foundClassOutline = classOutline;
     }
   }
-  return foundFunctionOutline;
+  return foundClassOutline;
 }
 
 export function jumpToKnownEventListenerHit(

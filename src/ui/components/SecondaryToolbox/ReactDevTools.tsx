@@ -715,7 +715,7 @@ export function ReactDevtoolsPanel() {
       />
       {/* Solely for E2E test usage - need to track our app picker status vs internal RDT status*/}
       <span
-        data-testname="ReactPanelPickerStatus"
+        data-test-name="ReactPanelPickerStatus"
         data-component-picker-active={`${componentPickerActive}`}
       />
     </>

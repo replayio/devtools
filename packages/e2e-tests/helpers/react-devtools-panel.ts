@@ -1,7 +1,7 @@
 import { Locator, Page, expect } from "@playwright/test";
 
 import { openConsolePanel, warpToMessage } from "./console-panel";
-import { getByTestName, getElementClasses, waitFor } from "./utils";
+import { getByTestName, getByTestNameNoSpace, getElementClasses, waitFor } from "./utils";
 
 export async function checkInspectedItemValue(item: Locator, expectedValue: string) {
   const value = await getInspectedItemValue(item);
@@ -131,7 +131,7 @@ export async function getComponentName(componentLocator: Locator): Promise<strin
 export async function getComponentSearchResultsCount(
   page: Page
 ): Promise<{ current: number; total: number } | null> {
-  const resultsCount = getByTestName(page, "ComponentSearchInput-ResultsCount");
+  const resultsCount = getByTestNameNoSpace(page, "ComponentSearchInput-ResultsCount");
   if (!(await resultsCount.isVisible())) {
     return null;
   }
