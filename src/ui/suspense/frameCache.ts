@@ -101,89 +101,79 @@ export interface FormattedPointStack {
   functionName?: string;
 }
 
-export async function formatPointStackFrame(
-  replayClient: ReplayClientInterface,
-  frame: PointStackFrame,
-  sourcesById: Map<string, Source>
-): Promise<FormattedPointStackFrame> {
-  updateMappedLocationForPointStackFrame(sourcesById, frame);
-  const functionLocation = getPreferredLocation(sourcesById, [], frame.functionLocation);
-  const executionLocation = getPreferredLocation(sourcesById, [], frame.point.frame ?? []);
-
-  const source = sourcesById.get(functionLocation.sourceId)!;
-
-  return {
-    url: source.url,
-    source,
-    functionLocation,
-    executionLocation,
-    point: frame.point,
-    functionDetails: await formatFunctionDetailsFromLocation(
-      replayClient,
-      "unknown",
-      functionLocation
-    ),
-  };
-}
-
 export const formattedPointStackCache: Cache<
-  [replayClient: ReplayClientInterface, point: TimeStampedPoint],
+  [replayClient: ReplayClientInterface, point: PointDescription, ignoreFileUrls?: string[]],
   FormattedPointStack
 > = createCache({
   debugLabel: "FormattedPointStack",
-  getKey: ([replayClient, point]) => point.point,
-  async load([replayClient, point]) {
-    return formatPointStackForPoint(replayClient, point);
+  getKey: ([replayClient, point, ignoreFileUrls = MORE_IGNORABLE_PARTIAL_URLS]) => {
+    // turn these into one giant string, since the URLs affects the filtering
+    return [point.point, ...ignoreFileUrls].join();
+  },
+  async load([replayClient, point, ignoreFileUrls = MORE_IGNORABLE_PARTIAL_URLS]) {
+    const sourcesById = await sourcesByIdCache.readAsync(replayClient);
+    // Some arbitrary guesses about how many frames we should fetch. Prefer frameDepth, cap at 60
+    const framesToFetch = Math.min(point.frameDepth ?? 60, 60);
+    const pointStack = await replayClient.getPointStack(point.point, framesToFetch);
+    const formattedFrames = await Promise.all(
+      pointStack.map(async frame => {
+        updateMappedLocationForPointStackFrame(sourcesById, frame);
+        const functionLocation = getPreferredLocation(sourcesById, [], frame.functionLocation);
+        const executionLocation = getPreferredLocation(sourcesById, [], frame.point.frame ?? []);
+
+        const source = sourcesById.get(functionLocation.sourceId)!;
+
+        return {
+          url: source.url,
+          source,
+          functionLocation,
+          executionLocation,
+          point: frame.point,
+          functionDetails: await formatFunctionDetailsFromLocation(
+            replayClient,
+            "unknown",
+            functionLocation
+          ),
+        };
+      })
+    );
+
+    const filteredPauseFrames = formattedFrames.filter(frame => {
+      const { source } = frame;
+      if (!source.url) {
+        return false;
+      }
+      // Filter out stack frames we might not care about, such as React or Redux internals
+      return !ignoreFileUrls.some(partialUrl => source.url?.includes(partialUrl));
+    });
+
+    // We want the oldest app stack frame.
+    // If this is a React update, that should be what called `setState()`
+    // But, React also calls `scheduleUpdate` frequently _internally_.
+    // So, there may not be any app code frames at all.
+    let earliestAppCodeFrame: FormattedPointStackFrame | undefined =
+      filteredPauseFrames.slice(-1)[0];
+
+    let functionName;
+
+    let resultPoint = point;
+    if (earliestAppCodeFrame) {
+      resultPoint = earliestAppCodeFrame.point;
+      const formattedFunction = await formatFunctionDetailsFromLocation(
+        replayClient,
+        "unknown",
+        earliestAppCodeFrame.executionLocation
+      );
+      functionName = formattedFunction?.functionName;
+    }
+
+    return {
+      point,
+      functionName,
+      resultPoint,
+      frame: earliestAppCodeFrame!,
+      allFrames: formattedFrames,
+      filteredFrames: filteredPauseFrames,
+    };
   },
 });
-
-export async function formatPointStackForPoint(
-  replayClient: ReplayClientInterface,
-  point: TimeStampedPoint,
-  ignoreFileUrls = MORE_IGNORABLE_PARTIAL_URLS
-): Promise<FormattedPointStack> {
-  const sourcesById = await sourcesByIdCache.readAsync(replayClient);
-  const pointStack = await replayClient.getPointStack(point.point, 30);
-  const formattedFrames = await Promise.all(
-    pointStack.map(frame => {
-      return formatPointStackFrame(replayClient, frame, sourcesById);
-    })
-  );
-
-  const filteredPauseFrames = formattedFrames.filter(frame => {
-    const { source } = frame;
-    if (!source.url) {
-      return false;
-    }
-    // Filter out stack frames we might not care about, such as React or Redux internals
-    return !ignoreFileUrls.some(partialUrl => source.url?.includes(partialUrl));
-  });
-
-  // We want the oldest app stack frame.
-  // If this is a React update, that should be what called `setState()`
-  // But, React also calls `scheduleUpdate` frequently _internally_.
-  // So, there may not be any app code frames at all.
-  let earliestAppCodeFrame: FormattedPointStackFrame | undefined = filteredPauseFrames.slice(-1)[0];
-
-  let functionName;
-
-  let resultPoint = point;
-  if (earliestAppCodeFrame) {
-    resultPoint = earliestAppCodeFrame.point;
-    const formattedFunction = await formatFunctionDetailsFromLocation(
-      replayClient,
-      "unknown",
-      earliestAppCodeFrame.executionLocation
-    );
-    functionName = formattedFunction?.functionName;
-  }
-
-  return {
-    point,
-    functionName,
-    resultPoint,
-    frame: earliestAppCodeFrame!,
-    allFrames: formattedFrames,
-    filteredFrames: filteredPauseFrames,
-  };
-}
