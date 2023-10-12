@@ -1,7 +1,7 @@
 import assert from "assert";
-import { TimeStampedPoint } from "@replayio/protocol";
+import { ExecutionPoint, TimeStampedPoint } from "@replayio/protocol";
 import { Suspense, memo, useContext, useMemo, useState } from "react";
-import { STATUS_PENDING, STATUS_RESOLVED, useImperativeCacheValue } from "suspense";
+import { Cache, STATUS_PENDING, STATUS_RESOLVED, useImperativeCacheValue } from "suspense";
 
 import { getExecutionPoint } from "devtools/client/debugger/src/selectors";
 import Loader from "replay-next/components/Loader";
@@ -18,7 +18,12 @@ import { jumpToKnownEventListenerHit } from "ui/actions/eventListeners/jumpToCod
 import { seek } from "ui/actions/timeline";
 import { JumpToCodeButton, JumpToCodeStatus } from "ui/components/shared/JumpToCodeButton";
 import { useJumpToSource } from "ui/components/TestSuite/hooks/useJumpToSource";
-import { TestEventDetailsCache } from "ui/components/TestSuite/suspense/TestEventDetailsCache";
+import {
+  TestEventDetailsEntry,
+  TestEventDomNodeDetails,
+  testEventDetailsResultsCache,
+  testEventDomNodeCache,
+} from "ui/components/TestSuite/suspense/TestEventDetailsCache";
 import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext";
 import { getViewMode } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
@@ -166,11 +171,7 @@ export default memo(function UserActionEventRow({
       </div>
       {showBadge && (
         <Suspense fallback={<Loader />}>
-          <Badge
-            isSelected={isSelected}
-            timeStampedPoint={resultTimeStampedPoint}
-            variable={resultVariable}
-          />
+          <Badge isSelected={isSelected} timeStampedPoint={resultTimeStampedPoint} />
         </Suspense>
       )}
       {showJumpToCode && jumpToCodeAnnotation && (
@@ -190,20 +191,20 @@ export default memo(function UserActionEventRow({
 function Badge({
   isSelected,
   timeStampedPoint,
-  variable,
 }: {
   isSelected: boolean;
   timeStampedPoint: TimeStampedPoint;
-  variable: string;
 }) {
   const client = useContext(ReplayClientContext);
 
-  const { value } = useImperativeCacheValue(
-    TestEventDetailsCache,
-    client,
-    timeStampedPoint,
-    variable
+  const { status, value } = useImperativeCacheValue(
+    testEventDetailsResultsCache as unknown as Cache<
+      [executionPoint: ExecutionPoint],
+      TestEventDetailsEntry
+    >,
+    timeStampedPoint.point
   );
+
   if (value?.count === null) {
     return null;
   }

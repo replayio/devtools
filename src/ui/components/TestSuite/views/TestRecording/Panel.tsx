@@ -6,8 +6,12 @@ import {
   PanelResizeHandle,
   Panel as ResizablePanel,
 } from "react-resizable-panels";
+import { useImperativeIntervalCacheValues } from "suspense";
 
+import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
+import { isExecutionPointsWithinRange } from "replay-next/src/utils/time";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import {
   TestEvent,
   TestSectionName,
@@ -21,11 +25,14 @@ import TestEventDetails from "ui/components/TestSuite/views/TestRecording/TestEv
 import TestSection from "ui/components/TestSuite/views/TestRecording/TestSection";
 import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext";
 
+import { testEventDetailsIntervalCache } from "../../suspense/TestEventDetailsCache";
 import styles from "./Panel.module.css";
 
 export default function Panel() {
   const { setTestEvent, setTestRecording, testEvent, testRecording } = useContext(TestSuiteContext);
   const { update } = useContext(TimelineContext);
+  const { range: focusWindow } = useContext(FocusContext);
+  const replayClient = useContext(ReplayClientContext);
 
   assert(testRecording != null);
 
@@ -39,6 +46,32 @@ export default function Panel() {
   useEffect(() => {
     committedValuesRef.current.testEvent = testEvent;
   });
+
+  // We only want to cache the test event details when the focus window has been updated
+  // to match the range of the test recording.  Experimentation shows there can be some renders
+  // where the focus range and test range are mismatched, so try to avoid caching in those cases.
+  const enableCache =
+    focusWindow &&
+    testRecording.timeStampedPointRange?.begin &&
+    isExecutionPointsWithinRange(
+      focusWindow.begin.point,
+      testRecording.timeStampedPointRange.begin.point,
+      testRecording.timeStampedPointRange.end.point
+    ) &&
+    isExecutionPointsWithinRange(
+      focusWindow.end.point,
+      testRecording.timeStampedPointRange.begin.point,
+      testRecording.timeStampedPointRange.end.point
+    );
+
+  useImperativeIntervalCacheValues(
+    testEventDetailsIntervalCache,
+    BigInt(focusWindow ? focusWindow.begin.point : "0"),
+    BigInt(focusWindow ? focusWindow.end.point : "0"),
+    replayClient,
+    testRecording,
+    enableCache
+  );
 
   // Select a test step and update the current time
   const selectTestEvent = useCallback(
