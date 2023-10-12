@@ -57,24 +57,6 @@ function UserActionEventDetails({
   timeStampedPoint: TimeStampedPoint;
   variable: string;
 }) {
-  const replayClient = useContext(ReplayClientContext);
-
-  // const { status, value } = useImperativeCacheValue(
-  //   testEventDetailsCache2,
-  //   replayClient,
-  //   timeStampedPoint,
-  //   variable
-  // );
-
-  // const {} = useImperativeIntervalCacheValues(
-  //   testEventDetailsCache3IntervalCache,
-  //   BigInt(timeStampedPoint.point),
-  //   BigInt(timeStampedPoint.point),
-  //   replayClient,
-  //   variable,
-  //   true
-  // );
-
   const { status, value } = useImperativeCacheValue(
     testEventDetailsResultsCache as unknown as Cache<
       [executionPoint: ExecutionPoint],
@@ -82,8 +64,6 @@ function UserActionEventDetails({
     >,
     timeStampedPoint.point
   );
-
-  // console.log("User action status: ", status, value);
 
   const context = useMemo(
     () => ({

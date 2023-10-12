@@ -56,7 +56,12 @@ export default function Panel() {
     isExecutionPointsWithinRange(
       focusWindow.begin.point,
       testRecording.timeStampedPointRange.begin.point,
-      testRecording.timeStampedPointRange.begin.point
+      testRecording.timeStampedPointRange.end.point
+    ) &&
+    isExecutionPointsWithinRange(
+      focusWindow.end.point,
+      testRecording.timeStampedPointRange.begin.point,
+      testRecording.timeStampedPointRange.end.point
     );
 
   useImperativeIntervalCacheValues(

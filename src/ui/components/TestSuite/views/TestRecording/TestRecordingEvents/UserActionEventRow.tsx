@@ -71,14 +71,6 @@ export default memo(function UserActionEventRow({
     replayClient
   );
 
-  const { value: domNode, status: domNodeStatus } = useImperativeCacheValue(
-    testEventDomNodeCache as unknown as Cache<
-      [executionPoint: ExecutionPoint],
-      TestEventDomNodeDetails
-    >,
-    userActionEvent.data.timeStampedPoints.result?.point ?? "0"
-  );
-
   const [isHovered, setIsHovered] = useState(false);
 
   const argsString = useMemo(() => {
