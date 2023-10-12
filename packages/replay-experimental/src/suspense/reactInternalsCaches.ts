@@ -14,19 +14,12 @@ import { getPointAndTimeForPauseId } from "replay-next/src/suspense/PauseCache";
 import { getPointDescriptionForFrame } from "replay-next/src/suspense/PointStackCache";
 import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
 import { sourcesByPartialUrlCache } from "replay-next/src/suspense/SourcesCache";
-import {
-  sourcesByIdCache,
-  streamingSourceContentsCache,
-} from "replay-next/src/suspense/SourcesCache";
+import { streamingSourceContentsCache } from "replay-next/src/suspense/SourcesCache";
 import { compareExecutionPoints } from "replay-next/src/utils/time";
 import { ReplayClientInterface } from "shared/client/types";
 import { findFunctionOutlineForLocation } from "ui/actions/eventListeners/jumpToCode";
 import { SourceDetails } from "ui/reducers/sources";
-import {
-  FormattedPointStack,
-  formatPointStackForPoint,
-  formattedPointStackCache,
-} from "ui/suspense/frameCache";
+import { FormattedPointStack, formattedPointStackCache } from "ui/suspense/frameCache";
 
 interface PointWithLocation {
   location: Location;
@@ -274,7 +267,7 @@ export const reactRendersIntervalCache = createFocusIntervalCacheForExecutionPoi
       })
     );
 
-    const scheduleUpdateEntries: ReactUpdateScheduled[] = await Promise.all(
+    const scheduleUpdateEntriesPromise = Promise.all(
       scheduleUpdateHits.map(async hit => {
         const mostlyFormattedPointStack = await formattedPointStackCache.readAsync(
           replayClient,
@@ -283,47 +276,52 @@ export const reactRendersIntervalCache = createFocusIntervalCacheForExecutionPoi
 
         const cause = mostlyFormattedPointStack.frame ? "user" : "unknown";
 
-        return {
+        const result: ReactUpdateScheduled = {
           type: "scheduled",
           cause,
           ...mostlyFormattedPointStack,
         };
+        return result;
       })
     );
 
-    const renderRootSyncEntries: ReactSyncUpdatedStarted[] = await Promise.all(
+    const renderRootSyncEntriesPromise = Promise.all(
       renderRootSyncHits.map(async hit => {
         const mostlyFormattedPointStack = await formattedPointStackCache.readAsync(
           replayClient,
           hit
         );
 
-        return {
+        const result: ReactSyncUpdatedStarted = {
           type: "sync_started",
           ...mostlyFormattedPointStack,
         };
+        return result;
       })
     );
-
-    const onCommitRootEntries: ReactRenderCommitted[] = await Promise.all(
+    const onCommitRootEntriesPromise = Promise.all(
       onCommitRootHits.map(async hit => {
         const mostlyFormattedPointStack = await formattedPointStackCache.readAsync(
           replayClient,
           hit
         );
 
-        return {
+        const result: ReactRenderCommitted = {
           type: "render_committed",
           ...mostlyFormattedPointStack,
         };
+        return result;
       })
     );
 
-    const allEntries: ReactRenderEntry[] = [
-      ...scheduleUpdateEntries,
-      ...renderRootSyncEntries,
-      ...onCommitRootEntries,
-    ];
+    // Fetch all 3 arrays in parallel, then flatten them into one array
+    const allEntries: ReactRenderEntry[] = (
+      await Promise.all([
+        scheduleUpdateEntriesPromise,
+        renderRootSyncEntriesPromise,
+        onCommitRootEntriesPromise,
+      ])
+    ).flat();
 
     allEntries.sort((a, b) => compareExecutionPoints(a.point.point, b.point.point));
     return allEntries;
