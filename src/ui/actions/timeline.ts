@@ -9,7 +9,7 @@ import {
 } from "@replayio/protocol";
 import clamp from "lodash/clamp";
 
-import { framePositionsCleared, resumed } from "devtools/client/debugger/src/reducers/pause";
+import { resumed } from "devtools/client/debugger/src/reducers/pause";
 import { unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 import {
   addLastScreen,
@@ -279,8 +279,6 @@ export function seek({
     }
 
     assert(executionPoint != null, `Could not find execution point for time ${time}`);
-
-    dispatch(framePositionsCleared());
 
     if (pauseId) {
       ThreadFront.timeWarpToPause({ point: executionPoint, time, pauseId }, openSource);
