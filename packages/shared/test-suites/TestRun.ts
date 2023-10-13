@@ -27,7 +27,7 @@ export type TestRunTest = {
   result: string;
   error: string | null;
   durationMs: number;
-  recordingId: string | null;
+  recordingIds: string[];
   recordings: Recording[];
 };
 

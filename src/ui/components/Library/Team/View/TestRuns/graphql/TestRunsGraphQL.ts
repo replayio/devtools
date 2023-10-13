@@ -63,7 +63,7 @@ const GET_TEST_RUNS = gql`
                 result
                 error
                 durationMs
-                recordingId
+                recordingIds
               }
               results {
                 counts {

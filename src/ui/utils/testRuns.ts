@@ -43,7 +43,7 @@ export function groupRecordings(recordings: Recording[], tests: TestRunTest[]): 
   const sortedRecordings = orderBy(recordings, "date", "desc");
 
   const recordingsMap = sortedRecordings.reduce((accumulated, recording) => {
-    const test = tests.find(t => t.recordingId === recording.id);
+    const test = tests.find(t => t.recordingIds.includes(recording.id));
 
     if (test == null) {
       return accumulated;
