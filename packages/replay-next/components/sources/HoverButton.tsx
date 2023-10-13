@@ -1,5 +1,5 @@
 import { TimeStampedPoint } from "@replayio/protocol";
-import { useContext } from "react";
+import { Suspense, useContext } from "react";
 
 import Icon from "replay-next/components/Icon";
 import useGetDefaultLogPointContent from "replay-next/components/sources/hooks/useGetDefaultLogPointContent";
@@ -62,7 +62,9 @@ export default function HoverButton({
 
   if (isMetaKeyActive) {
     return (
-      <MetaHoverButton lineHitCounts={lineHitCounts} lineNumber={lineNumber} source={source} />
+      <Suspense fallback={null}>
+        <MetaHoverButton lineHitCounts={lineHitCounts} lineNumber={lineNumber} source={source} />
+      </Suspense>
     );
   } else {
     return (
