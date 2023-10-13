@@ -73,7 +73,7 @@ export function Attributes({ recordings, testRun }: { recordings: Recording[]; t
         ) : null}
         <BranchIcon
           branchName={branchName}
-          isPrimaryBranch={isPrimaryBranch}
+          isPrimaryBranch={isPrimaryBranch ?? false}
           title={getTestRunTitle(testRun)}
         />
         <AttributeContainer dataTestId="TestRun-Duration" icon="timer">

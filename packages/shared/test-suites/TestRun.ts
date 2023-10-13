@@ -4,10 +4,10 @@ export type Mode = "diagnostics" | "record" | "record-on-retry" | "stress";
 
 export type SourceMetadata = {
   branchName: string | null;
-  commitId: string;
+  commitId: string | null;
   commitTitle: string | null;
   groupLabel: string | null;
-  isPrimaryBranch: boolean;
+  isPrimaryBranch: boolean | null;
   prNumber: number | null;
   prTitle: string | null;
   repository: string | null;
@@ -26,7 +26,7 @@ export type TestRun = {
       passed: number;
     };
   };
-  source: SourceMetadata | null;
+  source: SourceMetadata;
 };
 
 export function processTestRun(testRun: TestRunsForWorkspaceGraphQL): TestRun {
