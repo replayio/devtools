@@ -25,10 +25,10 @@ export interface GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node_res
 
 export interface GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node_source {
   __typename: "TestRunSource";
-  commitId: string;
+  commitId: string | null;
   commitTitle: string | null;
   groupLabel: string | null;
-  isPrimaryBranch: boolean;
+  isPrimaryBranch: boolean | null;
   branchName: string | null;
   prNumber: number | null;
   prTitle: string | null;
@@ -43,7 +43,7 @@ export interface GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node {
   date: any;
   mode: string | null;
   results: GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node_results;
-  source: GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node_source | null;
+  source: GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node_source;
 }
 
 export interface GetTestsRunsForWorkspace_node_Workspace_testRuns_edges {
