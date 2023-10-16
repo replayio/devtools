@@ -4,15 +4,41 @@ import React, { useContext } from "react";
 
 import { assert } from "protocol/utils";
 import { GraphQLClientContext } from "replay-next/src/contexts/GraphQLClientContext";
-import { Recording } from "shared/graphql/types";
+import { formatRelativeTime } from "replay-next/src/utils/time";
 import { TestRun, TestRunTest } from "shared/test-suites/TestRun";
 import { TeamContext } from "ui/components/Library/Team/TeamContextRoot";
 import { useTestRuns } from "ui/components/Library/Team/View/TestRuns/hooks/useTestRuns";
 import { testRunRecordingsCache } from "ui/components/Library/Team/View/TestRuns/suspense/TestRunsCache";
-import { groupRecordings } from "ui/utils/testRuns";
 import useToken from "ui/utils/useToken";
 
 import { DashboardLayout } from "../../index";
+
+function Message(props: React.HTMLProps<HTMLDivElement>) {
+  return (
+    <div
+      {...props}
+      className="m-auto rounded-md bg-gray-200 p-2 text-center"
+      style={{ width: 180 }}
+    />
+  );
+}
+
+function useDashboardQueryParams() {
+  const first = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v) ?? null;
+  const router = useRouter();
+  const teamId = first(router.query.team);
+  const [testRunId = null, _view, testId = null] = router.query.params || [];
+
+  return {
+    teamId,
+    testRunId,
+    testId,
+  };
+}
+
+function getTestRunTitle(testRun: TestRun) {
+  return testRun.source?.prTitle || testRun.source?.commitTitle || "Test";
+}
 
 // copied from useTestRunRecordingsSuspends.ts to skip the TestRunsContext dependency
 function useTestRunRecordingsSuspends(testRuns: TestRun[], testRunId: string | null) {
@@ -21,7 +47,7 @@ function useTestRunRecordingsSuspends(testRuns: TestRun[], testRunId: string | n
 
   const accessToken = useToken();
 
-  if (testRunId) {
+  if (testRunId && testRuns.length > 0) {
     const testRun = testRuns.find(t => t.id === testRunId);
     assert(testRun != null);
 
@@ -56,7 +82,8 @@ function TestRunRow({ teamId, testRun }: { teamId: string; testRun: TestRun }) {
         >
           {testRun.results.counts.failed === 0 ? "✅" : testRun.results.counts.failed}
         </div>
-        <div>{testRun.source?.prTitle || testRun.source?.commitTitle || "Test"}</div>
+        <div className="flex-grow">{getTestRunTitle(testRun)}</div>
+        <div>{formatRelativeTime(new Date(testRun.date))}</div>
       </div>
     </Link>
   );
@@ -81,8 +108,9 @@ function TestGroup({
   return (
     <div className="py-2">
       <div>
-        {files.length}{" "}
-        {result === "failed" ? "Failed Tests" : result === "flaky" ? "Flaky Tests" : "Passed Tests"}
+        {`${files.length} ${
+          result === "failed" ? "Failed Tests" : result === "flaky" ? "Flaky Tests" : "Passed Tests"
+        }`}
       </div>
       <div className="m-2 flex flex-col gap-2">
         {files.map(fileName => {
@@ -103,29 +131,41 @@ function TestGroup({
   );
 }
 
-function TestRunPanel({
-  teamId,
-  testRuns,
-  testRunId,
-}: {
-  teamId: string;
-  testRuns: TestRun[];
-  testRunId: string;
-}) {
-  const testRun = testRuns.find(t => t.id === testRunId);
-  assert(testRun != null);
+function TestRunPanel({ testRuns }: { testRuns: TestRun[] }) {
+  const { teamId, testRunId } = useDashboardQueryParams();
   const { groupedRecordings } = useTestRunRecordingsSuspends(testRuns, testRunId);
+
+  if (!teamId || !testRunId) {
+    return <Message>Select a run to see its details here</Message>;
+  }
 
   if (groupedRecordings == null) {
     return null;
   }
 
+  const testRun = testRuns.find(t => t.id === testRunId);
+  assert(testRun != null);
   const { passedRecordings, failedRecordings, flakyRecordings } = groupedRecordings;
 
   return (
     <div>
-      <div>{testRun.source?.prTitle || testRun.source?.commitTitle || "Test"}</div>
-      <div>Source control data</div>
+      <h2 className="pb-2 pt-4 text-xl">{getTestRunTitle(testRun)}</h2>
+      <div
+        className="m-2 grid grid-flow-row gap-2"
+        style={{
+          gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+          gridTemplateRows: "repeat(2, minmax(0, 1fr))",
+        }}
+      >
+        <div className="truncate">{formatRelativeTime(new Date(testRun.date))}</div>
+        <div className="truncate">{testRun.source?.user}</div>
+        <div className="truncate">{testRun.source?.branchName}</div>
+        <div className="truncate">duration</div>
+        <div className="truncate">{testRun.source?.prNumber}</div>
+        <div className="truncate">
+          {testRun.source?.triggerUrl ? <a href={testRun.source?.triggerUrl}>Workflow</a> : null}
+        </div>
+      </div>
       <TestGroup
         result="failed"
         testMap={failedRecordings.fileNameToTests}
@@ -148,15 +188,13 @@ function TestRunPanel({
   );
 }
 
-function TestPanel({
-  testRuns,
-  testRunId,
-  testId,
-}: {
-  testRuns: TestRun[];
-  testRunId: string;
-  testId: string;
-}) {
+function TestPanel({ testRuns }: { testRuns: TestRun[] }) {
+  const { testRunId, testId } = useDashboardQueryParams();
+
+  if (!testRunId || !testId || testRuns.length === 0) {
+    return testRunId ? <Message>Select a test to see its details here</Message> : null;
+  }
+
   const testRun = testRuns.find(t => t.id === testRunId);
   assert(testRun != null);
 
@@ -166,6 +204,18 @@ function TestPanel({
   return (
     <div>
       <div>{test.title}</div>
+      {test.error ? (
+        <>
+          <h2 className="pb-2 pt-4 text-xl">Errors</h2>
+          <div className="rounded-md bg-gray-200 p-3">
+            <div className="h-32 overflow-hidden pl-3 " style={{ borderLeft: "2px solid red" }}>
+              {test.error}
+            </div>
+          </div>
+        </>
+      ) : null}
+      <h2 className="pb-2 pt-4 text-xl">Recent replays of this test</h2>
+      <p>Needs the new tests graphql endpoint to fetch tests by testId: {test.testId}</p>
     </div>
   );
 }
@@ -173,10 +223,6 @@ function TestPanel({
 function TestRun() {
   const testRuns = useTestRuns();
   const router = useRouter();
-  const params = router.query.params;
-  const teamId = Array.isArray(router.query.team) ? router.query.team[0] : router.query.team!;
-  const testRunParams = Array.isArray(params) ? params : params ? [params] : [];
-  const [testRunId, _view, testId] = testRunParams;
 
   return (
     <div className="flex flex-grow flex-row space-x-2 p-2">
@@ -186,16 +232,10 @@ function TestRun() {
         ))}
       </Panel>
       <Panel>
-        {testRunId ? (
-          <TestRunPanel testRuns={testRuns} testRunId={testRunId} teamId={teamId} />
-        ) : (
-          <div>Select a run to see its details here</div>
-        )}
+        <TestRunPanel testRuns={testRuns} />
       </Panel>
       <Panel>
-        {testRunId && testId ? (
-          <TestPanel testRuns={testRuns} testRunId={testRunId} testId={testId} />
-        ) : null}
+        <TestPanel testRuns={testRuns} />
       </Panel>
     </div>
   );
