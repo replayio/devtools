@@ -16,6 +16,7 @@ export type RecordingCapabilities = {
   supportsNetworkRequests: boolean;
   supportsRepaintingGraphics: boolean;
   supportsPureEvaluation: boolean;
+  supportsObjectIdLookupsInEvaluations: boolean;
 };
 
 // Target applications which can create recordings.
@@ -24,6 +25,39 @@ export enum RecordingTarget {
   chromium = "chromium",
   node = "node",
   unknown = "unknown",
+}
+
+/**
+ * Takes a build date (i.e. 'YYYYMMDD') and converts it to a `Date` object.
+ */
+export function buildDateStringToDate(buildDate: string) {
+  const y = buildDate.substring(0, 4);
+  const m = buildDate.substring(4, 6);
+  const d = buildDate.substring(6);
+
+  return new Date(`${y}-${m}-${d}T00:00:00Z`);
+}
+
+export interface BuildComponents {
+  platform: string;
+  runtime: string;
+  date: string;
+}
+
+// Ported from the backend
+export function parseBuildIdComponents(buildId: string): BuildComponents | null {
+  // Add the platform, runtime, and date to the metadata, which we can determine
+  // from the build ID itself.
+  const match = /(.*?)-(.*?)-(.*?)-/.exec(buildId);
+
+  if (match) {
+    return { platform: match[1], runtime: match[2], date: match[3] };
+  }
+
+  // NOTE: Only old builds that are outside our supported range should hit
+  // this case, but this function may well be called for those older builds
+  // still if someone tries to view an older recording.
+  return null;
 }
 
 function getRecordingTarget(buildId: string): RecordingTarget {
@@ -51,10 +85,15 @@ export const recordingTargetCache = createSingleEntryCache<
   },
 });
 
-function getRecordingCapabilities(buildId: string) {
-  const recordingTarget = getRecordingTarget(buildId);
+function getRecordingCapabilities(
+  recordingTarget: RecordingTarget,
+  buildComponents: BuildComponents
+) {
   switch (recordingTarget) {
     case "chromium": {
+      const buildDate = buildDateStringToDate(buildComponents?.date ?? "");
+      const supportsObjectIdLookupsInEvaluations = buildDate >= new Date("2023-09-16");
+
       return {
         supportsEagerEvaluation: false,
         supportsElementsInspector: true,
@@ -62,6 +101,7 @@ function getRecordingCapabilities(buildId: string) {
         supportsNetworkRequests: false,
         supportsRepaintingGraphics: features.chromiumRepaints,
         supportsPureEvaluation: false,
+        supportsObjectIdLookupsInEvaluations,
       };
     }
     case "gecko": {
@@ -72,6 +112,7 @@ function getRecordingCapabilities(buildId: string) {
         supportsNetworkRequests: true,
         supportsRepaintingGraphics: true,
         supportsPureEvaluation: true,
+        supportsObjectIdLookupsInEvaluations: false,
       };
     }
     case "node": {
@@ -82,6 +123,7 @@ function getRecordingCapabilities(buildId: string) {
         supportsNetworkRequests: true,
         supportsRepaintingGraphics: false,
         supportsPureEvaluation: false,
+        supportsObjectIdLookupsInEvaluations: false,
       };
     }
     case "unknown":
@@ -93,6 +135,7 @@ function getRecordingCapabilities(buildId: string) {
         supportsNetworkRequests: true,
         supportsRepaintingGraphics: true,
         supportsPureEvaluation: false,
+        supportsObjectIdLookupsInEvaluations: false,
       };
     }
   }
@@ -106,6 +149,13 @@ export const recordingCapabilitiesCache = createSingleEntryCache<
   debugLabel: "recordingCapabilitiesCache",
   load: async ([replayClient]) => {
     const recordingTarget = await recordingTargetCache.readAsync(replayClient);
-    return getRecordingCapabilities(recordingTarget);
+    const buildId = await buildIdCache.readAsync(replayClient);
+
+    const buildComponents = parseBuildIdComponents(buildId) ?? {
+      platform: recordingTarget,
+      runtime: recordingTarget,
+      date: "",
+    };
+    return getRecordingCapabilities(recordingTarget, buildComponents);
   },
 });
