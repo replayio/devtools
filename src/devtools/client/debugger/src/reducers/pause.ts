@@ -3,16 +3,14 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import { AnyAction, PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import type { FrameId, Location, PauseId, SourceLocation, Value } from "@replayio/protocol";
+import type { FrameId, Location, PauseId, Value } from "@replayio/protocol";
 
-import { framesCache } from "replay-next/src/suspense/FrameCache";
-import { pointStackCache } from "replay-next/src/suspense/PointStackCache";
-import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
-import { ReplayClientInterface } from "shared/client/types";
+import { ThreadFront } from "protocol/thread";
+import { FindTargetCommand, resumeTargetCache } from "replay-next/src/suspense/ResumeTargetCache";
+import { isPointInRegion } from "shared/utils/time";
 import { SourceDetails, getPreferredLocation, getSelectedSourceId } from "ui/reducers/sources";
 import { getContextFromAction } from "ui/setup/redux/middleware/context";
 import type { UIState } from "ui/state";
-import { resumeOperations } from "ui/utils/resumeOperations";
 import { ThunkExtraArgs } from "ui/utils/thunk";
 
 export interface Context {
@@ -62,14 +60,6 @@ export interface PauseState {
   pauseHistoryIndex: number;
 }
 
-export type ValidCommand =
-  | "stepIn"
-  | "stepOut"
-  | "stepOver"
-  | "resume"
-  | "rewind"
-  | "reverseStepOver";
-
 const resumedPauseState = {
   selectedFrameId: null,
   executionPoint: null,
@@ -93,33 +83,46 @@ const initialState: PauseState = {
 
 export const executeCommandOperation = createAsyncThunk<
   { location: Location | null },
-  { cx: Context; command: ValidCommand },
+  { cx: Context; command: FindTargetCommand },
   { state: UIState; extra: ThunkExtraArgs }
->("pause/executeCommand", async ({ cx, command }, thunkApi) => {
+>("pause/executeCommand", async ({ command }, thunkApi) => {
   const { extra, getState } = thunkApi;
   const { replayClient } = extra;
   const state = getState();
   const focusWindow = replayClient.getCurrentFocusWindow();
+  const point = getExecutionPoint(state);
+  const selectedFrameId = getSelectedFrameId(state);
   const sourceId = getSelectedSourceId(state);
-  const symbols = sourceId ? await sourceOutlineCache.readAsync(replayClient, sourceId) : undefined;
-  const nextPoint = await getResumePoint(replayClient, state);
-
-  const resp = await resumeOperations[command](replayClient, {
-    point: nextPoint,
-    sourceId,
-    focusWindow,
-    locationsToSkip:
-      // skip over points that are mapped to the beginning of a function body
-      // see SCS-172
-      command === "stepOver" || command === "reverseStepOver"
-        ? (symbols?.functions.map(f => f.body).filter(Boolean) as SourceLocation[])
-        : undefined,
-  });
-  if (!resp?.frame) {
+  if (!point || !focusWindow) {
     return { location: null };
   }
 
-  const location = getPreferredLocation(state.sources, resp.frame);
+  ThreadFront.emit("resumed");
+
+  const resumeTarget = await resumeTargetCache.readAsync(
+    replayClient,
+    command,
+    point,
+    selectedFrameId,
+    sourceId
+  );
+
+  if (resumeTarget && isPointInRegion(resumeTarget.point, focusWindow)) {
+    const { point, time, frame } = resumeTarget;
+    ThreadFront.timeWarp(point, time, !!frame);
+  } else {
+    ThreadFront.emit("paused", {
+      point: ThreadFront.currentPoint,
+      time: ThreadFront.currentTime,
+      openSource: true,
+    });
+  }
+
+  if (!resumeTarget?.frame) {
+    return { location: null };
+  }
+
+  const location = getPreferredLocation(state.sources, resumeTarget.frame);
 
   return { location };
 });
@@ -248,23 +251,6 @@ export function getPauseHistory(state: UIState) {
 }
 export function getPauseHistoryIndex(state: UIState) {
   return state.pause.pauseHistoryIndex;
-}
-
-async function getResumePoint(replayClient: ReplayClientInterface, state: UIState) {
-  const executionPoint = getExecutionPoint(state);
-  const selectedFrameId = getSelectedFrameId(state);
-  if (!executionPoint || !selectedFrameId) {
-    return;
-  }
-  const frames = await framesCache.readAsync(replayClient, selectedFrameId.pauseId);
-  const frameIndex = frames?.findIndex(frame => frame.frameId === selectedFrameId.frameId);
-  if (!frames || !frameIndex) {
-    return;
-  }
-
-  const pointStack = await pointStackCache.readAsync(0, frameIndex, replayClient, executionPoint);
-
-  return pointStack[frameIndex].point.point;
 }
 
 const pauseWrapperReducer = (state: PauseState, action: AnyAction) => {
