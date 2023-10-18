@@ -28,7 +28,11 @@ export type ViewMode = "dev" | "non-dev";
 export const config = {
   backend_disableCache: {
     defaultValue: Boolean(false),
+    description: "Disable all caches, should only be used for debugging purposes",
     legacyKey: "devtools.disableCache",
+    highRisk: Boolean(true),
+    internalOnly: Boolean(true),
+    label: "Disable all caches",
   },
   backend_disableConcurrentControllerLoading: {
     defaultValue: Boolean(false),
