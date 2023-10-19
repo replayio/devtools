@@ -1,5 +1,5 @@
 import assert from "assert";
-import { Location } from "@replayio/protocol";
+import { Frame, Location } from "@replayio/protocol";
 import { compare } from "compare-versions";
 
 import { framesCache } from "replay-next/src/suspense/FrameCache";
@@ -7,6 +7,41 @@ import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { createCacheWithTelemetry } from "replay-next/src/utils/suspense";
 import { ReplayClientInterface } from "shared/client/types";
 import { GroupedTestCases, UserActionEvent } from "shared/test-suites/RecordingTestMetadata";
+
+function getCypressMarkerFrame(frames: Frame[]) {
+  const markerFrameIndex = frames.findIndex(
+    (f: any, i: any, l: any) => f.functionName === "__stackReplacementMarker"
+  );
+
+  if (markerFrameIndex !== -1) {
+    return markerFrameIndex;
+  }
+
+  // For requests that are dispatched from a Cypress promise handler, we
+  // don't always see __stackReplacemenMarker so we have to derive the
+  // callsite from the sourceIds
+
+  // the current frame will be the plugin source
+  let pluginSourceId = frames[0].functionLocation?.[0].sourceId;
+  let cypressSourceId: string | undefined;
+  let userSourceId: string | undefined;
+
+  for (let i = 1; i <= frames.length; i++) {
+    const sourceId = frames[i].functionLocation?.[0].sourceId;
+    if (!cypressSourceId && sourceId !== pluginSourceId) {
+      // The first non-plugin source will be cypress
+      cypressSourceId = sourceId;
+    } else if (cypressSourceId && !userSourceId && sourceId !== cypressSourceId) {
+      // the next non-cypress code will be userland code
+      userSourceId = sourceId;
+    } else if (cypressSourceId && userSourceId && sourceId === cypressSourceId) {
+      // when we land back in cypress code, use that as the marker frame
+      return i;
+    }
+  }
+
+  return -1;
+}
 
 export const TestStepSourceLocationCache = createCacheWithTelemetry<
   [client: ReplayClientInterface, groupedTestCases: GroupedTestCases, testEvent: UserActionEvent],
@@ -28,10 +63,7 @@ export const TestStepSourceLocationCache = createCacheWithTelemetry<
 
       if (frames) {
         if (compare(runnerVersion, "8.0.0", ">=")) {
-          // find the cypress marker frame
-          const markerFrameIndex = frames.findIndex(
-            (f: any, i: any, l: any) => f.functionName === "__stackReplacementMarker"
-          );
+          const markerFrameIndex = getCypressMarkerFrame(frames);
 
           // and extract its sourceId
           const markerSourceId = frames[markerFrameIndex]?.functionLocation?.[0].sourceId;
