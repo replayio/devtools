@@ -75,12 +75,10 @@ test("playwright-01: Basic Test Suites panel functionality", async ({
 
   // Relative dates can change over time.
   // Check for either the "X units ago" text, or the literal date.
-  expect(await getTestSuiteDate(page).textContent()).toMatch(/ ago|(9\/22\/2023)/);
-  expect(await getTestSuiteUser(page).textContent()).toMatch("ryanjduffy");
-  expect(await getTestSuiteBranch(page).textContent()).toMatch(
-    "ryan/playwright-plugin-annotations"
-  );
-  expect(await getTestSuiteDuration(page).textContent()).toMatch("0:32");
+  expect(await getTestSuiteDate(page).textContent()).toMatch(/ ago|(10\/19\/2023)/);
+  expect(await getTestSuiteUser(page).textContent()).toMatch("hbenl");
+  expect(await getTestSuiteBranch(page).textContent()).toMatch("hbenl/fe-1987");
+  expect(await getTestSuiteDuration(page).textContent()).toMatch("0:45");
 
   // can open tests
   await firstTest.click();
@@ -98,7 +96,7 @@ test("playwright-01: Basic Test Suites panel functionality", async ({
   expect(await sections.nth(0).textContent()).toMatch(/test body/i);
 
   const steps = getTestCaseSteps(selectedRow);
-  await expect(steps).toHaveCount(223);
+  await expect(steps).toHaveCount(231);
 
   const backButton = getTestRecordingBackButton(page);
   await backButton.click();
