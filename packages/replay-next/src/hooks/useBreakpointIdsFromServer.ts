@@ -8,6 +8,7 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { POINT_BEHAVIOR_ENABLED, Point, PointKey } from "shared/client/types";
 import { ReplayClientInterface } from "shared/client/types";
 
+import { evictResumeTargets } from "../suspense/ResumeTargetCache";
 import { getCorrespondingLocations } from "../utils/sources";
 
 // Breakpoints must be synced with the server so the stepping controls will work.
@@ -110,19 +111,21 @@ export default function useBreakpointIdsFromServer(
               if (pointBehavior?.shouldBreak === POINT_BEHAVIOR_ENABLED) {
                 breakpointAdded(client, location, point.condition).then(serverKeys => {
                   pointKeyToBreakpointKeyMap.set(key, serverKeys);
+                  evictResumeTargets();
                 });
               }
             } else if (prevPointBehavior?.shouldBreak !== pointBehavior?.shouldBreak) {
               if (pointBehavior?.shouldBreak === POINT_BEHAVIOR_ENABLED) {
                 breakpointAdded(client, location, point.condition).then(serverKeys => {
                   pointKeyToBreakpointKeyMap.set(key, serverKeys);
+                  evictResumeTargets();
                 });
               } else {
                 const serverKeys = pointKeyToBreakpointKeyMap.get(key);
                 if (serverKeys != null) {
-                  serverKeys.forEach(serverId => {
-                    client.breakpointRemoved(serverId);
-                  });
+                  Promise.all(serverKeys.map(serverId => client.breakpointRemoved(serverId))).then(
+                    () => evictResumeTargets()
+                  );
                 }
               }
             }
@@ -133,9 +136,9 @@ export default function useBreakpointIdsFromServer(
             if (point == null) {
               const serverKeys = pointKeyToBreakpointKeyMap.get(prevPoint.key);
               if (serverKeys != null) {
-                serverKeys.forEach(serverId => {
-                  client.breakpointRemoved(serverId);
-                });
+                Promise.all(serverKeys.map(serverId => client.breakpointRemoved(serverId))).then(
+                  () => evictResumeTargets()
+                );
               }
             }
           });

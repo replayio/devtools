@@ -2,50 +2,57 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import { FrameId, PauseId } from "@replayio/protocol";
-import { Suspense, useContext, useDeferredValue, useEffect, useState } from "react";
+import { Suspense, useContext, useEffect, useState } from "react";
+import { useImperativeCacheValue } from "suspense";
 
-import actions from "devtools/client/debugger/src/actions/index";
 import CommandBarButton from "devtools/client/debugger/src/components/shared/Button/CommandBarButton";
-import { getSelectedFrameId, getThreadContext } from "devtools/client/debugger/src/reducers/pause";
+import {
+  executeCommandOperation,
+  getExecutionPoint,
+  getSelectedFrameId,
+  getThreadContext,
+} from "devtools/client/debugger/src/reducers/pause";
 import { formatKeyShortcut } from "devtools/client/debugger/src/utils/text";
 import KeyShortcuts from "devtools/client/shared/key-shortcuts";
 import { framesCache } from "replay-next/src/suspense/FrameCache";
-import { frameStepsCache } from "replay-next/src/suspense/FrameStepsCache";
+import {
+  FIND_STEP_TARGET_COMMANDS,
+  FindTargetCommand,
+  resumeTargetCache,
+} from "replay-next/src/suspense/ResumeTargetCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { getOS, isMacOS } from "shared/utils/os";
+import { isPointInRegion } from "shared/utils/time";
 import Loader from "ui/components/shared/Loader";
+import { getSelectedSourceId } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
 
 const isOSX = isMacOS();
 
-// NOTE: the "resume" command will call either the resume
-// depending on whether or not the debugger is paused or running
-const COMMANDS = ["resume", "reverseStepOver", "stepOver", "stepIn", "stepOut"] as const;
-type PossibleCommands = (typeof COMMANDS)[number];
+const COMMANDS = ["findResumeTarget", ...FIND_STEP_TARGET_COMMANDS] as const;
 
-const KEYS = {
+const KEYS: Record<"WINNT" | "Darwin" | "Linux", Record<(typeof COMMANDS)[number], string>> = {
   WINNT: {
-    resume: "F8",
-    reverseStepOver: "Shift+F10",
-    stepOver: "F10",
-    stepIn: "F11",
-    stepOut: "Shift+F11",
+    findResumeTarget: "F8",
+    findReverseStepOverTarget: "Shift+F10",
+    findStepOverTarget: "F10",
+    findStepInTarget: "F11",
+    findStepOutTarget: "Shift+F11",
   },
   Darwin: {
-    resume: "Cmd+\\",
-    reverseStepOver: "Cmd+Shift+'",
-    stepOver: "Cmd+'",
-    stepIn: "Cmd+;",
-    stepOut: "Cmd+Shift+;",
+    findResumeTarget: "Cmd+\\",
+    findReverseStepOverTarget: "Cmd+Shift+'",
+    findStepOverTarget: "Cmd+'",
+    findStepInTarget: "Cmd+;",
+    findStepOutTarget: "Cmd+Shift+;",
   },
   Linux: {
-    resume: "F8",
-    reverseStepOver: "Shift+F10",
-    stepOver: "F10",
-    stepIn: "F11",
-    stepOut: "Shift+F11",
+    findResumeTarget: "F8",
+    findReverseStepOverTarget: "Shift+F10",
+    findStepOverTarget: "F10",
+    findStepInTarget: "F11",
+    findStepOutTarget: "Shift+F11",
   },
 };
 
@@ -70,37 +77,6 @@ function formatKey(action: string) {
   return formatKeyShortcut(key);
 }
 
-function useFramesAndFrameSteps(
-  selectedFrameId: FrameId | undefined,
-  selectedPauseId: PauseId | undefined
-) {
-  const replayClient = useContext(ReplayClientContext);
-
-  // This hook fetches Frames and frame-steps using Suspense.
-  // Each time the current Pause ID or Frame ID changes,
-  // the component will "suspend" to fetch new frame data.
-  // Components should avoid suspending during a high priority update though,
-  // because React will show the component's fallback UI until the data is ready
-  // (and this can be pretty jarring).
-  // The useDeferredValue() hook is used to avoid suspending during a high priority update.
-  // If the Pause ID or Frame ID changes during a high-priority update,
-  // useDeferredValue() will return the previous value instead
-  // allowing this component to avoid suspending during that update.
-  // It will then schedule a lower priority "transition" update with the new value,
-  // which React will run in the background (without committing or showing the fallback UI)
-  // until the new frame data has been loaded.
-  const deferredFrameId = useDeferredValue(selectedFrameId);
-  const deferredPauseId = useDeferredValue(selectedPauseId);
-
-  const frames = deferredPauseId ? framesCache.read(replayClient, deferredPauseId) : undefined;
-  const frameSteps =
-    deferredFrameId && deferredPauseId
-      ? frameStepsCache.read(replayClient, deferredPauseId, deferredFrameId)
-      : undefined;
-
-  return { frames, frameSteps };
-}
-
 export default function CommandBar() {
   return (
     <Suspense fallback={<Loader />}>
@@ -114,11 +90,6 @@ function CommandBarSuspends() {
 
   const [disableRewindResume, setDisableRewindResume] = useState(false);
 
-  const { frameId: selectedFrameId, pauseId: selectedPauseId } =
-    useAppSelector(getSelectedFrameId) ?? {};
-
-  const { frames, frameSteps } = useFramesAndFrameSteps(selectedFrameId, selectedPauseId);
-
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -127,66 +98,43 @@ function CommandBarSuspends() {
       target: document.body,
     });
 
-    function handleEvent(e: KeyboardEvent, action: PossibleCommands) {
+    function handleEvent(e: KeyboardEvent, command: FindTargetCommand) {
       e.preventDefault();
       e.stopPropagation();
-      dispatch(actions[action](cx));
+      dispatch(executeCommandOperation({ cx, command }));
     }
 
-    COMMANDS.forEach(action =>
-      shortcuts.on(getKey(action), (e: KeyboardEvent) => handleEvent(e, action))
+    COMMANDS.forEach(command =>
+      shortcuts.on(getKey(command), (e: KeyboardEvent) => handleEvent(e, command))
     );
 
     if (isOSX) {
       // The Mac supports both the Windows Function keys
       // as well as the Mac non-Function keys
-      COMMANDS.forEach(action =>
-        shortcuts.on(getKeyForOS("WINNT", action), (e: KeyboardEvent) => handleEvent(e, action))
+      COMMANDS.forEach(command =>
+        shortcuts.on(getKeyForOS("WINNT", command), (e: KeyboardEvent) => handleEvent(e, command))
       );
     }
 
     return () => {
-      COMMANDS.forEach(action => shortcuts!.off(getKey(action)));
+      COMMANDS.forEach(command => shortcuts!.off(getKey(command)));
       if (isOSX) {
-        COMMANDS.forEach(action => shortcuts!.off(getKeyForOS("WINNT", action)));
+        COMMANDS.forEach(command => shortcuts!.off(getKeyForOS("WINNT", command)));
       }
     };
   }, [cx, dispatch]);
 
-  const hasFramePositions = frameSteps && frameSteps.length > 0;
-  const isPaused = frames && frames.length > 0;
-  const disabled = !isPaused || !hasFramePositions;
-  const disabledTooltip = !isPaused
-    ? "Stepping is disabled until you're paused at a point"
-    : "Stepping is disabled because there are too many steps in the current frame";
-
   async function onRewind() {
     trackEvent("debugger.rewind");
     setDisableRewindResume(true);
-    await dispatch(actions.rewind(cx));
+    await dispatch(executeCommandOperation({ cx, command: "findRewindTarget" }));
     setDisableRewindResume(false);
   }
   async function onResume() {
     trackEvent("debugger.resume");
     setDisableRewindResume(true);
-    await dispatch(actions.resume(cx));
+    await dispatch(executeCommandOperation({ cx, command: "findResumeTarget" }));
     setDisableRewindResume(false);
-  }
-  function onReverseStepOver() {
-    trackEvent("debugger.reverse_step_over");
-    dispatch(actions.reverseStepOver(cx));
-  }
-  function onStepOver() {
-    trackEvent("debugger.step_over");
-    dispatch(actions.stepOver(cx));
-  }
-  function onStepIn() {
-    trackEvent("debugger.step_in");
-    dispatch(actions.stepIn(cx));
-  }
-  function onStepOut() {
-    trackEvent("debugger.step_out");
-    dispatch(actions.stepOut(cx));
   }
 
   return (
@@ -202,43 +150,106 @@ function CommandBarSuspends() {
         disabled={disableRewindResume}
         key="resume"
         onClick={onResume}
-        tooltip={`Resume ${formatKey("resume")}`}
+        tooltip={`Resume ${formatKey("findResumeTarget")}`}
         type="resume"
       />
       <div key="divider-2" className="divider" />
-      <CommandBarButton
-        disabled={disabled}
+      <StepButton
         key="reverseStepOver"
-        onClick={onReverseStepOver}
+        command="findReverseStepOverTarget"
+        mixpanelEvent="debugger.reverse_step_over"
         tooltip="Reverse Step Over"
-        disabledTooltip={disabledTooltip}
         type="reverseStepOver"
       />
-      <CommandBarButton
-        disabled={disabled}
+      <StepButton
         key="stepOver"
-        onClick={onStepOver}
+        command="findStepOverTarget"
+        mixpanelEvent="debugger.step_over"
         tooltip="Step Over"
-        disabledTooltip={disabledTooltip}
         type="stepOver"
       />
       <div key="divider-3" className="divider" />
-      <CommandBarButton
-        disabled={disabled}
+      <StepButton
         key="stepIn"
-        onClick={onStepIn}
+        command="findStepInTarget"
+        mixpanelEvent="debugger.step_in"
         tooltip="Step In"
-        disabledTooltip={disabledTooltip}
         type="stepIn"
       />
-      <CommandBarButton
-        disabled={disabled}
+      <StepButton
         key="stepOut"
-        onClick={onStepOut}
+        command="findStepOutTarget"
+        mixpanelEvent="debugger.step_out"
         tooltip="Step Out"
-        disabledTooltip={disabledTooltip}
         type="stepOut"
       />
     </div>
+  );
+}
+
+function StepButton({
+  command,
+  tooltip,
+  type,
+  mixpanelEvent,
+}: {
+  command: FindTargetCommand;
+  tooltip: string;
+  type: string;
+  mixpanelEvent: any;
+}) {
+  const dispatch = useAppDispatch();
+  const replayClient = useContext(ReplayClientContext);
+  const focusWindow = replayClient.getCurrentFocusWindow();
+  const cx = useAppSelector(getThreadContext);
+  const point = useAppSelector(getExecutionPoint);
+  const pauseAndFrameId = useAppSelector(getSelectedFrameId);
+  const sourceId = useAppSelector(getSelectedSourceId);
+
+  const { status: framesStatus, value: frames } = useImperativeCacheValue(
+    framesCache,
+    replayClient,
+    pauseAndFrameId?.pauseId
+  );
+
+  const { status: stepTargetStatus, value: stepTarget } = useImperativeCacheValue(
+    resumeTargetCache,
+    replayClient,
+    command,
+    point,
+    pauseAndFrameId,
+    sourceId
+  );
+
+  const isPaused = framesStatus === "resolved" && frames && frames.length > 0;
+  let disabled = false;
+  let disabledTooltip = "";
+  if (!isPaused) {
+    disabled = true;
+    disabledTooltip = "Stepping is disabled until you're paused at a point";
+  } else if (stepTargetStatus === "pending") {
+    disabled = true;
+    disabledTooltip = "Loading step target...";
+  } else if (stepTargetStatus === "rejected" || !stepTarget) {
+    disabled = true;
+    disabledTooltip = "Failed to find step target";
+  } else if (!focusWindow || !isPointInRegion(stepTarget.point, focusWindow)) {
+    disabled = true;
+    disabledTooltip = "Stepping is disabled because the target is outside the current focus window";
+  }
+
+  function onClick() {
+    trackEvent(mixpanelEvent);
+    dispatch(executeCommandOperation({ cx, command }));
+  }
+
+  return (
+    <CommandBarButton
+      disabled={disabled}
+      onClick={onClick}
+      tooltip={tooltip}
+      disabledTooltip={disabledTooltip}
+      type={type}
+    />
   );
 }

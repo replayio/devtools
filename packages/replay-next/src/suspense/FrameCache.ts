@@ -8,13 +8,16 @@ import { cachePauseData, sortFramesAndUpdateLocations } from "./PauseCache";
 import { sourcesByIdCache } from "./SourcesCache";
 
 export const framesCache: Cache<
-  [replayClient: ReplayClientInterface, pauseId: PauseId],
+  [replayClient: ReplayClientInterface, pauseId: PauseId | undefined],
   Frame[] | undefined
 > = createCache({
   config: { immutable: true },
   debugLabel: "FramesCache",
-  getKey: ([client, pauseId]) => pauseId,
+  getKey: ([, pauseId]) => pauseId ?? "",
   load: async ([client, pauseId]) => {
+    if (!pauseId) {
+      return;
+    }
     const framesResult = await client.getAllFrames(pauseId);
     const sources = await sourcesByIdCache.readAsync(client);
     cachePauseData(client, sources, pauseId, framesResult.data, framesResult.frames);
