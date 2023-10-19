@@ -16,7 +16,6 @@ import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { ResponsiveTabs, Tab } from "../../shared/components/ResponsiveTabs";
 import { setActiveTab } from "../actions";
 import { EventListenersApp } from "../event-listeners/EventListenersApp";
-import styles from "./App.module.css";
 
 const INSPECTOR_TAB_TITLES: Record<ActiveInspectorTab, string> = {
   ruleview: "Rules",
@@ -59,9 +58,7 @@ export default function InspectorApp() {
           <Panel minSize={20}>
             {enableNewElementsPanel ? <ElementsPanelAdapter /> : <MarkupApp />}
           </Panel>
-          <PanelResizeHandle className={styles.ResizeHandle}>
-            <div className={styles.ResizeHandleTarget} />
-          </PanelResizeHandle>
+          <PanelResizeHandle className="h-full w-1 bg-chrome" />
           <Panel defaultSize={40} minSize={20}>
             <div className="devtools-inspector-tab-panel">
               <div id="inspector-sidebar-container">
