@@ -21,9 +21,9 @@ export interface GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node_tes
   scope: string[];
   sourcePath: string;
   result: string;
-  error: string | null;
+  errors: string[] | null;
   durationMs: number;
-  recordingIds: (string | null)[];
+  recordingIds: string[];
 }
 
 export interface GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node_results_counts {
@@ -40,10 +40,10 @@ export interface GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node_res
 
 export interface GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node_source {
   __typename: "TestRunSource";
-  commitId: string;
+  commitId: string | null;
   commitTitle: string | null;
   groupLabel: string | null;
-  isPrimaryBranch: boolean;
+  isPrimaryBranch: boolean | null;
   branchName: string | null;
   prNumber: number | null;
   prTitle: string | null;
@@ -59,7 +59,7 @@ export interface GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node {
   mode: string | null;
   tests: GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node_tests[];
   results: GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node_results;
-  source: GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node_source | null;
+  source: GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node_source;
 }
 
 export interface GetTestsRunsForWorkspace_node_Workspace_testRuns_edges {

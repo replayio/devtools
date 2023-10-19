@@ -164,7 +164,7 @@ const FileNodeRenderer = memo(function FileNodeRenderer({
             <TestResultListItem
               depth={depth + 1}
               filterByText={filterByText}
-              key={test.recordingId}
+              key={recording.id}
               label={test.result === "passed" ? "Passed" : label}
               recording={recording}
               test={test}

@@ -5,10 +5,10 @@ export type Mode = "diagnostics" | "record" | "record-on-retry" | "stress";
 
 export type SourceMetadata = {
   branchName: string | null;
-  commitId: string;
+  commitId: string | null;
   commitTitle: string | null;
   groupLabel: string | null;
-  isPrimaryBranch: boolean;
+  isPrimaryBranch: boolean | null;
   prNumber: number | null;
   prTitle: string | null;
   repository: string | null;
@@ -25,7 +25,7 @@ export type TestRunTest = {
   scope: string[];
   sourcePath: string;
   result: string;
-  error: string | null;
+  errors: string[] | null;
   durationMs: number;
   recordingIds: string[];
   recordings: Recording[];

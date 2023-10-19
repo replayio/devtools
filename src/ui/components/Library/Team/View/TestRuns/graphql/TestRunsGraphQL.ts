@@ -20,7 +20,10 @@ const GET_TEST_RUN_RECORDINGS = gql`
         testRuns(id: $id) {
           edges {
             node {
-              results {
+              tests {
+                testId
+                sourcePath
+                title
                 recordings {
                   uuid
                   duration
@@ -61,7 +64,7 @@ const GET_TEST_RUNS = gql`
                 scope
                 sourcePath
                 result
-                error
+                errors
                 durationMs
                 recordingIds
               }
