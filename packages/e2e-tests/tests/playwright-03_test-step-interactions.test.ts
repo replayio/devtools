@@ -50,7 +50,7 @@ test("playwright-03: Test Step interactions", async ({
 
   const steps = getTestCaseSteps(selectedRow);
   const numSteps = await steps.count();
-  expect(numSteps).toBe(223);
+  expect(numSteps).toBe(231);
 
   // We should be in Viewer Mode to start with
   expect(await isViewerTabActive(page)).toBe(true);
@@ -73,7 +73,7 @@ test("playwright-03: Test Step interactions", async ({
 
   // Should show the "Before/After" buttons
   const beforeAfterButtons = getTestStepBeforeAfterButtons(page);
-  await beforeAfterButtons.waitFor({ state: "visible", timeout: 1000 });
+  await beforeAfterButtons.waitFor({ state: "visible" });
 
   const afterButton = beforeAfterButtons.locator("button", { hasText: "After" }).first();
 

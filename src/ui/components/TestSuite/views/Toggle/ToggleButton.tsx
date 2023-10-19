@@ -14,10 +14,11 @@ export default function ToggleButton() {
     return null;
   }
 
-  const { timeStampedPointRange } = testEvent;
+  const { timeStampedPoints } = testEvent.data;
   if (
-    timeStampedPointRange == null ||
-    timeStampedPointRange.begin.point === timeStampedPointRange.end.point
+    timeStampedPoints.beforeStep == null ||
+    timeStampedPoints.afterStep == null ||
+    timeStampedPoints.beforeStep.point === timeStampedPoints.afterStep.point
   ) {
     return null;
   }

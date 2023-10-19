@@ -7,7 +7,7 @@ import { ReplayClientInterface } from "shared/client/types";
 import { ProtocolError, commandError, isCommandError } from "shared/utils/error";
 
 import { createFocusIntervalCacheForExecutionPoints } from "./FocusIntervalCache";
-import { objectPropertyCache } from "./ObjectPreviews";
+import { objectCache, objectPropertyCache } from "./ObjectPreviews";
 import { cachePauseData, setPointAndTimeForPauseId } from "./PauseCache";
 import { sourcesByIdCache } from "./SourcesCache";
 
@@ -78,6 +78,9 @@ export function createAnalysisCache<
       const points = await findPoints(client, begin, end, ...params);
       onPointsReceived?.(points);
 
+      if (points.length === 0) {
+        return [];
+      }
       if (points.length > MAX_POINTS_TO_RUN_EVALUATION) {
         throw commandError("Too many points to run evaluation", ProtocolError.TooManyPoints);
       }
@@ -103,27 +106,38 @@ export function createAnalysisCache<
               if (result.exception) {
                 values.push(result.exception);
               } else if (result.returned?.object) {
-                const length =
-                  (
-                    await objectPropertyCache.readAsync(
-                      client,
-                      result.pauseId,
-                      result.returned.object,
-                      "length"
-                    )
-                  )?.value ?? 0;
-                const promises = [];
-                for (let i = 0; i < length; i++) {
-                  promises.push(
-                    objectPropertyCache.readAsync(
-                      client,
-                      result.pauseId,
-                      result.returned.object,
-                      String(i)
-                    )
-                  );
+                const objectPreview = await objectCache.readAsync(
+                  client,
+                  result.pauseId,
+                  result.returned.object,
+                  "canOverflow"
+                );
+                if (objectPreview?.className === "Object") {
+                  values.push(result.returned);
+                } else {
+                  // assume this is an array
+                  const length =
+                    (
+                      await objectPropertyCache.readAsync(
+                        client,
+                        result.pauseId,
+                        result.returned.object,
+                        "length"
+                      )
+                    )?.value ?? 0;
+                  const promises = [];
+                  for (let i = 0; i < length; i++) {
+                    promises.push(
+                      objectPropertyCache.readAsync(
+                        client,
+                        result.pauseId,
+                        result.returned.object,
+                        String(i)
+                      )
+                    );
+                  }
+                  values = (await Promise.all(promises)).filter(value => !!value) as Value[];
                 }
-                values = (await Promise.all(promises)).filter(value => !!value) as Value[];
               }
 
               resultsCache.cacheValue(

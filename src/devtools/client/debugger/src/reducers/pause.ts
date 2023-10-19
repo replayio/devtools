@@ -3,26 +3,14 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import { AnyAction, PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import type {
-  FrameId,
-  Location,
-  PauseId,
-  SourceLocation,
-  TimeStampedPoint,
-  Value,
-} from "@replayio/protocol";
-import findLast from "lodash/findLast";
+import type { FrameId, Location, PauseId, Value } from "@replayio/protocol";
 
-import { compareNumericStrings } from "protocol/utils";
-import { framesCache } from "replay-next/src/suspense/FrameCache";
-import { frameStepsCache } from "replay-next/src/suspense/FrameStepsCache";
-import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
-import { ReplayClientInterface } from "shared/client/types";
-import { userData } from "shared/user-data/GraphQL/UserData";
+import { ThreadFront } from "protocol/thread";
+import { FindTargetCommand, resumeTargetCache } from "replay-next/src/suspense/ResumeTargetCache";
+import { isPointInRegion } from "shared/utils/time";
 import { SourceDetails, getPreferredLocation, getSelectedSourceId } from "ui/reducers/sources";
 import { getContextFromAction } from "ui/setup/redux/middleware/context";
 import type { UIState } from "ui/state";
-import { resumeOperations } from "ui/utils/resumeOperations";
 import { ThunkExtraArgs } from "ui/utils/thunk";
 
 export interface Context {
@@ -56,9 +44,6 @@ export interface PauseFrame {
   library?: string;
 }
 
-// TBD
-type UnknownPosition = TimeStampedPoint & { location: Location };
-
 export interface PauseAndFrameId {
   pauseId: PauseId;
   frameId: FrameId;
@@ -68,38 +53,19 @@ export interface PauseState {
   cx: { navigateCounter: number };
   id: string | undefined;
   threadcx: ThreadContext;
-  pauseErrored: boolean;
-  pauseLoading: boolean;
   pausePreviewLocation: Location | null;
   selectedFrameId: PauseAndFrameId | null;
   executionPoint: string | null;
-  command: string | null;
-  replayFramePositions?: { positions: UnknownPosition[] } | null;
   pauseHistory: PauseHistoryData[];
   pauseHistoryIndex: number;
 }
 
-export type ValidCommand =
-  | "stepIn"
-  | "stepOut"
-  | "stepOver"
-  | "resume"
-  | "rewind"
-  | "reverseStepOver";
-
 const resumedPauseState = {
-  frames: null,
-  framesLoading: false,
-  framesErrored: false,
-  frameScopes: {},
   selectedFrameId: null,
   executionPoint: null,
-  why: null,
 };
 
 const initialState: PauseState = {
-  pauseErrored: false,
-  pauseLoading: false,
   cx: {
     navigateCounter: 0,
   },
@@ -111,40 +77,52 @@ const initialState: PauseState = {
   id: undefined,
   pausePreviewLocation: null,
   ...resumedPauseState,
-  command: null,
   pauseHistory: [],
   pauseHistoryIndex: -1,
 };
 
 export const executeCommandOperation = createAsyncThunk<
   { location: Location | null },
-  { cx: Context; command: ValidCommand },
+  { cx: Context; command: FindTargetCommand },
   { state: UIState; extra: ThunkExtraArgs }
->("pause/executeCommand", async ({ cx, command }, thunkApi) => {
+>("pause/executeCommand", async ({ command }, thunkApi) => {
   const { extra, getState } = thunkApi;
   const { replayClient } = extra;
   const state = getState();
   const focusWindow = replayClient.getCurrentFocusWindow();
+  const point = getExecutionPoint(state);
+  const selectedFrameId = getSelectedFrameId(state);
   const sourceId = getSelectedSourceId(state);
-  const symbols = sourceId ? await sourceOutlineCache.readAsync(replayClient, sourceId) : undefined;
-  const nextPoint = await getResumePoint(replayClient, state, command);
-
-  const resp = await resumeOperations[command](replayClient, {
-    point: nextPoint,
-    sourceId,
-    focusWindow,
-    locationsToSkip:
-      // skip over points that are mapped to the beginning of a function body
-      // see SCS-172
-      command === "stepOver" || command === "reverseStepOver"
-        ? (symbols?.functions.map(f => f.body).filter(Boolean) as SourceLocation[])
-        : undefined,
-  });
-  if (!resp?.frame) {
+  if (!point || !focusWindow) {
     return { location: null };
   }
 
-  const location = getPreferredLocation(state.sources, resp.frame);
+  ThreadFront.emit("resumed");
+
+  const resumeTarget = await resumeTargetCache.readAsync(
+    replayClient,
+    command,
+    point,
+    selectedFrameId,
+    sourceId
+  );
+
+  if (resumeTarget && isPointInRegion(resumeTarget.point, focusWindow)) {
+    const { point, time, frame } = resumeTarget;
+    ThreadFront.timeWarp(point, time, !!frame);
+  } else {
+    ThreadFront.emit("paused", {
+      point: ThreadFront.currentPoint,
+      time: ThreadFront.currentTime,
+      openSource: true,
+    });
+  }
+
+  if (!resumeTarget?.frame) {
+    return { location: null };
+  }
+
+  const location = getPreferredLocation(state.sources, resumeTarget.frame);
 
   return { location };
 });
@@ -154,13 +132,6 @@ const pauseSlice = createSlice({
   initialState,
   reducers: {
     pauseRequestedAt(state) {
-      Object.assign(state, {
-        pauseErrored: false,
-        pauseLoading: true,
-        framesLoading: true,
-        framesErrored: false,
-      });
-
       state.threadcx.isPaused = true;
     },
     paused(
@@ -168,19 +139,13 @@ const pauseSlice = createSlice({
       action: PayloadAction<{
         id: string;
         frame?: PauseFrame;
-        why?: string;
         executionPoint: string;
-        // used by the legacy Messages reducer
         time: number;
       }>
     ) {
-      const { id, frame, why, executionPoint, time } = action.payload;
+      const { id, frame, executionPoint, time } = action.payload;
       Object.assign(state, {
-        pauseErrored: false,
-        pauseLoading: false,
         id,
-        frameScopes: resumedPauseState.frameScopes,
-        why,
         executionPoint,
       });
 
@@ -207,12 +172,8 @@ const pauseSlice = createSlice({
     pauseCreationFailed(state, action: PayloadAction<string>) {
       const executionPoint = action.payload;
       Object.assign(state, {
-        pauseErrored: true,
-        pauseLoading: false,
         id: undefined,
         selectedFrameId: undefined,
-        frames: undefined,
-        frameScopes: {},
         executionPoint,
       });
 
@@ -224,12 +185,6 @@ const pauseSlice = createSlice({
     },
     previewLocationCleared(state) {
       state.pausePreviewLocation = null;
-    },
-    framePositionsLoaded(state, action: PayloadAction<UnknownPosition[]>) {
-      state.replayFramePositions = { positions: action.payload };
-    },
-    framePositionsCleared(state) {
-      state.replayFramePositions = null;
     },
     frameSelected(
       state,
@@ -245,31 +200,16 @@ const pauseSlice = createSlice({
   extraReducers: builder => {
     builder
       .addCase(executeCommandOperation.pending, (state, action) => {
-        const { command } = action.meta.arg;
-        state.command = command;
         state.threadcx.pauseCounter++;
         state.threadcx.isPaused = false;
-
-        if (command == "resume" || command == "rewind") {
-          // TODO This logic seems at odds with the existing
-          // "fetch if no positions" in the `command` thunk
-          // also clear out positions
-          state.replayFramePositions = null;
-        }
       })
       .addCase(executeCommandOperation.fulfilled, (state, action) => {
-        state.command = null;
         state.pausePreviewLocation = action.payload.location;
-      })
-      .addCase(executeCommandOperation.rejected, (state, action) => {
-        state.command = null;
       });
   },
 });
 
 export const {
-  framePositionsCleared,
-  framePositionsLoaded,
   frameSelected,
   pauseCreationFailed,
   pauseRequestedAt,
@@ -291,18 +231,6 @@ export function getThreadContext(state: UIState) {
   return state.pause.threadcx;
 }
 
-export function getPauseCommand(state: UIState) {
-  return state.pause.command;
-}
-
-export function isStepping(state: UIState) {
-  return ["stepIn", "stepOver", "stepOut"].includes(getPauseCommand(state)!);
-}
-
-export function isEvaluatingExpression(state: UIState) {
-  return state.pause.command === "expression";
-}
-
 export function getSelectedFrameId(state: UIState) {
   return state.pause.selectedFrameId;
 }
@@ -315,10 +243,6 @@ export function getPauseId(state: UIState) {
   return state.pause.id;
 }
 
-export function getPauseErrored(state: UIState) {
-  return state.pause.pauseErrored;
-}
-
 export function getPausePreviewLocation(state: UIState) {
   return state.pause.pausePreviewLocation;
 }
@@ -327,39 +251,6 @@ export function getPauseHistory(state: UIState) {
 }
 export function getPauseHistoryIndex(state: UIState) {
   return state.pause.pauseHistoryIndex;
-}
-
-async function getResumePoint(replayClient: ReplayClientInterface, state: UIState, type: string) {
-  const executionPoint = getExecutionPoint(state);
-  const selectedFrameId = getSelectedFrameId(state);
-  if (!executionPoint || !selectedFrameId) {
-    return;
-  }
-  const frames = await framesCache.readAsync(replayClient, selectedFrameId.pauseId);
-  const frame = frames?.find(frame => frame.frameId === selectedFrameId.frameId);
-  if (!frames || !frame || frame === frames[0]) {
-    return;
-  }
-  const frameSteps = await frameStepsCache.readAsync(
-    replayClient,
-    selectedFrameId.pauseId,
-    selectedFrameId.frameId
-  );
-  if (!frameSteps?.length) {
-    return;
-  }
-
-  if (type == "reverseStepOver" || type == "rewind") {
-    return findLast(frameSteps, p => compareNumericStrings(p.point, executionPoint) < 0)?.point;
-  }
-
-  if (type == "stepOver" || type == "resume" || type == "stepIn" || type == "stepOut") {
-    let index = frameSteps.findIndex(p => compareNumericStrings(p.point, executionPoint) > 0);
-    if (index < 0) {
-      index = frameSteps.length - 1;
-    }
-    return frameSteps[index].point;
-  }
 }
 
 const pauseWrapperReducer = (state: PauseState, action: AnyAction) => {

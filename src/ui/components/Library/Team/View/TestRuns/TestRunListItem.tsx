@@ -64,7 +64,7 @@ export function TestRunListItem({
         )}
         <BranchIcon
           branchName={<HighlightedText haystack={branchName || ""} needle={filterByText} />}
-          isPrimaryBranch={isPrimaryBranch}
+          isPrimaryBranch={isPrimaryBranch ?? false}
           title={title}
         />
         <ModeAttribute testRun={testRun} />

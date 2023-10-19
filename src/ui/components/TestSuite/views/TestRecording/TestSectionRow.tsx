@@ -2,6 +2,11 @@ import assert from "assert";
 import { ExecutionPoint, TimeStampedPoint } from "@replayio/protocol";
 import { ReactNode, useContext, useMemo, useTransition } from "react";
 
+import {
+  highlightNode,
+  highlightNodes,
+  unhighlightNode,
+} from "devtools/client/inspector/markup/actions/markup";
 import Icon from "replay-next/components/Icon";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
@@ -16,6 +21,7 @@ import {
   TestRunnerName,
   TestSectionName,
   getTestEventTime,
+  getTestEventTimeStampedPoint,
   isUserActionTestEvent,
 } from "shared/test-suites/RecordingTestMetadata";
 import { isPointInRegion } from "shared/utils/time";
@@ -25,6 +31,7 @@ import { useTestEventContextMenu } from "ui/components/TestSuite/views/TestRecor
 import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext";
 import { useAppDispatch } from "ui/setup/hooks";
 
+import { testEventDomNodeCache } from "../../suspense/TestEventDetailsCache";
 import NavigationEventRow from "./TestRecordingEvents/NavigationEventRow";
 import NetworkRequestEventRow from "./TestRecordingEvents/NetworkRequestEventRow";
 import UserActionEventRow from "./TestRecordingEvents/UserActionEventRow";
@@ -63,12 +70,7 @@ export function TestSectionRow({
     if (selectedTestEvent) {
       switch (testRunnerName) {
         case "cypress": {
-          let timeStampedPoint: TimeStampedPoint | null = null;
-          if (isUserActionTestEvent(testEvent)) {
-            timeStampedPoint = testEvent.timeStampedPointRange?.begin ?? null;
-          } else {
-            timeStampedPoint = testEvent.timeStampedPoint;
-          }
+          const timeStampedPoint = getTestEventTimeStampedPoint(testEvent);
 
           if (timeStampedPoint) {
             position = isExecutionPointsGreaterThan(timeStampedPoint.point, currentExecutionPoint)
@@ -179,12 +181,30 @@ export function TestSectionRow({
   const onMouseEnter = async () => {
     if (!isSelected) {
       dispatch(setTimelineToTime(getTestEventTime(testEvent)));
+
+      if (isUserActionTestEvent(testEvent)) {
+        // We hope to have details on the relevant DOM node cached by now.
+        // If we do, go ahead and read that synchronously so we can highlight the node.
+        // Otherwise, nothing to do here.
+        const firstDomNodeDetails = testEventDomNodeCache.getValueIfCached(
+          testEvent.data.timeStampedPoints.result?.point ?? ""
+        );
+
+        if (firstDomNodeDetails?.domNode?.isConnected) {
+          const { domNode, pauseId } = firstDomNodeDetails;
+          dispatch(highlightNodes([domNode.id], pauseId));
+        }
+      }
     }
   };
 
   const onMouseLeave = () => {
     if (!isSelected) {
       dispatch(setTimelineToTime(null));
+
+      if (isUserActionTestEvent(testEvent)) {
+        dispatch(unhighlightNode());
+      }
     }
   };
 

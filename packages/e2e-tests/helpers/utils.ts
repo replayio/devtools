@@ -168,9 +168,12 @@ export const getElementClasses = (loc: Locator) => loc.evaluate(el => Array.from
 
 export const getByTestName = (parent: Page | Locator, testName: string) => {
   // Sometimes there's a space, sometimes not
-  return parent
-    .locator(`[data-test-name="${testName}"]`)
-    .or(parent.locator(`[data-testname="${testName}"]`));
+  return parent.locator(`[data-test-name="${testName}"]`);
+};
+
+export const getByTestNameNoSpace = (parent: Page | Locator, testName: string) => {
+  // Sometimes there's a space, sometimes not
+  return parent.locator(`[data-testname="${testName}"]`);
 };
 
 export async function locatorTextToNumber(locator: Locator): Promise<number | null> {

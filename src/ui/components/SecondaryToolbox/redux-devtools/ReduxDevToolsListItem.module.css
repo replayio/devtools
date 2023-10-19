@@ -33,3 +33,7 @@
 .ListItem:hover .JumpToCodeButton {
   display: flex;
 }
+
+.SmallerIcon {
+  height: 1rem;
+}

@@ -1,6 +1,6 @@
-import { test } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
-import { takeScreenshot } from "../utils/general";
+import { takeScreenshot, waitFor } from "../utils/general";
 import {
   getSourceSearchResultsLocator,
   searchSources,
@@ -17,6 +17,12 @@ test("should find matches in multiple sources", async ({ page }, testInfo) => {
   await toggleIncludeNodeModulesCheckbox(page, true);
   await searchSources(page, "function t");
   await verifySourceSearchSummary(page, "3 results");
+  // wait for hit counts to be loaded
+  await waitFor(async () =>
+    expect(
+      await page.locator('[data-test-name="SearchFiles-ResultRow"][data-hit-count="0"]').count()
+    ).toBe(3)
+  );
   await verifyVisibleResultsCount(page, 6);
   await verifySourceSearchMatchingLocations(page, ["1", "2", "h1"]);
   await takeScreenshot(

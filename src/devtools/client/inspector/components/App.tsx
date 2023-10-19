@@ -58,7 +58,7 @@ export default function InspectorApp() {
           <Panel minSize={20}>
             {enableNewElementsPanel ? <ElementsPanelAdapter /> : <MarkupApp />}
           </Panel>
-          <PanelResizeHandle className="h-full w-1" />
+          <PanelResizeHandle className="h-full w-1 bg-chrome" />
           <Panel defaultSize={40} minSize={20}>
             <div className="devtools-inspector-tab-panel">
               <div id="inspector-sidebar-container">

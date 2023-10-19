@@ -10,6 +10,7 @@ import { ProtocolError, isCommandError } from "shared/utils/error";
 
 type Options<Point extends number | bigint, Params extends Array<any>, Value> = {
   debugLabel?: string;
+  debugLogging?: boolean;
   getKey?: (...params: Params) => string;
   getPointForValue: GetPointForValue<Point, Value>;
   load: (
@@ -52,9 +53,22 @@ export function createFocusIntervalCache<
       try {
         return await options.load(start, end, ...paramsWithCacheLoadOptions);
       } catch (error) {
-        if (isCommandError(error, ProtocolError.FocusWindowChange)) {
+        if (
+          isCommandError(error, ProtocolError.FocusWindowChange) ||
+          isCommandError(error, ProtocolError.RecordingUnloaded)
+        ) {
+          // Handle errors here by telling the cache "nothing got loaded".
+          // This will cause the cache to retry the load if requested later.
+          // The combo of `cache.abort()` + `returnAsPartial()` _seems_ to be necessary here,
+          // based on experimentation.
+
           const params = paramsWithCacheLoadOptions.slice(0, -1) as Params;
+          const intervalCacheOptions: IntervalCacheLoadOptions<Value> =
+            paramsWithCacheLoadOptions[paramsWithCacheLoadOptions.length - 1];
+
           cache.abort(...params);
+
+          return intervalCacheOptions.returnAsPartial([]);
         }
         throw error;
       }

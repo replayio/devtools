@@ -9,6 +9,7 @@ import {
   Cache,
   StreamingCache,
   StreamingValue,
+  createCache,
   createSingleEntryCache,
   createStreamingCache,
   useImperativeCacheValue,
@@ -184,6 +185,18 @@ export const sourcesByIdCache = createSingleEntryCache<
   load: async ([client]) => {
     const sources = await sourcesCache.readAsync(client);
     return new Map(sources.map(source => [source.sourceId, source]));
+  },
+});
+
+export const sourcesByPartialUrlCache: Cache<
+  [client: ReplayClientInterface, partialUrl: string],
+  Source[]
+> = createCache({
+  debugLabel: "SourcesByPartialUrl",
+  getKey: ([client, partialUrl]) => partialUrl,
+  load: async ([client, partialUrl]) => {
+    const sources = await sourcesCache.readAsync(client);
+    return sources.filter(source => source.url?.includes(partialUrl));
   },
 });
 

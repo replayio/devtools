@@ -1,6 +1,6 @@
-import { TimeStampedPoint } from "@replayio/protocol";
+import { ExecutionPoint, TimeStampedPoint } from "@replayio/protocol";
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { STATUS_PENDING, useImperativeCacheValue } from "suspense";
+import { Cache, STATUS_PENDING, useImperativeCacheValue } from "suspense";
 
 import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import PropertiesRenderer from "replay-next/components/inspector/PropertiesRenderer";
@@ -13,7 +13,10 @@ import {
   UserActionEventStack,
   isUserActionTestEvent,
 } from "shared/test-suites/RecordingTestMetadata";
-import { TestEventDetailsCache } from "ui/components/TestSuite/suspense/TestEventDetailsCache";
+import {
+  TestEventDetailsEntry,
+  testEventDetailsResultsCache,
+} from "ui/components/TestSuite/suspense/TestEventDetailsCache";
 import { TestSuiteCache } from "ui/components/TestSuite/suspense/TestSuiteCache";
 import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext";
 
@@ -54,13 +57,12 @@ function UserActionEventDetails({
   timeStampedPoint: TimeStampedPoint;
   variable: string;
 }) {
-  const replayClient = useContext(ReplayClientContext);
-
   const { status, value } = useImperativeCacheValue(
-    TestEventDetailsCache,
-    replayClient,
-    timeStampedPoint,
-    variable
+    testEventDetailsResultsCache as unknown as Cache<
+      [executionPoint: ExecutionPoint],
+      TestEventDetailsEntry
+    >,
+    timeStampedPoint.point
   );
 
   const context = useMemo(

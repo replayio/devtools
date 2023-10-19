@@ -1,5 +1,6 @@
 import { default as classNames, default as classnames } from "classnames";
 import { useContext, useEffect, useState } from "react";
+import { useImperativeCacheValue } from "suspense";
 
 import { getPauseId } from "devtools/client/debugger/src/selectors";
 import { framesCache } from "replay-next/src/suspense/FrameCache";
@@ -376,8 +377,12 @@ export default function Toolbar() {
   const dispatch = useAppDispatch();
   const replayClient = useContext(ReplayClientContext);
   const pauseId = useAppSelector(getPauseId);
-  const frames = pauseId ? framesCache.getValueIfCached(replayClient, pauseId) : undefined;
-  const hasFrames = frames && frames.length > 0;
+  const { status: framesStatus, value: frames } = useImperativeCacheValue(
+    framesCache,
+    replayClient,
+    pauseId
+  );
+  const hasFrames = framesStatus === "resolved" && frames && frames.length > 0;
   const viewMode = useAppSelector(selectors.getViewMode);
   const selectedPrimaryPanel = useAppSelector(getSelectedPrimaryPanel);
 
@@ -448,8 +453,8 @@ export default function Toolbar() {
             onClick={handleButtonClick}
           />
         ) : null}
-        {testRunner !== null &&
-          (testRunner === "cypress" ? (
+        {testRunner !== null ? (
+          testRunner === "cypress" ? (
             <ToolbarButton
               icon="cypress"
               label="Cypress Panel"
@@ -463,8 +468,15 @@ export default function Toolbar() {
               name="cypress"
               onClick={handleButtonClick}
             />
-          ))}
-        <ToolbarButton icon="info" label="Replay Info" name="events" onClick={handleButtonClick} />
+          )
+        ) : (
+          <ToolbarButton
+            icon="info"
+            label="Replay Info"
+            name="events"
+            onClick={handleButtonClick}
+          />
+        )}
         <ToolbarButton
           icon="forum"
           label="Comments"
