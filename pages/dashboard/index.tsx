@@ -52,3 +52,14 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 export default function Dashboard() {
   return <DashboardLayout>Content</DashboardLayout>;
 }
+
+export function Panel(props: React.HTMLProps<HTMLDivElement>) {
+  return (
+    <div
+      {...props}
+      className={`flex w-0 flex-grow flex-col space-y-2 overflow-y-auto rounded-md p-4${
+        props.className ? " " + props.className : ""
+      }`}
+    />
+  );
+}

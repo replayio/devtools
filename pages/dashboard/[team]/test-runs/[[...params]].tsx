@@ -11,7 +11,7 @@ import { useTestRuns } from "ui/components/Library/Team/View/TestRuns/hooks/useT
 import { testRunRecordingsCache } from "ui/components/Library/Team/View/TestRuns/suspense/TestRunsCache";
 import useToken from "ui/utils/useToken";
 
-import { DashboardLayout } from "../../index";
+import { DashboardLayout, Panel } from "../../index";
 
 function Message(props: React.HTMLProps<HTMLDivElement>) {
   return (
@@ -58,15 +58,6 @@ function useTestRunRecordingsSuspends(testRuns: TestRun[], testRunId: string | n
     groupedRecordings: null,
     recordings: null,
   };
-}
-
-function Panel(props: React.HTMLProps<HTMLDivElement>) {
-  return (
-    <div
-      {...props}
-      className="flex w-0 flex-grow flex-col space-y-2 overflow-y-auto rounded-md bg-white p-4"
-    />
-  );
 }
 
 function TestRunRow({ teamId, testRun }: { teamId: string; testRun: TestRun }) {
