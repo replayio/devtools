@@ -60,12 +60,6 @@ test("cypress-03: Test Step interactions", async ({ pageWithMeta: { page, record
   // Clicking in viewer mode shouldn't switch to DevTools mode
   expect(await isViewerTabActive(page)).toBe(true);
 
-  const firstGet = clickableSteps.filter({ hasText: /get/ }).first();
-
-  // Jump to the first `get` step
-  await firstGet.click();
-  prevPercent = await waitForTimelineAdvanced(page, prevPercent);
-
   // Should show the "Before/After" buttons
   const beforeAfterButtons = getTestStepBeforeAfterButtons(page);
   expect(await beforeAfterButtons.isVisible()).toBe(true);
@@ -75,6 +69,17 @@ test("cypress-03: Test Step interactions", async ({ pageWithMeta: { page, record
   // Clicking "After" changes the current time
   await afterButton.click();
   prevPercent = await waitForTimelineAdvanced(page, prevPercent);
+
+  const firstGet = clickableSteps.filter({ hasText: /get/ }).first();
+
+  // Jump to the first `get` step
+  await firstGet.click();
+  prevPercent = await waitForTimelineAdvanced(page, prevPercent);
+
+  // Buttons get hidden for `get` steps
+  await waitFor(async () => {
+    expect(await beforeAfterButtons.isVisible()).toBe(false);
+  });
 
   const networkStep = steps.filter({ hasText: /localhost/ }).first();
   await networkStep.click();
