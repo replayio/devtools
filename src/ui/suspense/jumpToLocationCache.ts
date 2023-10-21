@@ -8,16 +8,13 @@ import {
 } from "@replayio/protocol";
 import { createCache, createSingleEntryCache } from "suspense";
 
-import { PauseFrame } from "devtools/client/debugger/src/selectors";
-import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
-import { getPointDescriptionForFrame } from "replay-next/src/suspense/PointStackCache";
 import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
 import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientInterface } from "shared/client/types";
 import { IGNORABLE_PARTIAL_SOURCE_URLS } from "ui/actions/eventListeners/eventListenerUtils";
 import { findFunctionOutlineForLocation } from "ui/actions/eventListeners/jumpToCode";
 import { SourcesState, getPreferredLocation } from "ui/reducers/sources";
-import { getPauseFramesAsync } from "ui/suspense/frameCache";
+import { FormattedPointStackFrame, formattedPointStackCache } from "ui/suspense/frameCache";
 
 interface ApplyMiddlewareDecl {
   location: SourceLocationRange;
@@ -65,11 +62,11 @@ const applyMiddlewareDeclCache = createSingleEntryCache<
   },
 });
 
-function isFrameInDecl(decl: ApplyMiddlewareDecl, frame: PauseFrame) {
+function isFrameInDecl(decl: ApplyMiddlewareDecl, frame: FormattedPointStackFrame) {
   return (
-    frame.location.line >= decl.location.begin.line &&
-    frame.location.line < decl.location.end.line &&
-    frame.location.sourceId === decl.sourceId
+    frame.executionLocation.line >= decl.location.begin.line &&
+    frame.executionLocation.line < decl.location.end.line &&
+    frame.executionLocation.sourceId === decl.sourceId
   );
 }
 
@@ -85,7 +82,7 @@ function isNestedInside(child: SourceLocationRange, parent: SourceLocationRange)
 }
 
 async function searchingCallstackForDispatch(
-  pauseFrames: PauseFrame[],
+  pauseFrames: FormattedPointStackFrame[],
   replayClient: ReplayClientInterface,
   sourcesState: SourcesState
 ) {
@@ -156,7 +153,7 @@ async function isReduxMiddleware(replayClient: ReplayClientInterface, location: 
 }
 
 async function searchSourceOutlineForDispatch(
-  pauseFrames: PauseFrame[],
+  pauseFrames: FormattedPointStackFrame[],
   replayClient: ReplayClientInterface
 ) {
   // The first 2 elements in filtered pause frames are from replay's redux stub, so they should be ignored
@@ -167,7 +164,7 @@ async function searchSourceOutlineForDispatch(
   while (isMiddleware && preferredFrameIdx < pauseFrames.length) {
     let preferredFrame = pauseFrames[preferredFrameIdx];
 
-    if (await isReduxMiddleware(replayClient, preferredFrame.location)) {
+    if (await isReduxMiddleware(replayClient, preferredFrame.executionLocation)) {
       isMiddleware = true;
       preferredFrameIdx++;
     } else {
@@ -191,21 +188,17 @@ export const reduxDispatchJumpLocationCache = createCache<
   debugLabel: "ReduxDispatchJumpLocation",
   getKey: ([replayClient, point, time, sourcesState]) => point,
   load: async ([replayClient, point, time, sourcesState]) => {
-    const pauseId = await pauseIdCache.readAsync(replayClient, point, time);
-    const frames = (await getPauseFramesAsync(replayClient, pauseId, sourcesState)) ?? [];
-    const filteredPauseFrames = frames.filter(frame => {
-      const { source } = frame;
-      if (!source) {
-        return false;
-      }
-
-      return !IGNORABLE_PARTIAL_SOURCE_URLS.concat(
+    const frames = await formattedPointStackCache.readAsync(
+      replayClient,
+      { point, time },
+      IGNORABLE_PARTIAL_SOURCE_URLS.concat(
         "serializableStateInvariantMiddleware",
         "immutableStateInvariantMiddleware",
         "redux-thunk",
         "bindActionCreators"
-      ).some(partialUrl => source.url?.includes(partialUrl));
-    });
+      )
+    );
+    const { filteredFrames: filteredPauseFrames } = frames;
 
     let preferredFrameIdx = await searchingCallstackForDispatch(
       filteredPauseFrames,
@@ -220,12 +213,6 @@ export const reduxDispatchJumpLocationCache = createCache<
       preferredFrameIdx = await searchSourceOutlineForDispatch(filteredPauseFrames, replayClient);
     }
 
-    const matchingPoint = await getPointDescriptionForFrame(replayClient, point, preferredFrameIdx);
-
-    if (matchingPoint) {
-      return matchingPoint;
-    } else {
-      return getPointDescriptionForFrame(replayClient, point, 2);
-    }
+    return filteredPauseFrames[preferredFrameIdx].point;
   },
 });
