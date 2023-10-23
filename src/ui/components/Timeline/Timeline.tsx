@@ -2,12 +2,7 @@ import { MouseEvent, useContext, useLayoutEffect, useRef, useState } from "react
 
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { throttle } from "shared/utils/function";
-import {
-  seek,
-  setDisplayedFocusWindow,
-  setTimelineToTime,
-  stopPlayback,
-} from "ui/actions/timeline";
+import { seek, setDisplayedFocusWindow, setHoverTime, stopPlayback } from "ui/actions/timeline";
 import useTimelineContextMenu from "ui/components/Timeline/useTimelineContextMenu";
 import { selectors } from "ui/reducers";
 import {
@@ -97,7 +92,7 @@ export default function Timeline() {
     dispatch(setDragging(isDragging));
 
     if (hoverTime != mouseTime) {
-      dispatch(setTimelineToTime(mouseTime, isDragging));
+      dispatch(setHoverTime(mouseTime, isDragging));
     }
 
     if (isDragging) {
@@ -126,7 +121,7 @@ export default function Timeline() {
 
   const onMouseLeave = () => {
     setIsHovered(false);
-    dispatch(setTimelineToTime(null, false));
+    dispatch(setHoverTime(null, false));
   };
 
   return (
