@@ -25,7 +25,7 @@ import {
   isUserActionTestEvent,
 } from "shared/test-suites/RecordingTestMetadata";
 import { isPointInRegion } from "shared/utils/time";
-import { requestFocusWindow, seek, setTimelineToTime } from "ui/actions/timeline";
+import { requestFocusWindow, seek, setHoverTime } from "ui/actions/timeline";
 import { TestSuiteCache } from "ui/components/TestSuite/suspense/TestSuiteCache";
 import { useTestEventContextMenu } from "ui/components/TestSuite/views/TestRecording/useTestEventContextMenu";
 import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext";
@@ -180,7 +180,7 @@ export function TestSectionRow({
 
   const onMouseEnter = async () => {
     if (!isSelected) {
-      dispatch(setTimelineToTime(getTestEventTime(testEvent)));
+      dispatch(setHoverTime(getTestEventTime(testEvent)));
 
       if (isUserActionTestEvent(testEvent)) {
         // We hope to have details on the relevant DOM node cached by now.
@@ -200,7 +200,7 @@ export function TestSectionRow({
 
   const onMouseLeave = () => {
     if (!isSelected) {
-      dispatch(setTimelineToTime(null));
+      dispatch(setHoverTime(null));
 
       if (isUserActionTestEvent(testEvent)) {
         dispatch(unhighlightNode());

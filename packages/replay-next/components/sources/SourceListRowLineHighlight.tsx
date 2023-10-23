@@ -29,7 +29,7 @@ export const SourceListRowLineHighlight = memo(function SourceListRowLineHighlig
         if (columnBreakpointIndex < breakableColumnIndices.length - 1) {
           highlightColumnEnd = breakableColumnIndices[columnBreakpointIndex + 1] - 1;
         } else {
-          highlightColumnEnd = lineLength - 1;
+          highlightColumnEnd = lineLength;
         }
       }
 

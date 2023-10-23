@@ -573,7 +573,7 @@ export async function processCypressTestRecording(
                 testSourceCallStack: null,
                 timeStampedPoints: {
                   afterStep: stepEndPoint,
-                  beforeStep: stepStartPoint,
+                  beforeStep: command.name === "get" ? stepEndPoint : stepStartPoint,
                   result: resultPoint,
                   viewSource: viewSourcePoint,
                 },

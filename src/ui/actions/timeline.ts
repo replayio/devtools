@@ -160,7 +160,7 @@ function onPaused({ point, time }: PauseEventArgs): UIThunkAction {
   };
 }
 
-export function setTimelineToTime(time: number | null, updateGraphics = true): UIThunkAction {
+export function setHoverTime(time: number | null, updateGraphics = true): UIThunkAction {
   return async (dispatch, getState) => {
     dispatch(setTimelineState({ hoverTime: time }));
 
@@ -183,30 +183,6 @@ export function setTimelineToTime(time: number | null, updateGraphics = true): U
       paintGraphics(screen, mouse);
     } catch (error) {
       console.error(error);
-    }
-  };
-}
-
-export function setTimelineToPauseTime(
-  time: number,
-  pauseId: string,
-  point?: string,
-  force = false
-): UIThunkAction {
-  return async (dispatch, getState) => {
-    dispatch(setTimelineToTime(time));
-
-    if (time) {
-      const screenshot = await repaintAtPause(
-        time,
-        pauseId,
-        time => getHoverTime(getState()) !== time,
-        force
-      );
-
-      if (screenshot && point) {
-        addLastScreen(screenshot, point, time);
-      }
     }
   };
 }
@@ -264,7 +240,7 @@ export function seek({
 
       // getPointNearTime could take time while we're processing the recording
       // so we optimistically set the timeline to the target time
-      dispatch(setTimelineToTime(time));
+      dispatch(setTimelineState({ currentTime: time }));
 
       const nearestEvent = mostRecentPaintOrMouseEvent(time);
       const timeStampedPoint = await replayClient.getPointNearTime(time);
@@ -518,7 +494,7 @@ export function goToNextPaint(): UIThunkAction {
 export function setHoveredItem(hoveredItem: HoveredItem): UIThunkAction {
   return dispatch => {
     dispatch(setHoveredItemAction(hoveredItem));
-    dispatch(setTimelineToTime(hoveredItem?.time || null));
+    dispatch(setHoverTime(hoveredItem?.time || null));
   };
 }
 
@@ -529,7 +505,7 @@ export function clearHoveredItem(): UIThunkAction {
       return;
     }
     dispatch(setHoveredItemAction(null));
-    dispatch(setTimelineToTime(null));
+    dispatch(setHoverTime(null));
   };
 }
 
@@ -567,20 +543,20 @@ export function setDisplayedFocusWindow(
 
     // Update the paint preview to match the handle that's being dragged.
     if (begin !== prevBeginTime && end === prevEndTime) {
-      dispatch(setTimelineToTime(begin));
+      dispatch(setHoverTime(begin));
     } else if (begin === prevBeginTime && end !== prevEndTime) {
-      dispatch(setTimelineToTime(end));
+      dispatch(setHoverTime(end));
     } else {
       // Else just make sure the preview time stays within the moving window.
       const hoverTime = getHoverTime(state);
       if (hoverTime !== null) {
         if (hoverTime < begin) {
-          dispatch(setTimelineToTime(begin));
+          dispatch(setHoverTime(begin));
         } else if (hoverTime > end) {
-          dispatch(setTimelineToTime(end));
+          dispatch(setHoverTime(end));
         }
       } else {
-        dispatch(setTimelineToTime(currentTime));
+        dispatch(setHoverTime(currentTime));
       }
     }
 
