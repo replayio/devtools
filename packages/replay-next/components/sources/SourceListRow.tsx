@@ -183,7 +183,7 @@ export default function SourceListRow({
         <SourceListRowLineHighlight
           breakablePositionsByLine={breakablePositionsByLine}
           lineHighlight={lineHighlight}
-          lineLength={plainText?.[0].length ?? 0}
+          lineLength={plainText?.[lineIndex]?.length ?? 0}
         />
       )}
 
