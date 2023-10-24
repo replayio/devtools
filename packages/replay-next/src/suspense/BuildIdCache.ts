@@ -152,8 +152,8 @@ export const recordingCapabilitiesCache = createSingleEntryCache<
     const buildId = await buildIdCache.readAsync(replayClient);
 
     const buildComponents = parseBuildIdComponents(buildId) ?? {
-      platform: recordingTarget,
-      runtime: recordingTarget,
+      platform: "unknown",
+      runtime: "unknown",
       date: "",
     };
     return getRecordingCapabilities(recordingTarget, buildComponents);

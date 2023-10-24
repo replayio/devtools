@@ -9,11 +9,7 @@ import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { pauseEvaluationsCache } from "replay-next/src/suspense/PauseCache";
 import { evaluate } from "replay-next/src/utils/evaluate";
 import { ReplayClientInterface } from "shared/client/types";
-import {
-  ChunksArray,
-  deserializeChunkedString,
-  splitStringIntoChunks as splitStringIntoChunksOriginal,
-} from "ui/utils/evalChunkedStrings";
+import { ChunksArray, deserializeChunkedString } from "ui/utils/evalChunkedStrings";
 
 // Our modified RDT bundle exports some additional methods
 type RendererInterfaceWithAdditions = RendererInterface & {
@@ -50,8 +46,6 @@ declare global {
     };
   }
 }
-
-declare function splitStringIntoChunks(allChunks: ChunksArray, str: string): string[];
 
 function installReactDevToolsIntoPause() {
   // Create placeholders for our poor man's debug logging and the saved React tree operations
@@ -172,7 +166,24 @@ function getComponentSpecificNodesToFiberIDs(
   // This works with Firefox and older Chromium
   const domNodesToFiberIds = new Map<HTMLElement, number>();
 
-  const NO_NODES: HTMLElement[] = [];
+  // Inline this so it's available in scope
+  function splitStringIntoChunks(allChunks: ChunksArray, str: string) {
+    // Split the stringified data into chunks
+    const stringChunks: string[] = [];
+    for (let i = 0; i < str.length; i += 9999) {
+      stringChunks.push(str.slice(i, i + 9999));
+    }
+
+    // If there's more than one string chunk, save its size
+    if (stringChunks.length > 1) {
+      allChunks.push(stringChunks.length);
+    }
+
+    for (const chunk of stringChunks) {
+      allChunks.push(chunk);
+    }
+    return stringChunks.length;
+  }
 
   for (const [rendererId, rendererInterface] of window.__REACT_DEVTOOLS_GLOBAL_HOOK__
     .rendererInterfaces) {
@@ -183,7 +194,7 @@ function getComponentSpecificNodesToFiberIDs(
 
     const renderer = rendererInterface as RendererInterfaceWithAdditions;
     for (const fiberId of fiberIdsForRenderer) {
-      const nodes: HTMLElement[] = renderer.findNativeNodesForFiberID(fiberId) ?? NO_NODES;
+      const nodes: HTMLElement[] = renderer.findNativeNodesForFiberID(fiberId) ?? [];
 
       for (const node of nodes) {
         if (isObjectIdCapable) {
@@ -201,7 +212,6 @@ function getComponentSpecificNodesToFiberIDs(
   if (isObjectIdCapable) {
     const stringContents = JSON.stringify(nodeIdsToFiberIds);
     const chunksArray: ChunksArray = [];
-    // This should be in scope in the evaluated expression string
     splitStringIntoChunks(chunksArray, stringContents);
 
     // Return the split-up string, so it can be reassembled in the browser and parsed as JSON
@@ -238,10 +248,6 @@ export const nodesToFiberIdsCache: Cache<
     }
 
     const nodeIdsExpression = `
-      // Ensure this is in scope. Note the import rename to avoid
-      // the name conflict with the declared local TS type.
-      ${splitStringIntoChunksOriginal}
-
       // Pass in the fiber IDs and the capabilities flag
       (${getComponentSpecificNodesToFiberIDs})(
         ${JSON.stringify(rendererIdsToFiberIds)},

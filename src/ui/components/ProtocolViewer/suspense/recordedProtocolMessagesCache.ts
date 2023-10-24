@@ -31,8 +31,6 @@ export type RecordedProtocolData = {
   | { type: "response"; value: ProtocolResponse }
 );
 
-declare function splitStringIntoChunks(allChunks: ChunksArray, str: string): string[];
-
 export const recordedProtocolMessagesCache = createFocusIntervalCacheForExecutionPoints<
   [replayClient: ReplayClientInterface, sessionSource: SourceDetails, sourcesState: SourcesState],
   RecordedProtocolData
@@ -133,8 +131,29 @@ export const recordedProtocolMessagesCache = createFocusIntervalCacheForExecutio
         // `serializeArgument` will be evaluated in the paused browser.
         type ChunksArray = (string | number)[];
         function serializeArgument(arg: any) {
+          // Gotta define this inline, since this whole function
+          // will be evaluated
+          function splitStringIntoChunks(allChunks: ChunksArray, str: string) {
+            // Split the stringified data into chunks
+            const stringChunks: string[] = [];
+            for (let i = 0; i < str.length; i += 9999) {
+              stringChunks.push(str.slice(i, i + 9999));
+            }
+
+            // If there's more than one string chunk, save its size
+            if (stringChunks.length > 1) {
+              allChunks.push(stringChunks.length);
+            }
+
+            for (const chunk of stringChunks) {
+              allChunks.push(chunk);
+            }
+            return stringChunks.length;
+          }
+
           const stringifiedArg = JSON.stringify(arg);
           const chunks: ChunksArray = [];
+
           splitStringIntoChunks(chunks, stringifiedArg);
 
           return chunks;
@@ -146,10 +165,6 @@ export const recordedProtocolMessagesCache = createFocusIntervalCacheForExecutio
             // Run `serializeArgument` in an eval, and pass in the local variable
             // as the argument to serialize
             expression: `
-              // Ensure this is in scope. Note the import rename to avoid
-              // the name conflict with the declared local TS type.
-              ${splitStringIntoChunksOriginal}
-            
               (${serializeArgument})(${mappedExpression})
             `,
             limits: {
