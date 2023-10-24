@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { ListOnItemsRenderedProps } from "react-window";
 
-export function useScrollSelectedElementIntoView() {
+export function useScrollSelectedListItemIntoView(dataTestId: string) {
   const lastRenderedItemsRef = useRef<[startIndex: number, stopIndex: number]>([-1, -1]);
   const lastSelectedIndexRef = useRef<number | null>(null);
 
@@ -9,7 +9,7 @@ export function useScrollSelectedElementIntoView() {
     visibleStartIndex: startIndex,
     visibleStopIndex: stopIndex,
   }: ListOnItemsRenderedProps) => {
-    const list = document.querySelector('[data-test-id="ElementsList"]');
+    const list = document.querySelector(`[data-test-id="${dataTestId}"]`);
     if (list) {
       const selectedRow = list.querySelector("[data-selected]");
       if (selectedRow) {

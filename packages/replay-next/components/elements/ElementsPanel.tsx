@@ -74,8 +74,12 @@ export function ElementsPanel({
         if (query === "") {
           setSearchState(null);
         } else if (searchState?.query === query) {
-          const index =
-            searchState.index < searchState.results.length - 1 ? searchState.index + 1 : 0;
+          let index = searchState.index;
+          if (event.shiftKey) {
+            index = index > 0 ? index - 1 : searchState.results.length - 1;
+          } else {
+            index = index < searchState.results.length - 1 ? searchState.index + 1 : 0;
+          }
 
           setSearchState({
             ...searchState,
@@ -105,6 +109,11 @@ export function ElementsPanel({
             }
           }
         }
+        break;
+      }
+      case "Escape": {
+        setQuery("");
+        setSearchState(null);
         break;
       }
     }

@@ -2,11 +2,14 @@ import {
   CSSProperties,
   ComponentType,
   ForwardedRef,
+  LegacyRef,
   ReactElement,
+  forwardRef,
   useCallback,
   useEffect,
   useImperativeHandle,
   useLayoutEffect,
+  useMemo,
   useRef,
   useState,
   useSyncExternalStore,
@@ -45,6 +48,7 @@ export function GenericList<Item, ItemData extends Object>({
   listData,
   onItemsRendered,
   onKeyDown: onKeyDownProp,
+  onMouseMove: onMouseMoveProp,
   onSelectionChange,
   style,
   width,
@@ -55,7 +59,7 @@ export function GenericList<Item, ItemData extends Object>({
   defaultSelectedIndex?: number | null;
   fallbackForEmptyList?: ReactElement;
   forwardedRef?: ForwardedRef<ImperativeHandle>;
-  height: number | string;
+  height: number;
   itemData: ItemData;
   itemRendererComponent: ComponentType<
     ListChildComponentProps<GenericListItemData<Item, ItemData>>
@@ -64,6 +68,7 @@ export function GenericList<Item, ItemData extends Object>({
   listData: GenericListData<Item>;
   onItemsRendered?: (props: ListOnItemsRenderedProps) => any;
   onKeyDown?: (event: KeyboardEvent) => void;
+  onMouseMove?: (event: MouseEvent) => void;
   onSelectionChange?: (index: number | null) => void;
   style?: CSSProperties;
   width: number | string;
@@ -114,32 +119,6 @@ export function GenericList<Item, ItemData extends Object>({
 
   useLayoutEffect(() => {
     committedValuesRef.current.onSelectionChange = onSelectionChange;
-
-    // react-window doesn't provide a way to declaratively set data-* attributes
-    // but they're very useful for our e2e tests
-    // We use an effect without dependencies to set these so that we'll always (re)set them after a render,
-    // even if the name/id values haven't changed,
-    // so that other declarative updates don't erase these values
-    const element = outerRef.current;
-    if (element) {
-      if (selectedItemIndex != null) {
-        element.setAttribute("tabIndex", "0");
-      } else {
-        element.removeAttribute("tabIndex");
-      }
-
-      if (dataTestId) {
-        element.setAttribute("data-test-id", dataTestId);
-      } else {
-        element.removeAttribute("data-test-id");
-      }
-
-      if (dataTestName) {
-        element.setAttribute("data-test-name", dataTestName);
-      } else {
-        element.removeAttribute("data-test-name");
-      }
-    }
   });
 
   useLayoutEffect(() => {
@@ -165,6 +144,24 @@ export function GenericList<Item, ItemData extends Object>({
     }),
     [selectedItemIndex, selectItemAtIndexWrapper]
   );
+
+  useEffect(() => {
+    const element = outerRef.current;
+    if (element) {
+      if (!onMouseMoveProp) {
+        return;
+      }
+
+      const onMouseMove = (event: MouseEvent) => {
+        onMouseMoveProp(event);
+      };
+
+      element.addEventListener("mousemove", onMouseMove);
+      return () => {
+        element.removeEventListener("mousemove", onMouseMove);
+      };
+    }
+  }, [onMouseMoveProp]);
 
   useEffect(() => {
     // Not every list supports the concept of a selected row (e.g. Elements > Rules)
@@ -215,6 +212,22 @@ export function GenericList<Item, ItemData extends Object>({
     selectItemAtIndex: selectItemAtIndexWrapper,
   };
 
+  // react-window doesn't provide a way to declaratively set data-* attributes
+  // but they're very useful for our e2e tests
+  const OuterElement = useMemo(() => {
+    return forwardRef(function OuterElement(props, forwardedRef: LegacyRef<HTMLDivElement>) {
+      return (
+        <div
+          ref={forwardedRef}
+          data-test-id={dataTestId}
+          data-test-name={dataTestName}
+          tabIndex={0}
+          {...props}
+        />
+      );
+    });
+  }, [dataTestId, dataTestName]);
+
   if (fallbackForEmptyList !== undefined) {
     if (itemCount === 0) {
       return fallbackForEmptyList;
@@ -231,6 +244,7 @@ export function GenericList<Item, ItemData extends Object>({
       itemSize={itemSize}
       onItemsRendered={onItemsRendered}
       outerRef={outerRef}
+      outerElementType={OuterElement}
       ref={listRef}
       style={style}
       width={width}

@@ -14,8 +14,6 @@ import { ListOnItemsRenderedProps } from "react-window";
 import { useImperativeCacheValue } from "suspense";
 
 import { ElementsListData } from "replay-next/components/elements/ElementsListData";
-import { useElementsListCssVariables } from "replay-next/components/elements/hooks/useElementsListCssVariables";
-import { useScrollSelectedElementIntoView } from "replay-next/components/elements/hooks/useScrollSelectedElementIntoView";
 import { rootObjectIdCache } from "replay-next/components/elements/suspense/RootObjectIdCache";
 import { Item } from "replay-next/components/elements/types";
 import { DefaultFallback } from "replay-next/components/ErrorBoundary";
@@ -23,6 +21,8 @@ import {
   GenericList,
   ImperativeHandle as GenericListImperativeHandle,
 } from "replay-next/components/windowing/GenericList";
+import { useHorizontalScrollingListCssVariables } from "replay-next/components/windowing/hooks/useHorizontalScrollingListCssVariables";
+import { useScrollSelectedListItemIntoView } from "replay-next/components/windowing/hooks/useScrollSelectedListItemIntoView";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import { ElementsListItem, ElementsListItemData, ITEM_SIZE } from "./ElementsListItem";
@@ -51,12 +51,13 @@ export function ElementsList({
 
   const genericListRef = useRef<GenericListImperativeHandle>(null);
 
-  const { cssVariables, onItemsRendered: onItemsRenderedOne } = useElementsListCssVariables();
+  const { cssVariables, onItemsRendered: onItemsRenderedOne } =
+    useHorizontalScrollingListCssVariables("ElementsList");
 
-  const onItemsRenderedTwo = useScrollSelectedElementIntoView();
+  const onItemsRenderedTwo = useScrollSelectedListItemIntoView("ElementsList");
 
   const onItemsRendered = (props: ListOnItemsRenderedProps) => {
-    onItemsRenderedOne(props);
+    onItemsRenderedOne();
     onItemsRenderedTwo(props);
   };
 
