@@ -1,4 +1,9 @@
-import { PauseId, Object as ProtocolObject, Value as ProtocolValue } from "@replayio/protocol";
+import {
+  PauseId,
+  NamedValue as ProtocolNamedValue,
+  Object as ProtocolObject,
+  Value as ProtocolValue,
+} from "@replayio/protocol";
 import classNames from "classnames";
 import { MouseEvent, ReactNode, Suspense, useContext, useState } from "react";
 
@@ -21,7 +26,7 @@ export type Props = {
   onContextMenu?: (event: MouseEvent) => void;
   path?: string;
   pauseId: PauseId;
-  protocolValue: ProtocolValue;
+  protocolValue: ProtocolValue | ProtocolNamedValue;
 };
 
 // Renders a protocol Object/ObjectPreview as a key+value pair.

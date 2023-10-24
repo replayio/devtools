@@ -89,7 +89,7 @@ export function ElementsListItem({
     }
     case Node.TEXT_NODE: {
       dataType = "text";
-      rendered = (node.nodeValue ?? "").trim().replace(/[\n\r]/g, "\\n");
+      rendered = <span>{(node.nodeValue ?? "").trim().replace(/[\n\r]/g, "\\n")}</span>;
       break;
     }
     default: {
@@ -165,6 +165,7 @@ export function ElementsListItem({
         style={
           {
             ...style,
+            width: undefined,
             "--data-depth": depth != null ? `${depth}rem` : undefined,
           } as CSSProperties
         }

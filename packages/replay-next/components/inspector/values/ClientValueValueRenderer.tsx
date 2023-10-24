@@ -83,6 +83,7 @@ export default function ClientValueValueRenderer({
         {finalFormattedValue}
         <button
           className={styles.StringToggleButton}
+          data-test-name="StringToggleButton"
           onClick={() => setIsStringExpanded(!isStringExpanded)}
         >
           {isStringExpanded ? "Less" : "More"}
