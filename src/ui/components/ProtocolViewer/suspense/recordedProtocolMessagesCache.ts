@@ -1,12 +1,9 @@
 import {
   Location,
   PointDescription,
-  PointRange,
-  Property,
   RunEvaluationResult,
   TimeStampedPoint,
 } from "@replayio/protocol";
-import { Cache, createCache } from "suspense";
 
 import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPositionsCache";
 import { recordingTargetCache } from "replay-next/src/suspense/BuildIdCache";
@@ -16,15 +13,13 @@ import { mappedExpressionCache } from "replay-next/src/suspense/MappedExpression
 import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
 import { compareExecutionPoints } from "replay-next/src/utils/time";
 import { ReplayClientInterface } from "shared/client/types";
-import {
-  ProtocolError,
-  ProtocolErrorMap,
-  ProtocolRequest,
-  ProtocolRequestMap,
-  ProtocolResponse,
-  ProtocolResponseMap,
-} from "ui/reducers/protocolMessages";
+import { ProtocolError, ProtocolRequest, ProtocolResponse } from "ui/reducers/protocolMessages";
 import { SourceDetails, SourcesState, getPreferredLocation } from "ui/reducers/sources";
+import {
+  ChunksArray,
+  deserializeChunkedString,
+  splitStringIntoChunks as splitStringIntoChunksOriginal,
+} from "ui/utils/evalChunkedStrings";
 
 export type RecordedProtocolData = {
   id: number;
@@ -35,6 +30,8 @@ export type RecordedProtocolData = {
   | { type: "request"; value: ProtocolRequest }
   | { type: "response"; value: ProtocolResponse }
 );
+
+declare function splitStringIntoChunks(allChunks: ChunksArray, str: string): string[];
 
 export const recordedProtocolMessagesCache = createFocusIntervalCacheForExecutionPoints<
   [replayClient: ReplayClientInterface, sessionSource: SourceDetails, sourcesState: SourcesState],
@@ -136,26 +133,6 @@ export const recordedProtocolMessagesCache = createFocusIntervalCacheForExecutio
         // `serializeArgument` will be evaluated in the paused browser.
         type ChunksArray = (string | number)[];
         function serializeArgument(arg: any) {
-          // Gotta define this inline, since this whole function
-          // will be evaluated
-          function splitStringIntoChunks(allChunks: ChunksArray, str: string) {
-            // Split the stringified data into chunks
-            const stringChunks: string[] = [];
-            for (let i = 0; i < str.length; i += 9999) {
-              stringChunks.push(str.slice(i, i + 9999));
-            }
-
-            // If there's more than one string chunk, save its size
-            if (stringChunks.length > 1) {
-              allChunks.push(stringChunks.length);
-            }
-
-            for (const chunk of stringChunks) {
-              allChunks.push(chunk);
-            }
-            return stringChunks.length;
-          }
-
           const stringifiedArg = JSON.stringify(arg);
           const chunks: ChunksArray = [];
           splitStringIntoChunks(chunks, stringifiedArg);
@@ -163,29 +140,17 @@ export const recordedProtocolMessagesCache = createFocusIntervalCacheForExecutio
           return chunks;
         }
 
-        // The counterpart will run locally on the eval result data.
-        function deserializeChunkedString(chunks: Property[]): string {
-          let numStringChunks = 1;
-          if (typeof chunks[0].value === "number") {
-            const numChunksProp = chunks.shift()!;
-            numStringChunks = numChunksProp.value;
-          }
-          const stringChunks = chunks.splice(0, numStringChunks);
-
-          let str = "";
-          for (const stringChunkProp of stringChunks) {
-            str += stringChunkProp.value;
-          }
-
-          return str;
-        }
-
         const evalResults: RunEvaluationResult[] = [];
         await replayClient.runEvaluation(
           {
             // Run `serializeArgument` in an eval, and pass in the local variable
             // as the argument to serialize
-            expression: `(${serializeArgument})(${mappedExpression})`,
+            expression: `
+              // Put this into scope
+              ${splitStringIntoChunksOriginal}
+            
+              (${serializeArgument})(${mappedExpression})
+            `,
             limits: {
               begin: rangeStart,
               end: rangeEnd,
