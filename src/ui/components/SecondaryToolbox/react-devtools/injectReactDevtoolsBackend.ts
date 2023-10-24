@@ -1,12 +1,33 @@
+import { ObjectId } from "@replayio/protocol";
 import type { RendererInterface } from "@replayio/react-devtools-inline";
+import type { DevToolsHook } from "@replayio/react-devtools-inline/backend";
+import type { SerializedElement, Store } from "@replayio/react-devtools-inline/frontend";
+import { Cache, createCache } from "suspense";
 
+import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
+import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { pauseEvaluationsCache } from "replay-next/src/suspense/PauseCache";
+import { evaluate } from "replay-next/src/utils/evaluate";
 import { ReplayClientInterface } from "shared/client/types";
+import {
+  ChunksArray,
+  deserializeChunkedString,
+  splitStringIntoChunks as splitStringIntoChunksOriginal,
+} from "ui/utils/evalChunkedStrings";
 
 // Our modified RDT bundle exports some additional methods
 type RendererInterfaceWithAdditions = RendererInterface & {
   getOrGenerateFiberID: (fiber: any) => number;
   setRootPseudoKey: (id: number, fiber: any) => void;
+};
+
+// Some internal values not currently included in `@types/react-devtools-inline`
+type ElementWithChildren = SerializedElement & {
+  children: number[];
+};
+
+export type StoreWithInternals = Store & {
+  _idToElement: Map<number, ElementWithChildren>;
 };
 
 declare global {
@@ -19,8 +40,18 @@ declare global {
       event: string,
       data: any
     ) => { event: string; data: any };
+
+    __REACT_DEVTOOLS_GLOBAL_HOOK__: DevToolsHook;
+
+    // Available in Chromium builds after 2023-09-16
+    __RECORD_REPLAY__: {
+      getProtocolIdForObject: (obj: unknown) => ObjectId;
+      getObjectFromProtocolId: (id: ObjectId) => unknown;
+    };
   }
 }
+
+declare function splitStringIntoChunks(allChunks: ChunksArray, str: string): string[];
 
 function installReactDevToolsIntoPause() {
   // Create placeholders for our poor man's debug logging and the saved React tree operations
@@ -100,7 +131,7 @@ function installReactDevToolsIntoPause() {
 const injectGlobalHookSource = require("./installHook.raw.js").default;
 const reactDevtoolsBackendSource = require("./react_devtools_backend.raw.js").default;
 
-const expression = `(${installReactDevToolsIntoPause})()`
+const rdtInjectionExpression = `(${installReactDevToolsIntoPause})()`
   .replace("INSTALL_HOOK_PLACEHOLDER", `(${injectGlobalHookSource})`)
   .replace("DEVTOOLS_PLACEHOLDER", `(${reactDevtoolsBackendSource})`);
 
@@ -111,5 +142,159 @@ export async function injectReactDevtoolsBackend(
   if (!pauseId) {
     return;
   }
-  await pauseEvaluationsCache.readAsync(replayClient, pauseId, null, expression);
+  await pauseEvaluationsCache.readAsync(replayClient, pauseId, null, rdtInjectionExpression);
 }
+
+function collectElementIDs(
+  store: StoreWithInternals,
+  elementID: number,
+  elementIDs: number[] = []
+) {
+  elementIDs.push(elementID);
+  const element = store._idToElement.get(elementID);
+  for (const childID of element!.children) {
+    collectElementIDs(store, childID, elementIDs);
+  }
+  return elementIDs;
+}
+
+// Evaluated in the paused browser.
+// Encapsulates the logic for finding the DOM nodes associated with each fiber ID.
+// Returns a different structured result based on object ID lookup support.
+function getComponentSpecificNodesToFiberIDs(
+  rendererIdsToFiberIds: Record<number, number[]>,
+  isObjectIdCapable: boolean
+): Map<HTMLElement, number> | ChunksArray {
+  // Modern: if we have object ID lookup in evals, save just the IDs
+  // This only works with Chromium 2023-09-16+
+  const nodeIdsToFiberIds: Record<string, number> = {};
+  // Legacy: if we don't have object ID lookup in evals, save the full objects
+  // This works with Firefox and older Chromium
+  const domNodesToFiberIds = new Map<HTMLElement, number>();
+
+  const NO_NODES: HTMLElement[] = [];
+
+  for (const [rendererId, rendererInterface] of window.__REACT_DEVTOOLS_GLOBAL_HOOK__
+    .rendererInterfaces) {
+    const fiberIdsForRenderer = rendererIdsToFiberIds[rendererId];
+    if (!fiberIdsForRenderer) {
+      continue;
+    }
+
+    const renderer = rendererInterface as RendererInterfaceWithAdditions;
+    for (const fiberId of fiberIdsForRenderer) {
+      const nodes: HTMLElement[] = renderer.findNativeNodesForFiberID(fiberId) ?? NO_NODES;
+
+      for (const node of nodes) {
+        if (isObjectIdCapable) {
+          const nodeId = window.__RECORD_REPLAY__.getProtocolIdForObject(node);
+          nodeIdsToFiberIds[nodeId] = fiberId;
+        } else {
+          domNodesToFiberIds.set(node, fiberId);
+        }
+      }
+    }
+  }
+
+  // Fast path: sending back just a stringified object mapping node IDs to fiber IDs
+  // is much faster than sending back a bunch of objects (DOM node previews are expensive!)
+  if (isObjectIdCapable) {
+    const stringContents = JSON.stringify(nodeIdsToFiberIds);
+    const chunksArray: ChunksArray = [];
+    // This should be in scope in the evaluated expression string
+    splitStringIntoChunks(chunksArray, stringContents);
+
+    // Return the split-up string, so it can be reassembled in the browser and parsed as JSON
+    return chunksArray;
+  } else {
+    // Slow path: send back the full objects, which requires the protocol to preview them
+    return domNodesToFiberIds;
+  }
+}
+
+export const nodesToFiberIdsCache: Cache<
+  [replayClient: ReplayClientInterface, pauseId: string, store: StoreWithInternals],
+  [Map<ObjectId, number>, Map<number, ObjectId[]>]
+> = createCache({
+  debugLabel: "nodesToFiberIdsCache",
+  // simplifying assumption that the store will have the same contents at a pause ID
+  getKey: ([replayClient, pauseId, store]) => pauseId,
+  async load([replayClient, pauseId, store]) {
+    const nodeIdsToFiberIds = new Map<ObjectId, number>();
+
+    const rendererIdsToFiberIds: Record<number, number[]> = {};
+
+    const recordingCapabilities = recordingCapabilitiesCache.getValueIfCached(replayClient)!;
+
+    // Figure out all of the current fiber IDs we expect exist at this point in time
+    for (const rootID of store!.roots) {
+      const rendererId = store!.rootIDToRendererID.get(rootID)!;
+      const elementIDs = collectElementIDs(store, rootID);
+
+      if (!(rendererId in rendererIdsToFiberIds)) {
+        rendererIdsToFiberIds[rendererId] = [];
+      }
+      rendererIdsToFiberIds[rendererId].push(...elementIDs);
+    }
+
+    const nodeIdsExpression = `
+      // Ensure this is in scope. Note the import rename to avoid
+      // the name conflict with the declared local TS type.
+      ${splitStringIntoChunksOriginal}
+
+      // Pass in the nodes and the capabilities flag
+      (${getComponentSpecificNodesToFiberIDs})(
+        ${JSON.stringify(rendererIdsToFiberIds)},
+        ${recordingCapabilities.supportsObjectIdLookupsInEvaluations}
+      )
+    `;
+
+    const response = await evaluate({
+      replayClient: replayClient,
+      text: nodeIdsExpression,
+    });
+
+    if (response.returned?.object) {
+      const evalResultPreview = await objectCache.readAsync(
+        replayClient,
+        pauseId,
+        response.returned.object,
+        "canOverflow"
+      );
+
+      if (recordingCapabilities.supportsObjectIdLookupsInEvaluations) {
+        // Should have returned an array containing a chunked `JSON.stringify()` string
+        const properties = evalResultPreview.preview?.properties ?? [];
+        if (properties.length) {
+          const fullString = deserializeChunkedString(properties.slice());
+          const nodeIdsToFiberIdsRecord = JSON.parse(fullString) as Record<string, number>;
+          for (const [nodeId, fiberId] of Object.entries(nodeIdsToFiberIdsRecord)) {
+            nodeIdsToFiberIds.set(nodeId, fiberId);
+          }
+        }
+      } else {
+        // Should have returned a `Map<HTMLElement, number>`
+        evalResultPreview.preview?.containerEntries?.forEach(entry => {
+          // The backend should have returned numeric node IDs as values.
+          // The keys are DOM node objects. We don't need to fetch them,
+          // because all we care about here is the object IDs anyway.
+          if (typeof entry.key?.object === "string" && typeof entry.value.value === "number") {
+            nodeIdsToFiberIds.set(entry.key.object, entry.value.value);
+          }
+        });
+      }
+    }
+
+    // Invert the lookup - there's some cases where we want to go from fiberId to nodeId,
+    // so let's cache that too
+    const fiberIdsToNodeIds = new Map<number, ObjectId[]>();
+    for (const [nodeId, fiberId] of nodeIdsToFiberIds) {
+      if (!fiberIdsToNodeIds.has(fiberId)) {
+        fiberIdsToNodeIds.set(fiberId, []);
+      }
+      fiberIdsToNodeIds.get(fiberId)!.push(nodeId);
+    }
+
+    return [nodeIdsToFiberIds, fiberIdsToNodeIds];
+  },
+});
