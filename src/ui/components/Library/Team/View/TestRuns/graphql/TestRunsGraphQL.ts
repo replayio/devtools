@@ -1,10 +1,10 @@
 import { gql } from "@apollo/client";
 
 import {
-  GetTestsRunRecordings,
-  GetTestsRunRecordings_node_Workspace,
-  GetTestsRunRecordings_node_Workspace_testRuns_edges_node_results_recordings,
-} from "shared/graphql/generated/GetTestsRunRecordings";
+  GetTestRunRecordings,
+  GetTestRunRecordings_node_Workspace,
+  GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_recordings,
+} from "shared/graphql/generated/GetTestRunRecordings";
 import {
   GetTestsRunsForWorkspace,
   GetTestsRunsForWorkspace_node_Workspace,
@@ -13,7 +13,7 @@ import {
 import { GraphQLClientInterface } from "shared/graphql/GraphQLClient";
 
 const GET_TEST_RUN_RECORDINGS = gql`
-  query GetTestsRun($workspaceId: ID!, $id: String!) {
+  query GetTestRunRecordings($workspaceId: ID!, $id: String!) {
     node(id: $workspaceId) {
       ... on Workspace {
         id
@@ -100,10 +100,10 @@ export async function getTestRunRecordingsGraphQL(
   accessToken: string | null,
   workspaceId: string,
   summaryId: string
-): Promise<GetTestsRunRecordings_node_Workspace_testRuns_edges_node_results_recordings[]> {
-  const response = await graphQLClient.send<GetTestsRunRecordings>(
+): Promise<GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_recordings[]> {
+  const response = await graphQLClient.send<GetTestRunRecordings>(
     {
-      operationName: "GetTestsRun",
+      operationName: "GetTestRunRecordings",
       query: GET_TEST_RUN_RECORDINGS,
       variables: { id: summaryId, workspaceId },
     },
@@ -115,8 +115,7 @@ export async function getTestRunRecordingsGraphQL(
   }
 
   return (
-    (response.node as GetTestsRunRecordings_node_Workspace).testRuns?.edges[0]?.node.results
-      .recordings ?? []
+    (response.node as GetTestRunRecordings_node_Workspace).testRuns?.edges[0]?.node.tests.flatMap((t: any) => t.recordings) ?? []
   );
 }
 

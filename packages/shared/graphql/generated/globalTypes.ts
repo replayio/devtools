@@ -29,28 +29,6 @@ export interface AddCommentReplyInput {
   isPublished: boolean;
 }
 
-export interface AddPointInput {
-  badge?: string | null;
-  condition?: string | null;
-  content: string;
-  key: string;
-  recordingId: string;
-  sourceLocation: any;
-}
-
-export interface DeletePointInput {
-  key: string;
-  recordingId: string;
-}
-
-export interface UpdatePointInput {
-  badge?: string | null;
-  condition?: string | null;
-  content: string;
-  key: string;
-  recordingId: string;
-}
-
 //==============================================================
 // END Enums and Input Objects
 //==============================================================

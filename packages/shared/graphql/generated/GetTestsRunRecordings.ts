@@ -11,33 +11,36 @@ export interface GetTestsRunRecordings_node_Recording {
   __typename: "Recording";
 }
 
-export interface GetTestsRunRecordings_node_Workspace_testRuns_edges_node_results_recordings_comments_user {
+export interface GetTestsRunRecordings_node_Workspace_testRuns_edges_node_tests_recordings_comments_user {
   __typename: "User";
   id: string;
 }
 
-export interface GetTestsRunRecordings_node_Workspace_testRuns_edges_node_results_recordings_comments {
+export interface GetTestsRunRecordings_node_Workspace_testRuns_edges_node_tests_recordings_comments {
   __typename: "Comment";
-  user: GetTestsRunRecordings_node_Workspace_testRuns_edges_node_results_recordings_comments_user | null;
+  user: GetTestsRunRecordings_node_Workspace_testRuns_edges_node_tests_recordings_comments_user | null;
 }
 
-export interface GetTestsRunRecordings_node_Workspace_testRuns_edges_node_results_recordings {
+export interface GetTestsRunRecordings_node_Workspace_testRuns_edges_node_tests_recordings {
   __typename: "Recording";
   uuid: any;
   duration: number | null;
-  isProcessed: boolean;
+  isProcessed: boolean | null;
   createdAt: any;
-  comments: GetTestsRunRecordings_node_Workspace_testRuns_edges_node_results_recordings_comments[];
+  comments: GetTestsRunRecordings_node_Workspace_testRuns_edges_node_tests_recordings_comments[];
 }
 
-export interface GetTestsRunRecordings_node_Workspace_testRuns_edges_node_results {
-  __typename: "TestRunResults";
-  recordings: GetTestsRunRecordings_node_Workspace_testRuns_edges_node_results_recordings[];
+export interface GetTestsRunRecordings_node_Workspace_testRuns_edges_node_tests {
+  __typename: "TestRunTest";
+  testId: string;
+  sourcePath: string;
+  title: string;
+  recordings: GetTestsRunRecordings_node_Workspace_testRuns_edges_node_tests_recordings[];
 }
 
 export interface GetTestsRunRecordings_node_Workspace_testRuns_edges_node {
   __typename: "TestRun";
-  results: GetTestsRunRecordings_node_Workspace_testRuns_edges_node_results;
+  tests: GetTestsRunRecordings_node_Workspace_testRuns_edges_node_tests[];
 }
 
 export interface GetTestsRunRecordings_node_Workspace_testRuns_edges {
@@ -56,9 +59,7 @@ export interface GetTestsRunRecordings_node_Workspace {
   testRuns: GetTestsRunRecordings_node_Workspace_testRuns | null;
 }
 
-export type GetTestsRunRecordings_node =
-  | GetTestsRunRecordings_node_Recording
-  | GetTestsRunRecordings_node_Workspace;
+export type GetTestsRunRecordings_node = GetTestsRunRecordings_node_Recording | GetTestsRunRecordings_node_Workspace;
 
 export interface GetTestsRunRecordings {
   node: GetTestsRunRecordings_node | null;
