@@ -146,7 +146,8 @@ export const recordedProtocolMessagesCache = createFocusIntervalCacheForExecutio
             // Run `serializeArgument` in an eval, and pass in the local variable
             // as the argument to serialize
             expression: `
-              // Put this into scope
+              // Ensure this is in scope. Note the import rename to avoid
+              // the name conflict with the declared local TS type.
               ${splitStringIntoChunksOriginal}
             
               (${serializeArgument})(${mappedExpression})
