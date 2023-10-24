@@ -908,10 +908,16 @@ export class ReplayClient implements ReplayClientInterface {
       limit,
       query,
       sourceIds,
+      useRegex,
+      wholeWord,
+      caseSensitive
     }: {
       limit?: number;
       query: string;
       sourceIds?: string[];
+      useRegex?: boolean;
+      wholeWord?: boolean;
+      caseSensitive?: boolean;
     },
     onMatches: (matches: SearchSourceContentsMatch[], didOverflow: boolean) => void
   ): Promise<void> {
@@ -955,7 +961,15 @@ export class ReplayClient implements ReplayClientInterface {
     client.Debugger.addSearchSourceContentsMatchesListener(matchesListener);
     try {
       await client.Debugger.searchSourceContents(
-        { limit, searchId: thisSearchUniqueId, sourceIds, query },
+        {
+          limit,
+          searchId: thisSearchUniqueId,
+          sourceIds,
+          query,
+          useRegex,
+          wholeWord,
+          caseSensitive,
+        },
         sessionId
       );
 

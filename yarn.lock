@@ -3672,6 +3672,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@replayio/protocol@npm:^0.62.0":
+  version: 0.62.0
+  resolution: "@replayio/protocol@npm:0.62.0"
+  checksum: 38b3c04d9e69ec3679a3e3bf2423527f59a3e72c3a64f1f2dd2449bb4459f117e156b650a0409fd199f888baec90409c2d78224e3b9a6f092494fdf63a5b58ca
+  languageName: node
+  linkType: hard
+
 "@replayio/react-devtools-inline@npm:4.28.6":
   version: 4.28.6
   resolution: "@replayio/react-devtools-inline@npm:4.28.6"
@@ -12831,7 +12838,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"minimatch@npm:^9.0.1":
+"minimatch@npm:^9.0.1, minimatch@npm:^9.0.3":
   version: 9.0.3
   resolution: "minimatch@npm:9.0.3"
   dependencies:
@@ -14980,7 +14987,7 @@ __metadata:
     "@next/bundle-analyzer": ^12.2.0
     "@reduxjs/toolkit": ^1.8.4
     "@replayio/overboard": ^0.4.1
-    "@replayio/protocol": ^0.60.0
+    "@replayio/protocol": ^0.62.0
     "@replayio/react-devtools-inline": 4.28.6
     "@replayio/replay": ^0.12.4
     "@sentry/react": ^7.9.0
@@ -15076,6 +15083,7 @@ __metadata:
     logrocket-react: ^5.0.1
     memoize-one: ^6.0.0
     mini-css-extract-plugin: ^2.6.0
+    minimatch: ^9.0.3
     mixpanel-browser: ^2.43.0
     next: ^13.2
     next-compose-plugins: ^2.2.1

@@ -290,6 +290,9 @@ export interface ReplayClientInterface {
       limit?: number;
       query: string;
       sourceIds?: string[];
+      useRegex?: boolean;
+      wholeWord?: boolean;
+      caseSensitive?: boolean;
     },
     onMatches: (matches: SearchSourceContentsMatch[], didOverflow: boolean) => void
   ): Promise<void>;
