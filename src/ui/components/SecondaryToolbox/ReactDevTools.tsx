@@ -1,4 +1,4 @@
-import { ExecutionPoint, NodeBounds, ObjectId, Object as ProtocolObject } from "@replayio/protocol";
+import { NodeBounds, Object as ProtocolObject } from "@replayio/protocol";
 import type { SerializedElement, Store, Wall } from "@replayio/react-devtools-inline/frontend";
 import React, {
   useContext,
@@ -19,7 +19,7 @@ import { assert } from "protocol/utils";
 import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import { useIsPointWithinFocusWindow } from "replay-next/src/hooks/useIsPointWithinFocusWindow";
 import { useNag } from "replay-next/src/hooks/useNag";
-import { RecordingTarget, recordingTargetCache } from "replay-next/src/suspense/BuildIdCache";
+import { recordingTargetCache } from "replay-next/src/suspense/BuildIdCache";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { evaluate } from "replay-next/src/utils/evaluate";
 import { recordData } from "replay-next/src/utils/telemetry";
@@ -49,14 +49,15 @@ import { NodePicker as NodePickerClass, NodePickerOpts } from "ui/utils/nodePick
 import { getJSON } from "ui/utils/objectFetching";
 import { sendTelemetryEvent, trackEvent } from "ui/utils/telemetry";
 
-import { injectReactDevtoolsBackend } from "./react-devtools/injectReactDevtoolsBackend";
+import {
+  injectReactDevtoolsBackend,
+  nodesToFiberIdsCache,
+} from "./react-devtools/injectReactDevtoolsBackend";
 import { generateTreeResetOpsForPoint } from "./react-devtools/rdtProcessing";
 
 type ReactDevToolsInlineModule = typeof import("@replayio/react-devtools-inline/frontend");
 
 type NodeOptsWithoutBounds = Omit<NodePickerOpts, "onCheckNodeBounds">;
-
-const getDOMNodes = `((rendererID, id) => __REACT_DEVTOOLS_GLOBAL_HOOK__.rendererInterfaces.get(rendererID).findNativeNodesForFiberID(id))`;
 
 // Some internal values not currently included in `@types/react-devtools-inline`
 type ElementWithChildren = SerializedElement & {
@@ -123,6 +124,20 @@ class ReplayWall implements Wall {
     this._listener?.({ event: "stopInspectingNative", payload: true });
   }
 
+  // This is called  by the `useEffect` in the React DevTools panel.
+  async setUpRDTInternalsForCurrentPause() {
+    // Preload the React DevTools Backend for this pause
+    await this.ensureReactDevtoolsBackendLoaded();
+    // We should also kick off a request to pre-fetch the `Map<nodeId, fiberId>` lookup for this pause.
+    // That way, we have the data on hand when the user clicks on a node.
+    // This is async, but we won't wait for it here.
+    this.fetchNodeIdsToFiberIdsForPause();
+  }
+
+  async fetchNodeIdsToFiberIdsForPause() {
+    return nodesToFiberIdsCache.readAsync(this.replayClient!, this.pauseId!, this.store!);
+  }
+
   // called by the frontend to send a request to the backend
   async send(event: string, payload: any) {
     await this.ensureReactDevtoolsBackendLoaded();
@@ -171,12 +186,12 @@ class ReplayWall implements Wall {
           }
           this.highlightedElementId = id;
 
-          const response = await evaluate({
-            replayClient: this.replayClient,
-            text: `${getDOMNodes}(${rendererID}, ${id})[0]`,
-          });
+          // This _should_ be pre-fetched already, but await just in case
+          const [, fiberIdsToNodeIds] = await this.fetchNodeIdsToFiberIdsForPause();
 
-          const nodeId = response.returned?.object;
+          // Get the first node ID we found for this fiber ID, if available.
+          const [nodeId] = fiberIdsToNodeIds.get(id) ?? [];
+
           if (!nodeId || this.highlightedElementId !== id) {
             sendTelemetryEvent("reactdevtools.node_not_found", payload);
             return;
@@ -205,16 +220,23 @@ class ReplayWall implements Wall {
             break;
           }
 
-          const nodeToElementId = await this.mapNodesToElements();
+          // Should have been pre-fetched already
+          const [nodeIdsToFiberIds] = await this.fetchNodeIdsToFiberIdsForPause();
+          // Limit the NodePicker logic to check against just the nodes we got back
+          const enabledNodeIds: Set<string> = new Set(nodeIdsToFiberIds.keys());
 
           this.enablePicker({
             name: "reactComponent",
-            onHovering: nodeId => {
-              const elementId = nodeId && nodeToElementId.get(nodeId);
-              elementId && this._listener?.({ event: "selectFiber", payload: elementId });
+            onHovering: async nodeId => {
+              if (nodeId) {
+                const fiberId = nodeIdsToFiberIds.get(nodeId);
+                if (fiberId) {
+                  this._listener?.({ event: "selectFiber", payload: fiberId });
+                }
+              }
             },
             onPicked: _ => {
-              this._listener?.({ event: "stopInspectingNative", payload: true });
+              this.disablePickerInsideRDTComponent();
             },
             onHighlightNode: this.highlightNode,
             onUnhighlightNode: this.unhighlightNode,
@@ -223,7 +245,7 @@ class ReplayWall implements Wall {
               // tell the RDT component to stop inspecting
               this.disablePickerParentAndInternal();
             },
-            enabledNodeIds: [...nodeToElementId.keys()],
+            enabledNodeIds,
           });
 
           break;
@@ -270,51 +292,6 @@ class ReplayWall implements Wall {
     }
   }
 
-  private async mapNodesToElements() {
-    await this.ensureReactDevtoolsBackendLoaded();
-
-    const nodeToElementId = new Map<ObjectId, number>();
-    for (const rootID of this.store!.roots) {
-      const rendererID = this.store!.rootIDToRendererID.get(rootID)!;
-      const elementIDs = JSON.stringify(this.collectElementIDs(rootID));
-      const expr = `${elementIDs}.reduce((map, id) => { for (node of ${getDOMNodes}(${rendererID}, id) || []) { map.set(node, id); } return map; }, new Map())`;
-      const response = await evaluate({
-        replayClient: this.replayClient,
-        text: expr,
-      });
-      if (response.returned?.object) {
-        const mapObjData = await objectCache.readAsync(
-          this.replayClient,
-          this.pauseId!,
-          response.returned.object,
-          "canOverflow"
-        );
-
-        mapObjData.preview?.containerEntries?.forEach(entry => {
-          // The backend should have returned numeric node IDs as values.
-          // The keys are DOM node objects. We don't need to fetch them,
-          // because all we care about here is the object IDs anyway.
-          if (typeof entry.key?.object === "string" && typeof entry.value.value === "number") {
-            nodeToElementId.set(entry.key.object, entry.value.value);
-          }
-        });
-      }
-    }
-    return nodeToElementId;
-  }
-
-  private collectElementIDs(elementID: number, elementIDs?: number[]) {
-    if (!elementIDs) {
-      elementIDs = [];
-    }
-    elementIDs.push(elementID);
-    const element = this.store!._idToElement.get(elementID);
-    for (const childID of element!.children) {
-      this.collectElementIDs(childID, elementIDs);
-    }
-    return elementIDs;
-  }
-
   public async getComponentLocation(elementID: number) {
     const rendererID = this.store!.getRendererIDForElement(elementID);
     if (rendererID != null) {
@@ -323,7 +300,7 @@ class ReplayWall implements Wall {
 
       // Ask the renderer interface to determine the component function,
       // and store it as a global variable on the window
-      this.sendRequest("viewElementSource", { id: elementID, rendererID });
+      await this.sendRequest("viewElementSource", { id: elementID, rendererID });
 
       // This will be evaluated in the paused browser
       function retrieveSelectedReactComponentFunction() {
@@ -635,7 +612,8 @@ export function ReactDevtoolsPanel() {
 
   useEffect(() => {
     if (wall && currentPoint !== null) {
-      wall.ensureReactDevtoolsBackendLoaded();
+      // Inject the RDT backend and prefetch node IDs
+      wall.setUpRDTInternalsForCurrentPause();
     }
   }, [currentPoint, wall]);
 

@@ -9,8 +9,8 @@ export interface NodePickerOpts {
   onPicked: (nodeId: string | null) => void;
   onHighlightNode: (nodeId: string) => void;
   onUnhighlightNode: () => void;
-  onCheckNodeBounds: (x: number, y: number, nodeIds?: string[]) => Promise<NodeBounds | null>;
-  enabledNodeIds?: string[];
+  onCheckNodeBounds: (x: number, y: number, nodeIds?: Set<string>) => Promise<NodeBounds | null>;
+  enabledNodeIds?: Set<string>;
 }
 
 export class NodePicker {

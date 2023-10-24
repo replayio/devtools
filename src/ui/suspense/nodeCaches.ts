@@ -392,11 +392,11 @@ export function getMouseTarget(
   mouseTargets: NodeBounds[],
   x: number,
   y: number,
-  nodeIds?: string[]
+  nodeIds?: Set<string>
 ) {
   for (let nodeBounds of mouseTargets) {
     let { node, rect, rects, clipBounds, visibility, pointerEvents } = nodeBounds;
-    if (nodeIds && !nodeIds.includes(node)) {
+    if (nodeIds && !nodeIds.has(node)) {
       continue;
     }
     if (visibility === "hidden" || pointerEvents === "none") {
