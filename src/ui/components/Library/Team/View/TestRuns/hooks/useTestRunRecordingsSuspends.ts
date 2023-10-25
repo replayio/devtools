@@ -15,7 +15,7 @@ export function useTestRunRecordingsSuspends(testRunId: string | null) {
 
   const accessToken = useToken();
 
-  if (testRunId) {
+  if (testRunId && testRuns.length > 0) {
     const testRun = testRuns.find(t => t.id === testRunId);
     assert(testRun != null);
 
