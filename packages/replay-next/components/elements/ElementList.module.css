@@ -8,5 +8,5 @@
   * The parent list will measure rows after render and adjust the min-width of the list.
   * This prevents horizontal scrolling from jumping as new rows are rendered.
   */
-  width: var(--longest-line-width) !important;
+  width: max(100%, var(--longest-line-width)) !important;
 }

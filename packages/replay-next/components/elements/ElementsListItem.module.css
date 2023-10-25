@@ -1,5 +1,5 @@
 .Node {
-  min-width: var(--longest-line-width) !important;
+  min-width: max(100%, var(--longest-line-width)) !important;
   line-height: 1rem;
   font-family: var(--font-family-monospace);
   font-size: var(--font-size-regular-monospace);

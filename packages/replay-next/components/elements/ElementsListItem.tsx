@@ -25,6 +25,7 @@ export type ElementsListItemData = {};
 const COLLAPSE_DATA_URL_REGEX = /^data.+base64/;
 const COLLAPSE_DATA_URL_LENGTH = 60;
 const MAX_ATTRIBUTE_LENGTH = 50;
+const MAX_PLAIN_TEXT_LENGTH = 250;
 
 export const ITEM_SIZE = 16;
 
@@ -37,7 +38,9 @@ export function ElementsListItem({
   index: number;
   style: CSSProperties;
 }) {
-  const { itemData, listData, selectedItemIndex, selectItemAtIndex } = data;
+  const { listData } = data;
+
+  const selectedIndex = listData.getSelectedIndex();
 
   const elementsListData = listData as ElementsListData;
 
@@ -50,7 +53,7 @@ export function ElementsListItem({
   });
 
   const onContextMenuWrapper = (event: UIEvent) => {
-    selectItemAtIndex(index);
+    listData.setSelectedIndex(index);
     onContextMenu(event);
   };
 
@@ -89,7 +92,13 @@ export function ElementsListItem({
     }
     case Node.TEXT_NODE: {
       dataType = "text";
-      rendered = <span>{(node.nodeValue ?? "").trim().replace(/[\n\r]/g, "\\n")}</span>;
+
+      let text = (node.nodeValue ?? "").trim().replace(/[\n\r]/g, "\\n");
+      if (text.length > MAX_PLAIN_TEXT_LENGTH) {
+        text = text.substring(0, MAX_PLAIN_TEXT_LENGTH) + "…";
+      }
+
+      rendered = <span>{text}</span>;
       break;
     }
     default: {
@@ -133,14 +142,14 @@ export function ElementsListItem({
     event.preventDefault();
     event.stopPropagation();
 
-    selectItemAtIndex(index);
+    listData.setSelectedIndex(index);
   };
 
   const [subTreeIndicatorDepth, selectedItemId] = useMemo(() => {
-    if (selectedItemIndex == null) {
+    if (selectedIndex == null) {
       return [null, null];
     } else {
-      const { depth: rootDepth, id: rootId } = elementsListData.getItemAtIndex(selectedItemIndex);
+      const { depth: rootDepth, id: rootId } = elementsListData.getItemAtIndex(selectedIndex);
 
       if (isTail && id === rootId) {
         return [rootDepth, rootId];
@@ -148,7 +157,7 @@ export function ElementsListItem({
         return [elementsListData.isNodeInSubTree(id, rootId) ? rootDepth : null, rootId];
       }
     }
-  }, [elementsListData, id, isTail, selectedItemIndex]);
+  }, [elementsListData, id, isTail, selectedIndex]);
 
   return (
     <>
@@ -156,7 +165,7 @@ export function ElementsListItem({
         className={styles.Node}
         data-list-index={index}
         data-loading={hasChildren === null || undefined}
-        data-selected={index === selectedItemIndex || undefined}
+        data-selected={index === selectedIndex || undefined}
         data-test-name="ElementsListItem"
         data-type={dataType}
         key={id /* Reset so toggle animations aren't reused */}

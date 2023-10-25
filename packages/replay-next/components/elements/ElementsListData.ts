@@ -25,6 +25,8 @@ export class ElementsListData extends GenericListData<Item> {
   constructor(replayClient: ReplayClientInterface, pauseId: PauseId) {
     super();
 
+    this.setSelectedIndex(0);
+
     this._pauseId = pauseId;
     this._replayClient = replayClient;
   }

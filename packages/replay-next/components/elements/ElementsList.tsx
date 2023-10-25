@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useImperativeHandle,
+  useLayoutEffect,
   useMemo,
   useRef,
   useSyncExternalStore,
@@ -32,24 +33,24 @@ export type ImperativeHandle = {
   selectNode(nodeId: ObjectId | null): Promise<void>;
 };
 
+type OnSelectionChange = (id: ObjectId | null) => void;
+
 export function ElementsList({
   height,
   forwardedRef,
   noContentFallback,
-  onSelectionChange: onSelectionChangeProp,
+  onSelectionChange = null,
   pauseId,
 }: {
   height: number;
   forwardedRef?: ForwardedRef<ImperativeHandle>;
   noContentFallback?: ReactElement;
-  onSelectionChange?: (id: ObjectId | null) => void;
+  onSelectionChange?: OnSelectionChange | null;
   pauseId: PauseId;
 }) {
   const replayClient = useContext(ReplayClientContext);
 
   const itemData = useMemo<ElementsListItemData>(() => ({}), []);
-
-  const genericListRef = useRef<GenericListImperativeHandle>(null);
 
   const { cssVariables, onItemsRendered: onItemsRenderedOne } =
     useHorizontalScrollingListCssVariables("ElementsList");
@@ -68,21 +69,37 @@ export function ElementsList({
     [pauseId, replayClient]
   );
 
-  const didError = useSyncExternalStore(listData.subscribe, listData.didError, listData.didError);
+  // Convenience wrapper for onChange since the ListData class isn't exposed publicly in this case
+  const onSelectionChangeRef = useRef<OnSelectionChange | null>(null);
+  useLayoutEffect(() => {
+    onSelectionChangeRef.current = onSelectionChange;
+  });
+  useLayoutEffect(() => {
+    return listData.subscribeToSelectedIndex((index: number | null) => {
+      const onSelectionChange = onSelectionChangeRef.current;
+      if (onSelectionChange) {
+        const item = index != null ? listData.getItemAtIndex(index).id : null;
+        onSelectionChange(item);
+      }
+    });
+  }, [listData]);
+
+  const didError = useSyncExternalStore(
+    listData.subscribeToInvalidation,
+    listData.didError,
+    listData.didError
+  );
 
   useImperativeHandle(
     forwardedRef,
     () => ({
       async selectNode(nodeId: ObjectId | null) {
-        const genericList = genericListRef.current;
-        if (genericList) {
-          if (nodeId === null) {
-            genericList.selectItemAtIndex(null);
-          } else {
-            const index = await listData.loadPathToNode(nodeId);
-            if (index != null) {
-              genericList.selectItemAtIndex(index);
-            }
+        if (nodeId === null) {
+          listData.setSelectedIndex(null);
+        } else {
+          const index = await listData.loadPathToNode(nodeId);
+          if (index != null) {
+            listData.setSelectedIndex(index);
           }
         }
       },
@@ -108,12 +125,7 @@ export function ElementsList({
   }
 
   const onKeyDown = (event: KeyboardEvent) => {
-    const list = genericListRef.current;
-    if (list == null) {
-      return;
-    }
-
-    const index = list.selectedItemIndex;
+    const index = listData.getSelectedIndex();
     if (index == null) {
       return;
     }
@@ -126,13 +138,13 @@ export function ElementsList({
 
         const hasChildren = item.element.filteredChildNodeIds.length > 0;
         if (item.isTail) {
-          list.selectItemAtIndex(listData.getIndexForItem(item));
+          listData.setSelectedIndex(listData.getIndexForItem(item));
         } else if (hasChildren && item.isExpanded) {
           listData.toggleNodeExpanded(item.id, false);
         } else {
           const parentItem = listData.getParentItem(item);
           const parentIndex = listData.getIndexForItem(parentItem);
-          list.selectItemAtIndex(parentIndex);
+          listData.setSelectedIndex(parentIndex);
         }
         break;
       }
@@ -143,7 +155,7 @@ export function ElementsList({
         const hasChildren = item.element.filteredChildNodeIds.length > 0;
         if (hasChildren) {
           if (item.isExpanded) {
-            list.selectItemAtIndex(index + 1);
+            listData.setSelectedIndex(index + 1);
           } else {
             listData.toggleNodeExpanded(item.id, true);
           }
@@ -153,20 +165,11 @@ export function ElementsList({
     }
   };
 
-  const onSelectionChange = (index: number | null) => {
-    if (onSelectionChangeProp) {
-      const item = index != null ? listData.getItemAtIndex(index).id : null;
-      onSelectionChangeProp(item);
-    }
-  };
-
   return (
     <GenericList<Item, ElementsListItemData>
       className={styles.List}
       dataTestId="ElementsList"
-      defaultSelectedIndex={0}
       fallbackForEmptyList={noContentFallback}
-      forwardedRef={genericListRef}
       height={height}
       itemData={itemData}
       itemRendererComponent={ElementsListItem}
@@ -174,7 +177,6 @@ export function ElementsList({
       listData={listData}
       onItemsRendered={onItemsRendered}
       onKeyDown={onKeyDown}
-      onSelectionChange={onSelectionChange}
       style={cssVariables as CSSProperties}
       width="100%"
     />
