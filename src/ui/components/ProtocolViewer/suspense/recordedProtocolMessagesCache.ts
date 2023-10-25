@@ -1,12 +1,9 @@
 import {
   Location,
   PointDescription,
-  PointRange,
-  Property,
   RunEvaluationResult,
   TimeStampedPoint,
 } from "@replayio/protocol";
-import { Cache, createCache } from "suspense";
 
 import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPositionsCache";
 import { recordingTargetCache } from "replay-next/src/suspense/BuildIdCache";
@@ -16,15 +13,13 @@ import { mappedExpressionCache } from "replay-next/src/suspense/MappedExpression
 import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
 import { compareExecutionPoints } from "replay-next/src/utils/time";
 import { ReplayClientInterface } from "shared/client/types";
-import {
-  ProtocolError,
-  ProtocolErrorMap,
-  ProtocolRequest,
-  ProtocolRequestMap,
-  ProtocolResponse,
-  ProtocolResponseMap,
-} from "ui/reducers/protocolMessages";
+import { ProtocolError, ProtocolRequest, ProtocolResponse } from "ui/reducers/protocolMessages";
 import { SourceDetails, SourcesState, getPreferredLocation } from "ui/reducers/sources";
+import {
+  ChunksArray,
+  deserializeChunkedString,
+  splitStringIntoChunks as splitStringIntoChunksOriginal,
+} from "ui/utils/evalChunkedStrings";
 
 export type RecordedProtocolData = {
   id: number;
@@ -158,26 +153,10 @@ export const recordedProtocolMessagesCache = createFocusIntervalCacheForExecutio
 
           const stringifiedArg = JSON.stringify(arg);
           const chunks: ChunksArray = [];
+
           splitStringIntoChunks(chunks, stringifiedArg);
 
           return chunks;
-        }
-
-        // The counterpart will run locally on the eval result data.
-        function deserializeChunkedString(chunks: Property[]): string {
-          let numStringChunks = 1;
-          if (typeof chunks[0].value === "number") {
-            const numChunksProp = chunks.shift()!;
-            numStringChunks = numChunksProp.value;
-          }
-          const stringChunks = chunks.splice(0, numStringChunks);
-
-          let str = "";
-          for (const stringChunkProp of stringChunks) {
-            str += stringChunkProp.value;
-          }
-
-          return str;
         }
 
         const evalResults: RunEvaluationResult[] = [];
@@ -185,7 +164,9 @@ export const recordedProtocolMessagesCache = createFocusIntervalCacheForExecutio
           {
             // Run `serializeArgument` in an eval, and pass in the local variable
             // as the argument to serialize
-            expression: `(${serializeArgument})(${mappedExpression})`,
+            expression: `
+              (${serializeArgument})(${mappedExpression})
+            `,
             limits: {
               begin: rangeStart,
               end: rangeEnd,
