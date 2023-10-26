@@ -4,7 +4,7 @@ import { takeScreenshot } from "../utils/general";
 import {
   getSourceSearchResultsLocator,
   searchSources,
-  toggleIncludeNodeModulesCheckbox,
+  toggleExcludeNodeModulesCheckbox,
   toggleSearchResultsForFileName,
   verifySourceSearchSummary,
   verifyVisibleResultsCount,
@@ -14,7 +14,7 @@ import { beforeEach } from "./beforeEach";
 beforeEach();
 
 test("should expand and collapse sources", async ({ page }, testInfo) => {
-  await toggleIncludeNodeModulesCheckbox(page, true);
+  await toggleExcludeNodeModulesCheckbox(page, true);
   await searchSources(page, "function t");
   await verifySourceSearchSummary(page, "3 results");
   await verifyVisibleResultsCount(page, 6);

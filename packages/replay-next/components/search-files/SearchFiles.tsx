@@ -29,7 +29,8 @@ function FilterButton({
   toggle,
   active,
   tooltip: tooltipTitle,
-}: {
+  ...props
+}: React.ButtonHTMLAttributes<HTMLButtonElement> & {
   icon: IconType;
   toggle: () => any;
   active: boolean;
@@ -43,6 +44,8 @@ function FilterButton({
   return (
     <>
       <button
+        {...props}
+        data-active={active}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
         onClick={() => toggle()}
@@ -202,7 +205,8 @@ export default function SearchFiles({ limit }: { limit?: number }) {
             active={excludeNodeModules}
             toggle={() => setExcludeNodeModules(!excludeNodeModules)}
             icon="settings-off"
-            tooltip="Exclude NPM Modules"
+            data-test-id="FileSearch-ExcludeNodeModules"
+            tooltip="Exclude Node Modules"
           />
         </div>
         <Suspense>

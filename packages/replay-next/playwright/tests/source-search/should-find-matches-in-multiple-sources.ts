@@ -4,7 +4,7 @@ import { takeScreenshot, waitFor } from "../utils/general";
 import {
   getSourceSearchResultsLocator,
   searchSources,
-  toggleIncludeNodeModulesCheckbox,
+  toggleExcludeNodeModulesCheckbox,
   verifySourceSearchMatchingLocations,
   verifySourceSearchSummary,
   verifyVisibleResultsCount,
@@ -14,7 +14,7 @@ import { beforeEach } from "./beforeEach";
 beforeEach();
 
 test("should find matches in multiple sources", async ({ page }, testInfo) => {
-  await toggleIncludeNodeModulesCheckbox(page, true);
+  await toggleExcludeNodeModulesCheckbox(page, false);
   await searchSources(page, "function t");
   await verifySourceSearchSummary(page, "3 results");
   // wait for hit counts to be loaded

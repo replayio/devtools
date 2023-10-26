@@ -4,7 +4,7 @@ import { verifyCurrentSearchResult } from "../utils/source";
 import {
   clickSearchResultRow,
   searchSources,
-  toggleIncludeNodeModulesCheckbox,
+  toggleExcludeNodeModulesCheckbox,
   verifySourceSearchSummary,
   verifyVisibleResultsCount,
 } from "../utils/source-search";
@@ -13,7 +13,7 @@ import { beforeEach } from "./beforeEach";
 beforeEach();
 
 test("should open a source and scroll to the correct line", async ({ page }, testInfo) => {
-  await toggleIncludeNodeModulesCheckbox(page, true);
+  await toggleExcludeNodeModulesCheckbox(page, false);
   await searchSources(page, "function t");
   await verifySourceSearchSummary(page, "3 results");
   await verifyVisibleResultsCount(page, 6);
