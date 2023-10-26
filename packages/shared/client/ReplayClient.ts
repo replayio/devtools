@@ -910,7 +910,7 @@ export class ReplayClient implements ReplayClientInterface {
       sourceIds,
       useRegex,
       wholeWord,
-      caseSensitive
+      caseSensitive,
     }: {
       limit?: number;
       query: string;
