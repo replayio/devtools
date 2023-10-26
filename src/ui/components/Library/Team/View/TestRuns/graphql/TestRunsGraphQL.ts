@@ -123,9 +123,7 @@ export async function getTestRunTestsWithRecordingsGraphQL(
   }
 
   return (
-    (response.node as GetTestRunRecordings_node_Workspace).testRuns?.edges[0]?.node.tests.flatMap(
-      (t: any) => t.recordings
-    ) ?? []
+    (response.node as GetTestRunRecordings_node_Workspace).testRuns?.edges[0]?.node.tests ?? []
   );
 }
 
