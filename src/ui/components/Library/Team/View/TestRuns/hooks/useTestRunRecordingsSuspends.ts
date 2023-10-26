@@ -15,11 +15,13 @@ export function useTestRunRecordingsSuspends(testRunId: string | null) {
 
   const accessToken = useToken();
 
-  if (testRunId && testRuns.length > 0) {
-    const testRun = testRuns.find(t => t.id === testRunId);
-    assert(testRun != null);
-
-    return testRunRecordingsCache.read(graphQLClient, accessToken?.token ?? null, teamId, testRun);
+  if (testRunId) {
+    return testRunRecordingsCache.read(
+      graphQLClient,
+      accessToken?.token ?? null,
+      teamId,
+      testRunId
+    );
   }
 
   return {

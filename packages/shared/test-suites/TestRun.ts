@@ -45,7 +45,7 @@ export type TestRun = {
       passed: number;
     };
   };
-  source: SourceMetadata | null;
+  source: SourceMetadata;
   tests: TestRunTest[];
 };
 

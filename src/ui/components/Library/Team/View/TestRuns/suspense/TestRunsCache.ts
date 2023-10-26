@@ -3,9 +3,9 @@ import { createCache } from "suspense";
 
 import { GraphQLClientInterface } from "shared/graphql/GraphQLClient";
 import { Recording } from "shared/graphql/types";
-import { TestRun, processTestRun } from "shared/test-suites/TestRun";
+import { TestRun, TestRunTestWithRecordings, processTestRun } from "shared/test-suites/TestRun";
 import {
-  getTestRunRecordingsGraphQL,
+  getTestRunTestsWithRecordingsGraphQL,
   getTestRunsGraphQL,
 } from "ui/components/Library/Team/View/TestRuns/graphql/TestRunsGraphQL";
 import { convertRecording } from "ui/hooks/recordings";
@@ -37,25 +37,34 @@ export const testRunRecordingsCache = createCache<
     graphQLClient: GraphQLClientInterface,
     accessToken: string | null,
     workspaceId: string,
-    testRun: TestRun
+    testRunId: string
   ],
   TestRunRecordings
 >({
   config: { immutable: true },
   debugLabel: "testRunRecordingsCache",
-  getKey: ([_, __, workspaceId, testRun]) => `${workspaceId}:${testRun.id}`,
-  load: async ([graphQLClient, accessToken, workspaceId, testRun]) => {
-    const rawRecordings = await getTestRunRecordingsGraphQL(
+  getKey: ([_, __, workspaceId, testRunId]) => `${workspaceId}:${testRunId}`,
+  load: async ([graphQLClient, accessToken, workspaceId, testRunId]) => {
+    const tests = await getTestRunTestsWithRecordingsGraphQL(
       graphQLClient,
       accessToken,
       workspaceId,
-      testRun.id
+      testRunId
     );
 
-    const recordings = rawRecordings.map(convertRecording);
+    const recordings: Recording[] = [];
+    const testsWithRecordings = tests.map<TestRunTestWithRecordings>(test => {
+      const recs = orderBy(test.recordings.map(convertRecording), "date", "desc");
+      recordings.push(...recs);
+
+      return {
+        ...test,
+        recordings: recs,
+      };
+    });
 
     return {
-      groupedRecordings: groupRecordings(recordings, testRun.tests),
+      groupedRecordings: groupRecordings(testsWithRecordings),
       recordings,
     };
   },

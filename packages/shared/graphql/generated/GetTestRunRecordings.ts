@@ -32,11 +32,17 @@ export interface GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_r
 
 export interface GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests {
   __typename: "TestRunTest";
+  id: string;
   testId: string;
-  sourcePath: string;
-  title: string;
+  index: number;
   attempt: number;
+  title: string;
+  scope: string[];
+  sourcePath: string;
   result: string;
+  errors: string[] | null;
+  durationMs: number;
+  recordingIds: string[];
   recordings: GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_recordings[];
 }
 

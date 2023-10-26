@@ -165,7 +165,7 @@ const FileNodeRenderer = memo(function FileNodeRenderer({
               depth={depth + 1}
               filterByText={filterByText}
               key={recording.id}
-              label={test.result === "passed" ? "Passed" : label}
+              label={testPassed(test) ? "Passed" : label}
               recording={recording}
               test={test}
               secondaryBadgeCount={/* index > 0 ? index + 1 : null */ null}

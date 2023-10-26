@@ -3,7 +3,7 @@ import { gql } from "@apollo/client";
 import {
   GetTestRunRecordings,
   GetTestRunRecordings_node_Workspace,
-  GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_recordings,
+  GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests,
 } from "shared/graphql/generated/GetTestRunRecordings";
 import {
   GetTestsRunsForWorkspace,
@@ -21,11 +21,17 @@ const GET_TEST_RUN_RECORDINGS = gql`
           edges {
             node {
               tests {
+                id
                 testId
-                sourcePath
-                title
+                index
                 attempt
+                title
+                scope
+                sourcePath
                 result
+                errors
+                durationMs
+                recordingIds
                 recordings {
                   uuid
                   duration
@@ -97,12 +103,12 @@ const GET_TEST_RUNS = gql`
   }
 `;
 
-export async function getTestRunRecordingsGraphQL(
+export async function getTestRunTestsWithRecordingsGraphQL(
   graphQLClient: GraphQLClientInterface,
   accessToken: string | null,
   workspaceId: string,
   summaryId: string
-): Promise<GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_recordings[]> {
+): Promise<GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests[]> {
   const response = await graphQLClient.send<GetTestRunRecordings>(
     {
       operationName: "GetTestRunRecordings",
