@@ -28,8 +28,11 @@ export type TestRunTest = {
   errors: string[] | null;
   durationMs: number;
   recordingIds: string[];
-  recordings: Recording[];
 };
+
+export interface TestRunTestWithRecordings extends TestRunTest {
+  recordings: Recording[];
+}
 
 export type TestRun = {
   date: string;
@@ -47,14 +50,12 @@ export type TestRun = {
 };
 
 export function processTestRun(testRun: TestRunsForWorkspaceGraphQL): TestRun {
-  const { mode, results, tests, ...rest } = testRun;
+  const { mode, results, ...rest } = testRun;
 
   return {
     ...rest,
     mode: mode as Mode | null,
     results,
-    // TODO(ryanjduffy) temp
-    tests: tests.map(t => ({ ...t, recordings: [] })),
   };
 }
 

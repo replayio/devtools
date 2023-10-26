@@ -2,8 +2,7 @@ import assert from "assert";
 import { useMemo } from "react";
 
 import { insert, insertString } from "replay-next/src/utils/array";
-import { Recording } from "shared/graphql/types";
-import { TestRunTest } from "shared/test-suites/TestRun";
+import { TestRunTestWithRecordings } from "shared/test-suites/TestRun";
 import { TestGroup } from "ui/utils/testRuns";
 
 export function useFileNameTree(recordingGroup: TestGroup, filterByText: string = "") {
@@ -136,7 +135,7 @@ export type PathNode = {
 
 export type FileNode = {
   name: string;
-  tests: TestRunTest[];
+  tests: TestRunTestWithRecordings[];
   type: "file";
 };
 

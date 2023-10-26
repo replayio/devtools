@@ -5,11 +5,11 @@ import {
   getGroupedTestCasesFilePath,
   isGroupedTestCasesV1,
 } from "shared/test-suites/RecordingTestMetadata";
-import { TestRunTest } from "shared/test-suites/TestRun";
+import { TestRunTest, TestRunTestWithRecordings } from "shared/test-suites/TestRun";
 
 export type TestGroup = {
   count: number;
-  fileNameToTests: { [fileName: string]: TestRunTest[] };
+  fileNameToTests: { [fileName: string]: TestRunTestWithRecordings[] };
 };
 
 export type TestGroups = {
@@ -49,19 +49,21 @@ export function groupRecordings(recordings: Recording[], tests: TestRunTest[]): 
       return accumulated;
     }
 
-    test.recordings.push(recording);
-    const filePath = test.sourcePath;
+    const testWithRecordings: TestRunTestWithRecordings = { ...test, recordings: [] };
+
+    testWithRecordings.recordings.push(recording);
+    const filePath = testWithRecordings.sourcePath;
     if (!filePath) {
       return accumulated;
     }
     if (!accumulated[filePath]) {
       accumulated[filePath] = [];
     }
-    if (!accumulated[filePath].includes(test)) {
-      accumulated[filePath].push(test);
+    if (!accumulated[filePath].includes(testWithRecordings)) {
+      accumulated[filePath].push(testWithRecordings);
     }
     return accumulated;
-  }, {} as Record<string, TestRunTest[]>);
+  }, {} as Record<string, TestRunTestWithRecordings[]>);
 
   for (const filePath in recordingsMap) {
     const recordingTests = recordingsMap[filePath];
@@ -69,7 +71,7 @@ export function groupRecordings(recordings: Recording[], tests: TestRunTest[]): 
     const didAnyTestFail = recordingTests.some(testFailed);
     const didAnyTestPass = recordingTests.some(testPassed);
 
-    function addToTestGroup(group: TestGroup, test: TestRunTest) {
+    function addToTestGroup(group: TestGroup, test: TestRunTestWithRecordings) {
       if (group.fileNameToTests[filePath]) {
         group.fileNameToTests[filePath].push(test);
       } else {
