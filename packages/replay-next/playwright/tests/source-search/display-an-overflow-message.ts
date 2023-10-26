@@ -11,7 +11,7 @@ import { beforeEach } from "./beforeEach";
 beforeEach();
 
 test("display an overflow message", async ({ page }, testInfo) => {
-  await toggleExcludeNodeModulesCheckbox(page, true);
+  await toggleExcludeNodeModulesCheckbox(page, false);
   await searchSources(page, "e");
   await verifySourceSearchSummary(page, "first 50 results");
   await verifySourceSearchOverflowMessageShown(page, true);

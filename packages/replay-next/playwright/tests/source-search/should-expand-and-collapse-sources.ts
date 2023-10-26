@@ -14,7 +14,7 @@ import { beforeEach } from "./beforeEach";
 beforeEach();
 
 test("should expand and collapse sources", async ({ page }, testInfo) => {
-  await toggleExcludeNodeModulesCheckbox(page, true);
+  await toggleExcludeNodeModulesCheckbox(page, false);
   await searchSources(page, "function t");
   await verifySourceSearchSummary(page, "3 results");
   await verifyVisibleResultsCount(page, 6);
