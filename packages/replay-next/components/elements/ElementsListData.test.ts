@@ -39,7 +39,7 @@ describe("ElementsListData", () => {
     // Wait for the path of nodes to load and expand
     // but not for the full tree data to be loaded
     return new Promise<void>(resolve => {
-      const unsubscribe = listData.subscribe(() => {
+      const unsubscribe = listData.subscribeToInvalidation(() => {
         resolve();
         unsubscribe();
       });

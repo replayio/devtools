@@ -1,17 +1,13 @@
 import {
   CSSProperties,
   ComponentType,
-  ForwardedRef,
   LegacyRef,
   ReactElement,
   forwardRef,
-  useCallback,
   useEffect,
-  useImperativeHandle,
   useLayoutEffect,
   useMemo,
   useRef,
-  useState,
   useSyncExternalStore,
 } from "react";
 import {
@@ -25,8 +21,6 @@ import { GenericListData } from "replay-next/components/windowing/GenericListDat
 export type GenericListItemData<Item, ItemData> = {
   itemData: ItemData;
   listData: GenericListData<Item>;
-  selectedItemIndex: number | null;
-  selectItemAtIndex: (index: number | null) => void;
 };
 
 export type ImperativeHandle = {
@@ -38,9 +32,7 @@ export function GenericList<Item, ItemData extends Object>({
   className = "",
   dataTestId,
   dataTestName,
-  defaultSelectedIndex = null,
   fallbackForEmptyList,
-  forwardedRef,
   height,
   itemData,
   itemRendererComponent,
@@ -49,16 +41,13 @@ export function GenericList<Item, ItemData extends Object>({
   onItemsRendered,
   onKeyDown: onKeyDownProp,
   onMouseMove: onMouseMoveProp,
-  onSelectionChange,
   style,
   width,
 }: {
   className?: string;
   dataTestId?: string;
   dataTestName?: string;
-  defaultSelectedIndex?: number | null;
   fallbackForEmptyList?: ReactElement;
-  forwardedRef?: ForwardedRef<ImperativeHandle>;
   height: number;
   itemData: ItemData;
   itemRendererComponent: ComponentType<
@@ -69,43 +58,27 @@ export function GenericList<Item, ItemData extends Object>({
   onItemsRendered?: (props: ListOnItemsRenderedProps) => any;
   onKeyDown?: (event: KeyboardEvent) => void;
   onMouseMove?: (event: MouseEvent) => void;
-  onSelectionChange?: (index: number | null) => void;
   style?: CSSProperties;
   width: number | string;
 }) {
-  const [selectedItemIndex, selectItemAtIndex] = useState<number | null>(defaultSelectedIndex);
-
-  const selectItemAtIndexWrapper = useCallback((index: number | null) => {
-    selectItemAtIndex(index);
-
-    const onSelectionChange = committedValuesRef.current.onSelectionChange;
-    if (onSelectionChange) {
-      onSelectionChange(index);
-    }
-  }, []);
-
   // The store may be invalidated in ways that don't affect the item count,
   // so we need to subscribe to more than just the item count.
   const itemCount = useSyncExternalStore(
-    listData.subscribe,
+    listData.subscribeToInvalidation,
     listData.getItemCount,
     listData.getItemCount
   );
+  const selectedItemIndex = useSyncExternalStore(
+    listData.subscribeToSelectedIndex,
+    listData.getSelectedIndex,
+    listData.getSelectedIndex
+  );
   const revision = useSyncExternalStore(
-    listData.subscribe,
+    listData.subscribeToInvalidation,
     listData.getRevision,
     listData.getRevision
   );
 
-  if (selectedItemIndex != null && itemCount > 0 && selectedItemIndex >= itemCount) {
-    selectItemAtIndex(itemCount - 1);
-  }
-
-  const committedValuesRef = useRef<{
-    onSelectionChange: ((index: number | null) => void) | undefined;
-  }>({
-    onSelectionChange,
-  });
   const didMountRef = useRef(false);
   const listRef = useRef<List>(null);
   const outerRef = useRef<HTMLDivElement>(null);
@@ -118,32 +91,14 @@ export function GenericList<Item, ItemData extends Object>({
   }, [selectedItemIndex]);
 
   useLayoutEffect(() => {
-    committedValuesRef.current.onSelectionChange = onSelectionChange;
-  });
-
-  useLayoutEffect(() => {
     if (didMountRef.current) {
       return;
     }
 
-    if (defaultSelectedIndex != null && itemCount > defaultSelectedIndex) {
+    if (selectedItemIndex != null && itemCount > selectedItemIndex) {
       didMountRef.current = true;
-
-      const onSelectionChange = committedValuesRef.current.onSelectionChange;
-      if (onSelectionChange) {
-        onSelectionChange(defaultSelectedIndex);
-      }
     }
-  }, [defaultSelectedIndex, itemCount]);
-
-  useImperativeHandle(
-    forwardedRef,
-    () => ({
-      selectedItemIndex,
-      selectItemAtIndex: selectItemAtIndexWrapper,
-    }),
-    [selectedItemIndex, selectItemAtIndexWrapper]
-  );
+  }, [selectedItemIndex, itemCount]);
 
   useEffect(() => {
     const element = outerRef.current;
@@ -178,14 +133,14 @@ export function GenericList<Item, ItemData extends Object>({
           case "ArrowDown": {
             event.preventDefault();
             if (selectedItemIndex < itemCount - 1) {
-              selectItemAtIndexWrapper(selectedItemIndex + 1);
+              listData.setSelectedIndex(selectedItemIndex + 1);
             }
             break;
           }
           case "ArrowUp": {
             event.preventDefault();
             if (selectedItemIndex > 0) {
-              selectItemAtIndexWrapper(selectedItemIndex - 1);
+              listData.setSelectedIndex(selectedItemIndex - 1);
             }
             break;
           }
@@ -202,15 +157,7 @@ export function GenericList<Item, ItemData extends Object>({
         element.removeEventListener("keydown", onKeyDown);
       };
     }
-  }, [itemCount, onKeyDownProp, selectedItemIndex, selectItemAtIndexWrapper]);
-
-  const internalItemData = {
-    itemData,
-    listData,
-    revision,
-    selectedItemIndex,
-    selectItemAtIndex: selectItemAtIndexWrapper,
-  };
+  }, [itemCount, listData, onKeyDownProp, selectedItemIndex]);
 
   // react-window doesn't provide a way to declaratively set data-* attributes
   // but they're very useful for our e2e tests
@@ -240,7 +187,10 @@ export function GenericList<Item, ItemData extends Object>({
       className={className}
       height={height}
       itemCount={itemCount}
-      itemData={internalItemData}
+      itemData={{
+        itemData,
+        listData,
+      }}
       itemSize={itemSize}
       onItemsRendered={onItemsRendered}
       outerRef={outerRef}

@@ -1,14 +1,16 @@
 import assert from "assert";
 
-type Callback = () => void;
-type Unsubscribe = () => void;
+import { EventEmitter } from "shared/EventEmitter";
 
-export abstract class GenericListData<Item> {
+export abstract class GenericListData<Item> extends EventEmitter<{
+  invalidate: () => void;
+  selectedIndex: (index: number | null) => void;
+}> {
   private _cachedItemToIndexMap: Map<Item, number> = new Map();
   private _cachedIndexToItemMap: Map<number, Item> = new Map();
   private _cachedItemCount: number | null = null;
   private _revision: number = 0;
-  private _subscribers: Set<Callback> = new Set();
+  private _selectedIndex: number | null = null;
 
   getIndexForItem(item: Item): number {
     let index = this._cachedItemToIndexMap.get(item);
@@ -57,12 +59,21 @@ export abstract class GenericListData<Item> {
     return this._revision;
   };
 
-  subscribe = (callback: Callback): Unsubscribe => {
-    this._subscribers.add(callback);
+  getSelectedIndex = (): number | null => {
+    return this._selectedIndex;
+  };
 
-    return () => {
-      this._subscribers.delete(callback);
-    };
+  setSelectedIndex(value: number | null) {
+    this._selectedIndex = value;
+    this.emit("selectedIndex", value);
+  }
+
+  subscribeToInvalidation = (callback: () => void) => {
+    return this.addListener("invalidate", callback);
+  };
+
+  subscribeToSelectedIndex = (callback: (index: number | null) => void) => {
+    return this.addListener("selectedIndex", callback);
   };
 
   // Not all list types require this functionality
@@ -80,6 +91,6 @@ export abstract class GenericListData<Item> {
     this._cachedItemCount = null;
     this._revision++;
 
-    this._subscribers.forEach(callback => callback());
+    this.emit("invalidate");
   }
 }
