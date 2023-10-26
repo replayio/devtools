@@ -40,7 +40,7 @@ type SourcesContextType = {
     endLineIndex?: number,
     columnNumber?: number
   ) => void;
-  openSourceIds: SourceId[];
+  activeSourceIds: SourceId[];
   pendingFocusUpdate: boolean;
   setCursorLocation: (lineIndex: number | null, columnIndex: number | null) => void;
   setHoveredLocation: (lineIndex: number | null) => void;
@@ -60,7 +60,7 @@ export type OpenSourcesState = {
   cursorLineIndex: number | null;
   focusedSource: FocusedSource | null;
   hoveredLineIndex: number | null;
-  openSourceIds: SourceId[];
+  activeSourceIds: SourceId[];
   pendingFocusUpdate: boolean;
   visibleLinesBySourceId: { [key: SourceId]: SourceLocationRange };
 };
@@ -70,7 +70,7 @@ const INITIAL_STATE: OpenSourcesState = {
   cursorLineIndex: null,
   focusedSource: null,
   hoveredLineIndex: null,
-  openSourceIds: [],
+  activeSourceIds: [],
   pendingFocusUpdate: false,
   visibleLinesBySourceId: {},
 };
@@ -116,11 +116,11 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
         cursorLineIndex: prevCursorLineIndex,
         focusedSource: prevFocusedSource,
         hoveredLineIndex: prevHoveredLine,
-        openSourceIds,
+        activeSourceIds,
         visibleLinesBySourceId: prevVisibleLinesBySourceId,
       } = state;
 
-      const index = openSourceIds.indexOf(sourceId);
+      const index = activeSourceIds.indexOf(sourceId);
       if (index > -1) {
         let cursorColumnIndex = prevCursorColumnIndex;
         let cursorLineIndex = prevCursorLineIndex;
@@ -137,15 +137,15 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
               columnNumber: null,
               endLineIndex: null,
               mode: "view-source",
-              sourceId: openSourceIds[index - 1],
+              sourceId: activeSourceIds[index - 1],
               startLineIndex: null,
             };
-          } else if (index < openSourceIds.length - 1) {
+          } else if (index < activeSourceIds.length - 1) {
             focusedSource = {
               columnNumber: null,
               endLineIndex: null,
               mode: "view-source",
-              sourceId: openSourceIds[index + 1],
+              sourceId: activeSourceIds[index + 1],
               startLineIndex: null,
             };
           }
@@ -160,7 +160,10 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
           cursorLineIndex,
           focusedSource,
           hoveredLineIndex,
-          openSourceIds: [...openSourceIds.slice(0, index), ...openSourceIds.slice(index + 1)],
+          activeSourceIds: [
+            ...activeSourceIds.slice(0, index),
+            ...activeSourceIds.slice(index + 1),
+          ],
           visibleLinesBySourceId,
         };
       } else {
@@ -174,7 +177,7 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
         cursorColumnIndex: prevCursorColumnIndex,
         cursorLineIndex: prevCursorLineIndex,
         focusedSource: prevFocusedSource,
-        openSourceIds: prevOpenSourceIds,
+        activeSourceIds: prevActiveSourceIds,
         pendingFocusUpdate: prevPendingFocusUpdate,
         visibleLinesBySourceId: prevVisibleLinesBySourceId,
       } = state;
@@ -202,9 +205,9 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
         }
       }
 
-      let openSourceIds = prevOpenSourceIds;
-      if (prevOpenSourceIds.indexOf(focusedSource.sourceId) === -1) {
-        openSourceIds = [...prevOpenSourceIds, focusedSource.sourceId];
+      let activeSourceIds = prevActiveSourceIds;
+      if (prevActiveSourceIds.indexOf(focusedSource.sourceId) === -1) {
+        activeSourceIds = [...prevActiveSourceIds, focusedSource.sourceId];
       }
 
       return {
@@ -213,7 +216,7 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
         cursorLineIndex,
         focusedSource,
         hoveredLineIndex: null,
-        openSourceIds,
+        activeSourceIds,
         pendingFocusUpdate: true,
         visibleLinesBySourceId: prevVisibleLinesBySourceId,
       };
@@ -425,7 +428,7 @@ export function SourcesContextRoot({
       cursorLineIndex: state.cursorLineIndex,
       focusedSource: state.focusedSource,
       hoveredLineIndex: state.hoveredLineIndex,
-      openSourceIds: state.openSourceIds,
+      activeSourceIds: state.activeSourceIds,
       pendingFocusUpdate: state.pendingFocusUpdate,
       visibleLines: state.focusedSource?.sourceId
         ? state.visibleLinesBySourceId[state.focusedSource?.sourceId] || null

@@ -29,7 +29,7 @@ export default function SourcesRoot() {
 
 function Sources() {
   const client = useContext(ReplayClientContext);
-  const { closeSource, focusedSource, openSource, openSourceIds } = useContext(SourcesContext);
+  const { closeSource, focusedSource, openSource, activeSourceIds } = useContext(SourcesContext);
   const focusedSourceId = focusedSource?.sourceId ?? null;
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -106,7 +106,7 @@ function Sources() {
         tabIndex={0}
       >
         <div className={styles.Tabs}>
-          {openSourceIds.map(sourceId => {
+          {activeSourceIds.map(sourceId => {
             const source = getSourceSuspends(client, sourceId);
             const fileName = (source && getSourceFileName(source, true)) || "unknown";
 
@@ -143,8 +143,8 @@ function Sources() {
           })}
         </div>
         <div className={styles.Content}>
-          {openSourceIds.length === 0 && <div className={styles.NoOpenSources}>Sources</div>}
-          {openSourceIds.map(sourceId => {
+          {activeSourceIds.length === 0 && <div className={styles.NoOpenSources}>Sources</div>}
+          {activeSourceIds.map(sourceId => {
             const source = getSourceSuspends(client, sourceId);
             return (
               <LazyOffscreen
