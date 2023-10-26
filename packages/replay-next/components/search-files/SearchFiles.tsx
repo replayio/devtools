@@ -2,7 +2,6 @@ import {
   ChangeEvent,
   KeyboardEvent,
   Suspense,
-  startTransition,
   useContext,
   useEffect,
   useRef,
@@ -11,7 +10,7 @@ import {
 import { STATUS_REJECTED, useStreamingValue } from "suspense";
 
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
-import { useDebouncedState } from "replay-next/src/hooks/useDebounce";
+import { useDebounce } from "replay-next/src/hooks/useDebounce";
 import { useNag } from "replay-next/src/hooks/useNag";
 import useTooltip from "replay-next/src/hooks/useTooltip";
 import { searchCache } from "replay-next/src/suspense/SearchCache";
@@ -71,14 +70,9 @@ export default function SearchFiles({ limit }: { limit?: number }) {
   const [useRegex, setUseRegex] = useState(false);
   const [caseSensitive, setCaseSensitive] = useState(false);
   const [wholeWord, setWholeWord] = useState(false);
-  const [queryForSearch, setQueryForSearch] = useDebouncedState(queryForDisplay, 500);
+  const queryForSearch = useDebounce(queryForDisplay, 500);
   const [, dismissSearchSourceTextNag] = useNag(Nag.SEARCH_SOURCE_TEXT);
-
-  const setQueryForSearchTransition = (value: string) => {
-    startTransition(() => {
-      setQueryForSearch(value);
-    });
-  };
+  const isPending = queryForSearch !== queryForDisplay;
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -107,10 +101,6 @@ export default function SearchFiles({ limit }: { limit?: number }) {
 
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     switch (event.key) {
-      case "Enter":
-      case "NumpadEnter":
-        setQueryForSearchTransition(queryForDisplay);
-        break;
       case "Escape":
         setQueryForDisplay(queryForSearch);
         break;
@@ -142,10 +132,7 @@ export default function SearchFiles({ limit }: { limit?: number }) {
             autoFocus
             className={styles.Input}
             data-test-id="FileSearch-Input"
-            onChange={e => {
-              setQueryForDisplay(e.target.value);
-              setQueryForSearchTransition(e.target.value);
-            }}
+            onChange={onChange(setQueryForDisplay)}
             onKeyDown={onKeyDown}
             placeholder="Find in files..."
             ref={inputRef}
@@ -218,7 +205,7 @@ export default function SearchFiles({ limit }: { limit?: number }) {
           />
         </div>
         <Suspense>
-          <ResultsList query={queryForSearch} streaming={streaming} />
+          <ResultsList query={queryForSearch} streaming={streaming} isPending={isPending} />
         </Suspense>
       </div>
     </div>

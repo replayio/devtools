@@ -5,6 +5,7 @@
   flex-direction: column;
   cursor: default;
   user-select: none;
+  transition-duration: 200ms;
 }
 .ResultsPending {
   opacity: 0.5;
