@@ -35,6 +35,8 @@ export interface GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests {
   testId: string;
   sourcePath: string;
   title: string;
+  attempt: number;
+  result: string;
   recordings: GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_recordings[];
 }
 

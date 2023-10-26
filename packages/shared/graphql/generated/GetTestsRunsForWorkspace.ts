@@ -26,12 +26,40 @@ export interface GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node_tes
   recordingIds: string[];
 }
 
+export interface GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node_results_counts {
+  __typename: "TestRunStats";
+  failed: number;
+  flaky: number;
+  passed: number;
+}
+
+export interface GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node_results {
+  __typename: "TestRunResults";
+  counts: GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node_results_counts;
+}
+
+export interface GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node_source {
+  __typename: "TestRunSource";
+  commitId: string | null;
+  commitTitle: string | null;
+  groupLabel: string | null;
+  isPrimaryBranch: boolean | null;
+  branchName: string | null;
+  prNumber: number | null;
+  prTitle: string | null;
+  repository: string | null;
+  triggerUrl: string | null;
+  user: string | null;
+}
+
 export interface GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node {
   __typename: "TestRun";
   id: string;
   date: any;
   mode: string | null;
   tests: GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node_tests[];
+  results: GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node_results;
+  source: GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node_source;
 }
 
 export interface GetTestsRunsForWorkspace_node_Workspace_testRuns_edges {

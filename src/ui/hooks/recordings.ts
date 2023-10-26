@@ -40,7 +40,6 @@ import {
   GetRecordingUserIdVariables,
 } from "shared/graphql/generated/GetRecordingUserId";
 import { GetTestsRun_node_Workspace_testRuns_edges_node_tests_recordings } from "shared/graphql/generated/GetTestsRun";
-import { GetTestsRunRecordings_node_Workspace_testRuns_edges_node_results_recordings } from "shared/graphql/generated/GetTestsRunRecordings";
 import {
   GetWorkspaceRecordings,
   GetWorkspaceRecordingsVariables,
@@ -277,7 +276,6 @@ export function convertRecording(
     | GetMyRecordings_viewer_recordings_edges_node
     | GetWorkspaceRecordings_node_Workspace_recordings_edges_node
     | GetTestsRun_node_Workspace_testRuns_edges_node_tests_recordings
-    | GetTestsRunRecordings_node_Workspace_testRuns_edges_node_results_recordings
 ): Recording {
   const recording: Recording = {
     id: rec.uuid,
