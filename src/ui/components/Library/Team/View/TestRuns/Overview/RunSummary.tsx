@@ -55,7 +55,7 @@ export function ModeAttribute({ testRun }: { testRun: TestRun }) {
 export function Attributes({ recordings, testRun }: { recordings: Recording[]; testRun: TestRun }) {
   const { date, source } = testRun;
 
-  const duration = getDuration(recordings);
+  const duration = getDuration(testRun.tests);
   const durationString = getDurationString(duration);
 
   if (source) {

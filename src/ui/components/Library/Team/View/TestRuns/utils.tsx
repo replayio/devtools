@@ -1,13 +1,7 @@
-import { Recording } from "shared/graphql/types";
-import { isGroupedTestCasesV1 } from "shared/test-suites/RecordingTestMetadata";
+import { TestRunTest } from "shared/test-suites/TestRun";
 
-export function getDuration(recordings: Recording[]) {
-  return recordings.reduce<number>((accumulated, recording) => {
-    const testMetadata = recording.metadata?.test;
-    if (testMetadata == null || isGroupedTestCasesV1(testMetadata)) {
-      return accumulated;
-    }
-
-    return accumulated + testMetadata.approximateDuration;
+export function getDuration(tests: TestRunTest[]) {
+  return tests.reduce<number>((accumulated, test) => {
+    return accumulated + test.durationMs;
   }, 0);
 }

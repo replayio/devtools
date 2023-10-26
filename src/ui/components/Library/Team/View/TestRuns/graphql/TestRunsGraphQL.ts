@@ -24,6 +24,8 @@ const GET_TEST_RUN_RECORDINGS = gql`
                 testId
                 sourcePath
                 title
+                attempt
+                result
                 recordings {
                   uuid
                   duration
@@ -115,7 +117,9 @@ export async function getTestRunRecordingsGraphQL(
   }
 
   return (
-    (response.node as GetTestRunRecordings_node_Workspace).testRuns?.edges[0]?.node.tests.flatMap((t: any) => t.recordings) ?? []
+    (response.node as GetTestRunRecordings_node_Workspace).testRuns?.edges[0]?.node.tests.flatMap(
+      (t: any) => t.recordings
+    ) ?? []
   );
 }
 
