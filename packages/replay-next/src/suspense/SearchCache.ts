@@ -74,10 +74,10 @@ export const searchCache = createStreamingCache<
   [
     replayClient: ReplayClientInterface,
     query: string,
-    defaultFilter: boolean,
+    excludeNodeModules: boolean,
     includedFiles: string,
     excludedFiles: string,
-    openSourceIds: string[] | null,
+    activeSourceIds: string[] | null,
     useRegex: boolean,
     caseSensitive: boolean,
     wholeWord: boolean,
@@ -92,10 +92,10 @@ export const searchCache = createStreamingCache<
     options: StreamingCacheLoadOptions<SourceSearchResult[], StreamingSourceMetadata>,
     replayClient,
     query,
-    defaultFilter,
+    excludeNodeModules,
     includedFiles,
     excludedFiles,
-    openSourceIds,
+    activeSourceIds,
     useRegex,
     caseSensitive,
     wholeWord,
@@ -124,18 +124,23 @@ export const searchCache = createStreamingCache<
         return false;
       }
 
-      if (openSourceIds && !openSourceIds.includes(source.sourceId)) {
+      if (activeSourceIds && !activeSourceIds.includes(source.sourceId)) {
         return false;
       }
 
-      if (defaultFilter && (isModuleFromCdn(source) || isNodeModule(source))) {
+      if (excludeNodeModules && (isModuleFromCdn(source) || isNodeModule(source))) {
         return false;
       }
 
-      return (
-        (!includedFiles || includedFilesMatcher.match(source.url)) &&
-        !excludedFilesMatcher.match(source.url)
-      );
+      if (excludedFiles && excludedFilesMatcher.match(source.url)) {
+        return false;
+      }
+
+      if (includedFiles && !includedFilesMatcher.match(source.url)) {
+        return false;
+      }
+
+      return true;
     });
 
     let currentResultLocation: SourceSearchResultLocation | null = null;

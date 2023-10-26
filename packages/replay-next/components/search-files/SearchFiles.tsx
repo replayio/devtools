@@ -59,7 +59,7 @@ export default function SearchFiles({ limit }: { limit?: number }) {
   const client = useContext(ReplayClientContext);
   const { openSourceIds } = useContext(SourcesContext);
 
-  const [defaultSrcFilter, setDefaultSrcFilter] = useState(true);
+  const [excludeNodeModules, setExcludeNodeModules] = useState(true);
   const [queryForDisplay, setQueryForDisplay] = useState("");
   const [includedFiles, setIncludedFiles] = useState("");
   const [excludedFiles, setExcludedFiles] = useState("");
@@ -75,7 +75,7 @@ export default function SearchFiles({ limit }: { limit?: number }) {
   const streaming = searchCache.stream(
     client,
     queryForSuspense,
-    defaultSrcFilter,
+    excludeNodeModules,
     includedFiles,
     excludedFiles,
     openEditors ? openSourceIds : null,
@@ -100,7 +100,6 @@ export default function SearchFiles({ limit }: { limit?: number }) {
       case "Enter":
       case "NumpadEnter":
         startTransition(() => {
-          console.log({ setting: queryForDisplay });
           setQueryForSuspense(queryForDisplay);
         });
         break;
@@ -171,7 +170,6 @@ export default function SearchFiles({ limit }: { limit?: number }) {
         >
           <Icon className={styles.Icon} type="folder-open" />
           <input
-            autoFocus
             className={styles.Input}
             data-test-id="FileInclude-Input"
             onChange={onChange(setIncludedFiles)}
@@ -193,7 +191,6 @@ export default function SearchFiles({ limit }: { limit?: number }) {
         >
           <Icon className={styles.Icon} type="folder-closed" />
           <input
-            autoFocus
             className={styles.Input}
             data-test-id="FileExclude-Input"
             onChange={onChange(setExcludedFiles)}
@@ -202,10 +199,10 @@ export default function SearchFiles({ limit }: { limit?: number }) {
             value={excludedFiles}
           />
           <FilterButton
-            active={defaultSrcFilter}
-            toggle={() => setDefaultSrcFilter(!defaultSrcFilter)}
+            active={excludeNodeModules}
+            toggle={() => setExcludeNodeModules(!excludeNodeModules)}
             icon="settings-off"
-            tooltip="Use Default Exclude Settings"
+            tooltip="Exclude NPM Modules"
           />
         </div>
         <Suspense>
