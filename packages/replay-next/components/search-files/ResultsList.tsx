@@ -18,17 +18,15 @@ const EMPTY_ARRAY = [] as SourceSearchResult[];
 export default function ResultsList({
   query,
   streaming,
-  isPending: searchIsPending,
 }: {
   query: string;
   streaming: StreamingSearchValue;
-  isPending: boolean;
 }) {
   const replayClient = useContext(ReplayClientContext);
 
   const { data, status, value: orderedResults = EMPTY_ARRAY } = useStreamingValue(streaming);
 
-  const isPending = status === STATUS_PENDING || searchIsPending;
+  const isPending = status === STATUS_PENDING;
 
   const sources = sourcesCache.read(replayClient);
 

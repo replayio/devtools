@@ -1,12 +1,4 @@
-import {
-  ChangeEvent,
-  KeyboardEvent,
-  Suspense,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { ChangeEvent, Suspense, useContext, useEffect, useRef, useState } from "react";
 import { STATUS_REJECTED, useStreamingValue } from "suspense";
 
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
@@ -72,7 +64,6 @@ export default function SearchFiles({ limit }: { limit?: number }) {
   const [wholeWord, setWholeWord] = useState(false);
   const queryForSearch = useDebounce(queryForDisplay, 500);
   const [, dismissSearchSourceTextNag] = useNag(Nag.SEARCH_SOURCE_TEXT);
-  const isPending = queryForSearch !== queryForDisplay;
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -98,14 +89,6 @@ export default function SearchFiles({ limit }: { limit?: number }) {
     (event: ChangeEvent<HTMLInputElement>) => {
       dispatcher(event.target.value);
     };
-
-  const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    switch (event.key) {
-      case "Escape":
-        setQueryForDisplay(queryForSearch);
-        break;
-    }
-  };
 
   useEffect(() => {
     dismissSearchSourceTextNag();
@@ -133,7 +116,6 @@ export default function SearchFiles({ limit }: { limit?: number }) {
             className={styles.Input}
             data-test-id="FileSearch-Input"
             onChange={onChange(setQueryForDisplay)}
-            onKeyDown={onKeyDown}
             placeholder="Find in files..."
             ref={inputRef}
             type="text"
@@ -205,7 +187,7 @@ export default function SearchFiles({ limit }: { limit?: number }) {
           />
         </div>
         <Suspense>
-          <ResultsList query={queryForSearch} streaming={streaming} isPending={isPending} />
+          <ResultsList query={queryForSearch} streaming={streaming} />
         </Suspense>
       </div>
     </div>
