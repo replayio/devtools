@@ -162,8 +162,8 @@ export const config = {
     defaultValue: Boolean(false),
     legacyKey: "devtools.features.commentAttachments",
   },
-  feature_newElementsPanel: {
-    defaultValue: Boolean(false),
+  feature_enableNewElementsPanel: {
+    defaultValue: Boolean(true),
     label: "Enable new Elements panel",
     legacyKey: null,
   },

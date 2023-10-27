@@ -21,6 +21,9 @@ import { GenericListData } from "replay-next/components/windowing/GenericListDat
 export type GenericListItemData<Item, ItemData> = {
   itemData: ItemData;
   listData: GenericListData<Item>;
+  // Not required by list items but ensures a re-render when the underlying data is invalidated
+  revision: number;
+  selectedItemIndex: number | null;
 };
 
 export type ImperativeHandle = {
@@ -132,23 +135,40 @@ export function GenericList<Item, ItemData extends Object>({
         switch (event.key) {
           case "ArrowDown": {
             event.preventDefault();
-            if (selectedItemIndex < itemCount - 1) {
-              listData.setSelectedIndex(selectedItemIndex + 1);
+            const newSelectedItemIndex = Math.min(selectedItemIndex + 1, itemCount - 1);
+            if (selectedItemIndex !== newSelectedItemIndex) {
+              listData.setSelectedIndex(newSelectedItemIndex);
             }
             break;
           }
           case "ArrowUp": {
             event.preventDefault();
-            if (selectedItemIndex > 0) {
-              listData.setSelectedIndex(selectedItemIndex - 1);
+            const newSelectedItemIndex = Math.max(selectedItemIndex - 1, 0);
+            if (selectedItemIndex !== newSelectedItemIndex) {
+              listData.setSelectedIndex(newSelectedItemIndex);
             }
             break;
           }
-          default: {
-            if (onKeyDownProp) {
-              onKeyDownProp(event);
+          case "PageDown": {
+            event.preventDefault();
+            const newSelectedItemIndex = Math.min(selectedItemIndex + 10, itemCount - 1);
+            if (selectedItemIndex !== newSelectedItemIndex) {
+              listData.setSelectedIndex(newSelectedItemIndex);
             }
+            break;
           }
+          case "PageUp": {
+            event.preventDefault();
+            const newSelectedItemIndex = Math.max(selectedItemIndex - 10, 0);
+            if (selectedItemIndex !== newSelectedItemIndex) {
+              listData.setSelectedIndex(newSelectedItemIndex);
+            }
+            break;
+          }
+        }
+
+        if (onKeyDownProp) {
+          onKeyDownProp(event);
         }
       };
 
@@ -190,6 +210,8 @@ export function GenericList<Item, ItemData extends Object>({
       itemData={{
         itemData,
         listData,
+        revision,
+        selectedItemIndex,
       }}
       itemSize={itemSize}
       onItemsRendered={onItemsRendered}

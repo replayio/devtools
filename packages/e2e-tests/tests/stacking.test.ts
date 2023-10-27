@@ -32,8 +32,6 @@ test("stacking: Element highlighter selects the correct element when they overla
   const rulesContainer = page.locator('[data-test-id="RulesPanel"]');
 
   for (let testCase of stackingTestCases) {
-    // Really make sure the panel is closed
-    // ensureSidePanelClosed(page);
     debugPrint(page, `Stacking test case: ${testCase.id}`);
     await verifyStackingTestCaseSelectedElementUnderCursor(page, canvas, rulesContainer, testCase);
   }

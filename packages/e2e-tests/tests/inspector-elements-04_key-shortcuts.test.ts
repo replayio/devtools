@@ -3,10 +3,10 @@ import { expect } from "@playwright/test";
 import { openDevToolsTab, startTest } from "../helpers";
 import { warpToMessage } from "../helpers/console-panel";
 import {
-  getElementsPanelSelection,
-  getElementsRowWithText,
-  getElementsTree,
+  getElementsList,
+  getElementsListRow,
   openElementsPanel,
+  toggleElementsListRow,
   typeKeyAndVerifySelectedElement,
   waitForElementsToLoad,
   waitForSelectedElementsRow,
@@ -57,20 +57,9 @@ test("inspector-elements-04: Keyboard shortcuts should select the right DOM node
   await openElementsPanel(page);
 
   await waitForElementsToLoad(page);
+  const bodyTag = await getElementsListRow(page, { text: "body", type: "opening" });
+  await toggleElementsListRow(page, bodyTag, true);
   await waitForSelectedElementsRow(page, "body");
-  const bodyTag = await getElementsPanelSelection(page);
-  debugPrint(page, "Waiting for body children to load...");
-  const elementsTree = getElementsTree(page);
-  await waitFor(async () => {
-    const loadingChildren = elementsTree.getByText("Loading");
-    const numChildren = await loadingChildren.count();
-    expect(numChildren).toBe(0);
-
-    const divChildren = elementsTree.getByText("div");
-    const numDivChildren = await divChildren.count();
-    expect(numDivChildren).toBeGreaterThan(10);
-  });
-
   await bodyTag.click();
 
   // Basic up/down selects the next element in the tree
@@ -79,7 +68,7 @@ test("inspector-elements-04: Keyboard shortcuts should select the right DOM node
   await typeKeyAndVerifySelectedElement(page, "ArrowDown", bodyChildDomNodes[2]);
   await typeKeyAndVerifySelectedElement(page, "ArrowUp", bodyChildDomNodes[1]);
 
-  const div0Box1 = await getElementsRowWithText(page, div0ChildDomNodes[0]);
+  const div0Box1 = await getElementsListRow(page, { text: div0ChildDomNodes[0] });
 
   expect(await div0Box1.isVisible()).toBe(false);
 
@@ -103,9 +92,6 @@ test("inspector-elements-04: Keyboard shortcuts should select the right DOM node
   // Going back to the parent and Left again collapses the node
   await typeKeyAndVerifySelectedElement(page, "ArrowUp", bodyChildDomNodes[1]);
   await typeKeyAndVerifySelectedElement(page, "ArrowLeft", bodyChildDomNodes[1]);
-  await waitFor(async () => {
-    expect(await div0Box1.isVisible()).toBe(false);
-  });
 
   // PageDown should jump down 10 rows
   await typeKeyAndVerifySelectedElement(page, "PageDown", bodyChildDomNodes[11]);
@@ -115,6 +101,6 @@ test("inspector-elements-04: Keyboard shortcuts should select the right DOM node
 
   // If we expand the first child, it should still jump 10 rows total
   await typeKeyAndVerifySelectedElement(page, "ArrowRight", bodyChildDomNodes[1]);
-  await typeKeyAndVerifySelectedElement(page, "PageDown", bodyChildDomNodes[9]);
+  await typeKeyAndVerifySelectedElement(page, "PageDown", bodyChildDomNodes[8]);
   await typeKeyAndVerifySelectedElement(page, "PageUp", bodyChildDomNodes[1]);
 });

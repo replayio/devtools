@@ -59,7 +59,6 @@
 
 .HtmlAttribute {
   display: inline;
-  margin-left: 1ch;
   color: var(--value-type-html-attribute-name);
 }
 .HtmlAttribute:focus {

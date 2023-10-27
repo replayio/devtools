@@ -5,7 +5,7 @@ import { BooleanPreference } from "ui/components/shared/UserSettingsModal/compon
 export const PREFERENCES: PreferencesKey[] = [
   "feature_reactPanel",
   "feature_reduxDevTools",
-  "feature_newElementsPanel",
+  "feature_enableNewElementsPanel",
 ];
 
 export function Experimental() {

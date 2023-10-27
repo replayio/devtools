@@ -3,10 +3,11 @@ import { expect } from "@playwright/test";
 import { openDevToolsTab, startTest } from "../helpers";
 import { warpToMessage } from "../helpers/console-panel";
 import {
-  getElementsPanelSelection,
-  getElementsTree,
+  getElementsList,
+  getElementsListRow,
   openElementsPanel,
   searchElementsPanel,
+  toggleElementsListRow,
   typeKeyAndVerifySelectedElement,
   waitForElementsToLoad,
   waitForSelectedElementsRow,
@@ -59,10 +60,11 @@ test("inspector-elements-03: Nested node picker and selection behavior", async (
   await openElementsPanel(page);
 
   await waitForElementsToLoad(page);
+  const bodyTag = await getElementsListRow(page, { text: "body", type: "opening" });
+  await toggleElementsListRow(page, bodyTag, true);
   await waitForSelectedElementsRow(page, "body");
-  const bodyTag = await getElementsPanelSelection(page);
   debugPrint(page, "Waiting for body children to load...");
-  const elementsTree = getElementsTree(page);
+  const elementsTree = getElementsList(page);
   await waitFor(async () => {
     const loadingChildren = elementsTree.getByText("Loading");
     const numChildren = await loadingChildren.count();

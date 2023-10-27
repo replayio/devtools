@@ -121,6 +121,7 @@ export function ElementsListItem({
       <>
         <span
           className={isExpanded ? styles.IconContainerRotated : styles.IconContainer}
+          data-is-expanded={isExpanded ? "true" : "false"}
           onClick={toggle}
           role="button"
         >
@@ -214,9 +215,11 @@ function HTMLNodeRenderer({
     }
   }, [node.attributes]);
 
-  const attributes = sortedAttributes.map(({ name, value }) => (
-    <HtmlAttributeRenderer key={name} name={name} value={value} />
-  ));
+  let attributes: ReactNode[] = [];
+  sortedAttributes.forEach(({ name, value }, index) => {
+    attributes.push(" ");
+    attributes.push(<HtmlAttributeRenderer key={name} name={name} value={value} />);
+  });
 
   switch (mode) {
     case "collapsed-no-content":
