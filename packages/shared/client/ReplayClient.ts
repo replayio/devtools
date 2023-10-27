@@ -912,12 +912,12 @@ export class ReplayClient implements ReplayClientInterface {
       wholeWord,
       caseSensitive,
     }: {
+      caseSensitive?: boolean;
       limit?: number;
       query: string;
       sourceIds?: string[];
       useRegex?: boolean;
       wholeWord?: boolean;
-      caseSensitive?: boolean;
     },
     onMatches: (matches: SearchSourceContentsMatch[], didOverflow: boolean) => void
   ): Promise<void> {
