@@ -21,6 +21,10 @@ export class ElementsListData extends GenericListData<Item> {
   _pauseId: PauseId;
   _replayClient: ReplayClientInterface;
   _rootObjectId: ObjectId | null = null;
+  _rootObjectIdWaiter: {
+    promise: Promise<void>;
+    resolve: () => void;
+  };
 
   constructor(replayClient: ReplayClientInterface, pauseId: PauseId) {
     super();
@@ -29,6 +33,11 @@ export class ElementsListData extends GenericListData<Item> {
 
     this._pauseId = pauseId;
     this._replayClient = replayClient;
+
+    this._rootObjectIdWaiter = {} as any;
+    this._rootObjectIdWaiter.promise = new Promise(resolve => {
+      this._rootObjectIdWaiter.resolve = resolve;
+    });
   }
 
   activate() {
@@ -109,6 +118,8 @@ export class ElementsListData extends GenericListData<Item> {
       return;
     }
 
+    await this._rootObjectIdWaiter.promise;
+
     const rootId = this._rootObjectId;
     assert(rootId);
 
@@ -128,6 +139,7 @@ export class ElementsListData extends GenericListData<Item> {
 
   async registerRootNodeId(id: ObjectId, numLevelsToLoad: number = 2) {
     this._rootObjectId = id;
+    this._rootObjectIdWaiter.resolve();
 
     await this.loadAndProcessNodeSubTree(id, numLevelsToLoad);
   }

@@ -66,6 +66,10 @@ export function ElementsPanel({
       return;
     }
 
+    if (document.querySelector('[data-test-id="ElementsList"]') === null) {
+      return;
+    }
+
     switch (event.key) {
       case "Enter": {
         event.preventDefault();
@@ -128,6 +132,7 @@ export function ElementsPanel({
             className={styles.SearchInput}
             data-search-in-progress={searchInProgress || undefined}
             data-test-id="ElementsSearchInput"
+            disabled={pauseId == null}
             onChange={onSearchInputChange}
             onKeyDown={onSearchInputKeyDown}
             placeholder="Search DOM"
