@@ -4,7 +4,7 @@ import {
   activateInspectorTool,
   checkComputedStyle,
   searchElementsPanel,
-  selectElementsRowWithText,
+  selectElementsListRow,
   selectNextElementsPanelSearchResult,
 } from "../helpers/elements-panel";
 import test from "../testFixtureCloneRecording";
@@ -21,7 +21,7 @@ test("inspector-computed-02: Complex computed styles can be viewed", async ({
   await warpToMessage(page, "ExampleFinished");
   await activateInspectorTool(page);
 
-  await selectElementsRowWithText(page, '<div id="first" class="parent">');
+  await selectElementsListRow(page, { text: '<div id="first" class="parent">' });
   await checkComputedStyle(page, "font-family", "courier", [
     {
       selector: ".parent",
@@ -32,7 +32,7 @@ test("inspector-computed-02: Complex computed styles can be viewed", async ({
     },
   ]);
 
-  await selectElementsRowWithText(page, '<div class="parent"');
+  await selectElementsListRow(page, { text: '<div class="parent"' });
   await checkComputedStyle(page, "font-family", "serif", [
     { selector: "this.style", value: "serif", label: "element", url: "#", overridden: false },
     {

@@ -1,6 +1,11 @@
 import { openDevToolsTab, startTest } from "../helpers";
 import { openConsolePanel, warpToMessage } from "../helpers/console-panel";
-import { selectElementsRowWithText } from "../helpers/elements-panel";
+import {
+  getElementsListRow,
+  openElementsPanel,
+  selectElementsListRow,
+  toggleElementsListRow,
+} from "../helpers/elements-panel";
 import test, { expect } from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "doc_inspector_basic.html" });
@@ -14,15 +19,14 @@ test("highlighter: element highlighter works everywhere", async ({
   await openDevToolsTab(page);
   await openConsolePanel(page);
   await warpToMessage(page, "ExampleFinished");
+  await openElementsPanel(page);
 
-  const pickerButton = page.locator('[title="Select an element in the video to inspect it"]')!;
+  const bodyLocator = await getElementsListRow(page, { text: "body", type: "opening" });
+  await toggleElementsListRow(page, bodyLocator, true);
 
-  await pickerButton.click();
-
-  await selectElementsRowWithText(page, "myiframe");
+  await selectElementsListRow(page, { text: "myiframe" });
 
   const highlighter = page.locator("#box-model-content");
-
   await highlighter.waitFor();
 
   const pathDefinition = await highlighter.getAttribute("d");

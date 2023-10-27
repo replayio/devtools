@@ -1,10 +1,16 @@
 import { Locator, Page, expect } from "@playwright/test";
 import chalk from "chalk";
 
-import { debugPrint, waitFor } from "./utils";
+import { debugPrint, delay, waitFor } from "./utils";
+
+type ElementsListRowOptions = {
+  isSelected?: boolean;
+  text?: string;
+  type?: "opening" | "closing";
+};
 
 export async function activateInspectorTool(page: Page): Promise<void> {
-  await page.locator('[data-test-id="PanelButton-inspector"]').click();
+  await page.locator("#command-button-pick").click();
 }
 
 export async function checkAppliedRules(page: Page, expected: any) {
@@ -177,30 +183,42 @@ export async function getComputedStyle(page: Page, style: string) {
   }, style);
 }
 
-export async function getElementsPanelSelection(page: Page): Promise<Locator> {
-  await debugPrint(page, `Getting Elements panel selection`, "getElementsPanelSelection");
+export async function getElementsListRow(page: Page, options: ElementsListRowOptions = {}) {
+  let { isSelected, text = "", type } = options;
 
-  const elements = page.locator("#inspector-main-content");
-  const selectedLine = elements.locator(".tag-line.selected");
-
-  return selectedLine;
-}
-
-export async function getElementsRowWithText(
-  page: Page,
-  text: string,
-  isSelected: boolean = false
-): Promise<Locator> {
   await debugPrint(
     page,
-    `Searching for Elements row containing "${chalk.bold(text)}"`,
-    "getElementsRowWithText"
+    `Searching for ${
+      isSelected != null ? (isSelected ? chalk.bold("selected ") : chalk.bold("deselected ")) : ""
+    }Elements row${text ? ` containing "${chalk.bold(text)}"` : ""}`,
+    "getElementsListRow"
   );
 
-  const escapedText = text.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
-  return page.locator(
-    `#markup-box ${isSelected ? ".selected" : ""}[role="treeitem"]:has-text("${escapedText}")`
-  );
+  let selector = '[data-test-name="ElementsListItem"]';
+  if (isSelected != null) {
+    if (isSelected) {
+      selector += "[data-selected]";
+    } else {
+      selector += ":not([data-selected])";
+    }
+  }
+
+  text = text.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+
+  switch (type) {
+    case "closing":
+      text = `</${text}`;
+      break;
+    case "opening":
+      text = `<${text}`;
+      break;
+  }
+
+  if (text) {
+    selector += `:has-text("${text}")`;
+  }
+
+  return page.locator(selector);
 }
 
 // This helper function uses the Elements inspector to click on a part of the preview Canvas.
@@ -217,7 +235,11 @@ export async function inspectCanvasCoordinates(
     );
   }
 
-  await debugPrint(page, `Inspecting preview Canvas`, "inspectCanvasCoordinates");
+  await debugPrint(
+    page,
+    `Inspecting preview Canvas (${xPercentage}%, ${yPercentage}%)`,
+    "inspectCanvasCoordinates"
+  );
 
   await activateInspectorTool(page);
 
@@ -284,66 +306,100 @@ async function openSelectedElementTab(page: Page, tabId: string): Promise<void> 
 }
 
 export async function searchElementsPanel(page: Page, searchText: string): Promise<void> {
+  await openElementsPanel(page);
+
   await debugPrint(
     page,
     `Searching Elements for text ${chalk.bold(`"${searchText}"`)}`,
     "searchElementsPanel"
   );
 
-  await activateInspectorTool(page);
-
-  const input = page.locator('[placeholder="Search HTML"]')!;
+  const input = page.locator('[data-test-id="ElementsSearchInput"]')!;
   await input.focus();
   await input.type(searchText);
   await input.press("Enter");
 }
 
-export async function selectElementsRowWithText(page: Page, text: string): Promise<void> {
-  const elementsTab = page.locator(`button:has-text("Elements")`);
-  await elementsTab.click();
-  const node = await getElementsRowWithText(page, text);
-  await node.waitFor();
-  await node.click();
+export async function selectElementsListRow(
+  page: Page,
+  options: ElementsListRowOptions = {}
+): Promise<Locator> {
+  await openElementsPanel(page);
+
+  const row = await getElementsListRow(page, options);
+
+  await debugPrint(page, "Selecting Elements row", "selectElementsListRow");
+
+  await waitFor(async () => {
+    await row.waitFor();
+    await row.click();
+  });
+
+  return row;
+}
+
+export async function selectRootElementsRow(page: Page): Promise<void> {
+  const list = page.locator('[data-test-id="ElementsList"]');
+
+  // Scroll to top to ensure the first row is visible
+  while ((await list.locator('[data-list-index="0"]').count()) === 0) {
+    await list.focus();
+    await page.keyboard.press("ArrowUp");
+  }
+
+  // Select the first row
+  await list.locator('[data-list-index="0"]').click();
 }
 
 export async function selectNextElementsPanelSearchResult(page: Page): Promise<void> {
-  const input = page.locator('[placeholder="Search HTML"]')!;
+  const input = page.locator('[data-test-id="ElementsSearchInput"]')!;
   await input.focus();
   await input.press("Enter");
 }
 
-export function getElementsTree(page: Page) {
-  return page.locator(`#markup-box [role="tree"]`);
+export function getElementsList(page: Page) {
+  return page.locator(`[data-test-id="ElementsList"]`);
 }
 
 export async function waitForElementsToLoad(page: Page): Promise<void> {
   await debugPrint(page, "Waiting for elements to load", "waitForElementsToLoad");
 
-  const elements = page.locator("#markup-box");
+  const elements = getElementsList(page);
   await elements.waitFor();
-
-  const tree = elements.locator('[role="tree"]');
-  await tree.waitFor();
 }
 
-export async function toggleMarkupNode(page: Page, locator: Locator, open: boolean): Promise<void> {
-  await debugPrint(
-    page,
-    `Toggling element node ${chalk.bold(open ? "open" : "closed")}`,
-    "toggleMarkupNode"
-  );
-
-  const expander = locator.locator(".expander");
+export async function toggleElementsListRow(
+  page: Page,
+  rowLocator: Locator,
+  open: boolean
+): Promise<void> {
+  const expander = rowLocator.locator('[role="button"][data-is-expanded]');
   await expander.waitFor();
 
-  const isOpen = await expander.evaluate(node => node?.classList.contains("open"));
+  const isOpen = (await expander.getAttribute("data-is-expanded")) === "true";
   if (isOpen !== open) {
+    await debugPrint(
+      page,
+      `Toggling element node ${chalk.bold(open ? "open" : "closed")}`,
+      "toggleElementsListRow"
+    );
+
     await expander.click();
+  }
+
+  if (isOpen) {
+    // Wait for children to finish loading
+    const list = getElementsList(page);
+    await waitFor(async () => {
+      const loadingChildren = list.getByText("Loading");
+      const numChildren = await loadingChildren.count();
+      expect(numChildren).toBe(0);
+    });
   }
 }
 
 export async function waitForSelectedElementsRow(page: Page, text: string): Promise<Locator> {
-  const locator = await getElementsRowWithText(page, text, true);
+  const locator = await getElementsListRow(page, { isSelected: true, text });
   await locator.waitFor();
   return locator;
 }
@@ -351,9 +407,10 @@ export async function waitForSelectedElementsRow(page: Page, text: string): Prom
 export async function typeKeyAndVerifySelectedElement(
   page: Page,
   key: string,
-  expectedElement: string
+  expectedRowText: string
 ) {
   debugPrint(page, `Typing ${key}...`, "typeKeyAndVerifySelectedElement");
   await page.keyboard.press(key);
-  await waitForSelectedElementsRow(page, expectedElement);
+  await waitForSelectedElementsRow(page, expectedRowText);
+  await delay(500);
 }

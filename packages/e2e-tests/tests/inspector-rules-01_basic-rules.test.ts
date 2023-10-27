@@ -1,9 +1,11 @@
 import { openDevToolsTab, startTest } from "../helpers";
 import { openConsolePanel, warpToMessage } from "../helpers/console-panel";
 import {
-  activateInspectorTool,
   checkAppliedRules,
-  selectElementsRowWithText,
+  getElementsListRow,
+  openElementsPanel,
+  selectElementsListRow,
+  toggleElementsListRow,
 } from "../helpers/elements-panel";
 import test from "../testFixtureCloneRecording";
 
@@ -17,9 +19,12 @@ test("inspector-rules-01: Basic CSS rules should be viewed", async ({
   await openDevToolsTab(page);
   await openConsolePanel(page);
   await warpToMessage(page, "ExampleFinished");
-  await activateInspectorTool(page);
 
-  await selectElementsRowWithText(page, "maindiv");
+  await openElementsPanel(page);
+  const bodyLocator = await getElementsListRow(page, { text: "body", type: "opening" });
+  await toggleElementsListRow(page, bodyLocator, true);
+
+  await selectElementsListRow(page, { text: "maindiv" });
   await checkAppliedRules(page, [
     {
       selector: "div::first-letter",
@@ -58,7 +63,7 @@ test("inspector-rules-01: Basic CSS rules should be viewed", async ({
     },
   ]);
 
-  await selectElementsRowWithText(page, "conflict");
+  await selectElementsListRow(page, { text: "conflict" });
   await checkAppliedRules(page, [
     {
       selector: "div::first-letter",
@@ -106,7 +111,7 @@ test("inspector-rules-01: Basic CSS rules should be viewed", async ({
     },
   ]);
 
-  await selectElementsRowWithText(page, "important");
+  await selectElementsListRow(page, { text: "important" });
   await checkAppliedRules(page, [
     {
       selector: "div::first-letter",

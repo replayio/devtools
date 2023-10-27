@@ -1,11 +1,7 @@
 import { Locator, Page, expect } from "@playwright/test";
 
-import {
-  openAppliedRulesTab,
-  openElementsPanel,
-  selectElementsRowWithText,
-} from "./elements-panel";
-import { debugPrint, mapLocators, waitFor } from "./utils";
+import { openAppliedRulesTab, openElementsPanel, selectRootElementsRow } from "./elements-panel";
+import { debugPrint, waitFor } from "./utils";
 
 // `doc_stacking.html` data and utils
 
@@ -147,9 +143,10 @@ export async function verifyStackingTestCaseSelectedElementUnderCursor(
   testCase: StackingTestCase
 ) {
   await openElementsPanel(page);
-  // deselect any previously selected DOM node by selecting `<body>`.
+
+  // deselect any previously selected DOM node by selecting the root HTML or DOCTYPE row.
   // This ensures that the "Rules" tab is empty before every test case.
-  await selectElementsRowWithText(page, "body");
+  await selectRootElementsRow(page);
 
   await openAppliedRulesTab(page);
 

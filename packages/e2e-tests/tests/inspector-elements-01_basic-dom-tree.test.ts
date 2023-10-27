@@ -2,10 +2,11 @@ import { openDevToolsTab, startTest } from "../helpers";
 import { openConsolePanel, warpToMessage } from "../helpers/console-panel";
 import {
   activateInspectorTool,
-  getElementsRowWithText,
+  getElementsListRow,
+  openElementsPanel,
   searchElementsPanel,
   selectNextElementsPanelSearchResult,
-  toggleMarkupNode,
+  toggleElementsListRow,
   waitForSelectedElementsRow,
 } from "../helpers/elements-panel";
 import { rewindToLine } from "../helpers/pause-information-panel";
@@ -24,27 +25,33 @@ test("inspector-elements-01: Basic DOM tree node display", async ({
   await openConsolePanel(page);
   await warpToMessage(page, "ExampleFinished");
 
-  await activateInspectorTool(page);
-  let node = await getElementsRowWithText(page, '<div id="maindiv" style="color: red"');
-  await node.waitFor();
-  await toggleMarkupNode(page, node, true);
+  await openElementsPanel(page);
 
-  node = await getElementsRowWithText(page, "GOODBYE");
+  const bodyNode = await getElementsListRow(page, { text: "<body" });
+  await toggleElementsListRow(page, bodyNode, true);
+
+  await activateInspectorTool(page);
+  let node = await getElementsListRow(page, { text: '<div id="maindiv"' });
+  await node.waitFor();
+  await toggleElementsListRow(page, node, true);
+
+  node = await getElementsListRow(page, { text: "GOODBYE" });
   await node.waitFor();
 
   await addBreakpoint(page, { url: "doc_inspector_basic.html", lineNumber: 9 });
   await rewindToLine(page, 9);
 
-  node = await getElementsRowWithText(page, '<div id="maindiv" style="color: red"');
+  await toggleElementsListRow(page, bodyNode, true);
+  node = await getElementsListRow(page, { text: '<div id="maindiv"' });
   await node.waitFor();
-  await toggleMarkupNode(page, node, true);
+  await toggleElementsListRow(page, node, true);
 
-  node = await getElementsRowWithText(page, "HELLO");
+  node = await getElementsListRow(page, { text: "HELLO" });
   await node.waitFor();
 
   await searchElementsPanel(page, "STUFF");
   await waitForSelectedElementsRow(page, "STUFF");
 
   await selectNextElementsPanelSearchResult(page);
-  await waitForSelectedElementsRow(page, '<div id="div4" some-attribute="STUFF"');
+  await waitForSelectedElementsRow(page, 'div id="div4" some-attribute="STUFF"');
 });

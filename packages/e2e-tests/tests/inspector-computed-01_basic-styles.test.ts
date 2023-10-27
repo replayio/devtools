@@ -3,7 +3,8 @@ import { openConsolePanel, warpToMessage } from "../helpers/console-panel";
 import {
   activateInspectorTool,
   checkComputedStyle,
-  selectElementsRowWithText,
+  selectElementsListRow,
+  toggleElementsListRow,
 } from "../helpers/elements-panel";
 import { rewindToLine } from "../helpers/pause-information-panel";
 import { addBreakpoint } from "../helpers/source-panel";
@@ -21,15 +22,16 @@ test("inspector-computed-01: Basic computed styles can be viewed", async ({
   await warpToMessage(page, "ExampleFinished");
   await activateInspectorTool(page);
 
-  await selectElementsRowWithText(page, "body");
+  const row = await selectElementsListRow(page, { text: "<body" });
   await checkComputedStyle(page, "background-color", "rgb(0, 128, 0)");
 
-  await selectElementsRowWithText(page, "maindiv");
+  await toggleElementsListRow(page, row, true);
+  await selectElementsListRow(page, { text: "maindiv" });
   await checkComputedStyle(page, "background-color", "rgb(0, 0, 255)");
 
   await addBreakpoint(page, { url: "doc_inspector_styles.html", lineNumber: 11 });
   await rewindToLine(page, 11);
 
-  await selectElementsRowWithText(page, "maindiv");
+  await selectElementsListRow(page, { text: "maindiv" });
   await checkComputedStyle(page, "background-color", "rgb(255, 0, 0)");
 });

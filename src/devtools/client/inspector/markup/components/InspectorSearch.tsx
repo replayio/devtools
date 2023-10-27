@@ -111,6 +111,7 @@ export function InspectorSearch() {
         <input
           id="inspector-searchbox"
           className="devtools-searchinput"
+          data-test-id="ElementsSearchInput"
           type="input"
           placeholder="Search HTML"
           autoComplete="off"
