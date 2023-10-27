@@ -24,7 +24,6 @@ import {
   clearExpectedError,
   getExpectedError,
   getUnexpectedError,
-  setCurrentPoint,
   setTrialExpired,
 } from "ui/reducers/app";
 import { getToolboxLayout } from "ui/reducers/layout";
@@ -349,8 +348,6 @@ export function createSocket(
 
       dispatch(actions.setUploading(null));
       dispatch(actions.setAwaitingSourcemaps(false));
-
-      ThreadFront.on("paused", ({ point }) => dispatch(setCurrentPoint(point)));
 
       await replayClient.waitForSession();
       await dispatch(jumpToInitialPausePoint());

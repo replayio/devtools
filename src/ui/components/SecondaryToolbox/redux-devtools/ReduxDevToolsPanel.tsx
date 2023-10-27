@@ -2,7 +2,7 @@ import { Suspense, useContext, useMemo, useState } from "react";
 import { PanelGroup, PanelResizeHandle, Panel as ResizablePanel } from "react-resizable-panels";
 import { useImperativeCacheValue } from "suspense";
 
-import { annotateFrames } from "devtools/client/debugger/src/utils/pause/frames";
+import { getExecutionPoint } from "devtools/client/debugger/src/selectors";
 import IndeterminateLoader from "replay-next/components/IndeterminateLoader";
 import Loader from "replay-next/components/Loader";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
@@ -13,7 +13,6 @@ import { ActionFilter } from "ui/components/SecondaryToolbox/redux-devtools/Acti
 import { ReduxActionAnnotation } from "ui/components/SecondaryToolbox/redux-devtools/annotations";
 import { ReduxDevToolsContents } from "ui/components/SecondaryToolbox/redux-devtools/ReduxDevToolsContents";
 import { ReduxDevToolsList } from "ui/components/SecondaryToolbox/redux-devtools/ReduxDevToolsList";
-import { getCurrentPoint } from "ui/reducers/app";
 import { useAppSelector } from "ui/setup/hooks";
 import { reduxDevToolsAnnotationsCache } from "ui/suspense/annotationsCaches";
 
@@ -26,7 +25,7 @@ export default function ReduxDevToolsPanel() {
   const [selectedAnnotation, selectAnnotation] = useState<ReduxActionAnnotation | null>(null);
   const [searchValue, setSearchValue] = useState("");
 
-  const currentExecutionPoint = useAppSelector(getCurrentPoint);
+  const currentExecutionPoint = useAppSelector(getExecutionPoint);
 
   const { status: annotationsStatus, value: parsedAnnotations } = useImperativeCacheValue(
     reduxDevToolsAnnotationsCache,

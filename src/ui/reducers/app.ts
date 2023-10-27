@@ -1,7 +1,7 @@
 import { PayloadAction, createSelector, createSlice } from "@reduxjs/toolkit";
 
 import { RecordingTarget } from "replay-next/src/suspense/BuildIdCache";
-import { compareExecutionPoints, isExecutionPointsWithinRange } from "replay-next/src/utils/time";
+import { compareExecutionPoints } from "replay-next/src/utils/time";
 import { Workspace } from "shared/graphql/types";
 import { UIState } from "ui/state";
 import {
@@ -23,7 +23,6 @@ export const initialAppState: AppState = {
   activeNodePicker: null,
   awaitingSourcemaps: false,
   canvas: null,
-  currentPoint: null,
   defaultSettingsTab: "Preferences",
   displayedLoadingProgress: null,
   events: {},
@@ -131,9 +130,6 @@ const appSlice = createSlice({
     setRecordingWorkspace(state, action: PayloadAction<Workspace>) {
       state.recordingWorkspace = action.payload;
     },
-    setCurrentPoint(state, action: PayloadAction<string | null>) {
-      state.currentPoint = action.payload;
-    },
     setAppMode(state, action: PayloadAction<AppMode>) {
       state.mode = action.payload;
     },
@@ -151,7 +147,6 @@ export const {
   setAppMode,
   setAwaitingSourcemaps,
   setCanvas,
-  setCurrentPoint,
   setDefaultSettingsTab,
   loadReceivedEvents,
   setExpectedError,
@@ -224,4 +219,3 @@ export const getDefaultSettingsTab = (state: UIState) => state.app.defaultSettin
 export const getRecordingTarget = (state: UIState) => state.app.recordingTarget;
 export const getRecordingWorkspace = (state: UIState) => state.app.recordingWorkspace;
 export const getAreMouseTargetsLoading = (state: UIState) => state.app.mouseTargetsLoading;
-export const getCurrentPoint = (state: UIState) => state.app.currentPoint;

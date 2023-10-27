@@ -82,7 +82,6 @@ export interface AppState {
   activeNodePicker: NodePickerType | null;
   awaitingSourcemaps: boolean;
   canvas: Canvas | null;
-  currentPoint: ExecutionPoint | null;
   defaultSettingsTab: SettingsTabTitle;
   displayedLoadingProgress: number | null;
   events: Events;

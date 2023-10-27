@@ -1,4 +1,4 @@
-import { ExecutionPoint, PauseId } from "@replayio/protocol";
+import { ExecutionPoint } from "@replayio/protocol";
 import React, {
   PropsWithChildren,
   useCallback,
@@ -9,10 +9,10 @@ import React, {
   useTransition,
 } from "react";
 
+import { getExecutionPoint } from "devtools/client/debugger/src/selectors";
 import { TimelineContext, TimelineContextType } from "replay-next/src/contexts/TimelineContext";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { seek } from "ui/actions/timeline";
-import { getCurrentPoint } from "ui/reducers/app";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
@@ -28,7 +28,7 @@ export default function TimelineContextAdapter({ children }: PropsWithChildren) 
 
   const dispatch = useAppDispatch();
   const time = useAppSelector(getCurrentTime);
-  const executionPoint = useAppSelector(getCurrentPoint) || "0";
+  const executionPoint = useAppSelector(getExecutionPoint) || "0";
 
   const update = useCallback(
     async (time: number, executionPoint: ExecutionPoint, openSource: boolean) => {
