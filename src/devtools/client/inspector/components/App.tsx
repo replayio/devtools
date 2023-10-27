@@ -36,7 +36,7 @@ export default function InspectorApp() {
   const activeTab = useAppSelector(state => state.inspector.activeTab);
   const { executionPoint } = useContext(TimelineContext);
 
-  const [enableNewElementsPanel] = useGraphQLUserData("feature_newElementsPanel");
+  const [enableNewElementsPanel] = useGraphQLUserData("feature_enableNewElementsPanel");
 
   const isPointWithinFocusWindow = useIsPointWithinFocusWindow(executionPoint);
   if (!isPointWithinFocusWindow) {
