@@ -21,6 +21,9 @@ import { GenericListData } from "replay-next/components/windowing/GenericListDat
 export type GenericListItemData<Item, ItemData> = {
   itemData: ItemData;
   listData: GenericListData<Item>;
+  // Not required by list items but ensures a re-render when the underlying data is invalidated
+  revision: number;
+  selectedItemIndex: number | null;
 };
 
 export type ImperativeHandle = {
@@ -190,6 +193,8 @@ export function GenericList<Item, ItemData extends Object>({
       itemData={{
         itemData,
         listData,
+        revision,
+        selectedItemIndex,
       }}
       itemSize={itemSize}
       onItemsRendered={onItemsRendered}
