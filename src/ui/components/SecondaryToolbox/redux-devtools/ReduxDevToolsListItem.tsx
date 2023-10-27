@@ -1,10 +1,10 @@
-import { CSSProperties, useEffect, useRef } from "react";
+import { CSSProperties } from "react";
 
+import { getExecutionPoint } from "devtools/client/debugger/src/selectors";
 import { isExecutionPointsGreaterThan } from "replay-next/src/utils/time";
 import { ReduxActionAnnotation } from "ui/components/SecondaryToolbox/redux-devtools/annotations";
 import { jumpToLocationForReduxDispatch } from "ui/components/SecondaryToolbox/redux-devtools/utils/jumpToLocationForReduxDispatch";
 import { JumpToCodeButton } from "ui/components/shared/JumpToCodeButton";
-import { getCurrentPoint } from "ui/reducers/app";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 import useReduxDevtoolsContextMenu from "./useReduxDevtoolsContextMenu";
@@ -46,7 +46,7 @@ export function ReduxDevToolsListItem({
   );
 
   const dispatch = useAppDispatch();
-  const currentExecutionPoint = useAppSelector(getCurrentPoint);
+  const currentExecutionPoint = useAppSelector(getExecutionPoint);
 
   const onSeek = () => {
     selectAnnotation(annotation);

@@ -12,7 +12,7 @@ import React, {
 import { useImperativeCacheValue } from "suspense";
 
 import { selectLocation } from "devtools/client/debugger/src/actions/sources";
-import { getThreadContext } from "devtools/client/debugger/src/reducers/pause";
+import { getExecutionPoint, getThreadContext } from "devtools/client/debugger/src/reducers/pause";
 import { highlightNode, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 import { ThreadFront } from "protocol/thread";
 import { assert } from "protocol/utils";
@@ -31,12 +31,7 @@ import { useTheme } from "shared/theme/useTheme";
 import { UIThunkAction } from "ui/actions";
 import { fetchMouseTargetsForPause } from "ui/actions/app";
 import { enterFocusMode } from "ui/actions/timeline";
-import {
-  getCurrentPoint,
-  nodePickerDisabled,
-  nodePickerInitializing,
-  nodePickerReady,
-} from "ui/reducers/app";
+import { nodePickerDisabled, nodePickerInitializing, nodePickerReady } from "ui/reducers/app";
 import { getPreferredLocation } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector, useAppStore } from "ui/setup/hooks";
 import { UIState } from "ui/state";
@@ -464,7 +459,7 @@ export function ReactDevtoolsPanel() {
   const theme = useTheme();
   const replayClient = useContext(ReplayClientContext);
   const componentPickerActive = useAppSelector(getIsReactComponentPickerActive);
-  const currentPoint = useAppSelector(getCurrentPoint);
+  const currentPoint = useAppSelector(getExecutionPoint);
   const previousPoint = usePrevious(currentPoint);
   const isFirstAnnotationsInjection = useRef(true);
   const [, forceRender] = useReducer(c => c + 1, 0);
