@@ -12,7 +12,6 @@ import {
 } from "../../Recordings/RecordingListItem/RecordingListItem";
 import { AttributeContainer } from "../AttributeContainer";
 import { RunStats } from "../RunStats";
-import { getDuration } from "../utils";
 
 export function ModeAttribute({ testRun }: { testRun: TestRun }) {
   const { mode } = testRun;
@@ -52,11 +51,18 @@ export function ModeAttribute({ testRun }: { testRun: TestRun }) {
   return <AttributeContainer icon={modeIcon}>{modeText}</AttributeContainer>;
 }
 
-export function Attributes({ recordings, testRun }: { recordings: Recording[]; testRun: TestRun }) {
+export function Attributes({
+  recordings,
+  testRun,
+  durationMs,
+}: {
+  recordings: Recording[];
+  testRun: TestRun;
+  durationMs: number;
+}) {
   const { date, source } = testRun;
 
-  const duration = getDuration(testRun.tests);
-  const durationString = getDurationString(duration);
+  const durationString = getDurationString(durationMs);
 
   if (source) {
     const { branchName, isPrimaryBranch, user } = source;
@@ -137,10 +143,12 @@ export function RunSummary({
   isPending,
   recordings,
   testRun,
+  durationMs,
 }: {
   isPending: boolean;
   recordings: Recording[];
   testRun: TestRun;
+  durationMs: number;
 }) {
   const { source } = testRun;
 
@@ -163,7 +171,7 @@ export function RunSummary({
         </div>
       )}
       <div className="mt-1 flex w-full flex-row items-center gap-4 text-xs">
-        <Attributes recordings={recordings} testRun={testRun} />
+        <Attributes recordings={recordings} testRun={testRun} durationMs={durationMs} />
         <div className="grow" />
         <PullRequestLink testRun={testRun} />
         <RunnerLink testRun={testRun} />

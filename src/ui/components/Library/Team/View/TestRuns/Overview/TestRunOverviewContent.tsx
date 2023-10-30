@@ -11,7 +11,7 @@ export function TestRunOverviewContent() {
   const { filterByStatus, filterByText, testRunId, testRunIdForDisplay, testRuns } =
     useContext(TestRunsContext);
 
-  const { recordings } = useTestRunRecordingsSuspends(testRunId);
+  const { recordings, durationMs } = useTestRunRecordingsSuspends(testRunId);
 
   const isPending = testRunId !== testRunIdForDisplay;
 
@@ -23,7 +23,12 @@ export function TestRunOverviewContent() {
     if (!hasFilters || testRuns.find(testRun => testRun.id === testRunId)) {
       children = (
         <>
-          <RunSummary isPending={isPending} recordings={recordings} testRun={testRun} />
+          <RunSummary
+            isPending={isPending}
+            recordings={recordings}
+            testRun={testRun}
+            durationMs={durationMs}
+          />
           <RunResults isPending={isPending} />
         </>
       );

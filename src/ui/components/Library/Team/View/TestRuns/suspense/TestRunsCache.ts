@@ -28,6 +28,7 @@ export const testRunsCache = createCache<
 });
 
 export type TestRunRecordings = {
+  durationMs: number;
   groupedRecordings: TestGroups | null;
   recordings: Recording[] | null;
 };
@@ -53,7 +54,9 @@ export const testRunRecordingsCache = createCache<
     );
 
     const recordings: Recording[] = [];
+    let durationMs = 0;
     const testsWithRecordings = tests.map<TestRunTestWithRecordings>(test => {
+      durationMs += test.durationMs;
       const recs = orderBy(test.recordings.map(convertRecording), "date", "desc");
       recordings.push(...recs);
 
@@ -64,6 +67,7 @@ export const testRunRecordingsCache = createCache<
     });
 
     return {
+      durationMs,
       groupedRecordings: groupRecordings(testsWithRecordings),
       recordings,
     };

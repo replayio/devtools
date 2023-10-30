@@ -11,21 +11,6 @@ export interface GetTestsRunsForWorkspace_node_Recording {
   __typename: "Recording";
 }
 
-export interface GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node_tests {
-  __typename: "TestRunTest";
-  id: string;
-  testId: string;
-  index: number;
-  attempt: number;
-  title: string;
-  scope: string[];
-  sourcePath: string;
-  result: string;
-  errors: string[] | null;
-  durationMs: number;
-  recordingIds: string[];
-}
-
 export interface GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node_results_counts {
   __typename: "TestRunStats";
   failed: number;
@@ -57,7 +42,6 @@ export interface GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node {
   id: string;
   date: any;
   mode: string | null;
-  tests: GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node_tests[];
   results: GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node_results;
   source: GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node_source;
 }

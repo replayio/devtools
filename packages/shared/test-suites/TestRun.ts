@@ -46,7 +46,6 @@ export type TestRun = {
     };
   };
   source: SourceMetadata;
-  tests: TestRunTest[];
 };
 
 export function processTestRun(testRun: TestRunsForWorkspaceGraphQL): TestRun {

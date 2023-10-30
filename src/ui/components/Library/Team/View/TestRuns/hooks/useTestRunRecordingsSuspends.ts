@@ -16,5 +16,6 @@ export function useTestRunRecordingsSuspends(testRunId: string | null) {
     : {
         groupedRecordings: null,
         recordings: null,
+        durationMs: 0,
       };
 }

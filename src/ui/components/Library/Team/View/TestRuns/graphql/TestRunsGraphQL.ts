@@ -63,19 +63,6 @@ const GET_TEST_RUNS = gql`
               id
               date
               mode
-              tests {
-                id
-                testId
-                index
-                attempt
-                title
-                scope
-                sourcePath
-                result
-                errors
-                durationMs
-                recordingIds
-              }
               results {
                 counts {
                   failed
