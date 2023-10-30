@@ -9,7 +9,7 @@ import {
 } from "react";
 
 import Icon from "replay-next/components/Icon";
-import { useTestRunRecordingsSuspends } from "ui/components/Library/Team/View/TestRuns/hooks/useTestRunRecordingsSuspends";
+import { useTestRunDetailsSuspends } from "ui/components/Library/Team/View/TestRuns/hooks/useTestRunDetailsSuspends";
 import {
   FileNode,
   PathNode,
@@ -28,10 +28,10 @@ export function RunResults({ isPending }: { isPending: boolean }) {
   const [filterByText, setFilterByText] = useState("");
   const filterByTextDeferred = useDeferredValue(filterByText);
 
-  const { groupedRecordings } = useTestRunRecordingsSuspends(testRunId);
-  assert(groupedRecordings !== null);
+  const { groupedTests } = useTestRunDetailsSuspends(testRunId);
+  assert(groupedTests !== null);
 
-  const { passedRecordings, failedRecordings, flakyRecordings } = groupedRecordings;
+  const { passedRecordings, failedRecordings, flakyRecordings } = groupedTests;
 
   return (
     <>

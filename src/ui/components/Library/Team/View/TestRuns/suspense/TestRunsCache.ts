@@ -29,11 +29,11 @@ export const testRunsCache = createCache<
 
 export type TestRunRecordings = {
   durationMs: number;
-  groupedRecordings: TestGroups | null;
+  groupedTests: TestGroups | null;
   recordings: Recording[] | null;
 };
 
-export const testRunRecordingsCache = createCache<
+export const testRunDetailsCache = createCache<
   [
     graphQLClient: GraphQLClientInterface,
     accessToken: string | null,
@@ -43,7 +43,7 @@ export const testRunRecordingsCache = createCache<
   TestRunRecordings
 >({
   config: { immutable: true },
-  debugLabel: "testRunRecordingsCache",
+  debugLabel: "testRunDetailsCache",
   getKey: ([_, __, workspaceId, testRunId]) => `${workspaceId}:${testRunId}`,
   load: async ([graphQLClient, accessToken, workspaceId, testRunId]) => {
     const tests = await getTestRunTestsWithRecordingsGraphQL(
@@ -68,7 +68,7 @@ export const testRunRecordingsCache = createCache<
 
     return {
       durationMs,
-      groupedRecordings: groupRecordings(testsWithRecordings),
+      groupedTests: groupRecordings(testsWithRecordings),
       recordings,
     };
   },

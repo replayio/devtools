@@ -1,6 +1,6 @@
 import { useContext } from "react";
 
-import { useTestRunRecordingsSuspends } from "ui/components/Library/Team/View/TestRuns/hooks/useTestRunRecordingsSuspends";
+import { useTestRunDetailsSuspends } from "ui/components/Library/Team/View/TestRuns/hooks/useTestRunDetailsSuspends";
 import { RunResults } from "ui/components/Library/Team/View/TestRuns/Overview/RunResults";
 import { TestRunsContext } from "ui/components/Library/Team/View/TestRuns/TestRunsContextRoot";
 
@@ -11,7 +11,7 @@ export function TestRunOverviewContent() {
   const { filterByStatus, filterByText, testRunId, testRunIdForDisplay, testRuns } =
     useContext(TestRunsContext);
 
-  const { recordings, durationMs } = useTestRunRecordingsSuspends(testRunId);
+  const { recordings, durationMs } = useTestRunDetailsSuspends(testRunId);
 
   const isPending = testRunId !== testRunIdForDisplay;
 

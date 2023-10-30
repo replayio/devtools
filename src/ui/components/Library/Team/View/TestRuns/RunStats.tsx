@@ -1,14 +1,14 @@
-import { useTestRunRecordingsSuspends } from "ui/components/Library/Team/View/TestRuns/hooks/useTestRunRecordingsSuspends";
+import { useTestRunDetailsSuspends } from "ui/components/Library/Team/View/TestRuns/hooks/useTestRunDetailsSuspends";
 
 import styles from "../../../Library.module.css";
 
 export function RunStats({ testRunId }: { testRunId: string }) {
-  const { groupedRecordings } = useTestRunRecordingsSuspends(testRunId);
-  if (groupedRecordings === null) {
+  const { groupedTests } = useTestRunDetailsSuspends(testRunId);
+  if (groupedTests === null) {
     return null;
   }
 
-  const { passedRecordings, failedRecordings, flakyRecordings } = groupedRecordings;
+  const { passedRecordings, failedRecordings, flakyRecordings } = groupedTests;
 
   const passed = passedRecordings.count;
   const failed = failedRecordings.count;
