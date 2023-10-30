@@ -141,10 +141,6 @@
   min-width: 1px;
 }
 
-.Row[data-selected] .Timing {
-  background-color: var(--testsuites-success-color);
-}
-
 .Row:hover .TimingContainer {
   background-color: var(--body-bgcolor);
 }
