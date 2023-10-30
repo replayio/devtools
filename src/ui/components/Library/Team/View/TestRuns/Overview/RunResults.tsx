@@ -62,17 +62,17 @@ export function RunResults({ isPending }: { isPending: boolean }) {
         <TestStatusGroup
           filterByText={filterByTextDeferred}
           label="Failed"
-          recordingGroup={failedRecordings}
+          testGroup={failedRecordings}
         />
         <TestStatusGroup
           filterByText={filterByTextDeferred}
           label="Flaky"
-          recordingGroup={flakyRecordings}
+          testGroup={flakyRecordings}
         />
         <TestStatusGroup
           filterByText={filterByTextDeferred}
           label="Passed"
-          recordingGroup={passedRecordings}
+          testGroup={passedRecordings}
         />
       </div>
     </>
@@ -82,17 +82,17 @@ export function RunResults({ isPending }: { isPending: boolean }) {
 function TestStatusGroup({
   filterByText,
   label,
-  recordingGroup,
+  testGroup,
 }: {
   filterByText: string;
   label: string;
-  recordingGroup: TestGroup;
+  testGroup: TestGroup;
 }) {
   const [expanded, setExpanded] = useState(true);
 
-  const tree = useFileNameTree(recordingGroup, filterByText);
+  const tree = useFileNameTree(testGroup, filterByText);
 
-  const count = recordingGroup.count;
+  const count = testGroup.count;
   if (count == 0) {
     return null;
   }
