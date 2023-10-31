@@ -15,15 +15,15 @@ export function useHoneycombQueryLink() {
         JSON.stringify({
           time_range: 3600,
           granularity: 0,
-          breakdowns: ["trace.trace_id"],
-          calculations: [{ op: "COUNT" }],
+          breakdowns: ["trace.trace_id", "name", "rpc.replayprotocol.command_id"],
+          calculations: [{ op: "AVG", column: "duration_ms" }],
           filters: [
             { column: "name", op: "starts-with", value: "replayprotocol" },
             { column: "replay.session.id", op: "=", value: window.sessionId },
             { column: "rpc.replayprotocol.command_id", op: "=", value: request.id },
           ],
           filter_combination: "AND",
-          orders: [{ op: "COUNT", order: "descending" }],
+          orders: [{ op: "AVG", column: "duration_ms", order: "descending" }],
           havings: [],
           limit: 100,
         })

@@ -197,7 +197,7 @@ export function createSocket(
         enableRoutines: userData.get("backend_enableRoutines"),
         rerunRoutines: userData.get("backend_rerunRoutines"),
         disableRecordingAssetsInDatabase: userData.get("backend_disableRecordingAssetsInDatabase"),
-        keepAllTraces: userData.get("backend_keepAllTraces"),
+        sampleAllTraces: userData.get("backend_sampleAllTraces"),
         disableIncrementalSnapshots: userData.get("backend_disableIncrementalSnapshots"),
         disableConcurrentControllerLoading: userData.get(
           "backend_disableConcurrentControllerLoading"

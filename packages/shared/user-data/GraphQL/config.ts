@@ -80,9 +80,10 @@ export const config = {
     label: "Enable backend processing routines",
     legacyKey: "devtools.features.enableRoutines",
   },
-  backend_keepAllTraces: {
+  backend_sampleAllTraces: {
     defaultValue: Boolean(false),
     internalOnly: Boolean(true),
+    label: "Keep all Honeycomb events",
     legacyKey: "devtools.features.keepAllTraces",
   },
   backend_listenForMetrics: {
