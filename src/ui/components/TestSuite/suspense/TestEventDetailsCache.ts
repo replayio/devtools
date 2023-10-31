@@ -9,7 +9,7 @@ import {
 import cloneDeep from "lodash/cloneDeep";
 import { ExternallyManagedCache, createExternallyManagedCache } from "suspense";
 
-import { NodeInfo } from "devtools/client/inspector/markup/reducers/markup";
+import { Element, elementCache } from "replay-next/components/elements/suspense/ElementCache";
 import { createFocusIntervalCacheForExecutionPoints } from "replay-next/src/suspense/FocusIntervalCache";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { cachePauseData, setPointAndTimeForPauseId } from "replay-next/src/suspense/PauseCache";
@@ -21,7 +21,7 @@ import {
   UserActionEvent,
   isUserActionTestEvent,
 } from "shared/test-suites/RecordingTestMetadata";
-import { boxModelCache, processedNodeDataCache } from "ui/suspense/nodeCaches";
+import { boxModelCache } from "ui/suspense/nodeCaches";
 
 export type TestEventDetailsEntry = TimeStampedPoint & {
   count: number | null;
@@ -31,7 +31,7 @@ export type TestEventDetailsEntry = TimeStampedPoint & {
 
 export type TestEventDomNodeDetails = TimeStampedPoint & {
   pauseId: PauseId;
-  domNode: NodeInfo | null;
+  domNode: Element | null;
 };
 
 // The interval cache is used by `<Panel>` to fetch all of the step details and DOM node data for a single test.
@@ -259,12 +259,12 @@ async function fetchAndCachePossibleDomNode(
     el => !!el && el.className !== "Object" && el.preview?.node
   );
 
-  let nodeInfo: NodeInfo | null = null;
+  let nodeInfo: Element | null = null;
 
   if (firstDomNode) {
     // Kick off a fetch for the box model now, so we have that cached when we try to highlight this node
     boxModelCache.prefetch(replayClient, pauseId, firstDomNode.objectId);
-    nodeInfo = await processedNodeDataCache.readAsync(replayClient, pauseId, firstDomNode.objectId);
+    nodeInfo = await elementCache.readAsync(replayClient, pauseId, firstDomNode.objectId);
   }
 
   const domNodeDetails: TestEventDomNodeDetails = {

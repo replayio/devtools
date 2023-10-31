@@ -27,7 +27,6 @@
 
 "use strict";
 
-import nodeConstants from "devtools/shared/dom-node-constants";
 import {
   getBindingElementAndPseudo,
   getCSSStyleRules,
@@ -471,7 +470,7 @@ CssLogic.prototype = {
       if (InspectorUtils.selectorMatchesElement(element, domRule, idx)) {
         return true;
       }
-    } while ((element = element.parentNode) && element.nodeType === nodeConstants.ELEMENT_NODE);
+    } while ((element = element.parentNode) && element.nodeType === Node.ELEMENT_NODE);
 
     return false;
   },
@@ -586,7 +585,7 @@ CssLogic.prototype = {
       }
 
       distance--;
-    } while ((element = element.parentNode) && element.nodeType === nodeConstants.ELEMENT_NODE);
+    } while ((element = element.parentNode) && element.nodeType === Node.ELEMENT_NODE);
   },
 
   /**
@@ -676,7 +675,7 @@ CssLogic.getComputedStyle = function (node) {
   if (
     !node ||
     Cu.isDeadWrapper(node) ||
-    node.nodeType !== nodeConstants.ELEMENT_NODE ||
+    node.nodeType !== Node.ELEMENT_NODE ||
     !node.ownerGlobal
   ) {
     return null;

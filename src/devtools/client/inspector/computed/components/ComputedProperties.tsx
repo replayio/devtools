@@ -3,10 +3,11 @@ import { shallowEqual } from "react-redux";
 import { useImperativeCacheValue } from "suspense";
 
 import { getPauseId } from "devtools/client/debugger/src/selectors";
+import { elementCache } from "replay-next/components/elements/suspense/ElementCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { processedNodeDataCache } from "ui/suspense/nodeCaches";
-import { computedPropertiesCache, cssRulesCache } from "ui/suspense/styleCaches";
+import { isElement } from "ui/suspense/nodeCaches";
+import { computedPropertiesCache } from "ui/suspense/styleCaches";
 
 import { getSelectedNodeId } from "../../markup/selectors/markup";
 import { setComputedPropertyExpanded } from "../actions";
@@ -45,14 +46,14 @@ function ComputedProperties() {
 
   const replayClient = useContext(ReplayClientContext);
 
-  const { value: node, status: nodeStatus } = useImperativeCacheValue(
-    processedNodeDataCache,
+  const { value: element, status: elementStatus } = useImperativeCacheValue(
+    elementCache,
     replayClient,
     pauseId!,
     selectedNodeId!
   );
 
-  const canHaveRules = nodeStatus === "resolved" ? node?.isElement : false;
+  const canHaveRules = elementStatus === "resolved" && isElement(element.node);
 
   const { value: computedProperties, status } = useImperativeCacheValue(
     computedPropertiesCache,

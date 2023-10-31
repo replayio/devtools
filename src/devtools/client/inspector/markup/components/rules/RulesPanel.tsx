@@ -4,11 +4,12 @@ import AutoSizer from "react-virtualized-auto-sizer";
 import { getPauseId } from "devtools/client/debugger/src/selectors";
 import { RulesList } from "devtools/client/inspector/markup/components/rules/RulesList";
 import { getSelectedNodeId } from "devtools/client/inspector/markup/selectors/markup";
+import { elementCache } from "replay-next/components/elements/suspense/ElementCache";
 import Icon from "replay-next/components/Icon";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { shallowEqual } from "shared/utils/compare";
 import { useAppSelector } from "ui/setup/hooks";
-import { processedNodeDataCache } from "ui/suspense/nodeCaches";
+import { isElement } from "ui/suspense/nodeCaches";
 import { RuleState, cssRulesCache } from "ui/suspense/styleCaches";
 
 import styles from "./RulesPanel.module.css";
@@ -30,13 +31,12 @@ export function RulesPanelSuspends() {
 
   const isPending = pauseId !== deferredPauseId || selectedNodeId !== deferredSelectedNodeId;
 
-  const node = processedNodeDataCache.read(
-    replayClient,
-    deferredPauseId,
-    deferredSelectedNodeId ?? undefined
-  );
+  const element =
+    deferredPauseId && deferredSelectedNodeId
+      ? elementCache.read(replayClient, deferredPauseId, deferredSelectedNodeId)
+      : null;
 
-  const canHaveRules = !!node?.isElement;
+  const canHaveRules = element && isElement(element.node);
 
   const cachedStyles = cssRulesCache.read(
     replayClient,
