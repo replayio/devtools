@@ -1,61 +1,94 @@
-import {
-  ChangeEvent,
-  KeyboardEvent,
-  Suspense,
-  startTransition,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { ChangeEvent, Suspense, useContext, useEffect, useRef, useState } from "react";
 import { STATUS_REJECTED, useStreamingValue } from "suspense";
 
-import { Checkbox } from "design";
+import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
+import { useDebounce } from "replay-next/src/hooks/useDebounce";
 import { useNag } from "replay-next/src/hooks/useNag";
+import useTooltip from "replay-next/src/hooks/useTooltip";
 import { searchCache } from "replay-next/src/suspense/SearchCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Nag } from "shared/graphql/types";
 
-import Icon from "../Icon";
+import Icon, { IconType } from "../Icon";
 import InlineResultsCount from "./InlineResultsCount";
 import ResultsList from "./ResultsList";
 import styles from "./SearchFiles.module.css";
 
 export const SHOW_GLOBAL_SEARCH_EVENT_TYPE = "show-global-search";
 
+function FilterButton({
+  icon,
+  toggle,
+  active,
+  tooltip: tooltipTitle,
+  ...props
+}: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+  icon: IconType;
+  toggle: () => any;
+  active: boolean;
+  tooltip: string;
+}) {
+  const { onMouseEnter, onMouseLeave, tooltip } = useTooltip({
+    position: "below",
+    tooltip: tooltipTitle,
+  });
+
+  return (
+    <>
+      <button
+        {...props}
+        data-active={active}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+        onClick={() => toggle()}
+        className={active ? styles.SelectedSearchFilterButton : styles.SearchFilterButton}
+      >
+        <Icon className={styles.SearchFilterIcon} type={icon} />
+      </button>
+      {tooltip}
+    </>
+  );
+}
+
 export default function SearchFiles({ limit }: { limit?: number }) {
   const client = useContext(ReplayClientContext);
+  const { openSourceIds } = useContext(SourcesContext);
 
-  const [includeNodeModules, setIncludeNodeModules] = useState(false);
+  const [excludeNodeModules, setExcludeNodeModules] = useState(true);
   const [queryForDisplay, setQueryForDisplay] = useState("");
-  const [queryForSuspense, setQueryForSuspense] = useState("");
+  const [includedFiles, setIncludedFiles] = useState("");
+  const [excludedFiles, setExcludedFiles] = useState("");
+  const [openEditors, setOpenEditors] = useState(false);
+  const [useRegex, setUseRegex] = useState(false);
+  const [caseSensitive, setCaseSensitive] = useState(false);
+  const [wholeWord, setWholeWord] = useState(false);
+  const queryForSearch = useDebounce(queryForDisplay, 500);
   const [, dismissSearchSourceTextNag] = useNag(Nag.SEARCH_SOURCE_TEXT);
 
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const streaming = searchCache.stream(client, queryForSuspense, includeNodeModules, limit);
+  const streaming = searchCache.stream(
+    client,
+    queryForSearch,
+    excludeNodeModules,
+    includedFiles,
+    excludedFiles,
+    openEditors ? openSourceIds : null,
+    useRegex,
+    caseSensitive,
+    wholeWord,
+    limit
+  );
 
   const { status } = useStreamingValue(streaming);
 
   const didError = status === STATUS_REJECTED;
 
-  const onChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setQueryForDisplay(event.target.value);
-  };
-
-  const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    switch (event.key) {
-      case "Enter":
-      case "NumpadEnter":
-        startTransition(() => {
-          setQueryForSuspense(queryForDisplay);
-        });
-        break;
-      case "Escape":
-        setQueryForDisplay(queryForSuspense);
-        break;
-    }
-  };
+  const onChange =
+    (dispatcher: React.Dispatch<React.SetStateAction<string>>) =>
+    (event: ChangeEvent<HTMLInputElement>) => {
+      dispatcher(event.target.value);
+    };
 
   useEffect(() => {
     dismissSearchSourceTextNag();
@@ -82,8 +115,7 @@ export default function SearchFiles({ limit }: { limit?: number }) {
             autoFocus
             className={styles.Input}
             data-test-id="FileSearch-Input"
-            onChange={onChange}
-            onKeyDown={onKeyDown}
+            onChange={onChange(setQueryForDisplay)}
             placeholder="Find in files..."
             ref={inputRef}
             type="text"
@@ -92,19 +124,70 @@ export default function SearchFiles({ limit }: { limit?: number }) {
           <Suspense>
             <InlineResultsCount streaming={streaming} />
           </Suspense>
-        </div>
-
-        <div className={styles.CheckboxWrapper}>
-          <Checkbox
-            dataTestId="FileSearch-IncludeNodeModules"
-            label="Include node modules"
-            checked={includeNodeModules}
-            onChange={() => setIncludeNodeModules(!includeNodeModules)}
+          <FilterButton
+            active={caseSensitive}
+            toggle={() => setCaseSensitive(!caseSensitive)}
+            icon="case-sensitive"
+            tooltip="Match Case"
+          />
+          <FilterButton
+            active={wholeWord}
+            toggle={() => setWholeWord(!wholeWord)}
+            icon="whole-word"
+            tooltip="Match Whole word"
+          />
+          <FilterButton
+            active={useRegex}
+            toggle={() => setUseRegex(!useRegex)}
+            icon="regex"
+            tooltip="Use Regular Expression"
           />
         </div>
-
+        <div
+          className={styles.InputWrapper}
+          data-error={didError || undefined}
+          data-test-id="IncludeFiles-SearchInput"
+        >
+          <Icon className={styles.Icon} type="folder-open" />
+          <input
+            className={styles.Input}
+            data-test-id="FileInclude-Input"
+            onChange={onChange(setIncludedFiles)}
+            placeholder="Files to include..."
+            type="text"
+            value={includedFiles}
+          />
+          <FilterButton
+            active={openEditors}
+            toggle={() => setOpenEditors(!openEditors)}
+            icon="open-editors"
+            tooltip="Search only in Open Editors"
+          />
+        </div>
+        <div
+          className={styles.InputWrapper}
+          data-error={didError || undefined}
+          data-test-id="ExcludeFiles-SearchInput"
+        >
+          <Icon className={styles.Icon} type="folder-closed" />
+          <input
+            className={styles.Input}
+            data-test-id="FileExclude-Input"
+            onChange={onChange(setExcludedFiles)}
+            placeholder="Files to exclude..."
+            type="text"
+            value={excludedFiles}
+          />
+          <FilterButton
+            active={excludeNodeModules}
+            toggle={() => setExcludeNodeModules(!excludeNodeModules)}
+            icon="settings-off"
+            data-test-id="FileSearch-ExcludeNodeModules"
+            tooltip="Exclude Node Modules"
+          />
+        </div>
         <Suspense>
-          <ResultsList query={queryForSuspense} streaming={streaming} />
+          <ResultsList query={queryForSearch} streaming={streaming} />
         </Suspense>
       </div>
     </div>

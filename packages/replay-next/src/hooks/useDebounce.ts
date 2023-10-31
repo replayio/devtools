@@ -1,11 +1,13 @@
-import { useEffect, useState } from "react";
+import { startTransition, useEffect, useState } from "react";
 
-export function useDebounce<Value>(value: Value, delay: number = 100): Value {
+export function useDebounce<Value>(value: Value, delay: number = 100) {
   const [debouncedValue, setDebouncedValue] = useState(value);
 
   useEffect(() => {
     const handler = setTimeout(() => {
-      setDebouncedValue(value);
+      startTransition(() => {
+        setDebouncedValue(value);
+      });
     }, delay);
 
     return () => {

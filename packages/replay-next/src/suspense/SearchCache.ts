@@ -1,5 +1,6 @@
 import assert from "assert";
 import { Location, SearchSourceContentsMatch, SourceId } from "@replayio/protocol";
+import { Minimatch } from "minimatch";
 import { StreamingCacheLoadOptions, StreamingValue, createStreamingCache } from "suspense";
 
 import { insert } from "replay-next/src/utils/array";
@@ -11,6 +12,7 @@ import {
 } from "replay-next/src/utils/source";
 import { ReplayClientInterface } from "shared/client/types";
 
+import { Source } from "../suspense/SourcesCache";
 import { getCorrespondingSourceIds } from "../utils/sources";
 import { sourcesByIdCache } from "./SourcesCache";
 
@@ -69,18 +71,34 @@ export function assertSourceSearchResultMatch(
 }
 
 export const searchCache = createStreamingCache<
-  [replayClient: ReplayClientInterface, query: string, includeNodeModules: boolean, limit?: number],
+  [
+    replayClient: ReplayClientInterface,
+    query: string,
+    excludeNodeModules: boolean,
+    includedFiles: string,
+    excludedFiles: string,
+    activeSourceIds: string[] | null,
+    useRegex: boolean,
+    caseSensitive: boolean,
+    wholeWord: boolean,
+    limit?: number
+  ],
   SourceSearchResult[],
   StreamingSourceMetadata
 >({
   debugLabel: "NetworkRequestsCache",
-  getKey: (replayClient, query, includeNodeModules, limit) =>
-    `${limit}-${includeNodeModules}-${query.trim()}`,
+  getKey: (replayClient, query, ...args) => `${args.join("-")}-${query.trim()}`,
   load: async (
     options: StreamingCacheLoadOptions<SourceSearchResult[], StreamingSourceMetadata>,
     replayClient,
     query,
-    includeNodeModules,
+    excludeNodeModules,
+    includedFiles,
+    excludedFiles,
+    activeSourceIds,
+    useRegex,
+    caseSensitive,
+    wholeWord,
     limit = MAX_SEARCH_RESULTS_TO_DISPLAY
   ) => {
     const { reject, update, resolve } = options;
@@ -99,13 +117,37 @@ export const searchCache = createStreamingCache<
       return;
     }
 
-    const sourceIds = await getSourceIds(replayClient, includeNodeModules);
+    const includedFilesMatcher = new Minimatch(includedFiles, { matchBase: true });
+    const excludedFilesMatcher = new Minimatch(excludedFiles, { matchBase: true });
+    const sourceIds = await getSourceIds(replayClient, source => {
+      if (!source.url) {
+        return false;
+      }
+
+      if (activeSourceIds && !activeSourceIds.includes(source.sourceId)) {
+        return false;
+      }
+
+      if (excludeNodeModules && (isModuleFromCdn(source) || isNodeModule(source))) {
+        return false;
+      }
+
+      if (excludedFiles && excludedFilesMatcher.match(source.url)) {
+        return false;
+      }
+
+      if (includedFiles && !includedFilesMatcher.match(source.url)) {
+        return false;
+      }
+
+      return true;
+    });
 
     let currentResultLocation: SourceSearchResultLocation | null = null;
 
     try {
       await replayClient.searchSources(
-        { limit, query, sourceIds },
+        { limit, query, sourceIds, useRegex, wholeWord, caseSensitive },
         (matches: SearchSourceContentsMatch[], didOverflow: boolean) => {
           metadata.didOverflow ||= didOverflow;
           metadata.fetchedCount += matches.length;
@@ -143,56 +185,53 @@ export const searchCache = createStreamingCache<
   },
 });
 
-async function getSourceIds(client: ReplayClientInterface, includeNodeModules: boolean) {
-  if (sourceIdsWithNodeModules == null || sourceIdsWithoutNodeModules == null) {
-    sourceIdsWithNodeModules = [];
-    sourceIdsWithoutNodeModules = [];
+async function getSourceIds(
+  client: ReplayClientInterface,
+  includeSource: (source: Source) => boolean
+) {
+  const filteredSources: SourceId[] = [];
+  const sources = await sourcesByIdCache.readAsync(client);
 
-    const sources = await sourcesByIdCache.readAsync(client);
+  // Insert sources in order so that original sources are first.
+  const compareSources = (a: SourceId, b: SourceId) => {
+    const aIsOriginal = isSourceMappedSource(a, sources);
+    const bIsOriginal = isSourceMappedSource(b, sources);
+    if (aIsOriginal === bIsOriginal) {
+      return 0;
+    } else if (aIsOriginal) {
+      return -1;
+    } else {
+      return 1;
+    }
+  };
 
-    // Insert sources in order so that original sources are first.
-    const compareSources = (a: SourceId, b: SourceId) => {
-      const aIsOriginal = isSourceMappedSource(a, sources);
-      const bIsOriginal = isSourceMappedSource(b, sources);
-      if (aIsOriginal === bIsOriginal) {
-        return 0;
-      } else if (aIsOriginal) {
-        return -1;
-      } else {
-        return 1;
-      }
-    };
+  const minifiedSources = new Set<SourceId>();
+  sources.forEach(source => {
+    if (source.kind === "prettyPrinted" && source.generated.length) {
+      minifiedSources.add(source.generated[0]);
+    }
+  });
 
-    const minifiedSources = new Set<SourceId>();
-    sources.forEach(source => {
-      if (source.kind === "prettyPrinted" && source.generated.length) {
-        minifiedSources.add(source.generated[0]);
-      }
-    });
+  sources.forEach(source => {
+    const sourceId = source.sourceId;
 
-    sources.forEach(source => {
-      const sourceId = source.sourceId;
+    if (minifiedSources.has(sourceId)) {
+      return;
+    }
 
-      if (minifiedSources.has(sourceId)) {
-        return;
-      }
+    const correspondingSourceId = getCorrespondingSourceIds(sources, source.sourceId)[0];
+    if (correspondingSourceId !== sourceId) {
+      return;
+    }
 
-      const correspondingSourceId = getCorrespondingSourceIds(sources, source.sourceId)[0];
-      if (correspondingSourceId !== sourceId) {
-        return;
-      }
+    if (isBowerComponent(source)) {
+      return;
+    }
 
-      if (isBowerComponent(source)) {
-        return;
-      }
+    if (source.url && includeSource(source)) {
+      insert(filteredSources, sourceId, compareSources);
+    }
+  });
 
-      if (!isNodeModule(source) && !isModuleFromCdn(source)) {
-        insert(sourceIdsWithoutNodeModules!, sourceId, compareSources);
-      }
-
-      insert(sourceIdsWithNodeModules!, sourceId, compareSources);
-    });
-  }
-
-  return includeNodeModules ? sourceIdsWithNodeModules! : sourceIdsWithoutNodeModules!;
+  return filteredSources;
 }

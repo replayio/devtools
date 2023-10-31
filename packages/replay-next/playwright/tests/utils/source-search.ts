@@ -30,11 +30,12 @@ export async function searchSources(page: Page, text: string) {
   await page.keyboard.press("Enter");
 }
 
-export async function toggleIncludeNodeModulesCheckbox(page: Page, checked: boolean) {
-  const checkbox = page.locator('[data-test-id="FileSearch-IncludeNodeModules-Checkbox"]');
-  const currentChecked = await checkbox.isChecked();
+export async function toggleExcludeNodeModulesCheckbox(page: Page, checked: boolean) {
+  const toggleButton = page.locator('[data-test-id="FileSearch-ExcludeNodeModules"]');
+  const currentChecked = (await toggleButton.getAttribute("data-active"))! === "true";
+
   if (checked !== currentChecked) {
-    await checkbox.click();
+    await toggleButton.click();
   }
 }
 

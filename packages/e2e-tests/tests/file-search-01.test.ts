@@ -2,7 +2,7 @@ import { openDevToolsTab, startTest } from "../helpers";
 import {
   openFileSearchPanel,
   searchSources,
-  toggleIncludeNodeModulesCheckbox,
+  toggleExcludeNodeModulesCheckbox,
   toggleSearchResultsForFileName,
   verifyMatchExecuted,
   verifySourceSearchOverflowMessageShown,
@@ -34,7 +34,7 @@ test("file-search-01: should search files", async ({ pageWithMeta: { page, recor
   await verifyVisibleResultsCount(page, 24);
 
   // Now include node_modules in the search
-  await toggleIncludeNodeModulesCheckbox(page, true);
+  await toggleExcludeNodeModulesCheckbox(page, false);
   await verifySourceSearchOverflowMessageShown(page, false);
   await verifySourceSearchSummary(page, "25 results");
   await verifyVisibleResultsCount(page, 31); // 25 results in 6 different files
