@@ -34,7 +34,7 @@ export default function NewSourceAdapterRoot() {
 
 function NewSourceAdapter() {
   const replayClient = useContext(ReplayClientContext);
-  const { closeSource, focusedSource, openSource, openSourceIds, visibleLines } =
+  const { closeSource, focusedSource, openSource, activeSourceIds, visibleLines } =
     useContext(SourcesContext);
   const [sourceSearchState, sourceSearchActions] = useContext(SourceSearchContext);
 
@@ -76,13 +76,13 @@ function NewSourceAdapter() {
   }, [focusedSource, location, locationHasScrolled, openSource]);
 
   useLayoutEffect(() => {
-    openSourceIds.forEach(sourceId => {
+    activeSourceIds.forEach(sourceId => {
       const openTab = tabs.find(tab => tab.sourceId === sourceId);
       if (!openTab) {
         closeSource(sourceId);
       }
     });
-  }, [closeSource, openSourceIds, tabs]);
+  }, [closeSource, activeSourceIds, tabs]);
 
   // Sync the lines currently rendered by the new Source list to Redux.
   // This updates Redux state to mark certain actions as "processed".
@@ -150,7 +150,7 @@ function NewSourceAdapter() {
       tabIndex={0}
     >
       <NewSourceNag />
-      {openSourceIds.map(sourceId => {
+      {activeSourceIds.map(sourceId => {
         const source = getSourceSuspends(replayClient, sourceId);
         return (
           <LazyOffscreen key={sourceId} mode={sourceId === focusedSourceId ? "visible" : "hidden"}>
