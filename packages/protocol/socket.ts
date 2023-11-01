@@ -109,7 +109,7 @@ export type ExperimentalSettings = {
   disableRecordingAssetsInDatabase?: boolean;
   disableScanDataCache?: boolean;
   enableRoutines?: boolean;
-  keepAllTraces?: boolean;
+  sampleAllTraces?: boolean;
   listenForMetrics: boolean;
   profileWorkerThreads?: boolean;
   rerunRoutines?: boolean;
