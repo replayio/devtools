@@ -1,6 +1,7 @@
 .Wrapper {
   padding-left: 0.5rem;
   overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 .Wrapper[data-depth="0"] {

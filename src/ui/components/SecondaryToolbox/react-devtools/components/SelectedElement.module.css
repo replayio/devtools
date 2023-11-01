@@ -57,6 +57,9 @@
   flex-direction: column;
   gap: 0.25rem;
   white-space: nowrap;
+
+  font-family: var(--font-family-monospace);
+  font-size: var(--font-size-regular-monospace);
 }
 
 .Section [data-test-name="ClientValue"],
@@ -79,6 +82,8 @@
   display: block;
   padding-left: 0.25rem;
   flex: 0 0 auto;
+
+  font-family: var(--font-family-default);
   font-size: var(--font-size-small);
 }
 
