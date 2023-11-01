@@ -42,7 +42,6 @@ export interface GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests {
   result: string;
   errors: string[] | null;
   durationMs: number;
-  recordingIds: string[];
   recordings: GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_recordings[];
 }
 

@@ -31,7 +31,6 @@ const GET_TEST_RUN_RECORDINGS = gql`
                 result
                 errors
                 durationMs
-                recordingIds
                 recordings {
                   uuid
                   duration

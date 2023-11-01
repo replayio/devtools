@@ -27,7 +27,6 @@ export type TestRunTest = {
   result: string;
   errors: string[] | null;
   durationMs: number;
-  recordingIds: string[];
 };
 
 export interface TestRunTestWithRecordings extends TestRunTest {
