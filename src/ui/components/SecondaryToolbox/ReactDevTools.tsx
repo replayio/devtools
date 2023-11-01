@@ -1,6 +1,5 @@
 import { NodeBounds, Object as ProtocolObject } from "@replayio/protocol";
-import type { SerializedElement, Store, Wall } from "@replayio/react-devtools-inline/frontend";
-import React, {
+import {
   useContext,
   useEffect,
   useLayoutEffect,
@@ -12,25 +11,31 @@ import React, {
 import { useImperativeCacheValue } from "suspense";
 
 import { selectLocation } from "devtools/client/debugger/src/actions/sources";
-import { getExecutionPoint, getThreadContext } from "devtools/client/debugger/src/reducers/pause";
+import {
+  getExecutionPoint,
+  getPauseId,
+  getThreadContext,
+} from "devtools/client/debugger/src/reducers/pause";
 import { highlightNode, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
-import { ThreadFront } from "protocol/thread";
-import { assert } from "protocol/utils";
 import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import { useIsPointWithinFocusWindow } from "replay-next/src/hooks/useIsPointWithinFocusWindow";
 import { useNag } from "replay-next/src/hooks/useNag";
-import { recordingTargetCache } from "replay-next/src/suspense/BuildIdCache";
-import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
-import { evaluate } from "replay-next/src/utils/evaluate";
-import { recordData } from "replay-next/src/utils/telemetry";
+import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
 import { isExecutionPointsLessThan } from "replay-next/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
 import { Nag } from "shared/graphql/types";
 import { useTheme } from "shared/theme/useTheme";
+import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { UIThunkAction } from "ui/actions";
 import { fetchMouseTargetsForPause } from "ui/actions/app";
 import { enterFocusMode } from "ui/actions/timeline";
+import {
+  NodeOptsWithoutBounds,
+  ReplayWall,
+  StoreWithInternals,
+} from "ui/components/SecondaryToolbox/react-devtools/ReplayWall";
+import { reactDevToolsInlineModuleCache } from "ui/components/SecondaryToolbox/react-devtools/suspense/reactDevToolsInlineModuleCache";
 import { nodePickerDisabled, nodePickerInitializing, nodePickerReady } from "ui/reducers/app";
 import { getPreferredLocation } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector, useAppStore } from "ui/setup/hooks";
@@ -41,298 +46,11 @@ import {
 } from "ui/suspense/annotationsCaches";
 import { getMouseTarget } from "ui/suspense/nodeCaches";
 import { NodePicker as NodePickerClass, NodePickerOpts } from "ui/utils/nodePicker";
-import { getJSON } from "ui/utils/objectFetching";
-import { sendTelemetryEvent, trackEvent } from "ui/utils/telemetry";
 
-import {
-  injectReactDevtoolsBackend,
-  nodesToFiberIdsCache,
-} from "./react-devtools/injectReactDevtoolsBackend";
+import { ReactDevToolsPanel as NewReactDevtoolsPanel } from "./react-devtools/components/ReactDevToolsPanel";
 import { generateTreeResetOpsForPoint } from "./react-devtools/rdtProcessing";
 
 type ReactDevToolsInlineModule = typeof import("@replayio/react-devtools-inline/frontend");
-
-type NodeOptsWithoutBounds = Omit<NodePickerOpts, "onCheckNodeBounds">;
-
-// Some internal values not currently included in `@types/react-devtools-inline`
-type ElementWithChildren = SerializedElement & {
-  children: number[];
-};
-
-type StoreWithInternals = Store & {
-  _idToElement: Map<number, ElementWithChildren>;
-};
-
-// used by the frontend to communicate with the backend
-class ReplayWall implements Wall {
-  private _listener?: (msg: any) => void;
-  private inspectedElements = new Set();
-  private highlightedElementId?: number;
-  store?: StoreWithInternals;
-  pauseId?: string;
-
-  constructor(
-    private enablePicker: (opts: NodeOptsWithoutBounds) => void,
-    private initializePicker: () => void,
-    public disablePickerInParentPanel: () => void,
-    private highlightNode: (nodeId: string) => void,
-    private unhighlightNode: () => void,
-    private setProtocolCheckFailed: (failed: boolean) => void,
-    private fetchMouseTargetsForPause: () => Promise<NodeBounds[] | undefined>,
-    private replayClient: ReplayClientInterface,
-    private dismissInspectComponentNag: () => void
-  ) {}
-
-  setPauseId(pauseId: string) {
-    this.pauseId = pauseId;
-    this.inspectedElements.clear();
-  }
-
-  // called by the frontend to register a listener for receiving backend messages
-  listen(listener: (msg: any) => void) {
-    this._listener = msg => {
-      try {
-        listener(msg);
-      } catch (err) {
-        recordData("react-devtools-frontend-error", {
-          errorMessage: (err as Error).message,
-        });
-        console.warn("Error in ReactDevTools frontend", err);
-      }
-    };
-    return () => {
-      this._listener = undefined;
-    };
-  }
-
-  // send an annotation from the backend in the recording to the frontend
-  sendAnnotation(message: ParsedReactDevToolsAnnotation["contents"]) {
-    this._listener?.(message);
-  }
-
-  disablePickerParentAndInternal() {
-    this.disablePickerInParentPanel();
-    this.disablePickerInsideRDTComponent();
-  }
-
-  disablePickerInsideRDTComponent() {
-    this._listener?.({ event: "stopInspectingNative", payload: true });
-  }
-
-  // This is called  by the `useEffect` in the React DevTools panel.
-  async setUpRDTInternalsForCurrentPause() {
-    // Preload the React DevTools Backend for this pause
-    await this.ensureReactDevtoolsBackendLoaded();
-    // We should also kick off a request to pre-fetch the `Map<nodeId, fiberId>` lookup for this pause.
-    // That way, we have the data on hand when the user clicks on a node.
-    // This is async, but we won't wait for it here.
-    this.fetchNodeIdsToFiberIdsForPause();
-  }
-
-  async fetchNodeIdsToFiberIdsForPause() {
-    return nodesToFiberIdsCache.readAsync(this.replayClient!, this.pauseId!, this.store!);
-  }
-
-  // called by the frontend to send a request to the backend
-  async send(event: string, payload: any) {
-    await this.ensureReactDevtoolsBackendLoaded();
-
-    try {
-      switch (event) {
-        case "inspectElement": {
-          // Passport onboarding
-          this.dismissInspectComponentNag();
-          if (this.inspectedElements.has(payload.id) && !payload.path) {
-            // this element has been inspected before, the frontend asks to inspect it again
-            // to see if there are any changes - in Replay there won't be any so we can send
-            // the response immediately without asking the backend
-            this._listener?.({
-              event: "inspectedElement",
-              payload: {
-                responseID: payload.requestID,
-                id: payload.id,
-                type: "no-change",
-              },
-            });
-          } else {
-            if (!payload.path) {
-              this.inspectedElements.add(payload.id);
-            }
-            this.sendRequest(event, payload);
-          }
-          break;
-        }
-
-        case "getBridgeProtocol": {
-          const response = await this.sendRequest(event, payload);
-          if (response === undefined) {
-            trackEvent("error.reactdevtools.set_protocol_failed");
-            sendTelemetryEvent("reactdevtools.set_protocol_failed");
-            this.setProtocolCheckFailed(true);
-          }
-          break;
-        }
-
-        case "highlightNativeElement": {
-          const { rendererID, id } = payload;
-
-          if (this.highlightedElementId) {
-            this.unhighlightNode();
-          }
-          this.highlightedElementId = id;
-
-          // This _should_ be pre-fetched already, but await just in case
-          const [, fiberIdsToNodeIds] = await this.fetchNodeIdsToFiberIdsForPause();
-
-          // Get the first node ID we found for this fiber ID, if available.
-          const [nodeId] = fiberIdsToNodeIds.get(id) ?? [];
-
-          if (!nodeId || this.highlightedElementId !== id) {
-            sendTelemetryEvent("reactdevtools.node_not_found", payload);
-            return;
-          }
-
-          this.highlightNode(nodeId);
-          break;
-        }
-
-        case "clearNativeElementHighlight": {
-          this.unhighlightNode();
-          this.highlightedElementId = undefined;
-          break;
-        }
-
-        case "startInspectingNative": {
-          // Note that this message takes time to percolate upwards from the RDT internals
-          // up to here. This makes coordination of "is the picker active" tricky.
-          this.initializePicker();
-
-          const boundingRects = await this.fetchMouseTargetsForPause();
-
-          if (!boundingRects?.length) {
-            sendTelemetryEvent("reactdevtools.bounding_client_rects_failed");
-            this.disablePickerParentAndInternal();
-            break;
-          }
-
-          // Should have been pre-fetched already
-          const [nodeIdsToFiberIds] = await this.fetchNodeIdsToFiberIdsForPause();
-          // Limit the NodePicker logic to check against just the nodes we got back
-          const enabledNodeIds: Set<string> = new Set(nodeIdsToFiberIds.keys());
-
-          this.enablePicker({
-            name: "reactComponent",
-            onHovering: async nodeId => {
-              if (nodeId) {
-                const fiberId = nodeIdsToFiberIds.get(nodeId);
-                if (fiberId) {
-                  this._listener?.({ event: "selectFiber", payload: fiberId });
-                }
-              }
-            },
-            onPicked: _ => {
-              this.disablePickerInsideRDTComponent();
-            },
-            onHighlightNode: this.highlightNode,
-            onUnhighlightNode: this.unhighlightNode,
-            onClickOutsideCanvas: () => {
-              // Need to both cancel the Redux logic _and_
-              // tell the RDT component to stop inspecting
-              this.disablePickerParentAndInternal();
-            },
-            enabledNodeIds,
-          });
-
-          break;
-        }
-
-        case "stopInspectingNative": {
-          this.disablePickerInParentPanel();
-          break;
-        }
-      }
-    } catch (err) {
-      // we catch for the case where a region is unloaded and ThreadFront fails
-      console.warn(err);
-    }
-  }
-
-  public async ensureReactDevtoolsBackendLoaded() {
-    const recordingTarget = await recordingTargetCache.readAsync(this.replayClient);
-
-    if (recordingTarget === "chromium") {
-      const pauseId = await ThreadFront.getCurrentPauseId(this.replayClient);
-      await injectReactDevtoolsBackend(this.replayClient, pauseId);
-    }
-  }
-
-  // send a request to the backend in the recording and the reply to the frontend
-  private async sendRequest(event: string, payload: any) {
-    const originalPauseId = this.pauseId;
-    const response = await evaluate({
-      replayClient: this.replayClient,
-      text: ` window.__RECORD_REPLAY_REACT_DEVTOOLS_SEND_MESSAGE__("${event}", ${JSON.stringify(
-        payload
-      )})`,
-    });
-
-    if (response.returned) {
-      assert(this.pauseId, "Must have a pause ID to handle a response!");
-      const result: any = await getJSON(this.replayClient, this.pauseId, response.returned);
-
-      if (result && this.pauseId === originalPauseId) {
-        this._listener?.({ event: result.event, payload: result.data });
-      }
-      return result;
-    }
-  }
-
-  public async getComponentLocation(elementID: number) {
-    const rendererID = this.store!.getRendererIDForElement(elementID);
-    if (rendererID != null) {
-      // See original React DevTools extension implementation for comparison:
-      // https://github.com/facebook/react/blob/v18.0.0/packages/react-devtools-extensions/src/main.js#L194-L220
-
-      // Ask the renderer interface to determine the component function,
-      // and store it as a global variable on the window
-      await this.sendRequest("viewElementSource", { id: elementID, rendererID });
-
-      // This will be evaluated in the paused browser
-      function retrieveSelectedReactComponentFunction() {
-        const $type: React.ComponentType | undefined = (window as any).$type;
-        if ($type != null) {
-          if ($type && $type.prototype && $type.prototype.isReactComponent) {
-            // inspect Component.render, not constructor
-            return $type.prototype.render;
-          } else {
-            // inspect Functional Component
-            return $type;
-          }
-        }
-      }
-
-      const findSavedComponentFunctionCommand = `
-      (${retrieveSelectedReactComponentFunction})()
-    `;
-
-      const res = await evaluate({
-        replayClient: this.replayClient,
-        text: findSavedComponentFunctionCommand,
-      });
-
-      if (res?.returned?.object) {
-        const componentFunctionPreview = await objectCache.readAsync(
-          this.replayClient,
-          this.pauseId!,
-          res.returned.object,
-          "canOverflow"
-        );
-
-        return componentFunctionPreview;
-      }
-    }
-  }
-}
 
 function jumpToComponentPreferredSource(componentPreview: ProtocolObject): UIThunkAction {
   return (dispatch, getState) => {
@@ -385,51 +103,10 @@ function createReactDevTools(
     supportsNativeInspection: true,
   });
   wall.store = store as StoreWithInternals;
+
   const ReactDevTools = initialize(target, { bridge, store });
 
   return [ReactDevTools, wall, bridge] as const;
-}
-
-// React DevTools (RD) changed its internal data structure slightly in a minor update.
-// The result is that Replay sessions recorded with older versions of RD don't play well in newer versions.
-// We can work around this by checking RD's "bridge protocol" version (which we also store)
-// and loading the appropriate frontend version to match.
-// For more information see https://github.com/facebook/react/issues/24219
-async function loadReactDevToolsInlineModuleFromProtocol(
-  stateUpdaterCallback: Function,
-  replayClient: ReplayClientInterface,
-  pauseId?: string
-) {
-  if (!pauseId) {
-    return;
-  }
-
-  // Default assume that it's a recent recording
-  let backendBridgeProtocolVersion = 2;
-
-  const recordingTarget = await recordingTargetCache.readAsync(replayClient);
-
-  if (recordingTarget === "gecko") {
-    // For Gecko recordings, introspect the page to determine what RDT version was used
-    const response = await evaluate({
-      replayClient,
-      text: ` __RECORD_REPLAY_REACT_DEVTOOLS_SEND_MESSAGE__("getBridgeProtocol", undefined)`,
-    });
-    if (response.returned) {
-      // Unwrap the nested eval objects by asking the backend for contents
-      // of the nested fields: `{data: {version: 123}}`
-      const result: any = await getJSON(replayClient, pauseId, response.returned);
-      backendBridgeProtocolVersion = result?.data?.version ?? 2;
-    }
-  }
-
-  // We should only load the DevTools module once we know which protocol version it requires.
-  // If we don't have a version yet, it probably means we're too early in the Replay session.
-  if (backendBridgeProtocolVersion >= 2) {
-    stateUpdaterCallback(await import("@replayio/react-devtools-inline/frontend"));
-  }
-  // We no longer support loading a version of `react-devtools-inline`
-  // that only knows about protocol version 1.
 }
 
 const nodePickerInstance = new NodePickerClass();
@@ -475,24 +152,13 @@ export function ReactDevtoolsPanel() {
   );
 
   // Once we've obtained the protocol version, we'll dynamically load the correct module/version.
-  const [reactDevToolsInlineModule, setReactDevToolsInlineModule] =
-    useState<ReactDevToolsInlineModule | null>(null);
+  let reactDevToolsInlineModule: ReactDevToolsInlineModule | null = null;
+  if (pauseId != null) {
+    reactDevToolsInlineModule = reactDevToolsInlineModuleCache.read(replayClient, pauseId);
+  }
 
   const annotations: ParsedReactDevToolsAnnotation[] =
     annotationsStatus === "resolved" ? parsedAnnotations : EMPTY_ANNOTATIONS;
-
-  // Try to load the DevTools module whenever the current point changes.
-  // Eventually we'll reach a point that has the DevTools protocol embedded.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => {
-    if (reactDevToolsInlineModule === null) {
-      loadReactDevToolsInlineModuleFromProtocol(
-        setReactDevToolsInlineModule,
-        replayClient,
-        pauseId
-      );
-    }
-  });
 
   const [ReactDevTools, wall] = useMemo(() => {
     if (!reactDevToolsInlineModule) {
@@ -696,9 +362,27 @@ export function ReactDevtoolsPanel() {
 }
 
 export default function ReactDevToolsWithErrorBoundary() {
+  const replayClient = useContext(ReplayClientContext);
+
+  const pauseId = useAppSelector(getPauseId) ?? null;
+  const currentPoint = useAppSelector(getExecutionPoint);
+
+  const [newReactDevTools] = useGraphQLUserData("feature_newReactDevTools");
+
+  const recordingCapabilities = recordingCapabilitiesCache.read(replayClient);
+
+  // The new React DevTools depends on recently-added Chromium only Replay APIs
+  // Regardless of the user preference, don't show the new RDT for older Chrome or Firefox recordings
+  const showNewDevTools =
+    newReactDevTools && recordingCapabilities.supportsObjectIdLookupsInEvaluations;
+
   return (
-    <ErrorBoundary name="ReactDevTools">
-      <ReactDevtoolsPanel />
+    <ErrorBoundary name="ReactDevTools" resetKey={pauseId ?? ""}>
+      {showNewDevTools ? (
+        <NewReactDevtoolsPanel executionPoint={currentPoint} pauseId={pauseId} />
+      ) : (
+        <ReactDevtoolsPanel />
+      )}
     </ErrorBoundary>
   );
 }

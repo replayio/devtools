@@ -1,4 +1,4 @@
-import { ObjectId } from "@replayio/protocol";
+import { ObjectId, PauseId } from "@replayio/protocol";
 import type { RendererInterface } from "@replayio/react-devtools-inline";
 import type { DevToolsHook } from "@replayio/react-devtools-inline/backend";
 import type { SerializedElement, Store } from "@replayio/react-devtools-inline/frontend";
@@ -129,15 +129,29 @@ const rdtInjectionExpression = `(${installReactDevToolsIntoPause})()`
   .replace("INSTALL_HOOK_PLACEHOLDER", `(${injectGlobalHookSource})`)
   .replace("DEVTOOLS_PLACEHOLDER", `(${reactDevtoolsBackendSource})`);
 
-export async function injectReactDevtoolsBackend(
-  replayClient: ReplayClientInterface,
-  pauseId?: string
-) {
-  if (!pauseId) {
-    return;
-  }
-  await pauseEvaluationsCache.readAsync(replayClient, pauseId, null, rdtInjectionExpression);
-}
+export const reactDevToolsInjectionCache: Cache<
+  [replayClient: ReplayClientInterface, pauseId: PauseId],
+  boolean
+> = createCache({
+  config: { immutable: true },
+  debugLabel: "PauseEvaluations",
+  getKey: ([replayClient, pauseId]) => pauseId,
+  load: async ([replayClient, pauseId]) => {
+    const result = await pauseEvaluationsCache.readAsync(
+      replayClient,
+      pauseId,
+      null,
+      rdtInjectionExpression
+    );
+    if (result.exception != null) {
+      return false;
+    } else if (result.failed) {
+      return false;
+    } else {
+      return true;
+    }
+  },
+});
 
 function collectElementIDs(
   store: StoreWithInternals,

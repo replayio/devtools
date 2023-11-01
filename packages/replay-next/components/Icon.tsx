@@ -82,6 +82,7 @@ export type IconType =
   | "toggle-on"
   | "unchecked-rounded"
   | "up"
+  | "view-component-source"
   | "view-function-source"
   | "view-html-element"
   | "visible"
@@ -605,6 +606,10 @@ export default function Icon({
       break;
     case "up":
       path = "M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z";
+      break;
+    case "view-component-source":
+      path =
+        "M12.89,3L14.85,3.4L11.11,21L9.15,20.6L12.89,3M19.59,12L16,8.41V5.58L22.42,12L16,18.41V15.58L19.59,12M1.58,12L8,5.58V8.41L4.41,12L8,15.58V18.41L1.58,12Z";
       break;
     case "view-function-source":
       path = "M12.34,6V4H18v5.66h-2V7.41l-5,5V20H9v-7.58c0-0.53,0.21-1.04,0.59-1.41l5-5H12.34z";

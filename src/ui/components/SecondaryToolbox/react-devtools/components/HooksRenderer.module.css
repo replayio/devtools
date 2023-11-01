@@ -1,0 +1,43 @@
+.Wrapper {
+  padding-left: 0.5rem;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.Wrapper[data-depth="0"] {
+  padding-left: 0;
+}
+
+.Wrapper [data-test-name="Expandable"] {
+  width: 100%;
+  overflow: unset !important;
+  text-overflow: ellipsis;
+}
+.Wrapper [data-test-name="ExpandableChildren"] {
+  margin-left: 0;
+  width: 100%;
+}
+.Wrapper [data-test-name="ExpandablePreview"] {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.CustomHookName {
+  color: var(--color-dim);
+}
+
+.BuiltInHookName {
+  color: var(--object-inspector-expanded-key);
+}
+
+.Spacer {
+  display: inline-block;
+  width: 1.25rem;
+}
+
+.ViewSourceIconButton,
+.ViewSourceIcon {
+  width: 0.75rem;
+  height: 0.75rem;
+  display: inline;
+}

@@ -6,6 +6,7 @@ export const PREFERENCES: PreferencesKey[] = [
   "feature_reactPanel",
   "feature_reduxDevTools",
   "feature_enableNewElementsPanel",
+  "feature_newReactDevTools",
 ];
 
 export function Experimental() {
