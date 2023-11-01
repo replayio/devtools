@@ -85,6 +85,7 @@ export const config = {
     internalOnly: Boolean(true),
     label: "Keep all Honeycomb events",
     legacyKey: "devtools.features.keepAllTraces",
+    highRisk: Boolean(true),
   },
   backend_listenForMetrics: {
     defaultValue: Boolean(false),
