@@ -52,7 +52,7 @@ function FilterButton({
 
 export default function SearchFiles({ limit }: { limit?: number }) {
   const client = useContext(ReplayClientContext);
-  const { openSourceIds } = useContext(SourcesContext);
+  const { activeSourceIds } = useContext(SourcesContext);
 
   const [excludeNodeModules, setExcludeNodeModules] = useState(true);
   const [queryForDisplay, setQueryForDisplay] = useState("");
@@ -73,7 +73,7 @@ export default function SearchFiles({ limit }: { limit?: number }) {
     excludeNodeModules,
     includedFiles,
     excludedFiles,
-    openEditors ? openSourceIds : null,
+    openEditors ? activeSourceIds : null,
     useRegex,
     caseSensitive,
     wholeWord,
