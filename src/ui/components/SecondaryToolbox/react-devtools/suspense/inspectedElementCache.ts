@@ -34,7 +34,6 @@ export const inspectedElementCache = createCache<
 
     // Wait until the backend has been injected before sending a message through the wall/bridge
     await reactDevToolsInjectionCache.readAsync(replayClient, pauseId);
-    await Promise.resolve();
 
     const promise = createPromiseForRequest<{ value: InspectedReactElement }>(
       requestID,
