@@ -1,112 +1,85 @@
-import orderBy from "lodash/orderBy";
+import { TestRunTest, TestRunTestWithRecordings } from "shared/test-suites/TestRun";
 
-import { Recording } from "shared/graphql/types";
-import {
-  getGroupedTestCasesFilePath,
-  isGroupedTestCasesV1,
-} from "shared/test-suites/RecordingTestMetadata";
-
-export type RecordingGroup = {
+export type TestGroup = {
   count: number;
-  fileNameToRecordings: { [fileName: string]: Recording[] };
+  fileNameToTests: { [fileName: string]: TestRunTestWithRecordings[] };
 };
 
-export type RecordingGroups = {
-  passedRecordings: RecordingGroup;
-  failedRecordings: RecordingGroup;
-  flakyRecordings: RecordingGroup;
+export type TestGroups = {
+  passedRecordings: TestGroup;
+  failedRecordings: TestGroup;
+  flakyRecordings: TestGroup;
 };
 
-export function testPassed(recording: Recording) {
-  const testMetadata = recording.metadata?.test;
-  if (testMetadata == null) {
-    return false;
-  } else if (isGroupedTestCasesV1(testMetadata)) {
-    return testMetadata.result === "passed";
-  } else {
-    const { passed = 0 } = testMetadata.resultCounts;
-    return !testFailed(recording) && passed > 0;
-  }
+export function testPassed(test: TestRunTest) {
+  return test.result === "passed";
 }
 
-function testFailed(recording: Recording) {
-  const testMetadata = recording.metadata?.test;
-  if (testMetadata == null) {
-    return false;
-  } else if (isGroupedTestCasesV1(testMetadata)) {
-    return testMetadata.result === "failed" || testMetadata.result === "timedOut";
-  } else {
-    const { failed = 0, timedOut = 0 } = testMetadata.resultCounts ?? {};
-    return failed > 0 || timedOut > 0;
-  }
+function testFailed(test: TestRunTest) {
+  return test.result === "failed" || test.result === "timedOut";
 }
 
-export function groupRecordings(recordings: Recording[]): RecordingGroups {
-  const passedRecordings: RecordingGroup = {
+export function groupRecordings(tests: TestRunTestWithRecordings[]): TestGroups {
+  const passedRecordings: TestGroup = {
     count: 0,
-    fileNameToRecordings: {},
+    fileNameToTests: {},
   };
-  const failedRecordings: RecordingGroup = {
+  const failedRecordings: TestGroup = {
     count: 0,
-    fileNameToRecordings: {},
+    fileNameToTests: {},
   };
-  const flakyRecordings: RecordingGroup = {
+  const flakyRecordings: TestGroup = {
     count: 0,
-    fileNameToRecordings: {},
+    fileNameToTests: {},
   };
 
-  const sortedRecordings = orderBy(recordings, "date", "desc");
-
-  const recordingsMap = sortedRecordings.reduce((accumulated, recording) => {
-    const testMetadata = recording.metadata?.test;
-    if (testMetadata == null) {
-      return accumulated;
-    }
-
-    const filePath = getGroupedTestCasesFilePath(testMetadata);
+  const recordingsMap = tests.reduce((accumulated, test) => {
+    const filePath = test.sourcePath;
     if (!filePath) {
       return accumulated;
     }
     if (!accumulated[filePath]) {
       accumulated[filePath] = [];
     }
-    accumulated[filePath].push(recording);
+    if (!accumulated[filePath].includes(test)) {
+      accumulated[filePath].push(test);
+    }
     return accumulated;
-  }, {} as Record<string, Recording[]>);
+  }, {} as Record<string, TestRunTestWithRecordings[]>);
 
   for (const filePath in recordingsMap) {
-    const recordings = recordingsMap[filePath];
+    const recordingTests = recordingsMap[filePath];
 
-    const didAnyTestFail = recordings.some(testFailed);
-    const didAnyTestPass = recordings.some(testPassed);
+    const didAnyTestFail = recordingTests.some(testFailed);
+    const didAnyTestPass = recordingTests.some(testPassed);
 
-    function addToRecordingGroup(group: RecordingGroup, recording: Recording) {
-      if (group.fileNameToRecordings[filePath]) {
-        group.fileNameToRecordings[filePath].push(recording);
+    function addToTestGroup(group: TestGroup, test: TestRunTestWithRecordings) {
+      if (group.fileNameToTests[filePath]) {
+        group.fileNameToTests[filePath].push(test);
       } else {
         group.count++;
-        group.fileNameToRecordings[filePath] = [recording];
+        group.fileNameToTests[filePath] = [test];
       }
     }
 
-    for (const recording of recordings) {
-      if (testPassed(recording)) {
+    for (const test of recordingTests) {
+      if (test.result === "passed") {
         if (didAnyTestFail) {
-          addToRecordingGroup(flakyRecordings, recording);
+          addToTestGroup(flakyRecordings, test);
         } else {
-          addToRecordingGroup(passedRecordings, recording);
+          addToTestGroup(passedRecordings, test);
         }
-      } else if (testFailed(recording)) {
+      } else if (test.result === "failed") {
         if (didAnyTestPass) {
-          addToRecordingGroup(flakyRecordings, recording);
+          addToTestGroup(flakyRecordings, test);
         } else {
-          addToRecordingGroup(failedRecordings, recording);
+          addToTestGroup(failedRecordings, test);
         }
       }
     }
 
     if (didAnyTestFail && didAnyTestPass) {
-      flakyRecordings.fileNameToRecordings[filePath].sort((recordingA, recordingB) => {
+      flakyRecordings.fileNameToTests[filePath].sort((recordingA, recordingB) => {
         if (testPassed(recordingA) && testFailed(recordingB)) {
           return 1;
         } else if (testFailed(recordingA) && testPassed(recordingB)) {

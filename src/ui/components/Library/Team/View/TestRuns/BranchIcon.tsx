@@ -8,7 +8,7 @@ export function BranchIcon({
   title,
 }: {
   branchName: ReactNode;
-  isPrimaryBranch: boolean;
+  isPrimaryBranch: boolean | null;
   title: string;
 }) {
   const theme = useTheme();

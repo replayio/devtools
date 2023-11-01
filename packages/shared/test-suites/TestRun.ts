@@ -1,4 +1,5 @@
 import { GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node as TestRunsForWorkspaceGraphQL } from "shared/graphql/generated/GetTestsRunsForWorkspace";
+import { Recording } from "shared/graphql/types";
 
 export type Mode = "diagnostics" | "record" | "record-on-retry" | "stress";
 
@@ -14,6 +15,24 @@ export type SourceMetadata = {
   triggerUrl: string | null;
   user: string | null;
 };
+
+export type TestRunTest = {
+  id: string;
+  testId: string;
+  index: number;
+  attempt: number;
+  title: string;
+  scope: string[];
+  sourcePath: string;
+  result: string;
+  errors: string[] | null;
+  durationMs: number;
+  recordingIds: string[];
+};
+
+export interface TestRunTestWithRecordings extends TestRunTest {
+  recordings: Recording[];
+}
 
 export type TestRun = {
   date: string;

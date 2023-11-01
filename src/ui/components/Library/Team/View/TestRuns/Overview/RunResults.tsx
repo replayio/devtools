@@ -9,7 +9,7 @@ import {
 } from "react";
 
 import Icon from "replay-next/components/Icon";
-import { useTestRunRecordingsSuspends } from "ui/components/Library/Team/View/TestRuns/hooks/useTestRunRecordingsSuspends";
+import { useTestRunDetailsSuspends } from "ui/components/Library/Team/View/TestRuns/hooks/useTestRunDetailsSuspends";
 import {
   FileNode,
   PathNode,
@@ -17,7 +17,7 @@ import {
   useFileNameTree,
 } from "ui/components/Library/Team/View/TestRuns/Overview/useFileNameTree";
 import { TestRunsContext } from "ui/components/Library/Team/View/TestRuns/TestRunsContextRoot";
-import { RecordingGroup, testPassed } from "ui/utils/testRuns";
+import { TestGroup, testPassed } from "ui/utils/testRuns";
 
 import { TestResultListItem } from "./TestResultListItem";
 import styles from "../../../../Library.module.css";
@@ -28,10 +28,10 @@ export function RunResults({ isPending }: { isPending: boolean }) {
   const [filterByText, setFilterByText] = useState("");
   const filterByTextDeferred = useDeferredValue(filterByText);
 
-  const { groupedRecordings } = useTestRunRecordingsSuspends(testRunId);
-  assert(groupedRecordings !== null);
+  const { groupedTests } = useTestRunDetailsSuspends(testRunId);
+  assert(groupedTests !== null);
 
-  const { passedRecordings, failedRecordings, flakyRecordings } = groupedRecordings;
+  const { passedRecordings, failedRecordings, flakyRecordings } = groupedTests;
 
   return (
     <>
@@ -62,17 +62,17 @@ export function RunResults({ isPending }: { isPending: boolean }) {
         <TestStatusGroup
           filterByText={filterByTextDeferred}
           label="Failed"
-          recordingGroup={failedRecordings}
+          testGroup={failedRecordings}
         />
         <TestStatusGroup
           filterByText={filterByTextDeferred}
           label="Flaky"
-          recordingGroup={flakyRecordings}
+          testGroup={flakyRecordings}
         />
         <TestStatusGroup
           filterByText={filterByTextDeferred}
           label="Passed"
-          recordingGroup={passedRecordings}
+          testGroup={passedRecordings}
         />
       </div>
     </>
@@ -82,17 +82,17 @@ export function RunResults({ isPending }: { isPending: boolean }) {
 function TestStatusGroup({
   filterByText,
   label,
-  recordingGroup,
+  testGroup,
 }: {
   filterByText: string;
   label: string;
-  recordingGroup: RecordingGroup;
+  testGroup: TestGroup;
 }) {
   const [expanded, setExpanded] = useState(true);
 
-  const tree = useFileNameTree(recordingGroup, filterByText);
+  const tree = useFileNameTree(testGroup, filterByText);
 
-  const count = recordingGroup.count;
+  const count = testGroup.count;
   if (count == 0) {
     return null;
   }
@@ -137,7 +137,7 @@ const FileNodeRenderer = memo(function FileNodeRenderer({
   label: string;
   fileNode: FileNode;
 }) {
-  const { name, recordings } = fileNode;
+  const { name, tests } = fileNode;
 
   const [expanded, setExpanded] = useState(true);
 
@@ -156,19 +156,22 @@ const FileNodeRenderer = memo(function FileNodeRenderer({
       >
         <Icon className="h-5 w-5 shrink-0" type="file" />
         <div className="truncate">{name}</div>
-        {!expanded && <div className="text-xs text-bodySubColor">({recordings.length} tests)</div>}
+        {!expanded && <div className="text-xs text-bodySubColor">({tests.length} tests)</div>}
       </div>
       <Offscreen mode={expanded ? "visible" : "hidden"}>
-        {recordings.map(recording => (
-          <TestResultListItem
-            depth={depth + 1}
-            filterByText={filterByText}
-            key={recording.id}
-            label={testPassed(recording) ? "Passed" : label}
-            recording={recording}
-            secondaryBadgeCount={/* index > 0 ? index + 1 : null */ null}
-          />
-        ))}
+        {tests.flatMap(test =>
+          test.recordings.map(recording => (
+            <TestResultListItem
+              depth={depth + 1}
+              filterByText={filterByText}
+              key={recording.id}
+              label={testPassed(test) ? "Passed" : label}
+              recording={recording}
+              test={test}
+              secondaryBadgeCount={/* index > 0 ? index + 1 : null */ null}
+            />
+          ))
+        )}
       </Offscreen>
     </>
   );

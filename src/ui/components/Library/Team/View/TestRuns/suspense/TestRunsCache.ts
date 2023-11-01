@@ -3,13 +3,13 @@ import { createCache } from "suspense";
 
 import { GraphQLClientInterface } from "shared/graphql/GraphQLClient";
 import { Recording } from "shared/graphql/types";
-import { TestRun, processTestRun } from "shared/test-suites/TestRun";
+import { TestRun, TestRunTestWithRecordings, processTestRun } from "shared/test-suites/TestRun";
 import {
-  getTestRunRecordingsGraphQL,
+  getTestRunTestsWithRecordingsGraphQL,
   getTestRunsGraphQL,
 } from "ui/components/Library/Team/View/TestRuns/graphql/TestRunsGraphQL";
 import { convertRecording } from "ui/hooks/recordings";
-import { RecordingGroups, groupRecordings } from "ui/utils/testRuns";
+import { TestGroups, groupRecordings } from "ui/utils/testRuns";
 
 export const testRunsCache = createCache<
   [graphQLClient: GraphQLClientInterface, accessToken: string | null, workspaceId: string],
@@ -28,34 +28,47 @@ export const testRunsCache = createCache<
 });
 
 export type TestRunRecordings = {
-  groupedRecordings: RecordingGroups | null;
+  durationMs: number;
+  groupedTests: TestGroups | null;
   recordings: Recording[] | null;
 };
 
-export const testRunRecordingsCache = createCache<
+export const testRunDetailsCache = createCache<
   [
     graphQLClient: GraphQLClientInterface,
     accessToken: string | null,
     workspaceId: string,
-    summaryId: string
+    testRunId: string
   ],
   TestRunRecordings
 >({
   config: { immutable: true },
-  debugLabel: "testRunRecordingsCache",
-  getKey: ([_, __, workspaceId, summaryId]) => `${workspaceId}:${summaryId}`,
-  load: async ([graphQLClient, accessToken, workspaceId, summaryId]) => {
-    const rawRecordings = await getTestRunRecordingsGraphQL(
+  debugLabel: "testRunDetailsCache",
+  getKey: ([_, __, workspaceId, testRunId]) => `${workspaceId}:${testRunId}`,
+  load: async ([graphQLClient, accessToken, workspaceId, testRunId]) => {
+    const tests = await getTestRunTestsWithRecordingsGraphQL(
       graphQLClient,
       accessToken,
       workspaceId,
-      summaryId
+      testRunId
     );
 
-    const recordings = rawRecordings.map(convertRecording);
+    const recordings: Recording[] = [];
+    let durationMs = 0;
+    const testsWithRecordings = tests.map<TestRunTestWithRecordings>(test => {
+      durationMs += test.durationMs;
+      const recs = orderBy(test.recordings.map(convertRecording), "date", "desc");
+      recordings.push(...recs);
+
+      return {
+        ...test,
+        recordings: recs,
+      };
+    });
 
     return {
-      groupedRecordings: groupRecordings(recordings),
+      durationMs,
+      groupedTests: groupRecordings(testsWithRecordings),
       recordings,
     };
   },
