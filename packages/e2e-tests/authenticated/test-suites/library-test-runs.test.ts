@@ -29,6 +29,10 @@ test(`authenticated/test-suites/library-test-runs`, async ({ page }) => {
     title: "github: remove semgrep (#9332)",
   }).first();
   await expect(await getTestRunAttribute(testRun, "Branch").textContent()).toBe("main");
-  await expect(await getTestRunAttribute(testRun, "Date").textContent()).toContain("6/14/2023");
+  // Relative dates can change over time.
+  // Check for either the "X units ago" text, or the literal date.
+  await expect(await getTestRunAttribute(testRun, "Date").textContent()).toMatch(
+    / ago|(10\/26\/2023)/
+  );
   await expect(await getTestRunAttribute(testRun, "Username").textContent()).toContain("jazzdan");
 });
