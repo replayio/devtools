@@ -11,6 +11,7 @@ import {
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { setSelectedPanel } from "ui/actions/layout";
+import { SecondaryToolboxLoadingPanel } from "ui/components/SecondaryToolbox/SecondaryToolboxLoadingPanel";
 import { getSelectedPanel, getToolboxLayout } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { SecondaryPanelName } from "ui/state/layout";
@@ -25,7 +26,6 @@ import { selectors } from "../../reducers";
 import NetworkMonitor from "../NetworkMonitor";
 import { NodePicker } from "../NodePicker";
 import { Redacted } from "../Redacted";
-import Loader from "../shared/Loader";
 import ReplayLogo from "../shared/ReplayLogo";
 import WaitForReduxSlice from "../WaitForReduxSlice";
 import NewConsoleRoot from "./NewConsole";
@@ -125,38 +125,26 @@ function InspectorPanel() {
           </div>
         }
       >
-        <React.Suspense fallback={null}>
+        <Suspense fallback={null}>
           <InspectorApp />
-        </React.Suspense>
+        </Suspense>
       </WaitForReduxSlice>
     </div>
   );
 }
 
-function PanelButtonsScrollOverflowGradient() {
-  return <div className="secondary-toolbox-scroll-overflow-gradient"></div>;
-}
-
-export default function SecondaryToolboxSuspenseWrapper() {
-  return (
-    <Suspense fallback={<Loader />}>
-      <SecondaryToolbox />
-    </Suspense>
-  );
-}
-
-function SecondaryToolbox() {
+export default function SecondaryToolbox() {
   const selectedPanel = useAppSelector(getSelectedPanel);
   const toolboxLayout = useAppSelector(getToolboxLayout);
   const dispatch = useAppDispatch();
   const replayClient = useContext(ReplayClientContext);
+
   // Don't suspend when waiting for annotations to load
   const { value: hasReactAnnotations = false } = useImperativeCacheValue(
     annotationKindsCache,
     replayClient,
     REACT_ANNOTATIONS_KIND
   );
-
   const { value: hasReduxAnnotations = false } = useImperativeCacheValue(
     annotationKindsCache,
     replayClient,
@@ -164,6 +152,7 @@ function SecondaryToolbox() {
   );
 
   const chromiumNetMonitorEnabled = useGraphQLUserData("feature_chromiumNetMonitor");
+
   const recordingCapabilities = recordingCapabilitiesCache.read(replayClient);
   const showDebuggerTab = recordingCapabilities.supportsRepaintingGraphics
     ? toolboxLayout !== "ide"
@@ -185,11 +174,11 @@ function SecondaryToolbox() {
           showDebuggerTab={showDebuggerTab}
         />
         <div className="secondary-toolbox-right-buttons-container flex">
-          <PanelButtonsScrollOverflowGradient />
+          <div className="secondary-toolbox-scroll-overflow-gradient"></div>
         </div>
       </header>
       <Redacted className="secondary-toolbox-content bg-chrome text-xs">
-        <Suspense fallback={<LoadingPanel />}>
+        <Suspense fallback={<SecondaryToolboxLoadingPanel />}>
           {(chromiumNetMonitorEnabled || recordingCapabilities.supportsNetworkRequests) && (
             <Panel isActive={selectedPanel === "network"}>
               <NetworkMonitor />
@@ -214,15 +203,6 @@ function SecondaryToolbox() {
           )}
         </Suspense>
       </Redacted>
-    </div>
-  );
-}
-
-function LoadingPanel() {
-  return (
-    <div className="toolbox-bottom-loading-panel">
-      <Loader />
-      <div className="toolbox-bottom-loading-panel-text">Loading...</div>
     </div>
   );
 }

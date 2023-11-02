@@ -1,0 +1,22 @@
+.Button {
+  flex: 0 0 1.25rem;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  outline: none;
+  transition: 200ms opacity;
+}
+.Button[disabled] {
+  opacity: 0.5;
+}
+
+.Icon {
+  width: 1rem;
+  height: 1rem;
+}
+.Icon[data-active] {
+  color: var(--primary-accent);
+}

@@ -1,0 +1,81 @@
+.Row {
+  line-height: 1.25rem;
+  overflow: hidden;
+  transition: 200ms opacity;
+  padding-left: calc(var(--data-depth) * var(--indentation-size));
+}
+.Row[data-selected] {
+  background-color: var(--theme-selection-background);
+}
+.Row[data-selected] .ElementKey,
+.Row[data-selected] .ElementName,
+.Row[data-selected] .Icon {
+  color: var(--theme-selection-color);
+  fill: var(--theme-selection-color);
+}
+.Row[data-selected] .ElementKey {
+  background: var(--background-color-current-execution-point-column);
+}
+
+.Content {
+  height: 1.25rem;
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  font-family: var(--font-family-monospace);
+  font-size: var(--font-size-regular-monospace);
+  text-wrap: nowrap;
+  user-select: none;
+  padding-right: 1ch;
+}
+
+.Spacer {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+}
+
+.ElementName {
+  color: var(--value-type-html-tag);
+}
+.ElementKey {
+  background: var(--background-color-current-execution-point);
+  color: var(--value-type-html-tag);
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-tiny);
+  padding: 0 0.25rem;
+  border-radius: 0.25rem;
+  margin-left: 1ch;
+  height: 0.8rem;
+  line-height: 0.8rem;
+}
+
+.IconContainer,
+.IconContainerRotated {
+  transform-origin: 0.5rem 0.5rem;
+  transition: transform 200ms;
+  width: 1rem;
+  height: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: top;
+}
+.IconContainerRotated {
+  transform: rotate(90deg);
+}
+
+.Icon {
+  height: 0.75rem;
+  width: 0.75rem;
+  fill: var(--color-dimmer);
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

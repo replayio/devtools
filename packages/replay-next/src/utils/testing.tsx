@@ -221,6 +221,17 @@ export function createMockReplayClient() {
     return Promise.resolve(focusWindow);
   });
   mockClient.getCurrentFocusWindow.mockImplementation(() => focusWindow);
+  mockClient.streamSourceContents.mockImplementation(
+    (sourceId, onSourceContentsInfo, onSourceContentsChunk) => {
+      onSourceContentsInfo({
+        codeUnitCount: 0,
+        contentType: "text/javascript",
+        lineCount: 0,
+        sourceId,
+      });
+      return Promise.resolve();
+    }
+  );
 
   return mockClient;
 }
