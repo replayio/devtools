@@ -44,57 +44,6 @@ export function HooksRenderer({
     renderedName = <span className={styles.BuiltInHookName}>{hookName}</span>;
   }
 
-  // TODO [FE-2016] Some hooks (useEffect, useLayoutEffect, useCallback, etc.) accept inline function arguments
-  //                so the jump-to-definition button will be displayed for these
-  //                For other types of hooks, we could use mapped locations to display this button,
-  //                except for an outstanding issue with invalid locations
-  //                Note that when we re-enable this we should probably only do it for hooks that don't have function arguments
-  //                else we may end up showing two jump-to-definition buttons
-  //
-  // const hookSourceProperty = findProtocolObjectProperty(hookObject, "hookSource");
-  // const hookSource = hookSourceProperty?.object
-  //   ? objectCache.read(replayClient, pauseId, hookSourceProperty.object, "canOverflow")
-  //   : null;
-  //
-  // let hookSourceFunctionLocation: MappedLocation | null = null;
-  // if (hookSource) {
-  //   hookSourceFunctionLocation = getReplayLocationFromReactDevToolsSourceSuspends(
-  //     replayClient,
-  //     hookSource
-  //   );
-  // }
-  //
-  // TODO [FE-2016]
-  // if (isCustomHook && hookSourceFunctionLocation) {
-  //   hookName =
-  //     hookNameCache.read(replayClient, hookSourceFunctionLocation, hookName) ?? "Anonymous";
-  // }
-  //
-  // if (hookSourceFunctionLocation) {
-  //   const viewFunctionSource = (event: MouseEvent) => {
-  //     event.preventDefault();
-  //     event.stopPropagation();
-  //
-  //     if (inspectFunctionDefinition !== null) {
-  //       inspectFunctionDefinition(hookSourceFunctionLocation!);
-  //     }
-  //   };
-  //
-  //   renderedName = (
-  //     <>
-  //       {renderedName}
-  //       <button
-  //         className={styles.ViewSourceIconButton}
-  //         date-test-name="JumpToDefinitionButton"
-  //         onClick={viewFunctionSource}
-  //         title="Jump to definition"
-  //       >
-  //         <Icon className={styles.ViewSourceIcon} type="view-function-source" />
-  //       </button>
-  //     </>
-  //   );
-  // }
-
   let rendered: ReactNode = null;
   if (valueProperty?.object) {
     const protocolValue = objectCache.read(
