@@ -38,17 +38,6 @@
 .ElementName {
   color: var(--value-type-html-tag);
 }
-.ElementKey {
-  background: var(--background-color-current-execution-point);
-  color: var(--value-type-html-tag);
-  font-family: var(--font-family-sans);
-  font-size: var(--font-size-tiny);
-  padding: 0 0.25rem;
-  border-radius: 0.25rem;
-  margin-left: 1ch;
-  height: 0.8rem;
-  line-height: 0.8rem;
-}
 
 .IconContainer,
 .IconContainerRotated {

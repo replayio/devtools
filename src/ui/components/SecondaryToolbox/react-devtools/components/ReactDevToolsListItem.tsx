@@ -4,6 +4,7 @@ import { CSSProperties, ReactNode } from "react";
 import Icon from "replay-next/components/Icon";
 import { GenericListItemData } from "replay-next/components/windowing/GenericList";
 import { truncateMiddle } from "replay-next/src/utils/string";
+import { Badge } from "ui/components/SecondaryToolbox/react-devtools/components/Badge";
 import { ReactDevToolsListData } from "ui/components/SecondaryToolbox/react-devtools/ReactDevToolsListData";
 import { StoreWithInternals } from "ui/components/SecondaryToolbox/react-devtools/ReplayWall";
 import { ReactElement } from "ui/components/SecondaryToolbox/react-devtools/types";
@@ -12,7 +13,7 @@ import styles from "./ReactDevToolsListItem.module.css";
 
 export const ITEM_SIZE = 20;
 
-const MAX_KEY_LENGTH = 20;
+export const MAX_KEY_LENGTH = 20;
 
 export type ItemData = {
   store: StoreWithInternals;
@@ -33,16 +34,13 @@ export function ReactDevToolsListItem({
   const element = elementsListData.getItemAtIndex(index);
   assert(element);
 
-  const { children, depth, displayName, id, isCollapsed, key } = element;
+  const { children, depth, displayName, hocDisplayNames, id, isCollapsed, key } = element;
 
   let rendered: ReactNode = (
     <>
       <div className={styles.ElementName}>{displayName}</div>
-      {key && (
-        <div className={styles.ElementKey} title={`${key}`}>
-          {truncateMiddle(`${key}`, MAX_KEY_LENGTH)}
-        </div>
-      )}
+      {hocDisplayNames && hocDisplayNames.length > 0 && <Badge children={hocDisplayNames[0]} />}
+      {key && <Badge children={truncateMiddle(`${key}`, MAX_KEY_LENGTH)} title={`${key}`} />}
     </>
   );
 

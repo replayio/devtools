@@ -10,12 +10,15 @@ import PropertiesRenderer from "replay-next/components/inspector/PropertiesRende
 import Loader from "replay-next/components/Loader";
 import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
+import { truncateMiddle } from "replay-next/src/utils/string";
 import { suspendInParallel } from "replay-next/src/utils/suspense";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { PreferencesKey } from "shared/user-data/LocalStorage/types";
 import useLocalStorageUserData from "shared/user-data/LocalStorage/useLocalStorageUserData";
 import { setSelectedPanel } from "ui/actions/layout";
+import { Badge } from "ui/components/SecondaryToolbox/react-devtools/components/Badge";
 import { HooksRenderer } from "ui/components/SecondaryToolbox/react-devtools/components/HooksRenderer";
+import { MAX_KEY_LENGTH } from "ui/components/SecondaryToolbox/react-devtools/components/ReactDevToolsListItem";
 import { nodesToFiberIdsCache } from "ui/components/SecondaryToolbox/react-devtools/injectReactDevtoolsBackend";
 import { ReactDevToolsListData } from "ui/components/SecondaryToolbox/react-devtools/ReactDevToolsListData";
 import {
@@ -48,9 +51,10 @@ export function SelectedElement({
 
   const dispatch = useAppDispatch();
 
-  const deferredElement = useDeferredValue(element);
+  const { displayName, hocDisplayNames, id, key } = element;
 
-  const { displayName, id } = deferredElement;
+  // Only Suspend at deferred priority
+  const deferredElement = useDeferredValue(element);
 
   const isPending = element !== deferredElement;
 
@@ -101,10 +105,24 @@ export function SelectedElement({
     }
   };
 
+  let hocBadge: ReactNode = null;
+  if (hocDisplayNames && hocDisplayNames.length > 0) {
+    hocBadge = <Badge children={hocDisplayNames[0]} />;
+  }
+
+  let keyBadge: ReactNode = null;
+  if (key) {
+    keyBadge = <Badge children={truncateMiddle(`${key}`, MAX_KEY_LENGTH)} title={`${key}`} />;
+  }
+
   return (
     <div className={styles.Panel} data-is-pending={isPending || undefined}>
       <div className={styles.TopRow}>
-        <div className={styles.ComponentName}>{displayName}</div>
+        <div className={styles.ComponentName}>
+          {displayName}
+          {hocBadge}
+          {keyBadge}
+        </div>
         {nativeNodeIds.length > 0 && (
           <button
             className={styles.IconButton}
