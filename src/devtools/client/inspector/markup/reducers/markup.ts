@@ -1,75 +1,16 @@
 // Side-effectful import - needed to initialize these prefs
 import { EntityState, PayloadAction, createEntityAdapter, createSlice } from "@reduxjs/toolkit";
-import { Attr, BoxModel, PseudoType } from "@replayio/protocol";
+import { BoxModel } from "@replayio/protocol";
 
 import { pauseRequestedAt } from "devtools/client/debugger/src/reducers/pause";
-import { userData } from "shared/user-data/GraphQL/UserData";
 import { UIState } from "ui/state";
 
-export interface NodeInfo {
-  // A list of the node's attributes.
-  attributes: Attr[];
-  // All child nodes, regardless of type or loaded status
-  children: string[];
-  // The display name for the UI. This is either the lower case of the node's tag
-  // name or the doctype string for a document type node.
-  displayName: string;
-  // Whether or not the node has child nodes.
-  hasChildren: boolean;
-  // An unique object id.
-  id: string;
-  // Whether or not the node is attached to the document (?)
-  isConnected: boolean;
-  isElement: boolean;
-  // Whether or not the node is expanded.
-  // isExpanded: boolean;
-  // The namespace URI of the node. NYI
-  namespaceURI: string;
-  // The object id of the parent node.
-  parentNodeId: string | undefined;
-  // The pseudo element type.
-  pseudoType: PseudoType;
-  // The name of the current node.
-  tagName: string | undefined;
-  // The node's `nodeType` which identifies what the node is.
-  type: number;
-  // The node's `nodeValue` which identifies the value of the current node.
-  value: string | undefined;
-  // Whether this node's children are being loaded
-  isLoadingChildren: boolean;
-}
-
-export type SelectionReason =
-  | "navigateaway"
-  | "markup"
-  | "debugger"
-  | "breadcrumbs"
-  | "inspectorsearch"
-  | "box-model"
-  | "console"
-  | "keyboard"
-  | "unknown";
-
-type ExpandedNodes = Record<string, boolean | undefined>;
-
-// export type MarkupTree = { [key: string]: NodeInfo | undefined };
-
 export interface MarkupState {
-  // The root node to display in the DOM view.
-  rootNode: string | null;
-  // The selected node to display in the DOM view.
-  selectedNode: string | null;
-  selectionReason: SelectionReason | null;
-  // A node that should be scrolled into view.
-  scrollIntoViewNode: string | null;
   highlightedNodes: string[] | null;
   nodeBoxModels: EntityState<BoxModel>;
-  // The document could not be loaded at the current execution point.
-  loadingFailed: boolean;
-  expandedNodes: ExpandedNodes;
+  selectedNode: string | null;
 }
 
-const nodeAdapter = createEntityAdapter<NodeInfo>();
 const boxModelAdapter = createEntityAdapter<BoxModel>({
   selectId: boxModel => boxModel.node,
 });
@@ -79,14 +20,9 @@ export const { selectById: getNodeBoxModelById } = boxModelAdapter.getSelectors(
 );
 
 const initialState: MarkupState = {
-  rootNode: null,
-  selectedNode: null,
-  selectionReason: null,
-  scrollIntoViewNode: null,
-  expandedNodes: {},
   highlightedNodes: null,
-  loadingFailed: false,
   nodeBoxModels: boxModelAdapter.getInitialState(),
+  selectedNode: null,
 };
 
 const markupSlice = createSlice({
@@ -96,35 +32,16 @@ const markupSlice = createSlice({
     resetMarkup() {
       return initialState;
     },
-    newRootAdded(state, action: PayloadAction<string>) {
-      state.rootNode = action.payload;
-    },
-    updateNodeExpanded(state, action: PayloadAction<{ nodeId: string; isExpanded: boolean }>) {
-      const { nodeId, isExpanded } = action.payload;
-      state.expandedNodes[nodeId] = isExpanded;
-    },
-    expandMultipleNodes(state, action: PayloadAction<string[]>) {
-      action.payload.forEach(nodeId => {
-        state.expandedNodes[nodeId] = true;
-      });
-    },
     nodeSelected: {
-      reducer(
-        state,
-        action: PayloadAction<{ nodeId: string | null; reason: SelectionReason | undefined }>
-      ) {
-        const { nodeId, reason = null } = action.payload;
+      reducer(state, action: PayloadAction<{ nodeId: string | null }>) {
+        const { nodeId } = action.payload;
         state.selectedNode = nodeId;
-        state.selectionReason = nodeId ? reason : null;
       },
-      prepare(nodeId: string | null, reason?: SelectionReason) {
+      prepare(nodeId: string | null) {
         return {
-          payload: { nodeId, reason },
+          payload: { nodeId },
         };
       },
-    },
-    updateScrollIntoViewNode(state, action: PayloadAction<string | null>) {
-      state.scrollIntoViewNode = action.payload;
     },
     nodesHighlighted(state, action: PayloadAction<string[]>) {
       state.highlightedNodes = action.payload;
@@ -132,13 +49,8 @@ const markupSlice = createSlice({
     nodeBoxModelsLoaded(state, action: PayloadAction<BoxModel[]>) {
       boxModelAdapter.setAll(state.nodeBoxModels, action);
     },
-
     nodeHighlightingCleared(state) {
       state.highlightedNodes = null;
-    },
-    // The document could not be loaded at the current execution point.
-    updateLoadingFailed(state, action: PayloadAction<boolean>) {
-      state.loadingFailed = action.payload;
     },
   },
   extraReducers: builder => {
@@ -165,16 +77,11 @@ const markupSlice = createSlice({
 });
 
 export const {
-  newRootAdded,
   resetMarkup,
-  updateNodeExpanded,
-  expandMultipleNodes,
   nodeSelected,
-  updateScrollIntoViewNode,
   nodesHighlighted,
   nodeBoxModelsLoaded,
   nodeHighlightingCleared,
-  updateLoadingFailed,
 } = markupSlice.actions;
 
 export default markupSlice.reducer;

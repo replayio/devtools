@@ -16,12 +16,12 @@ import TextProperty, {
   ComputedPropertyInfo,
   Priority,
 } from "devtools/client/inspector/rules/models/text-property";
+import { elementCache } from "replay-next/components/elements/suspense/ElementCache";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { cachePauseData } from "replay-next/src/suspense/PauseCache";
 import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientInterface } from "shared/client/types";
-
-import { processedNodeDataCache } from "./nodeCaches";
+import { isElement } from "ui/suspense/nodeCaches";
 
 export interface WiredAppliedRule {
   rule: RuleFront;
@@ -288,9 +288,9 @@ export const cssRulesCache: Cache<
     if (!pauseId || typeof nodeId !== "string") {
       return null;
     }
-    const nodeInfo = await processedNodeDataCache.readAsync(replayClient, pauseId, nodeId);
 
-    if (!nodeInfo?.isConnected || !nodeInfo?.isElement) {
+    const element = await elementCache.readAsync(replayClient, pauseId, nodeId);
+    if (!element.node.isConnected || !isElement(element.node)) {
       return null;
     }
 
@@ -319,9 +319,9 @@ export const computedPropertiesCache: Cache<
     if (!pauseId || typeof nodeId !== "string") {
       return null;
     }
-    const nodeInfo = await processedNodeDataCache.readAsync(replayClient, pauseId, nodeId);
 
-    if (!nodeInfo?.isConnected || !nodeInfo?.isElement) {
+    const element = await elementCache.readAsync(replayClient, pauseId, nodeId);
+    if (!element.node.isConnected || !isElement(element.node)) {
       return null;
     }
 

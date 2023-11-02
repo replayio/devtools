@@ -3,9 +3,8 @@ import React from "react";
 
 import { assert } from "protocol/utils";
 import { useAppSelector } from "ui/setup/hooks";
-import { Canvas } from "ui/state/app";
 
-import { NodeInfo, getNodeBoxModelById } from "../reducers/markup";
+import { getNodeBoxModelById } from "../reducers/markup";
 
 // Note that the order of items in this array is important because it is used
 // for drawing the BoxModelHighlighter's path elements correctly.
@@ -134,11 +133,6 @@ function getOuterBounds(boxModelQuads: BoxModelQuads) {
     y: 0,
   };
 }
-
-const getAttribute = (node: NodeInfo, name: string) => {
-  const attr = node.attributes?.find(a => a.name == name);
-  return attr?.value;
-};
 
 export function PreviewNodeHighlighter({ nodeId }: { nodeId: string }) {
   const highlightedNodeBoxModel = useAppSelector(state => getNodeBoxModelById(state, nodeId));

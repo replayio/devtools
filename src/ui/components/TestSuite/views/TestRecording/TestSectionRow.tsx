@@ -1,12 +1,8 @@
 import assert from "assert";
-import { ExecutionPoint, TimeStampedPoint } from "@replayio/protocol";
+import { ExecutionPoint } from "@replayio/protocol";
 import { ReactNode, useContext, useMemo, useTransition } from "react";
 
-import {
-  highlightNode,
-  highlightNodes,
-  unhighlightNode,
-} from "devtools/client/inspector/markup/actions/markup";
+import { highlightNodes, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 import Icon from "replay-next/components/Icon";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
@@ -190,7 +186,7 @@ export function TestSectionRow({
           testEvent.data.timeStampedPoints.result?.point ?? ""
         );
 
-        if (firstDomNodeDetails?.domNode?.isConnected) {
+        if (firstDomNodeDetails?.domNode?.node.isConnected) {
           const { domNode, pauseId } = firstDomNodeDetails;
           dispatch(highlightNodes([domNode.id], pauseId));
         }
