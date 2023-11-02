@@ -31,6 +31,8 @@ const config: PlaywrightTestConfig = {
     timeout: 10_000,
   },
 
+  reporter: CI ? [["@replayio/playwright/reporter", { upload: true }], ["line"]] : undefined,
+
   // Retry failed tests on CI to account for some basic flakiness.
   retries: CI ? 3 : 0,
 
