@@ -68,11 +68,6 @@ export class ReactDevToolsListData extends GenericListData<ReactElement> {
     this.invalidate();
   }
 
-  updateStore(store: StoreWithInternals) {
-    this.store = store;
-    this.invalidate();
-  }
-
   protected getIndexForItemImplementation(element: ReactElement): number {
     const index = this.store.getIndexOfElementID(element.id);
     return index ?? -1;
