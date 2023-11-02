@@ -1,4 +1,5 @@
 import { NodeBounds, Object as ProtocolObject } from "@replayio/protocol";
+import { createBridge, createStore, initialize } from "@replayio/react-devtools-inline/frontend";
 import {
   useContext,
   useEffect,
@@ -35,7 +36,6 @@ import {
   ReplayWall,
   StoreWithInternals,
 } from "ui/components/SecondaryToolbox/react-devtools/ReplayWall";
-import { reactDevToolsInlineModuleCache } from "ui/components/SecondaryToolbox/react-devtools/suspense/reactDevToolsInlineModuleCache";
 import { nodePickerDisabled, nodePickerInitializing, nodePickerReady } from "ui/reducers/app";
 import { getPreferredLocation } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector, useAppStore } from "ui/setup/hooks";
@@ -50,8 +50,6 @@ import { NodePicker as NodePickerClass, NodePickerOpts } from "ui/utils/nodePick
 import { ReactDevToolsPanel as NewReactDevtoolsPanel } from "./react-devtools/components/ReactDevToolsPanel";
 import { generateTreeResetOpsForPoint } from "./react-devtools/rdtProcessing";
 
-type ReactDevToolsInlineModule = typeof import("@replayio/react-devtools-inline/frontend");
-
 function jumpToComponentPreferredSource(componentPreview: ProtocolObject): UIThunkAction {
   return (dispatch, getState) => {
     const state = getState();
@@ -65,7 +63,6 @@ function jumpToComponentPreferredSource(componentPreview: ProtocolObject): UIThu
 }
 
 function createReactDevTools(
-  reactDevToolsInlineModule: ReactDevToolsInlineModule,
   enablePicker: (opts: NodeOptsWithoutBounds) => void,
   initializePicker: () => void,
   disablePicker: () => void,
@@ -76,8 +73,6 @@ function createReactDevTools(
   replayClient: ReplayClientInterface,
   dismissInspectComponentNag: () => void
 ) {
-  const { createBridge, createStore, initialize } = reactDevToolsInlineModule;
-
   const target = { postMessage() {} } as unknown as Window;
   const wall = new ReplayWall(
     enablePicker,
@@ -151,20 +146,10 @@ export function ReactDevtoolsPanel() {
     replayClient
   );
 
-  // Once we've obtained the protocol version, we'll dynamically load the correct module/version.
-  let reactDevToolsInlineModule: ReactDevToolsInlineModule | null = null;
-  if (pauseId != null) {
-    reactDevToolsInlineModule = reactDevToolsInlineModuleCache.read(replayClient, pauseId);
-  }
-
   const annotations: ParsedReactDevToolsAnnotation[] =
     annotationsStatus === "resolved" ? parsedAnnotations : EMPTY_ANNOTATIONS;
 
   const [ReactDevTools, wall] = useMemo(() => {
-    if (!reactDevToolsInlineModule) {
-      return [null, null, null] as const;
-    }
-
     function dispatchHighlightNode(nodeId: string) {
       dispatch(highlightNode(nodeId));
     }
@@ -207,7 +192,6 @@ export function ReactDevtoolsPanel() {
     }
 
     const [ReactDevTools, wall, bridge] = createReactDevTools(
-      reactDevToolsInlineModule,
       enablePicker,
       initializePicker,
       disablePicker,
@@ -219,7 +203,7 @@ export function ReactDevtoolsPanel() {
       dismissInspectComponentNag
     );
     return [ReactDevTools, wall, bridge] as const;
-  }, [dispatch, reactDevToolsInlineModule, replayClient, dismissInspectComponentNag]);
+  }, [dispatch, replayClient, dismissInspectComponentNag]);
 
   useLayoutEffect(() => {
     if (
@@ -309,8 +293,7 @@ export function ReactDevtoolsPanel() {
   const firstOperation = annotations.find(annotation => annotation.contents.event == "operations");
   const reactInitPoint = firstOperation?.point ?? null;
 
-  const isReactDevToolsReady =
-    reactDevToolsInlineModule !== null && ReactDevTools !== null && wall !== null;
+  const isReactDevToolsReady = ReactDevTools !== null && wall !== null;
   const isReady =
     isReactDevToolsReady &&
     reactInitPoint !== null &&

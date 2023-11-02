@@ -1,3 +1,4 @@
+import { createBridge, createStore } from "@replayio/react-devtools-inline/frontend";
 import { Dispatch, SetStateAction, useContext, useMemo } from "react";
 
 import {
@@ -19,13 +20,9 @@ import { useAppDispatch } from "ui/setup/hooks";
 import { getMouseTarget } from "ui/suspense/nodeCaches";
 import { NodePicker as NodePickerClass, NodePickerOpts } from "ui/utils/nodePicker";
 
-type ReactDevToolsInlineModule = typeof import("@replayio/react-devtools-inline/frontend");
-
 export function useReplayWall({
-  reactDevToolsInlineModule,
   setProtocolCheckFailed,
 }: {
-  reactDevToolsInlineModule: ReactDevToolsInlineModule;
   setProtocolCheckFailed: Dispatch<SetStateAction<boolean>>;
 }) {
   const replayClient = useContext(ReplayClientContext);
@@ -35,8 +32,6 @@ export function useReplayWall({
   const [, dismissInspectComponentNag] = useNag(Nag.INSPECT_COMPONENT);
 
   const { bridge, store, wall } = useMemo(() => {
-    const { createBridge, createStore } = reactDevToolsInlineModule;
-
     const nodePicker = new NodePickerClass();
 
     function disablePicker() {
@@ -101,14 +96,7 @@ export function useReplayWall({
     wall.store = store;
 
     return { bridge, store, wall };
-  }, [
-    dispatch,
-    dismissInspectComponentNag,
-    forceUpdate,
-    reactDevToolsInlineModule,
-    replayClient,
-    setProtocolCheckFailed,
-  ]);
+  }, [dispatch, dismissInspectComponentNag, forceUpdate, replayClient, setProtocolCheckFailed]);
 
   return { bridge, store, wall };
 }

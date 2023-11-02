@@ -27,7 +27,6 @@ import { SelectedElementLoader } from "ui/components/SecondaryToolbox/react-devt
 import { useReactDevToolsAnnotations } from "ui/components/SecondaryToolbox/react-devtools/hooks/useReactDevToolsAnnotations";
 import { useReplayWall } from "ui/components/SecondaryToolbox/react-devtools/hooks/useReplayWall";
 import { ReactDevToolsListData } from "ui/components/SecondaryToolbox/react-devtools/ReactDevToolsListData";
-import { reactDevToolsInlineModuleCache } from "ui/components/SecondaryToolbox/react-devtools/suspense/reactDevToolsInlineModuleCache";
 import { ReactDevToolsInlineModule } from "ui/components/SecondaryToolbox/react-devtools/types";
 import { SecondaryToolboxLoadingPanel } from "ui/components/SecondaryToolbox/SecondaryToolboxLoadingPanel";
 import {
@@ -50,11 +49,6 @@ export function ReactDevToolsPanel({
     return <SecondaryToolboxLoadingPanel />;
   }
 
-  const reactDevToolsInlineModule = reactDevToolsInlineModuleCache.read(replayClient, pauseId);
-  if (reactDevToolsInlineModule == null) {
-    return <SecondaryToolboxLoadingPanel />;
-  }
-
   const annotations = reactDevToolsAnnotationsCache.read(replayClient);
 
   return (
@@ -62,7 +56,6 @@ export function ReactDevToolsPanel({
       annotations={annotations}
       executionPoint={executionPoint}
       pauseId={pauseId}
-      reactDevToolsInlineModule={reactDevToolsInlineModule}
     />
   );
 }
@@ -71,12 +64,10 @@ function ReactDevToolsPanelInner({
   annotations,
   executionPoint,
   pauseId,
-  reactDevToolsInlineModule,
 }: {
   annotations: ParsedReactDevToolsAnnotation[];
   executionPoint: ExecutionPoint | null;
   pauseId: PauseId | null;
-  reactDevToolsInlineModule: ReactDevToolsInlineModule;
 }) {
   const [collapsedLeft, setCollapsedLeft] = useState(false);
   const [collapsedRight, setCollapsedRight] = useState(false);
@@ -86,7 +77,6 @@ function ReactDevToolsPanelInner({
   const rightPanelRef = useRef<ImperativePanelHandle>(null);
 
   const { bridge, store, wall } = useReplayWall({
-    reactDevToolsInlineModule,
     setProtocolCheckFailed,
   });
 
