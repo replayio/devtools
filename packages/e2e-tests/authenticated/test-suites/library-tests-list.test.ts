@@ -31,7 +31,11 @@ test(`authenticated/test-suites/library-tests-list`, async ({ page }) => {
   const runSummary = getTestRunSummary(page);
   await expect(await runSummary.textContent()).toContain("github: remove semgrep (#9332)");
   await expect(await getTestRunAttribute(runSummary, "Branch").textContent()).toBe("main");
-  await expect(await getTestRunAttribute(runSummary, "Date").textContent()).toContain("6/14/2023");
+  // Relative dates can change over time.
+  // Check for either the "X units ago" text, or the literal date.
+  await expect(await getTestRunAttribute(runSummary, "Date").textContent()).toMatch(
+    / ago|(10\/26\/2023)/
+  );
   await expect(await getTestRunAttribute(runSummary, "Duration").textContent()).toContain(
     "1h 19m 3.6s"
   );
