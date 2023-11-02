@@ -1,4 +1,4 @@
-import type { PointDescription, SourceId } from "@replayio/protocol";
+import type { PointDescription, SourceId, TimeStampedPoint } from "@replayio/protocol";
 import { Suspense, useContext } from "react";
 
 import { binarySearch } from "protocol/utils";
@@ -10,7 +10,7 @@ import { useDebounce } from "replay-next/src/hooks/useDebounce";
 import { hitPointsForLocationCache } from "replay-next/src/suspense/HitPointsCache";
 import { sourceHitCountsCache } from "replay-next/src/suspense/SourceHitCountsCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { SourceLocationRange } from "shared/client/types";
+import { HitPointStatus, SourceLocationRange } from "shared/client/types";
 import { toPointRange } from "shared/utils/time";
 import { selectors } from "ui/reducers";
 import { useAppSelector } from "ui/setup/hooks";
@@ -75,25 +75,38 @@ function PreviewMarkersSuspends({
     index => lineNumber - hitCounts[index][0]
   );
 
-  const hitCountsForLine = hitCounts[hitCountsForLineIndex];
+  let firstColumnHitCounts = undefined;
   let firstColumnWithHitCounts = undefined;
+  const hitCountsForLine = hitCounts[hitCountsForLineIndex];
   if (hitCountsForLine && hitCountsForLine[0] === lineNumber) {
+    firstColumnHitCounts = hitCountsForLine[1].count;
     firstColumnWithHitCounts = hitCountsForLine[1].firstBreakableColumnIndex;
   }
 
-  const [hitPoints, hitPointStatus] = hitPointsForLocationCache.read(
-    replayClient,
-    {
-      begin: focusRange ? focusRange.begin.point : "0",
-      end: focusRange ? focusRange.end.point : endpoint,
-    },
-    {
-      column: firstColumnWithHitCounts ?? 0,
-      line: lineNumber,
-      sourceId,
-    },
-    null
-  );
+  let hitPoints: TimeStampedPoint[] = [];
+  let hitPointStatus: HitPointStatus | null = null;
+  if (
+    firstColumnWithHitCounts != null &&
+    firstColumnHitCounts != null &&
+    firstColumnHitCounts > 0
+  ) {
+    const tuple = hitPointsForLocationCache.read(
+      replayClient,
+      {
+        begin: focusRange ? focusRange.begin.point : "0",
+        end: focusRange ? focusRange.end.point : endpoint,
+      },
+      {
+        column: firstColumnWithHitCounts,
+        line: lineNumber,
+        sourceId,
+      },
+      null
+    );
+
+    hitPoints = tuple[0];
+    hitPointStatus = tuple[1];
+  }
 
   const showHitPointMarkers =
     hitPoints != null &&
