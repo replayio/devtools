@@ -1,13 +1,18 @@
 import { BackendEvents, FrontendBridge } from "@replayio/react-devtools-inline";
 
-const TIMEOUT_DELAY = 15_000;
-
-export function createPromiseForRequest<Value>(
-  requestID: number,
-  eventType: keyof BackendEvents,
-  bridge: FrontendBridge,
-  timeoutMessage: string = `Timed out waiting for response to "${eventType}" message`
-): Promise<Value> {
+export function createPromiseForRequest<Value>({
+  bridge,
+  eventType,
+  requestID,
+  timeoutDelay,
+  timeoutMessage = `Timed out waiting for response to "${eventType}" message`,
+}: {
+  bridge: FrontendBridge;
+  eventType: keyof BackendEvents;
+  requestID: number;
+  timeoutDelay: number;
+  timeoutMessage?: string;
+}): Promise<Value> {
   return new Promise((resolve, reject) => {
     const cleanup = () => {
       bridge.removeListener(eventType, onEvent);
@@ -29,6 +34,6 @@ export function createPromiseForRequest<Value>(
 
     bridge.addListener(eventType, onEvent);
 
-    const timeoutID = setTimeout(onTimeout, TIMEOUT_DELAY);
+    const timeoutID = setTimeout(onTimeout, timeoutDelay);
   });
 }
