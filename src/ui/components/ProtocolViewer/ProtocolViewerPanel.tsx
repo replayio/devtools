@@ -4,6 +4,7 @@ import Loader from "replay-next/components/Loader";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { useSources } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import useLocalStorageUserData from "shared/user-data/LocalStorage/useLocalStorageUserData";
 import { ProtocolViewer } from "ui/components/ProtocolViewer/components/ProtocolViewer";
 import { useIsRecordingOfReplay } from "ui/components/ProtocolViewer/hooks/useIsRecordingOfReplay";
 import {
@@ -23,9 +24,10 @@ import { useAppSelector } from "ui/setup/hooks";
 import styles from "./ProtocolViewerPanel.module.css";
 
 export function ProtocolViewerPanel() {
-  const [tab, setTab] = useState("live");
+  const [unsafeSelectedTab, selectTab] = useLocalStorageUserData("protocolViewerSelectedTab");
 
   const isRecordingOfReplay = useIsRecordingOfReplay();
+  const safeSelectedTab = isRecordingOfReplay ? unsafeSelectedTab : "live";
 
   return (
     <div className={styles.Container}>
@@ -33,15 +35,15 @@ export function ProtocolViewerPanel() {
         <div className={styles.Tabs}>
           <button
             className={styles.Tab}
-            data-active={tab === "live" || undefined}
-            onClick={() => setTab("live")}
+            data-active={safeSelectedTab === "live" || undefined}
+            onClick={() => selectTab("live")}
           >
             Live
           </button>
           <button
             className={styles.Tab}
-            data-active={tab === "recorded" || undefined}
-            onClick={() => setTab("recorded")}
+            data-active={safeSelectedTab === "recorded" || undefined}
+            onClick={() => selectTab("recorded")}
           >
             Recorded
           </button>
@@ -49,10 +51,10 @@ export function ProtocolViewerPanel() {
       )}
 
       <div className={styles.Panel}>
-        <Offscreen mode={tab === "live" ? "visible" : "hidden"}>
+        <Offscreen mode={safeSelectedTab === "live" ? "visible" : "hidden"}>
           <LiveProtocolRequests />
         </Offscreen>
-        {isRecordingOfReplay && tab === "recorded" ? (
+        {isRecordingOfReplay && safeSelectedTab === "recorded" ? (
           <Suspense fallback={<Loader />}>
             <RecordedProtocolRequests />
           </Suspense>
