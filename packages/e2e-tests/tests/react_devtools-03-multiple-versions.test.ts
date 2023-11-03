@@ -15,7 +15,7 @@ import test, { expect } from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "rdt-react-versions/dist/index.html" });
 
-test("react_devtools 03: process and display multiple React versions in page", async ({
+test("react_devtools-03: process and display multiple React versions in page", async ({
   pageWithMeta: { page, recordingId },
 }) => {
   const queryParams = new URLSearchParams();

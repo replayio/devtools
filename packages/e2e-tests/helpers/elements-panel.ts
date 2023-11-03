@@ -1,6 +1,7 @@
 import { Locator, Page, expect } from "@playwright/test";
 import chalk from "chalk";
 
+import { clearText } from "./lexical";
 import { debugPrint, delay, waitFor } from "./utils";
 
 type ElementsListRowOptions = {
@@ -315,9 +316,18 @@ export async function searchElementsPanel(page: Page, searchText: string): Promi
   );
 
   const input = page.locator('[data-test-id="ElementsSearchInput"]')!;
+  await input.isEnabled();
   await input.focus();
   await input.type(searchText);
-  await input.press("Enter");
+
+  await waitFor(async () => {
+    await input.press("Enter");
+
+    // If the Elements panel is still loading, the search won't be handled.
+    // A proxy for confirming that the search has been handled is that a results label will be rendered.
+    const resultsLabel = page.locator('[data-test-id="ElementsPanel-SearchResult"]');
+    await expect(await resultsLabel.count()).toEqual(1);
+  });
 }
 
 export async function selectElementsListRow(

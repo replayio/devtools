@@ -142,7 +142,7 @@ export function ElementsPanel({
           />
         </label>
         {searchState !== null && (
-          <div className={styles.SearchResults}>
+          <div className={styles.SearchResults} data-test-id="ElementsPanel-SearchResult">
             {searchState.index + 1} of {searchState.results.length}
           </div>
         )}

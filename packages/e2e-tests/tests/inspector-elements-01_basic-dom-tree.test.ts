@@ -27,9 +27,6 @@ test("inspector-elements-01: Basic DOM tree node display", async ({
 
   await openElementsPanel(page);
 
-  const bodyNode = await getElementsListRow(page, { text: "<body" });
-  await toggleElementsListRow(page, bodyNode, true);
-
   await activateInspectorTool(page);
   let node = await getElementsListRow(page, { text: '<div id="maindiv"' });
   await node.waitFor();
@@ -41,7 +38,6 @@ test("inspector-elements-01: Basic DOM tree node display", async ({
   await addBreakpoint(page, { url: "doc_inspector_basic.html", lineNumber: 9 });
   await rewindToLine(page, 9);
 
-  await toggleElementsListRow(page, bodyNode, true);
   node = await getElementsListRow(page, { text: '<div id="maindiv"' });
   await node.waitFor();
   await toggleElementsListRow(page, node, true);

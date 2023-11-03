@@ -3,16 +3,14 @@ import { expect } from "@playwright/test";
 import { openDevToolsTab, startTest } from "../helpers";
 import { warpToMessage } from "../helpers/console-panel";
 import {
-  getElementsList,
   getElementsListRow,
   openElementsPanel,
-  toggleElementsListRow,
   typeKeyAndVerifySelectedElement,
   waitForElementsToLoad,
   waitForSelectedElementsRow,
 } from "../helpers/elements-panel";
 import { closeSidePanel } from "../helpers/pause-information-panel";
-import { debugPrint, waitFor } from "../helpers/utils";
+import { waitFor } from "../helpers/utils";
 import test from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "doc_stacking.html" });
@@ -58,9 +56,8 @@ test("inspector-elements-04: Keyboard shortcuts should select the right DOM node
 
   await waitForElementsToLoad(page);
   const bodyTag = await getElementsListRow(page, { text: "body", type: "opening" });
-  await toggleElementsListRow(page, bodyTag, true);
-  await waitForSelectedElementsRow(page, "body");
   await bodyTag.click();
+  await waitForSelectedElementsRow(page, "body");
 
   // Basic up/down selects the next element in the tree
   await typeKeyAndVerifySelectedElement(page, "ArrowDown", bodyChildDomNodes[0]);

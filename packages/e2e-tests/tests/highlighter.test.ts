@@ -1,11 +1,6 @@
 import { openDevToolsTab, startTest } from "../helpers";
 import { openConsolePanel, warpToMessage } from "../helpers/console-panel";
-import {
-  getElementsListRow,
-  openElementsPanel,
-  selectElementsListRow,
-  toggleElementsListRow,
-} from "../helpers/elements-panel";
+import { openElementsPanel, selectElementsListRow } from "../helpers/elements-panel";
 import test, { expect } from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "doc_inspector_basic.html" });
@@ -20,9 +15,6 @@ test("highlighter: element highlighter works everywhere", async ({
   await openConsolePanel(page);
   await warpToMessage(page, "ExampleFinished");
   await openElementsPanel(page);
-
-  const bodyLocator = await getElementsListRow(page, { text: "body", type: "opening" });
-  await toggleElementsListRow(page, bodyLocator, true);
 
   await selectElementsListRow(page, { text: "myiframe" });
 
