@@ -59,7 +59,7 @@ test("cypress-04: Test Step buttons and menu item", async ({
 
   await waitForSelectedSource(page, "Link.js");
   await waitFor(async () => {
-    const lineNumber = await getSelectedLineNumber(page, true);
+    const lineNumber = await getSelectedLineNumber(page, false);
     expect(lineNumber).toBe(38);
   });
 
