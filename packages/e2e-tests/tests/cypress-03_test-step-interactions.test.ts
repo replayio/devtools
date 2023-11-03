@@ -11,7 +11,7 @@ import {
   openCypressTestPanel,
 } from "../helpers/testsuites";
 import { waitForTimelineAdvanced } from "../helpers/timeline";
-import { getByTestName, waitFor } from "../helpers/utils";
+import { delay, getByTestName, waitFor } from "../helpers/utils";
 import test, { expect } from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "flake/adding-spec.ts" });
@@ -153,6 +153,8 @@ test("cypress-03: Test Step interactions", async ({ pageWithMeta: { page, record
   });
 
   await steps.nth(9).click();
+  await delay(100);
+
   await waitFor(async () => {
     const detailsPane = getUserActionEventDetails(page);
     const detailsPaneContents = await getDetailsPaneContents(detailsPane);

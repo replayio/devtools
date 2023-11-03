@@ -323,6 +323,8 @@ export async function searchElementsPanel(page: Page, searchText: string): Promi
   await waitFor(async () => {
     await input.press("Enter");
 
+    await delay(250);
+
     // If the Elements panel is still loading, the search won't be handled.
     // A proxy for confirming that the search has been handled is that a results label will be rendered.
     const resultsLabel = page.locator('[data-test-id="ElementsPanel-SearchResult"]');
