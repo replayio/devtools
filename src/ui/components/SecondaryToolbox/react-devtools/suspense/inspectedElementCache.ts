@@ -11,6 +11,8 @@ import {
 import { InspectedReactElement } from "ui/components/SecondaryToolbox/react-devtools/types";
 import { createPromiseForRequest } from "ui/components/SecondaryToolbox/react-devtools/utils/createPromiseForRequest";
 
+const TIMEOUT_DELAY = 30_000;
+
 let uidCounter = 0;
 
 export const inspectedElementCache = createCache<
@@ -35,11 +37,13 @@ export const inspectedElementCache = createCache<
     // Wait until the backend has been injected before sending a message through the wall/bridge
     await reactDevToolsInjectionCache.readAsync(replayClient, pauseId);
 
-    const promise = createPromiseForRequest<{ value: InspectedReactElement }>(
+    const promise = createPromiseForRequest<{ value: InspectedReactElement }>({
+      bridge,
+      eventType: "inspectedElement",
       requestID,
-      "inspectedElement",
-      bridge
-    );
+      timeoutDelay: TIMEOUT_DELAY,
+      timeoutMessage: `Timed out while trying to inspect React element ${elementId}`,
+    });
 
     replayWall.send("inspectElement", {
       forceFullData: true,
