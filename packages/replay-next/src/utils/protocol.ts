@@ -207,7 +207,16 @@ export async function protocolValueToClientValue(
           ) {
             type = "error";
           } else if (className.startsWith("HTML")) {
-            type = "html-element";
+            switch (className) {
+              case "HTMLCollection": {
+                type = "array";
+                break;
+              }
+              default: {
+                type = "html-element";
+                break;
+              }
+            }
           } else if (className === "Text") {
             type = "html-text";
           }
