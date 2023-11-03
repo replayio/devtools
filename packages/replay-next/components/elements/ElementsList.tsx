@@ -18,10 +18,7 @@ import { ElementsListData } from "replay-next/components/elements/ElementsListDa
 import { rootObjectIdCache } from "replay-next/components/elements/suspense/RootObjectIdCache";
 import { Item } from "replay-next/components/elements/types";
 import { DefaultFallback } from "replay-next/components/ErrorBoundary";
-import {
-  GenericList,
-  ImperativeHandle as GenericListImperativeHandle,
-} from "replay-next/components/windowing/GenericList";
+import { GenericList } from "replay-next/components/windowing/GenericList";
 import { useHorizontalScrollingListCssVariables } from "replay-next/components/windowing/hooks/useHorizontalScrollingListCssVariables";
 import { useScrollSelectedListItemIntoView } from "replay-next/components/windowing/hooks/useScrollSelectedListItemIntoView";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
