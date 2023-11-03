@@ -7,7 +7,6 @@ import {
   getElementsListRow,
   openElementsPanel,
   searchElementsPanel,
-  toggleElementsListRow,
   typeKeyAndVerifySelectedElement,
   waitForElementsToLoad,
   waitForSelectedElementsRow,
@@ -60,9 +59,7 @@ test("inspector-elements-03: Nested node picker and selection behavior", async (
   await openElementsPanel(page);
 
   await waitForElementsToLoad(page);
-  const bodyTag = await getElementsListRow(page, { text: "body", type: "opening" });
-  await toggleElementsListRow(page, bodyTag, true);
-  await waitForSelectedElementsRow(page, "body");
+
   debugPrint(page, "Waiting for body children to load...");
   const elementsTree = getElementsList(page);
   await waitFor(async () => {
@@ -74,6 +71,7 @@ test("inspector-elements-03: Nested node picker and selection behavior", async (
   const canvas = page.locator("canvas#graphics");
   const rulesContainer = page.locator('[data-test-id="RulesPanel"]');
 
+  const bodyTag = await getElementsListRow(page, { text: "body", type: "opening" });
   await bodyTag.click();
 
   const stackingCaseR3C2 = stackingTestCases.find(tc => tc.id === "r3c2")!;

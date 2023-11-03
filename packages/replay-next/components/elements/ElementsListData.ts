@@ -137,7 +137,7 @@ export class ElementsListData extends GenericListData<Item> {
     return index;
   }
 
-  async registerRootNodeId(id: ObjectId, numLevelsToLoad: number = 2) {
+  async registerRootNodeId(id: ObjectId, numLevelsToLoad: number = 3) {
     this._rootObjectId = id;
     this._rootObjectIdWaiter.resolve();
 

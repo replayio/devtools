@@ -16,7 +16,7 @@ import test, { expect } from "../testFixtureCloneRecording";
 // trunk-ignore(gitleaks/generic-api-key)
 test.use({ exampleKey: "breakpoints-01" });
 
-test("react_devtools 02: RDT integrations (Chromium)", async ({
+test("react_devtools-02: RDT integrations (Chromium)", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {

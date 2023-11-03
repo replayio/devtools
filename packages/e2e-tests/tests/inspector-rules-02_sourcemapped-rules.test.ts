@@ -2,10 +2,8 @@ import { openDevToolsTab, startTest } from "../helpers";
 import { openConsolePanel, warpToMessage } from "../helpers/console-panel";
 import {
   checkAppliedRules,
-  getElementsListRow,
   openElementsPanel,
   selectElementsListRow,
-  toggleElementsListRow,
 } from "../helpers/elements-panel";
 import test from "../testFixtureCloneRecording";
 
@@ -21,8 +19,6 @@ test("inspector-rules-02: Sourcemapped rules should be viewed", async ({
   await warpToMessage(page, "ExampleFinished");
 
   await openElementsPanel(page);
-  const bodyLocator = await getElementsListRow(page, { text: "body", type: "opening" });
-  await toggleElementsListRow(page, bodyLocator, true);
 
   await selectElementsListRow(page, { text: "maindiv" });
   await checkAppliedRules(page, [

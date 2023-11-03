@@ -3,10 +3,8 @@ import { openConsolePanel, warpToMessage } from "../helpers/console-panel";
 import {
   checkAppliedRules,
   expandLonghands,
-  getElementsListRow,
   openElementsPanel,
   selectElementsListRow,
-  toggleElementsListRow,
 } from "../helpers/elements-panel";
 import test from "../testFixtureCloneRecording";
 
@@ -21,8 +19,6 @@ test("inspector-rules-03: Shorthand CSS rules should be viewed", async ({
   await openConsolePanel(page);
   await warpToMessage(page, "ExampleFinished");
   await openElementsPanel(page);
-  const bodyLocator = await getElementsListRow(page, { text: "body", type: "opening" });
-  await toggleElementsListRow(page, bodyLocator, true);
 
   await selectElementsListRow(page, { text: '<div class="parent" id="first">' });
   await checkAppliedRules(page, [
