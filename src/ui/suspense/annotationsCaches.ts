@@ -1,8 +1,6 @@
 import { Annotation, TimeStampedPoint } from "@replayio/protocol";
-import { Kind } from "graphql";
 import { Cache, createCache, createSingleEntryCache } from "suspense";
 
-import { ThreadFront } from "protocol/thread";
 import { compareNumericStrings } from "protocol/utils";
 import { ReplayClientInterface } from "shared/client/types";
 import { InteractionEventKind } from "ui/actions/eventListeners/constants";
