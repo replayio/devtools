@@ -272,11 +272,12 @@ export async function addLogpoint(
 }
 
 export async function closeSource(page: Page, url: string): Promise<void> {
-  await debugPrint(page, `Closing source "${chalk.bold(url)}"`, "openSource");
+  await debugPrint(page, `Closing source "${chalk.bold(url)}"`, "closeSource");
 
   const sourceTab = getSourceTab(page, url);
 
   if (await sourceTab.isVisible()) {
+    await sourceTab.hover();
     await sourceTab.locator("button").click();
   }
 
