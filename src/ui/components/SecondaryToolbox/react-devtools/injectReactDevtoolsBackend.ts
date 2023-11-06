@@ -271,6 +271,7 @@ export const nodesToFiberIdsCache: Cache<
 
     const response = await evaluate({
       replayClient: replayClient,
+      pauseId,
       text: nodeIdsExpression,
     });
 

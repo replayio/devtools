@@ -56,6 +56,7 @@ export interface PauseState {
   pausePreviewLocation: Location | null;
   selectedFrameId: PauseAndFrameId | null;
   executionPoint: string | null;
+  time: number;
   pauseHistory: PauseHistoryData[];
   pauseHistoryIndex: number;
 }
@@ -76,6 +77,7 @@ const initialState: PauseState = {
   },
   id: undefined,
   pausePreviewLocation: null,
+  time: 0,
   ...resumedPauseState,
   pauseHistory: [],
   pauseHistoryIndex: -1,
@@ -112,8 +114,8 @@ export const executeCommandOperation = createAsyncThunk<
     ThreadFront.timeWarp(point, time, !!frame);
   } else {
     ThreadFront.emit("paused", {
-      point: ThreadFront.currentPoint,
-      time: ThreadFront.currentTime,
+      point: getExecutionPoint(state),
+      time: getTime(state),
       openSource: true,
     });
   }
@@ -131,7 +133,19 @@ const pauseSlice = createSlice({
   name: "pause",
   initialState,
   reducers: {
-    pauseRequestedAt(state) {
+    pauseRequestedAt(
+      state,
+      action: PayloadAction<{
+        executionPoint: string;
+        time: number;
+      }>
+    ) {
+      const { executionPoint, time } = action.payload;
+      Object.assign(state, {
+        id: undefined,
+        executionPoint,
+        time,
+      });
       state.threadcx.isPaused = true;
     },
     paused(
@@ -147,6 +161,7 @@ const pauseSlice = createSlice({
       Object.assign(state, {
         id,
         executionPoint,
+        time,
       });
 
       state.selectedFrameId = frame ? { pauseId: frame.pauseId, frameId: frame.protocolId } : null;
@@ -237,6 +252,10 @@ export function getSelectedFrameId(state: UIState) {
 
 export function getExecutionPoint(state: UIState) {
   return state.pause.executionPoint;
+}
+
+export function getTime(state: UIState) {
+  return state.pause.time;
 }
 
 export function getPauseId(state: UIState) {

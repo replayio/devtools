@@ -16,6 +16,7 @@ import {
   getExecutionPoint,
   getPauseId,
   getThreadContext,
+  getTime,
 } from "devtools/client/debugger/src/reducers/pause";
 import { highlightNode, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 import ErrorBoundary from "replay-next/components/ErrorBoundary";
@@ -133,6 +134,7 @@ export function ReactDevtoolsPanel() {
   const componentPickerActive = useAppSelector(getIsReactComponentPickerActive);
   const currentPoint = useAppSelector(getExecutionPoint);
   const previousPoint = usePrevious(currentPoint);
+  const currentTime = useAppSelector(getTime);
   const isFirstAnnotationsInjection = useRef(true);
   const [, forceRender] = useReducer(c => c + 1, 0);
 
@@ -260,7 +262,7 @@ export function ReactDevtoolsPanel() {
       // Inject the RDT backend and prefetch node IDs
       wall.setUpRDTInternalsForCurrentPause();
     }
-  }, [currentPoint, wall]);
+  }, [currentPoint, currentTime, wall]);
 
   if (currentPoint === null) {
     return null;

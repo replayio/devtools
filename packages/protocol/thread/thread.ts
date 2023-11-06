@@ -30,48 +30,19 @@ export interface PauseEventArgs {
 type ThreadFrontEvent = "paused" | "resumed";
 
 class _ThreadFront {
-  currentPoint: ExecutionPoint = "0";
-  currentTime: number = 0;
-  private currentPauseId: PauseId | null = null;
-
   // added by EventEmitter.decorate(ThreadFront)
   eventListeners!: Map<ThreadFrontEvent, ((value?: any) => void)[]>;
   on!: (name: ThreadFrontEvent, handler: (value?: any) => void) => void;
   off!: (name: ThreadFrontEvent, handler: (value?: any) => void) => void;
   emit!: (name: ThreadFrontEvent, value?: any) => void;
 
-  /**
-   * This may be null if the pauseId for the current execution point hasn't been
-   * received from the backend yet. Use `await getCurrentPauseId()` instead if possible.
-   */
-  get currentPauseIdUnsafe() {
-    return (
-      this.currentPauseId ??
-      pauseIdCache.getValueIfCached(null as any, this.currentPoint, this.currentTime) ??
-      null
-    );
-  }
-
-  async getCurrentPauseId(replayClient: ReplayClientInterface): Promise<PauseId> {
-    return (
-      this.currentPauseId ??
-      (await pauseIdCache.readAsync(replayClient, this.currentPoint, this.currentTime))
-    );
-  }
-
   timeWarp(point: ExecutionPoint, time: number, openSource: boolean, frame?: Frame) {
-    this.currentPoint = point;
-    this.currentTime = time;
-    this.currentPauseId = null;
     this.emit("paused", { point, time, openSource, frame });
   }
 
   timeWarpToPause(pause: Pause, openSource: boolean) {
     const { point, time, pauseId } = pause;
     assert(point && time, "point or time not set on pause");
-    this.currentPoint = point;
-    this.currentTime = time;
-    this.currentPauseId = pauseId;
     this.emit("paused", { point, time, openSource });
   }
 }

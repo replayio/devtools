@@ -217,7 +217,7 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
 
   await setupApp(store, ThreadFront, replayClient);
   setupTimeline(store);
-  setupGraphics();
+  setupGraphics(store);
 
   networkRequestsCache.prefetch(replayClient);
 

@@ -8,11 +8,13 @@ import {
   nodeSelected,
   nodesHighlighted,
 } from "../reducers/markup";
+import { getCurrentPauseId } from "ui/utils/app";
+import { getPauseId } from "devtools/client/debugger/src/selectors";
 
 export function selectNode(nodeId: string): UIThunkAction {
-  return async (dispatch, getState, { ThreadFront, replayClient, protocolClient }) => {
-    const originalPauseId = await ThreadFront.getCurrentPauseId(replayClient);
-    if (ThreadFront.currentPauseIdUnsafe === originalPauseId) {
+  return async (dispatch, getState, { replayClient }) => {
+    const originalPauseId = await getCurrentPauseId(replayClient, getState());
+    if (getPauseId(getState()) === originalPauseId) {
       dispatch(highlightNode(nodeId, 1000));
       dispatch(nodeSelected(nodeId));
     }
@@ -38,7 +40,7 @@ export function highlightNodes(
 
     if (!pauseId) {
       // We're trying to highlight nodes from the current pause.
-      pauseId = await ThreadFront.getCurrentPauseId(replayClient);
+      pauseId = await getCurrentPauseId(replayClient, getState());
     }
 
     const { highlightedNodes } = getState().markup;
