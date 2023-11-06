@@ -101,13 +101,14 @@ function getSourceIdToVisualizeSuspense(
 
 export function getSourcemapVisualizerURLSuspense(
   replayClient: ReplayClientInterface,
+  recordingId: string | null,
   selectedSource: SourceDetails | null | undefined,
   selectedFrameId: PauseAndFrameId | null,
   sourcesState: SourcesState,
   position?: CursorPosition,
   client?: ReplayClientInterface
 ) {
-  if (!selectedSource) {
+  if (!recordingId || !selectedSource) {
     return null;
   }
   const sourceId = getSourceIdToVisualizeSuspense(
@@ -122,7 +123,7 @@ export function getSourcemapVisualizerURLSuspense(
     return null;
   }
 
-  let href = `/recording/${ThreadFront.recordingId}/sourcemap/${sourceId}`;
+  let href = `/recording/${recordingId}/sourcemap/${sourceId}`;
   const dispatchUrl = new URL(location.href).searchParams.get("dispatch");
   if (dispatchUrl) {
     href += `?dispatch=${dispatchUrl}`;

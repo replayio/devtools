@@ -66,6 +66,7 @@ import {
   setPlaybackStalled,
   setTimelineState,
 } from "../reducers/timeline";
+import { getRecordingId } from "./app";
 import type { UIStore, UIThunkAction } from "./index";
 
 const DEFAULT_FOCUS_WINDOW_PERCENTAGE = 0.3;
@@ -99,6 +100,8 @@ export async function setupTimeline(store: UIStore) {
 
 export function jumpToInitialPausePoint(): UIThunkAction<Promise<void>> {
   return async (dispatch, getState, { ThreadFront, replayClient }) => {
+    const recordingId = getRecordingId(getState());
+    assert(recordingId);
     const endpoint = await sessionEndPointCache.readAsync(replayClient);
     dispatch(pointsReceived([endpoint]));
     let { point, time } = endpoint;
@@ -115,7 +118,7 @@ export function jumpToInitialPausePoint(): UIThunkAction<Promise<void>> {
       return;
     }
 
-    const initialPausePoint = await getInitialPausePoint(ThreadFront.recordingId!);
+    const initialPausePoint = await getInitialPausePoint(recordingId);
     if (initialPausePoint?.point) {
       point = initialPausePoint.point;
     }

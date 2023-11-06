@@ -79,6 +79,7 @@ export type NodePickerType = "reactComponent" | "domElement";
 export type NodePickerStatus = "disabled" | "initializing" | "active";
 
 export interface AppState {
+  accessToken: string | null;
   activeNodePicker: NodePickerType | null;
   awaitingSourcemaps: boolean;
   canvas: Canvas | null;
@@ -95,6 +96,7 @@ export interface AppState {
   mode: AppMode;
   mouseTargetsLoading: boolean;
   recordingDuration: number;
+  recordingId: string | null;
   recordingTarget: RecordingTarget | null;
   recordingWorkspace: Workspace | null;
   selectedCommentId: string | null;

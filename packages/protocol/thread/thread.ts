@@ -34,12 +34,6 @@ class _ThreadFront {
   currentTime: number = 0;
   private currentPauseId: PauseId | null = null;
 
-  // Recording ID being examined.
-  recordingId: RecordingId | null = null;
-
-  // Waiter for the associated session ID.
-  sessionId: SessionId | null = null;
-
   // added by EventEmitter.decorate(ThreadFront)
   eventListeners!: Map<ThreadFrontEvent, ((value?: any) => void)[]>;
   on!: (name: ThreadFrontEvent, handler: (value?: any) => void) => void;
@@ -63,25 +57,6 @@ class _ThreadFront {
       this.currentPauseId ??
       (await pauseIdCache.readAsync(replayClient, this.currentPoint, this.currentTime))
     );
-  }
-
-  async setSessionId(sessionId: SessionId) {
-    this.sessionId = sessionId;
-    assert(sessionId, "there should be a sessionId");
-    // This helps when trying to debug logRocket sessions and the like
-    console.debug({ sessionId });
-  }
-
-  _accessToken: string | null = null;
-
-  getAccessToken(): string | null {
-    return this._accessToken;
-  }
-
-  setAccessToken(accessToken: string) {
-    this._accessToken = accessToken;
-
-    return client.Authentication.setAccessToken({ accessToken });
   }
 
   timeWarp(point: ExecutionPoint, time: number, openSource: boolean, frame?: Frame) {
