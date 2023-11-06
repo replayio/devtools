@@ -5,9 +5,9 @@
 import { AnyAction, PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { FrameId, Location, PauseId, Value } from "@replayio/protocol";
 
+import { ThreadFront } from "protocol/thread";
 import { FindTargetCommand, resumeTargetCache } from "replay-next/src/suspense/ResumeTargetCache";
 import { isPointInRegion } from "shared/utils/time";
-import { seek } from "ui/actions/timeline";
 import { SourceDetails, getPreferredLocation, getSelectedSourceId } from "ui/reducers/sources";
 import { getContextFromAction } from "ui/setup/redux/middleware/context";
 import type { UIState } from "ui/state";
@@ -56,7 +56,6 @@ export interface PauseState {
   pausePreviewLocation: Location | null;
   selectedFrameId: PauseAndFrameId | null;
   executionPoint: string | null;
-  time: number;
   pauseHistory: PauseHistoryData[];
   pauseHistoryIndex: number;
 }
@@ -77,7 +76,6 @@ const initialState: PauseState = {
   },
   id: undefined,
   pausePreviewLocation: null,
-  time: 0,
   ...resumedPauseState,
   pauseHistory: [],
   pauseHistoryIndex: -1,
@@ -88,7 +86,7 @@ export const executeCommandOperation = createAsyncThunk<
   { cx: Context; command: FindTargetCommand },
   { state: UIState; extra: ThunkExtraArgs }
 >("pause/executeCommand", async ({ command }, thunkApi) => {
-  const { dispatch, extra, getState } = thunkApi;
+  const { extra, getState } = thunkApi;
   const { replayClient } = extra;
   const state = getState();
   const focusWindow = replayClient.getCurrentFocusWindow();
@@ -99,7 +97,7 @@ export const executeCommandOperation = createAsyncThunk<
     return { location: null };
   }
 
-  dispatch(resumed());
+  ThreadFront.emit("resumed");
 
   const resumeTarget = await resumeTargetCache.readAsync(
     replayClient,
@@ -111,12 +109,13 @@ export const executeCommandOperation = createAsyncThunk<
 
   if (resumeTarget && isPointInRegion(resumeTarget.point, focusWindow)) {
     const { point, time, frame } = resumeTarget;
-    dispatch(seek({ executionPoint: point, time, openSource: !!frame }));
+    ThreadFront.timeWarp(point, time, !!frame);
   } else {
-    const executionPoint = getExecutionPoint(state);
-    if (executionPoint) {
-      dispatch(seek({ executionPoint, time: getTime(state), openSource: true }));
-    }
+    ThreadFront.emit("paused", {
+      point: ThreadFront.currentPoint,
+      time: ThreadFront.currentTime,
+      openSource: true,
+    });
   }
 
   if (!resumeTarget?.frame) {
@@ -132,19 +131,7 @@ const pauseSlice = createSlice({
   name: "pause",
   initialState,
   reducers: {
-    pauseRequestedAt(
-      state,
-      action: PayloadAction<{
-        executionPoint: string;
-        time: number;
-      }>
-    ) {
-      const { executionPoint, time } = action.payload;
-      Object.assign(state, {
-        id: undefined,
-        executionPoint,
-        time,
-      });
+    pauseRequestedAt(state) {
       state.threadcx.isPaused = true;
     },
     paused(
@@ -160,7 +147,6 @@ const pauseSlice = createSlice({
       Object.assign(state, {
         id,
         executionPoint,
-        time,
       });
 
       state.selectedFrameId = frame ? { pauseId: frame.pauseId, frameId: frame.protocolId } : null;
@@ -251,10 +237,6 @@ export function getSelectedFrameId(state: UIState) {
 
 export function getExecutionPoint(state: UIState) {
   return state.pause.executionPoint;
-}
-
-export function getTime(state: UIState) {
-  return state.pause.time;
 }
 
 export function getPauseId(state: UIState) {

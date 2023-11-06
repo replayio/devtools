@@ -2,6 +2,7 @@ import { Dictionary } from "@reduxjs/toolkit";
 import type { SourceId } from "@replayio/protocol";
 import sortBy from "lodash/sortBy";
 
+import { ThreadFront } from "protocol/thread";
 import { assert } from "protocol/utils";
 import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPositionsCache";
 import { mappedLocationCache } from "replay-next/src/suspense/MappedLocationCache";
@@ -100,14 +101,13 @@ function getSourceIdToVisualizeSuspense(
 
 export function getSourcemapVisualizerURLSuspense(
   replayClient: ReplayClientInterface,
-  recordingId: string | null,
   selectedSource: SourceDetails | null | undefined,
   selectedFrameId: PauseAndFrameId | null,
   sourcesState: SourcesState,
   position?: CursorPosition,
   client?: ReplayClientInterface
 ) {
-  if (!recordingId || !selectedSource) {
+  if (!selectedSource) {
     return null;
   }
   const sourceId = getSourceIdToVisualizeSuspense(
@@ -122,7 +122,7 @@ export function getSourcemapVisualizerURLSuspense(
     return null;
   }
 
-  let href = `/recording/${recordingId}/sourcemap/${sourceId}`;
+  let href = `/recording/${ThreadFront.recordingId}/sourcemap/${sourceId}`;
   const dispatchUrl = new URL(location.href).searchParams.get("dispatch");
   if (dispatchUrl) {
     href += `?dispatch=${dispatchUrl}`;

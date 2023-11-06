@@ -8,11 +8,7 @@ import { FixedSizeList as List } from "react-window";
 
 import { selectLocation } from "devtools/client/debugger/src/actions/sources/select";
 import AccessibleImage from "devtools/client/debugger/src/components/shared/AccessibleImage";
-import {
-  getExecutionPoint,
-  getThreadContext,
-  getTime,
-} from "devtools/client/debugger/src/reducers/pause";
+import { getExecutionPoint, getThreadContext } from "devtools/client/debugger/src/reducers/pause";
 import {
   ReactUpdateScheduled,
   reactRendersIntervalCache,
@@ -25,6 +21,7 @@ import { seek } from "ui/actions/timeline";
 import { JumpToCodeButton, JumpToCodeStatus } from "ui/components/shared/JumpToCodeButton";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { getSourceIdsByUrl } from "ui/reducers/sources";
+import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 import styles from "./ReactReduxPanels.module.css";
@@ -142,7 +139,7 @@ export const getReactDomSourceUrl = createSelector(getSourceIdsByUrl, sourcesByU
 
 export function ReactPanelSuspends() {
   const dispatch = useAppDispatch();
-  const currentTime = useAppSelector(getTime);
+  const currentTime = useAppSelector(getCurrentTime);
   const executionPoint = useAppSelector(getExecutionPoint);
   const { range: focusRange } = useContext(FocusContext);
   const replayClient = useContext(ReplayClientContext);

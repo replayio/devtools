@@ -6,6 +6,7 @@ import {
   jumpToPreviousPause,
 } from "devtools/client/debugger/src/actions/pause/jumps";
 import { openQuickOpen } from "devtools/client/debugger/src/actions/quick-open";
+import { ThreadFront as ThreadFrontType } from "protocol/thread";
 import { ReplayClientInterface } from "shared/client/types";
 import { getSystemColorScheme } from "shared/theme/getSystemColorScheme";
 import { userData } from "shared/user-data/GraphQL/UserData";
@@ -36,7 +37,11 @@ import { UIStore, UIThunkAction } from ".";
 
 export * from "../reducers/app";
 
-export async function setupApp(store: UIStore, replayClient: ReplayClientInterface) {
+export async function setupApp(
+  store: UIStore,
+  ThreadFront: typeof ThreadFrontType,
+  replayClient: ReplayClientInterface
+) {
   replayClient.waitForSession().then(sessionId => {
     store.dispatch(setSessionId(sessionId));
 
@@ -120,7 +125,7 @@ export function loadMouseTargets(): UIThunkAction<Promise<NodeBounds[] | undefin
 }
 
 export function setBreakpointsFromClipboard(): UIThunkAction {
-  return async () => {
+  return async (dispatch, getState, { ThreadFront }) => {
     // TODO [FE-998] Figure out a new implementation that works with IndexedDB instead
     /*
     const currentFocusedElement = document.activeElement;
@@ -163,7 +168,7 @@ export function setBreakpointsFromClipboard(): UIThunkAction {
 }
 
 export function copyBreakpointsToClipboard(): UIThunkAction {
-  return async () => {
+  return async (dispatch, getState, { ThreadFront }) => {
     // TODO [FE-998] Figure out a new implementation that works with IndexedDB instead
     /*
     const storageKey = `${ThreadFront.recordingId!}::points`;

@@ -8,8 +8,7 @@ import {
 } from "react-resizable-panels";
 
 import InspectorContextReduxAdapter from "devtools/client/debugger/src/components/shared/InspectorContextReduxAdapter";
-// eslint-disable-next-line no-restricted-imports
-import { client } from "protocol/socket";
+import { ThreadFront } from "protocol/thread";
 import { ExpandablesContextRoot } from "replay-next/src/contexts/ExpandablesContext";
 import { PointsContextRoot } from "replay-next/src/contexts/points/PointsContext";
 import { SelectedFrameContextRoot } from "replay-next/src/contexts/SelectedFrameContext";
@@ -19,7 +18,6 @@ import { setDefaultTags } from "replay-next/src/utils/telemetry";
 import { getTestEnvironment } from "shared/test-suites/RecordingTestMetadata";
 import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { userData } from "shared/user-data/GraphQL/UserData";
-import { setAccessToken } from "ui/actions/app";
 import { clearTrialExpired, createSocket } from "ui/actions/session";
 import { DevToolsDynamicLoadingMessage } from "ui/components/DevToolsDynamicLoadingMessage";
 import { DevToolsProcessingScreen } from "ui/components/DevToolsProcessingScreen";
@@ -31,7 +29,7 @@ import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { useTrackLoadingIdleTime } from "ui/hooks/tracking";
 import { useGetUserInfo, useUserIsAuthor } from "ui/hooks/users";
 import { getViewMode } from "ui/reducers/layout";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { useAppSelector } from "ui/setup/hooks";
 import { UIState } from "ui/state";
 import {
   endUploadWaitTracking,
@@ -151,7 +149,6 @@ function _DevTools({
   showSupportForm,
   uploadComplete,
 }: DevToolsProps) {
-  const dispatch = useAppDispatch();
   const { isAuthenticated } = useAuth0();
   const recordingId = useGetRecordingId();
   const { recording } = useGetRecording(recordingId);
@@ -210,11 +207,10 @@ function _DevTools({
     token
       .then(async ts => {
         if (ts?.token) {
-          dispatch(setAccessToken(ts.token));
-          await client.Authentication.setAccessToken({ accessToken: ts.token });
+          await ThreadFront.setAccessToken(ts.token);
         }
 
-        createSocket(recordingId);
+        createSocket(recordingId, ThreadFront);
       })
       .catch(() => {
         console.error("Failed to create session");
@@ -223,7 +219,7 @@ function _DevTools({
     return () => {
       clearTrialExpired();
     };
-  }, [dispatch, isAuthenticated, clearTrialExpired, createSocket, recordingId]);
+  }, [isAuthenticated, clearTrialExpired, createSocket, recordingId]);
 
   useEffect(() => {
     if (uploadComplete && loadingFinished) {

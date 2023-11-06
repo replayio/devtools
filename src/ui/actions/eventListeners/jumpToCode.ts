@@ -12,6 +12,7 @@ import { Cache, createCache } from "suspense";
 
 import { selectLocation } from "devtools/client/debugger/src/actions/sources/select";
 import { getThreadContext } from "devtools/client/debugger/src/reducers/pause";
+import type { ThreadFront as TF } from "protocol/thread";
 import { RecordingTarget, recordingTargetCache } from "replay-next/src/suspense/BuildIdCache";
 import { eventCountsCache, eventPointsCache } from "replay-next/src/suspense/EventsCache";
 import { topFrameCache } from "replay-next/src/suspense/FrameCache";
@@ -69,6 +70,7 @@ const USER_INTERACTION_IGNORABLE_URLS = [
 export const nextInteractionEventCache: Cache<
   [
     replayClient: ReplayClientInterface,
+    ThreadFront: typeof TF,
     point: ExecutionPoint,
     end: TimeStampedPoint,
     replayEventType: InteractionEventKind,
@@ -78,8 +80,8 @@ export const nextInteractionEventCache: Cache<
 > = createCache({
   config: { immutable: true },
   debugLabel: "NextInteractionEvent",
-  getKey: ([replayClient, point, end, replayEventType]) => point,
-  load: async ([replayClient, point, end, replayEventType, sourcesState]) => {
+  getKey: ([replayClient, threadFront, point, end, replayEventType]) => point,
+  load: async ([replayClient, threadFront, point, end, replayEventType, sourcesState]) => {
     const recordingTarget = await recordingTargetCache.readAsync(replayClient);
 
     // Limit to browsers
@@ -178,7 +180,7 @@ export function jumpToClickEventFunctionLocation(
   event: PointWithEventType,
   end?: TimeStampedPoint
 ): UIThunkAction<Promise<JumpToCodeStatus>> {
-  return async (dispatch, getState, { replayClient }) => {
+  return async (dispatch, getState, { ThreadFront, replayClient }) => {
     const { point: executionPoint, time } = event;
     const sourcesState = getState().sources;
 
@@ -217,6 +219,7 @@ export function jumpToClickEventFunctionLocation(
       // within a small time window
       const nextClickEvent = await nextInteractionEventCache.readAsync(
         replayClient,
+        ThreadFront,
         executionPoint,
         actualEnd,
         event.kind as InteractionEventKind,
@@ -234,6 +237,7 @@ export function jumpToClickEventFunctionLocation(
       );
 
       const functionSourceLocation = await eventListenerLocationCache.readAsync(
+        ThreadFront,
         replayClient,
         getState,
         pauseId,
@@ -296,6 +300,7 @@ export function jumpToClickEventFunctionLocation(
 // it accepts a state getter function but does not reflect the state it reads as part of the cache key.
 export const eventListenerLocationCache: Cache<
   [
+    ThreadFront: typeof TF,
     replayClient: ReplayClientInterface,
     getState: () => UIState,
     pauseId: string,
@@ -305,8 +310,9 @@ export const eventListenerLocationCache: Cache<
 > = createCache({
   config: { immutable: true },
   debugLabel: "EventListenerLocation",
-  getKey: ([replayClient, getState, pauseId, replayEventType]) => `${pauseId}:${replayEventType}`,
-  load: async ([replayClient, getState, pauseId, replayEventType]) => {
+  getKey: ([threadFront, replayClient, getState, pauseId, replayEventType]) =>
+    `${pauseId}:${replayEventType}`,
+  load: async ([threadFront, replayClient, getState, pauseId, replayEventType]) => {
     const topFrame = await topFrameCache.readAsync(replayClient, pauseId);
 
     if (!topFrame) {

@@ -1,15 +1,4 @@
-import { PauseId, TimeStampedPointRange } from "@replayio/protocol";
-
-import {
-  getExecutionPoint,
-  getPauseId,
-  getTime,
-} from "devtools/client/debugger/src/reducers/pause";
-import { assert } from "protocol/utils";
-import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
-import { ReplayClientInterface } from "shared/client/types";
-import { UIState } from "ui/state";
-
+import { TimeStampedPointRange } from "@replayio/protocol";
 export type TimeRange = {
   start: number;
   end: number;
@@ -38,18 +27,4 @@ export function getNonLoadingRegionTimeRanges(
   }
 
   return nonLoadingRegions;
-}
-
-export async function getCurrentPauseId(
-  replayClient: ReplayClientInterface,
-  state: UIState
-): Promise<PauseId> {
-  const pauseId = getPauseId(state);
-  if (pauseId) {
-    return pauseId;
-  }
-  const point = getExecutionPoint(state);
-  assert(point);
-  const time = getTime(state);
-  return pauseIdCache.readAsync(replayClient, point, time);
 }
