@@ -29,19 +29,6 @@ export interface PauseEventArgs {
 
 type ThreadFrontEvent = "paused" | "resumed";
 
-// Temporary experimental feature flag
-interface Features {
-  chromiumRepaints: boolean;
-  repaintEvaluations: boolean;
-}
-export let features: Features = {
-  chromiumRepaints: false,
-  repaintEvaluations: false,
-};
-export function setFeatures(f: Features): void {
-  features = f;
-}
-
 class _ThreadFront {
   currentPoint: ExecutionPoint = "0";
   currentTime: number = 0;

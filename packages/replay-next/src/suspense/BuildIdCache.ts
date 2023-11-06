@@ -1,7 +1,7 @@
 import { createSingleEntryCache } from "suspense";
 
-import { features } from "protocol/thread/thread";
 import { ReplayClientInterface } from "shared/client/types";
+import { userData } from "shared/user-data/GraphQL/UserData";
 
 export const buildIdCache = createSingleEntryCache<[replayClient: ReplayClientInterface], string>({
   config: { immutable: true },
@@ -99,7 +99,7 @@ function getRecordingCapabilities(
         supportsElementsInspector: true,
         supportsEventTypes: true,
         supportsNetworkRequests: false,
-        supportsRepaintingGraphics: features.chromiumRepaints,
+        supportsRepaintingGraphics: userData.get("protocol_chromiumRepaints"),
         supportsPureEvaluation: false,
         supportsObjectIdLookupsInEvaluations,
       };
