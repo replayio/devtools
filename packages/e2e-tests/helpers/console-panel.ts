@@ -94,10 +94,12 @@ export async function toggleConsoleMessageType(
   // because the latter wil sometimes fail prematurely if the checkbox state doesn't change quickly enough
   // Note this requires us to verify the initial state of the checkbox before clicking
   const checkbox = getConsoleMessageTypeCheckbox(page, type);
-  const isChecked = await checkbox.isChecked();
-  if (isChecked !== enabled) {
-    await checkbox.click({ timeout: 500 });
-  }
+  await waitFor(async () => {
+    const isChecked = await checkbox.isChecked();
+    if (isChecked !== enabled) {
+      await checkbox.click();
+    }
+  });
 }
 
 export async function executeTerminalExpression(
