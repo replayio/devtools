@@ -8,6 +8,7 @@ import {
   ExperimentalSettings,
   createSession,
 } from "protocol/socket";
+import { ThreadFront as ThreadFrontType } from "protocol/thread";
 import { assert } from "protocol/utils";
 import { recordingTargetCache } from "replay-next/src/suspense/BuildIdCache";
 import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
@@ -150,11 +151,22 @@ function isSourceContentsCommandResponse(
 // NOTE: This thunk is dispatched _before_ the rest of the devtools logic
 // is initialized, so `extra.ThreadFront` isn't available yet.
 // We pass `ThreadFront` in as an arg here instead.
-export function createSocket(recordingId: string): UIThunkAction {
+export function createSocket(
+  recordingId: string,
+  ThreadFront: typeof ThreadFrontType
+): UIThunkAction {
   return async (dispatch, getState, { replayClient }) => {
+    assert(recordingId, "no recordingId");
     try {
-      assert(recordingId, "no recordingId");
-      dispatch(actions.setRecordingId(recordingId));
+      if (ThreadFront.recordingId) {
+        assert(
+          recordingId === ThreadFront.recordingId,
+          "Can't create a session for 2 different recordings"
+        );
+        return;
+      }
+      ThreadFront.recordingId = recordingId;
+
       const [userInfo, recording] = await Promise.all([getUserInfo(), getRecording(recordingId)]);
       assert(recording, "failed to load recording");
 
@@ -310,6 +322,7 @@ export function createSocket(recordingId: string): UIThunkAction {
 
       window.sessionId = sessionId;
       await replayClient.configure(sessionId);
+      ThreadFront.setSessionId(sessionId);
       const recordingTarget = await recordingTargetCache.readAsync(replayClient);
       dispatch(actions.setRecordingTarget(recordingTarget));
 

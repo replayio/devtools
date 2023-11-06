@@ -109,7 +109,7 @@ function diffStates() {
 async function evaluateNoArgsFunction(
   replayClient: ReplayClientInterface,
   fn: Function,
-  pauseId: string,
+  pauseId?: string,
   frameId?: string
 ) {
   return await evaluate({

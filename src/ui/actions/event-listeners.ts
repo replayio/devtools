@@ -2,7 +2,6 @@
 
 import { cachePauseData } from "replay-next/src/suspense/PauseCache";
 import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
-import { getCurrentPauseId } from "ui/utils/app";
 
 import {
   REACT_16_EVENT_LISTENER_PROP_KEY,
@@ -25,9 +24,9 @@ export function getNodeEventListeners(
   nodeId: string,
   pauseId?: string
 ): UIThunkAction<Promise<FormattedEventListener[]>> {
-  return async (dispatch, getState, { replayClient, objectCache }) => {
+  return async (dispatch, getState, { ThreadFront, protocolClient, replayClient, objectCache }) => {
     if (!pauseId) {
-      pauseId = await getCurrentPauseId(replayClient, getState());
+      pauseId = await ThreadFront.getCurrentPauseId(replayClient);
     }
 
     if (!eventListenersCacheByPause.has(pauseId)) {

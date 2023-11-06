@@ -1,5 +1,4 @@
 import { PayloadAction, createSelector, createSlice } from "@reduxjs/toolkit";
-import { RecordingId } from "@replayio/protocol";
 
 import { RecordingTarget } from "replay-next/src/suspense/BuildIdCache";
 import { compareExecutionPoints } from "replay-next/src/utils/time";
@@ -21,7 +20,6 @@ import {
 } from "ui/state/app";
 
 export const initialAppState: AppState = {
-  accessToken: null,
   activeNodePicker: null,
   awaitingSourcemaps: false,
   canvas: null,
@@ -38,7 +36,6 @@ export const initialAppState: AppState = {
   mode: "devtools",
   mouseTargetsLoading: false,
   recordingDuration: 0,
-  recordingId: null,
   recordingTarget: null,
   recordingWorkspace: null,
   selectedCommentId: null,
@@ -54,12 +51,6 @@ const appSlice = createSlice({
   name: "app",
   initialState: initialAppState,
   reducers: {
-    setAccessToken(state, action: PayloadAction<string>) {
-      state.accessToken = action.payload;
-    },
-    setRecordingId(state, action: PayloadAction<RecordingId>) {
-      state.recordingId = action.payload;
-    },
     setMouseTargetsLoading(state, action: PayloadAction<boolean>) {
       state.mouseTargetsLoading = action.payload;
     },
@@ -152,8 +143,6 @@ const appSlice = createSlice({
 });
 
 export const {
-  setAccessToken,
-  setRecordingId,
   clearExpectedError,
   setAppMode,
   setAwaitingSourcemaps,
@@ -184,8 +173,6 @@ export default appSlice.reducer;
 const getSelectedPanel = (state: UIState) => state.layout.selectedPanel;
 const getViewMode = (state: UIState) => state.layout.viewMode;
 
-export const getAccessToken = (state: UIState) => state.app.accessToken;
-export const getRecordingId = (state: UIState) => state.app.recordingId;
 export const isInspectorSelected = (state: UIState) =>
   getViewMode(state) === "dev" && getSelectedPanel(state) == "inspector";
 export const getRecordingDuration = (state: UIState) => state.app.recordingDuration;

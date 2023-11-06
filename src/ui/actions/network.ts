@@ -13,7 +13,6 @@ import { sourcesCache } from "replay-next/src/suspense/SourcesCache";
 import { isPointInRegion } from "shared/utils/time";
 import { RequestSummary } from "ui/components/NetworkMonitor/utils";
 
-import { seek } from "./timeline";
 import { UIThunkAction } from ".";
 
 type ShowRequestDetailsAction = {
@@ -41,7 +40,7 @@ export function showRequestDetails(requestId: RequestId) {
 }
 
 export function selectNetworkRequest(requestId: RequestId): UIThunkAction {
-  return async (dispatch, getState, { replayClient }) => {
+  return async (dispatch, getState, { ThreadFront, replayClient }) => {
     let state = getState();
 
     const stream = networkRequestsCache.stream(replayClient);
@@ -85,7 +84,8 @@ export function seekToRequestFrame(
   frame: Frame,
   cx: Context
 ): UIThunkAction {
-  return async (dispatch, getState, { replayClient }) => {
+  return async (dispatch, getState, { ThreadFront, replayClient }) => {
+    const state = getState();
     const focusWindow = replayClient.getCurrentFocusWindow();
     const point = request.point;
 
@@ -94,6 +94,6 @@ export function seekToRequestFrame(
       return;
     }
 
-    dispatch(seek({ executionPoint: point.point, time: point.time, openSource: true }));
+    ThreadFront.timeWarp(point.point, point.time, true, frame);
   };
 }

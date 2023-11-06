@@ -1,10 +1,10 @@
 import { useApolloClient } from "@apollo/client";
 import { ReactNode, useCallback, useMemo } from "react";
 
+import { ThreadFront } from "protocol/thread";
 import { SessionContext, SessionContextType } from "replay-next/src/contexts/SessionContext";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import { useGetUserInfo } from "ui/hooks/users";
-import { getAccessToken, getSessionId } from "ui/reducers/app";
 import { getPoints, getRecordingDuration } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
 import { trackEventOnce } from "ui/utils/mixpanel";
@@ -27,27 +27,25 @@ export default function SessionContextAdapter({
     });
   }, [apolloClient]);
 
-  const accessToken = useAppSelector(getAccessToken);
-  const sessionId = useAppSelector(getSessionId);
   const duration = useAppSelector(getRecordingDuration)!;
   const receivedPoints = useAppSelector(getPoints);
   const endpoint = receivedPoints[receivedPoints.length - 1];
 
   const sessionContext = useMemo<SessionContextType>(
     () => ({
-      accessToken: apiKey || accessToken,
+      accessToken: apiKey || ThreadFront.getAccessToken(),
       currentUserInfo,
       duration,
       endpoint: endpoint.point,
       recordingId,
-      sessionId: sessionId!,
+      sessionId: ThreadFront.sessionId!,
       refetchUser,
       // Convince TS that the function types line up, since the
       // context version just accepts `string` and not `MixPanelEvent`
       trackEvent: trackEvent as SessionContextType["trackEvent"],
       trackEventOnce: trackEventOnce as SessionContextType["trackEventOnce"],
     }),
-    [accessToken, apiKey, currentUserInfo, duration, endpoint, recordingId, refetchUser, sessionId]
+    [apiKey, currentUserInfo, duration, endpoint, recordingId, refetchUser]
   );
 
   return <SessionContext.Provider value={sessionContext}>{children}</SessionContext.Provider>;

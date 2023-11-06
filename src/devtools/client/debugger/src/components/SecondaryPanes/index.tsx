@@ -1,7 +1,8 @@
 import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
+import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
 
-import { getExecutionPoint, getTime } from "../../selectors";
+import { getExecutionPoint } from "../../selectors";
 import BreakpointsPane from "./BreakpointsPane";
 import CommandBar from "./CommandBar";
 import NewFrames from "./Frames/NewFrames";
@@ -13,7 +14,7 @@ import { Accordion, AccordionPane } from "@recordreplay/accordion";
 
 export default function SecondaryPanes() {
   const currentPoint = useAppSelector(getExecutionPoint);
-  const currentTime = useAppSelector(getTime);
+  const currentTime = useAppSelector(getCurrentTime);
 
   const [scopesVisible, setScopesVisible] = useGraphQLUserData("layout_scopesPanelExpanded");
   const [callStackVisible, setCallStackVisible] = useGraphQLUserData(
