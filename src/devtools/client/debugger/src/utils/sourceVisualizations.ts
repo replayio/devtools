@@ -2,7 +2,6 @@ import { Dictionary } from "@reduxjs/toolkit";
 import type { SourceId } from "@replayio/protocol";
 import sortBy from "lodash/sortBy";
 
-import { ThreadFront } from "protocol/thread";
 import { assert } from "protocol/utils";
 import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPositionsCache";
 import { mappedLocationCache } from "replay-next/src/suspense/MappedLocationCache";

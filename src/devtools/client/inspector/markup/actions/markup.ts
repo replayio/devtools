@@ -1,6 +1,8 @@
+import { getPauseId } from "devtools/client/debugger/src/selectors";
 import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
 import type { UIThunkAction } from "ui/actions";
 import { boxModelCache } from "ui/suspense/nodeCaches";
+import { getCurrentPauseId } from "ui/utils/app";
 
 import {
   nodeBoxModelsLoaded,
@@ -8,8 +10,6 @@ import {
   nodeSelected,
   nodesHighlighted,
 } from "../reducers/markup";
-import { getCurrentPauseId } from "ui/utils/app";
-import { getPauseId } from "devtools/client/debugger/src/selectors";
 
 export function selectNode(nodeId: string): UIThunkAction {
   return async (dispatch, getState, { replayClient }) => {
@@ -28,7 +28,7 @@ export function highlightNodes(
   pauseId?: string,
   duration?: number
 ): UIThunkAction {
-  return async (dispatch, getState, { ThreadFront, protocolClient, replayClient }) => {
+  return async (dispatch, getState, { replayClient }) => {
     const recordingCapabilities = await recordingCapabilitiesCache.readAsync(replayClient);
     if (!recordingCapabilities.supportsRepaintingGraphics) {
       return;

@@ -1,7 +1,6 @@
 import { useApolloClient } from "@apollo/client";
 import { ReactNode, useCallback, useMemo } from "react";
 
-import { ThreadFront } from "protocol/thread";
 import { SessionContext, SessionContextType } from "replay-next/src/contexts/SessionContext";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import { useGetUserInfo } from "ui/hooks/users";

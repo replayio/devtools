@@ -5,9 +5,9 @@
 import { AnyAction, PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { FrameId, Location, PauseId, Value } from "@replayio/protocol";
 
-import { ThreadFront } from "protocol/thread";
 import { FindTargetCommand, resumeTargetCache } from "replay-next/src/suspense/ResumeTargetCache";
 import { isPointInRegion } from "shared/utils/time";
+import { seek } from "ui/actions/timeline";
 import { SourceDetails, getPreferredLocation, getSelectedSourceId } from "ui/reducers/sources";
 import { getContextFromAction } from "ui/setup/redux/middleware/context";
 import type { UIState } from "ui/state";
@@ -88,7 +88,7 @@ export const executeCommandOperation = createAsyncThunk<
   { cx: Context; command: FindTargetCommand },
   { state: UIState; extra: ThunkExtraArgs }
 >("pause/executeCommand", async ({ command }, thunkApi) => {
-  const { extra, getState } = thunkApi;
+  const { dispatch, extra, getState } = thunkApi;
   const { replayClient } = extra;
   const state = getState();
   const focusWindow = replayClient.getCurrentFocusWindow();
@@ -99,7 +99,7 @@ export const executeCommandOperation = createAsyncThunk<
     return { location: null };
   }
 
-  ThreadFront.emit("resumed");
+  dispatch(resumed());
 
   const resumeTarget = await resumeTargetCache.readAsync(
     replayClient,
@@ -111,13 +111,12 @@ export const executeCommandOperation = createAsyncThunk<
 
   if (resumeTarget && isPointInRegion(resumeTarget.point, focusWindow)) {
     const { point, time, frame } = resumeTarget;
-    ThreadFront.timeWarp(point, time, !!frame);
+    dispatch(seek({ executionPoint: point, time, openSource: !!frame }));
   } else {
-    ThreadFront.emit("paused", {
-      point: getExecutionPoint(state),
-      time: getTime(state),
-      openSource: true,
-    });
+    const executionPoint = getExecutionPoint(state);
+    if (executionPoint) {
+      dispatch(seek({ executionPoint, time: getTime(state), openSource: true }));
+    }
   }
 
   if (!resumeTarget?.frame) {

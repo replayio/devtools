@@ -9,10 +9,10 @@ import {
 } from "@replayio/protocol";
 import clamp from "lodash/clamp";
 
+import { paused } from "devtools/client/debugger/src/actions/pause";
 import { resumed } from "devtools/client/debugger/src/reducers/pause";
 import { unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 import {
-  addLastScreen,
   addScreenForPoint,
   gPaintPoints,
   getFirstMeaningfulPaint,
@@ -23,11 +23,8 @@ import {
   nextPaintOrMouseEvent,
   paintGraphics,
   previousPaintEvent,
-  repaintAtPause,
   timeIsBeyondKnownPaints,
 } from "protocol/graphics";
-import { ThreadFront } from "protocol/thread";
-import { PauseEventArgs } from "protocol/thread/thread";
 import { waitForTime } from "protocol/utils";
 import {
   pointsBoundingTimeCache,
@@ -74,10 +71,6 @@ export const MAX_FOCUS_REGION_DURATION = 60_000;
 export const MIN_FOCUS_REGION_DURATION = 0;
 
 export async function setupTimeline(store: UIStore) {
-  const dispatch = store.dispatch;
-
-  ThreadFront.on("paused", args => dispatch(onPaused(args)));
-
   const shortcuts = new KeyShortcuts({
     Left: ev => {
       if (!ev.target || !isEditableElement(ev.target)) {
@@ -99,7 +92,7 @@ export async function setupTimeline(store: UIStore) {
 }
 
 export function jumpToInitialPausePoint(): UIThunkAction<Promise<void>> {
-  return async (dispatch, getState, { ThreadFront, replayClient }) => {
+  return async (dispatch, getState, { replayClient }) => {
     const recordingId = getRecordingId(getState());
     assert(recordingId);
     const endpoint = await sessionEndPointCache.readAsync(replayClient);
@@ -114,7 +107,7 @@ export function jumpToInitialPausePoint(): UIThunkAction<Promise<void>> {
     );
 
     if (isTest()) {
-      ThreadFront.timeWarp(point, time, false);
+      dispatch(seek({ executionPoint: point, time, openSource: false }));
       return;
     }
 
@@ -125,7 +118,7 @@ export function jumpToInitialPausePoint(): UIThunkAction<Promise<void>> {
     if (initialPausePoint?.time) {
       time = initialPausePoint.time;
     }
-    ThreadFront.timeWarp(point, time, true);
+    dispatch(seek({ executionPoint: point, time, openSource: true }));
   };
 }
 
@@ -146,21 +139,6 @@ export async function getInitialPausePoint(recordingId: string) {
     const { point, time } = firstMeaningfulPaint;
     return { point, time };
   }
-}
-
-function onPaused({ point, time }: PauseEventArgs): UIThunkAction {
-  return async (dispatch, getState, { replayClient }) => {
-    const focusWindow = replayClient.getCurrentFocusWindow();
-    const params: Omit<PauseEventArgs, "openSource"> & {
-      focusWindow: TimeStampedPointRange | null;
-    } = {
-      focusWindow,
-      point,
-      time,
-    };
-    updatePausePointParams(params);
-    dispatch(setTimelineState({ currentTime: time, playback: null }));
-  };
 }
 
 export function setHoverTime(time: number | null, updateGraphics = true): UIThunkAction {
@@ -236,7 +214,7 @@ export function seek({
   pauseId?: PauseId;
   time: number;
 }): UIThunkAction<void> {
-  return async (dispatch, getState, { replayClient, ThreadFront }) => {
+  return async (dispatch, getState, { replayClient }) => {
     // If no ExecutionPoint provided, map time to nearest ExecutionPoint
     if (executionPoint == null) {
       time = await clampTime(replayClient, time);
@@ -259,11 +237,15 @@ export function seek({
 
     assert(executionPoint != null, `Could not find execution point for time ${time}`);
 
-    if (pauseId) {
-      ThreadFront.timeWarpToPause({ point: executionPoint, time, pauseId }, openSource);
-    } else {
-      ThreadFront.timeWarp(executionPoint, time, openSource);
-    }
+    dispatch(paused({ executionPoint, time, openSource }));
+
+    const focusWindow = replayClient.getCurrentFocusWindow();
+    updatePausePointParams({
+      focusWindow,
+      point: executionPoint,
+      time,
+    });
+    dispatch(setTimelineState({ currentTime: time, playback: null }));
 
     if (autoPlay) {
       dispatch(startPlayback());

@@ -10,7 +10,6 @@ import {
 import InspectorContextReduxAdapter from "devtools/client/debugger/src/components/shared/InspectorContextReduxAdapter";
 // eslint-disable-next-line no-restricted-imports
 import { client } from "protocol/socket";
-import { ThreadFront } from "protocol/thread";
 import { ExpandablesContextRoot } from "replay-next/src/contexts/ExpandablesContext";
 import { PointsContextRoot } from "replay-next/src/contexts/points/PointsContext";
 import { SelectedFrameContextRoot } from "replay-next/src/contexts/SelectedFrameContext";

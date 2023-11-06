@@ -8,7 +8,6 @@ import {
   ExperimentalSettings,
   createSession,
 } from "protocol/socket";
-import { ThreadFront as ThreadFrontType } from "protocol/thread";
 import { assert } from "protocol/utils";
 import { recordingTargetCache } from "replay-next/src/suspense/BuildIdCache";
 import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";

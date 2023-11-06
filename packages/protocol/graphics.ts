@@ -7,17 +7,18 @@ import {
   getPauseId,
   getTime,
 } from "devtools/client/debugger/src/reducers/pause";
+import { paused } from "devtools/client/debugger/src/reducers/pause";
 import {
   recordingCapabilitiesCache,
   recordingTargetCache,
 } from "replay-next/src/suspense/BuildIdCache";
 import { screenshotCache } from "replay-next/src/suspense/ScreenshotCache";
 import { replayClient } from "shared/client/ReplayClientContext";
+import { startAppListening } from "ui/setup/listenerMiddleware";
 import { AppStore } from "ui/setup/store";
 import { getCurrentPauseId } from "ui/utils/app";
 
 import { repaintGraphics } from "./repainted-graphics-cache";
-import { ThreadFront } from "./thread";
 import { assert, binarySearch, defer } from "./utils";
 
 const repaintedScreenshots: Map<string, ScreenShot> = new Map();
@@ -203,21 +204,24 @@ export function setupGraphics(store: AppStore) {
     );
   }
 
-  ThreadFront.on("paused", async ({ point, time }) => {
-    const { screen, mouse } = await getGraphicsAtTime(time);
+  startAppListening({
+    actionCreator: paused,
+    effect: async ({ payload: { executionPoint, time } }) => {
+      const { screen, mouse } = await getGraphicsAtTime(time);
 
-    if (point !== getExecutionPoint(store.getState())) {
-      return;
-    }
-    if (screen) {
-      paintGraphics(screen, mouse);
-    }
+      if (executionPoint !== getExecutionPoint(store.getState())) {
+        return;
+      }
+      if (screen) {
+        paintGraphics(screen, mouse);
+      }
 
-    if (typeof onPausedAtTime === "function") {
-      onPausedAtTime(time);
-    }
+      if (typeof onPausedAtTime === "function") {
+        onPausedAtTime(time);
+      }
 
-    await repaint();
+      await repaint();
+    },
   });
 }
 

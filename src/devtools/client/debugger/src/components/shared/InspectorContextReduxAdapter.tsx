@@ -9,10 +9,10 @@ import { ReactNode, useCallback, useMemo } from "react";
 import { getPauseId } from "devtools/client/debugger/src/reducers/pause";
 import { selectNode } from "devtools/client/inspector/markup/actions/markup";
 import { onViewSourceInDebugger } from "devtools/client/webconsole/actions";
-import { ThreadFront } from "protocol/thread";
 import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
 import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { setSelectedPanel, setSelectedPrimaryPanel, setViewMode } from "ui/actions/layout";
+import { seek } from "ui/actions/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 // Adapter that connects inspect-function and inspect-html-element actions with Redux.
@@ -48,7 +48,7 @@ export default function InspectorContextReduxAdapter({ children }: { children: R
   const inspectHTMLElement = useCallback(
     (protocolValue: ProtocolValue, pauseId: PauseId, point: ExecutionPoint, time: number) => {
       if (pauseId !== currentPauseId) {
-        ThreadFront.timeWarpToPause({ point, time, pauseId }, false);
+        dispatch(seek({ executionPoint: point, time, pauseId, openSource: false }));
       }
       dispatch(selectNode(protocolValue.object!));
       dispatch(setViewMode("dev"));
