@@ -24,7 +24,6 @@
 }
 
 .JumpToCodeButton {
-  display: none;
   font-family: var(--font-family-default);
   font-weight: bold;
   padding: 0 0.125rem;
@@ -39,6 +38,7 @@
   justify-content: center;
   white-space: nowrap;
   cursor: pointer;
+  display: none;
   border-radius: 0 1rem 1rem 0;
 }
 
