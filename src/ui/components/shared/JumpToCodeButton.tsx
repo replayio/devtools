@@ -84,9 +84,9 @@ export function JumpToCodeButton({
       className={jumpToCodeButtonClassname}
       data-test-name="JumpToCode"
     >
-      <div className="flex items-center space-x-1">
+      <div className="flex items-center space-x-1 px-1">
         {isHovered && (
-          <span className="truncate text-white" data-test-name="JumpToCodeButtonLabel">
+          <span className="mx-1 truncate text-white" data-test-name="JumpToCodeButtonLabel">
             {jumpButtonText}
           </span>
         )}
