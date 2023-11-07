@@ -28,6 +28,7 @@ export const testRunsCache = createCache<
 });
 
 export type TestRunRecordings = {
+  testRun: TestRun | null;
   durationMs: number;
   groupedTests: TestGroups | null;
   recordings: Recording[] | null;
@@ -46,27 +47,31 @@ export const testRunDetailsCache = createCache<
   debugLabel: "testRunDetailsCache",
   getKey: ([_, __, workspaceId, testRunId]) => `${workspaceId}:${testRunId}`,
   load: async ([graphQLClient, accessToken, workspaceId, testRunId]) => {
-    const tests = await getTestRunTestsWithRecordingsGraphQL(
+    const testRunNode = await getTestRunTestsWithRecordingsGraphQL(
       graphQLClient,
       accessToken,
       workspaceId,
       testRunId
     );
 
+    const testRun = testRunNode ? processTestRun(testRunNode) : null;
+
     const recordings: Recording[] = [];
     let durationMs = 0;
-    const testsWithRecordings = tests.map<TestRunTestWithRecordings>(test => {
-      durationMs += test.durationMs;
-      const recs = orderBy(test.recordings.map(convertRecording), "date", "desc");
-      recordings.push(...recs);
+    const testsWithRecordings =
+      testRunNode?.tests.map<TestRunTestWithRecordings>(test => {
+        durationMs += test.durationMs;
+        const recs = orderBy(test.recordings.map(convertRecording), "date", "desc");
+        recordings.push(...recs);
 
-      return {
-        ...test,
-        recordings: recs,
-      };
-    });
+        return {
+          ...test,
+          recordings: recs,
+        };
+      }) ?? [];
 
     return {
+      testRun,
       durationMs,
       groupedTests: groupRecordings(testsWithRecordings),
       recordings,

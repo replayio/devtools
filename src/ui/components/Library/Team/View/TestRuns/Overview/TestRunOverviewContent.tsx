@@ -8,19 +8,18 @@ import { RunSummary } from "./RunSummary";
 import styles from "../../../../Library.module.css";
 
 export function TestRunOverviewContent() {
-  const { filterByStatus, filterByText, testRunId, testRunIdForDisplay, testRuns } =
+  const { filterByStatus, filterByText, testRunId, testRunIdForDisplay } =
     useContext(TestRunsContext);
 
-  const { recordings, durationMs } = useTestRunDetailsSuspends(testRunId);
+  const { testRun, recordings, durationMs } = useTestRunDetailsSuspends(testRunId);
 
   const isPending = testRunId !== testRunIdForDisplay;
 
   const hasFilters = filterByStatus !== "all" || filterByText !== "";
-  const testRun = testRuns.find(testRun => testRun.id === testRunId);
 
   let children = null;
   if (testRun && recordings) {
-    if (!hasFilters || testRuns.find(testRun => testRun.id === testRunId)) {
+    if (!hasFilters || testRun) {
       children = (
         <>
           <RunSummary

@@ -11,6 +11,32 @@ export interface GetTestRunRecordings_node_Recording {
   __typename: "Recording";
 }
 
+export interface GetTestRunRecordings_node_Workspace_testRuns_edges_node_results_counts {
+  __typename: "TestRunStats";
+  failed: number;
+  flaky: number;
+  passed: number;
+}
+
+export interface GetTestRunRecordings_node_Workspace_testRuns_edges_node_results {
+  __typename: "TestRunResults";
+  counts: GetTestRunRecordings_node_Workspace_testRuns_edges_node_results_counts;
+}
+
+export interface GetTestRunRecordings_node_Workspace_testRuns_edges_node_source {
+  __typename: "TestRunSource";
+  commitId: string | null;
+  commitTitle: string | null;
+  groupLabel: string | null;
+  isPrimaryBranch: boolean | null;
+  branchName: string | null;
+  prNumber: number | null;
+  prTitle: string | null;
+  repository: string | null;
+  triggerUrl: string | null;
+  user: string | null;
+}
+
 export interface GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_recordings_comments_user {
   __typename: "User";
   id: string;
@@ -47,6 +73,11 @@ export interface GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests {
 
 export interface GetTestRunRecordings_node_Workspace_testRuns_edges_node {
   __typename: "TestRun";
+  id: string;
+  date: any;
+  mode: string | null;
+  results: GetTestRunRecordings_node_Workspace_testRuns_edges_node_results;
+  source: GetTestRunRecordings_node_Workspace_testRuns_edges_node_source;
   tests: GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests[];
 }
 

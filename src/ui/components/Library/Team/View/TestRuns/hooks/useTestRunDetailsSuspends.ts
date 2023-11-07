@@ -14,6 +14,7 @@ export function useTestRunDetailsSuspends(testRunId: string | null) {
   return testRunId
     ? testRunDetailsCache.read(graphQLClient, accessToken?.token ?? null, teamId, testRunId)
     : {
+        testRun: null,
         groupedTests: null,
         recordings: null,
         durationMs: 0,
