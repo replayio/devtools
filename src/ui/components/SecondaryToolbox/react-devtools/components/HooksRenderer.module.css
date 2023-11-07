@@ -30,6 +30,10 @@
 .BuiltInHookName {
   color: var(--object-inspector-expanded-key);
 }
+.BuiltInHookName[data-changed] {
+  background-color: var(--background-color-highlight-change);
+  color: var(--color-highlight-change);
+}
 
 .Spacer {
   display: inline-block;
