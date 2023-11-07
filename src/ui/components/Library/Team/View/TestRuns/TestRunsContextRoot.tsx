@@ -31,6 +31,9 @@ type TestRunsContextType = {
 
 export const TestRunsContext = createContext<TestRunsContextType>(null as any);
 
+type FilterByBranch = "all" | "primary";
+type FilterByStatus = "all" | "failed";
+
 export function TestRunsContextRoot({ children }: { children: ReactNode }) {
   const { teamId, testRunId: defaultTestRunId } = useGetTeamRouteParams();
 
@@ -38,8 +41,14 @@ export function TestRunsContextRoot({ children }: { children: ReactNode }) {
 
   const [testRunId, setTestRunId] = useState<string | null>(defaultTestRunId);
 
-  const [filterByBranch, setFilterByBranch] = useState<"all" | "primary">("all");
-  const [filterByStatus, setFilterByStatus] = useState<"all" | "failed">("all");
+  const [filterByBranch, setFilterByBranch] = useState<FilterByBranch>(() => {
+    const query = new URLSearchParams(window.location.search);
+    return (query.get("filterByBranch") as FilterByBranch) ?? "all";
+  });
+  const [filterByStatus, setFilterByStatus] = useState<FilterByStatus>(() => {
+    const query = new URLSearchParams(window.location.search);
+    return (query.get("filterByStatus") as FilterByStatus) ?? "all";
+  });
 
   const [filterByText, setFilterByText] = useState("");
   const filterByTextDeferred = useDeferredValue(filterByText);
