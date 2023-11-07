@@ -1,6 +1,5 @@
 import { FrameId, PauseId } from "@replayio/protocol";
 
-import { ThreadFront } from "protocol/thread/thread";
 import { ReplayClientInterface } from "shared/client/types";
 
 import { recordingCapabilitiesCache } from "../suspense/BuildIdCache";
@@ -15,14 +14,11 @@ export async function evaluate({
   pure = false,
 }: {
   replayClient: ReplayClientInterface;
-  pauseId?: PauseId;
+  pauseId: PauseId;
   text: string;
   frameId?: FrameId;
   pure?: boolean;
 }) {
-  if (!pauseId) {
-    pauseId = await ThreadFront.getCurrentPauseId(replayClient);
-  }
   const abilities = await recordingCapabilitiesCache.readAsync(replayClient);
   const result = await replayClient.evaluateExpression(
     pauseId,

@@ -10,7 +10,6 @@ import "../src/global-css";
 import "../src/test-prep";
 
 import { SystemProvider } from "design";
-import { setFeatures } from "protocol/thread/thread";
 import DecoratedErrorBoundary from "replay-next/components/ErrorBoundary";
 import { recordData as recordTelemetryData } from "replay-next/src/utils/telemetry";
 import { setUnexpectedError } from "ui/actions/errors";
@@ -28,14 +27,7 @@ import { useLaunchDarkly } from "ui/utils/launchdarkly";
 import { InstallRouteListener } from "ui/utils/routeListener";
 import tokenManager from "ui/utils/tokenManager";
 
-import { userData } from "shared/user-data/GraphQL/UserData";
 import "../src/base.css";
-
-// Expose app feature flags to the protocol through an app-agnostic API.
-setFeatures({
-  chromiumRepaints: userData.get("protocol_chromiumRepaints"),
-  repaintEvaluations: userData.get("protocol_repaintEvaluations")
-});
 
 interface AuthProps {
   apiKey?: string;

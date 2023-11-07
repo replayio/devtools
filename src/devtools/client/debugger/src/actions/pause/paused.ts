@@ -8,6 +8,7 @@ import { framesCache } from "replay-next/src/suspense/FrameCache";
 import { isPointInRegion } from "shared/utils/time";
 import type { UIThunkAction } from "ui/actions";
 import { getSelectedLocation } from "ui/reducers/sources";
+import { getCurrentPauseId } from "ui/utils/app";
 import { trackEvent } from "ui/utils/telemetry";
 
 import {
@@ -32,8 +33,8 @@ export function paused({
   frame?: $FixTypeLater;
   time: number;
 }): UIThunkAction {
-  return async function (dispatch, getState, { ThreadFront, replayClient }) {
-    dispatch(pauseRequestedAt());
+  return async function (dispatch, getState, { replayClient }) {
+    dispatch(pauseRequestedAt({ executionPoint, time }));
 
     const focusWindow = await replayClient.getCurrentFocusWindow();
 
@@ -45,7 +46,7 @@ export function paused({
 
     let pauseId: PauseId;
     try {
-      pauseId = await ThreadFront.getCurrentPauseId(replayClient);
+      pauseId = await getCurrentPauseId(replayClient, getState());
     } catch (e) {
       console.error(e);
       dispatch(pauseCreationFailed(executionPoint));

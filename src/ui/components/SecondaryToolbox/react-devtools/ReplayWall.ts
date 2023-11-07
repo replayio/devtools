@@ -214,8 +214,10 @@ export class ReplayWall implements Wall {
   // send a request to the backend in the recording and the reply to the frontend
   private async sendRequest(event: string, payload: any) {
     const originalPauseId = this.pauseId;
+    assert(originalPauseId, "Must have a pause ID to send a request!");
     const response = await evaluate({
       replayClient: this.replayClient,
+      pauseId: originalPauseId,
       text: ` window.__RECORD_REPLAY_REACT_DEVTOOLS_SEND_MESSAGE__("${event}", ${JSON.stringify(
         payload
       )})`,
@@ -260,15 +262,18 @@ export class ReplayWall implements Wall {
         (${retrieveSelectedReactComponentFunction})()
       `;
 
+      const pauseId = this.pauseId;
+      assert(pauseId);
       const res = await evaluate({
         replayClient: this.replayClient,
+        pauseId,
         text: findSavedComponentFunctionCommand,
       });
 
       if (res?.returned?.object) {
         const componentFunctionPreview = await objectCache.readAsync(
           this.replayClient,
-          this.pauseId!,
+          pauseId,
           res.returned.object,
           "canOverflow"
         );

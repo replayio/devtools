@@ -22,7 +22,6 @@ import {
 } from "protocol/graphics";
 // eslint-disable-next-line no-restricted-imports
 import { addEventListener, initSocket, client as protocolClient } from "protocol/socket";
-import { ThreadFront } from "protocol/thread";
 import { assert } from "protocol/utils";
 import { setPointsReceivedCallback as setAnalysisPointsReceivedCallback } from "replay-next/src/suspense/AnalysisCache";
 import { networkRequestsCache } from "replay-next/src/suspense/NetworkRequestsCache";
@@ -64,7 +63,6 @@ declare global {
     hasAlreadyBootstrapped: boolean;
   }
   interface AppHelpers {
-    threadFront?: typeof ThreadFront;
     actions?: ResolveThunks<typeof actions>;
     selectors?: BoundSelectors;
     debugger?: any;
@@ -157,7 +155,6 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
   ) as ObjectOfJustSelectorsHopefully;
 
   window.app = window.app || {};
-  window.app.threadFront = ThreadFront;
   // @ts-expect-error complains about thunk type mismatches
   window.app.actions = bindActionCreators(actions, store.dispatch);
   window.app.selectors = bindSelectors(store, justSelectors);
@@ -174,7 +171,6 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
   };
 
   const extraThunkArgs: ThunkExtraArgs = {
-    ThreadFront,
     replayClient,
     protocolClient,
     objectCache,
@@ -187,7 +183,7 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
 
   setupSourcesListeners(startAppListening);
 
-  dbgClient.bootstrap(store, ThreadFront, replayClient);
+  dbgClient.bootstrap(store, replayClient);
 
   const socket = initSocket(dispatchUrl);
   if (typeof window !== "undefined") {
@@ -215,9 +211,9 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
     );
   });
 
-  await setupApp(store, ThreadFront, replayClient);
+  await setupApp(store, replayClient);
   setupTimeline(store);
-  setupGraphics();
+  setupGraphics(store);
 
   networkRequestsCache.prefetch(replayClient);
 
