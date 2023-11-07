@@ -1,0 +1,11 @@
+.PropertyName {
+  color: var(--object-inspector-expanded-key);
+}
+.PropertyName[data-changed] {
+  background-color: var(--background-color-highlight-change);
+  color: var(--color-highlight-change);
+}
+
+.Separator {
+  color: var(--object-inspector-separator-color);
+}

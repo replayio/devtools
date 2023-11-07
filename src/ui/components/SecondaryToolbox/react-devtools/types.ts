@@ -101,6 +101,10 @@ export type InspectedReactElement = {
   type: ElementType;
 
   // Replay adds these attributes for the new React DevTools
+  changedContextKeys: string[];
+  changedHooksIds: number[];
+  changedPropsKeys: string[];
+  changedStateKeys: string[];
   contextObjectId: ObjectId | null;
   hooksObjectId: ObjectId | null;
   propsObjectId: ObjectId | null;

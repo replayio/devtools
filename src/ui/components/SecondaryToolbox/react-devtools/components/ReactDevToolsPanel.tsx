@@ -27,7 +27,6 @@ import { SelectedElementLoader } from "ui/components/SecondaryToolbox/react-devt
 import { useReactDevToolsAnnotations } from "ui/components/SecondaryToolbox/react-devtools/hooks/useReactDevToolsAnnotations";
 import { useReplayWall } from "ui/components/SecondaryToolbox/react-devtools/hooks/useReplayWall";
 import { ReactDevToolsListData } from "ui/components/SecondaryToolbox/react-devtools/ReactDevToolsListData";
-import { ReactDevToolsInlineModule } from "ui/components/SecondaryToolbox/react-devtools/types";
 import { SecondaryToolboxLoadingPanel } from "ui/components/SecondaryToolbox/SecondaryToolboxLoadingPanel";
 import {
   ParsedReactDevToolsAnnotation,
