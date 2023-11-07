@@ -24,12 +24,24 @@
 }
 
 .JumpToCodeButton {
-  display: none;
+  font-family: var(--font-family-default);
+  font-weight: bold;
+  padding: 0 0.125rem;
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  box-shadow: 0 0 1px var(--theme-tooltip-shadow);
+  left: 0;
+  top: 0;
+  height: 1.5rem;
+  outline: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  cursor: pointer;
+  display: none;
+  border-radius: 0 1rem 1rem 0;
 }
+
 .ListItem:hover .JumpToCodeButton {
   display: flex;
 }
