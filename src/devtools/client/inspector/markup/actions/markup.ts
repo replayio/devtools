@@ -1,6 +1,8 @@
+import { getPauseId } from "devtools/client/debugger/src/selectors";
 import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
 import type { UIThunkAction } from "ui/actions";
 import { boxModelCache } from "ui/suspense/nodeCaches";
+import { getCurrentPauseId } from "ui/utils/app";
 
 import {
   nodeBoxModelsLoaded,
@@ -10,9 +12,9 @@ import {
 } from "../reducers/markup";
 
 export function selectNode(nodeId: string): UIThunkAction {
-  return async (dispatch, getState, { ThreadFront, replayClient, protocolClient }) => {
-    const originalPauseId = await ThreadFront.getCurrentPauseId(replayClient);
-    if (ThreadFront.currentPauseIdUnsafe === originalPauseId) {
+  return async (dispatch, getState, { replayClient }) => {
+    const originalPauseId = await getCurrentPauseId(replayClient, getState());
+    if (getPauseId(getState()) === originalPauseId) {
       dispatch(highlightNode(nodeId, 1000));
       dispatch(nodeSelected(nodeId));
     }
@@ -26,7 +28,7 @@ export function highlightNodes(
   pauseId?: string,
   duration?: number
 ): UIThunkAction {
-  return async (dispatch, getState, { ThreadFront, protocolClient, replayClient }) => {
+  return async (dispatch, getState, { replayClient }) => {
     const recordingCapabilities = await recordingCapabilitiesCache.readAsync(replayClient);
     if (!recordingCapabilities.supportsRepaintingGraphics) {
       return;
@@ -38,7 +40,7 @@ export function highlightNodes(
 
     if (!pauseId) {
       // We're trying to highlight nodes from the current pause.
-      pauseId = await ThreadFront.getCurrentPauseId(replayClient);
+      pauseId = await getCurrentPauseId(replayClient, getState());
     }
 
     const { highlightedNodes } = getState().markup;

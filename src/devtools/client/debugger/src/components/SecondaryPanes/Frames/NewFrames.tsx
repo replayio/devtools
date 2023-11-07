@@ -10,7 +10,6 @@ import {
   getSelectedFrameId,
   getThreadContext,
 } from "devtools/client/debugger/src/selectors";
-import { ThreadFront } from "protocol/thread/thread";
 import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import { copyToClipboard } from "replay-next/components/sources/utils/clipboard";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
@@ -20,7 +19,7 @@ import { getPointAndTimeForPauseId, pauseIdCache } from "replay-next/src/suspens
 import { sourcesCache } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { isPointInRegion } from "shared/utils/time";
-import { enterFocusMode } from "ui/actions/timeline";
+import { enterFocusMode, seek } from "ui/actions/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { getPauseFramesSuspense } from "ui/suspense/frameCache";
 import { getAsyncParentPauseIdSuspense } from "ui/suspense/util";
@@ -135,7 +134,7 @@ function PauseFrames({
       if (point === null || time === null || !focusWindow || !isPointInRegion(point, focusWindow)) {
         return;
       }
-      ThreadFront.timeWarpToPause({ point, time, pauseId }, true);
+      dispatch(seek({ executionPoint: point, time, pauseId, openSource: true }));
     }
     dispatch(selectFrameAction(cx, frame));
   }

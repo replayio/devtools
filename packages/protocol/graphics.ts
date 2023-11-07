@@ -3,14 +3,22 @@ import { MouseEvent, PaintPoint, ScreenShot, TimeStampedPoint } from "@replayio/
 import maxBy from "lodash/maxBy";
 
 import {
+  getExecutionPoint,
+  getPauseId,
+  getTime,
+} from "devtools/client/debugger/src/reducers/pause";
+import { paused } from "devtools/client/debugger/src/reducers/pause";
+import {
   recordingCapabilitiesCache,
   recordingTargetCache,
 } from "replay-next/src/suspense/BuildIdCache";
 import { screenshotCache } from "replay-next/src/suspense/ScreenshotCache";
 import { replayClient } from "shared/client/ReplayClientContext";
+import { startAppListening } from "ui/setup/listenerMiddleware";
+import { AppStore } from "ui/setup/store";
+import { getCurrentPauseId } from "ui/utils/app";
 
 import { repaintGraphics } from "./repainted-graphics-cache";
-import { ThreadFront } from "./thread";
 import { assert, binarySearch, defer } from "./utils";
 
 const repaintedScreenshots: Map<string, ScreenShot> = new Map();
@@ -142,12 +150,12 @@ export const setHasAllPaintPoints = (newValue: boolean) => {
 export const timeIsBeyondKnownPaints = (time: number) =>
   !hasAllPaintPoints && gPaintPoints[gPaintPoints.length - 1].time < time;
 
-export function setupGraphics() {
+export function setupGraphics(store: AppStore) {
   replayClient.waitForSession().then(async (sessionId: string) => {
     let paintedGraphics = false;
     const maybePaintGraphics = async () => {
       if (!paintedGraphics) {
-        const { screen, mouse } = await getGraphicsAtTime(ThreadFront.currentTime, false, true);
+        const { screen, mouse } = await getGraphicsAtTime(getTime(store.getState()), false, true);
         if (screen) {
           paintedGraphics = true;
           paintGraphics(screen, mouse);
@@ -162,8 +170,8 @@ export function setupGraphics() {
         initialPaintsReceivedWaiter.resolve(null);
       }
       const latestPaint = BigInt(maxBy(paints, p => BigInt(p.point))?.point || 0);
-      const currentPoint = BigInt(ThreadFront.currentPoint);
-      if (currentPoint && latestPaint >= currentPoint) {
+      const currentPoint = getExecutionPoint(store.getState());
+      if (currentPoint && latestPaint >= BigInt(currentPoint)) {
         maybePaintGraphics();
       }
     });
@@ -184,21 +192,36 @@ export function setupGraphics() {
     }
   });
 
-  ThreadFront.on("paused", async ({ point, time }) => {
-    const { screen, mouse } = await getGraphicsAtTime(time);
+  async function repaint() {
+    const state = store.getState();
+    repaintAtPause(
+      getTime(state),
+      await getCurrentPauseId(replayClient, state),
+      (_time, pauseId) => {
+        return pauseId !== getPauseId(store.getState());
+      },
+      false
+    );
+  }
 
-    if (point !== ThreadFront.currentPoint) {
-      return;
-    }
-    if (screen) {
-      paintGraphics(screen, mouse);
-    }
+  startAppListening({
+    actionCreator: paused,
+    effect: async ({ payload: { executionPoint, time } }) => {
+      const { screen, mouse } = await getGraphicsAtTime(time);
 
-    if (typeof onPausedAtTime === "function") {
-      onPausedAtTime(time);
-    }
+      if (executionPoint !== getExecutionPoint(store.getState())) {
+        return;
+      }
+      if (screen) {
+        paintGraphics(screen, mouse);
+      }
 
-    await repaint();
+      if (typeof onPausedAtTime === "function") {
+        onPausedAtTime(time);
+      }
+
+      await repaint();
+    },
   });
 }
 
@@ -245,17 +268,6 @@ export async function fetchScreenshotForPause(pauseId: string, force = false) {
   }
 
   return screenShot;
-}
-
-export async function repaint(force = false) {
-  repaintAtPause(
-    ThreadFront.currentTime,
-    await ThreadFront.getCurrentPauseId(replayClient),
-    (_time, pauseId) => {
-      return pauseId !== ThreadFront.currentPauseIdUnsafe;
-    },
-    force
-  );
 }
 
 export async function repaintAtPause(

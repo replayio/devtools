@@ -1,13 +1,15 @@
 import { useContext } from "react";
 
-import { ThreadFront } from "protocol/thread";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { ProtocolViewerContext } from "ui/components/ProtocolViewer/components/ProtocolViewerContext";
 import { useGetUserInfo } from "ui/hooks/users";
+import { getSessionId } from "ui/reducers/app";
+import { useAppSelector } from "ui/setup/hooks";
 
 export function useBugReportLink() {
   const { requestMap, selectedRequestId } = useContext(ProtocolViewerContext);
   const { recordingId } = useContext(SessionContext);
+  const sessionId = useAppSelector(getSessionId);
 
   const { internal: isInternalUser } = useGetUserInfo();
   if (isInternalUser) {
@@ -22,7 +24,7 @@ export function useBugReportLink() {
         "description",
         [
           `* Recording ID: ${recordingId}`,
-          `* Session ID: ${ThreadFront.sessionId}`,
+          `* Session ID: ${sessionId}`,
           `* Command ID: ${request.id}`,
         ].join("\n")
       );

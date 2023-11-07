@@ -16,6 +16,7 @@ import {
   getExecutionPoint,
   getPauseId,
   getThreadContext,
+  getTime,
 } from "devtools/client/debugger/src/reducers/pause";
 import { highlightNode, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 import ErrorBoundary from "replay-next/components/ErrorBoundary";
@@ -108,16 +109,6 @@ const nodePickerInstance = new NodePickerClass();
 
 const EMPTY_ANNOTATIONS: ParsedReactDevToolsAnnotation[] = [];
 
-function usePrevious<T>(newValue: T) {
-  const previousRef = useRef<T>();
-
-  useLayoutEffect(() => {
-    previousRef.current = newValue;
-  });
-
-  return previousRef.current;
-}
-
 const getIsReactComponentPickerActive = (state: UIState) => {
   const { activeNodePicker, nodePickerStatus } = state.app;
   const isReactComponentPickerActive =
@@ -132,7 +123,8 @@ export function ReactDevtoolsPanel() {
   const replayClient = useContext(ReplayClientContext);
   const componentPickerActive = useAppSelector(getIsReactComponentPickerActive);
   const currentPoint = useAppSelector(getExecutionPoint);
-  const previousPoint = usePrevious(currentPoint);
+  const previousPointRef = useRef(currentPoint);
+  const currentTime = useAppSelector(getTime);
   const isFirstAnnotationsInjection = useRef(true);
   const [, forceRender] = useReducer(c => c + 1, 0);
 
@@ -219,18 +211,21 @@ export function ReactDevtoolsPanel() {
 
     wall.setPauseId(pauseId);
 
-    if (previousPoint && previousPoint !== currentPoint) {
+    if (previousPointRef.current && previousPointRef.current !== currentPoint) {
       // We keep the one RDT UI component instance alive, but operations are additive over time.
       // In order to reset the displayed component tree, we first need to generate a set of fake
       // "remove this React root" operations based on where we _were_ paused, and inject those.
-      const clearTreeOperations = generateTreeResetOpsForPoint(previousPoint, annotations);
+      const clearTreeOperations = generateTreeResetOpsForPoint(
+        previousPointRef.current,
+        annotations
+      );
 
       for (const rootRemovalOp of clearTreeOperations) {
         wall.sendAnnotation({ event: "operations", payload: rootRemovalOp });
       }
     }
 
-    if (previousPoint !== currentPoint || isFirstAnnotationsInjection.current) {
+    if (previousPointRef.current !== currentPoint || isFirstAnnotationsInjection.current) {
       isFirstAnnotationsInjection.current = false;
 
       // Now that the displayed tree is empty, we can inject all operations up to the _current_ point in time.
@@ -240,7 +235,9 @@ export function ReactDevtoolsPanel() {
         }
       }
     }
-  }, [ReactDevTools, wall, previousPoint, currentPoint, annotations, pauseId]);
+
+    previousPointRef.current = currentPoint;
+  }, [ReactDevTools, wall, currentPoint, annotations, pauseId]);
 
   useLayoutEffect(() => {
     return () => {
@@ -260,7 +257,7 @@ export function ReactDevtoolsPanel() {
       // Inject the RDT backend and prefetch node IDs
       wall.setUpRDTInternalsForCurrentPause();
     }
-  }, [currentPoint, wall]);
+  }, [currentPoint, currentTime, wall]);
 
   if (currentPoint === null) {
     return null;
