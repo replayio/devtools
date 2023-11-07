@@ -6,7 +6,6 @@ import { MouseEvent } from "react";
 import { setModal } from "ui/actions/app";
 import { MY_LIBRARY_TEAM } from "ui/components/Library/Team/TeamContextRoot";
 import Icon from "ui/components/shared/Icon";
-import { MY_LIBRARY } from "ui/components/UploadScreen/libraryConstants";
 import { useUpdateDefaultWorkspace } from "ui/hooks/settings";
 import { useAppDispatch } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
@@ -43,25 +42,43 @@ export function TeamButton({
   };
 
   return (
-    <Link
-      href={url}
+    <div
       className={classNames(
-        `${styles.teamRow} group flex flex-row justify-between space-x-2 px-4 py-2 text-left transition duration-200 hover:text-white focus:outline-none`,
-        isSelected ? `${styles.teamRowActive} cursor-auto font-bold` : "cursor-pointer"
+        `flex flex-col ${styles.teamRow} `,
+        isSelected ? `${styles.teamRowActive}` : ""
       )}
-      onClick={onClick}
     >
-      <span className="overflow-hidden overflow-ellipsis whitespace-pre">
-        <div className="flex">
-          <LibraryIcon teamType={isTest ? "tests" : "team"} />
-          {label}
-        </div>
-      </span>
-      {isNew ? (
-        <div className={"rounded-md bg-primaryAccent px-3 py-0.5 text-xs text-white"}>New</div>
-      ) : null}
-      {showSettingsButton ? <SettingsButton /> : null}
-    </Link>
+      <Link
+        href={url}
+        className={classNames(
+          `group flex flex-row justify-between space-x-2 px-4 py-2 text-left transition duration-200 hover:text-white focus:outline-none`,
+          isSelected ? `cursor-auto font-bold` : "cursor-pointer"
+        )}
+        onClick={onClick}
+      >
+        <span className="overflow-hidden overflow-ellipsis whitespace-pre">
+          <div className="flex">
+            <LibraryIcon teamType={isTest ? "tests" : "team"} />
+            {label}
+          </div>
+        </span>
+        {isNew ? (
+          <div className={"rounded-md bg-primaryAccent px-3 py-0.5 text-xs text-white"}>New</div>
+        ) : null}
+        {showSettingsButton ? <SettingsButton /> : null}
+      </Link>
+      {isSelected ? <TestTeamViews /> : null}
+    </div>
+  );
+}
+
+function TestTeamViews() {
+  return (
+    <div className="pl-4 pb-2">
+      <div className="flex flex-col">
+        <div className="px-4 py-1 font-bold">Runs</div>
+      </div>
+    </div>
   );
 }
 
