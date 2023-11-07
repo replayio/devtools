@@ -1,4 +1,4 @@
-import { NodeBounds, Object as ProtocolObject } from "@replayio/protocol";
+import { ExecutionPoint, NodeBounds, PauseId, Object as ProtocolObject } from "@replayio/protocol";
 import { createBridge, createStore, initialize } from "@replayio/react-devtools-inline/frontend";
 import {
   useContext,
@@ -257,7 +257,7 @@ export function ReactDevtoolsPanel() {
       // Inject the RDT backend and prefetch node IDs
       wall.setUpRDTInternalsForCurrentPause();
     }
-  }, [currentPoint, currentTime, wall]);
+  }, [currentPoint, wall]);
 
   if (currentPoint === null) {
     return null;
@@ -343,9 +343,12 @@ export function ReactDevtoolsPanel() {
 
 export default function ReactDevToolsWithErrorBoundary() {
   const replayClient = useContext(ReplayClientContext);
-
+  const pointAndPauseIdRef = useRef<[ExecutionPoint | null, PauseId | null]>([null, null]);
   const pauseId = useAppSelector(getPauseId) ?? null;
   const currentPoint = useAppSelector(getExecutionPoint);
+  if (currentPoint !== pointAndPauseIdRef.current[0] && pauseId) {
+    pointAndPauseIdRef.current = [currentPoint, pauseId];
+  }
 
   const [newReactDevTools] = useGraphQLUserData("feature_newReactDevTools");
 
@@ -359,7 +362,10 @@ export default function ReactDevToolsWithErrorBoundary() {
   return (
     <ErrorBoundary name="ReactDevTools" resetKey={pauseId ?? ""}>
       {showNewDevTools ? (
-        <NewReactDevtoolsPanel executionPoint={currentPoint} pauseId={pauseId} />
+        <NewReactDevtoolsPanel
+          executionPoint={pointAndPauseIdRef.current[0]}
+          pauseId={pointAndPauseIdRef.current[1]}
+        />
       ) : (
         <ReactDevtoolsPanel />
       )}
