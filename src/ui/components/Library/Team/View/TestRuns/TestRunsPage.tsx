@@ -125,6 +125,14 @@ function TestRunsContent() {
             </Suspense>
           </div>
         </Panel>
+        <PanelResizeHandle className="h-full w-2" />
+        <Panel minSize={20} order={2}>
+          <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-xl bg-white">
+            <Suspense fallback={<LibrarySpinner />}>
+              <div className="w-40 text-sm text-center">Select a test to see its details here</div>
+            </Suspense>
+          </div>
+        </Panel>
       </PanelGroup>
     </div>
   );
