@@ -6,7 +6,7 @@ import {
   waitForReactComponentCount,
 } from "../helpers/new-react-devtools-panel";
 import { getTimelineCurrentPercent, seekToTimePercent } from "../helpers/timeline";
-import test, { expect } from "../testFixtureCloneRecording";
+import test from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "cra/dist/index_chromium.html" });
 
