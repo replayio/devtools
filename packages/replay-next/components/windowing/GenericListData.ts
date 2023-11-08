@@ -69,10 +69,16 @@ export abstract class GenericListData<Item> extends EventEmitter<{
   }
 
   subscribeToInvalidation = (callback: () => void) => {
+    // Work around for github.com/facebook/react/issues/27670
+    callback();
+
     return this.addListener("invalidate", callback);
   };
 
   subscribeToSelectedIndex = (callback: (index: number | null) => void) => {
+    // Work around for github.com/facebook/react/issues/27670
+    callback(this._selectedIndex);
+
     return this.addListener("selectedIndex", callback);
   };
 

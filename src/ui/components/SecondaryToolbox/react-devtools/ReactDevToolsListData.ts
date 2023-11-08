@@ -40,6 +40,8 @@ export class ReactDevToolsListData extends GenericListData<ReactElement> {
 
     if (selectedElement) {
       this.selectElement(selectedElement);
+    } else if (this.getItemCount() > 0) {
+      this.setSelectedIndex(0);
     }
   }
 
