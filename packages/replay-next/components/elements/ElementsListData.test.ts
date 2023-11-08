@@ -36,12 +36,18 @@ describe("ElementsListData", () => {
   }
 
   function waitForInvalidation() {
+    const prevRevision = listData.getRevision();
+
     // Wait for the path of nodes to load and expand
     // but not for the full tree data to be loaded
     return new Promise<void>(resolve => {
       const unsubscribe = listData.subscribeToInvalidation(() => {
-        resolve();
-        unsubscribe();
+        const nextRevision = listData.getRevision();
+
+        if (prevRevision !== nextRevision) {
+          resolve();
+          unsubscribe();
+        }
       });
     });
   }
