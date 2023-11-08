@@ -68,36 +68,38 @@ function TestRunsContent() {
     <div className="flex w-full flex-grow flex-row p-2">
       <PanelGroup autoSaveId="Library:TestRuns" direction="horizontal">
         <Panel minSize={20} order={1}>
-          <div className="flex h-full w-full flex-col overflow-hidden rounded-xl bg-bodyBgcolor">
-            <div className="flex flex-row items-center justify-between gap-2 border-b border-themeBorder bg-bodyBgcolor p-2">
-              <div
-                className={styles.dropdownTrigger}
-                data-test-id="TestRunsPage-ResultFilter-DropdownTrigger"
-                onClick={onClickStatusFilter}
-                onKeyDown={onKeyDownStatusFilter}
-                tabIndex={0}
-              >
-                {filterByStatus === "all" ? "All runs" : "Only failures"}
-                <Icon className="h-5 w-5" type="chevron-down" />
+          <div className="flex h-full w-full flex-col gap-4 overflow-hidden rounded-xl bg-bodyBgcolor p-2">
+            <div className="flex flex-col gap-2">
+              <div className="flex flex-row items-center justify-between gap-2 bg-bodyBgcolor">
+                <div
+                  className={styles.dropdownTrigger}
+                  data-test-id="TestRunsPage-ResultFilter-DropdownTrigger"
+                  onClick={onClickStatusFilter}
+                  onKeyDown={onKeyDownStatusFilter}
+                  tabIndex={0}
+                >
+                  {filterByStatus === "all" ? "All runs" : "Only failures"}
+                  <Icon className="h-5 w-5" type="chevron-down" />
+                </div>
+                {contextMenuStatusFilter}
+                <div
+                  className={styles.dropdownTrigger}
+                  data-test-id="TestRunsPage-BranchFilter-DropdownTrigger"
+                  onClick={onClickBranchFilter}
+                  onKeyDown={onKeyDownBranchFilter}
+                  tabIndex={0}
+                >
+                  {filterByBranch === "all" ? "All branches" : "Only primary branch"}
+                  <Icon className="h-5 w-5" type="chevron-down" />
+                </div>
+                {contextMenuBranchFilter}
               </div>
-              {contextMenuStatusFilter}
-              <div
-                className={styles.dropdownTrigger}
-                data-test-id="TestRunsPage-BranchFilter-DropdownTrigger"
-                onClick={onClickBranchFilter}
-                onKeyDown={onKeyDownBranchFilter}
-                tabIndex={0}
-              >
-                {filterByBranch === "all" ? "All branches" : "Only primary branch"}
-                <Icon className="h-5 w-5" type="chevron-down" />
-              </div>
-              {contextMenuBranchFilter}
               <div className={styles.filterContainer}>
                 <input
                   className={styles.filterInput}
                   data-test-id="TestRunsPage-FilterByText-Input"
                   onChange={event => setFilterByText(event.currentTarget.value)}
-                  placeholder="Filter test runs"
+                  placeholder="Filter"
                   type="text"
                   value={filterByTextForDisplay}
                 />
@@ -129,7 +131,7 @@ function TestRunsContent() {
         <Panel minSize={20} order={2}>
           <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-xl bg-white">
             <Suspense fallback={<LibrarySpinner />}>
-              <div className="w-40 text-sm text-center">Select a test to see its details here</div>
+              <div className="w-40 text-center text-sm">Select a test to see its details here</div>
             </Suspense>
           </div>
         </Panel>
