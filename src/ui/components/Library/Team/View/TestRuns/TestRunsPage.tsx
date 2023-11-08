@@ -8,6 +8,7 @@ import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 import { TestRunOverviewPage } from "./Overview/TestRunOverviewContextRoot";
 import { TestRunList } from "./TestRunList";
 import { TestRunsContext, TestRunsContextRoot } from "./TestRunsContextRoot";
+import _styles from "../../../Library.module.css";
 import styles from "./TestRunsPage.module.css";
 
 export function TestRunsPage() {
@@ -129,7 +130,9 @@ function TestRunsContent() {
         </Panel>
         <PanelResizeHandle className="h-full w-2" />
         <Panel minSize={20} order={2}>
-          <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-xl bg-white">
+          <div
+            className={`flex h-full w-full items-center justify-center overflow-hidden rounded-xl ${_styles.testReplayDetails}`}
+          >
             <Suspense fallback={<LibrarySpinner />}>
               <div className="w-40 text-center text-sm">Select a test to see its details here</div>
             </Suspense>

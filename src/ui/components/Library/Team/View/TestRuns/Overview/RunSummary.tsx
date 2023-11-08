@@ -68,7 +68,7 @@ export function Attributes({
     const { branchName, isPrimaryBranch, user } = source;
 
     return (
-      <div className="flex flex-row flex-wrap items-center gap-4">
+      <div className="flex flex-row flex-wrap items-center space-x-4">
         <AttributeContainer dataTestId="TestRun-Date" icon="schedule" title={date.toLocaleString()}>
           {getTruncatedRelativeDate(date)}
         </AttributeContainer>
@@ -154,23 +154,17 @@ export function RunSummary({
 
   return (
     <div
-      className={`flex flex-col gap-1 border-b border-themeBorder p-4 ${
-        isPending ? "opacity-50" : ""
-      }`}
+      className={`flex flex-col border-b border-themeBorder ${isPending ? "opacity-50" : ""}`}
       data-test-id="TestRunSummary"
     >
-      <div className="flex flex-row items-center justify-between gap-1">
-        <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-xl font-medium">
-          {getTestRunTitle(testRun)}
-        </div>
+      <div className="flex flex-row items-center justify-between gap-1 px-4 pt-3">
+        <div className="flex-grow"></div>
         <RunStats testRunId={testRun.id} />
       </div>
-      {source?.groupLabel && (
-        <div className="text overflow-hidden overflow-ellipsis whitespace-nowrap font-medium text-bodySubColor">
-          {source.groupLabel}
-        </div>
-      )}
-      <div className="mt-1 flex w-full flex-row items-center gap-4 text-xs">
+      <div className="overflow-hidden overflow-ellipsis whitespace-nowrap border-b border-themeBorder px-4  py-3 font-bold">
+        {getTestRunTitle(testRun)}
+      </div>
+      <div className="flex w-full flex-row items-center gap-4 py-3 px-4 text-xs">
         <Attributes recordings={recordings} testRun={testRun} durationMs={durationMs} />
         <div className="grow" />
         <PullRequestLink testRun={testRun} />
