@@ -1,7 +1,7 @@
 import { Locator, Page, expect } from "@playwright/test";
 
 import { openConsolePanel, warpToMessage } from "./console-panel";
-import { openReactDevtoolsPanel as openReactDevtoolsPanelWithoutWorkaround } from "./react-devtools-panel";
+import { openReactDevtoolsPanel as openReactDevtoolsPanelOld } from "./react-devtools-panel";
 import { waitFor } from "./utils";
 
 export function getReactDevToolsPanel(page: Page) {
@@ -29,11 +29,7 @@ export async function jumpToMessageAndCheckComponents(
 }
 
 export async function openReactDevtoolsPanel(page: Page) {
-  await openReactDevtoolsPanelWithoutWorkaround(page);
-  // workaround for FE-2044: go to the Console and then back to the RDT panel
-  // to ensure that the RDT panel is updated
-  await openConsolePanel(page);
-  await openReactDevtoolsPanelWithoutWorkaround(page);
+  await openReactDevtoolsPanelOld(page);
 }
 
 export async function verifyReactComponentIsSelected(component: Locator) {
