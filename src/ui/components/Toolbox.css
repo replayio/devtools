@@ -75,3 +75,15 @@
 .toolbar-panel-button.active .toolbar-panel-icon {
   color: var(--primary-accent);
 }
+
+.toolbar-panel-badge {
+  position: absolute;
+  height: 0.5rem;
+  width: 0.5rem;
+  border-radius: 100%;
+  background-color: var(--secondary-accent);
+}
+
+.toolbar-panel-badge.dimmed {
+  opacity: 0.5;
+}

@@ -128,7 +128,12 @@ function MetaHoverButton({
 
   const onClick = () => {
     if (targetPoint != null) {
-      update(targetPoint.time, targetPoint.point, false);
+      const location = {
+        column: lineHitCounts?.firstBreakableColumnIndex ?? 0,
+        line: lineNumber,
+        sourceId: source.id,
+      };
+      update(targetPoint.time, targetPoint.point, false, location);
     }
   };
 

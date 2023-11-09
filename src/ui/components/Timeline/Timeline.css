@@ -236,3 +236,8 @@
 .timeline .progress-line-paused-edit-mode-inactive {
   background: var(--secondary-accent);
 }
+
+.timeline .progress-line-paused-edit-mode-active.dimmed,
+.timeline .progress-line-paused-edit-mode-inactive.dimmed {
+  opacity: 0.5;
+}

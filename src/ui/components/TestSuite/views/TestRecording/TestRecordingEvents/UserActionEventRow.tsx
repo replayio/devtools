@@ -1,5 +1,5 @@
 import assert from "assert";
-import { ExecutionPoint, TimeStampedPoint } from "@replayio/protocol";
+import { ExecutionPoint, Location, TimeStampedPoint } from "@replayio/protocol";
 import { Suspense, memo, useContext, useMemo, useState } from "react";
 import { Cache, STATUS_PENDING, STATUS_RESOLVED, useImperativeCacheValue } from "suspense";
 
@@ -99,12 +99,13 @@ export default memo(function UserActionEventRow({
   const onJumpToClickEvent = async () => {
     assert(jumpToCodeAnnotation != null);
 
-    const onSeek = (executionPoint: string, time: number) =>
+    const onSeek = (executionPoint: string, time: number, location: Location) =>
       dispatch(
         seek({
           executionPoint,
           openSource: true,
           time,
+          location,
         })
       );
 
