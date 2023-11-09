@@ -14,6 +14,7 @@ import {
 } from "devtools/client/debugger/src/reducers/pause";
 import { formatKeyShortcut } from "devtools/client/debugger/src/utils/text";
 import KeyShortcuts from "devtools/client/shared/key-shortcuts";
+import { LoadingProgressBar } from "replay-next/components/LoadingProgressBar";
 import { framesCache } from "replay-next/src/suspense/FrameCache";
 import {
   FIND_STEP_TARGET_COMMANDS,
@@ -23,7 +24,6 @@ import {
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { getOS, isMacOS } from "shared/utils/os";
 import { isPointInRegion } from "shared/utils/time";
-import Loader from "ui/components/shared/Loader";
 import { getSelectedSourceId } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
@@ -79,7 +79,7 @@ function formatKey(action: string) {
 
 export default function CommandBar() {
   return (
-    <Suspense fallback={<Loader />}>
+    <Suspense fallback={<LoadingProgressBar />}>
       <CommandBarSuspends />
     </Suspense>
   );

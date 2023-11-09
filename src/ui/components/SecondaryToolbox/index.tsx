@@ -4,6 +4,7 @@ import { useImperativeCacheValue } from "suspense";
 
 import { EditorPane } from "devtools/client/debugger/src/components/Editor/EditorPane";
 import LazyOffscreen from "replay-next/components/LazyOffscreen";
+import { PanelLoader } from "replay-next/components/PanelLoader";
 import {
   RecordingCapabilities,
   recordingCapabilitiesCache,
@@ -11,7 +12,6 @@ import {
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { setSelectedPanel } from "ui/actions/layout";
-import { SecondaryToolboxLoadingPanel } from "ui/components/SecondaryToolbox/SecondaryToolboxLoadingPanel";
 import { getSelectedPanel, getToolboxLayout } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { SecondaryPanelName } from "ui/state/layout";
@@ -178,7 +178,7 @@ export default function SecondaryToolbox() {
         </div>
       </header>
       <Redacted className="secondary-toolbox-content bg-chrome text-xs">
-        <Suspense fallback={<SecondaryToolboxLoadingPanel />}>
+        <Suspense fallback={<PanelLoader />}>
           {(chromiumNetMonitorEnabled || recordingCapabilities.supportsNetworkRequests) && (
             <Panel isActive={selectedPanel === "network"}>
               <NetworkMonitor />

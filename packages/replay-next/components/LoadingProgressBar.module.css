@@ -1,7 +1,11 @@
-.loading-progress-bar {
+.Wrapper {
+  width: 100%;
+  flex: 0 0 2px;
   height: 2px;
+}
+
+.Bar {
+  height: 100%;
   background: var(--primary-accent);
-  position: absolute;
   transition-duration: 200ms;
-  top: 0px;
 }
