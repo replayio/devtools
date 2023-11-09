@@ -106,7 +106,7 @@ function Body() {
   }, [sidePanelCollapsed]);
 
   return (
-    <div className="vertical-panels pr-2">
+    <div className="vertical-panels pr-1">
       <div className="flex h-full flex-row overflow-hidden bg-chrome">
         <Toolbar />
         <PanelGroup autoSaveId="DevTools-horizontal" className="split-box" direction="horizontal">
@@ -122,7 +122,7 @@ function Body() {
             <SidePanel />
           </Panel>
           <PanelResizeHandle
-            className={`h-full ${sidePanelCollapsed ? "w-0" : "w-2"}`}
+            className={`h-full ${sidePanelCollapsed ? "w-0" : "w-1"}`}
             id="PanelResizeHandle-SidePanel"
           />
           <Panel className="flex h-full overflow-hidden" minSize={50}>
