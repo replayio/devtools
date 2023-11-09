@@ -5,7 +5,7 @@
   flex-direction: row;
   align-items: center;
   background-color: var(--body-bgcolor);
-  border-bottom: 1px solid var(--theme-toolbar-background);
+  border-bottom: 1px solid var(--listitem-row-divider);
   padding: 0 1ch;
 }
 .Row {
@@ -124,7 +124,7 @@
 
 .TimingContainer {
   position: relative;
-  height: 0.75rem;
+  height: 0.8rem;
   border-radius: 3px;
   background-color: var(--chrome);
   margin-right: 1ch;

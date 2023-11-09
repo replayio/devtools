@@ -10,7 +10,7 @@ import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import useReduxDevtoolsContextMenu from "./useReduxDevtoolsContextMenu";
 import styles from "./ReduxDevToolsListItem.module.css";
 
-export const ITEM_SIZE = 24;
+export const ITEM_SIZE = 26;
 
 export type ItemData = {
   annotations: ReduxActionAnnotation[];
