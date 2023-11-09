@@ -87,7 +87,7 @@
   align-items: center;
   gap: 1ch;
 
-  background: var(--background-color-tertiary-button);
+  background: var(--background-color-primary-button);
   color: #fff;
   font-weight: bold;
 }

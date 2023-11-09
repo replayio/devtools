@@ -39,8 +39,6 @@
   --secondary-accent-hover: #d72451;
   --secondary-accent-stroke: #f02d5e;
 
-  --tertiary-accent: var(--green-60);
-
   /* used in our codebase, to be refactored */
   --blue-30: #75baff;
   --blue-40: #45a1ff;
@@ -192,7 +190,7 @@
   --theme-text-field-bgcolor: var(--theme-base-85);
   --theme-text-field-color: #fff;
   --theme-text-field-placeholder-color: #babbbc;
-  --team-row-active: var(--theme-text-field-bgcolor);
+  --team-row-active: var(--primary-accent-dimmed);
   --tooltip-bgcolor: var(--theme-base-100);
   --tooltip-color: #fff;
   --tooltip-border: 1px solid rgba(43, 46, 49, 1);
@@ -221,7 +219,6 @@
   --background-color-primary-button: #02acfd;
   --background-color-resize-handle: #242e3d;
   --background-color-secondary-button: #f02d5e;
-  --background-color-tertiary-button: var(--tertiary-accent);
   --background-color-source-search: #25364e;
   --background-color-warning: #42381f;
   --background-color-high-risk-setting: #310f21;
@@ -719,7 +716,7 @@
   --theme-text-field-bgcolor: #f6f6f6;
   --theme-text-field-color: var(--body-color);
   --theme-text-field-placeholder-color: #a9a9b1;
-  --team-row-active: #3f434a;
+  --team-row-active: #163e58; /* the dark version of --primary-accent-dimmed */
   --tooltip-bgcolor: #38383d;
   --tooltip-color: white;
   --tooltip-border: 1px solid transparent;
@@ -744,7 +741,6 @@
   --background-color-primary-button-disabled: #d2d2d2;
   --background-color-primary-button: #05acfd;
   --background-color-secondary-button: #f02d5e;
-  --background-color-tertiary-button: var(--tertiary-accent);
 
   --background-color-current-execution-point: #eaf3ff;
   --background-color-current-execution-point-column: #b8d7ff;

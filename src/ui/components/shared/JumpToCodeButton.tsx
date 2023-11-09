@@ -37,7 +37,7 @@ export function JumpToCodeButton({
   const jumpToCodeButtonClassname = classnames(
     `transition-width flex items-center justify-center rounded-full  duration-100 ease-out h-6 ${className}`,
     {
-      "bg-tertiaryAccent cursor-pointer cursor-default": jumpToCodeButtonAvailable,
+      "bg-primaryAccent cursor-pointer cursor-default": jumpToCodeButtonAvailable,
       "bg-gray-400 ": !jumpToCodeButtonAvailable,
       "px-2 shadow-sm": isHovered,
       "w-6": !isHovered,
