@@ -1,6 +1,6 @@
+import { LoadingProgressBar } from "replay-next/components/LoadingProgressBar";
 import { useNetworkRequestBody } from "replay-next/src/hooks/useNetworkRequestBody";
 
-import LoadingProgressBar from "../shared/LoadingProgressBar";
 import HttpBody from "./HttpBody";
 import { RequestSummary, findHeader } from "./utils";
 
