@@ -4,7 +4,10 @@ import { ContextMenuItem, useContextMenu } from "use-context-menu";
 
 import Icon from "replay-next/components/Icon";
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
+import { testPassed } from "ui/utils/testRuns";
 
+import { useTestRunDetailsSuspends } from "./hooks/useTestRunDetailsSuspends";
+import { TestResultListItem } from "./Overview/TestResultListItem";
 import { TestRunOverviewPage } from "./Overview/TestRunOverviewContextRoot";
 import { TestRunList } from "./TestRunList";
 import { TestRunsContext, TestRunsContextRoot } from "./TestRunsContextRoot";
@@ -131,14 +134,82 @@ function TestRunsContent() {
         <PanelResizeHandle className="h-full w-2" />
         <Panel minSize={20} order={2}>
           <div
-            className={`flex h-full w-full items-center justify-center overflow-hidden rounded-xl ${_styles.testReplayDetails}`}
+            className={`flex h-full w-full overflow-hidden rounded-xl ${_styles.testReplayDetails}`}
           >
             <Suspense fallback={<LibrarySpinner />}>
-              <div className="w-40 text-center text-sm">Select a test to see its details here</div>
+              <TestRunSpecDetails />
             </Suspense>
           </div>
         </Panel>
       </PanelGroup>
+    </div>
+  );
+}
+
+function TestRunSpecDetails() {
+  const { spec } = useContext(TestRunsContext);
+  const { testRunId } = useContext(TestRunsContext);
+
+  const { groupedTests, tests } = useTestRunDetailsSuspends(testRunId);
+
+  const selectedSpecTests = tests?.filter((t: any) => t.sourcePath === spec);
+
+  if (!spec) {
+    return <div>Select a test to see its details here</div>;
+  } else if (groupedTests === null) {
+    return null;
+  }
+
+  const selectedTest = selectedSpecTests[0];
+
+  const dates = selectedSpecTests.map(t => t.recordings[0].date);
+
+  console.log({ selectedTest, selectedSpecTests, dates });
+
+  const failedTests = selectedSpecTests.filter(t => t.result === "failed");
+
+  return (
+    <div className="flex flex-col justify-start text-sm">
+      <div>{spec}</div>
+      <div>
+        <div>Replays</div>
+        {/* {replays.map((r, i) => (
+          <div key="i">{r.title}</div>
+        ))} */}
+        <div>
+          {selectedSpecTests.map(s =>
+            s.recordings.map(r => (
+              <TestResultListItem
+                depth={1}
+                filterByText={""}
+                key={r.id}
+                label={s.result}
+                recording={r}
+                test={s}
+                secondaryBadgeCount={/* index > 0 ? index + 1 : null */ null}
+              />
+            ))
+          )}
+        </div>
+        {failedTests.length ? <Errors failedTests={failedTests} /> : null}
+      </div>
+    </div>
+  );
+}
+
+function Errors({ failedTests }: { failedTests: any }) {
+  return (
+    <div>
+      <div>Errors</div>
+      <div>
+        {failedTests.map((t, i) => (
+          <div key={i}>
+            {t.errors.map((e, i) => (
+              <div key={i}>{e.slice(0, 100)}</div>
+            ))}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
