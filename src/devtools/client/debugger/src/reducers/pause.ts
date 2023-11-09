@@ -146,14 +146,14 @@ const pauseSlice = createSlice({
         location?: Location;
       }>
     ) {
-      const { executionPoint, time } = action.payload;
+      const { executionPoint, location, time } = action.payload;
       Object.assign(state, {
         seekState: executionPoint ? "create-pause" : "find-point",
         id: undefined,
-        executionPoint,
+        executionPoint: executionPoint ?? null,
         time,
         pausePreviewLocation: location ?? null,
-      });
+      } satisfies Partial<PauseState>);
       state.threadcx.isPaused = true;
     },
     paused(
@@ -170,7 +170,7 @@ const pauseSlice = createSlice({
         id,
         executionPoint,
         time,
-      });
+      } satisfies Partial<PauseState>);
 
       state.selectedFrameId = null;
       state.threadcx.pauseCounter++;
@@ -199,8 +199,8 @@ const pauseSlice = createSlice({
         executionPoint: lastPause?.executionPoint ?? null,
         time: lastPause?.time ?? 0,
         pausePreviewLocation: null,
-        selectedFrameId: undefined,
-      });
+        selectedFrameId: null,
+      } satisfies Partial<PauseState>);
 
       state.threadcx.pauseCounter++;
       state.threadcx.isPaused = false;
