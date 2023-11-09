@@ -35,10 +35,10 @@
 .Row[data-selected],
 .Row[data-selected]:focus,
 .Row[data-selected]:hover {
-  background: var(--primary-accent-hover);
-  color: var(--primary-accent-foreground-text);
+  background: var(--primary-accent-dimmed);
+  color: var(--primary-accent-dimmed-foreground-text);
 
-  --status-color: var(--primary-accent-foreground-text);
+  --status-color: var(--primary-accent-dimmed-foreground-text);
 }
 
 /* These styles should stay in sync with NetworkMonitorListHeader */
@@ -87,7 +87,7 @@
   align-items: center;
   gap: 1ch;
 
-  background: linear-gradient(0deg, var(--primary-accent) 0, var(--primary-accent) 100%);
+  background: var(--background-color-tertiary-button);
   color: #fff;
   font-weight: bold;
 }
@@ -97,11 +97,6 @@
 }
 .SeekButton:focus,
 .SeekButton:hover {
-  background: linear-gradient(
-    0deg,
-    var(--primary-accent-hover) 0,
-    var(--primary-accent-hover) 100%
-  );
   outline: none;
 }
 

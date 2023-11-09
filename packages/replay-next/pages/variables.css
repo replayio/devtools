@@ -34,11 +34,12 @@
 
   --primary-accent: #01acfd;
   --primary-accent-hover: #0194ff;
-  --primary-accent-foreground-text: #fff;
 
   --secondary-accent: #f02d5e;
   --secondary-accent-hover: #d72451;
   --secondary-accent-stroke: #f02d5e;
+
+  --tertiary-accent: var(--green-60);
 
   /* used in our codebase, to be refactored */
   --blue-30: #75baff;
@@ -145,6 +146,10 @@
 :root,
 :root.theme-dark {
   --color-transparent: rgba(0, 0, 0, 0);
+  --primary-accent-foreground-text: #fff;
+
+  --primary-accent-dimmed: #163e58;
+  --primary-accent-dimmed-foreground-text: var(--body-color);
 
   /* Color ramp (Dark) */
   --theme-base-100: #000; /* background chrome */
@@ -216,6 +221,7 @@
   --background-color-primary-button: #02acfd;
   --background-color-resize-handle: #242e3d;
   --background-color-secondary-button: #f02d5e;
+  --background-color-tertiary-button: var(--tertiary-accent);
   --background-color-source-search: #25364e;
   --background-color-warning: #42381f;
   --background-color-high-risk-setting: #310f21;
@@ -667,6 +673,10 @@
 
 :root.theme-light {
   --color-transparent: rgba(255, 255, 255, 0);
+  --primary-accent-foreground-text: #fff;
+
+  --primary-accent-dimmed: #cceeff;
+  --primary-accent-dimmed-foreground-text: var(--body-color);
 
   /* Color ramp (Light) */
   --theme-base-100: hsl(0, 0%, 100%);
@@ -734,6 +744,7 @@
   --background-color-primary-button-disabled: #d2d2d2;
   --background-color-primary-button: #05acfd;
   --background-color-secondary-button: #f02d5e;
+  --background-color-tertiary-button: var(--tertiary-accent);
 
   --background-color-current-execution-point: #eaf3ff;
   --background-color-current-execution-point-column: #b8d7ff;

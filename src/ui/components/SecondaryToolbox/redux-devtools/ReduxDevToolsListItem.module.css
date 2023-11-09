@@ -18,8 +18,8 @@
   opacity: 1;
 }
 .ListItem[data-selected] {
-  background-color: var(--theme-selection-background);
-  color: var(--theme-selection-color);
+  background-color: var(--primary-accent-dimmed);
+  color: var(--body-color);
   opacity: 1;
 }
 

@@ -52,6 +52,7 @@ module.exports = {
         splitter: "var(--theme-splitter-color)",
         inputBorder: "var(--input-border)",
         bodyBgcolor: "var(--body-bgcolor)",
+        tertiaryAccent: "var(--tertiary-accent)",
         testStepBorder: "var(--test-step-border)",
         testsuitesActiveBgcolor: "var(--testsuites-active-bgcolor)",
         testsuitesErrorBgcolor: "var(--testsuites-error-bgcolor)",
