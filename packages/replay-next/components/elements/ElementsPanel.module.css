@@ -7,6 +7,11 @@
   background-color: var(--body-bgcolor);
 }
 
+.PanelLoader {
+  position: absolute;
+  width: 100%;
+}
+
 .SearchRow {
   flex: 0 0 auto;
   display: flex;

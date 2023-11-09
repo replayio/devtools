@@ -14,14 +14,13 @@ import { ReplayClientInterface } from "shared/client/types";
 import { Item, Metadata } from "./types";
 
 export class ElementsListData extends GenericListData<Item> {
-  _destroyed: boolean = false;
-  _didError: boolean = false;
-  _idToMutableMetadataMap: Map<ObjectId, Metadata> = new Map();
-  _numLevelsToLoad: number = 0;
-  _pauseId: PauseId;
-  _replayClient: ReplayClientInterface;
-  _rootObjectId: ObjectId | null = null;
-  _rootObjectIdWaiter: {
+  private _destroyed: boolean = false;
+  private _didError: boolean = false;
+  private _idToMutableMetadataMap: Map<ObjectId, Metadata> = new Map();
+  private _pauseId: PauseId;
+  private _replayClient: ReplayClientInterface;
+  private _rootObjectId: ObjectId | null = null;
+  private _rootObjectIdWaiter: {
     promise: Promise<void>;
     resolve: () => void;
   };
@@ -80,8 +79,10 @@ export class ElementsListData extends GenericListData<Item> {
   async loadPathToNode(leafNodeId: ObjectId) {
     let idPath;
     try {
+      this.updateLoadingState(true);
       idPath = await loadNodePathToRoot(this._replayClient, this._pauseId, leafNodeId);
     } catch (error) {
+      this.updateLoadingState(false);
       this.handleLoadingError(error);
       return;
     }
@@ -122,6 +123,8 @@ export class ElementsListData extends GenericListData<Item> {
     assert(rootId);
 
     await this.processLoadedIds(rootId, new Set(loadedIds.flat()), 0);
+
+    this.updateLoadingState(false);
 
     // Finish expanding the selected path again now that all data has been loaded
     for (expandedPathIndex; expandedPathIndex < idPath.length; expandedPathIndex++) {
@@ -436,7 +439,9 @@ export class ElementsListData extends GenericListData<Item> {
     loadedIds: Set<ObjectId>,
     numLevelsToLoad: number
   ) {
-    loadedIds.forEach(id => {
+    const ids = [...loadedIds];
+    for (let index = 0; index < ids.length; index++) {
+      const id = ids[index];
       if (!this._idToMutableMetadataMap.has(id)) {
         const element = elementCache.getValue(this._replayClient, this._pauseId, id);
         const node = element.node;
@@ -500,7 +505,7 @@ export class ElementsListData extends GenericListData<Item> {
           currentNodeId = metadata.element.node.parentNode;
         }
       }
-    });
+    }
 
     this.invalidate();
   }

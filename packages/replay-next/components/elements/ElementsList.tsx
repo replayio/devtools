@@ -18,6 +18,7 @@ import { ElementsListData } from "replay-next/components/elements/ElementsListDa
 import { rootObjectIdCache } from "replay-next/components/elements/suspense/RootObjectIdCache";
 import { Item } from "replay-next/components/elements/types";
 import { DefaultFallback } from "replay-next/components/ErrorBoundary";
+import { LoadingProgressBar } from "replay-next/components/LoadingProgressBar";
 import { GenericList } from "replay-next/components/windowing/GenericList";
 import { useHorizontalScrollingListCssVariables } from "replay-next/components/windowing/hooks/useHorizontalScrollingListCssVariables";
 import { useScrollSelectedListItemIntoView } from "replay-next/components/windowing/hooks/useScrollSelectedListItemIntoView";
@@ -86,6 +87,16 @@ export function ElementsList({
     listData.didError,
     listData.didError
   );
+  const isLoading = useSyncExternalStore(
+    listData.subscribeToLoading,
+    listData.getIsLoading,
+    listData.getIsLoading
+  );
+  const itemCount = useSyncExternalStore(
+    listData.subscribeToInvalidation,
+    listData.getItemCount,
+    listData.getItemCount
+  );
 
   useImperativeHandle(
     forwardedRef,
@@ -97,6 +108,8 @@ export function ElementsList({
           const index = await listData.loadPathToNode(nodeId);
           if (index != null) {
             listData.setSelectedIndex(index);
+          } else {
+            console.warn(`Index not found for node ${nodeId}`);
           }
         }
       },
@@ -163,19 +176,22 @@ export function ElementsList({
   };
 
   return (
-    <GenericList<Item, ElementsListItemData>
-      className={styles.List}
-      dataTestId="ElementsList"
-      fallbackForEmptyList={noContentFallback}
-      height={height}
-      itemData={itemData}
-      itemRendererComponent={ElementsListItem}
-      itemSize={ITEM_SIZE}
-      listData={listData}
-      onItemsRendered={onItemsRendered}
-      onKeyDown={onKeyDown}
-      style={cssVariables as CSSProperties}
-      width="100%"
-    />
+    <div className={styles.ListWrapper} style={{ height }}>
+      {isLoading && itemCount > 0 && <LoadingProgressBar />}
+      <GenericList<Item, ElementsListItemData>
+        className={styles.List}
+        dataTestId="ElementsList"
+        fallbackForEmptyList={noContentFallback}
+        height={height}
+        itemData={itemData}
+        itemRendererComponent={ElementsListItem}
+        itemSize={ITEM_SIZE}
+        listData={listData}
+        onItemsRendered={onItemsRendered}
+        onKeyDown={onKeyDown}
+        style={cssVariables as CSSProperties}
+        width="100%"
+      />
+    </div>
   );
 }
