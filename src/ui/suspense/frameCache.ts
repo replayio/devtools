@@ -88,7 +88,7 @@ export interface FormattedPointStackFrame {
   source: Source;
   functionLocation: Location;
   executionLocation: Location;
-  point: PointDescription;
+  point?: PointDescription;
   functionDetails?: FormattedEventListener;
 }
 
@@ -119,7 +119,7 @@ export const formattedPointStackCache: Cache<
       pointStack.map(async frame => {
         updateMappedLocationForPointStackFrame(sourcesById, frame);
         const functionLocation = getPreferredLocation(sourcesById, [], frame.functionLocation);
-        const executionLocation = getPreferredLocation(sourcesById, [], frame.point.frame ?? []);
+        const executionLocation = getPreferredLocation(sourcesById, [], frame.point?.frame ?? []);
 
         const source = sourcesById.get(functionLocation.sourceId)!;
 
@@ -158,7 +158,20 @@ export const formattedPointStackCache: Cache<
 
     let resultPoint = point;
     if (earliestAppCodeFrame) {
-      resultPoint = earliestAppCodeFrame.point;
+      if (earliestAppCodeFrame.point) {
+        // We _want_ to go to this line of code at the time that it ran.
+        // Technically the backend might not return an execution point for this stack frame.
+        // Handle that (hopefully unlikely) case by still using the original point
+        // at the "current" part of the stack trace, which would mean that we'd be showing
+        // the earlier stack frame but be paused at the "current" time.
+        // In discussion with Josh, this situation should almost never happen.
+        // The most plausible reason to be missing an execution point is something like
+        // `class B extends A`, where `B` has no constructor.
+        // Realistically, we're looking at React or Redux user app logic here,
+        // so we should always have actual code and thus an execution point.
+        resultPoint = earliestAppCodeFrame.point;
+      }
+
       const formattedFunction = await formatFunctionDetailsFromLocation(
         replayClient,
         "unknown",
