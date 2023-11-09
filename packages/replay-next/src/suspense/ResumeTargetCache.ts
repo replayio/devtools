@@ -73,7 +73,16 @@ export const resumeTargetCache = createCache<
 
       if (frameIndex > 0) {
         const pointStack = await pointStackCache.readAsync(0, frameIndex, replayClient, pausePoint);
-        currentPoint = pointStack[frameIndex].point.point;
+        const frame = pointStack[frameIndex];
+        if (!frame.point) {
+          // Avoid stepping in the top frame - we need to step in the _current_ frame.
+          // Note that it's unlikely that we _will_ hit this case.
+          // Per Josh, the most likely reason a stack frame would _not_ have an execution point
+          // is if there's no actual code inside, such as `class B extends A` where B has no constructor.
+          // We _could_ look for the next frame that _does_ have an execution point instead.
+          return;
+        }
+        currentPoint = frame.point.point;
       }
     }
 

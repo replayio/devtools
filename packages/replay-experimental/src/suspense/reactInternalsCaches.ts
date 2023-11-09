@@ -52,6 +52,10 @@ export const reactRenderQueuedJumpLocationCache: Cache<
       earliestAppCodeFrame.index
     );
 
+    if (!pointDescription) {
+      return undefined;
+    }
+
     return {
       location,
       point: {

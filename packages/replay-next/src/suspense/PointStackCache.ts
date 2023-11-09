@@ -29,7 +29,7 @@ export function updateMappedLocationForPointStackFrame(
   frame: PointStackFrame
 ) {
   updateMappedLocation(sources, frame.functionLocation);
-  if (frame.point.frame) {
+  if (frame.point?.frame) {
     updateMappedLocation(sources, frame.point.frame);
   }
 }
