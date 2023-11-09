@@ -3,7 +3,7 @@
   padding: 0 1ch;
   text-overflow: ellipsis;
   overflow: hidden;
-  border-bottom: 1px solid var(--theme-toolbar-background);
+  border-bottom: 1px solid var(--listitem-row-divider);
 }
 .ListItem[data-relative-position="after"] {
   opacity: 0.5;
