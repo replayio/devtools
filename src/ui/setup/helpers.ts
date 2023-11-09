@@ -1,7 +1,10 @@
+import type { Store } from "@replayio/react-devtools-inline";
+
 // eslint-disable-next-line no-restricted-imports
 import { client, sendMessage, triggerEvent } from "protocol/socket";
 import { GraphQLService, userData } from "shared/user-data/GraphQL/UserData";
 import { UIStore } from "ui/actions";
+import { ParsedReactDevToolsAnnotation } from "ui/suspense/annotationsCaches";
 import { getRecordingId } from "ui/utils/recording";
 
 import { ReplaySession, getReplaySession } from "./prefs";
@@ -12,6 +15,10 @@ declare global {
   }
   interface AppHelpers {
     store: UIStore;
+    rdt: {
+      store: Store | null;
+      annotations: ParsedReactDevToolsAnnotation[];
+    };
     local: () => void;
     prod: () => void;
     clearIndexedDB: () => void;
@@ -30,6 +37,7 @@ export async function setupAppHelper(store: UIStore) {
 
   window.app = {
     store,
+    rdt: { store: null, annotations: [] },
     preferences: userData,
     triggerEvent,
     replaySession,

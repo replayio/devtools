@@ -97,6 +97,7 @@ function createReactDevTools(
     checkBridgeProtocolCompatibility: false,
     supportsNativeInspection: true,
   });
+  window.app.rdt.store = store;
   wall.store = store as StoreWithInternals;
 
   const ReactDevTools = initialize(target, { bridge, store });
@@ -207,6 +208,8 @@ export function ReactDevtoolsPanel() {
     ) {
       return;
     }
+
+    window.app.rdt.annotations = annotations;
 
     wall.setPauseId(pauseId);
 
