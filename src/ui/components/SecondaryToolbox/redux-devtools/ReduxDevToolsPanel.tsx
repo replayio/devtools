@@ -1,4 +1,4 @@
-import { Suspense, useContext, useMemo, useState } from "react";
+import { Suspense, useContext, useEffect, useMemo, useState } from "react";
 import { PanelGroup, PanelResizeHandle, Panel as ResizablePanel } from "react-resizable-panels";
 import { useImperativeCacheValue } from "suspense";
 
@@ -15,6 +15,7 @@ import { ReduxDevToolsContents } from "ui/components/SecondaryToolbox/redux-devt
 import { ReduxDevToolsList } from "ui/components/SecondaryToolbox/redux-devtools/ReduxDevToolsList";
 import { useAppSelector } from "ui/setup/hooks";
 import { reduxDevToolsAnnotationsCache } from "ui/suspense/annotationsCaches";
+import { applyMiddlewareDeclCache } from "ui/suspense/jumpToLocationCache";
 
 import styles from "./ReduxDevToolsPanel.module.css";
 
@@ -59,6 +60,12 @@ export default function ReduxDevToolsPanel() {
 
     return [filteredAnnotations, firstAnnotationAfterCurrentExecutionPoint];
   }, [annotationsStatus, currentExecutionPoint, focusWindow, parsedAnnotations, searchValue]);
+
+  useEffect(() => {
+    // Preload the cache for where `applyMiddleware` is defined
+    // This will speed up the first click on a Redux "J2C" button
+    applyMiddlewareDeclCache.prefetch(client);
+  }, [client]);
 
   return (
     <div className={styles.Container} data-test-id="ReduxDevtools">
