@@ -131,17 +131,23 @@ const FileNodeRenderer = memo(function FileNodeRenderer({
   filterByText,
   label,
   fileNode,
+  path,
 }: {
   depth: number;
   filterByText: string;
   label: string;
   fileNode: FileNode;
+  path: string;
 }) {
   const { name, tests } = fileNode;
   const { setSpec } = useContext(TestRunsContext);
 
   const onClick = () => {
-    setSpec(name);
+    if (path) {
+      setSpec(path + "/" + name);
+    } else {
+      setSpec(name);
+    }
   };
 
   return (
@@ -262,6 +268,7 @@ function PathNodeRenderer({
                 key={index}
                 label={label}
                 fileNode={childNode}
+                path={name}
               />
             );
           }
