@@ -141,7 +141,9 @@ export class ElementsListData extends GenericListData<Item> {
 
     await this.loadAndProcessNodeSubTree(id, numLevelsToLoad);
 
-    this.setSelectedIndex(0);
+    if (this.getSelectedIndex() === null) {
+      this.setSelectedIndex(0);
+    }
   }
 
   async toggleNodeExpanded(id: ObjectId, isExpanded: boolean) {

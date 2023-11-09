@@ -1,5 +1,5 @@
 import { ObjectId } from "@replayio/protocol";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { selectNode } from "devtools/client/inspector/markup/actions/markup";
 import { getSelectedNodeId } from "devtools/client/inspector/markup/selectors/markup";
@@ -10,23 +10,23 @@ import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 export function ElementsPanelAdapter() {
   const { pauseId } = useMostRecentLoadedPause() ?? {};
-  const selectedNodeId = useAppSelector(getSelectedNodeId);
+  const selectedNodeIdFromRedux = useAppSelector(getSelectedNodeId);
 
   const dispatch = useAppDispatch();
 
-  const listRef = useRef<ImperativeHandle>(null);
+  const [list, setList] = useState<ImperativeHandle | null>(null);
+
   const selectedNodeIdRef = useRef<ObjectId | null>(null);
 
   useEffect(() => {
-    if (selectedNodeId !== selectedNodeIdRef.current) {
-      selectedNodeIdRef.current = selectedNodeId;
+    if (list) {
+      if (selectedNodeIdFromRedux !== selectedNodeIdRef.current) {
+        selectedNodeIdRef.current = selectedNodeIdFromRedux;
 
-      const list = listRef.current;
-      if (list) {
-        list.selectNode(selectedNodeId);
+        list.selectNode(selectedNodeIdFromRedux);
       }
     }
-  }, [selectedNodeId]);
+  }, [list, selectedNodeIdFromRedux]);
 
   const onSelectionChange = (id: ObjectId | null) => {
     if (id !== selectedNodeIdRef.current) {
@@ -40,7 +40,7 @@ export function ElementsPanelAdapter() {
 
   return (
     <ElementsPanel
-      listRef={listRef}
+      listRefSetter={setList}
       onSelectionChange={onSelectionChange}
       pauseId={pauseId ?? null}
     />

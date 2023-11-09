@@ -2,8 +2,8 @@ import { ObjectId, PauseId } from "@replayio/protocol";
 import {
   ChangeEvent,
   KeyboardEvent,
-  RefObject,
   Suspense,
+  useCallback,
   useContext,
   useRef,
   useState,
@@ -19,17 +19,26 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import styles from "./ElementsPanel.module.css";
 
 export function ElementsPanel({
-  listRef,
+  listRefSetter,
   onSelectionChange,
   pauseId,
 }: {
-  listRef: RefObject<ImperativeHandle>;
+  listRefSetter: (ref: ImperativeHandle | null) => void;
   onSelectionChange?: (id: ObjectId | null) => void;
   pauseId: PauseId | null;
 }) {
   const replayClient = useContext(ReplayClientContext);
 
+  const listRef = useRef<ImperativeHandle | null>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  const compositeListRef = useCallback(
+    (ref: ImperativeHandle | null) => {
+      listRef.current = ref;
+      listRefSetter(ref);
+    },
+    [listRefSetter]
+  );
 
   const [searchInProgress, setSearchInProgress] = useState(false);
   const [searchState, setSearchState] = useState<{
@@ -154,7 +163,7 @@ export function ElementsPanel({
               <Suspense fallback={<ElementsPanelLoader />}>
                 <ElementsList
                   height={height}
-                  forwardedRef={listRef}
+                  forwardedRef={compositeListRef}
                   key={pauseId}
                   noContentFallback={<ElementsPanelLoader />}
                   onSelectionChange={onSelectionChange}
