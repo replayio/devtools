@@ -144,7 +144,12 @@ function FastForwardButton({
 
   const fastForward = () => {
     assert(fastForwardToExecutionPoint != null);
-    update(fastForwardToExecutionPoint.time, fastForwardToExecutionPoint.point, false);
+    assert(lineHitCounts != null);
+    update(fastForwardToExecutionPoint.time, fastForwardToExecutionPoint.point, false, {
+      sourceId,
+      line: lineNumber,
+      column: lineHitCounts.firstBreakableColumnIndex,
+    });
   };
 
   return (
@@ -178,7 +183,12 @@ function RewindButton({
 
   const rewind = () => {
     assert(rewindToExecutionPoint != null);
-    update(rewindToExecutionPoint.time, rewindToExecutionPoint.point, false);
+    assert(lineHitCounts != null);
+    update(rewindToExecutionPoint.time, rewindToExecutionPoint.point, false, {
+      sourceId,
+      line: lineNumber,
+      column: lineHitCounts.firstBreakableColumnIndex,
+    });
   };
 
   return (

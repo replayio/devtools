@@ -121,7 +121,7 @@ export default function HitPointTimeline({
     const hitPoint = hitPoints[index];
     if (hitPoint !== null) {
       setOptimisticTime(hitPoint.time);
-      update(hitPoint.time, hitPoint.point, false);
+      update(hitPoint.time, hitPoint.point, false, point.location);
     }
   };
 
@@ -129,14 +129,14 @@ export default function HitPointTimeline({
     const [prevHitPoint] = findHitPointBefore(hitPoints, currentExecutionPoint);
     if (prevHitPoint !== null) {
       setOptimisticTime(prevHitPoint.time);
-      update(prevHitPoint.time, prevHitPoint.point, false);
+      update(prevHitPoint.time, prevHitPoint.point, false, point.location);
     }
   };
   const goToNext = () => {
     const [nextHitPoint] = findHitPointAfter(hitPoints, currentExecutionPoint);
     if (nextHitPoint !== null) {
       setOptimisticTime(nextHitPoint.time);
-      update(nextHitPoint.time, nextHitPoint.point, false);
+      update(nextHitPoint.time, nextHitPoint.point, false, point.location);
     }
   };
 
@@ -217,7 +217,7 @@ export default function HitPointTimeline({
               event.preventDefault();
 
               setOptimisticTime(hitPoint.time);
-              update(hitPoint.time, hitPoint.point, false);
+              update(hitPoint.time, hitPoint.point, false, point.location);
             }}
             style={{
               left: `${(100 * hitPoint.time) / duration}%`,

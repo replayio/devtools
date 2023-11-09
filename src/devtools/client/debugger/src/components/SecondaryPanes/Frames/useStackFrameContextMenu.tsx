@@ -8,7 +8,8 @@ import { getPointAndTimeForPauseId } from "replay-next/src/suspense/PauseCache";
 import { getPointDescriptionForFrame } from "replay-next/src/suspense/PointStackCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { requestFocusWindow, seek } from "ui/actions/timeline";
-import { useAppDispatch } from "ui/setup/hooks";
+import { getPreferredLocation } from "ui/reducers/sources";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 interface StackFrameContextMenuOptions {
   frame?: PauseFrame;
@@ -25,6 +26,7 @@ export function useStackFrameContextMenu({
 }: StackFrameContextMenuOptions) {
   const dispatch = useAppDispatch();
   const replayClient = useContext(ReplayClientContext);
+  const sourcesState = useAppSelector(state => state.sources);
 
   let frameDependentContextMenus: React.ReactNode = null;
 
@@ -46,6 +48,9 @@ export function useStackFrameContextMenu({
             executionPoint: framePoint.point,
             openSource: true,
             time: framePoint.time,
+            location: framePoint.frame
+              ? getPreferredLocation(sourcesState, framePoint.frame)
+              : undefined,
           })
         );
       }

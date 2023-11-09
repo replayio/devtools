@@ -456,7 +456,7 @@ export function findClassOutlineForLocation(
 }
 
 export function jumpToKnownEventListenerHit(
-  onSeek: (point: ExecutionPoint, time: number) => void,
+  onSeek: (point: ExecutionPoint, time: number, location: Location) => void,
   jumpToCodeDetails: ParsedJumpToCodeAnnotation
 ): UIThunkAction<Promise<void>> {
   return async (dispatch, getState) => {
@@ -468,6 +468,6 @@ export function jumpToKnownEventListenerHit(
     // Open the source file and jump to the found position.
     // This is either the function definition itself, or the first position _inside_ the function.
     dispatch(selectLocation(cx, firstBreakablePosition));
-    onSeek(listenerPoint.point, listenerPoint.time);
+    onSeek(listenerPoint.point, listenerPoint.time, location);
   };
 }

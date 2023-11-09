@@ -1,4 +1,4 @@
-import { ExecutionPoint } from "@replayio/protocol";
+import { ExecutionPoint, Location } from "@replayio/protocol";
 import React, { PropsWithChildren, useCallback, useMemo } from "react";
 
 import { getExecutionPoint, getTime } from "devtools/client/debugger/src/selectors";
@@ -13,8 +13,13 @@ export default function TimelineContextAdapter({ children }: PropsWithChildren) 
   const executionPoint = useAppSelector(getExecutionPoint) || "0";
 
   const update = useCallback(
-    async (time: number, executionPoint: ExecutionPoint, openSource: boolean) => {
-      dispatch(seek({ executionPoint, time, openSource }));
+    async (
+      time: number,
+      executionPoint: ExecutionPoint,
+      openSource: boolean,
+      location?: Location
+    ) => {
+      dispatch(seek({ executionPoint, time, openSource, location }));
     },
     [dispatch]
   );
