@@ -170,26 +170,30 @@ function TestRunSpecDetails() {
 
   return (
     <div className="flex flex-col justify-start text-sm">
-      <div>{spec}</div>
-      <div>
-        <div>Replays</div>
-        {/* {replays.map((r, i) => (
+      <div className="overflow-hidden overflow-ellipsis whitespace-nowrap border-b border-themeBorder px-4 py-3 font-bold">
+        {spec}
+      </div>
+      <div className="flex flex-col gap-3 py-3">
+        <div className="flex flex-col gap-2 px-3">
+          <div className="overflow-hidden overflow-ellipsis whitespace-nowrap">Replays</div>
+          {/* {replays.map((r, i) => (
           <div key="i">{r.title}</div>
         ))} */}
-        <div>
-          {selectedSpecTests.map(s =>
-            s.recordings.map(r => (
-              <TestResultListItem
-                depth={1}
-                filterByText={""}
-                key={r.id}
-                label={s.result}
-                recording={r}
-                test={s}
-                secondaryBadgeCount={/* index > 0 ? index + 1 : null */ null}
-              />
-            ))
-          )}
+          <div className="">
+            {selectedSpecTests.map(s =>
+              s.recordings.map(r => (
+                <TestResultListItem
+                  depth={1}
+                  filterByText={""}
+                  key={r.id}
+                  label={s.result}
+                  recording={r}
+                  test={s}
+                  secondaryBadgeCount={/* index > 0 ? index + 1 : null */ null}
+                />
+              ))
+            )}
+          </div>
         </div>
         {failedTests.length ? <Errors failedTests={failedTests} /> : null}
       </div>
@@ -199,13 +203,15 @@ function TestRunSpecDetails() {
 
 function Errors({ failedTests }: { failedTests: any }) {
   return (
-    <div>
-      <div>Errors</div>
+    <div className="flex flex-col gap-2 px-3">
+      <div className="overflow-hidden overflow-ellipsis whitespace-nowrap">Errors</div>
       <div>
         {failedTests.map((t, i) => (
           <div key={i}>
             {t.errors.map((e, i) => (
-              <div key={i}>{e.slice(0, 100)}</div>
+              <div className="p-2" key={i}>
+                {e.slice(0, 100)}...
+              </div>
             ))}
           </div>
         ))}
