@@ -108,7 +108,7 @@ export interface AppState {
   workspaceId: WorkspaceId | null;
 }
 
-export type AppMode = "devtools" | "sourcemap-visualizer";
+export type AppMode = "devtools" | "sourcemap-visualizer" | "sourcemaps-viewer";
 
 interface Events {
   [key: string]: ReplayEvent[];

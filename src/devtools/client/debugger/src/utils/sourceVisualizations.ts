@@ -68,11 +68,11 @@ function getSourceIdToVisualizeSuspense(
 
   let alternateSourceId = selectedFrameId
     ? getAlternateSourceIdFromSelectedFrameSuspense(
-        replayClient,
-        selectedSource,
-        selectedFrameId,
-        sourcesState
-      )
+      replayClient,
+      selectedSource,
+      selectedFrameId,
+      sourcesState
+    )
     : undefined;
   if (!alternateSourceId) {
     alternateSourceId = getUniqueAlternateSourceId(
@@ -123,6 +123,39 @@ export function getSourcemapVisualizerURLSuspense(
   }
 
   let href = `/recording/${recordingId}/sourcemap/${sourceId}`;
+  const dispatchUrl = new URL(location.href).searchParams.get("dispatch");
+  if (dispatchUrl) {
+    href += `?dispatch=${dispatchUrl}`;
+  }
+
+  return href;
+}
+
+export function getSourcemapsViewerURLSuspense(
+  replayClient: ReplayClientInterface,
+  recordingId: string | null,
+  selectedSource: SourceDetails | null | undefined,
+  selectedFrameId: PauseAndFrameId | null,
+  sourcesState: SourcesState,
+  position?: CursorPosition,
+  client?: ReplayClientInterface
+) {
+  if (!recordingId || !selectedSource) {
+    return null;
+  }
+  const sourceId = getSourceIdToVisualizeSuspense(
+    replayClient,
+    selectedSource,
+    selectedFrameId,
+    sourcesState,
+    position,
+    client
+  );
+  if (!sourceId) {
+    return null;
+  }
+
+  let href = `/recording/${recordingId}/sourcemaps/${sourceId}`;
   const dispatchUrl = new URL(location.href).searchParams.get("dispatch");
   if (dispatchUrl) {
     href += `?dispatch=${dispatchUrl}`;
@@ -234,13 +267,13 @@ function getAlternateSourceIdForPositionSuspense(
   });
   return source.isSourceMapped
     ? getBestNonSourceMappedSourceId(
-        sourcesById,
-        mappedLocation.map(loc => loc.sourceId)
-      )
+      sourcesById,
+      mappedLocation.map(loc => loc.sourceId)
+    )
     : getBestSourceMappedSourceId(
-        sourcesById,
-        mappedLocation.map(loc => loc.sourceId)
-      );
+      sourcesById,
+      mappedLocation.map(loc => loc.sourceId)
+    );
 }
 
 export function getAlternateSourceIdSuspense(
@@ -256,11 +289,11 @@ export function getAlternateSourceIdSuspense(
 
   let alternateSourceId = selectedFrameId
     ? getAlternateSourceIdFromSelectedFrameSuspense(
-        client,
-        selectedSource,
-        selectedFrameId,
-        sourcesState
-      )
+      client,
+      selectedSource,
+      selectedFrameId,
+      sourcesState
+    )
     : undefined;
   if (alternateSourceId) {
     return { sourceId: alternateSourceId };

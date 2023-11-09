@@ -9,7 +9,10 @@ import { useAppSelector } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
 
 import { getSelectedFrameId } from "../../reducers/pause";
-import { getSourcemapVisualizerURLSuspense } from "../../utils/sourceVisualizations";
+import {
+  getSourcemapVisualizerURLSuspense,
+  getSourcemapsViewerURLSuspense,
+} from "../../utils/sourceVisualizations";
 import { CursorPosition } from "./Footer";
 
 export default function SourcemapVisualizerLinkSuspends({
@@ -33,8 +36,36 @@ export default function SourcemapVisualizerLinkSuspends({
     cursorPosition,
     client
   );
-  if (!visualizerURL) {
-    return null;
+
+  const viewerURL = getSourcemapsViewerURLSuspense(
+    client,
+    recordingId,
+    selectedSource,
+    selectedFrameId,
+    sourcesState,
+    cursorPosition,
+    client
+  );
+
+  if (!visualizerURL && viewerURL) {
+    return (
+      <div className=" flex items-center pl-2">
+        <a
+          className="hover:underline"
+          target="_blank"
+          rel="noreferrer noopener"
+          href={viewerURL}
+          onClick={() => trackEvent("editor.open_sourcemap_visualizer")}
+        >
+          <Icon
+            size="small"
+            filename="external"
+            className="mr-1 cursor-pointer bg-iconColor group-hover:bg-primaryAccent"
+          />
+          Show Source Maps
+        </a>
+      </div>
+    );
   }
 
   return (
