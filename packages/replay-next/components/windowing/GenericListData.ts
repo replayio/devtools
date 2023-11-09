@@ -4,11 +4,13 @@ import { EventEmitter } from "shared/EventEmitter";
 
 export abstract class GenericListData<Item> extends EventEmitter<{
   invalidate: () => void;
+  loading: (value: boolean) => void;
   selectedIndex: (index: number | null) => void;
 }> {
   private _cachedItemToIndexMap: Map<Item, number> = new Map();
   private _cachedIndexToItemMap: Map<number, Item> = new Map();
   private _cachedItemCount: number | null = null;
+  private _isLoading: boolean = false;
   private _revision: number = 0;
   private _selectedIndex: number | null = null;
 
@@ -24,6 +26,10 @@ export abstract class GenericListData<Item> extends EventEmitter<{
 
     return index;
   }
+
+  getIsLoading = () => {
+    return this._isLoading;
+  };
 
   getItemAtIndex(index: number): Item {
     assert(
@@ -68,6 +74,13 @@ export abstract class GenericListData<Item> extends EventEmitter<{
     this.emit("selectedIndex", value);
   }
 
+  subscribeToLoading = (callback: (value: boolean) => void) => {
+    // Work around for github.com/facebook/react/issues/27670
+    callback(this._isLoading);
+
+    return this.addListener("loading", callback);
+  };
+
   subscribeToInvalidation = (callback: () => void) => {
     // Work around for github.com/facebook/react/issues/27670
     callback();
@@ -98,5 +111,11 @@ export abstract class GenericListData<Item> extends EventEmitter<{
     this._revision++;
 
     this.emit("invalidate");
+  }
+
+  protected updateLoadingState(value: boolean): void {
+    this._isLoading = value;
+
+    this.emit("loading", value);
   }
 }

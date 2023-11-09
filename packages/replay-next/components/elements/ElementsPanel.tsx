@@ -11,9 +11,9 @@ import {
 import AutoSizer from "react-virtualized-auto-sizer";
 
 import { ElementsList, ImperativeHandle } from "replay-next/components/elements/ElementsList";
-import { ElementsPanelLoader } from "replay-next/components/elements/ElementsPanelLoader";
 import { domSearchCache } from "replay-next/components/elements/suspense/DOMSearchCache";
 import Icon from "replay-next/components/Icon";
+import { PanelLoader } from "replay-next/components/PanelLoader";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import styles from "./ElementsPanel.module.css";
@@ -160,12 +160,16 @@ export function ElementsPanel({
         {pauseId ? (
           <AutoSizer disableWidth>
             {({ height }: { height: number }) => (
-              <Suspense fallback={<ElementsPanelLoader />}>
+              <Suspense
+                fallback={<PanelLoader className={styles.PanelLoader} style={{ height }} />}
+              >
                 <ElementsList
                   height={height}
                   forwardedRef={compositeListRef}
                   key={pauseId}
-                  noContentFallback={<ElementsPanelLoader />}
+                  noContentFallback={
+                    <PanelLoader className={styles.PanelLoader} style={{ height }} />
+                  }
                   onSelectionChange={onSelectionChange}
                   pauseId={pauseId}
                 />
@@ -173,7 +177,7 @@ export function ElementsPanel({
             )}
           </AutoSizer>
         ) : (
-          <ElementsPanelLoader />
+          <PanelLoader className={styles.PanelLoader} />
         )}
       </div>
     </div>
