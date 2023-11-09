@@ -30,7 +30,7 @@ function Elements() {
   const [pauseId, setPauseId] = useState<PauseId | null>(null);
   const [selectedObjectId, setSelectedObjectId] = useState<ObjectId | null>(null);
 
-  const listRef = useRef<ImperativeHandle>(null);
+  const [list, setList] = useState<ImperativeHandle | null>(null);
 
   // Jump to the middle of the Replay; hopefully there will be some Elements there
   useEffect(() => {
@@ -51,7 +51,6 @@ function Elements() {
     switch (event.key) {
       case "Enter":
         if (nodeId) {
-          const list = listRef.current;
           if (list) {
             list.selectNode(nodeId);
           }
@@ -74,7 +73,11 @@ function Elements() {
           value={nodeId}
         />
       </div>
-      <ElementsPanel listRef={listRef} onSelectionChange={setSelectedObjectId} pauseId={pauseId} />
+      <ElementsPanel
+        listRefSetter={setList}
+        onSelectionChange={setSelectedObjectId}
+        pauseId={pauseId}
+      />
       <div>
         {pauseId && selectedObjectId ? (
           <Suspense fallback={<Loader />}>
