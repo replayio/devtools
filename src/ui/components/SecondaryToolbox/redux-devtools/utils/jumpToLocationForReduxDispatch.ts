@@ -6,13 +6,7 @@ import { reduxDispatchJumpLocationCache } from "ui/suspense/jumpToLocationCache"
 
 export function jumpToLocationForReduxDispatch(point: ExecutionPoint, time: number): UIThunkAction {
   return async (dispatch, getState, { replayClient }) => {
-    const sourcesState = getState().sources;
-    const jumpLocation = await reduxDispatchJumpLocationCache.readAsync(
-      replayClient,
-      point,
-      time,
-      sourcesState
-    );
+    const jumpLocation = await reduxDispatchJumpLocationCache.readAsync(replayClient, point, time);
 
     if (jumpLocation) {
       dispatch(
