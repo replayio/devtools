@@ -8,7 +8,7 @@ import {
   useState,
 } from "react";
 
-import Icon from "replay-next/components/Icon";
+import Icon, { IconType } from "replay-next/components/Icon";
 import { useTestRunDetailsSuspends } from "ui/components/Library/Team/View/TestRuns/hooks/useTestRunDetailsSuspends";
 import {
   FileNode,
@@ -150,6 +150,16 @@ const FileNodeRenderer = memo(function FileNodeRenderer({
     }
   };
 
+  let type: IconType;
+
+  if (label === "Passed") {
+    type = "file";
+  } else if (label === "Failed") {
+    type = "error";
+  } else {
+    type = "warning";
+  }
+
   return (
     <>
       <div
@@ -160,7 +170,7 @@ const FileNodeRenderer = memo(function FileNodeRenderer({
           paddingLeft: `${depth * 1}rem`,
         }}
       >
-        <Icon className="h-5 w-5 shrink-0" type="file" />
+        <Icon className="h-5 w-5 shrink-0" type={type} />
         <div className="truncate">{name}</div>
       </div>
     </>
