@@ -202,8 +202,9 @@ export async function sendMessage<M extends CommandMethods>(
   const id = gNextMessageId++;
   const msg: CommandRequest = { id, method, params, pauseId, sessionId };
   const callerStackTrace = new Error(`Caller stacktrace for ${method}`);
+  console.log(`sendMessage`, method);
 
-  if (gSocketOpen) {
+  if (gSocketOpen && socket.readyState === WebSocket.OPEN) {
     doSend(msg);
   } else {
     gPendingMessages.push(msg);
@@ -252,11 +253,14 @@ const doSend = makeInfallible(message => {
   gSentBytes += stringified.length;
 
   gSessionCallbacks?.onRequest(message);
-
   socket.send(stringified);
 });
 
 function flushQueuedMessages() {
+  if (socket.readyState !== WebSocket.OPEN) {
+    return;
+  }
+
   gPendingMessages.forEach(msg => doSend(msg));
   gPendingMessages.length = 0;
   gSocketOpen = true;

@@ -37,35 +37,29 @@ export default function SourcemapVisualizerLinkSuspends({
     client
   );
 
-  const viewerURL = getSourcemapsViewerURLSuspense(
-    client,
-    recordingId,
-    selectedSource,
-    selectedFrameId,
-    sourcesState,
-    cursorPosition,
-    client
-  );
+  const viewerURL = getSourcemapsViewerURLSuspense(recordingId, selectedSource);
 
-  if (!visualizerURL && viewerURL) {
-    return (
-      <div className=" flex items-center pl-2">
-        <a
-          className="hover:underline"
-          target="_blank"
-          rel="noreferrer noopener"
-          href={viewerURL}
-          onClick={() => trackEvent("editor.open_sourcemap_visualizer")}
-        >
-          <Icon
-            size="small"
-            filename="external"
-            className="mr-1 cursor-pointer bg-iconColor group-hover:bg-primaryAccent"
-          />
-          Show Source Maps
-        </a>
-      </div>
-    );
+  if (!visualizerURL) {
+    if (viewerURL) {
+      return (
+        <div className=" flex items-center pl-2">
+          <a
+            className="hover:underline"
+            target="_blank"
+            rel="noreferrer noopener"
+            href={viewerURL}
+            onClick={() => trackEvent("editor.open_sourcemap_visualizer")}
+          >
+            <Icon
+              size="small"
+              filename="external"
+              className="mr-1 cursor-pointer bg-iconColor group-hover:bg-primaryAccent"
+            />
+          </a>
+        </div>
+      );
+    }
+    return null;
   }
 
   return (
