@@ -85,6 +85,11 @@ function DefaultSelectedFrameContextAdapter() {
     let cancelled = false;
 
     async function getData() {
+      if (!executionPoint) {
+        setSelectedPauseAndFrameId(null);
+        return;
+      }
+
       const pauseId = await pauseIdCache.readAsync(client, executionPoint, time);
 
       // Edge case handle an update that rendered while we were awaiting data.

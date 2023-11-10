@@ -116,7 +116,7 @@ function MetaHoverButton({
   }
 
   let targetPoint: TimeStampedPoint | null = null;
-  if (hitPoints !== null && hitPointStatus !== "too-many-points-to-find") {
+  if (executionPoint && hitPoints !== null && hitPointStatus !== "too-many-points-to-find") {
     if (isShiftKeyActive) {
       targetPoint = findLastHitPoint(hitPoints, executionPoint);
     } else {

@@ -12,7 +12,7 @@ export default function useCurrentPauseIdSuspense(): PauseId | null {
   const { executionPoint, time } = useContext(TimelineContext);
 
   const isInFocusWindow = useIsPointWithinFocusWindow(executionPoint);
-  if (!isInFocusWindow) {
+  if (!executionPoint || !isInFocusWindow) {
     return null;
   }
 

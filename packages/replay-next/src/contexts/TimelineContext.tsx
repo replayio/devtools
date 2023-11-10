@@ -9,7 +9,7 @@ import {
 } from "react";
 
 export type TimelineContextType = {
-  executionPoint: ExecutionPoint;
+  executionPoint: ExecutionPoint | null;
   isPending: boolean;
   time: number;
   update: (
