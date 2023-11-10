@@ -1,15 +1,15 @@
 import { ObjectId } from "@replayio/protocol";
 import { useEffect, useRef } from "react";
 
-import { getPauseId } from "devtools/client/debugger/src/selectors";
 import { selectNode } from "devtools/client/inspector/markup/actions/markup";
 import { getSelectedNodeId } from "devtools/client/inspector/markup/selectors/markup";
 import ElementsPanel from "replay-next/components/elements";
 import { ImperativeHandle } from "replay-next/components/elements/ElementsList";
+import { useMostRecentLoadedPause } from "replay-next/src/hooks/useMostRecentLoadedPause";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 export function ElementsPanelAdapter() {
-  const pauseId = useAppSelector(getPauseId);
+  const { pauseId } = useMostRecentLoadedPause() ?? {};
   const selectedNodeId = useAppSelector(getSelectedNodeId);
 
   const dispatch = useAppDispatch();

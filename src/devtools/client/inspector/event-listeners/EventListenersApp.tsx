@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useMemo, useState } from "react";
 
-import { getPauseId } from "devtools/client/debugger/src/reducers/pause";
 import { getSelectedDomNodeId } from "devtools/client/inspector/markup/reducers/markup";
 import { onViewSourceInDebugger } from "devtools/client/webconsole/actions/toolbox";
+import { useMostRecentLoadedPause } from "replay-next/src/hooks/useMostRecentLoadedPause";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { getNodeEventListeners } from "ui/actions/event-listeners";
@@ -20,7 +20,7 @@ export const EventListenersApp = () => {
   const [listeners, setListeners] = useState<EventListenerWithFunctionInfo[]>([]);
   const selectedDomNodeId = useAppSelector(getSelectedDomNodeId);
   const dispatch = useAppDispatch();
-  const pauseId = useAppSelector(getPauseId);
+  const { pauseId } = useMostRecentLoadedPause() ?? {};
   const replayClient = useContext(ReplayClientContext);
 
   useEffect(() => {

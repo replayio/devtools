@@ -6,7 +6,7 @@ import React, { useContext } from "react";
 import { shallowEqual } from "react-redux";
 import { useImperativeCacheValue } from "suspense";
 
-import { getPauseId } from "devtools/client/debugger/src/selectors";
+import { useMostRecentLoadedPause } from "replay-next/src/hooks/useMostRecentLoadedPause";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { useAppSelector } from "ui/setup/hooks";
 import { layoutCache } from "ui/suspense/styleCaches";
@@ -16,9 +16,9 @@ import { getSelectedNodeId } from "../../markup/selectors/markup";
 
 function LayoutApp() {
   const replayClient = useContext(ReplayClientContext);
-  const { pauseId, selectedNodeId } = useAppSelector(
+  const { pauseId } = useMostRecentLoadedPause() ?? {};
+  const { selectedNodeId } = useAppSelector(
     state => ({
-      pauseId: getPauseId(state),
       selectedNodeId: getSelectedNodeId(state),
     }),
     shallowEqual
