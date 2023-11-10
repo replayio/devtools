@@ -12,7 +12,7 @@ type ViewContainerContextType = {
   setView: (view: View) => void;
 };
 
-export type View = "recordings" | "runs";
+export type View = "recordings" | "runs" | "tests";
 
 export const ViewContext = createContext<ViewContainerContextType>(null as any);
 export function ViewContextRoot({

@@ -2,6 +2,7 @@ import { useContext } from "react";
 
 import { FilterBarContainer } from "./FilterBarContainer";
 import { RecordingsPage } from "./Recordings/RecordingsPage";
+import RunsPage from "./Runs/RunsPage";
 import { TestRunsPage } from "./TestRuns/TestRunsPage";
 import { ViewContext, ViewContextRoot } from "./ViewContextRoot";
 
@@ -20,7 +21,13 @@ export function ViewPageContent() {
     <div className="flex flex-grow flex-col overflow-hidden">
       <FilterBarContainer />
       <div className="flex flex-grow flex-row overflow-hidden">
-        {view === "recordings" ? <RecordingsPage /> : <TestRunsPage />}
+        {view === "recordings" ? (
+          <RecordingsPage />
+        ) : view === "runs" ? (
+          <TestRunsPage />
+        ) : (
+          <RunsPage />
+        )}
       </div>
     </div>
   );

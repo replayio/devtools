@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { MouseEvent } from "react";
+import { MouseEvent, useContext } from "react";
 
 import { setModal } from "ui/actions/app";
 import { MY_LIBRARY_TEAM } from "ui/components/Library/Team/TeamContextRoot";
@@ -10,6 +10,8 @@ import { useUpdateDefaultWorkspace } from "ui/hooks/settings";
 import { useAppDispatch } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
 
+import { pushRoute, useGetTeamRouteParams } from "../Team/utils";
+import { View, ViewContext } from "../Team/View/ViewContextRoot";
 import styles from "../Library.module.css";
 
 export function TeamButton({
@@ -72,11 +74,34 @@ export function TeamButton({
   );
 }
 
+// We don't currently have a context shared between the navigation
+// and the content of the library UI. Getting the view/teamId this
+// way is pretty clunky, so we should probably lift that state up
 function TestTeamViews() {
+  const router = useRouter();
+  const cont = useContext(ViewContext);
+  const view = useGetTeamRouteParams().view;
+  const { teamId } = useGetTeamRouteParams();
+
+  const setView = (view: View) => {
+    pushRoute(router, `/team/${teamId}/${view}`);
+  };
+
   return (
     <div className="pl-4 pb-2">
       <div className="flex flex-col">
-        <div className="px-4 py-1 font-bold">Runs</div>
+        <div
+          className={`px-4 py-1 ${view === "runs" ? "font-bold" : ""}`}
+          onClick={() => setView("runs")}
+        >
+          Runs
+        </div>
+        <div
+          className={`px-4 py-1 ${view === "tests" ? "font-bold" : ""}`}
+          onClick={() => setView("tests")}
+        >
+          Tests
+        </div>
       </div>
     </div>
   );
