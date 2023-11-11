@@ -8,22 +8,26 @@ import { testRunsCache } from "ui/components/Library/Team/View/TestRuns/suspense
 import useToken from "ui/utils/useToken";
 import { testsCache } from "../../TestRuns/suspense/TestsCache";
 
+
+
+
 const EMPTY_ARRAY: any[] = [];
 
-// export function useTestRuns(): TestRun[] {
-//   const graphQLClient = useContext(GraphQLClientContext);
-//   const { teamId } = useContext(TeamContext);
+export function useTestRuns(): TestRun[] {
+  const graphQLClient = useContext(GraphQLClientContext);
+  const { teamId } = useContext(TeamContext);
 
-//   const accessToken = useToken();
+  const accessToken = useToken();
 
-//   const { value = EMPTY_ARRAY } = useImperativeCacheValue(
-//     testRunsCache,
-//     graphQLClient,
-//     accessToken?.token ?? null,
-//     teamId
-//   );
-//   return value;
-// }
+  const { value = EMPTY_ARRAY } = useImperativeCacheValue(
+    testRunsCache,
+    graphQLClient,
+    accessToken?.token ?? null,
+    teamId
+  );
+  return value;
+}
+
 export function useTests(): any[] {
   const graphQLClient = useContext(GraphQLClientContext);
   const { teamId } = useContext(TeamContext);

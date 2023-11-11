@@ -8,6 +8,7 @@ import {
 } from "ui/components/Library/Team/View/TestRuns/graphql/TestRunsGraphQL";
 import { getTestsGraphQL } from "../../Tests/graphql/TestsGraphQL";
 
+
 export const testsCache = createCache<
   [graphQLClient: GraphQLClientInterface, accessToken: string | null, workspaceId: string],
   TestRun[]
@@ -16,8 +17,9 @@ export const testsCache = createCache<
   debugLabel: "testRunsCache",
   getKey: ([_, __, workspaceId]) => workspaceId,
   load: async ([graphQLClient, accessToken, workspaceId]) => {
+
     const rawTests = await getTestsGraphQL(graphQLClient, accessToken, workspaceId);
-    console.log({rawTests});
+    console.log({ rawTests });
 
     // const tests = rawTests.map(processTests);
 

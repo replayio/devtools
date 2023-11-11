@@ -4,6 +4,8 @@ import {
 } from "shared/graphql/generated/GetTestsRunsForWorkspace";
 import { GraphQLClientInterface } from "shared/graphql/GraphQLClient";
 
+import GetTestsForWorkspaces from "./fixtures/GetTestsForWorkspace.json"
+
 // const GET_TEST_RUNS = gql`
 const GET_TESTS = gql`
   query GetTestsForWorkspace($workspaceId: ID!) {
@@ -17,11 +19,7 @@ const GET_TESTS = gql`
               title
               scope
               executions {
-                title
                 result
-                runnerName
-                runnerVersion
-                createdAt
               }
             }
           }
@@ -38,7 +36,8 @@ export async function getTestsGraphQL(
 ): Promise<any[]> {
   console.log("gettestsgraphql")
 
-  const response = await graphQLClient.send<any>(
+
+  const response = true ? GetTestsForWorkspaces.data : await graphQLClient.send<any>(
     {
       operationName: "GetTestsForWorkspace",
       query: GET_TESTS,
@@ -47,7 +46,7 @@ export async function getTestsGraphQL(
     accessToken
   );
 
-  console.log({response});
+  console.log({ response });
 
   if (response?.node == null) {
     return [];
