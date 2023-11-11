@@ -33,7 +33,22 @@ export interface TestRunTestWithRecordings extends TestRunTest {
   recordings: Recording[];
 }
 
-export type __TEST = any;
+export type __TEST = {
+  testId: string;
+  title: string;
+  failureRate: number;
+  failureRates: FailureRates;
+  executions: any[];
+};
+
+export type FailureRates = {
+  hour: number;
+  day: number;
+  week: number;
+  month: number;
+}
+
+export type __EXECUTION = any;
 
 export type TestRun = {
   date: string;

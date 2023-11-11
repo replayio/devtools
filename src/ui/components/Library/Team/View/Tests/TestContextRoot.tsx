@@ -10,7 +10,7 @@ import {
   useState,
 } from "react";
 
-import { TestRun, getTestRunTitle } from "shared/test-suites/TestRun";
+import { TestRun, __TEST, getTestRunTitle } from "shared/test-suites/TestRun";
 import { useGetTeamRouteParams } from "ui/components/Library/Team/utils";
 import { useSyncTestRunIdToUrl } from "ui/components/Library/Team/View/TestRuns/hooks/useSyncTestIdToUrl";
 import { useTestRuns } from "ui/components/Library/Team/View/TestRuns/hooks/useTestRuns";
@@ -22,25 +22,23 @@ type TestsContextType = {
   // filterByStatus: "all" | "failed";
   filterByText: string;
   filterByTextForDisplay: string;
-  // selectTestRun: Dispatch<SetStateAction<string | null>>;
+  selectTestId: Dispatch<SetStateAction<string | null>>;
   // setFilterByBranch: Dispatch<SetStateAction<"all" | "primary">>;
   // setFilterByStatus: Dispatch<SetStateAction<"all" | "failed">>;
   setFilterByText: Dispatch<SetStateAction<string>>;
-  // testRunId: string | null;
-  // testRunIdForDisplay: string | null;
-  tests: any[];
+  testId: string | null;
+  testIdForDisplay: string | null;
+  tests: __TEST[];
 };
 
 export const TestContext = createContext<TestsContextType>(null as any);
 
 export function TestsContextRoot({ children }: { children: ReactNode }) {
-  const { teamId, testRunId: defaultTestRunId } = useGetTeamRouteParams();
+  // const { teamId, testRunId: defaultTestRunId } = useGetTeamRouteParams();
 
   const tests = useTests();
 
-  console.log({ tests });
-
-  // const [testRunId, setTestRunId] = useState<string | null>(defaultTestRunId);
+  const [testId, setTestId] = useState<string | null>(null);
 
   // const [filterByBranch, setFilterByBranch] = useState<"all" | "primary">("all");
   // const [filterByStatus, setFilterByStatus] = useState<"all" | "failed">("all");
@@ -82,7 +80,7 @@ export function TestsContextRoot({ children }: { children: ReactNode }) {
 
   // useSyncTestRunIdToUrl(teamId, testRunId, setTestRunId);
 
-  // const deferredTestRunId = useDeferredValue(testRunId);
+  const deferredTestId = useDeferredValue(testId);
 
   return (
     <TestContext.Provider
@@ -91,13 +89,12 @@ export function TestsContextRoot({ children }: { children: ReactNode }) {
         // filterByStatus,
         filterByText: filterByTextDeferred,
         filterByTextForDisplay: filterByText,
-        // selectTestRun: setTestRunId,
+        selectTestId: setTestId,
         // setFilterByBranch,
         // setFilterByStatus,
         setFilterByText,
-        // testRunId: deferredTestRunId,
-        // testRunIdForDisplay: testRunId,
-        // testRuns: filteredTestRuns,
+        testId: deferredTestId,
+        testIdForDisplay: testId,
         tests,
       }}
     >

@@ -2,10 +2,7 @@ import orderBy from "lodash/orderBy";
 import { createCache } from "suspense";
 
 import { GraphQLClientInterface } from "shared/graphql/GraphQLClient";
-import { TestRun, processTestRun } from "shared/test-suites/TestRun";
-import {
-  getTestRunsGraphQL,
-} from "ui/components/Library/Team/View/TestRuns/graphql/TestRunsGraphQL";
+import { TestRun, __EXECUTION } from "shared/test-suites/TestRun";
 import { getTestsGraphQL } from "../../Tests/graphql/TestsGraphQL";
 
 
@@ -24,21 +21,29 @@ export const testsCache = createCache<
     // until we're able to do it from the backend
     const processedTests = rawTests.map(t => ({
       ...t,
-      failureRate: t.executions.filter(e => e.result === "failed").length / t.executions.length
+      failureRate: getFailureRate(t.executions),
+      failureRates: getFailureRates(t.executions)
     }))
 
-    // const tests = rawTests.map(processTests);
+    console.log("processedTests", processedTests);
 
     return orderBy(processedTests, "failureRate", "desc");
   },
 });
 
-// export function processTests(test: any): any {
-//   const { mode, results, ...rest } = testRun;
+function getFailureRates(executions: __EXECUTION[]) {
+  return {
+    hour: getFailureRate(executions.filter(e => ((Date.now() - (new Date(e.createdAt)).getTime()) / 1000 / 60 / 60 ) < 1 )),
+    day: getFailureRate(executions.filter(e => ((Date.now() - (new Date(e.createdAt)).getTime()) / 1000 / 60 / 60 / 24) < 1 )),
+    week: getFailureRate(executions.filter(e => ((Date.now() - (new Date(e.createdAt)).getTime()) / 1000 / 60 / 60 / 24) < 7 )),
+    month: getFailureRate(executions.filter(e => ((Date.now() - (new Date(e.createdAt)).getTime()) / 1000 / 60 / 60 / 24) < 30 )),
+  };
+}
 
-//   return {
-//     ...rest,
-//     mode: mode as Mode | null,
-//     results,
-//   };
-// }
+function getFailureRate(executions: __EXECUTION[]) {
+  if (!executions.length) {
+    return 0;
+  }
+  
+  return executions.filter(e => e.result === "failed").length / executions.length
+}
