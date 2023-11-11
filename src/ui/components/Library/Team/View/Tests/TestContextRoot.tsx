@@ -1,5 +1,4 @@
 import { useRouter } from "next/router";
-
 import {
   Dispatch,
   ReactNode,
@@ -16,7 +15,7 @@ import { useGetTeamRouteParams } from "ui/components/Library/Team/utils";
 import { useSyncTestRunIdToUrl } from "ui/components/Library/Team/View/TestRuns/hooks/useSyncTestIdToUrl";
 import { useTestRuns } from "ui/components/Library/Team/View/TestRuns/hooks/useTestRuns";
 
-type TestRunsContextType = {
+type TestsContextType = {
   filterByBranch: "all" | "primary";
   filterByStatus: "all" | "failed";
   filterByText: string;
@@ -30,9 +29,9 @@ type TestRunsContextType = {
   testRuns: TestRun[];
 };
 
-export const TestContext = createContext<TestRunsContextType>(null as any);
+export const TestsContext = createContext<TestsContextType>(null as any);
 
-export function TestContextRoot({ children }: { children: ReactNode }) {
+export function TestsContextRoot({ children }: { children: ReactNode }) {
   const { teamId, testRunId: defaultTestRunId } = useGetTeamRouteParams();
 
   const testRuns = useTestRuns();
@@ -101,7 +100,7 @@ export function TestContextRoot({ children }: { children: ReactNode }) {
   const deferredTestRunId = useDeferredValue(testRunId);
 
   return (
-    <TestRunsContext.Provider
+    <TestsContext.Provider
       value={{
         filterByBranch,
         filterByStatus,
@@ -117,6 +116,6 @@ export function TestContextRoot({ children }: { children: ReactNode }) {
       }}
     >
       {children}
-    </TestRunsContext.Provider>
+    </TestsContext.Provider>
   );
 }

@@ -3,10 +3,10 @@ import ReactVirtualizedAutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 
 import { TestRun } from "shared/test-suites/TestRun";
-import { TestListItem } from "ui/components/Library/Team/View/TestRuns/TestListItem";
+import { TestListItem } from "ui/components/Library/Team/View/Tests/TestListItem";
 import { SecondaryButton } from "ui/components/shared/Button";
 
-import { TestContext } from "./TestContextRoot";
+import { TestsContext } from "./TestContextRoot";
 
 const PAGE_SIZE = 50;
 const ROW_HEIGHT = 65;
@@ -19,7 +19,7 @@ type ItemData = {
 };
 
 export function TestList() {
-  const { filterByText, testRuns } = useContext(TestContext);
+  const { filterByText, testRuns } = useContext(TestsContext);
   const [countToRender, setCountToRender] = useState(PAGE_SIZE);
 
   const itemData = useMemo<ItemData>(

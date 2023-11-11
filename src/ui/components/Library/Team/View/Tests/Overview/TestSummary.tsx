@@ -10,8 +10,7 @@ import {
   getDurationString,
   getTruncatedRelativeDate,
 } from "../../Recordings/RecordingListItem/RecordingListItem";
-import { AttributeContainer } from "../AttributeContainer";
-import { RunStats } from "../RunStats";
+import { TestStats } from "../TestStats";
 
 export function ModeAttribute({ testRun }: { testRun: TestRun }) {
   const { mode } = testRun;

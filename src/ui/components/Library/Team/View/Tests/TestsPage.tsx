@@ -6,15 +6,15 @@ import Icon from "replay-next/components/Icon";
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 
 import { TestOverviewPage } from "./Overview/TestOverviewContextRoot";
-import { TestContext, TestContextRoot } from "./TestContextRoot";
+import { TestsContext, TestsContextRoot } from "./TestContextRoot";
 import { TestList } from "./TestList";
-import styles from "./TestRunsPage.module.css";
+import styles from "./TestsPage.module.css";
 
-export function TestRunsPage() {
+export function TestsPage() {
   return (
-    <TestContextRoot>
+    <TestsContextRoot>
       <TestRunsContent />
-    </TestContextRoot>
+    </TestsContextRoot>
   );
 }
 
@@ -27,7 +27,7 @@ function TestRunsContent() {
     setFilterByBranch,
     setFilterByStatus,
     setFilterByText,
-  } = useContext(TestContext);
+  } = useContext(TestsContext);
 
   const {
     contextMenu: contextMenuStatusFilter,
@@ -72,7 +72,7 @@ function TestRunsContent() {
             <div className="flex flex-row items-center justify-between gap-2 border-b border-themeBorder bg-bodyBgcolor p-2">
               <div
                 className={styles.dropdownTrigger}
-                data-test-id="TestRunsPage-ResultFilter-DropdownTrigger"
+                data-test-id="TestPage-ResultFilter-DropdownTrigger"
                 onClick={onClickStatusFilter}
                 onKeyDown={onKeyDownStatusFilter}
                 tabIndex={0}
@@ -83,7 +83,7 @@ function TestRunsContent() {
               {contextMenuStatusFilter}
               <div
                 className={styles.dropdownTrigger}
-                data-test-id="TestRunsPage-BranchFilter-DropdownTrigger"
+                data-test-id="TestPage-BranchFilter-DropdownTrigger"
                 onClick={onClickBranchFilter}
                 onKeyDown={onKeyDownBranchFilter}
                 tabIndex={0}
@@ -95,7 +95,7 @@ function TestRunsContent() {
               <div className={styles.filterContainer}>
                 <input
                   className={styles.filterInput}
-                  data-test-id="TestRunsPage-FilterByText-Input"
+                  data-test-id="TestPage-FilterByText-Input"
                   onChange={event => setFilterByText(event.currentTarget.value)}
                   placeholder="Filter test runs"
                   type="text"
