@@ -2,8 +2,8 @@ import { useContext } from "react";
 
 import { FilterBarContainer } from "./FilterBarContainer";
 import { RecordingsPage } from "./Recordings/RecordingsPage";
-import RunsPage from "./Runs/RunsPage";
 import { TestRunsPage } from "./TestRuns/TestRunsPage";
+import RunsPage from "./Tests/TestsPage";
 import { ViewContext, ViewContextRoot } from "./ViewContextRoot";
 
 export function ViewPage({ defaultView }: { defaultView: string }) {
