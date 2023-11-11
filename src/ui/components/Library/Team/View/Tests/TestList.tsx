@@ -2,11 +2,11 @@ import { useContext, useMemo, useState } from "react";
 import ReactVirtualizedAutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 
-import { TestRun } from "shared/test-suites/TestRun";
+import { TestRun, __TEST } from "shared/test-suites/TestRun";
 import { TestListItem } from "ui/components/Library/Team/View/Tests/TestListItem";
 import { SecondaryButton } from "ui/components/shared/Button";
 
-import { TestsContext } from "./TestContextRoot";
+import { TestContext } from "./TestContextRoot";
 
 const PAGE_SIZE = 50;
 const ROW_HEIGHT = 65;
@@ -15,11 +15,11 @@ type ItemData = {
   countToRender: number;
   filterByText: string;
   loadMore: () => void;
-  testRuns: TestRun[];
+  tests: __TEST[];
 };
 
 export function TestList() {
-  const { filterByText, testRuns } = useContext(TestsContext);
+  const { tests, filterByText } = useContext(TestContext);
   const [countToRender, setCountToRender] = useState(PAGE_SIZE);
 
   const itemData = useMemo<ItemData>(
@@ -27,12 +27,12 @@ export function TestList() {
       countToRender,
       filterByText,
       loadMore: () => setCountToRender(countToRender + PAGE_SIZE),
-      testRuns,
+      tests,
     }),
-    [countToRender, filterByText, testRuns]
+    [countToRender, tests, filterByText]
   );
 
-  const itemCount = Math.min(countToRender + 1, testRuns.length);
+  const itemCount = Math.min(countToRender + 1, tests.length);
 
   return (
     <ReactVirtualizedAutoSizer
@@ -52,7 +52,9 @@ export function TestList() {
 }
 
 function TestListRow({ data, index, style }: ListChildComponentProps<ItemData>) {
-  const { countToRender, filterByText, loadMore, testRuns } = data;
+  const { countToRender, filterByText, loadMore, tests } = data;
+
+  console.log({ tests });
 
   if (index === countToRender) {
     return (
@@ -66,7 +68,7 @@ function TestListRow({ data, index, style }: ListChildComponentProps<ItemData>) 
 
   return (
     <div style={style}>
-      <TestListItem filterByText={filterByText} testRun={testRuns[index]} />
+      <TestListItem filterByText={filterByText} test={tests[index]} />
     </div>
   );
 }

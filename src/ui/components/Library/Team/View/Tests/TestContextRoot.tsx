@@ -15,31 +15,35 @@ import { useGetTeamRouteParams } from "ui/components/Library/Team/utils";
 import { useSyncTestRunIdToUrl } from "ui/components/Library/Team/View/TestRuns/hooks/useSyncTestIdToUrl";
 import { useTestRuns } from "ui/components/Library/Team/View/TestRuns/hooks/useTestRuns";
 
+import { useTests } from "./hooks/useTests";
+
 type TestsContextType = {
-  filterByBranch: "all" | "primary";
-  filterByStatus: "all" | "failed";
+  // filterByBranch: "all" | "primary";
+  // filterByStatus: "all" | "failed";
   filterByText: string;
   filterByTextForDisplay: string;
-  selectTestRun: Dispatch<SetStateAction<string | null>>;
-  setFilterByBranch: Dispatch<SetStateAction<"all" | "primary">>;
-  setFilterByStatus: Dispatch<SetStateAction<"all" | "failed">>;
+  // selectTestRun: Dispatch<SetStateAction<string | null>>;
+  // setFilterByBranch: Dispatch<SetStateAction<"all" | "primary">>;
+  // setFilterByStatus: Dispatch<SetStateAction<"all" | "failed">>;
   setFilterByText: Dispatch<SetStateAction<string>>;
-  testRunId: string | null;
-  testRunIdForDisplay: string | null;
-  testRuns: TestRun[];
+  // testRunId: string | null;
+  // testRunIdForDisplay: string | null;
+  tests: any[];
 };
 
-export const TestsContext = createContext<TestsContextType>(null as any);
+export const TestContext = createContext<TestsContextType>(null as any);
 
 export function TestsContextRoot({ children }: { children: ReactNode }) {
   const { teamId, testRunId: defaultTestRunId } = useGetTeamRouteParams();
 
-  const testRuns = useTestRuns();
+  const tests = useTests();
 
-  const [testRunId, setTestRunId] = useState<string | null>(defaultTestRunId);
+  console.log({ tests });
 
-  const [filterByBranch, setFilterByBranch] = useState<"all" | "primary">("all");
-  const [filterByStatus, setFilterByStatus] = useState<"all" | "failed">("all");
+  // const [testRunId, setTestRunId] = useState<string | null>(defaultTestRunId);
+
+  // const [filterByBranch, setFilterByBranch] = useState<"all" | "primary">("all");
+  // const [filterByStatus, setFilterByStatus] = useState<"all" | "failed">("all");
 
   const [filterByText, setFilterByText] = useState("");
   const filterByTextDeferred = useDeferredValue(filterByText);
@@ -47,36 +51,16 @@ export function TestsContextRoot({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   const filteredTestRuns = useMemo(() => {
-    let filteredTestRuns = testRuns;
+    let filteredTestRuns = tests;
 
-    if (filterByBranch === "primary" || filterByStatus === "failed" || filterByText !== "") {
+    if (filterByText !== "") {
       const lowerCaseText = filterByText.toLowerCase();
 
       filteredTestRuns = filteredTestRuns.filter(testRun => {
-        if (filterByStatus === "failed") {
-          if (testRun.results.counts.failed === 0) {
-            return false;
-          }
-        }
-
-        const branchName = testRun.source?.branchName ?? "";
-
-        if (filterByBranch === "primary") {
-          // TODO This should be configurable by Workspace
-          if (branchName !== "main" && branchName !== "master") {
-            return false;
-          }
-        }
-
         if (filterByText !== "") {
-          const user = testRun.source?.user ?? "";
           const title = getTestRunTitle(testRun);
 
-          if (
-            !branchName.toLowerCase().includes(lowerCaseText) &&
-            !user.toLowerCase().includes(lowerCaseText) &&
-            !title.toLowerCase().includes(lowerCaseText)
-          ) {
+          if (!title.toLowerCase().includes(lowerCaseText)) {
             return false;
           }
         }
@@ -86,36 +70,38 @@ export function TestsContextRoot({ children }: { children: ReactNode }) {
     }
 
     return filteredTestRuns;
-  }, [filterByBranch, filterByStatus, filterByText, testRuns]);
+  }, [filterByText, tests]);
+  // }, [filterByBranch, filterByStatus, filterByText, testRuns]);
 
-  useEffect(() => {
-    if (testRunId == null) {
-      // Select the first test run by default if nothing is selected.
-      setTestRunId(testRuns[0]?.id ?? null);
-    }
-  }, [router, teamId, testRunId, testRuns]);
+  // useEffect(() => {
+  //   if (testRunId == null) {
+  //     // Select the first test run by default if nothing is selected.
+  //     setTestRunId(testRuns[0]?.id ?? null);
+  //   }
+  // }, [router, teamId, testRunId, testRuns]);
 
-  useSyncTestRunIdToUrl(teamId, testRunId, setTestRunId);
+  // useSyncTestRunIdToUrl(teamId, testRunId, setTestRunId);
 
-  const deferredTestRunId = useDeferredValue(testRunId);
+  // const deferredTestRunId = useDeferredValue(testRunId);
 
   return (
-    <TestsContext.Provider
+    <TestContext.Provider
       value={{
-        filterByBranch,
-        filterByStatus,
+        // filterByBranch,
+        // filterByStatus,
         filterByText: filterByTextDeferred,
         filterByTextForDisplay: filterByText,
-        selectTestRun: setTestRunId,
-        setFilterByBranch,
-        setFilterByStatus,
+        // selectTestRun: setTestRunId,
+        // setFilterByBranch,
+        // setFilterByStatus,
         setFilterByText,
-        testRunId: deferredTestRunId,
-        testRunIdForDisplay: testRunId,
-        testRuns: filteredTestRuns,
+        // testRunId: deferredTestRunId,
+        // testRunIdForDisplay: testRunId,
+        // testRuns: filteredTestRuns,
+        tests,
       }}
     >
       {children}
-    </TestsContext.Provider>
+    </TestContext.Provider>
   );
 }

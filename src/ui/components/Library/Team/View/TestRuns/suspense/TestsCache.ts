@@ -14,16 +14,22 @@ export const testsCache = createCache<
   TestRun[]
 >({
   config: { immutable: true },
-  debugLabel: "testRunsCache",
+  debugLabel: "testsCache",
   getKey: ([_, __, workspaceId]) => workspaceId,
   load: async ([graphQLClient, accessToken, workspaceId]) => {
 
     const rawTests = await getTestsGraphQL(graphQLClient, accessToken, workspaceId);
-    console.log({ rawTests });
+    
+    // Compute the failure rate and add it to the stored test in cache
+    // until we're able to do it from the backend
+    const processedTests = rawTests.map(t => ({
+      ...t,
+      failureRate: t.executions.filter(e => e.result === "failed").length / t.executions.length
+    }))
 
     // const tests = rawTests.map(processTests);
 
-    return orderBy(rawTests, "date", "desc");
+    return orderBy(processedTests, "failureRate", "desc");
   },
 });
 
