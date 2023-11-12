@@ -26,8 +26,6 @@ export const testsCache = createCache<
       errorFrequency: getErrorFrequency(t.executions),
     }))
 
-    console.log("processedTests", processedTests);
-
     return orderBy(processedTests, "failureRate", "desc");
   },
 });

@@ -1,6 +1,7 @@
 import { access } from "fs";
+import orderBy from "lodash/orderBy";
 import { string } from "prop-types";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 
 import { FailureRates, __EXECUTION } from "shared/test-suites/TestRun";
 import { useTestRunDetailsSuspends } from "ui/components/Library/Team/View/TestRuns/hooks/useTestRunDetailsSuspends";
@@ -40,7 +41,7 @@ export function TestOverviewContent() {
             </div>
           </div>
           <Stats failureRates={test.failureRates} />
-          <ErrorFrequency errorFrequency={test.errorFrequency} />
+          <ErrorFrequency errorFrequency={test.errorFrequency} executions={test.executions} />
           {/* <RunSummary
             isPending={isPending}
             recordings={recordings}
@@ -60,17 +61,59 @@ export function TestOverviewContent() {
   );
 }
 
-function ErrorFrequency({ errorFrequency }: { errorFrequency: Record<string, number> }) {
+function ErrorFrequency({
+  errorFrequency,
+  executions,
+}: {
+  errorFrequency: Record<string, number>;
+  executions: __EXECUTION[];
+}) {
+  const [selectedError, setSelectedError] = useState<string | null>(null);
+
+  const passing = executions.filter(e => e.result === "passed");
+  const failing = executions.filter(e => e.result === "failed");
+  const sortedFailing = orderBy(failing, "createdAt", "desc");
+  const sortedPassing = orderBy(passing, "createdAt", "desc");
+
+  console.log({sortedFailing, sortedPassing});
+
   return (
     <div>
       <div>Top Errors</div>
       <div>
         {Object.entries(errorFrequency).map(([msg, count]) => (
-          <div key={msg} className="overflow-hidden overflow-ellipsis whitespace-nowrap">
+          <div
+            key={msg}
+            className="overflow-hidden overflow-ellipsis whitespace-nowrap"
+            onClick={() => setSelectedError(msg)}
+          >
             {count}: {msg}
           </div>
         ))}
       </div>
+      {selectedError ? (
+        <div>
+          <div className="overflow-hidden overflow-ellipsis whitespace-nowrap">
+            Selected error: {selectedError}
+          </div>
+          <div>
+            <div>Replay that contain this error</div>
+            <div>
+              {sortedFailing.slice(0, 3).map((e, i) => (
+                <div key={i}>{e.createdAt}</div>
+              ))}
+            </div>
+          </div>
+          <div>
+            <div>Recent replays of the test passing</div>
+            <div>
+              {sortedPassing.slice(0, 3).map((e, i) => (
+                <div key={i}>{e.createdAt}</div>
+              ))}
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -84,19 +127,19 @@ function Stats({ failureRates }: { failureRates: FailureRates }) {
         <div>Historical failure rate</div>
         <div className="flex">
           <div className="flex w-24 flex-col">
-            <div>{hour.toFixed(2)}%</div>
+            <div>{(hour * 100).toFixed(2)}%</div>
             <div>This Hour</div>
           </div>
           <div className="flex w-24 flex-col">
-            <div>{day.toFixed(2)}%</div>
+            <div>{(day * 100).toFixed(2)}%</div>
             <div>Day</div>
           </div>
           <div className="flex w-24 flex-col">
-            <div>{week.toFixed(2)}%</div>
+            <div>{(week * 100).toFixed(2)}%</div>
             <div>Week</div>
           </div>
           <div className="flex w-24 flex-col">
-            <div>{month.toFixed(2)}%</div>
+            <div>{(month * 100).toFixed(2)}%</div>
             <div>Month</div>
           </div>
         </div>

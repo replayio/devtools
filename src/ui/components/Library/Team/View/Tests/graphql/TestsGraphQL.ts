@@ -20,6 +20,7 @@ const GET_TESTS = gql`
               scope
               executions {
                 errors
+                createdAt
                 result
               }
             }
@@ -35,9 +36,6 @@ export async function getTestsGraphQL(
   accessToken: string | null,
   workspaceId: string
 ): Promise<any[]> {
-  console.log("gettestsgraphql")
-
-
   const response = await graphQLClient.send<any>(
     {
       operationName: "GetTestsForWorkspace",

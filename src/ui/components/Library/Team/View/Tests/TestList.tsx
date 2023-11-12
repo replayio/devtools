@@ -54,8 +54,6 @@ export function TestList() {
 function TestListRow({ data, index, style }: ListChildComponentProps<ItemData>) {
   const { countToRender, filterByText, loadMore, tests } = data;
 
-  console.log({ tests });
-
   if (index === countToRender) {
     return (
       <div className="flex justify-center p-4" style={style}>
