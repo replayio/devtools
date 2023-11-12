@@ -19,6 +19,7 @@ const GET_TESTS = gql`
               title
               scope
               executions {
+                errors
                 result
               }
             }
@@ -37,7 +38,7 @@ export async function getTestsGraphQL(
   console.log("gettestsgraphql")
 
 
-  const response = true ? GetTestsForWorkspaces.data : await graphQLClient.send<any>(
+  const response = await graphQLClient.send<any>(
     {
       operationName: "GetTestsForWorkspace",
       query: GET_TESTS,

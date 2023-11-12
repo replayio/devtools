@@ -1,6 +1,8 @@
+import { access } from "fs";
+import { string } from "prop-types";
 import { useContext } from "react";
 
-import { FailureRates } from "shared/test-suites/TestRun";
+import { FailureRates, __EXECUTION } from "shared/test-suites/TestRun";
 import { useTestRunDetailsSuspends } from "ui/components/Library/Team/View/TestRuns/hooks/useTestRunDetailsSuspends";
 import { RunResults } from "ui/components/Library/Team/View/TestRuns/Overview/RunResults";
 
@@ -37,9 +39,8 @@ export function TestOverviewContent() {
               {test.title}
             </div>
           </div>
-
-          {/* <div>{test.title}</div> */}
-          {/* <Stats failureRates={test.failureRates} /> */}
+          <Stats failureRates={test.failureRates} />
+          <ErrorFrequency errorFrequency={test.errorFrequency} />
           {/* <RunSummary
             isPending={isPending}
             recordings={recordings}
@@ -55,6 +56,21 @@ export function TestOverviewContent() {
   return (
     <div className={`flex h-full flex-col text-sm transition ${styles.runOverview} `}>
       {children}
+    </div>
+  );
+}
+
+function ErrorFrequency({ errorFrequency }: { errorFrequency: Record<string, number> }) {
+  return (
+    <div>
+      <div>Top Errors</div>
+      <div>
+        {Object.entries(errorFrequency).map(([msg, count]) => (
+          <div key={msg} className="overflow-hidden overflow-ellipsis whitespace-nowrap">
+            {count}: {msg}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

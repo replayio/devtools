@@ -22,7 +22,8 @@ export const testsCache = createCache<
     const processedTests = rawTests.map(t => ({
       ...t,
       failureRate: getFailureRate(t.executions),
-      failureRates: getFailureRates(t.executions)
+      failureRates: getFailureRates(t.executions),
+      errorFrequency: getErrorFrequency(t.executions),
     }))
 
     console.log("processedTests", processedTests);
@@ -38,6 +39,24 @@ function getFailureRates(executions: __EXECUTION[]) {
     week: getFailureRate(executions.filter(e => ((Date.now() - (new Date(e.createdAt)).getTime()) / 1000 / 60 / 60 / 24) < 7 )),
     month: getFailureRate(executions.filter(e => ((Date.now() - (new Date(e.createdAt)).getTime()) / 1000 / 60 / 60 / 24) < 30 )),
   };
+}
+
+function getErrorFrequency(executions: __EXECUTION[]) {
+  return executions.reduce((acc, e) => {
+    let newAcc = { ...acc };
+
+    if (e.result === "failed") {
+      e.errors.forEach(errorMessage => {
+        if (newAcc[errorMessage]) {
+          newAcc[errorMessage] = newAcc[errorMessage] + 1;
+        } else {
+          newAcc[errorMessage] = 1;
+        }
+      })
+    }
+
+    return newAcc;
+  }, {});
 }
 
 function getFailureRate(executions: __EXECUTION[]) {

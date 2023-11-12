@@ -38,7 +38,8 @@ export type __TEST = {
   title: string;
   failureRate: number;
   failureRates: FailureRates;
-  executions: any[];
+  errorFrequency: Record<string, number>;
+  executions: __EXECUTION[];
 };
 
 export type FailureRates = {
