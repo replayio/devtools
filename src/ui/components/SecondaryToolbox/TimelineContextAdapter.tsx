@@ -10,7 +10,7 @@ import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 export default function TimelineContextAdapter({ children }: PropsWithChildren) {
   const dispatch = useAppDispatch();
   const time = useAppSelector(getTime);
-  const executionPoint = useAppSelector(getExecutionPoint) || "0";
+  const executionPoint = useAppSelector(getExecutionPoint);
 
   const update = useCallback(
     async (

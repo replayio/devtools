@@ -1,12 +1,11 @@
-import { useContext } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
 import ComputedApp from "devtools/client/inspector/computed/components/ComputedApp";
 import LayoutApp from "devtools/client/inspector/layout/components/LayoutApp";
 import { ElementsPanelAdapter } from "devtools/client/inspector/markup/components/ElementsPanelAdapter";
 import { RulesPanel } from "devtools/client/inspector/markup/components/rules";
-import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { useIsPointWithinFocusWindow } from "replay-next/src/hooks/useIsPointWithinFocusWindow";
+import { useMostRecentLoadedPause } from "replay-next/src/hooks/useMostRecentLoadedPause";
 import { ActiveInspectorTab } from "shared/user-data/GraphQL/config";
 import { enterFocusMode } from "ui/actions/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
@@ -32,9 +31,9 @@ const availableTabs: readonly ActiveInspectorTab[] = [
 export default function InspectorApp() {
   const dispatch = useAppDispatch();
   const activeTab = useAppSelector(state => state.inspector.activeTab);
-  const { executionPoint } = useContext(TimelineContext);
+  const { point } = useMostRecentLoadedPause() ?? {};
 
-  const isPointWithinFocusWindow = useIsPointWithinFocusWindow(executionPoint);
+  const isPointWithinFocusWindow = useIsPointWithinFocusWindow(point ?? null);
   if (!isPointWithinFocusWindow) {
     return (
       <div className="inspector-responsive-container bg-bodyBgcolor p-2">

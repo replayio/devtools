@@ -2,8 +2,8 @@ import React, { useContext } from "react";
 import { shallowEqual } from "react-redux";
 import { useImperativeCacheValue } from "suspense";
 
-import { getPauseId } from "devtools/client/debugger/src/selectors";
 import { elementCache } from "replay-next/components/elements/suspense/ElementCache";
+import { useMostRecentLoadedPause } from "replay-next/src/hooks/useMostRecentLoadedPause";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { isElement } from "ui/suspense/nodeCaches";
@@ -33,9 +33,9 @@ function isHidden(property: ComputedPropertyState, search: string, showBrowserSt
 
 function ComputedProperties() {
   const dispatch = useAppDispatch();
-  const { pauseId, selectedNodeId, expandedProperties, search, showBrowserStyles } = useAppSelector(
+  const { pauseId } = useMostRecentLoadedPause() ?? {};
+  const { selectedNodeId, expandedProperties, search, showBrowserStyles } = useAppSelector(
     state => ({
-      pauseId: getPauseId(state),
       selectedNodeId: getSelectedNodeId(state),
       expandedProperties: state.computed.expandedProperties,
       search: state.computed.search,

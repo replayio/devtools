@@ -30,7 +30,7 @@ export default function ConsoleInput({ inputRef }: { inputRef?: RefObject<Impera
 
   let disabledMessage = null;
   let disabledReason = undefined;
-  if (!isPointWithinFocusWindow) {
+  if (executionPoint && !isPointWithinFocusWindow) {
     disabledReason = "not-focused";
     disabledMessage = (
       <>
@@ -57,7 +57,7 @@ export default function ConsoleInput({ inputRef }: { inputRef?: RefObject<Impera
   }
 
   return (
-    <ErrorBoundary name="ConsoleInput" resetKey={executionPoint} fallback={<ErrorFallback />}>
+    <ErrorBoundary name="ConsoleInput" resetKey={executionPoint ?? ""} fallback={<ErrorFallback />}>
       <Suspense fallback={<Loader />}>
         <ConsoleInputSuspends inputRef={inputRef} />
       </Suspense>
@@ -148,7 +148,7 @@ function ConsoleInputSuspends({ inputRef }: { inputRef?: RefObject<ImperativeHan
   };
 
   const onSubmit = async (expression: string) => {
-    if (!isExpressionValid) {
+    if (!executionPoint || !isExpressionValid) {
       return;
     }
 

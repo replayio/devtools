@@ -1,11 +1,11 @@
 import { useContext, useDeferredValue, useState } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
 
-import { getPauseId } from "devtools/client/debugger/src/selectors";
 import { RulesList } from "devtools/client/inspector/markup/components/rules/RulesList";
 import { getSelectedNodeId } from "devtools/client/inspector/markup/selectors/markup";
 import { elementCache } from "replay-next/components/elements/suspense/ElementCache";
 import Icon from "replay-next/components/Icon";
+import { useMostRecentLoadedPause } from "replay-next/src/hooks/useMostRecentLoadedPause";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { shallowEqual } from "shared/utils/compare";
 import { useAppSelector } from "ui/setup/hooks";
@@ -18,9 +18,9 @@ const NO_RULES_AVAILABLE: RuleState[] = [];
 
 export function RulesPanelSuspends() {
   const replayClient = useContext(ReplayClientContext);
-  const { pauseId, selectedNodeId } = useAppSelector(
+  const { pauseId } = useMostRecentLoadedPause() ?? {};
+  const { selectedNodeId } = useAppSelector(
     state => ({
-      pauseId: getPauseId(state),
       selectedNodeId: getSelectedNodeId(state),
     }),
     shallowEqual
