@@ -9,7 +9,7 @@ import { SecondaryButton } from "ui/components/shared/Button";
 import { TestContext } from "./TestContextRoot";
 
 const PAGE_SIZE = 50;
-const ROW_HEIGHT = 65;
+const ROW_HEIGHT = 45;
 
 type ItemData = {
   countToRender: number;
