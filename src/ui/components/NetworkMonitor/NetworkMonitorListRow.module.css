@@ -121,10 +121,11 @@
   position: relative;
   height: 0.75rem;
   border-radius: 3px;
-  background-color: var(--chrome);
+  background-color: var(--timing-container);
   margin-right: 1ch;
   overflow: hidden;
 }
+
 .TimingContainer[data-incomplete] {
   opacity: 0.65;
 }
@@ -136,6 +137,8 @@
   min-width: 1px;
 }
 
-.Row:hover .TimingContainer {
-  background-color: var(--body-bgcolor);
+.Row[data-selected] .TimingContainer,
+.Row[data-selected]:focus .TimingContainer,
+.Row[data-selected]:hover .TimingContainer {
+  background-color: var(--timing-container-selected-row);
 }

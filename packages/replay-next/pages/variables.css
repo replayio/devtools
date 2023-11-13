@@ -191,6 +191,8 @@
   --theme-text-field-color: #fff;
   --theme-text-field-placeholder-color: #babbbc;
   --team-row-active: var(--primary-accent-dimmed);
+  --timing-container: var(--theme-base-85);
+  --timing-container-selected-row: #175e88;
   --tooltip-bgcolor: var(--theme-base-100);
   --tooltip-color: #fff;
   --tooltip-border: 1px solid rgba(43, 46, 49, 1);
@@ -717,6 +719,8 @@
   --theme-text-field-color: var(--body-color);
   --theme-text-field-placeholder-color: #a9a9b1;
   --team-row-active: #163e58; /* the dark version of --primary-accent-dimmed */
+  --timing-container: var(--theme-base-85);
+  --timing-container-selected-row: #94d9fd;
   --tooltip-bgcolor: #38383d;
   --tooltip-color: white;
   --tooltip-border: 1px solid transparent;
