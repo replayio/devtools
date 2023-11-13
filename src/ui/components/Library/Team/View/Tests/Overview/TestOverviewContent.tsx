@@ -14,7 +14,7 @@ export function TestOverviewContent() {
 
   // const { recordings, durationMs } = useTestRunDetailsSuspends(testRunId);
 
-  // const isPending = testRunId !== testRunIdForDisplay;
+  const isPending = false; // testRunId !== testRunIdForDisplay;
 
   // const hasFilters = filterByStatus !== "all" || filterByText !== "";
   const hasFilters = filterByText !== "";
@@ -26,9 +26,20 @@ export function TestOverviewContent() {
   if (test) {
     if (!hasFilters || tests.find(test => test.testId === testId)) {
       children = (
-        <>
-          <div>{test.title}</div>
-          <Stats failureRates={test.failureRates} />
+        <div
+          className={`flex flex-col gap-1 border-b border-themeBorder py-2  px-4 ${
+            isPending ? "opacity-50" : ""
+          }`}
+          data-test-id="TestRunSummary"
+        >
+          <div className="flex flex-row items-center justify-between gap-1">
+            <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-lg font-medium">
+              {test.title}
+            </div>
+          </div>
+
+          {/* <div>{test.title}</div> */}
+          {/* <Stats failureRates={test.failureRates} /> */}
           {/* <RunSummary
             isPending={isPending}
             recordings={recordings}
@@ -36,7 +47,7 @@ export function TestOverviewContent() {
             durationMs={durationMs}
           /> */}
           {/* <RunResults isPending={isPending} /> */}
-        </>
+        </div>
       );
     }
   }

@@ -91,13 +91,17 @@ function TestTeamViews() {
     <div className="pl-4 pb-2">
       <div className="flex flex-col">
         <div
-          className={`px-4 py-1 ${view === "runs" ? "font-bold" : ""}`}
+          className={`px-4 py-1 ${
+            view === "runs" ? "font-bold" : ""
+          } hover:cursor-pointer hover:font-bold`}
           onClick={() => setView("runs")}
         >
           Runs
         </div>
         <div
-          className={`px-4 py-1 ${view === "tests" ? "font-bold" : ""}`}
+          className={`px-4 py-1 ${
+            view === "tests" ? "font-bold" : ""
+          } hover:cursor-pointer hover:font-bold`}
           onClick={() => setView("tests")}
         >
           Tests
