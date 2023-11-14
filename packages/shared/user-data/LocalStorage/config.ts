@@ -10,4 +10,5 @@ export const config = {
   reactDevToolsStateExpanded: Boolean(true),
   replayNextCurrentPanel: "sources" as ReplayNextCurrentPanel,
   replayVideoPanelCollapsed: false,
+  enableTestView: false,
 };

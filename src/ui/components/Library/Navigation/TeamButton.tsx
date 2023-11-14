@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { MouseEvent, useContext } from "react";
 
+import useLocalStorageUserData from "shared/user-data/LocalStorage/useLocalStorageUserData";
 import { setModal } from "ui/actions/app";
 import { MY_LIBRARY_TEAM } from "ui/components/Library/Team/TeamContextRoot";
 import Icon from "ui/components/shared/Icon";
@@ -78,6 +79,7 @@ export function TeamButton({
 // and the content of the library UI. Getting the view/teamId this
 // way is pretty clunky, so we should probably lift that state up
 function TestTeamViews() {
+  const [showTestsView] = useLocalStorageUserData("enableTestView");
   const router = useRouter();
   const cont = useContext(ViewContext);
   const view = useGetTeamRouteParams().view;
@@ -98,14 +100,16 @@ function TestTeamViews() {
         >
           Runs
         </div>
-        <div
-          className={`px-4 py-1 ${
-            view === "tests" ? "font-bold" : ""
-          } hover:cursor-pointer hover:font-bold`}
-          onClick={() => setView("tests")}
-        >
-          Tests
-        </div>
+        {showTestsView ? (
+          <div
+            className={`px-4 py-1 ${
+              view === "tests" ? "font-bold" : ""
+            } hover:cursor-pointer hover:font-bold`}
+            onClick={() => setView("tests")}
+          >
+            Tests
+          </div>
+        ) : null}
       </div>
     </div>
   );
