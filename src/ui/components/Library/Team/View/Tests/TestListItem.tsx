@@ -1,15 +1,14 @@
 import { useContext } from "react";
 
-import { TestRun, __TEST, getTestRunTitle } from "shared/test-suites/TestRun";
+import { __TEST } from "shared/test-suites/TestRun";
 import HighlightedText from "ui/components/Library/Team/View/TestRuns/HighlightedText";
-import Icon from "ui/components/shared/Icon";
 
 import { TestContext } from "./TestContextRoot";
 import styles from "../../../Library.module.css";
 
 function Status({ failCount }: { failCount: number }) {
   return (
-    <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-[#F02D5E] text-xs font-bold text-chrome">
+    <div className="flex h-5 w-8 shrink-0 items-center justify-center rounded-md bg-[#F02D5E] text-xs font-bold text-chrome">
       {failCount}
     </div>
   );

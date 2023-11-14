@@ -4,7 +4,6 @@ import { useContext, useState } from "react";
 import { FailureRates, __EXECUTION } from "shared/test-suites/TestRun";
 
 import { TestContext } from "../TestContextRoot";
-import { Status } from "../TestListItem";
 import styles from "../../../../Library.module.css";
 
 export function TestOverviewContent() {
@@ -68,7 +67,7 @@ function ErrorFrequency({
             .map(([msg, count]) => (
               <div
                 key={msg}
-                className={`flex cursor-pointer flex-row items-center space-x-3 rounded-sm border-b border-chrome bg-themeBase-100 p-3 ${styles.libraryRow}
+                className={`flex cursor-pointer flex-row items-center space-x-3 rounded-sm bg-themeBase-100 p-3 ${styles.libraryRow}
             `}
                 onClick={() => setSelectedError(msg)}
               >
