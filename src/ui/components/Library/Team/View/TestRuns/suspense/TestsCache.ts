@@ -2,9 +2,9 @@ import orderBy from "lodash/orderBy";
 import { createCache } from "suspense";
 
 import { GraphQLClientInterface } from "shared/graphql/GraphQLClient";
-import { TestRun, TestExecution } from "shared/test-suites/TestRun";
-import { getTestsGraphQL } from "../../Tests/graphql/TestsGraphQL";
+import { TestExecution, TestRun } from "shared/test-suites/TestRun";
 
+import { getTestsGraphQL } from "../../Tests/graphql/TestsGraphQL";
 
 export const testsCache = createCache<
   [graphQLClient: GraphQLClientInterface, accessToken: string | null, workspaceId: string],
@@ -14,9 +14,8 @@ export const testsCache = createCache<
   debugLabel: "testsCache",
   getKey: ([_, __, workspaceId]) => workspaceId,
   load: async ([graphQLClient, accessToken, workspaceId]) => {
-
     const rawTests = await getTestsGraphQL(graphQLClient, accessToken, workspaceId);
-    
+
     // Compute the failure rate and add it to the stored test in cache
     // until we're able to do it from the backend
     const processedTests = rawTests.map(t => ({
@@ -24,7 +23,7 @@ export const testsCache = createCache<
       failureRate: getFailureRate(t.executions),
       failureRates: getFailureRates(t.executions),
       errorFrequency: getErrorFrequency(t.executions),
-    }))
+    }));
 
     return orderBy(processedTests, "failureRate", "desc");
   },
@@ -32,10 +31,24 @@ export const testsCache = createCache<
 
 function getFailureRates(executions: TestExecution[]) {
   return {
-    hour: getFailureRate(executions.filter(e => ((Date.now() - (new Date(e.createdAt)).getTime()) / 1000 / 60 / 60 ) < 1 )),
-    day: getFailureRate(executions.filter(e => ((Date.now() - (new Date(e.createdAt)).getTime()) / 1000 / 60 / 60 / 24) < 1 )),
-    week: getFailureRate(executions.filter(e => ((Date.now() - (new Date(e.createdAt)).getTime()) / 1000 / 60 / 60 / 24) < 7 )),
-    month: getFailureRate(executions.filter(e => ((Date.now() - (new Date(e.createdAt)).getTime()) / 1000 / 60 / 60 / 24) < 30 )),
+    hour: getFailureRate(
+      executions.filter(e => (Date.now() - new Date(e.createdAt).getTime()) / 1000 / 60 / 60 < 1)
+    ),
+    day: getFailureRate(
+      executions.filter(
+        e => (Date.now() - new Date(e.createdAt).getTime()) / 1000 / 60 / 60 / 24 < 1
+      )
+    ),
+    week: getFailureRate(
+      executions.filter(
+        e => (Date.now() - new Date(e.createdAt).getTime()) / 1000 / 60 / 60 / 24 < 7
+      )
+    ),
+    month: getFailureRate(
+      executions.filter(
+        e => (Date.now() - new Date(e.createdAt).getTime()) / 1000 / 60 / 60 / 24 < 30
+      )
+    ),
   };
 }
 
@@ -50,7 +63,7 @@ function getErrorFrequency(executions: TestExecution[]) {
         } else {
           newAcc[errorMessage] = 1;
         }
-      })
+      });
     }
 
     return newAcc;
@@ -61,6 +74,6 @@ function getFailureRate(executions: TestExecution[]) {
   if (!executions.length) {
     return 0;
   }
-  
-  return executions.filter(e => e.result === "failed").length / executions.length
+
+  return executions.filter(e => e.result === "failed").length / executions.length;
 }

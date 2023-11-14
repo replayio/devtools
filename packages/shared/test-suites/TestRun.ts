@@ -47,7 +47,7 @@ export type FailureRates = {
   day: number;
   week: number;
   month: number;
-}
+};
 
 export type TestExecution = {
   errors: string[] | null;

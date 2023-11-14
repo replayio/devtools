@@ -1,10 +1,9 @@
 import { gql } from "@apollo/client";
-import {
-  GetTestsRunsForWorkspace_node_Workspace,
-} from "shared/graphql/generated/GetTestsRunsForWorkspace";
+
+import { GetTestsRunsForWorkspace_node_Workspace } from "shared/graphql/generated/GetTestsRunsForWorkspace";
 import { GraphQLClientInterface } from "shared/graphql/GraphQLClient";
 
-import GetTestsForWorkspaces from "./fixtures/GetTestsForWorkspace.json"
+import GetTestsForWorkspaces from "./fixtures/GetTestsForWorkspace.json";
 
 // const GET_TEST_RUNS = gql`
 const GET_TESTS = gql`
@@ -34,7 +33,7 @@ const GET_TESTS = gql`
 // TODO: Populate these types -jvv
 type _GetTestsForWorkspace = any;
 type _GetTestsForWorkspace_node_Workspace = any;
-type _GetTestsForWorkspace_node_Workspace_tests_edges= any;
+type _GetTestsForWorkspace_node_Workspace_tests_edges = any;
 type _GetTestsForWorkspace_node_Workspace_tests_edges_node = any;
 
 export async function getTestsGraphQL(
