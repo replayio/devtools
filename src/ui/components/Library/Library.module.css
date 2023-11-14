@@ -19,11 +19,11 @@
 }
 
 :root:global(.theme-dark) .libraryRowSelected {
-  background-color: #14243e;
+  background-color: var(--primary-accent-dimmed);
 }
 
 :root:global(.theme-dark) .libraryRowSelected:hover {
-  background-color: #162641;
+  background-color: var(--primary-accent-dimmed);
 }
 
 :root:global(.theme-dark) .teamRow:hover,

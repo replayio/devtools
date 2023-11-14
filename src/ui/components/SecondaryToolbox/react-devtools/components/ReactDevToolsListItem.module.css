@@ -5,14 +5,10 @@
   padding-left: calc(var(--data-depth) * var(--indentation-size));
 }
 .Row[data-selected] {
-  background-color: var(--theme-selection-background);
+  background-color: var(--primary-accent-dimmed);
+  color: var(--value-type-html-tag);
 }
-.Row[data-selected] .ElementKey,
-.Row[data-selected] .ElementName,
-.Row[data-selected] .Icon {
-  color: var(--theme-selection-color);
-  fill: var(--theme-selection-color);
-}
+
 .Row[data-selected] .ElementKey {
   background: var(--background-color-current-execution-point-column);
 }

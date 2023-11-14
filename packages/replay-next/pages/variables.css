@@ -34,7 +34,6 @@
 
   --primary-accent: #01acfd;
   --primary-accent-hover: #0194ff;
-  --primary-accent-foreground-text: #fff;
 
   --secondary-accent: #f02d5e;
   --secondary-accent-hover: #d72451;
@@ -145,6 +144,10 @@
 :root,
 :root.theme-dark {
   --color-transparent: rgba(0, 0, 0, 0);
+  --primary-accent-foreground-text: #fff;
+
+  --primary-accent-dimmed: #163e58;
+  --primary-accent-dimmed-foreground-text: var(--body-color);
 
   /* Color ramp (Dark) */
   --theme-base-100: #000; /* background chrome */
@@ -187,7 +190,9 @@
   --theme-text-field-bgcolor: var(--theme-base-85);
   --theme-text-field-color: #fff;
   --theme-text-field-placeholder-color: #babbbc;
-  --team-row-active: var(--theme-text-field-bgcolor);
+  --team-row-active: var(--primary-accent-dimmed);
+  --timing-container: var(--theme-base-85);
+  --timing-container-selected-row: #175e88;
   --tooltip-bgcolor: var(--theme-base-100);
   --tooltip-color: #fff;
   --tooltip-border: 1px solid rgba(43, 46, 49, 1);
@@ -668,6 +673,10 @@
 
 :root.theme-light {
   --color-transparent: rgba(255, 255, 255, 0);
+  --primary-accent-foreground-text: #fff;
+
+  --primary-accent-dimmed: #cceeff;
+  --primary-accent-dimmed-foreground-text: var(--body-color);
 
   /* Color ramp (Light) */
   --theme-base-100: hsl(0, 0%, 100%);
@@ -710,7 +719,9 @@
   --theme-text-field-bgcolor: #f6f6f6;
   --theme-text-field-color: var(--body-color);
   --theme-text-field-placeholder-color: #a9a9b1;
-  --team-row-active: #3f434a;
+  --team-row-active: #163e58; /* the dark version of --primary-accent-dimmed */
+  --timing-container: var(--theme-base-85);
+  --timing-container-selected-row: #94d9fd;
   --tooltip-bgcolor: #38383d;
   --tooltip-color: white;
   --tooltip-border: 1px solid transparent;

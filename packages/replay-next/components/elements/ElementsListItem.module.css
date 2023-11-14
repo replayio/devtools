@@ -19,7 +19,7 @@
   color: var(--color-default);
 }
 .Node[data-selected] {
-  background-color: var(--theme-selection-background);
+  background-color: var(--primary-accent-dimmed);
 }
 .Node[data-selected],
 .Node[data-selected] .HtmlAttributeName,
@@ -29,7 +29,6 @@
 .Node[data-selected] .HTMLTag,
 .Node[data-selected] .Separator,
 .Node[data-selected] .Icon {
-  color: var(--theme-selection-color);
   fill: var(--theme-selection-color);
 }
 .Node[data-loading] {
