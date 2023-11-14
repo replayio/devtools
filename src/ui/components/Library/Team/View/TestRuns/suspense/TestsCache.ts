@@ -2,13 +2,13 @@ import orderBy from "lodash/orderBy";
 import { createCache } from "suspense";
 
 import { GraphQLClientInterface } from "shared/graphql/GraphQLClient";
-import { TestExecution, TestRun } from "shared/test-suites/TestRun";
+import { Test, TestExecution } from "shared/test-suites/TestRun";
 
 import { getTestsGraphQL } from "../../Tests/graphql/TestsGraphQL";
 
 export const testsCache = createCache<
   [graphQLClient: GraphQLClientInterface, accessToken: string | null, workspaceId: string],
-  TestRun[]
+  Test[]
 >({
   config: { immutable: true },
   debugLabel: "testsCache",

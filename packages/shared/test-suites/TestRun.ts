@@ -52,7 +52,7 @@ export type FailureRates = {
 export type TestExecution = {
   errors: string[] | null;
   createdAt: string;
-  result: "passed" | "failed";
+  result: string;
 };
 
 export type TestRun = {
