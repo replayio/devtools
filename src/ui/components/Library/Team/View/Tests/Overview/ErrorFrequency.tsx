@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import orderBy from "lodash/orderBy";
 import { Dispatch, SetStateAction, useState } from "react";
 import { ContextMenuItem, useContextMenu } from "use-context-menu";
@@ -5,6 +6,7 @@ import { ContextMenuItem, useContextMenu } from "use-context-menu";
 import Icon from "replay-next/components/Icon";
 import { __EXECUTION } from "shared/test-suites/TestRun";
 
+import { getTruncatedRelativeDate } from "../../Recordings/RecordingListItem/RecordingListItem";
 import styles from "../../../../Library.module.css";
 import testPageStyles from "../TestsPage.module.css";
 
@@ -31,17 +33,22 @@ export function TestErrorList({
     { alignTo: "auto-target" }
   );
 
-  const passing = executions.filter(e => e.result === "passed");
-  const failing = executions.filter(e => e.result === "failed");
-  const sortedFailing = orderBy(failing, "createdAt", "desc");
-  const sortedPassing = orderBy(passing, "createdAt", "desc");
+  const uniqueErrorCount = Object.entries(errorFrequency).length;
+  const shouldTruncateErrors = Object.entries(errorFrequency).length > 5;
 
   return (
     <div>
       <div className="flex flex-col gap-2 border-b border-themeBorder py-2">
         <div className="flex items-center justify-between px-4">
-          <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-lg font-medium">
-            Top Errors
+          <div className="flex flex-row items-center gap-2 overflow-hidden">
+            <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-lg font-medium">
+              Top Errors
+            </div>
+            {shouldTruncateErrors ? (
+              <div className="overflow-hidden overflow-ellipsis whitespace-nowrap ">
+                (Showing 5 of {uniqueErrorCount} errors)
+              </div>
+            ) : null}
           </div>
           <div
             className={testPageStyles.dropdownTrigger}
@@ -69,30 +76,77 @@ export function TestErrorList({
             ))}
         </div>
       </div>
-      {selectedError ? (
-        <div className="flex flex-col gap-2 py-2 px-4">
-          <div className="flex flex-col gap-1">
-            <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-lg font-medium">
-              Replay that contain this error
-            </div>
-            <div>
-              {sortedFailing.slice(0, 3).map((e, i) => (
-                <div key={i}>{e.createdAt}</div>
-              ))}
-            </div>
-          </div>
-          <div className="flex flex-col gap-1">
-            <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-lg font-medium">
-              Recent replays of the test passing
-            </div>
-            <div>
-              {sortedPassing.slice(0, 3).map((e, i) => (
-                <div key={i}>{e.createdAt}</div>
-              ))}
-            </div>
-          </div>
+      {selectedError ? <ErrorReplays executions={executions} /> : null}
+    </div>
+  );
+}
+
+function ErrorReplays({ executions }: { executions: __EXECUTION }) {
+  const passing = executions.filter(e => e.result === "passed");
+  const failing = executions.filter(e => e.result === "failed");
+  const sortedFailing = orderBy(failing, "createdAt", "desc");
+  const sortedPassing = orderBy(passing, "createdAt", "desc");
+
+  // TODO: show the processed/unprocessed status for the replays -jvv
+  // TODO: add the top commit for the corresponding replay as label -jvv
+  return (
+    <div className="flex flex-col gap-2 py-2 px-4">
+      <div className="flex flex-col gap-2">
+        <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-lg font-medium">
+          Replay that contain this error
         </div>
-      ) : null}
+        <div className="flex flex-col gap-2">
+          {sortedFailing.slice(0, 3).map((e, i) => (
+            <div
+              key={i}
+              className="pointer-events-none flex flex-row justify-between  gap-2 opacity-50 "
+            >
+              <div className="flex items-center gap-2">
+                <div className={styles.iconWrapper}>
+                  <motion.div
+                    className={styles.iconMotion}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 1.0, boxShadow: "0px 0px 1px rgba(0,0,0,0.2)" }}
+                    transition={{ duration: 0.05 }}
+                  >
+                    <Icon className={styles["failed"]} type="play-unprocessed" />
+                  </motion.div>
+                </div>
+                <div>{`Replay #${i + 1}`}</div>
+              </div>
+              <div>{getTruncatedRelativeDate(e.createdAt)}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="flex flex-col gap-2">
+        <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-lg font-medium">
+          Recent replays of the test passing
+        </div>
+        <div className="flex flex-col gap-2">
+          {sortedPassing.slice(0, 3).map((e, i) => (
+            <div
+              key={i}
+              className="pointer-events-none flex flex-row justify-between  gap-2 opacity-50"
+            >
+              <div className="flex items-center gap-2">
+                <div className={styles.iconWrapper}>
+                  <motion.div
+                    className={styles.iconMotion}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 1.0, boxShadow: "0px 0px 1px rgba(0,0,0,0.2)" }}
+                    transition={{ duration: 0.05 }}
+                  >
+                    <Icon className={styles["passed"]} type="play-unprocessed" />
+                  </motion.div>
+                </div>
+                <div>{`Replay #${i + 1}`}</div>
+              </div>
+              <div>{getTruncatedRelativeDate(e.createdAt)}</div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
