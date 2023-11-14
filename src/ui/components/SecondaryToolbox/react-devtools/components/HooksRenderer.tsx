@@ -126,7 +126,7 @@ function HookRenderer({
         {renderedName}
         <button
           className={styles.ViewSourceIconButton}
-          date-test-name="JumpToDefinitionButton"
+          data-test-name="JumpToDefinitionButton"
           onClick={viewFunctionSource}
           title="Jump to definition"
         >

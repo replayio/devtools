@@ -142,3 +142,10 @@ export async function waitForSearchToFinish(page: Page) {
     }
   });
 }
+
+export async function selectSourceSearchResult(page: Page, index: number) {
+  const match = page
+    .locator('[data-test-name="SearchFiles-ResultRow"][data-test-type="Match"]')
+    .nth(index);
+  await match.click();
+}

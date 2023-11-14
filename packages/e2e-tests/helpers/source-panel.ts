@@ -926,3 +926,13 @@ export async function waitForSourceContentsToFinishStreaming(
     { retryInterval: 1_000, timeout: 15_000 }
   );
 }
+
+async function getSourceId(page: Page, url: string) {
+  const sourceTab = getSourceTab(page, url);
+  return await sourceTab.getAttribute("data-test-source-id");
+}
+
+export async function waitForSourceToBeShown(page: Page, url: string) {
+  const sourceId = await getSourceId(page, url);
+  await page.waitForSelector(`[data-test-id="Source-${sourceId}"]`, { state: "visible" });
+}
