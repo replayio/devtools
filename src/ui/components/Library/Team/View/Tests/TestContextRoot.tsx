@@ -1,30 +1,25 @@
-import { useRouter } from "next/router";
 import {
   Dispatch,
   ReactNode,
   SetStateAction,
   createContext,
   useDeferredValue,
-  useEffect,
   useMemo,
   useState,
 } from "react";
 
-import { TestRun, __TEST, getTestRunTitle } from "shared/test-suites/TestRun";
-import { useGetTeamRouteParams } from "ui/components/Library/Team/utils";
-import { useSyncTestRunIdToUrl } from "ui/components/Library/Team/View/TestRuns/hooks/useSyncTestIdToUrl";
-import { useTestRuns } from "ui/components/Library/Team/View/TestRuns/hooks/useTestRuns";
+import { __TEST, getTestRunTitle } from "shared/test-suites/TestRun";
 
 import { useTests } from "./hooks/useTests";
 
 type TestsContextType = {
-  // filterByBranch: "all" | "primary";
-  // filterByStatus: "all" | "failed";
+  sortBy: "failureRate";
+  filterByTime: number | null;
   filterByText: string;
   filterByTextForDisplay: string;
   selectTestId: Dispatch<SetStateAction<string | null>>;
-  // setFilterByBranch: Dispatch<SetStateAction<"all" | "primary">>;
-  // setFilterByStatus: Dispatch<SetStateAction<"all" | "failed">>;
+  setSortBy: Dispatch<SetStateAction<"failureRate">>;
+  setFilterByTime: Dispatch<SetStateAction<number | null>>;
   setFilterByText: Dispatch<SetStateAction<string>>;
   testId: string | null;
   testIdForDisplay: string | null;
@@ -34,19 +29,15 @@ type TestsContextType = {
 export const TestContext = createContext<TestsContextType>(null as any);
 
 export function TestsContextRoot({ children }: { children: ReactNode }) {
-  // const { teamId, testRunId: defaultTestRunId } = useGetTeamRouteParams();
-
   const tests = useTests();
 
   const [testId, setTestId] = useState<string | null>(null);
 
-  // const [filterByBranch, setFilterByBranch] = useState<"all" | "primary">("all");
-  // const [filterByStatus, setFilterByStatus] = useState<"all" | "failed">("all");
+  const [filterByTime, setFilterByTime] = useState<number | null>(null);
+  const [sortBy, setSortBy] = useState<"failureRate">("failureRate");
 
   const [filterByText, setFilterByText] = useState("");
   const filterByTextDeferred = useDeferredValue(filterByText);
-
-  const router = useRouter();
 
   const filteredTestRuns = useMemo(() => {
     let filteredTestRuns = tests;
@@ -85,13 +76,13 @@ export function TestsContextRoot({ children }: { children: ReactNode }) {
   return (
     <TestContext.Provider
       value={{
-        // filterByBranch,
-        // filterByStatus,
+        filterByTime,
+        sortBy,
         filterByText: filterByTextDeferred,
         filterByTextForDisplay: filterByText,
         selectTestId: setTestId,
-        // setFilterByBranch,
-        // setFilterByStatus,
+        setFilterByTime,
+        setSortBy,
         setFilterByText,
         testId: deferredTestId,
         testIdForDisplay: testId,

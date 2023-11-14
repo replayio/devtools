@@ -131,42 +131,41 @@ export function TestsPage() {
 //   );
 // }
 function TestsContent() {
-  const { filterByText, setFilterByText, filterByTextForDisplay } = useContext(TestContext);
+  const {
+    filterByText,
+    setFilterByText,
+    filterByTime,
+    setFilterByTime,
+    filterByTextForDisplay,
+    sortBy,
+    setSortBy,
+  } = useContext(TestContext);
 
-  // const {
-  //   contextMenu: contextMenuStatusFilter,
-  //   onContextMenu: onClickStatusFilter,
-  //   onKeyDown: onKeyDownStatusFilter,
-  // } = useContextMenu(
-  //   <>
-  //     <ContextMenuItem dataTestId="show-all-runs" onSelect={() => setFilterByStatus("all")}>
-  //       All tests
-  //     </ContextMenuItem>
-  //     <ContextMenuItem dataTestId="show-only-failures" onSelect={() => setFilterByStatus("failed")}>
-  //       Only failures
-  //     </ContextMenuItem>
-  //   </>,
-  //   { alignTo: "auto-target" }
-  // );
+  const {
+    contextMenu: contextMenuSortBy,
+    onContextMenu: onClickSortBy,
+    onKeyDown: onKeyDownSortBy,
+  } = useContextMenu(
+    <>
+      <ContextMenuItem dataTestId="show-all-runs" onSelect={() => setSortBy("failureRate")}>
+        Sort by failure rate
+      </ContextMenuItem>
+    </>,
+    { alignTo: "auto-target" }
+  );
 
-  // const {
-  //   contextMenu: contextMenuBranchFilter,
-  //   onContextMenu: onClickBranchFilter,
-  //   onKeyDown: onKeyDownBranchFilter,
-  // } = useContextMenu(
-  //   <>
-  //     <ContextMenuItem dataTestId="show-all-branches" onSelect={() => setFilterByBranch("all")}>
-  //       All branches
-  //     </ContextMenuItem>
-  //     <ContextMenuItem
-  //       dataTestId="show-only-primary-branch"
-  //       onSelect={() => setFilterByBranch("primary")}
-  //     >
-  //       Only primary branch
-  //     </ContextMenuItem>
-  //   </>,
-  //   { alignTo: "auto-target" }
-  // );
+  const {
+    contextMenu: contextMenuTimeFilter,
+    onContextMenu: onClickTimeFilter,
+    onKeyDown: onKeyDownTimeFilter,
+  } = useContextMenu(
+    <>
+      <ContextMenuItem dataTestId="show-all-runs" onSelect={() => setFilterByTime(null)}>
+        All tests
+      </ContextMenuItem>
+    </>,
+    { alignTo: "auto-target" }
+  );
 
   return (
     <div className="flex w-full flex-grow flex-row p-2">
@@ -174,28 +173,28 @@ function TestsContent() {
         <Panel minSize={20} order={1}>
           <div className="flex h-full w-full flex-col overflow-hidden rounded-xl bg-bodyBgcolor">
             <div className="flex flex-row items-center justify-between gap-2 border-b border-themeBorder bg-bodyBgcolor p-2">
-              {/* <div
+              <div
                 className={styles.dropdownTrigger}
                 data-test-id="TestPage-ResultFilter-DropdownTrigger"
-                onClick={onClickStatusFilter}
-                onKeyDown={onKeyDownStatusFilter}
+                onKeyDown={onKeyDownSortBy}
+                onClick={onClickSortBy}
                 tabIndex={0}
               >
-                {filterByStatus === "all" ? "All runs" : "Only failures"}
+                {sortBy === "failureRate" ? "Sort by failure rate" : ""}
                 <Icon className="h-5 w-5" type="chevron-down" />
               </div>
-              {contextMenuStatusFilter}
+              {contextMenuSortBy}
               <div
                 className={styles.dropdownTrigger}
                 data-test-id="TestPage-BranchFilter-DropdownTrigger"
-                onClick={onClickBranchFilter}
-                onKeyDown={onKeyDownBranchFilter}
+                onClick={onClickTimeFilter}
+                onKeyDown={onKeyDownTimeFilter}
                 tabIndex={0}
               >
-                {filterByBranch === "all" ? "All branches" : "Only primary branch"}
+                {filterByTime === null ? "All tests" : ""}
                 <Icon className="h-5 w-5" type="chevron-down" />
               </div>
-              {contextMenuBranchFilter} */}
+              {contextMenuTimeFilter}
               <div className={styles.filterContainer}>
                 <input
                   className={styles.filterInput}
