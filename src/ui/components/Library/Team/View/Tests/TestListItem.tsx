@@ -1,6 +1,6 @@
 import { useContext } from "react";
 
-import { __TEST } from "shared/test-suites/TestRun";
+import { Test } from "shared/test-suites/TestRun";
 import HighlightedText from "ui/components/Library/Team/View/TestRuns/HighlightedText";
 
 import { TestContext } from "./TestContextRoot";
@@ -14,7 +14,7 @@ function Status({ failCount }: { failCount: number }) {
   );
 }
 
-export function TestListItem({ filterByText, test }: { filterByText: string; test: __TEST }) {
+export function TestListItem({ filterByText, test }: { filterByText: string; test: Test }) {
   const { selectTestId, testIdForDisplay } = useContext(TestContext);
   const { title, failureRate } = test;
 

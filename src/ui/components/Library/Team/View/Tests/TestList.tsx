@@ -2,7 +2,7 @@ import { useContext, useMemo, useState } from "react";
 import ReactVirtualizedAutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 
-import { TestRun, __TEST } from "shared/test-suites/TestRun";
+import { Test, TestRun } from "shared/test-suites/TestRun";
 import { TestListItem } from "ui/components/Library/Team/View/Tests/TestListItem";
 import { SecondaryButton } from "ui/components/shared/Button";
 
@@ -15,7 +15,7 @@ type ItemData = {
   countToRender: number;
   filterByText: string;
   loadMore: () => void;
-  tests: __TEST[];
+  tests: Test[];
 };
 
 export function TestList() {

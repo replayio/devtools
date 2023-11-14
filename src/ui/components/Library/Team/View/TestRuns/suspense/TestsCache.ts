@@ -2,7 +2,7 @@ import orderBy from "lodash/orderBy";
 import { createCache } from "suspense";
 
 import { GraphQLClientInterface } from "shared/graphql/GraphQLClient";
-import { TestRun, __EXECUTION } from "shared/test-suites/TestRun";
+import { TestRun, TestExecution } from "shared/test-suites/TestRun";
 import { getTestsGraphQL } from "../../Tests/graphql/TestsGraphQL";
 
 
@@ -30,7 +30,7 @@ export const testsCache = createCache<
   },
 });
 
-function getFailureRates(executions: __EXECUTION[]) {
+function getFailureRates(executions: TestExecution[]) {
   return {
     hour: getFailureRate(executions.filter(e => ((Date.now() - (new Date(e.createdAt)).getTime()) / 1000 / 60 / 60 ) < 1 )),
     day: getFailureRate(executions.filter(e => ((Date.now() - (new Date(e.createdAt)).getTime()) / 1000 / 60 / 60 / 24) < 1 )),
@@ -39,7 +39,7 @@ function getFailureRates(executions: __EXECUTION[]) {
   };
 }
 
-function getErrorFrequency(executions: __EXECUTION[]) {
+function getErrorFrequency(executions: TestExecution[]) {
   return executions.reduce((acc, e) => {
     let newAcc = { ...acc };
 
@@ -57,7 +57,7 @@ function getErrorFrequency(executions: __EXECUTION[]) {
   }, {});
 }
 
-function getFailureRate(executions: __EXECUTION[]) {
+function getFailureRate(executions: TestExecution[]) {
   if (!executions.length) {
     return 0;
   }

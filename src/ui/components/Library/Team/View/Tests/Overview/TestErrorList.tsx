@@ -4,7 +4,7 @@ import { Dispatch, SetStateAction, useState } from "react";
 import { ContextMenuItem, useContextMenu } from "use-context-menu";
 
 import Icon from "replay-next/components/Icon";
-import { __EXECUTION } from "shared/test-suites/TestRun";
+import { TestExecution } from "shared/test-suites/TestRun";
 
 import { getTruncatedRelativeDate } from "../../Recordings/RecordingListItem/RecordingListItem";
 import styles from "../../../../Library.module.css";
@@ -18,7 +18,7 @@ export function TestErrorList({
   executions,
 }: {
   errorFrequency: Record<string, number>;
-  executions: __EXECUTION[];
+  executions: TestExecution[];
 }) {
   const [selectedError, setSelectedError] = useState<string | null>(null);
   const [filterByTime, setFilterByTime] = useState<number | null>(null);
@@ -112,7 +112,7 @@ function ErrorListItem({
   );
 }
 
-function ErrorReplays({ executions }: { executions: __EXECUTION[] }) {
+function ErrorReplays({ executions }: { executions: TestExecution[] }) {
   const passing = executions.filter(e => e.result === "passed");
   const failing = executions.filter(e => e.result === "failed");
   const sortedFailing = orderBy(failing, "createdAt", "desc");
