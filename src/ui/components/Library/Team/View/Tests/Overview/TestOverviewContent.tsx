@@ -3,7 +3,7 @@ import { useContext } from "react";
 import { FailureRates } from "shared/test-suites/TestRun";
 
 import { TestContext } from "../TestContextRoot";
-import { TestErrorList } from "./ErrorFrequency";
+import { TestErrorList } from "./TestErrorList";
 import styles from "../../../../Library.module.css";
 
 export function TestOverviewContent() {
