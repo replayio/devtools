@@ -1,11 +1,12 @@
 import { gql } from "@apollo/client";
 
-import { GetTestsRunsForWorkspace_node_Workspace } from "shared/graphql/generated/GetTestsRunsForWorkspace";
+import {
+  GetTestsForWorkspace,
+  GetTestsForWorkspace_node_Workspace,
+  GetTestsForWorkspace_node_Workspace_tests_edges_node,
+} from "shared/graphql/generated/GetTestsForWorkspace";
 import { GraphQLClientInterface } from "shared/graphql/GraphQLClient";
 
-import GetTestsForWorkspaces from "./fixtures/GetTestsForWorkspace.json";
-
-// const GET_TEST_RUNS = gql`
 const GET_TESTS = gql`
   query GetTestsForWorkspace($workspaceId: ID!) {
     node(id: $workspaceId) {
@@ -30,18 +31,12 @@ const GET_TESTS = gql`
   }
 `;
 
-// TODO: Populate these types -jvv
-type _GetTestsForWorkspace = any;
-type _GetTestsForWorkspace_node_Workspace = any;
-type _GetTestsForWorkspace_node_Workspace_tests_edges = any;
-type _GetTestsForWorkspace_node_Workspace_tests_edges_node = any;
-
 export async function getTestsGraphQL(
   graphQLClient: GraphQLClientInterface,
   accessToken: string | null,
   workspaceId: string
-): Promise<_GetTestsForWorkspace_node_Workspace_tests_edges_node[]> {
-  const response = await graphQLClient.send<_GetTestsForWorkspace>(
+): Promise<GetTestsForWorkspace_node_Workspace_tests_edges_node[]> {
+  const response = await graphQLClient.send<GetTestsForWorkspace>(
     {
       operationName: "GetTestsForWorkspace",
       query: GET_TESTS,
@@ -57,8 +52,6 @@ export async function getTestsGraphQL(
   }
 
   return (
-    (response.node as _GetTestsForWorkspace_node_Workspace).tests?.edges.map(
-      (edge: _GetTestsForWorkspace_node_Workspace_tests_edges) => edge.node
-    ) ?? []
+    (response.node as GetTestsForWorkspace_node_Workspace).tests?.edges.map(edge => edge.node) ?? []
   );
 }
