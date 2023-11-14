@@ -36,11 +36,10 @@ export function TestErrorList({
   const sortedFailing = orderBy(failing, "createdAt", "desc");
   const sortedPassing = orderBy(passing, "createdAt", "desc");
 
-  // ${isSelected ? styles.libraryRowSelected : ""}
   return (
     <div>
-      <div className="border-b border-themeBorder py-2 px-4">
-        <div className="flex justify-between">
+      <div className="flex flex-col gap-2 border-b border-themeBorder py-2">
+        <div className="flex items-center justify-between px-4">
           <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-lg font-medium">
             Top Errors
           </div>
@@ -60,12 +59,18 @@ export function TestErrorList({
           {Object.entries(errorFrequency)
             .slice(0, 5)
             .map(([msg, count], i) => (
-              <ErrorListItem msg={msg} count={count} setSelectedError={setSelectedError} key={i} />
+              <ErrorListItem
+                msg={msg}
+                count={count}
+                setSelectedError={setSelectedError}
+                key={i}
+                isSelected={msg === selectedError}
+              />
             ))}
         </div>
       </div>
       {selectedError ? (
-        <div className="flex flex-col gap-2 border-b border-themeBorder py-2 px-4">
+        <div className="flex flex-col gap-2 py-2 px-4">
           <div className="flex flex-col gap-1">
             <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-lg font-medium">
               Replay that contain this error
@@ -96,15 +101,20 @@ function ErrorListItem({
   msg,
   count,
   setSelectedError,
+  isSelected,
 }: {
   msg: string;
   count: number;
   setSelectedError: Dispatch<SetStateAction<string | null>>;
+  isSelected: boolean;
 }) {
   return (
     <div
       key={msg}
-      className={`flex cursor-pointer flex-row items-center space-x-3 rounded-sm bg-themeBase-100 p-3 ${styles.libraryRow}
+      title={msg}
+      className={`flex cursor-pointer flex-row items-center space-x-3 rounded-sm bg-themeBase-100 p-3 ${
+        styles.libraryRow
+      } ${isSelected ? styles.libraryRowSelected : ""}
 `}
       onClick={() => setSelectedError(msg)}
     >

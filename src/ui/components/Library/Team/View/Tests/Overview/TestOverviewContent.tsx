@@ -16,10 +16,7 @@ export function TestOverviewContent() {
   if (test) {
     if (!hasFilters || tests.find(test => test.testId === testId)) {
       children = (
-        <div
-          className="flex flex-col gap-1 border-b border-themeBorder"
-          data-test-id="TestRunSummary"
-        >
+        <div className="flex flex-col" data-test-id="TestRunSummary">
           <div className="flex flex-row items-center justify-between gap-1 border-b border-themeBorder py-2 px-4">
             <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-lg font-medium">
               {test.title}
