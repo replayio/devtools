@@ -40,10 +40,10 @@ function getFailureRates(executions: TestExecution[]) {
 }
 
 function getErrorFrequency(executions: TestExecution[]) {
-  return executions.reduce((acc, e) => {
+  return executions.reduce((acc: Record<string, number>, e) => {
     let newAcc = { ...acc };
 
-    if (e.result === "failed") {
+    if (e.result === "failed" && e.errors) {
       e.errors.forEach(errorMessage => {
         if (newAcc[errorMessage]) {
           newAcc[errorMessage] = newAcc[errorMessage] + 1;

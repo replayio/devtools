@@ -31,12 +31,18 @@ const GET_TESTS = gql`
   }
 `;
 
+// TODO: Populate these types -jvv
+type _GetTestsForWorkspace = any;
+type _GetTestsForWorkspace_node_Workspace = any;
+type _GetTestsForWorkspace_node_Workspace_tests_edges= any;
+type _GetTestsForWorkspace_node_Workspace_tests_edges_node = any;
+
 export async function getTestsGraphQL(
   graphQLClient: GraphQLClientInterface,
   accessToken: string | null,
   workspaceId: string
-): Promise<any[]> {
-  const response = await graphQLClient.send<any>(
+): Promise<_GetTestsForWorkspace_node_Workspace_tests_edges_node[]> {
+  const response = await graphQLClient.send<_GetTestsForWorkspace>(
     {
       operationName: "GetTestsForWorkspace",
       query: GET_TESTS,
@@ -52,8 +58,8 @@ export async function getTestsGraphQL(
   }
 
   return (
-    (response.node as any).tests?.edges.map(
-      edge => edge.node
+    (response.node as _GetTestsForWorkspace_node_Workspace).tests?.edges.map(
+      (edge: _GetTestsForWorkspace_node_Workspace_tests_edges) => edge.node
     ) ?? []
   );
 }
