@@ -38,7 +38,7 @@ export default function PlayPauseButton() {
 
   return (
     <div
-      className="mx-1.5 flex flex-row"
+      className="ml-1 mr-1.5 flex flex-row"
       style={{ width: "32px", height: "32px" }}
       onClick={onClick}
     >

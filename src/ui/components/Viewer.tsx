@@ -63,7 +63,7 @@ const Vertical = ({ toolboxLayout }: { toolboxLayout: ToolboxLayout }) => {
               <Video />
             </div>
           </Panel>
-          <PanelResizeHandle className={videoPanelCollapsed ? "" : "h-2 w-full shrink-0"} />
+          <PanelResizeHandle className={videoPanelCollapsed ? "" : "h-1 w-full shrink-0"} />
         </>
       )}
       <Panel
@@ -105,7 +105,7 @@ const Horizontal = ({ toolboxLayout }: { toolboxLayout: ToolboxLayout }) => {
       >
         <div className="flex w-full flex-1 flex-row">
           {recordingCapabilities.supportsRepaintingGraphics ? <SecondaryToolbox /> : <Toolbox />}
-          <PanelResizeHandle className={videoPanelCollapsed ? "" : "h-full w-2 shrink-0"} />
+          <PanelResizeHandle className={videoPanelCollapsed ? "" : "h-full w-1 shrink-0"} />
         </div>
       </Panel>
       <Panel
@@ -138,7 +138,7 @@ export default function Viewer() {
           <Panel minSize={25} order={1}>
             <Toolbox />
           </Panel>
-          <PanelResizeHandle className="h-full w-2" />{" "}
+          <PanelResizeHandle className="h-full w-1" />{" "}
         </>
       )}
       <Panel minSize={25} order={2}>
