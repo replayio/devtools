@@ -5,7 +5,7 @@ import { ContextMenuItem, useContextMenu } from "use-context-menu";
 import Icon from "replay-next/components/Icon";
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 
-import { TestOverviewPage } from "./Overview/TestOverviewContextRoot";
+import { TestOverviewContent } from "./Overview/TestOverviewContent";
 import { TestContext, TestsContextRoot } from "./TestContextRoot";
 import { TestList } from "./TestList";
 import styles from "./TestsPage.module.css";
@@ -108,7 +108,7 @@ function TestsContent() {
         <Panel minSize={20} order={2}>
           <div className="h-full w-full overflow-hidden rounded-xl">
             <Suspense fallback={<LibrarySpinner />}>
-              <TestOverviewPage />
+              <TestOverviewContent />
             </Suspense>
           </div>
         </Panel>
