@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import styles from "./LoadingProgressBar.module.css";
 
 export function LoadingProgressBar({
-  className,
+  className = "",
   initialProgress = 0,
 }: {
   className?: string;

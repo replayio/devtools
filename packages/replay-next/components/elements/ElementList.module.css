@@ -1,3 +1,7 @@
+.ListWrapper {
+  position: relative;
+}
+
 .List:focus {
   outline: none;
 }
