@@ -3,7 +3,7 @@ import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { ContextMenuItem, useContextMenu } from "use-context-menu";
 
 import Icon from "replay-next/components/Icon";
-import LibraryDropdownTrigger from "ui/components/Library/LibraryDropdown";
+import LibraryDropdownTrigger from "ui/components/Library/LibraryDropdownTrigger";
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 
 import { TestOverviewContent } from "./Overview/TestOverviewContent";

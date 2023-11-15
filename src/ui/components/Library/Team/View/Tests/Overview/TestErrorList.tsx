@@ -5,7 +5,7 @@ import { ContextMenuItem, useContextMenu } from "use-context-menu";
 
 import Icon from "replay-next/components/Icon";
 import { TestExecution } from "shared/test-suites/TestRun";
-import LibraryDropdownTrigger from "ui/components/Library/LibraryDropdown";
+import LibraryDropdownTrigger from "ui/components/Library/LibraryDropdownTrigger";
 
 import { getTruncatedRelativeDate } from "../../Recordings/RecordingListItem/RecordingListItem";
 import styles from "../../../../Library.module.css";

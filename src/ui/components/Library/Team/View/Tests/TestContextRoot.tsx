@@ -13,7 +13,7 @@ import { Test, getTestRunTitle } from "shared/test-suites/TestRun";
 import { useTests } from "./hooks/useTests";
 
 type TestsContextType = {
-  sortBy: "failureRate";
+  sortBy: "failureRate" | "alphabetical";
   filterByTime: number | null;
   filterByText: string;
   filterByTextForDisplay: string;
@@ -34,7 +34,7 @@ export function TestsContextRoot({ children }: { children: ReactNode }) {
   const [testId, setTestId] = useState<string | null>(null);
 
   const [filterByTime, setFilterByTime] = useState<number | null>(null);
-  const [sortBy, setSortBy] = useState<"failureRate">("failureRate");
+  const [sortBy, setSortBy] = useState<"failureRate" | "alphabetical">("failureRate");
 
   const [filterByText, setFilterByText] = useState("");
   const filterByTextDeferred = useDeferredValue(filterByText);
@@ -45,9 +45,9 @@ export function TestsContextRoot({ children }: { children: ReactNode }) {
     if (filterByText !== "") {
       const lowerCaseText = filterByText.toLowerCase();
 
-      filteredTests = filteredTests.filter(testRun => {
+      filteredTests = filteredTests.filter(test => {
         if (filterByText !== "") {
-          const title = getTestRunTitle(testRun);
+          const { title } = test;
 
           if (!title.toLowerCase().includes(lowerCaseText)) {
             return false;
