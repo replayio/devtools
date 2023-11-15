@@ -39,13 +39,13 @@ export function TestsContextRoot({ children }: { children: ReactNode }) {
   const [filterByText, setFilterByText] = useState("");
   const filterByTextDeferred = useDeferredValue(filterByText);
 
-  const filteredTestRuns = useMemo(() => {
-    let filteredTestRuns = tests;
+  const filteredTests = useMemo(() => {
+    let filteredTests = tests;
 
     if (filterByText !== "") {
       const lowerCaseText = filterByText.toLowerCase();
 
-      filteredTestRuns = filteredTestRuns.filter(testRun => {
+      filteredTests = filteredTests.filter(testRun => {
         if (filterByText !== "") {
           const title = getTestRunTitle(testRun);
 
@@ -58,18 +58,8 @@ export function TestsContextRoot({ children }: { children: ReactNode }) {
       });
     }
 
-    return filteredTestRuns;
+    return filteredTests;
   }, [filterByText, tests]);
-  // }, [filterByBranch, filterByStatus, filterByText, testRuns]);
-
-  // useEffect(() => {
-  //   if (testRunId == null) {
-  //     // Select the first test run by default if nothing is selected.
-  //     setTestRunId(testRuns[0]?.id ?? null);
-  //   }
-  // }, [router, teamId, testRunId, testRuns]);
-
-  // useSyncTestRunIdToUrl(teamId, testRunId, setTestRunId);
 
   const deferredTestId = useDeferredValue(testId);
 
@@ -86,7 +76,7 @@ export function TestsContextRoot({ children }: { children: ReactNode }) {
         setFilterByText,
         testId: deferredTestId,
         testIdForDisplay: testId,
-        tests,
+        tests: filteredTests,
       }}
     >
       {children}
