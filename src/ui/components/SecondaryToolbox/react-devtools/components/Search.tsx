@@ -97,7 +97,7 @@ export function Search({
         />
       </label>
       {searchState !== null && (
-        <div className={styles.SearchResults}>
+        <div className={styles.SearchResults} data-test-id="ReactDevTools-SearchResults">
           {searchState.index + 1} of {searchState.matchingRows.length}
         </div>
       )}

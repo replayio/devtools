@@ -7,10 +7,10 @@ import {
   openElementsPanel,
   waitForElementsToLoad,
 } from "../helpers/elements-panel";
-import { openNetworkPanel } from "../helpers/network-panel";
-import { findNetworkRequestRow } from "../helpers/network-panel";
+import { getReactComponents } from "../helpers/legacy-react-devtools-panel";
+import { findNetworkRequestRow, openNetworkPanel } from "../helpers/network-panel";
+import { openReactDevtoolsPanel } from "../helpers/new-react-devtools-panel";
 import { isPassportItemCompleted } from "../helpers/passport";
-import { getReactComponents, openReactDevtoolsPanel } from "../helpers/react-devtools-panel";
 import { enablePassport } from "../helpers/settings";
 import { resetTestUser, waitFor } from "../helpers/utils";
 import test, { expect } from "../testFixtureCloneRecording";

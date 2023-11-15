@@ -1,18 +1,10 @@
-import {
-  MappedLocation,
-  ObjectId,
-  PauseId,
-  Property,
-  Value as ProtocolValue,
-} from "@replayio/protocol";
-import { ReactNode, useContext } from "react";
+import { ObjectId, PauseId, Property, Value as ProtocolValue } from "@replayio/protocol";
+import { ReactNode } from "react";
 
 import KeyValueRenderer from "replay-next/components/inspector/KeyValueRendererWithContextMenu";
-import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientInterface } from "shared/client/types";
 import { InspectedReactElement } from "ui/components/SecondaryToolbox/react-devtools/types";
-import { findProtocolObjectProperty } from "ui/components/SecondaryToolbox/react-devtools/utils/findProtocolObjectProperty";
 
 import styles from "./ContextPropsStateRenderer.module.css";
 

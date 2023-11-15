@@ -9,7 +9,7 @@ import {
   getAllVisibleComponentNames,
   getReactComponents,
   openReactDevtoolsPanel,
-} from "../helpers/react-devtools-panel";
+} from "../helpers/new-react-devtools-panel";
 import { debugPrint, waitFor } from "../helpers/utils";
 import test, { expect } from "../testFixtureCloneRecording";
 
@@ -51,7 +51,7 @@ test("react_devtools-03: process and display multiple React versions in page", a
   //    <NoBuzz>
   expect(numComponents).toBe(18);
 
-  const componentNames = await getAllVisibleComponentNames(components);
+  const componentNames = await getAllVisibleComponentNames(page);
 
   expect(componentNames[0]).toBe("React16App");
   expect(componentNames[6]).toBe("React17App");

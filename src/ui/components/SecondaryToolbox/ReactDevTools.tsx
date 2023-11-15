@@ -28,7 +28,6 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
 import { Nag } from "shared/graphql/types";
 import { useTheme } from "shared/theme/useTheme";
-import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { UIThunkAction } from "ui/actions";
 import { fetchMouseTargetsForPause } from "ui/actions/app";
 import { enterFocusMode } from "ui/actions/timeline";
@@ -344,14 +343,12 @@ export function ReactDevtoolsPanel() {
 export default function ReactDevToolsWithErrorBoundary() {
   const replayClient = useContext(ReplayClientContext);
   const { point, pauseId } = useMostRecentLoadedPause() ?? {};
-  const [newReactDevTools] = useGraphQLUserData("feature_newReactDevTools");
 
   const recordingCapabilities = recordingCapabilitiesCache.read(replayClient);
 
   // The new React DevTools depends on recently-added Chromium only Replay APIs
-  // Regardless of the user preference, don't show the new RDT for older Chrome or Firefox recordings
-  const showNewDevTools =
-    newReactDevTools && recordingCapabilities.supportsObjectIdLookupsInEvaluations;
+  // For now, fall back to the old RDT for older Chrome or Firefox recordings
+  const showNewDevTools = recordingCapabilities.supportsObjectIdLookupsInEvaluations;
 
   return (
     <ErrorBoundary name="ReactDevTools" resetKey={pauseId ?? ""}>
