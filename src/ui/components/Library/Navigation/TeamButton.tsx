@@ -32,6 +32,7 @@ export function TeamButton({
   const isSelected = router.asPath.includes(basePath);
   const showSettingsButton = isSelected && id && id !== MY_LIBRARY_TEAM.id && !isNew;
   const updateDefaultWorkspace = useUpdateDefaultWorkspace();
+  const [enableTestSuitesTestsView] = useLocalStorageUserData("enableTestSuitesTestsView");
 
   const onClick = async () => {
     if (isNew) {
@@ -70,18 +71,13 @@ export function TeamButton({
         ) : null}
         {showSettingsButton ? <SettingsButton /> : null}
       </Link>
-      {isSelected ? <TestTeamViews /> : null}
+      {(isSelected && enableTestSuitesTestsView && isTest) ? <TestTeamViews /> : null}
     </div>
   );
 }
 
-// We don't currently have a context shared between the navigation
-// and the content of the library UI. Getting the view/teamId this
-// way is pretty clunky, so we should probably lift that state up
 function TestTeamViews() {
-  const [showTestsView] = useLocalStorageUserData("enableTestSuitesTestsView");
   const router = useRouter();
-  const cont = useContext(ViewContext);
   const view = useGetTeamRouteParams().view;
   const { teamId } = useGetTeamRouteParams();
 
@@ -93,23 +89,17 @@ function TestTeamViews() {
     <div className="pl-4">
       <div className="flex flex-col">
         <div
-          className={`py-1 pr-4 pl-8 ${
-            view === "runs" ? "font-bold" : ""
-          } hover:cursor-pointer`}
+          className={`py-1 pr-4 pl-8 ${view === "runs" ? "font-bold" : ""} hover:cursor-pointer`}
           onClick={() => setView("runs")}
         >
           Runs
         </div>
-        {showTestsView ? (
-          <div
-            className={`py-1 pr-4 pl-8 ${
-              view === "tests" ? "font-bold" : ""
-            } hover:cursor-pointer`}
-            onClick={() => setView("tests")}
-          >
-            Tests
-          </div>
-        ) : null}
+        <div
+          className={`py-1 pr-4 pl-8 ${view === "tests" ? "font-bold" : ""} hover:cursor-pointer`}
+          onClick={() => setView("tests")}
+        >
+          Tests
+        </div>
       </div>
     </div>
   );
