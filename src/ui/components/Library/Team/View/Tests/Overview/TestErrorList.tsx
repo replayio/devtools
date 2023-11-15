@@ -29,9 +29,19 @@ export function TestErrorList({
     onKeyDown: onKeyDownTimeFilter,
   } = useContextMenu(
     <>
-      <ContextMenuItem dataTestId="show-all-runs" onSelect={() => setFilterByTime(null)}>
-        All errors
+      <ContextMenuItem disabled onSelect={() => setFilterByTime(1 / 24)}>
+        Last hour
       </ContextMenuItem>
+      <ContextMenuItem disabled onSelect={() => setFilterByTime(1)}>
+        Last day
+      </ContextMenuItem>
+      <ContextMenuItem disabled onSelect={() => setFilterByTime(7)}>
+        Last week
+      </ContextMenuItem>
+      <ContextMenuItem disabled onSelect={() => setFilterByTime(30)}>
+        Last month
+      </ContextMenuItem>
+      <ContextMenuItem onSelect={() => setFilterByTime(null)}>All time</ContextMenuItem>
     </>,
     { alignTo: "auto-target" }
   );
@@ -55,7 +65,7 @@ export function TestErrorList({
           <LibraryDropdownTrigger
             onClick={onClickTimeFilter}
             onKeyDown={onKeyDownTimeFilter}
-            label={filterByTime === null ? "All errors" : ""}
+            label={filterByTime === null ? "All time" : ""}
           />
           {contextMenuTimeFilter}
         </div>
