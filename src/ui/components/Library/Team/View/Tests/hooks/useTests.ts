@@ -6,10 +6,11 @@ import { TeamContext } from "ui/components/Library/Team/TeamContextRoot";
 import useToken from "ui/utils/useToken";
 
 import { testsCache } from "../../TestRuns/suspense/TestsCache";
+import { Test } from "shared/test-suites/TestRun";
 
 const EMPTY_ARRAY: any[] = [];
 
-export function useTests(): any[] {
+export function useTests(): Test[] {
   const graphQLClient = useContext(GraphQLClientContext);
   const { teamId } = useContext(TeamContext);
 
