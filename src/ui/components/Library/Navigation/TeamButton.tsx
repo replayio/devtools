@@ -79,7 +79,7 @@ export function TeamButton({
 // and the content of the library UI. Getting the view/teamId this
 // way is pretty clunky, so we should probably lift that state up
 function TestTeamViews() {
-  const [showTestsView] = useLocalStorageUserData("enableTestView");
+  const [showTestsView] = useLocalStorageUserData("enableTestSuitesTestsView");
   const router = useRouter();
   const cont = useContext(ViewContext);
   const view = useGetTeamRouteParams().view;
