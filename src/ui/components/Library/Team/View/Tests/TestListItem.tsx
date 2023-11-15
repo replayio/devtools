@@ -8,8 +8,8 @@ import styles from "../../../Library.module.css";
 
 function Status({ failCount }: { failCount: number }) {
   return (
-    <div className="flex h-5 w-8 shrink-0 items-center justify-center rounded-md bg-[#F02D5E] text-xs font-bold text-chrome">
-      {failCount}
+    <div className="flex h-5 w-8 shrink-0 items-center justify-center rounded-md bg-[#F02D5E] text-xs font-bold text-white">
+      {failCount}%
     </div>
   );
 }
