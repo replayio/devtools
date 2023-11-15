@@ -48,5 +48,5 @@ test("react_devtools 04: fuzz testing", async ({ pageWithMeta: { page, recording
 });
 
 function evaluateStore() {
-  return [printStore((window as any).app.rdtStore), (window as any).app.rdtAnnotations];
+  return [printStore((window as any).app.rdt.store), (window as any).app.rdt.annotations];
 }
