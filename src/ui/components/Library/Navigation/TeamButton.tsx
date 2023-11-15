@@ -90,10 +90,10 @@ function TestTeamViews() {
   };
 
   return (
-    <div className="pl-4 pb-2">
+    <div className="pl-4">
       <div className="flex flex-col">
         <div
-          className={`px-4 py-1 ${
+          className={`py-1 pr-4 pl-8 ${
             view === "runs" ? "font-bold" : ""
           } hover:cursor-pointer hover:font-bold`}
           onClick={() => setView("runs")}
@@ -102,7 +102,7 @@ function TestTeamViews() {
         </div>
         {showTestsView ? (
           <div
-            className={`px-4 py-1 ${
+            className={`py-1 pr-4 pl-8 ${
               view === "tests" ? "font-bold" : ""
             } hover:cursor-pointer hover:font-bold`}
             onClick={() => setView("tests")}
