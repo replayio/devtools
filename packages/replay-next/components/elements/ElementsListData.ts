@@ -1,11 +1,11 @@
 import assert from "assert";
 import { ObjectId, PauseId, Node as ProtocolNode } from "@replayio/protocol";
 
+import { parentNodesCache } from "replay-next/components/elements/suspense/DOMParentNodesCache";
 import { Element, elementCache } from "replay-next/components/elements/suspense/ElementCache";
 import { getDistanceFromRoot } from "replay-next/components/elements/utils/getDistanceFromRoot";
 import { getItemWeight } from "replay-next/components/elements/utils/getItemWeight";
 import { isNodeInSubTree } from "replay-next/components/elements/utils/isNodeInSubTree";
-import { loadNodePathToRoot } from "replay-next/components/elements/utils/loadNodePathToRoot";
 import { loadNodeSubTree } from "replay-next/components/elements/utils/loadNodeSubTree";
 import { shouldDisplayNode } from "replay-next/components/elements/utils/shouldDisplayNode";
 import { GenericListData } from "replay-next/components/windowing/GenericListData";
@@ -80,7 +80,8 @@ export class ElementsListData extends GenericListData<Item> {
     let idPath;
     try {
       this.updateLoadingState(true);
-      idPath = await loadNodePathToRoot(this._replayClient, this._pauseId, leafNodeId);
+
+      idPath = await parentNodesCache.readAsync(this._replayClient, this._pauseId, leafNodeId);
     } catch (error) {
       this.updateLoadingState(false);
       this.handleLoadingError(error);
