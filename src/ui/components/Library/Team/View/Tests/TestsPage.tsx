@@ -3,6 +3,7 @@ import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { ContextMenuItem, useContextMenu } from "use-context-menu";
 
 import Icon from "replay-next/components/Icon";
+import LibraryDropdownTrigger from "ui/components/Library/LibraryDropdown";
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 
 import { TestOverviewContent } from "./Overview/TestOverviewContent";
@@ -61,27 +62,19 @@ function TestsContent() {
         <Panel minSize={20} order={1}>
           <div className="flex h-full w-full flex-col overflow-hidden rounded-xl bg-bodyBgcolor">
             <div className="flex flex-row items-center justify-between gap-2 border-b border-themeBorder bg-bodyBgcolor p-2">
-              <div
-                className={styles.dropdownTrigger}
-                data-test-id="TestPage-ResultFilter-DropdownTrigger"
+              <LibraryDropdownTrigger
+                testId="TestPage-ResultFilter-DropdownTrigger"
                 onKeyDown={onKeyDownSortBy}
                 onClick={onClickSortBy}
-                tabIndex={0}
-              >
-                {sortBy === "failureRate" ? "Sort by failure rate" : ""}
-                <Icon className="h-5 w-5" type="chevron-down" />
-              </div>
+                label={sortBy === "failureRate" ? "Sort by failure rate" : ""}
+              />
               {contextMenuSortBy}
-              <div
-                className={styles.dropdownTrigger}
-                data-test-id="TestPage-BranchFilter-DropdownTrigger"
+              <LibraryDropdownTrigger
+                testId="TestPage-BranchFilter-DropdownTrigger"
                 onClick={onClickTimeFilter}
                 onKeyDown={onKeyDownTimeFilter}
-                tabIndex={0}
-              >
-                {filterByTime === null ? "All tests" : ""}
-                <Icon className="h-5 w-5" type="chevron-down" />
-              </div>
+                label={filterByTime === null ? "All tests" : ""}
+              />
               {contextMenuTimeFilter}
               <div className={styles.filterContainer}>
                 <input

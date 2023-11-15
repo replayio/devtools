@@ -5,10 +5,10 @@ import { ContextMenuItem, useContextMenu } from "use-context-menu";
 
 import Icon from "replay-next/components/Icon";
 import { TestExecution } from "shared/test-suites/TestRun";
+import LibraryDropdownTrigger from "ui/components/Library/LibraryDropdown";
 
 import { getTruncatedRelativeDate } from "../../Recordings/RecordingListItem/RecordingListItem";
 import styles from "../../../../Library.module.css";
-import testPageStyles from "../TestsPage.module.css";
 
 const MAX_ERRORS_SHOWN = 5;
 const MAX_REPLAYS_SHOWN = 3;
@@ -52,16 +52,11 @@ export function TestErrorList({
               </div>
             ) : null}
           </div>
-          <div
-            className={testPageStyles.dropdownTrigger}
-            data-test-id="TestPage-BranchFilter-DropdownTrigger"
+          <LibraryDropdownTrigger
             onClick={onClickTimeFilter}
             onKeyDown={onKeyDownTimeFilter}
-            tabIndex={0}
-          >
-            {filterByTime === null ? "All errors" : ""}
-            <Icon className="h-5 w-5" type="chevron-down" />
-          </div>
+            label={filterByTime === null ? "All errors" : ""}
+          />
           {contextMenuTimeFilter}
         </div>
         <div>
