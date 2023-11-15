@@ -10,10 +10,10 @@ import { createCache, createSingleEntryCache } from "suspense";
 
 import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
 import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
+import { getPreferredLocation } from "replay-next/src/utils/sources";
 import { ReplayClientInterface } from "shared/client/types";
 import { IGNORABLE_PARTIAL_SOURCE_URLS } from "ui/actions/eventListeners/eventListenerUtils";
 import { findFunctionOutlineForLocation } from "ui/actions/eventListeners/jumpToCode";
-import { SourcesState, getPreferredLocation } from "ui/reducers/sources";
 import { FormattedPointStackFrame, formattedPointStackCache } from "ui/suspense/frameCache";
 
 interface ApplyMiddlewareDecl {
@@ -21,25 +21,25 @@ interface ApplyMiddlewareDecl {
   sourceId: string;
 }
 
-const applyMiddlewareDeclCache = createSingleEntryCache<
-  [replayClient: ReplayClientInterface, sourcesState: SourcesState],
+export const applyMiddlewareDeclCache = createSingleEntryCache<
+  [replayClient: ReplayClientInterface],
   ApplyMiddlewareDecl | null
 >({
   debugLabel: "ApplyMiddlewareDecl",
-  load: async ([replayClient, sourcesState]) => {
+  load: async ([replayClient]) => {
     const dispatchMatches: FunctionMatch[] = [];
 
     const sourcesById = await sourcesByIdCache.readAsync(replayClient);
-    const reactReduxSources = Array.from(sourcesById.values()).filter(source =>
+    const reduxSources = Array.from(sourcesById.values()).filter(source =>
       source.url?.includes("/redux/")
     );
 
-    if (reactReduxSources.length === 0) {
+    if (reduxSources.length === 0) {
       return null;
     }
 
     await replayClient.searchFunctions(
-      { query: "dispatch", sourceIds: reactReduxSources.map(source => source.id) },
+      { query: "dispatch", sourceIds: reduxSources.map(source => source.id) },
       matches => {
         dispatchMatches.push(...matches);
       }
@@ -49,7 +49,7 @@ const applyMiddlewareDeclCache = createSingleEntryCache<
     if (!firstMatch) {
       return null;
     }
-    const preferredLocation = getPreferredLocation(sourcesState, [firstMatch.loc]);
+    const preferredLocation = getPreferredLocation(sourcesById, [], [firstMatch.loc]);
     const reduxSource = sourcesById.get(preferredLocation.sourceId)!;
     const fileOutline = await sourceOutlineCache.readAsync(replayClient, reduxSource.id);
 
@@ -83,13 +83,12 @@ function isNestedInside(child: SourceLocationRange, parent: SourceLocationRange)
 
 async function searchingCallstackForDispatch(
   pauseFrames: FormattedPointStackFrame[],
-  replayClient: ReplayClientInterface,
-  sourcesState: SourcesState
+  replayClient: ReplayClientInterface
 ) {
   // The first 2 elements in filtered pause frames are from replay's redux stub, so they should be ignored
   // The 3rd element is the user function that calls it, and will most likely be the `dispatch` call
   let preferredFrameIdx = 2;
-  const applyMiddlewareDecl = await applyMiddlewareDeclCache.readAsync(replayClient, sourcesState);
+  const applyMiddlewareDecl = await applyMiddlewareDeclCache.readAsync(replayClient);
 
   if (!applyMiddlewareDecl) {
     return null;
@@ -176,18 +175,13 @@ async function searchSourceOutlineForDispatch(
 }
 
 export const reduxDispatchJumpLocationCache = createCache<
-  [
-    replayClient: ReplayClientInterface,
-    point: ExecutionPoint,
-    time: number,
-    sourcesState: SourcesState
-  ],
+  [replayClient: ReplayClientInterface, point: ExecutionPoint, time: number],
   PointDescription | undefined
 >({
   config: { immutable: true },
   debugLabel: "ReduxDispatchJumpLocation",
-  getKey: ([replayClient, point, time, sourcesState]) => point,
-  load: async ([replayClient, point, time, sourcesState]) => {
+  getKey: ([replayClient, point, time]) => point,
+  load: async ([replayClient, point, time]) => {
     const frames = await formattedPointStackCache.readAsync(
       replayClient,
       { point, time },
@@ -200,11 +194,7 @@ export const reduxDispatchJumpLocationCache = createCache<
     );
     const { filteredFrames: filteredPauseFrames } = frames;
 
-    let preferredFrameIdx = await searchingCallstackForDispatch(
-      filteredPauseFrames,
-      replayClient,
-      sourcesState
-    );
+    let preferredFrameIdx = await searchingCallstackForDispatch(filteredPauseFrames, replayClient);
 
     if (preferredFrameIdx === null) {
       // couldn't find the frame through the call stack

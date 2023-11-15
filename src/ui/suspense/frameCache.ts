@@ -12,6 +12,7 @@ import {
   TimeStampedPoint,
   TimeStampedPointRange,
 } from "@replayio/protocol";
+import findLast from "lodash/findLast";
 import { Cache, createCache } from "suspense";
 
 import { createFrame } from "devtools/client/debugger/src/client/create";
@@ -94,10 +95,13 @@ export interface FormattedPointStackFrame {
 
 export interface FormattedPointStack {
   point: PointDescription;
-  resultPoint: PointDescription;
-  frame?: FormattedPointStackFrame;
   allFrames: FormattedPointStackFrame[];
   filteredFrames: FormattedPointStackFrame[];
+}
+
+export interface FormattedPointStackWithRelevantFrame extends FormattedPointStack {
+  resultPoint: PointDescription;
+  frame?: FormattedPointStackFrame;
   functionName?: string;
 }
 
@@ -115,28 +119,23 @@ export const formattedPointStackCache: Cache<
     // Some arbitrary guesses about how many frames we should fetch. Prefer frameDepth, cap at 60
     const framesToFetch = Math.min(point.frameDepth ?? 60, 60);
     const pointStack = await replayClient.getPointStack(point.point, framesToFetch);
-    const formattedFrames = await Promise.all(
-      pointStack.map(async frame => {
-        updateMappedLocationForPointStackFrame(sourcesById, frame);
-        const functionLocation = getPreferredLocation(sourcesById, [], frame.functionLocation);
-        const executionLocation = getPreferredLocation(sourcesById, [], frame.point?.frame ?? []);
 
-        const source = sourcesById.get(functionLocation.sourceId)!;
+    const formattedFrames = pointStack.map(frame => {
+      updateMappedLocationForPointStackFrame(sourcesById, frame);
+      const functionLocation = getPreferredLocation(sourcesById, [], frame.functionLocation);
+      const executionLocation = getPreferredLocation(sourcesById, [], frame.point?.frame ?? []);
 
-        return {
-          url: source.url,
-          source,
-          functionLocation,
-          executionLocation,
-          point: frame.point,
-          functionDetails: await formatFunctionDetailsFromLocation(
-            replayClient,
-            "unknown",
-            functionLocation
-          ),
-        };
-      })
-    );
+      const source = sourcesById.get(functionLocation.sourceId)!;
+
+      const formattedFrame: FormattedPointStackFrame = {
+        url: source.url,
+        source,
+        functionLocation,
+        executionLocation,
+        point: frame.point,
+      };
+      return formattedFrame;
+    });
 
     const filteredPauseFrames = formattedFrames.filter(frame => {
       const { source } = frame;
@@ -147,18 +146,57 @@ export const formattedPointStackCache: Cache<
       return !ignoreFileUrls.some(partialUrl => source.url?.includes(partialUrl));
     });
 
-    // We want the oldest app stack frame.
+    return {
+      point,
+      allFrames: formattedFrames,
+      filteredFrames: filteredPauseFrames,
+    };
+  },
+});
+
+export const relevantAppFrameCache: Cache<
+  [replayClient: ReplayClientInterface, point: PointDescription, ignoreFileUrls?: string[]],
+  FormattedPointStackWithRelevantFrame
+> = createCache({
+  debugLabel: "FormattedPointStack",
+  getKey: ([replayClient, point, ignoreFileUrls = MORE_IGNORABLE_PARTIAL_URLS]) => {
+    // turn these into one giant string, since the URLs affects the filtering
+    return [point.point, ...ignoreFileUrls].join();
+  },
+  async load([replayClient, point, ignoreFileUrls = MORE_IGNORABLE_PARTIAL_URLS]) {
+    const formattedPointStack = await formattedPointStackCache.readAsync(
+      replayClient,
+      point,
+      ignoreFileUrls
+    );
+
+    // We want the newest app stack frame that appears to be useful.
+    // This logic is typically being used to find a frame that triggered
+    // a React or Redux state update.  There may be many user app code frames
+    // in the current stack, but the newest one is probably what triggered the update.
+    // Because of that, we need to search backwards from the newest frames.
     // If this is a React update, that should be what called `setState()`
     // But, React also calls `scheduleUpdate` frequently _internally_.
     // So, there may not be any app code frames at all.
-    let earliestAppCodeFrame: FormattedPointStackFrame | undefined =
-      filteredPauseFrames.slice(-1)[0];
+    let relevantAppCodeFrame: FormattedPointStackFrame | undefined = undefined;
+    const { filteredFrames } = formattedPointStack;
+
+    // Start by seeing it here's any frames that have a sourcemapped source.
+    // Ideally we'll go with that.
+    relevantAppCodeFrame = findLast(filteredFrames, frame => {
+      return frame.source.kind === "sourceMapped";
+    });
+
+    if (!relevantAppCodeFrame) {
+      // Otherwise, go with the newest frame
+      relevantAppCodeFrame = filteredFrames.slice(-1)[0];
+    }
 
     let functionName;
-
     let resultPoint = point;
-    if (earliestAppCodeFrame) {
-      if (earliestAppCodeFrame.point) {
+
+    if (relevantAppCodeFrame) {
+      if (relevantAppCodeFrame.point) {
         // We _want_ to go to this line of code at the time that it ran.
         // Technically the backend might not return an execution point for this stack frame.
         // Handle that (hopefully unlikely) case by still using the original point
@@ -169,24 +207,23 @@ export const formattedPointStackCache: Cache<
         // `class B extends A`, where `B` has no constructor.
         // Realistically, we're looking at React or Redux user app logic here,
         // so we should always have actual code and thus an execution point.
-        resultPoint = earliestAppCodeFrame.point;
+        resultPoint = relevantAppCodeFrame.point;
       }
 
       const formattedFunction = await formatFunctionDetailsFromLocation(
         replayClient,
         "unknown",
-        earliestAppCodeFrame.executionLocation
+        relevantAppCodeFrame.executionLocation
       );
+
       functionName = formattedFunction?.functionName;
     }
 
     return {
-      point,
+      ...formattedPointStack,
       functionName,
       resultPoint,
-      frame: earliestAppCodeFrame!,
-      allFrames: formattedFrames,
-      filteredFrames: filteredPauseFrames,
+      frame: relevantAppCodeFrame!,
     };
   },
 });
