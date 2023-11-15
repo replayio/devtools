@@ -95,7 +95,7 @@ function TestTeamViews() {
         <div
           className={`py-1 pr-4 pl-8 ${
             view === "runs" ? "font-bold" : ""
-          } hover:cursor-pointer hover:font-bold`}
+          } hover:cursor-pointer`}
           onClick={() => setView("runs")}
         >
           Runs
@@ -104,7 +104,7 @@ function TestTeamViews() {
           <div
             className={`py-1 pr-4 pl-8 ${
               view === "tests" ? "font-bold" : ""
-            } hover:cursor-pointer hover:font-bold`}
+            } hover:cursor-pointer`}
             onClick={() => setView("tests")}
           >
             Tests

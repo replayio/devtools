@@ -16,8 +16,6 @@ export const testsCache = createCache<
   load: async ([graphQLClient, accessToken, workspaceId]) => {
     const rawTests = await getTestsGraphQL(graphQLClient, accessToken, workspaceId);
 
-    // Compute the failure rate and add it to the stored test in cache
-    // until we're able to do it from the backend
     const processedTests = rawTests.map(t => ({
       ...t,
       failureRate: getFailureRate(t.executions),
