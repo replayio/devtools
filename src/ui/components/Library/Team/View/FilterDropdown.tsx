@@ -1,7 +1,6 @@
 import { useContext, useState } from "react";
 
 import PortalDropdown from "../../../shared/PortalDropdown";
-import { Dropdown, DropdownItem } from "../../LibraryDropdown";
 import { ViewContext } from "./ViewContextRoot";
 
 const daysInSeconds = (days: number) => 1000 * 60 * 60 * 24 * days;

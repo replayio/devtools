@@ -71,7 +71,7 @@ export function TeamButton({
         ) : null}
         {showSettingsButton ? <SettingsButton /> : null}
       </Link>
-      {(isSelected && enableTestSuitesTestsView && isTest) ? <TestTeamViews /> : null}
+      {isSelected && enableTestSuitesTestsView && isTest ? <TestTeamViews /> : null}
     </div>
   );
 }

@@ -39,6 +39,9 @@ function TestsContent() {
       <ContextMenuItem onSelect={() => setSortBy("failureRate")}>
         Sort by failure rate
       </ContextMenuItem>
+      <ContextMenuItem disabled onSelect={() => setSortBy("alphabetical")}>
+        Sort alphabetically
+      </ContextMenuItem>
     </>,
     { alignTo: "auto-target" }
   );

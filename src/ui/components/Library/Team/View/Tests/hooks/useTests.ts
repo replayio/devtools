@@ -2,11 +2,11 @@ import { useContext } from "react";
 import { useImperativeCacheValue } from "suspense";
 
 import { GraphQLClientContext } from "replay-next/src/contexts/GraphQLClientContext";
+import { Test } from "shared/test-suites/TestRun";
 import { TeamContext } from "ui/components/Library/Team/TeamContextRoot";
 import useToken from "ui/utils/useToken";
 
 import { testsCache } from "../../TestRuns/suspense/TestsCache";
-import { Test } from "shared/test-suites/TestRun";
 
 const EMPTY_ARRAY: any[] = [];
 

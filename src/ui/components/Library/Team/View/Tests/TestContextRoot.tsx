@@ -18,7 +18,7 @@ type TestsContextType = {
   filterByText: string;
   filterByTextForDisplay: string;
   selectTestId: Dispatch<SetStateAction<string | null>>;
-  setSortBy: Dispatch<SetStateAction<"failureRate">>;
+  setSortBy: Dispatch<SetStateAction<"failureRate" | "alphabetical">>;
   setFilterByTime: Dispatch<SetStateAction<number | null>>;
   setFilterByText: Dispatch<SetStateAction<string>>;
   testId: string | null;
