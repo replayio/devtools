@@ -74,6 +74,7 @@ export default memo(function UserActionEventRow({
   const [isHovered, setIsHovered] = useState(false);
 
   const argsString = useMemo(() => {
+    console.log("Command args: ", command);
     if (command.arguments) {
       return command.arguments.filter(argument => typeof argument === "string").join(" ");
     }

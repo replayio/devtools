@@ -18,6 +18,8 @@ import {
   PlaywrightAnnotationsCache,
 } from "ui/components/TestSuite/suspense/AnnotationsCache";
 
+import { inspectDeep } from "./__tests__/playwrightStepsParsing.test";
+
 export type SemVer = string;
 
 function assert(value: unknown, message: string, tags: Object = {}): asserts value {
@@ -230,12 +232,13 @@ export namespace RecordingTestMetadataV3 {
     timeStampedPointRange: TimeStampedPointRange | null;
   }
 
-  export type UserActionEventStack = Array<{
+  export type UserActionStackEntry = {
     columnNumber: number;
     fileName: string;
     functionName?: string;
     lineNumber: number;
-  }>;
+  };
+  export type UserActionEventStack = Array<UserActionStackEntry>;
 
   export interface UserActionEvent {
     data: {
@@ -294,6 +297,24 @@ export namespace RecordingTestMetadataV3 {
     type: "navigation";
   }
 
+  export interface FunctionEvent {
+    // Data needed to render this event
+    data: {
+      function: string;
+      line: number;
+      events: TestEvent[];
+
+      // The precise time this event occurred; not that events have no duration
+      timeStampedPoints: {
+        // The time/point range during which the step was executed
+        afterStep: TimeStampedPoint | null;
+        beforeStep: TimeStampedPoint | null;
+      };
+    };
+
+    type: "function";
+  }
+
   export interface NetworkRequestEvent {
     // Data needed to render this event
     data: {
@@ -313,7 +334,7 @@ export namespace RecordingTestMetadataV3 {
     type: "network-request";
   }
 
-  export type TestEvent = UserActionEvent | NavigationEvent | NetworkRequestEvent;
+  export type TestEvent = UserActionEvent | NavigationEvent | NetworkRequestEvent | FunctionEvent;
 
   export type TestError = {
     name: string;
@@ -342,6 +363,7 @@ export type TestRecording = RecordingTestMetadataV3.TestRecording;
 export type TestSectionName = RecordingTestMetadataV3.TestSectionName;
 export type UserActionEvent = RecordingTestMetadataV3.UserActionEvent;
 export type UserActionEventStack = RecordingTestMetadataV3.UserActionEventStack;
+export type UserActionStackEntry = RecordingTestMetadataV3.UserActionStackEntry;
 
 export async function processCypressTestRecording(
   testRecording: RecordingTestMetadataV2.TestRecording | RecordingTestMetadataV3.TestRecording,
@@ -750,7 +772,10 @@ export async function processGroupedTestCases(
         for (let index = 0; index < partialTestRecordings.length; index++) {
           const legacyTest = partialTestRecordings[index];
           const test = await processPlaywrightTestRecording(legacyTest, annotations, testStacks);
-
+          // const groupedTest = true ? groupTestStepsByCallStack(test) : test;
+          const regroupedTestEvents = groupTestStepsByCallStack(test.events.main);
+          test.events.main = regroupedTestEvents;
+          // console.log("Grouped test: ", regroupedTestEvents);
           testRecordings.push(test);
         }
 
@@ -805,6 +830,7 @@ export async function processPlaywrightTestRecording(
 
       const partialTestEvents =
         partialEvents[sectionName as RecordingTestMetadataV3.TestSectionName];
+
       partialTestEvents.forEach(partialTestEvent => {
         const {
           category,
@@ -814,6 +840,16 @@ export async function processPlaywrightTestRecording(
           parentId = null,
           scope = null,
         } = partialTestEvent.data;
+
+        // TODO Jason was doing this arg splitting and I don't know why
+        // const { category, error = null, id, parentId = null, scope = null } = partialTestEvent.data;
+
+        // const [_, name, args] = partialTestEvent.data.command.name.match(/(.*)\((.*)\)/) || [];
+
+        // const command = {
+        //   name: name || partialTestEvent.data.command.name,
+        //   arguments: args?.split(","),
+        // };
 
         assert(category, `Test event must have "category" property`, {
           command: command?.name,
@@ -900,6 +936,123 @@ export async function processPlaywrightTestRecording(
     // This function does not support the legacy TestItem format
     throw Error(`Unsupported legacy TestItem value`);
   }
+}
+
+class FunctionNode {
+  functionName: string;
+  events: TestEvent[];
+  children: { [key: string]: FunctionNode };
+  beforePoint: TimeStampedPoint | null = null;
+  afterPoint: TimeStampedPoint | null = null;
+  callStackEntry: UserActionStackEntry;
+
+  constructor(
+    functionName: string,
+    callStackEntry: UserActionStackEntry,
+    beforePoint: TimeStampedPoint | null,
+    afterPoint: TimeStampedPoint | null
+  ) {
+    this.functionName = functionName;
+    this.callStackEntry = callStackEntry;
+    this.beforePoint = beforePoint;
+    this.afterPoint = afterPoint;
+    this.events = [];
+    this.children = {};
+  }
+
+  findOrAddChild(
+    callStackEntry: UserActionStackEntry,
+    beforePoint: TimeStampedPoint | null,
+    afterPoint: TimeStampedPoint | null
+  ) {
+    const { functionName, fileName, lineNumber, columnNumber } = callStackEntry;
+    const displayName = functionName || fileName;
+
+    const identifierString = `${displayName}:${lineNumber}`;
+    if (!this.children.hasOwnProperty(identifierString)) {
+      this.children[identifierString] = new FunctionNode(
+        displayName,
+        callStackEntry,
+        beforePoint,
+        afterPoint
+      );
+    }
+
+    if (beforePoint) {
+      if (!this.beforePoint || comparePoints(this.beforePoint.point, beforePoint.point) > 0) {
+        this.beforePoint = beforePoint;
+      }
+    }
+
+    if (afterPoint) {
+      if (!this.afterPoint || comparePoints(this.afterPoint.point, afterPoint.point) < 0) {
+        this.afterPoint = afterPoint;
+      }
+    }
+    return this.children[identifierString];
+  }
+
+  toDict(): RecordingTestMetadataV3.FunctionEvent {
+    // Convert the children to a list of dictionaries
+    const childList = Object.values(this.children).map(childNode => childNode.toDict());
+
+    // Combine events and children
+    const combined = this.events.concat(childList);
+
+    return {
+      type: "function",
+      data: {
+        function: this.functionName,
+        line: this.callStackEntry.lineNumber,
+        timeStampedPoints: {
+          beforeStep: this.beforePoint,
+          afterStep: this.afterPoint,
+        },
+
+        events: combined,
+      },
+    };
+  }
+}
+
+export function groupTestStepsByCallStack(
+  testEvents: RecordingTestMetadataV3.TestEvent[]
+): RecordingTestMetadataV3.TestEvent[] {
+  // Initialize the root of the tree
+  const rootNode = new FunctionNode(
+    "",
+    { fileName: "", lineNumber: 0, columnNumber: 0 },
+    null,
+    null
+  );
+
+  for (let event of testEvents) {
+    let currentNode = rootNode;
+    let testSourceCallStack: UserActionEventStack = [];
+    if ("testSourceCallStack" in event.data) {
+      // console.log("Call stack: ", event.data.testSourceCallStack, event);
+      testSourceCallStack = event.data.testSourceCallStack ?? [];
+    }
+
+    const beforePoint = getTestEventTimeStampedPoint(event);
+    const afterPoint = getTestEventAfterTimeStampedPoint(event);
+
+    for (let callStackEntry of testSourceCallStack.slice().reverse()) {
+      // const functionName = call.functionName || call.fileName;
+      // currentNode = currentNode.findOrAddChild(functionName);
+      currentNode = currentNode.findOrAddChild(callStackEntry, beforePoint, afterPoint);
+    }
+
+    currentNode.events.push(event);
+  }
+
+  // Convert the tree to the desired dict structure
+  // test.events.main = rootNode.toDict().events;
+
+  // return test;
+  const groupedTestEvents = rootNode.toDict().data.events;
+
+  return groupedTestEvents;
 }
 
 // If there are test(s) with completed status (passed/failed/timedOut) but no annotations,
@@ -1022,6 +1175,16 @@ export function getTestEventTimeStampedPoint(
   }
 }
 
+export function getTestEventAfterTimeStampedPoint(
+  testEvent: RecordingTestMetadataV3.TestEvent
+): TimeStampedPoint | null {
+  if (isNavigationTestEvent(testEvent) || isNetworkRequestTestEvent(testEvent)) {
+    return testEvent.timeStampedPoint;
+  } else {
+    return testEvent.data.timeStampedPoints.afterStep ?? null;
+  }
+}
+
 export function getTestEventExecutionPoint(
   testEvent: RecordingTestMetadataV3.TestEvent
 ): ExecutionPoint | null {
@@ -1091,6 +1254,12 @@ export function isUserActionTestEvent(
   value: TestEvent
 ): value is RecordingTestMetadataV3.UserActionEvent {
   return value.type === "user-action";
+}
+
+export function isFunctionTestEvent(
+  value: TestEvent
+): value is RecordingTestMetadataV3.FunctionEvent {
+  return value.type === "function";
 }
 
 export function compareTestEventExecutionPoints(

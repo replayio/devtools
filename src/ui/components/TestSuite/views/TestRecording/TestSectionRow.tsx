@@ -28,6 +28,7 @@ import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext
 import { useAppDispatch } from "ui/setup/hooks";
 
 import { testEventDomNodeCache } from "../../suspense/TestEventDetailsCache";
+import HelperFunctionEventRow from "./TestRecordingEvents/HelperFunctionEventRow";
 import NavigationEventRow from "./TestRecordingEvents/NavigationEventRow";
 import NetworkRequestEventRow from "./TestRecordingEvents/NetworkRequestEventRow";
 import UserActionEventRow from "./TestRecordingEvents/UserActionEventRow";
@@ -109,6 +110,15 @@ export function TestSectionRow({
     case "network-request":
       child = <NetworkRequestEventRow networkRequestEvent={testEvent} />;
       break;
+    case "function":
+      child = (
+        <HelperFunctionEventRow
+          functionEvent={testEvent}
+          testRunnerName={testRunnerName}
+          testSectionName={testSectionName}
+        />
+      );
+      break;
     case "user-action":
       child = (
         <UserActionEventRow
@@ -125,6 +135,10 @@ export function TestSectionRow({
   }
 
   const onClick = async () => {
+    if (testEvent.type === "function") {
+      return false;
+    }
+
     startTransition(() => {
       setTestEvent(testEvent);
     });
