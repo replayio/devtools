@@ -27,10 +27,12 @@ function TestRunsContent() {
     filterByBranch,
     filterByStatus,
     filterByText,
+    filterByTime,
     filterByTextForDisplay,
     setFilterByBranch,
     setFilterByStatus,
     setFilterByText,
+    setFilterByTime,
   } = useContext(TestRunsContext);
 
   const {
@@ -68,13 +70,26 @@ function TestRunsContent() {
     { alignTo: "auto-target" }
   );
 
+  const {
+    contextMenu: contextMenuTimeFilter,
+    onContextMenu: onClickTimeFilter,
+    onKeyDown: onKeyDownTimeFilter,
+  } = useContextMenu(
+    <>
+      <ContextMenuItem dataTestId="show-all-runs" onSelect={() => setFilterByTime(null)}>
+        All tests
+      </ContextMenuItem>
+    </>,
+    { alignTo: "auto-target" }
+  );
+
   return (
     <div className="flex w-full flex-grow flex-row p-2">
       <PanelGroup autoSaveId="Library:TestRuns" direction="horizontal">
         <Panel minSize={20} order={1}>
           <div className="flex h-full w-full flex-col gap-4 overflow-hidden rounded-xl bg-bodyBgcolor p-2">
             <div className="flex flex-col gap-2">
-              <div className="flex flex-row items-center justify-between gap-2 bg-bodyBgcolor">
+              <div className="flex flex-row items-center gap-2 bg-bodyBgcolor">
                 <div
                   className={styles.dropdownTrigger}
                   data-test-id="TestRunsPage-ResultFilter-DropdownTrigger"
@@ -86,6 +101,17 @@ function TestRunsContent() {
                   <Icon className="h-5 w-5" type="chevron-down" />
                 </div>
                 {contextMenuStatusFilter}
+                <div
+                  className={styles.dropdownTrigger}
+                  data-test-id="TestPage-TimeFilter-DropdownTrigger"
+                  onClick={onClickTimeFilter}
+                  onKeyDown={onKeyDownTimeFilter}
+                  tabIndex={0}
+                >
+                  {filterByTime === null ? "All tests" : ""}
+                  <Icon className="h-5 w-5" type="chevron-down" />
+                </div>
+                {contextMenuTimeFilter}
                 <div
                   className={styles.dropdownTrigger}
                   data-test-id="TestRunsPage-BranchFilter-DropdownTrigger"
