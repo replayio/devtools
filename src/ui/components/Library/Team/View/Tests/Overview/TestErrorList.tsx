@@ -49,7 +49,7 @@ export function TestErrorList({
   const uniqueErrorCount = Object.entries(errorFrequency).length;
 
   return (
-    <div>
+    <div className="overflow-y-auto">
       <div className="flex flex-col gap-2 border-b border-themeBorder py-2">
         <div className="flex items-center justify-between px-4">
           <div className="flex flex-row items-center gap-2 overflow-hidden">

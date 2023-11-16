@@ -16,6 +16,7 @@ export const testsCache = createCache<
   load: async ([graphQLClient, accessToken, workspaceId]) => {
     const rawTests = await getTestsGraphQL(graphQLClient, accessToken, workspaceId);
 
+    // TODO SCS-1575
     const processedTests = rawTests.map(t => ({
       ...t,
       failureRate: getFailureRate(t.executions),

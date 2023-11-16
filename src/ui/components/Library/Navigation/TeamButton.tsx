@@ -60,12 +60,10 @@ export function TeamButton({
         )}
         onClick={onClick}
       >
-        <span className="overflow-hidden overflow-ellipsis whitespace-pre">
-          <div className="flex">
-            <LibraryIcon teamType={isTest ? "tests" : "team"} />
-            {label}
-          </div>
-        </span>
+        <div className="flex overflow-hidden">
+          <LibraryIcon teamType={isTest ? "tests" : "team"} />
+          <span className="overflow-hidden overflow-ellipsis whitespace-pre">{label}</span>
+        </div>
         {isNew ? (
           <div className={"rounded-md bg-primaryAccent px-3 py-0.5 text-xs text-white"}>New</div>
         ) : null}

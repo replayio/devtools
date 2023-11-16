@@ -29,7 +29,7 @@ export function TestOverviewContent() {
     }
   } else {
     children = (
-      <div className="flex h-full items-center justify-center">
+      <div className="flex h-full items-center justify-center p-2">
         <div className=" rounded-md bg-chrome py-2 px-3 text-center">
           Select a test to see its details here
         </div>
@@ -49,7 +49,7 @@ function Stats({ failureRates }: { failureRates: FailureRates }) {
 
   return (
     <div className="border-b border-themeBorder py-2 px-4">
-      <div>
+      <div className="overflow-y-auto">
         <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-lg font-medium">
           Historical failure rate
         </div>
