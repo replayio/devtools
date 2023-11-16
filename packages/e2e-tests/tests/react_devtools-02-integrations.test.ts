@@ -115,7 +115,7 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
     "Root",
     "Head",
     "AppContainer",
-    "z",
+    "Container",
     "Context.Provider",
     "Context.Provider",
     "PathnameContextProviderAdapter",
