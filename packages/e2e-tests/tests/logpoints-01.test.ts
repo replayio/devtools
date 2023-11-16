@@ -50,6 +50,7 @@ test(`logpoints-01: log-points appear in the correct order and allow time warpin
   await expect(logPointMessages.first()).toHaveText(/Beginning/);
   await expect(logPointMessages.last()).toHaveText(/Ending/);
 
+  await verifyLogpointBadge(logPointMessages.nth(1), null);
   await setLogpointBadge(page, logPointMessages.nth(1), "unicorn");
   await waitFor(async () => {
     await verifyLogpointBadge(logPointMessages.nth(1), "unicorn");
