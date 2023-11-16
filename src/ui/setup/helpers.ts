@@ -4,7 +4,6 @@ import type { Store } from "@replayio/react-devtools-inline";
 import { client, sendMessage, triggerEvent } from "protocol/socket";
 import { GraphQLService, userData } from "shared/user-data/GraphQL/UserData";
 import { UIStore } from "ui/actions";
-import { ParsedReactDevToolsAnnotation } from "ui/suspense/annotationsCaches";
 import { getRecordingId } from "ui/utils/recording";
 
 import { ReplaySession, getReplaySession } from "./prefs";
@@ -17,7 +16,7 @@ declare global {
     store: UIStore;
     rdt: {
       store: Store | null;
-      annotations: ParsedReactDevToolsAnnotation[];
+      getOperationsForPause: () => Promise<any>;
     };
     local: () => void;
     prod: () => void;
@@ -37,7 +36,7 @@ export async function setupAppHelper(store: UIStore) {
 
   window.app = {
     store,
-    rdt: { store: null, annotations: [] },
+    rdt: { store: null, getOperationsForPause: async () => [] },
     preferences: userData,
     triggerEvent,
     replaySession,

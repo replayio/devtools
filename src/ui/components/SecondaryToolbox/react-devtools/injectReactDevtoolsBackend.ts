@@ -29,6 +29,7 @@ export type StoreWithInternals = Store & {
 declare global {
   interface Window {
     __REACT_DEVTOOLS_SAVED_RENDERERS__: any[];
+    __REACT_DEVTOOLS_OPERATIONS: number[][];
     evaluationLogs: string[];
     logMessage: (message: string) => void;
     __REACT_DEVTOOLS_STUB_FIBER_ROOTS: Record<string, Set<any>>;
@@ -63,6 +64,11 @@ function installReactDevToolsIntoPause() {
   // has the initial RDT infrastructure available
   // @ts-ignore
   INSTALL_HOOK_PLACEHOLDER();
+
+  window.__REACT_DEVTOOLS_OPERATIONS = [];
+  window.__REACT_DEVTOOLS_GLOBAL_HOOK__.sub("operations", (newOperations: Array<number>) => {
+    window.__REACT_DEVTOOLS_OPERATIONS.push(newOperations);
+  });
 
   // The only time we have access to the React root objects is when `onCommitFiberRoot` gets called.
   // Our Chromium fork specifically captures all those and saves them.
@@ -124,7 +130,6 @@ function installReactDevToolsIntoPause() {
 
 const injectGlobalHookSource = require("./installHook.raw.js").default;
 const reactDevtoolsBackendSource = require("./react_devtools_backend.raw.js").default;
-
 const rdtInjectionExpression = `(${installReactDevToolsIntoPause})()`
   .replace("INSTALL_HOOK_PLACEHOLDER", `(${injectGlobalHookSource})`)
   .replace("DEVTOOLS_PLACEHOLDER", `(${reactDevtoolsBackendSource})`);

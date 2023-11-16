@@ -23,6 +23,7 @@ import { useIsPointWithinFocusWindow } from "replay-next/src/hooks/useIsPointWit
 import { useMostRecentLoadedPause } from "replay-next/src/hooks/useMostRecentLoadedPause";
 import { useNag } from "replay-next/src/hooks/useNag";
 import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
+import { pauseEvaluationsCache } from "replay-next/src/suspense/PauseCache";
 import { isExecutionPointsLessThan } from "replay-next/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
@@ -209,8 +210,6 @@ export function ReactDevtoolsPanel() {
       return;
     }
 
-    window.app.rdt.annotations = annotations;
-
     wall.setPauseId(pauseId);
 
     if (previousPointRef.current && previousPointRef.current !== currentPoint) {
@@ -255,11 +254,28 @@ export function ReactDevtoolsPanel() {
   }, [wall, store]);
 
   useEffect(() => {
-    if (wall && currentPoint !== null) {
+    if (currentPoint !== null && wall) {
       // Inject the RDT backend and prefetch node IDs
       wall.setUpRDTInternalsForCurrentPause();
     }
   }, [currentPoint, wall]);
+
+  useEffect(() => {
+    if (!pauseId || !annotations) {
+      return;
+    }
+
+    window.app.rdt.getOperationsForPause = async () => {
+      const operations = await replayClient.evaluateExpression(
+        pauseId,
+        `JSON.stringify(window.__REACT_DEVTOOLS_OPERATIONS)`,
+        null,
+        undefined
+      );
+
+      return JSON.parse(operations.returned!.value!);
+    };
+  }, [replayClient, annotations, pauseId]);
 
   if (currentPoint === null) {
     return null;
