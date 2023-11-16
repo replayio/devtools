@@ -27,6 +27,14 @@ export function TestOverviewContent() {
         </div>
       );
     }
+  } else {
+    children = (
+      <div className="flex h-full items-center justify-center">
+        <div className=" rounded-md bg-chrome py-2 px-3 text-center">
+          Select a test to see its details here
+        </div>
+      </div>
+    );
   }
 
   return (
