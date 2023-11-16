@@ -319,7 +319,7 @@ function Section({ children, title }: { children: ReactNode; title: SectionTitle
   const [expanded, setExpanded] = useLocalStorageUserData(key);
 
   return (
-    <div className={styles.Section}>
+    <div className={styles.Section} data-test-id={`ReactDevTools-Section-${title}`}>
       <Expandable
         children={children}
         childrenClassName={styles.SectionChildren}

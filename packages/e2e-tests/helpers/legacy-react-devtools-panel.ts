@@ -3,11 +3,6 @@ import { Locator, Page, expect } from "@playwright/test";
 import { openConsolePanel, warpToMessage } from "./console-panel";
 import { getByTestName, getByTestNameNoSpace, getElementClasses, waitFor } from "./utils";
 
-export async function checkInspectedItemValue(item: Locator, expectedValue: string) {
-  const value = await getInspectedItemValue(item);
-  expect(value).toBe(expectedValue);
-}
-
 export function getComponentPickerButton(page: Page) {
   return page.locator(
     "[data-react-devtools-portal-root] div[class^=SearchInput] button[class^=Toggle]"
@@ -82,11 +77,6 @@ export async function openReactDevtoolsPanel(page: Page) {
 export async function waitForReactComponentCount(page: Page, expected: number) {
   const components = getReactComponents(page);
   return waitFor(async () => expect(await components.count()).toBe(expected));
-}
-
-export async function waitForAndCheckInspectedItem(item: Locator, expectedValue: string) {
-  await item.waitFor();
-  await checkInspectedItemValue(item, expectedValue);
 }
 
 export async function jumpToMessageAndCheckComponents(

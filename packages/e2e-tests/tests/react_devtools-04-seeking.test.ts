@@ -14,8 +14,6 @@ test("react_devtools-04: Component selection is maintained when seeking to a new
   pageWithMeta: { page, recordingId },
 }) => {
   const queryParams = new URLSearchParams();
-  // Enable the new RDT panel
-  queryParams.set("features", "feature_newReactDevTools");
 
   await startTest(page, recordingId, undefined, queryParams);
   await openDevToolsTab(page);

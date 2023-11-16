@@ -201,7 +201,7 @@ function HookRenderer({
   }
 
   return (
-    <div className={styles.Wrapper} data-depth={depth}>
+    <div className={styles.Wrapper} data-depth={depth} data-test-name={`Hook-${hookName}`}>
       {rendered}
     </div>
   );

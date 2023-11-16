@@ -164,12 +164,6 @@ export const config = {
     defaultValue: Boolean(false),
     legacyKey: "devtools.features.commentAttachments",
   },
-  feature_newReactDevTools: {
-    defaultValue: Boolean(false),
-    description: "Experimental React DevTools UI",
-    label: "New React DevTools",
-    legacyKey: null,
-  },
   feature_protocolPanel: {
     defaultValue: Boolean(false),
     label: "View protocol requests and responses in the panel",

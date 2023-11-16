@@ -38,7 +38,9 @@ export function ReactDevToolsListItem({
 
   let rendered: ReactNode = (
     <>
-      <div className={styles.ElementName}>{displayName}</div>
+      <div className={styles.ElementName} data-test-name="ReactDevTools-Name">
+        {displayName}
+      </div>
       {hocDisplayNames && hocDisplayNames.length > 0 && <Badge children={hocDisplayNames[0]} />}
       {key && <Badge children={truncateMiddle(`${key}`, MAX_KEY_LENGTH)} title={`${key}`} />}
     </>

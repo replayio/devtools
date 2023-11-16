@@ -43,7 +43,13 @@ export function InspectButton({ bridge, wall }: { bridge: FrontendBridge; wall: 
   };
 
   return (
-    <button className={styles.Button} onClick={onClick} disabled={wall === null}>
+    <button
+      className={styles.Button}
+      data-state={isActive ? "active" : "inactive"}
+      data-test-id="ReactDevTools-InspectButton"
+      disabled={wall === null}
+      onClick={onClick}
+    >
       <Icon className={styles.Icon} data-active={isActive || undefined} type="inspect" />
     </button>
   );

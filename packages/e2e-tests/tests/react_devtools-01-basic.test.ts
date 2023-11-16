@@ -4,28 +4,39 @@ import {
   findConsoleMessage,
   openConsolePanel,
 } from "../helpers/console-panel";
-import { getPropertyValue } from "../helpers/object-inspector";
 import {
   enableComponentPicker,
-  getInspectedItem,
+  getComponentName,
+  getInspectedHook,
   getReactComponents,
+  getSelectedRow,
   isComponentPickerEnabled,
   jumpToMessageAndCheckComponents,
   openReactDevtoolsPanel,
-  waitForAndCheckInspectedItem,
-} from "../helpers/react-devtools-panel";
+  verifyInspectedPropertyValue,
+} from "../helpers/new-react-devtools-panel";
+import { getGetterValue } from "../helpers/object-inspector";
 import { hoverScreenshot } from "../helpers/screenshot";
 import { waitFor } from "../helpers/utils";
 import test, { expect } from "../testFixtureCloneRecording";
 
-test.use({ exampleKey: "cra/dist/index.html" });
+test.use({ exampleKey: "cra/dist/index_chromium.html" });
 
-test("react_devtools-01: Basic RDT behavior (FF)", async ({
+test("react_devtools-01: Basic RDT behavior (Chromium)", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  const queryParams = new URLSearchParams();
+  // Force this test to always re-run the RDT (and other) routines
+  // See pref names in packages/shared/user-data/GraphQL/config.ts
+  queryParams.set("features", "backend_rerunRoutines");
+
+  await startTest(page, recordingId, undefined, queryParams);
+
   await openDevToolsTab(page);
+
+  // If the "React" tab shows up, we know that the routine ran
+  await openReactDevtoolsPanel(page);
 
   // General behavior: should show a React component tree
   await jumpToMessageAndCheckComponents(page, "Initial list", 3);
@@ -54,20 +65,24 @@ test("react_devtools-01: Basic RDT behavior (FF)", async ({
   // and hovering over the translated DOM node coordinates.
   await executeTerminalExpression(page, "document.querySelector('li').getBoundingClientRect()");
   const message = await findConsoleMessage(page, "DOMRect");
-  const left = +(await getPropertyValue(message, "left"));
-  const right = +(await getPropertyValue(message, "right"));
-  const top = +(await getPropertyValue(message, "top"));
-  const bottom = +(await getPropertyValue(message, "bottom"));
+  // These show up as getters in Chromium, not properties
+  const left = +(await getGetterValue(message, "left"));
+  const right = +(await getGetterValue(message, "right"));
+  const top = +(await getGetterValue(message, "top"));
+  const bottom = +(await getGetterValue(message, "bottom"));
   const x = (left + right) / 2;
   const y = (top + bottom) / 2;
+
   await openReactDevtoolsPanel(page);
   await enableComponentPicker(page);
   await waitFor(async () => {
+    await page.mouse.move(0, 0); // Stop hovering
     await hoverScreenshot(page, x, y);
-    expect(await page.locator("[class^=InactiveSelectedElement]").count()).toBeGreaterThan(0);
+    const actualName = await getComponentName(getSelectedRow(page));
+    expect(actualName).toBe("Item");
   });
 
-  await waitForAndCheckInspectedItem(getInspectedItem(page, "Props", "text"), '"Foo"');
+  await verifyInspectedPropertyValue(page, "Props", "text", '"Foo"');
 
   await jumpToMessageAndCheckComponents(page, "Removed an entry", 3);
 
@@ -82,14 +97,12 @@ test("react_devtools-01: Basic RDT behavior (FF)", async ({
   // React component props inspector works
   component = getReactComponents(page).nth(0);
   await component.click();
-  const stateItem = getInspectedItem(page, "Hooks", "State");
+  const stateItem = getInspectedHook(page, "State");
   await stateItem.waitFor();
-  await stateItem.locator("button").click();
-  const childItem = getInspectedItem(page, "Hooks", "0");
-  await waitForAndCheckInspectedItem(childItem, '{key: "2", text: "Bar"}');
-  await childItem.locator("button").click();
-  await waitForAndCheckInspectedItem(getInspectedItem(page, "Hooks", "key"), '"2"');
-  await waitForAndCheckInspectedItem(getInspectedItem(page, "Hooks", "text"), '"Bar"');
+  await stateItem.locator('[role="button"]').click();
+  await waitFor(async () => {
+    await expect(await stateItem.textContent()).toContain('{key: "2", text: "Bar"}');
+  });
 
   // Component picker should cancel if you click outside the video
   await enableComponentPicker(page);
