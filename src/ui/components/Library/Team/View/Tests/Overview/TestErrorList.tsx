@@ -1,3 +1,4 @@
+import { RecordingId } from "@replayio/protocol";
 import { motion } from "framer-motion";
 import orderBy from "lodash/orderBy";
 import { Dispatch, SetStateAction, useState } from "react";
@@ -47,6 +48,8 @@ export function TestErrorList({
   );
 
   const uniqueErrorCount = Object.entries(errorFrequency).length;
+  // We don't bother displaying executions without replays
+  const filteredExecutions = executions.filter(e => e.recording[0] !== null);
 
   return (
     <div>
@@ -83,7 +86,7 @@ export function TestErrorList({
             ))}
         </div>
       </div>
-      {selectedError ? <ErrorReplays executions={executions} /> : null}
+      {selectedError ? <ErrorReplays executions={filteredExecutions} /> : null}
     </div>
   );
 }
@@ -132,7 +135,13 @@ function ErrorReplays({ executions }: { executions: TestExecution[] }) {
           </div>
           <div className="flex flex-col gap-2">
             {sortedFailing.slice(0, MAX_REPLAYS_SHOWN).map((e, i) => (
-              <ErrorReplayList date={e.createdAt} index={i + 1} key={i} status="failed" />
+              <ErrorReplayListItem
+                recordingId={e.recording[0]!.id}
+                title={e.commitTitle}
+                date={e.createdAt}
+                key={i}
+                status="failed"
+              />
             ))}
           </div>
         </div>
@@ -144,7 +153,13 @@ function ErrorReplays({ executions }: { executions: TestExecution[] }) {
           </div>
           <div className="flex flex-col gap-2">
             {sortedPassing.slice(0, MAX_REPLAYS_SHOWN).map((e, i) => (
-              <ErrorReplayList date={e.createdAt} index={i + 1} key={i} status="passed" />
+              <ErrorReplayListItem
+                recordingId={e.recording[0]!.id}
+                title={e.commitTitle}
+                date={e.createdAt}
+                key={i}
+                status="passed"
+              />
             ))}
           </div>
         </div>
@@ -153,17 +168,24 @@ function ErrorReplays({ executions }: { executions: TestExecution[] }) {
   );
 }
 
-function ErrorReplayList({
+function ErrorReplayListItem({
+  recordingId,
+  title,
   date,
-  index,
   status,
 }: {
+  recordingId: RecordingId;
+  title: string;
   date: string;
-  index: number;
   status: "passed" | "failed";
 }) {
+  const displayedTitle = title === null ? "(commit title missing)" : title;
+
   return (
-    <div className="pointer-events-none flex flex-row justify-between gap-2 opacity-50 ">
+    <a
+      href={`/recording/${recordingId}`}
+      className="flex cursor-pointer flex-row justify-between gap-2"
+    >
       <div className="flex items-center gap-2 overflow-hidden">
         <div className={styles.iconWrapper}>
           <motion.div
@@ -174,11 +196,13 @@ function ErrorReplayList({
             <Icon className={styles[status]} type="play-unprocessed" />
           </motion.div>
         </div>
-        <div className="overflow-hidden overflow-ellipsis whitespace-nowrap">{`Replay #${index}`}</div>
+        <div title={displayedTitle} className="overflow-hidden overflow-ellipsis whitespace-nowrap">
+          {displayedTitle}
+        </div>
       </div>
       <div className="shrink-0 overflow-hidden overflow-ellipsis whitespace-nowrap">
         {getTruncatedRelativeDate(date)}
       </div>
-    </div>
+    </a>
   );
 }

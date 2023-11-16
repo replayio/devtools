@@ -18,10 +18,34 @@ const GET_TESTS = gql`
               testId
               title
               scope
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const GET_TEST = gql`
+  query GetTestForWorkspace($workspaceId: ID!, $testId: String) {
+    node(id: $workspaceId) {
+      ... on Workspace {
+        id
+        tests(filter: { testId: $testId }) {
+          edges {
+            node {
+              testId
+              title
+              scope
               executions {
                 errors
                 createdAt
+                commitTitle
                 result
+                recording {
+                  uuid
+                  title
+                }
               }
             }
           }
@@ -44,8 +68,6 @@ export async function getTestsGraphQL(
     },
     accessToken
   );
-
-  console.log({ response });
 
   if (response?.node == null) {
     return [];
