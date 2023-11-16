@@ -1,7 +1,9 @@
 import { useContext } from "react";
 
 import { FailureRates } from "shared/test-suites/TestRun";
+import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 
+import { useTest } from "../hooks/useTests";
 import { TestContext } from "../TestContextRoot";
 import { TestErrorList } from "./TestErrorList";
 import styles from "../../../../Library.module.css";
@@ -13,21 +15,9 @@ export function TestOverviewContent() {
 
   let children = null;
 
-  if (test) {
-    if (!hasFilters || tests.find(test => test.testId === testId)) {
-      children = (
-        <div className="flex flex-col overflow-y-auto">
-          <div className="flex flex-row items-center justify-between gap-1 border-b border-themeBorder py-2 px-4">
-            <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-lg font-medium">
-              {test.title}
-            </div>
-          </div>
-          <div className="overflow-y-auto">
-            <Stats failureRates={test.failureRates} />
-            <TestErrorList errorFrequency={test.errorFrequency} executions={test.executions} />
-          </div>
-        </div>
-      );
+  if (testId && test) {
+    if (!hasFilters) {
+      children = <TestOverview testId={testId} />;
     }
   } else {
     children = (
@@ -42,6 +32,32 @@ export function TestOverviewContent() {
   return (
     <div className={`flex h-full flex-col text-sm transition ${styles.runOverview} `}>
       {children}
+    </div>
+  );
+}
+
+function TestOverview({ testId }: { testId: string }) {
+  const { test, loading } = useTest(testId);
+
+  if (loading) {
+    return (
+      <div className="flex h-full items-center justify-center p-2">
+        <LibrarySpinner />
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col overflow-y-auto">
+      <div className="flex flex-row items-center justify-between gap-1 border-b border-themeBorder py-2 px-4">
+        <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-lg font-medium">
+          {test.title}
+        </div>
+      </div>
+      <div className="overflow-y-auto">
+        <Stats failureRates={test.failureRates} />
+        <TestErrorList errorFrequency={test.errorFrequency} executions={test.executions} />
+      </div>
     </div>
   );
 }

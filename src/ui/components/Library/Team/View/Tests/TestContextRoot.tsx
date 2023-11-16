@@ -8,7 +8,7 @@ import {
   useState,
 } from "react";
 
-import { Test, getTestRunTitle } from "shared/test-suites/TestRun";
+import { Test, TestWithExecutions } from "shared/test-suites/TestRun";
 
 import { useTests } from "./hooks/useTests";
 
@@ -23,7 +23,7 @@ type TestsContextType = {
   setFilterByText: Dispatch<SetStateAction<string>>;
   testId: string | null;
   testIdForDisplay: string | null;
-  tests: Test[];
+  tests: (Test | TestWithExecutions)[];
 };
 
 export const TestContext = createContext<TestsContextType>(null as any);
