@@ -11,19 +11,11 @@ export interface GetTestsForWorkspace_node_Recording {
   __typename: "Recording";
 }
 
-export interface GetTestsForWorkspace_node_Workspace_tests_edges_node_executions {
-  __typename: "TestExecution";
-  errors: string[] | null;
-  createdAt: any;
-  result: string;
-}
-
 export interface GetTestsForWorkspace_node_Workspace_tests_edges_node {
   __typename: "Tests";
   testId: string;
   title: string;
   scope: string[];
-  executions: GetTestsForWorkspace_node_Workspace_tests_edges_node_executions[];
 }
 
 export interface GetTestsForWorkspace_node_Workspace_tests_edges {

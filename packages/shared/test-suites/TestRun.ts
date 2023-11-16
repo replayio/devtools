@@ -36,10 +36,13 @@ export interface TestRunTestWithRecordings extends TestRunTest {
 export type Test = {
   testId: string;
   title: string;
+};
+
+export type TestWithExecutions = Test & {
+  executions: TestExecution[];
   failureRate: number;
   failureRates: FailureRates;
   errorFrequency: Record<string, number>;
-  executions: TestExecution[];
 };
 
 export type FailureRates = {
@@ -53,6 +56,8 @@ export type TestExecution = {
   errors: string[] | null;
   createdAt: string;
   result: string;
+  commitTitle: string;
+  recording: (Recording | null)[];
 };
 
 export type TestRun = {
