@@ -112,15 +112,13 @@ export async function searchComponents(page: Page, text: string) {
     await expect(await input.isEnabled()).toBe(true);
   });
 
-  await waitFor(async () => {
-    await input.focus();
-    await input.press("Escape"); // Clear/reset
-    await input.type(text);
-    await input.press("Enter");
+  await input.focus();
+  await input.press("Escape"); // Clear/reset
+  await input.type(text);
+  await input.press("Enter");
 
-    const searchResults = page.locator('[data-test-id="ReactDevTools-SearchResults"]');
-    await searchResults.waitFor();
-  });
+  const searchResults = page.locator('[data-test-id="ReactDevTools-SearchResults"]');
+  await searchResults.waitFor();
 }
 
 export async function verifyInspectedPropertyValue(
@@ -181,9 +179,7 @@ export async function verifySearchResults(
   }
 
   if (expectedName != null) {
-    await waitFor(async () => {
-      await verifySelectedComponentName(page, expectedName);
-    });
+    await verifySelectedComponentName(page, expectedName);
   }
 }
 
