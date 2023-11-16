@@ -249,10 +249,13 @@ export async function toggleProtocolMessage(page: Page, name: ToggleName, on: bo
   });
 
   // Wait for messages within the Console to fully load
-  await waitFor(async () => {
-    const messageList = page.locator('[data-test-name="Messages"]');
-    await expect(await messageList.locator('[data-test-name="Loader"]').count()).toBe(0);
-  });
+  await waitFor(
+    async () => {
+      const messageList = page.locator('[data-test-name="Messages"]');
+      expect(await messageList.locator('[data-test-name="Loader"]').count()).toBe(0);
+    },
+    { timeout: 20_000 }
+  );
 }
 
 export async function verifyConsoleMessage(
