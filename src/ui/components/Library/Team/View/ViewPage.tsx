@@ -3,9 +3,9 @@ import { useContext } from "react";
 import useLocalStorageUserData from "shared/user-data/LocalStorage/useLocalStorageUserData";
 
 import { FilterBarContainer } from "./FilterBarContainer";
+import { TestRunsPage as NewTestRunsPage } from "./NewTestRuns/TestRunsPage";
 import { RecordingsPage } from "./Recordings/RecordingsPage";
 import { TestRunsPage } from "./TestRuns/TestRunsPage";
-import { NewTestRunsPage } from "./NewTestRuns/TestRunsPage";
 import { ViewContext, ViewContextRoot } from "./ViewContextRoot";
 
 export function ViewPage({ defaultView }: { defaultView: string }) {
@@ -19,12 +19,17 @@ export function ViewPage({ defaultView }: { defaultView: string }) {
 export function ViewPageContent() {
   const { view } = useContext(ViewContext);
   const [enableTestSuitesNewRunsView] = useLocalStorageUserData("replayVideoPanelCollapsed");
-
   return (
     <div className="flex flex-grow flex-col overflow-hidden">
       <FilterBarContainer />
       <div className="flex flex-grow flex-row overflow-hidden">
-        {view === "recordings" ? <RecordingsPage /> : enableTestSuitesNewRunsView ? <NewTestRunsPage /> : <TestRunsPage />}
+        {view === "recordings" ? (
+          <RecordingsPage />
+        ) : enableTestSuitesNewRunsView ? (
+          <NewTestRunsPage />
+        ) : (
+          <TestRunsPage />
+        )}
       </div>
     </div>
   );
