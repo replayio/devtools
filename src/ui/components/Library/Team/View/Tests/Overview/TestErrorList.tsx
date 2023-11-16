@@ -123,30 +123,32 @@ function ErrorReplays({ executions }: { executions: TestExecution[] }) {
   const sortedFailing = orderBy(failing, "createdAt", "desc");
   const sortedPassing = orderBy(passing, "createdAt", "desc");
 
-  // TODO: show the processed/unprocessed status for the replays -jvv
-  // TODO: add the top commit for the corresponding replay as label -jvv
   return (
     <div className="flex flex-col gap-2 py-2 px-4">
-      <div className="flex flex-col gap-2">
-        <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-lg font-medium">
-          Recent replays that contain this error
-        </div>
+      {failing.length ? (
         <div className="flex flex-col gap-2">
-          {sortedFailing.slice(0, MAX_REPLAYS_SHOWN).map((e, i) => (
-            <ErrorReplayList date={e.createdAt} index={i + 1} key={i} status="failed" />
-          ))}
+          <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-lg font-medium">
+            Recent replays that contain this error
+          </div>
+          <div className="flex flex-col gap-2">
+            {sortedFailing.slice(0, MAX_REPLAYS_SHOWN).map((e, i) => (
+              <ErrorReplayList date={e.createdAt} index={i + 1} key={i} status="failed" />
+            ))}
+          </div>
         </div>
-      </div>
-      <div className="flex flex-col gap-2">
-        <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-lg font-medium">
-          Recent replays of the test passing
-        </div>
+      ) : null}
+      {passing.length ? (
         <div className="flex flex-col gap-2">
-          {sortedPassing.slice(0, MAX_REPLAYS_SHOWN).map((e, i) => (
-            <ErrorReplayList date={e.createdAt} index={i + 1} key={i} status="passed" />
-          ))}
+          <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-lg font-medium">
+            Recent replays of the test passing
+          </div>
+          <div className="flex flex-col gap-2">
+            {sortedPassing.slice(0, MAX_REPLAYS_SHOWN).map((e, i) => (
+              <ErrorReplayList date={e.createdAt} index={i + 1} key={i} status="passed" />
+            ))}
+          </div>
         </div>
-      </div>
+      ) : null}
     </div>
   );
 }
