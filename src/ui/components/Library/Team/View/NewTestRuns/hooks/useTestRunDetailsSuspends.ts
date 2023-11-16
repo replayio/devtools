@@ -2,7 +2,7 @@ import { useContext } from "react";
 
 import { GraphQLClientContext } from "replay-next/src/contexts/GraphQLClientContext";
 import { TeamContext } from "ui/components/Library/Team/TeamContextRoot";
-import { testRunDetailsCache } from "ui/components/Library/Team/View/TestRuns/suspense/TestRunsCache";
+import { testRunDetailsCache } from "ui/components/Library/Team/View/NewTestRuns/suspense/TestRunsCache";
 import useToken from "ui/utils/useToken";
 
 export function useTestRunDetailsSuspends(testRunId: string | null) {
@@ -14,8 +14,8 @@ export function useTestRunDetailsSuspends(testRunId: string | null) {
   return testRunId
     ? testRunDetailsCache.read(graphQLClient, accessToken?.token ?? null, teamId, testRunId)
     : {
-        testRun: null,
         groupedTests: null,
+        tests: null,
         recordings: null,
         durationMs: 0,
       };

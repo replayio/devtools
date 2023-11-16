@@ -3,13 +3,14 @@ import ReactVirtualizedAutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 
 import { TestRun } from "shared/test-suites/TestRun";
-import { TestRunListItem } from "ui/components/Library/Team/View/TestRuns/TestRunListItem";
+import { TestRunListItem } from "ui/components/Library/Team/View/NewTestRuns/TestRunListItem";
 import { SecondaryButton } from "ui/components/shared/Button";
 
 import { TestRunsContext } from "./TestRunsContextRoot";
 
 const PAGE_SIZE = 50;
-const ROW_HEIGHT = 65;
+// const ROW_HEIGHT = 65;
+// const ROW_HEIGHT = 65;
 
 type ItemData = {
   countToRender: number;
@@ -43,7 +44,7 @@ export function TestRunList() {
           height={height}
           itemCount={itemCount}
           itemData={itemData}
-          itemSize={ROW_HEIGHT}
+          itemSize={29}
           width={width}
         />
       )}

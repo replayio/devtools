@@ -12,8 +12,8 @@ import {
 
 import { TestRun, getTestRunTitle } from "shared/test-suites/TestRun";
 import { useGetTeamRouteParams } from "ui/components/Library/Team/utils";
-import { useSyncTestRunIdToUrl } from "ui/components/Library/Team/View/TestRuns/hooks/useSyncTestIdToUrl";
-import { useTestRuns } from "ui/components/Library/Team/View/TestRuns/hooks/useTestRuns";
+import { useSyncTestRunIdToUrl } from "ui/components/Library/Team/View/NewTestRuns/hooks/useSyncTestIdToUrl";
+import { useTestRuns } from "ui/components/Library/Team/View/NewTestRuns/hooks/useTestRuns";
 
 type TestRunsContextType = {
   filterByBranch: "all" | "primary";
@@ -27,12 +27,11 @@ type TestRunsContextType = {
   testRunId: string | null;
   testRunIdForDisplay: string | null;
   testRuns: TestRun[];
+  spec: string | null;
+  setSpec: React.Dispatch<React.SetStateAction<string | null>>;
 };
 
 export const TestRunsContext = createContext<TestRunsContextType>(null as any);
-
-type FilterByBranch = "all" | "primary";
-type FilterByStatus = "all" | "failed";
 
 export function TestRunsContextRoot({ children }: { children: ReactNode }) {
   const { teamId, testRunId: defaultTestRunId } = useGetTeamRouteParams();
@@ -41,17 +40,13 @@ export function TestRunsContextRoot({ children }: { children: ReactNode }) {
 
   const [testRunId, setTestRunId] = useState<string | null>(defaultTestRunId);
 
-  const [filterByBranch, setFilterByBranch] = useState<FilterByBranch>(() => {
-    const query = new URLSearchParams(window.location.search);
-    return (query.get("filterByBranch") as FilterByBranch) ?? "all";
-  });
-  const [filterByStatus, setFilterByStatus] = useState<FilterByStatus>(() => {
-    const query = new URLSearchParams(window.location.search);
-    return (query.get("filterByStatus") as FilterByStatus) ?? "all";
-  });
+  const [filterByBranch, setFilterByBranch] = useState<"all" | "primary">("all");
+  const [filterByStatus, setFilterByStatus] = useState<"all" | "failed">("all");
 
   const [filterByText, setFilterByText] = useState("");
   const filterByTextDeferred = useDeferredValue(filterByText);
+
+  const [spec, setSpec] = useState<string | null>(null);
 
   const router = useRouter();
 
@@ -122,6 +117,8 @@ export function TestRunsContextRoot({ children }: { children: ReactNode }) {
         testRunId: deferredTestRunId,
         testRunIdForDisplay: testRunId,
         testRuns: filteredTestRuns,
+        spec,
+        setSpec,
       }}
     >
       {children}

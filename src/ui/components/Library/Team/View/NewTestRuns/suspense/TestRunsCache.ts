@@ -7,7 +7,7 @@ import { TestRun, TestRunTestWithRecordings, processTestRun } from "shared/test-
 import {
   getTestRunTestsWithRecordingsGraphQL,
   getTestRunsGraphQL,
-} from "ui/components/Library/Team/View/TestRuns/graphql/TestRunsGraphQL";
+} from "ui/components/Library/Team/View/NewTestRuns/graphql/TestRunsGraphQL";
 import { convertRecording } from "ui/hooks/recordings";
 import { TestGroups, groupRecordings } from "ui/utils/testRuns";
 
@@ -28,9 +28,9 @@ export const testRunsCache = createCache<
 });
 
 export type TestRunRecordings = {
-  testRun: TestRun | null;
   durationMs: number;
   groupedTests: TestGroups | null;
+  tests: any;
   recordings: Recording[] | null;
 };
 
@@ -47,33 +47,30 @@ export const testRunDetailsCache = createCache<
   debugLabel: "testRunDetailsCache",
   getKey: ([_, __, workspaceId, testRunId]) => `${workspaceId}:${testRunId}`,
   load: async ([graphQLClient, accessToken, workspaceId, testRunId]) => {
-    const testRunNode = await getTestRunTestsWithRecordingsGraphQL(
+    const tests = await getTestRunTestsWithRecordingsGraphQL(
       graphQLClient,
       accessToken,
       workspaceId,
       testRunId
     );
 
-    const testRun = testRunNode ? processTestRun(testRunNode) : null;
-
     const recordings: Recording[] = [];
     let durationMs = 0;
-    const testsWithRecordings =
-      testRunNode?.tests.map<TestRunTestWithRecordings>(test => {
-        durationMs += test.durationMs;
-        const recs = orderBy(test.recordings.map(convertRecording), "date", "desc");
-        recordings.push(...recs);
+    const testsWithRecordings = tests.map<TestRunTestWithRecordings>(test => {
+      durationMs += test.durationMs;
+      const recs = orderBy(test.recordings.map(convertRecording), "date", "desc");
+      recordings.push(...recs);
 
-        return {
-          ...test,
-          recordings: recs,
-        };
-      }) ?? [];
+      return {
+        ...test,
+        recordings: recs,
+      };
+    });
 
     return {
-      testRun,
       durationMs,
       groupedTests: groupRecordings(testsWithRecordings),
+      tests: testsWithRecordings,
       recordings,
     };
   },

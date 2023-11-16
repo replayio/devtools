@@ -3,7 +3,6 @@ import { gql } from "@apollo/client";
 import {
   GetTestRunRecordings,
   GetTestRunRecordings_node_Workspace,
-  GetTestRunRecordings_node_Workspace_testRuns_edges_node,
   GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests,
 } from "shared/graphql/generated/GetTestRunRecordings";
 import {
@@ -21,28 +20,6 @@ const GET_TEST_RUN_RECORDINGS = gql`
         testRuns(id: $id) {
           edges {
             node {
-              id
-              date
-              mode
-              results {
-                counts {
-                  failed
-                  flaky
-                  passed
-                }
-              }
-              source {
-                commitId
-                commitTitle
-                groupLabel
-                isPrimaryBranch
-                branchName
-                prNumber
-                prTitle
-                repository
-                triggerUrl
-                user
-              }
               tests {
                 id
                 testId
@@ -117,7 +94,7 @@ export async function getTestRunTestsWithRecordingsGraphQL(
   accessToken: string | null,
   workspaceId: string,
   summaryId: string
-): Promise<GetTestRunRecordings_node_Workspace_testRuns_edges_node | null> {
+): Promise<GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests[]> {
   const response = await graphQLClient.send<GetTestRunRecordings>(
     {
       operationName: "GetTestRunRecordings",
@@ -128,10 +105,12 @@ export async function getTestRunTestsWithRecordingsGraphQL(
   );
 
   if (response?.node == null) {
-    return null;
+    return [];
   }
 
-  return (response.node as GetTestRunRecordings_node_Workspace).testRuns?.edges[0]?.node ?? null;
+  return (
+    (response.node as GetTestRunRecordings_node_Workspace).testRuns?.edges[0]?.node.tests ?? []
+  );
 }
 
 export async function getTestRunsGraphQL(

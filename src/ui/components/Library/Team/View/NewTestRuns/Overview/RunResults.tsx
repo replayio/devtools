@@ -8,15 +8,15 @@ import {
   useState,
 } from "react";
 
-import Icon from "replay-next/components/Icon";
-import { useTestRunDetailsSuspends } from "ui/components/Library/Team/View/TestRuns/hooks/useTestRunDetailsSuspends";
+import Icon, { IconType } from "replay-next/components/Icon";
+import { useTestRunDetailsSuspends } from "ui/components/Library/Team/View/NewTestRuns/hooks/useTestRunDetailsSuspends";
 import {
   FileNode,
   PathNode,
   isPathNode,
   useFileNameTree,
-} from "ui/components/Library/Team/View/TestRuns/Overview/useFileNameTree";
-import { TestRunsContext } from "ui/components/Library/Team/View/TestRuns/TestRunsContextRoot";
+} from "ui/components/Library/Team/View/NewTestRuns/Overview/useFileNameTree";
+import { TestRunsContext } from "ui/components/Library/Team/View/NewTestRuns/TestRunsContextRoot";
 import { TestGroup, testPassed } from "ui/utils/testRuns";
 
 import { TestResultListItem } from "./TestResultListItem";
@@ -131,50 +131,82 @@ const FileNodeRenderer = memo(function FileNodeRenderer({
   filterByText,
   label,
   fileNode,
+  path,
 }: {
   depth: number;
   filterByText: string;
   label: string;
   fileNode: FileNode;
+  path: string;
 }) {
   const { name, tests } = fileNode;
+  const { setSpec } = useContext(TestRunsContext);
 
-  const [expanded, setExpanded] = useState(true);
+  const onClick = () => {
+    if (path) {
+      setSpec(path + "/" + name);
+    } else {
+      setSpec(name);
+    }
+  };
 
-  const onClick = () => setExpanded(!expanded);
+  let type: IconType;
+
+  if (label === "Passed") {
+    type = "file";
+  } else if (label === "Failed") {
+    type = "error";
+  } else {
+    type = "warning";
+  }
 
   return (
     <>
       <div
         className={`flex cursor-pointer items-center gap-2 truncate  py-2  pr-4 ${styles.libraryRow}`}
         data-test-id="TestRunResult-FileNode"
-        data-test-state={expanded ? "expanded" : "collapsed"}
         onClick={onClick}
         style={{
           paddingLeft: `${depth * 1}rem`,
         }}
       >
-        <Icon className="h-5 w-5 shrink-0" type="file" />
+        <Icon className="h-5 w-5 shrink-0" type={type} />
         <div className="truncate">{name}</div>
-        {!expanded && <div className="text-xs text-bodySubColor">({tests.length} tests)</div>}
       </div>
-      <Offscreen mode={expanded ? "visible" : "hidden"}>
-        {tests.flatMap(test =>
-          test.recordings.map(recording => (
-            <TestResultListItem
-              depth={depth + 1}
-              filterByText={filterByText}
-              key={recording.id}
-              label={testPassed(test) ? "Passed" : label}
-              recording={recording}
-              test={test}
-              secondaryBadgeCount={/* index > 0 ? index + 1 : null */ null}
-            />
-          ))
-        )}
-      </Offscreen>
     </>
   );
+  // return (
+  //   <>
+  //     <div
+  //       className={`flex cursor-pointer items-center gap-2 truncate  py-2  pr-4 ${styles.libraryRow}`}
+  //       data-test-id="TestRunResult-FileNode"
+  //       data-test-state={expanded ? "expanded" : "collapsed"}
+  //       onClick={onClick}
+  //       style={{
+  //         paddingLeft: `${depth * 1}rem`,
+  //       }}
+  //     >
+  //       <Icon className="h-5 w-5 shrink-0" type="file" />
+  //       <div className="truncate">{name}</div>
+  //       {!expanded && <div className="text-xs text-bodySubColor">({tests.length} tests)</div>}
+  //     </div>
+  //     <Offscreen mode={expanded ? "visible" : "hidden"}>
+  //       {tests.flatMap(test =>
+  //         test.recordings.map(recording => (
+  //           <TestResultListItem
+  //             depth={depth + 1}
+  //             filterByText={filterByText}
+  //             key={recording.id}
+  //             label={testPassed(test) ? "Passed" : label}
+  //             recording={recording}
+  //             test={test}
+  //             secondaryBadgeCount={/* index > 0 ? index + 1 : null */ null}
+  //           />
+  //         ))
+  //       )}
+  //     </Offscreen>
+  //   </>
+  // );
 });
 
 function PathNodeRenderer({
@@ -246,6 +278,7 @@ function PathNodeRenderer({
                 key={index}
                 label={label}
                 fileNode={childNode}
+                path={name}
               />
             );
           }
