@@ -54,7 +54,7 @@ function TestOverview({ testId }: { testId: string }) {
           {test.title}
         </div>
       </div>
-      <div className="overflow-y-auto">
+      <div className="flex flex-col overflow-y-auto">
         <Stats failureRates={test.failureRates} />
         <TestDetails errorFrequency={test.errorFrequency} executions={test.executions} />
       </div>

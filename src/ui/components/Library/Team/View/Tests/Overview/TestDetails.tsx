@@ -25,7 +25,7 @@ export function TestDetails({
   }, [testId]);
 
   return (
-    <div className="overflow-y-auto">
+    <div>
       {Object.entries(errorFrequency).length ? (
         <TestErrors
           errorFrequency={errorFrequency}
