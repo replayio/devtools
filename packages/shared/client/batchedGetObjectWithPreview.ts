@@ -61,10 +61,13 @@ async function getObjectPreviews(
   // It's possible that some of the objects requested have already been returned
   // but we still need to resolve their hanging promises
   objectIdToDeferred.forEach(deferred => {
-    // It's okay to resolve a deferred more than once; it will be ignored
-    deferred.resolve({
-      objects: [],
-    });
+    try {
+      deferred.resolve({
+        objects: [],
+      });
+    } catch (error) {
+      // TODO Add status to Deferred so we can avoid this
+    }
   });
 }
 
