@@ -2,7 +2,7 @@ import orderBy from "lodash/orderBy";
 import { createCache } from "suspense";
 
 import { GraphQLClientInterface } from "shared/graphql/GraphQLClient";
-import { Test, TestExecution } from "shared/test-suites/TestRun";
+import { Test } from "shared/test-suites/TestRun";
 
 import { getTestsGraphQL } from "../../Tests/graphql/TestsGraphQL";
 

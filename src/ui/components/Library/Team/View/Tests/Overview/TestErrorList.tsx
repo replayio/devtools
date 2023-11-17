@@ -9,6 +9,7 @@ import { TestExecution } from "shared/test-suites/TestRun";
 import LibraryDropdownTrigger from "ui/components/Library/LibraryDropdownTrigger";
 
 import { getTruncatedRelativeDate } from "../../Recordings/RecordingListItem/RecordingListItem";
+import { ErrorFrequency } from "../hooks/useTest";
 import styles from "../../../../Library.module.css";
 
 const MAX_ERRORS_SHOWN = 5;
@@ -18,7 +19,7 @@ export function TestErrorList({
   errorFrequency,
   executions,
 }: {
-  errorFrequency: Record<string, number>;
+  errorFrequency: Record<string, ErrorFrequency>;
   executions: TestExecution[];
 }) {
   const [selectedError, setSelectedError] = useState<string | null>(null);
@@ -48,12 +49,11 @@ export function TestErrorList({
   );
 
   const uniqueErrorCount = Object.entries(errorFrequency).length;
-  // We don't bother displaying executions without replays
-  const filteredExecutions = executions.filter(e => e.recording[0] !== null);
 
   return (
     <div>
       <div className="flex flex-col gap-2 border-b border-themeBorder py-2">
+        <ErrorSummary executions={executions} />
         <div className="flex items-center justify-between px-4">
           <div className="flex flex-row items-center gap-2 overflow-hidden">
             <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-lg font-medium">
@@ -75,10 +75,11 @@ export function TestErrorList({
         <div>
           {Object.entries(errorFrequency)
             .slice(0, MAX_ERRORS_SHOWN)
-            .map(([msg, count], i) => (
+            .map(([msg, { executions, replays }], i) => (
               <ErrorListItem
                 msg={msg}
-                count={count}
+                executionCount={executions}
+                replayCount={replays}
                 setSelectedError={setSelectedError}
                 key={i}
                 isSelected={msg === selectedError}
@@ -86,19 +87,27 @@ export function TestErrorList({
             ))}
         </div>
       </div>
-      {selectedError ? <ErrorReplays executions={filteredExecutions} /> : null}
+      {selectedError ? (
+        <ErrorReplays
+          executions={executions.filter(
+            e => e.errors?.[0] === selectedError || e.result === "passed"
+          )}
+        />
+      ) : null}
     </div>
   );
 }
 
 function ErrorListItem({
   msg,
-  count,
+  executionCount,
+  replayCount,
   setSelectedError,
   isSelected,
 }: {
   msg: string;
-  count: number;
+  executionCount: number;
+  replayCount: number;
   setSelectedError: Dispatch<SetStateAction<string | null>>;
   isSelected: boolean;
 }) {
@@ -113,22 +122,25 @@ function ErrorListItem({
       onClick={() => setSelectedError(msg)}
     >
       <div className="flex h-5 w-8 shrink-0 items-center justify-center rounded-md bg-[#F02D5E] text-xs font-bold text-white">
-        {count}
+        {executionCount}
       </div>
       <div className="overflow-hidden overflow-ellipsis whitespace-nowrap">{msg}</div>
+      <div className="shrink-0 overflow-hidden overflow-ellipsis whitespace-nowrap opacity-50">
+        ({replayCount})
+      </div>
     </div>
   );
 }
 
 function ErrorReplays({ executions }: { executions: TestExecution[] }) {
-  const passing = executions.filter(e => e.result === "passed");
-  const failing = executions.filter(e => e.result === "failed");
-  const sortedFailing = orderBy(failing, "createdAt", "desc");
-  const sortedPassing = orderBy(passing, "createdAt", "desc");
+  const passingReplays = executions.filter(e => e.result === "passed" && e.recordings.length);
+  const failingReplays = executions.filter(e => e.result === "failed" && e.recordings.length);
+  const sortedPassing = orderBy(passingReplays, "createdAt", "desc");
+  const sortedFailing = orderBy(failingReplays, "createdAt", "desc");
 
   return (
     <div className="flex flex-col gap-2 py-2 px-4">
-      {failing.length ? (
+      {failingReplays.length ? (
         <div className="flex flex-col gap-2">
           <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-lg font-medium">
             Recent replays that contain this error
@@ -136,7 +148,7 @@ function ErrorReplays({ executions }: { executions: TestExecution[] }) {
           <div className="flex flex-col gap-2">
             {sortedFailing.slice(0, MAX_REPLAYS_SHOWN).map((e, i) => (
               <ErrorReplayListItem
-                recordingId={e.recording[0]!.id}
+                recordingId={e.recordings[0]!.id}
                 title={e.commitTitle}
                 date={e.createdAt}
                 key={i}
@@ -146,7 +158,7 @@ function ErrorReplays({ executions }: { executions: TestExecution[] }) {
           </div>
         </div>
       ) : null}
-      {passing.length ? (
+      {passingReplays.length ? (
         <div className="flex flex-col gap-2">
           <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-lg font-medium">
             Recent replays of the test passing
@@ -154,7 +166,7 @@ function ErrorReplays({ executions }: { executions: TestExecution[] }) {
           <div className="flex flex-col gap-2">
             {sortedPassing.slice(0, MAX_REPLAYS_SHOWN).map((e, i) => (
               <ErrorReplayListItem
-                recordingId={e.recording[0]!.id}
+                recordingId={e.recordings[0]!.id}
                 title={e.commitTitle}
                 date={e.createdAt}
                 key={i}

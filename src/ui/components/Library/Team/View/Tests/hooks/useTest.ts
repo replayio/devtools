@@ -10,6 +10,11 @@ import { TeamContext } from "ui/components/Library/Team/TeamContextRoot";
 
 import { GET_TEST } from "../graphql/TestGraphQL";
 
+export type ErrorFrequency = {
+  executions: number;
+  replays: number;
+}
+
 const EMPTY_OBJ: Record<any, any> = {};
 
 export function useTest(testId: string) {
@@ -31,7 +36,7 @@ export function useTest(testId: string) {
         executions: rawTest.executions.map(
           (e: GetTestForWorkspace_node_Workspace_tests_edges_node_executions) => ({
             ...e,
-            recording: e.recordings.map(
+            recordings: e.recordings.map(
               (
                 r: GetTestForWorkspace_node_Workspace_tests_edges_node_executions_recordings | null
               ) => {
@@ -83,14 +88,18 @@ function getFailureRates(executions: TestExecution[]) {
     ),
   };
 }
+
 function getErrorFrequency(executions: TestExecution[]) {
-  return executions.reduce((acc: Record<string, number>, e) => {
+  return executions.reduce((acc: Record<string, ErrorFrequency>, e) => {
     if (e.result === "failed" && e.errors) {
       e.errors.forEach(errorMessage => {
         if (acc[errorMessage]) {
-          acc[errorMessage] = acc[errorMessage] + 1;
+          acc[errorMessage] = {
+            executions: acc[errorMessage].executions + 1,
+            replays: e.recordings.length ? acc[errorMessage].replays + 1 : acc[errorMessage].replays
+          };
         } else {
-          acc[errorMessage] = 1;
+          acc[errorMessage] = {executions: 1, replays: e.recordings.length ? 1 : 0};
         }
       });
     }
