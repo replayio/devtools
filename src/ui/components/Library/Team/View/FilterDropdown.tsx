@@ -9,6 +9,7 @@ const daysInSeconds = (days: number) => 1000 * 60 * 60 * 24 * days;
 const viewLabels = {
   recordings: "Recordings",
   runs: "Test Runs",
+  tests: "Tests",
 };
 
 export function FilterDropdown() {
