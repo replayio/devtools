@@ -9,7 +9,8 @@ type Request = {
   deferred: Deferred<PauseData>;
 };
 
-const BATCH_DELAY_MS = 250;
+const MAX_BATCH_SIZE = 250;
+const BATCH_DELAY_MS = 100;
 
 const queuedRequests: Map<string, [NodeJS.Timeout, Request[]]> = new Map();
 
@@ -91,7 +92,7 @@ function batchRequestsForPauseAndLevel(
     requests.push(request);
 
     // Server limit
-    if (requests.length === 250) {
+    if (requests.length === MAX_BATCH_SIZE) {
       clearTimeout(timeoutId);
 
       queuedRequests.delete(key);
