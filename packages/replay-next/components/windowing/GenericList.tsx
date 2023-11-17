@@ -66,6 +66,11 @@ export function GenericList<Item, ItemData extends Object>({
 }) {
   // The store may be invalidated in ways that don't affect the item count,
   // so we need to subscribe to more than just the item count.
+  const isLoading = useSyncExternalStore(
+    listData.subscribeToLoading,
+    listData.getIsLoading,
+    listData.getIsLoading
+  );
   const itemCount = useSyncExternalStore(
     listData.subscribeToInvalidation,
     listData.getItemCount,
@@ -196,7 +201,7 @@ export function GenericList<Item, ItemData extends Object>({
   }, [dataTestId, dataTestName]);
 
   if (fallbackForEmptyList !== undefined) {
-    if (itemCount === 0) {
+    if (!isLoading && itemCount === 0) {
       return fallbackForEmptyList;
     }
   }
