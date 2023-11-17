@@ -13,7 +13,7 @@ import { GET_TEST } from "../graphql/TestGraphQL";
 export type ErrorFrequency = {
   executions: number;
   replays: number;
-}
+};
 
 const EMPTY_OBJ: Record<any, any> = {};
 
@@ -96,10 +96,12 @@ function getErrorFrequency(executions: TestExecution[]) {
         if (acc[errorMessage]) {
           acc[errorMessage] = {
             executions: acc[errorMessage].executions + 1,
-            replays: e.recordings.length ? acc[errorMessage].replays + 1 : acc[errorMessage].replays
+            replays: e.recordings.length
+              ? acc[errorMessage].replays + 1
+              : acc[errorMessage].replays,
           };
         } else {
-          acc[errorMessage] = {executions: 1, replays: e.recordings.length ? 1 : 0};
+          acc[errorMessage] = { executions: 1, replays: e.recordings.length ? 1 : 0 };
         }
       });
     }
