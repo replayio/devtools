@@ -16,9 +16,7 @@ export function TestOverviewContent() {
   let children = null;
 
   if (testId && test) {
-    if (!hasFilters) {
-      children = <TestOverview testId={testId} />;
-    }
+    children = <TestOverview testId={testId} />;
   } else {
     children = (
       <div className="flex h-full items-center justify-center p-2">
