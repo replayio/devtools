@@ -75,6 +75,7 @@ import uniqueId from "lodash/uniqueId";
 import { addEventListener, client, initSocket, removeEventListener } from "protocol/socket";
 import { assert, compareNumericStrings, defer, waitForTime } from "protocol/utils";
 import { initProtocolMessagesStore } from "replay-next/components/protocol/ProtocolMessagesStore";
+import { batchedGetObjectPreview } from "shared/client/batchedGetObjectWithPreview";
 import { TOO_MANY_POINTS_TO_FIND } from "shared/constants";
 import { ProtocolError, commandError } from "shared/utils/error";
 import { isPointInRegion, isRangeInRegions } from "shared/utils/time";
@@ -707,12 +708,7 @@ export class ReplayClient implements ReplayClientInterface {
     level?: ObjectPreviewLevel
   ): Promise<PauseData> {
     const sessionId = this.getSessionIdThrows();
-    const result = await client.Pause.getObjectPreview(
-      { level, object: objectId },
-      sessionId,
-      pauseId || undefined
-    );
-    return result.data;
+    return batchedGetObjectPreview(sessionId, objectId, pauseId, level);
   }
 
   async getPointNearTime(time: number): Promise<TimeStampedPoint> {
