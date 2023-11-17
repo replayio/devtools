@@ -3,6 +3,7 @@ import ReactVirtualizedAutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 
 import { Test } from "shared/test-suites/TestRun";
+import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 import { TestListItem } from "ui/components/Library/Team/View/Tests/TestListItem";
 import { SecondaryButton } from "ui/components/shared/Button";
 
@@ -19,7 +20,7 @@ type ItemData = {
 };
 
 export function TestList() {
-  const { tests, filterByText } = useContext(TestContext);
+  const { tests, testsPending, filterByText } = useContext(TestContext);
   const [countToRender, setCountToRender] = useState(PAGE_SIZE);
 
   const itemData = useMemo<ItemData>(
@@ -33,6 +34,14 @@ export function TestList() {
   );
 
   const itemCount = Math.min(countToRender + 1, tests.length);
+
+  if (testsPending) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <LibrarySpinner />
+      </div>
+    );
+  }
 
   return (
     <ReactVirtualizedAutoSizer

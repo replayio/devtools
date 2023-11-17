@@ -24,12 +24,13 @@ type TestsContextType = {
   testId: string | null;
   testIdForDisplay: string | null;
   tests: (Test | TestWithExecutions)[];
+  testsPending: boolean;
 };
 
 export const TestContext = createContext<TestsContextType>(null as any);
 
 export function TestsContextRoot({ children }: { children: ReactNode }) {
-  const tests = useTests();
+  const { tests, status } = useTests();
 
   const [testId, setTestId] = useState<string | null>(null);
 
@@ -77,6 +78,7 @@ export function TestsContextRoot({ children }: { children: ReactNode }) {
         testId: deferredTestId,
         testIdForDisplay: testId,
         tests: filteredTests,
+        testsPending: status === "pending",
       }}
     >
       {children}
