@@ -701,6 +701,20 @@ export class ReplayClient implements ReplayClientInterface {
     return result;
   }
 
+  async getObjectsPreviews(
+    objects: string[],
+    pauseId: PauseId,
+    level: ObjectPreviewLevel
+  ): Promise<PauseData> {
+    const sessionId = this.getSessionIdThrows();
+    const result = await client.Pause.getObjectPreviews(
+      { level, objects },
+      sessionId,
+      pauseId || undefined
+    );
+    return result.data;
+  }
+
   async getObjectWithPreview(
     objectId: ObjectId,
     pauseId: PauseId,

@@ -17,6 +17,26 @@ import { ReplayClientInterface } from "../../../shared/client/types";
 import { Value as ClientValue, protocolValueToClientValue } from "../utils/protocol";
 import { cachePauseData, updateMappedLocation } from "./PauseCache";
 import { Source, sourcesByIdCache } from "./SourcesCache";
+import debounce from 'lodash/debounce'
+
+const debouncedGetObjectPreviews = debounce(async (client, pauseId: PauseId, previewLevel: ObjectPreviewLevel) => {
+  const objects = pauseObjectCache[pauseId][previewLevel];
+  pauseObjectCache[pauseId][previewLevel] = [];
+  console.log('fetching objects', objects)
+  const data = await client.getObjectsPreviews(objects, pauseId, previewLevel)
+  console.log('fetched objects', data)
+  const sources = await sourcesByIdCache.readAsync(client);
+  cachePauseData(client, sources, pauseId, data);
+}, 100)
+
+const getObjectPreview = async (client, objectId, pauseId, previewLevel) => {
+  const data = await client.getObjectWithPreview(objectId, pauseId, previewLevel);
+  const sources = await sourcesByIdCache.readAsync(client);
+  cachePauseData(client, sources, pauseId, data);
+
+}
+
+const pauseObjectCache: Record<PauseId, Record<ObjectPreviewLevel, string[]>> = {}
 
 export const objectCache: Cache<
   [
@@ -31,10 +51,26 @@ export const objectCache: Cache<
   debugLabel: "objectCache",
   getKey: ([client, pauseId, objectId, previewLevel]) => `${pauseId}:${objectId}:${previewLevel}`,
   load: async ([client, pauseId, objectId, previewLevel]) => {
-    const data = await client.getObjectWithPreview(objectId, pauseId, previewLevel);
 
-    const sources = await sourcesByIdCache.readAsync(client);
-    cachePauseData(client, sources, pauseId, data);
+    if (true) {
+
+      console.log('load object cache', pauseId, objectId)
+      await sourcesByIdCache.readAsync(client);
+
+      if (!pauseObjectCache[pauseId]) {
+        pauseObjectCache[pauseId] = {}
+      }
+      if (!pauseObjectCache[pauseId][previewLevel]) {
+        pauseObjectCache[pauseId][previewLevel] = []
+      }
+
+      pauseObjectCache[pauseId][previewLevel].push(objectId)
+
+
+      await debouncedGetObjectPreviews(client, pauseId, previewLevel)
+    } else {
+      await getObjectPreview(client, objectId, pauseId, previewLevel)
+    }
 
     // cachePauseData() calls preCacheObjects()
     // so the object should be in the cache now
