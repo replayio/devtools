@@ -11,11 +11,21 @@ export interface GetTestPreviewsForWorkspace_node_Recording {
   __typename: "Recording";
 }
 
+export interface GetTestPreviewsForWorkspace_node_Workspace_tests_edges_node_stats {
+  __typename: "TestsStats";
+  passed: number;
+  failed: number;
+  flaky: number;
+  skipped: number;
+  unknown: number;
+}
+
 export interface GetTestPreviewsForWorkspace_node_Workspace_tests_edges_node {
   __typename: "Tests";
   testId: string;
   title: string;
   scope: string[];
+  stats: GetTestPreviewsForWorkspace_node_Workspace_tests_edges_node_stats;
 }
 
 export interface GetTestPreviewsForWorkspace_node_Workspace_tests_edges {

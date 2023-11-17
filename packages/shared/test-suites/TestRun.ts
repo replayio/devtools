@@ -36,6 +36,7 @@ export interface TestRunTestWithRecordings extends TestRunTest {
 export type Test = {
   testId: string;
   title: string;
+  failureRate: number;
 };
 
 export type TestWithExecutions = Test & {

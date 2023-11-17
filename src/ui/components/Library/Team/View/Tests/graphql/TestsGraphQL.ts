@@ -18,6 +18,13 @@ const GET_TEST_PREVIEWS = gql`
               testId
               title
               scope
+              stats {
+                passed
+                failed
+                flaky
+                skipped
+                unknown
+              }
             }
           }
         }

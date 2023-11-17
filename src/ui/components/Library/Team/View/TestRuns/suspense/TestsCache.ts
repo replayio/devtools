@@ -1,6 +1,7 @@
 import orderBy from "lodash/orderBy";
 import { createCache } from "suspense";
 
+import { GetTestPreviewsForWorkspace_node_Workspace_tests_edges_node_stats } from "shared/graphql/generated/GetTestPreviewsForWorkspace";
 import { GraphQLClientInterface } from "shared/graphql/GraphQLClient";
 import { Test } from "shared/test-suites/TestRun";
 
@@ -19,8 +20,18 @@ export const testsCache = createCache<
     // TODO SCS-1575
     const processedTests = rawTests.map(t => ({
       ...t,
+      failureRate: generateFailureRate(t.stats),
     }));
 
     return orderBy(processedTests, "failureRate", "desc");
   },
 });
+
+function generateFailureRate(
+  stats: GetTestPreviewsForWorkspace_node_Workspace_tests_edges_node_stats
+) {
+  const { passed, failed, flaky, skipped, unknown } = stats;
+  const total = passed + failed + flaky + skipped + unknown;
+
+  return failed / total;
+}
