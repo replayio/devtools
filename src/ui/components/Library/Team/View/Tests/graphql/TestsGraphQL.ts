@@ -1,14 +1,14 @@
 import { gql } from "@apollo/client";
 
 import {
-  GetTestsForWorkspace,
-  GetTestsForWorkspace_node_Workspace,
-  GetTestsForWorkspace_node_Workspace_tests_edges_node,
-} from "shared/graphql/generated/GetTestsForWorkspace";
+  GetTestPreviewsForWorkspace,
+  GetTestPreviewsForWorkspace_node_Workspace,
+  GetTestPreviewsForWorkspace_node_Workspace_tests_edges_node,
+} from "shared/graphql/generated/GetTestPreviewsForWorkspace";
 import { GraphQLClientInterface } from "shared/graphql/GraphQLClient";
 
-const GET_TESTS = gql`
-  query GetTestsForWorkspace($workspaceId: ID!) {
+const GET_TEST_PREVIEWS = gql`
+  query GetTestPreviewsForWorkspace($workspaceId: ID!) {
     node(id: $workspaceId) {
       ... on Workspace {
         id
@@ -30,11 +30,11 @@ export async function getTestsGraphQL(
   graphQLClient: GraphQLClientInterface,
   accessToken: string | null,
   workspaceId: string
-): Promise<GetTestsForWorkspace_node_Workspace_tests_edges_node[]> {
-  const response = await graphQLClient.send<GetTestsForWorkspace>(
+): Promise<GetTestPreviewsForWorkspace_node_Workspace_tests_edges_node[]> {
+  const response = await graphQLClient.send<GetTestPreviewsForWorkspace>(
     {
-      operationName: "GetTestsForWorkspace",
-      query: GET_TESTS,
+      operationName: "GetTestPreviewsForWorkspace",
+      query: GET_TEST_PREVIEWS,
       variables: { workspaceId },
     },
     accessToken
@@ -45,6 +45,8 @@ export async function getTestsGraphQL(
   }
 
   return (
-    (response.node as GetTestsForWorkspace_node_Workspace).tests?.edges.map(edge => edge.node) ?? []
+    (response.node as GetTestPreviewsForWorkspace_node_Workspace).tests?.edges.map(
+      edge => edge.node
+    ) ?? []
   );
 }
