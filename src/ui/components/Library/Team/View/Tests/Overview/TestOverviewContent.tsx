@@ -5,7 +5,7 @@ import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 
 import { useTest } from "../hooks/useTest";
 import { TestContext } from "../TestContextRoot";
-import { TestErrorList } from "./TestErrorList";
+import { TestDetails } from "./TestDetails";
 import styles from "../../../../Library.module.css";
 
 export function TestOverviewContent() {
@@ -56,7 +56,7 @@ function TestOverview({ testId }: { testId: string }) {
       </div>
       <div className="overflow-y-auto">
         <Stats failureRates={test.failureRates} />
-        <TestErrorList errorFrequency={test.errorFrequency} executions={test.executions} />
+        <TestDetails errorFrequency={test.errorFrequency} executions={test.executions} />
       </div>
     </div>
   );
