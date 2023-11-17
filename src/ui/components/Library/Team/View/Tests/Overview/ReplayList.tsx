@@ -74,11 +74,10 @@ function ReplayListItem({
       href={`/recording/${recordingId}`}
       className="flex cursor-pointer flex-row items-center justify-between gap-2"
     >
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 overflow-hidden">
         <div className={styles.iconWrapper}>
           <motion.div
             className={styles.iconMotion}
-            whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 1, boxShadow: "0px 0px 1px rgba(0,0,0,0.2)" }}
             transition={{ duration: 0.05 }}
           >
@@ -89,7 +88,7 @@ function ReplayListItem({
           {displayedTitle}
         </div>
       </div>
-      <div className="overflow-hidden overflow-ellipsis whitespace-nowrap">
+      <div className="shrink-0 overflow-hidden overflow-ellipsis whitespace-nowrap">
         {getTruncatedRelativeDate(date)}
       </div>
     </a>
