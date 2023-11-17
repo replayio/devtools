@@ -28,6 +28,7 @@ import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext
 import { useAppDispatch } from "ui/setup/hooks";
 
 import { testEventDomNodeCache } from "../../suspense/TestEventDetailsCache";
+import { TestEventsList } from "./TestEventsList";
 import HelperFunctionEventRow from "./TestRecordingEvents/HelperFunctionEventRow";
 import NavigationEventRow from "./TestRecordingEvents/NavigationEventRow";
 import NetworkRequestEventRow from "./TestRecordingEvents/NetworkRequestEventRow";

@@ -1,3 +1,4 @@
+import { nanoid } from "@reduxjs/toolkit";
 import {
   ExecutionPoint,
   RequestId,
@@ -255,6 +256,9 @@ export namespace RecordingTestMetadataV3 {
       // An error that occurred while executing this action (if any)
       error: TestError | null;
 
+      // Used to associate related annotations
+      id: string;
+
       // Used to associate chained commands
       parentId: string | null;
 
@@ -318,6 +322,8 @@ export namespace RecordingTestMetadataV3 {
   }
 
   export interface NetworkRequestEvent {
+    id: string;
+
     // Data needed to render this event
     data: {
       request: {
@@ -426,6 +432,7 @@ export async function processCypressTestRecording(
               assert(annotation.message.url, "Navigation annotation must have a URL");
 
               const navigationEvent: RecordingTestMetadataV3.NavigationEvent = {
+                id: nanoid(),
                 data: {
                   url: annotation.message.url,
                 },
@@ -586,6 +593,7 @@ export async function processCypressTestRecording(
             });
 
             testEvents.push({
+              id: nanoid(),
               data: {
                 category,
                 command,
@@ -895,6 +903,7 @@ export async function processPlaywrightTestRecording(
         }
 
         testEvents.push({
+          id: nanoid(),
           data: {
             category,
             command,
@@ -1002,6 +1011,7 @@ class FunctionNode {
     const combined = this.events.concat(childList);
 
     return {
+      id: nanoid(),
       type: "function",
       data: {
         function: this.functionName,
@@ -1129,6 +1139,7 @@ async function processNetworkData(
     }
 
     networkRequestEvents.push({
+      id: nanoid(),
       data: {
         request: {
           id,

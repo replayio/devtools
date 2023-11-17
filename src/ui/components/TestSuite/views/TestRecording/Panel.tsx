@@ -6,9 +6,11 @@ import {
   PanelResizeHandle,
   Panel as ResizablePanel,
 } from "react-resizable-panels";
+import AutoSizer from "react-virtualized-auto-sizer";
 import { useImperativeIntervalCacheValues } from "suspense";
 
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
+import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { isExecutionPointsWithinRange } from "replay-next/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -20,12 +22,15 @@ import {
 } from "shared/test-suites/RecordingTestMetadata";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { TestResultIcon } from "ui/components/TestSuite/components/TestResultIcon";
+import { TestSuiteCache } from "ui/components/TestSuite/suspense/TestSuiteCache";
 import { TestError } from "ui/components/TestSuite/views/TestRecording/TestError";
 import TestEventDetails from "ui/components/TestSuite/views/TestRecording/TestEventDetails";
 import TestSection from "ui/components/TestSuite/views/TestRecording/TestSection";
 import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext";
 
 import { testEventDetailsIntervalCache } from "../../suspense/TestEventDetailsCache";
+import { TestEventsList } from "./TestEventsList";
+import { TestSectionEntryWithEvents } from "./types";
 import styles from "./Panel.module.css";
 
 export default function Panel() {
@@ -33,6 +38,8 @@ export default function Panel() {
   const { update } = useContext(TimelineContext);
   const { range: focusWindow } = useContext(FocusContext);
   const replayClient = useContext(ReplayClientContext);
+
+  const { recordingId } = useContext(SessionContext);
 
   assert(testRecording != null);
 
@@ -94,14 +101,21 @@ export default function Panel() {
   );
 
   const { beforeAll, beforeEach, main, afterEach, afterAll } = testRecording.events;
-  const testSections: [testSectionName: TestSectionName, title: string, testEvents: TestEvent[]][] =
-    [
-      ["beforeAll", "before all", beforeAll],
-      ["beforeEach", "before each", beforeEach],
-      ["main", "test body", main],
-      ["afterAll", "after each", afterEach],
-      ["afterEach", "after all", afterAll],
-    ];
+  const testSections: TestSectionEntryWithEvents[] = [
+    { name: "beforeAll", title: "before all", events: beforeAll },
+    { name: "beforeEach", title: "before each", events: beforeEach },
+    { name: "main", title: "test body", events: main },
+    { name: "afterEach", title: "after each", events: afterEach },
+    { name: "afterAll", title: "after all", events: afterAll },
+  ];
+  // const testSections: [testSectionName: TestSectionName, title: string, testEvents: TestEvent[]][] =
+  //   [
+  //     ["beforeAll", "before all", beforeAll],
+  //     ["beforeEach", "before each", beforeEach],
+  //     ["main", "test body", main],
+  //     ["afterAll", "after each", afterEach],
+  //     ["afterEach", "after all", afterAll],
+  //   ];
 
   // Select a default test event
   useEffect(() => {
@@ -155,6 +169,9 @@ export default function Panel() {
     }
   };
 
+  const groupedTestCases = TestSuiteCache.read(replayClient, recordingId);
+  assert(groupedTestCases != null);
+
   return (
     <>
       <div className={styles.Header}>
@@ -178,14 +195,24 @@ export default function Panel() {
         <PanelGroup autoSaveId="TestRecordingPanel" direction="vertical">
           <ResizablePanel className={styles.TestEventsPanel} collapsible>
             <div className={styles.TestEventsContainer}>
-              {testSections.map(([testSectionName, title, testEvents]) => (
+              <AutoSizer disableWidth>
+                {({ height }: { height: number }) => (
+                  <TestEventsList
+                    height={height}
+                    noContentFallback={<div>Loading...</div>}
+                    testSections={testSections}
+                    testRunnerName={groupedTestCases.environment.testRunner?.name ?? null}
+                  />
+                )}
+              </AutoSizer>
+              {/* {testSections.map(([testSectionName, title, testEvents]) => (
                 <TestSection
                   key={testSectionName}
                   testEvents={testEvents}
                   testSectionName={testSectionName}
                   title={title}
                 />
-              ))}
+              ))} */}
               {testRecording.error && <TestError error={testRecording.error} />}
             </div>
           </ResizablePanel>
