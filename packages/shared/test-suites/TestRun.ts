@@ -57,7 +57,7 @@ export type TestExecution = {
   createdAt: string;
   result: string;
   commitTitle: string;
-  recordings: (Recording | null)[];
+  recordings: Recording[];
 };
 
 export type TestRun = {
