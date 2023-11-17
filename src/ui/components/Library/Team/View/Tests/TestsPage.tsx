@@ -94,7 +94,7 @@ function TestsContent() {
                   className={styles.filterInput}
                   data-test-id="TestPage-FilterByText-Input"
                   onChange={event => setFilterByText(event.currentTarget.value)}
-                  placeholder="Filter testss"
+                  placeholder="Filter tests"
                   type="text"
                   value={filterByTextForDisplay}
                 />

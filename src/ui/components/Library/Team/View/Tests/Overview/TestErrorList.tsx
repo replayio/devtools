@@ -49,7 +49,7 @@ export function TestErrorList({
   const uniqueErrorCount = Object.entries(errorFrequency).length;
 
   return (
-    <div className="overflow-y-auto">
+    <div>
       <div className="flex flex-col gap-2 border-b border-themeBorder py-2">
         <div className="flex items-center justify-between px-4">
           <div className="flex flex-row items-center gap-2 overflow-hidden">
@@ -164,20 +164,21 @@ function ErrorReplayList({
 }) {
   return (
     <div className="pointer-events-none flex flex-row justify-between gap-2 opacity-50 ">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 overflow-hidden">
         <div className={styles.iconWrapper}>
           <motion.div
             className={styles.iconMotion}
-            whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 1.0, boxShadow: "0px 0px 1px rgba(0,0,0,0.2)" }}
             transition={{ duration: 0.05 }}
           >
             <Icon className={styles[status]} type="play-unprocessed" />
           </motion.div>
         </div>
-        <div>{`Replay #${index}`}</div>
+        <div className="overflow-hidden overflow-ellipsis whitespace-nowrap">{`Replay #${index}`}</div>
       </div>
-      <div>{getTruncatedRelativeDate(date)}</div>
+      <div className="shrink-0 overflow-hidden overflow-ellipsis whitespace-nowrap">
+        {getTruncatedRelativeDate(date)}
+      </div>
     </div>
   );
 }
