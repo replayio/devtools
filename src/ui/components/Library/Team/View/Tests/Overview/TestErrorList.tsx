@@ -1,7 +1,7 @@
 import { RecordingId } from "@replayio/protocol";
 import { motion } from "framer-motion";
 import orderBy from "lodash/orderBy";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useContext, useEffect, useState } from "react";
 import { ContextMenuItem, useContextMenu } from "use-context-menu";
 
 import Icon from "replay-next/components/Icon";
@@ -10,6 +10,7 @@ import LibraryDropdownTrigger from "ui/components/Library/LibraryDropdownTrigger
 
 import { getTruncatedRelativeDate } from "../../Recordings/RecordingListItem/RecordingListItem";
 import { ErrorFrequency } from "../hooks/useTest";
+import { TestContext } from "../TestContextRoot";
 import styles from "../../../../Library.module.css";
 
 const MAX_ERRORS_SHOWN = 5;
@@ -22,6 +23,7 @@ export function TestErrorList({
   errorFrequency: Record<string, ErrorFrequency>;
   executions: TestExecution[];
 }) {
+  const { testId } = useContext(TestContext);
   const [selectedError, setSelectedError] = useState<string | null>(null);
   const [filterByTime, setFilterByTime] = useState<number | null>(null);
 
@@ -49,6 +51,10 @@ export function TestErrorList({
   );
 
   const uniqueErrorCount = Object.entries(errorFrequency).length;
+
+  useEffect(() => {
+    setSelectedError(null);
+  }, [testId]);
 
   return (
     <div>
@@ -87,12 +93,12 @@ export function TestErrorList({
         </div>
       </div>
       {selectedError ? (
-        <ErrorReplays
-          executions={executions.filter(
-            e => e.errors?.[0] === selectedError || e.result === "passed"
-          )}
+        <ReplayList
+          executions={executions.filter(e => e.errors?.[0] === selectedError)}
+          result="failed"
         />
       ) : null}
+      <ReplayList executions={executions} result="passed" />
     </div>
   );
 }
@@ -133,22 +139,69 @@ function ErrorListItem({
   );
 }
 
-function ErrorReplays({ executions }: { executions: TestExecution[] }) {
-  const passingReplays = executions.filter(e => e.result === "passed" && e.recordings.length);
+function ReplayList({
+  executions,
+  result,
+}: {
+  executions: TestExecution[];
+  result: "passed" | "failed";
+}) {
+  const displayedReplays = executions.filter(e => e.result === result && e.recordings.length);
+  const sortedReplays = orderBy(displayedReplays, "createdAt", "desc");
+
+  let children = null;
+
+  if (!displayedReplays.length) {
+    children = <div>No replays found</div>;
+  } else {
+    children = (
+      <>
+        {sortedReplays.slice(0, MAX_REPLAYS_SHOWN).map((e, i) => (
+          <ReplayListItem
+            recordingId={e.recordings[0]!.id}
+            recordingTitle={e.recordings[0]!.title}
+            commitTitle={e.commitTitle}
+            date={e.createdAt}
+            key={i}
+            status={result}
+          />
+        ))}
+      </>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-2 py-2 px-4">
+      <div className="flex flex-col gap-2">
+        <div className="flex gap-1 overflow-hidden text-lg">
+          <div className="overflow-hidden overflow-ellipsis whitespace-nowrap font-medium">
+            Recent replays of the test passing
+          </div>
+          <div> ({displayedReplays.length})</div>
+        </div>
+        <div className="flex flex-col gap-2">{children}</div>
+      </div>
+    </div>
+  );
+}
+
+function FailingReplays({ executions }: { executions: TestExecution[] }) {
   const failingReplays = executions.filter(e => e.result === "failed" && e.recordings.length);
-  const sortedPassing = orderBy(passingReplays, "createdAt", "desc");
-  const sortedFailing = orderBy(failingReplays, "createdAt", "desc");
+  const sortedReplays = orderBy(failingReplays, "createdAt", "desc");
 
   return (
     <div className="flex flex-col gap-2 py-2 px-4">
       {failingReplays.length ? (
         <div className="flex flex-col gap-2">
-          <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-lg font-medium">
-            Recent replays that contain this error
+          <div className="flex gap-1 overflow-hidden text-lg">
+            <div className="overflow-hidden overflow-ellipsis whitespace-nowrap font-medium">
+              Recent replays that contain this error
+            </div>
+            <div> ({failingReplays.length})</div>
           </div>
           <div className="flex flex-col gap-2">
-            {sortedFailing.slice(0, MAX_REPLAYS_SHOWN).map((e, i) => (
-              <ErrorReplayListItem
+            {sortedReplays.slice(0, MAX_REPLAYS_SHOWN).map((e, i) => (
+              <ReplayListItem
                 recordingId={e.recordings[0]!.id}
                 recordingTitle={e.recordings[0]!.title}
                 commitTitle={e.commitTitle}
@@ -160,30 +213,11 @@ function ErrorReplays({ executions }: { executions: TestExecution[] }) {
           </div>
         </div>
       ) : null}
-      {passingReplays.length ? (
-        <div className="flex flex-col gap-2">
-          <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-lg font-medium">
-            Recent replays of the test passing
-          </div>
-          <div className="flex flex-col gap-2">
-            {sortedPassing.slice(0, MAX_REPLAYS_SHOWN).map((e, i) => (
-              <ErrorReplayListItem
-                recordingId={e.recordings[0]!.id}
-                recordingTitle={e.recordings[0]!.title}
-                commitTitle={e.commitTitle}
-                date={e.createdAt}
-                key={i}
-                status="passed"
-              />
-            ))}
-          </div>
-        </div>
-      ) : null}
     </div>
   );
 }
 
-function ErrorReplayListItem({
+function ReplayListItem({
   recordingId,
   commitTitle,
   recordingTitle,
@@ -201,9 +235,9 @@ function ErrorReplayListItem({
   return (
     <a
       href={`/recording/${recordingId}`}
-      className="flex cursor-pointer flex-row justify-between gap-2"
+      className="flex cursor-pointer flex-row items-center justify-between gap-2"
     >
-      <div className="flex items-center gap-2 overflow-hidden">
+      <div className="flex items-center gap-2">
         <div className={styles.iconWrapper}>
           <motion.div
             className={styles.iconMotion}
