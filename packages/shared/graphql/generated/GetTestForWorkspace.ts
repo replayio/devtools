@@ -11,7 +11,7 @@ export interface GetTestForWorkspace_node_Recording {
   __typename: "Recording";
 }
 
-export interface GetTestForWorkspace_node_Workspace_tests_edges_node_executions_recording {
+export interface GetTestForWorkspace_node_Workspace_tests_edges_node_executions_recordings {
   __typename: "Recording";
   uuid: any;
   title: string | null;
@@ -23,7 +23,7 @@ export interface GetTestForWorkspace_node_Workspace_tests_edges_node_executions 
   createdAt: any;
   commitTitle: string | null;
   result: string;
-  recording: (GetTestForWorkspace_node_Workspace_tests_edges_node_executions_recording | null)[];
+  recordings: GetTestForWorkspace_node_Workspace_tests_edges_node_executions_recordings[];
 }
 
 export interface GetTestForWorkspace_node_Workspace_tests_edges_node {

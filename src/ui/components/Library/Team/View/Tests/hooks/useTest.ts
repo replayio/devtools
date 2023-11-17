@@ -3,7 +3,7 @@ import { useContext, useMemo } from "react";
 
 import {
   GetTestForWorkspace_node_Workspace_tests_edges_node_executions,
-  GetTestForWorkspace_node_Workspace_tests_edges_node_executions_recording,
+  GetTestForWorkspace_node_Workspace_tests_edges_node_executions_recordings,
 } from "shared/graphql/generated/GetTestForWorkspace";
 import { TestExecution } from "shared/test-suites/TestRun";
 import { TeamContext } from "ui/components/Library/Team/TeamContextRoot";
@@ -14,14 +14,14 @@ const EMPTY_OBJ: Record<any, any> = {};
 
 export function useTest(testId: string) {
   const { teamId } = useContext(TeamContext);
-  const { data, loading } = useQuery(GET_TEST, {
+  const { data, loading, error } = useQuery(GET_TEST, {
     variables: { workspaceId: teamId, testId },
   });
 
   const test = useMemo(() => {
-    const rawTest = data.node.tests.edges[0].node;
+    const rawTest = data?.node.tests.edges[0].node;
 
-    if (loading) {
+    if (loading || !data) {
       return EMPTY_OBJ;
     }
 
@@ -33,7 +33,7 @@ export function useTest(testId: string) {
             ...e,
             recording: e.recordings.map(
               (
-                r: GetTestForWorkspace_node_Workspace_tests_edges_node_executions_recording | null
+                r: GetTestForWorkspace_node_Workspace_tests_edges_node_executions_recordings | null
               ) => {
                 if (!r) {
                   return r;
