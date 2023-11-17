@@ -15,6 +15,7 @@ import { ListOnItemsRenderedProps } from "react-window";
 import { useImperativeCacheValue } from "suspense";
 
 import { ElementsListData } from "replay-next/components/elements/ElementsListData";
+import { NoContentFallback } from "replay-next/components/elements/NoContentFallback";
 import { rootObjectIdCache } from "replay-next/components/elements/suspense/RootObjectIdCache";
 import { Item } from "replay-next/components/elements/types";
 import { DefaultFallback } from "replay-next/components/ErrorBoundary";
@@ -36,13 +37,11 @@ type OnSelectionChange = (id: ObjectId | null) => void;
 export function ElementsList({
   height,
   forwardedRef,
-  noContentFallback,
   onSelectionChange = null,
   pauseId,
 }: {
   height: number;
   forwardedRef?: ForwardedRef<ImperativeHandle>;
-  noContentFallback?: ReactElement;
   onSelectionChange?: OnSelectionChange | null;
   pauseId: PauseId;
 }) {
@@ -91,11 +90,6 @@ export function ElementsList({
     listData.subscribeToLoading,
     listData.getIsLoading,
     listData.getIsLoading
-  );
-  const itemCount = useSyncExternalStore(
-    listData.subscribeToInvalidation,
-    listData.getItemCount,
-    listData.getItemCount
   );
 
   useImperativeHandle(
@@ -177,11 +171,11 @@ export function ElementsList({
 
   return (
     <div className={styles.ListWrapper} style={{ height }}>
-      {isLoading && itemCount > 0 && <LoadingProgressBar />}
+      {isLoading && <LoadingProgressBar />}
       <GenericList<Item, ElementsListItemData>
         className={styles.List}
         dataTestId="ElementsList"
-        fallbackForEmptyList={noContentFallback}
+        fallbackForEmptyList={<NoContentFallback />}
         height={height}
         itemData={itemData}
         itemRendererComponent={ElementsListItem}

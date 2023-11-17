@@ -167,9 +167,6 @@ export function ElementsPanel({
                   height={height}
                   forwardedRef={compositeListRef}
                   key={pauseId}
-                  noContentFallback={
-                    <PanelLoader className={styles.PanelLoader} style={{ height }} />
-                  }
                   onSelectionChange={onSelectionChange}
                   pauseId={pauseId}
                 />
