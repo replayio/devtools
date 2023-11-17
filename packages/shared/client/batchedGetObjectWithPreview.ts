@@ -11,7 +11,7 @@ type Request = {
 
 const BATCH_DELAY_MS = 250;
 
-const queuedRequests: Map<string, Request[]> = new Map();
+const queuedRequests: Map<string, [NodeJS.Timeout, Request[]]> = new Map();
 
 export async function batchedGetObjectPreview(
   sessionId: SessionId,
@@ -82,19 +82,29 @@ function batchRequestsForPauseAndLevel(
     objectId,
   };
 
-  const data = queuedRequests.get(key);
-  if (data) {
-    data.push(request);
+  const match = queuedRequests.get(key);
+  if (match) {
+    const [timeoutId, requests] = match;
+    requests.push(request);
+
+    // Server limit
+    if (requests.length === 250) {
+      clearTimeout(timeoutId);
+
+      queuedRequests.delete(key);
+
+      getObjectPreviews(sessionId, pauseId, level, requests);
+    }
   } else {
     const requests: Request[] = [request];
 
-    queuedRequests.set(key, requests);
-
-    setTimeout(() => {
+    const timeoutId = setTimeout(() => {
       queuedRequests.delete(key);
 
       getObjectPreviews(sessionId, pauseId, level, requests);
     }, BATCH_DELAY_MS);
+
+    queuedRequests.set(key, [timeoutId, requests]);
   }
 }
 
