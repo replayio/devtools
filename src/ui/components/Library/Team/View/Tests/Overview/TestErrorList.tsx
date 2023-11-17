@@ -53,7 +53,6 @@ export function TestErrorList({
   return (
     <div>
       <div className="flex flex-col gap-2 border-b border-themeBorder py-2">
-        <ErrorSummary executions={executions} />
         <div className="flex items-center justify-between px-4">
           <div className="flex flex-row items-center gap-2 overflow-hidden">
             <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-lg font-medium">
@@ -115,16 +114,18 @@ function ErrorListItem({
     <div
       key={msg}
       title={msg}
-      className={`flex cursor-pointer flex-row items-center space-x-3 rounded-sm bg-themeBase-100 p-3 ${
+      className={`flex cursor-pointer flex-row items-center justify-between space-x-3 rounded-sm bg-themeBase-100 p-3 ${
         styles.libraryRow
       } ${isSelected ? styles.libraryRowSelected : ""}
 `}
       onClick={() => setSelectedError(msg)}
     >
-      <div className="flex h-5 w-8 shrink-0 items-center justify-center rounded-md bg-[#F02D5E] text-xs font-bold text-white">
-        {executionCount}
+      <div className="flex space-x-3 overflow-hidden ">
+        <div className="flex h-5 w-8 shrink-0 items-center justify-center rounded-md bg-[#F02D5E] text-xs font-bold text-white">
+          {executionCount}
+        </div>
+        <div className="overflow-hidden overflow-ellipsis whitespace-nowrap">{msg}</div>
       </div>
-      <div className="overflow-hidden overflow-ellipsis whitespace-nowrap">{msg}</div>
       <div className="shrink-0 overflow-hidden overflow-ellipsis whitespace-nowrap opacity-50">
         ({replayCount})
       </div>
@@ -149,7 +150,8 @@ function ErrorReplays({ executions }: { executions: TestExecution[] }) {
             {sortedFailing.slice(0, MAX_REPLAYS_SHOWN).map((e, i) => (
               <ErrorReplayListItem
                 recordingId={e.recordings[0]!.id}
-                title={e.commitTitle}
+                recordingTitle={e.recordings[0]!.title}
+                commitTitle={e.commitTitle}
                 date={e.createdAt}
                 key={i}
                 status="failed"
@@ -167,7 +169,8 @@ function ErrorReplays({ executions }: { executions: TestExecution[] }) {
             {sortedPassing.slice(0, MAX_REPLAYS_SHOWN).map((e, i) => (
               <ErrorReplayListItem
                 recordingId={e.recordings[0]!.id}
-                title={e.commitTitle}
+                recordingTitle={e.recordings[0]!.title}
+                commitTitle={e.commitTitle}
                 date={e.createdAt}
                 key={i}
                 status="passed"
@@ -182,16 +185,18 @@ function ErrorReplays({ executions }: { executions: TestExecution[] }) {
 
 function ErrorReplayListItem({
   recordingId,
-  title,
+  commitTitle,
+  recordingTitle,
   date,
   status,
 }: {
   recordingId: RecordingId;
-  title: string;
+  commitTitle: string | null;
+  recordingTitle?: string | null;
   date: string;
   status: "passed" | "failed";
 }) {
-  const displayedTitle = title === null ? "(commit title missing)" : title;
+  const displayedTitle = commitTitle || recordingTitle || "(commit title missing)";
 
   return (
     <a
