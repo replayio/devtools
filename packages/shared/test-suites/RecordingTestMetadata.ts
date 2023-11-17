@@ -241,6 +241,9 @@ export namespace RecordingTestMetadataV3 {
   export type UserActionEventStack = Array<UserActionStackEntry>;
 
   export interface UserActionEvent {
+    // Used to associate related annotations
+    id: string;
+
     data: {
       category: "assertion" | "command" | "other";
 
@@ -251,9 +254,6 @@ export namespace RecordingTestMetadataV3 {
 
       // An error that occurred while executing this action (if any)
       error: TestError | null;
-
-      // Used to associate related annotations
-      id: string;
 
       // Used to associate chained commands
       parentId: string | null;
@@ -286,6 +286,7 @@ export namespace RecordingTestMetadataV3 {
   }
 
   export interface NavigationEvent {
+    id: string;
     // Data needed to render this event
     data: {
       url: string;
@@ -298,6 +299,7 @@ export namespace RecordingTestMetadataV3 {
   }
 
   export interface FunctionEvent {
+    id: string;
     // Data needed to render this event
     data: {
       function: string;
