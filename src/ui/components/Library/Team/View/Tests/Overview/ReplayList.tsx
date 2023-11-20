@@ -9,19 +9,16 @@ import { getTruncatedRelativeDate } from "../../Recordings/RecordingListItem/Rec
 import { MAX_REPLAYS_SHOWN } from "./TestDetails";
 import styles from "../../../../Library.module.css";
 
-export function ReplayList({
-  executions,
-  result,
-}: {
-  executions: TestExecution[];
-  result: "passed" | "failed";
-}) {
-  const displayedReplays = executions.filter(e => e.result === result && e.recordings.length);
-  const sortedReplays = orderBy(displayedReplays, "createdAt", "desc");
+export function ReplayList({ executions }: { executions: TestExecution[] }) {
+  const sortedReplays = orderBy(
+    executions.filter(e => e.recordings.length > 0),
+    "createdAt",
+    "desc"
+  );
 
   let children = null;
 
-  if (!displayedReplays.length) {
+  if (!sortedReplays.length) {
     children = <div>No replays found</div>;
   } else {
     children = (
@@ -33,7 +30,7 @@ export function ReplayList({
             commitTitle={e.commitTitle}
             date={e.createdAt}
             key={i}
-            status={result}
+            status={e.result}
           />
         ))}
       </>
@@ -47,7 +44,7 @@ export function ReplayList({
           <div className="overflow-hidden overflow-ellipsis whitespace-nowrap font-medium">
             Recent replays of the test passing
           </div>
-          <div> ({displayedReplays.length})</div>
+          <div> ({sortedReplays.length})</div>
         </div>
         <div className="flex flex-col gap-2">{children}</div>
       </div>
@@ -65,7 +62,7 @@ function ReplayListItem({
   commitTitle: string | null;
   recordingTitle?: string | null;
   date: string;
-  status: "passed" | "failed";
+  status: TestExecution["result"];
 }) {
   const displayedTitle = commitTitle || recordingTitle || "(commit title missing)";
 

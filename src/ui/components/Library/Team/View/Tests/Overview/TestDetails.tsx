@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 
 import { TestExecution } from "shared/test-suites/TestRun";
+import { testFailed, testPassed } from "ui/utils/testRuns";
 
 import { ErrorFrequency } from "../hooks/useTest";
 import { TestContext } from "../TestContextRoot";
@@ -35,11 +36,10 @@ export function TestDetails({
       ) : null}
       {selectedError ? (
         <ReplayList
-          executions={executions.filter(e => e.errors?.[0] === selectedError)}
-          result="failed"
+          executions={executions.filter(testFailed).filter(e => e.errors?.[0] === selectedError)}
         />
       ) : null}
-      <ReplayList executions={executions} result="passed" />
+      <ReplayList executions={executions.filter(testPassed)} />
     </div>
   );
 }
