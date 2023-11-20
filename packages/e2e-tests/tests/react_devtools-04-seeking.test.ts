@@ -13,9 +13,9 @@ test.use({ exampleKey: "cra/dist/index_chromium.html" });
 test("react_devtools-04: Component selection is maintained when seeking to a new point", async ({
   pageWithMeta: { page, recordingId },
 }) => {
-  // Don't need to re-run the RDT routine for this test,
-  // as it's just checking UI behavior and not operations contents
-  await startTest(page, recordingId, undefined);
+  const queryParams = new URLSearchParams();
+
+  await startTest(page, recordingId, undefined, queryParams);
   await openDevToolsTab(page);
 
   // Seek to the first console message and check that the initial tree has 3 components
