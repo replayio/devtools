@@ -29,6 +29,7 @@ import { useAppDispatch } from "ui/setup/hooks";
 
 import { testEventDomNodeCache } from "../../suspense/TestEventDetailsCache";
 import { TestEventsList } from "./TestEventsList";
+import { ITEM_SIZE } from "./TestListItem";
 import HelperFunctionEventRow from "./TestRecordingEvents/HelperFunctionEventRow";
 import NavigationEventRow from "./TestRecordingEvents/NavigationEventRow";
 import NetworkRequestEventRow from "./TestRecordingEvents/NetworkRequestEventRow";
@@ -235,6 +236,7 @@ export function TestSectionRow({
       onContextMenu={onContextMenu}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
+      style={{ maxHeight: ITEM_SIZE }}
     >
       {child}
 

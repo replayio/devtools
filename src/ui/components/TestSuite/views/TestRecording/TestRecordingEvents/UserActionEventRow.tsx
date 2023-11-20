@@ -5,6 +5,7 @@ import { Cache, STATUS_PENDING, STATUS_RESOLVED, useImperativeCacheValue } from 
 
 import { getExecutionPoint } from "devtools/client/debugger/src/selectors";
 import Loader from "replay-next/components/Loader";
+import { truncateMiddle } from "replay-next/src/utils/string";
 import { isExecutionPointsWithinRange } from "replay-next/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import {
@@ -32,6 +33,7 @@ import {
   eventListenersJumpLocationsCache,
 } from "ui/suspense/annotationsCaches";
 
+import { ITEM_SIZE } from "../TestListItem";
 import styles from "./UserActionEventRow.module.css";
 
 const NO_ANNOTATIONS: ParsedJumpToCodeAnnotation[] = [];
@@ -73,12 +75,15 @@ export default memo(function UserActionEventRow({
 
   const [isHovered, setIsHovered] = useState(false);
 
-  const argsString = useMemo(() => {
-    console.log("Command args: ", command);
+  const [fullArgsString, truncatedArgsString] = useMemo(() => {
     if (command.arguments) {
-      return command.arguments.filter(argument => typeof argument === "string").join(" ");
+      const fullArgsString = command.arguments
+        .filter(argument => typeof argument === "string")
+        .join(" ");
+      const truncatedArgsString = truncateMiddle(fullArgsString, 40);
+      return [fullArgsString, truncatedArgsString];
     }
-    return "";
+    return ["", ""];
   }, [command.arguments]);
 
   const { disabled: jumpToTestSourceDisabled, onClick: onClickJumpToTestSource } = useJumpToSource({
@@ -157,6 +162,7 @@ export default memo(function UserActionEventRow({
       onClick={jumpToTestSourceDisabled ? undefined : onClickJumpToTestSource}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      style={{ maxHeight: ITEM_SIZE }}
     >
       <div className={styles.Text}>
         {eventNumber != null ? <span className={styles.Number}>{eventNumber}</span> : null}
@@ -167,8 +173,8 @@ export default memo(function UserActionEventRow({
         >
           {command.name}
         </span>{" "}
-        <span className={`${styles.Args} ${styles.Args}`} title={argsString}>
-          {argsString}
+        <span className={`${styles.Args} ${styles.Args}`} title={fullArgsString}>
+          {truncatedArgsString}
         </span>
       </div>
       {showBadge && (
