@@ -2,7 +2,11 @@ import assert from "assert";
 import { ObjectId, PauseId, Node as ProtocolNode } from "@replayio/protocol";
 
 import { parentNodesCache } from "replay-next/components/elements/suspense/DOMParentNodesCache";
-import { Element, elementCache } from "replay-next/components/elements/suspense/ElementCache";
+import {
+  Element,
+  elementCache,
+  fetchBatchedElements,
+} from "replay-next/components/elements/suspense/ElementCache";
 import { getDistanceFromRoot } from "replay-next/components/elements/utils/getDistanceFromRoot";
 import { getItemWeight } from "replay-next/components/elements/utils/getItemWeight";
 import { isNodeInSubTree } from "replay-next/components/elements/utils/isNodeInSubTree";
@@ -80,6 +84,11 @@ export class ElementsListData extends GenericListData<Item> {
   async loadPathToNode(leafNodeId: ObjectId) {
     let idPath;
     try {
+      await this._rootObjectIdWaiter.promise;
+
+      const rootId = this._rootObjectId;
+      assert(rootId);
+
       this.updateLoadingState(true);
 
       idPath = await parentNodesCache.readAsync(this._replayClient, this._pauseId, leafNodeId);
@@ -98,28 +107,12 @@ export class ElementsListData extends GenericListData<Item> {
         this.toggleNodeExpanded(id, true);
       }
 
-      // Fetch in parallel but preserve a stable order; it's important for display
-      const loadedIds: ObjectId[][] = [];
-      try {
-        await Promise.all(
-          idPath.map((id, index) =>
-            (async () => {
-              const ids = await loadNodeSubTree(this._replayClient, this._pauseId, id, 0);
-              loadedIds[index] = [...ids];
-            })()
-          )
-        );
-      } catch (error) {
-        this.handleLoadingError(error);
-        return;
-      }
+      // At this point, we have enough info to fetch all of the remaining nodes.
+      // Individually, nodes along the path to root have already been fetched,
+      // which means that we could fetch all of their children in parallel in a single pass.
+      const loadedIds = await fetchBatchedElements(this._replayClient, this._pauseId, idPath);
 
-      await this._rootObjectIdWaiter.promise;
-
-      const rootId = this._rootObjectId;
-      assert(rootId);
-
-      await this.processLoadedIds(rootId, new Set(loadedIds.flat()), 0);
+      await this.processLoadedIds(rootId, loadedIds, 0);
 
       this.updateLoadingState(false);
       this.invalidate();
@@ -450,6 +443,11 @@ export class ElementsListData extends GenericListData<Item> {
     for (let index = 0; index < ids.length; index++) {
       const id = ids[index];
       if (!this._idToMutableMetadataMap.has(id)) {
+        try {
+          const element = elementCache.getValue(this._replayClient, this._pauseId, id);
+        } catch (error) {
+          debugger;
+        }
         const element = elementCache.getValue(this._replayClient, this._pauseId, id);
         const node = element.node;
 

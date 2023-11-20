@@ -18,6 +18,21 @@ import { Value as ClientValue, protocolValueToClientValue } from "../utils/proto
 import { cachePauseData, updateMappedLocation } from "./PauseCache";
 import { Source, sourcesByIdCache } from "./SourcesCache";
 
+export async function fetchBatchedObjectPreviews(
+  client: ReplayClientInterface,
+  pauseId: PauseId,
+  objectIds: ObjectId[],
+  previewLevel: ObjectPreviewLevel
+) {
+  const data = await client.getObjectsWithPreview(objectIds, pauseId, previewLevel);
+
+  const sources = await sourcesByIdCache.readAsync(client);
+  cachePauseData(client, sources, pauseId, data);
+
+  const pauseData = await client.getObjectsWithPreview(objectIds, pauseId, previewLevel);
+  cachePauseData(client, sources, pauseId, pauseData);
+}
+
 export const objectCache: Cache<
   [
     client: ReplayClientInterface,

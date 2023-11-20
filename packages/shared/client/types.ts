@@ -233,6 +233,11 @@ export interface ReplayClientInterface {
     pauseId: PauseId,
     level?: ObjectPreviewLevel
   ): Promise<PauseData>;
+  getObjectsWithPreview(
+    objectIds: ObjectId[],
+    pauseId: PauseId,
+    level?: ObjectPreviewLevel
+  ): Promise<PauseData>;
   getObjectProperty(objectId: ObjectId, pauseId: PauseId, propertyName: string): Promise<Result>;
   getParentNodes(pauseId: PauseId, nodeId: string): Promise<getParentNodesResult>;
   getPointNearTime(time: number): Promise<TimeStampedPoint>;
