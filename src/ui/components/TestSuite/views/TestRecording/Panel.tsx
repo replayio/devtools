@@ -102,11 +102,11 @@ export default function Panel() {
 
   const { beforeAll, beforeEach, main, afterEach, afterAll } = testRecording.events;
   const testSections: TestSectionEntryWithEvents[] = [
-    { name: "beforeAll", title: "before all", events: beforeAll },
-    { name: "beforeEach", title: "before each", events: beforeEach },
-    { name: "main", title: "test body", events: main },
-    { name: "afterEach", title: "after each", events: afterEach },
-    { name: "afterAll", title: "after all", events: afterAll },
+    { id: "beforeAll", name: "beforeAll", title: "before all", events: beforeAll },
+    { id: "beforeEach", name: "beforeEach", title: "before each", events: beforeEach },
+    { id: "main", name: "main", title: "test body", events: main },
+    { id: "afterEach", name: "afterEach", title: "after each", events: afterEach },
+    { id: "afterAll", name: "afterAll", title: "after all", events: afterAll },
   ];
   // const testSections: [testSectionName: TestSectionName, title: string, testEvents: TestEvent[]][] =
   //   [

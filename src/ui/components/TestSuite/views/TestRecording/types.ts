@@ -2,7 +2,10 @@ export type Position = "after" | "before";
 
 import { TestEvent, TestSectionName } from "shared/test-suites/RecordingTestMetadata";
 
+export type TestListItem = TestEventWithSectionName | TestSectionEntry;
+
 export interface TestSectionEntry {
+  id: string;
   name: TestSectionName;
   title: string;
 }
@@ -12,30 +15,34 @@ export interface TestSectionEntryWithEvents extends TestSectionEntry {
 }
 
 export interface TestEventWithSectionName {
+  id: string;
   testSectionName: TestSectionName;
   event: TestEvent;
 }
 
-export const isTestSectionEntry = (
-  item: TestEventWithSectionName | TestSectionEntry
-): item is TestSectionEntry => {
+export const isTestSectionEntry = (item: TestListItem): item is TestSectionEntry => {
   return "name" in item && "title" in item;
 };
 
-export type TestEventItem = {
-  depth: number;
-  item: TestEventWithSectionName | TestSectionEntry;
+export const isTestEventWithName = (item: TestListItem): item is TestEventWithSectionName => {
+  return "event" in item;
+};
+
+export type TestListDisplayItem = {
   id: string;
+  parentId: string | null;
+  depth: number;
+  item: TestListItem;
   isExpanded: boolean;
-  isTail: boolean;
 };
 
 export type Metadata = {
+  id: string;
+  parentId: string | null;
+  hasChildren: boolean;
   childrenCanBeRendered: boolean;
   depth: number;
-  event: Event;
-  hasTail: boolean;
+  item: TestListItem;
   isExpanded: boolean;
-
   subTreeWeight: number;
 };
