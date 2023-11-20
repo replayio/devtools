@@ -18,8 +18,35 @@ export const GET_TEST = gql`
                 result
                 recordings {
                   id
+                  uuid
                   title
                 }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const GET_WORKSPACE_TESTS = gql`
+  query GetTestPreviewsForWorkspace($workspaceId: ID!) {
+    node(id: $workspaceId) {
+      ... on Workspace {
+        id
+        tests {
+          edges {
+            node {
+              testId
+              title
+              scope
+              stats {
+                passed
+                failed
+                flaky
+                skipped
+                unknown
               }
             }
           }
