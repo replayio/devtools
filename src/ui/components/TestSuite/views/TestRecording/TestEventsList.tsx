@@ -9,8 +9,8 @@ import {
 } from "shared/test-suites/RecordingTestMetadata";
 
 import { TestListData } from "./TestListData";
-import { ITEM_SIZE, TestListItem, TestListItemData } from "./TestListItem";
-import { Metadata, TestEventItem, TestSectionEntryWithEvents } from "./types";
+import { ITEM_SIZE, TestListItemData, TestListItemRenderer } from "./TestListItem";
+import { Metadata, TestListDisplayItem, TestSectionEntryWithEvents } from "./types";
 
 export function TestEventsList({
   height,
@@ -23,7 +23,11 @@ export function TestEventsList({
   testSections: TestSectionEntryWithEvents[];
   testRunnerName: TestRunnerName | null;
 }) {
-  const testListData = useMemo(() => new TestListData(testSections), [testSections]);
+  const testListData = useMemo(() => {
+    const testListData = new TestListData(testSections);
+    console.log("Test list data: ", testListData);
+    return testListData;
+  }, [testSections]);
 
   const itemData = useMemo<TestListItemData>(
     () => ({
@@ -38,7 +42,7 @@ export function TestEventsList({
       fallbackForEmptyList={noContentFallback}
       height={height}
       itemData={itemData}
-      itemRendererComponent={TestListItem}
+      itemRendererComponent={TestListItemRenderer}
       itemSize={ITEM_SIZE}
       listData={testListData}
       width="100%"

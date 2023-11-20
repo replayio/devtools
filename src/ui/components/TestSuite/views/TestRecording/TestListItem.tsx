@@ -8,7 +8,7 @@ import {
 } from "shared/test-suites/RecordingTestMetadata";
 
 import { TestSectionRow } from "./TestSectionRow";
-import { TestEventItem, TestSectionEntry, isTestSectionEntry } from "./types";
+import { TestListDisplayItem, TestSectionEntry, isTestSectionEntry } from "./types";
 import testSectionStyles from "./TestSection.module.css";
 
 export const ITEM_SIZE = 32;
@@ -17,12 +17,12 @@ export type TestListItemData = {
   testRunnerName: TestRunnerName | null;
 };
 
-export function TestListItem({
+export function TestListItemRenderer({
   data,
   index,
   style,
 }: {
-  data: GenericListItemData<TestEventItem, TestListItemData>;
+  data: GenericListItemData<TestListDisplayItem, TestListItemData>;
   index: number;
   style: CSSProperties;
 }) {
@@ -31,7 +31,7 @@ export function TestListItem({
 
   const selectedIndex = listData.getSelectedIndex();
   const listItem = listData.getItemAtIndex(index);
-  const { depth, item, id, isExpanded, isTail } = listItem;
+  const { depth, item, id } = listItem;
 
   let content: React.ReactNode = null;
 
