@@ -42,9 +42,6 @@ export function TestErrorList({
       <ContextMenuItem disabled onSelect={() => setFilterByTime(7)}>
         Last week
       </ContextMenuItem>
-      <ContextMenuItem disabled onSelect={() => setFilterByTime(30)}>
-        Last month
-      </ContextMenuItem>
       <ContextMenuItem onSelect={() => setFilterByTime(null)}>All time</ContextMenuItem>
     </>,
     { alignTo: "auto-target" }
