@@ -14,16 +14,16 @@ function Status({ failureRate }: { failureRate: number }) {
   if (failureRate > 0) {
     return (
       <div
-        className="flex h-5 w-8 shrink-0 items-center justify-center rounded-md bg-[#F02D5E] text-xs font-bold text-white"
+        className="flex h-5 w-10 shrink-0 items-center justify-center rounded-md bg-[#F02D5E] text-xs font-bold text-white"
         data-test-status={status}
-        title={displayedFailureRate.toFixed(2)}
+        title={`${displayedFailureRate === 100 ? "100" : displayedFailureRate.toFixed(2)}%`}
       >
         {displayedFailureRate}%
       </div>
     );
   } else {
     return (
-      <div className="flex h-5 w-8 shrink-0 items-center justify-center" data-test-status={status}>
+      <div className="flex h-5 w-10 shrink-0 items-center justify-center" data-test-status={status}>
         <Icon className={styles.testsuitesSuccess} filename={"testsuites-success"} size="medium" />
       </div>
     );
