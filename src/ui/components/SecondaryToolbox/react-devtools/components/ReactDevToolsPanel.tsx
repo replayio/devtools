@@ -3,6 +3,7 @@ import {
   KeyboardEvent,
   Suspense,
   useContext,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -78,6 +79,7 @@ function ReactDevToolsPanelInner({
   const { bridge, store, wall } = useReplayWall({
     setProtocolCheckFailed,
   });
+  const replayClient = useContext(ReplayClientContext);
 
   const listData = useMemo(() => new ReactDevToolsListData(store), [store]);
 
@@ -96,6 +98,28 @@ function ReactDevToolsPanelInner({
     pauseId,
     wall,
   });
+
+  useEffect(() => {
+    window.app.rdt.store = store;
+  }, [store]);
+
+  useEffect(() => {
+    if (!hasReactMounted || !pauseId) {
+      return;
+    }
+
+    window.app.rdt.getOperationsForPause = async () => {
+      const operations = await replayClient.evaluateExpression(
+        pauseId,
+        `JSON.stringify(window.__REACT_DEVTOOLS_OPERATIONS)`,
+        null,
+        undefined
+      );
+
+      return JSON.parse(operations.returned!.value!);
+    };
+  }, [pauseId, hasReactMounted, replayClient]);
+
   if (!hasReactMounted) {
     return (
       <div className={styles.ProtocolFailedPanel} data-test-id="ReactDevToolsPanel">
