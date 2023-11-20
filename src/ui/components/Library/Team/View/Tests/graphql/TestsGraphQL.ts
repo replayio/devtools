@@ -7,7 +7,7 @@ import {
 } from "shared/graphql/generated/GetTestPreviewsForWorkspace";
 import { GraphQLClientInterface } from "shared/graphql/GraphQLClient";
 
-const GET_TEST_PREVIEWS = gql`
+const GET_WORKSPACE_TESTS = gql`
   query GetTestPreviewsForWorkspace($workspaceId: ID!) {
     node(id: $workspaceId) {
       ... on Workspace {
@@ -41,7 +41,7 @@ export async function getTestsGraphQL(
   const response = await graphQLClient.send<GetTestPreviewsForWorkspace>(
     {
       operationName: "GetTestPreviewsForWorkspace",
-      query: GET_TEST_PREVIEWS,
+      query: GET_WORKSPACE_TESTS,
       variables: { workspaceId },
     },
     accessToken
