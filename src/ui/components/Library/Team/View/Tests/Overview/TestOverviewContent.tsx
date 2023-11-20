@@ -9,16 +9,12 @@ import { TestDetails } from "./TestDetails";
 import styles from "../../../../Library.module.css";
 
 export function TestOverviewContent() {
-  const { filterByText, testId, tests } = useContext(TestContext);
-  const hasFilters = filterByText !== "";
-  const test = tests.find(test => test.testId === testId);
+  const { testId } = useContext(TestContext);
 
   let children = null;
 
-  if (testId && test) {
-    if (!hasFilters) {
-      children = <TestOverview testId={testId} />;
-    }
+  if (testId) {
+    children = <TestOverview testId={testId} />;
   } else {
     children = (
       <div className="flex h-full items-center justify-center p-2">

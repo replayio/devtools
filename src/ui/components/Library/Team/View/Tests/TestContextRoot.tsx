@@ -23,6 +23,7 @@ type TestsContextType = {
   setFilterByText: Dispatch<SetStateAction<string>>;
   testId: string | null;
   testIdForDisplay: string | null;
+  selectedTest: Test | null;
   tests: Test[];
 };
 
@@ -76,6 +77,7 @@ export function TestsContextRoot({ children }: { children: ReactNode }) {
         setFilterByText,
         testId: deferredTestId,
         testIdForDisplay: testId,
+        selectedTest: testId ? tests.find(t => t.testId === testId) ?? null : null,
         tests: filteredTests,
       }}
     >
