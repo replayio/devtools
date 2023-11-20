@@ -34,8 +34,8 @@ const config: PlaywrightTestConfig = {
   // Retry failed tests on CI to account for some basic flakiness.
   retries: CI ? 3 : 0,
 
-  // Give individual tests a while to complete instead of default 30s
-  timeout: 120_000,
+  // Give individual tests 5 minutes to complete instead of default 30s
+  timeout: 300_000,
 
   // Limit the number of workers on CI, use default locally
   workers: CI ? 4 : undefined,

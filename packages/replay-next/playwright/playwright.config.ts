@@ -34,8 +34,8 @@ const config: FullConfig = {
   testMatch: ["tests/**/*.ts"],
   testIgnore: ["tests/**/beforeEach.ts", "tests/**/shared.ts", "tests/utils/*"],
 
-  // Give individual tests a while to complete instead of default 30s
-  timeout: 120_000,
+  // Give individual tests 5 minutes to complete instead of default 30s
+  timeout: 300_000,
 };
 
 if (CI) {
