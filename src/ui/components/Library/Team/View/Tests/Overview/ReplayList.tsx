@@ -9,7 +9,7 @@ import { getTruncatedRelativeDate } from "../../Recordings/RecordingListItem/Rec
 import { MAX_REPLAYS_SHOWN } from "./TestDetails";
 import styles from "../../../../Library.module.css";
 
-export function ReplayList({ executions }: { executions: TestExecution[] }) {
+export function ReplayList({ executions, label }: { executions: TestExecution[]; label: string }) {
   const sortedReplays = orderBy(
     executions.filter(e => e.recordings.length > 0),
     "createdAt",
@@ -42,7 +42,7 @@ export function ReplayList({ executions }: { executions: TestExecution[] }) {
       <div className="flex flex-col gap-2">
         <div className="flex gap-1 overflow-hidden text-lg">
           <div className="overflow-hidden overflow-ellipsis whitespace-nowrap font-medium">
-            Recent replays of the test passing
+            {label}
           </div>
           <div> ({sortedReplays.length})</div>
         </div>

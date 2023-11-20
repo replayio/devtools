@@ -36,10 +36,11 @@ export function TestDetails({
       ) : null}
       {selectedError ? (
         <ReplayList
+          label="Tests with this Error"
           executions={executions.filter(testFailed).filter(e => e.errors?.[0] === selectedError)}
         />
       ) : null}
-      <ReplayList executions={executions.filter(testPassed)} />
+      <ReplayList label="Recent passing tests" executions={executions.filter(testPassed)} />
     </div>
   );
 }
