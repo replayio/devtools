@@ -13,7 +13,7 @@ export interface GetTestForWorkspace_node_Recording {
 
 export interface GetTestForWorkspace_node_Workspace_tests_edges_node_executions_recordings {
   __typename: "Recording";
-  uuid: any;
+  id: string;
   title: string | null;
 }
 

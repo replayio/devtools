@@ -37,13 +37,19 @@ export function TestOverviewContent() {
 }
 
 function TestOverview({ testId }: { testId: string }) {
-  const { test, loading } = useTest(testId);
+  const { test, loading, error } = useTest(testId);
 
   if (loading) {
     return (
       <div className="flex h-full items-center justify-center p-2">
         <LibrarySpinner />
       </div>
+    );
+  }
+
+  if (error || !test) {
+    return (
+      <div className="flex h-full items-center justify-center p-2">Failed to load test details</div>
     );
   }
 

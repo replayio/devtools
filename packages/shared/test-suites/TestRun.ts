@@ -57,8 +57,8 @@ export type TestExecution = {
   errors: string[] | null;
   createdAt: string;
   result: string;
-  commitTitle: string;
-  recordings: Recording[];
+  commitTitle: string | null;
+  recordings: Pick<Recording, "id" | "title">[];
 };
 
 export type TestRun = {

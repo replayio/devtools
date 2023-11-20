@@ -17,7 +17,7 @@ export const GET_TEST = gql`
                 commitTitle
                 result
                 recordings {
-                  uuid
+                  id
                   title
                 }
               }

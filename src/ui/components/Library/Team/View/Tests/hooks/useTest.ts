@@ -1,10 +1,7 @@
 import { useQuery } from "@apollo/client";
-import { useContext, useMemo } from "react";
+import { useContext } from "react";
 
-import {
-  GetTestForWorkspace_node_Workspace_tests_edges_node_executions,
-  GetTestForWorkspace_node_Workspace_tests_edges_node_executions_recordings,
-} from "shared/graphql/generated/GetTestForWorkspace";
+import { GetTestForWorkspace_node_Workspace } from "shared/graphql/generated/GetTestForWorkspace";
 import { TestExecution } from "shared/test-suites/TestRun";
 import { TeamContext } from "ui/components/Library/Team/TeamContextRoot";
 
@@ -15,45 +12,18 @@ export type ErrorFrequency = {
   replays: number;
 };
 
-const EMPTY_OBJ: Record<any, any> = {};
-
 export function useTest(testId: string) {
   const { teamId } = useContext(TeamContext);
-  const { data, loading, error } = useQuery(GET_TEST, {
-    variables: { workspaceId: teamId, testId },
-  });
-
-  const test = useMemo(() => {
-    const rawTest = data?.node.tests.edges[0].node;
-
-    if (loading || !data) {
-      return EMPTY_OBJ;
+  const { data, loading, error } = useQuery<{ node: GetTestForWorkspace_node_Workspace }>(
+    GET_TEST,
+    {
+      variables: { workspaceId: teamId, testId },
     }
+  );
 
-    return (
-      {
-        ...rawTest,
-        executions: rawTest.executions.map(
-          (e: GetTestForWorkspace_node_Workspace_tests_edges_node_executions) => ({
-            ...e,
-            recordings: e.recordings.map(
-              (
-                r: GetTestForWorkspace_node_Workspace_tests_edges_node_executions_recordings | null
-              ) => {
-                if (!r) {
-                  return r;
-                }
+  const test = data?.node?.tests?.edges[0].node;
 
-                return { ...r, id: r.uuid };
-              }
-            ),
-          })
-        ),
-      } ?? EMPTY_OBJ
-    );
-  }, [data, loading]);
-
-  if (loading) {
+  if (loading || !test) {
     return { test: null, loading: true };
   }
 
@@ -64,7 +34,7 @@ export function useTest(testId: string) {
     errorFrequency: getErrorFrequency(test.executions),
   };
 
-  return { test: processedTest, loading };
+  return { test: processedTest, loading, error };
 }
 function getFailureRates(executions: TestExecution[]) {
   return {
