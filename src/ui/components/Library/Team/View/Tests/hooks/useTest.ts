@@ -4,6 +4,7 @@ import { useContext } from "react";
 import { GetTestForWorkspace_node_Workspace } from "shared/graphql/generated/GetTestForWorkspace";
 import { TestExecution } from "shared/test-suites/TestRun";
 import { TeamContext } from "ui/components/Library/Team/TeamContextRoot";
+import { convertRecording } from "ui/hooks/recordings";
 
 import { GET_TEST } from "../graphql/TestGraphQL";
 
@@ -27,11 +28,17 @@ export function useTest(testId: string) {
     return { test: null, loading: true };
   }
 
+  const executions = test.executions.map(e => ({
+    ...e,
+    recordings: e.recordings.map(convertRecording),
+  }));
+
   const processedTest = {
     ...test,
-    failureRate: getFailureRate(test.executions),
-    failureRates: getFailureRates(test.executions),
-    errorFrequency: getErrorFrequency(test.executions),
+    executions,
+    failureRate: getFailureRate(executions),
+    failureRates: getFailureRates(executions),
+    errorFrequency: getErrorFrequency(executions),
   };
 
   return { test: processedTest, loading, error };

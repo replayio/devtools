@@ -58,7 +58,7 @@ export type TestExecution = {
   createdAt: string;
   result: string;
   commitTitle: string | null;
-  recordings: Pick<Recording, "id" | "title">[];
+  recordings: Pick<Recording, "id" | "title" | "isProcessed">[];
 };
 
 export type TestRun = {

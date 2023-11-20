@@ -27,6 +27,7 @@ export function ReplayList({ executions, label }: { executions: TestExecution[];
           <ReplayListItem
             recordingId={e.recordings[0]!.id}
             recordingTitle={e.recordings[0]!.title}
+            isProcessed={e.recordings[0]!.isProcessed}
             commitTitle={e.commitTitle}
             date={e.createdAt}
             key={i}
@@ -55,12 +56,14 @@ function ReplayListItem({
   recordingId,
   commitTitle,
   recordingTitle,
+  isProcessed,
   date,
   status,
 }: {
   recordingId: RecordingId;
   commitTitle: string | null;
   recordingTitle?: string | null;
+  isProcessed?: boolean;
   date: string;
   status: TestExecution["result"];
 }) {
@@ -78,7 +81,10 @@ function ReplayListItem({
             whileTap={{ scale: 1, boxShadow: "0px 0px 1px rgba(0,0,0,0.2)" }}
             transition={{ duration: 0.05 }}
           >
-            <Icon className={styles[status]} type="play-unprocessed" />
+            <Icon
+              className={styles[status]}
+              type={isProcessed ? "play-processed" : "play-unprocessed"}
+            />
           </motion.div>
         </div>
         <div title={displayedTitle} className="overflow-hidden overflow-ellipsis whitespace-nowrap">

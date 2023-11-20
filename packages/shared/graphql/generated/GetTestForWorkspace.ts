@@ -16,6 +16,9 @@ export interface GetTestForWorkspace_node_Workspace_tests_edges_node_executions_
   id: string;
   uuid: any;
   title: string | null;
+  isProcessed: boolean | null;
+  duration: number | null;
+  createdAt: any;
 }
 
 export interface GetTestForWorkspace_node_Workspace_tests_edges_node_executions {

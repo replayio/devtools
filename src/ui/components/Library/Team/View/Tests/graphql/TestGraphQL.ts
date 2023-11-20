@@ -20,6 +20,9 @@ export const GET_TEST = gql`
                   id
                   uuid
                   title
+                  isProcessed
+                  duration
+                  createdAt
                 }
               }
             }
