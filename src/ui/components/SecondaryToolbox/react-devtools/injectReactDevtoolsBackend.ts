@@ -67,6 +67,7 @@ function installReactDevToolsIntoPause() {
 
   window.__REACT_DEVTOOLS_OPERATIONS = [];
   window.__REACT_DEVTOOLS_GLOBAL_HOOK__.sub("operations", (newOperations: Array<number>) => {
+    window.logMessage("ADDING OPERATION");
     window.__REACT_DEVTOOLS_OPERATIONS.push(newOperations);
   });
 
@@ -126,6 +127,8 @@ function installReactDevToolsIntoPause() {
       );
     }
   }
+
+  return JSON.stringify(window.evaluationLogs);
 }
 
 const injectGlobalHookSource = require("./installHook.raw.js").default;
@@ -153,6 +156,15 @@ export const reactDevToolsInjectionCache: Cache<
     } else if (result.failed) {
       return false;
     } else {
+      console.log(
+        JSON.parse(result.returned!.value).map(t => {
+          try {
+            return JSON.parse(t);
+          } catch {
+            return t;
+          }
+        })
+      );
       return true;
     }
   },
