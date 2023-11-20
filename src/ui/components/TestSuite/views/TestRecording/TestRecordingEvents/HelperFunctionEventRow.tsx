@@ -28,21 +28,7 @@ export default memo(function HelperFunctionEventRow({
 
   return (
     <div className={styles.Row}>
-      <Expandable
-        children={
-          <>
-            {events.map((testEvent, index) => (
-              <TestSectionRow
-                key={index}
-                testEvent={testEvent}
-                testRunnerName={testRunnerName}
-                testSectionName={testSectionName}
-              />
-            ))}
-          </>
-        }
-        header={<span className={styles.Name}>{formattedName || "Outer function"}</span>}
-      />
+      <span className={styles.Name}>{formattedName || "Outer function"}</span>
     </div>
   );
 });

@@ -40,7 +40,7 @@ export type Metadata = {
   id: string;
   parentId: string | null;
   hasChildren: boolean;
-  childrenCanBeRendered: boolean;
+  // childrenCanBeRendered: boolean;
   depth: number;
   item: TestListItem;
   isExpanded: boolean;

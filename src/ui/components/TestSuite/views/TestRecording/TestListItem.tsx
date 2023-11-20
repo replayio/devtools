@@ -59,6 +59,7 @@ export function TestListItemRenderer({
             ...style,
             width: undefined,
             "--data-depth": depth != null ? `${depth}rem` : undefined,
+            paddingLeft: depth != null ? `${depth}rem` : undefined,
           } as CSSProperties
         }
       >

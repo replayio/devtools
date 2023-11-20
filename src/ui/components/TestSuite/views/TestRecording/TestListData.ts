@@ -45,6 +45,14 @@ function getItemWeight(metadata: Metadata): number {
   }
 }
 
+function getChildNodeIds(testListItem: TestListItem) {
+  if (isTestEventWithName(testListItem) && isFunctionTestEvent(testListItem.event)) {
+    return testListItem.event.data.events.map(event => event.id);
+  }
+
+  return [];
+}
+
 export class TestListData extends GenericListData<TestListDisplayItem> {
   private _testListItems: TestListItem[];
   private _idToMutableMetadataMap: Map<string, Metadata> = new Map();
@@ -93,11 +101,10 @@ export class TestListData extends GenericListData<TestListDisplayItem> {
       const metadata: Metadata = {
         id,
         parentId,
-        childrenCanBeRendered: true,
         hasChildren: false,
         depth,
         item: testListItem,
-        isExpanded: false,
+        isExpanded: true,
         subTreeWeight: 0,
       };
 
@@ -137,8 +144,15 @@ export class TestListData extends GenericListData<TestListDisplayItem> {
     }
   }
 
+  private getMutableMetadata(id: string): Metadata {
+    const metadata = this._idToMutableMetadataMap.get(id);
+    assert(metadata, `Could not find metadata for ${id}`);
+    return metadata;
+  }
+
   protected getItemCountImplementation(): number {
-    return this._testListItems.length;
+    // return this._testListItems.length;
+    return this._idToTestListItemEntryMap.size;
   }
 
   getItemAtIndexImplementation(index: number): TestListDisplayItem {
@@ -146,14 +160,55 @@ export class TestListData extends GenericListData<TestListDisplayItem> {
       throw new Error("Invalid index");
     }
 
-    const testItem = this._testListItems[index];
-    return {
-      id: testItem.id,
-      // TODO Fill in parentId
-      parentId: null,
-      depth: 0,
-      item: testItem,
-      isExpanded: false,
-    };
+    assert(this._rootIds.size > 0, "Root ids should be populated");
+
+    let currentNodeIds = [...this._rootIds];
+    let currentNodeId: string | undefined = undefined;
+    let currentIndex = 0;
+
+    while (currentNodeIds.length > 0 && currentIndex <= index) {
+      for (let nodeIndex = 0; nodeIndex < currentNodeIds.length; nodeIndex++) {
+        currentNodeId = currentNodeIds[nodeIndex]!;
+        const metadata = this.getMutableMetadata(currentNodeId);
+
+        const weight = getItemWeight(metadata);
+
+        if (currentIndex + weight > index) {
+          // The element we're looking for is either this node itself or within its subtree
+          // Break out of the for loop and start looking into the current child next
+
+          const item: TestListDisplayItem = {
+            id: currentNodeId,
+            parentId: metadata.parentId,
+            depth: metadata.depth,
+            item: metadata.item,
+            isExpanded: metadata.isExpanded,
+          };
+
+          if (currentIndex === index) {
+            return item;
+          } else {
+            currentNodeIds = getChildNodeIds(metadata.item);
+            currentIndex++;
+            break;
+          }
+        } else {
+          // Skip over the current node and keep looking
+          currentIndex += weight;
+        }
+      }
+    }
+
+    throw Error(`Could not find node at index ${index}`);
+
+    // const testItem = this._testListItems[index];
+    // return {
+    //   id: testItem.id,
+    //   // TODO Fill in parentId
+    //   parentId: null,
+    //   depth: 0,
+    //   item: testItem,
+    //   isExpanded: false,
+    // };
   }
 }
