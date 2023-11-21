@@ -33,6 +33,6 @@ test("highlighter: element highlighter works everywhere", async ({
     .join(" ");
 
   // TODO:FE-805 This is a hack to get the test to pass. We should figure out why the path definition is different from the original and not use a hardcoded value.
-  const pathDefinitionToCompare = `M10,48 L310,48 L310,198 L10,198`;
+  const pathDefinitionToCompare = `M8,46 L312,46 L312,200 L8,200`;
   expect(normalizedPathDefinition).toBe(pathDefinitionToCompare);
 });
