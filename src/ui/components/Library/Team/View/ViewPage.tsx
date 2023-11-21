@@ -19,7 +19,7 @@ export function ViewPage({ defaultView }: { defaultView: string }) {
 
 export function ViewPageContent() {
   const { view } = useContext(ViewContext);
-  const [enableTestSuitesNewRunsView] = useLocalStorageUserData("replayVideoPanelCollapsed");
+  const [enableTestSuitesNewRunsView] = useLocalStorageUserData("enableTestSuitesNewRunsView");
   return (
     <div className="flex flex-grow flex-col overflow-hidden">
       <FilterBarContainer />
