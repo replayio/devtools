@@ -18,7 +18,13 @@ import {
   paused,
   resumed,
 } from "devtools/client/debugger/src/reducers/pause";
-import { pauseRequestedAt, previewLocationCleared } from "devtools/client/debugger/src/selectors";
+import {
+  getExecutionPoint,
+  getPauseId,
+  getTime,
+  pauseRequestedAt,
+  previewLocationCleared,
+} from "devtools/client/debugger/src/selectors";
 import { unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 import {
   addScreenForPoint,
@@ -236,17 +242,23 @@ export function seek({
     if (!pauseId) {
       // If no ExecutionPoint provided, map time to nearest ExecutionPoint
       if (executionPoint == null) {
-        time = await clampTime(replayClient, time);
+        const clampedTime = await clampTime(replayClient, time);
 
-        const nearestEvent = mostRecentPaintOrMouseEvent(time);
-        const timeStampedPoint = await replayClient.getPointNearTime(time);
+        const nearestEvent = mostRecentPaintOrMouseEvent(clampedTime);
+        const timeStampedPoint = await replayClient.getPointNearTime(clampedTime);
+        if (getTime(getState()) !== time) {
+          return;
+        }
+
         if (
           nearestEvent &&
-          Math.abs(nearestEvent.time - time) < Math.abs(timeStampedPoint.time - time)
+          Math.abs(nearestEvent.time - clampedTime) < Math.abs(timeStampedPoint.time - clampedTime)
         ) {
           executionPoint = nearestEvent.point;
+          time = nearestEvent.time;
         } else {
           executionPoint = timeStampedPoint.point;
+          time = timeStampedPoint.time;
         }
 
         dispatch(pauseRequestedAt({ executionPoint, time, location }));
@@ -266,12 +278,19 @@ export function seek({
         dispatch(pauseCreationFailed());
         return;
       }
+      if (getExecutionPoint(getState()) !== executionPoint) {
+        return;
+      }
     }
 
     assert(executionPoint);
     dispatch(paused({ executionPoint, time, id: pauseId }));
 
     const frames = await framesCache.readAsync(replayClient, pauseId);
+    if (getPauseId(getState()) !== pauseId) {
+      return;
+    }
+
     dispatch(previewLocationCleared());
     if (frames?.length) {
       const selectedFrame = frames[0];
