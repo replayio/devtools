@@ -19,9 +19,8 @@ import {
   resumed,
 } from "devtools/client/debugger/src/reducers/pause";
 import {
-  getExecutionPoint,
-  getPauseId,
-  getTime,
+  clearSeekLock,
+  getSeekLock,
   pauseRequestedAt,
   previewLocationCleared,
 } from "devtools/client/debugger/src/selectors";
@@ -235,7 +234,8 @@ export function seek({
   location?: Location;
 }): UIThunkAction<Promise<void>> {
   return async (dispatch, getState, { replayClient }) => {
-    dispatch(pauseRequestedAt({ executionPoint, time, location }));
+    const seekLock = new Object();
+    dispatch(pauseRequestedAt({ seekLock, executionPoint, time, location }));
     dispatch(setTimelineState({ currentTime: time, playback: null }));
     const focusWindow = replayClient.getCurrentFocusWindow();
 
@@ -246,8 +246,8 @@ export function seek({
 
         const nearestEvent = mostRecentPaintOrMouseEvent(clampedTime);
         const timeStampedPoint = await replayClient.getPointNearTime(clampedTime);
-        if (getTime(getState()) !== time) {
-          // someone requested seeking to a different time while we were waiting
+        if (getSeekLock(getState()) !== seekLock) {
+          // someone requested seeking to a different point while we were waiting
           return;
         }
 
@@ -262,7 +262,7 @@ export function seek({
           time = timeStampedPoint.time;
         }
 
-        dispatch(pauseRequestedAt({ executionPoint, time, location }));
+        dispatch(pauseRequestedAt({ seekLock, executionPoint, time, location }));
       }
 
       if (focusWindow === null || !isPointInRegion(executionPoint, focusWindow)) {
@@ -279,8 +279,8 @@ export function seek({
         dispatch(pauseCreationFailed());
         return;
       }
-      if (getExecutionPoint(getState()) !== executionPoint) {
-        // someone requested seeking to a different executionPoint while we were waiting
+      if (getSeekLock(getState()) !== seekLock) {
+        // someone requested seeking to a different point while we were waiting
         return;
       }
     }
@@ -289,8 +289,8 @@ export function seek({
     dispatch(paused({ executionPoint, time, id: pauseId }));
 
     const frames = await framesCache.readAsync(replayClient, pauseId);
-    if (getPauseId(getState()) !== pauseId) {
-      // someone requested seeking to a different pauseId while we were waiting
+    if (getSeekLock(getState()) !== seekLock) {
+      // someone requested seeking to a different point while we were waiting
       return;
     }
 
@@ -317,6 +317,7 @@ export function seek({
       point: executionPoint,
       time,
     });
+    dispatch(clearSeekLock());
 
     if (autoPlay) {
       dispatch(startPlayback());
