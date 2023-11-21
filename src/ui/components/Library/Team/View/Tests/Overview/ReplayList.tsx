@@ -6,7 +6,6 @@ import Icon from "replay-next/components/Icon";
 import { TestExecution } from "shared/test-suites/TestRun";
 
 import { getTruncatedRelativeDate } from "../../Recordings/RecordingListItem/RecordingListItem";
-import { MAX_REPLAYS_SHOWN } from "./TestDetails";
 import styles from "../../../../Library.module.css";
 
 export function ReplayList({ executions, label }: { executions: TestExecution[]; label: string }) {
@@ -23,7 +22,7 @@ export function ReplayList({ executions, label }: { executions: TestExecution[];
   } else {
     children = (
       <>
-        {sortedReplays.slice(0, MAX_REPLAYS_SHOWN).map((e, i) => (
+        {sortedReplays.map((e, i) => (
           <ReplayListItem
             recordingId={e.recordings[0]!.id}
             recordingTitle={e.recordings[0]!.title}
@@ -45,7 +44,6 @@ export function ReplayList({ executions, label }: { executions: TestExecution[];
           <div className="overflow-hidden overflow-ellipsis whitespace-nowrap font-medium">
             {label}
           </div>
-          <div> ({sortedReplays.length})</div>
         </div>
         <div className="flex flex-col gap-2">{children}</div>
       </div>
