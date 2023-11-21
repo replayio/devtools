@@ -53,6 +53,7 @@ export type SeekState = "find-point" | "create-pause" | "paused";
 
 export interface PauseState {
   cx: { navigateCounter: number };
+  seekLock: any;
   seekState: SeekState;
   id: string | undefined;
   threadcx: ThreadContext;
@@ -81,6 +82,7 @@ const initialState: PauseState = {
     isPaused: false,
     pauseCounter: 0,
   },
+  seekLock: null,
   time: 0,
   ...resumedPauseState,
   pauseHistory: [],
@@ -144,10 +146,12 @@ const pauseSlice = createSlice({
         executionPoint?: string;
         time: number;
         location?: Location;
+        seekLock: any;
       }>
     ) {
-      const { executionPoint, location, time } = action.payload;
+      const { seekLock, executionPoint, location, time } = action.payload;
       Object.assign(state, {
+        seekLock,
         seekState: executionPoint ? "create-pause" : "find-point",
         id: undefined,
         executionPoint: executionPoint ?? null,
@@ -185,6 +189,9 @@ const pauseSlice = createSlice({
         state.pauseHistoryIndex++;
       }
     },
+    clearSeekLock(state) {
+      state.seekLock = null;
+    },
     pauseHistoryDecremented(state) {
       state.pauseHistoryIndex--;
     },
@@ -194,6 +201,7 @@ const pauseSlice = createSlice({
     pauseCreationFailed(state) {
       const lastPause = state.pauseHistory[state.pauseHistoryIndex];
       Object.assign(state, {
+        seekLock: null,
         seekState: "paused",
         id: lastPause?.pauseId,
         executionPoint: lastPause?.executionPoint ?? null,
@@ -235,6 +243,7 @@ const pauseSlice = createSlice({
 });
 
 export const {
+  clearSeekLock,
   frameSelected,
   pauseCreationFailed,
   pauseRequestedAt,
@@ -254,6 +263,10 @@ export function getContext(state: UIState) {
 
 export function getThreadContext(state: UIState) {
   return state.pause.threadcx;
+}
+
+export function getSeekLock(state: UIState) {
+  return state.pause.seekLock;
 }
 
 export function getSeekState(state: UIState) {
