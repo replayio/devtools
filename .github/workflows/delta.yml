@@ -85,6 +85,7 @@ jobs:
         env:
           SHARD: ${{ matrix.shard }}
           SHARDS: 10
+          REPLAY_PLAYWRIGHT_FIXTURE: 1
           RECORD_REPLAY_METADATA_TEST_RUN_ID: ${{ needs.generate-test-run-id.outputs.testRunId }}
       - name: Upload Replay recordings
         if: always()
