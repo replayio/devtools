@@ -2,10 +2,9 @@ import orderBy from "lodash/orderBy";
 import { createCache } from "suspense";
 
 import {
-  GetTestPreviewsForWorkspace,
-  GetTestPreviewsForWorkspace_node_Workspace,
-  GetTestPreviewsForWorkspace_node_Workspace_tests_edges_node_stats,
-} from "shared/graphql/generated/GetTestPreviewsForWorkspace";
+  GetWorkspaceTests,
+  GetWorkspaceTests_node_Workspace,
+} from "shared/graphql/generated/GetWorkspaceTests";
 import { GraphQLClientInterface } from "shared/graphql/GraphQLClient";
 import { Test } from "shared/test-suites/TestRun";
 
@@ -19,9 +18,9 @@ export const testsCache = createCache<
   debugLabel: "testsCache",
   getKey: ([_, __, workspaceId]) => workspaceId,
   load: async ([graphQLClient, accessToken, workspaceId]) => {
-    const response = await graphQLClient.send<GetTestPreviewsForWorkspace>(
+    const response = await graphQLClient.send<GetWorkspaceTests>(
       {
-        operationName: "GetTestPreviewsForWorkspace",
+        operationName: "GetWorkspaceTests",
         query: GET_WORKSPACE_TESTS,
         variables: { workspaceId },
       },
@@ -29,25 +28,14 @@ export const testsCache = createCache<
     );
 
     const rawTests =
-      (response?.node as GetTestPreviewsForWorkspace_node_Workspace)?.tests?.edges.map(
-        edge => edge.node
-      ) ?? [];
+      (response?.node as GetWorkspaceTests_node_Workspace)?.tests?.edges.map(edge => edge.node) ??
+      [];
 
-    // TODO SCS-1575
     const processedTests = rawTests.map(t => ({
       ...t,
-      failureRate: generateFailureRate(t.stats),
+      failureRate: t.stats.failureRate,
     }));
 
     return orderBy(processedTests, "failureRate", "desc");
   },
 });
-
-function generateFailureRate(
-  stats: GetTestPreviewsForWorkspace_node_Workspace_tests_edges_node_stats
-) {
-  const { passed, failed, flaky } = stats;
-  const total = passed + failed + flaky;
-
-  return failed / total;
-}

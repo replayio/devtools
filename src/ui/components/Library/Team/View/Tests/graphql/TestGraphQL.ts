@@ -34,7 +34,7 @@ export const GET_TEST = gql`
 `;
 
 export const GET_WORKSPACE_TESTS = gql`
-  query GetTestPreviewsForWorkspace($workspaceId: ID!) {
+  query GetWorkspaceTests($workspaceId: ID!) {
     node(id: $workspaceId) {
       ... on Workspace {
         id
@@ -50,6 +50,7 @@ export const GET_WORKSPACE_TESTS = gql`
                 flaky
                 skipped
                 unknown
+                failureRate
               }
             }
           }
