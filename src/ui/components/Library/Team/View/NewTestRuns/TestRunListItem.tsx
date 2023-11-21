@@ -18,7 +18,7 @@ function Status({ failCount }: { failCount: number }) {
   if (failCount > 0) {
     return (
       <div
-        className="flex h-5 w-8 shrink-0 items-center justify-center rounded-md bg-[#F02D5E] text-xs font-bold text-chrome"
+        className="flex h-5 w-8 shrink-0 items-center justify-center rounded-md bg-[#F02D5E] text-xs font-bold text-white text-chrome"
         data-test-status={status}
       >
         {failCount}
@@ -88,7 +88,7 @@ export function TestRunListItem({
   return (
     <div
       data-test-id="TestRunListItem"
-      className={`flex cursor-pointer flex-row items-center space-x-3 rounded-sm bg-themeBase-100 p-1 ${
+      className={`flex cursor-pointer flex-row items-center space-x-3 rounded-md bg-themeBase-100 px-2 py-1 ${
         styles.libraryRow
       }
       ${isSelected ? styles.libraryRowSelected : ""}
@@ -105,22 +105,15 @@ export function TestRunListItem({
             <HighlightedText haystack={title} needle={filterByText} />
           </div>
         </div>
-        <div className="flex flex-row items-center gap-4 text-xs font-light">
-          {/* <AttributeContainer dataTestId="TestRun-Date" icon="schedule">
+        <div
+          className="flex items-center space-x-0.5 overflow-hidden text-ellipsis"
+          data-test-id="TestRun-Date"
+          title={title ?? ""}
+        >
+          <MaterialIcon className="w-4">schedule</MaterialIcon>
+          <span className="block overflow-hidden text-ellipsis whitespace-pre text-xs font-light">
             {getTruncatedRelativeDate(date)}
-          </AttributeContainer> */}
-          <div
-            className="flex items-start space-x-0.5 overflow-hidden text-ellipsis"
-            data-test-id="TestRun-Date"
-            title={title ?? ""}
-          >
-            <div className="w-4">
-              <MaterialIcon>schedule</MaterialIcon>
-            </div>
-            <span className="block overflow-hidden text-ellipsis whitespace-pre">
-              {getTruncatedRelativeDate(date)}
-            </span>
-          </div>
+          </span>
         </div>
       </div>
     </div>

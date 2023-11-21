@@ -44,7 +44,7 @@ export function TestRunList() {
           height={height}
           itemCount={itemCount}
           itemData={itemData}
-          itemSize={29}
+          itemSize={28}
           width={width}
         />
       )}

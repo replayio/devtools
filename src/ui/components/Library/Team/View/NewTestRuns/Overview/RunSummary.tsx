@@ -68,7 +68,7 @@ export function Attributes({
     const { branchName, isPrimaryBranch, user } = source;
 
     return (
-      <div className="flex flex-row flex-wrap items-center space-x-4">
+      <div className="flex flex-row flex-wrap items-center gap-x-4 gap-y-2">
         <AttributeContainer dataTestId="TestRun-Date" icon="schedule" title={date.toLocaleString()}>
           {getTruncatedRelativeDate(date)}
         </AttributeContainer>
