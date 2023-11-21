@@ -99,16 +99,7 @@ export async function startTest(
   const base = process.env.PLAYWRIGHT_TEST_BASE_URL || "http://localhost:8080";
 
   const params = new URLSearchParams();
-
-  // Checked by `isE2ETest()` in `packages/shared/utils/environment.ts`,
-  // to allow `apolloClient.ts` to bail out and avoid accidentally showing
-  // a Next.js error overlay.
   params.append("e2e", "1");
-
-  // Frontend E2E tests generate a lot of computing traffic,
-  // so we tell the backend to deprioritize them to conserve resources.
-  params.append("features", "backend_deprioritizeTraffic");
-
   if (apiKey) {
     params.append("apiKey", apiKey);
   }
