@@ -140,7 +140,7 @@ export default function UploadScreen({
       return workspaceId;
     }
 
-    return workspaces[0]?.id ?? MY_LIBRARY;
+    return MY_LIBRARY;
   });
 
   const initializeRecording = hooks.useInitializeRecording();
