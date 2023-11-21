@@ -97,16 +97,14 @@ export function TestRunListItem({
     >
       <Status failCount={failCount} />
       <div className="flex h-full flex-grow flex-row justify-between overflow-hidden">
-        <div className="flex flex-row justify-between space-x-3">
-          <div
-            className="wrap flex shrink grow-0 overflow-hidden text-ellipsis whitespace-nowrap pr-2 font-medium"
-            data-test-id="TestRun-Title"
-          >
-            <HighlightedText haystack={title} needle={filterByText} />
-          </div>
+        <div
+          className="wrap flex shrink grow-0 truncate pr-2 font-medium"
+          data-test-id="TestRun-Title"
+        >
+          <HighlightedText haystack={title} needle={filterByText} />
         </div>
         <div
-          className="flex items-center space-x-0.5 overflow-hidden text-ellipsis"
+          className="flex flex-shrink-0 items-center space-x-0.5 overflow-hidden text-ellipsis"
           data-test-id="TestRun-Date"
           title={title ?? ""}
         >
