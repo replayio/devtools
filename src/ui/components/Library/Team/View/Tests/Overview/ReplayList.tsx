@@ -20,21 +20,17 @@ export function ReplayList({ executions, label }: { executions: TestExecution[];
   if (!sortedReplays.length) {
     children = <div>No replays found</div>;
   } else {
-    children = (
-      <>
-        {sortedReplays.map((e, i) => (
-          <ReplayListItem
-            recordingId={e.recordings[0]!.id}
-            recordingTitle={e.recordings[0]!.title}
-            isProcessed={e.recordings[0]!.isProcessed}
-            commitTitle={e.commitTitle}
-            date={e.createdAt}
-            key={i}
-            status={e.result}
-          />
-        ))}
-      </>
-    );
+    children = sortedReplays.map((e, i) => (
+      <ReplayListItem
+        recordingId={e.recordings[0]!.id}
+        recordingTitle={e.recordings[0]!.title}
+        isProcessed={e.recordings[0]!.isProcessed}
+        commitTitle={e.commitTitle}
+        date={e.createdAt}
+        key={i}
+        status={e.result}
+      />
+    ));
   }
 
   return (
