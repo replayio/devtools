@@ -190,7 +190,8 @@ export function TestSectionRow({
 
         if (firstDomNodeDetails?.domNode?.node.isConnected) {
           const { domNode, pauseId } = firstDomNodeDetails;
-          dispatch(highlightNodes([domNode.id], pauseId));
+          // Use the actual box model, which we should have pre-cached already
+          dispatch(highlightNodes([domNode.id], pauseId, undefined, true));
         }
       }
     }

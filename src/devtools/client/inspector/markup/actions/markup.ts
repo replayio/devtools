@@ -1,7 +1,9 @@
+import { BoxModel } from "@replayio/protocol";
+
 import { getPauseId } from "devtools/client/debugger/src/selectors";
 import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
 import type { UIThunkAction } from "ui/actions";
-import { boxModelCache } from "ui/suspense/nodeCaches";
+import { boundingRectsCache, boundingRectsToBoxModel, boxModelCache } from "ui/suspense/nodeCaches";
 import { getCurrentPauseId } from "ui/utils/app";
 
 import {
@@ -26,7 +28,8 @@ let unhighlightTimer: ReturnType<typeof window.setTimeout> | null = null;
 export function highlightNodes(
   nodeIds: string[],
   pauseId?: string,
-  duration?: number
+  duration?: number,
+  useRealBoxModels = false
 ): UIThunkAction {
   return async (dispatch, getState, { replayClient }) => {
     const recordingCapabilities = await recordingCapabilitiesCache.readAsync(replayClient);
@@ -47,12 +50,33 @@ export function highlightNodes(
     if (!highlightedNodes || !nodeIds.every(id => highlightedNodes.includes(id))) {
       dispatch(nodesHighlighted(nodeIds));
 
-      const boxModels = await Promise.all(
-        nodeIds.map(async nodeId => {
-          const boxModel = await boxModelCache.readAsync(replayClient, pauseId!, nodeId);
-          return boxModel;
-        })
-      );
+      let boxModels: BoxModel[] = [];
+
+      if (useRealBoxModels) {
+        // In some cases, we care about showing "real" box models when highlighting a node:
+        // - hovering over the Box Model section of the "Layout" tab
+        // - the DOM node picker
+        // - relevant DOM nodes from Cypress test step details
+        // In that case, fetch real box models so we can show each piece separately.
+        // (The step details case should have pre-fetched those box models already.)
+        boxModels = await Promise.all(
+          nodeIds.map(async nodeId => {
+            const boxModel = await boxModelCache.readAsync(replayClient, pauseId!, nodeId);
+            return boxModel;
+          })
+        );
+      } else {
+        // But for other cases, we're really just trying to show the node's contents,
+        // such as when hovering over a React component.
+        // Fetching the bounding rects _might_ be a bit slower up front,
+        // but once we have them fetched we can highlight any node in this pause immediately.
+        const boundingClientRects = await boundingRectsCache.readAsync(replayClient, pauseId!);
+        const boxModelsFromClientRects = nodeIds.map(nodeId => {
+          return boundingRectsToBoxModel(nodeId, boundingClientRects);
+        });
+        boxModels = boxModelsFromClientRects;
+      }
+
       dispatch(nodeBoxModelsLoaded(boxModels));
 
       if (unhighlightTimer) {
@@ -68,8 +92,12 @@ export function highlightNodes(
   };
 }
 
-export function highlightNode(nodeId: string, duration?: number): UIThunkAction {
-  return highlightNodes([nodeId], undefined, duration);
+export function highlightNode(
+  nodeId: string,
+  duration?: number,
+  useRealBoxModels?: boolean
+): UIThunkAction {
+  return highlightNodes([nodeId], undefined, duration, useRealBoxModels);
 }
 
 export function unhighlightNode(): UIThunkAction {
