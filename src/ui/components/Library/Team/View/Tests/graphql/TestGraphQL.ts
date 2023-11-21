@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 
-export const GET_TEST = gql`
-  query GetTestForWorkspace($workspaceId: ID!, $testId: String) {
+export const GET_WORKSPACE_TEST_EXECUTIONS = gql`
+  query GetWorkspaceTestExecutions($workspaceId: ID!, $testId: String) {
     node(id: $workspaceId) {
       ... on Workspace {
         id

@@ -1,12 +1,12 @@
 import { useQuery } from "@apollo/client";
 import { useContext } from "react";
 
-import { GetTestForWorkspace_node_Workspace } from "shared/graphql/generated/GetTestForWorkspace";
+import { GetWorkspaceTestExecutions_node_Workspace } from "shared/graphql/generated/GetWorkspaceTestExecutions";
 import { TestExecution } from "shared/test-suites/TestRun";
 import { TeamContext } from "ui/components/Library/Team/TeamContextRoot";
 import { convertRecording } from "ui/hooks/recordings";
 
-import { GET_TEST } from "../graphql/TestGraphQL";
+import { GET_WORKSPACE_TEST_EXECUTIONS } from "../graphql/TestGraphQL";
 
 export type ErrorFrequency = {
   executions: number;
@@ -15,8 +15,8 @@ export type ErrorFrequency = {
 
 export function useTest(testId: string) {
   const { teamId } = useContext(TeamContext);
-  const { data, loading, error } = useQuery<{ node: GetTestForWorkspace_node_Workspace }>(
-    GET_TEST,
+  const { data, loading, error } = useQuery<{ node: GetWorkspaceTestExecutions_node_Workspace }>(
+    GET_WORKSPACE_TEST_EXECUTIONS,
     {
       variables: { workspaceId: teamId, testId },
     }
