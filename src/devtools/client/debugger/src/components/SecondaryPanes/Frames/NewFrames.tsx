@@ -128,13 +128,15 @@ function PauseFrames({
   const selectedFrameId = useAppSelector(getSelectedFrameId);
   const dispatch = useAppDispatch();
 
-  function selectFrame(cx: Context, frame: PauseFrame) {
+  async function selectFrame(cx: Context, frame: PauseFrame) {
     if (pauseId !== currentPauseId) {
       const [point, time] = getPointAndTimeForPauseId(pauseId);
       if (point === null || time === null || !focusWindow || !isPointInRegion(point, focusWindow)) {
         return;
       }
-      dispatch(seek({ executionPoint: point, time, pauseId, openSource: true }));
+      await dispatch(
+        seek({ executionPoint: point, time, pauseId, location: frame.location, openSource: true })
+      );
     }
     dispatch(selectFrameAction(cx, frame));
   }

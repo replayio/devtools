@@ -34,7 +34,6 @@
 
   --primary-accent: #01acfd;
   --primary-accent-hover: #0194ff;
-  --primary-accent-foreground-text: #fff;
 
   --secondary-accent: #f02d5e;
   --secondary-accent-hover: #d72451;
@@ -145,6 +144,10 @@
 :root,
 :root.theme-dark {
   --color-transparent: rgba(0, 0, 0, 0);
+  --primary-accent-foreground-text: #fff;
+
+  --primary-accent-dimmed: #163e58;
+  --primary-accent-dimmed-foreground-text: var(--body-color);
 
   /* Color ramp (Dark) */
   --theme-base-100: #000; /* background chrome */
@@ -187,7 +190,9 @@
   --theme-text-field-bgcolor: var(--theme-base-85);
   --theme-text-field-color: #fff;
   --theme-text-field-placeholder-color: #babbbc;
-  --team-row-active: var(--theme-text-field-bgcolor);
+  --team-row-active: var(--primary-accent-dimmed);
+  --timing-container: var(--theme-base-85);
+  --timing-container-selected-row: #175e88;
   --tooltip-bgcolor: var(--theme-base-100);
   --tooltip-color: #fff;
   --tooltip-border: 1px solid rgba(43, 46, 49, 1);
@@ -208,6 +213,7 @@
   --background-color-default: #081120;
   --background-color-disabled-button: #454950;
   --background-color-error: #473036;
+  --background-color-highlight-change: transparent;
   --background-color-high-contrast-button: #081120;
   --background-color-inputs: var(--theme-text-field-bgcolor);
   --background-color-light: #18181a;
@@ -234,6 +240,7 @@
   --color-dim: #aaaaaa;
   --color-dimmer: #5f6977;
   --color-error: #ffb3d2;
+  --color-highlight-change: #ff0;
   --color-link: var(--color-brand);
   --color-primary-button: #ffffff;
   --color-secondary-button: #ffffff;
@@ -539,6 +546,7 @@
   --title-hover-bgcolor: var(--theme-toggle-bgcolor);
   --toolbarbutton-focus-bgcolor: var(--theme-base-95);
   --unloaded-region-img: url("/images/dotted-mask-dark.svg");
+  --listitem-row-divider: var(--chrome);
 
   /* Toolbar (Dark) */
   --theme-tab-toolbar-background: var(--grey-90);
@@ -665,6 +673,10 @@
 
 :root.theme-light {
   --color-transparent: rgba(255, 255, 255, 0);
+  --primary-accent-foreground-text: #fff;
+
+  --primary-accent-dimmed: #cceeff;
+  --primary-accent-dimmed-foreground-text: var(--body-color);
 
   /* Color ramp (Light) */
   --theme-base-100: hsl(0, 0%, 100%);
@@ -707,14 +719,16 @@
   --theme-text-field-bgcolor: #f6f6f6;
   --theme-text-field-color: var(--body-color);
   --theme-text-field-placeholder-color: #a9a9b1;
-  --team-row-active: #3f434a;
+  --team-row-active: #163e58; /* the dark version of --primary-accent-dimmed */
+  --timing-container: var(--theme-base-85);
+  --timing-container-selected-row: #94d9fd;
   --tooltip-bgcolor: #38383d;
   --tooltip-color: white;
   --tooltip-border: 1px solid transparent;
 
   --event-row-hover-background-color: rgba(232, 234, 237, 0.5);
 
-  /* 
+  /*
     Note: these contrast-[x] classes are deprecated.
     Please use our theme-base-[x] classes instead.
   */
@@ -726,6 +740,7 @@
   --background-color-default: #e9e9e9;
   --background-color-disabled-button: #666666;
   --background-color-error: #fcefee;
+  --background-color-highlight-change: mark;
   --background-color-high-contrast-button: #f2f2f2;
   --background-color-light: #f9f9fa;
   --background-color-primary-button-disabled: #d2d2d2;
@@ -757,6 +772,7 @@
   --color-dimmer: #aaaaaa;
   --color-disabled-button: #ffffff;
   --color-error: #ff0000;
+  --color-highlight-change: marktext;
   --color-high-contrast-button: #000000;
   --color-link: var(--color-brand);
   --color-primary-button: #ffffff;
@@ -1061,6 +1077,7 @@
   --title-hover-bgcolor: #e6e6e6;
   --toolbarbutton-focus-bgcolor: var(--theme-base-90);
   --unloaded-region-img: url("/images/dotted-mask-light.svg");
+  --listitem-row-divider: var(--grey-20);
 
   /* Toolbar */
   --theme-tab-toolbar-background: var(--grey-20);

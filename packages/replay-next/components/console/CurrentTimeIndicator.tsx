@@ -1,13 +1,13 @@
-import { useContext, useLayoutEffect } from "react";
+import { useLayoutEffect } from "react";
 
-import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
+import { useMostRecentLoadedPause } from "replay-next/src/hooks/useMostRecentLoadedPause";
 
 import styles from "./CurrentTimeIndicator.module.css";
 
 export default function CurrentTimeIndicator() {
-  const { executionPoint } = useContext(TimelineContext);
+  const { point } = useMostRecentLoadedPause() ?? {};
 
-  useLayoutEffect(scrollCurrentTimeIndicatorIntoView, [executionPoint]);
+  useLayoutEffect(scrollCurrentTimeIndicatorIntoView, [point]);
 
   return (
     <div className={styles.CurrentTimeIndicator} data-test-id="Console-CurrentTimeIndicator" />

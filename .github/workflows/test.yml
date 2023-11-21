@@ -8,6 +8,9 @@ on:
 env:
   RECORD_REPLAY_API_KEY: rwk_yaEG8jo6gcisGHHoMj8SNoOMIHSbT7REuU5E1QnKCiL
   RECORD_REPLAY_METADATA_TEST_RUN_TITLE: E2E Tests
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
 
 jobs:
   download-browser:

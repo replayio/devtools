@@ -69,9 +69,11 @@ export function TestSectionRow({
           const timeStampedPoint = getTestEventTimeStampedPoint(testEvent);
 
           if (timeStampedPoint) {
-            position = isExecutionPointsGreaterThan(timeStampedPoint.point, currentExecutionPoint)
-              ? "after"
-              : "before";
+            position =
+              !currentExecutionPoint ||
+              isExecutionPointsGreaterThan(timeStampedPoint.point, currentExecutionPoint)
+                ? "after"
+                : "before";
           }
           break;
         }

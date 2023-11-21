@@ -190,6 +190,8 @@ function BadgeRenderer({
               styles.DefaultColorBadge,
               showNewBadgeFlash && styles.PulsingBadge
             )}
+            data-test-name="LogpointBadge"
+            data-test-badge={badge}
           />
         </span>
       );
@@ -198,7 +200,7 @@ function BadgeRenderer({
     case "unicorn":
       return (
         <span className={styles.UnicornBadge}>
-          <span className={styles.Unicorn} />
+          <span className={styles.Unicorn} data-test-name="LogpointBadge" data-test-badge={badge} />
         </span>
       );
     default:
@@ -206,6 +208,8 @@ function BadgeRenderer({
         <span className={styles.BadgeContainer}>
           <span
             className={styles.ColorBadge}
+            data-test-name="LogpointBadge"
+            data-test-badge={badge}
             style={{
               // @ts-ignore
               "--badge-color": `var(--badge-${badge}-color)`,

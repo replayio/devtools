@@ -112,21 +112,21 @@ export default function useConsoleContextMenu(loggable: Loggable) {
             <div
               className={styles.UnicornBadge}
               data-test-id="ConsoleContextMenu-Badge-unicorn"
-              onSelect={() => setBadge("unicorn")}
+              onClick={() => setBadge("unicorn")}
             />
             {BADGES.map(badge => (
               <div
                 key={badge}
                 className={styles.ColorBadge}
                 data-test-id={`ConsoleContextMenu-Badge-${badge}`}
-                onSelect={() => setBadge(badge)}
+                onClick={() => setBadge(badge)}
                 style={{
                   // @ts-ignore
                   "--badge-color": `var(--badge-${badge}-color)`,
                 }}
               />
             ))}
-            <div className={styles.ColorBadgeClear} onSelect={() => setBadge(null)} />
+            <div className={styles.ColorBadgeClear} onClick={() => setBadge(null)} />
           </ContextMenuItem>
         </>
       )}

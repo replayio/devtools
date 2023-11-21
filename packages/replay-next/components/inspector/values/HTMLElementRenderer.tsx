@@ -8,6 +8,7 @@ import {
 } from "replay-next/src/contexts/InspectorContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { clientValueCache, objectCache } from "replay-next/src/suspense/ObjectPreviews";
+import { getPointAndTimeForPauseId } from "replay-next/src/suspense/PauseCache";
 import {
   Value as ClientValue,
   filterNonEnumerableProperties,
@@ -83,7 +84,9 @@ export default function HTMLElementRenderer({
       // InspectableTimestampedPointContext (e.g. if the HTML element to render is
       // from a console message)
       const { executionPoint, time } = timestampedPointContext || timelineContext;
-      inspectHTMLElement(protocolValue, pauseId, executionPoint, time);
+      if (executionPoint) {
+        inspectHTMLElement(protocolValue, pauseId, executionPoint, time);
+      }
     }
   };
 

@@ -15,9 +15,11 @@ import { ListOnItemsRenderedProps } from "react-window";
 import { useImperativeCacheValue } from "suspense";
 
 import { ElementsListData } from "replay-next/components/elements/ElementsListData";
+import { NoContentFallback } from "replay-next/components/elements/NoContentFallback";
 import { rootObjectIdCache } from "replay-next/components/elements/suspense/RootObjectIdCache";
 import { Item } from "replay-next/components/elements/types";
 import { DefaultFallback } from "replay-next/components/ErrorBoundary";
+import { LoadingProgressBar } from "replay-next/components/LoadingProgressBar";
 import { GenericList } from "replay-next/components/windowing/GenericList";
 import { useHorizontalScrollingListCssVariables } from "replay-next/components/windowing/hooks/useHorizontalScrollingListCssVariables";
 import { useScrollSelectedListItemIntoView } from "replay-next/components/windowing/hooks/useScrollSelectedListItemIntoView";
@@ -35,13 +37,11 @@ type OnSelectionChange = (id: ObjectId | null) => void;
 export function ElementsList({
   height,
   forwardedRef,
-  noContentFallback,
   onSelectionChange = null,
   pauseId,
 }: {
   height: number;
   forwardedRef?: ForwardedRef<ImperativeHandle>;
-  noContentFallback?: ReactElement;
   onSelectionChange?: OnSelectionChange | null;
   pauseId: PauseId;
 }) {
@@ -86,6 +86,11 @@ export function ElementsList({
     listData.didError,
     listData.didError
   );
+  const isLoading = useSyncExternalStore(
+    listData.subscribeToLoading,
+    listData.getIsLoading,
+    listData.getIsLoading
+  );
 
   useImperativeHandle(
     forwardedRef,
@@ -97,6 +102,8 @@ export function ElementsList({
           const index = await listData.loadPathToNode(nodeId);
           if (index != null) {
             listData.setSelectedIndex(index);
+          } else {
+            console.warn(`Index not found for node ${nodeId}`);
           }
         }
       },
@@ -163,19 +170,22 @@ export function ElementsList({
   };
 
   return (
-    <GenericList<Item, ElementsListItemData>
-      className={styles.List}
-      dataTestId="ElementsList"
-      fallbackForEmptyList={noContentFallback}
-      height={height}
-      itemData={itemData}
-      itemRendererComponent={ElementsListItem}
-      itemSize={ITEM_SIZE}
-      listData={listData}
-      onItemsRendered={onItemsRendered}
-      onKeyDown={onKeyDown}
-      style={cssVariables as CSSProperties}
-      width="100%"
-    />
+    <div className={styles.ListWrapper} style={{ height }}>
+      {isLoading && <LoadingProgressBar />}
+      <GenericList<Item, ElementsListItemData>
+        className={styles.List}
+        dataTestId="ElementsList"
+        fallbackForEmptyList={<NoContentFallback />}
+        height={height}
+        itemData={itemData}
+        itemRendererComponent={ElementsListItem}
+        itemSize={ITEM_SIZE}
+        listData={listData}
+        onItemsRendered={onItemsRendered}
+        onKeyDown={onKeyDown}
+        style={cssVariables as CSSProperties}
+        width="100%"
+      />
+    </div>
   );
 }

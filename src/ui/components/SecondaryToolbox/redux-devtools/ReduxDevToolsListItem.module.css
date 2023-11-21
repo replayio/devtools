@@ -3,7 +3,7 @@
   padding: 0 1ch;
   text-overflow: ellipsis;
   overflow: hidden;
-  border-bottom: 1px solid var(--theme-toolbar-background);
+  border-bottom: 1px solid var(--listitem-row-divider);
 }
 .ListItem[data-relative-position="after"] {
   opacity: 0.5;
@@ -18,18 +18,30 @@
   opacity: 1;
 }
 .ListItem[data-selected] {
-  background-color: var(--theme-selection-background);
-  color: var(--theme-selection-color);
+  background-color: var(--primary-accent-dimmed);
+  color: var(--body-color);
   opacity: 1;
 }
 
 .JumpToCodeButton {
-  display: none;
+  font-family: var(--font-family-default);
+  font-weight: bold;
+  padding: 0 0.125rem;
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  box-shadow: 0 0 1px var(--theme-tooltip-shadow);
+  left: 0;
+  top: 0;
+  height: 1.5rem;
+  outline: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  cursor: pointer;
+  display: none;
+  border-radius: 0 1rem 1rem 0;
 }
+
 .ListItem:hover .JumpToCodeButton {
   display: flex;
 }

@@ -1,6 +1,6 @@
 import { unstable_Offscreen as Offscreen, Suspense, useContext, useMemo, useState } from "react";
 
-import Loader from "replay-next/components/Loader";
+import { PanelLoader } from "replay-next/components/PanelLoader";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { useSources } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -55,7 +55,7 @@ export function ProtocolViewerPanel() {
           <LiveProtocolRequests />
         </Offscreen>
         {isRecordingOfReplay && safeSelectedTab === "recorded" ? (
-          <Suspense fallback={<Loader />}>
+          <Suspense fallback={<PanelLoader />}>
             <RecordedProtocolRequests />
           </Suspense>
         ) : null}

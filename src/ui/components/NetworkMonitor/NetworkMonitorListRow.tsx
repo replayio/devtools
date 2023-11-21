@@ -10,7 +10,7 @@ import { RequestSummary } from "ui/components/NetworkMonitor/utils";
 
 import styles from "./NetworkMonitorListRow.module.css";
 
-export const LIST_ROW_HEIGHT = 27;
+export const LIST_ROW_HEIGHT = 26;
 
 export type ItemData = {
   columns: EnabledColumns;

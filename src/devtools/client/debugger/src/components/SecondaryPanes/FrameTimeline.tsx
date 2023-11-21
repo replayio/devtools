@@ -50,7 +50,7 @@ interface FrameTimelineProps {
   selectedFrame: PauseFrame | null;
   frameSteps: PointDescription[] | undefined;
   symbols: getSourceOutlineResult | null;
-  seek: (point: string, time: number, hasFrames: boolean) => void;
+  seek: (point: string, time: number, hasFrames: boolean, location?: Location) => void;
   setPreviewPausedLocation: (location: Location) => void;
   sourcesState: SourcesState;
 }
@@ -148,14 +148,17 @@ class FrameTimelineRenderer extends Component<FrameTimelineProps, FrameTimelineS
   };
 
   onMouseUp = (event: MouseEvent) => {
-    const { seek } = this.props;
+    const { seek, sourcesState } = this.props;
 
     const progress = this.getProgress(event.clientX);
     const position = this.getPosition(progress);
     this.setState({ scrubbing: false });
 
     if (position) {
-      seek(position.point, position.time, true);
+      const location = position.frame
+        ? getPreferredLocation(sourcesState, position.frame)
+        : undefined;
+      seek(position.point, position.time, true, location);
     }
   };
 
@@ -238,8 +241,8 @@ function FrameTimeline() {
     : undefined;
   const dispatch = useAppDispatch();
 
-  const seek = (executionPoint: string, time: number, openSource: boolean) =>
-    dispatch(actions.seek({ executionPoint, openSource, time }));
+  const seek = (executionPoint: string, time: number, openSource: boolean, location?: Location) =>
+    dispatch(actions.seek({ executionPoint, location, openSource, time }));
   const setPreviewPausedLocation = (location: Location) =>
     dispatch(actions.setPreviewPausedLocation(location));
 

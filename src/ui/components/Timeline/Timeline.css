@@ -6,7 +6,7 @@
   box-sizing: border-box;
   --progressbar-transition: 200ms;
   display: flex;
-  padding: 10px 12px 12px 6px;
+  padding: 10px 0px 12px 6px;
   align-items: center;
   user-select: none;
 
@@ -52,6 +52,7 @@
   display: flex;
   position: relative;
   flex-grow: 1;
+  padding-right: 10px;
 }
 
 .progress-bar-stack {
@@ -235,4 +236,9 @@
 
 .timeline .progress-line-paused-edit-mode-inactive {
   background: var(--secondary-accent);
+}
+
+.timeline .progress-line-paused-edit-mode-active.dimmed,
+.timeline .progress-line-paused-edit-mode-inactive.dimmed {
+  opacity: 0.5;
 }

@@ -204,6 +204,9 @@ function PointPanelWithHitPoints({
   // This is a more intuitive experience than using the current execution point,
   // which may be paused at a different location.
   const closestHitPoint = useMemo(() => {
+    if (!currentExecutionPoint) {
+      return null;
+    }
     const executionPoints = hitPoints.map(hitPoint => hitPoint.point);
     const index = findIndexBigInt(executionPoints, currentExecutionPoint, false);
     return hitPoints[index] || null;
@@ -288,7 +291,7 @@ function PointPanelWithHitPoints({
   };
 
   const addComment = () => {
-    if (accessToken === null) {
+    if (accessToken === null || !currentExecutionPoint) {
       return;
     }
 

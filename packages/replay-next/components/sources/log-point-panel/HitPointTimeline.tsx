@@ -22,7 +22,7 @@ import { formatTimestamp } from "replay-next/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { HitPointStatus, Point } from "shared/client/types";
 
-import { findHitPointAfter, findHitPointBefore } from "../utils/points";
+import { findHitPointAfter, findHitPointBefore, noMatchTuple } from "../utils/points";
 import { findHitPoint } from "../utils/points";
 import Capsule from "./Capsule";
 import styles from "./HitPointTimeline.module.css";
@@ -72,7 +72,8 @@ export default function HitPointTimeline({
   }, [currentTime]);
 
   const [closestHitPoint, closestHitPointIndex] = useMemo(
-    () => findHitPoint(hitPoints, currentExecutionPoint, false),
+    () =>
+      currentExecutionPoint ? findHitPoint(hitPoints, currentExecutionPoint, false) : noMatchTuple,
     [currentExecutionPoint, hitPoints]
   );
 
@@ -113,30 +114,40 @@ export default function HitPointTimeline({
   const firstHitPoint = hitPoints.length > 0 ? hitPoints[0] : null;
   const lastHitPoint = hitPoints.length > 0 ? hitPoints[hitPoints.length - 1] : null;
   const previousButtonEnabled =
-    firstHitPoint != null && isExecutionPointsLessThan(firstHitPoint.point, currentExecutionPoint);
+    currentExecutionPoint &&
+    firstHitPoint != null &&
+    isExecutionPointsLessThan(firstHitPoint.point, currentExecutionPoint);
   const nextButtonEnabled =
-    lastHitPoint != null && isExecutionPointsGreaterThan(lastHitPoint.point, currentExecutionPoint);
+    currentExecutionPoint &&
+    lastHitPoint != null &&
+    isExecutionPointsGreaterThan(lastHitPoint.point, currentExecutionPoint);
 
   const goToIndex = (index: number) => {
     const hitPoint = hitPoints[index];
     if (hitPoint !== null) {
       setOptimisticTime(hitPoint.time);
-      update(hitPoint.time, hitPoint.point, false);
+      update(hitPoint.time, hitPoint.point, false, point.location);
     }
   };
 
   const goToPrevious = () => {
+    if (!currentExecutionPoint) {
+      return;
+    }
     const [prevHitPoint] = findHitPointBefore(hitPoints, currentExecutionPoint);
     if (prevHitPoint !== null) {
       setOptimisticTime(prevHitPoint.time);
-      update(prevHitPoint.time, prevHitPoint.point, false);
+      update(prevHitPoint.time, prevHitPoint.point, false, point.location);
     }
   };
   const goToNext = () => {
+    if (!currentExecutionPoint) {
+      return;
+    }
     const [nextHitPoint] = findHitPointAfter(hitPoints, currentExecutionPoint);
     if (nextHitPoint !== null) {
       setOptimisticTime(nextHitPoint.time);
-      update(nextHitPoint.time, nextHitPoint.point, false);
+      update(nextHitPoint.time, nextHitPoint.point, false, point.location);
     }
   };
 
@@ -217,7 +228,7 @@ export default function HitPointTimeline({
               event.preventDefault();
 
               setOptimisticTime(hitPoint.time);
-              update(hitPoint.time, hitPoint.point, false);
+              update(hitPoint.time, hitPoint.point, false, point.location);
             }}
             style={{
               left: `${(100 * hitPoint.time) / duration}%`,

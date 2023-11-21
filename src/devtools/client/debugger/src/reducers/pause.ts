@@ -49,8 +49,11 @@ export interface PauseAndFrameId {
   frameId: FrameId;
 }
 
+export type SeekState = "find-point" | "create-pause" | "paused";
+
 export interface PauseState {
   cx: { navigateCounter: number };
+  seekState: SeekState;
   id: string | undefined;
   threadcx: ThreadContext;
   pausePreviewLocation: Location | null;
@@ -62,6 +65,9 @@ export interface PauseState {
 }
 
 const resumedPauseState = {
+  seekState: "find-point" as SeekState,
+  id: undefined,
+  pausePreviewLocation: null,
   selectedFrameId: null,
   executionPoint: null,
 };
@@ -75,8 +81,6 @@ const initialState: PauseState = {
     isPaused: false,
     pauseCounter: 0,
   },
-  id: undefined,
-  pausePreviewLocation: null,
   time: 0,
   ...resumedPauseState,
   pauseHistory: [],
@@ -111,8 +115,10 @@ export const executeCommandOperation = createAsyncThunk<
 
   if (resumeTarget && isPointInRegion(resumeTarget.point, focusWindow)) {
     const { point, time, frame } = resumeTarget;
-    dispatch(seek({ executionPoint: point, time, openSource: !!frame }));
+    const location = frame ? getPreferredLocation(state.sources, frame) : undefined;
+    dispatch(seek({ executionPoint: point, time, location, openSource: !!frame }));
   } else {
+    //TODO this has been cleared by resumed() above!?
     const executionPoint = getExecutionPoint(state);
     if (executionPoint) {
       dispatch(seek({ executionPoint, time: getTime(state), openSource: true }));
@@ -135,44 +141,46 @@ const pauseSlice = createSlice({
     pauseRequestedAt(
       state,
       action: PayloadAction<{
-        executionPoint: string;
+        executionPoint?: string;
         time: number;
+        location?: Location;
       }>
     ) {
-      const { executionPoint, time } = action.payload;
+      const { executionPoint, location, time } = action.payload;
       Object.assign(state, {
+        seekState: executionPoint ? "create-pause" : "find-point",
         id: undefined,
-        executionPoint,
+        executionPoint: executionPoint ?? null,
         time,
-      });
+        pausePreviewLocation: location ?? null,
+      } satisfies Partial<PauseState>);
       state.threadcx.isPaused = true;
     },
     paused(
       state,
       action: PayloadAction<{
         id: string;
-        frame?: PauseFrame;
         executionPoint: string;
         time: number;
       }>
     ) {
-      const { id, frame, executionPoint, time } = action.payload;
+      const { id, executionPoint, time } = action.payload;
       Object.assign(state, {
+        seekState: "paused",
         id,
         executionPoint,
         time,
-      });
+      } satisfies Partial<PauseState>);
 
-      state.selectedFrameId = frame ? { pauseId: frame.pauseId, frameId: frame.protocolId } : null;
+      state.selectedFrameId = null;
       state.threadcx.pauseCounter++;
-      state.pausePreviewLocation = null;
       if (state.pauseHistory[state.pauseHistoryIndex]?.executionPoint !== executionPoint) {
         state.pauseHistory = state.pauseHistory.slice(0, state.pauseHistoryIndex + 1);
         state.pauseHistory.push({
           pauseId: id,
           time,
           executionPoint,
-          hasFrames: !!frame,
+          hasFrames: false,
         });
         state.pauseHistoryIndex++;
       }
@@ -183,13 +191,16 @@ const pauseSlice = createSlice({
     pauseHistoryIncremented(state) {
       state.pauseHistoryIndex++;
     },
-    pauseCreationFailed(state, action: PayloadAction<string>) {
-      const executionPoint = action.payload;
+    pauseCreationFailed(state) {
+      const lastPause = state.pauseHistory[state.pauseHistoryIndex];
       Object.assign(state, {
-        id: undefined,
-        selectedFrameId: undefined,
-        executionPoint,
-      });
+        seekState: "paused",
+        id: lastPause?.pauseId,
+        executionPoint: lastPause?.executionPoint ?? null,
+        time: lastPause?.time ?? 0,
+        pausePreviewLocation: null,
+        selectedFrameId: null,
+      } satisfies Partial<PauseState>);
 
       state.threadcx.pauseCounter++;
       state.threadcx.isPaused = false;
@@ -243,6 +254,10 @@ export function getContext(state: UIState) {
 
 export function getThreadContext(state: UIState) {
   return state.pause.threadcx;
+}
+
+export function getSeekState(state: UIState) {
+  return state.pause.seekState;
 }
 
 export function getSelectedFrameId(state: UIState) {

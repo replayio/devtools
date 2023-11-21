@@ -24,7 +24,7 @@ export default function CodeCompletionPlugin({
   context: Context;
   dataTestId?: string;
   dataTestName?: string;
-  executionPoint: ExecutionPoint;
+  executionPoint: ExecutionPoint | null;
   time: number;
 }): JSX.Element {
   const [editor] = useLexicalComposerContext();
@@ -34,7 +34,9 @@ export default function CodeCompletionPlugin({
   const focusWindow = useCurrentFocusWindow();
 
   const findMatchesWrapper = (query: string, queryScope: string | null) => {
-    return findMatches(query, queryScope, replayClient, executionPoint, time, focusWindow, context);
+    return executionPoint
+      ? findMatches(query, queryScope, replayClient, executionPoint, time, focusWindow, context)
+      : [];
   };
 
   useEffect(() => {

@@ -19,7 +19,12 @@ import { compareExecutionPoints } from "replay-next/src/utils/time";
 import { ReplayClientInterface } from "shared/client/types";
 import { findFunctionOutlineForLocation } from "ui/actions/eventListeners/jumpToCode";
 import { SourceDetails } from "ui/reducers/sources";
-import { FormattedPointStack, formattedPointStackCache } from "ui/suspense/frameCache";
+import {
+  FormattedPointStack,
+  FormattedPointStackWithRelevantFrame,
+  formattedPointStackCache,
+  relevantAppFrameCache,
+} from "ui/suspense/frameCache";
 
 interface PointWithLocation {
   location: Location;
@@ -51,6 +56,10 @@ export const reactRenderQueuedJumpLocationCache: Cache<
       executionPoint,
       earliestAppCodeFrame.index
     );
+
+    if (!pointDescription) {
+      return undefined;
+    }
 
     return {
       location,
@@ -224,15 +233,15 @@ export const reactInternalMethodsHitsIntervalCache = createFocusIntervalCacheFor
 export type ReactUpdateScheduled = {
   type: "scheduled";
   cause: "user" | "internal" | "unknown";
-} & FormattedPointStack;
+} & FormattedPointStackWithRelevantFrame;
 
 export type ReactSyncUpdatedStarted = {
   type: "sync_started";
-} & FormattedPointStack;
+} & FormattedPointStackWithRelevantFrame;
 
 export type ReactRenderCommitted = {
   type: "render_committed";
-} & FormattedPointStack;
+} & FormattedPointStackWithRelevantFrame;
 
 export type ReactRenderEntry =
   | ReactUpdateScheduled
@@ -269,10 +278,7 @@ export const reactRendersIntervalCache = createFocusIntervalCacheForExecutionPoi
 
     const scheduleUpdateEntriesPromise = Promise.all(
       scheduleUpdateHits.map(async hit => {
-        const mostlyFormattedPointStack = await formattedPointStackCache.readAsync(
-          replayClient,
-          hit
-        );
+        const mostlyFormattedPointStack = await relevantAppFrameCache.readAsync(replayClient, hit);
 
         const cause = mostlyFormattedPointStack.frame ? "user" : "unknown";
 
@@ -287,10 +293,7 @@ export const reactRendersIntervalCache = createFocusIntervalCacheForExecutionPoi
 
     const renderRootSyncEntriesPromise = Promise.all(
       renderRootSyncHits.map(async hit => {
-        const mostlyFormattedPointStack = await formattedPointStackCache.readAsync(
-          replayClient,
-          hit
-        );
+        const mostlyFormattedPointStack = await relevantAppFrameCache.readAsync(replayClient, hit);
 
         const result: ReactSyncUpdatedStarted = {
           type: "sync_started",
@@ -301,10 +304,7 @@ export const reactRendersIntervalCache = createFocusIntervalCacheForExecutionPoi
     );
     const onCommitRootEntriesPromise = Promise.all(
       onCommitRootHits.map(async hit => {
-        const mostlyFormattedPointStack = await formattedPointStackCache.readAsync(
-          replayClient,
-          hit
-        );
+        const mostlyFormattedPointStack = await relevantAppFrameCache.readAsync(replayClient, hit);
 
         const result: ReactRenderCommitted = {
           type: "render_committed",

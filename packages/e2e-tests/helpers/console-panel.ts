@@ -1,6 +1,8 @@
 import { Locator, Page, expect } from "@playwright/test";
 import chalk from "chalk";
 
+import { Badge } from "shared/client/types";
+
 import { submitCurrentText as submitCurrentTextLexical, type as typeLexical } from "./lexical";
 import { waitForPaused } from "./pause-information-panel";
 import { Expected, MessageType } from "./types";
@@ -501,4 +503,14 @@ export async function openContextMenu(listItem: Locator, options: { useLeftClick
   // Inspector has its own context menu with "copy object"
   await listItem.hover();
   await listItem.click({ button: useLeftClick ? "left" : "right", position: { x: 10, y: 10 } });
+}
+
+export async function setLogpointBadge(page: Page, message: Locator, badge: Badge | null) {
+  await openContextMenu(message);
+  await page.locator(`[data-test-id="ConsoleContextMenu-Badge-${badge}"]`).click();
+}
+
+export async function verifyLogpointBadge(message: Locator, badge: Badge | null) {
+  const badgeLocator = message.locator(`[data-test-name="LogpointBadge"]`);
+  expect(await badgeLocator.getAttribute("data-test-badge")).toBe(badge);
 }

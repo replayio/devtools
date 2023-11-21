@@ -17,6 +17,7 @@ import {
 import AutoSizer from "react-virtualized-auto-sizer";
 
 import ErrorBoundary from "replay-next/components/ErrorBoundary";
+import { PanelLoader } from "replay-next/components/PanelLoader";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { InspectButton } from "ui/components/SecondaryToolbox/react-devtools/components/InspectButton";
 import { ReactDevToolsList } from "ui/components/SecondaryToolbox/react-devtools/components/ReactDevToolsList";
@@ -27,8 +28,6 @@ import { SelectedElementLoader } from "ui/components/SecondaryToolbox/react-devt
 import { useReactDevToolsAnnotations } from "ui/components/SecondaryToolbox/react-devtools/hooks/useReactDevToolsAnnotations";
 import { useReplayWall } from "ui/components/SecondaryToolbox/react-devtools/hooks/useReplayWall";
 import { ReactDevToolsListData } from "ui/components/SecondaryToolbox/react-devtools/ReactDevToolsListData";
-import { ReactDevToolsInlineModule } from "ui/components/SecondaryToolbox/react-devtools/types";
-import { SecondaryToolboxLoadingPanel } from "ui/components/SecondaryToolbox/SecondaryToolboxLoadingPanel";
 import {
   ParsedReactDevToolsAnnotation,
   reactDevToolsAnnotationsCache,
@@ -46,7 +45,7 @@ export function ReactDevToolsPanel({
   const replayClient = useContext(ReplayClientContext);
 
   if (executionPoint == null || pauseId == null) {
-    return <SecondaryToolboxLoadingPanel />;
+    return <PanelLoader />;
   }
 
   const annotations = reactDevToolsAnnotationsCache.read(replayClient);

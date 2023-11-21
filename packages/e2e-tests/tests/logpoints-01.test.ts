@@ -4,9 +4,12 @@ import {
   findConsoleMessage,
   openConsolePanel,
   seekToConsoleMessage,
+  setLogpointBadge,
+  verifyLogpointBadge,
 } from "../helpers/console-panel";
 import { resumeToLine, reverseStepOverToLine } from "../helpers/pause-information-panel";
 import { addBreakpoint, addLogpoint } from "../helpers/source-panel";
+import { waitFor } from "../helpers/utils";
 import test, { expect } from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "doc_rr_basic.html" });
@@ -46,6 +49,15 @@ test(`logpoints-01: log-points appear in the correct order and allow time warpin
   await expect(logPointMessages).toHaveCount(12);
   await expect(logPointMessages.first()).toHaveText(/Beginning/);
   await expect(logPointMessages.last()).toHaveText(/Ending/);
+
+  await verifyLogpointBadge(logPointMessages.nth(1), null);
+  await setLogpointBadge(page, logPointMessages.nth(1), "unicorn");
+  await waitFor(async () => {
+    await verifyLogpointBadge(logPointMessages.nth(1), "unicorn");
+    await verifyLogpointBadge(logPointMessages.nth(2), "unicorn");
+  });
+  await verifyLogpointBadge(logPointMessages.first(), null);
+  await verifyLogpointBadge(logPointMessages.last(), null);
 
   const message = await findConsoleMessage(page, "Number 5", "log-point");
   await seekToConsoleMessage(page, message);

@@ -6,7 +6,6 @@ import { MouseEvent, ReactNode, Suspense, useContext, useDeferredValue } from "r
 import { selectNode } from "devtools/client/inspector/markup/actions/markup";
 import Expandable from "replay-next/components/Expandable";
 import Icon from "replay-next/components/Icon";
-import PropertiesRenderer from "replay-next/components/inspector/PropertiesRenderer";
 import Loader from "replay-next/components/Loader";
 import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
@@ -17,6 +16,10 @@ import { PreferencesKey } from "shared/user-data/LocalStorage/types";
 import useLocalStorageUserData from "shared/user-data/LocalStorage/useLocalStorageUserData";
 import { setSelectedPanel } from "ui/actions/layout";
 import { Badge } from "ui/components/SecondaryToolbox/react-devtools/components/Badge";
+import {
+  ContextPropsStateRenderer,
+  SectionType,
+} from "ui/components/SecondaryToolbox/react-devtools/components/ContextPropsStateRenderer";
 import { HooksRenderer } from "ui/components/SecondaryToolbox/react-devtools/components/HooksRenderer";
 import { MAX_KEY_LENGTH } from "ui/components/SecondaryToolbox/react-devtools/components/ReactDevToolsListItem";
 import { nodesToFiberIdsCache } from "ui/components/SecondaryToolbox/react-devtools/injectReactDevtoolsBackend";
@@ -26,7 +29,10 @@ import {
   StoreWithInternals,
 } from "ui/components/SecondaryToolbox/react-devtools/ReplayWall";
 import { inspectedElementCache } from "ui/components/SecondaryToolbox/react-devtools/suspense/inspectedElementCache";
-import { ReactElement } from "ui/components/SecondaryToolbox/react-devtools/types";
+import {
+  InspectedReactElement,
+  ReactElement,
+} from "ui/components/SecondaryToolbox/react-devtools/types";
 import { useAppDispatch } from "ui/setup/hooks";
 
 import styles from "./SelectedElement.module.css";
@@ -35,7 +41,7 @@ export function SelectedElement({
   bridge,
   element,
   listData,
-  pauseId,
+  pauseId: defaultPriorityPauseId,
   replayWall,
   store,
 }: {
@@ -48,6 +54,8 @@ export function SelectedElement({
 }) {
   const replayClient = useContext(ReplayClientContext);
   const { inspectFunctionDefinition } = useContext(InspectorContext);
+
+  const pauseId = useDeferredValue(defaultPriorityPauseId);
 
   const dispatch = useAppDispatch();
 
@@ -161,24 +169,52 @@ export function SelectedElement({
             })}
           </Section>
         )}
-        {props && <InspectableSection objectId={propsObjectId} pauseId={pauseId} title="Props" />}
-        {state && <InspectableSection objectId={stateObjectId} pauseId={pauseId} title="State" />}
-        {hooks && <InspectableSection objectId={hooksObjectId} pauseId={pauseId} title="Hooks" />}
+        {props && (
+          <InspectableSection
+            inspectedElement={inspectedElement}
+            objectId={propsObjectId}
+            pauseId={pauseId}
+            title="Props"
+          />
+        )}
+        {state && (
+          <InspectableSection
+            inspectedElement={inspectedElement}
+            objectId={stateObjectId}
+            pauseId={pauseId}
+            title="State"
+          />
+        )}
+        {hooks && (
+          <InspectableSection
+            inspectedElement={inspectedElement}
+            objectId={hooksObjectId}
+            pauseId={pauseId}
+            title="Hooks"
+          />
+        )}
         {context && (
-          <InspectableSection objectId={contextObjectId} pauseId={pauseId} title="Context" />
+          <InspectableSection
+            inspectedElement={inspectedElement}
+            objectId={contextObjectId}
+            pauseId={pauseId}
+            title="Context"
+          />
         )}
       </div>
     </div>
   );
 }
 
-type SectionTitle = "Context" | "Hooks" | "Props" | "Rendered by" | "State";
+export type SectionTitle = "Context" | "Hooks" | "Props" | "Rendered by" | "State";
 
 function InspectableSection({
+  inspectedElement,
   objectId,
   pauseId,
   title,
 }: {
+  inspectedElement: InspectedReactElement;
   objectId: ObjectId | null;
   pauseId: PauseId;
   title: SectionTitle;
@@ -186,18 +222,27 @@ function InspectableSection({
   return (
     <Section key={objectId} title={title}>
       <Suspense fallback={<Loader />}>
-        <InspectableSectionInner objectId={objectId} pauseId={pauseId} />
+        <InspectableSectionInner
+          inspectedElement={inspectedElement}
+          objectId={objectId}
+          pauseId={pauseId}
+          title={title}
+        />
       </Suspense>
     </Section>
   );
 }
 
 function InspectableSectionInner({
+  inspectedElement,
   objectId,
   pauseId,
+  title,
 }: {
+  inspectedElement: InspectedReactElement;
   objectId: ObjectId | null;
   pauseId: PauseId;
+  title: SectionTitle;
 }) {
   const replayClient = useContext(ReplayClientContext);
 
@@ -213,16 +258,39 @@ function InspectableSectionInner({
   if (object.className === "Array") {
     // Render hooks differently; it's an Array but we don't want to show the indices.
     // It also reflects hooks internals that we shouldn't be showing directly.
-    return object.preview.properties.map((property, index) => (
+    return (
       <HooksRenderer
-        key={index}
-        objectId={property.object as ObjectId}
+        inspectedElement={inspectedElement}
+        objectId={object.objectId as ObjectId}
         pauseId={pauseId}
         replayClient={replayClient}
       />
-    )) as any;
+    );
   } else {
-    return <PropertiesRenderer hidePrototype key="properties" object={object} pauseId={pauseId} />;
+    let sectionType: SectionType | null = null;
+    switch (title) {
+      case "Context":
+        sectionType = "context";
+        break;
+      case "Props":
+        sectionType = "props";
+        break;
+      case "State":
+        sectionType = "state";
+        break;
+    }
+    assert(sectionType);
+
+    return (
+      <ContextPropsStateRenderer
+        inspectedElement={inspectedElement}
+        key="properties"
+        objectId={object.objectId as ObjectId}
+        pauseId={pauseId}
+        replayClient={replayClient}
+        sectionType={sectionType}
+      />
+    );
   }
 }
 
@@ -251,7 +319,7 @@ function Section({ children, title }: { children: ReactNode; title: SectionTitle
   const [expanded, setExpanded] = useLocalStorageUserData(key);
 
   return (
-    <div className={styles.Section}>
+    <div className={styles.Section} data-test-id={`ReactDevTools-Section-${title}`}>
       <Expandable
         children={children}
         childrenClassName={styles.SectionChildren}

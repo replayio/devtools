@@ -6,6 +6,7 @@ import { FilterBarContainer } from "./FilterBarContainer";
 import { TestRunsPage as NewTestRunsPage } from "./NewTestRuns/TestRunsPage";
 import { RecordingsPage } from "./Recordings/RecordingsPage";
 import { TestRunsPage } from "./TestRuns/TestRunsPage";
+import { TestsPage } from "./Tests/TestsPage";
 import { ViewContext, ViewContextRoot } from "./ViewContextRoot";
 
 export function ViewPage({ defaultView }: { defaultView: string }) {
@@ -25,11 +26,15 @@ export function ViewPageContent() {
       <div className="flex flex-grow flex-row overflow-hidden">
         {view === "recordings" ? (
           <RecordingsPage />
-        ) : enableTestSuitesNewRunsView ? (
-          <NewTestRunsPage />
-        ) : (
-          <TestRunsPage />
-        )}
+        ) : view === "runs" ? (
+          enableTestSuitesNewRunsView ? (
+            <NewTestRunsPage />
+          ) : (
+            <TestRunsPage />
+          )
+        ) : view === "tests" ? (
+          <TestsPage />
+        ) : null}
       </div>
     </div>
   );

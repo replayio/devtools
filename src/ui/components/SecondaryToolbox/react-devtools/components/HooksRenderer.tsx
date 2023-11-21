@@ -9,18 +9,48 @@ import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientInterface } from "shared/client/types";
 import { hookLocationCache } from "ui/components/SecondaryToolbox/react-devtools/suspense/hookLocationCache";
 import { hookNameCache } from "ui/components/SecondaryToolbox/react-devtools/suspense/hookNameCache";
+import { InspectedReactElement } from "ui/components/SecondaryToolbox/react-devtools/types";
 import { findProtocolObjectProperty } from "ui/components/SecondaryToolbox/react-devtools/utils/findProtocolObjectProperty";
 import { findProtocolObjectPropertyValue } from "ui/components/SecondaryToolbox/react-devtools/utils/findProtocolObjectPropertyValue";
 
 import styles from "./HooksRenderer.module.css";
 
 export function HooksRenderer({
+  inspectedElement,
+  objectId,
+  pauseId,
+  replayClient,
+}: {
+  inspectedElement: InspectedReactElement;
+  objectId: ObjectId;
+  pauseId: PauseId;
+  replayClient: ReplayClientInterface;
+}) {
+  const object = objectCache.read(replayClient, pauseId, `${objectId}`, "canOverflow");
+  if (!object.preview?.properties) {
+    return null;
+  }
+
+  return object.preview.properties.map((property, index) => (
+    <HookRenderer
+      inspectedElement={inspectedElement}
+      key={index}
+      objectId={property.object as ObjectId}
+      pauseId={pauseId}
+      replayClient={replayClient}
+    />
+  )) as any;
+}
+
+function HookRenderer({
   depth = 0,
+  inspectedElement,
   objectId,
   pauseId,
   replayClient,
 }: {
   depth?: number;
+  inspectedElement: InspectedReactElement;
   objectId: ObjectId;
   pauseId: PauseId;
   replayClient: ReplayClientInterface;
@@ -30,6 +60,7 @@ export function HooksRenderer({
   const hookObject = objectCache.read(replayClient, pauseId, `${objectId}`, "canOverflow");
 
   let hookName = findProtocolObjectPropertyValue<string>(hookObject, "name") || "Anonymous";
+  const id = findProtocolObjectPropertyValue<number>(hookObject, "id") ?? null;
   const subHooksProperty = findProtocolObjectProperty(hookObject, "subHooks");
   const valueProperty = findProtocolObjectProperty(hookObject, "value");
 
@@ -68,7 +99,16 @@ export function HooksRenderer({
   if (isCustomHook) {
     renderedName = <span className={styles.CustomHookName}>{hookName}</span>;
   } else {
-    renderedName = <span className={styles.BuiltInHookName}>{hookName}</span>;
+    let highlightChanged = false;
+    if (id != null && inspectedElement.changedHooksIds.includes(id)) {
+      highlightChanged = true;
+    }
+
+    renderedName = (
+      <span className={styles.BuiltInHookName} data-changed={highlightChanged || undefined}>
+        {hookName}
+      </span>
+    );
   }
 
   if (hookSourceFunctionLocation) {
@@ -86,7 +126,7 @@ export function HooksRenderer({
         {renderedName}
         <button
           className={styles.ViewSourceIconButton}
-          date-test-name="JumpToDefinitionButton"
+          data-test-name="JumpToDefinitionButton"
           onClick={viewFunctionSource}
           title="Jump to definition"
         >
@@ -138,8 +178,9 @@ export function HooksRenderer({
     rendered = (
       <Expandable
         children={subHooks?.preview?.properties?.map((property, index) => (
-          <HooksRenderer
+          <HookRenderer
             depth={depth + 1}
+            inspectedElement={inspectedElement}
             key={index}
             objectId={property.object as ObjectId}
             pauseId={pauseId}
@@ -160,7 +201,7 @@ export function HooksRenderer({
   }
 
   return (
-    <div className={styles.Wrapper} data-depth={depth}>
+    <div className={styles.Wrapper} data-depth={depth} data-test-name={`Hook-${hookName}`}>
       {rendered}
     </div>
   );

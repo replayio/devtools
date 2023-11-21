@@ -59,7 +59,7 @@ type Props = {
   dataTestId?: string;
   dataTestName?: string;
   editable: boolean;
-  executionPoint: ExecutionPoint;
+  executionPoint: ExecutionPoint | null;
   forwardedRef?: ForwardedRef<ImperativeHandle>;
   initialValue: string;
   onCancel?: () => void;

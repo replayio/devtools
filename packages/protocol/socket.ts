@@ -102,6 +102,7 @@ const noCallerStackTracesForFailedCommands = new Set<CommandMethods>([
 
 export type ExperimentalSettings = {
   controllerKey?: string;
+  deprioritizeTraffic?: boolean;
   disableCache?: boolean;
   disableConcurrentControllerLoading?: boolean;
   disableIncrementalSnapshots?: boolean;

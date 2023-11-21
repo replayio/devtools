@@ -12,6 +12,7 @@ import { copyToClipboard as copyTextToClipboard } from "replay-next/components/s
 import { useSourcesById } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { userData } from "shared/user-data/GraphQL/UserData";
+import { setSelectedPrimaryPanel } from "ui/actions/layout";
 import { MiniSource, getSelectedSourceId } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
@@ -61,6 +62,7 @@ export default function useTabContextMenu({ source }: { source: MiniSource }) {
   const onRevealInTreeClick = async () => {
     await userData.set("layout_sourcesCollapsed", false);
 
+    dispatch(setSelectedPrimaryPanel("explorer"));
     dispatch(showSource(cx, source.id));
   };
 

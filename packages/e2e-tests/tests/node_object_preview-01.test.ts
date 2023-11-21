@@ -4,6 +4,7 @@ import {
   openConsolePanel,
   verifyConsoleMessage,
 } from "../helpers/console-panel";
+import { getByTestName } from "../helpers/utils";
 import test, { expect } from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "node/objects.js" });
@@ -29,7 +30,7 @@ test("node_object_preview: Showing console objects in node", async ({
   await verifyConsoleMessage(page, "RangeError: foo");
 
   const functionMessage = await findConsoleMessage(page, "bar()");
-  const jumpIcon = functionMessage.locator('[date-test-name="JumpToDefinitionButton"]');
+  const jumpIcon = getByTestName(functionMessage, "JumpToDefinitionButton");
   const count = await jumpIcon.count();
   expect(count).toBe(1);
 

@@ -168,7 +168,7 @@ export default function NetworkMonitor() {
           </Panel>
           {selectedRequestId && (
             <>
-              <PanelResizeHandle className="h-2 w-full" />
+              <PanelResizeHandle className="h-1 w-full" />
               <Panel defaultSize={50}>
                 {selectedRequestId ? (
                   <RequestDetails requests={requests} selectedRequestId={selectedRequestId} />

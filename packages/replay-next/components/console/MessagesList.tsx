@@ -12,7 +12,7 @@ import Icon from "replay-next/components/Icon";
 import Loader from "replay-next/components/Loader";
 import { ConsoleFiltersContext } from "replay-next/src/contexts/ConsoleFiltersContext";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
-import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
+import { useMostRecentLoadedPause } from "replay-next/src/hooks/useMostRecentLoadedPause";
 import { useStreamingMessages } from "replay-next/src/hooks/useStreamingMessages";
 import {
   getLoggableExecutionPoint,
@@ -68,12 +68,15 @@ function MessagesListSuspends({ forwardedRef }: { forwardedRef: ForwardedRef<HTM
   const { isTransitionPending: isFocusTransitionPending } = useContext(FocusContext);
   const { loggables, streamingStatus } = useContext(LoggablesContext);
   const [searchState] = useContext(ConsoleSearchContext);
-  const { executionPoint: currentExecutionPoint } = useContext(TimelineContext);
+  const { point: currentExecutionPoint } = useMostRecentLoadedPause() ?? {};
 
   // The Console should render a line indicating the current execution point.
   // This point might match multiple logs– or it might be between logs, or after the last log, etc.
   // This looking finds the best place to render the indicator.
-  const currentTimeIndicatorPlacement = useMemo<CurrentTimeIndicatorPlacement>(() => {
+  const currentTimeIndicatorPlacement = useMemo<CurrentTimeIndicatorPlacement | null>(() => {
+    if (!currentExecutionPoint) {
+      return null;
+    }
     if (currentExecutionPoint === "0") {
       return "begin";
     }

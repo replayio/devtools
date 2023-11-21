@@ -1,11 +1,12 @@
-import { Object, ObjectId, PauseData } from "@replayio/protocol";
+import { ObjectId, PauseData, PauseId, Object as ProtocolObject } from "@replayio/protocol";
+import { mock } from "jest-mock-extended";
 
 import {
   MockReplayClientInterface,
   createMockReplayClient as createMockReplayClientExternal,
 } from "replay-next/src/utils/testing";
 
-export type IdToMockDataMap = { [objectId: ObjectId]: Object };
+export type IdToMockDataMap = { [objectId: ObjectId]: ProtocolObject };
 
 let elementToIdMap: Map<Node, ObjectId> = new Map();
 let idCounter = 0;
@@ -29,7 +30,7 @@ function createMockObject({
   nodeValue: string | null;
   objectId: ObjectId;
   parentNode: ObjectId | null;
-}): Object {
+}): ProtocolObject {
   return {
     className,
     objectId,
@@ -48,7 +49,7 @@ function createMockObject({
   };
 }
 
-function createMockPauseData({ objects }: { objects: Object[] }): PauseData {
+function createMockPauseData({ objects }: { objects: ProtocolObject[] }): PauseData {
   return {
     objects,
   };
@@ -149,6 +150,25 @@ export function createMockReplayClient(htmlString: string) {
   mockReplayClient = createMockReplayClientExternal();
   mockReplayClient.findSources.mockImplementation(() => {
     return Promise.resolve([]);
+  });
+  mockReplayClient.getParentNodes.mockImplementation((pauseId: PauseId, leafNodeId: ObjectId) => {
+    const objects: ProtocolObject[] = [];
+
+    let currentNodeId: ObjectId | undefined = leafNodeId;
+    while (currentNodeId) {
+      const mockNode: ProtocolObject | undefined = mockObjectWithPreviewData[currentNodeId];
+      if (mockNode) {
+        objects.push(mockNode);
+
+        currentNodeId = mockNode.preview?.node?.parentNode;
+      } else {
+        break;
+      }
+    }
+
+    return Promise.resolve({
+      data: { objects },
+    });
   });
   mockReplayClient.getObjectWithPreview.mockImplementation((objectId: ObjectId) => {
     const mockObject = mockObjectWithPreviewData[objectId];

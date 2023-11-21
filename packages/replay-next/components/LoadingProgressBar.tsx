@@ -1,6 +1,14 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-export default function LoadingProgressBar({ initialProgress = 0 }) {
+import styles from "./LoadingProgressBar.module.css";
+
+export function LoadingProgressBar({
+  className = "",
+  initialProgress = 0,
+}: {
+  className?: string;
+  initialProgress?: number;
+}) {
   const [displayedProgress, setDisplayedProgress] = useState(initialProgress);
   const key = useRef<any>(null);
 
@@ -25,10 +33,12 @@ export default function LoadingProgressBar({ initialProgress = 0 }) {
   }, [displayedProgress]);
 
   return (
-    <div
-      className="loading-progress-bar z-10"
-      data-testid="loading-progress-bar"
-      style={{ width: `${displayedProgress}%` }}
-    />
+    <div className={`${className} ${styles.Wrapper}`}>
+      <div
+        className={styles.Bar}
+        data-testid="loading-progress-bar"
+        style={{ width: `${displayedProgress}%` }}
+      />
+    </div>
   );
 }

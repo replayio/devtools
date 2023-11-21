@@ -1,4 +1,4 @@
-import { ExecutionPoint, NodeBounds, PauseId, Object as ProtocolObject } from "@replayio/protocol";
+import { NodeBounds, Object as ProtocolObject } from "@replayio/protocol";
 import { createBridge, createStore, initialize } from "@replayio/react-devtools-inline/frontend";
 import {
   useContext,
@@ -14,13 +14,13 @@ import { useImperativeCacheValue } from "suspense";
 import { selectLocation } from "devtools/client/debugger/src/actions/sources";
 import {
   getExecutionPoint,
-  getPauseId,
   getThreadContext,
   getTime,
 } from "devtools/client/debugger/src/reducers/pause";
 import { highlightNode, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import { useIsPointWithinFocusWindow } from "replay-next/src/hooks/useIsPointWithinFocusWindow";
+import { useMostRecentLoadedPause } from "replay-next/src/hooks/useMostRecentLoadedPause";
 import { useNag } from "replay-next/src/hooks/useNag";
 import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
 import { isExecutionPointsLessThan } from "replay-next/src/utils/time";
@@ -28,7 +28,6 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
 import { Nag } from "shared/graphql/types";
 import { useTheme } from "shared/theme/useTheme";
-import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { UIThunkAction } from "ui/actions";
 import { fetchMouseTargetsForPause } from "ui/actions/app";
 import { enterFocusMode } from "ui/actions/timeline";
@@ -343,29 +342,18 @@ export function ReactDevtoolsPanel() {
 
 export default function ReactDevToolsWithErrorBoundary() {
   const replayClient = useContext(ReplayClientContext);
-  const pointAndPauseIdRef = useRef<[ExecutionPoint | null, PauseId | null]>([null, null]);
-  const pauseId = useAppSelector(getPauseId) ?? null;
-  const currentPoint = useAppSelector(getExecutionPoint);
-  if (currentPoint !== pointAndPauseIdRef.current[0] && pauseId) {
-    pointAndPauseIdRef.current = [currentPoint, pauseId];
-  }
-
-  const [newReactDevTools] = useGraphQLUserData("feature_newReactDevTools");
+  const { point, pauseId } = useMostRecentLoadedPause() ?? {};
 
   const recordingCapabilities = recordingCapabilitiesCache.read(replayClient);
 
   // The new React DevTools depends on recently-added Chromium only Replay APIs
-  // Regardless of the user preference, don't show the new RDT for older Chrome or Firefox recordings
-  const showNewDevTools =
-    newReactDevTools && recordingCapabilities.supportsObjectIdLookupsInEvaluations;
+  // For now, fall back to the old RDT for older Chrome or Firefox recordings
+  const showNewDevTools = recordingCapabilities.supportsObjectIdLookupsInEvaluations;
 
   return (
     <ErrorBoundary name="ReactDevTools" resetKey={pauseId ?? ""}>
       {showNewDevTools ? (
-        <NewReactDevtoolsPanel
-          executionPoint={pointAndPauseIdRef.current[0]}
-          pauseId={pointAndPauseIdRef.current[1]}
-        />
+        <NewReactDevtoolsPanel executionPoint={point ?? null} pauseId={pauseId ?? null} />
       ) : (
         <ReactDevtoolsPanel />
       )}

@@ -2,7 +2,7 @@ import { default as classNames, default as classnames } from "classnames";
 import { useContext, useEffect, useState } from "react";
 import { useImperativeCacheValue } from "suspense";
 
-import { getPauseId } from "devtools/client/debugger/src/selectors";
+import { getPauseId, getPausePreviewLocation } from "devtools/client/debugger/src/selectors";
 import { framesCache } from "replay-next/src/suspense/FrameCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { isGroupedTestCasesV1 } from "shared/test-suites/RecordingTestMetadata";
@@ -270,12 +270,14 @@ function ToolbarButton({
   name,
   onClick,
   showBadge,
+  showBadgeDimmed,
 }: {
   icon: string;
   label: string;
   name: PrimaryPanelName;
   onClick: (name: PrimaryPanelName) => void;
   showBadge?: boolean;
+  showBadgeDimmed?: boolean;
 }) {
   const selectedPrimaryPanel = useAppSelector(selectors.getSelectedPrimaryPanel);
   const isActive = selectedPrimaryPanel == name;
@@ -344,6 +346,7 @@ function ToolbarButton({
       {iconContents}
     </MaterialIcon>
   );
+
   return (
     <div className="relative px-2">
       <ToolbarButtonTab active={isActive} />
@@ -361,7 +364,7 @@ function ToolbarButton({
       </div>
       {showBadge ? (
         <div
-          className="absolute h-2 w-2 rounded-full bg-secondaryAccent"
+          className={classnames("toolbar-panel-badge", { dimmed: showBadgeDimmed })}
           style={{
             // FE-1096 Aiming for pixel perfect badge alignment over icons with inconsistent shapes
             right: name === "comments" ? ".7rem" : ".8em",
@@ -377,6 +380,7 @@ export default function Toolbar() {
   const dispatch = useAppDispatch();
   const replayClient = useContext(ReplayClientContext);
   const pauseId = useAppSelector(getPauseId);
+  const hasPausePreviewLocation = !!useAppSelector(getPausePreviewLocation);
   const { status: framesStatus, value: frames } = useImperativeCacheValue(
     framesCache,
     replayClient,
@@ -497,7 +501,8 @@ export default function Toolbar() {
               icon="motion_photos_paused"
               name="debugger"
               label="Pause Information"
-              showBadge={hasFrames}
+              showBadge={hasFrames || hasPausePreviewLocation}
+              showBadgeDimmed={hasPausePreviewLocation}
               onClick={handleButtonClick}
             />
             {reactPanelExperimentEnabled && (

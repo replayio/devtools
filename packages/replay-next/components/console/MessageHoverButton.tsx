@@ -125,7 +125,7 @@ export default function MessageHoverButton({
       trackEvent("console.select_source");
 
       // we only want to open the source if this doesn't hide the console
-      update(time, executionPoint, canShowConsoleAndSources);
+      update(time, executionPoint, canShowConsoleAndSources, location ?? undefined);
 
       if (canShowConsoleAndSources && inspectFunctionDefinition !== null && location !== null) {
         inspectFunctionDefinition([location]);

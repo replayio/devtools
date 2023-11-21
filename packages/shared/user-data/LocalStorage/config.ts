@@ -11,4 +11,5 @@ export const config = {
   replayNextCurrentPanel: "sources" as ReplayNextCurrentPanel,
   replayVideoPanelCollapsed: false,
   enableTestSuitesNewRunsView: false,
+  enableTestSuitesTestsView: false,
 };

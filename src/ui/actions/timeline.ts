@@ -2,6 +2,7 @@ import assert from "assert";
 import {
   ExecutionPoint,
   FocusWindowRequestBias,
+  Location,
   PauseId,
   ScreenShot,
   TimeStampedPoint,
@@ -9,8 +10,15 @@ import {
 } from "@replayio/protocol";
 import clamp from "lodash/clamp";
 
-import { paused } from "devtools/client/debugger/src/actions/pause";
-import { resumed } from "devtools/client/debugger/src/reducers/pause";
+import { selectLocation } from "devtools/client/debugger/src/actions/sources/select";
+import {
+  frameSelected,
+  getThreadContext,
+  pauseCreationFailed,
+  paused,
+  resumed,
+} from "devtools/client/debugger/src/reducers/pause";
+import { pauseRequestedAt, previewLocationCleared } from "devtools/client/debugger/src/selectors";
 import { unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 import {
   addScreenForPoint,
@@ -30,6 +38,8 @@ import {
   pointsBoundingTimeCache,
   sessionEndPointCache,
 } from "replay-next/src/suspense/ExecutionPointsCache";
+import { framesCache } from "replay-next/src/suspense/FrameCache";
+import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { screenshotCache } from "replay-next/src/suspense/ScreenshotCache";
 import { ReplayClientInterface } from "shared/client/types";
 import {
@@ -38,7 +48,9 @@ import {
   isTest,
   updateUrlWithParams,
 } from "shared/utils/environment";
+import { isPointInRegion } from "shared/utils/time";
 import { getFirstComment } from "ui/hooks/comments/comments";
+import { getPreferredLocation, getSelectedLocation } from "ui/reducers/sources";
 import {
   getCurrentTime,
   getFocusWindow,
@@ -207,45 +219,82 @@ export function seek({
   openSource = false,
   pauseId,
   time,
+  location,
 }: {
   autoPlay?: boolean;
   executionPoint?: ExecutionPoint;
   openSource?: boolean;
   pauseId?: PauseId;
   time: number;
-}): UIThunkAction<void> {
+  location?: Location;
+}): UIThunkAction<Promise<void>> {
   return async (dispatch, getState, { replayClient }) => {
-    // If no ExecutionPoint provided, map time to nearest ExecutionPoint
-    if (executionPoint == null) {
-      time = await clampTime(replayClient, time);
+    dispatch(pauseRequestedAt({ executionPoint, time, location }));
+    dispatch(setTimelineState({ currentTime: time, playback: null }));
+    const focusWindow = replayClient.getCurrentFocusWindow();
 
-      // getPointNearTime could take time while we're processing the recording
-      // so we optimistically set the timeline to the target time
-      dispatch(setTimelineState({ currentTime: time }));
+    if (!pauseId) {
+      // If no ExecutionPoint provided, map time to nearest ExecutionPoint
+      if (executionPoint == null) {
+        time = await clampTime(replayClient, time);
 
-      const nearestEvent = mostRecentPaintOrMouseEvent(time);
-      const timeStampedPoint = await replayClient.getPointNearTime(time);
-      if (
-        nearestEvent &&
-        Math.abs(nearestEvent.time - time) < Math.abs(timeStampedPoint.time - time)
-      ) {
-        executionPoint = nearestEvent.point;
-      } else {
-        executionPoint = timeStampedPoint.point;
+        const nearestEvent = mostRecentPaintOrMouseEvent(time);
+        const timeStampedPoint = await replayClient.getPointNearTime(time);
+        if (
+          nearestEvent &&
+          Math.abs(nearestEvent.time - time) < Math.abs(timeStampedPoint.time - time)
+        ) {
+          executionPoint = nearestEvent.point;
+        } else {
+          executionPoint = timeStampedPoint.point;
+        }
+
+        dispatch(pauseRequestedAt({ executionPoint, time, location }));
+      }
+
+      if (focusWindow === null || !isPointInRegion(executionPoint, focusWindow)) {
+        dispatch(pauseCreationFailed());
+        return;
+      }
+
+      trackEvent("paused");
+
+      try {
+        pauseId = await pauseIdCache.readAsync(replayClient, executionPoint, time);
+      } catch (e) {
+        console.error(e);
+        dispatch(pauseCreationFailed());
+        return;
       }
     }
 
-    assert(executionPoint != null, `Could not find execution point for time ${time}`);
+    assert(executionPoint);
+    dispatch(paused({ executionPoint, time, id: pauseId }));
 
-    dispatch(paused({ executionPoint, time, openSource }));
+    const frames = await framesCache.readAsync(replayClient, pauseId);
+    dispatch(previewLocationCleared());
+    if (frames?.length) {
+      const selectedFrame = frames[0];
+      const cx = getThreadContext(getState());
+      dispatch(frameSelected({ cx, pauseId, frameId: selectedFrame.frameId }));
 
-    const focusWindow = replayClient.getCurrentFocusWindow();
+      const currentLocation = getSelectedLocation(getState());
+      const frameLocation = getPreferredLocation(getState().sources, selectedFrame.location);
+      if (
+        !currentLocation ||
+        currentLocation.sourceId !== frameLocation.sourceId ||
+        currentLocation.line !== frameLocation.line ||
+        currentLocation.column !== frameLocation.column
+      ) {
+        dispatch(selectLocation(cx, frameLocation, openSource));
+      }
+    }
+
     updatePausePointParams({
       focusWindow,
       point: executionPoint,
       time,
     });
-    dispatch(setTimelineState({ currentTime: time, playback: null }));
 
     if (autoPlay) {
       dispatch(startPlayback());

@@ -1,40 +1,39 @@
+import { Locator } from "@playwright/test";
+
 import { openDevToolsTab, startTest } from "../helpers";
 import {
   executeTerminalExpression,
   findConsoleMessage,
   openConsolePanel,
 } from "../helpers/console-panel";
-import { getGetterValue } from "../helpers/object-inspector";
 import {
   enableComponentPicker,
   getInspectedItem,
+  getInspectedItemValue,
   getReactComponents,
   isComponentPickerEnabled,
   jumpToMessageAndCheckComponents,
   openReactDevtoolsPanel,
-  waitForAndCheckInspectedItem,
-} from "../helpers/react-devtools-panel";
+} from "../helpers/legacy-react-devtools-panel";
+import { getPropertyValue } from "../helpers/object-inspector";
 import { hoverScreenshot } from "../helpers/screenshot";
 import { waitFor } from "../helpers/utils";
 import test, { expect } from "../testFixtureCloneRecording";
 
-test.use({ exampleKey: "cra/dist/index_chromium.html" });
+test.use({ exampleKey: "cra/dist/index.html" });
 
-test("react_devtools-01: Basic RDT behavior (Chromium)", async ({
+async function waitForAndCheckInspectedItem(item: Locator, expectedValue: string) {
+  await item.waitFor();
+  const value = await getInspectedItemValue(item);
+  expect(value).toBe(expectedValue);
+}
+
+test("react_devtools-01: Basic RDT behavior (FF)", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
-  const queryParams = new URLSearchParams();
-  // Force this test to always re-run the RDT (and other) routines
-  // See pref names in packages/shared/user-data/GraphQL/config.ts
-  queryParams.set("features", "backend_rerunRoutines");
-
-  await startTest(page, recordingId, undefined, queryParams);
-
+  await startTest(page, recordingId);
   await openDevToolsTab(page);
-
-  // If the "React" tab shows up, we know that the routine ran
-  await openReactDevtoolsPanel(page);
 
   // General behavior: should show a React component tree
   await jumpToMessageAndCheckComponents(page, "Initial list", 3);
@@ -63,14 +62,12 @@ test("react_devtools-01: Basic RDT behavior (Chromium)", async ({
   // and hovering over the translated DOM node coordinates.
   await executeTerminalExpression(page, "document.querySelector('li').getBoundingClientRect()");
   const message = await findConsoleMessage(page, "DOMRect");
-  // These show up as getters in Chromium, not properties
-  const left = +(await getGetterValue(message, "left"));
-  const right = +(await getGetterValue(message, "right"));
-  const top = +(await getGetterValue(message, "top"));
-  const bottom = +(await getGetterValue(message, "bottom"));
+  const left = +(await getPropertyValue(message, "left"));
+  const right = +(await getPropertyValue(message, "right"));
+  const top = +(await getPropertyValue(message, "top"));
+  const bottom = +(await getPropertyValue(message, "bottom"));
   const x = (left + right) / 2;
   const y = (top + bottom) / 2;
-
   await openReactDevtoolsPanel(page);
   await enableComponentPicker(page);
   await waitFor(async () => {

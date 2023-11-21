@@ -1,11 +1,11 @@
 import assert from "assert";
 import { ObjectId, PauseId, Node as ProtocolNode } from "@replayio/protocol";
 
+import { parentNodesCache } from "replay-next/components/elements/suspense/DOMParentNodesCache";
 import { Element, elementCache } from "replay-next/components/elements/suspense/ElementCache";
 import { getDistanceFromRoot } from "replay-next/components/elements/utils/getDistanceFromRoot";
 import { getItemWeight } from "replay-next/components/elements/utils/getItemWeight";
 import { isNodeInSubTree } from "replay-next/components/elements/utils/isNodeInSubTree";
-import { loadNodePathToRoot } from "replay-next/components/elements/utils/loadNodePathToRoot";
 import { loadNodeSubTree } from "replay-next/components/elements/utils/loadNodeSubTree";
 import { shouldDisplayNode } from "replay-next/components/elements/utils/shouldDisplayNode";
 import { GenericListData } from "replay-next/components/windowing/GenericListData";
@@ -14,14 +14,13 @@ import { ReplayClientInterface } from "shared/client/types";
 import { Item, Metadata } from "./types";
 
 export class ElementsListData extends GenericListData<Item> {
-  _destroyed: boolean = false;
-  _didError: boolean = false;
-  _idToMutableMetadataMap: Map<ObjectId, Metadata> = new Map();
-  _numLevelsToLoad: number = 0;
-  _pauseId: PauseId;
-  _replayClient: ReplayClientInterface;
-  _rootObjectId: ObjectId | null = null;
-  _rootObjectIdWaiter: {
+  private _destroyed: boolean = false;
+  private _didError: boolean = false;
+  private _idToMutableMetadataMap: Map<ObjectId, Metadata> = new Map();
+  private _pauseId: PauseId;
+  private _replayClient: ReplayClientInterface;
+  private _rootObjectId: ObjectId | null = null;
+  private _rootObjectIdWaiter: {
     promise: Promise<void>;
     resolve: () => void;
   };
@@ -29,7 +28,7 @@ export class ElementsListData extends GenericListData<Item> {
   constructor(replayClient: ReplayClientInterface, pauseId: PauseId) {
     super();
 
-    this.setSelectedIndex(0);
+    this.updateLoadingState(true);
 
     this._pauseId = pauseId;
     this._replayClient = replayClient;
@@ -71,7 +70,6 @@ export class ElementsListData extends GenericListData<Item> {
     console.error(error);
 
     this._didError = true;
-
     this.invalidate();
   }
 
@@ -82,59 +80,64 @@ export class ElementsListData extends GenericListData<Item> {
   async loadPathToNode(leafNodeId: ObjectId) {
     let idPath;
     try {
-      idPath = await loadNodePathToRoot(this._replayClient, this._pauseId, leafNodeId);
-    } catch (error) {
-      this.handleLoadingError(error);
-      return;
-    }
+      this.updateLoadingState(true);
 
-    let expandedPathIndex = 0;
+      idPath = await parentNodesCache.readAsync(this._replayClient, this._pauseId, leafNodeId);
 
-    // Expand the selected path as far as we can before loading
-    for (expandedPathIndex = 0; expandedPathIndex < idPath.length; expandedPathIndex++) {
-      const id = idPath[expandedPathIndex];
-      // Don't use toggleNodeExpanded() or getMutableMetadata()
-      // because this path isn't guaranteed to be loaded yet
-      if (!this._idToMutableMetadataMap.has(id)) {
-        break;
+      let expandedPathIndex = 0;
+
+      // Expand the selected path as far as we can before loading
+      for (expandedPathIndex = 0; expandedPathIndex < idPath.length; expandedPathIndex++) {
+        const id = idPath[expandedPathIndex];
+        // Don't use toggleNodeExpanded() or getMutableMetadata()
+        // because this path isn't guaranteed to be loaded yet
+        if (!this._idToMutableMetadataMap.has(id)) {
+          break;
+        }
+
+        this.toggleNodeExpanded(id, true);
       }
 
-      this.toggleNodeExpanded(id, true);
-    }
+      // Fetch in parallel but preserve a stable order; it's important for display
+      const loadedIds: ObjectId[][] = [];
+      try {
+        await Promise.all(
+          idPath.map((id, index) =>
+            (async () => {
+              const ids = await loadNodeSubTree(this._replayClient, this._pauseId, id, 0);
+              loadedIds[index] = [...ids];
+            })()
+          )
+        );
+      } catch (error) {
+        this.handleLoadingError(error);
+        return;
+      }
 
-    // Fetch in parallel but preserve a stable order; it's important for display
-    const loadedIds: ObjectId[][] = [];
-    try {
-      await Promise.all(
-        idPath.map((id, index) =>
-          (async () => {
-            const ids = await loadNodeSubTree(this._replayClient, this._pauseId, id, 0);
-            loadedIds[index] = [...ids];
-          })()
-        )
-      );
+      await this._rootObjectIdWaiter.promise;
+
+      const rootId = this._rootObjectId;
+      assert(rootId);
+
+      await this.processLoadedIds(rootId, new Set(loadedIds.flat()), 0);
+
+      this.updateLoadingState(false);
+      this.invalidate();
+
+      // Finish expanding the selected path again now that all data has been loaded
+      for (expandedPathIndex; expandedPathIndex < idPath.length; expandedPathIndex++) {
+        const id = idPath[expandedPathIndex];
+        this.toggleNodeExpanded(id, true);
+      }
+
+      const leafNode = this.getMutableMetadata(leafNodeId).element.node;
+      const index = this.getIndexForNode(leafNodeId, leafNode);
+
+      return index;
     } catch (error) {
+      this.updateLoadingState(false);
       this.handleLoadingError(error);
-      return;
     }
-
-    await this._rootObjectIdWaiter.promise;
-
-    const rootId = this._rootObjectId;
-    assert(rootId);
-
-    await this.processLoadedIds(rootId, new Set(loadedIds.flat()), 0);
-
-    // Finish expanding the selected path again now that all data has been loaded
-    for (expandedPathIndex; expandedPathIndex < idPath.length; expandedPathIndex++) {
-      const id = idPath[expandedPathIndex];
-      this.toggleNodeExpanded(id, true);
-    }
-
-    const leafNode = this.getMutableMetadata(leafNodeId).element.node;
-    const index = this.getIndexForNode(leafNodeId, leafNode);
-
-    return index;
   }
 
   async registerRootNodeId(id: ObjectId, numLevelsToLoad: number = 3) {
@@ -142,6 +145,10 @@ export class ElementsListData extends GenericListData<Item> {
     this._rootObjectIdWaiter.resolve();
 
     await this.loadAndProcessNodeSubTree(id, numLevelsToLoad);
+
+    if (this.getItemCount() > 0 && this.getSelectedIndex() === null) {
+      this.setSelectedIndex(0);
+    }
   }
 
   async toggleNodeExpanded(id: ObjectId, isExpanded: boolean) {
@@ -411,6 +418,7 @@ export class ElementsListData extends GenericListData<Item> {
   private async loadAndProcessNodeSubTree(relativeRootId: ObjectId, numLevelsToLoad: number = 0) {
     let loadedIds;
     try {
+      this.updateLoadingState(true);
       loadedIds = await loadNodeSubTree(
         this._replayClient,
         this._pauseId,
@@ -418,6 +426,7 @@ export class ElementsListData extends GenericListData<Item> {
         numLevelsToLoad
       );
     } catch (error) {
+      this.updateLoadingState(false);
       this.handleLoadingError(error);
       return;
     }
@@ -427,6 +436,9 @@ export class ElementsListData extends GenericListData<Item> {
     }
 
     await this.processLoadedIds(relativeRootId, loadedIds, numLevelsToLoad);
+
+    this.updateLoadingState(false);
+    this.invalidate();
   }
 
   private async processLoadedIds(
@@ -434,7 +446,9 @@ export class ElementsListData extends GenericListData<Item> {
     loadedIds: Set<ObjectId>,
     numLevelsToLoad: number
   ) {
-    loadedIds.forEach(id => {
+    const ids = [...loadedIds];
+    for (let index = 0; index < ids.length; index++) {
+      const id = ids[index];
       if (!this._idToMutableMetadataMap.has(id)) {
         const element = elementCache.getValue(this._replayClient, this._pauseId, id);
         const node = element.node;
@@ -498,9 +512,7 @@ export class ElementsListData extends GenericListData<Item> {
           currentNodeId = metadata.element.node.parentNode;
         }
       }
-    });
-
-    this.invalidate();
+    }
   }
 }
 

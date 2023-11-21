@@ -47,6 +47,10 @@ export default function useSourceContextMenu({
 
   const addComment = () => {
     startTransition(async () => {
+      if (!currentExecutionPoint) {
+        return;
+      }
+
       if (showCommentsPanel !== null) {
         showCommentsPanel();
       }
@@ -138,13 +142,18 @@ function FastForwardButton({
   });
 
   let fastForwardToExecutionPoint: TimeStampedPoint | null = null;
-  if (hitPoints !== null && hitPointStatus !== "too-many-points-to-find") {
+  if (currentExecutionPoint && hitPoints !== null && hitPointStatus !== "too-many-points-to-find") {
     fastForwardToExecutionPoint = findNextHitPoint(hitPoints, currentExecutionPoint);
   }
 
   const fastForward = () => {
     assert(fastForwardToExecutionPoint != null);
-    update(fastForwardToExecutionPoint.time, fastForwardToExecutionPoint.point, false);
+    assert(lineHitCounts != null);
+    update(fastForwardToExecutionPoint.time, fastForwardToExecutionPoint.point, false, {
+      sourceId,
+      line: lineNumber,
+      column: lineHitCounts.firstBreakableColumnIndex,
+    });
   };
 
   return (
@@ -172,13 +181,18 @@ function RewindButton({
   });
 
   let rewindToExecutionPoint: TimeStampedPoint | null = null;
-  if (hitPoints !== null && hitPointStatus !== "too-many-points-to-find") {
+  if (currentExecutionPoint && hitPoints !== null && hitPointStatus !== "too-many-points-to-find") {
     rewindToExecutionPoint = findLastHitPoint(hitPoints, currentExecutionPoint);
   }
 
   const rewind = () => {
     assert(rewindToExecutionPoint != null);
-    update(rewindToExecutionPoint.time, rewindToExecutionPoint.point, false);
+    assert(lineHitCounts != null);
+    update(rewindToExecutionPoint.time, rewindToExecutionPoint.point, false, {
+      sourceId,
+      line: lineNumber,
+      column: lineHitCounts.firstBreakableColumnIndex,
+    });
   };
 
   return (

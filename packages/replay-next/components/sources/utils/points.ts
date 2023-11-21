@@ -11,7 +11,7 @@ import { Point } from "shared/client/types";
 type HitPointAndIndexTuple = [hitPoint: TimeStampedPoint, index: number];
 type NoMatchTuple = [null, number];
 
-const noMatchTuple: NoMatchTuple = [null, -1];
+export const noMatchTuple: NoMatchTuple = [null, -1];
 
 export function findClosestHitPoint(
   hitPoints: TimeStampedPoint[],

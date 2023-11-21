@@ -221,12 +221,7 @@ function TabContents({
       break;
     }
     case "trace": {
-      const jumpLocationRes = reduxDispatchJumpLocationCache.read(
-        replayClient,
-        point,
-        time,
-        sourcesState
-      );
+      const jumpLocationRes = reduxDispatchJumpLocationCache.read(replayClient, point, time);
       jumpLocation = jumpLocationRes ?? null;
       break;
     }
