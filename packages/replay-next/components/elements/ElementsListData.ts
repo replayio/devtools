@@ -10,6 +10,7 @@ import { loadNodeSubTree } from "replay-next/components/elements/utils/loadNodeS
 import { shouldDisplayNode } from "replay-next/components/elements/utils/shouldDisplayNode";
 import { GenericListData } from "replay-next/components/windowing/GenericListData";
 import { ReplayClientInterface } from "shared/client/types";
+import { recordData as recordTelemetryData } from "replay-next/src/utils/telemetry";
 
 import { Item, Metadata } from "./types";
 
@@ -80,6 +81,7 @@ export class ElementsListData extends GenericListData<Item> {
   async loadPathToNode(leafNodeId: ObjectId) {
     let idPath;
     try {
+      const startTime = Date.now()
       this.updateLoadingState(true);
 
       idPath = await parentNodesCache.readAsync(this._replayClient, this._pauseId, leafNodeId);
@@ -132,6 +134,16 @@ export class ElementsListData extends GenericListData<Item> {
 
       const leafNode = this.getMutableMetadata(leafNodeId).element.node;
       const index = this.getIndexForNode(leafNodeId, leafNode);
+
+
+      const stopTime = Date.now();
+      recordTelemetryData("elements-panel-load-node", {
+        duration: stopTime - startTime,
+        params: {
+          nodeId: leafNodeId,
+          pauseId: this._pauseId
+        },
+      });
 
       return index;
     } catch (error) {
@@ -214,8 +226,7 @@ export class ElementsListData extends GenericListData<Item> {
         const indentation = "  ".repeat(depth);
         const nodeName = element.node.nodeName.toLowerCase();
         rows.push(
-          `${indentation} ${id}:${nodeName}${
-            childrenCanBeRendered ? "" : " *"
+          `${indentation} ${id}:${nodeName}${childrenCanBeRendered ? "" : " *"
           } (${subTreeWeight}, ${subTreeIsFullyLoaded ? "full" : "partial"})`
         );
       }
@@ -416,7 +427,9 @@ export class ElementsListData extends GenericListData<Item> {
   }
 
   private async loadAndProcessNodeSubTree(relativeRootId: ObjectId, numLevelsToLoad: number = 0) {
+    console.log('load sub tree', relativeRootId == this._rootObjectId)
     let loadedIds;
+    const startTime = Date.now();
     try {
       this.updateLoadingState(true);
       loadedIds = await loadNodeSubTree(
@@ -439,6 +452,14 @@ export class ElementsListData extends GenericListData<Item> {
 
     this.updateLoadingState(false);
     this.invalidate();
+
+    if (relativeRootId === this._rootObjectId) {
+      const stopTime = Date.now();
+      recordTelemetryData("elements-panel-load-tree", {
+        duration: stopTime - startTime,
+        params: {},
+      });
+    }
   }
 
   private async processLoadedIds(

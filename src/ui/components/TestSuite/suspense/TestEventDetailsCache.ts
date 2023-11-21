@@ -41,6 +41,7 @@ export const testEventDetailsIntervalCache = createFocusIntervalCacheForExecutio
   TestEventDetailsEntry
 >({
   debugLabel: "TestEventDetailsCache3",
+  telemetry: true,
   getPointForValue: (event: TestEventDetailsEntry) => event.point,
   getKey(client, testRecording, enabled) {
     const key = `${testRecording.id}-${enabled}`;

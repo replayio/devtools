@@ -7,6 +7,7 @@ import {
 } from "suspense";
 
 import { ProtocolError, isCommandError } from "shared/utils/error";
+import { recordData as recordTelemetryData } from "../utils/telemetry";
 
 type Options<Point extends number | bigint, Params extends Array<any>, Value> = {
   debugLabel?: string;
@@ -18,6 +19,7 @@ type Options<Point extends number | bigint, Params extends Array<any>, Value> = 
     end: Point,
     ...params: [...Params, IntervalCacheLoadOptions<Value>]
   ) => PromiseLike<Array<Value>> | Array<Value>;
+  telemetry?: boolean;
 };
 
 // Convenience wrapper around createFocusIntervalCache that converts BigInts to ExecutionPoints (strings)
@@ -51,7 +53,18 @@ export function createFocusIntervalCache<
     ...options,
     load: async (start, end, ...paramsWithCacheLoadOptions) => {
       try {
-        return await options.load(start, end, ...paramsWithCacheLoadOptions);
+
+        const startTime = Date.now();
+        const response = await options.load(start, end, ...paramsWithCacheLoadOptions);
+        const stopTime = Date.now();
+        if (options.telemetry) {
+          recordTelemetryData("suspense-cache-load", {
+            duration: stopTime - startTime,
+            label: options.debugLabel,
+            params: { start, end, ...paramsWithCacheLoadOptions },
+          });
+        }
+        return response;
       } catch (error) {
         if (
           isCommandError(error, ProtocolError.FocusWindowChange) ||

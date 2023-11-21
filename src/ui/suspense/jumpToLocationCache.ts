@@ -6,7 +6,8 @@ import {
   PointDescription,
   SourceLocationRange,
 } from "@replayio/protocol";
-import { createCache, createSingleEntryCache } from "suspense";
+import { createSingleEntryCache } from "suspense";
+import { createCacheWithTelemetry } from "replay-next/src/utils/suspense"
 
 import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
 import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
@@ -174,7 +175,7 @@ async function searchSourceOutlineForDispatch(
   return preferredFrameIdx;
 }
 
-export const reduxDispatchJumpLocationCache = createCache<
+export const reduxDispatchJumpLocationCache = createCacheWithTelemetry<
   [replayClient: ReplayClientInterface, point: ExecutionPoint, time: number],
   PointDescription | undefined
 >({
