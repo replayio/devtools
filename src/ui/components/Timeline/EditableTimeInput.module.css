@@ -8,4 +8,9 @@
 }
 .Input:focus {
   outline: none;
+  box-shadow: 0 0 0 1px var(--focus-mode-popout-text-input-ring);
+}
+
+.Input:first-of-type {
+  border-radius: 9px 0 0 9px;
 }
