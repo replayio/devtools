@@ -8,7 +8,7 @@ export default function NewTab() {
 
   // Function to detect if the user is on Windows
   const isWindows = () => {
-    return window.navigator.platform.indexOf("Win") == -1;
+    return window.navigator.platform.indexOf("Win") !== -1;
   };
 
   return (
