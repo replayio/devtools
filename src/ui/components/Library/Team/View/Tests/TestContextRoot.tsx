@@ -62,6 +62,11 @@ export function TestsContextRoot({ children }: { children: ReactNode }) {
     return filteredTests;
   }, [filterByText, tests]);
 
+  const selectedTest = useMemo(
+    () => (testId ? tests.find(t => t.testId === testId) ?? null : null),
+    [testId, tests]
+  );
+
   const deferredTestId = useDeferredValue(testId);
 
   return (
@@ -77,7 +82,7 @@ export function TestsContextRoot({ children }: { children: ReactNode }) {
         setFilterByText,
         testId: deferredTestId,
         testIdForDisplay: testId,
-        selectedTest: testId ? tests.find(t => t.testId === testId) ?? null : null,
+        selectedTest,
         tests: filteredTests,
       }}
     >
