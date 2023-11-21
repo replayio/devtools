@@ -7,8 +7,8 @@ import { formatDuration, formatTimestamp } from "ui/utils/time";
 
 import styles from "./ProtocolViewerListItem.module.css";
 
-const REQUEST_DURATION_MEDIUM_THRESHOLD_MS = 250;
-const REQUEST_DURATION_SLOW_THRESHOLD_MS = 1000;
+export const REQUEST_DURATION_MEDIUM_THRESHOLD_MS = 500;
+export const REQUEST_DURATION_SLOW_THRESHOLD_MS = 10_000;
 
 export function ProtocolViewerListItem({ id }: { id: number }) {
   const {
