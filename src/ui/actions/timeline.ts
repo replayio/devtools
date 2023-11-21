@@ -247,6 +247,7 @@ export function seek({
         const nearestEvent = mostRecentPaintOrMouseEvent(clampedTime);
         const timeStampedPoint = await replayClient.getPointNearTime(clampedTime);
         if (getTime(getState()) !== time) {
+          // someone requested seeking to a different time while we were waiting
           return;
         }
 
@@ -279,6 +280,7 @@ export function seek({
         return;
       }
       if (getExecutionPoint(getState()) !== executionPoint) {
+        // someone requested seeking to a different executionPoint while we were waiting
         return;
       }
     }
@@ -288,6 +290,7 @@ export function seek({
 
     const frames = await framesCache.readAsync(replayClient, pauseId);
     if (getPauseId(getState()) !== pauseId) {
+      // someone requested seeking to a different pauseId while we were waiting
       return;
     }
 
