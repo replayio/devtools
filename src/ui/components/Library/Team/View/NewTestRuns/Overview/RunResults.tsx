@@ -134,13 +134,17 @@ const FileNodeRenderer = memo(function FileNodeRenderer({
   };
 
   let type: IconType;
+  let iconClassName = "";
 
   if (label === "Passed") {
-    type = "file";
+    type = "checked-rounded";
+    iconClassName = "text-green-500";
   } else if (label === "Failed") {
     type = "error";
+    iconClassName = "text-red-500";
   } else {
     type = "warning";
+    iconClassName = "text-yellow-500";
   }
 
   return (
@@ -153,7 +157,7 @@ const FileNodeRenderer = memo(function FileNodeRenderer({
           paddingLeft: `${depth * 1}rem`,
         }}
       >
-        <Icon className="h-5 w-5 shrink-0" type={type} />
+        <Icon className={`h-5 w-5 shrink-0 ${iconClassName}`} type={type} />
         <div className="truncate">{name}</div>
       </div>
     </>
