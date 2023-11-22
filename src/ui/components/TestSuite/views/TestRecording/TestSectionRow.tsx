@@ -18,6 +18,7 @@ import {
   TestSectionName,
   getTestEventTime,
   getTestEventTimeStampedPoint,
+  isFunctionEvent,
   isUserActionTestEvent,
 } from "shared/test-suites/RecordingTestMetadata";
 import { isPointInRegion } from "shared/utils/time";
@@ -28,6 +29,7 @@ import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext
 import { useAppDispatch } from "ui/setup/hooks";
 
 import { testEventDomNodeCache } from "../../suspense/TestEventDetailsCache";
+import FunctionEventRow from "./TestRecordingEvents/FunctionEventRow";
 import NavigationEventRow from "./TestRecordingEvents/NavigationEventRow";
 import NetworkRequestEventRow from "./TestRecordingEvents/NetworkRequestEventRow";
 import UserActionEventRow from "./TestRecordingEvents/UserActionEventRow";
@@ -38,10 +40,12 @@ export function TestSectionRow({
   testEvent,
   testRunnerName,
   testSectionName,
+  nestingLevel = 0,
 }: {
   testEvent: TestEvent;
   testRunnerName: TestRunnerName | null;
   testSectionName: TestSectionName;
+  nestingLevel: number;
 }) {
   const { range: focusWindow } = useContext(FocusContext);
   const { executionPoint: currentExecutionPoint } = useContext(TimelineContext);
@@ -109,6 +113,17 @@ export function TestSectionRow({
     case "network-request":
       child = <NetworkRequestEventRow networkRequestEvent={testEvent} />;
       break;
+    case "function":
+      child = (
+        <FunctionEventRow
+          functionEvent={testEvent}
+          testRunnerName={testRunnerName}
+          testSectionName={testSectionName}
+          nestingLevel={nestingLevel + 1}
+        />
+      );
+      status = "success";
+      break;
     case "user-action":
       child = (
         <UserActionEventRow
@@ -125,9 +140,11 @@ export function TestSectionRow({
   }
 
   const onClick = async () => {
-    startTransition(() => {
-      setTestEvent(testEvent);
-    });
+    if (!isFunctionEvent(testEvent)) {
+      startTransition(() => {
+        setTestEvent(testEvent);
+      });
+    }
 
     let executionPoint: ExecutionPoint | null = null;
     let time: number | null = null;
@@ -137,6 +154,16 @@ export function TestSectionRow({
       if (timeStampedPoint) {
         executionPoint = timeStampedPoint.point;
         time = timeStampedPoint.time;
+      }
+    } else if (isFunctionEvent(testEvent)) {
+      const event = testEvent.data.events[0];
+      if (event.type === "navigation") {
+        executionPoint = event.timeStampedPoint.point;
+        time = event.timeStampedPoint.time;
+      } else if (event.type === "user-action") {
+        const timeStampedPoint = event.data.timeStampedPoints.beforeStep;
+        executionPoint = timeStampedPoint?.point ?? null;
+        time = timeStampedPoint?.time ?? null;
       }
     } else {
       executionPoint = testEvent.timeStampedPoint.point;
@@ -215,6 +242,7 @@ export function TestSectionRow({
       data-position={position}
       data-selected={isSelected || undefined}
       data-status={status}
+      data-nesting-level={nestingLevel}
       data-type={testEvent.type}
       data-test-name="TestSectionRow"
       onClick={onClick}

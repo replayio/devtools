@@ -281,6 +281,18 @@ export namespace RecordingTestMetadataV3 {
 
     type: "user-action";
   }
+  export interface FunctionEvent {
+    // Data needed to render this event
+    data: {
+      function: string;
+      events: TestEvent[];
+    };
+
+    // The precise time this event occurred; not that events have no duration
+    timeStampedPoint: TimeStampedPoint;
+
+    type: "function";
+  }
 
   export interface NavigationEvent {
     // Data needed to render this event
@@ -313,7 +325,7 @@ export namespace RecordingTestMetadataV3 {
     type: "network-request";
   }
 
-  export type TestEvent = UserActionEvent | NavigationEvent | NetworkRequestEvent;
+  export type TestEvent = UserActionEvent | NavigationEvent | NetworkRequestEvent | FunctionEvent;
 
   export type TestError = {
     name: string;
@@ -625,9 +637,9 @@ export async function processCypressTestRecording(
       timeStampedPointRange:
         testBeginPoint && testEndPoint
           ? {
-              begin: testBeginPoint,
-              end: testEndPoint,
-            }
+            begin: testBeginPoint,
+            end: testEndPoint,
+          }
           : null,
     };
   } else if (isTestRecordingV3(testRecording)) {
@@ -636,6 +648,74 @@ export async function processCypressTestRecording(
     // This function does not support the legacy TestItem format
     throw Error(`Unsupported legacy TestItem value`);
   }
+}
+
+
+class FunctionNode {
+  functionName: string;
+  events: TestEvent[];
+  children: { [key: string]: FunctionNode };
+
+  constructor(functionName = "") {
+    this.functionName = functionName;
+    this.events = [];
+    this.children = {};
+  }
+
+  findOrAddChild(functionName: string) {
+    if (!this.children.hasOwnProperty(functionName)) {
+      this.children[functionName] = new FunctionNode(functionName);
+    }
+    return this.children[functionName];
+  }
+
+  toDict(): any {
+    // Convert the children to a list of dictionaries
+    const childList = Object.values(this.children).map(childNode => childNode.toDict());
+
+    // Combine events and children
+    const combined = this.events.concat(childList);
+
+    const firstEvent = combined[0]
+
+    const timeStampedPoint = isUserActionTestEvent(firstEvent) ? firstEvent.data.timeStampedPoints.beforeStep : firstEvent.timeStampedPoint
+    return {
+      data: {
+        function: this.functionName,
+        events: combined,
+      },
+      timeStampedPoint,
+      type: "function",
+    };
+  }
+}
+
+
+function groupTestByCallStacks(test: RecordingTestMetadataV3.TestRecording) {
+  // Initialize the root of the tree
+  const rootNode = new FunctionNode();
+
+  // Sample events_data for demonstration purposes
+  // Make sure to define your `events_data` before this loop
+  // let events_data = [ ... ];
+
+  for (let event of test.events.main) {
+    let currentNode = rootNode;
+    // @ts-ignore
+    const callStack = event.data.testSourceCallStack || [];
+    for (let call of callStack.reverse()) {
+      const functionName = call.functionName || call.fileName;
+      console.log(functionName)
+      currentNode = currentNode.findOrAddChild(functionName);
+    }
+    currentNode.events.push(event);
+  }
+
+  // Convert the tree to the desired dict structure
+  test.events.main = rootNode.toDict().data.events;
+
+
+  return test;
 }
 
 export async function processGroupedTestCases(
@@ -749,7 +829,16 @@ export async function processGroupedTestCases(
         let testRecordings: RecordingTestMetadataV3.TestRecording[] = [];
         for (let index = 0; index < partialTestRecordings.length; index++) {
           const legacyTest = partialTestRecordings[index];
-          const test = await processPlaywrightTestRecording(legacyTest, annotations, testStacks);
+          let test = await processPlaywrightTestRecording(legacyTest, annotations, testStacks);
+
+          console.log('>> original', JSON.stringify(test))
+
+          if (true) {
+            test = groupTestByCallStacks(test)
+          }
+
+          console.log('>> out', JSON.stringify(test))
+
 
           testRecordings.push(test);
         }
@@ -867,11 +956,11 @@ export async function processPlaywrightTestRecording(
             scope,
             testSourceCallStack: stack
               ? stack.map(frame => ({
-                  columnNumber: frame.column,
-                  fileName: frame.file,
-                  functionName: frame.functionName,
-                  lineNumber: frame.line,
-                }))
+                columnNumber: frame.column,
+                fileName: frame.file,
+                functionName: frame.functionName,
+                lineNumber: frame.line,
+              }))
               : null,
             timeStampedPoints: {
               afterStep: timeStampedPointRange?.end ?? null,
@@ -982,8 +1071,8 @@ async function processNetworkData(
         },
         response: events.responseEvent
           ? {
-              status: events.responseEvent.responseStatus,
-            }
+            status: events.responseEvent.responseStatus,
+          }
           : null,
       },
       timeStampedPoint,
@@ -1015,7 +1104,7 @@ export function getGroupedTestCasesTitle(groupedTestCases: AnyGroupedTestCases):
 export function getTestEventTimeStampedPoint(
   testEvent: RecordingTestMetadataV3.TestEvent
 ): TimeStampedPoint | null {
-  if (isNavigationTestEvent(testEvent) || isNetworkRequestTestEvent(testEvent)) {
+  if (isFunctionEvent(testEvent) || isNavigationTestEvent(testEvent) || isNetworkRequestTestEvent(testEvent)) {
     return testEvent.timeStampedPoint;
   } else {
     return testEvent.data.timeStampedPoints.beforeStep ?? null;
@@ -1064,6 +1153,13 @@ export function isNetworkRequestTestEvent(
 ): value is RecordingTestMetadataV3.NetworkRequestEvent {
   return value.type === "network-request";
 }
+
+export function isFunctionEvent(
+  value: TestEvent
+): value is RecordingTestMetadataV3.FunctionEvent {
+  return value.type === "function";
+}
+
 
 export function isTestRecordingV1(
   value: AnyTestRecording
