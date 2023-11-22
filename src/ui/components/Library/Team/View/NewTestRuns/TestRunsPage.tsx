@@ -149,7 +149,13 @@ function TestRunSpecDetails() {
   const selectedSpecTests = tests?.filter((t: any) => t.sourcePath === spec);
 
   if (!spec) {
-    return <div>Select a test to see its details here</div>;
+    return (
+      <div className="flex h-full w-full items-center justify-center p-2">
+        <div className="rounded-md bg-chrome py-2 px-3 text-center">
+          Select a test to see its details here
+        </div>
+      </div>
+    );
   } else if (groupedTests === null) {
     return null;
   }
