@@ -39,8 +39,9 @@ export function TestsContextRoot({ children }: { children: ReactNode }) {
 
   const [filterByText, setFilterByText] = useState("");
   const filterByTextDeferred = useDeferredValue(filterByText);
+  const deferredTestId = useDeferredValue(testId);
 
-  const filteredTests = useMemo(() => {
+  const value = useMemo(() => {
     let filteredTests = tests;
 
     if (filterByText !== "") {
@@ -59,34 +60,21 @@ export function TestsContextRoot({ children }: { children: ReactNode }) {
       });
     }
 
-    return filteredTests;
-  }, [filterByText, tests]);
+    return {
+      filterByTime,
+      sortBy,
+      filterByText: filterByTextDeferred,
+      filterByTextForDisplay: filterByText,
+      selectTestId: setTestId,
+      setFilterByTime,
+      setSortBy,
+      setFilterByText,
+      testId: deferredTestId,
+      testIdForDisplay: testId,
+      selectedTest: testId ? tests.find(t => t.testId === testId) ?? null : null,
+      tests: filteredTests,
+    };
+  }, [filterByTime, sortBy, filterByText, filterByTextDeferred, deferredTestId, testId, tests]);
 
-  const selectedTest = useMemo(
-    () => (testId ? tests.find(t => t.testId === testId) ?? null : null),
-    [testId, tests]
-  );
-
-  const deferredTestId = useDeferredValue(testId);
-
-  return (
-    <TestContext.Provider
-      value={{
-        filterByTime,
-        sortBy,
-        filterByText: filterByTextDeferred,
-        filterByTextForDisplay: filterByText,
-        selectTestId: setTestId,
-        setFilterByTime,
-        setSortBy,
-        setFilterByText,
-        testId: deferredTestId,
-        testIdForDisplay: testId,
-        selectedTest,
-        tests: filteredTests,
-      }}
-    >
-      {children}
-    </TestContext.Provider>
-  );
+  return <TestContext.Provider value={value}>{children}</TestContext.Provider>;
 }
