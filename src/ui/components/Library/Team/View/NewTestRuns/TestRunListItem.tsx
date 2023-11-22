@@ -1,13 +1,13 @@
 import { useContext } from "react";
 
 import { TestRun, getTestRunTitle } from "shared/test-suites/TestRun";
-import { BranchIcon } from "ui/components/Library/Team/View/NewTestRuns/BranchIcon";
 import HighlightedText from "ui/components/Library/Team/View/NewTestRuns/HighlightedText";
+import { AttributeContainer } from "ui/components/Library/Team/View/TestRuns/AttributeContainer";
+import { BranchIcon } from "ui/components/Library/Team/View/TestRuns/BranchIcon";
 import Icon from "ui/components/shared/Icon";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 
 import { getTruncatedRelativeDate } from "../Recordings/RecordingListItem/RecordingListItem";
-import { AttributeContainer } from "./AttributeContainer";
 import { ModeAttribute } from "./Overview/RunSummary";
 import { TestRunsContext } from "./TestRunsContextRoot";
 import styles from "../../../Library.module.css";

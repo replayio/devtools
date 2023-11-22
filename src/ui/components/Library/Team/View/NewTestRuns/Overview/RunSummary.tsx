@@ -2,15 +2,14 @@ import { captureException } from "@sentry/react";
 import Link from "next/link";
 
 import Icon from "replay-next/components/Icon";
-import { Recording } from "shared/graphql/types";
 import { TestRun, getTestRunTitle } from "shared/test-suites/TestRun";
-import { BranchIcon } from "ui/components/Library/Team/View/NewTestRuns/BranchIcon";
+import { AttributeContainer } from "ui/components/Library/Team/View/TestRuns/AttributeContainer";
+import { BranchIcon } from "ui/components/Library/Team/View/TestRuns/BranchIcon";
 
 import {
   getDurationString,
   getTruncatedRelativeDate,
 } from "../../Recordings/RecordingListItem/RecordingListItem";
-import { AttributeContainer } from "../AttributeContainer";
 import { FilterField } from "../FilterField";
 import { RunStats } from "../RunStats";
 import dropdownStyles from "../Dropdown.module.css";

@@ -21,11 +21,11 @@ export function AttributeContainer({
 
   return (
     <div
-      className="flex items-start space-x-1 overflow-hidden text-ellipsis"
+      className="flex items-center space-x-1 overflow-hidden text-ellipsis"
       data-test-id={dataTestId}
       title={title ?? ""}
     >
-      <div className="w-4">{icon ? <MaterialIcon>{icon}</MaterialIcon> : null}</div>
+      {icon ? <MaterialIcon className="w-4">{icon}</MaterialIcon> : null}
       <span style={{ maxWidth }} className="block overflow-hidden text-ellipsis whitespace-pre">
         {children}
       </span>
