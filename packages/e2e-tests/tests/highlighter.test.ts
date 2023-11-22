@@ -32,7 +32,10 @@ test("highlighter: element highlighter works everywhere", async ({
     })
     .join(" ");
 
-  // TODO:FE-805 This is a hack to get the test to pass. We should figure out why the path definition is different from the original and not use a hardcoded value.
+  // The important things to check here are 1) the path exists
+  // at all (is the box even visible on screen), and 2) is it
+  // over the iframe element we're trying to highlight.
+  // These coordinates visually match the location of the iframe.
   const pathDefinitionToCompare = `M8,46 L312,46 L312,200 L8,200`;
   expect(normalizedPathDefinition).toBe(pathDefinitionToCompare);
 });
