@@ -49,6 +49,7 @@ import { getMouseTarget } from "ui/suspense/nodeCaches";
 import { NodePicker as NodePickerClass, NodePickerOpts } from "ui/utils/nodePicker";
 
 import { ReactDevToolsPanel as NewReactDevtoolsPanel } from "./react-devtools/components/ReactDevToolsPanel";
+import { evaluateReactDevtoolsOperationsArrays } from "./react-devtools/injectReactDevtoolsBackend";
 import { generateTreeResetOpsForPoint } from "./react-devtools/rdtProcessing";
 
 function jumpToComponentPreferredSource(componentPreview: ProtocolObject): UIThunkAction {
@@ -265,16 +266,8 @@ export function ReactDevtoolsPanel() {
       return;
     }
 
-    window.app.rdt.getOperationsForPause = async () => {
-      const operations = await replayClient.evaluateExpression(
-        pauseId,
-        `JSON.stringify(window.__REACT_DEVTOOLS_OPERATIONS)`,
-        null,
-        undefined
-      );
-
-      return JSON.parse(operations.returned!.value!);
-    };
+    window.app.rdt.generateNewOperationsArrays = () =>
+      evaluateReactDevtoolsOperationsArrays(replayClient, pauseId);
   }, [replayClient, annotations, pauseId]);
 
   if (currentPoint === null) {

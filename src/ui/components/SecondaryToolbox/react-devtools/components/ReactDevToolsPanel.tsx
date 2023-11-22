@@ -34,6 +34,7 @@ import {
   reactDevToolsAnnotationsCache,
 } from "ui/suspense/annotationsCaches";
 
+import { evaluateReactDevtoolsOperationsArrays } from "../injectReactDevtoolsBackend";
 import styles from "./ReactDevToolsPanel.module.css";
 
 export function ReactDevToolsPanel({
@@ -108,16 +109,8 @@ function ReactDevToolsPanelInner({
       return;
     }
 
-    window.app.rdt.getOperationsForPause = async () => {
-      const operations = await replayClient.evaluateExpression(
-        pauseId,
-        `JSON.stringify(window.__REACT_DEVTOOLS_OPERATIONS)`,
-        null,
-        undefined
-      );
-
-      return JSON.parse(operations.returned!.value!);
-    };
+    window.app.rdt.generateNewOperationsArrays = () =>
+      evaluateReactDevtoolsOperationsArrays(replayClient, pauseId);
   }, [pauseId, hasReactMounted, replayClient]);
 
   if (!hasReactMounted) {

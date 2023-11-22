@@ -16,7 +16,7 @@ declare global {
     store: UIStore;
     rdt: {
       store: Store | null;
-      getOperationsForPause: () => Promise<any>;
+      generateNewOperationsArrays: () => Promise<number[]>;
     };
     local: () => void;
     prod: () => void;
@@ -36,7 +36,7 @@ export async function setupAppHelper(store: UIStore) {
 
   window.app = {
     store,
-    rdt: { store: null, getOperationsForPause: async () => [] },
+    rdt: { store: null, generateNewOperationsArrays: async () => [] },
     preferences: userData,
     triggerEvent,
     replaySession,

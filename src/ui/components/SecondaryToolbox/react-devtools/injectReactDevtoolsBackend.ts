@@ -67,7 +67,6 @@ function installReactDevToolsIntoPause() {
 
   window.__REACT_DEVTOOLS_OPERATIONS = [];
   window.__REACT_DEVTOOLS_GLOBAL_HOOK__.sub("operations", (newOperations: Array<number>) => {
-    window.logMessage("ADDING OPERATION");
     window.__REACT_DEVTOOLS_OPERATIONS.push(newOperations);
   });
 
@@ -127,8 +126,35 @@ function installReactDevToolsIntoPause() {
       );
     }
   }
+}
 
-  return JSON.stringify(window.evaluationLogs);
+function generateReactDevtoolsOperationsArrays() {
+  window.__REACT_DEVTOOLS_OPERATIONS = [];
+
+  for (let renderer of window.__REACT_DEVTOOLS_GLOBAL_HOOK__.rendererInterfaces.values()) {
+    const rendererWithAdditions = renderer as RendererInterfaceWithAdditions;
+    rendererWithAdditions.updateComponentFilters([{ type: 1, isEnabled: true, value: 7 }]);
+  }
+
+  return JSON.stringify(window.__REACT_DEVTOOLS_OPERATIONS);
+}
+
+export async function evaluateReactDevtoolsOperationsArrays(
+  replayClient: ReplayClientInterface,
+  pauseId: PauseId
+) {
+  const operations = await replayClient.evaluateExpression(
+    pauseId,
+    `(${generateReactDevtoolsOperationsArrays})()`,
+    null,
+    undefined
+  );
+
+  try {
+    return JSON.parse(operations.returned!.value!) as number[];
+  } catch {
+    return [];
+  }
 }
 
 const injectGlobalHookSource = require("./installHook.raw.js").default;
@@ -156,15 +182,6 @@ export const reactDevToolsInjectionCache: Cache<
     } else if (result.failed) {
       return false;
     } else {
-      console.log(
-        JSON.parse(result.returned!.value).map(t => {
-          try {
-            return JSON.parse(t);
-          } catch {
-            return t;
-          }
-        })
-      );
       return true;
     }
   },
