@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import { useTestRunDetailsSuspends } from "ui/components/Library/Team/View/NewTestRuns/hooks/useTestRunDetailsSuspends";
 import { RunResults } from "ui/components/Library/Team/View/NewTestRuns/Overview/RunResults";
@@ -12,6 +12,11 @@ export function TestRunOverviewContent() {
     useContext(TestRunsContext);
 
   const { recordings, durationMs } = useTestRunDetailsSuspends(testRunId);
+  const [testFilterByText, setTestFilterByText] = useState("");
+
+  useEffect(() => {
+    setTestFilterByText("");
+  }, [testRunId]);
 
   const isPending = testRunId !== testRunIdForDisplay;
 
@@ -25,18 +30,19 @@ export function TestRunOverviewContent() {
         <>
           <RunSummary
             isPending={isPending}
-            recordings={recordings}
             testRun={testRun}
             durationMs={durationMs}
+            setTestFilterByText={setTestFilterByText}
+            testFilterByText={testFilterByText}
           />
-          <RunResults isPending={isPending} />
+          <RunResults isPending={isPending} testFilterByText={testFilterByText} />
         </>
       );
     }
   }
 
   return (
-    <div className={`flex h-full flex-col text-sm transition ${styles.runOverview}`}>
+    <div className={`flex h-full flex-col p-2 text-sm transition ${styles.runOverview}`}>
       {children}
     </div>
   );

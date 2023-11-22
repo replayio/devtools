@@ -4,15 +4,15 @@ import { ContextMenuItem, useContextMenu } from "use-context-menu";
 
 import Icon from "replay-next/components/Icon";
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
-import { testPassed } from "ui/utils/testRuns";
 
+import { FilterField } from "./FilterField";
 import { useTestRunDetailsSuspends } from "./hooks/useTestRunDetailsSuspends";
 import { TestResultListItem } from "./Overview/TestResultListItem";
 import { TestRunOverviewPage } from "./Overview/TestRunOverviewContextRoot";
 import { TestRunList } from "./TestRunList";
 import { TestRunsContext, TestRunsContextRoot } from "./TestRunsContextRoot";
 import _styles from "../../../Library.module.css";
-import styles from "./TestRunsPage.module.css";
+import dropdownStyles from "./Dropdown.module.css";
 
 export function TestRunsPage() {
   return (
@@ -76,7 +76,7 @@ function TestRunsContent() {
             <div className="flex flex-col gap-2">
               <div className="flex flex-row items-center justify-between gap-2 bg-bodyBgcolor">
                 <div
-                  className={styles.dropdownTrigger}
+                  className={dropdownStyles.dropdownTrigger}
                   data-test-id="TestRunsPage-ResultFilter-DropdownTrigger"
                   onClick={onClickStatusFilter}
                   onKeyDown={onKeyDownStatusFilter}
@@ -87,7 +87,7 @@ function TestRunsContent() {
                 </div>
                 {contextMenuStatusFilter}
                 <div
-                  className={styles.dropdownTrigger}
+                  className={dropdownStyles.dropdownTrigger}
                   data-test-id="TestRunsPage-BranchFilter-DropdownTrigger"
                   onClick={onClickBranchFilter}
                   onKeyDown={onKeyDownBranchFilter}
@@ -98,17 +98,11 @@ function TestRunsContent() {
                 </div>
                 {contextMenuBranchFilter}
               </div>
-              <div className={styles.filterContainer}>
-                <input
-                  className={styles.filterInput}
-                  data-test-id="TestRunsPage-FilterByText-Input"
-                  onChange={event => setFilterByText(event.currentTarget.value)}
-                  placeholder="Filter"
-                  type="text"
-                  value={filterByTextForDisplay}
-                />
-                <Icon className={styles.searchIcon} type="search" />
-              </div>
+              <FilterField
+                placeholder="Filter"
+                onChange={setFilterByText}
+                value={filterByTextForDisplay}
+              />
             </div>
             <div
               className="grow"

@@ -11,7 +11,9 @@ import {
   getTruncatedRelativeDate,
 } from "../../Recordings/RecordingListItem/RecordingListItem";
 import { AttributeContainer } from "../AttributeContainer";
+import { FilterField } from "../FilterField";
 import { RunStats } from "../RunStats";
+import dropdownStyles from "../Dropdown.module.css";
 
 export function ModeAttribute({ testRun }: { testRun: TestRun }) {
   const { mode } = testRun;
@@ -51,15 +53,7 @@ export function ModeAttribute({ testRun }: { testRun: TestRun }) {
   return <AttributeContainer icon={modeIcon}>{modeText}</AttributeContainer>;
 }
 
-export function Attributes({
-  recordings,
-  testRun,
-  durationMs,
-}: {
-  recordings: Recording[];
-  testRun: TestRun;
-  durationMs: number;
-}) {
+export function Attributes({ testRun, durationMs }: { testRun: TestRun; durationMs: number }) {
   const { date, source } = testRun;
 
   const durationString = getDurationString(durationMs);
@@ -116,7 +110,9 @@ function PullRequestLink({ testRun }: { testRun: TestRun }) {
       className="flex flex-row items-center gap-1 hover:underline"
     >
       <Icon className="h-4 w-4" type="open" />
-      <span data-test-id="TestRun-PullRequest">PR {prNumber}</span>
+      <span data-test-id="TestRun-PullRequest" className="whitespace-nowrap">
+        PR {prNumber}
+      </span>
     </Link>
   );
 }
@@ -141,31 +137,43 @@ function RunnerLink({ testRun }: { testRun: TestRun }) {
 
 export function RunSummary({
   isPending,
-  recordings,
   testRun,
   durationMs,
+  testFilterByText,
+  setTestFilterByText,
 }: {
   isPending: boolean;
-  recordings: Recording[];
   testRun: TestRun;
   durationMs: number;
+  testFilterByText: string;
+  setTestFilterByText: (value: string) => void;
 }) {
-  const { source } = testRun;
-
   return (
     <div
-      className={`flex flex-col border-b border-themeBorder ${isPending ? "opacity-50" : ""}`}
+      className={`flex flex-col gap-2 border-b border-themeBorder ${isPending ? "opacity-50" : ""}`}
       data-test-id="TestRunSummary"
     >
-      <div className="flex flex-row items-center justify-between gap-1 px-4 pt-3">
-        <div className="flex-grow"></div>
+      <div className="flex flex-row items-center justify-between gap-2">
+        <div
+          className={`flex-grow ${dropdownStyles.dropdownTrigger} ${dropdownStyles.disabled}`}
+          tabIndex={0}
+        >
+          <span>All Tests</span>
+          <Icon className="h-5 w-5" type="chevron-down" />
+        </div>
         <RunStats testRunId={testRun.id} />
       </div>
-      <div className="overflow-hidden overflow-ellipsis whitespace-nowrap border-b border-themeBorder px-4  py-3 font-bold">
+
+      <FilterField
+        placeholder="Filter tests"
+        value={testFilterByText}
+        onChange={setTestFilterByText}
+      />
+      <div className="overflow-hidden overflow-ellipsis whitespace-nowrap border-b border-themeBorder px-4 pt-2 pb-4 font-bold">
         {getTestRunTitle(testRun)}
       </div>
-      <div className="flex w-full flex-row items-center gap-4 py-3 px-4 text-xs">
-        <Attributes recordings={recordings} testRun={testRun} durationMs={durationMs} />
+      <div className="flex w-full flex-row items-center gap-4 px-4 pb-4 pt-2 text-xs">
+        <Attributes testRun={testRun} durationMs={durationMs} />
         <div className="grow" />
         <PullRequestLink testRun={testRun} />
         <RunnerLink testRun={testRun} />
