@@ -5,8 +5,8 @@ import { ContextMenuItem, useContextMenu } from "use-context-menu";
 import Icon from "replay-next/components/Icon";
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 
+import { useTestRunDetailsSuspends } from "../TestRuns/hooks/useTestRunDetailsSuspends";
 import { FilterField } from "./FilterField";
-import { useTestRunDetailsSuspends } from "./hooks/useTestRunDetailsSuspends";
 import { TestResultListItem } from "./Overview/TestResultListItem";
 import { TestRunOverviewPage } from "./Overview/TestRunOverviewContextRoot";
 import { TestRunList } from "./TestRunList";
@@ -145,8 +145,8 @@ function TestRunSpecDetails() {
   const { testRunId } = useContext(TestRunsContext);
 
   const { groupedTests, tests } = useTestRunDetailsSuspends(testRunId);
-
-  const selectedSpecTests = tests?.filter((t: any) => t.sourcePath === spec);
+  const selectedSpecTests = tests?.filter((t: any) => t.sourcePath === spec) ?? [];
+  const selectedTest = selectedSpecTests[0];
 
   if (!spec) {
     return (
@@ -156,15 +156,11 @@ function TestRunSpecDetails() {
         </div>
       </div>
     );
-  } else if (groupedTests === null) {
+  } else if (groupedTests === null || selectedTest == null) {
     return null;
   }
 
-  const selectedTest = selectedSpecTests[0];
-
   const dates = selectedSpecTests.map(t => t.recordings[0].date);
-
-  console.log({ selectedTest, selectedSpecTests, dates });
 
   const failedTests = selectedSpecTests.filter(t => t.result === "failed");
 

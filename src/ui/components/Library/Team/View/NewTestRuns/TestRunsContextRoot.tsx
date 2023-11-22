@@ -12,8 +12,8 @@ import {
 
 import { TestRun, getTestRunTitle } from "shared/test-suites/TestRun";
 import { useGetTeamRouteParams } from "ui/components/Library/Team/utils";
-import { useSyncTestRunIdToUrl } from "ui/components/Library/Team/View/NewTestRuns/hooks/useSyncTestIdToUrl";
-import { useTestRuns } from "ui/components/Library/Team/View/NewTestRuns/hooks/useTestRuns";
+import { useSyncTestRunIdToUrl } from "ui/components/Library/Team/View/TestRuns/hooks/useSyncTestIdToUrl";
+import { useTestRuns } from "ui/components/Library/Team/View/TestRuns/hooks/useTestRuns";
 
 type TestRunsContextType = {
   filterByBranch: "all" | "primary";

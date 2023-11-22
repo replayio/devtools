@@ -1,8 +1,8 @@
 import { useContext, useEffect, useState } from "react";
 
-import { useTestRunDetailsSuspends } from "ui/components/Library/Team/View/NewTestRuns/hooks/useTestRunDetailsSuspends";
 import { RunResults } from "ui/components/Library/Team/View/NewTestRuns/Overview/RunResults";
 import { TestRunsContext } from "ui/components/Library/Team/View/NewTestRuns/TestRunsContextRoot";
+import { useTestRunDetailsSuspends } from "ui/components/Library/Team/View/TestRuns/hooks/useTestRunDetailsSuspends";
 
 import { RunSummary } from "./RunSummary";
 import styles from "../../../../Library.module.css";

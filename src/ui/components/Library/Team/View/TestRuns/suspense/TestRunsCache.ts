@@ -32,6 +32,7 @@ export type TestRunRecordings = {
   durationMs: number;
   groupedTests: TestGroups | null;
   recordings: Recording[] | null;
+  tests: TestRunTestWithRecordings[] | null;
 };
 
 export const testRunDetailsCache = createCache<
@@ -74,6 +75,7 @@ export const testRunDetailsCache = createCache<
       testRun,
       durationMs,
       groupedTests: groupRecordings(testsWithRecordings),
+      tests: testsWithRecordings,
       recordings,
     };
   },
