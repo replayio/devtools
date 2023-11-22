@@ -37,9 +37,13 @@ export type Test = {
   testId: string;
   title: string;
   failureRate: number;
+};
+
+export type TestWithExecutions = Test & {
+  executions: TestExecution[];
+  failureRate: number;
   failureRates: FailureRates;
   errorFrequency: Record<string, number>;
-  executions: TestExecution[];
 };
 
 export type FailureRates = {
@@ -53,6 +57,8 @@ export type TestExecution = {
   errors: string[] | null;
   createdAt: string;
   result: string;
+  commitTitle: string | null;
+  recordings: Pick<Recording, "id" | "title" | "isProcessed">[];
 };
 
 export type TestRun = {
