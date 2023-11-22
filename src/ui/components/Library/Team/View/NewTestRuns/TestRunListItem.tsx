@@ -56,7 +56,7 @@ export function TestRunListItem({
     attributes = (
       <div className="flex flex-row items-center gap-4 text-xs font-light">
         <AttributeContainer dataTestId="TestRun-Date" icon="schedule" title={date.toLocaleString()}>
-          {getTruncatedRelativeDate(date)}
+          {getTruncatedRelativeDate(date, false)}
         </AttributeContainer>
         {user && (
           <AttributeContainer dataTestId="TestRun-Username" icon="person">
@@ -75,7 +75,7 @@ export function TestRunListItem({
     attributes = (
       <div className="flex flex-row items-center gap-4 text-xs font-light">
         <AttributeContainer dataTestId="TestRun-Date" icon="schedule">
-          {getTruncatedRelativeDate(date)}
+          {getTruncatedRelativeDate(date, false)}
         </AttributeContainer>
       </div>
     );
@@ -110,7 +110,7 @@ export function TestRunListItem({
         >
           <MaterialIcon className="w-4">schedule</MaterialIcon>
           <span className="block overflow-hidden text-ellipsis whitespace-pre text-xs font-light">
-            {getTruncatedRelativeDate(date)}
+            {getTruncatedRelativeDate(date, false)}
           </span>
         </div>
       </div>

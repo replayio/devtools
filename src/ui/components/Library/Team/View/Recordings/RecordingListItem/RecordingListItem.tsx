@@ -41,12 +41,12 @@ function shortenRelativeDate(date: string) {
     .replace("less than am", "1m");
 }
 
-export function getTruncatedRelativeDate(date: string) {
-  return getRelativeDate(date, true);
+export function getTruncatedRelativeDate(date: string, addSuffix = true) {
+  return getRelativeDate(date, true, addSuffix);
 }
 
-export function getRelativeDate(date: string, truncate: boolean = false) {
-  let content = formatDistanceToNow(new Date(date), { addSuffix: false });
+export function getRelativeDate(date: string, truncate: boolean = false, addSuffix = true) {
+  let content = formatDistanceToNow(new Date(date), { addSuffix });
 
   if (truncate) {
     content = shortenRelativeDate(content);
@@ -77,7 +77,7 @@ export function getRelativeDate(date: string, truncate: boolean = false) {
     content = formatter.format(new Date(date));
   }
 
-  return content.trim();
+  return content;
 }
 
 function ReplayTitle({ title }: { title?: string | null }) {
