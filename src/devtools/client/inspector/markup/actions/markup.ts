@@ -17,7 +17,7 @@ export function selectNode(nodeId: string): UIThunkAction {
   return async (dispatch, getState, { replayClient }) => {
     const originalPauseId = await getCurrentPauseId(replayClient, getState());
     if (getPauseId(getState()) === originalPauseId) {
-      dispatch(highlightNode(nodeId, 1000));
+      dispatch(highlightNode(nodeId, false, 1000));
       dispatch(nodeSelected(nodeId));
     }
   };
@@ -28,8 +28,8 @@ let unhighlightTimer: ReturnType<typeof window.setTimeout> | null = null;
 export function highlightNodes(
   nodeIds: string[],
   pauseId?: string,
-  duration?: number,
-  useRealBoxModels = false
+  useRealBoxModels = false,
+  duration?: number
 ): UIThunkAction {
   return async (dispatch, getState, { replayClient }) => {
     const recordingCapabilities = await recordingCapabilitiesCache.readAsync(replayClient);
@@ -94,10 +94,11 @@ export function highlightNodes(
 
 export function highlightNode(
   nodeId: string,
-  duration?: number,
-  useRealBoxModels?: boolean
+  useRealBoxModels?: boolean,
+  duration?: number
 ): UIThunkAction {
-  return highlightNodes([nodeId], undefined, duration, useRealBoxModels);
+  // Assume we're highlighting the current pause here
+  return highlightNodes([nodeId], undefined, useRealBoxModels, duration);
 }
 
 export function unhighlightNode(): UIThunkAction {

@@ -106,7 +106,7 @@ export function NodePicker() {
         onHighlightNode(nodeId) {
           // No timer, but use actual box models to show the various sections in the highlight,
           // rather than just the contents from the bounding rect
-          dispatch(highlightNode(nodeId, undefined, true));
+          dispatch(highlightNode(nodeId, true));
         },
         onUnhighlightNode() {
           dispatch(unhighlightNode());

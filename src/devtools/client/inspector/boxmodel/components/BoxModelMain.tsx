@@ -133,7 +133,7 @@ export class BoxModelMain extends React.PureComponent<FinalBMMProps> {
     if (selectedNodeId) {
       // No timer, but use actual box models to show the various sections in the highlight,
       // rather than just the contents from the bounding rect
-      highlightNode(selectedNodeId, undefined, true);
+      highlightNode(selectedNodeId, true);
     }
   };
 
