@@ -1,4 +1,4 @@
-import { TestRunOverviewContainer } from "./TestRunOverviewContainerContextType";
+import { TestRunOverviewContainer } from "../../TestRuns/Overview/TestRunOverviewContainerContextType";
 import { TestRunOverviewContent } from "./TestRunOverviewContent";
 
 export function TestRunOverviewPage() {
