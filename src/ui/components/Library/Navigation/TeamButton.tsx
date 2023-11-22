@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { MouseEvent } from "react";
+import { MouseEvent, useContext } from "react";
 
 import useLocalStorageUserData from "shared/user-data/LocalStorage/useLocalStorageUserData";
 import { setModal } from "ui/actions/app";
@@ -12,7 +12,7 @@ import { useAppDispatch } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
 
 import { pushRoute, useGetTeamRouteParams } from "../Team/utils";
-import { View } from "../Team/View/ViewContextRoot";
+import { View, ViewContext } from "../Team/View/ViewContextRoot";
 import styles from "../Library.module.css";
 
 export function TeamButton({
