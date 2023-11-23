@@ -1,5 +1,6 @@
 import { TimeStampedPoint, TimeStampedPointRange } from "@replayio/protocol";
 import clamp from "lodash/clamp";
+import React, { useEffect, useRef } from "react";
 
 import { gPaintPoints, hasAllPaintPoints } from "protocol/graphics";
 import useLoadedRegions from "replay-next/src/hooks/useLoadedRegions";
@@ -69,6 +70,25 @@ const Spans = ({
 };
 
 export default function ProtocolTimeline() {
+  const timelineRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    /* this is to change the padding when protocol timeline is present */
+    const timeline = timelineRef.current;
+    if (!timeline) {
+      return;
+    }
+    console.log(timeline);
+
+    const protocolTimeline = document.querySelector(".protocolTimeline");
+
+    console.log(protocolTimeline);
+
+    if (protocolTimeline) {
+      timeline.classList.add("specialBorder");
+    }
+  }, []);
+
   const loadedRegions = useLoadedRegions();
 
   const [showProtocolTimeline] = useGraphQLUserData("feature_protocolTimeline");
@@ -80,7 +100,7 @@ export default function ProtocolTimeline() {
   }
 
   return (
-    <div className="flex w-full flex-col space-y-1">
+    <div ref={timelineRef} className="protocolTimeline flex w-full flex-col space-y-1">
       {/* This is pretty silly, but these are the classnames that get generated
       dynamically by this component. And if they are not statically in the
       build, then tailwind will not include the rules for them, which makes them

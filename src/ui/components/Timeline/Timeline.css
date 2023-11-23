@@ -9,8 +9,11 @@
   padding: 10px 0px 12px 6px;
   align-items: center;
   user-select: none;
-
   --timeline-size: 5px;
+}
+
+.specialBorder {
+  border: 1px solid red;
 }
 
 .theme-light .timeline,
