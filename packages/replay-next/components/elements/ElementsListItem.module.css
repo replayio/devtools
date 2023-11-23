@@ -8,11 +8,12 @@
   user-select: none;
   transition: 200ms opacity;
   padding-left: calc(0.25rem + var(--data-depth));
+  color: var(--value-type-html-tag);
 }
 .Node[data-type="comment"] {
   color: var(--token-comment-color);
 }
-.Node[data-type="doctype"] {
+.Node[data-type="document"] {
   color: var(--token-meta-color);
 }
 .Node[data-type="text"] {
@@ -48,17 +49,20 @@
 }
 
 .HTMLTag {
-  color: var(--value-type-html-tag);
   line-height: 1rem;
 }
 
 .HTMLBracket {
   color: var(--value-type-html-tag-bracket);
 }
+.Node[data-type="document"] .HTMLBracket {
+  display: none;
+}
 
 .HtmlAttribute {
   display: inline;
   color: var(--value-type-html-attribute-name);
+  padding-left: 1ch;
 }
 .HtmlAttribute:focus {
   outline: none;

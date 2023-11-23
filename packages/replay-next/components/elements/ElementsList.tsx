@@ -2,7 +2,6 @@ import { ObjectId, PauseId } from "@replayio/protocol";
 import {
   CSSProperties,
   ForwardedRef,
-  ReactElement,
   useContext,
   useEffect,
   useImperativeHandle,
@@ -12,11 +11,9 @@ import {
   useSyncExternalStore,
 } from "react";
 import { ListOnItemsRenderedProps } from "react-window";
-import { useImperativeCacheValue } from "suspense";
 
 import { ElementsListData } from "replay-next/components/elements/ElementsListData";
 import { NoContentFallback } from "replay-next/components/elements/NoContentFallback";
-import { rootObjectIdCache } from "replay-next/components/elements/suspense/RootObjectIdCache";
 import { Item } from "replay-next/components/elements/types";
 import { DefaultFallback } from "replay-next/components/ErrorBoundary";
 import { LoadingProgressBar } from "replay-next/components/LoadingProgressBar";
@@ -47,7 +44,13 @@ export function ElementsList({
 }) {
   const replayClient = useContext(ReplayClientContext);
 
-  const itemData = useMemo<ElementsListItemData>(() => ({}), []);
+  const itemData = useMemo<ElementsListItemData>(
+    () => ({
+      pauseId,
+      replayClient,
+    }),
+    [pauseId, replayClient]
+  );
 
   const { cssVariables, onItemsRendered: onItemsRenderedOne } =
     useHorizontalScrollingListCssVariables("ElementsList");
@@ -58,8 +61,6 @@ export function ElementsList({
     onItemsRenderedOne();
     onItemsRenderedTwo(props);
   };
-
-  const { value: rootObjectId } = useImperativeCacheValue(rootObjectIdCache, replayClient, pauseId);
 
   const listData = useMemo<ElementsListData>(
     () => new ElementsListData(replayClient, pauseId),
@@ -75,8 +76,8 @@ export function ElementsList({
     return listData.subscribeToSelectedIndex((index: number | null) => {
       const onSelectionChange = onSelectionChangeRef.current;
       if (onSelectionChange) {
-        const item = index != null ? listData.getItemAtIndex(index).id : null;
-        onSelectionChange(item);
+        const objectId = index != null ? listData.getItemAtIndex(index).objectId : null;
+        onSelectionChange(objectId);
       }
     });
   }, [listData]);
@@ -96,16 +97,8 @@ export function ElementsList({
     forwardedRef,
     () => ({
       async selectNode(nodeId: ObjectId | null) {
-        if (nodeId === null) {
-          listData.setSelectedIndex(null);
-        } else {
-          const index = await listData.loadPathToNode(nodeId);
-          if (index != null) {
-            listData.setSelectedIndex(index);
-          } else {
-            console.warn(`Index not found for node ${nodeId}`);
-          }
-        }
+        await listData.waitUntilLoaded();
+        listData.selectNode(nodeId);
       },
     }),
     [listData]
@@ -117,12 +110,6 @@ export function ElementsList({
       listData.destroy();
     };
   }, [listData]);
-
-  useEffect(() => {
-    if (rootObjectId) {
-      listData.registerRootNodeId(rootObjectId);
-    }
-  }, [listData, rootObjectId]);
 
   if (didError) {
     return <DefaultFallback style={{ height }} />;
@@ -140,15 +127,22 @@ export function ElementsList({
         event.preventDefault();
         event.stopPropagation();
 
-        const hasChildren = item.element.filteredChildNodeIds.length > 0;
-        if (item.isTail) {
-          listData.setSelectedIndex(listData.getIndexForItem(item));
-        } else if (hasChildren && item.isExpanded) {
-          listData.toggleNodeExpanded(item.id, false);
-        } else {
-          const parentItem = listData.getParentItem(item);
-          const parentIndex = listData.getIndexForItem(parentItem);
-          listData.setSelectedIndex(parentIndex);
+        switch (item.displayMode) {
+          case "collapsed":
+          case "empty": {
+            const parentItem = listData.getParentItem(item);
+            const parentIndex = listData.getIndexForItem(parentItem);
+            listData.setSelectedIndex(parentIndex);
+            break;
+          }
+          case "head": {
+            listData.toggleNodeExpanded(item.objectId, false);
+            break;
+          }
+          case "tail": {
+            listData.setSelectedIndex(listData.getIndexForItem(item));
+            break;
+          }
         }
         break;
       }
@@ -156,12 +150,20 @@ export function ElementsList({
         event.preventDefault();
         event.stopPropagation();
 
-        const hasChildren = item.element.filteredChildNodeIds.length > 0;
-        if (hasChildren) {
-          if (item.isExpanded) {
+        switch (item.displayMode) {
+          case "collapsed": {
+            listData.toggleNodeExpanded(item.objectId, true);
+            break;
+          }
+          case "empty": {
+            break;
+          }
+          case "head": {
             listData.setSelectedIndex(index + 1);
-          } else {
-            listData.toggleNodeExpanded(item.id, true);
+            break;
+          }
+          case "tail": {
+            break;
           }
         }
         break;

@@ -1,5 +1,4 @@
 import { ObjectId, PauseData, PauseId, Object as ProtocolObject } from "@replayio/protocol";
-import { mock } from "jest-mock-extended";
 
 import {
   MockReplayClientInterface,

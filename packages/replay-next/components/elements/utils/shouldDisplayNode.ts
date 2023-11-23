@@ -7,8 +7,7 @@ export function shouldDisplayNode(node: ProtocolNode): boolean {
       // but we should show e.g. iframe document roots
       return node.parentNode != null;
     case Node.TEXT_NODE:
-      // Don't show whitespace-only text nodes
-      return !!node.nodeValue?.trim();
+      return false;
     default:
       return true;
   }

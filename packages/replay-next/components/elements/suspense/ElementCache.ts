@@ -14,6 +14,8 @@ export type Element = {
   node: Node;
 };
 
+// TODO [FE-2067] Remove this cache; the DOMCache has replaced it.
+//                Views should use the objectCache to fetch Element data.
 export const elementCache = createCache<
   [replayClient: ReplayClientInterface, pauseId: PauseId, id: ObjectId],
   Element
