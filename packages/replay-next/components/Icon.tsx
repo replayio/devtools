@@ -343,7 +343,7 @@ export default function Icon({
               rx="9"
               fill="currentColor"
               stroke="currentColor"
-              stroke-width="2"
+              strokeWidth="2"
             />
             <path
               d="M15.3324 10.7528C15.804 11.0212 15.804 11.7009 15.3324 11.9694L9.34584 15.3778C8.87919 15.6435 8.2995 15.3064 8.2995 14.7695L8.2995 7.95273C8.2995 7.41575 8.87919 7.07873 9.34584 7.34441L15.3324 10.7528Z"
@@ -371,7 +371,7 @@ export default function Icon({
               rx="9"
               fill="transparent"
               stroke="currentColor"
-              stroke-width="2"
+              strokeWidth="2"
             />
             <path
               d="M15.3324 10.7528C15.804 11.0212 15.804 11.7009 15.3324 11.9694L9.34584 15.3778C8.87919 15.6435 8.2995 15.3064 8.2995 14.7695L8.2995 7.95273C8.2995 7.41575 8.87919 7.07873 9.34584 7.34441L15.3324 10.7528Z"
