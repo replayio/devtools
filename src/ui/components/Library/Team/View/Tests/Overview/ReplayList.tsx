@@ -36,10 +36,8 @@ export function ReplayList({ executions, label }: { executions: TestExecution[];
   return (
     <div className="flex flex-col gap-2 py-2">
       <div className="flex flex-col gap-2">
-        <div className="flex gap-1 overflow-hidden pl-4 text-lg">
-          <div className="overflow-hidden overflow-ellipsis whitespace-nowrap font-medium">
-            {label}
-          </div>
+        <div className={styles.replayListTitle}>
+          <div className={styles.labelText}>{label}</div>
         </div>
         <div className="flex flex-col">{children}</div>
       </div>

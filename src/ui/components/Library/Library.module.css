@@ -299,8 +299,20 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
-  border-top: 1px solid var(--chrome);
+  border-bottom: 1px solid var(--chrome);
   padding: 0.625rem 1rem;
   cursor: pointer;
   transition: background-color 0.2s;
+}
+
+.replayListTitle {
+  padding: 0.5rem 1rem 0.08rem;
+  font-size: 1.125rem;
+}
+
+.labelText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
 }
