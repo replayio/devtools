@@ -651,78 +651,63 @@ export async function processCypressTestRecording(
   }
 }
 
-
-class FunctionNode {
-  functionName: string;
-  events: TestEvent[];
-  children: { [key: string]: FunctionNode };
-
-  constructor(functionName = "") {
-    this.functionName = functionName;
-    this.events = [];
-    this.children = {};
-  }
-
-  findOrAddChild(functionName: string) {
-    if (!this.children.hasOwnProperty(functionName)) {
-      this.children[functionName] = new FunctionNode(functionName);
+function addTimeStampedPoints(node: RecordingTestMetadataV3.FunctionEvent) {
+  node.timeStampedPoint = getTestEventTimeStampedPoint(
+    node.data.events[node.data.events.length - 1]
+  );
+  node.data.events?.forEach(child => {
+    if (isFunctionEvent(child)) {
+      addTimeStampedPoints(child);
     }
-    return this.children[functionName];
-  }
-
-  toDict(): any {
-    // Convert the children to a list of dictionaries
-    const childList = Object.values(this.children).map(childNode => childNode.toDict());
-
-    // Combine events and children
-    const combined = this.events.concat(childList);
-
-    const firstEvent = combined[0]
-
-    const timeStampedPoint = isUserActionTestEvent(firstEvent) ? firstEvent.data.timeStampedPoints.beforeStep : firstEvent.timeStampedPoint
-    return {
-      data: {
-        function: this.functionName,
-        events: combined,
-      },
-      timeStampedPoint,
-      type: "function",
-    };
-  }
+  });
 }
 
-export function buildCallTree(commands: TestEvent[]): RecordingTestMetadataV3.FunctionEvent | null {
-
+/*
+ * Converts a list of commands with call stacks into a tree of functions with nested commands
+ *
+ * example
+ * input: ["eval: a,c,d", "goto: a,f", "goto: a,e"]
+ * output:
+    a
+      c
+        d
+          _eval_
+      f
+        _goto_
+      e
+        _goto_
+ */
+export function buildCallTree(commands: TestEvent[]): Array<RecordingTestMetadataV3.FunctionEvent> {
   let root: RecordingTestMetadataV3.FunctionEvent = {
-    type: 'function',
+    type: "function",
     timeStampedPoint: null,
     data: {
-      function: '',
-      events: []
-    }
+      function: "",
+      key: '',
+      events: [],
+    },
   };
-
 
   for (const cmd of commands) {
     if (!cmd || !isUserActionTestEvent(cmd) || !cmd.data?.testSourceCallStack) {
-      continue
+      continue;
     }
     let currentNode = root;
-    const callStack = cmd.data.testSourceCallStack.reverse()
+    const callStack = cmd.data.testSourceCallStack.reverse();
     for (const frameIndex in callStack) {
-      const frame = callStack[frameIndex]
+      const frame = callStack[frameIndex];
       const name = frame.functionName || frame.fileName;
-      const key = `${name}.${callStack[frameIndex - 1]?.lineNumber || ""}`
+      const key = `${name}.${callStack[+frameIndex - 1]?.lineNumber || ""}`;
       let child = currentNode.data.events?.find(c => isFunctionEvent(c) && c.data.key === key);
       if (!child) {
         child = {
-          type: 'function',
+          type: "function",
           timeStampedPoint: null,
           data: {
             function: name,
             key,
-            events: []
-          }
+            events: [],
+          },
         };
         currentNode.data.events?.push(child);
       }
@@ -732,32 +717,10 @@ export function buildCallTree(commands: TestEvent[]): RecordingTestMetadataV3.Fu
     currentNode.data.events?.push(cmd);
   }
 
-
   root = root.data.events[0] as RecordingTestMetadataV3.FunctionEvent;
+  addTimeStampedPoints(root);
 
-  function walk(node: RecordingTestMetadataV3.FunctionEvent) {
-    node.timeStampedPoint = getTestEventTimeStampedPoint(node.data.events[node.data.events.length - 1]);
-    console.log(node.data.function, node.timeStampedPoint)
-    node.data.events?.forEach(child => {
-      if (isFunctionEvent(child)) {
-        walk(child);
-      }
-    });
-  }
-
-  walk(root);
-
-
-  return root;
-}
-
-
-
-function groupTestByCallStacks(test: RecordingTestMetadataV3.TestRecording) {
-  console.log(test.events.main)
-  test.events.main = [buildCallTree(test.events.main)]
-  console.log(test.events.main)
-  return test;
+  return [root];
 }
 
 export async function processGroupedTestCases(
@@ -873,12 +836,11 @@ export async function processGroupedTestCases(
           const legacyTest = partialTestRecordings[index];
           let test = await processPlaywrightTestRecording(legacyTest, annotations, testStacks);
 
+          // TODO: Add feature flag similar to Call Stack Framework grouping that the user can toggle by
+          // right clicking on the panel
           if (true) {
-            test = groupTestByCallStacks(test)
+            test.events.main = buildCallTree(test.events.main);
           }
-
-          // console.log('>> out', JSON.stringify(test))
-
 
           testRecordings.push(test);
         }
@@ -1144,10 +1106,14 @@ export function getGroupedTestCasesTitle(groupedTestCases: AnyGroupedTestCases):
 export function getTestEventTimeStampedPoint(
   testEvent: RecordingTestMetadataV3.TestEvent
 ): TimeStampedPoint | null {
-  if (isFunctionEvent(testEvent) || isNavigationTestEvent(testEvent) || isNetworkRequestTestEvent(testEvent)) {
+  if (
+    isFunctionEvent(testEvent) ||
+    isNavigationTestEvent(testEvent) ||
+    isNetworkRequestTestEvent(testEvent)
+  ) {
     return testEvent.timeStampedPoint;
   } else {
-    return testEvent.data.timeStampedPoints.afterStep ?? null;
+    return testEvent.data.timeStampedPoints.beforeStep ?? null;
   }
 }
 
@@ -1194,12 +1160,9 @@ export function isNetworkRequestTestEvent(
   return value.type === "network-request";
 }
 
-export function isFunctionEvent(
-  value: TestEvent
-): value is RecordingTestMetadataV3.FunctionEvent {
+export function isFunctionEvent(value: TestEvent): value is RecordingTestMetadataV3.FunctionEvent {
   return value.type === "function";
 }
-
 
 export function isTestRecordingV1(
   value: AnyTestRecording

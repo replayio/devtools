@@ -43,9 +43,9 @@ export function TestSectionRow({
   nestingLevel = 0,
 }: {
   testEvent: TestEvent;
-  testRunnerName: TestRunnerName | null;
+  testRunnerName: TestRunnerName;
   testSectionName: TestSectionName;
-  nestingLevel: number;
+  nestingLevel?: number;
 }) {
   const { range: focusWindow } = useContext(FocusContext);
   const { executionPoint: currentExecutionPoint } = useContext(TimelineContext);
@@ -149,25 +149,13 @@ export function TestSectionRow({
     let executionPoint: ExecutionPoint | null = null;
     let time: number | null = null;
 
-    if (isUserActionTestEvent(testEvent)) {
-      const timeStampedPoint = testEvent.data.timeStampedPoints.beforeStep ?? null;
-      if (timeStampedPoint) {
-        executionPoint = timeStampedPoint.point;
-        time = timeStampedPoint.time;
-      }
-    } else if (isFunctionEvent(testEvent)) {
-      const event = testEvent.data.events[0];
-      if (event.type === "navigation") {
-        executionPoint = event.timeStampedPoint.point;
-        time = event.timeStampedPoint.time;
-      } else if (event.type === "user-action") {
-        const timeStampedPoint = event.data.timeStampedPoints.beforeStep;
-        executionPoint = timeStampedPoint?.point ?? null;
-        time = timeStampedPoint?.time ?? null;
-      }
-    } else {
-      executionPoint = testEvent.timeStampedPoint.point;
-      time = testEvent.timeStampedPoint.time;
+    const timeStampedPoint = isUserActionTestEvent(testEvent)
+      ? testEvent.data.timeStampedPoints.beforeStep
+      : testEvent.timeStampedPoint;
+
+    if (timeStampedPoint) {
+      executionPoint = timeStampedPoint.point;
+      time = timeStampedPoint.time;
     }
 
     // It's possible that this step is outside of the current focus window

@@ -37,7 +37,7 @@ export default function TestSection({
         <TestSectionRow
           key={index}
           testEvent={testEvent}
-          testRunnerName={groupedTestCases.environment.testRunner?.name ?? null}
+          testRunnerName={groupedTestCases.environment.testRunner.name}
           testSectionName={testSectionName}
         />
       ))}

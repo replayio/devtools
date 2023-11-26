@@ -1,7 +1,7 @@
 import { memo, useState } from "react";
 
 import { truncateMiddle } from "replay-next/src/utils/string";
-import { RecordingTestMetadataV3 } from "shared/test-suites/RecordingTestMetadata";
+import { RecordingTestMetadataV3, TestSectionName, TestRunnerName } from "shared/test-suites/RecordingTestMetadata";
 
 import { TestSectionRow } from "../TestSectionRow";
 import styles from "./FunctionEventRow.module.css";
@@ -13,8 +13,8 @@ export default memo(function FunctionEventRow({
   nestingLevel,
 }: {
   functionEvent: RecordingTestMetadataV3.FunctionEvent;
-  testRunnerName: string | null;
-  testSectionName: string;
+  testRunnerName: TestRunnerName;
+  testSectionName: TestSectionName;
   nestingLevel: number;
 }) {
   const [collapsed, toggleCollapsed] = useState(true);
