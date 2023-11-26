@@ -285,11 +285,12 @@ export namespace RecordingTestMetadataV3 {
     // Data needed to render this event
     data: {
       function: string;
+      key: string;
       events: TestEvent[];
     };
 
     // The precise time this event occurred; not that events have no duration
-    timeStampedPoint: TimeStampedPoint;
+    timeStampedPoint: TimeStampedPoint | null;
 
     type: "function";
   }
@@ -690,31 +691,72 @@ class FunctionNode {
   }
 }
 
+export function buildCallTree(commands: TestEvent[]): RecordingTestMetadataV3.FunctionEvent | null {
 
-function groupTestByCallStacks(test: RecordingTestMetadataV3.TestRecording) {
-  // Initialize the root of the tree
-  const rootNode = new FunctionNode();
-
-  // Sample events_data for demonstration purposes
-  // Make sure to define your `events_data` before this loop
-  // let events_data = [ ... ];
-
-  for (let event of test.events.main) {
-    let currentNode = rootNode;
-    // @ts-ignore
-    const callStack = event.data.testSourceCallStack || [];
-    for (let call of callStack.reverse()) {
-      const functionName = call.functionName || call.fileName;
-      console.log(functionName)
-      currentNode = currentNode.findOrAddChild(functionName);
+  let root: RecordingTestMetadataV3.FunctionEvent = {
+    type: 'function',
+    timeStampedPoint: null,
+    data: {
+      function: '',
+      events: []
     }
-    currentNode.events.push(event);
+  };
+
+
+  for (const cmd of commands) {
+    if (!cmd || !isUserActionTestEvent(cmd) || !cmd.data?.testSourceCallStack) {
+      continue
+    }
+    let currentNode = root;
+    const callStack = cmd.data.testSourceCallStack.reverse()
+    for (const frameIndex in callStack) {
+      const frame = callStack[frameIndex]
+      const name = frame.functionName || frame.fileName;
+      const key = `${name}.${callStack[frameIndex - 1]?.lineNumber || ""}`
+      let child = currentNode.data.events?.find(c => isFunctionEvent(c) && c.data.key === key);
+      if (!child) {
+        child = {
+          type: 'function',
+          timeStampedPoint: null,
+          data: {
+            function: name,
+            key,
+            events: []
+          }
+        };
+        currentNode.data.events?.push(child);
+      }
+
+      currentNode = child as RecordingTestMetadataV3.FunctionEvent;
+    }
+    currentNode.data.events?.push(cmd);
   }
 
-  // Convert the tree to the desired dict structure
-  test.events.main = rootNode.toDict().data.events;
+
+  root = root.data.events[0] as RecordingTestMetadataV3.FunctionEvent;
+
+  function walk(node: RecordingTestMetadataV3.FunctionEvent) {
+    node.timeStampedPoint = getTestEventTimeStampedPoint(node.data.events[node.data.events.length - 1]);
+    console.log(node.data.function, node.timeStampedPoint)
+    node.data.events?.forEach(child => {
+      if (isFunctionEvent(child)) {
+        walk(child);
+      }
+    });
+  }
+
+  walk(root);
 
 
+  return root;
+}
+
+
+
+function groupTestByCallStacks(test: RecordingTestMetadataV3.TestRecording) {
+  console.log(test.events.main)
+  test.events.main = [buildCallTree(test.events.main)]
+  console.log(test.events.main)
   return test;
 }
 
@@ -831,13 +873,11 @@ export async function processGroupedTestCases(
           const legacyTest = partialTestRecordings[index];
           let test = await processPlaywrightTestRecording(legacyTest, annotations, testStacks);
 
-          console.log('>> original', JSON.stringify(test))
-
           if (true) {
             test = groupTestByCallStacks(test)
           }
 
-          console.log('>> out', JSON.stringify(test))
+          // console.log('>> out', JSON.stringify(test))
 
 
           testRecordings.push(test);
@@ -1107,7 +1147,7 @@ export function getTestEventTimeStampedPoint(
   if (isFunctionEvent(testEvent) || isNavigationTestEvent(testEvent) || isNetworkRequestTestEvent(testEvent)) {
     return testEvent.timeStampedPoint;
   } else {
-    return testEvent.data.timeStampedPoints.beforeStep ?? null;
+    return testEvent.data.timeStampedPoints.afterStep ?? null;
   }
 }
 
