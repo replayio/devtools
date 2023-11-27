@@ -68,6 +68,7 @@ export function useFileNameTree(testGroup: TestGroup, filterByText: string = "")
         assert(isFileNode(node));
       } else {
         node = {
+          absolutePath: fileName,
           name: part,
           tests: [],
           type: "file",
@@ -134,6 +135,7 @@ export type PathNode = {
 };
 
 export type FileNode = {
+  absolutePath: string;
   name: string;
   tests: TestRunTestWithRecordings[];
   type: "file";

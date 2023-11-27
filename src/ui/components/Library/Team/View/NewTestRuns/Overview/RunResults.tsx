@@ -122,16 +122,10 @@ const FileNodeRenderer = memo(function FileNodeRenderer({
   fileNode: FileNode;
   path: string;
 }) {
-  const { name, tests } = fileNode;
+  const { name, absolutePath, tests } = fileNode;
   const { setSpec } = useContext(TestRunsContext);
 
-  const onClick = () => {
-    if (path) {
-      setSpec(path + "/" + name);
-    } else {
-      setSpec(name);
-    }
-  };
+  const onClick = () => setSpec(absolutePath);
 
   let type: IconType;
   let iconClassName = "";
