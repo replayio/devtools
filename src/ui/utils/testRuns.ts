@@ -75,6 +75,8 @@ export function groupRecordings(tests: TestRunTestWithRecordings[]): TestGroups 
         } else {
           addToTestGroup(failedRecordings, test);
         }
+      } else if (test.result === "flaky") {
+        addToTestGroup(flakyRecordings, test);
       }
     }
 
