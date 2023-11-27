@@ -9,14 +9,11 @@
   padding: 10px;
   align-items: center;
   user-select: none;
+
   --timeline-size: 5px;
 }
 .timeline[data-protocol-timeline-enabled] {
   padding-bottom: 0;
-}
-
-.specialBorder {
-  border: 1px solid red;
 }
 
 .theme-light .timeline,
