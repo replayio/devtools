@@ -14,8 +14,7 @@
   background-color: var(--body-bgcolor);
 }
 
-:root:global(.theme-dark) .libraryRow:hover,
-:root:global(.theme-dark) .replayRow:hover {
+:root:global(.theme-dark) .libraryRow:hover {
   background-color: #1c2534;
 }
 
@@ -84,8 +83,7 @@
   color: var(--body-color);
 }
 
-:root:global(.theme-light) .libraryRow:hover,
-:root:global(.theme-light) .replayRow:hover {
+:root:global(.theme-light) .libraryRow:hover {
   background-color: var(--grey-10);
 }
 
@@ -273,46 +271,4 @@
 
 .dropdownTrigger:focus {
   box-shadow: 0 0 0 var(--ring-width) var(--ring-color);
-}
-
-.testTitle {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.25rem; /* For 'gap-1' */
-  border-bottom: 1px solid var(--theme-border);
-  padding: 1.065em 1rem;
-}
-
-.testTitle > div {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 1.125rem;
-  font-weight: 500;
-}
-
-.replayRow {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  border-bottom: 1px solid var(--chrome);
-  padding: 0.625rem 1rem;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.replayListTitle {
-  padding: 0.5rem 1rem 0.08rem;
-  font-size: 1.125rem;
-}
-
-.labelText {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-weight: 500;
 }
