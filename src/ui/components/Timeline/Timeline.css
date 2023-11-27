@@ -6,11 +6,14 @@
   box-sizing: border-box;
   --progressbar-transition: 200ms;
   display: flex;
-  padding: 10px 0px 12px 6px;
+  padding: 10px;
   align-items: center;
   user-select: none;
 
   --timeline-size: 5px;
+}
+.timeline[data-protocol-timeline-enabled] {
+  padding-bottom: 0;
 }
 
 .theme-light .timeline,
