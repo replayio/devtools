@@ -32,7 +32,6 @@ export function TeamButton({
   const isSelected = router.asPath.includes(basePath);
   const showSettingsButton = isSelected && id && id !== MY_LIBRARY_TEAM.id && !isNew;
   const updateDefaultWorkspace = useUpdateDefaultWorkspace();
-  const [enableTestSuitesTestsView] = useLocalStorageUserData("enableTestSuitesTestsView");
 
   const onClick = async () => {
     if (isNew) {
@@ -69,7 +68,7 @@ export function TeamButton({
         ) : null}
         {showSettingsButton ? <SettingsButton /> : null}
       </Link>
-      {isSelected && enableTestSuitesTestsView && isTest ? <TestTeamViews /> : null}
+      {isSelected && isTest ? <TestTeamViews /> : null}
     </div>
   );
 }
