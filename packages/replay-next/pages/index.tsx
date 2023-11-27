@@ -108,9 +108,9 @@ export default function HomePage({ apiKey }: { apiKey?: string }) {
                             <Panel
                               className={styles.Panel}
                               collapsible
-                              defaultSize={15}
-                              minSize={10}
-                              maxSize={20}
+                              defaultSizePercentage={15}
+                              minSizePercentage={10}
+                              maxSizePercentage={20}
                             >
                               <div className={styles.CommentsContainer}>
                                 <Suspense fallback={<Loader />}>
@@ -134,7 +134,11 @@ export default function HomePage({ apiKey }: { apiKey?: string }) {
                             <PanelResizeHandle className={styles.PanelResizeHandle}>
                               <div className={styles.PanelResizeHandleInner} />
                             </PanelResizeHandle>
-                            <Panel className={styles.Panel} defaultSize={50} minSize={35}>
+                            <Panel
+                              className={styles.Panel}
+                              defaultSizePercentage={50}
+                              minSizePercentage={35}
+                            >
                               <div className={styles.SourcesContainer}>
                                 <Suspense fallback={<Loader />}>
                                   <Sources />
@@ -144,7 +148,11 @@ export default function HomePage({ apiKey }: { apiKey?: string }) {
                             <PanelResizeHandle className={styles.PanelResizeHandle}>
                               <div className={styles.PanelResizeHandleInner} />
                             </PanelResizeHandle>
-                            <Panel className={styles.Panel} defaultSize={35} minSize={25}>
+                            <Panel
+                              className={styles.Panel}
+                              defaultSizePercentage={35}
+                              minSizePercentage={25}
+                            >
                               <div className={styles.ConsoleContainer}>
                                 <TerminalContextRoot>
                                   <ConsoleRoot showSearchInputByDefault={false} />

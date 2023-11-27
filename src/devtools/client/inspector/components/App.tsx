@@ -50,11 +50,11 @@ export default function InspectorApp() {
     <div className="inspector-responsive-container theme-body inspector">
       <div id="inspector-splitter-box">
         <PanelGroup autoSaveId="App" className="inspector-sidebar-splitter" direction="horizontal">
-          <Panel minSize={20}>
+          <Panel minSizePercentage={20}>
             <ElementsPanelAdapter />
           </Panel>
           <PanelResizeHandle className="h-full w-1 bg-chrome" />
-          <Panel defaultSize={40} minSize={20}>
+          <Panel defaultSizePercentage={40} minSizePercentage={20}>
             <div className="devtools-inspector-tab-panel">
               <div id="inspector-sidebar-container">
                 <div id="inspector-sidebar">

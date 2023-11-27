@@ -27,11 +27,11 @@ export function ProtocolViewer({
       responseMap={responseMap}
     >
       <PanelGroup autoSaveId="ProtocolViewer" className={styles.Container} direction="vertical">
-        <Panel id="list" minSize={20}>
+        <Panel id="list" minSizePercentage={20}>
           <ProtocolViewerList />
         </Panel>
         <PanelResizeHandle className={styles.PanelResizeHandle} />
-        <Panel id="details" minSize={20}>
+        <Panel id="details" minSizePercentage={20}>
           <RequestDetails />
         </Panel>
       </PanelGroup>

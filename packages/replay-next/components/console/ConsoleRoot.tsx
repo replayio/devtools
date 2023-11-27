@@ -159,9 +159,9 @@ function Console({
           <>
             <Panel
               className={styles.LeftPanel}
-              defaultSize={25}
+              defaultSizePercentage={25}
               id="filters"
-              minSize={20}
+              minSizePercentage={20}
               order={1}
               style={{ overflowY: "auto" }}
             >
@@ -190,7 +190,13 @@ function Console({
           </>
         </Offscreen>
 
-        <Panel className={styles.RightPanel} defaultSize={75} id="console" minSize={50} order={2}>
+        <Panel
+          className={styles.RightPanel}
+          defaultSizePercentage={75}
+          id="console"
+          minSizePercentage={50}
+          order={2}
+        >
           <div className={styles.RightColumnActionsRow}>
             {!isMenuOpen && (
               <ConsoleActionsRow

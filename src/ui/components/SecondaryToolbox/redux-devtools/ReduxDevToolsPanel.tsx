@@ -70,7 +70,7 @@ export default function ReduxDevToolsPanel() {
   return (
     <div className={styles.Container} data-test-id="ReduxDevtools">
       <PanelGroup autoSaveId="ReduxDevTools" direction="horizontal">
-        <ResizablePanel minSize={35}>
+        <ResizablePanel minSizePercentage={35}>
           <div className={styles.LeftPanel}>
             <ActionFilter searchValue={searchValue} onSearch={setSearchValue} />
             <div className={styles.ListContainer}>
@@ -90,7 +90,7 @@ export default function ReduxDevToolsPanel() {
           </div>
         </ResizablePanel>
         <PanelResizeHandle className={styles.ResizeHandle} />
-        <ResizablePanel minSize={35}>
+        <ResizablePanel minSizePercentage={35}>
           {selectedAnnotation && (
             <Suspense fallback={<Loader />}>
               <ReduxDevToolsContents

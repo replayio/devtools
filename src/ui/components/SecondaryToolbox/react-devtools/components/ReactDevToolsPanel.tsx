@@ -151,14 +151,15 @@ function ReactDevToolsPanelInner({
 
   return (
     <div className={styles.Panel} data-test-id="ReactDevToolsPanel">
-      <PanelGroup autoSaveId="ConsoleRoot" direction="horizontal">
+      <PanelGroup autoSaveId="ReactDevToolsRoot" direction="horizontal">
         <Panel
           className={styles.LeftPanel}
           collapsible
-          defaultSize={65}
+          defaultSizePercentage={65}
           id="tree"
-          minSize={25}
-          onCollapse={setCollapsedLeft}
+          minSizePercentage={25}
+          onCollapse={() => setCollapsedLeft(true)}
+          onExpand={() => setCollapsedLeft(false)}
           order={1}
           ref={leftPanelRef}
         >
@@ -192,8 +193,9 @@ function ReactDevToolsPanelInner({
           className={styles.RightPanel}
           collapsible
           id="properties"
-          minSize={25}
-          onCollapse={setCollapsedRight}
+          minSizePercentage={25}
+          onCollapse={() => setCollapsedRight(true)}
+          onExpand={() => setCollapsedRight(false)}
           order={2}
           ref={rightPanelRef}
         >
