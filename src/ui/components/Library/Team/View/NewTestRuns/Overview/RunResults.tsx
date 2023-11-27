@@ -114,15 +114,13 @@ const FileNodeRenderer = memo(function FileNodeRenderer({
   filterByText,
   label,
   fileNode,
-  path,
 }: {
   depth: number;
   filterByText: string;
   label: string;
   fileNode: FileNode;
-  path: string;
 }) {
-  const { name, absolutePath, tests } = fileNode;
+  const { absolutePath, tests } = fileNode;
   const { setSpec } = useContext(TestRunsContext);
 
   const onClick = () => setSpec(absolutePath);
@@ -152,7 +150,7 @@ const FileNodeRenderer = memo(function FileNodeRenderer({
         }}
       >
         <Icon className={`h-5 w-5 shrink-0 ${iconClassName}`} type={type} />
-        <div className="truncate">{name}</div>
+        <div className="truncate">{tests[0].title}</div>
       </div>
     </>
   );
@@ -227,7 +225,6 @@ function PathNodeRenderer({
                 key={index}
                 label={label}
                 fileNode={childNode}
-                path={name}
               />
             );
           }
