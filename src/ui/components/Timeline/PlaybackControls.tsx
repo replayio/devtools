@@ -37,11 +37,7 @@ export default function PlayPauseButton() {
   }
 
   return (
-    <div
-      className="ml-1 mr-1.5 flex flex-row"
-      style={{ width: "32px", height: "32px" }}
-      onClick={onClick}
-    >
+    <div className="flex flex-row" style={{ width: "24px", height: "32px" }} onClick={onClick}>
       <motion.img
         className="m-auto h-6 w-6 rounded-full hover:cursor-pointer"
         src={icon}

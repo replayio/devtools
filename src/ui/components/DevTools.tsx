@@ -106,7 +106,7 @@ function Body() {
   }, [sidePanelCollapsed]);
 
   return (
-    <div className="vertical-panels pr-1">
+    <div className="vertical-panels">
       <div className="flex h-full flex-row overflow-hidden bg-chrome">
         <Toolbar />
         <PanelGroup autoSaveId="DevTools-horizontal" className="split-box" direction="horizontal">
