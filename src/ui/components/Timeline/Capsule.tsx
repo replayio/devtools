@@ -2,9 +2,9 @@ import classNames from "classnames";
 import React, { useEffect, useRef, useState } from "react";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 
+import { useIndexingProgress } from "replay-next/src/hooks/useIndexingProgress";
 import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import ExternalLink from "ui/components/shared/ExternalLink";
-import { useIndexingProgress } from "ui/components/Timeline/useIndexingProgress";
 import { useLoadingIsSlow } from "ui/components/Timeline/useLoadingIsSlow";
 import useModalDismissSignal from "ui/hooks/useModalDismissSignal";
 import { getBasicProcessingProgress, getShowFocusModeControls } from "ui/reducers/timeline";
