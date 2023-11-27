@@ -17,7 +17,7 @@ export function TestOverviewContent() {
   } else {
     children = (
       <div className="flex h-full items-center justify-center p-2">
-        <div className=" rounded-md bg-chrome py-2 px-3 text-center">
+        <div className="rounded-md bg-chrome px-3 py-2 text-center">
           Select a test to see its details here
         </div>
       </div>
@@ -50,10 +50,8 @@ function TestOverview({ testId }: { testId: string }) {
 
   return (
     <div className="flex flex-col overflow-y-auto">
-      <div className="flex flex-row items-center justify-between gap-1 border-b border-themeBorder py-2 px-4">
-        <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-lg font-medium">
-          {test.title}
-        </div>
+      <div className={styles.testTitle}>
+        <div>{test.title}</div>
       </div>
       <div className="flex flex-col overflow-y-auto">
         <TestDetails executions={test.executions} />

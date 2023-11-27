@@ -34,14 +34,12 @@ export function ReplayList({ executions, label }: { executions: TestExecution[];
   }
 
   return (
-    <div className="flex flex-col gap-2 py-2 px-4">
+    <div className="flex flex-col gap-2 py-2">
       <div className="flex flex-col gap-2">
-        <div className="flex gap-1 overflow-hidden text-lg">
-          <div className="overflow-hidden overflow-ellipsis whitespace-nowrap font-medium">
-            {label}
-          </div>
+        <div className={styles.replayListTitle}>
+          <div className={styles.labelText}>{label}</div>
         </div>
-        <div className="flex flex-col gap-2">{children}</div>
+        <div className="flex flex-col">{children}</div>
       </div>
     </div>
   );
@@ -64,11 +62,8 @@ function ReplayListItem({
   const displayedTitle = commitTitle || recordingTitle || "(commit title missing)";
 
   return (
-    <a
-      href={`/recording/${recordingId}`}
-      className="flex cursor-pointer flex-row items-center justify-between gap-2"
-    >
-      <div className="flex items-center gap-2 overflow-hidden">
+    <a href={`/recording/${recordingId}`} className={styles.replayRow}>
+      <div className="flex items-center gap-2 overflow-x-hidden">
         <div className={styles.iconWrapper}>
           <motion.div
             className={styles.iconMotion}
@@ -81,7 +76,10 @@ function ReplayListItem({
             />
           </motion.div>
         </div>
-        <div title={displayedTitle} className="overflow-hidden overflow-ellipsis whitespace-nowrap">
+        <div
+          title={displayedTitle}
+          className="flex-grow overflow-hidden overflow-ellipsis whitespace-nowrap"
+        >
           {displayedTitle}
         </div>
       </div>

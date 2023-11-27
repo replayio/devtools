@@ -87,13 +87,13 @@ function TestTeamViews() {
     <div className="pl-4">
       <div className="flex flex-col">
         <div
-          className={`py-1 pr-4 pl-8 ${view === "runs" ? "font-bold" : ""} hover:cursor-pointer`}
+          className={`py-1 pr-4 pl-6 ${view === "runs" ? "font-bold" : ""} hover:cursor-pointer`}
           onClick={() => setView("runs")}
         >
           Runs
         </div>
         <div
-          className={`py-1 pr-4 pl-8 ${view === "tests" ? "font-bold" : ""} hover:cursor-pointer`}
+          className={`py-1 pr-4 pl-6 ${view === "tests" ? "font-bold" : ""} hover:cursor-pointer`}
           onClick={() => setView("tests")}
         >
           Tests
