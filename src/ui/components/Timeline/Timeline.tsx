@@ -1,6 +1,7 @@
 import { MouseEvent, useContext, useLayoutEffect, useRef, useState } from "react";
 
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
+import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { throttle } from "shared/utils/function";
 import { seek, setDisplayedFocusWindow, setHoverTime, stopPlayback } from "ui/actions/timeline";
 import useTimelineContextMenu from "ui/components/Timeline/useTimelineContextMenu";
@@ -39,6 +40,8 @@ export default function Timeline() {
   const timelineDimensions = useAppSelector(selectors.getTimelineDimensions);
   const zoomRegion = useAppSelector(selectors.getZoomRegion);
   const isPlaying = useAppSelector(isPlayingSelector);
+
+  const [showProtocolTimeline] = useGraphQLUserData("feature_protocolTimeline");
 
   const { rangeForDisplay } = useContext(FocusContext);
 
@@ -129,6 +132,7 @@ export default function Timeline() {
       <FocusModePopout updateFocusWindowThrottled={updateFocusWindowThrottled} />
       <div
         className="timeline"
+        data-protocol-timeline-enabled={showProtocolTimeline || undefined}
         data-test-id="Timeline"
         data-test-focus-begin-time={rangeForDisplay?.begin}
         data-test-focus-end-time={rangeForDisplay?.end}
@@ -146,7 +150,7 @@ export default function Timeline() {
           onMouseUp={onMouseUp}
         >
           <div className="progress-bar-stack" onContextMenu={onContextMenu}>
-            <ProtocolTimeline />
+            {showProtocolTimeline && <ProtocolTimeline />}
             <div className="progress-bar" data-test-id="Timeline-ProgressBar" ref={progressBarRef}>
               <ProgressBars />
               <PreviewMarkers />

@@ -1,10 +1,13 @@
-import { TimeStampedPoint, TimeStampedPointRange } from "@replayio/protocol";
+import {
+  loadedRegions as LoadedRegions,
+  TimeStampedPoint,
+  TimeStampedPointRange,
+} from "@replayio/protocol";
 import clamp from "lodash/clamp";
 import React, { useEffect, useRef } from "react";
 
 import { gPaintPoints, hasAllPaintPoints } from "protocol/graphics";
 import useLoadedRegions from "replay-next/src/hooks/useLoadedRegions";
-import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { getZoomRegion } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
 
@@ -69,6 +72,12 @@ const Spans = ({
   );
 };
 
+const EMPTY_LOADED_REGIONS: LoadedRegions = {
+  indexed: [],
+  loaded: [],
+  loading: [],
+};
+
 export default function ProtocolTimeline() {
   const timelineRef = useRef<HTMLDivElement>(null);
 
@@ -88,16 +97,10 @@ export default function ProtocolTimeline() {
       timeline.classList.add("specialBorder");
     }
   }, []);
+  const loadedRegions = useLoadedRegions() ?? EMPTY_LOADED_REGIONS;
 
-  const loadedRegions = useLoadedRegions();
-
-  const [showProtocolTimeline] = useGraphQLUserData("feature_protocolTimeline");
   const firstPaint = gPaintPoints[0];
   const lastPaint = gPaintPoints[gPaintPoints.length - 1];
-
-  if (!showProtocolTimeline || !loadedRegions) {
-    return null;
-  }
 
   return (
     <div ref={timelineRef} className="protocolTimeline flex w-full flex-col space-y-1">

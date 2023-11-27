@@ -93,7 +93,7 @@ export default function PointPanelWrapper(props: ExternalProps) {
 const EMPTY_ARRAY: any[] = [];
 
 function PointPanel(props: ExternalProps & { focusRange: TimeStampedPointRange }) {
-  const { focusRange, pointWithPendingEdits } = props;
+  const { focusRange, pointForSuspense } = props;
 
   const { enterFocusMode, update } = useContext(FocusContext);
 
@@ -103,8 +103,8 @@ function PointPanel(props: ExternalProps & { focusRange: TimeStampedPointRange }
     hitPointsForLocationCache,
     client,
     { begin: focusRange.begin.point, end: focusRange.end.point },
-    pointWithPendingEdits.location,
-    pointWithPendingEdits.condition
+    pointForSuspense.location,
+    pointForSuspense.condition
   );
 
   const hitPoints = (value?.[0] ?? EMPTY_ARRAY) as HitPointsAndStatusTuple[0];
