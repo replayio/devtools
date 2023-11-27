@@ -31,7 +31,7 @@ const Vertical = ({ toolboxLayout }: { toolboxLayout: ToolboxLayout }) => {
   useLayoutEffect(() => {
     const videoPanel = videoPanelRef.current;
     if (videoPanel) {
-      if (videoPanel.getCollapsed() !== videoPanelCollapsed) {
+      if (videoPanel.isCollapsed() !== videoPanelCollapsed) {
         if (videoPanelCollapsed) {
           videoPanel.collapse();
         } else {
@@ -52,10 +52,11 @@ const Vertical = ({ toolboxLayout }: { toolboxLayout: ToolboxLayout }) => {
           <Panel
             className="flex-column flex flex-1"
             collapsible
-            defaultSize={50}
+            defaultSizePercentage={50}
             id="Panel-Video"
-            minSize={10}
-            onCollapse={onVideoPanelCollapse}
+            minSizePercentage={10}
+            onCollapse={() => onVideoPanelCollapse(true)}
+            onExpand={() => onVideoPanelCollapse(false)}
             order={1}
             ref={videoPanelRef}
           >
@@ -68,9 +69,9 @@ const Vertical = ({ toolboxLayout }: { toolboxLayout: ToolboxLayout }) => {
       )}
       <Panel
         className="flex-column flex flex-1"
-        defaultSize={50}
+        defaultSizePercentage={50}
         id="Panel-SecondaryToolbox"
-        minSize={30}
+        minSizePercentage={30}
         order={2}
       >
         <SecondaryToolbox />
@@ -94,13 +95,13 @@ const Horizontal = ({ toolboxLayout }: { toolboxLayout: ToolboxLayout }) => {
     >
       <Panel
         className="flex flex-1 flex-row"
-        defaultSize={50}
+        defaultSizePercentage={50}
         id={
           recordingCapabilities.supportsRepaintingGraphics
             ? "Panel-SecondaryToolbox"
             : "Panel-Toolbox"
         }
-        minSize={30}
+        minSizePercentage={30}
         order={1}
       >
         <div className="flex w-full flex-1 flex-row">
@@ -111,14 +112,15 @@ const Horizontal = ({ toolboxLayout }: { toolboxLayout: ToolboxLayout }) => {
       <Panel
         className="flex flex-1 flex-row"
         collapsible
-        defaultSize={50}
+        defaultSizePercentage={50}
         id={
           recordingCapabilities.supportsRepaintingGraphics
             ? "Panel-Video"
             : "Panel-SecondaryToolbox"
         }
-        minSize={10}
-        onCollapse={setVideoPanelCollapsed}
+        minSizePercentage={10}
+        onCollapse={() => setVideoPanelCollapsed(true)}
+        onExpand={() => setVideoPanelCollapsed(false)}
         order={2}
         ref={videoPanelRef}
       >
@@ -135,13 +137,13 @@ export default function Viewer() {
     <PanelGroup autoSaveId="Viewer-Outer" className="w-full overflow-hidden" direction="horizontal">
       {toolboxLayout === "ide" && (
         <>
-          <Panel minSize={25} order={1}>
+          <Panel minSizePercentage={25} order={1}>
             <Toolbox />
           </Panel>
           <PanelResizeHandle className="h-full w-1" />{" "}
         </>
       )}
-      <Panel minSize={25} order={2}>
+      <Panel minSizePercentage={25} order={2}>
         {toolboxLayout === "left" ? (
           <Horizontal toolboxLayout={toolboxLayout} />
         ) : (

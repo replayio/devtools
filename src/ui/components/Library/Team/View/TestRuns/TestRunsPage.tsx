@@ -67,7 +67,7 @@ function TestRunsContent() {
   return (
     <div className="flex w-full flex-grow flex-row p-2">
       <PanelGroup autoSaveId="Library:TestRuns" direction="horizontal">
-        <Panel minSize={20} order={1}>
+        <Panel minSizePercentage={20} order={1}>
           <div className="flex h-full w-full flex-col overflow-hidden rounded-xl bg-bodyBgcolor">
             <div className="flex flex-row items-center justify-between gap-2 border-b border-themeBorder bg-bodyBgcolor p-2">
               <div
@@ -118,7 +118,7 @@ function TestRunsContent() {
         </Panel>
 
         <PanelResizeHandle className="h-full w-1" />
-        <Panel minSize={20} order={2}>
+        <Panel minSizePercentage={20} order={2}>
           <div className="h-full w-full overflow-hidden rounded-xl">
             <Suspense fallback={<LibrarySpinner />}>
               <TestRunOverviewPage />

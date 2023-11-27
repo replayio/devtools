@@ -113,10 +113,11 @@ function Body() {
           <Panel
             className="flex=1 flex h-full overflow-hidden"
             collapsible
-            defaultSize={20}
+            defaultSizePercentage={20}
             id="Panel-SidePanel"
-            minSize={15}
-            onCollapse={onSidePanelCollapse}
+            minSizePercentage={15}
+            onCollapse={() => onSidePanelCollapse(true)}
+            onExpand={() => onSidePanelCollapse(false)}
             ref={sidePanelRef}
           >
             <SidePanel />
@@ -125,7 +126,7 @@ function Body() {
             className={`h-full ${sidePanelCollapsed ? "w-0" : "w-1"}`}
             id="PanelResizeHandle-SidePanel"
           />
-          <Panel className="flex h-full overflow-hidden" minSize={50}>
+          <Panel className="flex h-full overflow-hidden" minSizePercentage={50}>
             {viewMode === "dev" ? (
               <React.Suspense fallback={<ViewLoader />}>
                 <Viewer />
