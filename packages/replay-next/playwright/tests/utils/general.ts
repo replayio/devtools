@@ -270,12 +270,15 @@ export async function waitForSession(page: Page): Promise<void> {
 
   await waitFor(
     async () => {
-      const value = await page.locator("body").getAttribute("data-initialized");
+      const bodyLocator = page.locator("body");
+      const value = await bodyLocator.getAttribute("data-initialized");
       expect(value).toBe("true");
+      const indexingPercent = await bodyLocator.getAttribute("data-test-progress");
+      expect(indexingPercent).toBe("100");
     },
     {
       retryInterval: 1_000,
-      timeout: 60_000,
+      timeout: 150_000,
     }
   );
 }

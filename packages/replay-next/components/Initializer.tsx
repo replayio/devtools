@@ -4,6 +4,7 @@
 import { loadedRegions as LoadedRegions } from "@replayio/protocol";
 import { ReactNode, useContext, useEffect, useRef, useState } from "react";
 
+import { useIndexingProgress } from "replay-next/src/hooks/useIndexingProgress";
 import { preCacheExecutionPointForTime } from "replay-next/src/suspense/ExecutionPointsCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { UserInfo } from "shared/graphql/types";
@@ -37,6 +38,7 @@ export default function Initializer({
   const client = useContext(ReplayClientContext);
   const [context, setContext] = useState<SessionContextType | null>(null);
   const didInitializeRef = useRef<boolean>(false);
+  const indexingProgress = useIndexingProgress();
 
   useEffect(() => {
     // The WebSocket and session/authentication are global.
@@ -108,6 +110,11 @@ export default function Initializer({
       client.removeEventListener("loadedRegionsChange", onChange);
     };
   }, [client]);
+
+  useEffect(() => {
+    // Same technique we use for "initialized" above.
+    document.body.setAttribute("data-test-progress", indexingProgress.toString());
+  }, [indexingProgress]);
 
   if (context === null) {
     return <Loader className={styles.Loader} />;
