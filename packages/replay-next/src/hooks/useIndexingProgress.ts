@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-import useLoadedRegions from "replay-next/src/hooks/useLoadedRegions";
+import useLoadedRegions from "./useLoadedRegions";
 
 const EMPTY_ARRAY = [] as any[];
 
