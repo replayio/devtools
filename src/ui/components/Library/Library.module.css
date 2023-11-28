@@ -280,9 +280,9 @@
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  gap: 0.25rem; /* For 'gap-1' */
+  gap: 0.25rem;
   border-bottom: 1px solid var(--theme-border);
-  padding: 1.065em 1rem;
+  padding: 0.93rem 1rem;
 }
 
 .testTitle > div {
