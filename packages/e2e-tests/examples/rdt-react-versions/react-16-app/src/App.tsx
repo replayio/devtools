@@ -49,7 +49,7 @@ function React16App() {
   }, []);
 
   return (
-    <div>
+    <div data-react-version={version}>
       <h2>Version: {version}</h2>
       <React16List list={list} />
       <React16FizzBuzzCounterClass version={version} />
