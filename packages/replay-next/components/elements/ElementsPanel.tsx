@@ -87,6 +87,10 @@ export function ElementsPanel({
         if (query === "") {
           setSearchState(null);
         } else if (searchState?.query === query) {
+          if (searchState.results.length === 0) {
+            return;
+          }
+
           let index = searchState.index;
           if (event.shiftKey) {
             index = index > 0 ? index - 1 : searchState.results.length - 1;
