@@ -107,7 +107,7 @@ function TestsContent() {
           </div>
         </Panel>
 
-        <PanelResizeHandle className="h-full w-2" />
+        <PanelResizeHandle className="h-full w-1" />
         <Panel minSize={20} order={2}>
           <div className="h-full w-full overflow-hidden rounded-xl">
             <Suspense fallback={<LibrarySpinner />}>
