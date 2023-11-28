@@ -24,14 +24,55 @@ type TestRunsContextType = {
   setFilterByBranch: Dispatch<SetStateAction<"all" | "primary">>;
   setFilterByStatus: Dispatch<SetStateAction<"all" | "failed">>;
   setFilterByText: Dispatch<SetStateAction<string>>;
+  testRuns: TestRun[];
   testRunId: string | null;
   testRunIdForDisplay: string | null;
-  testRuns: TestRun[];
   spec: string | null;
   setSpec: React.Dispatch<React.SetStateAction<string | null>>;
 };
 
+type TestRunsFilterContextType = {
+  filterByTime: "week" | "month";
+  startTime: string;
+  endTime: string;
+  setFilterByTime: Dispatch<SetStateAction<"week" | "month">>;
+};
+
+export const TestRunsFilterContext = createContext<TestRunsFilterContextType>(null as any);
 export const TestRunsContext = createContext<TestRunsContextType>(null as any);
+
+const daysAgo = (days: number) => {
+  const date = new Date();
+  date.setDate(date.getDate() - days);
+  // Set zero hours, so when used in Cache as key, it will be the same for the whole day.
+  date.setHours(0, 0, 0, 0);
+  return date.toISOString();
+};
+
+export function TestRunsFilterContextRoot({ children }: { children: ReactNode }) {
+  const [filterByTime, setFilterByTime] = useState<"week" | "month">("week");
+
+  const startTime = useMemo(() => {
+    if (filterByTime === "week") {
+      return daysAgo(7);
+    }
+    if (filterByTime === "month") {
+      return daysAgo(30);
+    }
+    return daysAgo(7);
+  }, [filterByTime]);
+
+  const endTime = useMemo(() => {
+    return new Date().toISOString();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filterByTime]);
+
+  return (
+    <TestRunsFilterContext.Provider value={{ filterByTime, startTime, endTime, setFilterByTime }}>
+      {children}
+    </TestRunsFilterContext.Provider>
+  );
+}
 
 export function TestRunsContextRoot({ children }: { children: ReactNode }) {
   const { teamId, testRunId: defaultTestRunId } = useGetTeamRouteParams();

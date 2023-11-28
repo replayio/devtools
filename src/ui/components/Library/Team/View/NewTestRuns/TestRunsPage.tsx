@@ -10,15 +10,22 @@ import { FilterField } from "./FilterField";
 import { TestResultListItem } from "./Overview/TestResultListItem";
 import { TestRunOverviewPage } from "./Overview/TestRunOverviewContextRoot";
 import { TestRunList } from "./TestRunList";
-import { TestRunsContext, TestRunsContextRoot } from "./TestRunsContextRoot";
+import {
+  TestRunsContext,
+  TestRunsContextRoot,
+  TestRunsFilterContext,
+  TestRunsFilterContextRoot,
+} from "./TestRunsContextRoot";
 import _styles from "../../../Library.module.css";
 import dropdownStyles from "./Dropdown.module.css";
 
 export function TestRunsPage() {
   return (
-    <TestRunsContextRoot>
-      <TestRunsContent />
-    </TestRunsContextRoot>
+    <TestRunsFilterContextRoot>
+      <TestRunsContextRoot>
+        <TestRunsContent />
+      </TestRunsContextRoot>
+    </TestRunsFilterContextRoot>
   );
 }
 
@@ -32,6 +39,7 @@ function TestRunsContent() {
     setFilterByStatus,
     setFilterByText,
   } = useContext(TestRunsContext);
+  const { filterByTime, setFilterByTime } = useContext(TestRunsFilterContext);
 
   const {
     contextMenu: contextMenuStatusFilter,
@@ -44,6 +52,22 @@ function TestRunsContent() {
       </ContextMenuItem>
       <ContextMenuItem dataTestId="show-only-failures" onSelect={() => setFilterByStatus("failed")}>
         Only failures
+      </ContextMenuItem>
+    </>,
+    { alignTo: "auto-target" }
+  );
+
+  const {
+    contextMenu: contextMenuTimeFilter,
+    onContextMenu: onClickTimeFilter,
+    onKeyDown: onKeyDownTimeFilter,
+  } = useContextMenu(
+    <>
+      <ContextMenuItem dataTestId="week" onSelect={() => setFilterByTime("week")}>
+        This week
+      </ContextMenuItem>
+      <ContextMenuItem dataTestId="month" onSelect={() => setFilterByTime("month")}>
+        This month
       </ContextMenuItem>
     </>,
     { alignTo: "auto-target" }
@@ -74,7 +98,7 @@ function TestRunsContent() {
         <Panel minSize={20} order={1}>
           <div className="flex h-full w-full flex-col gap-4 overflow-hidden rounded-xl bg-bodyBgcolor p-2">
             <div className="flex flex-col gap-2">
-              <div className="flex flex-row items-center justify-between gap-2 bg-bodyBgcolor">
+              <div className="grid w-full grid-cols-3 gap-2 bg-bodyBgcolor">
                 <div
                   className={dropdownStyles.dropdownTrigger}
                   data-test-id="TestRunsPage-ResultFilter-DropdownTrigger"
@@ -86,6 +110,17 @@ function TestRunsContent() {
                   <Icon className="h-5 w-5" type="chevron-down" />
                 </div>
                 {contextMenuStatusFilter}
+                <div
+                  className={dropdownStyles.dropdownTrigger}
+                  data-test-id="TestRunsPage-TimeFilter-DropdownTrigger"
+                  onClick={onClickTimeFilter}
+                  onKeyDown={onKeyDownTimeFilter}
+                  tabIndex={0}
+                >
+                  {filterByTime === "week" ? "This week" : "This month"}
+                  <Icon className="h-5 w-5" type="chevron-down" />
+                </div>
+                {contextMenuTimeFilter}
                 <div
                   className={dropdownStyles.dropdownTrigger}
                   data-test-id="TestRunsPage-BranchFilter-DropdownTrigger"

@@ -12,14 +12,26 @@ import { convertRecording } from "ui/hooks/recordings";
 import { TestGroups, groupRecordings } from "ui/utils/testRuns";
 
 export const testRunsCache = createCache<
-  [graphQLClient: GraphQLClientInterface, accessToken: string | null, workspaceId: string],
+  [
+    graphQLClient: GraphQLClientInterface,
+    accessToken: string | null,
+    workspaceId: string,
+    startTime: string | null,
+    endTime: string | null
+  ],
   TestRun[]
 >({
   config: { immutable: true },
   debugLabel: "testRunsCache",
-  getKey: ([_, __, workspaceId]) => workspaceId,
-  load: async ([graphQLClient, accessToken, workspaceId]) => {
-    const rawTestRuns = await getTestRunsGraphQL(graphQLClient, accessToken, workspaceId);
+  getKey: ([_, __, workspaceId, startTime, endTime]) => `${workspaceId}:${startTime}:${endTime}`,
+  load: async ([graphQLClient, accessToken, workspaceId, startTime, endTime]) => {
+    const rawTestRuns = await getTestRunsGraphQL(
+      graphQLClient,
+      accessToken,
+      workspaceId,
+      startTime,
+      endTime
+    );
 
     const testRuns = rawTestRuns.map(processTestRun);
 

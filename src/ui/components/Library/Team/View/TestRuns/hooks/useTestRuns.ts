@@ -7,11 +7,14 @@ import { TeamContext } from "ui/components/Library/Team/TeamContextRoot";
 import { testRunsCache } from "ui/components/Library/Team/View/TestRuns/suspense/TestRunsCache";
 import useToken from "ui/utils/useToken";
 
+import { TestRunsFilterContext } from "../../NewTestRuns/TestRunsContextRoot";
+
 const EMPTY_ARRAY: any[] = [];
 
 export function useTestRuns(): TestRun[] {
   const graphQLClient = useContext(GraphQLClientContext);
   const { teamId } = useContext(TeamContext);
+  const testRunFilterContext = useContext(TestRunsFilterContext);
 
   const accessToken = useToken();
 
@@ -19,7 +22,9 @@ export function useTestRuns(): TestRun[] {
     testRunsCache,
     graphQLClient,
     accessToken?.token ?? null,
-    teamId
+    teamId,
+    testRunFilterContext?.startTime,
+    testRunFilterContext?.endTime
   );
   return value;
 }
