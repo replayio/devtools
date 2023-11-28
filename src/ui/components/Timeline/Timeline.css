@@ -15,10 +15,6 @@
   padding-bottom: 0;
 }
 
-.specialBorder {
-  border: 1px solid red;
-}
-
 .theme-light .timeline,
 .theme-light .breakpoint-navigation-timeline {
   --commandbar-button-hover-background: #efefef;
