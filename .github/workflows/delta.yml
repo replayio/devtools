@@ -14,6 +14,7 @@ env:
   FLAKINESS_CONNECTION_STRING: ${{ secrets.FLAKINESS_CONNECTION_STRING }}
   PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
   RECORD_REPLAY_METADATA_TEST_RUN_TITLE: Snapshot Tests
+  DEBUG: replay:test-utils:*,replay:cli:*
 
 jobs:
   generate-test-run-id:
