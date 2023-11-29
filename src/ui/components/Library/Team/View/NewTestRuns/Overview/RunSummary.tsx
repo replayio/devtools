@@ -1,5 +1,6 @@
 import { captureException } from "@sentry/react";
 import Link from "next/link";
+import { ContextMenuItem, useContextMenu } from "use-context-menu";
 
 import Icon from "replay-next/components/Icon";
 import { TestRun, getTestRunTitle } from "shared/test-suites/TestRun";
@@ -140,13 +141,36 @@ export function RunSummary({
   durationMs,
   testFilterByText,
   setTestFilterByText,
+  filterCurrentRunByStatus,
+  setFilterCurrentRunByStatus,
 }: {
   isPending: boolean;
   testRun: TestRun;
   durationMs: number;
   testFilterByText: string;
   setTestFilterByText: (value: string) => void;
+  filterCurrentRunByStatus: "all" | "failed-and-flaky";
+  setFilterCurrentRunByStatus: (value: "all" | "failed-and-flaky") => void;
 }) {
+  const {
+    contextMenu: contextMenuStatusFilter,
+    onContextMenu: onClickStatusFilter,
+    onKeyDown: onKeyDownStatusFilter,
+  } = useContextMenu(
+    <>
+      <ContextMenuItem dataTestId="all" onSelect={() => setFilterCurrentRunByStatus("all")}>
+        All tests
+      </ContextMenuItem>
+      <ContextMenuItem
+        dataTestId="failed-and-flaky"
+        onSelect={() => setFilterCurrentRunByStatus("failed-and-flaky")}
+      >
+        Failed and flaky
+      </ContextMenuItem>
+    </>,
+    { alignTo: "auto-target" }
+  );
+
   return (
     <div
       className={`flex flex-col gap-2 border-b border-themeBorder ${isPending ? "opacity-50" : ""}`}
@@ -154,12 +178,15 @@ export function RunSummary({
     >
       <div className="flex flex-row items-center justify-between gap-2">
         <div
-          className={`flex-grow ${dropdownStyles.dropdownTrigger} ${dropdownStyles.disabled}`}
+          className={`flex-grow ${dropdownStyles.dropdownTrigger}`}
+          onClick={onClickStatusFilter}
+          onKeyDown={onKeyDownStatusFilter}
           tabIndex={0}
         >
-          <span>All Tests</span>
+          {filterCurrentRunByStatus === "all" ? "All runs" : "Failed and flaky"}
           <Icon className="h-5 w-5" type="chevron-down" />
         </div>
+        {contextMenuStatusFilter}
         <RunStats testRunId={testRun.id} />
       </div>
 

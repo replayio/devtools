@@ -24,9 +24,11 @@ import styles from "../../../../Library.module.css";
 export function RunResults({
   isPending,
   testFilterByText,
+  filterCurrentRunByStatus,
 }: {
   isPending: boolean;
   testFilterByText: string;
+  filterCurrentRunByStatus: "all" | "failed-and-flaky";
 }) {
   const { testRunId } = useContext(TestRunsContext);
 
@@ -53,11 +55,13 @@ export function RunResults({
         label="Flaky"
         testGroup={flakyRecordings}
       />
-      <TestStatusGroup
-        filterByText={filterByTextDeferred}
-        label="Passed"
-        testGroup={passedRecordings}
-      />
+      {filterCurrentRunByStatus !== "failed-and-flaky" && (
+        <TestStatusGroup
+          filterByText={filterByTextDeferred}
+          label="Passed"
+          testGroup={passedRecordings}
+        />
+      )}
     </div>
   );
 }

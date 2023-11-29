@@ -12,6 +12,9 @@ export function TestRunOverviewContent() {
     useContext(TestRunsContext);
 
   const { recordings, durationMs } = useTestRunDetailsSuspends(testRunId);
+  const [filterCurrentRunByStatus, setFilterCurrentRunByStatus] = useState<
+    "all" | "failed-and-flaky"
+  >("all");
   const [testFilterByText, setTestFilterByText] = useState("");
 
   useEffect(() => {
@@ -34,8 +37,14 @@ export function TestRunOverviewContent() {
             durationMs={durationMs}
             setTestFilterByText={setTestFilterByText}
             testFilterByText={testFilterByText}
+            setFilterCurrentRunByStatus={setFilterCurrentRunByStatus}
+            filterCurrentRunByStatus={filterCurrentRunByStatus}
           />
-          <RunResults isPending={isPending} testFilterByText={testFilterByText} />
+          <RunResults
+            isPending={isPending}
+            testFilterByText={testFilterByText}
+            filterCurrentRunByStatus={filterCurrentRunByStatus}
+          />
         </>
       );
     }
