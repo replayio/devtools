@@ -80,6 +80,8 @@ export function Attributes({ testRun, durationMs }: { testRun: TestRun; duration
           {durationString}
         </AttributeContainer>
         <ModeAttribute testRun={testRun} />
+        <PullRequestLink testRun={testRun} />
+        <RunnerLink testRun={testRun} />
       </div>
     );
   } else {
@@ -198,11 +200,8 @@ export function RunSummary({
       <div className="overflow-hidden overflow-ellipsis whitespace-nowrap border-b border-themeBorder px-4 pt-2 pb-4 font-bold">
         {getTestRunTitle(testRun)}
       </div>
-      <div className="flex w-full flex-row items-center gap-4 px-4 pb-4 pt-2 text-xs">
+      <div className="px-4 pb-4 pt-2 text-xs">
         <Attributes testRun={testRun} durationMs={durationMs} />
-        <div className="grow" />
-        <PullRequestLink testRun={testRun} />
-        <RunnerLink testRun={testRun} />
       </div>
     </div>
   );
