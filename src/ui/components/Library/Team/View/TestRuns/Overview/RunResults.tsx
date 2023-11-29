@@ -17,7 +17,7 @@ import {
   useFileNameTree,
 } from "ui/components/Library/Team/View/TestRuns/Overview/useFileNameTree";
 import { TestRunsContext } from "ui/components/Library/Team/View/TestRuns/TestRunsContextRoot";
-import { TestGroup, testPassed } from "ui/utils/testRuns";
+import { TestGroup, testFailed } from "ui/utils/testRuns";
 
 import { TestResultListItem } from "./TestResultListItem";
 import styles from "../../../../Library.module.css";
@@ -165,7 +165,7 @@ const FileNodeRenderer = memo(function FileNodeRenderer({
               depth={depth + 1}
               filterByText={filterByText}
               key={recording.id}
-              label={testPassed(test) ? "Passed" : label}
+              label={testFailed(test) ? "Failed" : label}
               recording={recording}
               test={test}
               secondaryBadgeCount={/* index > 0 ? index + 1 : null */ null}
