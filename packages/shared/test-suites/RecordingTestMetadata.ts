@@ -17,6 +17,7 @@ import {
   AnnotationsCache,
   PlaywrightAnnotationsCache,
 } from "ui/components/TestSuite/suspense/AnnotationsCache";
+import { userData } from "shared/user-data/GraphQL/UserData";
 
 export type SemVer = string;
 
@@ -656,7 +657,7 @@ function addTimeStampedPoints(node: RecordingTestMetadataV3.FunctionEvent) {
     node.data.events[node.data.events.length - 1]
   );
   node.data.events?.forEach(child => {
-    if (isFunctionEvent(child)) {
+    if (isFunctionTestEvent(child)) {
       addTimeStampedPoints(child);
     }
   });
@@ -677,7 +678,7 @@ function addTimeStampedPoints(node: RecordingTestMetadataV3.FunctionEvent) {
       e
         _goto_
  */
-export function buildCallTree(commands: TestEvent[]): Array<RecordingTestMetadataV3.FunctionEvent> {
+export function buildCallTree(commands: TestEvent[]): RecordingTestMetadataV3.TestEvent[] {
   let root: RecordingTestMetadataV3.FunctionEvent = {
     type: "function",
     timeStampedPoint: null,
@@ -698,7 +699,7 @@ export function buildCallTree(commands: TestEvent[]): Array<RecordingTestMetadat
       const frame = callStack[frameIndex];
       const name = frame.functionName || frame.fileName;
       const key = `${name}.${callStack[+frameIndex - 1]?.lineNumber || ""}`;
-      let child = currentNode.data.events?.find(c => isFunctionEvent(c) && c.data.key === key);
+      let child = currentNode.data.events?.find(c => isFunctionTestEvent(c) && c.data.key === key);
       if (!child) {
         child = {
           type: "function",
@@ -720,7 +721,7 @@ export function buildCallTree(commands: TestEvent[]): Array<RecordingTestMetadat
   root = root.data.events[0] as RecordingTestMetadataV3.FunctionEvent;
   addTimeStampedPoints(root);
 
-  return [root];
+  return root.data.events;
 }
 
 export async function processGroupedTestCases(
@@ -835,13 +836,6 @@ export async function processGroupedTestCases(
         for (let index = 0; index < partialTestRecordings.length; index++) {
           const legacyTest = partialTestRecordings[index];
           let test = await processPlaywrightTestRecording(legacyTest, annotations, testStacks);
-
-          // TODO: Add feature flag similar to Call Stack Framework grouping that the user can toggle by
-          // right clicking on the panel
-          if (true) {
-            test.events.main = buildCallTree(test.events.main);
-          }
-
           testRecordings.push(test);
         }
 
@@ -1107,7 +1101,7 @@ export function getTestEventTimeStampedPoint(
   testEvent: RecordingTestMetadataV3.TestEvent
 ): TimeStampedPoint | null {
   if (
-    isFunctionEvent(testEvent) ||
+    isFunctionTestEvent(testEvent) ||
     isNavigationTestEvent(testEvent) ||
     isNetworkRequestTestEvent(testEvent)
   ) {
@@ -1160,7 +1154,7 @@ export function isNetworkRequestTestEvent(
   return value.type === "network-request";
 }
 
-export function isFunctionEvent(value: TestEvent): value is RecordingTestMetadataV3.FunctionEvent {
+export function isFunctionTestEvent(value: TestEvent): value is RecordingTestMetadataV3.FunctionEvent {
   return value.type === "function";
 }
 

@@ -275,6 +275,10 @@ export const config = {
     defaultValue: Boolean(true),
     legacyKey: null,
   },
+  playwright_functionGrouping: {
+    defaultValue: Boolean(false),
+    legacyKey: "devtools.playwright.functionGrouping",
+  },
   protocol_chromiumRepaints: {
     defaultValue: Boolean(true),
     label: "Enable repaintGraphics for Chrome.",

@@ -9,6 +9,7 @@ import {
   UserActionEvent,
   getTestEventExecutionPoint,
   getTestEventTime,
+  isFunctionTestEvent,
   isUserActionTestEvent,
 } from "shared/test-suites/RecordingTestMetadata";
 import { startPlayback } from "ui/actions/timeline";
@@ -27,10 +28,27 @@ export function useTestEventContextMenu(testEvent: TestEvent) {
       <PlayFromHereMenuItem testEvent={testEvent} />
       {isUserActionTestEvent(testEvent) && <ShowBeforeMenuItem userActionEvent={testEvent} />}
       {isUserActionTestEvent(testEvent) && <ShowAfterMenuItem userActionEvent={testEvent} />}
+      {<ShowFunctionGroupingMenuItem />}
     </>
   );
 
   return { contextMenu, onContextMenu };
+}
+
+function ShowFunctionGroupingMenuItem() {
+  const functionGrouping = userData.get("playwright_functionGrouping")
+
+  return <ContextMenuItem
+  dataTestId="CallStackContextMenu-ToggleFrameworkGrouping"
+  onSelect={() => {
+    userData.set("playwright_functionGrouping", !userData.get("playwright_functionGrouping"))
+  }}
+>
+  <>
+  <MaterialIcon outlined={true}>unfold_more</MaterialIcon>
+    {functionGrouping ? "Disable" : "Enable"} Function grouping
+  </>
+</ContextMenuItem>
 }
 
 function JumpToSourceMenuItem({ userActionEvent }: { userActionEvent: UserActionEvent }) {

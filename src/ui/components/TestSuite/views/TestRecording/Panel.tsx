@@ -1,5 +1,5 @@
 import assert from "assert";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState, useMemo } from "react";
 import {
   ImperativePanelHandle,
   PanelGroup,
@@ -17,6 +17,7 @@ import {
   TestSectionName,
   getTestEventExecutionPoint,
   getTestEventTime,
+  buildCallTree
 } from "shared/test-suites/RecordingTestMetadata";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { TestResultIcon } from "ui/components/TestSuite/components/TestResultIcon";
@@ -27,12 +28,18 @@ import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext
 
 import { testEventDetailsIntervalCache } from "../../suspense/TestEventDetailsCache";
 import styles from "./Panel.module.css";
+import { userData } from "shared/user-data/GraphQL/UserData";
 
 export default function Panel() {
   const { setTestEvent, setTestRecording, testEvent, testRecording } = useContext(TestSuiteContext);
   const { update } = useContext(TimelineContext);
   const { range: focusWindow } = useContext(FocusContext);
   const replayClient = useContext(ReplayClientContext);
+  const [functionGroupingEnabled, setFunctionGroupingEnabled] = useState(userData.get("playwright_functionGrouping"))
+
+  useEffect(() => {
+    userData.subscribe("playwright_functionGrouping", setFunctionGroupingEnabled)
+  }, [])
 
   assert(testRecording != null);
 
@@ -93,15 +100,19 @@ export default function Panel() {
     [setTestEvent, update]
   );
 
-  const { beforeAll, beforeEach, main, afterEach, afterAll } = testRecording.events;
-  const testSections: [testSectionName: TestSectionName, title: string, testEvents: TestEvent[]][] =
-    [
-      ["beforeAll", "before all", beforeAll],
-      ["beforeEach", "before each", beforeEach],
-      ["main", "test body", main],
-      ["afterAll", "after each", afterEach],
-      ["afterEach", "after all", afterAll],
-    ];
+
+  const { beforeAll, beforeEach, main, afterEach, afterAll } = testRecording.events
+
+  const testSections: [testSectionName: TestSectionName, title: string, testEvents: TestEvent[]][] = useMemo(() => {
+    const { beforeAll, beforeEach, main, afterEach, afterAll } = testRecording.events 
+    return [
+        ["beforeAll", "before all", beforeAll],
+        ["beforeEach", "before each", beforeEach],
+        ["main", "test body", functionGroupingEnabled ? buildCallTree(main) : main],
+        ["afterAll", "after each", afterEach],
+        ["afterEach", "after all", afterAll],
+      ];
+  }, [testRecording, functionGroupingEnabled])
 
   // Select a default test event
   useEffect(() => {

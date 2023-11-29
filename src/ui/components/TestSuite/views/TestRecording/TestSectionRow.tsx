@@ -18,7 +18,7 @@ import {
   TestSectionName,
   getTestEventTime,
   getTestEventTimeStampedPoint,
-  isFunctionEvent,
+  isFunctionTestEvent,
   isUserActionTestEvent,
 } from "shared/test-suites/RecordingTestMetadata";
 import { isPointInRegion } from "shared/utils/time";
@@ -140,7 +140,7 @@ export function TestSectionRow({
   }
 
   const onClick = async () => {
-    if (!isFunctionEvent(testEvent)) {
+    if (!isFunctionTestEvent(testEvent)) {
       startTransition(() => {
         setTestEvent(testEvent);
       });
