@@ -251,6 +251,8 @@ function _DevTools({
           workspace: recording?.workspace,
           metadata: recording.metadata && {
             testEnvironment,
+            pluginVersion: testEnvironment?.pluginVersion,
+            testRunner: testEnvironment?.testRunner
           },
         },
         session: { userId, userEmail },
