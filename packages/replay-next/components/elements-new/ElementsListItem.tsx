@@ -1,3 +1,4 @@
+import assert from "assert";
 import { PauseId } from "@replayio/protocol";
 import {
   CSSProperties,
@@ -49,7 +50,7 @@ export function ElementsListItem({
   const elementsListData = listData as ElementsListData;
 
   const item = elementsListData.getItemAtIndex(index);
-  const { attributes, depth, displayMode, displayName, nodeType, objectId } = item;
+  const { attributes, depth, displayMode, nodeType, objectId, tagName, textContent } = item;
 
   const { contextMenu, onContextMenu } = useElementsListItemContextMenu({
     elementsListData,
@@ -74,17 +75,20 @@ export function ElementsListItem({
   let rendered: ReactNode = null;
 
   switch (nodeType) {
-    case Node.DOCUMENT_NODE: {
-      rendered = displayName;
+    case Node.DOCUMENT_NODE:
+    case Node.DOCUMENT_TYPE_NODE: {
+      rendered = tagName;
+      break;
+    }
+    case Node.TEXT_NODE: {
+      rendered = textContent;
       break;
     }
     default: {
+      assert(tagName);
+
       rendered = (
-        <HTMLNodeRenderer
-          attributes={attributes}
-          displayMode={displayMode}
-          displayName={displayName}
-        />
+        <HTMLNodeRenderer attributes={attributes} displayMode={displayMode} displayName={tagName} />
       );
       break;
     }

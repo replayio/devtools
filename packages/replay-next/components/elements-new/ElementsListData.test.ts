@@ -107,7 +107,9 @@ describe("ElementsListData", () => {
               <html>
                 <head />
                 <body>
-                  <div />
+                  <div>
+                    This is a div
+                  </div>
                 </body>
               </html>
           </iframe>
@@ -130,21 +132,23 @@ describe("ElementsListData", () => {
 
     toggleNodeExpanded(4, true);
     expect(listData.toString()).toMatchInlineSnapshot(`
-          "<html>
-            <head />
-            <body>
-              <iframe>
-                #document
-                  <html>
-                    <head />
-                    <body>
-                      <div />
-                    </body>
-                  </html>
-              </iframe>
-            </body>
-          </html>"
-      `);
+      "<html>
+        <head />
+        <body>
+          <iframe>
+            #document
+              <html>
+                <head />
+                <body>
+                  <div>
+                    This is a div
+                  </div>
+                </body>
+              </html>
+          </iframe>
+        </body>
+      </html>"
+    `);
   });
 
   it("should support collapsing and expanding nodes", async () => {
@@ -172,8 +176,12 @@ describe("ElementsListData", () => {
         <head>…</head>
         <body>
           <ul>
-            <li />
-            <li />
+            <li>
+              Thing one
+            </li>
+            <li>
+              Thing two
+            </li>
           </ul>
         </body>
       </html>"
@@ -185,26 +193,34 @@ describe("ElementsListData", () => {
     expect(listData.toString()).toMatchInlineSnapshot(`
       "<html>
         <head>
-          <script />
-          <link href=\\"index.css\\" />
+          <script type=\\"text/javascript\\">
+            // Line of text
+          </script>
+          <link rel=\\"stylesheet\\" href=\\"index.css\\" />
         </head>
         <body>
           <ul>
-            <li />
-            <li />
+            <li>
+              Thing one
+            </li>
+            <li>
+              Thing two
+            </li>
           </ul>
         </body>
       </html>"
     `);
 
     // Collapse <ul>
-    id = listData.getItemAtIndex(6).objectId;
+    id = listData.getItemAtIndex(8).objectId;
     listData.toggleNodeExpanded(id, false);
     expect(listData.toString()).toMatchInlineSnapshot(`
       "<html>
         <head>
-          <script />
-          <link href=\\"index.css\\" />
+          <script type=\\"text/javascript\\">
+            // Line of text
+          </script>
+          <link rel=\\"stylesheet\\" href=\\"index.css\\" />
         </head>
         <body>
           <ul>…</ul>
@@ -213,26 +229,30 @@ describe("ElementsListData", () => {
     `);
 
     // Collapse <body>
-    id = listData.getItemAtIndex(5).objectId;
+    id = listData.getItemAtIndex(7).objectId;
     listData.toggleNodeExpanded(id, false);
     expect(listData.toString()).toMatchInlineSnapshot(`
       "<html>
         <head>
-          <script />
-          <link href=\\"index.css\\" />
+          <script type=\\"text/javascript\\">
+            // Line of text
+          </script>
+          <link rel=\\"stylesheet\\" href=\\"index.css\\" />
         </head>
         <body>…</body>
       </html>"
     `);
 
     // Expand <body>
-    id = listData.getItemAtIndex(5).objectId;
+    id = listData.getItemAtIndex(7).objectId;
     listData.toggleNodeExpanded(id, true);
     expect(listData.toString()).toMatchInlineSnapshot(`
       "<html>
         <head>
-          <script />
-          <link href=\\"index.css\\" />
+          <script type=\\"text/javascript\\">
+            // Line of text
+          </script>
+          <link rel=\\"stylesheet\\" href=\\"index.css\\" />
         </head>
         <body>
           <ul>…</ul>

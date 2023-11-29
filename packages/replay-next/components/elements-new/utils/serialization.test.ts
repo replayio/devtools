@@ -84,7 +84,9 @@ describe("serializeDOM", () => {
             <ul class=\\"List\\">
               <li class=\\"ListItem Empty\\" />
               <li class=\\"ListItem\\">
-                <button id=\\"Button\\" />
+                <button id=\\"Button\\">
+                  Click me
+                </button>
               </li>
             </ul>
           </body>
@@ -93,6 +95,7 @@ describe("serializeDOM", () => {
     });
 
     it('should support "href" attributes for <link> tags and "src" attributes for <script> tags', () => {
+      // The <head> element is collapsed by default
       expect(
         parseDOM(`
       <html>
@@ -109,7 +112,7 @@ describe("serializeDOM", () => {
         "<html>
           <head>…</head>
           <body>
-            <a />
+            <a href=\\"https://example.com\\" />
           </body>
         </html>"
       `);
@@ -120,11 +123,11 @@ describe("serializeDOM", () => {
       expect(listData.toString()).toMatchInlineSnapshot(`
         "<html>
           <head>
-            <link href=\\"https://example.com/style.css\\" />
+            <link rel=\\"stylesheet\\" href=\\"https://example.com/style.css\\" />
             <script src=\\"https://example.com/script.js\\" />
           </head>
           <body>
-            <a />
+            <a href=\\"https://example.com\\" />
           </body>
         </html>"
       `);
@@ -154,7 +157,7 @@ describe("serializeDOM", () => {
         "<html>
           <head />
           <body>
-            <div />
+            <div style=\\"position: absolute\\" />
           </body>
         </html>"
       `);
@@ -179,7 +182,9 @@ describe("serializeDOM", () => {
                 <html>
                   <head />
                   <body>
-                    <p />
+                    <p>
+                      Hello World!
+                    </p>
                   </body>
                 </html>
             </iframe>
@@ -188,7 +193,7 @@ describe("serializeDOM", () => {
       `);
     });
 
-    it("should filter comment and text nodes", () => {
+    it("should filter comment", () => {
       expect(
         parseDOM(`
           <!-- This comment should not be visible -->
@@ -202,7 +207,9 @@ describe("serializeDOM", () => {
           <head />
           <body>
             <div>
-              <span />
+              <span>
+                This text should not be visible
+              </span>
             </div>
           </body>
         </html>"

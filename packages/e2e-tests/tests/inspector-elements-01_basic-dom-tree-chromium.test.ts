@@ -5,6 +5,7 @@ import {
   getElementsListRow,
   openElementsPanel,
   searchElementsPanel,
+  selectNextElementsPanelSearchResult,
   waitForSelectedElementsRow,
 } from "../helpers/elements-panel";
 import { rewindToLine } from "../helpers/pause-information-panel";
@@ -36,5 +37,6 @@ test("inspector-elements-01: Basic DOM tree node display", async ({
   await node.waitFor();
 
   await searchElementsPanel(page, "STUFF");
+  await selectNextElementsPanelSearchResult(page);
   await waitForSelectedElementsRow(page, 'id="div4"');
 });

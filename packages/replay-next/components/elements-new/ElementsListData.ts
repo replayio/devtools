@@ -88,9 +88,10 @@ export class ElementsListData extends GenericListData<Item> {
       attributes: parentMetadata.attributes,
       depth: parentMetadata.depth,
       displayMode: isTail ? "tail" : parentMetadata.isExpanded ? "head" : "collapsed",
-      displayName: parentMetadata.tagName.toLowerCase(),
       nodeType: parentMetadata.nodeType,
       objectId: parentMetadata.objectId,
+      tagName: parentMetadata.tagName,
+      textContent: parentMetadata.textContent,
     };
   }
 
@@ -190,46 +191,6 @@ export class ElementsListData extends GenericListData<Item> {
     }
   }
 
-  toDebugString() {
-    if (this._rootObjectId == null) {
-      return "";
-    }
-
-    const rootNode = this.getMutableMetadata(this._rootObjectId);
-    const queue: NodeType[] = [rootNode];
-    const rows: string[] = [];
-
-    while (queue.length > 0) {
-      const node = queue.shift()!;
-
-      const {
-        attributes,
-        children,
-        depth = 0,
-        isExpanded,
-        objectId,
-        tagName,
-        weight,
-      } = this.getMutableMetadata(node.objectId);
-
-      const idAttribute = attributes["id"] ?? 0;
-
-      if (depth >= 0) {
-        const indentation = "  ".repeat(depth);
-        const nodeName = tagName.toLowerCase();
-        rows.push(
-          `${indentation} ${objectId}:${nodeName}${
-            idAttribute ? ` id:${idAttribute}` : ""
-          } ({ children? ${children.length > 0}, isExpanded? ${isExpanded}, weight: ${weight} })`
-        );
-      }
-
-      queue.unshift(...children);
-    }
-
-    return rows.join("\n");
-  }
-
   toString(): string {
     const count = this.getItemCountImplementation();
 
@@ -238,15 +199,21 @@ export class ElementsListData extends GenericListData<Item> {
     for (let index = 0; index < count; index++) {
       const item = this.getItemAtIndex(index);
 
-      const { attributes, depth, displayMode, displayName, nodeType } = item;
+      const { attributes, depth, displayMode, nodeType, tagName, textContent } = item;
 
       let rendered;
       switch (nodeType) {
         case Node.DOCUMENT_NODE: {
-          rendered = displayName;
+          rendered = tagName;
+          break;
+        }
+        case Node.TEXT_NODE: {
+          rendered = textContent;
           break;
         }
         default: {
+          assert(tagName);
+
           let attributesString = "";
           for (let name in attributes) {
             const value = attributes[name];
@@ -257,11 +224,11 @@ export class ElementsListData extends GenericListData<Item> {
             }
           }
 
-          const openingTagNameAndAttributes = `${displayName}${attributesString}`;
+          const openingTagNameAndAttributes = `${tagName}${attributesString}`;
 
           switch (displayMode) {
             case "collapsed":
-              rendered = `<${openingTagNameAndAttributes}>…</${displayName}>`;
+              rendered = `<${openingTagNameAndAttributes}>…</${tagName}>`;
               break;
             case "empty":
               rendered = `<${openingTagNameAndAttributes} />`;
@@ -270,7 +237,7 @@ export class ElementsListData extends GenericListData<Item> {
               rendered = `<${openingTagNameAndAttributes}>`;
               break;
             case "tail":
-              rendered = `</${displayName}>`;
+              rendered = `</${tagName}>`;
               break;
           }
           break;
@@ -300,7 +267,8 @@ export class ElementsListData extends GenericListData<Item> {
 
     while (currentNodes.length > 0 && currentIndex <= rowIndex) {
       for (let index = 0; index < currentNodes.length; index++) {
-        const { attributes, children, nodeType, objectId, tagName } = currentNodes[index]!;
+        const { attributes, children, nodeType, objectId, tagName, textContent } =
+          currentNodes[index]!;
 
         const { depth, isExpanded, weight } = this.getMutableMetadata(objectId);
 
@@ -313,18 +281,20 @@ export class ElementsListData extends GenericListData<Item> {
               attributes,
               depth,
               displayMode: children.length > 0 ? (isExpanded ? "head" : "collapsed") : "empty",
-              displayName: tagName.toLowerCase(),
               nodeType,
               objectId,
+              tagName,
+              textContent,
             };
           } else if (currentIndex + weight - 1 === rowIndex && nodeType !== Node.DOCUMENT_NODE) {
             return {
               attributes,
               depth,
               displayMode: "tail",
-              displayName: tagName.toLowerCase(),
               nodeType,
               objectId,
+              tagName,
+              textContent,
             };
           } else {
             currentNodes = children;
@@ -394,7 +364,7 @@ export class ElementsListData extends GenericListData<Item> {
         const metadata: Metadata = {
           ...node,
           depth,
-          isExpanded: node.tagName !== "HEAD",
+          isExpanded: node.tagName !== "head",
           weight: 1,
         };
 

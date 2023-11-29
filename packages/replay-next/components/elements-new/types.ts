@@ -8,7 +8,8 @@ export type Node = {
   nodeType: number;
   parentObject: Node | null;
   objectId: ObjectId;
-  tagName: string;
+  tagName: string | null;
+  textContent: string | null;
 };
 
 export type ItemDisplayMode = "collapsed" | "empty" | "head" | "tail";
@@ -17,9 +18,10 @@ export type Item = {
   attributes: Attributes;
   depth: number;
   displayMode: ItemDisplayMode;
-  displayName: string;
   nodeType: number;
   objectId: ObjectId;
+  tagName: string | null;
+  textContent: string | null;
 };
 
 export type Metadata = Node & {

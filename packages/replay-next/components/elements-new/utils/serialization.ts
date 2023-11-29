@@ -36,14 +36,15 @@ export function deserializeDOM(rawData: number[]): NodeType | null {
     //   parentObjectId
     //   objectId
     //   nodeType
-    //   tagName (key id)
+    //   tagName (or text content) (key id)
     //   number of attribute/value string keys
     //   ...rest (string keys)
     const parentObjectId = "" + rawData[++rawDataIndex];
     const objectId = "" + rawData[++rawDataIndex];
     const nodeType = rawData[++rawDataIndex];
-    const tagNameKey = rawData[++rawDataIndex];
-    const tagName = tagNameKey !== 0 ? stringTable[tagNameKey] : "";
+    const tagNameOrTextContentKey = rawData[++rawDataIndex];
+    const tagNameOrTextContent =
+      tagNameOrTextContentKey !== 0 ? stringTable[tagNameOrTextContentKey] : null;
 
     const attributeStringKeyCount = rawData[++rawDataIndex];
     const attributeStopIndex = rawDataIndex + attributeStringKeyCount - 1;
@@ -75,7 +76,8 @@ export function deserializeDOM(rawData: number[]): NodeType | null {
       nodeType,
       parentObject,
       objectId,
-      tagName,
+      tagName: nodeType !== Node.TEXT_NODE ? tagNameOrTextContent ?? null : null,
+      textContent: nodeType === Node.TEXT_NODE ? tagNameOrTextContent ?? null : null,
     };
 
     if (parentObject) {
@@ -144,7 +146,7 @@ export function serializeDOM(rootNode: Document): number[] {
   }
 
   let nodesArray = [];
-  let queue: (number | Document | Element)[] = [0, rootNode];
+  let queue: (number | ChildNode | Document | Element)[] = [0, rootNode];
 
   while (queue.length > 0) {
     const parentObjectId = queue.shift() as number;
@@ -152,7 +154,7 @@ export function serializeDOM(rootNode: Document): number[] {
 
     const objectId = getObjectId(domNodeOrText);
 
-    let { children, classList, id, nodeType, tagName } = domNodeOrText;
+    let { childNodes, classList, id, nodeType, tagName, textContent } = domNodeOrText;
 
     switch (nodeType) {
       case Node.DOCUMENT_NODE: {
@@ -161,6 +163,14 @@ export function serializeDOM(rootNode: Document): number[] {
       }
       case Node.DOCUMENT_TYPE_NODE: {
         tagName = "<!Doctype>";
+        break;
+      }
+      case Node.TEXT_NODE: {
+        textContent = textContent ? textContent.trim() : null;
+        break;
+      }
+      default: {
+        tagName = tagName.toLowerCase();
         break;
       }
     }
@@ -179,75 +189,49 @@ export function serializeDOM(rootNode: Document): number[] {
     // And a class name attribute (e.g. <div class="foo bar baz" />) might be:
     //   [ 4, 22, 41, 42, 43 ]
 
-    // All node types should pass along id attribute
-    if (id) {
-      attributes.push(2);
-      attributes.push(registerString("id"));
-      attributes.push(registerString(id));
-    }
-
-    // All node types should pass along class attribute
-    // Class names are special; because of style reuse, we serialize individual class names separately
-    if (classList != null && classList.length > 0) {
-      attributes.push(classList.length + 1);
-      attributes.push(registerString("class"));
-      classList.forEach(className => {
-        const classNameKey = registerString(className);
-        attributes.push(classNameKey);
-      });
-    }
-
-    // All node types should pass along data-* attributes
     if (typeof domNodeOrText.getAttributeNames === "function") {
       const attributeNames = domNodeOrText.getAttributeNames();
       attributeNames.forEach(name => {
-        if (name.startsWith("data-")) {
-          const value = domNodeOrText.getAttribute(name);
-          if (value) {
-            attributes.push(2);
-            attributes.push(registerString(name));
-            attributes.push(registerString("" + value));
-          } else {
-            attributes.push(1);
-            attributes.push(registerString(name));
-          }
+        const value = domNodeOrText.getAttribute(name);
+        if (value) {
+          attributes.push(2);
+          attributes.push(registerString(name));
+          attributes.push(registerString("" + value));
+        } else {
+          attributes.push(1);
+          attributes.push(registerString(name));
         }
       });
-    }
-
-    // Custom attribute support for specific element types here
-    switch (tagName) {
-      case "LINK": {
-        const href = domNodeOrText.getAttribute("href");
-        if (href) {
-          attributes.push(2);
-          attributes.push(registerString("href"));
-          attributes.push(registerString(href));
-        }
-        break;
-      }
-      case "SCRIPT": {
-        const src = domNodeOrText.getAttribute("src");
-        if (src) {
-          attributes.push(2);
-          attributes.push(registerString("src"));
-          attributes.push(registerString(src));
-        }
-        break;
-      }
     }
 
     nodesArray.push(parentObjectId);
     nodesArray.push(objectId);
     nodesArray.push(nodeType);
-    nodesArray.push(registerString(tagName));
+    nodesArray.push(
+      nodeType === Node.TEXT_NODE ? registerString(textContent!) : registerString(tagName)
+    );
     nodesArray.push(attributes.length);
     nodesArray.push(...attributes);
 
-    if (children) {
-      for (let child of children) {
-        queue.push(objectId);
-        queue.push(child);
+    if (childNodes) {
+      for (let child of childNodes) {
+        switch (child.nodeType) {
+          case Node.COMMENT_NODE: {
+            break;
+          }
+          case Node.TEXT_NODE: {
+            if (child.textContent?.trim()) {
+              queue.push(objectId);
+              queue.push(child);
+            }
+            break;
+          }
+          default: {
+            queue.push(objectId);
+            queue.push(child);
+            break;
+          }
+        }
       }
     }
 
