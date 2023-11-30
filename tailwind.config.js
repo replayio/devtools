@@ -83,6 +83,9 @@ module.exports = {
         loadingBackground: "var(--loading-background)",
         loadingBoxes: "var(--loading-boxes)",
       },
+      fontFamily: {
+        monospace: ["var(--monospace-font-family)"],
+      },
       lineHeight: {
         "comment-text": "1.125rem",
         2: "10px",

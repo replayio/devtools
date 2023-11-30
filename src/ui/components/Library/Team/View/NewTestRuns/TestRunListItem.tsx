@@ -18,7 +18,7 @@ function Status({ failCount }: { failCount: number }) {
   if (failCount > 0) {
     return (
       <div
-        className="flex h-5 w-8 shrink-0 items-center justify-center rounded-md bg-[#F02D5E] text-xs font-bold text-white text-chrome"
+        className="flex h-5 w-8 shrink-0 items-center justify-center rounded-md bg-[color:var(--testsuites-v2-failed-pill)] text-xs font-bold text-white text-chrome"
         data-test-status={status}
       >
         {failCount}
@@ -91,7 +91,7 @@ export function TestRunListItem({
       className={`flex cursor-pointer flex-row items-center space-x-3 rounded-md bg-themeBase-100 px-2 py-1 ${
         styles.libraryRow
       }
-      ${isSelected ? styles.libraryRowSelected : ""}
+      ${isSelected ? styles.testsuitesV2LibraryRowSelected : ""}
       `}
       onClick={onClick}
     >

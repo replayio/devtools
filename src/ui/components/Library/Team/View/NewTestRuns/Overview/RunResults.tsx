@@ -84,6 +84,12 @@ function TestStatusGroup({
     return null;
   }
 
+  const labelToBgColor: Record<string, string> = {
+    Failed: "text-[color:var(--testsuites-v2-failed-header)]",
+    Flaky: "text-[color:var(--testsuites-v2-flaky-header)]",
+    Passed: "text-[color:var(--testsuites-v2-success-header)]",
+  };
+
   return (
     <div
       className="flex flex-col"
@@ -93,7 +99,7 @@ function TestStatusGroup({
         className={`top-0 flex grow flex-row p-2 pl-4 font-medium hover:cursor-pointer ${styles.libraryRowHeader}`}
         onClick={() => setExpanded(!expanded)}
       >
-        <div className="grow">
+        <div className={`grow font-bold ${labelToBgColor[label]}`}>
           <span data-test-id="TestRunResults-StatusGroup-Count">{count}</span> {label} Test
           {count > 1 ? "s" : ""}
         </div>
@@ -125,7 +131,7 @@ const FileNodeRenderer = memo(function FileNodeRenderer({
   fileNode: FileNode;
 }) {
   const { absolutePath, tests } = fileNode;
-  const { setSpec } = useContext(TestRunsContext);
+  const { setSpec, spec } = useContext(TestRunsContext);
 
   const onClick = () => setSpec(absolutePath);
 
@@ -143,10 +149,14 @@ const FileNodeRenderer = memo(function FileNodeRenderer({
     iconClassName = "text-yellow-500";
   }
 
+  const isSelected = absolutePath === spec;
+
   return (
     <>
       <div
-        className={`flex cursor-pointer items-center gap-2 truncate  py-2  pr-4 ${styles.libraryRow}`}
+        className={`flex cursor-pointer items-center gap-2 truncate rounded py-1.5 pr-4 ${
+          styles.libraryRow
+        } ${isSelected ? styles.testsuitesV2LibraryRowSelected : ""}`}
         data-test-id="TestRunResult-FileNode"
         onClick={onClick}
         style={{
@@ -194,7 +204,7 @@ function PathNodeRenderer({
     <>
       {name && (
         <div
-          className={`flex cursor-pointer items-center gap-2 truncate py-2 pr-4 ${styles.libraryRow}`}
+          className={`cursor-pointer truncate py-2 pr-4 ${styles.libraryRow}`}
           data-test-id="TestRunResult-PathNode"
           data-test-state={expanded ? "expanded" : "collapsed"}
           onClick={onClick}
@@ -202,8 +212,7 @@ function PathNodeRenderer({
             paddingLeft: `${depth * 1}rem`,
           }}
         >
-          <Icon className="h-5 w-5 shrink-0" type={expanded ? "folder-open" : "folder-closed"} />
-          <div className="flex items-center gap-1 truncate">{formattedNames}</div>
+          <div className="flex items-center gap-1 truncate">{formattedNames}/</div>
           {!expanded && (
             <div className="text-xs text-bodySubColor">({pathNode.nestedRecordingCount} tests)</div>
           )}

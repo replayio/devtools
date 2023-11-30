@@ -57,6 +57,9 @@ const GET_TEST_RUN_RECORDINGS = gql`
                 recordings {
                   uuid
                   duration
+                  owner {
+                    name
+                  }
                   isProcessed
                   createdAt
                   comments {

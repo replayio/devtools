@@ -534,6 +534,13 @@
   --testsuites-stack-frame-background-color-active: #25364e;
   --testsuites-stack-frame-background-color-hover: #252d3b;
 
+  --testsuites-v2-failed-header: #f02d5e;
+  --testsuites-v2-flaky-header: #f3bd41;
+  --testsuites-v2-success-header: #6bd442;
+  --testsuites-v2-failed-pill: #f02d5e;
+  --testsuites-v2-description: #f02d5e;
+  --testsuites-v2-error-bg: #330c14;
+
   --circular-progress-bar-trail-color: var(--testsuites-steps-bgcolor);
 
   /* To organise (Dark) */
@@ -1064,6 +1071,13 @@
   --testsuites-stack-frame-background-color: transparent;
   --testsuites-stack-frame-background-color-active: #ebf3ff;
   --testsuites-stack-frame-background-color-hover: #f7f7f7;
+
+  --testsuites-v2-failed-header: #f02d5e;
+  --testsuites-v2-flaky-header: #f3bd41;
+  --testsuites-v2-success-header: #6bd442;
+  --testsuites-v2-failed-pill: #f02d5e;
+  --testsuites-v2-description: #f02d5e;
+  --testsuites-v2-error-bg: #330c14;
 
   --circular-progress-bar-trail-color: var(--testsuites-steps-bgcolor);
 

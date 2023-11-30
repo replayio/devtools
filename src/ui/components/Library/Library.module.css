@@ -26,6 +26,14 @@
   background-color: var(--primary-accent-dimmed);
 }
 
+:root:global(.theme-dark) .testsuitesV2LibraryRowSelected {
+  background-color: rgba(0, 0, 0, 1);
+}
+
+:root:global(.theme-dark) .testsuitesV2LibraryRowSelected:hover {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
 :root:global(.theme-dark) .teamRow:hover,
 :root:global(.theme-dark) .teamRowActive {
   background-color: var(--team-row-active);
@@ -214,6 +222,9 @@
 }
 
 .libraryRow {
+}
+
+.testsuitesV2LibraryRowSelected {
 }
 
 .testsuitesSuccess {
