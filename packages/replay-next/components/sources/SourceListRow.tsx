@@ -129,7 +129,7 @@ export default function SourceListRow({
     : null;
 
   let showPointPanel = false;
-  if (pointWithPendingEdits && pointForSuspense) {
+  if (pointWithPendingEdits) {
     if (pointBehavior) {
       showPointPanel = pointBehavior.shouldLog !== POINT_BEHAVIOR_DISABLED;
     } else {
