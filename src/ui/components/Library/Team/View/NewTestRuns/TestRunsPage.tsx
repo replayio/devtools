@@ -3,6 +3,7 @@ import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { ContextMenuItem, useContextMenu } from "use-context-menu";
 
 import Icon from "replay-next/components/Icon";
+import { TestRunTestWithRecordings } from "shared/test-suites/TestRun";
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 
 import { useTestRunDetailsSuspends } from "../TestRuns/hooks/useTestRunDetailsSuspends";
@@ -227,7 +228,7 @@ function TestRunSpecDetails() {
   );
 }
 
-function Errors({ failedTests }: { failedTests: any }) {
+function Errors({ failedTests }: { failedTests: TestRunTestWithRecordings[] }) {
   return (
     <div className="flex flex-col gap-2 px-3">
       <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-lg font-semibold">
@@ -235,13 +236,12 @@ function Errors({ failedTests }: { failedTests: any }) {
       </div>
       <div className="flex flex-grow flex-col gap-2">
         {failedTests.map((t, i) => (
-          // bg-black is wrong for light theme. should use CSS variables?
           <div
             key={i}
             className="w-full overflow-x-auto rounded-md bg-[color:var(--testsuites-v2-error-bg)] px-3 py-4"
           >
             <div className="whitespace-pre border-l-2 border-[color:var(--testsuites-v2-failed-header)] px-3">
-              {t.errors.map((e, i) => (
+              {t.errors?.map((e, i) => (
                 <>
                   <div className="mb-2 flex flex-row items-center gap-2 text-[color:var(--testsuites-v2-failed-header)]">
                     <Icon type="warning" className="h-4 w-4" />
