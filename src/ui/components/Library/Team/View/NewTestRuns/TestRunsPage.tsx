@@ -243,7 +243,7 @@ function Errors({ failedTests }: { failedTests: TestRunTestWithRecordings[] }) {
             <div className="whitespace-pre border-l-2 border-[color:var(--testsuites-v2-failed-header)] px-3">
               {t.errors?.map((e, i) => (
                 <>
-                  <div className="mb-2 flex flex-row items-center gap-2 text-[color:var(--testsuites-v2-failed-header)]">
+                  <div className="mb-2 flex cursor-default select-none flex-row items-center gap-2 text-[color:var(--testsuites-v2-failed-header)]">
                     <Icon type="warning" className="h-4 w-4" />
                     <span className="font-monospace text-xs">Error</span>
                   </div>

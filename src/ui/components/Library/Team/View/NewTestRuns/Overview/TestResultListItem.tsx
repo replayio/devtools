@@ -21,17 +21,20 @@ function RecordingAttributes({ recording }: { recording: Recording }) {
   return (
     <div className="flex flex-row flex-wrap items-center gap-4 text-xs">
       <AttributeContainer
-        dataTestId="TestRun-Date"
+        dataTestId="Recording-Date"
         icon="schedule"
         title={new Date(recording.date).toLocaleString()}
       >
         {getTruncatedRelativeDate(recording.date)}
       </AttributeContainer>
-      <AttributeContainer dataTestId="TestRun-Duration" icon="timer">
-        {getDurationString(recording.duration)}
-      </AttributeContainer>
+
+      {recording.duration && recording.duration > 0 ? (
+        <AttributeContainer dataTestId="Recording-Duration" icon="timer">
+          {getDurationString(recording.duration)}
+        </AttributeContainer>
+      ) : null}
       {recording.user?.name ? (
-        <AttributeContainer dataTestId="TestRun-Username" icon="person">
+        <AttributeContainer dataTestId="Recording-Username" icon="person">
           {recording.user.name}
         </AttributeContainer>
       ) : null}

@@ -8,7 +8,7 @@ import {
   useState,
 } from "react";
 
-import Icon, { IconType } from "replay-next/components/Icon";
+import Icon from "replay-next/components/Icon";
 import { TestRunsContext } from "ui/components/Library/Team/View/NewTestRuns/TestRunsContextRoot";
 import { useTestRunDetailsSuspends } from "ui/components/Library/Team/View/TestRuns/hooks/useTestRunDetailsSuspends";
 import {
@@ -17,6 +17,7 @@ import {
   isPathNode,
   useFileNameTree,
 } from "ui/components/Library/Team/View/TestRuns/Overview/useFileNameTree";
+import FileIcon from "ui/components/shared/Icon";
 import { TestGroup, testPassed } from "ui/utils/testRuns";
 
 import styles from "../../../../Library.module.css";
@@ -135,18 +136,17 @@ const FileNodeRenderer = memo(function FileNodeRenderer({
 
   const onClick = () => setSpec(absolutePath);
 
-  let type: IconType;
-  let iconClassName = "";
-
+  let iconFilename: string;
+  let iconClass: string;
   if (label === "Passed") {
-    type = "checked-rounded";
-    iconClassName = "text-green-500";
+    iconFilename = "testsuites-success";
+    iconClass = styles.testsuitesV2Success;
   } else if (label === "Failed") {
-    type = "error";
-    iconClassName = "text-red-500";
+    iconClass = styles.testsuitesV2Failed;
+    iconFilename = "testsuites-v2-failed";
   } else {
-    type = "warning";
-    iconClassName = "text-yellow-500";
+    iconClass = styles.testsuitesV2Flaky;
+    iconFilename = "testsuites-v2-flaky";
   }
 
   const isSelected = absolutePath === spec;
@@ -163,7 +163,7 @@ const FileNodeRenderer = memo(function FileNodeRenderer({
           paddingLeft: `${depth * 1}rem`,
         }}
       >
-        <Icon className={`h-5 w-5 shrink-0 ${iconClassName}`} type={type} />
+        <FileIcon className={iconClass} filename={iconFilename} />
         <div className="truncate">{tests[0].title}</div>
       </div>
     </>

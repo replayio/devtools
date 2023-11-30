@@ -259,6 +259,18 @@
   border-radius: 50%;
 }
 
+.testsuitesV2Success {
+  background-color: var(--testsuites-v2-success-icon);
+}
+
+.testsuitesV2Failed {
+  background-color: var(--testsuites-v2-failed-icon);
+}
+
+.testsuitesV2Flaky {
+  background-color: var(--testsuites-v2-flaky-icon);
+}
+
 .FilterTestsFilter {
   border: 1px solid var(--input-border);
   background-color: var(--body-bgcolor);
