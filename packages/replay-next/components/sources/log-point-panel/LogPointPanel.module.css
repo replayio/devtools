@@ -1,4 +1,5 @@
-.Panel {
+.Panel,
+.Loader {
   position: absolute;
   top: var(--line-height);
   left: var(--source-line-number-offset);
