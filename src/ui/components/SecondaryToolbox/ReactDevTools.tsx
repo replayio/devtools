@@ -38,7 +38,7 @@ import {
 } from "ui/components/SecondaryToolbox/react-devtools/ReplayWall";
 import { nodePickerDisabled, nodePickerInitializing, nodePickerReady } from "ui/reducers/app";
 import { getPreferredLocation } from "ui/reducers/sources";
-import { getRecordingMightHaveRoutines } from "ui/reducers/timeline";
+import { getRecordingTooLongToSupportRoutines } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector, useAppStore } from "ui/setup/hooks";
 import { UIState } from "ui/state";
 import {
@@ -128,7 +128,7 @@ export function ReactDevtoolsPanel() {
   const currentTime = useAppSelector(getTime);
   const isFirstAnnotationsInjection = useRef(true);
   const [, forceRender] = useReducer(c => c + 1, 0);
-  const mightHaveRoutines = useAppSelector(getRecordingMightHaveRoutines);
+  const showRecordingTooLongWarning = useAppSelector(getRecordingTooLongToSupportRoutines);
 
   const isPointWithinFocusWindow = useIsPointWithinFocusWindow(currentPoint);
   const pauseId = useAppSelector(state => state.pause.id);
@@ -139,8 +139,6 @@ export function ReactDevtoolsPanel() {
     reactDevToolsAnnotationsCache,
     replayClient
   );
-
-  const showRecordingTooLongWarning = !mightHaveRoutines;
 
   const annotations: ParsedReactDevToolsAnnotation[] =
     annotationsStatus === "resolved" ? parsedAnnotations : EMPTY_ANNOTATIONS;

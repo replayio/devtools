@@ -39,6 +39,7 @@ import {
   timeIsBeyondKnownPaints,
 } from "protocol/graphics";
 import { waitForTime } from "protocol/utils";
+import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
 import {
   pointsBoundingTimeCache,
   sessionEndPointCache,
@@ -119,8 +120,18 @@ export function jumpToInitialPausePoint(): UIThunkAction<Promise<void>> {
     const state = getState();
     const zoomRegion = getZoomRegion(state);
     const newZoomRegion = { ...zoomRegion, endTime: time };
+
+    const { maxRecordingDurationForRoutines } = await recordingCapabilitiesCache.readAsync(
+      replayClient
+    );
+
     dispatch(
-      setTimelineState({ currentTime: time, recordingDuration: time, zoomRegion: newZoomRegion })
+      setTimelineState({
+        currentTime: time,
+        recordingDuration: time,
+        zoomRegion: newZoomRegion,
+        maxRecordingDurationForRoutines,
+      })
     );
 
     if (isTest()) {

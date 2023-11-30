@@ -13,7 +13,7 @@ import { ActionFilter } from "ui/components/SecondaryToolbox/redux-devtools/Acti
 import { ReduxActionAnnotation } from "ui/components/SecondaryToolbox/redux-devtools/annotations";
 import { ReduxDevToolsContents } from "ui/components/SecondaryToolbox/redux-devtools/ReduxDevToolsContents";
 import { ReduxDevToolsList } from "ui/components/SecondaryToolbox/redux-devtools/ReduxDevToolsList";
-import { getRecordingMightHaveRoutines } from "ui/reducers/timeline";
+import { getRecordingTooLongToSupportRoutines } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
 import { reduxDevToolsAnnotationsCache } from "ui/suspense/annotationsCaches";
 import { applyMiddlewareDeclCache } from "ui/suspense/jumpToLocationCache";
@@ -28,8 +28,7 @@ export default function ReduxDevToolsPanel() {
   const [searchValue, setSearchValue] = useState("");
 
   const currentExecutionPoint = useAppSelector(getExecutionPoint);
-  const mightHaveRoutines = useAppSelector(getRecordingMightHaveRoutines);
-  const showRecordingTooLongWarning = !mightHaveRoutines;
+  const showRecordingTooLongWarning = useAppSelector(getRecordingTooLongToSupportRoutines);
 
   const { status: annotationsStatus, value: parsedAnnotations } = useImperativeCacheValue(
     reduxDevToolsAnnotationsCache,

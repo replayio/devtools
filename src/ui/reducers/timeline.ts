@@ -10,15 +10,6 @@ import { mergeSortedPointLists } from "ui/utils/timeline";
 
 const initialFocusWindow = getPausePointParams().focusWindow;
 
-// The backend has a hardcoded limit it will only load recordings
-// up to 3 minutes long when running routines, otherwise it bails out.
-// If the recording is longer than that, we _won't_ have data for
-// React, Redux, or Jump to Code.
-// This corresponds to `RoutineMaxWindowDurationSeconds` in the backend.
-// The client uses recording duration in milliseconds.
-// Use this to show a warning in the React and Redux panels.
-export const MAX_RECORDING_LENGTH_FOR_ROUTINES_MS = 3 * 60 * 1000;
-
 function initialTimelineState(): TimelineState {
   return {
     allPaintsReceived: false,
@@ -28,6 +19,7 @@ function initialTimelineState(): TimelineState {
       : null,
     hoveredItem: null,
     markTimeStampedPoint: null,
+    maxRecordingDurationForRoutines: 0,
     hoverTime: null,
     playback: null,
     playbackFocusWindow: false,
@@ -150,7 +142,7 @@ export const isMaximumFocusWindow = (state: UIState) => {
   }
 };
 
-export const getRecordingMightHaveRoutines = (state: UIState) => {
-  const { recordingDuration } = state.timeline;
-  return recordingDuration !== null && recordingDuration! < MAX_RECORDING_LENGTH_FOR_ROUTINES_MS;
+export const getRecordingTooLongToSupportRoutines = (state: UIState) => {
+  const { recordingDuration, maxRecordingDurationForRoutines } = state.timeline;
+  return recordingDuration !== null && recordingDuration! > maxRecordingDurationForRoutines;
 };

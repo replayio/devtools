@@ -28,7 +28,7 @@ import { SelectedElementLoader } from "ui/components/SecondaryToolbox/react-devt
 import { useReactDevToolsAnnotations } from "ui/components/SecondaryToolbox/react-devtools/hooks/useReactDevToolsAnnotations";
 import { useReplayWall } from "ui/components/SecondaryToolbox/react-devtools/hooks/useReplayWall";
 import { ReactDevToolsListData } from "ui/components/SecondaryToolbox/react-devtools/ReactDevToolsListData";
-import { getRecordingMightHaveRoutines } from "ui/reducers/timeline";
+import { getRecordingTooLongToSupportRoutines } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
 import {
   ParsedReactDevToolsAnnotation,
@@ -73,9 +73,7 @@ function ReactDevToolsPanelInner({
   const [collapsedLeft, setCollapsedLeft] = useState(false);
   const [collapsedRight, setCollapsedRight] = useState(false);
   const [protocolCheckFailed, setProtocolCheckFailed] = useState(false);
-  const mightHaveRoutines = useAppSelector(getRecordingMightHaveRoutines);
-
-  const showRecordingTooLongWarning = !mightHaveRoutines;
+  const showRecordingTooLongWarning = useAppSelector(getRecordingTooLongToSupportRoutines);
 
   const leftPanelRef = useRef<ImperativePanelHandle>(null);
   const rightPanelRef = useRef<ImperativePanelHandle>(null);
