@@ -3,12 +3,7 @@ import { useRouter } from "next/router";
 
 import Icon from "replay-next/components/Icon";
 import { Recording } from "shared/graphql/types";
-import {
-  isGroupedTestCasesV1,
-  isGroupedTestCasesV2,
-} from "shared/test-suites/RecordingTestMetadata";
 import { TestRunTest } from "shared/test-suites/TestRun";
-import HighlightedText from "ui/components/Library/Team/View/NewTestRuns/HighlightedText";
 
 import {
   getDurationString,

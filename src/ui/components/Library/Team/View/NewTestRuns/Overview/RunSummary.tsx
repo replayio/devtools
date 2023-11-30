@@ -6,13 +6,13 @@ import Icon from "replay-next/components/Icon";
 import { TestRun, getTestRunTitle } from "shared/test-suites/TestRun";
 import { AttributeContainer } from "ui/components/Library/Team/View/TestRuns/AttributeContainer";
 import { BranchIcon } from "ui/components/Library/Team/View/TestRuns/BranchIcon";
+import { RunStats } from "ui/components/Library/Team/View/TestRuns/RunStats";
 
 import {
   getDurationString,
   getTruncatedRelativeDate,
 } from "../../Recordings/RecordingListItem/RecordingListItem";
 import { FilterField } from "../FilterField";
-import { RunStats } from "../RunStats";
 import dropdownStyles from "../Dropdown.module.css";
 
 export function ModeAttribute({ testRun }: { testRun: TestRun }) {

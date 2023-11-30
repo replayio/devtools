@@ -18,7 +18,7 @@ import {
   useFileNameTree,
 } from "ui/components/Library/Team/View/TestRuns/Overview/useFileNameTree";
 import FileIcon from "ui/components/shared/Icon";
-import { TestGroup, testPassed } from "ui/utils/testRuns";
+import { TestGroup } from "ui/utils/testRuns";
 
 import styles from "../../../../Library.module.css";
 
@@ -122,12 +122,10 @@ function TestStatusGroup({
 
 const FileNodeRenderer = memo(function FileNodeRenderer({
   depth,
-  filterByText,
   label,
   fileNode,
 }: {
   depth: number;
-  filterByText: string;
   label: string;
   fileNode: FileNode;
 }) {
@@ -232,13 +230,7 @@ function PathNodeRenderer({
             );
           } else {
             return (
-              <FileNodeRenderer
-                depth={depth + 1}
-                filterByText={filterByText}
-                key={index}
-                label={label}
-                fileNode={childNode}
-              />
+              <FileNodeRenderer depth={depth + 1} key={index} label={label} fileNode={childNode} />
             );
           }
         })}

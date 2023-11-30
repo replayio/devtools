@@ -51,15 +51,7 @@ export function ModeAttribute({ testRun }: { testRun: TestRun }) {
   return <AttributeContainer icon={modeIcon}>{modeText}</AttributeContainer>;
 }
 
-export function Attributes({
-  recordings,
-  testRun,
-  durationMs,
-}: {
-  recordings: Recording[];
-  testRun: TestRun;
-  durationMs: number;
-}) {
+export function Attributes({ testRun, durationMs }: { testRun: TestRun; durationMs: number }) {
   const { date, source } = testRun;
 
   const durationString = getDurationString(durationMs);
@@ -141,7 +133,6 @@ function RunnerLink({ testRun }: { testRun: TestRun }) {
 
 export function RunSummary({
   isPending,
-  recordings,
   testRun,
   durationMs,
 }: {
@@ -171,7 +162,7 @@ export function RunSummary({
         </div>
       )}
       <div className="mt-1 flex w-full flex-row items-center gap-4 text-xs">
-        <Attributes recordings={recordings} testRun={testRun} durationMs={durationMs} />
+        <Attributes testRun={testRun} durationMs={durationMs} />
         <div className="grow" />
         <PullRequestLink testRun={testRun} />
         <RunnerLink testRun={testRun} />

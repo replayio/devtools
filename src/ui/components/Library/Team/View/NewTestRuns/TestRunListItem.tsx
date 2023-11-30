@@ -1,9 +1,9 @@
 import { useContext } from "react";
 
 import { TestRun, getTestRunTitle } from "shared/test-suites/TestRun";
-import HighlightedText from "ui/components/Library/Team/View/NewTestRuns/HighlightedText";
 import { AttributeContainer } from "ui/components/Library/Team/View/TestRuns/AttributeContainer";
 import { BranchIcon } from "ui/components/Library/Team/View/TestRuns/BranchIcon";
+import HighlightedText from "ui/components/Library/Team/View/TestRuns/HighlightedText";
 import Icon from "ui/components/shared/Icon";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 
