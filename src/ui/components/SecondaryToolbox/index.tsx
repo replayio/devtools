@@ -13,6 +13,7 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { setSelectedPanel } from "ui/actions/layout";
 import { getSelectedPanel, getToolboxLayout } from "ui/reducers/layout";
+import { getRecordingMightHaveRoutines } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { SecondaryPanelName } from "ui/state/layout";
 import {
@@ -138,6 +139,7 @@ export default function SecondaryToolbox() {
   const toolboxLayout = useAppSelector(getToolboxLayout);
   const dispatch = useAppDispatch();
   const replayClient = useContext(ReplayClientContext);
+  const mightHaveRoutines = useAppSelector(getRecordingMightHaveRoutines);
 
   // Don't suspend when waiting for annotations to load
   const { value: hasReactAnnotations = false } = useImperativeCacheValue(
@@ -158,18 +160,28 @@ export default function SecondaryToolbox() {
     ? toolboxLayout !== "ide"
     : toolboxLayout === "full";
 
+  // We definitely show these tabs if we have annotations.
+  // If we don't have annotations, we want to show the tabs anyway _if_ the recording
+  // is too long, in which case the panels will show a warning message describing why.
+  const shouldShowReactTab = hasReactAnnotations || !mightHaveRoutines;
+  const shouldShowReduxTab = hasReduxAnnotations || !mightHaveRoutines;
+
   useLayoutEffect(() => {
-    if (selectedPanel === "react-components" && !hasReactAnnotations) {
+    // If the selected panel is not available, switch to the console panel.
+    if (
+      (selectedPanel === "react-components" && !shouldShowReactTab) ||
+      (selectedPanel === "redux-devtools" && !shouldShowReduxTab)
+    ) {
       dispatch(setSelectedPanel("console"));
     }
-  }, [selectedPanel, hasReactAnnotations, dispatch]);
+  }, [selectedPanel, shouldShowReactTab, shouldShowReduxTab, dispatch]);
 
   return (
     <div className={classnames(`secondary-toolbox rounded-lg`)}>
       <header className="secondary-toolbox-header">
         <PanelButtons
-          hasReactComponents={hasReactAnnotations}
-          hasReduxAnnotations={hasReduxAnnotations}
+          hasReactComponents={shouldShowReactTab}
+          hasReduxAnnotations={shouldShowReduxTab}
           recordingCapabilities={recordingCapabilities}
           showDebuggerTab={showDebuggerTab}
         />
