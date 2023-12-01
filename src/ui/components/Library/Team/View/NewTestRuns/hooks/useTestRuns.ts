@@ -27,10 +27,7 @@ export function useTestRuns(): TestRun[] {
     teamId
   );
 
-  const testRunsDesc = useMemo(() => {
-    const reversedValue = [...value].reverse();
-    return reversedValue;
-  }, [value]);
+  const testRunsDesc = useMemo(() => [...value].reverse(), [value]);
 
   return testRunsDesc;
 }
