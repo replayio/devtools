@@ -345,53 +345,50 @@ export class ElementsListData extends GenericListData<Item> {
         rootNode = await domCache.readAsync(this._replayClient, this._pauseId);
       }
 
-      if (rootNode == null) {
-        this.invalidate();
-        return;
-      }
-
       if (this._destroyed) {
         return;
       }
 
-      this._rootObjectId = rootNode.objectId;
+      if (rootNode) {
+        this._rootObjectId = rootNode.objectId;
 
-      let queue: Array<[depth: number, node: NodeType]> = [[-1, rootNode]];
+        let queue: Array<[depth: number, node: NodeType]> = [[-1, rootNode]];
 
-      while (queue.length) {
-        const [depth, node] = queue.shift()!;
+        while (queue.length) {
+          const [depth, node] = queue.shift()!;
 
-        const metadata: Metadata = {
-          ...node,
-          depth,
-          isExpanded: node.tagName !== "head",
-          weight: 1,
-        };
+          const metadata: Metadata = {
+            ...node,
+            depth,
+            isExpanded: node.tagName !== "head",
+            weight: 1,
+          };
 
-        this._idToMutableMetadataMap.set(node.objectId, metadata);
+          this._idToMutableMetadataMap.set(node.objectId, metadata);
 
-        let weightDelta = 1;
-        let currentMetadata = this.getParentMutableMetadata(metadata.objectId);
-        while (currentMetadata) {
-          if (!currentMetadata.isExpanded) {
-            break;
+          let weightDelta = 1;
+          let currentMetadata = this.getParentMutableMetadata(metadata.objectId);
+          while (currentMetadata) {
+            if (!currentMetadata.isExpanded) {
+              break;
+            }
+
+            if (currentMetadata.weight === 1 && currentMetadata.nodeType !== Node.DOCUMENT_NODE) {
+              // Transition from <node/> to <node>...</node>
+              // Add an extra count for the tail row
+              // #document nodes don't show a tail
+              weightDelta++;
+            }
+
+            currentMetadata.weight += weightDelta;
+
+            currentMetadata = this.getParentMutableMetadata(currentMetadata.objectId);
           }
 
-          if (currentMetadata.weight === 1 && currentMetadata.nodeType !== Node.DOCUMENT_NODE) {
-            // Transition from <node/> to <node>...</node>
-            // Add an extra count for the tail row
-            // #document nodes don't show a tail
-            weightDelta++;
-          }
-
-          currentMetadata.weight += weightDelta;
-
-          currentMetadata = this.getParentMutableMetadata(currentMetadata.objectId);
+          node.children.forEach(child => {
+            queue.push([depth + 1, child]);
+          });
         }
-
-        node.children.forEach(child => {
-          queue.push([depth + 1, child]);
-        });
       }
     } catch (error) {
       console.error(error);
