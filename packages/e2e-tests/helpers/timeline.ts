@@ -141,14 +141,16 @@ export async function getTimelineCurrentPercent(page: Page) {
 }
 
 export async function seekToTimePercent(page: Page, timePercent: number) {
+  await debugPrint(page, `Seeking timeline to ${timePercent}%`, "seekToTimePercent");
+
   const timeline = getTimelineProgressBar(page);
   const timelineBoundingBox = await timeline.boundingBox();
   expect(timelineBoundingBox).not.toBeFalsy();
-  timeline.click({
-    position: {
-      x: timelineBoundingBox!.width * (timePercent / 100),
-      y: timelineBoundingBox!.height / 2,
-    },
+
+  const x = timelineBoundingBox!.width * (timePercent / 100);
+  const y = timelineBoundingBox!.height / 2;
+  await timeline.click({
+    position: { x, y },
   });
 }
 

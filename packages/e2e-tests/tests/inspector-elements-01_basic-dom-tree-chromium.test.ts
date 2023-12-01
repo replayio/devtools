@@ -6,10 +6,12 @@ import {
   openElementsPanel,
   searchElementsPanel,
   selectNextElementsPanelSearchResult,
+  verifyElementsNotAvailable,
   waitForSelectedElementsRow,
 } from "../helpers/elements-panel";
 import { rewindToLine } from "../helpers/pause-information-panel";
 import { addBreakpoint } from "../helpers/source-panel";
+import { seekToTimePercent } from "../helpers/timeline";
 import test from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "doc_inspector_basic_chromium.html" });
@@ -39,4 +41,7 @@ test("inspector-elements-01: Basic DOM tree node display", async ({
   await searchElementsPanel(page, "STUFF");
   await selectNextElementsPanelSearchResult(page);
   await waitForSelectedElementsRow(page, 'id="div4"');
+
+  await seekToTimePercent(page, 0);
+  await verifyElementsNotAvailable(page);
 });
