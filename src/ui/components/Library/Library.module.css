@@ -270,17 +270,17 @@
 }
 
 .flakyPillV2 {
-  color: var(----color-high-contrast-button);
+  color: #000;
   background-color: var(--testsuites-v2-flaky-pill);
 }
 
 .failedPillV2 {
-  color: var(----color-high-contrast-button);
+  color: #000;
   background-color: var(--testsuites-v2-failed-pill);
 }
 
 .successPillV2 {
-  color: var(----color-high-contrast-button);
+  color: #000;
   background-color: var(--testsuites-v2-success-pill);
 }
 
