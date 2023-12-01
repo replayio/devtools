@@ -14,14 +14,14 @@ const EMPTY_ARRAY: any[] = [];
 export function useTestRuns(): TestRun[] {
   const graphQLClient = useContext(GraphQLClientContext);
   const { teamId } = useContext(TeamContext);
-  const testRunFilterContext = useContext(TestRunsFilterContext);
+  const { startTime, endTime } = useContext(TestRunsFilterContext);
 
   const accessToken = useToken();
 
   const { value = EMPTY_ARRAY } = useImperativeIntervalCacheValues(
     testRunsIntervalCache,
-    testRunFilterContext?.startTime?.getTime() ?? 0,
-    testRunFilterContext?.endTime?.getTime() ?? 0,
+    startTime.getTime(),
+    endTime.getTime(),
     graphQLClient,
     accessToken?.token ?? null,
     teamId
