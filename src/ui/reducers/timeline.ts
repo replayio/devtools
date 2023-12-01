@@ -19,6 +19,7 @@ function initialTimelineState(): TimelineState {
       : null,
     hoveredItem: null,
     markTimeStampedPoint: null,
+    maxRecordingDurationForRoutines: 0,
     hoverTime: null,
     playback: null,
     playbackFocusWindow: false,
@@ -139,4 +140,9 @@ export const isMaximumFocusWindow = (state: UIState) => {
   } else {
     return false;
   }
+};
+
+export const getRecordingTooLongToSupportRoutines = (state: UIState) => {
+  const { recordingDuration, maxRecordingDurationForRoutines } = state.timeline;
+  return recordingDuration !== null && recordingDuration! > maxRecordingDurationForRoutines;
 };

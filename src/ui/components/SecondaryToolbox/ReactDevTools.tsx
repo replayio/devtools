@@ -38,6 +38,7 @@ import {
 } from "ui/components/SecondaryToolbox/react-devtools/ReplayWall";
 import { nodePickerDisabled, nodePickerInitializing, nodePickerReady } from "ui/reducers/app";
 import { getPreferredLocation } from "ui/reducers/sources";
+import { getRecordingTooLongToSupportRoutines } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector, useAppStore } from "ui/setup/hooks";
 import { UIState } from "ui/state";
 import {
@@ -49,6 +50,7 @@ import { NodePicker as NodePickerClass, NodePickerOpts } from "ui/utils/nodePick
 
 import { ReactDevToolsPanel as NewReactDevtoolsPanel } from "./react-devtools/components/ReactDevToolsPanel";
 import { generateTreeResetOpsForPoint } from "./react-devtools/rdtProcessing";
+import styles from "./react-devtools/components/ReactDevToolsPanel.module.css";
 
 function jumpToComponentPreferredSource(componentPreview: ProtocolObject): UIThunkAction {
   return (dispatch, getState) => {
@@ -126,6 +128,7 @@ export function ReactDevtoolsPanel() {
   const currentTime = useAppSelector(getTime);
   const isFirstAnnotationsInjection = useRef(true);
   const [, forceRender] = useReducer(c => c + 1, 0);
+  const showRecordingTooLongWarning = useAppSelector(getRecordingTooLongToSupportRoutines);
 
   const isPointWithinFocusWindow = useIsPointWithinFocusWindow(currentPoint);
   const pauseId = useAppSelector(state => state.pause.id);
@@ -262,14 +265,28 @@ export function ReactDevtoolsPanel() {
     return null;
   }
 
+  if (showRecordingTooLongWarning) {
+    return (
+      <div className={styles.ProtocolFailedPanel} data-test-id="ReactDevToolsPanel">
+        <div className={styles.NotMountedYetMessage}>
+          <div>
+            React components are unavailable because this recording was too long to process them
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (!isPointWithinFocusWindow) {
     return (
-      <div className="h-full bg-bodyBgcolor p-2">
-        React components are unavailable because you're paused at a point outside{" "}
-        <span className="cursor-pointer underline" onClick={() => dispatch(enterFocusMode())}>
-          your debugging window
-        </span>
-        .
+      <div className={styles.ProtocolFailedPanel} data-test-id="ReactDevToolsPanel">
+        <div className={styles.NotMountedYetMessage}>
+          React components are unavailable because you're paused at a point outside{" "}
+          <span className="cursor-pointer underline" onClick={() => dispatch(enterFocusMode())}>
+            your debugging window
+          </span>
+          .
+        </div>
       </div>
     );
   }

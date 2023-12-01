@@ -13,10 +13,13 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { setSelectedPanel } from "ui/actions/layout";
 import { getSelectedPanel, getToolboxLayout } from "ui/reducers/layout";
+import { getRecordingTooLongToSupportRoutines } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { SecondaryPanelName } from "ui/state/layout";
 import {
   REACT_ANNOTATIONS_KIND,
+  REACT_SETUP_ANNOTATIONS_KIND,
+  REDUX_ANNOTATIONS_KIND,
   REDUX_SETUP_ANNOTATIONS_KIND,
   annotationKindsCache,
 } from "ui/suspense/annotationsCaches";
@@ -138,14 +141,28 @@ export default function SecondaryToolbox() {
   const toolboxLayout = useAppSelector(getToolboxLayout);
   const dispatch = useAppDispatch();
   const replayClient = useContext(ReplayClientContext);
+  const recordingTooLongForRoutines = useAppSelector(getRecordingTooLongToSupportRoutines);
 
   // Don't suspend when waiting for annotations to load
-  const { value: hasReactAnnotations = false } = useImperativeCacheValue(
+  const { value: hasReactRoutineAnnotations = false } = useImperativeCacheValue(
     annotationKindsCache,
     replayClient,
     REACT_ANNOTATIONS_KIND
   );
-  const { value: hasReduxAnnotations = false } = useImperativeCacheValue(
+
+  const { value: hasReactRecordingAnnotations = false } = useImperativeCacheValue(
+    annotationKindsCache,
+    replayClient,
+    REACT_SETUP_ANNOTATIONS_KIND
+  );
+
+  const { value: hasReduxRoutineAnnotations = false } = useImperativeCacheValue(
+    annotationKindsCache,
+    replayClient,
+    REDUX_ANNOTATIONS_KIND
+  );
+
+  const { value: hasReduxRecordingAnnotations = false } = useImperativeCacheValue(
     annotationKindsCache,
     replayClient,
     REDUX_SETUP_ANNOTATIONS_KIND
@@ -158,18 +175,32 @@ export default function SecondaryToolbox() {
     ? toolboxLayout !== "ide"
     : toolboxLayout === "full";
 
+  // We definitely show these tabs if we have actual annotations from the routine.
+  // If we don't have routine annotations, we want to show the tabs anyway _if_ the recording
+  // is too long, in which case the panels will show a warning message describing why.
+  // Also, we should only show these tabs if we're pretty sure the recording actually has
+  // _some_ kind of React or Redux data available (ie, not a Vue or Angular app).
+  const shouldShowReactTab =
+    hasReactRoutineAnnotations || (hasReactRecordingAnnotations && recordingTooLongForRoutines);
+  const shouldShowReduxTab =
+    hasReduxRoutineAnnotations || (hasReduxRecordingAnnotations && recordingTooLongForRoutines);
+
   useLayoutEffect(() => {
-    if (selectedPanel === "react-components" && !hasReactAnnotations) {
+    // If the selected panel is not available, switch to the console panel.
+    if (
+      (selectedPanel === "react-components" && !shouldShowReactTab) ||
+      (selectedPanel === "redux-devtools" && !shouldShowReduxTab)
+    ) {
       dispatch(setSelectedPanel("console"));
     }
-  }, [selectedPanel, hasReactAnnotations, dispatch]);
+  }, [selectedPanel, shouldShowReactTab, shouldShowReduxTab, dispatch]);
 
   return (
     <div className={classnames(`secondary-toolbox rounded-lg`)}>
       <header className="secondary-toolbox-header">
         <PanelButtons
-          hasReactComponents={hasReactAnnotations}
-          hasReduxAnnotations={hasReduxAnnotations}
+          hasReactComponents={shouldShowReactTab}
+          hasReduxAnnotations={shouldShowReduxTab}
           recordingCapabilities={recordingCapabilities}
           showDebuggerTab={showDebuggerTab}
         />

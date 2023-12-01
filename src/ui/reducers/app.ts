@@ -37,7 +37,6 @@ export const initialAppState: AppState = {
   modalOptions: null,
   mode: "devtools",
   mouseTargetsLoading: false,
-  recordingDuration: 0,
   recordingId: null,
   recordingTarget: null,
   recordingWorkspace: null,
@@ -188,7 +187,6 @@ export const getAccessToken = (state: UIState) => state.app.accessToken;
 export const getRecordingId = (state: UIState) => state.app.recordingId;
 export const isInspectorSelected = (state: UIState) =>
   getViewMode(state) === "dev" && getSelectedPanel(state) == "inspector";
-export const getRecordingDuration = (state: UIState) => state.app.recordingDuration;
 
 export const getLoadingFinished = (state: UIState) => state.app.loadingFinished;
 export const getUploading = (state: UIState) => state.app.uploading;
