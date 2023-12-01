@@ -84,8 +84,7 @@ export function ElementsPanel({
 
     let results = await domSearchCache.readAsync(replayClient, pauseId, query);
 
-    // DOM search API may match on nodes that have been filtered (e.g. text nodes)
-    // Refine the results list in memory to remove these matches.
+    // DOM search API may match on nodes that are not displayed locally.
     results = results.filter(id => listData.contains(id));
 
     setSearchInProgress(false);
