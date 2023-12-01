@@ -151,7 +151,7 @@ function ReactDevToolsPanelInner({
 
   return (
     <div className={styles.Panel} data-test-id="ReactDevToolsPanel">
-      <PanelGroup autoSaveId="ConsoleRoot" direction="horizontal">
+      <PanelGroup autoSaveId="ReactDevTools" direction="horizontal">
         <Panel
           className={styles.LeftPanel}
           collapsible
