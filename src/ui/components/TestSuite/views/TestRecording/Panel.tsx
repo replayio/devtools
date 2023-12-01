@@ -183,6 +183,7 @@ export default function Panel() {
                   key={testSectionName}
                   testEvents={testEvents}
                   testSectionName={testSectionName}
+                  testRunnerName={testRecording.testRunnerName}
                   title={title}
                 />
               ))}
