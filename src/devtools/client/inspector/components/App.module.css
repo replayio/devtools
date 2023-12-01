@@ -1,0 +1,48 @@
+.Panel {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+}
+
+.ResizeHandle,
+.ResizeHandleCollapsedLeft,
+.ResizeHandleCollapsedRight {
+  height: 100%;
+  width: 0.25rem;
+  background-color: var(--chrome);
+}
+.ResizeHandleCollapsedLeft,
+.ResizeHandleCollapsedRight {
+  width: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--body-bgcolor);
+}
+.ResizeHandleCollapsedLeft {
+  border-right: 0.25rem solid var(--chrome);
+}
+.ResizeHandleCollapsedLeft::after {
+  display: blocked;
+  content: "Elements";
+  cursor: pointer !important;
+  transform: rotate(-90deg);
+}
+.ResizeHandleCollapsedRight {
+  border-left: 0.25rem solid var(--chrome);
+}
+.ResizeHandleCollapsedRight::after {
+  display: blocked;
+  content: "Properties";
+  cursor: pointer !important;
+  transform: rotate(90deg);
+}
+.ResizeHandle:focus {
+  outline: none;
+}
+.ResizeHandleCollapsedLeft:focus,
+.ResizeHandleCollapsedRight:focus {
+  outline: none;
+  background: var(--background-color-resize-handle);
+}
