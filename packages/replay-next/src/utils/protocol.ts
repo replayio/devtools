@@ -1,6 +1,7 @@
 import {
   NamedValue,
   NamedValue as ProtocolNamedValue,
+  Object as ProtocolObject,
   ObjectId as ProtocolObjectId,
   PauseId as ProtocolPauseId,
   Property as ProtocolProperty,
@@ -412,4 +413,22 @@ export function joinChunksToString(chunks: ProtocolProperty[]): string {
   }
 
   return string;
+}
+
+export function findProtocolObjectProperty(
+  sourceObject: ProtocolObject,
+  name: string
+): ProtocolProperty | NamedValue | null {
+  return (
+    sourceObject.preview?.properties?.find(property => property.name === name) ??
+    sourceObject.preview?.getterValues?.find(property => property.name === name) ??
+    null
+  );
+}
+
+export function findProtocolObjectPropertyValue<Type>(
+  sourceObject: ProtocolObject,
+  name: string
+): Type | null {
+  return findProtocolObjectProperty(sourceObject, name)?.value ?? null;
 }

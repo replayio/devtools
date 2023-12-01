@@ -16,6 +16,12 @@ export abstract class GenericListData<Item> extends EventEmitter<{
   private _revision: number = 0;
   private _selectedIndex: number | null = null;
 
+  constructor() {
+    super();
+
+    this._loadingWaiter.resolve();
+  }
+
   getIndexForItem(item: Item): number {
     let index = this._cachedItemToIndexMap.get(item);
     if (index != null) {
