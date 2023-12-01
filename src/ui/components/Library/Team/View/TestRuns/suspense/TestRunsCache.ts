@@ -19,13 +19,7 @@ export const testRunsCache = createCache<
   debugLabel: "testRunsCache",
   getKey: ([_, __, workspaceId]) => workspaceId,
   load: async ([graphQLClient, accessToken, workspaceId]) => {
-    const rawTestRuns = await getTestRunsGraphQL(
-      graphQLClient,
-      accessToken,
-      workspaceId,
-      null,
-      null
-    );
+    const rawTestRuns = await getTestRunsGraphQL(graphQLClient, accessToken, workspaceId);
 
     const testRuns = rawTestRuns.map(processTestRun);
 

@@ -141,8 +141,8 @@ export async function getTestRunsGraphQL(
   graphQLClient: GraphQLClientInterface,
   accessToken: string | null,
   workspaceId: string,
-  startTime: string | null,
-  endTime: string | null
+  startTime?: string | null,
+  endTime?: string | null
 ): Promise<GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node[]> {
   const response = await graphQLClient.send<GetTestsRunsForWorkspace>(
     {
