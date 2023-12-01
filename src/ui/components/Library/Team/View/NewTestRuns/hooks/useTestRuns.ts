@@ -20,11 +20,11 @@ export function useTestRuns(): TestRun[] {
 
   const { value = EMPTY_ARRAY } = useImperativeIntervalCacheValues(
     testRunsIntervalCache,
-    startTime.getTime(),
-    endTime.getTime(),
+    -endTime.getTime(),
+    -startTime.getTime(),
     graphQLClient,
     accessToken?.token ?? null,
     teamId
   );
-  return value.toReversed();
+  return value;
 }

@@ -10,14 +10,14 @@ export const testRunsIntervalCache = createIntervalCache<
   TestRun
 >({
   debugLabel: "testRunsIntervalCache",
-  getPointForValue: testRun => new Date(testRun.date).getTime(),
-  load: async (start, end, graphQLClient, accessToken, workspaceId) => {
+  getPointForValue: testRun => -new Date(testRun.date).getTime(),
+  load: async (end, start, graphQLClient, accessToken, workspaceId) => {
     const rawTestRuns = await getTestRunsGraphQL(
       graphQLClient,
       accessToken,
       workspaceId,
-      new Date(start).toISOString(),
-      new Date(end).toISOString()
+      new Date(Math.abs(start)).toISOString(),
+      new Date(Math.abs(end)).toISOString()
     );
 
     return rawTestRuns.map(processTestRun);
