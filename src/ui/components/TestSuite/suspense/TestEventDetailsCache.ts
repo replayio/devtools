@@ -49,7 +49,6 @@ export const testEventDetailsIntervalCache = createFocusIntervalCacheForExecutio
     return key;
   },
   async load(begin, end, replayClient, testRecording, enabled, options) {
-    console.log("testEventDetailsIntervalCache load", begin, end, enabled, options);
     if (!enabled) {
       return [];
     }
@@ -67,6 +66,8 @@ export const testEventDetailsIntervalCache = createFocusIntervalCacheForExecutio
 
         switch (testRunnerName) {
           case "cypress": {
+            // Cypress commands have a `resultVariable` field that we need to find the
+            // right step details object at the given `result` point.
             if (e.data.timeStampedPoints.result && e.data.resultVariable) {
               const isInFocusRange = isExecutionPointsWithinRange(
                 e.data.timeStampedPoints.result.point,
@@ -78,7 +79,16 @@ export const testEventDetailsIntervalCache = createFocusIntervalCacheForExecutio
             return false;
           }
           case "playwright": {
-            if (e.data.timeStampedPoints.beforeStep) {
+            // Playwright commands have a "command" category. We'll only look for
+            // steps that have a `locator.something()` command and a locator string arg.
+            if (e.data.category === "command" && e.data.timeStampedPoints.beforeStep) {
+              if (
+                !e.data.command.name.startsWith("locator") ||
+                e.data.command.arguments.length === 0 ||
+                e.data.command.arguments[0].length === 0
+              ) {
+                return false;
+              }
               const isInFocusRange = isExecutionPointsWithinRange(
                 e.data.timeStampedPoints.beforeStep.point,
                 begin,
@@ -94,8 +104,6 @@ export const testEventDetailsIntervalCache = createFocusIntervalCacheForExecutio
       }
       return false;
     });
-
-    console.log("Filtered events: ", filteredEvents);
 
     if (filteredEvents.length === 0) {
       return [];
@@ -121,6 +129,13 @@ export const testEventDetailsIntervalCache = createFocusIntervalCacheForExecutio
       }
       case "playwright": {
         console.log("Attempted to process results for playwright: ", filteredEvents);
+        processedResults = await fetchPlaywrightStepDetails(
+          replayClient,
+          filteredEvents,
+          begin,
+          end,
+          sources
+        );
         break;
       }
       default:
@@ -200,8 +215,6 @@ async function fetchCypressStepDetails(
   );
 
   evalResults.sort((a, b) => compareExecutionPoints(a.point.point, b.point.point));
-
-  console.log("Eval results", evalResults);
 
   // We need to reformat the raw analysis data to extract details on the "step details" object.
   const processedResults: TestEventDetailsEntry[] = await Promise.all(
@@ -313,6 +326,15 @@ async function fetchAndCachePossibleCypressDomNode(
     el => !!el && el.className !== "Object" && el.preview?.node
   );
 
+  await cacheDomNodeEntry(firstDomNode, replayClient, pauseId, timeStampedPoint);
+}
+
+async function cacheDomNodeEntry(
+  firstDomNode: ProtocolObject | null | undefined,
+  replayClient: ReplayClientInterface,
+  pauseId: string,
+  timeStampedPoint: TimeStampedPoint
+) {
   let nodeInfo: Element | null = null;
 
   if (firstDomNode) {
@@ -328,4 +350,230 @@ async function fetchAndCachePossibleCypressDomNode(
   };
 
   testEventDomNodeCache.cacheValue(domNodeDetails, domNodeDetails.point);
+}
+
+async function fetchPlaywrightStepDetails(
+  replayClient: ReplayClientInterface,
+  filteredEvents: RecordingTestMetadataV3.UserActionEvent[],
+  begin: string,
+  end: string,
+  sources: Map<string, Source>
+): Promise<TestEventDetailsEntry[]> {
+  const testResultPoints = filteredEvents.map(e => e.data.timeStampedPoints.beforeStep!);
+
+  const evalResults: RunEvaluationResult[] = [];
+
+  // This is the injected script that Playwright uses to parse selectors and query the DOM.
+  const playwrightInjectedScriptModule: { source: string } = await import("./injectedScriptSource");
+
+  // These arguments and the preload eval string correspond to the Playwright setup logic
+  // in `playwright-core/src/server/dom.ts::injectedScript()`.
+  // We can hard-code several of these values ourselves.
+
+  // Controls injection into window, and some other external pieces
+  const isUnderTest = false;
+  // Playwright can be used from multiple languages
+  const sdkLanguage = "javascript";
+  // data-testid can be customized by the user
+  const testIdAttributeName = "data-testid";
+  // WebKit on Windows needs 5, everything else is 1
+  const rafCountForStablePosition = 1;
+  const browserName = "chromium";
+  const customSelectorEngines: string[] = [];
+
+  const preloadExpression = `
+        (() => {
+          const module = {};
+          ${playwrightInjectedScriptModule.source}
+          return new (module.exports.InjectedScript())(
+            globalThis,
+            ${isUnderTest},
+            "${sdkLanguage}",
+            "${testIdAttributeName}",
+            ${rafCountForStablePosition},
+            "${browserName}",
+            [${customSelectorEngines.join(",\n")}]
+          );
+        })();
+      `;
+
+  // Any focus range errors here will bubble up to the parent focus cache,
+  // which will retry the load if needed later.
+  await Promise.all(
+    // TODO We don't currently have a way for `runEvaluation` expressions to have variable behavior
+    // per execution point. The old analysis API put `point` and `time` in scope, and if we had
+    // that we could do _one_ `runEvaluation` with a single expression that would contain a lookup
+    // table mapping execution points to locator strings.
+    // Since we don't have that, for now we'll run a separate `runEvaluation` _per point_. This is horrible
+    // for perf, but it at least will work. (Slowly.)
+    testResultPoints.map(async (p, index) => {
+      const userEvent = filteredEvents[index];
+
+      // The locator string is always the first command arg.
+      const locatorString = userEvent.data.command.arguments[0];
+
+      await replayClient.runEvaluation(
+        {
+          selector: {
+            kind: "points",
+            points: [p.point],
+          },
+          preloadExpressions: [
+            {
+              name: "PLAYWRIGHT_INJECTED_SCRIPT",
+              expression: preloadExpression,
+            },
+          ],
+          expression: `
+          const locatorString = ${JSON.stringify(locatorString)};
+          
+          // Playwright parses the locator string into descriptive objects
+          const parsedSelector = PLAYWRIGHT_INJECTED_SCRIPT.parseSelector(locatorString);
+
+          let foundElements = []
+
+          // Look for the actual target elements
+          try {
+            foundElements = PLAYWRIGHT_INJECTED_SCRIPT.querySelectorAll(parsedSelector, PLAYWRIGHT_INJECTED_SCRIPT.document) ?? [];
+          } catch (err) { }
+
+          // It may be useful for test debugging purposes to see _all_ of the elements retrieved
+          // for _each_ segment of the locator string. Now that this is already split up,
+          // we can do that by slicing the selector parts and querying for each subset.
+          const iterativeSelectors = parsedSelector.parts.map((part, index) => {
+            return {
+              parts: parsedSelector.parts.slice(0, index + 1),
+              capture: parsedSelector.capture
+            }
+          });
+
+          const allSelectedElements = iterativeSelectors.map(selector => {
+            let elements = []; 
+            try {
+              elements = PLAYWRIGHT_INJECTED_SCRIPT.querySelectorAll(selector, PLAYWRIGHT_INJECTED_SCRIPT.document);
+            } catch (err) { }
+
+            return elements;
+          })
+
+
+          // Now we deal with our runEvaluation object preview limits again.
+          // To get the DOM node previews back as fast as possible, we'll inline the primary DOM
+          // nodes directly into this result array.
+          // We'll include the rest of the data for use in later dev work.
+          const result = [
+            foundElements.length,
+            ...foundElements,
+            JSON.stringify(parsedSelector),
+            // all parsed selectors
+            JSON.stringify(iterativeSelectors),
+            {
+              foundElements,
+              allSelectedElements
+            }
+          ]
+
+          result;
+        `,
+          fullPropertyPreview: true,
+          limits: { begin, end },
+        },
+        results => {
+          // This logic copy-pasted from AnalysisCache.ts
+          for (const result of results) {
+            // Immediately cache pause ID and data so we have it available for reuse
+            setPointAndTimeForPauseId(result.pauseId, result.point);
+            cachePauseData(replayClient, sources, result.pauseId, result.data);
+          }
+          // Collect them all so we process them in a single batch
+          evalResults.push(...results);
+        }
+      );
+    })
+  );
+
+  evalResults.sort((a, b) => compareExecutionPoints(a.point.point, b.point.point));
+
+  // We need to reformat the raw analysis data to extract details on the "step details" object.
+  const processedResults: TestEventDetailsEntry[] = await Promise.all(
+    evalResults.map(async result => {
+      const { pauseId, point: timeStampedPoint, returned, data } = result;
+      if (!returned?.object) {
+        return {
+          ...timeStampedPoint,
+          count: null,
+          pauseId: result.pauseId,
+          props: null,
+        };
+      }
+
+      // This should already be cached because of `runEvaluation` returned nested previews.
+      const resultValue = await objectCache.readAsync(
+        replayClient,
+        pauseId,
+        returned.object,
+        "full"
+      );
+
+      if (!resultValue.preview?.properties || resultValue.preview.properties.length === 0) {
+        return {
+          ...timeStampedPoint,
+          count: null,
+          pauseId: result.pauseId,
+          props: null,
+        };
+      }
+      const resultProps = resultValue.preview.properties;
+
+      const numTargetElements = resultProps[0].value as number;
+
+      let targetElements: ProtocolObject[] = [];
+
+      if (numTargetElements > 0) {
+        const targetElementProps = resultProps.slice(1, 1 + numTargetElements);
+        targetElements = (
+          await Promise.all(
+            targetElementProps.map(async prop => {
+              if (!prop.object) {
+                return null;
+              }
+              const cachedPropObject = await objectCache.readAsync(
+                replayClient,
+                pauseId,
+                prop.object,
+                "canOverflow"
+              );
+              return cachedPropObject;
+            })
+          )
+        ).filter(Boolean);
+
+        const remainingProps = resultProps.slice(1 + numTargetElements);
+        const [parsedSelectorStringProp, splitSelectorsStringProp, resultValueProp] =
+          remainingProps;
+
+        const [firstDomNode] = targetElements;
+
+        cacheDomNodeEntry(firstDomNode, replayClient, pauseId, timeStampedPoint);
+
+        return {
+          ...timeStampedPoint,
+          count: numTargetElements,
+          pauseId,
+          props: resultValueProp.value,
+        };
+      }
+
+      return {
+        ...timeStampedPoint,
+        count: null,
+        pauseId: result.pauseId,
+        props: null,
+      };
+    })
+  );
+
+  console.log("Processed results: ", processedResults);
+
+  return processedResults;
 }
