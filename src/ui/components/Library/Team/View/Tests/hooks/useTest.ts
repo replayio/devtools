@@ -1,7 +1,9 @@
 import { useQuery } from "@apollo/client";
 import { useContext, useMemo } from "react";
+import groupBy from "lodash/groupBy";
 
 import { GetWorkspaceTestExecutions_node_Workspace } from "shared/graphql/generated/GetWorkspaceTestExecutions";
+import { GroupedTestRun } from "shared/test-suites/TestRun";
 import { TeamContext } from "ui/components/Library/Team/TeamContextRoot";
 import { convertRecording } from "ui/hooks/recordings";
 
@@ -30,9 +32,22 @@ export function useTest(testId: string) {
       recordings: e.recordings.map(convertRecording),
     }));
 
+
+    const groupedExecutions = groupBy(executions, "testRunId");
+    const testRuns = Object.entries(groupedExecutions).reduce((acc, [testRunId, executions]) => {
+      acc.push({
+        testRunId,
+        executions,
+        date: executions[0].createdAt,
+      });
+
+      return acc;
+    }, [] as GroupedTestRun[]);
+
     return {
       ...test,
       executions,
+      testRuns,
     };
   }, [data]);
 

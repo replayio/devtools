@@ -54,7 +54,7 @@ function TestOverview({ testId }: { testId: string }) {
             <div>{lastTest.title}</div>
           </div>
           <div className="flex flex-col overflow-y-auto">
-            <TestDetails executions={lastTest.executions} />
+            <TestDetails testRuns={lastTest.testRuns} />
           </div>
         </>
       ) : (

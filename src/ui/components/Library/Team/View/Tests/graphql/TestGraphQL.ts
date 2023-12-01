@@ -17,9 +17,11 @@ export const GET_WORKSPACE_TEST_EXECUTIONS = gql`
               title
               scope
               executions {
+                testRunId
                 errors
                 createdAt
                 commitTitle
+                commitAuthor
                 result
                 recordings {
                   id
