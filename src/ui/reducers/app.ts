@@ -25,6 +25,7 @@ export const initialAppState: AppState = {
   activeNodePicker: null,
   awaitingSourcemaps: false,
   canvas: null,
+  defaultSelectedReactElementId: null,
   defaultSettingsTab: "Preferences",
   displayedLoadingProgress: null,
   events: {},
@@ -129,6 +130,9 @@ const appSlice = createSlice({
     setVideoUrl(state, action: PayloadAction<string>) {
       state.videoUrl = action.payload;
     },
+    setDefaultSelectedReactElementId(state, action: PayloadAction<number | null>) {
+      state.defaultSelectedReactElementId = action.payload;
+    },
     setDefaultSettingsTab(state, action: PayloadAction<SettingsTabTitle>) {
       state.defaultSettingsTab = action.payload;
     },
@@ -157,6 +161,7 @@ export const {
   setAppMode,
   setAwaitingSourcemaps,
   setCanvas,
+  setDefaultSelectedReactElementId,
   setDefaultSettingsTab,
   loadReceivedEvents,
   setExpectedError,
@@ -198,6 +203,8 @@ export const getTrialExpired = (state: UIState) => state.app.trialExpired;
 export const getModal = (state: UIState) => state.app.modal;
 export const getModalOptions = (state: UIState) => state.app.modalOptions;
 export const getHoveredCommentId = (state: UIState) => state.app.hoveredCommentId;
+export const getDefaultSelectedReactElementId = (state: UIState) =>
+  state.app.defaultSelectedReactElementId;
 export const getSelectedCommentId = (state: UIState) => state.app.selectedCommentId;
 
 const NO_EVENTS: MouseEvent[] = [];
