@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useMemo } from "react";
 import { useImperativeIntervalCacheValues } from "suspense";
 
 import { GraphQLClientContext } from "replay-next/src/contexts/GraphQLClientContext";
@@ -20,11 +20,17 @@ export function useTestRuns(): TestRun[] {
 
   const { value = EMPTY_ARRAY } = useImperativeIntervalCacheValues(
     testRunsIntervalCache,
-    -endTime.getTime(),
-    -startTime.getTime(),
+    startTime.getTime(),
+    endTime.getTime(),
     graphQLClient,
     accessToken?.token ?? null,
     teamId
   );
-  return value;
+
+  const testRunsDesc = useMemo(() => {
+    const reversedValue = [...value].reverse();
+    return reversedValue;
+  }, [value]);
+
+  return testRunsDesc;
 }
