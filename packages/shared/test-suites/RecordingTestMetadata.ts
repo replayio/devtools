@@ -189,6 +189,8 @@ export namespace RecordingTestMetadataV3 {
     // Useful for identifying retries of a failed test
     attempt: number;
 
+    testRunnerName: TestRunnerName;
+
     // An error that occurred for this test that was unrelated to a specific event
     // e.g. a JS runtime error in the cypress spec file
     error: TestError | null;
@@ -618,6 +620,7 @@ export async function processCypressTestRecording(
     return {
       attempt,
       error,
+      testRunnerName: "cypress",
       events,
       id,
       result,
@@ -888,6 +891,7 @@ export async function processPlaywrightTestRecording(
     return {
       attempt,
       error,
+      testRunnerName: "playwright",
       events,
       id,
       result,
