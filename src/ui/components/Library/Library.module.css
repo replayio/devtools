@@ -269,6 +269,21 @@
   border-radius: 50%;
 }
 
+.flakyPillV2 {
+  color: var(----color-high-contrast-button);
+  background-color: var(--testsuites-v2-flaky-pill);
+}
+
+.failedPillV2 {
+  color: var(----color-high-contrast-button);
+  background-color: var(--testsuites-v2-failed-pill);
+}
+
+.successPillV2 {
+  color: var(----color-high-contrast-button);
+  background-color: var(--testsuites-v2-success-pill);
+}
+
 .testsuitesV2Success {
   background-color: var(--testsuites-v2-success-icon);
 }

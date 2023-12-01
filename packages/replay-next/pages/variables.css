@@ -539,8 +539,10 @@
   --testsuites-v2-failed-pill: #f02d5e;
   --testsuites-v2-flaky-icon: #f3bd41;
   --testsuites-v2-flaky-header: #f3bd41;
+  --testsuites-v2-flaky-pill: #f3bd41;
   --testsuites-v2-success-icon: #6bd442;
   --testsuites-v2-success-header: #6bd442;
+  --testsuites-v2-success-pill: #6bd442;
   --testsuites-v2-description: #f02d5e;
   --testsuites-v2-error-bg: #330c14;
 
@@ -1081,8 +1083,10 @@
   --testsuites-v2-failed-pill: #f02d5e;
   --testsuites-v2-flaky-icon: #f3bd41;
   --testsuites-v2-flaky-header: #f3bd41;
+  --testsuites-v2-flaky-pill: #f3bd41;
   --testsuites-v2-success-icon: #6bd442;
   --testsuites-v2-success-header: #6bd442;
+  --testsuites-v2-success-pill: #6bd442;
   --testsuites-v2-description: #f02d5e;
   --testsuites-v2-error-bg: #330c14;
 

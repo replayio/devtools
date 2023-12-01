@@ -4,9 +4,9 @@ import { ContextMenuItem, useContextMenu } from "use-context-menu";
 
 import Icon from "replay-next/components/Icon";
 import { TestRun, getTestRunTitle } from "shared/test-suites/TestRun";
+import { RunStats } from "ui/components/Library/Team/View/NewTestRuns/RunStats";
 import { AttributeContainer } from "ui/components/Library/Team/View/TestRuns/AttributeContainer";
 import { BranchIcon } from "ui/components/Library/Team/View/TestRuns/BranchIcon";
-import { RunStats } from "ui/components/Library/Team/View/TestRuns/RunStats";
 
 import {
   getDurationString,
