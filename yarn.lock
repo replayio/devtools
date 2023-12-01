@@ -3648,12 +3648,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/playwright@npm:2.0.0-alpha.3":
-  version: 2.0.0-alpha.3
-  resolution: "@replayio/playwright@npm:2.0.0-alpha.3"
+"@replayio/playwright@npm:2.0.0-alpha.6":
+  version: 2.0.0-alpha.6
+  resolution: "@replayio/playwright@npm:2.0.0-alpha.6"
   dependencies:
-    "@replayio/replay": ^0.17.2
-    "@replayio/test-utils": ^1.1.9
+    "@replayio/replay": ^0.19.4
+    "@replayio/test-utils": ^1.3.6
     debug: ^4.3.4
     uuid: ^8.3.2
     ws: ^8.13.0
@@ -3661,7 +3661,7 @@ __metadata:
     "@playwright/test": 1.19.x
   bin:
     replayio-playwright: bin/replayio-playwright.js
-  checksum: 39bfe644c6b29a9c7df902e3ec51d1a466e6e295cc07b58217b123ababe7d4f8404d3d4e49d4848bd2e57b5fc487be2b623ecae8f2e95d6a8a224faeaaea0c3c
+  checksum: 3ca3c098b6f64ece62a5f591179dac0a143cda26fb6bb349b0abfb5b29a51530ef45f0c2c4e14f4aae53c2788439f10acad2806d803048e5b3c3d8c8d3de99a8
   languageName: node
   linkType: hard
 
@@ -3702,9 +3702,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/replay@npm:^0.17.2":
-  version: 0.17.2
-  resolution: "@replayio/replay@npm:0.17.2"
+"@replayio/replay@npm:^0.19.4":
+  version: 0.19.4
+  resolution: "@replayio/replay@npm:0.19.4"
   dependencies:
     "@replayio/sourcemap-upload": ^1.1.1
     commander: ^7.2.0
@@ -3718,7 +3718,7 @@ __metadata:
     ws: ^7.5.0
   bin:
     replay: bin/replay.js
-  checksum: f6f8fc3c6e43a400f0cd6b226375e8f9071707bfdddd6dc47a9ff2a04fb608c623356da1bb53428f10dd4a801c09c4541a8e6230c526559d4ccc4977d792eeb3
+  checksum: 40338b0f4e850535b2a22e35461ab6dffe22ab8ab0aa439e886f392779f43eb16efa53f9e2ca1a621eaf2b494a39c0271e6d090ffe76be3f9a407f64f64d6c02
   languageName: node
   linkType: hard
 
@@ -3748,16 +3748,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/test-utils@npm:^1.1.9":
-  version: 1.1.9
-  resolution: "@replayio/test-utils@npm:1.1.9"
+"@replayio/test-utils@npm:^1.3.6":
+  version: 1.3.6
+  resolution: "@replayio/test-utils@npm:1.3.6"
   dependencies:
-    "@replayio/replay": ^0.17.2
-    "@types/node-fetch": ^2.6.2
+    "@replayio/replay": ^0.19.4
     debug: ^4.3.4
     node-fetch: ^2.6.7
     uuid: ^8.3.2
-  checksum: 1fe789c4e68a97aee27e2a072e88e1460568342a6e112b5b4e202f8f1cc6a5074558808dbfd7d53102a0ec39214fc36965b2946abf8710b87f7d0889d01f02e6
+  checksum: b60028f804f5d8c6f7840b1b8a11728a75fc10cb9f36d00de75d327663eda13d07efa4fc5b7098a5168f772f74cb38dfaf773ced7123d7fee753b884e4278133
   languageName: node
   linkType: hard
 
@@ -9571,7 +9570,7 @@ __metadata:
   dependencies:
     "@playwright/test": ^1.37.0
     "@replayio/cypress": ^0.5.0
-    "@replayio/playwright": 2.0.0-alpha.3
+    "@replayio/playwright": 2.0.0-alpha.6
     chalk: ^4
     cli-spinners: ^2.7.0
     cypress: ^12.5.1
@@ -15118,7 +15117,7 @@ __metadata:
     style-loader: ^3.3.1
     stylelint: ^14.16.0
     stylelint-config-prettier: ^9.0.5
-    suspense: ^0.0.50
+    suspense: ^0.0.51
     tailwindcss: ^3.2.4
     ts-node: ^10.7.0
     tsconfig-paths: ^3.14.1
@@ -15305,7 +15304,7 @@ __metadata:
     react-dom: 0.0.0-experimental-e7d0053e6-20220325
     react-virtualized-auto-sizer: ^1.0.19
     shared: "workspace:*"
-    suspense: ^0.0.50
+    suspense: ^0.0.51
     typescript: 5.0.2
     use-context-menu: 0.4.13
     uuid: ^7.0.3
@@ -16617,9 +16616,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"suspense@npm:^0.0.50":
-  version: 0.0.50
-  resolution: "suspense@npm:0.0.50"
+"suspense@npm:^0.0.51":
+  version: 0.0.51
+  resolution: "suspense@npm:0.0.51"
   dependencies:
     "@types/deep-equal": ^1.0.1
     array-sorting-utilities: ^0.0.1
@@ -16630,7 +16629,7 @@ __metadata:
   peerDependencies:
     react: ^18.0.0
     react-dom: ^18.0.0
-  checksum: 2cd8d6a52772a9758d41337b11050ef194b484be7753ad3cdb3de8f2c60846f5f0259580a655d4141f465a1d04a7c5c33611575c517fda77fc478e675eabd8e7
+  checksum: 59d5dc585536caefc14b8402ddaf7f61abbc9ff333ca4b4dd44cd57401083997a2c5c72f21a31f9037f3aea7d0c41097b3a7cd404e4e53bf3681dc0ba0340be6
   languageName: node
   linkType: hard
 

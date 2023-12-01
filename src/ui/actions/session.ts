@@ -178,7 +178,6 @@ export function createSocket(recordingId: string): UIThunkAction {
       }
 
       const experimentalSettings: ExperimentalSettings = {
-        deprioritizeTraffic: userData.get("backend_deprioritizeTraffic"),
         disableScanDataCache: userData.get("backend_disableScanDataCache"),
         disableCache: userData.get("backend_disableCache"),
         listenForMetrics: userData.get("backend_listenForMetrics"),

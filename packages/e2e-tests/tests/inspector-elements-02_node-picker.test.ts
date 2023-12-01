@@ -30,7 +30,7 @@ test(`inspector-elements-02_node-picker: element picker and iframe behavior`, as
   await activateInspectorTool(page);
 
   // Click on the "maindiv" element in the Canvas view; this is x:5%, y:1%
-  await inspectCanvasCoordinates(page, 0.05, 0.01);
+  await inspectCanvasCoordinates(page, 0.5, 0.017);
 
   // Verify that the currently selected element in the Elements panel is the expected one:
   let selectedRow = await getElementsListRow(page, { isSelected: true });
@@ -39,7 +39,7 @@ test(`inspector-elements-02_node-picker: element picker and iframe behavior`, as
   await delay(500);
 
   // Click on the "myiframe" element in the Canvas view; this is x:5%, y:10%
-  await inspectCanvasCoordinates(page, 0.05, 0.1);
+  await inspectCanvasCoordinates(page, 0.09, 0.12);
 
   // Verify that the currently selected element in the Elements panel is the expected one:
   selectedRow = await getElementsListRow(page, { isSelected: true });

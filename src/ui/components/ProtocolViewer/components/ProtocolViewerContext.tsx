@@ -7,23 +7,28 @@ import {
   useState,
 } from "react";
 
+import { REQUEST_DURATION_SLOW_THRESHOLD_MS } from "ui/components/ProtocolViewer/components/ProtocolViewerListItem";
 import {
   ProtocolErrorMap,
   ProtocolRequestMap,
   ProtocolResponseMap,
 } from "ui/reducers/protocolMessages";
 
+export type FilterByCategory = "failed" | "pending" | "slow";
+
 export type ProtocolViewerContextType = {
   clearCurrentRequests: () => void;
   errorMap: ProtocolErrorMap;
   filteredRequestIds: number[];
-  filterText: string;
+  filterByCategory: FilterByCategory | null;
+  filterByText: string;
   longestRequestDuration: number;
   requestMap: ProtocolRequestMap;
   responseMap: ProtocolResponseMap;
   selectedRequestId: number | null;
   selectRequest: (id: number | null) => void;
-  updateFilterText: (text: string) => void;
+  updateFilterByCategory: (category: FilterByCategory | null) => void;
+  updateFilterByText: (text: string) => void;
 };
 
 export const ProtocolViewerContext = createContext<ProtocolViewerContextType>(null as any);
@@ -38,7 +43,8 @@ export function ProtocolViewerContextRoot({
   requestMap: ProtocolRequestMap;
   responseMap: ProtocolResponseMap;
 }) {
-  const [filterText, updateFilterText] = useState("");
+  const [filterByCategory, updateFilterByCategory] = useState<FilterByCategory | null>(null);
+  const [filterByText, updateFilterByText] = useState("");
   const [selectedRequestId, selectRequest] = useState<number | null>(null);
   const [clearBeforeIndex, setClearBeforeIndex] = useState(-1);
 
@@ -47,7 +53,8 @@ export function ProtocolViewerContextRoot({
     setClearBeforeIndex(length);
   }, [requestMap]);
 
-  const deferredFilterText = useDeferredValue(filterText);
+  const deferredFilterByCategory = useDeferredValue(filterByCategory);
+  const deferredFilterByText = useDeferredValue(filterByText);
 
   const longestRequestDuration = useMemo(() => {
     let longestDuration = 0;
@@ -71,19 +78,48 @@ export function ProtocolViewerContextRoot({
     const filteredIds: number[] = [];
 
     const isInverseSearch =
-      deferredFilterText.startsWith("!") || deferredFilterText.startsWith("-");
-    const lowerCaseFilterText = isInverseSearch
-      ? deferredFilterText.substring(1).toLowerCase()
-      : deferredFilterText.toLowerCase();
+      deferredFilterByText.startsWith("!") || deferredFilterByText.startsWith("-");
+    const lowerCaseFilterByText = isInverseSearch
+      ? deferredFilterByText.substring(1).toLowerCase()
+      : deferredFilterByText.toLowerCase();
 
     Array.from(Object.values(requestMap)).forEach((request, index) => {
       if (index < clearBeforeIndex) {
         return;
       }
 
-      if (deferredFilterText) {
+      if (deferredFilterByCategory) {
+        switch (deferredFilterByCategory) {
+          case "failed": {
+            if (!errorMap[request.id]) {
+              return;
+            }
+            break;
+          }
+          case "pending": {
+            if (responseMap[request.id]) {
+              return;
+            }
+            break;
+          }
+          case "slow": {
+            const response = responseMap[request.id];
+            if (!response) {
+              return;
+            } else {
+              const duration = response.recordedAt - request.recordedAt;
+              if (duration < REQUEST_DURATION_SLOW_THRESHOLD_MS) {
+                return;
+              }
+            }
+            break;
+          }
+        }
+      }
+
+      if (deferredFilterByText) {
         const text = `${request.class}.${request.method}`.toLowerCase();
-        const match = text.includes(lowerCaseFilterText);
+        const match = text.includes(lowerCaseFilterByText);
         if (match === isInverseSearch) {
           return;
         }
@@ -93,26 +129,36 @@ export function ProtocolViewerContextRoot({
     });
 
     return filteredIds;
-  }, [clearBeforeIndex, deferredFilterText, requestMap]);
+  }, [
+    clearBeforeIndex,
+    deferredFilterByCategory,
+    errorMap,
+    deferredFilterByText,
+    requestMap,
+    responseMap,
+  ]);
 
   const value = useMemo(
     () => ({
       clearCurrentRequests,
       errorMap,
+      filterByCategory,
+      filterByText,
       filteredRequestIds,
-      filterText,
       longestRequestDuration,
       requestMap,
       responseMap,
       selectedRequestId,
       selectRequest,
-      updateFilterText,
+      updateFilterByCategory,
+      updateFilterByText,
     }),
     [
       clearCurrentRequests,
       errorMap,
+      filterByCategory,
+      filterByText,
       filteredRequestIds,
-      filterText,
       longestRequestDuration,
       requestMap,
       responseMap,

@@ -18,7 +18,12 @@ import {
   paused,
   resumed,
 } from "devtools/client/debugger/src/reducers/pause";
-import { pauseRequestedAt, previewLocationCleared } from "devtools/client/debugger/src/selectors";
+import {
+  clearSeekLock,
+  getSeekLock,
+  pauseRequestedAt,
+  previewLocationCleared,
+} from "devtools/client/debugger/src/selectors";
 import { unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 import {
   addScreenForPoint,
@@ -229,27 +234,35 @@ export function seek({
   location?: Location;
 }): UIThunkAction<Promise<void>> {
   return async (dispatch, getState, { replayClient }) => {
-    dispatch(pauseRequestedAt({ executionPoint, time, location }));
+    const seekLock = new Object();
+    dispatch(pauseRequestedAt({ seekLock, executionPoint, time, location }));
     dispatch(setTimelineState({ currentTime: time, playback: null }));
     const focusWindow = replayClient.getCurrentFocusWindow();
 
     if (!pauseId) {
       // If no ExecutionPoint provided, map time to nearest ExecutionPoint
       if (executionPoint == null) {
-        time = await clampTime(replayClient, time);
+        const clampedTime = await clampTime(replayClient, time);
 
-        const nearestEvent = mostRecentPaintOrMouseEvent(time);
-        const timeStampedPoint = await replayClient.getPointNearTime(time);
-        if (
-          nearestEvent &&
-          Math.abs(nearestEvent.time - time) < Math.abs(timeStampedPoint.time - time)
-        ) {
-          executionPoint = nearestEvent.point;
-        } else {
-          executionPoint = timeStampedPoint.point;
+        const nearestEvent = mostRecentPaintOrMouseEvent(clampedTime);
+        const timeStampedPoint = await replayClient.getPointNearTime(clampedTime);
+        if (getSeekLock(getState()) !== seekLock) {
+          // someone requested seeking to a different point while we were waiting
+          return;
         }
 
-        dispatch(pauseRequestedAt({ executionPoint, time, location }));
+        if (
+          nearestEvent &&
+          Math.abs(nearestEvent.time - clampedTime) < Math.abs(timeStampedPoint.time - clampedTime)
+        ) {
+          executionPoint = nearestEvent.point;
+          time = nearestEvent.time;
+        } else {
+          executionPoint = timeStampedPoint.point;
+          time = timeStampedPoint.time;
+        }
+
+        dispatch(pauseRequestedAt({ seekLock, executionPoint, time, location }));
       }
 
       if (focusWindow === null || !isPointInRegion(executionPoint, focusWindow)) {
@@ -266,12 +279,21 @@ export function seek({
         dispatch(pauseCreationFailed());
         return;
       }
+      if (getSeekLock(getState()) !== seekLock) {
+        // someone requested seeking to a different point while we were waiting
+        return;
+      }
     }
 
     assert(executionPoint);
     dispatch(paused({ executionPoint, time, id: pauseId }));
 
     const frames = await framesCache.readAsync(replayClient, pauseId);
+    if (getSeekLock(getState()) !== seekLock) {
+      // someone requested seeking to a different point while we were waiting
+      return;
+    }
+
     dispatch(previewLocationCleared());
     if (frames?.length) {
       const selectedFrame = frames[0];
@@ -295,6 +317,7 @@ export function seek({
       point: executionPoint,
       time,
     });
+    dispatch(clearSeekLock());
 
     if (autoPlay) {
       dispatch(startPlayback());

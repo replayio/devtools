@@ -68,6 +68,6 @@ test("react_devtools-03: process and display multiple React versions in page", a
 
   // and DOM nodes from React 15 should be in the page
   await searchElementsPanel(page, "15.7.0");
-  const node = await getElementsListRow(page, { text: "15.7.0" });
+  const node = await getElementsListRow(page, { text: 'data-react-version="15.7.0"' });
   await node.waitFor();
 });

@@ -26,16 +26,6 @@ export type ViewMode = "dev" | "non-dev";
 // and to reduce the likelihood of merge conflicts
 
 export const config = {
-  // Won't be displayed in the UI - only used as a query param for E2E tests
-  backend_deprioritizeTraffic: {
-    defaultValue: Boolean(false),
-    description:
-      "Mark this session as low priority, to allow the backend to allocate computing resources effectively",
-    legacyKey: null,
-    highRisk: Boolean(true),
-    internalOnly: Boolean(true),
-    label: "Deprioritize backend compute for this session",
-  },
   backend_disableCache: {
     defaultValue: Boolean(false),
     description: "Disable all caches, should only be used for debugging purposes",

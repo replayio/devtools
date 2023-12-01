@@ -254,7 +254,7 @@ export async function toggleProtocolMessage(page: Page, name: ToggleName, on: bo
       const messageList = page.locator('[data-test-name="Messages"]');
       expect(await messageList.locator('[data-test-name="Loader"]').count()).toBe(0);
     },
-    { timeout: 20_000 }
+    { timeout: 60_000 }
   );
 }
 

@@ -2,6 +2,7 @@ import { Locator, Page, expect } from "@playwright/test";
 import chalk from "chalk";
 
 import { clearText } from "./lexical";
+import { getScreenshotScale } from "./screenshot";
 import { debugPrint, delay, waitFor } from "./utils";
 
 type ElementsListRowOptions = {
@@ -248,10 +249,21 @@ export async function inspectCanvasCoordinates(
   await pickerButton.click();
 
   const canvas = page.locator("#graphics");
-  const height = await canvas.getAttribute("height");
-  const width = await canvas.getAttribute("width");
-  const x = xPercentage * (width as any as number);
-  const y = yPercentage * (height as any as number);
+  const heightString = await canvas.getAttribute("height");
+  const widthString = await canvas.getAttribute("width");
+  const height = parseFloat(heightString ?? "0");
+  const width = parseFloat(widthString ?? "0");
+
+  await canvas.getAttribute("scale");
+  await debugPrint(
+    page,
+    `Canvas size ${chalk.bold(Math.round(width))}px by ${chalk.bold(Math.round(height))}px`,
+    "inspectCanvasCoordinates"
+  );
+
+  const scale = await getScreenshotScale(page);
+  const x = xPercentage * width * scale;
+  const y = yPercentage * height * scale;
 
   await debugPrint(
     page,

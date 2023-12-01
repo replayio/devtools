@@ -78,6 +78,34 @@ export const boxModelCache: Cache<
   },
 });
 
+// For node highlighting perf purposes, we can synthesize `BoxModel` objects
+// out of the `NodeBounds` objects we get from the protocol.
+export function boundingRectsToBoxModel(
+  nodeId: string,
+  boundingClientRects: NodeBounds[]
+): BoxModel {
+  const nodeBounds = boundingClientRects.find(({ node }) => node === nodeId);
+  if (!nodeBounds) {
+    return {
+      ...NO_BOX_MODEL,
+      node: nodeId,
+    };
+  }
+
+  const { rect, rects } = nodeBounds;
+  const [left, top, right, bottom] = rects ? rects[0] : rect;
+
+  const content = [left, top, right, top, right, bottom, left, bottom];
+
+  return {
+    node: nodeId,
+    border: EMPTY_QUADS,
+    content,
+    margin: EMPTY_QUADS,
+    padding: EMPTY_QUADS,
+  };
+}
+
 export function getMouseTarget(
   mouseTargets: NodeBounds[],
   x: number,

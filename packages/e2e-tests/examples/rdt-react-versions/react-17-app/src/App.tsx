@@ -49,7 +49,7 @@ function React17App() {
   }, []);
 
   return (
-    <div>
+    <div data-react-version={version}>
       <h2>Version: {version}</h2>
       <React17List list={list} />
       <React17FizzBuzzCounterClass version={version} />

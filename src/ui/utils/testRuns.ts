@@ -11,11 +11,11 @@ export type TestGroups = {
   flakyRecordings: TestGroup;
 };
 
-export function testPassed(test: TestRunTest) {
-  return test.result === "passed";
+export function testPassed<T extends { result: string }>(test: T) {
+  return test.result === "passed" || test.result === "flaky";
 }
 
-function testFailed(test: TestRunTest) {
+export function testFailed<T extends { result: string }>(test: T) {
   return test.result === "failed" || test.result === "timedOut";
 }
 
@@ -75,6 +75,8 @@ export function groupRecordings(tests: TestRunTestWithRecordings[]): TestGroups 
         } else {
           addToTestGroup(failedRecordings, test);
         }
+      } else if (test.result === "flaky") {
+        addToTestGroup(flakyRecordings, test);
       }
     }
 

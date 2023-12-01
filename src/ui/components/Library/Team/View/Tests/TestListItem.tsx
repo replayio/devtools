@@ -14,16 +14,16 @@ function Status({ failureRate }: { failureRate: number }) {
   if (failureRate > 0) {
     return (
       <div
-        className="flex h-5 w-8 shrink-0 items-center justify-center rounded-md bg-[#F02D5E] text-xs font-bold text-white"
+        className="flex h-5 w-10 shrink-0 items-center justify-center rounded-md bg-[#F02D5E] text-xs font-bold text-white"
         data-test-status={status}
+        title={`${displayedFailureRate === 100 ? "100" : displayedFailureRate.toFixed(2)}%`}
       >
-        {displayedFailureRate}
+        {displayedFailureRate}%
       </div>
     );
   } else {
     return (
-      <div data-test-status={status}>
-        {failureRate}
+      <div className="flex h-5 w-10 shrink-0 items-center justify-center" data-test-status={status}>
         <Icon className={styles.testsuitesSuccess} filename={"testsuites-success"} size="medium" />
       </div>
     );
@@ -32,7 +32,6 @@ function Status({ failureRate }: { failureRate: number }) {
 
 export function TestListItem({ filterByText, test }: { filterByText: string; test: Test }) {
   const { selectTestId, testIdForDisplay } = useContext(TestContext);
-  const { title, failureRate } = test;
   const isSelected = testIdForDisplay === test.testId;
 
   const onClick = () => {
@@ -49,14 +48,14 @@ export function TestListItem({ filterByText, test }: { filterByText: string; tes
       `}
       onClick={onClick}
     >
-      <Status failureRate={failureRate} />
+      <Status failureRate={test.failureRate} />
       <div className="flex h-full flex-grow flex-col justify-evenly overflow-hidden">
         <div className="flex flex-row justify-between space-x-3">
           <div
             className="wrap flex shrink grow-0 overflow-hidden text-ellipsis whitespace-nowrap pr-2 font-medium"
             data-test-id="Test-Title"
           >
-            <HighlightedText haystack={title} needle={filterByText} />
+            <HighlightedText haystack={test.title} needle={filterByText} />
           </div>
         </div>
       </div>

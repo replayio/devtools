@@ -8,7 +8,6 @@ import {
   useState,
   useTransition,
 } from "react";
-import { useImperativeCacheValue } from "suspense";
 
 import { assert } from "protocol/utils";
 import AvatarImage from "replay-next/components/AvatarImage";
@@ -53,7 +52,7 @@ type EditReason = "condition" | "content";
 type ExternalProps = {
   className: string;
   pointWithPendingEdits: Point;
-  pointForSuspense: Point;
+  pointForSuspense: Point | null;
 };
 
 type InternalProps = ExternalProps & {
@@ -64,47 +63,52 @@ type InternalProps = ExternalProps & {
   setFocusToEnd: () => void;
 };
 
-export default function PointPanelWrapper(props: ExternalProps) {
-  const { className, pointWithPendingEdits } = props;
+const EMPTY_ARRAY: any[] = [];
 
+export default function PointPanelWrapper(props: ExternalProps) {
   const { range: focusRange } = useContext(FocusContext);
   if (!focusRange) {
     return null;
   }
 
+  const { className, pointForSuspense, pointWithPendingEdits } = props;
+
+  const loader = (
+    <Loader
+      className={`${styles.Loader} ${className}`}
+      style={{
+        height: pointWithPendingEdits.condition
+          ? "var(--point-panel-with-conditional-height)"
+          : "var(--point-panel-height)",
+      }}
+    />
+  );
+
+  if (pointForSuspense == null) {
+    return loader;
+  }
+
   return (
-    <Suspense
-      fallback={
-        <Loader
-          className={`${styles.Loader} ${className}`}
-          style={{
-            height: pointWithPendingEdits.condition
-              ? "var(--point-panel-with-conditional-height)"
-              : "var(--point-panel-height)",
-          }}
-        />
-      }
-    >
-      <PointPanel focusRange={focusRange} {...props} />
+    <Suspense fallback={loader}>
+      <PointPanel {...props} focusRange={focusRange} pointForSuspense={pointForSuspense} />
     </Suspense>
   );
 }
 
-const EMPTY_ARRAY: any[] = [];
-
-function PointPanel(props: ExternalProps & { focusRange: TimeStampedPointRange }) {
-  const { focusRange, pointWithPendingEdits } = props;
+function PointPanel(
+  props: ExternalProps & { focusRange: TimeStampedPointRange; pointForSuspense: Point }
+) {
+  const { focusRange, pointForSuspense } = props;
 
   const { enterFocusMode, update } = useContext(FocusContext);
 
   const client = useContext(ReplayClientContext);
 
-  const { value } = useImperativeCacheValue(
-    hitPointsForLocationCache,
+  const value = hitPointsForLocationCache.read(
     client,
     { begin: focusRange.begin.point, end: focusRange.end.point },
-    pointWithPendingEdits.location,
-    pointWithPendingEdits.condition
+    pointForSuspense.location,
+    pointForSuspense.condition
   );
 
   const hitPoints = (value?.[0] ?? EMPTY_ARRAY) as HitPointsAndStatusTuple[0];
@@ -163,7 +167,9 @@ function PointPanelWithHitPoints({
   pointForSuspense,
   setFocusToBeginning,
   setFocusToEnd,
-}: InternalProps) {
+}: InternalProps & {
+  pointForSuspense: Point;
+}) {
   const graphQLClient = useContext(GraphQLClientContext);
   const { showCommentsPanel } = useContext(InspectorContext);
   const {

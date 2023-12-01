@@ -391,3 +391,25 @@ export function sourcesToSourceTree(sources: Source[]): SourceTree {
 
   return sourceTree;
 }
+
+export type UnknownFunction = (...args: any[]) => any;
+
+export type ChunksArray = (UnknownFunction | string | number)[];
+
+export function splitStringToChunks(string: string) {
+  const chunks: string[] = [];
+  for (let i = 0; i < string.length; i += 9999) {
+    chunks.push(string.slice(i, i + 9999));
+  }
+
+  return chunks;
+}
+
+export function joinChunksToString(chunks: ProtocolProperty[]): string {
+  let string = "";
+  for (const prop of chunks) {
+    string += prop.value;
+  }
+
+  return string;
+}

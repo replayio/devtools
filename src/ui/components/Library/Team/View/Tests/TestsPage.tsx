@@ -61,10 +61,7 @@ function TestsContent() {
       <ContextMenuItem disabled onSelect={() => setFilterByTime(7)}>
         Last week
       </ContextMenuItem>
-      <ContextMenuItem disabled onSelect={() => setFilterByTime(30)}>
-        Last month
-      </ContextMenuItem>
-      <ContextMenuItem onSelect={() => setFilterByTime(null)}>All time</ContextMenuItem>
+      <ContextMenuItem onSelect={() => setFilterByTime(null)}>Last two weeks</ContextMenuItem>
     </>,
     { alignTo: "auto-target" }
   );
@@ -86,7 +83,7 @@ function TestsContent() {
                 testId="TestPage-BranchFilter-DropdownTrigger"
                 onClick={onClickTimeFilter}
                 onKeyDown={onKeyDownTimeFilter}
-                label={filterByTime === null ? "All time" : ""}
+                label={filterByTime === null ? "Last two weeks" : ""}
               />
               {contextMenuTimeFilter}
               <div className={styles.filterContainer}>
@@ -110,7 +107,7 @@ function TestsContent() {
           </div>
         </Panel>
 
-        <PanelResizeHandle className="h-full w-2" />
+        <PanelResizeHandle className="h-full w-1" />
         <Panel minSize={20} order={2}>
           <div className="h-full w-full overflow-hidden rounded-xl">
             <Suspense fallback={<LibrarySpinner />}>
