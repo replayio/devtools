@@ -5,6 +5,7 @@ import {
   Suspense,
   useCallback,
   useContext,
+  useLayoutEffect,
   useRef,
   useState,
 } from "react";
@@ -66,6 +67,39 @@ export function ElementsPanel({
     }
   };
 
+  const runSearch = async () => {
+    if (pauseId == null) {
+      return;
+    }
+
+    setSearchInProgress(true);
+    const results = await domSearchCache.readAsync(replayClient, pauseId, query);
+    setSearchInProgress(false);
+    setSearchState({
+      index: results.length > 0 ? 0 : -1,
+      query,
+      results,
+    });
+
+    if (results.length > 0) {
+      const list = listRef.current;
+      if (list) {
+        const id = results[0];
+        list.selectNode(id);
+      }
+    }
+  };
+
+  const prevPauseIdRef = useRef<PauseId | null>(pauseId);
+  useLayoutEffect(() => {
+    const prevPauseId = prevPauseIdRef.current;
+    prevPauseIdRef.current = pauseId;
+
+    if (prevPauseId !== pauseId && !searchInProgress && query) {
+      runSearch();
+    }
+  });
+
   const onSearchInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     setQuery(event.currentTarget.value);
   };
@@ -109,22 +143,7 @@ export function ElementsPanel({
             list.selectNode(id);
           }
         } else {
-          setSearchInProgress(true);
-          const results = await domSearchCache.readAsync(replayClient, pauseId, query);
-          setSearchInProgress(false);
-          setSearchState({
-            index: results.length > 0 ? 0 : -1,
-            query,
-            results,
-          });
-
-          if (results.length > 0) {
-            const list = listRef.current;
-            if (list) {
-              const id = results[0];
-              list.selectNode(id);
-            }
-          }
+          runSearch();
         }
         break;
       }
@@ -154,7 +173,8 @@ export function ElementsPanel({
             value={query}
           />
         </label>
-        {searchState !== null && (
+        {searchInProgress && <Icon className={styles.SpinnerIcon} type="spinner" />}
+        {!searchInProgress && searchState !== null && (
           <div className={styles.SearchResults} data-test-id="ElementsPanel-SearchResult">
             {searchState.index + 1} of {searchState.results.length}
           </div>
