@@ -9,6 +9,15 @@ export const buildIdCache = createSingleEntryCache<[replayClient: ReplayClientIn
   load: ([replayClient]) => replayClient.getBuildId(),
 });
 
+// The backend has a hardcoded limit it will only load recordings
+// up to 3 minutes long when running routines, otherwise it bails out.
+// If the recording is longer than that, we _won't_ have data for
+// React, Redux, or Jump to Code.
+// This corresponds to `RoutineMaxWindowDurationSeconds` in the backend.
+// The client uses recording duration in milliseconds.
+// Use this to show a warning in the React and Redux panels.
+const MAX_RECORDING_DURATION_FOR_ROUTINES_MS = 3 * 60 * 1000;
+
 export type RecordingCapabilities = {
   supportsEagerEvaluation: boolean;
   supportsElementsInspector: boolean;
@@ -17,6 +26,7 @@ export type RecordingCapabilities = {
   supportsRepaintingGraphics: boolean;
   supportsPureEvaluation: boolean;
   supportsObjectIdLookupsInEvaluations: boolean;
+  maxRecordingDurationForRoutines: number;
 };
 
 // Target applications which can create recordings.
@@ -88,7 +98,7 @@ export const recordingTargetCache = createSingleEntryCache<
 function getRecordingCapabilities(
   recordingTarget: RecordingTarget,
   buildComponents: BuildComponents
-) {
+): RecordingCapabilities {
   switch (recordingTarget) {
     case "chromium": {
       const buildDate = buildDateStringToDate(buildComponents?.date ?? "");
@@ -102,6 +112,7 @@ function getRecordingCapabilities(
         supportsRepaintingGraphics: userData.get("protocol_chromiumRepaints"),
         supportsPureEvaluation: false,
         supportsObjectIdLookupsInEvaluations,
+        maxRecordingDurationForRoutines: MAX_RECORDING_DURATION_FOR_ROUTINES_MS,
       };
     }
     case "gecko": {
@@ -113,6 +124,7 @@ function getRecordingCapabilities(
         supportsRepaintingGraphics: true,
         supportsPureEvaluation: true,
         supportsObjectIdLookupsInEvaluations: false,
+        maxRecordingDurationForRoutines: MAX_RECORDING_DURATION_FOR_ROUTINES_MS,
       };
     }
     case "node": {
@@ -124,6 +136,7 @@ function getRecordingCapabilities(
         supportsRepaintingGraphics: false,
         supportsPureEvaluation: false,
         supportsObjectIdLookupsInEvaluations: false,
+        maxRecordingDurationForRoutines: MAX_RECORDING_DURATION_FOR_ROUTINES_MS,
       };
     }
     case "unknown":
@@ -136,6 +149,7 @@ function getRecordingCapabilities(
         supportsRepaintingGraphics: true,
         supportsPureEvaluation: false,
         supportsObjectIdLookupsInEvaluations: false,
+        maxRecordingDurationForRoutines: MAX_RECORDING_DURATION_FOR_ROUTINES_MS,
       };
     }
   }

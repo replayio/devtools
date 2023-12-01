@@ -9,8 +9,10 @@ import {
   createSession,
 } from "protocol/socket";
 import { assert } from "protocol/utils";
-import { recordingTargetCache } from "replay-next/src/suspense/BuildIdCache";
-import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
+import {
+  recordingCapabilitiesCache,
+  recordingTargetCache,
+} from "replay-next/src/suspense/BuildIdCache";
 import { extractGraphQLError } from "shared/graphql/apolloClient";
 import { Recording } from "shared/graphql/types";
 import { userData } from "shared/user-data/GraphQL/UserData";

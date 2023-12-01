@@ -71,3 +71,19 @@
   flex: 1 1 auto;
   padding-bottom: 0.25rem;
 }
+
+.SpinnerIcon {
+  color: var(--color-dim);
+  width: 1rem;
+  height: 1rem;
+  animation: 1s spin linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0);
+  }
+  100% {
+    transform: rotate(359deg);
+  }
+}

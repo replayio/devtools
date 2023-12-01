@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
 import ComputedApp from "devtools/client/inspector/computed/components/ComputedApp";
@@ -13,6 +14,7 @@ import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { ResponsiveTabs, Tab } from "../../shared/components/ResponsiveTabs";
 import { setActiveTab } from "../actions";
 import { EventListenersApp } from "../event-listeners/EventListenersApp";
+import styles from "./App.module.css";
 
 const INSPECTOR_TAB_TITLES: Record<ActiveInspectorTab, string> = {
   ruleview: "Rules",
@@ -33,6 +35,9 @@ export default function InspectorApp() {
   const activeTab = useAppSelector(state => state.inspector.activeTab);
   const { point } = useMostRecentLoadedPause() ?? {};
 
+  const [collapsedLeft, setCollapsedLeft] = useState(false);
+  const [collapsedRight, setCollapsedRight] = useState(false);
+
   const isPointWithinFocusWindow = useIsPointWithinFocusWindow(point ?? null);
   if (!isPointWithinFocusWindow) {
     return (
@@ -46,15 +51,22 @@ export default function InspectorApp() {
     );
   }
 
+  let resizeHandleClassName = styles.ResizeHandle;
+  if (collapsedLeft) {
+    resizeHandleClassName = styles.ResizeHandleCollapsedLeft;
+  } else if (collapsedRight) {
+    resizeHandleClassName = styles.ResizeHandleCollapsedRight;
+  }
+
   return (
     <div className="inspector-responsive-container theme-body inspector">
       <div id="inspector-splitter-box">
         <PanelGroup autoSaveId="App" className="inspector-sidebar-splitter" direction="horizontal">
-          <Panel minSize={20}>
+          <Panel collapsible minSize={20} onCollapse={setCollapsedLeft}>
             <ElementsPanelAdapter />
           </Panel>
-          <PanelResizeHandle className="h-full w-1 bg-chrome" />
-          <Panel defaultSize={40} minSize={20}>
+          <PanelResizeHandle className={resizeHandleClassName} />
+          <Panel collapsible defaultSize={40} minSize={20} onCollapse={setCollapsedRight}>
             <div className="devtools-inspector-tab-panel">
               <div id="inspector-sidebar-container">
                 <div id="inspector-sidebar">

@@ -29,28 +29,30 @@ export const domCache = createCache<
     }
 
     const expression = `
-        // Guard against minification renaming the functions
-        const serializeDOM = ${serializeDOMString};
-        const splitStringToChunks = ${splitStringToChunksString};
+      // Guard against minification renaming the functions
+      const serializeDOM = ${serializeDOMString};
+      const splitStringToChunks = ${splitStringToChunksString};
 
-        const resultsArray = serializeDOM(document);
-        const resultsString = JSON.stringify(resultsArray);
+      const resultsArray = serializeDOM(document);
+      const resultsString = JSON.stringify(resultsArray);
 
-        splitStringToChunks(resultsString);
+      splitStringToChunks(resultsString);
       `;
 
     const result = await pauseEvaluationsCache.readAsync(replayClient, pauseId, null, expression);
 
     const objectId = result.returned?.object;
-    assert(objectId != null);
+    if (objectId != null) {
+      const object = await objectCache.readAsync(replayClient, pauseId, objectId, "full");
+      if (object?.preview?.properties) {
+        const resultsString = joinChunksToString(object.preview.properties);
+        const numericArray = JSON.parse(resultsString) as number[];
 
-    const object = await objectCache.readAsync(replayClient, pauseId, objectId, "full");
-    assert(object?.preview?.properties);
+        return deserializeDOM(numericArray);
+      }
+    }
 
-    const resultsString = joinChunksToString(object.preview.properties);
-    const numericArray = JSON.parse(resultsString) as number[];
-
-    return deserializeDOM(numericArray);
+    return null;
   },
 });
 

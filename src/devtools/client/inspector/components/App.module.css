@@ -5,21 +5,6 @@
   height: 100%;
 }
 
-.LeftPanel,
-.RightPanel {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  background-color: var(--body-bgcolor);
-}
-.LeftPanel {
-  border-bottom-left-radius: 0.5rem;
-}
-.RightPanel {
-  border-bottom-right-radius: 0.5rem;
-}
-
 .ResizeHandle,
 .ResizeHandleCollapsedLeft,
 .ResizeHandleCollapsedRight {
@@ -60,41 +45,4 @@
 .ResizeHandleCollapsedRight:focus {
   outline: none;
   background: var(--background-color-resize-handle);
-}
-
-.LeftPanelTopRow {
-  height: 1.75rem;
-  flex: 0 0 1.75rem;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0.25rem;
-  border-bottom: 1px solid var(--theme-splitter-color);
-}
-
-.LeftPanelBottomRow {
-  flex: 1 1 auto;
-}
-
-.ProtocolFailedPanel {
-  display: flex;
-  align-items: flex-start;
-}
-
-.NotMountedYetMessage,
-.ProtocolFailedMessage {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  padding: 0.5rem;
-  border-radius: 0.25rem;
-  font-size: var(--font-size-regular);
-}
-.ProtocolFailedMessage {
-  margin: 0.5rem;
-  background-color: var(--background-color-warning);
-  color: var(--color-warning);
-  border: 1px solid var(--border-color-warning);
 }

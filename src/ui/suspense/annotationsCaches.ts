@@ -29,6 +29,7 @@ export interface ParsedJumpToCodeAnnotation extends TimeStampedPoint {
   nextEventPoint: TimeStampedPoint;
 }
 
+export const REACT_SETUP_ANNOTATIONS_KIND = "react-devtools-hook:v1:commit-fiber-root";
 export const REACT_ANNOTATIONS_KIND = "react-devtools-bridge";
 export const REDUX_SETUP_ANNOTATIONS_KIND = "redux-devtools-setup";
 export const REDUX_ANNOTATIONS_KIND = "redux-devtools-data";
