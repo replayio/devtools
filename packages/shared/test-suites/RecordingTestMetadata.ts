@@ -896,14 +896,55 @@ export async function processPlaywrightTestRecording(
       id,
       result,
       source,
-      timeStampedPointRange: null,
+      timeStampedPointRange: getPlaywrightTestTimeStampedPointRange(events),
     };
   } else if (isTestRecordingV3(testRecording)) {
+    if (!testRecording.timeStampedPointRange) {
+      testRecording.timeStampedPointRange = getPlaywrightTestTimeStampedPointRange(
+        testRecording.events
+      );
+    }
     return testRecording;
   } else {
     // This function does not support the legacy TestItem format
     throw Error(`Unsupported legacy TestItem value`);
   }
+}
+
+function getPlaywrightTestTimeStampedPointRange(
+  events: RecordingTestMetadataV3.TestRecording["events"]
+) {
+  const allEventsSections = Object.values(events);
+  let testBeginPoint: TimeStampedPoint | null = null;
+  let testEndPoint: TimeStampedPoint | null = null;
+  for (const events of allEventsSections) {
+    for (const event of events) {
+      const executionPoint = getTestEventExecutionPoint(event);
+      if (executionPoint) {
+        if (!testBeginPoint || comparePoints(testBeginPoint.point, executionPoint) > 0) {
+          testBeginPoint = {
+            point: executionPoint,
+            time: getTestEventTime(event)!,
+          };
+        }
+
+        if (!testEndPoint || comparePoints(testEndPoint.point, executionPoint) < 0) {
+          testEndPoint = {
+            point: executionPoint,
+            time: getTestEventTime(event)!,
+          };
+        }
+      }
+    }
+  }
+
+  if (testBeginPoint && testEndPoint) {
+    return {
+      begin: testBeginPoint,
+      end: testEndPoint,
+    };
+  }
+  return null;
 }
 
 // If there are test(s) with completed status (passed/failed/timedOut) but no annotations,
