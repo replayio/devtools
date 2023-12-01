@@ -12,8 +12,8 @@ import {
 
 import { TestRun, getTestRunTitle } from "shared/test-suites/TestRun";
 import { useGetTeamRouteParams } from "ui/components/Library/Team/utils";
+import { useTestRuns } from "ui/components/Library/Team/View/NewTestRuns/hooks/useTestRuns";
 import { useSyncTestRunIdToUrl } from "ui/components/Library/Team/View/TestRuns/hooks/useSyncTestIdToUrl";
-import { useTestRuns } from "ui/components/Library/Team/View/TestRuns/hooks/useTestRuns";
 
 type TestRunsContextType = {
   filterByBranch: "all" | "primary";
@@ -33,8 +33,8 @@ type TestRunsContextType = {
 
 type TestRunsFilterContextType = {
   filterByTime: "week" | "month";
-  startTime: string;
-  endTime: string;
+  startTime: Date;
+  endTime: Date;
   setFilterByTime: Dispatch<SetStateAction<"week" | "month">>;
 };
 
@@ -46,7 +46,7 @@ const daysAgo = (days: number) => {
   date.setDate(date.getDate() - days);
   // Set zero hours, so when used in Cache as key, it will be the same for the whole day.
   date.setHours(0, 0, 0, 0);
-  return date.toISOString();
+  return date;
 };
 
 export function TestRunsFilterContextRoot({ children }: { children: ReactNode }) {
@@ -63,7 +63,7 @@ export function TestRunsFilterContextRoot({ children }: { children: ReactNode })
   }, [filterByTime]);
 
   const endTime = useMemo(() => {
-    return new Date().toISOString();
+    return new Date();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filterByTime]);
 
