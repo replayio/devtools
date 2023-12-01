@@ -1,5 +1,5 @@
 import assert from "assert";
-import { ExecutionPoint } from "@replayio/protocol";
+import { ExecutionPoint, TimeStampedPoint } from "@replayio/protocol";
 import { ReactNode, useContext, useMemo, useTransition } from "react";
 
 import { highlightNodes, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
@@ -183,9 +183,23 @@ export function TestSectionRow({
       // We hope to have details on the relevant DOM node cached by now.
       // If we do, go ahead and read that synchronously so we can highlight the node.
       // Otherwise, nothing to do here.
-      const firstDomNodeDetails = testEventDomNodeCache.getValueIfCached(
-        testEvent.data.timeStampedPoints.result?.point ?? ""
-      );
+      let point: TimeStampedPoint | null = null;
+      switch (testRunnerName) {
+        case "cypress": {
+          point = testEvent.data.timeStampedPoints.result ?? null;
+          break;
+        }
+        default: {
+          point = testEvent.data.timeStampedPoints.beforeStep ?? null;
+          break;
+        }
+      }
+
+      if (!point) {
+        return;
+      }
+
+      const firstDomNodeDetails = testEventDomNodeCache.getValueIfCached(point.point);
 
       if (firstDomNodeDetails?.domNode?.node.isConnected) {
         const { domNode, pauseId } = firstDomNodeDetails;

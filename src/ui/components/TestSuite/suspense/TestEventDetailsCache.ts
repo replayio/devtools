@@ -525,11 +525,15 @@ async function fetchPlaywrightStepDetails(
       }
       const resultProps = resultValue.preview.properties;
 
+      // Now we deconstruct the mixed array that was returned from the eval.
+
+      // First is the number of target elements actually found.
       const numTargetElements = resultProps[0].value as number;
 
       let targetElements: ProtocolObject[] = [];
 
       if (numTargetElements > 0) {
+        // Extract these DOM node object previews
         const targetElementProps = resultProps.slice(1, 1 + numTargetElements);
         targetElements = (
           await Promise.all(
@@ -549,6 +553,8 @@ async function fetchPlaywrightStepDetails(
         ).filter(Boolean);
 
         const remainingProps = resultProps.slice(1 + numTargetElements);
+        // The rest of the array is two stringified "parsed selector" sets,
+        // and the `{ foundElements, allSelectedElements }` object.
         const [parsedSelectorStringProp, splitSelectorsStringProp, resultValueProp] =
           remainingProps;
 
@@ -572,8 +578,6 @@ async function fetchPlaywrightStepDetails(
       };
     })
   );
-
-  console.log("Processed results: ", processedResults);
 
   return processedResults;
 }
