@@ -106,6 +106,14 @@
   background-color: rgb(229, 244, 255);
 }
 
+:root:global(.theme-light) .testsuitesV2LibraryRowSelected {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+:root:global(.theme-light) .testsuitesV2LibraryRowSelected:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
 :root:global(.theme-light) .teamRow:hover,
 :root:global(.theme-light) .teamRowActive {
   background-color: var(--team-row-active);
