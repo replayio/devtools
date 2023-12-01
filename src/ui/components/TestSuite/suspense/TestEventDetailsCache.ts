@@ -13,10 +13,11 @@ import { Element, elementCache } from "replay-next/components/elements/suspense/
 import { createFocusIntervalCacheForExecutionPoints } from "replay-next/src/suspense/FocusIntervalCache";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { cachePauseData, setPointAndTimeForPauseId } from "replay-next/src/suspense/PauseCache";
-import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
+import { Source, sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
 import { compareExecutionPoints, isExecutionPointsWithinRange } from "replay-next/src/utils/time";
 import { ReplayClientInterface } from "shared/client/types";
 import {
+  RecordingTestMetadataV3,
   TestRecording,
   UserActionEvent,
   isUserActionTestEvent,
@@ -48,9 +49,12 @@ export const testEventDetailsIntervalCache = createFocusIntervalCacheForExecutio
     return key;
   },
   async load(begin, end, replayClient, testRecording, enabled, options) {
+    console.log("testEventDetailsIntervalCache load", begin, end, enabled, options);
     if (!enabled) {
       return [];
     }
+
+    const { testRunnerName } = testRecording;
 
     // This should be the same ordering used by `<Panel>` to render the steps.
     const { beforeAll, beforeEach, main, afterEach, afterAll } = testRecording.events;
@@ -60,113 +64,68 @@ export const testEventDetailsIntervalCache = createFocusIntervalCacheForExecutio
     const filteredEvents: UserActionEvent[] = allEvents.filter((e): e is UserActionEvent => {
       if (isUserActionTestEvent(e)) {
         // Same as TestStepDetails.tsx
-        if (e.data.timeStampedPoints.result && e.data.resultVariable) {
-          const isInFocusRange = isExecutionPointsWithinRange(
-            e.data.timeStampedPoints.result.point,
-            begin,
-            end
-          );
-          return isInFocusRange;
+
+        switch (testRunnerName) {
+          case "cypress": {
+            if (e.data.timeStampedPoints.result && e.data.resultVariable) {
+              const isInFocusRange = isExecutionPointsWithinRange(
+                e.data.timeStampedPoints.result.point,
+                begin,
+                end
+              );
+              return isInFocusRange;
+            }
+            return false;
+          }
+          case "playwright": {
+            if (e.data.timeStampedPoints.beforeStep) {
+              const isInFocusRange = isExecutionPointsWithinRange(
+                e.data.timeStampedPoints.beforeStep.point,
+                begin,
+                end
+              );
+              return isInFocusRange;
+            }
+            return false;
+          }
+          default:
+            return false;
         }
       }
-
       return false;
     });
+
+    console.log("Filtered events: ", filteredEvents);
 
     if (filteredEvents.length === 0) {
       return [];
     }
 
+    const sources = await sourcesByIdCache.readAsync(replayClient);
+
     // We assume that _all_ events have the same `resultVariable` field. Per Ryan, this is a safe assumption.
     // The field may change across plugin versions, but all events in a recording will have the same value.
     // This _should_ generally be `"arguments[4]"` based on the current plugin.
-    const stepDetailsVariable = filteredEvents[0].data.resultVariable;
+    let processedResults: TestEventDetailsEntry[] = [];
 
-    const variableNameWithConsoleProps = `${stepDetailsVariable}.consoleProps`;
-    const testResultPoints = filteredEvents.map(e => e.data.timeStampedPoints.result!);
-
-    const sources = await sourcesByIdCache.readAsync(replayClient);
-
-    const evalResults: RunEvaluationResult[] = [];
-
-    // Any focus range errors here will bubble up to the parent focus cache,
-    // which will retry the load if needed later.
-    await replayClient.runEvaluation(
-      {
-        selector: {
-          kind: "points",
-          points: testResultPoints.map(p => p.point),
-        },
-        expression: variableNameWithConsoleProps,
-        frameIndex: 1,
-        fullPropertyPreview: true,
-        limits: { begin, end },
-      },
-      results => {
-        // This logic copy-pasted from AnalysisCache.ts
-        for (const result of results) {
-          // Immediately cache pause ID and data so we have it available for reuse
-          setPointAndTimeForPauseId(result.pauseId, result.point);
-          cachePauseData(replayClient, sources, result.pauseId, result.data);
-        }
-        // Collect them all so we process them in a single batch
-        evalResults.push(...results);
+    switch (testRunnerName) {
+      case "cypress": {
+        processedResults = await fetchCypressStepDetails(
+          replayClient,
+          filteredEvents,
+          begin,
+          end,
+          sources
+        );
+        break;
       }
-    );
-
-    evalResults.sort((a, b) => compareExecutionPoints(a.point.point, b.point.point));
-
-    // We need to reformat the raw analysis data to extract details on the "step details" object.
-    const processedResults: TestEventDetailsEntry[] = await Promise.all(
-      evalResults.map(async result => {
-        const { pauseId, point: timeStampedPoint, returned } = result;
-        const consolePropsValue = returned;
-
-        if (consolePropsValue?.object) {
-          // This should already be cached because of `runEvaluation` returned nested previews.
-          const consoleProps = await objectCache.readAsync(
-            replayClient,
-            pauseId,
-            consolePropsValue.object,
-            "full"
-          );
-
-          // We're going to reformat this to filter out a couple properties and displayed values
-          const sanitized = cloneDeep(consoleProps);
-
-          if (sanitized?.preview?.properties) {
-            sanitized.preview.properties = sanitized.preview.properties.filter(
-              ({ name }) => name !== "Snapshot"
-            );
-
-            // suppress the prototype entry in the properties output
-            sanitized.preview.prototypeId = undefined;
-          }
-
-          // Kick this off, but don't block this cache read on it
-          fetchAndCachePossibleDomNode(replayClient, sanitized, pauseId, timeStampedPoint);
-
-          const elementsProp = sanitized.preview?.properties?.find(
-            ({ name }) => name === "Elements"
-          );
-          const count = (elementsProp?.value as number) ?? null;
-
-          return {
-            ...timeStampedPoint,
-            count,
-            pauseId,
-            props: sanitized,
-          };
-        }
-
-        return {
-          ...timeStampedPoint,
-          count: null,
-          pauseId: result.pauseId,
-          props: null,
-        };
-      })
-    );
+      case "playwright": {
+        console.log("Attempted to process results for playwright: ", filteredEvents);
+        break;
+      }
+      default:
+        break;
+    }
 
     for (const processedResult of processedResults) {
       // Store each result in the externally managed cache, to make it easy for the UI
@@ -201,10 +160,105 @@ export const testEventDomNodeCache: ExternallyManagedCache<
   },
 });
 
+async function fetchCypressStepDetails(
+  replayClient: ReplayClientInterface,
+  filteredEvents: RecordingTestMetadataV3.UserActionEvent[],
+  begin: string,
+  end: string,
+  sources: Map<string, Source>
+) {
+  const stepDetailsVariable = filteredEvents[0].data.resultVariable;
+
+  const variableNameWithConsoleProps = `${stepDetailsVariable}.consoleProps`;
+  const testResultPoints = filteredEvents.map(e => e.data.timeStampedPoints.result!);
+
+  const evalResults: RunEvaluationResult[] = [];
+
+  // Any focus range errors here will bubble up to the parent focus cache,
+  // which will retry the load if needed later.
+  await replayClient.runEvaluation(
+    {
+      selector: {
+        kind: "points",
+        points: testResultPoints.map(p => p.point),
+      },
+      expression: variableNameWithConsoleProps,
+      frameIndex: 1,
+      fullPropertyPreview: true,
+      limits: { begin, end },
+    },
+    results => {
+      // This logic copy-pasted from AnalysisCache.ts
+      for (const result of results) {
+        // Immediately cache pause ID and data so we have it available for reuse
+        setPointAndTimeForPauseId(result.pauseId, result.point);
+        cachePauseData(replayClient, sources, result.pauseId, result.data);
+      }
+      // Collect them all so we process them in a single batch
+      evalResults.push(...results);
+    }
+  );
+
+  evalResults.sort((a, b) => compareExecutionPoints(a.point.point, b.point.point));
+
+  console.log("Eval results", evalResults);
+
+  // We need to reformat the raw analysis data to extract details on the "step details" object.
+  const processedResults: TestEventDetailsEntry[] = await Promise.all(
+    evalResults.map(async result => {
+      const { pauseId, point: timeStampedPoint, returned } = result;
+      const consolePropsValue = returned;
+
+      if (consolePropsValue?.object) {
+        // This should already be cached because of `runEvaluation` returned nested previews.
+        const consoleProps = await objectCache.readAsync(
+          replayClient,
+          pauseId,
+          consolePropsValue.object,
+          "full"
+        );
+
+        // We're going to reformat this to filter out a couple properties and displayed values
+        const sanitized = cloneDeep(consoleProps);
+
+        if (sanitized?.preview?.properties) {
+          sanitized.preview.properties = sanitized.preview.properties.filter(
+            ({ name }) => name !== "Snapshot"
+          );
+
+          // suppress the prototype entry in the properties output
+          sanitized.preview.prototypeId = undefined;
+        }
+
+        // Kick this off, but don't block this cache read on it
+        fetchAndCachePossibleCypressDomNode(replayClient, sanitized, pauseId, timeStampedPoint);
+
+        const elementsProp = sanitized.preview?.properties?.find(({ name }) => name === "Elements");
+        const count = (elementsProp?.value as number) ?? null;
+
+        return {
+          ...timeStampedPoint,
+          count,
+          pauseId,
+          props: sanitized,
+        };
+      }
+
+      return {
+        ...timeStampedPoint,
+        count: null,
+        pauseId: result.pauseId,
+        props: null,
+      };
+    })
+  );
+  return processedResults;
+}
+
 // Pre-fetch the DOM node for this step, if possible.
 // Note this runs somewhat in the background and is not awaited,
 // and mutates the `testEventDomNodeCache` with the results.
-async function fetchAndCachePossibleDomNode(
+async function fetchAndCachePossibleCypressDomNode(
   replayClient: ReplayClientInterface,
   sanitized: ProtocolObject,
   pauseId: string,
