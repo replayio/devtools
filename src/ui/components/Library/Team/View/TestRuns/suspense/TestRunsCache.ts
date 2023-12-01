@@ -61,12 +61,17 @@ export const testRunDetailsCache = createCache<
     const testsWithRecordings =
       testRunNode?.tests.map<TestRunTestWithRecordings>(test => {
         durationMs += test.durationMs;
-        const recs = orderBy(test.recordings.map(convertRecording), "date", "desc");
-        recordings.push(...recs);
 
         return {
           ...test,
-          recordings: recs,
+          executions: test.executions.map(e => {
+            const recs = e.recordings.map(convertRecording);
+            recordings.push(...recs);
+            return {
+              result: e.result,
+              recordings: recs,
+            };
+          }),
         };
       }) ?? [];
 

@@ -160,17 +160,21 @@ const FileNodeRenderer = memo(function FileNodeRenderer({
       </div>
       <Offscreen mode={expanded ? "visible" : "hidden"}>
         {tests.flatMap(test =>
-          test.recordings.map(recording => (
-            <TestResultListItem
-              depth={depth + 1}
-              filterByText={filterByText}
-              key={recording.id}
-              label={testFailed(test) ? "Failed" : label}
-              recording={recording}
-              test={test}
-              secondaryBadgeCount={/* index > 0 ? index + 1 : null */ null}
-            />
-          ))
+          test.executions
+            .filter(e => e.recordings.length > 0)
+            .flatMap(execution =>
+              execution.recordings.map(recording => (
+                <TestResultListItem
+                  depth={depth + 1}
+                  filterByText={filterByText}
+                  key={recording.id}
+                  label={testFailed(execution) ? "Failed" : label}
+                  recording={recording}
+                  test={test}
+                  secondaryBadgeCount={/* index > 0 ? index + 1 : null */ null}
+                />
+              ))
+            )
         )}
       </Offscreen>
     </>
