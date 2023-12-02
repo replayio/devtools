@@ -79,13 +79,10 @@ jobs:
         working-directory: packages/replay-next
       - name: Wait until server is up
         run: npx wait-on --timeout=60000 http-get://localhost:3000
-      - name: debug
-        run: cat ./node_modules/@replayio/playwright/src/reporter.js
       - name: Run playwright tests
         run: yarn test:ci --reporter @replayio/playwright/reporter,line
         working-directory: packages/replay-next/playwright
         env:
-          DEBUG: replay:*
           SHARD: ${{ matrix.shard }}
           SHARDS: 10
           REPLAY_PLAYWRIGHT_FIXTURE: 1
