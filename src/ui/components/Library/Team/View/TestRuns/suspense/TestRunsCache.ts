@@ -9,7 +9,7 @@ import {
   getTestRunsGraphQL,
 } from "ui/components/Library/Team/View/TestRuns/graphql/TestRunsGraphQL";
 import { convertRecording } from "ui/hooks/recordings";
-import { TestGroups, groupRecordings } from "ui/utils/testRuns";
+import { TestGroups, groupRecordings, testFailed, testPassed } from "ui/utils/testRuns";
 
 export const testRunsCache = createCache<
   [graphQLClient: GraphQLClientInterface, accessToken: string | null, workspaceId: string],
@@ -67,8 +67,18 @@ export const testRunDetailsCache = createCache<
           executions: test.executions.map(e => {
             const recs = e.recordings.map(convertRecording);
             recordings.push(...recs);
+
+            let result = e.result;
+            if (test.result === "flaky") {
+              if (testFailed(e)) {
+                result = "flaky";
+              } else if (testPassed(e)) {
+                result = "passed";
+              }
+            }
+
             return {
-              result: e.result,
+              result,
               recordings: recs,
             };
           }),
