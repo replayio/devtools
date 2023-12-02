@@ -10,7 +10,7 @@ import {
 import { delay } from "../helpers/utils";
 import test, { expect } from "../testFixtureCloneRecording";
 
-test.use({ exampleKey: "doc_inspector_basic.html" });
+test.use({ exampleKey: "doc_inspector_basic_chromium.html" });
 
 test(`inspector-elements-02_node-picker: element picker and iframe behavior`, async ({
   pageWithMeta: { page, recordingId },
@@ -27,9 +27,8 @@ test(`inspector-elements-02_node-picker: element picker and iframe behavior`, as
 
   await waitForElementsToLoad(page);
 
-  await activateInspectorTool(page);
-
-  // Click on the "maindiv" element in the Canvas view; this is x:5%, y:1%
+  // Click on the "maindiv" element in the Canvas view
+  // Note these % values come from console logs in the recording
   await inspectCanvasCoordinates(page, 0.5, 0.017);
 
   // Verify that the currently selected element in the Elements panel is the expected one:
@@ -38,10 +37,11 @@ test(`inspector-elements-02_node-picker: element picker and iframe behavior`, as
 
   await delay(500);
 
-  // Click on the "myiframe" element in the Canvas view; this is x:5%, y:10%
+  // Click on the "myiframe" element in the Canvas view
+  // Note these % values come from console logs in the recording
   await inspectCanvasCoordinates(page, 0.09, 0.12);
 
   // Verify that the currently selected element in the Elements panel is the expected one:
   selectedRow = await getElementsListRow(page, { isSelected: true });
-  await expect(selectedRow).toContainText("myiframe");
+  await expect(selectedRow).toContainText('data-test-id="inner-body"');
 });

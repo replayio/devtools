@@ -95,7 +95,6 @@ export interface AppState {
   modalOptions: ModalOptionsType;
   mode: AppMode;
   mouseTargetsLoading: boolean;
-  recordingDuration: number;
   recordingId: string | null;
   recordingTarget: RecordingTarget | null;
   recordingWorkspace: Workspace | null;

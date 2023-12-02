@@ -1,3 +1,4 @@
+import assert from "assert";
 import { ObjectId, PauseId } from "@replayio/protocol";
 import {
   ChangeEvent,
@@ -6,12 +7,14 @@ import {
   useCallback,
   useContext,
   useLayoutEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
 
-import { ElementsList, ImperativeHandle } from "replay-next/components/elements/ElementsList";
+import { ElementsList, ImperativeHandle } from "replay-next/components/elements-new/ElementsList";
+import { ElementsListData } from "replay-next/components/elements-new/ElementsListData";
 import { domSearchCache } from "replay-next/components/elements/suspense/DOMSearchCache";
 import Icon from "replay-next/components/Icon";
 import { PanelLoader } from "replay-next/components/PanelLoader";
@@ -41,6 +44,11 @@ export function ElementsPanel({
     [listRefSetter]
   );
 
+  const listData = useMemo<ElementsListData | null>(
+    () => (pauseId ? new ElementsListData(replayClient, pauseId) : null),
+    [pauseId, replayClient]
+  );
+
   const [searchInProgress, setSearchInProgress] = useState(false);
   const [searchState, setSearchState] = useState<{
     index: number;
@@ -68,12 +76,17 @@ export function ElementsPanel({
   };
 
   const runSearch = async () => {
-    if (pauseId == null) {
+    if (listData == null || pauseId == null) {
       return;
     }
 
     setSearchInProgress(true);
-    const results = await domSearchCache.readAsync(replayClient, pauseId, query);
+
+    let results = await domSearchCache.readAsync(replayClient, pauseId, query);
+
+    // DOM search API may match on nodes that are not displayed locally.
+    results = results.filter(id => listData.contains(id));
+
     setSearchInProgress(false);
     setSearchState({
       index: results.length > 0 ? 0 : -1,
@@ -117,6 +130,8 @@ export function ElementsPanel({
       case "Enter": {
         event.preventDefault();
         event.stopPropagation();
+
+        assert(listData != null);
 
         if (query === "") {
           setSearchState(null);
@@ -164,7 +179,7 @@ export function ElementsPanel({
             className={styles.SearchInput}
             data-search-in-progress={searchInProgress || undefined}
             data-test-id="ElementsSearchInput"
-            disabled={pauseId == null}
+            disabled={listData == null || pauseId == null}
             onChange={onSearchInputChange}
             onKeyDown={onSearchInputKeyDown}
             placeholder="Search DOM"
@@ -181,7 +196,7 @@ export function ElementsPanel({
         )}
       </div>
       <div className={styles.ListRow} onKeyDown={onListKeyDown}>
-        {pauseId ? (
+        {listData && pauseId ? (
           <AutoSizer disableWidth>
             {({ height }: { height: number }) => (
               <Suspense
@@ -191,6 +206,7 @@ export function ElementsPanel({
                   height={height}
                   forwardedRef={compositeListRef}
                   key={pauseId}
+                  listData={listData}
                   onSelectionChange={onSelectionChange}
                   pauseId={pauseId}
                 />

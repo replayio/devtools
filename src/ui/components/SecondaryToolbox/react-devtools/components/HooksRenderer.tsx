@@ -6,12 +6,14 @@ import Icon from "replay-next/components/Icon";
 import KeyValueRenderer from "replay-next/components/inspector/KeyValueRendererWithContextMenu";
 import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
+import {
+  findProtocolObjectProperty,
+  findProtocolObjectPropertyValue,
+} from "replay-next/src/utils/protocol";
 import { ReplayClientInterface } from "shared/client/types";
 import { hookLocationCache } from "ui/components/SecondaryToolbox/react-devtools/suspense/hookLocationCache";
 import { hookNameCache } from "ui/components/SecondaryToolbox/react-devtools/suspense/hookNameCache";
 import { InspectedReactElement } from "ui/components/SecondaryToolbox/react-devtools/types";
-import { findProtocolObjectProperty } from "ui/components/SecondaryToolbox/react-devtools/utils/findProtocolObjectProperty";
-import { findProtocolObjectPropertyValue } from "ui/components/SecondaryToolbox/react-devtools/utils/findProtocolObjectPropertyValue";
 
 import styles from "./HooksRenderer.module.css";
 

@@ -23,4 +23,23 @@ function iframeFinished() {
   <div id="div4" some-attribute="STUFF"></div>
 </div>
 <iframe src="iframe.html" id="myiframe"></iframe>
+
+<script>
+  function printCenter(id) {
+    const main = document.getElementById(id);
+    const rect = main.getBoundingClientRect();
+
+    const left = rect.left / window.outerWidth;
+    const right = rect.right / window.outerWidth;
+    const center = (left + right) / 2;
+    const top = rect.top / window.outerHeight;
+    const bottom = rect.bottom / window.outerHeight;
+    const middle = (top + bottom) / 2;
+
+    console.log(`${id}: centered at x: ${center}%, y: ${middle}%`);
+  }
+
+  printCenter("maindiv");
+  printCenter("myiframe");
+</script>
 </body>

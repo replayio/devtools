@@ -13,6 +13,7 @@ import { ActionFilter } from "ui/components/SecondaryToolbox/redux-devtools/Acti
 import { ReduxActionAnnotation } from "ui/components/SecondaryToolbox/redux-devtools/annotations";
 import { ReduxDevToolsContents } from "ui/components/SecondaryToolbox/redux-devtools/ReduxDevToolsContents";
 import { ReduxDevToolsList } from "ui/components/SecondaryToolbox/redux-devtools/ReduxDevToolsList";
+import { getRecordingTooLongToSupportRoutines } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
 import { reduxDevToolsAnnotationsCache } from "ui/suspense/annotationsCaches";
 import { applyMiddlewareDeclCache } from "ui/suspense/jumpToLocationCache";
@@ -27,6 +28,7 @@ export default function ReduxDevToolsPanel() {
   const [searchValue, setSearchValue] = useState("");
 
   const currentExecutionPoint = useAppSelector(getExecutionPoint);
+  const showRecordingTooLongWarning = useAppSelector(getRecordingTooLongToSupportRoutines);
 
   const { status: annotationsStatus, value: parsedAnnotations } = useImperativeCacheValue(
     reduxDevToolsAnnotationsCache,
@@ -66,6 +68,16 @@ export default function ReduxDevToolsPanel() {
     // This will speed up the first click on a Redux "J2C" button
     applyMiddlewareDeclCache.prefetch(client);
   }, [client]);
+
+  if (showRecordingTooLongWarning) {
+    return (
+      <div className={styles.Container} data-test-id="ReduxDevtools">
+        <div className={styles.CouldNotLoadMessage}>
+          Redux actions are unavailable because this recording was too long to process them
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.Container} data-test-id="ReduxDevtools">

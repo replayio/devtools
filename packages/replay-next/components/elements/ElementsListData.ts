@@ -28,7 +28,7 @@ export class ElementsListData extends GenericListData<Item> {
   constructor(replayClient: ReplayClientInterface, pauseId: PauseId) {
     super();
 
-    this.updateLoadingState(true);
+    this.updateIsLoading(true);
 
     this._pauseId = pauseId;
     this._replayClient = replayClient;
@@ -80,7 +80,7 @@ export class ElementsListData extends GenericListData<Item> {
   async loadPathToNode(leafNodeId: ObjectId) {
     let idPath;
     try {
-      this.updateLoadingState(true);
+      this.updateIsLoading(true);
 
       idPath = await parentNodesCache.readAsync(this._replayClient, this._pauseId, leafNodeId);
 
@@ -121,7 +121,7 @@ export class ElementsListData extends GenericListData<Item> {
 
       await this.processLoadedIds(rootId, new Set(loadedIds.flat()), 0);
 
-      this.updateLoadingState(false);
+      this.updateIsLoading(false);
       this.invalidate();
 
       // Finish expanding the selected path again now that all data has been loaded
@@ -135,7 +135,7 @@ export class ElementsListData extends GenericListData<Item> {
 
       return index;
     } catch (error) {
-      this.updateLoadingState(false);
+      this.updateIsLoading(false);
       this.handleLoadingError(error);
     }
   }
@@ -418,7 +418,7 @@ export class ElementsListData extends GenericListData<Item> {
   private async loadAndProcessNodeSubTree(relativeRootId: ObjectId, numLevelsToLoad: number = 0) {
     let loadedIds;
     try {
-      this.updateLoadingState(true);
+      this.updateIsLoading(true);
       loadedIds = await loadNodeSubTree(
         this._replayClient,
         this._pauseId,
@@ -426,7 +426,7 @@ export class ElementsListData extends GenericListData<Item> {
         numLevelsToLoad
       );
     } catch (error) {
-      this.updateLoadingState(false);
+      this.updateIsLoading(false);
       this.handleLoadingError(error);
       return;
     }
@@ -437,7 +437,7 @@ export class ElementsListData extends GenericListData<Item> {
 
     await this.processLoadedIds(relativeRootId, loadedIds, numLevelsToLoad);
 
-    this.updateLoadingState(false);
+    this.updateIsLoading(false);
     this.invalidate();
   }
 

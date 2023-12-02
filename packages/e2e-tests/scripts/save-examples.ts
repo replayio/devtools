@@ -30,6 +30,12 @@ const argv = yargs
     description: "Only re-generate tests for this specific example file",
     type: "string",
   })
+  .option("runtime", {
+    alias: "r",
+    default: "",
+    description: "Override runtime specified in test config",
+    choices: ["", "chromium", "firefox", "node"],
+  })
   .option("target", {
     alias: "t",
     default: "all",
@@ -425,12 +431,14 @@ async function saveBrowserExample({ example }: TestRunCallbackArgs) {
   const playwrightScript: PlaywrightScript = example.playwrightScript ?? defaultPlaywrightScript;
 
   // Shouldn't be "node" by this point
-  await recordPlaywright(example.runtime as BrowserName, async (page, expect) => {
+  await recordPlaywright((argv.runtime || example.runtime) as BrowserName, async (page, expect) => {
     await page.goto(exampleUrl);
     await playwrightScript(page, expect);
   });
+
   console.log("Recording completed");
   const recordingId = await uploadLastRecording(exampleUrl);
+  console.log("Uploaded recording", recordingId);
 
   done();
 

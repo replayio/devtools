@@ -3,6 +3,7 @@ import { useContext, useEffect, useState } from "react";
 import { useImperativeCacheValue } from "suspense";
 
 import { getPauseId, getPausePreviewLocation } from "devtools/client/debugger/src/selectors";
+import Icon from "replay-next/components/Icon";
 import { framesCache } from "replay-next/src/suspense/FrameCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { isGroupedTestCasesV1 } from "shared/test-suites/RecordingTestMetadata";
@@ -203,48 +204,7 @@ function PauseInfoIcon() {
 function ReactIcon() {
   return (
     <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-      <svg
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        className="h-full w-full"
-      >
-        <path
-          d="M17.3073 20.4763C19.1626 19.4051 18.4266 14.6567 15.6633 9.87057C12.9 5.08439 9.15582 2.07279 7.30047 3.14398C5.44512 4.21517 6.18116 8.9635 8.94447 13.7497C11.7078 18.5358 15.4519 21.5474 17.3073 20.4763Z"
-          stroke="currentColor"
-          strokeWidth="1.1139"
-          strokeMiterlimit="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M7.30057 20.4762C9.15592 21.5474 12.9001 18.5358 15.6633 13.7496C18.4266 8.96344 19.1627 4.21511 17.3073 3.14392C15.452 2.07274 11.7078 5.08433 8.94453 9.8705C6.18125 14.6567 5.44522 19.405 7.30057 20.4762Z"
-          stroke="currentColor"
-          strokeWidth="1.1139"
-          strokeMiterlimit="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M22.3106 11.8101C22.3106 9.66778 17.8304 7.93104 12.3038 7.93103C6.77724 7.93102 2.29706 9.66775 2.29706 11.8101C2.29706 13.9525 6.77724 15.6892 12.3038 15.6892C17.8304 15.6892 22.3106 13.9525 22.3106 11.8101Z"
-          stroke="currentColor"
-          strokeWidth="1.1139"
-          strokeMiterlimit="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M12.2348 13.1466C12.9435 13.1466 13.518 12.572 13.518 11.8633C13.518 11.1546 12.9435 10.5801 12.2348 10.5801C11.5261 10.5801 10.9516 11.1546 10.9516 11.8633C10.9516 12.572 11.5261 13.1466 12.2348 13.1466Z"
-          fill="currentColor"
-          stroke="currentColor"
-          strokeWidth="0.1139"
-          strokeMiterlimit="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
+      <Icon type="react" />
     </div>
   );
 }

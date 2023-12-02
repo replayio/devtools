@@ -28,6 +28,8 @@ import { SelectedElementLoader } from "ui/components/SecondaryToolbox/react-devt
 import { useReactDevToolsAnnotations } from "ui/components/SecondaryToolbox/react-devtools/hooks/useReactDevToolsAnnotations";
 import { useReplayWall } from "ui/components/SecondaryToolbox/react-devtools/hooks/useReplayWall";
 import { ReactDevToolsListData } from "ui/components/SecondaryToolbox/react-devtools/ReactDevToolsListData";
+import { getRecordingTooLongToSupportRoutines } from "ui/reducers/timeline";
+import { useAppSelector } from "ui/setup/hooks";
 import {
   ParsedReactDevToolsAnnotation,
   reactDevToolsAnnotationsCache,
@@ -71,6 +73,7 @@ function ReactDevToolsPanelInner({
   const [collapsedLeft, setCollapsedLeft] = useState(false);
   const [collapsedRight, setCollapsedRight] = useState(false);
   const [protocolCheckFailed, setProtocolCheckFailed] = useState(false);
+  const showRecordingTooLongWarning = useAppSelector(getRecordingTooLongToSupportRoutines);
 
   const leftPanelRef = useRef<ImperativePanelHandle>(null);
   const rightPanelRef = useRef<ImperativePanelHandle>(null);
@@ -96,6 +99,19 @@ function ReactDevToolsPanelInner({
     pauseId,
     wall,
   });
+
+  if (showRecordingTooLongWarning) {
+    return (
+      <div className={styles.ProtocolFailedPanel} data-test-id="ReactDevToolsPanel">
+        <div className={styles.NotMountedYetMessage}>
+          <div>
+            React components are unavailable because this recording was too long to process them
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (!hasReactMounted) {
     return (
       <div className={styles.ProtocolFailedPanel} data-test-id="ReactDevToolsPanel">
@@ -151,7 +167,7 @@ function ReactDevToolsPanelInner({
 
   return (
     <div className={styles.Panel} data-test-id="ReactDevToolsPanel">
-      <PanelGroup autoSaveId="ConsoleRoot" direction="horizontal">
+      <PanelGroup autoSaveId="ReactDevTools" direction="horizontal">
         <Panel
           className={styles.LeftPanel}
           collapsible

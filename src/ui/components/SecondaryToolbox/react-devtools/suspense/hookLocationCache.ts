@@ -3,8 +3,8 @@ import { createCache } from "suspense";
 
 import { mappedLocationCache } from "replay-next/src/suspense/MappedLocationCache";
 import { sourcesByUrlCache } from "replay-next/src/suspense/SourcesCache";
+import { findProtocolObjectPropertyValue } from "replay-next/src/utils/protocol";
 import { ReplayClientInterface } from "shared/client/types";
-import { findProtocolObjectPropertyValue } from "ui/components/SecondaryToolbox/react-devtools/utils/findProtocolObjectPropertyValue";
 
 // React DevTools (specifically react-debug-tools) returns locations as objects with the following shape:
 // { fileName: string; lineNumber: number; columnNumber: number; }

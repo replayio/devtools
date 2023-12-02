@@ -1,6 +1,7 @@
 import {
   NamedValue,
   NamedValue as ProtocolNamedValue,
+  Object as ProtocolObject,
   ObjectId as ProtocolObjectId,
   PauseId as ProtocolPauseId,
   Property as ProtocolProperty,
@@ -390,4 +391,44 @@ export function sourcesToSourceTree(sources: Source[]): SourceTree {
   });
 
   return sourceTree;
+}
+
+export type UnknownFunction = (...args: any[]) => any;
+
+export type ChunksArray = (UnknownFunction | string | number)[];
+
+export function splitStringToChunks(string: string) {
+  const chunks: string[] = [];
+  for (let i = 0; i < string.length; i += 9999) {
+    chunks.push(string.slice(i, i + 9999));
+  }
+
+  return chunks;
+}
+
+export function joinChunksToString(chunks: ProtocolProperty[]): string {
+  let string = "";
+  for (const prop of chunks) {
+    string += prop.value;
+  }
+
+  return string;
+}
+
+export function findProtocolObjectProperty(
+  sourceObject: ProtocolObject,
+  name: string
+): ProtocolProperty | NamedValue | null {
+  return (
+    sourceObject.preview?.properties?.find(property => property.name === name) ??
+    sourceObject.preview?.getterValues?.find(property => property.name === name) ??
+    null
+  );
+}
+
+export function findProtocolObjectPropertyValue<Type>(
+  sourceObject: ProtocolObject,
+  name: string
+): Type | null {
+  return findProtocolObjectProperty(sourceObject, name)?.value ?? null;
 }

@@ -1,7 +1,7 @@
 import { Locator, Page, expect } from "@playwright/test";
 import chalk from "chalk";
 
-import { clearText } from "./lexical";
+import { getScreenshotScale } from "./screenshot";
 import { debugPrint, delay, waitFor } from "./utils";
 
 type ElementsListRowOptions = {
@@ -248,10 +248,21 @@ export async function inspectCanvasCoordinates(
   await pickerButton.click();
 
   const canvas = page.locator("#graphics");
-  const height = await canvas.getAttribute("height");
-  const width = await canvas.getAttribute("width");
-  const x = xPercentage * (width as any as number);
-  const y = yPercentage * (height as any as number);
+  const heightString = await canvas.getAttribute("height");
+  const widthString = await canvas.getAttribute("width");
+  const height = parseFloat(heightString ?? "0");
+  const width = parseFloat(widthString ?? "0");
+
+  await canvas.getAttribute("scale");
+  await debugPrint(
+    page,
+    `Canvas size ${chalk.bold(Math.round(width))}px by ${chalk.bold(Math.round(height))}px`,
+    "inspectCanvasCoordinates"
+  );
+
+  const scale = await getScreenshotScale(page);
+  const x = xPercentage * width * scale;
+  const y = yPercentage * height * scale;
 
   await debugPrint(
     page,
@@ -306,6 +317,23 @@ async function openSelectedElementTab(page: Page, tabId: string): Promise<void> 
   await tabLocator.click({ force: true });
 }
 
+export async function getElementsSearchResultsCount(
+  page: Page
+): Promise<{ current: number; total: number } | null> {
+  const searchResults = page.locator('[data-test-id="ElementsPanel-SearchResult"]');
+  if (!(await searchResults.isVisible())) {
+    return null;
+  }
+
+  const text = await searchResults.textContent();
+  if (!text) {
+    return null;
+  }
+
+  const [currentString, totalString] = text.split(" of ");
+  return { current: parseInt(currentString), total: parseInt(totalString) };
+}
+
 export async function searchElementsPanel(page: Page, searchText: string): Promise<void> {
   await openElementsPanel(page);
 
@@ -329,6 +357,54 @@ export async function searchElementsPanel(page: Page, searchText: string): Promi
     // A proxy for confirming that the search has been handled is that a results label will be rendered.
     const resultsLabel = page.locator('[data-test-id="ElementsPanel-SearchResult"]');
     await expect(await resultsLabel.count()).toEqual(1);
+  });
+}
+
+export async function verifySearchResults(
+  page: Page,
+  expectations: {
+    currentNumber?: number;
+    text?: string;
+    totalNumber?: number;
+  }
+) {
+  const {
+    currentNumber: expectedCurrent,
+    text: expectedText,
+    totalNumber: expectedTotal,
+  } = expectations;
+
+  if (expectedCurrent != null || expectedTotal != null) {
+    await waitFor(async () => {
+      const { current: actualCurrent, total: actualTotal } =
+        (await getElementsSearchResultsCount(page)) ?? {};
+
+      if (expectedCurrent != null) {
+        expect(actualCurrent).toBe(expectedCurrent);
+      }
+
+      if (expectedTotal != null) {
+        expect(actualTotal).toBe(expectedTotal);
+      }
+    });
+  }
+
+  if (expectedText != null) {
+    await verifySelectedElement(page, expectedText);
+  }
+}
+
+export async function verifySelectedElement(page: Page, expectedText: string) {
+  await debugPrint(
+    page,
+    `Expect selected Element to contain "${expectedText}"`,
+    "verifySelectedElementName"
+  );
+
+  await waitFor(async () => {
+    const locator = await getElementsListRow(page, { isSelected: true });
+    const textContent = await locator.textContent();
+    expect(textContent).toContain(expectedText);
   });
 }
 
@@ -425,4 +501,9 @@ export async function typeKeyAndVerifySelectedElement(
   await page.keyboard.press(key);
   await waitForSelectedElementsRow(page, expectedRowText);
   await delay(500);
+}
+
+export async function verifyElementsNotAvailable(page: Page) {
+  const locator = page.locator('[data-test-id="Elements-NotAvailable"]');
+  await locator.waitFor();
 }

@@ -19,6 +19,7 @@ export interface TimelineState {
   hoveredItem: HoveredItem | null;
   hoverTime: number | null;
   markTimeStampedPoint: TimeStampedPoint | null;
+  maxRecordingDurationForRoutines: number;
   paints: TimeStampedPoint[];
   playback: {
     beginTime: number;

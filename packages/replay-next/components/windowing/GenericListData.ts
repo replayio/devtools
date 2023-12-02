@@ -1,4 +1,5 @@
 import assert from "assert";
+import { Deferred, STATUS_RESOLVED, createDeferred } from "suspense";
 
 import { EventEmitter } from "shared/EventEmitter";
 
@@ -11,8 +12,15 @@ export abstract class GenericListData<Item> extends EventEmitter<{
   private _cachedIndexToItemMap: Map<number, Item> = new Map();
   private _cachedItemCount: number | null = null;
   private _isLoading: boolean = false;
+  private _loadingWaiter: Deferred<void> = createDeferred();
   private _revision: number = 0;
   private _selectedIndex: number | null = null;
+
+  constructor() {
+    super();
+
+    this._loadingWaiter.resolve();
+  }
 
   getIndexForItem(item: Item): number {
     let index = this._cachedItemToIndexMap.get(item);
@@ -95,6 +103,10 @@ export abstract class GenericListData<Item> extends EventEmitter<{
     return this.addListener("selectedIndex", callback);
   };
 
+  async waitUntilLoaded() {
+    await this._loadingWaiter.promise;
+  }
+
   // Not all list types require this functionality
   protected getIndexForItemImplementation(item: Item): number {
     throw Error("getIndexForItemImplementation not implemented");
@@ -113,9 +125,21 @@ export abstract class GenericListData<Item> extends EventEmitter<{
     this.emit("invalidate");
   }
 
-  protected updateLoadingState(value: boolean): void {
-    this._isLoading = value;
+  protected updateIsLoading(isLoading: boolean): void {
+    if (this._isLoading !== isLoading) {
+      this._isLoading = isLoading;
 
-    this.emit("loading", value);
+      if (isLoading) {
+        if (this._loadingWaiter.status === STATUS_RESOLVED) {
+          this._loadingWaiter = createDeferred();
+        }
+      } else {
+        if (this._loadingWaiter.status !== STATUS_RESOLVED) {
+          this._loadingWaiter.resolve();
+        }
+      }
+    }
+
+    this.emit("loading", isLoading);
   }
 }
