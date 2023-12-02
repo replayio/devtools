@@ -68,6 +68,8 @@ export const testRunDetailsCache = createCache<
             const recs = e.recordings.map(convertRecording);
             recordings.push(...recs);
 
+            // Adapt the execution status to convert "failed" execution status
+            // to "flaky" when the test eventually passes
             let result = e.result;
             if (test.result === "flaky") {
               if (testFailed(e)) {
