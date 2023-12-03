@@ -51,7 +51,7 @@ export function TestResultListItem({
   test,
 }: {
   depth: number;
-  label: string;
+  label: "passed" | "failed" | "flaky";
   recording: Recording;
   testRun: TestRun | null;
   test: TestRunTest;
@@ -62,22 +62,6 @@ export function TestResultListItem({
   const { apiKey, e2e } = useRouter().query;
 
   const numComments = comments?.length ?? 0;
-
-  label = label.toLowerCase();
-
-  let iconClass;
-  switch (label) {
-    case "failed":
-      iconClass = "failed";
-      break;
-    case "flaky":
-      iconClass = "flaky";
-      break;
-    case "passed":
-    default:
-      iconClass = "passed";
-      break;
-  }
 
   const iconType = isProcessed ? "play-processed" : "play-unprocessed";
 
@@ -99,7 +83,7 @@ export function TestResultListItem({
             whileTap={{ scale: 1.0, boxShadow: "0px 0px 1px rgba(0,0,0,0.2)" }}
             transition={{ duration: 0.05 }}
           >
-            <Icon className={styles[iconClass]} type={iconType} />
+            <Icon className={styles[label]} type={iconType} />
           </motion.div>
         </div>
       </div>

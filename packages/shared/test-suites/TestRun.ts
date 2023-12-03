@@ -24,7 +24,7 @@ export type TestRunTest = {
   title: string;
   scope: string[];
   sourcePath: string;
-  result: string;
+  result: "passed" | "failed" | "flaky";
   errors: string[] | null;
   durationMs: number;
 };

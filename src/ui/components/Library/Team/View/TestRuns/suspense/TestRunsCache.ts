@@ -67,6 +67,7 @@ export const testRunDetailsCache = createCache<
 
         return {
           ...test,
+          result: test.result as "passed" | "failed" | "flaky",
           recordings: recs,
         };
       }) ?? [];
