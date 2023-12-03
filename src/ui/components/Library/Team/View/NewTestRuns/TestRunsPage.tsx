@@ -180,7 +180,7 @@ function TestRunSpecDetails() {
   const { spec } = useContext(TestRunsContext);
   const { testRunId } = useContext(TestRunsContext);
 
-  const { groupedTests, tests } = useTestRunDetailsSuspends(testRunId);
+  const { groupedTests, tests, testRun } = useTestRunDetailsSuspends(testRunId);
   const selectedSpecTests = tests?.filter((t: any) => t.sourcePath === spec) ?? [];
   const selectedTest = selectedSpecTests[0];
 
@@ -212,10 +212,10 @@ function TestRunSpecDetails() {
               s.recordings.map(r => (
                 <TestResultListItem
                   depth={1}
-                  filterByText={""}
                   key={r.id}
                   label={s.result}
                   recording={r}
+                  testRun={testRun}
                   test={s}
                 />
               ))

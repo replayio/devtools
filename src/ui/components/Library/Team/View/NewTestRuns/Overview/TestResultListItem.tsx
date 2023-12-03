@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 
 import Icon from "replay-next/components/Icon";
 import { Recording } from "shared/graphql/types";
-import { TestRunTest } from "shared/test-suites/TestRun";
+import { TestRun, TestRunTest } from "shared/test-suites/TestRun";
 
 import {
   getDurationString,
@@ -12,7 +12,13 @@ import {
 import { AttributeContainer } from "../../TestRuns/AttributeContainer";
 import styles from "../../../../Library.module.css";
 
-function RecordingAttributes({ recording }: { recording: Recording }) {
+function RecordingAttributes({
+  recording,
+  testRun,
+}: {
+  recording: Recording;
+  testRun: TestRun | null;
+}) {
   return (
     <div className="flex flex-row flex-wrap items-center gap-4 text-xs">
       <AttributeContainer
@@ -28,9 +34,9 @@ function RecordingAttributes({ recording }: { recording: Recording }) {
           {getDurationString(recording.duration)}
         </AttributeContainer>
       ) : null}
-      {recording.user?.name ? (
+      {testRun?.source?.user ? (
         <AttributeContainer dataTestId="Recording-Username" icon="person">
-          {recording.user.name}
+          {testRun.source.user}
         </AttributeContainer>
       ) : null}
     </div>
@@ -39,15 +45,15 @@ function RecordingAttributes({ recording }: { recording: Recording }) {
 
 export function TestResultListItem({
   depth,
-  filterByText,
   label,
   recording,
+  testRun,
   test,
 }: {
   depth: number;
-  filterByText: string;
   label: string;
   recording: Recording;
+  testRun: TestRun | null;
   test: TestRunTest;
 }) {
   const { comments, isProcessed, id: recordingId } = recording;
@@ -99,7 +105,7 @@ export function TestResultListItem({
       </div>
       <div className={`${styles.fileInfo} gap-1`}>
         <div className={styles.title}>{title || "Test"}</div>
-        <RecordingAttributes recording={recording} />
+        <RecordingAttributes recording={recording} testRun={testRun} />
       </div>
       {numComments > 0 && (
         <div className={styles.comments}>
