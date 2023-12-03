@@ -14,8 +14,7 @@
   background-color: var(--body-bgcolor);
 }
 
-:root:global(.theme-dark) .libraryRow:hover,
-:root:global(.theme-dark) .replayRow:hover {
+:root:global(.theme-dark) .libraryRow:hover {
   background-color: #1c2534;
 }
 
@@ -25,14 +24,6 @@
 
 :root:global(.theme-dark) .libraryRowSelected:hover {
   background-color: var(--primary-accent-dimmed);
-}
-
-:root:global(.theme-dark) .testsuitesV2LibraryRowSelected {
-  background-color: rgba(0, 0, 0, 1);
-}
-
-:root:global(.theme-dark) .testsuitesV2LibraryRowSelected:hover {
-  background-color: rgba(0, 0, 0, 0.5);
 }
 
 :root:global(.theme-dark) .teamRow:hover,
@@ -93,8 +84,7 @@
   color: var(--body-color);
 }
 
-:root:global(.theme-light) .libraryRow:hover,
-:root:global(.theme-light) .replayRow:hover {
+:root:global(.theme-light) .libraryRow:hover {
   background-color: var(--grey-10);
 }
 
@@ -104,14 +94,6 @@
 
 :root:global(.theme-light) .libraryRowSelected:hover {
   background-color: rgb(229, 244, 255);
-}
-
-:root:global(.theme-light) .testsuitesV2LibraryRowSelected {
-  background-color: rgba(0, 0, 0, 0.2);
-}
-
-:root:global(.theme-light) .testsuitesV2LibraryRowSelected:hover {
-  background-color: rgba(0, 0, 0, 0.1);
 }
 
 :root:global(.theme-light) .teamRow:hover,
@@ -234,9 +216,6 @@
 .libraryRow {
 }
 
-.testsuitesV2LibraryRowSelected {
-}
-
 .testsuitesSuccess {
   background-color: var(--testsuites-success-color);
 }
@@ -267,33 +246,6 @@
   color: var(--theme-base-100);
   background-color: var(--testsuites-success-color);
   border-radius: 50%;
-}
-
-.flakyPillV2 {
-  color: #000;
-  background-color: var(--testsuites-v2-flaky-pill);
-}
-
-.failedPillV2 {
-  color: #000;
-  background-color: var(--testsuites-v2-failed-pill);
-}
-
-.successPillV2 {
-  color: #000;
-  background-color: var(--testsuites-v2-success-pill);
-}
-
-.testsuitesV2Success {
-  background-color: var(--testsuites-v2-success-icon);
-}
-
-.testsuitesV2Failed {
-  background-color: var(--testsuites-v2-failed-icon);
-}
-
-.testsuitesV2Flaky {
-  background-color: var(--testsuites-v2-flaky-icon);
 }
 
 .FilterTestsFilter {

@@ -20,7 +20,7 @@ import {
 import FileIcon from "ui/components/shared/Icon";
 import { TestGroup } from "ui/utils/testRuns";
 
-import styles from "../../../../Library.module.css";
+import styles from "../TestRuns.module.css";
 
 export function RunResults({
   isPending,
@@ -138,12 +138,12 @@ const FileNodeRenderer = memo(function FileNodeRenderer({
   let iconClass: string;
   if (label === "Passed") {
     iconFilename = "testsuites-success";
-    iconClass = styles.testsuitesV2Success;
+    iconClass = styles.testsuitesSuccess;
   } else if (label === "Failed") {
-    iconClass = styles.testsuitesV2Failed;
+    iconClass = styles.testsuitesFailed;
     iconFilename = "testsuites-v2-failed";
   } else {
-    iconClass = styles.testsuitesV2Flaky;
+    iconClass = styles.testsuitesFlaky;
     iconFilename = "testsuites-v2-flaky";
   }
 
@@ -154,7 +154,7 @@ const FileNodeRenderer = memo(function FileNodeRenderer({
       <div
         className={`flex cursor-pointer items-center gap-2 truncate rounded py-1.5 pr-4 ${
           styles.libraryRow
-        } ${isSelected ? styles.testsuitesV2LibraryRowSelected : ""}`}
+        } ${isSelected ? styles.libraryRowSelected : ""}`}
         data-test-id="TestRunResult-FileNode"
         onClick={onClick}
         style={{

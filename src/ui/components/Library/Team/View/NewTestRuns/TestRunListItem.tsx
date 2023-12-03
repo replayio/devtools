@@ -10,7 +10,7 @@ import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { getTruncatedRelativeDate } from "../Recordings/RecordingListItem/RecordingListItem";
 import { ModeAttribute } from "./Overview/RunSummary";
 import { TestRunsContext } from "./TestRunsContextRoot";
-import styles from "../../../Library.module.css";
+import styles from "./TestRuns.module.css";
 
 function Status({ failCount }: { failCount: number }) {
   const status = failCount > 0 ? "fail" : "success";
@@ -91,7 +91,7 @@ export function TestRunListItem({
       className={`flex cursor-pointer flex-row items-center space-x-3 rounded-md bg-themeBase-100 px-2 py-1 ${
         styles.libraryRow
       }
-      ${isSelected ? styles.testsuitesV2LibraryRowSelected : ""}
+      ${isSelected ? styles.libraryRowSelected : ""}
       `}
       onClick={onClick}
     >

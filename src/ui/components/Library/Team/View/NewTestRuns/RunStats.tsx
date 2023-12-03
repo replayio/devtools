@@ -1,6 +1,6 @@
 import { useTestRunDetailsSuspends } from "ui/components/Library/Team/View/TestRuns/hooks/useTestRunDetailsSuspends";
 
-import styles from "../../../Library.module.css";
+import styles from "./TestRuns.module.css";
 
 export function RunStats({ testRunId }: { testRunId: string }) {
   const { groupedTests } = useTestRunDetailsSuspends(testRunId);
@@ -16,9 +16,9 @@ export function RunStats({ testRunId }: { testRunId: string }) {
 
   return (
     <div className="flex shrink space-x-2">
-      {failed > 0 && <Pill className={styles.failedPillV2} value={failed} />}
-      {flakyCount > 0 && <Pill className={styles.flakyPillV2} value={flakyCount} />}
-      {passed > 0 && <Pill className={styles.successPillV2} value={passed} />}
+      {failed > 0 && <Pill className={styles.failedPill} value={failed} />}
+      {flakyCount > 0 && <Pill className={styles.flakyPill} value={flakyCount} />}
+      {passed > 0 && <Pill className={styles.successPill} value={passed} />}
     </div>
   );
 }

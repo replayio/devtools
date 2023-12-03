@@ -1,0 +1,66 @@
+/* Dark theme */
+
+:root:global(.theme-dark) .libraryRow {
+  color: var(--body-color);
+  background-color: var(--body-bgcolor);
+}
+
+:root:global(.theme-dark) .libraryRow:hover,
+:root:global(.theme-dark) .replayRow:hover {
+  background-color: #1c2534;
+}
+
+:root:global(.theme-dark) .libraryRowSelected {
+  background-color: rgba(0, 0, 0, 1);
+}
+
+:root:global(.theme-dark) .libraryRowSelected:hover {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Light theme */
+
+:root:global(.theme-light) .libraryRow {
+  background-color: var(--theme-base-100);
+  color: var(--body-color);
+}
+
+:root:global(.theme-light) .libraryRow:hover,
+:root:global(.theme-light) .replayRow:hover {
+  background-color: var(--grey-10);
+}
+
+:root:global(.theme-light) .libraryRowSelected {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+:root:global(.theme-light) .libraryRowSelected:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.flakyPill {
+  color: #000;
+  background-color: var(--testsuites-v2-flaky-pill);
+}
+
+.failedPill {
+  color: #000;
+  background-color: var(--testsuites-v2-failed-pill);
+}
+
+.successPill {
+  color: #000;
+  background-color: var(--testsuites-v2-success-pill);
+}
+
+.testsuitesSuccess {
+  background-color: var(--testsuites-v2-success-icon);
+}
+
+.testsuitesFailed {
+  background-color: var(--testsuites-v2-failed-icon);
+}
+
+.testsuitesFlaky {
+  background-color: var(--testsuites-v2-flaky-icon);
+}

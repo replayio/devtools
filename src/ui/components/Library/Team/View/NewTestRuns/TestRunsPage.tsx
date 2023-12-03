@@ -17,7 +17,7 @@ import {
   TestRunsFilterContext,
   TestRunsFilterContextRoot,
 } from "./TestRunsContextRoot";
-import _styles from "../../../Library.module.css";
+import styles from "../../../Library.module.css";
 import dropdownStyles from "./Dropdown.module.css";
 
 export function TestRunsPage() {
@@ -164,7 +164,7 @@ function TestRunsContent() {
         <PanelResizeHandle className="h-full w-2" />
         <Panel minSize={20} order={2}>
           <div
-            className={`flex h-full w-full overflow-hidden rounded-xl ${_styles.testReplayDetails}`}
+            className={`flex h-full w-full overflow-hidden rounded-xl ${styles.testReplayDetails}`}
           >
             <Suspense fallback={<LibrarySpinner />}>
               <TestRunSpecDetails />
