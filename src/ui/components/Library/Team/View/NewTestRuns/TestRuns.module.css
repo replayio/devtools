@@ -64,3 +64,15 @@
 .testsuitesFlaky {
   background-color: var(--testsuites-v2-flaky-icon);
 }
+
+.failedHeader {
+  color: var(--testsuites-v2-failed-header);
+}
+
+.successHeader {
+  color: var(--testsuites-v2-success-header);
+}
+
+.flakyHeader {
+  color: var(--testsuites-v2-flaky-header);
+}
