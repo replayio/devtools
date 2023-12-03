@@ -1,14 +1,11 @@
 import { useContext } from "react";
 
 import { TestRun, getTestRunTitle } from "shared/test-suites/TestRun";
-import { AttributeContainer } from "ui/components/Library/Team/View/TestRuns/AttributeContainer";
-import { BranchIcon } from "ui/components/Library/Team/View/TestRuns/BranchIcon";
 import HighlightedText from "ui/components/Library/Team/View/TestRuns/HighlightedText";
 import Icon from "ui/components/shared/Icon";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 
 import { getTruncatedRelativeDate } from "../Recordings/RecordingListItem/RecordingListItem";
-import { ModeAttribute } from "./Overview/RunSummary";
 import { TestRunsContext } from "./TestRunsContextRoot";
 import styles from "./TestRuns.module.css";
 
@@ -40,7 +37,7 @@ export function TestRunListItem({
   filterByText: string;
   testRun: TestRun;
 }) {
-  const { date, source } = testRun;
+  const { date } = testRun;
 
   const { selectTestRun, testRunIdForDisplay } = useContext(TestRunsContext);
 
@@ -48,38 +45,6 @@ export function TestRunListItem({
 
   const failCount = testRun.results.counts.failed;
   const isSelected = testRunIdForDisplay === testRun.id;
-
-  let attributes;
-  if (source) {
-    const { branchName, isPrimaryBranch, user } = source;
-
-    attributes = (
-      <div className="flex flex-row items-center gap-4 text-xs font-light">
-        <AttributeContainer dataTestId="TestRun-Date" icon="schedule" title={date.toLocaleString()}>
-          {getTruncatedRelativeDate(date, false)}
-        </AttributeContainer>
-        {user && (
-          <AttributeContainer dataTestId="TestRun-Username" icon="person">
-            <HighlightedText haystack={user} needle={filterByText} />
-          </AttributeContainer>
-        )}
-        <BranchIcon
-          branchName={<HighlightedText haystack={branchName || ""} needle={filterByText} />}
-          isPrimaryBranch={isPrimaryBranch ?? false}
-          title={title}
-        />
-        <ModeAttribute testRun={testRun} />
-      </div>
-    );
-  } else {
-    attributes = (
-      <div className="flex flex-row items-center gap-4 text-xs font-light">
-        <AttributeContainer dataTestId="TestRun-Date" icon="schedule">
-          {getTruncatedRelativeDate(date, false)}
-        </AttributeContainer>
-      </div>
-    );
-  }
 
   const onClick = () => {
     selectTestRun(testRun.id);

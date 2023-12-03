@@ -17,7 +17,7 @@ export const FilterField = ({
         className={styles.filterInput}
         data-test-id="TestRunsPage-FilterByText-Input"
         onChange={event => onChange(event.currentTarget.value)}
-        placeholder="Filter"
+        placeholder={placeholder}
         type="text"
         value={value}
       />
