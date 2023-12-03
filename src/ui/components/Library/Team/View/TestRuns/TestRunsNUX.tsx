@@ -2,7 +2,7 @@ import React from "react";
 
 import styles from "./TestRunsNUX.module.css";
 
-const TestRunsNUX: React.FC = () => {
+function TestRunsNUX() {
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>Installation docs</h1>
@@ -32,6 +32,6 @@ const TestRunsNUX: React.FC = () => {
       </p>
     </div>
   );
-};
+}
 
 export default TestRunsNUX;
