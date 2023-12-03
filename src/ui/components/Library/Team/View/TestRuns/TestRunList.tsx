@@ -4,6 +4,7 @@ import { FixedSizeList, ListChildComponentProps } from "react-window";
 
 import { TestRun } from "shared/test-suites/TestRun";
 import { TestRunListItem } from "ui/components/Library/Team/View/TestRuns/TestRunListItem";
+import TestRunsNUX from "ui/components/Library/Team/View/TestRuns/TestRunsNUX";
 import { SecondaryButton } from "ui/components/shared/Button";
 
 import { TestRunsContext } from "./TestRunsContextRoot";
@@ -36,17 +37,21 @@ export function TestRunList() {
 
   return (
     <ReactVirtualizedAutoSizer
-      children={({ height, width }) => (
-        <FixedSizeList
-          children={TestRunListRow}
-          className="no-scrollbar text-sm"
-          height={height}
-          itemCount={itemCount}
-          itemData={itemData}
-          itemSize={ROW_HEIGHT}
-          width={width}
-        />
-      )}
+      children={({ height, width }) =>
+        itemCount > 0 ? (
+          <FixedSizeList
+            children={TestRunListRow}
+            className="text-sm"
+            height={height}
+            itemCount={itemCount}
+            itemData={itemData}
+            itemSize={ROW_HEIGHT}
+            width={width}
+          />
+        ) : (
+          <TestRunsNUX />
+        )
+      }
     />
   );
 }

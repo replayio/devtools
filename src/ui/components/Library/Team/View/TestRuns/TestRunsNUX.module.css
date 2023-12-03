@@ -1,0 +1,22 @@
+.container {
+  padding: 12px;
+  width: 100vw;
+}
+
+.title {
+  font-weight: 600;
+  font-size: 18px;
+  margin-bottom: 0.5rem;
+}
+
+.content {
+  font-size: 15px;
+}
+
+ul.content {
+  margin: 0.5rem 0;
+}
+
+.content a {
+  text-decoration: underline;
+}
