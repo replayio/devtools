@@ -5,8 +5,7 @@
   background-color: var(--body-bgcolor);
 }
 
-:root:global(.theme-dark) .libraryRow:hover,
-:root:global(.theme-dark) .replayRow:hover {
+:root:global(.theme-dark) .libraryRow:hover {
   background-color: #1c2534;
 }
 
@@ -25,8 +24,7 @@
   color: var(--body-color);
 }
 
-:root:global(.theme-light) .libraryRow:hover,
-:root:global(.theme-light) .replayRow:hover {
+:root:global(.theme-light) .libraryRow:hover {
   background-color: var(--grey-10);
 }
 
