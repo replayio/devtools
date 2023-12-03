@@ -52,19 +52,12 @@ const daysAgo = (days: number) => {
 export function TestRunsFilterContextRoot({ children }: { children: ReactNode }) {
   const [filterByTime, setFilterByTime] = useState<"week" | "month">("week");
 
-  const startTime = useMemo(() => {
-    if (filterByTime === "week") {
-      return daysAgo(7);
-    }
+  const [startTime, endTime] = useMemo(() => {
+    const currentTime = new Date();
     if (filterByTime === "month") {
-      return daysAgo(30);
+      return [daysAgo(30), currentTime];
     }
-    return daysAgo(7);
-  }, [filterByTime]);
-
-  const endTime = useMemo(() => {
-    return new Date();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    return [daysAgo(7), currentTime];
   }, [filterByTime]);
 
   return (
