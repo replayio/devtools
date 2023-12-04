@@ -158,7 +158,7 @@ const FileNodeRenderer = memo(function FileNodeRenderer({
         <div className="truncate">{name}</div>
         {!expanded && (
           <div className="text-xs text-bodySubColor">
-            ({nestedRecordingCount} {nestedRecordingCount === 1 ? "replay" : "replays"})
+            ({nestedRecordingCount} {nestedRecordingCount === 1 ? "test" : "tests"})
           </div>
         )}
       </div>
