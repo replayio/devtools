@@ -35,6 +35,23 @@ function DocsLinks() {
 }
 
 export function TestRunsNUX() {
+  const codeString = `const { defineConfig } = require('cypress');
+// Add this line to require the replay plugin
+const { plugin: replayPlugin } = require('@replayio/cypress')
+
+module.exports = defineConfig({
+  e2e: {
+    setupNodeEvents(on, config) {
+      // Add this line to install the replay plugin
+      replayPlugin(on, config, {
+        upload: true,
+        apiKey: process.env.REPLAY_API_KEY,
+      });
+      // Make sure that setupNodeEvents returns config
+    }
+  }
+});`;
+
   return (
     <div className={styles["container"]}>
       <div className={styles["form-container"]}>
@@ -66,46 +83,46 @@ export function TestRunsNUX() {
           <option value="pnpm">pnpm</option>
         </select>
 
-        <hr />
+        <hr className={styles["default"]} />
 
         <div className={styles["instructions-list"]}>
-          <p className={styles["step-number"]}>1. Install the Replay plugin</p>
-          <p>Install the @replayio/cypress package in your project</p>
+          <p className={styles["step-number"]}>
+            1. Install the @replayio/cypress package in your project
+          </p>
           <input
             type="text"
-            placeholder="npm install @replayio/cypress -D"
+            value="npm install @replayio/cypress -D"
             className={styles["input-style"]}
           />
 
           <p className={styles["step-number"]}>2. Add the Replay plugin to cypress.config.js</p>
-          <textarea
-            placeholder="const { defineConfig } = require('cypress');\n// Add this line to require the replay plugin\nconst { plugin: replayPlugin } = require('@replayio/cypress')\n\nmodule.exports = defineConfig({\ne2e: {\n  setupNodeEvents(on, config) {\n    // Add this line to install the replay plugin\n    replayPlugin(on, config, {\n      upload: true,\n      apiKey: process.env.REPLAY_API_KEY,\n    });\n    // Make sure that setupNodeEvents returns config\n  }\n});"
-            className={styles["textarea-style"]}
-          ></textarea>
+          <pre className={styles["textarea-style"]}>{codeString}</pre>
 
-          <p className={styles["step-number"]}>3. Run the tests with Replay enabled</p>
+          <p className={styles["step-number"]}>3. Import Replay to your support file</p>
           <input
             type="text"
-            placeholder="npx cypress run --env replay=true"
+            value="require('@replayio/cypress/support');"
             className={styles["input-style"]}
           />
 
-          <p className={styles["step-number"]}>4. View your test results on the Replay dashboard</p>
+          <p className={styles["step-number"]}>
+            4. Save this API key in your .env file (remember to save!)
+          </p>
           <input
             type="text"
-            placeholder="Check your Replay dashboard for test results"
+            value="rwk_j6hPY4bAcpFivoNIPcOT0h4tgkOL4WqOH7Zblah"
             className={styles["input-style"]}
           />
 
-          <p className={styles["step-number"]}>5. Share test results with your team</p>
+          <p className={styles["step-number"]}>5. Run cypress as you normally would</p>
           <input
             type="text"
-            placeholder="Share the Replay dashboard URL with your team"
+            value="npx cypress run --browser replay-chromium"
             className={styles["input-style"]}
           />
         </div>
       </div>
-      <div className={styles["backgroundImage"]}>HELLO HELLO HELLO</div>
+      <div className={styles["backgroundImage"]}></div>
     </div>
   );
 }

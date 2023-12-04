@@ -35,6 +35,10 @@
   box-sizing: border-box;
 }
 
+.textarea-style {
+  font-size: 12px;
+}
+
 /* Modify the select arrow to match the design */
 .select-style {
   -webkit-appearance: none;
@@ -106,6 +110,7 @@ h1.default {
 /* Add a special style to the numbered steps */
 .step-number {
   font-weight: 500;
+  margin-bottom: 6px;
 }
 
 /* Optional: Add a responsive breakpoint */

@@ -72,68 +72,72 @@ function TestRunsContent({ TestRunListComponent }: TestRunsContentProps) {
   );
 
   return (
-    <div className="flex w-full flex-grow flex-row p-2">
+    <div className="w-full">
       {itemCount === 0 ? (
-        <TestRunsNUX />
+        <div className={styles.container}>
+          <TestRunsNUX />
+        </div>
       ) : (
-        <PanelGroup autoSaveId="Library:TestRuns" direction="horizontal">
-          <Panel minSize={20} order={1}>
-            <div className="flex h-full w-full flex-col overflow-hidden rounded-xl bg-bodyBgcolor">
-              <div className="flex flex-row items-center justify-between gap-2 border-b border-themeBorder bg-bodyBgcolor p-2">
-                <div
-                  className={styles.dropdownTrigger}
-                  data-test-id="TestRunsPage-ResultFilter-DropdownTrigger"
-                  onClick={onClickStatusFilter}
-                  onKeyDown={onKeyDownStatusFilter}
-                  tabIndex={0}
-                >
-                  {filterByStatus === "all" ? "All runs" : "Only failures"}
-                  <Icon className="h-5 w-5" type="chevron-down" />
+        <div className="flex w-full flex-grow flex-row p-2">
+          <PanelGroup autoSaveId="Library:TestRuns" direction="horizontal">
+            <Panel minSize={20} order={1}>
+              <div className="flex h-full w-full flex-col overflow-hidden rounded-xl bg-bodyBgcolor">
+                <div className="flex flex-row items-center justify-between gap-2 border-b border-themeBorder bg-bodyBgcolor p-2">
+                  <div
+                    className={styles.dropdownTrigger}
+                    data-test-id="TestRunsPage-ResultFilter-DropdownTrigger"
+                    onClick={onClickStatusFilter}
+                    onKeyDown={onKeyDownStatusFilter}
+                    tabIndex={0}
+                  >
+                    {filterByStatus === "all" ? "All runs" : "Only failures"}
+                    <Icon className="h-5 w-5" type="chevron-down" />
+                  </div>
+                  {contextMenuStatusFilter}
+                  <div
+                    className={styles.dropdownTrigger}
+                    data-test-id="TestRunsPage-BranchFilter-DropdownTrigger"
+                    onClick={onClickBranchFilter}
+                    onKeyDown={onKeyDownBranchFilter}
+                    tabIndex={0}
+                  >
+                    {filterByBranch === "all" ? "All branches" : "Only primary branch"}
+                    <Icon className="h-5 w-5" type="chevron-down" />
+                  </div>
+                  {contextMenuBranchFilter}
+                  <div className={styles.filterContainer}>
+                    <input
+                      className={styles.filterInput}
+                      data-test-id="TestRunsPage-FilterByText-Input"
+                      onChange={event => setFilterByText(event.currentTarget.value)}
+                      placeholder="Filter test runs"
+                      type="text"
+                      value={filterByTextForDisplay}
+                    />
+                    <Icon className={styles.searchIcon} type="search" />
+                  </div>
                 </div>
-                {contextMenuStatusFilter}
                 <div
-                  className={styles.dropdownTrigger}
-                  data-test-id="TestRunsPage-BranchFilter-DropdownTrigger"
-                  onClick={onClickBranchFilter}
-                  onKeyDown={onKeyDownBranchFilter}
-                  tabIndex={0}
+                  className="grow"
+                  data-filtered-by-status={filterByStatus}
+                  data-filtered-by-text={filterByText}
+                  data-test-id="TestRunList"
                 >
-                  {filterByBranch === "all" ? "All branches" : "Only primary branch"}
-                  <Icon className="h-5 w-5" type="chevron-down" />
-                </div>
-                {contextMenuBranchFilter}
-                <div className={styles.filterContainer}>
-                  <input
-                    className={styles.filterInput}
-                    data-test-id="TestRunsPage-FilterByText-Input"
-                    onChange={event => setFilterByText(event.currentTarget.value)}
-                    placeholder="Filter test runs"
-                    type="text"
-                    value={filterByTextForDisplay}
-                  />
-                  <Icon className={styles.searchIcon} type="search" />
+                  <Suspense fallback={<LibrarySpinner />}>{TestRunListComponent}</Suspense>
                 </div>
               </div>
-              <div
-                className="grow"
-                data-filtered-by-status={filterByStatus}
-                data-filtered-by-text={filterByText}
-                data-test-id="TestRunList"
-              >
-                <Suspense fallback={<LibrarySpinner />}>{TestRunListComponent}</Suspense>
-              </div>
-            </div>
-          </Panel>
+            </Panel>
 
-          <PanelResizeHandle className="h-full w-1" />
-          <Panel minSize={20} order={2}>
-            <div className="h-full w-full overflow-hidden rounded-xl">
-              <Suspense fallback={<LibrarySpinner />}>
-                <TestRunOverviewPage />
-              </Suspense>
-            </div>
-          </Panel>
-        </PanelGroup>
+            <PanelResizeHandle className="h-full w-1" />
+            <Panel minSize={20} order={2}>
+              <div className="h-full w-full overflow-hidden rounded-xl">
+                <Suspense fallback={<LibrarySpinner />}>
+                  <TestRunOverviewPage />
+                </Suspense>
+              </div>
+            </Panel>
+          </PanelGroup>
+        </div>
       )}
     </div>
   );
