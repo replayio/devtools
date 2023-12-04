@@ -33,15 +33,9 @@ export function useRedirectToTeam(replace: boolean = false) {
 }
 
 export function replaceRoute(router: NextRouter, relativeURL: string): void {
-  router.replace({
-    pathname: relativeURL,
-    query: router.query,
-  });
+  router.replace({ pathname: relativeURL });
 }
 
 export function pushRoute(router: NextRouter, relativeURL: string): void {
-  router.push({
-    pathname: relativeURL,
-    query: router.query,
-  });
+  router.push({ pathname: relativeURL });
 }
