@@ -3,7 +3,12 @@ import { createCache } from "suspense";
 
 import { GraphQLClientInterface } from "shared/graphql/GraphQLClient";
 import { Recording } from "shared/graphql/types";
-import { TestRun, TestRunTestWithRecordings, processTestRun } from "shared/test-suites/TestRun";
+import {
+  TestRun,
+  TestRunTest,
+  TestRunTestWithRecordings,
+  processTestRun,
+} from "shared/test-suites/TestRun";
 import {
   getTestRunTestsWithRecordingsGraphQL,
   getTestRunsGraphQL,
@@ -67,7 +72,7 @@ export const testRunDetailsCache = createCache<
 
         return {
           ...test,
-          result: test.result as "passed" | "failed" | "flaky",
+          result: test.result as TestRunTest["result"],
           recordings: recs,
         };
       }) ?? [];

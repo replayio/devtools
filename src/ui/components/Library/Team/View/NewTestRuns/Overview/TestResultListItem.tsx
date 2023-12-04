@@ -51,7 +51,7 @@ export function TestResultListItem({
   test,
 }: {
   depth: number;
-  label: "passed" | "failed" | "flaky";
+  label: TestRunTest["result"];
   recording: Recording;
   testRun: TestRun | null;
   test: TestRunTest;
@@ -83,7 +83,8 @@ export function TestResultListItem({
             whileTap={{ scale: 1.0, boxShadow: "0px 0px 1px rgba(0,0,0,0.2)" }}
             transition={{ duration: 0.05 }}
           >
-            <Icon className={styles[label]} type={iconType} />
+            {/* We have class for failed, flaky and passed. Other status will be treated as failed (skipped, timedOut, unknown) */}
+            <Icon className={styles[label] ?? styles.failed} type={iconType} />
           </motion.div>
         </div>
       </div>
