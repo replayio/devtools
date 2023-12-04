@@ -12,9 +12,11 @@ import { TestRunsContext, TestRunsContextRoot } from "./TestRunsContextRoot";
 import styles from "./TestRunsPage.module.css";
 
 export function TestRunsPage() {
+  const { component: TestRunListComponent } = TestRunList();
+
   return (
     <TestRunsContextRoot>
-      <TestRunsContent />
+      <TestRunsContent TestRunListComponent={TestRunListComponent} />
     </TestRunsContextRoot>
   );
 }
