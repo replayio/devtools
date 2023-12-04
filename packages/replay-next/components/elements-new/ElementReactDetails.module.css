@@ -1,0 +1,36 @@
+.Details {
+  flex: 0 0 auto;
+  padding: 0 1ch;
+  height: 1.75rem;
+  line-height: 1.5rem;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  cursor: pointer;
+  user-select: none;
+
+  background-color: var(--theme-toolbar-background);
+  color: var(--tab-color);
+  border-top: 0.25rem solid var(--chrome);
+  font-family: var(--monospace-font-family);
+  font-size: var(--theme-code-font-size);
+}
+.Details:hover .ComponentName {
+  text-decoration: underline;
+}
+
+.ComponentName {
+  color: var(--color-brand-react);
+}
+
+.ReactIcon,
+.ViewComponentIcon {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+}
+.ReactIcon {
+  color: var(--color-brand-react);
+}

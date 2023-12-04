@@ -48,24 +48,26 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/playwright@npm:^1.0.20":
-  version: 1.0.20
-  resolution: "@replayio/playwright@npm:1.0.20"
+"@replayio/playwright@npm:2.0.0-alpha.8":
+  version: 2.0.0-alpha.8
+  resolution: "@replayio/playwright@npm:2.0.0-alpha.8"
   dependencies:
-    "@replayio/replay": ^0.17.3
-    "@replayio/test-utils": ^1.1.10
+    "@replayio/replay": ^0.19.4
+    "@replayio/test-utils": ^1.3.6
+    debug: ^4.3.4
     uuid: ^8.3.2
+    ws: ^8.13.0
   peerDependencies:
     "@playwright/test": 1.19.x
   bin:
     replayio-playwright: bin/replayio-playwright.js
-  checksum: e969c93a869e3665c5d798a17c00255f3862d22c4bf88d7ca5790258869aac107747d0d66efe7d82074bfa079f86c3489d0ee7be4e8c7e08fa7e6a1fb324f337
+  checksum: 6303e469941c547cc0e1de772b7440151d155f55184010c2af238339dabdbac5a612c1f375c135e602a1c1fa69acc1e9755cd783741156fb8cd29e0933881dcb
   languageName: node
   linkType: hard
 
-"@replayio/replay@npm:^0.17.3":
-  version: 0.17.3
-  resolution: "@replayio/replay@npm:0.17.3"
+"@replayio/replay@npm:^0.19.4":
+  version: 0.19.4
+  resolution: "@replayio/replay@npm:0.19.4"
   dependencies:
     "@replayio/sourcemap-upload": ^1.1.1
     commander: ^7.2.0
@@ -79,7 +81,7 @@ __metadata:
     ws: ^7.5.0
   bin:
     replay: bin/replay.js
-  checksum: 0d29e65924c184eab7c6a6d113b33732ec14077524cf4f700d4ea897cc8f0dc9e190e6babe5db6efebcfb73fb0f966354476a28d6d97e8de8674408f313c67d9
+  checksum: 40338b0f4e850535b2a22e35461ab6dffe22ab8ab0aa439e886f392779f43eb16efa53f9e2ca1a621eaf2b494a39c0271e6d090ffe76be3f9a407f64f64d6c02
   languageName: node
   linkType: hard
 
@@ -96,16 +98,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/test-utils@npm:^1.1.10":
-  version: 1.1.10
-  resolution: "@replayio/test-utils@npm:1.1.10"
+"@replayio/test-utils@npm:^1.3.6":
+  version: 1.3.6
+  resolution: "@replayio/test-utils@npm:1.3.6"
   dependencies:
-    "@replayio/replay": ^0.17.3
-    "@types/node-fetch": ^2.6.2
+    "@replayio/replay": ^0.19.4
     debug: ^4.3.4
     node-fetch: ^2.6.7
     uuid: ^8.3.2
-  checksum: 370283c07e21bdc3372e27fde215c75f7714c67b20d290b5cb18a61235b3e70d01ee33abed8157ba1cd1d0edddb91cddb6d81856b17aac9435f20e750b415a6b
+  checksum: b60028f804f5d8c6f7840b1b8a11728a75fc10cb9f36d00de75d327663eda13d07efa4fc5b7098a5168f772f74cb38dfaf773ced7123d7fee753b884e4278133
   languageName: node
   linkType: hard
 
@@ -113,16 +114,6 @@ __metadata:
   version: 2.0.0
   resolution: "@tootallnate/once@npm:2.0.0"
   checksum: ad87447820dd3f24825d2d947ebc03072b20a42bfc96cbafec16bff8bbda6c1a81fcb0be56d5b21968560c5359a0af4038a68ba150c3e1694fe4c109a063bed8
-  languageName: node
-  linkType: hard
-
-"@types/node-fetch@npm:^2.6.2":
-  version: 2.6.2
-  resolution: "@types/node-fetch@npm:2.6.2"
-  dependencies:
-    "@types/node": "*"
-    form-data: ^3.0.0
-  checksum: 6f73b1470000d303d25a6fb92875ea837a216656cb7474f66cdd67bb014aa81a5a11e7ac9c21fe19bee9ecb2ef87c1962bceeaec31386119d1ac86e4c30ad7a6
   languageName: node
   linkType: hard
 
@@ -200,13 +191,6 @@ __metadata:
     delegates: ^1.0.0
     readable-stream: ^3.6.0
   checksum: 52590c24860fa7173bedeb69a4c05fb573473e860197f618b9a28432ee4379049336727ae3a1f9c4cb083114601c1140cee578376164d0e651217a9843f9fe83
-  languageName: node
-  linkType: hard
-
-"asynckit@npm:^0.4.0":
-  version: 0.4.0
-  resolution: "asynckit@npm:0.4.0"
-  checksum: 7b78c451df768adba04e2d02e63e2d0bf3b07adcd6e42b4cf665cb7ce899bedd344c69a1dcbce355b5f972d597b25aaa1c1742b52cffd9caccb22f348114f6be
   languageName: node
   linkType: hard
 
@@ -328,15 +312,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"combined-stream@npm:^1.0.8":
-  version: 1.0.8
-  resolution: "combined-stream@npm:1.0.8"
-  dependencies:
-    delayed-stream: ~1.0.0
-  checksum: 49fa4aeb4916567e33ea81d088f6584749fc90c7abec76fd516bf1c5aa5c79f3584b5ba3de6b86d26ddd64bae5329c4c7479343250cfe71c75bb366eae53bb7c
-  languageName: node
-  linkType: hard
-
 "commander@npm:^7.2.0":
   version: 7.2.0
   resolution: "commander@npm:7.2.0"
@@ -377,13 +352,6 @@ __metadata:
     has-property-descriptors: ^1.0.0
     object-keys: ^1.1.1
   checksum: e60aee6a19b102df4e2b1f301816804e81ab48bb91f00d0d935f269bf4b3f79c88b39e4f89eaa132890d23267335fd1140dfcd8d5ccd61031a0a2c41a54e33a6
-  languageName: node
-  linkType: hard
-
-"delayed-stream@npm:~1.0.0":
-  version: 1.0.0
-  resolution: "delayed-stream@npm:1.0.0"
-  checksum: 46fe6e83e2cb1d85ba50bd52803c68be9bd953282fa7096f51fc29edd5d67ff84ff753c51966061e5ba7cb5e47ef6d36a91924eddb7f3f3483b1c560f77a0020
   languageName: node
   linkType: hard
 
@@ -500,17 +468,6 @@ __metadata:
   dependencies:
     is-callable: ^1.1.3
   checksum: 6c48ff2bc63362319c65e2edca4a8e1e3483a2fabc72fbe7feaf8c73db94fc7861bd53bc02c8a66a0c1dd709da6b04eec42e0abdd6b40ce47305ae92a25e5d28
-  languageName: node
-  linkType: hard
-
-"form-data@npm:^3.0.0":
-  version: 3.0.1
-  resolution: "form-data@npm:3.0.1"
-  dependencies:
-    asynckit: ^0.4.0
-    combined-stream: ^1.0.8
-    mime-types: ^2.1.12
-  checksum: b019e8d35c8afc14a2bd8a7a92fa4f525a4726b6d5a9740e8d2623c30e308fbb58dc8469f90415a856698933c8479b01646a9dff33c87cc4e76d72aedbbf860d
   languageName: node
   linkType: hard
 
@@ -1024,22 +981,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mime-db@npm:1.52.0":
-  version: 1.52.0
-  resolution: "mime-db@npm:1.52.0"
-  checksum: 0d99a03585f8b39d68182803b12ac601d9c01abfa28ec56204fa330bc9f3d1c5e14beb049bafadb3dbdf646dfb94b87e24d4ec7b31b7279ef906a8ea9b6a513f
-  languageName: node
-  linkType: hard
-
-"mime-types@npm:^2.1.12":
-  version: 2.1.35
-  resolution: "mime-types@npm:2.1.35"
-  dependencies:
-    mime-db: 1.52.0
-  checksum: 89a5b7f1def9f3af5dad6496c5ed50191ae4331cc5389d7c521c8ad28d5fdad2d06fd81baf38fed813dc4e46bb55c8145bb0ff406330818c9cf712fb2e9b3836
-  languageName: node
-  linkType: hard
-
 "minimatch@npm:^3.1.1":
   version: 3.1.2
   resolution: "minimatch@npm:3.1.2"
@@ -1539,7 +1480,7 @@ __metadata:
   resolution: "tests@workspace:."
   dependencies:
     "@playwright/test": ^1.35.0
-    "@replayio/playwright": ^1.0.20
+    "@replayio/playwright": 2.0.0-alpha.8
     chalk: ^4
   languageName: unknown
   linkType: soft
@@ -1698,6 +1639,21 @@ __metadata:
     utf-8-validate:
       optional: true
   checksum: c3c100a181b731f40b7f2fddf004aa023f79d64f489706a28bc23ff88e87f6a64b3c6651fbec3a84a53960b75159574d7a7385709847a62ddb7ad6af76f49138
+  languageName: node
+  linkType: hard
+
+"ws@npm:^8.13.0":
+  version: 8.14.2
+  resolution: "ws@npm:8.14.2"
+  peerDependencies:
+    bufferutil: ^4.0.1
+    utf-8-validate: ">=5.0.2"
+  peerDependenciesMeta:
+    bufferutil:
+      optional: true
+    utf-8-validate:
+      optional: true
+  checksum: 3ca0dad26e8cc6515ff392b622a1467430814c463b3368b0258e33696b1d4bed7510bc7030f7b72838b9fdeb8dbd8839cbf808367d6aae2e1d668ce741d4308b
   languageName: node
   linkType: hard
 
