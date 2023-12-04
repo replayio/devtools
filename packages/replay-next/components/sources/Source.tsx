@@ -94,6 +94,13 @@ function SourceRenderer({
     trackEventOnce("editor.mouse_over");
   };
 
+  function dismissPopup() {
+    // Mouse-out should immediately cancel any pending actions.
+    // This avoids race cases where we might show a popup after the mouse has moused away.
+    setHoverStateDebounced.cancel();
+    setHoveredState(null);
+  }
+
   const onMouseMove = (event: MouseEvent) => {
     const { clientX, clientY, defaultPrevented, target } = event;
 
@@ -128,10 +135,7 @@ function SourceRenderer({
       }
     }
 
-    // Mouse-out should immediately cancel any pending actions.
-    // This avoids race cases where we might show a popup after the mouse has moused away.
-    setHoverStateDebounced.cancel();
-    setHoveredState(null);
+    dismissPopup();
   };
 
   return (
@@ -142,6 +146,7 @@ function SourceRenderer({
       data-test-source-contents-status={sourceContentsStatus}
       data-test-source-id={source.sourceId}
       onMouseEnter={trackMouseHover}
+      onMouseLeave={dismissPopup}
     >
       <div className={styles.SourceList} onMouseMove={onMouseMove} ref={sourceRef}>
         <AutoSizer
