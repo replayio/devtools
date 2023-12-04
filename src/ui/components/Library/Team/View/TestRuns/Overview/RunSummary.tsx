@@ -113,7 +113,7 @@ function PullRequestLink({ testRun }: { testRun: TestRun }) {
   );
 }
 
-function RunnerLink({ testRun }: { testRun: TestRun }) {
+export function RunnerLink({ testRun }: { testRun: TestRun }) {
   if (!testRun.source?.triggerUrl) {
     return null;
   }
