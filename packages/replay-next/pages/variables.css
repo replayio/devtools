@@ -234,6 +234,7 @@
   --border-color-elements-subtree: var(--background-color-contrast-1);
 
   --color-brand: #02acfd;
+  --color-brand-react: #ae87f2;
   --color-contrast: #081121;
   --color-current: #f02d5e;
   --color-default: #ffffff;
@@ -766,6 +767,7 @@
   --border-color-elements-subtree: var(--background-color-contrast-3);
 
   --color-brand: #05acfd;
+  --color-brand-react: #8c65d0;
   --color-contrast: #ffffff;
   --color-current: #f02d5e;
   --color-default: #223344;
