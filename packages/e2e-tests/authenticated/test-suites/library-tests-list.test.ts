@@ -61,14 +61,14 @@ test(`authenticated/test-suites/library-tests-list`, async ({ page }) => {
   const testRetriesLocator = findTestRecordingsInTree(flakyGroup, { title: "comments-02.test.ts" });
   await expect(await testRetriesLocator.count()).toBe(8);
   await fileNodeLocator.click();
-  await expect(await fileNodeLocator.textContent()).toContain("8 tests");
+  await expect(await fileNodeLocator.textContent()).toContain("8 replays");
   await fileNodeLocator.click();
-  await expect(await fileNodeLocator.textContent()).not.toContain("8 tests");
+  await expect(await fileNodeLocator.textContent()).not.toContain("8 replays");
 
   // Verify folders contain tests and can be collapsed
   const pathNodeLocator = findTestRecordingsTreePathNodes(flakyGroup, { text: "authenticated" });
   await pathNodeLocator.click();
-  await expect(await pathNodeLocator.textContent()).toContain("16 tests");
+  await expect(await pathNodeLocator.textContent()).toContain("3 tests");
   await pathNodeLocator.click();
-  await expect(await pathNodeLocator.textContent()).not.toContain("16 tests");
+  await expect(await pathNodeLocator.textContent()).not.toContain("3 tests");
 });

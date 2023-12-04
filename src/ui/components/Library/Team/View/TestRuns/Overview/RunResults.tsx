@@ -17,7 +17,7 @@ import {
   useFileNameTree,
 } from "ui/components/Library/Team/View/TestRuns/Overview/useFileNameTree";
 import { TestRunsContext } from "ui/components/Library/Team/View/TestRuns/TestRunsContextRoot";
-import { TestGroup, testFailed } from "ui/utils/testRuns";
+import { TestGroup } from "ui/utils/testRuns";
 
 import { TestResultListItem } from "./TestResultListItem";
 import styles from "../../../../Library.module.css";
@@ -137,7 +137,7 @@ const FileNodeRenderer = memo(function FileNodeRenderer({
   label: string;
   fileNode: FileNode;
 }) {
-  const { name, tests } = fileNode;
+  const { name, tests, nestedRecordingCount } = fileNode;
 
   const [expanded, setExpanded] = useState(true);
 
@@ -156,7 +156,11 @@ const FileNodeRenderer = memo(function FileNodeRenderer({
       >
         <Icon className="h-5 w-5 shrink-0" type="file" />
         <div className="truncate">{name}</div>
-        {!expanded && <div className="text-xs text-bodySubColor">({tests.length} tests)</div>}
+        {!expanded && (
+          <div className="text-xs text-bodySubColor">
+            ({nestedRecordingCount} {nestedRecordingCount === 1 ? "replay" : "replays"})
+          </div>
+        )}
       </div>
       <Offscreen mode={expanded ? "visible" : "hidden"}>
         {tests.flatMap(test =>
@@ -226,7 +230,9 @@ function PathNodeRenderer({
           <Icon className="h-5 w-5 shrink-0" type={expanded ? "folder-open" : "folder-closed"} />
           <div className="flex items-center gap-1 truncate">{formattedNames}</div>
           {!expanded && (
-            <div className="text-xs text-bodySubColor">({pathNode.nestedRecordingCount} tests)</div>
+            <div className="text-xs text-bodySubColor">
+              ({pathNode.nestedTestCount} {pathNode.nestedTestCount === 1 ? "test" : "tests"})
+            </div>
           )}
         </div>
       )}
