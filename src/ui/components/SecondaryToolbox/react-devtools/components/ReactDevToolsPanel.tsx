@@ -3,6 +3,7 @@ import {
   KeyboardEvent,
   Suspense,
   useContext,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -28,6 +29,7 @@ import { SelectedElementLoader } from "ui/components/SecondaryToolbox/react-devt
 import { useReactDevToolsAnnotations } from "ui/components/SecondaryToolbox/react-devtools/hooks/useReactDevToolsAnnotations";
 import { useReplayWall } from "ui/components/SecondaryToolbox/react-devtools/hooks/useReplayWall";
 import { ReactDevToolsListData } from "ui/components/SecondaryToolbox/react-devtools/ReactDevToolsListData";
+import { getDefaultSelectedReactElementId } from "ui/reducers/app";
 import { getRecordingTooLongToSupportRoutines } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
 import {
@@ -75,6 +77,8 @@ function ReactDevToolsPanelInner({
   const [protocolCheckFailed, setProtocolCheckFailed] = useState(false);
   const showRecordingTooLongWarning = useAppSelector(getRecordingTooLongToSupportRoutines);
 
+  const defaultSelectedReactElementId = useAppSelector(getDefaultSelectedReactElementId);
+
   const leftPanelRef = useRef<ImperativePanelHandle>(null);
   const rightPanelRef = useRef<ImperativePanelHandle>(null);
 
@@ -83,6 +87,12 @@ function ReactDevToolsPanelInner({
   });
 
   const listData = useMemo(() => new ReactDevToolsListData(store), [store]);
+
+  useLayoutEffect(() => {
+    if (listData != null) {
+      listData.setDefaultSelectedElementId(defaultSelectedReactElementId);
+    }
+  }, [defaultSelectedReactElementId, listData]);
 
   const selectedIndex = useSyncExternalStore(
     listData ? listData.subscribeToSelectedIndex : () => () => {},

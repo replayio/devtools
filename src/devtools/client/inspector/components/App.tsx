@@ -5,10 +5,14 @@ import ComputedApp from "devtools/client/inspector/computed/components/ComputedA
 import LayoutApp from "devtools/client/inspector/layout/components/LayoutApp";
 import { ElementsPanelAdapter } from "devtools/client/inspector/markup/components/ElementsPanelAdapter";
 import { RulesPanel } from "devtools/client/inspector/markup/components/rules";
+import { getSelectedNodeId } from "devtools/client/inspector/markup/selectors/markup";
+import { ElementReactDetails } from "replay-next/components/elements-new/ElementReactDetails";
 import { useIsPointWithinFocusWindow } from "replay-next/src/hooks/useIsPointWithinFocusWindow";
 import { useMostRecentLoadedPause } from "replay-next/src/hooks/useMostRecentLoadedPause";
 import { ActiveInspectorTab } from "shared/user-data/GraphQL/config";
+import { setSelectedPanel } from "ui/actions/layout";
 import { enterFocusMode } from "ui/actions/timeline";
+import { setDefaultSelectedReactElementId } from "ui/reducers/app";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 import { ResponsiveTabs, Tab } from "../../shared/components/ResponsiveTabs";
@@ -34,6 +38,7 @@ export default function InspectorApp() {
   const dispatch = useAppDispatch();
   const activeTab = useAppSelector(state => state.inspector.activeTab);
   const { point } = useMostRecentLoadedPause() ?? {};
+  const selectedNodeId = useAppSelector(getSelectedNodeId);
 
   const [collapsedLeft, setCollapsedLeft] = useState(false);
   const [collapsedRight, setCollapsedRight] = useState(false);
@@ -50,6 +55,11 @@ export default function InspectorApp() {
       </div>
     );
   }
+
+  const viewReactComponent = (id: number) => {
+    dispatch(setDefaultSelectedReactElementId(id));
+    dispatch(setSelectedPanel("react-components"));
+  };
 
   let resizeHandleClassName = styles.ResizeHandle;
   if (collapsedLeft) {
@@ -108,6 +118,12 @@ export default function InspectorApp() {
                   </div>
                 </div>
               </div>
+              {selectedNodeId && (
+                <ElementReactDetails
+                  nodeId={selectedNodeId}
+                  viewReactComponent={viewReactComponent}
+                />
+              )}
             </div>
           </Panel>
         </PanelGroup>

@@ -6,6 +6,7 @@ import { ReactElement } from "ui/components/SecondaryToolbox/react-devtools/type
 
 export class ReactDevToolsListData extends GenericListData<ReactElement> {
   private collapsedFiberIds: Set<number> = new Set();
+  private defaultSelectedElementId: number | null = null;
   private store: StoreWithInternals;
 
   constructor(store: StoreWithInternals) {
@@ -38,10 +39,25 @@ export class ReactDevToolsListData extends GenericListData<ReactElement> {
 
     this.invalidate();
 
-    if (selectedElement) {
+    const defaultSelectedElementId = this.defaultSelectedElementId;
+    if (defaultSelectedElementId !== null) {
+      const element = this.getItemById(defaultSelectedElementId);
+      this.selectElement(element);
+    } else if (selectedElement) {
       this.selectElement(selectedElement);
     } else if (this.getItemCount() > 0) {
       this.setSelectedIndex(0);
+    }
+  }
+
+  setDefaultSelectedElementId(defaultSelectedElementId: number | null) {
+    this.defaultSelectedElementId = defaultSelectedElementId;
+
+    if (defaultSelectedElementId !== null) {
+      const element = this.getItemById(defaultSelectedElementId);
+      if (element) {
+        this.selectElement(element);
+      }
     }
   }
 

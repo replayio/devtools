@@ -30,7 +30,8 @@ export function ViewContextRoot({
   // Initialize the view to whatever the appropriate default view is for that team.
   useEffect(() => {
     if (!view) {
-      pushRoute(router, `${router.asPath}/${defaultView}`);
+      const currentPath = new URL(window.location.origin + router.asPath).pathname;
+      pushRoute(router, `${currentPath}/${defaultView}`);
     }
   }, [view, router, defaultView]);
 

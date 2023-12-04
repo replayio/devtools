@@ -33,15 +33,17 @@ export function useRedirectToTeam(replace: boolean = false) {
 }
 
 export function replaceRoute(router: NextRouter, relativeURL: string): void {
+  const search = new URL(window.location.origin + router.asPath).search;
   router.replace({
     pathname: relativeURL,
-    query: router.query,
+    search,
   });
 }
 
 export function pushRoute(router: NextRouter, relativeURL: string): void {
+  const search = new URL(window.location.origin + router.asPath).search;
   router.push({
     pathname: relativeURL,
-    query: router.query,
+    search,
   });
 }
