@@ -34,21 +34,24 @@ export function TestRunList() {
 
   const itemCount = Math.min(countToRender + 1, testRuns.length);
 
-  return (
-    <ReactVirtualizedAutoSizer
-      children={({ height, width }) => (
-        <FixedSizeList
-          children={TestRunListRow}
-          className="no-scrollbar text-sm"
-          height={height}
-          itemCount={itemCount}
-          itemData={itemData}
-          itemSize={ROW_HEIGHT}
-          width={width}
-        />
-      )}
-    />
-  );
+  return {
+    itemCount,
+    component: (
+      <ReactVirtualizedAutoSizer
+        children={({ height, width }) => (
+          <FixedSizeList
+            children={TestRunListRow}
+            className="no-scrollbar text-sm"
+            height={height}
+            itemCount={itemCount}
+            itemData={itemData}
+            itemSize={ROW_HEIGHT}
+            width={width}
+          />
+        )}
+      />
+    ),
+  };
 }
 
 function TestRunListRow({ data, index, style }: ListChildComponentProps<ItemData>) {

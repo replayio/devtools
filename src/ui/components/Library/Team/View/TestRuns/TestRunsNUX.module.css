@@ -1,0 +1,126 @@
+.container {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+}
+
+.backgroundImage {
+  height: 100vh;
+  width: 50%;
+  background-image: url("https://www.enthusiasticpanther.com/show-art/show322.png");
+  background-size: cover;
+}
+
+.form-container {
+  max-width: 600px;
+  margin: 0 auto;
+  width: 50%;
+  overflow: auto;
+  max-height: 100vh;
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Style the input and select fields */
+.input-style,
+.select-style,
+.textarea-style {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+/* Modify the select arrow to match the design */
+.select-style {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url('data:image/svg+xml;charset=US-ASCII,<svg width="12" height="12" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><path d="M6.707 8.707a1 1 0 0 1-1.414 0L2.293 5.707A1 1 0 0 1 3.707 4.293L6 6.586l2.293-2.293a1 1 0 1 1 1.414 1.414l-3 3z" fill="%23999" fill-rule="evenodd"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 10px top 50%;
+  background-size: 12px 12px;
+}
+
+/* Style the buttons */
+.button-style {
+  display: inline-block;
+  padding: 10px 20px;
+  background: #5cb85c;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.button-style:hover {
+  background: #4cae4c;
+}
+
+/* Style the horizontal rule to match the design */
+hr.default {
+  border: none;
+  border-top: 2px solid #eee;
+  margin: 20px 0;
+}
+
+/* Style the instructions list */
+
+.instructions {
+  font-size: 16px;
+  margin-bottom: 2rem;
+}
+
+.instructions h1 {
+  font-size: 20px;
+  font-weight: 800;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.instructions-list {
+  list-style: none;
+  padding: 0;
+}
+
+.instructions-list li {
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+/* Style the headings */
+h1.default {
+  font-size: 24px;
+  color: #333;
+}
+
+/* Add a little space before each section header */
+.section-header {
+  padding-top: 20px;
+}
+
+/* Add a special style to the numbered steps */
+.step-number {
+  font-weight: 500;
+}
+
+/* Optional: Add a responsive breakpoint */
+@media (max-width: 768px) {
+  .form-container {
+    padding: 10px;
+  }
+
+  .input-style,
+  .select-style,
+  .textarea-style {
+    padding: 8px;
+  }
+
+  h1.default {
+    font-size: 20px;
+  }
+}

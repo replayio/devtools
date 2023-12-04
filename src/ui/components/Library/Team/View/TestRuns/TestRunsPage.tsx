@@ -4,6 +4,7 @@ import { ContextMenuItem, useContextMenu } from "use-context-menu";
 
 import Icon from "replay-next/components/Icon";
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
+import TestRunsNUX from "ui/components/Library/Team/View/TestRuns/TestRunsNUX";
 
 import { TestRunOverviewPage } from "./Overview/TestRunOverviewContextRoot";
 import { TestRunList } from "./TestRunList";
@@ -18,7 +19,11 @@ export function TestRunsPage() {
   );
 }
 
-function TestRunsContent() {
+type TestRunsContentProps = {
+  TestRunListComponent: React.ReactNode;
+};
+
+function TestRunsContent({ TestRunListComponent }: TestRunsContentProps) {
   const {
     filterByBranch,
     filterByStatus,
@@ -28,6 +33,8 @@ function TestRunsContent() {
     setFilterByStatus,
     setFilterByText,
   } = useContext(TestRunsContext);
+
+  const { itemCount, component: TestRunListComp } = TestRunList();
 
   const {
     contextMenu: contextMenuStatusFilter,
@@ -66,66 +73,68 @@ function TestRunsContent() {
 
   return (
     <div className="flex w-full flex-grow flex-row p-2">
-      <PanelGroup autoSaveId="Library:TestRuns" direction="horizontal">
-        <Panel minSize={20} order={1}>
-          <div className="flex h-full w-full flex-col overflow-hidden rounded-xl bg-bodyBgcolor">
-            <div className="flex flex-row items-center justify-between gap-2 border-b border-themeBorder bg-bodyBgcolor p-2">
-              <div
-                className={styles.dropdownTrigger}
-                data-test-id="TestRunsPage-ResultFilter-DropdownTrigger"
-                onClick={onClickStatusFilter}
-                onKeyDown={onKeyDownStatusFilter}
-                tabIndex={0}
-              >
-                {filterByStatus === "all" ? "All runs" : "Only failures"}
-                <Icon className="h-5 w-5" type="chevron-down" />
+      {itemCount === 0 ? (
+        <TestRunsNUX />
+      ) : (
+        <PanelGroup autoSaveId="Library:TestRuns" direction="horizontal">
+          <Panel minSize={20} order={1}>
+            <div className="flex h-full w-full flex-col overflow-hidden rounded-xl bg-bodyBgcolor">
+              <div className="flex flex-row items-center justify-between gap-2 border-b border-themeBorder bg-bodyBgcolor p-2">
+                <div
+                  className={styles.dropdownTrigger}
+                  data-test-id="TestRunsPage-ResultFilter-DropdownTrigger"
+                  onClick={onClickStatusFilter}
+                  onKeyDown={onKeyDownStatusFilter}
+                  tabIndex={0}
+                >
+                  {filterByStatus === "all" ? "All runs" : "Only failures"}
+                  <Icon className="h-5 w-5" type="chevron-down" />
+                </div>
+                {contextMenuStatusFilter}
+                <div
+                  className={styles.dropdownTrigger}
+                  data-test-id="TestRunsPage-BranchFilter-DropdownTrigger"
+                  onClick={onClickBranchFilter}
+                  onKeyDown={onKeyDownBranchFilter}
+                  tabIndex={0}
+                >
+                  {filterByBranch === "all" ? "All branches" : "Only primary branch"}
+                  <Icon className="h-5 w-5" type="chevron-down" />
+                </div>
+                {contextMenuBranchFilter}
+                <div className={styles.filterContainer}>
+                  <input
+                    className={styles.filterInput}
+                    data-test-id="TestRunsPage-FilterByText-Input"
+                    onChange={event => setFilterByText(event.currentTarget.value)}
+                    placeholder="Filter test runs"
+                    type="text"
+                    value={filterByTextForDisplay}
+                  />
+                  <Icon className={styles.searchIcon} type="search" />
+                </div>
               </div>
-              {contextMenuStatusFilter}
               <div
-                className={styles.dropdownTrigger}
-                data-test-id="TestRunsPage-BranchFilter-DropdownTrigger"
-                onClick={onClickBranchFilter}
-                onKeyDown={onKeyDownBranchFilter}
-                tabIndex={0}
+                className="grow"
+                data-filtered-by-status={filterByStatus}
+                data-filtered-by-text={filterByText}
+                data-test-id="TestRunList"
               >
-                {filterByBranch === "all" ? "All branches" : "Only primary branch"}
-                <Icon className="h-5 w-5" type="chevron-down" />
-              </div>
-              {contextMenuBranchFilter}
-              <div className={styles.filterContainer}>
-                <input
-                  className={styles.filterInput}
-                  data-test-id="TestRunsPage-FilterByText-Input"
-                  onChange={event => setFilterByText(event.currentTarget.value)}
-                  placeholder="Filter test runs"
-                  type="text"
-                  value={filterByTextForDisplay}
-                />
-                <Icon className={styles.searchIcon} type="search" />
+                <Suspense fallback={<LibrarySpinner />}>{TestRunListComponent}</Suspense>
               </div>
             </div>
-            <div
-              className="grow"
-              data-filtered-by-status={filterByStatus}
-              data-filtered-by-text={filterByText}
-              data-test-id="TestRunList"
-            >
+          </Panel>
+
+          <PanelResizeHandle className="h-full w-1" />
+          <Panel minSize={20} order={2}>
+            <div className="h-full w-full overflow-hidden rounded-xl">
               <Suspense fallback={<LibrarySpinner />}>
-                <TestRunList />
+                <TestRunOverviewPage />
               </Suspense>
             </div>
-          </div>
-        </Panel>
-
-        <PanelResizeHandle className="h-full w-1" />
-        <Panel minSize={20} order={2}>
-          <div className="h-full w-full overflow-hidden rounded-xl">
-            <Suspense fallback={<LibrarySpinner />}>
-              <TestRunOverviewPage />
-            </Suspense>
-          </div>
-        </Panel>
-      </PanelGroup>
+          </Panel>
+        </PanelGroup>
+      )}
     </div>
   );
 }
