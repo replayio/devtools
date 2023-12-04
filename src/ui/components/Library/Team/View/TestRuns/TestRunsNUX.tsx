@@ -63,7 +63,7 @@ module.exports = defineConfig({
           </p>
         </div>
         <h1>Team name</h1>
-        <input type="text" placeholder="Testsuites dashboard" className={styles["input-style"]} />
+        <input type="text" value="Testsuites dashboard" className={styles["input-style"]} />
 
         <label htmlFor="test-runner" className={styles["section-header"]}>
           Test runner
