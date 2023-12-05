@@ -8,18 +8,20 @@ import { RunSummary } from "./RunSummary";
 import styles from "../../../../Library.module.css";
 
 export function TestRunOverviewContent() {
-  const { filterByStatus, filterByText, testRunId, testRunIdForDisplay, testRuns } =
-    useContext(TestRunsContext);
+  const {
+    filterByStatus,
+    filterByText,
+    testRunId,
+    testRunIdForDisplay,
+    testRuns,
+    filterTestsByText,
+    setFilterTestsByText,
+  } = useContext(TestRunsContext);
 
   const { recordings, durationMs } = useTestRunDetailsSuspends(testRunId);
   const [filterCurrentRunByStatus, setFilterCurrentRunByStatus] = useState<
     "all" | "failed-and-flaky"
   >("all");
-  const [testFilterByText, setTestFilterByText] = useState("");
-
-  useEffect(() => {
-    setTestFilterByText("");
-  }, [testRunId]);
 
   const isPending = testRunId !== testRunIdForDisplay;
 
@@ -35,14 +37,14 @@ export function TestRunOverviewContent() {
             isPending={isPending}
             testRun={testRun}
             durationMs={durationMs}
-            setTestFilterByText={setTestFilterByText}
-            testFilterByText={testFilterByText}
+            setTestFilterByText={setFilterTestsByText}
+            testFilterByText={filterTestsByText}
             setFilterCurrentRunByStatus={setFilterCurrentRunByStatus}
             filterCurrentRunByStatus={filterCurrentRunByStatus}
           />
           <RunResults
             isPending={isPending}
-            testFilterByText={testFilterByText}
+            testFilterByText={filterTestsByText}
             filterCurrentRunByStatus={filterCurrentRunByStatus}
           />
         </>

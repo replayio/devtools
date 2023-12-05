@@ -8,12 +8,18 @@ import { TestResultListItem } from "./Overview/TestResultListItem";
 import { TestRunsContext } from "./TestRunsContextRoot";
 
 export function TestRunSpecDetails() {
-  const { spec } = useContext(TestRunsContext);
+  const { spec, filterTestsByText } = useContext(TestRunsContext);
   const { testRunId } = useContext(TestRunsContext);
 
   const { groupedTests, tests, testRun } = useTestRunDetailsSuspends(testRunId);
-  const selectedSpecTests = tests?.filter((t: any) => t.sourcePath === spec) ?? [];
-  const selectedTest = selectedSpecTests[0];
+  const selectedSpecTests =
+    // Select tests that not filtered in second panel
+    tests
+      ?.filter(
+        t => filterTestsByText === "" || t.sourcePath.toLowerCase().includes(filterTestsByText)
+      )
+      ?.filter((t: any) => t.sourcePath === spec) ?? [];
+  const selectedTest = selectedSpecTests?.[0];
 
   if (!spec) {
     return (

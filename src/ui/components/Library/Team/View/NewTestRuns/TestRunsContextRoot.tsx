@@ -20,10 +20,12 @@ type TestRunsContextType = {
   filterByStatus: "all" | "failed";
   filterByText: string;
   filterByTextForDisplay: string;
+  filterTestsByText: string;
   selectTestRun: Dispatch<SetStateAction<string | null>>;
   setFilterByBranch: Dispatch<SetStateAction<"all" | "primary">>;
   setFilterByStatus: Dispatch<SetStateAction<"all" | "failed">>;
   setFilterByText: Dispatch<SetStateAction<string>>;
+  setFilterTestsByText: Dispatch<SetStateAction<string>>;
   testRuns: TestRun[];
   testRunId: string | null;
   testRunIdForDisplay: string | null;
@@ -79,6 +81,7 @@ export function TestRunsContextRoot({ children }: { children: ReactNode }) {
 
   const [filterByText, setFilterByText] = useState("");
   const filterByTextDeferred = useDeferredValue(filterByText);
+  const [filterTestsByText, setFilterTestsByText] = useState("");
 
   const [spec, setSpec] = useState<string | null>(null);
 
@@ -133,6 +136,10 @@ export function TestRunsContextRoot({ children }: { children: ReactNode }) {
     }
   }, [router, teamId, testRunId, testRuns]);
 
+  useEffect(() => {
+    setFilterTestsByText("");
+  }, [testRunId]);
+
   useSyncTestRunIdToUrl(teamId, testRunId, setTestRunId);
 
   const deferredTestRunId = useDeferredValue(testRunId);
@@ -144,10 +151,12 @@ export function TestRunsContextRoot({ children }: { children: ReactNode }) {
         filterByStatus,
         filterByText: filterByTextDeferred,
         filterByTextForDisplay: filterByText,
+        filterTestsByText,
         selectTestRun: setTestRunId,
         setFilterByBranch,
         setFilterByStatus,
         setFilterByText,
+        setFilterTestsByText,
         testRunId: deferredTestRunId,
         testRunIdForDisplay: testRunId,
         testRuns: filteredTestRuns,
