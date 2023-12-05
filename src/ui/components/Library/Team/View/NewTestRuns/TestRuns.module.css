@@ -63,14 +63,14 @@
   background-color: var(--testsuites-v2-flaky-icon);
 }
 
-.failedHeader {
+.testStatusHeader[data-status="Failed"] {
   color: var(--testsuites-v2-failed-header);
 }
 
-.successHeader {
+.testStatusHeader[data-status="Passed"] {
   color: var(--testsuites-v2-success-header);
 }
 
-.flakyHeader {
+.testStatusHeader[data-status="Flaky"] {
   color: var(--testsuites-v2-flaky-header);
 }

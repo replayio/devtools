@@ -51,7 +51,7 @@ export function TestRunOverviewContent() {
   }
 
   return (
-    <div className={`flex h-full flex-col p-2 text-sm transition ${styles.runOverview}`}>
+    <div className={`flex h-full w-full flex-col p-2 text-sm transition ${styles.runOverview}`}>
       {children}
     </div>
   );

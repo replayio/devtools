@@ -153,7 +153,9 @@ function TestRunsContent() {
 
         <PanelResizeHandle className="h-full w-2" />
         <Panel minSize={20} order={2}>
-          <div className="h-full w-full overflow-hidden rounded-xl">
+          <div
+            className={`flex h-full w-full items-center justify-center overflow-hidden rounded-xl ${styles.testReplayDetails}`}
+          >
             <Suspense fallback={<LibrarySpinner />}>
               <TestRunOverviewPage />
             </Suspense>
@@ -162,7 +164,7 @@ function TestRunsContent() {
         <PanelResizeHandle className="h-full w-2" />
         <Panel minSize={20} order={2}>
           <div
-            className={`flex h-full w-full overflow-hidden rounded-xl ${styles.testReplayDetails}`}
+            className={`flex h-full w-full items-center justify-center overflow-hidden rounded-xl ${styles.testReplayDetails}`}
           >
             <Suspense fallback={<LibrarySpinner />}>
               <TestRunSpecDetails />

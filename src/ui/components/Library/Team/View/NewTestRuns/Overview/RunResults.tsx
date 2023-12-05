@@ -85,12 +85,6 @@ function TestStatusGroup({
     return null;
   }
 
-  const labelToColor: Record<string, string> = {
-    Failed: styles.failedHeader,
-    Flaky: styles.flakyHeader,
-    Passed: styles.successHeader,
-  };
-
   return (
     <div
       className="flex flex-col"
@@ -100,7 +94,7 @@ function TestStatusGroup({
         className={`top-0 flex grow flex-row p-2 pl-4 font-medium hover:cursor-pointer ${styles.libraryRowHeader}`}
         onClick={() => setExpanded(!expanded)}
       >
-        <div className={`grow font-bold ${labelToColor[label]}`}>
+        <div data-status={label} className={`grow font-bold ${styles.testStatusHeader}`}>
           <span data-test-id="TestRunResults-StatusGroup-Count">{count}</span> {label} Test
           {count > 1 ? "s" : ""}
         </div>
