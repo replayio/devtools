@@ -68,7 +68,7 @@ test(`authenticated/test-suites/library-tests-list`, async ({ page }) => {
   // Verify folders contain tests and can be collapsed
   const pathNodeLocator = findTestRecordingsTreePathNodes(flakyGroup, { text: "authenticated" });
   await pathNodeLocator.click();
-  await expect(await pathNodeLocator.textContent()).toContain("16 tests");
+  await expect(await pathNodeLocator.textContent()).toContain("3 tests");
   await pathNodeLocator.click();
-  await expect(await pathNodeLocator.textContent()).not.toContain("16 tests");
+  await expect(await pathNodeLocator.textContent()).not.toContain("3 tests");
 });

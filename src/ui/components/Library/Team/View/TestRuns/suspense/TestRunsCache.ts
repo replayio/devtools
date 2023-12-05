@@ -9,7 +9,7 @@ import {
   getTestRunsGraphQL,
 } from "ui/components/Library/Team/View/TestRuns/graphql/TestRunsGraphQL";
 import { convertRecording } from "ui/hooks/recordings";
-import { TestGroups, groupRecordings } from "ui/utils/testRuns";
+import { TestGroups, groupRecordings, testFailed, testPassed } from "ui/utils/testRuns";
 
 export const testRunsCache = createCache<
   [graphQLClient: GraphQLClientInterface, accessToken: string | null, workspaceId: string],
@@ -61,12 +61,29 @@ export const testRunDetailsCache = createCache<
     const testsWithRecordings =
       testRunNode?.tests.map<TestRunTestWithRecordings>(test => {
         durationMs += test.durationMs;
-        const recs = orderBy(test.recordings.map(convertRecording), "date", "desc");
-        recordings.push(...recs);
 
         return {
           ...test,
-          recordings: recs,
+          executions: test.executions.map(e => {
+            const recs = e.recordings.map(convertRecording);
+            recordings.push(...recs);
+
+            // Adapt the execution status to convert "failed" execution status
+            // to "flaky" when the test eventually passes
+            let result = e.result;
+            if (test.result === "flaky") {
+              if (testFailed(e)) {
+                result = "flaky";
+              } else if (testPassed(e)) {
+                result = "passed";
+              }
+            }
+
+            return {
+              result,
+              recordings: recs,
+            };
+          }),
         };
       }) ?? [];
 

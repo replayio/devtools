@@ -21,7 +21,7 @@ export function useFileNameTree(testGroup: TestGroup, filterByText: string = "")
     const root: Tree = {
       children: [],
       name: "",
-      nestedRecordingCount: 0,
+      nestedTestCount: 0,
       pathNames: [],
       type: "path",
     };
@@ -45,7 +45,7 @@ export function useFileNameTree(testGroup: TestGroup, filterByText: string = "")
           const pathNode: PathNode = {
             children: [],
             name: part,
-            nestedRecordingCount: 0,
+            nestedTestCount: 0,
             pathNames: [part],
             type: "path",
           };
@@ -71,14 +71,24 @@ export function useFileNameTree(testGroup: TestGroup, filterByText: string = "")
           name: part,
           tests: [],
           type: "file",
+          nestedRecordingCount: 0,
         };
 
         insert(currentNode.children, node, (a, b) => a.name.localeCompare(b.name));
       }
       node.tests.push(...tests);
+      node.nestedRecordingCount = node.tests.reduce(
+        (testsTotal, test) =>
+          testsTotal +
+          test.executions.reduce(
+            (executionTotal, execution) => executionTotal + execution.recordings.length,
+            0
+          ),
+        0
+      );
 
       ancestors.forEach(ancestor => {
-        ancestor.nestedRecordingCount += tests.length;
+        ancestor.nestedTestCount += tests.length;
       });
     }
 
@@ -128,7 +138,7 @@ export type TreeNode = FileNode | PathNode;
 export type PathNode = {
   children: TreeNode[];
   name: string;
-  nestedRecordingCount: number;
+  nestedTestCount: number;
   pathNames: string[];
   type: "path";
 };
@@ -137,6 +147,7 @@ export type FileNode = {
   name: string;
   tests: TestRunTestWithRecordings[];
   type: "file";
+  nestedRecordingCount: number;
 };
 
 export function isFileNode(node: FileNode | PathNode): node is FileNode {
