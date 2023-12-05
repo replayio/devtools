@@ -212,7 +212,7 @@ function PathNodeRenderer({
         >
           <div className="flex items-center gap-1 truncate">{formattedNames}/</div>
           {!expanded && (
-            <div className="text-xs text-bodySubColor">({pathNode.nestedRecordingCount} tests)</div>
+            <div className="text-xs text-bodySubColor">({pathNode.nestedTestCount} tests)</div>
           )}
         </div>
       )}
