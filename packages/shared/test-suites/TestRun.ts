@@ -30,7 +30,10 @@ export type TestRunTest = {
 };
 
 export interface TestRunTestWithRecordings extends TestRunTest {
-  recordings: Recording[];
+  executions: {
+    result: TestRunTest["result"];
+    recordings: Recording[];
+  }[];
 }
 
 export type Test = {

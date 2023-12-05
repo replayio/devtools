@@ -46,22 +46,23 @@ const GET_TEST_RUN_RECORDINGS = gql`
               tests {
                 id
                 testId
-                index
-                attempt
                 title
                 scope
                 sourcePath
                 result
                 errors
                 durationMs
-                recordings {
-                  uuid
-                  duration
-                  isProcessed
-                  createdAt
-                  comments {
-                    user {
-                      id
+                executions {
+                  result
+                  recordings {
+                    uuid
+                    duration
+                    isProcessed
+                    createdAt
+                    comments {
+                      user {
+                        id
+                      }
                     }
                   }
                 }

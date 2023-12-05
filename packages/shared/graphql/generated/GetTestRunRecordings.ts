@@ -37,23 +37,29 @@ export interface GetTestRunRecordings_node_Workspace_testRuns_edges_node_source 
   user: string | null;
 }
 
-export interface GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_recordings_comments_user {
+export interface GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_executions_recordings_comments_user {
   __typename: "User";
   id: string;
 }
 
-export interface GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_recordings_comments {
+export interface GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_executions_recordings_comments {
   __typename: "Comment";
-  user: GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_recordings_comments_user | null;
+  user: GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_executions_recordings_comments_user | null;
 }
 
-export interface GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_recordings {
+export interface GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_executions_recordings {
   __typename: "Recording";
   uuid: any;
   duration: number | null;
   isProcessed: boolean | null;
   createdAt: any;
-  comments: GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_recordings_comments[];
+  comments: GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_executions_recordings_comments[];
+}
+
+export interface GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_executions {
+  __typename: "TestRunTest";
+  result: string;
+  recordings: GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_executions_recordings[];
 }
 
 export interface GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests {
@@ -68,7 +74,7 @@ export interface GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests {
   result: string;
   errors: string[] | null;
   durationMs: number;
-  recordings: GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_recordings[];
+  executions: GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_executions[];
 }
 
 export interface GetTestRunRecordings_node_Workspace_testRuns_edges_node {
