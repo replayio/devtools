@@ -1,5 +1,6 @@
-import { useCallback, useContext, useMemo } from "react";
+import { useCallback, useContext, useLayoutEffect, useMemo, useRef } from "react";
 
+import { GraphQLClientInterface } from "shared/graphql/GraphQLClient";
 import { Nag } from "shared/graphql/types";
 import { dismissNag } from "shared/graphql/User";
 
@@ -17,7 +18,36 @@ export function useNag(nag: Nag): [shouldShow: boolean, dismiss: () => void] {
     return nags !== null && !nags.includes(nag);
   }, [nag, nags]);
 
-  const dismiss = useCallback(() => {
+  const committedValuesRef = useRef<{
+    accessToken: string | null;
+    graphQLClient: GraphQLClientInterface;
+    id: string | null;
+    nag: Nag;
+    refetchUser: () => void;
+    shouldShow: boolean;
+  }>({
+    accessToken,
+    graphQLClient,
+    id,
+    nag,
+    refetchUser,
+    shouldShow,
+  });
+
+  useLayoutEffect(() => {
+    const current = committedValuesRef.current;
+    current.accessToken = accessToken;
+    current.graphQLClient = graphQLClient;
+    current.id = id;
+    current.nag = nag;
+    current.refetchUser = refetchUser;
+    current.shouldShow = shouldShow;
+  });
+
+  const stableDismiss = useCallback(() => {
+    const { accessToken, graphQLClient, id, nag, refetchUser, shouldShow } =
+      committedValuesRef.current;
+
     if (!accessToken || !id || !shouldShow) {
       return;
     }
@@ -29,7 +59,7 @@ export function useNag(nag: Nag): [shouldShow: boolean, dismiss: () => void] {
       // so run this callback to force Apollo to refetch the user.
       refetchUser();
     });
-  }, [accessToken, graphQLClient, id, nag, refetchUser, shouldShow]);
+  }, []);
 
-  return [shouldShow, dismiss];
+  return [shouldShow, stableDismiss];
 }

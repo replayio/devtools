@@ -28,10 +28,12 @@ export function useReactDevToolsAnnotations({
     executionPoint: ExecutionPoint | null;
     firstExcludedAnnotationIndex: number | null;
     pauseId: PauseId | null;
+    wall: ReplayWall;
   }>({
     executionPoint: null,
     firstExcludedAnnotationIndex: null,
     pauseId: null,
+    wall,
   });
 
   const firstExcludedAnnotationIndex = useMemo(() => {
@@ -56,13 +58,15 @@ export function useReactDevToolsAnnotations({
       executionPoint: previousExecutionPoint,
       firstExcludedAnnotationIndex: prevFirstExcludedAnnotationIndex,
       pauseId: prevPauseId,
+      wall: prevWall,
     } = prevValuesRef.current;
 
     if (
       prevFirstExcludedAnnotationIndex === null ||
       currentExecutionPoint !== previousExecutionPoint ||
       currentPauseId !== prevPauseId ||
-      prevFirstExcludedAnnotationIndex !== firstExcludedAnnotationIndex
+      prevFirstExcludedAnnotationIndex !== firstExcludedAnnotationIndex ||
+      wall !== prevWall
     ) {
       prevValuesRef.current.executionPoint = currentExecutionPoint;
       prevValuesRef.current.firstExcludedAnnotationIndex = firstExcludedAnnotationIndex;

@@ -1,7 +1,14 @@
 import { Value as ProtocolValue } from "@replayio/protocol";
-import { Fragment, useMemo, useRef, useState } from "react";
-import { useLayoutEffect } from "react";
-import { Suspense, memo, useContext } from "react";
+import {
+  Fragment,
+  Suspense,
+  memo,
+  useContext,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { ProtocolMessage } from "replay-next/components/console/LoggablesContext";
 import useConsoleContextMenu from "replay-next/components/console/useConsoleContextMenu";
@@ -15,7 +22,7 @@ import { InspectableTimestampedPointContext } from "replay-next/src/contexts/Ins
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { clientValueCache } from "replay-next/src/suspense/ObjectPreviews";
 import { formatTimestamp } from "replay-next/src/utils/time";
-import { ReplayClientContext, replayClient } from "shared/client/ReplayClientContext";
+import { replayClient } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
 
 import ErrorStackRenderer from "../ErrorStackRenderer";
@@ -41,7 +48,6 @@ function MessageRenderer({
 
   const [isHovered, setIsHovered] = useState(false);
 
-  const client = useContext(ReplayClientContext);
   const { showTimestamps } = useContext(ConsoleFiltersContext);
   const { executionPoint: currentExecutionPoint } = useContext(TimelineContext);
 
