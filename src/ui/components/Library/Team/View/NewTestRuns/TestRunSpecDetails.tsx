@@ -38,16 +38,20 @@ export function TestRunSpecDetails() {
           </div>
           <div className="flex flex-col gap-2">
             {selectedSpecTests.map(s =>
-              s.recordings.map(r => (
-                <TestResultListItem
-                  depth={1}
-                  key={r.id}
-                  label={s.result}
-                  recording={r}
-                  testRun={testRun}
-                  test={s}
-                />
-              ))
+              s.executions
+                .filter(e => e.recordings.length > 0)
+                .flatMap(execution =>
+                  execution.recordings.map(r => (
+                    <TestResultListItem
+                      depth={1}
+                      key={r.id}
+                      label={s.result}
+                      recording={r}
+                      testRun={testRun}
+                      test={s}
+                    />
+                  ))
+                )
             )}
           </div>
         </div>
@@ -63,31 +67,24 @@ function Errors({ failedTests }: { failedTests: TestRunTestWithRecordings[] }) {
       <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-lg font-semibold">
         Errors
       </div>
-      <div className="flex flex-grow flex-col gap-2">
-        {failedTests.map((t, i) => (
+      {failedTests.map(t =>
+        t.errors?.map((e, i) => (
           <div
-            key={i}
+            key={`${t.id}-i`}
             className="w-full overflow-x-auto rounded-md bg-[color:var(--testsuites-v2-error-bg)] px-3 py-4"
           >
-            <div className="whitespace-pre border-l-2 border-[color:var(--testsuites-v2-failed-header)] px-3">
-              {t.errors?.map((e, i) => (
-                <>
-                  <div className="mb-2 flex cursor-default select-none flex-row items-center gap-2 text-[color:var(--testsuites-v2-failed-header)]">
-                    <Icon type="warning" className="h-4 w-4" />
-                    <span className="font-monospace text-xs">Error</span>
-                  </div>
-                  <div
-                    key={i}
-                    className="font-mono text-xs text-[color:var(--primary-accent-foreground-text)]"
-                  >
-                    {e.split("\n").slice(0, 4).join("\n")}
-                  </div>
-                </>
-              ))}
+            <div className="flex flex-col gap-4 whitespace-pre border-l-2 border-[color:var(--testsuites-v2-failed-header)] px-3">
+              <div className="mb-2 flex cursor-default select-none flex-row items-center gap-2 text-[color:var(--testsuites-v2-failed-header)]">
+                <Icon type="warning" className="h-4 w-4" />
+                <span className="font-monospace text-xs">Error</span>
+              </div>
+              <div className="font-mono text-xs text-[color:var(--primary-accent-foreground-text)]">
+                {e.split("\n").slice(0, 4).join("\n")}
+              </div>
             </div>
           </div>
-        ))}
-      </div>
+        ))
+      )}
     </div>
   );
 }
