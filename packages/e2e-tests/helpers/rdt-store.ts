@@ -678,10 +678,30 @@ export class Store {
   }
 }
 
+type StateContext = {
+  // Tree
+  numElements: number;
+  ownerSubtreeLeafElementID: number | null;
+  selectedElementID: number | null;
+  selectedElementIndex: number | null;
+
+  // Search
+  searchIndex: number | null;
+  searchResults: Array<number>;
+  searchText: string;
+
+  // Owners
+  ownerID: number | null;
+  ownerFlatTree: Array<Element> | null;
+
+  // Inspection element panel
+  inspectedElementID: number | null;
+};
+
 export function printStore(
   store: Store,
   includeWeight: boolean = false,
-  state: any = null
+  state: StateContext | null = null
 ): string {
   // Inlined inside `printStore` because it is serialized to run inside playwright script
   function printElement(element: Element, includeWeight: boolean = false): string {
@@ -736,7 +756,7 @@ export function printStore(
       snapshotLines.push(`${printedSelectedMarker}${printedElement}${printedErrorsAndWarnings}`);
     });
   } else {
-    const errorsAndWarnings = (store as any)._errorsAndWarnings ?? new Map();
+    const errorsAndWarnings = store._errorsAndWarnings ?? new Map();
     if (errorsAndWarnings.size > 0) {
       let errorCount = 0;
       let warningCount = 0;
