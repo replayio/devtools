@@ -19,8 +19,12 @@ import { ConsoleFiltersContext } from "replay-next/src/contexts/ConsoleFiltersCo
 import { InspectableTimestampedPointContext } from "replay-next/src/contexts/InspectorContext";
 import { TerminalExpression } from "replay-next/src/contexts/TerminalContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
+import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { pauseEvaluationsCache } from "replay-next/src/suspense/PauseCache";
-import { primitiveToClientValue } from "replay-next/src/utils/protocol";
+import {
+  findProtocolObjectPropertyValue,
+  primitiveToClientValue,
+} from "replay-next/src/utils/protocol";
 import { formatTimestamp } from "replay-next/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
@@ -120,6 +124,7 @@ function TerminalExpressionRenderer({
     </>
   );
 }
+
 function EvaluatedContent({ terminalExpression }: { terminalExpression: TerminalExpression }) {
   const client = useContext(ReplayClientContext);
 
@@ -145,7 +150,18 @@ function EvaluatedContent({ terminalExpression }: { terminalExpression: Terminal
   const { exception, returned } = result;
 
   let children: ReactNode | null = null;
-  if (exception) {
+  if (exception && returned?.object) {
+    // Special case: The returned value is an exception; we should render the message only
+    const exception = objectCache.read(client, pauseId, returned.object, "canOverflow");
+    const messageProperty = findProtocolObjectPropertyValue<string>(exception, "message");
+
+    children = (
+      <ClientValueValueRenderer
+        clientValue={primitiveToClientValue(messageProperty)}
+        context="console"
+      />
+    );
+  } else if (exception) {
     children = <Inspector context="console" pauseId={pauseId} protocolValue={exception} />;
   } else if (returned) {
     children = returned.value ? (

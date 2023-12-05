@@ -2,6 +2,7 @@ import { ExecutionPoint, PauseId, PointDescription, TimeStampedPoint } from "@re
 import { PointSelector, Value } from "@replayio/protocol";
 import { ExternallyManagedCache, IntervalCache, createExternallyManagedCache } from "suspense";
 
+import { findProtocolObjectPropertyValue } from "replay-next/src/utils/protocol";
 import { MAX_POINTS_TO_RUN_EVALUATION } from "shared/client/ReplayClient";
 import { ReplayClientInterface } from "shared/client/types";
 import { ProtocolError, commandError, isCommandError } from "shared/utils/error";
@@ -99,44 +100,61 @@ export function createAnalysisCache<
           },
           async results => {
             for (const result of results) {
-              setPointAndTimeForPauseId(result.pauseId, result.point);
-              cachePauseData(client, sources, result.pauseId, result.data);
+              const { data, exception, point, returned, pauseId } = result;
 
-              let values: Value[] = [];
-              if (result.exception) {
-                values.push(result.exception);
-              } else if (result.returned?.object) {
-                const objectPreview = await objectCache.readAsync(
-                  client,
-                  result.pauseId,
-                  result.returned.object,
-                  "canOverflow"
+              setPointAndTimeForPauseId(pauseId, point);
+              cachePauseData(client, sources, pauseId, data);
+
+              let values: Value[] | null = null;
+
+              if (exception && returned?.object) {
+                // Special case: The returned value is an exception; we should render the message only
+                const exception = objectCache.read(client, pauseId, returned.object, "canOverflow");
+                const messageProperty = findProtocolObjectPropertyValue<string>(
+                  exception,
+                  "message"
                 );
-                if (objectPreview?.className === "Object") {
-                  values.push(result.returned);
-                } else {
-                  // assume this is an array
-                  const length =
-                    (
-                      await objectPropertyCache.readAsync(
-                        client,
-                        result.pauseId,
-                        result.returned.object,
-                        "length"
-                      )
-                    )?.value ?? 0;
-                  const promises = [];
-                  for (let i = 0; i < length; i++) {
-                    promises.push(
-                      objectPropertyCache.readAsync(
-                        client,
-                        result.pauseId,
-                        result.returned.object,
-                        String(i)
-                      )
-                    );
+                if (messageProperty) {
+                  values = [
+                    {
+                      value: messageProperty,
+                    },
+                  ];
+                }
+              }
+
+              if (values === null) {
+                values = [];
+                if (exception) {
+                  values.push(exception);
+                } else if (returned?.object) {
+                  const objectPreview = await objectCache.readAsync(
+                    client,
+                    pauseId,
+                    returned.object,
+                    "canOverflow"
+                  );
+                  if (objectPreview?.className === "Object") {
+                    values.push(returned);
+                  } else {
+                    // assume this is an array
+                    const length =
+                      (
+                        await objectPropertyCache.readAsync(
+                          client,
+                          pauseId,
+                          returned.object,
+                          "length"
+                        )
+                      )?.value ?? 0;
+                    const promises = [];
+                    for (let i = 0; i < length; i++) {
+                      promises.push(
+                        objectPropertyCache.readAsync(client, pauseId, returned.object, String(i))
+                      );
+                    }
+                    values = (await Promise.all(promises)).filter(value => !!value) as Value[];
                   }
-                  values = (await Promise.all(promises)).filter(value => !!value) as Value[];
                 }
               }
 
