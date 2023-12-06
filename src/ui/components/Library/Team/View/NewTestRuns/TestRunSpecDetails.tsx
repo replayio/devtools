@@ -33,7 +33,7 @@ export function TestRunSpecDetails() {
     return null;
   }
 
-  const failedTests = selectedSpecTests.filter(t => t.result === "failed");
+  const failedTests = selectedSpecTests.filter(t => t.result === "failed" || t.result === "flaky");
 
   return (
     <div className="flex h-full w-full flex-col justify-start text-sm">
@@ -51,7 +51,7 @@ export function TestRunSpecDetails() {
                     <TestResultListItem
                       depth={1}
                       key={r.id}
-                      label={s.result}
+                      label={execution.result}
                       recording={r}
                       testRun={testRun}
                       test={s}
@@ -76,7 +76,7 @@ function Errors({ failedTests }: { failedTests: TestRunTestWithRecordings[] }) {
       {failedTests.map(t =>
         t.errors?.map((e, i) => (
           <div
-            key={`${t.id}-i`}
+            key={`${t.id}-${i}`}
             className="w-full overflow-x-auto rounded-md bg-[color:var(--testsuites-v2-error-bg)] px-3 py-4"
           >
             <div className="flex flex-col gap-4 whitespace-pre border-l-2 border-[color:var(--testsuites-v2-failed-header)] px-3">
