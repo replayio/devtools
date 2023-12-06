@@ -37,8 +37,6 @@ type FilterByStatus = "all" | "failed";
 export function TestRunsContextRoot({ children }: { children: ReactNode }) {
   const { teamId, testRunId: defaultTestRunId } = useGetTeamRouteParams();
 
-  const testRuns = useTestRuns();
-
   const [testRunId, setTestRunId] = useState<string | null>(defaultTestRunId);
 
   const [filterByBranch, setFilterByBranch] = useState<FilterByBranch>(() => {
@@ -50,6 +48,8 @@ export function TestRunsContextRoot({ children }: { children: ReactNode }) {
     return (query.get("filterByStatus") as FilterByStatus) ?? "all";
   });
 
+  const testRuns = useTestRuns(filterByBranch === "primary" ? "primary" : null);
+
   const [filterByText, setFilterByText] = useState("");
   const filterByTextDeferred = useDeferredValue(filterByText);
 
@@ -58,7 +58,7 @@ export function TestRunsContextRoot({ children }: { children: ReactNode }) {
   const filteredTestRuns = useMemo(() => {
     let filteredTestRuns = testRuns;
 
-    if (filterByBranch === "primary" || filterByStatus === "failed" || filterByText !== "") {
+    if (filterByStatus === "failed" || filterByText !== "") {
       const lowerCaseText = filterByText.toLowerCase();
 
       filteredTestRuns = filteredTestRuns.filter(testRun => {
@@ -69,13 +69,6 @@ export function TestRunsContextRoot({ children }: { children: ReactNode }) {
         }
 
         const branchName = testRun.source?.branchName ?? "";
-
-        if (filterByBranch === "primary") {
-          // TODO This should be configurable by Workspace
-          if (branchName !== "main" && branchName !== "master") {
-            return false;
-          }
-        }
 
         if (filterByText !== "") {
           const user = testRun.source?.user ?? "";
@@ -95,7 +88,7 @@ export function TestRunsContextRoot({ children }: { children: ReactNode }) {
     }
 
     return filteredTestRuns;
-  }, [filterByBranch, filterByStatus, filterByText, testRuns]);
+  }, [filterByStatus, filterByText, testRuns]);
 
   useEffect(() => {
     if (testRunId == null) {

@@ -9,7 +9,7 @@ import useToken from "ui/utils/useToken";
 
 const EMPTY_ARRAY: any[] = [];
 
-export function useTestRuns(): TestRun[] {
+export function useTestRuns(branch: string | null): TestRun[] {
   const graphQLClient = useContext(GraphQLClientContext);
   const { teamId } = useContext(TeamContext);
 
@@ -19,7 +19,8 @@ export function useTestRuns(): TestRun[] {
     testRunsCache,
     graphQLClient,
     accessToken?.token ?? null,
-    teamId
+    teamId,
+    branch
   );
   return value;
 }
