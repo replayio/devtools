@@ -25,18 +25,18 @@ export function BranchIcon({
 
   return (
     <div
-      className="flex-column flex h-4 min-w-fit items-center gap-1"
+      className="flex-column flex items-center gap-1"
       data-test-id="TestRun-Branch"
       title={title}
     >
       {isPrimaryBranch}
       {svgPath !== null && (
-        <svg className="h-4 w-4" viewBox="0 0 16 16" fill="currentColor">
+        <svg className="h-4 w-4 flex-shrink-0" viewBox="0 0 16 16" fill="currentColor">
           <path d="M0 0h16v16H0z" fill="none" />
           <path d={svgPath} fill={fillColor} />
         </svg>
       )}
-      {branchName}
+      <span className="flex-shrink">{branchName}</span>
     </div>
   );
 }

@@ -17,6 +17,7 @@ export function useTestRunDetailsSuspends(testRunId: string | null) {
         testRun: null,
         groupedTests: null,
         recordings: null,
+        tests: null,
         durationMs: 0,
       };
 }
