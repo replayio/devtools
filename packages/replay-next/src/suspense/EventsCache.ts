@@ -1,5 +1,4 @@
-import { PointDescription, PointRange, PointSelector } from "@replayio/protocol";
-import { EventHandlerType } from "@replayio/protocol";
+import { EventHandlerType, PointDescription, PointRange, PointSelector } from "@replayio/protocol";
 import isEmpty from "lodash/isEmpty";
 import without from "lodash/without";
 import { Cache, createCache } from "suspense";
@@ -11,7 +10,6 @@ import { ProtocolError, isCommandError } from "shared/utils/error";
 import { STANDARD_EVENT_CATEGORIES } from "../constants";
 import { groupEntries } from "../utils/group";
 import { createInfallibleSuspenseCache } from "../utils/suspense";
-import { createAnalysisCache } from "./AnalysisCache";
 import { createFocusIntervalCacheForExecutionPoints } from "./FocusIntervalCache";
 import { updateMappedLocation } from "./PauseCache";
 import { sourcesByIdCache } from "./SourcesCache";
@@ -33,6 +31,7 @@ export type EventCategory = {
 
 export type EventLog = PointDescription & {
   eventType: EventHandlerType;
+  label: string;
   type: "EventLog";
 };
 
@@ -79,31 +78,20 @@ export const eventPointsCache = createFocusIntervalCacheForExecutionPoints<
   },
 });
 
-export const eventsCache = createAnalysisCache<EventLog, [EventHandlerType]>(
-  "Events",
-  eventType => eventType,
-  (client, begin, end, eventType) =>
-    eventPointsCache.readAsync(BigInt(begin), BigInt(end), client, [eventType]),
-  (client, points, eventType) => {
-    return {
-      selector: createPointSelector([eventType]),
-      expression: "[...arguments]",
-      frameIndex: 0,
-    };
-  },
-  transformPoint
-);
-
 function createPointSelector(eventTypes: EventHandlerType[]): PointSelector {
   return { kind: "event-handlers", eventTypes };
 }
 
-function transformPoint(point: PointDescription, eventType: EventHandlerType): EventLog {
-  return { ...point, eventType, type: "EventLog" };
+function transformPoint(
+  point: PointDescription,
+  eventType: EventHandlerType,
+  label: string
+): EventLog {
+  return { ...point, label, eventType, type: "EventLog" };
 }
 
 export const getInfallibleEventPointsSuspense = createInfallibleSuspenseCache(
-  eventsCache.pointsIntervalCache.read
+  eventPointsCache.read
 );
 
 /**
