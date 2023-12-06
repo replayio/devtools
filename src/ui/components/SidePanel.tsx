@@ -3,8 +3,6 @@ import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import PrimaryPanes from "devtools/client/debugger/src/components/PrimaryPanes";
 import SecondaryPanes from "devtools/client/debugger/src/components/SecondaryPanes";
 import Accordion from "devtools/client/debugger/src/components/shared/Accordion";
-import { ReactPanel } from "replay-experimental/src/components/ReactPanel";
-import LazyOffscreen from "replay-next/components/LazyOffscreen";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { isExecutionPointsWithinRange } from "replay-next/src/utils/time";
 import { setSelectedPrimaryPanel } from "ui/actions/layout";
@@ -179,7 +177,6 @@ export default function SidePanel() {
         {selectedPrimaryPanel === "cypress" && <TestSuitePanel />}
         {selectedPrimaryPanel === "protocol" && <ProtocolViewer />}
         {selectedPrimaryPanel === "search" && <SearchFilesReduxAdapter />}
-        {selectedPrimaryPanel === "react" && <ReactPanel />}
       </div>
     </div>
   );

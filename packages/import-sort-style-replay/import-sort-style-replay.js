@@ -23,7 +23,7 @@ function sortImports(styleApi) {
     Boolean(imported.moduleName.match(/^(react|react-dom|prop-types|redux|\@reduxjs|next)/));
 
   const isNewPrototypeModule = imported =>
-    Boolean(imported.moduleName.match(/^(replay-next|shared|replay-experimental)/));
+    Boolean(imported.moduleName.match(/^(replay-next|shared)/));
   const isProtocolModule = imported => Boolean(imported.moduleName.match(/^protocol/));
   const isOtherInternalPackageModule = imported =>
     Boolean(imported.moduleName.match(/^(accordion|design|third-party)/));

@@ -15307,12 +15307,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"replay-experimental@workspace:packages/replay-experimental":
-  version: 0.0.0-use.local
-  resolution: "replay-experimental@workspace:packages/replay-experimental"
-  languageName: unknown
-  linkType: soft
-
 "replay-next@workspace:*, replay-next@workspace:packages/replay-next":
   version: 0.0.0-use.local
   resolution: "replay-next@workspace:packages/replay-next"

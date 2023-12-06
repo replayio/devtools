@@ -179,12 +179,6 @@ export const config = {
     label: "Visualize protocol events in the timeline",
     legacyKey: "devtools.features.protocolTimeline",
   },
-  feature_reactPanel: {
-    defaultValue: Boolean(false),
-    description: "Enable experimental React render details panel",
-    label: "Enable React Panel",
-    legacyKey: "devtools.features.reactPanel",
-  },
   feature_reduxDevTools: {
     defaultValue: Boolean(true),
     description: "Enable experimental Redux DevTools panel",
