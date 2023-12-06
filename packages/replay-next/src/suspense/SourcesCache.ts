@@ -188,18 +188,6 @@ export const sourcesByIdCache = createSingleEntryCache<
   },
 });
 
-export const sourcesByPartialUrlCache: Cache<
-  [client: ReplayClientInterface, partialUrl: string],
-  Source[]
-> = createCache({
-  debugLabel: "SourcesByPartialUrl",
-  getKey: ([client, partialUrl]) => partialUrl,
-  load: async ([client, partialUrl]) => {
-    const sources = await sourcesCache.readAsync(client);
-    return sources.filter(source => source.url?.includes(partialUrl));
-  },
-});
-
 type StreamingSourceContentsParams = [client: ReplayClientInterface, sourceId: ProtocolSourceId];
 type StreamingSourceContentsData = {
   codeUnitCount: number;
