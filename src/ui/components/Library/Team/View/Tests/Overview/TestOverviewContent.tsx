@@ -5,7 +5,8 @@ import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 import { useTest } from "../hooks/useTest";
 import { TestContext } from "../TestContextRoot";
 import { TestDetails } from "./TestDetails";
-import styles from "../../../../Library.module.css";
+import libraryStyles from "../../../../Library.module.css";
+import styles from "../../../../Testsuites.module.css";
 
 export function TestOverviewContent() {
   const { testId } = useContext(TestContext);
@@ -17,15 +18,13 @@ export function TestOverviewContent() {
   } else {
     children = (
       <div className="flex h-full items-center justify-center p-2">
-        <div className="rounded-md bg-chrome px-3 py-2 text-center">
-          Select a test to see its details here
-        </div>
+        <div className={styles.standardMessaging}>Select a test to see its details here</div>
       </div>
     );
   }
 
   return (
-    <div className={`flex h-full flex-col text-sm transition ${styles.runOverview} `}>
+    <div className={`flex h-full flex-col text-sm transition ${libraryStyles.runOverview} `}>
       {children}
     </div>
   );
@@ -50,7 +49,7 @@ function TestOverview({ testId }: { testId: string }) {
 
   return (
     <div className="flex flex-col overflow-y-auto">
-      <div className={styles.testTitle}>
+      <div className={libraryStyles.testTitle}>
         <div>{test.title}</div>
       </div>
       <div className="flex flex-col overflow-y-auto">

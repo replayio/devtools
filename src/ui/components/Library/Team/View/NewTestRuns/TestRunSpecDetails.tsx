@@ -6,6 +6,7 @@ import { TestRunTestWithRecordings } from "shared/test-suites/TestRun";
 import { useTestRunDetailsSuspends } from "../TestRuns/hooks/useTestRunDetailsSuspends";
 import { TestResultListItem } from "./Overview/TestResultListItem";
 import { TestRunsContext } from "./TestRunsContextRoot";
+import styles from "../../../Testsuites.module.css";
 
 export function TestRunSpecDetails() {
   const { spec, filterTestsByText } = useContext(TestRunsContext);
@@ -24,9 +25,7 @@ export function TestRunSpecDetails() {
   if (!spec) {
     return (
       <div className="flex h-full w-full items-center justify-center p-2">
-        <div className="rounded-md bg-chrome py-2 px-3 text-center">
-          Select a test to see its details here
-        </div>
+        <div className={styles.standardMessaging}>Select a test to see its details here</div>
       </div>
     );
   } else if (groupedTests === null || selectedTest == null) {
