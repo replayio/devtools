@@ -30,7 +30,7 @@ export function TestRunsPage() {
 
 function TestRunsContent() {
   const {
-    testRunFilterByBranch: filterByBranch,
+    filterByBranch,
     filterByStatus,
     filterByText,
     filterByTextForDisplay,
