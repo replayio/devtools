@@ -140,7 +140,8 @@ export default memo(function UserActionEventRow({
         }
 
         if (event === userActionEvent) {
-          return eventNumber;
+          // Prepend eventNumber with a zero if it's under 10
+          return eventNumber < 10 ? `0${eventNumber}` : eventNumber;
         }
       }
     }
@@ -150,15 +151,19 @@ export default memo(function UserActionEventRow({
 
   return (
     <div
-      className={styles.Row}
+      className="flex items-start space-x-0"
       data-chained-event={parentId !== null || undefined}
       data-status={error ? "error" : "success"}
       onClick={jumpToTestSourceDisabled ? undefined : onClickJumpToTestSource}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className={styles.Text}>
-        {eventNumber != null ? <span className={styles.Number}>{eventNumber}</span> : null}
+      {eventNumber != null ? (
+        <div className="flex-none">
+          <span className={styles.Number}>{eventNumber}</span>
+        </div>
+      ) : null}
+      <div className="flex-grow">
         <span
           className={`${styles.Name} ${styles.Name}`}
           data-name={command.name}
@@ -171,12 +176,14 @@ export default memo(function UserActionEventRow({
         </span>
       </div>
       {showBadge && (
-        <Suspense fallback={<Loader />}>
-          <Badge isSelected={isSelected} timeStampedPoint={resultTimeStampedPoint} />
-        </Suspense>
+        <div className="flex-none">
+          <Suspense fallback={<Loader />}>
+            <Badge isSelected={isSelected} timeStampedPoint={resultTimeStampedPoint} />
+          </Suspense>
+        </div>
       )}
       {showJumpToCode && jumpToCodeAnnotation && (
-        <div className={styles.JumpToCodeButton}>
+        <div className="flex-none">
           <JumpToCodeButton
             currentExecutionPoint={executionPoint}
             onClick={onJumpToClickEvent}
