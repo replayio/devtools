@@ -25,7 +25,7 @@ export function TestRunSpecDetails() {
   if (!spec) {
     return (
       <div className="flex h-full w-full items-center justify-center p-2">
-<div className={styles.standardMessaging}>Select a test to see its details here</div>
+        <div className={styles.standardMessaging}>Select a test to see its details here</div>
       </div>
     );
   } else if (groupedTests === null || selectedTest == null) {
