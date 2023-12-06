@@ -133,6 +133,22 @@ export function useFileNameTree(testGroup: TestGroup, filterByText: string = "")
   return tree;
 }
 
+export const treeContainFile = (treeNode: TreeNode[], file: string) => {
+  let containsFile = false;
+  treeNode.forEach(node => {
+    if (isFileNode(node)) {
+      if (node.absolutePath === file) {
+        containsFile = true;
+      }
+    } else {
+      if (treeContainFile(node.children, file)) {
+        containsFile = true;
+      }
+    }
+  });
+  return containsFile;
+};
+
 export type Tree = PathNode;
 export type TreeNode = FileNode | PathNode;
 

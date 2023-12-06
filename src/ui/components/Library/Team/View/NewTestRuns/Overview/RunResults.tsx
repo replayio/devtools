@@ -5,6 +5,7 @@ import {
   memo,
   useContext,
   useDeferredValue,
+  useMemo,
   useState,
 } from "react";
 
@@ -15,6 +16,7 @@ import {
   FileNode,
   PathNode,
   isPathNode,
+  treeContainFile,
   useFileNameTree,
 } from "ui/components/Library/Team/View/TestRuns/Overview/useFileNameTree";
 import FileIcon from "ui/components/shared/Icon";
@@ -174,8 +176,16 @@ function PathNodeRenderer({
   pathNode: PathNode;
 }) {
   const { children, name, pathNames } = pathNode;
-
   const [expanded, setExpanded] = useState(true);
+  const { spec } = useContext(TestRunsContext);
+
+  const containsSelectedSpec = useMemo(() => {
+    if (expanded || !spec) {
+      return false;
+    }
+
+    return treeContainFile(children, spec);
+  }, [children, expanded, spec]);
 
   const onClick = () => setExpanded(!expanded);
 
@@ -196,7 +206,9 @@ function PathNodeRenderer({
     <>
       {name && (
         <div
-          className={`cursor-pointer truncate py-2 pr-4 ${styles.libraryRow}`}
+          className={`cursor-pointer truncate rounded py-2 pr-4 ${styles.libraryRow} ${
+            containsSelectedSpec ? styles.libraryRowSelected : ""
+          }`}
           data-test-id="TestRunResult-PathNode"
           data-test-state={expanded ? "expanded" : "collapsed"}
           onClick={onClick}
