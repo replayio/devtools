@@ -1,7 +1,14 @@
-.standardMessaging {
+.standardMessaging,
+.noReplaysFound {
   border-radius: 0.375rem;
   background-color: var(--theme-base-90);
   padding: 0.5rem 0.75rem;
   text-align: center;
   font-size: var(--theme-body-font-size);
+  width: fit-content;
+  margin: 0 auto;
+}
+
+.noReplaysFound {
+  margin-top: 3rem;
 }
