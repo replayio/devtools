@@ -25,7 +25,7 @@ export function TestRunSpecDetails() {
   if (!spec) {
     return (
       <div className="flex h-full w-full items-center justify-center p-2">
-        <div className={styles.standardMessaging}>Select a test to see its details here</div>
+<div className={styles.standardMessaging}>Select a test to see its details here</div>
       </div>
     );
   } else if (groupedTests === null || selectedTest == null) {
@@ -36,7 +36,7 @@ export function TestRunSpecDetails() {
 
   return (
     <div className="flex h-full w-full flex-col justify-start text-sm">
-      <div className="mt-10 flex flex-grow flex-col gap-3 overflow-y-auto border-t border-themeBorder py-3">
+      <div className="flex flex-grow flex-col gap-3 overflow-y-auto py-3">
         <div className="flex flex-col gap-2 px-3">
           <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-lg font-semibold">
             Replays
