@@ -24,7 +24,7 @@ export function TestRunSpecDetails() {
   if (!spec) {
     return (
       <div className="flex h-full w-full items-center justify-center p-2">
-        <div className="rounded-md bg-chrome py-2 px-3 text-center">
+        <div className="rounded-md bg-chrome px-3 py-2 text-center">
           Select a test to see its details here
         </div>
       </div>
@@ -79,7 +79,7 @@ function Errors({ failedTests }: { failedTests: TestRunTestWithRecordings[] }) {
             key={`${t.id}-${i}`}
             className="w-full overflow-x-auto rounded-md bg-[color:var(--testsuites-v2-error-bg)] px-3 py-4"
           >
-            <div className="flex flex-col gap-4 whitespace-pre border-l-2 border-[color:var(--testsuites-v2-failed-header)] px-3">
+            <div className="flex flex-col gap-4 whitespace-pre-wrap break-words border-l-2 border-[color:var(--testsuites-v2-failed-header)] px-3">
               <div className="mb-2 flex cursor-default select-none flex-row items-center gap-2 text-[color:var(--testsuites-v2-failed-header)]">
                 <Icon type="warning" className="h-4 w-4" />
                 <span className="font-monospace text-xs">Error</span>
