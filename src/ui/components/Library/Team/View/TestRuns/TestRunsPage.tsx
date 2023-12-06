@@ -65,7 +65,7 @@ function TestRunsContent() {
   );
 
   return (
-    <div className="flex w-full flex-grow flex-row p-2">
+    <div className="flex w-full flex-grow flex-row p-1">
       <PanelGroup autoSaveId="Library:TestRuns" direction="horizontal">
         <Panel minSize={20} order={1}>
           <div className="flex h-full w-full flex-col overflow-hidden rounded-xl bg-bodyBgcolor">
