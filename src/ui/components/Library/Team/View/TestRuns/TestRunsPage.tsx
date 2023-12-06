@@ -4,7 +4,7 @@ import { ContextMenuItem, useContextMenu } from "use-context-menu";
 
 import Icon from "replay-next/components/Icon";
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
-import TestRunsNUX from "ui/components/Library/Team/View/TestRuns/TestRunsNUX";
+import { TestRunsNUX } from "ui/components/Library/Team/View/TestRuns/TestRunsNUX";
 
 import { TestRunOverviewPage } from "./Overview/TestRunOverviewContextRoot";
 import { TestRunList } from "./TestRunList";
@@ -12,11 +12,9 @@ import { TestRunsContext, TestRunsContextRoot } from "./TestRunsContextRoot";
 import styles from "./TestRunsPage.module.css";
 
 export function TestRunsPage() {
-  const { component: TestRunListComponent } = TestRunList();
-
   return (
     <TestRunsContextRoot>
-      <TestRunsContent TestRunListComponent={TestRunListComponent} />
+      <TestRunsContent TestRunListComponent={<TestRunList />} />
     </TestRunsContextRoot>
   );
 }
