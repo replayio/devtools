@@ -10,11 +10,11 @@
 }
 
 :root:global(.theme-dark) .libraryRowSelected {
-  background-color: rgba(0, 0, 0, 1);
+  background-color: var(--primary-accent-dimmed);
 }
 
 :root:global(.theme-dark) .libraryRowSelected:hover {
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: var(--primary-accent-dimmed-hover);
 }
 
 /* Light theme */
@@ -29,26 +29,27 @@
 }
 
 :root:global(.theme-light) .libraryRowSelected {
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: var(--primary-accent-dimmed);
 }
 
 :root:global(.theme-light) .libraryRowSelected:hover {
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: var(--primary-accent-dimmed-hover);
 }
 
 .flakyPill {
-  color: #000;
-  background-color: var(--testsuites-v2-flaky-pill);
+  color: var(--theme-base-100);
+  background-color: var(--testsuites-flaky-color);
 }
 
 .failedPill {
-  color: #000;
-  background-color: var(--testsuites-v2-failed-pill);
+  color: var(--theme-base-100);
+  background-color: var(--testsuites-failed-color);
 }
 
 .successPill {
-  color: #000;
-  background-color: var(--testsuites-v2-success-pill);
+  color: var(--theme-base-100);
+  background-color: var(--testsuites-success-color);
+  border-radius: 50%;
 }
 
 .testsuitesSuccess {

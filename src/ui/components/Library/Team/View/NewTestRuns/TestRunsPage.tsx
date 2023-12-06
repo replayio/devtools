@@ -92,7 +92,7 @@ function TestRunsContent() {
   );
 
   return (
-    <div className="flex w-full flex-grow flex-row p-2">
+    <div className="flex w-full flex-grow flex-row p-1">
       <PanelGroup autoSaveId="Library:TestRuns" direction="horizontal">
         <Panel minSize={20} order={1}>
           <div className="flex h-full w-full flex-col gap-4 overflow-hidden rounded-xl bg-bodyBgcolor p-2">
@@ -151,7 +151,7 @@ function TestRunsContent() {
           </div>
         </Panel>
 
-        <PanelResizeHandle className="h-full w-2" />
+        <PanelResizeHandle className="h-full w-1" />
         <Panel minSize={20} order={2}>
           <div
             className={`flex h-full w-full items-center justify-center overflow-hidden rounded-xl ${styles.testReplayDetails}`}
@@ -161,7 +161,7 @@ function TestRunsContent() {
             </Suspense>
           </div>
         </Panel>
-        <PanelResizeHandle className="h-full w-2" />
+        <PanelResizeHandle className="h-full w-1" />
         <Panel minSize={20} order={2}>
           <div
             className={`flex h-full w-full items-center justify-center overflow-hidden rounded-xl ${styles.testReplayDetails}`}
