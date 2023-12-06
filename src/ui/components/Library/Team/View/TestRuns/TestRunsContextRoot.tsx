@@ -48,7 +48,7 @@ export function TestRunsContextRoot({ children }: { children: ReactNode }) {
     return (query.get("filterByStatus") as FilterByStatus) ?? "all";
   });
 
-  const testRuns = useTestRuns(filterByBranch === "primary" ? "primary" : null);
+  const testRuns = useTestRuns(filterByBranch === "primary" ? "workspace:primary" : null);
 
   const [filterByText, setFilterByText] = useState("");
   const filterByTextDeferred = useDeferredValue(filterByText);
