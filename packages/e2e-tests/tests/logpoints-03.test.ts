@@ -13,10 +13,7 @@ test(`logpoints-03: should display event properties in the console`, async ({
 
   await addEventListenerLogpoints(page, [{ eventType: "event.mouse.click", categoryKey: "mouse" }]);
 
-  const message = await findConsoleMessage(page, "MouseEvent", "event");
+  const message = await findConsoleMessage(page, "(click)", "event");
 
-  await expect(message).toContainText('type: "click"');
-  await expect(message).toContainText("target: <div");
-  await expect(message).toContainText("clientX: 0");
-  await expect(message).toContainText("clientY: 0");
+  await expect(message).toContainText("doc_events.html");
 });

@@ -1,14 +1,11 @@
-import { Fragment, useMemo, useRef, useState } from "react";
-import { useLayoutEffect } from "react";
-import { Suspense, memo, useContext } from "react";
+import { Suspense, memo, useContext, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import useConsoleContextMenu from "replay-next/components/console/useConsoleContextMenu";
-import Inspector from "replay-next/components/inspector";
 import Loader from "replay-next/components/Loader";
 import { ConsoleFiltersContext } from "replay-next/src/contexts/ConsoleFiltersContext";
 import { InspectableTimestampedPointContext } from "replay-next/src/contexts/InspectorContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
-import { EventLog, eventsCache } from "replay-next/src/suspense/EventsCache";
+import { EventLog } from "replay-next/src/suspense/EventsCache";
 import { formatTimestamp } from "replay-next/src/utils/time";
 
 import MessageHoverButton from "../MessageHoverButton";
@@ -94,32 +91,14 @@ function EventLogRenderer({
 function AnalyzedContent({ eventLog }: { eventLog: EventLog }) {
   const { showTimestamps } = useContext(ConsoleFiltersContext);
 
-  const { pauseId, values } = eventsCache.resultsCache.read(eventLog.point, eventLog.eventType);
-
-  const content =
-    values.length > 0
-      ? values.map((value, index) => (
-          <Fragment key={index}>
-            <Inspector context="console" pauseId={pauseId} protocolValue={value} />
-            {index < values.length - 1 && " "}
-          </Fragment>
-        ))
-      : null;
-
   return (
     <>
       {showTimestamps && (
         <span className={styles.TimeStamp}>{formatTimestamp(eventLog.time, true)} </span>
       )}
-      {content ? (
-        <span className={styles.LogContents} data-test-name="LogContents">
-          {content}
-        </span>
-      ) : (
-        <span className={styles.LogContentsEmpty} data-test-name="LogContents">
-          No data to display.
-        </span>
-      )}
+      <span className={styles.LogContentsEmpty} data-test-name="LogContents">
+        ({eventLog.label})
+      </span>
     </>
   );
 }

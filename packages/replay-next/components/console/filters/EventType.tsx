@@ -6,7 +6,7 @@ import Icon from "replay-next/components/Icon";
 import { ConsoleFiltersContext } from "replay-next/src/contexts/ConsoleFiltersContext";
 import { useCurrentFocusPointRange } from "replay-next/src/hooks/useCurrentFocusPointRange";
 import useTooltip from "replay-next/src/hooks/useTooltip";
-import { Event, eventsCache } from "replay-next/src/suspense/EventsCache";
+import { Event, eventPointsCache } from "replay-next/src/suspense/EventsCache";
 import { MAX_POINTS_TO_RUN_EVALUATION } from "shared/client/ReplayClient";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
@@ -27,11 +27,11 @@ export default function EventType({
   const focusPointRange = useCurrentFocusPointRange();
 
   const status = useIntervalCacheStatus(
-    eventsCache.pointsIntervalCache,
+    eventPointsCache,
     BigInt(focusPointRange.begin),
     BigInt(focusPointRange.end),
     client,
-    event.type
+    [event.type]
   );
 
   const { onMouseEnter, onMouseLeave, tooltip } = useTooltip({
@@ -39,14 +39,21 @@ export default function EventType({
     tooltip: "There are too many events. Please focus to a smaller time range and try again.",
   });
 
-  const checked = eventTypes[event.rawEventTypes[0]] === true;
+  const checked = eventTypes[event.rawEventTypes[0]]?.enabled ?? false;
   const newChecked = !checked;
-  const toggle = () =>
+  const toggle = () => {
     update({
       eventTypes: Object.fromEntries(
-        event.rawEventTypes.map(rawEventType => [rawEventType, newChecked])
+        event.rawEventTypes.map(rawEventType => [
+          rawEventType,
+          {
+            enabled: newChecked,
+            label: event.label,
+          },
+        ])
       ),
     });
+  };
 
   const stopPropagation = (event: MouseEvent) => {
     event.stopPropagation();

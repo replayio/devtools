@@ -21,12 +21,7 @@ test(`logpoints-03_chromium: should display event properties in the console`, as
   // However, the E2E test helpers _do_ need this pattern to determine what categories to expand.
   await addEventListenerLogpoints(page, [{ eventType: "click", categoryKey: "mouse" }]);
 
-  const message = await findConsoleMessage(page, "PointerEvent", "event");
+  const message = await findConsoleMessage(page, "(click)", "event");
 
-  expandConsoleMessage(message);
-
-  await expect(message).toContainText('type: "click"');
-  await expect(message).toContainText("target: <div");
-  await expect(message).toContainText("clientX: 0");
-  await expect(message).toContainText("clientY: 0");
+  await expect(message).toContainText("doc_events_chromium.html");
 });
