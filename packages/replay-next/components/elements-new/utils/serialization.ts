@@ -117,6 +117,8 @@ export function serializeDOM(rootNode: Document): number[] {
         const id = __RECORD_REPLAY_ARGUMENTS__.internal.registerPlainObject(value);
         if (id) {
           return parseInt(id);
+        } else {
+          throw Error(`[RUN-2965] registerPlainObject failed for value: ${JSON.stringify(value, null, 2)}`);
         }
       }
     }
