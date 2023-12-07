@@ -76,11 +76,16 @@ const GET_TEST_RUN_RECORDINGS = gql`
 `;
 
 const GET_TEST_RUNS = gql`
-  query GetTestsRunsForWorkspace($workspaceId: ID!, $branch: String) {
+  query GetTestsRunsForWorkspace(
+    $workspaceId: ID!
+    $branch: String
+    $startTime: String
+    $endTime: String
+  ) {
     node(id: $workspaceId) {
       ... on Workspace {
         id
-        testRuns(filter: { branch: $branch }) {
+        testRuns(filter: { branch: $branch, startTime: $startTime, endTime: $endTime }) {
           edges {
             node {
               id
@@ -139,13 +144,15 @@ export async function getTestRunsGraphQL(
   graphQLClient: GraphQLClientInterface,
   accessToken: string | null,
   workspaceId: string,
-  branch: string | null
+  branch: string | null,
+  startTime?: string | null,
+  endTime?: string | null
 ): Promise<GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node[]> {
   const response = await graphQLClient.send<GetTestsRunsForWorkspace>(
     {
       operationName: "GetTestsRunsForWorkspace",
       query: GET_TEST_RUNS,
-      variables: { workspaceId, branch: branch ?? null },
+      variables: { workspaceId, branch, startTime, endTime },
     },
     accessToken
   );

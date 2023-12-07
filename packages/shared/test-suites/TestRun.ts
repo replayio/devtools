@@ -24,14 +24,14 @@ export type TestRunTest = {
   title: string;
   scope: string[];
   sourcePath: string;
-  result: string;
+  result: "passed" | "failed" | "flaky" | "skipped" | "timedOut" | "unknown";
   errors: string[] | null;
   durationMs: number;
 };
 
 export interface TestRunTestWithRecordings extends TestRunTest {
   executions: {
-    result: string;
+    result: TestRunTest["result"];
     recordings: Recording[];
   }[];
 }

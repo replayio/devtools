@@ -63,7 +63,8 @@
   color: #fff;
 }
 
-:root:global(.theme-dark) .runOverview {
+:root:global(.theme-dark) .runOverview,
+:root:global(.theme-dark) .testReplayDetails {
   color: var(--body-color);
   background-color: var(--body-bgcolor);
 }
@@ -130,7 +131,8 @@
   color: var(--body-color);
 }
 
-:root:global(.theme-light) .runOverview {
+:root:global(.theme-light) .runOverview,
+:root:global(.theme-light) .testReplayDetails {
   background-color: var(--theme-base-100);
   color: var(--body-color);
 }

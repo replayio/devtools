@@ -3,7 +3,12 @@ import { createCache } from "suspense";
 
 import { GraphQLClientInterface } from "shared/graphql/GraphQLClient";
 import { Recording } from "shared/graphql/types";
-import { TestRun, TestRunTestWithRecordings, processTestRun } from "shared/test-suites/TestRun";
+import {
+  TestRun,
+  TestRunTest,
+  TestRunTestWithRecordings,
+  processTestRun,
+} from "shared/test-suites/TestRun";
 import {
   getTestRunTestsWithRecordingsGraphQL,
   getTestRunsGraphQL,
@@ -37,6 +42,7 @@ export type TestRunRecordings = {
   durationMs: number;
   groupedTests: TestGroups | null;
   recordings: Recording[] | null;
+  tests: TestRunTestWithRecordings[] | null;
 };
 
 export const testRunDetailsCache = createCache<
@@ -69,6 +75,7 @@ export const testRunDetailsCache = createCache<
 
         return {
           ...test,
+          result: test.result as TestRunTest["result"],
           executions: test.executions.map(e => {
             const recs = e.recordings.map(convertRecording);
             recordings.push(...recs);
@@ -85,7 +92,7 @@ export const testRunDetailsCache = createCache<
             }
 
             return {
-              result,
+              result: result as TestRunTest["result"],
               recordings: recs,
             };
           }),
@@ -96,6 +103,7 @@ export const testRunDetailsCache = createCache<
       testRun,
       durationMs,
       groupedTests: groupRecordings(testsWithRecordings),
+      tests: testsWithRecordings,
       recordings,
     };
   },

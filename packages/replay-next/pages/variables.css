@@ -147,6 +147,7 @@
   --primary-accent-foreground-text: #fff;
 
   --primary-accent-dimmed: #163e58;
+  --primary-accent-dimmed-hover: #12374f;
   --primary-accent-dimmed-foreground-text: var(--body-color);
 
   /* Color ramp (Dark) */
@@ -535,6 +536,18 @@
   --testsuites-stack-frame-background-color-active: #25364e;
   --testsuites-stack-frame-background-color-hover: #252d3b;
 
+  --testsuites-v2-failed-icon: var(--testsuites-failed-color);
+  --testsuites-v2-failed-header: var(--testsuites-failed-color);
+  --testsuites-v2-failed-pill: var(--testsuites-failed-color);
+  --testsuites-v2-flaky-icon: var(--testsuites-flaky-color);
+  --testsuites-v2-flaky-header: var(--testsuites-flaky-color);
+  --testsuites-v2-flaky-pill: var(--testsuites-flaky-color);
+  --testsuites-v2-success-icon: var(--testsuites-success-color);
+  --testsuites-v2-success-header: var(--testsuites-success-color);
+  --testsuites-v2-success-pill: var(--testsuites-success-color);
+  --testsuites-v2-description: #f02d5e;
+  --testsuites-v2-error-bg: #330c14;
+
   --circular-progress-bar-trail-color: var(--testsuites-steps-bgcolor);
 
   /* To organise (Dark) */
@@ -678,6 +691,7 @@
   --primary-accent-foreground-text: #fff;
 
   --primary-accent-dimmed: #cceeff;
+  --primary-accent-dimmed-hover: #c5e9fa;
   --primary-accent-dimmed-foreground-text: var(--body-color);
 
   /* Color ramp (Light) */
@@ -1067,6 +1081,18 @@
   --testsuites-stack-frame-background-color: transparent;
   --testsuites-stack-frame-background-color-active: #ebf3ff;
   --testsuites-stack-frame-background-color-hover: #f7f7f7;
+
+  --testsuites-v2-failed-icon: var(--testsuites-failed-color);
+  --testsuites-v2-failed-header: var(--testsuites-failed-color);
+  --testsuites-v2-failed-pill: var(--testsuites-failed-color);
+  --testsuites-v2-flaky-icon: var(--testsuites-flaky-color);
+  --testsuites-v2-flaky-header: var(--testsuites-flaky-color);
+  --testsuites-v2-flaky-pill: var(--testsuites-flaky-color);
+  --testsuites-v2-success-icon: var(--testsuites-success-color);
+  --testsuites-v2-success-header: var(--testsuites-success-color);
+  --testsuites-v2-success-pill: var(--testsuites-success-color);
+  --testsuites-v2-description: #f02d5e;
+  --testsuites-v2-error-bg: #330c14;
 
   --circular-progress-bar-trail-color: var(--testsuites-steps-bgcolor);
 
