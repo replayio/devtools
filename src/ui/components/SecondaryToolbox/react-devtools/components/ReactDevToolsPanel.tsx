@@ -23,7 +23,10 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { InspectButton } from "ui/components/SecondaryToolbox/react-devtools/components/InspectButton";
 import { ReactDevToolsList } from "ui/components/SecondaryToolbox/react-devtools/components/ReactDevToolsList";
 import { Search } from "ui/components/SecondaryToolbox/react-devtools/components/Search";
-import { SelectedElement } from "ui/components/SecondaryToolbox/react-devtools/components/SelectedElement";
+import {
+  Debouncer,
+  SelectedElement,
+} from "ui/components/SecondaryToolbox/react-devtools/components/SelectedElement";
 import { SelectedElementErrorBoundaryFallback } from "ui/components/SecondaryToolbox/react-devtools/components/SelectedElementErrorBoundaryFallback";
 import { SelectedElementLoader } from "ui/components/SecondaryToolbox/react-devtools/components/SelectedElementLoader";
 import { useReactDevToolsAnnotations } from "ui/components/SecondaryToolbox/react-devtools/hooks/useReactDevToolsAnnotations";
@@ -81,6 +84,9 @@ function ReactDevToolsPanelInner({
 
   const leftPanelRef = useRef<ImperativePanelHandle>(null);
   const rightPanelRef = useRef<ImperativePanelHandle>(null);
+
+  const [isComponentPickerActive, setIsComponentPickerActive] = useState(false);
+  const selectedElementDebouncerRef = useRef<Debouncer | null>(null);
 
   const { bridge, store, wall } = useReplayWall({
     setProtocolCheckFailed,
@@ -189,7 +195,12 @@ function ReactDevToolsPanelInner({
           ref={leftPanelRef}
         >
           <div className={styles.LeftPanelTopRow}>
-            <InspectButton bridge={bridge} wall={wall} />
+            <InspectButton
+              bridge={bridge}
+              isActive={isComponentPickerActive}
+              setIsActive={setIsComponentPickerActive}
+              wall={wall}
+            />
             <Search listData={listData} pauseId={pauseId} />
           </div>
 
@@ -232,7 +243,9 @@ function ReactDevToolsPanelInner({
               <Suspense fallback={<SelectedElementLoader element={selectedElement} />}>
                 <SelectedElement
                   bridge={bridge}
+                  debouncerRef={selectedElementDebouncerRef}
                   element={selectedElement}
+                  isComponentPickerActive={isComponentPickerActive}
                   listData={listData}
                   pauseId={pauseId}
                   replayWall={wall}

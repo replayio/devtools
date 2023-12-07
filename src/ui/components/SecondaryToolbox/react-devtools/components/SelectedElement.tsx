@@ -37,16 +37,26 @@ import { useAppDispatch } from "ui/setup/hooks";
 
 import styles from "./SelectedElement.module.css";
 
+export interface Debouncer {
+  element: ReactElement;
+  promise: Promise<void>;
+  resolved: boolean;
+}
+
 export function SelectedElement({
   bridge,
+  debouncerRef,
   element,
+  isComponentPickerActive,
   listData,
   pauseId: defaultPriorityPauseId,
   replayWall,
   store,
 }: {
   bridge: FrontendBridge;
+  debouncerRef: React.MutableRefObject<Debouncer | null>;
   element: ReactElement;
+  isComponentPickerActive: boolean;
   listData: ReactDevToolsListData;
   pauseId: PauseId;
   replayWall: ReplayWall;
@@ -65,6 +75,24 @@ export function SelectedElement({
   const deferredElement = useDeferredValue(element);
 
   const isPending = element !== deferredElement;
+
+  // If the component picker is active, we want to debounce loading the selected element's data,
+  // we achieve this by suspending this component
+  if (isComponentPickerActive) {
+    if (debouncerRef.current?.element !== element) {
+      const debouncer: Debouncer = {
+        element,
+        promise: new Promise(resolve => setTimeout(resolve, 500)).then(() => {
+          debouncer.resolved = true;
+        }),
+        resolved: false,
+      };
+      debouncerRef.current = debouncer;
+    }
+    if (!debouncerRef.current.resolved) {
+      throw debouncerRef.current.promise;
+    }
+  }
 
   const [inspectedElement, [, fiberIdsToNodeIds]] = suspendInParallel(
     () => inspectedElementCache.read(replayClient, bridge, store, replayWall, pauseId, id),

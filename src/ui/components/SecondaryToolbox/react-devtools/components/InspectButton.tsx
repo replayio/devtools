@@ -1,19 +1,27 @@
 import { FrontendBridge } from "@replayio/react-devtools-inline";
-import { MouseEvent, useEffect, useLayoutEffect, useState } from "react";
+import { Dispatch, MouseEvent, SetStateAction, useEffect, useLayoutEffect, useState } from "react";
 
 import Icon from "replay-next/components/Icon";
 import { ReplayWall } from "ui/components/SecondaryToolbox/react-devtools/ReplayWall";
 
 import styles from "./InspectButton.module.css";
 
-export function InspectButton({ bridge, wall }: { bridge: FrontendBridge; wall: ReplayWall }) {
-  const [isActive, setIsActive] = useState(false);
-
+export function InspectButton({
+  bridge,
+  isActive,
+  setIsActive,
+  wall,
+}: {
+  bridge: FrontendBridge;
+  isActive: boolean;
+  setIsActive: Dispatch<SetStateAction<boolean>>;
+  wall: ReplayWall;
+}) {
   useLayoutEffect(() => {
     return () => {
       setIsActive(false);
     };
-  }, []);
+  }, [setIsActive]);
 
   // Note this approach has a possible race case if an event is sent before the effect is run
   // but there is no good way to work around that within the constraints of React and the RDT backend
@@ -27,7 +35,7 @@ export function InspectButton({ bridge, wall }: { bridge: FrontendBridge; wall: 
     return () => {
       bridge.removeListener("stopInspectingNative", onStop);
     };
-  }, [bridge]);
+  }, [bridge, setIsActive]);
 
   const onClick = (event: MouseEvent) => {
     event.preventDefault();
