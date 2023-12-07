@@ -21,6 +21,7 @@ export async function recordPlaywright(
   // TODO Figure out how to get these to co-exist so we can re-record more FF examples.
   const playwrightTestPackage =
     browserName === "chromium" ? "@playwright/test" : "playwright-test1_19";
+
   const playwrightTest: typeof PlaywrightTest = require(playwrightTestPackage);
 
   const browserEntry = playwrightTest[browserName];
@@ -36,9 +37,7 @@ export async function recordPlaywright(
       RECORD_REPLAY_DRIVER: config.driverPath,
       // @ts-ignore
       RECORD_REPLAY_VERBOSE: config.driverPath ? "1" : undefined,
-      // Replay FF needs this to force recording on open
-      // TODO Maybe we'll need this for Chromium after we add login behavior?
-      RECORD_ALL_CONTENT: browserName === "firefox" ? "1" : undefined,
+      RECORD_ALL_CONTENT: "1",
     },
     executablePath, //: config.browserPath,
     headless: config.headless,
@@ -91,6 +90,6 @@ export async function uploadLastRecording(url: string) {
       server: config.backendUrl,
     });
   } else {
-    console.log("No recording found!");
+    throw Error(`No recording found matching url "${url}"`);
   }
 }
