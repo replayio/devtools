@@ -2,6 +2,9 @@ name: Run test suites
 on:
   pull_request:
   workflow_dispatch:
+    inputs:
+      runtimeBuildId:
+        description: "Runtime build ID (include a leading dash if non-empty)"
   push:
     branches:
       - main
@@ -106,6 +109,7 @@ jobs:
           RECORD_REPLAY_TEST_METRICS: 1
           AUTOMATED_TEST_SECRET: ${{ secrets.AUTOMATED_TEST_SECRET }}
           AUTHENTICATED_TESTS_WORKSPACE_API_KEY: ${{ secrets.AUTHENTICATED_TESTS_WORKSPACE_API_KEY }}
+          RECORD_REPLAY_CHROMIUM_DOWNLOAD_FILE: linux-chromium${{ github.event.inputs.runtimeBuildId }}.tar.xz
   authenticated-e2etest:
     name: Authenticated end-to-end tests (${{ matrix.shard }})
     runs-on: ubuntu-latest
