@@ -24,7 +24,10 @@ export type EventCategory = {
 /**
  * These "standard" categories actually differ between different runtimes.
  */
-export const STANDARD_EVENT_CATEGORIES: Partial<Record<RecordingTarget, EventCategory[]>> = {
+export const STANDARD_EVENT_CATEGORIES: Record<
+  RecordingTarget.chromium | RecordingTarget.gecko,
+  EventCategory[]
+> = {
   // Copied from src/devtools/server/actors/utils/event-breakpoints.js
   gecko: [
     {
@@ -958,3 +961,23 @@ export const STANDARD_EVENT_CATEGORIES: Partial<Record<RecordingTarget, EventCat
     ],
   // </GENERATED CODE. DO NOT EDIT.>
 };
+
+// [FE-2083] Add a WebSocket category to the chromium event list (without modifying the generated code above)
+STANDARD_EVENT_CATEGORIES.chromium.push({
+  category: "WebSocket",
+  eventTargets: ["DOMWebSocket"],
+  events: [
+    {
+      type: "open",
+      label: "open",
+    },
+    {
+      type: "message",
+      label: "message",
+    },
+    {
+      type: "close",
+      label: "close",
+    },
+  ],
+});
