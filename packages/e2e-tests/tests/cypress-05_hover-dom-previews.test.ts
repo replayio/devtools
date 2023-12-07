@@ -71,4 +71,16 @@ test("cypress-05: Test DOM node preview on user action step hover", async ({
   const pathDefinition = await highlighter.getAttribute("d");
   // Should have a meaningful SVG path of some kind for the highlighter
   expect(pathDefinition).toBeTruthy();
+
+  // Select `firstClickStep`
+  await firstClickStep.click();
+  await waitFor(async () =>
+    expect(await firstClickStep.getAttribute("data-selected")).toBe("true")
+  );
+  // Make the highlighter go away
+  await firstStep.hover();
+  await highlighter.waitFor({ state: "hidden" });
+  // Hover over the selected `firstClickStep` and verify that the highlighter is shown again
+  await firstClickStep.hover();
+  await highlighter.waitFor({ state: "visible" });
 });

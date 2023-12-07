@@ -177,33 +177,29 @@ export function TestSectionRow({
   };
 
   const onMouseEnter = async () => {
-    if (!isSelected) {
-      dispatch(setHoverTime(getTestEventTime(testEvent)));
+    dispatch(setHoverTime(getTestEventTime(testEvent)));
 
-      if (isUserActionTestEvent(testEvent)) {
-        // We hope to have details on the relevant DOM node cached by now.
-        // If we do, go ahead and read that synchronously so we can highlight the node.
-        // Otherwise, nothing to do here.
-        const firstDomNodeDetails = testEventDomNodeCache.getValueIfCached(
-          testEvent.data.timeStampedPoints.result?.point ?? ""
-        );
+    if (isUserActionTestEvent(testEvent)) {
+      // We hope to have details on the relevant DOM node cached by now.
+      // If we do, go ahead and read that synchronously so we can highlight the node.
+      // Otherwise, nothing to do here.
+      const firstDomNodeDetails = testEventDomNodeCache.getValueIfCached(
+        testEvent.data.timeStampedPoints.result?.point ?? ""
+      );
 
-        if (firstDomNodeDetails?.domNode?.node.isConnected) {
-          const { domNode, pauseId } = firstDomNodeDetails;
-          // Use the actual box model, which we should have pre-cached already
-          dispatch(highlightNodes([domNode.id], pauseId, true));
-        }
+      if (firstDomNodeDetails?.domNode?.node.isConnected) {
+        const { domNode, pauseId } = firstDomNodeDetails;
+        // Use the actual box model, which we should have pre-cached already
+        dispatch(highlightNodes([domNode.id], pauseId, true));
       }
     }
   };
 
   const onMouseLeave = () => {
-    if (!isSelected) {
-      dispatch(setHoverTime(null));
+    dispatch(setHoverTime(null));
 
-      if (isUserActionTestEvent(testEvent)) {
-        dispatch(unhighlightNode());
-      }
+    if (isUserActionTestEvent(testEvent)) {
+      dispatch(unhighlightNode());
     }
   };
 
