@@ -83,9 +83,7 @@ function Errors({ failedTests }: { failedTests: TestRunTestWithRecordings[] }) {
                 <Icon type="warning" className="h-4 w-4" />
                 <span className="font-monospace text-xs">Error</span>
               </div>
-              <div className="font-mono text-xs text-[color:var(--primary-accent-foreground-text)]">
-                {e.split("\n").slice(0, 4).join("\n")}
-              </div>
+              <div className="font-mono text-xs">{e.split("\n").slice(0, 4).join("\n")}</div>
             </div>
           </div>
         ))
