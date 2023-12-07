@@ -6,16 +6,23 @@ import { getTestRunsGraphQL } from "ui/components/Library/Team/View/TestRuns/gra
 
 export const testRunsIntervalCache = createIntervalCache<
   number,
-  [graphQLClient: GraphQLClientInterface, accessToken: string | null, workspaceId: string],
+  [
+    graphQLClient: GraphQLClientInterface,
+    accessToken: string | null,
+    workspaceId: string,
+    branch: string | null
+  ],
   TestRun
 >({
   debugLabel: "testRunsIntervalCache",
   getPointForValue: testRun => new Date(testRun.date).getTime(),
-  load: async (start, end, graphQLClient, accessToken, workspaceId) => {
+  getKey: (_, __, workspaceId, branch) => `${workspaceId}+${branch ?? "all"}`,
+  load: async (start, end, graphQLClient, accessToken, workspaceId, branch) => {
     const rawTestRuns = await getTestRunsGraphQL(
       graphQLClient,
       accessToken,
       workspaceId,
+      branch,
       new Date(start).toISOString(),
       new Date(end).toISOString()
     );

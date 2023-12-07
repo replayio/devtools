@@ -11,7 +11,7 @@ import { TestRunsFilterContext } from "../../NewTestRuns/TestRunsContextRoot";
 
 const EMPTY_ARRAY: any[] = [];
 
-export function useTestRuns(): TestRun[] {
+export function useTestRuns(branch: string | null): TestRun[] {
   const graphQLClient = useContext(GraphQLClientContext);
   const { teamId } = useContext(TeamContext);
   const { startTime, endTime } = useContext(TestRunsFilterContext);
@@ -24,7 +24,8 @@ export function useTestRuns(): TestRun[] {
     endTime.getTime(),
     graphQLClient,
     accessToken?.token ?? null,
-    teamId
+    teamId,
+    branch
   );
 
   const testRunsDesc = useMemo(() => [...value].reverse(), [value]);
