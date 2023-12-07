@@ -33,6 +33,9 @@ export function TestRunSpecDetails() {
   }
 
   const failedTests = selectedSpecTests.filter(t => t.result === "failed" || t.result === "flaky");
+  const hasRecordings = selectedSpecTests.some(test =>
+    test.executions.some(e => e.recordings.length > 0)
+  );
 
   return (
     <div className="flex h-full w-full flex-col justify-start text-sm">
@@ -42,22 +45,24 @@ export function TestRunSpecDetails() {
             Replays
           </div>
           <div className="flex flex-col gap-2">
-            {selectedSpecTests.map(s =>
-              s.executions
-                .filter(e => e.recordings.length > 0)
-                .flatMap(execution =>
-                  execution.recordings.map(r => (
-                    <TestResultListItem
-                      depth={1}
-                      key={r.id}
-                      label={execution.result}
-                      recording={r}
-                      testRun={testRun}
-                      test={s}
-                    />
-                  ))
+            {hasRecordings
+              ? selectedSpecTests.map(s =>
+                  s.executions
+                    .filter(e => e.recordings.length > 0)
+                    .flatMap(execution =>
+                      execution.recordings.map(r => (
+                        <TestResultListItem
+                          depth={1}
+                          key={r.id}
+                          label={execution.result}
+                          recording={r}
+                          testRun={testRun}
+                          test={s}
+                        />
+                      ))
+                    )
                 )
-            )}
+              : "No replay message"}
           </div>
         </div>
         {failedTests.length ? <Errors failedTests={failedTests} /> : null}
@@ -67,11 +72,13 @@ export function TestRunSpecDetails() {
 }
 
 function Errors({ failedTests }: { failedTests: TestRunTestWithRecordings[] }) {
+  const hasErrors = failedTests.some(t => !!t.errors?.length);
   return (
     <div className="flex flex-col gap-2 px-3">
       <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-lg font-semibold">
         Errors
       </div>
+      {hasErrors ? <div>Error message</div> : null}
       {failedTests.map(t =>
         t.errors?.map((e, i) => (
           <div
