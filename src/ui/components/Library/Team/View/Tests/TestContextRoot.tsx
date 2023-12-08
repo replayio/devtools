@@ -7,6 +7,7 @@ import {
   useMemo,
   useState,
 } from "react";
+import { STATUS_PENDING } from "suspense";
 
 import { Test } from "shared/test-suites/TestRun";
 
@@ -24,13 +25,14 @@ type TestsContextType = {
   testId: string | null;
   testIdForDisplay: string | null;
   selectedTest: Test | null;
+  testsLoading: boolean;
   tests: Test[];
 };
 
 export const TestContext = createContext<TestsContextType>(null as any);
 
 export function TestsContextRoot({ children }: { children: ReactNode }) {
-  const tests = useTests();
+  const { tests, status } = useTests();
 
   const [testId, setTestId] = useState<string | null>(null);
 
@@ -72,9 +74,19 @@ export function TestsContextRoot({ children }: { children: ReactNode }) {
       testId: deferredTestId,
       testIdForDisplay: testId,
       selectedTest: testId ? tests.find(t => t.testId === testId) ?? null : null,
+      testsLoading: status === STATUS_PENDING,
       tests: filteredTests,
     };
-  }, [filterByTime, sortBy, filterByText, filterByTextDeferred, deferredTestId, testId, tests]);
+  }, [
+    filterByTime,
+    sortBy,
+    filterByText,
+    filterByTextDeferred,
+    deferredTestId,
+    testId,
+    status,
+    tests,
+  ]);
 
   return <TestContext.Provider value={value}>{children}</TestContext.Provider>;
 }

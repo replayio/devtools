@@ -28,6 +28,7 @@ function TestsContent() {
     filterByTextForDisplay,
     sortBy,
     setSortBy,
+    testsLoading,
   } = useContext(TestContext);
 
   const {
@@ -100,9 +101,13 @@ function TestsContent() {
             </div>
 
             <div className="grow" data-filtered-by-text={filterByText} data-test-id="TestList">
-              <Suspense fallback={<LibrarySpinner />}>
+              {testsLoading ? (
+                <div className="flex h-full items-center justify-center">
+                  <LibrarySpinner />
+                </div>
+              ) : (
                 <TestList />
-              </Suspense>
+              )}
             </div>
           </div>
         </Panel>
