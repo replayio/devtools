@@ -143,7 +143,15 @@ export async function waitFor(
 
   const startTime = performance.now();
 
+  const consoleLog = console.log;
+
   while (true) {
+    // This loop tries failing code many times before giving up.
+    // It's noisy to log expect() failures on every attempt,
+    // so we suppress them for all but the last attempt.
+    const messages: any[] = [];
+    console.log = (...rest) => messages.push(rest);
+
     try {
       await callback();
 
@@ -154,12 +162,15 @@ export async function waitFor(
       }
 
       if (performance.now() - startTime > timeout) {
+        messages.forEach(args => consoleLog(...args));
         throw error;
       }
 
       await delay(retryInterval);
 
       continue;
+    } finally {
+      console.log = consoleLog;
     }
   }
 }

@@ -196,7 +196,7 @@ describe("ElementsListData", () => {
           <script type=\\"text/javascript\\">
             // Line of text
           </script>
-          <link rel=\\"stylesheet\\" href=\\"index.css\\" />
+          <link href=\\"index.css\\" rel=\\"stylesheet\\" />
         </head>
         <body>
           <ul>
@@ -220,7 +220,7 @@ describe("ElementsListData", () => {
           <script type=\\"text/javascript\\">
             // Line of text
           </script>
-          <link rel=\\"stylesheet\\" href=\\"index.css\\" />
+          <link href=\\"index.css\\" rel=\\"stylesheet\\" />
         </head>
         <body>
           <ul>…</ul>
@@ -237,7 +237,7 @@ describe("ElementsListData", () => {
           <script type=\\"text/javascript\\">
             // Line of text
           </script>
-          <link rel=\\"stylesheet\\" href=\\"index.css\\" />
+          <link href=\\"index.css\\" rel=\\"stylesheet\\" />
         </head>
         <body>…</body>
       </html>"
@@ -252,7 +252,7 @@ describe("ElementsListData", () => {
           <script type=\\"text/javascript\\">
             // Line of text
           </script>
-          <link rel=\\"stylesheet\\" href=\\"index.css\\" />
+          <link href=\\"index.css\\" rel=\\"stylesheet\\" />
         </head>
         <body>
           <ul>…</ul>
