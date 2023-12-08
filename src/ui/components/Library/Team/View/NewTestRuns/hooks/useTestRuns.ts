@@ -1,5 +1,5 @@
-import { useContext, useMemo } from "react";
-import { useImperativeIntervalCacheValues } from "suspense";
+import { useContext, useEffect, useMemo, useState } from "react";
+import { STATUS_PENDING, useImperativeIntervalCacheValues } from "suspense";
 
 import { GraphQLClientContext } from "replay-next/src/contexts/GraphQLClientContext";
 import { TestRun } from "shared/test-suites/TestRun";
@@ -15,10 +15,11 @@ export function useTestRuns(): TestRun[] {
   const graphQLClient = useContext(GraphQLClientContext);
   const { teamId } = useContext(TeamContext);
   const { startTime, endTime } = useContext(TestRunsFilterContext);
+  const [testRuns, setTestRuns] = useState<TestRun[]>([]);
 
   const accessToken = useToken();
 
-  const { value = EMPTY_ARRAY } = useImperativeIntervalCacheValues(
+  const { value = EMPTY_ARRAY, status } = useImperativeIntervalCacheValues(
     testRunsIntervalCache,
     startTime.getTime(),
     endTime.getTime(),
@@ -27,7 +28,16 @@ export function useTestRuns(): TestRun[] {
     teamId
   );
 
-  const testRunsDesc = useMemo(() => [...value].reverse(), [value]);
+  useEffect(() => {
+    if (status === STATUS_PENDING) {
+      // To avoid resetting the test runs to an empty array when loading
+      return;
+    }
+
+    setTestRuns(value);
+  }, [value, status]);
+
+  const testRunsDesc = useMemo(() => [...testRuns].reverse(), [testRuns]);
 
   return testRunsDesc;
 }
