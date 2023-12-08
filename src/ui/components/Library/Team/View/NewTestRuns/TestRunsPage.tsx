@@ -5,26 +5,22 @@ import { ContextMenuItem, useContextMenu } from "use-context-menu";
 import Icon from "replay-next/components/Icon";
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 
+import { TimeFilterContext, TimeFilterContextRoot } from "../TimeFilterContextRoot";
 import { FilterField } from "./FilterField";
 import { TestRunOverviewPage } from "./Overview/TestRunOverviewContextRoot";
 import { TestRunList } from "./TestRunList";
-import {
-  TestRunsContext,
-  TestRunsContextRoot,
-  TestRunsFilterContext,
-  TestRunsFilterContextRoot,
-} from "./TestRunsContextRoot";
+import { TestRunsContext, TestRunsContextRoot } from "./TestRunsContextRoot";
 import { TestRunSpecDetails } from "./TestRunSpecDetails";
 import styles from "../../../Library.module.css";
 import dropdownStyles from "./Dropdown.module.css";
 
 export function TestRunsPage() {
   return (
-    <TestRunsFilterContextRoot>
+    <TimeFilterContextRoot>
       <TestRunsContextRoot>
         <TestRunsContent />
       </TestRunsContextRoot>
-    </TestRunsFilterContextRoot>
+    </TimeFilterContextRoot>
   );
 }
 
@@ -39,7 +35,7 @@ function TestRunsContent() {
     setFilterByText,
     testRunsLoading,
   } = useContext(TestRunsContext);
-  const { filterByTime, setFilterByTime } = useContext(TestRunsFilterContext);
+  const { filterByTime, setFilterByTime } = useContext(TimeFilterContext);
 
   const {
     contextMenu: contextMenuStatusFilter,

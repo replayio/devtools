@@ -10,19 +10,29 @@ import { Test } from "shared/test-suites/TestRun";
 
 import { GET_WORKSPACE_TESTS } from "../../Tests/graphql/TestGraphQL";
 
+// We don't have any good way like (Test.created_at) to sort tests, therefore we can't properly build query ranges,
+// therefore can't use createIntervalCache
 export const testsCache = createCache<
-  [graphQLClient: GraphQLClientInterface, accessToken: string | null, workspaceId: string],
+  [
+    graphQLClient: GraphQLClientInterface,
+    accessToken: string | null,
+    workspaceId: string,
+    startTime: Date,
+    endTime: Date
+  ],
   Test[]
 >({
   config: { immutable: true },
   debugLabel: "testsCache",
-  getKey: ([_, __, workspaceId]) => workspaceId,
-  load: async ([graphQLClient, accessToken, workspaceId]) => {
+  // endTime will keep on changing, so we need to snap it to a two minute window
+  getKey: ([_, __, workspaceId, startTime, endTime]) =>
+    `${workspaceId}:${startTime.getTime()}:${snapToTwoMinuteWindow(endTime).getTime()}`,
+  load: async ([graphQLClient, accessToken, workspaceId, startTime, endTime]) => {
     const response = await graphQLClient.send<GetWorkspaceTests>(
       {
         operationName: "GetWorkspaceTests",
         query: GET_WORKSPACE_TESTS,
-        variables: { workspaceId },
+        variables: { workspaceId, startTime, endTime },
       },
       accessToken
     );
@@ -39,3 +49,13 @@ export const testsCache = createCache<
     return orderBy(processedTests, "failureRate", "desc");
   },
 });
+
+const snapToTwoMinuteWindow = (date: Date, windowSizeInMinutes = 2) => {
+  const millisecondsInMinute = 60 * 1000;
+  const totalMilliseconds = date.getTime();
+  const totalMinutes = totalMilliseconds / millisecondsInMinute;
+  const roundedMinutes = Math.round(totalMinutes / windowSizeInMinutes) * windowSizeInMinutes;
+  const newTotalMilliseconds = roundedMinutes * millisecondsInMinute;
+  const snappedDate = new Date(newTotalMilliseconds);
+  return snappedDate;
+};

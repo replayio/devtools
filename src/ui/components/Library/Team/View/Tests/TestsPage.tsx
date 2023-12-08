@@ -6,6 +6,11 @@ import Icon from "replay-next/components/Icon";
 import LibraryDropdownTrigger from "ui/components/Library/LibraryDropdownTrigger";
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 
+import {
+  TimeFilterContext,
+  TimeFilterContextRoot,
+  TimeFilterOptions,
+} from "../TimeFilterContextRoot";
 import { TestOverviewContent } from "./Overview/TestOverviewContent";
 import { TestContext, TestsContextRoot } from "./TestContextRoot";
 import { TestList } from "./TestList";
@@ -13,23 +18,26 @@ import styles from "./TestsPage.module.css";
 
 export function TestsPage() {
   return (
-    <TestsContextRoot>
-      <TestsContent />
-    </TestsContextRoot>
+    <TimeFilterContextRoot>
+      <TestsContextRoot>
+        <TestsContent />
+      </TestsContextRoot>
+    </TimeFilterContextRoot>
   );
 }
 
+const TimeFilterLabel: Record<TimeFilterOptions, string> = {
+  "two-week": "Last two weeks",
+  week: "Last week",
+  day: "Last day",
+  hour: "Last hour",
+  month: "Last month",
+};
+
 function TestsContent() {
-  const {
-    filterByText,
-    setFilterByText,
-    filterByTime,
-    setFilterByTime,
-    filterByTextForDisplay,
-    sortBy,
-    setSortBy,
-    testsLoading,
-  } = useContext(TestContext);
+  const { filterByText, setFilterByText, filterByTextForDisplay, sortBy, setSortBy, testsLoading } =
+    useContext(TestContext);
+  const { filterByTime, setFilterByTime } = useContext(TimeFilterContext);
 
   const {
     contextMenu: contextMenuSortBy,
@@ -53,16 +61,10 @@ function TestsContent() {
     onKeyDown: onKeyDownTimeFilter,
   } = useContextMenu(
     <>
-      <ContextMenuItem disabled onSelect={() => setFilterByTime(1 / 24)}>
-        Last hour
-      </ContextMenuItem>
-      <ContextMenuItem disabled onSelect={() => setFilterByTime(1)}>
-        Last day
-      </ContextMenuItem>
-      <ContextMenuItem disabled onSelect={() => setFilterByTime(7)}>
-        Last week
-      </ContextMenuItem>
-      <ContextMenuItem onSelect={() => setFilterByTime(null)}>Last two weeks</ContextMenuItem>
+      <ContextMenuItem onSelect={() => setFilterByTime("hour")}>Last hour</ContextMenuItem>
+      <ContextMenuItem onSelect={() => setFilterByTime("day")}>Last day</ContextMenuItem>
+      <ContextMenuItem onSelect={() => setFilterByTime("week")}>Last week</ContextMenuItem>
+      <ContextMenuItem onSelect={() => setFilterByTime("two-week")}>Last two weeks</ContextMenuItem>
     </>,
     { alignTo: "auto-target" }
   );
@@ -84,7 +86,7 @@ function TestsContent() {
                 testId="TestPage-BranchFilter-DropdownTrigger"
                 onClick={onClickTimeFilter}
                 onKeyDown={onKeyDownTimeFilter}
-                label={filterByTime === null ? "Last two weeks" : ""}
+                label={TimeFilterLabel[filterByTime]}
               />
               {contextMenuTimeFilter}
               <div className={styles.filterContainer}>
