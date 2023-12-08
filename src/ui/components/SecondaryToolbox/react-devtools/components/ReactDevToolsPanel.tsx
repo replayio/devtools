@@ -19,6 +19,7 @@ import AutoSizer from "react-virtualized-auto-sizer";
 
 import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import { PanelLoader } from "replay-next/components/PanelLoader";
+import { useDebounce } from "replay-next/src/hooks/useDebounce";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { InspectButton } from "ui/components/SecondaryToolbox/react-devtools/components/InspectButton";
 import { ReactDevToolsList } from "ui/components/SecondaryToolbox/react-devtools/components/ReactDevToolsList";
@@ -82,6 +83,8 @@ function ReactDevToolsPanelInner({
   const leftPanelRef = useRef<ImperativePanelHandle>(null);
   const rightPanelRef = useRef<ImperativePanelHandle>(null);
 
+  const [isComponentPickerActive, setIsComponentPickerActive] = useState(false);
+
   const { bridge, store, wall } = useReplayWall({
     setProtocolCheckFailed,
   });
@@ -101,6 +104,10 @@ function ReactDevToolsPanelInner({
   );
   const selectedElement =
     listData && selectedIndex != null ? listData.getItemAtIndex(selectedIndex) : null;
+
+  const debouncedSelectedElement = useDebounce(selectedElement, 500);
+  const showSelectedElementDetails =
+    debouncedSelectedElement === selectedElement || !isComponentPickerActive;
 
   const hasReactMounted = useReactDevToolsAnnotations({
     annotations,
@@ -189,7 +196,12 @@ function ReactDevToolsPanelInner({
           ref={leftPanelRef}
         >
           <div className={styles.LeftPanelTopRow}>
-            <InspectButton bridge={bridge} wall={wall} />
+            <InspectButton
+              bridge={bridge}
+              isActive={isComponentPickerActive}
+              setIsActive={setIsComponentPickerActive}
+              wall={wall}
+            />
             <Search listData={listData} pauseId={pauseId} />
           </div>
 
@@ -224,22 +236,26 @@ function ReactDevToolsPanelInner({
           ref={rightPanelRef}
         >
           {listData && pauseId && selectedElement ? (
-            <ErrorBoundary
-              fallback={<SelectedElementErrorBoundaryFallback element={selectedElement} />}
-              name="ReactDevToolsPanelProperties"
-              resetKey={`${pauseId}:${selectedElement.id}`}
-            >
-              <Suspense fallback={<SelectedElementLoader element={selectedElement} />}>
-                <SelectedElement
-                  bridge={bridge}
-                  element={selectedElement}
-                  listData={listData}
-                  pauseId={pauseId}
-                  replayWall={wall}
-                  store={store}
-                />
-              </Suspense>
-            </ErrorBoundary>
+            showSelectedElementDetails ? (
+              <ErrorBoundary
+                fallback={<SelectedElementErrorBoundaryFallback element={selectedElement} />}
+                name="ReactDevToolsPanelProperties"
+                resetKey={`${pauseId}:${selectedElement.id}`}
+              >
+                <Suspense fallback={<SelectedElementLoader element={selectedElement} />}>
+                  <SelectedElement
+                    bridge={bridge}
+                    element={selectedElement}
+                    listData={listData}
+                    pauseId={pauseId}
+                    replayWall={wall}
+                    store={store}
+                  />
+                </Suspense>
+              </ErrorBoundary>
+            ) : (
+              <SelectedElementLoader element={selectedElement} />
+            )
           ) : null}
         </Panel>
       </PanelGroup>
