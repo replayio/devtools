@@ -9,6 +9,7 @@ import {
   useMemo,
   useState,
 } from "react";
+import { STATUS_PENDING } from "suspense";
 
 import { TestRun, getTestRunTitle } from "shared/test-suites/TestRun";
 import { useGetTeamRouteParams } from "ui/components/Library/Team/utils";
@@ -26,6 +27,7 @@ type TestRunsContextType = {
   setFilterByStatus: Dispatch<SetStateAction<"all" | "failed">>;
   setFilterByText: Dispatch<SetStateAction<string>>;
   setFilterTestsByText: Dispatch<SetStateAction<string>>;
+  testRunsLoading: boolean;
   testRuns: TestRun[];
   testRunId: string | null;
   testRunIdForDisplay: string | null;
@@ -72,7 +74,7 @@ export function TestRunsFilterContextRoot({ children }: { children: ReactNode })
 export function TestRunsContextRoot({ children }: { children: ReactNode }) {
   const { teamId, testRunId: defaultTestRunId } = useGetTeamRouteParams();
 
-  const testRuns = useTestRuns();
+  const { testRuns, status } = useTestRuns();
 
   const [testRunId, setTestRunId] = useState<string | null>(defaultTestRunId);
 
@@ -159,6 +161,7 @@ export function TestRunsContextRoot({ children }: { children: ReactNode }) {
         setFilterTestsByText,
         testRunId: deferredTestRunId,
         testRunIdForDisplay: testRunId,
+        testRunsLoading: status === STATUS_PENDING,
         testRuns: filteredTestRuns,
         spec,
         setSpec,
