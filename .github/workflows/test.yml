@@ -3,8 +3,8 @@ on:
   pull_request:
   workflow_dispatch:
     inputs:
-      runtimeBuildId:
-        description: "Runtime build ID (include a leading dash if non-empty)"
+      linuxBuildFile:
+        description: "Linux Chromium Build File (.tar.xz)"
   push:
     branches:
       - main
@@ -93,7 +93,7 @@ jobs:
       - name: Install Replay Playwright
         run: npx @replayio/playwright install
         env:
-          RECORD_REPLAY_CHROMIUM_DOWNLOAD_FILE: linux-chromium${{ github.event.inputs.runtimeBuildId }}.tar.xz
+          RECORD_REPLAY_CHROMIUM_DOWNLOAD_FILE: ${{ github.event.inputs.linuxBuildFile }}
       - uses: replayio/action-playwright@main
         with:
           command: npx playwright test --shard ${{ matrix.shard }}/10 --reporter=@replayio/playwright/reporter,line tests/*.ts
