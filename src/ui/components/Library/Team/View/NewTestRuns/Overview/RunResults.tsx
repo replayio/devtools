@@ -206,9 +206,9 @@ function PathNodeRenderer({
     <>
       {name && (
         <div
-          className={`cursor-pointer truncate rounded py-2 pr-4 ${styles.libraryRow} ${
-            containsSelectedSpec ? styles.libraryRowSelected : ""
-          }`}
+          className={`flex cursor-pointer justify-between truncate rounded py-2 pr-4 ${
+            styles.libraryRow
+          } ${containsSelectedSpec ? styles.libraryRowSelected : ""}`}
           data-test-id="TestRunResult-PathNode"
           data-test-state={expanded ? "expanded" : "collapsed"}
           onClick={onClick}
@@ -216,10 +216,19 @@ function PathNodeRenderer({
             paddingLeft: `${depth * 1}rem`,
           }}
         >
-          <div className="flex items-center gap-1 truncate">{formattedNames}/</div>
-          {!expanded && (
-            <div className="text-xs text-bodySubColor">({pathNode.nestedTestCount} tests)</div>
-          )}
+          <div>
+            <div className="flex items-center gap-1 truncate">{formattedNames}/</div>
+            {!expanded && (
+              <div className="text-xs text-bodySubColor">({pathNode.nestedTestCount} tests)</div>
+            )}
+          </div>
+
+          <Icon
+            className={`${
+              expanded ? "" : "rotate-90"
+            } rotate duration-140 h-4 w-4 transition ease-out`}
+            type="chevron-down"
+          />
         </div>
       )}
       <Offscreen mode={expanded ? "visible" : "hidden"}>
