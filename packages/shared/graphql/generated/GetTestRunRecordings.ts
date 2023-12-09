@@ -66,6 +66,8 @@ export interface GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests {
   __typename: "TestRunTest";
   id: string;
   testId: string;
+  index: number;
+  attempt: number;
   title: string;
   scope: string[];
   sourcePath: string;
@@ -101,7 +103,9 @@ export interface GetTestRunRecordings_node_Workspace {
   testRuns: GetTestRunRecordings_node_Workspace_testRuns | null;
 }
 
-export type GetTestRunRecordings_node = GetTestRunRecordings_node_Recording | GetTestRunRecordings_node_Workspace;
+export type GetTestRunRecordings_node =
+  | GetTestRunRecordings_node_Recording
+  | GetTestRunRecordings_node_Workspace;
 
 export interface GetTestRunRecordings {
   node: GetTestRunRecordings_node | null;
