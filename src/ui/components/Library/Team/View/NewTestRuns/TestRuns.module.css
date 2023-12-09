@@ -42,7 +42,7 @@
 }
 
 .failedPill {
-  color: var(--theme-base-100);
+  color: var(--primary-accent-foreground-text);
   background-color: var(--testsuites-failed-color);
 }
 

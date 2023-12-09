@@ -1,20 +1,44 @@
-import { useContext } from "react";
+import { useContext, useMemo } from "react";
 
 import { Test } from "shared/test-suites/TestRun";
 import HighlightedText from "ui/components/Library/Team/View/TestRuns/HighlightedText";
 import Icon from "ui/components/shared/Icon";
 
 import { TestContext } from "./TestContextRoot";
-import styles from "../../../Library.module.css";
+import styles from "../NewTestRuns/TestRuns.module.css";
 
-function Status({ failureRate }: { failureRate: number }) {
-  const status = failureRate > 0 ? "fail" : "success";
-  const displayedFailureRate = Number((failureRate * 100).toFixed(0));
+function Status({ test }: { test: Test }) {
+  const { sortBy } = useContext(TestContext);
 
-  if (failureRate > 0) {
+  // We are showing rate in the pill depending on the sortBy.
+  // If sortBy is failureRate or alphabetical, we show rate in this order of priority: failureRate, flakyRate, success.
+  // Otherwise with sortBy flakyRate, we show rate in this order: flakyRate, failureRate, success.
+
+  const { status, rate, classNames } = useMemo(() => {
+    console.log("sortBy", sortBy, test.failureRate, test.flakyRate);
+    if (sortBy === "flakyRate" && test.flakyRate > 0) {
+      return {
+        status: "flaky",
+        rate: test.flakyRate,
+        classNames: styles.flakyPill,
+      };
+    } else if (test.failureRate > 0) {
+      return {
+        status: "failure",
+        rate: test.failureRate,
+        classNames: styles.failedPill,
+      };
+    } else {
+      return { status: "success", rate: 0, classNames: "" };
+    }
+  }, [sortBy, test.failureRate, test.flakyRate]);
+
+  const displayedFailureRate = Number((rate * 100).toFixed(0));
+
+  if (rate > 0) {
     return (
       <div
-        className="flex h-5 w-10 shrink-0 items-center justify-center rounded-md bg-[#F02D5E] text-xs font-bold text-white"
+        className={`flex h-5 w-10 shrink-0 items-center justify-center rounded-md text-xs font-bold text-white ${classNames}`}
         data-test-status={status}
         title={`${displayedFailureRate === 100 ? "100" : displayedFailureRate.toFixed(2)}%`}
       >
@@ -48,7 +72,7 @@ export function TestListItem({ filterByText, test }: { filterByText: string; tes
       `}
       onClick={onClick}
     >
-      <Status failureRate={test.failureRate} />
+      <Status test={test} />
       <div className="flex h-full flex-grow flex-col justify-evenly overflow-hidden">
         <div className="flex flex-row justify-between space-x-3">
           <div

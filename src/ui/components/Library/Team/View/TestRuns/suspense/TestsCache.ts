@@ -34,6 +34,7 @@ export const testsCache = createCache<
     const processedTests = rawTests.map(t => ({
       ...t,
       failureRate: t.stats.failureRate,
+      flakyRate: t.stats.flakyRate,
     }));
 
     return orderBy(processedTests, "failureRate", "desc");
