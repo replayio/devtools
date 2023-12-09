@@ -35,10 +35,13 @@ test(`stepping-03: Stepping past the beginning or end of a frame should act like
   await reverseStepOverToLine(page, 20);
   await executeAndVerifyTerminalExpression(page, "number", "9");
 
+  await stepOverToLine(page, 20); // TODO [FE-2109][RUN-2958] Chromium steps to the same line again
   await stepOverToLine(page, 21);
-  await stepOverToLine(page, 22);
+  await stepOverToLine(page, 21); // TODO [FE-2109][RUN-2958] Chromium steps to the same line again
+  await stepOverToLine(page, 21); // TODO [FE-2109][RUN-2958] Gecko steps to empty line 22 but Chromium steps to line 21 yet again
   await stepOverToLine(page, 12);
   await stepOverToLine(page, 16);
+  await stepOverToLine(page, 16); // TODO [FE-2109][RUN-2958] Chromium steps to the same line again
   await stepOverToLine(page, 17);
 
   // After forward-stepping out of the topmost frame we should run forward to

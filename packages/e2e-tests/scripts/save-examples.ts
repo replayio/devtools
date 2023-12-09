@@ -34,7 +34,7 @@ const argv = yargs
     alias: "r",
     default: "",
     description: "Override runtime specified in test config",
-    choices: ["", "chromium", "firefox", "node"],
+    choices: ["", "chromium", "node"],
   })
   .option("target", {
     alias: "t",
@@ -52,40 +52,28 @@ type TestExampleFile = {
   filename: string;
   folder: string;
   category: "browser" | "node";
-  runtime: "firefox" | "chromium" | "node";
+  runtime: "chromium" | "node";
   playwrightScript?: PlaywrightScript;
 };
 
 const knownExamples: TestExampleFile[] = [
   {
-    filename: "authenticated_comments_1.html",
+    filename: "authenticated_comments.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
-    filename: "authenticated_comments_2.html",
+    filename: "authenticated_logpoints.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
-  },
-  {
-    filename: "authenticated_comments_3.html",
-    folder: config.browserExamplesPath,
-    category: "browser",
-    runtime: "firefox",
-  },
-  {
-    filename: "authenticated_logpoints_1.html",
-    folder: config.browserExamplesPath,
-    category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "cra/dist/index.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "cra/dist/index_chromium.html",
@@ -103,25 +91,25 @@ const knownExamples: TestExampleFile[] = [
     filename: "doc_async.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_control_flow.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_debugger_statements.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_events.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_events_chromium.html",
@@ -133,43 +121,43 @@ const knownExamples: TestExampleFile[] = [
     filename: "doc_exceptions.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_exceptions_bundle.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_inspector_basic.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_inspector_shorthand.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_inspector_sourcemapped.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_inspector_styles.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_minified.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_minified_chromium.html",
@@ -181,79 +169,79 @@ const knownExamples: TestExampleFile[] = [
     filename: "doc_navigate.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_prod_bundle.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_recursion.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_rr_basic.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_rr_blackbox.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_rr_console.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_rr_error.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_rr_logs.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_rr_objects.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_rr_preview.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_rr_region_loading.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_rr_worker.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_stacking.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_stacking_chromium.html",
@@ -265,7 +253,7 @@ const knownExamples: TestExampleFile[] = [
     filename: "log_points_and_block_scope.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "redux-fundamentals/dist/index.html",
@@ -327,6 +315,12 @@ const knownExamples: TestExampleFile[] = [
     folder: config.nodeExamplesPath,
     category: "node",
     runtime: "node",
+  },
+  {
+    filename: "node_picker.html",
+    folder: config.browserExamplesPath,
+    category: "browser",
+    runtime: "chromium",
   },
   // The two separate Cypress examples from "cypress-realworld"
   // and "flake" are not listed here. We don't re-record those

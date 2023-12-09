@@ -20,7 +20,10 @@ test("inspector-rules-01: Basic CSS rules should be viewed", async ({
 
   await openElementsPanel(page);
 
-  await selectElementsListRow(page, { text: "maindiv" });
+  // TODO [FE-2109] Some of these styles no longer match, in ways that seem totally incompatible.
+  // Need to dig in and decide what might be a Chromium regression vs a bad test.
+
+  await selectElementsListRow(page, { text: 'id="maindiv"' });
   await checkAppliedRules(page, [
     {
       selector: "div::first-letter",

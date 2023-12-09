@@ -76,6 +76,8 @@ test("inspector-elements-03: Nested node picker and selection behavior", async (
 
   const stackingCaseR3C2 = stackingTestCases.find(tc => tc.id === "r3c2")!;
 
+  // TODO [FE-2109][RUN-2989] All of the node picker stuff below fails because bounding boxes are wrong
+
   // This should select a `<div class="box1">`, 3 levels deep
   await verifyStackingTestCaseSelectedElementUnderCursor(
     page,

@@ -419,8 +419,8 @@ export async function selectElementsListRow(
   await debugPrint(page, "Selecting Elements row", "selectElementsListRow");
 
   await waitFor(async () => {
-    await row.waitFor();
-    await row.click();
+    await row.first().waitFor();
+    await row.first().click();
   });
 
   return row;

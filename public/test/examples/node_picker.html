@@ -1,0 +1,65 @@
+<html>
+  <head>
+    <style type="text/css">
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      .main-div {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 50vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .iframe {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100vw;
+        height: 50vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="main-div">
+      Main div
+    </div>
+
+    <iframe id="iframe" class="iframe"></iframe>
+
+    <script>
+      const iframe = document.getElementById("iframe");
+      iframe.srcdoc = `
+        <!DOCTYPE html>
+        <style type="text/css">
+          html, body {
+            margin: 0;
+            padding: 0;
+          }
+          .inner-div {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+        </style>
+        <div class="inner-div">
+          Inner div
+        </div>
+      `;
+
+      console.log("ExampleFinished");
+    </script>
+  </body>
+</html>

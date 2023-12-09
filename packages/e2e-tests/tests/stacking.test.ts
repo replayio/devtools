@@ -6,7 +6,6 @@ import {
   stackingTestCases,
   verifyStackingTestCaseSelectedElementUnderCursor,
 } from "../helpers/stacking-test-cases";
-import { debugPrint } from "../helpers/utils";
 import test from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "doc_stacking.html" });
@@ -32,7 +31,10 @@ test("stacking: Element highlighter selects the correct element when they overla
   const rulesContainer = page.locator('[data-test-id="RulesPanel"]');
 
   for (let testCase of stackingTestCases) {
-    debugPrint(page, `Stacking test case: ${testCase.id}`);
+    // Really make sure the panel is closed
+    closeSidePanel(page);
+
+    // TODO [FE-2109][RUN-2999] Fails because of incorrect inherited styles
     await verifyStackingTestCaseSelectedElementUnderCursor(page, canvas, rulesContainer, testCase);
   }
 });

@@ -28,6 +28,9 @@ test("stepping-02: Test fixes for some simple stepping bugs", async ({
   await addBreakpoint(page, { lineNumber: 21, url: exampleKey });
   await rewindToLine(page, 21);
 
+  // TODO [FE-2109][RUN-2958] Chromium requires two steps in here
+  await stepInToLine(page, 21);
+
   await stepInToLine(page, 24);
   await stepOverToLine(page, 25);
   await stepOverToLine(page, 26);

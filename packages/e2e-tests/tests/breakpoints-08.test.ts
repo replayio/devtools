@@ -18,12 +18,12 @@ test(`breakpoints-08: should be temporarily disabled`, async ({
   await openDevToolsTab(page);
 
   // Add breakpoint and verify text in console
-  await addBreakpoint(page, { lineNumber: 5, url: exampleKey });
+  await addBreakpoint(page, { lineNumber: 4, url: exampleKey });
 
   // Find the newly added point in the side panel
   await openPauseInformationPanel(page);
   await openPrintStatementsAccordionPane(page);
-  const breakpoints = findPoints(page, "breakpoint", { lineNumber: 5 });
+  const breakpoints = findPoints(page, "breakpoint", { lineNumber: 4 });
   await expect(await breakpoints.count()).toBe(1);
   const breakpoint = breakpoints.first();
 
@@ -35,6 +35,6 @@ test(`breakpoints-08: should be temporarily disabled`, async ({
   await togglePoint(page, breakpoint, true);
 
   // Delete the breakpoint and verify that it's no longer in the side panel
-  await removeBreakpoint(page, { lineNumber: 5, url: exampleKey });
+  await removeBreakpoint(page, { lineNumber: 4, url: exampleKey });
   await expect(await breakpoints.count()).toBe(0);
 });

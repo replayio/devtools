@@ -21,6 +21,7 @@ test("console_errors: Test that errors and warnings from various sources are sho
   await enableConsoleMessageType(page, "exceptions");
   await enableConsoleMessageType(page, "warnings");
 
+  // TODO [FE-2109][RUN-2962] Re-record "doc_exceptions_bundle.html" once Chromium properly reports Console APIs
   await verifyConsoleMessage(page, "ConsoleTrace");
   await verifyConsoleMessage(page, "ConsoleWarn");
   await verifyConsoleMessage(page, "ConsoleError");

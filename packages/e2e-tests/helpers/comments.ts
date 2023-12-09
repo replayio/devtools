@@ -7,7 +7,7 @@ import { clearText, focus, isEditable, type as typeText } from "./lexical";
 import { findNetworkRequestRow } from "./network-panel";
 import { openSource } from "./source-explorer-panel";
 import { getSourceLine } from "./source-panel";
-import { debugPrint, waitFor } from "./utils";
+import { debugPrint, delay, waitFor } from "./utils";
 
 // Keep in sync with shared/graphq/types
 type CommentType =

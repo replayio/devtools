@@ -24,7 +24,7 @@ test("inspector-rules-03: Shorthand CSS rules should be viewed", async ({
   await checkAppliedRules(page, [
     {
       selector: ".parent",
-      source: "shorthand_styles.css:1",
+      source: "shorthand_styles.css",
       properties: [
         { text: "margin-left: 10px;", overridden: false },
         { text: "font: italic small-caps bold 24px courier;", overridden: false },

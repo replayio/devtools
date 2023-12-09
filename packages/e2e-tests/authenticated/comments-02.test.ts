@@ -9,10 +9,7 @@ import {
 import { openSource } from "../helpers/source-explorer-panel";
 import test, { Page } from "../testFixtureCloneRecording";
 
-// Each authenticated e2e test must use a unique recording id;
-// else shared state from one test could impact another test running in parallel.
-// TODO [SCS-1066] Share recordings between other tests
-const url = "authenticated_comments_2.html";
+const url = "authenticated_comments.html";
 
 async function load(page: Page, recordingId: string, apiKey: string) {
   await startTest(page, recordingId, apiKey);

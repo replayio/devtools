@@ -61,9 +61,13 @@ test("inspector-elements-04: Keyboard shortcuts should select the right DOM node
 
   // Basic up/down selects the next element in the tree
   await typeKeyAndVerifySelectedElement(page, "ArrowDown", bodyChildDomNodes[0]);
+  await typeKeyAndVerifySelectedElement(page, "ArrowLeft", bodyChildDomNodes[0]); // Collapse <style> tag
   await typeKeyAndVerifySelectedElement(page, "ArrowDown", bodyChildDomNodes[1]);
+  await typeKeyAndVerifySelectedElement(page, "ArrowLeft", bodyChildDomNodes[1]); // Collapse <div> tag
   await typeKeyAndVerifySelectedElement(page, "ArrowDown", bodyChildDomNodes[2]);
   await typeKeyAndVerifySelectedElement(page, "ArrowUp", bodyChildDomNodes[1]);
+
+  // TODO [FE-2109][RUN-2989] The rest of this test fails because of bounding box issues
 
   const div0Box1 = await getElementsListRow(page, { text: div0ChildDomNodes[0] });
 

@@ -25,7 +25,7 @@ test(`inspector-elements-05_search: element picker and iframe behavior`, async (
   await searchElementsPanel(page, "myiframe");
   await verifySearchResults(page, { currentNumber: 0, totalNumber: 0 });
 
-  // The search string should now match text inside of the <script> tag
+  // The search string should now match an <iframe> and text inside of the <script> tag within the <iframe>
   await seekToTimePercent(page, 90);
-  await verifySearchResults(page, { currentNumber: 1, text: "<iframe", totalNumber: 1 });
+  await verifySearchResults(page, { currentNumber: 1, text: "<iframe", totalNumber: 2 });
 });

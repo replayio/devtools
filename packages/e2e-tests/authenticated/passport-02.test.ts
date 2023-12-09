@@ -7,9 +7,8 @@ import {
   openElementsPanel,
   waitForElementsToLoad,
 } from "../helpers/elements-panel";
-import { getReactComponents } from "../helpers/legacy-react-devtools-panel";
 import { findNetworkRequestRow, openNetworkPanel } from "../helpers/network-panel";
-import { openReactDevtoolsPanel } from "../helpers/new-react-devtools-panel";
+import { getReactComponents, openReactDevtoolsPanel } from "../helpers/new-react-devtools-panel";
 import { isPassportItemCompleted } from "../helpers/passport";
 import { enablePassport } from "../helpers/settings";
 import { resetTestUser, waitFor } from "../helpers/utils";
@@ -45,7 +44,7 @@ test(`authenticated/passport-02: Infrared inspection`, async ({
   );
 
   await openNetworkPanel(page);
-  const networkRequest = await findNetworkRequestRow(page, { name: "index.html" });
+  const networkRequest = await findNetworkRequestRow(page, { name: "favicon.ico" });
   await networkRequest.click();
 
   await waitFor(async () =>

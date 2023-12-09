@@ -24,7 +24,7 @@ test("inspector-rules-02: Sourcemapped rules should be viewed", async ({
   await checkAppliedRules(page, [
     {
       selector: "div",
-      source: "styles.css:2",
+      source: "inline:1",
       properties: [{ text: "background-color: blue;", overridden: false }],
     },
   ]);

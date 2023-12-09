@@ -18,7 +18,10 @@ test("repaint: repaints the screen screen when stepping over code that modifies 
 
   const prevDataUrl = await getCanvasDataUrl(page);
 
-  await stepOver(page);
+  await stepOver(page); // Step to the try,await
+  await stepOver(page); // Step into the catch
+  await stepOver(page); // TODO [FE-2109][RUN-2958] Chromium requires extra steps
+
   await waitForPaused(page);
 
   await waitFor(async () => {

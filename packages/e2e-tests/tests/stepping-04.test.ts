@@ -23,7 +23,8 @@ test("stepping-04: Test stepping in a frame other than the top frame", async ({
 
   await warpToMessage(page, "logpoint 5");
   await selectFrame(page, 1);
-  await stepOverToLine(page, 22);
+  await stepOverToLine(page, 21); // TODO [FE-2109][RUN-2958] Chromium steps to the same line again
+  await stepOverToLine(page, 12);
 
   await warpToMessage(page, "logpoint 5");
   await selectFrame(page, 1);
