@@ -26,7 +26,7 @@ export function TestsPage() {
   );
 }
 
-const TimeFilterLabel: Record<TimeFilterOptions, string> = {
+const timeFilterLabel: Record<TimeFilterOptions, string> = {
   "two-week": "Last two weeks",
   week: "Last week",
   day: "Last day",
@@ -86,7 +86,7 @@ function TestsContent() {
                 testId="TestPage-BranchFilter-DropdownTrigger"
                 onClick={onClickTimeFilter}
                 onKeyDown={onKeyDownTimeFilter}
-                label={TimeFilterLabel[filterByTime]}
+                label={timeFilterLabel[filterByTime]}
               />
               {contextMenuTimeFilter}
               <div className={styles.filterContainer}>
