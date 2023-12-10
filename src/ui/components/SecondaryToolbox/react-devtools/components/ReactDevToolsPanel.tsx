@@ -171,7 +171,8 @@ function ReactDevToolsPanelInner({
           defaultSize={65}
           id="tree"
           minSize={25}
-          onCollapse={setCollapsedLeft}
+          onCollapse={() => setCollapsedLeft(true)}
+          onExpand={() => setCollapsedLeft(false)}
           order={1}
           ref={leftPanelRef}
         >
@@ -206,7 +207,8 @@ function ReactDevToolsPanelInner({
           collapsible
           id="properties"
           minSize={25}
-          onCollapse={setCollapsedRight}
+          onCollapse={() => setCollapsedRight(true)}
+          onExpand={() => setCollapsedRight(false)}
           order={2}
           ref={rightPanelRef}
         >

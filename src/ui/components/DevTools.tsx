@@ -116,7 +116,8 @@ function Body() {
             defaultSize={20}
             id="Panel-SidePanel"
             minSize={15}
-            onCollapse={onSidePanelCollapse}
+            onCollapse={() => onSidePanelCollapse(true)}
+            onExpand={() => onSidePanelCollapse(false)}
             ref={sidePanelRef}
           >
             <SidePanel />
