@@ -191,6 +191,7 @@ export function serializeDOM(rootNode: Document): number[] {
 
     if (typeof domNodeOrText.getAttributeNames === "function") {
       const attributeNames = domNodeOrText.getAttributeNames();
+      attributeNames.sort();
       attributeNames.forEach(name => {
         const value = domNodeOrText.getAttribute(name);
         if (value) {

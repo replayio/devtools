@@ -38,10 +38,6 @@ test(`authenticated/comments-02: Test shared comments and replies`, async ({
     const page = await context.newPage();
     await load(page, recordingId, E2E_USER_1_API_KEY);
 
-    // Clean up from previous tests
-    // TODO [SCS-1066] Ideally we would create a fresh recording for each test run
-    await deleteAllComments(page);
-
     await addSourceCodeComment(page, {
       text: "This is a test comment from user 1",
       lineNumber: 3,
