@@ -3,9 +3,14 @@ import { delay, waitFor } from "../helpers/utils";
 import test, { Page } from "../testFixtureCloneRecording";
 
 async function waitForPanelSize(page: Page, expectedSize: number) {
-  const sidePanel = page.locator('[data-panel-id="Panel-SidePanel"]');
   await waitFor(async () => {
-    const actualSize = parseInt((await sidePanel.getAttribute("data-panel-size")) || "");
+    const flexStyle = await page.evaluate(() => {
+      const element = document.querySelector('[data-panel-id="Panel-SidePanel"]');
+      const style = window.getComputedStyle(element);
+      return style.getPropertyValue("flex");
+    });
+
+    const actualSize = parseInt(flexStyle.split(" ")[0]);
     if (actualSize !== expectedSize) {
       throw `Expected panel size to be ${expectedSize} but was ${actualSize}`;
     }
