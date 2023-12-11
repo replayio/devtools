@@ -35,6 +35,13 @@ export type TestEventDomNodeDetails = TimeStampedPoint & {
   domNode: Element | null;
 };
 
+let getPlaywrightTestStepDomNodesString: string | null = null;
+
+async function lazyImportExpression() {
+  const module = await import("../utils/playwrightStepDomNodes");
+  getPlaywrightTestStepDomNodesString = module.getPlaywrightTestStepDomNodes.toString();
+}
+
 // The interval cache is used by `<Panel>` to fetch all of the step details and DOM node data for a single test.
 // `<Panel>` will kick this off when it renders, and then the cache will fetch all of the data in the background.
 export const testEventDetailsIntervalCache = createFocusIntervalCacheForExecutionPoints<
@@ -366,6 +373,10 @@ async function fetchPlaywrightStepDetails(
     "./assets/injectedScriptSource.js"
   );
 
+  if (getPlaywrightTestStepDomNodesString === null) {
+    await lazyImportExpression();
+  }
+
   // These arguments and the preload eval string correspond to the Playwright setup logic
   // in `playwright-core/src/server/dom.ts::injectedScript()`.
   // We can hard-code several of these values ourselves.
@@ -423,58 +434,9 @@ async function fetchPlaywrightStepDetails(
         // Inject the lookup table of all locator strings
         const pointsToLocatorStrings = ${JSON.stringify(pointsToLocatorStrings)};
 
-        // This is a magic variable in scope with the current execution point for this eval step.
-        // Ref: BAC-4285, backend PR #9104 
-        const currentExecutionPoint = __REPLAY_CURRENT_EVALUATION_POINT__;
+        const getPlaywrightTestStepDomNodes = ${getPlaywrightTestStepDomNodesString};
 
-        // Look up the locator string for this execution point
-        const locatorString = pointsToLocatorStrings[currentExecutionPoint];
-        
-        // Playwright parses the locator string into descriptive objects
-        const parsedSelector = PLAYWRIGHT_INJECTED_SCRIPT.parseSelector(locatorString);
-
-        let foundElements = []
-
-        // Look for the actual target elements
-        try {
-          foundElements = PLAYWRIGHT_INJECTED_SCRIPT.querySelectorAll(parsedSelector, PLAYWRIGHT_INJECTED_SCRIPT.document) ?? [];
-        } catch (err) { }
-
-        // It may be useful for test debugging purposes to see _all_ of the elements retrieved
-        // for _each_ segment of the locator string. Now that this is already split up,
-        // we can do that by slicing the selector parts and querying for each subset.
-        const iterativeSelectors = parsedSelector.parts.map((part, index) => {
-          return {
-            parts: parsedSelector.parts.slice(0, index + 1),
-            capture: parsedSelector.capture
-          }
-        });
-
-        const allSelectedElements = iterativeSelectors.map(selector => {
-          let elements = []; 
-          try {
-            elements = PLAYWRIGHT_INJECTED_SCRIPT.querySelectorAll(selector, PLAYWRIGHT_INJECTED_SCRIPT.document);
-          } catch (err) { }
-
-          return elements;
-        })
-
-
-        // Now we deal with our runEvaluation object preview limits again.
-        // To get the DOM node previews back as fast as possible, we'll inline the primary DOM
-        // nodes directly into this result array.
-        // We'll include the rest of the data for use in later dev work.
-        const result = [
-          foundElements.length,
-          ...foundElements,
-          JSON.stringify(parsedSelector),
-          // all parsed selectors
-          JSON.stringify(iterativeSelectors),
-          {
-            foundElements,
-            allSelectedElements
-          }
-        ]
+        const result = getPlaywrightTestStepDomNodes(pointsToLocatorStrings);
 
         result;
     `,
