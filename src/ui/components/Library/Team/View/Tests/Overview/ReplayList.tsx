@@ -5,6 +5,7 @@ import orderBy from "lodash/orderBy";
 import Icon from "replay-next/components/Icon";
 import { TestExecution } from "shared/test-suites/TestRun";
 
+import { Alert } from "../../NewTestRuns/Alert";
 import { getTruncatedRelativeDate } from "../../Recordings/RecordingListItem/RecordingListItem";
 import styles from "../../../../Library.module.css";
 import testsuiteStyles from "../../../../Testsuites.module.css";
@@ -44,7 +45,14 @@ export function ReplayList({ executions, label }: { executions: TestExecution[];
           <div className={styles.labelText}>{label}</div>
         </div>
         <div className="flex flex-col">
-          {hasExecutionsWithoutReplays ? <div>Executions without Replays message</div> : null}
+          {hasExecutionsWithoutReplays ? (
+            <div className="p-3">
+              <Alert link="https://docs.replay.io/test-suites">
+                Some of this test's executions don't have any replays. They may be outside the
+                retention window or may not have been uploaded
+              </Alert>
+            </div>
+          ) : null}
           {children}
         </div>
       </div>

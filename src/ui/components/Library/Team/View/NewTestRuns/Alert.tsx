@@ -10,7 +10,7 @@ export function Alert({ children, link }: { children: string; link?: string }) {
   }
 
   return (
-    <div className="flex flex-row items-center gap-3 rounded-lg bg-chrome p-3">
+    <div className="gap-3 rounded-lg bg-chrome p-3">
       <span>{children}</span>
       <a href={link} rel="noreferrer" target="_blank" className="ml-1 underline">
         Learn more
