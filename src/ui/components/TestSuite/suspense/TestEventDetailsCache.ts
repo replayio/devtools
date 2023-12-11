@@ -22,7 +22,7 @@ import {
   UserActionEvent,
   isUserActionTestEvent,
 } from "shared/test-suites/RecordingTestMetadata";
-import { boxModelCache } from "ui/suspense/nodeCaches";
+import { boundingRectsCache } from "ui/suspense/nodeCaches";
 
 export type TestEventDetailsEntry = TimeStampedPoint & {
   count: number | null;
@@ -338,8 +338,8 @@ async function cacheDomNodeEntry(
   let nodeInfo: Element | null = null;
 
   if (firstDomNode) {
-    // Kick off a fetch for the box model now, so we have that cached when we try to highlight this node
-    boxModelCache.prefetch(replayClient, pauseId, firstDomNode.objectId);
+    // Kick off a fetch for the bounding rects now, so we have that cached when we try to highlight this node
+    boundingRectsCache.prefetch(replayClient, pauseId);
     nodeInfo = await elementCache.readAsync(replayClient, pauseId, firstDomNode.objectId);
   }
 
