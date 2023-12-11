@@ -14,3 +14,4 @@ pages/_app.tsx
 *.json
 *.yaml
 src/**/*.raw.js
+src/ui/components/TestSuite/suspense/assets/*.js

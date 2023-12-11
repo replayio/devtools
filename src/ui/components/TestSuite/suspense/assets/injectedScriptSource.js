@@ -1,3 +1,5 @@
+// Copied from:
+// playwright-core@1.37.1/lib/generated/injectedScriptSource.js
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {

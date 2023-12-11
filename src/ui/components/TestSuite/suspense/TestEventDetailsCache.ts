@@ -364,7 +364,9 @@ async function fetchPlaywrightStepDetails(
   const evalResults: RunEvaluationResult[] = [];
 
   // This is the injected script that Playwright uses to parse selectors and query the DOM.
-  const playwrightInjectedScriptModule: { source: string } = await import("./injectedScriptSource");
+  const playwrightInjectedScriptModule: { source: string } = await import(
+    "./assets/injectedScriptSource.js"
+  );
 
   // These arguments and the preload eval string correspond to the Playwright setup logic
   // in `playwright-core/src/server/dom.ts::injectedScript()`.
