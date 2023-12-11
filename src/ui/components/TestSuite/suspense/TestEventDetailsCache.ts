@@ -359,8 +359,6 @@ async function fetchPlaywrightStepDetails(
   end: string,
   sources: Map<string, Source>
 ): Promise<TestEventDetailsEntry[]> {
-  const testResultPoints = filteredEvents.map(e => e.data.timeStampedPoints.beforeStep!);
-
   const evalResults: RunEvaluationResult[] = [];
 
   // This is the injected script that Playwright uses to parse selectors and query the DOM.
@@ -399,99 +397,100 @@ async function fetchPlaywrightStepDetails(
         })();
       `;
 
+  const pointsToLocatorStrings: Record<string, string> = {};
+  for (const userEvent of filteredEvents) {
+    // The locator string is always the first command arg.
+    const locatorString = userEvent.data.command.arguments[0];
+    const point = userEvent.data.timeStampedPoints.beforeStep!.point;
+    pointsToLocatorStrings[point] = locatorString;
+  }
+
   // Any focus range errors here will bubble up to the parent focus cache,
   // which will retry the load if needed later.
-  await Promise.all(
-    // TODO We don't currently have a way for `runEvaluation` expressions to have variable behavior
-    // per execution point. The old analysis API put `point` and `time` in scope, and if we had
-    // that we could do _one_ `runEvaluation` with a single expression that would contain a lookup
-    // table mapping execution points to locator strings.
-    // Since we don't have that, for now we'll run a separate `runEvaluation` _per point_. This is horrible
-    // for perf, but it at least will work. (Slowly.)
-    testResultPoints.map(async (p, index) => {
-      const userEvent = filteredEvents[index];
-
-      // The locator string is always the first command arg.
-      const locatorString = userEvent.data.command.arguments[0];
-
-      await replayClient.runEvaluation(
+  await replayClient.runEvaluation(
+    {
+      selector: {
+        kind: "points",
+        points: Object.keys(pointsToLocatorStrings).sort(),
+      },
+      preloadExpressions: [
         {
-          selector: {
-            kind: "points",
-            points: [p.point],
-          },
-          preloadExpressions: [
-            {
-              name: "PLAYWRIGHT_INJECTED_SCRIPT",
-              expression: preloadExpression,
-            },
-          ],
-          expression: `
-          const locatorString = ${JSON.stringify(locatorString)};
-          
-          // Playwright parses the locator string into descriptive objects
-          const parsedSelector = PLAYWRIGHT_INJECTED_SCRIPT.parseSelector(locatorString);
+          name: "PLAYWRIGHT_INJECTED_SCRIPT",
+          expression: preloadExpression,
+        },
+      ],
+      expression: `
+        // Inject the lookup table of all locator strings
+        const pointsToLocatorStrings = ${JSON.stringify(pointsToLocatorStrings)};
 
-          let foundElements = []
+        // This is a magic variable in scope with the current execution point for this eval step.
+        // Ref: BAC-4285, backend PR #9104 
+        const currentExecutionPoint = __REPLAY_CURRENT_EVALUATION_POINT__;
 
-          // Look for the actual target elements
+        // Look up the locator string for this execution point
+        const locatorString = pointsToLocatorStrings[currentExecutionPoint];
+        
+        // Playwright parses the locator string into descriptive objects
+        const parsedSelector = PLAYWRIGHT_INJECTED_SCRIPT.parseSelector(locatorString);
+
+        let foundElements = []
+
+        // Look for the actual target elements
+        try {
+          foundElements = PLAYWRIGHT_INJECTED_SCRIPT.querySelectorAll(parsedSelector, PLAYWRIGHT_INJECTED_SCRIPT.document) ?? [];
+        } catch (err) { }
+
+        // It may be useful for test debugging purposes to see _all_ of the elements retrieved
+        // for _each_ segment of the locator string. Now that this is already split up,
+        // we can do that by slicing the selector parts and querying for each subset.
+        const iterativeSelectors = parsedSelector.parts.map((part, index) => {
+          return {
+            parts: parsedSelector.parts.slice(0, index + 1),
+            capture: parsedSelector.capture
+          }
+        });
+
+        const allSelectedElements = iterativeSelectors.map(selector => {
+          let elements = []; 
           try {
-            foundElements = PLAYWRIGHT_INJECTED_SCRIPT.querySelectorAll(parsedSelector, PLAYWRIGHT_INJECTED_SCRIPT.document) ?? [];
+            elements = PLAYWRIGHT_INJECTED_SCRIPT.querySelectorAll(selector, PLAYWRIGHT_INJECTED_SCRIPT.document);
           } catch (err) { }
 
-          // It may be useful for test debugging purposes to see _all_ of the elements retrieved
-          // for _each_ segment of the locator string. Now that this is already split up,
-          // we can do that by slicing the selector parts and querying for each subset.
-          const iterativeSelectors = parsedSelector.parts.map((part, index) => {
-            return {
-              parts: parsedSelector.parts.slice(0, index + 1),
-              capture: parsedSelector.capture
-            }
-          });
-
-          const allSelectedElements = iterativeSelectors.map(selector => {
-            let elements = []; 
-            try {
-              elements = PLAYWRIGHT_INJECTED_SCRIPT.querySelectorAll(selector, PLAYWRIGHT_INJECTED_SCRIPT.document);
-            } catch (err) { }
-
-            return elements;
-          })
+          return elements;
+        })
 
 
-          // Now we deal with our runEvaluation object preview limits again.
-          // To get the DOM node previews back as fast as possible, we'll inline the primary DOM
-          // nodes directly into this result array.
-          // We'll include the rest of the data for use in later dev work.
-          const result = [
-            foundElements.length,
-            ...foundElements,
-            JSON.stringify(parsedSelector),
-            // all parsed selectors
-            JSON.stringify(iterativeSelectors),
-            {
-              foundElements,
-              allSelectedElements
-            }
-          ]
-
-          result;
-        `,
-          fullPropertyPreview: true,
-          limits: { begin, end },
-        },
-        results => {
-          // This logic copy-pasted from AnalysisCache.ts
-          for (const result of results) {
-            // Immediately cache pause ID and data so we have it available for reuse
-            setPointAndTimeForPauseId(result.pauseId, result.point);
-            cachePauseData(replayClient, sources, result.pauseId, result.data);
+        // Now we deal with our runEvaluation object preview limits again.
+        // To get the DOM node previews back as fast as possible, we'll inline the primary DOM
+        // nodes directly into this result array.
+        // We'll include the rest of the data for use in later dev work.
+        const result = [
+          foundElements.length,
+          ...foundElements,
+          JSON.stringify(parsedSelector),
+          // all parsed selectors
+          JSON.stringify(iterativeSelectors),
+          {
+            foundElements,
+            allSelectedElements
           }
-          // Collect them all so we process them in a single batch
-          evalResults.push(...results);
-        }
-      );
-    })
+        ]
+
+        result;
+    `,
+      fullPropertyPreview: true,
+      limits: { begin, end },
+    },
+    results => {
+      // This logic copy-pasted from AnalysisCache.ts
+      for (const result of results) {
+        // Immediately cache pause ID and data so we have it available for reuse
+        setPointAndTimeForPauseId(result.pauseId, result.point);
+        cachePauseData(replayClient, sources, result.pauseId, result.data);
+      }
+      // Collect them all so we process them in a single batch
+      evalResults.push(...results);
+    }
   );
 
   evalResults.sort((a, b) => compareExecutionPoints(a.point.point, b.point.point));
