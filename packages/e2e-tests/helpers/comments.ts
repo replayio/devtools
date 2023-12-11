@@ -158,11 +158,6 @@ export async function addVisualComment(
     async () => {
       const canvasLocator = page.locator("canvas#graphics");
       await canvasLocator.click({ position: { x, y } });
-
-      await selectContextMenuItem(page, {
-        contextMenuItemTestName: "ContextMenuItem-AddComment",
-        contextMenuTestId: "ContextMenu-Video",
-      });
     },
     "visual",
     text

@@ -432,8 +432,10 @@ async function saveBrowserExample({ example }: TestRunCallbackArgs) {
 
   // Shouldn't be "node" by this point
   await recordPlaywright((argv.runtime || example.runtime) as BrowserName, async (page, expect) => {
-    await page.goto(exampleUrl);
-    await playwrightScript(page, expect);
+    const waitForLogPromise = playwrightScript(page, expect);
+    const goToPagePromise = page.goto(exampleUrl);
+
+    await Promise.all([goToPagePromise, waitForLogPromise]);
   });
 
   console.log("Recording completed");
