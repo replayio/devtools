@@ -48,8 +48,9 @@ export function ReplayList({ executions, label }: { executions: TestExecution[];
           {hasExecutionsWithoutReplays ? (
             <div className="p-3">
               <Alert link="https://docs.replay.io/test-suites">
-                Some of this test's executions don't have any replays. They may be outside the
-                retention window or may not have been uploaded
+                This test's failure rate may not match the aggregate results from the Replays
+                displayed here, as some of those corresponding Replays used for the calculations
+                have expired
               </Alert>
             </div>
           ) : null}
