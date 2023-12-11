@@ -179,12 +179,6 @@ export const config = {
     label: "Visualize protocol events in the timeline",
     legacyKey: "devtools.features.protocolTimeline",
   },
-  feature_reduxDevTools: {
-    defaultValue: Boolean(true),
-    description: "Enable experimental Redux DevTools panel",
-    label: "Enable Redux DevTools",
-    legacyKey: null,
-  },
 
   global_disableLogRocket: {
     defaultValue: Boolean(false),

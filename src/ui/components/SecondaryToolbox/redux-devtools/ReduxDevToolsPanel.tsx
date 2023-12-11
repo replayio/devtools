@@ -28,7 +28,6 @@ export default function ReduxDevToolsPanel() {
   const [searchValue, setSearchValue] = useState("");
 
   const currentExecutionPoint = useAppSelector(getExecutionPoint);
-  const showRecordingTooLongWarning = useAppSelector(getRecordingTooLongToSupportRoutines);
 
   const { status: annotationsStatus, value: parsedAnnotations } = useImperativeCacheValue(
     reduxDevToolsAnnotationsCache,
@@ -68,16 +67,6 @@ export default function ReduxDevToolsPanel() {
     // This will speed up the first click on a Redux "J2C" button
     applyMiddlewareDeclCache.prefetch(client);
   }, [client]);
-
-  if (showRecordingTooLongWarning) {
-    return (
-      <div className={styles.Container} data-test-id="ReduxDevtools">
-        <div className={styles.CouldNotLoadMessage}>
-          Redux actions are unavailable because this recording was too long to process them
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className={styles.Container} data-test-id="ReduxDevtools">
