@@ -34,7 +34,8 @@ function TestRunsContent({ TestRunListComponent }: TestRunsContentProps) {
     setFilterByText,
   } = useContext(TestRunsContext);
 
-  const { itemCount, component: TestRunListComp } = TestRunList();
+  const TestRunListComp = TestRunListComponent;
+  const itemCount = 0; // Update this with the actual item count
 
   const {
     contextMenu: contextMenuStatusFilter,

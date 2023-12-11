@@ -10,6 +10,9 @@
   width: 50%;
   background-image: url("/images/illustrations/nux-1.png");
   background-size: cover;
+  background-position: bottom center;
+  background-repeat: no-repeat;
+  background-color: #ffbf4a;
 }
 
 .form-container {
@@ -18,7 +21,7 @@
   width: 50%;
   overflow: auto;
   max-height: 100vh;
-  padding: 20px;
+  padding: 40px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -26,7 +29,8 @@
 /* Style the input and select fields */
 .input-style,
 .select-style,
-.textarea-style {
+.textarea-style,
+.textarea-style-pre {
   width: 100%;
   padding: 10px;
   margin-bottom: 20px;
@@ -36,11 +40,17 @@
   background-color: var(--theme-text-field-bgcolor);
 }
 
+.textarea-style-pre {
+  margin-bottom: 60px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-x: auto;
+}
+
 .textarea-style {
   font-size: 12px;
 }
 
-/* Modify the select arrow to match the design */
 .select-style {
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -95,6 +105,7 @@ h1.default {
 .step-number {
   font-weight: 500;
   margin-bottom: 6px;
+  margin-top: 24px;
 }
 
 /* Optional: Add a responsive breakpoint */
