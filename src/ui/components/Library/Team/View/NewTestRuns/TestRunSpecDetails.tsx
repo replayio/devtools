@@ -1,9 +1,10 @@
 import { useContext } from "react";
 
 import Icon from "replay-next/components/Icon";
-import { TestRunTestWithRecordings } from "shared/test-suites/TestRun";
+import { TestRun, TestRunTestWithRecordings } from "shared/test-suites/TestRun";
 
 import { useTestRunDetailsSuspends } from "../TestRuns/hooks/useTestRunDetailsSuspends";
+import { Alert } from "./Alert";
 import { TestResultListItem } from "./Overview/TestResultListItem";
 import { TestRunsContext } from "./TestRunsContextRoot";
 import styles from "../../../Testsuites.module.css";
@@ -45,40 +46,57 @@ export function TestRunSpecDetails() {
             Replays
           </div>
           <div className="flex flex-col gap-2">
-            {hasRecordings
-              ? selectedSpecTests.map(s =>
-                  s.executions
-                    .filter(e => e.recordings.length > 0)
-                    .flatMap(execution =>
-                      execution.recordings.map(r => (
-                        <TestResultListItem
-                          depth={1}
-                          key={r.id}
-                          label={execution.result}
-                          recording={r}
-                          testRun={testRun}
-                          test={s}
-                        />
-                      ))
-                    )
-                )
-              : "No replay message"}
+            {hasRecordings ? (
+              selectedSpecTests.map(s =>
+                s.executions
+                  .filter(e => e.recordings.length > 0)
+                  .flatMap(execution =>
+                    execution.recordings.map(r => (
+                      <TestResultListItem
+                        depth={1}
+                        key={r.id}
+                        label={execution.result}
+                        recording={r}
+                        testRun={testRun}
+                        test={s}
+                      />
+                    ))
+                  )
+              )
+            ) : (
+              <Alert link="https://docs.replay.io/test-suites">
+                No replays were found for this run. They may be outside the retention window or may
+                not have been uploaded
+              </Alert>
+            )}
           </div>
         </div>
-        {failedTests.length ? <Errors failedTests={failedTests} /> : null}
+        {failedTests.length ? <Errors test={selectedTest} failedTests={failedTests} /> : null}
       </div>
     </div>
   );
 }
 
-function Errors({ failedTests }: { failedTests: TestRunTestWithRecordings[] }) {
+function Errors({
+  test,
+  failedTests,
+}: {
+  test: TestRunTestWithRecordings;
+  failedTests: TestRunTestWithRecordings[];
+}) {
   const hasErrors = failedTests.some(t => !!t.errors?.length);
+
   return (
     <div className="flex flex-col gap-2 px-3">
       <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-lg font-semibold">
         Errors
       </div>
-      {hasErrors ? <div>Error message</div> : null}
+      {hasErrors && test.result === "flaky" ? (
+        <Alert>
+          This run had some flakes, so some of these errors may have been resolved during the course
+          of the run
+        </Alert>
+      ) : null}
       {failedTests.map(t =>
         t.errors?.map((e, i) => (
           <div
