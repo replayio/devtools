@@ -24,6 +24,7 @@ import {
 import { addEventListener, initSocket, client as protocolClient } from "protocol/socket";
 import { assert } from "protocol/utils";
 import { setPointsReceivedCallback as setAnalysisPointsReceivedCallback } from "replay-next/src/suspense/AnalysisCache";
+import { buildIdCache, parseBuildIdComponents } from "replay-next/src/suspense/BuildIdCache";
 import { networkRequestsCache } from "replay-next/src/suspense/NetworkRequestsCache";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientInterface } from "shared/client/types";
@@ -90,44 +91,45 @@ const defaultMessaging: UnexpectedError = {
   message: "Our apologies!",
 };
 
-let isWindows: boolean = false;
-let isFirefox: boolean = false;
-if (typeof window !== "undefined") {
-  isWindows = window.navigator.platform.toLowerCase().indexOf("win") > -1;
-  isFirefox = window.navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
-}
+async function getSessionErrorMessages(replayClient: ReplayClientInterface) {
+  const buildId = await buildIdCache.readAsync(replayClient);
+  const buildComponents = parseBuildIdComponents(buildId);
+  const isWindows = buildComponents?.platform === "windows";
+  const isFirefox = buildComponents?.runtime === "gecko";
 
-// Reported reasons why a session can be destroyed.
-const SessionErrorMessages: Record<number, Partial<UnexpectedError>> = {
-  [SessionError.BackendDeploy]: {
-    content: "Please wait a few minutes and try again.",
-  },
-  [SessionError.NodeTerminated]: {
-    content: "Our servers hiccuped but things should be back to normal soon.",
-  },
-  [SessionError.UnknownFatalError]: {
-    content:
-      isWindows && isFirefox
-        ? "The browser replayed an event out of order. We are hoping to release a new Chrome based browser in a couple of months which will be more reliable. Thanks for your patience 🙏"
-        : "Refreshing should help.\nIf not, please try recording again.",
-    action: "refresh",
-    message: isWindows ? "Windows replaying error" : "Replaying error",
-  },
-  [SessionError.KnownFatalError]: {
-    content:
-      "This error has been fixed in an updated version of Replay. Please try upgrading Replay and trying a new recording.",
-  },
-  [SessionError.OldBuild]: {
-    content: "This recording is no longer available. Please try recording a new replay.",
-  },
-  [SessionError.LongRecording]: {
-    content: "You’ve hit an error that happens with long recordings. Can you try a shorter one?",
-  },
-  [SessionError.InactivityTimeout]: {
-    content: "This replay timed out to reduce server load.",
-    message: "Ready when you are!",
-  },
-};
+  // Reported reasons why a session can be destroyed.
+  const sessionErrorMessages: Record<number, Partial<UnexpectedError>> = {
+    [SessionError.BackendDeploy]: {
+      content: "Please wait a few minutes and try again.",
+    },
+    [SessionError.NodeTerminated]: {
+      content: "Our servers hiccuped but things should be back to normal soon.",
+    },
+    [SessionError.UnknownFatalError]: {
+      content:
+        isWindows && isFirefox
+          ? "The browser replayed an event out of order. We are hoping to release a new Chrome based browser in a couple of months which will be more reliable. Thanks for your patience 🙏"
+          : "Refreshing should help.\nIf not, please try recording again.",
+      action: "refresh",
+      message: isWindows ? "Windows replaying error" : "Replaying error",
+    },
+    [SessionError.KnownFatalError]: {
+      content:
+        "This error has been fixed in an updated version of Replay. Please try upgrading Replay and trying a new recording.",
+    },
+    [SessionError.OldBuild]: {
+      content: "This recording is no longer available. Please try recording a new replay.",
+    },
+    [SessionError.LongRecording]: {
+      content: "You’ve hit an error that happens with long recordings. Can you try a shorter one?",
+    },
+    [SessionError.InactivityTimeout]: {
+      content: "This replay timed out to reduce server load.",
+      message: "Ready when you are!",
+    },
+  };
+  return sessionErrorMessages;
+}
 
 export default async function setupDevtools(store: AppStore, replayClient: ReplayClientInterface) {
   if (window.hasAlreadyBootstrapped) {
@@ -201,12 +203,13 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
     store.dispatch(actions.setAwaitingSourcemaps(true))
   );
 
-  addEventListener("Recording.sessionError", (error: sessionError) => {
+  addEventListener("Recording.sessionError", async (error: sessionError) => {
+    const sessionErrorMessages = await getSessionErrorMessages(replayClient);
     store.dispatch(
       actions.setUnexpectedError({
         ...defaultMessaging,
         ...error,
-        ...SessionErrorMessages[error.code],
+        ...sessionErrorMessages[error.code],
       })
     );
   });
