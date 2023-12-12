@@ -36,7 +36,7 @@ function DocsLinks() {
 
 export function TestRunsNUX() {
   const [testRunner, setTestRunner] = useState("");
-  const codeString = `const { defineConfig } = require('cypress');
+  const cypressCodeString = `const { defineConfig } = require('cypress');
 // Add this line to require the replay plugin
 const { plugin: replayPlugin } = require('@replayio/cypress')
 
@@ -53,29 +53,41 @@ module.exports = defineConfig({
   }
 });`;
 
+  const playwrightCodeString = `import { PlaywrightTestConfig, devices } from "@playwright/test";
+  import { devices as replayDevices } from "@replayio/playwright";
+   
+  const config: PlaywrightTestConfig = {
+    reporter: [["@replayio/playwright/reporter", {
+      apiKey: process.env.REPLAY_API_KEY,
+      upload: true
+    }], ['line']],
+    projects: [
+      {
+        name: "replay-chromium",
+        use: { ...replayDevices["Replay Chromium"] as any },
+      }
+    ],
+  };
+  export default config;`;
+
   return (
     <div className={styles["container"]}>
       <div className={styles["form-container"]}>
         <div className={styles["instructions"]}>
-          <h1>Let's get started!</h1>
+          <h1 className={styles["default"]}>Let's get started!</h1>
           <p>
-            Your replay team is ready to go. Please select your testrunner and we'll show how to get
-            started.
+            Your replay team is ready to go. Please select your test runner and we'll show how to
+            get started.
           </p>
         </div>
 
         <h1>Team name</h1>
-        <div style={{ display: "flex", alignItems: "start", gap: "10px" }}>
+        <div className={styles.teamNameContainer}>
           <input type="text" value="Untitled team" className={styles["input-style"]} />
-          <button
-            disabled
-            className="rounded-lg bg-gray-300 p-3 text-white"
-            style={{ height: "fit-content" }}
-          >
+          <button disabled className={styles.saveButton}>
             Save
           </button>
         </div>
-
         <label htmlFor="test-runner" className={styles["section-header"]}>
           Test runner
         </label>
@@ -85,7 +97,7 @@ module.exports = defineConfig({
           value={testRunner}
           onChange={e => setTestRunner(e.target.value)}
         >
-          <option value="">Select a testrunner</option>
+          <option value="">Select a test runner</option>
           <option value="cypress">Cypress</option>
           <option value="playwright">Playwright</option>
           <option value="jest">Jest</option>
@@ -114,7 +126,7 @@ module.exports = defineConfig({
             />
 
             <p className={styles["step-number"]}>2. Add the Replay plugin to cypress.config.js</p>
-            <pre className={styles["textarea-style-pre"]}>{codeString}</pre>
+            <pre className={styles["textarea-style-pre"]}>{cypressCodeString}</pre>
 
             <p className={styles["step-number"]}>3. Import Replay to your support file</p>
             <input
@@ -152,19 +164,12 @@ module.exports = defineConfig({
             />
 
             <p className={styles["step-number"]}>
-              2. Add the Replay plugin to playwright.config.js
+              2. Add Replay Chromium browser and Replay Reporter to your playwright.config.ts file.
             </p>
-            <pre className={styles["textarea-style-pre"]}>{codeString}</pre>
-
-            <p className={styles["step-number"]}>3. Import Replay to your support file</p>
-            <input
-              type="text"
-              value="require('@replayio/playwright/support');"
-              className={styles["input-style"]}
-            />
+            <pre className={styles["textarea-style-pre"]}>{playwrightCodeString}</pre>
 
             <p className={styles["step-number"]}>
-              4. Save this API key in your .env file (remember to save!)
+              3. Save this API key in your .env file (remember to save!)
             </p>
             <input
               type="text"
@@ -172,10 +177,10 @@ module.exports = defineConfig({
               className={styles["input-style"]}
             />
 
-            <p className={styles["step-number"]}>5. Run playwright as you normally would</p>
+            <p className={styles["step-number"]}>4. Run playwright as you normally would</p>
             <input
               type="text"
-              value="npx playwright run --browser replay-chromium"
+              value="npx playwright test --project replay-chromium"
               className={styles["input-style"]}
             />
           </div>
@@ -183,39 +188,22 @@ module.exports = defineConfig({
         {testRunner === "jest" && (
           <div className={styles["instructions-list"]}>
             <p className={styles["step-number"]}>
-              1. Install the @replayio/jest package in your project
+              1. Install replay-node,{" "}
+              <a href="https://docs.replay.io/reference-guide/recording/replay-node-(experimental)">
+                as described here
+              </a>
             </p>
-            <input
-              type="text"
-              value="npm install @replayio/jest -D"
-              className={styles["input-style"]}
-            />
 
-            <p className={styles["step-number"]}>2. Add the Replay plugin to jest.config.js</p>
-            <pre className={styles["textarea-style-pre"]}>{codeString}</pre>
-
-            <p className={styles["step-number"]}>3. Import Replay to your support file</p>
-            <input
-              type="text"
-              value="require('@replayio/jest/support');"
-              className={styles["input-style"]}
-            />
-
-            <p className={styles["step-number"]}>
-              4. Save this API key in your .env file (remember to save!)
+            <p className={styles["text-description"]}>
+              2. Run <span className={styles["code"]}>replay-node --exec $jestCmd</span> to record
+              the test. For example:{" "}
+              <span className={styles["code"]}>replay-node --exec npm test</span> would record all
+              of the tests run by the test script in your package.json,
+              <span className={styles["code"]}>
+                replay-node --exec npm run test -- specific.test.ts
+              </span>{" "}
+              would pass “specific.test.ts” to npm run test and record that.
             </p>
-            <input
-              type="text"
-              value="rwk_j6hPY4bAcpFivoNIPcOT0h4tgkOL4WqOH7Zblah"
-              className={styles["input-style"]}
-            />
-
-            <p className={styles["step-number"]}>5. Run jest as you normally would</p>
-            <input
-              type="text"
-              value="npx jest run --browser replay-chromium"
-              className={styles["input-style"]}
-            />
           </div>
         )}
       </div>
