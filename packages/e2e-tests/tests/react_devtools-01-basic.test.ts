@@ -17,7 +17,7 @@ import {
 } from "../helpers/new-react-devtools-panel";
 import { getGetterValue } from "../helpers/object-inspector";
 import { hoverScreenshot } from "../helpers/screenshot";
-import { waitFor } from "../helpers/utils";
+import { delay, waitFor } from "../helpers/utils";
 import test, { expect } from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "cra/dist/index_chromium.html" });
@@ -78,6 +78,7 @@ test("react_devtools-01: Basic RDT behavior (Chromium)", async ({
   await waitFor(async () => {
     await page.mouse.move(0, 0); // Stop hovering
     await hoverScreenshot(page, x, y);
+
     const actualName = await getComponentName(getSelectedRow(page));
     expect(actualName).toBe("Item");
   });

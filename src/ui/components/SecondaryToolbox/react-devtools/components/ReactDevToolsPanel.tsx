@@ -2,12 +2,12 @@ import { ExecutionPoint, PauseId } from "@replayio/protocol";
 import {
   KeyboardEvent,
   Suspense,
+  useCallback,
   useContext,
   useLayoutEffect,
   useMemo,
   useRef,
   useState,
-  useSyncExternalStore,
 } from "react";
 import {
   ImperativePanelHandle,
@@ -19,6 +19,7 @@ import AutoSizer from "react-virtualized-auto-sizer";
 
 import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import { PanelLoader } from "replay-next/components/PanelLoader";
+import useDebounceState from "replay-next/src/hooks/useDebounceState";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { InspectButton } from "ui/components/SecondaryToolbox/react-devtools/components/InspectButton";
 import { ReactDevToolsList } from "ui/components/SecondaryToolbox/react-devtools/components/ReactDevToolsList";
@@ -29,8 +30,8 @@ import { SelectedElementLoader } from "ui/components/SecondaryToolbox/react-devt
 import { useReactDevToolsAnnotations } from "ui/components/SecondaryToolbox/react-devtools/hooks/useReactDevToolsAnnotations";
 import { useReplayWall } from "ui/components/SecondaryToolbox/react-devtools/hooks/useReplayWall";
 import { ReactDevToolsListData } from "ui/components/SecondaryToolbox/react-devtools/ReactDevToolsListData";
+import { ReactElement } from "ui/components/SecondaryToolbox/react-devtools/types";
 import { getDefaultSelectedReactElementId } from "ui/reducers/app";
-import { getRecordingTooLongToSupportRoutines } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
 import {
   ParsedReactDevToolsAnnotation,
@@ -87,19 +88,38 @@ function ReactDevToolsPanelInner({
 
   const listData = useMemo(() => new ReactDevToolsListData(store), [store]);
 
+  const {
+    debouncedValue: selectedElementDebounced,
+    setValue: selectElement,
+    setValueDebounced: selectElementDebounced,
+  } = useDebounceState<ReactElement | null>(null);
+  const selectedElementRef = useRef<ReactElement | null>(null);
+
+  const selectElementHighPriority = useCallback(
+    (element: ReactElement | null) => {
+      listData.selectElement(element);
+      if (element !== selectedElementRef.current) {
+        selectedElementRef.current = element;
+        selectElement(element);
+      }
+    },
+    [listData, selectElement]
+  );
+
+  const selectElementLowPriority = useCallback(
+    (element: ReactElement | null) => {
+      selectedElementRef.current = element;
+      listData.selectElement(element);
+      selectElementDebounced(element);
+    },
+    [listData, selectElementDebounced]
+  );
+
   useLayoutEffect(() => {
     if (listData != null) {
       listData.setDefaultSelectedElementId(defaultSelectedReactElementId);
     }
   }, [defaultSelectedReactElementId, listData]);
-
-  const selectedIndex = useSyncExternalStore(
-    listData ? listData.subscribeToSelectedIndex : () => () => {},
-    listData ? listData.getSelectedIndex : () => null,
-    listData ? listData.getSelectedIndex : () => null
-  );
-  const selectedElement =
-    listData && selectedIndex != null ? listData.getItemAtIndex(selectedIndex) : null;
 
   const hasReactMounted = useReactDevToolsAnnotations({
     annotations,
@@ -188,7 +208,8 @@ function ReactDevToolsPanelInner({
                     bridge={bridge}
                     height={height}
                     listData={listData}
-                    pauseId={pauseId}
+                    selectElementHighPriority={selectElementHighPriority}
+                    selectElementLowPriority={selectElementLowPriority}
                     store={store}
                     wall={wall}
                     width={width}
@@ -210,16 +231,19 @@ function ReactDevToolsPanelInner({
           order={2}
           ref={rightPanelRef}
         >
-          {listData && pauseId && selectedElement ? (
+          {listData && pauseId && selectedElementDebounced ? (
             <ErrorBoundary
-              fallback={<SelectedElementErrorBoundaryFallback element={selectedElement} />}
+              fallback={<SelectedElementErrorBoundaryFallback element={selectedElementDebounced} />}
               name="ReactDevToolsPanelProperties"
-              resetKey={`${pauseId}:${selectedElement.id}`}
+              resetKey={`${pauseId}:${selectedElementDebounced.id}`}
             >
-              <Suspense fallback={<SelectedElementLoader element={selectedElement} />}>
+              <Suspense fallback={<SelectedElementLoader element={selectedElementDebounced} />}>
                 <SelectedElement
                   bridge={bridge}
-                  element={selectedElement}
+                  element={selectedElementDebounced}
+                  isDebounceDelayed={
+                    selectedElementRef.current?.id !== selectedElementDebounced?.id
+                  }
                   listData={listData}
                   pauseId={pauseId}
                   replayWall={wall}

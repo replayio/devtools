@@ -27,7 +27,7 @@ export const inspectedElementCache = createCache<
   InspectedReactElement
 >({
   config: { immutable: true },
-  debugLabel: "DOMSearchCache",
+  debugLabel: "inspectedElementCache",
   getKey: ([replayClient, bridge, store, replayWall, pauseId, elementId]) =>
     `${pauseId}:${elementId}`,
   load: async ([replayClient, bridge, store, replayWall, pauseId, elementId]) => {
