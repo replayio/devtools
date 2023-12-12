@@ -98,7 +98,7 @@ function TestRunsContent() {
         <Panel minSize={20} order={1}>
           <div className="flex h-full w-full flex-col gap-4 overflow-hidden rounded-xl bg-bodyBgcolor p-2">
             <div className="flex flex-col gap-2">
-              <div className="grid w-full grid-cols-3 gap-2 bg-bodyBgcolor">
+              <div className="grid w-full grid-cols-3 gap-2 overflow-hidden bg-bodyBgcolor">
                 <div
                   className={dropdownStyles.dropdownTrigger}
                   data-test-id="TestRunsPage-ResultFilter-DropdownTrigger"
@@ -106,8 +106,10 @@ function TestRunsContent() {
                   onKeyDown={onKeyDownStatusFilter}
                   tabIndex={0}
                 >
-                  {filterByStatus === "all" ? "All runs" : "Only failures"}
-                  <Icon className="h-5 w-5" type="chevron-down" />
+                  <div className="truncate">
+                    {filterByStatus === "all" ? "All runs" : "Only failures"}
+                  </div>
+                  <Icon className="h-5 w-5 flex-shrink-0" type="chevron-down" />
                 </div>
                 {contextMenuStatusFilter}
                 <div
@@ -117,8 +119,10 @@ function TestRunsContent() {
                   onKeyDown={onKeyDownTimeFilter}
                   tabIndex={0}
                 >
-                  {filterByTime === "week" ? "This week" : "This month"}
-                  <Icon className="h-5 w-5" type="chevron-down" />
+                  <div className="truncate">
+                    {filterByTime === "week" ? "This week" : "This month"}
+                  </div>
+                  <Icon className="h-5 w-5 flex-shrink-0" type="chevron-down" />
                 </div>
                 {contextMenuTimeFilter}
                 <div
@@ -128,8 +132,10 @@ function TestRunsContent() {
                   onKeyDown={onKeyDownBranchFilter}
                   tabIndex={0}
                 >
-                  {filterByBranch === "all" ? "All branches" : "Only primary branch"}
-                  <Icon className="h-5 w-5" type="chevron-down" />
+                  <div className="truncate">
+                    {filterByBranch === "all" ? "All branches" : "Only primary branch"}
+                  </div>
+                  <Icon className="h-5 w-5 flex-shrink-0" type="chevron-down" />
                 </div>
                 {contextMenuBranchFilter}
               </div>
