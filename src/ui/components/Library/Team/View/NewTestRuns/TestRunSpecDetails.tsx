@@ -44,32 +44,18 @@ export function TestRunSpecDetails() {
           </div>
           <TestRunResultList selectedSpecTests={selectedSpecTests} />
         </div>
-        {failedTests.length ? <Errors test={selectedTest} failedTests={failedTests} /> : null}
+        {failedTests.length ? <Errors failedTests={failedTests} /> : null}
       </div>
     </div>
   );
 }
 
-function Errors({
-  test,
-  failedTests,
-}: {
-  test: TestRunTestWithRecordings;
-  failedTests: TestRunTestWithRecordings[];
-}) {
-  const hasErrors = failedTests.some(t => !!t.errors?.length);
-
+function Errors({ failedTests }: { failedTests: TestRunTestWithRecordings[] }) {
   return (
     <div className="flex flex-col gap-2 px-3">
       <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-lg font-semibold">
         Errors
       </div>
-      {hasErrors && test.result === "flaky" ? (
-        <Alert>
-          This run had some flakes, so some of these errors may have been resolved during the course
-          of the run
-        </Alert>
-      ) : null}
       {failedTests.map(t =>
         t.errors?.map((e, i) => (
           <div
