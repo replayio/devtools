@@ -15,7 +15,6 @@ function Status({ test }: { test: Test }) {
   // Otherwise with sortBy flakyRate, we show rate in this order: flakyRate, failureRate, success.
 
   const { status, rate, classNames } = useMemo(() => {
-    console.log("sortBy", sortBy, test.failureRate, test.flakyRate);
     if (sortBy === "flakyRate" && test.flakyRate > 0) {
       return {
         status: "flaky",
