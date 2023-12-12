@@ -98,7 +98,8 @@ function TestRunsContent() {
     <div className="flex w-full flex-grow flex-row p-1">
       <PanelGroup autoSaveId="Library:TestRuns" direction="horizontal">
         <Panel minSize={20} order={1}>
-          <div className="flex h-full w-full flex-col gap-4 overflow-hidden rounded-xl bg-bodyBgcolor p-2">
+          <div className="relative flex h-full w-full flex-col gap-4 overflow-hidden rounded-xl bg-bodyBgcolor p-2">
+            {testRunsLoading && testRuns.length > 0 && <IndeterminateProgressBar />}
             <div className="flex flex-col gap-2">
               <div className="grid w-full grid-cols-3 gap-2 bg-bodyBgcolor">
                 <div
@@ -147,7 +148,6 @@ function TestRunsContent() {
               data-filtered-by-text={filterByText}
               data-test-id="TestRunList"
             >
-              {testRunsLoading && testRuns.length > 0 && <IndeterminateProgressBar />}
               {testRunsLoading && testRuns.length === 0 ? (
                 <div className="flex h-full items-center justify-center">
                   <LibrarySpinner />
