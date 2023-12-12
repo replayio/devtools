@@ -10,23 +10,12 @@ import styles from "./TestListItem.module.css";
 function Status({ test }: { test: Test }) {
   const { sortBy } = useContext(TestContext);
 
-  // We are showing rate in the pill depending on the sortBy.
-  // If sortBy is failureRate or alphabetical, we show rate in this order of priority: failureRate, flakyRate, success.
-  // Otherwise with sortBy flakyRate, we show rate in this order: flakyRate, failureRate, success.
-
   const { status, rate, classNames } = useMemo(() => {
-    if (sortBy === "flakyRate" && test.flakyRate > 0) {
-      return {
-        status: "flaky",
-        rate: test.flakyRate,
-        classNames: styles.flakyPill,
-      };
+    if (sortBy === "flakyRate" && (test.flakyRate > 0 || test.failureRate > 0)) {
+      return { status: "flaky", rate: test.flakyRate, classNames: styles.flakyPill };
     } else if (test.failureRate > 0) {
-      return {
-        status: "failure",
-        rate: test.failureRate,
-        classNames: styles.failedPill,
-      };
+      // sortBy could be "failureRate" or "alphabetical", show failure rate in that case
+      return { status: "failure", rate: test.failureRate, classNames: styles.failedPill };
     } else {
       return { status: "success", rate: 0, classNames: "" };
     }
