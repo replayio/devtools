@@ -11,7 +11,7 @@ function Status({ test }: { test: Test }) {
   const { sortBy } = useContext(TestContext);
 
   const { status, rate, classNames } = useMemo(() => {
-    if (sortBy === "flakyRate" && (test.flakyRate > 0 || test.failureRate > 0)) {
+    if (sortBy === "flakyRate") {
       return { status: "flaky", rate: test.flakyRate, classNames: styles.flakyPill };
     } else if (test.failureRate > 0) {
       // sortBy could be "failureRate" or "alphabetical", show failure rate in that case
@@ -23,7 +23,13 @@ function Status({ test }: { test: Test }) {
 
   const displayedFailureRate = Number((rate * 100).toFixed(0));
 
-  if (rate > 0) {
+  if (status === "success") {
+    return (
+      <div className="flex h-5 w-10 shrink-0 items-center justify-center" data-test-status={status}>
+        <Icon className={styles.testsuitesSuccess} filename={"testsuites-success"} size="medium" />
+      </div>
+    );
+  } else {
     return (
       <div
         className={`flex h-5 w-10 shrink-0 items-center justify-center rounded-md text-xs font-bold text-white ${classNames}`}
@@ -31,12 +37,6 @@ function Status({ test }: { test: Test }) {
         title={`${displayedFailureRate === 100 ? "100" : displayedFailureRate.toFixed(2)}%`}
       >
         {displayedFailureRate}%
-      </div>
-    );
-  } else {
-    return (
-      <div className="flex h-5 w-10 shrink-0 items-center justify-center" data-test-status={status}>
-        <Icon className={styles.testsuitesSuccess} filename={"testsuites-success"} size="medium" />
       </div>
     );
   }
