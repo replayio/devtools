@@ -5,7 +5,7 @@ import HighlightedText from "ui/components/Library/Team/View/TestRuns/Highlighte
 import Icon from "ui/components/shared/Icon";
 
 import { TestContext } from "./TestContextRoot";
-import styles from "../NewTestRuns/TestRuns.module.css";
+import styles from "./TestListItem.module.css";
 
 function Status({ test }: { test: Test }) {
   const { sortBy } = useContext(TestContext);
