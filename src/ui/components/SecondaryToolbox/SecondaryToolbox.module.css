@@ -1,0 +1,9 @@
+.RoutinePanelMessage {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  font-size: var(--font-size-regular);
+}

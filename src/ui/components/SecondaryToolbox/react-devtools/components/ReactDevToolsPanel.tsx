@@ -75,7 +75,6 @@ function ReactDevToolsPanelInner({
   const [collapsedLeft, setCollapsedLeft] = useState(false);
   const [collapsedRight, setCollapsedRight] = useState(false);
   const [protocolCheckFailed, setProtocolCheckFailed] = useState(false);
-  const showRecordingTooLongWarning = useAppSelector(getRecordingTooLongToSupportRoutines);
 
   const defaultSelectedReactElementId = useAppSelector(getDefaultSelectedReactElementId);
 
@@ -109,18 +108,6 @@ function ReactDevToolsPanelInner({
     pauseId,
     wall,
   });
-
-  if (showRecordingTooLongWarning) {
-    return (
-      <div className={styles.ProtocolFailedPanel} data-test-id="ReactDevToolsPanel">
-        <div className={styles.NotMountedYetMessage}>
-          <div>
-            React components are unavailable because this recording was too long to process them
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   if (!hasReactMounted) {
     return (
