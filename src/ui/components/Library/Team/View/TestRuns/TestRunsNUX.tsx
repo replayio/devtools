@@ -83,7 +83,11 @@ module.exports = defineConfig({
 
         <h1>Team name</h1>
         <div className={styles.teamNameContainer}>
-          <input type="text" value="Untitled team" className={styles["input-style"]} />
+          <input
+            type="text"
+            value="Untitled team"
+            className={`${styles["input-style"]} ${styles["team-name"]}`}
+          />
           <button disabled className={styles.saveButton}>
             Save
           </button>

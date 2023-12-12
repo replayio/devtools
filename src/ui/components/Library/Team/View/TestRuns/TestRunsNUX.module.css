@@ -37,6 +37,14 @@
   border-radius: 4px;
   box-sizing: border-box;
   background-color: var(--theme-text-field-bgcolor);
+  font-family: var(--font-family-monospace);
+  font-size: var(--font-size-regular-monospace);
+}
+
+.select-style,
+.team-name {
+  font-family: var(--font-family-default);
+  font-size: var(--font-size-large);
 }
 
 .textarea-style-pre {
