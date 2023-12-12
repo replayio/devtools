@@ -5,6 +5,7 @@ import { ContextMenuItem, useContextMenu } from "use-context-menu";
 import Icon from "replay-next/components/Icon";
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 
+import { TeamContext, withinTeamRetentionLimit } from "../../TeamContextRoot";
 import { FilterField } from "./FilterField";
 import { TestRunOverviewPage } from "./Overview/TestRunOverviewContextRoot";
 import { TestRunList } from "./TestRunList";
@@ -28,7 +29,22 @@ export function TestRunsPage() {
   );
 }
 
+function getFilterByTimeLabel(days: number) {
+  if (days >= 30) {
+    return "Last 30 days";
+  } else if (days >= 14) {
+    return "Last 2 weeks";
+  } else if (days >= 7) {
+    return "Last week";
+  } else if (days >= 1) {
+    return "Last day";
+  }
+
+  return "Last hour";
+}
+
 function TestRunsContent() {
+  const { team } = useContext(TeamContext);
   const {
     filterByBranch,
     filterByStatus,
@@ -63,12 +79,30 @@ function TestRunsContent() {
     onKeyDown: onKeyDownTimeFilter,
   } = useContextMenu(
     <>
-      <ContextMenuItem dataTestId="week" onSelect={() => setFilterByTime("week")}>
-        This week
+      <ContextMenuItem dataTestId="hour" onSelect={() => setFilterByTime(1 / 24)}>
+        Last hour
       </ContextMenuItem>
-      <ContextMenuItem dataTestId="month" onSelect={() => setFilterByTime("month")}>
-        This month
+      <ContextMenuItem dataTestId="day" onSelect={() => setFilterByTime(1)}>
+        Last day
       </ContextMenuItem>
+      {withinTeamRetentionLimit(team, 7) ? (
+        <ContextMenuItem
+          dataTestId="week"
+          onSelect={() => (withinTeamRetentionLimit(team, 7) ? setFilterByTime(7) : null)}
+        >
+          Last week
+        </ContextMenuItem>
+      ) : null}
+      {withinTeamRetentionLimit(team, 14) ? (
+        <ContextMenuItem dataTestId="twoweek" onSelect={() => setFilterByTime(14)}>
+          Last two weeks
+        </ContextMenuItem>
+      ) : null}
+      {withinTeamRetentionLimit(team, 30) ? (
+        <ContextMenuItem dataTestId="month" onSelect={() => setFilterByTime(30)}>
+          Last 30 Days
+        </ContextMenuItem>
+      ) : null}
     </>,
     { alignTo: "auto-target" }
   );
@@ -117,7 +151,7 @@ function TestRunsContent() {
                   onKeyDown={onKeyDownTimeFilter}
                   tabIndex={0}
                 >
-                  {filterByTime === "week" ? "This week" : "This month"}
+                  {getFilterByTimeLabel(filterByTime)}
                   <Icon className="h-5 w-5" type="chevron-down" />
                 </div>
                 {contextMenuTimeFilter}

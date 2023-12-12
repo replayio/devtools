@@ -36,10 +36,10 @@ type TestRunsContextType = {
 };
 
 type TestRunsFilterContextType = {
-  filterByTime: "week" | "month";
+  filterByTime: number;
   startTime: Date;
   endTime: Date;
-  setFilterByTime: Dispatch<SetStateAction<"week" | "month">>;
+  setFilterByTime: Dispatch<SetStateAction<number>>;
 };
 
 export const TestRunsFilterContext = createContext<TestRunsFilterContextType>(null as any);
@@ -54,14 +54,16 @@ const daysAgo = (days: number) => {
 };
 
 export function TestRunsFilterContextRoot({ children }: { children: ReactNode }) {
-  const [filterByTime, setFilterByTime] = useState<"week" | "month">("week");
+  const [filterByTime, setFilterByTime] = useState<number>(7);
 
   const [startTime, endTime] = useMemo(() => {
     const currentTime = new Date();
-    if (filterByTime === "month") {
-      return [daysAgo(30), currentTime];
-    }
-    return [daysAgo(7), currentTime];
+    return [
+      filterByTime < 1
+        ? new Date(currentTime.getTime() - filterByTime * 24 * 60 * 60 * 1000)
+        : daysAgo(filterByTime),
+      currentTime,
+    ];
   }, [filterByTime]);
 
   return (

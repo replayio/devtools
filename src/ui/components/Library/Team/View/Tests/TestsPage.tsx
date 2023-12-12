@@ -6,6 +6,7 @@ import Icon from "replay-next/components/Icon";
 import LibraryDropdownTrigger from "ui/components/Library/LibraryDropdownTrigger";
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 
+import { TeamContext, withinTeamRetentionLimit } from "../../TeamContextRoot";
 import { TestOverviewContent } from "./Overview/TestOverviewContent";
 import { TestContext, TestsContextRoot } from "./TestContextRoot";
 import { TestList } from "./TestList";
@@ -30,6 +31,7 @@ function TestsContent() {
     setSortBy,
     testsLoading,
   } = useContext(TestContext);
+  const { team } = useContext(TeamContext);
 
   const {
     contextMenu: contextMenuSortBy,
@@ -53,16 +55,17 @@ function TestsContent() {
     onKeyDown: onKeyDownTimeFilter,
   } = useContextMenu(
     <>
-      <ContextMenuItem disabled onSelect={() => setFilterByTime(1 / 24)}>
-        Last hour
-      </ContextMenuItem>
-      <ContextMenuItem disabled onSelect={() => setFilterByTime(1)}>
-        Last day
-      </ContextMenuItem>
-      <ContextMenuItem disabled onSelect={() => setFilterByTime(7)}>
-        Last week
-      </ContextMenuItem>
-      <ContextMenuItem onSelect={() => setFilterByTime(null)}>Last two weeks</ContextMenuItem>
+      <ContextMenuItem onSelect={() => setFilterByTime(1 / 24)}>Last hour</ContextMenuItem>
+      <ContextMenuItem onSelect={() => setFilterByTime(1)}>Last day</ContextMenuItem>
+      {withinTeamRetentionLimit(team, 7) ? (
+        <ContextMenuItem onSelect={() => setFilterByTime(7)}>Last week</ContextMenuItem>
+      ) : null}
+      {withinTeamRetentionLimit(team, 14) ? (
+        <ContextMenuItem onSelect={() => setFilterByTime(14)}>Last two weeks</ContextMenuItem>
+      ) : null}
+      {withinTeamRetentionLimit(team, 30) ? (
+        <ContextMenuItem onSelect={() => setFilterByTime(30)}>Last 30 days</ContextMenuItem>
+      ) : null}
     </>,
     { alignTo: "auto-target" }
   );
