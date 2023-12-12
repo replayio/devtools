@@ -5,8 +5,8 @@ import orderBy from "lodash/orderBy";
 import Icon from "replay-next/components/Icon";
 import { TestExecution } from "shared/test-suites/TestRun";
 
-import { Alert } from "../../NewTestRuns/Alert";
 import { getTruncatedRelativeDate } from "../../Recordings/RecordingListItem/RecordingListItem";
+import { Alert, AlertType } from "../../shared/Alert";
 import styles from "../../../../Library.module.css";
 import testsuiteStyles from "../../../../Testsuites.module.css";
 
@@ -47,11 +47,10 @@ export function ReplayList({ executions, label }: { executions: TestExecution[];
         <div className="flex flex-col">
           {hasExecutionsWithoutReplays ? (
             <div className="p-3">
-              <Alert link="https://docs.replay.io/test-suites">
-                This test's failure rate may not match the aggregate results from the Replays
-                displayed here, as some of those corresponding Replays used for the calculations
-                have expired
-              </Alert>
+              <Alert
+                reason={AlertType.MISSING_REPLAYS_FOR_TEST}
+                link="https://docs.replay.io/test-suites"
+              />
             </div>
           ) : null}
           {children}
