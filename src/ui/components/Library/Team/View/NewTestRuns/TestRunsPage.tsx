@@ -3,6 +3,7 @@ import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { ContextMenuItem, useContextMenu } from "use-context-menu";
 
 import Icon from "replay-next/components/Icon";
+import { IndeterminateProgressBar } from "replay-next/components/IndeterminateLoader";
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 
 import { FilterField } from "./FilterField";
@@ -38,6 +39,7 @@ function TestRunsContent() {
     setFilterByStatus,
     setFilterByText,
     testRunsLoading,
+    testRuns,
   } = useContext(TestRunsContext);
   const { filterByTime, setFilterByTime } = useContext(TestRunsFilterContext);
 
@@ -145,7 +147,8 @@ function TestRunsContent() {
               data-filtered-by-text={filterByText}
               data-test-id="TestRunList"
             >
-              {testRunsLoading ? (
+              {testRunsLoading && testRuns.length > 0 && <IndeterminateProgressBar />}
+              {testRunsLoading && testRuns.length === 0 ? (
                 <div className="flex h-full items-center justify-center">
                   <LibrarySpinner />
                 </div>
