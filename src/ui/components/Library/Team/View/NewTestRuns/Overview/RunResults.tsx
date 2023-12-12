@@ -216,7 +216,15 @@ function PathNodeRenderer({
             paddingLeft: `${depth * 1}rem`,
           }}
         >
-          <div className="flex items-center gap-1 truncate">{formattedNames}/</div>
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 truncate">{formattedNames}/</div>
+            <Icon
+              className={`${
+                expanded ? "" : "rotate-90"
+              } rotate duration-140 h-4 w-4 transition ease-out`}
+              type="chevron-down"
+            />
+          </div>
           {!expanded && (
             <div className="text-xs text-bodySubColor">({pathNode.nestedTestCount} tests)</div>
           )}
