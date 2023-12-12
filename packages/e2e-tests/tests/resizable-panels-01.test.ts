@@ -5,7 +5,7 @@ import test, { Page } from "../testFixtureCloneRecording";
 async function waitForPanelSize(page: Page, expectedSize: number) {
   await waitFor(async () => {
     const flexStyle = await page.evaluate(() => {
-      const element = document.querySelector('[data-panel-id="Panel-SidePanel"]');
+      const element = document.querySelector('[data-panel-id="Panel-SidePanel"]')!;
       const style = window.getComputedStyle(element);
       return style.getPropertyValue("flex");
     });
