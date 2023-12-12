@@ -1,11 +1,11 @@
 import { useContext } from "react";
 
 import Icon from "replay-next/components/Icon";
-import { TestRun, TestRunTestWithRecordings } from "shared/test-suites/TestRun";
+import { TestRunTestWithRecordings } from "shared/test-suites/TestRun";
 
 import { useTestRunDetailsSuspends } from "../TestRuns/hooks/useTestRunDetailsSuspends";
 import { Alert } from "./Alert";
-import { TestResultListItem } from "./Overview/TestResultListItem";
+import { TestRunResultList } from "./TestRunResultList";
 import { TestRunsContext } from "./TestRunsContextRoot";
 import styles from "../../../Testsuites.module.css";
 
@@ -34,9 +34,6 @@ export function TestRunSpecDetails() {
   }
 
   const failedTests = selectedSpecTests.filter(t => t.result === "failed" || t.result === "flaky");
-  const hasRecordings = selectedSpecTests.some(test =>
-    test.executions.some(e => e.recordings.length > 0)
-  );
 
   return (
     <div className="flex h-full w-full flex-col justify-start text-sm">
@@ -45,31 +42,7 @@ export function TestRunSpecDetails() {
           <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-lg font-semibold">
             Replays
           </div>
-          <div className="flex flex-col gap-2">
-            {hasRecordings ? (
-              selectedSpecTests.map(s =>
-                s.executions
-                  .filter(e => e.recordings.length > 0)
-                  .flatMap(execution =>
-                    execution.recordings.map(r => (
-                      <TestResultListItem
-                        depth={1}
-                        key={r.id}
-                        label={execution.result}
-                        recording={r}
-                        testRun={testRun}
-                        test={s}
-                      />
-                    ))
-                  )
-              )
-            ) : (
-              <Alert link="https://docs.replay.io/test-suites">
-                No replays were found for this run. They may be outside the retention window or may
-                not have been uploaded
-              </Alert>
-            )}
-          </div>
+          <TestRunResultList selectedSpecTests={selectedSpecTests} />
         </div>
         {failedTests.length ? <Errors test={selectedTest} failedTests={failedTests} /> : null}
       </div>
