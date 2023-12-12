@@ -123,7 +123,7 @@ describe("serializeDOM", () => {
       expect(listData.toString()).toMatchInlineSnapshot(`
         "<html>
           <head>
-            <link rel=\\"stylesheet\\" href=\\"https://example.com/style.css\\" />
+            <link href=\\"https://example.com/style.css\\" rel=\\"stylesheet\\" />
             <script src=\\"https://example.com/script.js\\" />
           </head>
           <body>

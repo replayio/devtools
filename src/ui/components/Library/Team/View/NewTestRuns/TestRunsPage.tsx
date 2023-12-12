@@ -37,6 +37,7 @@ function TestRunsContent() {
     setFilterByBranch,
     setFilterByStatus,
     setFilterByText,
+    testRunsLoading,
   } = useContext(TestRunsContext);
   const { filterByTime, setFilterByTime } = useContext(TestRunsFilterContext);
 
@@ -144,9 +145,13 @@ function TestRunsContent() {
               data-filtered-by-text={filterByText}
               data-test-id="TestRunList"
             >
-              <Suspense fallback={<LibrarySpinner />}>
+              {testRunsLoading ? (
+                <div className="flex h-full items-center justify-center">
+                  <LibrarySpinner />
+                </div>
+              ) : (
                 <TestRunList />
-              </Suspense>
+              )}
             </div>
           </div>
         </Panel>

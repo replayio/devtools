@@ -1,4 +1,3 @@
-import { NodeBounds } from "@replayio/protocol";
 import classnames from "classnames";
 import React, { useCallback, useLayoutEffect, useRef, useState } from "react";
 
@@ -25,11 +24,6 @@ import { NodePicker as NodePickerClass } from "ui/utils/nodePicker";
 interface Position {
   x: number;
   y: number;
-}
-
-interface GlobalNodePickerTestMethods {
-  clickNodePickerButton: () => Promise<void>;
-  nodePickerMouseClickInCanvas: (pos: Position | null) => Promise<void>;
 }
 
 const nodePickerInstance = new NodePickerClass();
@@ -72,24 +66,6 @@ export function NodePicker() {
       dispatch(selectNode(nodeId));
     },
     [dispatch]
-  );
-
-  const nodePickerMouseClickInCanvas = useCallback(
-    async function nodePickerMouseClickInCanvas(pos: Position | null) {
-      setGlobalNodePickerActive(false);
-      nodePickerRemoveTime.current = Date.now();
-      let nodeBounds: NodeBounds | null = null;
-      if (pos) {
-        const boundingRects = await dispatch(fetchMouseTargetsForPause());
-        nodeBounds = getMouseTarget(boundingRects ?? [], pos.x, pos.y);
-      }
-      if (nodeBounds) {
-        handleNodeSelected(nodeBounds.node);
-      } else {
-        dispatch(unhighlightNode());
-      }
-    },
-    [dispatch, handleNodeSelected]
   );
 
   useLayoutEffect(() => {

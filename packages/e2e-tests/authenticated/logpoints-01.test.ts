@@ -9,6 +9,7 @@ import {
 } from "../helpers/pause-information-panel";
 import { openSource } from "../helpers/source-explorer-panel";
 import { addLogpoint, editLogPoint, removeAllLogpoints } from "../helpers/source-panel";
+import { waitForRecordingToFinishIndexing } from "../helpers/utils";
 import test, { Page, expect } from "../testFixtureCloneRecording";
 
 // Each authenticated e2e test must use a unique recording id;
@@ -43,10 +44,6 @@ test(`authenticated/logpoints-01: Shared logpoints functionality`, async ({
     const context = await browser.newContext();
     const page = await context.newPage();
     await load(page, recordingId, E2E_USER_1_API_KEY);
-
-    // Clean up from previous tests
-    // TODO [SCS-1066] Ideally we would create a fresh recording for each test run
-    await removeAllLogpoints(page);
 
     // Add log point (will be shared, since we're authenticated)
     await addLogpoint(page, {
@@ -88,6 +85,8 @@ test(`authenticated/logpoints-01: Shared logpoints functionality`, async ({
     const page = pageOne;
     await page.reload();
 
+    await waitForRecordingToFinishIndexing(page);
+
     // Verify log point is still present and not affected by user 2
     await verifyConsoleMessage(page, "initial:", "log-point", 10);
 
@@ -106,6 +105,8 @@ test(`authenticated/logpoints-01: Shared logpoints functionality`, async ({
     // User 2
     const page = pageTwo;
     await page.reload();
+
+    await waitForRecordingToFinishIndexing(page);
 
     // Point should show updated content
     await verifyConsoleMessage(page, "updated:", "log-point", 10);

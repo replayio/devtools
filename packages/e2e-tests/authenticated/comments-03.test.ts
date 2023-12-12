@@ -24,10 +24,6 @@ test(`authenticated/comments-03: Comment previews`, async ({
   await startTest(page, recordingId, E2E_USER_1_API_KEY);
   await openDevToolsTab(page);
 
-  // Clean up from previous tests
-  // TODO [SCS-1066] Ideally we would create a fresh recording for each test run
-  await deleteAllComments(page);
-
   // Add and verify source code comment previews
   await openSource(page, url);
   const sourceCodeComment = await addSourceCodeComment(page, {

@@ -1,5 +1,5 @@
 import { useContext, useEffect, useMemo, useState } from "react";
-import { STATUS_PENDING, useImperativeIntervalCacheValues } from "suspense";
+import { STATUS_PENDING, Status, useImperativeIntervalCacheValues } from "suspense";
 
 import { GraphQLClientContext } from "replay-next/src/contexts/GraphQLClientContext";
 import { TestRun } from "shared/test-suites/TestRun";
@@ -11,7 +11,7 @@ import { TestRunsFilterContext } from "../../NewTestRuns/TestRunsContextRoot";
 
 const EMPTY_ARRAY: any[] = [];
 
-export function useTestRuns(): TestRun[] {
+export function useTestRuns(): { testRuns: TestRun[]; status: Status } {
   const graphQLClient = useContext(GraphQLClientContext);
   const { teamId } = useContext(TeamContext);
   const { startTime, endTime } = useContext(TestRunsFilterContext);
@@ -39,5 +39,5 @@ export function useTestRuns(): TestRun[] {
 
   const testRunsDesc = useMemo(() => [...testRuns].reverse(), [testRuns]);
 
-  return testRunsDesc;
+  return { testRuns, status };
 }

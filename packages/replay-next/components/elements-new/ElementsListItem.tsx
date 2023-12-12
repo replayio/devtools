@@ -202,6 +202,7 @@ function HTMLNodeRenderer({
 }) {
   let renderedAttributes: ReactNode[] = [];
   for (let key in attributes) {
+    renderedAttributes.push(" ");
     renderedAttributes.push(<HtmlAttributeRenderer key={key} name={key} value={attributes[key]} />);
   }
 
