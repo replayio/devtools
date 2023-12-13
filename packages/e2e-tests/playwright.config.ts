@@ -22,6 +22,9 @@ if (CI) {
     {
       name: "My Test Report",
       outputFile: "./test-results/report.html",
+      onEnd: async (reportData: any, capability: any) => {
+        console.log(reportData.summary);
+      },
     },
   ]);
 }
