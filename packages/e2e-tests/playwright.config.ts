@@ -1,4 +1,4 @@
-import { PlaywrightTestConfig, devices } from "@playwright/test";
+import { PlaywrightTestConfig, ReporterDescription, devices } from "@playwright/test";
 import { devices as replayDevices } from "@replayio/playwright";
 
 const { CI, SLOW_MO } = process.env;
@@ -13,6 +13,18 @@ const projects = [
     use: { ...devices["Desktop Chromium"] },
   },
 ];
+
+const reporters: ReporterDescription[] = [];
+
+if (CI) {
+  reporters.push([
+    "monocart-reporter",
+    {
+      name: "My Test Report",
+      outputFile: "./test-results/report.html",
+    },
+  ]);
+}
 
 const config: PlaywrightTestConfig = {
   use: {
@@ -40,6 +52,7 @@ const config: PlaywrightTestConfig = {
   // Limit the number of workers on CI, use default locally
   workers: CI ? 4 : undefined,
   projects,
+  reporter: reporters,
 };
 
 export default config;
