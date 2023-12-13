@@ -15,6 +15,7 @@ export const GET_RECORDING = gql`
   query GetRecording($recordingId: UUID!) {
     recording(uuid: $recordingId) {
       uuid
+      buildId
       url
       title
       duration
