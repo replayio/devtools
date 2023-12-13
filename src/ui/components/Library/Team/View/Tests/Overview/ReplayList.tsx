@@ -6,10 +6,12 @@ import Icon from "replay-next/components/Icon";
 import { TestExecution } from "shared/test-suites/TestRun";
 
 import { getTruncatedRelativeDate } from "../../Recordings/RecordingListItem/RecordingListItem";
+import { Alert, AlertType } from "../../shared/Alert";
 import { TestSuitePanelMessage } from "../../TestSuitePanelMessage";
 import styles from "../../../../Library.module.css";
 
 export function ReplayList({ executions, label }: { executions: TestExecution[]; label: string }) {
+  const hasExecutionsWithoutReplays = executions.some(e => e.recordings.length === 0);
   const sortedReplays = orderBy(
     executions.filter(e => e.recordings.length > 0),
     "createdAt",
@@ -42,7 +44,17 @@ export function ReplayList({ executions, label }: { executions: TestExecution[];
         <div className={styles.replayListTitle}>
           <div className={styles.labelText}>{label}</div>
         </div>
-        <div className="flex flex-col">{children}</div>
+        <div className="flex flex-col">
+          {hasExecutionsWithoutReplays ? (
+            <div className="p-3">
+              <Alert
+                reason={AlertType.MISSING_REPLAYS_FOR_TEST}
+                link="https://docs.replay.io/test-suites"
+              />
+            </div>
+          ) : null}
+          {children}
+        </div>
       </div>
     </div>
   );
