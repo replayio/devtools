@@ -11,6 +11,7 @@ import {
 
 import { assert } from "protocol/utils";
 import AvatarImage from "replay-next/components/AvatarImage";
+import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import Icon from "replay-next/components/Icon";
 import CodeEditor from "replay-next/components/lexical/CodeEditor";
 import {
@@ -88,10 +89,25 @@ export default function PointPanelWrapper(props: ExternalProps) {
     return loader;
   }
 
+  const errorFallback = (
+    <div
+      className={`${styles.ErrorFallback} ${className}`}
+      style={{
+        height: pointWithPendingEdits.condition
+          ? "var(--point-panel-with-conditional-height)"
+          : "var(--point-panel-height)",
+      }}
+    >
+      Could not load hit points
+    </div>
+  );
+
   return (
-    <Suspense fallback={loader}>
-      <PointPanel {...props} focusRange={focusRange} pointForSuspense={pointForSuspense} />
-    </Suspense>
+    <ErrorBoundary name="LogPointPanel" fallback={errorFallback}>
+      <Suspense fallback={loader}>
+        <PointPanel {...props} focusRange={focusRange} pointForSuspense={pointForSuspense} />
+      </Suspense>
+    </ErrorBoundary>
   );
 }
 

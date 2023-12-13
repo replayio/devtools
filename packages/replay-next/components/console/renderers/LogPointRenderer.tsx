@@ -7,6 +7,7 @@ import { Suspense, memo, useContext } from "react";
 import { assert } from "protocol/utils";
 import useConsoleContextMenu from "replay-next/components/console/useConsoleContextMenu";
 import ErrorBoundary from "replay-next/components/ErrorBoundary";
+import Icon from "replay-next/components/Icon";
 import Inspector from "replay-next/components/inspector";
 import ClientValueValueRenderer from "replay-next/components/inspector/values/ClientValueValueRenderer";
 import Loader from "replay-next/components/Loader";
@@ -151,21 +152,28 @@ function AnalyzedContent({ logPointInstance }: { logPointInstance: PointInstance
     point.condition
   );
 
-  const { isRemote, pauseId, values } = entry;
+  const { failed, isRemote, pauseId, values } = entry;
 
-  const children = isRemote
-    ? values.map((value, index) => (
-        <Fragment key={index}>
-          <Inspector context="console" pauseId={pauseId!} protocolValue={value} />
-          {index < values.length - 1 && " "}
-        </Fragment>
-      ))
-    : values.map((value, index) => (
-        <Fragment key={index}>
-          <ClientValueValueRenderer context="console" clientValue={primitiveToClientValue(value)} />
-          {index < values.length - 1 && " "}
-        </Fragment>
-      ));
+  const children = failed ? (
+    <span className={styles.Exception}>
+      <Icon className={styles.ErrorIcon} type="error" />
+      The expression could not be evaluated.
+    </span>
+  ) : isRemote ? (
+    values.map((value, index) => (
+      <Fragment key={index}>
+        <Inspector context="console" pauseId={pauseId!} protocolValue={value} />
+        {index < values.length - 1 && " "}
+      </Fragment>
+    ))
+  ) : (
+    values.map((value, index) => (
+      <Fragment key={index}>
+        <ClientValueValueRenderer context="console" clientValue={primitiveToClientValue(value)} />
+        {index < values.length - 1 && " "}
+      </Fragment>
+    ))
+  );
 
   return (
     <InspectableTimestampedPointContext.Provider value={context}>

@@ -6,8 +6,8 @@ import { TestRunTestWithRecordings } from "shared/test-suites/TestRun";
 import { Alert } from "../shared/Alert";
 import { useTestRunDetailsSuspends } from "../TestRuns/hooks/useTestRunDetailsSuspends";
 import { TestRunResultList } from "./TestRunResultList";
+import { TestSuitePanelMessage } from "../TestSuitePanelMessage";
 import { TestRunsContext } from "./TestRunsContextRoot";
-import styles from "../../../Testsuites.module.css";
 
 export function TestRunSpecDetails() {
   const { spec, filterTestsByText } = useContext(TestRunsContext);
@@ -24,11 +24,7 @@ export function TestRunSpecDetails() {
   const selectedTest = selectedSpecTests?.[0];
 
   if (!spec) {
-    return (
-      <div className="flex h-full w-full items-center justify-center p-2">
-        <div className={styles.standardMessaging}>Select a test to see its details here</div>
-      </div>
-    );
+    return <TestSuitePanelMessage>Select a test to see its details here</TestSuitePanelMessage>;
   } else if (groupedTests === null || selectedTest == null) {
     return null;
   }

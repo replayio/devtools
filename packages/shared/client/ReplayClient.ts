@@ -30,6 +30,7 @@ import {
   ResponseBodyData,
   responseBodyData as ResponseBodyDataEvent,
   Result,
+  RunEvaluationPreload,
   RunEvaluationResult,
   SameLineSourceLocations,
   ScopeId,
@@ -985,6 +986,7 @@ export class ReplayClient implements ReplayClientInterface {
   async runEvaluation(
     opts: {
       selector: PointSelector;
+      preloadExpressions?: RunEvaluationPreload[];
       expression: string;
       frameIndex?: number;
       fullPropertyPreview?: boolean;
@@ -1018,6 +1020,7 @@ export class ReplayClient implements ReplayClientInterface {
     try {
       result = await client.Session.runEvaluation(
         {
+          preloadExpressions: opts.preloadExpressions,
           expression: opts.expression,
           frameIndex: opts.frameIndex,
           fullReturnedPropertyPreview: opts.fullPropertyPreview,

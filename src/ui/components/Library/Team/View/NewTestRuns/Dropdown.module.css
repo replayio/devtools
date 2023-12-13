@@ -15,6 +15,7 @@
   --ring-width: 3px;
   --ring-color: var(--primary-accent);
   white-space: nowrap;
+  overflow: hidden;
 }
 
 .dropdownTrigger.disabled {

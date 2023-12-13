@@ -2,6 +2,7 @@ import { ExecutionPoint, PauseId } from "@replayio/protocol";
 import {
   KeyboardEvent,
   Suspense,
+  useCallback,
   useContext,
   useLayoutEffect,
   useMemo,
@@ -19,6 +20,7 @@ import AutoSizer from "react-virtualized-auto-sizer";
 
 import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import { PanelLoader } from "replay-next/components/PanelLoader";
+import { useDebounce } from "replay-next/src/hooks/useDebounce";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { InspectButton } from "ui/components/SecondaryToolbox/react-devtools/components/InspectButton";
 import { ReactDevToolsList } from "ui/components/SecondaryToolbox/react-devtools/components/ReactDevToolsList";
@@ -30,13 +32,13 @@ import { useReactDevToolsAnnotations } from "ui/components/SecondaryToolbox/reac
 import { useReplayWall } from "ui/components/SecondaryToolbox/react-devtools/hooks/useReplayWall";
 import { ReactDevToolsListData } from "ui/components/SecondaryToolbox/react-devtools/ReactDevToolsListData";
 import { getDefaultSelectedReactElementId } from "ui/reducers/app";
-import { getRecordingTooLongToSupportRoutines } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
 import {
   ParsedReactDevToolsAnnotation,
   reactDevToolsAnnotationsCache,
 } from "ui/suspense/annotationsCaches";
 
+import { ReactElement } from "../types";
 import styles from "./ReactDevToolsPanel.module.css";
 
 export function ReactDevToolsPanel({
@@ -75,7 +77,6 @@ function ReactDevToolsPanelInner({
   const [collapsedLeft, setCollapsedLeft] = useState(false);
   const [collapsedRight, setCollapsedRight] = useState(false);
   const [protocolCheckFailed, setProtocolCheckFailed] = useState(false);
-  const showRecordingTooLongWarning = useAppSelector(getRecordingTooLongToSupportRoutines);
 
   const defaultSelectedReactElementId = useAppSelector(getDefaultSelectedReactElementId);
 
@@ -102,6 +103,28 @@ function ReactDevToolsPanelInner({
   const selectedElement =
     listData && selectedIndex != null ? listData.getItemAtIndex(selectedIndex) : null;
 
+  const [debounceElementDetails, setDebounceElementDetails] = useState(false);
+  const selectedElementDebounced = useDebounce(selectedElement, 500);
+  const selectedElementForDetailsPanel = debounceElementDetails
+    ? selectedElementDebounced
+    : selectedElement;
+
+  const selectElementHighPriority = useCallback(
+    (element: ReactElement | null) => {
+      listData.selectElement(element);
+      setDebounceElementDetails(false);
+    },
+    [listData]
+  );
+
+  const selectElementLowPriority = useCallback(
+    (element: ReactElement | null) => {
+      listData.selectElement(element);
+      setDebounceElementDetails(true);
+    },
+    [listData]
+  );
+
   const hasReactMounted = useReactDevToolsAnnotations({
     annotations,
     executionPoint,
@@ -109,18 +132,6 @@ function ReactDevToolsPanelInner({
     pauseId,
     wall,
   });
-
-  if (showRecordingTooLongWarning) {
-    return (
-      <div className={styles.ProtocolFailedPanel} data-test-id="ReactDevToolsPanel">
-        <div className={styles.NotMountedYetMessage}>
-          <div>
-            React components are unavailable because this recording was too long to process them
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   if (!hasReactMounted) {
     return (
@@ -184,7 +195,8 @@ function ReactDevToolsPanelInner({
           defaultSize={65}
           id="tree"
           minSize={25}
-          onCollapse={setCollapsedLeft}
+          onCollapse={() => setCollapsedLeft(true)}
+          onExpand={() => setCollapsedLeft(false)}
           order={1}
           ref={leftPanelRef}
         >
@@ -201,7 +213,8 @@ function ReactDevToolsPanelInner({
                     bridge={bridge}
                     height={height}
                     listData={listData}
-                    pauseId={pauseId}
+                    selectElementHighPriority={selectElementHighPriority}
+                    selectElementLowPriority={selectElementLowPriority}
                     store={store}
                     wall={wall}
                     width={width}
@@ -219,20 +232,26 @@ function ReactDevToolsPanelInner({
           collapsible
           id="properties"
           minSize={25}
-          onCollapse={setCollapsedRight}
+          onCollapse={() => setCollapsedRight(true)}
+          onExpand={() => setCollapsedRight(false)}
           order={2}
           ref={rightPanelRef}
         >
-          {listData && pauseId && selectedElement ? (
+          {listData && pauseId && selectedElementForDetailsPanel ? (
             <ErrorBoundary
-              fallback={<SelectedElementErrorBoundaryFallback element={selectedElement} />}
+              fallback={
+                <SelectedElementErrorBoundaryFallback element={selectedElementForDetailsPanel} />
+              }
               name="ReactDevToolsPanelProperties"
-              resetKey={`${pauseId}:${selectedElement.id}`}
+              resetKey={`${pauseId}:${selectedElementForDetailsPanel.id}`}
             >
-              <Suspense fallback={<SelectedElementLoader element={selectedElement} />}>
+              <Suspense
+                fallback={<SelectedElementLoader element={selectedElementForDetailsPanel} />}
+              >
                 <SelectedElement
                   bridge={bridge}
-                  element={selectedElement}
+                  element={selectedElementForDetailsPanel}
+                  isDebounceDelayed={selectedElementForDetailsPanel.id !== selectedElement?.id}
                   listData={listData}
                   pauseId={pauseId}
                   replayWall={wall}

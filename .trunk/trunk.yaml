@@ -26,6 +26,7 @@ lint:
         - "./.trunk"
         - "./test"
         - packages/e2e-tests/examples
+        - src/ui/components/TestSuite/suspense/assets/*.js
 actions:
   enabled:
     - trunk-upgrade-available
