@@ -31,11 +31,10 @@ export const testsCache = createCache<
       (response?.node as GetWorkspaceTests_node_Workspace)?.tests?.edges.map(edge => edge.node) ??
       [];
 
-    const processedTests = rawTests.map(t => ({
+    return rawTests.map(t => ({
       ...t,
       failureRate: t.stats.failureRate,
+      flakyRate: t.stats.flakyRate,
     }));
-
-    return orderBy(processedTests, "failureRate", "desc");
   },
 });

@@ -19,6 +19,7 @@ export interface GetWorkspaceTests_node_Workspace_tests_edges_node_stats {
   skipped: number;
   unknown: number;
   failureRate: number;
+  flakyRate: number;
 }
 
 export interface GetWorkspaceTests_node_Workspace_tests_edges_node {
