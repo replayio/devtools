@@ -9,11 +9,11 @@ import { TestDetails } from "./TestDetails";
 import libraryStyles from "../../../../Library.module.css";
 
 export function TestOverviewContent() {
-  const { testId } = useContext(TestContext);
+  const { testId, tests } = useContext(TestContext);
 
   let children = null;
 
-  if (testId) {
+  if (testId && tests.some(t => t.testId === testId)) {
     children = <TestOverview testId={testId} />;
   } else {
     children = <TestSuitePanelMessage>Select a test to see its details here</TestSuitePanelMessage>;

@@ -25,11 +25,9 @@ import { TestGroup } from "ui/utils/testRuns";
 import styles from "../TestRuns.module.css";
 
 export function RunResults({
-  isPending,
   testFilterByText,
   filterCurrentRunByStatus,
 }: {
-  isPending: boolean;
   testFilterByText: string;
   filterCurrentRunByStatus: "all" | "failed-and-flaky";
 }) {
@@ -44,7 +42,7 @@ export function RunResults({
 
   return (
     <div
-      className={`no-scrollbar flex flex-col overflow-y-auto ${isPending ? "opacity-50" : ""}`}
+      className={`no-scrollbar flex flex-col overflow-y-auto`}
       data-filtered-by-text={filterByTextDeferred}
       data-test-id="TestRunResults"
     >

@@ -83,7 +83,6 @@ function PullRequestLink({ testRun }: { testRun: TestRun }) {
 }
 
 export function RunSummary({
-  isPending,
   testRun,
   durationMs,
   testFilterByText,
@@ -91,7 +90,6 @@ export function RunSummary({
   filterCurrentRunByStatus,
   setFilterCurrentRunByStatus,
 }: {
-  isPending: boolean;
   testRun: TestRun;
   durationMs: number;
   testFilterByText: string;
@@ -120,7 +118,7 @@ export function RunSummary({
 
   return (
     <div
-      className={`flex flex-col gap-2 border-b border-themeBorder ${isPending ? "opacity-50" : ""}`}
+      className={`flex flex-col gap-2 border-b border-themeBorder`}
       data-test-id="TestRunSummary"
     >
       <div className="flex flex-row items-center justify-between gap-2">

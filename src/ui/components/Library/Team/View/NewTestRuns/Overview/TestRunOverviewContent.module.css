@@ -1,0 +1,15 @@
+
+:root:global(.theme-dark) .runOverview {
+  color: var(--body-color);
+  background-color: var(--body-bgcolor);
+}
+
+:root:global(.theme-light) .runOverview {
+  background-color: var(--theme-base-100);
+  color: var(--body-color);
+}
+
+.runOverview[data-pending="true"] {
+  opacity: 0.5;
+  pointer-events: none;
+}

@@ -11,7 +11,7 @@ import { TestRunsContext } from "./TestRunsContextRoot";
 
 export function TestRunSpecDetails() {
   const { spec, filterTestsByText } = useContext(TestRunsContext);
-  const { testRunId } = useContext(TestRunsContext);
+  const { testRunId, testRuns } = useContext(TestRunsContext);
 
   const { groupedTests, tests, testRun } = useTestRunDetailsSuspends(testRunId);
   const selectedSpecTests =
@@ -23,10 +23,13 @@ export function TestRunSpecDetails() {
       ?.filter((t: any) => t.sourcePath === spec) ?? [];
   const selectedTest = selectedSpecTests?.[0];
 
-  if (!spec) {
+  if (
+    !spec ||
+    groupedTests === null ||
+    selectedTest == null ||
+    !testRuns.some(t => t.id === testRunId)
+  ) {
     return <TestSuitePanelMessage>Select a test to see its details here</TestSuitePanelMessage>;
-  } else if (groupedTests === null || selectedTest == null) {
-    return null;
   }
 
   const failedTests = selectedSpecTests.filter(t => t.result === "failed" || t.result === "flaky");
