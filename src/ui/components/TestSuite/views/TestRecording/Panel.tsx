@@ -146,7 +146,7 @@ export default function Panel() {
   const toggleStepDetailsPanel = () => {
     const panel = stepDetailsPanelRef.current;
     if (panel) {
-      const collapsed = panel.getCollapsed();
+      const collapsed = panel.isCollapsed();
       if (collapsed) {
         panel.expand();
       } else {
@@ -197,7 +197,8 @@ export default function Panel() {
             className={styles.TestEventDetailsPanel}
             collapsible
             defaultSize={35}
-            onCollapse={collapsed => setStepDetailsPanelCollapsed(collapsed)}
+            onCollapse={() => setStepDetailsPanelCollapsed(true)}
+            onExpand={() => setStepDetailsPanelCollapsed(false)}
             ref={stepDetailsPanelRef}
           >
             <div className={styles.TestEventDetailsContainer}>
