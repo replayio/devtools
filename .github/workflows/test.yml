@@ -1,10 +1,17 @@
 name: Run test suites
+run-name: >-
+  ${{ (github.event.inputs.runId && format('Run test suites - run id {0}', github.event.inputs.runId))
+      || (github.event.inputs.linuxBuildFile && format('Run test suites - linux build {0}', github.event.inputs.linuxBuildFile))
+      || '' }}
+
 on:
   pull_request:
   workflow_dispatch:
     inputs:
       linuxBuildFile:
         description: "Linux Chromium Build File (.tar.xz)"
+      runId:
+        description: "Test Run ID, chosen by workflow dispatcher, to make it possible to find the correct run from the api"
   push:
     branches:
       - main

@@ -31,7 +31,7 @@ const Vertical = ({ toolboxLayout }: { toolboxLayout: ToolboxLayout }) => {
   useLayoutEffect(() => {
     const videoPanel = videoPanelRef.current;
     if (videoPanel) {
-      if (videoPanel.getCollapsed() !== videoPanelCollapsed) {
+      if (videoPanel.isCollapsed() !== videoPanelCollapsed) {
         if (videoPanelCollapsed) {
           videoPanel.collapse();
         } else {
@@ -55,7 +55,8 @@ const Vertical = ({ toolboxLayout }: { toolboxLayout: ToolboxLayout }) => {
             defaultSize={50}
             id="Panel-Video"
             minSize={10}
-            onCollapse={onVideoPanelCollapse}
+            onCollapse={() => onVideoPanelCollapse(true)}
+            onExpand={() => onVideoPanelCollapse(false)}
             order={1}
             ref={videoPanelRef}
           >
@@ -118,7 +119,8 @@ const Horizontal = ({ toolboxLayout }: { toolboxLayout: ToolboxLayout }) => {
             : "Panel-SecondaryToolbox"
         }
         minSize={10}
-        onCollapse={setVideoPanelCollapsed}
+        onCollapse={() => setVideoPanelCollapsed(true)}
+        onExpand={() => setVideoPanelCollapsed(false)}
         order={2}
         ref={videoPanelRef}
       >

@@ -78,8 +78,10 @@ export abstract class GenericListData<Item> extends EventEmitter<{
   };
 
   setSelectedIndex(value: number | null) {
-    this._selectedIndex = value;
-    this.emit("selectedIndex", value);
+    if (this._selectedIndex !== value) {
+      this._selectedIndex = value;
+      this.emit("selectedIndex", value);
+    }
   }
 
   subscribeToLoading = (callback: (value: boolean) => void) => {

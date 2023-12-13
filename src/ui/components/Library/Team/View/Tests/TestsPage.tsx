@@ -33,6 +33,11 @@ const timeFilterLabel: Record<TimeFilterOptions, string> = {
   hour: "Last hour",
   month: "Last 30 days",
 };
+const sortLabel = {
+  failureRate: "Sort by failure rate",
+  flakyRate: "Sort by flaky rate",
+  alphabetical: "Sort alphabetically",
+};
 
 function TestsContent() {
   const { filterByText, setFilterByText, filterByTextForDisplay, sortBy, setSortBy, testsLoading } =
@@ -48,7 +53,8 @@ function TestsContent() {
       <ContextMenuItem onSelect={() => setSortBy("failureRate")}>
         Sort by failure rate
       </ContextMenuItem>
-      <ContextMenuItem disabled onSelect={() => setSortBy("alphabetical")}>
+      <ContextMenuItem onSelect={() => setSortBy("flakyRate")}>Sort by flaky rate</ContextMenuItem>
+      <ContextMenuItem onSelect={() => setSortBy("alphabetical")}>
         Sort alphabetically
       </ContextMenuItem>
     </>,
@@ -79,7 +85,7 @@ function TestsContent() {
                 testId="TestPage-ResultFilter-DropdownTrigger"
                 onKeyDown={onKeyDownSortBy}
                 onClick={onClickSortBy}
-                label={sortBy === "failureRate" ? "Sort by failure rate" : ""}
+                label={sortLabel[sortBy]}
               />
               {contextMenuSortBy}
               <LibraryDropdownTrigger

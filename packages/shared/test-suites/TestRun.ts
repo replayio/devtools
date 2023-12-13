@@ -40,6 +40,7 @@ export type Test = {
   testId: string;
   title: string;
   failureRate: number;
+  flakyRate: number;
 };
 
 export type TestWithExecutions = Test & {

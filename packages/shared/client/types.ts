@@ -39,6 +39,7 @@ import {
   ResponseBodyData,
   responseBodyData as ResponseBodyDataEvent,
   Result,
+  RunEvaluationPreload,
   RunEvaluationResult,
   SameLineSourceLocations,
   ScopeId,
@@ -270,6 +271,7 @@ export interface ReplayClientInterface {
   runEvaluation(
     opts: {
       selector: PointSelector;
+      preloadExpressions?: RunEvaluationPreload[];
       expression: string;
       frameIndex?: number;
       fullPropertyPreview?: boolean;

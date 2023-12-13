@@ -18,6 +18,7 @@ export interface AnalysisParams {
 }
 
 export interface RemoteAnalysisResult {
+  failed: boolean;
   pauseId: PauseId;
   point: ExecutionPoint;
   time: number;
@@ -142,6 +143,7 @@ export function createAnalysisCache<
 
               resultsCache.cacheValue(
                 {
+                  failed: result.failed ?? false,
                   pauseId: result.pauseId,
                   point: result.point.point,
                   time: result.point.time,

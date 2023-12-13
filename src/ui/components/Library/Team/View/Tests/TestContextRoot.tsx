@@ -1,3 +1,4 @@
+import orderBy from "lodash/orderBy";
 import {
   Dispatch,
   ReactNode,
@@ -14,11 +15,11 @@ import { Test } from "shared/test-suites/TestRun";
 import { useTests } from "./hooks/useTests";
 
 type TestsContextType = {
-  sortBy: "failureRate" | "alphabetical";
+  sortBy: "failureRate" | "flakyRate" | "alphabetical";
   filterByText: string;
   filterByTextForDisplay: string;
   selectTestId: Dispatch<SetStateAction<string | null>>;
-  setSortBy: Dispatch<SetStateAction<"failureRate" | "alphabetical">>;
+  setSortBy: Dispatch<SetStateAction<TestsContextType["sortBy"]>>;
   setFilterByText: Dispatch<SetStateAction<string>>;
   testId: string | null;
   testIdForDisplay: string | null;
@@ -34,7 +35,7 @@ export function TestsContextRoot({ children }: { children: ReactNode }) {
 
   const [testId, setTestId] = useState<string | null>(null);
 
-  const [sortBy, setSortBy] = useState<"failureRate" | "alphabetical">("failureRate");
+  const [sortBy, setSortBy] = useState<TestsContextType["sortBy"]>("failureRate");
 
   const [filterByText, setFilterByText] = useState("");
   const filterByTextDeferred = useDeferredValue(filterByText);
@@ -57,6 +58,12 @@ export function TestsContextRoot({ children }: { children: ReactNode }) {
 
         return true;
       });
+    }
+
+    if (sortBy === "alphabetical") {
+      filteredTests = orderBy(filteredTests, "title", "asc");
+    } else {
+      filteredTests = orderBy(filteredTests, sortBy, "desc");
     }
 
     return {

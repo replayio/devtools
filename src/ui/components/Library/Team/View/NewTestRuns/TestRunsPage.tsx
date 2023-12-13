@@ -3,6 +3,7 @@ import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { ContextMenuItem, useContextMenu } from "use-context-menu";
 
 import Icon from "replay-next/components/Icon";
+import { IndeterminateProgressBar } from "replay-next/components/IndeterminateLoader";
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 
 import { TimeFilterContext, TimeFilterContextRoot } from "../TimeFilterContextRoot";
@@ -34,6 +35,7 @@ function TestRunsContent() {
     setFilterByStatus,
     setFilterByText,
     testRunsLoading,
+    testRuns,
   } = useContext(TestRunsContext);
   const { filterByTime, setFilterByTime } = useContext(TimeFilterContext);
 
@@ -92,9 +94,10 @@ function TestRunsContent() {
     <div className="flex w-full flex-grow flex-row p-1">
       <PanelGroup autoSaveId="Library:TestRuns" direction="horizontal">
         <Panel minSize={20} order={1}>
-          <div className="flex h-full w-full flex-col gap-4 overflow-hidden rounded-xl bg-bodyBgcolor p-2">
+          <div className="relative flex h-full w-full flex-col gap-4 overflow-hidden rounded-xl bg-bodyBgcolor p-2">
+            {testRunsLoading && testRuns.length > 0 && <IndeterminateProgressBar />}
             <div className="flex flex-col gap-2">
-              <div className="grid w-full grid-cols-3 gap-2 bg-bodyBgcolor">
+              <div className="grid w-full grid-cols-3 gap-2 overflow-hidden bg-bodyBgcolor">
                 <div
                   className={dropdownStyles.dropdownTrigger}
                   data-test-id="TestRunsPage-ResultFilter-DropdownTrigger"
@@ -102,8 +105,10 @@ function TestRunsContent() {
                   onKeyDown={onKeyDownStatusFilter}
                   tabIndex={0}
                 >
-                  {filterByStatus === "all" ? "All runs" : "Only failures"}
-                  <Icon className="h-5 w-5" type="chevron-down" />
+                  <div className="truncate">
+                    {filterByStatus === "all" ? "All runs" : "Only failures"}
+                  </div>
+                  <Icon className="h-5 w-5 flex-shrink-0" type="chevron-down" />
                 </div>
                 {contextMenuStatusFilter}
                 <div
@@ -113,8 +118,10 @@ function TestRunsContent() {
                   onKeyDown={onKeyDownTimeFilter}
                   tabIndex={0}
                 >
-                  {filterByTime === "week" ? "Last 7 days" : "Last 30 days"}
-                  <Icon className="h-5 w-5" type="chevron-down" />
+                  <div className="truncate">
+                    {filterByTime === "week" ? "Last 7 days" : "Last 30 days"}
+                  </div>
+                  <Icon className="h-5 w-5 flex-shrink-0" type="chevron-down" />
                 </div>
                 {contextMenuTimeFilter}
                 <div
@@ -124,8 +131,10 @@ function TestRunsContent() {
                   onKeyDown={onKeyDownBranchFilter}
                   tabIndex={0}
                 >
-                  {filterByBranch === "all" ? "All branches" : "Only primary branch"}
-                  <Icon className="h-5 w-5" type="chevron-down" />
+                  <div className="truncate">
+                    {filterByBranch === "all" ? "All branches" : "Only primary branch"}
+                  </div>
+                  <Icon className="h-5 w-5 flex-shrink-0" type="chevron-down" />
                 </div>
                 {contextMenuBranchFilter}
               </div>
@@ -141,7 +150,7 @@ function TestRunsContent() {
               data-filtered-by-text={filterByText}
               data-test-id="TestRunList"
             >
-              {testRunsLoading ? (
+              {testRunsLoading && testRuns.length === 0 ? (
                 <div className="flex h-full items-center justify-center">
                   <LibrarySpinner />
                 </div>

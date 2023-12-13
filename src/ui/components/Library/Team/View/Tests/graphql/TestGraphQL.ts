@@ -56,6 +56,7 @@ export const GET_WORKSPACE_TESTS = gql`
                 skipped
                 unknown
                 failureRate
+                flakyRate
               }
             }
           }
