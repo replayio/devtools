@@ -16,12 +16,14 @@ const projects = [
 
 const reporters: ReporterDescription[] = [];
 
+console.log("CI: ", CI);
 if (CI) {
+  console.log("Adding monocart reporter");
   reporters.push([
     "monocart-reporter",
     {
       name: "My Test Report",
-      outputFile: "./test-results/report.html",
+      outputFile: "./test-results/monocart-report.html",
       onEnd: async (reportData: any, capability: any) => {
         console.log("Working dir: ", process.cwd());
         console.log(reportData.summary);

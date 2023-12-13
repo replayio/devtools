@@ -119,12 +119,16 @@ jobs:
           AUTOMATED_TEST_SECRET: ${{ secrets.AUTOMATED_TEST_SECRET }}
           AUTHENTICATED_TESTS_WORKSPACE_API_KEY: ${{ secrets.AUTHENTICATED_TESTS_WORKSPACE_API_KEY }}
       - name: List output folder contents
-        run: ls . && ls packages/e2e-tests  
+        run: echo "." && ls .
+      - name: List output folder contents
+        run: echo "e2e-tests" && ls packages/e2e-tests 
+      - name: List output folder contents
+        run: echo "test-results" && ls packages/e2e-tests/test-results
       - name: Archive Playwright report results with code coverage 
         uses: actions/upload-artifact@v3
         with:
           name: code-coverage-report
-          path: ./test-results/report.html
+          path: packages/e2e-tests/test-results
   authenticated-e2etest:
     name: Authenticated end-to-end tests (${{ matrix.shard }})
     runs-on: ubuntu-latest
