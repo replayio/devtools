@@ -339,6 +339,7 @@ export interface Workspace {
   subscription?: Subscription | null;
   isOrganization?: boolean;
   isTest?: boolean;
+  retentionLimit?: number | null;
 }
 
 export interface WorkspaceSettings {

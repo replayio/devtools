@@ -6,6 +6,7 @@ import Icon from "replay-next/components/Icon";
 import LibraryDropdownTrigger from "ui/components/Library/LibraryDropdownTrigger";
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 
+import { TeamContext } from "../../TeamContextRoot";
 import {
   TimeFilterContext,
   TimeFilterContextRoot,
@@ -40,9 +41,12 @@ const sortLabel = {
 };
 
 function TestsContent() {
+  const { team } = useContext(TeamContext);
   const { filterByText, setFilterByText, filterByTextForDisplay, sortBy, setSortBy, testsLoading } =
     useContext(TestContext);
   const { filterByTime, setFilterByTime } = useContext(TimeFilterContext);
+
+  const retentionLimit = team?.retentionLimit ?? 7;
 
   const {
     contextMenu: contextMenuSortBy,
@@ -70,7 +74,9 @@ function TestsContent() {
       <ContextMenuItem onSelect={() => setFilterByTime("hour")}>Last hour</ContextMenuItem>
       <ContextMenuItem onSelect={() => setFilterByTime("day")}>Last day</ContextMenuItem>
       <ContextMenuItem onSelect={() => setFilterByTime("week")}>Last 7 days</ContextMenuItem>
-      <ContextMenuItem onSelect={() => setFilterByTime("two-week")}>Last 14 days</ContextMenuItem>
+      {retentionLimit > 7 && (
+        <ContextMenuItem onSelect={() => setFilterByTime("month")}>Last 30 days</ContextMenuItem>
+      )}
     </>,
     { alignTo: "auto-target" }
   );

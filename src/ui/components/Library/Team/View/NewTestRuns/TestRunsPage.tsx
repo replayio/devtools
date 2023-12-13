@@ -6,6 +6,7 @@ import Icon from "replay-next/components/Icon";
 import { IndeterminateProgressBar } from "replay-next/components/IndeterminateLoader";
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 
+import { TeamContext } from "../../TeamContextRoot";
 import { TimeFilterContext, TimeFilterContextRoot } from "../TimeFilterContextRoot";
 import { FilterField } from "./FilterField";
 import { TestRunOverviewPage } from "./Overview/TestRunOverviewContextRoot";
@@ -37,7 +38,9 @@ function TestRunsContent() {
     testRunsLoading,
     testRuns,
   } = useContext(TestRunsContext);
+  const { team } = useContext(TeamContext);
   const { filterByTime, setFilterByTime } = useContext(TimeFilterContext);
+  const retentionLimit = team?.retentionLimit ?? 7;
 
   const {
     contextMenu: contextMenuStatusFilter,
@@ -64,9 +67,11 @@ function TestRunsContent() {
       <ContextMenuItem dataTestId="week" onSelect={() => setFilterByTime("week")}>
         Last 7 days
       </ContextMenuItem>
-      <ContextMenuItem dataTestId="month" onSelect={() => setFilterByTime("month")}>
-        Last 30 days
-      </ContextMenuItem>
+      {retentionLimit > 7 && (
+        <ContextMenuItem dataTestId="month" onSelect={() => setFilterByTime("month")}>
+          Last 30 days
+        </ContextMenuItem>
+      )}
     </>,
     { alignTo: "auto-target" }
   );
