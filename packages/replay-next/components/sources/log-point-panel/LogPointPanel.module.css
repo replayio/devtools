@@ -1,5 +1,6 @@
 .Panel,
-.Loader {
+.Loader,
+.ErrorFallback {
   position: absolute;
   top: var(--line-height);
   left: var(--source-line-number-offset);
@@ -26,13 +27,22 @@
   color: var(--point-panel-input-disabled-link-color-hover);
 }
 
-.Loader {
-  background-color: var(--point-panel-background-color);
+.Loader,
+.ErrorFallback {
   padding: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--color-dimmer);
+}
+.Loader {
+  background-color: var(--point-panel-background-color);
+}
+.ErrorFallback {
+  background-color: var(--background-color-error);
+  color: var(--color-error);
+  border-top: 1px solid var(--border-color-error);
+  border-bottom: 1px solid var(--border-color-error);
 }
 
 .EditableContentWrapperRow,
