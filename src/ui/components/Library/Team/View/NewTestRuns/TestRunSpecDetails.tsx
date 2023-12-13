@@ -5,8 +5,8 @@ import { TestRunTestWithRecordings } from "shared/test-suites/TestRun";
 
 import { Alert } from "../shared/Alert";
 import { useTestRunDetailsSuspends } from "../TestRuns/hooks/useTestRunDetailsSuspends";
-import { TestRunResultList } from "./TestRunResultList";
 import { TestSuitePanelMessage } from "../TestSuitePanelMessage";
+import { TestRunResultList } from "./TestRunResultList";
 import { TestRunsContext } from "./TestRunsContextRoot";
 
 export function TestRunSpecDetails() {
