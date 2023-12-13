@@ -23,6 +23,7 @@ if (CI) {
       name: "My Test Report",
       outputFile: "./test-results/report.html",
       onEnd: async (reportData: any, capability: any) => {
+        console.log("Working dir: ", process.cwd());
         console.log(reportData.summary);
       },
     },
