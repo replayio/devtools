@@ -40,6 +40,7 @@ import styles from "./SelectedElement.module.css";
 export function SelectedElement({
   bridge,
   element,
+  isDebounceDelayed,
   listData,
   pauseId: defaultPriorityPauseId,
   replayWall,
@@ -47,6 +48,7 @@ export function SelectedElement({
 }: {
   bridge: FrontendBridge;
   element: ReactElement;
+  isDebounceDelayed: boolean;
   listData: ReactDevToolsListData;
   pauseId: PauseId;
   replayWall: ReplayWall;
@@ -64,7 +66,7 @@ export function SelectedElement({
   // Only Suspend at deferred priority
   const deferredElement = useDeferredValue(element);
 
-  const isPending = element !== deferredElement;
+  const isPending = isDebounceDelayed || element !== deferredElement;
 
   const [inspectedElement, [, fiberIdsToNodeIds]] = suspendInParallel(
     () => inspectedElementCache.read(replayClient, bridge, store, replayWall, pauseId, id),
