@@ -190,9 +190,10 @@ export async function bootstrapApp() {
 
       setTelemetryContext(userInfo);
       maybeSetMixpanelContext({ ...userInfo, workspaceId, role, isTest: rec?.isTest });
+      initLaunchDarkly(workspaceId);
+    } else {
+      initLaunchDarkly();
     }
-
-    initLaunchDarkly();
   });
 
   return store;
