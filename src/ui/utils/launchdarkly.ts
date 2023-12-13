@@ -6,6 +6,7 @@ import { UserInfo } from "ui/hooks/users";
 
 const DEFAULT_FLAGS = {
   "maintenance-mode": false,
+  "enable-new-test-run-view": false,
 } as const;
 
 let client: LDClient.LDClient;
@@ -15,10 +16,15 @@ const readyPromise = new Promise<boolean>(resolve => {
 });
 const LD_KEY = isDevelopment() ? "60ca05fb43d6f10d234bb3ce" : "60ca05fb43d6f10d234bb3cf";
 
-function initLaunchDarkly(user?: UserInfo) {
+function initLaunchDarkly(workspaceId?: string | null, user?: UserInfo) {
   client = LDClient.initialize(LD_KEY, {
-    kind: "user",
-    key: user ? user.id : "anon",
+    kind: "multi",
+    user: {
+      key: user ? user.id : "anon",
+    },
+    workspace: {
+      key: workspaceId || null,
+    },
   });
 
   client.on("ready", () => {
@@ -46,4 +52,11 @@ function useLaunchDarkly() {
   return { ready, getFeatureFlag };
 }
 
-export { initLaunchDarkly, useLaunchDarkly };
+function refreshLaunchDarklyContext(teamId: string) {
+  const currentContext = client.getContext();
+  const newContext = { ...currentContext, workspace: { key: teamId } };
+
+  client.identify(newContext);
+}
+
+export { initLaunchDarkly, useLaunchDarkly, refreshLaunchDarklyContext };

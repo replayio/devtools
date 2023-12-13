@@ -1,6 +1,6 @@
 import { useContext } from "react";
 
-import useLocalStorageUserData from "shared/user-data/LocalStorage/useLocalStorageUserData";
+import { useLaunchDarkly } from "ui/utils/launchdarkly";
 
 import { FilterBarContainer } from "./FilterBarContainer";
 import { TestRunsPage as NewTestRunsPage } from "./NewTestRuns/TestRunsPage";
@@ -17,9 +17,20 @@ export function ViewPage({ defaultView }: { defaultView: string }) {
   );
 }
 
+function TestRunsView() {
+  const { getFeatureFlag, ready } = useLaunchDarkly();
+  const enableTestSuitesNewRunsView = getFeatureFlag("enable-new-test-run-view");
+
+  if (!ready) {
+    return null;
+  }
+
+  return enableTestSuitesNewRunsView ? <NewTestRunsPage /> : <TestRunsPage />;
+}
+
 export function ViewPageContent() {
   const { view } = useContext(ViewContext);
-  const [enableTestSuitesNewRunsView] = useLocalStorageUserData("enableTestSuitesNewRunsView");
+
   return (
     <div className="flex flex-grow flex-col overflow-hidden">
       <FilterBarContainer />
@@ -27,11 +38,7 @@ export function ViewPageContent() {
         {view === "recordings" ? (
           <RecordingsPage />
         ) : view === "runs" ? (
-          enableTestSuitesNewRunsView ? (
-            <NewTestRunsPage />
-          ) : (
-            <TestRunsPage />
-          )
+          <TestRunsView />
         ) : view === "tests" ? (
           <TestsPage />
         ) : null}
