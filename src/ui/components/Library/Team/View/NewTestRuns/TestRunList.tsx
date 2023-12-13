@@ -6,7 +6,6 @@ import { TestRun } from "shared/test-suites/TestRun";
 import { TestRunListItem } from "ui/components/Library/Team/View/NewTestRuns/TestRunListItem";
 import { SecondaryButton } from "ui/components/shared/Button";
 
-import { TestSuitePanelMessage } from "../TestSuitePanelMessage";
 import { TestRunsContext } from "./TestRunsContextRoot";
 
 const PAGE_SIZE = 50;

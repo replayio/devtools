@@ -9,15 +9,8 @@ import { RunSummary } from "./RunSummary";
 import styles from "../../../../Library.module.css";
 
 export function TestRunOverviewContent() {
-  const {
-    filterByStatus,
-    filterByText,
-    testRunId,
-    testRunIdForDisplay,
-    testRuns,
-    filterTestsByText,
-    setFilterTestsByText,
-  } = useContext(TestRunsContext);
+  const { testRunId, testRunIdForDisplay, testRuns, filterTestsByText, setFilterTestsByText } =
+    useContext(TestRunsContext);
 
   const { recordings, durationMs } = useTestRunDetailsSuspends(testRunId);
   const [filterCurrentRunByStatus, setFilterCurrentRunByStatus] = useState<
@@ -26,11 +19,10 @@ export function TestRunOverviewContent() {
 
   const isPending = testRunId !== testRunIdForDisplay;
 
-  const hasFilters = filterByStatus !== "all" || filterByText !== "";
   const testRun = testRuns.find(testRun => testRun.id === testRunId);
 
   let children = null;
-  if (testRun && recordings && !hasFilters) {
+  if (testRun && recordings?.length) {
     children = (
       <>
         <RunSummary
