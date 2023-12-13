@@ -118,6 +118,13 @@ jobs:
           RECORD_REPLAY_TEST_METRICS: 1
           AUTOMATED_TEST_SECRET: ${{ secrets.AUTOMATED_TEST_SECRET }}
           AUTHENTICATED_TESTS_WORKSPACE_API_KEY: ${{ secrets.AUTHENTICATED_TESTS_WORKSPACE_API_KEY }}
+      - name: List output folder contents
+        run: ls packages/e2e-tests  
+      - name: Archive Playwright report results with code coverage 
+        uses: actions/upload-artifact@v3
+        with:
+          name: code-coverage-report
+          path: packages/e2e-tests/test-results/report.html
   authenticated-e2etest:
     name: Authenticated end-to-end tests (${{ matrix.shard }})
     runs-on: ubuntu-latest
