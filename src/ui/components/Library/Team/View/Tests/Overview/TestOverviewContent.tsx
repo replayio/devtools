@@ -2,11 +2,11 @@ import { useContext } from "react";
 
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 
+import { TestSuitePanelMessage } from "../../TestSuitePanelMessage";
 import { useTest } from "../hooks/useTest";
 import { TestContext } from "../TestContextRoot";
 import { TestDetails } from "./TestDetails";
 import libraryStyles from "../../../../Library.module.css";
-import styles from "../../../../Testsuites.module.css";
 
 export function TestOverviewContent() {
   const { testId } = useContext(TestContext);
@@ -16,11 +16,7 @@ export function TestOverviewContent() {
   if (testId) {
     children = <TestOverview testId={testId} />;
   } else {
-    children = (
-      <div className="flex h-full items-center justify-center p-2">
-        <div className={styles.standardMessaging}>Select a test to see its details here</div>
-      </div>
-    );
+    children = <TestSuitePanelMessage>Select a test to see its details here</TestSuitePanelMessage>;
   }
 
   return (

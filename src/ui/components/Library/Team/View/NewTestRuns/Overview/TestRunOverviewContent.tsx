@@ -4,6 +4,7 @@ import { RunResults } from "ui/components/Library/Team/View/NewTestRuns/Overview
 import { TestRunsContext } from "ui/components/Library/Team/View/NewTestRuns/TestRunsContextRoot";
 import { useTestRunDetailsSuspends } from "ui/components/Library/Team/View/TestRuns/hooks/useTestRunDetailsSuspends";
 
+import { TestSuitePanelMessage } from "../../TestSuitePanelMessage";
 import { RunSummary } from "./RunSummary";
 import styles from "../../../../Library.module.css";
 
@@ -29,27 +30,27 @@ export function TestRunOverviewContent() {
   const testRun = testRuns.find(testRun => testRun.id === testRunId);
 
   let children = null;
-  if (testRun && recordings) {
-    if (!hasFilters || testRuns.find(testRun => testRun.id === testRunId)) {
-      children = (
-        <>
-          <RunSummary
-            isPending={isPending}
-            testRun={testRun}
-            durationMs={durationMs}
-            setTestFilterByText={setFilterTestsByText}
-            testFilterByText={filterTestsByText}
-            setFilterCurrentRunByStatus={setFilterCurrentRunByStatus}
-            filterCurrentRunByStatus={filterCurrentRunByStatus}
-          />
-          <RunResults
-            isPending={isPending}
-            testFilterByText={filterTestsByText}
-            filterCurrentRunByStatus={filterCurrentRunByStatus}
-          />
-        </>
-      );
-    }
+  if (testRun && recordings && !hasFilters) {
+    children = (
+      <>
+        <RunSummary
+          isPending={isPending}
+          testRun={testRun}
+          durationMs={durationMs}
+          setTestFilterByText={setFilterTestsByText}
+          testFilterByText={filterTestsByText}
+          setFilterCurrentRunByStatus={setFilterCurrentRunByStatus}
+          filterCurrentRunByStatus={filterCurrentRunByStatus}
+        />
+        <RunResults
+          isPending={isPending}
+          testFilterByText={filterTestsByText}
+          filterCurrentRunByStatus={filterCurrentRunByStatus}
+        />
+      </>
+    );
+  } else {
+    children = <TestSuitePanelMessage>Select a run to see its details here</TestSuitePanelMessage>;
   }
 
   return (

@@ -6,8 +6,8 @@ import Icon from "replay-next/components/Icon";
 import { TestExecution } from "shared/test-suites/TestRun";
 
 import { getTruncatedRelativeDate } from "../../Recordings/RecordingListItem/RecordingListItem";
+import { TestSuitePanelMessage } from "../../TestSuitePanelMessage";
 import styles from "../../../../Library.module.css";
-import testsuiteStyles from "../../../../Testsuites.module.css";
 
 export function ReplayList({ executions, label }: { executions: TestExecution[]; label: string }) {
   const sortedReplays = orderBy(
@@ -19,7 +19,7 @@ export function ReplayList({ executions, label }: { executions: TestExecution[];
   let children = null;
 
   if (!sortedReplays.length) {
-    children = <div className={testsuiteStyles.noReplaysFound}>No replays found</div>;
+    children = <TestSuitePanelMessage>No replays found</TestSuitePanelMessage>;
   } else {
     children = sortedReplays.map((e, i) =>
       e.recordings.map(r => (
