@@ -19,6 +19,7 @@ import { mappedExpressionCache } from "./MappedExpressionCache";
 
 export type LogPointAnalysisResult = {
   executionPoint: ExecutionPoint;
+  failed: boolean;
   isRemote: boolean;
   pauseId: PauseId | null;
   time: number;
@@ -68,6 +69,7 @@ export function getLogPointAnalysisResultSuspense(
     const localResult = localAnalysisCache.read(code);
     return {
       executionPoint: point.point,
+      failed: false,
       isRemote: false,
       pauseId: null,
       time: point.time,
@@ -95,6 +97,7 @@ export function getLogPointAnalysisResultSuspense(
     );
     return {
       executionPoint: remoteResult.point,
+      failed: remoteResult.failed,
       isRemote: true,
       pauseId: remoteResult.pauseId,
       time: remoteResult.time,
