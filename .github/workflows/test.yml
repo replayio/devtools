@@ -103,7 +103,7 @@ jobs:
           RECORD_REPLAY_CHROMIUM_DOWNLOAD_FILE: ${{ github.event.inputs.linuxBuildFile }}
       - uses: replayio/action-playwright@main
         with:
-          command: npx playwright test --shard ${{ matrix.shard }}/10 --reporter=@replayio/playwright/reporter,line tests/*.ts
+          command: npx playwright test --shard ${{ matrix.shard }}/10 tests/*.ts
           working-directory: ./packages/e2e-tests
           api-key: ${{ env.RECORD_REPLAY_API_KEY }}
           public: true
@@ -121,9 +121,9 @@ jobs:
       - name: List output folder contents
         run: echo "." && ls .
       - name: List output folder contents
-        run: echo "e2e-tests" && ls packages/e2e-tests 
+        run: echo "e2e-tests contents:" && ls packages/e2e-tests 
       - name: List output folder contents
-        run: echo "test-results" && ls packages/e2e-tests/test-results
+        run: echo "test-results contents:" && ls -l -r packages/e2e-tests/test-results
       - name: Archive Playwright report results with code coverage 
         uses: actions/upload-artifact@v3
         with:
@@ -169,13 +169,15 @@ jobs:
       - name: Install Replay Playwright
         run: npx @replayio/playwright install
       - name: Run Playwright
-        run: npx playwright test --shard ${{ matrix.shard }}/1 --reporter=@replayio/playwright/reporter,line authenticated/**/*.ts authenticated/*.ts --project replay-chromium
+        run: npx playwright test --shard ${{ matrix.shard }}/1 authenticated/**/*.ts authenticated/*.ts --project replay-chromium
         working-directory: ./packages/e2e-tests
         env:
           REPLAY_PLAYWRIGHT_FIXTURE: 1
           RECORD_REPLAY_METADATA_TEST_RUN_ID: ${{ needs.generate-test-run-id.outputs.testRunId }}
           PLAYWRIGHT_TEST_BASE_URL: ${{ needs.preview-branch.outputs.url }}
           INPUT_STRIPE: ${{ matrix.shard }}/1
+          RECORD_REPLAY_WEBHOOK_URL: ${{ secrets.RECORD_REPLAY_WEBHOOK_URL }}
+          RECORD_REPLAY_TEST_METRICS: 1
           AUTOMATED_TEST_SECRET: ${{ secrets.AUTOMATED_TEST_SECRET }}
           AUTHENTICATED_TESTS_WORKSPACE_API_KEY: ${{ secrets.AUTHENTICATED_TESTS_WORKSPACE_API_KEY }}
       - uses: replayio/action-upload@v0.5.1
@@ -217,7 +219,7 @@ jobs:
         run: npx @replayio/playwright install
       - uses: replayio/action-playwright@main
         with:
-          command: npx playwright test --reporter=@replayio/playwright/reporter,line jail/*.test.ts --project replay-chromium || exit 0
+          command: npx playwright test jail/*.test.ts --project replay-chromium || exit 0
           working-directory: ./packages/e2e-tests
           api-key: ${{ env.RECORD_REPLAY_API_KEY }}
           public: true

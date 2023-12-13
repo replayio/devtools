@@ -14,22 +14,26 @@ const projects = [
   },
 ];
 
-const reporters: ReporterDescription[] = [];
+const reporters: ReporterDescription[] = [["line"]];
 
 console.log("CI: ", CI);
 if (CI) {
   console.log("Adding monocart reporter");
-  reporters.push([
-    "monocart-reporter",
-    {
-      name: "My Test Report",
-      outputFile: "./test-results/monocart-report.html",
-      onEnd: async (reportData: any, capability: any) => {
-        console.log("Working dir: ", process.cwd());
-        console.log(reportData.summary);
+  reporters.unshift(
+    [
+      "monocart-reporter",
+      {
+        name: "My Test Report",
+        outputFile: "./test-results/monocart-report.html",
+        logging: "debug",
+        onEnd: async (reportData: any, capability: any) => {
+          console.log("Working dir: ", process.cwd());
+          console.log(reportData.summary);
+        },
       },
-    },
-  ]);
+    ],
+    ["@replayio/playwright/reporter"]
+  );
 }
 
 const config: PlaywrightTestConfig = {
