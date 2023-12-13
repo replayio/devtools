@@ -1,5 +1,6 @@
 import { UIEvent, useContext, useLayoutEffect, useRef, useState } from "react";
 
+import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import useGetDefaultLogPointContent from "replay-next/components/sources/hooks/useGetDefaultLogPointContent";
 import HoverButton from "replay-next/components/sources/HoverButton";
 import useSourceContextMenu from "replay-next/components/sources/useSourceContextMenu";
@@ -233,17 +234,19 @@ export function SourceListRowMouseEvents({
       )}
 
       {!isLineNumberHovered && isRowHovered && (
-        <HoverButton
-          addPoint={addPoint}
-          deletePoints={deletePoints}
-          editPendingPointText={editPendingPointText}
-          editPointBehavior={editPointBehavior}
-          lineHitCounts={lineHitCounts}
-          lineNumber={lineNumber}
-          point={pointForDefaultPriority}
-          pointBehavior={pointBehavior}
-          source={source}
-        />
+        <ErrorBoundary name="SourceListRowMouseEvents-HoverButton" fallback={null}>
+          <HoverButton
+            addPoint={addPoint}
+            deletePoints={deletePoints}
+            editPendingPointText={editPendingPointText}
+            editPointBehavior={editPointBehavior}
+            lineHitCounts={lineHitCounts}
+            lineNumber={lineNumber}
+            point={pointForDefaultPriority}
+            pointBehavior={pointBehavior}
+            source={source}
+          />
+        </ErrorBoundary>
       )}
 
       {contextMenu}
