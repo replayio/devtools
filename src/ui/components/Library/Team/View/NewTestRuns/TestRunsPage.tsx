@@ -60,10 +60,10 @@ function TestRunsContent() {
   } = useContextMenu(
     <>
       <ContextMenuItem dataTestId="week" onSelect={() => setFilterByTime("week")}>
-        This week
+        Last 7 days
       </ContextMenuItem>
       <ContextMenuItem dataTestId="month" onSelect={() => setFilterByTime("month")}>
-        This month
+        Last 30 days
       </ContextMenuItem>
     </>,
     { alignTo: "auto-target" }
@@ -113,7 +113,7 @@ function TestRunsContent() {
                   onKeyDown={onKeyDownTimeFilter}
                   tabIndex={0}
                 >
-                  {filterByTime === "week" ? "This week" : "This month"}
+                  {filterByTime === "week" ? "Last 7 days" : "Last 30 days"}
                   <Icon className="h-5 w-5" type="chevron-down" />
                 </div>
                 {contextMenuTimeFilter}

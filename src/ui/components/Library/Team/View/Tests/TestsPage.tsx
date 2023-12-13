@@ -28,10 +28,10 @@ export function TestsPage() {
 
 const timeFilterLabel: Record<TimeFilterOptions, string> = {
   "two-week": "Last two weeks",
-  week: "Last week",
+  week: "Last 7 days",
   day: "Last day",
   hour: "Last hour",
-  month: "Last month",
+  month: "Last 30 days",
 };
 
 function TestsContent() {
@@ -63,8 +63,8 @@ function TestsContent() {
     <>
       <ContextMenuItem onSelect={() => setFilterByTime("hour")}>Last hour</ContextMenuItem>
       <ContextMenuItem onSelect={() => setFilterByTime("day")}>Last day</ContextMenuItem>
-      <ContextMenuItem onSelect={() => setFilterByTime("week")}>Last week</ContextMenuItem>
-      <ContextMenuItem onSelect={() => setFilterByTime("two-week")}>Last two weeks</ContextMenuItem>
+      <ContextMenuItem onSelect={() => setFilterByTime("week")}>Last 7 days</ContextMenuItem>
+      <ContextMenuItem onSelect={() => setFilterByTime("two-week")}>Last 14 days</ContextMenuItem>
     </>,
     { alignTo: "auto-target" }
   );

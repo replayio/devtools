@@ -21,7 +21,7 @@ const daysAgo = (days: number) => {
 const hoursAgo = (hours: number) => {
   const date = new Date();
   date.setHours(date.getHours() - hours);
-  date.setMinutes(0, 0, 0);
+  date.setSeconds(0, 0);
   return date;
 };
 
