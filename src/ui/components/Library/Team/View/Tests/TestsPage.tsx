@@ -11,6 +11,7 @@ import {
   TimeFilterContext,
   TimeFilterContextRoot,
   TimeFilterOptions,
+  withinTeamRetentionLimit,
 } from "../TimeFilterContextRoot";
 import { TestOverviewContent } from "./Overview/TestOverviewContent";
 import { TestContext, TestsContextRoot } from "./TestContextRoot";
@@ -46,8 +47,6 @@ function TestsContent() {
     useContext(TestContext);
   const { filterByTime, setFilterByTime } = useContext(TimeFilterContext);
 
-  const retentionLimit = team?.retentionLimit ?? 7;
-
   const {
     contextMenu: contextMenuSortBy,
     onContextMenu: onClickSortBy,
@@ -71,10 +70,16 @@ function TestsContent() {
     onKeyDown: onKeyDownTimeFilter,
   } = useContextMenu(
     <>
-      <ContextMenuItem onSelect={() => setFilterByTime("hour")}>Last hour</ContextMenuItem>
-      <ContextMenuItem onSelect={() => setFilterByTime("day")}>Last day</ContextMenuItem>
-      <ContextMenuItem onSelect={() => setFilterByTime("week")}>Last 7 days</ContextMenuItem>
-      {retentionLimit > 7 && (
+      {withinTeamRetentionLimit(team, 1) && (
+        <>
+          <ContextMenuItem onSelect={() => setFilterByTime("hour")}>Last hour</ContextMenuItem>
+          <ContextMenuItem onSelect={() => setFilterByTime("day")}>Last day</ContextMenuItem>
+        </>
+      )}
+      {withinTeamRetentionLimit(team, 7) && (
+        <ContextMenuItem onSelect={() => setFilterByTime("week")}>Last 7 days</ContextMenuItem>
+      )}
+      {withinTeamRetentionLimit(team, 30) && (
         <ContextMenuItem onSelect={() => setFilterByTime("month")}>Last 30 days</ContextMenuItem>
       )}
     </>,
