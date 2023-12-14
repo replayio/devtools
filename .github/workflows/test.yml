@@ -296,9 +296,15 @@ jobs:
       - name: Download all coverage reports from GitHub Actions Artifacts
         uses: actions/download-artifact@v3
         with:
-          name: all-code-coverage-reports
           path: test-results
       - name: List output folder contents
-        run: echo "test-results contents:" && ls -l -r ./test-results
-      # - name: Merge into HTML Report
-      #   run: npx playwright merge-reports --reporter html ./all-blob-reports 
+        run: echo "test-results contents:" && ls -l -R ./test-results
+      - name: Merge Monocart reports
+        run: yarn ts-node packages/e2e-tests/scripts/merge-monocart-reports.ts ./test-results
+      - name: Archive merged Playwright report results with code coverage 
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: all-code-coverage-reports-merged
+          path: ./test-results/merged-report*
+          retention-days: 14
