@@ -101,14 +101,9 @@ jobs:
         run: npx @replayio/playwright install
         env:
           RECORD_REPLAY_CHROMIUM_DOWNLOAD_FILE: ${{ github.event.inputs.linuxBuildFile }}
-      - uses: replayio/action-playwright@main
-        with:
-          command: npx playwright test --shard ${{ matrix.shard }}/10 tests/*.ts
-          working-directory: ./packages/e2e-tests
-          api-key: ${{ env.RECORD_REPLAY_API_KEY }}
-          public: true
-          upload-all: true
-          project: replay-chromium
+      - name: Run Playwright
+        run: npx playwright test --shard ${{ matrix.shard }}/10 tests/*.ts --project replay-chromium
+        working-directory: ./packages/e2e-tests
         env:
           REPLAY_PLAYWRIGHT_FIXTURE: 1
           RECORD_REPLAY_METADATA_TEST_RUN_ID: ${{ needs.generate-test-run-id.outputs.testRunId }}
@@ -129,6 +124,11 @@ jobs:
         with:
           name: code-coverage-report
           path: packages/e2e-tests/test-results
+      - uses: replayio/action-upload@v0.5.1
+        with:
+          api-key: ${{ env.RECORD_REPLAY_API_KEY }}
+          public: true
+          upload-all: true
   authenticated-e2etest:
     name: Authenticated end-to-end tests (${{ matrix.shard }})
     runs-on: ubuntu-latest
