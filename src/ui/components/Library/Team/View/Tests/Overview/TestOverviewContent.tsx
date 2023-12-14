@@ -6,7 +6,7 @@ import { TestSuitePanelMessage } from "../../TestSuitePanelMessage";
 import { useTest } from "../hooks/useTest";
 import { TestContext } from "../TestContextRoot";
 import { TestDetails } from "./TestDetails";
-import libraryStyles from "../../../../Library.module.css";
+import styles from "../../../../Testsuites.module.css";
 
 export function TestOverviewContent() {
   const { testId } = useContext(TestContext);
@@ -20,7 +20,7 @@ export function TestOverviewContent() {
   }
 
   return (
-    <div className={`flex h-full flex-col text-sm transition ${libraryStyles.runOverview} `}>
+    <div className={`flex h-full flex-col text-sm transition ${styles.runOverview} `}>
       {children}
     </div>
   );
@@ -45,7 +45,7 @@ function TestOverview({ testId }: { testId: string }) {
 
   return (
     <div className="flex flex-col overflow-y-auto">
-      <div className={libraryStyles.testTitle}>
+      <div className={styles.testTitle}>
         <div>{test.title}</div>
       </div>
       <div className="flex flex-col overflow-y-auto">
