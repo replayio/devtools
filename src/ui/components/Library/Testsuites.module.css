@@ -121,7 +121,7 @@
 }
 
 .FilterTestsFilter {
-  border: 1px solid var(--input-border);
+  border: 2px solid var(--input-border);
   background-color: var(--body-bgcolor);
 }
 
