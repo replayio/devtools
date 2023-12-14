@@ -303,6 +303,10 @@ jobs:
         run: yarn ts-node packages/e2e-tests/scripts/merge-monocart-reports.ts ./test-results
       - name: List output folder contents
         run: echo "test-results contents:" && ls -l -R ./test-results
+      - name: List output folder contents
+        run: echo "root contents:" && ls -l  ./
+      - name: List output folder contents
+        run: echo "coverage contents:" && ls -l -R ./coverage
       - name: Archive merged Playwright report results with code coverage 
         uses: actions/upload-artifact@v3
         if: always()
@@ -310,6 +314,8 @@ jobs:
           name: all-code-coverage-reports-merged
           path: |
             ./test-results/merged-report*
+            ./test-results/merged-coverage*
             ./test-results/coverage*
             ./test-results/attachments*
+            ./coverage/index.html
           retention-days: 14

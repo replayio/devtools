@@ -21,6 +21,9 @@ console.log("Report files: ", reportJsonFiles);
     await merge(reportJsonFiles, {
       name: "My Merged Report",
       outputFile: "./test-results/merged-report.html",
+      coverage: {
+        outputFile: "./test-results/merged-coverage.html",
+      },
       attachmentPath: (currentPath, extras) => {
         console.log("Current attachment path: ", currentPath);
         return "./attachments";
