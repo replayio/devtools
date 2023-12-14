@@ -26,6 +26,10 @@ if (CI) {
         name: "My Test Report",
         outputFile: `./test-results/monocart-report_${SHARD_NUMBER}.html`,
         logging: "debug",
+        coverage: {
+          entryFilter: () => true,
+          sourceFilter: (sourcePath: string) => sourcePath.search(/src|replay-next\/.+/) !== -1,
+        },
         onEnd: async (reportData: any, capability: any) => {
           console.log("Working dir: ", process.cwd());
           console.log(reportData.summary);

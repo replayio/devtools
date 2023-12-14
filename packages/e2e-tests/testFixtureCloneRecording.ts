@@ -1,6 +1,7 @@
 import { Page, test as base } from "@playwright/test";
 import type { AxiosError } from "axios";
 import axios from "axios";
+import { addCoverageReport } from "monocart-reporter";
 
 import { TestRecordingKey } from "./helpers";
 import { cloneTestRecording, deleteTestRecording } from "./helpers/utils";
@@ -26,10 +27,13 @@ const testWithCloneRecording = base.extend<TestIsolatedRecordingFixture>({
       const { recording } = exampleRecordings[exampleKey];
       newRecordingId = await cloneTestRecording(recording);
 
-      await use({
-        page,
-        recordingId: newRecordingId,
-      });
+      await page.coverage.startJSCoverage({
+        resetOnNavigation: false,
+      }),
+        await use({
+          page,
+          recordingId: newRecordingId,
+        });
     } catch (err: any) {
       if (axios.isAxiosError(err)) {
         console.error("Axios error cloning recording: ", {
@@ -41,6 +45,9 @@ const testWithCloneRecording = base.extend<TestIsolatedRecordingFixture>({
       }
       throw err;
     } finally {
+      const jsCoverage = page.coverage.stopJSCoverage();
+
+      await addCoverageReport(jsCoverage, base.info());
       if (newRecordingId) {
         await deleteTestRecording(newRecordingId);
       }
