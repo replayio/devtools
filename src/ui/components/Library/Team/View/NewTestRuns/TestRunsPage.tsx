@@ -15,7 +15,7 @@ import {
   TestRunsFilterContextRoot,
 } from "./TestRunsContextRoot";
 import { TestRunSpecDetails } from "./TestRunSpecDetails";
-import styles from "../../../Library.module.css";
+import styles from "../../../Testsuites.module.css";
 import dropdownStyles from "./Dropdown.module.css";
 
 export function TestRunsPage() {
