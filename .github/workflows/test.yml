@@ -155,23 +155,21 @@ jobs:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
       - name: Install Replay Playwright
         run: npx @replayio/playwright install
-      - uses: replayio/action-playwright@main
-        with:
-          command: npx playwright test --shard ${{ matrix.shard }}/1 --reporter=@replayio/playwright/reporter,line authenticated/**/*.ts authenticated/*.ts
-          working-directory: ./packages/e2e-tests
-          api-key: ${{ env.RECORD_REPLAY_API_KEY }}
-          public: true
-          upload-all: true
-          project: replay-chromium
+      - name: Run Playwright
+        run: npx playwright test --shard ${{ matrix.shard }}/1 --reporter=@replayio/playwright/reporter,line authenticated/**/*.ts --project replay-chromium
+        working-directory: ./packages/e2e-tests
         env:
           REPLAY_PLAYWRIGHT_FIXTURE: 1
           RECORD_REPLAY_METADATA_TEST_RUN_ID: ${{ needs.generate-test-run-id.outputs.testRunId }}
           PLAYWRIGHT_TEST_BASE_URL: ${{ needs.preview-branch.outputs.url }}
           INPUT_STRIPE: ${{ matrix.shard }}/1
-          RECORD_REPLAY_WEBHOOK_URL: ${{ secrets.RECORD_REPLAY_WEBHOOK_URL }}
-          RECORD_REPLAY_TEST_METRICS: 1
           AUTOMATED_TEST_SECRET: ${{ secrets.AUTOMATED_TEST_SECRET }}
           AUTHENTICATED_TESTS_WORKSPACE_API_KEY: ${{ secrets.AUTHENTICATED_TESTS_WORKSPACE_API_KEY }}
+      - uses: replayio/action-upload@v0.5.1
+        with:
+          api-key: ${{ env.RECORD_REPLAY_API_KEY }}
+          public: true
+          upload-all: true
   e2etest-jail:
     name: End-to-end tests - Jail
     runs-on: ubuntu-latest
