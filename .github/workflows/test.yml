@@ -130,6 +130,8 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v2
+      - run: ls -R
+        working-directory: ./packages/e2e-tests
       - name: Setup node
         uses: actions/setup-node@v2
         with:
