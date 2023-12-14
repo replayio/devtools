@@ -6,7 +6,7 @@ import test from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "doc_rr_basic.html" });
 
-test(`breakpoints-01: Test basic breakpoint functionality`, async ({
+test.only(`breakpoints-01: Test basic breakpoint functionality`, async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {

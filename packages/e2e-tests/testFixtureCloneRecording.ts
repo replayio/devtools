@@ -29,11 +29,11 @@ const testWithCloneRecording = base.extend<TestIsolatedRecordingFixture>({
 
       await page.coverage.startJSCoverage({
         resetOnNavigation: false,
-      }),
-        await use({
-          page,
-          recordingId: newRecordingId,
-        });
+      });
+      await use({
+        page,
+        recordingId: newRecordingId,
+      });
     } catch (err: any) {
       if (axios.isAxiosError(err)) {
         console.error("Axios error cloning recording: ", {
@@ -45,7 +45,7 @@ const testWithCloneRecording = base.extend<TestIsolatedRecordingFixture>({
       }
       throw err;
     } finally {
-      const jsCoverage = page.coverage.stopJSCoverage();
+      const jsCoverage = await page.coverage.stopJSCoverage();
 
       await addCoverageReport(jsCoverage, base.info());
       if (newRecordingId) {
