@@ -367,11 +367,14 @@ async function saveRecording(example: string, apiKey: string, recordingId: strin
   const buildId = response.data.data.recording.buildId;
 
   const done = logAnimated(`Saving ${chalk.bold(example)} with recording id ${recordingId}`);
-  const id = await uploadRecording(recordingId, {
-    apiKey,
-    server: config.backendUrl,
-    verbose: true,
-  });
+
+  if (!skipUpload) {
+    await uploadRecording(recordingId, {
+      apiKey,
+      server: config.backendUrl,
+      verbose: true,
+    });
+  }
 
   await makeReplayPublic(apiKey, recordingId);
   await updateRecordingTitle(apiKey, recordingId, `E2E Example: ${example}`);
@@ -460,12 +463,14 @@ async function saveBrowserExample({ example }: TestRunCallbackArgs) {
 
   console.log("Recording completed");
   const recordingId = await uploadLastRecording(exampleUrl);
-  console.log("Uploaded recording", recordingId);
+  if (recordingId == null) {
+    throw new Error("Recording not uploaded");
+  }
 
   done();
 
   if (config.useExampleFile && recordingId) {
-    await saveRecording(example.filename, config.replayApiKey, recordingId);
+    await saveRecording(example.filename, config.replayApiKey, recordingId, true);
   }
   if (recordingId) {
     removeRecording(recordingId);
