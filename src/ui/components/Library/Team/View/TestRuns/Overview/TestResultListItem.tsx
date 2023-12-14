@@ -10,7 +10,7 @@ import {
 import { TestRunTest } from "shared/test-suites/TestRun";
 import HighlightedText from "ui/components/Library/Team/View/TestRuns/HighlightedText";
 
-import styles from "../../../../Testsuites.module.css";
+import styles from "../../../../Library.module.css";
 
 export function TestResultListItem({
   depth,

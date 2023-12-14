@@ -9,7 +9,7 @@ import { getTruncatedRelativeDate } from "../Recordings/RecordingListItem/Record
 import { AttributeContainer } from "./AttributeContainer";
 import { ModeAttribute } from "./Overview/RunSummary";
 import { TestRunsContext } from "./TestRunsContextRoot";
-import styles from "../../../Testsuites.module.css";
+import styles from "../../../Library.module.css";
 
 function Status({ failCount }: { failCount: number }) {
   const status = failCount > 0 ? "fail" : "success";
