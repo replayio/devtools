@@ -21,6 +21,11 @@ console.log("Report files: ", reportJsonFiles);
     await merge(reportJsonFiles, {
       name: "My Merged Report",
       outputFile: "./test-results/merged-report.html",
+      attachmentPath: (currentPath, extras) => {
+        console.log("Current attachment path: ", currentPath);
+        return "./attachments";
+        // return `https://cenfun.github.io/monocart-reporter/${currentPath}`;
+      },
       onEnd: async (reportData: any, capability: any) => {
         console.log("Finished merging report", reportData.summary);
       },

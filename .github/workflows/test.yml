@@ -311,4 +311,5 @@ jobs:
           path: |
             ./test-results/merged-report*
             ./test-results/coverage*
+            ./test-results/attachments*
           retention-days: 14
