@@ -39,5 +39,5 @@ export function useTestRuns(): { testRuns: TestRun[]; status: Status } {
 
   const testRunsDesc = useMemo(() => [...testRuns].reverse(), [testRuns]);
 
-  return { testRuns, status };
+  return { testRuns: testRunsDesc, status };
 }
