@@ -120,9 +120,11 @@ jobs:
         uses: actions/upload-artifact@v3
         if: always()
         with:
-          name: all-code-coverage-reports
+          name: all-code-coverage-reports_${{ matrix.shard }}
           path: packages/e2e-tests/test-results
+          retention-days: 3
       - uses: replayio/action-upload@v0.5.1
+        if: always()
         with:
           api-key: ${{ env.RECORD_REPLAY_API_KEY }}
           public: true

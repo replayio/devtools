@@ -1,7 +1,7 @@
 import { PlaywrightTestConfig, ReporterDescription, devices } from "@playwright/test";
 import { devices as replayDevices } from "@replayio/playwright";
 
-const { CI, SLOW_MO } = process.env;
+const { CI, SLOW_MO, SHARD_NUMBER } = process.env;
 
 const projects = [
   {
@@ -24,7 +24,7 @@ if (CI) {
       "monocart-reporter",
       {
         name: "My Test Report",
-        outputFile: "./test-results/monocart-report.html",
+        outputFile: `./test-results/monocart-report_${SHARD_NUMBER}.html`,
         logging: "debug",
         onEnd: async (reportData: any, capability: any) => {
           console.log("Working dir: ", process.cwd());
