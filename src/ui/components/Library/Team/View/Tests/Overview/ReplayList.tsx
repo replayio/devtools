@@ -7,7 +7,7 @@ import { TestExecution } from "shared/test-suites/TestRun";
 
 import { getTruncatedRelativeDate } from "../../Recordings/RecordingListItem/RecordingListItem";
 import { TestSuitePanelMessage } from "../../TestSuitePanelMessage";
-import styles from "../../../../Library.module.css";
+import styles from "../../../../Testsuites.module.css";
 
 export function ReplayList({ executions, label }: { executions: TestExecution[]; label: string }) {
   const sortedReplays = orderBy(
