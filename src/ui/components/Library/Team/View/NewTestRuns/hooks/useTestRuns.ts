@@ -7,14 +7,14 @@ import { TeamContext } from "ui/components/Library/Team/TeamContextRoot";
 import { testRunsIntervalCache } from "ui/components/Library/Team/View/NewTestRuns/suspense/TestRunsCache";
 import useToken from "ui/utils/useToken";
 
-import { TestRunsFilterContext } from "../../NewTestRuns/TestRunsContextRoot";
+import { TimeFilterContext } from "../../TimeFilterContextRoot";
 
 const EMPTY_ARRAY: any[] = [];
 
 export function useTestRuns(): { testRuns: TestRun[]; status: Status } {
   const graphQLClient = useContext(GraphQLClientContext);
   const { teamId } = useContext(TeamContext);
-  const { startTime, endTime } = useContext(TestRunsFilterContext);
+  const { startTime, endTime } = useContext(TimeFilterContext);
   const [testRuns, setTestRuns] = useState<TestRun[]>([]);
 
   const accessToken = useToken();

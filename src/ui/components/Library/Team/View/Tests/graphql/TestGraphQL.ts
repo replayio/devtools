@@ -1,11 +1,16 @@
 import { gql } from "@apollo/client";
 
 export const GET_WORKSPACE_TEST_EXECUTIONS = gql`
-  query GetWorkspaceTestExecutions($workspaceId: ID!, $testId: String) {
+  query GetWorkspaceTestExecutions(
+    $workspaceId: ID!
+    $testId: String
+    $startTime: String
+    $endTime: String
+  ) {
     node(id: $workspaceId) {
       ... on Workspace {
         id
-        tests(filter: { testId: $testId }) {
+        tests(filter: { testId: $testId, startTime: $startTime, endTime: $endTime }) {
           edges {
             node {
               testId
@@ -34,11 +39,11 @@ export const GET_WORKSPACE_TEST_EXECUTIONS = gql`
 `;
 
 export const GET_WORKSPACE_TESTS = gql`
-  query GetWorkspaceTests($workspaceId: ID!) {
+  query GetWorkspaceTests($workspaceId: ID!, $startTime: String, $endTime: String) {
     node(id: $workspaceId) {
       ... on Workspace {
         id
-        tests {
+        tests(filter: { startTime: $startTime, endTime: $endTime }) {
           edges {
             node {
               testId

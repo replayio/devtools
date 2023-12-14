@@ -35,41 +35,7 @@ type TestRunsContextType = {
   setSpec: React.Dispatch<React.SetStateAction<string | null>>;
 };
 
-type TestRunsFilterContextType = {
-  filterByTime: "week" | "month";
-  startTime: Date;
-  endTime: Date;
-  setFilterByTime: Dispatch<SetStateAction<"week" | "month">>;
-};
-
-export const TestRunsFilterContext = createContext<TestRunsFilterContextType>(null as any);
 export const TestRunsContext = createContext<TestRunsContextType>(null as any);
-
-const daysAgo = (days: number) => {
-  const date = new Date();
-  date.setDate(date.getDate() - days);
-  // Set zero hours, so when used in Cache as key, it will be the same for the whole day.
-  date.setHours(0, 0, 0, 0);
-  return date;
-};
-
-export function TestRunsFilterContextRoot({ children }: { children: ReactNode }) {
-  const [filterByTime, setFilterByTime] = useState<"week" | "month">("week");
-
-  const [startTime, endTime] = useMemo(() => {
-    const currentTime = new Date();
-    if (filterByTime === "month") {
-      return [daysAgo(30), currentTime];
-    }
-    return [daysAgo(7), currentTime];
-  }, [filterByTime]);
-
-  return (
-    <TestRunsFilterContext.Provider value={{ filterByTime, startTime, endTime, setFilterByTime }}>
-      {children}
-    </TestRunsFilterContext.Provider>
-  );
-}
 
 export function TestRunsContextRoot({ children }: { children: ReactNode }) {
   const { teamId, testRunId: defaultTestRunId } = useGetTeamRouteParams();

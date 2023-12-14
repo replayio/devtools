@@ -5,18 +5,20 @@ import { GetWorkspaceTestExecutions_node_Workspace } from "shared/graphql/genera
 import { TeamContext } from "ui/components/Library/Team/TeamContextRoot";
 import { convertRecording } from "ui/hooks/recordings";
 
+import { TimeFilterContext } from "../../TimeFilterContextRoot";
 import { GET_WORKSPACE_TEST_EXECUTIONS } from "../graphql/TestGraphQL";
 
 export function useTest(testId: string) {
   const { teamId } = useContext(TeamContext);
+  const { startTime, endTime } = useContext(TimeFilterContext);
   const { data, loading, error } = useQuery<{ node: GetWorkspaceTestExecutions_node_Workspace }>(
     GET_WORKSPACE_TEST_EXECUTIONS,
     {
-      variables: { workspaceId: teamId, testId },
+      variables: { workspaceId: teamId, testId, startTime, endTime },
     }
   );
 
-  const test = data?.node?.tests?.edges[0].node;
+  const test = data?.node?.tests?.edges?.[0].node;
 
   if (loading || !test) {
     return { test: null, loading: true };

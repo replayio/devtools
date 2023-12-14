@@ -6,26 +6,22 @@ import Icon from "replay-next/components/Icon";
 import { IndeterminateProgressBar } from "replay-next/components/IndeterminateLoader";
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 
+import { TimeFilterContext, TimeFilterContextRoot } from "../TimeFilterContextRoot";
 import { FilterField } from "./FilterField";
 import { TestRunOverviewPage } from "./Overview/TestRunOverviewContextRoot";
 import { TestRunList } from "./TestRunList";
-import {
-  TestRunsContext,
-  TestRunsContextRoot,
-  TestRunsFilterContext,
-  TestRunsFilterContextRoot,
-} from "./TestRunsContextRoot";
+import { TestRunsContext, TestRunsContextRoot } from "./TestRunsContextRoot";
 import { TestRunSpecDetails } from "./TestRunSpecDetails";
 import styles from "../../../Library.module.css";
 import dropdownStyles from "./Dropdown.module.css";
 
 export function TestRunsPage() {
   return (
-    <TestRunsFilterContextRoot>
+    <TimeFilterContextRoot>
       <TestRunsContextRoot>
         <TestRunsContent />
       </TestRunsContextRoot>
-    </TestRunsFilterContextRoot>
+    </TimeFilterContextRoot>
   );
 }
 
@@ -41,7 +37,7 @@ function TestRunsContent() {
     testRunsLoading,
     testRuns,
   } = useContext(TestRunsContext);
-  const { filterByTime, setFilterByTime } = useContext(TestRunsFilterContext);
+  const { filterByTime, setFilterByTime } = useContext(TimeFilterContext);
 
   const {
     contextMenu: contextMenuStatusFilter,
@@ -66,10 +62,10 @@ function TestRunsContent() {
   } = useContextMenu(
     <>
       <ContextMenuItem dataTestId="week" onSelect={() => setFilterByTime("week")}>
-        This week
+        Last 7 days
       </ContextMenuItem>
       <ContextMenuItem dataTestId="month" onSelect={() => setFilterByTime("month")}>
-        This month
+        Last 30 days
       </ContextMenuItem>
     </>,
     { alignTo: "auto-target" }
@@ -123,7 +119,7 @@ function TestRunsContent() {
                   tabIndex={0}
                 >
                   <div className="truncate">
-                    {filterByTime === "week" ? "This week" : "This month"}
+                    {filterByTime === "week" ? "Last 7 days" : "Last 30 days"}
                   </div>
                   <Icon className="h-5 w-5 flex-shrink-0" type="chevron-down" />
                 </div>

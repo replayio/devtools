@@ -16,12 +16,10 @@ import { useTests } from "./hooks/useTests";
 
 type TestsContextType = {
   sortBy: "failureRate" | "flakyRate" | "alphabetical";
-  filterByTime: number | null;
   filterByText: string;
   filterByTextForDisplay: string;
   selectTestId: Dispatch<SetStateAction<string | null>>;
   setSortBy: Dispatch<SetStateAction<TestsContextType["sortBy"]>>;
-  setFilterByTime: Dispatch<SetStateAction<number | null>>;
   setFilterByText: Dispatch<SetStateAction<string>>;
   testId: string | null;
   testIdForDisplay: string | null;
@@ -37,7 +35,6 @@ export function TestsContextRoot({ children }: { children: ReactNode }) {
 
   const [testId, setTestId] = useState<string | null>(null);
 
-  const [filterByTime, setFilterByTime] = useState<number | null>(null);
   const [sortBy, setSortBy] = useState<TestsContextType["sortBy"]>("failureRate");
 
   const [filterByText, setFilterByText] = useState("");
@@ -70,12 +67,10 @@ export function TestsContextRoot({ children }: { children: ReactNode }) {
     }
 
     return {
-      filterByTime,
       sortBy,
       filterByText: filterByTextDeferred,
       filterByTextForDisplay: filterByText,
       selectTestId: setTestId,
-      setFilterByTime,
       setSortBy,
       setFilterByText,
       testId: deferredTestId,
@@ -84,16 +79,7 @@ export function TestsContextRoot({ children }: { children: ReactNode }) {
       testsLoading: status === STATUS_PENDING,
       tests: filteredTests,
     };
-  }, [
-    filterByTime,
-    sortBy,
-    filterByText,
-    filterByTextDeferred,
-    deferredTestId,
-    testId,
-    status,
-    tests,
-  ]);
+  }, [sortBy, filterByText, filterByTextDeferred, deferredTestId, testId, status, tests]);
 
   return <TestContext.Provider value={value}>{children}</TestContext.Provider>;
 }
