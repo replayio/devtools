@@ -109,20 +109,18 @@ jobs:
           RECORD_REPLAY_METADATA_TEST_RUN_ID: ${{ needs.generate-test-run-id.outputs.testRunId }}
           PLAYWRIGHT_TEST_BASE_URL: ${{ needs.preview-branch.outputs.url }}
           INPUT_STRIPE: ${{ matrix.shard }}/10
+          SHARD_NUMBER: ${{ matrix.shard }}
           RECORD_REPLAY_WEBHOOK_URL: ${{ secrets.RECORD_REPLAY_WEBHOOK_URL }}
           RECORD_REPLAY_TEST_METRICS: 1
           AUTOMATED_TEST_SECRET: ${{ secrets.AUTOMATED_TEST_SECRET }}
           AUTHENTICATED_TESTS_WORKSPACE_API_KEY: ${{ secrets.AUTHENTICATED_TESTS_WORKSPACE_API_KEY }}
       - name: List output folder contents
-        run: echo "." && ls .
-      - name: List output folder contents
-        run: echo "e2e-tests contents:" && ls packages/e2e-tests 
-      - name: List output folder contents
         run: echo "test-results contents:" && ls -l -r packages/e2e-tests/test-results
       - name: Archive Playwright report results with code coverage 
         uses: actions/upload-artifact@v3
+        if: always()
         with:
-          name: code-coverage-report
+          name: all-code-coverage-reports
           path: packages/e2e-tests/test-results
       - uses: replayio/action-upload@v0.5.1
         with:
@@ -262,3 +260,43 @@ jobs:
           YARN_CHECKSUM_BEHAVIOR: "update"
       - name: Run tests
         run: yarn test
+  merge-coverage-reports:
+    # Merge reports after playwright-tests, even if some shards have failed
+    if: always()
+    needs: [e2etest]
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+      # Get the yarn cache path.
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
+      - name: Restore yarn cache
+        uses: actions/cache@v3
+        id: yarn-cache
+        with:
+          path: |
+            ${{ steps.yarn-cache-dir-path.outputs.dir }}
+            **/node_modules
+          key: yarn-cache-folder-${{ hashFiles('**/yarn.lock', '.yarnrc.yml') }}
+          restore-keys: "yarn-cache-folder-"
+      # Actually install packages with Yarn
+      - name: Install packages
+        run: yarn install
+        env:
+          YARN_CHECKSUM_BEHAVIOR: "update"
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+      - name: Download all coverage reports from GitHub Actions Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: all-code-coverage-reports
+          path: test-results
+      - name: List output folder contents
+        run: echo "test-results contents:" && ls -l -r ./test-results
+      # - name: Merge into HTML Report
+      #   run: npx playwright merge-reports --reporter html ./all-blob-reports 
