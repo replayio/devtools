@@ -8,7 +8,7 @@ import { TestExecution } from "shared/test-suites/TestRun";
 import { getTruncatedRelativeDate } from "../../Recordings/RecordingListItem/RecordingListItem";
 import { Alert, AlertType } from "../../shared/Alert";
 import { TestSuitePanelMessage } from "../../TestSuitePanelMessage";
-import styles from "../../../../Testsuites.module.css";
+import styles from "../../../../Library.module.css";
 
 export function ReplayList({ executions, label }: { executions: TestExecution[]; label: string }) {
   const hasExecutionsWithoutReplays = executions.some(e => e.recordings.length === 0);

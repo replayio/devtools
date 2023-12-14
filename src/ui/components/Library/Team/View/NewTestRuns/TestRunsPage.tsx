@@ -12,7 +12,7 @@ import { TestRunOverviewPage } from "./Overview/TestRunOverviewContextRoot";
 import { TestRunList } from "./TestRunList";
 import { TestRunsContext, TestRunsContextRoot } from "./TestRunsContextRoot";
 import { TestRunSpecDetails } from "./TestRunSpecDetails";
-import styles from "../../../Testsuites.module.css";
+import styles from "../../../Library.module.css";
 import dropdownStyles from "./Dropdown.module.css";
 
 export function TestRunsPage() {

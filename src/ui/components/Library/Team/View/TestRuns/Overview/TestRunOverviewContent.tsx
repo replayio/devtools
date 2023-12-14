@@ -5,7 +5,7 @@ import { RunResults } from "ui/components/Library/Team/View/TestRuns/Overview/Ru
 import { TestRunsContext } from "ui/components/Library/Team/View/TestRuns/TestRunsContextRoot";
 
 import { RunSummary } from "./RunSummary";
-import styles from "../../../../Testsuites.module.css";
+import styles from "../../../../Library.module.css";
 
 export function TestRunOverviewContent() {
   const { filterByStatus, filterByText, testRunId, testRunIdForDisplay } =
