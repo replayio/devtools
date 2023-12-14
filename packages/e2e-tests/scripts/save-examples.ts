@@ -7,7 +7,7 @@
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 import type { Page, expect as expectFunction } from "@playwright/test";
-import { listAllRecordings, removeRecording, uploadRecording } from "@replayio/replay";
+import { removeRecording, uploadRecording } from "@replayio/replay";
 import axios from "axios";
 import chalk from "chalk";
 import { dots } from "cli-spinners";
@@ -19,6 +19,7 @@ import { SetRecordingIsPrivateVariables } from "../../shared/graphql/generated/S
 import { UpdateRecordingTitleVariables } from "../../shared/graphql/generated/UpdateRecordingTitle";
 import config, { BrowserName } from "../config";
 import { testFunction as reduxFundamentalsScript } from "../examples/redux-fundamentals/tests/example-script";
+import { ExamplesData } from "../helpers";
 import { recordNodeExample } from "./record-node";
 import { recordPlaywright, uploadLastRecording } from "./record-playwright";
 
@@ -355,17 +356,27 @@ function logAnimated(text: string): () => void {
   };
 }
 
-async function saveRecording(example: string, apiKey: string, recordingId?: string) {
-  if (recordingId) {
-  } else {
-    const recordings = listAllRecordings();
-    if (recordings.length > 0) {
-      const lastRecording = recordings[recordings.length - 1];
-      recordingId = lastRecording.id;
-    } else {
-      throw "No recording id found";
-    }
-  }
+async function saveRecording(example: string, apiKey: string, recordingId: string) {
+  const response = await axios({
+    url: config.graphqlUrl,
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+    },
+    data: {
+      query: `
+          query GetRecordingBuildId($recordingId: UUID!) {
+            recording(uuid: $recordingId) {
+              buildId
+            }
+          }
+        `,
+      variables: {
+        recordingId,
+      },
+    },
+  });
+  const buildId = response.data.data.recording.buildId;
 
   const done = logAnimated(`Saving ${chalk.bold(example)} with recording id ${recordingId}`);
   const id = await uploadRecording(recordingId, {
@@ -378,8 +389,22 @@ async function saveRecording(example: string, apiKey: string, recordingId?: stri
   await updateRecordingTitle(apiKey, recordingId, `E2E Example: ${example}`);
 
   const text = "" + readFileSync(examplesJsonPath);
-  const json = JSON.parse(text);
-  writeFileSync(examplesJsonPath, JSON.stringify({ ...json, [example]: id }, null, 2));
+  const json: ExamplesData = JSON.parse(text);
+
+  writeFileSync(
+    examplesJsonPath,
+    JSON.stringify(
+      {
+        ...json,
+        [example]: {
+          recording: id,
+          buildId,
+        },
+      },
+      null,
+      2
+    )
+  );
 
   done();
 }
@@ -460,7 +485,7 @@ async function saveNodeExamples() {
 
     const recordingId = await recordNodeExample(examplePath);
     if (recordingId) {
-      await saveRecording(example.filename, config.replayApiKey, recordingId!);
+      await saveRecording(example.filename, config.replayApiKey, recordingId);
       removeRecording(recordingId);
 
       done();

@@ -23,7 +23,8 @@ const testWithCloneRecording = base.extend<TestIsolatedRecordingFixture>({
 
     let newRecordingId: string | undefined = undefined;
     try {
-      newRecordingId = await cloneTestRecording(exampleRecordings[exampleKey]);
+      const { recording } = exampleRecordings[exampleKey];
+      newRecordingId = await cloneTestRecording(recording);
 
       await use({
         page,
