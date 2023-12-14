@@ -1,9 +1,9 @@
 import { motion } from "framer-motion";
-import { useRouter } from "next/router";
 
 import Icon from "replay-next/components/Icon";
 import { Recording } from "shared/graphql/types";
 import { TestRun, TestRunTest } from "shared/test-suites/TestRun";
+import { useGetRecordingURLForTest } from "ui/utils/recording";
 
 import {
   getDurationString,
@@ -58,8 +58,7 @@ export function TestResultListItem({
 }) {
   const { comments, isProcessed, id: recordingId } = recording;
   const { title } = test;
-
-  const { apiKey, e2e } = useRouter().query;
+  const recordingUrl = useGetRecordingURLForTest(recordingId);
 
   const numComments = comments?.length ?? 0;
 
@@ -67,7 +66,7 @@ export function TestResultListItem({
 
   return (
     <a
-      href={`/recording/${recordingId}?e2e=${e2e ?? ""}&apiKey=${apiKey ?? ""}`}
+      href={recordingUrl}
       className={`${styles.recordingLink} ${styles.libraryRow}`}
       data-test-id="TestRunResultsListItem"
       data-test-status={label}

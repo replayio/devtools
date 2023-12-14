@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-import { useRouter } from "next/router";
 
 import Icon from "replay-next/components/Icon";
 import { Recording } from "shared/graphql/types";
@@ -9,6 +8,7 @@ import {
 } from "shared/test-suites/RecordingTestMetadata";
 import { TestRunTest } from "shared/test-suites/TestRun";
 import HighlightedText from "ui/components/Library/Team/View/TestRuns/HighlightedText";
+import { useGetRecordingURLForTest } from "ui/utils/recording";
 
 import styles from "../../../../Library.module.css";
 
@@ -29,8 +29,7 @@ export function TestResultListItem({
 }) {
   const { comments, isProcessed, id: recordingId } = recording;
   const { sourcePath, title } = test;
-
-  const { apiKey, e2e } = useRouter().query;
+  const recordingUrl = useGetRecordingURLForTest(recordingId);
 
   const numComments = comments?.length ?? 0;
 
@@ -54,7 +53,7 @@ export function TestResultListItem({
 
   return (
     <a
-      href={`/recording/${recordingId}?e2e=${e2e ?? ""}&apiKey=${apiKey ?? ""}`}
+      href={recordingUrl}
       className={`${styles.recordingLink} ${styles.libraryRow}`}
       data-test-id="TestRunResultsListItem"
       data-test-status={label}

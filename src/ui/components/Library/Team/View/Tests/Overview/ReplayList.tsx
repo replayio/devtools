@@ -4,6 +4,7 @@ import orderBy from "lodash/orderBy";
 
 import Icon from "replay-next/components/Icon";
 import { TestExecution } from "shared/test-suites/TestRun";
+import { useGetRecordingURLForTest } from "ui/utils/recording";
 
 import { getTruncatedRelativeDate } from "../../Recordings/RecordingListItem/RecordingListItem";
 import { Alert, AlertType } from "../../shared/Alert";
@@ -77,7 +78,7 @@ function ReplayListItem({
   const displayedTitle = commitTitle || recordingTitle || "(commit title missing)";
 
   return (
-    <a href={`/recording/${recordingId}`} className={styles.replayRow}>
+    <a href={useGetRecordingURLForTest(recordingId)} className={styles.replayRow}>
       <div className="flex items-center gap-2 overflow-x-hidden">
         <div className={styles.iconWrapper}>
           <motion.div

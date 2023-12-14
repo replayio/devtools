@@ -1,3 +1,4 @@
+import { useRouter } from "next/router";
 import slugify from "slugify";
 
 import { Recording } from "shared/graphql/types";
@@ -15,7 +16,21 @@ export function getRecordingURL(recording: Recording): string {
     id = slugify(recording.title, { strict: true }).toLowerCase() + SLUG_SEPARATOR + recording.id;
   }
 
+  // Revert once we merge the test-suites branch into main (see SCS-1723)
+  if (window.location.host === "tests.replay.io") {
+    return `https://app.replay.io/recording/${id}`;
+  }
+
   return `/recording/${id}`;
+}
+
+export function useGetRecordingURLForTest(recordingId: string): string {
+  const { apiKey, e2e } = useRouter().query;
+  const pathName = `/recording/${recordingId}?e2e=${e2e ?? ""}&apiKey=${apiKey ?? ""}`;
+  // Revert once we merge the test-suites branch into main (see SCS-1723)
+  const host = window.location.host === "tests.replay.io" ? "https://app.replay.io" : "";
+
+  return host + pathName;
 }
 
 export function getRecordingId(): string | undefined {
