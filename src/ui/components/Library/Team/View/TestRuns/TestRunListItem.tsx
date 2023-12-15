@@ -87,7 +87,7 @@ export function TestRunListItem({
   return (
     <div
       data-test-id="TestRunListItem"
-      className={`flex cursor-pointer flex-row items-center space-x-3 rounded-sm border-b border-chrome bg-themeBase-100 p-3 ${
+      className={`flex cursor-pointer flex-row items-center space-x-3 rounded-sm border-b border-chrome p-3 ${
         styles.libraryRow
       }
       ${isSelected ? styles.libraryRowSelected : ""}
