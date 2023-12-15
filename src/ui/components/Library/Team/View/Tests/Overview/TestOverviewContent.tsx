@@ -1,5 +1,6 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 
+import { IndeterminateProgressBar } from "replay-next/components/IndeterminateLoader";
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 
 import { TestSuitePanelMessage } from "../../TestSuitePanelMessage";
@@ -7,6 +8,15 @@ import { useTest } from "../hooks/useTest";
 import { TestContext } from "../TestContextRoot";
 import { TestDetails } from "./TestDetails";
 import libraryStyles from "../../../../Library.module.css";
+import styles from "./TestOverviewContent.module.css";
+
+function SelectTestMessage({ error }: { error?: boolean }) {
+  return (
+    <TestSuitePanelMessage>
+      {error ? "Failed to load test details" : "Select a test to see its details here"}
+    </TestSuitePanelMessage>
+  );
+}
 
 export function TestOverviewContent() {
   const { testId, tests } = useContext(TestContext);
@@ -16,7 +26,7 @@ export function TestOverviewContent() {
   if (testId && tests.some(t => t.testId === testId)) {
     children = <TestOverview testId={testId} />;
   } else {
-    children = <TestSuitePanelMessage>Select a test to see its details here</TestSuitePanelMessage>;
+    children = <SelectTestMessage />;
   }
 
   return (
@@ -27,30 +37,30 @@ export function TestOverviewContent() {
 }
 
 function TestOverview({ testId }: { testId: string }) {
+  const [lastTest, setLastTest] = useState<typeof test | null>(null);
   const { test, loading, error } = useTest(testId);
 
-  if (loading) {
-    return (
-      <div className="flex h-full items-center justify-center p-2">
-        <LibrarySpinner />
-      </div>
-    );
-  }
-
-  if (error || !test) {
-    return (
-      <div className="flex h-full items-center justify-center p-2">Failed to load test details</div>
-    );
-  }
+  useEffect(() => {
+    if (test) {
+      setLastTest(test);
+    }
+  }, [test]);
 
   return (
-    <div className="flex flex-col overflow-y-auto">
-      <div className={libraryStyles.testTitle}>
-        <div>{test.title}</div>
-      </div>
-      <div className="flex flex-col overflow-y-auto">
-        <TestDetails executions={test.executions} />
-      </div>
+    <div className={styles.wrapper} data-pending={loading}>
+      {loading ? <IndeterminateProgressBar /> : null}
+      {lastTest ? (
+        <>
+          <div className={libraryStyles.testTitle}>
+            <div>{lastTest.title}</div>
+          </div>
+          <div className="flex flex-col overflow-y-auto">
+            <TestDetails executions={lastTest.executions} />
+          </div>
+        </>
+      ) : (
+        <SelectTestMessage error={!!error} />
+      )}
     </div>
   );
 }

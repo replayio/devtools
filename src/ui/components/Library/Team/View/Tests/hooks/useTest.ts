@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client";
-import { useContext } from "react";
+import { useContext, useMemo } from "react";
 
 import { GetWorkspaceTestExecutions_node_Workspace } from "shared/graphql/generated/GetWorkspaceTestExecutions";
 import { TeamContext } from "ui/components/Library/Team/TeamContextRoot";
@@ -18,21 +18,23 @@ export function useTest(testId: string) {
     }
   );
 
-  const test = data?.node?.tests?.edges?.[0].node;
+  const test = useMemo(() => {
+    const test = data?.node?.tests?.edges?.[0].node;
 
-  if (loading || !test) {
-    return { test: null, loading: true };
-  }
+    if (!test) {
+      return null;
+    }
 
-  const executions = test.executions.map(e => ({
-    ...e,
-    recordings: e.recordings.map(convertRecording),
-  }));
+    const executions = test.executions.map(e => ({
+      ...e,
+      recordings: e.recordings.map(convertRecording),
+    }));
 
-  const processedTest = {
-    ...test,
-    executions,
-  };
+    return {
+      ...test,
+      executions,
+    };
+  }, [data]);
 
-  return { test: processedTest, loading, error };
+  return { test, loading, error };
 }

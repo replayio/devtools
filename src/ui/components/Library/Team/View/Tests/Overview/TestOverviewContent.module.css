@@ -1,0 +1,12 @@
+.wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    height: 100%;
+}
+
+.wrapper[data-pending="true"] {
+    opacity: 0.5;
+    pointer-events: none;
+}
