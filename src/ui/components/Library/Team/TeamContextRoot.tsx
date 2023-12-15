@@ -12,7 +12,7 @@ import { LibrarySpinner } from "../LibrarySpinner";
 export const MY_LIBRARY_TEAM = {
   name: "Your Library",
   isTest: false,
-  retentionLimit: 7,
+  retentionLimit: null,
   id: "me",
   databaseId: null,
 };

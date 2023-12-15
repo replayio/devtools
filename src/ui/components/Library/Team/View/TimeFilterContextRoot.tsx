@@ -64,7 +64,7 @@ export function withinTeamRetentionLimit(
   team: Workspace | typeof MY_LIBRARY_TEAM | null | undefined,
   days: number
 ) {
-  if (!team || !("retentionLimit" in team)) {
+  if (!team) {
     return false;
   }
 
