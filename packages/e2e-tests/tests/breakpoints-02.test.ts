@@ -6,7 +6,7 @@ import test from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "doc_rr_basic.html" });
 
-test.only(`breakpoints-02: Test unhandled divergence while evaluating at a breakpoint`, async ({
+test(`breakpoints-02: Test unhandled divergence while evaluating at a breakpoint`, async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {

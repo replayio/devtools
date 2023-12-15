@@ -6,7 +6,7 @@ import test, { Page } from "../testFixtureCloneRecording";
 test.use({ exampleKey: "doc_control_flow.html" });
 
 // Test hitting breakpoints when using tricky control flow constructs:
-test.only(`breakpoints-04: catch, finally, generators, and async/await`, async ({
+test(`breakpoints-04: catch, finally, generators, and async/await`, async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {

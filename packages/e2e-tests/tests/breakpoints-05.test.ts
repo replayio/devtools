@@ -9,7 +9,7 @@ import test from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "doc_debugger_statements.html" });
 
-test.only(`breakpoints-05: Test interaction of breakpoints with debugger statements`, async ({
+test(`breakpoints-05: Test interaction of breakpoints with debugger statements`, async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
