@@ -12,6 +12,9 @@ on:
         description: "Linux Chromium Build File (.tar.xz)"
       runId:
         description: "Test Run ID, chosen by workflow dispatcher, to make it possible to find the correct run from the api"
+      rerecord:
+        description: "Generate new recordings for all tests before running them"
+        default: "false"
   push:
     branches:
       - main
@@ -62,10 +65,62 @@ jobs:
           script: return require("uuid").v4()
     outputs:
       testRunId: ${{ steps.uuid.outputs.result }}
+  maybe-rerecord:
+    name: >-
+      ${{ (github.event.inputs.rerecord == 'true' && 'Generate new recordings') || 'Skip new recordings' }}
+    runs-on: ubuntu-latest
+    needs: [preview-branch, generate-test-run-id]
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+      # Get the yarn cache path.
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
+      - name: Restore yarn cache
+        uses: actions/cache@v3
+        id: yarn-cache
+        with:
+          path: |
+            ${{ steps.yarn-cache-dir-path.outputs.dir }}
+            **/node_modules
+          key: yarn-cache-folder-${{ hashFiles('**/yarn.lock', '.yarnrc.yml') }}
+          restore-keys: "yarn-cache-folder-"
+      # Actually install packages with Yarn
+      - name: Install packages
+        run: yarn install
+        env:
+          YARN_CHECKSUM_BEHAVIOR: "update"
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+      - name: Install Replay Playwright
+        run: npx @replayio/playwright install
+        env:
+          RECORD_REPLAY_CHROMIUM_DOWNLOAD_FILE: ${{ github.event.inputs.linuxBuildFile }}
+        if: ${{ github.event.inputs.rerecord == 'true' }}
+      - name: Run dev server
+        run: yarn dev &
+        if: ${{ github.event.inputs.rerecord == 'true' }}
+      - name: Generate chromium recordings to test replays against
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: npx ts-node ./scripts/save-examples.ts --target=browser --runtime=chromium
+          working-directory: packages/e2e-tests
+        if: ${{ github.event.inputs.rerecord == 'true' }}
+      - name: Create artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: examples-json
+          path: packages/e2e-tests/examples.json
+        if: ${{ github.event.inputs.rerecord == 'true' }}
+
   e2etest:
     name: End-to-end tests (${{ matrix.shard }})
     runs-on: ubuntu-latest
-    needs: [preview-branch, generate-test-run-id]
+    needs: [preview-branch, generate-test-run-id, maybe-rerecord]
     strategy:
       # GH cancels other matrixed jobs by default if one fails. We want all E2E jobs to complete.
       fail-fast: false
@@ -101,6 +156,14 @@ jobs:
         run: npx @replayio/playwright install
         env:
           RECORD_REPLAY_CHROMIUM_DOWNLOAD_FILE: ${{ github.event.inputs.linuxBuildFile }}
+      - name: Download examples.json
+        uses: actions/download-artifact@v2
+        with:
+          name: examples-json
+        if: ${{ github.event.inputs.rerecord == 'true' }}
+      - name: Replace examples.json with downloaded artifact
+        run: mv examples.json packages/e2e-tests/examples.json
+        if: ${{ github.event.inputs.rerecord == 'true' }}
       - uses: replayio/action-playwright@main
         with:
           command: npx playwright test --shard ${{ matrix.shard }}/10 --reporter=@replayio/playwright/reporter,line tests/*.ts
@@ -118,10 +181,11 @@ jobs:
           RECORD_REPLAY_TEST_METRICS: 1
           AUTOMATED_TEST_SECRET: ${{ secrets.AUTOMATED_TEST_SECRET }}
           AUTHENTICATED_TESTS_WORKSPACE_API_KEY: ${{ secrets.AUTHENTICATED_TESTS_WORKSPACE_API_KEY }}
+
   authenticated-e2etest:
     name: Authenticated end-to-end tests (${{ matrix.shard }})
     runs-on: ubuntu-latest
-    needs: [preview-branch, generate-test-run-id]
+    needs: [preview-branch, generate-test-run-id, maybe-rerecord]
     strategy:
       # GH cancels other matrixed jobs by default if one fails. We want all E2E jobs to complete.
       fail-fast: false
@@ -155,6 +219,14 @@ jobs:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
       - name: Install Replay Playwright
         run: npx @replayio/playwright install
+      - name: Download examples.json
+        uses: actions/download-artifact@v2
+        with:
+          name: examples-json
+        if: ${{ github.event.inputs.rerecord == 'true' }}
+      - name: Replace examples.json with downloaded artifact
+        run: mv examples.json packages/e2e-tests/examples.json
+        if: ${{ github.event.inputs.rerecord == 'true' }}
       - uses: replayio/action-playwright@main
         with:
           command: npx playwright test --shard ${{ matrix.shard }}/1 --reporter=@replayio/playwright/reporter,line authenticated/**/*.ts authenticated/*.ts
@@ -172,10 +244,11 @@ jobs:
           RECORD_REPLAY_TEST_METRICS: 1
           AUTOMATED_TEST_SECRET: ${{ secrets.AUTOMATED_TEST_SECRET }}
           AUTHENTICATED_TESTS_WORKSPACE_API_KEY: ${{ secrets.AUTHENTICATED_TESTS_WORKSPACE_API_KEY }}
+
   e2etest-jail:
     name: End-to-end tests - Jail
     runs-on: ubuntu-latest
-    needs: [preview-branch, generate-test-run-id]
+    needs: [preview-branch, generate-test-run-id, maybe-rerecord]
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v2
@@ -204,6 +277,14 @@ jobs:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
       - name: Install Replay Playwright
         run: npx @replayio/playwright install
+      - name: Download examples.json
+        uses: actions/download-artifact@v2
+        with:
+          name: examples-json
+        if: ${{ github.event.inputs.rerecord == 'true' }}
+      - name: Replace examples.json with downloaded artifact
+        run: mv examples.json packages/e2e-tests/examples.json
+        if: ${{ github.event.inputs.rerecord == 'true' }}
       - uses: replayio/action-playwright@main
         with:
           command: npx playwright test --reporter=@replayio/playwright/reporter,line jail/*.test.ts --project replay-chromium || exit 0
@@ -219,6 +300,7 @@ jobs:
           RECORD_REPLAY_TEST_METRICS: 1
           AUTOMATED_TEST_SECRET: ${{ secrets.AUTOMATED_TEST_SECRET }}
           AUTHENTICATED_TESTS_WORKSPACE_API_KEY: ${{ secrets.AUTHENTICATED_TESTS_WORKSPACE_API_KEY }}
+
   unit-test:
     name: Unit Tests
     runs-on: ubuntu-latest
