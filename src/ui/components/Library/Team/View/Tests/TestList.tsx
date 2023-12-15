@@ -6,7 +6,9 @@ import { Test } from "shared/test-suites/TestRun";
 import { TestListItem } from "ui/components/Library/Team/View/Tests/TestListItem";
 import { SecondaryButton } from "ui/components/shared/Button";
 
+import { TestSuitePanelMessage } from "../TestSuitePanelMessage";
 import { TestContext } from "./TestContextRoot";
+import styles from "./TestList.module.css";
 
 const PAGE_SIZE = 50;
 const ROW_HEIGHT = 45;
@@ -19,7 +21,7 @@ type ItemData = {
 };
 
 export function TestList() {
-  const { tests, filterByText } = useContext(TestContext);
+  const { tests, testsCount, testsLoading, filterByText } = useContext(TestContext);
   const [countToRender, setCountToRender] = useState(PAGE_SIZE);
 
   const itemData = useMemo<ItemData>(
@@ -33,6 +35,14 @@ export function TestList() {
   );
 
   const itemCount = Math.min(countToRender + 1, tests.length);
+
+  if (!testsLoading && tests.length === 0 && testsCount > 0) {
+    return (
+      <TestSuitePanelMessage className={styles.message}>
+        No tests match the current filters
+      </TestSuitePanelMessage>
+    );
+  }
 
   return (
     <ReactVirtualizedAutoSizer
