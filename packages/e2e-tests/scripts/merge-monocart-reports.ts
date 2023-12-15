@@ -23,12 +23,19 @@ console.log("Report files: ", reportJsonFiles);
       outputFile: "./test-results/merged-report.html",
       coverage: {
         outputFile: "./test-results/merged-coverage.html",
-        entryFilter: () => true,
-        sourceFilter: (sourcePath: string) => sourcePath.search(/src|replay-next\/.+/) !== -1,
+        entryFilter: entry => {
+          console.log("Entry: ", entry.url);
+          return true;
+        },
+        sourceFilter: (sourcePath: string) => {
+          console.log("Source: ", sourcePath);
+          return sourcePath.search(/src|replay-next\/.+/) !== -1;
+        },
         onEnd: async reportData => {
           console.log("Finished merging coverage report", reportData.summary);
         },
       },
+
       attachmentPath: (currentPath, extras) => {
         console.log("Current attachment path: ", currentPath);
         // return "./attachments";

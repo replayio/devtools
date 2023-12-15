@@ -27,8 +27,19 @@ if (CI) {
         outputFile: `./test-results/monocart-report_${SHARD_NUMBER}.html`,
         logging: "debug",
         coverage: {
-          entryFilter: () => true,
-          sourceFilter: (sourcePath: string) => sourcePath.search(/src|replay-next\/.+/) !== -1,
+          reports: [["v8"], ["v8-json"]],
+
+          entryFilter: (entry: any) => {
+            console.log("Entry: ", entry.url);
+            return true;
+          },
+          sourceFilter: (sourcePath: string) => {
+            console.log("Source: ", sourcePath);
+            return sourcePath.search(/src|replay-next\/.+/) !== -1;
+          },
+          onEnd: async (reportData: any) => {
+            console.log("Coverage onEnd: ", reportData);
+          },
         },
         onEnd: async (reportData: any, capability: any) => {
           console.log("Working dir: ", process.cwd());
