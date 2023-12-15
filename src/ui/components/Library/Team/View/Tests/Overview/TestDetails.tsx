@@ -1,16 +1,12 @@
 import orderBy from "lodash/orderBy";
 
 import { Recording } from "shared/graphql/types";
-import { GroupedTestRun, TestExecution } from "shared/test-suites/TestRun";
-import Icon from "ui/components/shared/Icon";
-import MaterialIcon from "ui/components/shared/MaterialIcon";
+import { GroupedTestRun } from "shared/test-suites/TestRun";
 import { testFailed, testPassed } from "ui/utils/testRuns";
 
-import { getTruncatedRelativeDate } from "../../Recordings/RecordingListItem/RecordingListItem";
 import { TestSuitePanelMessage } from "../../TestSuitePanelMessage";
+import { Execution } from "./Execution";
 import { StatusIcon } from "./StatusIcon";
-
-// import styles from "./TestRuns.module.css";
 
 export function TestDetails({ testRuns }: { testRuns: GroupedTestRun[] }) {
   const sortedTestRuns = orderBy(testRuns, "date", "desc");
@@ -52,7 +48,7 @@ function TestRun({ testRun }: { testRun: GroupedTestRun }) {
   );
 }
 
-function getReplayResult(result: string, index: number, total: number) {
+export function getReplayResult(result: string, index: number, total: number) {
   if (result === "passed") {
     return "passed";
   } else if (result === "failed") {
@@ -65,55 +61,7 @@ function getReplayResult(result: string, index: number, total: number) {
   }
 }
 
-// TODO:Make sure the recordings are sorted by their dates
-function Execution({ execution }: { execution: TestExecution }) {
-  const title = execution.commitTitle || "<Commit title unavailable>";
-
-  return (
-    <div className="flex flex-col">
-      <div className="flex flex-row items-center justify-between gap-2 overflow-hidden border-b border-bodyBgcolor py-2 px-4">
-        <div className="flex flex-row items-center gap-2 overflow-hidden">
-          <ExecutionStatus result={execution.result} />
-          <div className="flex flex-col overflow-x-hidden">
-            <div title={title} className="flex-grow truncate font-bold">
-              {title}
-            </div>
-            {execution.commitAuthor ? <CommitAuthor author={execution.commitAuthor} /> : null}
-          </div>
-        </div>
-        <div className="flex flex-shrink-0 flex-row items-center gap-1">
-          <div className="flex w-4 items-center">
-            <MaterialIcon>schedule</MaterialIcon>
-          </div>
-          <div>{getTruncatedRelativeDate(execution.createdAt)}</div>
-        </div>
-      </div>
-      {execution.recordings.map((r, i) => (
-        <Replay
-          recording={r}
-          key={i}
-          result={getReplayResult(execution.result, i, execution.recordings.length)}
-          attemptNumber={execution.recordings.length - i}
-        />
-      ))}
-    </div>
-  );
-}
-
-function CommitAuthor({ author }: { author: string }) {
-  return (
-    <div className="flex flex-row gap-4 overflow-hidden overflow-ellipsis whitespace-nowrap">
-      <div className="flex flex-row items-center gap-1">
-        <div className="flex w-4 items-center">
-          <MaterialIcon>person</MaterialIcon>
-        </div>
-        <div>{author}</div>
-      </div>
-    </div>
-  );
-}
-
-function Replay({
+export function Replay({
   recording,
   result,
   attemptNumber,
@@ -141,29 +89,5 @@ function Replay({
         </div>
       </div>
     </a>
-  );
-}
-
-function ExecutionStatus({ result }: { result: string }) {
-  let className;
-  let icon;
-
-  if (result === "passed") {
-    icon = "testsuites-success";
-    className = "bg-testsuitesSuccessColor";
-  } else if (result === "failed") {
-    className = "bg-testsuitesFailedColor";
-    icon = "testsuites-v2-failed";
-  } else if (result === "flaky") {
-    className = "bg-testsuitesFlakyColor";
-    icon = "testsuites-v2-flaky";
-  } else {
-    return null;
-  }
-
-  return (
-    <div className="flex w-6 flex-shrink-0 flex-col items-center" title={result}>
-      <Icon filename={icon} size="medium" className={className} />
-    </div>
   );
 }
