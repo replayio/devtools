@@ -305,8 +305,6 @@ jobs:
         run: echo "test-results contents:" && ls -l -R ./test-results
       - name: List output folder contents
         run: echo "root contents:" && ls -l  ./
-      - name: List output folder contents
-        run: echo "coverage contents:" && ls -l -R ./coverage
       - name: Archive merged Playwright report results with code coverage 
         uses: actions/upload-artifact@v3
         if: always()

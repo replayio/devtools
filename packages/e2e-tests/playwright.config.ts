@@ -25,7 +25,6 @@ if (CI) {
       {
         name: "My Test Report",
         outputFile: `./test-results/monocart-report_${SHARD_NUMBER}.html`,
-        logging: "debug",
         coverage: {
           reports: [["v8"], ["v8-json"]],
 
@@ -34,8 +33,13 @@ if (CI) {
             return true;
           },
           sourceFilter: (sourcePath: string) => {
-            console.log("Source: ", sourcePath);
-            return sourcePath.search(/src|replay-next\/.+/) !== -1;
+            const regex = /(src|replay-next|packages|pages)\/.+\.(t|j)sx?/gm;
+
+            //return sourcePath.search(/src|replay-next\/.+/) !== -1;
+            const matches = regex.test(sourcePath);
+            const isNodeModules = sourcePath.includes("node_modules");
+            console.log("Source: ", sourcePath, matches);
+            return matches && !isNodeModules;
           },
           onEnd: async (reportData: any) => {
             console.log("Coverage onEnd: ", reportData);

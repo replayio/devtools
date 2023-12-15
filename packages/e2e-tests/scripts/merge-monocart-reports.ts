@@ -28,8 +28,13 @@ console.log("Report files: ", reportJsonFiles);
           return true;
         },
         sourceFilter: (sourcePath: string) => {
-          console.log("Source: ", sourcePath);
-          return sourcePath.search(/src|replay-next\/.+/) !== -1;
+          const regex = /(src|replay-next|packages|pages)\/.+\.(t|j)sx?/gm;
+
+          //return sourcePath.search(/src|replay-next\/.+/) !== -1;
+          const matches = regex.test(sourcePath);
+          const isNodeModules = sourcePath.includes("node_modules");
+          console.log("Source: ", sourcePath, matches);
+          return matches && !isNodeModules;
         },
         onEnd: async reportData => {
           console.log("Finished merging coverage report", reportData.summary);
