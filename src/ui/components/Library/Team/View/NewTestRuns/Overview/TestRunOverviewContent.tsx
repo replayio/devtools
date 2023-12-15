@@ -54,6 +54,8 @@ export function TestRunOverviewContent() {
         />
       </>
     );
+  } else if (!recordings?.length) {
+    children = <TestSuitePanelMessage>Zero results</TestSuitePanelMessage>;
   } else {
     children = <TestSuitePanelMessage>Select a run to see its details here</TestSuitePanelMessage>;
   }
