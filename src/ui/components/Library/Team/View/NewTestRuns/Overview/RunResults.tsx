@@ -44,7 +44,7 @@ export function RunResults({
 
   return (
     <div
-      className={`no-scrollbar flex flex-col overflow-y-auto ${isPending ? "opacity-50" : ""}`}
+      className={`flex flex-col overflow-y-auto ${isPending ? "opacity-50" : ""}`}
       data-filtered-by-text={filterByTextDeferred}
       data-test-id="TestRunResults"
     >
