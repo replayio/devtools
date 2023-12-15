@@ -3,9 +3,10 @@ import { useContext } from "react";
 import Icon from "replay-next/components/Icon";
 import { TestRunTestWithRecordings } from "shared/test-suites/TestRun";
 
+import { Alert } from "../shared/Alert";
 import { useTestRunDetailsSuspends } from "../TestRuns/hooks/useTestRunDetailsSuspends";
 import { TestSuitePanelMessage } from "../TestSuitePanelMessage";
-import { TestResultListItem } from "./Overview/TestResultListItem";
+import { TestRunResultList } from "./TestRunResultList";
 import { TestRunsContext } from "./TestRunsContextRoot";
 
 export function TestRunSpecDetails() {
@@ -37,24 +38,7 @@ export function TestRunSpecDetails() {
           <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-lg font-semibold">
             Replays
           </div>
-          <div className="flex flex-col gap-2">
-            {selectedSpecTests.map(s =>
-              s.executions
-                .filter(e => e.recordings.length > 0)
-                .flatMap(execution =>
-                  execution.recordings.map(r => (
-                    <TestResultListItem
-                      depth={1}
-                      key={r.id}
-                      label={execution.result}
-                      recording={r}
-                      testRun={testRun}
-                      test={s}
-                    />
-                  ))
-                )
-            )}
-          </div>
+          <TestRunResultList selectedSpecTests={selectedSpecTests} />
         </div>
         {failedTests.length ? <Errors failedTests={failedTests} /> : null}
       </div>
