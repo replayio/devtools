@@ -49,7 +49,7 @@ export function ReplayList({ executions, label }: { executions: TestExecution[];
             <div className="p-3">
               <Alert
                 reason={AlertType.MISSING_REPLAYS_FOR_TEST}
-                link="https://docs.replay.io/test-suites"
+                link="https://docs.replay.io/test-suites/test-suites-faq#what-causes-replays-to-be-missing-from-the-test-view"
               />
             </div>
           ) : null}
