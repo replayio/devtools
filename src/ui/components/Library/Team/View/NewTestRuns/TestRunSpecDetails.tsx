@@ -6,6 +6,7 @@ import { TestRunTestWithRecordings } from "shared/test-suites/TestRun";
 import { Alert } from "../shared/Alert";
 import { useTestRunDetailsSuspends } from "../TestRuns/hooks/useTestRunDetailsSuspends";
 import { TestSuitePanelMessage } from "../TestSuitePanelMessage";
+import { TestRunPanelWrapper } from "./TestRunPanelWrapper";
 import { TestRunResultList } from "./TestRunResultList";
 import { TestRunsContext } from "./TestRunsContextRoot";
 
@@ -35,7 +36,7 @@ export function TestRunSpecDetails() {
   const failedTests = selectedSpecTests.filter(t => t.result === "failed" || t.result === "flaky");
 
   return (
-    <div className="flex h-full w-full flex-col justify-start text-sm">
+    <TestRunPanelWrapper>
       <div className="flex flex-grow flex-col gap-3 overflow-y-auto py-3">
         <div className="flex flex-col gap-2 px-3">
           <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-lg font-semibold">
@@ -45,7 +46,7 @@ export function TestRunSpecDetails() {
         </div>
         {failedTests.length ? <Errors failedTests={failedTests} /> : null}
       </div>
-    </div>
+    </TestRunPanelWrapper>
   );
 }
 
