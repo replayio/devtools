@@ -68,7 +68,6 @@ function getReplayResult(result: string, index: number, total: number) {
 // TODO:Make sure the recordings are sorted by their dates
 function Execution({ execution }: { execution: TestExecution }) {
   const title = execution.commitTitle || "<Commit title unavailable>";
-  const author = execution.commitAuthor || "<Commit author unavailable>";
 
   return (
     <div className="flex flex-col">
@@ -79,14 +78,7 @@ function Execution({ execution }: { execution: TestExecution }) {
             <div title={title} className="flex-grow truncate font-bold">
               {title}
             </div>
-            {/* <div className="flex flex-row gap-4 overflow-hidden overflow-ellipsis whitespace-nowrap">
-              <div className="flex flex-row items-center gap-1">
-                <div className="flex w-4 items-center">
-                  <MaterialIcon>person</MaterialIcon>
-                </div>
-                <div>{author}</div>
-              </div>
-            </div> */}
+            {execution.commitAuthor ? <CommitAuthor author={execution.commitAuthor} /> : null}
           </div>
         </div>
         <div className="flex flex-shrink-0 flex-row items-center gap-1">
@@ -101,9 +93,22 @@ function Execution({ execution }: { execution: TestExecution }) {
           recording={r}
           key={i}
           result={getReplayResult(execution.result, i, execution.recordings.length)}
-          title={`Attempt ${execution.recordings.length - i}`}
+          attemptNumber={execution.recordings.length - i}
         />
       ))}
+    </div>
+  );
+}
+
+function CommitAuthor({ author }: { author: string }) {
+  return (
+    <div className="flex flex-row gap-4 overflow-hidden overflow-ellipsis whitespace-nowrap">
+      <div className="flex flex-row items-center gap-1">
+        <div className="flex w-4 items-center">
+          <MaterialIcon>person</MaterialIcon>
+        </div>
+        <div>{author}</div>
+      </div>
     </div>
   );
 }
@@ -111,12 +116,14 @@ function Execution({ execution }: { execution: TestExecution }) {
 function Replay({
   recording,
   result,
-  title,
+  attemptNumber,
 }: {
   recording: Pick<Recording, "id" | "title" | "isProcessed">;
   result: string;
-  title: string;
+  attemptNumber: number;
 }) {
+  const title = attemptNumber === 1 ? "Initial attempt" : `Attempt ${attemptNumber}`;
+
   return (
     <a
       href={`/recording/${recording.id}`}
