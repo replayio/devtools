@@ -10,7 +10,7 @@ if (!inputFolderPath) {
   throw new Error("Missing input folder path");
 }
 
-const pattern = path.posix.join(inputFolderPath, "**/*.json");
+const pattern = path.posix.join(inputFolderPath, "**/monocart*.json");
 console.log("Input path: ", inputFolderPath, "pattern: ", pattern);
 const reportJsonFiles = glob.sync(pattern, { absolute: true });
 
@@ -31,7 +31,8 @@ console.log("Report files: ", reportJsonFiles);
       },
       attachmentPath: (currentPath, extras) => {
         console.log("Current attachment path: ", currentPath);
-        return "./attachments";
+        // return "./attachments";
+        return currentPath;
         // return `https://cenfun.github.io/monocart-reporter/${currentPath}`;
       },
       onEnd: async (reportData: any, capability: any) => {

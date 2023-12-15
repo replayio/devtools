@@ -47,7 +47,7 @@ const testWithCloneRecording = base.extend<TestIsolatedRecordingFixture>({
     } finally {
       const jsCoverage = await page.coverage.stopJSCoverage();
 
-      await attachCoverageReport(jsCoverage, base.info());
+      await addCoverageReport(jsCoverage, base.info());
       if (newRecordingId) {
         await deleteTestRecording(newRecordingId);
       }
