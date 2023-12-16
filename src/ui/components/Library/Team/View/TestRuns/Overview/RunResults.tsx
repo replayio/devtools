@@ -20,7 +20,7 @@ import { TestRunsContext } from "ui/components/Library/Team/View/TestRuns/TestRu
 import { TestGroup } from "ui/utils/testRuns";
 
 import { TestResultListItem } from "./TestResultListItem";
-import styles from "../../../../Library.module.css";
+import styles from "../../../../Testsuites.module.css";
 
 export function RunResults({ isPending }: { isPending: boolean }) {
   const { testRunId } = useContext(TestRunsContext);

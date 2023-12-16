@@ -1,6 +1,6 @@
 export enum AlertType {
   MISSING_REPLAYS_FOR_TEST_RUN = "No replays were found for this run. They may be outside the retention window or may not have been uploaded",
-  MISSING_REPLAYS_FOR_TEST = "This test's failure rate may not match the aggregate results from the Replays displayed here, as some of those corresponding Replays used for the calculations have expired",
+  MISSING_REPLAYS_FOR_TEST = "This test has executions that are not reflected in the list of replays below",
 }
 
 export function Alert({ reason, link }: { reason: AlertType; link?: string }) {

@@ -7,7 +7,6 @@ import { TestSuitePanelMessage } from "../../TestSuitePanelMessage";
 import { useTest } from "../hooks/useTest";
 import { TestContext } from "../TestContextRoot";
 import { TestDetails } from "./TestDetails";
-import libraryStyles from "../../../../Library.module.css";
 import styles from "./TestOverviewContent.module.css";
 
 function SelectTestMessage({ error }: { error?: boolean }) {
@@ -30,7 +29,7 @@ export function TestOverviewContent() {
   }
 
   return (
-    <div className={`flex h-full flex-col text-sm transition ${libraryStyles.runOverview} `}>
+    <div className={`flex h-full flex-col text-sm transition ${styles.runOverview} `}>
       {children}
     </div>
   );
@@ -51,7 +50,7 @@ function TestOverview({ testId }: { testId: string }) {
       {loading ? <IndeterminateProgressBar /> : null}
       {lastTest ? (
         <>
-          <div className={libraryStyles.testTitle}>
+          <div className={styles.testTitle}>
             <div>{lastTest.title}</div>
           </div>
           <div className="flex flex-col overflow-y-auto">
