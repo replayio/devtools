@@ -72,9 +72,9 @@
 }
 
 .info .text {
-  padding-left: 1rem; /* equivalent to px-4 in Tailwind */
-  padding-right: 1rem; /* equivalent to px-4 in Tailwind */
-  padding-top: 1.5rem; /* equivalent to py-6 in Tailwind */
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 1.5rem;
   padding-bottom: 1.5rem;
 }
 
