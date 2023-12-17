@@ -72,7 +72,7 @@ export function TestResultListItem({
       data-test-id="TestRunResultsListItem"
       data-test-status={label}
       style={{
-        paddingLeft: `${depth * 1}rem`,
+        paddingLeft: `${depth * 0.5}rem`,
       }}
     >
       <div className={styles.linkContent}>
