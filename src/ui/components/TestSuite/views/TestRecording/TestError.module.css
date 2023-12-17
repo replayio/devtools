@@ -20,4 +20,5 @@
   font-family: var(--font-family-monospace);
   color: var(--testsuites-error-color);
   margin-top: 0.75rem;
+  white-space: pre-wrap;
 }
