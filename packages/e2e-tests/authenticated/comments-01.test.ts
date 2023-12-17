@@ -4,10 +4,7 @@ import { addSourceCodeComment, deleteComment, editComment } from "../helpers/com
 import { openSource } from "../helpers/source-explorer-panel";
 import test from "../testFixtureCloneRecording";
 
-// Each authenticated e2e test must use a unique recording id;
-// else shared state from one test could impact another test running in parallel.
-// TODO [SCS-1066] Share recordings between other tests
-test.use({ exampleKey: "authenticated_comments_1.html" });
+test.use({ exampleKey: "authenticated_comments.html" });
 
 test(`authenticated/comments-01: Test add, edit, and delete comment functionality`, async ({
   pageWithMeta: { page, recordingId },
