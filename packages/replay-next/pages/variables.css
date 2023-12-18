@@ -480,6 +480,7 @@
 
   /* Timeline (Dark) */
   --progressbar-preview-min: var(--primary-accent);
+  --unloaded-region-img: url("/images/dotted-mask-dark.svg");
 
   /* Menus (Dark) */
   --menu-bgcolor: #000;
@@ -550,17 +551,14 @@
 
   --circular-progress-bar-trail-color: var(--testsuites-steps-bgcolor);
 
-  /* To organise (Dark) */
-  --jellyfish-bgcolor: rgba(40, 40, 40, 0.8);
-  --theme-console-input-bgcolor: var(--theme-base-95);
+  /* DevTools header (Dark) */
   --theme-toggle-bgcolor: var(--theme-base-85);
   --theme-toggle-color: white;
   --theme-toggle-handle-bgcolor: var(--theme-base-100);
-  --timejump-text: var(--buttontext-color);
   --title-hover-bgcolor: var(--theme-toggle-bgcolor);
+
+  /* DevTools left nav (Dark) */
   --toolbarbutton-focus-bgcolor: var(--theme-base-95);
-  --unloaded-region-img: url("/images/dotted-mask-dark.svg");
-  --listitem-row-divider: var(--chrome);
 
   /* Toolbar (Dark) */
   --theme-tab-toolbar-background: var(--grey-90);
@@ -684,6 +682,11 @@
   --focus-mode-popout-background-color: rgba(67, 71, 73, 0.6);
   --focus-mode-popout-background-color-no-transparency: rgba(0, 0, 0, 1);
   --focus-mode-popout-color: white;
+
+  /* Miscellaneous (Dark) */
+  --jellyfish-bgcolor: rgba(40, 40, 40, 0.8); /* Tailwind class used in upload, sharing, team */
+  --listitem-row-divider: var(--chrome); /* Used in Redux DevTools, Network, shared */
+  --theme-console-input-bgcolor: var(--theme-base-95); /* Used in SupportForm and webconsole.css */
 }
 
 :root.theme-light {
@@ -1026,6 +1029,7 @@
 
   /* Timeline (Light) */
   --progressbar-preview-min: var(--primary-accent);
+  --unloaded-region-img: url("/images/dotted-mask-light.svg");
 
   /* Menus (Light) */
   --menu-bgcolor: var(--theme-toolbar-background);
@@ -1095,17 +1099,15 @@
   --testsuites-v2-error-bg: var(--testsuites-error-bgcolor);
   --circular-progress-bar-trail-color: var(--testsuites-steps-bgcolor);
 
-  /* To organise (Light) */
-  --jellyfish-bgcolor: rgba(255, 255, 255, 0.8);
-  --theme-console-input-bgcolor: var(--body-bgcolor);
+  /* DevTools header (Light) */
+
   --theme-toggle-bgcolor: var(--theme-base-85);
   --theme-toggle-color: var(--grey-70);
   --theme-toggle-handle-bgcolor: var(--theme-base-100);
-  --timejump-text: var(--buttontext-color);
   --title-hover-bgcolor: #e6e6e6;
+
+  /* DevTools left nav (Light) */
   --toolbarbutton-focus-bgcolor: var(--theme-base-90);
-  --unloaded-region-img: url("/images/dotted-mask-light.svg");
-  --listitem-row-divider: var(--grey-20);
 
   /* Toolbar */
   --theme-tab-toolbar-background: var(--grey-20);
@@ -1228,6 +1230,11 @@
   --focus-mode-popout-background-color: rgba(0, 0, 0, 0.6);
   --focus-mode-popout-background-color-no-transparency: rgba(0, 0, 0, 1);
   --focus-mode-popout-color: white;
+
+  /* Miscellaneous (Light) */
+  --jellyfish-bgcolor: rgba(255, 255, 255, 0.8); /* Tailwind class used in upload, sharing, team */
+  --listitem-row-divider: var(--grey-20); /* Used in Redux DevTools, Network, shared */
+  --theme-console-input-bgcolor: var(--body-bgcolor); /* Used in SupportForm and webconsole.css */
 }
 
 /*
