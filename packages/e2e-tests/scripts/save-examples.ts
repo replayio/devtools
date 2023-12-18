@@ -344,7 +344,7 @@ function logAnimated(text: string): () => void {
   };
 }
 
-async function saveRecording(example: string, apiKey: string, recordingId: string) {
+async function saveRecording(example: string, apiKey: string, recordingId: string, skipUpload?: boolean) {
   const response = await axios({
     url: config.graphqlUrl,
     method: "POST",
