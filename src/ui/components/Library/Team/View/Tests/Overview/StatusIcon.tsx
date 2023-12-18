@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import Icon from "replay-next/components/Icon";
 import { TestExecution } from "shared/test-suites/TestRun";
 
-import styles from "../../../../Library.module.css";
+import styles from "./StatusIcon.module.css";
 
 export function StatusIcon({
   status,

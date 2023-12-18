@@ -77,15 +77,13 @@ export function Replay({
       href={`/recording/${recording.id}`}
       className="flex flex-row gap-2 border-b border-bodyBgcolor py-1 px-4"
     >
-      <div className="flex flex-row gap-2 overflow-hidden">
+      <div className="flex flex-row items-center gap-2 overflow-hidden">
         <StatusIcon status={result} isProcessed={recording.isProcessed} />
-        <div className="flex flex-col overflow-x-hidden">
-          <div
-            title={title}
-            className="flex-grow overflow-hidden overflow-ellipsis whitespace-nowrap"
-          >
-            {title}
-          </div>
+        <div
+          title={title}
+          className="flex-grow overflow-hidden overflow-ellipsis whitespace-nowrap"
+        >
+          {title}
         </div>
       </div>
     </a>
