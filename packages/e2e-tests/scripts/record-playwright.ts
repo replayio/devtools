@@ -68,7 +68,7 @@ export async function recordPlaywright(
   }
 }
 
-export async function uploadLastRecording(url: string) : Promise<string> {
+export async function uploadLastRecording(url: string): Promise<string> {
   const list = cli.listAllRecordings();
   const id = findLast(list, rec => rec.metadata.uri === url)?.id;
 
