@@ -2,10 +2,12 @@ import { Suspense, useContext } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { ContextMenuItem, useContextMenu } from "use-context-menu";
 
+import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import Icon from "replay-next/components/Icon";
 import LibraryDropdownTrigger from "ui/components/Library/LibraryDropdownTrigger";
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 
+import { TestSuitePanelMessage } from "../TestSuitePanelMessage";
 import {
   TimeFilterContext,
   TimeFilterContextRoot,
@@ -18,11 +20,19 @@ import styles from "./TestsPage.module.css";
 
 export function TestsPage() {
   return (
-    <TimeFilterContextRoot>
-      <TestsContextRoot>
-        <TestsContent />
-      </TestsContextRoot>
-    </TimeFilterContextRoot>
+    <ErrorBoundary name="TestsPageErrorBoundary" fallback={<ErrorFallback />}>
+      <TimeFilterContextRoot>
+        <TestsContextRoot>
+          <TestsContent />
+        </TestsContextRoot>
+      </TimeFilterContextRoot>
+    </ErrorBoundary>
+  );
+}
+
+function ErrorFallback() {
+  return (
+    <TestSuitePanelMessage>Failed to load tests. Refresh page to try again.</TestSuitePanelMessage>
   );
 }
 

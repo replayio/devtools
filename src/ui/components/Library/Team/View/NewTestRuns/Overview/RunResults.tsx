@@ -42,7 +42,7 @@ export function RunResults({
 
   return (
     <div
-      className={`no-scrollbar flex flex-col overflow-y-auto`}
+      className="flex flex-col overflow-y-auto"
       data-filtered-by-text={filterByTextDeferred}
       data-test-id="TestRunResults"
     >
