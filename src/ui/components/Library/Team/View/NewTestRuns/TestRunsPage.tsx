@@ -7,8 +7,13 @@ import Icon from "replay-next/components/Icon";
 import { IndeterminateProgressBar } from "replay-next/components/IndeterminateLoader";
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 
+import { TeamContext } from "../../TeamContextRoot";
 import { TestSuitePanelMessage } from "../TestSuitePanelMessage";
-import { TimeFilterContext, TimeFilterContextRoot } from "../TimeFilterContextRoot";
+import {
+  TimeFilterContext,
+  TimeFilterContextRoot,
+  withinTeamRetentionLimit,
+} from "../TimeFilterContextRoot";
 import { FilterField } from "./FilterField";
 import { TestRunOverviewPage } from "./Overview/TestRunOverviewContextRoot";
 import { TestRunList } from "./TestRunList";
@@ -49,6 +54,7 @@ function TestRunsContent() {
     testRunsLoading,
     testRuns,
   } = useContext(TestRunsContext);
+  const { team } = useContext(TeamContext);
   const { filterByTime, setFilterByTime } = useContext(TimeFilterContext);
 
   const {
@@ -73,12 +79,16 @@ function TestRunsContent() {
     onKeyDown: onKeyDownTimeFilter,
   } = useContextMenu(
     <>
-      <ContextMenuItem dataTestId="week" onSelect={() => setFilterByTime("week")}>
-        Last 7 days
-      </ContextMenuItem>
-      <ContextMenuItem dataTestId="month" onSelect={() => setFilterByTime("month")}>
-        Last 30 days
-      </ContextMenuItem>
+      {withinTeamRetentionLimit(team, 7) && (
+        <ContextMenuItem dataTestId="week" onSelect={() => setFilterByTime("week")}>
+          Last 7 days
+        </ContextMenuItem>
+      )}
+      {withinTeamRetentionLimit(team, 30) && (
+        <ContextMenuItem dataTestId="month" onSelect={() => setFilterByTime("month")}>
+          Last 30 days
+        </ContextMenuItem>
+      )}
     </>,
     { alignTo: "auto-target" }
   );
