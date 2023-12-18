@@ -1,6 +1,6 @@
 import { useQuery } from "@apollo/client";
-import { useContext, useMemo } from "react";
 import groupBy from "lodash/groupBy";
+import { useContext, useMemo } from "react";
 
 import { GetWorkspaceTestExecutions_node_Workspace } from "shared/graphql/generated/GetWorkspaceTestExecutions";
 import { GroupedTestRun } from "shared/test-suites/TestRun";
@@ -31,7 +31,6 @@ export function useTest(testId: string) {
       ...e,
       recordings: e.recordings.map(convertRecording),
     }));
-
 
     const groupedExecutions = groupBy(executions, "testRunId");
     const testRuns = Object.entries(groupedExecutions).reduce((acc, [testRunId, executions]) => {
