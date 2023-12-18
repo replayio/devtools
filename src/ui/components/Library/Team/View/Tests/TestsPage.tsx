@@ -7,11 +7,13 @@ import Icon from "replay-next/components/Icon";
 import LibraryDropdownTrigger from "ui/components/Library/LibraryDropdownTrigger";
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 
+import { TeamContext } from "../../TeamContextRoot";
 import { TestSuitePanelMessage } from "../TestSuitePanelMessage";
 import {
   TimeFilterContext,
   TimeFilterContextRoot,
   TimeFilterOptions,
+  withinTeamRetentionLimit,
 } from "../TimeFilterContextRoot";
 import { TestOverviewContent } from "./Overview/TestOverviewContent";
 import { TestContext, TestsContextRoot } from "./TestContextRoot";
@@ -50,6 +52,7 @@ const sortLabel = {
 };
 
 function TestsContent() {
+  const { team } = useContext(TeamContext);
   const { filterByText, setFilterByText, filterByTextForDisplay, sortBy, setSortBy, testsLoading } =
     useContext(TestContext);
   const { filterByTime, setFilterByTime } = useContext(TimeFilterContext);
@@ -77,10 +80,18 @@ function TestsContent() {
     onKeyDown: onKeyDownTimeFilter,
   } = useContextMenu(
     <>
-      <ContextMenuItem onSelect={() => setFilterByTime("hour")}>Last hour</ContextMenuItem>
-      <ContextMenuItem onSelect={() => setFilterByTime("day")}>Last day</ContextMenuItem>
-      <ContextMenuItem onSelect={() => setFilterByTime("week")}>Last 7 days</ContextMenuItem>
-      <ContextMenuItem onSelect={() => setFilterByTime("two-week")}>Last 14 days</ContextMenuItem>
+      {withinTeamRetentionLimit(team, 1) && (
+        <>
+          <ContextMenuItem onSelect={() => setFilterByTime("hour")}>Last hour</ContextMenuItem>
+          <ContextMenuItem onSelect={() => setFilterByTime("day")}>Last day</ContextMenuItem>
+        </>
+      )}
+      {withinTeamRetentionLimit(team, 7) && (
+        <ContextMenuItem onSelect={() => setFilterByTime("week")}>Last 7 days</ContextMenuItem>
+      )}
+      {withinTeamRetentionLimit(team, 30) && (
+        <ContextMenuItem onSelect={() => setFilterByTime("month")}>Last 30 days</ContextMenuItem>
+      )}
     </>,
     { alignTo: "auto-target" }
   );

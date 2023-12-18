@@ -1,5 +1,9 @@
 import { Dispatch, ReactNode, SetStateAction, createContext, useMemo, useState } from "react";
 
+import { Workspace } from "shared/graphql/types";
+
+import { MY_LIBRARY_TEAM } from "../TeamContextRoot";
+
 export type TimeFilterOptions = "hour" | "day" | "week" | "two-week" | "month";
 
 type TimeFilterContextType = {
@@ -54,4 +58,15 @@ export function TimeFilterContextRoot({ children }: { children: ReactNode }) {
       {children}
     </TimeFilterContext.Provider>
   );
+}
+
+export function withinTeamRetentionLimit(
+  team: Workspace | typeof MY_LIBRARY_TEAM | null | undefined,
+  days: number
+) {
+  if (!team) {
+    return false;
+  }
+
+  return team.retentionLimit == null || team.retentionLimit >= days;
 }

@@ -9,7 +9,13 @@ import { useGetWorkspace } from "ui/hooks/workspaces";
 
 import { LibrarySpinner } from "../LibrarySpinner";
 
-export const MY_LIBRARY_TEAM = { name: "Your Library", isTest: false, id: "me", databaseId: null };
+export const MY_LIBRARY_TEAM = {
+  name: "Your Library",
+  isTest: false,
+  retentionLimit: null,
+  id: "me",
+  databaseId: null,
+};
 type TeamContainerContextType = {
   teamId: string;
   team?: Workspace | typeof MY_LIBRARY_TEAM | null;
