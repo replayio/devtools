@@ -10,7 +10,7 @@ import {
   getTruncatedRelativeDate,
 } from "../../Recordings/RecordingListItem/RecordingListItem";
 import { AttributeContainer } from "../../TestRuns/AttributeContainer";
-import styles from "../../../../Library.module.css";
+import styles from "../../../../Testsuites.module.css";
 
 function RecordingAttributes({
   recording,
@@ -72,7 +72,7 @@ export function TestResultListItem({
       data-test-id="TestRunResultsListItem"
       data-test-status={label}
       style={{
-        paddingLeft: `${depth * 1}rem`,
+        paddingLeft: `${depth * 0.5}rem`,
       }}
     >
       <div className={styles.linkContent}>
@@ -83,7 +83,6 @@ export function TestResultListItem({
             whileTap={{ scale: 1.0, boxShadow: "0px 0px 1px rgba(0,0,0,0.2)" }}
             transition={{ duration: 0.05 }}
           >
-            {/* We have class for failed, flaky and passed. Other status will be treated as failed (skipped, timedOut, unknown) */}
             <Icon className={styles[label] ?? styles.failed} type={iconType} />
           </motion.div>
         </div>

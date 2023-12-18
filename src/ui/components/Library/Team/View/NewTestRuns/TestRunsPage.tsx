@@ -1,12 +1,14 @@
-import { Suspense, useContext } from "react";
+import { ReactNode, Suspense, useContext } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { ContextMenuItem, useContextMenu } from "use-context-menu";
 
+import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import Icon from "replay-next/components/Icon";
 import { IndeterminateProgressBar } from "replay-next/components/IndeterminateLoader";
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 
 import { TeamContext } from "../../TeamContextRoot";
+import { TestSuitePanelMessage } from "../TestSuitePanelMessage";
 import {
   TimeFilterContext,
   TimeFilterContextRoot,
@@ -17,16 +19,26 @@ import { TestRunOverviewPage } from "./Overview/TestRunOverviewContextRoot";
 import { TestRunList } from "./TestRunList";
 import { TestRunsContext, TestRunsContextRoot } from "./TestRunsContextRoot";
 import { TestRunSpecDetails } from "./TestRunSpecDetails";
-import styles from "../../../Library.module.css";
+import styles from "../../../Testsuites.module.css";
 import dropdownStyles from "./Dropdown.module.css";
+
+function ErrorFallback() {
+  return (
+    <TestSuitePanelMessage>
+      Failed to load test runs. Refresh page to try again.
+    </TestSuitePanelMessage>
+  );
+}
 
 export function TestRunsPage() {
   return (
-    <TimeFilterContextRoot>
-      <TestRunsContextRoot>
-        <TestRunsContent />
-      </TestRunsContextRoot>
-    </TimeFilterContextRoot>
+    <ErrorBoundary name="TestRunsPageErrorBoundary" fallback={<ErrorFallback />}>
+      <TimeFilterContextRoot>
+        <TestRunsContextRoot>
+          <TestRunsContent />
+        </TestRunsContextRoot>
+      </TimeFilterContextRoot>
+    </ErrorBoundary>
   );
 }
 

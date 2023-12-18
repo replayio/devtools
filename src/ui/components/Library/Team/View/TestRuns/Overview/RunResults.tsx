@@ -20,7 +20,7 @@ import { TestRunsContext } from "ui/components/Library/Team/View/TestRuns/TestRu
 import { TestGroup } from "ui/utils/testRuns";
 
 import { TestResultListItem } from "./TestResultListItem";
-import styles from "../../../../Library.module.css";
+import styles from "../../../../Testsuites.module.css";
 
 export function RunResults({ isPending }: { isPending: boolean }) {
   const { testRunId } = useContext(TestRunsContext);
@@ -55,7 +55,7 @@ export function RunResults({ isPending }: { isPending: boolean }) {
         />
       </div>
       <div
-        className={`no-scrollbar flex flex-col overflow-y-auto ${isPending ? "opacity-50" : ""}`}
+        className={`flex flex-col overflow-y-auto ${isPending ? "opacity-50" : ""}`}
         data-filtered-by-text={filterByTextDeferred}
         data-test-id="TestRunResults"
       >
@@ -224,7 +224,7 @@ function PathNodeRenderer({
           data-test-state={expanded ? "expanded" : "collapsed"}
           onClick={onClick}
           style={{
-            paddingLeft: `${depth * 1}rem`,
+            paddingLeft: `${depth * 0.5}rem`,
           }}
         >
           <Icon className="h-5 w-5 shrink-0" type={expanded ? "folder-open" : "folder-closed"} />

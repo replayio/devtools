@@ -9,7 +9,7 @@ import { getTruncatedRelativeDate } from "../Recordings/RecordingListItem/Record
 import { AttributeContainer } from "./AttributeContainer";
 import { ModeAttribute } from "./Overview/RunSummary";
 import { TestRunsContext } from "./TestRunsContextRoot";
-import styles from "../../../Library.module.css";
+import styles from "../../../Testsuites.module.css";
 
 function Status({ failCount }: { failCount: number }) {
   const status = failCount > 0 ? "fail" : "success";
@@ -87,7 +87,7 @@ export function TestRunListItem({
   return (
     <div
       data-test-id="TestRunListItem"
-      className={`flex cursor-pointer flex-row items-center space-x-3 rounded-sm border-b border-chrome bg-themeBase-100 p-3 ${
+      className={`flex cursor-pointer flex-row items-center space-x-3 rounded-sm border-b border-chrome p-3 ${
         styles.libraryRow
       }
       ${isSelected ? styles.libraryRowSelected : ""}
