@@ -81,7 +81,7 @@ export class ElementsListData extends GenericListData<Item> {
   }
 
   getParentItem(item: Item, isTail: boolean = false): Item {
-    const parentMetadata = this.getMutableMetadata(item.objectId);
+    const parentMetadata = this.getParentMutableMetadata(item.objectId);
     assert(parentMetadata);
 
     return {
