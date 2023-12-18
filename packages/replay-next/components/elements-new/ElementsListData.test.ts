@@ -56,6 +56,55 @@ describe("ElementsListData", () => {
     };
   });
 
+  it("should be return a parent item", async () => {
+    startTest(
+      `
+    <html>
+      <head></head>
+      <body>
+        <script />
+        <div>
+          <main>
+            <h1>Text</h1>
+          </main>
+        </div>
+      </body>
+    </html>
+    `
+    );
+
+    expect(listData.toString()).toMatchInlineSnapshot(`
+      "<html>
+        <head />
+        <body>
+          <script />
+          <div>
+            <main>
+              <h1>
+                Text
+              </h1>
+            </main>
+          </div>
+        </body>
+      </html>"
+    `);
+
+    let item = listData.getItemAtIndex(6);
+    expect(item.tagName).toBe("h1");
+
+    item = listData.getParentItem(item);
+    expect(item.tagName).toBe("main");
+
+    item = listData.getParentItem(item);
+    expect(item.tagName).toBe("div");
+
+    item = listData.getParentItem(item);
+    expect(item.tagName).toBe("body");
+
+    item = listData.getParentItem(item);
+    expect(item.tagName).toBe("html");
+  });
+
   it("should load a simple document tree", async () => {
     startTest(
       `
