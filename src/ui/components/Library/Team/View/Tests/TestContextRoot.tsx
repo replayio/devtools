@@ -26,6 +26,7 @@ type TestsContextType = {
   selectedTest: Test | null;
   testsLoading: boolean;
   tests: Test[];
+  testsCount: number;
 };
 
 export const TestContext = createContext<TestsContextType>(null as any);
@@ -78,6 +79,7 @@ export function TestsContextRoot({ children }: { children: ReactNode }) {
       selectedTest: testId ? tests.find(t => t.testId === testId) ?? null : null,
       testsLoading: status === STATUS_PENDING,
       tests: filteredTests,
+      testsCount: status === STATUS_PENDING ? 0 : tests.length,
     };
   }, [sortBy, filterByText, filterByTextDeferred, deferredTestId, testId, status, tests]);
 

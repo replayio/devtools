@@ -5,28 +5,25 @@ import { TestRunsContext } from "ui/components/Library/Team/View/NewTestRuns/Tes
 import { useTestRunDetailsSuspends } from "ui/components/Library/Team/View/TestRuns/hooks/useTestRunDetailsSuspends";
 
 import { TestSuitePanelMessage } from "../../TestSuitePanelMessage";
+import { TestRunPanelWrapper } from "../TestRunPanelWrapper";
 import { RunSummary } from "./RunSummary";
-import styles from "../../../../Library.module.css";
 
 export function TestRunOverviewContent() {
-  const { testRunId, testRunIdForDisplay, testRuns, filterTestsByText, setFilterTestsByText } =
+  const { testRunId, testRuns, filterTestsByText, setFilterTestsByText } =
     useContext(TestRunsContext);
 
-  const { recordings, durationMs } = useTestRunDetailsSuspends(testRunId);
+  const { durationMs } = useTestRunDetailsSuspends(testRunId);
   const [filterCurrentRunByStatus, setFilterCurrentRunByStatus] = useState<
     "all" | "failed-and-flaky"
   >("all");
 
-  const isPending = testRunId !== testRunIdForDisplay;
-
   const testRun = testRuns.find(testRun => testRun.id === testRunId);
 
   let children = null;
-  if (testRun && recordings?.length) {
+  if (testRun) {
     children = (
       <>
         <RunSummary
-          isPending={isPending}
           testRun={testRun}
           durationMs={durationMs}
           setTestFilterByText={setFilterTestsByText}
@@ -35,7 +32,6 @@ export function TestRunOverviewContent() {
           filterCurrentRunByStatus={filterCurrentRunByStatus}
         />
         <RunResults
-          isPending={isPending}
           testFilterByText={filterTestsByText}
           filterCurrentRunByStatus={filterCurrentRunByStatus}
         />
@@ -45,9 +41,5 @@ export function TestRunOverviewContent() {
     children = <TestSuitePanelMessage>Select a run to see its details here</TestSuitePanelMessage>;
   }
 
-  return (
-    <div className={`flex h-full w-full flex-col p-2 text-sm transition ${styles.runOverview}`}>
-      {children}
-    </div>
-  );
+  return <TestRunPanelWrapper>{children}</TestRunPanelWrapper>;
 }

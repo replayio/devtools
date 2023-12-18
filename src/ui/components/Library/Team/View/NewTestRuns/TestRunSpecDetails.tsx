@@ -6,12 +6,13 @@ import { TestRunTestWithRecordings } from "shared/test-suites/TestRun";
 import { Alert } from "../shared/Alert";
 import { useTestRunDetailsSuspends } from "../TestRuns/hooks/useTestRunDetailsSuspends";
 import { TestSuitePanelMessage } from "../TestSuitePanelMessage";
+import { TestRunPanelWrapper } from "./TestRunPanelWrapper";
 import { TestRunResultList } from "./TestRunResultList";
 import { TestRunsContext } from "./TestRunsContextRoot";
 
 export function TestRunSpecDetails() {
   const { spec, filterTestsByText } = useContext(TestRunsContext);
-  const { testRunId } = useContext(TestRunsContext);
+  const { testRunId, testRuns } = useContext(TestRunsContext);
 
   const { groupedTests, tests, testRun } = useTestRunDetailsSuspends(testRunId);
   const selectedSpecTests =
@@ -23,16 +24,19 @@ export function TestRunSpecDetails() {
       ?.filter((t: any) => t.sourcePath === spec) ?? [];
   const selectedTest = selectedSpecTests?.[0];
 
-  if (!spec) {
+  if (
+    !spec ||
+    groupedTests === null ||
+    selectedTest == null ||
+    !testRuns.some(t => t.id === testRunId)
+  ) {
     return <TestSuitePanelMessage>Select a test to see its details here</TestSuitePanelMessage>;
-  } else if (groupedTests === null || selectedTest == null) {
-    return null;
   }
 
   const failedTests = selectedSpecTests.filter(t => t.result === "failed" || t.result === "flaky");
 
   return (
-    <div className="flex h-full w-full flex-col justify-start text-sm">
+    <TestRunPanelWrapper>
       <div className="flex flex-grow flex-col gap-3 overflow-y-auto py-3">
         <div className="flex flex-col gap-2 px-3">
           <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-lg font-semibold">
@@ -42,7 +46,7 @@ export function TestRunSpecDetails() {
         </div>
         {failedTests.length ? <Errors failedTests={failedTests} /> : null}
       </div>
-    </div>
+    </TestRunPanelWrapper>
   );
 }
 

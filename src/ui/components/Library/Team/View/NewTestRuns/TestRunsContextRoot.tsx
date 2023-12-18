@@ -29,6 +29,7 @@ type TestRunsContextType = {
   setFilterTestsByText: Dispatch<SetStateAction<string>>;
   testRunsLoading: boolean;
   testRuns: TestRun[];
+  testRunCount: number;
   testRunId: string | null;
   testRunIdForDisplay: string | null;
   spec: string | null;
@@ -129,6 +130,7 @@ export function TestRunsContextRoot({ children }: { children: ReactNode }) {
         testRunIdForDisplay: testRunId,
         testRunsLoading: status === STATUS_PENDING,
         testRuns: filteredTestRuns,
+        testRunCount: status === STATUS_PENDING ? 0 : testRuns.length,
         spec,
         setSpec,
       }}
