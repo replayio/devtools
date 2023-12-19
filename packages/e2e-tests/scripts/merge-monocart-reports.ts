@@ -76,7 +76,7 @@ const rootFolder = path.posix.join(currentFolder, "../../..");
       outputDir: "./test-results/coverage-reports",
       logging: "debug",
       entryFilter: entry => {
-        const ignoreUrls = ["cdn", "webreplay", "devtools-"];
+        const ignoreUrls = ["cdn", "webreplay", "devtools-", "_buildManifest", "_ssgManifest"];
         for (const ignoreUrl of ignoreUrls) {
           if (entry.url.includes(ignoreUrl)) {
             return false;
@@ -84,10 +84,20 @@ const rootFolder = path.posix.join(currentFolder, "../../..");
         }
         return true;
       },
+      sourceFilter: (sourcePath: string) => {
+        const regex = /(src|replay-next|packages|pages)\/.+\.(t|j)sx?/gm;
+
+        //return sourcePath.search(/src|replay-next\/.+/) !== -1;
+        const matches = regex.test(sourcePath);
+        const isNodeModules = sourcePath.includes("node_modules");
+        // console.log("Source: ", sourcePath, matches);
+        return matches && !isNodeModules;
+      },
+
       sourcePath: (currentPath: string) => {
         // console.log("Source path: ", currentPath);
 
-        const reJustFilename = /(_N_E\/)?(?<filename>.+)\/(\d|\w){4}/;
+        const reJustFilename = /(_N_E\/)?(?<filename>.+)(\/(\d|\w){4})?/;
         const match = reJustFilename.exec(currentPath);
 
         if (match) {
@@ -114,7 +124,14 @@ const rootFolder = path.posix.join(currentFolder, "../../..");
         console.log("Source finder: ", sourcePath);
         const revisedPath = path.posix.join(rootFolder, sourcePath);
 
-        return fs.readFileSync(revisedPath, "utf8");
+        if (fs.existsSync(revisedPath)) {
+          if (fs.statSync(revisedPath).isDirectory()) {
+            console.log("Directory: ", revisedPath);
+            return;
+          }
+
+          return fs.readFileSync(revisedPath, "utf8");
+        }
       },
 
       reports: [["html"]],
@@ -143,7 +160,7 @@ const rootFolder = path.posix.join(currentFolder, "../../..");
     // }
 
     const coverageResults = await coverageReport.generate();
-    console.log(coverageResults);
+    console.log("Coverage: ", Object.keys(coverageResults));
 
     process.exit(0);
   } catch (error) {

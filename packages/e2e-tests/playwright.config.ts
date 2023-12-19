@@ -64,7 +64,7 @@ if (CI) {
 
           entryFilter: (entry: any) => {
             console.log("Entry: ", entry.url);
-            const ignoreUrls = ["cdn", "webreplay", "node_modules"];
+            const ignoreUrls = ["cdn", "webreplay", "node_modules", "_buildManifest", "_ssgManifest"];
             for (const ignoreUrl of ignoreUrls) {
               if (entry.url.includes(ignoreUrl)) {
                 return false;
