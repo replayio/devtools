@@ -35,6 +35,12 @@ import { merge } from "monocart-reporter";
         outputFile: "./test-results/merged-coverage.html",
         entryFilter: entry => {
           console.log("Entry: ", entry.url);
+          const ignoreUrls = ["cdn", "webreplay", "devtools-"];
+          for (const ignoreUrl of ignoreUrls) {
+            if (entry.url.includes(ignoreUrl)) {
+              return false;
+            }
+          }
           return true;
         },
         sourceFilter: (sourcePath: string) => {

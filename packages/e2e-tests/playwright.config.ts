@@ -30,6 +30,12 @@ if (CI) {
 
           entryFilter: (entry: any) => {
             console.log("Entry: ", entry.url);
+            const ignoreUrls = ["cdn", "webreplay"];
+            for (const ignoreUrl of ignoreUrls) {
+              if (entry.url.includes(ignoreUrl)) {
+                return false;
+              }
+            }
             return true;
           },
           sourceFilter: (sourcePath: string) => {
