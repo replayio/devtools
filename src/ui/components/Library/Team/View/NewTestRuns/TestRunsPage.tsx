@@ -167,12 +167,7 @@ function TestRunsContent() {
                 value={filterByTextForDisplay}
               />
             </div>
-            <div
-              className="grow"
-              data-filtered-by-status={filterByStatus}
-              data-filtered-by-text={filterByText}
-              data-test-id="TestRunList"
-            >
+            <div>
               {testRunsLoading && testRuns.length === 0 ? (
                 <div className="flex h-full items-center justify-center">
                   <LibrarySpinner />
