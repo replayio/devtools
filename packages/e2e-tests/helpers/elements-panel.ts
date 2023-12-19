@@ -334,7 +334,26 @@ export async function getElementsSearchResultsCount(
   return { current: parseInt(currentString), total: parseInt(totalString) };
 }
 
-export async function searchElementsPanel(page: Page, searchText: string): Promise<void> {
+function getSearchInput(page: Page) {
+  return page.locator('[data-test-id="ElementsSearchInput"]')!;
+}
+
+export async function runOrAdvanceSearch(page: Page) {
+  const input = getSearchInput(page);
+
+  await waitFor(async () => {
+    await expect(await input.isEnabled()).toBe(true);
+  });
+
+  await input.focus();
+  await input.press("Enter");
+}
+
+export async function searchElementsPanel(
+  page: Page,
+  searchText: string,
+  advanced?: boolean
+): Promise<void> {
   await openElementsPanel(page);
 
   await debugPrint(
@@ -343,8 +362,13 @@ export async function searchElementsPanel(page: Page, searchText: string): Promi
     "searchElementsPanel"
   );
 
-  const input = page.locator('[data-test-id="ElementsSearchInput"]')!;
+  if (advanced != undefined) {
+    await toggleAdvanced(page, advanced);
+  }
+
+  const input = getSearchInput(page);
   await input.isEnabled();
+  await input.clear();
   await input.focus();
   await input.type(searchText);
 
@@ -440,7 +464,7 @@ export async function selectRootElementsRow(page: Page): Promise<void> {
 }
 
 export async function selectNextElementsPanelSearchResult(page: Page): Promise<void> {
-  const input = page.locator('[data-test-id="ElementsSearchInput"]')!;
+  const input = getSearchInput(page);
   await input.focus();
   await input.press("Enter");
 }
@@ -449,11 +473,27 @@ export function getElementsList(page: Page) {
   return page.locator(`[data-test-id="ElementsList"]`);
 }
 
-export async function waitForElementsToLoad(page: Page): Promise<void> {
-  await debugPrint(page, "Waiting for elements to load", "waitForElementsToLoad");
+export async function toggleAdvanced(page: Page, advanced: boolean) {
+  const button = page.locator('[data-test-id="ElementsPanel-AdvancedSearchButton"]');
 
-  const elements = getElementsList(page);
-  await elements.waitFor();
+  const state = await button.getAttribute("data-active");
+  if (advanced && state !== null) {
+    return;
+  } else if (!advanced && state === null) {
+    return;
+  }
+
+  await expect(await button.isEnabled()).toBe(true);
+  await button.click();
+
+  await waitFor(async () => {
+    const state = await button.getAttribute("data-active");
+    if (advanced) {
+      expect(state).not.toBe(null);
+    } else {
+      expect(state).toBe(null);
+    }
+  });
 }
 
 export async function toggleElementsListRow(
@@ -484,6 +524,13 @@ export async function toggleElementsListRow(
       expect(numChildren).toBe(0);
     });
   }
+}
+
+export async function waitForElementsToLoad(page: Page): Promise<void> {
+  await debugPrint(page, "Waiting for elements to load", "waitForElementsToLoad");
+
+  const elements = getElementsList(page);
+  await elements.waitFor();
 }
 
 export async function waitForSelectedElementsRow(page: Page, text: string): Promise<Locator> {
