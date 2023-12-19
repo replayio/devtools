@@ -16,14 +16,10 @@ const projects = [
   },
 ];
 
-const currentFolder = __dirname;
-const rootFolder = path.posix.join(currentFolder, "../..");
-
 const reporters: ReporterDescription[] = [["line"]];
 
 console.log("CI: ", CI);
 if (CI) {
-  console.log("Adding monocart reporter");
   reporters.unshift(
     [
       "monocart-reporter",
@@ -31,40 +27,19 @@ if (CI) {
         name: "My Test Report",
         outputFile: `./test-results/monocart-report_${SHARD_NUMBER}.html`,
         coverage: {
-          reports: [
-            ["json", { file: "./test-results/istanbul-coverage-report.json" }],
-            // ["v8-json", { outputFile: "./test-results/v8-coverage-report.json" }],
-          ],
-
-          // sourcePath: (currentPath: string) => {
-          //   // console.log("Source path: ", currentPath);
-
-          //   const reJustFilename = /(_N_E\/)?(?<filename>.+)\/(\d|\w){4}/;
-          //   const match = reJustFilename.exec(currentPath);
-
-          //   if (match) {
-          //     const filename: string = match.groups?.filename || "";
-          //     // const pathWithoutNE = currentPath.replace("_N_E/", "");
-          //     const revisedPath = path.posix.join(rootFolder, filename);
-          //     // console.log("Revised path: ", revisedPath, fs.existsSync(revisedPath));
-          //     return revisedPath;
-          //   } else {
-          //     console.log("No match: ", currentPath);
-          //   }
-          //   //  const pathWithoutNE
-          //   // const pathWithoutNE = currentPath.replace("_N_E/", "");
-          //   // const revisedPath = path.posix.join(rootFolder, pathWithoutNE);
-          //   // console.log("Revised path: ", revisedPath, fs.existsSync(revisedPath));
-          //   return currentPath;
-          // },
-          // sourcePathHandler: (currentPath: string) => {
-          //   console.log("Source path handler: ", currentPath);
-          //   return currentPath;
-          // },
+          reports: [["json", { file: "./test-results/istanbul-coverage-report.json" }]],
 
           entryFilter: (entry: any) => {
-            console.log("Entry: ", entry.url);
-            const ignoreUrls = ["cdn", "webreplay", "node_modules", "_buildManifest", "_ssgManifest"];
+            // These entries aren't relevant for our own source,
+            // or result in bogus file paths that throw errors when written to disk
+            const ignoreUrls = [
+              "cdn",
+              "webreplay",
+              "node_modules",
+              "_buildManifest",
+              "_ssgManifest",
+            ];
+
             for (const ignoreUrl of ignoreUrls) {
               if (entry.url.includes(ignoreUrl)) {
                 return false;
@@ -73,21 +48,16 @@ if (CI) {
             return true;
           },
           sourceFilter: (sourcePath: string) => {
-            const regex = /(src|replay-next|packages|pages)\/.+\.(t|j)sx?/gm;
+            const validSourceRegex = /(src|replay-next|packages|pages)\/.+\.(t|j)sx?/gm;
 
-            //return sourcePath.search(/src|replay-next\/.+/) !== -1;
-            const matches = regex.test(sourcePath);
+            const matches = validSourceRegex.test(sourcePath);
             const isNodeModules = sourcePath.includes("node_modules");
-            // console.log("Source: ", sourcePath, matches);
+
             return matches && !isNodeModules;
           },
           onEnd: async (reportData: any) => {
             console.log("Coverage onEnd: ", reportData);
           },
-        },
-        onEnd: async (reportData: any, capability: any) => {
-          console.log("Working dir: ", process.cwd());
-          console.log(reportData.summary);
         },
       },
     ],
