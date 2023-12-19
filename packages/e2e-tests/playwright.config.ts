@@ -63,13 +63,13 @@ if (CI) {
           // },
 
           entryFilter: (entry: any) => {
-            const ignoreUrls = ["cdn", "webreplay", "node_modules", "_next"];
+            console.log("Entry: ", entry.url);
+            const ignoreUrls = ["cdn", "webreplay", "node_modules"];
             for (const ignoreUrl of ignoreUrls) {
               if (entry.url.includes(ignoreUrl)) {
                 return false;
               }
             }
-            console.log("Entry: ", entry.url);
             return true;
           },
           sourceFilter: (sourcePath: string) => {
