@@ -35,7 +35,7 @@
   --primary-accent: #01acfd;
   --primary-accent-hover: #0194ff;
 
-  --secondary-accent: orange;
+  --secondary-accent: var(--secondary-accent);
   --secondary-accent-hover: #d72451;
   --secondary-accent-stroke: var(--secondary-accent);
 
