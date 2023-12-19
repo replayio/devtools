@@ -23,16 +23,6 @@ export const EditorPane = () => {
 
   const nodeWidth = useWidthObserver(panelEl);
 
-  // ExperimentFeature: LargeText Logic
-  useLayoutEffect(() => {
-    const root = document.querySelector<HTMLElement>(":root")!;
-    if (enableLargeText) {
-      root.style.setProperty("--font-size-regular-monospace", "14px");
-    } else {
-      root.style.setProperty("--font-size-regular-monospace", "11px");
-    }
-  }, [enableLargeText]);
-
   return (
     <div
       className={classNames("editor-pane overflow-hidden ", {
