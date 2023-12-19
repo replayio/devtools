@@ -19,6 +19,7 @@ import { TestRunOverviewPage } from "./Overview/TestRunOverviewContextRoot";
 import { TestRunList } from "./TestRunList";
 import { TestRunsContext, TestRunsContextRoot } from "./TestRunsContextRoot";
 import { TestRunSpecDetails } from "./TestRunSpecDetails";
+import { TestRunsStats } from "./TestRunsStats";
 import styles from "../../../Testsuites.module.css";
 import dropdownStyles from "./Dropdown.module.css";
 
@@ -165,6 +166,15 @@ function TestRunsContent() {
                 onChange={setFilterByText}
                 value={filterByTextForDisplay}
               />
+            </div>
+            <div>
+              {testRunsLoading && testRuns.length === 0 ? (
+                <div className="flex h-full items-center justify-center">
+                  <LibrarySpinner />
+                </div>
+              ) : (
+                <TestRunsStats />
+              )}
             </div>
             <div
               className="grow"
