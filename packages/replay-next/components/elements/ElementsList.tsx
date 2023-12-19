@@ -29,6 +29,7 @@ import { ElementsListItem, ElementsListItemData, ITEM_SIZE } from "./ElementsLis
 import styles from "./ElementList.module.css";
 
 export type ImperativeHandle = {
+  selectIndex(index: null): Promise<void>;
   selectNode(nodeId: ObjectId | null): Promise<void>;
 };
 
@@ -95,6 +96,10 @@ export function ElementsList({
   useImperativeHandle(
     forwardedRef,
     () => ({
+      async selectIndex(index: number | null) {
+        await listData.waitUntilLoaded();
+        listData.setSelectedIndex(index);
+      },
       async selectNode(nodeId: ObjectId | null) {
         if (nodeId === null) {
           listData.setSelectedIndex(null);

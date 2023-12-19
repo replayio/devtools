@@ -2,6 +2,9 @@ export type ReplayNextCurrentPanel = "comments" | "protocol-viewer" | "search" |
 export type ProtocolViewerSelectedTab = "live" | "recorded";
 
 export const config = {
+  elementsPanelAdvancedSearch: false,
+  enableTestSuitesNewRunsView: false,
+  enableTestSuitesTestsView: false,
   protocolViewerSelectedTab: "live" as ProtocolViewerSelectedTab,
   reactDevToolsContextExpanded: Boolean(true),
   reactDevToolsHooksExpanded: Boolean(true),
@@ -10,6 +13,4 @@ export const config = {
   reactDevToolsStateExpanded: Boolean(true),
   replayNextCurrentPanel: "sources" as ReplayNextCurrentPanel,
   replayVideoPanelCollapsed: false,
-  enableTestSuitesNewRunsView: false,
-  enableTestSuitesTestsView: false,
 };
