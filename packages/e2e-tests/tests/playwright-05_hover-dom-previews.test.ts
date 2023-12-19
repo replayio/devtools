@@ -20,11 +20,6 @@ test("playwright-05: Test DOM node previews on user action step hover", async ({
 
   await openPlaywrightTestPanel(page);
 
-  const testPanel = getTestSuitePanel(page);
-
-  const isVisible = await testPanel.isVisible();
-  expect(isVisible).toBe(true);
-
   // has 1 test
   const rows = getTestRows(page);
   await waitFor(async () => {

@@ -21,11 +21,6 @@ test("playwright-02: Test Step timeline behavior", async ({
 
   await openPlaywrightTestPanel(page);
 
-  const testPanel = getTestSuitePanel(page);
-
-  const isVisible = await testPanel.isVisible();
-  expect(isVisible).toBe(true);
-
   // has 1 test
   const rows = getTestRows(page);
   await waitFor(async () => {

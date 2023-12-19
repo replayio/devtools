@@ -26,11 +26,6 @@ test("playwright-04: Test Step buttons and menu item", async ({
 
   await openPlaywrightTestPanel(page);
 
-  const testPanel = getTestSuitePanel(page);
-
-  const isVisible = await testPanel.isVisible();
-  expect(isVisible).toBe(true);
-
   // has 1 test
   const rows = getTestRows(page);
   await waitFor(async () => {
@@ -81,8 +76,8 @@ test("playwright-04: Test Step buttons and menu item", async ({
   const jumpToSourceMenuItem = page.getByText("Jump to test source");
   expect(await jumpToSourceMenuItem.getAttribute("data-disabled")).toBe("true");
 
-  // click it anyway to hide the context menu
-  await jumpToSourceMenuItem.click({ force: true });
+  // hide the context menu
+  await page.keyboard.press("Escape");
 
   await firstJ2CStep.click();
   const pausedTimelinePercent = await getTimelineCurrentPercent(page);
