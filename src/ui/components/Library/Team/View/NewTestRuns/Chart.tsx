@@ -28,11 +28,13 @@ function generateChartData(testRuns: TestRun[]) {
   const sortedDates = Object.keys(groupedRuns).sort(
     (a, b) => new Date(a).getTime() - new Date(b).getTime()
   );
+
   const sortedData = sortedDates.reduce((acc, date) => {
     const runs = groupedRuns[date];
     const failureRate = runs.filter(r => r.results.counts.failed > 0).length / runs.length;
 
-    acc.push({ x: date, y: failureRate });
+    // Format the dates like MM/DD
+    acc.push({ x: date.split("-").slice(1).join("/"), y: failureRate });
     return acc;
   }, [] as ChartDataType[]);
 
@@ -51,10 +53,10 @@ export const Chart = () => {
   return (
     <div className="flex flex-col overflow-auto rounded-lg bg-chrome p-4">
       <div className="font-bold">Build failures trend (percentage of builds failed)</div>
-      <div style={{ height: 240, minWidth: 640 }}>
+      <div style={{ height: 160, minWidth: 640 }}>
         <ResponsiveLine
           data={data}
-          margin={{ top: 50, right: 60, bottom: 30, left: 60 }}
+          margin={{ top: 30, right: 60, bottom: 30, left: 60 }}
           xScale={{ type: "point" }}
           yScale={{
             type: "linear",
@@ -63,7 +65,7 @@ export const Chart = () => {
             stacked: true,
             reverse: false,
           }}
-          gridYValues={[0, 0.5, 1]}
+          gridYValues={[0, 0.2, 0.4, 0.6, 0.8, 1]}
           yFormat=" >%"
           axisTop={null}
           axisRight={null}
@@ -75,6 +77,7 @@ export const Chart = () => {
             legendPosition: "middle",
           }}
           axisLeft={{
+            tickValues: 4,
             tickSize: 5,
             tickPadding: 5,
             tickRotation: 0,
@@ -89,7 +92,8 @@ export const Chart = () => {
           pointLabelYOffset={-12}
           useMesh={false}
           enableGridX={false}
-          enableGridY={false}
+          theme={{ text: { fill: "var(--body-color)" } }}
+          colors={{ scheme: "set1" }}
         />
       </div>
     </div>

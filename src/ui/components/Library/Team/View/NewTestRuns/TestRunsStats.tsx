@@ -24,8 +24,8 @@ export function TestRunsStats() {
       <div className="flex flex-row gap-2">
         <div className="flex flex-col gap-1 rounded-lg bg-chrome  p-4">
           <div className="font-bold">Build failure rate</div>
-          <div className="flex flex-row gap-2">
-            <div className={styles.failureRate}>{(buildFailureRate * 100).toFixed(3)}%</div>
+          <div className="flex flex-row gap-1">
+            <div className={styles.failureRate}>{(buildFailureRate * 100).toFixed(0)}%</div>
             <div>
               ({buildFailuresCount}/{buildsCount})
             </div>
@@ -34,8 +34,8 @@ export function TestRunsStats() {
         <div className="flex flex-row gap-2">
           <div className="flex flex-col gap-1 rounded-lg bg-chrome  p-4">
             <div className="font-bold">Test failure rate</div>
-            <div className="flex flex-row gap-2">
-              <div className={styles.failureRate}>{(testFailureRate * 100).toFixed(3)}%</div>
+            <div className="flex flex-row gap-1">
+              <div className={styles.failureRate}>{(testFailureRate * 100).toFixed(0)}%</div>
               <div>
                 ({testFailuresCount}/{testsCount})
               </div>
