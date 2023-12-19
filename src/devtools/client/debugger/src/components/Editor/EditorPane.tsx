@@ -27,9 +27,9 @@ export const EditorPane = () => {
   useLayoutEffect(() => {
     const root = document.querySelector<HTMLElement>(":root")!;
     if (enableLargeText) {
-      root.style.setProperty("--theme-code-font-size", "14px");
+      root.style.setProperty("--font-size-regular-monospace", "14px");
     } else {
-      root.style.setProperty("--theme-code-font-size", "11px");
+      root.style.setProperty("--font-size-regular-monospace", "11px");
     }
   }, [enableLargeText]);
 

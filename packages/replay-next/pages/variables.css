@@ -9,10 +9,10 @@
   --theme-textbox-box-shadow: rgba(97, 181, 255, 0.75);
 
   /* Text sizes */
-  --devtools-base-font-size: 12px;
+  —font-size-regular: 12px;
   --root-font-size: 16px;
-  --theme-body-font-size: 12px;
-  --theme-code-font-size: 11px;
+  --font-size-regular: 12px;
+  --font-size-regular-monospace: 11px;
   --theme-code-line-height: calc(15 / 11);
   --theme-tab-font-size: var(--font-size-large);
 
