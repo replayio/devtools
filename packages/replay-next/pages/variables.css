@@ -202,16 +202,16 @@
   --background-color-contrast-1: var(--theme-base-90);
   --background-color-contrast-2: var(--theme-base-100);
   --background-color-contrast-3: var(--theme-base-60);
-  --background-color-contrast-5: #081121;
+  --background-color-contrast-5: var(--chrome);
 
   --background-color-current-execution-point: #25364e;
   --background-color-current-execution-point-column: #2663c080;
   --background-color-current-search-result: #25364e;
-  --background-color-default: #081120;
+  --background-color-default: var(--chrome);
   --background-color-disabled-button: #454950;
   --background-color-error: #473036;
   --background-color-highlight-change: transparent;
-  --background-color-high-contrast-button: #081120;
+  --background-color-high-contrast-button: var(--chrome);
   --background-color-inputs: var(--theme-text-field-bgcolor);
   --background-color-light: #18181a;
   --background-color-primary-button-disabled: #17527b;
@@ -232,7 +232,7 @@
 
   --color-brand: #02acfd;
   --color-brand-react: #ae87f2;
-  --color-contrast: #081121;
+  --color-contrast: var(--chrome);
   --color-current: #f02d5e;
   --color-default: #ffffff;
   --color-dim: #aaaaaa;
