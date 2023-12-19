@@ -233,10 +233,9 @@
   --border-color-warning: #6f5920;
   --border-color: #e1e6ed;
   --border-color-elements-subtree: var(--background-color-contrast-1);
-
   --color-brand: #02acfd;
   --color-brand-react: #ae87f2;
-  --color-contrast: #081121;
+  --color-contrast: var(--chrome);
   --color-current: var(--secondary-accent);
   --color-default: #ffffff;
   --color-dim: #aaaaaa;
@@ -785,7 +784,7 @@
 
   --color-brand: #05acfd;
   --color-brand-react: #8c65d0;
-  --color-contrast: #ffffff;
+  --color-contrast: var(--theme-base-100);
   --color-current: var(--secondary-accent);
   --color-default: #223344;
   --color-dim: rgba(135, 135, 137, 0.9);
