@@ -87,18 +87,23 @@ export function ElementsPanel({
 
     let indices: number[];
 
-    // Basic search is an in-memory, what-you-see search.
     if (!advancedSearch) {
+      // Basic search is an in-memory, what-you-see search
       indices = listData.search(query);
     } else {
       setSearchInProgress(true);
 
+      // Advanced search uses the protocol API and mirrors Chrome's element search
       let ids = await domSearchCache.readAsync(replayClient, pauseId, query);
 
-      // DOM search API may match on nodes that are not displayed locally.
-      ids = ids.filter(id => listData.contains(id));
+      indices = [];
 
-      indices = ids.map(id => listData.getIndexForItemId(id));
+      ids.forEach(id => {
+        // DOM search API may match on nodes that are not displayed locally
+        if (listData.contains(id)) {
+          indices.push(listData.getIndexForItemId(id));
+        }
+      });
     }
 
     setSearchInProgress(false);
