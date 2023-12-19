@@ -4,6 +4,9 @@ import glob from "glob";
 import CoverageReport from "monocart-coverage-reports";
 import { merge } from "monocart-reporter";
 
+const currentFolder = __dirname;
+const rootFolder = path.posix.join(currentFolder, "../../..");
+
 (async () => {
   try {
     // We'll pass this in from the outside
@@ -28,46 +31,46 @@ import { merge } from "monocart-reporter";
 
     console.log("Report files: ", reportJsonFiles);
     console.log("Coverage files: ", coverageJsonFiles);
-    await merge(reportJsonFiles, {
-      name: "My Merged Report",
-      outputFile: "./test-results/merged-report.html",
-      coverage: {
-        outputFile: "./test-results/merged-coverage.html",
-        entryFilter: entry => {
-          console.log("Entry: ", entry.url);
-          const ignoreUrls = ["cdn", "webreplay", "devtools-"];
-          for (const ignoreUrl of ignoreUrls) {
-            if (entry.url.includes(ignoreUrl)) {
-              return false;
-            }
-          }
-          return true;
-        },
-        sourceFilter: (sourcePath: string) => {
-          const regex = /(src|replay-next|packages|pages)\/.+\.(t|j)sx?/gm;
+    // await merge(reportJsonFiles, {
+    //   name: "My Merged Report",
+    //   outputFile: "./test-results/merged-report.html",
+    //   coverage: {
+    //     outputFile: "./test-results/merged-coverage.html",
+    //     entryFilter: entry => {
+    //       console.log("Entry: ", entry.url);
+    //       const ignoreUrls = ["cdn", "webreplay", "devtools-"];
+    //       for (const ignoreUrl of ignoreUrls) {
+    //         if (entry.url.includes(ignoreUrl)) {
+    //           return false;
+    //         }
+    //       }
+    //       return true;
+    //     },
+    //     sourceFilter: (sourcePath: string) => {
+    //       const regex = /(src|replay-next|packages|pages)\/.+\.(t|j)sx?/gm;
 
-          //return sourcePath.search(/src|replay-next\/.+/) !== -1;
-          const matches = regex.test(sourcePath);
-          const isNodeModules = sourcePath.includes("node_modules");
-          console.log("Source: ", sourcePath, matches);
-          return matches && !isNodeModules;
-        },
-        onEnd: async reportData => {
-          console.log("Finished merging coverage report", reportData.summary);
-        },
-      },
+    //       //return sourcePath.search(/src|replay-next\/.+/) !== -1;
+    //       const matches = regex.test(sourcePath);
+    //       const isNodeModules = sourcePath.includes("node_modules");
+    //       console.log("Source: ", sourcePath, matches);
+    //       return matches && !isNodeModules;
+    //     },
+    //     onEnd: async reportData => {
+    //       console.log("Finished merging coverage report", reportData.summary);
+    //     },
+    //   },
 
-      attachmentPath: (currentPath, extras) => {
-        console.log("Current attachment path: ", currentPath);
-        // return "./attachments";
-        return currentPath;
-        // return `https://cenfun.github.io/monocart-reporter/${currentPath}`;
-      },
-      onEnd: async (reportData: any, capability: any) => {
-        console.log("Finished merging report", reportData.summary);
-        console.log("All report data: ", reportData);
-      },
-    });
+    //   attachmentPath: (currentPath, extras) => {
+    //     console.log("Current attachment path: ", currentPath);
+    //     // return "./attachments";
+    //     return currentPath;
+    //     // return `https://cenfun.github.io/monocart-reporter/${currentPath}`;
+    //   },
+    //   onEnd: async (reportData: any, capability: any) => {
+    //     console.log("Finished merging report", reportData.summary);
+    //     console.log("All report data: ", reportData);
+    //   },
+    // });
 
     const coverageReport = new CoverageReport({
       outputDir: "./test-results/coverage-reports",
@@ -81,6 +84,39 @@ import { merge } from "monocart-reporter";
         }
         return true;
       },
+      sourcePath: (currentPath: string) => {
+        // console.log("Source path: ", currentPath);
+
+        const reJustFilename = /(_N_E\/)?(?<filename>.+)\/(\d|\w){4}/;
+        const match = reJustFilename.exec(currentPath);
+
+        if (match) {
+          const filename: string = match.groups?.filename || "";
+          return filename;
+          // const pathWithoutNE = currentPath.replace("_N_E/", "");
+          // const revisedPath = path.posix.join(rootFolder, filename);
+          // console.log("Revised path: ", revisedPath, fs.existsSync(revisedPath));
+          // return revisedPath;
+        } else {
+          console.log("No match: ", currentPath);
+        }
+        //  const pathWithoutNE
+        // const pathWithoutNE = currentPath.replace("_N_E/", "");
+        // const revisedPath = path.posix.join(rootFolder, pathWithoutNE);
+        // console.log("Revised path: ", revisedPath, fs.existsSync(revisedPath));
+        return currentPath;
+        // console.log("Source path: ", currentPath);
+        // return currentPath;
+      },
+
+      // @ts-ignore
+      sourceFinder: (sourcePath: string) => {
+        console.log("Source finder: ", sourcePath);
+        const revisedPath = path.posix.join(rootFolder, sourcePath);
+
+        return fs.readFileSync(revisedPath, "utf8");
+      },
+
       reports: [["html"]],
     });
     const coverageJsonContents = coverageJsonFiles.map(
