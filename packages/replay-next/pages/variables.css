@@ -48,9 +48,9 @@
   --primary-accent: #01acfd;
   --primary-accent-hover: #0194ff;
 
-  --secondary-accent: #f02d5e;
+  --secondary-accent: var(--secondary-accent);
   --secondary-accent-hover: #d72451;
-  --secondary-accent-stroke: #f02d5e;
+  --secondary-accent-stroke: var(--secondary-accent);
 
   /* used in our codebase, to be refactored */
   --blue-30: #75baff;
@@ -217,7 +217,7 @@
   --background-color-primary-button-disabled: #17527b;
   --background-color-primary-button: #02acfd;
   --background-color-resize-handle: #242e3d;
-  --background-color-secondary-button: #f02d5e;
+  --background-color-secondary-button: var(--secondary-accent);
   --background-color-source-search: #25364e;
   --background-color-warning: #42381f;
   --background-color-high-risk-setting: #310f21;
@@ -229,11 +229,10 @@
   --border-color-warning: #6f5920;
   --border-color: #e1e6ed;
   --border-color-elements-subtree: var(--background-color-contrast-1);
-
   --color-brand: #02acfd;
   --color-brand-react: #ae87f2;
   --color-contrast: var(--chrome);
-  --color-current: #f02d5e;
+  --color-current: var(--secondary-accent);
   --color-default: #ffffff;
   --color-dim: #aaaaaa;
   --color-dimmer: #5f6977;
@@ -340,7 +339,7 @@
   --point-panel-timeline-label-color: var(--color-brand);
   --point-panel-timeline-label-hover-color: #35dfff;
   --point-panel-timeline-label-unselected-color: #747476;
-  --point-panel-timeline-label-selected-color: #f02d5e;
+  --point-panel-timeline-label-selected-color: var(--secondary-accent);
   --point-panel-timeline-label-edit-hover-background-color: #434343;
   --point-panel-timeline-label-edit-color: #fff;
 
@@ -525,7 +524,7 @@
   --testsuites-steps-bgcolor: transparent;
   --testsuites-steps-toggle-bgcolor: #191f2a;
   --testsuites-success-color: #31d710;
-  --testsuites-failed-color: #f02d5e;
+  --testsuites-failed-color: var(--secondary-accent);
   --testsuites-flaky-color: #fdba00;
   --testsuites-skipped-color: var(--theme-base-70);
   --testsuites-unresolved-color: var(--background-color-contrast-1);
@@ -542,7 +541,7 @@
   --testsuites-v2-success-icon: var(--testsuites-success-color);
   --testsuites-v2-success-header: var(--testsuites-success-color);
   --testsuites-v2-success-pill: var(--testsuites-success-color);
-  --testsuites-v2-description: #f02d5e;
+  --testsuites-v2-description: var(--secondary-accent);
   --testsuites-v2-error-bg: var(--testsuites-error-bgcolor);
 
   --circular-progress-bar-trail-color: var(--testsuites-steps-bgcolor);
@@ -760,7 +759,7 @@
   --background-color-light: #f9f9fa;
   --background-color-primary-button-disabled: #d2d2d2;
   --background-color-primary-button: #05acfd;
-  --background-color-secondary-button: #f02d5e;
+  --background-color-secondary-button: var(--secondary-accent);
 
   --background-color-current-execution-point: #eaf3ff;
   --background-color-current-execution-point-column: #b8d7ff;
@@ -782,7 +781,7 @@
   --color-brand: #05acfd;
   --color-brand-react: #8c65d0;
   --color-contrast: var(--theme-base-100);
-  --color-current: #f02d5e;
+  --color-current: var(--secondary-accent);
   --color-default: #223344;
   --color-dim: rgba(135, 135, 137, 0.9);
   --color-dimmer: #aaaaaa;
@@ -814,7 +813,7 @@
   --color-primary-background: var(--theme-base-100);
   --color-secondary-background: #eeeeee;
 
-  --nag-background-color: #f02d5e;
+  --nag-background-color: var(--secondary-accent);
   --nag-gradient-color-begin: #ff3087;
   --nag-gradient-color-end: #ed265c;
   --nag-color: var(--theme-base-100);
@@ -889,7 +888,7 @@
   --point-panel-timeline-label-color: var(--color-brand);
   --point-panel-timeline-label-hover-color: #008adb;
   --point-panel-timeline-label-unselected-color: #d1d5db;
-  --point-panel-timeline-label-selected-color: #f02d5e;
+  --point-panel-timeline-label-selected-color: var(--secondary-accent);
   --point-panel-timeline-label-edit-hover-background-color: #f5f5f5;
   --point-panel-timeline-label-edit-color: #223344;
 
@@ -1068,13 +1067,13 @@
   --testsuites-error-bgcolor-hover: #ffe0e0;
   --testsuites-error-bgcolor: #ffe9e9;
   --testsuites-error-border-color: var(--testsuites-error-icon-bgcolor);
-  --testsuites-error-color: #f02d5e;
+  --testsuites-error-color: var(--secondary-accent);
   --testsuites-error-icon-bgcolor: rgb(203, 0, 0);
   --testsuites-steps-bgcolor-hover: #f7f7f7;
   --testsuites-steps-bgcolor: var(--theme-base-100);
   --testsuites-steps-toggle-bgcolor: var(--theme-base-100);
   --testsuites-success-color: #058b00;
-  --testsuites-failed-color: #f02d5e;
+  --testsuites-failed-color: var(--secondary-accent);
   --testsuites-flaky-color: #fdba00;
   --testsuites-skipped-color: var(--theme-base-70);
   --testsuites-unresolved-color: var(--background-color-contrast-1);
@@ -1091,7 +1090,7 @@
   --testsuites-v2-success-icon: var(--testsuites-success-color);
   --testsuites-v2-success-header: var(--testsuites-success-color);
   --testsuites-v2-success-pill: var(--testsuites-success-color);
-  --testsuites-v2-description: #f02d5e;
+  --testsuites-v2-description: var(--secondary-accent);
   --testsuites-v2-error-bg: var(--testsuites-error-bgcolor);
   --circular-progress-bar-trail-color: var(--testsuites-steps-bgcolor);
 
