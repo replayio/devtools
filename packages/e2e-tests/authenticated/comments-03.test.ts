@@ -11,11 +11,7 @@ import { openNetworkPanel } from "../helpers/network-panel";
 import { openSource } from "../helpers/source-explorer-panel";
 import test, { expect } from "../testFixtureCloneRecording";
 
-// Each authenticated e2e test must use a unique recording id;
-// else shared state from one test could impact another test running in parallel.
-// TODO [SCS-1066] Share recordings between other tests
-
-test.use({ exampleKey: "authenticated_comments_3.html" });
+test.use({ exampleKey: "authenticated_comments.html" });
 
 test(`authenticated/comments-03: Comment previews`, async ({
   pageWithMeta: { page, recordingId },
@@ -27,7 +23,7 @@ test(`authenticated/comments-03: Comment previews`, async ({
   // Add and verify source code comment previews
   await openSource(page, url);
   const sourceCodeComment = await addSourceCodeComment(page, {
-    lineNumber: 23,
+    lineNumber: 13,
     text: "source code",
     url,
   });
@@ -39,13 +35,13 @@ test(`authenticated/comments-03: Comment previews`, async ({
   await openNetworkPanel(page);
   const networkRequestComment = await addNetworkRequestComment(page, {
     method: "GET",
-    name: "1",
-    status: 200,
+    name: "favicon.ico",
+    status: 404,
     text: "network request",
   });
   const networkRequestCommentPreviewText =
     (await networkRequestComment.locator('[data-test-name="CommentPreview"]').textContent()) ?? "";
-  await expect(networkRequestCommentPreviewText.trim()).toBe("[GET] 1");
+  await expect(networkRequestCommentPreviewText.trim()).toBe("[GET] favicon.ico");
 
   // Add and verify visual comment
   const visualComment = await addVisualComment(page, {

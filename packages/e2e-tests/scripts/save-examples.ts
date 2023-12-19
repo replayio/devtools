@@ -59,28 +59,16 @@ type TestExampleFile = {
 
 const knownExamples: TestExampleFile[] = [
   {
-    filename: "authenticated_comments_1.html",
+    filename: "authenticated_comments.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
-    filename: "authenticated_comments_2.html",
+    filename: "authenticated_logpoints.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
-  },
-  {
-    filename: "authenticated_comments_3.html",
-    folder: config.browserExamplesPath,
-    category: "browser",
-    runtime: "firefox",
-  },
-  {
-    filename: "authenticated_logpoints_1.html",
-    folder: config.browserExamplesPath,
-    category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "cra/dist/index.html",
@@ -116,7 +104,7 @@ const knownExamples: TestExampleFile[] = [
     filename: "doc_debugger_statements.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_events.html",
@@ -158,7 +146,7 @@ const knownExamples: TestExampleFile[] = [
     filename: "doc_inspector_sourcemapped.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_inspector_styles.html",
@@ -194,7 +182,7 @@ const knownExamples: TestExampleFile[] = [
     filename: "doc_recursion.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_rr_basic.html",
@@ -206,25 +194,25 @@ const knownExamples: TestExampleFile[] = [
     filename: "doc_rr_blackbox.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_rr_console.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_rr_error.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_rr_logs.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_rr_objects.html",
@@ -236,19 +224,19 @@ const knownExamples: TestExampleFile[] = [
     filename: "doc_rr_preview.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_rr_region_loading.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_rr_worker.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_stacking.html",
@@ -266,7 +254,7 @@ const knownExamples: TestExampleFile[] = [
     filename: "log_points_and_block_scope.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "redux-fundamentals/dist/index.html",
@@ -389,18 +377,25 @@ async function saveRecording(example: string, apiKey: string, recordingId: strin
   await updateRecordingTitle(apiKey, recordingId, `E2E Example: ${example}`);
 
   const text = "" + readFileSync(examplesJsonPath);
-  const json: ExamplesData = JSON.parse(text);
+
+  const json: ExamplesData = {
+    ...JSON.parse(text),
+    [example]: {
+      recording: id,
+      buildId,
+    },
+  };
+
+  const keys = Object.keys(json).sort();
 
   writeFileSync(
     examplesJsonPath,
     JSON.stringify(
-      {
-        ...json,
-        [example]: {
-          recording: id,
-          buildId,
-        },
-      },
+      keys.reduce((accumulated, key) => {
+        accumulated[key] = json[key];
+
+        return accumulated;
+      }, {}),
       null,
       2
     )
