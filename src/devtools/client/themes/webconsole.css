@@ -118,7 +118,7 @@
    * Note: on hover we show a 3px pseudo-border on top of the left padding. */
   padding-inline-start: 4px;
   padding-inline-end: 8px;
-  font-size: var(--theme-code-font-size);
+  font-size: var(--font-size-regular-monospace);
   line-height: var(--console-output-line-height);
   color: var(--console-message-color);
 }
@@ -424,7 +424,7 @@ html #webconsole-notificationbox {
   align-items: center;
   max-width: 100%;
   font-family: var(--monospace-font-family);
-  font-size: var(--theme-code-font-size);
+  font-size: var(--font-size-regular-monospace);
   line-height: var(--console-output-line-height);
   background-color: var(--theme-console-input-bgcolor);
 }

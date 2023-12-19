@@ -1,18 +1,31 @@
+/* Core font sizes */
+:root,
+:root.prefers-default-font-size {
+  --font-size-large: 16px;
+  --font-size-regular: 12px;
+  --font-size-regular-monospace: 11px;
+  --font-size-small: 10px;
+  --font-size-tiny: 8px;
+}
+
+:root.prefers-large-font-size {
+  --font-size-large: 20px;
+  --font-size-regular: 14px;
+  --font-size-regular-monospace: 13px;
+  --font-size-small: 12px;
+  --font-size-tiny: 10px;
+}
+
 :root {
   --font-family-default: Inter, sans-serif;
   --font-family-monospace: Menlo, ui-monospace, SFMono-Regular, Monaco, Consolas, Liberation Mono,
     Courier New, monospace;
 
-  /* Migration note: everyone below this was removed from src/devtools/client/themes/variables.css */
-
   --theme-focus-border-color-textbox: #0675d3;
   --theme-textbox-box-shadow: rgba(97, 181, 255, 0.75);
 
-  /* Text sizes */
-  --devtools-base-font-size: 12px;
+  /* Other font sizes */
   --root-font-size: 16px;
-  --theme-body-font-size: 12px;
-  --theme-code-font-size: 11px;
   --theme-code-line-height: calc(15 / 11);
   --theme-tab-font-size: var(--font-size-large);
 
@@ -122,23 +135,6 @@
   --z-index-7--mask: var(--z-index-7);
   --z-index-8--modal: var(--z-index-8);
   --z-index-8--dropdown: var(--z-index-8);
-}
-
-:root,
-:root.prefers-default-font-size {
-  --font-size-large: 16px;
-  --font-size-regular: 12px;
-  --font-size-regular-monospace: 11px;
-  --font-size-small: 10px;
-  --font-size-tiny: 8px;
-}
-
-:root.prefers-large-font-size {
-  --font-size-large: 20px;
-  --font-size-regular: 14px;
-  --font-size-regular-monospace: 13px;
-  --font-size-small: 12px;
-  --font-size-tiny: 10px;
 }
 
 :root,

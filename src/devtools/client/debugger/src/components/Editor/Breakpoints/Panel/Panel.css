@@ -78,7 +78,7 @@
   color: var(--theme-toolbar-color);
   display: flex;
   font-family: var(--monospace-font-family);
-  font-size: var(--theme-code-font-size);
+  font-size: var(--font-size-regular-monospace);
   width: 100%;
   min-height: 28px;
   padding-top: 2px;
