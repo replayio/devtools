@@ -54,4 +54,6 @@ export interface GetWorkspaceTests {
 
 export interface GetWorkspaceTestsVariables {
   workspaceId: string;
+  startTime?: string | null;
+  endTime?: string | null;
 }

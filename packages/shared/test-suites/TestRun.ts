@@ -62,7 +62,15 @@ export type TestExecution = {
   createdAt: string;
   result: string;
   commitTitle: string | null;
+  commitAuthor: string | null;
+  testRunId: string;
   recordings: Pick<Recording, "id" | "title" | "isProcessed">[];
+};
+
+export type GroupedTestRun = {
+  testRunId: string;
+  executions: TestExecution[];
+  date: string;
 };
 
 export type TestRun = {
