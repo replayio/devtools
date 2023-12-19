@@ -38,7 +38,11 @@ export function TestRunOverviewContent() {
       </>
     );
   } else {
-    children = <TestSuitePanelMessage>Select a run to see its details here</TestSuitePanelMessage>;
+    children = (
+      <TestSuitePanelMessage data-test-id="NoTestRunSelected">
+        Select a run to see its details here
+      </TestSuitePanelMessage>
+    );
   }
 
   return <TestRunPanelWrapper>{children}</TestRunPanelWrapper>;
