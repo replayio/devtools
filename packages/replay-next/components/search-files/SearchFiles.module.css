@@ -34,7 +34,7 @@
   border-radius: 0.5rem;
 }
 .InputWrapper:focus-within {
-  border-color: var(--color-brand);
+  border-color: var(--primary-accent);
 }
 .InputWrapper[data-error],
 .InputWrapper[data-error]:focus-within {
@@ -87,7 +87,7 @@
 
 .SelectedSearchFilterButton {
   background-color: var(--color-hit-counts-label-background-3);
-  border-color: var(--color-brand);
+  border-color: var(--primary-accent);
 }
 
 .SearchFilterIcon {

@@ -215,7 +215,7 @@
   --background-color-inputs: var(--theme-text-field-bgcolor);
   --background-color-light: #18181a;
   --background-color-primary-button-disabled: #17527b;
-  --background-color-primary-button: #02acfd;
+  --background-color-primary-button: var(--primary-accent);
   --background-color-resize-handle: #242e3d;
   --background-color-secondary-button: var(--secondary-accent);
   --background-color-source-search: #25364e;
@@ -229,7 +229,6 @@
   --border-color-warning: #6f5920;
   --border-color: #e1e6ed;
   --border-color-elements-subtree: var(--background-color-contrast-1);
-  --color-brand: #02acfd;
   --color-brand-react: #ae87f2;
   --color-contrast: var(--chrome);
   --color-current: var(--secondary-accent);
@@ -238,7 +237,7 @@
   --color-dimmer: #5f6977;
   --color-error: #ffb3d2;
   --color-highlight-change: #ff0;
-  --color-link: var(--color-brand);
+  --color-link: var(--primary-accent);
   --color-primary-button: #ffffff;
   --color-secondary-button: #ffffff;
   --color-disabled-button: #ffffff;
@@ -332,11 +331,11 @@
   --point-panel-input-disabled-link-color-hover: #fff;
   --point-panel-timeline-background-color: var(--theme-base-100);
   --point-panel-timeline-button-background-color: var(--theme-base-100);
-  --point-panel-timeline-button-color: var(--color-brand);
+  --point-panel-timeline-button-color: var(--primary-accent);
   --point-panel-timeline-button-color-disabled: #2c4450;
   --point-panel-timeline-button-shadow: 0px 0px 2px 0px hsla(0, 0%, 0%, 0.12);
   --point-panel-timeline-label-background-color: var(--theme-base-100);
-  --point-panel-timeline-label-color: var(--color-brand);
+  --point-panel-timeline-label-color: var(--primary-accent);
   --point-panel-timeline-label-hover-color: #35dfff;
   --point-panel-timeline-label-unselected-color: #747476;
   --point-panel-timeline-label-selected-color: var(--secondary-accent);
@@ -488,7 +487,7 @@
 
   /* Code Mirror (Dark) */
   --caret-color: #fff;
-  --cm-string: #01acfd;
+  --cm-string: var(--primary-accent);
   --cm-variable: #58e0ff;
   --debug-line-background: var(--theme-base-100);
   --debug-line-border: var(--theme-base-85);
@@ -758,7 +757,7 @@
   --background-color-high-contrast-button: #f2f2f2;
   --background-color-light: #f9f9fa;
   --background-color-primary-button-disabled: #d2d2d2;
-  --background-color-primary-button: #05acfd;
+  --background-color-primary-button: var(--primary-accent);
   --background-color-secondary-button: var(--secondary-accent);
 
   --background-color-current-execution-point: #eaf3ff;
@@ -778,7 +777,6 @@
   --border-color: #081121;
   --border-color-elements-subtree: var(--background-color-contrast-3);
 
-  --color-brand: #05acfd;
   --color-brand-react: #8c65d0;
   --color-contrast: var(--theme-base-100);
   --color-current: var(--secondary-accent);
@@ -789,7 +787,8 @@
   --color-error: #ff0000;
   --color-highlight-change: marktext;
   --color-high-contrast-button: #000000;
-  --color-link: var(--color-brand);
+
+  --color-link: var(--primary-accent);
   --color-primary-button: var(--theme-base-100);
   --color-search-results: #47628b;
   --color-secondary-button: var(--theme-base-100);
@@ -882,10 +881,12 @@
   --point-panel-timeline-background-color: var(--theme-base-100);
   --point-panel-timeline-button-background-color: var(--theme-base-100);
   --point-panel-timeline-button-color-disabled: #e7f7ff;
-  --point-panel-timeline-button-color: var(--color-brand);
+  --point-panel-timeline-button-color: var(--primary-accent);
   --point-panel-timeline-button-shadow: 0px 0px 2px 0px hsla(0, 0%, 0%, 0.12);
+
   --point-panel-timeline-label-background-color: var(--theme-base-100);
-  --point-panel-timeline-label-color: var(--color-brand);
+  --point-panel-timeline-label-color: var(--primary-accent);
+
   --point-panel-timeline-label-hover-color: #008adb;
   --point-panel-timeline-label-unselected-color: #d1d5db;
   --point-panel-timeline-label-selected-color: var(--secondary-accent);
