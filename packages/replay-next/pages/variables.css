@@ -1,4 +1,4 @@
-/* Text sizes */
+/* Core font sizes */
 :root,
 :root.prefers-default-font-size {
   --font-size-large: 16px;
@@ -24,7 +24,7 @@
   --theme-focus-border-color-textbox: #0675d3;
   --theme-textbox-box-shadow: rgba(97, 181, 255, 0.75);
 
-  /* Other text sizes */
+  /* Other font sizes */
   --root-font-size: 16px;
   --theme-code-line-height: calc(15 / 11);
   --theme-tab-font-size: var(--font-size-large);

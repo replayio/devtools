@@ -54,7 +54,7 @@
 
 .NoComments p {
   margin-top: 1rem;
-  font-size: var(—font-size-regular);
+  font-size: var(--font-size-regular);
 }
 
 .NoCommentsIcon {
