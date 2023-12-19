@@ -22,7 +22,7 @@ import { merge } from "monocart-reporter";
     console.log("Input path: ", inputFolderPath, "pattern: ", pattern);
     const reportJsonFiles = glob.sync(pattern, { absolute: true });
 
-    const pattern2 = path.posix.join(inputFolderPath, "**/coverage-report.json");
+    const pattern2 = path.posix.join(inputFolderPath, "**/istanbul-coverage-report.json");
 
     const coverageJsonFiles = glob.sync(pattern2, { absolute: true });
 
@@ -87,14 +87,15 @@ import { merge } from "monocart-reporter";
       f => JSON.parse(fs.readFileSync(f, "utf-8")) as any
     );
     for (const coverageJson of coverageJsonContents) {
-      console.log("Files length: ", coverageJson.files.length);
+      await coverageReport.add(coverageJson);
+      // console.log("Files length: ", coverageJson.files.length);
     }
-    const allCoverageFiles = coverageJsonContents.flatMap(c => c.files);
-    console.log("All coverage files length: ", allCoverageFiles.length);
-    for (const item of allCoverageFiles) {
-      item.text = item.source;
-    }
-    await coverageReport.add(allCoverageFiles);
+    // const allCoverageFiles = coverageJsonContents.flatMap(c => c.files);
+    // console.log("All coverage files length: ", allCoverageFiles.length);
+    // for (const item of allCoverageFiles) {
+    //   item.text = item.source;
+    // }
+    // await coverageReport.add(allCoverageFiles);
     // for (const coverageJsonFile of coverageJsonFiles) {
     //   const coverageJson = JSON.parse(fs.readFileSync(coverageJsonFile, "utf-8"));
     //   // console.log(

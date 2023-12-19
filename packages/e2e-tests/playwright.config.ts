@@ -26,7 +26,7 @@ if (CI) {
         name: "My Test Report",
         outputFile: `./test-results/monocart-report_${SHARD_NUMBER}.html`,
         coverage: {
-          reports: [["html"], ["v8-json"]],
+          reports: [["json", { file: "./test-results/istanbul-coverage-report.json" }]],
 
           entryFilter: (entry: any) => {
             console.log("Entry: ", entry.url);
