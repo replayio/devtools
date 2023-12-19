@@ -27,26 +27,6 @@ const rootFolder = path.posix.join(currentFolder, "../../..");
     const coverageReport = new CoverageReport({
       outputDir: "./test-results/coverage-reports",
       logging: "debug",
-      // entryFilter: entry => {
-      //   // These entries aren't relevant for our own source,
-      //   // or result in bogus file paths that throw errors when written to disk
-      //   const ignoreUrls = ["cdn", "webreplay", "node_modules", "_buildManifest", "_ssgManifest"];
-
-      //   for (const ignoreUrl of ignoreUrls) {
-      //     if (entry.url.includes(ignoreUrl)) {
-      //       return false;
-      //     }
-      //   }
-      //   return true;
-      // },
-      // sourceFilter: (sourcePath: string) => {
-      //   const validSourceRegex = /(src|replay-next|packages|pages)\/.+\.(t|j)sx?/gm;
-
-      //   const matches = validSourceRegex.test(sourcePath);
-      //   const isNodeModules = sourcePath.includes("node_modules");
-
-      //   return matches && !isNodeModules;
-      // },
 
       sourcePath: (currentPath: string) => {
         // Webpack files end up with a "_N_E/" prefix,
@@ -80,6 +60,10 @@ const rootFolder = path.posix.join(currentFolder, "../../..");
 
           return fs.readFileSync(revisedPath, "utf8");
         }
+      },
+
+      onEnd: async (reportData: any) => {
+        console.log("Coverage generated: ", reportData.summary);
       },
 
       reports: [["html"]],

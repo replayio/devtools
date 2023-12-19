@@ -56,7 +56,7 @@ if (CI) {
             return matches && !isNodeModules;
           },
           onEnd: async (reportData: any) => {
-            console.log("Coverage onEnd: ", reportData);
+            console.log("Coverage generated: ", reportData.summary);
           },
         },
       },

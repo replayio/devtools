@@ -180,6 +180,13 @@ jobs:
           RECORD_REPLAY_TEST_METRICS: 1
           AUTOMATED_TEST_SECRET: ${{ secrets.AUTOMATED_TEST_SECRET }}
           AUTHENTICATED_TESTS_WORKSPACE_API_KEY: ${{ secrets.AUTHENTICATED_TESTS_WORKSPACE_API_KEY }}
+      - name: Archive Playwright report results with code coverage 
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: all-code-coverage-reports_${{ matrix.shard }}
+          path: packages/e2e-tests/test-results
+          retention-days: 3
       - uses: replayio/action-upload@v0.5.1
         with:
           api-key: ${{ env.RECORD_REPLAY_API_KEY }}
@@ -265,7 +272,7 @@ jobs:
   merge-coverage-reports:
     # Merge reports after playwright-tests, even if some shards have failed
     if: always()
-    needs: [e2etest]
+    needs: [e2etest, authenticated-e2etest]
 
     runs-on: ubuntu-latest
     steps:
