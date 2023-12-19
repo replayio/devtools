@@ -10,5 +10,5 @@
   outline: none;
 }
 .Input:focus {
-  border-color: var(--color-brand);
+  border-color: var(--primary-accent);
 }
