@@ -60,7 +60,7 @@
   color: var(--theme-text-color-strong);
   padding: 0.5rem;
   border-radius: 0.5rem;
-  font-size: var(--theme-body-font-size);
+  font-size: var(--font-size-regular);
   text-align: center;
 }
 

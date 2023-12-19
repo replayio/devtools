@@ -1,18 +1,31 @@
+/* Core font sizes */
+:root,
+:root.prefers-default-font-size {
+  --font-size-large: 16px;
+  --font-size-regular: 12px;
+  --font-size-regular-monospace: 11px;
+  --font-size-small: 10px;
+  --font-size-tiny: 8px;
+}
+
+:root.prefers-large-font-size {
+  --font-size-large: 20px;
+  --font-size-regular: 14px;
+  --font-size-regular-monospace: 13px;
+  --font-size-small: 12px;
+  --font-size-tiny: 10px;
+}
+
 :root {
   --font-family-default: Inter, sans-serif;
   --font-family-monospace: Menlo, ui-monospace, SFMono-Regular, Monaco, Consolas, Liberation Mono,
     Courier New, monospace;
 
-  /* Migration note: everyone below this was removed from src/devtools/client/themes/variables.css */
-
   --theme-focus-border-color-textbox: #0675d3;
   --theme-textbox-box-shadow: rgba(97, 181, 255, 0.75);
 
-  /* Text sizes */
-  --devtools-base-font-size: 12px;
+  /* Other font sizes */
   --root-font-size: 16px;
-  --theme-body-font-size: 12px;
-  --theme-code-font-size: 11px;
   --theme-code-line-height: calc(15 / 11);
   --theme-tab-font-size: var(--font-size-large);
 
@@ -125,23 +138,6 @@
 }
 
 :root,
-:root.prefers-default-font-size {
-  --font-size-large: 16px;
-  --font-size-regular: 12px;
-  --font-size-regular-monospace: 11px;
-  --font-size-small: 10px;
-  --font-size-tiny: 8px;
-}
-
-:root.prefers-large-font-size {
-  --font-size-large: 20px;
-  --font-size-regular: 14px;
-  --font-size-regular-monospace: 13px;
-  --font-size-small: 12px;
-  --font-size-tiny: 10px;
-}
-
-:root,
 :root.theme-dark {
   --color-transparent: rgba(0, 0, 0, 0);
   --primary-accent-foreground-text: #fff;
@@ -206,16 +202,16 @@
   --background-color-contrast-1: var(--theme-base-90);
   --background-color-contrast-2: var(--theme-base-100);
   --background-color-contrast-3: var(--theme-base-60);
-  --background-color-contrast-5: #081121;
+  --background-color-contrast-5: var(--chrome);
 
   --background-color-current-execution-point: #25364e;
   --background-color-current-execution-point-column: #2663c080;
   --background-color-current-search-result: #25364e;
-  --background-color-default: #081120;
+  --background-color-default: var(--chrome);
   --background-color-disabled-button: #454950;
   --background-color-error: #473036;
   --background-color-highlight-change: transparent;
-  --background-color-high-contrast-button: #081120;
+  --background-color-high-contrast-button: var(--chrome);
   --background-color-inputs: var(--theme-text-field-bgcolor);
   --background-color-light: #18181a;
   --background-color-primary-button-disabled: #17527b;
@@ -235,7 +231,7 @@
   --border-color-elements-subtree: var(--background-color-contrast-1);
 
   --color-brand-react: #ae87f2;
-  --color-contrast: #081121;
+  --color-contrast: var(--chrome);
   --color-current: #f02d5e;
   --color-default: #ffffff;
   --color-dim: #aaaaaa;
@@ -285,7 +281,7 @@
   --comment-card-source-preview-background-color: var(--background-color-current-execution-point);
   --comment-card-source-preview-background-color-hover: #364052;
   --comment-reply-unpublished-background-color: var(--point-panel-background-color);
-  --comment-reply-unpublished-textfield-background-color: #000;
+  --comment-reply-unpublished-textfield-background-color: var(--theme-base-100);
   --comment-reply-unpublished-textfield-color: #fff;
 
   --object-inspector-bucket-color: #939395;
@@ -322,7 +318,7 @@
 
   --point-panel-background-color: #1f2b43;
   --point-panel-conditional-icon: var(--blue-40);
-  --point-panel-input-background-color: #000000;
+  --point-panel-input-background-color: var(--theme-base-100);
   --point-panel-input-border-color: transparent;
   --point-panel-input-border-color-hover: #273149;
   --point-panel-input-border-color-focus: var(--theme-selection-background);
@@ -334,12 +330,12 @@
   --point-panel-input-disabled-cancel-button-color: #a65858;
   --point-panel-input-disabled-cancel-button-color-hover: #d3aaaa;
   --point-panel-input-disabled-link-color-hover: #fff;
-  --point-panel-timeline-background-color: #000000;
-  --point-panel-timeline-button-background-color: #000000;
+  --point-panel-timeline-background-color: var(--theme-base-100);
+  --point-panel-timeline-button-background-color: var(--theme-base-100);
   --point-panel-timeline-button-color: var(--primary-accent);
   --point-panel-timeline-button-color-disabled: #2c4450;
   --point-panel-timeline-button-shadow: 0px 0px 2px 0px hsla(0, 0%, 0%, 0.12);
-  --point-panel-timeline-label-background-color: #000000;
+  --point-panel-timeline-label-background-color: var(--theme-base-100);
   --point-panel-timeline-label-color: var(--primary-accent);
   --point-panel-timeline-label-hover-color: #35dfff;
   --point-panel-timeline-label-unselected-color: #747476;
@@ -372,9 +368,9 @@
   --region-loading-color: #69e261;
 
   --search-result-active-background-color: #fffd03;
-  --search-result-active-color: #000000;
+  --search-result-active-color: var(--theme-base-100);
   --search-result-inactive-background-color: #ff9632;
-  --search-result-inactive-color: #000000;
+  --search-result-inactive-color: var(--theme-base-100);
 
   --token-comment-color: #8f8f92;
   --token-definition-color: #fefefe;
@@ -482,7 +478,7 @@
   --unloaded-region-img: url("/images/dotted-mask-dark.svg");
 
   /* Menus (Dark) */
-  --menu-bgcolor: #000;
+  --menu-bgcolor: var(--theme-base-100);
   --menu-color: var(--body-color);
   --menu-hover-bgcolor: #1b2332;
   --menu-hover-color: white;
@@ -506,7 +502,7 @@
   --breakpoint-tip: #fff;
 
   /* Testsuites (Dark) */
-  --test-step-border: #000;
+  --test-step-border: var(--theme-base-100);
   --testsuites-active-bgcolor: var(--background-color-current-execution-point);
   --testsuites-aside-background-color: var(--theme-base-90);
   --testsuites-aside-color: #fff;
@@ -720,7 +716,7 @@
   --body-sub-color: #a9a9b1;
   --buttontext-color: #f4f8fa;
   --checkbox-border: var(--input-border);
-  --checkbox: #fff;
+  --checkbox: var(--theme-base-100);
   --chrome: var(--theme-base-95); /* bg app */
   --dropshadow: 0 4px 6px -1px rgb(100 100 255 / 0.7), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --icon-color: var(--body-color);
@@ -783,19 +779,20 @@
   --border-color-elements-subtree: var(--background-color-contrast-3);
 
   --color-brand-react: #8c65d0;
-  --color-contrast: #ffffff;
+  --color-contrast: var(--theme-base-100);
   --color-current: #f02d5e;
   --color-default: #223344;
   --color-dim: rgba(135, 135, 137, 0.9);
   --color-dimmer: #aaaaaa;
-  --color-disabled-button: #ffffff;
+  --color-disabled-button: var(--theme-base-100);
   --color-error: #ff0000;
   --color-highlight-change: marktext;
   --color-high-contrast-button: #000000;
+
   --color-link: var(--primary-accent);
-  --color-primary-button: #ffffff;
+  --color-primary-button: var(--theme-base-100);
   --color-search-results: #47628b;
-  --color-secondary-button: #ffffff;
+  --color-secondary-button: var(--theme-base-100);
   --color-warning: #6c5914;
   --color-high-risk-setting: #df4c50;
 
@@ -813,13 +810,13 @@
 
   --color-control-background-active: var(--background-color-primary-button);
   --color-control-background: var(--background-color-inputs);
-  --color-primary-background: #ffffff;
+  --color-primary-background: var(--theme-base-100);
   --color-secondary-background: #eeeeee;
 
   --nag-background-color: #f02d5e;
   --nag-gradient-color-begin: #ff3087;
   --nag-gradient-color-end: #ed265c;
-  --nag-color: #ffffff;
+  --nag-color: var(--theme-base-100);
 
   --collapsible-toggle-color: #868688;
 
@@ -833,7 +830,7 @@
   --comment-card-source-preview-background-color-hover: #e3ecf9;
   --comment-card-source-preview-background-color: var(--background-color-current-execution-point);
   --comment-reply-unpublished-background-color: var(--point-panel-background-color);
-  --comment-reply-unpublished-textfield-background-color: #fff;
+  --comment-reply-unpublished-textfield-background-color: var(--theme-base-100);
   --comment-reply-unpublished-textfield-color: #000;
 
   --object-inspector-bucket-color: #737373;
@@ -870,7 +867,7 @@
 
   --point-panel-background-color: #f0f1f4;
   --point-panel-conditional-icon: var(--blue-60);
-  --point-panel-input-background-color: #ffffff;
+  --point-panel-input-background-color: var(--theme-base-100);
   --point-panel-input-border-color-focus: var(--theme-selection-background);
   --point-panel-input-border-color-hover: #e9ebef;
   --point-panel-input-border-color: transparent;
@@ -882,13 +879,15 @@
   --point-panel-input-disabled-link-color-hover: #b9000d;
   --point-panel-input-edit-button-color-hover: var(--primary-accent);
   --point-panel-input-edit-button-color: var(--color-dimmer);
-  --point-panel-timeline-background-color: #ffffff;
-  --point-panel-timeline-button-background-color: #ffffff;
+  --point-panel-timeline-background-color: var(--theme-base-100);
+  --point-panel-timeline-button-background-color: var(--theme-base-100);
   --point-panel-timeline-button-color-disabled: #e7f7ff;
   --point-panel-timeline-button-color: var(--primary-accent);
   --point-panel-timeline-button-shadow: 0px 0px 2px 0px hsla(0, 0%, 0%, 0.12);
-  --point-panel-timeline-label-background-color: #ffffff;
+
+  --point-panel-timeline-label-background-color: var(--theme-base-100);
   --point-panel-timeline-label-color: var(--primary-accent);
+
   --point-panel-timeline-label-hover-color: #008adb;
   --point-panel-timeline-label-unselected-color: #d1d5db;
   --point-panel-timeline-label-selected-color: #f02d5e;
@@ -897,15 +896,15 @@
 
   --badge-default-color: rgba(0, 0, 0, 0.08);
   --badge-green-color: #73cc6d;
-  --badge-green-contrast-color: #fff;
+  --badge-green-contrast-color: var(--theme-base-100);
   --badge-orange-color: #da7c04;
-  --badge-orange-contrast-color: #fff;
+  --badge-orange-contrast-color: var(--theme-base-100);
   --badge-picker-background-color: #f9f9fa;
   --badge-picker-invalid-background-color: #f4d8d8;
   --badge-purple-color: #a973cd;
-  --badge-purple-contrast-color: #fff;
+  --badge-purple-contrast-color: var(--theme-base-100);
   --badge-unicorn-color: #ff6ddf;
-  --badge-unicorn-contrast-color: #fff;
+  --badge-unicorn-contrast-color: var(--theme-base-100);
   --badge-yellow-color: #e4cd00;
   --badge-yellow-contrast-color: rgb(99, 79, 5);
 
@@ -1064,17 +1063,17 @@
   --testsuites-capsule-alias-selected-bgcolor: var(--theme-base-100);
   --testsuites-capsule-alias-selected-color: var(--body-color);
   --testsuites-capsule-error-bgcolor: rgb(203, 0, 0);
-  --testsuites-capsule-error-color: #fff;
+  --testsuites-capsule-error-color: var(--theme-base-100);
   --testsuites-capsule-success-bgcolor: var(--testsuites-success-color);
-  --testsuites-capsule-success-color: #ffffff;
+  --testsuites-capsule-success-color: var(--theme-base-100);
   --testsuites-error-bgcolor-hover: #ffe0e0;
   --testsuites-error-bgcolor: #ffe9e9;
   --testsuites-error-border-color: var(--testsuites-error-icon-bgcolor);
   --testsuites-error-color: #f02d5e;
   --testsuites-error-icon-bgcolor: rgb(203, 0, 0);
   --testsuites-steps-bgcolor-hover: #f7f7f7;
-  --testsuites-steps-bgcolor: #fff;
-  --testsuites-steps-toggle-bgcolor: #fff;
+  --testsuites-steps-bgcolor: var(--theme-base-100);
+  --testsuites-steps-toggle-bgcolor: var(--theme-base-100);
   --testsuites-success-color: #058b00;
   --testsuites-failed-color: #f02d5e;
   --testsuites-flaky-color: #fdba00;
@@ -1115,7 +1114,7 @@
   --theme-toolbar-color: var(--body-color);
   --theme-toolbar-highlighted-color: var(--green-60);
   --theme-toolbar-hover-active: var(--grey-20);
-  --theme-toolbar-hover: #fff;
+  --theme-toolbar-hover: var(--theme-base-100);
   --theme-toolbar-panel-icon-color: var(--theme-base-60);
   --theme-toolbar-selected-color: var(--body-color);
   --theme-toolbar-separator: var(--grey-90-a10);
@@ -1135,7 +1134,7 @@
   /* Selection (Light) */
   --theme-selection-background-hover: #f0f9fe;
   --theme-selection-background: var(--primary-accent);
-  --theme-selection-color: #ffffff;
+  --theme-selection-color: var(--theme-base-100);
   --theme-selection-focus-background: var(--toolbarbutton-hover-background);
   --theme-selection-focus-color: var(--grey-70);
   --theme-table-selection-background-hover: var(--theme-toolbar-background);
@@ -1213,7 +1212,7 @@
   --loading-boxes: white;
 
   /* Tour */
-  --tour-body-color: #fff;
+  --tour-body-color: var(--theme-base-100);
   --tour-callout-body-color: #ff0;
 
   /* Focus mode editor (light) */
