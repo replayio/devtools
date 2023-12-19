@@ -1,6 +1,6 @@
 import groupBy from "lodash/groupBy";
 import dynamic from "next/dynamic";
-import { useContext } from "react";
+import { useContext, useMemo } from "react";
 
 import { TestRun } from "shared/test-suites/TestRun";
 
@@ -46,7 +46,7 @@ function generateChartData(testRuns: TestRun[]) {
 }
 export const Chart = () => {
   const { testRuns } = useContext(TestRunsContext);
-  const data = generateChartData(testRuns);
+  const data = useMemo(() => generateChartData(testRuns), [testRuns]);
 
   return (
     <div className="flex flex-col overflow-auto rounded-lg bg-chrome p-4">
