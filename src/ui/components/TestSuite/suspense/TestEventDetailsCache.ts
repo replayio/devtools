@@ -14,6 +14,10 @@ import { createFocusIntervalCacheForExecutionPoints } from "replay-next/src/susp
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { cachePauseData, setPointAndTimeForPauseId } from "replay-next/src/suspense/PauseCache";
 import { Source, sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
+import {
+  findProtocolObjectProperty,
+  findProtocolObjectPropertyValue,
+} from "replay-next/src/utils/protocol";
 import { compareExecutionPoints, isExecutionPointsWithinRange } from "replay-next/src/utils/time";
 import { ReplayClientInterface } from "shared/client/types";
 import {
@@ -250,11 +254,31 @@ async function fetchCypressStepDetails(
           sanitized.preview.prototypeId = undefined;
         }
 
-        // Kick this off, but don't block this cache read on it
-        fetchAndCachePossibleCypressDomNode(replayClient, sanitized, pauseId, timeStampedPoint);
+        // Sometimes the elements data is directly in this object,
+        // other times it's nested under a `.props` field
+        let propsObjectWithElements = sanitized;
 
-        const elementsProp = sanitized.preview?.properties?.find(({ name }) => name === "Elements");
-        const count = (elementsProp?.value as number) ?? null;
+        const propsObjectProp = findProtocolObjectProperty(sanitized, "props");
+
+        if (propsObjectProp) {
+          propsObjectWithElements = await objectCache.readAsync(
+            replayClient,
+            pauseId,
+            propsObjectProp.object!,
+            "full"
+          );
+        }
+
+        // Kick this off, but don't block this cache read on it
+        fetchAndCachePossibleCypressDomNode(
+          replayClient,
+          propsObjectWithElements,
+          pauseId,
+          timeStampedPoint
+        );
+
+        const count =
+          findProtocolObjectPropertyValue<number>(propsObjectWithElements, "Elements") ?? null;
 
         return {
           ...timeStampedPoint,
