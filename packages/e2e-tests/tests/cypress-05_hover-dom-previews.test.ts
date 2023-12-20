@@ -6,7 +6,7 @@ import {
   getTestSuitePanel,
   openCypressTestPanel,
 } from "../helpers/testsuites";
-import { waitFor } from "../helpers/utils";
+import { debugPrint, waitFor } from "../helpers/utils";
 import test, { expect } from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "cypress-realworld/bankaccounts.spec.js" });
@@ -50,6 +50,8 @@ test("cypress-05: Test DOM node preview on user action step hover", async ({
     hasText: /click|type/,
   });
 
+  debugPrint(page, "Checking highlighting for one node");
+
   // Hovering over a user action step should show a preview of the DOM node
   const firstClickStep = userActionSteps.first();
 
@@ -84,6 +86,8 @@ test("cypress-05: Test DOM node preview on user action step hover", async ({
   await firstClickStep.hover();
   await highlighter.waitFor({ state: "visible" });
 
+  debugPrint(page, "Checking highlighting for multiple nodes");
+
   // Should also handle multiple found DOM nodes
   const stepWithMultipleNodes = steps
     .filter({
@@ -108,6 +112,10 @@ test("cypress-05: Test DOM node preview on user action step hover", async ({
     { timeout: 30000 }
   );
 
+  debugPrint(page, "Checking found nodes badge");
+
+  // Badge doesn't show up until the step is selected
+  await stepWithMultipleNodes.click();
   const badge = stepWithMultipleNodes.locator(`[class*="SelectedBadge"]`);
   const badgeText = await badge.innerText();
   expect(badgeText).toBe("2");

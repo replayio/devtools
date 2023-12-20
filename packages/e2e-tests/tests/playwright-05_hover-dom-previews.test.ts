@@ -6,7 +6,7 @@ import {
   getTestSuitePanel,
   openPlaywrightTestPanel,
 } from "../helpers/testsuites";
-import { waitFor } from "../helpers/utils";
+import { debugPrint, waitFor } from "../helpers/utils";
 import test, { expect } from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "playwright/breakpoints-05" });
@@ -44,6 +44,8 @@ test("playwright-05: Test DOM node previews on user action step hover", async ({
     hasText: /click/,
   });
 
+  debugPrint(page, "Checking highlighting for one node");
+
   // Hovering over a user action step should show a preview of the DOM node
   const lastClickStep = userActionSteps.last();
   await lastClickStep.scrollIntoViewIfNeeded();
@@ -78,6 +80,8 @@ test("playwright-05: Test DOM node previews on user action step hover", async ({
   await lastClickStep.hover();
   await highlighter.waitFor({ state: "visible" });
 
+  debugPrint(page, "Checking highlighting for multiple nodes");
+
   // Should also handle multiple found DOM nodes
   const stepWithMultipleNodes = steps
     .filter({
@@ -102,6 +106,11 @@ test("playwright-05: Test DOM node previews on user action step hover", async ({
     { timeout: 30000 }
   );
 
-  // We don't have badges shown for Playwright test steps,
-  // so skip that unlike the Cypress test
+  debugPrint(page, "Checking found nodes badge");
+
+  // Badge doesn't show up until the step is selected
+  await stepWithMultipleNodes.click();
+  const badge = stepWithMultipleNodes.locator(`[class*="SelectedBadge"]`);
+  const badgeText = await badge.innerText();
+  expect(badgeText).toBe("4");
 });
