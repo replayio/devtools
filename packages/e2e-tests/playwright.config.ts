@@ -1,5 +1,3 @@
-import fs from "fs";
-import path from "path";
 import { PlaywrightTestConfig, ReporterDescription, devices } from "@playwright/test";
 import { devices as replayDevices } from "@replayio/playwright";
 
@@ -18,13 +16,12 @@ const projects = [
 
 const reporters: ReporterDescription[] = [["line"]];
 
-console.log("CI: ", CI);
 if (CI) {
   reporters.unshift(
     [
       "monocart-reporter",
       {
-        name: "My Test Report",
+        name: "Replay E2E Coverage Report",
         outputFile: `./test-results/monocart-report_${SHARD_NUMBER}.html`,
         coverage: {
           reports: [["json", { file: "./test-results/istanbul-coverage-report.json" }]],

@@ -114,8 +114,6 @@ jobs:
           RECORD_REPLAY_TEST_METRICS: 1
           AUTOMATED_TEST_SECRET: ${{ secrets.AUTOMATED_TEST_SECRET }}
           AUTHENTICATED_TESTS_WORKSPACE_API_KEY: ${{ secrets.AUTHENTICATED_TESTS_WORKSPACE_API_KEY }}
-      - name: List output folder contents
-        run: echo "test-results contents:" && ls -l -r packages/e2e-tests/test-results
       - name: Archive Playwright report results with code coverage 
         uses: actions/upload-artifact@v3
         if: always()
@@ -141,8 +139,6 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v2
-      - run: ls -R
-        working-directory: ./packages/e2e-tests
       - name: Setup node
         uses: actions/setup-node@v2
         with:
@@ -304,14 +300,8 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           path: test-results
-      - name: List output folder contents
-        run: echo "test-results contents:" && ls -l -R ./test-results
       - name: Merge Monocart reports
         run: yarn ts-node packages/e2e-tests/scripts/merge-monocart-reports.ts ./test-results
-      - name: List output folder contents
-        run: echo "test-results contents:" && ls -l -R ./test-results
-      - name: List output folder contents
-        run: echo "root contents:" && ls -l  ./
       - name: Archive merged Playwright report results with code coverage 
         uses: actions/upload-artifact@v3
         if: always()
