@@ -103,9 +103,7 @@ export interface GetTestRunRecordings_node_Workspace {
   testRuns: GetTestRunRecordings_node_Workspace_testRuns | null;
 }
 
-export type GetTestRunRecordings_node =
-  | GetTestRunRecordings_node_Recording
-  | GetTestRunRecordings_node_Workspace;
+export type GetTestRunRecordings_node = GetTestRunRecordings_node_Recording | GetTestRunRecordings_node_Workspace;
 
 export interface GetTestRunRecordings {
   node: GetTestRunRecordings_node | null;

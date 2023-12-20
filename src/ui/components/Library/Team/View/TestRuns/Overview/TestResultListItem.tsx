@@ -1,15 +1,11 @@
-import { motion } from "framer-motion";
 import { useRouter } from "next/router";
 
 import Icon from "replay-next/components/Icon";
 import { Recording } from "shared/graphql/types";
-import {
-  isGroupedTestCasesV1,
-  isGroupedTestCasesV2,
-} from "shared/test-suites/RecordingTestMetadata";
 import { TestRunTest } from "shared/test-suites/TestRun";
 import HighlightedText from "ui/components/Library/Team/View/TestRuns/HighlightedText";
 
+import { StatusIcon } from "../../Tests/Overview/StatusIcon";
 import styles from "../../../../Testsuites.module.css";
 
 export function TestResultListItem({
@@ -36,22 +32,6 @@ export function TestResultListItem({
 
   label = label.toLowerCase();
 
-  let iconClass;
-  switch (label) {
-    case "failed":
-      iconClass = "failed";
-      break;
-    case "flaky":
-      iconClass = "flaky";
-      break;
-    case "passed":
-    default:
-      iconClass = "passed";
-      break;
-  }
-
-  const iconType = isProcessed ? "play-processed" : "play-unprocessed";
-
   return (
     <a
       href={`/recording/${recordingId}?e2e=${e2e ?? ""}&apiKey=${apiKey ?? ""}`}
@@ -64,16 +44,7 @@ export function TestResultListItem({
     >
       <div className={styles.linkContent}>
         {secondaryBadgeCount != null && <Icon className={`${styles.icon}`} type="arrow-nested" />}
-        <div className={styles.iconWrapper}>
-          <motion.div
-            className={styles.iconMotion}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 1.0, boxShadow: "0px 0px 1px rgba(0,0,0,0.2)" }}
-            transition={{ duration: 0.05 }}
-          >
-            <Icon className={styles[iconClass]} type={iconType} />
-          </motion.div>
-        </div>
+        <StatusIcon isProcessed={isProcessed} status={label} />
       </div>
       <div className={styles.fileInfo}>
         <div className={styles.title}>{title || "Test"}</div>

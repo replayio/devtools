@@ -22,7 +22,7 @@ export function TestRunResultList({
     return (
       <Alert
         reason={AlertType.MISSING_REPLAYS_FOR_TEST_RUN}
-        link="https://docs.replay.io/test-suites"
+        link="https://docs.replay.io/test-suites/test-suites-faq#what-causes-replays-to-be-missing-from-the-test-view"
       />
     );
   }
