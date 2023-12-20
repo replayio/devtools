@@ -107,7 +107,7 @@ jobs:
       - name: Generate chromium recordings to test replays against
         uses: coactions/setup-xvfb@v1
         with:
-          run: npx ts-node ./scripts/save-examples.ts --target=browser --runtime=chromium
+          run: npx ts-node ./scripts/save-examples.ts --target=browser
           working-directory: packages/e2e-tests
         if: ${{ github.event.inputs.rerecord == 'true' }}
       - name: Create artifact
