@@ -48,7 +48,7 @@
   --primary-accent: #01acfd;
   --primary-accent-hover: #0194ff;
 
-  --secondary-accent: var(--secondary-accent);
+  --secondary-accent: #d72451;
   --secondary-accent-hover: #d72451;
   --secondary-accent-stroke: var(--secondary-accent);
 
@@ -166,7 +166,7 @@
 
   /* Core classes (Dark) */
   --body-bgcolor: var(--theme-base-95);
-  --body-color: var(--grey-30);
+  --body-color: var(--color-default);
   --body-sub-color: var(--grey-40);
   --buttontext-color: #f4f8fa;
   --checkbox-border: var(--input-border);
@@ -711,7 +711,7 @@
 
   /* Core classes (Light) */
   --body-bgcolor: var(--theme-base-100); /* bg text */
-  --body-color: #38383d;
+  --body-color: var(--color-default);
   --body-sub-color: #a9a9b1;
   --buttontext-color: #f4f8fa;
   --checkbox-border: var(--input-border);
