@@ -166,7 +166,7 @@
 
   /* Core classes (Dark) */
   --body-bgcolor: var(--theme-base-95);
-  --body-color: var(--grey-30);
+  --body-color: var(--color-default);
   --body-sub-color: var(--grey-40);
   --buttontext-color: #f4f8fa;
   --checkbox-border: var(--input-border);
@@ -232,7 +232,7 @@
   --color-brand-react: #ae87f2;
   --color-contrast: var(--chrome);
   --color-current: var(--secondary-accent);
-  --color-default: #ffffff;
+  --color-default: #d7d7db;
   --color-dim: #aaaaaa;
   --color-dimmer: #5f6977;
   --color-error: #ffb3d2;
@@ -582,7 +582,7 @@
   /* Selection (Dark) */
   --theme-selection-background-hover: #353b48;
   --theme-selection-background: var(--primary-accent);
-  --theme-selection-color: #ffffff;
+  --theme-selection-color: #fff;
   --theme-selection-focus-background: var(--grey-60);
   --theme-selection-focus-color: var(--grey-30);
   --theme-table-selection-background-hover: var(--theme-toolbar-background);
@@ -711,7 +711,7 @@
 
   /* Core classes (Light) */
   --body-bgcolor: var(--theme-base-100); /* bg text */
-  --body-color: #38383d;
+  --body-color: var(--color-default);
   --body-sub-color: #a9a9b1;
   --buttontext-color: #f4f8fa;
   --checkbox-border: var(--input-border);
