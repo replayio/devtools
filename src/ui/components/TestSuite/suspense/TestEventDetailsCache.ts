@@ -24,6 +24,7 @@ import {
   RecordingTestMetadataV3,
   TestRecording,
   UserActionEvent,
+  getUserActionTestEventResultPoint,
   isUserActionTestEvent,
 } from "shared/test-suites/RecordingTestMetadata";
 import { boundingRectsCache } from "ui/suspense/nodeCaches";
@@ -72,48 +73,14 @@ export const testEventDetailsIntervalCache = createFocusIntervalCacheForExecutio
 
     // Limit this down to just user actions that have valid results.
     const filteredEvents: UserActionEvent[] = allEvents.filter((e): e is UserActionEvent => {
-      if (isUserActionTestEvent(e)) {
-        // Same as TestStepDetails.tsx
+      const resultPoint = getUserActionTestEventResultPoint(e, testRunnerName);
 
-        switch (testRunnerName) {
-          case "cypress": {
-            // Cypress commands have a `resultVariable` field that we need to find the
-            // right step details object at the given `result` point.
-            if (e.data.timeStampedPoints.result && e.data.resultVariable) {
-              const isInFocusRange = isExecutionPointsWithinRange(
-                e.data.timeStampedPoints.result.point,
-                begin,
-                end
-              );
-              return isInFocusRange;
-            }
-            return false;
-          }
-          case "playwright": {
-            // Playwright commands have a "command" category. We'll only look for
-            // steps that have a `locator.something()` command and a locator string arg.
-            if (e.data.category === "command" && e.data.timeStampedPoints.beforeStep) {
-              if (
-                !e.data.command.name.startsWith("locator") ||
-                e.data.command.arguments.length === 0 ||
-                e.data.command.arguments[0].length === 0
-              ) {
-                return false;
-              }
-              const isInFocusRange = isExecutionPointsWithinRange(
-                e.data.timeStampedPoints.beforeStep.point,
-                begin,
-                end
-              );
-              return isInFocusRange;
-            }
-            return false;
-          }
-          default:
-            return false;
-        }
+      if (!resultPoint) {
+        return false;
       }
-      return false;
+
+      const isInFocusRange = isExecutionPointsWithinRange(resultPoint.point, begin, end);
+      return isInFocusRange;
     });
 
     if (filteredEvents.length === 0) {

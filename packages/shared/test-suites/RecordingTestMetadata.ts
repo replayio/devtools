@@ -1073,6 +1073,45 @@ export function getTestEventExecutionPoint(
   return getTestEventTimeStampedPoint(testEvent)?.point ?? null;
 }
 
+export function getUserActionTestEventResultPoint(
+  testEvent: RecordingTestMetadataV3.TestEvent,
+  testRunnerName: TestRunnerName
+): TimeStampedPoint | null {
+  if (isUserActionTestEvent(testEvent)) {
+    // Same as TestStepDetails.tsx
+
+    switch (testRunnerName) {
+      case "cypress": {
+        // Cypress commands have a `resultVariable` field that we need to find the
+        // right step details object at the given `result` point.
+        if (testEvent.data.timeStampedPoints.result && testEvent.data.resultVariable) {
+          return testEvent.data.timeStampedPoints.result;
+        }
+        break;
+      }
+      case "playwright": {
+        // Playwright commands have a "command" category. We'll only look for
+        // steps that have a `locator.something()` command and a locator string arg.
+        if (testEvent.data.category === "command" && testEvent.data.timeStampedPoints.beforeStep) {
+          const { command } = testEvent.data;
+          if (
+            !command.name.startsWith("locator") ||
+            command.arguments.length === 0 ||
+            command.arguments[0].length === 0
+          ) {
+            return null;
+          }
+
+          return testEvent.data.timeStampedPoints.beforeStep;
+        }
+        break;
+      }
+    }
+  }
+
+  return null;
+}
+
 export function getTestEventTime(testEvent: RecordingTestMetadataV3.TestEvent): number | null {
   return getTestEventTimeStampedPoint(testEvent)?.time ?? null;
 }
