@@ -1,7 +1,6 @@
 import { Page, test as base } from "@playwright/test";
-import type { AxiosError } from "axios";
 import axios from "axios";
-import { addCoverageReport, attachCoverageReport } from "monocart-reporter";
+import { addCoverageReport } from "monocart-reporter";
 
 import { TestRecordingKey } from "./helpers";
 import { cloneTestRecording, deleteTestRecording } from "./helpers/utils";
@@ -13,6 +12,8 @@ type TestIsolatedRecordingFixture = {
     recordingId: string;
   };
 };
+
+export { base };
 
 const testWithCloneRecording = base.extend<TestIsolatedRecordingFixture>({
   exampleKey: undefined,
@@ -52,6 +53,8 @@ const testWithCloneRecording = base.extend<TestIsolatedRecordingFixture>({
         console.error("Error stopping JS coverage: ", err);
       }
 
+      // A couple of our tests don't use the default page object, like `auth/comments-02`
+      // and `auth/logpoints-01`. Handle missing coverage without erroring.
       if (!jsCoverage || Object.keys(jsCoverage).length === 0) {
         console.error("No JS coverage: ", exampleKey);
       } else {
