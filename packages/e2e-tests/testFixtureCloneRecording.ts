@@ -45,12 +45,19 @@ const testWithCloneRecording = base.extend<TestIsolatedRecordingFixture>({
       }
       throw err;
     } finally {
-      const jsCoverage = await page.coverage.stopJSCoverage();
-      if (!jsCoverage || Object.keys(jsCoverage).length === 0) {
-        console.error("No JS coverage: ", exampleKey);
+      let jsCoverage: Awaited<ReturnType<Page["coverage"]["stopJSCoverage"]>> | undefined;
+      try {
+        jsCoverage = await page.coverage.stopJSCoverage();
+      } catch (err: any) {
+        console.error("Error stopping JS coverage: ", err);
       }
 
-      await addCoverageReport(jsCoverage, base.info());
+      if (!jsCoverage || Object.keys(jsCoverage).length === 0) {
+        console.error("No JS coverage: ", exampleKey);
+      } else {
+        await addCoverageReport(jsCoverage, base.info());
+      }
+
       if (newRecordingId) {
         await deleteTestRecording(newRecordingId);
       }
