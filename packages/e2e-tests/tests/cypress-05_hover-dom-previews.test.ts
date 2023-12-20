@@ -83,4 +83,32 @@ test("cypress-05: Test DOM node preview on user action step hover", async ({
   // Hover over the selected `firstClickStep` and verify that the highlighter is shown again
   await firstClickStep.hover();
   await highlighter.waitFor({ state: "visible" });
+
+  // Should also handle multiple found DOM nodes
+  const stepWithMultipleNodes = steps
+    .filter({
+      hasText: "[data-test*=bankaccount-list-item]",
+    })
+    .first();
+
+  // There should now be 2 highlighters in the page,
+  // one per found list item DOM node
+
+  await waitFor(
+    async () => {
+      // Repeatedly hover over the first step and then the actual step, to force the
+      // `onMouseEnter` handler to keep checking if we have a DOM node entry available.
+      await firstStep.hover({ timeout: 1000 });
+      await stepWithMultipleNodes.hover({ timeout: 1000 });
+      const count = await highlighter.count();
+      await highlighter.first().waitFor({ state: "visible", timeout: 1000 });
+      expect(count).toBe(2);
+    },
+    // Give the evaluation plenty of time to complete
+    { timeout: 30000 }
+  );
+
+  const badge = stepWithMultipleNodes.locator(`[class*="SelectedBadge"]`);
+  const badgeText = await badge.innerText();
+  expect(badgeText).toBe("2");
 });

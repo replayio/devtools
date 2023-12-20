@@ -77,4 +77,31 @@ test("playwright-05: Test DOM node previews on user action step hover", async ({
   // Hover over the selected `firstClickStep` and verify that the highlighter is shown again
   await lastClickStep.hover();
   await highlighter.waitFor({ state: "visible" });
+
+  // Should also handle multiple found DOM nodes
+  const stepWithMultipleNodes = steps
+    .filter({
+      hasText: `[data-test-name="ScopesList"] >> [data-test-name="Expandable"]`,
+    })
+    .last();
+
+  // There should now be 4 highlighters in the page,
+  // one per found expandable scope DOM node
+
+  await waitFor(
+    async () => {
+      // Repeatedly hover over the first step and then the actual step, to force the
+      // `onMouseEnter` handler to keep checking if we have a DOM node entry available.
+      await firstStep.hover({ timeout: 1000 });
+      await stepWithMultipleNodes.hover({ timeout: 1000 });
+      const count = await highlighter.count();
+      await highlighter.first().waitFor({ state: "visible", timeout: 1000 });
+      expect(count).toBe(4);
+    },
+    // Give the evaluation plenty of time to complete
+    { timeout: 30000 }
+  );
+
+  // We don't have badges shown for Playwright test steps,
+  // so skip that unlike the Cypress test
 });
