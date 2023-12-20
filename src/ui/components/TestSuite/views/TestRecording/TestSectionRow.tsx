@@ -199,13 +199,20 @@ export function TestSectionRow({
         return;
       }
 
-      const firstDomNodeDetails = testEventDomNodeCache.getValueIfCached(point.point);
+      const domNodesDetails = testEventDomNodeCache.getValueIfCached(point.point);
 
-      if (firstDomNodeDetails?.domNode?.node.isConnected) {
-        const { domNode, pauseId } = firstDomNodeDetails;
-        // Highlight using bounding rects, which we should have pre-cached already
-        dispatch(highlightNodes([domNode.id], pauseId, false));
+      if (!domNodesDetails) {
+        return;
       }
+
+      const { pauseId, domNodes } = domNodesDetails;
+      // Highlight using bounding rects, which we should have pre-cached already
+      dispatch(
+        highlightNodes(
+          domNodes.map(d => d.id),
+          pauseId
+        )
+      );
     }
   };
 

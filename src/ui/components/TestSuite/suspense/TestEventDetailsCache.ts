@@ -36,7 +36,7 @@ export type TestEventDetailsEntry = TimeStampedPoint & {
 
 export type TestEventDomNodeDetails = TimeStampedPoint & {
   pauseId: PauseId;
-  domNode: Element | null;
+  domNodes: Element[];
 };
 
 let getPlaywrightTestStepDomNodesString: string | null = null;
@@ -345,39 +345,48 @@ async function fetchAndCachePossibleCypressDomNode(
             return cachedPropObject;
           })
         );
-        return yieldedDomNodes[0] ?? null;
+        return yieldedDomNodes ?? null;
       } else {
         return cachedPropObject;
       }
     })
   );
 
+  const flattenedDomNodes = possibleDomNodes.flat().filter(Boolean);
+
   // Try to make sure this looks like a DOM node
-  const firstDomNode = possibleDomNodes.find(
+  const matchingDomNodes = flattenedDomNodes.filter(
     el => !!el && el.className !== "Object" && el.preview?.node
   );
 
-  await cacheDomNodeEntry(firstDomNode, replayClient, pauseId, timeStampedPoint);
+  await cacheDomNodeEntry(matchingDomNodes, replayClient, pauseId, timeStampedPoint);
 }
 
 async function cacheDomNodeEntry(
-  firstDomNode: ProtocolObject | null | undefined,
+  matchingDomNodes: ProtocolObject[],
   replayClient: ReplayClientInterface,
   pauseId: string,
   timeStampedPoint: TimeStampedPoint
 ) {
-  let nodeInfo: Element | null = null;
+  let elements: Element[] = [];
 
-  if (firstDomNode) {
-    // Kick off a fetch for the bounding rects now, so we have that cached when we try to highlight this node
+  if (matchingDomNodes.length > 0) {
     boundingRectsCache.prefetch(replayClient, pauseId);
-    nodeInfo = await elementCache.readAsync(replayClient, pauseId, firstDomNode.objectId);
+    elements = await Promise.all(
+      matchingDomNodes.map(async domNode => {
+        const cachedDomNode = await elementCache.readAsync(replayClient, pauseId, domNode.objectId);
+        return cachedDomNode;
+      })
+    );
+
+    // Only want to show elements that are actually in the page
+    elements = elements.filter(e => e.node.isConnected);
   }
 
   const domNodeDetails: TestEventDomNodeDetails = {
     ...timeStampedPoint,
     pauseId,
-    domNode: nodeInfo,
+    domNodes: elements,
   };
 
   testEventDomNodeCache.cacheValue(domNodeDetails, domNodeDetails.point);
@@ -545,9 +554,7 @@ async function fetchPlaywrightStepDetails(
         const [parsedSelectorStringProp, splitSelectorsStringProp, resultValueProp] =
           remainingProps;
 
-        const [firstDomNode] = targetElements;
-
-        cacheDomNodeEntry(firstDomNode, replayClient, pauseId, timeStampedPoint);
+        cacheDomNodeEntry(targetElements, replayClient, pauseId, timeStampedPoint);
 
         return {
           ...timeStampedPoint,
