@@ -9,7 +9,7 @@ const logoSizes = {
 const logoColors = {
   white: "#FFF",
   fuschia: "#F02D5E",
-  gray: "var(--cool-gray-500)",
+  gray: "#6b7280)",
 };
 
 const Logo = () => (

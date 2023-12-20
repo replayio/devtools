@@ -63,7 +63,6 @@
   --cool-gray-200: #e5e7eb;
   --cool-gray-300: #d1d5db;
   --cool-gray-400: #9ca3af;
-  --cool-gray-500: #6b7280;
   --green-50: #30e60b;
   --green-60: #12bc00;
   --green-70: #058b00;
@@ -73,7 +72,6 @@
   --grey-10-a30: rgba(249, 249, 250, 0.3);
   --grey-10: #f9f9fa;
   --grey-20: #ededf0;
-  --grey-25: #e0e0e2;
   --grey-30: #d7d7db;
   --grey-40: #b1b1b3;
   --grey-43: #a4a4a4;
@@ -503,9 +501,6 @@
   /* Testsuites (Dark) */
   --test-step-border: var(--theme-base-100);
   --testsuites-active-bgcolor: var(--background-color-current-execution-point);
-  --testsuites-aside-background-color: var(--theme-base-90);
-  --testsuites-aside-color: #fff;
-  --testsuites-aside-border-color: #fdce22;
   --testsuites-capsule-alias-bgcolor: var(--theme-base-90);
   --testsuites-capsule-alias-color: #fff;
   --testsuites-capsule-alias-selected-bgcolor: var(--theme-base-100);
@@ -560,7 +555,6 @@
   --theme-toolbar-background-hover: #232327;
   --theme-toolbar-background: #18181a;
   --theme-toolbar-color: var(--body-color);
-  --theme-toolbar-highlighted-color: var(--green-50);
   --theme-toolbar-hover-active: #252526;
   --theme-toolbar-hover: #232327;
   --theme-toolbar-panel-icon-color: var(--icon-color);
@@ -610,7 +604,6 @@
   --theme-highlight-green: #86de74;
   --theme-highlight-purple: #b98eff;
   --theme-highlight-red: #ff7de9;
-  --theme-highlight-yellow: #fff89e;
 
   /* These theme-highlight color variables have not been photonized. */
   --theme-highlight-bluegrey: #5e88b0;
@@ -1054,9 +1047,6 @@
   /* Testsuites (Light) */
   --test-step-border: rgba(0, 0, 0, 0.05);
   --testsuites-active-bgcolor: var(--background-color-current-execution-point);
-  --testsuites-aside-background-color: rgb(254 243 199);
-  --testsuites-aside-color: var(--body-color);
-  --testsuites-aside-border-color: rgb(253 230 138);
   --testsuites-capsule-alias-bgcolor: var(--theme-base-90);
   --testsuites-capsule-alias-color: var(--body-color);
   --testsuites-capsule-alias-selected-bgcolor: var(--theme-base-100);
@@ -1111,7 +1101,6 @@
   --theme-toolbar-background-hover: rgba(221, 225, 228, 0.66);
   --theme-toolbar-background: var(--grey-10);
   --theme-toolbar-color: var(--body-color);
-  --theme-toolbar-highlighted-color: var(--green-60);
   --theme-toolbar-hover-active: var(--grey-20);
   --theme-toolbar-hover: var(--theme-base-100);
   --theme-toolbar-panel-icon-color: var(--theme-base-60);
@@ -1161,7 +1150,6 @@
   --theme-highlight-green: var(--green-70);
   --theme-highlight-purple: var(--blue-70);
   --theme-highlight-red: var(--magenta-65);
-  --theme-highlight-yellow: #fff89e;
 
   /* These theme-highlight color variables have not been photonized. */
   --theme-highlight-bluegrey: #0072ab;
