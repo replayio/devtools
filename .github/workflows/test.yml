@@ -105,7 +105,7 @@ jobs:
         run: yarn dev &
         if: ${{ github.event.inputs.rerecord == 'true' }}
       - name: Generate chromium recordings to test replays against
-        run: jq -r 'to_entries | .[] | select(.value.buildId | contains("chromium")) | .key' examples.json | while read example; do echo xvfb-run npx ts-node ./scripts/save-examples.ts -e \"$example\"; done
+        run: jq -r 'to_entries | .[] | select(.value.buildId | contains("chromium")) | .key' examples.json | while read example; do xvfb-run npx ts-node ./scripts/save-examples.ts -e \"$example\"; done
         working-directory: packages/e2e-tests
         if: ${{ github.event.inputs.rerecord == 'true' }}
       - name: Create artifact
