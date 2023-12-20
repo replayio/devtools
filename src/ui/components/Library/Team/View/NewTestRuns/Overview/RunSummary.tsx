@@ -124,6 +124,7 @@ export function RunSummary({
       <div className="flex flex-row items-center justify-between gap-2">
         <div
           className={`flex-grow ${dropdownStyles.dropdownTrigger}`}
+          data-test-id="TestRunSummary-StatusFilter-DropdownTrigger"
           onClick={onClickStatusFilter}
           onKeyDown={onKeyDownStatusFilter}
           tabIndex={0}
@@ -137,6 +138,7 @@ export function RunSummary({
 
       <FilterField
         placeholder="Filter tests"
+        dataTestId="TestRunSummary-Filter"
         value={testFilterByText}
         onChange={setTestFilterByText}
       />

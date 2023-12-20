@@ -30,7 +30,11 @@ export function TestRunSpecDetails() {
     selectedTest == null ||
     !testRuns.some(t => t.id === testRunId)
   ) {
-    return <TestSuitePanelMessage>Select a test to see its details here</TestSuitePanelMessage>;
+    return (
+      <TestSuitePanelMessage data-test-id="NoTestSelected">
+        Select a test to see its details here
+      </TestSuitePanelMessage>
+    );
   }
 
   const failedTests = selectedSpecTests.filter(t => t.result === "failed" || t.result === "flaky");
@@ -60,6 +64,7 @@ function Errors({ failedTests }: { failedTests: TestRunTestWithRecordings[] }) {
         t.errors?.map((e, i) => (
           <div
             key={`${t.id}-${i}`}
+            data-test-id="TestRunSpecDetails-Error"
             className="w-full overflow-x-auto rounded-md bg-[color:var(--testsuites-v2-error-bg)] px-3 py-4"
           >
             <div className="flex flex-col gap-4 whitespace-pre-wrap break-words border-l-2 border-[color:var(--testsuites-v2-failed-header)] px-3">
