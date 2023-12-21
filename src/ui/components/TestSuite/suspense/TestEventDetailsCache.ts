@@ -346,8 +346,17 @@ async function cacheDomNodeEntry(
       })
     );
 
-    // Only want to show elements that are actually in the page
-    elements = elements.filter(e => e.node.isConnected);
+    const uniqueDomNodeIds = new Set<string>();
+
+    // Only want to show elements that are actually in the page,
+    // and remove any duplicates
+    elements = elements.filter(e => {
+      if (e.node.isConnected && !uniqueDomNodeIds.has(e.id)) {
+        uniqueDomNodeIds.add(e.id);
+        return true;
+      }
+      return false;
+    });
   }
 
   const domNodeDetails: TestEventDomNodeDetails = {
