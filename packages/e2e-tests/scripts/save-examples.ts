@@ -43,6 +43,12 @@ const argv = yargs
     description: "Only re-generate tests for this target",
     choices: ["all", "browser", "node"],
   })
+  .option("browser", {
+    alias: "b",
+    default: "all",
+    description: "Only re-generate tests for this browser",
+    choices: ["all", "chromium", "firefox"],
+  })
   .help()
   .alias("help", "h")
   .parseSync();
@@ -414,6 +420,9 @@ async function saveExamples(
   callback: (args: TestRunCallbackArgs) => Promise<void>
 ) {
   let examplesToRun = knownExamples.filter(example => example.category === examplesTarget);
+  if (examplesTarget == "browser" && argv.browser !== "all") {
+    examplesToRun = examplesToRun.filter(example => example.runtime === argv.browser);
+  }
 
   const specificExample = argv.example;
 
