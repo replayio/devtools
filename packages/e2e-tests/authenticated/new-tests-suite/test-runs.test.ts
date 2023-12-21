@@ -1,4 +1,4 @@
-import test, { expect } from "@playwright/test";
+import test, { Page, expect } from "@playwright/test";
 
 import { startLibraryTest } from "../../helpers";
 import { TEMP_USER_API_KEY, TEMP_USER_TEAM_ID } from "../../helpers/authentication";
@@ -6,23 +6,23 @@ import { openContextMenu } from "../../helpers/console-panel";
 import { selectContextMenuItem } from "../../helpers/context-menu";
 import { debugPrint } from "../../helpers/utils";
 
-const noTestRunsMessage = page => page.locator('[data-test-id="NoTestRuns"]');
-const noTestRunSelectedMessage = page => page.locator('[data-test-id="NoTestRunSelected"]');
-const noTestSelected = page => page.locator('[data-test-id="NoTestSelected"]');
+const noTestRunsMessage = (page: Page) => page.locator('[data-test-id="NoTestRuns"]');
+const noTestRunSelectedMessage = (page: Page) => page.locator('[data-test-id="NoTestRunSelected"]');
+const noTestSelected = (page: Page) => page.locator('[data-test-id="NoTestSelected"]');
 
-const testRunsItems = page => page.locator('[data-test-id="TestRunListItem"]');
-const testRunSummary = page => page.locator('[data-test-id="TestRunSummary"]');
-const testItems = page => page.locator('[data-test-id="TestRunResult-FileNode"]');
+const testRunsItems = (page: Page) => page.locator('[data-test-id="TestRunListItem"]');
+const testRunSummary = (page: Page) => page.locator('[data-test-id="TestRunSummary"]');
+const testItems = (page: Page) => page.locator('[data-test-id="TestRunResult-FileNode"]');
 
-const testRecordings = page => page.locator('[data-test-id="TestRunResultsListItem"]');
-const testErrors = page => page.locator('[data-test-id="TestRunSpecDetails-Error"]');
+const testRecordings = (page: Page) => page.locator('[data-test-id="TestRunResultsListItem"]');
+const testErrors = (page: Page) => page.locator('[data-test-id="TestRunSpecDetails-Error"]');
 
-const filterRunsByText = async (page, text) => {
+const filterRunsByText = async (page: Page, text: string) => {
   await debugPrint(page, `Filtering test runs list by text`, "filterTestRunsList");
   await page.fill("data-test-id=TestRunsPage-FilterByText-Input", text);
 };
 
-const filterTestsByText = async (page, text) => {
+const filterTestsByText = async (page: Page, text: string) => {
   await debugPrint(page, `Filtering test list by text`, "filterTestList");
   await page.fill("data-test-id=TestRunSummary-Filter", text);
 };
