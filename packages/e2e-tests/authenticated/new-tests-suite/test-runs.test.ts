@@ -31,8 +31,8 @@ const filterTestsByText = async (page: Page, text: string) => {
 // - Figure out a way to make sure we always have same test runs available. Right now what we are using will go away in 7 days.
 // - Move that test run to golden workspace
 
-test(`authenticated/test-suites/new-test-runs`, async ({ page }) => {
-  await startLibraryTest(page, TEMP_USER_API_KEY, TEMP_USER_TEAM_ID);
+test(`authenticated/new-test-suites/test-runs`, async ({ page }) => {
+  await startLibraryTest(page, TEMP_USER_API_KEY, TEMP_USER_TEAM_ID, "test-runs");
   expect(await testRunsItems(page).count()).not.toBe(0);
 
   //#region > Test runs list
@@ -60,14 +60,14 @@ test(`authenticated/test-suites/new-test-runs`, async ({ page }) => {
 
   //#region >>> Filter by primary branch
   const branchDropdown = page.locator('[data-test-id="TestRunsPage-BranchFilter-DropdownTrigger"]');
-  openContextMenu(branchDropdown, { useLeftClick: true });
+  await openContextMenu(branchDropdown, { useLeftClick: true });
   await selectContextMenuItem(page, {
     contextMenuItemTestId: "show-only-primary-branch",
   });
   await filterRunsByText(page, "fmt again.");
   expect(await testRunsItems(page).count()).toBe(0);
   await filterRunsByText(page, "");
-  openContextMenu(branchDropdown, { useLeftClick: true });
+  await openContextMenu(branchDropdown, { useLeftClick: true });
   await selectContextMenuItem(page, {
     contextMenuItemTestId: "show-all-branches",
   });
@@ -105,7 +105,7 @@ test(`authenticated/test-suites/new-test-runs`, async ({ page }) => {
   const statusDropdown = page.locator(
     '[data-test-id="TestRunSummary-StatusFilter-DropdownTrigger"]'
   );
-  openContextMenu(statusDropdown, { useLeftClick: true });
+  await openContextMenu(statusDropdown, { useLeftClick: true });
   await selectContextMenuItem(page, {
     contextMenuItemTestId: "failed-and-flaky",
   });
