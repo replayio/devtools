@@ -8,8 +8,8 @@ const logoSizes = {
 };
 const logoColors = {
   white: "#FFF",
-  fuschia: "#F02D5E",
-  gray: "#6b7280)",
+  fuschia: "var(--secondary-accent)",
+  gray: "var(--grey-50)",
 };
 
 const Logo = () => (
