@@ -5,8 +5,20 @@ const { CI, SLOW_MO, SHARD_NUMBER } = process.env;
 
 const projects = [
   {
+    name: "replay-chromium-custom",
+    use: {
+      launchOptions: {
+        executablePath:
+          process.env["REPLAY_BROWSER_BINARY_PATH"] ||
+          process.env.REPLAY_DIR + "/chromium/src/out/Release/chrome",
+      },
+    },
+  },
+  {
     name: "replay-chromium",
-    use: { ...(replayDevices["Replay Chromium"] as any) },
+    use: {
+      ...(replayDevices["Replay Chromium"] as any),
+    },
   },
   {
     name: "chromium",
