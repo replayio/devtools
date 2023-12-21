@@ -12,7 +12,7 @@ export function Execution({ execution }: { execution: TestExecution }) {
   const sortedRecordings = orderBy(execution.recordings, "date", "desc");
 
   return (
-    <div className="flex flex-col">
+    <div data-test-id="ExecutionItem" className="flex flex-col">
       <div className="flex flex-row items-center justify-between gap-2 overflow-hidden border-b border-bodyBgcolor py-2 px-4">
         <div className="flex flex-row items-center gap-2 overflow-hidden">
           <ExecutionStatus result={execution.result} />
