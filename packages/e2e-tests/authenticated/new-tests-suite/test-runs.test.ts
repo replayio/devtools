@@ -28,10 +28,8 @@ const filterTestsByText = async (page, text) => {
 };
 
 //TODO:
-// - Figure out which test data to use - we need something consistent for the test
-// - Can we use hardcoded link? Deep link to test run is not working
-// - If we want to test time range filter, we need a workspace with at least 30 days retention limit to enable that dropdown
-// - Branch filter seems broken
+// - Figure out a way to make sure we always have same test runs available. Right now what we are using will go away in 7 days.
+// - Move that test run to golden workspace
 
 test(`authenticated/test-suites/new-test-runs`, async ({ page }) => {
   await startLibraryTest(page, TEMP_USER_API_KEY, TEMP_USER_TEAM_ID);
@@ -57,6 +55,22 @@ test(`authenticated/test-suites/new-test-runs`, async ({ page }) => {
   expect(await noTestRunsMessage(page).count()).toBe(0);
   expect(await noTestRunSelectedMessage(page).count()).toBe(1);
   expect(await noTestSelected(page).count()).toBe(1);
+  await filterRunsByText(page, "");
+  //#endregion
+
+  //#region >>> Filter by primary branch
+  const branchDropdown = page.locator('[data-test-id="TestRunsPage-BranchFilter-DropdownTrigger"]');
+  openContextMenu(branchDropdown, { useLeftClick: true });
+  await selectContextMenuItem(page, {
+    contextMenuItemTestId: "show-only-primary-branch",
+  });
+  await filterRunsByText(page, "fmt again.");
+  expect(await testRunsItems(page).count()).toBe(0);
+  await filterRunsByText(page, "");
+  openContextMenu(branchDropdown, { useLeftClick: true });
+  await selectContextMenuItem(page, {
+    contextMenuItemTestId: "show-all-branches",
+  });
   //#endregion
 
   //#region >>> Workspace with limited retention limit should not show large time range filter
