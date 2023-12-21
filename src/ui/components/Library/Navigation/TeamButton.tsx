@@ -74,7 +74,7 @@ export function TeamButton({
   );
 }
 
-function TestTeamViews({ basePath }: { basePath: string }) {
+function TestTeamViews() {
   const view = useGetTeamRouteParams().view;
   const { teamId } = useGetTeamRouteParams();
 
