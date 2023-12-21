@@ -389,7 +389,7 @@ async function saveRecording(
   const json: ExamplesData = {
     ...JSON.parse(text),
     [example]: {
-      recording: id,
+      recording: recordingId,
       buildId,
     },
   };
