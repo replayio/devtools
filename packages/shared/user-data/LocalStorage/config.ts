@@ -12,4 +12,5 @@ export const config = {
   replayVideoPanelCollapsed: false,
   enableTestSuitesNewRunsView: true,
   enableTestSuitesTestsView: true,
+  enableTestSuitesChart: false,
 };
