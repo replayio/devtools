@@ -252,9 +252,12 @@ jobs:
         with:
           path: test-results
       - name: Merge Monocart reports
-        run: yarn ts-node packages/e2e-tests/scripts/merge-monocart-reports.ts ./test-results
+        id: merge-monocart-reports
+        run: |
+          yarn ts-node packages/e2e-tests/scripts/merge-monocart-reports.ts ./test-results
       - name: Archive merged Playwright report results with code coverage 
         uses: actions/upload-artifact@v4
+        id: upload-coverage-report
         if: always()
         with:
           name: all-code-coverage-reports-merged
@@ -263,3 +266,8 @@ jobs:
             ./test-results/merged-coverage*
             ./test-results/coverage-reports
           retention-days: 14
+      - name: Post coverage summary as a PR comment
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          filePath: ./coverageSummary.md
+          comment_tag: coverage_summary
