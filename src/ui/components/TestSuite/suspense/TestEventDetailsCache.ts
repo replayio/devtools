@@ -24,7 +24,6 @@ import {
   RecordingTestMetadataV3,
   TestRecording,
   UserActionEvent,
-  getUserActionTestEventResultPoint,
   isUserActionTestEvent,
 } from "shared/test-suites/RecordingTestMetadata";
 import { boundingRectsCache } from "ui/suspense/nodeCaches";
@@ -33,11 +32,13 @@ export type TestEventDetailsEntry = TimeStampedPoint & {
   count: number | null;
   pauseId: PauseId;
   props: ProtocolObject | null;
+  testEvent: UserActionEvent;
 };
 
 export type TestEventDomNodeDetails = TimeStampedPoint & {
   pauseId: PauseId;
   domNodes: Element[];
+  testEvent: UserActionEvent;
 };
 
 let getPlaywrightTestStepDomNodesString: string | null = null;
@@ -73,8 +74,7 @@ export const testEventDetailsIntervalCache = createFocusIntervalCacheForExecutio
 
     // Limit this down to just user actions that have valid results.
     const filteredEvents: UserActionEvent[] = allEvents.filter((e): e is UserActionEvent => {
-      const resultPoint = getUserActionTestEventResultPoint(e, testRunnerName);
-
+      const resultPoint = isUserActionTestEvent(e) ? e.data.timeStampedPoints.result : null;
       if (!resultPoint) {
         return false;
       }
@@ -106,7 +106,6 @@ export const testEventDetailsIntervalCache = createFocusIntervalCacheForExecutio
         break;
       }
       case "playwright": {
-        console.log("Attempted to process results for playwright: ", filteredEvents);
         processedResults = await fetchPlaywrightStepDetails(
           replayClient,
           filteredEvents,
@@ -200,67 +199,73 @@ async function fetchCypressStepDetails(
       const { pauseId, point: timeStampedPoint, returned } = result;
       const consolePropsValue = returned;
 
-      if (consolePropsValue?.object) {
-        // This should already be cached because of `runEvaluation` returned nested previews.
-        const consoleProps = await objectCache.readAsync(
-          replayClient,
-          pauseId,
-          consolePropsValue.object,
-          "full"
-        );
+      const testEvent = filteredEvents.find(
+        e => e.data.timeStampedPoints.result!.point === timeStampedPoint.point
+      )!;
 
-        // We're going to reformat this to filter out a couple properties and displayed values
-        const sanitized = cloneDeep(consoleProps);
+      const testEventDetailsEntry: TestEventDetailsEntry = {
+        ...timeStampedPoint,
+        pauseId: result.pauseId,
+        testEvent,
+        props: null,
+        count: null,
+      };
 
-        if (sanitized?.preview?.properties) {
-          sanitized.preview.properties = sanitized.preview.properties.filter(
-            ({ name }) => name !== "Snapshot"
-          );
-
-          // suppress the prototype entry in the properties output
-          sanitized.preview.prototypeId = undefined;
-        }
-
-        // Sometimes the elements data is directly in this object,
-        // other times it's nested under a `.props` field
-        let propsObjectWithElements = sanitized;
-
-        const propsObjectProp = findProtocolObjectProperty(sanitized, "props");
-
-        if (propsObjectProp) {
-          propsObjectWithElements = await objectCache.readAsync(
-            replayClient,
-            pauseId,
-            propsObjectProp.object!,
-            "full"
-          );
-        }
-
-        // Kick this off, but don't block this cache read on it
-        fetchAndCachePossibleCypressDomNode(
-          replayClient,
-          propsObjectWithElements,
-          pauseId,
-          timeStampedPoint
-        );
-
-        const count =
-          findProtocolObjectPropertyValue<number>(propsObjectWithElements, "Elements") ?? null;
-
-        return {
-          ...timeStampedPoint,
-          count,
-          pauseId,
-          props: sanitized,
-        };
+      if (!consolePropsValue?.object) {
+        return testEventDetailsEntry;
       }
 
-      return {
-        ...timeStampedPoint,
-        count: null,
-        pauseId: result.pauseId,
-        props: null,
-      };
+      // This should already be cached because of `runEvaluation` returned nested previews.
+      const consoleProps = await objectCache.readAsync(
+        replayClient,
+        pauseId,
+        consolePropsValue.object,
+        "full"
+      );
+
+      // We're going to reformat this to filter out a couple properties and displayed values
+      const sanitized = cloneDeep(consoleProps);
+
+      if (sanitized?.preview?.properties) {
+        sanitized.preview.properties = sanitized.preview.properties.filter(
+          ({ name }) => name !== "Snapshot"
+        );
+
+        // suppress the prototype entry in the properties output
+        sanitized.preview.prototypeId = undefined;
+      }
+
+      // Sometimes the elements data is directly in this object,
+      // other times it's nested under a `.props` field
+      let propsObjectWithElements = sanitized;
+
+      const propsObjectProp = findProtocolObjectProperty(sanitized, "props");
+
+      if (propsObjectProp) {
+        propsObjectWithElements = await objectCache.readAsync(
+          replayClient,
+          pauseId,
+          propsObjectProp.object!,
+          "full"
+        );
+      }
+
+      // Kick this off, but don't block this cache read on it
+      fetchAndCachePossibleCypressDomNode(
+        replayClient,
+        propsObjectWithElements,
+        pauseId,
+        timeStampedPoint,
+        testEvent
+      );
+
+      const count =
+        findProtocolObjectPropertyValue<number>(propsObjectWithElements, "Elements") ?? null;
+
+      testEventDetailsEntry.count = count;
+      testEventDetailsEntry.props = sanitized;
+
+      return testEventDetailsEntry;
     })
   );
   return processedResults;
@@ -273,73 +278,74 @@ async function fetchAndCachePossibleCypressDomNode(
   replayClient: ReplayClientInterface,
   sanitized: ProtocolObject,
   pauseId: string,
-  timeStampedPoint: TimeStampedPoint
+  timeStampedPoint: TimeStampedPoint,
+  testEvent: UserActionEvent
 ) {
+  // Prefer "Yielded", because it's what the test step settled on
+  // (such as a `eq` step selecting some element from a list)
   const propNamesWithPotentialElements = ["Yielded", "Applied To"] as const;
+  // Find the matching properties, in the same preference order
+  const propsWithPotentialElements = propNamesWithPotentialElements.map(propName =>
+    findProtocolObjectProperty(sanitized, propName)
+  );
 
-  const propsWithPotentialElements =
-    sanitized.preview?.properties?.filter(({ name }) =>
-      propNamesWithPotentialElements.includes(name)
-    ) ?? [];
+  // Grab the first one that exists, if any
+  const firstPropWithPotentialElements = propsWithPotentialElements.find(Boolean);
 
-  const possibleDomNodes = await Promise.all(
-    propsWithPotentialElements.map(async prop => {
-      if (!prop.object) {
-        return null;
-      }
+  let possibleDomNodes: ProtocolObject[] = [];
 
-      const cachedPropObject = await objectCache.readAsync(
-        replayClient,
-        pauseId,
-        prop.object,
-        "canOverflow"
+  if (firstPropWithPotentialElements?.object) {
+    const cachedPropObject = await objectCache.readAsync(
+      replayClient,
+      pauseId,
+      firstPropWithPotentialElements.object,
+      "canOverflow"
+    );
+
+    if (cachedPropObject.className === "Array") {
+      // Probably multiple DOM nodes. Pre-fetch these too.
+      const yieldedPropsWithObjects = (cachedPropObject.preview?.properties ?? []).filter(
+        prop => prop.object
       );
 
-      if (cachedPropObject.className === "Array") {
-        // Probably multiple DOM nodes. Pre-fetch these too.
-        const yieldedPropsWithObjects = (cachedPropObject.preview?.properties ?? []).filter(
-          prop => prop.object
-        );
+      const yieldedDomNodes = await Promise.all(
+        yieldedPropsWithObjects.map(async (prop: Property) => {
+          const cachedPropObject = await objectCache.readAsync(
+            replayClient,
+            pauseId,
+            prop.object!,
+            "canOverflow"
+          );
+          return cachedPropObject;
+        })
+      );
+      possibleDomNodes = yieldedDomNodes;
+    } else {
+      possibleDomNodes = [cachedPropObject];
+    }
+  }
 
-        const yieldedDomNodes = await Promise.all(
-          yieldedPropsWithObjects.map(async (prop: Property) => {
-            const cachedPropObject = await objectCache.readAsync(
-              replayClient,
-              pauseId,
-              prop.object!,
-              "canOverflow"
-            );
-            return cachedPropObject;
-          })
-        );
-        return yieldedDomNodes ?? null;
-      } else {
-        return cachedPropObject;
-      }
-    })
-  );
-
-  const flattenedDomNodes = possibleDomNodes.flat().filter(Boolean);
-
-  // Try to make sure this looks like a DOM node
-  const matchingDomNodes = flattenedDomNodes.filter(
-    el => !!el && el.className !== "Object" && el.preview?.node
-  );
-
-  await cacheDomNodeEntry(matchingDomNodes, replayClient, pauseId, timeStampedPoint);
+  await cacheDomNodeEntry(possibleDomNodes, replayClient, pauseId, timeStampedPoint, testEvent);
 }
 
 async function cacheDomNodeEntry(
-  matchingDomNodes: ProtocolObject[],
+  possibleDomNodes: ProtocolObject[],
   replayClient: ReplayClientInterface,
   pauseId: string,
-  timeStampedPoint: TimeStampedPoint
+  timeStampedPoint: TimeStampedPoint,
+  testEvent: UserActionEvent
 ) {
   let elements: Element[] = [];
 
-  if (matchingDomNodes.length > 0) {
+  if (possibleDomNodes.length > 0) {
+    // Try to make sure this looks like a DOM node
+    const matchingDomNodes = possibleDomNodes.filter(
+      el => !!el && el.className !== "Object" && el.preview?.node
+    );
+
     boundingRectsCache.prefetch(replayClient, pauseId);
-    elements = await Promise.all(
+
+    const initialElements = await Promise.all(
       matchingDomNodes.map(async domNode => {
         const cachedDomNode = await elementCache.readAsync(replayClient, pauseId, domNode.objectId);
         return cachedDomNode;
@@ -350,7 +356,7 @@ async function cacheDomNodeEntry(
 
     // Only want to show elements that are actually in the page,
     // and remove any duplicates
-    elements = elements.filter(e => {
+    elements = initialElements.filter(e => {
       if (e.node.isConnected && !uniqueDomNodeIds.has(e.id)) {
         uniqueDomNodeIds.add(e.id);
         return true;
@@ -363,6 +369,7 @@ async function cacheDomNodeEntry(
     ...timeStampedPoint,
     pauseId,
     domNodes: elements,
+    testEvent,
   };
 
   testEventDomNodeCache.cacheValue(domNodeDetails, domNodeDetails.point);
@@ -421,7 +428,7 @@ async function fetchPlaywrightStepDetails(
   for (const userEvent of filteredEvents) {
     // The locator string is always the first command arg.
     const locatorString = userEvent.data.command.arguments[0];
-    const point = userEvent.data.timeStampedPoints.beforeStep!.point;
+    const point = userEvent.data.timeStampedPoints.result!.point;
     pointsToLocatorStrings[point] = locatorString;
   }
 
@@ -470,13 +477,20 @@ async function fetchPlaywrightStepDetails(
   const processedResults: TestEventDetailsEntry[] = await Promise.all(
     evalResults.map(async result => {
       const { pauseId, point: timeStampedPoint, returned, data } = result;
+      const testEvent = filteredEvents.find(
+        e => e.data.timeStampedPoints.result!.point === timeStampedPoint.point
+      )!;
+
+      const testEventDetailsEntry: TestEventDetailsEntry = {
+        ...timeStampedPoint,
+        pauseId: result.pauseId,
+        testEvent,
+        props: null,
+        count: null,
+      };
+
       if (!returned?.object) {
-        return {
-          ...timeStampedPoint,
-          count: null,
-          pauseId: result.pauseId,
-          props: null,
-        };
+        return testEventDetailsEntry;
       }
 
       // This should already be cached because of `runEvaluation` returned nested previews.
@@ -488,13 +502,9 @@ async function fetchPlaywrightStepDetails(
       );
 
       if (!resultValue.preview?.properties || resultValue.preview.properties.length === 0) {
-        return {
-          ...timeStampedPoint,
-          count: null,
-          pauseId: result.pauseId,
-          props: null,
-        };
+        return testEventDetailsEntry;
       }
+
       const resultProps = resultValue.preview.properties;
 
       // Now we deconstruct the mixed array that was returned from the eval.
@@ -530,22 +540,13 @@ async function fetchPlaywrightStepDetails(
         const [parsedSelectorStringProp, splitSelectorsStringProp, resultValueProp] =
           remainingProps;
 
-        cacheDomNodeEntry(targetElements, replayClient, pauseId, timeStampedPoint);
+        cacheDomNodeEntry(targetElements, replayClient, pauseId, timeStampedPoint, testEvent);
 
-        return {
-          ...timeStampedPoint,
-          count: numTargetElements,
-          pauseId,
-          props: resultValueProp.value,
-        };
+        testEventDetailsEntry.props = resultValueProp.value;
+        testEventDetailsEntry.count = numTargetElements;
       }
 
-      return {
-        ...timeStampedPoint,
-        count: null,
-        pauseId: result.pauseId,
-        props: null,
-      };
+      return testEventDetailsEntry;
     })
   );
 

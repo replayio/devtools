@@ -12,7 +12,6 @@ import {
   RecordingTestMetadataV3,
   TestSectionName,
   UserActionEvent,
-  getUserActionTestEventResultPoint,
   isUserActionTestEvent,
 } from "shared/test-suites/RecordingTestMetadata";
 import { jumpToKnownEventListenerHit } from "ui/actions/eventListeners/jumpToCode";
@@ -58,7 +57,7 @@ export default memo(function UserActionEventRow({
   const { data } = userActionEvent;
   const testRunnerName = groupedTestCases.environment.testRunner.name;
   const { command, error, parentId } = data;
-  const resultPoint = getUserActionTestEventResultPoint(userActionEvent, testRunnerName);
+  const resultPoint = userActionEvent.data.timeStampedPoints.result;
 
   const replayClient = useContext(ReplayClientContext);
 
