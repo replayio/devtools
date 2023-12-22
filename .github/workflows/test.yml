@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Waiting for 200 from the Vercel Preview
-        uses: patrickedqvist/wait-for-vercel-preview@v1
+        uses: patrickedqvist/wait-for-vercel-preview@v1.3.1
         id: waitFor200
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -81,7 +81,7 @@ jobs:
       # Get the yarn cache path.
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
+        run: echo "{dir}={$(yarn config get cacheFolder)}" >> $GITHUB_OUTPUT
       - name: Restore yarn cache
         uses: actions/cache@v3
         id: yarn-cache
@@ -145,7 +145,7 @@ jobs:
       # Get the yarn cache path.
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
+        run: echo "{dir}={$(yarn config get cacheFolder)}" >> $GITHUB_OUTPUT
       - name: Restore yarn cache
         uses: actions/cache@v3
         id: yarn-cache
@@ -199,7 +199,7 @@ jobs:
       # Get the yarn cache path.
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
+        run: echo "{dir}={$(yarn config get cacheFolder)}" >> $GITHUB_OUTPUT
       - name: Restore yarn cache
         uses: actions/cache@v3
         id: yarn-cache
@@ -231,7 +231,7 @@ jobs:
       # Get the yarn cache path.
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
+        run: echo "{dir}={$(yarn config get cacheFolder)}" >> $GITHUB_OUTPUT
       - name: Restore yarn cache
         uses: actions/cache@v3
         id: yarn-cache
