@@ -6,7 +6,7 @@ import {
   getTestSuitePanel,
   openPlaywrightTestPanel,
 } from "../helpers/testsuites";
-import { waitFor } from "../helpers/utils";
+import { debugPrint, waitFor } from "../helpers/utils";
 import test, { expect } from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "playwright/breakpoints-05" });
@@ -44,6 +44,8 @@ test("playwright-05: Test DOM node previews on user action step hover", async ({
     hasText: /click/,
   });
 
+  debugPrint(page, "Checking highlighting for one node");
+
   // Hovering over a user action step should show a preview of the DOM node
   const lastClickStep = userActionSteps.last();
   await lastClickStep.scrollIntoViewIfNeeded();
@@ -77,4 +79,38 @@ test("playwright-05: Test DOM node previews on user action step hover", async ({
   // Hover over the selected `firstClickStep` and verify that the highlighter is shown again
   await lastClickStep.hover();
   await highlighter.waitFor({ state: "visible" });
+
+  debugPrint(page, "Checking highlighting for multiple nodes");
+
+  // Should also handle multiple found DOM nodes
+  const stepWithMultipleNodes = steps
+    .filter({
+      hasText: `[data-test-name="ScopesList"] >> [data-test-name="Expandable"]`,
+    })
+    .last();
+
+  // There should now be 4 highlighters in the page,
+  // one per found expandable scope DOM node
+
+  await waitFor(
+    async () => {
+      // Repeatedly hover over the first step and then the actual step, to force the
+      // `onMouseEnter` handler to keep checking if we have a DOM node entry available.
+      await firstStep.hover({ timeout: 1000 });
+      await stepWithMultipleNodes.hover({ timeout: 1000 });
+      const count = await highlighter.count();
+      await highlighter.first().waitFor({ state: "visible", timeout: 1000 });
+      expect(count).toBe(4);
+    },
+    // Give the evaluation plenty of time to complete
+    { timeout: 30000 }
+  );
+
+  debugPrint(page, "Checking found nodes badge");
+
+  // Badge doesn't show up until the step is selected
+  await stepWithMultipleNodes.click();
+  const badge = stepWithMultipleNodes.locator(`[class*="SelectedBadge"]`);
+  const badgeText = await badge.innerText();
+  expect(badgeText).toBe("4");
 });

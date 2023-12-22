@@ -55,8 +55,9 @@ export default memo(function UserActionEventRow({
   userActionEvent: UserActionEvent;
 }) {
   const { data } = userActionEvent;
-  const { command, error, parentId, timeStampedPoints, resultVariable } = data;
-  const { result: resultTimeStampedPoint } = timeStampedPoints;
+  const testRunnerName = groupedTestCases.environment.testRunner.name;
+  const { command, error, parentId } = data;
+  const resultPoint = userActionEvent.data.timeStampedPoints.result;
 
   const replayClient = useContext(ReplayClientContext);
 
@@ -112,11 +113,7 @@ export default memo(function UserActionEventRow({
     dispatch(jumpToKnownEventListenerHit(onSeek, jumpToCodeAnnotation));
   };
 
-  const showBadge =
-    isSelected &&
-    command.name === "get" &&
-    resultVariable != null &&
-    resultTimeStampedPoint !== null;
+  const showBadge = isSelected && resultPoint !== null;
   const showJumpToCode = (isHovered || isSelected) && canShowJumpToCode;
 
   let jumpToCodeStatus: JumpToCodeStatus = "loading";
@@ -172,7 +169,7 @@ export default memo(function UserActionEventRow({
       </div>
       {showBadge && (
         <Suspense fallback={<Loader />}>
-          <Badge isSelected={isSelected} timeStampedPoint={resultTimeStampedPoint} />
+          <Badge isSelected={isSelected} timeStampedPoint={resultPoint} />
         </Suspense>
       )}
       {showJumpToCode && jumpToCodeAnnotation && (
