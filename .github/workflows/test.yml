@@ -179,7 +179,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: all-code-coverage-reports_${{ matrix.shard }}
+          name: all-code-coverage-reports_auth
           path: packages/e2e-tests/test-results
           retention-days: 3
       - uses: replayio/action-upload@v0.5.1
