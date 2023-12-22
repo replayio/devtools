@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Check out repository code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
     # Get the yarn cache path.
     - name: Get yarn cache directory path
       id: yarn-cache-dir-path

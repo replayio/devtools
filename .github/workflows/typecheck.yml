@@ -6,7 +6,7 @@ jobs:
   typecheck:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       # Get the yarn cache path.
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
@@ -35,7 +35,7 @@ jobs:
     name: GraphQL schema types
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       # Get the yarn cache path.
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path

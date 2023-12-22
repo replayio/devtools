@@ -31,7 +31,7 @@ jobs:
       - name: Download
         run: wget https://static.replay.io/downloads/macOS-replay-playwright.tar.xz
       - name: Create artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: macOS-replay-playwright
           path: macOS-replay-playwright.tar.xz
@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Waiting for 200 from the Vercel Preview
-        uses: patrickedqvist/wait-for-vercel-preview@v1.2.0
+        uses: patrickedqvist/wait-for-vercel-preview@v1
         id: waitFor200
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -73,9 +73,9 @@ jobs:
         shard: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Setup node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           node-version: "16"
       # Get the yarn cache path.
@@ -115,7 +115,7 @@ jobs:
           AUTOMATED_TEST_SECRET: ${{ secrets.AUTOMATED_TEST_SECRET }}
           AUTHENTICATED_TESTS_WORKSPACE_API_KEY: ${{ secrets.AUTHENTICATED_TESTS_WORKSPACE_API_KEY }}
       - name: Archive Playwright report results with code coverage 
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: all-code-coverage-reports_${{ matrix.shard }}
@@ -138,9 +138,9 @@ jobs:
         shard: ["1"]
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Setup node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           node-version: "16"
       # Get the yarn cache path.
@@ -177,7 +177,7 @@ jobs:
           AUTOMATED_TEST_SECRET: ${{ secrets.AUTOMATED_TEST_SECRET }}
           AUTHENTICATED_TESTS_WORKSPACE_API_KEY: ${{ secrets.AUTHENTICATED_TESTS_WORKSPACE_API_KEY }}
       - name: Archive Playwright report results with code coverage 
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: all-code-coverage-reports_${{ matrix.shard }}
@@ -193,9 +193,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Setup node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           node-version: "16"
       # Get the yarn cache path.
@@ -225,9 +225,9 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Setup node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           node-version: "16"
       # Get the yarn cache path.
@@ -250,13 +250,13 @@ jobs:
           YARN_CHECKSUM_BEHAVIOR: "update"
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
       - name: Download all coverage reports from GitHub Actions Artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           path: test-results
       - name: Merge Monocart reports
         run: yarn ts-node packages/e2e-tests/scripts/merge-monocart-reports.ts ./test-results
       - name: Archive merged Playwright report results with code coverage 
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: all-code-coverage-reports-merged
