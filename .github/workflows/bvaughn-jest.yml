@@ -17,11 +17,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Check out repository code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
     # Get the yarn cache path.
     - name: Get yarn cache directory path
       id: yarn-cache-dir-path
-      run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
+      run: echo "{dir}={$(yarn config get cacheFolder)}" >> $GITHUB_OUTPUT
     - name: Restore yarn cache
       uses: actions/cache@v3
       id: yarn-cache

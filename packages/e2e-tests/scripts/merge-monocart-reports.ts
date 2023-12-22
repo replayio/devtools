@@ -64,6 +64,25 @@ const rootFolder = path.posix.join(currentFolder, "../../..");
 
       onEnd: async (reportData: any) => {
         console.log("Coverage generated: ", reportData.summary);
+        const shortSha = process.env.GITHUB_SHA?.substring(0, 7) ?? "(unknown)";
+
+        // TODO Eventually include the uploaded artifact URL:
+        // https://github.com/actions/upload-artifact/issues/50#issuecomment-1856471599
+
+        fs.writeFileSync(
+          "coverageSummary.md",
+          `
+### Coverage Summary (statements)
+
+- Commit: ${shortSha}
+
+\`\`\`json
+${JSON.stringify(reportData.summary.statements, null, 2)}
+\`\`\`
+
+
+`
+        );
       },
 
       reports: [["html"]],
