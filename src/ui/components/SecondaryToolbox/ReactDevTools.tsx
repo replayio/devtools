@@ -1,5 +1,6 @@
 import { ObjectId, Object as ProtocolObject } from "@replayio/protocol";
 import { createBridge, createStore, initialize } from "@replayio/react-devtools-inline/frontend";
+import { bool } from "prop-types";
 import { useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useImperativeCacheValue } from "suspense";
 
@@ -27,7 +28,6 @@ import {
 import { getPreferredLocation } from "ui/reducers/sources";
 import { getRecordingTooLongToSupportRoutines } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector, useAppStore } from "ui/setup/hooks";
-import { UIState } from "ui/state";
 import {
   ParsedReactDevToolsAnnotation,
   reactDevToolsAnnotationsCache,
@@ -92,7 +92,6 @@ const EMPTY_ANNOTATIONS: ParsedReactDevToolsAnnotation[] = [];
 
 export function ReactDevtoolsPanel() {
   const dispatch = useAppDispatch();
-  const store = useAppStore();
   const theme = useTheme();
   const replayClient = useContext(ReplayClientContext);
   const currentPoint = useAppSelector(getExecutionPoint);
@@ -110,6 +109,10 @@ export function ReactDevtoolsPanel() {
   const nodePickerActive =
     (nodePickerStatus === "initializing" || nodePickerStatus === "active") &&
     nodePickerType === "reactComponent";
+
+  // Disable node picker when this component unmounts
+  // It doesn't matter if it's enabled or not (or even if this is the current tool)
+  useLayoutEffect(() => () => disableNodePicker(), [disableNodePicker]);
 
   const isPointWithinFocusWindow = useIsPointWithinFocusWindow(currentPoint);
   const pauseId = useAppSelector(state => state.pause.id);

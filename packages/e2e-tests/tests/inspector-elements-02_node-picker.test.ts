@@ -1,7 +1,7 @@
 import { openDevToolsTab, startTest } from "../helpers";
 import { warpToMessage } from "../helpers/console-panel";
 import {
-  activateInspectorTool,
+  findElementCoordinates,
   getElementsListRow,
   inspectCanvasCoordinates,
   openElementsPanel,
@@ -24,24 +24,23 @@ test(`inspector-elements-02_node-picker: element picker and iframe behavior`, as
   await warpToMessage(page, "ExampleFinished");
 
   await openElementsPanel(page);
-
   await waitForElementsToLoad(page);
 
-  await activateInspectorTool(page);
+  // Click on a DIV element and verify the selection
+  {
+    const { x, y } = await findElementCoordinates(page, 'id="maindiv"');
+    await inspectCanvasCoordinates(page, x, y);
 
-  // Click on the "maindiv" element in the Canvas view; this is x:5%, y:1%
-  await inspectCanvasCoordinates(page, 0.5, 0.017);
+    const selectedRow = await getElementsListRow(page, { isSelected: true });
+    await expect(selectedRow).toContainText('id="maindiv"');
+  }
 
-  // Verify that the currently selected element in the Elements panel is the expected one:
-  let selectedRow = await getElementsListRow(page, { isSelected: true });
-  await expect(selectedRow).toContainText("maindiv");
+  // Click on the content inside of an iframe and verify the selection
+  {
+    const { x, y } = await findElementCoordinates(page, 'id="myiframe"');
+    await inspectCanvasCoordinates(page, x, y);
 
-  await delay(500);
-
-  // Click on the "myiframe" element in the Canvas view; this is x:5%, y:10%
-  await inspectCanvasCoordinates(page, 0.09, 0.12);
-
-  // Verify that the currently selected element in the Elements panel is the expected one:
-  selectedRow = await getElementsListRow(page, { isSelected: true });
-  await expect(selectedRow).toContainText("myiframe");
+    const selectedRow = await getElementsListRow(page, { isSelected: true });
+    await expect(selectedRow).toContainText('id="myiframe"');
+  }
 });

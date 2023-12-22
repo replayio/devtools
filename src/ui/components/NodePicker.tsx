@@ -52,10 +52,11 @@ export function NodePicker() {
 
   return (
     <button
-      id="command-button-pick"
       className={classnames("devtools-button toolbar-panel-button tab", {
         active,
       })}
+      data-status={status}
+      id="command-button-pick"
       onClick={onClick}
       title="Select an element in the video to inspect it"
     />

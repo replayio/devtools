@@ -182,6 +182,7 @@ export function ElementsList({
       {isLoading && <LoadingProgressBar />}
       <GenericList<Item, ElementsListItemData>
         className={styles.List}
+        dataStatus={isLoading ? "loading" : "loaded"}
         dataTestId="ElementsList"
         fallbackForEmptyList={<NoContentFallback />}
         height={height}
