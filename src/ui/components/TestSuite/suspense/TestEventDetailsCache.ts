@@ -289,8 +289,10 @@ async function fetchAndCachePossibleCypressDomNode(
     findProtocolObjectProperty(sanitized, propName)
   );
 
-  // Grab the first one that exists, if any
-  const firstPropWithPotentialElements = propsWithPotentialElements.find(Boolean);
+  // Grab the first prop field that points to some object (DOM node or array).
+  // As an example, if there's `"Yielded": undefined`, we would skip that
+  // and fall back to `"Applied To"` if that has something.
+  const firstPropWithPotentialElements = propsWithPotentialElements.find(prop => prop?.object);
 
   let possibleDomNodes: ProtocolObject[] = [];
 
