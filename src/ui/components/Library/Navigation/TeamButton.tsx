@@ -75,29 +75,24 @@ export function TeamButton({
 }
 
 function TestTeamViews() {
-  const router = useRouter();
   const view = useGetTeamRouteParams().view;
   const { teamId } = useGetTeamRouteParams();
-
-  const setView = (view: View) => {
-    pushRoute(router, `/team/${teamId}/${view}`);
-  };
 
   return (
     <div className="pl-4">
       <div className="flex flex-col">
-        <div
+        <Link
+          href={`/team/${teamId}/runs`}
           className={`py-1 pr-4 pl-6 ${view === "runs" ? "font-bold" : ""} hover:cursor-pointer`}
-          onClick={() => setView("runs")}
         >
           Runs
-        </div>
-        <div
+        </Link>
+        <Link
+          href={`/team/${teamId}/tests`}
           className={`py-1 pr-4 pl-6 ${view === "tests" ? "font-bold" : ""} hover:cursor-pointer`}
-          onClick={() => setView("tests")}
         >
           Tests
-        </div>
+        </Link>
       </div>
     </div>
   );
