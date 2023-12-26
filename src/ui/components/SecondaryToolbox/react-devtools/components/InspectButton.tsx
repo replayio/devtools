@@ -10,7 +10,26 @@ import styles from "./InspectButton.module.css";
 export function InspectButton({ wall }: { wall: ReplayWall }) {
   const { status, type } = useContext(NodePickerContext);
 
-  const isActive = (status === "active" || status === "initializing") && type === "reactComponent";
+  let isActive = false;
+  let didError = false;
+  let state = "inactive";
+  let title = undefined;
+  if (type === "reactComponent") {
+    switch (status) {
+      case "active":
+      case "initializing": {
+        isActive = true;
+        state = "active";
+        break;
+      }
+      case "error": {
+        didError = true;
+        state = "error";
+        title = "Something went wrong initializing this component";
+        break;
+      }
+    }
+  }
 
   const onClick = (event: MouseEvent) => {
     event.preventDefault();
@@ -26,12 +45,18 @@ export function InspectButton({ wall }: { wall: ReplayWall }) {
   return (
     <button
       className={styles.Button}
-      data-state={isActive ? "active" : "inactive"}
+      data-state={state}
       data-test-id="ReactDevTools-InspectButton"
       disabled={wall === null}
       onClick={onClick}
+      title={title}
     >
-      <Icon className={styles.Icon} data-active={isActive || undefined} type="inspect" />
+      <Icon
+        className={styles.Icon}
+        data-active={isActive || undefined}
+        data-errored={didError || undefined}
+        type="inspect"
+      />
     </button>
   );
 }

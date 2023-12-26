@@ -79,6 +79,9 @@ h2 {
 #command-button-pick.active::before {
   background-color: var(--primary-accent);
 }
+#command-button-pick.errored::before {
+  background-color: var(--theme-icon-error-color);
+}
 
 .app-mask {
   height: 100%;

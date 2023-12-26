@@ -1,6 +1,5 @@
 import { ObjectId, Object as ProtocolObject } from "@replayio/protocol";
 import { createBridge, createStore, initialize } from "@replayio/react-devtools-inline/frontend";
-import { bool } from "prop-types";
 import { useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useImperativeCacheValue } from "suspense";
 
@@ -27,7 +26,7 @@ import {
 } from "ui/components/SecondaryToolbox/react-devtools/ReplayWall";
 import { getPreferredLocation } from "ui/reducers/sources";
 import { getRecordingTooLongToSupportRoutines } from "ui/reducers/timeline";
-import { useAppDispatch, useAppSelector, useAppStore } from "ui/setup/hooks";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import {
   ParsedReactDevToolsAnnotation,
   reactDevToolsAnnotationsCache,
