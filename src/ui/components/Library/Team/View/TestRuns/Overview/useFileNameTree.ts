@@ -68,7 +68,7 @@ export function useFileNameTree(testGroup: TestGroup, filterByText: string = "")
           {
             absolutePath: fileName,
             name: test.title,
-            tests: [test],
+            test,
             type: "file",
             nestedRecordingCount: test.executions.reduce(
               (executionTotal, execution) => executionTotal + execution.recordings.length,
@@ -144,7 +144,7 @@ export const treeContainTest = (treeNode: TreeNode[], testId: string) => {
   let containsFile = false;
   treeNode.forEach(node => {
     if (isFileNode(node)) {
-      if (node.tests.some(t => t.testId === testId)) {
+      if (node.test.testId === testId) {
         containsFile = true;
       }
     } else {
@@ -170,7 +170,7 @@ export type PathNode = {
 export type FileNode = {
   absolutePath: string;
   name: string;
-  tests: TestRunTestWithRecordings[];
+  test: TestRunTestWithRecordings;
   type: "file";
   nestedRecordingCount: number;
 };

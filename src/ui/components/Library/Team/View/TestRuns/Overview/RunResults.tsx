@@ -137,7 +137,7 @@ const FileNodeRenderer = memo(function FileNodeRenderer({
   label: string;
   fileNode: FileNode;
 }) {
-  const { name, tests, nestedRecordingCount } = fileNode;
+  const { name, test, nestedRecordingCount } = fileNode;
 
   const [expanded, setExpanded] = useState(true);
 
@@ -163,23 +163,21 @@ const FileNodeRenderer = memo(function FileNodeRenderer({
         )}
       </div>
       <Offscreen mode={expanded ? "visible" : "hidden"}>
-        {tests.flatMap(test =>
-          test.executions
-            .filter(e => e.recordings.length > 0)
-            .flatMap(execution =>
-              execution.recordings.map(recording => (
-                <TestResultListItem
-                  depth={depth + 1}
-                  filterByText={filterByText}
-                  key={recording.id}
-                  label={execution.result}
-                  recording={recording}
-                  test={test}
-                  secondaryBadgeCount={/* index > 0 ? index + 1 : null */ null}
-                />
-              ))
-            )
-        )}
+        {test.executions
+          .filter(e => e.recordings.length > 0)
+          .flatMap(execution =>
+            execution.recordings.map(recording => (
+              <TestResultListItem
+                depth={depth + 1}
+                filterByText={filterByText}
+                key={recording.id}
+                label={execution.result}
+                recording={recording}
+                test={test}
+                secondaryBadgeCount={/* index > 0 ? index + 1 : null */ null}
+              />
+            ))
+          )}
       </Offscreen>
     </>
   );

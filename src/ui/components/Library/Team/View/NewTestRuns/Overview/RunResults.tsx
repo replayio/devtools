@@ -16,7 +16,6 @@ import {
   FileNode,
   PathNode,
   isPathNode,
-  treeContainFile,
   treeContainTest,
   useFileNameTree,
 } from "ui/components/Library/Team/View/TestRuns/Overview/useFileNameTree";
@@ -124,8 +123,8 @@ const FileNodeRenderer = memo(function FileNodeRenderer({
   label: string;
   fileNode: FileNode;
 }) {
-  const { tests } = fileNode;
-  const currentTestId = tests[0].testId;
+  const { test } = fileNode;
+  const currentTestId = test.testId;
   const { setTestId, testId } = useContext(TestRunsContext);
 
   const onClick = () => setTestId(currentTestId);
