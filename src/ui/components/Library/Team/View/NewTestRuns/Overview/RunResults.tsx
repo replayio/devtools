@@ -17,6 +17,7 @@ import {
   PathNode,
   isPathNode,
   treeContainFile,
+  treeContainTest,
   useFileNameTree,
 } from "ui/components/Library/Team/View/TestRuns/Overview/useFileNameTree";
 import FileIcon from "ui/components/shared/Icon";
@@ -123,10 +124,11 @@ const FileNodeRenderer = memo(function FileNodeRenderer({
   label: string;
   fileNode: FileNode;
 }) {
-  const { absolutePath, tests } = fileNode;
-  const { setSpec, spec } = useContext(TestRunsContext);
+  const { tests } = fileNode;
+  const currentTestId = tests[0].testId;
+  const { setTestId, testId } = useContext(TestRunsContext);
 
-  const onClick = () => setSpec(absolutePath);
+  const onClick = () => setTestId(currentTestId);
 
   let iconFilename: string;
   let iconClass: string;
@@ -141,7 +143,7 @@ const FileNodeRenderer = memo(function FileNodeRenderer({
     iconFilename = "testsuites-v2-flaky";
   }
 
-  const isSelected = absolutePath === spec;
+  const isSelected = currentTestId === testId;
 
   return (
     <>
@@ -156,7 +158,7 @@ const FileNodeRenderer = memo(function FileNodeRenderer({
         }}
       >
         <FileIcon className={iconClass} filename={iconFilename} />
-        <div className="truncate">{tests[0].title}</div>
+        <div className="truncate">{fileNode.name}</div>
       </div>
     </>
   );
@@ -175,15 +177,15 @@ function PathNodeRenderer({
 }) {
   const { children, name, pathNames } = pathNode;
   const [expanded, setExpanded] = useState(true);
-  const { spec } = useContext(TestRunsContext);
+  const { testId } = useContext(TestRunsContext);
 
   const containsSelectedSpec = useMemo(() => {
-    if (expanded || !spec) {
+    if (expanded || !testId) {
       return false;
     }
 
-    return treeContainFile(children, spec);
-  }, [children, expanded, spec]);
+    return treeContainTest(children, testId);
+  }, [children, expanded, testId]);
 
   const onClick = () => setExpanded(!expanded);
 

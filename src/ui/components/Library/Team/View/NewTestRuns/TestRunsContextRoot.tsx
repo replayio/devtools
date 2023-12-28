@@ -32,8 +32,8 @@ type TestRunsContextType = {
   testRunCount: number;
   testRunId: string | null;
   testRunIdForDisplay: string | null;
-  spec: string | null;
-  setSpec: React.Dispatch<React.SetStateAction<string | null>>;
+  testId: string | null;
+  setTestId: React.Dispatch<React.SetStateAction<string | null>>;
 };
 
 export const TestRunsContext = createContext<TestRunsContextType>(null as any);
@@ -52,7 +52,7 @@ export function TestRunsContextRoot({ children }: { children: ReactNode }) {
   const filterByTextDeferred = useDeferredValue(filterByText);
   const [filterTestsByText, setFilterTestsByText] = useState("");
 
-  const [spec, setSpec] = useState<string | null>(null);
+  const [testId, setTestId] = useState<string | null>(null);
 
   const router = useRouter();
 
@@ -131,8 +131,8 @@ export function TestRunsContextRoot({ children }: { children: ReactNode }) {
         testRunsLoading: status === STATUS_PENDING,
         testRuns: filteredTestRuns,
         testRunCount: status === STATUS_PENDING ? 0 : testRuns.length,
-        spec,
-        setSpec,
+        testId,
+        setTestId,
       }}
     >
       {children}

@@ -1,9 +1,7 @@
 import { useContext } from "react";
 
-import Icon from "replay-next/components/Icon";
 import { TestRunTestWithRecordings } from "shared/test-suites/TestRun";
 
-import { Alert } from "../shared/Alert";
 import { useTestRunDetailsSuspends } from "../TestRuns/hooks/useTestRunDetailsSuspends";
 import { TestSuitePanelMessage } from "../TestSuitePanelMessage";
 import { TestRunPanelWrapper } from "./TestRunPanelWrapper";
@@ -11,21 +9,21 @@ import { TestRunResultList } from "./TestRunResultList";
 import { TestRunsContext } from "./TestRunsContextRoot";
 
 export function TestRunSpecDetails() {
-  const { spec, filterTestsByText } = useContext(TestRunsContext);
+  const { testId, filterTestsByText } = useContext(TestRunsContext);
   const { testRunId, testRuns } = useContext(TestRunsContext);
 
-  const { groupedTests, tests, testRun } = useTestRunDetailsSuspends(testRunId);
+  const { groupedTests, tests } = useTestRunDetailsSuspends(testRunId);
   const selectedSpecTests =
     // Select tests that not filtered in second panel
     tests
       ?.filter(
         t => filterTestsByText === "" || t.sourcePath.toLowerCase().includes(filterTestsByText)
       )
-      ?.filter((t: any) => t.sourcePath === spec) ?? [];
+      ?.filter(t => t.testId === testId) ?? [];
   const selectedTest = selectedSpecTests?.[0];
 
   if (
-    !spec ||
+    !testId ||
     groupedTests === null ||
     selectedTest == null ||
     !testRuns.some(t => t.id === testRunId)
