@@ -4,9 +4,9 @@ import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import { isUserActionTestEvent } from "shared/test-suites/RecordingTestMetadata";
 import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext";
 
-import { CypressUserActionEventDetails } from "./CypressUserActionEventDetails";
-import { PlaywrightUserActionEventDetails } from "./PlaywrightUserActionEventDetails";
-import { LoadingFailedMessage } from "./TestEventLoadingMessages";
+import { CypressUserActionEventDetails } from "./TestEventStepDetails/CypressUserActionEventDetails";
+import { PlaywrightUserActionEventDetails } from "./TestEventStepDetails/PlaywrightUserActionEventDetails";
+import { LoadingFailedMessage } from "./TestEventStepDetails/TestEventDetailsLoadingMessages";
 import styles from "./TestEventDetails.module.css";
 
 export default function TestEventDetails({ collapsed }: { collapsed: boolean }) {

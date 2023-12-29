@@ -7,7 +7,7 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { UserActionEvent } from "shared/test-suites/RecordingTestMetadata";
 import { TestSuiteCache } from "ui/components/TestSuite/suspense/TestSuiteCache";
 
-import { LoadingFailedMessage } from "./TestEventLoadingMessages";
+import { LoadingFailedMessage } from "./TestEventDetailsLoadingMessages";
 import styles from "./TestEventDetails.module.css";
 
 export function PlaywrightUserActionEventDetails({ testEvent }: { testEvent: UserActionEvent }) {

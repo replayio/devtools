@@ -10,7 +10,7 @@ import {
   testEventDetailsResultsCache,
 } from "ui/components/TestSuite/suspense/TestEventDetailsCache";
 
-import { LoadingFailedMessage, LoadingInProgress } from "./TestEventLoadingMessages";
+import { LoadingFailedMessage, LoadingInProgress } from "./TestEventDetailsLoadingMessages";
 import styles from "./TestEventDetails.module.css";
 
 export function CypressUserActionEventDetails({ testEvent }: { testEvent: UserActionEvent }) {
