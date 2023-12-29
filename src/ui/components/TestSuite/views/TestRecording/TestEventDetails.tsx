@@ -16,23 +16,19 @@ export default function TestEventDetails({ collapsed }: { collapsed: boolean }) 
     return null;
   } else if (testEvent == null || !isUserActionTestEvent(testEvent)) {
     return <SelectionPrompt />;
-  } else if (testEvent.data.testSourceCallStack !== null) {
-    return (
-      <PlaywrightUserActionEventDetails
-        key={testEvent.data.id}
-        stack={testEvent.data.testSourceCallStack}
-      />
-    );
-  } else if (!testEvent.data.resultVariable || !testEvent.data.timeStampedPoints.result) {
+  } else if (!testEvent.data.timeStampedPoints.result) {
     return <LoadingFailedMessage />;
   }
 
+  const { testRunnerName } = testEvent.data;
+  const UserEventDetailsComponent =
+    testRunnerName === "playwright"
+      ? PlaywrightUserActionEventDetails
+      : CypressUserActionEventDetails;
+
   return (
     <ErrorBoundary name="TestEventDetails">
-      <CypressUserActionEventDetails
-        timeStampedPoint={testEvent.data.timeStampedPoints.result}
-        variable={testEvent.data.resultVariable}
-      />
+      <UserEventDetailsComponent testEvent={testEvent} />
     </ErrorBoundary>
   );
 }

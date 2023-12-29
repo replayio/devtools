@@ -4,24 +4,26 @@ import { SyntaxHighlighter } from "replay-next/components/SyntaxHighlighter/Synt
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { ParsedToken, parsedTokensToHtml } from "replay-next/src/utils/syntax-parser";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { UserActionEventStack } from "shared/test-suites/RecordingTestMetadata";
+import { UserActionEvent } from "shared/test-suites/RecordingTestMetadata";
 import { TestSuiteCache } from "ui/components/TestSuite/suspense/TestSuiteCache";
 
+import { LoadingFailedMessage } from "./TestEventLoadingMessages";
 import styles from "./TestEventDetails.module.css";
 
-export function PlaywrightUserActionEventDetails({ stack }: { stack: UserActionEventStack }) {
+export function PlaywrightUserActionEventDetails({ testEvent }: { testEvent: UserActionEvent }) {
   const replayClient = useContext(ReplayClientContext);
   const { recordingId } = useContext(SessionContext);
 
   const [stackFrameIndex, setStackFrameIndex] = useState(0);
 
-  let topFrame = stack[stackFrameIndex];
+  const stack = testEvent.data.testSourceCallStack;
+  let topFrame = stack?.[stackFrameIndex];
   let sourceCode: string | null = null;
 
   const lineRenderer = useCallback(
     ({ lineNumber, tokens }: { lineNumber: number; tokens: ParsedToken[] }) => (
       <SyntaxHighlighterLine
-        isSelected={topFrame.lineNumber === lineNumber}
+        isSelected={topFrame?.lineNumber === lineNumber}
         key={lineNumber}
         tokens={tokens}
       />
@@ -36,19 +38,15 @@ export function PlaywrightUserActionEventDetails({ stack }: { stack: UserActionE
     }
   }
 
-  if (!sourceCode) {
-    return (
-      <div className={styles.Message} data-test-name="TestEventDetailsMessage">
-        Unable to display details for this step
-      </div>
-    );
+  if (!sourceCode || !stack) {
+    return <LoadingFailedMessage />;
   }
 
   return (
     <div className={styles.UserActionEventDetails} data-test-name="UserActionEventDetails">
       <div className={styles.DetailsTitle}>Call stack</div>
       <div className={styles.CallStack}>
-        {stack.map((frame, index) => (
+        {stack?.map((frame, index) => (
           <div
             key={index}
             className={styles.StackFrame}

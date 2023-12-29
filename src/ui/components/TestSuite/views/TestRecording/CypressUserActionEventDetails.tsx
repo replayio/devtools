@@ -4,6 +4,7 @@ import { Cache, STATUS_PENDING, useImperativeCacheValue } from "suspense";
 
 import PropertiesRenderer from "replay-next/components/inspector/PropertiesRenderer";
 import { InspectableTimestampedPointContext } from "replay-next/src/contexts/InspectorContext";
+import { UserActionEvent } from "shared/test-suites/RecordingTestMetadata";
 import {
   TestEventDetailsEntry,
   testEventDetailsResultsCache,
@@ -12,13 +13,9 @@ import {
 import { LoadingFailedMessage, LoadingInProgress } from "./TestEventLoadingMessages";
 import styles from "./TestEventDetails.module.css";
 
-export function CypressUserActionEventDetails({
-  timeStampedPoint,
-  variable,
-}: {
-  timeStampedPoint: TimeStampedPoint;
-  variable: string;
-}) {
+export function CypressUserActionEventDetails({ testEvent }: { testEvent: UserActionEvent }) {
+  // Parent ensures this exists
+  const timeStampedPoint = testEvent.data.timeStampedPoints.result!;
   const { status, value } = useImperativeCacheValue(
     testEventDetailsResultsCache as unknown as Cache<
       [executionPoint: ExecutionPoint],
