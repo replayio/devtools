@@ -118,6 +118,7 @@ jobs:
           RECORD_REPLAY_TEST_METRICS: 1
           AUTOMATED_TEST_SECRET: ${{ secrets.AUTOMATED_TEST_SECRET }}
           AUTHENTICATED_TESTS_WORKSPACE_API_KEY: ${{ secrets.AUTHENTICATED_TESTS_WORKSPACE_API_KEY }}
+          GOLDEN_TEST_RUN_WORKSPACE_API_KEY: ${{ secrets.GOLDEN_TEST_RUN_WORKSPACE_API_KEY }}
   authenticated-e2etest:
     name: Authenticated end-to-end tests (${{ matrix.shard }})
     runs-on: ubuntu-latest
@@ -172,6 +173,7 @@ jobs:
           RECORD_REPLAY_TEST_METRICS: 1
           AUTOMATED_TEST_SECRET: ${{ secrets.AUTOMATED_TEST_SECRET }}
           AUTHENTICATED_TESTS_WORKSPACE_API_KEY: ${{ secrets.AUTHENTICATED_TESTS_WORKSPACE_API_KEY }}
+          GOLDEN_TEST_RUN_WORKSPACE_API_KEY: ${{ secrets.GOLDEN_TEST_RUN_WORKSPACE_API_KEY }}
   e2etest-jail:
     name: End-to-end tests - Jail
     runs-on: ubuntu-latest
@@ -219,6 +221,7 @@ jobs:
           RECORD_REPLAY_TEST_METRICS: 1
           AUTOMATED_TEST_SECRET: ${{ secrets.AUTOMATED_TEST_SECRET }}
           AUTHENTICATED_TESTS_WORKSPACE_API_KEY: ${{ secrets.AUTHENTICATED_TESTS_WORKSPACE_API_KEY }}
+          GOLDEN_TEST_RUN_WORKSPACE_API_KEY: ${{ secrets.GOLDEN_TEST_RUN_WORKSPACE_API_KEY }}
   unit-test:
     name: Unit Tests
     runs-on: ubuntu-latest

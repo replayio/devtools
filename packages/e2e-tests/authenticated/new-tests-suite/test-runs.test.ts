@@ -1,10 +1,12 @@
-import test, { Page, expect } from "@playwright/test";
-
 import { startLibraryTest } from "../../helpers";
-import { TEMP_USER_API_KEY, TEMP_USER_TEAM_ID } from "../../helpers/authentication";
+import {
+  TEST_RUN_WORKSPACE_API_KEY,
+  TEST_RUN_WORKSPACE_TEAM_ID,
+} from "../../helpers/authentication";
 import { openContextMenu } from "../../helpers/console-panel";
 import { selectContextMenuItem } from "../../helpers/context-menu";
 import { debugPrint } from "../../helpers/utils";
+import test, { Page, expect } from "../../testFixtureTestRuns";
 
 const noTestRunsMessage = (page: Page) => page.locator('[data-test-id="NoTestRuns"]');
 const noTestRunSelectedMessage = (page: Page) => page.locator('[data-test-id="NoTestRunSelected"]');
@@ -27,12 +29,10 @@ const filterTestsByText = async (page: Page, text: string) => {
   await page.fill("data-test-id=TestRunSummary-Filter", text);
 };
 
-//TODO:
-// - Figure out a way to make sure we always have same test runs available. Right now what we are using will go away in 7 days.
-// - Move that test run to golden workspace
+test.use({ testRunState: "SINGLE_TEST" });
 
-test(`authenticated/new-test-suites/test-runs`, async ({ page }) => {
-  await startLibraryTest(page, TEMP_USER_API_KEY, TEMP_USER_TEAM_ID, "test-runs");
+test(`authenticated/new-test-suites/test-runs`, async ({ pageWithMeta: { page, clientKey } }) => {
+  await startLibraryTest(page, TEST_RUN_WORKSPACE_API_KEY, TEST_RUN_WORKSPACE_TEAM_ID);
   expect(await testRunsItems(page).count()).not.toBe(0);
 
   //#region > Test runs list
@@ -47,14 +47,12 @@ test(`authenticated/new-test-suites/test-runs`, async ({ page }) => {
   //#endregion
 
   //#region >>> Filter search result - specific result
-  await filterRunsByText(page, "fmt again.");
+  await filterRunsByText(page, clientKey);
 
   expect(await testRunsItems(page).count()).toBe(1);
   const testItem = testRunsItems(page).first();
-  expect(await testItem.innerText()).toContain("fmt again.");
+  expect(await testItem.innerText()).toContain(clientKey);
   expect(await noTestRunsMessage(page).count()).toBe(0);
-  expect(await noTestRunSelectedMessage(page).count()).toBe(1);
-  expect(await noTestSelected(page).count()).toBe(1);
   await filterRunsByText(page, "");
   //#endregion
 
@@ -64,7 +62,7 @@ test(`authenticated/new-test-suites/test-runs`, async ({ page }) => {
   await selectContextMenuItem(page, {
     contextMenuItemTestId: "show-only-primary-branch",
   });
-  await filterRunsByText(page, "fmt again.");
+  await filterRunsByText(page, clientKey);
   expect(await testRunsItems(page).count()).toBe(0);
   await filterRunsByText(page, "");
   await openContextMenu(branchDropdown, { useLeftClick: true });
@@ -81,7 +79,7 @@ test(`authenticated/new-test-suites/test-runs`, async ({ page }) => {
   //#region > Selected test run
 
   //#region >>> Opens test run overview
-  await filterRunsByText(page, "fmt again.");
+  await filterRunsByText(page, clientKey);
 
   expect(await testRunsItems(page).count()).toBe(1);
   testRunsItems(page).first().click();
@@ -89,15 +87,13 @@ test(`authenticated/new-test-suites/test-runs`, async ({ page }) => {
   expect(await noTestSelected(page).count()).toBe(1);
 
   expect(await testRunSummary(page).count()).toBe(1);
-  expect(await testRunSummary(page).innerText()).toContain("fmt again.");
+  expect(await testRunSummary(page).innerText()).toContain(clientKey);
   //#endregion
 
   //#region >>> Filter test by text
-  await filterTestsByText(page, "logpoints-03_chromium");
+  await filterTestsByText(page, clientKey);
   expect(await testItems(page).count()).toBe(1);
-  expect(await testItems(page).innerText()).toContain(
-    "logpoints-03_chromium: should display event properties in the console"
-  );
+  expect(await testItems(page).innerText()).toContain("The one and only test");
   await filterTestsByText(page, "");
   //#endregion
 
@@ -109,14 +105,18 @@ test(`authenticated/new-test-suites/test-runs`, async ({ page }) => {
   await selectContextMenuItem(page, {
     contextMenuItemTestId: "failed-and-flaky",
   });
-  expect(await testItems(page).count()).toBe(3);
+  expect(await testItems(page).count()).toBe(0);
+  await openContextMenu(statusDropdown, { useLeftClick: true });
+  await selectContextMenuItem(page, {
+    contextMenuItemTestId: "all",
+  });
   //#endregion
 
   //#region >>> Replays and errors
   testItems(page).first().click();
   await page.waitForSelector('[data-test-id="NoTestSelected"]', { state: "detached" });
-  expect(await testRecordings(page).count()).toBe(4);
-  expect(await testErrors(page).count()).toBe(4);
+  expect(await testRecordings(page).count()).toBe(1);
+  expect(await testErrors(page).count()).toBe(0);
   //#endregion
 
   //#endregion
