@@ -147,6 +147,7 @@ export function SelectedElement({
             className={styles.IconButton}
             onClick={viewComponentSource}
             title="Jump to definition"
+            data-test-name="ReactDevTools-JumpToComponentSource"
           >
             <Icon className={styles.Icon} type="view-component-source" />
           </button>
