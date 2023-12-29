@@ -5,7 +5,11 @@ import { insert, insertString } from "replay-next/src/utils/array";
 import { TestRunTestWithRecordings } from "shared/test-suites/TestRun";
 import { TestGroup } from "ui/utils/testRuns";
 
-export function useFileNameTree(testGroup: TestGroup, filterByText: string = "") {
+export function useFileNameTree(
+  testGroup: TestGroup,
+  filterByText: string = "",
+  searchTitle = false
+) {
   const { fileNameToTests } = testGroup;
 
   filterByText = filterByText.toLowerCase();
@@ -13,7 +17,12 @@ export function useFileNameTree(testGroup: TestGroup, filterByText: string = "")
   const tree = useMemo<Tree>(() => {
     const sortedFileNames: string[] = [];
     for (let fileName in fileNameToTests) {
-      if (filterByText === "" || fileName.toLowerCase().includes(filterByText)) {
+      if (
+        filterByText === "" ||
+        fileName.toLowerCase().includes(filterByText) ||
+        (searchTitle &&
+          fileNameToTests[fileName].some(test => test.title.toLowerCase().includes(filterByText)))
+      ) {
         insertString(sortedFileNames, fileName);
       }
     }
