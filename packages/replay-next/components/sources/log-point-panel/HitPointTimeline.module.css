@@ -47,7 +47,7 @@
   cursor: default;
 }
 .HitPointButton {
-  background-color: var(--color-brand);
+  background-color: var(--primary-accent);
   z-index: 2;
   cursor: pointer;
 }
@@ -61,7 +61,7 @@
   position: absolute;
   left: 0;
   height: 0.25rem;
-  background-color: var(--color-brand);
+  background-color: var(--primary-accent);
   border-radius: 0.25rem;
 }
 .ProgressBarPartiallyOpaque {

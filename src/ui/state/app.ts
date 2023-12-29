@@ -80,7 +80,6 @@ export type NodePickerStatus = "disabled" | "initializing" | "active";
 
 export interface AppState {
   accessToken: string | null;
-  activeNodePicker: NodePickerType | null;
   awaitingSourcemaps: boolean;
   canvas: Canvas | null;
   defaultSelectedReactElementId: number | null;
@@ -91,11 +90,9 @@ export interface AppState {
   hoveredCommentId: string | null;
   loading: number;
   loadingFinished: boolean;
-  nodePickerStatus: NodePickerStatus;
   modal: ModalType | null;
   modalOptions: ModalOptionsType;
   mode: AppMode;
-  mouseTargetsLoading: boolean;
   recordingId: string | null;
   recordingTarget: RecordingTarget | null;
   recordingWorkspace: Workspace | null;

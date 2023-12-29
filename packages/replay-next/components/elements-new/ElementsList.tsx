@@ -26,6 +26,9 @@ import { ElementsListItem, ElementsListItemData, ITEM_SIZE } from "./ElementsLis
 import styles from "./ElementList.module.css";
 
 export type ImperativeHandle = {
+  selectIndex(index: number | null): Promise<void>;
+
+  // TODO [FE-2133] We can remove this API once Gecko support is removed
   selectNode(nodeId: ObjectId | null): Promise<void>;
 };
 
@@ -93,6 +96,12 @@ export function ElementsList({
   useImperativeHandle(
     forwardedRef,
     () => ({
+      async selectIndex(index: number | null) {
+        await listData.waitUntilLoaded();
+        listData.setSelectedIndex(index);
+      },
+
+      // TODO [FE-2133] We can remove this API once Gecko support is removed
       async selectNode(nodeId: ObjectId | null) {
         await listData.waitUntilLoaded();
         listData.selectNode(nodeId);
@@ -173,6 +182,7 @@ export function ElementsList({
       {isLoading && <LoadingProgressBar />}
       <GenericList<Item, ElementsListItemData>
         className={styles.List}
+        dataStatus={isLoading ? "loading" : "loaded"}
         dataTestId="ElementsList"
         fallbackForEmptyList={<NoContentFallback />}
         height={height}

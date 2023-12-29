@@ -85,7 +85,7 @@ html[dir="rtl"] .editor-mount {
 .editor-wrapper .editor-mount {
   width: 100%;
   background-color: var(--body-bgcolor);
-  font-size: var(--theme-code-font-size);
+  font-size: var(--font-size-regular-monospace);
   line-height: var(--theme-code-line-height);
 }
 

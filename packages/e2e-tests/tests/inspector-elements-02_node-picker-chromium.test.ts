@@ -2,6 +2,7 @@ import { openDevToolsTab, startTest } from "../helpers";
 import { warpToMessage } from "../helpers/console-panel";
 import {
   activateInspectorTool,
+  findElementCoordinates,
   getElementsListRow,
   inspectCanvasCoordinates,
   openElementsPanel,
@@ -12,7 +13,7 @@ import test, { expect } from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "doc_inspector_basic_chromium.html" });
 
-test(`inspector-elements-02_node-picker: element picker and iframe behavior`, async ({
+test(`inspector-elements-02-chromium: element picker and iframe behavior`, async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
@@ -24,24 +25,23 @@ test(`inspector-elements-02_node-picker: element picker and iframe behavior`, as
   await warpToMessage(page, "ExampleFinished");
 
   await openElementsPanel(page);
-
   await waitForElementsToLoad(page);
 
-  // Click on the "maindiv" element in the Canvas view
-  // Note these % values come from console logs in the recording
-  await inspectCanvasCoordinates(page, 0.5, 0.017);
+  // Click on a DIV element and verify the selection
+  {
+    const { x, y } = await findElementCoordinates(page, 'id="maindiv"');
+    await inspectCanvasCoordinates(page, x, y);
 
-  // Verify that the currently selected element in the Elements panel is the expected one:
-  let selectedRow = await getElementsListRow(page, { isSelected: true });
-  await expect(selectedRow).toContainText("maindiv");
+    const selectedRow = await getElementsListRow(page, { isSelected: true });
+    await expect(selectedRow).toContainText('id="maindiv"');
+  }
 
-  await delay(500);
+  // Click on the content inside of an iframe and verify the selection
+  {
+    const { x, y } = await findElementCoordinates(page, 'data-test-id="inner-body"');
+    await inspectCanvasCoordinates(page, x, y);
 
-  // Click on the "myiframe" element in the Canvas view
-  // Note these % values come from console logs in the recording
-  await inspectCanvasCoordinates(page, 0.09, 0.12);
-
-  // Verify that the currently selected element in the Elements panel is the expected one:
-  selectedRow = await getElementsListRow(page, { isSelected: true });
-  await expect(selectedRow).toContainText('data-test-id="inner-body"');
+    const selectedRow = await getElementsListRow(page, { isSelected: true });
+    await expect(selectedRow).toContainText('data-test-id="inner-body"');
+  }
 });

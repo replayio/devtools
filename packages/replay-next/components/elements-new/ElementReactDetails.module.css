@@ -15,14 +15,14 @@
   color: var(--tab-color);
   border-top: 0.25rem solid var(--chrome);
   font-family: var(--monospace-font-family);
-  font-size: var(--theme-code-font-size);
+  font-size: var(--font-size-regular-monospace);
 }
 .Details:hover .ComponentName {
   text-decoration: underline;
 }
 
 .ComponentName {
-  color: var(--color-brand-react);
+  color: var(--primary-accent-react);
 }
 
 .ReactIcon,
@@ -32,5 +32,5 @@
   height: 1rem;
 }
 .ReactIcon {
-  color: var(--color-brand-react);
+  color: var(--primary-accent-react);
 }

@@ -1,3 +1,5 @@
+import { addCoverageReport } from "monocart-reporter";
+
 import { openDevToolsTab, startTest } from "../helpers";
 import { E2E_USER_1_API_KEY, E2E_USER_2_API_KEY } from "../helpers/authentication";
 import { disableAllConsoleMessageTypes, verifyConsoleMessage } from "../helpers/console-panel";
@@ -10,22 +12,27 @@ import {
 import { openSource } from "../helpers/source-explorer-panel";
 import { addLogpoint, editLogPoint, removeAllLogpoints } from "../helpers/source-panel";
 import { waitForRecordingToFinishIndexing } from "../helpers/utils";
-import test, { Page, expect } from "../testFixtureCloneRecording";
+import test, { Page, base, expect } from "../testFixtureCloneRecording";
 
-// Each authenticated e2e test must use a unique recording id;
-// else shared state from one test could impact another test running in parallel.
-// TODO [SCS-1066] Share recordings between other tests
-const url = "authenticated_logpoints_1.html";
+const url = "authenticated_logpoints.html";
 const lineNumber = 14;
 
 async function load(page: Page, recordingId: string, apiKey: string) {
   await startTest(page, recordingId, apiKey);
+  await page.coverage.startJSCoverage();
 
   await openDevToolsTab(page);
   await openSource(page, url);
   await openPauseInformationPanel(page);
 
   await disableAllConsoleMessageTypes(page);
+}
+
+async function close(page: Page) {
+  const jsCoverage = await page.coverage.stopJSCoverage();
+
+  await addCoverageReport(jsCoverage, base.info());
+  await page.close();
 }
 
 test.use({ exampleKey: url });
@@ -110,8 +117,6 @@ test(`authenticated/logpoints-01: Shared logpoints functionality`, async ({
 
     // Point should show updated content
     await verifyConsoleMessage(page, "updated:", "log-point", 10);
-
-    await page.close();
   }
 
   {
@@ -122,7 +127,10 @@ test(`authenticated/logpoints-01: Shared logpoints functionality`, async ({
 
     // Cleanup
     await removeAllLogpoints(page);
+  }
 
-    await page.close();
+  {
+    await close(pageOne);
+    await close(pageTwo);
   }
 });

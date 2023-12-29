@@ -31,12 +31,10 @@ const Vertical = ({ toolboxLayout }: { toolboxLayout: ToolboxLayout }) => {
   useLayoutEffect(() => {
     const videoPanel = videoPanelRef.current;
     if (videoPanel) {
-      if (videoPanel.isCollapsed() !== videoPanelCollapsed) {
-        if (videoPanelCollapsed) {
-          videoPanel.collapse();
-        } else {
-          videoPanel.expand();
-        }
+      if (videoPanelCollapsed) {
+        videoPanel.collapse();
+      } else {
+        videoPanel.expand();
       }
     }
   }, [videoPanelCollapsed]);

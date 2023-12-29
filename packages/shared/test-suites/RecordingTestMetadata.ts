@@ -257,6 +257,8 @@ export namespace RecordingTestMetadataV3 {
       // Used to associate chained commands
       parentId: string | null;
 
+      testRunnerName: TestRunnerName;
+
       // This value comes from annotations and so is only available for Cypress tests (for now)
       resultVariable: string | null;
 
@@ -515,12 +517,16 @@ export async function processCypressTestRecording(
                     time: annotation.time,
                   };
 
-                  resultPoint = {
-                    point: annotation.point,
-                    time: annotation.time,
-                  };
-
                   resultVariable = annotation.message.logVariable ?? null;
+
+                  if (resultVariable) {
+                    // Cypress commands have a `resultVariable` field that we need to find the
+                    // right step details object at the given `result` point.
+                    resultPoint = {
+                      point: annotation.point,
+                      time: annotation.time,
+                    };
+                  }
                   break;
                 }
                 case "step:enqueue": {
@@ -570,6 +576,7 @@ export async function processCypressTestRecording(
                 error,
                 id,
                 parentId,
+                testRunnerName: "cypress",
                 resultVariable,
                 scope,
                 testSourceCallStack: null,
@@ -859,6 +866,22 @@ export async function processPlaywrightTestRecording(
           };
         }
 
+        let afterStep: TimeStampedPoint | null = timeStampedPointRange?.end ?? null;
+        let beforeStep: TimeStampedPoint | null = timeStampedPointRange?.begin ?? null;
+        let resultPoint: TimeStampedPoint | null = null;
+
+        if (category === "command" && beforeStep) {
+          // Playwright commands have a "command" category. We'll only look for
+          // steps that have a `locator.something()` command and a locator string arg.
+          if (
+            command.name.startsWith("locator") &&
+            command.arguments.length > 0 &&
+            command.arguments[0].length > 0
+          ) {
+            resultPoint = beforeStep;
+          }
+        }
+
         testEvents.push({
           data: {
             category,
@@ -866,6 +889,7 @@ export async function processPlaywrightTestRecording(
             error,
             id,
             parentId,
+            testRunnerName: "playwright",
             resultVariable: null,
             scope,
             testSourceCallStack: stack
@@ -877,9 +901,9 @@ export async function processPlaywrightTestRecording(
                 }))
               : null,
             timeStampedPoints: {
-              afterStep: timeStampedPointRange?.end ?? null,
-              beforeStep: timeStampedPointRange?.begin ?? null,
-              result: null,
+              afterStep,
+              beforeStep,
+              result: resultPoint,
               viewSource: null,
             },
           },

@@ -14,7 +14,7 @@
   margin-bottom: 0.25rem;
 }
 .TopRow:focus-within {
-  border-color: var(--color-brand);
+  border-color: var(--primary-accent);
 }
 
 .Icon {
