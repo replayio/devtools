@@ -15,7 +15,6 @@ import { TerminalContextRoot } from "replay-next/src/contexts/TerminalContext";
 import { TimelineContext, TimelineContextRoot } from "replay-next/src/contexts/TimelineContext";
 import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { NodePickerContextRoot } from "ui/components/NodePickerContext";
 
 import createTest from "./utils/createTest";
 import styles from "./styles.module.css";
@@ -106,11 +105,9 @@ function Root() {
           <TimelineContextRoot>
             <SelectedFrameContextRoot>
               <FocusContextRoot>
-                <NodePickerContextRoot>
-                  <TerminalContextRoot>
-                    <Elements />
-                  </TerminalContextRoot>
-                </NodePickerContextRoot>
+                <TerminalContextRoot>
+                  <Elements />
+                </TerminalContextRoot>
               </FocusContextRoot>
             </SelectedFrameContextRoot>
           </TimelineContextRoot>

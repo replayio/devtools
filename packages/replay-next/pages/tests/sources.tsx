@@ -5,7 +5,6 @@ import { KeyboardModifiersContextRoot } from "replay-next/src/contexts/KeyboardM
 import { PointsContextRoot } from "replay-next/src/contexts/points/PointsContext";
 import { SourcesContextRoot } from "replay-next/src/contexts/SourcesContext";
 import { TimelineContextRoot } from "replay-next/src/contexts/TimelineContext";
-import { NodePickerContextRoot } from "ui/components/NodePickerContext";
 
 import createTest from "./utils/createTest";
 import styles from "./styles.module.css";
@@ -19,16 +18,14 @@ function Source() {
         <PointsContextRoot>
           <TimelineContextRoot>
             <FocusContextRoot>
-              <NodePickerContextRoot>
-                <div className={styles.Grid2Columns}>
-                  <div className={styles.VerticalContainer}>
-                    <SourceExplorer />
-                  </div>
-                  <div className={styles.VerticalContainer}>
-                    <Sources />
-                  </div>
+              <div className={styles.Grid2Columns}>
+                <div className={styles.VerticalContainer}>
+                  <SourceExplorer />
                 </div>
-              </NodePickerContextRoot>
+                <div className={styles.VerticalContainer}>
+                  <Sources />
+                </div>
+              </div>
             </FocusContextRoot>
           </TimelineContextRoot>
         </PointsContextRoot>

@@ -23,7 +23,6 @@ import { TimelineContextRoot } from "replay-next/src/contexts/TimelineContext";
 import usePreferredColorScheme from "replay-next/src/hooks/usePreferredColorScheme";
 import { ReplayNextCurrentPanel } from "shared/user-data/LocalStorage/config";
 import useLocalStorageUserData from "shared/user-data/LocalStorage/useLocalStorageUserData";
-import { NodePickerContextRoot } from "ui/components/NodePickerContext";
 
 import styles from "./index.module.css";
 
@@ -65,107 +64,103 @@ export default function HomePage({ apiKey }: { apiKey?: string }) {
             <PointsContextRoot>
               <TimelineContextRoot>
                 <FocusContextRoot>
-                  <NodePickerContextRoot>
-                    <SelectedFrameContextRoot>
-                      <div className={styles.VerticalContainer}>
-                        <div className={styles.HorizontalContainer}>
-                          <div className={styles.ToolBar}>
-                            <button
-                              className={panel === "comments" ? styles.TabSelected : styles.Tab}
-                              data-test-id="TabButton-Comments"
-                              disabled={isPending}
-                              onClick={() => setPanelTransition("comments")}
-                            >
-                              <Icon className={styles.TabIcon} type="comments" />
-                            </button>
-                            <button
-                              className={panel === "sources" ? styles.TabSelected : styles.Tab}
-                              data-test-id="TabButton-Sources"
-                              disabled={isPending}
-                              onClick={() => setPanelTransition("sources")}
-                            >
-                              <Icon className={styles.TabIcon} type="source-explorer" />
-                            </button>
-                            <button
-                              className={panel === "search" ? styles.TabSelected : styles.Tab}
-                              data-test-id="TabButton-Search"
-                              disabled={isPending}
-                              onClick={() => setPanelTransition("search")}
-                            >
-                              <Icon className={styles.TabIcon} type="search" />
-                            </button>
-                            <button
-                              className={
-                                panel === "protocol-viewer" ? styles.TabSelected : styles.Tab
-                              }
-                              data-test-id="TabButton-ProtocolViewer"
-                              disabled={isPending}
-                              onClick={() => setPanelTransition("protocol-viewer")}
-                            >
-                              <Icon className={styles.TabIcon} type="protocol-viewer" />
-                            </button>
-                          </div>
-                          <div className={styles.PanelGroup}>
-                            <PanelGroup autoSaveId="bvaughn-layout-main" direction="horizontal">
-                              <Panel
-                                className={styles.Panel}
-                                collapsible
-                                defaultSize={15}
-                                minSize={10}
-                                maxSize={20}
-                              >
-                                <div className={styles.CommentsContainer}>
-                                  <Suspense fallback={<Loader />}>
-                                    <LazyOffscreen
-                                      mode={panel == "comments" ? "visible" : "hidden"}
-                                    >
-                                      <CommentList />
-                                    </LazyOffscreen>
-                                    <LazyOffscreen
-                                      mode={panel == "protocol-viewer" ? "visible" : "hidden"}
-                                    >
-                                      <ProtocolViewer />
-                                    </LazyOffscreen>
-                                    <LazyOffscreen mode={panel == "search" ? "visible" : "hidden"}>
-                                      <SearchFiles />
-                                    </LazyOffscreen>
-                                    <LazyOffscreen mode={panel == "sources" ? "visible" : "hidden"}>
-                                      <SourceExplorer />
-                                    </LazyOffscreen>
-                                  </Suspense>
-                                </div>
-                              </Panel>
-                              <PanelResizeHandle className={styles.PanelResizeHandle}>
-                                <div className={styles.PanelResizeHandleInner} />
-                              </PanelResizeHandle>
-                              <Panel className={styles.Panel} defaultSize={50} minSize={35}>
-                                <div className={styles.SourcesContainer}>
-                                  <Suspense fallback={<Loader />}>
-                                    <Sources />
-                                  </Suspense>
-                                </div>
-                              </Panel>
-                              <PanelResizeHandle className={styles.PanelResizeHandle}>
-                                <div className={styles.PanelResizeHandleInner} />
-                              </PanelResizeHandle>
-                              <Panel className={styles.Panel} defaultSize={35} minSize={25}>
-                                <div className={styles.ConsoleContainer}>
-                                  <TerminalContextRoot>
-                                    <ConsoleRoot showSearchInputByDefault={false} />
-                                  </TerminalContextRoot>
-                                </div>
-                              </Panel>
-                            </PanelGroup>
-                          </div>
+                  <SelectedFrameContextRoot>
+                    <div className={styles.VerticalContainer}>
+                      <div className={styles.HorizontalContainer}>
+                        <div className={styles.ToolBar}>
+                          <button
+                            className={panel === "comments" ? styles.TabSelected : styles.Tab}
+                            data-test-id="TabButton-Comments"
+                            disabled={isPending}
+                            onClick={() => setPanelTransition("comments")}
+                          >
+                            <Icon className={styles.TabIcon} type="comments" />
+                          </button>
+                          <button
+                            className={panel === "sources" ? styles.TabSelected : styles.Tab}
+                            data-test-id="TabButton-Sources"
+                            disabled={isPending}
+                            onClick={() => setPanelTransition("sources")}
+                          >
+                            <Icon className={styles.TabIcon} type="source-explorer" />
+                          </button>
+                          <button
+                            className={panel === "search" ? styles.TabSelected : styles.Tab}
+                            data-test-id="TabButton-Search"
+                            disabled={isPending}
+                            onClick={() => setPanelTransition("search")}
+                          >
+                            <Icon className={styles.TabIcon} type="search" />
+                          </button>
+                          <button
+                            className={
+                              panel === "protocol-viewer" ? styles.TabSelected : styles.Tab
+                            }
+                            data-test-id="TabButton-ProtocolViewer"
+                            disabled={isPending}
+                            onClick={() => setPanelTransition("protocol-viewer")}
+                          >
+                            <Icon className={styles.TabIcon} type="protocol-viewer" />
+                          </button>
                         </div>
-                        <div className={styles.Row}>
-                          <Suspense fallback={<Loader />}>
-                            <Focuser />
-                          </Suspense>
+                        <div className={styles.PanelGroup}>
+                          <PanelGroup autoSaveId="bvaughn-layout-main" direction="horizontal">
+                            <Panel
+                              className={styles.Panel}
+                              collapsible
+                              defaultSize={15}
+                              minSize={10}
+                              maxSize={20}
+                            >
+                              <div className={styles.CommentsContainer}>
+                                <Suspense fallback={<Loader />}>
+                                  <LazyOffscreen mode={panel == "comments" ? "visible" : "hidden"}>
+                                    <CommentList />
+                                  </LazyOffscreen>
+                                  <LazyOffscreen
+                                    mode={panel == "protocol-viewer" ? "visible" : "hidden"}
+                                  >
+                                    <ProtocolViewer />
+                                  </LazyOffscreen>
+                                  <LazyOffscreen mode={panel == "search" ? "visible" : "hidden"}>
+                                    <SearchFiles />
+                                  </LazyOffscreen>
+                                  <LazyOffscreen mode={panel == "sources" ? "visible" : "hidden"}>
+                                    <SourceExplorer />
+                                  </LazyOffscreen>
+                                </Suspense>
+                              </div>
+                            </Panel>
+                            <PanelResizeHandle className={styles.PanelResizeHandle}>
+                              <div className={styles.PanelResizeHandleInner} />
+                            </PanelResizeHandle>
+                            <Panel className={styles.Panel} defaultSize={50} minSize={35}>
+                              <div className={styles.SourcesContainer}>
+                                <Suspense fallback={<Loader />}>
+                                  <Sources />
+                                </Suspense>
+                              </div>
+                            </Panel>
+                            <PanelResizeHandle className={styles.PanelResizeHandle}>
+                              <div className={styles.PanelResizeHandleInner} />
+                            </PanelResizeHandle>
+                            <Panel className={styles.Panel} defaultSize={35} minSize={25}>
+                              <div className={styles.ConsoleContainer}>
+                                <TerminalContextRoot>
+                                  <ConsoleRoot showSearchInputByDefault={false} />
+                                </TerminalContextRoot>
+                              </div>
+                            </Panel>
+                          </PanelGroup>
                         </div>
                       </div>
-                    </SelectedFrameContextRoot>
-                  </NodePickerContextRoot>
+                      <div className={styles.Row}>
+                        <Suspense fallback={<Loader />}>
+                          <Focuser />
+                        </Suspense>
+                      </div>
+                    </div>
+                  </SelectedFrameContextRoot>
                 </FocusContextRoot>
               </TimelineContextRoot>
             </PointsContextRoot>
