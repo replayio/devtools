@@ -78,7 +78,7 @@ function TestStatusGroup({
 }) {
   const [expanded, setExpanded] = useState(true);
 
-  const tree = useFileNameTree(testGroup, filterByText, true);
+  const tree = useFileNameTree(testGroup, filterByText);
 
   const count = testGroup.count;
   if (count == 0) {
