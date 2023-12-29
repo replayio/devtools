@@ -137,7 +137,7 @@ export function useFileNameTree(
     }
 
     return root;
-  }, [fileNameToTests, filterByText]);
+  }, [fileNameToTests, filterByText, searchTitle]);
 
   return tree;
 }
