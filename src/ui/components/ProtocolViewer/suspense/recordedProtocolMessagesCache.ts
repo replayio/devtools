@@ -15,11 +15,7 @@ import { compareExecutionPoints } from "replay-next/src/utils/time";
 import { ReplayClientInterface } from "shared/client/types";
 import { ProtocolError, ProtocolRequest, ProtocolResponse } from "ui/reducers/protocolMessages";
 import { SourceDetails, SourcesState, getPreferredLocation } from "ui/reducers/sources";
-import {
-  ChunksArray,
-  deserializeChunkedString,
-  splitStringIntoChunks as splitStringIntoChunksOriginal,
-} from "ui/utils/evalChunkedStrings";
+import { deserializeChunkedString } from "ui/utils/evalChunkedStrings";
 
 export type RecordedProtocolData = {
   id: number;
@@ -189,7 +185,7 @@ export const recordedProtocolMessagesCache = createFocusIntervalCacheForExecutio
 
         const allProtocolData = evalResults
           .map(evalResult => {
-            const { pauseId, data, returned, point } = evalResult;
+            const { data, point, returned } = evalResult;
             if (!returned?.object) {
               return undefined;
             }

@@ -90,6 +90,9 @@ export async function commandPalette(page: Page, query: string) {
 }
 
 export type TestRecordingKey = keyof typeof exampleRecordings;
+export type TestRecordingValue = (typeof exampleRecordings)[TestRecordingKey];
+export type ExamplesData = Record<TestRecordingKey, TestRecordingValue>;
+
 export async function startTest(
   page: Page,
   recordingId: string,

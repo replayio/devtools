@@ -204,7 +204,6 @@ export enum RecordingRole {
 }
 
 export interface Recording {
-  buildId?: string | null;
   collaborators?: string[];
   collaboratorRequests?: CollaboratorRequest[] | null;
   comments?: any;

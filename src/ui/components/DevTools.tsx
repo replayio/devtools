@@ -23,6 +23,7 @@ import { setAccessToken } from "ui/actions/app";
 import { clearTrialExpired, createSocket } from "ui/actions/session";
 import { DevToolsDynamicLoadingMessage } from "ui/components/DevToolsDynamicLoadingMessage";
 import { DevToolsProcessingScreen } from "ui/components/DevToolsProcessingScreen";
+import { NodePickerContextRoot } from "ui/components/NodePickerContext";
 import { RecordingDocumentTitle } from "ui/components/RecordingDocumentTitle";
 import TerminalContextAdapter from "ui/components/SecondaryToolbox/TerminalContextAdapter";
 import { SupportForm } from "ui/components/SupportForm";
@@ -269,26 +270,30 @@ function _DevTools({
         <FocusContextReduxAdapter>
           <PointsContextRoot>
             <TimelineContextAdapter>
-              <TestSuiteContextRoot>
-                <SelectedFrameContextRoot SelectedFrameContextAdapter={SelectedFrameContextAdapter}>
-                  <TerminalContextAdapter>
-                    <InspectorContextReduxAdapter>
-                      <ExpandablesContextRoot>
-                        <LayoutContextAdapter>
-                          <KeyModifiers>
-                            <RecordingDocumentTitle />
-                            <Header />
-                            <Body />
-                            {showCommandPalette ? <CommandPaletteModal /> : null}
-                            {showSupportForm ? <SupportForm /> : null}
-                            <KeyboardShortcuts />
-                          </KeyModifiers>
-                        </LayoutContextAdapter>
-                      </ExpandablesContextRoot>
-                    </InspectorContextReduxAdapter>
-                  </TerminalContextAdapter>
-                </SelectedFrameContextRoot>
-              </TestSuiteContextRoot>
+              <NodePickerContextRoot>
+                <TestSuiteContextRoot>
+                  <SelectedFrameContextRoot
+                    SelectedFrameContextAdapter={SelectedFrameContextAdapter}
+                  >
+                    <TerminalContextAdapter>
+                      <InspectorContextReduxAdapter>
+                        <ExpandablesContextRoot>
+                          <LayoutContextAdapter>
+                            <KeyModifiers>
+                              <RecordingDocumentTitle />
+                              <Header />
+                              <Body />
+                              {showCommandPalette ? <CommandPaletteModal /> : null}
+                              {showSupportForm ? <SupportForm /> : null}
+                              <KeyboardShortcuts />
+                            </KeyModifiers>
+                          </LayoutContextAdapter>
+                        </ExpandablesContextRoot>
+                      </InspectorContextReduxAdapter>
+                    </TerminalContextAdapter>
+                  </SelectedFrameContextRoot>
+                </TestSuiteContextRoot>
+              </NodePickerContextRoot>
             </TimelineContextAdapter>
           </PointsContextRoot>
         </FocusContextReduxAdapter>

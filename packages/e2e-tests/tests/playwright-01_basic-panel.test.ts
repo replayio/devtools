@@ -16,6 +16,7 @@ import {
   getTestSuiteResultsSkippedCount,
   getTestSuiteUser,
   openCypressTestPanel,
+  openPlaywrightTestPanel,
 } from "../helpers/testsuites";
 import { waitFor } from "../helpers/utils";
 import test, { expect } from "../testFixtureCloneRecording";
@@ -29,12 +30,7 @@ test("playwright-01: Basic Test Suites panel functionality", async ({
   await startTest(page, recordingId);
   await openDevToolsTab(page);
 
-  await openCypressTestPanel(page);
-
-  const testPanel = getTestSuitePanel(page);
-
-  const isVisible = await testPanel.isVisible();
-  expect(isVisible).toBe(true);
+  await openPlaywrightTestPanel(page);
 
   // These are nested, but at least one should exist
   // on the test suites panel

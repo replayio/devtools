@@ -20,12 +20,15 @@ export default function TestRecordingTreeRow({
 
   const onClick = () => startTransition(onClickProp);
 
-  const { attempt, error, id, result, source } = testRecording;
+  const { attempt, error, id, result, source, testRunnerName } = testRecording;
   const { title } = source;
 
   const isFlaky = flakyTestIds.has(id);
-  // TODO [SCS-1268] Remove undefined check
-  const showTitle = isFlaky ? result === "passed" : attempt === undefined || attempt === 1;
+
+  let showTitleAndError = true;
+  if (testRunnerName === "cypress") {
+    showTitleAndError = isFlaky ? result === "passed" : attempt === 1;
+  }
 
   let attemptLabel;
   switch (result) {
@@ -46,12 +49,12 @@ export default function TestRecordingTreeRow({
       data-test-name="TestRecordingTreeRow"
       onClick={onClick}
     >
-      {showTitle || <Icon className={styles.NestedIcon} type="arrow-nested" />}
+      {showTitleAndError || <Icon className={styles.NestedIcon} type="arrow-nested" />}
       <TestResultIcon result={result} />
       <div className={styles.Column}>
         <div className={styles.HeaderRow}>
           <div className={styles.Title}>
-            {showTitle ? (
+            {showTitleAndError ? (
               title
             ) : (
               <>
@@ -62,7 +65,7 @@ export default function TestRecordingTreeRow({
           </div>
           <MaterialIcon className={styles.Chevron}>chevron_right</MaterialIcon>
         </div>
-        {showTitle && error && (
+        {showTitleAndError && error && (
           <div className={styles.Error}>
             <span className={styles.ErrorTitle}>Error:</span> {error.message}
           </div>
