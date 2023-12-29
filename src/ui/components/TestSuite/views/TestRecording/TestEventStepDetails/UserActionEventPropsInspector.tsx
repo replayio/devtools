@@ -13,9 +13,10 @@ import {
 import { LoadingFailedMessage, LoadingInProgress } from "./TestEventDetailsLoadingMessages";
 import styles from "./TestEventDetails.module.css";
 
-export function CypressUserActionEventDetails({ testEvent }: { testEvent: UserActionEvent }) {
+export function UserActionEventPropsInspector({ testEvent }: { testEvent: UserActionEvent }) {
   // Parent ensures this exists
   const timeStampedPoint = testEvent.data.timeStampedPoints.result!;
+
   const { status, value } = useImperativeCacheValue(
     testEventDetailsResultsCache as unknown as Cache<
       [executionPoint: ExecutionPoint],
@@ -41,7 +42,7 @@ export function CypressUserActionEventDetails({ testEvent }: { testEvent: UserAc
   return (
     <div className={styles.UserActionEventDetails} data-test-name="UserActionEventDetails">
       <InspectableTimestampedPointContext.Provider value={context}>
-        <PropertiesRenderer pauseId={value.pauseId} object={value.props} />
+        <PropertiesRenderer pauseId={value.pauseId} object={value.props} hidePrototype={true} />
       </InspectableTimestampedPointContext.Provider>
     </div>
   );

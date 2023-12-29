@@ -4,10 +4,10 @@ import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import { isUserActionTestEvent } from "shared/test-suites/RecordingTestMetadata";
 import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext";
 
-import { CypressUserActionEventDetails } from "./TestEventStepDetails/CypressUserActionEventDetails";
 import { PlaywrightUserActionEventDetails } from "./TestEventStepDetails/PlaywrightUserActionEventDetails";
 import { LoadingFailedMessage } from "./TestEventStepDetails/TestEventDetailsLoadingMessages";
-import styles from "./TestEventDetails.module.css";
+import { UserActionEventPropsInspector } from "./TestEventStepDetails/UserActionEventPropsInspector";
+import styles from "./TestEventStepDetails/TestEventDetails.module.css";
 
 export default function TestEventDetails({ collapsed }: { collapsed: boolean }) {
   const { testEvent } = useContext(TestSuiteContext);
@@ -16,15 +16,13 @@ export default function TestEventDetails({ collapsed }: { collapsed: boolean }) 
     return null;
   } else if (testEvent == null || !isUserActionTestEvent(testEvent)) {
     return <SelectionPrompt />;
-  } else if (!testEvent.data.timeStampedPoints.result) {
-    return <LoadingFailedMessage />;
   }
 
   const { testRunnerName } = testEvent.data;
   const UserEventDetailsComponent =
     testRunnerName === "playwright"
       ? PlaywrightUserActionEventDetails
-      : CypressUserActionEventDetails;
+      : UserActionEventPropsInspector;
 
   return (
     <ErrorBoundary name="TestEventDetails">
