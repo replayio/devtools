@@ -37,7 +37,7 @@
   border-radius: 0.25rem;
 }
 .ContentWrapper:focus-within {
-  border-color: var(--color-brand);
+  border-color: var(--primary-accent);
 }
 .ContentWrapper p {
   margin: 0;
@@ -67,7 +67,7 @@
   border: 2px solid var(--background-color-contrast-3);
 }
 .Button:focus {
-  border: 2px solid var(--color-brand);
+  border: 2px solid var(--primary-accent);
 }
 
 .Icon {
@@ -80,7 +80,7 @@
 .ReplyButton {
   cursor: pointer;
   user-select: none;
-  color: var(--color-brand);
+  color: var(--primary-accent);
   outline: none;
   border: none;
   padding: 0.25rem;
@@ -91,7 +91,7 @@
   margin: 0.25rem;
 }
 .ReplyButton:focus {
-  border: 2px solid var(--color-brand);
+  border: 2px solid var(--primary-accent);
 }
 
 .Input {
@@ -106,7 +106,7 @@
   font-family: var(--font-family-default);
 }
 .Input:focus {
-  border: 2px solid var(--color-brand);
+  border: 2px solid var(--primary-accent);
 }
 
 .ConfirmDeleteButton {

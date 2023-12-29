@@ -37,11 +37,11 @@
 }
 
 .theme-body-font-size {
-  font-size: var(--theme-body-font-size);
+  font-size: var(--font-size-regular);
 }
 
 .theme-code-font-size {
-  font-size: var(--theme-code-font-size);
+  font-size: var(--font-size-regular-monospace);
 }
 
 .theme-tab-font-size {
@@ -77,7 +77,7 @@
 
 .devtools-monospace {
   font-family: var(--monospace-font-family);
-  font-size: var(--theme-code-font-size);
+  font-size: var(--font-size-regular-monospace);
 }
 
 /**

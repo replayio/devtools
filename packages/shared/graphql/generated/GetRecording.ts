@@ -139,7 +139,6 @@ export interface GetRecording_recording_collaboratorRequests {
 export interface GetRecording_recording {
   __typename: "Recording";
   uuid: any;
-  buildId: string | null;
   url: string | null;
   title: string | null;
   duration: number | null;

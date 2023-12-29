@@ -6,6 +6,7 @@ import { SelectedFrameContextRoot } from "replay-next/src/contexts/SelectedFrame
 import { SourcesContextRoot } from "replay-next/src/contexts/SourcesContext";
 import { TerminalContextRoot } from "replay-next/src/contexts/TerminalContext";
 import { TimelineContextRoot } from "replay-next/src/contexts/TimelineContext";
+import { NodePickerContextRoot } from "ui/components/NodePickerContext";
 
 import createTest from "./utils/createTest";
 import styles from "./styles.module.css";
@@ -20,13 +21,15 @@ function Console() {
           <TimelineContextRoot>
             <SelectedFrameContextRoot>
               <FocusContextRoot>
-                <div className={styles.Grid1Column}>
-                  <div className={styles.VerticalContainer}>
-                    <TerminalContextRoot>
-                      <ConsoleRoot showSearchInputByDefault={false} />
-                    </TerminalContextRoot>
+                <NodePickerContextRoot>
+                  <div className={styles.Grid1Column}>
+                    <div className={styles.VerticalContainer}>
+                      <TerminalContextRoot>
+                        <ConsoleRoot showSearchInputByDefault={false} />
+                      </TerminalContextRoot>
+                    </div>
                   </div>
-                </div>
+                </NodePickerContextRoot>
               </FocusContextRoot>
             </SelectedFrameContextRoot>
           </TimelineContextRoot>

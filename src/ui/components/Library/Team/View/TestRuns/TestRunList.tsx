@@ -39,7 +39,7 @@ export function TestRunList() {
       children={({ height, width }) => (
         <FixedSizeList
           children={TestRunListRow}
-          className="no-scrollbar text-sm"
+          className="text-sm"
           height={height}
           itemCount={itemCount}
           itemData={itemData}

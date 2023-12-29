@@ -1,6 +1,9 @@
 import { Page } from "@playwright/test";
 
 export async function openSettingsModal(page: Page) {
+  // Don't want to use `showUserOptionsDropdown` here, as it
+  // waits for user settings, and the user may not be logged in
+  // in the auth tests
   await page.locator(".user-options").click();
   await page.locator('.dropdown-container button:has-text("Settings")').click();
 }

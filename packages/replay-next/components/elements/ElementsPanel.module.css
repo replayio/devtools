@@ -36,7 +36,7 @@
   border-radius: 0.25rem;
 }
 .SearchIconAndInput:focus-within {
-  border-color: var(--color-brand);
+  border-color: var(--primary-accent);
 }
 
 .SearchIcon {

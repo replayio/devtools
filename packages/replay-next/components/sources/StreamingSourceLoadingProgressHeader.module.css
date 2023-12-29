@@ -22,6 +22,6 @@
   opacity: 0;
 }
 .RawProgressBar {
-  background-color: var(--color-brand);
+  background-color: var(--primary-accent);
   transition: width 250ms ease-out;
 }

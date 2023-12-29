@@ -81,7 +81,7 @@ export class ElementsListData extends GenericListData<Item> {
   }
 
   getParentItem(item: Item, isTail: boolean = false): Item {
-    const parentMetadata = this.getMutableMetadata(item.objectId);
+    const parentMetadata = this.getParentMutableMetadata(item.objectId);
     assert(parentMetadata);
 
     return {
@@ -114,6 +114,23 @@ export class ElementsListData extends GenericListData<Item> {
     }
 
     return false;
+  }
+
+  search(text: string): number[] {
+    text = text.toLocaleLowerCase();
+
+    const matches: Set<number> = new Set();
+    const count = this.getItemCount();
+
+    for (let index = 0; index < count; index++) {
+      const item = this.getItemAtIndex(index);
+      const string = this.toStringItem(item).toLocaleLowerCase();
+      if (string.includes(text)) {
+        matches.add(index);
+      }
+    }
+
+    return Array.from(matches);
   }
 
   selectNode(objectId: ObjectId | null) {
@@ -199,57 +216,61 @@ export class ElementsListData extends GenericListData<Item> {
     for (let index = 0; index < count; index++) {
       const item = this.getItemAtIndex(index);
 
-      const { attributes, depth, displayMode, nodeType, tagName, textContent } = item;
-
-      let rendered;
-      switch (nodeType) {
-        case Node.DOCUMENT_NODE: {
-          rendered = tagName;
-          break;
-        }
-        case Node.TEXT_NODE: {
-          rendered = textContent;
-          break;
-        }
-        default: {
-          assert(tagName);
-
-          let attributesString = "";
-          for (let name in attributes) {
-            const value = attributes[name];
-            if (value) {
-              attributesString += ` ${name}="${value}"`;
-            } else {
-              attributesString += ` ${name}`;
-            }
-          }
-
-          const openingTagNameAndAttributes = `${tagName}${attributesString}`;
-
-          switch (displayMode) {
-            case "collapsed":
-              rendered = `<${openingTagNameAndAttributes}>…</${tagName}>`;
-              break;
-            case "empty":
-              rendered = `<${openingTagNameAndAttributes} />`;
-              break;
-            case "head":
-              rendered = `<${openingTagNameAndAttributes}>`;
-              break;
-            case "tail":
-              rendered = `</${tagName}>`;
-              break;
-          }
-          break;
-        }
-      }
-
-      const indentation = "  ".repeat(depth);
-
-      rows.push(`${indentation}${rendered}`);
+      rows.push(this.toStringItem(item));
     }
 
     return rows.join("\n");
+  }
+
+  toStringItem(item: Item): string {
+    const { attributes, depth, displayMode, nodeType, tagName, textContent } = item;
+
+    let rendered;
+    switch (nodeType) {
+      case Node.DOCUMENT_NODE: {
+        rendered = tagName;
+        break;
+      }
+      case Node.TEXT_NODE: {
+        rendered = textContent;
+        break;
+      }
+      default: {
+        assert(tagName);
+
+        let attributesString = "";
+        for (let name in attributes) {
+          const value = attributes[name];
+          if (value) {
+            attributesString += ` ${name}="${value}"`;
+          } else {
+            attributesString += ` ${name}`;
+          }
+        }
+
+        const openingTagNameAndAttributes = `${tagName}${attributesString}`;
+
+        switch (displayMode) {
+          case "collapsed":
+            rendered = `<${openingTagNameAndAttributes}>…</${tagName}>`;
+            break;
+          case "empty":
+            rendered = `<${openingTagNameAndAttributes} />`;
+            break;
+          case "head":
+            rendered = `<${openingTagNameAndAttributes}>`;
+            break;
+          case "tail":
+            rendered = `</${tagName}>`;
+            break;
+        }
+        break;
+      }
+    }
+
+    const indentation = "  ".repeat(depth);
+
+    return `${indentation}${rendered}`;
   }
 
   protected getIndexForItemImplementation(item: Item): number {

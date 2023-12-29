@@ -4,20 +4,18 @@ import { PreviewNodeHighlighter } from "devtools/client/inspector/markup/compone
 import { installObserver, refreshGraphics } from "protocol/graphics";
 import Spinner from "replay-next/components/Spinner";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
-import {
-  getAreMouseTargetsLoading,
-  getIsNodePickerActive,
-  getIsNodePickerInitializing,
-  getRecordingTarget,
-  getVideoUrl,
-} from "ui/actions/app";
+import { getRecordingTarget, getVideoUrl } from "ui/actions/app";
 import { stopPlayback } from "ui/actions/timeline";
 import CommentsOverlay from "ui/components/Comments/VideoComments/index";
+import { NodePickerContext } from "ui/components/NodePickerContext";
 import ToggleButton from "ui/components/TestSuite/views/Toggle/ToggleButton";
 import useVideoContextMenu from "ui/components/useVideoContextMenu";
 import { getSelectedPrimaryPanel } from "ui/reducers/layout";
-import { getPlayback, isPlaybackStalled } from "ui/reducers/timeline";
-import { isPlaying as isPlayingSelector } from "ui/reducers/timeline";
+import {
+  getPlayback,
+  isPlaybackStalled,
+  isPlaying as isPlayingSelector,
+} from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 import ReplayLogo from "./shared/ReplayLogo";
@@ -30,14 +28,15 @@ export default function Video() {
 
   const panel = useAppSelector(getSelectedPrimaryPanel);
   const highlightedNodeIds = useAppSelector(state => state.markup.highlightedNodes);
-  const isNodePickerActive = useAppSelector(getIsNodePickerActive);
-  const isNodePickerInitializing = useAppSelector(getIsNodePickerInitializing);
   const playback = useAppSelector(getPlayback);
   const recordingTarget = useAppSelector(getRecordingTarget);
   const videoUrl = useAppSelector(getVideoUrl);
   const stalled = useAppSelector(isPlaybackStalled);
-  const mouseTargetsLoading = useAppSelector(getAreMouseTargetsLoading);
   const isPlaying = useAppSelector(isPlayingSelector);
+
+  const { status } = useContext(NodePickerContext);
+  const isNodePickerActive = status === "active";
+  const isNodePickerInitializing = status === "initializing";
 
   const isPaused = !playback;
   const isNodeTarget = recordingTarget == "node";
@@ -49,7 +48,7 @@ export default function Video() {
   const [showDelayedSpinner, setShowDelayedSpinner] = useState(false);
 
   useEffect(() => {
-    if (isNodePickerActive && mouseTargetsLoading) {
+    if (isNodePickerInitializing) {
       const timerId = setTimeout(() => {
         setShowDelayedSpinner(true);
       }, 700);
@@ -59,7 +58,7 @@ export default function Video() {
     } else {
       setShowDelayedSpinner(false);
     }
-  }, [isNodePickerActive, mouseTargetsLoading, stalled]);
+  }, [isNodePickerInitializing, stalled]);
 
   useEffect(() => {
     installObserver();
@@ -81,12 +80,6 @@ export default function Video() {
       didSeekOnMountRef.current = false;
     };
   });
-
-  const onMouseDown = () => {
-    if (isNodePickerActive || isNodePickerInitializing) {
-      return;
-    }
-  };
 
   const onClick = (e: React.MouseEvent) => {
     if (isPlaying) {
@@ -110,13 +103,7 @@ export default function Video() {
       </div>
 
       <video id="graphicsVideo" src={videoUrl || undefined} />
-      <canvas
-        id="graphics"
-        onClick={onClick}
-        onContextMenu={onContextMenu}
-        onMouseDown={onMouseDown}
-        ref={canvasRef}
-      />
+      <canvas id="graphics" onClick={onClick} onContextMenu={onContextMenu} ref={canvasRef} />
       {contextMenu}
       <CommentsOverlay showComments={showComments}>
         {(showDelayedSpinner || stalled) && (

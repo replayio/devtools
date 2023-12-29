@@ -1,4 +1,4 @@
-import { KeyboardEvent, NodeBounds } from "@replayio/protocol";
+import { KeyboardEvent } from "@replayio/protocol";
 import groupBy from "lodash/groupBy";
 
 import {
@@ -13,7 +13,6 @@ import { shallowEqual } from "shared/utils/compare";
 import { CommandKey } from "ui/components/CommandPalette/CommandPalette";
 import { getEventsForType } from "ui/reducers/app";
 import { Canvas, EventKind, ReplayEvent, ReplayNavigationEvent } from "ui/state/app";
-import { boundingRectsCache } from "ui/suspense/nodeCaches";
 import { compareBigInt } from "ui/utils/helpers";
 import { getRecordingId } from "ui/utils/recording";
 
@@ -21,7 +20,6 @@ import {
   loadReceivedEvents,
   setCanvas as setCanvasAction,
   setModal,
-  setMouseTargetsLoading,
   setSessionId,
 } from "../reducers/app";
 import {
@@ -94,28 +92,6 @@ export function setCanvas(canvas: Canvas): UIThunkAction {
     if (!shallowEqual(existingCanvas, canvas)) {
       dispatch(setCanvasAction(canvas));
     }
-  };
-}
-
-export function fetchMouseTargetsForPause(): UIThunkAction<Promise<NodeBounds[] | undefined>> {
-  return async (dispatch, getState, { replayClient, protocolClient }) => {
-    const state = getState();
-    const pauseId = state.pause.id;
-
-    if (!pauseId) {
-      return;
-    }
-
-    return boundingRectsCache.readAsync(replayClient, pauseId);
-  };
-}
-
-export function loadMouseTargets(): UIThunkAction<Promise<NodeBounds[] | undefined>> {
-  return async dispatch => {
-    dispatch(setMouseTargetsLoading(true));
-    const boundingRects = await dispatch(fetchMouseTargetsForPause());
-    dispatch(setMouseTargetsLoading(false));
-    return boundingRects;
   };
 }
 
