@@ -1,4 +1,5 @@
 import { isDevelopment } from "shared/utils/environment";
+import { getRecordingId } from "shared/utils/recording";
 import type { UIThunkAction } from "ui/actions";
 import {
   setExpectedError as setExpectedErrorAction,
@@ -6,7 +7,6 @@ import {
 } from "ui/reducers/app";
 import type { UIState } from "ui/state";
 import type { ExpectedError, UnexpectedError } from "ui/state/app";
-import { getRecordingId } from "ui/utils/recording";
 import { sendTelemetryEvent } from "ui/utils/telemetry";
 
 const getSessionId = (state: UIState) => state.app.sessionId;

@@ -3,8 +3,8 @@ import React, { Dispatch, SetStateAction } from "react";
 
 import ExternalLink from "replay-next/components/ExternalLink";
 import { OperationsData } from "shared/graphql/types";
+import { getRecordingId } from "shared/utils/recording";
 import { useGetRecording } from "ui/hooks/recordings";
-import { getRecordingId } from "ui/utils/recording";
 
 import MaterialIcon from "../shared/MaterialIcon";
 

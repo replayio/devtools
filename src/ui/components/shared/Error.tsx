@@ -2,6 +2,7 @@ import { useRouter } from "next/dist/client/router";
 import React, { useState } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
+import { getRecordingId } from "shared/utils/recording";
 import { setModal } from "ui/actions/app";
 import { setExpectedError } from "ui/actions/errors";
 import { useGetTeamIdFromRoute } from "ui/components/Library/Team/utils";
@@ -12,7 +13,6 @@ import { getExpectedError, getTrialExpired, getUnexpectedError } from "ui/reduce
 import { useAppDispatch } from "ui/setup/hooks";
 import { UIState } from "ui/state";
 import { ErrorActions, ExpectedError, UnexpectedError } from "ui/state/app";
-import { getRecordingId } from "ui/utils/recording";
 
 import { PrimaryButton } from "./Button";
 import { Dialog, DialogActions, DialogDescription, DialogLogo, DialogTitle } from "./Dialog";

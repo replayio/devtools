@@ -10,11 +10,11 @@ import { ReplayClientInterface } from "shared/client/types";
 import { getSystemColorScheme } from "shared/theme/getSystemColorScheme";
 import { userData } from "shared/user-data/GraphQL/UserData";
 import { shallowEqual } from "shared/utils/compare";
+import { getRecordingId } from "shared/utils/recording";
 import { CommandKey } from "ui/components/CommandPalette/CommandPalette";
 import { getEventsForType } from "ui/reducers/app";
 import { Canvas, EventKind, ReplayEvent, ReplayNavigationEvent } from "ui/state/app";
 import { compareBigInt } from "ui/utils/helpers";
-import { getRecordingId } from "ui/utils/recording";
 
 import {
   loadReceivedEvents,
