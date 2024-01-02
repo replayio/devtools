@@ -29,6 +29,8 @@ export function InlineErrorBoundary({
 }: Omit<ErrorBoundaryProps, "fallback" | "fallbackRender" | "FallbackComponent" | "resetKeys"> & {
   fallback?: ReactElement | null;
 
+  children: React.ReactNode;
+
   // Uniquely identifies this error boundary; logged to Sentry.
   name: string;
 
