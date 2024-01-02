@@ -1,7 +1,7 @@
 import { ExecutionPoint, FrameId, PauseId, TimeStampedPointRange } from "@replayio/protocol";
 import { RefObject, Suspense, useContext, useEffect, useMemo, useRef, useState } from "react";
 
-import ErrorBoundary from "replay-next/components/ErrorBoundary";
+import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBoundary";
 import Icon from "replay-next/components/Icon";
 import CodeEditor, { ImperativeHandle } from "replay-next/components/lexical/CodeEditor";
 import Loader from "replay-next/components/Loader";
@@ -57,11 +57,15 @@ export default function ConsoleInput({ inputRef }: { inputRef?: RefObject<Impera
   }
 
   return (
-    <ErrorBoundary name="ConsoleInput" resetKey={executionPoint ?? ""} fallback={<ErrorFallback />}>
+    <InlineErrorBoundary
+      name="ConsoleInput"
+      resetKey={executionPoint ?? ""}
+      fallback={<ErrorFallback />}
+    >
       <Suspense fallback={<Loader />}>
         <ConsoleInputSuspends inputRef={inputRef} />
       </Suspense>
-    </ErrorBoundary>
+    </InlineErrorBoundary>
   );
 }
 

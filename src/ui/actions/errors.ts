@@ -27,18 +27,16 @@ export function setExpectedError(error: ExpectedError): UIThunkAction {
   };
 }
 
-export function setUnexpectedError(error: UnexpectedError, skipTelemetry = false): UIThunkAction {
+export function setUnexpectedError(error: UnexpectedError): UIThunkAction {
   return (dispatch, getState) => {
     const state = getState();
 
-    if (!skipTelemetry) {
-      sendTelemetryEvent("DevtoolsUnexpectedError", {
-        ...error,
-        recordingId: getRecordingId(),
-        sessionId: getSessionId(state),
-        environment: isDevelopment() ? "dev" : "prod",
-      });
-    }
+    sendTelemetryEvent("DevtoolsUnexpectedError", {
+      ...error,
+      recordingId: getRecordingId(),
+      sessionId: getSessionId(state),
+      environment: isDevelopment() ? "dev" : "prod",
+    });
 
     dispatch(setUnexpectedErrorAction(error));
   };

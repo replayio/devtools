@@ -8,6 +8,8 @@
   align-items: center;
   justify-content: center;
   z-index: var(--context-menu-z-index);
+  background-color: rgba(--focus-mode-popout-background-color);
+  backdrop-filter: blur(0.5rem);
 }
 
 .Modal {
@@ -15,10 +17,10 @@
   border: 1px solid var(--context-menu-border-color);
   border-radius: 0.5rem;
   filter: var(--context-menu-filter);
-  padding: 0.5rem;
+  padding: 0.75rem;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.75rem;
   font-size: var(--font-size-regular);
   font-family: var(--font-family-default);
   width: 20rem;
@@ -26,6 +28,10 @@
 .Modal[data-confirmation] {
   align-items: center;
   padding: 1rem;
+}
+
+.Message {
+  font-style: italic;
 }
 
 .Header {
@@ -57,8 +63,6 @@
 }
 
 .FormActions {
-  border-bottom: 1px solid var(--context-menu-border-color);
-  padding-bottom: 0.5rem;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -99,12 +103,28 @@
 .SubmitButton {
   flex: 1 1 auto;
   justify-content: center;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  line-height: 1rem;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  background-color: var(--primary-accent);
+}
+.SubmitButton:hover {
+  background-color: var(--primary-accent-hover);
 }
 .SubmitButton:focus {
   border-color: transparent;
   box-shadow: none;
   outline-offset: 2px;
   outline: 2px solid var(--primary-accent);
+}
+
+.HorizontalRule {
+  height: 1px;
+  border: none;
+  border-bottom: 1px solid var(--context-menu-border-color);
 }
 
 .Footer {
@@ -128,6 +148,19 @@
   fill: currentColor;
 }
 
+.FooterButton {
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+.FooterButton[color="blue"] {
+  border: 1px solid var(--primary-accent);
+}
+.FooterButton[color="pink"] {
+  background-color: var(--secondary-accent);
+}
 .FooterButton:focus {
   border-color: transparent;
   box-shadow: none;

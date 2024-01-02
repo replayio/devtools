@@ -9,6 +9,7 @@ import {
   useRef,
 } from "react";
 
+import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBoundary";
 import { SelectedFrameContext } from "replay-next/src/contexts/SelectedFrameContext";
 import { useCurrentFocusWindow } from "replay-next/src/hooks/useCurrentFocusWindow";
 import { getFrameSuspense } from "replay-next/src/suspense/FrameCache";
@@ -20,7 +21,6 @@ import {
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { isPointInRegion } from "shared/utils/time";
 
-import ErrorBoundary from "../ErrorBoundary";
 import SourcePreviewInspector from "../inspector/SourcePreviewInspector";
 import Popup, { PopupStyle } from "../Popup";
 import styles from "./PreviewPopup.module.css";
@@ -36,7 +36,7 @@ type Props = {
 
 export default function PreviewPopup(props: Props) {
   return (
-    <ErrorBoundary name="PreviewPopup">
+    <InlineErrorBoundary name="PreviewPopup">
       <Suspense
         fallback={
           <PopupWithChildren {...props}>
@@ -48,7 +48,7 @@ export default function PreviewPopup(props: Props) {
       >
         <SuspendingPreviewPopup {...props} />
       </Suspense>
-    </ErrorBoundary>
+    </InlineErrorBoundary>
   );
 }
 

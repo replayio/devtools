@@ -12,7 +12,8 @@ import {
 } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
-import ErrorBoundary from "replay-next/components/ErrorBoundary";
+import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBoundary";
+import { InlineErrorFallback } from "replay-next/components/errors/InlineErrorFallback";
 import IndeterminateLoader from "replay-next/components/IndeterminateLoader";
 import { ImperativeHandle } from "replay-next/components/lexical/CodeEditor";
 import Loader from "replay-next/components/Loader";
@@ -44,7 +45,7 @@ export default function ConsoleRoot({
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   return (
-    <ErrorBoundary name="ConsoleRoot">
+    <InlineErrorBoundary name="ConsoleRoot">
       <Suspense fallback={<IndeterminateLoader />}>
         <ConsoleFiltersContextRoot>
           <LoggablesContextRoot messageListRef={messageListRef}>
@@ -63,7 +64,7 @@ export default function ConsoleRoot({
           </LoggablesContextRoot>
         </ConsoleFiltersContextRoot>
       </Suspense>
-    </ErrorBoundary>
+    </InlineErrorBoundary>
   );
 }
 
@@ -211,7 +212,10 @@ function Console({
               </div>
             }
           >
-            <ErrorBoundary name="ConsoleRoot" fallbackClassName={styles.ErrorBoundaryFallback}>
+            <InlineErrorBoundary
+              name="ConsoleRoot"
+              fallback={<InlineErrorFallback className={styles.ErrorBoundaryFallback} />}
+            >
               <div className={styles.MessageColumn} onClick={onClick}>
                 {nagHeader}
 
@@ -225,7 +229,7 @@ function Console({
                   searchInputRef={searchInputRef}
                 />
               </div>
-            </ErrorBoundary>
+            </InlineErrorBoundary>
           </Suspense>
         </Panel>
       </PanelGroup>

@@ -6,7 +6,7 @@ import { useImperativeCacheValue } from "suspense";
 import { selectLocation } from "devtools/client/debugger/src/actions/sources";
 import { getExecutionPoint, getThreadContext } from "devtools/client/debugger/src/reducers/pause";
 import { highlightNode, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
-import ErrorBoundary from "replay-next/components/ErrorBoundary";
+import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBoundary";
 import { useIsPointWithinFocusWindow } from "replay-next/src/hooks/useIsPointWithinFocusWindow";
 import { useMostRecentLoadedPause } from "replay-next/src/hooks/useMostRecentLoadedPause";
 import { useNag } from "replay-next/src/hooks/useNag";
@@ -294,12 +294,12 @@ export default function ReactDevToolsWithErrorBoundary() {
   const showNewDevTools = recordingCapabilities.supportsObjectIdLookupsInEvaluations;
 
   return (
-    <ErrorBoundary name="ReactDevTools" resetKey={pauseId ?? ""}>
+    <InlineErrorBoundary name="ReactDevTools" resetKey={pauseId ?? ""}>
       {showNewDevTools ? (
         <NewReactDevtoolsPanel executionPoint={point ?? null} pauseId={pauseId ?? null} />
       ) : (
         <ReactDevtoolsPanel />
       )}
-    </ErrorBoundary>
+    </InlineErrorBoundary>
   );
 }

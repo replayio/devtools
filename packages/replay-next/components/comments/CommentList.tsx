@@ -1,6 +1,6 @@
 import { Suspense, useContext } from "react";
 
-import ErrorBoundary from "replay-next/components/ErrorBoundary";
+import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBoundary";
 import Loader from "replay-next/components/Loader";
 import { GraphQLClientContext } from "replay-next/src/contexts/GraphQLClientContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
@@ -17,7 +17,7 @@ export default function CommentList() {
   const commentList = commentsCache.read(graphQLClient, accessToken, recordingId);
 
   return (
-    <ErrorBoundary name="CommentList">
+    <InlineErrorBoundary name="CommentList">
       <Suspense fallback={<Loader />}>
         <div className={styles.List}>
           <div className={styles.Header}>Comments</div>
@@ -26,6 +26,6 @@ export default function CommentList() {
           ))}
         </div>
       </Suspense>
-    </ErrorBoundary>
+    </InlineErrorBoundary>
   );
 }

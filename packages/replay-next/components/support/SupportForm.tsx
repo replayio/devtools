@@ -1,19 +1,23 @@
-import { useContext, useRef, useState } from "react";
+import { ReactNode, useContext, useRef, useState } from "react";
 
 import ExternalLink from "replay-next/components/ExternalLink";
 import Icon from "replay-next/components/Icon";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import useModalDismissSignal from "replay-next/src/hooks/useModalDismissSignal";
-import { setShowSupportForm } from "ui/actions/layout";
-import { PrimaryButton, SecondaryButton } from "ui/components/shared/Button";
-import { useAppDispatch } from "ui/setup/hooks";
+import { getRecordingId } from "shared/utils/recording";
 
 import styles from "./SupportForm.module.css";
 
-export function SupportForm() {
-  const { currentUserInfo, recordingId, sessionId } = useContext(SessionContext);
-
-  const dispatch = useAppDispatch();
+export function SupportForm({
+  details,
+  onDismiss,
+  title = "Support",
+}: {
+  details?: ReactNode;
+  onDismiss?: () => void;
+  title?: ReactNode;
+}) {
+  const { currentUserInfo, sessionId } = useContext(SessionContext) || {};
 
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -24,8 +28,8 @@ export function SupportForm() {
   const confirmClose = () => {
     if (text) {
       setShowConfirmationPrompt(true);
-    } else {
-      dispatch(setShowSupportForm(false));
+    } else if (onDismiss) {
+      onDismiss();
     }
   };
 
@@ -36,7 +40,9 @@ export function SupportForm() {
       setShowConfirmationPrompt(false);
     };
     const confirm = () => {
-      dispatch(setShowSupportForm(false));
+      if (onDismiss) {
+        onDismiss();
+      }
       setShowConfirmationPrompt(false);
     };
 
@@ -46,20 +52,20 @@ export function SupportForm() {
           <div className={styles.Header}>Cancel support request?</div>
           <div>You started writing a message, cancel it?</div>
           <div className={styles.Footer} data-confirmation>
-            <SecondaryButton className={styles.FooterButton} color="blue" onClick={dismiss}>
+            <button className={styles.FooterButton} color="blue" onClick={dismiss}>
               No
-            </SecondaryButton>
-            <PrimaryButton className={styles.FooterButton} color="pink" onClick={confirm}>
+            </button>
+            <button className={styles.FooterButton} color="pink" onClick={confirm}>
               Yes, delete it
-            </PrimaryButton>
+            </button>
           </div>
         </div>
       </div>
     );
   } else {
     const closeIfEmpty = () => {
-      if (!text) {
-        dispatch(setShowSupportForm(false));
+      if (onDismiss && !text) {
+        onDismiss();
       }
     };
 
@@ -75,7 +81,7 @@ export function SupportForm() {
             // FormCarry does not support nested values
             body: JSON.stringify({
               date: new Date(),
-              recordingId,
+              recordingId: getRecordingId(),
               sessionId,
               text,
               url: window.location.href,
@@ -119,11 +125,14 @@ export function SupportForm() {
       <div className={styles.Background}>
         <div className={styles.Modal} ref={modalRef}>
           <div className={styles.Header}>
-            <div>Support</div>
-            <button className={styles.CloseButton} onClick={confirmClose}>
-              <Icon className={styles.CloseButtonIcon} type="close" />
-            </button>
+            <div>{title}</div>
+            {onDismiss && (
+              <button className={styles.CloseButton} onClick={confirmClose}>
+                <Icon className={styles.CloseButtonIcon} type="close" />
+              </button>
+            )}
           </div>
+          {details}
           {confirmationMessage ? (
             <div className={styles.ConfirmationMessage}>{confirmationMessage}</div>
           ) : (
@@ -136,26 +145,34 @@ export function SupportForm() {
                 value={text}
               />
               <div className={styles.FormActions}>
-                {/* TODO [FE-1894] Add screenshot function (eventually)
-            <SecondaryButton
-              className={styles.ScreenshotButton}
-              color="gray"
-              onClick={takeScreenshot}
-            >
-              <Icon className={styles.ScreenshotButtonIcon} type="screenshot" />
-            </SecondaryButton>
-            */}
-                <PrimaryButton
+                <button
                   className={styles.SubmitButton}
                   color="blue"
                   disabled={!text}
                   onClick={submit}
                 >
                   Submit
-                </PrimaryButton>
+                </button>
               </div>
+              <hr className={styles.HorizontalRule} />
             </>
           )}
+          <ExternalLink
+            className={styles.Footer}
+            href="https://discord.gg/n2dTK6kcRX"
+            onClick={closeIfEmpty}
+          >
+            <svg
+              width="12"
+              height="10"
+              viewBox="0 0 12 10"
+              xmlns="http://www.w3.org/2000/svg"
+              className={styles.FooterIcon}
+            >
+              <path d="M10.1652 0.901328C9.37675 0.540373 8.54443 0.284299 7.68947 0.139648C7.57247 0.348793 7.46662 0.563974 7.37234 0.784292C6.46164 0.647059 5.53551 0.647059 4.62481 0.784292C4.53049 0.563997 4.42463 0.348818 4.30768 0.139648C3.45217 0.285521 2.61931 0.542203 1.8301 0.903216C0.263323 3.22129 -0.161406 5.48179 0.0509584 7.7102C0.968502 8.38812 1.9955 8.90369 3.0873 9.2345C3.33314 8.90386 3.55068 8.55308 3.7376 8.1859C3.38256 8.05329 3.03988 7.88969 2.71354 7.69699C2.79942 7.63469 2.88343 7.57051 2.9646 7.50822C3.91419 7.95479 4.95063 8.18633 5.99999 8.18633C7.04935 8.18633 8.08579 7.95479 9.03539 7.50822C9.1175 7.57523 9.2015 7.63941 9.28645 7.69699C8.95947 7.89 8.61616 8.05392 8.26049 8.18684C8.44719 8.55385 8.66474 8.90434 8.9108 9.2345C10.0035 8.90502 11.0313 8.38969 11.949 7.71114C12.1982 5.12691 11.5234 2.88717 10.1652 0.901328ZM4.0066 6.33974C3.41481 6.33974 2.9259 5.8027 2.9259 5.14201C2.9259 4.48132 3.39782 3.93955 4.00471 3.93955C4.6116 3.93955 5.09674 4.48132 5.08635 5.14201C5.07597 5.8027 4.60971 6.33974 4.0066 6.33974ZM7.99338 6.33974C7.40065 6.33974 6.91363 5.8027 6.91363 5.14201C6.91363 4.48132 7.38555 3.93955 7.99338 3.93955C8.60122 3.93955 9.08258 4.48132 9.0722 5.14201C9.06181 5.8027 8.5965 6.33974 7.99338 6.33974Z" />
+            </svg>
+            <div>Chat with us on Discord</div>
+          </ExternalLink>
           <ExternalLink
             className={styles.Footer}
             href="https://github.com/replayio/devtools"
@@ -175,22 +192,6 @@ export function SupportForm() {
               />
             </svg>
             <div>File a ticket in GitHub</div>
-          </ExternalLink>
-          <ExternalLink
-            className={styles.Footer}
-            href="https://discord.gg/n2dTK6kcRX"
-            onClick={closeIfEmpty}
-          >
-            <svg
-              width="12"
-              height="10"
-              viewBox="0 0 12 10"
-              xmlns="http://www.w3.org/2000/svg"
-              className={styles.FooterIcon}
-            >
-              <path d="M10.1652 0.901328C9.37675 0.540373 8.54443 0.284299 7.68947 0.139648C7.57247 0.348793 7.46662 0.563974 7.37234 0.784292C6.46164 0.647059 5.53551 0.647059 4.62481 0.784292C4.53049 0.563997 4.42463 0.348818 4.30768 0.139648C3.45217 0.285521 2.61931 0.542203 1.8301 0.903216C0.263323 3.22129 -0.161406 5.48179 0.0509584 7.7102C0.968502 8.38812 1.9955 8.90369 3.0873 9.2345C3.33314 8.90386 3.55068 8.55308 3.7376 8.1859C3.38256 8.05329 3.03988 7.88969 2.71354 7.69699C2.79942 7.63469 2.88343 7.57051 2.9646 7.50822C3.91419 7.95479 4.95063 8.18633 5.99999 8.18633C7.04935 8.18633 8.08579 7.95479 9.03539 7.50822C9.1175 7.57523 9.2015 7.63941 9.28645 7.69699C8.95947 7.89 8.61616 8.05392 8.26049 8.18684C8.44719 8.55385 8.66474 8.90434 8.9108 9.2345C10.0035 8.90502 11.0313 8.38969 11.949 7.71114C12.1982 5.12691 11.5234 2.88717 10.1652 0.901328ZM4.0066 6.33974C3.41481 6.33974 2.9259 5.8027 2.9259 5.14201C2.9259 4.48132 3.39782 3.93955 4.00471 3.93955C4.6116 3.93955 5.09674 4.48132 5.08635 5.14201C5.07597 5.8027 4.60971 6.33974 4.0066 6.33974ZM7.99338 6.33974C7.40065 6.33974 6.91363 5.8027 6.91363 5.14201C6.91363 4.48132 7.38555 3.93955 7.99338 3.93955C8.60122 3.93955 9.08258 4.48132 9.0722 5.14201C9.06181 5.8027 8.5965 6.33974 7.99338 6.33974Z" />
-            </svg>
-            <div>Chat with us on Discord</div>
           </ExternalLink>
           <ExternalLink
             className={styles.Footer}

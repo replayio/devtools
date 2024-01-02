@@ -10,6 +10,7 @@ import {
 import InspectorContextReduxAdapter from "devtools/client/debugger/src/components/shared/InspectorContextReduxAdapter";
 // eslint-disable-next-line no-restricted-imports
 import { client } from "protocol/socket";
+import { SupportForm } from "replay-next/components/support/SupportForm";
 import { ExpandablesContextRoot } from "replay-next/src/contexts/ExpandablesContext";
 import { PointsContextRoot } from "replay-next/src/contexts/points/PointsContext";
 import { SelectedFrameContextRoot } from "replay-next/src/contexts/SelectedFrameContext";
@@ -26,7 +27,6 @@ import { DevToolsProcessingScreen } from "ui/components/DevToolsProcessingScreen
 import { NodePickerContextRoot } from "ui/components/NodePickerContext";
 import { RecordingDocumentTitle } from "ui/components/RecordingDocumentTitle";
 import TerminalContextAdapter from "ui/components/SecondaryToolbox/TerminalContextAdapter";
-import { SupportForm } from "ui/components/SupportForm";
 import { TestSuiteContextRoot } from "ui/components/TestSuite/views/TestSuiteContext";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { useTrackLoadingIdleTime } from "ui/hooks/tracking";
