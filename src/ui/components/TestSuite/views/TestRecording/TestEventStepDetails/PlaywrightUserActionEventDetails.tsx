@@ -19,7 +19,13 @@ import { LoadingFailedMessage } from "./TestEventDetailsLoadingMessages";
 import { UserActionEventPropsInspector } from "./UserActionEventPropsInspector";
 import styles from "./TestEventDetails.module.css";
 
-export function PlaywrightUserActionEventDetails({ testEvent }: { testEvent: UserActionEvent }) {
+export function PlaywrightUserActionEventDetails({
+  testEvent,
+  testEventPending,
+}: {
+  testEvent: UserActionEvent;
+  testEventPending?: boolean;
+}) {
   const [selectedTab, selectTab] = useLocalStorageUserData("playwrightStepSelectedTab");
 
   return (
@@ -41,7 +47,11 @@ export function PlaywrightUserActionEventDetails({ testEvent }: { testEvent: Use
         </button>
       </div>
 
-      <div className={styles.UserActionEventDetails}>
+      <div
+        className={styles.UserActionEventDetails}
+        data-test-name="UserActionEventDetails"
+        data-is-pending={testEventPending || undefined}
+      >
         <Offscreen mode={selectedTab === "elements" ? "visible" : "hidden"}>
           {testEvent.data.timeStampedPoints.result ? (
             <UserActionEventPropsInspector testEvent={testEvent} />

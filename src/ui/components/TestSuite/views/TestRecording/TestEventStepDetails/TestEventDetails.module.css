@@ -25,6 +25,10 @@
   padding-bottom: 0.5rem;
 }
 
+.UserActionEventDetails[data-is-pending] {
+  opacity: 0.5;
+}
+
 .DetailsTitle {
   font-size: var(--font-size-small);
   color: var(--color-dimmer);
