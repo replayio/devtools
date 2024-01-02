@@ -142,7 +142,10 @@ export function RunSummary({
         value={testFilterByText}
         onChange={setTestFilterByText}
       />
-      <div className="overflow-hidden overflow-ellipsis whitespace-nowrap border-b border-themeBorder px-4 pt-2 pb-4 font-medium">
+      <div
+        data-test-id="TestRunSummary-Title"
+        className="overflow-hidden overflow-ellipsis whitespace-nowrap border-b border-themeBorder px-4 pt-2 pb-4 font-medium"
+      >
         {getTestRunTitle(testRun)}
       </div>
       <div className="px-4 pt-2 pb-4 text-xs">

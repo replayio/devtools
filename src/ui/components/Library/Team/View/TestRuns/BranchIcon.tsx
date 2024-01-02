@@ -27,6 +27,7 @@ export function BranchIcon({
     <div
       className="flex-column flex items-center gap-1"
       data-test-id="TestRun-Branch"
+      data-test-branch={isPrimaryBranch ? "primary" : "feature"}
       title={title}
     >
       {isPrimaryBranch}
