@@ -544,14 +544,7 @@ async function fetchPlaywrightStepDetails(
 
         cacheDomNodeEntry(targetElements, replayClient, pauseId, timeStampedPoint, testEvent);
 
-        const resultContents = await objectCache.readAsync(
-          replayClient,
-          pauseId,
-          resultValueProp.object!,
-          "canOverflow"
-        );
-
-        testEventDetailsEntry.props = resultContents;
+        testEventDetailsEntry.props = resultValueProp.value;
         testEventDetailsEntry.count = numTargetElements;
       }
 
