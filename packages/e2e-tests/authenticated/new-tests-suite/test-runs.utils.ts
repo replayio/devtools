@@ -9,6 +9,7 @@ export const noTestSelected = (page: Page) => page.locator('[data-test-id="NoTes
 
 export const testRunsItems = (page: Page) => page.locator('[data-test-id="TestRunListItem"]');
 export const testRunSummary = (page: Page) => page.locator('[data-test-id="TestRunSummary"]');
+export const testRunResult = (page: Page) => page.locator('[data-test-id="TestRunResults"]');
 export const testItems = (page: Page) => page.locator('[data-test-id="TestRunResult-FileNode"]');
 
 export const testRecordings = (page: Page) =>

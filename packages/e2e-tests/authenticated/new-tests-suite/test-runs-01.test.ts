@@ -16,6 +16,7 @@ import {
   testErrors,
   testItems,
   testRecordings,
+  testRunResult,
   testRunSummary,
   testRunsItems,
 } from "./test-runs.utils";
@@ -63,7 +64,7 @@ test(`authenticated/new-test-suites/test-runs`, async ({ pageWithMeta: { page, c
   const failedItemsCount = await testRunsItems(page).count();
   for (let i = 0; i < failedItemsCount; i++) {
     const testRunItem = testRunsItems(page).nth(i);
-    expect(await testRunItem.locator('[data-test-status="failed"]').count()).toBe(1);
+    expect(await testRunItem.locator('[data-test-status="fail"]').count()).toBe(1);
   }
   await openContextMenu(resultDropdown, { useLeftClick: true });
   await selectContextMenuItem(page, {
@@ -94,6 +95,17 @@ test(`authenticated/new-test-suites/test-runs`, async ({ pageWithMeta: { page, c
   const flakyPillCount = testRunSummary(page).locator('[data-test-id="Pill-flaky"]');
   expect(await failedPillCount.count()).toBe(0);
   expect(await flakyPillCount.count()).toBe(0);
+  //#endregion
+
+  //#region >>> If a section does not contain any tests, it should not be displayed
+  const failedTests = testRunResult(page).locator(
+    '[data-test-id="TestRunResults-StatusGroup-failed"]'
+  );
+  const flakyTests = testRunResult(page).locator(
+    '[data-test-id="TestRunResults-StatusGroup-flaky"]'
+  );
+  expect(await failedTests.count()).toBe(0);
+  expect(await flakyTests.count()).toBe(0);
   //#endregion
 
   //#region >>> Filter test by text

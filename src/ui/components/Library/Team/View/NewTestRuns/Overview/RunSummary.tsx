@@ -34,11 +34,13 @@ export function Attributes({ testRun, durationMs }: { testRun: TestRun; duration
             {user}
           </AttributeContainer>
         ) : null}
-        <BranchIcon
-          branchName={branchName}
-          isPrimaryBranch={isPrimaryBranch ?? false}
-          title={getTestRunTitle(testRun)}
-        />
+        {branchName ? (
+          <BranchIcon
+            branchName={branchName}
+            isPrimaryBranch={isPrimaryBranch ?? false}
+            title={getTestRunTitle(testRun)}
+          />
+        ) : null}
         <AttributeContainer dataTestId="TestRun-Duration" icon="timer">
           {durationString}
         </AttributeContainer>
