@@ -1,9 +1,9 @@
 import React from "react";
 
+import ExternalLink from "replay-next/components/ExternalLink";
 import { SubscriptionWithPricing } from "shared/graphql/types";
 
 import { Button } from "../Button";
-import ExternalLink from "../ExternalLink";
 import { PlanDetails } from "./PlanDetails";
 
 export function PricingPage({

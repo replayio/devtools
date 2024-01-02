@@ -1,6 +1,6 @@
 import React from "react";
 
-import ExternalLink from "ui/components/shared/ExternalLink";
+import ExternalLink from "replay-next/components/ExternalLink";
 
 import DeclarationValue from "../../rules/components/DeclarationValue";
 import { MatchedSelectorState } from "../state";

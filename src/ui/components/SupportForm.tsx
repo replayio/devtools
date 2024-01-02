@@ -1,12 +1,11 @@
 import { useContext, useRef, useState } from "react";
 
+import ExternalLink from "replay-next/components/ExternalLink";
 import Icon from "replay-next/components/Icon";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import useModalDismissSignal from "replay-next/src/hooks/useModalDismissSignal";
-import { getOS } from "shared/utils/os";
 import { setShowSupportForm } from "ui/actions/layout";
 import { PrimaryButton, SecondaryButton } from "ui/components/shared/Button";
-import ExternalLink from "ui/components/shared/ExternalLink";
 import { useAppDispatch } from "ui/setup/hooks";
 
 import styles from "./SupportForm.module.css";
