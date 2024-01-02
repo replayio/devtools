@@ -14,7 +14,7 @@ export function UnexpectedErrorForm({ details, title }: { details?: ReactNode; t
       details={
         <>
           {details && <div className={styles.Details}>{details}</div>}
-          <div className={styles.Boilerplate}>
+          <div>
             We've sent this crash to our team. Please add any details that might help us diagnose
             and fix this issue.
           </div>
