@@ -11,7 +11,6 @@ import {
 } from "ui/components/TestSuite/suspense/TestEventDetailsCache";
 
 import { LoadingFailedMessage, LoadingInProgress } from "./TestEventDetailsLoadingMessages";
-import styles from "./TestEventDetails.module.css";
 
 export function UserActionEventPropsInspector({ testEvent }: { testEvent: UserActionEvent }) {
   // Parent ensures this exists
@@ -40,10 +39,8 @@ export function UserActionEventPropsInspector({ testEvent }: { testEvent: UserAc
   }
 
   return (
-    <div className={styles.UserActionEventDetails} data-test-name="UserActionEventDetails">
-      <InspectableTimestampedPointContext.Provider value={context}>
-        <PropertiesRenderer pauseId={value.pauseId} object={value.props} hidePrototype={true} />
-      </InspectableTimestampedPointContext.Provider>
-    </div>
+    <InspectableTimestampedPointContext.Provider value={context}>
+      <PropertiesRenderer pauseId={value.pauseId} object={value.props} hidePrototype={true} />
+    </InspectableTimestampedPointContext.Provider>
   );
 }

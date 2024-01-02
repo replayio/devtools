@@ -10,9 +10,19 @@ import { TestSuiteCache } from "ui/components/TestSuite/suspense/TestSuiteCache"
 import { LoadingFailedMessage } from "./TestEventDetailsLoadingMessages";
 import styles from "./TestEventDetails.module.css";
 
-export function PlaywrightUserActionEventDetails({ testEvent }: { testEvent: UserActionEvent }) {
+export function PlaywrightUserActionEventDetails({
+  testEvent,
+  testEventPending,
+}: {
+  testEvent: UserActionEvent;
+  testEventPending?: boolean;
+}) {
   return (
-    <div className={styles.UserActionEventDetails}>
+    <div
+      className={styles.UserActionEventDetails}
+      data-test-name="UserActionEventDetails"
+      data-is-pending={testEventPending || undefined}
+    >
       <PlaywrightStepSources testEvent={testEvent} />
     </div>
   );

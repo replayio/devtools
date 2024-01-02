@@ -4,12 +4,12 @@ import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBo
 import { isUserActionTestEvent } from "shared/test-suites/RecordingTestMetadata";
 import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext";
 
+import { CypressUserActionStepDetails } from "./TestEventStepDetails/CypressUserActionStepDetails";
 import { PlaywrightUserActionEventDetails } from "./TestEventStepDetails/PlaywrightUserActionEventDetails";
-import { UserActionEventPropsInspector } from "./TestEventStepDetails/UserActionEventPropsInspector";
 import styles from "./TestEventStepDetails/TestEventDetails.module.css";
 
 export default function TestEventDetails({ collapsed }: { collapsed: boolean }) {
-  const { testEvent } = useContext(TestSuiteContext);
+  const { testEvent, testEventPending } = useContext(TestSuiteContext);
 
   if (collapsed) {
     return null;
@@ -21,11 +21,11 @@ export default function TestEventDetails({ collapsed }: { collapsed: boolean }) 
   const UserEventDetailsComponent =
     testRunnerName === "playwright"
       ? PlaywrightUserActionEventDetails
-      : UserActionEventPropsInspector;
+      : CypressUserActionStepDetails;
 
   return (
     <InlineErrorBoundary name="TestEventDetails">
-      <UserEventDetailsComponent testEvent={testEvent} />
+      <UserEventDetailsComponent testEvent={testEvent} testEventPending={testEventPending} />
     </InlineErrorBoundary>
   );
 }
