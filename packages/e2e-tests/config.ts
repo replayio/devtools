@@ -22,7 +22,8 @@ export default {
   // While thats not great, it's also not the end of the world.
   // If someone does that, we can always change this code to only run in CI in the main repo and have this as a secret.
   // It's a lot easier to hardcode it for now though.
-  replayApiKey: "rwk_7o3q05qOwAXoYHWiVLra5cuOilLIghqDRMWyd8ObPac",
+  replayApiKey:
+    process.env.RECORD_REPLAY_API_KEY || "rwk_7o3q05qOwAXoYHWiVLra5cuOilLIghqDRMWyd8ObPac",
   shouldRecordTest: !process.env.DONT_RECORD_TEST,
   shouldSaveCoverageData: !!process.env.E2E_CODE_COVERAGE,
   updateFixtures: !!process.env.SHOULD_UPDATE_FIXTURES,

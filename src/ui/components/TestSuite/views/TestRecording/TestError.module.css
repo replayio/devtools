@@ -1,6 +1,8 @@
 .Row {
   border-left: 2px solid var(--testsuites-error-border-color);
   padding: 0.5rem 0.75rem;
+  white-space: pre-wrap;
+  word-break: break-all;
 }
 
 .Header {
@@ -21,4 +23,5 @@
   color: var(--testsuites-error-color);
   margin-top: 0.75rem;
   white-space: pre-wrap;
+  word-break: break-all;
 }

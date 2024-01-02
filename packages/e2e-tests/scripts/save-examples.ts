@@ -7,7 +7,7 @@
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 import type { Page, expect as expectFunction } from "@playwright/test";
-import { listAllRecordings, removeRecording, uploadRecording } from "@replayio/replay";
+import { removeRecording, uploadRecording } from "@replayio/replay";
 import axios from "axios";
 import chalk from "chalk";
 import { dots } from "cli-spinners";
@@ -19,6 +19,7 @@ import { SetRecordingIsPrivateVariables } from "../../shared/graphql/generated/S
 import { UpdateRecordingTitleVariables } from "../../shared/graphql/generated/UpdateRecordingTitle";
 import config, { BrowserName } from "../config";
 import { testFunction as reduxFundamentalsScript } from "../examples/redux-fundamentals/tests/example-script";
+import { ExamplesData } from "../helpers";
 import { recordNodeExample } from "./record-node";
 import { recordPlaywright, uploadLastRecording } from "./record-playwright";
 
@@ -58,28 +59,16 @@ type TestExampleFile = {
 
 const knownExamples: TestExampleFile[] = [
   {
-    filename: "authenticated_comments_1.html",
+    filename: "authenticated_comments.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
-    filename: "authenticated_comments_2.html",
+    filename: "authenticated_logpoints.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
-  },
-  {
-    filename: "authenticated_comments_3.html",
-    folder: config.browserExamplesPath,
-    category: "browser",
-    runtime: "firefox",
-  },
-  {
-    filename: "authenticated_logpoints_1.html",
-    folder: config.browserExamplesPath,
-    category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "cra/dist/index.html",
@@ -115,7 +104,7 @@ const knownExamples: TestExampleFile[] = [
     filename: "doc_debugger_statements.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_events.html",
@@ -157,7 +146,7 @@ const knownExamples: TestExampleFile[] = [
     filename: "doc_inspector_sourcemapped.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_inspector_styles.html",
@@ -193,7 +182,7 @@ const knownExamples: TestExampleFile[] = [
     filename: "doc_recursion.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_rr_basic.html",
@@ -205,25 +194,25 @@ const knownExamples: TestExampleFile[] = [
     filename: "doc_rr_blackbox.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_rr_console.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_rr_error.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_rr_logs.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_rr_objects.html",
@@ -235,19 +224,19 @@ const knownExamples: TestExampleFile[] = [
     filename: "doc_rr_preview.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_rr_region_loading.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_rr_worker.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_stacking.html",
@@ -265,7 +254,7 @@ const knownExamples: TestExampleFile[] = [
     filename: "log_points_and_block_scope.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "redux-fundamentals/dist/index.html",
@@ -355,31 +344,70 @@ function logAnimated(text: string): () => void {
   };
 }
 
-async function saveRecording(example: string, apiKey: string, recordingId?: string) {
-  if (recordingId) {
-  } else {
-    const recordings = listAllRecordings();
-    if (recordings.length > 0) {
-      const lastRecording = recordings[recordings.length - 1];
-      recordingId = lastRecording.id;
-    } else {
-      throw "No recording id found";
-    }
-  }
+async function saveRecording(
+  example: string,
+  apiKey: string,
+  recordingId: string,
+  skipUpload?: boolean
+) {
+  const response = await axios({
+    url: config.graphqlUrl,
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+    },
+    data: {
+      query: `
+          query GetRecordingBuildId($recordingId: UUID!) {
+            recording(uuid: $recordingId) {
+              buildId
+            }
+          }
+        `,
+      variables: {
+        recordingId,
+      },
+    },
+  });
+  const buildId = response.data.data.recording.buildId;
 
   const done = logAnimated(`Saving ${chalk.bold(example)} with recording id ${recordingId}`);
-  const id = await uploadRecording(recordingId, {
-    apiKey,
-    server: config.backendUrl,
-    verbose: true,
-  });
+
+  if (!skipUpload) {
+    await uploadRecording(recordingId, {
+      apiKey,
+      server: config.backendUrl,
+      verbose: true,
+    });
+  }
 
   await makeReplayPublic(apiKey, recordingId);
   await updateRecordingTitle(apiKey, recordingId, `E2E Example: ${example}`);
 
   const text = "" + readFileSync(examplesJsonPath);
-  const json = JSON.parse(text);
-  writeFileSync(examplesJsonPath, JSON.stringify({ ...json, [example]: id }, null, 2));
+
+  const json: ExamplesData = {
+    ...JSON.parse(text),
+    [example]: {
+      recording: recordingId,
+      buildId,
+    },
+  };
+
+  const keys = Object.keys(json).sort();
+
+  writeFileSync(
+    examplesJsonPath,
+    JSON.stringify(
+      keys.reduce((accumulated, key) => {
+        accumulated[key] = json[key];
+
+        return accumulated;
+      }, {}),
+      null,
+      2
+    )
+  );
 
   done();
 }
@@ -440,12 +468,14 @@ async function saveBrowserExample({ example }: TestRunCallbackArgs) {
 
   console.log("Recording completed");
   const recordingId = await uploadLastRecording(exampleUrl);
-  console.log("Uploaded recording", recordingId);
+  if (recordingId == null) {
+    throw new Error("Recording not uploaded");
+  }
 
   done();
 
   if (config.useExampleFile && recordingId) {
-    await saveRecording(example.filename, config.replayApiKey, recordingId);
+    await saveRecording(example.filename, config.replayApiKey, recordingId, true);
   }
   if (recordingId) {
     removeRecording(recordingId);
@@ -460,7 +490,7 @@ async function saveNodeExamples() {
 
     const recordingId = await recordNodeExample(examplePath);
     if (recordingId) {
-      await saveRecording(example.filename, config.replayApiKey, recordingId!);
+      await saveRecording(example.filename, config.replayApiKey, recordingId);
       removeRecording(recordingId);
 
       done();

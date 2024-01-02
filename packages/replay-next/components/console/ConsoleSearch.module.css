@@ -8,7 +8,7 @@
   overflow: hidden;
 }
 .ContainerFocused {
-  border-color: var(--color-brand);
+  border-color: var(--primary-accent);
 }
 
 .Icon {
@@ -61,7 +61,7 @@
   outline: none;
 }
 .ResultsIconButton:focus {
-  border-color: var(--color-brand);
+  border-color: var(--primary-accent);
 }
 .ResultsIconButton:hover:not(.ResultsIconButton:disabled):not(.ResultsIconButtonActive) {
   color: var(--color-default);

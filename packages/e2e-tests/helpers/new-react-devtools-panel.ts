@@ -59,7 +59,7 @@ export function getInspectedHook(page: Page, name: string) {
 }
 
 export function getReactComponents(page: Page) {
-  return getReactDevToolsPanel(page).locator('[data-test-name="ReactDevToolsListItem"]');
+  return page.locator('[data-test-name="ReactDevToolsListItem"]');
 }
 
 export function getReactDevToolsList(page: Page) {

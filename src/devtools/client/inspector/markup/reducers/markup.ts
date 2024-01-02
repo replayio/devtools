@@ -44,7 +44,8 @@ const markupSlice = createSlice({
       },
     },
     nodesHighlighted(state, action: PayloadAction<string[]>) {
-      state.highlightedNodes = action.payload;
+      const uniqueNodeIds = [...new Set(action.payload)];
+      state.highlightedNodes = uniqueNodeIds;
     },
     nodeBoxModelsLoaded(state, action: PayloadAction<BoxModel[]>) {
       boxModelAdapter.setAll(state.nodeBoxModels, action);

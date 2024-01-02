@@ -5,6 +5,7 @@ import { ContextMenuItem, useContextMenu } from "use-context-menu";
 import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import Icon from "replay-next/components/Icon";
 import { IndeterminateProgressBar } from "replay-next/components/IndeterminateLoader";
+import useLocalStorageUserData from "shared/user-data/LocalStorage/useLocalStorageUserData";
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 
 import { TeamContext } from "../../TeamContextRoot";
@@ -57,6 +58,7 @@ function TestRunsContent() {
   } = useContext(TestRunsContext);
   const { team } = useContext(TeamContext);
   const { filterByTime, setFilterByTime } = useContext(TimeFilterContext);
+  const [enableTestSuitesChart] = useLocalStorageUserData("enableTestSuitesChart");
 
   const {
     contextMenu: contextMenuStatusFilter,
@@ -168,15 +170,17 @@ function TestRunsContent() {
                 value={filterByTextForDisplay}
               />
             </div>
-            <div>
-              {testRunsLoading && testRuns.length === 0 ? (
-                <div className="flex h-full items-center justify-center">
-                  <LibrarySpinner />
-                </div>
-              ) : (
-                <TestRunsStats />
-              )}
-            </div>
+            {enableTestSuitesChart && (
+              <div>
+                {testRunsLoading && testRuns.length === 0 ? (
+                  <div className="flex h-full items-center justify-center">
+                    <LibrarySpinner />
+                  </div>
+                ) : (
+                  <TestRunsStats />
+                )}
+              </div>
+            )}
             <div
               className="grow"
               data-filtered-by-status={filterByStatus}

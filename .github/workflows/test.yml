@@ -31,7 +31,7 @@ jobs:
       - name: Download
         run: wget https://static.replay.io/downloads/macOS-replay-playwright.tar.xz
       - name: Create artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: macOS-replay-playwright
           path: macOS-replay-playwright.tar.xz
@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Waiting for 200 from the Vercel Preview
-        uses: patrickedqvist/wait-for-vercel-preview@v1.2.0
+        uses: patrickedqvist/wait-for-vercel-preview@v1.3.1
         id: waitFor200
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -73,15 +73,15 @@ jobs:
         shard: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Setup node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           node-version: "16"
       # Get the yarn cache path.
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
+        run: echo "{dir}={$(yarn config get cacheFolder)}" >> $GITHUB_OUTPUT
       - name: Restore yarn cache
         uses: actions/cache@v3
         id: yarn-cache
@@ -101,24 +101,32 @@ jobs:
         run: npx @replayio/playwright install
         env:
           RECORD_REPLAY_CHROMIUM_DOWNLOAD_FILE: ${{ github.event.inputs.linuxBuildFile }}
-      - uses: replayio/action-playwright@main
-        with:
-          command: npx playwright test --shard ${{ matrix.shard }}/10 --reporter=@replayio/playwright/reporter,line tests/*.ts
-          working-directory: ./packages/e2e-tests
-          api-key: ${{ env.RECORD_REPLAY_API_KEY }}
-          public: true
-          upload-all: true
-          project: replay-chromium
+      - name: Run Playwright
+        run: npx playwright test --shard ${{ matrix.shard }}/10 tests/*.ts --project replay-chromium
+        working-directory: ./packages/e2e-tests
         env:
           REPLAY_PLAYWRIGHT_FIXTURE: 1
-          RECORD_REPLAY_METADATA_TEST_RUN_ID: ${{ needs.generate-test-run-id.outputs.testRunId }}
+          RECORD_REPLAY_TEST_RUN_ID: ${{ needs.generate-test-run-id.outputs.testRunId }}
           PLAYWRIGHT_TEST_BASE_URL: ${{ needs.preview-branch.outputs.url }}
           INPUT_STRIPE: ${{ matrix.shard }}/10
+          SHARD_NUMBER: ${{ matrix.shard }}
           RECORD_REPLAY_WEBHOOK_URL: ${{ secrets.RECORD_REPLAY_WEBHOOK_URL }}
           RECORD_REPLAY_TEST_METRICS: 1
           AUTOMATED_TEST_SECRET: ${{ secrets.AUTOMATED_TEST_SECRET }}
           AUTHENTICATED_TESTS_WORKSPACE_API_KEY: ${{ secrets.AUTHENTICATED_TESTS_WORKSPACE_API_KEY }}
           GOLDEN_TEST_RUN_WORKSPACE_API_KEY: ${{ secrets.GOLDEN_TEST_RUN_WORKSPACE_API_KEY }}
+      - name: Archive Playwright report results with code coverage 
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: all-code-coverage-reports_${{ matrix.shard }}
+          path: packages/e2e-tests/test-results
+          retention-days: 3
+      - uses: replayio/action-upload@v0.5.1
+        if: always()
+        with:
+          api-key: ${{ env.RECORD_REPLAY_API_KEY }}
+          public: true
   authenticated-e2etest:
     name: Authenticated end-to-end tests (${{ matrix.shard }})
     runs-on: ubuntu-latest
@@ -130,15 +138,15 @@ jobs:
         shard: ["1"]
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Setup node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           node-version: "16"
       # Get the yarn cache path.
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
+        run: echo "{dir}={$(yarn config get cacheFolder)}" >> $GITHUB_OUTPUT
       - name: Restore yarn cache
         uses: actions/cache@v3
         id: yarn-cache
@@ -156,17 +164,12 @@ jobs:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
       - name: Install Replay Playwright
         run: npx @replayio/playwright install
-      - uses: replayio/action-playwright@main
-        with:
-          command: npx playwright test --shard ${{ matrix.shard }}/1 --reporter=@replayio/playwright/reporter,line authenticated/**/*.ts
-          working-directory: ./packages/e2e-tests
-          api-key: ${{ env.RECORD_REPLAY_API_KEY }}
-          public: true
-          upload-all: true
-          project: replay-chromium
+      - name: Run Playwright
+        run: npx playwright test --shard ${{ matrix.shard }}/1 authenticated/**/*.ts authenticated/*.ts --project replay-chromium
+        working-directory: ./packages/e2e-tests
         env:
           REPLAY_PLAYWRIGHT_FIXTURE: 1
-          RECORD_REPLAY_METADATA_TEST_RUN_ID: ${{ needs.generate-test-run-id.outputs.testRunId }}
+          RECORD_REPLAY_TEST_RUN_ID: ${{ needs.generate-test-run-id.outputs.testRunId }}
           PLAYWRIGHT_TEST_BASE_URL: ${{ needs.preview-branch.outputs.url }}
           INPUT_STRIPE: ${{ matrix.shard }}/1
           RECORD_REPLAY_WEBHOOK_URL: ${{ secrets.RECORD_REPLAY_WEBHOOK_URL }}
@@ -174,68 +177,31 @@ jobs:
           AUTOMATED_TEST_SECRET: ${{ secrets.AUTOMATED_TEST_SECRET }}
           AUTHENTICATED_TESTS_WORKSPACE_API_KEY: ${{ secrets.AUTHENTICATED_TESTS_WORKSPACE_API_KEY }}
           GOLDEN_TEST_RUN_WORKSPACE_API_KEY: ${{ secrets.GOLDEN_TEST_RUN_WORKSPACE_API_KEY }}
-  e2etest-jail:
-    name: End-to-end tests - Jail
-    runs-on: ubuntu-latest
-    needs: [preview-branch, generate-test-run-id]
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@v2
-      - name: Setup node
-        uses: actions/setup-node@v2
+      - name: Archive Playwright report results with code coverage 
+        uses: actions/upload-artifact@v4
+        if: always()
         with:
-          node-version: "16"
-      # Get the yarn cache path.
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
-      - name: Restore yarn cache
-        uses: actions/cache@v3
-        id: yarn-cache
+          name: all-code-coverage-reports_auth
+          path: packages/e2e-tests/test-results
+          retention-days: 3
+      - uses: replayio/action-upload@v0.5.1
         with:
-          path: |
-            ${{ steps.yarn-cache-dir-path.outputs.dir }}
-            **/node_modules
-          key: yarn-cache-folder-${{ hashFiles('**/yarn.lock', '.yarnrc.yml') }}
-          restore-keys: "yarn-cache-folder-"
-      # Actually install packages with Yarn
-      - name: Install packages
-        run: yarn install
-        env:
-          YARN_CHECKSUM_BEHAVIOR: "update"
-          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
-      - name: Install Replay Playwright
-        run: npx @replayio/playwright install
-      - uses: replayio/action-playwright@main
-        with:
-          command: npx playwright test --reporter=@replayio/playwright/reporter,line jail/*.test.ts --project replay-chromium || exit 0
-          working-directory: ./packages/e2e-tests
           api-key: ${{ env.RECORD_REPLAY_API_KEY }}
           public: true
-          upload-all: true
-          project: replay-chromium
-        env:
-          REPLAY_PLAYWRIGHT_FIXTURE: 1
-          RECORD_REPLAY_METADATA_TEST_RUN_ID: ${{ needs.generate-test-run-id.outputs.testRunId }}
-          PLAYWRIGHT_TEST_BASE_URL: ${{ needs.preview-branch.outputs.url }}
-          RECORD_REPLAY_TEST_METRICS: 1
-          AUTOMATED_TEST_SECRET: ${{ secrets.AUTOMATED_TEST_SECRET }}
-          AUTHENTICATED_TESTS_WORKSPACE_API_KEY: ${{ secrets.AUTHENTICATED_TESTS_WORKSPACE_API_KEY }}
-          GOLDEN_TEST_RUN_WORKSPACE_API_KEY: ${{ secrets.GOLDEN_TEST_RUN_WORKSPACE_API_KEY }}
   unit-test:
     name: Unit Tests
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Setup node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           node-version: "16"
       # Get the yarn cache path.
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
+        run: echo "{dir}={$(yarn config get cacheFolder)}" >> $GITHUB_OUTPUT
       - name: Restore yarn cache
         uses: actions/cache@v3
         id: yarn-cache
@@ -252,3 +218,58 @@ jobs:
           YARN_CHECKSUM_BEHAVIOR: "update"
       - name: Run tests
         run: yarn test
+  merge-coverage-reports:
+    # Merge reports after playwright-tests, even if some shards have failed
+    if: always()
+    needs: [e2etest, authenticated-e2etest]
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "16"
+      # Get the yarn cache path.
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "{dir}={$(yarn config get cacheFolder)}" >> $GITHUB_OUTPUT
+      - name: Restore yarn cache
+        uses: actions/cache@v3
+        id: yarn-cache
+        with:
+          path: |
+            ${{ steps.yarn-cache-dir-path.outputs.dir }}
+            **/node_modules
+          key: yarn-cache-folder-${{ hashFiles('**/yarn.lock', '.yarnrc.yml') }}
+          restore-keys: "yarn-cache-folder-"
+      # Actually install packages with Yarn
+      - name: Install packages
+        run: yarn install
+        env:
+          YARN_CHECKSUM_BEHAVIOR: "update"
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+      - name: Download all coverage reports from GitHub Actions Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: test-results
+      - name: Merge Monocart reports
+        id: merge-monocart-reports
+        run: |
+          yarn ts-node packages/e2e-tests/scripts/merge-monocart-reports.ts ./test-results
+      - name: Archive merged Playwright report results with code coverage 
+        uses: actions/upload-artifact@v4
+        id: upload-coverage-report
+        if: always()
+        with:
+          name: all-code-coverage-reports-merged
+          path: |
+            ./test-results/merged-report*
+            ./test-results/merged-coverage*
+            ./test-results/coverage-reports
+          retention-days: 14
+      - name: Post coverage summary as a PR comment
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          filePath: ./coverageSummary.md
+          comment_tag: coverage_summary

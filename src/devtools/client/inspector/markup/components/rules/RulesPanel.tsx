@@ -66,7 +66,11 @@ export function RulesPanelSuspends() {
           {({ height }: { height: number }) => (
             <RulesList
               height={height}
-              noContentFallback={<div className={styles.NoStyles}>No styles to display</div>}
+              noContentFallback={
+                <div className={styles.NoStyles}>
+                  {selectedNodeId ? "No styles to display" : "No element selected"}
+                </div>
+              }
               rules={cachedStyles?.rules ?? NO_RULES_AVAILABLE}
               searchText={searchText}
             />

@@ -11,16 +11,17 @@ import Icon from "replay-next/components/Icon";
 import { createTypeDataForVisualComment } from "replay-next/components/sources/utils/comments";
 import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
+import { useMostRecentLoadedPause } from "replay-next/src/hooks/useMostRecentLoadedPause";
 import { useNag } from "replay-next/src/hooks/useNag";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Nag } from "shared/graphql/types";
-import { fetchMouseTargetsForPause } from "ui/actions/app";
+import { mouseEventCanvasPosition as getPositionForInspectingElement } from "shared/utils/canvas";
 import { createFrameComment } from "ui/actions/comments";
 import { setSelectedPanel, setViewMode } from "ui/actions/layout";
 import { stopPlayback } from "ui/actions/timeline";
 import { isPlaying as isPlayingSelector } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { getMouseTarget } from "ui/suspense/nodeCaches";
-import { mouseEventCanvasPosition as getPositionForInspectingElement } from "ui/utils/nodePicker";
+import { boundingRectsCache, getMouseTarget } from "ui/suspense/nodeCaches";
 
 import styles from "./VideoContextMenu.module.css";
 
@@ -30,7 +31,10 @@ export default function useVideoContextMenu({
   canvasRef: RefObject<HTMLCanvasElement>;
 }) {
   const { showCommentsPanel } = useContext(InspectorContext);
+  const replayClient = useContext(ReplayClientContext);
   const { accessToken, recordingId } = useContext(SessionContext);
+
+  const { pauseId } = useMostRecentLoadedPause() ?? {};
 
   const dispatch = useAppDispatch();
   const isPlaying = useAppSelector(isPlayingSelector);
@@ -96,6 +100,10 @@ export default function useVideoContextMenu({
   };
 
   const onShow = async (event: UIEvent) => {
+    if (pauseId == null) {
+      return;
+    }
+
     if (isPlaying) {
       dispatch(stopPlayback());
     }
@@ -115,7 +123,7 @@ export default function useVideoContextMenu({
       if (position != null) {
         const { x, y } = position;
 
-        const boundingRects = await dispatch(fetchMouseTargetsForPause());
+        const boundingRects = await boundingRectsCache.readAsync(replayClient, pauseId);
         const target = getMouseTarget(boundingRects ?? [], x, y);
         const targetNodeId = target?.node ?? null;
         mouseEventDataRef.current.targetNodeId = targetNodeId;

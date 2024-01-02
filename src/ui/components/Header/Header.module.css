@@ -48,7 +48,7 @@
 }
 .EditableTitle:focus {
   outline: none;
-  border-color: var(--color-brand);
+  border-color: var(--primary-accent);
 }
 
 .BackButton {
