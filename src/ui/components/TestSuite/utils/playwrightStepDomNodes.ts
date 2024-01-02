@@ -22,6 +22,12 @@ export type ParsedSelector = {
   capture?: number;
 };
 
+// Pair together a Playwright locator substring with the elements it matches
+export type IntermediateSelectedElements = {
+  source: string;
+  elements: HTMLElement[];
+};
+
 export function getPlaywrightTestStepDomNodes(pointsToLocatorStrings: Record<string, string>) {
   const currentExecutionPoint = __REPLAY_CURRENT_EVALUATION_POINT__;
 
@@ -49,10 +55,11 @@ export function getPlaywrightTestStepDomNodes(pointsToLocatorStrings: Record<str
     return {
       parts: parsedSelector.parts.slice(0, index + 1),
       capture: parsedSelector.capture,
+      source: part.source,
     };
   });
 
-  const allSelectedElements = iterativeSelectors.map(selector => {
+  const allSelectedElements: IntermediateSelectedElements[] = iterativeSelectors.map(selector => {
     let elements: HTMLElement[] = [];
     try {
       elements = PLAYWRIGHT_INJECTED_SCRIPT.querySelectorAll(
@@ -61,7 +68,10 @@ export function getPlaywrightTestStepDomNodes(pointsToLocatorStrings: Record<str
       );
     } catch (err) {}
 
-    return elements;
+    return {
+      source: selector.source,
+      elements,
+    };
   });
 
   // Now we deal with our runEvaluation object preview limits again.
@@ -74,9 +84,12 @@ export function getPlaywrightTestStepDomNodes(pointsToLocatorStrings: Record<str
     JSON.stringify(parsedSelector),
     // all parsed selectors
     JSON.stringify(iterativeSelectors),
+    // Construct an object containing both the final requested
+    // target elements, and all of the intermediate elements,
+    // so that we can show this in the "Step Details" panel
     {
-      foundElements,
-      allSelectedElements,
+      "Target Elements": foundElements,
+      "All Located Elements": allSelectedElements,
     },
   ];
 
