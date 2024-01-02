@@ -1,11 +1,10 @@
 import slugify from "slugify";
 
 import { Recording } from "shared/graphql/types";
-
-import { usesWindow } from "../../ssr";
-import { SLUG_SEPARATOR, extractIdAndSlug } from "./helpers";
+import { SLUG_SEPARATOR, extractIdAndSlug } from "shared/utils/slug";
 
 const WARNING_MS = 60 * 2 * 1000;
+
 export const showDurationWarning = (recording: Recording) =>
   !!recording.duration && recording.duration > WARNING_MS;
 
@@ -19,16 +18,12 @@ export function getRecordingURL(recording: Recording): string {
 }
 
 export function getRecordingId(): string | undefined {
-  return usesWindow(win => {
-    if (!win) {
-      return undefined;
-    }
-
+  if (typeof window !== "undefined" && window != null) {
     const parts = window.location.pathname.split("/");
     if (parts[1] === "recording") {
       return extractIdAndSlug(parts.slice(2)).id;
     }
 
     return undefined;
-  });
+  }
 }

@@ -1,7 +1,7 @@
 import { PauseId, Value } from "@replayio/protocol";
 import { Suspense, useContext } from "react";
 
-import ErrorBoundary from "replay-next/components/ErrorBoundary";
+import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBoundary";
 import Inspector from "replay-next/components/inspector/Inspector";
 import ScopesInspector from "replay-next/components/inspector/ScopesInspector";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
@@ -141,7 +141,7 @@ export default function Scopes() {
   return (
     <div className="scopes-content">
       <Redacted className="pane scopes-list" data-test-name="ScopesList">
-        <ErrorBoundary
+        <InlineErrorBoundary
           name="NewScopes"
           key={`${selectedFrameId?.pauseId}:${selectedFrameId?.frameId}`}
           fallback={<div className="pane-info">Error loading scopes</div>}
@@ -149,7 +149,7 @@ export default function Scopes() {
           <Suspense fallback={<div className="pane-info">Loading…</div>}>
             <ScopesRenderer />
           </Suspense>
-        </ErrorBoundary>
+        </InlineErrorBoundary>
       </Redacted>
     </div>
   );

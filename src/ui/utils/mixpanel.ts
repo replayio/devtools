@@ -4,11 +4,11 @@ import mixpanel from "mixpanel-browser";
 import { ActiveInspectorTab, ViewMode } from "shared/user-data/GraphQL/config";
 import { userData } from "shared/user-data/GraphQL/UserData";
 import { isReplayBrowser, skipTelemetry } from "shared/utils/environment";
+import { getRecordingId } from "shared/utils/recording";
 import { CanonicalRequestType } from "ui/components/NetworkMonitor/utils";
 import { WorkspaceId, WorkspaceUuid } from "ui/state/app";
 import { PrimaryPanelName, SecondaryPanelName } from "ui/state/layout";
 
-import { getRecordingId } from "./recording";
 import { TelemetryUser, trackTiming } from "./telemetry";
 import { decodeWorkspaceId } from "./workspace";
 

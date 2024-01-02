@@ -18,7 +18,7 @@ import {
 } from "react-resizable-panels";
 import AutoSizer from "react-virtualized-auto-sizer";
 
-import ErrorBoundary from "replay-next/components/ErrorBoundary";
+import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBoundary";
 import { PanelLoader } from "replay-next/components/PanelLoader";
 import { useDebounce } from "replay-next/src/hooks/useDebounce";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -238,7 +238,7 @@ function ReactDevToolsPanelInner({
           ref={rightPanelRef}
         >
           {listData && pauseId && selectedElementForDetailsPanel ? (
-            <ErrorBoundary
+            <InlineErrorBoundary
               fallback={
                 <SelectedElementErrorBoundaryFallback element={selectedElementForDetailsPanel} />
               }
@@ -258,7 +258,7 @@ function ReactDevToolsPanelInner({
                   store={store}
                 />
               </Suspense>
-            </ErrorBoundary>
+            </InlineErrorBoundary>
           ) : null}
         </Panel>
       </PanelGroup>

@@ -14,8 +14,8 @@ import {
   unsubscribeToEmailTypeVariables,
 } from "shared/graphql/generated/unsubscribeToEmailType";
 import { Recording, Workspace } from "shared/graphql/types";
+import { getRecordingId } from "shared/utils/recording";
 import { DISMISS_NAG, GET_USER_ID, GET_USER_INFO } from "ui/graphql/users";
-import { getRecordingId } from "ui/utils/recording";
 import { sendTelemetryEvent } from "ui/utils/telemetry";
 
 import { useGetRecording } from "./recordings";

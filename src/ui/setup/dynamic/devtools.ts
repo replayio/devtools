@@ -44,7 +44,7 @@ import timeline, {
   setPlaybackStalled,
 } from "ui/reducers/timeline";
 import { UIState } from "ui/state";
-import { UnexpectedError } from "ui/state/app";
+import { ExpectedError, UnexpectedError } from "ui/state/app";
 import {
   REACT_ANNOTATIONS_KIND,
   REDUX_ANNOTATIONS_KIND,
@@ -98,7 +98,7 @@ async function getSessionErrorMessages(replayClient: ReplayClientInterface) {
   const isFirefox = buildComponents?.runtime === "gecko";
 
   // Reported reasons why a session can be destroyed.
-  const sessionErrorMessages: Record<number, Partial<UnexpectedError>> = {
+  const sessionErrorMessages: Record<number, Partial<ExpectedError>> = {
     [SessionError.BackendDeploy]: {
       content: "Please wait a few minutes and try again.",
     },
@@ -206,7 +206,7 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
   addEventListener("Recording.sessionError", async (error: sessionError) => {
     const sessionErrorMessages = await getSessionErrorMessages(replayClient);
     store.dispatch(
-      actions.setUnexpectedError({
+      actions.setExpectedError({
         ...defaultMessaging,
         ...error,
         ...sessionErrorMessages[error.code],

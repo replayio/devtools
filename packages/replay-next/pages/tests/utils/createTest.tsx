@@ -1,6 +1,6 @@
 import { FunctionComponent, Suspense } from "react";
 
-import ErrorBoundary from "replay-next/components/ErrorBoundary";
+import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBoundary";
 import Initializer from "replay-next/components/Initializer";
 import usePreferredColorScheme from "replay-next/src/hooks/usePreferredColorScheme";
 import { getFlag } from "shared/utils/url";
@@ -12,13 +12,13 @@ export default function createTest(Component: FunctionComponent<any>, defaultRec
     usePreferredColorScheme();
 
     return (
-      <ErrorBoundary name="createTest">
+      <InlineErrorBoundary name="createTest">
         <Suspense fallback="Loading...">
           <Initializer recordingId={recordingId}>
             <Component />
           </Initializer>
         </Suspense>
-      </ErrorBoundary>
+      </InlineErrorBoundary>
     );
   };
 }

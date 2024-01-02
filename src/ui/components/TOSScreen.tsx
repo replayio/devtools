@@ -1,9 +1,9 @@
 import React from "react";
 
+import ExternalLink from "replay-next/components/ExternalLink";
 import { useAcceptTOS } from "ui/hooks/users";
 
 import { PrimaryButton } from "./shared/Button";
-import ExternalLink from "./shared/ExternalLink";
 import { DefaultViewportWrapper } from "./shared/Viewport";
 
 export const LATEST_TOS_VERSION = 1;

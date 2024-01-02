@@ -1,11 +1,10 @@
 import { useContext } from "react";
 
-import ErrorBoundary from "replay-next/components/ErrorBoundary";
+import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBoundary";
 import { isUserActionTestEvent } from "shared/test-suites/RecordingTestMetadata";
 import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext";
 
 import { PlaywrightUserActionEventDetails } from "./TestEventStepDetails/PlaywrightUserActionEventDetails";
-import { LoadingFailedMessage } from "./TestEventStepDetails/TestEventDetailsLoadingMessages";
 import { UserActionEventPropsInspector } from "./TestEventStepDetails/UserActionEventPropsInspector";
 import styles from "./TestEventStepDetails/TestEventDetails.module.css";
 
@@ -25,9 +24,9 @@ export default function TestEventDetails({ collapsed }: { collapsed: boolean }) 
       : UserActionEventPropsInspector;
 
   return (
-    <ErrorBoundary name="TestEventDetails">
+    <InlineErrorBoundary name="TestEventDetails">
       <UserEventDetailsComponent testEvent={testEvent} />
-    </ErrorBoundary>
+    </InlineErrorBoundary>
   );
 }
 

@@ -11,7 +11,7 @@ import {
 
 import { assert } from "protocol/utils";
 import AvatarImage from "replay-next/components/AvatarImage";
-import ErrorBoundary from "replay-next/components/ErrorBoundary";
+import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBoundary";
 import Icon from "replay-next/components/Icon";
 import CodeEditor from "replay-next/components/lexical/CodeEditor";
 import {
@@ -103,11 +103,11 @@ export default function PointPanelWrapper(props: ExternalProps) {
   );
 
   return (
-    <ErrorBoundary name="LogPointPanel" fallback={errorFallback}>
+    <InlineErrorBoundary name="LogPointPanel" fallback={errorFallback}>
       <Suspense fallback={loader}>
         <PointPanel {...props} focusRange={focusRange} pointForSuspense={pointForSuspense} />
       </Suspense>
-    </ErrorBoundary>
+    </InlineErrorBoundary>
   );
 }
 

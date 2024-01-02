@@ -3,12 +3,12 @@ import { ConnectedProps, connect } from "react-redux";
 
 import { OperationsData } from "shared/graphql/types";
 import { getDisplayedUrl } from "shared/utils/environment";
+import { getRecordingId, showDurationWarning } from "shared/utils/recording";
 import * as actions from "ui/actions/app";
 import { getTruncatedRelativeDate } from "ui/components/Library/Team/View/Recordings/RecordingListItem/RecordingListItem";
 import hooks from "ui/hooks";
 import { getRecordingTarget } from "ui/reducers/app";
 import { useAppSelector } from "ui/setup/hooks";
-import { getRecordingId, showDurationWarning } from "ui/utils/recording";
 import useAuth0 from "ui/utils/useAuth0";
 
 import { AvatarImage } from "../Avatar";
