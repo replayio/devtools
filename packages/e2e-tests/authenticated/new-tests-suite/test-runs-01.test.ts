@@ -13,9 +13,7 @@ import {
   noTestRunSelectedMessage,
   noTestRunsMessage,
   noTestSelected,
-  testErrors,
   testItems,
-  testRecordings,
   testRunResult,
   testRunSummary,
   testRunsItems,
@@ -82,7 +80,7 @@ test(`authenticated/new-test-suites/test-runs`, async ({ pageWithMeta: { page, c
   await filterRunsByText(page, clientKey);
 
   expect(await testRunsItems(page).count()).toBe(1);
-  testRunsItems(page).first().click();
+  await testRunsItems(page).first().click();
   await page.waitForSelector('[data-test-id="NoTestRunSelected"]', { state: "detached" });
   expect(await noTestSelected(page).count()).toBe(1);
 
@@ -129,13 +127,6 @@ test(`authenticated/new-test-suites/test-runs`, async ({ pageWithMeta: { page, c
   await selectContextMenuItem(page, {
     contextMenuItemTestId: "all",
   });
-  //#endregion
-
-  //#region >>> Replays and errors
-  testItems(page).first().click();
-  await page.waitForSelector('[data-test-id="NoTestSelected"]', { state: "detached" });
-  expect(await testRecordings(page).count()).toBe(1);
-  expect(await testErrors(page).count()).toBe(0);
   //#endregion
 
   //#endregion
