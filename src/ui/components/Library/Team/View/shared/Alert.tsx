@@ -1,4 +1,4 @@
-export const AlertList = {
+const AlertList = {
   MISSING_REPLAYS_FOR_TEST_RUN:
     "No replays were found for this run. They may be outside the retention window or may not have been uploaded",
   MISSING_REPLAYS_FOR_TEST:
