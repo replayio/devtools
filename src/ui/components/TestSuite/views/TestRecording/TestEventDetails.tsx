@@ -5,7 +5,6 @@ import { isUserActionTestEvent } from "shared/test-suites/RecordingTestMetadata"
 import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext";
 
 import { PlaywrightUserActionEventDetails } from "./TestEventStepDetails/PlaywrightUserActionEventDetails";
-import { LoadingFailedMessage } from "./TestEventStepDetails/TestEventDetailsLoadingMessages";
 import { UserActionEventPropsInspector } from "./TestEventStepDetails/UserActionEventPropsInspector";
 import styles from "./TestEventStepDetails/TestEventDetails.module.css";
 

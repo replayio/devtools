@@ -1,58 +1,19 @@
-import {
-  unstable_Offscreen as Offscreen,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 
 import { SyntaxHighlighter } from "replay-next/components/SyntaxHighlighter/SyntaxHighlighter";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { ParsedToken, parsedTokensToHtml } from "replay-next/src/utils/syntax-parser";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { UserActionEvent } from "shared/test-suites/RecordingTestMetadata";
-import useLocalStorageUserData from "shared/user-data/LocalStorage/useLocalStorageUserData";
 import { TestSuiteCache } from "ui/components/TestSuite/suspense/TestSuiteCache";
 
 import { LoadingFailedMessage } from "./TestEventDetailsLoadingMessages";
-import { UserActionEventPropsInspector } from "./UserActionEventPropsInspector";
 import styles from "./TestEventDetails.module.css";
 
 export function PlaywrightUserActionEventDetails({ testEvent }: { testEvent: UserActionEvent }) {
-  const [selectedTab, selectTab] = useLocalStorageUserData("playwrightStepSelectedTab");
-
   return (
-    <div className={styles.TabsContainer}>
-      <div className={styles.Tabs}>
-        <button
-          className={styles.Tab}
-          data-active={selectedTab === "elements" || undefined}
-          onClick={() => selectTab("elements")}
-        >
-          Elements
-        </button>
-        <button
-          className={styles.Tab}
-          data-active={selectedTab === "source" || undefined}
-          onClick={() => selectTab("source")}
-        >
-          Source
-        </button>
-      </div>
-
-      <div className={styles.UserActionEventDetails}>
-        <Offscreen mode={selectedTab === "elements" ? "visible" : "hidden"}>
-          {testEvent.data.timeStampedPoints.result ? (
-            <UserActionEventPropsInspector testEvent={testEvent} />
-          ) : (
-            <LoadingFailedMessage />
-          )}
-        </Offscreen>
-        <Offscreen mode={selectedTab === "source" ? "visible" : "hidden"}>
-          <PlaywrightStepSources testEvent={testEvent} />
-        </Offscreen>
-      </div>
+    <div className={styles.UserActionEventDetails}>
+      <PlaywrightStepSources testEvent={testEvent} />
     </div>
   );
 }
