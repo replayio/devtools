@@ -72,8 +72,6 @@
   --grey-20: #ededf0;
   --grey-30: #d7d7db;
   --grey-40: #b1b1b3;
-  --grey-43: #a4a4a4;
-  --grey-45: #939395;
   --grey-50: #737373;
   --grey-55: #5c5c5f;
   --grey-60: #4a4a4f;
@@ -584,8 +582,8 @@
   --theme-icon-warning-color: var(--yellow-60);
 
   /* Text color (Dark) */
-  --theme-comment: var(--grey-45);
-  --theme-text-color-alt: var(--grey-45);
+  --theme-comment: var(--color-dim);
+  --theme-text-color-alt: var(--color-dim);
   --theme-text-color-inactive: var(--grey-50);
   --theme-text-color-strong: var(--grey-30);
 
