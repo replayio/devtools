@@ -49,4 +49,5 @@ export const findTestRunByText = async (page: Page, locator: Locator, text: stri
       return testRunItem;
     }
   }
+  throw new Error(`Test run with text ${text} not found`);
 };

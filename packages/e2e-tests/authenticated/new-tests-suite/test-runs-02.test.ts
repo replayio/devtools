@@ -37,7 +37,6 @@ test(`authenticated/new-test-suites/test-runs`, async ({ pageWithMeta: { page, c
   //#region >>> A test run with any failing tests should display a count of the failures to the left of the test run title
   const testRunItemCount = await testRunsItems(page).count();
   let failedRun = await findTestRunByText(page, testRunsItems(page), clientKey);
-  expect(failedRun).toBeTruthy();
 
   const testRunStatusPill = failedRun.locator('[data-test-status="fail"]');
   expect(await testRunStatusPill.count()).toBe(1);

@@ -24,7 +24,6 @@ test(`authenticated/new-test-suites/test-runs`, async ({ pageWithMeta: { page, c
 
   //#region >>> A test run in which all tests are flaky should display a green checkmark to the left of the test run title
   const flakyRun = await findTestRunByText(page, testRunsItems(page), clientKey);
-  expect(flakyRun).toBeTruthy();
 
   const testRunItemIcon = flakyRun.locator('[data-test-status="success"]');
   expect(await testRunItemIcon.count()).toBe(1);

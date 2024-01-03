@@ -30,7 +30,6 @@ test(`authenticated/new-test-suites/test-runs`, async ({ pageWithMeta: { page, c
   //#region >>> When source control metadata is present, the title should be the commit title
   const itemCounts = await testRunsItems(page).count();
   let testRun = await findTestRunByText(page, testRunsItems(page), clientKey);
-  expect(testRun).toBeTruthy();
   //#endregion
 
   //#region >>> When all tests pass should display a green checkmark to the left of the test run title
