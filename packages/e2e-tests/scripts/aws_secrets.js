@@ -1,3 +1,5 @@
+/* Copyright 2024 Record Replay Inc. */
+
 const { execSync } = require("child_process");
 
 function getSecret(key, region) {

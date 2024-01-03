@@ -1,3 +1,5 @@
+/* Copyright 2024 Record Replay Inc. */
+
 const { execSync, exec } = require("child_process");
 const getSecret = require("./aws_secrets");
 

@@ -1,4 +1,4 @@
-/* Copyright 2023 Record Replay Inc. */
+/* Copyright 2024 Record Replay Inc. */
 
 const fs = require("fs");
 const path = require("path");

@@ -1,3 +1,5 @@
+/* Copyright 2024 Record Replay Inc. */
+
 const build_id_from_artifact = require("./build_id_from_artifact");
 const install_build_products = require("./build_products");
 const run_fe_tests = require("./buildkite_run_fe_tests");

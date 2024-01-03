@@ -7,6 +7,8 @@
     - seek-oss/aws-sm#v2.3.1:
         region: us-east-2
         env:
+          AUTOMATED_TEST_SECRET: "graphql-automated-test-secret"
+          RECORD_REPLAY_API_KEY: "runtime-record-replay-api-key"
           FLY_API_TOKEN: "prod/fly-api-token"
           BUILDKITE_AGENT_TOKEN: "prod/buildkite-agent-token"
           SSH_PRIVATE_RSA_KEY_B64: "prod/buildkite-ssh-private-key"
@@ -33,6 +35,9 @@
           HASURA_ADMIN_SECRET: HASURA_ADMIN_SECRET
           AWS_SECRET_ACCESS_KEY: BUILD_USER_SECRET_ACCESS_KEY
           AWS_ACCESS_KEY_ID: BUILD_USER_ACCESS_KEY_ID
+          AUTOMATED_TEST_SECRET: AUTOMATED_TEST_SECRET
+          RECORD_REPLAY_API_KEY: RECORD_REPLAY_API_KEY
+
         env:
           DISPLAY: ":1"
           PLAYWRIGHT_HEADLESS: "true"
