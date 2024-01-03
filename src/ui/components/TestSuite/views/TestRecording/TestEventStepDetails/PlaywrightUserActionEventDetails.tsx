@@ -17,18 +17,6 @@ export function PlaywrightUserActionEventDetails({
   testEvent: UserActionEvent;
   testEventPending?: boolean;
 }) {
-  return (
-    <div
-      className={styles.UserActionEventDetails}
-      data-test-name="UserActionEventDetails"
-      data-is-pending={testEventPending || undefined}
-    >
-      <PlaywrightStepSources testEvent={testEvent} />
-    </div>
-  );
-}
-
-function PlaywrightStepSources({ testEvent }: { testEvent: UserActionEvent }) {
   const replayClient = useContext(ReplayClientContext);
   const { recordingId } = useContext(SessionContext);
 
@@ -61,7 +49,11 @@ function PlaywrightStepSources({ testEvent }: { testEvent: UserActionEvent }) {
   }
 
   return (
-    <div className={styles.UserActionEventDetails} data-test-name="UserActionEventDetails">
+    <div
+      className={styles.UserActionEventDetails}
+      data-test-name="UserActionEventDetails"
+      data-is-pending={testEventPending || undefined}
+    >
       <div className={styles.DetailsTitle}>Call stack</div>
       <div className={styles.CallStack}>
         {stack?.map((frame, index) => (
