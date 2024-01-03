@@ -9,6 +9,7 @@ import {
   replyToComment,
 } from "../helpers/comments";
 import { openSource } from "../helpers/source-explorer-panel";
+import { delay } from "../helpers/utils";
 import test, { Page, base } from "../testFixtureCloneRecording";
 
 const url = "authenticated_comments.html";
@@ -55,6 +56,9 @@ test(`authenticated/comments-02: Test shared comments and replies`, async ({
     pageOne = page;
   }
 
+  // Delay so the comment has time to be saved to GraphQL
+  await delay(500);
+
   {
     console.log("User 2: Reply to comment");
 
@@ -75,6 +79,9 @@ test(`authenticated/comments-02: Test shared comments and replies`, async ({
 
     pageTwo = page;
   }
+
+  // Delay so the replay has time to be saved to GraphQL
+  await delay(500);
 
   {
     console.log("User 1: View reply (and delete comment)");
