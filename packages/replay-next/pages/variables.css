@@ -60,7 +60,6 @@
   --blue-60: #0060df;
   --blue-70: #003eaa;
   --blue-80: #002275;
-  --cool-gray-200: #e5e7eb;
   --green-70: #058b00;
   --grey-10-a15: rgba(249, 249, 250, 0.15);
   --grey-10-a20: rgba(249, 249, 250, 0.2);
@@ -702,7 +701,7 @@
   --scroll-thumb-color: #aaaaaa;
   --tab-bgcolor-alt-subtle: var(--theme-base-100); /* info, events */
   --tab-selected-bgcolor: var(--theme-base-100); /* current tab */
-  --input-border: var(--cool-gray-200);
+  --input-border: var(--grey-20);
   --theme-border: #d2d5da;
   --theme-focuser-bgcolor: var(--primary-accent);
   --theme-sidebar-background: var(--theme-base-100);
