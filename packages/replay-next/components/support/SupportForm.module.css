@@ -32,6 +32,7 @@
 
 .Message {
   font-style: italic;
+  word-break: break-word;
 }
 
 .Header {
