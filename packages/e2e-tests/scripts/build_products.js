@@ -9,7 +9,7 @@ function install_build_products(RUNTIME_BUILD_ID, PLATFORM, ARCHITECTURE) {
   let ARCH_SUFFIX = "";
   if (PLATFORM === "win32") {
     BUILD_FILE = `${RUNTIME_BUILD_ID}.zip`;
-  } else if (ARCHITECTURE === "x64") {
+  } else if (ARCHITECTURE === "x86_64") {
     BUILD_FILE = `${RUNTIME_BUILD_ID}.tar.xz`;
   } else if (ARCHITECTURE === "arm64") {
     BUILD_FILE = `${RUNTIME_BUILD_ID}-arm.tar.xz`;

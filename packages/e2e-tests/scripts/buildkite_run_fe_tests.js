@@ -34,9 +34,7 @@ function run_fe_tests(CHROME_BINARY_PATH) {
 
   process.env.RECORD_REPLAY_DISPATCH_SERVER = "wss://dispatch.replay.io";
   process.env.REPLAY_BROWSER_BINARY_PATH = CHROME_BINARY_PATH;
-  process.env.RECORD_REPLAY_API_KEY = "rwk_b6mnJ00rI4pzlwkYmggmmmV1TVQXA0AUktRHoo4vGl9";
   process.env.AUTHENTICATED_TESTS_WORKSPACE_API_KEY = process.env.RECORD_REPLAY_API_KEY;
-  process.env.AUTOMATED_TEST_SECRET = "c2MjW2nnut4vqpntvD@P3f46Edf-86eb";
 
   // Generate new recordings with the new chromium build.
   execSync(
