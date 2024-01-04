@@ -79,7 +79,7 @@ function run_fe_tests(CHROME_BINARY_PATH) {
     "react_devtools-03-multiple-versions",
   ];
 
-  execSync(`xvfb-run yarn test:debug_local ${testNames.join(" ")}`, {
+  execSync(`xvfb-run yarn test:debug ${testNames.join(" ")}`, {
     stdio: "inherit",
     stderr: "inherit",
   });
