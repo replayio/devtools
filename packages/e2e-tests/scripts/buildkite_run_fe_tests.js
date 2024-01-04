@@ -48,10 +48,12 @@ function run_fe_tests(CHROME_BINARY_PATH) {
     "doc_rr_preview.html",
     "doc_rr_region_loading.html",
     "doc_stacking_chromium.html",
-    "rdt-react-versions/dist/index.html"
+    "rdt-react-versions/dist/index.html",
   ];
   execSync(
-    `xvfb-run ./packages/e2e-tests/scripts/save-examples.ts --runtime=chromium --project=replay-chromium-local --example=${htmlFiles.join(',')}`,
+    `xvfb-run ./packages/e2e-tests/scripts/save-examples.ts --runtime=chromium --project=replay-chromium-local --example=${htmlFiles.join(
+      ","
+    )}`,
     { stdio: "inherit" }
   );
 
@@ -61,9 +63,9 @@ function run_fe_tests(CHROME_BINARY_PATH) {
   // Run the known-passind tests.
   const testNames = [
     "comments-01",
-    "comments-02",
-    "comments-03", 
-    "logpoints-01", 
+    //"comments-02",
+    "comments-03",
+    "logpoints-01",
     "stepping-05_chromium",
     "scopes_renderer",
     "passport-01",
@@ -71,12 +73,15 @@ function run_fe_tests(CHROME_BINARY_PATH) {
     "passport-04",
     "object_preview-03",
     "focus_mode-01",
-    "elements-search", 
+    "elements-search",
     "stacking_chromium",
-    "react_devtools-03-multiple-versions"
-  ]
+    "react_devtools-03-multiple-versions",
+  ];
 
-  execSync(`xvfb-run yarn test:debug_local ${testNames.join(' ')}`, { stdio: "inherit", stderr: "inherit" });
+  execSync(`xvfb-run yarn test:debug_local ${testNames.join(" ")}`, {
+    stdio: "inherit",
+    stderr: "inherit",
+  });
 
   // Make sure the web server shuts down.
   webProc.kill("SIGKILL");

@@ -423,7 +423,7 @@ async function saveExamples(
 ) {
   let examplesToRun = knownExamples.filter(example => example.category === examplesTarget);
 
-  const specificExamples = argv.example.split(',').filter(s => s.length > 0);
+  const specificExamples = argv.example.split(",").filter(s => s.length > 0);
 
   if (specificExamples) {
     examplesToRun = examplesToRun.filter(example => specificExamples.includes(example.filename));
