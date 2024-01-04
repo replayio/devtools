@@ -1,14 +1,14 @@
+import { HTMLProps } from "react";
+
 import styles from "./TestSuitePanelMessage.module.css";
 
 export function TestSuitePanelMessage({
   children,
   className,
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
+  ...props
+}: HTMLProps<HTMLDivElement>) {
   return (
-    <div className={`${styles.panelMessage} ${className ?? ""}`}>
+    <div className={`${styles.panelMessage} ${className ?? ""}`} {...props}>
       <div className={styles.content}>{children}</div>
     </div>
   );

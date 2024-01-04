@@ -37,7 +37,7 @@ export function TestRunList() {
 
   if (!testRunsLoading && testRuns.length === 0 && testRunCount > 0) {
     return (
-      <TestSuitePanelMessage className={styles.message}>
+      <TestSuitePanelMessage data-test-id="NoTestRuns" className={styles.message}>
         No test runs match the current filters
       </TestSuitePanelMessage>
     );
