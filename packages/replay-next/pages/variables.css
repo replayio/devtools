@@ -1235,7 +1235,24 @@
   --context-menu-z-index: 25;
 
   /* menu item styles */
+  --context-menu-item-background-color-hover: var(--context-menu-bgcolor-hover);
+  --context-menu-item-background-color-focus: var(--context-menu-bgcolor-hover);
   --context-menu-item-color: var(--color-default);
+  --context-menu-item-color-disabled: var(--color-dimmer);
+  --context-menu-item-font-size: var(--font-size-regular);
+  --context-menu-item-height: 1.5rem;
+  --context-menu-item-padding: 0.25rem 0.5rem;
+
+  /* category styles */
+  --context-menu-category-color: var(--color-default);
+  --context-menu-category-font-size: var(--font-size-regular);
+  --context-menu-category-height: 1rem;
+  --context-menu-category-padding: 0.25rem 0.5rem;
+
+  /* divider styles */
+  --context-menu-divider-color: var(--context-menu-divider);
+  --context-menu-divider-margin: 0.25rem 0;
+  --context-menu-divider-size: 1px;
 }
 
 /* browser specific tweaks */
