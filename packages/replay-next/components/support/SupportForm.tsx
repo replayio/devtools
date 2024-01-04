@@ -33,7 +33,7 @@ export function SupportForm({
     }
   };
 
-  useModalDismissSignal(modalRef, confirmClose, true);
+  useModalDismissSignal(modalRef, onDismiss ? confirmClose : noop, true);
 
   if (showConfirmationPrompt) {
     const dismiss = () => {
@@ -214,3 +214,5 @@ export function SupportForm({
     );
   }
 }
+
+function noop() {}

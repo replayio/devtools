@@ -21,6 +21,7 @@ import { getTestEnvironment } from "shared/test-suites/RecordingTestMetadata";
 import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { userData } from "shared/user-data/GraphQL/UserData";
 import { setAccessToken } from "ui/actions/app";
+import { setShowSupportForm } from "ui/actions/layout";
 import { clearTrialExpired, createSocket } from "ui/actions/session";
 import { DevToolsDynamicLoadingMessage } from "ui/components/DevToolsDynamicLoadingMessage";
 import { DevToolsProcessingScreen } from "ui/components/DevToolsProcessingScreen";
@@ -260,6 +261,10 @@ function _DevTools({
     }
   }, [recording, userId, userEmail, userLoading]);
 
+  const dismissSupportForm = () => {
+    dispatch(setShowSupportForm(false));
+  };
+
   if (!loadingFinished) {
     return isProcessed ? <DevToolsDynamicLoadingMessage /> : <DevToolsProcessingScreen />;
   }
@@ -284,7 +289,9 @@ function _DevTools({
                               <Header />
                               <Body />
                               {showCommandPalette ? <CommandPaletteModal /> : null}
-                              {showSupportForm ? <SupportForm /> : null}
+                              {showSupportForm ? (
+                                <SupportForm onDismiss={dismissSupportForm} />
+                              ) : null}
                               <KeyboardShortcuts />
                             </KeyModifiers>
                           </LayoutContextAdapter>
