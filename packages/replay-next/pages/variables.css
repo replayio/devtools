@@ -60,9 +60,6 @@
   --blue-60: #0060df;
   --blue-70: #003eaa;
   --blue-80: #002275;
-  --cool-gray-200: #e5e7eb;
-  --cool-gray-300: #d1d5db;
-  --cool-gray-400: #9ca3af;
   --green-70: #058b00;
   --grey-10-a15: rgba(249, 249, 250, 0.15);
   --grey-10-a20: rgba(249, 249, 250, 0.2);
@@ -72,13 +69,10 @@
   --grey-20: #ededf0;
   --grey-30: #d7d7db;
   --grey-40: #b1b1b3;
-  --grey-43: #a4a4a4;
-  --grey-45: #939395;
   --grey-50: #737373;
   --grey-55: #5c5c5f;
   --grey-60: #4a4a4f;
   --grey-70: #38383d;
-  --grey-80: #2a2a2e;
   --grey-90-a10: rgba(12, 12, 13, 0.1);
   --grey-90-a30: rgba(12, 12, 13, 0.3);
   --grey-90: #0c0c0d;
@@ -585,8 +579,8 @@
   --theme-icon-warning-color: var(--yellow-60);
 
   /* Text color (Dark) */
-  --theme-comment: var(--grey-45);
-  --theme-text-color-alt: var(--grey-45);
+  --theme-comment: var(--color-dim);
+  --theme-text-color-alt: var(--color-dim);
   --theme-text-color-inactive: var(--grey-50);
   --theme-text-color-strong: var(--grey-30);
 
@@ -707,7 +701,7 @@
   --scroll-thumb-color: #aaaaaa;
   --tab-bgcolor-alt-subtle: var(--theme-base-100); /* info, events */
   --tab-selected-bgcolor: var(--theme-base-100); /* current tab */
-  --input-border: var(--cool-gray-200);
+  --input-border: var(--grey-20);
   --theme-border: #d2d5da;
   --theme-focuser-bgcolor: var(--primary-accent);
   --theme-sidebar-background: var(--theme-base-100);

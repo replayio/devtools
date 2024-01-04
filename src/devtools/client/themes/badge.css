@@ -16,10 +16,10 @@
 .theme-dark:root {
   --badge-active-background-color: var(--blue-60);
   --badge-active-border-color: #fff6;
-  --badge-background-color: var(--grey-80);
+  --badge-background-color: var(--theme-base-95);
   --badge-border-color: var(--grey-50);
   --badge-color: var(--grey-40);
-  --badge-hover-background-color: var(--grey-80);
+  --badge-hover-background-color: var(--theme-base-95);
   --badge-interactive-background-color: var(--grey-70);
   --badge-interactive-color: var(--grey-30);
 }
