@@ -6,16 +6,18 @@ export const FilterField = ({
   onChange,
   placeholder,
   value,
+  dataTestId,
 }: {
   placeholder: string;
   value: string;
+  dataTestId: string;
   onChange: (value: string) => void;
 }) => {
   return (
     <div className={styles.filterContainer}>
       <input
         className={styles.filterInput}
-        data-test-id="TestRunsPage-FilterByText-Input"
+        data-test-id={dataTestId}
         onChange={event => onChange(event.currentTarget.value)}
         placeholder={placeholder}
         type="text"

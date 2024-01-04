@@ -21,7 +21,7 @@ function getRecordingId(file: string) {
   }
 }
 
-export async function recordNodeExample(scriptPath: string) {
+export async function recordNodeExample(scriptPath: string): Promise<string> {
   const nodePath = config.nodePath || execSync("which replay-node").toString().trim();
   if (!nodePath) {
     console.warn("\x1b[1m\x1b[31m" + "Node e2e tests require @replayio/node" + "\x1b[0m");

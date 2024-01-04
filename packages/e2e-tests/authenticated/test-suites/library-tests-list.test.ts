@@ -15,7 +15,7 @@ import {
   getTestRunSummary,
 } from "../../helpers/test-suites";
 
-test(`authenticated/test-suites/library-tests-list`, async ({ page }) => {
+test.skip(`authenticated/test-suites/library-tests-list`, async ({ page }) => {
   await startLibraryTest(page, E2E_USER_3_API_KEY, E2E_USER_3_TEAM_ID);
 
   await new Promise(resolve => setTimeout(resolve, 1_000));

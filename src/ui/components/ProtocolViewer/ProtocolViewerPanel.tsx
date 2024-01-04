@@ -1,5 +1,6 @@
-import { unstable_Offscreen as Offscreen, Suspense, useContext, useMemo, useState } from "react";
+import { unstable_Offscreen as Offscreen, Suspense, useContext, useMemo } from "react";
 
+import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import { PanelLoader } from "replay-next/components/PanelLoader";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { useSources } from "replay-next/src/suspense/SourcesCache";
@@ -52,12 +53,16 @@ export function ProtocolViewerPanel() {
 
       <div className={styles.Panel}>
         <Offscreen mode={safeSelectedTab === "live" ? "visible" : "hidden"}>
-          <LiveProtocolRequests />
+          <ErrorBoundary name="LiveProtocolRequests">
+            <LiveProtocolRequests />
+          </ErrorBoundary>
         </Offscreen>
         {isRecordingOfReplay && safeSelectedTab === "recorded" ? (
-          <Suspense fallback={<PanelLoader />}>
-            <RecordedProtocolRequests />
-          </Suspense>
+          <ErrorBoundary name="RecordedProtocolRequests">
+            <Suspense fallback={<PanelLoader />}>
+              <RecordedProtocolRequests />
+            </Suspense>
+          </ErrorBoundary>
         ) : null}
       </div>
     </div>

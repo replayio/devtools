@@ -281,7 +281,6 @@ export function convertRecording(
 ): Recording {
   const recording: Recording = {
     id: rec.uuid,
-    buildId: "buildId" in rec ? rec.buildId : undefined,
     user: "owner" in rec ? rec.owner : undefined,
     userId: "owner" in rec ? rec.owner?.id : undefined,
     // NOTE: URLs are nullable in the database

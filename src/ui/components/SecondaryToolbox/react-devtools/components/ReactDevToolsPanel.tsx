@@ -201,7 +201,7 @@ function ReactDevToolsPanelInner({
           ref={leftPanelRef}
         >
           <div className={styles.LeftPanelTopRow}>
-            <InspectButton bridge={bridge} wall={wall} />
+            <InspectButton wall={wall} />
             <Search listData={listData} pauseId={pauseId} />
           </div>
 

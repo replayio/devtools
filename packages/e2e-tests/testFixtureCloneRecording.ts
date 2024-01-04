@@ -1,6 +1,6 @@
 import { Page, test as base } from "@playwright/test";
-import type { AxiosError } from "axios";
 import axios from "axios";
+import { addCoverageReport } from "monocart-reporter";
 
 import { TestRecordingKey } from "./helpers";
 import { cloneTestRecording, deleteTestRecording } from "./helpers/utils";
@@ -13,6 +13,8 @@ type TestIsolatedRecordingFixture = {
   };
 };
 
+export { base };
+
 const testWithCloneRecording = base.extend<TestIsolatedRecordingFixture>({
   exampleKey: undefined,
   pageWithMeta: async ({ page, exampleKey }, use) => {
@@ -23,8 +25,12 @@ const testWithCloneRecording = base.extend<TestIsolatedRecordingFixture>({
 
     let newRecordingId: string | undefined = undefined;
     try {
-      newRecordingId = await cloneTestRecording(exampleRecordings[exampleKey]);
+      const { recording } = exampleRecordings[exampleKey];
+      newRecordingId = await cloneTestRecording(recording);
 
+      await page.coverage.startJSCoverage({
+        resetOnNavigation: false,
+      });
       await use({
         page,
         recordingId: newRecordingId,
@@ -40,6 +46,21 @@ const testWithCloneRecording = base.extend<TestIsolatedRecordingFixture>({
       }
       throw err;
     } finally {
+      let jsCoverage: Awaited<ReturnType<Page["coverage"]["stopJSCoverage"]>> | undefined;
+      try {
+        jsCoverage = await page.coverage.stopJSCoverage();
+      } catch (err: any) {
+        console.error("Error stopping JS coverage: ", err);
+      }
+
+      // A couple of our tests don't use the default page object, like `auth/comments-02`
+      // and `auth/logpoints-01`. Handle missing coverage without erroring.
+      if (!jsCoverage || Object.keys(jsCoverage).length === 0) {
+        console.error("No JS coverage: ", exampleKey);
+      } else {
+        await addCoverageReport(jsCoverage, base.info());
+      }
+
       if (newRecordingId) {
         await deleteTestRecording(newRecordingId);
       }

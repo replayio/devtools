@@ -4,6 +4,7 @@ import {
   getAllVisibleComponentNames,
   getReactComponents,
   getReactDevToolsList,
+  getReactDevToolsPanel,
   getSearchInput,
   getViewSourceButton,
   openReactDevtoolsPanel,
@@ -38,11 +39,8 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
 
   debugPrint(page, "Checking initial list of React components");
 
+  await getReactDevToolsPanel(page).waitFor();
   const components = getReactComponents(page);
-  await waitFor(async () => {
-    const numComponents = await components.count();
-    return expect(numComponents).toBeGreaterThan(0);
-  });
   const numComponents = await components.count();
 
   // Should be seeing 20-ish at least, but give some buffer.

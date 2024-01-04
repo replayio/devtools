@@ -16,7 +16,7 @@ import {
   verifyInspectedPropertyValue,
 } from "../helpers/new-react-devtools-panel";
 import { getGetterValue } from "../helpers/object-inspector";
-import { hoverScreenshot } from "../helpers/screenshot";
+import { clickScreenshot, hoverScreenshot } from "../helpers/screenshot";
 import { waitFor } from "../helpers/utils";
 import test, { expect } from "../testFixtureCloneRecording";
 
@@ -78,6 +78,7 @@ test("react_devtools-01: Basic RDT behavior (Chromium)", async ({
   await waitFor(async () => {
     await page.mouse.move(0, 0); // Stop hovering
     await hoverScreenshot(page, x, y);
+    await clickScreenshot(page, x, y);
     const actualName = await getComponentName(getSelectedRow(page));
     expect(actualName).toBe("Item");
   });

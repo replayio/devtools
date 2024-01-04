@@ -178,35 +178,31 @@ export function TestSectionRow({
 
   const onMouseEnter = async () => {
     dispatch(setHoverTime(getTestEventTime(testEvent)));
-
-    if (isUserActionTestEvent(testEvent)) {
-      // We hope to have details on the relevant DOM node cached by now.
-      // If we do, go ahead and read that synchronously so we can highlight the node.
-      // Otherwise, nothing to do here.
-      let point: TimeStampedPoint | null = null;
-      switch (testRunnerName) {
-        case "cypress": {
-          point = testEvent.data.timeStampedPoints.result ?? null;
-          break;
-        }
-        default: {
-          point = testEvent.data.timeStampedPoints.beforeStep ?? null;
-          break;
-        }
-      }
-
-      if (!point) {
-        return;
-      }
-
-      const firstDomNodeDetails = testEventDomNodeCache.getValueIfCached(point.point);
-
-      if (firstDomNodeDetails?.domNode?.node.isConnected) {
-        const { domNode, pauseId } = firstDomNodeDetails;
-        // Highlight using bounding rects, which we should have pre-cached already
-        dispatch(highlightNodes([domNode.id], pauseId, false));
-      }
+    if (!isUserActionTestEvent(testEvent)) {
+      return;
     }
+
+    // We hope to have details on the relevant DOM node cached by now.
+    // If we do, go ahead and read that synchronously so we can highlight the node.
+    const resultPoint = testEvent.data.timeStampedPoints.result;
+    if (!resultPoint) {
+      return;
+    }
+
+    const domNodesDetails = testEventDomNodeCache.getValueIfCached(resultPoint.point);
+
+    if (!domNodesDetails) {
+      return;
+    }
+
+    const { pauseId, domNodes } = domNodesDetails;
+    // Highlight using bounding rects, which we should have pre-cached already
+    dispatch(
+      highlightNodes(
+        domNodes.map(d => d.id),
+        pauseId
+      )
+    );
   };
 
   const onMouseLeave = () => {

@@ -13,7 +13,6 @@ import {
   ExpectedError,
   ModalOptionsType,
   ModalType,
-  NodePickerType,
   ReplayEvent,
   SettingsTabTitle,
   UnexpectedError,
@@ -22,7 +21,6 @@ import {
 
 export const initialAppState: AppState = {
   accessToken: null,
-  activeNodePicker: null,
   awaitingSourcemaps: false,
   canvas: null,
   defaultSelectedReactElementId: null,
@@ -33,11 +31,9 @@ export const initialAppState: AppState = {
   hoveredCommentId: null,
   loading: 4,
   loadingFinished: false,
-  nodePickerStatus: "disabled",
   modal: null,
   modalOptions: null,
   mode: "devtools",
-  mouseTargetsLoading: false,
   recordingId: null,
   recordingTarget: null,
   recordingWorkspace: null,
@@ -59,9 +55,6 @@ const appSlice = createSlice({
     },
     setRecordingId(state, action: PayloadAction<RecordingId>) {
       state.recordingId = action.payload;
-    },
-    setMouseTargetsLoading(state, action: PayloadAction<boolean>) {
-      state.mouseTargetsLoading = action.payload;
     },
     setUploading(state, action: PayloadAction<UploadInfo | null>) {
       state.uploading = action.payload;
@@ -111,19 +104,6 @@ const appSlice = createSlice({
       // Load multiple event types into state at once
       Object.assign(state.events, action.payload);
     },
-    nodePickerInitializing(state, action: PayloadAction<NodePickerType>) {
-      state.activeNodePicker = action.payload;
-      state.nodePickerStatus = "initializing";
-    },
-    nodePickerReady(state, action: PayloadAction<NodePickerType>) {
-      if (state.activeNodePicker === action.payload && state.nodePickerStatus === "initializing") {
-        state.nodePickerStatus = "active";
-      }
-    },
-    nodePickerDisabled(state) {
-      state.activeNodePicker = null;
-      state.nodePickerStatus = "disabled";
-    },
     setCanvas(state, action: PayloadAction<Canvas>) {
       state.canvas = action.payload;
     },
@@ -165,12 +145,8 @@ export const {
   setDefaultSettingsTab,
   loadReceivedEvents,
   setExpectedError,
-  nodePickerDisabled,
-  nodePickerInitializing,
-  nodePickerReady,
   setLoadingFinished,
   setModal,
-  setMouseTargetsLoading,
   setRecordingTarget,
   setRecordingWorkspace,
   setSessionId,
@@ -228,12 +204,8 @@ export const getSortedEventsForDisplay = createSelector(
   }
 );
 
-export const getIsNodePickerActive = (state: UIState) => state.app.nodePickerStatus === "active";
-export const getIsNodePickerInitializing = (state: UIState) =>
-  state.app.nodePickerStatus === "initializing";
 export const getCanvas = (state: UIState) => state.app.canvas;
 export const getVideoUrl = (state: UIState) => state.app.videoUrl;
 export const getDefaultSettingsTab = (state: UIState) => state.app.defaultSettingsTab;
 export const getRecordingTarget = (state: UIState) => state.app.recordingTarget;
 export const getRecordingWorkspace = (state: UIState) => state.app.recordingWorkspace;
-export const getAreMouseTargetsLoading = (state: UIState) => state.app.mouseTargetsLoading;

@@ -13,7 +13,11 @@ export function useFileNameTree(testGroup: TestGroup, filterByText: string = "")
   const tree = useMemo<Tree>(() => {
     const sortedFileNames: string[] = [];
     for (let fileName in fileNameToTests) {
-      if (filterByText === "" || fileName.toLowerCase().includes(filterByText)) {
+      if (
+        filterByText === "" ||
+        fileName.toLowerCase().includes(filterByText) ||
+        fileNameToTests[fileName].some(test => test.title.toLowerCase().includes(filterByText))
+      ) {
         insertString(sortedFileNames, fileName);
       }
     }

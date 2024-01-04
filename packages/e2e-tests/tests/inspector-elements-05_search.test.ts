@@ -18,7 +18,6 @@ test(`inspector-elements-05_search: element picker and iframe behavior`, async (
   await startTest(page, recordingId);
   await openDevToolsTab(page);
   await openElementsPanel(page);
-  await waitForElementsToLoad(page);
 
   // This search string should not match anything initially
   await seekToTimePercent(page, 5);
