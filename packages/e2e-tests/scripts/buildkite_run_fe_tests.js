@@ -38,17 +38,45 @@ function run_fe_tests(CHROME_BINARY_PATH) {
   process.env.REPLAY_BROWSER_BINARY_PATH = CHROME_BINARY_PATH;
   process.env.AUTHENTICATED_TESTS_WORKSPACE_API_KEY = process.env.RECORD_REPLAY_API_KEY;
 
-  // Generate new recordings with the new chromium build.
+  // Generate new recordings for known-passing tests with the new chromium build.
+  const htmlFiles = [
+    "authenticated_comments.html",
+    "authenticated_logpoints.html",
+    "doc_minified_chromium.html",
+    "doc_recursion.html",
+    "doc_rr_console.html",
+    "doc_rr_preview.html",
+    "doc_rr_region_loading.html",
+    "doc_stacking_chromium.html",
+    "rdt-react-versions/dist/index.html"
+  ];
   execSync(
-    `xvfb-run ./packages/e2e-tests/scripts/save-examples.ts --runtime=chromium --project=replay-chromium-local --example=authenticated_comments_1.html`,
+    `xvfb-run ./packages/e2e-tests/scripts/save-examples.ts --runtime=chromium --project=replay-chromium-local --example=${htmlFiles.join(',')}`,
     { stdio: "inherit" }
   );
 
   // Without the wait, the next xvfb-run command can fail.
   execSync("sleep 5");
 
-  // Run the tests.
-  execSync(`xvfb-run yarn test:debug_local comments-01`, { stdio: "inherit", stderr: "inherit" });
+  // Run the known-passind tests.
+  const testNames = [
+    "comments-01",
+    "comments-02",
+    "comments-03", 
+    "logpoints-01", 
+    "stepping-05_chromium",
+    "scopes_renderer",
+    "passport-01",
+    "passport-03",
+    "passport-04",
+    "object_preview-03",
+    "focus_mode-01",
+    "elements-search", 
+    "stacking_chromium",
+    "react_devtools-03-multiple-versions"
+  ]
+
+  execSync(`xvfb-run yarn test:debug_local ${testNames.join(' ')}`, { stdio: "inherit", stderr: "inherit" });
 
   // Make sure the web server shuts down.
   webProc.kill("SIGKILL");
