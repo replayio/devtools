@@ -1,4 +1,4 @@
-import { ReactNode, Suspense, useContext } from "react";
+import { Suspense, useContext } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { ContextMenuItem, useContextMenu } from "use-context-menu";
 
