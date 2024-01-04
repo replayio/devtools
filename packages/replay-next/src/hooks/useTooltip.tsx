@@ -153,7 +153,6 @@ export default function useTooltip({
 
   let renderedTooltip: ReactNode = null;
   if (showTooltip) {
-    console.log({ className });
     renderedTooltip = (
       <Tooltip className={className} ref={tooltipRef}>
         {tooltip}
