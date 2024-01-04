@@ -19,7 +19,7 @@ function run_fe_tests(CHROME_BINARY_PATH) {
 
   execSync("npx playwright install chromium", {
     stdio: "inherit",
-  })
+  });
 
   // Start the webserver.
   let webProc = exec("yarn dev", (error, stdout, stderr) => {
