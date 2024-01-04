@@ -10,13 +10,16 @@ export function TestRunsStats() {
   const buildFailuresCount = testRuns.filter(r => r.results.counts.failed > 0).length;
   const buildFailureRate = buildFailuresCount / buildsCount;
 
+  if (!testRuns.length) {
+    return null;
+  }
+
   return (
     <div className="flex flex-col gap-2 text-sm">
       <div className="flex flex-col overflow-auto rounded-lg bg-chrome p-4">
         <Chart />
-        <div className="px-16">
-          Weekly average failure rate: {buildFailureRate * 100}% ({buildFailuresCount}/{buildsCount}
-          )
+        <div>
+          Failure rate: {(buildFailureRate * 100).toFixed(2)}% ({buildFailuresCount}/{buildsCount})
         </div>
       </div>
     </div>
