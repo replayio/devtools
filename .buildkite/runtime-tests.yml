@@ -1,0 +1,44 @@
+- label: "Runtime e2e tests (linux-x86_64)"
+  key: "runtime-fe-e2e-tests-linux_x86_64"
+  command: "node ./packages/e2e-tests/scripts/buildkite_run_fe_tests_from_artifact-linux-x86_64.js"
+  agents:
+    - "deploy=true"
+  plugins:
+    - seek-oss/aws-sm#v2.3.1:
+        region: us-east-2
+        env:
+          AUTOMATED_TEST_SECRET: "graphql-automated-test-secret"
+          RECORD_REPLAY_API_KEY: "runtime-record-replay-api-key"
+          FLY_API_TOKEN: "prod/fly-api-token"
+          BUILDKITE_AGENT_TOKEN: "prod/buildkite-agent-token"
+          SSH_PRIVATE_RSA_KEY_B64: "prod/buildkite-ssh-private-key"
+          TAILSCALE_AUTHKEY: "dev/fly-e2e-test-runner-tailscale-auth-key"
+          HASURA_ADMIN_SECRET: "prod/hasura-admin-secret"
+          BUILD_USER_ACCESS_KEY_ID:
+            secret-id: "prod/build-user"
+            json-key: ".access_key_id"
+          BUILD_USER_SECRET_ACCESS_KEY:
+            secret-id: "prod/build-user"
+            json-key: ".secret_access_key"
+          BUILDEVENT_APIKEY: honeycomb-api-key
+    - "ssh://git@github.com/replayio/fly-buildkite-plugin.git#v0.75":
+        # This image's source code is here https://github.com/replayio/backend-e2e-base-image
+        image: "registry.fly.io/buildkite-backend-e2e-tests:v14"
+        organization: "replay"
+        cpus: 4
+        memory: 4096
+        secrets:
+          BUILDKITE_AGENT_TOKEN: BUILDKITE_AGENT_TOKEN
+          SSH_PRIVATE_RSA_KEY_B64: SSH_PRIVATE_RSA_KEY_B64
+          FLY_API_TOKEN: FLY_API_TOKEN
+          TAILSCALE_AUTHKEY: TAILSCALE_AUTHKEY
+          HASURA_ADMIN_SECRET: HASURA_ADMIN_SECRET
+          AWS_SECRET_ACCESS_KEY: BUILD_USER_SECRET_ACCESS_KEY
+          AWS_ACCESS_KEY_ID: BUILD_USER_ACCESS_KEY_ID
+          AUTOMATED_TEST_SECRET: AUTOMATED_TEST_SECRET
+          RECORD_REPLAY_API_KEY: RECORD_REPLAY_API_KEY
+
+        env:
+          DISPLAY: ":1"
+          PLAYWRIGHT_HEADLESS: "true"
+          PLAYWRIGHT_CHROMIUM: "true"
