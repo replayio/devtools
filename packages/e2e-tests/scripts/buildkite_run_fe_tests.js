@@ -37,6 +37,7 @@ function run_fe_tests(CHROME_BINARY_PATH) {
   process.env.RECORD_REPLAY_DISPATCH_SERVER = "wss://dispatch.replay.io";
   process.env.REPLAY_BROWSER_BINARY_PATH = CHROME_BINARY_PATH;
   process.env.AUTHENTICATED_TESTS_WORKSPACE_API_KEY = process.env.RECORD_REPLAY_API_KEY;
+  process.env.PLAYWRIGHT_TEST_BASE_URL = "https://app.replay.io";
 
   // Generate new recordings for known-passing tests with the new chromium build.
   const htmlFiles = [
