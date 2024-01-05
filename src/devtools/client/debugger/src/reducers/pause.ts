@@ -2,16 +2,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import { AnyAction, PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { AnyAction, PayloadAction, createSlice } from "@reduxjs/toolkit";
 import type { FrameId, Location, PauseId, Value } from "@replayio/protocol";
 
-import { FindTargetCommand, resumeTargetCache } from "replay-next/src/suspense/ResumeTargetCache";
-import { isPointInRegion } from "shared/utils/time";
-import { seek } from "ui/actions/timeline";
-import { SourceDetails, getPreferredLocation, getSelectedSourceId } from "ui/reducers/sources";
+import { FindTargetCommand } from "replay-next/src/suspense/ResumeTargetCache";
+import { SourceDetails } from "ui/reducers/sources";
 import { getContextFromAction } from "ui/setup/redux/middleware/context";
 import type { UIState } from "ui/state";
-import { ThunkExtraArgs } from "ui/utils/thunk";
 
 export interface Context {
   navigateCounter: number;
@@ -49,7 +46,7 @@ export interface PauseAndFrameId {
   frameId: FrameId;
 }
 
-export type SeekState = "find-point" | "create-pause" | "paused";
+export type SeekState = "step" | "find-point" | "create-pause" | "paused";
 
 export interface PauseState {
   cx: { navigateCounter: number };
@@ -63,6 +60,7 @@ export interface PauseState {
   time: number;
   pauseHistory: PauseHistoryData[];
   pauseHistoryIndex: number;
+  queuedCommands: FindTargetCommand[];
 }
 
 const resumedPauseState = {
@@ -87,54 +85,8 @@ const initialState: PauseState = {
   ...resumedPauseState,
   pauseHistory: [],
   pauseHistoryIndex: -1,
+  queuedCommands: [],
 };
-
-export const executeCommandOperation = createAsyncThunk<
-  { location: Location | null },
-  { cx: Context; command: FindTargetCommand },
-  { state: UIState; extra: ThunkExtraArgs }
->("pause/executeCommand", async ({ command }, thunkApi) => {
-  const { dispatch, extra, getState } = thunkApi;
-  const { replayClient } = extra;
-  const state = getState();
-  const focusWindow = replayClient.getCurrentFocusWindow();
-  const point = getExecutionPoint(state);
-  const selectedFrameId = getSelectedFrameId(state);
-  const sourceId = getSelectedSourceId(state);
-  if (!point || !focusWindow) {
-    return { location: null };
-  }
-
-  dispatch(resumed());
-
-  const resumeTarget = await resumeTargetCache.readAsync(
-    replayClient,
-    command,
-    point,
-    selectedFrameId,
-    sourceId
-  );
-
-  if (resumeTarget && isPointInRegion(resumeTarget.point, focusWindow)) {
-    const { point, time, frame } = resumeTarget;
-    const location = frame ? getPreferredLocation(state.sources, frame) : undefined;
-    dispatch(seek({ executionPoint: point, time, location, openSource: !!frame }));
-  } else {
-    //TODO this has been cleared by resumed() above!?
-    const executionPoint = getExecutionPoint(state);
-    if (executionPoint) {
-      dispatch(seek({ executionPoint, time: getTime(state), openSource: true }));
-    }
-  }
-
-  if (!resumeTarget?.frame) {
-    return { location: null };
-  }
-
-  const location = getPreferredLocation(state.sources, resumeTarget.frame);
-
-  return { location };
-});
 
 const pauseSlice = createSlice({
   name: "pause",
@@ -229,16 +181,20 @@ const pauseSlice = createSlice({
       Object.assign(state, resumedPauseState);
       state.threadcx.isPaused = false;
     },
-  },
-  extraReducers: builder => {
-    builder
-      .addCase(executeCommandOperation.pending, (state, action) => {
-        state.threadcx.pauseCounter++;
-        state.threadcx.isPaused = false;
-      })
-      .addCase(executeCommandOperation.fulfilled, (state, action) => {
-        state.pausePreviewLocation = action.payload.location;
-      });
+    stepping(state, action: PayloadAction<any>) {
+      Object.assign(state, {
+        ...resumedPauseState,
+        seekState: "step",
+        seekLock: action.payload,
+      } satisfies Partial<PauseState>);
+      state.threadcx.isPaused = false;
+    },
+    enqueueCommand(state, action: PayloadAction<FindTargetCommand>) {
+      state.queuedCommands.push(action.payload);
+    },
+    dequeueCommand(state) {
+      state.queuedCommands.shift();
+    },
   },
 });
 
@@ -253,6 +209,9 @@ export const {
   resumed,
   pauseHistoryDecremented,
   pauseHistoryIncremented,
+  stepping,
+  enqueueCommand,
+  dequeueCommand,
 } = pauseSlice.actions;
 
 // Selectors
@@ -297,6 +256,10 @@ export function getPauseHistory(state: UIState) {
 }
 export function getPauseHistoryIndex(state: UIState) {
   return state.pause.pauseHistoryIndex;
+}
+
+export function getNextQueuedCommand(state: UIState) {
+  return state.pause.queuedCommands[0];
 }
 
 const pauseWrapperReducer = (state: PauseState, action: AnyAction) => {

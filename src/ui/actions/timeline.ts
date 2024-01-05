@@ -3,6 +3,7 @@ import {
   ExecutionPoint,
   FocusWindowRequestBias,
   Location,
+  PauseDescription,
   PauseId,
   ScreenShot,
   TimeStampedPoint,
@@ -10,6 +11,7 @@ import {
 } from "@replayio/protocol";
 import clamp from "lodash/clamp";
 
+import { setPreviewPausedLocation } from "devtools/client/debugger/src/actions/pause";
 import { selectLocation } from "devtools/client/debugger/src/actions/sources/select";
 import {
   frameSelected,
@@ -20,9 +22,16 @@ import {
 } from "devtools/client/debugger/src/reducers/pause";
 import {
   clearSeekLock,
+  dequeueCommand,
+  enqueueCommand,
+  getExecutionPoint,
+  getNextQueuedCommand,
   getSeekLock,
+  getSeekState,
+  getSelectedFrameId,
   pauseRequestedAt,
   previewLocationCleared,
+  stepping,
 } from "devtools/client/debugger/src/selectors";
 import { unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 import {
@@ -46,6 +55,7 @@ import {
 } from "replay-next/src/suspense/ExecutionPointsCache";
 import { framesCache } from "replay-next/src/suspense/FrameCache";
 import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
+import { FindTargetCommand, resumeTargetCache } from "replay-next/src/suspense/ResumeTargetCache";
 import { screenshotCache } from "replay-next/src/suspense/ScreenshotCache";
 import { ReplayClientInterface } from "shared/client/types";
 import {
@@ -56,7 +66,11 @@ import {
 } from "shared/utils/environment";
 import { isPointInRegion } from "shared/utils/time";
 import { getFirstComment } from "ui/hooks/comments/comments";
-import { getPreferredLocation, getSelectedLocation } from "ui/reducers/sources";
+import {
+  getPreferredLocation,
+  getSelectedLocation,
+  getSelectedSourceId,
+} from "ui/reducers/sources";
 import {
   getCurrentTime,
   getFocusWindow,
@@ -227,6 +241,68 @@ export function updatePausePointParams({
 
 function encodeFocusWindow(focusWindow: TimeStampedPointRange | null) {
   return focusWindow ? encodeObjectToURL(focusWindow) : undefined;
+}
+
+export function step(command: FindTargetCommand): UIThunkAction<Promise<any>> {
+  return async (dispatch, getState, { replayClient }) => {
+    const state = getState();
+    if (getSeekState(state) === "step") {
+      // another call to step() is already in progress, it will execute the enqueued command
+      dispatch(enqueueCommand(command));
+      return;
+    }
+    const focusWindow = replayClient.getCurrentFocusWindow();
+    let point = getExecutionPoint(state);
+    let selectedFrameId = getSelectedFrameId(state);
+    const sourceId = getSelectedSourceId(state);
+    if (!point || !focusWindow) {
+      return;
+    }
+
+    const seekLock = new Object();
+    dispatch(stepping(seekLock));
+    dispatch(enqueueCommand(command));
+
+    let resumeTarget: PauseDescription | undefined;
+    let location: Location | undefined;
+    let nextCommand: FindTargetCommand | undefined = getNextQueuedCommand(getState());
+    while (nextCommand) {
+      dispatch(dequeueCommand());
+
+      resumeTarget = await resumeTargetCache.readAsync(
+        replayClient,
+        nextCommand,
+        point,
+        selectedFrameId,
+        sourceId
+      );
+
+      if (resumeTarget && isPointInRegion(resumeTarget.point, focusWindow)) {
+        point = resumeTarget.point;
+        selectedFrameId = null;
+        location = resumeTarget.frame
+          ? getPreferredLocation(state.sources, resumeTarget.frame)
+          : undefined;
+        if (location) {
+          dispatch(setPreviewPausedLocation(location));
+        } else {
+          dispatch(previewLocationCleared());
+        }
+      } else {
+        dispatch(pauseCreationFailed());
+        return;
+      }
+
+      nextCommand = getNextQueuedCommand(getState());
+    }
+
+    if (resumeTarget && isPointInRegion(resumeTarget.point, focusWindow)) {
+      const { point, time } = resumeTarget;
+      await dispatch(seek({ executionPoint: point, time, location, openSource: !!location }));
+    } else {
+      dispatch(pauseCreationFailed());
+    }
+  };
 }
 
 export function seek({
