@@ -1,44 +1,23 @@
-import test, { Page, expect } from "@playwright/test";
-import chalk from "chalk";
-
-import { TEMP_USER_API_KEY, TEMP_USER_TEAM_ID } from "../../helpers/authentication";
+import {
+  TEST_RUN_WORKSPACE_API_KEY,
+  TEST_RUN_WORKSPACE_TEAM_ID,
+} from "../../helpers/authentication";
 import { openContextMenu } from "../../helpers/console-panel";
 import { selectContextMenuItem } from "../../helpers/context-menu";
-import { debugPrint } from "../../helpers/utils";
+import test, { expect } from "../../testFixtureTestRuns";
+import {
+  filterTestsByText,
+  noTestMatches,
+  noTestSelected,
+  startTest,
+  testsItems,
+  waitForTestRunResults,
+} from "./test-suite.utils";
 
-const startTest = async (page: Page, apiKey: string, teamId: string) => {
-  const base = process.env.PLAYWRIGHT_TEST_BASE_URL || "http://localhost:8080";
-  const url = `${base}/team/${teamId}/tests?e2e=1&apiKey=${apiKey}`;
-  await debugPrint(page, `Navigating to ${chalk.bold(url)}`, "startLibraryTest");
-  await page.goto(url);
-  await page.locator('[data-test-id="TestList"]').waitFor();
-  await page.locator('[data-test-id="TestListItem"]').first().waitFor();
-};
+test.use({ testRunState: "UNIQUE_TESTS_FOR_TESTS_VIEW" });
 
-const noTestMatches = (page: Page) => page.locator('[data-test-id="NoTestMatches"]');
-const noTestSelected = (page: Page) => page.locator('[data-test-id="NoTestSelected"]');
-
-const waitForTestRunResults = (page: Page) =>
-  page.waitForSelector('[data-test-id="TestOverview"][data-pending="false"]');
-
-const filterTestsByText = async (page: Page, text: string) => {
-  await debugPrint(page, `Filtering tests list by text`, "filterTestsByText");
-  await page.fill("data-test-id=TestPage-FilterByText-Input", text);
-};
-
-const testsItems = (page: Page, status?: "failure" | "flaky") => {
-  if (status) {
-    return page.locator(`[data-test-status="${status}"]`);
-  }
-  return page.locator('[data-test-id="TestListItem"]');
-};
-
-//TODO:
-// - Figure out a way to make sure we always have same test available. Right now what we are using will go away in 7 days.
-// - Move that test run (/test) to golden workspace
-
-test(`authenticated/new-test-suites/tests`, async ({ page }) => {
-  await startTest(page, TEMP_USER_API_KEY, TEMP_USER_TEAM_ID);
+test(`authenticated/new-test-suites/tests`, async ({ pageWithMeta: { page, clientKey } }) => {
+  await startTest(page, TEST_RUN_WORKSPACE_API_KEY, TEST_RUN_WORKSPACE_TEAM_ID);
   expect(await testsItems(page).count()).not.toBe(0);
 
   //#region > Test runs list

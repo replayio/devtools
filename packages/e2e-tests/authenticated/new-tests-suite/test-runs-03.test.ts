@@ -12,7 +12,7 @@ import {
   testRecordings,
   testRunSummary,
   testRunsItems,
-} from "./test-runs.utils";
+} from "./test-suite.utils";
 
 test.use({ testRunState: "FLAKY_IN_MAIN_WITH_SOURCE" });
 

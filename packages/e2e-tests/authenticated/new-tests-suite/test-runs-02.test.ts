@@ -3,13 +3,11 @@ import {
   TEST_RUN_WORKSPACE_API_KEY,
   TEST_RUN_WORKSPACE_TEAM_ID,
 } from "../../helpers/authentication";
-import { openContextMenu } from "../../helpers/console-panel";
-import { selectContextMenuItem } from "../../helpers/context-menu";
 import test, { expect } from "../../testFixtureTestRuns";
 import {
   filterRunsByText,
+  filterSummaryTestsByText,
   filterTestRunsByBranch,
-  filterTestsByText,
   findTestRunByText,
   noTestSelected,
   testErrors,
@@ -18,7 +16,7 @@ import {
   testRunResult,
   testRunSummary,
   testRunsItems,
-} from "./test-runs.utils";
+} from "./test-suite.utils";
 
 test.use({ testRunState: "FAILED_IN_TEMP_BRANCH_WITHOUT_SOURCE" });
 
@@ -216,10 +214,10 @@ test(`authenticated/new-test-suites/test-runs`, async ({ pageWithMeta: { page, c
   //#endregion
 
   //#region >>> When a test was selected but omitted due to a change in filter, the test run test details view should show a message
-  await filterTestsByText(page, "something that would never exist");
+  await filterSummaryTestsByText(page, "something that would never exist");
   expect(await testItems(page).count()).toBe(0);
   expect(await noTestSelected(page).count()).toBe(1);
-  await filterTestsByText(page, "");
+  await filterSummaryTestsByText(page, "");
   //#endregion
 
   //#endregion

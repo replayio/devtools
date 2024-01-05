@@ -8,7 +8,7 @@ import { selectContextMenuItem } from "../../helpers/context-menu";
 import test, { expect } from "../../testFixtureTestRuns";
 import {
   filterRunsByText,
-  filterTestsByText,
+  filterSummaryTestsByText,
   findTestRunByText,
   noTestRunSelectedMessage,
   noTestRunsMessage,
@@ -17,7 +17,7 @@ import {
   testRunResult,
   testRunSummary,
   testRunsItems,
-} from "./test-runs.utils";
+} from "./test-suite.utils";
 
 test.use({ testRunState: "SUCCESS_IN_MAIN_WITH_SOURCE" });
 
@@ -106,11 +106,11 @@ test(`authenticated/new-test-suites/test-runs`, async ({ pageWithMeta: { page, c
   //#endregion
 
   //#region >>> Filter test by text
-  await filterTestsByText(page, clientKey);
+  await filterSummaryTestsByText(page, clientKey);
   expect(await testItems(page).count()).toBe(2);
   expect(await testItems(page).nth(0).innerText()).toContain(clientKey);
   expect(await testItems(page).nth(1).innerText()).toContain(clientKey);
-  await filterTestsByText(page, "");
+  await filterSummaryTestsByText(page, "");
   //#endregion
 
   //#region >>> Filter by status
