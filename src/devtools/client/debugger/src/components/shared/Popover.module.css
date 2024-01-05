@@ -11,7 +11,7 @@
   max-height: 400px;
   height: auto;
   overflow: auto;
-  font-size: var(--theme-code-font-size);
+  font-size: var(--font-size-regular-monospace);
   background-color: var(--color-primary-background);
   border: 1px solid var(--body-color);
 }

@@ -78,7 +78,7 @@
   color: var(--color-default);
 }
 .TabSelected {
-  color: var(--color-brand);
+  color: var(--primary-accent);
   position: relative;
 }
 .Tab:disabled {
@@ -89,7 +89,7 @@
   position: absolute;
   left: 0;
   content: " ";
-  border-right: 0.25rem solid var(--color-brand);
+  border-right: 0.25rem solid var(--primary-accent);
   border-top-right-radius: 0.25rem;
   border-bottom-right-radius: 0.25rem;
   height: 2rem;

@@ -16,17 +16,24 @@ export function RunStats({ testRunId }: { testRunId: string }) {
 
   return (
     <div className="flex shrink space-x-2">
-      {failed > 0 && <Pill className={styles.failedPill} value={failed} />}
-      {flakyCount > 0 && <Pill className={styles.flakyPill} value={flakyCount} />}
-      {passed > 0 && <Pill className={styles.successPill} value={passed} />}
+      {failed > 0 && <Pill status="failed" value={failed} />}
+      {flakyCount > 0 && <Pill status="flaky" value={flakyCount} />}
+      {passed > 0 && <Pill status="success" value={passed} />}
     </div>
   );
 }
 
-function Pill({ className, value }: { className: string; value: number }) {
+const pillStyles = {
+  success: styles.successPill,
+  failed: styles.failedPill,
+  flaky: styles.flakyPill,
+};
+
+function Pill({ status, value }: { status: "failed" | "success" | "flaky"; value: number }) {
   return (
     <div
-      className={`flex h-[1.35rem] min-w-[1.35rem] items-center justify-center rounded-md text-xs font-bold ${className}`}
+      data-test-id={`Pill-${status}`}
+      className={`flex h-[1.35rem] min-w-[1.35rem] items-center justify-center rounded-md text-xs font-bold ${pillStyles[status]}`}
     >
       {value}
     </div>

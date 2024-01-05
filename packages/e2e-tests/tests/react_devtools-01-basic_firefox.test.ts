@@ -16,7 +16,7 @@ import {
   openReactDevtoolsPanel,
 } from "../helpers/legacy-react-devtools-panel";
 import { getPropertyValue } from "../helpers/object-inspector";
-import { hoverScreenshot } from "../helpers/screenshot";
+import { clickScreenshot, hoverScreenshot } from "../helpers/screenshot";
 import { waitFor } from "../helpers/utils";
 import test, { expect } from "../testFixtureCloneRecording";
 
@@ -72,6 +72,7 @@ test("react_devtools-01: Basic RDT behavior (FF)", async ({
   await enableComponentPicker(page);
   await waitFor(async () => {
     await hoverScreenshot(page, x, y);
+    await clickScreenshot(page, x, y);
     expect(await page.locator("[class^=InactiveSelectedElement]").count()).toBeGreaterThan(0);
   });
 

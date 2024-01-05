@@ -167,14 +167,6 @@ function RecordingPage({
         return;
       }
 
-      if (rec.buildId?.includes("gecko")) {
-        const url = new URL(window.location.href);
-        if (url.hostname === "app.replay.io") {
-          url.hostname = "legacy.replay.io";
-          window.location.replace(url.toString());
-        }
-      }
-
       setRecording(rec);
 
       if (Array.isArray(query.id) && query.id[query.id.length - 1] === "share") {

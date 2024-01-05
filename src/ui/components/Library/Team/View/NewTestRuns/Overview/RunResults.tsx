@@ -91,6 +91,7 @@ function TestStatusGroup({
       data-test-id={`TestRunResults-StatusGroup-${label.toLowerCase()}`}
     >
       <div
+        data-test-id="TestRunResults-StatusGroup-Title"
         className={`top-0 flex grow flex-row p-2 pl-4 font-medium hover:cursor-pointer ${styles.libraryRowHeader}`}
         onClick={() => setExpanded(!expanded)}
       >
@@ -100,6 +101,8 @@ function TestStatusGroup({
         </div>
         <div className="flex">
           <Icon
+            data-test-id="TestRunResults-StatusGroup-Icon"
+            data-test-state={expanded ? "expanded" : "collapsed"}
             className={`${
               expanded ? "" : "rotate-90"
             } rotate duration-140 h-4 w-4 transition ease-out`}
@@ -217,6 +220,8 @@ function PathNodeRenderer({
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1 truncate">{formattedNames}/</div>
             <Icon
+              data-test-id="TestRunResult-PathNode-Icon"
+              data-test-state={expanded ? "expanded" : "collapsed"}
               className={`${
                 expanded ? "" : "rotate-90"
               } rotate duration-140 h-4 w-4 transition ease-out`}

@@ -37,7 +37,7 @@ export function TestRunList() {
 
   if (!testRunsLoading && testRuns.length === 0 && testRunCount > 0) {
     return (
-      <TestSuitePanelMessage className={styles.message}>
+      <TestSuitePanelMessage data-test-id="NoTestRuns" className={styles.message}>
         No test runs match the current filters
       </TestSuitePanelMessage>
     );
@@ -48,7 +48,7 @@ export function TestRunList() {
       children={({ height, width }) => (
         <FixedSizeList
           children={TestRunListRow}
-          className="no-scrollbar text-sm"
+          className="text-sm"
           height={height}
           itemCount={itemCount}
           itemData={itemData}

@@ -1,6 +1,7 @@
-import { startTest } from "../helpers";
-import { delay, waitFor } from "../helpers/utils";
-import test, { Page } from "../testFixtureCloneRecording";
+import { openDevToolsTab, startTest } from "../helpers";
+import { showUserOptionsDropdown } from "../helpers/layout";
+import { debugPrint, delay, waitFor } from "../helpers/utils";
+import test, { Page, expect } from "../testFixtureCloneRecording";
 
 async function waitForPanelSize(page: Page, expectedSize: number) {
   await waitFor(async () => {
@@ -23,7 +24,7 @@ async function waitForPanelSize(page: Page, expectedSize: number) {
 
 test.use({ exampleKey: "doc_rr_basic.html" });
 
-test("resizable-panels-01: Left side Toolbar should be collapsible", async ({
+test("resizable-panels-01: Left side Toolbar and Video should be collapsible", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
@@ -57,4 +58,39 @@ test("resizable-panels-01: Left side Toolbar should be collapsible", async ({
   // Collapse panel via the side toggle
   await button.click();
   await waitForPanelSize(page, 0);
+
+  // Video panel should be toggleable
+  debugPrint(page, "Checking video panel");
+  await openDevToolsTab(page);
+
+  debugPrint(page, "Initial height should be greater than 0");
+  const video = page.locator("#video");
+  const getVideoHeight = async () => {
+    const heightValue = await video.evaluate(e => e.clientHeight);
+    return heightValue;
+  };
+  const initialHeight = await getVideoHeight();
+  expect(initialHeight).toBeGreaterThan(0);
+
+  await showUserOptionsDropdown(page);
+  const toggleVideoButton = page.locator(`[data-test-id="ToggleVideoPlayerButton"]`);
+
+  const initialVideoState = await toggleVideoButton.getAttribute("data-test-video-collapsed");
+  expect(initialVideoState).toBe("expanded");
+
+  debugPrint(page, "Height should be 0 when collapsed");
+  await toggleVideoButton.click();
+  const collapsedVideoState = await toggleVideoButton.getAttribute("data-test-video-collapsed");
+  expect(collapsedVideoState).toBe("collapsed");
+
+  const collapsedHeight = await getVideoHeight();
+  expect(collapsedHeight).toBe(0);
+
+  debugPrint(page, "Expanded height should be greater than 0");
+  await toggleVideoButton.click();
+  const expandedVideoState = await toggleVideoButton.getAttribute("data-test-video-collapsed");
+  expect(expandedVideoState).toBe("expanded");
+
+  const expandedHeight = await getVideoHeight();
+  expect(expandedHeight).toBeGreaterThan(0);
 });

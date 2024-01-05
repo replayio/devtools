@@ -16,7 +16,7 @@ import test from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "doc_inspector_basic_chromium.html" });
 
-test("inspector-elements-01: Basic DOM tree node display", async ({
+test("inspector-elements-01-chromium: Basic DOM tree node display", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {

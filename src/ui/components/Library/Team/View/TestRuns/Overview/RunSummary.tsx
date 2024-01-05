@@ -120,6 +120,7 @@ export function RunnerLink({ testRun }: { testRun: TestRun }) {
 
   return (
     <Link
+      data-test-id="TestRun-WorkflowLink"
       href={testRun.source.triggerUrl}
       target="_blank"
       rel="noreferrer noopener"

@@ -1,3 +1,5 @@
+import { addCoverageReport } from "monocart-reporter";
+
 import { openDevToolsTab, startTest } from "../helpers";
 import { E2E_USER_1_API_KEY, E2E_USER_2_API_KEY } from "../helpers/authentication";
 import {
@@ -7,18 +9,23 @@ import {
   replyToComment,
 } from "../helpers/comments";
 import { openSource } from "../helpers/source-explorer-panel";
-import test, { Page } from "../testFixtureCloneRecording";
+import test, { Page, base } from "../testFixtureCloneRecording";
 
-// Each authenticated e2e test must use a unique recording id;
-// else shared state from one test could impact another test running in parallel.
-// TODO [SCS-1066] Share recordings between other tests
-const url = "authenticated_comments_2.html";
+const url = "authenticated_comments.html";
 
 async function load(page: Page, recordingId: string, apiKey: string) {
   await startTest(page, recordingId, apiKey);
+  await page.coverage.startJSCoverage();
 
   await openDevToolsTab(page);
   await openSource(page, url);
+}
+
+async function close(page: Page) {
+  const jsCoverage = await page.coverage.stopJSCoverage();
+
+  await addCoverageReport(jsCoverage, base.info());
+  await page.close();
 }
 
 test.use({ exampleKey: url });
@@ -36,6 +43,7 @@ test(`authenticated/comments-02: Test shared comments and replies`, async ({
     // User 1
     const context = await browser.newContext();
     const page = await context.newPage();
+
     await load(page, recordingId, E2E_USER_1_API_KEY);
 
     await addSourceCodeComment(page, {
@@ -82,5 +90,10 @@ test(`authenticated/comments-02: Test shared comments and replies`, async ({
     });
 
     await deleteAllComments(page);
+  }
+
+  {
+    await close(pageOne);
+    await close(pageTwo);
   }
 });

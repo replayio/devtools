@@ -70,7 +70,7 @@
 }
 
 .accordion ._content {
-  font-size: var(--theme-body-font-size);
+  font-size: var(--font-size-regular);
   overflow-y: auto;
   background-color: var(--body-bgcolor);
 }

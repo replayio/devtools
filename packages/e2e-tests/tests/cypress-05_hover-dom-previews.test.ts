@@ -6,7 +6,7 @@ import {
   getTestSuitePanel,
   openCypressTestPanel,
 } from "../helpers/testsuites";
-import { waitFor } from "../helpers/utils";
+import { debugPrint, waitFor } from "../helpers/utils";
 import test, { expect } from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "cypress-realworld/bankaccounts.spec.js" });
@@ -50,6 +50,8 @@ test("cypress-05: Test DOM node preview on user action step hover", async ({
     hasText: /click|type/,
   });
 
+  debugPrint(page, "Checking highlighting for one node");
+
   // Hovering over a user action step should show a preview of the DOM node
   const firstClickStep = userActionSteps.first();
 
@@ -83,4 +85,38 @@ test("cypress-05: Test DOM node preview on user action step hover", async ({
   // Hover over the selected `firstClickStep` and verify that the highlighter is shown again
   await firstClickStep.hover();
   await highlighter.waitFor({ state: "visible" });
+
+  debugPrint(page, "Checking highlighting for multiple nodes");
+
+  // Should also handle multiple found DOM nodes
+  const stepWithMultipleNodes = steps
+    .filter({
+      hasText: "[data-test*=bankaccount-list-item]",
+    })
+    .first();
+
+  // There should now be 2 highlighters in the page,
+  // one per found list item DOM node
+
+  await waitFor(
+    async () => {
+      // Repeatedly hover over the first step and then the actual step, to force the
+      // `onMouseEnter` handler to keep checking if we have a DOM node entry available.
+      await firstStep.hover({ timeout: 1000 });
+      await stepWithMultipleNodes.hover({ timeout: 1000 });
+      const count = await highlighter.count();
+      await highlighter.first().waitFor({ state: "visible", timeout: 1000 });
+      expect(count).toBe(2);
+    },
+    // Give the evaluation plenty of time to complete
+    { timeout: 30000 }
+  );
+
+  debugPrint(page, "Checking found nodes badge");
+
+  // Badge doesn't show up until the step is selected
+  await stepWithMultipleNodes.click();
+  const badge = stepWithMultipleNodes.locator(`[class*="SelectedBadge"]`);
+  const badgeText = await badge.innerText();
+  expect(badgeText).toBe("2");
 });

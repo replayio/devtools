@@ -34,11 +34,13 @@ export function Attributes({ testRun, durationMs }: { testRun: TestRun; duration
             {user}
           </AttributeContainer>
         ) : null}
-        <BranchIcon
-          branchName={branchName}
-          isPrimaryBranch={isPrimaryBranch ?? false}
-          title={getTestRunTitle(testRun)}
-        />
+        {branchName ? (
+          <BranchIcon
+            branchName={branchName}
+            isPrimaryBranch={isPrimaryBranch ?? false}
+            title={getTestRunTitle(testRun)}
+          />
+        ) : null}
         <AttributeContainer dataTestId="TestRun-Duration" icon="timer">
           {durationString}
         </AttributeContainer>
@@ -124,6 +126,7 @@ export function RunSummary({
       <div className="flex flex-row items-center justify-between gap-2">
         <div
           className={`flex-grow ${dropdownStyles.dropdownTrigger}`}
+          data-test-id="TestRunSummary-StatusFilter-DropdownTrigger"
           onClick={onClickStatusFilter}
           onKeyDown={onKeyDownStatusFilter}
           tabIndex={0}
@@ -137,10 +140,14 @@ export function RunSummary({
 
       <FilterField
         placeholder="Filter tests"
+        dataTestId="TestRunSummary-Filter"
         value={testFilterByText}
         onChange={setTestFilterByText}
       />
-      <div className="overflow-hidden overflow-ellipsis whitespace-nowrap border-b border-themeBorder px-4 pt-2 pb-4 font-medium">
+      <div
+        data-test-id="TestRunSummary-Title"
+        className="overflow-hidden overflow-ellipsis whitespace-nowrap border-b border-themeBorder px-4 pt-2 pb-4 font-medium"
+      >
         {getTestRunTitle(testRun)}
       </div>
       <div className="px-4 pt-2 pb-4 text-xs">

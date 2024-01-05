@@ -151,7 +151,7 @@ ul.children + .tag-line::before {
 /* A tag line should have a height of 16px, with a line-height of 14px,
  * (assuming a font-size of 11px). */
 .tag-line {
-  font-size: var(--theme-code-font-size);
+  font-size: var(--font-size-regular-monospace);
   min-height: 1.2727em;
   line-height: 1.2727em;
   padding-block: 1px;

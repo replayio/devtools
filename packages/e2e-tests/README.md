@@ -101,6 +101,35 @@ For example, to re-record the _control flow_ test using _node_ you would run:
 ./scripts/save-examples.ts --target=node --example=control_flow
 ```
 
+### How to record and run examples using a custom backend and custom Chromium
+
+This assumes defaults for ports.
+
+#### Record the example
+
+Here we're recording `doc_debugger_statements.html`.
+
+```AUTOMATED_TEST_SECRET=<find me at backend/src/graphql-api/schema.ts!> \
+GRAPHQL_ADDRESS=http://localhost:8087/v1/graphql \
+DISPATCH_ADDRESS=ws://localhost:8000 \
+RECORD_REPLAY_PATH=<parent path to chromium>/chromium/src/out/Release/chrome \
+RECORD_REPLAY_API_KEY=<your api key> \
+./scripts/save-examples.ts --runtime=chromium --project=replay-chromium-local --example=doc_debugger_statements.html
+```
+
+#### Run the test
+
+Here we're running the `breakpoints-05 test`, which depends on the `doc_debugger_statements.html` recording above.
+
+```AUTOMATED_TEST_SECRET=<find me at backend/src/graphql-api/schema.ts!> \
+GRAPHQL_ADDRESS=http://localhost:8087/v1/graphql \
+AUTHENTICATED_TESTS_WORKSPACE_API_KEY=$RECORD_REPLAY_API_KEY \
+DISPATCH_ADDRESS=ws://localhost:8000 \
+RECORD_REPLAY_PATH=~/codedepot/chromium/src/out/Release/chrome \
+RECORD_REPLAY_API_KEY=<your api key> \
+yarn test:debug_local breakpoints-05
+```
+
 ### Updating Other Test Examples
 
 Most of our E2E tests work by having "golden recordings" of the small HTML+JS example files in `public/test`. However, for our Cypress Test Panel E2E tests, we need to work with existing Cypress test recordings as the "golden recordings" that our UI is checked against.

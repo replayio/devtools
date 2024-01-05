@@ -28,9 +28,10 @@ export async function recordPlaywright(
   let executablePath: string | undefined = undefined;
   if (config.shouldRecordTest) {
     executablePath = config.browserPath || getExecutablePath(browserName)!;
+    console.log(`Recording with executable at ${executablePath}`);
   }
 
-  const browser = await browserEntry.launch({
+  const browserServer = await browserEntry.launchServer({
     env: {
       ...process.env,
       // @ts-ignore
@@ -43,6 +44,15 @@ export async function recordPlaywright(
     headless: config.headless,
   });
 
+  // Set if you want to see the chromium logs during recording.
+  if (process.env.RECORD_REPLAY_BROWSER_LOG) {
+    const stderr = browserServer.process().stderr;
+    stderr?.addListener("data", data => {
+      console.error(data + "");
+    });
+  }
+
+  const browser = await browserEntry.connect(browserServer.wsEndpoint());
   const context = await browser.newContext({
     ignoreHTTPSErrors: true,
   });
@@ -58,7 +68,7 @@ export async function recordPlaywright(
   }
 }
 
-export async function uploadLastRecording(url: string) {
+export async function uploadLastRecording(url: string): Promise<string> {
   const list = cli.listAllRecordings();
   const id = findLast(list, rec => rec.metadata.uri === url)?.id;
 

@@ -1,121 +1,63 @@
+import { ObjectId } from "@replayio/protocol";
 import classnames from "classnames";
-import React, { useCallback, useLayoutEffect, useRef, useState } from "react";
+import { useContext } from "react";
 
-import {
-  highlightNode,
-  selectNode,
-  unhighlightNode,
-} from "devtools/client/inspector/markup/actions/markup";
+import { selectNode } from "devtools/client/inspector/markup/actions/markup";
+import { useMostRecentLoadedPause } from "replay-next/src/hooks/useMostRecentLoadedPause";
 import { useNag } from "replay-next/src/hooks/useNag";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Nag } from "shared/graphql/types";
-import {
-  fetchMouseTargetsForPause,
-  loadMouseTargets,
-  nodePickerDisabled,
-  nodePickerInitializing,
-  nodePickerReady,
-  setMouseTargetsLoading,
-} from "ui/actions/app";
 import { setSelectedPanel } from "ui/actions/layout";
+import { NodePickerContext } from "ui/components/NodePickerContext";
 import { useAppDispatch } from "ui/setup/hooks";
-import { getMouseTarget } from "ui/suspense/nodeCaches";
-import { NodePicker as NodePickerClass } from "ui/utils/nodePicker";
-
-interface Position {
-  x: number;
-  y: number;
-}
-
-const nodePickerInstance = new NodePickerClass();
+import { boundingRectsCache } from "ui/suspense/nodeCaches";
 
 export function NodePicker() {
   const dispatch = useAppDispatch();
-  const [, dismissInspectElementNag] = useNag(Nag.INSPECT_ELEMENT); // Replay Passport
 
-  // Contrast with the React DevTools instance of the picker
-  const [globalNodePickerActive, setGlobalNodePickerActive] = useState(false);
+  const [shouldShow, dismissInspectElementNag] = useNag(Nag.INSPECT_ELEMENT); // Replay Passport
 
-  const nodePickerRemoveTime = useRef<number | undefined>(undefined);
+  const { enable, status, type } = useContext(NodePickerContext);
+  const replayClient = useContext(ReplayClientContext);
 
-  async function clickNodePickerButton(e: React.MouseEvent) {
-    e.preventDefault();
-    e.stopPropagation();
-    if (globalNodePickerActive) {
-      // The node picker mousedown listener will take care of deactivation.
-      return;
+  const { pauseId } = useMostRecentLoadedPause() ?? {};
+
+  const active = (status === "initializing" || status === "active") && type === "domElement";
+
+  const onClick = () => {
+    if (shouldShow) {
+      dismissInspectElementNag();
     }
 
-    // Hacky workaround to make sure the picker stays deactivated when
-    // clicking on its icon.
-    const now = Date.now();
-    if (nodePickerRemoveTime.current && now - nodePickerRemoveTime.current < 200) {
-      return;
-    }
-
-    setGlobalNodePickerActive(true);
-    dispatch(nodePickerInitializing("domElement"));
-    await dispatch(loadMouseTargets());
-    dispatch(nodePickerReady("domElement"));
-    dispatch(setSelectedPanel("inspector"));
-    dismissInspectElementNag(); // Replay Passport
-  }
-
-  const handleNodeSelected = useCallback(
-    async function handleNodeSelected(nodeId: string) {
-      dispatch(highlightNode(nodeId));
-      dispatch(selectNode(nodeId));
-    },
-    [dispatch]
-  );
-
-  useLayoutEffect(() => {
-    if (globalNodePickerActive) {
-      function disableNodePicker() {
-        nodePickerInstance.disable();
-        setGlobalNodePickerActive(false);
-        dispatch(nodePickerDisabled());
-        dispatch(setMouseTargetsLoading(false));
+    if (!active) {
+      if (pauseId == null) {
+        console.warn("NodePicker enabled before PauseId is available");
+        return;
       }
 
-      nodePickerInstance.enable({
-        name: "domElement",
-        onHighlightNode(nodeId) {
-          dispatch(highlightNode(nodeId));
+      enable(
+        {
+          onSelected: (nodeId: ObjectId) => {
+            dispatch(setSelectedPanel("inspector"));
+            dispatch(selectNode(nodeId));
+          },
+          type: "domElement",
         },
-        onUnhighlightNode() {
-          dispatch(unhighlightNode());
-        },
-        async onPicked(nodeId) {
-          nodePickerRemoveTime.current = Date.now();
-
-          if (nodeId) {
-            handleNodeSelected(nodeId);
-          } else {
-            dispatch(unhighlightNode());
-          }
-
-          disableNodePicker();
-        },
-        onCheckNodeBounds: async (x, y, nodeIds) => {
-          const boundingRects = await dispatch(fetchMouseTargetsForPause());
-          return getMouseTarget(boundingRects ?? [], x, y, nodeIds);
-        },
-        onClickOutsideCanvas() {
-          disableNodePicker();
-        },
-      });
-    } else {
-      nodePickerInstance.disable();
+        async () => {
+          await boundingRectsCache.readAsync(replayClient, pauseId);
+        }
+      );
     }
-  }, [globalNodePickerActive, dispatch, handleNodeSelected]);
+  };
 
   return (
     <button
-      id="command-button-pick"
       className={classnames("devtools-button toolbar-panel-button tab", {
-        active: globalNodePickerActive,
+        active,
       })}
-      onClick={clickNodePickerButton}
+      data-status={status}
+      id="command-button-pick"
+      onClick={onClick}
       title="Select an element in the video to inspect it"
     />
   );
