@@ -1,5 +1,7 @@
 import { useContext } from "react";
 
+import { trackEvent } from "ui/utils/telemetry";
+
 import { FilterBarContainer } from "./FilterBarContainer";
 import { TestRunsPage } from "./NewTestRuns/TestRunsPage";
 import { RecordingsPage } from "./Recordings/RecordingsPage";
@@ -16,6 +18,7 @@ export function ViewPage({ defaultView }: { defaultView: string }) {
 
 export function ViewPageContent() {
   const { view } = useContext(ViewContext);
+
   return (
     <div className="flex flex-grow flex-col overflow-hidden">
       <FilterBarContainer />
