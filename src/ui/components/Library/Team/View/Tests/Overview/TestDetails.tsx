@@ -2,6 +2,7 @@ import orderBy from "lodash/orderBy";
 
 import { Recording } from "shared/graphql/types";
 import { GroupedTestRun } from "shared/test-suites/TestRun";
+import { trackEvent } from "ui/utils/telemetry";
 import { testFailed, testPassed } from "ui/utils/testRuns";
 
 import { TestSuitePanelMessage } from "../../TestSuitePanelMessage";
@@ -76,6 +77,7 @@ export function Replay({
     <a
       href={`/recording/${recording.id}`}
       className="flex flex-row gap-2 border-b border-bodyBgcolor py-1 px-4"
+      onClick={() => trackEvent("test_dashboard.open_replay", { view: "tests" })}
     >
       <div className="flex flex-row items-center gap-2 overflow-hidden">
         <StatusIcon status={result} isProcessed={recording.isProcessed} />
