@@ -164,6 +164,7 @@ function TestRunsContent() {
               </div>
               <FilterField
                 placeholder="Filter"
+                dataTestId="TestRunsPage-FilterByText-Input"
                 onChange={setFilterByText}
                 value={filterByTextForDisplay}
               />

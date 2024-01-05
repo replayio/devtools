@@ -3,7 +3,6 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { MouseEvent, useContext } from "react";
 
-import useLocalStorageUserData from "shared/user-data/LocalStorage/useLocalStorageUserData";
 import { setModal } from "ui/actions/app";
 import { MY_LIBRARY_TEAM } from "ui/components/Library/Team/TeamContextRoot";
 import Icon from "ui/components/shared/Icon";
@@ -11,8 +10,7 @@ import { useUpdateDefaultWorkspace } from "ui/hooks/settings";
 import { useAppDispatch } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
 
-import { pushRoute, useGetTeamRouteParams } from "../Team/utils";
-import { View, ViewContext } from "../Team/View/ViewContextRoot";
+import { useGetTeamRouteParams } from "../Team/utils";
 import styles from "../Library.module.css";
 
 export function TeamButton({
@@ -32,7 +30,6 @@ export function TeamButton({
   const isSelected = router.asPath.includes(basePath);
   const showSettingsButton = isSelected && id && id !== MY_LIBRARY_TEAM.id && !isNew;
   const updateDefaultWorkspace = useUpdateDefaultWorkspace();
-  const [enableTestSuitesTestsView] = useLocalStorageUserData("enableTestSuitesTestsView");
 
   const onClick = async () => {
     if (isNew) {
@@ -69,7 +66,7 @@ export function TeamButton({
         ) : null}
         {showSettingsButton ? <SettingsButton /> : null}
       </Link>
-      {isSelected && enableTestSuitesTestsView && isTest ? <TestTeamViews /> : null}
+      {isSelected && isTest ? <TestTeamViews /> : null}
     </div>
   );
 }

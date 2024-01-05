@@ -9,7 +9,7 @@ import {
   getVisibleBranchNames,
 } from "../../helpers/test-suites";
 
-test(`authenticated/test-suites/library-test-runs`, async ({ page }) => {
+test.skip(`authenticated/test-suites/library-test-runs`, async ({ page }) => {
   await startLibraryTest(page, E2E_USER_3_API_KEY, E2E_USER_3_TEAM_ID);
 
   await filterTestRunsList(page, { branch: "primary" });

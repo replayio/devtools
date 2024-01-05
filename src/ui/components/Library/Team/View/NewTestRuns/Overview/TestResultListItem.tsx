@@ -71,9 +71,6 @@ export function TestResultListItem({
       className={`${styles.recordingLink} ${styles.libraryRow}`}
       data-test-id="TestRunResultsListItem"
       data-test-status={label}
-      style={{
-        paddingLeft: `${depth * 0.5}rem`,
-      }}
     >
       <div className={styles.linkContent}>
         <div className={styles.iconWrapper}>
