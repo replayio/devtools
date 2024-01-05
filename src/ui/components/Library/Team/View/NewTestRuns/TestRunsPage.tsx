@@ -122,7 +122,7 @@ function TestRunsContent() {
           <div className="relative flex h-full w-full flex-col gap-4 overflow-hidden rounded-xl bg-bodyBgcolor p-2">
             {testRunsLoading && testRuns.length > 0 && <IndeterminateProgressBar />}
             <div className="flex flex-col gap-2">
-              <div className="grid w-full grid-cols-3 gap-2 overflow-hidden bg-bodyBgcolor">
+              <div className="grid w-full grid-cols-3 gap-2 bg-bodyBgcolor">
                 <div
                   className={dropdownStyles.dropdownTrigger}
                   data-test-id="TestRunsPage-ResultFilter-DropdownTrigger"
