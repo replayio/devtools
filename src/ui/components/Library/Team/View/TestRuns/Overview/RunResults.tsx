@@ -171,7 +171,7 @@ const FileNodeRenderer = memo(function FileNodeRenderer({
                 <TestResultListItem
                   depth={depth + 1}
                   filterByText={filterByText}
-                  key={recording.id}
+                  key={test.id + recording.id}
                   label={execution.result}
                   recording={recording}
                   test={test}
