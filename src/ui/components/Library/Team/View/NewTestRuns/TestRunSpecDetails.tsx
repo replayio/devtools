@@ -1,8 +1,7 @@
-import { useContext, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 
 import { TestRunTestWithRecordings } from "shared/test-suites/TestRun";
 
-import { Alert } from "../shared/Alert";
 import { useTestRunDetailsSuspends } from "../TestRuns/hooks/useTestRunDetailsSuspends";
 import { TestSuitePanelMessage } from "../TestSuitePanelMessage";
 import { TestRunPanelWrapper } from "./TestRunPanelWrapper";
@@ -71,19 +70,23 @@ const getSummary = (message: string) => {
 
 function Errors({ failedTests }: { failedTests: TestRunTestWithRecordings[] }) {
   const { spec } = useContext(TestRunsContext);
-  const errors = failedTests.flatMap(t => t.errors || []);
-  const uniqueErrors = errors.reduce((acc, e) => {
-    const existingError = acc.find(a => a.message === e);
 
-    if (existingError) {
-      existingError.count += 1;
-    } else {
-      acc.push({ message: e, count: 1, summary: getSummary(e) });
-    }
+  const sortedErrors = useMemo(() => {
+    const errors = failedTests.flatMap(t => t.errors || []);
+    const uniqueErrors = errors.reduce((acc, e) => {
+      const existingError = acc.find(a => a.message === e);
 
-    return acc;
-  }, [] as ErrorCount[]);
-  const sortedErrors = uniqueErrors.sort((a, b) => b.count - a.count);
+      if (existingError) {
+        existingError.count += 1;
+      } else {
+        acc.push({ message: e, count: 1, summary: getSummary(e) });
+      }
+
+      return acc;
+    }, [] as ErrorCount[]);
+
+    return uniqueErrors.sort((a, b) => b.count - a.count);
+  }, [failedTests]);
 
   return (
     <div className="flex flex-col gap-2 px-3">
