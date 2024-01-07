@@ -1,5 +1,6 @@
 import { useContext, useMemo, useState } from "react";
 
+import Icon from "replay-next/components/Icon";
 import { TestRunTestWithRecordings } from "shared/test-suites/TestRun";
 
 import { useTestRunDetailsSuspends } from "../TestRuns/hooks/useTestRunDetailsSuspends";
@@ -116,12 +117,26 @@ function ErrorGroup({
       className="flex w-full flex-col gap-2 overflow-x-auto rounded-md bg-[color:var(--testsuites-v2-error-bg)] px-3 py-4"
       data-test-id="TestRunSpecDetails-Error"
     >
-      <button className="flex flex-row gap-1" onClick={() => setExpanded(!expanded)}>
-        <div>({count})</div>
-        <div className="truncate">{summary}</div>
+      <button
+        className="flex flex-row items-start justify-between gap-1"
+        onClick={() => setExpanded(!expanded)}
+      >
+        <div className="mt-0.5 flex items-center justify-center rounded-md bg-[color:var(--testsuites-failed-color)] px-2 py-0 text-xs font-bold text-white">
+          {count}
+        </div>
+        <div className="ml-2 flex-grow truncate text-left">{summary}</div>
+        <Icon
+          data-test-id="TestRunResults-StatusGroup-Icon"
+          data-test-state={expanded ? "expanded" : "collapsed"}
+          className={`duration-140 mt-0.5 transition-transform ${
+            expanded ? "rotate-0" : "rotate-90"
+          }`}
+          style={{ minWidth: "1rem", minHeight: "1rem" }}
+          type="chevron-down"
+        />
       </button>
       {expanded ? (
-        <div className="flex flex-col gap-4 whitespace-pre-wrap break-words border-l-2 border-[color:var(--testsuites-v2-failed-header)] px-3">
+        <div className="mt-2 flex flex-col gap-4 whitespace-pre-wrap break-words ">
           <div className="font-mono text-xs">{message.split("\n").slice(0, 4).join("\n")}</div>
         </div>
       ) : null}
