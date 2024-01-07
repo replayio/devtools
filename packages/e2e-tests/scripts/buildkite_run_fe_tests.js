@@ -54,6 +54,7 @@ function run_fe_tests(CHROME_BINARY_PATH) {
     "doc_rr_region_loading.html",
     "doc_stacking_chromium.html",
     "rdt-react-versions/dist/index.html",
+    "doc_prod_bundle.html",
   ];
   execSync(
     `xvfb-run ./packages/e2e-tests/scripts/save-examples.ts --runtime=chromium --project=replay-chromium-local --example=${htmlFiles.join(
