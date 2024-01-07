@@ -82,6 +82,8 @@ function run_fe_tests(CHROME_BINARY_PATH) {
     "elements-search",
     "stacking_chromium",
     "react_devtools-03-multiple-versions",
+    "breakpoints-06",
+    "object_preview-04"
   ];
 
   execSync(`xvfb-run yarn test:debug ${testNames.join(" ")}`, {
