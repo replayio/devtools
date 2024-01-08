@@ -131,7 +131,7 @@ function ErrorGroup({
           className={`duration-140 mt-0.5 transition-transform ${
             expanded ? "rotate-0" : "rotate-90"
           }`}
-          style={{ minWidth: "1rem", minHeight: "1rem" }}
+          style={{ minWidth: "1rem", minHeight: "1rem", width: "1rem", height: "1rem" }}
           type="chevron-down"
         />
       </button>
