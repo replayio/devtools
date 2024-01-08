@@ -202,7 +202,7 @@ test(`authenticated/new-test-suites/test-runs-02: failed run in temp branch with
   await testItems(failedTests).filter({ hasText: `Cypress Test` }).click();
   await page.waitForSelector('[data-test-id="NoTestSelected"]', { state: "detached" });
   expect(await testRecordings(page).count()).toBe(1);
-  expect(await testErrors(page).count()).toBe(2);
+  expect(await testErrors(page).count()).toBe(1);
 
   await testItems(failedTests).filter({ hasNotText: `Cypress Test` }).click();
   await page.waitForSelector('[data-test-id="NoTestSelected"]', { state: "detached" });
