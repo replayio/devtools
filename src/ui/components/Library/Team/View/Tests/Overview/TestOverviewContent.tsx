@@ -54,7 +54,7 @@ function TestOverview({ testId }: { testId: string }) {
       {loading ? <IndeterminateProgressBar /> : null}
       {lastTest ? (
         <>
-          <div className={styles.testTitle}>
+          <div data-test-id="TestOverviewTitle" className={styles.testTitle}>
             <div>{lastTest.title}</div>
           </div>
           <div className="flex flex-col overflow-y-auto">

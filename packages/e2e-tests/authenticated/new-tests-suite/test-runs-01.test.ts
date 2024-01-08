@@ -21,7 +21,9 @@ import {
 
 test.use({ testRunState: "SUCCESS_IN_MAIN_WITH_SOURCE" });
 
-test(`authenticated/new-test-suites/test-runs`, async ({ pageWithMeta: { page, clientKey } }) => {
+test(`authenticated/new-test-suites/test-runs-01: passed run in main branch with source`, async ({
+  pageWithMeta: { page, clientKey },
+}) => {
   await startLibraryTest(page, TEST_RUN_WORKSPACE_API_KEY, TEST_RUN_WORKSPACE_TEAM_ID);
   expect(await testRunsItems(page).count()).not.toBe(0);
 
@@ -71,6 +73,7 @@ test(`authenticated/new-test-suites/test-runs`, async ({ pageWithMeta: { page, c
 
   //#region >>> Workspace with limited retention limit should not show large time range filter
   expect(await page.locator('[data-test-id="month"]').count()).toBe(0);
+  //#endregion
   //#endregion
 
   //#region > Selected test run
@@ -127,7 +130,6 @@ test(`authenticated/new-test-suites/test-runs`, async ({ pageWithMeta: { page, c
     contextMenuItemTestId: "all",
   });
   //#endregion
-
   //#endregion
 
   //#region >>> When a test run was selected but omitted due to a change in filter, the run details view should show a message

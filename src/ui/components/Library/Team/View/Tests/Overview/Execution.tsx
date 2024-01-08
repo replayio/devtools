@@ -17,7 +17,11 @@ export function Execution({ execution }: { execution: TestExecution }) {
         <div className="flex flex-row items-center gap-2 overflow-hidden">
           <ExecutionStatus result={execution.result} />
           <div className="flex flex-col overflow-x-hidden">
-            <div title={title} className="flex-grow truncate font-bold">
+            <div
+              data-test-id="ExecutionTitle"
+              title={title}
+              className="flex-grow truncate font-bold"
+            >
               {title}
             </div>
             {execution.commitAuthor ? <CommitAuthor author={execution.commitAuthor} /> : null}
@@ -27,7 +31,7 @@ export function Execution({ execution }: { execution: TestExecution }) {
           <div className="flex w-4 items-center">
             <MaterialIcon>schedule</MaterialIcon>
           </div>
-          <div>{getTruncatedRelativeDate(execution.createdAt)}</div>
+          <div data-test-id="ExecutionDate">{getTruncatedRelativeDate(execution.createdAt)}</div>
         </div>
       </div>
       {sortedRecordings.map((r, i) => (
@@ -59,7 +63,11 @@ function ExecutionStatus({ result }: { result: string }) {
   }
 
   return (
-    <div className="flex w-6 flex-shrink-0 flex-col items-center" title={result}>
+    <div
+      className="flex w-6 flex-shrink-0 flex-col items-center"
+      data-test-id="ExecutionStatusIcon"
+      title={result}
+    >
       <Icon filename={icon} size="medium" className={className} />
     </div>
   );
@@ -67,7 +75,10 @@ function ExecutionStatus({ result }: { result: string }) {
 
 export function CommitAuthor({ author }: { author: string }) {
   return (
-    <div className="flex flex-row gap-4 overflow-hidden overflow-ellipsis whitespace-nowrap">
+    <div
+      data-test-id="CommitAuthor"
+      className="flex flex-row gap-4 overflow-hidden overflow-ellipsis whitespace-nowrap"
+    >
       <div className="flex flex-row items-center gap-1">
         <div className="flex w-4 items-center">
           <MaterialIcon>person</MaterialIcon>

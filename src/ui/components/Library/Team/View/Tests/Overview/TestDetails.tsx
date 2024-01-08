@@ -80,6 +80,7 @@ export function Replay({
       <div className="flex flex-row items-center gap-2 overflow-hidden">
         <StatusIcon status={result} isProcessed={recording.isProcessed} />
         <div
+          data-test-id="ReplayTitle"
           title={title}
           className="flex-grow overflow-hidden overflow-ellipsis whitespace-nowrap"
         >

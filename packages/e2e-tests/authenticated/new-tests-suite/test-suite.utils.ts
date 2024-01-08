@@ -64,7 +64,7 @@ export const startTest = async (page: Page, apiKey: string, teamId: string) => {
 
 export const noTestMatches = (page: Page) => page.locator('[data-test-id="NoTestMatches"]');
 
-export const waitForTestRunResults = (page: Page) =>
+export const waitForTestExecutions = (page: Page) =>
   page.waitForSelector('[data-test-id="TestOverview"][data-pending="false"]');
 
 export const filterTestsByText = async (page: Page, text: string) => {
@@ -77,4 +77,10 @@ export const testsItems = (page: Page, status?: "failure" | "flaky") => {
     return page.locator(`[data-test-status="${status}"]`);
   }
   return page.locator('[data-test-id="TestListItem"]');
+};
+
+export const sortTestsBy = async (page: Page, sortOption: string) => {
+  const rateSortDropdown = page.locator('[data-test-id="TestPage-ResultFilter-DropdownTrigger"]');
+  await openContextMenu(rateSortDropdown, { useLeftClick: true });
+  await selectContextMenuItem(page, { contextMenuItemTestId: sortOption });
 };
