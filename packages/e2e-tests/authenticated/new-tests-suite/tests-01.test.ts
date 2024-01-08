@@ -7,6 +7,7 @@ import { selectContextMenuItem } from "../../helpers/context-menu";
 import test, { expect } from "../../testFixtureTestRuns";
 import {
   filterTestsByText,
+  findTestByText,
   noTestMatches,
   noTestSelected,
   sortTestsBy,
@@ -79,11 +80,7 @@ test(`authenticated/new-test-suites/tests-01: basic tests`, async ({ pageWithMet
   //#endregion
 
   //#region >>> List of executions
-  const testItemWithExecutions = (await testsItems(page).all()).find(async item => {
-    const title = await item.innerText();
-    return title.includes("Tests View - Sixth test");
-  });
-  expect(testItemWithExecutions).toBeDefined();
+  const testItemWithExecutions = await findTestByText(page, testName);
   await testItemWithExecutions.click();
   await waitForTestExecutions(page);
 

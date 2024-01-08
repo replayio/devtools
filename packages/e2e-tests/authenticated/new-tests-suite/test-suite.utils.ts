@@ -84,3 +84,14 @@ export const sortTestsBy = async (page: Page, sortOption: string) => {
   await openContextMenu(rateSortDropdown, { useLeftClick: true });
   await selectContextMenuItem(page, { contextMenuItemTestId: sortOption });
 };
+
+export const findTestByText = async (page: Page, text: string) => {
+  const testItemWithExecutions = (await testsItems(page).all()).find(async item => {
+    const title = await item.innerText();
+    return title.includes(text);
+  });
+  if (!testItemWithExecutions) {
+    throw new Error("Test item not found");
+  }
+  return testItemWithExecutions;
+};
