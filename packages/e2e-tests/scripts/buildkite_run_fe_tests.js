@@ -40,6 +40,9 @@ function run_fe_tests(CHROME_BINARY_PATH) {
 
   process.env.RECORD_REPLAY_DISPATCH_SERVER = "wss://dispatch.replay.io";
   process.env.REPLAY_BROWSER_BINARY_PATH = CHROME_BINARY_PATH;
+  process.env.REPLAY_CHROMIUM_EXECUTABLE_PATH = CHROME_BINARY_PATH;
+  process.env.RECORD_REPLAY_PATH = CHROME_BINARY_PATH;
+  // process.env.RECORD_REPLAY_DIRECTORY =
   process.env.AUTHENTICATED_TESTS_WORKSPACE_API_KEY = process.env.RECORD_REPLAY_API_KEY;
   process.env.PLAYWRIGHT_TEST_BASE_URL = "https://app.replay.io";
 
@@ -55,15 +58,6 @@ function run_fe_tests(CHROME_BINARY_PATH) {
     "doc_stacking_chromium.html",
     "rdt-react-versions/dist/index.html",
   ];
-  execSync(
-    `xvfb-run ./packages/e2e-tests/scripts/save-examples.ts --runtime=chromium --project=replay-chromium-local --example=${htmlFiles.join(
-      ","
-    )}`,
-    { stdio: "inherit" }
-  );
-
-  // Without the wait, the next xvfb-run command can fail.
-  execSync("sleep 5");
 
   // Run the known-passind tests.
   const testNames = [
@@ -82,6 +76,16 @@ function run_fe_tests(CHROME_BINARY_PATH) {
     "stacking_chromium",
     "react_devtools-03-multiple-versions",
   ];
+
+  execSync(
+    `xvfb-run ./packages/e2e-tests/scripts/save-examples.ts --runtime=chromium --project=replay-chromium-local --example=${htmlFiles.join(
+      ","
+    )}`,
+    { stdio: "inherit", env: process.env }
+  );
+
+  // Without the wait, the next xvfb-run command can fail.
+  execSync("sleep 5");
 
   execSync(`xvfb-run yarn test:debug ${testNames.join(" ")}`, {
     stdio: "inherit",
