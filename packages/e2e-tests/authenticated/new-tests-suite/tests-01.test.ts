@@ -58,7 +58,6 @@ test(`authenticated/new-test-suites/tests-01: basic tests`, async ({ pageWithMet
     contextMenuItemTestId: "alphabetical",
   });
   expect(await testsItems(page, "failure").count()).not.toBe(0);
-  //TODO: Why is this flaky? It returns "First test", "Fifth test" sometimes
   expect(await testsItems(page).first().innerText()).toContain("Tests View - Fifth test");
   //#endregion
 
