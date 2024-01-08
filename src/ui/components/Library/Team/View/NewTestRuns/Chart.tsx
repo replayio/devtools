@@ -1,8 +1,7 @@
-import { Point, PointTooltipProps } from "@nivo/line";
+import { Point } from "@nivo/line";
 import groupBy from "lodash/groupBy";
 import dynamic from "next/dynamic";
 import { useContext, useMemo, useState } from "react";
-import { createPortal } from "react-dom";
 
 import useTooltip from "replay-next/src/hooks/useTooltip";
 import { TestRun } from "shared/test-suites/TestRun";
@@ -67,7 +66,7 @@ export const Chart = () => {
   });
 
   return (
-    <div style={{ height: 80, minWidth: 360 }}>
+    <div style={{ height: 80, minWidth: 50 }}>
       <ResponsiveLine
         data={data}
         margin={{ top: 10, right: 10, bottom: 10, left: 10 }}

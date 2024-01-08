@@ -18,8 +18,8 @@ export function TestRunsStats() {
     <div className="flex flex-col gap-2 text-sm">
       <div className="flex flex-col overflow-auto rounded-lg bg-chrome p-4">
         <Chart />
-        <div>
-          Failure rate: {(buildFailureRate * 100).toFixed(2)}% ({buildFailuresCount}/{buildsCount})
+        <div className="truncate" title={`${buildFailuresCount}/${buildsCount}`}>
+          Failure rate: {(buildFailureRate * 100).toFixed(2)}%
         </div>
       </div>
     </div>
