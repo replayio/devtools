@@ -3,7 +3,7 @@ import React, { PropsWithChildren, ReactNode, Suspense, useContext, useMemo } fr
 import { isPromiseLike } from "suspense";
 
 import { Badge, Checkbox } from "design";
-import ErrorBoundary from "replay-next/components/ErrorBoundary";
+import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBoundary";
 import Icon from "replay-next/components/Icon";
 import { ConsoleFiltersContext } from "replay-next/src/contexts/ConsoleFiltersContext";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
@@ -166,7 +166,7 @@ function Toggle({
 
 function CountErrorBoundary({ children }: PropsWithChildren) {
   return (
-    <ErrorBoundary
+    <InlineErrorBoundary
       name="FilterToggles"
       fallback={
         <span title="Something went wrong loading message counts.">
@@ -175,7 +175,7 @@ function CountErrorBoundary({ children }: PropsWithChildren) {
       }
     >
       {children}
-    </ErrorBoundary>
+    </InlineErrorBoundary>
   );
 }
 

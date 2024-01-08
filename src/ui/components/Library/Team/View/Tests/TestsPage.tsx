@@ -2,7 +2,7 @@ import { Suspense, useContext } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { ContextMenuItem, useContextMenu } from "use-context-menu";
 
-import ErrorBoundary from "replay-next/components/ErrorBoundary";
+import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBoundary";
 import Icon from "replay-next/components/Icon";
 import LibraryDropdownTrigger from "ui/components/Library/LibraryDropdownTrigger";
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
@@ -22,13 +22,13 @@ import styles from "./TestsPage.module.css";
 
 export function TestsPage() {
   return (
-    <ErrorBoundary name="TestsPageErrorBoundary" fallback={<ErrorFallback />}>
+    <InlineErrorBoundary name="TestsPageErrorBoundary" fallback={<ErrorFallback />}>
       <TimeFilterContextRoot>
         <TestsContextRoot>
           <TestsContent />
         </TestsContextRoot>
       </TimeFilterContextRoot>
-    </ErrorBoundary>
+    </InlineErrorBoundary>
   );
 }
 

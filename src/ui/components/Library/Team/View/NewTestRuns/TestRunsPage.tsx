@@ -2,7 +2,7 @@ import { ReactNode, Suspense, useContext } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { ContextMenuItem, useContextMenu } from "use-context-menu";
 
-import ErrorBoundary from "replay-next/components/ErrorBoundary";
+import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBoundary";
 import Icon from "replay-next/components/Icon";
 import { IndeterminateProgressBar } from "replay-next/components/IndeterminateLoader";
 import useLocalStorageUserData from "shared/user-data/LocalStorage/useLocalStorageUserData";
@@ -34,13 +34,13 @@ function ErrorFallback() {
 
 export function TestRunsPage() {
   return (
-    <ErrorBoundary name="TestRunsPageErrorBoundary" fallback={<ErrorFallback />}>
+    <InlineErrorBoundary name="TestRunsPageErrorBoundary" fallback={<ErrorFallback />}>
       <TimeFilterContextRoot>
         <TestRunsContextRoot>
           <TestRunsContent />
         </TestRunsContextRoot>
       </TimeFilterContextRoot>
-    </ErrorBoundary>
+    </InlineErrorBoundary>
   );
 }
 

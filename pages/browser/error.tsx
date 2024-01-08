@@ -1,7 +1,7 @@
 import { useRouter } from "next/dist/client/router";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 
-import { ExpectedErrorScreen } from "ui/components/shared/Error";
+import { ExpectedErrorModal } from "ui/components/Errors/ExpectedErrorModal";
 import { getAuthHost } from "ui/utils/auth";
 import useAuth0 from "ui/utils/useAuth0";
 
@@ -42,13 +42,11 @@ const BrowserError = () => {
         // the auth process cleanly
         <iframe src={`https://${authHost}/v2/logout`} style={{ height: 0, width: 0 }} />
       ) : null}
-      <ExpectedErrorScreen
-        error={{
-          message,
-          content: Array.isArray(content) ? content[0] : content,
-          action: url ? "try-again" : undefined,
-          onAction: handleAction,
-        }}
+      <ExpectedErrorModal
+        action={url ? "try-again" : undefined}
+        details={Array.isArray(content) ? content[0] : content}
+        onDismiss={handleAction}
+        title={message}
       />
     </>
   );

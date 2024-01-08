@@ -9,6 +9,7 @@ import { isNodeInSubTree } from "replay-next/components/elements/utils/isNodeInS
 import { loadNodeSubTree } from "replay-next/components/elements/utils/loadNodeSubTree";
 import { shouldDisplayNode } from "replay-next/components/elements/utils/shouldDisplayNode";
 import { GenericListData } from "replay-next/components/windowing/GenericListData";
+import { recordData as recordTelemetryData } from "replay-next/src/utils/telemetry";
 import { ReplayClientInterface } from "shared/client/types";
 
 import { Item, Metadata } from "./types";
@@ -23,6 +24,7 @@ export class ElementsListData extends GenericListData<Item> {
   private _rootObjectIdWaiter: {
     promise: Promise<void>;
     resolve: () => void;
+    resolved: boolean;
   };
 
   constructor(replayClient: ReplayClientInterface, pauseId: PauseId) {
@@ -33,9 +35,14 @@ export class ElementsListData extends GenericListData<Item> {
     this._pauseId = pauseId;
     this._replayClient = replayClient;
 
-    this._rootObjectIdWaiter = {} as any;
+    this._rootObjectIdWaiter = {
+      resolved: false,
+    } as any;
     this._rootObjectIdWaiter.promise = new Promise(resolve => {
-      this._rootObjectIdWaiter.resolve = resolve;
+      this._rootObjectIdWaiter.resolve = () => {
+        this._rootObjectIdWaiter.resolved = true;
+        resolve();
+      };
     });
   }
 
@@ -81,6 +88,9 @@ export class ElementsListData extends GenericListData<Item> {
     let idPath;
     try {
       this.updateIsLoading(true);
+
+      const isInitialLoad = this._rootObjectIdWaiter.resolved == false;
+      const startTime = Date.now();
 
       idPath = await parentNodesCache.readAsync(this._replayClient, this._pauseId, leafNodeId);
 
@@ -132,6 +142,19 @@ export class ElementsListData extends GenericListData<Item> {
 
       const leafNode = this.getMutableMetadata(leafNodeId).element.node;
       const index = this.getIndexForNode(leafNodeId, leafNode);
+
+      if (isInitialLoad) {
+        const stopTime = Date.now();
+
+        // Fire and forget telemetry (if enabled)
+        recordTelemetryData("suspense-cache-load", {
+          duration: stopTime - startTime,
+          label: "LegacyElementsPanel",
+          params: {
+            pauseId: this._pauseId,
+          },
+        });
+      }
 
       return index;
     } catch (error) {

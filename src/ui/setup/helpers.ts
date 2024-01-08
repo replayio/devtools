@@ -1,8 +1,8 @@
 // eslint-disable-next-line no-restricted-imports
 import { client, sendMessage, triggerEvent } from "protocol/socket";
 import { GraphQLService, userData } from "shared/user-data/GraphQL/UserData";
+import { getRecordingId } from "shared/utils/recording";
 import { UIStore } from "ui/actions";
-import { getRecordingId } from "ui/utils/recording";
 
 import { ReplaySession, getReplaySession } from "./prefs";
 

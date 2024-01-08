@@ -45,7 +45,7 @@
 .light.textInput {
   background-color: #f6f6f6; /* --theme-text-field-bgcolor */
   color: #38383d; /* Light: var(--body-color); */
-  border-color: var(--cool-gray-200); /* --input-border */
+  border-color: var(--grey-20); /* --input-border */
   caret-color: #38383d;
 }
 

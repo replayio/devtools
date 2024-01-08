@@ -2,7 +2,8 @@ import type { AppContext, AppProps } from "next/app";
 import NextApp from "next/app";
 import Head from "next/head";
 
-import ErrorBoundary from "../components/ErrorBoundary";
+import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBoundary";
+
 import "use-context-menu/styles.css";
 import "./global.css";
 import "./variables.css";
@@ -21,9 +22,9 @@ function Routing({ Component, pageProps }: AppProps) {
         <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
         <title>Replay</title>
       </Head>
-      <ErrorBoundary name="Routing">
+      <InlineErrorBoundary name="Routing">
         <Component {...pageProps} />
-      </ErrorBoundary>
+      </InlineErrorBoundary>
     </>
   );
 }

@@ -10,6 +10,7 @@ import {
 import InspectorContextReduxAdapter from "devtools/client/debugger/src/components/shared/InspectorContextReduxAdapter";
 // eslint-disable-next-line no-restricted-imports
 import { client } from "protocol/socket";
+import { SupportForm } from "replay-next/components/support/SupportForm";
 import { ExpandablesContextRoot } from "replay-next/src/contexts/ExpandablesContext";
 import { PointsContextRoot } from "replay-next/src/contexts/points/PointsContext";
 import { SelectedFrameContextRoot } from "replay-next/src/contexts/SelectedFrameContext";
@@ -20,13 +21,13 @@ import { getTestEnvironment } from "shared/test-suites/RecordingTestMetadata";
 import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { userData } from "shared/user-data/GraphQL/UserData";
 import { setAccessToken } from "ui/actions/app";
+import { setShowSupportForm } from "ui/actions/layout";
 import { clearTrialExpired, createSocket } from "ui/actions/session";
 import { DevToolsDynamicLoadingMessage } from "ui/components/DevToolsDynamicLoadingMessage";
 import { DevToolsProcessingScreen } from "ui/components/DevToolsProcessingScreen";
 import { NodePickerContextRoot } from "ui/components/NodePickerContext";
 import { RecordingDocumentTitle } from "ui/components/RecordingDocumentTitle";
 import TerminalContextAdapter from "ui/components/SecondaryToolbox/TerminalContextAdapter";
-import { SupportForm } from "ui/components/SupportForm";
 import { TestSuiteContextRoot } from "ui/components/TestSuite/views/TestSuiteContext";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { useTrackLoadingIdleTime } from "ui/hooks/tracking";
@@ -260,6 +261,10 @@ function _DevTools({
     }
   }, [recording, userId, userEmail, userLoading]);
 
+  const dismissSupportForm = () => {
+    dispatch(setShowSupportForm(false));
+  };
+
   if (!loadingFinished) {
     return isProcessed ? <DevToolsDynamicLoadingMessage /> : <DevToolsProcessingScreen />;
   }
@@ -284,7 +289,9 @@ function _DevTools({
                               <Header />
                               <Body />
                               {showCommandPalette ? <CommandPaletteModal /> : null}
-                              {showSupportForm ? <SupportForm /> : null}
+                              {showSupportForm ? (
+                                <SupportForm onDismiss={dismissSupportForm} />
+                              ) : null}
                               <KeyboardShortcuts />
                             </KeyModifiers>
                           </LayoutContextAdapter>
