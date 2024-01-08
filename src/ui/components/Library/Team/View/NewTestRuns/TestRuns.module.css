@@ -6,7 +6,7 @@
 }
 
 :root:global(.theme-dark) .libraryRow:hover {
-  background-color: #1c2534;
+  background-color: var(--primary-accent-dimmed-hover);
 }
 
 :root:global(.theme-dark) .libraryRowSelected {
