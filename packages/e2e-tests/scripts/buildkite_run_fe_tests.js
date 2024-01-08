@@ -42,7 +42,7 @@ function run_fe_tests(CHROME_BINARY_PATH) {
   process.env.REPLAY_BROWSER_BINARY_PATH = CHROME_BINARY_PATH;
   process.env.REPLAY_CHROMIUM_EXECUTABLE_PATH = CHROME_BINARY_PATH;
   process.env.RECORD_REPLAY_PATH = CHROME_BINARY_PATH;
-  // process.env.RECORD_REPLAY_DIRECTORY = 
+  // process.env.RECORD_REPLAY_DIRECTORY =
   process.env.AUTHENTICATED_TESTS_WORKSPACE_API_KEY = process.env.RECORD_REPLAY_API_KEY;
   process.env.PLAYWRIGHT_TEST_BASE_URL = "https://app.replay.io";
 
@@ -76,7 +76,7 @@ function run_fe_tests(CHROME_BINARY_PATH) {
     "stacking_chromium",
     "react_devtools-03-multiple-versions",
   ];
-  
+
   execSync(
     `xvfb-run ./packages/e2e-tests/scripts/save-examples.ts --runtime=chromium --project=replay-chromium-local --example=${htmlFiles.join(
       ","
