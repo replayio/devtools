@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import Icon from "replay-next/components/Icon";
 import { Recording } from "shared/graphql/types";
 import { TestRun, TestRunTest } from "shared/test-suites/TestRun";
+import { trackEvent } from "ui/utils/telemetry";
 
 import {
   getDurationString,
@@ -71,6 +72,7 @@ export function TestResultListItem({
       className={`${styles.recordingLink} ${styles.libraryRow}`}
       data-test-id="TestRunResultsListItem"
       data-test-status={label}
+      onClick={() => trackEvent("test_dashboard.open_replay", { view: "runs", result: label })}
     >
       <div className={styles.linkContent}>
         <div className={styles.iconWrapper}>
