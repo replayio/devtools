@@ -13,7 +13,6 @@
 .SkippedRow {
   color: var(--color-dim);
 }
-
 .Row[data-is-pending] {
   opacity: 0.5;
 }
