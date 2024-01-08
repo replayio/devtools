@@ -11,6 +11,7 @@ import {
   getTruncatedRelativeDate,
 } from "../../Recordings/RecordingListItem/RecordingListItem";
 import { AttributeContainer } from "../../TestRuns/AttributeContainer";
+import { StatusIcon } from "../../Tests/Overview/StatusIcon";
 import styles from "../../../../Testsuites.module.css";
 
 function RecordingAttributes({
@@ -64,8 +65,6 @@ export function TestResultListItem({
 
   const numComments = comments?.length ?? 0;
 
-  const iconType = isProcessed ? "play-processed" : "play-unprocessed";
-
   return (
     <a
       href={`/recording/${recordingId}?e2e=${e2e ?? ""}&apiKey=${apiKey ?? ""}`}
@@ -74,18 +73,7 @@ export function TestResultListItem({
       data-test-status={label}
       onClick={() => trackEvent("test_dashboard.open_replay", { view: "runs", result: label })}
     >
-      <div className={styles.linkContent}>
-        <div className={styles.iconWrapper}>
-          <motion.div
-            className={styles.iconMotion}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 1.0, boxShadow: "0px 0px 1px rgba(0,0,0,0.2)" }}
-            transition={{ duration: 0.05 }}
-          >
-            <Icon className={styles[label] ?? styles.failed} type={iconType} />
-          </motion.div>
-        </div>
-      </div>
+      <StatusIcon status={label} isProcessed={isProcessed} />
       <div className={`${styles.fileInfo} gap-1`}>
         <div className={styles.title}>{title || "Test"}</div>
         <RecordingAttributes recording={recording} testRun={testRun} />

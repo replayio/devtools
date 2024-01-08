@@ -44,21 +44,6 @@
   width: 1rem;
 }
 
-.iconWrapper {
-  display: flex;
-  cursor: pointer;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.15s ease-in-out;
-}
-
-.iconMotion {
-  margin: auto;
-  height: 1.5rem;
-  width: 1.5rem;
-  border-radius: 50%;
-}
-
 .fileInfo {
   display: flex;
   flex-shrink: 1;
