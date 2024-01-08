@@ -16,11 +16,12 @@ export function StatusIcon({
     <div className={styles.iconWrapper}>
       <motion.div
         className={styles.iconMotion}
-        whileTap={{ scale: 1, boxShadow: "0px 0px 1px rgba(0,0,0,0.2)" }}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 1.0, boxShadow: "0px 0px 1px rgba(0,0,0,0.2)" }}
         transition={{ duration: 0.05 }}
       >
         <Icon
-          className={styles[status]}
+          className={`${styles.icon} ${styles[status] ?? styles.failed}`}
           type={isProcessed ? "play-processed" : "play-unprocessed"}
         />
       </motion.div>

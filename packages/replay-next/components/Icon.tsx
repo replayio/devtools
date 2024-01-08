@@ -339,25 +339,16 @@ export default function Icon({
       path = (
         <>
           <svg
-            width="22"
-            height="23"
-            viewBox="0 0 22 23"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
-            <rect
-              x="2"
-              y="2.3611"
-              width="18"
-              height="18"
-              rx="9"
-              fill="currentColor"
-              stroke="currentColor"
-              strokeWidth="2"
-            />
+            <circle cx="12" cy="12" r="12" fill="currentColor" />
             <path
-              d="M15.3324 10.7528C15.804 11.0212 15.804 11.7009 15.3324 11.9694L9.34584 15.3778C8.87919 15.6435 8.2995 15.3064 8.2995 14.7695L8.2995 7.95273C8.2995 7.41575 8.87919 7.07873 9.34584 7.34441L15.3324 10.7528Z"
-              fill="#FFFFFF"
+              d="M16.569 11.2599C17.1437 11.5864 17.1437 12.4134 16.569 12.7401L9.27488 16.8872C8.70631 17.2105 8 16.8003 8 16.1471V7.85296C8 7.1996 8.70631 6.78954 9.27488 7.1128L16.569 11.2599Z"
+              fill="white"
             />
           </svg>
         </>
@@ -367,24 +358,15 @@ export default function Icon({
       path = (
         <>
           <svg
-            width="22"
-            height="23"
-            viewBox="0 0 22 23"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
-            <rect
-              x="2"
-              y="2.3611"
-              width="18"
-              height="18"
-              rx="9"
-              fill="transparent"
-              stroke="currentColor"
-              strokeWidth="2"
-            />
+            <circle cx="12" cy="12" r="11" stroke="currentColor" strokeWidth="2" />
             <path
-              d="M15.3324 10.7528C15.804 11.0212 15.804 11.7009 15.3324 11.9694L9.34584 15.3778C8.87919 15.6435 8.2995 15.3064 8.2995 14.7695L8.2995 7.95273C8.2995 7.41575 8.87919 7.07873 9.34584 7.34441L15.3324 10.7528Z"
+              d="M16.569 11.2599C17.1437 11.5864 17.1437 12.4134 16.569 12.7401L9.27488 16.8872C8.70631 17.2105 8 16.8003 8 16.1471V7.85296C8 7.1996 8.70631 6.78954 9.27488 7.1128L16.569 11.2599Z"
               fill="currentColor"
             />
           </svg>
