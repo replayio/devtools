@@ -31,10 +31,7 @@ const pillStyles = {
 
 function Pill({ status, value }: { status: "failed" | "success" | "flaky"; value: number }) {
   return (
-    <div
-      data-test-id={`Pill-${status}`}
-      className={`flex h-[1.35rem] min-w-[1.35rem] items-center justify-center rounded-md text-xs font-bold ${pillStyles[status]}`}
-    >
+    <div data-test-id={`Pill-${status}`} className={`${styles.Pill} ${pillStyles[status]}`}>
       {value}
     </div>
   );
