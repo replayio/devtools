@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useMemo, useState } from "react";
 
 import { TestRunTestWithRecordings } from "shared/test-suites/TestRun";
 
@@ -52,25 +52,84 @@ export function TestRunSpecDetails() {
   );
 }
 
+interface ErrorCount {
+  message: string;
+  summary: string;
+  count: number;
+}
+
+const getSummary = (message: string) => {
+  const firstLine = message.split("\n")[0];
+
+  if (firstLine.match(/^.*\dms: (.*)/)?.[1]) {
+    return firstLine.match(/^.*\dms: (.*)/)![1];
+  } else {
+    return firstLine;
+  }
+};
+
 function Errors({ failedTests }: { failedTests: TestRunTestWithRecordings[] }) {
+  const { testId } = useContext(TestRunsContext);
+
+  const sortedErrors = useMemo(() => {
+    const errors = failedTests.flatMap(t => t.errors || []);
+    const uniqueErrors = errors.reduce((acc, e) => {
+      const existingError = acc.find(a => a.message === e);
+
+      if (existingError) {
+        existingError.count += 1;
+      } else {
+        acc.push({ message: e, count: 1, summary: getSummary(e) });
+      }
+
+      return acc;
+    }, [] as ErrorCount[]);
+
+    return uniqueErrors.sort((a, b) => b.count - a.count);
+  }, [failedTests]);
+
   return (
     <div className="flex flex-col gap-2 px-3">
       <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-lg font-semibold">
         Errors
       </div>
-      {failedTests.map(t =>
-        t.errors?.map((e, i) => (
-          <div
-            key={`${t.id}-${i}`}
-            data-test-id="TestRunSpecDetails-Error"
-            className="w-full overflow-x-auto rounded-md bg-[color:var(--testsuites-v2-error-bg)] px-3 py-4"
-          >
-            <div className="flex flex-col gap-4 whitespace-pre-wrap break-words border-l-2 border-[color:var(--testsuites-v2-failed-header)] px-3">
-              <div className="font-mono text-xs">{e.split("\n").slice(0, 4).join("\n")}</div>
-            </div>
-          </div>
-        ))
-      )}
+      {sortedErrors.map((e, i) => (
+        <ErrorGroup
+          key={`${testId}-${i}`}
+          message={e.message}
+          count={e.count}
+          summary={e.summary}
+        />
+      ))}
+    </div>
+  );
+}
+
+function ErrorGroup({
+  message,
+  count,
+  summary,
+}: {
+  message: string;
+  count: number;
+  summary: string;
+}) {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <div
+      className="flex w-full flex-col gap-2 overflow-x-auto rounded-md bg-[color:var(--testsuites-v2-error-bg)] px-3 py-4"
+      data-test-id="TestRunSpecDetails-Error"
+    >
+      <button className="flex flex-row gap-1" onClick={() => setExpanded(!expanded)}>
+        <div>({count})</div>
+        <div className="truncate">{summary}</div>
+      </button>
+      {expanded ? (
+        <div className="flex flex-col gap-4 whitespace-pre-wrap break-words border-l-2 border-[color:var(--testsuites-v2-failed-header)] px-3">
+          <div className="font-mono text-xs">{message.split("\n").slice(0, 4).join("\n")}</div>
+        </div>
+      ) : null}
     </div>
   );
 }

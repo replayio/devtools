@@ -15,6 +15,7 @@ import { TestRun, getTestRunTitle } from "shared/test-suites/TestRun";
 import { useGetTeamRouteParams } from "ui/components/Library/Team/utils";
 import { useTestRuns } from "ui/components/Library/Team/View/NewTestRuns/hooks/useTestRuns";
 import { useSyncTestRunIdToUrl } from "ui/components/Library/Team/View/TestRuns/hooks/useSyncTestIdToUrl";
+import { trackEvent } from "ui/utils/telemetry";
 
 type TestRunsContextType = {
   filterByBranch: "all" | "primary";
@@ -121,7 +122,10 @@ export function TestRunsContextRoot({ children }: { children: ReactNode }) {
         filterByText: filterByTextDeferred,
         filterByTextForDisplay: filterByText,
         filterTestsByText,
-        selectTestRun: setTestRunId,
+        selectTestRun: runId => {
+          setTestRunId(runId);
+          trackEvent("test_dashboard.select_run", { view: "runs" });
+        },
         setFilterByBranch,
         setFilterByStatus,
         setFilterByText,
@@ -132,7 +136,10 @@ export function TestRunsContextRoot({ children }: { children: ReactNode }) {
         testRuns: filteredTestRuns,
         testRunCount: status === STATUS_PENDING ? 0 : testRuns.length,
         testId,
-        setTestId,
+        setTestId: testId => {
+          setTestId(testId);
+          trackEvent("test_dashboard.select_test", { view: "runs" });
+        },
       }}
     >
       {children}

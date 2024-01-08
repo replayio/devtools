@@ -1,4 +1,4 @@
-import { ReactNode, Suspense, useContext } from "react";
+import { ReactNode, Suspense, useContext, useEffect } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { ContextMenuItem, useContextMenu } from "use-context-menu";
 
@@ -7,6 +7,7 @@ import Icon from "replay-next/components/Icon";
 import { IndeterminateProgressBar } from "replay-next/components/IndeterminateLoader";
 import useLocalStorageUserData from "shared/user-data/LocalStorage/useLocalStorageUserData";
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
+import { trackEvent } from "ui/utils/telemetry";
 
 import { TeamContext } from "../../TeamContextRoot";
 import { TestSuitePanelMessage } from "../TestSuitePanelMessage";
@@ -115,6 +116,10 @@ function TestRunsContent() {
     { alignTo: "auto-target" }
   );
 
+  useEffect(() => {
+    trackEvent("test_dashboard.open", { view: "runs" });
+  }, []);
+
   return (
     <div className="flex w-full flex-grow flex-row p-1">
       <PanelGroup autoSaveId="Library:TestRuns" direction="horizontal">
@@ -122,7 +127,7 @@ function TestRunsContent() {
           <div className="relative flex h-full w-full flex-col gap-4 overflow-hidden rounded-xl bg-bodyBgcolor p-2">
             {testRunsLoading && testRuns.length > 0 && <IndeterminateProgressBar />}
             <div className="flex flex-col gap-2">
-              <div className="grid w-full grid-cols-3 gap-2 overflow-hidden bg-bodyBgcolor">
+              <div className="grid w-full grid-cols-3 gap-2 bg-bodyBgcolor">
                 <div
                   className={dropdownStyles.dropdownTrigger}
                   data-test-id="TestRunsPage-ResultFilter-DropdownTrigger"

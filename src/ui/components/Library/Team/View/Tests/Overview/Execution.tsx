@@ -59,7 +59,7 @@ function ExecutionStatus({ result }: { result: string }) {
   }
 
   return (
-    <div className="flex w-6 flex-shrink-0 flex-col items-center" title={result}>
+    <div className="flex h-6 w-6 flex-shrink-0 flex-col items-center justify-center" title={result}>
       <Icon filename={icon} size="medium" className={className} />
     </div>
   );

@@ -17,7 +17,7 @@ import { formatDuration } from "ui/utils/time";
 
 import { Redacted } from "../../../../../Redacted";
 import RecordingOptionsDropdown from "./RecordingOptionsDropdown";
-import styles from "../../../../Testsuites.module.css";
+import styles from "../../../../Library.module.css";
 
 export function getDurationString(durationMs: number | null | undefined) {
   if (typeof durationMs !== "number") {
