@@ -106,7 +106,7 @@ type MixpanelEvent =
   | ["test_dashboard.open", { view: "tests" | "runs" }]
   | ["test_dashboard.select_run", { view: "runs" }]
   | ["test_dashboard.select_test", { view: "tests" | "runs" }]
-  | ["test_dashboard.open_replay", { view: "tests" | "runs" }]
+  | ["test_dashboard.open_replay", { view: "tests" | "runs"; result: string }]
   | ["timeline.comment_select"]
   | ["timeline.discard_focus_explicit"]
   | ["timeline.discard_focus_implicit"]

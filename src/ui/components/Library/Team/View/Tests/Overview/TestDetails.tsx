@@ -77,7 +77,7 @@ export function Replay({
     <a
       href={`/recording/${recording.id}`}
       className="flex flex-row gap-2 border-b border-bodyBgcolor py-1 px-4"
-      onClick={() => trackEvent("test_dashboard.open_replay", { view: "tests" })}
+      onClick={() => trackEvent("test_dashboard.open_replay", { view: "tests", result })}
     >
       <div className="flex flex-row items-center gap-2 overflow-hidden">
         <StatusIcon status={result} isProcessed={recording.isProcessed} />

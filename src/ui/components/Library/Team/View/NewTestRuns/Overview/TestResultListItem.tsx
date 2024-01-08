@@ -72,7 +72,7 @@ export function TestResultListItem({
       className={`${styles.recordingLink} ${styles.libraryRow}`}
       data-test-id="TestRunResultsListItem"
       data-test-status={label}
-      onClick={() => trackEvent("test_dashboard.open_replay", { view: "runs" })}
+      onClick={() => trackEvent("test_dashboard.open_replay", { view: "runs", result: label })}
     >
       <div className={styles.linkContent}>
         <div className={styles.iconWrapper}>
