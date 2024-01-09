@@ -17,10 +17,53 @@ import {
   useFileNameTree,
 } from "ui/components/Library/Team/View/TestRuns/Overview/useFileNameTree";
 import { TestRunsContext } from "ui/components/Library/Team/View/TestRuns/TestRunsContextRoot";
-import { TestGroup } from "ui/utils/testRuns";
+import { TestGroup, TestGroups } from "ui/utils/testRuns";
 
 import { TestResultListItem } from "./TestResultListItem";
 import styles from "../../../../Library.module.css";
+
+function hasDuplicateRecordings(fileNameToTests: TestGroup["fileNameToTests"]) {
+  return Object.values(fileNameToTests).some(tests => {
+    const recordingIds = new Set<string>();
+    for (const test of tests) {
+      for (const execution of test.executions) {
+        for (const recording of execution.recordings) {
+          if (recordingIds.has(recording.id)) {
+            return true;
+          } else {
+            recordingIds.add(recording.id);
+          }
+        }
+      }
+    }
+
+    return false;
+  });
+}
+
+function DeepLinkWarning({ testGroups }: { testGroups: TestGroups }) {
+  const duplicate =
+    hasDuplicateRecordings(testGroups.failedRecordings.fileNameToTests) ||
+    hasDuplicateRecordings(testGroups.passedRecordings.fileNameToTests) ||
+    hasDuplicateRecordings(testGroups.flakyRecordings.fileNameToTests);
+
+  if (!duplicate) {
+    return null;
+  }
+
+  return (
+    <div
+      className="m-2 flex flex-row items-center gap-2 rounded-lg border p-2"
+      style={{
+        color: "var(--theme-warning-color)",
+        backgroundColor: "var(--theme-warning-background)",
+        borderColor: "var(--theme-warning-border)",
+      }}
+    >
+      <Icon type="warning" /> Heads up! Deep linking to tests within a recording will be added soon.
+    </div>
+  );
+}
 
 export function RunResults({ isPending }: { isPending: boolean }) {
   const { testRunId } = useContext(TestRunsContext);
@@ -59,6 +102,7 @@ export function RunResults({ isPending }: { isPending: boolean }) {
         data-filtered-by-text={filterByTextDeferred}
         data-test-id="TestRunResults"
       >
+        <DeepLinkWarning testGroups={groupedTests} />
         <TestStatusGroup
           filterByText={filterByTextDeferred}
           label="Failed"
