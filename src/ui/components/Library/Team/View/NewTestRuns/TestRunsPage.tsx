@@ -1,4 +1,4 @@
-import { ReactNode, Suspense, useContext, useEffect } from "react";
+import { Suspense, useContext, useEffect } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { ContextMenuItem, useContextMenu } from "use-context-menu";
 
@@ -59,7 +59,6 @@ function TestRunsContent() {
   } = useContext(TestRunsContext);
   const { team } = useContext(TeamContext);
   const { filterByTime, setFilterByTime } = useContext(TimeFilterContext);
-  const [enableTestSuitesChart] = useLocalStorageUserData("enableTestSuitesChart");
 
   const {
     contextMenu: contextMenuStatusFilter,
@@ -175,16 +174,12 @@ function TestRunsContent() {
                 value={filterByTextForDisplay}
               />
             </div>
-            {enableTestSuitesChart && (
-              <div>
-                {testRunsLoading && testRuns.length === 0 ? (
-                  <div className="flex h-full items-center justify-center">
-                    <LibrarySpinner />
-                  </div>
-                ) : (
-                  <TestRunsStats />
-                )}
+            {testRunsLoading && testRuns.length === 0 ? (
+              <div className="flex h-full items-center justify-center">
+                <LibrarySpinner />
               </div>
+            ) : (
+              <TestRunsStats />
             )}
             <div
               className="grow"

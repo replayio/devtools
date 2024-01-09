@@ -1,7 +1,9 @@
+import { Point } from "@nivo/line";
 import groupBy from "lodash/groupBy";
 import dynamic from "next/dynamic";
-import { useContext, useMemo } from "react";
+import { useContext, useMemo, useState } from "react";
 
+import useTooltip from "replay-next/src/hooks/useTooltip";
 import { TestRun } from "shared/test-suites/TestRun";
 
 import { TestRunsContext } from "./TestRunsContextRoot";
@@ -29,9 +31,11 @@ function generateChartData(testRuns: TestRun[]) {
     (a, b) => new Date(a).getTime() - new Date(b).getTime()
   );
 
-  const sortedData = sortedDates.reduce((acc, date) => {
+  const displayedDates = sortedDates.length === 8 ? sortedDates.slice(1) : sortedDates;
+
+  const sortedData = displayedDates.reduce((acc, date) => {
     const runs = groupedRuns[date];
-    const failureRate = runs.filter(r => r.results.counts.failed > 0).length / runs.length;
+    const failureRate = (runs.filter(r => r.results.counts.failed > 0).length / runs.length) * 100;
 
     // Format the dates like MM/DD
     acc.push({ x: date.split("-").slice(1).join("/"), y: failureRate });
@@ -40,62 +44,80 @@ function generateChartData(testRuns: TestRun[]) {
 
   return [
     {
-      id: "build-failures",
+      id: "Failure rate (%)",
       color: "hsl(21, 70%, 50%)",
       data: sortedData,
     },
   ];
 }
+
 export const Chart = () => {
   const { testRuns } = useContext(TestRunsContext);
   const data = useMemo(() => generateChartData(testRuns), [testRuns]);
+  const [hoveredPoint, setHoveredPoint] = useState<Point | null>(null);
+
+  const { onMouseEnter, onMouseLeave, tooltip } = useTooltip({
+    tooltip: hoveredPoint ? (
+      <PointTooltip
+        date={hoveredPoint.data.x as string}
+        failureRate={hoveredPoint.data.y as number}
+      />
+    ) : null,
+  });
 
   return (
-    <div className="flex flex-col overflow-auto rounded-lg bg-chrome p-4">
-      <div className="font-bold">Build failures trend (percentage of builds failed)</div>
-      <div style={{ height: 160, minWidth: 640 }}>
-        <ResponsiveLine
-          data={data}
-          margin={{ top: 30, right: 60, bottom: 30, left: 60 }}
-          xScale={{ type: "point" }}
-          yScale={{
-            type: "linear",
-            min: 0,
-            max: 1,
-            stacked: true,
-            reverse: false,
-          }}
-          gridYValues={[0, 0.2, 0.4, 0.6, 0.8, 1]}
-          yFormat=" >%"
-          axisTop={null}
-          axisRight={null}
-          axisBottom={{
-            tickSize: 5,
-            tickPadding: 5,
-            tickRotation: 0,
-            legendOffset: 36,
-            legendPosition: "middle",
-          }}
-          axisLeft={{
-            tickValues: 4,
-            tickSize: 5,
-            tickPadding: 5,
-            tickRotation: 0,
-            legendOffset: -40,
-            legendPosition: "middle",
-          }}
-          enablePoints={false}
-          pointSize={10}
-          pointColor={{ theme: "background" }}
-          pointBorderWidth={2}
-          pointBorderColor={{ from: "serieColor" }}
-          pointLabelYOffset={-12}
-          useMesh={false}
-          enableGridX={false}
-          theme={{ text: { fill: "var(--body-color)" } }}
-          colors={{ scheme: "set1" }}
-        />
-      </div>
+    <div style={{ height: 80, minWidth: 50 }}>
+      <ResponsiveLine
+        data={data}
+        margin={{ top: 10, right: 10, bottom: 10, left: 10 }}
+        axisBottom={null}
+        axisLeft={null}
+        enablePoints={true}
+        yScale={{
+          type: "linear",
+          min: 0,
+          max: 100,
+          stacked: true,
+          reverse: false,
+        }}
+        pointSize={10}
+        pointColor={{ theme: "background" }}
+        pointBorderWidth={2}
+        pointBorderColor={{ from: "serieColor" }}
+        pointLabelYOffset={-12}
+        useMesh={true}
+        enableArea={true}
+        enableGridX={false}
+        enableGridY={false}
+        animate={false}
+        tooltip={() => null}
+        onMouseEnter={(p, e) => {
+          onMouseEnter(e);
+          setHoveredPoint(p);
+        }}
+        onMouseLeave={(p, e) => {
+          onMouseLeave(e);
+          setHoveredPoint(null);
+        }}
+        onMouseMove={(p, e) => {
+          onMouseEnter(e);
+          if (hoveredPoint?.id !== p.id) {
+            setHoveredPoint(p);
+          }
+        }}
+        theme={{ text: { fill: "var(--body-color)" } }}
+        colors={{ scheme: "set1" }}
+      />
+      {tooltip}
     </div>
   );
 };
+
+function PointTooltip({ date, failureRate }: { date: string; failureRate: number }) {
+  return (
+    <div className="flex gap-1">
+      <div>({date})</div>
+      <div>{failureRate.toFixed(0)}%</div>
+    </div>
+  );
+}
