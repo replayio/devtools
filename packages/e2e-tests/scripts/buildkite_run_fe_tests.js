@@ -13,6 +13,11 @@ function run_fe_tests(CHROME_BINARY_PATH) {
     stdio: "inherit",
   });
 
+  // Custom NPM dependencies
+  execSync("yarn add -D find-in-files", {
+    stdio: "inherit",
+  });
+
   execSync("cp .env.sample .env", {
     stdio: "inherit",
   });
@@ -46,51 +51,11 @@ function run_fe_tests(CHROME_BINARY_PATH) {
   process.env.AUTHENTICATED_TESTS_WORKSPACE_API_KEY = process.env.RECORD_REPLAY_API_KEY;
   process.env.PLAYWRIGHT_TEST_BASE_URL = "https://app.replay.io";
 
-  // Generate new recordings for known-passing tests with the new chromium build.
-  const htmlFiles = [
-    "authenticated_comments.html",
-    "authenticated_logpoints.html",
-    "doc_minified_chromium.html",
-    "doc_recursion.html",
-    "doc_rr_console.html",
-    "doc_rr_preview.html",
-    "doc_rr_region_loading.html",
-    "doc_stacking_chromium.html",
-    "rdt-react-versions/dist/index.html",
-  ];
-
-  // Run the known-passind tests.
-  const testNames = [
-    "comments-01",
-    //"comments-02",
-    "comments-03",
-    "logpoints-01",
-    "stepping-05_chromium",
-    "scopes_renderer",
-    "passport-01",
-    "passport-03",
-    "passport-04",
-    "object_preview-03",
-    "focus_mode-01",
-    "elements-search",
-    "stacking_chromium",
-    "react_devtools-03-multiple-versions",
-  ];
-
+  // Re-record chromium golden recordings.
   execSync(
-    `xvfb-run ./packages/e2e-tests/scripts/save-examples.ts --runtime=chromium --project=replay-chromium-local --example=${htmlFiles.join(
-      ","
-    )}`,
+    `xvfb-run ./packages/e2e-tests/scripts/save-and-run-chromium-examples.ts`,
     { stdio: "inherit", env: process.env }
   );
-
-  // Without the wait, the next xvfb-run command can fail.
-  execSync("sleep 5");
-
-  execSync(`xvfb-run yarn test:debug ${testNames.join(" ")}`, {
-    stdio: "inherit",
-    stderr: "inherit",
-  });
 
   // Make sure the web server shuts down.
   webProc.kill("SIGKILL");
