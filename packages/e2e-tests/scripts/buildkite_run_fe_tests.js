@@ -52,10 +52,10 @@ function run_fe_tests(CHROME_BINARY_PATH) {
   process.env.PLAYWRIGHT_TEST_BASE_URL = "https://app.replay.io";
 
   // Re-record chromium golden recordings.
-  execSync(
-    `xvfb-run ./packages/e2e-tests/scripts/save-and-run-chromium-examples.ts`,
-    { stdio: "inherit", env: process.env }
-  );
+  execSync(`xvfb-run ./packages/e2e-tests/scripts/save-and-run-chromium-examples.ts`, {
+    stdio: "inherit",
+    env: process.env,
+  });
 
   // Make sure the web server shuts down.
   webProc.kill("SIGKILL");

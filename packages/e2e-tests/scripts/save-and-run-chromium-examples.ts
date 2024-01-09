@@ -21,7 +21,7 @@ function getChromiumHtmlFiles() {
  */
 async function getTestNamesWhichUse(htmlFiles: string[]) {
   const searchTerm = "(" + htmlFiles.join(")|(") + ")";
-  const results = await findInFiles(searchTerm, join(__dirname, ".."), "test\.ts");
+  const results = await findInFiles(searchTerm, join(__dirname, ".."), "test.ts");
   // NOTE: results is an array that was forced to look like an object.
   const testNames = Object.keys(results);
   return testNames;
@@ -39,7 +39,7 @@ async function getTestNamesWhichUse(htmlFiles: string[]) {
     )}`,
     { stdio: "inherit", env: process.env }
   );
-  
+
   // Without the wait, the next xvfb-run command can fail.
   execSync("sleep 5");
 
