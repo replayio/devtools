@@ -12,11 +12,13 @@ import {
   testRecordings,
   testRunSummary,
   testRunsItems,
-} from "./test-runs.utils";
+} from "./test-suite.utils";
 
 test.use({ testRunState: "FLAKY_IN_MAIN_WITH_SOURCE" });
 
-test(`authenticated/new-test-suites/test-runs`, async ({ pageWithMeta: { page, clientKey } }) => {
+test(`authenticated/new-test-suites/test-runs-03: flaky run in main branch with source`, async ({
+  pageWithMeta: { page, clientKey },
+}) => {
   await startLibraryTest(page, TEST_RUN_WORKSPACE_API_KEY, TEST_RUN_WORKSPACE_TEAM_ID);
   expect(await testRunsItems(page).count()).not.toBe(0);
 

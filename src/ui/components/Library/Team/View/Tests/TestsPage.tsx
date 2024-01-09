@@ -64,11 +64,13 @@ function TestsContent() {
     onKeyDown: onKeyDownSortBy,
   } = useContextMenu(
     <>
-      <ContextMenuItem onSelect={() => setSortBy("failureRate")}>
+      <ContextMenuItem dataTestId="failureRate" onSelect={() => setSortBy("failureRate")}>
         Sort by failure rate
       </ContextMenuItem>
-      <ContextMenuItem onSelect={() => setSortBy("flakyRate")}>Sort by flaky rate</ContextMenuItem>
-      <ContextMenuItem onSelect={() => setSortBy("alphabetical")}>
+      <ContextMenuItem dataTestId="flakyRate" onSelect={() => setSortBy("flakyRate")}>
+        Sort by flaky rate
+      </ContextMenuItem>
+      <ContextMenuItem dataTestId="alphabetical" onSelect={() => setSortBy("alphabetical")}>
         Sort alphabetically
       </ContextMenuItem>
     </>,
