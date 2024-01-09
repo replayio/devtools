@@ -1,6 +1,7 @@
 import assert from "assert";
 import { RecordingId } from "@replayio/protocol";
 import classNames from "classnames";
+import { useRouter } from "next/router";
 import { ClipboardEvent, KeyboardEvent, useLayoutEffect, useRef, useState } from "react";
 
 import { RecordingTarget } from "replay-next/src/suspense/BuildIdCache";
@@ -166,6 +167,7 @@ function HeaderTitle({
 }
 
 export default function Header() {
+  const router = useRouter();
   const recordingTarget = useAppSelector(getRecordingTarget);
   const { isAuthenticated } = useAuth0();
   const recordingId = hooks.useGetRecordingId();
@@ -178,25 +180,33 @@ export default function Header() {
 
   assert(recording != null);
 
-  let dashboardUrl = window.location.origin;
-  if (recording.workspace !== null) {
-    dashboardUrl = `/team/${recording.workspace?.id}`;
-
-    if (isTestSuiteReplay(recording) && recording.metadata?.test) {
-      const runId = getTestRunId(recording.metadata.test);
-      if (runId != null) {
-        dashboardUrl += `/runs/${runId}`;
-      }
+  let fallbackUrl = window.location.origin;
+  if (router.query.referer) {
+    fallbackUrl = decodeURIComponent(router.query.referer as string);
+  } else if (recording.workspace !== null) {
+    fallbackUrl = `/team/${recording.workspace?.id}`;
+    if (isTestSuiteReplay(recording) && recording.testRun?.id) {
+      fallbackUrl += `/runs/${recording.testRun.id}`;
     }
   } else {
-    dashboardUrl = "/team/me/recordings";
+    fallbackUrl = "/team/me/recordings";
   }
+
+  const goBack = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+    e.preventDefault();
+
+    if (window.history.length > 1) {
+      router.back();
+    } else {
+      router.push(fallbackUrl);
+    }
+  };
 
   return (
     <div className={styles.Header}>
       <div className="relative flex flex-grow flex-row items-center overflow-hidden">
         {isAuthenticated && (
-          <a href={dashboardUrl}>
+          <a onClick={goBack} href={fallbackUrl}>
             <IconWithTooltip icon={backIcon} content={"Back to Library"} />
           </a>
         )}
