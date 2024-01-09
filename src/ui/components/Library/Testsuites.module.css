@@ -36,6 +36,7 @@
   flex-direction: row;
   align-items: center;
   gap: 1rem;
+  padding: 12px 6px;
 }
 
 .icon {
@@ -149,7 +150,7 @@
 
 :root:global(.theme-dark) .libraryRow:hover,
 :root:global(.theme-dark) .replayRow:hover {
-  background-color: #1c2534;
+  background-color: var(--primary-accent-dimmed-hover);
 }
 
 :root:global(.theme-dark) .libraryRowSelected {
