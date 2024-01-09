@@ -11,6 +11,7 @@ import {
 import { STATUS_PENDING } from "suspense";
 
 import { Test } from "shared/test-suites/TestRun";
+import { trackEvent } from "ui/utils/telemetry";
 
 import { useTests } from "./hooks/useTests";
 
@@ -18,7 +19,7 @@ type TestsContextType = {
   sortBy: "failureRate" | "flakyRate" | "alphabetical";
   filterByText: string;
   filterByTextForDisplay: string;
-  selectTestId: Dispatch<SetStateAction<string | null>>;
+  selectTestId: (testId: string | null) => void;
   setSortBy: Dispatch<SetStateAction<TestsContextType["sortBy"]>>;
   setFilterByText: Dispatch<SetStateAction<string>>;
   testId: string | null;
@@ -71,7 +72,10 @@ export function TestsContextRoot({ children }: { children: ReactNode }) {
       sortBy,
       filterByText: filterByTextDeferred,
       filterByTextForDisplay: filterByText,
-      selectTestId: setTestId,
+      selectTestId: (id: string | null) => {
+        trackEvent("test_dashboard.select_test", { view: "tests" });
+        setTestId(id);
+      },
       setSortBy,
       setFilterByText,
       testId: deferredTestId,

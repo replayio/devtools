@@ -28,7 +28,7 @@ export function TestRunResultList({
   }
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col">
       {selectedSpecTests.map(s =>
         s.executions
           .filter(e => e.recordings.length > 0)

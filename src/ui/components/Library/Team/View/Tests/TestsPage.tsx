@@ -1,4 +1,4 @@
-import { Suspense, useContext } from "react";
+import { Suspense, useContext, useEffect } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { ContextMenuItem, useContextMenu } from "use-context-menu";
 
@@ -6,6 +6,7 @@ import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBo
 import Icon from "replay-next/components/Icon";
 import LibraryDropdownTrigger from "ui/components/Library/LibraryDropdownTrigger";
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
+import { trackEvent } from "ui/utils/telemetry";
 
 import { TeamContext } from "../../TeamContextRoot";
 import { TestSuitePanelMessage } from "../TestSuitePanelMessage";
@@ -95,6 +96,10 @@ function TestsContent() {
     </>,
     { alignTo: "auto-target" }
   );
+
+  useEffect(() => {
+    trackEvent("test_dashboard.open", { view: "tests" });
+  }, []);
 
   return (
     <div className="flex w-full flex-grow flex-row p-1">
