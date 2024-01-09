@@ -8,7 +8,7 @@ import { selectContextMenuItem } from "../../helpers/context-menu";
 import test, { expect } from "../../testFixtureTestRuns";
 import {
   filterRunsByText,
-  filterTestsByText,
+  filterSummaryTestsByText,
   findTestRunByText,
   noTestRunSelectedMessage,
   noTestRunsMessage,
@@ -17,11 +17,13 @@ import {
   testRunResult,
   testRunSummary,
   testRunsItems,
-} from "./test-runs.utils";
+} from "./test-suite.utils";
 
 test.use({ testRunState: "SUCCESS_IN_MAIN_WITH_SOURCE" });
 
-test(`authenticated/new-test-suites/test-runs`, async ({ pageWithMeta: { page, clientKey } }) => {
+test(`authenticated/new-test-suites/test-runs-01: passed run in main branch with source`, async ({
+  pageWithMeta: { page, clientKey },
+}) => {
   await startLibraryTest(page, TEST_RUN_WORKSPACE_API_KEY, TEST_RUN_WORKSPACE_TEAM_ID);
   expect(await testRunsItems(page).count()).not.toBe(0);
 
@@ -72,6 +74,7 @@ test(`authenticated/new-test-suites/test-runs`, async ({ pageWithMeta: { page, c
   //#region >>> Workspace with limited retention limit should not show large time range filter
   expect(await page.locator('[data-test-id="month"]').count()).toBe(0);
   //#endregion
+  //#endregion
 
   //#region > Selected test run
 
@@ -106,11 +109,11 @@ test(`authenticated/new-test-suites/test-runs`, async ({ pageWithMeta: { page, c
   //#endregion
 
   //#region >>> Filter test by text
-  await filterTestsByText(page, clientKey);
+  await filterSummaryTestsByText(page, clientKey);
   expect(await testItems(page).count()).toBe(2);
   expect(await testItems(page).nth(0).innerText()).toContain(clientKey);
   expect(await testItems(page).nth(1).innerText()).toContain(clientKey);
-  await filterTestsByText(page, "");
+  await filterSummaryTestsByText(page, "");
   //#endregion
 
   //#region >>> Filter by status
@@ -127,7 +130,6 @@ test(`authenticated/new-test-suites/test-runs`, async ({ pageWithMeta: { page, c
     contextMenuItemTestId: "all",
   });
   //#endregion
-
   //#endregion
 
   //#region >>> When a test run was selected but omitted due to a change in filter, the run details view should show a message

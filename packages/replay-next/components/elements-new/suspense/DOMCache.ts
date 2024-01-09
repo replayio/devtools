@@ -1,12 +1,11 @@
 import { PauseId } from "@replayio/protocol";
-import { createCache } from "suspense";
 
-import { assert } from "protocol/utils";
 import { Node } from "replay-next/components/elements-new/types";
 import { deserializeDOM } from "replay-next/components/elements-new/utils/serialization";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { pauseEvaluationsCache } from "replay-next/src/suspense/PauseCache";
 import { joinChunksToString } from "replay-next/src/utils/protocol";
+import { createCacheWithTelemetry } from "replay-next/src/utils/suspense";
 import { ReplayClientInterface } from "shared/client/types";
 
 // TODO [FE-2005][FE-2067] With persistent DOM ids, we could switch this cache from PauseId to execution point.
@@ -16,7 +15,7 @@ export type Data = Node;
 let serializeDOMString: string | null = null;
 let splitStringToChunksString: string | null = null;
 
-export const domCache = createCache<
+export const domCache = createCacheWithTelemetry<
   [replayClient: ReplayClientInterface, pauseId: PauseId],
   Data | null
 >({

@@ -15,7 +15,7 @@ import { ListOnItemsRenderedProps } from "react-window";
 import { ElementsListData } from "replay-next/components/elements-new/ElementsListData";
 import { NoContentFallback } from "replay-next/components/elements-new/NoContentFallback";
 import { Item } from "replay-next/components/elements-new/types";
-import { DefaultFallback } from "replay-next/components/ErrorBoundary";
+import { InlineErrorFallback } from "replay-next/components/errors/InlineErrorFallback";
 import { LoadingProgressBar } from "replay-next/components/LoadingProgressBar";
 import { GenericList } from "replay-next/components/windowing/GenericList";
 import { useHorizontalScrollingListCssVariables } from "replay-next/components/windowing/hooks/useHorizontalScrollingListCssVariables";
@@ -118,7 +118,7 @@ export function ElementsList({
   }, [listData]);
 
   if (didError) {
-    return <DefaultFallback style={{ height }} />;
+    return <InlineErrorFallback style={{ height }} />;
   }
 
   const onKeyDown = (event: KeyboardEvent) => {

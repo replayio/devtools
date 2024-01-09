@@ -51,13 +51,12 @@ export function TestSectionRow({
     setTestEvent,
     testEvent: selectedTestEvent,
     testRecording,
+    testEventPending,
   } = useContext(TestSuiteContext);
 
   const isSelected = testEvent === selectedTestEvent;
 
   const dispatch = useAppDispatch();
-
-  const [isPending, startTransition] = useTransition();
 
   const { contextMenu, onContextMenu } = useTestEventContextMenu(testEvent);
 
@@ -125,9 +124,7 @@ export function TestSectionRow({
   }
 
   const onClick = async () => {
-    startTransition(() => {
-      setTestEvent(testEvent);
-    });
+    setTestEvent(testEvent);
 
     let executionPoint: ExecutionPoint | null = null;
     let time: number | null = null;
@@ -217,7 +214,7 @@ export function TestSectionRow({
     <div
       className={styles.Row}
       data-context-menu-active={contextMenu !== null || undefined}
-      data-is-pending={isPending || undefined}
+      data-is-pending={testEventPending || undefined}
       data-position={position}
       data-selected={isSelected || undefined}
       data-status={status}

@@ -38,7 +38,7 @@ export function TestList() {
 
   if (!testsLoading && tests.length === 0 && testsCount > 0) {
     return (
-      <TestSuitePanelMessage className={styles.message}>
+      <TestSuitePanelMessage data-test-id="NoTestMatches" className={styles.message}>
         No tests match the current filters
       </TestSuitePanelMessage>
     );

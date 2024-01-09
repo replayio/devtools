@@ -71,11 +71,11 @@ import {
   UpdateRecordingWorkspaceVariables,
 } from "shared/graphql/generated/UpdateRecordingWorkspace";
 import { Recording, RecordingRole, User, Workspace } from "shared/graphql/types";
+import { getRecordingId } from "shared/utils/recording";
+import { extractIdAndSlug } from "shared/utils/slug";
 import { CollaboratorDbData } from "ui/components/shared/SharingModal/CollaboratorsList";
 import { GET_RECORDING, GET_RECORDING_USER_ID, SUBSCRIBE_RECORDING } from "ui/graphql/recordings";
 import { WorkspaceId } from "ui/state/app";
-import { extractIdAndSlug } from "ui/utils/helpers";
-import { getRecordingId } from "ui/utils/recording";
 
 import { useGetUserId } from "./users";
 

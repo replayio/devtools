@@ -1,4 +1,5 @@
 import { Locator, Page } from "@playwright/test";
+import chalk from "chalk";
 
 import { openContextMenu } from "../../helpers/console-panel";
 import { selectContextMenuItem } from "../../helpers/context-menu";
@@ -35,7 +36,7 @@ export const filterTestRunsByBranch = async (
   await filterRunsByText(page, searchText);
 };
 
-export const filterTestsByText = async (page: Page, text: string) => {
+export const filterSummaryTestsByText = async (page: Page, text: string) => {
   await debugPrint(page, `Filtering test list by text`, "filterTestList");
   await page.fill("data-test-id=TestRunSummary-Filter", text);
 };
@@ -50,4 +51,47 @@ export const findTestRunByText = async (page: Page, locator: Locator, text: stri
     }
   }
   throw new Error(`Test run with text ${text} not found`);
+};
+
+export const startTest = async (page: Page, apiKey: string, teamId: string) => {
+  const base = process.env.PLAYWRIGHT_TEST_BASE_URL || "http://localhost:8080";
+  const url = `${base}/team/${teamId}/tests?e2e=1&apiKey=${apiKey}`;
+  await debugPrint(page, `Navigating to ${chalk.bold(url)}`, "startTestView");
+  await page.goto(url);
+  await page.locator('[data-test-id="TestList"]').waitFor();
+  await page.locator('[data-test-id="TestListItem"]').first().waitFor();
+};
+
+export const noTestMatches = (page: Page) => page.locator('[data-test-id="NoTestMatches"]');
+
+export const waitForTestExecutions = (page: Page) =>
+  page.waitForSelector('[data-test-id="TestOverview"][data-pending="false"]');
+
+export const filterTestsByText = async (page: Page, text: string) => {
+  await debugPrint(page, `Filtering tests list by text`, "filterTestsByText");
+  await page.fill("data-test-id=TestPage-FilterByText-Input", text);
+};
+
+export const testsItems = (page: Page, status?: "failure" | "flaky") => {
+  if (status) {
+    return page.locator(`[data-test-status="${status}"]`);
+  }
+  return page.locator('[data-test-id="TestListItem"]');
+};
+
+export const sortTestsBy = async (page: Page, sortOption: string) => {
+  const rateSortDropdown = page.locator('[data-test-id="TestPage-ResultFilter-DropdownTrigger"]');
+  await openContextMenu(rateSortDropdown, { useLeftClick: true });
+  await selectContextMenuItem(page, { contextMenuItemTestId: sortOption });
+};
+
+export const findTestByText = async (page: Page, text: string) => {
+  const testItemWithExecutions = (await testsItems(page).all()).find(async item => {
+    const title = await item.innerText();
+    return title.includes(text);
+  });
+  if (!testItemWithExecutions) {
+    throw new Error("Test item not found");
+  }
+  return testItemWithExecutions;
 };

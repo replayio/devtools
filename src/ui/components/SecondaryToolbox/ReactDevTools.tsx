@@ -1,13 +1,12 @@
 import { ObjectId, Object as ProtocolObject } from "@replayio/protocol";
 import { createBridge, createStore, initialize } from "@replayio/react-devtools-inline/frontend";
-import { bool } from "prop-types";
 import { useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useImperativeCacheValue } from "suspense";
 
 import { selectLocation } from "devtools/client/debugger/src/actions/sources";
 import { getExecutionPoint, getThreadContext } from "devtools/client/debugger/src/reducers/pause";
 import { highlightNode, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
-import ErrorBoundary from "replay-next/components/ErrorBoundary";
+import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBoundary";
 import { useIsPointWithinFocusWindow } from "replay-next/src/hooks/useIsPointWithinFocusWindow";
 import { useMostRecentLoadedPause } from "replay-next/src/hooks/useMostRecentLoadedPause";
 import { useNag } from "replay-next/src/hooks/useNag";
@@ -27,7 +26,7 @@ import {
 } from "ui/components/SecondaryToolbox/react-devtools/ReplayWall";
 import { getPreferredLocation } from "ui/reducers/sources";
 import { getRecordingTooLongToSupportRoutines } from "ui/reducers/timeline";
-import { useAppDispatch, useAppSelector, useAppStore } from "ui/setup/hooks";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import {
   ParsedReactDevToolsAnnotation,
   reactDevToolsAnnotationsCache,
@@ -295,12 +294,12 @@ export default function ReactDevToolsWithErrorBoundary() {
   const showNewDevTools = recordingCapabilities.supportsObjectIdLookupsInEvaluations;
 
   return (
-    <ErrorBoundary name="ReactDevTools" resetKey={pauseId ?? ""}>
+    <InlineErrorBoundary name="ReactDevTools" resetKey={pauseId ?? ""}>
       {showNewDevTools ? (
         <NewReactDevtoolsPanel executionPoint={point ?? null} pauseId={pauseId ?? null} />
       ) : (
         <ReactDevtoolsPanel />
       )}
-    </ErrorBoundary>
+    </InlineErrorBoundary>
   );
 }

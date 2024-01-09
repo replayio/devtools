@@ -1,5 +1,6 @@
 import { useContext, useMemo, useState } from "react";
 
+import Icon from "replay-next/components/Icon";
 import { TestRunTestWithRecordings } from "shared/test-suites/TestRun";
 
 import { useTestRunDetailsSuspends } from "../TestRuns/hooks/useTestRunDetailsSuspends";
@@ -7,6 +8,7 @@ import { TestSuitePanelMessage } from "../TestSuitePanelMessage";
 import { TestRunPanelWrapper } from "./TestRunPanelWrapper";
 import { TestRunResultList } from "./TestRunResultList";
 import { TestRunsContext } from "./TestRunsContextRoot";
+import styles from "./TestRunSpecDetails.module.css";
 
 export function TestRunSpecDetails() {
   const { spec, filterTestsByText } = useContext(TestRunsContext);
@@ -39,11 +41,9 @@ export function TestRunSpecDetails() {
 
   return (
     <TestRunPanelWrapper>
-      <div className="flex flex-grow flex-col gap-3 overflow-y-auto py-3">
-        <div className="flex flex-col gap-2 px-3">
-          <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-lg font-semibold">
-            Replays
-          </div>
+      <div className={styles.mainContainer}>
+        <div className={styles.subContainer}>
+          <div className={styles.title}>Replays</div>
           <TestRunResultList selectedSpecTests={selectedSpecTests} />
         </div>
         {failedTests.length ? <Errors failedTests={failedTests} /> : null}
@@ -89,10 +89,8 @@ function Errors({ failedTests }: { failedTests: TestRunTestWithRecordings[] }) {
   }, [failedTests]);
 
   return (
-    <div className="flex flex-col gap-2 px-3">
-      <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-lg font-semibold">
-        Errors
-      </div>
+    <div className={styles.subContainer}>
+      <div className={styles.title}>Errors</div>
       {sortedErrors.map((e, i) => (
         <ErrorGroup key={`${spec}-${i}`} message={e.message} count={e.count} summary={e.summary} />
       ))}
@@ -112,16 +110,19 @@ function ErrorGroup({
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <div
-      className="flex w-full flex-col gap-2 overflow-x-auto rounded-md bg-[color:var(--testsuites-v2-error-bg)] px-3 py-4"
-      data-test-id="TestRunSpecDetails-Error"
-    >
-      <button className="flex flex-row gap-1" onClick={() => setExpanded(!expanded)}>
-        <div>({count})</div>
-        <div className="truncate">{summary}</div>
+    <div className={styles.errorGroupContainer} data-test-id="TestRunSpecDetails-Error">
+      <button className={styles.errorToggleButton} onClick={() => setExpanded(!expanded)}>
+        <div className={styles.errorCountLabel}>{count}</div>
+        <div className={styles.errorSummary}>{summary}</div>
+        <Icon
+          data-test-id="TestRunResults-StatusGroup-Icon"
+          data-test-state={expanded ? "expanded" : "collapsed"}
+          className={`${styles.errorToggleIcon} ${expanded ? "rotate-0" : "rotate-90"}`}
+          type="chevron-down"
+        />
       </button>
       {expanded ? (
-        <div className="flex flex-col gap-4 whitespace-pre-wrap break-words border-l-2 border-[color:var(--testsuites-v2-failed-header)] px-3">
+        <div className={styles.errorDetails}>
           <div className="font-mono text-xs">{message.split("\n").slice(0, 4).join("\n")}</div>
         </div>
       ) : null}

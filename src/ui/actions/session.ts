@@ -300,7 +300,7 @@ export function createSocket(recordingId: string): UIThunkAction {
           },
           onSocketClose: (willClose: boolean) => {
             if (!willClose) {
-              dispatch(setUnexpectedError(getDisconnectionError(), true));
+              dispatch(setExpectedError(getDisconnectionError()));
             }
           },
         }
@@ -352,7 +352,7 @@ export function createSocket(recordingId: string): UIThunkAction {
       ) {
         dispatch(setFocusWindow({ begin: focusWindow.begin.time, end: focusWindow.end.time }));
       }
-    } catch (e: any) {
+    } catch (error: any) {
       const currentError = getUnexpectedError(getState());
 
       // Don't overwrite an existing error.
@@ -360,7 +360,7 @@ export function createSocket(recordingId: string): UIThunkAction {
         dispatch(
           setUnexpectedError({
             message: "Unexpected session error",
-            content: e.message || "The session has closed due to an error.",
+            content: error.message || "The session has closed due to an error.",
             action: "library",
           })
         );

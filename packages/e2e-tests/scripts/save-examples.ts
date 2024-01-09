@@ -28,7 +28,7 @@ type Target = "all" | "browser" | "node";
 const argv = yargs
   .option("example", {
     alias: "e",
-    description: "Only re-generate tests for this specific example file",
+    description: "Only re-generate tests for a single file, or a comma-separated list of files",
     type: "string",
   })
   .option("runtime", {
@@ -423,10 +423,10 @@ async function saveExamples(
 ) {
   let examplesToRun = knownExamples.filter(example => example.category === examplesTarget);
 
-  const specificExample = argv.example;
+  const specificExamples = argv.example.split(",").filter(s => s.length > 0);
 
-  if (specificExample) {
-    examplesToRun = examplesToRun.filter(example => example.filename === specificExample);
+  if (specificExamples) {
+    examplesToRun = examplesToRun.filter(example => specificExamples.includes(example.filename));
   }
 
   console.log(

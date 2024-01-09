@@ -10,9 +10,13 @@ import { TestDetails } from "./TestDetails";
 import styles from "./TestOverviewContent.module.css";
 
 function SelectTestMessage({ error }: { error?: boolean }) {
-  return (
-    <TestSuitePanelMessage>
-      {error ? "Failed to load test details" : "Select a test to see its details here"}
+  return error ? (
+    <TestSuitePanelMessage data-test-id="FailedToLoadTestDetails">
+      Failed to load test details
+    </TestSuitePanelMessage>
+  ) : (
+    <TestSuitePanelMessage data-test-id="NoTestSelected">
+      Select a test to see its details here
     </TestSuitePanelMessage>
   );
 }
@@ -46,11 +50,11 @@ function TestOverview({ testId }: { testId: string }) {
   }, [test]);
 
   return (
-    <div className={styles.wrapper} data-pending={loading}>
+    <div className={styles.wrapper} data-test-id="TestOverview" data-pending={loading}>
       {loading ? <IndeterminateProgressBar /> : null}
       {lastTest ? (
         <>
-          <div className={styles.testTitle}>
+          <div data-test-id="TestOverviewTitle" className={styles.testTitle}>
             <div>{lastTest.title}</div>
           </div>
           <div className="flex flex-col overflow-y-auto">

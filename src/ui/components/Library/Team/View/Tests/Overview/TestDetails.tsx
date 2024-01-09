@@ -55,8 +55,14 @@ export function getReplayResult(result: string, index: number, total: number) {
   } else if (result === "failed") {
     return "failed";
   } else if (result === "flaky") {
-    // return passing for the first (last) one, failing for the rest
-    return index === 0 ? "passed" : "failed";
+    if (total === 1) {
+      // If there's only one replay but the test is flaky,
+      // it's cypress and the flake was resolved internally
+      return "flaky";
+    } else {
+      // return passing for the first (last) one, flaky for the rest
+      return index === 0 ? "passed" : "flaky";
+    }
   } else {
     return result;
   }
@@ -82,6 +88,7 @@ export function Replay({
       <div className="flex flex-row items-center gap-2 overflow-hidden">
         <StatusIcon status={result} isProcessed={recording.isProcessed} />
         <div
+          data-test-id="ReplayTitle"
           title={title}
           className="flex-grow overflow-hidden overflow-ellipsis whitespace-nowrap"
         >

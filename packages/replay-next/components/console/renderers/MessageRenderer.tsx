@@ -12,7 +12,7 @@ import {
 
 import { ProtocolMessage } from "replay-next/components/console/LoggablesContext";
 import useConsoleContextMenu from "replay-next/components/console/useConsoleContextMenu";
-import ErrorBoundary from "replay-next/components/ErrorBoundary";
+import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBoundary";
 import Expandable from "replay-next/components/Expandable";
 import Icon from "replay-next/components/Icon";
 import Inspector from "replay-next/components/inspector";
@@ -125,12 +125,12 @@ function MessageRenderer({
   const logContents = (
     <span className={styles.LogContents} data-test-name="LogContents">
       {message.text && <span className={styles.MessageText}>{message.text}</span>}
-      <ErrorBoundary
+      <InlineErrorBoundary
         name="MessageRenderer"
         fallback={<div className={styles.ErrorBoundaryFallback}>Something went wrong.</div>}
       >
         {primaryContent}
-      </ErrorBoundary>
+      </InlineErrorBoundary>
     </span>
   );
 

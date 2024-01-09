@@ -5,7 +5,7 @@ const { CI, SLOW_MO, SHARD_NUMBER } = process.env;
 
 const projects = [
   {
-    name: "replay-chromium-custom",
+    name: "replay-chromium-local",
     use: {
       launchOptions: {
         executablePath:

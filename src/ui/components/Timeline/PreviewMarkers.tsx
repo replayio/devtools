@@ -2,7 +2,7 @@ import type { PointDescription, SourceId, TimeStampedPoint } from "@replayio/pro
 import { Suspense, useContext } from "react";
 
 import { binarySearch } from "protocol/utils";
-import ErrorBoundary from "replay-next/components/ErrorBoundary";
+import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBoundary";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
@@ -30,7 +30,7 @@ export default function PreviewMarkers() {
   }
 
   return (
-    <ErrorBoundary fallback={null} name="PreviewMarkers">
+    <InlineErrorBoundary fallback={null} name="PreviewMarkers">
       <Suspense fallback={null}>
         <PreviewMarkersSuspends
           lineNumber={debouncedHoveredLineIndex + 1}
@@ -38,7 +38,7 @@ export default function PreviewMarkers() {
           visibleLines={visibleLines}
         />
       </Suspense>
-    </ErrorBoundary>
+    </InlineErrorBoundary>
   );
 }
 

@@ -13,7 +13,6 @@ import { getToolboxLayout, getViewMode } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
 
-import ExternalLink from "../shared/ExternalLink";
 import styles from "./UserOptions.module.css";
 
 export default function UserOptions() {

@@ -9,10 +9,10 @@ import {
   isGroupedTestCasesV2,
 } from "shared/test-suites/RecordingTestMetadata";
 import { getDisplayedUrl } from "shared/utils/environment";
+import { getRecordingURL } from "shared/utils/recording";
 import { TestResultIcon } from "ui/components/TestSuite/components/TestResultIcon";
 import hooks from "ui/hooks";
 import { useGetUserPermissions } from "ui/hooks/users";
-import { getRecordingURL } from "ui/utils/recording";
 import { formatDuration } from "ui/utils/time";
 
 import { Redacted } from "../../../../../Redacted";

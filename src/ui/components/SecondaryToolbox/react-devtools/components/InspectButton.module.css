@@ -20,3 +20,6 @@
 .Icon[data-active] {
   color: var(--primary-accent);
 }
+.Icon[data-errored] {
+  color: var(--theme-icon-error-color);
+}

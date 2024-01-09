@@ -9,6 +9,7 @@ import { getSystemColorScheme } from "shared/theme/getSystemColorScheme";
 import { userData } from "shared/user-data/GraphQL/UserData";
 import { CONSOLE_SETTINGS_DATABASE, POINTS_DATABASE } from "shared/user-data/IndexedDB/config";
 import { preloadIDBInitialValues } from "shared/user-data/IndexedDB/utils";
+import { getRecordingId } from "shared/utils/recording";
 import { UIStore } from "ui/actions";
 import { getRecording } from "ui/hooks/recordings";
 import { getUserSettings } from "ui/hooks/settings";
@@ -21,7 +22,6 @@ import type { LayoutState } from "ui/state/layout";
 import { setUserInBrowserPrefs } from "ui/utils/browser";
 import { initLaunchDarkly } from "ui/utils/launchdarkly";
 import { maybeSetMixpanelContext } from "ui/utils/mixpanel";
-import { getRecordingId } from "ui/utils/recording";
 import { setTelemetryContext, setupTelemetry, trackEvent } from "ui/utils/telemetry";
 import tokenManager from "ui/utils/tokenManager";
 

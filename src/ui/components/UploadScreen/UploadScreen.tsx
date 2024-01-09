@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 
 import { Recording, UserSettings, Workspace } from "shared/graphql/types";
+import { showDurationWarning } from "shared/utils/recording";
 import Modal from "ui/components/shared/NewModal";
 import hooks from "ui/hooks";
 import { useGetRecordingId } from "ui/hooks/recordings";
-import { showDurationWarning } from "ui/utils/recording";
 import { trackEvent } from "ui/utils/telemetry";
 import { decodeWorkspaceId } from "ui/utils/workspace";
 

@@ -10,7 +10,7 @@ import {
   getSelectedFrameId,
   getThreadContext,
 } from "devtools/client/debugger/src/selectors";
-import ErrorBoundary from "replay-next/components/ErrorBoundary";
+import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBoundary";
 import { copyToClipboard } from "replay-next/components/sources/utils/clipboard";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { useCurrentFocusWindow } from "replay-next/src/hooks/useCurrentFocusWindow";
@@ -98,7 +98,7 @@ function FramesRenderer({
     <>
       {asyncSeparator}
       <PauseFrames pauseId={pauseId} frames={frames} panel={panel} />
-      <ErrorBoundary
+      <InlineErrorBoundary
         key={pauseId}
         name="NewFrames"
         fallback={<div className="pane-info empty">Error loading frames :(</div>}
@@ -106,7 +106,7 @@ function FramesRenderer({
         <Suspense fallback={<div className="pane-info empty">Loading async frames…</div>}>
           <FramesRenderer panel={panel} pauseId={pauseId} asyncIndex={asyncIndex + 1} />
         </Suspense>
-      </ErrorBoundary>
+      </InlineErrorBoundary>
     </>
   );
 }
@@ -218,7 +218,7 @@ function Frames({ panel, point, time }: FramesProps) {
 
   return (
     <div className="pane frames" data-test-id="FramesPanel">
-      <ErrorBoundary
+      <InlineErrorBoundary
         key={pauseId}
         name="Frames"
         fallback={<div className="pane-info empty">Error loading frames :((</div>}
@@ -228,7 +228,7 @@ function Frames({ panel, point, time }: FramesProps) {
             <FramesRenderer pauseId={pauseId} panel={panel} />
           </div>
         </Suspense>
-      </ErrorBoundary>
+      </InlineErrorBoundary>
     </div>
   );
 }
