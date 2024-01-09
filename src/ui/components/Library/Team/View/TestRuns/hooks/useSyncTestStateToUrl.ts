@@ -7,8 +7,8 @@ export function useSyncTestStateToUrl(
   teamId: string,
   testRunId: string | null,
   setTestRunId: Dispatch<SetStateAction<string | null>>,
-  testId: string | null,
-  setTestId: Dispatch<SetStateAction<string | null>>
+  testId?: string | null,
+  setTestId?: Dispatch<SetStateAction<string | null>>
 ) {
   const router = useRouter();
 
@@ -41,7 +41,7 @@ export function useSyncTestStateToUrl(
       if (testRunIdFromState !== testRunIdFromUrl) {
         setTestRunId(testRunIdFromUrl);
       }
-      if (testIdFromState !== testIdFromUrl) {
+      if (testIdFromState !== testIdFromUrl && setTestId) {
         setTestId(testIdFromUrl);
       }
     }

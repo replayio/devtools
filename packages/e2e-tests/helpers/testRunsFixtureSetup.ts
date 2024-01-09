@@ -610,8 +610,6 @@ async function startTestRunShard(
     throw new Error("Unexpected error retrieving test run shard id");
   }
 
-  console.log(">>>", resp.data.startTestRunShard);
-
   return { shard: testRunShardId, testRunId: resp.data.startTestRunShard.testRunId, clientKey };
 }
 

@@ -13,10 +13,6 @@ import {
 
 test.use({ testRunState: "FLAKY_IN_MAIN_WITH_SOURCE" });
 
-// this function takes a ms argument and returns a promise
-// that resolves after that has passed
-const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
 test(`authenticated/new-test-suites/test-runs-03: flaky run in main branch with source`, async ({
   pageWithMeta: { page, clientKey, testRunId },
 }) => {

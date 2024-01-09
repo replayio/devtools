@@ -12,7 +12,7 @@ import {
 
 import { TestRun, getTestRunTitle } from "shared/test-suites/TestRun";
 import { useGetTeamRouteParams } from "ui/components/Library/Team/utils";
-import { useSyncTestRunIdToUrl } from "ui/components/Library/Team/View/TestRuns/hooks/useSyncTestIdToUrl";
+import { useSyncTestStateToUrl } from "ui/components/Library/Team/View/TestRuns/hooks/useSyncTestStateToUrl";
 import { useTestRuns } from "ui/components/Library/Team/View/TestRuns/hooks/useTestRuns";
 
 type TestRunsContextType = {
@@ -104,7 +104,7 @@ export function TestRunsContextRoot({ children }: { children: ReactNode }) {
     }
   }, [router, teamId, testRunId, testRuns]);
 
-  useSyncTestRunIdToUrl(teamId, testRunId, setTestRunId);
+  useSyncTestStateToUrl(teamId, testRunId, setTestRunId);
 
   const deferredTestRunId = useDeferredValue(testRunId);
 
