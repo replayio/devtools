@@ -20,7 +20,7 @@ export function useSyncTestStateToUrl(
     const prevTestRunId = prevTestRunIdRef.current;
     const prevTestId = prevTestIdRef.current;
     if (testRunId && (testRunId !== prevTestRunId || (testId && testId !== prevTestId))) {
-      const pathname = `/team/${teamId}/runs/${testRunId}${testId ? `/test/${testId}` : ""}`;
+      const pathname = `/team/${teamId}/runs/${testRunId}${testId ? `/tests/${testId}` : ""}`;
       if (prevTestRunId === null) {
         router.replace({ pathname, query: router.query });
       } else if (prevTestRunIdRef.current !== testRunId || prevTestIdRef.current !== testId) {
