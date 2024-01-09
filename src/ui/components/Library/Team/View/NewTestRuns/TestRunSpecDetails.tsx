@@ -11,7 +11,7 @@ import { TestRunsContext } from "./TestRunsContextRoot";
 import styles from "./TestRunSpecDetails.module.css";
 
 export function TestRunSpecDetails() {
-  const { spec, filterTestsByText } = useContext(TestRunsContext);
+  const { testId, filterTestsByText } = useContext(TestRunsContext);
   const { testRunId, testRuns } = useContext(TestRunsContext);
 
   const { groupedTests, tests } = useTestRunDetailsSuspends(testRunId);
@@ -21,11 +21,11 @@ export function TestRunSpecDetails() {
       ?.filter(
         t => filterTestsByText === "" || t.sourcePath.toLowerCase().includes(filterTestsByText)
       )
-      ?.filter((t: any) => t.sourcePath === spec) ?? [];
+      ?.filter(t => t.testId === testId) ?? [];
   const selectedTest = selectedSpecTests?.[0];
 
   if (
-    !spec ||
+    !testId ||
     groupedTests === null ||
     selectedTest == null ||
     !testRuns.some(t => t.id === testRunId)
@@ -69,7 +69,7 @@ const getSummary = (message: string) => {
 };
 
 function Errors({ failedTests }: { failedTests: TestRunTestWithRecordings[] }) {
-  const { spec } = useContext(TestRunsContext);
+  const { testId } = useContext(TestRunsContext);
 
   const sortedErrors = useMemo(() => {
     const errors = failedTests.flatMap(t => t.errors || []);
@@ -92,7 +92,12 @@ function Errors({ failedTests }: { failedTests: TestRunTestWithRecordings[] }) {
     <div className={styles.subContainer}>
       <div className={styles.title}>Errors</div>
       {sortedErrors.map((e, i) => (
-        <ErrorGroup key={`${spec}-${i}`} message={e.message} count={e.count} summary={e.summary} />
+        <ErrorGroup
+          key={`${testId}-${i}`}
+          message={e.message}
+          count={e.count}
+          summary={e.summary}
+        />
       ))}
     </div>
   );

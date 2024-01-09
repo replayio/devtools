@@ -38,7 +38,7 @@ export function useFileNameTree(testGroup: TestGroup, filterByText: string = "")
       const ancestors: PathNode[] = [root];
 
       let currentNode: PathNode = root;
-      for (let index = 0; index < parts.length - 1; index++) {
+      for (let index = 0; index < parts.length; index++) {
         const part = parts[index];
 
         const existingNode = currentNode.children.find(child => child.name === part);
@@ -66,31 +66,22 @@ export function useFileNameTree(testGroup: TestGroup, filterByText: string = "")
         ancestors.push(currentNode);
       }
 
-      const part = parts[parts.length - 1];
-      let node = currentNode.children.find(child => child.name === part);
-      if (node) {
-        assert(isFileNode(node));
-      } else {
-        node = {
-          absolutePath: fileName,
-          name: part,
-          tests: [],
-          type: "file",
-          nestedRecordingCount: 0,
-        };
-
-        insert(currentNode.children, node, (a, b) => a.name.localeCompare(b.name));
+      for (let test of tests) {
+        insert(
+          currentNode.children,
+          {
+            absolutePath: fileName,
+            name: test.title,
+            test,
+            type: "file",
+            nestedRecordingCount: test.executions.reduce(
+              (executionTotal, execution) => executionTotal + execution.recordings.length,
+              0
+            ),
+          },
+          (a, b) => a.name.localeCompare(b.name)
+        );
       }
-      node.tests.push(...tests);
-      node.nestedRecordingCount = node.tests.reduce(
-        (testsTotal, test) =>
-          testsTotal +
-          test.executions.reduce(
-            (executionTotal, execution) => executionTotal + execution.recordings.length,
-            0
-          ),
-        0
-      );
 
       ancestors.forEach(ancestor => {
         ancestor.nestedTestCount += tests.length;
@@ -153,6 +144,22 @@ export const treeContainFile = (treeNode: TreeNode[], file: string) => {
   return containsFile;
 };
 
+export const treeContainTest = (treeNode: TreeNode[], testId: string) => {
+  let containsFile = false;
+  treeNode.forEach(node => {
+    if (isFileNode(node)) {
+      if (node.test.testId === testId) {
+        containsFile = true;
+      }
+    } else {
+      if (treeContainTest(node.children, testId)) {
+        containsFile = true;
+      }
+    }
+  });
+  return containsFile;
+};
+
 export type Tree = PathNode;
 export type TreeNode = FileNode | PathNode;
 
@@ -167,7 +174,7 @@ export type PathNode = {
 export type FileNode = {
   absolutePath: string;
   name: string;
-  tests: TestRunTestWithRecordings[];
+  test: TestRunTestWithRecordings;
   type: "file";
   nestedRecordingCount: number;
 };
