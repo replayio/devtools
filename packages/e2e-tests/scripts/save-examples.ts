@@ -30,6 +30,7 @@ const argv = yargs
     alias: "e",
     description: "Only re-generate tests for a single file, or a comma-separated list of files",
     type: "string",
+    default: "",
   })
   .option("runtime", {
     alias: "r",
@@ -425,7 +426,7 @@ async function saveExamples(
 
   const specificExamples = argv.example.split(",").filter(s => s.length > 0);
 
-  if (specificExamples) {
+  if (specificExamples.length > 0) {
     examplesToRun = examplesToRun.filter(example => specificExamples.includes(example.filename));
   }
 
