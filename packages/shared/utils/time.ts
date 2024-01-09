@@ -1,7 +1,32 @@
-import { ExecutionPoint, PointRange, TimeStampedPointRange } from "@replayio/protocol";
+import {
+  ExecutionPoint,
+  PointRange,
+  TimeStampedPoint,
+  TimeStampedPointRange,
+} from "@replayio/protocol";
 
 const supportsPerformanceNow =
   typeof performance !== "undefined" && typeof performance.now === "function";
+
+export function minTimeStampedPoint(points: (TimeStampedPoint | null)[]): TimeStampedPoint | null {
+  let min: TimeStampedPoint | null = null;
+  for (const point of points) {
+    if (point) {
+      min = min === null ? point : BigInt(point.point) < BigInt(min.point) ? point : min;
+    }
+  }
+  return min;
+}
+
+export function maxTimeStampedPoint(points: (TimeStampedPoint | null)[]): TimeStampedPoint | null {
+  let max: TimeStampedPoint | null = null;
+  for (const point of points) {
+    if (point) {
+      max = max === null ? point : BigInt(point.point) > BigInt(max.point) ? point : max;
+    }
+  }
+  return max;
+}
 
 export function isRangeInRegions(
   range: TimeStampedPointRange | PointRange,
