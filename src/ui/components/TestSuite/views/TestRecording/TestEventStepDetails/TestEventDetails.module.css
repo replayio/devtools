@@ -25,6 +25,10 @@
   padding-bottom: 0.5rem;
 }
 
+.UserActionEventDetails[data-is-pending] {
+  opacity: 0.5;
+}
+
 .DetailsTitle {
   font-size: var(--font-size-small);
   color: var(--color-dimmer);
@@ -96,4 +100,41 @@
 }
 .SourceCodeLineSelected {
   background-color: var(--background-color-current-execution-point);
+}
+
+.TabsContainer {
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+
+.Tabs {
+  display: flex;
+  background: var(--tab-bgcolor);
+  border-bottom: 1px solid var(--theme-splitter-color);
+  flex: 0 0 auto;
+}
+
+.Tab {
+  padding: 0.5rem;
+  border-bottom-color: transparent;
+  background-color: var(--tab-bgcolor);
+  color: var(--tab-color);
+}
+.Tab[data-active] {
+  background-color: var(--tab-selected-bgcolor);
+  color: var(--tab-selected-color);
+  cursor: default;
+}
+.Tab:hover:not(.Tab[data-active]) {
+  background-color: var(--tab-hover-bgcolor);
+  color: var(--tab-hover-color);
+}
+.Tab:focus {
+  outline: none;
+}
+
+.Panel {
+  height: 100%;
+  flex: 1 1 auto;
 }

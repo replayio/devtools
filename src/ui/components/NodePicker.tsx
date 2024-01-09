@@ -22,14 +22,19 @@ export function NodePicker() {
 
   const { pauseId } = useMostRecentLoadedPause() ?? {};
 
-  const active = (status === "initializing" || status === "active") && type === "domElement";
+  const isActive = (status === "initializing" || status === "active") && type === "domElement";
+  const didError = status === "error" && type === "domElement";
+
+  const title = didError
+    ? "Something went wrong initializing this component"
+    : "Select an element in the video to inspect it";
 
   const onClick = () => {
     if (shouldShow) {
       dismissInspectElementNag();
     }
 
-    if (!active) {
+    if (!isActive) {
       if (pauseId == null) {
         console.warn("NodePicker enabled before PauseId is available");
         return;
@@ -53,12 +58,13 @@ export function NodePicker() {
   return (
     <button
       className={classnames("devtools-button toolbar-panel-button tab", {
-        active,
+        active: isActive,
+        errored: didError,
       })}
       data-status={status}
       id="command-button-pick"
       onClick={onClick}
-      title="Select an element in the video to inspect it"
+      title={title}
     />
   );
 }

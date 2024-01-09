@@ -6,7 +6,7 @@ import { Suspense, memo, useContext } from "react";
 
 import { assert } from "protocol/utils";
 import useConsoleContextMenu from "replay-next/components/console/useConsoleContextMenu";
-import ErrorBoundary from "replay-next/components/ErrorBoundary";
+import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBoundary";
 import Icon from "replay-next/components/Icon";
 import Inspector from "replay-next/components/inspector";
 import ClientValueValueRenderer from "replay-next/components/inspector/values/ClientValueValueRenderer";
@@ -80,14 +80,14 @@ function LogPointRenderer({
       )}
       <span className={styles.LogContents} data-test-name="LogContents">
         <BadgeRenderer badge={logPointInstance.point.badge} showNewBadgeFlash={showNewBadgeFlash} />
-        <ErrorBoundary
+        <InlineErrorBoundary
           name="LogPointRenderer"
           fallback={<div className={styles.ErrorBoundaryFallback}>Something went wrong.</div>}
         >
           <Suspense key={logPointInstance.point.content} fallback={<Loader />}>
             <AnalyzedContent logPointInstance={logPointInstance} />
           </Suspense>
-        </ErrorBoundary>
+        </InlineErrorBoundary>
       </span>
     </>
   );

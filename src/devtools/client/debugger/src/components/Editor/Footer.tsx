@@ -1,6 +1,6 @@
 import { Suspense, memo, useContext } from "react";
 
-import ErrorBoundary from "replay-next/components/ErrorBoundary";
+import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBoundary";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 
 import SourcemapToggleSuspends from "./SourcemapToggle";
@@ -22,7 +22,7 @@ function SourceFooter() {
   return (
     <div className="source-footer-wrapper">
       <div className="source-footer">
-        <ErrorBoundary
+        <InlineErrorBoundary
           name="SourceFooter"
           fallback={<div className="error">An error occurred while replaying</div>}
         >
@@ -30,7 +30,7 @@ function SourceFooter() {
             <SourcemapToggleSuspends cursorPosition={cursorPosition} />
             <SourcemapVisualizerLinkSuspends cursorPosition={cursorPosition} />
           </Suspense>
-        </ErrorBoundary>
+        </InlineErrorBoundary>
       </div>
     </div>
   );

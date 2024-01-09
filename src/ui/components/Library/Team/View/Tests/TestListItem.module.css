@@ -5,7 +5,7 @@
 
 :root:global(.theme-dark) .libraryRow:hover,
 :root:global(.theme-dark) .replayRow:hover {
-  background-color: #1c2534;
+  background-color: var(--primary-accent-dimmed-hover);
 }
 
 :root:global(.theme-dark) .libraryRowSelected {
@@ -40,7 +40,7 @@
 }
 
 .failedPill {
-  color: var(--theme-base-100);
+  color: #fff;
   background-color: var(--testsuites-failed-color);
 }
 

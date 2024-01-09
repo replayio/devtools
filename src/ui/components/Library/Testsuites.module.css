@@ -36,27 +36,13 @@
   flex-direction: row;
   align-items: center;
   gap: 1rem;
+  padding: 12px 6px;
 }
 
 .icon {
   margin-left: 2rem;
   height: 1rem;
   width: 1rem;
-}
-
-.iconWrapper {
-  display: flex;
-  cursor: pointer;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.15s ease-in-out;
-}
-
-.iconMotion {
-  margin: auto;
-  height: 1.5rem;
-  width: 1.5rem;
-  border-radius: 50%;
 }
 
 .fileInfo {
@@ -164,7 +150,7 @@
 
 :root:global(.theme-dark) .libraryRow:hover,
 :root:global(.theme-dark) .replayRow:hover {
-  background-color: #1c2534;
+  background-color: var(--primary-accent-dimmed-hover);
 }
 
 :root:global(.theme-dark) .libraryRowSelected {

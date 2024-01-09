@@ -4,11 +4,11 @@ import mixpanel from "mixpanel-browser";
 import { ActiveInspectorTab, ViewMode } from "shared/user-data/GraphQL/config";
 import { userData } from "shared/user-data/GraphQL/UserData";
 import { isReplayBrowser, skipTelemetry } from "shared/utils/environment";
+import { getRecordingId } from "shared/utils/recording";
 import { CanonicalRequestType } from "ui/components/NetworkMonitor/utils";
 import { WorkspaceId, WorkspaceUuid } from "ui/state/app";
 import { PrimaryPanelName, SecondaryPanelName } from "ui/state/layout";
 
-import { getRecordingId } from "./recording";
 import { TelemetryUser, trackTiming } from "./telemetry";
 import { decodeWorkspaceId } from "./workspace";
 
@@ -103,6 +103,10 @@ type MixpanelEvent =
   | ["tabs.select"]
   | ["team_change", { workspaceId: WorkspaceId | null }]
   | ["team.change_default", { workspaceUuid: WorkspaceUuid | null }]
+  | ["test_dashboard.open", { view: "tests" | "runs" }]
+  | ["test_dashboard.select_run", { view: "runs" }]
+  | ["test_dashboard.select_test", { view: "tests" | "runs" }]
+  | ["test_dashboard.open_replay", { view: "tests" | "runs"; result: string }]
   | ["timeline.comment_select"]
   | ["timeline.discard_focus_explicit"]
   | ["timeline.discard_focus_implicit"]

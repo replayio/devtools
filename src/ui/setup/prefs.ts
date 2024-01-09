@@ -7,6 +7,7 @@ import { Tab, getTabs } from "devtools/client/debugger/src/reducers/tabs";
 import { persistTabs } from "devtools/client/debugger/src/utils/tabs";
 import { asyncStoreHelper } from "devtools/shared/async-store-helper";
 import { ViewMode } from "shared/user-data/GraphQL/config";
+import { getRecordingId } from "shared/utils/recording";
 import { UIStore } from "ui/actions";
 import {
   getLocalNags,
@@ -17,7 +18,6 @@ import {
 } from "ui/reducers/layout";
 import { UIState } from "ui/state";
 import { PrimaryPanelName, SecondaryPanelName, ToolboxLayout } from "ui/state/layout";
-import { getRecordingId } from "ui/utils/recording";
 
 export interface ReplaySessions {
   [id: string]: ReplaySession;

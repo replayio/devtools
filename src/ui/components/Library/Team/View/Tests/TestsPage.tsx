@@ -1,11 +1,12 @@
-import { Suspense, useContext } from "react";
+import { Suspense, useContext, useEffect } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { ContextMenuItem, useContextMenu } from "use-context-menu";
 
-import ErrorBoundary from "replay-next/components/ErrorBoundary";
+import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBoundary";
 import Icon from "replay-next/components/Icon";
 import LibraryDropdownTrigger from "ui/components/Library/LibraryDropdownTrigger";
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
+import { trackEvent } from "ui/utils/telemetry";
 
 import { TeamContext } from "../../TeamContextRoot";
 import { TestSuitePanelMessage } from "../TestSuitePanelMessage";
@@ -22,13 +23,13 @@ import styles from "./TestsPage.module.css";
 
 export function TestsPage() {
   return (
-    <ErrorBoundary name="TestsPageErrorBoundary" fallback={<ErrorFallback />}>
+    <InlineErrorBoundary name="TestsPageErrorBoundary" fallback={<ErrorFallback />}>
       <TimeFilterContextRoot>
         <TestsContextRoot>
           <TestsContent />
         </TestsContextRoot>
       </TimeFilterContextRoot>
-    </ErrorBoundary>
+    </InlineErrorBoundary>
   );
 }
 
@@ -97,6 +98,10 @@ function TestsContent() {
     </>,
     { alignTo: "auto-target" }
   );
+
+  useEffect(() => {
+    trackEvent("test_dashboard.open", { view: "tests" });
+  }, []);
 
   return (
     <div className="flex w-full flex-grow flex-row p-1">

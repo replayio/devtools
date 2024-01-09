@@ -9,24 +9,19 @@ import { Provider } from "react-redux";
 import "../src/global-css";
 import "../src/test-prep";
 
+import { RootErrorBoundary } from "ui/components/Errors/RootErrorBoundary";
 import { SystemProvider } from "design";
-import DecoratedErrorBoundary from "replay-next/components/ErrorBoundary";
 import { recordData as recordTelemetryData } from "replay-next/src/utils/telemetry";
-import { setUnexpectedError } from "ui/actions/errors";
 import { ApolloWrapper } from "ui/components/ApolloWrapper";
 import _App from "ui/components/App";
 import MaintenanceModeScreen from "ui/components/MaintenanceMode";
 import { ConfirmProvider } from "ui/components/shared/Confirm";
-import ErrorRenderer from "ui/components/shared/Error";
 import LoadingScreen from "ui/components/shared/LoadingScreen";
 import useAuthTelemetry from "ui/hooks/useAuthTelemetry";
-import { getUnexpectedError } from "ui/reducers/app";
 import { bootstrapApp } from "ui/setup";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { useLaunchDarkly } from "ui/utils/launchdarkly";
 import { InstallRouteListener } from "ui/utils/routeListener";
 import tokenManager from "ui/utils/tokenManager";
-
 import "../src/base.css";
 
 interface AuthProps {
@@ -94,14 +89,14 @@ function Routing({ Component, pageProps }: AppProps) {
   return (
     <Provider store={store}>
       <MemoizedHeader />
-      <ErrorBoundary>
+      <RootErrorBoundary name="_app">
         <_App>
           <InstallRouteListener />
           <React.Suspense fallback={<LoadingScreen message="Fetching data..." />}>
             <Component {...pageProps} />
           </React.Suspense>
         </_App>
-      </ErrorBoundary>
+      </RootErrorBoundary>
     </Provider>
   );
 }
@@ -161,37 +156,5 @@ App.getInitialProps = (appContext: AppContext) => {
 
   return { ...props, ...authProps };
 };
-
-function ErrorBoundary({ children }: { children: ReactNode }) {
-  const unexpectedError = useAppSelector(getUnexpectedError);
-  const dispatch = useAppDispatch();
-
-  const onError = (error: unknown) => {
-    if (error instanceof Error && error.name === "ChunkLoadError") {
-      return dispatch(setUnexpectedError({
-        message: "Replay updated",
-        content: "Replay was updated since you opened it. Please refresh the page.",
-        action: "refresh",
-      }, true));
-    }
-
-    // Otherwise, if it's bubbled up this far, React is crashing anyway.
-    // Let's show the "Oops!" screen and tell the user to refresh.
-
-    dispatch(
-      setUnexpectedError({
-        message: "Unexpected error",
-        content: "Something went wrong, but you can refresh the page to try again.",
-        action: "refresh",
-      })
-    );
-  };
-
-  return (
-    <DecoratedErrorBoundary onError={onError} fallback={<ErrorRenderer />} name="Routing">
-      {unexpectedError ? <ErrorRenderer /> : children}
-    </DecoratedErrorBoundary>
-  );
-}
 
 export default App;

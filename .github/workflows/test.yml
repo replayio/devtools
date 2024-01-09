@@ -185,6 +185,7 @@ jobs:
           path: packages/e2e-tests/test-results
           retention-days: 3
       - uses: replayio/action-upload@v0.5.1
+        if: always()
         with:
           api-key: ${{ env.RECORD_REPLAY_API_KEY }}
           public: true

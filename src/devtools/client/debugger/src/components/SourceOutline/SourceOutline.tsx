@@ -5,7 +5,7 @@ import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList as List } from "react-window";
 import { useImperativeCacheValue } from "suspense";
 
-import ErrorBoundary from "replay-next/components/ErrorBoundary";
+import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBoundary";
 import Spinner from "replay-next/components/Spinner";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import {
@@ -184,7 +184,7 @@ export default function SourceOutlineWrapper() {
   }
 
   return (
-    <ErrorBoundary name="SourceOutlineWrapper" key={selectedSource?.id}>
+    <InlineErrorBoundary name="SourceOutlineWrapper" key={selectedSource?.id}>
       <Suspense fallback={null}>
         <SourceOutline
           cursorPosition={cursorPosition || null}
@@ -192,6 +192,6 @@ export default function SourceOutlineWrapper() {
           symbols={symbols}
         />
       </Suspense>
-    </ErrorBoundary>
+    </InlineErrorBoundary>
   );
 }

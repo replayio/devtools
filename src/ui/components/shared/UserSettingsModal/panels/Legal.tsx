@@ -1,4 +1,4 @@
-import ExternalLink from "ui/components/shared/ExternalLink";
+import ExternalLink from "replay-next/components/ExternalLink";
 import { SettingsBodyHeader } from "ui/components/shared/SettingsModal/SettingsBody";
 
 export function Legal() {

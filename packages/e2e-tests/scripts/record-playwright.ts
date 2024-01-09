@@ -37,7 +37,8 @@ export async function recordPlaywright(
       // @ts-ignore
       RECORD_REPLAY_DRIVER: config.driverPath,
       // @ts-ignore
-      RECORD_REPLAY_VERBOSE: config.driverPath ? "1" : undefined,
+      RECORD_REPLAY_VERBOSE:
+        config.driverPath || process.env.RECORD_REPLAY_BROWSER_LOG ? "1" : undefined,
       RECORD_ALL_CONTENT: "1",
     },
     executablePath, //: config.browserPath,

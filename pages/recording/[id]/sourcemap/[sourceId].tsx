@@ -1,6 +1,6 @@
 import { Source } from "@replayio/protocol";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 // eslint-disable-next-line no-restricted-imports
 import { client, initSocket } from "protocol/socket";
@@ -9,11 +9,10 @@ import renderSourcemap from "third-party/sourcemap-visualizer/sourcemapVisualize
 import { UIStore } from "ui/actions";
 import { setAppMode } from "ui/actions/app";
 import { getAccessibleRecording } from "ui/actions/session";
-import { ExpectedErrorScreen } from "ui/components/shared/Error";
+import { ExpectedErrorModal } from "ui/components/Errors/ExpectedErrorModal";
 import LoadingScreen from "ui/components/shared/LoadingScreen";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import { useAppDispatch, useAppStore } from "ui/setup/hooks";
-import { ExpectedError } from "ui/state/app";
 import tokenManager from "ui/utils/tokenManager";
 
 type SourcemapResult =
@@ -156,18 +155,12 @@ export default function SourceMapLoader() {
   }
 
   if ("error" in sourcemapResult) {
-    const error: ExpectedError = {
-      message: "Error",
-      content: sourcemapResult.error,
-    };
-    return <ExpectedErrorScreen error={error} />;
+    return <ExpectedErrorModal details={sourcemapResult.error} title="Error" />;
   }
   if (!sourcemapResult.map) {
-    const error: ExpectedError = {
-      message: "No sourcemap",
-      content: "There is no sourcemap for this source",
-    };
-    return <ExpectedErrorScreen error={error} />;
+    return (
+      <ExpectedErrorModal details="There is no sourcemap for this source" title="No sourcemap" />
+    );
   }
 
   return (
