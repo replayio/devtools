@@ -45,7 +45,7 @@ function generateChartData(testRuns: TestRun[]) {
   return [
     {
       id: "Failure rate (%)",
-      color: "hsl(21, 70%, 50%)",
+      color: "#01ACFD",
       data: sortedData,
     },
   ];
@@ -65,11 +65,37 @@ export const Chart = () => {
     ) : null,
   });
 
+  const markers = [
+    {
+      axis: "y",
+      value: 100,
+      lineStyle: { stroke: "var(--theme-base-90)", strokeWidth: 1 },
+      legendOrientation: "vertical",
+    },
+    {
+      axis: "y",
+      value: 0,
+      lineStyle: { stroke: "var(--theme-base-90)", strokeWidth: 1 },
+      legendOrientation: "vertical",
+    },
+  ];
+
+  const gradientId = "gradientBlue";
+
   return (
-    <div style={{ height: 80, minWidth: 50 }}>
+    <div style={{ height: 100, minWidth: 50 }}>
+      <svg style={{ height: 0 }}>
+        <defs>
+          <linearGradient id={gradientId} x1="0%" y1="100%" x2="0%" y2="0%">
+            <stop offset="0%" stopColor="#02496D" stopOpacity={0} />
+            <stop offset="100%" stopColor="#02496D" stopOpacity={100} />
+          </linearGradient>
+        </defs>
+      </svg>
       <ResponsiveLine
         data={data}
-        margin={{ top: 10, right: 10, bottom: 10, left: 10 }}
+        markers={markers}
+        margin={{ top: 10, right: 10, bottom: 10, left: 4 }}
         axisBottom={null}
         axisLeft={null}
         enablePoints={true}
@@ -80,33 +106,49 @@ export const Chart = () => {
           stacked: true,
           reverse: false,
         }}
-        pointSize={10}
+        pointSize={4}
         pointColor={{ theme: "background" }}
-        pointBorderWidth={2}
+        pointBorderWidth={3}
         pointBorderColor={{ from: "serieColor" }}
         pointLabelYOffset={-12}
         useMesh={true}
         enableArea={true}
+        areaOpacity={0.8}
         enableGridX={false}
         enableGridY={false}
         animate={false}
         tooltip={() => null}
-        onMouseEnter={(p, e) => {
-          onMouseEnter(e);
-          setHoveredPoint(p);
+        onMouseEnter={(point, event) => {
+          onMouseEnter(event);
+          setHoveredPoint(point);
         }}
-        onMouseLeave={(p, e) => {
-          onMouseLeave(e);
+        onMouseLeave={(point, event) => {
+          onMouseLeave(event);
           setHoveredPoint(null);
         }}
-        onMouseMove={(p, e) => {
-          onMouseEnter(e);
-          if (hoveredPoint?.id !== p.id) {
-            setHoveredPoint(p);
+        onMouseMove={(point, event) => {
+          onMouseEnter(event);
+          if (hoveredPoint?.id !== point.id) {
+            setHoveredPoint(point);
           }
         }}
         theme={{ text: { fill: "var(--body-color)" } }}
-        colors={{ scheme: "set1" }}
+        colors={{ datum: "color" }}
+        areaColor={{ from: "color", modifiers: [] }}
+        areaBaselineValue={0}
+        // Reference the gradient for the area color
+        areaBlendMode="normal"
+        defs={[
+          {
+            id: gradientId,
+            type: "linearGradient",
+            colors: [
+              { offset: 0, color: "white" },
+              { offset: 100, color: "white" },
+            ],
+          },
+        ]}
+        fill={[{ match: "*", id: gradientId }]}
       />
       {tooltip}
     </div>
