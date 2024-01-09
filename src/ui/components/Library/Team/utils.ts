@@ -4,9 +4,11 @@ import { NextRouter, useRouter } from "next/router";
 import { View } from "ui/components/Library/Team/View/ViewContextRoot";
 
 export function parseQueryParams(query: ParsedUrlQuery) {
-  const [teamId, view, testRunId] = Array.isArray(query.param) ? query.param : [query.param!];
+  const [teamId, view, testRunId, _, testId] = Array.isArray(query.param)
+    ? query.param
+    : [query.param!];
 
-  return { teamId, testRunId: testRunId || null, view: view as View };
+  return { teamId, testRunId: testRunId || null, view: view as View, testId };
 }
 
 export function useGetTeamRouteParams() {
