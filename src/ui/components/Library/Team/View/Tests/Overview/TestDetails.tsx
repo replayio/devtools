@@ -77,7 +77,7 @@ export function Replay({
   result: string;
   attemptNumber: number;
 }) {
-  const title = attemptNumber === 1 ? "Initial attempt" : `Attempt ${attemptNumber}`;
+  const title = `Attempt ${attemptNumber}`;
 
   return (
     <a
