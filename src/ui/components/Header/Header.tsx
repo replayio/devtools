@@ -181,9 +181,7 @@ export default function Header() {
   assert(recording != null);
 
   let fallbackUrl = window.location.origin;
-  if (router.query.referer) {
-    fallbackUrl = decodeURIComponent(router.query.referer as string);
-  } else if (recording.workspace !== null) {
+  if (recording.workspace !== null) {
     fallbackUrl = `/team/${recording.workspace?.id}`;
     if (isTestSuiteReplay(recording) && recording.testRun?.id) {
       fallbackUrl += `/runs/${recording.testRun.id}`;
