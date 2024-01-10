@@ -45,7 +45,7 @@ function generateChartData(testRuns: TestRun[]) {
   return [
     {
       id: "Failure rate (%)",
-      color: "#01ACFD",
+      color: "var(--testsuites-graph-gradient-stroke)",
       data: sortedData,
     },
   ];
@@ -69,13 +69,23 @@ export const Chart = () => {
     {
       axis: "y",
       value: 100,
-      lineStyle: { stroke: "var(--theme-base-90)", strokeWidth: 1 },
+      lineStyle: { stroke: "var(--testsuites-graph-marker)", strokeWidth: 1 },
+      legendOrientation: "vertical",
+    },
+    {
+      axis: "y",
+      value: 50,
+      lineStyle: {
+        stroke: "var(--testsuites-graph-gradient-marker)",
+        strokeWidth: 1,
+        strokeOpacity: 0.4,
+      },
       legendOrientation: "vertical",
     },
     {
       axis: "y",
       value: 0,
-      lineStyle: { stroke: "var(--theme-base-90)", strokeWidth: 1 },
+      lineStyle: { stroke: "var(--testsuites-graph-marker)", strokeWidth: 1 },
       legendOrientation: "vertical",
     },
   ];
@@ -83,12 +93,20 @@ export const Chart = () => {
   const gradientId = "gradientBlue";
 
   return (
-    <div style={{ height: 100, minWidth: 50 }}>
+    <div style={{ height: 90, minWidth: 50 }}>
       <svg style={{ height: 0 }}>
         <defs>
           <linearGradient id={gradientId} x1="0%" y1="100%" x2="0%" y2="0%">
-            <stop offset="0%" stopColor="#02496D" stopOpacity={0} />
-            <stop offset="100%" stopColor="#02496D" stopOpacity={100} />
+            <stop
+              offset="0%"
+              stopColor="var(--testsuites-graph-gradient-start)"
+              stopOpacity="var(--testsuites-graph-gradient-end-opacity)"
+            />
+            <stop
+              offset="100%"
+              stopColor="var(--testsuites-graph-gradient-end)"
+              stopOpacity={100}
+            />
           </linearGradient>
         </defs>
       </svg>

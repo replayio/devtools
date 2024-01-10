@@ -2,7 +2,6 @@ import { useContext } from "react";
 
 import { Chart } from "./Chart";
 import { TestRunsContext } from "./TestRunsContextRoot";
-import styles from "./TestRunsStats.module.css";
 
 export function TestRunsStats() {
   const { testRuns } = useContext(TestRunsContext);
@@ -16,13 +15,10 @@ export function TestRunsStats() {
   }
 
   return (
-    <div className={styles.testRunsStatsContainer}>
-      <div className={styles.chartContainer}>
+    <div className="test-runs-stats-container">
+      <div className="chart-container">
         <Chart />
-        <div
-          className={styles.failureRateDescription}
-          title={`${buildFailuresCount}/${buildsCount}`}
-        >
+        <div className="failure-rate-description" title={`${buildFailuresCount}/${buildsCount}`}>
           <b>Failure rate:</b> {(buildFailureRate * 100).toFixed(2)}%
         </div>
       </div>
