@@ -65,6 +65,9 @@
 
 .SearchResults {
   font-size: var(--font-size-small);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .ListRow {
