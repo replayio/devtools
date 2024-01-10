@@ -9,6 +9,7 @@
   border-left: 2px solid transparent;
   background-color: var(--row-background-color);
   color: var(--row-color);
+  column-gap: 0;
 }
 .Row:hover,
 .Row[data-context-menu-active] {
