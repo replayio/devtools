@@ -1,10 +1,12 @@
-import { ReactNode } from "react";
+import { ReactNode, useMemo } from "react";
 import { STATUS_PENDING, STATUS_REJECTED, useStreamingValue } from "suspense";
 
 import Icon from "replay-next/components/Icon";
-import { StreamingSearchValue } from "replay-next/src/suspense/SearchCache";
+import { SourceSearchResult, StreamingSearchValue } from "replay-next/src/suspense/SearchCache";
 
 import styles from "./SearchResults.module.css";
+
+const EMPTY_ARRAY = [] as SourceSearchResult[];
 
 export default function SearchResults({
   query,
@@ -13,7 +15,20 @@ export default function SearchResults({
   query: string;
   streaming: StreamingSearchValue;
 }) {
-  const { data, error, status } = useStreamingValue(streaming);
+  const { data, error, status, value = EMPTY_ARRAY } = useStreamingValue(streaming);
+
+  const fileCount = useMemo(() => {
+    const sourceIdSet = new Set<string>();
+    value.forEach(result => {
+      switch (result.type) {
+        case "location": {
+          sourceIdSet.add(result.location.sourceId);
+          break;
+        }
+      }
+    });
+    return sourceIdSet.size;
+  }, [value]);
 
   const didOverflow = data?.didOverflow ?? false;
   const fetchedCount = data?.fetchedCount ?? 0;
@@ -42,13 +57,13 @@ export default function SearchResults({
           }
           break;
         case 1:
-          rendered = "1 result";
+          rendered = "1 result.";
           break;
         default:
           if (didOverflow) {
-            rendered = `First ${fetchedCount} results`;
+            rendered = `First ${fetchedCount} results.`;
           } else {
-            rendered = `${fetchedCount} results`;
+            rendered = `${fetchedCount} results in ${fileCount} files.`;
           }
           break;
       }
