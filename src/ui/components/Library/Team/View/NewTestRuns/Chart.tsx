@@ -112,7 +112,7 @@ export const Chart = () => {
       </svg>
       <ResponsiveLine
         data={data}
-        markers={markers}
+        markers={markers as CartesianMarkerProps<DatumValue>[]}
         margin={{ top: 10, right: 10, bottom: 10, left: 4 }}
         axisBottom={null}
         axisLeft={null}
