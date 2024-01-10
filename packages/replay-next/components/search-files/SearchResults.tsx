@@ -53,19 +53,19 @@ export default function SearchResults({
       switch (fetchedCount) {
         case 0:
           if (query) {
-            rendered = "No results found. Review your settings for configured exclusions.";
+            rendered = "No results found. Review your settings for configured exclusions";
           }
           break;
         case 1:
-          rendered = "1 result.";
+          rendered = "1 result";
           break;
         default:
           if (didOverflow) {
-            rendered = `First ${fetchedCount} results.`;
+            rendered = `First ${fetchedCount} results`;
           } else {
             rendered = `${fetchedCount} results in ${fileCount} ${
               fileCount === 1 ? "file" : "files"
-            }.`;
+            }`;
           }
           break;
       }
