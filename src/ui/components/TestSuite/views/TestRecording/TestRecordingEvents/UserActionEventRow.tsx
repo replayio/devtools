@@ -153,12 +153,8 @@ export default memo(function UserActionEventRow({
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className={styles.Text}>
-        {eventNumber != null ? (
-          <div className="flex-none">
-            <span className={styles.Number}>{eventNumber}</span>
-          </div>
-        ) : null}
-        <div className="flex-grow">
+        {eventNumber != null ? <div className={styles.Number}>{eventNumber}</div> : null}
+        <div className={styles.Event}>
           <span
             className={`${styles.Name} ${styles.Name}`}
             data-name={command.name}
@@ -172,11 +168,9 @@ export default memo(function UserActionEventRow({
         </div>
       </div>
       {showBadge && (
-        <div className="flex-none">
-          <Suspense fallback={<Loader />}>
-            <Badge isSelected={isSelected} timeStampedPoint={resultPoint} />
-          </Suspense>
-        </div>
+        <Suspense fallback={<Loader />}>
+          <Badge isSelected={isSelected} timeStampedPoint={resultPoint} />
+        </Suspense>
       )}
       {showJumpToCode && jumpToCodeAnnotation && (
         <div className={styles.JumpToCodeButton}>
