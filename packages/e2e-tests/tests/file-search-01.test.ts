@@ -18,6 +18,14 @@ test("file-search-01: should search files", async ({ pageWithMeta: { page, recor
   await openDevToolsTab(page);
   await openFileSearchPanel(page);
 
+  // Verify message shown at first
+  await verifySourceSearchSummary(page, "");
+
+  // Verify overflow message
+  await searchSources(page, "a");
+  await verifySourceSearchOverflowMessageShown(page, true);
+  await verifySourceSearchSummary(page, "First 1000 results.");
+
   // Verify search results for the string "test"
   await searchSources(page, "test");
   await verifySourceSearchOverflowMessageShown(page, false);
