@@ -135,7 +135,7 @@ export default memo(function UserActionEventRow({
         }
 
         if (event === userActionEvent) {
-          return eventNumber;
+          return eventNumber < 10 ? `0${eventNumber}` : eventNumber;
         }
       }
     }
@@ -153,22 +153,30 @@ export default memo(function UserActionEventRow({
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className={styles.Text}>
-        {eventNumber != null ? <span className={styles.Number}>{eventNumber}</span> : null}
-        <span
-          className={`${styles.Name} ${styles.Name}`}
-          data-name={command.name}
-          title={command.name}
-        >
-          {command.name}
-        </span>{" "}
-        <span className={`${styles.Args} ${styles.Args}`} title={argsString}>
-          {argsString}
-        </span>
+        {eventNumber != null ? (
+          <div className="flex-none">
+            <span className={styles.Number}>{eventNumber}</span>
+          </div>
+        ) : null}
+        <div className="flex-grow">
+          <span
+            className={`${styles.Name} ${styles.Name}`}
+            data-name={command.name}
+            title={command.name}
+          >
+            {command.name}
+          </span>{" "}
+          <span className={`${styles.Args} ${styles.Args}`} title={argsString}>
+            {argsString}
+          </span>
+        </div>
       </div>
       {showBadge && (
-        <Suspense fallback={<Loader />}>
-          <Badge isSelected={isSelected} timeStampedPoint={resultPoint} />
-        </Suspense>
+        <div className="flex-none">
+          <Suspense fallback={<Loader />}>
+            <Badge isSelected={isSelected} timeStampedPoint={resultPoint} />
+          </Suspense>
+        </div>
       )}
       {showJumpToCode && jumpToCodeAnnotation && (
         <div className={styles.JumpToCodeButton}>

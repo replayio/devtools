@@ -52,6 +52,7 @@
 }
 
 .Text {
+  display: flex;
   flex: 1;
 }
 
