@@ -10,8 +10,8 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Nag } from "shared/graphql/types";
 
 import Icon, { IconType } from "../Icon";
-import InlineResultsCount from "./InlineResultsCount";
 import ResultsList from "./ResultsList";
+import SearchResults from "./SearchResults";
 import styles from "./SearchFiles.module.css";
 
 export const SHOW_GLOBAL_SEARCH_EVENT_TYPE = "show-global-search";
@@ -139,9 +139,6 @@ export default function SearchFiles({ limit }: { limit?: number }) {
             type="text"
             value={queryForDisplay}
           />
-          <Suspense>
-            <InlineResultsCount streaming={streaming} />
-          </Suspense>
           <FilterButton
             active={caseSensitive}
             toggle={() => setCaseSensitive(!caseSensitive)}
@@ -208,6 +205,9 @@ export default function SearchFiles({ limit }: { limit?: number }) {
             tooltip="Exclude Node Modules"
           />
         </div>
+        <Suspense>
+          <SearchResults query={queryForSearch} streaming={streaming} />
+        </Suspense>
         <Suspense>
           <ResultsList query={queryForSearch} streaming={streaming} />
         </Suspense>

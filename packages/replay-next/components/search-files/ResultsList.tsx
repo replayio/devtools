@@ -49,11 +49,7 @@ export default function ResultsList({
   );
 
   if (status === STATUS_RESOLVED && orderedResults.length === 0) {
-    return (
-      <div className={styles.Results}>
-        <div className={styles.NoResults}>No results found</div>
-      </div>
-    );
+    return null;
   }
 
   return (

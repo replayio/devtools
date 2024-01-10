@@ -11,11 +11,6 @@
   opacity: 0.5;
 }
 
-.NoResults {
-  padding: 0 0.5rem;
-  color: var(--color-dim);
-}
-
 .List {
   overflow: hidden;
   flex: 1 1 auto;

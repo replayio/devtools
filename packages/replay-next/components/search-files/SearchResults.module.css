@@ -4,7 +4,7 @@
   color: var(--color-dim);
   font-size: var(--font-size-small);
   user-select: none;
-  margin-right: 0.5rem;
+  padding: 0 0.5rem;
 }
 .ResultsCountPending {
   opacity: 0.5;

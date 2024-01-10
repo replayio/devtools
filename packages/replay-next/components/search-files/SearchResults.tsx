@@ -4,9 +4,15 @@ import { STATUS_PENDING, STATUS_REJECTED, useStreamingValue } from "suspense";
 import Icon from "replay-next/components/Icon";
 import { StreamingSearchValue } from "replay-next/src/suspense/SearchCache";
 
-import styles from "./InlineResultsCount.module.css";
+import styles from "./SearchResults.module.css";
 
-export default function InlineResultsCount({ streaming }: { streaming: StreamingSearchValue }) {
+export default function SearchResults({
+  query,
+  streaming,
+}: {
+  query: string;
+  streaming: StreamingSearchValue;
+}) {
   const { data, error, status } = useStreamingValue(streaming);
 
   const didOverflow = data?.didOverflow ?? false;
@@ -31,14 +37,16 @@ export default function InlineResultsCount({ streaming }: { streaming: Streaming
     default: {
       switch (fetchedCount) {
         case 0:
-          rendered = "No matches";
+          if (query) {
+            rendered = "No results found. Review your settings for configured exclusions.";
+          }
           break;
         case 1:
           rendered = "1 result";
           break;
         default:
           if (didOverflow) {
-            rendered = `first ${fetchedCount} results`;
+            rendered = `First ${fetchedCount} results`;
           } else {
             rendered = `${fetchedCount} results`;
           }
