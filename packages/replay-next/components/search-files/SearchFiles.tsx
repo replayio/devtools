@@ -1,4 +1,4 @@
-import { ChangeEvent, Suspense, useContext, useEffect, useRef, useState } from "react";
+import { ChangeEvent, MouseEvent, Suspense, useContext, useEffect, useRef, useState } from "react";
 import { STATUS_REJECTED, useStreamingValue } from "suspense";
 
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
@@ -102,6 +102,22 @@ export default function SearchFiles({ limit }: { limit?: number }) {
     };
   }, [dismissSearchSourceTextNag]);
 
+  const onInputContainerClick = (event: MouseEvent) => {
+    if (event.defaultPrevented) {
+      return;
+    }
+
+    const input = event.currentTarget.querySelector("input");
+    if (input) {
+      input.focus();
+      input.select();
+    }
+  };
+
+  const onInputClick = (event: MouseEvent) => {
+    event.preventDefault();
+  };
+
   return (
     <div className={styles.SearchFiles} data-test-id="FileSearch-Pane">
       <div className={styles.Content}>
@@ -109,6 +125,7 @@ export default function SearchFiles({ limit }: { limit?: number }) {
           className={styles.InputWrapper}
           data-error={didError || undefined}
           data-test-id="SearchFiles-SearchInput"
+          onClick={onInputContainerClick}
         >
           <Icon className={styles.Icon} type="search" />
           <input
@@ -116,6 +133,7 @@ export default function SearchFiles({ limit }: { limit?: number }) {
             className={styles.Input}
             data-test-id="FileSearch-Input"
             onChange={onChange(setQueryForDisplay)}
+            onClick={onInputClick}
             placeholder="Find in files..."
             ref={inputRef}
             type="text"
@@ -147,12 +165,14 @@ export default function SearchFiles({ limit }: { limit?: number }) {
           className={styles.InputWrapper}
           data-error={didError || undefined}
           data-test-id="IncludeFiles-SearchInput"
+          onClick={onInputContainerClick}
         >
           <Icon className={styles.Icon} type="folder-open" />
           <input
             className={styles.Input}
             data-test-id="FileInclude-Input"
             onChange={onChange(setIncludedFiles)}
+            onClick={onInputClick}
             placeholder="Files to include..."
             type="text"
             value={includedFiles}
@@ -168,12 +188,14 @@ export default function SearchFiles({ limit }: { limit?: number }) {
           className={styles.InputWrapper}
           data-error={didError || undefined}
           data-test-id="ExcludeFiles-SearchInput"
+          onClick={onInputContainerClick}
         >
           <Icon className={styles.Icon} type="folder-closed" />
           <input
             className={styles.Input}
             data-test-id="FileExclude-Input"
             onChange={onChange(setExcludedFiles)}
+            onClick={onInputClick}
             placeholder="Files to exclude..."
             type="text"
             value={excludedFiles}
