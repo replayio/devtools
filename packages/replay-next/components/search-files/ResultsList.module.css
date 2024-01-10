@@ -15,23 +15,3 @@
   overflow: hidden;
   flex: 1 1 auto;
 }
-
-.OverflowHeader {
-  display: flex;
-  padding: 0 0.5rem;
-  color: var(--color-dim);
-  font-size: var(--font-size-small);
-  background-color: var(--background-color-source-search);
-  border-top: 1px solid var(--border-color-source-search);
-  border-bottom: 1px solid var(--border-color-source-search);
-  padding: 0.5rem;
-  margin-bottom: 0.5rem;
-}
-
-.OverflowIcon {
-  flex: 0 0 0.75rem;
-  width: 0.75rem;
-  height: 0.75rem;
-  color: var(--color-warning);
-  margin-right: 1ch;
-}

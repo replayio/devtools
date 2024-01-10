@@ -73,12 +73,20 @@ export default function SearchResults({
   const isPending = status === STATUS_PENDING;
 
   return (
-    <div
-      className={isPending ? styles.ResultsCountPending : styles.ResultsCount}
-      data-test-id="SearchFiles-SummaryLabel"
-      data-test-state={isPending ? "pending" : "complete"}
-    >
-      {rendered}
-    </div>
+    <>
+      <div
+        className={isPending ? styles.ResultsCountPending : styles.ResultsCount}
+        data-test-id="SearchFiles-SummaryLabel"
+        data-test-state={isPending ? "pending" : "complete"}
+      >
+        {rendered}
+      </div>
+      {didOverflow && (
+        <div className={styles.OverflowHeader} data-test-id="SourceSearch-OverflowMessage">
+          <Icon className={styles.OverflowIcon} type="warning" /> The result set only contains a
+          subset of all matches. Be more specific in your search to narrow down the results.
+        </div>
+      )}
+    </>
   );
 }
