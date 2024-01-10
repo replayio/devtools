@@ -523,6 +523,13 @@
   --testsuites-v2-error-bg: var(--testsuites-error-bgcolor);
   --circular-progress-bar-trail-color: var(--testsuites-steps-bgcolor);
 
+  --testsuites-chart-container: var(--theme-base-100);
+  --testsuites-graph-gradient-start: #02496d;
+  --testsuites-graph-gradient-end: #02496d;
+  --testsuites-graph-gradient-end-opacity: 0;
+  --testsuites-graph-gradient-stroke: var(--primary-accent);
+  --testsuites-graph-marker: var(--primary-accent-dimmed);
+
   /* DevTools header (Dark) */
   --theme-toggle-bgcolor: var(--theme-base-85);
   --theme-toggle-color: white;
@@ -1067,6 +1074,13 @@
   --testsuites-v2-description: var(--secondary-accent);
   --testsuites-v2-error-bg: var(--testsuites-error-bgcolor);
   --circular-progress-bar-trail-color: var(--testsuites-steps-bgcolor);
+
+  --testsuites-chart-container: var(--theme-text-field-bgcolor);
+  --testsuites-graph-gradient-start: var(--primary-accent-dimmed);
+  --testsuites-graph-gradient-end: var(--primary-accent-dimmed);
+  --testsuites-graph-gradient-end-opacity: 100;
+  --testsuites-graph-gradient-stroke: var(--primary-accent);
+  --testsuites-graph-marker: var(--theme-base-85);
 
   /* DevTools header (Light) */
 
