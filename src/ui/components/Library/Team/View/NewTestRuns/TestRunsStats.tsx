@@ -2,6 +2,7 @@ import { useContext } from "react";
 
 import { Chart } from "./Chart";
 import { TestRunsContext } from "./TestRunsContextRoot";
+import styles from "./TestRunsStats.module.css";
 
 export function TestRunsStats() {
   const { testRuns } = useContext(TestRunsContext);
@@ -15,11 +16,14 @@ export function TestRunsStats() {
   }
 
   return (
-    <div className="flex flex-col gap-2 text-sm">
-      <div className="flex flex-col overflow-auto rounded-lg bg-chrome p-4">
+    <div className={styles.testRunsStatsContainer}>
+      <div className={styles.chartContainer}>
         <Chart />
-        <div className="truncate" title={`${buildFailuresCount}/${buildsCount}`}>
-          Failure rate: {(buildFailureRate * 100).toFixed(2)}%
+        <div
+          className={styles.failureRateDescription}
+          title={`${buildFailuresCount}/${buildsCount}`}
+        >
+          <b>Failure rate:</b> {(buildFailureRate * 100).toFixed(2)}%
         </div>
       </div>
     </div>
