@@ -63,7 +63,9 @@ export default function SearchResults({
           if (didOverflow) {
             rendered = `First ${fetchedCount} results.`;
           } else {
-            rendered = `${fetchedCount} results in ${fileCount} files.`;
+            rendered = `${fetchedCount} results in ${fileCount} ${
+              fileCount === 1 ? "file" : "files"
+            }.`;
           }
           break;
       }

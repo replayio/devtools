@@ -21,7 +21,7 @@ test("file-search-01: should search files", async ({ pageWithMeta: { page, recor
   // Verify search results for the string "test"
   await searchSources(page, "test");
   await verifySourceSearchOverflowMessageShown(page, false);
-  await verifySourceSearchSummary(page, "21 results");
+  await verifySourceSearchSummary(page, "21 results in 1 file.");
   await verifyVisibleResultsCount(page, 25); // 21 results in 4 different files
 
   // Verify files can be collapsed
@@ -36,7 +36,7 @@ test("file-search-01: should search files", async ({ pageWithMeta: { page, recor
   // Now include node_modules in the search
   await toggleExcludeNodeModulesCheckbox(page, false);
   await verifySourceSearchOverflowMessageShown(page, false);
-  await verifySourceSearchSummary(page, "25 results");
+  await verifySourceSearchSummary(page, "25 results in 1 file.");
   await verifyVisibleResultsCount(page, 31); // 25 results in 6 different files
 
   // Collapse the first few results
