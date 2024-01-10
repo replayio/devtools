@@ -93,7 +93,7 @@ export const Chart = () => {
   const gradientId = "gradientBlue";
 
   return (
-    <div style={{ height: 88, minWidth: 50 }}>
+    <div style={{ height: 90, minWidth: 50 }}>
       <svg style={{ height: 0 }}>
         <defs>
           <linearGradient id={gradientId} x1="0%" y1="100%" x2="0%" y2="0%">
