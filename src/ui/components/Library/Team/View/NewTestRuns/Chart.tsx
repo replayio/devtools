@@ -1,3 +1,4 @@
+import { CartesianMarkerProps } from "@nivo/core";
 import { Point } from "@nivo/line";
 import groupBy from "lodash/groupBy";
 import dynamic from "next/dynamic";
@@ -65,7 +66,7 @@ export const Chart = () => {
     ) : null,
   });
 
-  const markers = [
+  const markers: CartesianMarkerProps[] = [
     {
       axis: "y",
       value: 100,
@@ -152,7 +153,6 @@ export const Chart = () => {
         }}
         theme={{ text: { fill: "var(--body-color)" } }}
         colors={{ datum: "color" }}
-        areaColor={{ from: "color", modifiers: [] }}
         areaBaselineValue={0}
         // Reference the gradient for the area color
         areaBlendMode="normal"
