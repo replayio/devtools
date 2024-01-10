@@ -144,8 +144,9 @@ function TeamBillingButton() {
   const currentWorkspaceId = useGetTeamIdFromRoute();
 
   const router = useRouter();
-  const onClick = () => {
-    router.push(`/team/${currentWorkspaceId}/settings/billing`);
+  const onClick = async () => {
+    await router.push(`/team/${currentWorkspaceId}/settings/billing`);
+    dispatch(clearExpectedError());
     dispatch(setModal("workspace-settings"));
   };
 

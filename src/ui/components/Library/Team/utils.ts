@@ -2,6 +2,8 @@ import { ParsedUrlQuery } from "querystring";
 import { NextRouter, useRouter } from "next/router";
 
 import { View } from "ui/components/Library/Team/View/ViewContextRoot";
+import { getRecordingWorkspace } from "ui/reducers/app";
+import { useAppSelector } from "ui/setup/hooks";
 
 export function parseQueryParams(query: ParsedUrlQuery) {
   const [teamId, view, testRunId] = Array.isArray(query.param) ? query.param : [query.param!];
@@ -16,8 +18,17 @@ export function useGetTeamRouteParams() {
 }
 
 export function useGetTeamIdFromRoute() {
-  const params = useGetTeamRouteParams();
-  return params.teamId;
+  const { query, route } = useRouter();
+  const workspace = useAppSelector(getRecordingWorkspace);
+
+  if (route.startsWith("/team/")) {
+    const params = parseQueryParams(query);
+    return params.teamId;
+  }
+  if (workspace) {
+    return workspace.id;
+  }
+  return "me";
 }
 
 export function useRedirectToTeam(replace: boolean = false) {
