@@ -21,12 +21,7 @@ import { UIThunkAction } from "ui/actions";
 import * as actions from "ui/actions/app";
 import { getRecording } from "ui/hooks/recordings";
 import { getUserId, getUserInfo } from "ui/hooks/users";
-import {
-  clearExpectedError,
-  getExpectedError,
-  getUnexpectedError,
-  setTrialExpired,
-} from "ui/reducers/app";
+import { clearExpectedError, getExpectedError, getUnexpectedError } from "ui/reducers/app";
 import { getToolboxLayout } from "ui/reducers/layout";
 import {
   ProtocolEvent,
@@ -176,7 +171,15 @@ export function createSocket(recordingId: string): UIThunkAction {
         recording.workspace &&
         subscriptionExpired(recording.workspace, new Date(recording.date))
       ) {
-        return dispatch(setTrialExpired());
+        dispatch(
+          setExpectedError({
+            message: "Free Trial Expired",
+            content:
+              "This replay is unavailable because it was recorded after your team's free trial expired.",
+            action: recording.userRole !== "team-admin" ? "library" : "team-billing",
+          })
+        );
+        return;
       }
 
       const experimentalSettings: ExperimentalSettings = {
@@ -375,8 +378,4 @@ export function onUploadedData({ uploaded, length }: uploadedData): UIThunkActio
     const lengthMB = length ? (length / (1024 * 1024)).toFixed(2) : undefined;
     dispatch(actions.setUploading({ total: lengthMB, amount: uploadedMB }));
   };
-}
-
-export function clearTrialExpired() {
-  return setTrialExpired(false);
 }

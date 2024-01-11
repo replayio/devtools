@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import { ReactNode, useState } from "react";
 
-import { setModal } from "ui/actions/app";
+import { clearExpectedError, setModal } from "ui/actions/app";
 import { setExpectedError } from "ui/actions/errors";
 import { useGetTeamIdFromRoute } from "ui/components/Library/Team/utils";
 import { PrimaryButton } from "ui/components/shared/Button";
@@ -123,10 +123,12 @@ function RequestRecordingAccessButton() {
 
 function SignInButton() {
   const router = useRouter();
+  const dispatch = useAppDispatch();
 
-  const onClick = () => {
+  const onClick = async () => {
     const returnToPath = window.location.pathname + window.location.search;
-    router.push({ pathname: "/login", query: { returnTo: returnToPath } });
+    await router.push({ pathname: "/login", query: { returnTo: returnToPath } });
+    dispatch(clearExpectedError());
   };
 
   return (
@@ -142,8 +144,9 @@ function TeamBillingButton() {
   const currentWorkspaceId = useGetTeamIdFromRoute();
 
   const router = useRouter();
-  const onClick = () => {
-    router.push(`/team/${currentWorkspaceId}/settings/billing`);
+  const onClick = async () => {
+    await router.push(`/team/${currentWorkspaceId}/settings/billing`);
+    dispatch(clearExpectedError());
     dispatch(setModal("workspace-settings"));
   };
 

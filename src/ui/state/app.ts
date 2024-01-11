@@ -98,7 +98,6 @@ export interface AppState {
   recordingWorkspace: Workspace | null;
   selectedCommentId: string | null;
   sessionId: SessionId | null;
-  trialExpired: boolean;
   unexpectedError: UnexpectedError | null;
   uploading: UploadInfo | null;
   videoUrl: string | null;

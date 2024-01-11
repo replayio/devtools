@@ -1,16 +1,13 @@
 import assert from "assert";
-import { ExecutionPoint, TimeStampedPoint } from "@replayio/protocol";
-import { ReactNode, useContext, useMemo, useTransition } from "react";
+import { TimeStampedPoint, TimeStampedPointRange } from "@replayio/protocol";
+import { ReactNode, useContext, useMemo } from "react";
 
 import { highlightNodes, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 import Icon from "replay-next/components/Icon";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
-import {
-  isExecutionPointsGreaterThan,
-  isExecutionPointsLessThan,
-} from "replay-next/src/utils/time";
+import { isExecutionPointsGreaterThan } from "replay-next/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import {
   TestEvent,
@@ -18,10 +15,10 @@ import {
   TestSectionName,
   getTestEventTime,
   getTestEventTimeStampedPoint,
+  getUserActionEventRange,
   isUserActionTestEvent,
 } from "shared/test-suites/RecordingTestMetadata";
-import { isPointInRegion } from "shared/utils/time";
-import { requestFocusWindow, seek, setHoverTime } from "ui/actions/timeline";
+import { extendFocusWindowIfNecessary, seek, setHoverTime } from "ui/actions/timeline";
 import { TestSuiteCache } from "ui/components/TestSuite/suspense/TestSuiteCache";
 import { useTestEventContextMenu } from "ui/components/TestSuite/views/TestRecording/useTestEventContextMenu";
 import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext";
@@ -126,50 +123,26 @@ export function TestSectionRow({
   const onClick = async () => {
     setTestEvent(testEvent);
 
-    let executionPoint: ExecutionPoint | null = null;
-    let time: number | null = null;
+    let timeStampedPoint: TimeStampedPoint | null = null;
+    let testEventRange: TimeStampedPointRange | null = null;
 
     if (isUserActionTestEvent(testEvent)) {
-      const timeStampedPoint = testEvent.data.timeStampedPoints.beforeStep ?? null;
-      if (timeStampedPoint) {
-        executionPoint = timeStampedPoint.point;
-        time = timeStampedPoint.time;
-      }
+      timeStampedPoint = testEvent.data.timeStampedPoints.beforeStep ?? null;
+      testEventRange = getUserActionEventRange(testEvent);
     } else {
-      executionPoint = testEvent.timeStampedPoint.point;
-      time = testEvent.timeStampedPoint.time;
+      timeStampedPoint = testEvent.timeStampedPoint;
+      testEventRange = {
+        begin: timeStampedPoint,
+        end: timeStampedPoint,
+      };
     }
 
-    // It's possible that this step is outside of the current focus window
-    // In order to show details below, we need to adjust the focus window
-    // See FE-1756
-    if (executionPoint !== null && time !== null) {
-      if (focusWindow && !isPointInRegion(executionPoint, focusWindow)) {
-        const timeStampedPoint = { point: executionPoint, time };
-        if (isExecutionPointsLessThan(executionPoint, focusWindow.begin.point)) {
-          await dispatch(
-            requestFocusWindow(
-              {
-                begin: timeStampedPoint,
-                end: focusWindow.end,
-              },
-              "begin"
-            )
-          );
-        } else {
-          await dispatch(
-            requestFocusWindow(
-              {
-                begin: focusWindow.begin,
-                end: timeStampedPoint,
-              },
-              "end"
-            )
-          );
-        }
-      }
-
-      await dispatch(seek({ executionPoint, openSource: false, time }));
+    if (timeStampedPoint && testEventRange) {
+      // It's possible that this step is outside of the current focus window
+      // In order to show details below, we need to adjust the focus window
+      // See FE-1756
+      await dispatch(extendFocusWindowIfNecessary(testEventRange));
+      await dispatch(seek({ ...timeStampedPoint, openSource: false }));
     }
   };
 
