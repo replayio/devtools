@@ -90,7 +90,7 @@ function run_fe_tests(CHROME_BINARY_PATH) {
   ];
 
   execSync(
-    `xvfb-run ./packages/e2e-tests/scripts/save-examples.ts --runtime=chromium --project=replay-chromium-local`,
+    `xvfb-run ./packages/e2e-tests/scripts/save-examples.ts --runtime=chromium --target=browser --project=replay-chromium-local`,
     { stdio: "inherit", env: process.env }
   );
 
