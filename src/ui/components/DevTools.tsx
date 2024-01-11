@@ -22,7 +22,7 @@ import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData"
 import { userData } from "shared/user-data/GraphQL/UserData";
 import { setAccessToken } from "ui/actions/app";
 import { setShowSupportForm } from "ui/actions/layout";
-import { clearTrialExpired, createSocket } from "ui/actions/session";
+import { createSocket } from "ui/actions/session";
 import { DevToolsDynamicLoadingMessage } from "ui/components/DevToolsDynamicLoadingMessage";
 import { DevToolsProcessingScreen } from "ui/components/DevToolsProcessingScreen";
 import { NodePickerContextRoot } from "ui/components/NodePickerContext";
@@ -146,7 +146,6 @@ function Body() {
 
 function _DevTools({
   apiKey,
-  clearTrialExpired,
   createSocket,
   loadingFinished,
   sessionId,
@@ -222,11 +221,7 @@ function _DevTools({
       .catch(() => {
         console.error("Failed to create session");
       });
-
-    return () => {
-      clearTrialExpired();
-    };
-  }, [dispatch, isAuthenticated, clearTrialExpired, createSocket, recordingId]);
+  }, [dispatch, isAuthenticated, createSocket, recordingId]);
 
   useEffect(() => {
     if (uploadComplete && loadingFinished) {
@@ -318,7 +313,6 @@ const connector = connect(
   }),
   {
     createSocket,
-    clearTrialExpired,
   }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;

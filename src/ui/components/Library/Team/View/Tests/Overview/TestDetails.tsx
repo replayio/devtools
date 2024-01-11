@@ -21,7 +21,7 @@ export function TestDetails({ testRuns }: { testRuns: GroupedTestRun[] }) {
   }
 
   return (
-    <div className="flex flex-col gap-1 p-2">
+    <div className="flex flex-col gap-2 py-2">
       {sortedTestRuns.map((t: any) => (
         <TestRun testRun={t} key={t.testRunId} />
       ))}
@@ -41,7 +41,7 @@ function TestRun({ testRun }: { testRun: GroupedTestRun }) {
   const sortedExecutions = orderBy(executionsWithReplays, "createdAt", "desc");
 
   return (
-    <div className="flex flex-col rounded-md bg-chrome">
+    <div className="flex flex-col">
       {sortedExecutions.map((e, i) => (
         <Execution execution={e} key={i} />
       ))}
@@ -77,12 +77,12 @@ export function Replay({
   result: string;
   attemptNumber: number;
 }) {
-  const title = attemptNumber === 1 ? "Initial attempt" : `Attempt ${attemptNumber}`;
+  const title = `Attempt ${attemptNumber}`;
 
   return (
     <a
       href={`/recording/${recording.id}`}
-      className="flex flex-row gap-2 border-b border-bodyBgcolor py-1 px-4"
+      className="flex flex-row gap-2 pr-4 pl-8"
       onClick={() => trackEvent("test_dashboard.open_replay", { view: "tests", result })}
     >
       <div className="flex flex-row items-center gap-2 overflow-hidden">

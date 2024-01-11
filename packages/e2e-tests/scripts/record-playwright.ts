@@ -66,6 +66,7 @@ export async function recordPlaywright(
     await page.close();
     await context.close();
     await browser.close();
+    await browserServer.close();
   }
 }
 

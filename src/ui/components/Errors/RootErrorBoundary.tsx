@@ -1,4 +1,3 @@
-import { useRouter } from "next/router";
 import { ErrorInfo } from "react";
 import { ErrorBoundary, ErrorBoundaryProps } from "react-error-boundary";
 
@@ -21,7 +20,6 @@ export function RootErrorBoundary({
 }: Omit<ErrorBoundaryProps, "fallback" | "fallbackRender" | "FallbackComponent" | "resetKeys"> & {
   name: string;
 }) {
-  const { pathname } = useRouter();
   const expectedError = useAppSelector(getExpectedError);
   const unexpectedError = useAppSelector(getUnexpectedError);
   const dispatch = useAppDispatch();
@@ -46,7 +44,7 @@ export function RootErrorBoundary({
     }
   };
 
-  if (expectedError && pathname !== "/login") {
+  if (expectedError) {
     return (
       <ExpectedErrorModal
         action={expectedError.action ?? "refresh"}

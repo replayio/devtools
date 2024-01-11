@@ -39,7 +39,6 @@ export const initialAppState: AppState = {
   recordingWorkspace: null,
   selectedCommentId: null,
   sessionId: null,
-  trialExpired: false,
   unexpectedError: null,
   uploading: null,
   videoUrl: null,
@@ -76,9 +75,6 @@ const appSlice = createSlice({
       state.expectedError = null;
       state.modal = null;
       state.modalOptions = null;
-    },
-    setTrialExpired(state, action: PayloadAction<boolean | undefined>) {
-      state.trialExpired = action.payload ?? true;
     },
     setSessionId(state, action: PayloadAction<string>) {
       state.sessionId = action.payload;
@@ -150,7 +146,6 @@ export const {
   setRecordingTarget,
   setRecordingWorkspace,
   setSessionId,
-  setTrialExpired,
   setUnexpectedError,
   setUploading,
   setVideoUrl,
@@ -175,7 +170,6 @@ export const getAwaitingSourcemaps = (state: UIState) => state.app.awaitingSourc
 export const getSessionId = (state: UIState) => state.app.sessionId;
 export const getExpectedError = (state: UIState) => state.app.expectedError;
 export const getUnexpectedError = (state: UIState) => state.app.unexpectedError;
-export const getTrialExpired = (state: UIState) => state.app.trialExpired;
 export const getModal = (state: UIState) => state.app.modal;
 export const getModalOptions = (state: UIState) => state.app.modalOptions;
 export const getHoveredCommentId = (state: UIState) => state.app.hoveredCommentId;

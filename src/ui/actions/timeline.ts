@@ -54,7 +54,7 @@ import {
   isTest,
   updateUrlWithParams,
 } from "shared/utils/environment";
-import { isPointInRegion } from "shared/utils/time";
+import { isPointInRegion, maxTimeStampedPoint, minTimeStampedPoint } from "shared/utils/time";
 import { getFirstComment } from "ui/hooks/comments/comments";
 import { getPreferredLocation, getSelectedLocation } from "ui/reducers/sources";
 import {
@@ -629,6 +629,26 @@ export function setDisplayedFocusWindow(
     }
 
     dispatch(newFocusWindow({ begin, end }));
+  };
+}
+
+export function extendFocusWindowIfNecessary(
+  focusWindow: TimeStampedPointRange
+): UIThunkAction<Promise<void>> {
+  return async (dispatch, getState, { replayClient }) => {
+    const currentFocusWindow = replayClient.getCurrentFocusWindow();
+    assert(currentFocusWindow);
+    if (
+      isPointInRegion(focusWindow.begin.point, currentFocusWindow) &&
+      isPointInRegion(focusWindow.end.point, currentFocusWindow)
+    ) {
+      return;
+    }
+
+    const begin = minTimeStampedPoint([focusWindow.begin, currentFocusWindow.begin])!;
+    const end = maxTimeStampedPoint([focusWindow.end, currentFocusWindow.end])!;
+    const bias = begin.point !== currentFocusWindow.begin.point ? "begin" : "end";
+    await dispatch(requestFocusWindow({ begin, end }, bias));
   };
 }
 

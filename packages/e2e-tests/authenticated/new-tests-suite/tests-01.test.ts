@@ -104,7 +104,7 @@ test(`authenticated/new-test-suites/tests-01: basic tests`, async ({ pageWithMet
 
   //#region >>> Replay list
   expect(await executionItem.locator('[data-test-id="ReplayTitle"]').nth(1).innerText()).toContain(
-    "Initial attempt"
+    "Attempt 1"
   );
   expect(await executionItem.locator('[data-test-id="ReplayTitle"]').nth(0).innerText()).toContain(
     "Attempt 2"

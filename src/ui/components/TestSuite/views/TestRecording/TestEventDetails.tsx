@@ -25,7 +25,11 @@ export default function TestEventDetails({ collapsed }: { collapsed: boolean }) 
 
   return (
     <InlineErrorBoundary name="TestEventDetails">
-      <UserEventDetailsComponent testEvent={testEvent} testEventPending={testEventPending} />
+      <UserEventDetailsComponent
+        key={testEvent.data.id}
+        testEvent={testEvent}
+        testEventPending={testEventPending}
+      />
     </InlineErrorBoundary>
   );
 }

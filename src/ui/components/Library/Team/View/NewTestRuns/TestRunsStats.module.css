@@ -1,4 +1,23 @@
-.failureRate {
-  color: var(--testsuites-v2-failed-header);
-  font-weight: bold;
+.testRunsStatsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.chartContainer {
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  border-radius: 0.375rem;
+  background-color: var(--testsuites-chart-container);
+  padding: 0.5rem;
+}
+
+.failureRateDescription {
+  margin-left: 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 12px;
 }
