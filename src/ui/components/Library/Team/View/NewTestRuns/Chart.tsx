@@ -7,6 +7,7 @@ import { useContext, useMemo, useState } from "react";
 import useTooltip from "replay-next/src/hooks/useTooltip";
 import { TestRun } from "shared/test-suites/TestRun";
 
+import { TimeFilterContext } from "../TimeFilterContextRoot";
 import { TestRunsContext } from "./TestRunsContextRoot";
 
 // Workaround for import issues, see https://github.com/plouc/nivo/issues/2310#issuecomment-1552663752
@@ -22,21 +23,24 @@ const generateDateString = (date: string) => {
   return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
 };
 
-function generateChartData(testRuns: TestRun[]) {
+function generateChartData(testRuns: TestRun[], days: number) {
   const groupedRuns = groupBy(
     testRuns.map(r => ({ ...r, _date: generateDateString(r.date) })),
     "_date"
   );
 
-  const sortedDates = Object.keys(groupedRuns).sort(
-    (a, b) => new Date(a).getTime() - new Date(b).getTime()
-  );
+  const displayedDates = [];
+  for (let i = 0; i < days; i++) {
+    const d = new Date(new Date().getTime() - i * (24 * 60 * 60 * 1000));
 
-  const displayedDates = sortedDates.length === 8 ? sortedDates.slice(1) : sortedDates;
+    displayedDates.unshift(generateDateString(d.toISOString()));
+  }
 
   const sortedData = displayedDates.reduce((acc, date) => {
     const runs = groupedRuns[date];
-    const failureRate = (runs.filter(r => r.results.counts.failed > 0).length / runs.length) * 100;
+    const failureRate = runs
+      ? (runs.filter(r => r.results.counts.failed > 0).length / runs.length) * 100
+      : 0;
 
     // Format the dates like MM/DD
     acc.push({ x: date.split("-").slice(1).join("/"), y: failureRate });
@@ -54,7 +58,9 @@ function generateChartData(testRuns: TestRun[]) {
 
 export const Chart = () => {
   const { testRuns } = useContext(TestRunsContext);
-  const data = useMemo(() => generateChartData(testRuns), [testRuns]);
+  const { startTime, endTime } = useContext(TimeFilterContext);
+  const days = (endTime.getTime() - startTime.getTime()) / 1000 / 60 / 60 / 24;
+  const data = useMemo(() => generateChartData(testRuns, days), [testRuns, days]);
   const [hoveredPoint, setHoveredPoint] = useState<Point | null>(null);
 
   const { onMouseEnter, onMouseLeave, tooltip } = useTooltip({
