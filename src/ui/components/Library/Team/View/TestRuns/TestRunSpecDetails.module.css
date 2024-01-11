@@ -39,7 +39,7 @@
 
 .errorToggleButton {
   display: flex;
-  align-items: flex-start;
+  align-items: center; /* Changed from flex-start to center */
   justify-content: space-between;
   gap: 0.25rem;
 }
