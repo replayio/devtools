@@ -171,7 +171,7 @@ const knownExamples: TestExampleFile[] = [
     filename: "doc_navigate.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_prod_bundle.html",
