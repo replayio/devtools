@@ -5,20 +5,11 @@ import { GroupedTestRun } from "shared/test-suites/TestRun";
 import { trackEvent } from "ui/utils/telemetry";
 import { testFailed, testPassed } from "ui/utils/testRuns";
 
-import { TestSuitePanelMessage } from "../../TestSuitePanelMessage";
 import { Execution } from "./Execution";
 import { StatusIcon } from "./StatusIcon";
 
 export function TestDetails({ testRuns }: { testRuns: GroupedTestRun[] }) {
   const sortedTestRuns = orderBy(testRuns, "date", "desc");
-
-  if (!sortedTestRuns.length) {
-    return (
-      <div className="flex flex-col gap-1 p-2">
-        <TestSuitePanelMessage>No test runs found</TestSuitePanelMessage>;
-      </div>
-    );
-  }
 
   return (
     <div className="flex flex-col gap-2 py-2">
