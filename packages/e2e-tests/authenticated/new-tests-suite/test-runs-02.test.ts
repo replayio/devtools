@@ -67,8 +67,8 @@ test(`authenticated/new-test-suites/test-runs-02: failed run in temp branch with
   const flakyPillCount = testRunSummary(page).locator('[data-test-id="Pill-flaky"]');
   const successPillCount = testRunSummary(page).locator('[data-test-id="Pill-success"]');
   expect(await failedPillCount.innerText()).toBe("2");
-  expect(await flakyPillCount.innerText()).toBe("2");
-  expect(await successPillCount.innerText()).toBe("3");
+  expect(await flakyPillCount.innerText()).toBe("3");
+  expect(await successPillCount.innerText()).toBe("4");
   //#endregion
 
   //#region >>> The relative time of the test run creation date should be displayed
@@ -110,19 +110,19 @@ test(`authenticated/new-test-suites/test-runs-02: failed run in temp branch with
     '[data-test-id="TestRunResults-StatusGroup-flaky"]'
   );
   expect(await flakyTests.count()).toBe(1);
-  expect(await testItems(flakyTests).count()).toBe(2);
+  expect(await testItems(flakyTests).count()).toBe(3);
   expect(
     await flakyTests.locator('[data-test-id="TestRunResults-StatusGroup-Count"]').innerText()
-  ).toEqual("2");
+  ).toEqual("3");
 
   const successTests = testRunResult(page).locator(
     '[data-test-id="TestRunResults-StatusGroup-passed"]'
   );
   expect(await successTests.count()).toBe(1);
-  expect(await testItems(successTests).count()).toBe(3);
+  expect(await testItems(successTests).count()).toBe(4);
   expect(
     await successTests.locator('[data-test-id="TestRunResults-StatusGroup-Count"]').innerText()
-  ).toEqual("3");
+  ).toEqual("4");
   //#endregion
 
   //#region When clicking a selection, the visibility of the groups within that section should toggle.
@@ -152,21 +152,17 @@ test(`authenticated/new-test-suites/test-runs-02: failed run in temp branch with
   const testRunResultPathNode = testRunResultStatusGroupPassed.locator(
     '[data-test-id="TestRunResult-PathNode"]'
   );
-  expect(await testRunResultPathNode.count()).toBe(2);
+  expect(await testRunResultPathNode.count()).toBe(6);
   expect((await testRunResultPathNode.nth(0).innerText()).replace(/\s/g, "")).toBe("cypress/e2e/");
   expect((await testRunResultPathNode.nth(1).innerText()).replace(/\s/g, "")).toBe("auth/");
   const testRunResultFileNode = testItems(testRunResultStatusGroupPassed);
-  expect(await testRunResultFileNode.count()).toBe(3);
+  expect(await testRunResultFileNode.count()).toBe(4);
   expect(await testRunResultFileNode.nth(0).innerText()).toBe(`Second test ${clientKey}`);
-  expect(await testRunResultFileNode.nth(0).getAttribute("style")).toBe("padding-left: 3rem;");
+  expect(await testRunResultFileNode.nth(0).getAttribute("style")).toBe("padding-left: 5rem;");
   expect(await testRunResultFileNode.nth(1).innerText()).toBe(`Third test ${clientKey}`);
-  expect(await testRunResultFileNode.nth(1).getAttribute("style")).toBe("padding-left: 3rem;");
+  expect(await testRunResultFileNode.nth(1).getAttribute("style")).toBe("padding-left: 5rem;");
   expect(await testRunResultFileNode.nth(2).innerText()).toBe(`First test ${clientKey}`);
-  expect(await testRunResultFileNode.nth(2).getAttribute("style")).toBe("padding-left: 2rem;");
-  //#endregion
-
-  //#region >>> Test should be rolled up into their runner group
-  expect(await testItems(page).filter({ hasText: "Cypress Test" }).count()).toBe(1);
+  expect(await testRunResultFileNode.nth(2).getAttribute("style")).toBe("padding-left: 4rem;");
   //#endregion
 
   //#region >>> Clicking a group, the visibility of the tests within that section should toggle and the caret to the right of the group label should animate to the new state
@@ -185,7 +181,7 @@ test(`authenticated/new-test-suites/test-runs-02: failed run in temp branch with
   //#region > Test Details
 
   //#region >>> When a test is selected, recording list should be displayed
-  await testItems(page).filter({ hasText: "Cypress Test" }).click();
+  await testItems(page).filter({ hasText: "Cypress Test" }).first().click();
   await page.waitForSelector('[data-test-id="NoTestSelected"]', { state: "detached" });
   expect(await testRecordings(page).count()).toBe(1);
   expect(await testRecordings(page).nth(0).getAttribute("data-test-status")).toBe("failed");
@@ -199,12 +195,12 @@ test(`authenticated/new-test-suites/test-runs-02: failed run in temp branch with
   //#endregion
 
   //#region >>> Errors
-  await testItems(failedTests).filter({ hasText: `Cypress Test` }).click();
+  await testItems(failedTests).filter({ hasText: `Cypress Test` }).first().click();
   await page.waitForSelector('[data-test-id="NoTestSelected"]', { state: "detached" });
   expect(await testRecordings(page).count()).toBe(1);
   expect(await testErrors(page).count()).toBe(1);
 
-  await testItems(failedTests).filter({ hasNotText: `Cypress Test` }).click();
+  await testItems(failedTests).filter({ hasNotText: `Cypress Test` }).first().click();
   await page.waitForSelector('[data-test-id="NoTestSelected"]', { state: "detached" });
   expect(await testRecordings(page).count()).toBe(1);
   expect(await testErrors(page).count()).toBe(1);

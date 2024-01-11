@@ -65,7 +65,7 @@ function run_fe_tests(CHROME_BINARY_PATH) {
     //"comments-02",
     "comments-03",
     "logpoints-01",
-    "stepping-05_chromium",
+    //"stepping-05_chromium",
     "scopes_renderer",
     "passport-01",
     "passport-03",

@@ -29,6 +29,7 @@
   gap: 0.5rem;
   overflow: hidden;
   border-radius: 0.375rem;
+  padding: 4px;
 }
 
 .linkContent {

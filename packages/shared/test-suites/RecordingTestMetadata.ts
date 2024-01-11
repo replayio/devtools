@@ -13,6 +13,7 @@ import { insert } from "replay-next/src/utils/array";
 import { assertWithTelemetry, recordData } from "replay-next/src/utils/telemetry";
 import { ReplayClientInterface } from "shared/client/types";
 import { Annotation, PlaywrightTestSources, PlaywrightTestStacks } from "shared/graphql/types";
+import { maxTimeStampedPoint, minTimeStampedPoint } from "shared/utils/time";
 import {
   AnnotationsCache,
   PlaywrightAnnotationsCache,
@@ -1099,6 +1100,16 @@ export function getTestEventExecutionPoint(
 
 export function getTestEventTime(testEvent: RecordingTestMetadataV3.TestEvent): number | null {
   return getTestEventTimeStampedPoint(testEvent)?.time ?? null;
+}
+
+export function getUserActionEventRange(
+  userActionEvent: RecordingTestMetadataV3.UserActionEvent
+): TimeStampedPointRange {
+  const { afterStep, beforeStep, result, viewSource } = userActionEvent.data.timeStampedPoints;
+  return {
+    begin: minTimeStampedPoint([afterStep, beforeStep, result, viewSource])!,
+    end: maxTimeStampedPoint([afterStep, beforeStep, result, viewSource])!,
+  };
 }
 
 export function isGroupedTestCasesV1(

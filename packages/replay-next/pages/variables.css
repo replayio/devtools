@@ -65,17 +65,19 @@
   --grey-10-a20: rgba(249, 249, 250, 0.2);
   --grey-10-a25: rgba(249, 249, 250, 0.25);
   --grey-10-a30: rgba(249, 249, 250, 0.3);
-  --grey-10: #f9f9fa;
-  --grey-20: #ededf0;
-  --grey-30: #d7d7db;
+
+  --grey-10: #f2f2f2;
+  --grey-20: #e6e6e6;
+  --grey-30: #d9d9d9;
   --grey-40: #b1b1b3;
   --grey-50: #737373;
-  --grey-55: #5c5c5f;
-  --grey-60: #4a4a4f;
-  --grey-70: #38383d;
+  --grey-60: #3e434b;
+  --grey-70: #3d4552;
+  --grey-70: none;
+  --grey-90: #192230;
+
   --grey-90-a10: rgba(12, 12, 13, 0.1);
   --grey-90-a30: rgba(12, 12, 13, 0.3);
-  --grey-90: #0c0c0d;
   --magenta-65: #dd00a9;
   --purple-50: #9400ff;
   --red-20: #ffb3d2;
@@ -130,9 +132,9 @@
 
   /* Color ramp (Dark) */
   --theme-base-100: #000; /* background chrome */
-  --theme-base-95: #192230; /* tab bars */
-  --theme-base-90: #3d4552; /* editor and selected tab */
-  --theme-base-85: #3e434b; /* textfields */
+  --theme-base-95: var(--grey-90); /* tab bars */
+  --theme-base-90: var(--grey-70); /* editor and selected tab */
+  --theme-base-85: var(--grey-60); /* textfields */
   --theme-base-80: #797d81;
   --theme-base-70: #a2a6a8;
   --theme-base-60: #c3c6c8;
@@ -676,9 +678,9 @@
 
   /* Color ramp (Light) */
   --theme-base-100: hsl(0, 0%, 100%);
-  --theme-base-95: hsl(0, 0%, 95%);
-  --theme-base-90: hsl(0, 0%, 90%);
-  --theme-base-85: hsl(0, 0%, 85%);
+  --theme-base-95: var(--grey-10);
+  --theme-base-90: var(--grey-20);
+  --theme-base-85: var(--grey-30);
   --theme-base-80: hsl(0, 0%, 80%);
   --theme-base-70: hsl(0, 0%, 70%);
   --theme-base-60: hsl(0, 0%, 60%);

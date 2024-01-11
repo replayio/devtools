@@ -27,14 +27,14 @@ test(`authenticated/new-test-suites/tests-01: basic tests`, async ({ pageWithMet
 
   //#region >>> Each test should be displayed in the first column by title
   expect(await testsItems(page).count()).not.toBe(0);
-  await filterTestsByText(page, "cypress-spec-uniq.ts");
-  expect(await testsItems(page).count()).toBe(1);
-  expect(await testsItems(page).first().locator('[data-test-id="Test-Title"]').innerText()).toEqual(
-    "cypress-spec-uniq.ts"
-  );
+  await filterTestsByText(page, "Tests View - Cypress Test");
+  expect(await testsItems(page).count()).toBe(3);
+  expect(
+    await testsItems(page).first().locator('[data-test-id="Test-Title"]').innerText()
+  ).toContain("Tests View - Cypress Test");
 
   await filterTestsByText(page, "Tests View -");
-  expect(await testsItems(page).count()).toBe(6);
+  expect(await testsItems(page).count()).toBe(9);
   //#endregion
 
   //#region >>> Sort by flaky rate
@@ -58,7 +58,7 @@ test(`authenticated/new-test-suites/tests-01: basic tests`, async ({ pageWithMet
     contextMenuItemTestId: "alphabetical",
   });
   expect(await testsItems(page, "failure").count()).not.toBe(0);
-  expect(await testsItems(page).first().innerText()).toContain("Tests View - Fifth test");
+  expect(await testsItems(page).first().innerText()).toContain("Tests View - Cypress Test");
   //#endregion
 
   //#region >>> Filter search result - no results
