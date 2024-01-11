@@ -13,8 +13,8 @@ import { STATUS_PENDING } from "suspense";
 
 import { TestRun, getTestRunTitle } from "shared/test-suites/TestRun";
 import { useGetTeamRouteParams } from "ui/components/Library/Team/utils";
+import { useSyncTestStateToUrl } from "ui/components/Library/Team/View/NewTestRuns/hooks/useSyncTestStateToUrl";
 import { useTestRuns } from "ui/components/Library/Team/View/NewTestRuns/hooks/useTestRuns";
-import { useSyncTestRunIdToUrl } from "ui/components/Library/Team/View/TestRuns/hooks/useSyncTestIdToUrl";
 import { trackEvent } from "ui/utils/telemetry";
 
 type TestRunsContextType = {
@@ -110,7 +110,7 @@ export function TestRunsContextRoot({ children }: { children: ReactNode }) {
     setFilterTestsByText("");
   }, [testRunId]);
 
-  useSyncTestRunIdToUrl(teamId, testRunId, setTestRunId);
+  useSyncTestStateToUrl(teamId, testRunId, setTestRunId, testId, setTestId);
 
   const deferredTestRunId = useDeferredValue(testRunId);
 

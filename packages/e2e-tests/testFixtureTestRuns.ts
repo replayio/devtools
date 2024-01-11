@@ -9,6 +9,7 @@ type TestRunSetupFixture = {
   pageWithMeta: {
     page: Page;
     clientKey: string;
+    testRunId: string;
   };
 };
 
@@ -21,8 +22,8 @@ const testWithTestRunSetup = base.extend<TestRunSetupFixture>({
 
     const testRunClientKey = crypto.randomUUID();
     try {
-      await setupTestRun(testRunState, testRunClientKey);
-      await use({ page, clientKey: testRunClientKey });
+      const testRunId = await setupTestRun(testRunState, testRunClientKey);
+      await use({ page, clientKey: testRunClientKey, testRunId });
     } catch (err: any) {
       if (axios.isAxiosError(err)) {
         console.error("Axios error setting up test run: ", {

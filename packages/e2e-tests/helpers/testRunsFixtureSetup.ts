@@ -548,6 +548,7 @@ async function startTestRunShard(
   testRun: TestRunShardInputModel
 ): Promise<{
   shard: string;
+  testRunId: string;
   clientKey: string;
 }> {
   if (!process.env.GOLDEN_TEST_RUN_WORKSPACE_API_KEY) {
@@ -571,6 +572,7 @@ async function startTestRunShard(
             }) {
               success
               testRunShardId
+              testRunId
             }
           }
         `,
@@ -608,7 +610,7 @@ async function startTestRunShard(
     throw new Error("Unexpected error retrieving test run shard id");
   }
 
-  return { shard: testRunShardId, clientKey };
+  return { shard: testRunShardId, testRunId: resp.data.startTestRunShard.testRunId, clientKey };
 }
 
 async function addTestsToShard(
@@ -693,15 +695,15 @@ async function completeTestRunShard(shard: string): Promise<boolean> {
 export async function setupTestRun(
   state: keyof typeof testRunStates,
   clientKey: string
-): Promise<boolean> {
+): Promise<string> {
   if (!process.env.GOLDEN_TEST_RUN_WORKSPACE_API_KEY) {
     throw new Error("GOLDEN_TEST_RUN_WORKSPACE_API_KEY must be set in order to setup test runs.");
   }
 
-  const { shard } = await startTestRunShard(clientKey, testRunStates[state]);
+  const { shard, testRunId } = await startTestRunShard(clientKey, testRunStates[state]);
 
   await addTestsToShard(shard, clientKey, testRunStates[state].tests);
   await completeTestRunShard(shard);
 
-  return true;
+  return testRunId;
 }
