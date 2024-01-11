@@ -503,7 +503,6 @@ export function refreshGraphics() {
   }
 
   const canvas = document.getElementById("graphics") as HTMLCanvasElement;
-  const graphicsVideo = document.getElementById("graphicsVideo") as HTMLVideoElement;
 
   // Find an image to draw.
   let image;
@@ -522,12 +521,10 @@ export function refreshGraphics() {
   if (bounds) {
     canvas.width = bounds.width;
     canvas.height = bounds.height;
-    graphicsVideo.style.width = bounds.width + "px";
-    graphicsVideo.style.height = bounds.height + "px";
 
-    canvas.style.transform = graphicsVideo.style.transform = `scale(${bounds.scale})`;
-    canvas.style.left = graphicsVideo.style.left = String(bounds.left) + "px";
-    canvas.style.top = graphicsVideo.style.top = String(bounds.top) + "px";
+    canvas.style.transform = `scale(${bounds.scale})`;
+    canvas.style.left = String(bounds.left) + "px";
+    canvas.style.top = String(bounds.top) + "px";
     if (image) {
       cx.drawImage(image, 0, 0);
     }
@@ -637,9 +634,4 @@ export function setAllPaintsReceivedCallback(callback: typeof onAllPaintsReceive
 let onRefreshGraphics: (canvas: Canvas) => void;
 export function setRefreshGraphicsCallback(callback: typeof onRefreshGraphics): void {
   onRefreshGraphics = callback;
-}
-
-let onVideoUrl: (url: string) => void;
-export function setVideoUrlCallback(callback: typeof onVideoUrl): void {
-  onVideoUrl = callback;
 }

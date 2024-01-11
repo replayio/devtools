@@ -46,7 +46,6 @@ export const initialAppState: AppState = {
   sessionId: null,
   unexpectedError: null,
   uploading: null,
-  videoUrl: null,
   workspaceId: null,
 };
 
@@ -108,9 +107,6 @@ const appSlice = createSlice({
     setCanvas(state, action: PayloadAction<Canvas>) {
       state.canvas = action.payload;
     },
-    setVideoUrl(state, action: PayloadAction<string>) {
-      state.videoUrl = action.payload;
-    },
     setDefaultSelectedReactElementId(state, action: PayloadAction<number | null>) {
       state.defaultSelectedReactElementId = action.payload;
     },
@@ -159,7 +155,6 @@ export const {
   setSessionId,
   setUnexpectedError,
   setUploading,
-  setVideoUrl,
   setHoveredCommentId,
   setSelectedCommentId,
   setProcessing,
@@ -212,7 +207,6 @@ export const getSortedEventsForDisplay = createSelector(
 );
 
 export const getCanvas = (state: UIState) => state.app.canvas;
-export const getVideoUrl = (state: UIState) => state.app.videoUrl;
 export const getDefaultSettingsTab = (state: UIState) => state.app.defaultSettingsTab;
 export const getRecordingTarget = (state: UIState) => state.app.recordingTarget;
 export const getRecordingWorkspace = (state: UIState) => state.app.recordingWorkspace;
