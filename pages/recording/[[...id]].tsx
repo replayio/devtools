@@ -208,7 +208,7 @@ function RecordingPage({
     return (
       <>
         {head}
-        <DevTools apiKey={apiKey} uploadComplete={uploadComplete} />
+        <DevTools apiKey={apiKey} replayClient={replayClient} uploadComplete={uploadComplete} />
       </>
     );
   }

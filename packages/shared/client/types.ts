@@ -151,7 +151,8 @@ export type PointBehavior = {
 export type ReplayClientEvents =
   | "focusWindowChange"
   | "loadedRegionsChange"
-  | "processingProgressChange";
+  | "processingProgressChange"
+  | "sessionCreated";
 
 export type HitPointStatus =
   | "complete"
