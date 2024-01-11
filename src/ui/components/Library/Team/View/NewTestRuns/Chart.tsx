@@ -59,7 +59,7 @@ function generateChartData(testRuns: TestRun[], days: number) {
 export const Chart = () => {
   const { testRuns } = useContext(TestRunsContext);
   const { startTime, endTime } = useContext(TimeFilterContext);
-  const days = (endTime.getTime() - startTime.getTime()) / 1000 / 60 / 60 / 24;
+  const days = Math.floor((endTime.getTime() - startTime.getTime()) / 1000 / 60 / 60 / 24);
   const data = useMemo(() => generateChartData(testRuns, days), [testRuns, days]);
   const [hoveredPoint, setHoveredPoint] = useState<Point | null>(null);
 
