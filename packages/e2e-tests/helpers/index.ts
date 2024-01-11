@@ -70,10 +70,18 @@ export async function isDevToolsTabActive(page: Page) {
   return classes.includes("active");
 }
 
-export async function startLibraryTest(page: Page, apiKey: string, teamId: string) {
+export async function startLibraryTest(
+  page: Page,
+  apiKey: string,
+  teamId: string,
+  runId?: string,
+  testId?: string
+) {
   const base = process.env.PLAYWRIGHT_TEST_BASE_URL || "http://localhost:8080";
 
-  const url = `${base}/team/${teamId}/runs?e2e=1&apiKey=${apiKey}`;
+  const url = `${base}/team/${teamId}/runs${runId ? `/${runId}` : ""}${
+    testId ? `/tests/${testId}` : ""
+  }?e2e=1&apiKey=${apiKey}`;
 
   await debugPrint(page, `Navigating to ${chalk.bold(url)}`, "startLibraryTest");
 
@@ -81,6 +89,12 @@ export async function startLibraryTest(page: Page, apiKey: string, teamId: strin
 
   await page.locator('[data-test-id="TestRunResults"]').waitFor();
   await page.locator('[data-test-id="TestRunList"]').waitFor();
+  if (runId) {
+    await page.waitForSelector('[data-test-id="NoTestRunSelected"]', { state: "detached" });
+  }
+  if (testId) {
+    await page.waitForSelector('[data-test-id="NoTestSelected"]', { state: "detached" });
+  }
 }
 
 export async function commandPalette(page: Page, query: string) {
