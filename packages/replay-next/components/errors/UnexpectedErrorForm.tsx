@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 
 import { SupportForm } from "replay-next/components/support/SupportForm";
+import { ReplayClientInterface } from "shared/client/types";
 
 import styles from "./UnexpectedErrorForm.module.css";
 
@@ -8,9 +9,26 @@ import styles from "./UnexpectedErrorForm.module.css";
 // It will show a contact form so the user can send additional repro steps.
 // If additional error details can be shown, they should be passed in as props.
 
-export function UnexpectedErrorForm({ details, title }: { details?: ReactNode; title: ReactNode }) {
+export function UnexpectedErrorForm({
+  currentUserEmail,
+  currentUserId,
+  currentUserName,
+  details,
+  replayClient,
+  title,
+}: {
+  currentUserEmail: string | null;
+  currentUserId: string | null;
+  currentUserName: string | null;
+  details?: ReactNode;
+  replayClient: ReplayClientInterface;
+  title: ReactNode;
+}) {
   return (
     <SupportForm
+      currentUserEmail={currentUserEmail}
+      currentUserId={currentUserId}
+      currentUserName={currentUserName}
       details={
         <>
           {details && <div className={styles.Details}>{details}</div>}
@@ -20,6 +38,7 @@ export function UnexpectedErrorForm({ details, title }: { details?: ReactNode; t
           </div>
         </>
       }
+      replayClient={replayClient}
       title={title}
     />
   );

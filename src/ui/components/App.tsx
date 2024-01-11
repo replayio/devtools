@@ -5,7 +5,6 @@ import QuickOpenModal from "devtools/client/debugger/src/components/QuickOpenMod
 import { getQuickOpenEnabled } from "devtools/client/debugger/src/selectors";
 import { getSystemColorScheme } from "shared/theme/getSystemColorScheme";
 import { Theme } from "shared/theme/types";
-import { useTheme } from "shared/theme/useTheme";
 import { userData } from "shared/user-data/GraphQL/UserData";
 import { isTest } from "shared/utils/environment";
 import { actions } from "ui/actions";
@@ -114,7 +113,6 @@ function App({ children, hideModal, modal, quickOpenEnabled }: AppProps) {
   const auth = useAuth0();
   const dismissNag = hooks.useDismissNag();
   const userInfo = useGetUserInfo();
-  const theme = useTheme();
 
   useEffect(() => {
     if (userInfo.nags && shouldShowNag(userInfo.nags, Nag.FIRST_LOG_IN)) {

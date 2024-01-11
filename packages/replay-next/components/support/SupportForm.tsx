@@ -1,29 +1,46 @@
-import { ReactNode, useContext, useRef, useState } from "react";
+import { ReactNode, useRef, useState, useSyncExternalStore } from "react";
 
 import ExternalLink from "replay-next/components/ExternalLink";
 import Icon from "replay-next/components/Icon";
-import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import useModalDismissSignal from "replay-next/src/hooks/useModalDismissSignal";
+import { ReplayClientInterface } from "shared/client/types";
 import { getRecordingId } from "shared/utils/recording";
 
 import styles from "./SupportForm.module.css";
 
 export function SupportForm({
+  currentUserEmail,
+  currentUserId,
+  currentUserName,
   details,
   onDismiss,
+  replayClient,
   title = "Support",
 }: {
+  currentUserEmail: string | null;
+  currentUserId: string | null;
+  currentUserName: string | null;
   details?: ReactNode;
   onDismiss?: () => void;
+  replayClient: ReplayClientInterface;
   title?: ReactNode;
 }) {
-  const { currentUserInfo, sessionId } = useContext(SessionContext) || {};
-
   const modalRef = useRef<HTMLDivElement>(null);
 
   const [showConfirmationPrompt, setShowConfirmationPrompt] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<null | "failure" | "success">(null);
   const [text, setText] = useState("");
+
+  const sessionId = useSyncExternalStore(
+    (change: () => void) => {
+      replayClient.addEventListener("sessionCreated", change);
+      return () => {
+        replayClient.removeEventListener("sessionCreated", change);
+      };
+    },
+    replayClient.getSessionId,
+    replayClient.getSessionId
+  );
 
   const confirmClose = () => {
     if (text) {
@@ -86,9 +103,9 @@ export function SupportForm({
               text,
               url: window.location.href,
               userAgent: navigator.userAgent,
-              userEmail: currentUserInfo?.email,
-              userId: currentUserInfo?.id,
-              userName: currentUserInfo?.name,
+              userEmail: currentUserEmail,
+              userId: currentUserId,
+              userName: currentUserName,
             }),
           });
 
@@ -113,8 +130,8 @@ export function SupportForm({
         confirmationMessage = "Something went wrong. Please reload the page and try again.";
         break;
       case "success":
-        if (currentUserInfo) {
-          confirmationMessage = `Thank you for your note. We'll get back to you at ${currentUserInfo.email} as son as possible.`;
+        if (currentUserEmail) {
+          confirmationMessage = `Thank you for your note. We'll get back to you at ${currentUserEmail} as son as possible.`;
         } else {
           confirmationMessage = "Thank you for your note.";
         }

@@ -17,6 +17,7 @@ import { SelectedFrameContextRoot } from "replay-next/src/contexts/SelectedFrame
 import { useIsRecordingProcessed } from "replay-next/src/hooks/useIsRecordingProcessed";
 import usePreferredFontSize from "replay-next/src/hooks/usePreferredFontSize";
 import { setDefaultTags } from "replay-next/src/utils/telemetry";
+import { ReplayClientInterface } from "shared/client/types";
 import { getTestEnvironment } from "shared/test-suites/RecordingTestMetadata";
 import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { userData } from "shared/user-data/GraphQL/UserData";
@@ -62,7 +63,11 @@ import Video from "./Video";
 
 const Viewer = React.lazy(() => import("./Viewer"));
 
-type DevToolsProps = PropsFromRedux & { apiKey?: string; uploadComplete: boolean };
+type DevToolsProps = PropsFromRedux & {
+  apiKey?: string;
+  replayClient: ReplayClientInterface;
+  uploadComplete: boolean;
+};
 
 function ViewLoader() {
   const [showLoader, setShowLoader] = useState(false);
@@ -148,6 +153,7 @@ function _DevTools({
   apiKey,
   createSocket,
   loadingFinished,
+  replayClient,
   sessionId,
   showCommandPalette,
   showSupportForm,
@@ -159,7 +165,7 @@ function _DevTools({
   const { recording } = useGetRecording(recordingId);
   const { trackLoadingIdleTime } = useTrackLoadingIdleTime(uploadComplete, recording);
   const { userIsAuthor, loading } = useUserIsAuthor();
-  const { id: userId, email: userEmail, loading: userLoading } = useGetUserInfo();
+  const { id: userId, email: userEmail, loading: userLoading, name: userName } = useGetUserInfo();
 
   const isProcessed = useIsRecordingProcessed(recording);
 
@@ -285,7 +291,13 @@ function _DevTools({
                               <Body />
                               {showCommandPalette ? <CommandPaletteModal /> : null}
                               {showSupportForm ? (
-                                <SupportForm onDismiss={dismissSupportForm} />
+                                <SupportForm
+                                  currentUserEmail={userEmail}
+                                  currentUserId={userId}
+                                  currentUserName={userName}
+                                  onDismiss={dismissSupportForm}
+                                  replayClient={replayClient}
+                                />
                               ) : null}
                               <KeyboardShortcuts />
                             </KeyModifiers>

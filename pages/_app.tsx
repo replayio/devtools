@@ -9,11 +9,12 @@ import { Provider } from "react-redux";
 import "../src/global-css";
 import "../src/test-prep";
 
-import { RootErrorBoundary } from "ui/components/Errors/RootErrorBoundary";
 import { SystemProvider } from "design";
 import { recordData as recordTelemetryData } from "replay-next/src/utils/telemetry";
+import { replayClient } from "shared/client/ReplayClientContext";
 import { ApolloWrapper } from "ui/components/ApolloWrapper";
 import _App from "ui/components/App";
+import { RootErrorBoundary } from "ui/components/Errors/RootErrorBoundary";
 import MaintenanceModeScreen from "ui/components/MaintenanceMode";
 import { ConfirmProvider } from "ui/components/shared/Confirm";
 import LoadingScreen from "ui/components/shared/LoadingScreen";
@@ -77,8 +78,6 @@ function Routing({ Component, pageProps }: AppProps) {
   }, []);
 
   if (!store) {
-    // We hide the tips here since we don't have the store ready yet, which
-    // the tips need to work properly.
     return null;
   }
 
@@ -89,7 +88,7 @@ function Routing({ Component, pageProps }: AppProps) {
   return (
     <Provider store={store}>
       <MemoizedHeader />
-      <RootErrorBoundary name="_app">
+      <RootErrorBoundary replayClient={replayClient}>
         <_App>
           <InstallRouteListener />
           <React.Suspense fallback={<LoadingScreen message="Fetching data..." />}>
