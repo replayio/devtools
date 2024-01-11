@@ -33,6 +33,7 @@ export type EventCategory = {
 
 export type EventLog = PointDescription & {
   eventType: EventHandlerType;
+  label: string;
   type: "EventLog";
 };
 
@@ -79,15 +80,21 @@ export const eventPointsCache = createFocusIntervalCacheForExecutionPoints<
   },
 });
 
-export const eventsCache = createAnalysisCache<EventLog, [EventHandlerType]>(
+export const eventsCache = createAnalysisCache<EventLog, [EventHandlerType, string]>(
   "Events",
   eventType => eventType,
-  (client, begin, end, eventType) =>
-    eventPointsCache.readAsync(BigInt(begin), BigInt(end), client, [eventType]),
-  (client, points, eventType) => {
+  (client, begin, end, eventType, label) =>
+    eventPointsCache.readAsync(BigInt(begin), BigInt(end), client, [eventType, label]),
+  async (client, points, eventType) => {
+    const recordingTarget = await recordingTargetCache.readAsync(client);
+    const expression =
+      recordingTarget === "chromium"
+        ? "__RECORD_REPLAY__.getFrameArgumentsArray()"
+        : "[...arguments]";
+
     return {
       selector: createPointSelector([eventType]),
-      expression: "[...arguments]",
+      expression,
       frameIndex: 0,
     };
   },
@@ -98,8 +105,12 @@ function createPointSelector(eventTypes: EventHandlerType[]): PointSelector {
   return { kind: "event-handlers", eventTypes };
 }
 
-function transformPoint(point: PointDescription, eventType: EventHandlerType): EventLog {
-  return { ...point, eventType, type: "EventLog" };
+function transformPoint(
+  point: PointDescription,
+  eventType: EventHandlerType,
+  label: string
+): EventLog {
+  return { ...point, label, eventType, type: "EventLog" };
 }
 
 export const getInfallibleEventPointsSuspense = createInfallibleSuspenseCache(

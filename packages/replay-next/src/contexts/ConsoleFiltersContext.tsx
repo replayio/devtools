@@ -24,7 +24,10 @@ export type Toggles = {
 };
 
 export type EventTypes = {
-  [eventType: EventHandlerType]: boolean;
+  [eventType: EventHandlerType]: {
+    enabled: boolean;
+    label: string;
+  };
 };
 
 export type ConsoleFiltersContextType = Toggles & {
