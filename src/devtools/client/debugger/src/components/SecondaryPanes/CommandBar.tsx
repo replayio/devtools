@@ -2,20 +2,17 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import { Suspense, useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import { useImperativeCacheValue } from "suspense";
 
 import CommandBarButton from "devtools/client/debugger/src/components/shared/Button/CommandBarButton";
 import {
-  executeCommandOperation,
   getExecutionPoint,
   getSelectedFrameId,
   getThreadContext,
 } from "devtools/client/debugger/src/reducers/pause";
 import { formatKeyShortcut } from "devtools/client/debugger/src/utils/text";
 import KeyShortcuts from "devtools/client/shared/key-shortcuts";
-import { LoadingProgressBar } from "replay-next/components/LoadingProgressBar";
-import { framesCache } from "replay-next/src/suspense/FrameCache";
 import {
   FIND_STEP_TARGET_COMMANDS,
   FindTargetCommand,
@@ -24,6 +21,7 @@ import {
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { getOS, isMacOS } from "shared/utils/os";
 import { isPointInRegion } from "shared/utils/time";
+import { step } from "ui/actions/timeline";
 import { getSelectedSourceId } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
@@ -78,17 +76,7 @@ function formatKey(action: string) {
 }
 
 export default function CommandBar() {
-  return (
-    <Suspense fallback={<LoadingProgressBar />}>
-      <CommandBarSuspends />
-    </Suspense>
-  );
-}
-
-function CommandBarSuspends() {
   const cx = useAppSelector(getThreadContext);
-
-  const [disableRewindResume, setDisableRewindResume] = useState(false);
 
   const dispatch = useAppDispatch();
 
@@ -101,7 +89,7 @@ function CommandBarSuspends() {
     function handleEvent(e: KeyboardEvent, command: FindTargetCommand) {
       e.preventDefault();
       e.stopPropagation();
-      dispatch(executeCommandOperation({ cx, command }));
+      dispatch(step(command));
     }
 
     COMMANDS.forEach(command =>
@@ -124,32 +112,19 @@ function CommandBarSuspends() {
     };
   }, [cx, dispatch]);
 
-  async function onRewind() {
-    trackEvent("debugger.rewind");
-    setDisableRewindResume(true);
-    await dispatch(executeCommandOperation({ cx, command: "findRewindTarget" }));
-    setDisableRewindResume(false);
-  }
-  async function onResume() {
-    trackEvent("debugger.resume");
-    setDisableRewindResume(true);
-    await dispatch(executeCommandOperation({ cx, command: "findResumeTarget" }));
-    setDisableRewindResume(false);
-  }
-
   return (
     <div className="command-bar">
-      <CommandBarButton
-        disabled={disableRewindResume}
+      <StepButton
         key="rewind"
-        onClick={onRewind}
+        command="findRewindTarget"
+        mixpanelEvent="debugger.rewind"
         tooltip="Rewind Execution"
         type="rewind"
       />
-      <CommandBarButton
-        disabled={disableRewindResume}
+      <StepButton
         key="resume"
-        onClick={onResume}
+        command="findResumeTarget"
+        mixpanelEvent="debugger.resume"
         tooltip={`Resume ${formatKey("findResumeTarget")}`}
         type="resume"
       />
@@ -201,16 +176,9 @@ function StepButton({
   const dispatch = useAppDispatch();
   const replayClient = useContext(ReplayClientContext);
   const focusWindow = replayClient.getCurrentFocusWindow();
-  const cx = useAppSelector(getThreadContext);
   const point = useAppSelector(getExecutionPoint);
   const pauseAndFrameId = useAppSelector(getSelectedFrameId);
   const sourceId = useAppSelector(getSelectedSourceId);
-
-  const { status: framesStatus, value: frames } = useImperativeCacheValue(
-    framesCache,
-    replayClient,
-    pauseAndFrameId?.pauseId
-  );
 
   const { status: stepTargetStatus, value: stepTarget } = useImperativeCacheValue(
     resumeTargetCache,
@@ -221,10 +189,9 @@ function StepButton({
     sourceId
   );
 
-  const isPaused = framesStatus === "resolved" && frames && frames.length > 0;
   let disabled = false;
   let disabledTooltip = "";
-  if (!isPaused) {
+  if (!point) {
     disabled = true;
     disabledTooltip = "Stepping is disabled until you're paused at a point";
   } else if (stepTargetStatus === "pending") {
@@ -240,7 +207,7 @@ function StepButton({
 
   function onClick() {
     trackEvent(mixpanelEvent);
-    dispatch(executeCommandOperation({ cx, command }));
+    dispatch(step(command));
   }
 
   return (
