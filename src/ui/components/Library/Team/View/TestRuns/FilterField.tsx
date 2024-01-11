@@ -1,6 +1,6 @@
 import Icon from "replay-next/components/Icon";
 
-import styles from "./TestRunsPage.module.css";
+import styles from "./FilterField.module.css";
 
 export const FilterField = ({
   onChange,
