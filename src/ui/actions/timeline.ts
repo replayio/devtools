@@ -21,8 +21,9 @@ import {
   resumed,
 } from "devtools/client/debugger/src/reducers/pause";
 import {
+  clearQueuedCommands,
   clearSeekLock,
-  dequeueCommand,
+  dequeueCommand as dequeueCommandAction,
   enqueueCommand,
   getExecutionPoint,
   getNextQueuedCommand,
@@ -265,10 +266,8 @@ export function step(command: FindTargetCommand): UIThunkAction<Promise<any>> {
 
     let resumeTarget: PauseDescription | undefined;
     let location: Location | undefined;
-    let nextCommand: FindTargetCommand | undefined = getNextQueuedCommand(getState());
+    let nextCommand: FindTargetCommand | undefined = dispatch(dequeueCommand());
     while (nextCommand) {
-      dispatch(dequeueCommand());
-
       resumeTarget = await resumeTargetCache.readAsync(
         replayClient,
         nextCommand,
@@ -290,10 +289,11 @@ export function step(command: FindTargetCommand): UIThunkAction<Promise<any>> {
         }
       } else {
         dispatch(pauseCreationFailed());
+        dispatch(clearQueuedCommands());
         return;
       }
 
-      nextCommand = getNextQueuedCommand(getState());
+      nextCommand = dispatch(dequeueCommand());
     }
 
     if (resumeTarget && isPointInRegion(resumeTarget.point, focusWindow)) {
@@ -302,6 +302,14 @@ export function step(command: FindTargetCommand): UIThunkAction<Promise<any>> {
     } else {
       dispatch(pauseCreationFailed());
     }
+  };
+}
+
+function dequeueCommand(): UIThunkAction<FindTargetCommand> {
+  return (dispatch, getState) => {
+    const command = getNextQueuedCommand(getState());
+    dispatch(dequeueCommandAction());
+    return command;
   };
 }
 

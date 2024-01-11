@@ -189,6 +189,9 @@ const pauseSlice = createSlice({
       } satisfies Partial<PauseState>);
       state.threadcx.isPaused = false;
     },
+    clearQueuedCommands(state) {
+      state.queuedCommands = [];
+    },
     enqueueCommand(state, action: PayloadAction<FindTargetCommand>) {
       state.queuedCommands.push(action.payload);
     },
@@ -210,6 +213,7 @@ export const {
   pauseHistoryDecremented,
   pauseHistoryIncremented,
   stepping,
+  clearQueuedCommands,
   enqueueCommand,
   dequeueCommand,
 } = pauseSlice.actions;
