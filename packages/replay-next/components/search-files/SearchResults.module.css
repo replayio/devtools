@@ -4,7 +4,7 @@
   color: var(--color-dim);
   font-size: var(--font-size-small);
   user-select: none;
-  margin-right: 0.5rem;
+  padding: 0 0.5rem;
 }
 .ResultsCountPending {
   opacity: 0.5;
@@ -21,6 +21,25 @@
   width: 1rem;
   height: 1rem;
   animation: 1s spin linear infinite;
+}
+
+.OverflowHeader {
+  display: block;
+  padding: 0 0.5rem;
+  color: var(--color-dim);
+  font-size: var(--font-size-small);
+  background-color: var(--background-color-source-search);
+  border-top: 1px solid var(--border-color-source-search);
+  border-bottom: 1px solid var(--border-color-source-search);
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.OverflowIcon {
+  display: inline;
+  width: 0.75rem;
+  height: 0.75rem;
+  color: var(--color-warning);
 }
 
 @keyframes spin {

@@ -36,7 +36,7 @@ test(`stepping-05: Test stepping in pretty-printed code`, async ({
 
   await openConsolePanel(page);
   await addEventListenerLogpoints(page, [{ eventType: "event.mouse.click", categoryKey: "mouse" }]);
-  await warpToMessage(page, "click", 15);
+  await warpToMessage(page, "(click)", 15);
 
   await stepInToLine(page, 2);
   await stepOutToLine(page, 15);

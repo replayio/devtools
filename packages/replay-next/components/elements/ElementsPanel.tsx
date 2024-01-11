@@ -155,6 +155,11 @@ export function ElementsPanel({
     }
   };
 
+  let searchResultsText = "";
+  if (!searchInProgress && searchState !== null) {
+    searchResultsText = `${searchState.index + 1} of ${searchState.results.length}`;
+  }
+
   return (
     <div className={styles.Panel}>
       <div className={styles.SearchRow}>
@@ -175,8 +180,12 @@ export function ElementsPanel({
         </label>
         {searchInProgress && <Icon className={styles.SpinnerIcon} type="spinner" />}
         {!searchInProgress && searchState !== null && (
-          <div className={styles.SearchResults} data-test-id="ElementsPanel-SearchResult">
-            {searchState.index + 1} of {searchState.results.length}
+          <div
+            className={styles.SearchResults}
+            data-test-id="ElementsPanel-SearchResult"
+            title={searchResultsText}
+          >
+            {searchResultsText}
           </div>
         )}
       </div>

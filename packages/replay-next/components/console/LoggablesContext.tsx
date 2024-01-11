@@ -107,11 +107,11 @@ function LoggablesContextInner({
   const { endpoint } = useContext(SessionContext);
 
   // Find the set of event type handlers we should be displaying in the console.
-  const eventTypesToLoad = useMemo<EventHandlerType[]>(() => {
-    const filteredEventHandlerTypes: EventHandlerType[] = [];
-    for (let [eventType, enabled] of Object.entries(eventTypes)) {
+  const eventTypeAndLabelTuples = useMemo<[type: EventHandlerType, label: string][]>(() => {
+    const filteredEventHandlerTypes: [type: EventHandlerType, label: string][] = [];
+    for (let [eventType, { enabled, label }] of Object.entries(eventTypes)) {
       if (enabled) {
-        filteredEventHandlerTypes.push(eventType);
+        filteredEventHandlerTypes.push([eventType, label]);
       }
     }
     return filteredEventHandlerTypes;
@@ -123,17 +123,29 @@ function LoggablesContextInner({
       return [];
     }
     return suspendInParallel(
-      ...eventTypesToLoad.map(
-        eventType => () =>
-          getInfallibleEventPointsSuspense(
-            BigInt(focusRange.begin.point),
-            BigInt(focusRange.end.point),
-            client,
-            eventType
-          ) ?? []
+      ...eventTypeAndLabelTuples.map(
+        ([eventType, label]) =>
+          () =>
+            (
+              getInfallibleEventPointsSuspense(
+                BigInt(focusRange.begin.point),
+                BigInt(focusRange.end.point),
+                client,
+                eventType,
+                label
+              ) ?? []
+            ).map(
+              pointDescription =>
+                ({
+                  ...pointDescription,
+                  eventType,
+                  label,
+                  type: "EventLog",
+                } satisfies EventLog)
+            )
       )
     ).flat();
-  }, [client, eventTypesToLoad, focusRange]);
+  }, [client, eventTypeAndLabelTuples, focusRange]);
 
   // Pre-filter in-focus messages by non text based search criteria.
   const preFilteredMessages = useMemo<ProtocolMessage[]>(() => {
@@ -247,7 +259,7 @@ function LoggablesContextInner({
             const textContent = element.textContent?.toLocaleLowerCase();
             const matches = textContent?.includes(filterByLowerCaseText);
 
-            // HACK Style must be compatible with the visibility check in useConsoleSearchDOM()
+            // HACK Style must be compatible with the visibility check in useConsoleSearchDOM()
             element.style.display = matches ? "inherit" : "none";
           }
         });

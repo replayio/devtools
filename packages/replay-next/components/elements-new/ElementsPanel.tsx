@@ -199,6 +199,11 @@ export function ElementsPanel({
     // So just set focus on the search input and let the user trigger the search when they're ready.
   };
 
+  let searchResultsText = "";
+  if (!searchInProgress && searchState !== null) {
+    searchResultsText = `${searchState.index + 1} of ${searchState.indices.length}`;
+  }
+
   return (
     <div className={styles.Panel}>
       <div className={styles.SearchRow}>
@@ -228,8 +233,12 @@ export function ElementsPanel({
         </button>
         {searchInProgress && <Icon className={styles.SpinnerIcon} type="spinner" />}
         {!searchInProgress && searchState !== null && (
-          <div className={styles.SearchResults} data-test-id="ElementsPanel-SearchResult">
-            {searchState.index + 1} of {searchState.indices.length}
+          <div
+            className={styles.SearchResults}
+            data-test-id="ElementsPanel-SearchResult"
+            title={searchResultsText}
+          >
+            {searchResultsText}
           </div>
         )}
       </div>

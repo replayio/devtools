@@ -30,8 +30,6 @@ export default function ResultsList({
 
   const sources = sourcesCache.read(replayClient);
 
-  const didOverflow = data?.didOverflow ?? false;
-
   const listData = useMemo(() => new FileSearchListData(orderedResults), [orderedResults]);
 
   // Data streams in to the same array, so we need to let the list know when to recompute the item count.
@@ -49,11 +47,7 @@ export default function ResultsList({
   );
 
   if (status === STATUS_RESOLVED && orderedResults.length === 0) {
-    return (
-      <div className={styles.Results}>
-        <div className={styles.NoResults}>No results found</div>
-      </div>
-    );
+    return null;
   }
 
   return (
@@ -61,13 +55,6 @@ export default function ResultsList({
       className={isPending ? styles.ResultsPending : styles.Results}
       data-test-id="SourceSearch-Results"
     >
-      {didOverflow && (
-        <div className={styles.OverflowHeader} data-test-id="SourceSearch-OverflowMessage">
-          <Icon className={styles.OverflowIcon} type="warning" />
-          The result set only contains a subset of all matches. Be more specific in your search to
-          narrow down the results.
-        </div>
-      )}
       <div className={styles.List}>
         <AutoSizer
           children={({ height, width }) => (

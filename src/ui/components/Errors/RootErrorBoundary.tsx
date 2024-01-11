@@ -2,7 +2,9 @@ import { ErrorInfo } from "react";
 import { ErrorBoundary, ErrorBoundaryProps } from "react-error-boundary";
 
 import { UnexpectedErrorForm } from "replay-next/components/errors/UnexpectedErrorForm";
+import { ReplayClientInterface } from "shared/client/types";
 import { setExpectedError, setUnexpectedError } from "ui/actions/errors";
+import { useGetUserInfo } from "ui/hooks/users";
 import { getExpectedError, getUnexpectedError } from "ui/reducers/app";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
@@ -15,14 +17,16 @@ import { ExpectedErrorModal } from "./ExpectedErrorModal";
 
 export function RootErrorBoundary({
   children,
-  name,
+  replayClient,
   ...rest
 }: Omit<ErrorBoundaryProps, "fallback" | "fallbackRender" | "FallbackComponent" | "resetKeys"> & {
-  name: string;
+  replayClient: ReplayClientInterface;
 }) {
   const expectedError = useAppSelector(getExpectedError);
   const unexpectedError = useAppSelector(getUnexpectedError);
   const dispatch = useAppDispatch();
+
+  const currentUserInfo = useGetUserInfo();
 
   const onError = (error: Error, info: ErrorInfo) => {
     if (error instanceof Error && error.name === "ChunkLoadError") {
@@ -55,7 +59,11 @@ export function RootErrorBoundary({
   } else if (unexpectedError) {
     return (
       <UnexpectedErrorForm
+        currentUserEmail={currentUserInfo?.email ?? null}
+        currentUserId={currentUserInfo?.id ?? null}
+        currentUserName={currentUserInfo?.name ?? null}
         details={unexpectedError.content ?? ""}
+        replayClient={replayClient}
         title={unexpectedError.message ?? "Error"}
       />
     );

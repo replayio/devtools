@@ -141,6 +141,7 @@ export class ReplayClient implements ReplayClientInterface {
   // Apps that only communicate with the Replay protocol through this client should use the initialize method instead.
   async configure(sessionId: string): Promise<void> {
     this._sessionId = sessionId;
+    this._dispatchEvent("sessionCreated");
     this.sessionWaiter.resolve(sessionId);
 
     await this.syncFocusWindow();
@@ -260,6 +261,7 @@ export class ReplayClient implements ReplayClientInterface {
     const { sessionId } = await client.Recording.createSession({ recordingId });
 
     this._sessionId = sessionId;
+    this._dispatchEvent("sessionCreated");
     this.sessionWaiter.resolve(sessionId);
 
     await this.syncFocusWindow();
@@ -770,9 +772,7 @@ export class ReplayClient implements ReplayClientInterface {
     return endpoint;
   }
 
-  getSessionId(): SessionId | null {
-    return this._sessionId;
-  }
+  getSessionId = (): SessionId | null => this._sessionId;
 
   async getSourceHitCounts(
     sourceId: SourceId,
