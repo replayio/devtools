@@ -10,8 +10,7 @@ import test, { expect } from "../testFixtureCloneRecording";
 // and the event type string. We've copy-pasted it to simplify getting _any_ E2E test working.
 test.use({ exampleKey: "doc_events_chromium.html" });
 
-// TODO [FE-2118] Re-enable this test once RUN-2669 eventually ships
-test.skip(`logpoints-03_chromium: should display event properties in the console`, async ({
+test(`logpoints-03_chromium: should display event properties in the console`, async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
