@@ -15,7 +15,10 @@ export function TestDetails({ testRuns }: { testRuns: GroupedTestRun[] }) {
   if (!sortedTestRuns.length) {
     return (
       <div className="flex flex-col gap-1 p-2">
-        <TestSuitePanelMessage>No test runs found</TestSuitePanelMessage>;
+        <TestSuitePanelMessage data-test-id="NoTestSelected">
+          No test runs found
+        </TestSuitePanelMessage>
+        ;
       </div>
     );
   }
