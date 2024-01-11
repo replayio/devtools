@@ -27,7 +27,7 @@ export function TestRunPanelWrapper({ children }: { children: React.ReactNode })
 
   return (
     <div
-      className={`flex h-full w-full flex-col p-2 text-sm transition ${styles.wrapper}`}
+      className={`flex h-full w-full flex-col text-sm transition ${styles.wrapper}`}
       data-pending={deferredPending}
     >
       {deferredPending ? <IndeterminateProgressBar /> : null}

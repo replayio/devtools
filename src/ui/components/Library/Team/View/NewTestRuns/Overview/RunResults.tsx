@@ -43,15 +43,17 @@ export function RunResults({
 
   if (!tests?.length) {
     return (
-      <TestSuitePanelMessage data-test-id="NoTestRunSelected">
-        No test data available for this test run
-      </TestSuitePanelMessage>
+      <div className="absolute flex h-full w-full items-center justify-center">
+        <TestSuitePanelMessage data-test-id="NoTestRunSelected">
+          No test data available for this test run
+        </TestSuitePanelMessage>
+      </div>
     );
   }
 
   return (
     <div
-      className="flex flex-col overflow-y-auto"
+      className="flex flex-col overflow-y-auto p-2 pt-0"
       data-filtered-by-text={filterByTextDeferred}
       data-test-id="TestRunResults"
     >

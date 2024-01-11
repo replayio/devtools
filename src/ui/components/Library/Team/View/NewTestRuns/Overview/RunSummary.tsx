@@ -123,11 +123,11 @@ export function RunSummary({
 
   return (
     <div
-      className={`flex flex-col gap-2 border-b border-themeBorder`}
+      className={`flex flex-col gap-2 border-b border-themeBorder pt-2`}
       data-test-id="TestRunSummary"
     >
       {tests?.length ? (
-        <>
+        <div className="flex flex-col gap-2 px-2">
           <div className="flex flex-row items-center justify-between gap-2">
             <div
               className={`flex-grow ${dropdownStyles.dropdownTrigger}`}
@@ -148,7 +148,7 @@ export function RunSummary({
             value={testFilterByText}
             onChange={setTestFilterByText}
           />
-        </>
+        </div>
       ) : null}
       <div
         data-test-id="TestRunSummary-Title"
