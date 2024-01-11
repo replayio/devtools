@@ -6,19 +6,19 @@ import {
   getExecutionPoint,
   getPauseId,
   getTime,
+  paused,
 } from "devtools/client/debugger/src/reducers/pause";
-import { paused } from "devtools/client/debugger/src/reducers/pause";
 import {
   recordingCapabilitiesCache,
   recordingTargetCache,
 } from "replay-next/src/suspense/BuildIdCache";
+import { RepaintGraphicsCache } from "replay-next/src/suspense/GraphicsCache";
 import { screenshotCache } from "replay-next/src/suspense/ScreenshotCache";
 import { replayClient } from "shared/client/ReplayClientContext";
 import { startAppListening } from "ui/setup/listenerMiddleware";
 import { AppStore } from "ui/setup/store";
 import { getCurrentPauseId } from "ui/utils/app";
 
-import { repaintGraphics } from "./repainted-graphics-cache";
 import { assert, binarySearch, defer } from "./utils";
 
 const repaintedScreenshots: Map<string, ScreenShot> = new Map();
@@ -199,8 +199,7 @@ export function setupGraphics(store: AppStore) {
       await getCurrentPauseId(replayClient, state),
       (_time, pauseId) => {
         return pauseId !== getPauseId(store.getState());
-      },
-      false
+      }
     );
   }
 
@@ -225,7 +224,7 @@ export function setupGraphics(store: AppStore) {
   });
 }
 
-export async function fetchScreenshotForPause(pauseId: string, force = false) {
+export async function fetchScreenshotForPause(pauseId: string) {
   const recordingCapabilities = await recordingCapabilitiesCache.readAsync(replayClient);
   if (!recordingCapabilities.supportsRepaintingGraphics) {
     return;
@@ -244,7 +243,7 @@ export async function fetchScreenshotForPause(pauseId: string, force = false) {
     }
   }, 500);
 
-  const rv = await repaintGraphics(replayClient, pauseId, force);
+  const rv = await RepaintGraphicsCache.readAsync(replayClient, pauseId);
   graphicsFetched = true;
 
   if (didStall) {
@@ -273,10 +272,9 @@ export async function fetchScreenshotForPause(pauseId: string, force = false) {
 export async function repaintAtPause(
   time: number,
   pauseId: string,
-  shouldCancelRepaint: (time: number, pauseId: string) => boolean,
-  force = false
+  shouldCancelRepaint: (time: number, pauseId: string) => boolean
 ) {
-  const screenshot = await fetchScreenshotForPause(pauseId, force);
+  const screenshot = await fetchScreenshotForPause(pauseId);
 
   if (screenshot && !shouldCancelRepaint(time, pauseId)) {
     const { mouse } = await getGraphicsAtTime(time);

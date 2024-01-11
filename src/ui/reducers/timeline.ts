@@ -114,7 +114,6 @@ export const getRecordingDuration = (state: UIState) => state.timeline.recording
 export const getTimelineDimensions = (state: UIState) => state.timeline.timelineDimensions;
 export const getMarkTimeStampedPoint = (state: UIState) => state.timeline.markTimeStampedPoint;
 export const getHoveredItem = (state: UIState) => state.timeline.hoveredItem;
-export const getPaints = (state: UIState) => state.timeline.paints;
 export const getPoints = (state: UIState) => state.timeline.points;
 export const getBasicProcessingProgress = (state: UIState) => {
   if (state.timeline.allPaintsReceived) {
