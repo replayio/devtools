@@ -3,7 +3,7 @@ import { useContext } from "react";
 import { TestRunTestWithRecordings } from "shared/test-suites/TestRun";
 
 import { Alert } from "../shared/Alert";
-import { useTestRunDetailsSuspends } from "../TestRuns/hooks/useTestRunDetailsSuspends";
+import { useTestRunDetailsSuspends } from "./hooks/useTestRunDetailsSuspends";
 import { TestResultListItem } from "./Overview/TestResultListItem";
 import { TestRunsContext } from "./TestRunsContextRoot";
 

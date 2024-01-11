@@ -8,7 +8,7 @@ import {
 import { GraphQLClientInterface } from "shared/graphql/GraphQLClient";
 import { Test } from "shared/test-suites/TestRun";
 
-import { GET_WORKSPACE_TESTS } from "../../Tests/graphql/TestGraphQL";
+import { GET_WORKSPACE_TESTS } from "../graphql/TestGraphQL";
 
 // We don't have any good way like (Test.created_at) to sort tests, therefore we can't properly build query ranges,
 // therefore can't use createIntervalCache

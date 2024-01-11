@@ -6,10 +6,11 @@ import { TestRun } from "shared/test-suites/TestRun";
 import { TestRunListItem } from "ui/components/Library/Team/View/TestRuns/TestRunListItem";
 import { SecondaryButton } from "ui/components/shared/Button";
 
+import { TestSuitePanelMessage } from "../TestSuitePanelMessage";
 import { TestRunsContext } from "./TestRunsContextRoot";
+import styles from "./TestRunList.module.css";
 
 const PAGE_SIZE = 50;
-const ROW_HEIGHT = 65;
 
 type ItemData = {
   countToRender: number;
@@ -19,7 +20,7 @@ type ItemData = {
 };
 
 export function TestRunList() {
-  const { filterByText, testRuns } = useContext(TestRunsContext);
+  const { filterByText, testRunsLoading, testRuns, testRunCount } = useContext(TestRunsContext);
   const [countToRender, setCountToRender] = useState(PAGE_SIZE);
 
   const itemData = useMemo<ItemData>(
@@ -34,6 +35,14 @@ export function TestRunList() {
 
   const itemCount = Math.min(countToRender + 1, testRuns.length);
 
+  if (!testRunsLoading && testRuns.length === 0 && testRunCount > 0) {
+    return (
+      <TestSuitePanelMessage data-test-id="NoTestRuns" className={styles.message}>
+        No test runs match the current filters
+      </TestSuitePanelMessage>
+    );
+  }
+
   return (
     <ReactVirtualizedAutoSizer
       children={({ height, width }) => (
@@ -43,7 +52,7 @@ export function TestRunList() {
           height={height}
           itemCount={itemCount}
           itemData={itemData}
-          itemSize={ROW_HEIGHT}
+          itemSize={28}
           width={width}
         />
       )}
