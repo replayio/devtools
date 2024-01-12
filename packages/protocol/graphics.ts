@@ -2,12 +2,7 @@
 import { MouseEvent, PaintPoint, ScreenShot, TimeStampedPoint } from "@replayio/protocol";
 import maxBy from "lodash/maxBy";
 
-import {
-  getExecutionPoint,
-  getPauseId,
-  getTime,
-  paused,
-} from "devtools/client/debugger/src/reducers/pause";
+import { getExecutionPoint, getTime } from "devtools/client/debugger/src/reducers/pause";
 import {
   recordingCapabilitiesCache,
   recordingTargetCache,
@@ -15,9 +10,7 @@ import {
 import { RepaintGraphicsCache } from "replay-next/src/suspense/GraphicsCache";
 import { screenshotCache } from "replay-next/src/suspense/ScreenshotCache";
 import { replayClient } from "shared/client/ReplayClientContext";
-import { startAppListening } from "ui/setup/listenerMiddleware";
 import { AppStore } from "ui/setup/store";
-import { getCurrentPauseId } from "ui/utils/app";
 
 import { assert, binarySearch, defer } from "./utils";
 
@@ -155,7 +148,7 @@ export function setupGraphics(store: AppStore) {
     let paintedGraphics = false;
     const maybePaintGraphics = async () => {
       if (!paintedGraphics) {
-        const { screen, mouse } = await getGraphicsAtTime(getTime(store.getState()), false, true);
+        const { screen, mouse } = await getGraphicsAtTime(getTime(store.getState()), true);
         if (screen) {
           paintedGraphics = true;
           paintGraphics(screen, mouse);
@@ -190,37 +183,6 @@ export function setupGraphics(store: AppStore) {
       // Make sure we never wait for any paints when trying to do things like playback
       setHasAllPaintPoints(true);
     }
-  });
-
-  async function repaint() {
-    const state = store.getState();
-    repaintAtPause(
-      getTime(state),
-      await getCurrentPauseId(replayClient, state),
-      (_time, pauseId) => {
-        return pauseId !== getPauseId(store.getState());
-      }
-    );
-  }
-
-  startAppListening({
-    actionCreator: paused,
-    effect: async ({ payload: { executionPoint, time } }) => {
-      const { screen, mouse } = await getGraphicsAtTime(time);
-
-      if (executionPoint !== getExecutionPoint(store.getState())) {
-        return;
-      }
-      if (screen) {
-        paintGraphics(screen, mouse);
-      }
-
-      if (typeof onPausedAtTime === "function") {
-        onPausedAtTime(time);
-      }
-
-      await repaint();
-    },
   });
 }
 
@@ -362,7 +324,6 @@ export interface MouseAndClickPosition {
 
 export async function getGraphicsAtTime(
   time: number,
-  forPlayback = false,
   allowLastPaint = false
 ): Promise<{ screen?: ScreenShot; mouse?: MouseAndClickPosition }> {
   const paintIndex = mostRecentIndex(gPaintPoints, time);

@@ -58,7 +58,7 @@ import SidePanel from "./SidePanel";
 import SourcesContextAdapter from "./SourcesContextAdapter";
 import Timeline from "./Timeline/Timeline";
 import Toolbar from "./Toolbar";
-import Video from "./Video";
+import Video from "./VideoNew";
 
 const Viewer = React.lazy(() => import("./Viewer"));
 

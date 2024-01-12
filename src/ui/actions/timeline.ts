@@ -186,7 +186,9 @@ export async function getInitialPausePoint(recordingId: string) {
 
 export function setHoverTime(time: number | null, updateGraphics = true): UIThunkAction {
   return async (dispatch, getState) => {
-    dispatch(setTimelineState({ hoverTime: time }));
+    dispatch(
+      setTimelineState({ hoverTime: time, showHoverTimeGraphics: updateGraphics && time != null })
+    );
 
     if (!updateGraphics) {
       return;
@@ -492,7 +494,7 @@ export function playbackPoints(
 
     const prepareNextGraphics = () => {
       nextGraphicsTime = snapTimeForPlayback(nextPaintOrMouseEvent(currentTime)?.time || end.time);
-      nextGraphicsPromise = getGraphicsAtTime(nextGraphicsTime, true);
+      nextGraphicsPromise = getGraphicsAtTime(nextGraphicsTime);
       dispatch(precacheScreenshots(nextGraphicsTime));
     };
     const shouldContinuePlayback = () => getPlayback(getState());
@@ -856,7 +858,7 @@ export function precacheScreenshots(beginTime: number): UIThunkAction {
       const paintPoint = gPaintPoints[index];
       // the client isn't used in the cache key, so it's OK to pass a dummy value here
       if (!screenshotCache.getValueIfCached(null as any, paintPoint.point, paintPoint.paintHash)) {
-        const graphicsPromise = getGraphicsAtTime(time, true);
+        const graphicsPromise = getGraphicsAtTime(time);
 
         const precachedTime = Math.max(time - SNAP_TIME_INTERVAL, beginTime);
         if (precachedTime > getPlaybackPrecachedTime(getState())) {

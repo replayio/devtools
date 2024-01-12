@@ -32,6 +32,7 @@ export interface TimelineState {
   recordingDuration: number | null;
   shouldAnimate: boolean;
   showFocusModeControls: boolean;
+  showHoverTimeGraphics: boolean;
   stalled?: boolean;
   timelineDimensions: { width: number; left: number; top: number };
   zoomRegion: ZoomRegion;

@@ -22,6 +22,7 @@ h2 {
   position: absolute;
   transform-origin: top left;
   cursor: pointer;
+  display: none;
 }
 
 .collapsed-toolbox #graphics {

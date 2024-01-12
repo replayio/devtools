@@ -100,6 +100,7 @@ export default function Video() {
       <div className="absolute flex h-full w-full items-center justify-center bg-chrome">
         <ReplayLogo size="sm" color="gray" />
       </div>
+
       <canvas id="graphics" onClick={onClick} onContextMenu={onContextMenu} ref={canvasRef} />
       {contextMenu}
       <CommentsOverlay showComments={showComments}>
