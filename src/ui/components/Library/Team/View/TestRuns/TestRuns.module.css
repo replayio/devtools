@@ -86,3 +86,8 @@
 .testStatusHeader[data-status="Flaky"] {
   color: var(--testsuites-v2-flaky-header);
 }
+
+.noTestsMessage {
+  position: absolute;
+  margin: -0.5rem;
+}

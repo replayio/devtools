@@ -12,6 +12,7 @@ import {
   getDurationString,
   getTruncatedRelativeDate,
 } from "../../Recordings/RecordingListItem/RecordingListItem";
+import { useTestRunDetailsSuspends } from "../../TestRuns/hooks/useTestRunDetailsSuspends";
 import { FilterField } from "../FilterField";
 import dropdownStyles from "../Dropdown.module.css";
 
@@ -155,6 +156,7 @@ export function RunSummary({
   filterCurrentRunByStatus: "all" | "failed-and-flaky";
   setFilterCurrentRunByStatus: (value: "all" | "failed-and-flaky") => void;
 }) {
+  const { tests } = useTestRunDetailsSuspends(testRun.id);
   const {
     contextMenu: contextMenuStatusFilter,
     onContextMenu: onClickStatusFilter,
@@ -179,27 +181,31 @@ export function RunSummary({
       className={`flex flex-col gap-2 border-b border-themeBorder`}
       data-test-id="TestRunSummary"
     >
-      <div className="flex flex-row items-center justify-between gap-2">
-        <div
-          className={`flex-grow ${dropdownStyles.dropdownTrigger}`}
-          data-test-id="TestRunSummary-StatusFilter-DropdownTrigger"
-          onClick={onClickStatusFilter}
-          onKeyDown={onKeyDownStatusFilter}
-          tabIndex={0}
-        >
-          {filterCurrentRunByStatus === "all" ? "All runs" : "Failed and flaky"}
-          <Icon className="h-5 w-5" type="chevron-down" />
-        </div>
-        {contextMenuStatusFilter}
-        <RunStats testRunId={testRun.id} />
-      </div>
+      {tests?.length ? (
+        <>
+          <div className="flex flex-row items-center justify-between gap-2">
+            <div
+              className={`flex-grow ${dropdownStyles.dropdownTrigger}`}
+              data-test-id="TestRunSummary-StatusFilter-DropdownTrigger"
+              onClick={onClickStatusFilter}
+              onKeyDown={onKeyDownStatusFilter}
+              tabIndex={0}
+            >
+              {filterCurrentRunByStatus === "all" ? "All runs" : "Failed and flaky"}
+              <Icon className="h-5 w-5" type="chevron-down" />
+            </div>
+            {contextMenuStatusFilter}
+            <RunStats testRunId={testRun.id} />
+          </div>
 
-      <FilterField
-        placeholder="Filter tests"
-        dataTestId="TestRunSummary-Filter"
-        value={testFilterByText}
-        onChange={setTestFilterByText}
-      />
+          <FilterField
+            placeholder="Filter tests"
+            dataTestId="TestRunSummary-Filter"
+            value={testFilterByText}
+            onChange={setTestFilterByText}
+          />
+        </>
+      ) : null}
       <div
         data-test-id="TestRunSummary-Title"
         className="overflow-hidden overflow-ellipsis whitespace-nowrap border-b border-themeBorder px-4 pt-2 pb-4 font-medium"

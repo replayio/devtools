@@ -3,8 +3,8 @@ import { useTestRunDetailsSuspends } from "ui/components/Library/Team/View/TestR
 import styles from "./TestRuns.module.css";
 
 export function RunStats({ testRunId }: { testRunId: string }) {
-  const { groupedTests } = useTestRunDetailsSuspends(testRunId);
-  if (groupedTests === null) {
+  const { groupedTests, tests } = useTestRunDetailsSuspends(testRunId);
+  if (groupedTests === null || !tests?.length) {
     return null;
   }
 

@@ -71,7 +71,7 @@ function NewSourceAdapter() {
       focusedSource?.startLineIndex !== lineIndex ||
       !locationHasScrolled
     ) {
-      openSource("view-source", location.sourceId, lineIndex, lineIndex, columnNumber);
+      openSource("view-source", location.sourceId, lineIndex, lineIndex, columnNumber, false);
     }
   }, [focusedSource, location, locationHasScrolled, openSource]);
 

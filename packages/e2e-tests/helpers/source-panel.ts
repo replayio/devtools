@@ -70,6 +70,13 @@ export async function addBreakpoint(
   });
 
   await waitForBreakpoint(page, options);
+
+  // We want to add a slight delay after adding a breakpoint so that the
+  // breakpoint logic will have time to send protocol commands to the server,
+  // since that is not guaranteed to happen synchronously on click. This is
+  // important for cases where we add a breakpoint and then immediately
+  // attempt to step to the breakpoint location.
+  await delay(500);
 }
 
 export async function editBadge(

@@ -38,7 +38,8 @@ type SourcesContextType = {
     sourceId: SourceId,
     startLineIndex?: number,
     endLineIndex?: number,
-    columnNumber?: number
+    columnNumber?: number,
+    callSelectLocation?: boolean
   ) => void;
   activeSourceIds: SourceId[];
   pendingFocusUpdate: boolean;
@@ -374,7 +375,8 @@ export function SourcesContextRoot({
       sourceId: SourceId,
       startLineIndex: number | null = null,
       endLineIndex: number | null = null,
-      columnNumber: number | null = null
+      columnNumber: number | null = null,
+      callSelectLocation = true
     ) => {
       startTransition(() => {
         dispatch({
@@ -389,7 +391,7 @@ export function SourcesContextRoot({
         });
 
         const selectLocation = selectLocationRef.current;
-        if (selectLocation) {
+        if (selectLocation && callSelectLocation) {
           selectLocation({
             line: startLineIndex !== null ? startLineIndex + 1 : undefined,
             sourceId,

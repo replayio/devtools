@@ -57,9 +57,15 @@ function TestOverview({ testId }: { testId: string }) {
           <div data-test-id="TestOverviewTitle" className={styles.testTitle}>
             <div>{lastTest.title}</div>
           </div>
-          <div className="flex flex-col overflow-y-auto">
-            <TestDetails testRuns={lastTest.testRuns} />
-          </div>
+          {lastTest.testRuns.length ? (
+            <div className="flex flex-col overflow-y-auto">
+              <TestDetails testRuns={lastTest.testRuns} />
+            </div>
+          ) : (
+            <div className="flex h-full flex-col items-center justify-center">
+              <TestSuitePanelMessage>No test runs found</TestSuitePanelMessage>
+            </div>
+          )}
         </>
       ) : (
         <SelectTestMessage error={!!error} />
