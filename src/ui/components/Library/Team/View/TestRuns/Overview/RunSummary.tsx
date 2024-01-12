@@ -1,19 +1,22 @@
 import { captureException } from "@sentry/react";
 import Link from "next/link";
+import { ContextMenuItem, useContextMenu } from "use-context-menu";
 
 import Icon from "replay-next/components/Icon";
-import { Recording } from "shared/graphql/types";
 import { TestRun, getTestRunTitle } from "shared/test-suites/TestRun";
+import { AttributeContainer } from "ui/components/Library/Team/View/TestRuns/AttributeContainer";
 import { BranchIcon } from "ui/components/Library/Team/View/TestRuns/BranchIcon";
+import { RunStats } from "ui/components/Library/Team/View/TestRuns/RunStats";
 
 import {
   getDurationString,
   getTruncatedRelativeDate,
 } from "../../Recordings/RecordingListItem/RecordingListItem";
-import { AttributeContainer } from "../AttributeContainer";
-import { RunStats } from "../RunStats";
+import { useTestRunDetailsSuspends } from "../../TestRuns/hooks/useTestRunDetailsSuspends";
+import { FilterField } from "../FilterField";
+import dropdownStyles from "../Dropdown.module.css";
 
-export function ModeAttribute({ testRun }: { testRun: TestRun }) {
+function ModeAttribute({ testRun }: { testRun: TestRun }) {
   const { mode } = testRun;
 
   let modeIcon = null;
@@ -51,6 +54,25 @@ export function ModeAttribute({ testRun }: { testRun: TestRun }) {
   return <AttributeContainer icon={modeIcon}>{modeText}</AttributeContainer>;
 }
 
+function RunnerLink({ testRun }: { testRun: TestRun }) {
+  if (!testRun.source?.triggerUrl) {
+    return null;
+  }
+
+  return (
+    <Link
+      data-test-id="TestRun-WorkflowLink"
+      href={testRun.source.triggerUrl}
+      target="_blank"
+      rel="noreferrer noopener"
+      className="flex flex-row items-center gap-1 hover:underline"
+    >
+      <Icon className="h-4 w-4" type="open" />
+      <span>Workflow</span>
+    </Link>
+  );
+}
+
 export function Attributes({ testRun, durationMs }: { testRun: TestRun; durationMs: number }) {
   const { date, source } = testRun;
 
@@ -60,7 +82,7 @@ export function Attributes({ testRun, durationMs }: { testRun: TestRun; duration
     const { branchName, isPrimaryBranch, user } = source;
 
     return (
-      <div className="flex flex-row flex-wrap items-center gap-4">
+      <div className="flex flex-row flex-wrap items-center gap-x-4 gap-y-2">
         <AttributeContainer dataTestId="TestRun-Date" icon="schedule" title={date.toLocaleString()}>
           {getTruncatedRelativeDate(date)}
         </AttributeContainer>
@@ -69,15 +91,19 @@ export function Attributes({ testRun, durationMs }: { testRun: TestRun; duration
             {user}
           </AttributeContainer>
         ) : null}
-        <BranchIcon
-          branchName={branchName}
-          isPrimaryBranch={isPrimaryBranch ?? false}
-          title={getTestRunTitle(testRun)}
-        />
+        {branchName ? (
+          <BranchIcon
+            branchName={branchName}
+            isPrimaryBranch={isPrimaryBranch ?? false}
+            title={getTestRunTitle(testRun)}
+          />
+        ) : null}
         <AttributeContainer dataTestId="TestRun-Duration" icon="timer">
           {durationString}
         </AttributeContainer>
         <ModeAttribute testRun={testRun} />
+        <PullRequestLink testRun={testRun} />
+        <RunnerLink testRun={testRun} />
       </div>
     );
   } else {
@@ -108,65 +134,86 @@ function PullRequestLink({ testRun }: { testRun: TestRun }) {
       className="flex flex-row items-center gap-1 hover:underline"
     >
       <Icon className="h-4 w-4" type="open" />
-      <span data-test-id="TestRun-PullRequest">PR {prNumber}</span>
-    </Link>
-  );
-}
-
-export function RunnerLink({ testRun }: { testRun: TestRun }) {
-  if (!testRun.source?.triggerUrl) {
-    return null;
-  }
-
-  return (
-    <Link
-      data-test-id="TestRun-WorkflowLink"
-      href={testRun.source.triggerUrl}
-      target="_blank"
-      rel="noreferrer noopener"
-      className="flex flex-row items-center gap-1 hover:underline"
-    >
-      <Icon className="h-4 w-4" type="open" />
-      <span>Workflow</span>
+      <span data-test-id="TestRun-PullRequest" className="whitespace-nowrap">
+        PR {prNumber}
+      </span>
     </Link>
   );
 }
 
 export function RunSummary({
-  isPending,
   testRun,
   durationMs,
+  testFilterByText,
+  setTestFilterByText,
+  filterCurrentRunByStatus,
+  setFilterCurrentRunByStatus,
 }: {
-  isPending: boolean;
-  recordings: Recording[];
   testRun: TestRun;
   durationMs: number;
+  testFilterByText: string;
+  setTestFilterByText: (value: string) => void;
+  filterCurrentRunByStatus: "all" | "failed-and-flaky";
+  setFilterCurrentRunByStatus: (value: "all" | "failed-and-flaky") => void;
 }) {
-  const { source } = testRun;
+  const { tests } = useTestRunDetailsSuspends(testRun.id);
+  const {
+    contextMenu: contextMenuStatusFilter,
+    onContextMenu: onClickStatusFilter,
+    onKeyDown: onKeyDownStatusFilter,
+  } = useContextMenu(
+    <>
+      <ContextMenuItem dataTestId="all" onSelect={() => setFilterCurrentRunByStatus("all")}>
+        All tests
+      </ContextMenuItem>
+      <ContextMenuItem
+        dataTestId="failed-and-flaky"
+        onSelect={() => setFilterCurrentRunByStatus("failed-and-flaky")}
+      >
+        Failed and flaky
+      </ContextMenuItem>
+    </>,
+    { alignTo: "auto-target" }
+  );
 
   return (
     <div
-      className={`flex flex-col gap-1 border-b border-themeBorder p-4 ${
-        isPending ? "opacity-50" : ""
-      }`}
+      className={`flex flex-col gap-2 border-b border-themeBorder`}
       data-test-id="TestRunSummary"
     >
-      <div className="flex flex-row items-center justify-between gap-1">
-        <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-xl font-medium">
-          {getTestRunTitle(testRun)}
-        </div>
-        <RunStats testRunId={testRun.id} />
+      {!tests?.length ? (
+        <>
+          <div className="flex flex-row items-center justify-between gap-2">
+            <div
+              className={`flex-grow ${dropdownStyles.dropdownTrigger}`}
+              data-test-id="TestRunSummary-StatusFilter-DropdownTrigger"
+              onClick={onClickStatusFilter}
+              onKeyDown={onKeyDownStatusFilter}
+              tabIndex={0}
+            >
+              {filterCurrentRunByStatus === "all" ? "All runs" : "Failed and flaky"}
+              <Icon className="h-5 w-5" type="chevron-down" />
+            </div>
+            {contextMenuStatusFilter}
+            <RunStats testRunId={testRun.id} />
+          </div>
+
+          <FilterField
+            placeholder="Filter tests"
+            dataTestId="TestRunSummary-Filter"
+            value={testFilterByText}
+            onChange={setTestFilterByText}
+          />
+        </>
+      ) : null}
+      <div
+        data-test-id="TestRunSummary-Title"
+        className="overflow-hidden overflow-ellipsis whitespace-nowrap border-b border-themeBorder px-4 pt-2 pb-4 font-medium"
+      >
+        {getTestRunTitle(testRun)}
       </div>
-      {source?.groupLabel && (
-        <div className="text overflow-hidden overflow-ellipsis whitespace-nowrap font-medium text-bodySubColor">
-          {source.groupLabel}
-        </div>
-      )}
-      <div className="mt-1 flex w-full flex-row items-center gap-4 text-xs">
+      <div className="px-4 pt-2 pb-4 text-xs">
         <Attributes testRun={testRun} durationMs={durationMs} />
-        <div className="grow" />
-        <PullRequestLink testRun={testRun} />
-        <RunnerLink testRun={testRun} />
       </div>
     </div>
   );

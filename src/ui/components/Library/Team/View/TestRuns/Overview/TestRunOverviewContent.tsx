@@ -1,42 +1,49 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import { useTestRunDetailsSuspends } from "ui/components/Library/Team/View/TestRuns/hooks/useTestRunDetailsSuspends";
 import { RunResults } from "ui/components/Library/Team/View/TestRuns/Overview/RunResults";
 import { TestRunsContext } from "ui/components/Library/Team/View/TestRuns/TestRunsContextRoot";
 
+import { TestSuitePanelMessage } from "../../TestSuitePanelMessage";
+import { TestRunPanelWrapper } from "../TestRunPanelWrapper";
 import { RunSummary } from "./RunSummary";
-import styles from "../../../../Testsuites.module.css";
 
 export function TestRunOverviewContent() {
-  const { filterByStatus, filterByText, testRunId, testRunIdForDisplay } =
+  const { testRunId, testRuns, filterTestsByText, setFilterTestsByText } =
     useContext(TestRunsContext);
 
-  const { testRun, recordings, durationMs } = useTestRunDetailsSuspends(testRunId);
+  const { durationMs } = useTestRunDetailsSuspends(testRunId);
+  const [filterCurrentRunByStatus, setFilterCurrentRunByStatus] = useState<
+    "all" | "failed-and-flaky"
+  >("all");
 
-  const isPending = testRunId !== testRunIdForDisplay;
-
-  const hasFilters = filterByStatus !== "all" || filterByText !== "";
+  const testRun = testRuns.find(testRun => testRun.id === testRunId);
 
   let children = null;
-  if (testRun && recordings) {
-    if (!hasFilters || testRun) {
-      children = (
-        <>
-          <RunSummary
-            isPending={isPending}
-            recordings={recordings}
-            testRun={testRun}
-            durationMs={durationMs}
-          />
-          <RunResults isPending={isPending} />
-        </>
-      );
-    }
+  if (testRun) {
+    children = (
+      <>
+        <RunSummary
+          testRun={testRun}
+          durationMs={durationMs}
+          setTestFilterByText={setFilterTestsByText}
+          testFilterByText={filterTestsByText}
+          setFilterCurrentRunByStatus={setFilterCurrentRunByStatus}
+          filterCurrentRunByStatus={filterCurrentRunByStatus}
+        />
+        <RunResults
+          testFilterByText={filterTestsByText}
+          filterCurrentRunByStatus={filterCurrentRunByStatus}
+        />
+      </>
+    );
+  } else {
+    children = (
+      <TestSuitePanelMessage data-test-id="NoTestRunSelected">
+        Select a run to see its details here
+      </TestSuitePanelMessage>
+    );
   }
 
-  return (
-    <div className={`flex h-full flex-col text-sm transition ${styles.runOverview} `}>
-      {children}
-    </div>
-  );
+  return <TestRunPanelWrapper>{children}</TestRunPanelWrapper>;
 }

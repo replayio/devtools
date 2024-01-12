@@ -9,49 +9,51 @@ import {
   useMemo,
   useState,
 } from "react";
+import { STATUS_PENDING } from "suspense";
 
 import { TestRun, getTestRunTitle } from "shared/test-suites/TestRun";
 import { useGetTeamRouteParams } from "ui/components/Library/Team/utils";
-import { useSyncTestRunIdToUrl } from "ui/components/Library/Team/View/TestRuns/hooks/useSyncTestIdToUrl";
+import { useSyncTestStateToUrl } from "ui/components/Library/Team/View/TestRuns/hooks/useSyncTestStateToUrl";
 import { useTestRuns } from "ui/components/Library/Team/View/TestRuns/hooks/useTestRuns";
+import { trackEvent } from "ui/utils/telemetry";
 
 type TestRunsContextType = {
   filterByBranch: "all" | "primary";
   filterByStatus: "all" | "failed";
   filterByText: string;
   filterByTextForDisplay: string;
+  filterTestsByText: string;
   selectTestRun: Dispatch<SetStateAction<string | null>>;
   setFilterByBranch: Dispatch<SetStateAction<"all" | "primary">>;
   setFilterByStatus: Dispatch<SetStateAction<"all" | "failed">>;
   setFilterByText: Dispatch<SetStateAction<string>>;
+  setFilterTestsByText: Dispatch<SetStateAction<string>>;
+  testRunsLoading: boolean;
+  testRuns: TestRun[];
+  testRunCount: number;
   testRunId: string | null;
   testRunIdForDisplay: string | null;
-  testRuns: TestRun[];
+  testId: string | null;
+  setTestId: React.Dispatch<React.SetStateAction<string | null>>;
 };
 
 export const TestRunsContext = createContext<TestRunsContextType>(null as any);
 
-type FilterByBranch = "all" | "primary";
-type FilterByStatus = "all" | "failed";
-
 export function TestRunsContextRoot({ children }: { children: ReactNode }) {
   const { teamId, testRunId: defaultTestRunId } = useGetTeamRouteParams();
 
-  const testRuns = useTestRuns();
+  const { testRuns, status } = useTestRuns();
 
   const [testRunId, setTestRunId] = useState<string | null>(defaultTestRunId);
 
-  const [filterByBranch, setFilterByBranch] = useState<FilterByBranch>(() => {
-    const query = new URLSearchParams(window.location.search);
-    return (query.get("filterByBranch") as FilterByBranch) ?? "all";
-  });
-  const [filterByStatus, setFilterByStatus] = useState<FilterByStatus>(() => {
-    const query = new URLSearchParams(window.location.search);
-    return (query.get("filterByStatus") as FilterByStatus) ?? "all";
-  });
+  const [filterByBranch, setFilterByBranch] = useState<"all" | "primary">("all");
+  const [filterByStatus, setFilterByStatus] = useState<"all" | "failed">("all");
 
   const [filterByText, setFilterByText] = useState("");
   const filterByTextDeferred = useDeferredValue(filterByText);
+  const [filterTestsByText, setFilterTestsByText] = useState("");
+
+  const [testId, setTestId] = useState<string | null>(null);
 
   const router = useRouter();
 
@@ -104,7 +106,11 @@ export function TestRunsContextRoot({ children }: { children: ReactNode }) {
     }
   }, [router, teamId, testRunId, testRuns]);
 
-  useSyncTestRunIdToUrl(teamId, testRunId, setTestRunId);
+  useEffect(() => {
+    setFilterTestsByText("");
+  }, [testRunId]);
+
+  useSyncTestStateToUrl(teamId, testRunId, setTestRunId, testId, setTestId);
 
   const deferredTestRunId = useDeferredValue(testRunId);
 
@@ -115,13 +121,25 @@ export function TestRunsContextRoot({ children }: { children: ReactNode }) {
         filterByStatus,
         filterByText: filterByTextDeferred,
         filterByTextForDisplay: filterByText,
-        selectTestRun: setTestRunId,
+        filterTestsByText,
+        selectTestRun: runId => {
+          setTestRunId(runId);
+          trackEvent("test_dashboard.select_run", { view: "runs" });
+        },
         setFilterByBranch,
         setFilterByStatus,
         setFilterByText,
+        setFilterTestsByText,
         testRunId: deferredTestRunId,
         testRunIdForDisplay: testRunId,
+        testRunsLoading: status === STATUS_PENDING,
         testRuns: filteredTestRuns,
+        testRunCount: status === STATUS_PENDING ? 0 : testRuns.length,
+        testId,
+        setTestId: testId => {
+          setTestId(testId);
+          trackEvent("test_dashboard.select_test", { view: "runs" });
+        },
       }}
     >
       {children}

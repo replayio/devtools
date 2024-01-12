@@ -6,8 +6,8 @@ import { Test } from "shared/test-suites/TestRun";
 import { TeamContext } from "ui/components/Library/Team/TeamContextRoot";
 import useToken from "ui/utils/useToken";
 
-import { testsCache } from "../../TestRuns/suspense/TestsCache";
 import { TimeFilterContext } from "../../TimeFilterContextRoot";
+import { testsCache } from "../suspense/TestsCache";
 
 const EMPTY_ARRAY: any[] = [];
 
