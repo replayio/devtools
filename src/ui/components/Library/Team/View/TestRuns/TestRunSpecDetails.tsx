@@ -24,7 +24,13 @@ export function TestRunSpecDetails() {
       ?.filter(t => t.testId === testId) ?? [];
   const selectedTest = selectedSpecTests?.[0];
 
-  if (
+  if (!tests?.length) {
+    return (
+      <TestSuitePanelMessage data-test-id="NoTestData">
+        No test data available for this test run
+      </TestSuitePanelMessage>
+    );
+  } else if (
     !testId ||
     groupedTests === null ||
     selectedTest == null ||

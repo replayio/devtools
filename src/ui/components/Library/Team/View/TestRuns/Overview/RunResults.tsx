@@ -22,6 +22,7 @@ import { TestRunsContext } from "ui/components/Library/Team/View/TestRuns/TestRu
 import FileIcon from "ui/components/shared/Icon";
 import { TestGroup } from "ui/utils/testRuns";
 
+import { TestSuitePanelMessage } from "../../TestSuitePanelMessage";
 import styles from "../TestRuns.module.css";
 
 export function RunResults({
@@ -35,10 +36,18 @@ export function RunResults({
 
   const filterByTextDeferred = useDeferredValue(testFilterByText);
 
-  const { groupedTests } = useTestRunDetailsSuspends(testRunId);
+  const { groupedTests, tests } = useTestRunDetailsSuspends(testRunId);
   assert(groupedTests !== null);
 
   const { passedRecordings, failedRecordings, flakyRecordings } = groupedTests;
+
+  if (!tests?.length) {
+    return (
+      <TestSuitePanelMessage data-test-id="NoTestRunSelected" className={styles.noTestsMessage}>
+        No test data available for this test run
+      </TestSuitePanelMessage>
+    );
+  }
 
   return (
     <div
