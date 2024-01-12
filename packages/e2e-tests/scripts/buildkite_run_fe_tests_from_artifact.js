@@ -5,8 +5,12 @@ const install_build_products = require("./build_products");
 const run_fe_tests = require("./buildkite_run_fe_tests");
 
 function run_fe_tests_from_artifact(PLATFORM, ARCH) {
+  console.group("BUILD PREP");
+  console.time("BUILD PREP");
   let RUNTIME_BUILD_ID = build_id_from_artifact(PLATFORM, ARCH);
   let CHROME_BINARY_PATH = install_build_products(RUNTIME_BUILD_ID, PLATFORM, ARCH);
+  console.timeEnd("BUILD PREP");
+  console.groupEnd();
 
   run_fe_tests(CHROME_BINARY_PATH);
 }

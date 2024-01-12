@@ -16,7 +16,7 @@ beforeEach();
 test("should expand and collapse sources", async ({ page }, testInfo) => {
   await toggleExcludeNodeModulesCheckbox(page, false);
   await searchSources(page, "function t");
-  await verifySourceSearchSummary(page, "3 results");
+  await verifySourceSearchSummary(page, "3 results in 1 file");
   await verifyVisibleResultsCount(page, 6);
   await takeScreenshot(
     page,
@@ -55,7 +55,7 @@ test("should expand and collapse sources", async ({ page }, testInfo) => {
 
   await toggleSearchResultsForFileName(page, true, { sourceId: "h1" });
   await toggleSearchResultsForFileName(page, true, { sourceId: "1" });
-  await verifySourceSearchSummary(page, "3 results");
+  await verifySourceSearchSummary(page, "3 results in 1 file");
   await verifyVisibleResultsCount(page, 6);
   await takeScreenshot(
     page,
