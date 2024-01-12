@@ -36,7 +36,9 @@ export function useSyncTestStateToUrl(
   useEffect(() => {
     const testRunIdFromState = prevTestRunIdRef.current;
     const testIdFromState = prevTestIdRef.current;
-    const { testRunId: testRunIdFromUrl, testId: testIdFromUrl } = parseQueryParams(router.query);
+    const { testOrTestRunId: testRunIdFromUrl, testId: testIdFromUrl } = parseQueryParams(
+      router.query
+    );
     if (testRunIdFromUrl) {
       if (testRunIdFromState !== testRunIdFromUrl) {
         setTestRunId(testRunIdFromUrl);
