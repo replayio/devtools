@@ -4,7 +4,6 @@ import { ContextMenuItem, useContextMenu } from "use-context-menu";
 
 import Icon from "replay-next/components/Icon";
 import { TestRun, getTestRunTitle } from "shared/test-suites/TestRun";
-import { AttributeContainer } from "ui/components/Library/Team/View/TestRuns/AttributeContainer";
 import { BranchIcon } from "ui/components/Library/Team/View/TestRuns/BranchIcon";
 import { RunStats } from "ui/components/Library/Team/View/TestRuns/RunStats";
 
@@ -13,6 +12,7 @@ import {
   getTruncatedRelativeDate,
 } from "../../Recordings/RecordingListItem/RecordingListItem";
 import { useTestRunDetailsSuspends } from "../../TestRuns/hooks/useTestRunDetailsSuspends";
+import { AttributeContainer } from "../AttributeContainer";
 import { Dropdown } from "../Dropdown";
 import { FilterField } from "../FilterField";
 
