@@ -43,7 +43,7 @@ export function RunResults({
 
   if (!tests?.length) {
     return (
-      <TestSuitePanelMessage data-test-id="NoTestRunSelected">
+      <TestSuitePanelMessage data-test-id="NoTestRunSelected" className={styles.noTestsMessage}>
         No test data available for this test run
       </TestSuitePanelMessage>
     );
