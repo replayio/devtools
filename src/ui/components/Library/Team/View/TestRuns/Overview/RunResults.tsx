@@ -23,6 +23,7 @@ import FileIcon from "ui/components/shared/Icon";
 import { TestGroup } from "ui/utils/testRuns";
 
 import { TestSuitePanelMessage } from "../../TestSuitePanelMessage";
+import { TestRunLibraryRow } from "../TestRunLibraryRow";
 import styles from "../TestRuns.module.css";
 
 export function RunResults({
@@ -157,21 +158,18 @@ const FileNodeRenderer = memo(function FileNodeRenderer({
   const isSelected = currentTestId === testId;
 
   return (
-    <>
-      <div
-        className={`flex cursor-pointer items-center gap-2 truncate rounded py-1.5 pr-4 ${
-          styles.libraryRow
-        } ${isSelected ? styles.libraryRowSelected : ""}`}
-        data-test-id="TestRunResult-FileNode"
-        onClick={onClick}
-        style={{
-          paddingLeft: `${depth * 1}rem`,
-        }}
-      >
-        <FileIcon className={iconClass} filename={iconFilename} />
-        <div className="truncate">{fileNode.name}</div>
-      </div>
-    </>
+    <TestRunLibraryRow
+      isSelected={isSelected}
+      className="cursor-pointer gap-2 truncate py-1.5 pr-4"
+      data-test-id="TestRunResult-FileNode"
+      onClick={onClick}
+      style={{
+        paddingLeft: `${depth * 1}rem`,
+      }}
+    >
+      <FileIcon className={iconClass} filename={iconFilename} />
+      <div className="truncate">{fileNode.name}</div>
+    </TestRunLibraryRow>
   );
 });
 
@@ -216,10 +214,9 @@ function PathNodeRenderer({
   return (
     <>
       {name && (
-        <div
-          className={`cursor-pointer truncate rounded py-2 pr-4 ${styles.libraryRow} ${
-            containsSelectedSpec ? styles.libraryRowSelected : ""
-          }`}
+        <TestRunLibraryRow
+          isSelected={containsSelectedSpec}
+          className="cursor-pointer truncate py-2 pr-4"
           data-test-id="TestRunResult-PathNode"
           data-test-state={expanded ? "expanded" : "collapsed"}
           onClick={onClick}
@@ -241,7 +238,7 @@ function PathNodeRenderer({
           {!expanded && (
             <div className="text-xs text-bodySubColor">({pathNode.nestedTestCount} tests)</div>
           )}
-        </div>
+        </TestRunLibraryRow>
       )}
       <Offscreen mode={expanded ? "visible" : "hidden"}>
         {children.map((childNode, index) => {

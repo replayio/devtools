@@ -127,21 +127,3 @@
   white-space: nowrap;
   font-weight: 500;
 }
-
-:root:global(.theme-dark) .libraryRow {
-  color: var(--body-color);
-  background-color: var(--body-bgcolor);
-}
-
-:root:global(.theme-dark) .libraryRow:hover,
-:root:global(.theme-dark) .replayRow:hover {
-  background-color: var(--primary-accent-dimmed-hover);
-}
-
-:root:global(.theme-dark) .libraryRowSelected {
-  background-color: var(--primary-accent-dimmed);
-}
-
-:root:global(.theme-dark) .libraryRowSelected:hover {
-  background-color: var(--primary-accent-dimmed);
-}

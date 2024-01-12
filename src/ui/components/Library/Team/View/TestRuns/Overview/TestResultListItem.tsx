@@ -12,6 +12,7 @@ import {
 } from "../../Recordings/RecordingListItem/RecordingListItem";
 import { StatusIcon } from "../../Tests/Overview/StatusIcon";
 import { AttributeContainer } from "../AttributeContainer";
+import { TestRunLibraryRow } from "../TestRunLibraryRow";
 import styles from "../../../../Testsuites.module.css";
 
 function RecordingAttributes({
@@ -66,24 +67,26 @@ export function TestResultListItem({
   const numComments = comments?.length ?? 0;
 
   return (
-    <a
-      href={`/recording/${recordingId}?e2e=${e2e ?? ""}&apiKey=${apiKey ?? ""}`}
-      className={`${styles.recordingLink} ${styles.libraryRow}`}
-      data-test-id="TestRunResultsListItem"
-      data-test-status={label}
-      onClick={() => trackEvent("test_dashboard.open_replay", { view: "runs", result: label })}
-    >
-      <StatusIcon status={label} isProcessed={isProcessed} />
-      <div className={`${styles.fileInfo} gap-1`}>
-        <div className={styles.title}>{title || "Test"}</div>
-        <RecordingAttributes recording={recording} testRun={testRun} />
-      </div>
-      {numComments > 0 && (
-        <div className={styles.comments}>
-          <img src="/images/comment-outline.svg" className={styles.commentIcon} />
-          <span>{numComments}</span>
+    <TestRunLibraryRow>
+      <a
+        href={`/recording/${recordingId}?e2e=${e2e ?? ""}&apiKey=${apiKey ?? ""}`}
+        className={styles.recordingLink}
+        data-test-id="TestRunResultsListItem"
+        data-test-status={label}
+        onClick={() => trackEvent("test_dashboard.open_replay", { view: "runs", result: label })}
+      >
+        <StatusIcon status={label} isProcessed={isProcessed} />
+        <div className={`${styles.fileInfo} gap-1`}>
+          <div className={styles.title}>{title || "Test"}</div>
+          <RecordingAttributes recording={recording} testRun={testRun} />
         </div>
-      )}
-    </a>
+        {numComments > 0 && (
+          <div className={styles.comments}>
+            <img src="/images/comment-outline.svg" className={styles.commentIcon} />
+            <span>{numComments}</span>
+          </div>
+        )}
+      </a>
+    </TestRunLibraryRow>
   );
 }
