@@ -181,8 +181,8 @@ export default function Header() {
   assert(recording != null);
 
   let fallbackUrl = window.location.origin;
-  if (recording.workspace !== null) {
-    fallbackUrl = `/team/${recording.workspace?.id}`;
+  if (recording.workspace != null) {
+    fallbackUrl = `/team/${recording.workspace.id}`;
     if (isTestSuiteReplay(recording) && recording.testRun?.id) {
       fallbackUrl += `/runs/${recording.testRun.id}`;
     }
