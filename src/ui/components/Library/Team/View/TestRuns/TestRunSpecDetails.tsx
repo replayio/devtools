@@ -3,8 +3,8 @@ import { useContext, useMemo, useState } from "react";
 import Icon from "replay-next/components/Icon";
 import { TestRunTestWithRecordings } from "shared/test-suites/TestRun";
 
-import { useTestRunDetailsSuspends } from "../TestRuns/hooks/useTestRunDetailsSuspends";
 import { TestSuitePanelMessage } from "../TestSuitePanelMessage";
+import { useTestRunDetailsSuspends } from "./hooks/useTestRunDetailsSuspends";
 import { TestRunPanelWrapper } from "./TestRunPanelWrapper";
 import { TestRunResultList } from "./TestRunResultList";
 import { TestRunsContext } from "./TestRunsContextRoot";

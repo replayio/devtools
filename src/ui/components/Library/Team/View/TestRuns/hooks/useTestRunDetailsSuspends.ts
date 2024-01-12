@@ -2,8 +2,9 @@ import { useContext } from "react";
 
 import { GraphQLClientContext } from "replay-next/src/contexts/GraphQLClientContext";
 import { TeamContext } from "ui/components/Library/Team/TeamContextRoot";
-import { testRunDetailsCache } from "ui/components/Library/Team/View/TestRuns/suspense/TestRunsCache";
 import useToken from "ui/utils/useToken";
+
+import { testRunDetailsCache } from "../suspense/TestRunsCache";
 
 export function useTestRunDetailsSuspends(testRunId: string | null) {
   const graphQLClient = useContext(GraphQLClientContext);

@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 
 import { IndeterminateProgressBar } from "replay-next/components/IndeterminateLoader";
-import { TestRunsContext } from "ui/components/Library/Team/View/NewTestRuns/TestRunsContextRoot";
+import { TestRunsContext } from "ui/components/Library/Team/View/TestRuns/TestRunsContextRoot";
 
 import styles from "./TestRunPanelWrapper.module.css";
 

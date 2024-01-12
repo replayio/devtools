@@ -33,7 +33,12 @@ export function Execution({
   }
 
   return (
-    <div data-test-id="ExecutionItem" className="flex flex-col px-2" data-test-run-id={testRunId}>
+    <a
+      data-test-run-id={testRunId}
+      data-test-id="ExecutionItem"
+      className="flex flex-col px-2"
+      href={shouldCollapse ? `/recording/${sortedRecordings[0].id}` : undefined}
+    >
       <div className="flex flex-row items-center justify-between gap-2 overflow-hidden py-2">
         <div className="flex flex-row items-center gap-2 overflow-hidden">
           {icon}
@@ -67,7 +72,7 @@ export function Execution({
           ))}
         </div>
       ) : null}
-    </div>
+    </a>
   );
 }
 function ExecutionStatus({ result }: { result: string }) {
