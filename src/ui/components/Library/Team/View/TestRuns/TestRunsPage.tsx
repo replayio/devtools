@@ -18,7 +18,7 @@ import {
 } from "../TimeFilterContextRoot";
 import { Dropdown } from "./Dropdown";
 import { FilterField } from "./FilterField";
-import { TestRunOverviewPage } from "./Overview/TestRunOverviewContextRoot";
+import { TestRunOverviewPanel } from "./Overview/TestRunOverviewPanel";
 import { TestRunList } from "./TestRunList";
 import { TestRunsContext, TestRunsContextRoot } from "./TestRunsContextRoot";
 import { TestRunSpecDetails } from "./TestRunSpecDetails";
@@ -189,7 +189,7 @@ function TestRunsContent() {
             className={`flex h-full w-full items-center justify-center overflow-hidden rounded-xl ${styles.testReplayDetails}`}
           >
             <Suspense fallback={<LibrarySpinner />}>
-              <TestRunOverviewPage />
+              <TestRunOverviewPanel />
             </Suspense>
           </div>
         </Panel>

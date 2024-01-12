@@ -8,7 +8,7 @@ import { TestSuitePanelMessage } from "../../TestSuitePanelMessage";
 import { TestRunPanelWrapper } from "../TestRunPanelWrapper";
 import { RunSummary } from "./RunSummary";
 
-export function TestRunOverviewContent() {
+export function TestRunOverviewPanel() {
   const { testRunId, testRuns, filterTestsByText, setFilterTestsByText } =
     useContext(TestRunsContext);
 
