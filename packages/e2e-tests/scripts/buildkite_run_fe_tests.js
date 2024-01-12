@@ -40,7 +40,6 @@ function run_fe_tests(CHROME_BINARY_PATH) {
   console.timeEnd("DEPS");
   console.groupEnd();
 
-
   console.group("SAVE-EXAMPLES");
   console.time("SAVE-EXAMPLES");
   {
@@ -56,6 +55,20 @@ function run_fe_tests(CHROME_BINARY_PATH) {
     process.env.AUTHENTICATED_TESTS_WORKSPACE_API_KEY = process.env.RECORD_REPLAY_API_KEY;
     process.env.PLAYWRIGHT_TEST_BASE_URL = "https://app.replay.io";
 
+    execSync(
+      `xvfb-run ./packages/e2e-tests/scripts/save-examples.ts --runtime=chromium --target=browser --project=replay-chromium-local`,
+      { stdio: "inherit", env: process.env }
+    );
+
+    // Without the wait, the next xvfb-run command can fail.
+    execSync("sleep 5");
+  }
+  console.timeEnd("SAVE-EXAMPLES");
+  console.groupEnd();
+
+  console.group("TESTS");
+  console.time("TESTS");
+  {
     // Run the known-passing tests.
     const testNames = [
       "breakpoints-01",
@@ -98,21 +111,6 @@ function run_fe_tests(CHROME_BINARY_PATH) {
       "stepping-01",
       "stepping-05_chromium",
     ];
-
-    execSync(
-      `xvfb-run ./packages/e2e-tests/scripts/save-examples.ts --runtime=chromium --target=browser --project=replay-chromium-local`,
-      { stdio: "inherit", env: process.env }
-    );
-
-    // Without the wait, the next xvfb-run command can fail.
-    execSync("sleep 5");
-  }
-  console.timeEnd("SAVE-EXAMPLES");
-  console.groupEnd();
-
-  console.group("TESTS");
-  console.time("TESTS");
-  {
     execSync(`xvfb-run yarn test:debug ${testNames.join(" ")}`, {
       stdio: "inherit",
       stderr: "inherit",
