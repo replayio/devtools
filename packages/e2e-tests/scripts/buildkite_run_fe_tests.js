@@ -111,7 +111,7 @@ function run_fe_tests(CHROME_BINARY_PATH) {
       "stepping-01",
       "stepping-05_chromium",
     ];
-    execSync(`xvfb-run yarn test:debug ${testNames.join(" ")}`, {
+    execSync(`xvfb-run yarn test:runtime ${testNames.join(" ")}`, {
       stdio: "inherit",
       stderr: "inherit",
     });
