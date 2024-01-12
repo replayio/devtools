@@ -5,7 +5,7 @@ const getSecret = require("./aws_secrets");
 
 function run_fe_tests(CHROME_BINARY_PATH) {
   console.group("START");
-  console.time("START");
+  console.time("START time");
   {
     // Install node deps
     execSync("npm i -g yarn", {
@@ -37,11 +37,11 @@ function run_fe_tests(CHROME_BINARY_PATH) {
     // Wait a little, to let the yarn dev server start up.
     execSync("sleep 5");
   }
-  console.timeEnd("DEPS");
+  console.timeEnd("START time");
   console.groupEnd();
 
   console.group("SAVE-EXAMPLES");
-  console.time("SAVE-EXAMPLES");
+  console.time("SAVE-EXAMPLES time");
   {
     if (!process.env.HASURA_ADMIN_SECRET) {
       process.env.HASURA_ADMIN_SECRET = getSecret("prod/hasura-admin-secret", "us-east-2");
@@ -63,11 +63,11 @@ function run_fe_tests(CHROME_BINARY_PATH) {
     // Without the wait, the next xvfb-run command can fail.
     execSync("sleep 5");
   }
-  console.timeEnd("SAVE-EXAMPLES");
+  console.timeEnd("SAVE-EXAMPLES time");
   console.groupEnd();
 
   console.group("TESTS");
-  console.time("TESTS");
+  console.time("TESTS time");
   {
     // Run the known-passing tests.
     const testNames = [
@@ -119,7 +119,7 @@ function run_fe_tests(CHROME_BINARY_PATH) {
     // Make sure the web server shuts down.
     webProc.kill("SIGKILL");
   }
-  console.timeEnd("TESTS");
+  console.timeEnd("TESTS time");
   console.groupEnd();
 
   // Without this, we can hang--no idea why.
