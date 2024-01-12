@@ -181,7 +181,7 @@ export function RunSummary({
       className={`flex flex-col gap-2 border-b border-themeBorder`}
       data-test-id="TestRunSummary"
     >
-      {!tests?.length ? (
+      {tests?.length ? (
         <>
           <div className="flex flex-row items-center justify-between gap-2">
             <div
