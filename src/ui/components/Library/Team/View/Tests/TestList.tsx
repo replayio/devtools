@@ -3,10 +3,10 @@ import ReactVirtualizedAutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 
 import { Test } from "shared/test-suites/TestRun";
-import { TestListItem } from "ui/components/Library/Team/View/Tests/TestListItem";
 
 import { TestSuitePanelMessage } from "../TestSuitePanelMessage";
 import { TestContext } from "./TestContextRoot";
+import { TestListItem } from "./TestListItem";
 import styles from "./TestList.module.css";
 
 const ROW_HEIGHT = 45;

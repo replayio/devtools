@@ -1,7 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 
 import { IndeterminateProgressBar } from "replay-next/components/IndeterminateLoader";
-import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 
 import { TestSuitePanelMessage } from "../../TestSuitePanelMessage";
 import { useTest } from "../hooks/useTest";

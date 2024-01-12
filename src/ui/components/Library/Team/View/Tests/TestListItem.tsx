@@ -1,9 +1,9 @@
 import { useContext, useMemo } from "react";
 
 import { Test } from "shared/test-suites/TestRun";
-import HighlightedText from "ui/components/Library/Team/View/TestRuns/HighlightedText";
 import Icon from "ui/components/shared/Icon";
 
+import HighlightedText from "../TestRuns/HighlightedText";
 import { TestRunLibraryRow } from "../TestRuns/TestRunLibraryRow";
 import { TestContext } from "./TestContextRoot";
 import styles from "./TestListItem.module.css";

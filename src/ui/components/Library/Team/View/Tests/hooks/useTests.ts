@@ -1,4 +1,4 @@
-import { useContext, useRef } from "react";
+import { useContext } from "react";
 import { Status, useImperativeCacheValue } from "suspense";
 
 import { GraphQLClientContext } from "replay-next/src/contexts/GraphQLClientContext";
