@@ -1,8 +1,8 @@
 import { useContext } from "react";
 
 import { FilterBarContainer } from "./FilterBarContainer";
-import { TestRunsPage } from "./NewTestRuns/TestRunsPage";
 import { RecordingsPage } from "./Recordings/RecordingsPage";
+import { TestRunsPage } from "./TestRuns/TestRunsPage";
 import { TestsPage } from "./Tests/TestsPage";
 import { ViewContext, ViewContextRoot } from "./ViewContextRoot";
 
