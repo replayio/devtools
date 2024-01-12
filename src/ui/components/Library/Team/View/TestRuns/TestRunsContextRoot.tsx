@@ -40,7 +40,7 @@ type TestRunsContextType = {
 export const TestRunsContext = createContext<TestRunsContextType>(null as any);
 
 export function TestRunsContextRoot({ children }: { children: ReactNode }) {
-  const { teamId, testRunId: defaultTestRunId } = useGetTeamRouteParams();
+  const { teamId, testOrTestRunId: defaultTestRunId } = useGetTeamRouteParams();
 
   const { testRuns, status } = useTestRuns();
 

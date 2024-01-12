@@ -53,13 +53,17 @@ export const findTestRunByText = async (page: Page, locator: Locator, text: stri
   throw new Error(`Test run with text ${text} not found`);
 };
 
-export const startTest = async (page: Page, apiKey: string, teamId: string) => {
+export const startTest = async (page: Page, apiKey: string, teamId: string, testId?: string) => {
   const base = process.env.PLAYWRIGHT_TEST_BASE_URL || "http://localhost:8080";
-  const url = `${base}/team/${teamId}/tests?e2e=1&apiKey=${apiKey}`;
+  const url = `${base}/team/${teamId}/tests${testId ? `/${testId}` : ""}?e2e=1&apiKey=${apiKey}`;
   await debugPrint(page, `Navigating to ${chalk.bold(url)}`, "startTestView");
   await page.goto(url);
   await page.locator('[data-test-id="TestList"]').waitFor();
   await page.locator('[data-test-id="TestListItem"]').first().waitFor();
+
+  if (testId) {
+    await page.waitForSelector('[data-test-id="NoTestSelected"]', { state: "detached" });
+  }
 };
 
 export const noTestMatches = (page: Page) => page.locator('[data-test-id="NoTestMatches"]');

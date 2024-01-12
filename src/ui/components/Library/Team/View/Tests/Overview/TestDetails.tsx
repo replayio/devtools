@@ -34,7 +34,7 @@ function TestRun({ testRun }: { testRun: GroupedTestRun }) {
   return (
     <div className="flex flex-col">
       {sortedExecutions.map((e, i) => (
-        <Execution execution={e} key={i} />
+        <Execution execution={e} key={i} testRunId={testRun.testRunId} />
       ))}
     </div>
   );
