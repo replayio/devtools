@@ -35,7 +35,7 @@ type FilterByBranch = "all" | "primary";
 type FilterByStatus = "all" | "failed";
 
 export function TestRunsContextRoot({ children }: { children: ReactNode }) {
-  const { teamId, testRunId: defaultTestRunId } = useGetTeamRouteParams();
+  const { teamId, viewId: defaultTestRunId } = useGetTeamRouteParams();
 
   const testRuns = useTestRuns();
 

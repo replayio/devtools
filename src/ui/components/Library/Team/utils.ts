@@ -6,11 +6,9 @@ import { getRecordingWorkspace } from "ui/reducers/app";
 import { useAppSelector } from "ui/setup/hooks";
 
 export function parseQueryParams(query: ParsedUrlQuery) {
-  const [teamId, view, testOrTestRunId, _, testId] = Array.isArray(query.param)
-    ? query.param
-    : [query.param!];
+  const [teamId, view, viewId, subId] = Array.isArray(query.param) ? query.param : [query.param!];
 
-  return { teamId, testOrTestRunId: testOrTestRunId || null, view: view as View, testId };
+  return { teamId, viewId: viewId || null, view: view as View, subId };
 }
 
 export function useGetTeamRouteParams() {

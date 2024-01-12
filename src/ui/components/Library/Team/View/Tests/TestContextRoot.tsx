@@ -14,7 +14,7 @@ import { Test } from "shared/test-suites/TestRun";
 import { trackEvent } from "ui/utils/telemetry";
 
 import { useGetTeamRouteParams } from "../../utils";
-import { useSyncTestIdToUrl } from "./hooks/useSyncTestIdToUrl";
+import { useSyncTestStateToUrl } from "../NewTestRuns/hooks/useSyncTestStateToUrl";
 import { useTests } from "./hooks/useTests";
 
 type TestsContextType = {
@@ -90,7 +90,7 @@ export function TestsContextRoot({ children }: { children: ReactNode }) {
     };
   }, [sortBy, filterByText, filterByTextDeferred, deferredTestId, testId, status, tests]);
 
-  useSyncTestIdToUrl(teamId, testId, setTestId);
+  useSyncTestStateToUrl(teamId, testId, setTestId);
 
   return <TestContext.Provider value={value}>{children}</TestContext.Provider>;
 }
