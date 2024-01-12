@@ -1,11 +1,10 @@
-import { useContext, useEffect, useState } from "react";
-
-import { useTestRunDetailsSuspends } from "ui/components/Library/Team/View/TestRuns/hooks/useTestRunDetailsSuspends";
-import { RunResults } from "ui/components/Library/Team/View/TestRuns/Overview/RunResults";
-import { TestRunsContext } from "ui/components/Library/Team/View/TestRuns/TestRunsContextRoot";
+import { useContext, useState } from "react";
 
 import { TestSuitePanelMessage } from "../../TestSuitePanelMessage";
+import { useTestRunDetailsSuspends } from "../hooks/useTestRunDetailsSuspends";
+import { RunResults } from "../Overview/RunResults";
 import { TestRunPanelWrapper } from "../TestRunPanelWrapper";
+import { TestRunsContext } from "../TestRunsContextRoot";
 import { RunSummary } from "./RunSummary";
 
 export function TestRunOverviewPanel() {

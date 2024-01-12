@@ -1,12 +1,15 @@
 import { useContext } from "react";
 
 import { TestRun, getTestRunTitle } from "shared/test-suites/TestRun";
-import HighlightedText from "ui/components/Library/Team/View/TestRuns/HighlightedText";
 import Icon from "ui/components/shared/Icon";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 
 import { getTruncatedRelativeDate } from "../Recordings/RecordingListItem/RecordingListItem";
+<<<<<<< HEAD
 import { TestRunLibraryRow } from "./TestRunLibraryRow";
+=======
+import HighlightedText from "./HighlightedText";
+>>>>>>> 2e33334b8 (chore: standardize test run imports)
 import { TestRunsContext } from "./TestRunsContextRoot";
 import styles from "./TestRunListItem.module.css";
 

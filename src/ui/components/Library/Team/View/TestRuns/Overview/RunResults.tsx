@@ -10,20 +10,19 @@ import {
 } from "react";
 
 import Icon from "replay-next/components/Icon";
+import FileIcon from "ui/components/shared/Icon";
+import { TestGroup } from "ui/utils/testRuns";
+
+import { TestSuitePanelMessage } from "../../TestSuitePanelMessage";
 import {
   FileNode,
   PathNode,
   isPathNode,
   treeContainTest,
   useFileNameTree,
-} from "ui/components/Library/Team/View/TestRuns/hooks/useFileNameTree";
-import { useTestRunDetailsSuspends } from "ui/components/Library/Team/View/TestRuns/hooks/useTestRunDetailsSuspends";
-import { TestRunsContext } from "ui/components/Library/Team/View/TestRuns/TestRunsContextRoot";
-import FileIcon from "ui/components/shared/Icon";
-import { TestGroup } from "ui/utils/testRuns";
-
-import { TestSuitePanelMessage } from "../../TestSuitePanelMessage";
-import { TestRunLibraryRow } from "../TestRunLibraryRow";
+} from "../hooks/useFileNameTree";
+import { useTestRunDetailsSuspends } from "../hooks/useTestRunDetailsSuspends";
+import { TestRunsContext } from "../TestRunsContextRoot";
 import styles from "./RunResults.module.css";
 
 export function RunResults({

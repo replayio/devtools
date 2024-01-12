@@ -3,9 +3,9 @@ import ReactVirtualizedAutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 
 import { TestRun } from "shared/test-suites/TestRun";
-import { TestRunListItem } from "ui/components/Library/Team/View/TestRuns/TestRunListItem";
 
 import { TestSuitePanelMessage } from "../TestSuitePanelMessage";
+import { TestRunListItem } from "./TestRunListItem";
 import { TestRunsContext } from "./TestRunsContextRoot";
 import styles from "./TestRunList.module.css";
 

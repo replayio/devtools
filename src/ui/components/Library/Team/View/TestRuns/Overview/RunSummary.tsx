@@ -4,8 +4,6 @@ import { ContextMenuItem, useContextMenu } from "use-context-menu";
 
 import Icon from "replay-next/components/Icon";
 import { TestRun, getTestRunTitle } from "shared/test-suites/TestRun";
-import { BranchIcon } from "ui/components/Library/Team/View/TestRuns/BranchIcon";
-import { RunStats } from "ui/components/Library/Team/View/TestRuns/RunStats";
 
 import {
   getDurationString,
@@ -13,8 +11,10 @@ import {
 } from "../../Recordings/RecordingListItem/RecordingListItem";
 import { useTestRunDetailsSuspends } from "../../TestRuns/hooks/useTestRunDetailsSuspends";
 import { AttributeContainer } from "../AttributeContainer";
+import { BranchIcon } from "../BranchIcon";
 import { Dropdown } from "../Dropdown";
 import { FilterField } from "../FilterField";
+import { RunStats } from "../RunStats";
 
 function ModeAttribute({ testRun }: { testRun: TestRun }) {
   const { mode } = testRun;

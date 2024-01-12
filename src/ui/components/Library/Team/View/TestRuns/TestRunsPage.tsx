@@ -5,7 +5,6 @@ import { ContextMenuItem, useContextMenu } from "use-context-menu";
 import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBoundary";
 import Icon from "replay-next/components/Icon";
 import { IndeterminateProgressBar } from "replay-next/components/IndeterminateLoader";
-import useLocalStorageUserData from "shared/user-data/LocalStorage/useLocalStorageUserData";
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 import { trackEvent } from "ui/utils/telemetry";
 
