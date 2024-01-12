@@ -16,7 +16,7 @@ beforeEach();
 test("should find matches in multiple sources", async ({ page }, testInfo) => {
   await toggleExcludeNodeModulesCheckbox(page, false);
   await searchSources(page, "function t");
-  await verifySourceSearchSummary(page, "3 results");
+  await verifySourceSearchSummary(page, "3 results in 1 file");
   // wait for hit counts to be loaded
   await waitFor(async () =>
     expect(

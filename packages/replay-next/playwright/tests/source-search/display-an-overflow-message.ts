@@ -13,6 +13,6 @@ beforeEach();
 test("display an overflow message", async ({ page }, testInfo) => {
   await toggleExcludeNodeModulesCheckbox(page, false);
   await searchSources(page, "e");
-  await verifySourceSearchSummary(page, "first 50 results");
+  await verifySourceSearchSummary(page, "First 50 results");
   await verifySourceSearchOverflowMessageShown(page, true);
 });
