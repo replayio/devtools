@@ -151,7 +151,6 @@ export function setupGraphics(store: AppStore) {
         const { screen, mouse } = await getGraphicsAtTime(getTime(store.getState()), true);
         if (screen) {
           paintedGraphics = true;
-          paintGraphics(screen, mouse);
         }
       }
     };
@@ -229,21 +228,6 @@ export async function fetchScreenshotForPause(pauseId: string) {
   }
 
   return screenShot;
-}
-
-export async function repaintAtPause(
-  time: number,
-  pauseId: string,
-  shouldCancelRepaint: (time: number, pauseId: string) => boolean
-) {
-  const screenshot = await fetchScreenshotForPause(pauseId);
-
-  if (screenshot && !shouldCancelRepaint(time, pauseId)) {
-    const { mouse } = await getGraphicsAtTime(time);
-    paintGraphics(screenshot, mouse);
-
-    return screenshot;
-  }
 }
 
 export async function addScreenForPoint(point: string, time: number) {
@@ -377,24 +361,6 @@ let gLastBounds: {
 
 // Mouse information to draw.
 let gDrawMouse: MouseAndClickPosition | null = null;
-
-export function paintGraphics(screenShot?: ScreenShot, mouse?: MouseAndClickPosition) {
-  if (!screenShot) {
-    clearGraphics();
-  } else {
-    assert(screenShot.data, "no screenshot data");
-    addScreenShot(screenShot);
-    if (gDrawImage && gDrawImage.width && gDrawImage.height) {
-      gLastImage = gDrawImage;
-    }
-    gDrawImage = new Image();
-    gDrawImage.onload = refreshGraphics;
-    gDrawImage.src = `data:${screenShot.mimeType};base64,${screenShot.data}`;
-  }
-  gDrawMouse = mouse || null;
-  gDevicePixelRatio = screenShot?.scale || 1;
-  refreshGraphics();
-}
 
 function clearGraphics() {
   // Keeping gLastImage around to use it as a fallback for video sizing

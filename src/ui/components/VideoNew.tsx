@@ -32,6 +32,8 @@ export default function Video() {
   const hoverTime = useAppSelector(getHoverTime);
   const showHoverTimeGraphics = useAppSelector(getShowHoverTimeGraphics);
 
+  // TODO [FE-2104] I think this breaks playback; I guess we don't unsuspend and commit in time?
+
   const time = hoverTime != null && showHoverTimeGraphics ? hoverTime : currentTime;
   const executionPoint = showHoverTimeGraphics ? null : currentExecutionPoint;
 
