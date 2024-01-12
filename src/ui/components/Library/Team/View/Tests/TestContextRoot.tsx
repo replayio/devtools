@@ -13,6 +13,8 @@ import { STATUS_PENDING } from "suspense";
 import { Test } from "shared/test-suites/TestRun";
 import { trackEvent } from "ui/utils/telemetry";
 
+import { useGetTeamRouteParams } from "../../utils";
+import { useSyncTestIdToUrl } from "./hooks/useSyncTestIdToUrl";
 import { useTests } from "./hooks/useTests";
 
 type TestsContextType = {
@@ -33,6 +35,7 @@ type TestsContextType = {
 export const TestContext = createContext<TestsContextType>(null as any);
 
 export function TestsContextRoot({ children }: { children: ReactNode }) {
+  const { teamId } = useGetTeamRouteParams();
   const { tests, status } = useTests();
 
   const [testId, setTestId] = useState<string | null>(null);
@@ -86,6 +89,8 @@ export function TestsContextRoot({ children }: { children: ReactNode }) {
       testsCount: status === STATUS_PENDING ? 0 : tests.length,
     };
   }, [sortBy, filterByText, filterByTextDeferred, deferredTestId, testId, status, tests]);
+
+  useSyncTestIdToUrl(teamId, testId, setTestId);
 
   return <TestContext.Provider value={value}>{children}</TestContext.Provider>;
 }

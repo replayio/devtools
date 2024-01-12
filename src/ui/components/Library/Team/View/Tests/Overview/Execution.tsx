@@ -8,7 +8,13 @@ import { getTruncatedRelativeDate } from "../../Recordings/RecordingListItem/Rec
 import { StatusIcon } from "./StatusIcon";
 import { Replay, getReplayResult } from "./TestDetails";
 
-export function Execution({ execution }: { execution: TestExecution }) {
+export function Execution({
+  execution,
+  testRunId,
+}: {
+  execution: TestExecution;
+  testRunId: string;
+}) {
   const title = execution.commitTitle || "<Commit title unavailable>";
   const sortedRecordings = orderBy(execution.recordings, "date", "desc");
   const shouldCollapse = sortedRecordings.length === 1;
@@ -28,6 +34,7 @@ export function Execution({ execution }: { execution: TestExecution }) {
 
   return (
     <a
+      data-test-run-id={testRunId}
       data-test-id="ExecutionItem"
       className="flex flex-col px-2"
       href={shouldCollapse ? `/recording/${sortedRecordings[0].id}` : undefined}
