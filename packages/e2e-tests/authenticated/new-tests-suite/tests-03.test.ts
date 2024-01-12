@@ -2,22 +2,13 @@ import {
   TEST_RUN_WORKSPACE_API_KEY,
   TEST_RUN_WORKSPACE_TEAM_ID,
 } from "../../helpers/authentication";
-import { openContextMenu } from "../../helpers/console-panel";
-import { selectContextMenuItem } from "../../helpers/context-menu";
 import test, { expect } from "../../testFixtureTestRuns";
-import {
-  filterTestsByText,
-  startTest,
-  testsItems,
-  waitForTestExecutions,
-} from "./test-suite.utils";
+import { startTest, testsItems, waitForTestExecutions } from "./test-suite.utils";
 
 test.use({ testRunState: "UNIQUE_TESTS_FOR_TESTS_VIEW" });
 
-const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
 test(`authenticated/new-test-suites/tests-03: test ID in the URL`, async ({
-  pageWithMeta: { page },
+  pageWithMeta: { page, testRunId },
 }) => {
   await startTest(
     page,
@@ -28,6 +19,8 @@ test(`authenticated/new-test-suites/tests-03: test ID in the URL`, async ({
   expect(await testsItems(page).count()).not.toBe(0);
 
   await waitForTestExecutions(page);
-  expect(await page.locator('[data-test-id="ExecutionItem"]').count()).not.toBe(0);
-  //#endregion
+
+  //#region > Should show the newly-generated test run ID
+  const executions = await page.locator(`[data-test-run-id="${testRunId}"]`);
+  expect(await executions.count()).toBe(1);
 });

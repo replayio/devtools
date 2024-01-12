@@ -18,7 +18,6 @@ export function TestDetails({ testRuns }: { testRuns: GroupedTestRun[] }) {
         <TestSuitePanelMessage data-test-id="NoTestSelected">
           No test runs found
         </TestSuitePanelMessage>
-        ;
       </div>
     );
   }
@@ -46,7 +45,7 @@ function TestRun({ testRun }: { testRun: GroupedTestRun }) {
   return (
     <div className="flex flex-col">
       {sortedExecutions.map((e, i) => (
-        <Execution execution={e} key={i} />
+        <Execution execution={e} key={i} testRunId={testRun.testRunId} />
       ))}
     </div>
   );
