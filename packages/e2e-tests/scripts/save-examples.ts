@@ -93,7 +93,7 @@ const knownExamples: TestExampleFile[] = [
     filename: "doc_async.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_control_flow.html",
