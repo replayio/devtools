@@ -180,31 +180,28 @@ export default function Header() {
 
   assert(recording != null);
 
-  let fallbackUrl = window.location.origin;
-  if (recording.workspace != null) {
-    fallbackUrl = `/team/${recording.workspace.id}`;
-    if (isTestSuiteReplay(recording) && recording.testRun?.id) {
-      fallbackUrl += `/runs/${recording.testRun.id}`;
-    }
+  const referrer = Array.isArray(router.query.referrer)
+    ? router.query.referrer[0]
+    : router.query.referrer;
+  let fallbackUrl: string;
+  if (referrer) {
+    fallbackUrl = referrer;
   } else {
-    fallbackUrl = "/team/me/recordings";
-  }
-
-  const goBack = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
-    e.preventDefault();
-
-    if (window.history.length > 1) {
-      router.back();
+    if (recording.workspace != null) {
+      fallbackUrl = `/team/${recording.workspace.id}`;
+      if (isTestSuiteReplay(recording) && recording.testRun?.id) {
+        fallbackUrl += `/runs/${recording.testRun.id}`;
+      }
     } else {
-      router.push(fallbackUrl);
+      fallbackUrl = "/team/me/recordings";
     }
-  };
+  }
 
   return (
     <div className={styles.Header}>
       <div className="relative flex flex-grow flex-row items-center overflow-hidden">
         {isAuthenticated && (
-          <a onClick={goBack} href={fallbackUrl}>
+          <a href={fallbackUrl}>
             <IconWithTooltip icon={backIcon} content={"Back to Library"} />
           </a>
         )}
