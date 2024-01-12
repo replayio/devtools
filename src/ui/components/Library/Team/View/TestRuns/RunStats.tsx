@@ -1,6 +1,6 @@
 import { useTestRunDetailsSuspends } from "ui/components/Library/Team/View/TestRuns/hooks/useTestRunDetailsSuspends";
 
-import styles from "./TestRuns.module.css";
+import styles from "./RunStats.module.css";
 
 export function RunStats({ testRunId }: { testRunId: string }) {
   const { groupedTests, tests } = useTestRunDetailsSuspends(testRunId);

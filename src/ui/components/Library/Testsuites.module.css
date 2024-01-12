@@ -99,22 +99,6 @@
   color: var(--testsuites-success-color);
 }
 
-.flakyPill {
-  color: var(--theme-base-100);
-  background-color: var(--testsuites-flaky-color);
-}
-
-.failedPill {
-  color: var(--theme-base-100);
-  background-color: var(--testsuites-failed-color);
-}
-
-.successPill {
-  color: var(--theme-base-100);
-  background-color: var(--testsuites-success-color);
-  border-radius: 50%;
-}
-
 .FilterTestsFilter {
   border: 1px solid var(--input-border);
   background-color: var(--body-bgcolor);
