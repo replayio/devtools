@@ -13,7 +13,6 @@ import { STATUS_PENDING } from "suspense";
 
 import { TestRun, getTestRunTitle } from "shared/test-suites/TestRun";
 import { useGetTeamRouteParams } from "ui/components/Library/Team/utils";
-import { useSyncTestStateToUrl } from "ui/components/Library/Team/View/TestRuns/hooks/useSyncTestStateToUrl";
 import { useTestRuns } from "ui/components/Library/Team/View/TestRuns/hooks/useTestRuns";
 import { trackEvent } from "ui/utils/telemetry";
 
@@ -40,22 +39,20 @@ type TestRunsContextType = {
 export const TestRunsContext = createContext<TestRunsContextType>(null as any);
 
 export function TestRunsContextRoot({ children }: { children: ReactNode }) {
-  const { teamId, testOrTestRunId: defaultTestRunId } = useGetTeamRouteParams();
+  const { teamId, testOrTestRunId, testId } = useGetTeamRouteParams();
 
   const { testRuns, status } = useTestRuns();
 
-  const [testRunId, setTestRunId] = useState<string | null>(defaultTestRunId);
-
+  const [localTestRunId, setTestRunId] = useState<string | null>(testOrTestRunId);
   const [filterByBranch, setFilterByBranch] = useState<"all" | "primary">("all");
   const [filterByStatus, setFilterByStatus] = useState<"all" | "failed">("all");
 
   const [filterByText, setFilterByText] = useState("");
   const filterByTextDeferred = useDeferredValue(filterByText);
   const [filterTestsByText, setFilterTestsByText] = useState("");
-
-  const [testId, setTestId] = useState<string | null>(null);
-
   const router = useRouter();
+
+  const testRunId = testOrTestRunId ?? testRuns[0]?.id;
 
   const filteredTestRuns = useMemo(() => {
     let filteredTestRuns = testRuns;
@@ -100,19 +97,20 @@ export function TestRunsContextRoot({ children }: { children: ReactNode }) {
   }, [filterByBranch, filterByStatus, filterByText, testRuns]);
 
   useEffect(() => {
-    if (testRunId == null) {
-      // Select the first test run by default if nothing is selected.
-      setTestRunId(testRuns[0]?.id ?? null);
+    if (!testOrTestRunId && testRuns?.length > 0) {
+      router.replace(`/team/${teamId}/runs/${testRuns[0]?.id}`);
     }
-  }, [router, teamId, testRunId, testRuns]);
+  }, [testOrTestRunId, testRuns]);
+
+  useEffect(() => {
+    setTestRunId(testRunId);
+  }, [testRunId]);
 
   useEffect(() => {
     setFilterTestsByText("");
   }, [testRunId]);
 
-  useSyncTestStateToUrl(teamId, testRunId, setTestRunId, testId, setTestId);
-
-  const deferredTestRunId = useDeferredValue(testRunId);
+  const deferredTestRunId = useDeferredValue(localTestRunId);
 
   return (
     <TestRunsContext.Provider
@@ -123,8 +121,8 @@ export function TestRunsContextRoot({ children }: { children: ReactNode }) {
         filterByTextForDisplay: filterByText,
         filterTestsByText,
         selectTestRun: runId => {
-          setTestRunId(runId);
           trackEvent("test_dashboard.select_run", { view: "runs" });
+          router.push(`/team/${teamId}/runs/${runId}${testId ? `/tests/${testId}` : ""}`);
         },
         setFilterByBranch,
         setFilterByStatus,
@@ -137,8 +135,8 @@ export function TestRunsContextRoot({ children }: { children: ReactNode }) {
         testRunCount: status === STATUS_PENDING ? 0 : testRuns.length,
         testId,
         setTestId: testId => {
-          setTestId(testId);
           trackEvent("test_dashboard.select_test", { view: "runs" });
+          router.push(`/team/${teamId}/runs/${testRunId}/tests/${testId}`);
         },
       }}
     >

@@ -1,10 +1,12 @@
 import orderBy from "lodash/orderBy";
+import { useRouter } from "next/router";
 import {
   Dispatch,
   ReactNode,
   SetStateAction,
   createContext,
   useDeferredValue,
+  useEffect,
   useMemo,
   useState,
 } from "react";
@@ -14,7 +16,6 @@ import { Test } from "shared/test-suites/TestRun";
 import { trackEvent } from "ui/utils/telemetry";
 
 import { useGetTeamRouteParams } from "../../utils";
-import { useSyncTestIdToUrl } from "./hooks/useSyncTestIdToUrl";
 import { useTests } from "./hooks/useTests";
 
 type TestsContextType = {
@@ -35,16 +36,20 @@ type TestsContextType = {
 export const TestContext = createContext<TestsContextType>(null as any);
 
 export function TestsContextRoot({ children }: { children: ReactNode }) {
-  const { teamId } = useGetTeamRouteParams();
+  const router = useRouter();
+  const { teamId, testOrTestRunId } = useGetTeamRouteParams();
   const { tests, status } = useTests();
 
-  const [testId, setTestId] = useState<string | null>(null);
-
+  const [localTestId, setTestId] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<TestsContextType["sortBy"]>("failureRate");
-
   const [filterByText, setFilterByText] = useState("");
+
+  useEffect(() => {
+    setTestId(testOrTestRunId);
+  }, [testOrTestRunId]);
+
   const filterByTextDeferred = useDeferredValue(filterByText);
-  const deferredTestId = useDeferredValue(testId);
+  const deferredTestId = useDeferredValue(localTestId);
 
   const value = useMemo(() => {
     let filteredTests = tests;
@@ -76,21 +81,19 @@ export function TestsContextRoot({ children }: { children: ReactNode }) {
       filterByText: filterByTextDeferred,
       filterByTextForDisplay: filterByText,
       selectTestId: (id: string | null) => {
+        router.push(`/team/${teamId}/tests/${id}`);
         trackEvent("test_dashboard.select_test", { view: "tests" });
-        setTestId(id);
       },
       setSortBy,
       setFilterByText,
       testId: deferredTestId,
-      testIdForDisplay: testId,
-      selectedTest: testId ? tests.find(t => t.testId === testId) ?? null : null,
+      testIdForDisplay: testOrTestRunId,
+      selectedTest: testOrTestRunId ? tests.find(t => t.testId === testOrTestRunId) ?? null : null,
       testsLoading: status === STATUS_PENDING,
       tests: filteredTests,
       testsCount: status === STATUS_PENDING ? 0 : tests.length,
     };
-  }, [sortBy, filterByText, filterByTextDeferred, deferredTestId, testId, status, tests]);
-
-  useSyncTestIdToUrl(teamId, testId, setTestId);
+  }, [sortBy, filterByText, filterByTextDeferred, deferredTestId, testOrTestRunId, status, tests]);
 
   return <TestContext.Provider value={value}>{children}</TestContext.Provider>;
 }
