@@ -19,11 +19,18 @@ export function useSyncTestStateToUrl(
   useEffect(() => {
     const prevTestRunId = prevTestRunIdRef.current;
     const prevTestId = prevTestIdRef.current;
+    const { testOrTestRunId: testRunIdFromUrl, testId: testIdFromUrl } = parseQueryParams(
+      router.query
+    );
+
     if (testRunId && (testRunId !== prevTestRunId || (testId && testId !== prevTestId))) {
       const pathname = `/team/${teamId}/runs/${testRunId}${testId ? `/tests/${testId}` : ""}`;
       if (prevTestRunId === null) {
         router.replace({ pathname, query: router.query });
-      } else if (prevTestRunIdRef.current !== testRunId || prevTestIdRef.current !== testId) {
+      } else if (
+        (prevTestRunIdRef.current !== testRunId && testRunId !== testRunIdFromUrl) ||
+        (prevTestIdRef.current !== testId && testId !== testIdFromUrl)
+      ) {
         router.push({ pathname, query: router.query });
       }
     }
