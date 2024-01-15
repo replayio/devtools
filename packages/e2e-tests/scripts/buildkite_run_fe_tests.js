@@ -110,6 +110,9 @@ function run_fe_tests(CHROME_BINARY_PATH) {
       "stacking_chromium",
       "stepping-01",
       "stepping-05_chromium",
+      "object_preview-01",
+      "object_preview-02",
+      "object_preview-06",
     ];
     execSync(`xvfb-run yarn test:runtime ${testNames.join(" ")}`, {
       stdio: "inherit",
