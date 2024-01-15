@@ -177,7 +177,7 @@ const knownExamples: TestExampleFile[] = [
     filename: "doc_prod_bundle.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_recursion.html",
