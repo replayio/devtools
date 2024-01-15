@@ -135,7 +135,7 @@ const knownExamples: TestExampleFile[] = [
     filename: "doc_inspector_basic.html",
     folder: config.browserExamplesPath,
     category: "browser",
-    runtime: "firefox",
+    runtime: "chromium",
   },
   {
     filename: "doc_inspector_shorthand.html",
