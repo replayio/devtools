@@ -7,25 +7,9 @@
     "recording": "b50dd5b7-ab70-4987-8987-cc3240dd2cf3",
     "buildId": "macOS-chromium-20240110-e5625ebd3edc-50d01be708a2"
   },
-  "authenticated_comments_1.html": {
-    "recording": "10f1cf17-2a29-4cde-b54e-dcf77f738fbd",
-    "buildId": "macOS-gecko-20230322-7777175a1013-228a8d6652a4"
-  },
-  "authenticated_comments_2.html": {
-    "recording": "80e2ad7d-7b13-42d8-af3b-9c761d8528f2",
-    "buildId": "macOS-gecko-20230322-7777175a1013-228a8d6652a4"
-  },
-  "authenticated_comments_3.html": {
-    "recording": "0cd75bf9-78a8-4c1b-9982-7290e7743c03",
-    "buildId": "macOS-gecko-20230322-7777175a1013-228a8d6652a4"
-  },
   "authenticated_logpoints.html": {
     "recording": "aefdfcfb-33e3-420b-915a-8d3be4b683b6",
     "buildId": "macOS-chromium-20240110-e5625ebd3edc-50d01be708a2"
-  },
-  "authenticated_logpoints_1.html": {
-    "recording": "f7e69589-ddb8-4a0e-b517-f393d225991e",
-    "buildId": "macOS-gecko-20230322-7777175a1013-228a8d6652a4"
   },
   "breakpoints-01": {
     "recording": "c8debea5-3270-4728-8f08-2252855897cc",
