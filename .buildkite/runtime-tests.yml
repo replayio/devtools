@@ -1,4 +1,5 @@
 - label: "Runtime e2e tests (linux-x86_64)"
+  timeout_in_minutes: 60
   key: "runtime-fe-e2e-tests-linux_x86_64"
   command: "node ./packages/e2e-tests/scripts/buildkite_run_fe_tests_from_artifact-linux-x86_64.js"
   agents:
