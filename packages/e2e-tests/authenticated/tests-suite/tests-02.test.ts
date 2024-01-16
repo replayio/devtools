@@ -7,6 +7,7 @@ import { selectContextMenuItem } from "../../helpers/context-menu";
 import test, { expect } from "../../testFixtureTestRuns";
 import {
   filterTestsByText,
+  sortTestsBy,
   startTest,
   testsItems,
   waitForTestExecutions,
@@ -21,6 +22,7 @@ test(`authenticated/new-test-suites/tests-02: test with no recording`, async ({
   expect(await testsItems(page).count()).not.toBe(0);
 
   //#region > Should not show executions list when there are no recordings
+  await sortTestsBy(page, "alphabetical");
   await filterTestsByText(page, "Empty run");
   expect(await testsItems(page).count()).toBe(1);
   await testsItems(page).first().click();

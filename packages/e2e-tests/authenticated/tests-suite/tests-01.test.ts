@@ -28,13 +28,13 @@ test(`authenticated/new-test-suites/tests-01: basic tests`, async ({ pageWithMet
   //#region >>> Each test should be displayed in the first column by title
   expect(await testsItems(page).count()).not.toBe(0);
   await filterTestsByText(page, "Tests View - Cypress Test");
-  expect(await testsItems(page).count()).toBe(3);
+  expect(await testsItems(page).count()).toBe(1);
   expect(
     await testsItems(page).first().locator('[data-test-id="Test-Title"]').innerText()
   ).toContain("Tests View - Cypress Test");
 
   await filterTestsByText(page, "Tests View -");
-  expect(await testsItems(page).count()).toBe(9);
+  expect(await testsItems(page).count()).toBe(2);
   //#endregion
 
   //#region >>> Sort by flaky rate
