@@ -46,16 +46,22 @@ const timeFilterLabel: Record<TimeFilterOptions, string> = {
   hour: "Last hour",
   month: "Last 30 days",
 };
-const sortLabel = {
-  failureRate: "Sort by failure rate",
-  flakyRate: "Sort by flaky rate",
+const filterCriterionLabel = {
+  failureRate: "Filter by failure rate",
+  flakyRate: "Filter by flaky rate",
   alphabetical: "Sort alphabetically",
 };
 
 function TestsContent() {
   const { team } = useContext(TeamContext);
-  const { filterByText, setFilterByText, filterByTextForDisplay, sortBy, setSortBy, testsLoading } =
-    useContext(TestContext);
+  const {
+    filterByText,
+    setFilterByText,
+    filterByTextForDisplay,
+    filterCriterion,
+    setFilterCriterion,
+    testsLoading,
+  } = useContext(TestContext);
   const { filterByTime, setFilterByTime } = useContext(TimeFilterContext);
 
   const {
@@ -64,14 +70,17 @@ function TestsContent() {
     onKeyDown: onKeyDownSortBy,
   } = useContextMenu(
     <>
-      <ContextMenuItem dataTestId="failureRate" onSelect={() => setSortBy("failureRate")}>
-        Sort by failure rate
+      <ContextMenuItem dataTestId="failureRate" onSelect={() => setFilterCriterion("failureRate")}>
+        {filterCriterionLabel["failureRate"]}
       </ContextMenuItem>
-      <ContextMenuItem dataTestId="flakyRate" onSelect={() => setSortBy("flakyRate")}>
-        Sort by flaky rate
+      <ContextMenuItem dataTestId="flakyRate" onSelect={() => setFilterCriterion("flakyRate")}>
+        {filterCriterionLabel["flakyRate"]}
       </ContextMenuItem>
-      <ContextMenuItem dataTestId="alphabetical" onSelect={() => setSortBy("alphabetical")}>
-        Sort alphabetically
+      <ContextMenuItem
+        dataTestId="alphabetical"
+        onSelect={() => setFilterCriterion("alphabetical")}
+      >
+        {filterCriterionLabel["alphabetical"]}
       </ContextMenuItem>
     </>,
     { alignTo: "auto-target" }
@@ -113,7 +122,7 @@ function TestsContent() {
                 testId="TestPage-ResultFilter-DropdownTrigger"
                 onKeyDown={onKeyDownSortBy}
                 onClick={onClickSortBy}
-                label={sortLabel[sortBy]}
+                label={filterCriterionLabel[filterCriterion]}
               />
               {contextMenuSortBy}
               <LibraryDropdownTrigger

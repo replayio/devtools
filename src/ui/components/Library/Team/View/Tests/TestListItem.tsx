@@ -8,7 +8,7 @@ import { TestContext } from "./TestContextRoot";
 import styles from "./TestListItem.module.css";
 
 function Status({ test }: { test: Test }) {
-  const { sortBy } = useContext(TestContext);
+  const { filterCriterion: sortBy } = useContext(TestContext);
 
   const { status, rate, classNames } = useMemo(() => {
     if (sortBy === "flakyRate") {

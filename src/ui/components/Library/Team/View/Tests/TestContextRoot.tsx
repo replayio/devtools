@@ -18,11 +18,11 @@ import { useSyncTestIdToUrl } from "./hooks/useSyncTestIdToUrl";
 import { useTests } from "./hooks/useTests";
 
 type TestsContextType = {
-  sortBy: "failureRate" | "flakyRate" | "alphabetical";
+  filterCriterion: "failureRate" | "flakyRate" | "alphabetical";
   filterByText: string;
   filterByTextForDisplay: string;
   selectTestId: (testId: string | null) => void;
-  setSortBy: Dispatch<SetStateAction<TestsContextType["sortBy"]>>;
+  setFilterCriterion: Dispatch<SetStateAction<TestsContextType["filterCriterion"]>>;
   setFilterByText: Dispatch<SetStateAction<string>>;
   testId: string | null;
   testIdForDisplay: string | null;
@@ -40,7 +40,8 @@ export function TestsContextRoot({ children }: { children: ReactNode }) {
 
   const [testId, setTestId] = useState<string | null>(null);
 
-  const [sortBy, setSortBy] = useState<TestsContextType["sortBy"]>("failureRate");
+  const [filterCriterion, setFilterCriterion] =
+    useState<TestsContextType["filterCriterion"]>("failureRate");
 
   const [filterByText, setFilterByText] = useState("");
   const filterByTextDeferred = useDeferredValue(filterByText);
@@ -65,21 +66,22 @@ export function TestsContextRoot({ children }: { children: ReactNode }) {
       });
     }
 
-    if (sortBy === "alphabetical") {
+    if (filterCriterion === "alphabetical") {
       filteredTests = orderBy(filteredTests, "title", "asc");
     } else {
-      filteredTests = orderBy(filteredTests, sortBy, "desc");
+      filteredTests = filteredTests.filter(test => test[filterCriterion] > 0);
+      filteredTests = orderBy(filteredTests, filterCriterion, "desc");
     }
 
     return {
-      sortBy,
+      filterCriterion,
       filterByText: filterByTextDeferred,
       filterByTextForDisplay: filterByText,
       selectTestId: (id: string | null) => {
         trackEvent("test_dashboard.select_test", { view: "tests" });
         setTestId(id);
       },
-      setSortBy,
+      setFilterCriterion,
       setFilterByText,
       testId: deferredTestId,
       testIdForDisplay: testId,
@@ -88,7 +90,7 @@ export function TestsContextRoot({ children }: { children: ReactNode }) {
       tests: filteredTests,
       testsCount: status === STATUS_PENDING ? 0 : tests.length,
     };
-  }, [sortBy, filterByText, filterByTextDeferred, deferredTestId, testId, status, tests]);
+  }, [filterCriterion, filterByText, filterByTextDeferred, deferredTestId, testId, status, tests]);
 
   useSyncTestIdToUrl(teamId, testId, setTestId);
 
