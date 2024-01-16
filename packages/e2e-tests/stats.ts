@@ -3,6 +3,12 @@ const { join } = require("path");
 
 type Examples = typeof import("./examples.json");
 type Example = Examples[keyof Examples];
+type Stats = {
+  [buildId: string]: {
+    numRecordings: number;
+    numTests: number;
+  };
+};
 
 const exampleJSON = JSON.parse(readFileSync(join(__dirname, "examples.json"), "utf8")) as Examples;
 
@@ -28,57 +34,34 @@ function crawl(directoryPath: string) {
 
 basePaths.forEach(crawl);
 
-const summaryStats = {
-  chromiumOld: {
-    recordings: 0,
-    tests: 0,
-  },
-  chromiumNew: {
-    recordings: 0,
-    tests: 0,
-  },
-  gecko: {
-    recordings: 0,
-    tests: 0,
-  },
-  node: {
-    recordings: 0,
-    tests: 0,
-  },
-};
+const stats: Stats = {};
 
 for (let key in exampleJSON) {
   const { buildId } = exampleJSON[key as keyof Examples];
 
-  if (buildId.includes("gecko")) {
-    summaryStats.gecko.recordings++;
-  } else if (buildId.includes("node")) {
-    summaryStats.node.recordings++;
-  } else {
-    if (buildId.includes("2024")) {
-      summaryStats.chromiumNew.recordings++;
-    } else {
-      summaryStats.chromiumOld.recordings++;
-    }
+  if (stats[buildId] == null) {
+    stats[buildId] = {
+      numRecordings: 0,
+      numTests: 0,
+    };
   }
+
+  stats[buildId].numRecordings++;
 
   testFileList.forEach(filePath => {
     const text = readFileSync(filePath, "utf8");
     if (text.includes(key)) {
-      if (buildId.includes("gecko")) {
-        summaryStats.gecko.tests++;
-      } else if (buildId.includes("node")) {
-        summaryStats.node.tests++;
-      } else {
-        if (buildId.includes("2024")) {
-          summaryStats.chromiumNew.tests++;
-        } else {
-          summaryStats.chromiumOld.tests++;
-        }
-      }
+      stats[buildId].numTests++;
     }
   });
 }
 
+const sortedStats = Object.keys(stats)
+  .sort()
+  .reduce((sorted: Stats, key) => {
+    sorted[key] = stats[key as keyof typeof stats];
+    return sorted;
+  }, {} as Stats);
+
 console.log(`Searched ${testFileList.length} files.`);
-console.table(summaryStats);
+console.table(sortedStats);
