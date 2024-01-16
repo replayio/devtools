@@ -80,4 +80,5 @@ for (let key in exampleJSON) {
   });
 }
 
-console.log(`Searched ${testFileList.length} files and found:\n`, summaryStats);
+console.log(`Searched ${testFileList.length} files.`);
+console.table(summaryStats);
