@@ -1,7 +1,5 @@
 import { ReactNode } from "react";
 
-import { useTheme } from "shared/theme/useTheme";
-
 export function BranchIcon({
   branchName = "branch",
   isPrimaryBranch,
@@ -11,7 +9,6 @@ export function BranchIcon({
   isPrimaryBranch: boolean | null;
   title: string;
 }) {
-  const theme = useTheme();
   let fillColor;
   fillColor = isPrimaryBranch ? "var(--body-color)" : "var(--testsuites-success-color)";
 
