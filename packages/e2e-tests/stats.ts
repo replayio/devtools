@@ -56,12 +56,55 @@ for (let key in exampleJSON) {
   });
 }
 
-const sortedStats = Object.keys(stats)
-  .sort()
-  .reduce((sorted: Stats, key) => {
-    sorted[key] = stats[key as keyof typeof stats];
-    return sorted;
-  }, {} as Stats);
+const browserSummaryStats: Stats = {};
+const osSummaryStats: Stats = {};
+const releaseYearStats: Stats = {};
+const sortedStats: Stats = {};
 
-console.log(`Searched ${testFileList.length} files.`);
+Object.keys(stats)
+  .sort()
+  .forEach(key => {
+    const { numRecordings, numTests } = stats[key];
+
+    sortedStats[key] = {
+      numRecordings,
+      numTests,
+    };
+
+    const [os, browser, date] = key.split("-");
+
+    const year = date.substring(0, 4);
+
+    if (browserSummaryStats[browser] == null) {
+      browserSummaryStats[browser] = {
+        numRecordings: 0,
+        numTests: 0,
+      };
+    }
+    browserSummaryStats[browser].numRecordings += numRecordings;
+    browserSummaryStats[browser].numTests += numTests;
+
+    if (osSummaryStats[os] == null) {
+      osSummaryStats[os] = {
+        numRecordings: 0,
+        numTests: 0,
+      };
+    }
+    osSummaryStats[os].numRecordings += numRecordings;
+    osSummaryStats[os].numTests += numTests;
+
+    if (releaseYearStats[year] == null) {
+      releaseYearStats[year] = {
+        numRecordings: 0,
+        numTests: 0,
+      };
+    }
+    releaseYearStats[year].numRecordings += numRecordings;
+    releaseYearStats[year].numTests += numTests;
+  });
+
+console.log(`Searched ${testFileList.length} tests`);
 console.table(sortedStats);
+console.table(browserSummaryStats);
+console.table(osSummaryStats);
+console.table(releaseYearStats);
