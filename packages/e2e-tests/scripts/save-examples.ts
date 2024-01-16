@@ -9,6 +9,7 @@ import { join } from "path";
 import type { Page, expect as expectFunction } from "@playwright/test";
 import { removeRecording, uploadRecording } from "@replayio/replay";
 import axios from "axios";
+import { blue, underline, yellow } from "chalk";
 import chalk from "chalk";
 import { dots } from "cli-spinners";
 import logUpdate from "log-update";
@@ -20,6 +21,7 @@ import { UpdateRecordingTitleVariables } from "../../shared/graphql/generated/Up
 import config, { BrowserName } from "../config";
 import { testFunction as reduxFundamentalsScript } from "../examples/redux-fundamentals/tests/example-script";
 import { ExamplesData } from "../helpers";
+import { getStats } from "./get-stats";
 import { recordNodeExample } from "./record-node";
 import { recordPlaywright, uploadLastRecording } from "./record-playwright";
 
@@ -157,12 +159,6 @@ const knownExamples: TestExampleFile[] = [
   },
   {
     filename: "doc_minified.html",
-    folder: config.browserExamplesPath,
-    category: "browser",
-    runtime: "firefox",
-  },
-  {
-    filename: "doc_minified_chromium.html",
     folder: config.browserExamplesPath,
     category: "browser",
     runtime: "chromium",
@@ -328,6 +324,8 @@ const knownExamples: TestExampleFile[] = [
 
 const examplesJsonPath = join(__dirname, "..", "examples.json");
 
+const exampleToNewRecordingId: { [example: string]: string } = {};
+
 function logAnimated(text: string): () => void {
   let index = 0;
 
@@ -473,11 +471,14 @@ async function saveBrowserExample({ example }: TestRunCallbackArgs) {
     throw new Error("Recording not uploaded");
   }
 
+  exampleToNewRecordingId[example.filename] = recordingId;
+
   done();
 
   if (config.useExampleFile && recordingId) {
     await saveRecording(example.filename, config.replayApiKey, recordingId, true);
   }
+
   if (recordingId) {
     removeRecording(recordingId);
   }
@@ -493,6 +494,8 @@ async function saveNodeExamples() {
     if (recordingId) {
       await saveRecording(example.filename, config.replayApiKey, recordingId);
       removeRecording(recordingId);
+
+      exampleToNewRecordingId[example.filename] = recordingId;
 
       done();
 
@@ -623,6 +626,33 @@ async function waitUntilMessage(
       const saveExamplesForTarget = functionsForTarget[target as keyof typeof functionsForTarget];
       await saveExamplesForTarget();
     }
+
+    const updatedExamples = Object.keys(exampleToNewRecordingId);
+    const newRecordingIds = Object.values(exampleToNewRecordingId);
+
+    console.log("\n");
+    console.log(
+      `${newRecordingIds.length} new recordings have been saved. Open each recording to ensure it has been pre-processed:`
+    );
+    console.log(
+      newRecordingIds
+        .map(recordingId => ` • ${blue(underline(`https://go/r/${recordingId}`))}`)
+        .join("\n")
+    );
+
+    const { exampleToTestMap } = getStats();
+
+    console.log("\n");
+    console.log("The following tests have been impacted by this change:");
+    console.table(
+      updatedExamples
+        .map(example => {
+          const tests = exampleToTestMap[example];
+
+          return ` • ${yellow(example)}${tests.map(test => `\n   • ${test}`).join("")}`;
+        })
+        .join("\n")
+    );
 
     process.exit(0);
   } catch (error) {
