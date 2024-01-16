@@ -8,10 +8,10 @@ import { TestContext } from "./TestContextRoot";
 import styles from "./TestListItem.module.css";
 
 function Status({ test }: { test: Test }) {
-  const { filterCriterion: sortBy } = useContext(TestContext);
+  const { filterCriterion } = useContext(TestContext);
 
   const { status, rate, classNames } = useMemo(() => {
-    if (sortBy === "flakyRate") {
+    if (filterCriterion === "flakyRate") {
       return { status: "flaky", rate: test.flakyRate, classNames: styles.flakyPill };
     } else if (test.failureRate > 0) {
       // sortBy could be "failureRate" or "alphabetical", show failure rate in that case
@@ -19,7 +19,7 @@ function Status({ test }: { test: Test }) {
     } else {
       return { status: "success", rate: 0, classNames: "" };
     }
-  }, [sortBy, test.failureRate, test.flakyRate]);
+  }, [filterCriterion, test.failureRate, test.flakyRate]);
 
   const displayedFailureRate = Number((rate * 100).toFixed(0));
 
