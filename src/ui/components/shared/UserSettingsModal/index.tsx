@@ -9,7 +9,6 @@ import SettingsModal from "../SettingsModal";
 import { Settings } from "../SettingsModal/types";
 import { Advanced } from "./panels/Advanced";
 import { ApiKeys } from "./panels/ApiKeys";
-import { Experimental } from "./panels/Experimental";
 import { Legal } from "./panels/Legal";
 import { Personal } from "./panels/Personal";
 import { Preferences } from "./panels/Preferences";
@@ -32,11 +31,13 @@ const PANELS: Settings<SettingsTabTitle, {}> = [
     component: ApiKeys,
   },
 
-  {
-    title: "Experimental",
-    icon: "biotech",
-    component: Experimental,
-  },
+  // PR #9997 removed the last experimental setting
+  // Until we have another one, we should hide that tab
+  // {
+  //   title: "Experimental",
+  //   icon: "biotech",
+  //   component: Experimental,
+  // },
   {
     title: "Support",
     icon: "support",
