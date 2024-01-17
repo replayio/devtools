@@ -98,6 +98,10 @@
     "recording": "84bfc1b8-edf2-4d1e-b55e-c31aba7d139d",
     "buildId": "linux-gecko-20230919-72cad6f42a93-4d0a9f5b9de2"
   },
+  "doc_rr_basic_chromium.html": {
+    "recording": "c5e59983-9f11-4f7a-a4b3-1b10629ce6ca",
+    "buildId": "macOS-chromium-20240110-3078216bece0-50d01be708a2"
+  },
   "doc_rr_blackbox.html": {
     "recording": "3faddf0d-facb-40f7-91f1-f6c800803b64",
     "buildId": "macOS-gecko-20220722-76bf615bc154-b7eae18423ef"

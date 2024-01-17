@@ -12,7 +12,7 @@ import { addBreakpoint, addLogpoint } from "../helpers/source-panel";
 import { waitFor } from "../helpers/utils";
 import test, { expect } from "../testFixtureCloneRecording";
 
-test.use({ exampleKey: "doc_rr_basic.html" });
+test.use({ exampleKey: "doc_rr_basic_chromium.html" });
 
 test(`logpoints-01: log-points appear in the correct order and allow time warping`, async ({
   pageWithMeta: { page, recordingId },
