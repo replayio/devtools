@@ -24,7 +24,7 @@ import { TestGroup } from "ui/utils/testRuns";
 
 import { TestSuitePanelMessage } from "../../TestSuitePanelMessage";
 import { TestRunLibraryRow } from "../TestRunLibraryRow";
-import styles from "../TestRuns.module.css";
+import styles from "./RunResults.module.css";
 
 export function RunResults({
   testFilterByText,
@@ -102,7 +102,7 @@ function TestStatusGroup({
     >
       <div
         data-test-id="TestRunResults-StatusGroup-Title"
-        className={`top-0 flex grow flex-row p-2 pl-4 font-medium hover:cursor-pointer ${styles.libraryRowHeader}`}
+        className="top-0 flex grow flex-row p-2 pl-4 font-medium hover:cursor-pointer"
         onClick={() => setExpanded(!expanded)}
       >
         <div data-status={label} className={`grow font-bold ${styles.testStatusHeader}`}>
