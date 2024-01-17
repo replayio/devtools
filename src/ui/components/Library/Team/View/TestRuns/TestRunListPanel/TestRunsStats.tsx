@@ -1,7 +1,7 @@
 import { useContext } from "react";
 
+import { TestRunsContext } from "../TestRunsContextRoot";
 import { Chart } from "./Chart";
-import { TestRunsContext } from "./TestRunsContextRoot";
 import styles from "./TestRunsStats.module.css";
 
 export function TestRunsStats() {

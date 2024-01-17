@@ -2,12 +2,12 @@ import { useContext } from "react";
 
 import { TestRunTestWithRecordings } from "shared/test-suites/TestRun";
 
-import { Alert } from "../shared/Alert";
-import { useTestRunDetailsSuspends } from "./hooks/useTestRunDetailsSuspends";
-import { TestResultListItem } from "./Overview/TestResultListItem";
-import { TestRunsContext } from "./TestRunsContextRoot";
+import { Alert } from "../../shared/Alert";
+import { useTestRunDetailsSuspends } from "../hooks/useTestRunDetailsSuspends";
+import { TestResultListItem } from "../TestRunDetailsPanel/TestResultListItem";
+import { TestRunsContext } from "../TestRunsContextRoot";
 
-export function TestRunResultList({
+export function ExecutionList({
   selectedSpecTests,
 }: {
   selectedSpecTests: TestRunTestWithRecordings[];

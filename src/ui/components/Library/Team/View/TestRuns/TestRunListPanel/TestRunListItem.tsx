@@ -4,13 +4,10 @@ import { TestRun, getTestRunTitle } from "shared/test-suites/TestRun";
 import Icon from "ui/components/shared/Icon";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 
-import { getTruncatedRelativeDate } from "../Recordings/RecordingListItem/RecordingListItem";
-<<<<<<< HEAD
+import { getTruncatedRelativeDate } from "../../Recordings/RecordingListItem/RecordingListItem";
+import HighlightedText from "../HighlightedText";
+import { TestRunsContext } from "../TestRunsContextRoot";
 import { TestRunLibraryRow } from "./TestRunLibraryRow";
-=======
-import HighlightedText from "./HighlightedText";
->>>>>>> 2e33334b8 (chore: standardize test run imports)
-import { TestRunsContext } from "./TestRunsContextRoot";
 import styles from "./TestRunListItem.module.css";
 
 function Status({ failCount }: { failCount: number }) {

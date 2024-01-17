@@ -9,12 +9,12 @@ import {
   getDurationString,
   getTruncatedRelativeDate,
 } from "../../Recordings/RecordingListItem/RecordingListItem";
-import { useTestRunDetailsSuspends } from "../../TestRuns/hooks/useTestRunDetailsSuspends";
-import { AttributeContainer } from "../AttributeContainer";
-import { BranchIcon } from "../BranchIcon";
 import { Dropdown } from "../Dropdown";
 import { FilterField } from "../FilterField";
-import { RunStats } from "../RunStats";
+import { useTestRunDetailsSuspends } from "../hooks/useTestRunDetailsSuspends";
+import { AttributeContainer } from "./AttributeContainer";
+import { BranchIcon } from "./BranchIcon";
+import { RunStats } from "./RunStats";
 
 function ModeAttribute({ testRun }: { testRun: TestRun }) {
   const { mode } = testRun;

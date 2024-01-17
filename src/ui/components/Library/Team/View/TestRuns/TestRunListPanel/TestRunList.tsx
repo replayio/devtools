@@ -4,9 +4,9 @@ import { FixedSizeList, ListChildComponentProps } from "react-window";
 
 import { TestRun } from "shared/test-suites/TestRun";
 
-import { TestSuitePanelMessage } from "../TestSuitePanelMessage";
+import { TestSuitePanelMessage } from "../../TestSuitePanelMessage";
+import { TestRunsContext } from "../TestRunsContextRoot";
 import { TestRunListItem } from "./TestRunListItem";
-import { TestRunsContext } from "./TestRunsContextRoot";
 import styles from "./TestRunList.module.css";
 
 type ItemData = {

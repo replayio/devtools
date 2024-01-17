@@ -8,9 +8,9 @@ import {
   getDurationString,
   getTruncatedRelativeDate,
 } from "../../Recordings/RecordingListItem/RecordingListItem";
-import { StatusIcon } from "../../Tests/Overview/StatusIcon";
-import { AttributeContainer } from "../AttributeContainer";
+import { StatusIcon } from "../../StatusIcon";
 import { TestRunLibraryRow } from "../TestRunLibraryRow";
+import { AttributeContainer } from "./AttributeContainer";
 import styles from "./TestResultListItem.module.css";
 
 function RecordingAttributes({

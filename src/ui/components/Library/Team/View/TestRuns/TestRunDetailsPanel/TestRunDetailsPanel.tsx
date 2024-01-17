@@ -2,12 +2,12 @@ import { useContext, useState } from "react";
 
 import { TestSuitePanelMessage } from "../../TestSuitePanelMessage";
 import { useTestRunDetailsSuspends } from "../hooks/useTestRunDetailsSuspends";
-import { RunResults } from "../Overview/RunResults";
 import { TestRunPanelWrapper } from "../TestRunPanelWrapper";
 import { TestRunsContext } from "../TestRunsContextRoot";
+import { RunResults } from "./RunResults";
 import { RunSummary } from "./RunSummary";
 
-export function TestRunOverviewPanel() {
+export function TestRunDetailsPanel() {
   const { testRunId, testRuns, filterTestsByText, setFilterTestsByText } =
     useContext(TestRunsContext);
 
