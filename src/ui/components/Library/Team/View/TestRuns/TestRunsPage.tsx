@@ -16,13 +16,13 @@ import {
   TimeFilterContextRoot,
   withinTeamRetentionLimit,
 } from "../TimeFilterContextRoot";
+import { Dropdown } from "./Dropdown";
 import { FilterField } from "./FilterField";
 import { TestRunOverviewPage } from "./Overview/TestRunOverviewContextRoot";
 import { TestRunList } from "./TestRunList";
 import { TestRunsContext, TestRunsContextRoot } from "./TestRunsContextRoot";
 import { TestRunSpecDetails } from "./TestRunSpecDetails";
 import { TestRunsStats } from "./TestRunsStats";
-import dropdownStyles from "./Dropdown.module.css";
 import styles from "./TestRunsPage.module.css";
 
 function ErrorFallback() {
@@ -127,45 +127,30 @@ function TestRunsContent() {
             {testRunsLoading && testRuns.length > 0 && <IndeterminateProgressBar />}
             <div className="flex flex-col gap-2">
               <div className="grid w-full grid-cols-3 gap-2 bg-bodyBgcolor">
-                <div
-                  className={dropdownStyles.dropdownTrigger}
+                <Dropdown
                   data-test-id="TestRunsPage-ResultFilter-DropdownTrigger"
                   onClick={onClickStatusFilter}
                   onKeyDown={onKeyDownStatusFilter}
-                  tabIndex={0}
+                  label={filterByStatus === "all" ? "All runs" : "Only failures"}
                 >
-                  <div className="truncate">
-                    {filterByStatus === "all" ? "All runs" : "Only failures"}
-                  </div>
-                  <Icon className="h-5 w-5 flex-shrink-0" type="chevron-down" />
-                </div>
-                {contextMenuStatusFilter}
-                <div
-                  className={dropdownStyles.dropdownTrigger}
+                  {contextMenuStatusFilter}
+                </Dropdown>
+                <Dropdown
                   data-test-id="TestRunsPage-TimeFilter-DropdownTrigger"
                   onClick={onClickTimeFilter}
                   onKeyDown={onKeyDownTimeFilter}
-                  tabIndex={0}
+                  label={filterByTime === "week" ? "Last 7 days" : "Last 30 days"}
                 >
-                  <div className="truncate">
-                    {filterByTime === "week" ? "Last 7 days" : "Last 30 days"}
-                  </div>
-                  <Icon className="h-5 w-5 flex-shrink-0" type="chevron-down" />
-                </div>
-                {contextMenuTimeFilter}
-                <div
-                  className={dropdownStyles.dropdownTrigger}
+                  {contextMenuTimeFilter}
+                </Dropdown>
+                <Dropdown
                   data-test-id="TestRunsPage-BranchFilter-DropdownTrigger"
                   onClick={onClickBranchFilter}
                   onKeyDown={onKeyDownBranchFilter}
-                  tabIndex={0}
+                  label={filterByBranch === "all" ? "All branches" : "Only primary branch"}
                 >
-                  <div className="truncate">
-                    {filterByBranch === "all" ? "All branches" : "Only primary branch"}
-                  </div>
-                  <Icon className="h-5 w-5 flex-shrink-0" type="chevron-down" />
-                </div>
-                {contextMenuBranchFilter}
+                  {contextMenuBranchFilter}
+                </Dropdown>
               </div>
               <FilterField
                 placeholder="Filter"

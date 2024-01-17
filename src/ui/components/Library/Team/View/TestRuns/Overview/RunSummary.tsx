@@ -13,8 +13,8 @@ import {
   getTruncatedRelativeDate,
 } from "../../Recordings/RecordingListItem/RecordingListItem";
 import { useTestRunDetailsSuspends } from "../../TestRuns/hooks/useTestRunDetailsSuspends";
+import { Dropdown } from "../Dropdown";
 import { FilterField } from "../FilterField";
-import dropdownStyles from "../Dropdown.module.css";
 
 function ModeAttribute({ testRun }: { testRun: TestRun }) {
   const { mode } = testRun;
@@ -184,17 +184,15 @@ export function RunSummary({
       {tests?.length ? (
         <>
           <div className="flex flex-row items-center justify-between gap-2">
-            <div
-              className={`flex-grow ${dropdownStyles.dropdownTrigger}`}
+            <Dropdown
+              className="flex-grow"
               data-test-id="TestRunSummary-StatusFilter-DropdownTrigger"
               onClick={onClickStatusFilter}
               onKeyDown={onKeyDownStatusFilter}
-              tabIndex={0}
+              label={filterCurrentRunByStatus === "all" ? "All runs" : "Failed and flaky"}
             >
-              {filterCurrentRunByStatus === "all" ? "All runs" : "Failed and flaky"}
-              <Icon className="h-5 w-5" type="chevron-down" />
-            </div>
-            {contextMenuStatusFilter}
+              {contextMenuStatusFilter}
+            </Dropdown>
             <RunStats testRunId={testRun.id} />
           </div>
 
