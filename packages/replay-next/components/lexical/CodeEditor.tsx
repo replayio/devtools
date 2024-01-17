@@ -66,6 +66,7 @@ type Props = {
   onChange?: (markdown: string, editorState: SerializedEditorState) => void;
   onSave: (markdown: string, editorState: SerializedEditorState) => void;
   placeholder?: string;
+  preventTabFocusChange?: boolean;
   time: number;
 };
 
@@ -84,6 +85,7 @@ function CodeEditor({
   onChange,
   onSave,
   placeholder = "",
+  preventTabFocusChange = false,
   time,
 }: Props): JSX.Element {
   const historyState = useMemo(() => createEmptyHistoryState(), []);
@@ -237,7 +239,7 @@ function CodeEditor({
           ErrorBoundary={LexicalErrorBoundary}
         />
         <FormPlugin onCancel={onFormCancel} onChange={onFormChange} onSubmit={onFormSubmit} />
-        <CodePlugin />
+        <CodePlugin preventTabFocusChange={preventTabFocusChange} />
         <CodeCompletionPlugin
           context={context}
           dataTestId={dataTestId ? `${dataTestId}-CodeTypeAhead` : undefined}
