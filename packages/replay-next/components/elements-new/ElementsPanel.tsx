@@ -87,12 +87,14 @@ export function ElementsPanel({
 
     let indices: number[];
 
+    setSearchInProgress(true);
+
     if (!advancedSearch) {
+      await listData.waitUntilLoaded();
+
       // Basic search is an in-memory, what-you-see search
       indices = listData.search(query);
     } else {
-      setSearchInProgress(true);
-
       // Advanced search uses the protocol API and mirrors Chrome's element search
       let ids = await domSearchCache.readAsync(replayClient, pauseId, query);
 

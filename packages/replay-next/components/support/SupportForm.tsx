@@ -212,7 +212,7 @@ export function SupportForm({
           </ExternalLink>
           <ExternalLink
             className={styles.Footer}
-            href="mailto:help@replay.io"
+            href="mailto:support@replay.io"
             onClick={closeIfEmpty}
           >
             <svg
