@@ -176,8 +176,8 @@
     "buildId": "linux-node-20220927-e89c81527684-2590458e44be"
   },
   "playwright/breakpoints-05": {
-    "recording": "37386c80-0344-4e2c-a0eb-c88214ab22a4",
-    "buildId": "linux-chromium-20231018-529a23b6fc02-c67890b7465e"
+    "recording": "9a58c8b2-26ad-47ef-9833-9bd3e385f9cc",
+    "buildId": "macOS-chromium-20240110-3078216bece0-50d01be708a2"
   },
   "rdt-react-versions/dist/index.html": {
     "recording": "1a50e5c0-9105-4f29-abac-f746ea0added",
