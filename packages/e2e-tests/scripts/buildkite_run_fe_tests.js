@@ -6,11 +6,10 @@
   the known failing tests.
 */
 
-
 const { execSync, exec } = require("child_process");
 const getSecret = require("./aws_secrets");
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
 const testNames = [
   "breakpoints-01",
@@ -138,18 +137,19 @@ function run_fe_tests(CHROME_BINARY_PATH) {
 }
 
 function listFailingTests() {
-  const testDirectory = path.join(__dirname, '../tests');
+  const testDirectory = path.join(__dirname, "../tests");
   const testFiles = fs.readdirSync(testDirectory);
   console.log(testFiles);
 
-  const missingTests = testFiles.filter(testFile => !testNames.includes(testFile.replace('.test.ts', ''))).sort();
-  console.log('Missing tests:', missingTests.join("\n"));
+  const missingTests = testFiles
+    .filter(testFile => !testNames.includes(testFile.replace(".test.ts", "")))
+    .sort();
+  console.log("Missing tests:", missingTests.join("\n"));
 }
 
 module.exports = run_fe_tests;
 
-
-  const args = process.argv.slice(2);
-  if (args.includes("--failing-tests")) {
-    listFailingTests();
-  }
+const args = process.argv.slice(2);
+if (args.includes("--failing-tests")) {
+  listFailingTests();
+}
