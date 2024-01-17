@@ -14,18 +14,16 @@ import { SupportForm } from "replay-next/components/support/SupportForm";
 import { ExpandablesContextRoot } from "replay-next/src/contexts/ExpandablesContext";
 import { PointsContextRoot } from "replay-next/src/contexts/points/PointsContext";
 import { SelectedFrameContextRoot } from "replay-next/src/contexts/SelectedFrameContext";
-import { useIsRecordingProcessed } from "replay-next/src/hooks/useIsRecordingProcessed";
 import usePreferredFontSize from "replay-next/src/hooks/usePreferredFontSize";
 import { setDefaultTags } from "replay-next/src/utils/telemetry";
 import { ReplayClientInterface } from "shared/client/types";
 import { getTestEnvironment } from "shared/test-suites/RecordingTestMetadata";
 import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { userData } from "shared/user-data/GraphQL/UserData";
-import { setAccessToken } from "ui/actions/app";
+import { getProcessing, setAccessToken } from "ui/actions/app";
 import { setShowSupportForm } from "ui/actions/layout";
 import { createSocket } from "ui/actions/session";
 import { DevToolsDynamicLoadingMessage } from "ui/components/DevToolsDynamicLoadingMessage";
-import { DevToolsProcessingScreen } from "ui/components/DevToolsProcessingScreen";
 import { NodePickerContextRoot } from "ui/components/NodePickerContext";
 import { RecordingDocumentTitle } from "ui/components/RecordingDocumentTitle";
 import TerminalContextAdapter from "ui/components/SecondaryToolbox/TerminalContextAdapter";
@@ -46,6 +44,7 @@ import useAuth0 from "ui/utils/useAuth0";
 
 import { selectors } from "../reducers";
 import { CommandPaletteModal } from "./CommandPalette/CommandPaletteModal";
+import { DevToolsProcessingScreen } from "./DevToolsProcessingScreen";
 import FocusContextReduxAdapter from "./FocusContextReduxAdapter";
 import Header from "./Header/index";
 import KeyboardShortcuts from "./KeyboardShortcuts";
@@ -166,8 +165,7 @@ function _DevTools({
   const { trackLoadingIdleTime } = useTrackLoadingIdleTime(uploadComplete, recording);
   const { userIsAuthor, loading } = useUserIsAuthor();
   const { id: userId, email: userEmail, loading: userLoading, name: userName } = useGetUserInfo();
-
-  const isProcessed = useIsRecordingProcessed(recording);
+  const processing = useAppSelector(getProcessing);
 
   const isExternalRecording = useMemo(
     () => recording?.user && !recording.user.internal,
@@ -267,7 +265,7 @@ function _DevTools({
   };
 
   if (!loadingFinished) {
-    return isProcessed ? <DevToolsDynamicLoadingMessage /> : <DevToolsProcessingScreen />;
+    return processing ? <DevToolsProcessingScreen /> : <DevToolsDynamicLoadingMessage />;
   }
 
   return (

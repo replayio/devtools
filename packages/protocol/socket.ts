@@ -137,16 +137,15 @@ export function setSessionCallbacks(sessionCallbacks: SessionCallbacks) {
 
 export async function createSession(
   recordingId: string,
-  loadPoint: string | undefined,
   experimentalSettings: ExperimentalSettings,
   focusWindow: FocusWindow | undefined,
   sessionCallbacks: SessionCallbacks
 ) {
   const { sessionId } = await sendMessage("Recording.createSession", {
     recordingId,
-    loadPoint: loadPoint || undefined,
     experimentalSettings,
     focusRequest: focusWindow,
+    blockOnProcessing: true,
   });
 
   setSessionCallbacks(sessionCallbacks);

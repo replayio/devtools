@@ -1,9 +1,9 @@
 import Head from "next/head";
 import { useEffect, useRef, useState } from "react";
 
-import { useIsRecordingProcessed } from "replay-next/src/hooks/useIsRecordingProcessed";
-import { useRecordingProcessingProgress } from "replay-next/src/hooks/useRecordingProcessingProgress";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
+import { getProcessing } from "ui/reducers/app";
+import { useAppSelector } from "ui/setup/hooks";
 
 import { isTestSuiteReplay } from "./TestSuite/utils/isTestSuiteReplay";
 
@@ -13,11 +13,9 @@ const ANIMATION_FRAMES = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧"
 export function RecordingDocumentTitle() {
   const recordingId = useGetRecordingId();
   const { recording } = useGetRecording(recordingId);
+  const processing = useAppSelector(getProcessing);
 
   const [prefix, setPrefix] = useState("");
-
-  const isProcessed = useIsRecordingProcessed(recording);
-  const processingProgress = useRecordingProcessingProgress();
 
   const { metadata, title = "" } = recording ?? {};
 
@@ -31,8 +29,8 @@ export function RecordingDocumentTitle() {
     // Wait until we have a signal one way or another about whether this is still processing
     // This avoids title flickers if we were to set a ✅/❌ prefix for test suites,
     // and then replacing it a moment later with a loading spinner
-    if (isProcessed != null) {
-      if (isProcessed === false) {
+    if (processing != null) {
+      if (processing === true) {
         // Set the first animation frame immediately (and update it in the interval below)
         setPrefix(ANIMATION_FRAMES[0]);
 
@@ -69,7 +67,7 @@ export function RecordingDocumentTitle() {
         setPrefix("");
       }
     }
-  }, [isProcessed, processingProgress, testResult]);
+  }, [processing, testResult]);
 
   return (
     <Head>
