@@ -11,7 +11,7 @@
     "test:chromium": "playwright test --project chromium --reporter=@replayio/playwright/reporter,line",
     "test:replay-chromium": "playwright test --project replay-chromium --reporter=@replayio/playwright/reporter,line",
     "test:debug": "playwright test --project chromium --workers 1 --headed",
-    "test:runtime": "playwright test --project chromium --workers 2",
+    "test:runtime": "playwright test --project chromium --workers 4",
     "test:debug_local": "playwright test --project=replay-chromium-local --workers 1 --headed",
     "test:ui": "playwright test --ui",
     "test:install": "playwright install",
