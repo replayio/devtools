@@ -421,7 +421,6 @@ async function waitUntilMessage(
 
     for (const recordingId of newRecordingIds) {
       await loadRecording(recordingId);
-      console.log(`    ✅ Loaded recording ${recordingId}`);
     }
 
     console.log("\n");
