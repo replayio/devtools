@@ -52,9 +52,8 @@ test("file-search-01: should search files", async ({ pageWithMeta: { page, recor
   await toggleSearchResultsForFileName(page, false, { fileName: "jsonp%20chunk%20loading" });
   await toggleSearchResultsForFileName(page, false, { fileName: "load%20script" });
   await toggleSearchResultsForFileName(page, false, { fileName: "react-dom.production.min.js" });
-  await toggleSearchResultsForFileName(page, false, { fileName: "main.eb199253.js" });
 
-  // Verify result 7 was executed but result 8 was not
+  // Verify result 6 was not executed but result 7 was
+  await verifyMatchExecuted(page, 6, false);
   await verifyMatchExecuted(page, 7, true);
-  await verifyMatchExecuted(page, 8, false);
 });

@@ -139,7 +139,7 @@ function MatchRow({
 
   const { context, location } = result.match;
 
-  const { value: hitCounts } = useImperativeIntervalCacheValues(
+  const { status, value: hitCounts } = useImperativeIntervalCacheValues(
     sourceHitCountsCache,
     result.match.location.line,
     result.match.location.line,
@@ -147,11 +147,12 @@ function MatchRow({
     result.match.location.sourceId,
     range ? toPointRange(range) : null
   );
+  const hitCount = status === "resolved" ? hitCounts[0]?.[1].count ?? 0 : undefined;
 
   return (
     <div
       className={styles.MatchRow}
-      data-hit-count={hitCounts?.length}
+      data-hit-count={hitCount}
       data-test-name="SearchFiles-ResultRow"
       data-test-type="Match"
       onClick={() => {
