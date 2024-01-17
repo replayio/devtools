@@ -46,6 +46,7 @@ const testWithCloneRecording = base.extend<TestIsolatedRecordingFixture>({
       }
       throw err;
     } finally {
+      console.log("Finished test")
       let jsCoverage: Awaited<ReturnType<Page["coverage"]["stopJSCoverage"]>> | undefined;
       try {
         jsCoverage = await page.coverage.stopJSCoverage();
@@ -64,6 +65,7 @@ const testWithCloneRecording = base.extend<TestIsolatedRecordingFixture>({
       if (newRecordingId) {
         await deleteTestRecording(newRecordingId);
       }
+      console.log("Finished deleting test")
     }
   },
 });
