@@ -4,6 +4,7 @@ const { execSync, exec } = require("child_process");
 const getSecret = require("./aws_secrets");
 
 function run_fe_tests(CHROME_BINARY_PATH) {
+  let webProc = null;
   console.group("START");
   console.time("START time");
   {
@@ -25,7 +26,7 @@ function run_fe_tests(CHROME_BINARY_PATH) {
     });
 
     // Start the webserver.
-    let webProc = exec("yarn dev", (error, stdout, stderr) => {
+    webProc = exec("yarn dev", (error, stdout, stderr) => {
       if (error) {
         console.error(`exec error: ${error}`);
         return;
