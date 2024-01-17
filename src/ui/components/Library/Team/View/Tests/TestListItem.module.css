@@ -1,4 +1,3 @@
-
 :root:global(.theme-dark) .replayRow:hover {
   background-color: var(--primary-accent-dimmed-hover);
 }
