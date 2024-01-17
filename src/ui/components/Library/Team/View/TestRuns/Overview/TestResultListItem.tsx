@@ -13,7 +13,7 @@ import {
 import { StatusIcon } from "../../Tests/Overview/StatusIcon";
 import { AttributeContainer } from "../AttributeContainer";
 import { TestRunLibraryRow } from "../TestRunLibraryRow";
-import styles from "../../../../Testsuites.module.css";
+import styles from "./TestResultListItem.module.css";
 
 function RecordingAttributes({
   recording,

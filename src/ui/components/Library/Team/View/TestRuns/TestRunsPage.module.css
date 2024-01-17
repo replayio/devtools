@@ -1,0 +1,9 @@
+:root:global(.theme-light) .testReplayDetails {
+  background-color: var(--theme-base-100);
+  color: var(--body-color);
+}
+
+:root:global(.theme-dark) .testReplayDetails {
+  color: var(--body-color);
+  background-color: var(--body-bgcolor);
+}

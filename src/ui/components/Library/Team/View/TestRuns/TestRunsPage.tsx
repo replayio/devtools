@@ -22,8 +22,8 @@ import { TestRunList } from "./TestRunList";
 import { TestRunsContext, TestRunsContextRoot } from "./TestRunsContextRoot";
 import { TestRunSpecDetails } from "./TestRunSpecDetails";
 import { TestRunsStats } from "./TestRunsStats";
-import styles from "../../../Testsuites.module.css";
 import dropdownStyles from "./Dropdown.module.css";
+import styles from "./TestRunsPage.module.css";
 
 function ErrorFallback() {
   return (
