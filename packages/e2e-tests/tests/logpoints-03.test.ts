@@ -1,19 +1,29 @@
 import { openDevToolsTab, startTest } from "../helpers";
-import { addEventListenerLogpoints, findConsoleMessage } from "../helpers/console-panel";
+import {
+  addEventListenerLogpoints,
+  expandConsoleMessage,
+  findConsoleMessage,
+} from "../helpers/console-panel";
 import test, { expect } from "../testFixtureCloneRecording";
 
-test.use({ exampleKey: "doc_events.html" });
+// This test file is identical to `logpoints-03.test`, except for the example filename
+// and the event type string. We've copy-pasted it to simplify getting _any_ E2E test working.
+test.use({ exampleKey: "doc_events_chromium.html" });
 
-test(`logpoints-03: should display event properties in the console`, async ({
+test(`logpoints-03_chromium: should display event properties in the console`, async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
   await startTest(page, recordingId);
   await openDevToolsTab(page);
 
-  await addEventListenerLogpoints(page, [{ eventType: "event.mouse.click", categoryKey: "mouse" }]);
+  // WARNING: Our Chromium events logic does _not_ actually use the `event.x.y` naming convention.
+  // However, the E2E test helpers _do_ need this pattern to determine what categories to expand.
+  await addEventListenerLogpoints(page, [{ eventType: "click", categoryKey: "mouse" }]);
 
-  const message = await findConsoleMessage(page, "(click)", "event");
+  const message = await findConsoleMessage(page, "PointerEvent", "event");
+
+  expandConsoleMessage(message);
 
   await expect(message).toContainText('type: "click"');
   await expect(message).toContainText("target: <div");
