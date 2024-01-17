@@ -7,7 +7,6 @@ import {
   openElementsPanel,
   waitForElementsToLoad,
 } from "../helpers/elements-panel";
-import { delay } from "../helpers/utils";
 import test, { expect } from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "doc_inspector_basic.html" });
@@ -37,10 +36,10 @@ test(`inspector-elements-02_node-picker: element picker and iframe behavior`, as
 
   // Click on the content inside of an iframe and verify the selection
   {
-    const { x, y } = await findElementCoordinates(page, 'id="myiframe"');
+    const { x, y } = await findElementCoordinates(page, 'data-test-id="inner-body"');
     await inspectCanvasCoordinates(page, x, y);
 
     const selectedRow = await getElementsListRow(page, { isSelected: true });
-    await expect(selectedRow).toContainText('id="myiframe"');
+    await expect(selectedRow).toContainText('data-test-id="inner-body"');
   }
 });
