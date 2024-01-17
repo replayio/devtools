@@ -1,7 +1,58 @@
 /* Copyright 2024 Record Replay Inc. */
 
+/*
+  The script is primarly used to run the frontend tests, 
+  but can also be used with the flag --failing-tests to list 
+  the known failing tests.
+*/
+
+
 const { execSync, exec } = require("child_process");
 const getSecret = require("./aws_secrets");
+const fs = require('fs');
+const path = require('path');
+
+const testNames = [
+  "breakpoints-01",
+  "breakpoints-03",
+  "breakpoints-04",
+  "breakpoints-05",
+  //"breakpoints-06",
+  "comments-01",
+  "comments-02",
+  "comments-03",
+  "console_async_eval",
+  "console_dock",
+  "console_eval",
+  "console-expressions-01",
+  "cypress-01",
+  "cypress-02",
+  "cypress-03",
+  "elements-search",
+  "focus_mode-01",
+  "logpoints-01",
+  "logpoints-02",
+  "logpoints-03_chromium",
+  "logpoints-05",
+  "logpoints-06",
+  "logpoints-07",
+  "logpoints-08",
+  "logpoints-09",
+  "network-0",
+  "object_preview-03",
+  //"object_preview-04",
+  "object_preview-05",
+  "passport-01",
+  "passport-03",
+  "passport-04",
+  "react_devtools-01-basic.test",
+  "react_devtools-03-multiple-versions",
+  "react_devtools-04-seeking",
+  "scopes_renderer",
+  "stacking_chromium",
+  "stepping-01",
+  //"stepping-05_chromium",
+];
 
 function run_fe_tests(CHROME_BINARY_PATH) {
   let webProc = null;
@@ -71,47 +122,6 @@ function run_fe_tests(CHROME_BINARY_PATH) {
   console.time("TESTS time");
   {
     // Run the known-passing tests.
-    const testNames = [
-      "breakpoints-01",
-      "breakpoints-03",
-      "breakpoints-04",
-      "breakpoints-05",
-      //"breakpoints-06",
-      "comments-01",
-      "comments-02",
-      "comments-03",
-      "console_async_eval",
-      "console_dock",
-      "console_eval",
-      "console-expressions-01",
-      "cypress-01",
-      "cypress-02",
-      "cypress-03",
-      "elements-search",
-      "focus_mode-01",
-      "logpoints-01",
-      "logpoints-02",
-      "logpoints-03_chromium",
-      "logpoints-05",
-      "logpoints-06",
-      "logpoints-07",
-      "logpoints-08",
-      "logpoints-09",
-      "network-0",
-      "object_preview-03",
-      //"object_preview-04",
-      "object_preview-05",
-      "passport-01",
-      "passport-03",
-      "passport-04",
-      "react_devtools-01-basic.test",
-      "react_devtools-03-multiple-versions",
-      "react_devtools-04-seeking",
-      "scopes_renderer",
-      "stacking_chromium",
-      "stepping-01",
-      //"stepping-05_chromium",
-    ];
     execSync(`xvfb-run yarn test:runtime ${testNames.join(" ")}`, {
       stdio: "inherit",
       stderr: "inherit",
@@ -127,4 +137,19 @@ function run_fe_tests(CHROME_BINARY_PATH) {
   process.exit(0);
 }
 
+function listFailingTests() {
+  const testDirectory = path.join(__dirname, '../tests');
+  const testFiles = fs.readdirSync(testDirectory);
+  console.log(testFiles);
+
+  const missingTests = testFiles.filter(testFile => !testNames.includes(testFile.replace('.test.ts', ''))).sort();
+  console.log('Missing tests:', missingTests.join("\n"));
+}
+
 module.exports = run_fe_tests;
+
+
+  const args = process.argv.slice(2);
+  if (args.includes("--failing-tests")) {
+    listFailingTests();
+  }
