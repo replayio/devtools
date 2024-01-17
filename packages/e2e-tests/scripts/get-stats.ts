@@ -20,7 +20,7 @@ export function getStats() {
   const testFileToInfoMap: {
     [testFile: string]: {
       runtime: string;
-      runtimeReleaseDate: string;
+      runtimeReleaseDate: Date;
       runtimeOS: string;
       recordingId: string;
     };
@@ -73,10 +73,11 @@ export function getStats() {
 
         testFileToInfoMap[relativeFilePath] = {
           runtime,
-          runtimeReleaseDate: `${releaseDate.substring(0, 4)}-${releaseDate.substring(
-            4,
-            6
-          )}-${releaseDate.substring(6)}`,
+          runtimeReleaseDate: new Date(
+            `${releaseDate.substring(0, 4)}-${releaseDate.substring(4, 6)}-${releaseDate.substring(
+              6
+            )} 00:00:00`
+          ),
           runtimeOS: os,
           recordingId: recording,
         };
@@ -131,6 +132,30 @@ export function getStats() {
       releaseYearStats[year].numTests += numTests;
     });
 
+  const sortedTestFileToInfoMap: typeof testFileToInfoMap = {};
+  const entries = Object.entries(testFileToInfoMap).sort((a, b) => {
+    const aValue = a[1];
+    const bValue = b[1];
+
+    if (aValue.runtimeReleaseDate.getTime() !== bValue.runtimeReleaseDate.getTime()) {
+      return aValue.runtimeReleaseDate.getTime() - bValue.runtimeReleaseDate.getTime();
+    } else if (aValue.runtimeOS !== bValue.runtimeOS) {
+      return aValue.runtimeOS.localeCompare(bValue.runtimeOS);
+    } else if (aValue.runtime !== bValue.runtime) {
+      return aValue.runtime.localeCompare(bValue.runtime);
+    } else {
+      return a[0].localeCompare(b[0]);
+    }
+  });
+  entries.forEach(([key, { recordingId, runtime, runtimeOS, runtimeReleaseDate }]) => {
+    sortedTestFileToInfoMap[key] = {
+      runtimeReleaseDate: runtimeReleaseDate.toISOString().slice(0, 10) as any,
+      runtimeOS,
+      runtime,
+      recordingId,
+    };
+  });
+
   return {
     browserSummaryStats,
     exampleToTestMap,
@@ -138,6 +163,6 @@ export function getStats() {
     releaseYearStats,
     sortedStats,
     testFileList,
-    testFileToInfoMap,
+    testFileToInfoMap: sortedTestFileToInfoMap,
   };
 }
