@@ -21,6 +21,7 @@ import config, { BrowserName } from "../config";
 import examplesJson from "../examples.json";
 import { ExamplesData, TestRecordingIntersectionValue } from "../helpers";
 import { getStats } from "./get-stats";
+import { loadRecording } from "./loadRecording";
 import { recordNodeExample } from "./record-node";
 import { recordPlaywright, uploadLastRecording } from "./record-playwright";
 
@@ -413,15 +414,15 @@ async function waitUntilMessage(
 
     console.log("\n");
     console.log(
-      `${newRecordingIds.length} new recordings have been saved. Open each recording to ensure it has been pre-processed:`
-    );
-    console.log(
-      newRecordingIds
-        .map(recordingId => ` • ${chalk.blue(chalk.underline(`https://go/r/${recordingId}`))}`)
-        .join("\n")
+      `${newRecordingIds.length} new recordings have been saved. Loading each recording to ensure it has been pre-processed.`
     );
 
     const { exampleToTestMap } = getStats();
+
+    for (const recordingId of newRecordingIds) {
+      await loadRecording(recordingId);
+      console.log(`    ✅ Loaded recording ${recordingId}`);
+    }
 
     console.log("\n");
     console.log("The following tests have been impacted by this change:");
