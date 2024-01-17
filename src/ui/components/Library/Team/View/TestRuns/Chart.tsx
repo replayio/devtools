@@ -42,8 +42,12 @@ function generateChartData(testRuns: TestRun[], days: number) {
       ? (runs.filter(r => r.results.counts.failed > 0).length / runs.length) * 100
       : 0;
 
-    // Format the dates like MM/DD
-    acc.push({ x: date.split("-").slice(1).join("/"), y: failureRate });
+    // Format the dates like MMM DD - Jan 16
+    const d = new Date(date);
+    acc.push({
+      x: `${d.toLocaleString("default", { month: "short" })} ${d.getDate()}`,
+      y: failureRate,
+    });
     return acc;
   }, [] as ChartDataType[]);
 
