@@ -20,11 +20,10 @@ export default function LabeledIcon({
   return (
     <div
       className={`${className} ${styles.LabeledIcon}`}
-      data-test-name={dataTestName}
       title={title ?? label}
     >
       <MaterialIcon className={`${iconClassname} ${styles.Icon}`}>{icon}</MaterialIcon>
-      <label className={styles.Label}>{label}</label>
+      <label data-test-name={dataTestName} className={styles.Label}>{label}</label>
     </div>
   );
 }
