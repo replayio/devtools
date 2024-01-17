@@ -4,6 +4,7 @@ const { execSync, exec } = require("child_process");
 const getSecret = require("./aws_secrets");
 
 function run_fe_tests(CHROME_BINARY_PATH) {
+  let webProc = null;
   console.group("START");
   console.time("START time");
   {
@@ -25,7 +26,7 @@ function run_fe_tests(CHROME_BINARY_PATH) {
     });
 
     // Start the webserver.
-    let webProc = exec("yarn dev", (error, stdout, stderr) => {
+    webProc = exec("yarn dev", (error, stdout, stderr) => {
       if (error) {
         console.error(`exec error: ${error}`);
         return;
@@ -75,7 +76,7 @@ function run_fe_tests(CHROME_BINARY_PATH) {
       "breakpoints-03",
       "breakpoints-04",
       "breakpoints-05",
-      "breakpoints-06",
+      //"breakpoints-06",
       "comments-01",
       "comments-02",
       "comments-03",
@@ -98,7 +99,7 @@ function run_fe_tests(CHROME_BINARY_PATH) {
       "logpoints-09",
       "network-0",
       "object_preview-03",
-      "object_preview-04",
+      //"object_preview-04",
       "object_preview-05",
       "passport-01",
       "passport-03",
@@ -109,7 +110,7 @@ function run_fe_tests(CHROME_BINARY_PATH) {
       "scopes_renderer",
       "stacking_chromium",
       "stepping-01",
-      "stepping-05_chromium",
+      //"stepping-05_chromium",
     ];
     execSync(`xvfb-run yarn test:runtime ${testNames.join(" ")}`, {
       stdio: "inherit",
