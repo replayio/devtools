@@ -7,9 +7,9 @@ import { trackEvent } from "ui/utils/telemetry";
 
 import { TestSuitePanelMessage } from "../TestSuitePanelMessage";
 import { TimeFilterContextRoot, TimeFilterOptions } from "../TimeFilterContextRoot";
-import { TestOverviewContent } from "./Overview/TestOverviewContent";
 import { TestsContextRoot } from "./TestContextRoot";
-import { TestListPanel } from "./TestListPanel";
+import { TestDetailsPanel } from "./TestDetailsPanel/TestDetailsPanel";
+import { TestListPanel } from "./TestListPanel/TestListPanel";
 
 function ErrorFallback() {
   return (
@@ -35,7 +35,7 @@ export function TestsPage() {
               <Panel minSize={20} order={2}>
                 <div className="h-full w-full overflow-hidden rounded-xl">
                   <Suspense fallback={<LibrarySpinner />}>
-                    <TestOverviewContent />
+                    <TestDetailsPanel />
                   </Suspense>
                 </div>
               </Panel>

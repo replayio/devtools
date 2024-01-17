@@ -4,8 +4,8 @@ import { TestRun, getTestRunTitle } from "shared/test-suites/TestRun";
 import Icon from "ui/components/shared/Icon";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 
+import HighlightedText from "../../HighlightedText";
 import { getTruncatedRelativeDate } from "../../Recordings/RecordingListItem/RecordingListItem";
-import HighlightedText from "../HighlightedText";
 import { TestRunsContext } from "../TestRunsContextRoot";
 import { TestRunLibraryRow } from "./TestRunLibraryRow";
 import styles from "./TestRunListItem.module.css";
