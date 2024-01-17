@@ -330,6 +330,9 @@ export function convertRecording(
   if ("userRole" in rec) {
     recording.userRole = rec.userRole as RecordingRole;
   }
+  if ("testRun" in rec) {
+    recording.testRun = rec.testRun;
+  }
 
   return recording;
 }

@@ -1,4 +1,5 @@
 import orderBy from "lodash/orderBy";
+import { useRouter } from "next/router";
 
 import { TestExecution } from "shared/test-suites/TestRun";
 import Icon from "ui/components/shared/Icon";
@@ -15,6 +16,7 @@ export function Execution({
   execution: TestExecution;
   testRunId: string;
 }) {
+  const router = useRouter();
   const title = execution.commitTitle || "<Commit title unavailable>";
   const sortedRecordings = orderBy(execution.recordings, "date", "desc");
   const shouldCollapse = sortedRecordings.length === 1;
@@ -37,7 +39,11 @@ export function Execution({
       data-test-run-id={testRunId}
       data-test-id="ExecutionItem"
       className="flex flex-col px-2"
-      href={shouldCollapse ? `/recording/${sortedRecordings[0].id}` : undefined}
+      href={
+        shouldCollapse
+          ? `/recording/${sortedRecordings[0].id}?referrer=${encodeURIComponent(router.asPath)}`
+          : undefined
+      }
     >
       <div className="flex flex-row items-center justify-between gap-2 overflow-hidden py-2">
         <div className="flex flex-row items-center gap-2 overflow-hidden">
