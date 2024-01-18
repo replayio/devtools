@@ -1,5 +1,10 @@
 import { openDevToolsTab, startTest } from "../helpers";
-import { resumeToLine, rewindToLine, stepOver, waitForPaused } from "../helpers/pause-information-panel";
+import {
+  resumeToLine,
+  rewindToLine,
+  stepOver,
+  waitForPaused,
+} from "../helpers/pause-information-panel";
 import { addBreakpoint } from "../helpers/source-panel";
 import { waitFor } from "../helpers/utils";
 import { Page, test } from "../testFixtureCloneRecording";
