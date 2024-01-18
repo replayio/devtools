@@ -83,8 +83,8 @@ const config: PlaywrightTestConfig = {
       width: 1280,
       height: 1024,
     },
-    // Don't allow any one action to take more than 15s
-    actionTimeout: 65_000,
+    // Don't allow any one action to take more than 60s
+    actionTimeout: 60_000,
   },
 
   expect: {
