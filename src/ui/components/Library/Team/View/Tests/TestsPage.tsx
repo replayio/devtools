@@ -123,6 +123,7 @@ function TestsContent() {
               />
               {contextMenuTimeFilter}
               <FilterField
+                className="flex-grow"
                 dataTestId="TestPage-FilterByText-Input"
                 onChange={setFilterByText}
                 placeholder="Filter tests"
