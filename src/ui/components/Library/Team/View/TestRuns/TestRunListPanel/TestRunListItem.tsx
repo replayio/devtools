@@ -6,8 +6,8 @@ import MaterialIcon from "ui/components/shared/MaterialIcon";
 
 import HighlightedText from "../../HighlightedText";
 import { getTruncatedRelativeDate } from "../../Recordings/RecordingListItem/RecordingListItem";
+import { TestRunLibraryRow } from "../TestRunLibraryRow";
 import { TestRunsContext } from "../TestRunsContextRoot";
-import { TestRunLibraryRow } from "./TestRunLibraryRow";
 import styles from "./TestRunListItem.module.css";
 
 function Status({ failCount }: { failCount: number }) {
