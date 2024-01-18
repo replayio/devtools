@@ -10,8 +10,6 @@ import type { Page, expect as expectFunction } from "@playwright/test";
 import { removeRecording, uploadRecording } from "@replayio/replay";
 import axios from "axios";
 import chalk from "chalk";
-import { dots } from "cli-spinners";
-import logUpdate from "log-update";
 import { v4 as uuidv4 } from "uuid";
 import yargs from "yargs";
 
@@ -22,6 +20,7 @@ import examplesJson from "../examples.json";
 import { ExamplesData, TestRecordingIntersectionValue } from "../helpers";
 import { getStats } from "./get-stats";
 import { loadRecording } from "./loadRecording";
+import { logAnimated } from "./log";
 import { recordNodeExample } from "./record-node";
 import { recordPlaywright, uploadLastRecording } from "./record-playwright";
 
@@ -63,23 +62,6 @@ const examplesJsonPath = join(__dirname, "..", "examples.json");
 
 const exampleToNewRecordingId: { [example: string]: string } = {};
 
-function logAnimated(text: string): () => void {
-  let index = 0;
-
-  const update = () => {
-    const frame = dots.frames[++index % dots.frames.length];
-    logUpdate(`${chalk.yellowBright(frame)} ${text}`);
-  };
-
-  const intervalId = setInterval(update, dots.interval);
-
-  return () => {
-    clearInterval(intervalId);
-    logUpdate(`${chalk.greenBright("✓")} ${text}`);
-    logUpdate.done();
-  };
-}
-
 async function saveRecording(
   example: string,
   apiKey: string,
@@ -108,7 +90,9 @@ async function saveRecording(
 
   const buildId = response.data.data.recording.buildId;
 
-  const done = logAnimated(`Saving ${chalk.bold(example)} with recording id ${recordingId}`);
+  const { completeLog } = logAnimated(
+    `Saving ${chalk.bold(example)} with recording id ${recordingId}`
+  );
 
   if (!skipUpload) {
     await uploadRecording(recordingId, {
@@ -145,7 +129,7 @@ async function saveRecording(
     )
   );
 
-  done();
+  completeLog();
 }
 
 interface TestRunCallbackArgs {
@@ -210,12 +194,6 @@ async function saveExamples(
     examplesToRun = examplesToRun.filter(example => specificExamples.includes(example.filename));
   }
 
-  console.log(
-    "Running examples for target: ",
-    examplesTarget,
-    examplesToRun.map(e => e.filename)
-  );
-
   for (const example of examplesToRun) {
     const examplePath = join(example.folder, example.filename);
     if (existsSync(examplePath)) {
@@ -231,7 +209,7 @@ async function saveBrowserExamples() {
 }
 
 async function saveBrowserExample({ example }: TestRunCallbackArgs) {
-  const done = logAnimated(`Recording example ${chalk.bold(example.filename)}`);
+  const { completeLog } = logAnimated(`Recording example ${chalk.bold(example.filename)}`);
 
   const exampleUrl = `${config.devtoolsUrl}/test/examples/${example.filename}`;
   async function defaultPlaywrightScript(page: Page) {
@@ -247,7 +225,6 @@ async function saveBrowserExample({ example }: TestRunCallbackArgs) {
     await Promise.all([goToPagePromise, waitForLogPromise]);
   });
 
-  console.log("Recording completed");
   const recordingId = await uploadLastRecording(exampleUrl);
   if (recordingId == null) {
     throw new Error("Recording not uploaded");
@@ -255,7 +232,7 @@ async function saveBrowserExample({ example }: TestRunCallbackArgs) {
 
   exampleToNewRecordingId[example.filename] = recordingId;
 
-  done();
+  completeLog();
 
   if (config.useExampleFile && recordingId) {
     await saveRecording(example.filename, config.replayApiKey, recordingId, true);
@@ -268,7 +245,7 @@ async function saveBrowserExample({ example }: TestRunCallbackArgs) {
 
 async function saveNodeExamples() {
   await saveExamples("node", async ({ example, examplePath }: TestRunCallbackArgs) => {
-    const done = logAnimated(`Recording example ${chalk.bold(example.filename)}`);
+    const { completeLog } = logAnimated(`⏳ Recording example ${chalk.bold(example.filename)}`);
 
     process.env.RECORD_REPLAY_METADATA_TEST_RUN_ID = uuidv4();
 
@@ -279,13 +256,11 @@ async function saveNodeExamples() {
 
       exampleToNewRecordingId[example.filename] = recordingId;
 
-      done();
-
-      console.log(
-        `Saved recording ${chalk.bold(example.filename)} with id ${chalk.bold(recordingId)}`
-      );
+      completeLog();
     } else {
-      done();
+      completeLog();
+
+      console.error(`❌ Failed to record example ${chalk.bold(example.filename)}`);
 
       throw `Unable to save recording for ${chalk.bold(example.filename)}`;
     }
@@ -412,7 +387,6 @@ async function waitUntilMessage(
     const updatedExamples = Object.keys(exampleToNewRecordingId);
     const newRecordingIds = Object.values(exampleToNewRecordingId);
 
-    console.log("\n");
     console.log(
       `${newRecordingIds.length} new recordings have been saved. Loading each recording to ensure it has been pre-processed.`
     );
@@ -423,7 +397,6 @@ async function waitUntilMessage(
       await loadRecording(recordingId);
     }
 
-    console.log("\n");
     console.log("The following tests have been impacted by this change:");
     console.table(
       updatedExamples
