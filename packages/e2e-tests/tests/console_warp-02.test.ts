@@ -53,6 +53,7 @@ test("console_warp-02: support pausing, warping, stepping and evaluating console
   await stepOverToLine(page, 21);
   await verifyPausedAtMessage(page, "1 << 7", "terminal-expression");
 
+  await stepOverToLine(page, 21);
   await stepOverToLine(page, 22);
   await verifyPausedAtMessage(page, "ExampleFinished", "console-log");
 });
