@@ -4,6 +4,7 @@ import { Test } from "shared/test-suites/TestRun";
 import HighlightedText from "ui/components/Library/Team/View/TestRuns/HighlightedText";
 import Icon from "ui/components/shared/Icon";
 
+import { TestRunLibraryRow } from "../TestRuns/TestRunLibraryRow";
 import { TestContext } from "./TestContextRoot";
 import styles from "./TestListItem.module.css";
 
@@ -51,13 +52,10 @@ export function TestListItem({ filterByText, test }: { filterByText: string; tes
   };
 
   return (
-    <div
+    <TestRunLibraryRow
+      isSelected={isSelected}
       data-test-id="TestListItem"
-      className={`flex cursor-pointer flex-row items-center space-x-3 rounded-sm border-b border-chrome p-3 ${
-        styles.libraryRow
-      }
-      ${isSelected ? styles.libraryRowSelected : ""}
-      `}
+      className="cursor-pointer space-x-3 border-b border-chrome p-3"
       onClick={onClick}
     >
       <Status test={test} />
@@ -71,6 +69,6 @@ export function TestListItem({ filterByText, test }: { filterByText: string; tes
           </div>
         </div>
       </div>
-    </div>
+    </TestRunLibraryRow>
   );
 }

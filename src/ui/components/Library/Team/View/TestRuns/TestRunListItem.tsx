@@ -6,8 +6,9 @@ import Icon from "ui/components/shared/Icon";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 
 import { getTruncatedRelativeDate } from "../Recordings/RecordingListItem/RecordingListItem";
+import { TestRunLibraryRow } from "./TestRunLibraryRow";
 import { TestRunsContext } from "./TestRunsContextRoot";
-import styles from "./TestRuns.module.css";
+import styles from "./TestRunListItem.module.css";
 
 function Status({ failCount }: { failCount: number }) {
   const status = failCount > 0 ? "fail" : "success";
@@ -51,13 +52,10 @@ export function TestRunListItem({
   };
 
   return (
-    <div
+    <TestRunLibraryRow
+      isSelected={isSelected}
       data-test-id="TestRunListItem"
-      className={`flex cursor-pointer flex-row items-center space-x-3 rounded-md bg-themeBase-100 px-2 py-1 ${
-        styles.libraryRow
-      }
-      ${isSelected ? styles.libraryRowSelected : ""}
-      `}
+      className="cursor-pointer space-x-3 bg-themeBase-100 px-2 py-1"
       onClick={onClick}
     >
       <Status failCount={failCount} />
@@ -76,6 +74,6 @@ export function TestRunListItem({
           </span>
         </div>
       </div>
-    </div>
+    </TestRunLibraryRow>
   );
 }

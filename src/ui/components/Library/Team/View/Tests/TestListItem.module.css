@@ -1,37 +1,9 @@
-:root:global(.theme-dark) .libraryRow {
-  color: var(--body-color);
-  background-color: var(--body-bgcolor);
-}
-
-:root:global(.theme-dark) .libraryRow:hover,
 :root:global(.theme-dark) .replayRow:hover {
   background-color: var(--primary-accent-dimmed-hover);
 }
 
-:root:global(.theme-dark) .libraryRowSelected {
-  background-color: var(--primary-accent-dimmed);
-}
-
-:root:global(.theme-dark) .libraryRowSelected:hover {
-  background-color: var(--primary-accent-dimmed);
-}
-
-:root:global(.theme-light) .libraryRow {
-  background-color: var(--theme-base-100);
-  color: var(--body-color);
-}
-
-:root:global(.theme-light) .libraryRow:hover,
 :root:global(.theme-light) .replayRow:hover {
   background-color: var(--grey-10);
-}
-
-:root:global(.theme-light) .libraryRowSelected {
-  background-color: rgb(233 246 255);
-}
-
-:root:global(.theme-light) .libraryRowSelected:hover {
-  background-color: rgb(229, 244, 255);
 }
 
 .flakyPill {

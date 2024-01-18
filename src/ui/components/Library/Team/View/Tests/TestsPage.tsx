@@ -3,12 +3,12 @@ import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { ContextMenuItem, useContextMenu } from "use-context-menu";
 
 import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBoundary";
-import Icon from "replay-next/components/Icon";
 import LibraryDropdownTrigger from "ui/components/Library/LibraryDropdownTrigger";
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 import { trackEvent } from "ui/utils/telemetry";
 
 import { TeamContext } from "../../TeamContextRoot";
+import { FilterField } from "../TestRuns/FilterField";
 import { TestSuitePanelMessage } from "../TestSuitePanelMessage";
 import {
   TimeFilterContext,
@@ -19,7 +19,6 @@ import {
 import { TestOverviewContent } from "./Overview/TestOverviewContent";
 import { TestContext, TestsContextRoot } from "./TestContextRoot";
 import { TestList } from "./TestList";
-import styles from "./TestsPage.module.css";
 
 export function TestsPage() {
   return (
@@ -123,17 +122,13 @@ function TestsContent() {
                 label={timeFilterLabel[filterByTime]}
               />
               {contextMenuTimeFilter}
-              <div className={styles.filterContainer}>
-                <input
-                  className={styles.filterInput}
-                  data-test-id="TestPage-FilterByText-Input"
-                  onChange={event => setFilterByText(event.currentTarget.value)}
-                  placeholder="Filter tests"
-                  type="text"
-                  value={filterByTextForDisplay}
-                />
-                <Icon className={styles.searchIcon} type="search" />
-              </div>
+              <FilterField
+                className="flex-grow"
+                dataTestId="TestPage-FilterByText-Input"
+                onChange={setFilterByText}
+                placeholder="Filter tests"
+                value={filterByTextForDisplay}
+              />
             </div>
 
             <div className="grow" data-filtered-by-text={filterByText} data-test-id="TestList">
