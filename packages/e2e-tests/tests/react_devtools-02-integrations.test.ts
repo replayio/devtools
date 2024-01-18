@@ -32,10 +32,7 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
 
   await openDevToolsTab(page);
 
-  await warpToMessage(
-    page,
-    "Waiting for breakpoint at doc_rr_basic_chromium.html:21 (waitForBreakpoint)"
-  );
+  await warpToMessage(page, "Waiting for breakpoint at doc_rr_basic.html:21 (waitForBreakpoint)");
 
   // If the "React" tab shows up, we know that the routine ran
   await openReactDevtoolsPanel(page);
