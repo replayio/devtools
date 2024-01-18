@@ -1,5 +1,5 @@
 import { ApolloError } from "@apollo/client";
-import { uploadedData } from "@replayio/protocol";
+import { processRecordingProgress, uploadedData } from "@replayio/protocol";
 import * as Sentry from "@sentry/react";
 
 import {
@@ -145,10 +145,9 @@ function isSourceContentsCommandResponse(
 
 // Create a session to use while debugging.
 // NOTE: This thunk is dispatched _before_ the rest of the devtools logic
-// is initialized, so `extra.ThreadFront` isn't available yet.
-// We pass `ThreadFront` in as an arg here instead.
+// is initialized
 export function createSocket(recordingId: string): UIThunkAction {
-  return async (dispatch, getState, { replayClient }) => {
+  return async (dispatch, getState, { protocolClient, replayClient }) => {
     try {
       assert(recordingId, "no recordingId");
       dispatch(actions.setRecordingId(recordingId));
@@ -209,7 +208,19 @@ export function createSocket(recordingId: string): UIThunkAction {
         experimentalSettings.controllerKey = String(Date.now());
       }
 
-      const loadPoint = new URL(window.location.href).searchParams.get("point") || undefined;
+      if (!recording.isProcessed) {
+        dispatch(actions.setProcessing(true));
+
+        function onProcessingProgress(progress: processRecordingProgress) {
+          dispatch(actions.setProcessingProgress(progress.progressPercent));
+        }
+
+        protocolClient.Recording.addProcessRecordingProgressListener(onProcessingProgress);
+        await protocolClient.Recording.processRecording({ recordingId, experimentalSettings });
+        protocolClient.Recording.removeProcessRecordingProgressListener(onProcessingProgress);
+      }
+
+      dispatch(actions.setProcessing(false));
 
       const queuedProtocolMessages: ReceivedProtocolMessage[] = [];
       let flushTimeoutId: NodeJS.Timeout | null = null;
@@ -235,7 +246,6 @@ export function createSocket(recordingId: string): UIThunkAction {
 
       const sessionId = await createSession(
         recordingId,
-        loadPoint,
         experimentalSettings,
         focusWindowFromParams !== null ? focusWindowFromParams : undefined,
         {
@@ -341,7 +351,6 @@ export function createSocket(recordingId: string): UIThunkAction {
       dispatch(actions.setUploading(null));
       dispatch(actions.setAwaitingSourcemaps(false));
 
-      await replayClient.waitForSession();
       await dispatch(jumpToInitialPausePoint());
 
       dispatch(actions.setLoadingFinished(true));
