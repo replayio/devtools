@@ -4,12 +4,11 @@
 // Use the API key for the "Frontend E2E Test Team" that we have set up in admin,
 // as that should let us mark these recordings as public.
 
-import { existsSync, readFileSync, writeFileSync } from "fs";
+import { existsSync, writeFileSync } from "fs";
 import { join } from "path";
 import type { Page, expect as expectFunction } from "@playwright/test";
 import { removeRecording, uploadRecording } from "@replayio/replay";
 import axios from "axios";
-import { blue, underline, yellow } from "chalk";
 import chalk from "chalk";
 import { dots } from "cli-spinners";
 import logUpdate from "log-update";
@@ -19,8 +18,8 @@ import yargs from "yargs";
 import { SetRecordingIsPrivateVariables } from "../../shared/graphql/generated/SetRecordingIsPrivate";
 import { UpdateRecordingTitleVariables } from "../../shared/graphql/generated/UpdateRecordingTitle";
 import config, { BrowserName } from "../config";
-import { testFunction as reduxFundamentalsScript } from "../examples/redux-fundamentals/tests/example-script";
-import { ExamplesData } from "../helpers";
+import examplesJson from "../examples.json";
+import { ExamplesData, TestRecordingIntersectionValue } from "../helpers";
 import { getStats } from "./get-stats";
 import { recordNodeExample } from "./record-node";
 import { recordPlaywright, uploadLastRecording } from "./record-playwright";
@@ -59,268 +58,6 @@ type TestExampleFile = {
   runtime: "firefox" | "chromium" | "node";
   playwrightScript?: PlaywrightScript;
 };
-
-const knownExamples: TestExampleFile[] = [
-  {
-    filename: "authenticated_comments.html",
-    folder: config.browserExamplesPath,
-    category: "browser",
-    runtime: "chromium",
-  },
-  {
-    filename: "authenticated_logpoints.html",
-    folder: config.browserExamplesPath,
-    category: "browser",
-    runtime: "chromium",
-  },
-  {
-    filename: "cra/dist/index.html",
-    folder: config.browserExamplesPath,
-    category: "browser",
-    runtime: "firefox",
-  },
-  {
-    filename: "cra/dist/index_chromium.html",
-    folder: config.browserExamplesPath,
-    category: "browser",
-    runtime: "chromium",
-  },
-  {
-    filename: "redux/dist/index.html",
-    folder: config.browserExamplesPath,
-    category: "browser",
-    runtime: "chromium",
-  },
-  {
-    filename: "doc_async.html",
-    folder: config.browserExamplesPath,
-    category: "browser",
-    runtime: "chromium",
-  },
-  {
-    filename: "doc_control_flow.html",
-    folder: config.browserExamplesPath,
-    category: "browser",
-    runtime: "firefox",
-  },
-  {
-    filename: "doc_debugger_statements.html",
-    folder: config.browserExamplesPath,
-    category: "browser",
-    runtime: "chromium",
-  },
-  {
-    filename: "doc_events.html",
-    folder: config.browserExamplesPath,
-    category: "browser",
-    runtime: "firefox",
-  },
-  {
-    filename: "doc_events_chromium.html",
-    folder: config.browserExamplesPath,
-    category: "browser",
-    runtime: "chromium",
-  },
-  {
-    filename: "doc_exceptions.html",
-    folder: config.browserExamplesPath,
-    category: "browser",
-    runtime: "firefox",
-  },
-  {
-    filename: "doc_exceptions_bundle.html",
-    folder: config.browserExamplesPath,
-    category: "browser",
-    runtime: "firefox",
-  },
-  {
-    filename: "doc_inspector_basic.html",
-    folder: config.browserExamplesPath,
-    category: "browser",
-    runtime: "chromium",
-  },
-  {
-    filename: "doc_inspector_shorthand.html",
-    folder: config.browserExamplesPath,
-    category: "browser",
-    runtime: "firefox",
-  },
-  {
-    filename: "doc_inspector_sourcemapped.html",
-    folder: config.browserExamplesPath,
-    category: "browser",
-    runtime: "chromium",
-  },
-  {
-    filename: "doc_inspector_styles.html",
-    folder: config.browserExamplesPath,
-    category: "browser",
-    runtime: "firefox",
-  },
-  {
-    filename: "doc_minified.html",
-    folder: config.browserExamplesPath,
-    category: "browser",
-    runtime: "chromium",
-  },
-  {
-    filename: "doc_navigate.html",
-    folder: config.browserExamplesPath,
-    category: "browser",
-    runtime: "chromium",
-  },
-  {
-    filename: "doc_prod_bundle.html",
-    folder: config.browserExamplesPath,
-    category: "browser",
-    runtime: "chromium",
-  },
-  {
-    filename: "doc_recursion.html",
-    folder: config.browserExamplesPath,
-    category: "browser",
-    runtime: "chromium",
-  },
-  {
-    filename: "doc_rr_basic.html",
-    folder: config.browserExamplesPath,
-    category: "browser",
-    runtime: "firefox",
-  },
-  {
-    filename: "doc_rr_blackbox.html",
-    folder: config.browserExamplesPath,
-    category: "browser",
-    runtime: "chromium",
-  },
-  {
-    filename: "doc_rr_console.html",
-    folder: config.browserExamplesPath,
-    category: "browser",
-    runtime: "chromium",
-  },
-  {
-    filename: "doc_rr_error.html",
-    folder: config.browserExamplesPath,
-    category: "browser",
-    runtime: "chromium",
-  },
-  {
-    filename: "doc_rr_logs.html",
-    folder: config.browserExamplesPath,
-    category: "browser",
-    runtime: "chromium",
-  },
-  {
-    filename: "doc_rr_objects.html",
-    folder: config.browserExamplesPath,
-    category: "browser",
-    runtime: "firefox",
-  },
-  {
-    filename: "doc_rr_preview.html",
-    folder: config.browserExamplesPath,
-    category: "browser",
-    runtime: "chromium",
-  },
-  {
-    filename: "doc_rr_region_loading.html",
-    folder: config.browserExamplesPath,
-    category: "browser",
-    runtime: "chromium",
-  },
-  {
-    filename: "doc_rr_worker.html",
-    folder: config.browserExamplesPath,
-    category: "browser",
-    runtime: "chromium",
-  },
-  {
-    filename: "doc_stacking.html",
-    folder: config.browserExamplesPath,
-    category: "browser",
-    runtime: "firefox",
-  },
-  {
-    filename: "doc_stacking_chromium.html",
-    folder: config.browserExamplesPath,
-    category: "browser",
-    runtime: "chromium",
-  },
-  {
-    filename: "log_points_and_block_scope.html",
-    folder: config.browserExamplesPath,
-    category: "browser",
-    runtime: "chromium",
-  },
-  {
-    filename: "redux-fundamentals/dist/index.html",
-    folder: config.browserExamplesPath,
-    category: "browser",
-    runtime: "chromium",
-    playwrightScript: reduxFundamentalsScript,
-  },
-  {
-    filename: "rdt-react-versions/dist/index.html",
-    folder: config.browserExamplesPath,
-    category: "browser",
-    runtime: "chromium",
-  },
-  {
-    filename: "node/control_flow.js",
-    folder: config.nodeExamplesPath,
-    category: "node",
-    runtime: "node",
-  },
-  {
-    filename: "node/async.js",
-    folder: config.nodeExamplesPath,
-    category: "node",
-    runtime: "node",
-  },
-  {
-    filename: "node/basic.js",
-    folder: config.nodeExamplesPath,
-    category: "node",
-    runtime: "node",
-  },
-  {
-    filename: "node/error.js",
-    folder: config.nodeExamplesPath,
-    category: "node",
-    runtime: "node",
-  },
-  {
-    filename: "node/exceptions.js",
-    folder: config.nodeExamplesPath,
-    category: "node",
-    runtime: "node",
-  },
-  {
-    filename: "node/objects.js",
-    folder: config.nodeExamplesPath,
-    category: "node",
-    runtime: "node",
-  },
-  {
-    filename: "node/run_worker.js",
-    folder: config.nodeExamplesPath,
-    category: "node",
-    runtime: "node",
-  },
-  {
-    filename: "node/spawn.js",
-    folder: config.nodeExamplesPath,
-    category: "node",
-    runtime: "node",
-  },
-  // The two separate Cypress examples from "cypress-realworld"
-  // and "flake" are not listed here. We don't re-record those
-  // ourselves. Instead we use specific recordings from CI runs
-  // in those benchmark repos.
-  // Similarly, the "breakpoints-01" recording is not listed here.
-  // See README.md for instructions on updating those recording IDs.
-];
 
 const examplesJsonPath = join(__dirname, "..", "examples.json");
 
@@ -368,6 +105,7 @@ async function saveRecording(
       },
     },
   });
+
   const buildId = response.data.data.recording.buildId;
 
   const done = logAnimated(`Saving ${chalk.bold(example)} with recording id ${recordingId}`);
@@ -383,11 +121,10 @@ async function saveRecording(
   await makeReplayPublic(apiKey, recordingId);
   await updateRecordingTitle(apiKey, recordingId, `E2E Example: ${example}`);
 
-  const text = "" + readFileSync(examplesJsonPath);
-
   const json: ExamplesData = {
-    ...JSON.parse(text),
+    ...examplesJson,
     [example]: {
+      ...examplesJson[example],
       recording: recordingId,
       buildId,
     },
@@ -420,7 +157,52 @@ async function saveExamples(
   examplesTarget: Target,
   callback: (args: TestRunCallbackArgs) => Promise<void>
 ) {
-  let examplesToRun = knownExamples.filter(example => example.category === examplesTarget);
+  let examplesToRun: TestExampleFile[] = [];
+
+  for (const key in examplesJson) {
+    const {
+      buildId,
+      playwrightScript,
+      requiresManualUpdate = false,
+    } = examplesJson[key] as TestRecordingIntersectionValue;
+
+    if (requiresManualUpdate) {
+      // A few of our examples require manual updates;
+      // See README.md for instructions on updating them
+      continue;
+    }
+
+    const [_, runtime] = buildId.split("-");
+
+    let category: TestExampleFile["category"];
+    let folder: TestExampleFile["folder"];
+
+    switch (runtime) {
+      case "chromium":
+      case "gecko": {
+        category = "browser";
+        folder = config.browserExamplesPath;
+        break;
+      }
+      case "node": {
+        category = "node";
+        folder = config.nodeExamplesPath;
+        break;
+      }
+    }
+
+    if (category === examplesTarget) {
+      examplesToRun.push({
+        category,
+        filename: key,
+        folder,
+        runtime: runtime as TestExampleFile["runtime"],
+        playwrightScript: playwrightScript
+          ? require(join("..", playwrightScript)).default
+          : undefined,
+      });
+    }
+  }
 
   const specificExamples = argv.example.split(",").filter(s => s.length > 0);
 
@@ -636,7 +418,7 @@ async function waitUntilMessage(
     );
     console.log(
       newRecordingIds
-        .map(recordingId => ` • ${blue(underline(`https://go/r/${recordingId}`))}`)
+        .map(recordingId => ` • ${chalk.blue(chalk.underline(`https://go/r/${recordingId}`))}`)
         .join("\n")
     );
 
@@ -649,7 +431,7 @@ async function waitUntilMessage(
         .map(example => {
           const tests = exampleToTestMap[example];
 
-          return ` • ${yellow(example)}${tests.map(test => `\n   • ${test}`).join("")}`;
+          return ` • ${chalk.yellow(example)}${tests.map(test => `\n   • ${test}`).join("")}`;
         })
         .join("\n")
     );
