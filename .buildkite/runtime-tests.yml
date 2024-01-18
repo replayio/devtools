@@ -23,7 +23,7 @@ steps:
               secret-id: "prod/build-user"
               json-key: ".secret_access_key"
             BUILDEVENT_APIKEY: honeycomb-api-key
-      - "ssh://git@github.com/replayio/fly-buildkite-plugin.git#v0.75":
+      - "ssh://git@github.com/replayio/fly-buildkite-plugin.git#v0.77":
           # This image's source code is here https://github.com/replayio/backend-e2e-base-image
           image: "registry.fly.io/buildkite-backend-e2e-tests:v14"
           organization: "replay"
