@@ -1,7 +1,5 @@
-import { motion } from "framer-motion";
 import { useRouter } from "next/router";
 
-import Icon from "replay-next/components/Icon";
 import { Recording } from "shared/graphql/types";
 import { TestRun, TestRunTest } from "shared/test-suites/TestRun";
 import { trackEvent } from "ui/utils/telemetry";
@@ -10,9 +8,9 @@ import {
   getDurationString,
   getTruncatedRelativeDate,
 } from "../../Recordings/RecordingListItem/RecordingListItem";
-import { StatusIcon } from "../../Tests/Overview/StatusIcon";
-import { AttributeContainer } from "../AttributeContainer";
+import { StatusIcon } from "../../StatusIcon";
 import { TestRunLibraryRow } from "../TestRunLibraryRow";
+import { AttributeContainer } from "./AttributeContainer";
 import styles from "./TestResultListItem.module.css";
 
 function RecordingAttributes({

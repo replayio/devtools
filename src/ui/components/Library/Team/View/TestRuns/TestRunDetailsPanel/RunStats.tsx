@@ -1,5 +1,4 @@
-import { useTestRunDetailsSuspends } from "ui/components/Library/Team/View/TestRuns/hooks/useTestRunDetailsSuspends";
-
+import { useTestRunDetailsSuspends } from "../hooks/useTestRunDetailsSuspends";
 import styles from "./RunStats.module.css";
 
 export function RunStats({ testRunId }: { testRunId: string }) {

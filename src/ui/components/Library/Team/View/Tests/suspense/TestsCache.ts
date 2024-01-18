@@ -1,4 +1,3 @@
-import orderBy from "lodash/orderBy";
 import { createCache } from "suspense";
 
 import {

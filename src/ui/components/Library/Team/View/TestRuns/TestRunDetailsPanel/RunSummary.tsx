@@ -4,17 +4,17 @@ import { ContextMenuItem, useContextMenu } from "use-context-menu";
 
 import Icon from "replay-next/components/Icon";
 import { TestRun, getTestRunTitle } from "shared/test-suites/TestRun";
-import { AttributeContainer } from "ui/components/Library/Team/View/TestRuns/AttributeContainer";
-import { BranchIcon } from "ui/components/Library/Team/View/TestRuns/BranchIcon";
-import { RunStats } from "ui/components/Library/Team/View/TestRuns/RunStats";
 
 import {
   getDurationString,
   getTruncatedRelativeDate,
 } from "../../Recordings/RecordingListItem/RecordingListItem";
-import { useTestRunDetailsSuspends } from "../../TestRuns/hooks/useTestRunDetailsSuspends";
 import { Dropdown } from "../Dropdown";
 import { FilterField } from "../FilterField";
+import { useTestRunDetailsSuspends } from "../hooks/useTestRunDetailsSuspends";
+import { AttributeContainer } from "./AttributeContainer";
+import { BranchIcon } from "./BranchIcon";
+import { RunStats } from "./RunStats";
 
 function ModeAttribute({ testRun }: { testRun: TestRun }) {
   const { mode } = testRun;

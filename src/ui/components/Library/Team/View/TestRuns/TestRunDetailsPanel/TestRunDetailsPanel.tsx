@@ -1,14 +1,13 @@
-import { useContext, useEffect, useState } from "react";
-
-import { useTestRunDetailsSuspends } from "ui/components/Library/Team/View/TestRuns/hooks/useTestRunDetailsSuspends";
-import { RunResults } from "ui/components/Library/Team/View/TestRuns/Overview/RunResults";
-import { TestRunsContext } from "ui/components/Library/Team/View/TestRuns/TestRunsContextRoot";
+import { useContext, useState } from "react";
 
 import { TestSuitePanelMessage } from "../../TestSuitePanelMessage";
+import { useTestRunDetailsSuspends } from "../hooks/useTestRunDetailsSuspends";
 import { TestRunPanelWrapper } from "../TestRunPanelWrapper";
+import { TestRunsContext } from "../TestRunsContextRoot";
+import { RunResults } from "./RunResults";
 import { RunSummary } from "./RunSummary";
 
-export function TestRunOverviewContent() {
+export function TestRunDetailsPanel() {
   const { testRunId, testRuns, filterTestsByText, setFilterTestsByText } =
     useContext(TestRunsContext);
 

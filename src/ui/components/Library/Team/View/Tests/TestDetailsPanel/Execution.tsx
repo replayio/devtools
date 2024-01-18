@@ -6,7 +6,7 @@ import Icon from "ui/components/shared/Icon";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 
 import { getTruncatedRelativeDate } from "../../Recordings/RecordingListItem/RecordingListItem";
-import { StatusIcon } from "./StatusIcon";
+import { StatusIcon } from "../../StatusIcon";
 import { Replay, getReplayResult } from "./TestDetails";
 
 export function Execution({

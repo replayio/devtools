@@ -1,5 +1,4 @@
-import { createIntervalCache } from "suspense";
-import { createCache } from "suspense";
+import { createCache, createIntervalCache } from "suspense";
 
 import { GraphQLClientInterface } from "shared/graphql/GraphQLClient";
 import { Recording } from "shared/graphql/types";
@@ -9,12 +8,13 @@ import {
   TestRunTestWithRecordings,
   processTestRun,
 } from "shared/test-suites/TestRun";
+import { convertRecording } from "ui/hooks/recordings";
+import { TestGroups, groupRecordings, testFailed, testPassed } from "ui/utils/testRuns";
+
 import {
   getTestRunTestsWithRecordingsGraphQL,
   getTestRunsGraphQL,
-} from "ui/components/Library/Team/View/TestRuns/graphql/TestRunsGraphQL";
-import { convertRecording } from "ui/hooks/recordings";
-import { TestGroups, groupRecordings, testFailed, testPassed } from "ui/utils/testRuns";
+} from "../graphql/TestRunsGraphQL";
 
 export const testRunsIntervalCache = createIntervalCache<
   number,

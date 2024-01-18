@@ -1,11 +1,7 @@
-import { ReactElement } from "react";
-
 export default function HighlightedText({
-  className = "pre-wrap truncate",
   haystack,
   needle,
 }: {
-  className?: string;
   haystack: string;
   needle: string;
 }) {
@@ -13,7 +9,7 @@ export default function HighlightedText({
     const index = haystack.toLowerCase().indexOf(needle.toLowerCase());
     if (index >= 0) {
       return (
-        <div className={className}>
+        <div className="pre-wrap truncate">
           {haystack.slice(0, index)}
           <mark>{haystack.slice(index, index + needle.length)}</mark>
           {haystack.slice(index + needle.length)}
@@ -22,5 +18,5 @@ export default function HighlightedText({
     }
   }
 
-  return <div className={className}>{haystack}</div>;
+  return <div className="pre-wrap truncate">{haystack}</div>;
 }

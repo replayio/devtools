@@ -1,11 +1,11 @@
 import { useContext, useMemo } from "react";
 
 import { Test } from "shared/test-suites/TestRun";
-import HighlightedText from "ui/components/Library/Team/View/TestRuns/HighlightedText";
 import Icon from "ui/components/shared/Icon";
 
-import { TestRunLibraryRow } from "../TestRuns/TestRunLibraryRow";
-import { TestContext } from "./TestContextRoot";
+import HighlightedText from "../../HighlightedText";
+import { TestRunLibraryRow } from "../../TestRuns/TestRunLibraryRow";
+import { TestContext } from "../TestContextRoot";
 import styles from "./TestListItem.module.css";
 
 function Status({ test }: { test: Test }) {

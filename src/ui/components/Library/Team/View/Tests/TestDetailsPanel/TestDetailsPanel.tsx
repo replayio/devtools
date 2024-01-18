@@ -1,13 +1,12 @@
 import { useContext, useEffect, useState } from "react";
 
 import { IndeterminateProgressBar } from "replay-next/components/IndeterminateLoader";
-import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 
 import { TestSuitePanelMessage } from "../../TestSuitePanelMessage";
 import { useTest } from "../hooks/useTest";
 import { TestContext } from "../TestContextRoot";
 import { TestDetails } from "./TestDetails";
-import styles from "./TestOverviewContent.module.css";
+import styles from "./TestDetailsPanel.module.css";
 
 function SelectTestMessage({ error }: { error?: boolean }) {
   return error ? (
@@ -21,7 +20,7 @@ function SelectTestMessage({ error }: { error?: boolean }) {
   );
 }
 
-export function TestOverviewContent() {
+export function TestDetailsPanel() {
   const { testId, tests } = useContext(TestContext);
 
   let children = null;

@@ -13,9 +13,10 @@ import { STATUS_PENDING } from "suspense";
 
 import { TestRun, getTestRunTitle } from "shared/test-suites/TestRun";
 import { useGetTeamRouteParams } from "ui/components/Library/Team/utils";
-import { useSyncTestStateToUrl } from "ui/components/Library/Team/View/TestRuns/hooks/useSyncTestStateToUrl";
-import { useTestRuns } from "ui/components/Library/Team/View/TestRuns/hooks/useTestRuns";
 import { trackEvent } from "ui/utils/telemetry";
+
+import { useSyncTestStateToUrl } from "./hooks/useSyncTestStateToUrl";
+import { useTestRuns } from "./hooks/useTestRuns";
 
 type TestRunsContextType = {
   filterByBranch: "all" | "primary";

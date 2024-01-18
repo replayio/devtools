@@ -3,14 +3,14 @@ import { useContext, useMemo, useState } from "react";
 import Icon from "replay-next/components/Icon";
 import { TestRunTestWithRecordings } from "shared/test-suites/TestRun";
 
-import { TestSuitePanelMessage } from "../TestSuitePanelMessage";
-import { useTestRunDetailsSuspends } from "./hooks/useTestRunDetailsSuspends";
-import { TestRunPanelWrapper } from "./TestRunPanelWrapper";
-import { TestRunResultList } from "./TestRunResultList";
-import { TestRunsContext } from "./TestRunsContextRoot";
-import styles from "./TestRunSpecDetails.module.css";
+import { TestSuitePanelMessage } from "../../TestSuitePanelMessage";
+import { useTestRunDetailsSuspends } from "../hooks/useTestRunDetailsSuspends";
+import { TestRunPanelWrapper } from "../TestRunPanelWrapper";
+import { TestRunsContext } from "../TestRunsContextRoot";
+import { ExecutionList } from "./ExecutionList";
+import styles from "./TestRunTestPanel.module.css";
 
-export function TestRunSpecDetails() {
+export function TestRunTestPanel() {
   const { testId, filterTestsByText } = useContext(TestRunsContext);
   const { testRunId, testRuns } = useContext(TestRunsContext);
 
@@ -50,7 +50,7 @@ export function TestRunSpecDetails() {
       <div className={styles.mainContainer}>
         <div className={styles.subContainer}>
           <div className={styles.title}>Replays</div>
-          <TestRunResultList selectedSpecTests={selectedSpecTests} />
+          <ExecutionList selectedSpecTests={selectedSpecTests} />
         </div>
         {failedTests.length ? <Errors failedTests={failedTests} /> : null}
       </div>

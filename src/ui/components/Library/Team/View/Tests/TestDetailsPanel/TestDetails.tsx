@@ -5,8 +5,8 @@ import { GroupedTestRun } from "shared/test-suites/TestRun";
 import { trackEvent } from "ui/utils/telemetry";
 import { testFailed, testPassed } from "ui/utils/testRuns";
 
+import { StatusIcon } from "../../StatusIcon";
 import { Execution } from "./Execution";
-import { StatusIcon } from "./StatusIcon";
 
 export function TestDetails({ testRuns }: { testRuns: GroupedTestRun[] }) {
   const sortedTestRuns = orderBy(testRuns, "date", "desc");

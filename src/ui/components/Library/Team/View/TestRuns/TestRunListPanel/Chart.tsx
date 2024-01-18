@@ -7,8 +7,8 @@ import { useContext, useMemo, useState } from "react";
 import useTooltip from "replay-next/src/hooks/useTooltip";
 import { TestRun } from "shared/test-suites/TestRun";
 
-import { TimeFilterContext } from "../TimeFilterContextRoot";
-import { TestRunsContext } from "./TestRunsContextRoot";
+import { TimeFilterContext } from "../../TimeFilterContextRoot";
+import { TestRunsContext } from "../TestRunsContextRoot";
 
 // Workaround for import issues, see https://github.com/plouc/nivo/issues/2310#issuecomment-1552663752
 export const ResponsiveLine = dynamic(() => import("@nivo/line").then(m => m.ResponsiveLine), {
