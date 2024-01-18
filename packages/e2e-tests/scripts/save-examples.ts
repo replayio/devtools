@@ -60,6 +60,8 @@ type TestExampleFile = {
 };
 const examplesJsonPath = join(__dirname, "..", "examples.json");
 
+let mutableExamplesJSON = { ...examplesJson };
+
 const exampleToNewRecordingId: { [example: string]: string } = {};
 
 async function saveRecording(
@@ -105,29 +107,18 @@ async function saveRecording(
   await makeReplayPublic(apiKey, recordingId);
   await updateRecordingTitle(apiKey, recordingId, `E2E Example: ${example}`);
 
-  const json: ExamplesData = {
-    ...examplesJson,
+  mutableExamplesJSON = {
+    ...mutableExamplesJSON,
     [example]: {
-      ...examplesJson[example],
+      ...mutableExamplesJSON[example],
       recording: recordingId,
       buildId,
     },
   };
 
-  const keys = Object.keys(json).sort();
+  const keys = Object.keys(mutableExamplesJSON).sort();
 
-  writeFileSync(
-    examplesJsonPath,
-    JSON.stringify(
-      keys.reduce((accumulated, key) => {
-        accumulated[key] = json[key];
-
-        return accumulated;
-      }, {}),
-      null,
-      2
-    )
-  );
+  writeFileSync(examplesJsonPath, JSON.stringify(mutableExamplesJSON, null, 2));
 
   completeLog();
 }
