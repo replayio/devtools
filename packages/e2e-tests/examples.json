@@ -22,8 +22,8 @@
     "buildId": "linux-gecko-20230919-72cad6f42a93-4d0a9f5b9de2"
   },
   "cra/dist/index_chromium.html": {
-    "recording": "b461ee79-3eeb-43dc-8c5d-1e144a42fc6d",
-    "buildId": "linux-chromium-20230922-a3b77ea9490c-4d0a9f5b9de2"
+    "recording": "513086d1-9452-43af-adc3-a8d28a7204cf",
+    "buildId": "linux-chromium-20240110-3078216bece0-50d01be708a2"
   },
   "cypress-realworld/bankaccounts.spec.js": {
     "recording": "7c605061-71fe-433d-8926-88e91354d21d",

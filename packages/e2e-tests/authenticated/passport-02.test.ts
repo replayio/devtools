@@ -8,15 +8,15 @@ import {
   openElementsPanel,
   waitForElementsToLoad,
 } from "../helpers/elements-panel";
-import { getReactComponents } from "../helpers/legacy-react-devtools-panel";
 import { findNetworkRequestRow, openNetworkPanel } from "../helpers/network-panel";
+import { getReactComponents } from "../helpers/new-react-devtools-panel";
 import { openReactDevtoolsPanel } from "../helpers/new-react-devtools-panel";
 import { isPassportItemCompleted } from "../helpers/passport";
 import { enablePassport } from "../helpers/settings";
 import { resetTestUser, waitFor } from "../helpers/utils";
 import test, { expect } from "../testFixtureCloneRecording";
 
-test.use({ exampleKey: "cra/dist/index.html" });
+test.use({ exampleKey: "cra/dist/index_chromium.html" });
 
 test(`authenticated/passport-02: Infrared inspection`, async ({
   pageWithMeta: { page, recordingId },
@@ -50,7 +50,7 @@ test(`authenticated/passport-02: Infrared inspection`, async ({
   );
 
   await openNetworkPanel(page);
-  const networkRequest = await findNetworkRequestRow(page, { name: "index.html" });
+  const networkRequest = await findNetworkRequestRow(page, { name: "index_chromium.html" });
   await networkRequest.click();
 
   await waitFor(async () =>
