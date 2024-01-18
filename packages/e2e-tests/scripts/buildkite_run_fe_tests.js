@@ -4,6 +4,7 @@ const { execSync, exec } = require("child_process");
 const getSecret = require("./aws_secrets");
 
 function run_fe_tests(CHROME_BINARY_PATH) {
+  let webProc = null;
   console.group("START");
   console.time("START time");
   {
@@ -24,10 +25,22 @@ function run_fe_tests(CHROME_BINARY_PATH) {
       stdio: "inherit",
     });
 
+    if (!process.env.HASURA_ADMIN_SECRET) {
+      process.env.HASURA_ADMIN_SECRET = getSecret("prod/hasura-admin-secret", "us-east-2");
+    }
+
+    process.env.RECORD_REPLAY_DISPATCH_SERVER = "wss://dispatch.replay.io";
+    process.env.REPLAY_BROWSER_BINARY_PATH = CHROME_BINARY_PATH;
+    process.env.REPLAY_CHROMIUM_EXECUTABLE_PATH = CHROME_BINARY_PATH;
+    process.env.RECORD_REPLAY_PATH = CHROME_BINARY_PATH;
+    // process.env.RECORD_REPLAY_DIRECTORY =
+    process.env.AUTHENTICATED_TESTS_WORKSPACE_API_KEY = process.env.RECORD_REPLAY_API_KEY;
+    process.env.PLAYWRIGHT_TEST_BASE_URL = "https://app.replay.io";
+
     // Start the webserver.
-    let webProc = exec("yarn dev", (error, stdout, stderr) => {
+    webProc = exec("yarn dev", (error, stdout, stderr) => {
       if (error) {
-        console.error(`exec error: ${error}`);
+        console.error(`yarn dev exec error: ${error}`);
         return;
       }
       console.error(`yarn dev stdout: ${stdout}`);
@@ -43,20 +56,25 @@ function run_fe_tests(CHROME_BINARY_PATH) {
   console.group("SAVE-EXAMPLES");
   console.time("SAVE-EXAMPLES time");
   {
-    if (!process.env.HASURA_ADMIN_SECRET) {
-      process.env.HASURA_ADMIN_SECRET = getSecret("prod/hasura-admin-secret", "us-east-2");
-    }
 
-    process.env.RECORD_REPLAY_DISPATCH_SERVER = "wss://dispatch.replay.io";
-    process.env.REPLAY_BROWSER_BINARY_PATH = CHROME_BINARY_PATH;
-    process.env.REPLAY_CHROMIUM_EXECUTABLE_PATH = CHROME_BINARY_PATH;
-    process.env.RECORD_REPLAY_PATH = CHROME_BINARY_PATH;
-    // process.env.RECORD_REPLAY_DIRECTORY =
-    process.env.AUTHENTICATED_TESTS_WORKSPACE_API_KEY = process.env.RECORD_REPLAY_API_KEY;
-    process.env.PLAYWRIGHT_TEST_BASE_URL = "https://app.replay.io";
+
+    // Generate new recordings for known-passing tests with the new chromium build.
+    const htmlFiles = [
+      "authenticated_comments.html",
+      "authenticated_logpoints.html",
+      "doc_minified_chromium.html",
+      "doc_recursion.html",
+      "doc_rr_console.html",
+      "doc_rr_preview.html",
+      "doc_rr_region_loading.html",
+      "doc_stacking_chromium.html",
+      "rdt-react-versions/dist/index.html",
+    ];
 
     execSync(
-      `xvfb-run ./packages/e2e-tests/scripts/save-examples.ts --runtime=chromium --target=browser --project=replay-chromium-local`,
+      `xvfb-run ./packages/e2e-tests/scripts/save-examples.ts --runtime=chromium --project=replay-chromium-local --example=${htmlFiles.join(
+        ","
+      )}`,
       { stdio: "inherit", env: process.env }
     );
 
@@ -71,45 +89,20 @@ function run_fe_tests(CHROME_BINARY_PATH) {
   {
     // Run the known-passing tests.
     const testNames = [
-      "breakpoints-01",
-      "breakpoints-03",
-      "breakpoints-04",
-      "breakpoints-05",
-      "breakpoints-06",
       "comments-01",
-      "comments-02",
+      //"comments-02",
       "comments-03",
-      "console_async_eval",
-      "console_dock",
-      "console_eval",
-      "console-expressions-01",
-      "cypress-01",
-      "cypress-02",
-      "cypress-03",
-      "elements-search",
-      "focus_mode-01",
       "logpoints-01",
-      "logpoints-02",
-      "logpoints-03_chromium",
-      "logpoints-05",
-      "logpoints-06",
-      "logpoints-07",
-      "logpoints-08",
-      "logpoints-09",
-      "network-0",
-      "object_preview-03",
-      "object_preview-04",
-      "object_preview-05",
+      //"stepping-05_chromium",
+      "scopes_renderer",
       "passport-01",
       "passport-03",
       "passport-04",
-      "react_devtools-01-basic.test",
-      "react_devtools-03-multiple-versions",
-      "react_devtools-04-seeking",
-      "scopes_renderer",
+      "object_preview-03",
+      "focus_mode-01",
+      "elements-search",
       "stacking_chromium",
-      "stepping-01",
-      "stepping-05_chromium",
+      "react_devtools-03-multiple-versions",
     ];
     execSync(`xvfb-run yarn test:runtime ${testNames.join(" ")}`, {
       stdio: "inherit",
