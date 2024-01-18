@@ -17,6 +17,14 @@ export function getStats() {
   const exampleToTestMap: { [example: string]: string[] } = {};
   const stats: Stats = {};
   const testFileList: string[] = [];
+  const testFileToInfoMap: {
+    [testFile: string]: {
+      runtime: string;
+      runtimeReleaseDate: string;
+      runtimeOS: string;
+      recordingId: string;
+    };
+  } = {};
 
   function crawl(directoryPath: string) {
     readdirSync(directoryPath).forEach((entry: string) => {
@@ -37,7 +45,7 @@ export function getStats() {
   basePaths.forEach(crawl);
 
   for (let key in exampleJSON) {
-    const { buildId } = exampleJSON[key as keyof Examples];
+    const { buildId, recording } = exampleJSON[key as keyof Examples];
 
     if (stats[buildId] == null) {
       stats[buildId] = {
@@ -57,7 +65,21 @@ export function getStats() {
           exampleToTestMap[key] = [];
         }
 
-        exampleToTestMap[key].push(relative(baseDir, filePath));
+        const relativeFilePath = relative(baseDir, filePath);
+
+        exampleToTestMap[key].push(relativeFilePath);
+
+        const [os, runtime, releaseDate] = buildId.split("-");
+
+        testFileToInfoMap[relativeFilePath] = {
+          runtime,
+          runtimeReleaseDate: `${releaseDate.substring(0, 4)}-${releaseDate.substring(
+            4,
+            6
+          )}-${releaseDate.substring(6)}`,
+          runtimeOS: os,
+          recordingId: recording,
+        };
       }
     });
   }
@@ -116,5 +138,6 @@ export function getStats() {
     releaseYearStats,
     sortedStats,
     testFileList,
+    testFileToInfoMap,
   };
 }
