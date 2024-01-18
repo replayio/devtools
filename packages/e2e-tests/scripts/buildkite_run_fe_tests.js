@@ -55,6 +55,7 @@ function run_fe_tests(CHROME_BINARY_PATH) {
     // process.env.RECORD_REPLAY_DIRECTORY =
     process.env.AUTHENTICATED_TESTS_WORKSPACE_API_KEY = process.env.RECORD_REPLAY_API_KEY;
     process.env.PLAYWRIGHT_TEST_BASE_URL = "https://app.replay.io";
+    process.env.REPLAY_DISABLE_CLONE = "true";
 
     execSync(
       `xvfb-run ./packages/e2e-tests/scripts/save-examples.ts --runtime=chromium --target=browser --project=replay-chromium-local`,
