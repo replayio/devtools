@@ -40,13 +40,13 @@ export function TestListPanel() {
   } = useContextMenu(
     <>
       <ContextMenuItem dataTestId="failureRate" onSelect={() => setSortBy("failureRate")}>
-        Sort by failure rate
+        {sortLabel.failureRate}
       </ContextMenuItem>
       <ContextMenuItem dataTestId="flakyRate" onSelect={() => setSortBy("flakyRate")}>
-        Sort by flaky rate
+        {sortLabel.flakyRate}
       </ContextMenuItem>
       <ContextMenuItem dataTestId="alphabetical" onSelect={() => setSortBy("alphabetical")}>
-        Sort alphabetically
+        {sortLabel.alphabetical}
       </ContextMenuItem>
     </>,
     { alignTo: "auto-target" }
@@ -60,15 +60,23 @@ export function TestListPanel() {
     <>
       {withinTeamRetentionLimit(team, 1) && (
         <>
-          <ContextMenuItem onSelect={() => setFilterByTime("hour")}>Last hour</ContextMenuItem>
-          <ContextMenuItem onSelect={() => setFilterByTime("day")}>Last day</ContextMenuItem>
+          <ContextMenuItem onSelect={() => setFilterByTime("hour")}>
+            {timeFilterLabel.hour}
+          </ContextMenuItem>
+          <ContextMenuItem onSelect={() => setFilterByTime("day")}>
+            {timeFilterLabel.day}
+          </ContextMenuItem>
         </>
       )}
       {withinTeamRetentionLimit(team, 7) && (
-        <ContextMenuItem onSelect={() => setFilterByTime("week")}>Last 7 days</ContextMenuItem>
+        <ContextMenuItem onSelect={() => setFilterByTime("week")}>
+          {timeFilterLabel.week}
+        </ContextMenuItem>
       )}
       {withinTeamRetentionLimit(team, 30) && (
-        <ContextMenuItem onSelect={() => setFilterByTime("month")}>Last 30 days</ContextMenuItem>
+        <ContextMenuItem onSelect={() => setFilterByTime("month")}>
+          {timeFilterLabel.month}
+        </ContextMenuItem>
       )}
     </>,
     { alignTo: "auto-target" }
