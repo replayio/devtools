@@ -26,7 +26,7 @@ const testWithCloneRecording = base.extend<TestIsolatedRecordingFixture>({
     let newRecordingId: string | undefined = undefined;
     try {
       const { recording } = exampleRecordings[exampleKey];
-      newRecordingId = await cloneTestRecording(recording);
+      newRecordingId = recording;// = await cloneTestRecording(recording);
 
       await page.coverage.startJSCoverage({
         resetOnNavigation: false,

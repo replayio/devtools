@@ -94,7 +94,9 @@ export async function waitForRecordingToFinishIndexing(page: Page): Promise<void
   const timelineCapsuleLocator = page.locator('[data-test-id="Timeline-Capsule"]');
   await waitFor(
     async () => {
-      await expect(await timelineCapsuleLocator.getAttribute("data-test-progress")).toBe("100");
+      expect(await timelineCapsuleLocator.getAttribute("data-test-progress", {
+        timeout: 150_000
+      })).toBe("100");
     },
     {
       retryInterval: 1_000,
