@@ -92,7 +92,7 @@ test("playwright-01: Basic Test Suites panel functionality", async ({
   expect(await sections.nth(0).textContent()).toMatch(/test body/i);
 
   const steps = getTestCaseSteps(selectedRow);
-  const stepCount = await steps.count()
+  const stepCount = await steps.count();
   await expect(stepCount).toBeGreaterThan(200);
 
   const backButton = getTestRecordingBackButton(page);
