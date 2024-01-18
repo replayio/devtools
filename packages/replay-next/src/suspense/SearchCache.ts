@@ -43,9 +43,6 @@ export type StreamingSearchValue = StreamingValue<SourceSearchResult[], Streamin
 
 const MAX_SEARCH_RESULTS_TO_DISPLAY = 1_000;
 
-let sourceIdsWithNodeModules: SourceId[] | null = null;
-let sourceIdsWithoutNodeModules: SourceId[] | null = null;
-
 export function isSourceSearchResultLocation(
   result: SourceSearchResult
 ): result is SourceSearchResultLocation {
@@ -174,7 +171,8 @@ export const searchCache = createStreamingCache<
             orderedResults.push({ match, type: "match" });
           }
 
-          update(orderedResults, undefined, metadata);
+          // Clone results array to avoid breaking/bypassing external memoization
+          update([...orderedResults], undefined, metadata);
         }
       );
 
