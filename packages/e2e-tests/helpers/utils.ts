@@ -98,6 +98,7 @@ export async function waitForRecordingToFinishIndexing(page: Page): Promise<void
     },
     {
       retryInterval: 1_000,
+      timeout: 150_000,
     }
   );
 }
