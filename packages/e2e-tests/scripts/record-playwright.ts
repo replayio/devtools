@@ -1,5 +1,4 @@
 import type { Page, expect as expectFunction } from "@playwright/test";
-// import * as playwright1_19 from "playwright-test1_19";
 import type * as PlaywrightTest from "@playwright/test";
 import { getExecutablePath } from "@replayio/playwright";
 import * as cli from "@replayio/replay";

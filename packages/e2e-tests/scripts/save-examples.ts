@@ -58,7 +58,6 @@ type TestExampleFile = {
   runtime: "firefox" | "chromium" | "node";
   playwrightScript?: PlaywrightScript;
 };
-
 const examplesJsonPath = join(__dirname, "..", "examples.json");
 
 const exampleToNewRecordingId: { [example: string]: string } = {};
