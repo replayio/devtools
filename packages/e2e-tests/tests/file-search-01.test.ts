@@ -29,8 +29,8 @@ test("file-search-01: should search files", async ({ pageWithMeta: { page, recor
   // Verify search results for the string "test"
   await searchSources(page, "test");
   await verifySourceSearchOverflowMessageShown(page, false);
-  await verifySourceSearchSummary(page, "12 results in 1 file");
-  await verifyVisibleResultsCount(page, 16); // 12 results in 4 different files
+  await verifySourceSearchSummary(page, "12 results in 4 files");
+  await verifyVisibleResultsCount(page, 16);
 
   // Verify files can be collapsed
   await toggleSearchResultsForFileName(page, false, { fileName: "jsonp%20chunk%20loading" });
@@ -44,8 +44,8 @@ test("file-search-01: should search files", async ({ pageWithMeta: { page, recor
   // Now include node_modules in the search
   await toggleExcludeNodeModulesCheckbox(page, false);
   await verifySourceSearchOverflowMessageShown(page, false);
-  await verifySourceSearchSummary(page, "16 results in 1 file");
-  await verifyVisibleResultsCount(page, 22); // 16 results in 6 different files
+  await verifySourceSearchSummary(page, "16 results in 6 files");
+  await verifyVisibleResultsCount(page, 22);
 
   // Collapse the first few results
   await toggleSearchResultsForFileName(page, false, { fileName: "unsupportedIterableToArray.js" });
