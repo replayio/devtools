@@ -17,6 +17,14 @@ export function getStats() {
   const exampleToTestMap: { [example: string]: string[] } = {};
   const stats: Stats = {};
   const testFileList: string[] = [];
+  const testFileToInfoMap: {
+    [testFile: string]: {
+      runtime: string;
+      runtimeReleaseDate: Date;
+      runtimeOS: string;
+      recordingId: string;
+    };
+  } = {};
 
   function crawl(directoryPath: string) {
     readdirSync(directoryPath).forEach((entry: string) => {
@@ -37,7 +45,7 @@ export function getStats() {
   basePaths.forEach(crawl);
 
   for (let key in exampleJSON) {
-    const { buildId } = exampleJSON[key as keyof Examples];
+    const { buildId, recording } = exampleJSON[key as keyof Examples];
 
     if (stats[buildId] == null) {
       stats[buildId] = {
@@ -57,7 +65,22 @@ export function getStats() {
           exampleToTestMap[key] = [];
         }
 
-        exampleToTestMap[key].push(relative(baseDir, filePath));
+        const relativeFilePath = relative(baseDir, filePath);
+
+        exampleToTestMap[key].push(relativeFilePath);
+
+        const [os, runtime, releaseDate] = buildId.split("-");
+
+        testFileToInfoMap[relativeFilePath] = {
+          runtime,
+          runtimeReleaseDate: new Date(
+            `${releaseDate.substring(0, 4)}-${releaseDate.substring(4, 6)}-${releaseDate.substring(
+              6
+            )} 00:00:00`
+          ),
+          runtimeOS: os,
+          recordingId: recording,
+        };
       }
     });
   }
@@ -109,6 +132,30 @@ export function getStats() {
       releaseYearStats[year].numTests += numTests;
     });
 
+  const sortedTestFileToInfoMap: typeof testFileToInfoMap = {};
+  const entries = Object.entries(testFileToInfoMap).sort((a, b) => {
+    const aValue = a[1];
+    const bValue = b[1];
+
+    if (aValue.runtimeReleaseDate.getTime() !== bValue.runtimeReleaseDate.getTime()) {
+      return aValue.runtimeReleaseDate.getTime() - bValue.runtimeReleaseDate.getTime();
+    } else if (aValue.runtimeOS !== bValue.runtimeOS) {
+      return aValue.runtimeOS.localeCompare(bValue.runtimeOS);
+    } else if (aValue.runtime !== bValue.runtime) {
+      return aValue.runtime.localeCompare(bValue.runtime);
+    } else {
+      return a[0].localeCompare(b[0]);
+    }
+  });
+  entries.forEach(([key, { recordingId, runtime, runtimeOS, runtimeReleaseDate }]) => {
+    sortedTestFileToInfoMap[key] = {
+      runtimeReleaseDate: runtimeReleaseDate.toISOString().slice(0, 10) as any,
+      runtimeOS,
+      runtime,
+      recordingId,
+    };
+  });
+
   return {
     browserSummaryStats,
     exampleToTestMap,
@@ -116,5 +163,6 @@ export function getStats() {
     releaseYearStats,
     sortedStats,
     testFileList,
+    testFileToInfoMap: sortedTestFileToInfoMap,
   };
 }

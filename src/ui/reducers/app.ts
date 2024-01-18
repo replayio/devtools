@@ -34,6 +34,8 @@ export const initialAppState: AppState = {
   modal: null,
   modalOptions: null,
   mode: "devtools",
+  processing: null,
+  processingProgress: null,
   recordingId: null,
   recordingTarget: null,
   recordingWorkspace: null,
@@ -127,6 +129,12 @@ const appSlice = createSlice({
     setSelectedCommentId(state, action: PayloadAction<string | null>) {
       state.selectedCommentId = action.payload;
     },
+    setProcessing(state, action: PayloadAction<boolean>) {
+      state.processing = action.payload;
+    },
+    setProcessingProgress(state, action: PayloadAction<number>) {
+      state.processingProgress = action.payload;
+    },
   },
 });
 
@@ -151,6 +159,8 @@ export const {
   setVideoUrl,
   setHoveredCommentId,
   setSelectedCommentId,
+  setProcessing,
+  setProcessingProgress,
 } = appSlice.actions;
 
 export default appSlice.reducer;
@@ -203,3 +213,5 @@ export const getVideoUrl = (state: UIState) => state.app.videoUrl;
 export const getDefaultSettingsTab = (state: UIState) => state.app.defaultSettingsTab;
 export const getRecordingTarget = (state: UIState) => state.app.recordingTarget;
 export const getRecordingWorkspace = (state: UIState) => state.app.recordingWorkspace;
+export const getProcessing = (state: UIState) => state.app.processing;
+export const getProcessingProgress = (state: UIState) => state.app.processingProgress;

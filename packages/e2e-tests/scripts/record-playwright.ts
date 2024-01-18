@@ -1,5 +1,4 @@
 import type { Page, expect as expectFunction } from "@playwright/test";
-// import * as playwright1_19 from "playwright-test1_19";
 import type * as PlaywrightTest from "@playwright/test";
 import { getExecutablePath } from "@replayio/playwright";
 import * as cli from "@replayio/replay";
@@ -28,7 +27,6 @@ export async function recordPlaywright(
   let executablePath: string | undefined = undefined;
   if (config.shouldRecordTest) {
     executablePath = config.browserPath || getExecutablePath(browserName)!;
-    console.log(`Recording with executable at ${executablePath}`);
   }
 
   const browserServer = await browserEntry.launchServer({
@@ -61,7 +59,7 @@ export async function recordPlaywright(
   try {
     return await script(page as any, playwrightTest.expect);
   } catch (err) {
-    console.log("PLAYWRIGHT ERROR", err);
+    console.error("PLAYWRIGHT ERROR", err);
   } finally {
     await page.close();
     await context.close();

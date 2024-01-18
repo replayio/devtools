@@ -1,10 +1,7 @@
-import { ScreenShot } from "@replayio/protocol";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
-import { getGraphicsAtTime } from "protocol/graphics";
-import { OperationsData } from "shared/graphql/types";
-import { CollaboratorRequest, Recording } from "shared/graphql/types";
+import { CollaboratorRequest, OperationsData, Recording } from "shared/graphql/types";
 import { actions } from "ui/actions";
 import { AvatarImage } from "ui/components/Avatar";
 import Modal from "ui/components/shared/NewModal";
@@ -18,14 +15,11 @@ import { useHasNoRole } from "ui/hooks/recordings";
 import { getModalOptions, getRecordingTarget } from "ui/reducers/app";
 import { useAppSelector } from "ui/setup/hooks";
 import { UIState } from "ui/state";
-import useToken from "ui/utils/useToken";
 
 import { PrimaryButton } from "../Button";
-import MaterialIcon from "../MaterialIcon";
 import Collaborators from "./Collaborators";
 import PrivacyDropdown from "./PrivacyDropdown";
 import { CopyButton } from "./ReplayLink";
-import styles from "./SharingModal.module.css";
 
 function SharingModalWrapper(props: PropsFromRedux) {
   const opts = props.modalOptions;
@@ -167,17 +161,8 @@ function SharingSection({
         showPrivacy={showPrivacy}
         setShowPrivacy={setShowPrivacy}
       />
-      <section className="flex flex-col bg-menuHoverBgcolor px-4 pt-3 pb-5">
-        <div className="mb-2 font-bold">Sharing Options</div>
-
-        <div className="flex">
-          <div className="mr-2">
-            <CopyButton recording={recording} />
-          </div>
-          <div>
-            <DownloadSection recording={recording} />
-          </div>
-        </div>
+      <section className="flex flex-col bg-menuHoverBgcolor px-4 py-3">
+        <CopyButton recording={recording} />
       </section>
     </>
   );
@@ -216,69 +201,6 @@ function Header({
   );
 
   return <section></section>;
-}
-
-function DownloadSection({ recording }: { recording: Recording }) {
-  const token = useToken();
-
-  const [downloadState, setDownloadState] = useState<
-    "not-started" | "downloading" | "success" | "error"
-  >("not-started");
-
-  const buttonStates = {
-    "not-started": {
-      label: "Download as video",
-      icon: "download",
-    },
-    downloading: {
-      label: "Downloading video ...",
-      icon: "loop",
-    },
-    success: {
-      label: "Video downloaded",
-      icon: "check",
-    },
-    error: {
-      label: "Failed to download",
-      icon: "error",
-    },
-  };
-
-  const onDownload = () => {
-    console.log(`Download recording ${recording.id}`);
-
-    const xhr = new XMLHttpRequest();
-    xhr.responseType = "blob";
-    xhr.onload = function () {
-      const a = document.createElement("a");
-      a.href = window.URL.createObjectURL(xhr.response);
-      setDownloadState("success");
-
-      a.download = "replay.mp4";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    };
-    xhr.onerror = function () {
-      console.error(`Failed to download video ${recording.id}`);
-      setDownloadState("error");
-    };
-    xhr.open("POST", "/api/video");
-    xhr.setRequestHeader("Content-Type", "application/json");
-    xhr.send(JSON.stringify({ recordingId: recording.id, token: token.token }));
-    setDownloadState("downloading");
-  };
-
-  return (
-    <div>
-      <button className={styles.downloadVideo} onClick={onDownload}>
-        <MaterialIcon className={`mr-2 ${downloadState === "downloading" ? "animate-spin" : ""}`}>
-          {buttonStates[downloadState].icon}
-        </MaterialIcon>
-        {buttonStates[downloadState].label}
-      </button>
-    </div>
-  );
 }
 
 function SharingModal({ recording, hideModal }: SharingModalProps) {

@@ -199,6 +199,7 @@ function ConsoleInputSuspends({ inputRef }: { inputRef?: RefObject<ImperativeHan
             key={incrementedKey}
             onChange={onChange}
             onSave={onSubmit}
+            preventTabFocusChange
             ref={inputRef}
             time={time}
           />
