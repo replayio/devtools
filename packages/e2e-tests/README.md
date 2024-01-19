@@ -124,6 +124,7 @@ Here we're running the `breakpoints-05 test`, which depends on the `doc_debugger
 ```AUTOMATED_TEST_SECRET=<find me at backend/src/graphql-api/schema.ts!> \
 GRAPHQL_ADDRESS=http://localhost:8087/v1/graphql \
 AUTHENTICATED_TESTS_WORKSPACE_API_KEY=$RECORD_REPLAY_API_KEY \
+GOLDEN_TEST_RUN_WORKSPACE_API_KEY=<workspace api key to a test workspace>
 DISPATCH_ADDRESS=ws://localhost:8000 \
 RECORD_REPLAY_PATH=~/codedepot/chromium/src/out/Release/chrome \
 RECORD_REPLAY_API_KEY=<your api key> \
