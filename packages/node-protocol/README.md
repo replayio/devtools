@@ -15,7 +15,3 @@ const { client } = await createClient();
 const { sessionId } = await client.Recording.createSession({ recordingId });
 console.log(`sessionId: ${sessionId}`);
 ```
-
-### Case Study: Downloading a video
-
-See [video.ts](https://github.com/replayio/devtools/blob/main/pages/api/video.ts) for an example of how the protocol can be used to create a video of a recording on demand.

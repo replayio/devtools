@@ -148,11 +148,7 @@ export type PointBehavior = {
   shouldLog: POINT_BEHAVIOR;
 };
 
-export type ReplayClientEvents =
-  | "focusWindowChange"
-  | "loadedRegionsChange"
-  | "processingProgressChange"
-  | "sessionCreated";
+export type ReplayClientEvents = "focusWindowChange" | "loadedRegionsChange" | "sessionCreated";
 
 export type HitPointStatus =
   | "complete"
@@ -170,7 +166,6 @@ export type AnnotationListener = (annotation: Annotation) => void;
 
 export interface ReplayClientInterface {
   get loadedRegions(): LoadedRegions | null;
-  get processingProgress(): number | null;
   addEventListener(type: ReplayClientEvents, handler: Function): void;
   breakpointAdded(location: Location, condition: string | null): Promise<BreakpointId>;
   breakpointRemoved(breakpointId: BreakpointId): Promise<void>;

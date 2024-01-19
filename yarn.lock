@@ -3665,10 +3665,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/protocol@npm:^0.63.0":
-  version: 0.63.0
-  resolution: "@replayio/protocol@npm:0.63.0"
-  checksum: 4e737fa07042bc23c7632a8adeaf2c449e1270675cf2eb988346853f71416f73b7b14a3507125a362567a6d71e661fc349a936172541dccc38b5b8aa6a07ec99
+"@replayio/protocol@npm:^0.68.0":
+  version: 0.68.0
+  resolution: "@replayio/protocol@npm:0.68.0"
+  checksum: 2c628c36ce330e01f992aba39a9f2bd55dfccbadf8a928a680a0e3ae09605b06faa3c98c8f298cc62f22b0135d651ab8ca88e120a250f8f87f264979124effbb
   languageName: node
   linkType: hard
 
@@ -9754,6 +9754,7 @@ __metadata:
     log-update: ^4
     strip-ansi: ^6.0.0
     ts-node: ^10.7.0
+    ws: ^7.4.6
     yargs: ^17.6.0
   languageName: unknown
   linkType: soft
@@ -15482,7 +15483,7 @@ __metadata:
     "@next/bundle-analyzer": ^12.2.0
     "@reduxjs/toolkit": ^1.8.4
     "@replayio/overboard": ^0.4.1
-    "@replayio/protocol": ^0.63.0
+    "@replayio/protocol": ^0.68.0
     "@replayio/react-devtools-inline": 4.28.6
     "@replayio/replay": ^0.20.1
     "@sentry/react": ^7.9.0
@@ -15783,7 +15784,7 @@ __metadata:
     "@lezer/common_replay_next": "npm:@lezer/common@1.0.1"
     "@lezer/highlight_replay_next": "npm:@lezer/highlight@1.1.1"
     "@playwright/test": ^1.35.0
-    "@replayio/protocol": ^0.63.0
+    "@replayio/protocol": ^0.68.0
     "@testing-library/jest-dom": ^5.16.3
     "@testing-library/react": ^13.2.0
     "@types/uuid": ^7.0.3
@@ -18752,6 +18753,21 @@ __metadata:
     utf-8-validate:
       optional: true
   checksum: 49479ccf3ddab6500c5906fbcc316e9c8cd44b0ffb3903a6c1caf9b38cb9e06691685722a4c642cfa7d4c6eb390424fc3142cd4f8b940cfc7a9ce9761b1cd65b
+  languageName: node
+  linkType: hard
+
+"ws@npm:^7.4.6":
+  version: 7.5.9
+  resolution: "ws@npm:7.5.9"
+  peerDependencies:
+    bufferutil: ^4.0.1
+    utf-8-validate: ^5.0.2
+  peerDependenciesMeta:
+    bufferutil:
+      optional: true
+    utf-8-validate:
+      optional: true
+  checksum: c3c100a181b731f40b7f2fddf004aa023f79d64f489706a28bc23ff88e87f6a64b3c6651fbec3a84a53960b75159574d7a7385709847a62ddb7ad6af76f49138
   languageName: node
   linkType: hard
 

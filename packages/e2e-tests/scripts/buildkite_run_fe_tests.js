@@ -8,6 +8,19 @@ function run_fe_tests(CHROME_BINARY_PATH) {
   console.group("START");
   console.time("START time");
   {
+    if (!process.env.HASURA_ADMIN_SECRET) {
+      process.env.HASURA_ADMIN_SECRET = getSecret("prod/hasura-admin-secret", "us-east-2");
+    }
+
+    process.env.RECORD_REPLAY_DISPATCH_SERVER = "wss://dispatch.replay.io";
+    process.env.REPLAY_BROWSER_BINARY_PATH = CHROME_BINARY_PATH;
+    process.env.REPLAY_CHROMIUM_EXECUTABLE_PATH = CHROME_BINARY_PATH;
+    process.env.RECORD_REPLAY_PATH = CHROME_BINARY_PATH;
+    // process.env.RECORD_REPLAY_DIRECTORY =
+    process.env.AUTHENTICATED_TESTS_WORKSPACE_API_KEY = process.env.RECORD_REPLAY_API_KEY;
+    process.env.PLAYWRIGHT_TEST_BASE_URL = "https://app.replay.io";
+    process.env.REPLAY_DISABLE_CLONE = "true";
+
     // Install node deps
     execSync("npm i -g yarn", {
       stdio: "inherit",
@@ -24,18 +37,6 @@ function run_fe_tests(CHROME_BINARY_PATH) {
     execSync("npx playwright install chromium", {
       stdio: "inherit",
     });
-
-    if (!process.env.HASURA_ADMIN_SECRET) {
-      process.env.HASURA_ADMIN_SECRET = getSecret("prod/hasura-admin-secret", "us-east-2");
-    }
-
-    process.env.RECORD_REPLAY_DISPATCH_SERVER = "wss://dispatch.replay.io";
-    process.env.REPLAY_BROWSER_BINARY_PATH = CHROME_BINARY_PATH;
-    process.env.REPLAY_CHROMIUM_EXECUTABLE_PATH = CHROME_BINARY_PATH;
-    process.env.RECORD_REPLAY_PATH = CHROME_BINARY_PATH;
-    // process.env.RECORD_REPLAY_DIRECTORY =
-    process.env.AUTHENTICATED_TESTS_WORKSPACE_API_KEY = process.env.RECORD_REPLAY_API_KEY;
-    process.env.PLAYWRIGHT_TEST_BASE_URL = "https://app.replay.io";
 
     // Start the webserver.
     webProc = exec("yarn dev", (error, stdout, stderr) => {
