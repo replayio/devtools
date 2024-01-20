@@ -1,26 +1,41 @@
 /* Copyright 2024 Record Replay Inc. */
 
+const path = require("path");
 const { execSync, exec } = require("child_process");
 const getSecret = require("./aws_secrets");
 
-function run_fe_tests(CHROME_BINARY_PATH) {
-  let webProc = null;
+function run_fe_tests(CHROME_BINARY_PATH, useXvfb = true) {
+  CHROME_BINARY_PATH ||= process.env.REPLAY_CHROMIUM_EXECUTABLE_PATH;
+
+  if (!CHROME_BINARY_PATH) {
+    throw new Error("No chromium binary path (nor REPLAY_CHROMIUM_EXECUTABLE_PATH) provided.");
+  }
+
   console.group("START");
   console.time("START time");
+
+  const envWrapper = useXvfb ? "xvfb-run" : "";
+  const TestRootPath = path.join(
+    process.env.REPLAY_DIR ? path.join(process.env.REPLAY_DIR, "devtools") : ".",
+    "packages/e2e-tests"
+  );
+
+  process.env.HASURA_ADMIN_SECRET ||= getSecret("prod/hasura-admin-secret", "us-east-2");
+
+  // TODO: Our over-use of defined and re-defined env vars is great...
+  process.env.RECORD_REPLAY_DISPATCH_SERVER ||= (process.env.DISPATCH_ADDRESS ||= "wss://dispatch.replay.io");
+  process.env.REPLAY_BROWSER_BINARY_PATH = CHROME_BINARY_PATH;
+  process.env.REPLAY_CHROMIUM_EXECUTABLE_PATH = CHROME_BINARY_PATH;
+  process.env.RECORD_REPLAY_PATH = CHROME_BINARY_PATH;
+  // process.env.RECORD_REPLAY_DIRECTORY =
+  process.env.AUTHENTICATED_TESTS_WORKSPACE_API_KEY = process.env.RECORD_REPLAY_API_KEY;
+  process.env.PLAYWRIGHT_TEST_BASE_URL = "https://app.replay.io";
+
+  // TODO: See if this makes a difference
+  process.env.REPLAY_DISABLE_CLONE = "1";
+
+  let webProc = null;
   {
-    if (!process.env.HASURA_ADMIN_SECRET) {
-      process.env.HASURA_ADMIN_SECRET = getSecret("prod/hasura-admin-secret", "us-east-2");
-    }
-
-    process.env.RECORD_REPLAY_DISPATCH_SERVER = "wss://dispatch.replay.io";
-    process.env.REPLAY_BROWSER_BINARY_PATH = CHROME_BINARY_PATH;
-    process.env.REPLAY_CHROMIUM_EXECUTABLE_PATH = CHROME_BINARY_PATH;
-    process.env.RECORD_REPLAY_PATH = CHROME_BINARY_PATH;
-    // process.env.RECORD_REPLAY_DIRECTORY =
-    process.env.AUTHENTICATED_TESTS_WORKSPACE_API_KEY = process.env.RECORD_REPLAY_API_KEY;
-    process.env.PLAYWRIGHT_TEST_BASE_URL = "https://app.replay.io";
-    process.env.REPLAY_DISABLE_CLONE = "true";
-
     // Install node deps
     execSync("npm i -g yarn", {
       stdio: "inherit",
@@ -34,6 +49,7 @@ function run_fe_tests(CHROME_BINARY_PATH) {
       stdio: "inherit",
     });
 
+    // TODO: Do we need this?
     execSync("npx playwright install chromium", {
       stdio: "inherit",
     });
@@ -73,7 +89,7 @@ function run_fe_tests(CHROME_BINARY_PATH) {
     ];
 
     execSync(
-      `xvfb-run ./packages/e2e-tests/scripts/save-examples.ts --runtime=chromium --project=replay-chromium-local --example=${htmlFiles.join(
+      `${envWrapper} ${path.join(TestRootPath, "scripts/save-examples.ts")} --runtime=chromium --project=replay-chromium-local --example=${htmlFiles.join(
         ","
       )}`,
       { stdio: "inherit", env: process.env }
@@ -105,7 +121,7 @@ function run_fe_tests(CHROME_BINARY_PATH) {
       "stacking_chromium",
       "react_devtools-03-multiple-versions",
     ];
-    execSync(`xvfb-run yarn test:runtime ${testNames.join(" ")}`, {
+    execSync(`${envWrapper} yarn test:runtime ${testNames.join(" ")}`, {
       stdio: "inherit",
       stderr: "inherit",
     });
@@ -121,3 +137,14 @@ function run_fe_tests(CHROME_BINARY_PATH) {
 }
 
 module.exports = run_fe_tests;
+
+
+/** ###########################################################################
+ * {@link main}
+ * ##########################################################################*/
+
+(async function main() {
+  if (process.argv[1] === __filename) {
+    runtime_fe_tests(undefined, false);
+  }
+})();
