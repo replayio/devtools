@@ -32,7 +32,7 @@ function run_fe_tests(CHROME_BINARY_PATH, useXvfb = true) {
   process.env.PLAYWRIGHT_TEST_BASE_URL = "https://app.replay.io";
 
   // TODO: See if this makes a difference
-  process.env.REPLAY_DISABLE_CLONE = "1";
+  // process.env.REPLAY_DISABLE_CLONE = "1";
 
   let webProc = null;
   {
