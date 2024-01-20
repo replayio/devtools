@@ -5,7 +5,7 @@ import test from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "node/basic.js" });
 
-test("quick_open_modal-01: Test basic searching functionality", async ({
+test("node_quick_open_modal-01: Test basic searching functionality", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {

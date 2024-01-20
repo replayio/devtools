@@ -403,23 +403,22 @@ export default function Toolbar() {
             onClick={handleButtonClick}
           />
         ) : null}
-        {testRunner !== null ? (
-          testRunner === "cypress" ? (
-            <ToolbarButton
-              icon="cypress"
-              label="Cypress Panel"
-              name="cypress"
-              onClick={handleButtonClick}
-            />
-          ) : (
-            <ToolbarButton
-              icon="playwright"
-              label="Test Info"
-              name="cypress"
-              onClick={handleButtonClick}
-            />
-          )
+        {testRunner === "cypress" ? (
+          <ToolbarButton
+            icon="cypress"
+            label="Cypress Panel"
+            name="cypress"
+            onClick={handleButtonClick}
+          />
         ) : (
+          <ToolbarButton
+            icon="playwright"
+            label="Test Info"
+            name="cypress"
+            onClick={handleButtonClick}
+          />
+        )}
+        {testRunner !== "cypress" && (
           <ToolbarButton
             icon="info"
             label="Replay Info"

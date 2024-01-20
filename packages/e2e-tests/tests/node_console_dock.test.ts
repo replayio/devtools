@@ -8,7 +8,7 @@ import test from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "node/basic.js" });
 
-test("console_dock_node: Should show the correct docking behavior for recordings without video", async ({
+test("node_console_dock: Should show the correct docking behavior for recordings without video", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
