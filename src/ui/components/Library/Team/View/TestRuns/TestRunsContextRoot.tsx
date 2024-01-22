@@ -41,11 +41,11 @@ type TestRunsContextType = {
 export const TestRunsContext = createContext<TestRunsContextType>(null as any);
 
 export function TestRunsContextRoot({ children }: { children: ReactNode }) {
-  const { teamId, testOrTestRunId: defaultTestRunId } = useGetTeamRouteParams();
+  const { teamId, testRunId: defaultTestRunId } = useGetTeamRouteParams();
 
   const { testRuns, status } = useTestRuns();
 
-  const [testRunId, setTestRunId] = useState<string | null>(defaultTestRunId);
+  const [testRunId, setTestRunId] = useState<string | null>(defaultTestRunId ?? null);
 
   const [filterByBranch, setFilterByBranch] = useState<"all" | "primary">("all");
   const [filterByStatus, setFilterByStatus] = useState<"all" | "failed">("all");

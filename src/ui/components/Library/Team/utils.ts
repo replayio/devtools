@@ -1,16 +1,32 @@
 import { ParsedUrlQuery } from "querystring";
 import { NextRouter, useRouter } from "next/router";
 
+import { assert } from "protocol/utils";
 import { View } from "ui/components/Library/Team/View/ViewContextRoot";
 import { getRecordingWorkspace } from "ui/reducers/app";
 import { useAppSelector } from "ui/setup/hooks";
 
 export function parseQueryParams(query: ParsedUrlQuery) {
-  const [teamId, view, testOrTestRunId, _, testId] = Array.isArray(query.param)
-    ? query.param
-    : [query.param!];
+  const [teamId, view, ...params] = Array.isArray(query.param) ? query.param : [query.param!];
 
-  return { teamId, testOrTestRunId: testOrTestRunId || null, view: view as View, testId };
+  let testRunId: string | undefined;
+  let testId: string | undefined;
+
+  assert(!view || view === "runs" || view === "tests" || view === "recordings");
+
+  switch (view) {
+    case "runs": {
+      testRunId = params[0];
+      testId = params[2];
+      break;
+    }
+    case "tests": {
+      testId = params[0];
+      break;
+    }
+  }
+
+  return { teamId, testRunId, view: view as View, testId };
 }
 
 export function useGetTeamRouteParams() {
