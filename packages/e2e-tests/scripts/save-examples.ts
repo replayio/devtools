@@ -386,7 +386,11 @@ async function waitUntilMessage(
     const { exampleToTestMap } = getStats();
 
     for (const recordingId of newRecordingIds) {
-      await loadRecording(recordingId);
+      try {
+        await loadRecording(recordingId);
+      } catch (e) {
+        console.log(`Error during processing: ${e}`);
+      }
     }
 
     console.log("The following tests have been impacted by this change:");
@@ -394,8 +398,9 @@ async function waitUntilMessage(
       updatedExamples
         .map(example => {
           const tests = exampleToTestMap[example];
-
-          return ` • ${chalk.yellow(example)}${tests.map(test => `\n   • ${test}`).join("")}`;
+          return tests
+            ? ` • ${chalk.yellow(example)}${tests.map(test => `\n   • ${test}`).join("")}`
+            : "";
         })
         .join("\n")
     );
