@@ -101,6 +101,7 @@ async function saveRecording(
       apiKey,
       server: config.backendUrl,
       verbose: true,
+      strict: true,
     });
   }
 
