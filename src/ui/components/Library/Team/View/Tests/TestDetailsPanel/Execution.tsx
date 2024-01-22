@@ -9,6 +9,29 @@ import { getTruncatedRelativeDate } from "../../Recordings/RecordingListItem/Rec
 import { StatusIcon } from "../../StatusIcon";
 import { Replay, getReplayResult } from "./TestDetails";
 
+function ExecutionItem({
+  testRunId,
+  href,
+  children,
+}: {
+  testRunId: string;
+  href?: string;
+  children: React.ReactNode;
+}) {
+  const props = {
+    "data-test-run-id": testRunId,
+    "data-test-id": "ExecutionItem",
+    className: "flex flex-col px-2",
+    children,
+  };
+
+  if (href) {
+    return <a {...props} href={href} />;
+  }
+
+  return <div {...props} />;
+}
+
 export function Execution({
   execution,
   testRunId,
@@ -35,10 +58,8 @@ export function Execution({
   }
 
   return (
-    <a
-      data-test-run-id={testRunId}
-      data-test-id="ExecutionItem"
-      className="flex flex-col px-2"
+    <ExecutionItem
+      testRunId={testRunId}
       href={
         shouldCollapse
           ? `/recording/${sortedRecordings[0].id}?referrer=${encodeURIComponent(router.asPath)}`
@@ -78,7 +99,7 @@ export function Execution({
           ))}
         </div>
       ) : null}
-    </a>
+    </ExecutionItem>
   );
 }
 function ExecutionStatus({ result }: { result: string }) {
