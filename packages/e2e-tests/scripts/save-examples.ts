@@ -400,7 +400,7 @@ async function waitUntilMessage(
           const tests = exampleToTestMap[example];
           return tests
             ? ` • ${chalk.yellow(example)}${tests.map(test => `\n   • ${test}`).join("")}`
-            : "";
+            : ` • ${chalk.red(example)} is updated, but has no associated tests`;
         })
         .join("\n")
     );
