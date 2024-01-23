@@ -9,6 +9,7 @@ import {
   useEffect,
   useMemo,
   useState,
+  useTransition,
 } from "react";
 import { STATUS_PENDING } from "suspense";
 
@@ -25,8 +26,9 @@ type TestsContextType = {
   selectTestId: (testId: string | null) => void;
   setSortBy: Dispatch<SetStateAction<TestsContextType["sortBy"]>>;
   setFilterByText: Dispatch<SetStateAction<string>>;
+  testIdForSuspense: string | null;
   testId: string | null;
-  testIdForDisplay: string | null;
+  testPending: boolean;
   selectedTest: Test | null;
   testsLoading: boolean;
   tests: Test[];
@@ -44,8 +46,11 @@ export function TestsContextRoot({ children }: { children: ReactNode }) {
   const [sortBy, setSortBy] = useState<TestsContextType["sortBy"]>("failureRate");
   const [filterByText, setFilterByText] = useState("");
 
+  const [isTestPending, startTestTransition] = useTransition();
   useEffect(() => {
-    setTestId(testId ?? null);
+    startTestTransition(() => {
+      setTestId(testId ?? null);
+    });
   }, [testId]);
 
   const filterByTextDeferred = useDeferredValue(filterByText);
@@ -86,8 +91,9 @@ export function TestsContextRoot({ children }: { children: ReactNode }) {
       },
       setSortBy,
       setFilterByText,
-      testId: deferredTestId,
-      testIdForDisplay: testId ?? null,
+      testIdForSuspense: deferredTestId,
+      testId: testId ?? null,
+      testPending: isTestPending,
       selectedTest: testId ? tests.find(t => t.testId === testId) ?? null : null,
       testsLoading: status === STATUS_PENDING,
       tests: filteredTests,

@@ -8,6 +8,7 @@ import {
   useEffect,
   useMemo,
   useState,
+  useTransition,
 } from "react";
 import { STATUS_PENDING } from "suspense";
 
@@ -31,8 +32,9 @@ type TestRunsContextType = {
   testRunsLoading: boolean;
   testRuns: TestRun[];
   testRunCount: number;
+  testRunIdForSuspense: string | null;
   testRunId: string | null;
-  testRunIdForDisplay: string | null;
+  testRunPending: boolean;
   testId: string | null;
   setTestId: React.Dispatch<React.SetStateAction<string | null>>;
 };
@@ -101,15 +103,13 @@ export function TestRunsContextRoot({ children }: { children: ReactNode }) {
     }
   }, [testRunId, testRuns]);
 
+  const [isTestRunPending, startTestRunTransition] = useTransition();
   useEffect(() => {
-    setTestRunId(testRunId);
+    startTestRunTransition(() => {
+      setTestRunId(testRunId);
+      setFilterTestsByText("");
+    });
   }, [testRunId]);
-
-  useEffect(() => {
-    setFilterTestsByText("");
-  }, [testRunId]);
-
-  const deferredTestRunId = useDeferredValue(localTestRunId);
 
   return (
     <TestRunsContext.Provider
@@ -127,8 +127,9 @@ export function TestRunsContextRoot({ children }: { children: ReactNode }) {
         setFilterByStatus,
         setFilterByText,
         setFilterTestsByText,
-        testRunId: deferredTestRunId,
-        testRunIdForDisplay: testRunId,
+        testRunIdForSuspense: localTestRunId,
+        testRunId: testRunId,
+        testRunPending: isTestRunPending,
         testRunsLoading: status === STATUS_PENDING,
         testRuns: filteredTestRuns,
         testRunCount: status === STATUS_PENDING ? 0 : testRuns.length,

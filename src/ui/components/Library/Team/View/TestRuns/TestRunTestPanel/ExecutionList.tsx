@@ -12,7 +12,7 @@ export function ExecutionList({
 }: {
   selectedSpecTests: TestRunTestWithRecordings[];
 }) {
-  const { testRunId } = useContext(TestRunsContext);
+  const { testRunIdForSuspense: testRunId } = useContext(TestRunsContext);
   const { testRun } = useTestRunDetailsSuspends(testRunId);
   const noRecordings = selectedSpecTests.every(test =>
     test.executions.every(e => e.recordings.length === 0)

@@ -40,7 +40,7 @@ export function TestRunListItem({
 }) {
   const { date } = testRun;
 
-  const { selectTestRun, testRunIdForDisplay } = useContext(TestRunsContext);
+  const { selectTestRun, testRunId: testRunIdForDisplay } = useContext(TestRunsContext);
 
   const title = getTestRunTitle(testRun);
 

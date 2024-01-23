@@ -21,7 +21,7 @@ function SelectTestMessage({ error }: { error?: boolean }) {
 }
 
 export function TestDetailsPanel() {
-  const { testId, tests } = useContext(TestContext);
+  const { testIdForSuspense: testId, tests } = useContext(TestContext);
 
   let children = null;
 

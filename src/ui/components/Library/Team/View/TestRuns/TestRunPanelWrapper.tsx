@@ -7,7 +7,8 @@ import styles from "./TestRunPanelWrapper.module.css";
 
 export function TestRunPanelWrapper({ children }: { children: React.ReactNode }) {
   const [deferredPending, setDeferredPending] = useState(false);
-  const { testRunId, testRunIdForDisplay } = useContext(TestRunsContext);
+  const { testRunIdForSuspense: testRunId, testRunId: testRunIdForDisplay } =
+    useContext(TestRunsContext);
 
   const isPending = testRunId !== testRunIdForDisplay;
 

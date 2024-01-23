@@ -12,7 +12,7 @@ import styles from "./TestRunTestPanel.module.css";
 
 export function TestRunTestPanel() {
   const { testId, filterTestsByText } = useContext(TestRunsContext);
-  const { testRunId, testRuns } = useContext(TestRunsContext);
+  const { testRunIdForSuspense: testRunId, testRuns } = useContext(TestRunsContext);
 
   const { groupedTests, tests } = useTestRunDetailsSuspends(testRunId);
   const selectedSpecTests =
