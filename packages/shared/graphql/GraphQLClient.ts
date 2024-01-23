@@ -8,6 +8,16 @@ type Data = {
   };
 };
 
+// By default, we use real GraphQL backend APIs.
+// We can leverage this when writing tests (or UI demos) by injecting a stub client.
+export let graphqlUrl = process.env.NEXT_PUBLIC_API_URL || "https://api.replay.io/v1/graphql";
+if (typeof window !== "undefined") {
+  const url = new URL(window.location.href);
+  if (url.searchParams.has("graphql")) {
+    graphqlUrl = url.searchParams.get("graphql") as string;
+  }
+}
+
 export interface GraphQLClientInterface {
   send<T>(data: Data, accessToken: string | null): Promise<T>;
 }
@@ -42,3 +52,5 @@ export class GraphQLClient implements GraphQLClientInterface {
     return json.data as T;
   }
 }
+
+export const graphQLClient = new GraphQLClient(graphqlUrl);
