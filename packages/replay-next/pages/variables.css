@@ -527,8 +527,7 @@
 
   --testsuites-chart-container: var(--theme-base-100);
   --testsuites-graph-gradient-start: #02496d;
-  --testsuites-graph-gradient-end: #02496d;
-  --testsuites-graph-gradient-end-opacity: 0;
+  --testsuites-graph-gradient-end: #02496d00;
   --testsuites-graph-gradient-stroke: var(--primary-accent);
   --testsuites-graph-marker: var(--primary-accent-dimmed);
 
@@ -1080,7 +1079,6 @@
   --testsuites-chart-container: var(--theme-text-field-bgcolor);
   --testsuites-graph-gradient-start: var(--primary-accent-dimmed);
   --testsuites-graph-gradient-end: var(--primary-accent-dimmed);
-  --testsuites-graph-gradient-end-opacity: 100;
   --testsuites-graph-gradient-stroke: var(--primary-accent);
   --testsuites-graph-marker: var(--theme-base-85);
 
