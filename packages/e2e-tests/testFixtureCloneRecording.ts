@@ -4,6 +4,7 @@ import { addCoverageReport } from "monocart-reporter";
 
 import { TestRecordingKey } from "./helpers";
 import { cloneTestRecording, deleteTestRecording } from "./helpers/utils";
+import { loadRecording } from "./scripts/loadRecording";
 
 type TestIsolatedRecordingFixture = {
   exampleKey: TestRecordingKey;
@@ -23,18 +24,17 @@ const testWithCloneRecording = base.extend<TestIsolatedRecordingFixture>({
       throw new Error("Invalid recording");
     }
 
-    if (process.env.REPLAY_DISABLE_CLONE) {
-      await use({
-        page,
-        recordingId: exampleRecordings[exampleKey].recording,
-      });
-      return;
-    }
-
     let newRecordingId: string | undefined = undefined;
     try {
       const { recording } = exampleRecordings[exampleKey];
+      console.log("Cloning recording");
       newRecordingId = await cloneTestRecording(recording);
+
+      try {
+        await loadRecording(newRecordingId);
+      } catch (e) {
+        console.warn("Error processing recording; ignoring.");
+      }
 
       await page.coverage.startJSCoverage({
         resetOnNavigation: false,

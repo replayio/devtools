@@ -84,6 +84,8 @@ export async function uploadLastRecording(url: string): Promise<string> {
     return await cli.uploadRecording(id, {
       apiKey: config.replayApiKey,
       server: config.backendUrl,
+      verbose: true,
+      strict: true,
     });
   } else {
     throw Error(
