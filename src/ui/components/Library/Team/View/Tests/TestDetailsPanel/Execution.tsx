@@ -7,7 +7,30 @@ import MaterialIcon from "ui/components/shared/MaterialIcon";
 
 import { getTruncatedRelativeDate } from "../../Recordings/RecordingListItem/RecordingListItem";
 import { StatusIcon } from "../../StatusIcon";
-import { Replay, getReplayResult } from "./TestDetails";
+import { TestRunRecordingLink } from "./TestDetails";
+
+// This attempts to derive the result for a recording based on the computed
+// result for test in the run. We aren't surfacing each execution from the test
+// run yet that would provide the correct answer. That will be added by
+// SCS-1843.
+function getReplayResult(result: string, index: number, total: number) {
+  if (result === "passed") {
+    return "passed";
+  } else if (result === "failed") {
+    return "failed";
+  } else if (result === "flaky") {
+    if (total === 1) {
+      // If there's only one replay but the test is flaky,
+      // it's cypress and the flake was resolved internally
+      return "flaky";
+    } else {
+      // return passing for the first (last) one, flaky for the rest
+      return index === 0 ? "passed" : "flaky";
+    }
+  } else {
+    return result;
+  }
+}
 
 function ExecutionItem({
   testRunId,
@@ -90,7 +113,7 @@ export function Execution({
       {!shouldCollapse ? (
         <div className="flex flex-col gap-1">
           {sortedRecordings.map((r, i) => (
-            <Replay
+            <TestRunRecordingLink
               recording={r}
               key={i}
               result={getReplayResult(execution.result, i, execution.recordings.length)}

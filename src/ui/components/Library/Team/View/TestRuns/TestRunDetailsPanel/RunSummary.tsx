@@ -1,5 +1,6 @@
 import { captureException } from "@sentry/react";
 import Link from "next/link";
+import { useContext } from "react";
 import { ContextMenuItem, useContextMenu } from "use-context-menu";
 
 import Icon from "replay-next/components/Icon";
@@ -12,6 +13,7 @@ import {
 import { Dropdown } from "../Dropdown";
 import { FilterField } from "../FilterField";
 import { useTestRunDetailsSuspends } from "../hooks/useTestRunDetailsSuspends";
+import { TestRunsContext } from "../TestRunsContextRoot";
 import { AttributeContainer } from "./AttributeContainer";
 import { BranchIcon } from "./BranchIcon";
 import { RunStats } from "./RunStats";
@@ -144,18 +146,16 @@ function PullRequestLink({ testRun }: { testRun: TestRun }) {
 export function RunSummary({
   testRun,
   durationMs,
-  testFilterByText,
-  setTestFilterByText,
   filterCurrentRunByStatus,
   setFilterCurrentRunByStatus,
 }: {
   testRun: TestRun;
   durationMs: number;
-  testFilterByText: string;
-  setTestFilterByText: (value: string) => void;
   filterCurrentRunByStatus: "all" | "failed-and-flaky";
   setFilterCurrentRunByStatus: (value: "all" | "failed-and-flaky") => void;
 }) {
+  const { filterTestsByText, setFilterTestsByText } = useContext(TestRunsContext);
+
   const { tests } = useTestRunDetailsSuspends(testRun.id);
   const {
     contextMenu: contextMenuStatusFilter,
@@ -199,8 +199,8 @@ export function RunSummary({
           <FilterField
             placeholder="Filter tests"
             dataTestId="TestRunSummary-Filter"
-            value={testFilterByText}
-            onChange={setTestFilterByText}
+            value={filterTestsByText}
+            onChange={setFilterTestsByText}
           />
         </>
       ) : null}

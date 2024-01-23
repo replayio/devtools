@@ -67,11 +67,7 @@ interface ErrorCount {
 const getSummary = (message: string) => {
   const firstLine = message.split("\n")[0];
 
-  if (firstLine.match(/^.*\dms: (.*)/)?.[1]) {
-    return firstLine.match(/^.*\dms: (.*)/)![1];
-  } else {
-    return firstLine;
-  }
+  return firstLine.match(/^.*\dms: (.*)/)?.[1] ?? firstLine;
 };
 
 function Errors({ failedTests }: { failedTests: TestRunTestWithRecordings[] }) {
