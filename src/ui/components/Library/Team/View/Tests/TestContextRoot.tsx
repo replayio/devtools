@@ -37,7 +37,7 @@ export const TestContext = createContext<TestsContextType>(null as any);
 
 export function TestsContextRoot({ children }: { children: ReactNode }) {
   const router = useRouter();
-  const { teamId, testOrTestRunId } = useGetTeamRouteParams();
+  const { teamId, testId } = useGetTeamRouteParams();
   const { tests, status } = useTests();
 
   const [localTestId, setTestId] = useState<string | null>(null);
@@ -45,8 +45,8 @@ export function TestsContextRoot({ children }: { children: ReactNode }) {
   const [filterByText, setFilterByText] = useState("");
 
   useEffect(() => {
-    setTestId(testOrTestRunId);
-  }, [testOrTestRunId]);
+    setTestId(testId ?? null);
+  }, [testId]);
 
   const filterByTextDeferred = useDeferredValue(filterByText);
   const deferredTestId = useDeferredValue(localTestId);
@@ -87,13 +87,13 @@ export function TestsContextRoot({ children }: { children: ReactNode }) {
       setSortBy,
       setFilterByText,
       testId: deferredTestId,
-      testIdForDisplay: testOrTestRunId,
-      selectedTest: testOrTestRunId ? tests.find(t => t.testId === testOrTestRunId) ?? null : null,
+      testIdForDisplay: testId ?? null,
+      selectedTest: testId ? tests.find(t => t.testId === testId) ?? null : null,
       testsLoading: status === STATUS_PENDING,
       tests: filteredTests,
       testsCount: status === STATUS_PENDING ? 0 : tests.length,
     };
-  }, [sortBy, filterByText, filterByTextDeferred, deferredTestId, testOrTestRunId, status, tests]);
+  }, [sortBy, filterByText, filterByTextDeferred, deferredTestId, testId, status, tests]);
 
   return <TestContext.Provider value={value}>{children}</TestContext.Provider>;
 }

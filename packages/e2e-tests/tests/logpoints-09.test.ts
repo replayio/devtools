@@ -3,7 +3,7 @@ import { addLogpoint, editLogPoint, verifyLogPointPanelContent } from "../helper
 import test from "../testFixtureCloneRecording";
 
 const lineNumber = 20;
-test.use({ exampleKey: "doc_rr_basic.html" });
+test.use({ exampleKey: "doc_rr_basic_chromium.html" });
 
 test(`logpoints-09: should support pending edits`, async ({
   pageWithMeta: { page, recordingId },

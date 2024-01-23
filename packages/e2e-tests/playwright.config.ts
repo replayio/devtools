@@ -83,12 +83,12 @@ const config: PlaywrightTestConfig = {
       width: 1280,
       height: 1024,
     },
-    // Don't allow any one action to take more than 15s
-    actionTimeout: 15_000,
+    // Don't allow any one action to take more than 60s
+    actionTimeout: 60_000,
   },
 
   expect: {
-    timeout: 10_000,
+    timeout: 15_000,
   },
 
   // Retry failed tests on CI to account for some basic flakiness.

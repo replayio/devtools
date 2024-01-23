@@ -7,7 +7,6 @@ import {
   $isParagraphNode,
   $isRangeSelection,
   $isTextNode,
-  COMMAND_PRIORITY_EDITOR,
   COMMAND_PRIORITY_LOW,
   COMMAND_PRIORITY_NORMAL,
   KEY_ARROW_DOWN_COMMAND,
@@ -29,7 +28,11 @@ import $isCodeNode from "./utils/$isCodeNode";
 import parsedTokensToCodeTextNode from "./utils/parsedTokensToCodeTextNode";
 import parseTokens from "./utils/parseTokens";
 
-export default function CodePlugin(): null {
+export default function CodePlugin({
+  preventTabFocusChange,
+}: {
+  preventTabFocusChange: boolean;
+}): null {
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {
@@ -46,9 +49,12 @@ export default function CodePlugin(): null {
       }
     }
 
-    const onTabCommand = (_: KeyboardEvent) => {
-      // Tab characters should not indent code blocks.
-      // Tabbing should change focus.
+    const onTabCommand = (event: KeyboardEvent) => {
+      if (preventTabFocusChange) {
+        event.preventDefault();
+      }
+
+      // Tab key should not indent code blocks.
       return true;
     };
 
@@ -76,7 +82,7 @@ export default function CodePlugin(): null {
         COMMAND_PRIORITY_LOW
       )
     );
-  }, [editor]);
+  }, [editor, preventTabFocusChange]);
 
   return null;
 }

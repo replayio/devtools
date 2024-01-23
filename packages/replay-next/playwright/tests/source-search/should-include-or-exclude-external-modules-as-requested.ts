@@ -13,7 +13,7 @@ beforeEach();
 test("should include or exclude external modules as requested", async ({ page }, testInfo) => {
   await toggleExcludeNodeModulesCheckbox(page, true);
   await searchSources(page, "react");
-  await verifySourceSearchSummary(page, "4 results in 1 file");
+  await verifySourceSearchSummary(page, "4 results in 2 files");
   await verifySourceSearchMatchingLocations(page, ["2", "h1"]);
 
   await toggleExcludeNodeModulesCheckbox(page, false);

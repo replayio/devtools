@@ -93,6 +93,8 @@ export interface AppState {
   modal: ModalType | null;
   modalOptions: ModalOptionsType;
   mode: AppMode;
+  processing: boolean | null;
+  processingProgress: number | null;
   recordingId: string | null;
   recordingTarget: RecordingTarget | null;
   recordingWorkspace: Workspace | null;

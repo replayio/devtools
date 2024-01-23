@@ -4,7 +4,7 @@ import { addBreakpoint } from "../helpers/source-panel";
 import { waitFor } from "../helpers/utils";
 import { Page, test } from "../testFixtureCloneRecording";
 
-test.use({ exampleKey: "doc_control_flow.html" });
+test.use({ exampleKey: "doc_control_flow_firefox.html" });
 
 test("repaint: repaints the screen screen when stepping over code that modifies the DOM", async ({
   pageWithMeta: { page, recordingId },
@@ -13,11 +13,14 @@ test("repaint: repaints the screen screen when stepping over code that modifies 
   await startTest(page, recordingId);
   await openDevToolsTab(page);
 
-  await addBreakpoint(page, { lineNumber: 50, url: exampleKey });
+  await addBreakpoint(page, { lineNumber: 50, url: "doc_control_flow.html" });
   await rewindToLine(page, 50);
 
   const prevDataUrl = await getCanvasDataUrl(page);
 
+  // this steps over a (synchronous) DOM update. The recorded screenshot for the point after the step
+  // will not have changed (because the browser doesn't repaint in the middle of javascript execution),
+  // but the repainted screenshot must have changed.
   await stepOver(page);
   await waitForPaused(page);
 

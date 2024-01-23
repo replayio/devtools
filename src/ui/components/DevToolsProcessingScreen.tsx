@@ -1,8 +1,9 @@
-import { useRecordingProcessingProgress } from "replay-next/src/hooks/useRecordingProcessingProgress";
 import LoadingScreen from "ui/components/shared/LoadingScreen";
+import { getProcessingProgress } from "ui/reducers/app";
+import { useAppSelector } from "ui/setup/hooks";
 
 export function DevToolsProcessingScreen() {
-  const processingProgress = useRecordingProcessingProgress();
+  const processingProgress = useAppSelector(getProcessingProgress);
 
   return (
     <LoadingScreen

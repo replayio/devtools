@@ -13,8 +13,9 @@ import { STATUS_PENDING } from "suspense";
 
 import { TestRun, getTestRunTitle } from "shared/test-suites/TestRun";
 import { useGetTeamRouteParams } from "ui/components/Library/Team/utils";
-import { useTestRuns } from "ui/components/Library/Team/View/TestRuns/hooks/useTestRuns";
 import { trackEvent } from "ui/utils/telemetry";
+
+import { useTestRuns } from "./hooks/useTestRuns";
 
 type TestRunsContextType = {
   filterByBranch: "all" | "primary";
@@ -39,11 +40,9 @@ type TestRunsContextType = {
 export const TestRunsContext = createContext<TestRunsContextType>(null as any);
 
 export function TestRunsContextRoot({ children }: { children: ReactNode }) {
-  const { teamId, testOrTestRunId, testId } = useGetTeamRouteParams();
-
+  const { teamId, testRunId: defaultTestRunId, testId } = useGetTeamRouteParams();
   const { testRuns, status } = useTestRuns();
-
-  const [localTestRunId, setTestRunId] = useState<string | null>(testOrTestRunId);
+  const [localTestRunId, setTestRunId] = useState<string | null>(defaultTestRunId ?? null);
   const [filterByBranch, setFilterByBranch] = useState<"all" | "primary">("all");
   const [filterByStatus, setFilterByStatus] = useState<"all" | "failed">("all");
 
@@ -52,7 +51,7 @@ export function TestRunsContextRoot({ children }: { children: ReactNode }) {
   const [filterTestsByText, setFilterTestsByText] = useState("");
   const router = useRouter();
 
-  const testRunId = testOrTestRunId ?? testRuns[0]?.id;
+  const testRunId = defaultTestRunId ?? testRuns[0]?.id;
 
   const filteredTestRuns = useMemo(() => {
     let filteredTestRuns = testRuns;
@@ -97,10 +96,10 @@ export function TestRunsContextRoot({ children }: { children: ReactNode }) {
   }, [filterByBranch, filterByStatus, filterByText, testRuns]);
 
   useEffect(() => {
-    if (!testOrTestRunId && testRuns?.length > 0) {
+    if (!testRunId && testRuns?.length > 0) {
       router.replace(`/team/${teamId}/runs/${testRuns[0]?.id}`);
     }
-  }, [testOrTestRunId, testRuns]);
+  }, [testRunId, testRuns]);
 
   useEffect(() => {
     setTestRunId(testRunId);
@@ -133,7 +132,7 @@ export function TestRunsContextRoot({ children }: { children: ReactNode }) {
         testRunsLoading: status === STATUS_PENDING,
         testRuns: filteredTestRuns,
         testRunCount: status === STATUS_PENDING ? 0 : testRuns.length,
-        testId,
+        testId: testId ?? null,
         setTestId: testId => {
           trackEvent("test_dashboard.select_test", { view: "runs" });
           router.push(`/team/${teamId}/runs/${testRunId}/tests/${testId}`);

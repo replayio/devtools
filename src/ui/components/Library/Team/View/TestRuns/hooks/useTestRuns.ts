@@ -4,10 +4,10 @@ import { STATUS_PENDING, Status, useImperativeIntervalCacheValues } from "suspen
 import { GraphQLClientContext } from "replay-next/src/contexts/GraphQLClientContext";
 import { TestRun } from "shared/test-suites/TestRun";
 import { TeamContext } from "ui/components/Library/Team/TeamContextRoot";
-import { testRunsIntervalCache } from "ui/components/Library/Team/View/TestRuns/suspense/TestRunsCache";
 import useToken from "ui/utils/useToken";
 
 import { TimeFilterContext } from "../../TimeFilterContextRoot";
+import { testRunsIntervalCache } from "../suspense/TestRunsCache";
 
 const EMPTY_ARRAY: any[] = [];
 

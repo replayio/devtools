@@ -103,9 +103,18 @@ export async function commandPalette(page: Page, query: string) {
   await page.keyboard.press("Enter");
 }
 
+// Intersection (rather than Union) of JSON attributes
+type GetKeys<U> = U extends Record<infer K, any> ? K : never;
+type UnionToIntersection<U extends object> = {
+  [K in GetKeys<U>]: U extends Record<K, infer T> ? T : never;
+};
+
 export type TestRecordingKey = keyof typeof exampleRecordings;
-export type TestRecordingValue = (typeof exampleRecordings)[TestRecordingKey];
-export type ExamplesData = Record<TestRecordingKey, TestRecordingValue>;
+export type TestRecordingUnionValue = (typeof exampleRecordings)[TestRecordingKey];
+export type TestRecordingIntersectionValue = UnionToIntersection<
+  (typeof exampleRecordings)[TestRecordingKey]
+>;
+export type ExamplesData = Record<TestRecordingKey, TestRecordingUnionValue>;
 
 export async function startTest(
   page: Page,

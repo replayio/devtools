@@ -23,6 +23,14 @@ const testWithCloneRecording = base.extend<TestIsolatedRecordingFixture>({
       throw new Error("Invalid recording");
     }
 
+    if (process.env.REPLAY_DISABLE_CLONE) {
+      await use({
+        page,
+        recordingId: exampleRecordings[exampleKey].recording,
+      });
+      return;
+    }
+
     let newRecordingId: string | undefined = undefined;
     try {
       const { recording } = exampleRecordings[exampleKey];

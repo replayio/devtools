@@ -144,20 +144,14 @@ export const treeContainFile = (treeNode: TreeNode[], file: string) => {
   return containsFile;
 };
 
-export const treeContainTest = (treeNode: TreeNode[], testId: string) => {
-  let containsFile = false;
-  treeNode.forEach(node => {
+export const treeContainTest = (treeNode: TreeNode[], testId: string): boolean => {
+  return treeNode.some(node => {
     if (isFileNode(node)) {
-      if (node.test.testId === testId) {
-        containsFile = true;
-      }
-    } else {
-      if (treeContainTest(node.children, testId)) {
-        containsFile = true;
-      }
+      return node.test.testId === testId;
     }
+
+    return treeContainTest(node.children, testId);
   });
-  return containsFile;
 };
 
 export type Tree = PathNode;

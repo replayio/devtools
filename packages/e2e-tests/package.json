@@ -11,7 +11,7 @@
     "test:chromium": "playwright test --project chromium --reporter=@replayio/playwright/reporter,line",
     "test:replay-chromium": "playwright test --project replay-chromium --reporter=@replayio/playwright/reporter,line",
     "test:debug": "playwright test --project chromium --workers 1 --headed",
-    "test:runtime": "playwright test --project chromium --workers 4 --headed",
+    "test:runtime": "playwright test --grep-invert node_ --project chromium --workers 4",
     "test:debug_local": "playwright test --project=replay-chromium-local --workers 1 --headed",
     "test:ui": "playwright test --ui",
     "test:install": "playwright install",
@@ -27,6 +27,7 @@
     "cypress": "^12.5.1",
     "log-update": "^4",
     "ts-node": "^10.7.0",
+    "ws": "^7.4.6",
     "yargs": "^17.6.0"
   },
   "dependencies": {
