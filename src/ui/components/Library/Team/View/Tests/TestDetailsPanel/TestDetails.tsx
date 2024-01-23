@@ -40,26 +40,7 @@ function TestRun({ testRun }: { testRun: GroupedTestRun }) {
   );
 }
 
-export function getReplayResult(result: string, index: number, total: number) {
-  if (result === "passed") {
-    return "passed";
-  } else if (result === "failed") {
-    return "failed";
-  } else if (result === "flaky") {
-    if (total === 1) {
-      // If there's only one replay but the test is flaky,
-      // it's cypress and the flake was resolved internally
-      return "flaky";
-    } else {
-      // return passing for the first (last) one, flaky for the rest
-      return index === 0 ? "passed" : "flaky";
-    }
-  } else {
-    return result;
-  }
-}
-
-export function Replay({
+export function TestRunRecordingLink({
   recording,
   result,
   attemptNumber,

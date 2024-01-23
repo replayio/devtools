@@ -16,7 +16,7 @@
 }
 
 .failedPill {
-  color: #fff; /* we want white in both themes, or else the contrast is bad */
+  color: var(--primary-accent-foreground-text);
   background-color: var(--testsuites-failed-color);
 }
 

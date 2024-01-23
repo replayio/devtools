@@ -27,16 +27,12 @@ import { TestRunsContext } from "../TestRunsContextRoot";
 import styles from "./RunResults.module.css";
 
 export function RunResults({
-  testFilterByText,
   filterCurrentRunByStatus,
 }: {
-  testFilterByText: string;
   filterCurrentRunByStatus: "all" | "failed-and-flaky";
 }) {
-  const { testRunId } = useContext(TestRunsContext);
-
-  const filterByTextDeferred = useDeferredValue(testFilterByText);
-
+  const { filterTestsByText, testRunId } = useContext(TestRunsContext);
+  const filterByTextDeferred = useDeferredValue(filterTestsByText);
   const { groupedTests, tests } = useTestRunDetailsSuspends(testRunId);
   assert(groupedTests !== null);
 

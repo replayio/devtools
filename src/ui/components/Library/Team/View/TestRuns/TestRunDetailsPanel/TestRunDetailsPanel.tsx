@@ -8,8 +8,7 @@ import { RunResults } from "./RunResults";
 import { RunSummary } from "./RunSummary";
 
 export function TestRunDetailsPanel() {
-  const { testRunId, testRuns, filterTestsByText, setFilterTestsByText } =
-    useContext(TestRunsContext);
+  const { testRunId, testRuns } = useContext(TestRunsContext);
 
   const { durationMs } = useTestRunDetailsSuspends(testRunId);
   const [filterCurrentRunByStatus, setFilterCurrentRunByStatus] = useState<
@@ -25,15 +24,10 @@ export function TestRunDetailsPanel() {
         <RunSummary
           testRun={testRun}
           durationMs={durationMs}
-          setTestFilterByText={setFilterTestsByText}
-          testFilterByText={filterTestsByText}
           setFilterCurrentRunByStatus={setFilterCurrentRunByStatus}
           filterCurrentRunByStatus={filterCurrentRunByStatus}
         />
-        <RunResults
-          testFilterByText={filterTestsByText}
-          filterCurrentRunByStatus={filterCurrentRunByStatus}
-        />
+        <RunResults filterCurrentRunByStatus={filterCurrentRunByStatus} />
       </>
     );
   } else {
