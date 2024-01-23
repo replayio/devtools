@@ -225,9 +225,7 @@ export interface Recording {
   userId?: string;
   userRole?: RecordingRole;
   workspace?: Workspace;
-  testRun?: {
-    id: string;
-  } | null;
+  testRunId: string | null;
 }
 
 export type PlaywrightTestSources = {
