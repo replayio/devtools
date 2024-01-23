@@ -1,5 +1,5 @@
 import type { Page, expect as expectFunction } from "@playwright/test";
-import type * as PlaywrightTest from "@playwright/test";
+import { chromium, expect } from "@playwright/test";
 import { getExecutablePath } from "@replayio/playwright";
 import * as cli from "@replayio/replay";
 import findLast from "lodash/findLast";
@@ -10,26 +10,12 @@ export async function recordPlaywright(
   browserName: BrowserName,
   script: (page: Page, expect?: typeof expectFunction) => Promise<void>
 ) {
-  // Dynamically import `@playwright/test`, for two reasons:
-  // - FF only works with PT <=1.19
-  // - PT errors if it gets imported more than once
-  // WARNING: `playwright-test1_19` is not installed by default!
-  // Installing it clobbers the `./node_modules/.bin/playwright` symlink,
-  // which then breaks the ability to _run_ some of our E2E tests.
-  // Right now I'm recording FF examples and then uninstalling that version.
-  // TODO Figure out how to get these to co-exist so we can re-record more FF examples.
-  const playwrightTestPackage =
-    browserName === "chromium" ? "@playwright/test" : "playwright-test1_19";
-
-  const playwrightTest: typeof PlaywrightTest = require(playwrightTestPackage);
-
-  const browserEntry = playwrightTest[browserName];
   let executablePath: string | undefined = undefined;
   if (config.shouldRecordTest) {
     executablePath = config.browserPath || getExecutablePath(browserName)!;
   }
 
-  const browserServer = await browserEntry.launchServer({
+  const browserServer = await chromium.launchServer({
     env: {
       ...process.env,
       // @ts-ignore
@@ -51,13 +37,13 @@ export async function recordPlaywright(
     });
   }
 
-  const browser = await browserEntry.connect(browserServer.wsEndpoint());
+  const browser = await chromium.connect(browserServer.wsEndpoint());
   const context = await browser.newContext({
     ignoreHTTPSErrors: true,
   });
   const page = await context.newPage();
   try {
-    return await script(page as any, playwrightTest.expect);
+    return await script(page as any, expect);
   } catch (err) {
     console.error("PLAYWRIGHT ERROR", err);
   } finally {
@@ -100,6 +86,10 @@ export async function uploadLastRecording(url: string): Promise<string> {
       server: config.backendUrl,
     });
   } else {
-    throw Error(`No recording found matching url "${url}"`);
+    throw Error(
+      `No recording found matching url "${url}" in list:\n${list
+        .map(rec => rec.metadata.uri)
+        .join("\n")}`
+    );
   }
 }
