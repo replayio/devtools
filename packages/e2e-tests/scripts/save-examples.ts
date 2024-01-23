@@ -379,19 +379,9 @@ async function waitUntilMessage(
     const updatedExamples = Object.keys(exampleToNewRecordingId);
     const newRecordingIds = Object.values(exampleToNewRecordingId);
 
-    console.log(
-      `${newRecordingIds.length} new recordings have been saved. Loading each recording to ensure it has been pre-processed.`
-    );
+    console.log(`${newRecordingIds.length} new recordings have been saved.`);
 
     const { exampleToTestMap } = getStats();
-
-    for (const recordingId of newRecordingIds) {
-      try {
-        await loadRecording(recordingId);
-      } catch (e) {
-        console.log(`Error during processing: ${e}`);
-      }
-    }
 
     console.log("The following tests have been impacted by this change:");
     console.table(

@@ -1,6 +1,8 @@
 import { Page, test as base } from "@playwright/test";
+import { SimpleProtocolClient } from "@replayio/protocol";
 import axios from "axios";
 import { addCoverageReport } from "monocart-reporter";
+import WebSocket from "ws";
 
 import { TestRecordingKey } from "./helpers";
 import { cloneTestRecording, deleteTestRecording } from "./helpers/utils";
@@ -13,6 +15,11 @@ type TestIsolatedRecordingFixture = {
   };
 };
 
+const DISPATCH_URL =
+  process.env.DISPATCH_ADDRESS ||
+  process.env.NEXT_PUBLIC_DISPATCH_URL ||
+  "wss://dispatch.replay.io";
+
 export { base };
 
 const testWithCloneRecording = base.extend<TestIsolatedRecordingFixture>({
@@ -23,18 +30,26 @@ const testWithCloneRecording = base.extend<TestIsolatedRecordingFixture>({
       throw new Error("Invalid recording");
     }
 
-    if (process.env.REPLAY_DISABLE_CLONE) {
-      await use({
-        page,
-        recordingId: exampleRecordings[exampleKey].recording,
-      });
-      return;
-    }
-
     let newRecordingId: string | undefined = undefined;
     try {
       const { recording } = exampleRecordings[exampleKey];
+      console.log("       Cloning recording");
       newRecordingId = await cloneTestRecording(recording);
+
+      const callbacks: any = {
+        onClose: console.error,
+        onError: console.error,
+      };
+      const client = new SimpleProtocolClient(new WebSocket(DISPATCH_URL), callbacks, console.log);
+
+      try {
+        console.log("       Processing recording");
+        await client.sendCommand("Recording.processRecording", {
+          recordingId: newRecordingId,
+        });
+      } catch (e) {
+        console.warn("       Error processing recording; ignoring.");
+      }
 
       await page.coverage.startJSCoverage({
         resetOnNavigation: false,
