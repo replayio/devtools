@@ -33,6 +33,12 @@ const argv = yargs
     type: "string",
     default: "",
   })
+  .option("build", {
+    alias: "b",
+    default: "",
+    description: "Only re-generate tests for recordings made with the specified build id",
+    type: "string",
+  })
   .option("runtime", {
     alias: "r",
     default: "",
@@ -52,9 +58,10 @@ const argv = yargs
 type PlaywrightScript = (page: Page, expect: typeof expectFunction) => Promise<void>;
 
 type TestExampleFile = {
+  buildId: string;
+  category: "browser" | "node";
   filename: string;
   folder: string;
-  category: "browser" | "node";
   runtime: "firefox" | "chromium" | "node";
   playwrightScript?: PlaywrightScript;
 };
@@ -117,8 +124,6 @@ async function saveRecording(
     },
   };
 
-  const keys = Object.keys(mutableExamplesJSON).sort();
-
   writeFileSync(examplesJsonPath, JSON.stringify(mutableExamplesJSON, null, 2));
 
   completeLog();
@@ -169,6 +174,7 @@ async function saveExamples(
 
     if (category === examplesTarget) {
       examplesToRun.push({
+        buildId,
         category,
         filename: key,
         folder,
@@ -181,9 +187,13 @@ async function saveExamples(
   }
 
   const specificExamples = argv.example.split(",").filter(s => s.length > 0);
-
   if (specificExamples.length > 0) {
     examplesToRun = examplesToRun.filter(example => specificExamples.includes(example.filename));
+  }
+
+  const buildId = argv.build;
+  if (buildId) {
+    examplesToRun = examplesToRun.filter(example => example.buildId.includes(buildId));
   }
 
   for (const example of examplesToRun) {
