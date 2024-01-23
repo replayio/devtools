@@ -29,7 +29,6 @@
     "@lexical/link": "^0.6.5",
     "@lexical/mark": "^0.6.5",
     "@lexical/react": "^0.6.5",
-    "@nivo/line": "^0.84.0",
     "@reduxjs/toolkit": "^1.8.4",
     "@replayio/overboard": "^0.4.1",
     "@replayio/protocol": "^0.68.0",
