@@ -8,7 +8,7 @@ import { RunResults } from "./RunResults";
 import { RunSummary } from "./RunSummary";
 
 export function TestRunDetailsPanel() {
-  const { testRunId, testRunIdForSuspense, testRunPending } = useContext(TestRunsContext);
+  const { testRunIdForSuspense } = useContext(TestRunsContext);
 
   const { durationMs, testRun } = useTestRunDetailsSuspends(testRunIdForSuspense);
   const [filterCurrentRunByStatus, setFilterCurrentRunByStatus] = useState<
