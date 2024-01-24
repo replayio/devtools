@@ -129,8 +129,8 @@ jobs:
       - name: Upload test results to Trunk
         uses: trunk-io/analytics-uploader@main
         with:
-          org_url_slug: replay
-          junit_paths: test-results/**/*.xml
+          org-url-slug: replay
+          junit-paths: test-results/**/*.xml
           token: ${{ secrets.TRUNK_API_TOKEN }}
         continue-on-error: true
 
@@ -198,8 +198,8 @@ jobs:
       - name: Upload test results to Trunk
         uses: trunk-io/analytics-uploader@main
         with:
-          org_url_slug: replay
-          junit_paths: test-results/**/*.xml
+          org-url-slug: replay
+          junit-paths: test-results/**/*.xml
           token: ${{ secrets.TRUNK_API_TOKEN }}
         continue-on-error: true
 
@@ -236,8 +236,8 @@ jobs:
       - name: Upload test results to Trunk
         uses: trunk-io/analytics-uploader@main
         with:
-          org_url_slug: replay
-          junit_paths: test-results/**/*.xml
+          org-url-slug: replay
+          junit-paths: test-results/**/*.xml
           token: ${{ secrets.TRUNK_API_TOKEN }}
         continue-on-error: true
 
