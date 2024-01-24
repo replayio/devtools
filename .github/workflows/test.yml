@@ -114,7 +114,7 @@ jobs:
           RECORD_REPLAY_TEST_METRICS: 1
           AUTOMATED_TEST_SECRET: ${{ secrets.AUTOMATED_TEST_SECRET }}
           AUTHENTICATED_TESTS_WORKSPACE_API_KEY: ${{ secrets.AUTHENTICATED_TESTS_WORKSPACE_API_KEY }}
-      - name: Archive Playwright report results with code coverage 
+      - name: Archive Playwright report results with code coverage
         uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -126,6 +126,14 @@ jobs:
         with:
           api-key: ${{ env.RECORD_REPLAY_API_KEY }}
           public: true
+      - name: Upload test results to Trunk
+        uses: trunk-io/analytics-uploader@main
+        with:
+          org_url_slug: replay
+          junit_paths: test-results/**/*.xml
+          token: ${{ secrets.TRUNK_API_TOKEN }}
+        continue-on-error: true
+
   authenticated-e2etest:
     name: Authenticated end-to-end tests (${{ matrix.shard }})
     runs-on: ubuntu-latest
@@ -175,7 +183,7 @@ jobs:
           RECORD_REPLAY_TEST_METRICS: 1
           AUTOMATED_TEST_SECRET: ${{ secrets.AUTOMATED_TEST_SECRET }}
           AUTHENTICATED_TESTS_WORKSPACE_API_KEY: ${{ secrets.AUTHENTICATED_TESTS_WORKSPACE_API_KEY }}
-      - name: Archive Playwright report results with code coverage 
+      - name: Archive Playwright report results with code coverage
         uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -187,6 +195,14 @@ jobs:
         with:
           api-key: ${{ env.RECORD_REPLAY_API_KEY }}
           public: true
+      - name: Upload test results to Trunk
+        uses: trunk-io/analytics-uploader@main
+        with:
+          org_url_slug: replay
+          junit_paths: test-results/**/*.xml
+          token: ${{ secrets.TRUNK_API_TOKEN }}
+        continue-on-error: true
+
   unit-test:
     name: Unit Tests
     runs-on: ubuntu-latest
@@ -217,6 +233,14 @@ jobs:
           YARN_CHECKSUM_BEHAVIOR: "update"
       - name: Run tests
         run: yarn test
+      - name: Upload test results to Trunk
+        uses: trunk-io/analytics-uploader@main
+        with:
+          org_url_slug: replay
+          junit_paths: test-results/**/*.xml
+          token: ${{ secrets.TRUNK_API_TOKEN }}
+        continue-on-error: true
+
   merge-coverage-reports:
     # Merge reports after playwright-tests, even if some shards have failed
     if: always()
@@ -256,7 +280,7 @@ jobs:
         id: merge-monocart-reports
         run: |
           yarn ts-node packages/e2e-tests/scripts/merge-monocart-reports.ts ./test-results
-      - name: Archive merged Playwright report results with code coverage 
+      - name: Archive merged Playwright report results with code coverage
         uses: actions/upload-artifact@v4
         id: upload-coverage-report
         if: always()

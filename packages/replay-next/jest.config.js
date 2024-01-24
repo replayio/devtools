@@ -1,3 +1,5 @@
+process.env.JEST_JUNIT_ADD_FILE_ATTRIBUTE = "true";
+
 module.exports = {
   moduleNameMapper: {
     "^replay-next/(.*)": "<rootDir>/$1",
@@ -39,4 +41,16 @@ module.exports = {
     "^.+\\.module\\.(css|sass|scss)$",
   ],
   setupFilesAfterEnv: ["<rootDir>/jest.setupEnv.js"],
+  reporters: [
+    "default",
+    ["jest-junit", {
+      outputDirectory: "<rootDir>/../../test-results",
+      outputName: "replay-next-test-result-jest.xml",
+      addFileAttribute: "true",
+      uniqueOutputName: "true",
+      ancestorSeparator: "",
+      includeConsoleOutput: "true",
+      reportTestSuiteErrors: "true",
+    }]
+  ]
 };

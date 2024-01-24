@@ -11796,6 +11796,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"jest-junit@npm:^16.0.0":
+  version: 16.0.0
+  resolution: "jest-junit@npm:16.0.0"
+  dependencies:
+    mkdirp: ^1.0.4
+    strip-ansi: ^6.0.1
+    uuid: ^8.3.2
+    xml: ^1.0.1
+  checksum: 412aa4bfeec4254a9b34f417fda79107c7cbd295e56ffeb299ac9c977545910fbabe57c91c6cd1f12b700d4a1f60f79872b0075003f02da87d463e30fc2d9d78
+  languageName: node
+  linkType: hard
+
 "jest-leak-detector@npm:^28.1.1":
   version: 28.1.1
   resolution: "jest-leak-detector@npm:28.1.1"
@@ -15571,6 +15583,7 @@ __metadata:
     jest: ^28.0.2
     jest-environment-jsdom: ^28.0.2
     jest-in-case: ^1.0.2
+    jest-junit: ^16.0.0
     jwt-decode: ^3.1.2
     launchdarkly-js-client-sdk: ^3.0.0
     lexical: ^0.6.5
@@ -18824,6 +18837,13 @@ __metadata:
     eventemitter3: ^2.0.0
     xml-lexer: ^0.2.2
   checksum: d4b4ca6eb2d61c17d2df2be73dd82a393ae88a4cd10c5152f9908bf3e3bafa5562ce4b63df31ef198bc9a7c8447d4c277c98622438da5b32abf55c2f15984bfa
+  languageName: node
+  linkType: hard
+
+"xml@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "xml@npm:1.0.1"
+  checksum: 11b5545ef3f8fec3fa29ce251f50ad7b6c97c103ed4d851306ec23366f5fa4699dd6a942262df52313a0cd1840ab26256da253c023bad3309d8ce46fe6020ca0
   languageName: node
   linkType: hard
 

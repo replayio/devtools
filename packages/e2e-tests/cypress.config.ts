@@ -8,6 +8,10 @@ export default defineConfig({
     baseUrl: "http://localhost:8080",
     screenshotOnRunFailure: false,
     video: false,
+    reporter: "junit",
+    reporterOptions: {
+      mochaFile: "test-results/e2e-test-results-cypress-[hash].xml",
+    },
     setupNodeEvents(on, config) {
       cypressReplay(on, config);
       return config;

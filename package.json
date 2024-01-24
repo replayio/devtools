@@ -178,6 +178,7 @@
     "jest": "^28.0.2",
     "jest-environment-jsdom": "^28.0.2",
     "jest-in-case": "^1.0.2",
+    "jest-junit": "^16.0.0",
     "mini-css-extract-plugin": "^2.6.0",
     "monocart-reporter": "^2.0.4",
     "next-compose-plugins": "^2.2.1",
