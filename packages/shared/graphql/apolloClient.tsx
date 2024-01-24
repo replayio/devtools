@@ -19,7 +19,7 @@ import { createClient } from "graphql-ws";
 import memoizeOne from "memoize-one";
 
 import { defer } from "protocol/utils";
-import { hasApiKey, isE2ETest } from "shared/utils/environment";
+import { hasApiKey, isTest } from "shared/utils/environment";
 
 export let clientWaiter = defer<ApolloClient<NormalizedCacheObject>>();
 
@@ -33,7 +33,7 @@ export async function query<TData = any, TVariables = OperationVariables>(
 export async function mutate<TData = any, TVariables = OperationVariables>(
   options: MutationOptions<TData, TVariables>
 ) {
-  if (isE2ETest() && !hasApiKey()) {
+  if (isTest() && !hasApiKey()) {
     // Recordings of failed e2e tests may show the Next.js error popup triggered by a failed graphql mutation,
     // making them hard to work with, so disable mutations unless the user is authenticated.
     return;
