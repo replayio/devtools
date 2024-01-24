@@ -1,9 +1,9 @@
 import { Locator, Page } from "@playwright/test";
 import chalk from "chalk";
 
-import { openContextMenu } from "../../helpers/console-panel";
-import { selectContextMenuItem } from "../../helpers/context-menu";
-import { debugPrint } from "../../helpers/utils";
+import { openContextMenu } from "./console-panel";
+import { selectContextMenuItem } from "./context-menu";
+import { debugPrint } from "./utils";
 
 export const noTestRunsMessage = (page: Page) => page.locator('[data-test-id="NoTestRuns"]');
 export const noTestRunSelectedMessage = (page: Page) =>

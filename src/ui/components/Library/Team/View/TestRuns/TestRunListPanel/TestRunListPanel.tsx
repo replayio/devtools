@@ -90,7 +90,7 @@ export default function TestRunListPanel() {
         <div className="grid w-full grid-cols-3 gap-2 bg-bodyBgcolor">
           <div
             className={dropdownStyles.dropdownTrigger}
-            data-test-id="TestRunsPage-ResultFilter-DropdownTrigger"
+            data-testid="TestRunsPage-ResultFilter-DropdownTrigger"
             onClick={onClickStatusFilter}
             onKeyDown={onKeyDownStatusFilter}
             tabIndex={0}

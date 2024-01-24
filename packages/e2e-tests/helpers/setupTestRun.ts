@@ -1,4 +1,3 @@
-import * as crypto from "crypto";
 import axios from "axios";
 
 import config from "../config";
@@ -34,6 +33,12 @@ interface TestRunTestInputModel {
   recordingIds: string[];
 }
 
+// The objects below represent different test cases that could be produced by
+// the test runner plugins. This data is used to create test runs and tests used
+// to validate the behavior of the test suite dashboard. The recording ids
+// listed need to be valid, non-deleted recordings so they are returned by the
+// backend in the dashboard queries but the recordings are never opened by these
+// tests so they do not need to be refreshed.
 export const testRunStates = {
   SUCCESS_IN_MAIN_WITH_SOURCE: {
     runnerName: "playwright",

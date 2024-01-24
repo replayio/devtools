@@ -2,7 +2,7 @@ import crypto from "crypto";
 import { Page, test as base } from "@playwright/test";
 import axios from "axios";
 
-import { setupTestRun, testRunStates } from "./helpers/testRunsFixtureSetup";
+import { setupTestRun, testRunStates } from "./helpers/setupTestRun";
 
 type TestRunSetupFixture = {
   testRunState: keyof typeof testRunStates;
