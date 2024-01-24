@@ -168,7 +168,7 @@ export async function jumpToLogPointHit(
   await page.keyboard.press("Enter");
 }
 
-async function scrollUntilLineIsVisible(page: Page, lineNumber: number) {
+export async function scrollUntilLineIsVisible(page: Page, lineNumber: number) {
   const lineLocator = await getSourceLine(page, lineNumber);
 
   // Don't rely on lineLocator.isVisible() because it can give false positives for partially visible rows
