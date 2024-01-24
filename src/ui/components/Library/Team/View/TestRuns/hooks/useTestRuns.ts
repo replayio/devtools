@@ -11,33 +11,24 @@ import { testRunsIntervalCache } from "../suspense/TestRunsCache";
 
 const EMPTY_ARRAY: any[] = [];
 
-export function useTestRuns(): { testRuns: TestRun[]; status: Status } {
+export function useTestRuns(): { testRuns: TestRun[] } {
   const graphQLClient = useContext(GraphQLClientContext);
   const { teamId } = useContext(TeamContext);
   const { startTime, endTime } = useContext(TimeFilterContext);
-  const [testRuns, setTestRuns] = useState<TestRun[]>([]);
 
   const accessToken = useToken();
 
-  const { value = EMPTY_ARRAY, status } = useImperativeIntervalCacheValues(
-    testRunsIntervalCache,
-    startTime.getTime(),
-    endTime.getTime(),
-    graphQLClient,
-    accessToken?.token ?? null,
-    teamId
-  );
-
-  useEffect(() => {
-    if (status === STATUS_PENDING) {
-      // To avoid resetting the test runs to an empty array when loading
-      return;
-    }
-
-    setTestRuns(value);
-  }, [value, status]);
+  const testRuns = teamId
+    ? testRunsIntervalCache.read(
+        startTime.getTime(),
+        endTime.getTime(),
+        graphQLClient,
+        accessToken?.token ?? null,
+        teamId
+      )
+    : EMPTY_ARRAY;
 
   const testRunsDesc = useMemo(() => [...testRuns].reverse(), [testRuns]);
 
-  return { testRuns: testRunsDesc, status };
+  return { testRuns: testRunsDesc };
 }

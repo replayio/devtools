@@ -22,8 +22,6 @@ export default function TestRunListPanel() {
     setFilterByBranch,
     setFilterByStatus,
     setFilterByText,
-    testRunsLoading,
-    testRuns,
   } = useContext(TestRunsContext);
   const { team } = useContext(TeamContext);
   const { filterByTime, setFilterByTime } = useContext(TimeFilterContext);
@@ -85,7 +83,6 @@ export default function TestRunListPanel() {
 
   return (
     <div className="relative flex h-full w-full flex-col gap-4 overflow-hidden rounded-xl bg-bodyBgcolor p-2">
-      {testRunsLoading && testRuns.length > 0 && <IndeterminateProgressBar />}
       <div className="flex flex-col gap-2">
         <div className="grid w-full grid-cols-3 gap-2 bg-bodyBgcolor">
           <div
@@ -135,26 +132,14 @@ export default function TestRunListPanel() {
           value={filterByTextForDisplay}
         />
       </div>
-      {testRunsLoading && testRuns.length === 0 ? (
-        <div className="flex h-full items-center justify-center">
-          <LibrarySpinner />
-        </div>
-      ) : (
-        <TestRunsStats />
-      )}
+      <TestRunsStats />
       <div
         className="grow"
         data-filtered-by-status={filterByStatus}
         data-filtered-by-text={filterByText}
         data-test-id="TestRunList"
       >
-        {testRunsLoading && testRuns.length === 0 ? (
-          <div className="flex h-full items-center justify-center">
-            <LibrarySpinner />
-          </div>
-        ) : (
-          <TestRunList />
-        )}
+        <TestRunList />
       </div>
     </div>
   );

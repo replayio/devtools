@@ -12,8 +12,8 @@ export function ExecutionList({
 }: {
   selectedSpecTests: TestRunTestWithRecordings[];
 }) {
-  const { testRunIdForSuspense: testRunId } = useContext(TestRunsContext);
-  const { testRun } = useTestRunDetailsSuspends(testRunId);
+  const { testRunIdForSuspense } = useContext(TestRunsContext);
+  const { testRun } = useTestRunDetailsSuspends(testRunIdForSuspense);
   const noRecordings = selectedSpecTests.every(test =>
     test.executions.every(e => e.recordings.length === 0)
   );

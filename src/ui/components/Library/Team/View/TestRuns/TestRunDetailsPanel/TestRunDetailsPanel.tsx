@@ -8,14 +8,12 @@ import { RunResults } from "./RunResults";
 import { RunSummary } from "./RunSummary";
 
 export function TestRunDetailsPanel() {
-  const { testRunIdForSuspense: testRunId, testRuns } = useContext(TestRunsContext);
+  const { testRunId, testRunIdForSuspense, testRunPending } = useContext(TestRunsContext);
 
-  const { durationMs } = useTestRunDetailsSuspends(testRunId);
+  const { durationMs, testRun } = useTestRunDetailsSuspends(testRunIdForSuspense);
   const [filterCurrentRunByStatus, setFilterCurrentRunByStatus] = useState<
     "all" | "failed-and-flaky"
   >("all");
-
-  const testRun = testRuns.find(testRun => testRun.id === testRunId);
 
   let children = null;
   if (testRun) {

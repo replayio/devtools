@@ -2,9 +2,10 @@ import { useContext, useMemo } from "react";
 import ReactVirtualizedAutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 
-import { TestRun } from "shared/test-suites/TestRun";
+import { TestRun, getTestRunTitle } from "shared/test-suites/TestRun";
 
 import { TestSuitePanelMessage } from "../../TestSuitePanelMessage";
+import { useTestRuns } from "../hooks/useTestRuns";
 import { TestRunsContext } from "../TestRunsContextRoot";
 import { TestRunListItem } from "./TestRunListItem";
 import styles from "./TestRunList.module.css";
@@ -15,7 +16,49 @@ type ItemData = {
 };
 
 export function TestRunList() {
-  const { filterByText, testRunsLoading, testRuns, testRunCount } = useContext(TestRunsContext);
+  const { filterByText, filterByBranch, filterByStatus } = useContext(TestRunsContext);
+  const { testRuns } = useTestRuns();
+  const filteredTestRuns = useMemo(() => {
+    let filteredTestRuns = testRuns;
+
+    if (filterByBranch === "primary" || filterByStatus === "failed" || filterByText !== "") {
+      const lowerCaseText = filterByText.toLowerCase();
+
+      filteredTestRuns = filteredTestRuns.filter(testRun => {
+        if (filterByStatus === "failed") {
+          if (testRun.results.counts.failed === 0) {
+            return false;
+          }
+        }
+
+        const branchName = testRun.source?.branchName ?? "";
+
+        if (filterByBranch === "primary") {
+          // TODO This should be configurable by Workspace
+          if (branchName !== "main" && branchName !== "master") {
+            return false;
+          }
+        }
+
+        if (filterByText !== "") {
+          const user = testRun.source?.user ?? "";
+          const title = getTestRunTitle(testRun);
+
+          if (
+            !branchName.toLowerCase().includes(lowerCaseText) &&
+            !user.toLowerCase().includes(lowerCaseText) &&
+            !title.toLowerCase().includes(lowerCaseText)
+          ) {
+            return false;
+          }
+        }
+
+        return true;
+      });
+    }
+
+    return filteredTestRuns;
+  }, [filterByBranch, filterByStatus, filterByText, testRuns]);
 
   const itemData = useMemo<ItemData>(
     () => ({
@@ -25,7 +68,7 @@ export function TestRunList() {
     [filterByText, testRuns]
   );
 
-  if (!testRunsLoading && testRuns.length === 0 && testRunCount > 0) {
+  if (testRuns.length > 0 && filteredTestRuns.length === 0) {
     return (
       <TestSuitePanelMessage data-test-id="NoTestRuns" className={styles.message}>
         No test runs match the current filters

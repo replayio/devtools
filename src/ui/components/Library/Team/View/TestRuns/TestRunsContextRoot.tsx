@@ -5,18 +5,13 @@ import {
   SetStateAction,
   createContext,
   useDeferredValue,
-  useEffect,
-  useMemo,
+  useLayoutEffect,
   useState,
   useTransition,
 } from "react";
-import { STATUS_PENDING } from "suspense";
 
-import { TestRun, getTestRunTitle } from "shared/test-suites/TestRun";
 import { useGetTeamRouteParams } from "ui/components/Library/Team/utils";
 import { trackEvent } from "ui/utils/telemetry";
-
-import { useTestRuns } from "./hooks/useTestRuns";
 
 type TestRunsContextType = {
   filterByBranch: "all" | "primary";
@@ -29,9 +24,6 @@ type TestRunsContextType = {
   setFilterByStatus: Dispatch<SetStateAction<"all" | "failed">>;
   setFilterByText: Dispatch<SetStateAction<string>>;
   setFilterTestsByText: Dispatch<SetStateAction<string>>;
-  testRunsLoading: boolean;
-  testRuns: TestRun[];
-  testRunCount: number;
   testRunIdForSuspense: string | null;
   testRunId: string | null;
   testRunPending: boolean;
@@ -42,9 +34,10 @@ type TestRunsContextType = {
 export const TestRunsContext = createContext<TestRunsContextType>(null as any);
 
 export function TestRunsContextRoot({ children }: { children: ReactNode }) {
-  const { teamId, testRunId: defaultTestRunId, testId } = useGetTeamRouteParams();
-  const { testRuns, status } = useTestRuns();
-  const [localTestRunId, setTestRunId] = useState<string | null>(defaultTestRunId ?? null);
+  const { teamId, testRunId, testId } = useGetTeamRouteParams();
+  const [testRunIdForSuspense, setTestRunIdForSuspense] = useState<string | null>(
+    testRunId ?? null
+  );
   const [filterByBranch, setFilterByBranch] = useState<"all" | "primary">("all");
   const [filterByStatus, setFilterByStatus] = useState<"all" | "failed">("all");
 
@@ -53,62 +46,14 @@ export function TestRunsContextRoot({ children }: { children: ReactNode }) {
   const [filterTestsByText, setFilterTestsByText] = useState("");
   const router = useRouter();
 
-  const testRunId = defaultTestRunId ?? testRuns[0]?.id;
-
-  const filteredTestRuns = useMemo(() => {
-    let filteredTestRuns = testRuns;
-
-    if (filterByBranch === "primary" || filterByStatus === "failed" || filterByText !== "") {
-      const lowerCaseText = filterByText.toLowerCase();
-
-      filteredTestRuns = filteredTestRuns.filter(testRun => {
-        if (filterByStatus === "failed") {
-          if (testRun.results.counts.failed === 0) {
-            return false;
-          }
-        }
-
-        const branchName = testRun.source?.branchName ?? "";
-
-        if (filterByBranch === "primary") {
-          // TODO This should be configurable by Workspace
-          if (branchName !== "main" && branchName !== "master") {
-            return false;
-          }
-        }
-
-        if (filterByText !== "") {
-          const user = testRun.source?.user ?? "";
-          const title = getTestRunTitle(testRun);
-
-          if (
-            !branchName.toLowerCase().includes(lowerCaseText) &&
-            !user.toLowerCase().includes(lowerCaseText) &&
-            !title.toLowerCase().includes(lowerCaseText)
-          ) {
-            return false;
-          }
-        }
-
-        return true;
+  const [isTestRunPending, startTestRunTransition] = useTransition();
+  useLayoutEffect(() => {
+    if (testRunId) {
+      setFilterTestsByText("");
+      startTestRunTransition(() => {
+        setTestRunIdForSuspense(testRunId);
       });
     }
-
-    return filteredTestRuns;
-  }, [filterByBranch, filterByStatus, filterByText, testRuns]);
-
-  useEffect(() => {
-    if (!testRunId && testRuns?.length > 0) {
-      router.replace(`/team/${teamId}/runs/${testRuns[0]?.id}`);
-    }
-  }, [testRunId, testRuns]);
-
-  const [isTestRunPending, startTestRunTransition] = useTransition();
-  useEffect(() => {
-    startTestRunTransition(() => {
-      setTestRunId(testRunId);
-      setFilterTestsByText("");
-    });
   }, [testRunId]);
 
   return (
@@ -127,12 +72,9 @@ export function TestRunsContextRoot({ children }: { children: ReactNode }) {
         setFilterByStatus,
         setFilterByText,
         setFilterTestsByText,
-        testRunIdForSuspense: localTestRunId,
-        testRunId: testRunId,
+        testRunIdForSuspense: testRunIdForSuspense,
+        testRunId: testRunId ?? null,
         testRunPending: isTestRunPending,
-        testRunsLoading: status === STATUS_PENDING,
-        testRuns: filteredTestRuns,
-        testRunCount: status === STATUS_PENDING ? 0 : testRuns.length,
         testId: testId ?? null,
         setTestId: testId => {
           trackEvent("test_dashboard.select_test", { view: "runs" });

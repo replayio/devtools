@@ -42,7 +42,13 @@ function TestRunsContent() {
     <div className="flex w-full flex-grow flex-row p-1">
       <PanelGroup autoSaveId="Library:TestRuns" direction="horizontal">
         <Panel minSize={20} order={1}>
-          <TestRunListPanel />
+          <div
+            className={`flex h-full w-full items-center justify-center overflow-hidden rounded-xl ${styles.testReplayDetails}`}
+          >
+            <Suspense fallback={<LibrarySpinner />}>
+              <TestRunListPanel />
+            </Suspense>
+          </div>
         </Panel>
 
         <PanelResizeHandle className="h-full w-1" />

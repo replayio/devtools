@@ -12,9 +12,9 @@ import styles from "./TestRunTestPanel.module.css";
 
 export function TestRunTestPanel() {
   const { testId, filterTestsByText } = useContext(TestRunsContext);
-  const { testRunIdForSuspense: testRunId, testRuns } = useContext(TestRunsContext);
+  const { testRunIdForSuspense } = useContext(TestRunsContext);
 
-  const { groupedTests, tests } = useTestRunDetailsSuspends(testRunId);
+  const { groupedTests, tests, testRun } = useTestRunDetailsSuspends(testRunIdForSuspense);
   const selectedSpecTests =
     // Select tests that not filtered in second panel
     tests
@@ -30,12 +30,7 @@ export function TestRunTestPanel() {
         No test data available for this test run
       </TestSuitePanelMessage>
     );
-  } else if (
-    !testId ||
-    groupedTests === null ||
-    selectedTest == null ||
-    !testRuns.some(t => t.id === testRunId)
-  ) {
+  } else if (!testId || groupedTests === null || selectedTest == null || !testRun) {
     return (
       <TestSuitePanelMessage data-test-id="NoTestSelected">
         Select a test to see its details here
