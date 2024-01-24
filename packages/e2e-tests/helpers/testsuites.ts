@@ -70,6 +70,10 @@ export function getTestSuiteResult(page: Page) {
   return getByTestName(page, "TestSuiteResult");
 }
 
+export function getResultDropdown(page: Page) {
+  return page.getByTestId("TestRunsPage-ResultFilter-DropdownTrigger");
+}
+
 export async function getTestSuiteResultsPassedCount(page: Page): Promise<number | null> {
   return locatorTextToNumber(getByTestName(page, "TestSuiteResultsPassedCount"));
 }
