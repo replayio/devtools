@@ -1,5 +1,7 @@
 import { DocumentNode } from "graphql";
 
+import { graphqlClientIdHeader } from "shared/graphql/clientIdHeader";
+
 type Data = {
   operationName: string;
   query: string | DocumentNode;
@@ -42,6 +44,7 @@ export class GraphQLClient implements GraphQLClientInterface {
         ...(accessToken && {
           Authorization: `Bearer ${accessToken}`,
         }),
+        ...graphqlClientIdHeader(),
         "Content-Type": "application/json",
       },
       body: JSON.stringify(data),

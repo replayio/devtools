@@ -18,8 +18,8 @@ import { getMainDefinition } from "@apollo/client/utilities";
 import { createClient } from "graphql-ws";
 import memoizeOne from "memoize-one";
 
-import { generateUUID } from "devtools/shared/generate-uuid";
 import { defer } from "protocol/utils";
+import { graphqlClientIdHeader } from "shared/graphql/clientIdHeader";
 import { hasApiKey, isTest } from "shared/utils/environment";
 
 export let clientWaiter = defer<ApolloClient<NormalizedCacheObject>>();
@@ -116,12 +116,8 @@ export function createApolloCache() {
 }
 
 function createHttpLink(token: string | undefined) {
-  // We generate a client ID so that we can easily filter backend requests down to a specific client
-  // browser tab.
-  const clientId = generateUUID();
-
   const headers: Record<string, string> = {
-    ["Replay-Client-ID"]: clientId,
+    ...graphqlClientIdHeader(),
   };
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
