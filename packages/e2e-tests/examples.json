@@ -5,12 +5,12 @@
     "requiresManualUpdate": true
   },
   "authenticated_comments.html": {
-    "recording": "b50dd5b7-ab70-4987-8987-cc3240dd2cf3",
-    "buildId": "macOS-chromium-20240110-e5625ebd3edc-50d01be708a2"
+    "recording": "94775d4e-33e7-4c02-8622-3b212503ebab",
+    "buildId": "linux-chromium-20240123-609ec6caa105-50d01be708a2"
   },
   "authenticated_logpoints.html": {
-    "recording": "aefdfcfb-33e3-420b-915a-8d3be4b683b6",
-    "buildId": "macOS-chromium-20240110-e5625ebd3edc-50d01be708a2"
+    "recording": "8f4049fa-4bb8-4717-b146-811a1bede5ed",
+    "buildId": "linux-chromium-20240123-609ec6caa105-50d01be708a2"
   },
   "breakpoints-01": {
     "recording": "c8debea5-3270-4728-8f08-2252855897cc",
@@ -22,8 +22,8 @@
     "buildId": "linux-gecko-20230919-72cad6f42a93-4d0a9f5b9de2"
   },
   "cra/dist/index_chromium.html": {
-    "recording": "513086d1-9452-43af-adc3-a8d28a7204cf",
-    "buildId": "linux-chromium-20240110-3078216bece0-50d01be708a2"
+    "recording": "4cc16148-b4d0-4897-ac53-25ccbe60ad50",
+    "buildId": "linux-chromium-20240123-609ec6caa105-50d01be708a2"
   },
   "cypress-realworld/bankaccounts.spec.js": {
     "recording": "adbd6030-7338-4768-a4a8-4286cacacf12",
@@ -31,28 +31,28 @@
     "requiresManualUpdate": true
   },
   "doc_async.html": {
-    "recording": "26fcd678-77fe-43de-b29c-e7c5ae43e609",
-    "buildId": "linux-chromium-20240110-3078216bece0-50d01be708a2"
+    "recording": "c0b469af-654d-40a8-9c55-458dee9870fb",
+    "buildId": "linux-chromium-20240123-609ec6caa105-50d01be708a2"
   },
   "doc_control_flow.html": {
-    "recording": "822cacfc-40a8-4230-9c80-9ef5b87c4520",
-    "buildId": "macOS-chromium-20240110-3078216bece0-50d01be708a2"
+    "recording": "0cd81b35-85fe-41e0-bffc-84975df0761f",
+    "buildId": "linux-chromium-20240123-609ec6caa105-50d01be708a2"
   },
   "doc_control_flow_firefox.html": {
     "recording": "8b024e1a-1e84-4424-97bd-3c2c528642fd",
     "buildId": "macOS-gecko-20220722-76bf615bc154-b7eae18423ef"
   },
   "doc_debugger_statements.html": {
-    "recording": "ed568038-f53c-4788-870c-44ca36967b1c",
-    "buildId": "macOS-chromium-20240110-3078216bece0-50d01be708a2"
+    "recording": "44d3e310-8840-4228-b644-d80d92f3bc14",
+    "buildId": "linux-chromium-20240123-609ec6caa105-50d01be708a2"
   },
   "doc_events.html": {
     "recording": "318c599b-7e5f-4dd5-a34b-0ffb37101e44",
     "buildId": "macOS-gecko-20220722-76bf615bc154-b7eae18423ef"
   },
   "doc_events_chromium.html": {
-    "recording": "5385af28-ce9b-4712-aabe-783b4762ad2b",
-    "buildId": "macOS-chromium-20240110-e5625ebd3edc-50d01be708a2"
+    "recording": "6fe23adc-09e6-44e2-8297-01ebcb4fae73",
+    "buildId": "linux-chromium-20240123-609ec6caa105-50d01be708a2"
   },
   "doc_exceptions.html": {
     "recording": "11d683a6-30bb-46c2-ab55-f8d990bffa9e",
@@ -63,8 +63,8 @@
     "buildId": "macOS-gecko-20220722-76bf615bc154-b7eae18423ef"
   },
   "doc_inspector_basic.html": {
-    "recording": "4a67386b-51ed-4291-960e-18317201d0cb",
-    "buildId": "linux-chromium-20240110-3078216bece0-50d01be708a2"
+    "recording": "14b8f627-106c-4d48-b3de-5685bf827c23",
+    "buildId": "linux-chromium-20240123-609ec6caa105-50d01be708a2"
   },
   "doc_inspector_shorthand.html": {
     "recording": "28f3f493-c7cb-43bb-a8fc-c0f661e9096d",
@@ -87,36 +87,36 @@
     "buildId": "macOS-chromium-20231208-59d13ff47173-ad0834963a29"
   },
   "doc_navigate.html": {
-    "recording": "1e08543b-64de-45fa-bb0d-c9453565f09a",
-    "buildId": "linux-chromium-20240110-3078216bece0-50d01be708a2"
+    "recording": "4f8e4f4f-987f-4938-830b-428039c82e6b",
+    "buildId": "linux-chromium-20240123-609ec6caa105-50d01be708a2"
   },
   "doc_prod_bundle.html": {
-    "recording": "6c5cbba0-c620-4649-ba4c-0afd2bf1daae",
-    "buildId": "linux-chromium-20240110-3078216bece0-50d01be708a2"
+    "recording": "6f0a99ee-4e0a-4237-a32f-58d109ce79d4",
+    "buildId": "linux-chromium-20240123-609ec6caa105-50d01be708a2"
   },
   "doc_recursion.html": {
-    "recording": "b49f38bb-79a3-404c-acbf-186aaa15968d",
-    "buildId": "macOS-chromium-20240110-e5625ebd3edc-50d01be708a2"
+    "recording": "ff6a3773-383a-4c74-bfb3-bfd13b26494a",
+    "buildId": "linux-chromium-20240123-609ec6caa105-50d01be708a2"
   },
   "doc_rr_basic.html": {
     "recording": "84bfc1b8-edf2-4d1e-b55e-c31aba7d139d",
     "buildId": "linux-gecko-20230919-72cad6f42a93-4d0a9f5b9de2"
   },
   "doc_rr_basic_chromium.html": {
-    "recording": "c5e59983-9f11-4f7a-a4b3-1b10629ce6ca",
-    "buildId": "macOS-chromium-20240110-3078216bece0-50d01be708a2"
+    "recording": "02da5eac-be78-4418-ae3e-bef8fb1540c7",
+    "buildId": "linux-chromium-20240123-609ec6caa105-50d01be708a2"
   },
   "doc_rr_blackbox.html": {
-    "recording": "865905de-ffbc-4c52-9c0a-9289df930916",
-    "buildId": "macOS-chromium-20240110-3078216bece0-50d01be708a2"
+    "recording": "852d9ece-bec7-4616-bfe1-3ddf495d73a2",
+    "buildId": "linux-chromium-20240123-609ec6caa105-50d01be708a2"
   },
   "doc_rr_console.html": {
-    "recording": "a00acf1e-3dd6-4e75-b909-bad040bc6a91",
-    "buildId": "macOS-chromium-20240110-e5625ebd3edc-50d01be708a2"
+    "recording": "0c3f19f9-78bb-4171-a157-fba3d709ae56",
+    "buildId": "linux-chromium-20240123-609ec6caa105-50d01be708a2"
   },
   "doc_rr_error.html": {
-    "recording": "214da9fa-6760-4cf1-b89b-c92d061ebabd",
-    "buildId": "linux-chromium-20240110-3078216bece0-50d01be708a2"
+    "recording": "29fb738f-9a78-46fb-8d7d-84cf4474e437",
+    "buildId": "linux-chromium-20240123-609ec6caa105-50d01be708a2"
   },
   "doc_rr_logs.html": {
     "recording": "1a735f4e-dc3f-4fcf-a41c-9bee22c7ba77",
@@ -127,24 +127,24 @@
     "buildId": "linux-gecko-20230919-72cad6f42a93-4d0a9f5b9de2"
   },
   "doc_rr_preview.html": {
-    "recording": "1cd7b33e-cf87-4ff1-9785-25821582bd96",
-    "buildId": "macOS-chromium-20240110-e5625ebd3edc-50d01be708a2"
+    "recording": "942cd72a-bbda-41de-a941-bae20cf9cc81",
+    "buildId": "linux-chromium-20240123-609ec6caa105-50d01be708a2"
   },
   "doc_rr_region_loading.html": {
-    "recording": "0271dff8-1e72-489f-8937-5cd901293dc4",
-    "buildId": "macOS-chromium-20240110-e5625ebd3edc-50d01be708a2"
+    "recording": "39147fc3-96da-430a-b4dc-da79f2e433c1",
+    "buildId": "linux-chromium-20240123-609ec6caa105-50d01be708a2"
   },
   "doc_rr_worker.html": {
-    "recording": "bc72d6e5-ee21-48c7-a59e-98d99ef2c814",
-    "buildId": "macOS-chromium-20240110-e5625ebd3edc-50d01be708a2"
+    "recording": "d5a71d57-734b-49ea-8a38-0f585adbb0d8",
+    "buildId": "linux-chromium-20240123-609ec6caa105-50d01be708a2"
   },
   "doc_stacking.html": {
     "recording": "233a22c5-428e-46f8-a1ac-4b2488ac517e",
     "buildId": "macOS-gecko-20220722-76bf615bc154-b7eae18423ef"
   },
   "doc_stacking_chromium.html": {
-    "recording": "284db28d-b148-4e00-b8e4-88dbdc46a7cb",
-    "buildId": "macOS-chromium-20240110-e5625ebd3edc-50d01be708a2"
+    "recording": "4981f045-88b5-45c6-9355-355c843abfef",
+    "buildId": "linux-chromium-20240123-609ec6caa105-50d01be708a2"
   },
   "flake/adding-spec.ts": {
     "recording": "7b0db00a-d9a9-4d2d-b816-af14a1b682a6",
@@ -152,8 +152,8 @@
     "requiresManualUpdate": true
   },
   "log_points_and_block_scope.html": {
-    "recording": "d048b96f-b9ab-4680-8e87-ac06da389577",
-    "buildId": "macOS-chromium-20240110-3078216bece0-50d01be708a2"
+    "recording": "95efeb5e-c8fc-49f6-9438-51e700dce3db",
+    "buildId": "linux-chromium-20240123-609ec6caa105-50d01be708a2"
   },
   "node/async.js": {
     "recording": "c81bddb8-3edd-45c3-b7b1-486a7e07f741",
@@ -197,12 +197,12 @@
     "buildId": "macOS-chromium-20231208-59d13ff47173-ad0834963a29"
   },
   "redux-fundamentals/dist/index.html": {
-    "recording": "446b1dd2-407a-4eb1-9798-232a1ba7c67e",
-    "buildId": "macOS-chromium-20240110-e5625ebd3edc-50d01be708a2",
+    "recording": "845410d4-8355-4815-baed-53ef57d3e1f0",
+    "buildId": "linux-chromium-20240123-609ec6caa105-50d01be708a2",
     "playwrightScript": "examples/redux-fundamentals/tests/example-script"
   },
   "redux/dist/index.html": {
-    "recording": "c70d9bf2-bee0-443c-b966-fd542fc43371",
-    "buildId": "macOS-chromium-20240110-e5625ebd3edc-50d01be708a2"
+    "recording": "8e3e7dbe-1876-4e8a-b29a-d22a26136261",
+    "buildId": "linux-chromium-20240123-609ec6caa105-50d01be708a2"
   }
 }
