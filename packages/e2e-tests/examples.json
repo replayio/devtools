@@ -13,8 +13,8 @@
     "buildId": "linux-chromium-20240123-609ec6caa105-50d01be708a2"
   },
   "breakpoints-01": {
-    "recording": "c8debea5-3270-4728-8f08-2252855897cc",
-    "buildId": "linux-chromium-20230922-bda476c612fc-4d0a9f5b9de2",
+    "recording": "d8614dc0-129b-421e-bc67-8c63048fb6c9",
+    "buildId": "linux-chromium-20240123-609ec6caa105-50d01be708a2",
     "requiresManualUpdate": true
   },
   "cra/dist/index.html": {
