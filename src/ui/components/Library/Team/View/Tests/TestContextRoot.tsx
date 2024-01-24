@@ -6,7 +6,7 @@ import {
   SetStateAction,
   createContext,
   useDeferredValue,
-  useEffect,
+  useLayoutEffect,
   useMemo,
   useState,
   useTransition,
@@ -47,7 +47,7 @@ export function TestsContextRoot({ children }: { children: ReactNode }) {
   const [filterByText, setFilterByText] = useState("");
 
   const [isTestPending, startTestTransition] = useTransition();
-  useEffect(() => {
+  useLayoutEffect(() => {
     startTestTransition(() => {
       setTestId(testId ?? null);
     });
