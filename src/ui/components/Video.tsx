@@ -1,122 +1,103 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { ScreenShot } from "@replayio/protocol";
+import { MouseEvent, useContext, useEffect, useState } from "react";
+import { useStreamingValue } from "suspense";
 
-import { PreviewNodeHighlighter } from "devtools/client/inspector/markup/components/PreviewNodeHighlighter";
-import { installObserver, refreshGraphics } from "protocol/graphics";
-import Spinner from "replay-next/components/Spinner";
-import { SessionContext } from "replay-next/src/contexts/SessionContext";
-import { getRecordingTarget } from "ui/actions/app";
-import { stopPlayback } from "ui/actions/timeline";
-import CommentsOverlay from "ui/components/Comments/VideoComments/index";
-import { NodePickerContext } from "ui/components/NodePickerContext";
-import ToggleButton from "ui/components/TestSuite/views/Toggle/ToggleButton";
-import useVideoContextMenu from "ui/components/useVideoContextMenu";
-import { getSelectedPrimaryPanel } from "ui/reducers/layout";
+import { getExecutionPoint, getTime } from "devtools/client/debugger/src/selectors";
+import Icon from "replay-next/components/Icon";
+import { LoadingProgressBar } from "replay-next/components/LoadingProgressBar";
+import { StreamingScreenShotCache } from "replay-next/src/suspense/GraphicsCache";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import {
-  getPlayback,
-  isPlaybackStalled,
-  isPlaying as isPlayingSelector,
+  getCurrentTime,
+  getHoverTime,
+  getShowHoverTimeGraphics,
+  isPlaying,
 } from "ui/reducers/timeline";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { useAppSelector } from "ui/setup/hooks";
 
 import ReplayLogo from "./shared/ReplayLogo";
-import Tooltip from "./shared/Tooltip";
+import styles from "./Video.module.css";
 
+// There are two scenarios we need to fetch graphics for:
+// (1) The current execution point has changed (e.g. the timeline has changed)
+// (2) The user is hovering over something (like a test step)
+//
+// In both cases, it should show the previous screenshot until a newer one has been fetched.
+// This prevents flickering as data is being fetched.
+//
+// In the first case, if screenshot loading fails, we should show an explicit error.
+//
+// In the second case, we should fail quietly if there is no screenshot available.
+// In that event the previous graphics (for the current execution point) will remain visible.
 export default function Video() {
-  const { accessToken } = useContext(SessionContext);
+  const replayClient = useContext(ReplayClientContext);
 
-  const dispatch = useAppDispatch();
+  const hoverTime = useAppSelector(getHoverTime);
+  const pauseExecutionPoint = useAppSelector(getExecutionPoint);
+  const pauseTime = useAppSelector(getTime);
+  const playbackTime = useAppSelector(getCurrentTime);
+  const preferHoverTime = useAppSelector(getShowHoverTimeGraphics);
+  const preferPlaybackTime = useAppSelector(isPlaying);
 
-  const panel = useAppSelector(getSelectedPrimaryPanel);
-  const highlightedNodeIds = useAppSelector(state => state.markup.highlightedNodes);
-  const playback = useAppSelector(getPlayback);
-  const recordingTarget = useAppSelector(getRecordingTarget);
-  const stalled = useAppSelector(isPlaybackStalled);
-  const isPlaying = useAppSelector(isPlayingSelector);
+  let executionPoint: string | null = null;
+  let time = 0;
+  if (preferPlaybackTime) {
+    time = playbackTime;
+  } else if (hoverTime != null && preferHoverTime) {
+    time = hoverTime;
+  } else {
+    time = pauseTime;
+    executionPoint = pauseExecutionPoint;
+  }
 
-  const { status } = useContext(NodePickerContext);
-  const isNodePickerActive = status === "active";
-  const isNodePickerInitializing = status === "initializing";
+  const streaming = StreamingScreenShotCache.stream(replayClient, time, executionPoint);
+  const { data: status, progress = 0, value: screenShot } = useStreamingValue(streaming);
 
-  const isPaused = !playback;
-  const isNodeTarget = recordingTarget == "node";
-
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  const { addComment, contextMenu, onContextMenu } = useVideoContextMenu({ canvasRef });
-
-  const [showDelayedSpinner, setShowDelayedSpinner] = useState(false);
-
+  const [prevScreenShot, setPrevScreenShot] = useState<ScreenShot | undefined>(undefined);
   useEffect(() => {
-    if (isNodePickerInitializing) {
-      const timerId = setTimeout(() => {
-        setShowDelayedSpinner(true);
-      }, 700);
-      return () => {
-        clearTimeout(timerId);
-      };
-    } else {
-      setShowDelayedSpinner(false);
+    if (screenShot != null && !preferHoverTime) {
+      setPrevScreenShot(screenShot);
     }
-  }, [isNodePickerInitializing, stalled]);
+  }, [screenShot, preferHoverTime]);
 
-  useEffect(() => {
-    installObserver();
-  }, []);
-
-  const didSeekOnMountRef = useRef(false);
-  useEffect(() => {
-    if (didSeekOnMountRef.current) {
-      return;
-    }
-
-    didSeekOnMountRef.current = true;
-
-    if (playback) {
-      refreshGraphics();
-    }
-
-    return () => {
-      didSeekOnMountRef.current = false;
-    };
-  });
-
-  const onClick = (e: React.MouseEvent) => {
-    if (isPlaying) {
-      dispatch(stopPlayback());
-    }
-
-    if (isNodePickerActive || isNodePickerInitializing || accessToken == null) {
-      return;
-    }
-
-    addComment(e);
+  const onClick = (event: MouseEvent) => {
+    // TODO [FE-2104] Handle event
   };
 
-  const showComments =
-    isPaused && !isNodeTarget && !isNodePickerActive && !isNodePickerInitializing;
+  const onContextMenu = (event: MouseEvent) => {
+    // TODO [FE-2104] Handle event
+  };
+
+  const screenShotToRender = screenShot ?? prevScreenShot;
+  const showError = status === "loading-failed" && !preferHoverTime && !preferPlaybackTime;
 
   return (
-    <div id="video" className="relative bg-toolbarBackground">
-      <div className="absolute flex h-full w-full items-center justify-center bg-chrome">
+    <div id="video" className={styles.Container}>
+      <div className={styles.Logo}>
         <ReplayLogo size="sm" color="gray" />
       </div>
 
-      <canvas id="graphics" onClick={onClick} onContextMenu={onContextMenu} ref={canvasRef} />
-      {contextMenu}
-      <CommentsOverlay showComments={showComments}>
-        {(showDelayedSpinner || stalled) && (
-          <div className="absolute bottom-5 right-5 z-20 flex opacity-100">
-            <Spinner className="w-5 animate-spin text-black" />
-          </div>
-        )}
-      </CommentsOverlay>
-      {isNodePickerInitializing ? <Tooltip label="Loading…" targetID="video" /> : null}
-      {panel === "cypress" && <ToggleButton />}
-      <div id="highlighter-root">
-        {highlightedNodeIds?.map(nodeId => (
-          <PreviewNodeHighlighter key={nodeId} nodeId={nodeId} />
-        ))}
-      </div>
+      {/* TODO [FE-2104] Remove this once references to it are gone */}
+      <canvas id="graphics" />
+
+      {screenShotToRender && (
+        <img
+          className={styles.Image}
+          src={`data:${screenShotToRender.mimeType};base64,${screenShotToRender.data}`}
+          onClick={onClick}
+          onContextMenu={onContextMenu}
+        />
+      )}
+
+      {/* TODO [FE-2104] Add comment overlay */}
+      {/* TODO [FE-2104] Add DOM element highlight overlay */}
+
+      {progress < 1 && <LoadingProgressBar className={styles.Loading} key={executionPoint} />}
+      {showError && (
+        <div className={styles.Error} title="Could not load screenshot">
+          <Icon className={styles.ErrorIcon} type="error" />
+        </div>
+      )}
     </div>
   );
 }

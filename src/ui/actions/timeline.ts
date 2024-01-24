@@ -39,7 +39,6 @@ import {
   addScreenForPoint,
   gPaintPoints,
   getFirstMeaningfulPaint,
-  getGraphicsAtTime,
   mostRecentIndex,
   mostRecentPaintOrMouseEvent,
   nextPaintEvent,
@@ -54,6 +53,7 @@ import {
   sessionEndPointCache,
 } from "replay-next/src/suspense/ExecutionPointsCache";
 import { framesCache } from "replay-next/src/suspense/FrameCache";
+import { StreamingScreenShotCache } from "replay-next/src/suspense/GraphicsCache";
 import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { FindTargetCommand, resumeTargetCache } from "replay-next/src/suspense/ResumeTargetCache";
 import { screenshotCache } from "replay-next/src/suspense/ScreenshotCache";
@@ -452,14 +452,14 @@ export function playbackPoints(
   begin: { time: number; point?: string },
   end: { time: number; point?: string }
 ): UIThunkAction {
-  return async (dispatch, getState) => {
+  return async (dispatch, getState, { replayClient }) => {
     dispatch(unhighlightNode());
 
     let beginDate = Date.now();
     let currentDate = beginDate;
     let currentTime = begin.time;
-    let nextGraphicsTime!: number;
-    let nextGraphicsPromise!: ReturnType<typeof getGraphicsAtTime>;
+    let nextGraphicsTime: number | null = null;
+    let nextGraphicsPromise: PromiseLike<any> | null = null;
     let endPointScreenPromise: Promise<ScreenShot | undefined> = Promise.resolve(undefined);
 
     if (begin.point) {
@@ -472,14 +472,21 @@ export function playbackPoints(
 
     const prepareNextGraphics = () => {
       nextGraphicsTime = snapTimeForPlayback(nextPaintOrMouseEvent(currentTime)?.time || end.time);
-      nextGraphicsPromise = getGraphicsAtTime(nextGraphicsTime);
-      dispatch(precacheScreenshots(nextGraphicsTime));
+
+      // TODO [FE-2104] Pass the execution point (if we have one)
+      const streaming = StreamingScreenShotCache.stream(replayClient, nextGraphicsTime, null);
+      nextGraphicsPromise = streaming.resolver;
+
+      assert(nextGraphicsPromise);
+
+      dispatch(precacheScreenshots(nextGraphicsTime, nextGraphicsPromise));
     };
     const shouldContinuePlayback = () => getPlayback(getState());
     prepareNextGraphics();
 
     while (shouldContinuePlayback()) {
       await new Promise(resolve => requestAnimationFrame(resolve));
+      // await new Promise(resolve => setTimeout(resolve, 1000));
       if (!shouldContinuePlayback()) {
         return;
       }
@@ -505,7 +512,7 @@ export function playbackPoints(
         })
       );
 
-      if (currentTime >= nextGraphicsTime) {
+      if (nextGraphicsTime != null && currentTime >= nextGraphicsTime) {
         try {
           let maybeNextGraphics = await Promise.race([nextGraphicsPromise, waitForTime(500)]);
           if (!maybeNextGraphics) {
@@ -532,7 +539,7 @@ export function playbackPoints(
               })
             );
           }
-        } catch (e) {}
+        } catch (error) {}
 
         prepareNextGraphics();
       }
@@ -807,8 +814,11 @@ const PRECACHE_DURATION: number = 5000;
 
 let precacheBeginTime: number = -1;
 
-export function precacheScreenshots(beginTime: number): UIThunkAction {
-  return async (dispatch, getState) => {
+export function precacheScreenshots(
+  beginTime: number,
+  graphicsPromise: PromiseLike<any>
+): UIThunkAction {
+  return async (dispatch, getState, { replayClient }) => {
     const recordingDuration = getRecordingDuration(getState());
     if (!recordingDuration) {
       return;
@@ -833,7 +843,7 @@ export function precacheScreenshots(beginTime: number): UIThunkAction {
       const paintPoint = gPaintPoints[index];
       // the client isn't used in the cache key, so it's OK to pass a dummy value here
       if (!screenshotCache.getValueIfCached(null as any, paintPoint.point, paintPoint.paintHash)) {
-        const graphicsPromise = getGraphicsAtTime(time);
+        StreamingScreenShotCache.prefetch(replayClient, time, null);
 
         const precachedTime = Math.max(time - SNAP_TIME_INTERVAL, beginTime);
         if (precachedTime > getPlaybackPrecachedTime(getState())) {
