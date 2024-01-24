@@ -528,7 +528,7 @@
 
   /* DevTools header (Dark) */
   --theme-toggle-bgcolor: var(--theme-base-85);
-  --theme-toggle-color: white;
+  --theme-toggle-color: var(--theme-icon-color);
   --theme-toggle-handle-bgcolor: var(--theme-base-100);
   --title-hover-bgcolor: var(--theme-toggle-bgcolor);
 
@@ -1074,7 +1074,7 @@
   /* DevTools header (Light) */
 
   --theme-toggle-bgcolor: var(--theme-base-85);
-  --theme-toggle-color: var(--grey-70);
+  --theme-toggle-color: var(--theme-icon-color);
   --theme-toggle-handle-bgcolor: var(--theme-base-100);
   --title-hover-bgcolor: #e6e6e6;
 
