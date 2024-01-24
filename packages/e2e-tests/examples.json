@@ -83,8 +83,8 @@
     "buildId": "macOS-gecko-20220722-76bf615bc154-b7eae18423ef"
   },
   "doc_minified_chromium.html": {
-    "recording": "7f769195-a0d1-4c20-9c8e-d33af3285a6c",
-    "buildId": "macOS-chromium-20231208-59d13ff47173-ad0834963a29"
+    "recording": "f3f7d7a8-04fc-4d5c-bd24-c38bd371e282",
+    "buildId": "linux-chromium-20240123-609ec6caa105-50d01be708a2"
   },
   "doc_navigate.html": {
     "recording": "4f8e4f4f-987f-4938-830b-428039c82e6b",
@@ -193,8 +193,8 @@
     "requiresManualUpdate": true
   },
   "rdt-react-versions/dist/index.html": {
-    "recording": "1a50e5c0-9105-4f29-abac-f746ea0added",
-    "buildId": "macOS-chromium-20231208-59d13ff47173-ad0834963a29"
+    "recording": "f5bc3a10-4e83-4f8b-8286-5e13e2ef6bf7",
+    "buildId": "linux-chromium-20240123-609ec6caa105-50d01be708a2"
   },
   "redux-fundamentals/dist/index.html": {
     "recording": "845410d4-8355-4815-baed-53ef57d3e1f0",
