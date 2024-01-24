@@ -27,5 +27,5 @@
   color: white;
 }
 .ToggleOffIcon {
-  background-color: var(--theme-icon-color);
+  background-color: var(--theme-toggle-color);
 }
