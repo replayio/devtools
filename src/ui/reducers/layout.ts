@@ -1,15 +1,18 @@
 import { userData } from "shared/user-data/GraphQL/UserData";
 import { LayoutAction } from "ui/actions/layout";
+import { getMutableParamsFromURL } from "ui/setup/dynamic/url";
 import { UIState } from "ui/state";
 import { LayoutState } from "ui/state/layout";
+
+const { primaryPanel, secondaryPanel, viewMode } = getMutableParamsFromURL();
 
 export const syncInitialLayoutState: LayoutState = {
   showCommandPalette: false,
   showSupportForm: false,
-  selectedPrimaryPanel: null,
-  viewMode: userData.get("layout_defaultViewMode"),
+  selectedPrimaryPanel: primaryPanel,
+  viewMode: viewMode || userData.get("layout_defaultViewMode"),
   toolboxLayout: "ide",
-  selectedPanel: "console",
+  selectedPanel: secondaryPanel || "console",
   localNags: [],
 };
 

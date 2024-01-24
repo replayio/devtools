@@ -1,4 +1,5 @@
-import { encodeObjectToURL, getPausePointParams } from "shared/utils/environment";
+import { encodeObjectToURL } from "shared/utils/environment";
+import { getMutableParamsFromURL } from "ui/setup/dynamic/url";
 
 describe("getPauseParams", () => {
   const urlWithFocusWindow = (focusWindow: string) => {
@@ -14,7 +15,8 @@ describe("getPauseParams", () => {
     const original = window.location.href;
     window.location.href = urlWithFocusWindow(focusWindowParams);
 
-    expect(getPausePointParams()).toMatchInlineSnapshot(`
+    const { focusWindow, point, time } = getMutableParamsFromURL();
+    expect({ focusWindow, point, time }).toMatchInlineSnapshot(`
       Object {
         "focusWindow": Object {
           "begin": Object {
@@ -38,7 +40,7 @@ describe("getPauseParams", () => {
     const original = window.location.href;
     window.location.href = urlWithFocusWindow(malformedParams);
 
-    expect(getPausePointParams()?.focusWindow).toBeUndefined();
+    expect(getMutableParamsFromURL()?.focusWindow).toBeUndefined();
 
     window.location.href = original;
   });

@@ -27,7 +27,7 @@ storybook-static/
 !.yarn/versions
 .pnp.*
 *.tgz
-test/.yarn/cache/
+test/.yarn/
 *.mp4
 videos/
 .vercel

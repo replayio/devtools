@@ -3,21 +3,17 @@ import { quickOpen } from "../helpers/commands";
 import {
   addLogpoint,
   getPointPanelLocator,
+  scrollUntilLineIsVisible,
   verifyLogPointPanelContent,
   waitForSourceLineHitCounts,
 } from "../helpers/source-panel";
-import {
-  getFocusBeginTime,
-  getFocusEndTime,
-  setFocusRange,
-  setFocusRangeEndTime,
-} from "../helpers/timeline";
+import { getFocusBeginTime, getFocusEndTime, setFocusRange } from "../helpers/timeline";
 import test, { expect } from "../testFixtureCloneRecording";
 
 // We need 500...10k hits
 // Line 44 has 4.9k hits
-const sourceUrl = "react-dom.production.min.js";
-const lineNumber = 44;
+const sourceUrl = "react-dom.production.js";
+const lineNumber = 251;
 
 // trunk-ignore(gitleaks/generic-api-key)
 test.use({ exampleKey: "breakpoints-01" });
@@ -29,8 +25,9 @@ test(`logpoints-11: too-many-points-to-run-analysis UX`, async ({
   await startTest(page, recordingId);
   await openDevToolsTab(page);
 
-  await quickOpen(page, "react-dom.production.min.js");
+  await quickOpen(page, sourceUrl);
 
+  await scrollUntilLineIsVisible(page, lineNumber);
   await waitForSourceLineHitCounts(page, lineNumber);
   await addLogpoint(page, {
     lineNumber,

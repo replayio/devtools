@@ -16,7 +16,7 @@ import {
 import { extractGraphQLError } from "shared/graphql/apolloClient";
 import { Recording } from "shared/graphql/types";
 import { userData } from "shared/user-data/GraphQL/UserData";
-import { getPausePointParams, isTest } from "shared/utils/environment";
+import { isTest } from "shared/utils/environment";
 import { UIThunkAction } from "ui/actions";
 import * as actions from "ui/actions/app";
 import { getRecording } from "ui/hooks/recordings";
@@ -30,6 +30,7 @@ import {
   protocolMessagesReceived,
 } from "ui/reducers/protocolMessages";
 import { setFocusWindow } from "ui/reducers/timeline";
+import { getMutableParamsFromURL } from "ui/setup/dynamic/url";
 import type { ExpectedError, UnexpectedError } from "ui/state/app";
 import LogRocket from "ui/utils/logrocket";
 import { endMixpanelSession } from "ui/utils/mixpanel";
@@ -49,6 +50,8 @@ declare global {
     sessionMetrics: any[] | undefined;
   }
 }
+
+const { focusWindow: focusWindowFromURL } = getMutableParamsFromURL();
 
 export function getAccessibleRecording(
   recordingId: string
@@ -242,12 +245,10 @@ export function createSocket(recordingId: string): UIThunkAction {
         }
       }
 
-      const focusWindowFromParams = getPausePointParams().focusWindow;
-
       const sessionId = await createSession(
         recordingId,
         experimentalSettings,
-        focusWindowFromParams !== null ? focusWindowFromParams : undefined,
+        focusWindowFromURL !== null ? focusWindowFromURL : undefined,
         {
           onEvent: (event: ProtocolEvent) => {
             // no-op but required, apparently
@@ -358,9 +359,9 @@ export function createSocket(recordingId: string): UIThunkAction {
       const focusWindow = replayClient.getCurrentFocusWindow();
       assert(focusWindow !== null); // replayClient.configure() sets this value
       if (
-        !focusWindowFromParams ||
-        focusWindowFromParams.begin.time !== focusWindow.begin.time ||
-        focusWindowFromParams.end.time !== focusWindow.end.time
+        !focusWindowFromURL ||
+        focusWindowFromURL.begin.time !== focusWindow.begin.time ||
+        focusWindowFromURL.end.time !== focusWindow.end.time
       ) {
         dispatch(setFocusWindow({ begin: focusWindow.begin.time, end: focusWindow.end.time }));
       }
