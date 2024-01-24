@@ -99,7 +99,18 @@ export function TestsContextRoot({ children }: { children: ReactNode }) {
       tests: filteredTests,
       testsCount: status === STATUS_PENDING ? 0 : tests.length,
     };
-  }, [sortBy, filterByText, filterByTextDeferred, deferredTestId, testId, status, tests]);
+  }, [
+    sortBy,
+    filterByText,
+    filterByTextDeferred,
+    deferredTestId,
+    testId,
+    status,
+    tests,
+    isTestPending,
+    router,
+    teamId,
+  ]);
 
   return <TestContext.Provider value={value}>{children}</TestContext.Provider>;
 }
