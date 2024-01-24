@@ -4,6 +4,7 @@ import { RecordingId } from "@replayio/protocol";
 import { RecordingTarget } from "replay-next/src/suspense/BuildIdCache";
 import { compareExecutionPoints } from "replay-next/src/utils/time";
 import { Workspace } from "shared/graphql/types";
+import { getMutableParamsFromURL } from "ui/setup/dynamic/url";
 import { UIState } from "ui/state";
 import {
   AppMode,
@@ -18,6 +19,8 @@ import {
   UnexpectedError,
   UploadInfo,
 } from "ui/state/app";
+
+const { commentId } = getMutableParamsFromURL();
 
 export const initialAppState: AppState = {
   accessToken: null,
@@ -39,7 +42,7 @@ export const initialAppState: AppState = {
   recordingId: null,
   recordingTarget: null,
   recordingWorkspace: null,
-  selectedCommentId: null,
+  selectedCommentId: commentId,
   sessionId: null,
   unexpectedError: null,
   uploading: null,

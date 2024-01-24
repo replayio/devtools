@@ -150,12 +150,19 @@ You'll also probably need to specifically share that recording as "Public", espe
 
 We also now have a "golden recording" of one of our own `breakpoints-01` E2E test runs. This serves as a testbed for checking more advanced behaviors like the React and Redux routines. If we ever need to update this, just copy-paste the recording ID from a test run in our "Frontend E2E tests" workspace.
 
+### Test Suite Dashboard Tests
+
+The test suite dashboard tests (within `/test-suite-dashboard`) validate how the dashboard renders in various data scenarios created by the test runner plugins. Each scenario is modeled by an object in `./helpers/setupTestRun.ts` that represents different test run results a plugin might produce. Those objects are added to the database using the same methods the plugin would use and are retrieved by the dashboard to assert on expected behavior. We ensure multiple tests can run at the same time by generating a new UUID for the `clientKey` for the test run scenario used and looking for that UUID in the results.
+
+> _Note:_ The scenarios include the same recording ID for all recordings. That recording is never accessed by the tests but must be a valid, non-deleted recording for the backend to return the expected data in the dashboard. The recorded does not need to be re-recorded like other examples but can be updated to a new valid recording ID if necessary.
+
 ### Folder Structure
 
 From the root of the repo:
 
 - `/packages/e2e-tests`:
   - `/tests`: all of the actual E2E test files
+  - `/test-suite-dashboard`: suite of tests for the test suite dashboard which do not interact with recordings
   - `/helpers`: "page object"-style helper functions to interact with the client DOM, as well as other assorted utils
   - `/scripts/save-examples.ts`: TS-Node script to re-record "golden" recording files for different examples
   - `config.ts`: Configuration for scripts

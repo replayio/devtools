@@ -33,6 +33,12 @@ const argv = yargs
     type: "string",
     default: "",
   })
+  .option("build", {
+    alias: "b",
+    default: "",
+    description: "Only re-generate tests for recordings made with the specified build id",
+    type: "string",
+  })
   .option("runtime", {
     alias: "r",
     default: "",
@@ -52,9 +58,10 @@ const argv = yargs
 type PlaywrightScript = (page: Page, expect: typeof expectFunction) => Promise<void>;
 
 type TestExampleFile = {
+  buildId: string;
+  category: "browser" | "node";
   filename: string;
   folder: string;
-  category: "browser" | "node";
   runtime: "firefox" | "chromium" | "node";
   playwrightScript?: PlaywrightScript;
 };
@@ -101,6 +108,7 @@ async function saveRecording(
       apiKey,
       server: config.backendUrl,
       verbose: true,
+      strict: true,
     });
   }
 
@@ -115,8 +123,6 @@ async function saveRecording(
       buildId,
     },
   };
-
-  const keys = Object.keys(mutableExamplesJSON).sort();
 
   writeFileSync(examplesJsonPath, JSON.stringify(mutableExamplesJSON, null, 2));
 
@@ -168,6 +174,7 @@ async function saveExamples(
 
     if (category === examplesTarget) {
       examplesToRun.push({
+        buildId,
         category,
         filename: key,
         folder,
@@ -180,9 +187,13 @@ async function saveExamples(
   }
 
   const specificExamples = argv.example.split(",").filter(s => s.length > 0);
-
   if (specificExamples.length > 0) {
     examplesToRun = examplesToRun.filter(example => specificExamples.includes(example.filename));
+  }
+
+  const buildId = argv.build;
+  if (buildId) {
+    examplesToRun = examplesToRun.filter(example => example.buildId.includes(buildId));
   }
 
   for (const example of examplesToRun) {
@@ -385,7 +396,11 @@ async function waitUntilMessage(
     const { exampleToTestMap } = getStats();
 
     for (const recordingId of newRecordingIds) {
-      await loadRecording(recordingId);
+      try {
+        await loadRecording(recordingId);
+      } catch (e) {
+        console.log(`Error during processing: ${e}`);
+      }
     }
 
     console.log("The following tests have been impacted by this change:");
@@ -393,8 +408,9 @@ async function waitUntilMessage(
       updatedExamples
         .map(example => {
           const tests = exampleToTestMap[example];
-
-          return ` • ${chalk.yellow(example)}${tests.map(test => `\n   • ${test}`).join("")}`;
+          return tests
+            ? ` • ${chalk.yellow(example)}${tests.map(test => `\n   • ${test}`).join("")}`
+            : ` • ${chalk.red(example)} is updated, but has no associated tests`;
         })
         .join("\n")
     );

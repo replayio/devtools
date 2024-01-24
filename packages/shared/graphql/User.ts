@@ -1,14 +1,6 @@
-import { GraphQLClientInterface } from "./GraphQLClient";
-import { Nag, UserInfo } from "./types";
-
-// TODO Pass this client via Context
-let GRAPHQL_URL = "https://api.replay.io/v1/graphql";
-if (typeof window !== "undefined") {
-  const url = new URL(window.location.href);
-  if (url.searchParams.has("graphql")) {
-    GRAPHQL_URL = url.searchParams.get("graphql") as string;
-  }
-}
+import { GetUser } from "./generated/GetUser";
+import { GraphQLClientInterface, graphQLClient } from "./GraphQLClient";
+import { EmailSubscription, Nag, UserInfo } from "./types";
 
 const GetUserQuery = `
 query GetUser {
@@ -35,24 +27,17 @@ query GetUser {
 `;
 
 export async function getCurrentUserInfo(accessToken: string | null): Promise<UserInfo | null> {
-  const response = await fetch(GRAPHQL_URL, {
-    method: "POST",
-    headers: {
-      ...(accessToken && {
-        Authorization: `Bearer ${accessToken}`,
-      }),
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
+  const data = await graphQLClient.send<GetUser>(
+    {
       operationName: "GetUser",
       query: GetUserQuery,
       variables: {},
-    }),
-  });
-  const json: any = await response.json();
+    },
+    accessToken
+  );
 
   // TODO GraphQL types
-  const viewer = json.data?.viewer;
+  const viewer = data?.viewer;
   if (!viewer) {
     return null;
   }
@@ -65,8 +50,8 @@ export async function getCurrentUserInfo(accessToken: string | null): Promise<Us
     email: viewer.email,
     id: viewer.user.id,
     internal: viewer.internal,
-    nags: viewer.nags,
-    unsubscribedEmailTypes: viewer.unsubscribedEmailTypes,
+    nags: viewer.nags as Nag[],
+    unsubscribedEmailTypes: viewer.unsubscribedEmailTypes as EmailSubscription[],
     features: viewer.features || {},
   };
 }

@@ -29,9 +29,11 @@ export async function loadRecording(recordingId: string) {
   const client = new SimpleProtocolClient(new WebSocket(DISPATCH_URL), callbacks, console.log);
   client.addEventListener("Recording.processRecordingProgress", onProgress);
 
-  await client.sendCommand("Recording.processRecording", {
-    recordingId,
-  });
-
-  completeLog();
+  try {
+    await client.sendCommand("Recording.processRecording", {
+      recordingId,
+    });
+  } finally {
+    completeLog();
+  }
 }
