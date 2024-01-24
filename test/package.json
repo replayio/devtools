@@ -17,8 +17,6 @@
     "eslint-plugin-react-hooks": "^4.3.0",
     "playwright": "^1.25.1"
   },
-  "optionalDependencies": {
-  },
   "browserslist": [
     "defaults"
   ],
