@@ -1,5 +1,7 @@
 import { useContext, useState } from "react";
 
+import { filterTestRun } from "shared/test-suites/TestRun";
+
 import { TestSuitePanelMessage } from "../../TestSuitePanelMessage";
 import { useTestRunDetailsSuspends } from "../hooks/useTestRunDetailsSuspends";
 import { TestRunPanelWrapper } from "../TestRunPanelWrapper";
@@ -8,7 +10,8 @@ import { RunResults } from "./RunResults";
 import { RunSummary } from "./RunSummary";
 
 export function TestRunDetailsPanel() {
-  const { testRunIdForSuspense } = useContext(TestRunsContext);
+  const { testRunIdForSuspense, filterByText, filterByBranch, filterByStatus } =
+    useContext(TestRunsContext);
 
   const { durationMs, testRun } = useTestRunDetailsSuspends(testRunIdForSuspense);
   const [filterCurrentRunByStatus, setFilterCurrentRunByStatus] = useState<
@@ -16,7 +19,10 @@ export function TestRunDetailsPanel() {
   >("all");
 
   let children = null;
-  if (testRun) {
+  if (
+    testRun &&
+    filterTestRun(testRun, { branch: filterByBranch, status: filterByStatus, text: filterByText })
+  ) {
     children = (
       <>
         <RunSummary

@@ -66,7 +66,7 @@ export function TestRunsContextRoot({ children }: { children: ReactNode }) {
         filterTestsByText,
         selectTestRun: runId => {
           trackEvent("test_dashboard.select_run", { view: "runs" });
-          router.push(`/team/${teamId}/runs/${runId}`);
+          router.push({ pathname: `/team/${teamId}/runs/${runId}`, query: router.query });
         },
         setFilterByBranch,
         setFilterByStatus,
@@ -78,7 +78,10 @@ export function TestRunsContextRoot({ children }: { children: ReactNode }) {
         testId: testId ?? null,
         setTestId: testId => {
           trackEvent("test_dashboard.select_test", { view: "runs" });
-          router.push(`/team/${teamId}/runs/${testRunId}/tests/${testId}`);
+          router.push({
+            pathname: `/team/${teamId}/runs/${testRunId}/tests/${testId}`,
+            query: router.query,
+          });
         },
       }}
     >

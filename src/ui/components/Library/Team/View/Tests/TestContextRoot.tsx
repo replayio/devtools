@@ -86,7 +86,7 @@ export function TestsContextRoot({ children }: { children: ReactNode }) {
       filterByText: filterByTextDeferred,
       filterByTextForDisplay: filterByText,
       selectTestId: (id: string | null) => {
-        router.push(`/team/${teamId}/tests/${id}`);
+        router.push({ pathname: `/team/${teamId}/tests/${id}`, query: router.query });
         trackEvent("test_dashboard.select_test", { view: "tests" });
       },
       setSortBy,
