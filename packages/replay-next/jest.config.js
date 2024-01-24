@@ -1,5 +1,3 @@
-process.env.JEST_JUNIT_ADD_FILE_ATTRIBUTE = "true";
-
 module.exports = {
   moduleNameMapper: {
     "^replay-next/(.*)": "<rootDir>/$1",
