@@ -66,7 +66,7 @@ export function TestRunsContextRoot({ children }: { children: ReactNode }) {
         filterTestsByText,
         selectTestRun: runId => {
           trackEvent("test_dashboard.select_run", { view: "runs" });
-          router.push(`/team/${teamId}/runs/${runId}${testId ? `/tests/${testId}` : ""}`);
+          router.push(`/team/${teamId}/runs/${runId}`);
         },
         setFilterByBranch,
         setFilterByStatus,
