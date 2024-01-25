@@ -40,12 +40,12 @@ export function TestRunListItem({
 }) {
   const { date } = testRun;
 
-  const { selectTestRun, testRunIdForDisplay } = useContext(TestRunsContext);
+  const { selectTestRun, testRunId } = useContext(TestRunsContext);
 
   const title = getTestRunTitle(testRun);
 
   const failCount = testRun.results.counts.failed;
-  const isSelected = testRunIdForDisplay === testRun.id;
+  const isSelected = testRunId === testRun.id;
 
   const onClick = () => {
     selectTestRun(testRun.id);

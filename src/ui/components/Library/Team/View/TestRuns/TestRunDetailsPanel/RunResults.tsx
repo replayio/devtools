@@ -31,9 +31,9 @@ export function RunResults({
 }: {
   filterCurrentRunByStatus: "all" | "failed-and-flaky";
 }) {
-  const { filterTestsByText, testRunId } = useContext(TestRunsContext);
+  const { filterTestsByText, testRunIdForSuspense } = useContext(TestRunsContext);
   const filterByTextDeferred = useDeferredValue(filterTestsByText);
-  const { groupedTests, tests } = useTestRunDetailsSuspends(testRunId);
+  const { groupedTests, tests } = useTestRunDetailsSuspends(testRunIdForSuspense);
   assert(groupedTests !== null);
 
   const { passedRecordings, failedRecordings, flakyRecordings } = groupedTests;

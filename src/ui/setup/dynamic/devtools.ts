@@ -43,6 +43,7 @@ import timeline, {
   pointsReceived,
   setPlaybackStalled,
 } from "ui/reducers/timeline";
+import { setUpUrlParamsListener } from "ui/setup/dynamic/url";
 import { UIState } from "ui/state";
 import { ExpectedError, UnexpectedError } from "ui/state/app";
 import {
@@ -282,6 +283,8 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
   setVideoUrlCallback((url: string) => {
     store.dispatch(setVideoUrl(url));
   });
+
+  setUpUrlParamsListener(store, replayClient);
 }
 
 interface MigrationSetting {

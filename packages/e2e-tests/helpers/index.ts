@@ -87,7 +87,6 @@ export async function startLibraryTest(
 
   await page.goto(url);
 
-  await page.locator('[data-test-id="TestRunResults"]').waitFor();
   await page.locator('[data-test-id="TestRunList"]').waitFor();
   if (runId) {
     await page.waitForSelector('[data-test-id="NoTestRunSelected"]', { state: "detached" });

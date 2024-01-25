@@ -2,9 +2,10 @@ import { useContext, useMemo } from "react";
 import ReactVirtualizedAutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 
-import { TestRun } from "shared/test-suites/TestRun";
+import { TestRun, filterTestRun, getTestRunTitle } from "shared/test-suites/TestRun";
 
 import { TestSuitePanelMessage } from "../../TestSuitePanelMessage";
+import { useTestRunSuspends } from "../hooks/useTestRunSuspends";
 import { TestRunsContext } from "../TestRunsContextRoot";
 import { TestRunListItem } from "./TestRunListItem";
 import styles from "./TestRunList.module.css";
@@ -15,17 +16,28 @@ type ItemData = {
 };
 
 export function TestRunList() {
-  const { filterByText, testRunsLoading, testRuns, testRunCount } = useContext(TestRunsContext);
+  const { filterByText, filterByBranch, filterByStatus } = useContext(TestRunsContext);
+  const { testRuns } = useTestRunSuspends();
+  const itemData = useMemo<ItemData>(() => {
+    let filteredTestRuns = testRuns;
 
-  const itemData = useMemo<ItemData>(
-    () => ({
+    if (filterByBranch === "primary" || filterByStatus === "failed" || filterByText !== "") {
+      filteredTestRuns = filteredTestRuns.filter(testRun =>
+        filterTestRun(testRun, {
+          branch: filterByBranch,
+          text: filterByText,
+          status: filterByStatus,
+        })
+      );
+    }
+
+    return {
       filterByText,
-      testRuns,
-    }),
-    [filterByText, testRuns]
-  );
+      testRuns: filteredTestRuns,
+    };
+  }, [filterByBranch, filterByStatus, filterByText, testRuns]);
 
-  if (!testRunsLoading && testRuns.length === 0 && testRunCount > 0) {
+  if (testRuns.length > 0 && itemData.testRuns.length === 0) {
     return (
       <TestSuitePanelMessage data-test-id="NoTestRuns" className={styles.message}>
         No test runs match the current filters
@@ -40,7 +52,7 @@ export function TestRunList() {
           children={TestRunListRow}
           className="text-sm"
           height={height}
-          itemCount={testRuns.length}
+          itemCount={itemData.testRuns.length}
           itemData={itemData}
           itemSize={28}
           width={width}

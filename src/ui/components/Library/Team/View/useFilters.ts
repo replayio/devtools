@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 
-import { getParams, updateUrlWithParams } from "shared/utils/environment";
-
 import { View } from "./ViewContextRoot";
 
 type Surrounder = {
@@ -74,7 +72,6 @@ const useFilterString = (str: string, view: View) => {
   const setAppliedText = (newStr: string) => {
     setAppliedString(newStr);
     setDisplayedString(newStr);
-    updateUrlWithParams({ q: encodeFilter(newStr) });
   };
 
   return {
@@ -86,9 +83,8 @@ const useFilterString = (str: string, view: View) => {
 };
 
 export function useFilters(view: View) {
-  const initialString = decodeURIComponent(getParams().q || "");
   const { appliedString, displayedString, setDisplayedText, setAppliedText } = useFilterString(
-    initialString,
+    "",
     view
   );
 

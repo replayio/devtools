@@ -44,7 +44,7 @@ function Status({ test }: { test: Test }) {
 }
 
 export function TestListItem({ filterByText, test }: { filterByText: string; test: Test }) {
-  const { selectTestId, testIdForDisplay } = useContext(TestContext);
+  const { selectTestId, testId: testIdForDisplay } = useContext(TestContext);
   const isSelected = testIdForDisplay === test.testId;
 
   const onClick = () => {
