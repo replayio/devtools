@@ -10,7 +10,6 @@ export const PREFERENCES: PreferencesKey[] = [
   "backend_newControllerOnRefresh",
   "protocol_chromiumRepaints",
   "backend_profileWorkerThreads",
-  "feature_basicProcessingLoadingBar",
   "backend_disableCache",
   "backend_disableScanDataCache",
   "backend_enableRoutines",

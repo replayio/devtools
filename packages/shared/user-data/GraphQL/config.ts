@@ -148,14 +148,6 @@ export const config = {
     legacyKey: "devtools.debugger.ui.framework-grouping-on",
   },
 
-  feature_basicProcessingLoadingBar: {
-    defaultValue: Boolean(false),
-    description:
-      "Split the loading bar's progress between gathering static resources from the recording and indexing runtime information",
-    label: "Detailed loading bar",
-    legacyKey: "devtools.features.basicProcessingLoadingBar",
-  },
-
   feature_chromiumNetMonitor: {
     defaultValue: Boolean(true),
     legacyKey: "devtools.features.chromiumNetMonitor",
