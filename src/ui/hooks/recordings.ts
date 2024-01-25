@@ -295,6 +295,7 @@ export function convertRecording(
     userRole: "userRole" in rec ? (rec.userRole as RecordingRole) : undefined,
     isTest: "isTest" in rec ? rec.isTest : undefined,
     isInTestWorkspace: "isInTestWorkspace" in rec ? rec.isInTestWorkspace : undefined,
+    testRunId: null,
   };
 
   if ("workspace" in rec) {
@@ -329,6 +330,9 @@ export function convertRecording(
   }
   if ("userRole" in rec) {
     recording.userRole = rec.userRole as RecordingRole;
+  }
+  if ("testRun" in rec) {
+    recording.testRunId = rec.testRun?.id ?? null;
   }
 
   return recording;

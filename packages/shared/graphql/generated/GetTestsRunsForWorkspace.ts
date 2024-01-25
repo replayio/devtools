@@ -70,4 +70,6 @@ export interface GetTestsRunsForWorkspace {
 
 export interface GetTestsRunsForWorkspaceVariables {
   workspaceId: string;
+  startTime?: string | null;
+  endTime?: string | null;
 }

@@ -523,8 +523,13 @@
   --testsuites-v2-success-pill: var(--testsuites-success-color);
   --testsuites-v2-description: var(--secondary-accent);
   --testsuites-v2-error-bg: var(--testsuites-error-bgcolor);
-
   --circular-progress-bar-trail-color: var(--testsuites-steps-bgcolor);
+
+  --testsuites-chart-container: var(--theme-base-100);
+  --testsuites-graph-gradient-start: #02496d;
+  --testsuites-graph-gradient-end: #02496d00;
+  --testsuites-graph-gradient-stroke: var(--primary-accent);
+  --testsuites-graph-marker: var(--primary-accent-dimmed);
 
   /* DevTools header (Dark) */
   --theme-toggle-bgcolor: var(--theme-base-85);
@@ -1071,6 +1076,12 @@
   --testsuites-v2-error-bg: var(--testsuites-error-bgcolor);
   --circular-progress-bar-trail-color: var(--testsuites-steps-bgcolor);
 
+  --testsuites-chart-container: var(--theme-text-field-bgcolor);
+  --testsuites-graph-gradient-start: var(--primary-accent-dimmed);
+  --testsuites-graph-gradient-end: var(--primary-accent-dimmed);
+  --testsuites-graph-gradient-stroke: var(--primary-accent);
+  --testsuites-graph-marker: var(--theme-base-85);
+
   /* DevTools header (Light) */
 
   --theme-toggle-bgcolor: var(--theme-base-85);
@@ -1231,8 +1242,6 @@
   --context-menu-z-index: 25;
 
   /* menu item styles */
-  --context-menu-item-background-color-hover: var(--context-menu-bgcolor-hover);
-  --context-menu-item-background-color-focus: var(--context-menu-bgcolor-hover);
   --context-menu-item-color: var(--color-default);
   --context-menu-item-color-disabled: var(--color-dimmer);
   --context-menu-item-font-size: var(--font-size-regular);

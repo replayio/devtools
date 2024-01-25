@@ -1,0 +1,28 @@
+.testsuitesSuccess {
+  background-color: var(--testsuites-v2-success-icon);
+}
+
+.testsuitesFailed {
+  background-color: var(--testsuites-v2-failed-icon);
+}
+
+.testsuitesFlaky {
+  background-color: var(--testsuites-v2-flaky-icon);
+}
+
+.testStatusHeader[data-status="Failed"] {
+  color: var(--testsuites-v2-failed-header);
+}
+
+.testStatusHeader[data-status="Passed"] {
+  color: var(--testsuites-v2-success-header);
+}
+
+.testStatusHeader[data-status="Flaky"] {
+  color: var(--testsuites-v2-flaky-header);
+}
+
+.noTestsMessage {
+  position: absolute;
+  margin: -0.5rem;
+}

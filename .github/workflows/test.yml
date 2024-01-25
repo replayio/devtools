@@ -114,6 +114,7 @@ jobs:
           RECORD_REPLAY_TEST_METRICS: 1
           AUTOMATED_TEST_SECRET: ${{ secrets.AUTOMATED_TEST_SECRET }}
           AUTHENTICATED_TESTS_WORKSPACE_API_KEY: ${{ secrets.AUTHENTICATED_TESTS_WORKSPACE_API_KEY }}
+          GOLDEN_TEST_RUN_WORKSPACE_API_KEY: ${{ secrets.GOLDEN_TEST_RUN_WORKSPACE_API_KEY }}
       - name: Archive Playwright report results with code coverage 
         uses: actions/upload-artifact@v4
         if: always()
@@ -164,7 +165,7 @@ jobs:
       - name: Install Replay Playwright
         run: npx @replayio/playwright install
       - name: Run Playwright
-        run: npx playwright test --shard ${{ matrix.shard }}/1 authenticated/**/*.ts authenticated/*.ts --project replay-chromium
+        run: npx playwright test --shard ${{ matrix.shard }}/1 authenticated/ test-suite-dashboard/ --project replay-chromium
         working-directory: ./packages/e2e-tests
         env:
           REPLAY_PLAYWRIGHT_FIXTURE: 1
@@ -175,6 +176,7 @@ jobs:
           RECORD_REPLAY_TEST_METRICS: 1
           AUTOMATED_TEST_SECRET: ${{ secrets.AUTOMATED_TEST_SECRET }}
           AUTHENTICATED_TESTS_WORKSPACE_API_KEY: ${{ secrets.AUTHENTICATED_TESTS_WORKSPACE_API_KEY }}
+          GOLDEN_TEST_RUN_WORKSPACE_API_KEY: ${{ secrets.GOLDEN_TEST_RUN_WORKSPACE_API_KEY }}
       - name: Archive Playwright report results with code coverage 
         uses: actions/upload-artifact@v4
         if: always()

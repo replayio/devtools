@@ -1,0 +1,27 @@
+:root:global(.theme-dark) .replayRow:hover {
+  background-color: var(--primary-accent-dimmed-hover);
+}
+
+:root:global(.theme-light) .replayRow:hover {
+  background-color: var(--grey-10);
+}
+
+.flakyPill {
+  color: var(--theme-base-100);
+  background-color: var(--testsuites-flaky-color);
+}
+
+.failedPill {
+  color: #fff; /* we want white in both themes, or else the contrast is bad */
+  background-color: var(--testsuites-failed-color);
+}
+
+.successPill {
+  color: var(--theme-base-100);
+  background-color: var(--testsuites-success-color);
+  border-radius: 50%;
+}
+
+.testsuitesSuccess {
+  background-color: var(--testsuites-v2-success-icon);
+}

@@ -225,6 +225,7 @@ export interface Recording {
   userId?: string;
   userRole?: RecordingRole;
   workspace?: Workspace;
+  testRunId: string | null;
 }
 
 export type PlaywrightTestSources = {
@@ -338,6 +339,7 @@ export interface Workspace {
   subscription?: Subscription | null;
   isOrganization?: boolean;
   isTest?: boolean;
+  retentionLimit?: number | null;
 }
 
 export interface WorkspaceSettings {
