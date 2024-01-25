@@ -478,6 +478,16 @@ export async function warpToMessage(page: Page, text: string, line?: number) {
   await seekToConsoleMessage(page, message, line);
 }
 
+export async function warpToLastMessage(page: Page, text: string, line?: number) {
+  await openConsolePanel(page);
+
+  const messages = await findConsoleMessage(page, text);
+  const message = messages.last();
+  await message.waitFor();
+
+  await seekToConsoleMessage(page, message, line);
+}
+
 export async function setConsoleMessageAsFocusStart(page: Page, message: Locator) {
   await debugPrint(page, `Setting focus range start`, "setConsoleMessageAsFocusStart");
 
