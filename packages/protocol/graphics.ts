@@ -115,10 +115,6 @@ const gMouseClickEvents: MouseEvent[] = [];
 let gDevicePixelRatio = 1;
 
 function onPaints(paints: PaintPoint[]) {
-  if (typeof onPointsReceived === "function") {
-    onPointsReceived(paints);
-  }
-
   paints.forEach(async ({ point, time, screenShots }) => {
     const paintHash = screenShots.find(desc => desc.mimeType == "image/jpeg")!.hash;
     insertEntrySorted(gPaintPoints, { point, time, paintHash });
@@ -126,10 +122,6 @@ function onPaints(paints: PaintPoint[]) {
 }
 
 function onMouseEvents(events: MouseEvent[]) {
-  if (typeof onPointsReceived === "function") {
-    onPointsReceived(events);
-  }
-
   events.forEach(entry => {
     insertEntrySorted(gMouseEvents, entry);
     if (entry.kind == "mousedown") {
@@ -178,7 +170,6 @@ export function setupGraphics(store: AppStore) {
     client.Graphics.findPaints({}, sessionId).then(async () => {
       initialPaintsReceivedWaiter.resolve(null);
       hasAllPaintPoints = true;
-      onAllPaintsReceived(true);
       maybePaintGraphics();
     });
 
@@ -621,16 +612,6 @@ export function setPausedonPausedAtTimeCallback(callback: typeof onPausedAtTime)
 let onPlaybackStatus: (stalled: boolean) => void;
 export function setPlaybackStatusCallback(callback: typeof onPlaybackStatus): void {
   onPlaybackStatus = callback;
-}
-
-let onPointsReceived: (points: TimeStampedPoint[]) => void;
-export function setPointsReceivedCallback(callback: typeof onPointsReceived): void {
-  onPointsReceived = callback;
-}
-
-let onAllPaintsReceived: (received: boolean) => void;
-export function setAllPaintsReceivedCallback(callback: typeof onAllPaintsReceived): void {
-  onAllPaintsReceived = callback;
 }
 
 let onRefreshGraphics: (canvas: Canvas) => void;
