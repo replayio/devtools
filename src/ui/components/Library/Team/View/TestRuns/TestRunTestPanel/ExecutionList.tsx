@@ -7,16 +7,10 @@ import { useTestRunDetailsSuspends } from "../hooks/useTestRunDetailsSuspends";
 import { TestResultListItem } from "../TestRunDetailsPanel/TestResultListItem";
 import { TestRunsContext } from "../TestRunsContextRoot";
 
-export function ExecutionList({
-  selectedSpecTests,
-}: {
-  selectedSpecTests: TestRunTestWithRecordings[];
-}) {
+export function ExecutionList({ test }: { test: TestRunTestWithRecordings }) {
   const { testRunIdForSuspense } = useContext(TestRunsContext);
   const { testRun } = useTestRunDetailsSuspends(testRunIdForSuspense);
-  const noRecordings = selectedSpecTests.every(test =>
-    test.executions.every(e => e.recordings.length === 0)
-  );
+  const noRecordings = test.executions.every(e => e.recordings.length === 0);
 
   if (noRecordings) {
     return (
@@ -29,22 +23,20 @@ export function ExecutionList({
 
   return (
     <div className="flex flex-col">
-      {selectedSpecTests.map(s =>
-        s.executions
-          .filter(e => e.recordings.length > 0)
-          .flatMap(execution =>
-            execution.recordings.map(r => (
-              <TestResultListItem
-                depth={1}
-                key={r.id}
-                label={execution.result}
-                recording={r}
-                testRun={testRun}
-                test={s}
-              />
-            ))
-          )
-      )}
+      {test.executions
+        .filter(e => e.recordings.length > 0)
+        .flatMap(execution =>
+          execution.recordings.map(r => (
+            <TestResultListItem
+              depth={1}
+              key={r.id}
+              label={execution.result}
+              recording={r}
+              testRun={testRun}
+              test={test}
+            />
+          ))
+        )}
     </div>
   );
 }

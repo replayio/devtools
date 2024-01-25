@@ -15,14 +15,11 @@ export function TestRunTestPanel() {
   const { testRunIdForSuspense } = useContext(TestRunsContext);
 
   const { groupedTests, tests, testRun } = useTestRunDetailsSuspends(testRunIdForSuspense);
-  const selectedSpecTests =
-    // Select tests that not filtered in second panel
-    tests
-      ?.filter(
-        t => filterTestsByText === "" || t.sourcePath.toLowerCase().includes(filterTestsByText)
-      )
-      ?.filter(t => t.testId === testId) ?? [];
-  const selectedTest = selectedSpecTests?.[0];
+  const selectedTest = tests?.find(
+    t =>
+      t.testId === testId &&
+      (filterTestsByText === "" || t.sourcePath.toLowerCase().includes(filterTestsByText))
+  );
 
   if (!tests?.length) {
     return (
@@ -38,16 +35,16 @@ export function TestRunTestPanel() {
     );
   }
 
-  const failedTests = selectedSpecTests.filter(t => t.result === "failed" || t.result === "flaky");
-
   return (
     <TestRunPanelWrapper>
       <div className={styles.mainContainer}>
         <div className={styles.subContainer}>
           <div className={styles.title}>Replays</div>
-          <ExecutionList selectedSpecTests={selectedSpecTests} />
+          <ExecutionList test={selectedTest} />
         </div>
-        {failedTests.length ? <Errors failedTests={failedTests} /> : null}
+        {selectedTest.result === "failed" || selectedTest.result === "flaky" ? (
+          <Errors test={selectedTest} />
+        ) : null}
       </div>
     </TestRunPanelWrapper>
   );
@@ -65,11 +62,11 @@ const getSummary = (message: string) => {
   return firstLine.match(/^.*\dms: (.*)/)?.[1] ?? firstLine;
 };
 
-function Errors({ failedTests }: { failedTests: TestRunTestWithRecordings[] }) {
+function Errors({ test }: { test: TestRunTestWithRecordings }) {
   const { testId } = useContext(TestRunsContext);
 
   const sortedErrors = useMemo(() => {
-    const errors = failedTests.flatMap(t => t.errors || []);
+    const errors = test.errors ?? [];
     const uniqueErrors = errors.reduce((acc, e) => {
       const existingError = acc.find(a => a.message === e);
 
@@ -83,7 +80,7 @@ function Errors({ failedTests }: { failedTests: TestRunTestWithRecordings[] }) {
     }, [] as ErrorCount[]);
 
     return uniqueErrors.sort((a, b) => b.count - a.count);
-  }, [failedTests]);
+  }, [test]);
 
   return (
     <div className={styles.subContainer}>

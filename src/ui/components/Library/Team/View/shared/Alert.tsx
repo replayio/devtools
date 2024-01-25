@@ -5,7 +5,7 @@ const AlertList = {
     "This test has executions that are not reflected in the list of replays below",
 };
 
-export function Alert({ reason, link }: { reason: keyof typeof AlertList; link?: string }) {
+export function Alert({ reason, link }: { reason: keyof typeof AlertList; link: string }) {
   return (
     <div data-test-id={reason} className="gap-3 rounded-lg bg-chrome p-3">
       <span>{AlertList[reason]}</span>
