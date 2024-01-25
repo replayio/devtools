@@ -102,7 +102,6 @@ export interface AppState {
   sessionId: SessionId | null;
   unexpectedError: UnexpectedError | null;
   uploading: UploadInfo | null;
-  videoUrl: string | null;
   workspaceId: WorkspaceId | null;
 }
 

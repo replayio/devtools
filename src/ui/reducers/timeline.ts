@@ -1,18 +1,15 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { TimeStampedPoint } from "@replayio/protocol";
-import sortBy from "lodash/sortBy";
 
 import { MAX_FOCUS_REGION_DURATION } from "ui/actions/timeline";
 import { getMutableParamsFromURL } from "ui/setup/dynamic/url";
 import { UIState } from "ui/state";
 import { HoveredItem, TimeRange, TimelineState } from "ui/state/timeline";
-import { mergeSortedPointLists } from "ui/utils/timeline";
 
 const { focusWindow: focusWindowFromURL } = getMutableParamsFromURL();
 
 function initialTimelineState(): TimelineState {
   return {
-    allPaintsReceived: false,
     currentTime: 0,
     focusWindow: focusWindowFromURL
       ? { begin: focusWindowFromURL.begin.time, end: focusWindowFromURL.end.time }
@@ -24,8 +21,7 @@ function initialTimelineState(): TimelineState {
     playback: null,
     playbackFocusWindow: false,
     playbackPrecachedTime: 0,
-    paints: [{ time: 0, point: "0" }],
-    points: [{ time: 0, point: "0" }],
+    endpoint: { time: 0, point: "0" },
     recordingDuration: null,
     shouldAnimate: true,
     showFocusModeControls: false,
@@ -66,28 +62,13 @@ const timelineSlice = createSlice({
     setFocusWindow(state, action: PayloadAction<TimeRange | null>) {
       state.focusWindow = action.payload;
     },
-    pointsReceived(state, action: PayloadAction<TimeStampedPoint[]>) {
-      const mutablePoints = [...state.points];
-      state.points = mergeSortedPointLists(
-        mutablePoints,
-        sortBy(action.payload, p => BigInt(p.point))
-      );
-    },
-    paintsReceived(state, action: PayloadAction<TimeStampedPoint[]>) {
-      const mutablePaints = [...state.paints];
-      state.paints = mergeSortedPointLists(
-        mutablePaints,
-        sortBy(action.payload, p => BigInt(p.point))
-      );
-    },
-    allPaintsReceived(state, action: PayloadAction<boolean>) {
-      state.allPaintsReceived = action.payload;
+    setEndpoint(state, action: PayloadAction<TimeStampedPoint>) {
+      state.endpoint = action.payload;
     },
   },
 });
 
 export const {
-  allPaintsReceived,
   setDragging,
   setHoveredItem,
   setMarkTimeStampPoint,
@@ -96,8 +77,7 @@ export const {
   setPlaybackStalled,
   setFocusWindow,
   setTimelineState,
-  pointsReceived,
-  paintsReceived,
+  setEndpoint,
 } = timelineSlice.actions;
 
 export default timelineSlice.reducer;
@@ -114,19 +94,7 @@ export const getRecordingDuration = (state: UIState) => state.timeline.recording
 export const getTimelineDimensions = (state: UIState) => state.timeline.timelineDimensions;
 export const getMarkTimeStampedPoint = (state: UIState) => state.timeline.markTimeStampedPoint;
 export const getHoveredItem = (state: UIState) => state.timeline.hoveredItem;
-export const getPaints = (state: UIState) => state.timeline.paints;
-export const getPoints = (state: UIState) => state.timeline.points;
-export const getBasicProcessingProgress = (state: UIState) => {
-  if (state.timeline.allPaintsReceived) {
-    return 1.0;
-  }
-  const maxPaint = state.timeline.paints[state.timeline.paints.length - 1];
-  const maxPoint = state.timeline.points[state.timeline.points.length - 1];
-  if (!maxPoint || maxPoint.point === "0") {
-    return 0.0;
-  }
-  return (1.0 * (maxPaint?.time || 0)) / maxPoint.time;
-};
+export const getEndpoint = (state: UIState) => state.timeline.endpoint;
 export const getPlaybackPrecachedTime = (state: UIState) => state.timeline.playbackPrecachedTime;
 export const getPlaybackFocusWindow = (state: UIState) => state.timeline.playbackFocusWindow;
 export const getFocusWindow = (state: UIState) => state.timeline.focusWindow;

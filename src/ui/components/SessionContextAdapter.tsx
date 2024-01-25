@@ -5,7 +5,7 @@ import { SessionContext, SessionContextType } from "replay-next/src/contexts/Ses
 import { useGetRecordingId } from "ui/hooks/recordings";
 import { useGetUserInfo } from "ui/hooks/users";
 import { getAccessToken, getSessionId } from "ui/reducers/app";
-import { getPoints, getRecordingDuration } from "ui/reducers/timeline";
+import { getEndpoint, getRecordingDuration } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
 import { trackEventOnce } from "ui/utils/mixpanel";
 import { trackEvent } from "ui/utils/telemetry";
@@ -30,8 +30,7 @@ export default function SessionContextAdapter({
   const accessToken = useAppSelector(getAccessToken);
   const sessionId = useAppSelector(getSessionId);
   const duration = useAppSelector(getRecordingDuration)!;
-  const receivedPoints = useAppSelector(getPoints);
-  const endpoint = receivedPoints[receivedPoints.length - 1];
+  const endpoint = useAppSelector(getEndpoint);
 
   const sessionContext = useMemo<SessionContextType>(
     () => ({

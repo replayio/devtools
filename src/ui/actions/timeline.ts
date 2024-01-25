@@ -78,7 +78,7 @@ import {
   getRecordingDuration,
   getShowFocusModeControls,
   getZoomRegion,
-  pointsReceived,
+  setEndpoint,
   setPlaybackPrecachedTime,
 } from "ui/reducers/timeline";
 import { getMutableParamsFromURL } from "ui/setup/dynamic/url";
@@ -126,8 +126,10 @@ export function jumpToInitialPausePoint(): UIThunkAction<Promise<void>> {
   return async (dispatch, getState, { replayClient }) => {
     const recordingId = getRecordingId(getState());
     assert(recordingId);
+
     const endpoint = await sessionEndPointCache.readAsync(replayClient);
-    dispatch(pointsReceived([endpoint]));
+    dispatch(setEndpoint(endpoint));
+
     let { point, time } = endpoint;
 
     const state = getState();
