@@ -17,7 +17,6 @@ import {
   setPlaybackStatusCallback,
   setPointsReceivedCallback,
   setRefreshGraphicsCallback,
-  setVideoUrlCallback,
   setupGraphics,
 } from "protocol/graphics";
 // eslint-disable-next-line no-restricted-imports
@@ -34,7 +33,7 @@ import { UIStore, actions } from "ui/actions";
 import { setCanvas } from "ui/actions/app";
 import { precacheScreenshots } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
-import app, { loadReceivedEvents, setVideoUrl } from "ui/reducers/app";
+import app, { loadReceivedEvents } from "ui/reducers/app";
 import network from "ui/reducers/network";
 import protocolMessages from "ui/reducers/protocolMessages";
 import timeline, {
@@ -278,10 +277,6 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
 
   setRefreshGraphicsCallback((canvas: Canvas) => {
     store.dispatch(setCanvas(canvas));
-  });
-
-  setVideoUrlCallback((url: string) => {
-    store.dispatch(setVideoUrl(url));
   });
 
   setUpUrlParamsListener(store, replayClient);
