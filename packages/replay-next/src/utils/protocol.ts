@@ -409,7 +409,12 @@ export function splitStringToChunks(string: string) {
 export function joinChunksToString(chunks: ProtocolProperty[]): string {
   let string = "";
   for (const prop of chunks) {
-    string += prop.value;
+    // Only iterate over array indices here;
+    // other properties (e.g. "length") should be ignored
+    const maybeNumber = parseInt(prop.name);
+    if (!Number.isNaN(maybeNumber)) {
+      string += prop.value;
+    }
   }
 
   return string;
