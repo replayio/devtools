@@ -9,6 +9,7 @@ import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import {
   findProtocolObjectProperty,
   findProtocolObjectPropertyValue,
+  isArrayElement,
 } from "replay-next/src/utils/protocol";
 import { ReplayClientInterface } from "shared/client/types";
 import { hookLocationCache } from "ui/components/SecondaryToolbox/react-devtools/suspense/hookLocationCache";
@@ -33,7 +34,9 @@ export function HooksRenderer({
     return null;
   }
 
-  return object.preview.properties.map((property, index) => (
+  const arrayElements = object.preview.properties.filter(isArrayElement);
+
+  return arrayElements.map((property, index) => (
     <HookRenderer
       inspectedElement={inspectedElement}
       key={index}
@@ -177,9 +180,11 @@ function HookRenderer({
   }
 
   if (isCustomHook) {
+    const arrayElements = subHooks?.preview?.properties?.filter(isArrayElement);
+
     rendered = (
       <Expandable
-        children={subHooks?.preview?.properties?.map((property, index) => (
+        children={arrayElements?.map((property, index) => (
           <HookRenderer
             depth={depth + 1}
             inspectedElement={inspectedElement}
