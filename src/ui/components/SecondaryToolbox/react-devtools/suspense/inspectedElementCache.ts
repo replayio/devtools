@@ -15,6 +15,30 @@ const TIMEOUT_DELAY = 30_000;
 
 let uidCounter = 0;
 
+type ErrorResponse = {
+  errorType: string;
+  id: number;
+  message: string;
+  responseID: number;
+  stack: string;
+  type: "error";
+};
+
+type FullDataResponse = {
+  id: number;
+  responseID: number;
+  type: "full-data";
+  value: InspectedReactElement;
+};
+
+type NotFoundResponse = {
+  id: number;
+  responseID: number;
+  type: "not-found";
+};
+
+type Response = ErrorResponse | FullDataResponse | NotFoundResponse;
+
 export const inspectedElementCache = createCache<
   [
     replayClient: ReplayClientInterface,
@@ -24,7 +48,7 @@ export const inspectedElementCache = createCache<
     pauseId: PauseId,
     elementId: number
   ],
-  InspectedReactElement
+  InspectedReactElement | null
 >({
   config: { immutable: true },
   debugLabel: "inspectedElementCache",
@@ -37,7 +61,7 @@ export const inspectedElementCache = createCache<
     // Wait until the backend has been injected before sending a message through the wall/bridge
     await reactDevToolsInjectionCache.readAsync(replayClient, pauseId);
 
-    const promise = createPromiseForRequest<{ value: InspectedReactElement }>({
+    const promise = createPromiseForRequest<Response>({
       bridge,
       eventType: "inspectedElement",
       requestID,
@@ -55,6 +79,17 @@ export const inspectedElementCache = createCache<
 
     const result = await promise;
 
-    return result.value;
+    switch (result.type) {
+      case "error":
+        console.error(
+          `React element ${elementId} threw an error while being inspected:\n\n${result.message}\n${result.stack}`
+        );
+        return null;
+      case "full-data":
+        return result.value;
+      case "not-found":
+        console.error(`React element ${elementId} could not be found`);
+        return null;
+    }
   },
 });
