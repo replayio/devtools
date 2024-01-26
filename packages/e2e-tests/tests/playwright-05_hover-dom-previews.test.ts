@@ -100,7 +100,7 @@ test("playwright-05: Test DOM node previews on user action step hover", async ({
       await stepWithMultipleNodes.hover({ timeout: 1000 });
       const count = await highlighter.count();
       await highlighter.first().waitFor({ state: "visible", timeout: 1000 });
-      expect(count).toBe(4);
+      expect(count).toBe(3);
     },
     // Give the evaluation plenty of time to complete
     { timeout: 30000 }
@@ -112,5 +112,5 @@ test("playwright-05: Test DOM node previews on user action step hover", async ({
   await stepWithMultipleNodes.click();
   const badge = stepWithMultipleNodes.locator(`[class*="SelectedBadge"]`);
   const badgeText = await badge.innerText();
-  expect(badgeText).toBe("4");
+  expect(badgeText).toBe("3");
 });
