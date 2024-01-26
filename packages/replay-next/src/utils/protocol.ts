@@ -407,17 +407,10 @@ export function splitStringToChunks(string: string) {
 }
 
 export function joinChunksToString(chunks: ProtocolProperty[]): string {
-  let string = "";
-  for (const prop of chunks) {
-    // Only iterate over array indices here;
-    // other properties (e.g. "length") should be ignored
-    const maybeNumber = parseInt(prop.name);
-    if (!Number.isNaN(maybeNumber)) {
-      string += prop.value;
-    }
-  }
-
-  return string;
+  return chunks
+    .filter(isArrayElement)
+    .map(prop => prop.value)
+    .join("");
 }
 
 export function findProtocolObjectProperty(
@@ -436,4 +429,8 @@ export function findProtocolObjectPropertyValue<Type>(
   name: string
 ): Type | null {
   return findProtocolObjectProperty(sourceObject, name)?.value ?? null;
+}
+
+export function isArrayElement(property: ProtocolProperty): boolean {
+  return /^(0|([1-9]\d*))$/.test(property.name);
 }
