@@ -73,6 +73,17 @@ export function SelectedElement({
     () => nodesToFiberIdsCache.read(replayClient, pauseId!, store)
   );
 
+  if (inspectedElement == null) {
+    return (
+      <div className={styles.Panel} data-is-pending={isPending || undefined}>
+        <div className={styles.TopRow}>
+          <div className={styles.ComponentName}>{displayName}</div>
+        </div>
+        <div className={styles.Error}>The selected component could not be inspected.</div>
+      </div>
+    );
+  }
+
   const {
     context,
     contextObjectId,
