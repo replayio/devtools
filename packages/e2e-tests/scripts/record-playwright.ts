@@ -1,5 +1,5 @@
 import type { Page, expect as expectFunction } from "@playwright/test";
-import { chromium, expect } from "@playwright/test";
+import { chromium, expect, firefox } from "@playwright/test";
 import { getExecutablePath } from "@replayio/playwright";
 import * as cli from "@replayio/replay";
 import findLast from "lodash/findLast";
@@ -15,7 +15,9 @@ export async function recordPlaywright(
     executablePath = config.browserPath || getExecutablePath(browserName)!;
   }
 
-  const browserServer = await chromium.launchServer({
+  const browserType = browserName === "chromium" ? chromium : firefox;
+
+  const browserServer = await browserType.launchServer({
     env: {
       ...process.env,
       // @ts-ignore

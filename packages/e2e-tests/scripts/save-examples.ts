@@ -153,21 +153,24 @@ async function saveExamples(
       continue;
     }
 
-    const [_, runtime] = buildId.split("-");
+    const [_, buildRuntime] = buildId.split("-");
 
     let category: TestExampleFile["category"];
     let folder: TestExampleFile["folder"];
+    let runtime: TestExampleFile["runtime"];
 
-    switch (runtime) {
+    switch (buildRuntime) {
       case "chromium":
       case "gecko": {
         category = "browser";
         folder = config.browserExamplesPath;
+        runtime = buildRuntime === "gecko" ? "firefox" : "chromium";
         break;
       }
       case "node": {
         category = "node";
         folder = config.nodeExamplesPath;
+        runtime = "node";
         break;
       }
     }
@@ -178,7 +181,7 @@ async function saveExamples(
         category,
         filename: key,
         folder,
-        runtime: runtime as TestExampleFile["runtime"],
+        runtime,
         playwrightScript: playwrightScript
           ? require(join("..", playwrightScript)).default
           : undefined,
