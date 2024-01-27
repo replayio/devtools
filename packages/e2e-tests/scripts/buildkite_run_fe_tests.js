@@ -56,6 +56,10 @@ function run_fe_tests(CHROME_BINARY_PATH) {
     process.env.PLAYWRIGHT_TEST_BASE_URL = "https://app.replay.io";
     process.env.REPLAY_DISABLE_CLONE = "true";
     process.env.DEBUG = "replay:cli";
+    process.env.RECORD_REPLAY_METADATA_SOURCE_REPOSITORY =
+      process.env.RECORD_REPLAY_METADATA_SOURCE_REPOSITORY ||
+      // transform https://github.com/replayio/chromium.git => replayio/chromium for the source control metadata
+      process.env.BUILDKITE_REPO?.replace(/.*github.com[:\/](.*)\.git/, "$1");
 
     execSync(
       `xvfb-run ./packages/e2e-tests/scripts/save-examples.ts --runtime=chromium --target=browser --project=replay-chromium-local`,
@@ -116,6 +120,11 @@ function run_fe_tests(CHROME_BINARY_PATH) {
     execSync(`xvfb-run yarn test:runtime ${testNames.join(" ")}`, {
       stdio: "inherit",
       stderr: "inherit",
+      env: {
+        ...process.env,
+        REPLAY_API_KEY: process.env.RUNTIME_TEAM_API_KEY,
+        REPLAY_UPLOAD: "1",
+      },
     });
 
     // Make sure the web server shuts down.
