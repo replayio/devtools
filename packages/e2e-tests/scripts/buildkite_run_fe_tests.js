@@ -3,6 +3,12 @@
 const { execSync, exec } = require("child_process");
 const getSecret = require("./aws_secrets");
 
+// transforms https://github.com/replayio/chromium.git or
+// git@github.com:replayio/chromium to replayio/chromium
+function githubUrlToRepository(url) {
+  return url?.replace(/.*github.com[:\/](.*)\.git/, "$1");
+}
+
 function run_fe_tests(CHROME_BINARY_PATH) {
   let webProc = null;
   console.group("START");
@@ -58,8 +64,7 @@ function run_fe_tests(CHROME_BINARY_PATH) {
     process.env.DEBUG = "replay:cli";
     process.env.RECORD_REPLAY_METADATA_SOURCE_REPOSITORY =
       process.env.RECORD_REPLAY_METADATA_SOURCE_REPOSITORY ||
-      // transform https://github.com/replayio/chromium.git => replayio/chromium for the source control metadata
-      process.env.BUILDKITE_REPO?.replace(/.*github.com[:\/](.*)\.git/, "$1");
+      githubUrlToRepository(process.env.BUILDKITE_REPO);
 
     execSync(
       `xvfb-run ./packages/e2e-tests/scripts/save-examples.ts --runtime=chromium --target=browser --project=replay-chromium-local`,
