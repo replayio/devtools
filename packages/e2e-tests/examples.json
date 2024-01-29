@@ -18,12 +18,8 @@
     "requiresManualUpdate": true
   },
   "cra/dist/index.html": {
-    "recording": "757aa270-fc4b-4cdd-867c-743d6524fb7e",
-    "buildId": "linux-gecko-20230919-72cad6f42a93-4d0a9f5b9de2"
-  },
-  "cra/dist/index_chromium.html": {
-    "recording": "4cc16148-b4d0-4897-ac53-25ccbe60ad50",
-    "buildId": "linux-chromium-20240123-609ec6caa105-50d01be708a2"
+    "recording": "3e1e2548-bead-4843-9b39-9d4c747a5607",
+    "buildId": "linux-chromium-20240126-c9de98d17d37-50d01be708a2"
   },
   "cypress-realworld/bankaccounts.spec.js": {
     "recording": "adbd6030-7338-4768-a4a8-4286cacacf12",

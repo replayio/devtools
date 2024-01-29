@@ -16,7 +16,7 @@ import { enablePassport } from "../helpers/settings";
 import { resetTestUser, waitFor } from "../helpers/utils";
 import test, { expect } from "../testFixtureCloneRecording";
 
-test.use({ exampleKey: "cra/dist/index_chromium.html" });
+test.use({ exampleKey: "cra/dist/index.html" });
 
 test(`authenticated/passport-02: Infrared inspection`, async ({
   pageWithMeta: { page, recordingId },
@@ -50,7 +50,7 @@ test(`authenticated/passport-02: Infrared inspection`, async ({
   );
 
   await openNetworkPanel(page);
-  const networkRequest = await findNetworkRequestRow(page, { name: "index_chromium.html" });
+  const networkRequest = await findNetworkRequestRow(page, { name: "index.html" });
   await networkRequest.click();
 
   await waitFor(async () =>
