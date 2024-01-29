@@ -64,7 +64,7 @@ function run_fe_tests(CHROME_BINARY_PATH) {
     process.env.DEBUG = "replay:cli";
     process.env.RECORD_REPLAY_METADATA_SOURCE_REPOSITORY =
       process.env.RECORD_REPLAY_METADATA_SOURCE_REPOSITORY ||
-      githubUrlToRepository(process.env.BUILDKITE_REPO);
+      githubUrlToRepository(process.env.RUNTIME_REPO);
 
     execSync(
       `xvfb-run ./packages/e2e-tests/scripts/save-examples.ts --runtime=chromium --target=browser --project=replay-chromium-local`,
