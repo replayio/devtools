@@ -5,7 +5,7 @@ import {
 } from "@replayio/protocol";
 import clamp from "lodash/clamp";
 
-import { gPaintPoints, hasAllPaintPoints } from "protocol/graphics";
+import { PaintsCache } from "protocol/PaintsCache";
 import useLoadedRegions from "replay-next/src/hooks/useLoadedRegions";
 import { getZoomRegion } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
@@ -80,8 +80,9 @@ const EMPTY_LOADED_REGIONS: LoadedRegions = {
 export default function ProtocolTimeline() {
   const loadedRegions = useLoadedRegions() ?? EMPTY_LOADED_REGIONS;
 
-  const firstPaint = gPaintPoints[0];
-  const lastPaint = gPaintPoints[gPaintPoints.length - 1];
+  const paints = PaintsCache.read();
+  const firstPaint = paints[0];
+  const lastPaint = paints[paints.length - 1];
 
   return (
     <div className="flex w-full flex-col space-y-1">
@@ -97,11 +98,13 @@ export default function ProtocolTimeline() {
         regions={[
           {
             begin: { point: firstPaint.point, time: firstPaint.time },
-            end: { point: lastPaint.point, time: hasAllPaintPoints ? Infinity : lastPaint.time },
+            // This timeline should always extend to the end,
+            // even though the final paint will be before the end
+            end: { point: lastPaint.point, time: Infinity },
           },
         ]}
         color="sky-500"
-        points={gPaintPoints}
+        points={paints}
         title="Paints"
       />
     </div>

@@ -206,7 +206,7 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
     );
   });
 
-  await setupApp(store, replayClient);
+  setupApp(store, replayClient);
   setupTimeline(store);
   setupGraphics(store);
 
