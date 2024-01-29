@@ -153,7 +153,7 @@ async function saveExamples(
       continue;
     }
 
-    let [_, runtime] = buildId.split("-");
+    const [_, runtime] = buildId.split("-");
 
     let category: TestExampleFile["category"];
     let folder: TestExampleFile["folder"];
