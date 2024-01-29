@@ -107,7 +107,10 @@ export async function setupGraphics(store: AppStore) {
   await Promise.all([PaintsCache.readAsync(), RecordedMouseEventsCache.readAsync()]);
 
   // TODO [FE-2104] Remove gPaintPoints entirely
-  gPaintPoints.push(...PaintsCache.getValue());
+  const paints = PaintsCache.getValue();
+  if (paints) {
+    gPaintPoints.push(...paints);
+  }
 
   // TODO [FE-2104] Remove gMouseEvents and gMouseClickEvents entirely
   RecordedMouseEventsCache.getValue().forEach(entry => {
