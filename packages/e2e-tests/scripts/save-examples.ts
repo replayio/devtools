@@ -17,7 +17,7 @@ import { SetRecordingIsPrivateVariables } from "../../shared/graphql/generated/S
 import { UpdateRecordingTitleVariables } from "../../shared/graphql/generated/UpdateRecordingTitle";
 import config, { BrowserName } from "../config";
 import examplesJson from "../examples.json";
-import { ExamplesData, TestRecordingIntersectionValue } from "../helpers";
+import { TestRecordingIntersectionValue } from "../helpers";
 import { getStats } from "./get-stats";
 import { loadRecording } from "./loadRecording";
 import { logAnimated } from "./log";
@@ -153,7 +153,7 @@ async function saveExamples(
       continue;
     }
 
-    const [_, runtime] = buildId.split("-");
+    let [_, runtime] = buildId.split("-");
 
     let category: TestExampleFile["category"];
     let folder: TestExampleFile["folder"];
@@ -220,7 +220,7 @@ async function saveBrowserExample({ example }: TestRunCallbackArgs) {
   const playwrightScript: PlaywrightScript = example.playwrightScript ?? defaultPlaywrightScript;
 
   // Shouldn't be "node" by this point
-  await recordPlaywright((argv.runtime || example.runtime) as BrowserName, async (page, expect) => {
+  await recordPlaywright(async (page, expect) => {
     const waitForLogPromise = playwrightScript(page, expect);
     const goToPagePromise = page.goto(exampleUrl);
 
