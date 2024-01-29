@@ -73,3 +73,18 @@
   line-height: 0.75rem;
   color: var(--color-dimmer);
 }
+
+.LogPointPanel {
+  position: absolute;
+  left: var(--source-line-number-offset);
+}
+
+.Row[data-log-point-placement="above"] {
+  align-items: flex-end;
+}
+.Row[data-log-point-placement="above"] .LogPointPanel {
+  top: 0;
+}
+.Row[data-log-point-placement="below"] .LogPointPanel {
+  top: var(--line-height);
+}
