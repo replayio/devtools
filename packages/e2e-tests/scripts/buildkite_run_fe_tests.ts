@@ -107,7 +107,7 @@ export function run_fe_tests(CHROME_BINARY_PATH, runInCI = true) {
       stdio: "inherit",
     });
 
-    // TODO: Do we need this?
+    // TODO: We can remove this once we change runtime from `chromium` to `replay-chromium`.
     execSync("npx playwright install chromium", {
       stdio: "inherit",
     });
@@ -136,45 +136,45 @@ export function run_fe_tests(CHROME_BINARY_PATH, runInCI = true) {
     console.log(`Tests (${testFiles.length}):\n ${testFiles.join("\n ")}`);
     console.timeEnd("GATHER-EXAMPLES time");
 
-    // console.group("SAVE-EXAMPLES");
-    // console.time("SAVE-EXAMPLES time");
-    // {
-    //   const examplesCfg = exampleFiles?.length ? ` --example=${exampleFiles.join(",")}` : "";
-    //   execSync(
-    //     `${envWrapper} ${path.join(
-    //       TestRootPath,
-    //       "scripts/save-examples.ts"
-    //     )} --runtime=chromium --target=browser --project=chromium${examplesCfg}`,
-    //     { stdio: "inherit", env: process.env }
-    //   );
+    console.group("SAVE-EXAMPLES");
+    console.time("SAVE-EXAMPLES time");
+    {
+      const examplesCfg = exampleFiles?.length ? ` --example=${exampleFiles.join(",")}` : "";
+      execSync(
+        `${envWrapper} ${path.join(
+          TestRootPath,
+          "scripts/save-examples.ts"
+        )} --runtime=chromium --target=browser --project=chromium${examplesCfg}`,
+        { stdio: "inherit", env: process.env }
+      );
 
-    //   // Without the wait, the next xvfb-run command can fail.
-    //   execSync("sleep 5");
-    // }
-    // console.timeEnd("SAVE-EXAMPLES time");
-    // console.groupEnd();
+      // Without the wait, the next xvfb-run command can fail.
+      execSync("sleep 5");
+    }
+    console.timeEnd("SAVE-EXAMPLES time");
+    console.groupEnd();
 
-    // console.group("TESTS");
-    // console.time("TESTS time");
-    // {
-    //   // Run the known-passing tests.
-    //   execSync(
-    //     `${envWrapper} npx playwright test --grep-invert node_ --project=chromium --workers=1 --retries=2 ${testFiles.join(
-    //       " "
-    //     )}`,
-    //     {
-    //       stdio: "inherit",
-    //       env: process.env,
-    //     }
-    //   );
-    // }
-    // console.timeEnd("TESTS time");
-    // console.groupEnd();
-    // // Make sure the web server shuts down.
-    // webProc?.kill("SIGKILL");
+    console.group("TESTS");
+    console.time("TESTS time");
+    {
+      // Run the known-passing tests.
+      execSync(
+        `${envWrapper} npx playwright test --grep-invert node_ --project=chromium --workers=1 --retries=2 ${testFiles.join(
+          " "
+        )}`,
+        {
+          stdio: "inherit",
+          env: process.env,
+        }
+      );
+    }
+    console.timeEnd("TESTS time");
+    console.groupEnd();
+    // Make sure the web server shuts down.
+    webProc?.kill("SIGKILL");
 
-    // // Without this, we can hang--no idea why.
-    // process.exit(0);
+    // Without this, we can hang--no idea why.
+    process.exit(0);
   } finally {
     // Make sure the web server shuts down in case of exceptions.
     webProc?.kill("SIGKILL");
