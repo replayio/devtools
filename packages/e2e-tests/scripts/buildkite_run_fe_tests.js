@@ -122,6 +122,9 @@ function run_fe_tests(CHROME_BINARY_PATH) {
       "stepping-01",
       //"stepping-05_chromium",
     ];
+
+    console.log(">>>>", process.env);
+
     execSync(`xvfb-run yarn test:runtime ${testNames.join(" ")}`, {
       stdio: "inherit",
       stderr: "inherit",
