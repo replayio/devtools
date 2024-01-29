@@ -4,15 +4,14 @@ import { getExecutablePath } from "@replayio/playwright";
 import * as cli from "@replayio/replay";
 import findLast from "lodash/findLast";
 
-import config, { BrowserName } from "../config";
+import config from "../config";
 
 export async function recordPlaywright(
-  browserName: BrowserName,
   script: (page: Page, expect?: typeof expectFunction) => Promise<void>
 ) {
   let executablePath: string | undefined = undefined;
   if (config.shouldRecordTest) {
-    executablePath = config.browserPath || getExecutablePath(browserName)!;
+    executablePath = config.browserPath || getExecutablePath("chromium");
   }
 
   const browserServer = await chromium.launchServer({
