@@ -187,29 +187,10 @@ export async function getInitialPausePoint(recordingId: string) {
 }
 
 export function setHoverTime(time: number | null, updateGraphics = true): UIThunkAction {
-  return async (dispatch, getState) => {
-    dispatch(setTimelineState({ hoverTime: time }));
-
-    if (!updateGraphics) {
-      return;
-    }
-
-    const stateBeforeScreenshot = getState();
-
-    try {
-      const currentTime = getCurrentTime(stateBeforeScreenshot);
-      const screenshotTime = time || currentTime;
-      const { screen, mouse } = await getGraphicsAtTime(screenshotTime);
-      const stateAfterScreenshot = getState();
-
-      if (getHoverTime(stateAfterScreenshot) !== time) {
-        return;
-      }
-
-      paintGraphics(screen, mouse);
-    } catch (error) {
-      console.error(error);
-    }
+  return dispatch => {
+    dispatch(
+      setTimelineState({ hoverTime: time, showHoverTimeGraphics: updateGraphics && time != null })
+    );
   };
 }
 

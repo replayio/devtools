@@ -14,6 +14,7 @@ export interface ZoomRegion {
 export interface TimelineState {
   currentTime: number;
   dragging: boolean;
+  endpoint: TimeStampedPoint;
   focusWindow: TimeRange | null;
   hoveredItem: HoveredItem | null;
   hoverTime: number | null;
@@ -26,10 +27,10 @@ export interface TimelineState {
   } | null;
   playbackFocusWindow: boolean;
   playbackPrecachedTime: number;
-  endpoint: TimeStampedPoint;
   recordingDuration: number | null;
   shouldAnimate: boolean;
   showFocusModeControls: boolean;
+  showHoverTimeGraphics: boolean;
   stalled?: boolean;
   timelineDimensions: { width: number; left: number; top: number };
   zoomRegion: ZoomRegion;
