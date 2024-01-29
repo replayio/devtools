@@ -1,6 +1,6 @@
 import { createSingleEntryCache } from "suspense";
 
-import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
+import { recordingTargetCache } from "replay-next/src/suspense/BuildIdCache";
 import { findIndex } from "replay-next/src/utils/array";
 import { replayClient } from "shared/client/ReplayClientContext";
 import { TimeStampedPointWithPaintHash } from "shared/client/types";
@@ -11,12 +11,14 @@ export const PaintsCache = createSingleEntryCache<[], TimeStampedPointWithPaintH
   config: { immutable: true },
   debugLabel: "PaintsCache",
   load: async ([]) => {
-    const recordingCapabilities = await recordingCapabilitiesCache.readAsync(replayClient);
-    if (recordingCapabilities.supportsRepaintingGraphics) {
-      return await replayClient.findPaints();
-    } else {
-      return [];
+    const target = await recordingTargetCache.readAsync(replayClient);
+    switch (target) {
+      case "node": {
+        return [];
+      }
     }
+
+    return await replayClient.findPaints();
   },
 });
 
