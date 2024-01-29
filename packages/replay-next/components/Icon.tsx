@@ -313,11 +313,11 @@ export default function Icon({
       break;
     case "log-point-panel-arrow-above":
       path =
-        "M17.17,11l-1.59,1.59L17,14l4-4l-4-4l-1.41,1.41L17.17,9L9,9c-1.1,0-2,0.9-2,2v9h2v-9L17.17,11z";
+        "M11 17.17L12.59 15.58L14 17L10 21L6 17L7.41 15.59L9 17.17L9 9C9 7.9 9.9 7 11 7L20 7L20 9L11 9L11 17.17Z";
       break;
     case "log-point-panel-arrow-below":
       path =
-        "M17.17 13L15.58 11.41L17 10L21 14L17 18L15.59 16.59L17.17 15H9C7.9 15 7 14.1 7 13V4H9V13H17.17Z";
+        "M11 6.83L12.59 8.42L14 7L10 3L6 7L7.41 8.41L9 6.83L9 15C9 16.1 9.9 17 11 17L20 17L20 15L11 15L11 6.83Z";
       break;
     case "menu-closed":
       path = "M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z";
