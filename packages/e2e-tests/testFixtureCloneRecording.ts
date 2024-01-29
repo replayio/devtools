@@ -21,7 +21,7 @@ const testWithCloneRecording = base.extend<TestIsolatedRecordingFixture>({
   pageWithMeta: async ({ page, exampleKey }, use) => {
     const exampleRecordings = require("./examples.json");
     if (!exampleRecordings[exampleKey]) {
-      throw new Error("Invalid recording");
+      throw new Error(`Invalid recording: ${exampleKey}`);
     }
 
     let newRecordingId: string | undefined = undefined;

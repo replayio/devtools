@@ -1,10 +1,10 @@
 /* Copyright 2024 Record Replay Inc. */
 
-const build_id_from_artifact = require("./build_id_from_artifact");
-const install_build_products = require("./build_products");
-const run_fe_tests = require("./buildkite_run_fe_tests");
+import { build_id_from_artifact } from "./build_id_from_artifact";
+import { install_build_products } from "./build_products";
+import { run_fe_tests } from "./buildkite_run_fe_tests";
 
-function run_fe_tests_from_artifact(PLATFORM, ARCH) {
+export function run_fe_tests_from_artifact(PLATFORM, ARCH) {
   console.group("BUILD PREP");
   console.time("BUILD PREP");
   let RUNTIME_BUILD_ID = build_id_from_artifact(PLATFORM, ARCH);
@@ -14,5 +14,3 @@ function run_fe_tests_from_artifact(PLATFORM, ARCH) {
 
   run_fe_tests(CHROME_BINARY_PATH);
 }
-
-module.exports = run_fe_tests_from_artifact;

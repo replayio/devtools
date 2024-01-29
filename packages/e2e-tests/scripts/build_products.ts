@@ -1,11 +1,11 @@
 /* Copyright 2024 Record Replay Inc. */
 
-const fs = require("fs");
-const path = require("path");
-const os = require("os");
-const { execSync } = require("child_process");
+import { execSync } from "child_process";
+import fs from "fs";
+import os from "os";
+import path from "path";
 
-function install_build_products(RUNTIME_BUILD_ID, PLATFORM, ARCHITECTURE) {
+export function install_build_products(RUNTIME_BUILD_ID, PLATFORM, ARCHITECTURE) {
   // Set BUILD_FILE based on ARCHITECTURE and PLATFORM
   let BUILD_FILE;
   let ARCH_SUFFIX = "";
@@ -63,5 +63,3 @@ function install_build_products(RUNTIME_BUILD_ID, PLATFORM, ARCHITECTURE) {
   }
   return CHROME_BINARY;
 }
-
-module.exports = install_build_products;
