@@ -90,8 +90,9 @@
 }
 
 .LogPointPanelIcon {
+  font-size: var(--font-size-tiny);
   position: absolute;
-  left: 1rem;
+  left: calc(var(--line-number-size) - 1ch);
   width: 1rem;
   height: 1rem;
   color: var(--color-dimmer);
