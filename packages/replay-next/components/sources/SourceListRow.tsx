@@ -2,6 +2,7 @@ import { SameLineSourceLocations } from "@replayio/protocol";
 import { CSSProperties, useContext, useMemo } from "react";
 import { STATUS_PENDING, useImperativeIntervalCacheValues } from "suspense";
 
+import Icon from "replay-next/components/Icon";
 import {
   ExecutionPointLineHighlight,
   LineHighlight,
@@ -217,6 +218,12 @@ export default function SourceListRow({
         <SourceListRowFormattedText
           parsedTokens={parsedTokens ? parsedTokens[lineIndex] ?? null : null}
           plainText={plainText[lineIndex] ?? null}
+        />
+      )}
+      {showPointPanel && (
+        <Icon
+          className={styles.LogPointPanelIcon}
+          type={logPointPanelAbove ? "log-point-panel-arrow-above" : "log-point-panel-arrow-below"}
         />
       )}
       {showPointPanel && (
