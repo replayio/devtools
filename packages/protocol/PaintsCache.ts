@@ -7,14 +7,14 @@ import { TimeStampedPointWithPaintHash } from "shared/client/types";
 
 // This could be a streaming cache, but streaming APIs are more awkward to interop with
 // Since we wait for processing to complete before loading a recording, paints should always load very quickly
-export const PaintsCache = createSingleEntryCache<[], TimeStampedPointWithPaintHash[]>({
+export const PaintsCache = createSingleEntryCache<[], TimeStampedPointWithPaintHash[] | null>({
   config: { immutable: true },
   debugLabel: "PaintsCache",
   load: async ([]) => {
     const target = await recordingTargetCache.readAsync(replayClient);
     switch (target) {
       case "node": {
-        return [];
+        return null;
       }
     }
 
@@ -47,7 +47,7 @@ export function mostRecentPaint(time: number) {
 // TODO [FE-2401] Do we need to keep this method? Maybe not.
 export function timeIsBeyondKnownPaints(time: number) {
   const paints = PaintsCache.getValueIfCached();
-  if (!paints) {
+  if (!paints || paints.length === 0) {
     return false;
   }
 
