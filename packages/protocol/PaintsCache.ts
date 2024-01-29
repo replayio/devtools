@@ -1,4 +1,4 @@
-import { createCache } from "suspense";
+import { createSingleEntryCache } from "suspense";
 
 import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
 import { findIndex } from "replay-next/src/utils/array";
@@ -7,10 +7,9 @@ import { TimeStampedPointWithPaintHash } from "shared/client/types";
 
 // This could be a streaming cache, but streaming APIs are more awkward to interop with
 // Since we wait for processing to complete before loading a recording, paints should always load very quickly
-export const PaintsCache = createCache<[], TimeStampedPointWithPaintHash[]>({
+export const PaintsCache = createSingleEntryCache<[], TimeStampedPointWithPaintHash[]>({
   config: { immutable: true },
   debugLabel: "PaintsCache",
-  getKey: () => ``, // Single entry cache
   load: async ([]) => {
     const recordingCapabilities = await recordingCapabilitiesCache.readAsync(replayClient);
     if (recordingCapabilities.supportsRepaintingGraphics) {
