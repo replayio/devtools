@@ -10,6 +10,7 @@ import {
   ViewSourceLineHighlight,
 } from "replay-next/components/sources/hooks/useLineHighlights";
 import { SourceSearchResult } from "replay-next/components/sources/hooks/useSourceSearch";
+import { LogPointPositionHighlight } from "replay-next/components/sources/LogPointPositionHighlight";
 import SearchResultHighlight from "replay-next/components/sources/SearchResultHighlight";
 import SourceLineLoadingPlaceholder from "replay-next/components/sources/SourceLineLoadingPlaceholder";
 import { SourceListRowFormattedText } from "replay-next/components/sources/SourceListRowFormattedText";
@@ -218,6 +219,13 @@ export default function SourceListRow({
         <SourceListRowFormattedText
           parsedTokens={parsedTokens ? parsedTokens[lineIndex] ?? null : null}
           plainText={plainText[lineIndex] ?? null}
+        />
+      )}
+      {showPointPanel && (
+        <LogPointPositionHighlight
+          breakablePositionsByLine={breakablePositionsByLine}
+          lineNumber={lineNumber}
+          lineText={plainText?.[lineIndex] ?? ""}
         />
       )}
       {showPointPanel && (

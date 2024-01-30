@@ -1,0 +1,39 @@
+.Highlight {
+  position: absolute;
+  left: calc(var(--source-line-number-offset) + var(--source-hit-count-offset));
+  display: inline-block;
+  height: 1rem;
+  margin-left: var(--data-column-offset);
+  width: var(--data-width);
+  white-space: pre;
+  pointer-events: none;
+
+  /* TESTING */
+  z-index: -1;
+  background-color: var(--background-color-contrast-5);
+  color: transparent;
+  box-sizing: content-box;
+  border-radius: 0.25rem;
+  margin-left: calc(var(--data-column-offset) - 0.25rem);
+  padding: 0.5rem 0.25rem 0;
+
+  /* TESTING */
+  z-index: unset;
+  background-color: mark;
+  color: marktext;
+}
+
+.DownArrow {
+  position: absolute;
+  left: calc(var(--source-line-number-offset) + var(--source-hit-count-offset));
+  font-family: var(--font-family-monospace);
+  font-size: var(--font-size-regular);
+
+  margin-left: calc(var(--data-column-offset) - 0.75rem);
+
+  height: 1rem;
+  width: 0;
+  border: 12px solid transparent;
+  border-top: 12px solid var(--point-panel-background-color);
+  filter: drop-shadow(0px 1px 0 var(--border-color));
+}
