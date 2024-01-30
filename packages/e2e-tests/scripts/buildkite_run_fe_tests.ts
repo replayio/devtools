@@ -61,6 +61,12 @@ function gatherChromiumExamplesAndTests() {
   return { testFiles, exampleFiles: uniq(exampleFiles) };
 }
 
+// transforms https://github.com/replayio/chromium.git or
+// git@github.com:replayio/chromium to replayio/chromium
+function githubUrlToRepository(url) {
+  return url?.replace(/.*github.com[:\/](.*)\.git/, "$1");
+}
+
 export default function run_fe_tests(CHROME_BINARY_PATH, runInCI = true) {
   console.group("START");
   console.time("START time");
@@ -89,6 +95,7 @@ export default function run_fe_tests(CHROME_BINARY_PATH, runInCI = true) {
     "wss://dispatch.replay.io";
   process.env.AUTHENTICATED_TESTS_WORKSPACE_API_KEY = process.env.RECORD_REPLAY_API_KEY;
   process.env.PLAYWRIGHT_TEST_BASE_URL ||= "https://app.replay.io";
+  process.env.RECORD_REPLAY_METADATA_SOURCE_REPOSITORY ||= githubUrlToRepository(process.env.RUNTIME_REPO)
 
   console.debug(`process.env.PLAYWRIGHT_TEST_BASE_URL="${process.env.PLAYWRIGHT_TEST_BASE_URL}"`);
 
@@ -156,7 +163,11 @@ export default function run_fe_tests(CHROME_BINARY_PATH, runInCI = true) {
         {
           cwd: TestRootPath,
           stdio: "inherit",
-          env: process.env,
+          env: {
+            ...process.env,
+            REPLAY_API_KEY: process.env.RUNTIME_TEAM_API_KEY,
+            REPLAY_UPLOAD: "1",
+          },
         }
       );
     }
