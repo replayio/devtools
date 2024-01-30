@@ -399,7 +399,7 @@ async function waitUntilMessage(
       try {
         await loadRecording(recordingId);
       } catch (e) {
-        console.log(`Error during processing: ${e}`);
+        console.error(`Ignored error during processing: ${e?.stack || e}`);
       }
     }
 

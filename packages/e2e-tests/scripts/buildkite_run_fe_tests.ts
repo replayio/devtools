@@ -134,10 +134,9 @@ export default function run_fe_tests(CHROME_BINARY_PATH, runInCI = true) {
       const examplesCfg = exampleFiles?.length ? ` --example=${exampleFiles.join(",")}` : "";
       execSync(
         `${envWrapper} ${path.join(
-          TestRootPath,
           "scripts/save-examples.ts"
         )} --runtime=chromium --target=browser --project=chromium${examplesCfg}`,
-        { stdio: "inherit", env: process.env }
+        { cwd: TestRootPath, stdio: "inherit", env: process.env }
       );
 
       // Without the wait, the next xvfb-run command can fail.
@@ -155,6 +154,7 @@ export default function run_fe_tests(CHROME_BINARY_PATH, runInCI = true) {
           " "
         )}`,
         {
+          cwd: TestRootPath,
           stdio: "inherit",
           env: process.env,
         }
