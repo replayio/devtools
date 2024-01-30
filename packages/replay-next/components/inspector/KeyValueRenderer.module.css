@@ -13,10 +13,6 @@
 .VerticalNameWithFlag {
   color: var(--object-inspector-expanded-key-with-flag);
 }
-.VerticalName.GetterValue,
-.VerticalNameWithFlag.GetterValue {
-  color: var(--object-inspector-gettervalue-key);
-}
 
 .ToggleAlignmentPadding {
   margin-left: 1.25rem;

@@ -1,4 +1,6 @@
-import { ReactNode } from "react";
+import { ReactNode, useMemo } from "react";
+
+import { mergePropertiesAndGetterValues } from "replay-next/src/utils/protocol";
 
 import KeyValueRenderer from "../KeyValueRenderer";
 import { ObjectPreviewRendererProps } from "./types";
@@ -13,11 +15,22 @@ const MAX_PROPERTIES_TO_PREVIEW = 5;
 export default function ObjectRenderer({ context, object, pauseId }: ObjectPreviewRendererProps) {
   const { className, preview } = object;
 
-  const properties = preview?.properties?.slice(0, MAX_PROPERTIES_TO_PREVIEW);
-  let propertiesList: ReactNode[] | null = null;
-  if (context !== "nested" && properties) {
-    const showOverflowMarker = preview?.overflow || properties.length > MAX_PROPERTIES_TO_PREVIEW;
+  const [properties, propertiesWereTruncated] = useMemo(() => {
+    if (preview == null) {
+      return [[], false];
+    }
 
+    return mergePropertiesAndGetterValues(
+      preview.properties || [],
+      preview.getterValues || [],
+      MAX_PROPERTIES_TO_PREVIEW
+    );
+  }, [preview]);
+
+  const showOverflowMarker = object.preview?.overflow || propertiesWereTruncated;
+
+  let propertiesList: ReactNode[] | null = null;
+  if (context !== "nested") {
     propertiesList = properties.map((property, index) => (
       <span key={index} className={styles.Value}>
         <KeyValueRenderer
