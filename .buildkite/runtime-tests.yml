@@ -23,6 +23,7 @@ steps:
               secret-id: "prod/build-user"
               json-key: ".secret_access_key"
             BUILDEVENT_APIKEY: honeycomb-api-key
+            RUNTIME_TEAM_API_KEY: runtime-replay-api-key
       - "ssh://git@github.com/replayio/fly-buildkite-plugin.git#v0.77":
           # This image's source code is here https://github.com/replayio/backend-e2e-base-image
           image: "registry.fly.io/buildkite-backend-e2e-tests:v14"
@@ -39,6 +40,7 @@ steps:
             AWS_ACCESS_KEY_ID: BUILD_USER_ACCESS_KEY_ID
             AUTOMATED_TEST_SECRET: AUTOMATED_TEST_SECRET
             RECORD_REPLAY_API_KEY: RECORD_REPLAY_API_KEY
+            RUNTIME_TEAM_API_KEY: RUNTIME_TEAM_API_KEY
 
           env:
             DISPLAY: ":1"

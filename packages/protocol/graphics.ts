@@ -1,19 +1,18 @@
 // Routines for managing and rendering graphics data fetched over the WRP.
-import { MouseEvent, PaintPoint, ScreenShot, TimeStampedPoint } from "@replayio/protocol";
-import maxBy from "lodash/maxBy";
+import { MouseEvent, ScreenShot } from "@replayio/protocol";
 
 import {
   getExecutionPoint,
   getPauseId,
   getTime,
+  paused,
 } from "devtools/client/debugger/src/reducers/pause";
-import { paused } from "devtools/client/debugger/src/reducers/pause";
-import {
-  recordingCapabilitiesCache,
-  recordingTargetCache,
-} from "replay-next/src/suspense/BuildIdCache";
+import { PaintsCache, timeIsBeyondKnownPaints } from "protocol/PaintsCache";
+import { RecordedMouseEventsCache } from "protocol/RecordedEventsCache";
+import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
 import { screenshotCache } from "replay-next/src/suspense/ScreenshotCache";
 import { replayClient } from "shared/client/ReplayClientContext";
+import { TimeStampedPointWithPaintHash } from "shared/client/types";
 import { startAppListening } from "ui/setup/listenerMiddleware";
 import { AppStore } from "ui/setup/store";
 import { getCurrentPauseId } from "ui/utils/app";
@@ -94,94 +93,43 @@ function closerEntry<T1 extends Timed, T2 extends Timed>(
 // Paint / Mouse Event Points
 //////////////////////////////
 
-export interface TimeStampedPointWithPaintHash extends TimeStampedPoint {
-  paintHash: string;
-}
-
-// All paints that have occurred in the recording, in order. Include the
-// beginning point of the recording as well, which is not painted and has
-// a known point and time.
+// TODO [FE-2104] Delete these arrays
 export const gPaintPoints: TimeStampedPointWithPaintHash[] = [
   { point: "0", time: 0, paintHash: "" },
 ];
-
-// All mouse events that have occurred in the recording, in order.
 const gMouseEvents: MouseEvent[] = [];
-
-// All mouse click events that have occurred in the recording, in order.
 const gMouseClickEvents: MouseEvent[] = [];
 
 // Device pixel ratio used by the current screenshot.
 let gDevicePixelRatio = 1;
 
-function onPaints(paints: PaintPoint[]) {
-  paints.forEach(async ({ point, time, screenShots }) => {
-    const paintHash = screenShots.find(desc => desc.mimeType == "image/jpeg")!.hash;
-    insertEntrySorted(gPaintPoints, { point, time, paintHash });
-  });
-}
+export async function setupGraphics(store: AppStore) {
+  await Promise.all([PaintsCache.readAsync(), RecordedMouseEventsCache.readAsync()]);
 
-function onMouseEvents(events: MouseEvent[]) {
-  events.forEach(entry => {
-    insertEntrySorted(gMouseEvents, entry);
+  // TODO [FE-2104] Remove gPaintPoints entirely
+  const paints = PaintsCache.getValue();
+  if (paints) {
+    gPaintPoints.push(...paints);
+  }
+
+  // TODO [FE-2104] Remove gMouseEvents and gMouseClickEvents entirely
+  RecordedMouseEventsCache.getValue().forEach(entry => {
+    gMouseEvents.push(entry);
     if (entry.kind == "mousedown") {
-      insertEntrySorted(gMouseClickEvents, entry);
+      gMouseClickEvents.push(entry);
     }
   });
 
+  // TODO [FE-2104] Remove this callback
   if (typeof onMouseDownEvents === "function") {
     onMouseDownEvents(gMouseClickEvents);
   }
-}
 
-export let hasAllPaintPoints = false;
-
-export const setHasAllPaintPoints = (newValue: boolean) => {
-  hasAllPaintPoints = newValue;
-};
-export const timeIsBeyondKnownPaints = (time: number) =>
-  !hasAllPaintPoints && gPaintPoints[gPaintPoints.length - 1].time < time;
-
-export function setupGraphics(store: AppStore) {
-  replayClient.waitForSession().then(async (sessionId: string) => {
-    let paintedGraphics = false;
-    const maybePaintGraphics = async () => {
-      if (!paintedGraphics) {
-        const { screen, mouse } = await getGraphicsAtTime(getTime(store.getState()), false, true);
-        if (screen) {
-          paintedGraphics = true;
-          paintGraphics(screen, mouse);
-        }
-      }
-    };
-
-    const { client } = await import("./socket");
-    client.Graphics.addPaintPointsListener(async ({ paints }) => {
-      onPaints(paints);
-      if (gPaintPoints.length >= INITIAL_PAINT_COUNT) {
-        initialPaintsReceivedWaiter.resolve(null);
-      }
-      const latestPaint = BigInt(maxBy(paints, p => BigInt(p.point))?.point || 0);
-      const currentPoint = getExecutionPoint(store.getState());
-      if (currentPoint && latestPaint >= BigInt(currentPoint)) {
-        maybePaintGraphics();
-      }
-    });
-    client.Graphics.findPaints({}, sessionId).then(async () => {
-      initialPaintsReceivedWaiter.resolve(null);
-      hasAllPaintPoints = true;
-      maybePaintGraphics();
-    });
-
-    client.Session.addMouseEventsListener(({ events }) => onMouseEvents(events));
-    client.Session.findMouseEvents({}, sessionId);
-
-    const recordingTarget = await recordingTargetCache.readAsync(replayClient);
-    if (recordingTarget === "node") {
-      // Make sure we never wait for any paints when trying to do things like playback
-      setHasAllPaintPoints(true);
-    }
-  });
+  const currentTime = getTime(store.getState());
+  const { screen, mouse } = await getGraphicsAtTime(currentTime, false);
+  if (screen) {
+    paintGraphics(screen, mouse);
+  }
 
   async function repaint() {
     const state = store.getState();
@@ -566,10 +514,10 @@ async function getScreenshotDimensions(screen: ScreenShot) {
 
 // the maximum number of paints to be considered when looking for the first meaningful paint
 const INITIAL_PAINT_COUNT = 10;
-const initialPaintsReceivedWaiter = defer();
 
 export async function getFirstMeaningfulPaint() {
-  await initialPaintsReceivedWaiter.promise;
+  await PaintsCache.readAsync();
+
   for (const paintPoint of gPaintPoints.slice(0, INITIAL_PAINT_COUNT)) {
     const { screen } = await getGraphicsAtTime(paintPoint.time);
     if (!screen) {

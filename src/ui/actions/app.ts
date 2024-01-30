@@ -1,11 +1,16 @@
 import { KeyboardEvent } from "@replayio/protocol";
 import groupBy from "lodash/groupBy";
+import { isPromiseLike } from "suspense";
 
 import {
   jumpToNextPause,
   jumpToPreviousPause,
 } from "devtools/client/debugger/src/actions/pause/jumps";
 import { openQuickOpen } from "devtools/client/debugger/src/actions/quick-open";
+import {
+  RecordedKeyboardEventsCache,
+  RecordedNavigationEventsCache,
+} from "protocol/RecordedEventsCache";
 import { ReplayClientInterface } from "shared/client/types";
 import { getSystemColorScheme } from "shared/theme/getSystemColorScheme";
 import { userData } from "shared/user-data/GraphQL/UserData";
@@ -35,42 +40,47 @@ import { UIStore, UIThunkAction } from ".";
 export * from "../reducers/app";
 
 export async function setupApp(store: UIStore, replayClient: ReplayClientInterface) {
-  replayClient.waitForSession().then(sessionId => {
-    store.dispatch(setSessionId(sessionId));
+  const sessionId = await replayClient.waitForSession();
 
-    replayClient
-      .findKeyboardEvents(({ events }) => onKeyboardEvents(events, store))
-      .then(() => {
-        store.dispatch(loadReceivedKeyboardEvents());
+  store.dispatch(setSessionId(sessionId));
+
+  {
+    const result = RecordedKeyboardEventsCache.readAsync();
+    if (isPromiseLike(result)) {
+      result.then(events => {
+        onKeyboardEvents(events, store);
       });
-    replayClient.findNavigationEvents(({ events }) =>
-      onNavigationEvents(events as ReplayNavigationEvent[], store)
-    );
-  });
-}
-
-const allKeyboardEvents: KeyboardEvent[] = [];
-
-function onKeyboardEvents(events: KeyboardEvent[], store: UIStore) {
-  allKeyboardEvents.push(...events);
-}
-
-function loadReceivedKeyboardEvents(): UIThunkAction {
-  return dispatch => {
-    const groupedEvents = groupBy(allKeyboardEvents, event => event.kind) as Record<
-      EventKind,
-      ReplayEvent[]
-    >;
-
-    for (let key of Object.keys(groupedEvents)) {
-      groupedEvents[key].sort((a: ReplayEvent, b: ReplayEvent) =>
-        compareBigInt(BigInt(a.point), BigInt(b.point))
-      );
+    } else {
+      onKeyboardEvents(result, store);
     }
-    dispatch(loadReceivedEvents(groupedEvents));
-  };
+  }
+
+  {
+    const result = RecordedNavigationEventsCache.readAsync();
+    if (isPromiseLike(result)) {
+      result.then(events => {
+        onNavigationEvents(events as ReplayNavigationEvent[], store);
+      });
+    } else {
+      onNavigationEvents(result as ReplayNavigationEvent[], store);
+    }
+  }
 }
 
+// TODO [FE-2104] Remove these values from Redux; they should be in Suspense caches only
+function onKeyboardEvents(events: KeyboardEvent[], store: UIStore) {
+  const groupedEvents = groupBy(events, event => event.kind) as Record<EventKind, ReplayEvent[]>;
+
+  for (let key of Object.keys(groupedEvents)) {
+    groupedEvents[key].sort((a: ReplayEvent, b: ReplayEvent) =>
+      compareBigInt(BigInt(a.point), BigInt(b.point))
+    );
+  }
+
+  store.dispatch(loadReceivedEvents(groupedEvents));
+}
+
+// TODO [FE-2104] Remove these values from Redux; they should be in Suspense caches only
 function onNavigationEvents(events: ReplayNavigationEvent[], store: UIStore) {
   const currentNavEvents: ReplayNavigationEvent[] = events.map(e => ({ ...e, kind: "navigation" }));
   const newNavEvents = [...getEventsForType(store.getState(), "navigation"), ...currentNavEvents];

@@ -20,7 +20,7 @@ import { clickScreenshot, hoverScreenshot } from "../helpers/screenshot";
 import { waitFor } from "../helpers/utils";
 import test, { expect } from "../testFixtureCloneRecording";
 
-test.use({ exampleKey: "cra/dist/index_chromium.html" });
+test.use({ exampleKey: "cra/dist/index.html" });
 
 test("react_devtools-01: Basic RDT behavior", async ({
   pageWithMeta: { page, recordingId },

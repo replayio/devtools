@@ -46,8 +46,8 @@ import {
   nextPaintOrMouseEvent,
   paintGraphics,
   previousPaintEvent,
-  timeIsBeyondKnownPaints,
 } from "protocol/graphics";
+import { mostRecentPaint, timeIsBeyondKnownPaints } from "protocol/PaintsCache";
 import { waitForTime } from "protocol/utils";
 import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
 import {
@@ -850,12 +850,11 @@ export function precacheScreenshots(beginTime: number): UIThunkAction {
 
     const endTime = Math.min(beginTime + PRECACHE_DURATION, recordingDuration);
     for (let time = beginTime; time < endTime; time += SNAP_TIME_INTERVAL) {
-      const index = mostRecentIndex(gPaintPoints, time);
-      if (index === undefined) {
+      const paintPoint = mostRecentPaint(time);
+      if (paintPoint === null) {
         return;
       }
 
-      const paintPoint = gPaintPoints[index];
       // the client isn't used in the cache key, so it's OK to pass a dummy value here
       if (!screenshotCache.getValueIfCached(null as any, paintPoint.point, paintPoint.paintHash)) {
         const graphicsPromise = getGraphicsAtTime(time, true);
