@@ -2,7 +2,7 @@ steps:
   - label: "Runtime e2e tests (linux-x86_64)"
     timeout_in_minutes: 60
     key: "runtime-fe-e2e-tests-linux_x86_64"
-    command: "npm install -g ts-node && ts-node ./packages/e2e-tests/scripts/buildkite_run_fe_tests_from_artifact-linux-x86_64.ts"
+    command: "npm i -g yarn && yarn install && ts-node ./packages/e2e-tests/scripts/buildkite_run_fe_tests_from_artifact-linux-x86_64.ts"
     agents:
       - "deploy=true"
     plugins:

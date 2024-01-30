@@ -94,15 +94,7 @@ export default function run_fe_tests(CHROME_BINARY_PATH, runInCI = true) {
 
   let webProc;
   if (runInCI) {
-    // Install node deps
-    execSync("npm i -g yarn", {
-      stdio: "inherit",
-    });
-
-    execSync("yarn install", {
-      stdio: "inherit",
-    });
-
+    // Get ready.
     execSync("cp .env.sample .env", {
       stdio: "inherit",
     });
