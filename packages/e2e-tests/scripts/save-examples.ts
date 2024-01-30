@@ -218,41 +218,38 @@ async function saveBrowserExamples() {
 async function saveBrowserExample({ example }: TestRunCallbackArgs) {
   const recordingMsg = `Recording example ${chalk.bold(example.filename)}`;
   const { completeLog, updateLog } = logAnimated(recordingMsg);
-  try {
-    updateLog(`${recordingMsg} (Recording...)`);
-    const exampleUrl = `${config.devtoolsUrl}/test/examples/${example.filename}`;
-    async function defaultPlaywrightScript(page: Page) {
-      await waitUntilMessage(page as Page, "ExampleFinished");
-    }
-    const playwrightScript: PlaywrightScript = example.playwrightScript ?? defaultPlaywrightScript;
-    await raceForTime(
-      CONFIG.recordingTimeout,
-      recordPlaywright(async (page, expect) => {
-        const waitForLogPromise = playwrightScript(page, expect);
-        const goToPagePromise = page.goto(exampleUrl);
-
-        await Promise.all([goToPagePromise, waitForLogPromise]);
-      })
-    );
-
-    updateLog(`${recordingMsg} (Uplading...)`);
-    const recordingId = await raceForTime(CONFIG.uploadTimeout, uploadLastRecording(exampleUrl));
-    if (recordingId == null) {
-      throw new Error(`Recording "${example.filename}" not uploaded`);
-    }
-    exampleToNewRecordingId[example.filename] = recordingId;
-
-    updateLog(`${recordingMsg} (Updating DB...)`);
-    if (config.useExampleFile && recordingId) {
-      await saveRecording(example.filename, config.replayApiKey, recordingId, true);
-    }
-
-    if (recordingId) {
-      removeRecording(recordingId);
-    }
-  } finally {
-    completeLog();
+  updateLog(`${recordingMsg} (Recording...)`);
+  const exampleUrl = `${config.devtoolsUrl}/test/examples/${example.filename}`;
+  async function defaultPlaywrightScript(page: Page) {
+    await waitUntilMessage(page as Page, "ExampleFinished");
   }
+  const playwrightScript: PlaywrightScript = example.playwrightScript ?? defaultPlaywrightScript;
+  await raceForTime(
+    CONFIG.recordingTimeout,
+    recordPlaywright(async (page, expect) => {
+      const waitForLogPromise = playwrightScript(page, expect);
+      const goToPagePromise = page.goto(exampleUrl);
+
+      await Promise.all([goToPagePromise, waitForLogPromise]);
+    })
+  );
+
+  updateLog(`${recordingMsg} (Uplading...)`);
+  const recordingId = await raceForTime(CONFIG.uploadTimeout, uploadLastRecording(exampleUrl));
+  if (recordingId == null) {
+    throw new Error(`Recording "${example.filename}" not uploaded`);
+  }
+  exampleToNewRecordingId[example.filename] = recordingId;
+
+  updateLog(`${recordingMsg} (Updating DB...)`);
+  if (config.useExampleFile && recordingId) {
+    await saveRecording(example.filename, config.replayApiKey, recordingId, true);
+  }
+
+  if (recordingId) {
+    removeRecording(recordingId);
+  }
+  completeLog();
 }
 
 async function saveNodeExamples() {
