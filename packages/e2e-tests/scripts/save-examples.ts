@@ -55,6 +55,11 @@ const argv = yargs
   .alias("help", "h")
   .parseSync();
 
+const CONFIG = {
+  recordingTimeout: 5000,
+  uploadTimeout: 60_000,
+};
+
 type PlaywrightScript = (page: Page, expect: typeof expectFunction) => Promise<void>;
 
 type TestExampleFile = {
@@ -211,37 +216,42 @@ async function saveBrowserExamples() {
 }
 
 async function saveBrowserExample({ example }: TestRunCallbackArgs) {
-  const { completeLog } = logAnimated(`Recording example ${chalk.bold(example.filename)}`);
+  const recordingMsg = `Recording example ${chalk.bold(example.filename)}`;
+  const { completeLog, updateLog } = logAnimated(recordingMsg);
+  try {
+    updateLog(`${recordingMsg} (Recording...)`);
+    const exampleUrl = `${config.devtoolsUrl}/test/examples/${example.filename}`;
+    async function defaultPlaywrightScript(page: Page) {
+      await waitUntilMessage(page as Page, "ExampleFinished");
+    }
+    const playwrightScript: PlaywrightScript = example.playwrightScript ?? defaultPlaywrightScript;
+    await raceForTime(
+      CONFIG.recordingTimeout,
+      recordPlaywright((argv.runtime || example.runtime) as BrowserName, async (page, expect) => {
+        const waitForLogPromise = playwrightScript(page, expect);
+        const goToPagePromise = page.goto(exampleUrl);
 
-  const exampleUrl = `${config.devtoolsUrl}/test/examples/${example.filename}`;
-  async function defaultPlaywrightScript(page: Page) {
-    await waitUntilMessage(page as Page, "ExampleFinished");
-  }
-  const playwrightScript: PlaywrightScript = example.playwrightScript ?? defaultPlaywrightScript;
+        await Promise.all([goToPagePromise, waitForLogPromise]);
+      })
+    );
 
-  // Shouldn't be "node" by this point
-  await recordPlaywright((argv.runtime || example.runtime) as BrowserName, async (page, expect) => {
-    const waitForLogPromise = playwrightScript(page, expect);
-    const goToPagePromise = page.goto(exampleUrl);
+    updateLog(`${recordingMsg} (Uplading...)`);
+    const recordingId = await raceForTime(CONFIG.uploadTimeout, uploadLastRecording(exampleUrl));
+    if (recordingId == null) {
+      throw new Error(`Recording "${example.filename}" not uploaded`);
+    }
+    exampleToNewRecordingId[example.filename] = recordingId;
 
-    await Promise.all([goToPagePromise, waitForLogPromise]);
-  });
+    updateLog(`${recordingMsg} (Updating DB...)`);
+    if (config.useExampleFile && recordingId) {
+      await saveRecording(example.filename, config.replayApiKey, recordingId, true);
+    }
 
-  const recordingId = await uploadLastRecording(exampleUrl);
-  if (recordingId == null) {
-    throw new Error("Recording not uploaded");
-  }
-
-  exampleToNewRecordingId[example.filename] = recordingId;
-
-  completeLog();
-
-  if (config.useExampleFile && recordingId) {
-    await saveRecording(example.filename, config.replayApiKey, recordingId, true);
-  }
-
-  if (recordingId) {
-    removeRecording(recordingId);
+    if (recordingId) {
+      removeRecording(recordingId);
+    }
+  } finally {
+    completeLog();
   }
 }
 
@@ -336,6 +346,17 @@ async function updateRecordingTitle(apiKey: string, recordingId: string, title: 
   }).catch(e => {
     logError(e, variables);
   });
+}
+
+async function sleep(timeoutMs: number) {
+  return new Promise<void>(r => setTimeout(() => r(), timeoutMs));
+}
+
+async function raceForTime<T>(timeoutMs: number, promise: Promise<T>) {
+  return Promise.race([
+    promise,
+    sleep(timeoutMs).then(() => Promise.reject(new Error(`Race timeout after ${timeoutMs}ms`))),
+  ]);
 }
 
 async function waitUntilMessage(
