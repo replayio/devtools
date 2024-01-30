@@ -61,7 +61,7 @@ function gatherChromiumExamplesAndTests() {
   return { testFiles, exampleFiles: uniq(exampleFiles) };
 }
 
-export function run_fe_tests(CHROME_BINARY_PATH, runInCI = true) {
+export default function run_fe_tests(CHROME_BINARY_PATH, runInCI = true) {
   console.group("START");
   console.time("START time");
 

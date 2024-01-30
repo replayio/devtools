@@ -2,9 +2,9 @@
 
 import { build_id_from_artifact } from "./build_id_from_artifact";
 import { install_build_products } from "./build_products";
-import { run_fe_tests } from "./buildkite_run_fe_tests";
+import run_fe_tests from "./buildkite_run_fe_tests";
 
-export function run_fe_tests_from_artifact(PLATFORM, ARCH) {
+export default function run_fe_tests_from_artifact(PLATFORM, ARCH) {
   console.group("BUILD PREP");
   console.time("BUILD PREP");
   let RUNTIME_BUILD_ID = build_id_from_artifact(PLATFORM, ARCH);
