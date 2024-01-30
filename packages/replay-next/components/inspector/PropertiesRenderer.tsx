@@ -12,7 +12,7 @@ import { FC, Fragment, ReactNode, Suspense, useContext, useMemo } from "react";
 import Expandable from "replay-next/components/Expandable";
 import Loader from "replay-next/components/Loader";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
-import { mergePropertiesAndGetterValues } from "replay-next/src/utils/protocol";
+import { isArrayElement } from "replay-next/src/utils/protocol";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import GetterRenderer from "./GetterRenderer";
@@ -56,31 +56,29 @@ export default function PropertiesRenderer({
       return [];
     }
 
-    let [properties] = mergePropertiesAndGetterValues(
-      preview.properties || [],
-      preview.getterValues || []
+    const ownProperties = sortBy(preview.properties || [], property =>
+      isArrayElement(property) ? Number(property.name) : property.name
     );
 
-    properties = sortBy(properties, ({ name }) => {
-      const maybeNumber = Number(name);
-      return isNaN(maybeNumber) ? name : maybeNumber;
-    });
+    const getterValues = sortBy(preview.getterValues || [], getterValue => getterValue.name);
 
     if (preview.promiseState) {
       if (preview.promiseState.value) {
-        properties.unshift({ name: "<value>", ...preview.promiseState.value });
+        getterValues.unshift({ name: "<value>", ...preview.promiseState.value });
       }
-      properties.unshift({ name: "<state>", value: preview.promiseState.state });
+      getterValues.unshift({ name: "<state>", value: preview.promiseState.state });
     }
 
     if (preview.proxyState) {
-      properties.unshift(
+      getterValues.unshift(
         { name: "<target>", ...preview.proxyState.target },
         { name: "<handler>", ...preview.proxyState.handler }
       );
     }
 
-    return properties;
+    return ownProperties
+      .map(property => ({ ...property, isGetterValue: false }))
+      .concat(getterValues.map(getterValue => ({ ...getterValue, isGetterValue: true })));
   }, [preview]);
 
   let EntriesRenderer: FC<EntriesRendererProps> = ContainerEntriesRenderer;
