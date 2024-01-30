@@ -26,7 +26,7 @@ export type Props = {
   onContextMenu?: (event: MouseEvent) => void;
   path?: string;
   pauseId: PauseId;
-  protocolValue: (ProtocolValue | ProtocolNamedValue) & { isGetterValue?: boolean };
+  protocolValue: ProtocolValue | ProtocolNamedValue;
 };
 
 // Renders a protocol Object/ObjectPreview as a key+value pair.
@@ -131,9 +131,6 @@ export default function KeyValueRenderer({
     } else {
       nameClass = styles.VerticalName;
     }
-  }
-  if (protocolValue.isGetterValue) {
-    nameClass += " " + styles.GetterValue;
   }
 
   // What we show when expanded or collapsed depends on the context we are displayed in.
