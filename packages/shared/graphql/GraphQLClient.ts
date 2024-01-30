@@ -11,11 +11,13 @@ type Data = {
 // By default, we use real GraphQL backend APIs.
 // We can leverage this when writing tests (or UI demos) by injecting a stub client.
 export let graphqlUrl = process.env.NEXT_PUBLIC_API_URL || "https://api.replay.io/v1/graphql";
+let testScope: string | undefined;
 if (typeof window !== "undefined") {
   const url = new URL(window.location.href);
   if (url.searchParams.has("graphql")) {
     graphqlUrl = url.searchParams.get("graphql") as string;
   }
+  testScope = url.searchParams.get("testScope") ?? undefined;
 }
 
 export interface GraphQLClientInterface {
@@ -26,9 +28,11 @@ export interface GraphQLClientInterface {
 // For now let's see how far we can get just using the Fetch API.
 export class GraphQLClient implements GraphQLClientInterface {
   private url: string;
+  private testScope: string | undefined;
 
-  constructor(url: string) {
+  constructor(url: string, testScope?: string) {
     this.url = url;
+    this.testScope = testScope;
   }
 
   async send<T>(data: Data, accessToken: string | null): Promise<T> {
@@ -41,6 +45,7 @@ export class GraphQLClient implements GraphQLClientInterface {
       headers: {
         ...(accessToken && {
           Authorization: `Bearer ${accessToken}`,
+          "replay-test-scope": this.testScope,
         }),
         "Content-Type": "application/json",
       },
@@ -53,4 +58,4 @@ export class GraphQLClient implements GraphQLClientInterface {
   }
 }
 
-export const graphQLClient = new GraphQLClient(graphqlUrl);
+export const graphQLClient = new GraphQLClient(graphqlUrl, testScope);

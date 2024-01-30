@@ -3,13 +3,24 @@
 // Because our e2e tests are public anyway, these secrets were already visible
 // and the impact of leaking them is small, since the users are in an isolated team/workspace
 
-// Can view the "Replay: Authenticated e2e tests" workspace
-// trunk-ignore(gitleaks/generic-api-key)
-export const E2E_USER_1_API_KEY = "ruk_jukvxbSz7syp4Tw21RzEwSK2bjucNDklCEDmVkjbHMA";
+export interface TestUser {
+  apiKey: string;
+  email: string;
+}
 
 // Can view the "Replay: Authenticated e2e tests" workspace
-// trunk-ignore(gitleaks/generic-api-key)
-export const E2E_USER_2_API_KEY = "ruk_K77rBZ4FuPyfj5ocfpPpTXJx7WGVesSySInnCJ4sS1Y";
+export const E2E_USER_1: TestUser = {
+  // trunk-ignore(gitleaks/generic-api-key)
+  apiKey: "ruk_jukvxbSz7syp4Tw21RzEwSK2bjucNDklCEDmVkjbHMA",
+  email: "frontende2e1@replay.io",
+};
+
+// Can view the "Replay: Authenticated e2e tests" workspace
+export const E2E_USER_2: TestUser = {
+  // trunk-ignore(gitleaks/generic-api-key)
+  apiKey: "ruk_K77rBZ4FuPyfj5ocfpPpTXJx7WGVesSySInnCJ4sS1Y",
+  email: "frontende2e2@replay.io",
+};
 
 // Can view the "Replay Devtools Snapshots" (Test Suites) workspace
 // but cannot upload new recordings nor source-maps
