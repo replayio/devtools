@@ -3,6 +3,7 @@ import { PreferencesKey } from "shared/user-data/GraphQL/types";
 import { BooleanPreference } from "ui/components/shared/UserSettingsModal/components/BooleanPreference";
 
 export const PREFERENCES: PreferencesKey[] = [
+  "feature_showLogPointPanelAboveLine",
   "backend_sampleAllTraces",
   "global_logTelemetryEvent",
   "feature_protocolTimeline",

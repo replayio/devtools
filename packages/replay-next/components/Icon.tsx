@@ -46,6 +46,8 @@ export type IconType =
   | "inspect"
   | "invisible"
   | "invoke-getter"
+  | "log-point-panel-arrow-above"
+  | "log-point-panel-arrow-below"
   | "menu-closed"
   | "menu-open"
   | "open"
@@ -308,6 +310,14 @@ export default function Icon({
           <polygon points="13,6 11.59,7.41 16.17,12 11.59,16.59 13,18 19,12" />
         </>
       );
+      break;
+    case "log-point-panel-arrow-above":
+      path =
+        "M11 17.17L12.59 15.58L14 17L10 21L6 17L7.41 15.59L9 17.17L9 9C9 7.9 9.9 7 11 7L20 7L20 9L11 9L11 17.17Z";
+      break;
+    case "log-point-panel-arrow-below":
+      path =
+        "M11 6.83L12.59 8.42L14 7L10 3L6 7L7.41 8.41L9 6.83L9 15C9 16.1 9.9 17 11 17L20 17L20 15L11 15L11 6.83Z";
       break;
     case "menu-closed":
       path = "M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z";

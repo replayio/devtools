@@ -2,6 +2,7 @@ import { SameLineSourceLocations } from "@replayio/protocol";
 import { CSSProperties, useContext, useMemo } from "react";
 import { STATUS_PENDING, useImperativeIntervalCacheValues } from "suspense";
 
+import Icon from "replay-next/components/Icon";
 import {
   ExecutionPointLineHighlight,
   LineHighlight,
@@ -24,6 +25,7 @@ import { bucketVisibleLines } from "replay-next/src/utils/source";
 import { ParsedToken } from "replay-next/src/utils/syntax-parser";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { LineHitCounts, POINT_BEHAVIOR_DISABLED, Point } from "shared/client/types";
+import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { toPointRange } from "shared/utils/time";
 
 import LogPointPanel from "./log-point-panel/LogPointPanel";
@@ -80,6 +82,8 @@ export default function SourceListRow({
   const client = useContext(ReplayClientContext);
   const [{ enabled: searchEnabled, index: searchResultIndex, results: searchResults }] =
     useContext(SourceSearchContext);
+
+  const [logPointPanelAbove] = useGraphQLUserData("feature_showLogPointPanelAboveLine");
 
   const visibleSearchResults = useMemo<SourceSearchResult[]>(
     () => (searchEnabled ? searchResults.filter(result => result.lineIndex == lineIndex) : []),
@@ -154,6 +158,7 @@ export default function SourceListRow({
   return (
     <div
       className={styles.Row}
+      data-log-point-placement={logPointPanelAbove ? "above" : "below"}
       data-test-hitcounts-loaded={hitCounts != null ? true : undefined}
       data-test-line-has-hits={lineHitCounts != null ? hitCount > 0 : undefined}
       data-test-line-number={lineNumber}
@@ -216,8 +221,14 @@ export default function SourceListRow({
         />
       )}
       {showPointPanel && (
+        <Icon
+          className={styles.LogPointPanelIcon}
+          type={logPointPanelAbove ? "log-point-panel-arrow-above" : "log-point-panel-arrow-below"}
+        />
+      )}
+      {showPointPanel && (
         <LogPointPanel
-          className={styles.PointPanel}
+          className={styles.LogPointPanel}
           pointWithPendingEdits={pointWithPendingEdits}
           pointForSuspense={pointForSuspense!}
         />
