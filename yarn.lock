@@ -3617,20 +3617,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/cypress@npm:^0.5.0":
-  version: 0.5.6
-  resolution: "@replayio/cypress@npm:0.5.6"
+"@replayio/cypress@npm:^1.7.16":
+  version: 1.7.16
+  resolution: "@replayio/cypress@npm:1.7.16"
   dependencies:
-    "@replayio/replay": ^0.12.4
-    "@replayio/test-utils": ^0.5.3
+    "@replayio/replay": ^0.21.1
+    "@replayio/test-utils": ^1.3.12
+    chalk: ^4.1.2
     debug: ^4.3.4
-    semver: ^7.3.8
+    semver: ^7.5.2
+    terminate: ^2.6.1
+    txml: ^3.2.5
     uuid: ^8.3.2
+    ws: ^8.14.2
   peerDependencies:
     cypress: ">=5.3.0"
   bin:
     replayio-cypress: bin/replayio-cypress.js
-  checksum: d41d2f4abc38b9e3757f6a3ac8db887e175ed197b9af58ac5682e39ecff64213d360a3e97b3e3e6e1a3a3bf6d46f6534b0c250df15c7c28ded24bbb6a5e18e9d
+  checksum: 2402193ce8d75459c3737bdb9ebb8f97ecb52cf6e12b90593cf4338a67d8cd709af3dc150a2675a75923c5928b022d7754ac63050518166922a3cda2122bd317
   languageName: node
   linkType: hard
 
@@ -3682,26 +3686,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/replay@npm:^0.12.4":
-  version: 0.12.4
-  resolution: "@replayio/replay@npm:0.12.4"
-  dependencies:
-    "@replayio/sourcemap-upload": ^1.0.6
-    commander: ^7.2.0
-    debug: ^4.3.4
-    is-uuid: ^1.0.2
-    jsonata: ^1.8.6
-    node-fetch: ^2.6.8
-    p-map: ^4.0.0
-    superstruct: ^0.15.4
-    text-table: ^0.2.0
-    ws: ^7.5.0
-  bin:
-    replay: bin/replay.js
-  checksum: bb2b6c7a2bb6f9167352f4ce29eb532cd8d788679782d6bebb49655d86dd785d3c6be2e7c6292b3be9d50401dfedda1b4367f10bfe62e96143cd327c642012a5
-  languageName: node
-  linkType: hard
-
 "@replayio/replay@npm:^0.20.0":
   version: 0.20.0
   resolution: "@replayio/replay@npm:0.20.0"
@@ -3748,7 +3732,30 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/sourcemap-upload@npm:^1.0.6, @replayio/sourcemap-upload@npm:^1.1.1":
+"@replayio/replay@npm:^0.21.1":
+  version: 0.21.1
+  resolution: "@replayio/replay@npm:0.21.1"
+  dependencies:
+    "@replayio/sourcemap-upload": ^1.1.1
+    "@types/semver": ^7.5.6
+    commander: ^7.2.0
+    debug: ^4.3.4
+    is-uuid: ^1.0.2
+    jsonata: ^1.8.6
+    node-fetch: ^2.6.8
+    p-map: ^4.0.0
+    query-registry: ^2.6.0
+    semver: ^7.5.4
+    superstruct: ^0.15.4
+    text-table: ^0.2.0
+    ws: ^7.5.0
+  bin:
+    replay: bin/replay.js
+  checksum: 8884f6707a570782c365ae35e254e474da0b8659787156bed2161959d93e0b4276ad7db0de5d47cc62007215d07bb01362ebef9529101ce23c14595e2b024e40
+  languageName: node
+  linkType: hard
+
+"@replayio/sourcemap-upload@npm:^1.1.1":
   version: 1.1.1
   resolution: "@replayio/sourcemap-upload@npm:1.1.1"
   dependencies:
@@ -3761,16 +3768,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/test-utils@npm:^0.5.3":
-  version: 0.5.3
-  resolution: "@replayio/test-utils@npm:0.5.3"
+"@replayio/test-utils@npm:^1.3.12":
+  version: 1.3.12
+  resolution: "@replayio/test-utils@npm:1.3.12"
   dependencies:
-    "@replayio/replay": ^0.12.4
-    "@types/node-fetch": ^2.6.2
+    "@replayio/replay": ^0.21.1
     debug: ^4.3.4
     node-fetch: ^2.6.7
     uuid: ^8.3.2
-  checksum: d1c4e85f39e82a9cfe25bec3621f7b52770e3890df5ac638b9e1420656619962110f5ebbf3159643c6aa053df6bb6799aa9cffa076f49f959f8c7625c5ecee42
+  checksum: 3cc8c25774a07235947912b8edb4bc5972d4e7382ce5c324eac518cce941c7d85c82e90c16767218c928b42a3d5e4017e9b4b4cde3ed9985f182d6a36f902217
   languageName: node
   linkType: hard
 
@@ -4637,7 +4643,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node-fetch@npm:^2.5.10, @types/node-fetch@npm:^2.6.2":
+"@types/node-fetch@npm:^2.5.10":
   version: 2.6.2
   resolution: "@types/node-fetch@npm:2.6.2"
   dependencies:
@@ -8209,7 +8215,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"duplexer@npm:^0.1.2":
+"duplexer@npm:^0.1.2, duplexer@npm:~0.1.1":
   version: 0.1.2
   resolution: "duplexer@npm:0.1.2"
   checksum: 62ba61a830c56801db28ff6305c7d289b6dc9f859054e8c982abd8ee0b0a14d2e9a8e7d086ffee12e868d43e2bbe8a964be55ddbd8c8957714c87373c7a4f9b0
@@ -8919,6 +8925,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"event-stream@npm:=3.3.4":
+  version: 3.3.4
+  resolution: "event-stream@npm:3.3.4"
+  dependencies:
+    duplexer: ~0.1.1
+    from: ~0
+    map-stream: ~0.1.0
+    pause-stream: 0.0.11
+    split: 0.3
+    stream-combiner: ~0.0.4
+    through: ~2.3.1
+  checksum: 80b467820b6daf824d9fb4345d2daf115a056e5c104463f2e98534e92d196a27f2df5ea2aa085624db26f4c45698905499e881d13bc7c01f7a13eac85be72a22
+  languageName: node
+  linkType: hard
+
 "event-target-shim@npm:^5.0.0":
   version: 5.0.1
   resolution: "event-target-shim@npm:5.0.1"
@@ -9621,6 +9642,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"from@npm:~0":
+  version: 0.1.7
+  resolution: "from@npm:0.1.7"
+  checksum: b85125b7890489656eb2e4f208f7654a93ec26e3aefaf3bbbcc0d496fc1941e4405834fcc9fe7333192aa2187905510ace70417bbf9ac6f6f4784a731d986939
+  languageName: node
+  linkType: hard
+
 "fromentries@npm:^1.3.2":
   version: 1.3.2
   resolution: "fromentries@npm:1.3.2"
@@ -9746,7 +9774,7 @@ __metadata:
   resolution: "functional-tests@workspace:packages/e2e-tests"
   dependencies:
     "@playwright/test": ^1.37.0
-    "@replayio/cypress": ^0.5.0
+    "@replayio/cypress": ^1.7.16
     "@replayio/playwright": ^2.0.0-alpha.9
     chalk: ^4
     cli-spinners: ^2.7.0
@@ -12978,6 +13006,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"map-stream@npm:~0.1.0":
+  version: 0.1.0
+  resolution: "map-stream@npm:0.1.0"
+  checksum: 38abbe4eb883888031e6b2fc0630bc583c99396be16b8ace5794b937b682a8a081f03e8b15bfd4914d1bc88318f0e9ac73ba3512ae65955cd449f63256ddb31d
+  languageName: node
+  linkType: hard
+
 "matcher@npm:^3.0.0":
   version: 3.0.0
   resolution: "matcher@npm:3.0.0"
@@ -14409,6 +14444,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"pause-stream@npm:0.0.11":
+  version: 0.0.11
+  resolution: "pause-stream@npm:0.0.11"
+  dependencies:
+    through: ~2.3
+  checksum: 3c4a14052a638b92e0c96eb00c0d7977df7f79ea28395250c525d197f1fc02d34ce1165d5362e2e6ebbb251524b94a76f3f0d4abc39ab8b016d97449fe15583c
+  languageName: node
+  linkType: hard
+
 "pend@npm:~1.2.0":
   version: 1.2.0
   resolution: "pend@npm:1.2.0"
@@ -14928,6 +14972,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ps-tree@npm:^1.2.0":
+  version: 1.2.0
+  resolution: "ps-tree@npm:1.2.0"
+  dependencies:
+    event-stream: =3.3.4
+  bin:
+    ps-tree: ./bin/ps-tree.js
+  checksum: e635dd00f53d30d31696cf5f95b3a8dbdf9b1aeb36d4391578ce8e8cd22949b7c5536c73b0dc18c78615ea3ddd4be96101166be59ca2e3e3cb1e2f79ba3c7f98
+  languageName: node
+  linkType: hard
+
 "psl@npm:^1.1.28, psl@npm:^1.1.33":
   version: 1.9.0
   resolution: "psl@npm:1.9.0"
@@ -15386,6 +15441,17 @@ __metadata:
     parse-json: ^5.0.0
     type-fest: ^0.6.0
   checksum: eb696e60528b29aebe10e499ba93f44991908c57d70f2d26f369e46b8b9afc208ef11b4ba64f67630f31df8b6872129e0a8933c8c53b7b4daf0eace536901222
+  languageName: node
+  linkType: hard
+
+"readable-stream@npm:2 || 3":
+  version: 3.6.2
+  resolution: "readable-stream@npm:3.6.2"
+  dependencies:
+    inherits: ^2.0.3
+    string_decoder: ^1.1.1
+    util-deprecate: ^1.0.1
+  checksum: bdcbe6c22e846b6af075e32cf8f4751c2576238c5043169a1c221c92ee2878458a816a4ea33f4c67623c0b6827c8a400409bfb3cf0bf3381392d0b1dfb52ac8d
   languageName: node
   linkType: hard
 
@@ -16147,7 +16213,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"semver@npm:^7.0.0, semver@npm:^7.5.3, semver@npm:^7.5.4":
+"semver@npm:^7.0.0, semver@npm:^7.5.2, semver@npm:^7.5.3, semver@npm:^7.5.4":
   version: 7.5.4
   resolution: "semver@npm:7.5.4"
   dependencies:
@@ -16158,7 +16224,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"semver@npm:^7.3.2, semver@npm:^7.3.4, semver@npm:^7.3.5, semver@npm:^7.3.7, semver@npm:^7.3.8":
+"semver@npm:^7.3.2, semver@npm:^7.3.4, semver@npm:^7.3.5, semver@npm:^7.3.7":
   version: 7.3.8
   resolution: "semver@npm:7.3.8"
   dependencies:
@@ -16634,6 +16700,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"split@npm:0.3":
+  version: 0.3.3
+  resolution: "split@npm:0.3.3"
+  dependencies:
+    through: 2
+  checksum: 2e076634c9637cfdc54ab4387b6a243b8c33b360874a25adf6f327a5647f07cb3bf1c755d515248eb3afee4e382278d01f62c62d87263c118f28065b86f74f02
+  languageName: node
+  linkType: hard
+
 "sprintf-js@npm:^1.1.2":
   version: 1.1.2
   resolution: "sprintf-js@npm:1.1.2"
@@ -16721,6 +16796,15 @@ __metadata:
   dependencies:
     internal-slot: ^1.0.4
   checksum: d04173690b2efa40e24ab70e5e51a3ff31d56d699550cfad084104ab3381390daccb36652b25755e420245f3b0737de66c1879eaa2a8d4fc0a78f9bf892fcb42
+  languageName: node
+  linkType: hard
+
+"stream-combiner@npm:~0.0.4":
+  version: 0.0.4
+  resolution: "stream-combiner@npm:0.0.4"
+  dependencies:
+    duplexer: ~0.1.1
+  checksum: 844b622cfe8b9de45a6007404f613b60aaf85200ab9862299066204242f89a7c8033b1c356c998aa6cfc630f6cd9eba119ec1c6dc1f93e245982be4a847aee7d
   languageName: node
   linkType: hard
 
@@ -17374,6 +17458,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"terminate@npm:^2.6.1":
+  version: 2.6.1
+  resolution: "terminate@npm:2.6.1"
+  dependencies:
+    ps-tree: ^1.2.0
+  checksum: 31c154656ad59c3cbf76829bcbb775ed170ea4a368ff02d80584e2d55933ef9c2b16aef31aece2d4f4f6979f346523d32a3b2b0a30c996a92f53b2625939d416
+  languageName: node
+  linkType: hard
+
 "terser-webpack-plugin@npm:^5.1.3":
   version: 5.3.3
   resolution: "terser-webpack-plugin@npm:5.3.3"
@@ -17442,7 +17535,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"through@npm:^2.3.8":
+"through2@npm:^3.0.1":
+  version: 3.0.2
+  resolution: "through2@npm:3.0.2"
+  dependencies:
+    inherits: ^2.0.4
+    readable-stream: 2 || 3
+  checksum: 47c9586c735e7d9cbbc1029f3ff422108212f7cc42e06d5cc9fff7901e659c948143c790e0d0d41b1b5f89f1d1200bdd200c7b72ad34f42f9edbeb32ea49e8b7
+  languageName: node
+  linkType: hard
+
+"through@npm:2, through@npm:^2.3.8, through@npm:~2.3, through@npm:~2.3.1":
   version: 2.3.8
   resolution: "through@npm:2.3.8"
   checksum: a38c3e059853c494af95d50c072b83f8b676a9ba2818dcc5b108ef252230735c54e0185437618596c790bbba8fcdaef5b290405981ffa09dce67b1f1bf190cbd
@@ -17731,6 +17834,15 @@ __metadata:
   version: 0.14.5
   resolution: "tweetnacl@npm:0.14.5"
   checksum: 6061daba1724f59473d99a7bb82e13f211cdf6e31315510ae9656fefd4779851cb927adad90f3b488c8ed77c106adc0421ea8055f6f976ff21b27c5c4e918487
+  languageName: node
+  linkType: hard
+
+"txml@npm:^3.2.5":
+  version: 3.2.5
+  resolution: "txml@npm:3.2.5"
+  dependencies:
+    through2: ^3.0.1
+  checksum: a8357d90dd725f66a9868f02eb6d95dd6bcf682d6cc6e699007c9b2ede7ebdcbffe40373fe1e83c11657edc5beb9dea47828f39cce8d81375d15a87116e66cc2
   languageName: node
   linkType: hard
 
@@ -18783,6 +18895,21 @@ __metadata:
     utf-8-validate:
       optional: true
   checksum: 3ca0dad26e8cc6515ff392b622a1467430814c463b3368b0258e33696b1d4bed7510bc7030f7b72838b9fdeb8dbd8839cbf808367d6aae2e1d668ce741d4308b
+  languageName: node
+  linkType: hard
+
+"ws@npm:^8.14.2":
+  version: 8.16.0
+  resolution: "ws@npm:8.16.0"
+  peerDependencies:
+    bufferutil: ^4.0.1
+    utf-8-validate: ">=5.0.2"
+  peerDependenciesMeta:
+    bufferutil:
+      optional: true
+    utf-8-validate:
+      optional: true
+  checksum: feb3eecd2bae82fa8a8beef800290ce437d8b8063bdc69712725f21aef77c49cb2ff45c6e5e7fce622248f9c7abaee506bae0a9064067ffd6935460c7357321b
   languageName: node
   linkType: hard
 
