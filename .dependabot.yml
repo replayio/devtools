@@ -1,0 +1,27 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    allow:
+      - dependency-name: "@replayio/replay"
+      - dependency-name: "@replayio/cypress"
+      - dependency-name: "@replayio/playwright"
+      - dependency-name: "@replayio/puppeteer"
+      - dependency-name: "@replayio/node"
+      - dependency-name: "@replayio/sourcemap-upload"
+      - dependency-name: "@replayio/sourcemap-upload-webpack-plugin"
+
+  - package-ecosystem: "npm"
+    directory: "/packages/e2e-tests"
+    schedule:
+      interval: "daily"
+    allow:
+      - dependency-name: "@replayio/replay"
+      - dependency-name: "@replayio/cypress"
+      - dependency-name: "@replayio/playwright"
+      - dependency-name: "@replayio/puppeteer"
+      - dependency-name: "@replayio/node"
+      - dependency-name: "@replayio/sourcemap-upload"
+      - dependency-name: "@replayio/sourcemap-upload-webpack-plugin"
