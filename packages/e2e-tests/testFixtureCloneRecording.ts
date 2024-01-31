@@ -1,16 +1,20 @@
+import crypto from "crypto";
 import { Page, test as base } from "@playwright/test";
 import axios from "axios";
 import { addCoverageReport } from "monocart-reporter";
 
 import { TestRecordingKey } from "./helpers";
-import { cloneTestRecording, deleteTestRecording } from "./helpers/utils";
+import { TestUser } from "./helpers/authentication";
+import { cloneTestRecording, deleteTestRecording, resetTestUser } from "./helpers/utils";
 import { loadRecording } from "./scripts/loadRecording";
 
 type TestIsolatedRecordingFixture = {
   exampleKey: TestRecordingKey;
+  testUsers?: TestUser[];
   pageWithMeta: {
     page: Page;
     recordingId: string;
+    testScope: string;
   };
 };
 
@@ -18,12 +22,14 @@ export { base };
 
 const testWithCloneRecording = base.extend<TestIsolatedRecordingFixture>({
   exampleKey: undefined,
-  pageWithMeta: async ({ page, exampleKey }, use) => {
+  testUsers: undefined,
+  pageWithMeta: async ({ page, exampleKey, testUsers }, use) => {
     const exampleRecordings = require("./examples.json");
     if (!exampleRecordings[exampleKey]) {
       throw new Error("Invalid recording");
     }
 
+    const testScope = crypto.randomUUID();
     let newRecordingId: string | undefined = undefined;
     try {
       const { recording } = exampleRecordings[exampleKey];
@@ -42,6 +48,7 @@ const testWithCloneRecording = base.extend<TestIsolatedRecordingFixture>({
       await use({
         page,
         recordingId: newRecordingId,
+        testScope,
       });
     } catch (err: any) {
       if (axios.isAxiosError(err)) {
@@ -71,6 +78,9 @@ const testWithCloneRecording = base.extend<TestIsolatedRecordingFixture>({
 
       if (newRecordingId) {
         await deleteTestRecording(newRecordingId);
+      }
+      for (const user of testUsers ?? []) {
+        await resetTestUser(user.email, testScope);
       }
     }
   },

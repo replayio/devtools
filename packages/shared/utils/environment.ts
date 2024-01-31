@@ -6,6 +6,7 @@ export type ReadOnlyURLParams = {
   apiKey: string | null;
   e2e: boolean;
   referrer: string | null;
+  testScope: string | null;
 };
 
 export function decodeBase64FromURL(urlParam: string): Object | undefined {
@@ -55,6 +56,8 @@ export function getReadOnlyParamsFromURL(): ReadOnlyURLParams {
     // This was original added as "login-referrer"
     // https://github.com/replayio/devtools/commit/4352083de6bc1ed7b24c16c684f7650292f61658
     referrer: searchParams.get("referrer") ?? searchParams.get("login-referrer"),
+
+    testScope: searchParams.get("testScope"),
   };
 }
 
