@@ -171,6 +171,11 @@ export const config = {
     label: "Visualize protocol events in the timeline",
     legacyKey: "devtools.features.protocolTimeline",
   },
+  feature_showLogPointPanelAboveLine: {
+    defaultValue: Boolean(false),
+    label: "Show log point panel above source line",
+    legacyKey: null,
+  },
 
   global_disableLogRocket: {
     defaultValue: Boolean(false),
