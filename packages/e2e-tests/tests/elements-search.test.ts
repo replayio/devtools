@@ -79,7 +79,7 @@ test("elements-search: Element panel should support basic and advanced search mo
   await verifySelectedElement(page, "</body>");
 
   // Change timeline and verify results are updated
-  await seekToTimePercent(page, 1);
+  await seekToTimePercent(page, 0);
   await verifySearchResults(page, {
     currentNumber: 0,
     totalNumber: 0,
