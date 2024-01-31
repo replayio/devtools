@@ -12,7 +12,7 @@ import { FC, Fragment, ReactNode, Suspense, useContext, useMemo } from "react";
 import Expandable from "replay-next/components/Expandable";
 import Loader from "replay-next/components/Loader";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
-import { mergePropertiesAndGetterValues } from "replay-next/src/utils/protocol";
+import { isArrayElement } from "replay-next/src/utils/protocol";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import GetterRenderer from "./GetterRenderer";
@@ -56,31 +56,34 @@ export default function PropertiesRenderer({
       return [];
     }
 
-    let [properties] = mergePropertiesAndGetterValues(
-      preview.properties || [],
-      preview.getterValues || []
+    const ownProperties = sortBy(preview.properties || [], property =>
+      isArrayElement(property) ? Number(property.name) : property.name
     );
 
-    properties = sortBy(properties, ({ name }) => {
-      const maybeNumber = Number(name);
-      return isNaN(maybeNumber) ? name : maybeNumber;
-    });
+    const getterValues = sortBy(preview.getterValues || [], getterValue => getterValue.name);
 
     if (preview.promiseState) {
       if (preview.promiseState.value) {
-        properties.unshift({ name: "<value>", ...preview.promiseState.value });
+        getterValues.unshift({ name: "<value>", ...preview.promiseState.value });
       }
-      properties.unshift({ name: "<state>", value: preview.promiseState.state });
+      getterValues.unshift({ name: "<state>", value: preview.promiseState.state });
     }
 
     if (preview.proxyState) {
-      properties.unshift(
+      getterValues.unshift(
         { name: "<target>", ...preview.proxyState.target },
         { name: "<handler>", ...preview.proxyState.handler }
       );
     }
 
-    return properties;
+    const ownPropertyNames = new Set(ownProperties.map(property => property.name));
+    return ownProperties
+      .map<[NamedValue | ProtocolProperty, boolean]>(property => [property, false])
+      .concat(
+        getterValues
+          .filter(getterValue => !ownPropertyNames.has(getterValue.name))
+          .map<[NamedValue | ProtocolProperty, boolean]>(getterValue => [getterValue, true])
+      );
   }, [preview]);
 
   let EntriesRenderer: FC<EntriesRendererProps> = ContainerEntriesRenderer;
@@ -99,7 +102,8 @@ export default function PropertiesRenderer({
 
   // For collections that contain a lot of properties, group them into "buckets" of 100 props.
   // This most commonly comes into play with large Arrays.
-  const buckets: { header: string; properties: Array<NamedValue | ProtocolProperty> }[] = [];
+  const buckets: { header: string; properties: Array<[NamedValue | ProtocolProperty, boolean]> }[] =
+    [];
   if (properties.length >= PROPERTY_BUCKET_SIZE) {
     let index = 0;
 
@@ -147,7 +151,7 @@ export default function PropertiesRenderer({
             key={`bucketed-properties-${index}`}
             children={
               <Suspense fallback={<Loader />}>
-                {bucket.properties.map((property, index) => (
+                {bucket.properties.map(([property, isGetterValue], index) => (
                   <Fragment key={index}>
                     {property.hasOwnProperty("get") && (
                       <GetterRenderer
@@ -163,6 +167,7 @@ export default function PropertiesRenderer({
                       path={addPathSegment(bucketPath, property.name)}
                       pauseId={pauseId}
                       protocolValue={property}
+                      isGetterValue={isGetterValue}
                     />
                   </Fragment>
                 ))}
@@ -176,7 +181,7 @@ export default function PropertiesRenderer({
 
       {buckets.length === 0 && (
         <Suspense fallback={<Loader />}>
-          {properties.map((property, index) => {
+          {properties.map(([property, isGetterValue], index) => {
             return (
               <Fragment key={index}>
                 {property.hasOwnProperty("get") && (
@@ -193,6 +198,7 @@ export default function PropertiesRenderer({
                   path={addPathSegment(path, property.name)}
                   pauseId={pauseId}
                   protocolValue={property}
+                  isGetterValue={isGetterValue}
                 />
               </Fragment>
             );
