@@ -56,7 +56,7 @@ const argv = yargs
   .parseSync();
 
 const CONFIG = {
-  recordingTimeout: 5000,
+  recordingTimeout: 60_000,
   uploadTimeout: 60_000,
 };
 
