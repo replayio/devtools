@@ -9751,7 +9751,6 @@ __metadata:
     chalk: ^4
     cli-spinners: ^2.7.0
     cypress: ^12.5.1
-    log-update: ^4
     strip-ansi: ^6.0.0
     ts-node: ^10.7.0
     ws: ^7.4.6
@@ -12794,7 +12793,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"log-update@npm:^4, log-update@npm:^4.0.0":
+"log-update@npm:^4.0.0":
   version: 4.0.0
   resolution: "log-update@npm:4.0.0"
   dependencies:
