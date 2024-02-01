@@ -4,11 +4,13 @@ import { EventKind } from "ui/state/app";
 
 import { Collapsible } from "./Collapsible";
 import { ExecutedStatementSequences } from "./ExecutedStatement";
+import { NetworkEventSequences } from "./NetworkEvent";
 import { ReactComponentSequences } from "./ReactComponent";
 import {
   Data,
   Discrepancy,
   ExecutedStatementDiscrepancyType,
+  NetworkEventDiscrepancyType,
   ReactComponentDiscrepancyType,
   Sequence,
 } from "./types";
@@ -73,6 +75,15 @@ export function RootCause() {
                 Object.values(
                   groupedSequences["ExecutedStatement"]
                 ) as Sequence<ExecutedStatementDiscrepancyType>[]
+              }
+            />
+          </Collapsible>
+          <Collapsible label="NetworkEvent">
+            <NetworkEventSequences
+              sequences={
+                Object.values(
+                  groupedSequences["NetworkEvent"]
+                ) as Sequence<NetworkEventDiscrepancyType>[]
               }
             />
           </Collapsible>
