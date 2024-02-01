@@ -10,13 +10,20 @@ interface Run {
     recordingId: string;
   };
 }
-export type Discrepancy = ReactComponentDiscrepancyType;
+export type Discrepancy = ReactComponentDiscrepancyType | ExecutedStatementDiscrepancyType;
 export interface ReactComponentDiscrepancyType {
   eventKind: "ReactComponent";
   kind: "Extra" | "Missing";
   sequenceId: string;
   commonPoint: string;
   event: ReactComponentEvent;
+}
+export interface ExecutedStatementDiscrepancyType {
+  eventKind: "ExecutedStatement";
+  kind: "Extra" | "Missing";
+  sequenceId: string;
+  commonPoint: string;
+  event: ExecutedStatementEvent;
 }
 export interface Sequence<T> {
   sequenceId: string;
@@ -25,6 +32,14 @@ export interface Sequence<T> {
 }
 interface ReactComponentEvent extends Event {
   nodeName: string;
+}
+interface ExecutedStatementEvent extends Event {
+  description: {
+    column: number;
+    line: number;
+    text: string;
+    url: string;
+  }
 }
 interface Event {
   key: string;

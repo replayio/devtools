@@ -3,8 +3,15 @@ import { createContext } from "react";
 import { EventKind } from "ui/state/app";
 
 import { Collapsible } from "./Collapsible";
+import { ExecutedStatementSequences } from "./ExecutedStatement";
 import { ReactComponentSequences } from "./ReactComponent";
-import { Data, Discrepancy, ReactComponentDiscrepancyType, Sequence } from "./types";
+import {
+  Data,
+  Discrepancy,
+  ExecutedStatementDiscrepancyType,
+  ReactComponentDiscrepancyType,
+  Sequence,
+} from "./types";
 
 const data: Data = require("./data.json");
 
@@ -44,6 +51,8 @@ export function RootCause() {
   const successId = testFailure.successRun.id.recordingId;
   const groupedSequences = groupSequences(testFailure.discrepancies);
 
+  console.log({ data, groupedSequences });
+
   return (
     <RootCauseContext.Provider value={{ failedId, successId }}>
       <div className="flex flex-col">
@@ -55,6 +64,15 @@ export function RootCause() {
                 Object.values(
                   groupedSequences["ReactComponent"]
                 ) as Sequence<ReactComponentDiscrepancyType>[]
+              }
+            />
+          </Collapsible>
+          <Collapsible label="ExecutedStatement">
+            <ExecutedStatementSequences
+              sequences={
+                Object.values(
+                  groupedSequences["ExecutedStatement"]
+                ) as Sequence<ExecutedStatementDiscrepancyType>[]
               }
             />
           </Collapsible>
