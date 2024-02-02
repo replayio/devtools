@@ -116,7 +116,7 @@ export default function run_fe_tests(CHROME_BINARY_PATH, runInCI = true) {
   process.env.HASURA_ADMIN_SECRET ||= getSecret("prod/hasura-admin-secret", "us-east-2");
   process.env.DISPATCH_ADDRESS ||= "wss://dispatch.replay.io";
   process.env.AUTHENTICATED_TESTS_WORKSPACE_API_KEY = process.env.RECORD_REPLAY_API_KEY;
-  process.env.PLAYWRIGHT_TEST_BASE_URL ||= "https://app.replay.io";
+  process.env.PLAYWRIGHT_TEST_BASE_URL ||= "http://localhost:8080";
   process.env.RECORD_REPLAY_METADATA_SOURCE_REPOSITORY ||= githubUrlToRepository(
     process.env.RUNTIME_REPO
   );
