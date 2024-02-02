@@ -111,7 +111,7 @@ function MissingResponse({
         <div className="flex flex-col">
           <div>path: {path}</div>
           <div>requestTag: {requestTag}</div>
-          <div>requestTag: {requestUrl}</div>
+          <div>requestUrl: {requestUrl}</div>
         </div>
         <ReplayLink id={successId} kind="missing" result="passing" point={point} time={time} />
       </div>
@@ -135,11 +135,11 @@ function MissingRequest({
   const { successId } = useContext(RootCauseContext);
 
   return (
-    <Collapsible label={`(Missing+Response) ${label}`}>
+    <Collapsible label={`(Missing+Request) ${label}`}>
       <div className="flex flex-col gap-1 pl-4">
         <div className="flex flex-col">
           <div>requestMethod: {requestMethod}</div>
-          <div>requestTag: {requestUrl}</div>
+          <div>requestUrl: {requestUrl}</div>
         </div>
         <ReplayLink id={successId} kind="missing" result="passing" point={point} time={time} />
       </div>

@@ -10,7 +10,10 @@ interface Run {
     recordingId: string;
   };
 }
-export type Discrepancy = ReactComponentDiscrepancyType | ExecutedStatementDiscrepancyType | NetworkEventDiscrepancyType;
+export type Discrepancy =
+  | ReactComponentDiscrepancyType
+  | ExecutedStatementDiscrepancyType
+  | NetworkEventDiscrepancyType;
 export interface ReactComponentDiscrepancyType {
   eventKind: "ReactComponent";
   kind: "Extra" | "Missing";
@@ -25,7 +28,11 @@ export interface ExecutedStatementDiscrepancyType {
   commonPoint: string;
   event: ExecutedStatementEvent;
 }
-export type NetworkEventDiscrepancyType = __NetworkEventExtraRequestDiscrepancyType | NetworkEventMissingRequestDiscrepancyType | NetworkEventExtraResponseDiscrepancyType | NetworkEventMissingResponseDiscrepancyType;
+export type NetworkEventDiscrepancyType =
+  | __NetworkEventExtraRequestDiscrepancyType
+  | NetworkEventMissingRequestDiscrepancyType
+  | NetworkEventExtraResponseDiscrepancyType
+  | NetworkEventMissingResponseDiscrepancyType;
 export interface __NetworkEventExtraRequestDiscrepancyType {
   eventKind: "NetworkEvent";
   kind: "Extra";
@@ -68,7 +75,7 @@ interface ExecutedStatementEvent extends Event {
     line: number;
     text: string;
     url: string;
-  }
+  };
 }
 export interface NetworkEventExtraResponseEvent extends Event {
   requestId: string;
@@ -77,7 +84,7 @@ export interface NetworkEventExtraResponseEvent extends Event {
 }
 export interface NetworkEventMissingResponseEvent extends Event {
   requestId: string;
-  data: NetworkEventResponseEventData
+  data: NetworkEventResponseEventData;
 }
 export interface __NetworkEventExtraRequestEvent extends Event {
   requestId: string;
@@ -85,7 +92,7 @@ export interface __NetworkEventExtraRequestEvent extends Event {
 }
 export interface NetworkEventMissingRequestEvent extends Event {
   requestId: string;
-  data: NetworkEventRequestEventData
+  data: NetworkEventRequestEventData;
 }
 interface Event {
   key: string;
@@ -101,7 +108,7 @@ interface NetworkEventResponseEventData {
     kind: "Any" | "Literal" | "Type" | string;
     type?: "string" | string;
     v?: string[];
-  }
+  };
 }
 interface NetworkEventRequestEventData {
   initiator: {
