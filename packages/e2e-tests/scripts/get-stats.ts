@@ -150,6 +150,16 @@ export function getStats() {
     }
   });
 
+  entries.forEach(([key, { exampleName, recordingId, runtime, runtimeOS, runtimeReleaseDate }]) => {
+    sortedTestFileToInfoMap[key] = {
+      exampleName,
+      runtimeReleaseDate: runtimeReleaseDate.toISOString().slice(0, 10) as any,
+      runtimeOS,
+      runtime,
+      recordingId,
+    };
+  });
+
   return {
     browserSummaryStats,
     exampleToTestMap,
@@ -157,6 +167,6 @@ export function getStats() {
     releaseYearStats,
     sortedStats,
     testFileList,
-    testFileToInfoMap: Object.fromEntries(entries),
+    testFileToInfoMap: sortedTestFileToInfoMap,
   };
 }
