@@ -8,7 +8,7 @@ import { getSecret } from "./aws_secrets";
 import { ExampleInfo, getStats } from "./get-stats";
 
 const CONFIG = {
-  VerboseOverride: "1"
+  VerboseOverride: "1",
 };
 
 const TestFileBlackList = new Set([]);
@@ -67,10 +67,18 @@ function gatherChromiumExamplesAndTests() {
   }
 
   if (remainingBlackListTests.size) {
-    throw new Error(`WARNING: TestFileBlackList contains unknown tests:\n ${Array.from(remainingBlackListTests).join("\n ")}`);
+    throw new Error(
+      `WARNING: TestFileBlackList contains unknown tests:\n ${Array.from(
+        remainingBlackListTests
+      ).join("\n ")}`
+    );
   }
   if (remainingWhiteListTests.size) {
-    throw new Error(`WARNING: TestFileWhiteList contains unknown tests:\n ${Array.from(remainingWhiteListTests).join("\n ")}`);
+    throw new Error(
+      `WARNING: TestFileWhiteList contains unknown tests:\n ${Array.from(
+        remainingWhiteListTests
+      ).join("\n ")}`
+    );
   }
 
   return { testFiles, exampleFiles: uniq(exampleFiles) };
@@ -106,11 +114,12 @@ export default function run_fe_tests(CHROME_BINARY_PATH, runInCI = true) {
   // process.env.RECORD_REPLAY_DIRECTORY =
 
   process.env.HASURA_ADMIN_SECRET ||= getSecret("prod/hasura-admin-secret", "us-east-2");
-  process.env.DISPATCH_ADDRESS ||=
-    "wss://dispatch.replay.io";
+  process.env.DISPATCH_ADDRESS ||= "wss://dispatch.replay.io";
   process.env.AUTHENTICATED_TESTS_WORKSPACE_API_KEY = process.env.RECORD_REPLAY_API_KEY;
   process.env.PLAYWRIGHT_TEST_BASE_URL ||= "https://app.replay.io";
-  process.env.RECORD_REPLAY_METADATA_SOURCE_REPOSITORY ||= githubUrlToRepository(process.env.RUNTIME_REPO);
+  process.env.RECORD_REPLAY_METADATA_SOURCE_REPOSITORY ||= githubUrlToRepository(
+    process.env.RUNTIME_REPO
+  );
   process.env.RECORD_REPLAY_VERBOSE ||= CONFIG.VerboseOverride;
 
   console.debug(`process.env.PLAYWRIGHT_TEST_BASE_URL="${process.env.PLAYWRIGHT_TEST_BASE_URL}"`);
