@@ -120,9 +120,12 @@ export default function run_fe_tests(CHROME_BINARY_PATH, runInCI = true) {
   process.env.RECORD_REPLAY_METADATA_SOURCE_REPOSITORY ||= githubUrlToRepository(
     process.env.RUNTIME_REPO
   );
+
+  // Allow overriding runtime debug output.
   process.env.RECORD_REPLAY_VERBOSE ||= CONFIG.VerboseOverride;
 
-  console.debug(`process.env.PLAYWRIGHT_TEST_BASE_URL="${process.env.PLAYWRIGHT_TEST_BASE_URL}"`);
+  // Debug replay:cli by default.
+  process.env.DEBUG = "replay:cli";
 
   let webProc;
   if (runInCI) {

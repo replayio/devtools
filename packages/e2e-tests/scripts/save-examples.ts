@@ -4,6 +4,7 @@
 // Use the API key for the "Frontend E2E Test Team" that we have set up in admin,
 // as that should let us mark these recordings as public.
 
+import { execSync } from "child_process";
 import { existsSync, writeFileSync } from "fs";
 import { join } from "path";
 import type { Page, expect as expectFunction } from "@playwright/test";
@@ -371,6 +372,12 @@ async function waitUntilMessage(
 
 (async () => {
   try {
+    // Debug: Allow verifying the replay-cli version.
+    console.log(`@replayio/replay version:`);
+    execSync("npx replay version", {
+      stdio: "inherit",
+    });
+
     const functionsForTarget = {
       browser: saveBrowserExamples,
       node: saveNodeExamples,
