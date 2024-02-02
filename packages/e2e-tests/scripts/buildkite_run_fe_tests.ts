@@ -139,7 +139,10 @@ export default function run_fe_tests(CHROME_BINARY_PATH, runInCI = true) {
       stdio: "inherit",
     });
 
-    // Start the webserver.
+    // Prepare .env and start the webserver.
+    execSync("cp .env.sample .env", {
+      stdio: "inherit",
+    });
     webProc = exec("yarn dev", (error, stdout, stderr) => {
       if (error) {
         console.error(`yarn dev exec ERROR: ${error}`);
