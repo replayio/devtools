@@ -53,8 +53,6 @@ export function RootCause() {
   const successId = testFailure.successRun.id.recordingId;
   const groupedSequences = groupSequences(testFailure.discrepancies);
 
-  console.log({ data, groupedSequences });
-
   return (
     <RootCauseContext.Provider value={{ failedId, successId }}>
       <div className="flex flex-col">

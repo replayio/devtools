@@ -1,6 +1,7 @@
 import { useContext } from "react";
 
 import { Collapsible } from "./Collapsible";
+import { ReplayLink } from "./ReplayLink";
 import { RootCauseContext } from "./RootCause";
 import { ReactComponentDiscrepancyType, Sequence } from "./types";
 
@@ -29,10 +30,13 @@ function ReactComponentSequence({ group }: { group: Sequence<ReactComponentDiscr
             <ReactComponentDiscrepancy key={i} discrepancy={d} />
           ))}
         </div>
-        <a href={`/recording/${recordingId}`} target="_blank" rel="noreferrer">
-          Go to <span className="italic">{group.kind.toLowerCase()}</span> point in{" "}
-          <span className="italic">{group.kind == "Extra" ? "failing" : "passing"}</span> replay
-        </a>
+        <ReplayLink
+          id={recordingId}
+          kind={group.kind.toLowerCase() as "extra" | "missing"}
+          result={group.kind == "Extra" ? "failing" : "passing"}
+          point={group.discrepancies[0].event.point}
+          time={group.discrepancies[0].event.time}
+        />
       </div>
     </Collapsible>
   );
