@@ -131,7 +131,7 @@ export function SupportForm({
         break;
       case "success":
         if (currentUserEmail) {
-          confirmationMessage = `Thank you for your note. We'll get back to you at ${currentUserEmail} as son as possible.`;
+          confirmationMessage = `Thank you for your note. We'll get back to you at ${currentUserEmail} as soon as possible.`;
         } else {
           confirmationMessage = "Thank you for your note.";
         }
