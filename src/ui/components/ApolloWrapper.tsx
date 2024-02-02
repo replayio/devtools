@@ -2,7 +2,7 @@ import { ApolloProvider } from "@apollo/client";
 import { ReactNode } from "react";
 
 import { createApolloClient } from "shared/graphql/apolloClient";
-import { isTest } from "shared/utils/environment";
+import { getReadOnlyParamsFromURL, isTest } from "shared/utils/environment";
 import useToken from "ui/utils/useToken";
 
 import { ExpectedErrorModal } from "./Errors/ExpectedErrorModal";
@@ -35,6 +35,10 @@ export function ApolloWrapper({
   }
 
   return (
-    <ApolloProvider client={createApolloClient(token, onAuthError)}>{children}</ApolloProvider>
+    <ApolloProvider
+      client={createApolloClient(token, getReadOnlyParamsFromURL().testScope, onAuthError)}
+    >
+      {children}
+    </ApolloProvider>
   );
 }

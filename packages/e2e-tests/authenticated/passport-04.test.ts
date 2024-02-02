@@ -1,20 +1,19 @@
 import { openDevToolsTab, startTest } from "../helpers";
-import { E2E_USER_1_API_KEY } from "../helpers/authentication";
+import { E2E_USER_1 } from "../helpers/authentication";
 import { addSourceCodeComment, deleteComment } from "../helpers/comments";
 import { isPassportItemCompleted } from "../helpers/passport";
 import { enablePassport } from "../helpers/settings";
-import { resetTestUser, waitFor } from "../helpers/utils";
+import { waitFor } from "../helpers/utils";
 import test, { expect } from "../testFixtureCloneRecording";
 
-test.use({ exampleKey: "doc_rr_console.html" });
+test.use({ exampleKey: "doc_rr_console.html", testUsers: [E2E_USER_1] });
 
 test(`authenticated/passport-04: Multiplayer`, async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
+  testUsers,
 }) => {
-  await resetTestUser("frontende2e1@replay.io");
-
-  await startTest(page, recordingId, E2E_USER_1_API_KEY);
+  await startTest(page, recordingId, { apiKey: testUsers![0].apiKey, testScope });
 
   await enablePassport(page);
 

@@ -44,6 +44,7 @@ export async function mutate<TData = any, TVariables = OperationVariables>(
 
 export const createApolloClient = memoizeOne(function (
   token: string | undefined,
+  testScope: string | null,
   onAuthError?: () => void
 ) {
   let previousWaiter = clientWaiter;
@@ -53,7 +54,7 @@ export const createApolloClient = memoizeOne(function (
 
   const retryLink = createRetryLink();
   const errorLink = createErrorLink(onAuthError);
-  const httpLink = createHttpLink(token);
+  const httpLink = createHttpLink(token, testScope);
 
   const options: any = {
     cache: createApolloCache(),
@@ -114,10 +115,13 @@ export function createApolloCache() {
   });
 }
 
-function createHttpLink(token: string | undefined) {
+function createHttpLink(token: string | undefined, testScope: string | null) {
   const headers: Record<string, string> = {};
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
+  }
+  if (testScope) {
+    headers["replay-test-scope"] = testScope;
   }
 
   const uri = process.env.NEXT_PUBLIC_API_URL;

@@ -3617,23 +3617,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/cypress@npm:^0.5.0":
-  version: 0.5.6
-  resolution: "@replayio/cypress@npm:0.5.6"
-  dependencies:
-    "@replayio/replay": ^0.12.4
-    "@replayio/test-utils": ^0.5.3
-    debug: ^4.3.4
-    semver: ^7.3.8
-    uuid: ^8.3.2
-  peerDependencies:
-    cypress: ">=5.3.0"
-  bin:
-    replayio-cypress: bin/replayio-cypress.js
-  checksum: d41d2f4abc38b9e3757f6a3ac8db887e175ed197b9af58ac5682e39ecff64213d360a3e97b3e3e6e1a3a3bf6d46f6534b0c250df15c7c28ded24bbb6a5e18e9d
-  languageName: node
-  linkType: hard
-
 "@replayio/overboard@npm:^0.4.1":
   version: 0.4.1
   resolution: "@replayio/overboard@npm:0.4.1"
@@ -3679,26 +3662,6 @@ __metadata:
     source-map-js: ^0.6.2
     sourcemap-codec: ^1.4.8
   checksum: 1b7ebbfd0c309792a3680ef783912dafa6ea3b2aafa98ffe89265818614ec7aa872772c13102fde8d64e568344dbdb0b3052e5584e97b9cc06b9a1aa6007fd49
-  languageName: node
-  linkType: hard
-
-"@replayio/replay@npm:^0.12.4":
-  version: 0.12.4
-  resolution: "@replayio/replay@npm:0.12.4"
-  dependencies:
-    "@replayio/sourcemap-upload": ^1.0.6
-    commander: ^7.2.0
-    debug: ^4.3.4
-    is-uuid: ^1.0.2
-    jsonata: ^1.8.6
-    node-fetch: ^2.6.8
-    p-map: ^4.0.0
-    superstruct: ^0.15.4
-    text-table: ^0.2.0
-    ws: ^7.5.0
-  bin:
-    replay: bin/replay.js
-  checksum: bb2b6c7a2bb6f9167352f4ce29eb532cd8d788679782d6bebb49655d86dd785d3c6be2e7c6292b3be9d50401dfedda1b4367f10bfe62e96143cd327c642012a5
   languageName: node
   linkType: hard
 
@@ -3748,7 +3711,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/sourcemap-upload@npm:^1.0.6, @replayio/sourcemap-upload@npm:^1.1.1":
+"@replayio/sourcemap-upload@npm:^1.1.1":
   version: 1.1.1
   resolution: "@replayio/sourcemap-upload@npm:1.1.1"
   dependencies:
@@ -3758,19 +3721,6 @@ __metadata:
     node-fetch: ^2.6.1
     string.prototype.matchall: ^4.0.5
   checksum: e47252d133fc34b87a5a7b68e3c792120ff51e12082f45bbf2f91286df39cefd6b6c647e9111c2f3fd89743f7fc30867644ae3647dd1ddb6e83146d12711e9b5
-  languageName: node
-  linkType: hard
-
-"@replayio/test-utils@npm:^0.5.3":
-  version: 0.5.3
-  resolution: "@replayio/test-utils@npm:0.5.3"
-  dependencies:
-    "@replayio/replay": ^0.12.4
-    "@types/node-fetch": ^2.6.2
-    debug: ^4.3.4
-    node-fetch: ^2.6.7
-    uuid: ^8.3.2
-  checksum: d1c4e85f39e82a9cfe25bec3621f7b52770e3890df5ac638b9e1420656619962110f5ebbf3159643c6aa053df6bb6799aa9cffa076f49f959f8c7625c5ecee42
   languageName: node
   linkType: hard
 
@@ -4637,7 +4587,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node-fetch@npm:^2.5.10, @types/node-fetch@npm:^2.6.2":
+"@types/node-fetch@npm:^2.5.10":
   version: 2.6.2
   resolution: "@types/node-fetch@npm:2.6.2"
   dependencies:
@@ -9746,12 +9696,10 @@ __metadata:
   resolution: "functional-tests@workspace:packages/e2e-tests"
   dependencies:
     "@playwright/test": ^1.37.0
-    "@replayio/cypress": ^0.5.0
     "@replayio/playwright": ^2.0.0-alpha.9
     chalk: ^4
     cli-spinners: ^2.7.0
     cypress: ^12.5.1
-    log-update: ^4
     strip-ansi: ^6.0.0
     ts-node: ^10.7.0
     ws: ^7.4.6
@@ -12794,7 +12742,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"log-update@npm:^4, log-update@npm:^4.0.0":
+"log-update@npm:^4.0.0":
   version: 4.0.0
   resolution: "log-update@npm:4.0.0"
   dependencies:
@@ -15264,13 +15212,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-resizable-panels@npm:^2.0.1":
-  version: 2.0.1
-  resolution: "react-resizable-panels@npm:2.0.1"
+"react-resizable-panels@npm:^2.0.2":
+  version: 2.0.2
+  resolution: "react-resizable-panels@npm:2.0.2"
   peerDependencies:
     react: ^16.14.0 || ^17.0.0 || ^18.0.0
     react-dom: ^16.14.0 || ^17.0.0 || ^18.0.0
-  checksum: 3158873b6da3cff30e4fb019ed525664d619d00eeb76c2865b6fe6026db3e084a3a5eaf934efb2ec397c0fcbae940ea65e1200a54ee74e1da3a48362385f4163
+  checksum: f8f9dcc5b2bdba664aa05aad6a7c19472efc55709673a4282b717df9974132e7b40df9b8872746d01df57dcbcea1983335495454f04f7fb9ac112f6ef1e97991
   languageName: node
   linkType: hard
 
@@ -15608,7 +15556,7 @@ __metadata:
     react-lazyload: ^3.2.0
     react-merge-refs: ^1.1.0
     react-redux: ^8.0.2
-    react-resizable-panels: ^2.0.1
+    react-resizable-panels: ^2.0.2
     react-tooltip: ^4.5.1
     react-transition-group: ^4.4.2
     react-virtualized-auto-sizer: ^1.0.19
@@ -16158,7 +16106,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"semver@npm:^7.3.2, semver@npm:^7.3.4, semver@npm:^7.3.5, semver@npm:^7.3.7, semver@npm:^7.3.8":
+"semver@npm:^7.3.2, semver@npm:^7.3.4, semver@npm:^7.3.5, semver@npm:^7.3.7":
   version: 7.3.8
   resolution: "semver@npm:7.3.8"
   dependencies:

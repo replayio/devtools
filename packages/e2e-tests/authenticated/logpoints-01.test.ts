@@ -1,7 +1,7 @@
 import { addCoverageReport } from "monocart-reporter";
 
 import { openDevToolsTab, startTest } from "../helpers";
-import { E2E_USER_1_API_KEY, E2E_USER_2_API_KEY } from "../helpers/authentication";
+import { E2E_USER_1, E2E_USER_2 } from "../helpers/authentication";
 import { disableAllConsoleMessageTypes, verifyConsoleMessage } from "../helpers/console-panel";
 import {
   findPoints,
@@ -17,8 +17,8 @@ import test, { Page, base, expect } from "../testFixtureCloneRecording";
 const url = "authenticated_logpoints.html";
 const lineNumber = 14;
 
-async function load(page: Page, recordingId: string, apiKey: string) {
-  await startTest(page, recordingId, apiKey);
+async function load(page: Page, recordingId: string, apiKey: string, testScope: string) {
+  await startTest(page, recordingId, { apiKey, testScope });
   await page.coverage.startJSCoverage();
 
   await openDevToolsTab(page);
@@ -35,11 +35,12 @@ async function close(page: Page) {
   await page.close();
 }
 
-test.use({ exampleKey: url });
+test.use({ exampleKey: url, testUsers: [E2E_USER_1, E2E_USER_2] });
 
 test(`authenticated/logpoints-01: Shared logpoints functionality`, async ({
   browser,
-  pageWithMeta: { recordingId },
+  pageWithMeta: { recordingId, testScope },
+  testUsers,
 }) => {
   let pageOne: Page;
   let pageTwo: Page;
@@ -50,7 +51,7 @@ test(`authenticated/logpoints-01: Shared logpoints functionality`, async ({
     // User 1
     const context = await browser.newContext();
     const page = await context.newPage();
-    await load(page, recordingId, E2E_USER_1_API_KEY);
+    await load(page, recordingId, testUsers![0].apiKey, testScope);
 
     // Add log point (will be shared, since we're authenticated)
     await addLogpoint(page, {
@@ -70,7 +71,7 @@ test(`authenticated/logpoints-01: Shared logpoints functionality`, async ({
     // User 2
     const context = await browser.newContext();
     const page = await context.newPage();
-    await load(page, recordingId, E2E_USER_2_API_KEY);
+    await load(page, recordingId, testUsers![1].apiKey, testScope);
 
     const locator = await findPoints(page, "logpoint", { lineNumber });
 
