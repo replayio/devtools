@@ -47,7 +47,7 @@ import {
   paintGraphics,
   previousPaintEvent,
 } from "protocol/graphics";
-import { mostRecentPaint, timeIsBeyondKnownPaints } from "protocol/PaintsCache";
+import { mostRecentPaint } from "protocol/PaintsCache";
 import { waitForTime } from "protocol/utils";
 import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
 import {
@@ -395,7 +395,7 @@ export function togglePlayback(): UIThunkAction {
     const playback = getPlayback(state);
     const currentTime = getCurrentTime(state);
 
-    if (playback || timeIsBeyondKnownPaints(currentTime)) {
+    if (playback) {
       dispatch(stopPlayback());
     } else {
       dispatch(startPlayback());
@@ -412,10 +412,6 @@ export function startPlayback(
   return (dispatch, getState, { replayClient }) => {
     const state = getState();
     const currentTime = getCurrentTime(state);
-
-    if (timeIsBeyondKnownPaints(currentTime)) {
-      return;
-    }
 
     const endTime =
       optEndTime ||
@@ -494,7 +490,7 @@ export function playbackPoints(
 
     const prepareNextGraphics = () => {
       nextGraphicsTime = snapTimeForPlayback(nextPaintOrMouseEvent(currentTime)?.time || end.time);
-      nextGraphicsPromise = getGraphicsAtTime(nextGraphicsTime, true);
+      nextGraphicsPromise = getGraphicsAtTime(nextGraphicsTime);
       dispatch(precacheScreenshots(nextGraphicsTime));
     };
     const shouldContinuePlayback = () => getPlayback(getState());
@@ -857,7 +853,7 @@ export function precacheScreenshots(beginTime: number): UIThunkAction {
 
       // the client isn't used in the cache key, so it's OK to pass a dummy value here
       if (!screenshotCache.getValueIfCached(null as any, paintPoint.point, paintPoint.paintHash)) {
-        const graphicsPromise = getGraphicsAtTime(time, true);
+        const graphicsPromise = getGraphicsAtTime(time);
 
         const precachedTime = Math.max(time - SNAP_TIME_INTERVAL, beginTime);
         if (precachedTime > getPlaybackPrecachedTime(getState())) {
