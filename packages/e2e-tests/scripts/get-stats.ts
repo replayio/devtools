@@ -150,17 +150,6 @@ export function getStats() {
     }
   });
 
-  // TODO: move this to where we print things
-  // entries.forEach(([key, { exampleName, recordingId, runtime, runtimeOS, runtimeReleaseDate }]) => {
-  //   sortedTestFileToInfoMap[key] = {
-  //     exampleName,
-  //     runtimeReleaseDate: runtimeReleaseDate.toISOString().slice(0, 10) as any,
-  //     runtimeOS,
-  //     runtime,
-  //     recordingId,
-  //   };
-  // });
-
   return {
     browserSummaryStats,
     exampleToTestMap,
