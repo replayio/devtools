@@ -134,7 +134,6 @@ export function getStats() {
       releaseYearStats[year].numTests += numTests;
     });
 
-  const sortedTestFileToInfoMap: typeof testFileToInfoMap = {};
   const entries = Object.entries(testFileToInfoMap).sort((a, b) => {
     const aValue = a[1];
     const bValue = b[1];
