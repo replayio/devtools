@@ -22,24 +22,23 @@ function checkReRecord(testFile, exampleFileInfo: ExampleInfo) {
   let shouldTestOnLatest: boolean;
   let shouldTestOverride: boolean;
 
-  const testName = testFile; // TODO
   shouldTestOnLatest =
     exampleFileInfo.runtime === "chromium" &&
     exampleFileInfo.runtimeReleaseDate.getUTCFullYear() === 2024;
-  if (TestFileWhiteList.has(testName) && TestFileBlackList.has(testName)) {
-    throw new Error(`Test was both in BlackList and WhiteList: ${testName}`);
+  if (TestFileWhiteList.has(testFile) && TestFileBlackList.has(testFile)) {
+    throw new Error(`Test was both in BlackList and WhiteList: ${testFile}`);
   }
-  if (TestFileWhiteList.has(testName)) {
+  if (TestFileWhiteList.has(testFile)) {
     shouldTestOverride = true;
   }
-  if (TestFileBlackList.has(testName)) {
+  if (TestFileBlackList.has(testFile)) {
     shouldTestOverride = false;
   }
   if (shouldTestOverride !== undefined && shouldTestOnLatest !== shouldTestOverride) {
     if (shouldTestOverride) {
-      console.warn(`${testName} is not eligible but whitelisted.`);
+      console.warn(`${testFile} is not eligible but whitelisted.`);
     } else {
-      console.warn(`${testName} is eligible but blacklisted.`);
+      console.warn(`${testFile} is eligible but blacklisted.`);
     }
     return shouldTestOverride;
   }
@@ -54,12 +53,24 @@ function gatherChromiumExamplesAndTests() {
   const testFiles: string[] = [];
   const exampleFiles: string[] = [];
 
+  const remainingBlackListTests = new Set(TestFileBlackList);
+  const remainingWhiteListTests = new Set(TestFileWhiteList);
+
   for (const [testFile, exampleFileInfo] of Object.entries(testFileToInfoMap)) {
+    remainingBlackListTests.delete(testFile);
+    remainingWhiteListTests.delete(testFile);
     const shouldReRecord = checkReRecord(testFile, exampleFileInfo);
     if (shouldReRecord) {
       testFiles.push(testFile);
       exampleFiles.push(exampleFileInfo.exampleName);
     }
+  }
+
+  if (remainingBlackListTests.size) {
+    throw new Error(`WARNING: TestFileBlackList contains unknown tests:\n ${Array.from(remainingBlackListTests).join("\n ")}`);
+  }
+  if (remainingWhiteListTests.size) {
+    throw new Error(`WARNING: TestFileWhiteList contains unknown tests:\n ${Array.from(remainingWhiteListTests).join("\n ")}`);
   }
 
   return { testFiles, exampleFiles: uniq(exampleFiles) };
@@ -95,7 +106,7 @@ export default function run_fe_tests(CHROME_BINARY_PATH, runInCI = true) {
   // process.env.RECORD_REPLAY_DIRECTORY =
 
   process.env.HASURA_ADMIN_SECRET ||= getSecret("prod/hasura-admin-secret", "us-east-2");
-  process.env.RECORD_REPLAY_DISPATCH_SERVER ||= process.env.DISPATCH_ADDRESS ||=
+  process.env.DISPATCH_ADDRESS ||=
     "wss://dispatch.replay.io";
   process.env.AUTHENTICATED_TESTS_WORKSPACE_API_KEY = process.env.RECORD_REPLAY_API_KEY;
   process.env.PLAYWRIGHT_TEST_BASE_URL ||= "https://app.replay.io";
