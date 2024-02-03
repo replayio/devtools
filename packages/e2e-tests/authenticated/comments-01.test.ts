@@ -1,16 +1,17 @@
 import { openDevToolsTab, startTest } from "../helpers";
-import { E2E_USER_1_API_KEY } from "../helpers/authentication";
+import { E2E_USER_1 } from "../helpers/authentication";
 import { addSourceCodeComment, deleteComment, editComment } from "../helpers/comments";
 import { openSource } from "../helpers/source-explorer-panel";
 import test from "../testFixtureCloneRecording";
 
-test.use({ exampleKey: "authenticated_comments.html" });
+test.use({ exampleKey: "authenticated_comments.html", testUsers: [E2E_USER_1] });
 
 test(`authenticated/comments-01: Test add, edit, and delete comment functionality`, async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
+  testUsers,
 }) => {
-  await startTest(page, recordingId, E2E_USER_1_API_KEY);
+  await startTest(page, recordingId, { apiKey: testUsers![0].apiKey, testScope });
   await openDevToolsTab(page);
   await openSource(page, exampleKey);
 

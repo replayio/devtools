@@ -12,7 +12,7 @@ export default {
   browserPath: process.env.RECORD_REPLAY_PATH,
   devtoolsUrl: process.env.PLAYWRIGHT_TEST_BASE_URL || "http://localhost:8080",
   driverPath: process.env.RECORD_REPLAY_DRIVER,
-  headless: !!process.env.RECORD_REPLAY_PLAYWRIGHT_HEADLESS,
+  headless: process.env.RECORD_REPLAY_PLAYWRIGHT_HEADLESS != "false",
   nodeExamplesPath: join(__dirname, "../../test/examples"),
   nodePath: process.env.RECORD_REPLAY_NODE,
   // Browser recordings go into our "FE E2E Node 'Golden' Recordings'" workspace.

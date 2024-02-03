@@ -115,18 +115,24 @@ export type TestRecordingIntersectionValue = UnionToIntersection<
 >;
 export type ExamplesData = Record<TestRecordingKey, TestRecordingUnionValue>;
 
+export interface AuthInfo {
+  apiKey: string;
+  testScope: string;
+}
+
 export async function startTest(
   page: Page,
   recordingId: string,
-  apiKey?: string,
+  auth?: AuthInfo,
   additionalQueryParams?: URLSearchParams
 ) {
   const base = process.env.PLAYWRIGHT_TEST_BASE_URL || "http://localhost:8080";
 
   const params = new URLSearchParams();
   params.append("e2e", "1");
-  if (apiKey) {
-    params.append("apiKey", apiKey);
+  if (auth) {
+    params.append("apiKey", auth.apiKey);
+    params.append("testScope", auth.testScope);
   }
 
   if (additionalQueryParams) {

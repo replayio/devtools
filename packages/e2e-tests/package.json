@@ -21,11 +21,9 @@
   "license": "ISC",
   "devDependencies": {
     "@playwright/test": "^1.37.0",
-    "@replayio/cypress": "^0.5.0",
     "@replayio/playwright": "^2.0.0-alpha.9",
     "cli-spinners": "^2.7.0",
     "cypress": "^12.5.1",
-    "log-update": "^4",
     "ts-node": "^10.7.0",
     "ws": "^7.4.6",
     "yargs": "^17.6.0"

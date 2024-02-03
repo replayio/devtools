@@ -1,11 +1,16 @@
 import { KeyboardEvent } from "@replayio/protocol";
 import groupBy from "lodash/groupBy";
+import { isPromiseLike } from "suspense";
 
 import {
   jumpToNextPause,
   jumpToPreviousPause,
 } from "devtools/client/debugger/src/actions/pause/jumps";
 import { openQuickOpen } from "devtools/client/debugger/src/actions/quick-open";
+import {
+  RecordedKeyboardEventsCache,
+  RecordedNavigationEventsCache,
+} from "protocol/RecordedEventsCache";
 import { ReplayClientInterface } from "shared/client/types";
 import { getSystemColorScheme } from "shared/theme/getSystemColorScheme";
 import { userData } from "shared/user-data/GraphQL/UserData";
@@ -35,42 +40,47 @@ import { UIStore, UIThunkAction } from ".";
 export * from "../reducers/app";
 
 export async function setupApp(store: UIStore, replayClient: ReplayClientInterface) {
-  replayClient.waitForSession().then(sessionId => {
-    store.dispatch(setSessionId(sessionId));
+  const sessionId = await replayClient.waitForSession();
 
-    replayClient
-      .findKeyboardEvents(({ events }) => onKeyboardEvents(events, store))
-      .then(() => {
-        store.dispatch(loadReceivedKeyboardEvents());
+  store.dispatch(setSessionId(sessionId));
+
+  {
+    const result = RecordedKeyboardEventsCache.readAsync();
+    if (isPromiseLike(result)) {
+      result.then(events => {
+        onKeyboardEvents(events, store);
       });
-    replayClient.findNavigationEvents(({ events }) =>
-      onNavigationEvents(events as ReplayNavigationEvent[], store)
-    );
-  });
-}
-
-const allKeyboardEvents: KeyboardEvent[] = [];
-
-function onKeyboardEvents(events: KeyboardEvent[], store: UIStore) {
-  allKeyboardEvents.push(...events);
-}
-
-function loadReceivedKeyboardEvents(): UIThunkAction {
-  return dispatch => {
-    const groupedEvents = groupBy(allKeyboardEvents, event => event.kind) as Record<
-      EventKind,
-      ReplayEvent[]
-    >;
-
-    for (let key of Object.keys(groupedEvents)) {
-      groupedEvents[key].sort((a: ReplayEvent, b: ReplayEvent) =>
-        compareBigInt(BigInt(a.point), BigInt(b.point))
-      );
+    } else {
+      onKeyboardEvents(result, store);
     }
-    dispatch(loadReceivedEvents(groupedEvents));
-  };
+  }
+
+  {
+    const result = RecordedNavigationEventsCache.readAsync();
+    if (isPromiseLike(result)) {
+      result.then(events => {
+        onNavigationEvents(events as ReplayNavigationEvent[], store);
+      });
+    } else {
+      onNavigationEvents(result as ReplayNavigationEvent[], store);
+    }
+  }
 }
 
+// TODO [FE-2104] Remove these values from Redux; they should be in Suspense caches only
+function onKeyboardEvents(events: KeyboardEvent[], store: UIStore) {
+  const groupedEvents = groupBy(events, event => event.kind) as Record<EventKind, ReplayEvent[]>;
+
+  for (let key of Object.keys(groupedEvents)) {
+    groupedEvents[key].sort((a: ReplayEvent, b: ReplayEvent) =>
+      compareBigInt(BigInt(a.point), BigInt(b.point))
+    );
+  }
+
+  store.dispatch(loadReceivedEvents(groupedEvents));
+}
+
+// TODO [FE-2104] Remove these values from Redux; they should be in Suspense caches only
 function onNavigationEvents(events: ReplayNavigationEvent[], store: UIStore) {
   const currentNavEvents: ReplayNavigationEvent[] = events.map(e => ({ ...e, kind: "navigation" }));
   const newNavEvents = [...getEventsForType(store.getState(), "navigation"), ...currentNavEvents];
@@ -92,62 +102,6 @@ export function setCanvas(canvas: Canvas): UIThunkAction {
     if (!shallowEqual(existingCanvas, canvas)) {
       dispatch(setCanvasAction(canvas));
     }
-  };
-}
-
-export function setBreakpointsFromClipboard(): UIThunkAction {
-  return async () => {
-    // TODO [FE-998] Figure out a new implementation that works with IndexedDB instead
-    /*
-    const currentFocusedElement = document.activeElement;
-    let text = "";
-    try {
-      // The `readText()` API requires that the current DOM be focused somehow
-      document.body.focus();
-      text = await navigator.clipboard.readText();
-
-      // Was the clipboard data even valid JSON?
-      const parsedValue = JSON.parse(text);
-      // Assuming it was JSON, does it appear to be an array of Point objects?
-      if (Array.isArray(parsedValue) && parsedValue.every(isValidPoint)) {
-        // TODO [FE-874] This will need to change if we modify how we do per-recording persistence
-
-        // This value appears to be actual breakpoints. Our current implementation watches
-        //  for changes in `localStorage` and will auto-update itself when that event fires.
-        const storageKey = `${ThreadFront.recordingId!}::points`;
-        // Just reuse the text from the clipboard
-        localStorage.setItem(storageKey, text);
-        // Apparently the "storage" event only fires across tabs, and setting a value
-        // in the _same_ tab won't trigger it. Do that manually:
-        window.dispatchEvent(new Event("storage"));
-      }
-    } catch (err) {
-      if (err instanceof SyntaxError) {
-        console.error("Could not parse clipboard text as JSON:", `"${text}"`);
-      } else if (err instanceof DOMException) {
-        console.error("Could not copy clipboard text - document not focused", err);
-      } else {
-        console.error(err);
-      }
-    } finally {
-      if (currentFocusedElement && "focus" in currentFocusedElement) {
-        (currentFocusedElement as HTMLElement).focus();
-      }
-    }
-    */
-  };
-}
-
-export function copyBreakpointsToClipboard(): UIThunkAction {
-  return async () => {
-    // TODO [FE-998] Figure out a new implementation that works with IndexedDB instead
-    /*
-    const storageKey = `${ThreadFront.recordingId!}::points`;
-    const currentPointsValue = localStorage.getItem(storageKey);
-    if (currentPointsValue) {
-      await navigator.clipboard.writeText(currentPointsValue);
-    }
-    */
   };
 }
 
@@ -229,11 +183,6 @@ export function executeCommand(key: CommandKey): UIThunkAction {
       url.searchParams.append("restart", "true");
       window.location.href = url.toString();
     }
-    // else if (key === "copy_points") {
-    //   dispatch(copyBreakpointsToClipboard());
-    // } else if (key === "set_points") {
-    //   dispatch(setBreakpointsFromClipboard());
-    // }
 
     dispatch(hideCommandPalette());
   };

@@ -81,7 +81,7 @@
     "react-lazyload": "^3.2.0",
     "react-merge-refs": "^1.1.0",
     "react-redux": "^8.0.2",
-    "react-resizable-panels": "^1.0.5",
+    "react-resizable-panels": "^2.0.2",
     "react-tooltip": "^4.5.1",
     "react-transition-group": "^4.4.2",
     "react-virtualized-auto-sizer": "^1.0.19",

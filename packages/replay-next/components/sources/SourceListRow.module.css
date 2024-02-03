@@ -73,3 +73,33 @@
   line-height: 0.75rem;
   color: var(--color-dimmer);
 }
+
+.Row[data-log-point-placement="above"] {
+  align-items: flex-end;
+}
+
+.LogPointPanel {
+  position: absolute;
+  left: var(--source-line-number-offset);
+}
+.Row[data-log-point-placement="above"] .LogPointPanel {
+  top: 0;
+}
+.Row[data-log-point-placement="below"] .LogPointPanel {
+  top: var(--line-height);
+}
+
+.LogPointPanelIcon {
+  font-size: var(--font-size-tiny);
+  position: absolute;
+  left: calc(var(--line-number-size) - 1ch);
+  width: 1rem;
+  height: 1rem;
+  color: var(--color-dimmer);
+}
+.Row[data-log-point-placement="above"] .LogPointPanelIcon {
+  top: calc(50% - 1rem);
+}
+.Row[data-log-point-placement="below"] .LogPointPanelIcon {
+  top: calc(50%);
+}

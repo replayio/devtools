@@ -7,13 +7,18 @@ import { ReplayClientInterface } from "shared/client/types";
 import { updateMappedLocation } from "./PauseCache";
 import { sourcesByIdCache } from "./SourcesCache";
 
+function getKey([client, pauseId, frameId]: [ReplayClientInterface, PauseId, FrameId]) {
+  const focusWindow = client.getCurrentFocusWindow();
+  return `${pauseId}:${frameId}` + (focusWindow ? `:${focusWindow.begin}-${focusWindow.end}` : "");
+}
+
 export const frameStepsCache: Cache<
   [replayClient: ReplayClientInterface, pauseId: PauseId, frameId: FrameId],
   PointDescription[] | undefined
 > = createCache({
   config: { immutable: true },
   debugLabel: "frameStepsCache",
-  getKey: ([client, pauseId, frameId]) => `${pauseId}:${frameId}`,
+  getKey,
   load: async ([client, pauseId, frameId]) => {
     try {
       const frameSteps = await client.getFrameSteps(pauseId, frameId);

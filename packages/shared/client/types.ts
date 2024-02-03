@@ -1,8 +1,6 @@
 import {
   Annotation,
-  AppliedRule,
   BreakpointId,
-  ComputedStyleProperty,
   ContentType,
   Result as EvaluationResult,
   EventHandlerType,
@@ -66,8 +64,6 @@ import {
   getScopeResult,
   getSourceOutlineResult,
   getTopFrameResult,
-  keyboardEvents,
-  navigationEvents,
   performSearchResult,
   querySelectorResult,
   repaintGraphicsResult,
@@ -162,6 +158,10 @@ export interface SourceLocationRange {
   end: SourceLocation;
 }
 
+export interface TimeStampedPointWithPaintHash extends TimeStampedPoint {
+  paintHash: string;
+}
+
 export type AnnotationListener = (annotation: Annotation) => void;
 
 export interface ReplayClientInterface {
@@ -178,7 +178,7 @@ export interface ReplayClientInterface {
     pure?: boolean
   ): Promise<EvaluationResult>;
   findAnnotations(kind: string, listener: AnnotationListener): Promise<void>;
-  findKeyboardEvents(onKeyboardEvents: (events: keyboardEvents) => void): Promise<void>;
+  findKeyboardEvents(): Promise<KeyboardEvent[]>;
   findMessages(onMessage?: (message: Message) => void): Promise<{
     messages: Message[];
     overflow: boolean;
@@ -187,13 +187,15 @@ export interface ReplayClientInterface {
     messages: Message[];
     overflow: boolean;
   }>;
-  findNavigationEvents(onKeyboardEvents: (events: navigationEvents) => void): Promise<void>;
+  findMouseEvents(): Promise<MouseEvent[]>;
+  findNavigationEvents(): Promise<NavigationEvent[]>;
   findNetworkRequests(
     onRequestsReceived?: (data: { requests: RequestInfo[]; events: RequestEventInfo[] }) => void
   ): Promise<{
     events: RequestEventInfo[];
     requests: RequestInfo[];
   }>;
+  findPaints(): Promise<TimeStampedPointWithPaintHash[]>;
   findPoints(selector: PointSelector, limits?: PointLimits): Promise<PointDescription[]>;
   findRewindTarget(point: ExecutionPoint): Promise<PauseDescription>;
   findResumeTarget(point: ExecutionPoint): Promise<PauseDescription>;

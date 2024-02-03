@@ -197,12 +197,13 @@ export async function locatorTextToNumber(locator: Locator): Promise<number | nu
   return trimmed ? parseInt(trimmed) : null;
 }
 
-export async function resetTestUser(email: string) {
+export async function resetTestUser(email: string, testScope: string) {
   const variables = { email, secret: process.env.AUTOMATED_TEST_SECRET };
 
   return axios({
     url: config.graphqlUrl,
     method: "POST",
+    headers: { "replay-test-scope": testScope },
     data: {
       query: `
         mutation resetTestUser($email: String!, $secret: String!) {

@@ -111,7 +111,7 @@ interface Events {
   [key: string]: ReplayEvent[];
 }
 
-// Todo: We should move this deifnition to the protocol instead of typing it here.
+// Todo: We should move this definition to the protocol instead of typing it here.
 export type ReplayNavigationEvent = Omit<NavigationEvent, "kind"> & {
   kind: "navigation";
 };

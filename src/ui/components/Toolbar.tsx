@@ -403,14 +403,15 @@ export default function Toolbar() {
             onClick={handleButtonClick}
           />
         ) : null}
-        {testRunner === "cypress" ? (
+        {testRunner === "cypress" && (
           <ToolbarButton
             icon="cypress"
             label="Cypress Panel"
             name="cypress"
             onClick={handleButtonClick}
           />
-        ) : (
+        )}
+        {testRunner === "playwright" && (
           <ToolbarButton
             icon="playwright"
             label="Test Info"

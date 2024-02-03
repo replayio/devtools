@@ -55,9 +55,14 @@ async function checkForJumpButton(eventLocator: Locator, shouldBeEnabled: boolea
   expect(await jumpButton.isVisible()).toBe(true);
   await jumpButton.hover({});
 
-  const buttonText = await getByTestName(jumpButton, "JumpToCodeButtonLabel").innerText();
-  const expectedText = shouldBeEnabled ? "Jump to code" : "No results";
-  expect(buttonText).toBe(expectedText);
+  await waitFor(
+    async () => {
+      const buttonText = await getByTestName(jumpButton, "JumpToCodeButtonLabel").innerText();
+      const expectedText = shouldBeEnabled ? "Jump to code" : "No results";
+      expect(buttonText).toBe(expectedText);
+    },
+    { timeout: 10_000 }
+  );
 
   return jumpButton;
 }

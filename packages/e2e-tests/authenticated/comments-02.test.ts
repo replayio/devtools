@@ -1,7 +1,7 @@
 import { addCoverageReport } from "monocart-reporter";
 
 import { openDevToolsTab, startTest } from "../helpers";
-import { E2E_USER_1_API_KEY, E2E_USER_2_API_KEY } from "../helpers/authentication";
+import { E2E_USER_1, E2E_USER_2 } from "../helpers/authentication";
 import {
   addSourceCodeComment,
   deleteAllComments,
@@ -13,8 +13,8 @@ import test, { Page, base } from "../testFixtureCloneRecording";
 
 const url = "authenticated_comments.html";
 
-async function load(page: Page, recordingId: string, apiKey: string) {
-  await startTest(page, recordingId, apiKey);
+async function load(page: Page, recordingId: string, apiKey: string, testScope: string) {
+  await startTest(page, recordingId, { apiKey, testScope });
   await page.coverage.startJSCoverage();
 
   await openDevToolsTab(page);
@@ -28,11 +28,12 @@ async function close(page: Page) {
   await page.close();
 }
 
-test.use({ exampleKey: url });
+test.use({ exampleKey: url, testUsers: [E2E_USER_1, E2E_USER_2] });
 
 test(`authenticated/comments-02: Test shared comments and replies`, async ({
   browser,
-  pageWithMeta: { recordingId },
+  pageWithMeta: { recordingId, testScope },
+  testUsers,
 }) => {
   let pageOne: Page;
   let pageTwo: Page;
@@ -44,7 +45,7 @@ test(`authenticated/comments-02: Test shared comments and replies`, async ({
     const context = await browser.newContext();
     const page = await context.newPage();
 
-    await load(page, recordingId, E2E_USER_1_API_KEY);
+    await load(page, recordingId, testUsers![0].apiKey, testScope);
 
     await addSourceCodeComment(page, {
       text: "This is a test comment from user 1",
@@ -61,7 +62,7 @@ test(`authenticated/comments-02: Test shared comments and replies`, async ({
     // User 2
     const context = await browser.newContext();
     const page = await context.newPage();
-    await load(page, recordingId, E2E_USER_2_API_KEY);
+    await load(page, recordingId, testUsers![1].apiKey, testScope);
 
     const commentLocator = await getComments(page, {
       text: "This is a test comment from user 1",
