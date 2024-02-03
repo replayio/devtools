@@ -70,12 +70,20 @@ export function getAccessibleRecording(
       }
       return recording!;
     } catch (err) {
-      let content = "Unexpected error retrieving recording.";
-      if (err instanceof ApolloError) {
-        content = extractGraphQLError(err)!;
+      if (isRecordingDeletedError(err)) {
+        dispatch(setExpectedError(getDeletedRecordingError()));
+        return null;
       }
 
-      dispatch(setExpectedError({ message: "Error", content }));
+      dispatch(
+        setExpectedError({
+          message: "Error",
+          content:
+            err instanceof ApolloError
+              ? extractGraphQLError(err)!
+              : "Unexpected error retrieving recording.",
+        })
+      );
       return null;
     }
   };
@@ -91,6 +99,13 @@ function clearRecordingNotAccessibleError(): UIThunkAction {
       dispatch(clearExpectedError());
     }
   };
+}
+
+function isRecordingDeletedError(err: unknown): boolean {
+  return (
+    err instanceof ApolloError &&
+    err.graphQLErrors.some(e => e.extensions?.code === "DELETED_RECORDING")
+  );
 }
 
 function getRecordingNotAccessibleError(
@@ -127,6 +142,13 @@ export function getDisconnectionError(): UnexpectedError {
     action: "refresh",
     content: "This replay timed out to reduce server load.",
     message: "Ready when you are!",
+  };
+}
+
+function getDeletedRecordingError(): ExpectedError {
+  return {
+    message: "Recording Deleted",
+    content: "This recording has been deleted.",
   };
 }
 
