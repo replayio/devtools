@@ -19,20 +19,17 @@ export async function recordPlaywright(
       ...process.env,
       // @ts-ignore
       RECORD_REPLAY_DRIVER: config.driverPath,
-      // @ts-ignore
-      RECORD_REPLAY_VERBOSE:
-        config.driverPath || process.env.RECORD_REPLAY_BROWSER_LOG ? "1" : undefined,
       RECORD_ALL_CONTENT: "1",
     },
     executablePath, //: config.browserPath,
     headless: config.headless,
   });
 
-  // Set if you want to see the chromium logs during recording.
-  if (process.env.RECORD_REPLAY_BROWSER_LOG) {
+  if (process.env.RECORD_REPLAY_VERBOSE) {
+    // TODO: Always keep logs, and make them available if the recording failed.
     const stderr = browserServer.process().stderr;
     stderr?.addListener("data", data => {
-      console.error(data + "");
+      console.debug(`[RUNTIME] ${data}`);
     });
   }
 
