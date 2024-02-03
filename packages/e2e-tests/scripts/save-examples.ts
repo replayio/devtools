@@ -372,12 +372,6 @@ async function waitUntilMessage(
 
 (async () => {
   try {
-    // Debug: Allow verifying the replay-cli version.
-    console.log(`@replayio/replay version:`);
-    execSync("npx replay version", {
-      stdio: "inherit",
-    });
-
     const functionsForTarget = {
       browser: saveBrowserExamples,
       node: saveNodeExamples,

@@ -2,16 +2,33 @@
 
 import { exec, execSync } from "child_process";
 import path from "path";
-import uniq from "lodash/uniq";
+import chalk from "chalk";
+import difference from "lodash/difference";
 
 import { getSecret } from "./aws_secrets";
 import { ExampleInfo, getStats } from "./get-stats";
 
 const CONFIG = {
-  VerboseOverride: "1",
+  // Allow overriding recorder debug output.
+  RecorderVerboseOverride: false,
 };
 
-const TestFileBlackList = new Set([]);
+// We use this for debugging purposes only.
+const TestFileOverrideList = [];
+
+// Disable some tests that we know to be problematic.
+const TestFileBlackList = new Set([
+  // https://linear.app/replay/issue/RUN-3222/
+  "tests/jump-to-code-01_basic.test.ts",
+  // https://linear.app/replay/issue/RUN-3223
+  "tests/breakpoints-06.test.ts",
+  "tests/object_preview-04.test.ts",
+  "tests/stepping-05_chromium.test.ts",
+  // https://linear.app/replay/issue/RUN-3224/
+  "authenticated/comments-03.test.ts",
+]);
+
+// Enable some tests that we have recently fixed but not yet enabled everywhere.
 const TestFileWhiteList = new Set([]);
 
 /**
@@ -36,9 +53,9 @@ function checkReRecord(testFile, exampleFileInfo: ExampleInfo) {
   }
   if (shouldTestOverride !== undefined && shouldTestOnLatest !== shouldTestOverride) {
     if (shouldTestOverride) {
-      console.warn(`${testFile} is not eligible but whitelisted.`);
+      console.warn(chalk.yellow(`✅ WHITELISTED: ${testFile}`));
     } else {
-      console.warn(`${testFile} is eligible but blacklisted.`);
+      console.warn(chalk.yellow(`❌ BACKLISTED: ${testFile}`));
     }
     return shouldTestOverride;
   }
@@ -50,38 +67,57 @@ function checkReRecord(testFile, exampleFileInfo: ExampleInfo) {
  */
 function gatherChromiumExamplesAndTests() {
   const { testFileToInfoMap } = getStats();
-  const testFiles: string[] = [];
-  const exampleFiles: string[] = [];
+  const testFiles = new Set<string>();
+  const exampleFiles = new Set<string>();
 
   const remainingBlackListTests = new Set(TestFileBlackList);
   const remainingWhiteListTests = new Set(TestFileWhiteList);
 
   for (const [testFile, exampleFileInfo] of Object.entries(testFileToInfoMap)) {
-    remainingBlackListTests.delete(testFile);
-    remainingWhiteListTests.delete(testFile);
-    const shouldReRecord = checkReRecord(testFile, exampleFileInfo);
+    let shouldReRecord: boolean;
+    if (TestFileOverrideList.length) {
+      // Only pick from TestFileOverrideList.
+      shouldReRecord = TestFileOverrideList.includes(testFile);
+    } else {
+      // Normal book-keeping.
+      remainingBlackListTests.delete(testFile);
+      remainingWhiteListTests.delete(testFile);
+      shouldReRecord = checkReRecord(testFile, exampleFileInfo);
+    }
     if (shouldReRecord) {
-      testFiles.push(testFile);
-      exampleFiles.push(exampleFileInfo.exampleName);
+      testFiles.add(testFile);
+      exampleFiles.add(exampleFileInfo.exampleName);
     }
   }
 
-  if (remainingBlackListTests.size) {
-    throw new Error(
-      `WARNING: TestFileBlackList contains unknown tests:\n ${Array.from(
-        remainingBlackListTests
-      ).join("\n ")}`
-    );
-  }
-  if (remainingWhiteListTests.size) {
-    throw new Error(
-      `WARNING: TestFileWhiteList contains unknown tests:\n ${Array.from(
-        remainingWhiteListTests
-      ).join("\n ")}`
-    );
+  console.log(`Examples (${exampleFiles.size}):\n ${Array.from(exampleFiles).join("\n ")}`);
+  console.log(`Tests (${testFiles.size}):\n ${Array.from(testFiles).join("\n ")}`);
+
+  if (TestFileOverrideList.length) {
+    // Only check TestFileOverrideList.
+    const diff = difference(TestFileOverrideList, Array.from(testFiles));
+    if (diff.length) {
+      throw new Error(`TestFileOverrideList contained unknown tests: ${diff.join(",")}`);
+    }
+  } else {
+    // Normal book-keeping.
+    if (remainingBlackListTests.size) {
+      throw new Error(
+        `WARNING: TestFileBlackList contains unknown tests:\n ${Array.from(
+          remainingBlackListTests
+        ).join("\n ")}`
+      );
+    }
+    if (remainingWhiteListTests.size) {
+      throw new Error(
+        `WARNING: TestFileWhiteList contains unknown tests:\n ${Array.from(
+          remainingWhiteListTests
+        ).join("\n ")}`
+      );
+    }
   }
 
-  return { testFiles, exampleFiles: uniq(exampleFiles) };
+  return { testFiles: Array.from(testFiles), exampleFiles: Array.from(exampleFiles) };
 }
 
 // transforms https://github.com/replayio/chromium.git or
@@ -90,7 +126,7 @@ function githubUrlToRepository(url) {
   return url?.replace(/.*github.com[:\/](.*)\.git/, "$1");
 }
 
-export default function run_fe_tests(CHROME_BINARY_PATH, runInCI = true) {
+export default function run_fe_tests(CHROME_BINARY_PATH, runInCI = true, nWorkers = 4) {
   console.group("START");
   console.time("START time");
 
@@ -116,13 +152,15 @@ export default function run_fe_tests(CHROME_BINARY_PATH, runInCI = true) {
   process.env.HASURA_ADMIN_SECRET ||= getSecret("prod/hasura-admin-secret", "us-east-2");
   process.env.DISPATCH_ADDRESS ||= "wss://dispatch.replay.io";
   process.env.AUTHENTICATED_TESTS_WORKSPACE_API_KEY = process.env.RECORD_REPLAY_API_KEY;
+  // TODO: https://linear.app/replay/issue/FE-2237/
   process.env.PLAYWRIGHT_TEST_BASE_URL ||= "http://localhost:8080";
   process.env.RECORD_REPLAY_METADATA_SOURCE_REPOSITORY ||= githubUrlToRepository(
     process.env.RUNTIME_REPO
   );
 
-  // Allow overriding runtime debug output.
-  process.env.RECORD_REPLAY_VERBOSE ||= CONFIG.VerboseOverride;
+  if (CONFIG.RecorderVerboseOverride) {
+    process.env.RECORD_REPLAY_VERBOSE = "1";
+  }
 
   // Debug replay:cli by default.
   process.env.DEBUG = "replay:cli";
@@ -148,8 +186,14 @@ export default function run_fe_tests(CHROME_BINARY_PATH, runInCI = true) {
       console.error(`yarn dev stderr: ${stderr}`);
     });
 
+    // Debug: Allow verifying the replay-cli version.
+    console.log(`Checking @replayio/replay version...`);
+    execSync("npx replay version", {
+      stdio: "inherit",
+    });
+
     // Wait a little, to let the yarn dev server start up.
-    execSync("sleep 5");
+    execSync("sleep 2");
   }
 
   try {
@@ -159,8 +203,6 @@ export default function run_fe_tests(CHROME_BINARY_PATH, runInCI = true) {
     console.group("GATHER-EXAMPLES");
     console.time("GATHER-EXAMPLES time");
     const { exampleFiles, testFiles } = gatherChromiumExamplesAndTests();
-    console.log(`Examples (${exampleFiles.length}):\n ${exampleFiles.join("\n ")}`);
-    console.log(`Tests (${testFiles.length}):\n ${testFiles.join("\n ")}`);
     console.timeEnd("GATHER-EXAMPLES time");
 
     console.group("SAVE-EXAMPLES");
@@ -185,7 +227,7 @@ export default function run_fe_tests(CHROME_BINARY_PATH, runInCI = true) {
     {
       // Run the known-passing tests.
       execSync(
-        `${envWrapper} npx playwright test --grep-invert node_ --project=chromium --workers=1 --retries=2 ${testFiles.join(
+        `${envWrapper} npx playwright test --grep-invert node_ --project=chromium --workers=${nWorkers} --retries=2 ${testFiles.join(
           " "
         )}`,
         {
@@ -218,6 +260,6 @@ export default function run_fe_tests(CHROME_BINARY_PATH, runInCI = true) {
 
 (async function main() {
   if (process.argv[1] === __filename) {
-    run_fe_tests(undefined, false);
+    run_fe_tests(undefined, false, 1 /* nWorkers */);
   }
 })();
