@@ -29,7 +29,9 @@ export const filterTestRunsByText = async (page: Page, text: string) => {
   // Wait for the update to be rendered to the DOM before completing
   // This simplifies the corresponding expect() code in the caller
   const list = page.locator('[data-test-id="TestRunList"]');
-  await expect(await list.getAttribute("data-filtered-by-text")).toBe(text);
+  await waitFor(async () => {
+    await expect(await list.getAttribute("data-filtered-by-text")).toBe(text);
+  });
 };
 
 export const filterTestRunsByBranch = async (page: Page, branch: "all" | "primary") => {
@@ -48,7 +50,9 @@ export const filterTestRunsByBranch = async (page: Page, branch: "all" | "primar
   // Wait for the update to be rendered to the DOM before completing
   // This simplifies the corresponding expect() code in the caller
   const list = page.locator('[data-test-id="TestRunList"]');
-  await expect(await list.getAttribute("data-filtered-by-branch")).toBe(branch);
+  await waitFor(async () => {
+    await expect(await list.getAttribute("data-filtered-by-branch")).toBe(branch);
+  });
 };
 
 export const filterTestRunsByStatus = async (page: Page, status: "all" | "failed") => {
@@ -67,7 +71,9 @@ export const filterTestRunsByStatus = async (page: Page, status: "all" | "failed
   // Wait for the update to be rendered to the DOM before completing
   // This simplifies the corresponding expect() code in the caller
   const list = page.locator('[data-test-id="TestRunList"]');
-  await expect(await list.getAttribute("data-filtered-by-status")).toBe(status);
+  await waitFor(async () => {
+    await expect(await list.getAttribute("data-filtered-by-status")).toBe(status);
+  });
 };
 
 export const filterSummaryTestsByText = async (page: Page, text: string) => {
@@ -77,7 +83,9 @@ export const filterSummaryTestsByText = async (page: Page, text: string) => {
   // Wait for the update to be rendered to the DOM before completing
   // This simplifies the corresponding expect() code in the caller
   const list = page.locator('[data-test-id="TestRunResults"]');
-  await expect(await list.getAttribute("data-filtered-by-text")).toBe(text);
+  await waitFor(async () => {
+    await expect(await list.getAttribute("data-filtered-by-text")).toBe(text);
+  });
 };
 
 export const filterSummaryByStatus = async (page: Page, status: "all" | "failed-and-flaky") => {
@@ -96,7 +104,9 @@ export const filterSummaryByStatus = async (page: Page, status: "all" | "failed-
   // Wait for the update to be rendered to the DOM before completing
   // This simplifies the corresponding expect() code in the caller
   const list = page.locator('[data-test-id="TestRunResults"]');
-  await expect(await list.getAttribute("data-filtered-by-status")).toBe(status);
+  await waitFor(async () => {
+    await expect(await list.getAttribute("data-filtered-by-status")).toBe(status);
+  });
 };
 
 export const findTestRunByText = async (page: Page, locator: Locator, text: string) => {
