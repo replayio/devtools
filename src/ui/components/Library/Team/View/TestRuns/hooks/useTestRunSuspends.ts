@@ -11,7 +11,7 @@ import { testRunsIntervalCache } from "../suspense/TestRunsCache";
 
 const EMPTY_ARRAY: any[] = [];
 
-export function useTestRunSuspends(): { testRuns: TestRun[] } {
+export function useTestRunsSuspends(): { testRuns: TestRun[] } {
   const graphQLClient = useContext(GraphQLClientContext);
   const { teamId } = useContext(TeamContext);
   const { filterByText, filterByBranch, filterByStatus } = useContext(TestRunsContext);

@@ -5,7 +5,7 @@ import { FixedSizeList, ListChildComponentProps } from "react-window";
 import { TestRun } from "shared/test-suites/TestRun";
 
 import { TestSuitePanelMessage } from "../../TestSuitePanelMessage";
-import { useTestRunSuspends } from "../hooks/useTestRunSuspends";
+import { useTestRunsSuspends } from "../hooks/useTestRunSuspends";
 import { TestRunsContext } from "../TestRunsContextRoot";
 import { TestRunListItem } from "./TestRunListItem";
 import styles from "./TestRunList.module.css";
@@ -17,7 +17,7 @@ type ItemData = {
 
 export function TestRunList() {
   const { filterByText } = useContext(TestRunsContext);
-  const { testRuns } = useTestRunSuspends();
+  const { testRuns } = useTestRunsSuspends();
   const itemData = useMemo<ItemData>(
     () => ({
       filterByText,

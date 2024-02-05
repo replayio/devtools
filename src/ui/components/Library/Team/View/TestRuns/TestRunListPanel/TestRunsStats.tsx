@@ -7,7 +7,7 @@ import { TestRun } from "shared/test-suites/TestRun";
 import { useTheme } from "shared/theme/useTheme";
 import { TimeFilterContext } from "ui/components/Library/Team/View/TimeFilterContextRoot";
 
-import { useTestRunSuspends } from "../hooks/useTestRunSuspends";
+import { useTestRunsSuspends } from "../hooks/useTestRunSuspends";
 import styles from "./TestRunsStats.module.css";
 
 type ChartDataType = { failureRate: number; label: string };
@@ -17,7 +17,7 @@ const PADDING = 4;
 const POINT_RADIUS = 4;
 
 export function TestRunsStats() {
-  const { testRuns } = useTestRunSuspends();
+  const { testRuns } = useTestRunsSuspends();
 
   if (!testRuns.length) {
     return null;
@@ -44,7 +44,7 @@ export function TestRunsStats() {
 }
 
 function ChartWithDimensions({ height, width }: { height: number; width: number }) {
-  const { testRuns } = useTestRunSuspends();
+  const { testRuns } = useTestRunsSuspends();
   const { startTime, endTime } = useContext(TimeFilterContext);
 
   const ref = useRef<HTMLCanvasElement>(null);
