@@ -5,6 +5,7 @@ import { TestRunTestWithRecordings } from "shared/test-suites/TestRun";
 
 import { TestSuitePanelMessage } from "../../TestSuitePanelMessage";
 import { useTestRunDetailsSuspends } from "../hooks/useTestRunDetailsSuspends";
+import { RootCause } from "../RootCause/RootCause";
 import { TestRunPanelWrapper } from "../TestRunPanelWrapper";
 import { TestRunsContext } from "../TestRunsContextRoot";
 import { ExecutionList } from "./ExecutionList";
@@ -45,6 +46,7 @@ export function TestRunTestPanel() {
         {selectedTest.result === "failed" || selectedTest.result === "flaky" ? (
           <Errors test={selectedTest} />
         ) : null}
+        <RootCause />
       </div>
     </TestRunPanelWrapper>
   );
@@ -81,6 +83,8 @@ function Errors({ test }: { test: TestRunTestWithRecordings }) {
 
     return uniqueErrors.sort((a, b) => b.count - a.count);
   }, [test]);
+
+  return null;
 
   return (
     <div className={styles.subContainer}>
