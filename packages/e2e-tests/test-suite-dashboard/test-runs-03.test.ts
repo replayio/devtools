@@ -1,7 +1,7 @@
 import { startLibraryTest } from "../helpers";
 import { TEST_RUN_WORKSPACE_API_KEY, TEST_RUN_WORKSPACE_TEAM_ID } from "../helpers/authentication";
 import {
-  filterRunsByText,
+  filterTestRunsByText,
   findTestRunByText,
   noTestSelected,
   testItems,
@@ -30,7 +30,7 @@ test(`test-suite-dashboard/test-runs-03: flaky run in main branch with source`, 
   // > Selected test run
 
   // >>> Opens test run overview and match the title
-  await filterRunsByText(page, clientKey);
+  await filterTestRunsByText(page, clientKey);
 
   expect(await testRunsItems(page).count()).toBe(1);
   const testItem = testRunsItems(page).first();

@@ -9,7 +9,7 @@ import useToken from "ui/utils/useToken";
 import { TimeFilterContext } from "../../TimeFilterContextRoot";
 import { testRunsIntervalCache } from "../suspense/TestRunsCache";
 
-const EMPTY_ARRAY: any[] = [];
+const EMPTY_ARRAY: TestRun[] = [];
 
 export function useTestRunsSuspends() {
   const graphQLClient = useContext(GraphQLClientContext);

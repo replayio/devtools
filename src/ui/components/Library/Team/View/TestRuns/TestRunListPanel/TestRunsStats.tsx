@@ -32,7 +32,7 @@ export function TestRunsStats() {
       <div className={styles.ChartWrapper}>
         <AutoSizer>
           {({ height, width }: { height: number; width: number }) => (
-            <ChartWithDimensions height={height} width={width} />
+            <ChartWithDimensions height={height} testRuns={testRuns} width={width} />
           )}
         </AutoSizer>
       </div>
@@ -43,8 +43,15 @@ export function TestRunsStats() {
   );
 }
 
-function ChartWithDimensions({ height, width }: { height: number; width: number }) {
-  const { filteredSortedTestRuns: testRuns } = useTestRunsSuspends();
+function ChartWithDimensions({
+  height,
+  testRuns,
+  width,
+}: {
+  height: number;
+  testRuns: TestRun[];
+  width: number;
+}) {
   const { startTime, endTime } = useContext(TimeFilterContext);
 
   const ref = useRef<HTMLCanvasElement>(null);

@@ -87,7 +87,7 @@ export default function TestRunListPanel() {
         <div className="grid w-full grid-cols-3 gap-2 bg-bodyBgcolor">
           <div
             className={dropdownStyles.dropdownTrigger}
-            data-testid="TestRunsPage-ResultFilter-DropdownTrigger"
+            data-test-id="TestRunsPage-ResultFilter-DropdownTrigger"
             onClick={onClickStatusFilter}
             onKeyDown={onKeyDownStatusFilter}
             tabIndex={0}
@@ -135,6 +135,7 @@ export default function TestRunListPanel() {
       <TestRunsStats />
       <div
         className="grow"
+        data-filtered-by-branch={filterByBranch}
         data-filtered-by-status={filterByStatus}
         data-filtered-by-text={filterByText}
         data-test-id="TestRunList"
