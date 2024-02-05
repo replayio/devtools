@@ -7,7 +7,7 @@ import { TestRun } from "shared/test-suites/TestRun";
 import { useTheme } from "shared/theme/useTheme";
 import { TimeFilterContext } from "ui/components/Library/Team/View/TimeFilterContextRoot";
 
-import { useTestRunsSuspends } from "../hooks/useTestRunSuspends";
+import { useTestRunsSuspends } from "../hooks/useTestRunsSuspends";
 import styles from "./TestRunsStats.module.css";
 
 type ChartDataType = { failureRate: number; label: string };
