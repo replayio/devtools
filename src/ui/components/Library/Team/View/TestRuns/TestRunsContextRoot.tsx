@@ -13,15 +13,18 @@ import {
 import { useGetTeamRouteParams } from "ui/components/Library/Team/utils";
 import { trackEvent } from "ui/utils/telemetry";
 
+export type FilterByBranch = "all" | "primary";
+export type FilterByStatus = "all" | "failed";
+
 type TestRunsContextType = {
-  filterByBranch: "all" | "primary";
-  filterByStatus: "all" | "failed";
+  filterByBranch: FilterByBranch;
+  filterByStatus: FilterByStatus;
   filterByText: string;
   filterByTextForDisplay: string;
   filterTestsByText: string;
   selectTestRun: Dispatch<SetStateAction<string | null>>;
-  setFilterByBranch: Dispatch<SetStateAction<"all" | "primary">>;
-  setFilterByStatus: Dispatch<SetStateAction<"all" | "failed">>;
+  setFilterByBranch: Dispatch<SetStateAction<FilterByBranch>>;
+  setFilterByStatus: Dispatch<SetStateAction<FilterByStatus>>;
   setFilterByText: Dispatch<SetStateAction<string>>;
   setFilterTestsByText: Dispatch<SetStateAction<string>>;
   testRunIdForSuspense: string | null;
@@ -38,8 +41,8 @@ export function TestRunsContextRoot({ children }: { children: ReactNode }) {
   const [testRunIdForSuspense, setTestRunIdForSuspense] = useState<string | null>(
     testRunId ?? null
   );
-  const [filterByBranch, setFilterByBranch] = useState<"all" | "primary">("all");
-  const [filterByStatus, setFilterByStatus] = useState<"all" | "failed">("all");
+  const [filterByBranch, setFilterByBranch] = useState<FilterByBranch>("all");
+  const [filterByStatus, setFilterByStatus] = useState<FilterByStatus>("all");
 
   const [filterByText, setFilterByText] = useState("");
   const filterByTextDeferred = useDeferredValue(filterByText);
