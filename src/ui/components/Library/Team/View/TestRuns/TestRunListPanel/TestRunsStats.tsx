@@ -32,19 +32,30 @@ export function TestRunsStats() {
       <div className={styles.ChartWrapper}>
         <AutoSizer>
           {({ height, width }: { height: number; width: number }) => (
-            <ChartWithDimensions height={height} width={width} />
+            <ChartWithDimensions height={height} testRuns={testRuns} width={width} />
           )}
         </AutoSizer>
       </div>
-      <div className={styles.FailureRateDescription} title={`${buildFailuresCount}/${buildsCount}`}>
-        <strong>Failure rate:</strong> {(buildFailureRate * 100).toFixed(2)}%
+      <div
+        className={styles.FailureRateDescription}
+        data-test-id="TestRunStats-ChartSummaryLabel"
+        title={`${buildFailuresCount}/${buildsCount} failed`}
+      >
+        <strong>Failure rate:</strong> {Math.round(buildFailureRate * 100)}%
       </div>
     </div>
   );
 }
 
-function ChartWithDimensions({ height, width }: { height: number; width: number }) {
-  const { filteredSortedTestRuns: testRuns } = useTestRunsSuspends();
+function ChartWithDimensions({
+  height,
+  testRuns,
+  width,
+}: {
+  height: number;
+  testRuns: TestRun[];
+  width: number;
+}) {
   const { startTime, endTime } = useContext(TimeFilterContext);
 
   const ref = useRef<HTMLCanvasElement>(null);
