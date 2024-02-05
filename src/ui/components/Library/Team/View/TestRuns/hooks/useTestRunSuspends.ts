@@ -1,9 +1,9 @@
-import { useContext, useEffect, useMemo, useState } from "react";
-import { STATUS_PENDING, Status, useImperativeIntervalCacheValues } from "suspense";
+import { useContext, useMemo } from "react";
 
 import { GraphQLClientContext } from "replay-next/src/contexts/GraphQLClientContext";
-import { TestRun } from "shared/test-suites/TestRun";
+import { TestRun, filterTestRun } from "shared/test-suites/TestRun";
 import { TeamContext } from "ui/components/Library/Team/TeamContextRoot";
+import { TestRunsContext } from "ui/components/Library/Team/View/TestRuns/TestRunsContextRoot";
 import useToken from "ui/utils/useToken";
 
 import { TimeFilterContext } from "../../TimeFilterContextRoot";
@@ -14,6 +14,7 @@ const EMPTY_ARRAY: any[] = [];
 export function useTestRunSuspends(): { testRuns: TestRun[] } {
   const graphQLClient = useContext(GraphQLClientContext);
   const { teamId } = useContext(TeamContext);
+  const { filterByText, filterByBranch, filterByStatus } = useContext(TestRunsContext);
   const { startTime, endTime } = useContext(TimeFilterContext);
 
   const accessToken = useToken();
@@ -28,7 +29,21 @@ export function useTestRunSuspends(): { testRuns: TestRun[] } {
       )
     : EMPTY_ARRAY;
 
-  const testRunsDesc = useMemo(() => [...testRuns].reverse(), [testRuns]);
+  const filteredSortedTestRuns = useMemo(() => {
+    let filteredTestRuns = testRuns;
 
-  return { testRuns: testRunsDesc };
+    if (filterByBranch === "primary" || filterByStatus === "failed" || filterByText !== "") {
+      filteredTestRuns = filteredTestRuns.filter(testRun =>
+        filterTestRun(testRun, {
+          branch: filterByBranch,
+          text: filterByText,
+          status: filterByStatus,
+        })
+      );
+    }
+
+    return [...filteredTestRuns].reverse();
+  }, [filterByBranch, filterByStatus, filterByText, testRuns]);
+
+  return { testRuns: filteredSortedTestRuns };
 }

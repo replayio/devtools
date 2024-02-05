@@ -5,7 +5,6 @@ import AutoSizer from "react-virtualized-auto-sizer";
 import useTooltip from "replay-next/src/hooks/useTooltip";
 import { TestRun } from "shared/test-suites/TestRun";
 import { useTheme } from "shared/theme/useTheme";
-import { TestRunsContext } from "ui/components/Library/Team/View/TestRuns/TestRunsContextRoot";
 import { TimeFilterContext } from "ui/components/Library/Team/View/TimeFilterContextRoot";
 
 import { useTestRunSuspends } from "../hooks/useTestRunSuspends";

@@ -2,7 +2,7 @@ import { useContext, useMemo } from "react";
 import ReactVirtualizedAutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 
-import { TestRun, filterTestRun, getTestRunTitle } from "shared/test-suites/TestRun";
+import { TestRun } from "shared/test-suites/TestRun";
 
 import { TestSuitePanelMessage } from "../../TestSuitePanelMessage";
 import { useTestRunSuspends } from "../hooks/useTestRunSuspends";
@@ -16,26 +16,15 @@ type ItemData = {
 };
 
 export function TestRunList() {
-  const { filterByText, filterByBranch, filterByStatus } = useContext(TestRunsContext);
+  const { filterByText } = useContext(TestRunsContext);
   const { testRuns } = useTestRunSuspends();
-  const itemData = useMemo<ItemData>(() => {
-    let filteredTestRuns = testRuns;
-
-    if (filterByBranch === "primary" || filterByStatus === "failed" || filterByText !== "") {
-      filteredTestRuns = filteredTestRuns.filter(testRun =>
-        filterTestRun(testRun, {
-          branch: filterByBranch,
-          text: filterByText,
-          status: filterByStatus,
-        })
-      );
-    }
-
-    return {
+  const itemData = useMemo<ItemData>(
+    () => ({
       filterByText,
-      testRuns: filteredTestRuns,
-    };
-  }, [filterByBranch, filterByStatus, filterByText, testRuns]);
+      testRuns,
+    }),
+    [filterByText, testRuns]
+  );
 
   if (testRuns.length > 0 && itemData.testRuns.length === 0) {
     return (
