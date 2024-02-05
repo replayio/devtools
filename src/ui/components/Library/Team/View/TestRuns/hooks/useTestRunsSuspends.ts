@@ -11,7 +11,7 @@ import { testRunsIntervalCache } from "../suspense/TestRunsCache";
 
 const EMPTY_ARRAY: any[] = [];
 
-export function useTestRunsSuspends(): { testRuns: TestRun[] } {
+export function useTestRunsSuspends() {
   const graphQLClient = useContext(GraphQLClientContext);
   const { teamId } = useContext(TeamContext);
   const { filterByText, filterByBranch, filterByStatus } = useContext(TestRunsContext);
@@ -45,5 +45,5 @@ export function useTestRunsSuspends(): { testRuns: TestRun[] } {
     return [...filteredTestRuns].reverse();
   }, [filterByBranch, filterByStatus, filterByText, testRuns]);
 
-  return { testRuns: filteredSortedTestRuns };
+  return { filteredSortedTestRuns, rawTestRuns: testRuns };
 }

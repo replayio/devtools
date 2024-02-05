@@ -17,16 +17,16 @@ type ItemData = {
 
 export function TestRunList() {
   const { filterByText } = useContext(TestRunsContext);
-  const { testRuns } = useTestRunsSuspends();
+  const { filteredSortedTestRuns, rawTestRuns } = useTestRunsSuspends();
   const itemData = useMemo<ItemData>(
     () => ({
       filterByText,
-      testRuns,
+      testRuns: filteredSortedTestRuns,
     }),
-    [filterByText, testRuns]
+    [filterByText, filteredSortedTestRuns]
   );
 
-  if (testRuns.length > 0 && itemData.testRuns.length === 0) {
+  if (rawTestRuns.length > 0 && filteredSortedTestRuns.length === 0) {
     return (
       <TestSuitePanelMessage data-test-id="NoTestRuns" className={styles.message}>
         No test runs match the current filters

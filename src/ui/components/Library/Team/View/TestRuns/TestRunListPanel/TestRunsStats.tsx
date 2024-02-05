@@ -17,7 +17,7 @@ const PADDING = 4;
 const POINT_RADIUS = 4;
 
 export function TestRunsStats() {
-  const { testRuns } = useTestRunsSuspends();
+  const { filteredSortedTestRuns: testRuns } = useTestRunsSuspends();
 
   if (!testRuns.length) {
     return null;
@@ -44,7 +44,7 @@ export function TestRunsStats() {
 }
 
 function ChartWithDimensions({ height, width }: { height: number; width: number }) {
-  const { testRuns } = useTestRunsSuspends();
+  const { filteredSortedTestRuns: testRuns } = useTestRunsSuspends();
   const { startTime, endTime } = useContext(TimeFilterContext);
 
   const ref = useRef<HTMLCanvasElement>(null);
