@@ -17,7 +17,7 @@ import test, { expect } from "../testFixtureTestSuiteDashboard";
 
 test.use({ testRunState: "FAILED_IN_TEMP_BRANCH_WITHOUT_SOURCE" });
 
-test(`authenticated/new-test-suites/test-runs-02: failed run in temp branch without source`, async ({
+test(`test-suite-dashboard/test-runs-02: failed run in temp branch without source`, async ({
   pageWithMeta: { page, clientKey },
 }) => {
   await startLibraryTest(page, TEST_RUN_WORKSPACE_API_KEY, TEST_RUN_WORKSPACE_TEAM_ID);

@@ -19,7 +19,7 @@ import test, { expect } from "../testFixtureTestSuiteDashboard";
 
 test.use({ testRunState: "SUCCESS_IN_MAIN_WITH_SOURCE" });
 
-test(`authenticated/new-test-suites/test-runs-01: passed run in main branch with source`, async ({
+test(`test-suite-dashboard/test-runs-01: passed run in main branch with source`, async ({
   pageWithMeta: { page, clientKey },
 }) => {
   await startLibraryTest(page, TEST_RUN_WORKSPACE_API_KEY, TEST_RUN_WORKSPACE_TEAM_ID);
