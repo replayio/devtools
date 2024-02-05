@@ -7,7 +7,7 @@ import {
   getTime,
   paused,
 } from "devtools/client/debugger/src/reducers/pause";
-import { PaintsCache, timeIsBeyondKnownPaints } from "protocol/PaintsCache";
+import { PaintsCache } from "protocol/PaintsCache";
 import { RecordedMouseEventsCache } from "protocol/RecordedEventsCache";
 import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
 import { screenshotCache } from "replay-next/src/suspense/ScreenshotCache";
@@ -18,7 +18,7 @@ import { AppStore } from "ui/setup/store";
 import { getCurrentPauseId } from "ui/utils/app";
 
 import { repaintGraphics } from "./repainted-graphics-cache";
-import { assert, binarySearch, defer } from "./utils";
+import { assert, binarySearch } from "./utils";
 
 const repaintedScreenshots: Map<string, ScreenShot> = new Map();
 
@@ -126,7 +126,7 @@ export async function setupGraphics(store: AppStore) {
   }
 
   const currentTime = getTime(store.getState());
-  const { screen, mouse } = await getGraphicsAtTime(currentTime, false);
+  const { screen, mouse } = await getGraphicsAtTime(currentTime);
   if (screen) {
     paintGraphics(screen, mouse);
   }
@@ -302,13 +302,10 @@ export interface MouseAndClickPosition {
 }
 
 export async function getGraphicsAtTime(
-  time: number,
-  forPlayback = false,
-  allowLastPaint = false
+  time: number
 ): Promise<{ screen?: ScreenShot; mouse?: MouseAndClickPosition }> {
   const paintIndex = mostRecentIndex(gPaintPoints, time);
-  if (paintIndex === undefined || (timeIsBeyondKnownPaints(time) && !allowLastPaint)) {
-    // There are no graphics to paint here.
+  if (paintIndex === undefined) {
     return {};
   }
 

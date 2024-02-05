@@ -43,15 +43,3 @@ export function mostRecentPaint(time: number) {
     return null;
   }
 }
-
-// TODO [FE-2401] Do we need to keep this method? Maybe not.
-export function timeIsBeyondKnownPaints(time: number) {
-  const paints = PaintsCache.getValueIfCached();
-  if (!paints || paints.length === 0) {
-    return false;
-  }
-
-  const lastPoint = paints[paints.length - 1];
-
-  return lastPoint.time < time;
-}
