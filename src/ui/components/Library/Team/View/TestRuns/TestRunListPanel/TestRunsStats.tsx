@@ -36,8 +36,12 @@ export function TestRunsStats() {
           )}
         </AutoSizer>
       </div>
-      <div className={styles.FailureRateDescription} title={`${buildFailuresCount}/${buildsCount}`}>
-        <strong>Failure rate:</strong> {(buildFailureRate * 100).toFixed(2)}%
+      <div
+        className={styles.FailureRateDescription}
+        data-test-id="TestRunStats-ChartSummaryLabel"
+        title={`${buildFailuresCount}/${buildsCount} failed`}
+      >
+        <strong>Failure rate:</strong> {Math.round(buildFailureRate * 100)}%
       </div>
     </div>
   );

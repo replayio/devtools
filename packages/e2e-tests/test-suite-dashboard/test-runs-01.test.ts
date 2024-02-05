@@ -46,14 +46,18 @@ test(`test-suite-dashboard/test-runs-01: passed run in main branch with source`,
   expect(await noTestRunsMessage(page).count()).toBe(0);
   await filterTestRunsByText(page, "");
 
+  const chartLabel = page.locator('[data-test-id="TestRunStats-ChartSummaryLabel"]');
+
   // >>> filtered by failures, only test runs containing one or more failures should be displayed
   await filterTestRunsByStatus(page, "failed");
+  expect(await chartLabel.textContent()).toBe("Failure rate: 100%");
   const failedItemsCount = await testRunsItems(page).count();
   for (let i = 0; i < failedItemsCount; i++) {
     const testRunItem = testRunsItems(page).nth(i);
     expect(await testRunItem.locator('[data-test-status="fail"]').count()).toBe(1);
   }
   await filterTestRunsByStatus(page, "all");
+  expect(await chartLabel.textContent()).not.toBe("Failure rate: 100%");
 
   // >>> Workspace with limited retention limit should not show large time range filter
   expect(await page.getByTestId("month").count()).toBe(0);
