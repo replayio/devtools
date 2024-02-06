@@ -2,10 +2,10 @@ import { useContext, useMemo } from "react";
 import ReactVirtualizedAutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 
-import { TestRun, filterTestRun, getTestRunTitle } from "shared/test-suites/TestRun";
+import { TestRun } from "shared/test-suites/TestRun";
 
 import { TestSuitePanelMessage } from "../../TestSuitePanelMessage";
-import { useTestRunSuspends } from "../hooks/useTestRunSuspends";
+import { useTestRunsSuspends } from "../hooks/useTestRunsSuspends";
 import { TestRunsContext } from "../TestRunsContextRoot";
 import { TestRunListItem } from "./TestRunListItem";
 import styles from "./TestRunList.module.css";
@@ -16,28 +16,17 @@ type ItemData = {
 };
 
 export function TestRunList() {
-  const { filterByText, filterByBranch, filterByStatus } = useContext(TestRunsContext);
-  const { testRuns } = useTestRunSuspends();
-  const itemData = useMemo<ItemData>(() => {
-    let filteredTestRuns = testRuns;
-
-    if (filterByBranch === "primary" || filterByStatus === "failed" || filterByText !== "") {
-      filteredTestRuns = filteredTestRuns.filter(testRun =>
-        filterTestRun(testRun, {
-          branch: filterByBranch,
-          text: filterByText,
-          status: filterByStatus,
-        })
-      );
-    }
-
-    return {
+  const { filterByText } = useContext(TestRunsContext);
+  const { filteredSortedTestRuns, rawTestRuns } = useTestRunsSuspends();
+  const itemData = useMemo<ItemData>(
+    () => ({
       filterByText,
-      testRuns: filteredTestRuns,
-    };
-  }, [filterByBranch, filterByStatus, filterByText, testRuns]);
+      testRuns: filteredSortedTestRuns,
+    }),
+    [filterByText, filteredSortedTestRuns]
+  );
 
-  if (testRuns.length > 0 && itemData.testRuns.length === 0) {
+  if (rawTestRuns.length > 0 && filteredSortedTestRuns.length === 0) {
     return (
       <TestSuitePanelMessage data-test-id="NoTestRuns" className={styles.message}>
         No test runs match the current filters

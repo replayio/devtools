@@ -5,7 +5,7 @@ import test, { expect } from "../testFixtureTestSuiteDashboard";
 
 test.use({ testRunState: "FLAKY_IN_MAIN_WITH_SOURCE" });
 
-test(`authenticated/new-test-suites/test-runs-04: test ID in the URL`, async ({
+test(`test-suite-dashboard/test-runs-04: test ID in the URL`, async ({
   pageWithMeta: { page, clientKey, testRunId },
 }) => {
   await startLibraryTest(

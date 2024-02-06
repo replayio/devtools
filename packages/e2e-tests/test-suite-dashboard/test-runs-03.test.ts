@@ -1,7 +1,7 @@
 import { startLibraryTest } from "../helpers";
 import { TEST_RUN_WORKSPACE_API_KEY, TEST_RUN_WORKSPACE_TEAM_ID } from "../helpers/authentication";
 import {
-  filterRunsByText,
+  filterTestRunsByText,
   findTestRunByText,
   noTestSelected,
   testItems,
@@ -13,7 +13,7 @@ import test, { expect } from "../testFixtureTestSuiteDashboard";
 
 test.use({ testRunState: "FLAKY_IN_MAIN_WITH_SOURCE" });
 
-test(`authenticated/new-test-suites/test-runs-03: flaky run in main branch with source`, async ({
+test(`test-suite-dashboard/test-runs-03: flaky run in main branch with source`, async ({
   pageWithMeta: { page, clientKey },
 }) => {
   await startLibraryTest(page, TEST_RUN_WORKSPACE_API_KEY, TEST_RUN_WORKSPACE_TEAM_ID);
@@ -30,7 +30,7 @@ test(`authenticated/new-test-suites/test-runs-03: flaky run in main branch with 
   // > Selected test run
 
   // >>> Opens test run overview and match the title
-  await filterRunsByText(page, clientKey);
+  await filterTestRunsByText(page, clientKey);
 
   expect(await testRunsItems(page).count()).toBe(1);
   const testItem = testRunsItems(page).first();

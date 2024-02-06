@@ -49,6 +49,7 @@ export function RunResults({
   return (
     <div
       className="flex flex-col overflow-y-auto"
+      data-filtered-by-status={filterCurrentRunByStatus}
       data-filtered-by-text={filterByTextDeferred}
       data-test-id="TestRunResults"
     >

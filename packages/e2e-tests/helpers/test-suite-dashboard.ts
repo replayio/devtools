@@ -1,9 +1,10 @@
 import { Locator, Page } from "@playwright/test";
 import chalk from "chalk";
 
+import { expect } from "../testFixtureTestSuiteDashboard";
 import { openContextMenu } from "./console-panel";
 import { selectContextMenuItem } from "./context-menu";
-import { debugPrint } from "./utils";
+import { debugPrint, waitFor } from "./utils";
 
 export const noTestRunsMessage = (page: Page) => page.locator('[data-test-id="NoTestRuns"]');
 export const noTestRunSelectedMessage = (page: Page) =>
@@ -20,25 +21,92 @@ export const testRecordings = (page: Page) =>
   page.locator('[data-test-id="TestRunResultsListItem"]');
 export const testErrors = (page: Page) => page.locator('[data-test-id="TestRunSpecDetails-Error"]');
 
-export const filterRunsByText = async (page: Page, text: string) => {
-  await debugPrint(page, `Filtering test runs list by text`, "filterTestRunsList");
+export const filterTestRunsByText = async (page: Page, text: string) => {
+  await debugPrint(page, `Filtering test runs list by text: "${text}"`, "filterTestRunsList");
+
   await page.fill("data-test-id=TestRunsPage-FilterByText-Input", text);
+
+  // Wait for the update to be rendered to the DOM before completing
+  // This simplifies the corresponding expect() code in the caller
+  const list = page.locator('[data-test-id="TestRunList"]');
+  await waitFor(async () => {
+    await expect(await list.getAttribute("data-filtered-by-text")).toBe(text);
+  });
 };
 
-export const filterTestRunsByBranch = async (
-  page: Page,
-  searchText: string,
-  contextMenuItemTestId: string
-) => {
-  const branchDropdown = page.locator('[data-test-id="TestRunsPage-BranchFilter-DropdownTrigger"]');
-  await openContextMenu(branchDropdown, { useLeftClick: true });
-  await selectContextMenuItem(page, { contextMenuItemTestId });
-  await filterRunsByText(page, searchText);
+export const filterTestRunsByBranch = async (page: Page, branch: "all" | "primary") => {
+  await debugPrint(
+    page,
+    `Filtering test runs list by branch: "${branch}"`,
+    "filterTestRunsByBranch"
+  );
+
+  const dropdown = page.locator('[data-test-id="TestRunsPage-BranchFilter-DropdownTrigger"]');
+  await openContextMenu(dropdown, { useLeftClick: true });
+  await selectContextMenuItem(page, {
+    contextMenuItemTestId: branch === "primary" ? "show-only-primary-branch" : "show-all-branches",
+  });
+
+  // Wait for the update to be rendered to the DOM before completing
+  // This simplifies the corresponding expect() code in the caller
+  const list = page.locator('[data-test-id="TestRunList"]');
+  await waitFor(async () => {
+    await expect(await list.getAttribute("data-filtered-by-branch")).toBe(branch);
+  });
+};
+
+export const filterTestRunsByStatus = async (page: Page, status: "all" | "failed") => {
+  await debugPrint(
+    page,
+    `Filtering test runs list by status: "${status}"`,
+    "filterTestRunsByStatus"
+  );
+
+  const dropdown = page.locator('[data-test-id="TestRunsPage-ResultFilter-DropdownTrigger"]');
+  await openContextMenu(dropdown, { useLeftClick: true });
+  await selectContextMenuItem(page, {
+    contextMenuItemTestId: status === "failed" ? "show-only-failures" : "show-all-runs",
+  });
+
+  // Wait for the update to be rendered to the DOM before completing
+  // This simplifies the corresponding expect() code in the caller
+  const list = page.locator('[data-test-id="TestRunList"]');
+  await waitFor(async () => {
+    await expect(await list.getAttribute("data-filtered-by-status")).toBe(status);
+  });
 };
 
 export const filterSummaryTestsByText = async (page: Page, text: string) => {
-  await debugPrint(page, `Filtering test list by text`, "filterTestList");
+  await debugPrint(page, `Filtering test list by text: "${text}"`, "filterSummaryTestsByText");
   await page.fill("data-test-id=TestRunSummary-Filter", text);
+
+  // Wait for the update to be rendered to the DOM before completing
+  // This simplifies the corresponding expect() code in the caller
+  const list = page.locator('[data-test-id="TestRunResults"]');
+  await waitFor(async () => {
+    await expect(await list.getAttribute("data-filtered-by-text")).toBe(text);
+  });
+};
+
+export const filterSummaryByStatus = async (page: Page, status: "all" | "failed-and-flaky") => {
+  await debugPrint(
+    page,
+    `Filtering test summary list by status: "${status}"`,
+    "filterSummaryByStatus"
+  );
+
+  const dropdown = page.locator('[data-test-id="TestRunSummary-StatusFilter-DropdownTrigger"]');
+  await openContextMenu(dropdown, { useLeftClick: true });
+  await selectContextMenuItem(page, {
+    contextMenuItemTestId: status === "failed-and-flaky" ? "failed-and-flaky" : "all",
+  });
+
+  // Wait for the update to be rendered to the DOM before completing
+  // This simplifies the corresponding expect() code in the caller
+  const list = page.locator('[data-test-id="TestRunResults"]');
+  await waitFor(async () => {
+    await expect(await list.getAttribute("data-filtered-by-status")).toBe(status);
+  });
 };
 
 export const findTestRunByText = async (page: Page, locator: Locator, text: string) => {

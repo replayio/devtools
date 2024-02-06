@@ -1,4 +1,5 @@
 import { openDevToolsTab, startTest } from "../helpers";
+import { warpToMessage } from "../helpers/console-panel";
 import {
   openElementsPanel,
   searchElementsPanel,
@@ -23,6 +24,7 @@ test(`inspector-elements-05_search: element picker and iframe behavior`, async (
   await verifySearchResults(page, { currentNumber: 0, totalNumber: 0 });
 
   // The search string should now match the <body> inside the <iframe>
-  await seekToTimePercent(page, 90);
+  await warpToMessage(page, "iframeFinished");
+  await openElementsPanel(page);
   await verifySearchResults(page, { currentNumber: 1, text: "<body", totalNumber: 1 });
 });

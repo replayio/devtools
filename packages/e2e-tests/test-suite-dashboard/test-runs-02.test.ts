@@ -1,9 +1,9 @@
 import { startLibraryTest } from "../helpers";
 import { TEST_RUN_WORKSPACE_API_KEY, TEST_RUN_WORKSPACE_TEAM_ID } from "../helpers/authentication";
 import {
-  filterRunsByText,
   filterSummaryTestsByText,
   filterTestRunsByBranch,
+  filterTestRunsByText,
   findTestRunByText,
   noTestSelected,
   testErrors,
@@ -17,7 +17,7 @@ import test, { expect } from "../testFixtureTestSuiteDashboard";
 
 test.use({ testRunState: "FAILED_IN_TEMP_BRANCH_WITHOUT_SOURCE" });
 
-test(`authenticated/new-test-suites/test-runs-02: failed run in temp branch without source`, async ({
+test(`test-suite-dashboard/test-runs-02: failed run in temp branch without source`, async ({
   pageWithMeta: { page, clientKey },
 }) => {
   await startLibraryTest(page, TEST_RUN_WORKSPACE_API_KEY, TEST_RUN_WORKSPACE_TEAM_ID);
@@ -26,12 +26,13 @@ test(`authenticated/new-test-suites/test-runs-02: failed run in temp branch with
   // > List view
 
   // >>> Filter by primary branch
-  await filterTestRunsByBranch(page, clientKey, "show-only-primary-branch");
+  await filterTestRunsByBranch(page, "primary");
+  await filterTestRunsByText(page, clientKey);
   expect(await testRunsItems(page).count()).toBe(0);
-  await filterTestRunsByBranch(page, "", "show-all-branches");
+  await filterTestRunsByBranch(page, "all");
+  await filterTestRunsByText(page, "");
 
   // >>> A test run with any failing tests should display a count of the failures to the left of the test run title
-  const testRunItemCount = await testRunsItems(page).count();
   let failedRun = await findTestRunByText(page, testRunsItems(page), clientKey);
 
   const testRunStatusPill = failedRun.locator('[data-test-status="fail"]');
@@ -41,7 +42,7 @@ test(`authenticated/new-test-suites/test-runs-02: failed run in temp branch with
   // >>> Run Overview
 
   // >>> Opens test run overview and match the title
-  await filterRunsByText(page, clientKey);
+  await filterTestRunsByText(page, clientKey);
 
   expect(await testRunsItems(page).count()).toBe(1);
   await testRunsItems(page).first().click();

@@ -1,10 +1,10 @@
 import { startLibraryTest } from "../helpers";
 import { TEST_RUN_WORKSPACE_API_KEY, TEST_RUN_WORKSPACE_TEAM_ID } from "../helpers/authentication";
-import { openContextMenu } from "../helpers/console-panel";
-import { selectContextMenuItem } from "../helpers/context-menu";
 import {
-  filterRunsByText,
+  filterSummaryByStatus,
   filterSummaryTestsByText,
+  filterTestRunsByStatus,
+  filterTestRunsByText,
   findTestRunByText,
   noTestRunSelectedMessage,
   noTestRunsMessage,
@@ -14,12 +14,11 @@ import {
   testRunSummary,
   testRunsItems,
 } from "../helpers/test-suite-dashboard";
-import { getResultDropdown } from "../helpers/testsuites";
 import test, { expect } from "../testFixtureTestSuiteDashboard";
 
 test.use({ testRunState: "SUCCESS_IN_MAIN_WITH_SOURCE" });
 
-test(`authenticated/new-test-suites/test-runs-01: passed run in main branch with source`, async ({
+test(`test-suite-dashboard/test-runs-01: passed run in main branch with source`, async ({
   pageWithMeta: { page, clientKey },
 }) => {
   await startLibraryTest(page, TEST_RUN_WORKSPACE_API_KEY, TEST_RUN_WORKSPACE_TEAM_ID);
@@ -38,30 +37,27 @@ test(`authenticated/new-test-suites/test-runs-01: passed run in main branch with
   const testRunItemDate = testRun.locator('[data-test-id="TestRun-Date"]');
   expect(await testRunItemDate.count()).toBe(1);
 
-  // >>> Filted by text, only test runs in which the pull request title match the provided text should be displayed
-  await filterRunsByText(page, clientKey);
+  // >>> Filter by text, only test runs in which the pull request title match the provided text should be displayed
+  await filterTestRunsByText(page, clientKey);
 
   expect(await testRunsItems(page).count()).toBe(1);
   const testItem = testRunsItems(page).first();
   expect(await testItem.innerText()).toContain(clientKey);
   expect(await noTestRunsMessage(page).count()).toBe(0);
-  await filterRunsByText(page, "");
+  await filterTestRunsByText(page, "");
+
+  const chartLabel = page.locator('[data-test-id="TestRunStats-ChartSummaryLabel"]');
 
   // >>> filtered by failures, only test runs containing one or more failures should be displayed
-  const resultDropdown = getResultDropdown(page);
-  await openContextMenu(resultDropdown, { useLeftClick: true });
-  await selectContextMenuItem(page, {
-    contextMenuItemTestId: "show-only-failures",
-  });
+  await filterTestRunsByStatus(page, "failed");
+  expect(await chartLabel.textContent()).toBe("Failure rate: 100%");
   const failedItemsCount = await testRunsItems(page).count();
   for (let i = 0; i < failedItemsCount; i++) {
     const testRunItem = testRunsItems(page).nth(i);
     expect(await testRunItem.locator('[data-test-status="fail"]').count()).toBe(1);
   }
-  await openContextMenu(resultDropdown, { useLeftClick: true });
-  await selectContextMenuItem(page, {
-    contextMenuItemTestId: "show-all-runs",
-  });
+  await filterTestRunsByStatus(page, "all");
+  expect(await chartLabel.textContent()).not.toBe("Failure rate: 100%");
 
   // >>> Workspace with limited retention limit should not show large time range filter
   expect(await page.getByTestId("month").count()).toBe(0);
@@ -69,7 +65,7 @@ test(`authenticated/new-test-suites/test-runs-01: passed run in main branch with
   // > Selected test run
 
   // >>> Opens test run overview
-  await filterRunsByText(page, clientKey);
+  await filterTestRunsByText(page, clientKey);
 
   expect(await testRunsItems(page).count()).toBe(1);
   await testRunsItems(page).first().click();
@@ -99,21 +95,12 @@ test(`authenticated/new-test-suites/test-runs-01: passed run in main branch with
   await filterSummaryTestsByText(page, "");
 
   // >>> Filter by status
-  const statusDropdown = page.locator(
-    '[data-test-id="TestRunSummary-StatusFilter-DropdownTrigger"]'
-  );
-  await openContextMenu(statusDropdown, { useLeftClick: true });
-  await selectContextMenuItem(page, {
-    contextMenuItemTestId: "failed-and-flaky",
-  });
+  await filterSummaryByStatus(page, "failed-and-flaky");
   expect(await testItems(page).count()).toBe(0);
-  await openContextMenu(statusDropdown, { useLeftClick: true });
-  await selectContextMenuItem(page, {
-    contextMenuItemTestId: "all",
-  });
+  await filterSummaryByStatus(page, "all");
 
   // >>> When a test run was selected but omitted due to a change in filter, the run details view should show a message
-  await filterRunsByText(page, "something that would never exist");
+  await filterTestRunsByText(page, "something that would never exist");
 
   expect(await testRunsItems(page).count()).toBe(0);
   expect(await noTestRunsMessage(page).count()).toBe(1);

@@ -1,15 +1,12 @@
 import classnames from "classnames";
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
 import Icon from "replay-next/components/Icon";
 import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
-import { userData } from "shared/user-data/GraphQL/UserData";
 import * as actions from "ui/actions/app";
-import { isTestSuiteReplay } from "ui/components/TestSuite/utils/isTestSuiteReplay";
 import hooks from "ui/hooks";
-import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { useHasNoRole } from "ui/hooks/recordings";
 import {
   shouldShowAddComment,
   shouldShowAddUnicornBadge,
@@ -29,16 +26,13 @@ import {
 
 import styles from "./Passport.module.css";
 
-type PrimaryPanelName = "events" | "cypress" | string;
 const stepNames = ["step-one", "step-two", "step-three", "step-four"] as const;
 
 const Passport = (props: PropsFromRedux) => {
-  const [showTestsuitesPassportFirstRun, setShowTestsuitesPassportFirstRun] = useState(
-    userData.get("layout_testsuitesPassportFirstRun") !== false
+  const [showTestsuitesPassportFirstRun, setShowTestsuitesPassportFirstRun] = useGraphQLUserData(
+    "layout_testsuitesPassportFirstRun"
   );
 
-  const recordingId = useGetRecordingId();
-  const { recording } = useGetRecording(recordingId);
   const [selectedIndices, setSelectedIndices] = useState({ sectionIndex: 0, itemIndex: 0 });
   const { nags } = hooks.useGetUserInfo();
   const showAddComment = shouldShowAddComment(nags);
@@ -55,35 +49,16 @@ const Passport = (props: PropsFromRedux) => {
   const showSearchSourceText = shouldShowSearchSourceText(nags);
   const showShareNag = shouldShowShareNag(nags);
   const showUseFocusMode = shouldShowUseFocusMode(nags);
-  const dispatch = useAppDispatch();
 
-  type StepNames = (typeof stepNames)[number];
+  const { hasNoRole, loading: roleDataLoading } = useHasNoRole();
+
   const videoExampleRef = useRef<HTMLImageElement>(null);
-  const [videoHeight, setVideoHeight] = useState<number | null>(null);
 
   useEffect(() => {
     if (showTestsuitesPassportFirstRun) {
-      userData.set("layout_testsuitesPassportFirstRun", false);
+      setShowTestsuitesPassportFirstRun(false);
     }
-  }, [showTestsuitesPassportFirstRun]);
-
-  useLayoutEffect(() => {
-    const videoExample = videoExampleRef.current;
-    if (videoExample) {
-      const updateHeight = () => {
-        setVideoHeight(videoExample.offsetHeight);
-      };
-
-      // Set initial height
-      updateHeight();
-
-      window.addEventListener("resize", updateHeight);
-
-      return () => {
-        window.removeEventListener("resize", updateHeight);
-      };
-    }
-  }, []);
+  }, [showTestsuitesPassportFirstRun, setShowTestsuitesPassportFirstRun]);
 
   const getItemStyle = (sectionIndex: number, itemIndex: number) => {
     if (sectionIndex === selectedIndices.sectionIndex && itemIndex === selectedIndices.itemIndex) {
@@ -230,16 +205,19 @@ const Passport = (props: PropsFromRedux) => {
       docsLink: "https://replayio.notion.site/Go-to-file-4e867dc10f7d4db3be78e9bfc53c97f9?pvs=4",
       blurb: "Press command-P on your keyboard.",
     },
+  ];
 
-    {
+  // Users that have no role don't see the "Share" dialog
+  if (!roleDataLoading && !hasNoRole) {
+    swissArmyItems.push({
       label: "Share",
       completed: !showShareNag,
       videoUrl: "https://vercel.replay.io/passport/share.gif",
       imageBaseName: "share",
       docsLink: "https://replayio.notion.site/Share-7ecdd5ce6c36456bb1354540656f6799?pvs=4",
       blurb: "Click the blue share button at the top of the app.",
-    },
-  ];
+    });
+  }
 
   const sections: Section[] = [
     {

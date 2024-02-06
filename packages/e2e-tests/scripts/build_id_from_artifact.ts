@@ -4,7 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const { execSync } = require("child_process");
 
-function build_id_from_artifact(os, arch) {
+export function build_id_from_artifact(os, arch) {
   const buildIdPath = path.join("build_id", os, arch, "build_id");
 
   execSync(
@@ -14,5 +14,3 @@ function build_id_from_artifact(os, arch) {
 
   return fs.readFileSync(buildIdPath, "utf8").trim();
 }
-
-module.exports = build_id_from_artifact;

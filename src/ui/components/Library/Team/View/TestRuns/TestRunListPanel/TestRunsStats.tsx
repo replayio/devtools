@@ -5,10 +5,9 @@ import AutoSizer from "react-virtualized-auto-sizer";
 import useTooltip from "replay-next/src/hooks/useTooltip";
 import { TestRun } from "shared/test-suites/TestRun";
 import { useTheme } from "shared/theme/useTheme";
-import { TestRunsContext } from "ui/components/Library/Team/View/TestRuns/TestRunsContextRoot";
 import { TimeFilterContext } from "ui/components/Library/Team/View/TimeFilterContextRoot";
 
-import { useTestRunSuspends } from "../hooks/useTestRunSuspends";
+import { useTestRunsSuspends } from "../hooks/useTestRunsSuspends";
 import styles from "./TestRunsStats.module.css";
 
 type ChartDataType = { failureRate: number; label: string };
@@ -18,7 +17,7 @@ const PADDING = 4;
 const POINT_RADIUS = 4;
 
 export function TestRunsStats() {
-  const { testRuns } = useTestRunSuspends();
+  const { filteredSortedTestRuns: testRuns } = useTestRunsSuspends();
 
   if (!testRuns.length) {
     return null;
@@ -33,19 +32,30 @@ export function TestRunsStats() {
       <div className={styles.ChartWrapper}>
         <AutoSizer>
           {({ height, width }: { height: number; width: number }) => (
-            <ChartWithDimensions height={height} width={width} />
+            <ChartWithDimensions height={height} testRuns={testRuns} width={width} />
           )}
         </AutoSizer>
       </div>
-      <div className={styles.FailureRateDescription} title={`${buildFailuresCount}/${buildsCount}`}>
-        <strong>Failure rate:</strong> {(buildFailureRate * 100).toFixed(2)}%
+      <div
+        className={styles.FailureRateDescription}
+        data-test-id="TestRunStats-ChartSummaryLabel"
+        title={`${buildFailuresCount}/${buildsCount} failed`}
+      >
+        <strong>Failure rate:</strong> {Math.round(buildFailureRate * 100)}%
       </div>
     </div>
   );
 }
 
-function ChartWithDimensions({ height, width }: { height: number; width: number }) {
-  const { testRuns } = useTestRunSuspends();
+function ChartWithDimensions({
+  height,
+  testRuns,
+  width,
+}: {
+  height: number;
+  testRuns: TestRun[];
+  width: number;
+}) {
   const { startTime, endTime } = useContext(TimeFilterContext);
 
   const ref = useRef<HTMLCanvasElement>(null);

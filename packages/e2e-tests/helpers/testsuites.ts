@@ -1,16 +1,7 @@
 import { Locator, Page, expect } from "@playwright/test";
 
 import { getKeyValueEntryHeader, getKeyValueEntryValue } from "./object-inspector";
-import {
-  clearTextArea,
-  debugPrint,
-  delay,
-  getByTestName,
-  getCommandKey,
-  locatorTextToNumber,
-  mapLocators,
-  waitFor,
-} from "./utils";
+import { getByTestName, locatorTextToNumber, waitFor } from "./utils";
 
 export function getTestSuitePanel(page: Page) {
   return getByTestName(page, "TestSuitePanel");
@@ -68,10 +59,6 @@ export function getSelectedTestCase(row: Page | Locator) {
 
 export function getTestSuiteResult(page: Page) {
   return getByTestName(page, "TestSuiteResult");
-}
-
-export function getResultDropdown(page: Page) {
-  return page.getByTestId("TestRunsPage-ResultFilter-DropdownTrigger");
 }
 
 export async function getTestSuiteResultsPassedCount(page: Page): Promise<number | null> {

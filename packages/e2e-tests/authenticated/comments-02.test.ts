@@ -1,5 +1,3 @@
-import { addCoverageReport } from "monocart-reporter";
-
 import { openDevToolsTab, startTest } from "../helpers";
 import { E2E_USER_1, E2E_USER_2 } from "../helpers/authentication";
 import {
@@ -9,7 +7,7 @@ import {
   replyToComment,
 } from "../helpers/comments";
 import { openSource } from "../helpers/source-explorer-panel";
-import test, { Page, base } from "../testFixtureCloneRecording";
+import test, { Page } from "../testFixtureCloneRecording";
 
 const url = "authenticated_comments.html";
 
@@ -19,13 +17,6 @@ async function load(page: Page, recordingId: string, apiKey: string, testScope: 
 
   await openDevToolsTab(page);
   await openSource(page, url);
-}
-
-async function close(page: Page) {
-  const jsCoverage = await page.coverage.stopJSCoverage();
-
-  await addCoverageReport(jsCoverage, base.info());
-  await page.close();
 }
 
 test.use({ exampleKey: url, testUsers: [E2E_USER_1, E2E_USER_2] });
@@ -94,7 +85,7 @@ test(`authenticated/comments-02: Test shared comments and replies`, async ({
   }
 
   {
-    await close(pageOne);
-    await close(pageTwo);
+    await pageOne.close();
+    await pageTwo.close();
   }
 });

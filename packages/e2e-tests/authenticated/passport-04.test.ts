@@ -18,7 +18,10 @@ test(`authenticated/passport-04: Multiplayer`, async ({
   await enablePassport(page);
 
   expect(await isPassportItemCompleted(page, "Add a comment")).toBeFalsy();
-  expect(await isPassportItemCompleted(page, "Share")).toBeFalsy();
+
+  // Test users have no role, so they don't see the "Share" button
+  //
+  // expect(await isPassportItemCompleted(page, "Share")).toBeFalsy();
 
   await openDevToolsTab(page);
 
@@ -33,9 +36,11 @@ test(`authenticated/passport-04: Multiplayer`, async ({
     expect(await isPassportItemCompleted(page, "Add a comment")).toBeTruthy()
   );
 
-  await page.locator('button:has-text("Share")').click();
-  await page.locator('button:has-text("Copy URL")').click();
-  await page.keyboard.press("Escape");
-
-  await waitFor(async () => expect(await isPassportItemCompleted(page, "Share")).toBeTruthy());
+  // Test users have no role, so they don't see the "Share" button
+  //
+  // await page.locator('button:has-text("Share")').click();
+  // await page.locator('button:has-text("Copy URL")').click();
+  // await page.keyboard.press("Escape");
+  //
+  // await waitFor(async () => expect(await isPassportItemCompleted(page, "Share")).toBeTruthy());
 });

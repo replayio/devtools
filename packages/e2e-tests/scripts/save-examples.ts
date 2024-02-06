@@ -4,6 +4,7 @@
 // Use the API key for the "Frontend E2E Test Team" that we have set up in admin,
 // as that should let us mark these recordings as public.
 
+import { execSync } from "child_process";
 import { existsSync, writeFileSync } from "fs";
 import { join } from "path";
 import type { Page, expect as expectFunction } from "@playwright/test";
@@ -53,6 +54,11 @@ const argv = yargs
   .help()
   .alias("help", "h")
   .parseSync();
+
+const CONFIG = {
+  recordingTimeout: 60_000,
+  uploadTimeout: 60_000,
+};
 
 type PlaywrightScript = (page: Page, expect: typeof expectFunction) => Promise<void>;
 
@@ -214,20 +220,20 @@ async function saveBrowserExample({ example }: TestRunCallbackArgs) {
     await waitUntilMessage(page as Page, "ExampleFinished");
   }
   const playwrightScript: PlaywrightScript = example.playwrightScript ?? defaultPlaywrightScript;
+  await raceForTime(
+    CONFIG.recordingTimeout,
+    recordPlaywright(async (page, expect) => {
+      const waitForLogPromise = playwrightScript(page, expect);
+      const goToPagePromise = page.goto(exampleUrl);
 
-  // Shouldn't be "node" by this point
-  await recordPlaywright(async (page, expect) => {
-    const waitForLogPromise = playwrightScript(page, expect);
-    const goToPagePromise = page.goto(exampleUrl);
+      await Promise.all([goToPagePromise, waitForLogPromise]);
+    })
+  );
 
-    await Promise.all([goToPagePromise, waitForLogPromise]);
-  });
-
-  const recordingId = await uploadLastRecording(exampleUrl);
+  const recordingId = await raceForTime(CONFIG.uploadTimeout, uploadLastRecording(exampleUrl));
   if (recordingId == null) {
-    throw new Error("Recording not uploaded");
+    throw new Error(`Recording "${example.filename}" not uploaded`);
   }
-
   exampleToNewRecordingId[example.filename] = recordingId;
 
   if (config.useExampleFile && recordingId) {
@@ -328,6 +334,17 @@ async function updateRecordingTitle(apiKey: string, recordingId: string, title: 
   });
 }
 
+async function sleep(timeoutMs: number) {
+  return new Promise<void>(r => setTimeout(() => r(), timeoutMs));
+}
+
+async function raceForTime<T>(timeoutMs: number, promise: Promise<T>) {
+  return Promise.race([
+    promise,
+    sleep(timeoutMs).then(() => Promise.reject(new Error(`Race timeout after ${timeoutMs}ms`))),
+  ]);
+}
+
 async function waitUntilMessage(
   page: Page,
   message: string,
@@ -389,7 +406,7 @@ async function waitUntilMessage(
       try {
         await loadRecording(recordingId);
       } catch (e) {
-        console.log(`Error during processing: ${e}`);
+        console.error(`Ignored error during processing: ${e?.stack || e}`);
       }
     }
 
