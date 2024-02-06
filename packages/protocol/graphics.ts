@@ -1,5 +1,5 @@
 // Routines for managing and rendering graphics data fetched over the WRP.
-import { MouseEvent, ScreenShot } from "@replayio/protocol";
+import { ScreenShot } from "@replayio/protocol";
 
 import {
   getExecutionPoint,
@@ -8,7 +8,7 @@ import {
   paused,
 } from "devtools/client/debugger/src/reducers/pause";
 import { PaintsCache } from "protocol/PaintsCache";
-import { RecordedMouseEventsCache } from "protocol/RecordedEventsCache";
+import { RecordedClickEventsCache, RecordedMouseEventsCache } from "protocol/RecordedEventsCache";
 import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
 import { screenshotCache } from "replay-next/src/suspense/ScreenshotCache";
 import { replayClient } from "shared/client/ReplayClientContext";
@@ -97,8 +97,6 @@ function closerEntry<T1 extends Timed, T2 extends Timed>(
 export const gPaintPoints: TimeStampedPointWithPaintHash[] = [
   { point: "0", time: 0, paintHash: "" },
 ];
-const gMouseEvents: MouseEvent[] = [];
-const gMouseClickEvents: MouseEvent[] = [];
 
 // Device pixel ratio used by the current screenshot.
 let gDevicePixelRatio = 1;
@@ -112,18 +110,8 @@ export async function setupGraphics(store: AppStore) {
     gPaintPoints.push(...paints);
   }
 
-  // TODO [FE-2104] Remove gMouseEvents and gMouseClickEvents entirely
-  RecordedMouseEventsCache.getValue().forEach(entry => {
-    gMouseEvents.push(entry);
-    if (entry.kind == "mousedown") {
-      gMouseClickEvents.push(entry);
-    }
-  });
-
-  // TODO [FE-2104] Remove this callback
-  if (typeof onMouseDownEvents === "function") {
-    onMouseDownEvents(gMouseClickEvents);
-  }
+  await RecordedMouseEventsCache.readAsync();
+  await RecordedClickEventsCache.readAsync();
 
   const currentTime = getTime(store.getState());
   const { screen, mouse } = await getGraphicsAtTime(currentTime);
@@ -245,14 +233,20 @@ export function addLastScreen(screen: ScreenShot | null, point: string, time: nu
 }
 
 export function mostRecentPaintOrMouseEvent(time: number) {
+  const mouseEvents = RecordedMouseEventsCache.getValueIfCached() ?? [];
+
   const paintEntry = mostRecentEntry(gPaintPoints, time);
-  const mouseEntry = mostRecentEntry(gMouseEvents, time);
+  const mouseEntry = mostRecentEntry(mouseEvents, time);
+
   return closerEntry(time, paintEntry, mouseEntry);
 }
 
 export function nextPaintOrMouseEvent(time: number) {
+  const mouseEvents = RecordedMouseEventsCache.getValueIfCached() ?? [];
+
   const paintEntry = nextEntry(gPaintPoints, time);
-  const mouseEntry = nextEntry(gMouseEvents, time);
+  const mouseEntry = nextEntry(mouseEvents, time);
+
   return closerEntry(time, paintEntry, mouseEntry);
 }
 
@@ -314,15 +308,18 @@ export async function getGraphicsAtTime(
     return {};
   }
 
+  const clickEvents = RecordedClickEventsCache.getValueIfCached() ?? [];
+  const mouseEvents = RecordedMouseEventsCache.getValueIfCached() ?? [];
+
   const screenPromise = screenshotCache.readAsync(replayClient, point, paintHash);
 
   const screen = await screenPromise;
 
   let mouse: MouseAndClickPosition | undefined;
-  const mouseEvent = mostRecentEntry(gMouseEvents, time);
+  const mouseEvent = mostRecentEntry(mouseEvents, time);
   if (mouseEvent) {
     mouse = { x: mouseEvent.clientX, y: mouseEvent.clientY };
-    const clickEvent = mostRecentEntry(gMouseClickEvents, time);
+    const clickEvent = mostRecentEntry(clickEvents, time);
     if (clickEvent && clickEvent.time + ClickThresholdMs >= time) {
       mouse.clickX = clickEvent.clientX;
       mouse.clickY = clickEvent.clientY;
@@ -478,7 +475,7 @@ export function refreshGraphics() {
   }
 
   if (gDrawMouse) {
-    const { x, y, clickX, clickY } = gDrawMouse;
+    const { x, y, clickX } = gDrawMouse;
     drawCursor(cx, x, y);
     if (clickX !== undefined) {
       drawClick(cx, x, y);
@@ -542,11 +539,6 @@ export interface Canvas {
   scale: number;
   top: number;
   width: number;
-}
-
-let onMouseDownEvents: (events: MouseEvent[]) => void;
-export function setMouseDownEventsCallback(callback: typeof onMouseDownEvents): void {
-  onMouseDownEvents = callback;
 }
 
 let onPausedAtTime: (time: number) => void;

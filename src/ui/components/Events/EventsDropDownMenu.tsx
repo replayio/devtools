@@ -1,29 +1,19 @@
-import { MouseEvent, UIEvent, useContext, useMemo, useTransition } from "react";
+import { FormEvent, MouseEvent, useContext, useMemo, useTransition } from "react";
 import { ContextMenuCategory, ContextMenuItem, useContextMenu } from "use-context-menu";
 
 import { Badge, Checkbox } from "design";
+import { RecordedEvent } from "protocol/RecordedEventsCache";
 import Icon from "replay-next/components/Icon";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { isExecutionPointsWithinRange } from "replay-next/src/utils/time";
 import { ConsoleEventFilterPreferencesKey } from "shared/user-data/GraphQL/config";
 import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
-import { getSortedEventsForDisplay } from "ui/reducers/app";
-import { useAppSelector } from "ui/setup/hooks";
 
 import styles from "./EventsDropDownMenu.module.css";
 
-function createSelectHandler(callback: () => void): (event: UIEvent) => void {
-  return (event: UIEvent) => {
-    event.preventDefault();
-    event.stopPropagation();
-
-    callback();
-  };
-}
-
-export default function EventsDropDownMenu() {
+export default function EventsDropDownMenu({ events }: { events: RecordedEvent[] }) {
   const { range: focusWindow } = useContext(FocusContext);
-  const events = useAppSelector(getSortedEventsForDisplay);
+
   const eventCounts = useMemo<{ [key in ConsoleEventFilterPreferencesKey]: number }>(
     () =>
       events.reduce(
@@ -110,20 +100,31 @@ function EventTypeContextMenuItem({
   const enabled = filters[category] !== false;
   const checked = enabled && count > 0;
 
+  const onChange = () => {
+    startTransition(() => {
+      setFilters({
+        ...filters,
+        [category]: !enabled,
+      });
+    });
+  };
+
   return (
-    <ContextMenuItem
-      disabled={count === 0 || isPending}
-      onSelect={createSelectHandler(() =>
-        startTransition(() => {
-          setFilters({
-            ...filters,
-            [category]: !enabled,
-          });
-        })
-      )}
-    >
-      <div className={styles.MenuItem}>
-        <Checkbox className={styles.Checkbox} label={category} checked={checked} />
+    <ContextMenuItem disabled={count === 0 || isPending}>
+      <div
+        className={styles.MenuItem}
+        onClick={event => {
+          // Don't close the drop-down menu on click
+          event.preventDefault();
+          event.stopPropagation();
+        }}
+      >
+        <Checkbox
+          checked={checked}
+          className={styles.Checkbox}
+          label={category}
+          onChange={onChange}
+        />
         {count > 0 && <Badge label={count} />}
       </div>
     </ContextMenuItem>

@@ -1,32 +1,18 @@
-import { KeyboardEvent } from "@replayio/protocol";
-import groupBy from "lodash/groupBy";
-import { isPromiseLike } from "suspense";
-
 import {
   jumpToNextPause,
   jumpToPreviousPause,
 } from "devtools/client/debugger/src/actions/pause/jumps";
 import { openQuickOpen } from "devtools/client/debugger/src/actions/quick-open";
-import {
-  RecordedKeyboardEventsCache,
-  RecordedNavigationEventsCache,
-} from "protocol/RecordedEventsCache";
+import { preloadAllRecordedEventsCache } from "protocol/RecordedEventsCache";
 import { ReplayClientInterface } from "shared/client/types";
 import { getSystemColorScheme } from "shared/theme/getSystemColorScheme";
 import { userData } from "shared/user-data/GraphQL/UserData";
 import { shallowEqual } from "shared/utils/compare";
 import { getRecordingId } from "shared/utils/recording";
 import { CommandKey } from "ui/components/CommandPalette/CommandPalette";
-import { getEventsForType } from "ui/reducers/app";
-import { Canvas, EventKind, ReplayEvent, ReplayNavigationEvent } from "ui/state/app";
-import { compareBigInt } from "ui/utils/helpers";
+import { Canvas } from "ui/state/app";
 
-import {
-  loadReceivedEvents,
-  setCanvas as setCanvasAction,
-  setModal,
-  setSessionId,
-} from "../reducers/app";
+import { setCanvas as setCanvasAction, setModal, setSessionId } from "../reducers/app";
 import {
   hideCommandPalette,
   setSelectedPanel,
@@ -41,52 +27,10 @@ export * from "../reducers/app";
 
 export async function setupApp(store: UIStore, replayClient: ReplayClientInterface) {
   const sessionId = await replayClient.waitForSession();
-
   store.dispatch(setSessionId(sessionId));
 
-  {
-    const result = RecordedKeyboardEventsCache.readAsync();
-    if (isPromiseLike(result)) {
-      result.then(events => {
-        onKeyboardEvents(events, store);
-      });
-    } else {
-      onKeyboardEvents(result, store);
-    }
-  }
-
-  {
-    const result = RecordedNavigationEventsCache.readAsync();
-    if (isPromiseLike(result)) {
-      result.then(events => {
-        onNavigationEvents(events as ReplayNavigationEvent[], store);
-      });
-    } else {
-      onNavigationEvents(result as ReplayNavigationEvent[], store);
-    }
-  }
-}
-
-// TODO [FE-2104] Remove these values from Redux; they should be in Suspense caches only
-function onKeyboardEvents(events: KeyboardEvent[], store: UIStore) {
-  const groupedEvents = groupBy(events, event => event.kind) as Record<EventKind, ReplayEvent[]>;
-
-  for (let key of Object.keys(groupedEvents)) {
-    groupedEvents[key].sort((a: ReplayEvent, b: ReplayEvent) =>
-      compareBigInt(BigInt(a.point), BigInt(b.point))
-    );
-  }
-
-  store.dispatch(loadReceivedEvents(groupedEvents));
-}
-
-// TODO [FE-2104] Remove these values from Redux; they should be in Suspense caches only
-function onNavigationEvents(events: ReplayNavigationEvent[], store: UIStore) {
-  const currentNavEvents: ReplayNavigationEvent[] = events.map(e => ({ ...e, kind: "navigation" }));
-  const newNavEvents = [...getEventsForType(store.getState(), "navigation"), ...currentNavEvents];
-  newNavEvents.sort((a, b) => compareBigInt(BigInt(a.point), BigInt(b.point)));
-
-  store.dispatch(loadReceivedEvents({ navigation: newNavEvents }));
+  // Pre-fetch recorded event data; it's used by several components later in the app
+  await preloadAllRecordedEventsCache();
 }
 
 export function hideModal() {
