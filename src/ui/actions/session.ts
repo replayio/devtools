@@ -104,7 +104,7 @@ function clearRecordingNotAccessibleError(): UIThunkAction {
 function isRecordingDeletedError(err: unknown): boolean {
   return (
     err instanceof ApolloError &&
-    err.graphQLErrors.some(e => e.extensions?.code === "DELETED_RECORDING")
+    err.graphQLErrors.some(e => e.extensions?.code === "DELETED_OBJECT")
   );
 }
 
