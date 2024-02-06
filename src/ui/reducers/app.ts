@@ -1,8 +1,7 @@
-import { PayloadAction, createSelector, createSlice } from "@reduxjs/toolkit";
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { RecordingId } from "@replayio/protocol";
 
 import { RecordingTarget } from "replay-next/src/suspense/BuildIdCache";
-import { compareExecutionPoints } from "replay-next/src/utils/time";
 import { Workspace } from "shared/graphql/types";
 import { getMutableParamsFromURL } from "ui/setup/dynamic/url";
 import { UIState } from "ui/state";
@@ -10,11 +9,9 @@ import {
   AppMode,
   AppState,
   Canvas,
-  EventKind,
   ExpectedError,
   ModalOptionsType,
   ModalType,
-  ReplayEvent,
   SettingsTabTitle,
   UnexpectedError,
   UploadInfo,
@@ -29,7 +26,6 @@ export const initialAppState: AppState = {
   defaultSelectedReactElementId: null,
   defaultSettingsTab: "Preferences",
   displayedLoadingProgress: null,
-  events: {},
   expectedError: null,
   hoveredCommentId: null,
   loading: 4,
@@ -100,10 +96,6 @@ const appSlice = createSlice({
         };
       },
     },
-    loadReceivedEvents(state, action: PayloadAction<Record<EventKind, ReplayEvent[]>>) {
-      // Load multiple event types into state at once
-      Object.assign(state.events, action.payload);
-    },
     setCanvas(state, action: PayloadAction<Canvas>) {
       state.canvas = action.payload;
     },
@@ -146,7 +138,6 @@ export const {
   setCanvas,
   setDefaultSelectedReactElementId,
   setDefaultSettingsTab,
-  loadReceivedEvents,
   setExpectedError,
   setLoadingFinished,
   setModal,
@@ -184,27 +175,6 @@ export const getHoveredCommentId = (state: UIState) => state.app.hoveredCommentI
 export const getDefaultSelectedReactElementId = (state: UIState) =>
   state.app.defaultSelectedReactElementId;
 export const getSelectedCommentId = (state: UIState) => state.app.selectedCommentId;
-
-const NO_EVENTS: MouseEvent[] = [];
-export const getEventsForType = (state: UIState, type: string) =>
-  state.app.events[type] || NO_EVENTS;
-
-export const getSortedEventsForDisplay = createSelector(
-  (state: UIState) => state.app.events,
-  events => {
-    let sortedEvents: ReplayEvent[] = [];
-
-    for (let [eventType, eventsOfType] of Object.entries(events)) {
-      if (["keydown", "keyup"].includes(eventType)) {
-        continue;
-      }
-      sortedEvents = sortedEvents.concat(eventsOfType);
-    }
-
-    sortedEvents.sort((a, b) => compareExecutionPoints(a.point, b.point));
-    return sortedEvents;
-  }
-);
 
 export const getCanvas = (state: UIState) => state.app.canvas;
 export const getDefaultSettingsTab = (state: UIState) => state.app.defaultSettingsTab;

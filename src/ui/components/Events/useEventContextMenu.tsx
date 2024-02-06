@@ -1,12 +1,12 @@
 import { ContextMenuDivider, ContextMenuItem, useContextMenu } from "use-context-menu";
 
+import { RecordedEvent } from "protocol/RecordedEventsCache";
 import Icon from "replay-next/components/Icon";
 import { copyToClipboard as copyTextToClipboard } from "replay-next/components/sources/utils/clipboard";
 import { requestFocusWindow } from "ui/actions/timeline";
 import { useAppDispatch } from "ui/setup/hooks";
-import { ReplayEvent } from "ui/state/app";
 
-export default function useEventContextMenu(event: ReplayEvent) {
+export default function useEventContextMenu(event: RecordedEvent) {
   const dispatch = useAppDispatch();
 
   const setFocusEnd = () => {

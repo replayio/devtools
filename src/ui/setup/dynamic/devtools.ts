@@ -1,9 +1,8 @@
 // Side-effectful import, has to be imported before event-listeners
 // Ordering matters here
 import { ActionCreatorWithoutPayload, bindActionCreators } from "@reduxjs/toolkit";
-import { MouseEvent, sessionError, uploadedData } from "@replayio/protocol";
+import { sessionError, uploadedData } from "@replayio/protocol";
 import { IDBPDatabase, openDB } from "idb";
-import debounce from "lodash/debounce";
 
 import { setupSourcesListeners } from "devtools/client/debugger/src/actions/sources";
 import * as dbgClient from "devtools/client/debugger/src/client";
@@ -11,7 +10,6 @@ import debuggerReducers from "devtools/client/debugger/src/reducers";
 import * as inspectorReducers from "devtools/client/inspector/reducers";
 import {
   Canvas,
-  setMouseDownEventsCallback,
   setPausedonPausedAtTimeCallback,
   setPlaybackStatusCallback,
   setRefreshGraphicsCallback,
@@ -30,7 +28,7 @@ import { UIStore, actions } from "ui/actions";
 import { setCanvas } from "ui/actions/app";
 import { precacheScreenshots } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
-import app, { loadReceivedEvents } from "ui/reducers/app";
+import app from "ui/reducers/app";
 import network from "ui/reducers/network";
 import protocolMessages from "ui/reducers/protocolMessages";
 import timeline, { setPlaybackStalled } from "ui/reducers/timeline";
@@ -223,19 +221,6 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
   // Add protocol event listeners for things that the Redux store needs to stay in sync with.
   // TODO We should revisit this as part of a larger architectural redesign (#6932).
 
-  setMouseDownEventsCallback(
-    // We seem to get duplicate mousedown events each time, like ["a"], ["a"], ["a", "b"], ["a", "b"], etc.
-    // Debounce the callback so we only dispatch the last set.
-    debounce((events: MouseEvent[]) => {
-      if (!events.length) {
-        // No reason to dispatch when there's 0 events
-        return;
-      }
-
-      //
-      store.dispatch(loadReceivedEvents({ mousedown: [...events] }));
-    }, 1_000)
-  );
   setPausedonPausedAtTimeCallback((time: number) => {
     store.dispatch(precacheScreenshots(time));
   });

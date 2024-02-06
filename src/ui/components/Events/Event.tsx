@@ -1,18 +1,14 @@
 import classnames from "classnames";
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode, memo } from "react";
 
+import { RecordedEvent } from "protocol/RecordedEventsCache";
 import { useNag } from "replay-next/src/hooks/useNag";
 import { Nag } from "shared/graphql/types";
-import {
-  PointWithEventType,
-  jumpToClickEventFunctionLocation,
-  jumpToKnownEventListenerHit,
-} from "ui/actions/eventListeners/jumpToCode";
+import { jumpToKnownEventListenerHit } from "ui/actions/eventListeners/jumpToCode";
 import useEventContextMenu from "ui/components/Events/useEventContextMenu";
 import { JumpToCodeButton, JumpToCodeStatus } from "ui/components/shared/JumpToCodeButton";
 import { setMarkTimeStampPoint } from "ui/reducers/timeline";
 import { useAppDispatch } from "ui/setup/hooks";
-import { ReplayEvent } from "ui/state/app";
 import { ParsedJumpToCodeAnnotation } from "ui/suspense/annotationsCaches";
 
 import MaterialIcon from "../shared/MaterialIcon";
@@ -21,14 +17,14 @@ import styles from "./Event.module.css";
 
 type EventProps = {
   currentTime: number;
-  event: ReplayEvent;
+  event: RecordedEvent;
   executionPoint: string;
   jumpToCodeAnnotation?: ParsedJumpToCodeAnnotation;
   jumpToCodeLoadingStatus: "loading" | "complete";
   onSeek: (point: string, time: number) => void;
 };
 
-export const getEventLabel = (event: ReplayEvent) => {
+export const getEventLabel = (event: RecordedEvent) => {
   const { kind } = event;
   const { label } = getReplayEvent(kind);
 
@@ -44,7 +40,7 @@ export const getEventLabel = (event: ReplayEvent) => {
   return label;
 };
 
-export default React.memo(function Event({
+export default memo(function Event({
   currentTime,
   executionPoint,
   event,
