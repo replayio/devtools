@@ -47,7 +47,7 @@ import {
   paintGraphics,
   previousPaintEvent,
 } from "protocol/graphics";
-import { mostRecentPaint } from "protocol/PaintsCache";
+import { findMostRecentPaint } from "protocol/PaintsCache";
 import { waitForTime } from "protocol/utils";
 import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
 import {
@@ -526,7 +526,7 @@ export function playbackPoints(
       if (currentTime >= nextGraphicsTime) {
         try {
           let maybeNextGraphics = await Promise.race([nextGraphicsPromise, waitForTime(500)]);
-          if (!maybeNextGraphics) {
+          if (typeof maybeNextGraphics === "number") {
             dispatch(setPlaybackStalled(true));
             maybeNextGraphics = await nextGraphicsPromise;
             dispatch(setPlaybackStalled(false));
@@ -846,7 +846,7 @@ export function precacheScreenshots(beginTime: number): UIThunkAction {
 
     const endTime = Math.min(beginTime + PRECACHE_DURATION, recordingDuration);
     for (let time = beginTime; time < endTime; time += SNAP_TIME_INTERVAL) {
-      const paintPoint = mostRecentPaint(time);
+      const paintPoint = findMostRecentPaint(time);
       if (paintPoint === null) {
         return;
       }

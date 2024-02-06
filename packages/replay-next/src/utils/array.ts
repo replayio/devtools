@@ -19,6 +19,46 @@ export function find<T>(
   return index >= 0 ? sortedItems[index] : null;
 }
 
+export function findIndexLTE<T>(
+  sortedItems: T[],
+  targetItem: T,
+  comparisonFunction: ComparisonFunction<T>
+): number {
+  const index = findIndex(sortedItems, targetItem, comparisonFunction, false);
+
+  // This is the nearest item, but it may be greater
+  const item = sortedItems[index];
+  if (item) {
+    if (comparisonFunction(targetItem, item) >= 0) {
+      return index;
+    } else {
+      return index - 1;
+    }
+  }
+
+  return -1;
+}
+
+export function findIndexGTE<T>(
+  sortedItems: T[],
+  targetItem: T,
+  comparisonFunction: ComparisonFunction<T>
+): number {
+  const index = findIndex(sortedItems, targetItem, comparisonFunction, false);
+
+  // This is the nearest item, but it may be lesser
+  const item = sortedItems[index];
+  if (item) {
+    if (comparisonFunction(targetItem, item) <= 0) {
+      return index;
+    } else if (index < sortedItems.length - 1) {
+      return index + 1;
+    }
+  }
+
+  return -1;
+}
+
 // Note that for non-exact matches to work
 // the comparison function should return more fine-grained delta values than the typical -1, 0, or 1.
 export function findIndex<T>(
