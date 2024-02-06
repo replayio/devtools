@@ -7,18 +7,20 @@ import { ExecutedStatementSequences } from "./ExecutedStatement";
 import { NetworkEventSequences } from "./NetworkEvent";
 import { ReactComponentSequences } from "./ReactComponent";
 import {
+  AnyDiscrepancy,
   Data,
   Discrepancy,
-  ExecutedStatementDiscrepancyType,
-  NetworkEventDiscrepancyType,
-  ReactComponentDiscrepancyType,
+  DiscrepancyEvent,
+  ExecutedStatementDiscrepancy,
+  NetworkEventDiscrepancy,
+  ReactComponentDiscrepancy,
   Sequence,
 } from "./types";
 
 const data: Data = require("./data.json");
 
-function groupSequences(discrepancies: Discrepancy[]) {
-  const grouped: Record<EventKind, Record<string, Sequence<Discrepancy>>> = {};
+function groupSequences(discrepancies: AnyDiscrepancy[]) {
+  const grouped: Record<EventKind, Record<string, Sequence<AnyDiscrepancy>>> = {};
 
   discrepancies.forEach(d => {
     if (!grouped[d.eventKind]) {
@@ -48,7 +50,7 @@ type RootCauseContextType = {
 export const RootCauseContext = createContext<RootCauseContextType>(null as any);
 
 export function RootCause() {
-  const testFailure = data.discrepancies[0];
+  const testFailure = data.discrepancies![0];
   const failedId = testFailure.failedRun.id.recordingId;
   const successId = testFailure.successRun.id.recordingId;
   const groupedSequences = groupSequences(testFailure.discrepancies);
@@ -63,7 +65,7 @@ export function RootCause() {
               sequences={
                 Object.values(
                   groupedSequences["ReactComponent"]
-                ) as Sequence<ReactComponentDiscrepancyType>[]
+                ) as Sequence<ReactComponentDiscrepancy>[]
               }
             />
           </Collapsible>
@@ -72,7 +74,7 @@ export function RootCause() {
               sequences={
                 Object.values(
                   groupedSequences["ExecutedStatement"]
-                ) as Sequence<ExecutedStatementDiscrepancyType>[]
+                ) as Sequence<ExecutedStatementDiscrepancy>[]
               }
             />
           </Collapsible>
@@ -81,7 +83,7 @@ export function RootCause() {
               sequences={
                 Object.values(
                   groupedSequences["NetworkEvent"]
-                ) as Sequence<NetworkEventDiscrepancyType>[]
+                ) as Sequence<NetworkEventDiscrepancy>[]
               }
             />
           </Collapsible>

@@ -4,17 +4,16 @@ import { Collapsible } from "./Collapsible";
 import { ReplayLink } from "./ReplayLink";
 import { RootCauseContext } from "./RootCause";
 import {
-  NetworkEventDiscrepancyType,
-  NetworkEventExtraResponseDiscrepancyType,
-  NetworkEventMissingRequestDiscrepancyType,
-  NetworkEventMissingResponseDiscrepancyType,
+  NetworkEventContentsRequest,
+  NetworkEventContentsResponseJSON,
+  NetworkEventDiscrepancy,
   Sequence,
 } from "./types";
 
 export function NetworkEventSequences({
   sequences,
 }: {
-  sequences: Sequence<NetworkEventDiscrepancyType>[];
+  sequences: Sequence<NetworkEventDiscrepancy>[];
 }) {
   return (
     <div className="flex flex-col gap-2">
@@ -24,7 +23,7 @@ export function NetworkEventSequences({
     </div>
   );
 }
-function NetworkEventSequence({ group }: { group: Sequence<NetworkEventDiscrepancyType> }) {
+function NetworkEventSequence({ group }: { group: Sequence<NetworkEventDiscrepancy> }) {
   return (
     <div className="pl-4">
       <Collapsible label={`(${group.kind}) ${group.sequenceId}`}>
@@ -98,7 +97,7 @@ function MissingResponse({
 }: {
   label: string;
   path: string;
-  requestTag: string;
+  requestTag?: string;
   requestUrl: string;
   point: string;
   time: number;
@@ -110,7 +109,7 @@ function MissingResponse({
       <div className="flex flex-col gap-1 pl-4">
         <div className="flex flex-col">
           <div>path: {path}</div>
-          <div>requestTag: {requestTag}</div>
+          {requestTag ? <div>requestTag: {requestTag}</div> : null}
           <div>requestUrl: {requestUrl}</div>
         </div>
         <ReplayLink id={successId} kind="missing" result="passing" point={point} time={time} />
@@ -147,18 +146,19 @@ function MissingRequest({
   );
 }
 
-function NetworkEventDiscrepancy({ discrepancy }: { discrepancy: NetworkEventDiscrepancyType }) {
+function NetworkEventDiscrepancy({ discrepancy }: { discrepancy: NetworkEventDiscrepancy }) {
   const {
     kind,
-    event: { data },
+    event: { data, key, point, time },
   } = discrepancy;
   let content;
 
   if (kind == "Extra") {
     if (data.kind === "ResponseJSON") {
-      const {
-        event: { data, alternate, key, point, time },
-      } = discrepancy as NetworkEventExtraResponseDiscrepancyType;
+      const { data, alternate } = discrepancy.event as {
+        data: NetworkEventContentsResponseJSON;
+        alternate: NetworkEventContentsResponseJSON;
+      };
 
       content = (
         <ExtraResponse
@@ -174,14 +174,7 @@ function NetworkEventDiscrepancy({ discrepancy }: { discrepancy: NetworkEventDis
     }
   } else {
     if (data.kind === "ResponseJSON") {
-      const {
-        event: {
-          data: { path, requestTag, requestUrl },
-          key,
-          point,
-          time,
-        },
-      } = discrepancy as NetworkEventMissingResponseDiscrepancyType;
+      const { path, requestTag, requestUrl } = data as NetworkEventContentsResponseJSON;
 
       content = (
         <MissingResponse
@@ -194,14 +187,7 @@ function NetworkEventDiscrepancy({ discrepancy }: { discrepancy: NetworkEventDis
         />
       );
     } else if (data.kind === "Request") {
-      const {
-        event: {
-          data: { requestMethod, requestUrl },
-          key,
-          point,
-          time,
-        },
-      } = discrepancy as NetworkEventMissingRequestDiscrepancyType;
+      const { requestMethod, requestUrl } = data as NetworkEventContentsRequest;
 
       content = (
         <MissingRequest
@@ -214,5 +200,6 @@ function NetworkEventDiscrepancy({ discrepancy }: { discrepancy: NetworkEventDis
       );
     }
   }
+
   return <div>{content}</div>;
 }
