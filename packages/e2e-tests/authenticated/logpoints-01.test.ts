@@ -1,5 +1,3 @@
-import { addCoverageReport } from "monocart-reporter";
-
 import { openDevToolsTab, startTest } from "../helpers";
 import { E2E_USER_1, E2E_USER_2 } from "../helpers/authentication";
 import { disableAllConsoleMessageTypes, verifyConsoleMessage } from "../helpers/console-panel";
@@ -12,7 +10,7 @@ import {
 import { openSource } from "../helpers/source-explorer-panel";
 import { addLogpoint, editLogPoint, removeAllLogpoints } from "../helpers/source-panel";
 import { waitForRecordingToFinishIndexing } from "../helpers/utils";
-import test, { Page, base, expect } from "../testFixtureCloneRecording";
+import test, { Page, expect } from "../testFixtureCloneRecording";
 
 const url = "authenticated_logpoints.html";
 const lineNumber = 14;
@@ -26,13 +24,6 @@ async function load(page: Page, recordingId: string, apiKey: string, testScope: 
   await openPauseInformationPanel(page);
 
   await disableAllConsoleMessageTypes(page);
-}
-
-async function close(page: Page) {
-  const jsCoverage = await page.coverage.stopJSCoverage();
-
-  await addCoverageReport(jsCoverage, base.info());
-  await page.close();
 }
 
 test.use({ exampleKey: url, testUsers: [E2E_USER_1, E2E_USER_2] });
@@ -131,7 +122,7 @@ test(`authenticated/logpoints-01: Shared logpoints functionality`, async ({
   }
 
   {
-    await close(pageOne);
-    await close(pageTwo);
+    await pageOne.close();
+    await pageTwo.close();
   }
 });
