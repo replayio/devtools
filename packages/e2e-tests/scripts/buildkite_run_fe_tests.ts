@@ -172,11 +172,6 @@ export default function run_fe_tests(CHROME_BINARY_PATH, runInCI = true, nWorker
       stdio: "inherit",
     });
 
-    // TODO: We can remove this once we change runtime from `chromium` to `replay-chromium`.
-    execSync("npx playwright install chromium", {
-      stdio: "inherit",
-    });
-
     // Start the webserver.
     webProc = exec("yarn dev", (error, stdout, stderr) => {
       if (error) {
@@ -212,7 +207,7 @@ export default function run_fe_tests(CHROME_BINARY_PATH, runInCI = true, nWorker
       execSync(
         `${envWrapper} ${path.join(
           "scripts/save-examples.ts"
-        )} --runtime=chromium --target=browser --project=chromium${examplesCfg}`,
+        )} --runtime=chromium --target=browser ${examplesCfg}`,
         { cwd: TestRootPath, stdio: "inherit", env: process.env }
       );
 
@@ -227,7 +222,7 @@ export default function run_fe_tests(CHROME_BINARY_PATH, runInCI = true, nWorker
     {
       // Run the known-passing tests.
       execSync(
-        `${envWrapper} npx playwright test --grep-invert node_ --project=chromium --workers=${nWorkers} --retries=2 ${testFiles.join(
+        `${envWrapper} npx playwright test --grep-invert node_ --project=replay-chromium --workers=${nWorkers} --retries=2 ${testFiles.join(
           " "
         )}`,
         {
