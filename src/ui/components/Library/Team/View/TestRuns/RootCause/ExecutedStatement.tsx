@@ -3,14 +3,14 @@ import { useContext } from "react";
 import { Collapsible } from "./Collapsible";
 import { ReplayLink } from "./ReplayLink";
 import { RootCauseContext } from "./RootCause";
-import { ExecutedStatementDiscrepancyType, Sequence } from "./types";
+import { ExecutedStatementDiscrepancy, Sequence } from "./types";
 
 let UNKNOWN_SOURCE = "Unknown source";
 
 export function ExecutedStatementSequences({
   sequences,
 }: {
-  sequences: Sequence<ExecutedStatementDiscrepancyType>[];
+  sequences: Sequence<ExecutedStatementDiscrepancy>[];
 }) {
   return (
     <div className="flex flex-col gap-2 pl-4">
@@ -20,11 +20,7 @@ export function ExecutedStatementSequences({
     </div>
   );
 }
-function ExecutedStatementSequence({
-  group,
-}: {
-  group: Sequence<ExecutedStatementDiscrepancyType>;
-}) {
+function ExecutedStatementSequence({ group }: { group: Sequence<ExecutedStatementDiscrepancy> }) {
   return (
     <Collapsible label={`${group.kind} ${group.sequenceId}`}>
       <div className="pl-4">
@@ -40,10 +36,10 @@ function ExecutedStatementSequence({
 function ExecutedStatementDiscrepancy({
   discrepancy,
 }: {
-  discrepancy: ExecutedStatementDiscrepancyType;
+  discrepancy: ExecutedStatementDiscrepancy;
 }) {
   const { failedId, successId } = useContext(RootCauseContext);
-  const source = getSource(discrepancy.event.description.url);
+  const source = getSource(discrepancy.event.description?.url);
   const { kind, event } = discrepancy;
   const recordingId = kind === "Extra" ? failedId : successId;
 
@@ -64,6 +60,6 @@ function ExecutedStatementDiscrepancy({
   );
 }
 
-function getSource(url: string) {
+function getSource(url?: string) {
   return url ? url.split("/").pop() : UNKNOWN_SOURCE;
 }
