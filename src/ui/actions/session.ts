@@ -388,6 +388,11 @@ export function createSocket(recordingId: string): UIThunkAction {
         dispatch(setFocusWindow({ begin: focusWindow.begin.time, end: focusWindow.end.time }));
       }
     } catch (error: any) {
+      if (isRecordingDeletedError(error)) {
+        dispatch(setExpectedError(getDeletedRecordingError()));
+        return;
+      }
+
       const currentError = getUnexpectedError(getState());
 
       // Don't overwrite an existing error.
