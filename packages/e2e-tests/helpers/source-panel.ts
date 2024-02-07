@@ -76,7 +76,7 @@ export async function addBreakpoint(
   // since that is not guaranteed to happen synchronously on click. This is
   // important for cases where we add a breakpoint and then immediately
   // attempt to step to the breakpoint location.
-  await delay(500);
+  await delay(1000);
 }
 
 export async function editBadge(
