@@ -295,6 +295,7 @@ export function convertRecording(
     userRole: "userRole" in rec ? (rec.userRole as RecordingRole) : undefined,
     isTest: "isTest" in rec ? rec.isTest : undefined,
     isInTestWorkspace: "isInTestWorkspace" in rec ? rec.isInTestWorkspace : undefined,
+    rootCauseAnalysis: "rootCauseAnalysis" in rec ? rec.rootCauseAnalysis : undefined,
     testRunId: null,
   };
 

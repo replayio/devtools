@@ -64,6 +64,11 @@ const GET_TEST_RUN_RECORDINGS = gql`
                         id
                       }
                     }
+                    rootCauseAnalysis {
+                      id
+                      version
+                      result
+                    }
                   }
                 }
               }

@@ -9,11 +9,10 @@ import { ReactComponentSequences } from "./ReactComponent";
 import {
   AnyDiscrepancy,
   Data,
-  Discrepancy,
-  DiscrepancyEvent,
   ExecutedStatementDiscrepancy,
   NetworkEventDiscrepancy,
   ReactComponentDiscrepancy,
+  RootCauseAnalysisResult,
   Sequence,
 } from "./types";
 
@@ -49,7 +48,7 @@ type RootCauseContextType = {
 
 export const RootCauseContext = createContext<RootCauseContextType>(null as any);
 
-export function RootCause() {
+export function RootCause({ discrepancy }: { discrepancy: RootCauseAnalysisResult }) {
   const testFailure = data.discrepancies![0];
   const failedId = testFailure.failedRun.id.recordingId;
   const successId = testFailure.successRun.id.recordingId;
@@ -58,9 +57,10 @@ export function RootCause() {
   return (
     <RootCauseContext.Provider value={{ failedId, successId }}>
       <div className="flex flex-col">
-        <div>Root cause</div>
         <div className="flex flex-col gap-4 px-4">
-          <Collapsible label="ReactComponent">
+          <Collapsible
+            label={`ReactComponent (${Object.keys(groupedSequences["ReactComponent"]).length})`}
+          >
             <ReactComponentSequences
               sequences={
                 Object.values(
@@ -69,7 +69,11 @@ export function RootCause() {
               }
             />
           </Collapsible>
-          <Collapsible label="ExecutedStatement">
+          <Collapsible
+            label={`ExecutedStatement (${
+              Object.keys(groupedSequences["ExecutedStatement"]).length
+            })`}
+          >
             <ExecutedStatementSequences
               sequences={
                 Object.values(
@@ -78,7 +82,9 @@ export function RootCause() {
               }
             />
           </Collapsible>
-          <Collapsible label="NetworkEvent">
+          <Collapsible
+            label={`NetworkEvent (${Object.keys(groupedSequences["NetworkEvent"]).length})`}
+          >
             <NetworkEventSequences
               sequences={
                 Object.values(

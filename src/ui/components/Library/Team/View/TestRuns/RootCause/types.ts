@@ -10,7 +10,7 @@ export interface Data {
   discrepancies: Array<RootCauseAnalysisResult> | undefined;
 }
 
-interface RootCauseAnalysisResult {
+export interface RootCauseAnalysisResult {
   // The failed test run which was analyzed.
   failedRun: TestRunInfo;
 
