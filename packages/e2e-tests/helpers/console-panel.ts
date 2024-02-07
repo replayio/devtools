@@ -263,10 +263,17 @@ export async function seekToConsoleMessage(
 
   await debugPrint(page, `Seeking to message "${chalk.bold(textContent)}"`, "seekToConsoleMessage");
 
-  await consoleMessage.scrollIntoViewIfNeeded();
-  await consoleMessage.waitFor();
-  await consoleMessage.hover();
-  await consoleMessage.locator('[data-test-id="ConsoleMessageHoverButton"]').click();
+  await waitFor(async () => {
+    if ((await consoleMessage.getAttribute("data-test-paused-here")) === "true") {
+      return;
+    }
+    await consoleMessage.scrollIntoViewIfNeeded();
+    await consoleMessage.waitFor();
+    await consoleMessage.hover();
+    await consoleMessage
+      .locator('[data-test-id="ConsoleMessageHoverButton"]')
+      .click({ timeout: 1000 });
+  });
 
   await waitFor(
     async () =>
