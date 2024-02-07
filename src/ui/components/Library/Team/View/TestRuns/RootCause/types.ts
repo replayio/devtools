@@ -1,9 +1,14 @@
-import { ExecutionPoint, MappedLocation, RequestInitiator, TimeStampedPoint } from "@replayio/protocol";
+import {
+  ExecutionPoint,
+  MappedLocation,
+  RequestInitiator,
+  TimeStampedPoint,
+} from "@replayio/protocol";
 
 export interface Data {
   result: string; // AnalysisResult
   discrepancies: Array<RootCauseAnalysisResult> | undefined;
-};
+}
 
 interface RootCauseAnalysisResult {
   // The failed test run which was analyzed.
@@ -110,9 +115,7 @@ interface NetworkEvent extends DiscrepancyEvent {
   data: NetworkEventContents;
 }
 
-type NetworkEventContents =
-  | NetworkEventContentsRequest
-  | NetworkEventContentsResponseJSON;
+type NetworkEventContents = NetworkEventContentsRequest | NetworkEventContentsResponseJSON;
 
 export interface NetworkEventContentsRequest {
   kind: "Request";
@@ -137,10 +140,7 @@ export interface NetworkEventContentsResponseJSON {
   value: ComparableValue;
 }
 
-type ComparableValue =
-  | ComparableValueLiteral
-  | ComparableValueType
-  | ComparableValueAny;
+type ComparableValue = ComparableValueLiteral | ComparableValueType | ComparableValueAny;
 
 // A specific literal value.
 interface ComparableValueLiteral {
