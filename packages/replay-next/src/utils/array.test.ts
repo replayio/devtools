@@ -1,4 +1,12 @@
-import { findIndex, findIndexBigInt, findIndexString, insert, insertString } from "./array";
+import {
+  findIndex,
+  findIndexBigInt,
+  findIndexGTE,
+  findIndexLTE,
+  findIndexString,
+  insert,
+  insertString,
+} from "./array";
 
 describe("array utils", () => {
   describe("findIndex", () => {
@@ -59,6 +67,62 @@ describe("array utils", () => {
         // Ambiguous case!
         expect(findIndex([1, 3], 2, compare, false)).toEqual(1);
       });
+    });
+  });
+
+  describe("findIndexGTE", () => {
+    const compare = (a: number, b: number) => {
+      if (a === b) {
+        return 0;
+      } else {
+        return a > b ? 1 : -1;
+      }
+    };
+
+    it("should return -1 if no match can be found", () => {
+      expect(findIndexGTE([], 1, compare)).toBe(-1);
+      expect(findIndexGTE([2], 3, compare)).toBe(-1);
+    });
+
+    it("should return the smallest match that is gte the specified item", () => {
+      expect(findIndexGTE([1, 5, 25], 25, compare)).toBe(2);
+      expect(findIndexGTE([1, 5, 25], 24, compare)).toBe(2);
+      expect(findIndexGTE([1, 5, 25], 6, compare)).toBe(2);
+
+      expect(findIndexGTE([1, 5, 25], 5, compare)).toBe(1);
+      expect(findIndexGTE([1, 5, 25], 4, compare)).toBe(1);
+      expect(findIndexGTE([1, 5, 25], 2, compare)).toBe(1);
+
+      expect(findIndexGTE([1, 5, 25], 1, compare)).toBe(0);
+      expect(findIndexGTE([1, 5, 25], 0, compare)).toBe(0);
+    });
+  });
+
+  describe("findIndexLTE", () => {
+    const compare = (a: number, b: number) => {
+      if (a === b) {
+        return 0;
+      } else {
+        return a > b ? 1 : -1;
+      }
+    };
+
+    it("should return -1 if no match can be found", () => {
+      expect(findIndexLTE([], 1, compare)).toBe(-1);
+      expect(findIndexLTE([2], 1, compare)).toBe(-1);
+    });
+
+    it("should return the largest match that is lte the specified item", () => {
+      expect(findIndexLTE([1, 5, 25], 1, compare)).toBe(0);
+      expect(findIndexLTE([1, 5, 25], 2, compare)).toBe(0);
+      expect(findIndexLTE([1, 5, 25], 4, compare)).toBe(0);
+
+      expect(findIndexLTE([1, 5, 25], 5, compare)).toBe(1);
+      expect(findIndexLTE([1, 5, 25], 6, compare)).toBe(1);
+      expect(findIndexLTE([1, 5, 25], 24, compare)).toBe(1);
+
+      expect(findIndexLTE([1, 5, 25], 25, compare)).toBe(2);
+      expect(findIndexLTE([1, 5, 25], 26, compare)).toBe(2);
     });
   });
 
