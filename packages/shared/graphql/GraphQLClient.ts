@@ -40,15 +40,19 @@ export class GraphQLClient implements GraphQLClientInterface {
       data.query = data.query.loc?.source.body ?? "";
     }
 
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+    if (accessToken) {
+      headers["Authorization"] = `Bearer ${accessToken}`;
+    }
+    if (testScope) {
+      headers["replay-test-scope"] = testScope;
+    }
+
     const response = await fetch(this.url, {
       method: "POST",
-      headers: {
-        ...(accessToken && {
-          Authorization: `Bearer ${accessToken}`,
-          "replay-test-scope": this.testScope,
-        }),
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify(data),
     });
 
