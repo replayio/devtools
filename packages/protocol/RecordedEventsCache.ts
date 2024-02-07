@@ -46,7 +46,7 @@ export const RecordedClickEventsCache = createSingleEntryCache<[], MouseEvent[]>
   config: { immutable: true },
   debugLabel: "RecordedClickEventsCache",
   load: async () => {
-    const events = await replayClient.findMouseEvents();
+    const events = await RecordedMouseEventsCache.readAsync();
 
     // This is kind of funky but it's what Replay has always called a "click" event
     // github.com/replayio/devtools/commit/770952935755b67c8ea02f3aa1b4f0334ec22ee0
