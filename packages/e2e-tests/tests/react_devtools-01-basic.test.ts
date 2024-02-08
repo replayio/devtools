@@ -18,7 +18,7 @@ import {
 } from "../helpers/new-react-devtools-panel";
 import { getGetterValue } from "../helpers/object-inspector";
 import { clickScreenshot, hoverScreenshot } from "../helpers/screenshot";
-import { waitFor } from "../helpers/utils";
+import { delay, waitFor } from "../helpers/utils";
 import test, { expect } from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "cra/dist/index.html" });
@@ -79,11 +79,12 @@ test("react_devtools-01: Basic RDT behavior", async ({
   const { x, y } = await findElementCoordinates(page, "<li>");
 
   await openReactDevtoolsPanel(page);
-  await enableComponentPicker(page);
   await waitFor(async () => {
-    await page.mouse.move(0, 0); // Stop hovering
+    await enableComponentPicker(page);
+
     await hoverScreenshot(page, x, y);
     await clickScreenshot(page, x, y);
+
     const actualName = await getComponentName(getSelectedRow(page));
     expect(actualName).toBe("Item");
   });

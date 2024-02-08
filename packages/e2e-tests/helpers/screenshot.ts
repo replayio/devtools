@@ -19,7 +19,9 @@ export async function convertCoordinatesForScreenshot(
     page,
     `Scaling coordinates ${chalk.bold(xPercentage.toFixed(2))}%, ${chalk.bold(
       yPercentage.toFixed(2)
-    )}% to ${chalk.bold(Math.round(x))}px, ${chalk.bold(Math.round(y))}px`,
+    )}% to ${chalk.bold(Math.round(x))}px, ${chalk.bold(Math.round(y))}px of ${chalk.bold(
+      Math.round(width)
+    )}px x ${chalk.bold(Math.round(height))}px`,
     "convertCoordinatesForScreenshot"
   );
 

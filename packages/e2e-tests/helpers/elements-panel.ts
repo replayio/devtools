@@ -1,3 +1,4 @@
+import assert from "assert";
 import { Locator, Page, expect } from "@playwright/test";
 import chalk from "chalk";
 
@@ -87,23 +88,19 @@ export async function findElementCoordinates(page: Page, partialText: string) {
     "findElementCoordinates"
   );
 
-  const imageBounds = await page.evaluate(() => {
-    const element = document.getElementById("graphics");
-    return element!.getBoundingClientRect();
-  });
+  const containerBounds = await page.locator("#overlay-graphics").boundingBox();
+  assert(containerBounds);
 
   await page.locator(".box-model-regions").waitFor();
 
-  const highlightBounds = await page.evaluate(() => {
-    const highlight = document.querySelector(".box-model-regions");
-    return highlight!.getBoundingClientRect();
-  });
+  const highlightBounds = await page.locator(".box-model-regions").boundingBox();
+  assert(highlightBounds);
 
-  const relativeHighlightLeft = highlightBounds.left - imageBounds.left;
-  const relativeHighlightTop = highlightBounds.top - imageBounds.top;
+  const relativeHighlightX = highlightBounds.x - containerBounds.x;
+  const relativeHighlightY = highlightBounds.y - containerBounds.y;
 
-  const x = (relativeHighlightLeft + highlightBounds.width / 2) / imageBounds.width;
-  const y = (relativeHighlightTop + highlightBounds.height / 2) / imageBounds.height;
+  const x = (relativeHighlightX + highlightBounds.width / 2) / containerBounds.width;
+  const y = (relativeHighlightY + highlightBounds.height / 2) / containerBounds.height;
 
   await debugPrint(
     page,
