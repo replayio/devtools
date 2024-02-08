@@ -182,7 +182,14 @@ export async function bootstrapApp() {
     const userInfo = await getUserInfo();
     if (userInfo) {
       const recordingId = getRecordingId();
-      const rec = recordingId ? await getRecording(recordingId) : null;
+      let rec = null;
+      if (recordingId) {
+        try {
+          rec = await getRecording(recordingId);
+        } catch (e) {
+          console.warn("Error fetching recording");
+        }
+      }
 
       const userSettings = await getUserSettings();
       const workspaceId = userSettings.defaultWorkspaceId;
