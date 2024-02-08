@@ -54,6 +54,7 @@ export interface ExpectedError {
   content: string;
   action?: ErrorActions;
   onAction?: () => void;
+  dataTestId?: string;
 }
 
 export type UnexpectedError = {

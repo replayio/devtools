@@ -54,6 +54,7 @@ export function RootErrorBoundary({
         action={expectedError.action ?? "refresh"}
         details={expectedError.content ?? ""}
         title={expectedError.message ?? "Error"}
+        dataTestId={expectedError.dataTestId}
       />
     );
   } else if (unexpectedError) {

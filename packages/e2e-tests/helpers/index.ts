@@ -124,7 +124,8 @@ export async function startTest(
   page: Page,
   recordingId: string,
   auth?: AuthInfo,
-  additionalQueryParams?: URLSearchParams
+  additionalQueryParams?: URLSearchParams,
+  shouldWaitForIndexing: boolean = true
 ) {
   const base = process.env.PLAYWRIGHT_TEST_BASE_URL || "http://localhost:8080";
 
@@ -147,8 +148,10 @@ export async function startTest(
 
   await page.goto(url);
 
-  // Wait until the backend has finished loading and indexing a recording
-  // This reduces the likelihood of unexpectedly slow API calls,
-  // which might otherwise cause the test to fail in misleading ways
-  await waitForRecordingToFinishIndexing(page);
+  if (shouldWaitForIndexing) {
+    // Wait until the backend has finished loading and indexing a recording
+    // This reduces the likelihood of unexpectedly slow API calls,
+    // which might otherwise cause the test to fail in misleading ways
+    await waitForRecordingToFinishIndexing(page);
+  }
 }
