@@ -78,6 +78,7 @@ import { GET_RECORDING, GET_RECORDING_USER_ID, SUBSCRIBE_RECORDING } from "ui/gr
 import { WorkspaceId } from "ui/state/app";
 
 import { useGetUserId } from "./users";
+import { GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_executions_recordings } from "shared/graphql/generated/GetTestRunRecordings";
 
 function isTest() {
   return new URL(window.location.href).searchParams.get("test");
@@ -278,6 +279,7 @@ export function convertRecording(
     | GetWorkspaceRecordings_node_Workspace_recordings_edges_node
     | GetTestsRun_node_Workspace_testRuns_edges_node_tests_recordings
     | GetWorkspaceTestExecutions_node_Workspace_tests_edges_node_executions_recordings
+    | GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_executions_recordings
 ): Recording {
   const recording: Recording = {
     id: rec.uuid,

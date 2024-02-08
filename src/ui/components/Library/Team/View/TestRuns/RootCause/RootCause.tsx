@@ -16,8 +16,6 @@ import {
   Sequence,
 } from "./types";
 
-const data: Data = require("./data.json");
-
 function groupSequences(discrepancies: AnyDiscrepancy[]) {
   const grouped: Record<EventKind, Record<string, Sequence<AnyDiscrepancy>>> = {};
 
@@ -38,7 +36,7 @@ function groupSequences(discrepancies: AnyDiscrepancy[]) {
     }
   });
 
-  return grouped;
+  return { NetworkEvent: [], ExecutedStatement: [], ReactComponent: [], ...grouped };
 }
 
 type RootCauseContextType = {
@@ -49,7 +47,7 @@ type RootCauseContextType = {
 export const RootCauseContext = createContext<RootCauseContextType>(null as any);
 
 export function RootCause({ discrepancy }: { discrepancy: RootCauseAnalysisResult }) {
-  const testFailure = data.discrepancies![0];
+  const testFailure = discrepancy;
   const failedId = testFailure.failedRun.id.recordingId;
   const successId = testFailure.successRun.id.recordingId;
   const groupedSequences = groupSequences(testFailure.discrepancies);

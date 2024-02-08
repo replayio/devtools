@@ -8,7 +8,7 @@
 // ====================================================
 
 export interface GetTestRunRecordings_node_Recording {
-  __typename: "Recording";
+  __typename: "Recording" | "RootCauseAnalysis";
 }
 
 export interface GetTestRunRecordings_node_Workspace_testRuns_edges_node_results_counts {
@@ -47,6 +47,13 @@ export interface GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_e
   user: GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_executions_recordings_comments_user | null;
 }
 
+export interface GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_executions_recordings_rootCauseAnalysis {
+  __typename: "RootCauseAnalysis";
+  id: string;
+  version: number | null;
+  result: any | null;
+}
+
 export interface GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_executions_recordings {
   __typename: "Recording";
   uuid: any;
@@ -54,6 +61,7 @@ export interface GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_e
   isProcessed: boolean | null;
   createdAt: any;
   comments: GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_executions_recordings_comments[];
+  rootCauseAnalysis: GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_executions_recordings_rootCauseAnalysis | null;
 }
 
 export interface GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_executions {

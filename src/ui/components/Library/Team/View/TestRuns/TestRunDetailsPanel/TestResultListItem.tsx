@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import { useState } from "react";
 
+import { GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_executions_recordings_rootCauseAnalysis } from "shared/graphql/generated/GetTestRunRecordings";
 import { Recording } from "shared/graphql/types";
 import { TestRun, TestRunTest } from "shared/test-suites/TestRun";
 import { trackEvent } from "ui/utils/telemetry";
@@ -96,11 +97,17 @@ export function TestResultListItem({
   );
 }
 
-function RootCauseDisplay({ analysis }: { analysis: any }) {
+function RootCauseDisplay({
+  analysis,
+}: {
+  analysis: GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_executions_recordings_rootCauseAnalysis;
+}) {
   const [collapsed, setCollapsed] = useState(true);
-  const {
-    result: { result, skipReason, discrepancies },
-  } = analysis;
+  const { result, skipReason, discrepancies } = analysis.result as {
+    result: string;
+    skipReason: string;
+    discrepancies: any[];
+  };
 
   if (result === "Skipped") {
     return <div className="pl-9">Analysis skipped: {skipReason}</div>;
