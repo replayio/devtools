@@ -140,7 +140,7 @@ export function SupportForm({
 
     return (
       <div className={styles.Background}>
-        <div className={styles.Modal} ref={modalRef}>
+        <div className={styles.Modal} ref={modalRef} data-test-id="SupportForm">
           <div className={styles.Header}>
             <div>{title}</div>
             {onDismiss && (

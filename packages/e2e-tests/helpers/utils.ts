@@ -92,15 +92,31 @@ export async function waitForRecordingToFinishIndexing(page: Page): Promise<void
   );
 
   const timelineCapsuleLocator = page.locator('[data-test-id="Timeline-Capsule"]');
-  await waitFor(
-    async () => {
-      await expect(await timelineCapsuleLocator.getAttribute("data-test-progress")).toBe("100");
-    },
-    {
-      retryInterval: 1_000,
-      timeout: 150_000,
+  try {
+    await waitFor(
+      async () => {
+        expect(await timelineCapsuleLocator.getAttribute("data-test-progress")).toBe("100");
+      },
+      {
+        retryInterval: 1_000,
+        timeout: 150_000,
+      }
+    );
+  } catch {
+    if (await page.locator('[data-test-id="SupportForm"]').isVisible()) {
+      const errorDetailsLocator = page.locator('[data-test-id="UnexpectedErrorDetails"]');
+      if (await errorDetailsLocator.isVisible()) {
+        throw new Error(`Recording crashed: ${await errorDetailsLocator.innerText()}`);
+      }
+      throw new Error("Recording crashed");
     }
-  );
+
+    if (await timelineCapsuleLocator.isVisible()) {
+      throw new Error("Recording did not finish loading");
+    }
+
+    throw new Error("Recording did not finish processing");
+  }
 }
 
 export async function toggleExpandable(
