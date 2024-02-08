@@ -39,6 +39,7 @@ import {
   GetRecordingUserId,
   GetRecordingUserIdVariables,
 } from "shared/graphql/generated/GetRecordingUserId";
+import { GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_executions_recordings } from "shared/graphql/generated/GetTestRunRecordings";
 import { GetTestsRun_node_Workspace_testRuns_edges_node_tests_recordings } from "shared/graphql/generated/GetTestsRun";
 import {
   GetWorkspaceRecordings,
@@ -78,7 +79,6 @@ import { GET_RECORDING, GET_RECORDING_USER_ID, SUBSCRIBE_RECORDING } from "ui/gr
 import { WorkspaceId } from "ui/state/app";
 
 import { useGetUserId } from "./users";
-import { GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_executions_recordings } from "shared/graphql/generated/GetTestRunRecordings";
 
 function isTest() {
   return new URL(window.location.href).searchParams.get("test");

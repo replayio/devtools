@@ -1,6 +1,7 @@
 import { ExecutionPoint } from "@replayio/protocol";
 
 import { AnyGroupedTestCases } from "shared/test-suites/RecordingTestMetadata";
+
 import { GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_executions_recordings_rootCauseAnalysis } from "./generated/GetTestRunRecordings";
 
 export enum Nag {
@@ -187,7 +188,7 @@ export interface PlanPricing {
   discount: number;
 }
 
-export interface SubscriptionWithPricing extends Subscription, PlanPricing { }
+export interface SubscriptionWithPricing extends Subscription, PlanPricing {}
 
 export enum RecordingRole {
   // A user accessing a public recording may have no role (even if authenticated)
