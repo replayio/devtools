@@ -22,13 +22,11 @@ export function ExpectedErrorModal({
   details,
   onDismiss,
   title,
-  dataTestId,
 }: {
   action?: ErrorActions;
   details: string;
   onDismiss?: () => void;
   title: string;
-  dataTestId?: string;
 }) {
   let actionButton: ReactNode = null;
 
@@ -63,7 +61,7 @@ export function ExpectedErrorModal({
 
   return (
     <DefaultViewportWrapper>
-      <Dialog dataTestId={dataTestId} showFooterLinks={true} showIllustration={true}>
+      <Dialog dataTestId="ExpectedError" showFooterLinks={true} showIllustration={true}>
         <DialogTitle>{title}</DialogTitle>
         {details && <DialogDescription>{details}</DialogDescription>}
         {actionButton ? <DialogActions>{actionButton}</DialogActions> : null}

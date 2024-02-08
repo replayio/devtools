@@ -8,5 +8,7 @@ test("deleted-recording: Show error message for deleted recording", async ({ pag
 
   const error = page.locator('[data-test-id="ExpectedError"]');
   await error.waitFor({ timeout: 10_000 });
+
   expect(await error.isVisible()).toBe(true);
+  expect(await error.textContent()).toContain("Recording Deleted");
 });
