@@ -4,10 +4,13 @@ import {
   ExecutionPoint,
   FrameId,
   FunctionMatch,
+  KeyboardEvent,
   loadedRegions as LoadedRegions,
   Location,
   MappedLocation,
   Message,
+  MouseEvent,
+  NavigationEvent,
   ObjectId,
   ObjectPreviewLevel,
   PauseData,
@@ -59,8 +62,10 @@ import {
   getScopeResult,
   getTopFrameResult,
   keyboardEvents,
+  mouseEvents,
   navigationEvents,
   newSources,
+  paintPoints,
   performSearchResult,
   querySelectorResult,
   repaintGraphicsResult,
@@ -76,6 +81,7 @@ import uniqueId from "lodash/uniqueId";
 import { addEventListener, client, initSocket, removeEventListener } from "protocol/socket";
 import { assert, compareNumericStrings, defer, waitForTime } from "protocol/utils";
 import { initProtocolMessagesStore } from "replay-next/components/protocol/ProtocolMessagesStore";
+import { insert } from "replay-next/src/utils/array";
 import { TOO_MANY_POINTS_TO_FIND } from "shared/constants";
 import { ProtocolError, commandError } from "shared/utils/error";
 import { isPointInRegion, isRangeInRegions } from "shared/utils/time";
@@ -85,6 +91,7 @@ import {
   ReplayClientEvents,
   ReplayClientInterface,
   SourceLocationRange,
+  TimeStampedPointWithPaintHash,
 } from "./types";
 
 export const MAX_POINTS_TO_FIND = 10_000;
@@ -122,15 +129,6 @@ export class ReplayClient implements ReplayClientInterface {
       client.Session.addAnnotationsListener(this.onAnnotations);
     });
   }
-
-  private getSessionIdThrows(): SessionId {
-    const sessionId = this._sessionId;
-    if (sessionId === null) {
-      throw Error("Invalid session");
-    }
-    return sessionId;
-  }
-
   // Configures the client to use an already initialized session iD.
   // This method should be used for apps that use the protocol package directly.
   // Apps that only communicate with the Replay protocol through this client should use the initialize method instead.
@@ -160,7 +158,7 @@ export class ReplayClient implements ReplayClientInterface {
   }
 
   async breakpointAdded(location: Location, condition: string | null): Promise<BreakpointId> {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
 
     const { breakpointId } = await client.Debugger.setBreakpoint(
       {
@@ -174,7 +172,7 @@ export class ReplayClient implements ReplayClientInterface {
   }
 
   async breakpointRemoved(breakpointId: BreakpointId): Promise<void> {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
     await client.Debugger.removeBreakpoint({ breakpointId }, sessionId);
   }
 
@@ -185,7 +183,7 @@ export class ReplayClient implements ReplayClientInterface {
   }
 
   async createPause(executionPoint: ExecutionPoint): Promise<createPauseResult> {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
 
     await this.waitForPointToBeInFocusRange(executionPoint);
 
@@ -200,7 +198,7 @@ export class ReplayClient implements ReplayClientInterface {
     frameId: FrameId | null,
     pure?: boolean
   ): Promise<EvaluationResult> {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
 
     // Edge case handling:
     // User is logging a plan object (e.g. "{...}")
@@ -261,24 +259,35 @@ export class ReplayClient implements ReplayClientInterface {
   }
 
   async findAnnotations(kind: string, listener: AnnotationListener) {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
     assert(!this.annotationListeners.has(kind), `Annotations of kind ${kind} requested twice`);
     this.annotationListeners.set(kind, listener);
     await client.Session.findAnnotations({ kind }, sessionId);
   }
 
-  async findKeyboardEvents(onKeyboardEvents: (events: keyboardEvents) => void) {
-    const sessionId = this.getSessionIdThrows();
+  async findKeyboardEvents() {
+    const sessionId = await this.waitForSession();
+
+    const sortedEvents: KeyboardEvent[] = [];
+
+    const onKeyboardEvents = ({ events }: keyboardEvents) => {
+      events.forEach(event => {
+        insert(sortedEvents, event, (a, b) => a.time - b.time);
+      });
+    };
+
     client.Session.addKeyboardEventsListener(onKeyboardEvents);
-    await client.Session.findKeyboardEvents({}, sessionId!);
+    await client.Session.findKeyboardEvents({}, sessionId);
     client.Session.removeKeyboardEventsListener(onKeyboardEvents);
+
+    return sortedEvents;
   }
 
   async findMessages(onMessage?: (message: Message) => void): Promise<{
     messages: Message[];
     overflow: boolean;
   }> {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
 
     const sortedMessages: Message[] = [];
 
@@ -324,7 +333,7 @@ export class ReplayClient implements ReplayClientInterface {
     messages: Message[];
     overflow: boolean;
   }> {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
 
     // It is important to wait until the range is fully loaded before requesting messages.
     // It would be better if findMessagesInRange errored when the requested range could not be returned,
@@ -350,11 +359,40 @@ export class ReplayClient implements ReplayClientInterface {
     };
   }
 
-  async findNavigationEvents(onNavigationEvents: (events: navigationEvents) => void) {
-    const sessionId = this.getSessionIdThrows();
+  async findMouseEvents() {
+    const sessionId = await this.waitForSession();
+
+    const sortedEvents: MouseEvent[] = [];
+
+    const onMouseEvents = ({ events }: mouseEvents) => {
+      events.forEach(event => {
+        insert(sortedEvents, event, (a, b) => a.time - b.time);
+      });
+    };
+
+    client.Session.addMouseEventsListener(onMouseEvents);
+    await client.Session.findMouseEvents({}, sessionId);
+    client.Session.removeMouseEventsListener(onMouseEvents);
+
+    return sortedEvents;
+  }
+
+  async findNavigationEvents() {
+    const sessionId = await this.waitForSession();
+
+    const sortedEvents: NavigationEvent[] = [];
+
+    const onNavigationEvents = ({ events }: navigationEvents) => {
+      events.forEach(event => {
+        insert(sortedEvents, event, (a, b) => a.time - b.time);
+      });
+    };
+
     client.Session.addNavigationEventsListener(onNavigationEvents);
-    await client.Session.findNavigationEvents({}, sessionId!);
+    await client.Session.findNavigationEvents({}, sessionId);
     client.Session.removeNavigationEventsListener(onNavigationEvents);
+
+    return sortedEvents;
   }
 
   _findNetworkRequestsCalled: boolean = false;
@@ -395,12 +433,36 @@ export class ReplayClient implements ReplayClientInterface {
     return { events, requests };
   }
 
+  async findPaints(): Promise<TimeStampedPointWithPaintHash[]> {
+    const sessionId = await this.waitForSession();
+
+    const sortedPaints: TimeStampedPointWithPaintHash[] = [{ point: "0", time: 0, paintHash: "" }];
+
+    const onPaints = async ({ paints }: paintPoints) => {
+      paints.forEach(async ({ point, time, screenShots }) => {
+        const paint: TimeStampedPointWithPaintHash = {
+          paintHash: screenShots.find(({ mimeType }) => mimeType == "image/jpeg")?.hash ?? "",
+          point,
+          time,
+        };
+
+        insert(sortedPaints, paint, (a, b) => a.time - b.time);
+      });
+    };
+
+    client.Graphics.addPaintPointsListener(onPaints);
+    await client.Graphics.findPaints({}, sessionId);
+    client.Graphics.removePaintPointsListener(onPaints);
+
+    return sortedPaints;
+  }
+
   async findPoints(
     pointSelector: PointSelector,
     pointLimits?: PointPageLimits
   ): Promise<PointDescription[]> {
     const points: PointDescription[] = [];
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
     const findPointsId = String(this.nextFindPointsId++);
     pointLimits = pointLimits ? { ...pointLimits } : {};
     if (!pointLimits.maxCount) {
@@ -440,37 +502,37 @@ export class ReplayClient implements ReplayClientInterface {
   }
 
   async findRewindTarget(point: ExecutionPoint): Promise<PauseDescription> {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
     const { target } = await client.Debugger.findRewindTarget({ point }, sessionId);
     return target;
   }
 
   async findResumeTarget(point: ExecutionPoint): Promise<PauseDescription> {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
     const { target } = await client.Debugger.findResumeTarget({ point }, sessionId);
     return target;
   }
 
   async findStepInTarget(point: ExecutionPoint): Promise<PauseDescription> {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
     const { target } = await client.Debugger.findStepInTarget({ point }, sessionId);
     return target;
   }
 
   async findStepOutTarget(point: ExecutionPoint): Promise<PauseDescription> {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
     const { target } = await client.Debugger.findStepOutTarget({ point }, sessionId);
     return target;
   }
 
   async findStepOverTarget(point: ExecutionPoint): Promise<PauseDescription> {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
     const { target } = await client.Debugger.findStepOverTarget({ point }, sessionId);
     return target;
   }
 
   async findReverseStepOverTarget(point: ExecutionPoint): Promise<PauseDescription> {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
     const { target } = await client.Debugger.findReverseStepOverTarget({ point }, sessionId);
     return target;
   }
@@ -480,7 +542,7 @@ export class ReplayClient implements ReplayClientInterface {
 
     await this.waitForSession();
 
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
 
     const newSourceListener = (source: Source) => {
       sources.push(source);
@@ -501,13 +563,13 @@ export class ReplayClient implements ReplayClientInterface {
   }
 
   async getAllFrames(pauseId: PauseId): Promise<getAllFramesResult> {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
     const result = await client.Pause.getAllFrames({}, sessionId, pauseId);
     return result;
   }
 
   async getPointStack(point: ExecutionPoint, maxCount: number): Promise<PointStackFrame[]> {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
     const result = await client.Session.getPointStack({ point, maxCount }, sessionId);
     return result.frames;
   }
@@ -563,30 +625,30 @@ export class ReplayClient implements ReplayClientInterface {
   }
 
   async getTopFrame(pauseId: PauseId): Promise<getTopFrameResult> {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
     const result = await client.Pause.getTopFrame({}, sessionId, pauseId);
     return result;
   }
 
   async hasAnnotationKind(kind: string): Promise<boolean> {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
     const { hasKind } = await client.Session.hasAnnotationKind({ kind }, sessionId);
     return hasKind;
   }
 
   async getAnnotationKinds(): Promise<string[]> {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
     const { kinds } = await client.Session.getAnnotationKinds({}, sessionId);
     return kinds;
   }
 
   async getAllBoundingClientRects(pauseId: string): Promise<getAllBoundingClientRectsResult> {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
     return client.DOM.getAllBoundingClientRects({}, sessionId, pauseId);
   }
 
   async getAppliedRules(pauseId: string, nodeId: string): Promise<getAppliedRulesResult> {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
     return client.CSS.getAppliedRules({ node: nodeId }, sessionId, pauseId);
   }
 
@@ -594,37 +656,37 @@ export class ReplayClient implements ReplayClientInterface {
     pauseId: string,
     nodeId: string
   ): Promise<getBoundingClientRectResult> {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
     return client.DOM.getBoundingClientRect({ node: nodeId }, sessionId, pauseId);
   }
 
   async getBoxModel(pauseId: string, nodeId: string): Promise<getBoxModelResult> {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
     return client.DOM.getBoxModel({ node: nodeId }, sessionId, pauseId);
   }
 
   async getComputedStyle(pauseId: PauseId, nodeId: string): Promise<getComputedStyleResult> {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
     return client.CSS.getComputedStyle({ node: nodeId }, sessionId, pauseId);
   }
 
   async getDocument(pauseId: string): Promise<getDocumentResult> {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
     return client.DOM.getDocument({}, sessionId, pauseId);
   }
 
   async getEventListeners(pauseId: string, nodeId: string): Promise<getEventListenersResult> {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
     return client.DOM.getEventListeners({ node: nodeId }, sessionId, pauseId);
   }
 
   async getParentNodes(pauseId: string, nodeId: string): Promise<getParentNodesResult> {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
     return client.DOM.getParentNodes({ node: nodeId }, sessionId, pauseId);
   }
 
   async performSearch(pauseId: string, query: string): Promise<performSearchResult> {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
     return client.DOM.performSearch({ query }, sessionId, pauseId);
   }
 
@@ -633,7 +695,7 @@ export class ReplayClient implements ReplayClientInterface {
     nodeId: string,
     selector: string
   ): Promise<querySelectorResult> {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
     return client.DOM.querySelector({ node: nodeId, selector }, sessionId, pauseId);
   }
 
@@ -641,7 +703,7 @@ export class ReplayClient implements ReplayClientInterface {
     eventTypes: string[],
     range: PointRange | null
   ): Promise<Record<string, number>> {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
     const { counts } = await client.Debugger.getEventHandlerCounts(
       { eventTypes, range: range ?? undefined },
       sessionId
@@ -650,7 +712,7 @@ export class ReplayClient implements ReplayClientInterface {
   }
 
   async getAllEventHandlerCounts(range: PointRange | null): Promise<Record<string, number>> {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
     const { counts } = await client.Debugger.getAllEventHandlerCounts(
       { range: range ?? undefined },
       sessionId
@@ -659,13 +721,13 @@ export class ReplayClient implements ReplayClientInterface {
     return countsObject;
   }
 
-  getExceptionValue(pauseId: PauseId): Promise<getExceptionValueResult> {
-    const sessionId = this.getSessionIdThrows();
+  async getExceptionValue(pauseId: PauseId): Promise<getExceptionValueResult> {
+    const sessionId = await this.waitForSession();
     return client.Pause.getExceptionValue({}, sessionId, pauseId);
   }
 
   private async syncFocusWindow(): Promise<TimeStampedPointRange> {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
     const { window } = await client.Session.getFocusWindow({}, sessionId);
     this.focusWindow = window;
     this._dispatchEvent("focusWindowChange", window);
@@ -673,7 +735,7 @@ export class ReplayClient implements ReplayClientInterface {
   }
 
   async getFrameSteps(pauseId: PauseId, frameId: FrameId): Promise<PointDescription[]> {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
     const { steps } = await client.Pause.getFrameSteps({ frameId }, sessionId, pauseId);
     return steps;
   }
@@ -683,7 +745,7 @@ export class ReplayClient implements ReplayClientInterface {
     pauseId: PauseId,
     propertyName: string
   ): Promise<Result> {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
     const { result } = await client.Pause.getObjectProperty(
       {
         object: objectId,
@@ -700,7 +762,7 @@ export class ReplayClient implements ReplayClientInterface {
     pauseId: PauseId,
     level?: ObjectPreviewLevel
   ): Promise<PauseData> {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
     const result = await client.Pause.getObjectPreview(
       { level, object: objectId },
       sessionId,
@@ -710,14 +772,14 @@ export class ReplayClient implements ReplayClientInterface {
   }
 
   async getPointNearTime(time: number): Promise<TimeStampedPoint> {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
 
     const { point } = await client.Session.getPointNearTime({ time }, sessionId);
     return point;
   }
 
   async getPointsBoundingTime(time: number): Promise<PointsBoundingTime> {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
 
     const result = await client.Session.getPointsBoundingTime({ time }, sessionId);
     return result;
@@ -728,19 +790,19 @@ export class ReplayClient implements ReplayClientInterface {
   }
 
   async getScope(pauseId: PauseId, scopeId: ScopeId): Promise<getScopeResult> {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
     const result = await client.Pause.getScope({ scope: scopeId }, sessionId, pauseId);
     return result;
   }
 
   async getScopeMap(location: Location): Promise<VariableMapping[] | undefined> {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
     const { map } = await client.Debugger.getScopeMap({ location }, sessionId);
     return map;
   }
 
   async getScreenshot(point: ExecutionPoint): Promise<ScreenShot> {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
     const { screen } = await client.Graphics.getPaintContents(
       { point, mimeType: "image/jpeg" },
       sessionId
@@ -749,7 +811,7 @@ export class ReplayClient implements ReplayClientInterface {
   }
 
   async mapExpressionToGeneratedScope(expression: string, location: Location): Promise<string> {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
     const result = await client.Debugger.mapExpressionToGeneratedScope(
       { expression, location },
       sessionId
@@ -758,7 +820,7 @@ export class ReplayClient implements ReplayClientInterface {
   }
 
   async getSessionEndpoint(): Promise<TimeStampedPoint> {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
     const { endpoint } = await client.Session.getEndpoint({}, sessionId);
     return endpoint;
   }
@@ -770,7 +832,7 @@ export class ReplayClient implements ReplayClientInterface {
     locations: SameLineSourceLocations[],
     focusRange: PointRange | null
   ) {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
     await this.waitForRangeToBeInFocusRange(focusRange);
     const { hits } = await client.Debugger.getHitCounts(
       { sourceId, locations, maxHits: TOO_MANY_POINTS_TO_FIND, range: focusRange || undefined },
@@ -779,15 +841,16 @@ export class ReplayClient implements ReplayClientInterface {
     return hits;
   }
 
-  getSourceOutline(sourceId: SourceId) {
-    return client.Debugger.getSourceOutline({ sourceId }, this.getSessionIdThrows());
+  async getSourceOutline(sourceId: SourceId) {
+    const sessionId = await this.waitForSession();
+    return client.Debugger.getSourceOutline({ sourceId }, sessionId);
   }
 
   async getBreakpointPositions(
     sourceId: SourceId,
     locationRange: SourceLocationRange | null
   ): Promise<SameLineSourceLocations[]> {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
     const begin = locationRange ? locationRange.start : undefined;
     const end = locationRange ? locationRange.end : undefined;
 
@@ -803,13 +866,13 @@ export class ReplayClient implements ReplayClientInterface {
   }
 
   async getMappedLocation(location: Location): Promise<MappedLocation> {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
     const { mappedLocation } = await client.Debugger.getMappedLocation({ location }, sessionId);
     return mappedLocation;
   }
 
   async requestFocusWindow(params: PointRangeFocusRequest): Promise<TimeStampedPointRange> {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
 
     const { window } = await client.Session.requestFocusWindow(
       {
@@ -834,8 +897,8 @@ export class ReplayClient implements ReplayClientInterface {
     }
   }
 
-  repaintGraphics(pauseId: PauseId): Promise<repaintGraphicsResult> {
-    const sessionId = this.getSessionIdThrows();
+  async repaintGraphics(pauseId: PauseId): Promise<repaintGraphicsResult> {
+    const sessionId = await this.waitForSession();
     return client.DOM.repaintGraphics({}, sessionId, pauseId);
   }
 
@@ -852,7 +915,7 @@ export class ReplayClient implements ReplayClientInterface {
     },
     onMatches: (matches: FunctionMatch[]) => void
   ): Promise<void> {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
     const thisSearchUniqueId = uniqueId("search-fns-");
 
     let pendingMatches: FunctionMatch[] = [];
@@ -913,7 +976,7 @@ export class ReplayClient implements ReplayClientInterface {
     },
     onMatches: (matches: SearchSourceContentsMatch[], didOverflow: boolean) => void
   ): Promise<void> {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
     const thisSearchUniqueId = uniqueId("search-sources-");
 
     let didOverflow = false;
@@ -986,7 +1049,7 @@ export class ReplayClient implements ReplayClientInterface {
     },
     onResults: (results: RunEvaluationResult[]) => void
   ): Promise<void> {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
     const runEvaluationId = String(this.nextRunEvaluationId++);
     const pointLimits: PointPageLimits = opts.limits ? { ...opts.limits } : {};
     if (!pointLimits.maxCount) {
@@ -1036,7 +1099,7 @@ export class ReplayClient implements ReplayClientInterface {
     onSourceContentsInfo: (params: sourceContentsInfo) => void,
     onSourceContentsChunk: (params: sourceContentsChunk) => void
   ): Promise<void> {
-    const sessionId = this.getSessionIdThrows();
+    const sessionId = await this.waitForSession();
 
     let pendingChunk = "";
     let pendingThrottlePromise: Promise<void> | null = null;

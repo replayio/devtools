@@ -31,7 +31,11 @@ export function UnexpectedErrorForm({
       currentUserName={currentUserName}
       details={
         <>
-          {details && <div className={styles.Details}>{details}</div>}
+          {details && (
+            <div className={styles.Details} data-test-id="UnexpectedErrorDetails">
+              {details}
+            </div>
+          )}
           <div>
             We've sent this crash to our team. Please add any details that might help us diagnose
             and fix this issue.

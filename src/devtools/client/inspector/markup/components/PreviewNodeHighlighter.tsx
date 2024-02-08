@@ -2,6 +2,7 @@ import type { Quads } from "@replayio/protocol";
 import React from "react";
 
 import { assert } from "protocol/utils";
+import { getCanvas } from "ui/reducers/app";
 import { useAppSelector } from "ui/setup/hooks";
 
 import { getNodeBoxModelById } from "../reducers/markup";
@@ -136,7 +137,7 @@ function getOuterBounds(boxModelQuads: BoxModelQuads) {
 
 export function PreviewNodeHighlighter({ nodeId }: { nodeId: string }) {
   const highlightedNodeBoxModel = useAppSelector(state => getNodeBoxModelById(state, nodeId));
-  const canvas = useAppSelector(state => state.app.canvas);
+  const canvas = useAppSelector(getCanvas);
 
   if (!highlightedNodeBoxModel || !canvas) {
     return null;

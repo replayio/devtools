@@ -114,6 +114,7 @@ jobs:
           RECORD_REPLAY_TEST_METRICS: 1
           AUTOMATED_TEST_SECRET: ${{ secrets.AUTOMATED_TEST_SECRET }}
           AUTHENTICATED_TESTS_WORKSPACE_API_KEY: ${{ secrets.AUTHENTICATED_TESTS_WORKSPACE_API_KEY }}
+          GOLDEN_TEST_RUN_WORKSPACE_API_KEY: ${{ secrets.GOLDEN_TEST_RUN_WORKSPACE_API_KEY }}
       - name: Archive Playwright report results with code coverage 
         uses: actions/upload-artifact@v4
         if: always()
@@ -164,7 +165,7 @@ jobs:
       - name: Install Replay Playwright
         run: npx @replayio/playwright install
       - name: Run Playwright
-        run: npx playwright test --shard ${{ matrix.shard }}/1 authenticated/**/*.ts authenticated/*.ts --project replay-chromium
+        run: npx playwright test --shard ${{ matrix.shard }}/1 authenticated/ test-suite-dashboard/ --project replay-chromium
         working-directory: ./packages/e2e-tests
         env:
           REPLAY_PLAYWRIGHT_FIXTURE: 1
@@ -175,6 +176,7 @@ jobs:
           RECORD_REPLAY_TEST_METRICS: 1
           AUTOMATED_TEST_SECRET: ${{ secrets.AUTOMATED_TEST_SECRET }}
           AUTHENTICATED_TESTS_WORKSPACE_API_KEY: ${{ secrets.AUTHENTICATED_TESTS_WORKSPACE_API_KEY }}
+          GOLDEN_TEST_RUN_WORKSPACE_API_KEY: ${{ secrets.GOLDEN_TEST_RUN_WORKSPACE_API_KEY }}
       - name: Archive Playwright report results with code coverage 
         uses: actions/upload-artifact@v4
         if: always()
@@ -217,58 +219,3 @@ jobs:
           YARN_CHECKSUM_BEHAVIOR: "update"
       - name: Run tests
         run: yarn test
-  merge-coverage-reports:
-    # Merge reports after playwright-tests, even if some shards have failed
-    if: always()
-    needs: [e2etest, authenticated-e2etest]
-
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "16"
-      # Get the yarn cache path.
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "{dir}={$(yarn config get cacheFolder)}" >> $GITHUB_OUTPUT
-      - name: Restore yarn cache
-        uses: actions/cache@v3
-        id: yarn-cache
-        with:
-          path: |
-            ${{ steps.yarn-cache-dir-path.outputs.dir }}
-            **/node_modules
-          key: yarn-cache-folder-${{ hashFiles('**/yarn.lock', '.yarnrc.yml') }}
-          restore-keys: "yarn-cache-folder-"
-      # Actually install packages with Yarn
-      - name: Install packages
-        run: yarn install
-        env:
-          YARN_CHECKSUM_BEHAVIOR: "update"
-          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
-      - name: Download all coverage reports from GitHub Actions Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: test-results
-      - name: Merge Monocart reports
-        id: merge-monocart-reports
-        run: |
-          yarn ts-node packages/e2e-tests/scripts/merge-monocart-reports.ts ./test-results
-      - name: Archive merged Playwright report results with code coverage 
-        uses: actions/upload-artifact@v4
-        id: upload-coverage-report
-        if: always()
-        with:
-          name: all-code-coverage-reports-merged
-          path: |
-            ./test-results/merged-report*
-            ./test-results/merged-coverage*
-            ./test-results/coverage-reports
-          retention-days: 14
-      - name: Post coverage summary as a PR comment
-        uses: thollander/actions-comment-pull-request@v2
-        with:
-          filePath: ./coverageSummary.md
-          comment_tag: coverage_summary

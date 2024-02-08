@@ -238,6 +238,7 @@ export function useGetNonPendingWorkspaces(): { workspaces: Workspace[]; loading
                 isTest
                 isOrganization
                 isTest
+                retentionLimit
                 subscription {
                   status
                   trialEnds

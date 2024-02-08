@@ -148,14 +148,6 @@ export const config = {
     legacyKey: "devtools.debugger.ui.framework-grouping-on",
   },
 
-  feature_basicProcessingLoadingBar: {
-    defaultValue: Boolean(false),
-    description:
-      "Split the loading bar's progress between gathering static resources from the recording and indexing runtime information",
-    label: "Detailed loading bar",
-    legacyKey: "devtools.features.basicProcessingLoadingBar",
-  },
-
   feature_chromiumNetMonitor: {
     defaultValue: Boolean(true),
     legacyKey: "devtools.features.chromiumNetMonitor",
@@ -178,6 +170,11 @@ export const config = {
     defaultValue: Boolean(false),
     label: "Visualize protocol events in the timeline",
     legacyKey: "devtools.features.protocolTimeline",
+  },
+  feature_showLogPointPanelAboveLine: {
+    defaultValue: Boolean(false),
+    label: "Show log point panel above source line",
+    legacyKey: null,
   },
 
   global_disableLogRocket: {

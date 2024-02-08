@@ -5,8 +5,9 @@ import {
 } from "@replayio/protocol";
 import clamp from "lodash/clamp";
 
-import { gPaintPoints, hasAllPaintPoints } from "protocol/graphics";
+import { PaintsCache } from "protocol/PaintsCache";
 import useLoadedRegions from "replay-next/src/hooks/useLoadedRegions";
+import { TimeStampedPointWithPaintHash } from "shared/client/types";
 import { getZoomRegion } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
 
@@ -80,8 +81,14 @@ const EMPTY_LOADED_REGIONS: LoadedRegions = {
 export default function ProtocolTimeline() {
   const loadedRegions = useLoadedRegions() ?? EMPTY_LOADED_REGIONS;
 
-  const firstPaint = gPaintPoints[0];
-  const lastPaint = gPaintPoints[gPaintPoints.length - 1];
+  let firstPaint: TimeStampedPointWithPaintHash | null = null;
+  let lastPaint: TimeStampedPointWithPaintHash | null = null;
+
+  const paints = PaintsCache.read();
+  if (paints && paints.length > 0) {
+    firstPaint = paints[0];
+    lastPaint = paints[paints.length - 1];
+  }
 
   return (
     <div className="flex w-full flex-col space-y-1">
@@ -93,17 +100,21 @@ export default function ProtocolTimeline() {
       <Spans regions={loadedRegions.loading} color="gray-500" title="Loading" />
       <Spans regions={loadedRegions.loaded} color="orange-500" title="Loaded" />
       <Spans regions={loadedRegions.indexed} color="green-500" title="Indexed" />
-      <Spans
-        regions={[
-          {
-            begin: { point: firstPaint.point, time: firstPaint.time },
-            end: { point: lastPaint.point, time: hasAllPaintPoints ? Infinity : lastPaint.time },
-          },
-        ]}
-        color="sky-500"
-        points={gPaintPoints}
-        title="Paints"
-      />
+      {paints && (
+        <Spans
+          regions={[
+            {
+              begin: { point: firstPaint?.point ?? "0", time: firstPaint?.time ?? 0 },
+              // This timeline should always extend to the end,
+              // even though the final paint will be before the end
+              end: { point: lastPaint?.point ?? "0", time: Infinity },
+            },
+          ]}
+          color="sky-500"
+          points={paints}
+          title="Paints"
+        />
+      )}
     </div>
   );
 }

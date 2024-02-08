@@ -232,7 +232,7 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
   await searchComponents(page, "Suspense");
   await verifySearchResults(page, {
     currentNumber: 1,
-    totalNumber: 14,
+    totalNumber: 15,
   });
 
   list.evaluate(el => (el.scrollTop = 0));

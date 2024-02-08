@@ -4,7 +4,7 @@ import { PreviewNodeHighlighter } from "devtools/client/inspector/markup/compone
 import { installObserver, refreshGraphics } from "protocol/graphics";
 import Spinner from "replay-next/components/Spinner";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
-import { getRecordingTarget, getVideoUrl } from "ui/actions/app";
+import { getRecordingTarget } from "ui/actions/app";
 import { stopPlayback } from "ui/actions/timeline";
 import CommentsOverlay from "ui/components/Comments/VideoComments/index";
 import { NodePickerContext } from "ui/components/NodePickerContext";
@@ -30,7 +30,6 @@ export default function Video() {
   const highlightedNodeIds = useAppSelector(state => state.markup.highlightedNodes);
   const playback = useAppSelector(getPlayback);
   const recordingTarget = useAppSelector(getRecordingTarget);
-  const videoUrl = useAppSelector(getVideoUrl);
   const stalled = useAppSelector(isPlaybackStalled);
   const isPlaying = useAppSelector(isPlayingSelector);
 
@@ -102,7 +101,6 @@ export default function Video() {
         <ReplayLogo size="sm" color="gray" />
       </div>
 
-      <video id="graphicsVideo" src={videoUrl || undefined} />
       <canvas id="graphics" onClick={onClick} onContextMenu={onContextMenu} ref={canvasRef} />
       {contextMenu}
       <CommentsOverlay showComments={showComments}>

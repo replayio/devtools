@@ -3,6 +3,7 @@ import { PreferencesKey } from "shared/user-data/GraphQL/types";
 import { BooleanPreference } from "ui/components/shared/UserSettingsModal/components/BooleanPreference";
 
 export const PREFERENCES: PreferencesKey[] = [
+  "feature_showLogPointPanelAboveLine",
   "backend_sampleAllTraces",
   "global_logTelemetryEvent",
   "feature_protocolTimeline",
@@ -10,7 +11,6 @@ export const PREFERENCES: PreferencesKey[] = [
   "backend_newControllerOnRefresh",
   "protocol_chromiumRepaints",
   "backend_profileWorkerThreads",
-  "feature_basicProcessingLoadingBar",
   "backend_disableCache",
   "backend_disableScanDataCache",
   "backend_enableRoutines",

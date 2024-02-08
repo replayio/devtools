@@ -61,7 +61,7 @@ export function ExpectedErrorModal({
 
   return (
     <DefaultViewportWrapper>
-      <Dialog showFooterLinks={true} showIllustration={true}>
+      <Dialog dataTestId="ExpectedError" showFooterLinks={true} showIllustration={true}>
         <DialogTitle>{title}</DialogTitle>
         {details && <DialogDescription>{details}</DialogDescription>}
         {actionButton ? <DialogActions>{actionButton}</DialogActions> : null}

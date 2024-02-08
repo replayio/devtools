@@ -1,12 +1,4 @@
-import {
-  ExecutionPoint,
-  KeyboardEvent,
-  KeyboardEventKind,
-  MouseEvent,
-  MouseEventKind,
-  NavigationEvent,
-  SessionId,
-} from "@replayio/protocol";
+import { NavigationEvent, SessionId } from "@replayio/protocol";
 
 import type { RecordingTarget } from "replay-next/src/suspense/BuildIdCache";
 import { Workspace } from "shared/graphql/types";
@@ -85,7 +77,6 @@ export interface AppState {
   defaultSelectedReactElementId: number | null;
   defaultSettingsTab: SettingsTabTitle;
   displayedLoadingProgress: number | null;
-  events: Events;
   expectedError: ExpectedError | null;
   hoveredCommentId: string | null;
   loading: number;
@@ -102,25 +93,10 @@ export interface AppState {
   sessionId: SessionId | null;
   unexpectedError: UnexpectedError | null;
   uploading: UploadInfo | null;
-  videoUrl: string | null;
   workspaceId: WorkspaceId | null;
 }
 
 export type AppMode = "devtools" | "sourcemap-visualizer";
-
-interface Events {
-  [key: string]: ReplayEvent[];
-}
-
-// Todo: We should move this deifnition to the protocol instead of typing it here.
-export type ReplayNavigationEvent = Omit<NavigationEvent, "kind"> & {
-  kind: "navigation";
-};
-
-export type ReplayEvent = MouseEvent | KeyboardEvent | ReplayNavigationEvent;
-
-export type EventCategory = "mouse" | "keyboard" | "navigation";
-export type EventKind = MouseEventKind | KeyboardEventKind | string;
 
 export interface Canvas {
   gDevicePixelRatio: number;

@@ -92,15 +92,31 @@ export async function waitForRecordingToFinishIndexing(page: Page): Promise<void
   );
 
   const timelineCapsuleLocator = page.locator('[data-test-id="Timeline-Capsule"]');
-  await waitFor(
-    async () => {
-      await expect(await timelineCapsuleLocator.getAttribute("data-test-progress")).toBe("100");
-    },
-    {
-      retryInterval: 1_000,
-      timeout: 150_000,
+  try {
+    await waitFor(
+      async () => {
+        expect(await timelineCapsuleLocator.getAttribute("data-test-progress")).toBe("100");
+      },
+      {
+        retryInterval: 1_000,
+        timeout: 150_000,
+      }
+    );
+  } catch {
+    if (await page.locator('[data-test-id="SupportForm"]').isVisible()) {
+      const errorDetailsLocator = page.locator('[data-test-id="UnexpectedErrorDetails"]');
+      if (await errorDetailsLocator.isVisible()) {
+        throw new Error(`Recording crashed: ${await errorDetailsLocator.innerText()}`);
+      }
+      throw new Error("Recording crashed");
     }
-  );
+
+    if (await timelineCapsuleLocator.isVisible()) {
+      throw new Error("Recording did not finish loading");
+    }
+
+    throw new Error("Recording did not finish processing");
+  }
 }
 
 export async function toggleExpandable(
@@ -197,12 +213,13 @@ export async function locatorTextToNumber(locator: Locator): Promise<number | nu
   return trimmed ? parseInt(trimmed) : null;
 }
 
-export async function resetTestUser(email: string) {
+export async function resetTestUser(email: string, testScope: string) {
   const variables = { email, secret: process.env.AUTOMATED_TEST_SECRET };
 
   return axios({
     url: config.graphqlUrl,
     method: "POST",
+    headers: { "replay-test-scope": testScope },
     data: {
       query: `
         mutation resetTestUser($email: String!, $secret: String!) {

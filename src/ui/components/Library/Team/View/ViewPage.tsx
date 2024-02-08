@@ -1,9 +1,6 @@
 import { useContext } from "react";
 
-import useLocalStorageUserData from "shared/user-data/LocalStorage/useLocalStorageUserData";
-
 import { FilterBarContainer } from "./FilterBarContainer";
-import { TestRunsPage as NewTestRunsPage } from "./NewTestRuns/TestRunsPage";
 import { RecordingsPage } from "./Recordings/RecordingsPage";
 import { TestRunsPage } from "./TestRuns/TestRunsPage";
 import { TestsPage } from "./Tests/TestsPage";
@@ -19,7 +16,6 @@ export function ViewPage({ defaultView }: { defaultView: string }) {
 
 export function ViewPageContent() {
   const { view } = useContext(ViewContext);
-  const [enableTestSuitesNewRunsView] = useLocalStorageUserData("enableTestSuitesNewRunsView");
   return (
     <div className="flex flex-grow flex-col overflow-hidden">
       <FilterBarContainer />
@@ -27,11 +23,7 @@ export function ViewPageContent() {
         {view === "recordings" ? (
           <RecordingsPage />
         ) : view === "runs" ? (
-          enableTestSuitesNewRunsView ? (
-            <NewTestRunsPage />
-          ) : (
-            <TestRunsPage />
-          )
+          <TestRunsPage />
         ) : view === "tests" ? (
           <TestsPage />
         ) : null}

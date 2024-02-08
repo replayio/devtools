@@ -4,10 +4,9 @@ import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 
 import ExternalLink from "replay-next/components/ExternalLink";
 import { useIndexingProgress } from "replay-next/src/hooks/useIndexingProgress";
-import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { useLoadingIsSlow } from "ui/components/Timeline/useLoadingIsSlow";
 import useModalDismissSignal from "ui/hooks/useModalDismissSignal";
-import { getBasicProcessingProgress, getShowFocusModeControls } from "ui/reducers/timeline";
+import { getShowFocusModeControls } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
 
 import Icon from "../shared/Icon";
@@ -22,14 +21,7 @@ export default function Capsule({
 }: {
   setShowLoadingProgress: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const indexingProgress = useIndexingProgress();
-  const basicProcessingProgress = Math.round(useAppSelector(getBasicProcessingProgress) * 100);
-  const [basicProcessingLoadingBar] = useGraphQLUserData("feature_basicProcessingLoadingBar");
-
-  let progress = indexingProgress;
-  if (basicProcessingLoadingBar) {
-    progress = Math.round((basicProcessingProgress + indexingProgress) / 2);
-  }
+  const progress = useIndexingProgress();
 
   const showFocusModeControls = useAppSelector(getShowFocusModeControls);
 

@@ -89,12 +89,6 @@ function CollaboratorsSection({
   showPrivacy: boolean;
   setShowPrivacy: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const { hasNoRole, loading } = useHasNoRole();
-
-  if (hasNoRole || loading) {
-    return null;
-  }
-
   return (
     <section className="space-y-4 bg-modalBgcolor p-4">
       <div className="flex w-full flex-col justify-between space-y-3">
@@ -208,6 +202,11 @@ function SharingModal({ recording, hideModal }: SharingModalProps) {
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [modalMode, setModalMode] = useState<ModalMode>("sharing");
   const showEnvironmentVariables = recordingTarget == "node";
+
+  const { hasNoRole, loading } = useHasNoRole();
+  if (hasNoRole || loading) {
+    return null;
+  }
 
   return (
     <Modal options={{ maskTransparency: "translucent" }} onMaskClick={hideModal}>

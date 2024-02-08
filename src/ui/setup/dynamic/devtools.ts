@@ -1,9 +1,8 @@
 // Side-effectful import, has to be imported before event-listeners
 // Ordering matters here
 import { ActionCreatorWithoutPayload, bindActionCreators } from "@reduxjs/toolkit";
-import { MouseEvent, TimeStampedPoint, sessionError, uploadedData } from "@replayio/protocol";
+import { sessionError, uploadedData } from "@replayio/protocol";
 import { IDBPDatabase, openDB } from "idb";
-import debounce from "lodash/debounce";
 
 import { setupSourcesListeners } from "devtools/client/debugger/src/actions/sources";
 import * as dbgClient from "devtools/client/debugger/src/client";
@@ -11,19 +10,14 @@ import debuggerReducers from "devtools/client/debugger/src/reducers";
 import * as inspectorReducers from "devtools/client/inspector/reducers";
 import {
   Canvas,
-  setAllPaintsReceivedCallback,
-  setMouseDownEventsCallback,
   setPausedonPausedAtTimeCallback,
   setPlaybackStatusCallback,
-  setPointsReceivedCallback,
   setRefreshGraphicsCallback,
-  setVideoUrlCallback,
   setupGraphics,
 } from "protocol/graphics";
 // eslint-disable-next-line no-restricted-imports
 import { addEventListener, initSocket, client as protocolClient } from "protocol/socket";
 import { assert } from "protocol/utils";
-import { setPointsReceivedCallback as setAnalysisPointsReceivedCallback } from "replay-next/src/suspense/AnalysisCache";
 import { buildIdCache, parseBuildIdComponents } from "replay-next/src/suspense/BuildIdCache";
 import { networkRequestsCache } from "replay-next/src/suspense/NetworkRequestsCache";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
@@ -34,15 +28,10 @@ import { UIStore, actions } from "ui/actions";
 import { setCanvas } from "ui/actions/app";
 import { precacheScreenshots } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
-import app, { loadReceivedEvents, setVideoUrl } from "ui/reducers/app";
+import app from "ui/reducers/app";
 import network from "ui/reducers/network";
 import protocolMessages from "ui/reducers/protocolMessages";
-import timeline, {
-  allPaintsReceived,
-  paintsReceived,
-  pointsReceived,
-  setPlaybackStalled,
-} from "ui/reducers/timeline";
+import timeline, { setPlaybackStalled } from "ui/reducers/timeline";
 import { setUpUrlParamsListener } from "ui/setup/dynamic/url";
 import { UIState } from "ui/state";
 import { ExpectedError, UnexpectedError } from "ui/state/app";
@@ -215,7 +204,7 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
     );
   });
 
-  await setupApp(store, replayClient);
+  setupApp(store, replayClient);
   setupTimeline(store);
   setupGraphics(store);
 
@@ -232,19 +221,6 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
   // Add protocol event listeners for things that the Redux store needs to stay in sync with.
   // TODO We should revisit this as part of a larger architectural redesign (#6932).
 
-  setMouseDownEventsCallback(
-    // We seem to get duplicate mousedown events each time, like ["a"], ["a"], ["a", "b"], ["a", "b"], etc.
-    // Debounce the callback so we only dispatch the last set.
-    debounce((events: MouseEvent[]) => {
-      if (!events.length) {
-        // No reason to dispatch when there's 0 events
-        return;
-      }
-
-      //
-      store.dispatch(loadReceivedEvents({ mousedown: [...events] }));
-    }, 1_000)
-  );
   setPausedonPausedAtTimeCallback((time: number) => {
     store.dispatch(precacheScreenshots(time));
   });
@@ -252,36 +228,8 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
     store.dispatch(setPlaybackStalled(stalled));
   });
 
-  // Points come in piecemeal over time. Cut down the number of dispatches by
-  // storing incoming points and debouncing the dispatch considerably.
-  let points: TimeStampedPoint[] = [];
-
-  const onPointsReceived = debounce(() => {
-    store.dispatch(pointsReceived(points.map(({ point, time }) => ({ point, time }))));
-    store.dispatch(paintsReceived(points.filter(p => "screenShots" in p)));
-    points = [];
-  }, 1_000);
-
-  setPointsReceivedCallback(newPoints => {
-    points.push(...newPoints);
-    onPointsReceived();
-  });
-
-  setAnalysisPointsReceivedCallback(newPoints => {
-    points.push(...newPoints);
-    onPointsReceived();
-  });
-
-  setAllPaintsReceivedCallback((received: boolean) => {
-    store.dispatch(allPaintsReceived(received));
-  });
-
   setRefreshGraphicsCallback((canvas: Canvas) => {
     store.dispatch(setCanvas(canvas));
-  });
-
-  setVideoUrlCallback((url: string) => {
-    store.dispatch(setVideoUrl(url));
   });
 
   setUpUrlParamsListener(store, replayClient);

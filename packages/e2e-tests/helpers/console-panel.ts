@@ -263,10 +263,17 @@ export async function seekToConsoleMessage(
 
   await debugPrint(page, `Seeking to message "${chalk.bold(textContent)}"`, "seekToConsoleMessage");
 
-  await consoleMessage.scrollIntoViewIfNeeded();
-  await consoleMessage.waitFor();
-  await consoleMessage.hover();
-  await consoleMessage.locator('[data-test-id="ConsoleMessageHoverButton"]').click();
+  await waitFor(async () => {
+    if ((await consoleMessage.getAttribute("data-test-paused-here")) === "true") {
+      return;
+    }
+    await consoleMessage.scrollIntoViewIfNeeded();
+    await consoleMessage.waitFor();
+    await consoleMessage.hover();
+    await consoleMessage
+      .locator('[data-test-id="ConsoleMessageHoverButton"]')
+      .click({ timeout: 1000 });
+  });
 
   await waitFor(
     async () =>
@@ -473,6 +480,16 @@ export async function warpToMessage(page: Page, text: string, line?: number) {
 
   const messages = await findConsoleMessage(page, text);
   const message = messages.first();
+  await message.waitFor();
+
+  await seekToConsoleMessage(page, message, line);
+}
+
+export async function warpToLastMessage(page: Page, text: string, line?: number) {
+  await openConsolePanel(page);
+
+  const messages = await findConsoleMessage(page, text);
+  const message = messages.last();
   await message.waitFor();
 
   await seekToConsoleMessage(page, message, line);

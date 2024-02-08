@@ -50,10 +50,10 @@
   border-radius: 0.25rem;
 }
 .AdvancedButton:focus {
-  border-color: var(--color-brand);
+  border-color: var(--color-control-background-active);
 }
 .AdvancedButton[data-active] {
-  color: var(--color-brand);
+  color: var(--color-control-background-active);
 }
 
 .AdvancedIcon,

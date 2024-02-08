@@ -4,6 +4,7 @@
 // Use the API key for the "Frontend E2E Test Team" that we have set up in admin,
 // as that should let us mark these recordings as public.
 
+import { execSync } from "child_process";
 import { existsSync, writeFileSync } from "fs";
 import { join } from "path";
 import type { Page, expect as expectFunction } from "@playwright/test";
@@ -15,12 +16,11 @@ import yargs from "yargs";
 
 import { SetRecordingIsPrivateVariables } from "../../shared/graphql/generated/SetRecordingIsPrivate";
 import { UpdateRecordingTitleVariables } from "../../shared/graphql/generated/UpdateRecordingTitle";
-import config, { BrowserName } from "../config";
+import config from "../config";
 import examplesJson from "../examples.json";
-import { ExamplesData, TestRecordingIntersectionValue } from "../helpers";
+import { TestRecordingIntersectionValue } from "../helpers";
 import { getStats } from "./get-stats";
 import { loadRecording } from "./loadRecording";
-import { logAnimated } from "./log";
 import { recordNodeExample } from "./record-node";
 import { recordPlaywright, uploadLastRecording } from "./record-playwright";
 
@@ -54,6 +54,11 @@ const argv = yargs
   .help()
   .alias("help", "h")
   .parseSync();
+
+const CONFIG = {
+  recordingTimeout: 60_000,
+  uploadTimeout: 60_000,
+};
 
 type PlaywrightScript = (page: Page, expect: typeof expectFunction) => Promise<void>;
 
@@ -99,15 +104,14 @@ async function saveRecording(
 
   const buildId = response.data.data.recording.buildId;
 
-  const { completeLog } = logAnimated(
-    `Saving ${chalk.bold(example)} with recording id ${recordingId}`
+  console.log(
+    `Saving ${chalk.grey.bold(example)} with recording id ${chalk.yellow.bold(recordingId)}`
   );
 
   if (!skipUpload) {
     await uploadRecording(recordingId, {
       apiKey,
       server: config.backendUrl,
-      verbose: true,
       strict: true,
     });
   }
@@ -125,8 +129,6 @@ async function saveRecording(
   };
 
   writeFileSync(examplesJsonPath, JSON.stringify(mutableExamplesJSON, null, 2));
-
-  completeLog();
 }
 
 interface TestRunCallbackArgs {
@@ -211,30 +213,28 @@ async function saveBrowserExamples() {
 }
 
 async function saveBrowserExample({ example }: TestRunCallbackArgs) {
-  const { completeLog } = logAnimated(`Recording example ${chalk.bold(example.filename)}`);
+  console.log(`Recording example ${chalk.gray.bold(example.filename)}`);
 
   const exampleUrl = `${config.devtoolsUrl}/test/examples/${example.filename}`;
   async function defaultPlaywrightScript(page: Page) {
     await waitUntilMessage(page as Page, "ExampleFinished");
   }
   const playwrightScript: PlaywrightScript = example.playwrightScript ?? defaultPlaywrightScript;
+  await raceForTime(
+    CONFIG.recordingTimeout,
+    recordPlaywright(async (page, expect) => {
+      const waitForLogPromise = playwrightScript(page, expect);
+      const goToPagePromise = page.goto(exampleUrl);
 
-  // Shouldn't be "node" by this point
-  await recordPlaywright((argv.runtime || example.runtime) as BrowserName, async (page, expect) => {
-    const waitForLogPromise = playwrightScript(page, expect);
-    const goToPagePromise = page.goto(exampleUrl);
+      await Promise.all([goToPagePromise, waitForLogPromise]);
+    })
+  );
 
-    await Promise.all([goToPagePromise, waitForLogPromise]);
-  });
-
-  const recordingId = await uploadLastRecording(exampleUrl);
+  const recordingId = await raceForTime(CONFIG.uploadTimeout, uploadLastRecording(exampleUrl));
   if (recordingId == null) {
-    throw new Error("Recording not uploaded");
+    throw new Error(`Recording "${example.filename}" not uploaded`);
   }
-
   exampleToNewRecordingId[example.filename] = recordingId;
-
-  completeLog();
 
   if (config.useExampleFile && recordingId) {
     await saveRecording(example.filename, config.replayApiKey, recordingId, true);
@@ -247,7 +247,7 @@ async function saveBrowserExample({ example }: TestRunCallbackArgs) {
 
 async function saveNodeExamples() {
   await saveExamples("node", async ({ example, examplePath }: TestRunCallbackArgs) => {
-    const { completeLog } = logAnimated(`⏳ Recording example ${chalk.bold(example.filename)}`);
+    console.log(`Recording example ${chalk.gray.bold(example.filename)}`);
 
     process.env.RECORD_REPLAY_METADATA_TEST_RUN_ID = uuidv4();
 
@@ -257,11 +257,7 @@ async function saveNodeExamples() {
       removeRecording(recordingId);
 
       exampleToNewRecordingId[example.filename] = recordingId;
-
-      completeLog();
     } else {
-      completeLog();
-
       console.error(`❌ Failed to record example ${chalk.bold(example.filename)}`);
 
       throw `Unable to save recording for ${chalk.bold(example.filename)}`;
@@ -338,6 +334,17 @@ async function updateRecordingTitle(apiKey: string, recordingId: string, title: 
   });
 }
 
+async function sleep(timeoutMs: number) {
+  return new Promise<void>(r => setTimeout(() => r(), timeoutMs));
+}
+
+async function raceForTime<T>(timeoutMs: number, promise: Promise<T>) {
+  return Promise.race([
+    promise,
+    sleep(timeoutMs).then(() => Promise.reject(new Error(`Race timeout after ${timeoutMs}ms`))),
+  ]);
+}
+
 async function waitUntilMessage(
   page: Page,
   message: string,
@@ -352,8 +359,8 @@ async function waitUntilMessage(
           clearTimeout(timer);
           resolve(true);
         }
-      } catch (e) {
-        console.log("Unserializable value");
+      } catch (error) {
+        // Ignore
       }
     });
   });
@@ -399,7 +406,7 @@ async function waitUntilMessage(
       try {
         await loadRecording(recordingId);
       } catch (e) {
-        console.log(`Error during processing: ${e}`);
+        console.error(`Ignored error during processing: ${e?.stack || e}`);
       }
     }
 

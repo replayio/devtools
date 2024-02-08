@@ -1,4 +1,4 @@
-import { setHasAllPaintPoints } from "protocol/graphics";
+import { PaintsCache } from "protocol/PaintsCache";
 import { createTestStore } from "test/testUtils";
 import { UIStore } from "ui/actions";
 
@@ -29,7 +29,10 @@ describe("Redux timeline state", () => {
     );
 
     // Fake having loaded paint points.
-    setHasAllPaintPoints(true);
+    PaintsCache.cache([
+      { point: "0", time: 0, paintHash: "" },
+      { point: "1", time: 100, paintHash: "" },
+    ]);
   });
 
   describe("focus region", () => {

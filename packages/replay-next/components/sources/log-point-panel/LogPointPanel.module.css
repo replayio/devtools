@@ -1,9 +1,6 @@
 .Panel,
 .Loader,
 .ErrorFallback {
-  position: absolute;
-  top: var(--line-height);
-  left: var(--source-line-number-offset);
   width: calc(var(--list-width) - var(--source-line-number-offset));
   border-left: var(--hit-count-bar-size) solid var(--color-hit-counts-bar-0);
   font-size: var(--font-size-small);

@@ -11,7 +11,7 @@ import {
 } from "../helpers/file-search";
 import test from "../testFixtureCloneRecording";
 
-test.use({ exampleKey: "cra/dist/index_chromium.html" });
+test.use({ exampleKey: "cra/dist/index.html" });
 
 test("file-search-01: should search files", async ({ pageWithMeta: { page, recordingId } }) => {
   await startTest(page, recordingId);
