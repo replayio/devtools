@@ -149,6 +149,7 @@ function getDeletedRecordingError(): ExpectedError {
   return {
     message: "Recording Deleted",
     content: "This recording has been deleted.",
+    action: "library",
   };
 }
 
