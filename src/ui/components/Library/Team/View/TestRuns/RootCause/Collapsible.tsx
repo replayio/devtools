@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 export function Collapsible({ children, label }: { children: React.ReactNode; label: string }) {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
 
   return (
     <div className="flex flex-col gap-2">

@@ -46,7 +46,6 @@ export function TestRunTestPanel() {
         {selectedTest.result === "failed" || selectedTest.result === "flaky" ? (
           <Errors test={selectedTest} />
         ) : null}
-        <RootCause />
       </div>
     </TestRunPanelWrapper>
   );

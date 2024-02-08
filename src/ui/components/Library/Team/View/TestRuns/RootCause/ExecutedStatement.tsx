@@ -46,7 +46,9 @@ function ExecutedStatementDiscrepancy({
   return (
     <div className="flex flex-col">
       <div className="flex flex-row justify-between gap-4">
-        <div className="truncate font-mono">{discrepancy.event.key}</div>
+        <div className="truncate font-mono" title={discrepancy.event.key}>
+          {discrepancy.event.key}
+        </div>
         <div className="whitespace-pre">{source}</div>
       </div>
       <ReplayLink

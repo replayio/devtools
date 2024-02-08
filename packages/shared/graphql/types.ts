@@ -3,6 +3,8 @@ import { ExecutionPoint } from "@replayio/protocol";
 
 import { AnyGroupedTestCases } from "shared/test-suites/RecordingTestMetadata";
 
+import { GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_executions_recordings_rootCauseAnalysis } from "./generated/GetTestRunRecordings";
+
 export enum Nag {
   ADD_COMMENT = "add_comment",
   ADD_COMMENT_TO_LINE = "add_comment_to_line",
@@ -216,6 +218,7 @@ export interface Recording {
   userRole?: RecordingRole;
   workspace?: Workspace;
   testRunId: string | null;
+  rootCauseAnalysis?: GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_executions_recordings_rootCauseAnalysis | null;
 }
 
 export type PlaywrightTestSources = {

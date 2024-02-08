@@ -1,5 +1,7 @@
 import { useRouter } from "next/router";
+import { useState } from "react";
 
+import { GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_executions_recordings_rootCauseAnalysis } from "shared/graphql/generated/GetTestRunRecordings";
 import { Recording } from "shared/graphql/types";
 import { TestRun, TestRunTest } from "shared/test-suites/TestRun";
 import { trackEvent } from "ui/utils/telemetry";
@@ -9,6 +11,7 @@ import {
   getTruncatedRelativeDate,
 } from "../../Recordings/RecordingListItem/RecordingListItem";
 import { StatusIcon } from "../../StatusIcon";
+import { RootCause } from "../RootCause/RootCause";
 import { TestRunLibraryRow } from "../TestRunLibraryRow";
 import { AttributeContainer } from "./AttributeContainer";
 import styles from "./TestResultListItem.module.css";
@@ -65,26 +68,60 @@ export function TestResultListItem({
   const numComments = comments?.length ?? 0;
 
   return (
-    <TestRunLibraryRow>
-      <a
-        href={`/recording/${recordingId}?e2e=${e2e ?? ""}&apiKey=${apiKey ?? ""}`}
-        className={styles.recordingLink}
-        data-test-id="TestRunResultsListItem"
-        data-test-status={label}
-        onClick={() => trackEvent("test_dashboard.open_replay", { view: "runs", result: label })}
-      >
-        <StatusIcon status={label} isProcessed={isProcessed} />
-        <div className={`${styles.fileInfo} gap-1`}>
-          <div className={styles.title}>{title || "Test"}</div>
-          <RecordingAttributes recording={recording} testRun={testRun} />
-        </div>
-        {numComments > 0 && (
-          <div className={styles.comments}>
-            <img src="/images/comment-outline.svg" className={styles.commentIcon} />
-            <span>{numComments}</span>
+    <div className="flex flex-col">
+      <TestRunLibraryRow>
+        <a
+          href={`/recording/${recordingId}?e2e=${e2e ?? ""}&apiKey=${apiKey ?? ""}`}
+          className={styles.recordingLink}
+          data-test-id="TestRunResultsListItem"
+          data-test-status={label}
+          onClick={() => trackEvent("test_dashboard.open_replay", { view: "runs", result: label })}
+        >
+          <StatusIcon status={label} isProcessed={isProcessed} />
+          <div className={`${styles.fileInfo} gap-1`}>
+            <div className={styles.title}>{title || "Test"}</div>
+            <RecordingAttributes recording={recording} testRun={testRun} />
           </div>
-        )}
-      </a>
-    </TestRunLibraryRow>
+          {numComments > 0 && (
+            <div className={styles.comments}>
+              <img src="/images/comment-outline.svg" className={styles.commentIcon} />
+              <span>{numComments}</span>
+            </div>
+          )}
+        </a>
+      </TestRunLibraryRow>
+      {recording.rootCauseAnalysis ? (
+        <RootCauseDisplay analysis={recording.rootCauseAnalysis} />
+      ) : null}
+    </div>
+  );
+}
+
+function RootCauseDisplay({
+  analysis,
+}: {
+  analysis: GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_executions_recordings_rootCauseAnalysis;
+}) {
+  const [collapsed, setCollapsed] = useState(true);
+  const { result, skipReason, discrepancies } = analysis.result as {
+    result: string;
+    skipReason: string;
+    discrepancies: any[];
+  };
+
+  if (result === "Skipped") {
+    return <div className="pl-9">Analysis skipped: {skipReason}</div>;
+  }
+
+  return (
+    <div className="flex flex-col gap-2 pl-9">
+      <button onClick={() => setCollapsed(!collapsed)} className="flex flex-row gap-1">
+        <div className="font-mono">{collapsed ? "▶" : "▼"}</div>
+        <div>Root cause available</div>
+      </button>
+      {discrepancies && !collapsed
+        ? discrepancies.map((d, i) => <RootCause key={i} discrepancy={d} />)
+        : null}
+    </div>
   );
 }
