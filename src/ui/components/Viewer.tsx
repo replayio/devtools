@@ -48,7 +48,7 @@ const Vertical = ({ toolboxLayout }: { toolboxLayout: ToolboxLayout }) => {
       {toolboxLayout !== "full" && (
         <>
           <Panel
-            className="flex-column flex flex-1"
+            className="overflow-hidden"
             collapsible
             defaultSize={50}
             id="Panel-Video"
@@ -58,9 +58,7 @@ const Vertical = ({ toolboxLayout }: { toolboxLayout: ToolboxLayout }) => {
             order={1}
             ref={videoPanelRef}
           >
-            <div className="flex-column flex flex-1">
-              <Video />
-            </div>
+            <Video />
           </Panel>
           <PanelResizeHandle className={videoPanelCollapsed ? "" : "h-1 w-full shrink-0"} />
         </>
