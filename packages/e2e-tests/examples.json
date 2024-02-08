@@ -26,6 +26,11 @@
     "buildId": "linux-chromium-20240123-609ec6caa105-50d01be708a2",
     "requiresManualUpdate": true
   },
+  "deleted-replay": {
+    "recording": "94f1729a-3aab-449b-98d6-10865a5e83c5",
+    "buildId": "linux-chromium-20240126-c9de98d17d37-50d01be708a2",
+    "requiresManualUpdate": true
+  },
   "doc_async.html": {
     "recording": "22857e2a-e6f9-4d79-b9b4-b3eaf293d326",
     "buildId": "linux-chromium-20240126-c9de98d17d37-50d01be708a2"
