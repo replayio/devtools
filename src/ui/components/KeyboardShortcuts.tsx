@@ -129,10 +129,8 @@ function KeyboardShortcuts({
       if (!e.target || !isEditableElement(e.target)) {
         e.preventDefault();
 
-        const canvas = document.querySelector("canvas#graphics");
-        const typeData = canvas
-          ? await createTypeDataForVisualComment(canvas as HTMLCanvasElement, null, null)
-          : null;
+        const image = document.getElementById("graphics");
+        const typeData = image ? await createTypeDataForVisualComment(image, null, null) : null;
 
         createFrameComment(null, recordingId, typeData);
       }

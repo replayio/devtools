@@ -8,7 +8,6 @@ import { UIState } from "ui/state";
 import {
   AppMode,
   AppState,
-  Canvas,
   ExpectedError,
   ModalOptionsType,
   ModalType,
@@ -22,7 +21,6 @@ const { commentId } = getMutableParamsFromURL();
 export const initialAppState: AppState = {
   accessToken: null,
   awaitingSourcemaps: false,
-  canvas: null,
   defaultSelectedReactElementId: null,
   defaultSettingsTab: "Preferences",
   displayedLoadingProgress: null,
@@ -96,9 +94,6 @@ const appSlice = createSlice({
         };
       },
     },
-    setCanvas(state, action: PayloadAction<Canvas>) {
-      state.canvas = action.payload;
-    },
     setDefaultSelectedReactElementId(state, action: PayloadAction<number | null>) {
       state.defaultSelectedReactElementId = action.payload;
     },
@@ -135,7 +130,6 @@ export const {
   clearExpectedError,
   setAppMode,
   setAwaitingSourcemaps,
-  setCanvas,
   setDefaultSelectedReactElementId,
   setDefaultSettingsTab,
   setExpectedError,
@@ -176,7 +170,6 @@ export const getDefaultSelectedReactElementId = (state: UIState) =>
   state.app.defaultSelectedReactElementId;
 export const getSelectedCommentId = (state: UIState) => state.app.selectedCommentId;
 
-export const getCanvas = (state: UIState) => state.app.canvas;
 export const getDefaultSettingsTab = (state: UIState) => state.app.defaultSettingsTab;
 export const getRecordingTarget = (state: UIState) => state.app.recordingTarget;
 export const getRecordingWorkspace = (state: UIState) => state.app.recordingWorkspace;

@@ -4,6 +4,7 @@ import {
   findConsoleMessage,
   openConsolePanel,
 } from "../helpers/console-panel";
+import { findElementCoordinates, openElementsPanel } from "../helpers/elements-panel";
 import {
   enableComponentPicker,
   getComponentName,
@@ -59,6 +60,9 @@ test("react_devtools-01: Basic RDT behavior", async ({
   // And back to a later point should still work
   await jumpToMessageAndCheckComponents(page, "Added an entry", 4);
 
+  // Simplify test by jumping to a point where there's only one <li> so we can easily select it
+  await jumpToMessageAndCheckComponents(page, "Initial list", 3);
+
   // Verify that the React component picker
   // works, by manually calculating the coordinates of
   // a DOM node in the recording, activating the picker,
@@ -70,8 +74,9 @@ test("react_devtools-01: Basic RDT behavior", async ({
   const right = +(await getGetterValue(message, "right"));
   const top = +(await getGetterValue(message, "top"));
   const bottom = +(await getGetterValue(message, "bottom"));
-  const x = (left + right) / 2;
-  const y = (top + bottom) / 2;
+
+  await openElementsPanel(page);
+  const { x, y } = await findElementCoordinates(page, "<li>");
 
   await openReactDevtoolsPanel(page);
   await enableComponentPicker(page);

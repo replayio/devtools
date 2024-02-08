@@ -156,8 +156,8 @@ export async function addVisualComment(
   await addCommentHelper(
     page,
     async () => {
-      const canvasLocator = page.locator("canvas#graphics");
-      await canvasLocator.click({ position: { x, y } });
+      const element = page.locator("#graphics");
+      await element.click({ position: { x, y } });
     },
     "visual",
     text

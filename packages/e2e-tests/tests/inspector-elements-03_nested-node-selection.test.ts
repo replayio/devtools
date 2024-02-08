@@ -68,7 +68,7 @@ test("inspector-elements-03: Nested node picker and selection behavior", async (
     expect(numChildren).toBe(0);
   });
 
-  const canvas = page.locator("canvas#graphics");
+  const element = page.locator("#graphics");
   const rulesContainer = page.locator('[data-test-id="RulesPanel"]');
 
   const bodyTag = await getElementsListRow(page, { text: "body", type: "opening" });
@@ -79,7 +79,7 @@ test("inspector-elements-03: Nested node picker and selection behavior", async (
   // This should select a `<div class="box1">`, 3 levels deep
   await verifyStackingTestCaseSelectedElementUnderCursor(
     page,
-    canvas,
+    element,
     rulesContainer,
     stackingCaseR3C2
   );

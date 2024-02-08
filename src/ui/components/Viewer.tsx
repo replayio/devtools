@@ -9,7 +9,7 @@ import {
 import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import useLocalStorageUserData from "shared/user-data/LocalStorage/useLocalStorageUserData";
-import Video from "ui/components/Video";
+import Video from "ui/components/Video/Video";
 import { getToolboxLayout } from "ui/reducers/layout";
 import { useAppSelector } from "ui/setup/hooks";
 import { ToolboxLayout } from "ui/state/layout";

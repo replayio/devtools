@@ -13,7 +13,7 @@ import {
 import { highlightNode, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 import { useMostRecentLoadedPause } from "replay-next/src/hooks/useMostRecentLoadedPause";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { mouseEventCanvasPosition } from "shared/utils/canvas";
+import { getMouseEventPosition } from "ui/components/Video/getMouseEventPosition";
 import { useAppDispatch } from "ui/setup/hooks";
 import { boundingRectsCache, getMouseTarget } from "ui/suspense/nodeCaches";
 
@@ -146,8 +146,8 @@ export function NodePickerContextRoot({ children }: PropsWithChildren<{}>) {
     }
 
     // HACK The HTMLCanvasElement is only accessible via the DOM
-    const canvas = document.getElementById("graphics");
-    if (canvas == null) {
+    const graphicsElement = document.getElementById("graphics");
+    if (graphicsElement == null) {
       console.error("Canvas not found");
       return;
     }
@@ -158,7 +158,7 @@ export function NodePickerContextRoot({ children }: PropsWithChildren<{}>) {
     const { limitToNodeIds, onSelected } = options;
 
     const getNodeIdForMouseEvent = async (event: MouseEvent) => {
-      const position = mouseEventCanvasPosition(event, canvas);
+      const position = getMouseEventPosition(event);
       if (position != null) {
         const { x, y } = position;
 
@@ -208,8 +208,8 @@ export function NodePickerContextRoot({ children }: PropsWithChildren<{}>) {
     };
 
     setTimeout(() => {
-      canvas.addEventListener("click", onCanvasMouseClick);
-      canvas.addEventListener("mousemove", onCanvasMouseMove);
+      graphicsElement.addEventListener("click", onCanvasMouseClick);
+      graphicsElement.addEventListener("mousemove", onCanvasMouseMove);
       document.addEventListener("click", onDocumentClicked);
     }, 0);
 
@@ -219,8 +219,8 @@ export function NodePickerContextRoot({ children }: PropsWithChildren<{}>) {
     // although showing one picker should dismiss another active picker
     // The easiest way to accomplish this is to add the document handler after the click has finished processing
     return () => {
-      canvas.removeEventListener("click", onCanvasMouseClick);
-      canvas.removeEventListener("mousemove", onCanvasMouseMove);
+      graphicsElement.removeEventListener("click", onCanvasMouseClick);
+      graphicsElement.removeEventListener("mousemove", onCanvasMouseMove);
       document.removeEventListener("click", onDocumentClicked);
     };
   }, [disable, dispatch, pauseId, replayClient, state]);

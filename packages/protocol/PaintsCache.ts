@@ -1,7 +1,7 @@
 import { createSingleEntryCache } from "suspense";
 
+import { StreamingScreenShotCache } from "protocol/StreamingScreenShotCache";
 import { recordingTargetCache } from "replay-next/src/suspense/BuildIdCache";
-import { screenshotCache } from "replay-next/src/suspense/ScreenshotCache";
 import { find, findIndexGTE, findIndexLTE } from "replay-next/src/utils/array";
 import { getDimensions } from "replay-next/src/utils/image";
 import { replayClient } from "shared/client/ReplayClientContext";
@@ -41,17 +41,18 @@ export async function findFirstMeaningfulPaint() {
       const paint = paints[index];
 
       try {
-        const { data, hash, mimeType } = await screenshotCache.readAsync(
+        const { value } = await StreamingScreenShotCache.readAsync(
           replayClient,
-          paint.point,
-          paint.paintHash
+          paint.time,
+          paint.point
         );
+        if (value && value.hash) {
+          const { width, height } = await getDimensions(value.hash, value.mimeType);
 
-        const { width, height } = await getDimensions(hash, mimeType);
-
-        // Estimate how interesting the image is by the unique pixel density (given an arbitrary image size)
-        if (data.length > (width * height) / 40) {
-          return paint;
+          // Estimate how interesting the image is by the unique pixel density (given an arbitrary image size)
+          if (value.data.length > (width * height) / 40) {
+            return paint;
+          }
         }
       } catch (error) {
         console.warn(error);

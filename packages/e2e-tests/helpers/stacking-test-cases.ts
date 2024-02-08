@@ -1,6 +1,7 @@
 import { Locator, Page, expect } from "@playwright/test";
 
 import { openAppliedRulesTab, openElementsPanel, selectRootElementsRow } from "./elements-panel";
+import { getGraphicsElementScale } from "./screenshot";
 import { debugPrint, waitFor } from "./utils";
 
 // `doc_stacking.html` data and utils
@@ -138,7 +139,7 @@ export const stackingTestCases: StackingTestCase[] = [
 
 export async function verifyStackingTestCaseSelectedElementUnderCursor(
   page: Page,
-  canvas: Locator,
+  graphics: Locator,
   rulesContainer: Locator,
   testCase: StackingTestCase
 ) {
@@ -154,7 +155,7 @@ export async function verifyStackingTestCaseSelectedElementUnderCursor(
   // page size. We'll need to alter where we click on page by the same scale,
   // in order to correctly click on the intended elements from original x/y coords.
   // Grab the `transform` style from the canvas node and parse out the scale factor.
-  const scale = await readCanvasTransformScale(canvas);
+  const scale = await getGraphicsElementScale(page);
 
   // Click the "Select an Element from Preview" button
   await page.locator("#command-button-pick").click();
@@ -165,7 +166,7 @@ export async function verifyStackingTestCaseSelectedElementUnderCursor(
     y: testCase.position.y * scale,
   };
 
-  await canvas.hover({
+  await graphics.hover({
     position,
   });
 
@@ -175,7 +176,7 @@ export async function verifyStackingTestCaseSelectedElementUnderCursor(
   );
 
   // Click the corresponding spot in the preview canvas
-  await canvas.click({
+  await graphics.click({
     position,
     force: true,
   });
@@ -194,15 +195,4 @@ export async function verifyStackingTestCaseSelectedElementUnderCursor(
       expect(textContent?.startsWith(testCase.expectedRules[index])).toBe(true);
     }
   });
-}
-
-async function readCanvasTransformScale(canvas: Locator) {
-  const canvasTransformString = await canvas.evaluate(node => {
-    return node.style.transform;
-  });
-  // simpler to rewrite "scale(0.123)" by replacing than regexing right now
-  const scaleString = canvasTransformString.replace("scale(", "").replace(")", "");
-
-  const scale = Number(scaleString);
-  return scale;
 }

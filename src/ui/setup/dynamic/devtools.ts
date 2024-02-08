@@ -8,13 +8,6 @@ import { setupSourcesListeners } from "devtools/client/debugger/src/actions/sour
 import * as dbgClient from "devtools/client/debugger/src/client";
 import debuggerReducers from "devtools/client/debugger/src/reducers";
 import * as inspectorReducers from "devtools/client/inspector/reducers";
-import {
-  Canvas,
-  setPausedonPausedAtTimeCallback,
-  setPlaybackStatusCallback,
-  setRefreshGraphicsCallback,
-  setupGraphics,
-} from "protocol/graphics";
 // eslint-disable-next-line no-restricted-imports
 import { addEventListener, initSocket, client as protocolClient } from "protocol/socket";
 import { assert } from "protocol/utils";
@@ -25,13 +18,11 @@ import { ReplayClientInterface } from "shared/client/types";
 import { CONSOLE_SETTINGS_DATABASE, POINTS_DATABASE } from "shared/user-data/IndexedDB/config";
 import { IDBOptions } from "shared/user-data/IndexedDB/types";
 import { UIStore, actions } from "ui/actions";
-import { setCanvas } from "ui/actions/app";
-import { precacheScreenshots } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
 import app from "ui/reducers/app";
 import network from "ui/reducers/network";
 import protocolMessages from "ui/reducers/protocolMessages";
-import timeline, { setPlaybackStalled } from "ui/reducers/timeline";
+import timeline from "ui/reducers/timeline";
 import { setUpUrlParamsListener } from "ui/setup/dynamic/url";
 import { UIState } from "ui/state";
 import { ExpectedError, UnexpectedError } from "ui/state/app";
@@ -206,7 +197,6 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
 
   setupApp(store, replayClient);
   setupTimeline(store);
-  setupGraphics(store);
 
   networkRequestsCache.prefetch(replayClient);
 
@@ -216,20 +206,6 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
     annotationKindsCache.prefetch(replayClient, REDUX_ANNOTATIONS_KIND);
     reactDevToolsAnnotationsCache.prefetch(replayClient);
     eventListenersJumpLocationsCache.prefetch(replayClient);
-  });
-
-  // Add protocol event listeners for things that the Redux store needs to stay in sync with.
-  // TODO We should revisit this as part of a larger architectural redesign (#6932).
-
-  setPausedonPausedAtTimeCallback((time: number) => {
-    store.dispatch(precacheScreenshots(time));
-  });
-  setPlaybackStatusCallback((stalled: boolean) => {
-    store.dispatch(setPlaybackStalled(stalled));
-  });
-
-  setRefreshGraphicsCallback((canvas: Canvas) => {
-    store.dispatch(setCanvas(canvas));
   });
 
   setUpUrlParamsListener(store, replayClient);

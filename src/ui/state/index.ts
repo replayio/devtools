@@ -25,7 +25,6 @@ export interface UIState {
   ast: ASTState;
   asyncRequests: AsyncRequestsState;
   computed: ComputedState;
-  sources: NewSourcesState;
   inspector: InspectorState;
   layout: LayoutState;
   markup: MarkupState;
@@ -35,6 +34,7 @@ export interface UIState {
   protocolMessages: ProtocolMessagesState;
   quickOpen: QuickOpenState;
   reactDevTools: ReactDevToolsState;
+  sources: NewSourcesState;
   sourceTree: SourceTreeState;
   tabs: TabsState;
   threads: ThreadsState;
