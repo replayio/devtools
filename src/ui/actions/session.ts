@@ -150,6 +150,7 @@ function getDeletedRecordingError(): ExpectedError {
     message: "Recording Deleted",
     content: "This recording has been deleted.",
     action: "library",
+    dataTestId: "Error-RecordingDeleted",
   };
 }
 
