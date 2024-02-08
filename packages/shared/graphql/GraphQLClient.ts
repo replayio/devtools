@@ -1,5 +1,7 @@
 import { DocumentNode } from "graphql";
 
+import { graphqlClientIdHeader } from "shared/graphql/clientIdHeader";
+
 type Data = {
   operationName: string;
   query: string | DocumentNode;
@@ -52,7 +54,10 @@ export class GraphQLClient implements GraphQLClientInterface {
 
     const response = await fetch(this.url, {
       method: "POST",
-      headers,
+      headers: {
+        ...headers,
+        ...graphqlClientIdHeader(),
+      },
       body: JSON.stringify(data),
     });
 

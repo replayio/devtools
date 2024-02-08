@@ -19,6 +19,7 @@ import { createClient } from "graphql-ws";
 import memoizeOne from "memoize-one";
 
 import { defer } from "protocol/utils";
+import { graphqlClientIdHeader } from "shared/graphql/clientIdHeader";
 import { hasApiKey, isTest } from "shared/utils/environment";
 
 export let clientWaiter = defer<ApolloClient<NormalizedCacheObject>>();
@@ -116,7 +117,9 @@ export function createApolloCache() {
 }
 
 function createHttpLink(token: string | undefined, testScope: string | null) {
-  const headers: Record<string, string> = {};
+  const headers: Record<string, string> = {
+    ...graphqlClientIdHeader(),
+  };
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
   }
