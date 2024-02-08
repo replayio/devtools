@@ -79,6 +79,7 @@ export default function Video() {
   const screenShotToRender = useDisplayedScreenShot(screenShot, timeToSuspend);
 
   const showLoader = progress < 1 && playbackTime == null;
+  const showBeforeAfterTestStepToggles = panel === "cypress";
 
   let showError = false;
   if (status === "loading-failed") {
@@ -123,7 +124,7 @@ export default function Video() {
           Could not load screenshot
         </div>
       )}
-      {panel === "cypress" && <ToggleButton />}
+      {showBeforeAfterTestStepToggles && <ToggleButton />}
       {contextMenu}
     </div>
   );

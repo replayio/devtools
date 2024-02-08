@@ -49,7 +49,8 @@ export async function findFirstMeaningfulPaint() {
         if (value && value.hash) {
           const { width, height } = await getDimensions(value.hash, value.mimeType);
 
-          // Estimate how interesting the image is by the unique pixel density (given an arbitrary image size)
+          // Estimate how "interesting" the screen is based on what % of the image is different pixels.
+          // This is done to avoid showing something like a blank page or a mostly empty loading screen.
           if (value.data.length > (width * height) / 40) {
             return paint;
           }

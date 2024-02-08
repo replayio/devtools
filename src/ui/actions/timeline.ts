@@ -170,12 +170,11 @@ export async function getInitialPausePoint(recordingId: string) {
   }
 }
 
-export function setHoverTime(time: number | null, updateGraphics = true): UIThunkAction {
-  return dispatch => {
-    dispatch(
-      setTimelineState({ hoverTime: time, showHoverTimeGraphics: updateGraphics && time != null })
-    );
-  };
+export function setHoverTime(time: number | null, updateGraphics = true) {
+  return setTimelineState({
+    hoverTime: time,
+    showHoverTimeGraphics: updateGraphics && time != null,
+  });
 }
 
 export function step(command: FindTargetCommand): UIThunkAction<Promise<any>> {
@@ -275,13 +274,15 @@ export function seek({
 
         const nearestPaint = findMostRecentPaint(clampedTime);
         const nearestMouseEvent = findMostRecentMouseEvent(clampedTime);
-        const nearestEvent =
-          nearestPaint && nearestMouseEvent
-            ? Math.abs(nearestPaint.time - clampedTime) <
-              Math.abs(nearestMouseEvent.time - clampedTime)
+
+        let nearestEvent = nearestPaint ?? nearestMouseEvent ?? null;
+        if (nearestPaint && nearestMouseEvent) {
+          nearestEvent =
+            Math.abs(nearestPaint.time - clampedTime) <
+            Math.abs(nearestMouseEvent.time - clampedTime)
               ? nearestPaint
-              : nearestMouseEvent
-            : nearestPaint ?? nearestMouseEvent ?? null;
+              : nearestMouseEvent;
+        }
 
         const timeStampedPoint = await replayClient.getPointNearTime(clampedTime);
         if (getSeekLock(getState()) !== seekLock) {

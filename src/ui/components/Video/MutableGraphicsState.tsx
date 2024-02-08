@@ -11,6 +11,8 @@
 //
 // This approach is unusual, but it's arguably cleaner than sharing these values via the DOM.
 
+import { shallowEqual } from "shared/utils/compare";
+
 export interface GraphicsState {
   height: number;
   left: number;
@@ -43,6 +45,7 @@ export function subscribe(callback: Callback): Unsubscribe {
     subscribers.delete(callback);
   };
 }
+
 export function update({ element, scale }: { element: HTMLImageElement; scale?: number }) {
   const { clientHeight, clientWidth, naturalWidth } = element;
 
@@ -52,20 +55,17 @@ export function update({ element, scale }: { element: HTMLImageElement; scale?: 
     : clientWidth / naturalWidth;
   const recordingScale = scale ?? mutableState.recordingScale;
 
-  if (
-    mutableState.height != clientHeight ||
-    mutableState.left != left ||
-    mutableState.localScale != localScale ||
-    mutableState.recordingScale != recordingScale ||
-    mutableState.top != top ||
-    mutableState.width != clientWidth
-  ) {
-    mutableState.height = clientHeight;
-    mutableState.left = left;
-    mutableState.localScale = localScale;
-    mutableState.recordingScale = recordingScale;
-    mutableState.top = top;
-    mutableState.width = clientWidth;
+  const state: GraphicsState = {
+    height: clientHeight,
+    left,
+    localScale,
+    recordingScale,
+    top,
+    width: clientWidth,
+  };
+
+  if (!shallowEqual(mutableState, state)) {
+    Object.assign(mutableState, state);
 
     subscribers.forEach(callback => {
       callback(mutableState);

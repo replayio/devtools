@@ -20,8 +20,8 @@ export const RepaintGraphicsCache: Cache<
 
 type StreamingScreenShotCacheStatus =
   | "complete"
-  | "loading-imprecise"
-  | "loading-precise"
+  | "fetching-cached-paint"
+  | "fetching-repaint"
   | "loading-failed";
 
 export const StreamingScreenShotCache = createStreamingCache<
@@ -34,7 +34,7 @@ export const StreamingScreenShotCache = createStreamingCache<
   load: async ({ update, reject, resolve }, replayClient, time, executionPoint) => {
     let screenShot: ScreenShot | undefined = undefined;
 
-    update(screenShot, 0, "loading-imprecise");
+    update(screenShot, 0, "fetching-cached-paint");
 
     let didLoadImpreciseScreenShot = false;
 
@@ -59,7 +59,7 @@ export const StreamingScreenShotCache = createStreamingCache<
 
           return;
         } else {
-          update(screenShot, 0.5, "loading-precise");
+          update(screenShot, 0.5, "fetching-repaint");
         }
       } catch (error) {
         update(undefined, 1, "loading-failed");
