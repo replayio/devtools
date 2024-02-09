@@ -152,8 +152,6 @@ export default function run_fe_tests(CHROME_BINARY_PATH, runInCI = true, nWorker
   process.env.HASURA_ADMIN_SECRET ||= getSecret("prod/hasura-admin-secret", "us-east-2");
   process.env.DISPATCH_ADDRESS ||= "wss://dispatch.replay.io";
   process.env.AUTHENTICATED_TESTS_WORKSPACE_API_KEY = process.env.RECORD_REPLAY_API_KEY;
-  // TODO: https://linear.app/replay/issue/FE-2237/
-  process.env.PLAYWRIGHT_TEST_BASE_URL ||= "https://app.replay.io";
   process.env.RECORD_REPLAY_METADATA_SOURCE_REPOSITORY ||= githubUrlToRepository(
     process.env.RUNTIME_REPO
   );
@@ -208,7 +206,15 @@ export default function run_fe_tests(CHROME_BINARY_PATH, runInCI = true, nWorker
         `${envWrapper} ${path.join(
           "scripts/save-examples.ts"
         )} --runtime=chromium --target=browser ${examplesCfg}`,
-        { cwd: TestRootPath, stdio: "inherit", env: process.env }
+        {
+          cwd: TestRootPath,
+          stdio: "inherit",
+          env: {
+            ...process.env,
+            // Run the tests against the local dev server.
+            PLAYWRIGHT_TEST_BASE_URL: "http://localhost:8080",
+          },
+        }
       );
 
       // Without the wait, the next xvfb-run command can fail.
@@ -230,6 +236,8 @@ export default function run_fe_tests(CHROME_BINARY_PATH, runInCI = true, nWorker
           stdio: "inherit",
           env: {
             ...process.env,
+            // Replay the tests against prod backend devtools.
+            PLAYWRIGHT_TEST_BASE_URL: "https://app.replay.io",
             REPLAY_API_KEY: process.env.RUNTIME_TEAM_API_KEY,
             REPLAY_UPLOAD: "1",
           },
