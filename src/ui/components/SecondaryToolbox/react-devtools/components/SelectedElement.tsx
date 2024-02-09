@@ -70,7 +70,7 @@ export function SelectedElement({
 
   const [inspectedElement, [, fiberIdsToNodeIds]] = suspendInParallel(
     () => inspectedElementCache.read(replayClient, bridge, store, replayWall, pauseId, id),
-    () => nodesToFiberIdsCache.read(replayClient, pauseId!, store)
+    () => nodesToFiberIdsCache.read(replayClient, pauseId!, replayWall)
   );
 
   if (inspectedElement == null) {

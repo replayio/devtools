@@ -1,6 +1,7 @@
 import { ObjectId } from "@replayio/protocol";
 import type { SerializedElement, Store, Wall } from "@replayio/react-devtools-inline/frontend";
 import React from "react";
+import { Deferred, createDeferred } from "suspense";
 
 import { assert } from "protocol/utils";
 import { recordingTargetCache } from "replay-next/src/suspense/BuildIdCache";
@@ -25,6 +26,7 @@ export type StoreWithInternals = Store & {
 };
 
 export class ReplayWall implements Wall {
+  private _pauseIdToDeferredMap: Map<string, Deferred<void>> = new Map();
   private disableNodePicker: NodePickerContextType["disable"];
   private dismissInspectComponentNag: () => void;
   private enableNodePicker: NodePickerContextType["enable"];
@@ -67,6 +69,27 @@ export class ReplayWall implements Wall {
 
   setPauseId(pauseId: string) {
     this.pauseId = pauseId;
+
+    const deferred = this._pauseIdToDeferredMap.get(pauseId);
+    if (deferred != null && deferred.status === "pending") {
+      deferred.resolve();
+    }
+  }
+
+  waitForPauseId(pauseId: string) {
+    let deferred = this._pauseIdToDeferredMap.get(pauseId);
+    if (deferred == null) {
+      deferred = createDeferred<void>("wait-for-pause-id");
+      this._pauseIdToDeferredMap.set(pauseId, deferred);
+    }
+
+    if (this.pauseId === pauseId) {
+      if (deferred.status === "pending") {
+        deferred.resolve();
+      }
+    }
+
+    return deferred.promise;
   }
 
   // called by the frontend to register a listener for receiving backend messages
@@ -133,7 +156,7 @@ export class ReplayWall implements Wall {
           const [, fiberIdsToNodeIds] = await nodesToFiberIdsCache.readAsync(
             replayClient,
             pauseId,
-            store
+            this
           );
 
           // Get the first node ID we found for this fiber ID, if available.
@@ -181,7 +204,7 @@ export class ReplayWall implements Wall {
               type: "reactComponent",
             },
             async () => {
-              const result = await nodesToFiberIdsCache.readAsync(replayClient, pauseId, store);
+              const result = await nodesToFiberIdsCache.readAsync(replayClient, pauseId, this);
 
               nodeIdsToFiberIds = result[0];
 

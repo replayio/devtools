@@ -1,3 +1,4 @@
+import assert from "assert";
 import { ObjectId, PauseId } from "@replayio/protocol";
 import type { RendererInterface } from "@replayio/react-devtools-inline";
 import type { DevToolsHook } from "@replayio/react-devtools-inline/backend";
@@ -9,6 +10,7 @@ import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { pauseEvaluationsCache } from "replay-next/src/suspense/PauseCache";
 import { evaluate } from "replay-next/src/utils/evaluate";
 import { ReplayClientInterface } from "shared/client/types";
+import { ReplayWall } from "ui/components/SecondaryToolbox/react-devtools/ReplayWall";
 import { ChunksArray, deserializeChunkedString } from "ui/utils/evalChunkedStrings";
 
 // Our modified RDT bundle exports some additional methods
@@ -237,13 +239,18 @@ function getComponentSpecificNodesToFiberIDs(
 }
 
 export const nodesToFiberIdsCache: Cache<
-  [replayClient: ReplayClientInterface, pauseId: string, store: StoreWithInternals],
+  [replayClient: ReplayClientInterface, pauseId: string, wall: ReplayWall],
   [Map<ObjectId, number>, Map<number, ObjectId[]>]
 > = createCache({
   debugLabel: "nodesToFiberIdsCache",
   // simplifying assumption that the store will have the same contents at a pause ID
-  getKey: ([replayClient, pauseId, store]) => pauseId,
-  async load([replayClient, pauseId, store]) {
+  getKey: ([replayClient, pauseId, wall]) => pauseId,
+  async load([replayClient, pauseId, wall]) {
+    await wall.waitForPauseId(pauseId);
+
+    const { store } = wall;
+    assert(store);
+
     const nodeIdsToFiberIds = new Map<ObjectId, number>();
 
     const rendererIdsToFiberIds: Record<number, number[]> = {};
@@ -251,8 +258,10 @@ export const nodesToFiberIdsCache: Cache<
     const recordingCapabilities = recordingCapabilitiesCache.getValueIfCached(replayClient)!;
 
     // Figure out all of the current fiber IDs we expect exist at this point in time
-    for (const rootID of store!.roots) {
-      const rendererId = store!.rootIDToRendererID.get(rootID)!;
+    for (const rootID of store.roots) {
+      const rendererId = store.rootIDToRendererID.get(rootID);
+      assert(rendererId != null);
+
       const elementIDs = collectElementIDs(store, rootID);
 
       if (!(rendererId in rendererIdsToFiberIds)) {
