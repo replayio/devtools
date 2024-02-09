@@ -22,6 +22,7 @@ export interface TimelineState {
   playback: {
     beginTime: number;
     beginDate: number;
+    endTime: number;
     time: number;
   } | null;
   playbackFocusWindow: boolean;
@@ -30,6 +31,7 @@ export interface TimelineState {
   recordingDuration: number | null;
   shouldAnimate: boolean;
   showFocusModeControls: boolean;
+  showHoverTimeGraphics: boolean;
   stalled?: boolean;
   timelineDimensions: { width: number; left: number; top: number };
   zoomRegion: ZoomRegion;
@@ -53,8 +55,6 @@ export enum FocusOperation {
 }
 
 export type PlaybackOptions = {
-  beginPoint?: string;
-  endPoint?: string;
   beginTime: number | null;
   endTime: number | null;
 };

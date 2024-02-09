@@ -16,7 +16,7 @@ test("repaint: repaints the screen screen when stepping over code that modifies 
   await addBreakpoint(page, { lineNumber: 50, url: "doc_control_flow.html" });
   await rewindToLine(page, 50);
 
-  const prevDataUrl = await getCanvasDataUrl(page);
+  const prevSource = await getScreenShotSource(page);
 
   // this steps over a (synchronous) DOM update. The recorded screenshot for the point after the step
   // will not have changed (because the browser doesn't repaint in the middle of javascript execution),
@@ -25,17 +25,17 @@ test("repaint: repaints the screen screen when stepping over code that modifies 
   await waitForPaused(page);
 
   await waitFor(async () => {
-    const nextDataUrl = await getCanvasDataUrl(page);
-    if (prevDataUrl === nextDataUrl) {
+    const nextSource = await getScreenShotSource(page);
+    if (prevSource === nextSource) {
       throw `The screenshot did not change`;
     }
   });
 });
 
-async function getCanvasDataUrl(page: Page): Promise<string> {
+async function getScreenShotSource(page: Page): Promise<string> {
   const dataUrl = await page.evaluate(() => {
-    const canvas = document.querySelector("#graphics") as HTMLCanvasElement;
-    return canvas.toDataURL();
+    const element = document.querySelector("#graphics") as HTMLImageElement;
+    return element.src;
   });
   return dataUrl;
 }

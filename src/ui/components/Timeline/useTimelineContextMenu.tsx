@@ -43,9 +43,8 @@ export default function useTimelineContextMenu() {
   };
 
   const addComment = async () => {
-    const canvas = document.querySelector("canvas#graphics");
-
-    const typeData = await createTypeDataForVisualComment(canvas as HTMLCanvasElement, null, null);
+    const image = document.getElementById("graphics");
+    const typeData = await createTypeDataForVisualComment(image, null, null);
 
     await dispatch(
       seek({

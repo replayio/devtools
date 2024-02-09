@@ -18,16 +18,6 @@ h2 {
   height: 100%;
 }
 
-#graphics {
-  position: absolute;
-  transform-origin: top left;
-  cursor: pointer;
-}
-
-.collapsed-toolbox #graphics {
-  position: absolute;
-}
-
 .command-button {
   float: left;
 }

@@ -69,9 +69,8 @@ function PlayFromHereMenuItem({ testEvent }: { testEvent: TestEvent }) {
 
   const dispatch = useAppDispatch();
 
-  const beginPoint = getTestEventExecutionPoint(testEvent);
   const endTimeStampedPoint = testRecording.timeStampedPointRange?.end ?? null;
-  if (beginPoint == null || endTimeStampedPoint == null) {
+  if (endTimeStampedPoint == null) {
     return null;
   }
 
@@ -80,9 +79,7 @@ function PlayFromHereMenuItem({ testEvent }: { testEvent: TestEvent }) {
 
     dispatch(
       startPlayback({
-        beginPoint,
         beginTime: getTestEventTime(testEvent),
-        endPoint: endTimeStampedPoint.point,
         endTime: endTimeStampedPoint.time,
       })
     );
@@ -114,9 +111,7 @@ function PlayToHereMenuItem({ testEvent }: { testEvent: TestEvent }) {
 
     dispatch(
       startPlayback({
-        beginPoint: beginTimeStampedPoint.point,
         beginTime: beginTimeStampedPoint.time,
-        endPoint,
         endTime: getTestEventTime(testEvent),
       })
     );

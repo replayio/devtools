@@ -7,12 +7,10 @@ import { preloadAllRecordedEventsCache } from "protocol/RecordedEventsCache";
 import { ReplayClientInterface } from "shared/client/types";
 import { getSystemColorScheme } from "shared/theme/getSystemColorScheme";
 import { userData } from "shared/user-data/GraphQL/UserData";
-import { shallowEqual } from "shared/utils/compare";
 import { getRecordingId } from "shared/utils/recording";
 import { CommandKey } from "ui/components/CommandPalette/CommandPalette";
-import { Canvas } from "ui/state/app";
 
-import { setCanvas as setCanvasAction, setModal, setSessionId } from "../reducers/app";
+import { setModal, setSessionId } from "../reducers/app";
 import {
   hideCommandPalette,
   setSelectedPanel,
@@ -35,18 +33,6 @@ export async function setupApp(store: UIStore, replayClient: ReplayClientInterfa
 
 export function hideModal() {
   return setModal(null, null);
-}
-
-export function setCanvas(canvas: Canvas): UIThunkAction {
-  return (dispatch, getState) => {
-    const { canvas: existingCanvas } = getState().app;
-
-    // Skip dispatching if the new canvas value is identical to what's in the store.
-    // This improves perf slightly, especially since this was dispatching frequently.
-    if (!shallowEqual(existingCanvas, canvas)) {
-      dispatch(setCanvasAction(canvas));
-    }
-  };
 }
 
 export function executeCommand(key: CommandKey): UIThunkAction {

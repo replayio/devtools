@@ -6,6 +6,7 @@ import {
 import { createSingleEntryCache } from "suspense";
 
 import { compareNumericStrings } from "protocol/utils";
+import { findIndexLTE } from "replay-next/src/utils/array";
 import { replayClient } from "shared/client/ReplayClientContext";
 
 // TODO [BAC-4618] Update the type definition in the protocol package
@@ -81,3 +82,15 @@ export const RecordedNavigationEventsCache = createSingleEntryCache<[], Navigati
     }));
   },
 });
+
+export function findMostRecentClickEvent(time: number) {
+  const events = RecordedClickEventsCache.getValueIfCached() ?? [];
+  const index = findIndexLTE(events, { time } as MouseEvent, (a, b) => a.time - b.time);
+  return index >= 0 ? events[index] : null;
+}
+
+export function findMostRecentMouseEvent(time: number) {
+  const events = RecordedMouseEventsCache.getValueIfCached() ?? [];
+  const index = findIndexLTE(events, { time } as MouseEvent, (a, b) => a.time - b.time);
+  return index >= 0 ? events[index] : null;
+}

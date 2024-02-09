@@ -19,8 +19,7 @@ export type CommentOptions = {
   type: CommentType;
   typeData: any | null;
 
-  // TODO [FE-1058]
-  // Legacy attributes that should eventually be deleted in favor of type/typeData
+  // TODO [FE-2251]Remove these legacy attributes
   networkRequestId?: string;
   position: CommentPosition | null;
   primaryLabel?: string | null;

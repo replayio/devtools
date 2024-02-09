@@ -1,4 +1,4 @@
-import React, { MouseEvent, RefObject, UIEvent, useContext, useEffect, useRef } from "react";
+import React, { MouseEvent, UIEvent, useContext, useEffect, useRef } from "react";
 import { ContextMenuItem, assertMouseEvent, useContextMenu } from "use-context-menu";
 
 import {
@@ -6,7 +6,6 @@ import {
   selectNode,
   unhighlightNode,
 } from "devtools/client/inspector/markup/actions/markup";
-import { assert } from "protocol/utils";
 import Icon from "replay-next/components/Icon";
 import { createTypeDataForVisualComment } from "replay-next/components/sources/utils/comments";
 import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
@@ -15,21 +14,17 @@ import { useMostRecentLoadedPause } from "replay-next/src/hooks/useMostRecentLoa
 import { useNag } from "replay-next/src/hooks/useNag";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Nag } from "shared/graphql/types";
-import { mouseEventCanvasPosition as getPositionForInspectingElement } from "shared/utils/canvas";
 import { createFrameComment } from "ui/actions/comments";
 import { setSelectedPanel, setViewMode } from "ui/actions/layout";
 import { stopPlayback } from "ui/actions/timeline";
+import { getMouseEventPosition } from "ui/components/Video/getMouseEventPosition";
 import { isPlaying as isPlayingSelector } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { boundingRectsCache, getMouseTarget } from "ui/suspense/nodeCaches";
 
 import styles from "./VideoContextMenu.module.css";
 
-export default function useVideoContextMenu({
-  canvasRef,
-}: {
-  canvasRef: RefObject<HTMLCanvasElement>;
-}) {
+export default function useVideoContextMenu() {
   const { showCommentsPanel } = useContext(InspectorContext);
   const replayClient = useContext(ReplayClientContext);
   const { accessToken, recordingId } = useContext(SessionContext);
@@ -64,13 +59,8 @@ export default function useVideoContextMenu({
       return;
     }
 
-    const canvas = document.querySelector("canvas#graphics");
-
-    const typeData = await createTypeDataForVisualComment(
-      canvas as HTMLCanvasElement,
-      pageX,
-      pageY
-    );
+    const image = document.getElementById("graphics");
+    const typeData = await createTypeDataForVisualComment(image, pageX, pageY);
 
     dispatch(createFrameComment(position, recordingId, typeData));
 
@@ -109,17 +99,13 @@ export default function useVideoContextMenu({
     }
 
     if (assertMouseEvent(event)) {
-      const canvas = canvasRef.current;
-      assert(canvas !== null);
-
       // Data needed for adding a comment:
       mouseEventDataRef.current.pageX = event.pageX;
       mouseEventDataRef.current.pageY = event.pageY;
       mouseEventDataRef.current.position = getPositionForAddingComment(event);
 
       // Data needed for inspecting an element:
-
-      const position = getPositionForInspectingElement(event.nativeEvent, canvas);
+      const position = getMouseEventPosition(event.nativeEvent);
       if (position != null) {
         const { x, y } = position;
 
@@ -182,10 +168,10 @@ export default function useVideoContextMenu({
 }
 
 function getPositionForAddingComment(event: MouseEvent): { x: number; y: number } {
-  const canvas = document.getElementById("graphics");
-  const bounds = canvas!.getBoundingClientRect();
+  const element = event.currentTarget as HTMLElement;
+  const bounds = element.getBoundingClientRect();
 
-  const scale = bounds.width / canvas!.offsetWidth;
+  const scale = bounds.width / element.offsetWidth;
 
   return {
     x: (event.clientX - bounds.left) / scale,

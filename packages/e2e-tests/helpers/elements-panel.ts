@@ -1,7 +1,8 @@
+import assert from "assert";
 import { Locator, Page, expect } from "@playwright/test";
 import chalk from "chalk";
 
-import { getScreenshotScale } from "./screenshot";
+import { getGraphicsElementScale } from "./screenshot";
 import { debugPrint, delay, waitFor } from "./utils";
 
 type ElementsListRowOptions = {
@@ -87,27 +88,27 @@ export async function findElementCoordinates(page: Page, partialText: string) {
     "findElementCoordinates"
   );
 
-  const canvasBounds = await page.evaluate(() => {
-    const canvas = document.getElementById("graphics");
-    return canvas!.getBoundingClientRect();
-  });
+  const containerBounds = await page.locator("#overlay-graphics").boundingBox();
+  assert(containerBounds);
 
   await page.locator(".box-model-regions").waitFor();
 
-  const highlightBounds = await page.evaluate(() => {
-    const highlight = document.querySelector(".box-model-regions");
-    return highlight!.getBoundingClientRect();
-  });
+  const highlightBounds = await page.locator(".box-model-regions").boundingBox();
+  assert(highlightBounds);
 
-  const xMin = (highlightBounds.left - canvasBounds.left) / canvasBounds.width;
-  const xMax = (highlightBounds.right - canvasBounds.left) / canvasBounds.width;
-  const yMin = (highlightBounds.top - canvasBounds.top) / canvasBounds.height;
-  const yMax = (highlightBounds.bottom - canvasBounds.top) / canvasBounds.height;
+  const relativeHighlightX = highlightBounds.x - containerBounds.x;
+  const relativeHighlightY = highlightBounds.y - containerBounds.y;
 
-  const x = xMin + (xMax - xMin) / 2;
-  const y = yMin + (yMax - yMin) / 2;
+  const x = (relativeHighlightX + highlightBounds.width / 2) / containerBounds.width;
+  const y = (relativeHighlightY + highlightBounds.height / 2) / containerBounds.height;
 
-  await debugPrint(page, `Found relative coordinates ${x}%, ${y}%`, "findElementCoordinates");
+  await debugPrint(
+    page,
+    `Found relative coordinates ${chalk.bold(x.toFixed(2))}%, ${chalk.bold(
+      y.toFixed(2)
+    )}% for element with text "${partialText}"`,
+    "findElementCoordinates"
+  );
 
   return { x, y };
 }
@@ -293,20 +294,19 @@ export async function inspectCanvasCoordinates(
   const pickerButton = page.locator('[title="Select an element in the video to inspect it"]')!;
   await pickerButton.click();
 
-  const canvas = page.locator("#graphics");
-  const heightString = await canvas.getAttribute("height");
-  const widthString = await canvas.getAttribute("width");
-  const height = parseFloat(heightString ?? "0");
-  const width = parseFloat(widthString ?? "0");
+  const graphicsElement = page.locator("#graphics");
+  const { width, height } = (await graphicsElement.boundingBox())!;
 
-  await canvas.getAttribute("scale");
+  expect(height).toBeGreaterThan(0);
+  expect(width).toBeGreaterThan(0);
+
   await debugPrint(
     page,
     `Canvas size ${chalk.bold(Math.round(width))}px by ${chalk.bold(Math.round(height))}px`,
     "inspectCanvasCoordinates"
   );
 
-  const scale = await getScreenshotScale(page);
+  const scale = await getGraphicsElementScale(page);
   const x = xPercentage * width * scale;
   const y = yPercentage * height * scale;
 
@@ -318,9 +318,9 @@ export async function inspectCanvasCoordinates(
     "inspectCanvasCoordinates"
   );
 
-  canvas.hover({ position: { x, y } });
+  graphicsElement.hover({ position: { x, y } });
   await delay(250);
-  canvas.click({ position: { x, y } });
+  graphicsElement.click({ position: { x, y } });
 }
 
 export async function openAppliedRulesTab(page: Page) {

@@ -73,7 +73,6 @@ export type NodePickerStatus = "disabled" | "initializing" | "active";
 export interface AppState {
   accessToken: string | null;
   awaitingSourcemaps: boolean;
-  canvas: Canvas | null;
   defaultSelectedReactElementId: number | null;
   defaultSettingsTab: SettingsTabTitle;
   displayedLoadingProgress: number | null;
@@ -97,12 +96,3 @@ export interface AppState {
 }
 
 export type AppMode = "devtools" | "sourcemap-visualizer";
-
-export interface Canvas {
-  gDevicePixelRatio: number;
-  height: number;
-  left: number;
-  scale: number;
-  top: number;
-  width: number;
-}

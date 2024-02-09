@@ -5,7 +5,6 @@ import {
   Location,
   PauseDescription,
   PauseId,
-  ScreenShot,
   TimeStampedPoint,
   TimeStampedPointRange,
 } from "@replayio/protocol";
@@ -18,7 +17,6 @@ import {
   getThreadContext,
   pauseCreationFailed,
   paused,
-  resumed,
 } from "devtools/client/debugger/src/reducers/pause";
 import {
   clearQueuedCommands,
@@ -36,19 +34,12 @@ import {
 } from "devtools/client/debugger/src/selectors";
 import { unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 import {
-  addScreenForPoint,
-  gPaintPoints,
-  getFirstMeaningfulPaint,
-  getGraphicsAtTime,
-  mostRecentIndex,
-  mostRecentPaintOrMouseEvent,
-  nextPaintEvent,
-  nextPaintOrMouseEvent,
-  paintGraphics,
-  previousPaintEvent,
-} from "protocol/graphics";
-import { findMostRecentPaint } from "protocol/PaintsCache";
-import { waitForTime } from "protocol/utils";
+  findFirstMeaningfulPaint,
+  findMostRecentPaint,
+  findNextPaintEvent,
+  findPreviousPaintEvent,
+} from "protocol/PaintsCache";
+import { findMostRecentMouseEvent } from "protocol/RecordedEventsCache";
 import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
 import {
   pointsBoundingTimeCache,
@@ -57,7 +48,6 @@ import {
 import { framesCache } from "replay-next/src/suspense/FrameCache";
 import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { FindTargetCommand, resumeTargetCache } from "replay-next/src/suspense/ResumeTargetCache";
-import { screenshotCache } from "replay-next/src/suspense/ScreenshotCache";
 import { ReplayClientInterface } from "shared/client/types";
 import { isTest } from "shared/utils/environment";
 import { isPointInRegion, maxTimeStampedPoint, minTimeStampedPoint } from "shared/utils/time";
@@ -74,24 +64,18 @@ import {
   getHoveredItem,
   getPlayback,
   getPlaybackFocusWindow,
-  getPlaybackPrecachedTime,
-  getRecordingDuration,
   getShowFocusModeControls,
   getZoomRegion,
+  setFocusWindow as newFocusWindow,
   setEndpoint,
-  setPlaybackPrecachedTime,
+  setHoveredItem as setHoveredItemAction,
+  setTimelineState,
 } from "ui/reducers/timeline";
 import { getMutableParamsFromURL } from "ui/setup/dynamic/url";
 import { HoveredItem, PlaybackOptions, TimeRange } from "ui/state/timeline";
 import KeyShortcuts, { isEditableElement } from "ui/utils/key-shortcuts";
 import { trackEvent } from "ui/utils/telemetry";
 
-import {
-  setFocusWindow as newFocusWindow,
-  setHoveredItem as setHoveredItemAction,
-  setPlaybackStalled,
-  setTimelineState,
-} from "../reducers/timeline";
 import { getRecordingId } from "./app";
 import type { UIStore, UIThunkAction } from "./index";
 
@@ -179,38 +163,18 @@ export async function getInitialPausePoint(recordingId: string) {
     return { point, time };
   }
 
-  const firstMeaningfulPaint = await getFirstMeaningfulPaint();
+  const firstMeaningfulPaint = await findFirstMeaningfulPaint();
   if (firstMeaningfulPaint) {
     const { point, time } = firstMeaningfulPaint;
     return { point, time };
   }
 }
 
-export function setHoverTime(time: number | null, updateGraphics = true): UIThunkAction {
-  return async (dispatch, getState) => {
-    dispatch(setTimelineState({ hoverTime: time }));
-
-    if (!updateGraphics) {
-      return;
-    }
-
-    const stateBeforeScreenshot = getState();
-
-    try {
-      const currentTime = getCurrentTime(stateBeforeScreenshot);
-      const screenshotTime = time || currentTime;
-      const { screen, mouse } = await getGraphicsAtTime(screenshotTime);
-      const stateAfterScreenshot = getState();
-
-      if (getHoverTime(stateAfterScreenshot) !== time) {
-        return;
-      }
-
-      paintGraphics(screen, mouse);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+export function setHoverTime(time: number | null, updateGraphics = true) {
+  return setTimelineState({
+    hoverTime: time,
+    showHoverTimeGraphics: updateGraphics && time != null,
+  });
 }
 
 export function step(command: FindTargetCommand): UIThunkAction<Promise<any>> {
@@ -308,7 +272,18 @@ export function seek({
       if (executionPoint == null) {
         const clampedTime = await clampTime(replayClient, time);
 
-        const nearestEvent = mostRecentPaintOrMouseEvent(clampedTime);
+        const nearestPaint = findMostRecentPaint(clampedTime);
+        const nearestMouseEvent = findMostRecentMouseEvent(clampedTime);
+
+        let nearestEvent = nearestPaint ?? nearestMouseEvent ?? null;
+        if (nearestPaint && nearestMouseEvent) {
+          nearestEvent =
+            Math.abs(nearestPaint.time - clampedTime) <
+            Math.abs(nearestMouseEvent.time - clampedTime)
+              ? nearestPaint
+              : nearestMouseEvent;
+        }
+
         const timeStampedPoint = await replayClient.getPointNearTime(clampedTime);
         if (getSeekLock(getState()) !== seekLock) {
           // someone requested seeking to a different point while we were waiting
@@ -393,7 +368,6 @@ export function togglePlayback(): UIThunkAction {
   return (dispatch, getState) => {
     const state = getState();
     const playback = getPlayback(state);
-    const currentTime = getCurrentTime(state);
 
     if (playback) {
       dispatch(stopPlayback());
@@ -404,7 +378,7 @@ export function togglePlayback(): UIThunkAction {
 }
 
 export function startPlayback(
-  { beginTime: optBeginTime, endTime: optEndTime, beginPoint, endPoint }: PlaybackOptions = {
+  { beginTime: optBeginTime, endTime: optEndTime }: PlaybackOptions = {
     beginTime: null,
     endTime: null,
   }
@@ -427,14 +401,12 @@ export function startPlayback(
 
     dispatch(
       setTimelineState({
-        playback: { beginTime, beginDate, time: beginTime },
+        playback: { beginTime, beginDate, endTime, time: beginTime },
         currentTime: beginTime,
       })
     );
 
-    dispatch(
-      playbackPoints({ time: beginTime, point: beginPoint }, { time: endTime, point: endPoint })
-    );
+    dispatch(unhighlightNode());
   };
 }
 
@@ -460,107 +432,6 @@ export function replayPlayback(): UIThunkAction {
   };
 }
 
-export function playback(beginTime: number, endTime: number): UIThunkAction {
-  return async dispatch => {
-    dispatch(playbackPoints({ time: beginTime }, { time: endTime }));
-  };
-}
-
-export function playbackPoints(
-  begin: { time: number; point?: string },
-  end: { time: number; point?: string }
-): UIThunkAction {
-  return async (dispatch, getState) => {
-    dispatch(unhighlightNode());
-
-    let beginDate = Date.now();
-    let currentDate = beginDate;
-    let currentTime = begin.time;
-    let nextGraphicsTime!: number;
-    let nextGraphicsPromise!: ReturnType<typeof getGraphicsAtTime>;
-    let endPointScreenPromise: Promise<ScreenShot | undefined> = Promise.resolve(undefined);
-
-    if (begin.point) {
-      await addScreenForPoint(begin.point, begin.time);
-    }
-
-    if (end.point) {
-      endPointScreenPromise = addScreenForPoint(end.point, end.time);
-    }
-
-    const prepareNextGraphics = () => {
-      nextGraphicsTime = snapTimeForPlayback(nextPaintOrMouseEvent(currentTime)?.time || end.time);
-      nextGraphicsPromise = getGraphicsAtTime(nextGraphicsTime);
-      dispatch(precacheScreenshots(nextGraphicsTime));
-    };
-    const shouldContinuePlayback = () => getPlayback(getState());
-    prepareNextGraphics();
-
-    while (shouldContinuePlayback()) {
-      await new Promise(resolve => requestAnimationFrame(resolve));
-      if (!shouldContinuePlayback()) {
-        return;
-      }
-
-      currentDate = Date.now();
-      currentTime = begin.time + (currentDate - beginDate);
-
-      if (currentTime > end.time) {
-        if (end.point) {
-          await endPointScreenPromise;
-          dispatch(seek({ executionPoint: end.point, openSource: false, time: end.time }));
-        } else {
-          dispatch(seek({ time: end.time }));
-        }
-        return dispatch(setTimelineState({ currentTime: end.time, playback: null }));
-      }
-
-      dispatch(resumed());
-      dispatch(
-        setTimelineState({
-          currentTime,
-          playback: { beginTime: begin.time, beginDate, time: currentTime },
-        })
-      );
-
-      if (currentTime >= nextGraphicsTime) {
-        try {
-          let maybeNextGraphics = await Promise.race([nextGraphicsPromise, waitForTime(500)]);
-          if (typeof maybeNextGraphics === "number") {
-            dispatch(setPlaybackStalled(true));
-            maybeNextGraphics = await nextGraphicsPromise;
-            dispatch(setPlaybackStalled(false));
-          }
-          const { screen, mouse } = maybeNextGraphics;
-
-          if (!shouldContinuePlayback()) {
-            return;
-          }
-
-          // Playback may have stalled waiting for `nextGraphicsPromise` and would jump
-          // in the next iteration in order to catch up. To avoid jumps of more than
-          // 100 milliseconds, we reset `beginTime` and `beginDate` as if playback had
-          // begun right now.
-          if (Date.now() - currentDate > 100) {
-            begin.time = currentTime;
-            beginDate = Date.now();
-            dispatch(
-              setTimelineState({
-                currentTime,
-                playback: { beginTime: begin.time, beginDate, time: currentTime },
-              })
-            );
-          }
-
-          paintGraphics(screen, mouse);
-        } catch (e) {}
-
-        prepareNextGraphics();
-      }
-    }
-  };
-}
-
 export function goToPrevPaint(): UIThunkAction {
   return (dispatch, getState) => {
     const currentTime = getCurrentTime(getState());
@@ -570,8 +441,7 @@ export function goToPrevPaint(): UIThunkAction {
       return;
     }
 
-    const previous = previousPaintEvent(currentTime);
-
+    const previous = findPreviousPaintEvent(currentTime);
     if (!previous) {
       return;
     }
@@ -591,8 +461,7 @@ export function goToNextPaint(): UIThunkAction {
       return;
     }
 
-    const next = nextPaintEvent(currentTime);
-
+    const next = findNextPaintEvent(currentTime);
     if (!next) {
       return;
     }
@@ -822,65 +691,4 @@ export function toggleFocusMode(): UIThunkAction<Promise<void>> {
       await dispatch(enterFocusMode());
     }
   };
-}
-
-const PRECACHE_DURATION: number = 5000;
-
-let precacheBeginTime: number = -1;
-
-export function precacheScreenshots(beginTime: number): UIThunkAction {
-  return async (dispatch, getState) => {
-    const recordingDuration = getRecordingDuration(getState());
-    if (!recordingDuration) {
-      return;
-    }
-
-    beginTime = snapTimeForPlayback(beginTime);
-    if (beginTime === precacheBeginTime) {
-      return;
-    }
-    if (beginTime < precacheBeginTime) {
-      dispatch(setPlaybackPrecachedTime(beginTime));
-    }
-    precacheBeginTime = beginTime;
-
-    const endTime = Math.min(beginTime + PRECACHE_DURATION, recordingDuration);
-    for (let time = beginTime; time < endTime; time += SNAP_TIME_INTERVAL) {
-      const paintPoint = findMostRecentPaint(time);
-      if (paintPoint === null) {
-        return;
-      }
-
-      // the client isn't used in the cache key, so it's OK to pass a dummy value here
-      if (!screenshotCache.getValueIfCached(null as any, paintPoint.point, paintPoint.paintHash)) {
-        const graphicsPromise = getGraphicsAtTime(time);
-
-        const precachedTime = Math.max(time - SNAP_TIME_INTERVAL, beginTime);
-        if (precachedTime > getPlaybackPrecachedTime(getState())) {
-          dispatch(setPlaybackPrecachedTime(precachedTime));
-        }
-
-        await graphicsPromise;
-
-        if (precacheBeginTime !== beginTime) {
-          return;
-        }
-      }
-    }
-
-    let precachedTime = endTime;
-    if (mostRecentIndex(gPaintPoints, precachedTime) === gPaintPoints.length - 1) {
-      precachedTime = recordingDuration;
-    }
-    if (precachedTime > getPlaybackPrecachedTime(getState())) {
-      dispatch(setPlaybackPrecachedTime(precachedTime));
-    }
-  };
-}
-
-const SNAP_TIME_INTERVAL = 50;
-
-// Snap time to 50ms intervals, snapping up.
-function snapTimeForPlayback(time: number) {
-  return time + SNAP_TIME_INTERVAL - (time % SNAP_TIME_INTERVAL);
 }

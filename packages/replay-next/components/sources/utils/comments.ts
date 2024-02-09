@@ -1,4 +1,4 @@
-import { SourceId } from "@replayio/protocol";
+import { ScreenShot, SourceId } from "@replayio/protocol";
 
 import { assert } from "protocol/utils";
 import { getSourceAsync } from "replay-next/src/suspense/SourcesCache";
@@ -124,19 +124,16 @@ export async function createTypeDataForSourceCodeComment(
 }
 
 export async function createTypeDataForVisualComment(
-  canvas: HTMLCanvasElement,
+  image: HTMLElement | null,
   pageX: number | null,
   pageY: number | null
 ): Promise<VisualCommentTypeData> {
-  const encodedImage = await getBase64Png(canvas, {
-    maxWidth: 300,
-    maxHeight: 300,
-  });
+  const encodedImage = image instanceof HTMLImageElement ? image.src : null;
 
   let scaledX: number | null = null;
   let scaledY: number | null = null;
-  if (pageX !== null && pageY !== null) {
-    const { height, left, top, width } = canvas.getBoundingClientRect();
+  if (image !== null && pageX !== null && pageY !== null) {
+    const { height, left, top, width } = image.getBoundingClientRect();
 
     scaledX = (pageX - left) / width;
     scaledY = (pageY - top) / height;

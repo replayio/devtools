@@ -1,40 +1,67 @@
 import { Page } from "@playwright/test";
+import chalk from "chalk";
 
-export function getScreenshot(page: Page) {
-  return page.locator("canvas#graphics");
+import { debugPrint } from "./utils";
+
+export async function convertCoordinatesForScreenshot(
+  page: Page,
+  xPercentage: number,
+  yPercentage: number
+) {
+  const graphicsElement = getGraphicsElement(page);
+
+  const { width, height } = (await graphicsElement.boundingBox())!;
+
+  const x = xPercentage * width;
+  const y = yPercentage * height;
+
+  await debugPrint(
+    page,
+    `Scaling coordinates ${chalk.bold(xPercentage.toFixed(2))}%, ${chalk.bold(
+      yPercentage.toFixed(2)
+    )}% to ${chalk.bold(Math.round(x))}px, ${chalk.bold(Math.round(y))}px of ${chalk.bold(
+      Math.round(width)
+    )}px x ${chalk.bold(Math.round(height))}px`,
+    "convertCoordinatesForScreenshot"
+  );
+
+  return { x, y };
 }
 
-export async function clickScreenshot(page: Page, x: number, y: number) {
-  const screenshot = getScreenshot(page);
-  const scale = await getScreenshotScale(page);
-  const position = {
-    x: x * scale,
-    y: y * scale,
-  };
+export function getGraphicsElement(page: Page) {
+  return page.locator("#graphics");
+}
+
+export async function clickScreenshot(page: Page, xPercentage: number, yPercentage: number) {
+  await debugPrint(
+    page,
+    `Click screenshot coordinates ${chalk.bold(xPercentage.toFixed(2))}%, ${chalk.bold(
+      yPercentage.toFixed(2)
+    )}%`,
+    "clickScreenshot"
+  );
+
+  const screenshot = getGraphicsElement(page);
+  const position = await convertCoordinatesForScreenshot(page, xPercentage, yPercentage);
   await screenshot.click({ position, force: true });
 }
 
-export async function getScreenshotScale(page: Page) {
-  // HACK Our preview canvas is scaled down depending on position and original app
-  // page size. We'll need to alter where we click on page by the same scale,
-  // in order to correctly click on the intended elements from original x/y coords.
-  // Grab the `transform` style from the canvas node and parse out the scale factor.
-  const screenshot = getScreenshot(page);
-  const canvasTransformString = await screenshot.evaluate(node => {
-    return node.style.transform;
-  });
-  // simpler to rewrite "scale(0.123)" by replacing than regexing right now
-  const scaleString = canvasTransformString.replace("scale(", "").replace(")", "");
-
+export async function getGraphicsElementScale(page: Page) {
+  const element = getGraphicsElement(page);
+  const scaleString = await element.getAttribute("data-scale");
   return Number(scaleString);
 }
 
-export async function hoverScreenshot(page: Page, x: number, y: number) {
-  const screenshot = getScreenshot(page);
-  const scale = await getScreenshotScale(page);
-  const position = {
-    x: x * scale,
-    y: y * scale,
-  };
+export async function hoverScreenshot(page: Page, xPercentage: number, yPercentage: number) {
+  await debugPrint(
+    page,
+    `Hover over screenshot coordinates ${chalk.bold(xPercentage.toFixed(2))}%, ${chalk.bold(
+      yPercentage.toFixed(2)
+    )}%`,
+    "hoverScreenshot"
+  );
+
+  const screenshot = getGraphicsElement(page);
+  const position = await convertCoordinatesForScreenshot(page, xPercentage, yPercentage);
   await screenshot.hover({ position, force: true });
 }
