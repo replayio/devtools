@@ -15,7 +15,7 @@ function bar() {
   console.log(barobj);
   update(barobj, bararr);
   console.log(barobj);
-  setTimeout(recordingFinished, 0);
+  setTimeout(recordingFinished, 500);
   return bararr;
 }
 function update(obj, arr) {
