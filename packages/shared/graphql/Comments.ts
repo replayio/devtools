@@ -3,7 +3,7 @@ import { RecordingId } from "@replayio/protocol";
 import { GetComments } from "./generated/GetComments";
 import { AddCommentInput } from "./generated/globalTypes";
 import { GraphQLClientInterface } from "./GraphQLClient";
-import { Comment, CommentPosition } from "./types";
+import { Comment } from "./types";
 
 const AddCommentMutation = `
   mutation AddComment($input: AddCommentInput!) {
@@ -51,16 +51,11 @@ const GetCommentsQuery = `
         id
         isPublished
         content
-        primaryLabel
-        secondaryLabel
         createdAt
         updatedAt
         hasFrames
-        sourceLocation
         time
         point
-        position
-        networkRequestId
         type
         typeData
         user {
@@ -92,8 +87,8 @@ const GetCommentsQuery = `
 `;
 
 const UpdateCommentMutation = `
-  mutation UpdateCommentContent($newContent: String!, $newIsPublished: Boolean!, $commentId: ID!, $newPosition: JSONObject) {
-    updateComment(input: { id: $commentId, content: $newContent, isPublished: $newIsPublished, position: $newPosition }) {
+  mutation UpdateCommentContent($newContent: String!, $newIsPublished: Boolean!, $commentId: ID!) {
+    updateComment(input: { id: $commentId, content: $newContent, isPublished: $newIsPublished }) {
       success
     }
   }
@@ -212,11 +207,9 @@ export async function getComments(
           ...reply,
           content: reply.content,
           hasFrames: comment.hasFrames,
-          sourceLocation: comment.sourceLocation,
           time: comment.time,
           parentId: comment.id,
           point: comment.point,
-          position: comment.position,
         };
       }),
     };
@@ -228,14 +221,13 @@ export async function updateComment(
   accessToken: string,
   commentId: string,
   newContent: string,
-  newIsPublished: boolean,
-  newPosition: CommentPosition | null
+  newIsPublished: boolean
 ) {
   await graphQLClient.send<GetComments>(
     {
       operationName: "UpdateCommentContent",
       query: UpdateCommentMutation,
-      variables: { newContent, newIsPublished, newPosition, commentId },
+      variables: { newContent, newIsPublished, commentId },
     },
     accessToken
   );

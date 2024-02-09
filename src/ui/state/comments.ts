@@ -18,13 +18,6 @@ export type CommentOptions = {
   hasFrames: boolean;
   type: CommentType;
   typeData: any | null;
-
-  // TODO [FE-2251]Remove these legacy attributes
-  networkRequestId?: string;
-  position: CommentPosition | null;
-  primaryLabel?: string | null;
-  secondaryLabel?: string | null;
-  sourceLocation: SourceLocation | null;
 };
 
 export interface Remark {

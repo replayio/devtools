@@ -91,12 +91,6 @@ export interface Comment extends Remark {
   replies: Reply[];
   type: string | null;
   typeData: any | null;
-
-  // TODO [FE-2251]Remove these legacy attributes
-  position: CommentPosition | null;
-  networkRequestId: string | null;
-  primaryLabel?: string;
-  secondaryLabel?: string;
 }
 
 export interface Reply extends Remark {

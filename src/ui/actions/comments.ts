@@ -28,18 +28,7 @@ export function createComment(
   options: CommentOptions
 ): UIThunkAction {
   return async dispatch => {
-    let {
-      hasFrames,
-      type,
-      typeData,
-
-      // TODO [FE-1058] Delete legacy fields in favor of type/typeData
-      networkRequestId,
-      position,
-      primaryLabel = null,
-      secondaryLabel = null,
-      sourceLocation,
-    } = options;
+    let { hasFrames, type, typeData } = options;
 
     trackEvent("comments.create");
 
@@ -55,13 +44,6 @@ export function createComment(
           time,
           type,
           typeData,
-
-          // TODO [FE-1058] Delete legacy fields in favor of type/typeData
-          networkRequestId: networkRequestId || null,
-          position,
-          primaryLabel,
-          secondaryLabel,
-          sourceLocation,
         },
       },
     });
@@ -89,9 +71,7 @@ export function createFrameComment(
 
     dispatch(
       createComment(currentTime, executionPoint, recordingId, {
-        position,
         hasFrames: true,
-        sourceLocation: null,
         type: COMMENT_TYPE_VISUAL,
         typeData,
       })
@@ -117,10 +97,7 @@ export function createNetworkRequestComment(
 
     dispatch(
       createComment(time, executionPoint, recordingId, {
-        position: null,
         hasFrames: false,
-        sourceLocation: null,
-        networkRequestId: request.id,
         type: COMMENT_TYPE_NETWORK_REQUEST,
         typeData: createTypeDataForNetworkRequestComment(
           request.id,
