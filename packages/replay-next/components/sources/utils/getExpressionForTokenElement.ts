@@ -1,4 +1,7 @@
-import { getTokenTypeFromClassName } from "replay-next/components/sources/utils/tokens";
+import {
+  getTokenTypeFromClassName,
+  getTokenTypeFromDOM,
+} from "replay-next/components/sources/utils/tokens";
 
 export default function getExpressionForTokenElement(
   rowElement: HTMLElement,
@@ -28,7 +31,9 @@ export default function getExpressionForTokenElement(
   let index = children.indexOf(tokenElement) - 1;
   outer: while (index >= 0) {
     const currentTokenElement = children[index] as HTMLElement;
-    const tokenType = getTokenTypeFromClassName(currentTokenElement.className);
+    const tokenType =
+      getTokenTypeFromClassName(currentTokenElement.className) ??
+      getTokenTypeFromDOM(currentTokenElement);
     const code = currentTokenElement.textContent;
 
     if (currentTokenElement.nodeName === "#text") {
@@ -49,7 +54,7 @@ export default function getExpressionForTokenElement(
       }
       case "operator":
       case "punctuation": {
-        if (code !== ".") {
+        if (code !== "." && code !== "?.") {
           break outer;
         }
         break;
