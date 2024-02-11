@@ -2,6 +2,7 @@ import { Locator, Page, expect } from "@playwright/test";
 import axios from "axios";
 import chalk from "chalk";
 import stripAnsi from "strip-ansi";
+import isString from "lodash/isString";
 
 import config from "../config";
 
@@ -171,8 +172,9 @@ export async function waitFor(
 
       return;
     } catch (error) {
-      if (!error?.matcherResult) {
-        // Not an `expect` error → Probably not recoverable.
+      if (!error?.matcherResult && !isString(error)) {
+        // Not an `expect` error and not one of our thrown strings.
+        // → Probably not recoverable.
         throw error;
       }
 
