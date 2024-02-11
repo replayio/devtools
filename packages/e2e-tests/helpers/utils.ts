@@ -1,8 +1,8 @@
 import { Locator, Page, expect } from "@playwright/test";
 import axios from "axios";
 import chalk from "chalk";
-import stripAnsi from "strip-ansi";
 import isString from "lodash/isString";
+import stripAnsi from "strip-ansi";
 
 import config from "../config";
 
@@ -96,7 +96,10 @@ export async function waitForRecordingToFinishIndexing(page: Page): Promise<void
   try {
     await waitFor(
       async () => {
-        expect(await timelineCapsuleLocator.getAttribute("data-test-progress"), "Recording did not finish processing").toBe("100");
+        expect(
+          await timelineCapsuleLocator.getAttribute("data-test-progress"),
+          "Recording did not finish processing"
+        ).toBe("100");
       },
       {
         retryInterval: 1_000,
