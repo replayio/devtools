@@ -102,20 +102,21 @@ export async function waitForRecordingToFinishIndexing(page: Page): Promise<void
         timeout: 150_000,
       }
     );
-  } catch {
-    if (await page.locator('[data-test-id="SupportForm"]').isVisible()) {
-      const errorDetailsLocator = page.locator('[data-test-id="UnexpectedErrorDetails"]');
-      if (await errorDetailsLocator.isVisible()) {
-        throw new Error(`Recording crashed: ${await errorDetailsLocator.innerText()}`);
+  } catch (err) {
+    try {
+      if (await page.locator('[data-test-id="SupportForm"]').isVisible()) {
+        const errorDetailsLocator = page.locator('[data-test-id="UnexpectedErrorDetails"]');
+        if (await errorDetailsLocator.isVisible()) {
+          throw new Error(`Recording did not finish processing: ${await errorDetailsLocator.innerText()}`);
+        }
       }
-      throw new Error("Recording crashed");
+
+    } catch {
+      // Page is in a faulty state. Stop trying and only report original state.
+      throw new Error(`Recording did not finish processing:\n  ${err.stack}`);
     }
 
-    if (await timelineCapsuleLocator.isVisible()) {
-      throw new Error("Recording did not finish loading");
-    }
-
-    throw new Error("Recording did not finish processing");
+    throw new Error(`Recording did not finish processing:\n  ${err.stack}`);
   }
 }
 
@@ -173,8 +174,9 @@ export async function waitFor(
 
       return;
     } catch (error) {
-      if (typeof error === "string") {
-        console.log(error);
+      if (!error?.matcherResult) {
+        // Not an `expect` error → Probably not recoverable.
+        throw error;
       }
 
       if (performance.now() - startTime > timeout) {
