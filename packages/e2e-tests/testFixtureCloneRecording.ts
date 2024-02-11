@@ -35,12 +35,6 @@ const testWithCloneRecording = base.extend<TestIsolatedRecordingFixture>({
         const { recording } = exampleRecordings[exampleKey];
         console.log("Cloning recording");
         newRecordingId = await cloneTestRecording(recording);
-
-        try {
-          await loadRecording(newRecordingId);
-        } catch (e) {
-          console.warn("Error processing recording; ignoring.");
-        }
       } catch (err: any) {
         if (axios.isAxiosError(err)) {
           console.error("Axios error cloning recording: ", {
@@ -53,11 +47,18 @@ const testWithCloneRecording = base.extend<TestIsolatedRecordingFixture>({
         throw err;
       }
 
+      try {
+        await loadRecording(newRecordingId);
+      } catch (e) {
+        console.warn("Error processing recording; ignoring.");
+      }
+
+      // Start coverage.
       await page.coverage.startJSCoverage({
         resetOnNavigation: false,
       });
 
-      // Run Test:
+      // Run test.
       await use({
         page,
         recordingId: newRecordingId,
