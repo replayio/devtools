@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { Page, test as base, expect } from "@playwright/test";
+import { Page, test as base } from "@playwright/test";
 import axios from "axios";
 
 import { TestRecordingKey } from "./helpers";
