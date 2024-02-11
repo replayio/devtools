@@ -41,8 +41,6 @@ const testWithCloneRecording = base.extend<TestIsolatedRecordingFixture>({
             errors: err.response?.data?.errors,
             details: err.toJSON(),
           });
-        } else {
-          console.error("Error cloning recording: ", err);
         }
         throw err;
       }
