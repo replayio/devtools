@@ -110,13 +110,10 @@ export async function waitForRecordingToFinishIndexing(page: Page): Promise<void
           throw new Error(`Recording did not finish processing: ${await errorDetailsLocator.innerText()}`);
         }
       }
-
-    } catch {
-      // Page is in a faulty state. Stop trying and only report original state.
-      throw new Error(`Recording did not finish processing:\n  ${err.stack}`);
+    } finally {
+      // Page is in a faulty state or no more info available. Stop trying and only report original error.
+      throw err;
     }
-
-    throw new Error(`Recording did not finish processing:\n  ${err.stack}`);
   }
 }
 
