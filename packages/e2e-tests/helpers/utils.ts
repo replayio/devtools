@@ -95,7 +95,7 @@ export async function waitForRecordingToFinishIndexing(page: Page): Promise<void
   try {
     await waitFor(
       async () => {
-        expect(await timelineCapsuleLocator.getAttribute("data-test-progress")).toBe("100");
+        expect(await timelineCapsuleLocator.getAttribute("data-test-progress"), "Recording did not finish processing").toBe("100");
       },
       {
         retryInterval: 1_000,
@@ -107,7 +107,7 @@ export async function waitForRecordingToFinishIndexing(page: Page): Promise<void
       if (await page.locator('[data-test-id="SupportForm"]').isVisible()) {
         const errorDetailsLocator = page.locator('[data-test-id="UnexpectedErrorDetails"]');
         if (await errorDetailsLocator.isVisible()) {
-          throw new Error(`Recording did not finish processing: ${await errorDetailsLocator.innerText()}`);
+          throw new Error(`Session failed: ${await errorDetailsLocator.innerText()}`);
         }
       }
     } finally {
