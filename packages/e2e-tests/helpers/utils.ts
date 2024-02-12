@@ -193,7 +193,7 @@ export async function waitFor(
       await callback();
 
       return;
-    } catch (error) {
+    } catch (error: any) {
       if (error?.message?.includes("crash")) {
         // We have to resort to heuristics since:
         // 1. We don't have access to the `Page` object, and
