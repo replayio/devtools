@@ -85,6 +85,16 @@ export async function mapLocators<T>(
   );
 }
 
+export async function getSupportFormErrorDetails(page: Page) {
+  if (await page.locator('[data-test-id="SupportForm"]').isVisible()) {
+    const errorDetailsLocator = page.locator('[data-test-id="UnexpectedErrorDetails"]');
+    if (await errorDetailsLocator.isVisible()) {
+      return await errorDetailsLocator.innerText();
+    }
+  }
+  return null;
+}
+
 export async function waitForRecordingToFinishIndexing(page: Page): Promise<void> {
   await debugPrint(
     page,
@@ -107,14 +117,13 @@ export async function waitForRecordingToFinishIndexing(page: Page): Promise<void
       }
     );
   } catch (err: any) {
+    let errorDetails: string | null = null;
     try {
-      if (await page.locator('[data-test-id="SupportForm"]').isVisible()) {
-        const errorDetailsLocator = page.locator('[data-test-id="UnexpectedErrorDetails"]');
-        if (await errorDetailsLocator.isVisible()) {
-          throw new Error(`Session failed: ${await errorDetailsLocator.innerText()}`);
-        }
-      }
+      errorDetails = await getSupportFormErrorDetails(page);
     } finally {
+      if (errorDetails) {
+        throw new Error(`Session failed: ${errorDetails}`);
+      }
       // Page is in a faulty state or no more info available: Simply report original error.
       throw err;
     }

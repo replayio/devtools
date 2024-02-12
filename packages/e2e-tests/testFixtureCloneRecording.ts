@@ -63,9 +63,8 @@ const testWithCloneRecording = base.extend<TestIsolatedRecordingFixture>({
         testScope,
       });
     } finally {
-      let jsCoverage: Awaited<ReturnType<Page["coverage"]["stopJSCoverage"]>> | undefined;
       try {
-        jsCoverage = await page.coverage.stopJSCoverage();
+        await page.coverage.stopJSCoverage();
       } catch (err: any) {
         console.error("Error stopping JS coverage: ", err);
       }
