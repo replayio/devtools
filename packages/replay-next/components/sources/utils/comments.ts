@@ -3,6 +3,7 @@ import { SourceId } from "@replayio/protocol";
 import { assert } from "protocol/utils";
 import { getSourceAsync } from "replay-next/src/suspense/SourcesCache";
 import { streamingSyntaxParsingCache } from "replay-next/src/suspense/SyntaxParsingCache";
+import { scaleImage } from "replay-next/src/utils/image";
 import { getSourceFileName } from "replay-next/src/utils/source";
 import { ParsedToken } from "replay-next/src/utils/syntax-parser";
 import { ReplayClientInterface } from "shared/client/types";
@@ -147,7 +148,12 @@ export async function createTypeDataForVisualComment(
   pageX: number | null,
   pageY: number | null
 ): Promise<VisualCommentTypeData> {
-  const encodedImage = image instanceof HTMLImageElement ? image.src : null;
+  let encodedImage: string | null = null;
+  if (image instanceof HTMLImageElement) {
+    const scaledImage = scaleImage({ imageElement: image, maxHeight: 300, maxWidth: 300 });
+
+    encodedImage = scaledImage.src;
+  }
 
   let scaledX: number | null = null;
   let scaledY: number | null = null;
