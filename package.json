@@ -14,6 +14,7 @@
     "lint": "trunk check",
     "lint:fix": "trunk check --fix",
     "typecheck": "tsc",
+    "checks": "npm run typecheck && npm run lint",
     "typecheck:watch": "yarn typecheck --watch",
     "gql:schema": "gq https://graphql.replay.io/v1/graphql -H \"X-Hasura-Admin-Secret: $HASURA_KEY\" --introspect > schema.graphql",
     "gql:gen": "apollo codegen:generate --localSchemaFile=schema.graphql --includes='{packages/shared,src}/**/*.{ts,tsx}' --target=typescript --tagName=gql --outputFlat packages/shared/graphql/generated",

@@ -31,9 +31,19 @@ const testWithCloneRecording = base.extend<TestIsolatedRecordingFixture>({
     const testScope = crypto.randomUUID();
     let newRecordingId: string | undefined = undefined;
     try {
-      const { recording } = exampleRecordings[exampleKey];
-      console.log("Cloning recording");
-      newRecordingId = await cloneTestRecording(recording);
+      try {
+        const { recording } = exampleRecordings[exampleKey];
+        console.log("Cloning recording");
+        newRecordingId = await cloneTestRecording(recording);
+      } catch (err: any) {
+        if (axios.isAxiosError(err)) {
+          console.error("Axios error cloning recording: ", {
+            errors: err.response?.data?.errors,
+            details: err.toJSON(),
+          });
+        }
+        throw err;
+      }
 
       try {
         await loadRecording(newRecordingId);
@@ -41,28 +51,20 @@ const testWithCloneRecording = base.extend<TestIsolatedRecordingFixture>({
         console.warn("Error processing recording; ignoring.");
       }
 
+      // Start coverage.
       await page.coverage.startJSCoverage({
         resetOnNavigation: false,
       });
+
+      // Run test.
       await use({
         page,
         recordingId: newRecordingId,
         testScope,
       });
-    } catch (err: any) {
-      if (axios.isAxiosError(err)) {
-        console.error("Axios error cloning recording: ", {
-          errors: err.response?.data?.errors,
-          details: err.toJSON(),
-        });
-      } else {
-        console.error("Error cloning recording: ", err);
-      }
-      throw err;
     } finally {
-      let jsCoverage: Awaited<ReturnType<Page["coverage"]["stopJSCoverage"]>> | undefined;
       try {
-        jsCoverage = await page.coverage.stopJSCoverage();
+        await page.coverage.stopJSCoverage();
       } catch (err: any) {
         console.error("Error stopping JS coverage: ", err);
       }

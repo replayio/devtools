@@ -84,6 +84,33 @@ export async function mapLocators<T>(
   );
 }
 
+export async function getSupportFormErrorDetails(page: Page) {
+  if (await page.locator('[data-test-id="SupportForm"]').isVisible()) {
+    let details: string = "";
+    try {
+      const errorDetailsLocator = page.locator('[data-test-id="UnexpectedErrorDetails"]');
+      if (await errorDetailsLocator.isVisible()) {
+        details = await errorDetailsLocator.innerText();
+      }
+    } catch (err) {
+      // Ignore locator errors.
+      console.error(`ERROR:`, err);
+    }
+    return details || "(support form is visible)";
+  }
+  return null;
+}
+
+export class UnrecoverableError extends Error {
+  constructor(message?: string) {
+    super(message);
+  }
+
+  get isUnrecoverable() {
+    return true;
+  }
+}
+
 export async function waitForRecordingToFinishIndexing(page: Page): Promise<void> {
   await debugPrint(
     page,
@@ -92,31 +119,25 @@ export async function waitForRecordingToFinishIndexing(page: Page): Promise<void
   );
 
   const timelineCapsuleLocator = page.locator('[data-test-id="Timeline-Capsule"]');
-  try {
-    await waitFor(
-      async () => {
-        expect(await timelineCapsuleLocator.getAttribute("data-test-progress")).toBe("100");
-      },
-      {
-        retryInterval: 1_000,
-        timeout: 150_000,
-      }
-    );
-  } catch {
-    if (await page.locator('[data-test-id="SupportForm"]').isVisible()) {
-      const errorDetailsLocator = page.locator('[data-test-id="UnexpectedErrorDetails"]');
-      if (await errorDetailsLocator.isVisible()) {
-        throw new Error(`Recording crashed: ${await errorDetailsLocator.innerText()}`);
-      }
-      throw new Error("Recording crashed");
-    }
 
-    if (await timelineCapsuleLocator.isVisible()) {
-      throw new Error("Recording did not finish loading");
-    }
+  let supportFormErrorDetails: string | null = null;
+  await waitFor(
+    async () => {
+      supportFormErrorDetails = await getSupportFormErrorDetails(page);
+      if (supportFormErrorDetails) {
+        throw new UnrecoverableError(`Session failed: ${supportFormErrorDetails}`);
+      }
 
-    throw new Error("Recording did not finish processing");
-  }
+      expect(
+        await timelineCapsuleLocator.getAttribute("data-test-progress"),
+        "Recording did not finish processing"
+      ).toBe("100");
+    },
+    {
+      retryInterval: 1_000,
+      timeout: 150_000,
+    }
+  );
 }
 
 export async function toggleExpandable(
@@ -172,9 +193,20 @@ export async function waitFor(
       await callback();
 
       return;
-    } catch (error) {
-      if (typeof error === "string") {
-        console.log(error);
+    } catch (error: any) {
+      if (error?.message?.includes("crash")) {
+        // We have to resort to heuristics since:
+        // 1. We don't have access to the `Page` object, and
+        // 2. the Error object also has no special properties.
+        throw error;
+      }
+      if (error?.isUnrecoverable) {
+        // We sometimes don't want to keep trying.
+        throw error;
+      }
+      if (!error?.matcherResult) {
+        // Not an `expect` error: → Log it.
+        console.log("ERROR:", error?.stack || error);
       }
 
       if (performance.now() - startTime > timeout) {
