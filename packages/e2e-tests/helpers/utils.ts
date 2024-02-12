@@ -184,10 +184,15 @@ export async function waitFor(
 
       return;
     } catch (error) {
-      if (!error?.matcherResult && !isString(error)) {
-        // Not an `expect` error and not one of our thrown strings.
-        // → Probably not recoverable.
+      if (error?.message?.includes("crash")) {
+        // We have to resort to heuristics since:
+        // 1. We don't have access to the `Page` object, and
+        // 2. the Error object also has no special properties.
         throw error;
+      }
+      if (!error?.matcherResult) {
+        // Not an `expect` error: → Log it.
+        console.log("ERROR:", error?.stack || error);
       }
 
       if (performance.now() - startTime > timeout) {
