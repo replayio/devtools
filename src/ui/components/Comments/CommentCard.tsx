@@ -3,10 +3,7 @@ import { MouseEvent, memo, useContext } from "react";
 
 import { selectLocation } from "devtools/client/debugger/src/actions/sources";
 import { getThreadContext } from "devtools/client/debugger/src/selectors";
-import {
-  isSourceCodeComment,
-  isSourceCodeCommentTypeData,
-} from "replay-next/components/sources/utils/comments";
+import { isSourceCodeCommentTypeData } from "replay-next/components/sources/utils/comments";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { Comment } from "shared/graphql/types";
@@ -60,9 +57,7 @@ function CommentCard({
     dispatch(setSelectedCommentId(comment.id));
 
     const openSource = viewMode === "dev";
-    if (isSourceCodeComment(comment)) {
-      dispatch(seekToComment(comment, openSource));
-    }
+    dispatch(seekToComment(comment, openSource));
 
     const { type, typeData } = comment;
     if (openSource && isSourceCodeCommentTypeData(type, typeData)) {
