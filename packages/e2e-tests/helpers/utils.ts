@@ -1,7 +1,6 @@
 import { Locator, Page, expect } from "@playwright/test";
 import axios from "axios";
 import chalk from "chalk";
-import isString from "lodash/isString";
 import stripAnsi from "strip-ansi";
 
 import config from "../config";
