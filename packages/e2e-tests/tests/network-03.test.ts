@@ -37,7 +37,7 @@ test(`network-03: should sync and display the current time in relation to the ne
   await verifyRequestRowTimelineState(
     page,
     {
-      name: "FiraCode-VariableFont",
+      name: "index.42ea0b38.css",
     },
     "before"
   );
@@ -57,8 +57,8 @@ test(`network-03: should sync and display the current time in relation to the ne
   );
 
   // Changes to the current should update the indicator in the Network panel also
-  // Seeking to the "cypress_runner.js" request will have opened "index.fcb7159a.js"
-  await waitForSourceContentsToFinishStreaming(page, { sourceId: "pp8" });
+  // Seeking to the "cypress_runner.js" request will have opened "cypress_runner.css"
+  await waitForSourceContentsToFinishStreaming(page, { sourceId: "pp6" });
   await fastForwardToLine(page, { lineNumber: 118 });
   await verifyRequestRowTimelineState(
     page,

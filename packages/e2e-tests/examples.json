@@ -148,8 +148,8 @@
     "buildId": "linux-chromium-20240126-c9de98d17d37-50d01be708a2"
   },
   "flake/adding-spec.ts": {
-    "recording": "7b0db00a-d9a9-4d2d-b816-af14a1b682a6",
-    "buildId": "linux-chromium-20230713-9fb0f2ba86de-cd7086fd0adc",
+    "recording": "a667c000-8432-45d7-b08d-a7e4f5002ecb",
+    "buildId": "linux-chromium-20240208-e6ff39de2177-11bb013e140b",
     "requiresManualUpdate": true
   },
   "log_points_and_block_scope.html": {

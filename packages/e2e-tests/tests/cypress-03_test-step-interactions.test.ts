@@ -45,7 +45,7 @@ test("cypress-03: Test Step interactions", async ({ pageWithMeta: { page, record
 
   const steps = getTestCaseSteps(selectedRow);
   const numSteps = await steps.count();
-  expect(numSteps).toBe(20);
+  expect(numSteps).toBe(21);
 
   // We should be in Viewer Mode to start with
   expect(await isViewerTabActive(page)).toBe(true);
@@ -136,7 +136,7 @@ test("cypress-03: Test Step interactions", async ({ pageWithMeta: { page, record
     expect(detailsPaneContents["Selector"]).toBe(`".new-todo"`);
   });
 
-  await steps.nth(6).click();
+  await steps.nth(8).click();
   await waitFor(async () => {
     const detailsPane = getUserActionEventDetails(page);
     const detailsPaneContents = await getDetailsPaneContents(detailsPane);
@@ -144,7 +144,7 @@ test("cypress-03: Test Step interactions", async ({ pageWithMeta: { page, record
     expect(detailsPaneContents["Typed"]).toMatch("buy some cheese");
   });
 
-  await steps.nth(8).click();
+  await steps.nth(9).click();
   await waitFor(async () => {
     const detailsPane = getUserActionEventDetails(page);
     const detailsPaneContents = await getDetailsPaneContents(detailsPane);
@@ -152,7 +152,7 @@ test("cypress-03: Test Step interactions", async ({ pageWithMeta: { page, record
     expect(detailsPaneContents["Typed"]).toMatch("{enter}");
   });
 
-  await steps.nth(9).click();
+  await steps.nth(10).click();
   await delay(100);
 
   await waitFor(async () => {
