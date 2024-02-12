@@ -106,7 +106,7 @@ export async function waitForRecordingToFinishIndexing(page: Page): Promise<void
         timeout: 150_000,
       }
     );
-  } catch (err) {
+  } catch (err: any) {
     try {
       if (await page.locator('[data-test-id="SupportForm"]').isVisible()) {
         const errorDetailsLocator = page.locator('[data-test-id="UnexpectedErrorDetails"]');
@@ -115,7 +115,7 @@ export async function waitForRecordingToFinishIndexing(page: Page): Promise<void
         }
       }
     } finally {
-      // Page is in a faulty state or no more info available. Stop trying and only report original error.
+      // Page is in a faulty state or no more info available: Simply report original error.
       throw err;
     }
   }
