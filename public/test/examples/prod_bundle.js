@@ -1,2 +1,2 @@
-!function(){function o(){const o={barprop1:2,barprop2:3,nested:{nestedprop1:4}},e=[5,6,o];var t;return console.log(o),t=e,o.barprop1="updated",t.push("new"),console.log(o),setTimeout(n,0),e}function n(){console.log("ExampleFinished")}setTimeout((function(){console.log(o())}),0),window.bar=o}();
+(()=>{function o(){const o={barprop1:2,barprop2:3,nested:{nestedprop1:4}},n=[5,6,o];var t;return console.log(o),t=n,o.barprop1="updated",t.push("new"),console.log(o),setTimeout(e,500),n}function e(){console.log("ExampleFinished")}setTimeout((function(){console.log(o())}),0),window.bar=o})();
 //# sourceMappingURL=prod_bundle.js.map
