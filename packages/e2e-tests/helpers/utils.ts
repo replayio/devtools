@@ -86,8 +86,17 @@ export async function mapLocators<T>(
 
 export async function getSupportFormErrorDetails(page: Page) {
   if (await page.locator('[data-test-id="SupportForm"]').isVisible()) {
-    const errorDetailsLocator = page.locator('[data-test-id="UnexpectedErrorDetails"]');
-    return (await errorDetailsLocator.innerText()) || "(support form is visible)";
+    let details: string = "";
+    try {
+      const errorDetailsLocator = page.locator('[data-test-id="UnexpectedErrorDetails"]');
+      if (await errorDetailsLocator.isVisible()) {
+        details = await errorDetailsLocator.innerText();
+      }
+    } catch (err) {
+      // Ignore locator errors.
+      console.error(`ERROR:`, err);
+    }
+    return details || "(support form is visible)";
   }
   return null;
 }
