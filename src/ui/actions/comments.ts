@@ -7,19 +7,27 @@ import {
   COMMENT_TYPE_VISUAL,
   VisualCommentTypeData,
   createTypeDataForNetworkRequestComment,
+  isNetworkRequestComment,
+  isSourceCodeComment,
 } from "replay-next/components/sources/utils/comments";
 import { mutate } from "shared/graphql/apolloClient";
-import { CommentSourceLocation } from "shared/graphql/types";
+import { Comment, CommentType } from "shared/graphql/types";
+import { selectNetworkRequest } from "ui/actions/network";
 import { RequestSummary } from "ui/components/NetworkMonitor/utils";
 import { ADD_COMMENT_MUTATION, AddCommentMutation } from "ui/hooks/comments/useAddComment";
 import { selectors } from "ui/reducers";
 import { getCurrentTime } from "ui/reducers/timeline";
-import { Comment, CommentOptions } from "ui/state/comments";
 import { trackEvent } from "ui/utils/telemetry";
 
 import type { UIThunkAction } from "./index";
 import { setSelectedPrimaryPanel } from "./layout";
 import { seek } from "./timeline";
+
+type CommentOptions = {
+  hasFrames: boolean;
+  type: CommentType;
+  typeData: any | null;
+};
 
 export function createComment(
   time: number,
@@ -112,13 +120,8 @@ export function createNetworkRequestComment(
   };
 }
 
-export function seekToComment(
-  comment: Comment,
-  sourceLocation: CommentSourceLocation | null,
-  openSource: boolean
-): UIThunkAction {
+export function seekToComment(comment: Comment, openSource: boolean): UIThunkAction {
   return (dispatch, getState) => {
-    let context = selectors.getThreadContext(getState());
     dispatch(
       seek({
         executionPoint: comment.point,
@@ -126,11 +129,25 @@ export function seekToComment(
         time: comment.time,
       })
     );
+
     dispatch(setSelectedPrimaryPanel("comments"));
 
-    if (sourceLocation) {
-      context = selectors.getThreadContext(getState());
-      dispatch(selectLocation(context, sourceLocation, openSource));
+    if (isSourceCodeComment(comment)) {
+      const context = selectors.getThreadContext(getState());
+      dispatch(
+        selectLocation(
+          context,
+          {
+            sourceId: comment.typeData.sourceId,
+            line: comment.typeData.lineNumber,
+            column: comment.typeData.columnIndex,
+            sourceUrl: comment.typeData.sourceUrl || undefined,
+          },
+          openSource
+        )
+      );
+    } else if (isNetworkRequestComment(comment)) {
+      dispatch(selectNetworkRequest(comment.typeData.id));
     }
   };
 }

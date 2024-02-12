@@ -2,87 +2,14 @@ import { ChatAltIcon } from "@heroicons/react/solid";
 import { useState } from "react";
 
 import Icon from "replay-next/components/Icon";
-import { isVisualCommentTypeData } from "replay-next/components/sources/utils/comments";
-import { Comment } from "ui/state/comments";
+import { VisualComment } from "replay-next/components/sources/utils/comments";
 
 import styles from "./styles.module.css";
 
 // Adapter component that can handle rendering legacy or modern visual comments.
-export default function VisualPreview({ comment }: { comment: Comment }) {
-  const { type, typeData } = comment;
+export default function VisualPreview({ comment }: { comment: VisualComment }) {
+  const { encodedImage, scaledX, scaledY } = comment.typeData;
 
-  if (isVisualCommentTypeData(type, typeData)) {
-    // Modern comments store all of the information needed to render the comment preview in the typeData field.
-    return (
-      <ModernVisualPreview
-        encodedImage={typeData.encodedImage}
-        pageX={typeData.pageX}
-        pageY={typeData.pageY}
-        scaledX={typeData.scaledX}
-        scaledY={typeData.scaledY}
-      />
-    );
-  } else if (comment.primaryLabel && comment.secondaryLabel) {
-    // Some legacy comments store JSON data in the primaryLabel field.
-    return (
-      <LegacyVisualPreview
-        primaryLabel={comment.primaryLabel}
-        secondaryLabel={comment.secondaryLabel}
-      />
-    );
-  } else {
-    return null;
-  }
-}
-
-function LegacyVisualPreview({
-  primaryLabel,
-  secondaryLabel,
-}: {
-  primaryLabel: string;
-  secondaryLabel: string;
-}) {
-  let scaledX: number | null = null;
-  let scaledY: number | null = null;
-  try {
-    const coordinates = JSON.parse(primaryLabel) as any;
-
-    scaledX = coordinates.x;
-    scaledY = coordinates.y;
-  } catch (error) {}
-
-  if (scaledX === null || scaledY === null) {
-    return null;
-  }
-
-  // Legacy comments didn't store page X/Y but that's okay.
-  let pageX = null;
-  let pageY = null;
-
-  return (
-    <ModernVisualPreview
-      encodedImage={secondaryLabel}
-      pageX={pageX}
-      pageY={pageY}
-      scaledX={scaledX}
-      scaledY={scaledY}
-    />
-  );
-}
-
-function ModernVisualPreview({
-  encodedImage,
-  pageX,
-  pageY,
-  scaledX,
-  scaledY,
-}: {
-  encodedImage: string | null;
-  pageX: number | null;
-  pageY: number | null;
-  scaledX: number | null;
-  scaledY: number | null;
-}) {
   const [showPreview, setShowPreview] = useState(false);
 
   if (encodedImage === null) {

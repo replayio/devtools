@@ -20,7 +20,7 @@ import {
   updateComment as updateCommentGraphQL,
   updateCommentReply as updateCommentReplyGraphQL,
 } from "shared/graphql/Comments";
-import { Comment, CommentSourceLocation, User } from "shared/graphql/types";
+import { Comment, User } from "shared/graphql/types";
 
 import CommentPreview from "./CommentPreview";
 import styles from "./Comment.module.css";

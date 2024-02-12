@@ -1,9 +1,7 @@
-import { NavigationEvent, SessionId } from "@replayio/protocol";
+import { SessionId } from "@replayio/protocol";
 
 import type { RecordingTarget } from "replay-next/src/suspense/BuildIdCache";
-import { Workspace } from "shared/graphql/types";
-
-import { Reply } from "./comments";
+import { Reply, Workspace } from "shared/graphql/types";
 
 export type ModalOptionsType = {
   recordingId?: string;

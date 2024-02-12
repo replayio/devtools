@@ -2,10 +2,10 @@ import { ChatAltIcon } from "@heroicons/react/solid";
 import { useLayoutEffect, useRef } from "react";
 
 import { isVisualCommentTypeData } from "replay-next/components/sources/utils/comments";
+import { Comment } from "shared/graphql/types";
 import { setHoveredCommentId, setSelectedCommentId } from "ui/actions/app";
 import { subscribe } from "ui/components/Video/MutableGraphicsState";
 import { useAppDispatch } from "ui/setup/hooks";
-import { Comment } from "ui/state/comments";
 
 import styles from "./VideoComment.module.css";
 
