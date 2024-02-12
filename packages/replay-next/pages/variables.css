@@ -378,7 +378,7 @@
   */
 
   /* src/devtools/client/debugger/src/components/SecondaryPanes/FrameTimeline.css */
-  --progressbar-background: var(--theme-base-90);
+  --progressbar-background: var(--theme-base-85);
   --progressbar-unfocused-background: #8fa7be;
   --replay-head-background: var(--theme-highlight-purple);
 
