@@ -76,7 +76,6 @@ interface Remark {
   id: string;
   isPublished: boolean;
   point: string;
-  sourceLocation: CommentSourceLocation | null;
   time: number;
   updatedAt: string;
   user: User;
