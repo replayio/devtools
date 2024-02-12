@@ -241,10 +241,10 @@ export default function run_fe_tests(CHROME_BINARY_PATH, runInCI = true, nWorker
             REPLAY_API_KEY: process.env.RUNTIME_TEAM_API_KEY,
             REPLAY_UPLOAD: "1",
 
-            // [RUN-3257]Enable JS ASSERTS:
+            // [RUN-3257] Enable JS ASSERTS:
             RECORD_REPLAY_JS_OBJECT_ASSERTS: "1",
             RECORD_REPLAY_JS_PROGRESS_ASSERTS: "1",
-            RECORD_REPLAY_JS_PROGRESS_CHECKS: "1"
+            RECORD_REPLAY_JS_PROGRESS_CHECKS: "1",
           },
         }
       );
