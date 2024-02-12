@@ -1,84 +1,22 @@
 import { useContext } from "react";
-import { useStreamingValue } from "suspense";
 
 import Icon from "replay-next/components/Icon";
-import { isNetworkRequestCommentTypeData } from "replay-next/components/sources/utils/comments";
+import { NetworkRequestComment } from "replay-next/components/sources/utils/comments";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
-import { networkRequestsCache } from "replay-next/src/suspense/NetworkRequestsCache";
-import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { setSelectedPanel } from "ui/actions/layout";
 import { selectNetworkRequest } from "ui/actions/network";
 import { useAppDispatch } from "ui/setup/hooks";
-import { Comment } from "ui/state/comments";
 import { trackEvent } from "ui/utils/telemetry";
 import { isInFocusSpan } from "ui/utils/timeline";
 
 import styles from "./styles.module.css";
 
 // Adapter component that can handle rendering legacy or modern network-request comments.
-export default function NetworkRequestPreview({ comment }: { comment: Comment }) {
-  const { type, typeData } = comment;
+export default function NetworkRequestPreview({ comment }: { comment: NetworkRequestComment }) {
+  const { id, method, name, time } = comment.typeData;
 
-  if (isNetworkRequestCommentTypeData(type, typeData)) {
-    // Modern comments store all of the information needed to render the comment preview in the typeData field.
-    return (
-      <ModernNetworkRequestPreview
-        id={typeData.id}
-        method={typeData.method}
-        name={typeData.name}
-        time={comment.time}
-      />
-    );
-  } else if (comment.networkRequestId !== null) {
-    // Legacy comments store only the network request id (which must be used to match against Redux data).
-    return <LegacyNetworkRequestPreview networkRequestId={comment.networkRequestId} />;
-  } else {
-    return null;
-  }
-}
-
-function LegacyNetworkRequestPreview({ networkRequestId }: { networkRequestId: string }) {
-  const replayClient = useContext(ReplayClientContext);
-
-  const stream = networkRequestsCache.stream(replayClient);
-  const data = useStreamingValue(stream);
-  const records = data.data;
-  if (records == null) {
-    return null;
-  }
-
-  const record = records[networkRequestId];
-  if (record == null) {
-    return null;
-  }
-
-  const requestOpenEvent = record.events.openEvent;
-  if (requestOpenEvent == null) {
-    return null;
-  }
-
-  return (
-    <ModernNetworkRequestPreview
-      id={networkRequestId}
-      method={requestOpenEvent.requestMethod}
-      name={requestOpenEvent.requestUrl}
-      time={record.timeStampedPoint.time}
-    />
-  );
-}
-
-function ModernNetworkRequestPreview({
-  id,
-  method,
-  name,
-  time,
-}: {
-  id: string;
-  method: string;
-  name: string;
-  time: number;
-}) {
   const dispatch = useAppDispatch();
+
   const { range: focusWindow } = useContext(FocusContext);
 
   const onClick = () => {

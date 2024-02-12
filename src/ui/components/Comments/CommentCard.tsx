@@ -3,9 +3,13 @@ import { MouseEvent, memo, useContext } from "react";
 
 import { selectLocation } from "devtools/client/debugger/src/actions/sources";
 import { getThreadContext } from "devtools/client/debugger/src/selectors";
-import { isSourceCodeCommentTypeData } from "replay-next/components/sources/utils/comments";
+import {
+  isSourceCodeComment,
+  isSourceCodeCommentTypeData,
+} from "replay-next/components/sources/utils/comments";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
+import { Comment } from "shared/graphql/types";
 import { isPointInRegion } from "shared/utils/time";
 import { seekToComment } from "ui/actions/comments";
 import { setViewMode } from "ui/actions/layout";
@@ -18,7 +22,6 @@ import {
 } from "ui/reducers/app";
 import { getViewMode } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { Comment } from "ui/state/comments";
 import { isCommentContentEmpty } from "ui/utils/comments";
 import { trackEvent } from "ui/utils/telemetry";
 
@@ -57,7 +60,9 @@ function CommentCard({
     dispatch(setSelectedCommentId(comment.id));
 
     const openSource = viewMode === "dev";
-    dispatch(seekToComment(comment, comment.sourceLocation, openSource));
+    if (isSourceCodeComment(comment)) {
+      dispatch(seekToComment(comment, openSource));
+    }
 
     const { type, typeData } = comment;
     if (openSource && isSourceCodeCommentTypeData(type, typeData)) {
@@ -85,7 +90,7 @@ function CommentCard({
 
   const onPreviewClick = (event: MouseEvent) => {
     event.stopPropagation();
-    dispatch(seekToComment(comment, comment.sourceLocation, true));
+    dispatch(seekToComment(comment, true));
   };
 
   const showReplyButton = !isCommentContentEmpty(comment.content);

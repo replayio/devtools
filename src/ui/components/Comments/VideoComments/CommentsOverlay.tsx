@@ -1,6 +1,7 @@
 import { useContext, useMemo } from "react";
 
 import { isVisualCommentTypeData } from "replay-next/components/sources/utils/comments";
+import { Comment } from "shared/graphql/types";
 import { getRecordingTarget } from "ui/actions/app";
 import VideoComment from "ui/components/Comments/VideoComments/VideoComment";
 import { NodePickerContext } from "ui/components/NodePickerContext";
@@ -8,7 +9,6 @@ import hooks from "ui/hooks";
 import { getHoveredCommentId, getSelectedCommentId } from "ui/reducers/app";
 import { getCurrentTime, getPlayback } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
-import { Comment } from "ui/state/comments";
 
 function findComment({ comments, currentTime }: { comments: Comment[]; currentTime: number }) {
   return comments.filter(
