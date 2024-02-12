@@ -24,13 +24,7 @@ export function useDisplayedScreenShot(screenShot: ScreenShot | undefined, time:
     }
   }, [screenShot, preferHoverTime, time]);
 
-  let screenShotToRender = screenShot;
-  if (screenShotToRender == null && time >= prevScreenShotData.time) {
-    // If we're seeking (or playing) forward, continue to show the previous screenshot
-    // This prevents "flickering" while the new one loads
-    // It doesn't make sense to do this when seeking backwards though
-    screenShotToRender = prevScreenShotData.screenShot;
-  }
-
-  return screenShotToRender;
+  // If we're seeking (or playing) forward, continue to show the previous screenshot
+  // This prevents "flickering" while the new one loads
+  return screenShot ?? prevScreenShotData.screenShot;
 }
