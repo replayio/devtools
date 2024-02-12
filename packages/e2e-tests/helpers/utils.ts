@@ -87,11 +87,19 @@ export async function mapLocators<T>(
 export async function getSupportFormErrorDetails(page: Page) {
   if (await page.locator('[data-test-id="SupportForm"]').isVisible()) {
     const errorDetailsLocator = page.locator('[data-test-id="UnexpectedErrorDetails"]');
-    if (await errorDetailsLocator.isVisible()) {
-      return await errorDetailsLocator.innerText();
-    }
+    return (await errorDetailsLocator.innerText()) || "(support form is visible)";
   }
   return null;
+}
+
+export class UnrecoverableError extends Error {
+  constructor(message?: string) {
+    super(message);
+  }
+
+  get isUnrecoverable() {
+    return true;
+  }
 }
 
 export async function waitForRecordingToFinishIndexing(page: Page): Promise<void> {
@@ -102,31 +110,25 @@ export async function waitForRecordingToFinishIndexing(page: Page): Promise<void
   );
 
   const timelineCapsuleLocator = page.locator('[data-test-id="Timeline-Capsule"]');
-  try {
-    await waitFor(
-      async () => {
-        expect(
-          await timelineCapsuleLocator.getAttribute("data-test-progress"),
-          "Recording did not finish processing"
-        ).toBe("100");
-      },
-      {
-        retryInterval: 1_000,
-        timeout: 150_000,
+
+  let supportFormErrorDetails: string | null = null;
+  await waitFor(
+    async () => {
+      supportFormErrorDetails = await getSupportFormErrorDetails(page);
+      if (supportFormErrorDetails) {
+        throw new UnrecoverableError(`Session failed: ${supportFormErrorDetails}`);
       }
-    );
-  } catch (err: any) {
-    let errorDetails: string | null = null;
-    try {
-      errorDetails = await getSupportFormErrorDetails(page);
-    } finally {
-      if (errorDetails) {
-        throw new Error(`Session failed: ${errorDetails}`);
-      }
-      // Page is in a faulty state or no more info available: Simply report original error.
-      throw err;
+
+      expect(
+        await timelineCapsuleLocator.getAttribute("data-test-progress"),
+        "Recording did not finish processing"
+      ).toBe("100");
+    },
+    {
+      retryInterval: 1_000,
+      timeout: 150_000,
     }
-  }
+  );
 }
 
 export async function toggleExpandable(
@@ -187,6 +189,10 @@ export async function waitFor(
         // We have to resort to heuristics since:
         // 1. We don't have access to the `Page` object, and
         // 2. the Error object also has no special properties.
+        throw error;
+      }
+      if (error?.isUnrecoverable) {
+        // We sometimes don't want to keep trying.
         throw error;
       }
       if (!error?.matcherResult) {
