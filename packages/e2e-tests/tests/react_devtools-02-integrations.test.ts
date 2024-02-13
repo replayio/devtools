@@ -59,65 +59,9 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
   const componentNames = await getAllVisibleComponentNames(page);
 
   /*
-    In production, the first 20-ish component names normally look like this (flattened):
-    [
-      "ea", 
-      "J", 
-      "X", 
-      "z", 
-      "Context.Provider", 
-      "Context.Provider", 
-      "Anonymous", 
-      "Context.Provider", 
-      "Context.Provider", 
-      "Context.Provider", 
-      "Context.Provider", 
-      "n8", 
-      "O", 
-      "Anonymous", 
-      "Anonymous"
-      "Auth0Provider", 
-      "iU",   
-      "Context.Provider", 
-      "Context.Consumer", 
-      "da", 
-      "dn"
-      "Anonymous", 
-      "Anonymous"
-    ]
-
-    In development, however, they are (minus dev-only components):
-
-    [
-      'Root',
-      'Head',
-      'AppContainer',
-      'Container',
-      'AppRouterContext.Provider',
-      'SearchParamsContext.Provider',
-      'PathnameContextProviderAdapter',
-      'PathnameContext.Provider',
-      'RouterContext.Provider',
-      'HeadManagerContext.Provider',
-      'ImageConfigContext.Provider',
-      'App',
-      'SystemProvider',
-      'Head',
-      'SideEffect',
-      'Auth0Provider',
-      'Auth0Provider', // twice? wut?
-      'Context.Provider',
-      'Context.Consumer',
-      'SSRRecordingPage',
-      'RecordingHead',
-      'Head',
-      'SideEffect'
-    ]
-    
-
-    In practice, the routine's name processing currently lose the specific context names, 
-    and a couple components aren't getting their names mapped.
-    But, assuming the routine name mapping worked, we _should_ end up with this:
+    The first 20-ish component names normally look like the list below (flattened)
+    In practice, the routine's name processing currently lose the specific context names,
+    but assuming the routine name mapping worked, we _should_ end up with this:
   */
   const expectedComponentNames = [
     "Root",
@@ -136,7 +80,7 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
     "Head",
     "SideEffect",
     "Auth0Provider",
-    "iN",
+    "Auth0Provider",
     "Context.Provider",
     "Context.Consumer",
     "SSRRecordingPage",
@@ -232,7 +176,7 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
   await searchComponents(page, "Suspense");
   await verifySearchResults(page, {
     currentNumber: 1,
-    totalNumber: 16,
+    totalNumber: 15,
   });
 
   list.evaluate(el => (el.scrollTop = 0));
