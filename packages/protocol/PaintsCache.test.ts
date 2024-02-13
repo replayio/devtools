@@ -43,17 +43,19 @@ describe("PaintsCache", () => {
   });
 
   function preCacheScreenshot(base64: string, mimeType: ScreenShot["mimeType"], data: string) {
-    screenshotCache.cache(
-      {
-        data,
-        hash: base64,
-        mimeType,
-        scale: 1,
-      },
-      null as any,
-      null as any,
-      base64
-    );
+    if (base64) {
+      screenshotCache.cache(
+        {
+          data,
+          hash: base64,
+          mimeType,
+          scale: 1,
+        },
+        null as any,
+        null as any,
+        base64
+      );
+    }
   }
 
   describe("findFirstMeaningfulPaint", () => {

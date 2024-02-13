@@ -43,7 +43,7 @@ export const StreamingScreenShotCache = createStreamingCache<
 
     const paintPoint = findMostRecentPaint(time);
 
-    if (paintPoint) {
+    if (paintPoint && paintPoint.paintHash) {
       try {
         screenShot = await screenshotCache.readAsync(
           replayClient,
@@ -69,7 +69,7 @@ export const StreamingScreenShotCache = createStreamingCache<
       }
     }
 
-    if (executionPoint != null) {
+    if (executionPoint && executionPoint !== "0") {
       const pauseId = await pauseIdCache.readAsync(replayClient, executionPoint, time);
 
       try {
