@@ -20,10 +20,6 @@ const TestFileOverrideList = [];
 const TestFileBlackList = new Set([
   // https://linear.app/replay/issue/RUN-3222/
   "tests/jump-to-code-01_basic.test.ts",
-  // https://linear.app/replay/issue/RUN-3223
-  "tests/breakpoints-06.test.ts",
-  "tests/object_preview-04.test.ts",
-  "tests/stepping-05_chromium.test.ts",
   // https://linear.app/replay/issue/RUN-3224/
   "authenticated/comments-03.test.ts",
 ]);
