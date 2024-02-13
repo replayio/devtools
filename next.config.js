@@ -1,6 +1,5 @@
 const { patchWebpackConfig } = require("next-global-css");
 const { RetryChunkLoadPlugin } = require("webpack-retry-chunk-load-plugin");
-const { WebpackReactSourcemapsPlugin } = require("@acemarke/react-prod-sourcemaps");
 
 const withBundleAnalyzer = require("@next/bundle-analyzer")({
   enabled: process.env.ANALYZE === "true",
@@ -138,8 +137,6 @@ const baseNextConfig = {
         })
       );
     }
-
-    config.plugins.push(WebpackReactSourcemapsPlugin({ debug: false }));
 
     // Allow CSS imported from `node_modules`, to work around an error
     // from importing `<Editor>` from `@redux-devtools/ui`

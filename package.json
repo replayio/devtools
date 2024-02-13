@@ -21,7 +21,6 @@
     "gql": "yarn gql:schema && yarn gql:gen"
   },
   "dependencies": {
-    "@acemarke/react-prod-sourcemaps": "0.2.1",
     "@apollo/client": "^3.5.10",
     "@auth0/auth0-react": "1.2.0",
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
