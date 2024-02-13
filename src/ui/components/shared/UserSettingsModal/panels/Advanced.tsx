@@ -9,7 +9,6 @@ export const PREFERENCES: PreferencesKey[] = [
   "feature_protocolTimeline",
   "feature_protocolPanel",
   "backend_newControllerOnRefresh",
-  "protocol_chromiumRepaints",
   "backend_profileWorkerThreads",
   "backend_disableCache",
   "backend_disableScanDataCache",

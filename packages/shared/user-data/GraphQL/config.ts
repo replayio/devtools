@@ -260,11 +260,6 @@ export const config = {
     defaultValue: Boolean(true),
     legacyKey: null,
   },
-  protocol_chromiumRepaints: {
-    defaultValue: Boolean(true),
-    label: "Enable repaintGraphics for Chrome.",
-    legacyKey: "devtools.features.chromiumRepaints",
-  },
   protocol_repaintEvaluations: {
     defaultValue: Boolean(false),
     legacyKey: "devtools.features.repaintEvaluations",
