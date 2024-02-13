@@ -4,10 +4,9 @@ import { addBreakpoint } from "../helpers/source-panel";
 import { waitFor } from "../helpers/utils";
 import { Page, test } from "../testFixtureCloneRecording";
 
-test.use({ exampleKey: "doc_control_flow_firefox.html" });
+test.use({ exampleKey: "doc_control_flow.html" });
 
-// TODO [RUN-3260]
-test.skip("repaint: repaints the screen screen when stepping over code that modifies the DOM", async ({
+test("repaint: repaints the screen screen when stepping over code that modifies the DOM", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
