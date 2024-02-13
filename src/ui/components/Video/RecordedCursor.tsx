@@ -22,15 +22,19 @@ export function RecordedCursor({ time }: { time: number }) {
     if (mouseEvent) {
       // Imperatively position and scale these graphics to avoid "render lag" when resizes occur
       return subscribe(state => {
-        const { localScale, recordingScale } = state;
+        const { height, localScale, recordingScale, width } = state;
 
-        const scale = recordingScale / localScale;
-        let mouseX = mouseEvent.clientX / scale;
-        let mouseY = mouseEvent.clientY / scale;
+        const originalHeight = height / localScale;
+        const originalWidth = width / localScale;
+
+        const mouseX = (mouseEvent.clientX / originalWidth) * width;
+        const mouseY = (mouseEvent.clientY / originalHeight) * height;
+
+        const cursorScale = Math.min(1, Math.max(0.25, localScale * recordingScale));
 
         element.style.left = `${mouseX}px`;
         element.style.top = `${mouseY}px`;
-        element.style.transform = `scale(${localScale})`;
+        element.style.transform = `scale(${cursorScale})`;
       });
     }
   }, [mouseEvent]);
