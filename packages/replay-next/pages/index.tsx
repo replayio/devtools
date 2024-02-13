@@ -6,7 +6,7 @@ import ConsoleRoot from "replay-next/components/console";
 import Focuser from "replay-next/components/console/Focuser";
 import Icon from "replay-next/components/Icon";
 import Initializer from "replay-next/components/Initializer";
-import LazyOffscreen from "replay-next/components/LazyOffscreen";
+import LazyActivity from "replay-next/components/LazyActivity";
 import Loader from "replay-next/components/Loader";
 import ProtocolViewer from "replay-next/components/protocol/ProtocolViewer";
 import SearchFiles from "replay-next/components/search-files/SearchFiles";
@@ -114,20 +114,20 @@ export default function HomePage({ apiKey }: { apiKey?: string }) {
                             >
                               <div className={styles.CommentsContainer}>
                                 <Suspense fallback={<Loader />}>
-                                  <LazyOffscreen mode={panel == "comments" ? "visible" : "hidden"}>
+                                  <LazyActivity mode={panel == "comments" ? "visible" : "hidden"}>
                                     <CommentList />
-                                  </LazyOffscreen>
-                                  <LazyOffscreen
+                                  </LazyActivity>
+                                  <LazyActivity
                                     mode={panel == "protocol-viewer" ? "visible" : "hidden"}
                                   >
                                     <ProtocolViewer />
-                                  </LazyOffscreen>
-                                  <LazyOffscreen mode={panel == "search" ? "visible" : "hidden"}>
+                                  </LazyActivity>
+                                  <LazyActivity mode={panel == "search" ? "visible" : "hidden"}>
                                     <SearchFiles />
-                                  </LazyOffscreen>
-                                  <LazyOffscreen mode={panel == "sources" ? "visible" : "hidden"}>
+                                  </LazyActivity>
+                                  <LazyActivity mode={panel == "sources" ? "visible" : "hidden"}>
                                     <SourceExplorer />
-                                  </LazyOffscreen>
+                                  </LazyActivity>
                                 </Suspense>
                               </div>
                             </Panel>

@@ -122,7 +122,7 @@ export function SourceListRowMouseEvents({
     committedValuesRef.current.toggleBreakpoint = toggleBreakpoint;
   });
 
-  // Use a layout effect rather than a passive effect so event listeners will be removed if the parent Offscreen is hidden
+  // Use a layout effect rather than a passive effect so event listeners will be removed if the parent Activity is hidden
   useLayoutEffect(() => {
     const rowElement = document.querySelector(
       `[data-test-source-id="${sourceId}"] [data-test-name="SourceLine"][data-test-line-number="${lineNumber}"]`

@@ -8,7 +8,7 @@ import { ReactNode, Suspense, useContext, useState } from "react";
 import { ExpandablesContext } from "replay-next/src/contexts/ExpandablesContext";
 
 import Icon from "../Icon";
-import LazyOffscreen from "../LazyOffscreen";
+import LazyActivity from "../LazyActivity";
 import Loader from "../Loader";
 import HTMLChildrenRenderer from "./HTMLChildrenRenderer";
 import HTMLElementRenderer from "./values/HTMLElementRenderer";
@@ -78,7 +78,7 @@ export default function HTMLExpandable({
         />
       </span>
 
-      <LazyOffscreen mode={isOpen ? "visible" : "hidden"}>
+      <LazyActivity mode={isOpen ? "visible" : "hidden"}>
         <span className={styles.Children} data-test-name="ExpandableChildren">
           <Suspense fallback={<Loader />}>
             <HTMLChildrenRenderer object={object} path={path} pauseId={pauseId} />
@@ -94,7 +94,7 @@ export default function HTMLExpandable({
             showOpeningTag={false}
           />
         </span>
-      </LazyOffscreen>
+      </LazyActivity>
     </span>
   );
 }

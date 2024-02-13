@@ -1,8 +1,8 @@
 import classNames from "classnames";
 import {
+  unstable_Activity as Activity,
   KeyboardEvent,
   MouseEvent,
-  unstable_Offscreen as Offscreen,
   ReactNode,
   RefObject,
   Suspense,
@@ -93,7 +93,7 @@ function Console({
   // _If_ it's off initially, we want to completely skip rendering it, which
   // avoids making the "fetch events" calls during app startup to speed up loading.
   // But, if it's ever been shown and toggled off, continue rendering it
-  // inside the `<Offscreen>` to preserve state.
+  // inside the `<Activity>` to preserve state.
   const renderFilters = isMenuOpen || showFiltersByDefault || menuValueHasBeenToggled;
 
   const onKeyDown = (event: KeyboardEvent) => {
@@ -156,7 +156,7 @@ function Console({
       onKeyDown={onKeyDown}
     >
       <PanelGroup autoSaveId="ConsoleRoot" direction="horizontal">
-        <Offscreen mode={isMenuOpen ? "visible" : "hidden"}>
+        <Activity mode={isMenuOpen ? "visible" : "hidden"}>
           <>
             <Panel
               className={styles.LeftPanel}
@@ -189,7 +189,7 @@ function Console({
               <PanelResizeHandle className={styles.PanelResizeHandle} />
             </div>
           </>
-        </Offscreen>
+        </Activity>
 
         <Panel className={styles.RightPanel} defaultSize={75} id="console" minSize={50} order={2}>
           <div className={styles.RightColumnActionsRow}>

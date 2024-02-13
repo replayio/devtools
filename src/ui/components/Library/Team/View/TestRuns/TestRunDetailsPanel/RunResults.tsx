@@ -1,6 +1,6 @@
 import assert from "assert";
 import {
-  unstable_Offscreen as Offscreen,
+  unstable_Activity as Activity,
   ReactNode,
   memo,
   useContext,
@@ -117,9 +117,9 @@ function TestStatusGroup({
           />
         </div>
       </div>
-      <Offscreen mode={expanded ? "visible" : "hidden"}>
+      <Activity mode={expanded ? "visible" : "hidden"}>
         <PathNodeRenderer depth={1} filterByText={filterByText} label={label} pathNode={tree} />
-      </Offscreen>
+      </Activity>
     </div>
   );
 }
@@ -237,7 +237,7 @@ function PathNodeRenderer({
           )}
         </TestRunLibraryRow>
       )}
-      <Offscreen mode={expanded ? "visible" : "hidden"}>
+      <Activity mode={expanded ? "visible" : "hidden"}>
         {children.map((childNode, index) => {
           if (isPathNode(childNode)) {
             return (
@@ -255,7 +255,7 @@ function PathNodeRenderer({
             );
           }
         })}
-      </Offscreen>
+      </Activity>
     </>
   );
 }

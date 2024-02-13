@@ -1,11 +1,11 @@
-import { unstable_Offscreen as Offscreen, ReactNode, useEffect, useRef } from "react";
+import { unstable_Activity as Activity, ReactNode, useEffect, useRef } from "react";
 
-// Wrapper around the Offscreen API that defers rendering the Offscreen tree initially,
+// Wrapper around the Activity API that defers rendering the Activity tree initially,
 // until it's been explicitly marked as "visible".
 //
 // This allows UIs that make heavy use of Suspense (such as the Object Inspector)
 // to avoid sending a flood of protocol requests when initially mounted.
-export default function LazyOffscreen({
+export default function LazyActivity({
   children,
   mode,
 }: {
@@ -25,5 +25,5 @@ export default function LazyOffscreen({
     return null;
   }
 
-  return <Offscreen children={children} mode={mode} />;
+  return <Activity children={children} mode={mode} />;
 }

@@ -3,7 +3,7 @@ import React, { ReactNode, Suspense, useContext, useLayoutEffect } from "react";
 import { useImperativeCacheValue } from "suspense";
 
 import { EditorPane } from "devtools/client/debugger/src/components/Editor/EditorPane";
-import LazyOffscreen from "replay-next/components/LazyOffscreen";
+import LazyActivity from "replay-next/components/LazyActivity";
 import { PanelLoader } from "replay-next/components/PanelLoader";
 import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -270,5 +270,5 @@ export default function SecondaryToolbox() {
 }
 
 function Panel({ children, isActive }: { children: ReactNode; isActive: boolean }) {
-  return <LazyOffscreen mode={isActive ? "visible" : "hidden"}>{children}</LazyOffscreen>;
+  return <LazyActivity mode={isActive ? "visible" : "hidden"}>{children}</LazyActivity>;
 }

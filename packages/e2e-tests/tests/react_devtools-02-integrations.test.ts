@@ -240,11 +240,11 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
   // Re-select "App" just so we're back at the top
   await getReactComponents(page).first().click();
 
-  // Should render our `<LazyOffscreen>` components, but _not_ `<Offscreen>`,
+  // Should render our `<LazyActivity>` components, but _not_ `<Activity>`,
   // because RDT already filters those out by default
-  debugPrint(page, `Checking rendering of <Offscreen> components`);
+  debugPrint(page, `Checking rendering of <Activity> components`);
 
-  await searchComponents(page, "Offscreen");
+  await searchComponents(page, "Activity");
   await verifySearchResults(page, {
     currentNumber: 1,
     totalNumber: 6,
@@ -252,6 +252,6 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
 
   const offscreenSearchComponentNames = await getAllVisibleComponentNames(page);
   expect(offscreenSearchComponentNames.length).toBeGreaterThan(0);
-  expect(offscreenSearchComponentNames.includes("LazyOffscreen")).toBe(true);
-  expect(offscreenSearchComponentNames.includes("Offscreen")).toBe(false);
+  expect(offscreenSearchComponentNames.includes("LazyActivity")).toBe(true);
+  expect(offscreenSearchComponentNames.includes("Activity")).toBe(false);
 });
