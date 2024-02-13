@@ -6765,15 +6765,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"circular-dependency-plugin@npm:^5.2.2":
-  version: 5.2.2
-  resolution: "circular-dependency-plugin@npm:5.2.2"
-  peerDependencies:
-    webpack: ">=4.0.1"
-  checksum: d1a51e7f86e72d9e7a08c47234511cc7a5c3050781c2d6dcc77c0b22214f94f272702488c952e59b2af589c67944160ad1c9c0b7b3e0d4f89222f2a27ebf085e
-  languageName: node
-  linkType: hard
-
 "cjs-module-lexer@npm:^1.0.0":
   version: 1.2.2
   resolution: "cjs-module-lexer@npm:1.2.2"
@@ -14190,7 +14181,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:^2.6.2, prettier@npm:^2.8.8":
+"prettier@npm:^2.8.8":
   version: 2.8.8
   resolution: "prettier@npm:2.8.8"
   bin:
@@ -14940,7 +14931,6 @@ __metadata:
     babel-plugin-add-react-displayname: ^0.0.5
     babel-plugin-transform-import-meta: ^2.1.1
     bufferutil: ^4.0.6
-    circular-dependency-plugin: ^5.2.2
     classnames: ^2.3.1
     comlink: ^4.3.1
     compare-versions: ^6.0.0-rc.1
@@ -15044,7 +15034,6 @@ __metadata:
     v8-to-istanbul: ^9.0.1
     webpack: ^5.71.0
     webpack-cli: ^4.9.2
-    webpack-retry-chunk-load-plugin: ^3.0.0
   languageName: unknown
   linkType: soft
 
@@ -17749,17 +17738,6 @@ __metadata:
     clone-deep: ^4.0.1
     wildcard: ^2.0.0
   checksum: 88786ab91013f1bd2a683834ff381be81c245a4b0f63304a5103e90f6653f44dab496a0768287f8531761f8ad957d1f9f3ccb2cb55df0de1bd9ee343e079da26
-  languageName: node
-  linkType: hard
-
-"webpack-retry-chunk-load-plugin@npm:^3.0.0":
-  version: 3.1.1
-  resolution: "webpack-retry-chunk-load-plugin@npm:3.1.1"
-  dependencies:
-    prettier: ^2.6.2
-  peerDependencies:
-    webpack: ">=5.0.0"
-  checksum: ea621b7317691378d93dbfa67737657e7628d51988ae5540e04a0bd8e91deeadcd5cb5ba8d8995c89b5eb532190c2d818029992b34305821ea72376296dcdf8d
   languageName: node
   linkType: hard
 
