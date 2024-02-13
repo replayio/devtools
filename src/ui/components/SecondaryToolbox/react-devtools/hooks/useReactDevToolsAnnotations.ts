@@ -9,6 +9,8 @@ import { isPlaying as isPlayingSelector } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
 import { ParsedReactDevToolsAnnotation } from "ui/suspense/annotationsCaches";
 
+import { cacheRendererIdsToFiberIds } from "../injectReactDevtoolsBackend";
+
 export function useReactDevToolsAnnotations({
   annotations,
   executionPoint: currentExecutionPoint,
@@ -99,6 +101,8 @@ export function useReactDevToolsAnnotations({
           wall.sendAnnotation(contents);
         }
       }
+
+      cacheRendererIdsToFiberIds(currentPauseId, wall.store!);
 
       if (listData) {
         listData.processMutatedStore();
