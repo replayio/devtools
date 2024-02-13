@@ -3,7 +3,7 @@ import { Deferred, createDeferred } from "suspense";
 
 import { waitForTime } from "protocol/utils";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { stopPlayback } from "ui/actions/timeline";
+import { seek, stopPlayback } from "ui/actions/timeline";
 import { getPlayback, setTimelineState } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
@@ -86,6 +86,10 @@ export function useImperativeVideoPlayback(): [
 
     return () => {
       stop = true;
+
+      // Jump to the nearest recorded event (mouse or paint)
+      // so that Redux state is updated with approximately the same time as playback was stopped at
+      dispatch(seek({ time: previousTime }));
 
       setPlaybackTime(null);
     };
