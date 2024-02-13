@@ -41,16 +41,11 @@ export interface GetRecording_recording_comments {
   id: string;
   isPublished: boolean | null;
   content: string;
-  primaryLabel: string | null;
-  secondaryLabel: string | null;
   createdAt: any;
   updatedAt: any;
   hasFrames: boolean;
-  sourceLocation: any | null;
   time: number;
   point: string;
-  position: any | null;
-  networkRequestId: string | null;
   user: GetRecording_recording_comments_user | null;
   replies: GetRecording_recording_comments_replies[];
 }

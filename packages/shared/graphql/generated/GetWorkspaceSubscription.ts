@@ -8,7 +8,7 @@
 // ====================================================
 
 export interface GetWorkspaceSubscription_node_Recording {
-  __typename: "Recording";
+  __typename: "Recording" | "RootCauseAnalysis";
 }
 
 export interface GetWorkspaceSubscription_node_Workspace_subscription_paymentMethods_card {
