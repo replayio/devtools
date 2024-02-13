@@ -150,7 +150,7 @@ const baseNextConfig = {
     };
 
     const sourceMapRegExp =
-      /node_modules.+(immer|@reduxjs|react-resizable-panels|react-window|suspense|use-context-menu).+\.js$/;
+      /node_modules.+(immer|@reduxjs|react-resizable-panels|react|react-dom|react-window|suspense|use-context-menu).+\.js$/;
 
     config.module.rules.push({
       test: sourceMapRegExp,
