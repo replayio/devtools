@@ -18,12 +18,12 @@ import {
 } from "../helpers/new-react-devtools-panel";
 import { getGetterValue } from "../helpers/object-inspector";
 import { clickScreenshot, hoverScreenshot } from "../helpers/screenshot";
-import { delay, waitFor } from "../helpers/utils";
+import { waitFor } from "../helpers/utils";
 import test, { expect } from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "cra/dist/index.html" });
 
-test.skip("react_devtools-01: Basic RDT behavior", async ({
+test("react_devtools-01: Basic RDT behavior", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {

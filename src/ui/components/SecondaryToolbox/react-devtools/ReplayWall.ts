@@ -130,11 +130,7 @@ export class ReplayWall implements Wall {
 
           this.unhighlightNode();
 
-          const [, fiberIdsToNodeIds] = await nodesToFiberIdsCache.readAsync(
-            replayClient,
-            pauseId,
-            store
-          );
+          const [, fiberIdsToNodeIds] = await nodesToFiberIdsCache.readAsync(replayClient, pauseId);
 
           // Get the first node ID we found for this fiber ID, if available.
           const [nodeId] = fiberIdsToNodeIds.get(fiberId) ?? [];
@@ -181,7 +177,7 @@ export class ReplayWall implements Wall {
               type: "reactComponent",
             },
             async () => {
-              const result = await nodesToFiberIdsCache.readAsync(replayClient, pauseId, store);
+              const result = await nodesToFiberIdsCache.readAsync(replayClient, pauseId);
 
               nodeIdsToFiberIds = result[0];
 

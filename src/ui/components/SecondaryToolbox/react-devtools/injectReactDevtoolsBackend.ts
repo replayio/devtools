@@ -2,7 +2,7 @@ import { ObjectId, PauseId } from "@replayio/protocol";
 import type { RendererInterface } from "@replayio/react-devtools-inline";
 import type { DevToolsHook } from "@replayio/react-devtools-inline/backend";
 import type { SerializedElement, Store } from "@replayio/react-devtools-inline/frontend";
-import { Cache, createCache } from "suspense";
+import { Cache, createCache, createExternallyManagedCache } from "suspense";
 
 import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
@@ -236,30 +236,43 @@ function getComponentSpecificNodesToFiberIDs(
   }
 }
 
+const rendererIdsToFiberIdsCache = createExternallyManagedCache<
+  [pauseId: string],
+  Record<number, number[]>
+>({
+  debugLabel: "rendererIdsToFiberIdsCache",
+  getKey: ([pauseId]) => pauseId,
+});
+
+export function cacheRendererIdsToFiberIds(pauseId: string, store: StoreWithInternals) {
+  const rendererIdsToFiberIds: Record<number, number[]> = {};
+
+  // Figure out all of the current fiber IDs we expect exist at this point in time
+  for (const rootID of store.roots) {
+    const rendererId = store.rootIDToRendererID.get(rootID)!;
+    const elementIDs = collectElementIDs(store, rootID);
+
+    if (!(rendererId in rendererIdsToFiberIds)) {
+      rendererIdsToFiberIds[rendererId] = [];
+    }
+    rendererIdsToFiberIds[rendererId].push(...elementIDs);
+  }
+
+  rendererIdsToFiberIdsCache.cacheValue(rendererIdsToFiberIds, pauseId);
+}
+
 export const nodesToFiberIdsCache: Cache<
-  [replayClient: ReplayClientInterface, pauseId: string, store: StoreWithInternals],
+  [replayClient: ReplayClientInterface, pauseId: string],
   [Map<ObjectId, number>, Map<number, ObjectId[]>]
 > = createCache({
   debugLabel: "nodesToFiberIdsCache",
-  // simplifying assumption that the store will have the same contents at a pause ID
-  getKey: ([replayClient, pauseId, store]) => pauseId,
-  async load([replayClient, pauseId, store]) {
+  getKey: ([replayClient, pauseId]) => pauseId,
+  async load([replayClient, pauseId]) {
     const nodeIdsToFiberIds = new Map<ObjectId, number>();
 
-    const rendererIdsToFiberIds: Record<number, number[]> = {};
+    const rendererIdsToFiberIds = await rendererIdsToFiberIdsCache.readAsync(pauseId);
 
     const recordingCapabilities = recordingCapabilitiesCache.getValueIfCached(replayClient)!;
-
-    // Figure out all of the current fiber IDs we expect exist at this point in time
-    for (const rootID of store!.roots) {
-      const rendererId = store!.rootIDToRendererID.get(rootID)!;
-      const elementIDs = collectElementIDs(store, rootID);
-
-      if (!(rendererId in rendererIdsToFiberIds)) {
-        rendererIdsToFiberIds[rendererId] = [];
-      }
-      rendererIdsToFiberIds[rendererId].push(...elementIDs);
-    }
 
     const nodeIdsExpression = `
       // Pass in the fiber IDs and the capabilities flag

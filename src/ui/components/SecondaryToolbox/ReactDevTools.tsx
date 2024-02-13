@@ -181,9 +181,9 @@ export function ReactDevtoolsPanel() {
   }, [ReactDevTools, wall, currentPoint, annotations, pauseId]);
 
   useEffect(() => {
-    if (pauseId && wall.store) {
+    if (pauseId) {
       // Speed up node picker initialization
-      nodesToFiberIdsCache.prefetch(replayClient, pauseId, wall.store);
+      nodesToFiberIdsCache.prefetch(replayClient, pauseId);
     }
   }, [pauseId, replayClient, wall]);
 
