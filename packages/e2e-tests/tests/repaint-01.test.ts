@@ -1,8 +1,9 @@
 import { openDevToolsTab, startTest } from "../helpers";
 import { rewindToLine, stepOver, waitForPaused } from "../helpers/pause-information-panel";
+import { getGraphicsDataUrl } from "../helpers/screenshot";
 import { addBreakpoint } from "../helpers/source-panel";
 import { waitFor } from "../helpers/utils";
-import { Page, test } from "../testFixtureCloneRecording";
+import { test } from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "doc_control_flow.html" });
 
@@ -16,7 +17,7 @@ test("repaint-01: repaints the screen screen when stepping over code that modifi
   await addBreakpoint(page, { lineNumber: 50, url: exampleKey });
   await rewindToLine(page, 50);
 
-  const prevSource = await getScreenShotSource(page);
+  const prevSource = await getGraphicsDataUrl(page);
 
   // this steps over a (synchronous) DOM update. The recorded screenshot for the point after the step
   // will not have changed (because the browser doesn't repaint in the middle of javascript execution),
@@ -25,17 +26,9 @@ test("repaint-01: repaints the screen screen when stepping over code that modifi
   await waitForPaused(page);
 
   await waitFor(async () => {
-    const nextSource = await getScreenShotSource(page);
+    const nextSource = await getGraphicsDataUrl(page);
     if (prevSource === nextSource) {
       throw `The screenshot did not change`;
     }
   });
 });
-
-async function getScreenShotSource(page: Page): Promise<string> {
-  const dataUrl = await page.evaluate(() => {
-    const element = document.querySelector("#graphics") as HTMLImageElement;
-    return element.src;
-  });
-  return dataUrl;
-}

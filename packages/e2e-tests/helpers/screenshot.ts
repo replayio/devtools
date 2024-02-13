@@ -65,3 +65,10 @@ export async function hoverScreenshot(page: Page, xPercentage: number, yPercenta
   const position = await convertCoordinatesForScreenshot(page, xPercentage, yPercentage);
   await screenshot.hover({ position, force: true });
 }
+
+export async function getGraphicsDataUrl(page: Page): Promise<string> {
+  return await page.evaluate(() => {
+    const element = document.querySelector("#graphics") as HTMLImageElement;
+    return element.src;
+  });
+}
