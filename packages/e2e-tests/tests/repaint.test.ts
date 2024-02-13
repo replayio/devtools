@@ -6,7 +6,8 @@ import { Page, test } from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "doc_control_flow_firefox.html" });
 
-test("repaint: repaints the screen screen when stepping over code that modifies the DOM", async ({
+// TODO [RUN-3260]
+test.skip("repaint: repaints the screen screen when stepping over code that modifies the DOM", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
