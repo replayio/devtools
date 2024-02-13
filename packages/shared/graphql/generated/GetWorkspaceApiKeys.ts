@@ -8,7 +8,7 @@
 // ====================================================
 
 export interface GetWorkspaceApiKeys_node_Recording {
-  __typename: "Recording";
+  __typename: "Recording" | "RootCauseAnalysis";
 }
 
 export interface GetWorkspaceApiKeys_node_Workspace_apiKeys {
