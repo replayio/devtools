@@ -93,7 +93,7 @@ export default function SourceList({
 
   useLayoutEffect(
     () => () => {
-      // The Offscreen API cleans up layout effects when hiding views.
+      // The Activity API cleans up layout effects when hiding views.
       // For our purposes, that's the same as an "unmount".
       hasMountedRef.current = false;
     },

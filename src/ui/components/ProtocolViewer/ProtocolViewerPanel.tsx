@@ -1,4 +1,4 @@
-import { unstable_Offscreen as Offscreen, Suspense, useContext, useMemo } from "react";
+import { unstable_Activity as Activity, Suspense, useContext, useMemo } from "react";
 
 import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBoundary";
 import { PanelLoader } from "replay-next/components/PanelLoader";
@@ -52,11 +52,11 @@ export function ProtocolViewerPanel() {
       )}
 
       <div className={styles.Panel}>
-        <Offscreen mode={safeSelectedTab === "live" ? "visible" : "hidden"}>
+        <Activity mode={safeSelectedTab === "live" ? "visible" : "hidden"}>
           <InlineErrorBoundary name="LiveProtocolRequests">
             <LiveProtocolRequests />
           </InlineErrorBoundary>
-        </Offscreen>
+        </Activity>
         {isRecordingOfReplay && safeSelectedTab === "recorded" ? (
           <InlineErrorBoundary name="RecordedProtocolRequests">
             <Suspense fallback={<PanelLoader />}>

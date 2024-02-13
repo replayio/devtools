@@ -11,8 +11,9 @@ import { verifyFocusModeVisible } from "../helpers/timeline";
 import test from "../testFixtureCloneRecording";
 
 // We need > 10k hits
+// Line 150 has >20k hits
 const sourceUrl = "react-dom.production.js";
-const lineNumber = 149;
+const lineNumber = 150;
 
 // trunk-ignore(gitleaks/generic-api-key)
 test.use({ exampleKey: "breakpoints-01" });
