@@ -13,7 +13,7 @@ test("repaint: repaints the screen screen when stepping over code that modifies 
   await startTest(page, recordingId);
   await openDevToolsTab(page);
 
-  await addBreakpoint(page, { lineNumber: 50, url: "doc_control_flow.html" });
+  await addBreakpoint(page, { lineNumber: 50, url: exampleKey });
   await rewindToLine(page, 50);
 
   const prevSource = await getScreenShotSource(page);
