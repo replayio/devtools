@@ -2,6 +2,7 @@ import { openDevToolsTab, startTest } from "../helpers";
 import {
   executeAndVerifyTerminalExpression,
   openConsolePanel,
+  toggleConsoleMessageType,
   verifyPausedAtMessage,
   warpToMessage,
 } from "../helpers/console-panel";
@@ -17,6 +18,8 @@ test("console_warp-02: support pausing, warping, stepping and evaluating console
   await startTest(page, recordingId);
   await openDevToolsTab(page);
   await openConsolePanel(page);
+  // hide the favicon exception
+  await toggleConsoleMessageType(page, "errors", false);
 
   // When warping to a message, it is the paused one.
   await warpToMessage(page, "number: 2");

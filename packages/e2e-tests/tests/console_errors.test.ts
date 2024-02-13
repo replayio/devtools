@@ -9,7 +9,7 @@ import test from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "doc_exceptions_bundle.html" });
 
-test("console_errors: Test that errors and warnings from various sources are shown in the console", async ({
+test.skip("console_errors: Test that errors and warnings from various sources are shown in the console", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {

@@ -82,6 +82,14 @@ async function saveRecording(
   recordingId: string,
   skipUpload?: boolean
 ) {
+  if (!skipUpload) {
+    await uploadRecording(recordingId, {
+      apiKey,
+      server: config.backendUrl,
+      strict: true,
+    });
+  }
+
   const response = await axios({
     url: config.graphqlUrl,
     method: "POST",
@@ -107,14 +115,6 @@ async function saveRecording(
   console.log(
     `Saving ${chalk.grey.bold(example)} with recording id ${chalk.yellow.bold(recordingId)}`
   );
-
-  if (!skipUpload) {
-    await uploadRecording(recordingId, {
-      apiKey,
-      server: config.backendUrl,
-      strict: true,
-    });
-  }
 
   await makeReplayPublic(apiKey, recordingId);
   await updateRecordingTitle(apiKey, recordingId, `E2E Example: ${example}`);
