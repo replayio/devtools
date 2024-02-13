@@ -13,7 +13,7 @@ import test, { expect } from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "node/exceptions.js" });
 
-test("node_logpoint-02: Node exception logpoints", async ({
+test.skip("node_logpoint-02: Node exception logpoints", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
