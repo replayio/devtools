@@ -4,6 +4,7 @@ import { exec, execSync } from "child_process";
 import path from "path";
 import chalk from "chalk";
 import difference from "lodash/difference";
+import size from "lodash/size";
 
 import { getSecret } from "./aws_secrets";
 import { ExampleInfo, getStats } from "./get-stats";
@@ -37,7 +38,8 @@ function checkReRecord(testFile, exampleFileInfo: ExampleInfo) {
 
   shouldTestOnLatest =
     exampleFileInfo.runtime === "chromium" &&
-    exampleFileInfo.runtimeReleaseDate.getUTCFullYear() === 2024;
+    exampleFileInfo.runtimeReleaseDate.getUTCFullYear() === 2024 &&
+    !exampleFileInfo.requiresManualUpdate;
   if (TestFileWhiteList.has(testFile) && TestFileBlackList.has(testFile)) {
     throw new Error(`Test was both in BlackList and WhiteList: ${testFile}`);
   }
@@ -58,11 +60,15 @@ function checkReRecord(testFile, exampleFileInfo: ExampleInfo) {
   return shouldTestOnLatest;
 }
 
+function computePct(current: number, total: number) {
+  return Math.round((current / total) * 100);
+}
+
 /**
  * Get all examples that should re-record and their depending tests.
  */
 function gatherChromiumExamplesAndTests() {
-  const { testFileToInfoMap } = getStats();
+  const { testFileToInfoMap, exampleToTestMap } = getStats();
   const testFiles = new Set<string>();
   const exampleFiles = new Set<string>();
 
@@ -86,8 +92,16 @@ function gatherChromiumExamplesAndTests() {
     }
   }
 
-  console.log(`Examples (${exampleFiles.size}):\n ${Array.from(exampleFiles).join("\n ")}`);
-  console.log(`Tests (${testFiles.size}):\n ${Array.from(testFiles).join("\n ")}`);
+  console.log(
+    `Examples (${exampleFiles.size}, ${computePct(
+      exampleFiles.size,
+      size(exampleToTestMap)
+    )}%):\n ${Array.from(exampleFiles).join(", ")}`
+  );
+  console.log(`Tests (${testFiles.size}, ${computePct(
+    testFiles.size,
+    size(testFileToInfoMap)
+  )}%):\n ${Array.from(testFiles).join(", ")}`);
 
   if (TestFileOverrideList.length) {
     // Only check TestFileOverrideList.
