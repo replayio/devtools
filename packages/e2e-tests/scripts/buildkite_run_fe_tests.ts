@@ -98,10 +98,12 @@ function gatherChromiumExamplesAndTests() {
       size(exampleToTestMap)
     )}%):\n ${Array.from(exampleFiles).join(", ")}`
   );
-  console.log(`Tests (${testFiles.size}, ${computePct(
-    testFiles.size,
-    size(testFileToInfoMap)
-  )}%):\n ${Array.from(testFiles).join(", ")}`);
+  console.log(
+    `Tests (${testFiles.size}, ${computePct(
+      testFiles.size,
+      size(testFileToInfoMap)
+    )}%):\n ${Array.from(testFiles).join(", ")}`
+  );
 
   if (TestFileOverrideList.length) {
     // Only check TestFileOverrideList.
