@@ -40,6 +40,7 @@ export type Test = {
   testId: string;
   title: string;
   failureRate: number;
+  flakyRate: number;
 };
 
 export type TestWithExecutions = Test & {
@@ -61,7 +62,15 @@ export type TestExecution = {
   createdAt: string;
   result: string;
   commitTitle: string | null;
+  commitAuthor: string | null;
+  testRunId: string;
   recordings: Pick<Recording, "id" | "title" | "isProcessed">[];
+};
+
+export type GroupedTestRun = {
+  testRunId: string;
+  executions: TestExecution[];
+  date: string;
 };
 
 export type TestRun = {
@@ -100,4 +109,48 @@ export function getTestRunTitle(groupedTestCases: TestRun): string {
   }
 
   return "Test";
+}
+
+export function filterTestRun(
+  testRun: TestRun,
+  {
+    status,
+    text,
+    branch,
+  }: {
+    status: string;
+    text: string;
+    branch: string;
+  }
+) {
+  const lowerCaseText = text.toLowerCase();
+  if (status === "failed") {
+    if (testRun.results.counts.failed === 0) {
+      return false;
+    }
+  }
+
+  const branchName = testRun.source?.branchName ?? "";
+
+  if (branch === "primary") {
+    // TODO This should be configurable by Workspace
+    if (branchName !== "main" && branchName !== "master") {
+      return false;
+    }
+  }
+
+  if (text !== "") {
+    const user = testRun.source?.user ?? "";
+    const title = getTestRunTitle(testRun);
+
+    if (
+      !branchName.toLowerCase().includes(lowerCaseText) &&
+      !user.toLowerCase().includes(lowerCaseText) &&
+      !title.toLowerCase().includes(lowerCaseText)
+    ) {
+      return false;
+    }
+  }
+
+  return true;
 }

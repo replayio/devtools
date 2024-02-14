@@ -8,6 +8,6 @@ test(`restart debugging session`, async ({ pageWithMeta: { page, recordingId }, 
   await startTest(page, recordingId);
   await openDevToolsTab(page);
   await commandPalette(page, "restart session");
-  await page.waitForNavigation();
+  await page.waitForURL(/restart=true/);
   await waitForRecordingToFinishIndexing(page);
 });

@@ -8,7 +8,7 @@
 // ====================================================
 
 export interface GetWorkspaceRecordings_node_Recording {
-  __typename: "Recording";
+  __typename: "Recording" | "RootCauseAnalysis";
 }
 
 export interface GetWorkspaceRecordings_node_Workspace_recordings_edges_node_comments_user {

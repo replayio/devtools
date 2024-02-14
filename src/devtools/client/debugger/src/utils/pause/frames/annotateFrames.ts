@@ -29,7 +29,6 @@ function annotateFrame(frame: PauseFrame, frames: PauseFrame[]) {
 
 function annotateBabelAsyncFrames(frames: PauseFrame[]) {
   const babelFrameIndexes = getBabelFrameIndexes(frames);
-  // @ts-expect-error doesn't like searching for numbers in a PauseFrame[]
   const isBabelFrame = (frameIndex: number) => babelFrameIndexes.includes(frameIndex);
 
   return frames.map((frame, frameIndex) =>

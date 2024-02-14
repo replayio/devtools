@@ -12,7 +12,6 @@ export interface ZoomRegion {
 }
 
 export interface TimelineState {
-  allPaintsReceived: boolean;
   currentTime: number;
   dragging: boolean;
   focusWindow: TimeRange | null;
@@ -20,26 +19,27 @@ export interface TimelineState {
   hoverTime: number | null;
   markTimeStampedPoint: TimeStampedPoint | null;
   maxRecordingDurationForRoutines: number;
-  paints: TimeStampedPoint[];
   playback: {
     beginTime: number;
     beginDate: number;
+    endTime: number;
     time: number;
   } | null;
   playbackFocusWindow: boolean;
   playbackPrecachedTime: number;
-  points: TimeStampedPoint[];
+  endpoint: TimeStampedPoint;
   recordingDuration: number | null;
   shouldAnimate: boolean;
   showFocusModeControls: boolean;
+  showHoverTimeGraphics: boolean;
   stalled?: boolean;
   timelineDimensions: { width: number; left: number; top: number };
   zoomRegion: ZoomRegion;
 }
 
 export interface HoveredItem {
-  target: "timeline" | "console" | "widget" | "transcript";
   point?: string;
+  target: "timeline" | "console" | "widget" | "transcript";
   time?: number;
   location?: HoveredLocation;
 }
@@ -55,8 +55,6 @@ export enum FocusOperation {
 }
 
 export type PlaybackOptions = {
-  beginPoint?: string;
-  endPoint?: string;
   beginTime: number | null;
   endTime: number | null;
 };

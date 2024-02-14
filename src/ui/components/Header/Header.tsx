@@ -1,6 +1,7 @@
 import assert from "assert";
 import { RecordingId } from "@replayio/protocol";
 import classNames from "classnames";
+import { useRouter } from "next/router";
 import { ClipboardEvent, KeyboardEvent, useLayoutEffect, useRef, useState } from "react";
 
 import { RecordingTarget } from "replay-next/src/suspense/BuildIdCache";
@@ -166,6 +167,7 @@ function HeaderTitle({
 }
 
 export default function Header() {
+  const router = useRouter();
   const recordingTarget = useAppSelector(getRecordingTarget);
   const { isAuthenticated } = useAuth0();
   const recordingId = hooks.useGetRecordingId();
@@ -178,25 +180,28 @@ export default function Header() {
 
   assert(recording != null);
 
-  let dashboardUrl = window.location.origin;
-  if (recording.workspace !== null) {
-    dashboardUrl = `/team/${recording.workspace?.id}`;
-
-    if (isTestSuiteReplay(recording) && recording.metadata?.test) {
-      const runId = getTestRunId(recording.metadata.test);
-      if (runId != null) {
-        dashboardUrl += `/runs/${runId}`;
-      }
-    }
+  const referrer = Array.isArray(router.query.referrer)
+    ? router.query.referrer[0]
+    : router.query.referrer;
+  let fallbackUrl: string;
+  if (referrer) {
+    fallbackUrl = referrer;
   } else {
-    dashboardUrl = "/team/me/recordings";
+    if (recording.workspace != null) {
+      fallbackUrl = `/team/${recording.workspace.id}`;
+      if (isTestSuiteReplay(recording) && recording.testRunId) {
+        fallbackUrl += `/runs/${recording.testRunId}`;
+      }
+    } else {
+      fallbackUrl = "/team/me/recordings";
+    }
   }
 
   return (
     <div className={styles.Header}>
       <div className="relative flex flex-grow flex-row items-center overflow-hidden">
         {isAuthenticated && (
-          <a href={dashboardUrl}>
+          <a href={fallbackUrl}>
             <IconWithTooltip icon={backIcon} content={"Back to Library"} />
           </a>
         )}

@@ -8,16 +8,11 @@ export const GET_COMMENTS = gql`
         id
         isPublished
         content
-        primaryLabel
-        secondaryLabel
         createdAt
         updatedAt
         hasFrames
-        sourceLocation
         time
         point
-        position
-        networkRequestId
         type
         typeData
         user {

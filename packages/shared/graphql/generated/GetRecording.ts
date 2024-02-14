@@ -7,6 +7,11 @@
 // GraphQL query operation: GetRecording
 // ====================================================
 
+export interface GetRecording_recording_testRun {
+  __typename: "TestRun";
+  id: string;
+}
+
 export interface GetRecording_recording_comments_user {
   __typename: "User";
   id: string;
@@ -36,16 +41,11 @@ export interface GetRecording_recording_comments {
   id: string;
   isPublished: boolean | null;
   content: string;
-  primaryLabel: string | null;
-  secondaryLabel: string | null;
   createdAt: any;
   updatedAt: any;
   hasFrames: boolean;
-  sourceLocation: any | null;
   time: number;
   point: string;
-  position: any | null;
-  networkRequestId: string | null;
   user: GetRecording_recording_comments_user | null;
   replies: GetRecording_recording_comments_replies[];
 }
@@ -153,6 +153,7 @@ export interface GetRecording_recording {
   isTest: boolean;
   isProcessed: boolean | null;
   isInTestWorkspace: boolean;
+  testRun: GetRecording_recording_testRun | null;
   comments: GetRecording_recording_comments[];
   activeSessions: GetRecording_recording_activeSessions[] | null;
   owner: GetRecording_recording_owner | null;

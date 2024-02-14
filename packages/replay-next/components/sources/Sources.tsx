@@ -6,7 +6,7 @@ import { getSourceFileName } from "replay-next/src/utils/source";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import Icon from "../Icon";
-import LazyOffscreen from "../LazyOffscreen";
+import LazyActivity from "../LazyActivity";
 import Source from "./Source";
 import SourceFileNameSearch from "./SourceFileNameSearch";
 import {
@@ -147,12 +147,12 @@ function Sources() {
           {activeSourceIds.map(sourceId => {
             const source = getSourceSuspends(client, sourceId);
             return (
-              <LazyOffscreen
+              <LazyActivity
                 key={sourceId}
                 mode={sourceId === focusedSourceId ? "visible" : "hidden"}
               >
                 <Source source={source!} />
-              </LazyOffscreen>
+              </LazyActivity>
             );
           })}
         </div>

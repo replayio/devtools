@@ -18,21 +18,6 @@ h2 {
   height: 100%;
 }
 
-#graphics,
-#graphicsVideo {
-  position: absolute;
-  transform-origin: top left;
-  cursor: pointer;
-}
-
-#graphicsVideo {
-  max-width: unset;
-}
-
-.collapsed-toolbox #graphics {
-  position: absolute;
-}
-
 .command-button {
   float: left;
 }

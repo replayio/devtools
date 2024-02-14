@@ -66,6 +66,7 @@ export interface GetNonPendingWorkspaces_viewer_workspaces_edges_node {
   hasPaymentMethod: boolean;
   isTest: boolean;
   isOrganization: boolean;
+  retentionLimit: number | null;
   subscription: GetNonPendingWorkspaces_viewer_workspaces_edges_node_subscription | null;
   settings: GetNonPendingWorkspaces_viewer_workspaces_edges_node_settings | null;
   members: GetNonPendingWorkspaces_viewer_workspaces_edges_node_members | null;

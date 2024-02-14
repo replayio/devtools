@@ -59,65 +59,9 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
   const componentNames = await getAllVisibleComponentNames(page);
 
   /*
-    In production, the first 20-ish component names normally look like this (flattened):
-    [
-      "ea", 
-      "J", 
-      "X", 
-      "z", 
-      "Context.Provider", 
-      "Context.Provider", 
-      "Anonymous", 
-      "Context.Provider", 
-      "Context.Provider", 
-      "Context.Provider", 
-      "Context.Provider", 
-      "n8", 
-      "O", 
-      "Anonymous", 
-      "Anonymous"
-      "Auth0Provider", 
-      "iU",   
-      "Context.Provider", 
-      "Context.Consumer", 
-      "da", 
-      "dn"
-      "Anonymous", 
-      "Anonymous"
-    ]
-
-    In development, however, they are (minus dev-only components):
-
-    [
-      'Root',
-      'Head',
-      'AppContainer',
-      'Container',
-      'AppRouterContext.Provider',
-      'SearchParamsContext.Provider',
-      'PathnameContextProviderAdapter',
-      'PathnameContext.Provider',
-      'RouterContext.Provider',
-      'HeadManagerContext.Provider',
-      'ImageConfigContext.Provider',
-      'App',
-      'SystemProvider',
-      'Head',
-      'SideEffect',
-      'Auth0Provider',
-      'Auth0Provider', // twice? wut?
-      'Context.Provider',
-      'Context.Consumer',
-      'SSRRecordingPage',
-      'RecordingHead',
-      'Head',
-      'SideEffect'
-    ]
-    
-
-    In practice, the routine's name processing currently lose the specific context names, 
-    and a couple components aren't getting their names mapped.
-    But, assuming the routine name mapping worked, we _should_ end up with this:
+    The first 20-ish component names normally look like the list below (flattened)
+    In practice, the routine's name processing currently lose the specific context names,
+    but assuming the routine name mapping worked, we _should_ end up with this:
   */
   const expectedComponentNames = [
     "Root",
@@ -136,7 +80,7 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
     "Head",
     "SideEffect",
     "Auth0Provider",
-    "iN",
+    "Auth0Provider",
     "Context.Provider",
     "Context.Consumer",
     "SSRRecordingPage",
@@ -232,7 +176,7 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
   await searchComponents(page, "Suspense");
   await verifySearchResults(page, {
     currentNumber: 1,
-    totalNumber: 14,
+    totalNumber: 15,
   });
 
   list.evaluate(el => (el.scrollTop = 0));
@@ -240,11 +184,11 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
   // Re-select "App" just so we're back at the top
   await getReactComponents(page).first().click();
 
-  // Should render our `<LazyOffscreen>` components, but _not_ `<Offscreen>`,
+  // Should render our `<LazyActivity>` components, but _not_ `<Activity>`,
   // because RDT already filters those out by default
-  debugPrint(page, `Checking rendering of <Offscreen> components`);
+  debugPrint(page, `Checking rendering of <Activity> components`);
 
-  await searchComponents(page, "Offscreen");
+  await searchComponents(page, "Activity");
   await verifySearchResults(page, {
     currentNumber: 1,
     totalNumber: 6,
@@ -252,6 +196,6 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
 
   const offscreenSearchComponentNames = await getAllVisibleComponentNames(page);
   expect(offscreenSearchComponentNames.length).toBeGreaterThan(0);
-  expect(offscreenSearchComponentNames.includes("LazyOffscreen")).toBe(true);
-  expect(offscreenSearchComponentNames.includes("Offscreen")).toBe(false);
+  expect(offscreenSearchComponentNames.includes("LazyActivity")).toBe(true);
+  expect(offscreenSearchComponentNames.includes("Activity")).toBe(false);
 });

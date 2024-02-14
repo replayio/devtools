@@ -84,6 +84,33 @@ export async function mapLocators<T>(
   );
 }
 
+export async function getSupportFormErrorDetails(page: Page) {
+  if (await page.locator('[data-test-id="SupportForm"]').isVisible()) {
+    let details: string = "";
+    try {
+      const errorDetailsLocator = page.locator('[data-test-id="UnexpectedErrorDetails"]');
+      if (await errorDetailsLocator.isVisible()) {
+        details = await errorDetailsLocator.innerText();
+      }
+    } catch (err) {
+      // Ignore locator errors.
+      console.error(`ERROR:`, err);
+    }
+    return details || "(support form is visible)";
+  }
+  return null;
+}
+
+export class UnrecoverableError extends Error {
+  constructor(message?: string) {
+    super(message);
+  }
+
+  get isUnrecoverable() {
+    return true;
+  }
+}
+
 export async function waitForRecordingToFinishIndexing(page: Page): Promise<void> {
   await debugPrint(
     page,
@@ -92,9 +119,19 @@ export async function waitForRecordingToFinishIndexing(page: Page): Promise<void
   );
 
   const timelineCapsuleLocator = page.locator('[data-test-id="Timeline-Capsule"]');
+
+  let supportFormErrorDetails: string | null = null;
   await waitFor(
     async () => {
-      await expect(await timelineCapsuleLocator.getAttribute("data-test-progress")).toBe("100");
+      supportFormErrorDetails = await getSupportFormErrorDetails(page);
+      if (supportFormErrorDetails) {
+        throw new UnrecoverableError(`Session failed: ${supportFormErrorDetails}`);
+      }
+
+      expect(
+        await timelineCapsuleLocator.getAttribute("data-test-progress"),
+        "Recording did not finish processing"
+      ).toBe("100");
     },
     {
       retryInterval: 1_000,
@@ -156,9 +193,20 @@ export async function waitFor(
       await callback();
 
       return;
-    } catch (error) {
-      if (typeof error === "string") {
-        console.log(error);
+    } catch (error: any) {
+      if (error?.message?.includes("crash")) {
+        // We have to resort to heuristics since:
+        // 1. We don't have access to the `Page` object, and
+        // 2. the Error object also has no special properties.
+        throw error;
+      }
+      if (error?.isUnrecoverable) {
+        // We sometimes don't want to keep trying.
+        throw error;
+      }
+      if (!error?.matcherResult) {
+        // Not an `expect` error: → Log it.
+        console.log("ERROR:", error?.stack || error);
       }
 
       if (performance.now() - startTime > timeout) {
@@ -197,12 +245,13 @@ export async function locatorTextToNumber(locator: Locator): Promise<number | nu
   return trimmed ? parseInt(trimmed) : null;
 }
 
-export async function resetTestUser(email: string) {
+export async function resetTestUser(email: string, testScope: string) {
   const variables = { email, secret: process.env.AUTOMATED_TEST_SECRET };
 
   return axios({
     url: config.graphqlUrl,
     method: "POST",
+    headers: { "replay-test-scope": testScope },
     data: {
       query: `
         mutation resetTestUser($email: String!, $secret: String!) {

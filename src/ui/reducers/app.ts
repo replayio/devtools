@@ -1,20 +1,16 @@
-import { PayloadAction, createSelector, createSlice } from "@reduxjs/toolkit";
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { RecordingId } from "@replayio/protocol";
 
 import { RecordingTarget } from "replay-next/src/suspense/BuildIdCache";
-import { compareExecutionPoints } from "replay-next/src/utils/time";
 import { Workspace } from "shared/graphql/types";
 import { getMutableParamsFromURL } from "ui/setup/dynamic/url";
 import { UIState } from "ui/state";
 import {
   AppMode,
   AppState,
-  Canvas,
-  EventKind,
   ExpectedError,
   ModalOptionsType,
   ModalType,
-  ReplayEvent,
   SettingsTabTitle,
   UnexpectedError,
   UploadInfo,
@@ -25,11 +21,9 @@ const { commentId } = getMutableParamsFromURL();
 export const initialAppState: AppState = {
   accessToken: null,
   awaitingSourcemaps: false,
-  canvas: null,
   defaultSelectedReactElementId: null,
   defaultSettingsTab: "Preferences",
   displayedLoadingProgress: null,
-  events: {},
   expectedError: null,
   hoveredCommentId: null,
   loading: 4,
@@ -46,7 +40,6 @@ export const initialAppState: AppState = {
   sessionId: null,
   unexpectedError: null,
   uploading: null,
-  videoUrl: null,
   workspaceId: null,
 };
 
@@ -101,16 +94,6 @@ const appSlice = createSlice({
         };
       },
     },
-    loadReceivedEvents(state, action: PayloadAction<Record<EventKind, ReplayEvent[]>>) {
-      // Load multiple event types into state at once
-      Object.assign(state.events, action.payload);
-    },
-    setCanvas(state, action: PayloadAction<Canvas>) {
-      state.canvas = action.payload;
-    },
-    setVideoUrl(state, action: PayloadAction<string>) {
-      state.videoUrl = action.payload;
-    },
     setDefaultSelectedReactElementId(state, action: PayloadAction<number | null>) {
       state.defaultSelectedReactElementId = action.payload;
     },
@@ -147,10 +130,8 @@ export const {
   clearExpectedError,
   setAppMode,
   setAwaitingSourcemaps,
-  setCanvas,
   setDefaultSelectedReactElementId,
   setDefaultSettingsTab,
-  loadReceivedEvents,
   setExpectedError,
   setLoadingFinished,
   setModal,
@@ -159,7 +140,6 @@ export const {
   setSessionId,
   setUnexpectedError,
   setUploading,
-  setVideoUrl,
   setHoveredCommentId,
   setSelectedCommentId,
   setProcessing,
@@ -190,29 +170,6 @@ export const getDefaultSelectedReactElementId = (state: UIState) =>
   state.app.defaultSelectedReactElementId;
 export const getSelectedCommentId = (state: UIState) => state.app.selectedCommentId;
 
-const NO_EVENTS: MouseEvent[] = [];
-export const getEventsForType = (state: UIState, type: string) =>
-  state.app.events[type] || NO_EVENTS;
-
-export const getSortedEventsForDisplay = createSelector(
-  (state: UIState) => state.app.events,
-  events => {
-    let sortedEvents: ReplayEvent[] = [];
-
-    for (let [eventType, eventsOfType] of Object.entries(events)) {
-      if (["keydown", "keyup"].includes(eventType)) {
-        continue;
-      }
-      sortedEvents = sortedEvents.concat(eventsOfType);
-    }
-
-    sortedEvents.sort((a, b) => compareExecutionPoints(a.point, b.point));
-    return sortedEvents;
-  }
-);
-
-export const getCanvas = (state: UIState) => state.app.canvas;
-export const getVideoUrl = (state: UIState) => state.app.videoUrl;
 export const getDefaultSettingsTab = (state: UIState) => state.app.defaultSettingsTab;
 export const getRecordingTarget = (state: UIState) => state.app.recordingTarget;
 export const getRecordingWorkspace = (state: UIState) => state.app.recordingWorkspace;

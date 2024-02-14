@@ -27,12 +27,12 @@ test.skip("stacking: Element highlighter selects the correct element when they o
   // Dock the console to the _left_ side, to make the video preview as big as possible
   await toggleToolboxLayout(page, "left");
 
-  const canvas = page.locator("canvas#graphics");
+  const element = page.locator("#graphics");
   const rulesContainer = page.locator('[data-test-id="RulesPanel"]');
 
   for (let testCase of stackingTestCases) {
     // Really make sure the panel is closed
     closeSidePanel(page);
-    await verifyStackingTestCaseSelectedElementUnderCursor(page, canvas, rulesContainer, testCase);
+    await verifyStackingTestCaseSelectedElementUnderCursor(page, element, rulesContainer, testCase);
   }
 });

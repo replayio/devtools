@@ -78,7 +78,7 @@ function SourceRenderer({
 
   useLayoutEffect(
     () => () => {
-      // If a hover preview is visible when this Source is hidden for Offscreen
+      // If a hover preview is visible when this Source is hidden for Activity
       // make sure to clean it up so it doesn't remain visible.
       setHoveredState(null);
     },

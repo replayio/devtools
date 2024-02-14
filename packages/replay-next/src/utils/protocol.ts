@@ -45,40 +45,6 @@ export function filterNonEnumerableProperties(properties: ProtocolProperty[]): P
   return properties.filter(property => property.flags == null || property.flags & 4);
 }
 
-export function mergePropertiesAndGetterValues(
-  properties: ProtocolProperty[],
-  getterValues: NamedValue[],
-  maxEntries: number = Infinity
-): [Array<NamedValue | ProtocolProperty>, boolean] {
-  const trackedNames: Set<string> = new Set();
-  const mergedProperties: Array<NamedValue | ProtocolProperty> = [];
-
-  for (let index = 0; index < properties.length; index++) {
-    const property = properties[index];
-
-    if (mergedProperties.length >= maxEntries) {
-      return [mergedProperties, true];
-    }
-
-    trackedNames.add(property.name);
-    mergedProperties.push(property);
-  }
-
-  for (let index = 0; index < getterValues.length; index++) {
-    if (mergedProperties.length >= maxEntries) {
-      return [mergedProperties, true];
-    }
-
-    const getterValue = getterValues[index];
-
-    if (!trackedNames.has(getterValue.name)) {
-      mergedProperties.push(getterValue);
-    }
-  }
-
-  return [mergedProperties, false];
-}
-
 function isProtocolProperty(
   valueOrProperty: ProtocolValue | ProtocolNamedValue | ProtocolProperty
 ): valueOrProperty is ProtocolProperty {
@@ -407,12 +373,10 @@ export function splitStringToChunks(string: string) {
 }
 
 export function joinChunksToString(chunks: ProtocolProperty[]): string {
-  let string = "";
-  for (const prop of chunks) {
-    string += prop.value;
-  }
-
-  return string;
+  return chunks
+    .filter(isArrayElement)
+    .map(prop => prop.value)
+    .join("");
 }
 
 export function findProtocolObjectProperty(
@@ -431,4 +395,8 @@ export function findProtocolObjectPropertyValue<Type>(
   name: string
 ): Type | null {
   return findProtocolObjectProperty(sourceObject, name)?.value ?? null;
+}
+
+export function isArrayElement(property: ProtocolProperty): boolean {
+  return /^(0|([1-9]\d*))$/.test(property.name);
 }

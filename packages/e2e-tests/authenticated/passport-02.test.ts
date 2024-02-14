@@ -1,5 +1,5 @@
 import { openDevToolsTab, startTest } from "../helpers";
-import { E2E_USER_1_API_KEY } from "../helpers/authentication";
+import { E2E_USER_1 } from "../helpers/authentication";
 import { showCommentsPanel } from "../helpers/comments";
 import { warpToMessage } from "../helpers/console-panel";
 import {
@@ -13,18 +13,16 @@ import { getReactComponents } from "../helpers/new-react-devtools-panel";
 import { openReactDevtoolsPanel } from "../helpers/new-react-devtools-panel";
 import { isPassportItemCompleted } from "../helpers/passport";
 import { enablePassport } from "../helpers/settings";
-import { resetTestUser, waitFor } from "../helpers/utils";
+import { waitFor } from "../helpers/utils";
 import test, { expect } from "../testFixtureCloneRecording";
 
-test.use({ exampleKey: "cra/dist/index_chromium.html" });
+test.use({ exampleKey: "cra/dist/index.html", testUsers: [E2E_USER_1] });
 
 test(`authenticated/passport-02: Infrared inspection`, async ({
-  pageWithMeta: { page, recordingId },
-  exampleKey,
+  pageWithMeta: { page, recordingId, testScope },
+  testUsers,
 }) => {
-  await resetTestUser("frontende2e1@replay.io");
-
-  await startTest(page, recordingId, E2E_USER_1_API_KEY);
+  await startTest(page, recordingId, { apiKey: testUsers![0].apiKey, testScope });
 
   await enablePassport(page);
 
@@ -50,7 +48,7 @@ test(`authenticated/passport-02: Infrared inspection`, async ({
   );
 
   await openNetworkPanel(page);
-  const networkRequest = await findNetworkRequestRow(page, { name: "index_chromium.html" });
+  const networkRequest = await findNetworkRequestRow(page, { name: "index.html" });
   await networkRequest.click();
 
   await waitFor(async () =>

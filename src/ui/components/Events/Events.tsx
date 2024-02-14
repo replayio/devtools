@@ -4,11 +4,11 @@ import React, { memo, useContext, useMemo } from "react";
 import { STATUS_PENDING, STATUS_RESOLVED, useImperativeCacheValue } from "suspense";
 
 import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
+import { RecordedEvent } from "protocol/RecordedEventsCache";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { isExecutionPointsWithinRange } from "replay-next/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
-import { getSortedEventsForDisplay } from "ui/actions/app";
 import { seek } from "ui/actions/timeline";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
@@ -31,12 +31,11 @@ export function CurrentTimeLine({ isActive }: { isActive: boolean }) {
 
 const NO_ANNOTATIONS: ParsedJumpToCodeAnnotation[] = [];
 
-function Events() {
+function Events({ events }: { events: RecordedEvent[] }) {
   const client = useContext(ReplayClientContext);
   const dispatch = useAppDispatch();
   const currentTime = useAppSelector(getCurrentTime);
   const executionPoint = useAppSelector(getExecutionPoint);
-  const events = useAppSelector(getSortedEventsForDisplay);
   const { range: focusWindow } = useContext(FocusContext);
 
   const { status: annotationsStatus, value: parsedAnnotations } = useImperativeCacheValue(
@@ -57,8 +56,6 @@ function Events() {
         }
 
         switch (event.kind) {
-          case "keydown":
-          case "keyup":
           case "keypress":
             return filters.keyboard !== false;
           case "mousedown":
@@ -67,7 +64,7 @@ function Events() {
             return filters.navigation !== false;
         }
 
-        return true;
+        return false;
       }),
     [events, filters, focusWindow]
   );

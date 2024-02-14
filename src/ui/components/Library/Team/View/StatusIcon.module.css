@@ -1,0 +1,33 @@
+.iconWrapper {
+  display: flex;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease-in-out;
+}
+
+.iconMotion {
+  margin: auto;
+  height: 1.5rem;
+  width: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.failed {
+  color: var(--testsuites-failed-color);
+}
+
+.flaky {
+  color: var(--testsuites-flaky-color);
+}
+
+.passed {
+  color: var(--testsuites-success-color);
+}

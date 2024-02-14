@@ -70,8 +70,19 @@ export function SelectedElement({
 
   const [inspectedElement, [, fiberIdsToNodeIds]] = suspendInParallel(
     () => inspectedElementCache.read(replayClient, bridge, store, replayWall, pauseId, id),
-    () => nodesToFiberIdsCache.read(replayClient, pauseId!, store)
+    () => nodesToFiberIdsCache.read(replayClient, pauseId!)
   );
+
+  if (inspectedElement == null) {
+    return (
+      <div className={styles.Panel} data-is-pending={isPending || undefined}>
+        <div className={styles.TopRow}>
+          <div className={styles.ComponentName}>{displayName}</div>
+        </div>
+        <div className={styles.Error}>The selected component could not be inspected.</div>
+      </div>
+    );
+  }
 
   const {
     context,

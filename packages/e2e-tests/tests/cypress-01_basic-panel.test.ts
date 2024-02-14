@@ -75,10 +75,10 @@ test("cypress-01: Basic Test Suites panel functionality", async ({
 
   // Relative dates can change over time.
   // Check for either the "X units ago" text, or the literal date.
-  expect(await getTestSuiteDate(page).textContent()).toMatch(/ ago|(7\/14\/2023)/);
+  expect(await getTestSuiteDate(page).textContent()).toMatch(/ ago|(2\/12\/2023)/);
   expect(await getTestSuiteUser(page).textContent()).toMatch("ryanjduffy");
   expect(await getTestSuiteBranch(page).textContent()).toMatch("main");
-  expect(await getTestSuiteDuration(page).textContent()).toMatch("0:12");
+  expect(await getTestSuiteDuration(page).textContent()).toMatch("0:11");
 
   // can open tests
   await firstTest.click();
@@ -88,15 +88,15 @@ test("cypress-01: Basic Test Suites panel functionality", async ({
     expect(selectedRow).toHaveCount(1);
   });
 
-  // This recording only has a "test body" section
+  // This recording has a "before each" and a "test body" section
   const sections = getTestSections(selectedRow);
-  await expect(sections).toHaveCount(1);
+  await expect(sections).toHaveCount(2);
 
   // These are CSS-transformed to uppercase
-  expect(await sections.nth(0).textContent()).toMatch(/test body/i);
+  expect(await sections.nth(1).textContent()).toMatch(/test body/i);
 
   const steps = getTestCaseSteps(selectedRow);
-  await expect(steps).toHaveCount(20);
+  await expect(steps).toHaveCount(21);
 
   const backButton = getTestRecordingBackButton(page);
   await backButton.click();

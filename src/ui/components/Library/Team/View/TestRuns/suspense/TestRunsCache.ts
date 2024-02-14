@@ -1,5 +1,4 @@
-import orderBy from "lodash/orderBy";
-import { createCache } from "suspense";
+import { createCache, createIntervalCache } from "suspense";
 
 import { GraphQLClientInterface } from "shared/graphql/GraphQLClient";
 import { Recording } from "shared/graphql/types";
@@ -9,26 +8,31 @@ import {
   TestRunTestWithRecordings,
   processTestRun,
 } from "shared/test-suites/TestRun";
-import {
-  getTestRunTestsWithRecordingsGraphQL,
-  getTestRunsGraphQL,
-} from "ui/components/Library/Team/View/TestRuns/graphql/TestRunsGraphQL";
 import { convertRecording } from "ui/hooks/recordings";
 import { TestGroups, groupRecordings, testFailed, testPassed } from "ui/utils/testRuns";
 
-export const testRunsCache = createCache<
+import {
+  getTestRunTestsWithRecordingsGraphQL,
+  getTestRunsGraphQL,
+} from "../graphql/TestRunsGraphQL";
+
+export const testRunsIntervalCache = createIntervalCache<
+  number,
   [graphQLClient: GraphQLClientInterface, accessToken: string | null, workspaceId: string],
-  TestRun[]
+  TestRun
 >({
-  config: { immutable: true },
-  debugLabel: "testRunsCache",
-  getKey: ([_, __, workspaceId]) => workspaceId,
-  load: async ([graphQLClient, accessToken, workspaceId]) => {
-    const rawTestRuns = await getTestRunsGraphQL(graphQLClient, accessToken, workspaceId);
+  debugLabel: "testRunsIntervalCache",
+  getPointForValue: testRun => new Date(testRun.date).getTime(),
+  load: async (start, end, graphQLClient, accessToken, workspaceId) => {
+    const rawTestRuns = await getTestRunsGraphQL(
+      graphQLClient,
+      accessToken,
+      workspaceId,
+      new Date(start).toISOString(),
+      new Date(end).toISOString()
+    );
 
-    const testRuns = rawTestRuns.map(processTestRun);
-
-    return orderBy(testRuns, "date", "desc");
+    return rawTestRuns.map(processTestRun);
   },
 });
 

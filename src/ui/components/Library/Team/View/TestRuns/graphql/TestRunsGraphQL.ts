@@ -43,7 +43,7 @@ const GET_TEST_RUN_RECORDINGS = gql`
                 triggerUrl
                 user
               }
-              tests {
+              tests(includeNonRecorded: true) {
                 id
                 testId
                 title
@@ -52,6 +52,8 @@ const GET_TEST_RUN_RECORDINGS = gql`
                 result
                 errors
                 durationMs
+                index
+                attempt
                 executions {
                   result
                   recordings {

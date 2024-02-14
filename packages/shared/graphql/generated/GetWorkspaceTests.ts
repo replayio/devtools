@@ -8,7 +8,7 @@
 // ====================================================
 
 export interface GetWorkspaceTests_node_Recording {
-  __typename: "Recording";
+  __typename: "Recording" | "RootCauseAnalysis";
 }
 
 export interface GetWorkspaceTests_node_Workspace_tests_edges_node_stats {
@@ -19,6 +19,7 @@ export interface GetWorkspaceTests_node_Workspace_tests_edges_node_stats {
   skipped: number;
   unknown: number;
   failureRate: number;
+  flakyRate: number;
 }
 
 export interface GetWorkspaceTests_node_Workspace_tests_edges_node {
@@ -53,4 +54,6 @@ export interface GetWorkspaceTests {
 
 export interface GetWorkspaceTestsVariables {
   workspaceId: string;
+  startTime?: string | null;
+  endTime?: string | null;
 }

@@ -1,5 +1,6 @@
-import cypressReplay from "@replayio/cypress";
 import { defineConfig } from "cypress";
+
+import cypressReplay from "@replayio/cypress";
 
 export default defineConfig({
   e2e: {

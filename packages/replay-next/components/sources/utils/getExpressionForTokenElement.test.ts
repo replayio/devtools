@@ -121,4 +121,11 @@ describe("getExpressionForTokenElement", () => {
   it("should support instance properties", () => {
     expect(getExpressionHelper("this.ar|ray")).toBe("this.array");
   });
+
+  // FE-2253
+  it("should support the optional chaining operator", () => {
+    expect(getExpressionHelper("object?.p|roperty")).toBe("object?.property");
+    expect(getExpressionHelper("object?.propert|y")).toBe("object?.property");
+    expect(getExpressionHelper("object?.property|")).toBe("object?.property");
+  });
 });

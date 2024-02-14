@@ -1,21 +1,19 @@
 import { openDevToolsTab, startTest } from "../helpers";
-import { E2E_USER_1_API_KEY } from "../helpers/authentication";
+import { E2E_USER_1 } from "../helpers/authentication";
 import { isPassportItemCompleted } from "../helpers/passport";
 import { enablePassport } from "../helpers/settings";
 import { addLogpoint, editLogPoint, removeAllLogpoints } from "../helpers/source-panel";
 import { enterFocusMode, saveFocusRange } from "../helpers/timeline";
-import { clearTextArea, getCommandKey, resetTestUser, waitFor } from "../helpers/utils";
+import { clearTextArea, getCommandKey, waitFor } from "../helpers/utils";
 import test, { expect } from "../testFixtureCloneRecording";
 
-test.use({ exampleKey: "doc_rr_console.html" });
+test.use({ exampleKey: "doc_rr_console.html", testUsers: [E2E_USER_1] });
 
 test(`authenticated/passport-03: Swiss army knife`, async ({
-  pageWithMeta: { page, recordingId },
-  exampleKey,
+  pageWithMeta: { page, recordingId, testScope },
+  testUsers,
 }) => {
-  await resetTestUser("frontende2e1@replay.io");
-
-  await startTest(page, recordingId, E2E_USER_1_API_KEY);
+  await startTest(page, recordingId, { apiKey: testUsers![0].apiKey, testScope });
 
   await enablePassport(page);
 

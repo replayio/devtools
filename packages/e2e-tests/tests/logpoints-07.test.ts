@@ -13,7 +13,7 @@ import {
 import { delay } from "../helpers/utils";
 import test from "../testFixtureCloneRecording";
 
-test.use({ exampleKey: "cra/dist/index_chromium.html" });
+test.use({ exampleKey: "cra/dist/index.html" });
 
 test(`logpoints-07: should use the correct scope in auto-complete`, async ({
   pageWithMeta: { page, recordingId },

@@ -71,7 +71,7 @@ test("playwright-01: Basic Test Suites panel functionality", async ({
 
   // Relative dates can change over time.
   // Check for either the "X units ago" text, or the literal date.
-  expect(await getTestSuiteDate(page).textContent()).toMatch(/ ago|(10\/19\/2023)/);
+  expect(await getTestSuiteDate(page).textContent()).toMatch(/ ago|(1\/26\/2024)/);
   expect(await getTestSuiteUser(page).textContent()).toMatch("hbenl");
   expect(await getTestSuiteBranch(page).textContent()).toMatch("main");
   expect(await getTestSuiteDuration(page).textContent()).toMatch(/0:\d{2}/);

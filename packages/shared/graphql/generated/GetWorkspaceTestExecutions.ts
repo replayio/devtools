@@ -8,7 +8,7 @@
 // ====================================================
 
 export interface GetWorkspaceTestExecutions_node_Recording {
-  __typename: "Recording";
+  __typename: "Recording" | "RootCauseAnalysis";
 }
 
 export interface GetWorkspaceTestExecutions_node_Workspace_tests_edges_node_executions_recordings {
@@ -23,9 +23,11 @@ export interface GetWorkspaceTestExecutions_node_Workspace_tests_edges_node_exec
 
 export interface GetWorkspaceTestExecutions_node_Workspace_tests_edges_node_executions {
   __typename: "TestExecution";
+  testRunId: string;
   errors: string[] | null;
   createdAt: any;
   commitTitle: string | null;
+  commitAuthor: string | null;
   result: string;
   recordings: GetWorkspaceTestExecutions_node_Workspace_tests_edges_node_executions_recordings[];
 }
@@ -63,4 +65,6 @@ export interface GetWorkspaceTestExecutions {
 export interface GetWorkspaceTestExecutionsVariables {
   workspaceId: string;
   testId?: string | null;
+  startTime?: string | null;
+  endTime?: string | null;
 }

@@ -206,13 +206,14 @@ export function createMockReplayClient() {
     point: timeToFakeExecutionPoint(1_000),
     time: 1_000,
   }));
-  mockClient.findKeyboardEvents.mockImplementation(async () => {});
+  mockClient.findKeyboardEvents.mockImplementation(async () => []);
   mockClient.findMessages.mockImplementation(async () => ({ messages: [], overflow: false }));
   mockClient.findMessagesInRange.mockImplementation(async () => ({
     messages: [],
     overflow: false,
   }));
-  mockClient.findNavigationEvents.mockImplementation(async () => {});
+  mockClient.findMouseEvents.mockImplementation(async () => []);
+  mockClient.findNavigationEvents.mockImplementation(async () => []);
   mockClient.findSources.mockImplementation(async () => []);
   mockClient.removeEventListener.mockImplementation(() => {});
   mockClient.getCurrentFocusWindow.mockImplementation(() => null);

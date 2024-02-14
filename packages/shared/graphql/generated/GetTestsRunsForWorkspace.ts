@@ -8,7 +8,7 @@
 // ====================================================
 
 export interface GetTestsRunsForWorkspace_node_Recording {
-  __typename: "Recording";
+  __typename: "Recording" | "RootCauseAnalysis";
 }
 
 export interface GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node_results_counts {
@@ -70,4 +70,6 @@ export interface GetTestsRunsForWorkspace {
 
 export interface GetTestsRunsForWorkspaceVariables {
   workspaceId: string;
+  startTime?: string | null;
+  endTime?: string | null;
 }

@@ -2,6 +2,17 @@ import { lstatSync, readFileSync, readdirSync } from "fs";
 import { join, relative } from "path";
 
 type Examples = typeof import("../examples.json");
+
+/**
+ * Note: typeof does not include optional props, so we need to
+ * cast to this instead.
+ */
+type AllExampleProps = {
+  recording: string;
+  buildId: string;
+  playwrightScript?: string;
+  requiresManualUpdate?: boolean;
+};
 type Stats = {
   [buildId: string]: {
     numRecordings: number;
@@ -13,18 +24,20 @@ const baseDir = join(__dirname, "..");
 const exampleJSON = JSON.parse(readFileSync(join(baseDir, "examples.json"), "utf8")) as Examples;
 const basePaths = [join(baseDir, "authenticated"), join(baseDir, "tests")];
 
+export type ExampleInfo = {
+  runtime: string;
+  runtimeReleaseDate: Date;
+  runtimeOS: string;
+  recordingId: string;
+  exampleName: string;
+  requiresManualUpdate: boolean;
+};
+
 export function getStats() {
   const exampleToTestMap: { [example: string]: string[] } = {};
   const stats: Stats = {};
   const testFileList: string[] = [];
-  const testFileToInfoMap: {
-    [testFile: string]: {
-      runtime: string;
-      runtimeReleaseDate: Date;
-      runtimeOS: string;
-      recordingId: string;
-    };
-  } = {};
+  const testFileToInfoMap: { [testFile: string]: ExampleInfo } = {};
 
   function crawl(directoryPath: string) {
     readdirSync(directoryPath).forEach((entry: string) => {
@@ -44,8 +57,10 @@ export function getStats() {
 
   basePaths.forEach(crawl);
 
-  for (let key in exampleJSON) {
-    const { buildId, recording } = exampleJSON[key as keyof Examples];
+  for (let exampleName in exampleJSON) {
+    const { buildId, recording, requiresManualUpdate } = exampleJSON[
+      exampleName as keyof Examples
+    ] as AllExampleProps;
 
     if (stats[buildId] == null) {
       stats[buildId] = {
@@ -58,20 +73,21 @@ export function getStats() {
 
     testFileList.forEach(filePath => {
       const text = readFileSync(filePath, "utf8");
-      if (text.includes(key)) {
+      if (text.includes(exampleName)) {
         stats[buildId].numTests++;
 
-        if (exampleToTestMap[key] == null) {
-          exampleToTestMap[key] = [];
+        if (exampleToTestMap[exampleName] == null) {
+          exampleToTestMap[exampleName] = [];
         }
 
         const relativeFilePath = relative(baseDir, filePath);
 
-        exampleToTestMap[key].push(relativeFilePath);
+        exampleToTestMap[exampleName].push(relativeFilePath);
 
         const [os, runtime, releaseDate] = buildId.split("-");
 
         testFileToInfoMap[relativeFilePath] = {
+          exampleName,
           runtime,
           runtimeReleaseDate: new Date(
             `${releaseDate.substring(0, 4)}-${releaseDate.substring(4, 6)}-${releaseDate.substring(
@@ -80,6 +96,7 @@ export function getStats() {
           ),
           runtimeOS: os,
           recordingId: recording,
+          requiresManualUpdate: !!requiresManualUpdate,
         };
       }
     });
@@ -92,15 +109,15 @@ export function getStats() {
 
   Object.keys(stats)
     .sort()
-    .forEach(key => {
-      const { numRecordings, numTests } = stats[key];
+    .forEach(buildId => {
+      const { numRecordings, numTests } = stats[buildId];
 
-      sortedStats[key] = {
+      sortedStats[buildId] = {
         numRecordings,
         numTests,
       };
 
-      const [os, browser, date] = key.split("-");
+      const [os, browser, date] = buildId.split("-");
 
       const year = date.substring(0, 4);
 
@@ -132,7 +149,6 @@ export function getStats() {
       releaseYearStats[year].numTests += numTests;
     });
 
-  const sortedTestFileToInfoMap: typeof testFileToInfoMap = {};
   const entries = Object.entries(testFileToInfoMap).sort((a, b) => {
     const aValue = a[1];
     const bValue = b[1];
@@ -147,14 +163,6 @@ export function getStats() {
       return a[0].localeCompare(b[0]);
     }
   });
-  entries.forEach(([key, { recordingId, runtime, runtimeOS, runtimeReleaseDate }]) => {
-    sortedTestFileToInfoMap[key] = {
-      runtimeReleaseDate: runtimeReleaseDate.toISOString().slice(0, 10) as any,
-      runtimeOS,
-      runtime,
-      recordingId,
-    };
-  });
 
   return {
     browserSummaryStats,
@@ -163,6 +171,6 @@ export function getStats() {
     releaseYearStats,
     sortedStats,
     testFileList,
-    testFileToInfoMap: sortedTestFileToInfoMap,
+    testFileToInfoMap: Object.fromEntries(entries),
   };
 }

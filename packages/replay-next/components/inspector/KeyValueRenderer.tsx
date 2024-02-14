@@ -22,6 +22,7 @@ export type Props = {
   context: "console" | "default" | "nested";
   enableInspection?: boolean;
   expandByDefault?: boolean;
+  isGetterValue?: boolean;
   layout?: "horizontal" | "vertical";
   onContextMenu?: (event: MouseEvent) => void;
   path?: string;
@@ -43,6 +44,7 @@ export default function KeyValueRenderer({
   context,
   enableInspection = true,
   expandByDefault = false,
+  isGetterValue = false,
   layout = "horizontal",
   onContextMenu,
   path,
@@ -164,7 +166,11 @@ export default function KeyValueRenderer({
       {before}
       {name != null ? (
         <>
-          <span className={nameClass} data-test-name="KeyValue-Header">
+          <span
+            className={nameClass}
+            data-getter-value={isGetterValue || undefined}
+            data-test-name="KeyValue-Header"
+          >
             {name}
           </span>
           <span className={styles.Separator}>: </span>

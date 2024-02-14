@@ -77,6 +77,7 @@ test("cypress-02: Test Step timeline behavior", async ({
     const currentPercent = await getTimelineCurrentPercent(page);
 
     expect(currentPercent).toBeGreaterThan(0);
+    expect(currentPercent).toBeGreaterThanOrEqual(prevPercent);
     expect(currentPercent).toBeGreaterThan(lastHoverPercent);
 
     prevPercent = currentPercent;

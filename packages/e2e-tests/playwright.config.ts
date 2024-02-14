@@ -1,7 +1,7 @@
 import { PlaywrightTestConfig, ReporterDescription, devices } from "@playwright/test";
 import { devices as replayDevices } from "@replayio/playwright";
 
-const { CI, SLOW_MO, SHARD_NUMBER } = process.env;
+const { CI, SLOW_MO } = process.env;
 
 const projects = [
   {
@@ -26,52 +26,10 @@ const projects = [
   },
 ];
 
-const reporters: ReporterDescription[] = [["line"]];
+const reporter: ReporterDescription[] = [["line"]];
 
 if (CI) {
-  reporters.unshift(
-    [
-      "monocart-reporter",
-      {
-        name: "Replay E2E Coverage Report",
-        outputFile: `./test-results/monocart-report_${SHARD_NUMBER}.html`,
-        coverage: {
-          reports: [["json", { file: "./test-results/istanbul-coverage-report.json" }]],
-
-          entryFilter: (entry: any) => {
-            // These entries aren't relevant for our own source,
-            // or result in bogus file paths that throw errors when written to disk
-            const ignoreUrls = [
-              "cdn",
-              "webreplay",
-              "node_modules",
-              "_buildManifest",
-              "_ssgManifest",
-            ];
-
-            for (const ignoreUrl of ignoreUrls) {
-              if (entry.url.includes(ignoreUrl)) {
-                return false;
-              }
-            }
-            return true;
-          },
-          sourceFilter: (sourcePath: string) => {
-            const validSourceRegex = /(src|replay-next|packages|pages)\/.+\.(t|j)sx?/gm;
-
-            const matches = validSourceRegex.test(sourcePath);
-            const isNodeModules = sourcePath.includes("node_modules");
-
-            return matches && !isNodeModules;
-          },
-          onEnd: async (reportData: any) => {
-            console.log("Coverage generated: ", reportData.summary);
-          },
-        },
-      },
-    ],
-    ["@replayio/playwright/reporter"]
-  );
+  reporter.unshift(["@replayio/playwright/reporter"]);
 }
 
 const config: PlaywrightTestConfig = {
@@ -100,7 +58,7 @@ const config: PlaywrightTestConfig = {
   // Limit the number of workers on CI, use default locally
   workers: CI ? 4 : undefined,
   projects,
-  reporter: reporters,
+  reporter,
 };
 
 export default config;

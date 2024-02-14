@@ -275,6 +275,7 @@
   --object-inspector-go-to-definition-icon-color-hover: #ffffff;
   --object-inspector-go-to-definition-icon-color: #dddddd;
   --object-inspector-inline-key: #36d1c4;
+  --object-inspector-gettervalue-key: #939395;
   --object-inspector-invoke-getter-icon-color-hover: #ffffff;
   --object-inspector-invoke-getter-icon-color: #dddddd;
   --object-inspector-prototype-color: #939395;
@@ -377,7 +378,7 @@
   */
 
   /* src/devtools/client/debugger/src/components/SecondaryPanes/FrameTimeline.css */
-  --progressbar-background: var(--theme-base-90);
+  --progressbar-background: var(--theme-base-85);
   --progressbar-unfocused-background: #8fa7be;
   --replay-head-background: var(--theme-highlight-purple);
 
@@ -523,12 +524,17 @@
   --testsuites-v2-success-pill: var(--testsuites-success-color);
   --testsuites-v2-description: var(--secondary-accent);
   --testsuites-v2-error-bg: var(--testsuites-error-bgcolor);
-
   --circular-progress-bar-trail-color: var(--testsuites-steps-bgcolor);
+
+  --testsuites-chart-container: var(--theme-base-100);
+  --testsuites-graph-gradient-start: #02496d;
+  --testsuites-graph-gradient-end: #02496d00;
+  --testsuites-graph-gradient-stroke: var(--primary-accent);
+  --testsuites-graph-marker: var(--primary-accent-dimmed);
 
   /* DevTools header (Dark) */
   --theme-toggle-bgcolor: var(--theme-base-85);
-  --theme-toggle-color: white;
+  --theme-toggle-color: var(--theme-icon-color);
   --theme-toggle-handle-bgcolor: var(--theme-base-100);
   --title-hover-bgcolor: var(--theme-toggle-bgcolor);
 
@@ -819,6 +825,7 @@
   --object-inspector-go-to-definition-icon-color-hover: #000000;
   --object-inspector-go-to-definition-icon-color: #222222;
   --object-inspector-inline-key: #0074e8;
+  --object-inspector-gettervalue-key: #737373;
   --object-inspector-invoke-getter-icon-color-hover: #000000;
   --object-inspector-invoke-getter-icon-color: #222222;
   --object-inspector-prototype-color: #737373;
@@ -1071,10 +1078,16 @@
   --testsuites-v2-error-bg: var(--testsuites-error-bgcolor);
   --circular-progress-bar-trail-color: var(--testsuites-steps-bgcolor);
 
+  --testsuites-chart-container: var(--theme-text-field-bgcolor);
+  --testsuites-graph-gradient-start: var(--primary-accent-dimmed);
+  --testsuites-graph-gradient-end: var(--primary-accent-dimmed);
+  --testsuites-graph-gradient-stroke: var(--primary-accent);
+  --testsuites-graph-marker: var(--theme-base-85);
+
   /* DevTools header (Light) */
 
   --theme-toggle-bgcolor: var(--theme-base-85);
-  --theme-toggle-color: var(--grey-70);
+  --theme-toggle-color: var(--theme-icon-color);
   --theme-toggle-handle-bgcolor: var(--theme-base-100);
   --title-hover-bgcolor: #e6e6e6;
 
@@ -1231,8 +1244,6 @@
   --context-menu-z-index: 25;
 
   /* menu item styles */
-  --context-menu-item-background-color-hover: var(--context-menu-bgcolor-hover);
-  --context-menu-item-background-color-focus: var(--context-menu-bgcolor-hover);
   --context-menu-item-color: var(--color-default);
   --context-menu-item-color-disabled: var(--color-dimmer);
   --context-menu-item-font-size: var(--font-size-regular);

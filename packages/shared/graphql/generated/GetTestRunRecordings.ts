@@ -8,7 +8,7 @@
 // ====================================================
 
 export interface GetTestRunRecordings_node_Recording {
-  __typename: "Recording";
+  __typename: "Recording" | "RootCauseAnalysis";
 }
 
 export interface GetTestRunRecordings_node_Workspace_testRuns_edges_node_results_counts {
@@ -57,7 +57,7 @@ export interface GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_e
 }
 
 export interface GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_executions {
-  __typename: "TestRunTest";
+  __typename: "TestRunTestExecution";
   result: string;
   recordings: GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_executions_recordings[];
 }
@@ -66,14 +66,14 @@ export interface GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests {
   __typename: "TestRunTest";
   id: string;
   testId: string;
-  index: number;
-  attempt: number;
   title: string;
   scope: string[];
   sourcePath: string;
   result: string;
   errors: string[] | null;
   durationMs: number;
+  index: number;
+  attempt: number;
   executions: GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_executions[];
 }
 
