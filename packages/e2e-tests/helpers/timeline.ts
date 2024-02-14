@@ -147,7 +147,8 @@ export async function seekToTimePercent(page: Page, timePercent: number) {
   const timelineBoundingBox = await timeline.boundingBox();
   expect(timelineBoundingBox).not.toBeFalsy();
 
-  const x = timelineBoundingBox!.width * (timePercent / 100);
+  const width = timelineBoundingBox!.width;
+  const x = Math.min(width * (timePercent / 100), width - 1);
   const y = timelineBoundingBox!.height / 2;
   await timeline.click({
     position: { x, y },
