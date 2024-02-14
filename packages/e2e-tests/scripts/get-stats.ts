@@ -11,7 +11,7 @@ type AllExampleProps = {
   recording: string;
   buildId: string;
   playwrightScript?: string;
-  requiresManualUpdate?: string;
+  requiresManualUpdate?: boolean;
 };
 type Stats = {
   [buildId: string]: {
