@@ -11,6 +11,7 @@ import type { Page, expect as expectFunction } from "@playwright/test";
 import { removeRecording, uploadRecording } from "@replayio/replay";
 import axios from "axios";
 import chalk from "chalk";
+import difference from "lodash/difference";
 import { v4 as uuidv4 } from "uuid";
 import yargs from "yargs";
 
@@ -82,6 +83,10 @@ async function saveRecording(
   recordingId: string,
   skipUpload?: boolean
 ) {
+  console.log(
+    `Saving ${chalk.grey.bold(example)} with recording id ${chalk.yellow.bold(recordingId)}`
+  );
+
   if (!skipUpload) {
     await uploadRecording(recordingId, {
       apiKey,
@@ -111,10 +116,6 @@ async function saveRecording(
   });
 
   const buildId = response.data.data.recording.buildId;
-
-  console.log(
-    `Saving ${chalk.grey.bold(example)} with recording id ${chalk.yellow.bold(recordingId)}`
-  );
 
   await makeReplayPublic(apiKey, recordingId);
   await updateRecordingTitle(apiKey, recordingId, `E2E Example: ${example}`);
@@ -190,6 +191,13 @@ async function saveExamples(
 
   const specificExamples = argv.example.split(",").filter(s => s.length > 0);
   if (specificExamples.length > 0) {
+    const allExampleNames = examplesToRun.map(e => e.filename);
+    const invalidInputs = difference(specificExamples, allExampleNames);
+    if (invalidInputs.length) {
+      throw new Error(
+        `Invalid examples don't exist or require manual recording: ${invalidInputs.join(",")}`
+      );
+    }
     examplesToRun = examplesToRun.filter(example => specificExamples.includes(example.filename));
   }
 
