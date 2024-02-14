@@ -5,7 +5,7 @@ import { ReactNode, useEffect, useState } from "react";
 
 import { query } from "shared/graphql/apolloClient";
 import { GetConnection, GetConnectionVariables } from "shared/graphql/generated/GetConnection";
-import { getLoginReferrerParam } from "shared/utils/environment";
+import { getReadOnlyParamsFromURL } from "shared/utils/environment";
 import { isMacOS } from "shared/utils/os";
 import { getAuthClientId, getAuthHost } from "ui/utils/auth";
 import { requestBrowserLogin, setUserInBrowserPrefs } from "ui/utils/browser";
@@ -87,7 +87,8 @@ function SSOLogin({ onLogin }: { onLogin: (connection: string) => void }) {
 }
 
 function LoginMessaging() {
-  const referrer = getLoginReferrerParam();
+  const { referrer: referrerString } = getReadOnlyParamsFromURL();
+  const referrer = referrerString === "first-browser-open" ? referrerString : "default";
 
   // Custom screen for when the user is seeing the login screen and this is the first
   // time that they have opened the browser.
@@ -208,7 +209,7 @@ export function LoginLink({
   children: ReactNode;
   referrer?: LoginReferrer;
 }) {
-  const href = `/${referrer ? `?login-referrer=${referrer}` : ""}`;
+  const href = referrer ? `/?referrer=${referrer}` : "/";
   return <Link href={href}>{children}</Link>;
 }
 

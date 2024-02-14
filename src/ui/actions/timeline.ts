@@ -59,12 +59,7 @@ import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { FindTargetCommand, resumeTargetCache } from "replay-next/src/suspense/ResumeTargetCache";
 import { screenshotCache } from "replay-next/src/suspense/ScreenshotCache";
 import { ReplayClientInterface } from "shared/client/types";
-import {
-  encodeObjectToURL,
-  getPausePointParams,
-  isTest,
-  updateUrlWithParams,
-} from "shared/utils/environment";
+import { isTest } from "shared/utils/environment";
 import { isPointInRegion, maxTimeStampedPoint, minTimeStampedPoint } from "shared/utils/time";
 import { getFirstComment } from "ui/hooks/comments/comments";
 import {
@@ -86,6 +81,7 @@ import {
   pointsReceived,
   setPlaybackPrecachedTime,
 } from "ui/reducers/timeline";
+import { getMutableParamsFromURL } from "ui/setup/dynamic/url";
 import { HoveredItem, PlaybackOptions, TimeRange } from "ui/state/timeline";
 import KeyShortcuts, { isEditableElement } from "ui/utils/key-shortcuts";
 import { trackEvent } from "ui/utils/telemetry";
@@ -98,6 +94,8 @@ import {
 } from "../reducers/timeline";
 import { getRecordingId } from "./app";
 import type { UIStore, UIThunkAction } from "./index";
+
+const { point: pointFromURL, time: timeFromURL } = getMutableParamsFromURL();
 
 const DEFAULT_FOCUS_WINDOW_PERCENTAGE = 0.3;
 export const MAX_FOCUS_REGION_DURATION = 60_000;
@@ -166,9 +164,11 @@ export function jumpToInitialPausePoint(): UIThunkAction<Promise<void>> {
 }
 
 export async function getInitialPausePoint(recordingId: string) {
-  const pausePointParams = getPausePointParams();
-  if (pausePointParams.point !== null) {
-    return pausePointParams;
+  if (pointFromURL !== null && timeFromURL !== null) {
+    return {
+      point: pointFromURL,
+      time: timeFromURL,
+    };
   }
 
   const firstComment = await getFirstComment(recordingId);
@@ -209,39 +209,6 @@ export function setHoverTime(time: number | null, updateGraphics = true): UIThun
       console.error(error);
     }
   };
-}
-
-export function getUrlParams({
-  focusWindow,
-  point,
-  time,
-}: {
-  focusWindow: TimeStampedPointRange | null;
-  point: ExecutionPoint;
-  time: number;
-}) {
-  return {
-    point,
-    time: `${time}`,
-    focusWindow: encodeFocusWindow(focusWindow),
-  };
-}
-
-export function updatePausePointParams({
-  point,
-  time,
-  focusWindow,
-}: {
-  point: ExecutionPoint;
-  time: number;
-  focusWindow: TimeStampedPointRange | null;
-}) {
-  const params = getUrlParams({ focusWindow, point, time });
-  updateUrlWithParams(params);
-}
-
-function encodeFocusWindow(focusWindow: TimeStampedPointRange | null) {
-  return focusWindow ? encodeObjectToURL(focusWindow) : undefined;
 }
 
 export function step(command: FindTargetCommand): UIThunkAction<Promise<any>> {
@@ -407,11 +374,6 @@ export function seek({
       }
     }
 
-    updatePausePointParams({
-      focusWindow,
-      point: executionPoint,
-      time,
-    });
     dispatch(clearSeekLock());
 
     if (autoPlay) {
@@ -804,7 +766,6 @@ export function requestFocusWindow(
       end,
     });
     dispatch(newFocusWindow({ begin: window.begin.time, end: window.end.time }));
-    updateUrlWithParams({ focusWindow: encodeFocusWindow(window) });
   };
 }
 

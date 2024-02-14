@@ -32,7 +32,10 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
 
   await openDevToolsTab(page);
 
-  await warpToMessage(page, "Waiting for breakpoint at doc_rr_basic.html:21 (waitForBreakpoint)");
+  await warpToMessage(
+    page,
+    "Waiting for breakpoint at doc_rr_basic_chromium.html:21 (waitForBreakpoint)"
+  );
 
   // If the "React" tab shows up, we know that the routine ran
   await openReactDevtoolsPanel(page);
@@ -133,7 +136,7 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
     "Head",
     "SideEffect",
     "Auth0Provider",
-    "iU",
+    "iN",
     "Context.Provider",
     "Context.Consumer",
     "SSRRecordingPage",
@@ -196,7 +199,7 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
   await searchComponents(page, "Anonymous"); // Search and select 1st result
   await verifySearchResults(page, {
     currentNumber: 1,
-    totalNumber: 17,
+    totalNumber: 15,
   });
 
   await componentSearchInput.focus();
@@ -205,7 +208,7 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
   await componentSearchInput.press("Enter");
   await verifySearchResults(page, {
     currentNumber: 4,
-    totalNumber: 17,
+    totalNumber: 15,
   });
 
   await viewSourceButton.click();
@@ -229,7 +232,7 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
   await searchComponents(page, "Suspense");
   await verifySearchResults(page, {
     currentNumber: 1,
-    totalNumber: 17,
+    totalNumber: 14,
   });
 
   list.evaluate(el => (el.scrollTop = 0));
@@ -244,7 +247,7 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
   await searchComponents(page, "Offscreen");
   await verifySearchResults(page, {
     currentNumber: 1,
-    totalNumber: 7,
+    totalNumber: 6,
   });
 
   const offscreenSearchComponentNames = await getAllVisibleComponentNames(page);
