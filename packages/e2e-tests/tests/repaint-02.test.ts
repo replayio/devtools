@@ -6,9 +6,7 @@ import test, { expect } from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "playwright/breakpoints-05" });
 
-test("repaint-02: repaints on hover", async ({
-  pageWithMeta: { page, recordingId },
-}) => {
+test("repaint-02: repaints on hover", async ({ pageWithMeta: { page, recordingId } }) => {
   await startTest(page, recordingId);
 
   const initialScreenShot = await getGraphicsDataUrl(page);
