@@ -845,22 +845,10 @@ export async function waitForSelectedSource(page: Page, url: string) {
       await page.locator('[data-test-name="Source"]:visible').getAttribute("data-test-source-id")
     ).toBe(headerSourceId);
 
-    // HACK Assume that the source file has loaded when the combined text of the first
-    // 10 lines is no longer an empty string
-    const lines = editorPanel.locator(`[data-test-name="SourceLine"]`);
-
-    const lineTexts = await mapLocators(lines, lineLocator => lineLocator.textContent());
+    // Only succeed when we see formatted lines.
+    const lines = editorPanel.locator(`[data-test-formatted-source="true"]`);
     const numLines = await lines.count();
-
-    const combinedLineText = lineTexts
-      .slice(0, 10)
-      .join()
-      .trim()
-      // Remove zero-width spaces, which would be considered non-empty
-      .replace(/[\u200B-\u200D\uFEFF]/g, "");
-
     expect(numLines).toBeGreaterThan(0);
-    expect(combinedLineText).not.toBe("");
   });
 }
 
