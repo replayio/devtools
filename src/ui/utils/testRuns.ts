@@ -49,7 +49,6 @@ export function groupRecordings(tests: TestRunTestWithRecordings[]): TestGroups 
 
   for (const filePath in recordingsMap) {
     const recordingTests = recordingsMap[filePath];
-    recordingTests.sort((testA, testB) => testA.attempt - testB.attempt);
 
     function addToTestGroup(group: TestGroup, test: TestRunTestWithRecordings) {
       if (group.fileNameToTests[filePath]) {
