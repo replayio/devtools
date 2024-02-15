@@ -19,7 +19,7 @@ test(`inspector-elements-05_search: element picker and iframe behavior`, async (
   await openElementsPanel(page);
 
   // This search string should not match anything initially
-  await seekToTimePercent(page, 50);
+  await warpToMessage(page, "waiting for iframe");
   await searchElementsPanel(page, "inner-body");
   await verifySearchResults(page, { currentNumber: 0, totalNumber: 0 });
 

@@ -16,7 +16,7 @@ test("highlighter: element highlighter works everywhere", async ({
   await warpToMessage(page, "ExampleFinished");
   await openElementsPanel(page);
 
-  await selectElementsListRow(page, { text: "myiframe" });
+  await selectElementsListRow(page, { text: 'iframe id="myiframe"', type: "opening" });
 
   const highlighter = page.locator("#box-model-content");
   await highlighter.waitFor();

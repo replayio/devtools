@@ -61,7 +61,11 @@ export const SourceListRowFormattedText = memo(
       renderedTextLength += token.value.length;
     }
 
-    return <div className={styles.Text}>{renderedTokens}</div>;
+    return (
+      <div className={styles.Text} data-test-formatted-source="true">
+        {renderedTokens}
+      </div>
+    );
   }
 );
 

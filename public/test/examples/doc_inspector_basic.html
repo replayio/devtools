@@ -14,6 +14,17 @@ function iframeFinished() {
   console.log("iframeFinished");
   window.setTimeout(foo);
 }
+
+function createIFrame() {
+  var iframe = document.createElement("iframe");
+  iframe.id = "myiframe";
+  iframe.src = "./iframe.html";
+  document.getElementById("iframehost").appendChild(iframe);
+}
+
+console.log("waiting for iframe");
+window.setTimeout(createIFrame);
+
 </script>
 <div id="div1">
   <div id="div2">
@@ -23,7 +34,8 @@ function iframeFinished() {
   </div>
   <div id="div4" some-attribute="STUFF"></div>
 </div>
-<iframe src="iframe.html" id="myiframe"></iframe>
+<div id="iframehost">
+</div>
 
 <script>
   function printCenter(id) {
@@ -41,6 +53,5 @@ function iframeFinished() {
   }
 
   printCenter("maindiv");
-  printCenter("myiframe");
 </script>
 </body>

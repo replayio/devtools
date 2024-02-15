@@ -2,6 +2,17 @@ import { lstatSync, readFileSync, readdirSync } from "fs";
 import { join, relative } from "path";
 
 type Examples = typeof import("../examples.json");
+
+/**
+ * Note: typeof does not include optional props, so we need to
+ * cast to this instead.
+ */
+type AllExampleProps = {
+  recording: string;
+  buildId: string;
+  playwrightScript?: string;
+  requiresManualUpdate?: boolean;
+};
 type Stats = {
   [buildId: string]: {
     numRecordings: number;
@@ -19,6 +30,7 @@ export type ExampleInfo = {
   runtimeOS: string;
   recordingId: string;
   exampleName: string;
+  requiresManualUpdate: boolean;
 };
 
 export function getStats() {
@@ -46,7 +58,9 @@ export function getStats() {
   basePaths.forEach(crawl);
 
   for (let exampleName in exampleJSON) {
-    const { buildId, recording } = exampleJSON[exampleName as keyof Examples];
+    const { buildId, recording, requiresManualUpdate } = exampleJSON[
+      exampleName as keyof Examples
+    ] as AllExampleProps;
 
     if (stats[buildId] == null) {
       stats[buildId] = {
@@ -82,6 +96,7 @@ export function getStats() {
           ),
           runtimeOS: os,
           recordingId: recording,
+          requiresManualUpdate: !!requiresManualUpdate,
         };
       }
     });
