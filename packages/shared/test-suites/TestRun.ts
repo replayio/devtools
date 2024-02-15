@@ -19,8 +19,6 @@ export type SourceMetadata = {
 export type TestRunTest = {
   id: string;
   testId: string;
-  index: number;
-  attempt: number;
   title: string;
   scope: string[];
   sourcePath: string;
