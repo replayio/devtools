@@ -52,8 +52,6 @@ const GET_TEST_RUN_RECORDINGS = gql`
                 result
                 errors
                 durationMs
-                index
-                attempt
                 executions {
                   result
                   recordings {

@@ -72,8 +72,6 @@ export interface GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests {
   result: string;
   errors: string[] | null;
   durationMs: number;
-  index: number;
-  attempt: number;
   executions: GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_executions[];
 }
 

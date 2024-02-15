@@ -11,13 +11,8 @@ export interface AddCommentInput {
   content: string;
   hasFrames: boolean;
   isPublished: boolean;
-  networkRequestId?: string | null;
   point: string;
-  position?: any | null;
-  primaryLabel?: string | null;
   recordingId: string;
-  secondaryLabel?: string | null;
-  sourceLocation?: any | null;
   time: number;
   type?: string | null;
   typeData?: any | null;
