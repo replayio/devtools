@@ -23,6 +23,8 @@ const TestFileBlackList = new Set([
   "tests/jump-to-code-01_basic.test.ts",
   // https://linear.app/replay/issue/RUN-3224/
   "authenticated/comments-03.test.ts",
+  // https://linear.app/replay/issue/RUN-3274
+  "tests/repaint-01.test.ts",
 ]);
 
 // Enable some tests that we have recently fixed but not yet enabled everywhere.
