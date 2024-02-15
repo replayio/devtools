@@ -1,3 +1,5 @@
+import { readFileSync } from "fs";
+import path from "path";
 import type { Page, expect as expectFunction } from "@playwright/test";
 import { chromium, expect } from "@playwright/test";
 import { getExecutablePath } from "@replayio/playwright";
@@ -84,10 +86,19 @@ export async function uploadLastRecording(url: string): Promise<string> {
       strict: true,
     });
   } else {
+    const recordingsLog = readRecordingsLog().split("\n").slice(-11).join("\n");
     throw Error(
       `No recording found matching url "${url}" in list:\n${list
         .map(rec => rec.metadata.uri)
-        .join("\n")}`
+        .join("\n")}\nLast 10 lines of recordings.log:\n${recordingsLog}`
     );
   }
+}
+
+function readRecordingsLog() {
+  const dir =
+    process.env.RECORD_REPLAY_DIRECTORY ||
+    path.join(process.env.HOME || process.env.USERPROFILE, ".replay");
+  const file = path.join(dir, "recordings.log");
+  return readFileSync(file, "utf8");
 }
