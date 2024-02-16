@@ -203,75 +203,72 @@ export default function run_fe_tests(CHROME_BINARY_PATH, runInCI = true, nWorker
     execSync("sleep 2");
   }
 
-  try {
-    console.timeEnd("START time");
-    console.groupEnd();
+  for (var i = 0; i < 15; i++) {
+    
+      console.timeEnd("START time");
+      console.groupEnd();
 
-    console.group("GATHER-EXAMPLES");
-    console.time("GATHER-EXAMPLES time");
-    const { exampleFiles, testFiles } = gatherChromiumExamplesAndTests();
-    console.timeEnd("GATHER-EXAMPLES time");
+      console.group("GATHER-EXAMPLES");
+      console.time("GATHER-EXAMPLES time");
+      const { exampleFiles, testFiles } = gatherChromiumExamplesAndTests();
+      console.timeEnd("GATHER-EXAMPLES time");
 
-    console.group("SAVE-EXAMPLES");
-    console.time("SAVE-EXAMPLES time");
-    {
-      const examplesCfg = ` --example=authenticated_logpoints.html`;//exampleFiles?.length ? ` --example=${exampleFiles.join(",")}` : "";
-      execSync(
-        `${envWrapper} ${path.join(
-          "scripts/save-examples.ts"
-        )} --runtime=chromium --target=browser ${examplesCfg}`,
-        {
-          cwd: TestRootPath,
-          stdio: "inherit",
-          env: {
-            ...process.env,
-            // Run the tests against the local dev server.
-            PLAYWRIGHT_TEST_BASE_URL: "http://localhost:8080",
-          },
-        }
-      );
+      console.group("SAVE-EXAMPLES");
+      console.time("SAVE-EXAMPLES time");
+      {
+        const examplesCfg = ` --example=authenticated_logpoints.html`;//exampleFiles?.length ? ` --example=${exampleFiles.join(",")}` : "";
+        execSync(
+          `${envWrapper} ${path.join(
+            "scripts/save-examples.ts"
+          )} --runtime=chromium --target=browser ${examplesCfg}`,
+          {
+            cwd: TestRootPath,
+            stdio: "inherit",
+            env: {
+              ...process.env,
+              // Run the tests against the local dev server.
+              PLAYWRIGHT_TEST_BASE_URL: "http://localhost:8080",
+            },
+          }
+        );
 
-      // Without the wait, the next xvfb-run command can fail.
-      execSync("sleep 5");
+        // Without the wait, the next xvfb-run command can fail.
+        execSync("sleep 5");
+      }
+      console.timeEnd("SAVE-EXAMPLES time");
+      console.groupEnd();
+
+      console.group("TESTS");
+      console.time("TESTS time");
+      {
+        // Run the known-passing tests.
+        execSync(
+          `${envWrapper} npx playwright test --grep-invert node_ --project=replay-chromium --workers=1 authenticated/logpoints-01`,
+          {
+            cwd: TestRootPath,
+            stdio: "inherit",
+            env: {
+              ...process.env,
+              // Replay the tests against prod backend devtools.
+              PLAYWRIGHT_TEST_BASE_URL: "https://app.replay.io",
+              REPLAY_API_KEY: process.env.RUNTIME_TEAM_API_KEY,
+              REPLAY_UPLOAD: "1",
+
+              // [RUN-3257] Enable JS ASSERTS:
+              RECORD_REPLAY_JS_OBJECT_ASSERTS: "1",
+              RECORD_REPLAY_JS_PROGRESS_ASSERTS: "1",
+              RECORD_REPLAY_JS_PROGRESS_CHECKS: "1",
+            },
+          }
+        );
+      }
+      console.timeEnd("TESTS time");
+      console.groupEnd();
     }
-    console.timeEnd("SAVE-EXAMPLES time");
-    console.groupEnd();
-
-    console.group("TESTS");
-    console.time("TESTS time");
-    {
-      // Run the known-passing tests.
-      execSync(
-        `${envWrapper} npx playwright test --grep-invert node_ --project=replay-chromium --workers=${nWorkers} --retries=2 authenticated/logpoints-01`,
-        {
-          cwd: TestRootPath,
-          stdio: "inherit",
-          env: {
-            ...process.env,
-            // Replay the tests against prod backend devtools.
-            PLAYWRIGHT_TEST_BASE_URL: "https://app.replay.io",
-            REPLAY_API_KEY: process.env.RUNTIME_TEAM_API_KEY,
-            REPLAY_UPLOAD: "1",
-
-            // [RUN-3257] Enable JS ASSERTS:
-            RECORD_REPLAY_JS_OBJECT_ASSERTS: "1",
-            RECORD_REPLAY_JS_PROGRESS_ASSERTS: "1",
-            RECORD_REPLAY_JS_PROGRESS_CHECKS: "1",
-          },
-        }
-      );
-    }
-    console.timeEnd("TESTS time");
-    console.groupEnd();
-    // Make sure the web server shuts down.
-    webProc?.kill("SIGKILL");
-
-    // Without this, we can hang--no idea why.
-    process.exit(0);
-  } finally {
     // Make sure the web server shuts down in case of exceptions.
     webProc?.kill("SIGKILL");
-  }
+    // Without this, we can hang--no idea why.
+    process.exit(0);
 }
 
 /** ###########################################################################
