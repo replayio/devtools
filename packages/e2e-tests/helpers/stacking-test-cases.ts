@@ -1,6 +1,11 @@
 import { Locator, Page, expect } from "@playwright/test";
 
-import { openAppliedRulesTab, openElementsPanel, selectRootElementsRow } from "./elements-panel";
+import {
+  activateInspectorTool,
+  openAppliedRulesTab,
+  openElementsPanel,
+  selectRootElementsRow,
+} from "./elements-panel";
 import { getGraphicsElementScale } from "./screenshot";
 import { debugPrint, waitFor } from "./utils";
 
@@ -158,7 +163,7 @@ export async function verifyStackingTestCaseSelectedElementUnderCursor(
   const scale = await getGraphicsElementScale(page);
 
   // Click the "Select an Element from Preview" button
-  await page.locator("#command-button-pick").click();
+  await activateInspectorTool(page);
 
   // Modify the original app coords by the canvas transform scale
   const position = {

@@ -32,7 +32,7 @@ test("fe-1875 :: verify that steps go to the right point in time", async ({
   let timelinePercent = await waitForTimelineAdvanced(page, 0);
   expect(Math.round(timelinePercent)).toBe(72);
 
-  page.click('[data-test-name="JumpToCode"]');
+  await page.click('[data-test-name="JumpToCode"]');
 
   await waitForPaused(page, 652);
 
@@ -45,7 +45,7 @@ test("fe-1875 :: verify that steps go to the right point in time", async ({
   await waitForPaused(page, 227);
 
   await openCypressTestPanel(page);
-  page.click('[data-test-name="JumpToCode"]');
+  await page.click('[data-test-name="JumpToCode"]');
 
   await waitForPaused(page, 1019);
 });
