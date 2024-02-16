@@ -370,15 +370,10 @@ export async function verifyExpectedCount(
 ) {
   if (expectedCount != null) {
     // Verify a specific number of messages
-    await waitFor(
-      async () => {
-        const count = await locator.count();
-        if (count !== expectedCount) {
-          throw `Expected ${expectedCount} messages, but found ${count}`;
-        }
-      },
-      { timeout }
-    );
+    await waitFor(async () => {
+      const count = await locator.count();
+      expect(count).toBe(expectedCount);
+    });
   } else {
     // Or just verify that there was at least one
     const message = locator.first();
