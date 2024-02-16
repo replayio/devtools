@@ -11,7 +11,7 @@ import test, { expect } from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "doc_exceptions.html" });
 
-test.skip(`logpoints-04: should display exceptions in the console`, async ({
+test(`logpoints-04: should display exceptions in the console`, async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
