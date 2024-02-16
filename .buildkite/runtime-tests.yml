@@ -2,7 +2,10 @@ steps:
   - label: "Runtime e2e tests (linux-x86_64)"
     timeout_in_minutes: 60
     key: "runtime-fe-e2e-tests-linux_x86_64"
-    command: "npm i -g yarn && yarn install && ts-node ./packages/e2e-tests/scripts/buildkite_run_fe_tests_from_artifact-linux-x86_64.ts"
+    commands:
+      - "be_cmd install_yarn -- npm i -g yarn"
+      - "be_cmd node_deps -- yarn install"
+      - "be_cmd run_tests -- ts-node ./packages/e2e-tests/scripts/buildkite_run_fe_tests_from_artifact-linux-x86_64.ts"
     agents:
       - "deploy=true"
     plugins:
@@ -22,8 +25,10 @@ steps:
             BUILD_USER_SECRET_ACCESS_KEY:
               secret-id: "prod/build-user"
               json-key: ".secret_access_key"
-            BUILDEVENT_APIKEY: honeycomb-api-key
             RUNTIME_TEAM_API_KEY: runtime-replay-api-key
+            BUILDEVENT_APIKEY: honeycomb-api-key
+            BUILDEVENT_BUILDKITE_API_TOKEN: buildkite-api-token-honeycomb-build-events
+      - replayio/buildevents#76b6f57: ~
       - "ssh://git@github.com/replayio/fly-buildkite-plugin.git#v0.77":
           # This image's source code is here https://github.com/replayio/backend-e2e-base-image
           image: "registry.fly.io/buildkite-backend-e2e-tests:v14"
