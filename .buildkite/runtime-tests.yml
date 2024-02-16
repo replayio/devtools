@@ -25,7 +25,6 @@ steps:
             BUILD_USER_SECRET_ACCESS_KEY:
               secret-id: "prod/build-user"
               json-key: ".secret_access_key"
-            BUILDEVENT_APIKEY: honeycomb-api-key
             RUNTIME_TEAM_API_KEY: runtime-replay-api-key
             BUILDEVENT_APIKEY: honeycomb-api-key
             BUILDEVENT_BUILDKITE_API_TOKEN: buildkite-api-token-honeycomb-build-events
