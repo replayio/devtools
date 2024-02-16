@@ -32,7 +32,9 @@ async function addCommentHelper(
 
   // Wait for new comment to be added
   const commentsLocator = await getComments(page, { type });
-  await waitFor(async () => await expect(await commentsLocator.count()).toBe(idsBefore.size + 1));
+  await waitFor(async () => expect(await commentsLocator.count()).toBe(idsBefore.size + 1), {
+    timeout: 10_000,
+  });
 
   // Get updated ids
   const idsAfter = await getCommentIds(page, { type });

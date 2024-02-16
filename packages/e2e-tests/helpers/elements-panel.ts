@@ -423,7 +423,7 @@ export async function searchElementsPanel(
   await waitFor(async () => {
     await input.press("Enter");
 
-    await delay(250);
+    await delay(500);
 
     // If the Elements panel is still loading, the search won't be handled.
     // A proxy for confirming that the search has been handled is that a results label will be rendered.
