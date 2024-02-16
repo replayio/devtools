@@ -3651,9 +3651,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/replay@npm:^0.21.0":
-  version: 0.21.0
-  resolution: "@replayio/replay@npm:0.21.0"
+"@replayio/replay@npm:^0.21.1":
+  version: 0.21.1
+  resolution: "@replayio/replay@npm:0.21.1"
   dependencies:
     "@replayio/sourcemap-upload": ^1.1.1
     "@types/semver": ^7.5.6
@@ -3670,7 +3670,7 @@ __metadata:
     ws: ^7.5.0
   bin:
     replay: bin/replay.js
-  checksum: 338df2cbb2d1c5c7acd9a50cee11cf001ae468b2be760f62c8bc57dfac5163944d515631bfc3d9d1bde44fb9b0535d32cb2b9fa5d4c5ec0da505374e269462ae
+  checksum: 8884f6707a570782c365ae35e254e474da0b8659787156bed2161959d93e0b4276ad7db0de5d47cc62007215d07bb01362ebef9529101ce23c14595e2b024e40
   languageName: node
   linkType: hard
 
@@ -14887,7 +14887,7 @@ __metadata:
     "@replayio/overboard": ^0.4.1
     "@replayio/protocol": ^0.68.0
     "@replayio/react-devtools-inline": 4.28.6
-    "@replayio/replay": ^0.21.0
+    "@replayio/replay": ^0.21.1
     "@sentry/react": ^7.9.0
     "@sentry/tracing": ^7.9.0
     "@stripe/react-stripe-js": ^1.7.0
