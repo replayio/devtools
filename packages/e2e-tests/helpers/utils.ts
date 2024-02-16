@@ -206,6 +206,7 @@ export async function waitFor(
         
         if (performance.now() - startTime > timeout) {
           messages.forEach(args => consoleLog(...args));
+          console.log(`KLOCHEK: giving up after ${performance.now() - startTime} ms`);
           throw error;
         }   
         
