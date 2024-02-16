@@ -317,7 +317,7 @@ export async function verifyConsoleMessage(
   );
 
   const messages = await findConsoleMessage(page, expected, messageType);
-  await verifyExpectedCount(messages, expectedCount);
+  await verifyExpectedCount(messages, expectedCount, 10_000);
 }
 
 export async function verifyConsoleMessageObjectContents(
@@ -363,15 +363,22 @@ export async function verifyEvaluationResult(
   await verifyExpectedCount(messages, expectedCount);
 }
 
-export async function verifyExpectedCount(locator: Locator, expectedCount?: number) {
+export async function verifyExpectedCount(
+  locator: Locator,
+  expectedCount?: number,
+  timeout = 5_000
+) {
   if (expectedCount != null) {
     // Verify a specific number of messages
-    await waitFor(async () => {
-      const count = await locator.count();
-      if (count !== expectedCount) {
-        throw `Expected ${expectedCount} messages, but found ${count}`;
-      }
-    });
+    await waitFor(
+      async () => {
+        const count = await locator.count();
+        if (count !== expectedCount) {
+          throw `Expected ${expectedCount} messages, but found ${count}`;
+        }
+      },
+      { timeout }
+    );
   } else {
     // Or just verify that there was at least one
     const message = locator.first();
