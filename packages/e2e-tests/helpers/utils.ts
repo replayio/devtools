@@ -195,14 +195,12 @@ export async function waitFor(
         await callback();
         return;
       } catch (error: any) {
-        if (error?.message?.includes("crash")) {
+        if (error?.message?.includes("crash") ||
+            error?.isUnrecoverable) 
+        {
           // We have to resort to heuristics since:
           // 1. We don't have access to the `Page` object, and
           // 2. the Error object also has no special properties.
-          throw error;
-        }
-        if (error?.isUnrecoverable) {
-          // We sometimes don't want to keep trying.
           throw error;
         }
         

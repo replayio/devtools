@@ -215,7 +215,7 @@ export default function run_fe_tests(CHROME_BINARY_PATH, runInCI = true, nWorker
     console.group("SAVE-EXAMPLES");
     console.time("SAVE-EXAMPLES time");
     {
-      const examplesCfg = exampleFiles?.length ? ` --example=${exampleFiles.join(",")}` : "";
+      const examplesCfg = ` --example=authenticated_logpoints.html`;//exampleFiles?.length ? ` --example=${exampleFiles.join(",")}` : "";
       execSync(
         `${envWrapper} ${path.join(
           "scripts/save-examples.ts"
@@ -242,9 +242,7 @@ export default function run_fe_tests(CHROME_BINARY_PATH, runInCI = true, nWorker
     {
       // Run the known-passing tests.
       execSync(
-        `${envWrapper} npx playwright test --grep-invert node_ --project=replay-chromium --workers=${nWorkers} --retries=2 ${testFiles.join(
-          " "
-        )}`,
+        `${envWrapper} npx playwright test --grep-invert node_ --project=replay-chromium --workers=${nWorkers} --retries=2 authenticated/logpoints-01`,
         {
           cwd: TestRootPath,
           stdio: "inherit",

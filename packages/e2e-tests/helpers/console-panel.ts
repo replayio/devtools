@@ -372,7 +372,9 @@ export async function verifyExpectedCount(
     // Verify a specific number of messages
     await waitFor(async () => {
       const count = await locator.count();
-      expect(count).toBe(expectedCount);
+      if (count != expectedCount) {
+        throw new Error(`Expected ${expectedCount} messages, but found ${count}`);
+      }
     });
   } else {
     // Or just verify that there was at least one
