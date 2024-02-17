@@ -15,12 +15,10 @@ const CONFIG = {
 };
 
 // We use this for debugging purposes only.
-const TestFileOverrideList = [];
+let TestFileOverrideList = [];
 
 // Disable some tests that we know to be problematic.
 const TestFileBlackList = new Set([
-  // https://linear.app/replay/issue/RUN-3222/
-  "tests/jump-to-code-01_basic.test.ts",
   // https://linear.app/replay/issue/RUN-3224/
   "authenticated/comments-03.test.ts",
   // https://linear.app/replay/issue/RUN-3274/
@@ -140,7 +138,15 @@ function githubUrlToRepository(url) {
   return url?.replace(/.*github.com[:\/](.*)\.git/, "$1");
 }
 
-export default function run_fe_tests(CHROME_BINARY_PATH, runInCI = true, nWorkers = 4) {
+export default function run_fe_tests(
+  CHROME_BINARY_PATH,
+  runInCI = true,
+  nWorkers = 4,
+  testOverrides?: string[]
+) {
+  if (testOverrides) {
+    TestFileOverrideList = testOverrides;
+  }
   console.group("START");
   console.time("START time");
 
@@ -282,6 +288,7 @@ export default function run_fe_tests(CHROME_BINARY_PATH, runInCI = true, nWorker
 
 (async function main() {
   if (process.argv[1] === __filename) {
-    run_fe_tests(undefined, false, 1 /* nWorkers */);
+    const testWorkers = process.argv.slice(2);
+    run_fe_tests(undefined, false, 1 /* nWorkers */, testWorkers);
   }
 })();
