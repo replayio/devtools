@@ -19,8 +19,6 @@ const TestFileOverrideList = [];
 
 // Disable some tests that we know to be problematic.
 const TestFileBlackList = new Set([
-  // https://linear.app/replay/issue/RUN-3222/
-  "tests/jump-to-code-01_basic.test.ts",
   // https://linear.app/replay/issue/RUN-3224/
   "authenticated/comments-03.test.ts",
   // https://linear.app/replay/issue/RUN-3274/
