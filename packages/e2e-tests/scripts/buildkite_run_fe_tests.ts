@@ -28,7 +28,7 @@ const TestFileBlackList = new Set([
 ]);
 
 // Enable some tests that we have recently fixed but not yet enabled everywhere.
-const TestFileWhiteList = new Set([]);
+const TestFileWhiteList = new Set(["tests/logpoints-04.test.ts", "tests/console_errors.test.ts"]);
 
 /**
  * Re-record all examples that have previously been recorded with
