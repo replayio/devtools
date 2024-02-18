@@ -271,6 +271,9 @@ export default function run_fe_tests(
             RECORD_REPLAY_JS_OBJECT_ASSERTS: "1",
             RECORD_REPLAY_JS_PROGRESS_ASSERTS: "1",
             RECORD_REPLAY_JS_PROGRESS_CHECKS: "1",
+
+            // [RUN-3246] Send P/W metadata:
+            REPLAY_PLAYWRIGHT_FIXTURE: "1",
           },
         }
       );
