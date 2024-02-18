@@ -15,7 +15,10 @@ const CONFIG = {
 };
 
 // We use this for debugging purposes only.
-let TestFileOverrideList = [];
+let TestFileOverrideList = [
+  "tests/inspector-computed-02_complex-styles.ts",
+  "tests/inspector-rules-03_shorthand-rules.test.ts",
+];
 
 // Disable some tests that we know to be problematic.
 const TestFileBlackList = new Set([
@@ -26,7 +29,10 @@ const TestFileBlackList = new Set([
 ]);
 
 // Enable some tests that we have recently fixed but not yet enabled everywhere.
-const TestFileWhiteList = new Set([]);
+const TestFileWhiteList = new Set([
+  "tests/inspector-computed-02_complex-styles.ts",
+  "tests/inspector-rules-03_shorthand-rules.test.ts",
+]);
 
 /**
  * Re-record all examples that have previously been recorded with
