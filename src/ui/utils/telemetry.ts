@@ -1,3 +1,4 @@
+import { extraErrorDataIntegration } from "@sentry/integrations";
 import * as Sentry from "@sentry/react";
 import { Integrations } from "@sentry/tracing";
 
@@ -53,7 +54,8 @@ export function setupTelemetry() {
 
   Sentry.init({
     dsn: "https://41c20dff316f42fea692ef4f0d055261@o437061.ingest.sentry.io/5399075",
-    integrations: [new Integrations.BrowserTracing()],
+    integrations: [new Integrations.BrowserTracing(), extraErrorDataIntegration({ depth: 6 })],
+    normalizeDepth: 7,
     tracesSampleRate: 1.0,
     release: process.env.REPLAY_RELEASE ? process.env.REPLAY_RELEASE : "development",
     beforeSend(event) {
