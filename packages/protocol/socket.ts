@@ -222,7 +222,7 @@ export async function sendMessage<M extends CommandMethods>(
       return {};
     }
 
-    console.warn("Message failed", method, { code, id, message }, data);
+    console.warn("Message failed", method, { code, id, message, params }, data);
 
     let finalMessage = message;
     if (process.env.NODE_ENV === "development") {
