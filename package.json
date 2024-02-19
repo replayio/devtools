@@ -33,6 +33,7 @@
     "@replayio/overboard": "^0.4.1",
     "@replayio/protocol": "^0.68.0",
     "@replayio/react-devtools-inline": "4.28.6",
+    "@sentry/integrations": "^7.101.1",
     "@sentry/react": "^7.9.0",
     "@sentry/tracing": "^7.9.0",
     "@stripe/react-stripe-js": "^1.7.0",
