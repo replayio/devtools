@@ -1,5 +1,5 @@
 .TextArea {
-  width: calc(100% - 2rem);
+  width: 100%;
   height: 6rem;
   resize: none;
   border-radius: 0.25rem;

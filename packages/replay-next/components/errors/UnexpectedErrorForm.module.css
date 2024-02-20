@@ -13,7 +13,6 @@
 }
 
 .Message {
-  width: calc(100% - 3rem);
   display: flex;
   flex-direction: column;
   align-items: center;
