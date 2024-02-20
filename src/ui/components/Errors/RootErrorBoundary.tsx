@@ -64,7 +64,7 @@ export function RootErrorBoundary({
         currentUserName={currentUserInfo?.name ?? null}
         details={unexpectedError.content ?? ""}
         replayClient={replayClient}
-        title={unexpectedError.message ?? "Error"}
+        title={unexpectedError.message ?? "Session error"}
       />
     );
   } else {

@@ -1,0 +1,62 @@
+.TextArea {
+  width: calc(100% - 2rem);
+  height: 6rem;
+  resize: none;
+  border-radius: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  border: none;
+  font-family: var(--font-family-default);
+  font-size: var(--font-size-regular);
+  background-color: var(--support-form-text-area-background-color);
+  border: 1px solid transparent;
+  color: var(--support-form-color);
+  caret-color: var(--support-form-color);
+}
+.TextArea:focus {
+  box-shadow: none;
+  outline-offset: 0;
+  outline: 1px solid var(--primary-accent);
+  border: 1px solid var(--primary-accent);
+}
+.TextArea::placeholder {
+  color: var(--color-dimmer);
+}
+
+.FormActions {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1ch;
+}
+
+.CancelCloseButton,
+.CloseButton,
+.SubmitButton {
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-weight: bold;
+}
+.CancelCloseButton {
+  background-color: var(--support-form-modal-background-color);
+  color: var(--primary-accent);
+  border: 2px solid var(--primary-accent);
+}
+.CancelCloseButton:hover {
+  color: var(--primary-accent-hover);
+  border: 2px solid var(--primary-accent-hover);
+}
+.CloseButton {
+  background-color: var(--secondary-accent);
+  color: var(--primary-accent-foreground-text);
+}
+.CloseButton:hover {
+  background-color: var(--secondary-accent-hover);
+}
+.SubmitButton {
+  background-color: var(--primary-accent);
+  color: var(--primary-accent-foreground-text);
+}
+.SubmitButton:hover {
+  background-color: var(--primary-accent-hover);
+}
