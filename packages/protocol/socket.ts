@@ -54,6 +54,14 @@ interface MessageWaiter {
 
 const gMessageWaiters = new Map<number, MessageWaiter>();
 
+interface MessageLogItem {
+  method: CommandMethods;
+  sent: number;
+  status: "pending" | "successful" | "failed";
+}
+
+const messageLog = new Map<number, MessageLogItem>();
+
 // These are helpful when investigating connection speeds.
 const gStartTime = Date.now();
 let gSentBytes = 0;
@@ -208,12 +216,16 @@ export async function sendMessage<M extends CommandMethods>(
     gPendingMessages.push(msg);
   }
 
+  messageLog.set(id, { method, sent: Date.now(), status: "pending" });
+
   const response = await new Promise<CommandResponse>(resolve =>
     gMessageWaiters.set(id, { method, resolve })
   );
 
   if (response.error) {
     gSessionCallbacks?.onResponseError(response);
+
+    messageLog.get(id)!.status = "failed";
 
     const { code, data, message } = response.error;
 
@@ -241,6 +253,8 @@ export async function sendMessage<M extends CommandMethods>(
 
     throw commandError(finalMessage, code, { id, method, params, pauseId, sessionId });
   }
+
+  messageLog.get(id)!.status = "successful";
 
   return response.result as any;
 }
@@ -361,6 +375,18 @@ if (typeof window === "object") {
       received: gReceivedBytes,
       sent: gSentBytes,
       time: Date.now() - gStartTime,
+    };
+  };
+
+  (window as any).failedOrPendingSince = (since: number) => {
+    const messages = [...messageLog.values()];
+    return {
+      failed: messages
+        .filter(({ sent, status }) => status === "failed" && sent >= since)
+        .map(({ method }) => method),
+      pending: messages
+        .filter(({ sent, status }) => status === "pending" && sent >= since)
+        .map(({ method }) => method),
     };
   };
 

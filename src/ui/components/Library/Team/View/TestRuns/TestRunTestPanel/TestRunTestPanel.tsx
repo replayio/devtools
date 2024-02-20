@@ -122,7 +122,7 @@ function ErrorGroup({
       </button>
       {expanded ? (
         <div className={styles.errorDetails}>
-          <div className="font-mono text-xs">{message.split("\n").slice(0, 4).join("\n")}</div>
+          <div className="font-mono text-xs">{message.split("\n").slice(0, 8).join("\n")}</div>
         </div>
       ) : null}
     </div>

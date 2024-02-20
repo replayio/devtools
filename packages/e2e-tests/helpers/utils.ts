@@ -174,10 +174,12 @@ export async function waitFor(
   options: {
     retryInterval?: number;
     timeout?: number;
+    page?: Page;
   } = {}
 ): Promise<void> {
-  const { retryInterval = 250, timeout = 10_000 } = options;
+  const { retryInterval = 250, timeout = 10_000, page } = options;
 
+  const startDate = Date.now();
   const startTime = performance.now();
 
   const consoleLog = console.log;
@@ -211,6 +213,23 @@ export async function waitFor(
 
       if (performance.now() - startTime > timeout) {
         messages.forEach(args => consoleLog(...args));
+        const failedOrPendingCommands = await page?.evaluate(
+          ({ startDate }) => (window as any).failedOrPendingSince(startDate),
+          { startDate }
+        );
+        let addendum = "";
+        if (failedOrPendingCommands?.failed.length > 0) {
+          addendum += `\nFailed commands: ${failedOrPendingCommands.failed.join(",")}`;
+        }
+        if (failedOrPendingCommands?.pending.length > 0) {
+          addendum += `\nPending commands: ${failedOrPendingCommands.pending.join(",")}`;
+        }
+        if (typeof error === "string") {
+          error += addendum;
+        } else {
+          error.message += addendum;
+        }
+
         throw error;
       }
 

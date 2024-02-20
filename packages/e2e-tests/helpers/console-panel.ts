@@ -377,7 +377,7 @@ export async function verifyExpectedCount(
           throw `Expected ${expectedCount} messages, but found ${count}`;
         }
       },
-      { timeout }
+      { timeout: 1_000, page: locator.page() }
     );
   } else {
     // Or just verify that there was at least one

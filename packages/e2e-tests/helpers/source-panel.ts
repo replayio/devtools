@@ -918,7 +918,7 @@ export async function waitForSourceContentsToFinishStreaming(
       const status = await sourceLocator.getAttribute("data-test-source-contents-status");
       expect(status).toBe("resolved");
     },
-    { retryInterval: 1_000, timeout: 15_000 }
+    { retryInterval: 1_000, timeout: 1_000, page }
   );
 }
 

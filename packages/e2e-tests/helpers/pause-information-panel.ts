@@ -245,11 +245,14 @@ export async function stepOver(page: Page): Promise<void> {
 
 export async function verifyFramesCount(page: Page, expectedCount: number) {
   const framesPanel = getFramesPanel(page);
-  return waitFor(async () => {
-    const frameListItems = framesPanel.locator(".frame");
-    const actualCount = await frameListItems.count();
-    expect(actualCount).toBe(expectedCount);
-  });
+  return waitFor(
+    async () => {
+      const frameListItems = framesPanel.locator(".frame");
+      const actualCount = await frameListItems.count();
+      expect(actualCount).toBe(expectedCount);
+    },
+    { timeout: 1_000, page }
+  );
 }
 
 export async function waitForFrameTimeline(page: Page, widthPercentage: string) {
@@ -304,7 +307,7 @@ export async function waitForPaused(page: Page, line?: number): Promise<void> {
       expect(numFrames).toBeGreaterThan(0);
       expect(numScopes).toBeGreaterThan(0);
     },
-    { timeout: 15_000 }
+    { timeout: 1_000, page }
   );
 
   if (line) {
