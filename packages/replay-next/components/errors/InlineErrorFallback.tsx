@@ -1,12 +1,14 @@
-import { CSSProperties } from "react";
+import { CSSProperties, ReactNode } from "react";
 
 import styles from "./InlineErrorFallback.module.css";
 
 export function InlineErrorFallback({
   className,
+  message,
   style,
 }: {
   className?: string;
+  message?: ReactNode;
   style?: CSSProperties;
 }) {
   return (
@@ -18,8 +20,12 @@ export function InlineErrorFallback({
       </svg>
       <div className={styles.Header}>Our apologies!</div>
       <div className={styles.Message}>
-        <p>Something went wrong while replaying.</p>
-        <p>We'll look into it as soon as possible.</p>
+        {message ?? (
+          <>
+            <p>Something went wrong while replaying.</p>
+            <p>We'll look into it as soon as possible.</p>
+          </>
+        )}
       </div>
     </div>
   );

@@ -25,3 +25,7 @@
   justify-content: center;
   color: var(--color-dim);
 }
+
+.LoadingFailed {
+  text-align: center;
+}
