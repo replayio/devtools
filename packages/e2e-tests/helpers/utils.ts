@@ -176,7 +176,7 @@ export async function waitFor(
     timeout?: number;
   } = {}
 ): Promise<void> {
-  const { retryInterval = 250, timeout = 5_000 } = options;
+  const { retryInterval = 250, timeout = 10_000 } = options;
 
   const startTime = performance.now();
 

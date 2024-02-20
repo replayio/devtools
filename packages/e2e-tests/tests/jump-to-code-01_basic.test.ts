@@ -55,14 +55,11 @@ async function checkForJumpButton(eventLocator: Locator, shouldBeEnabled: boolea
   expect(await jumpButton.isVisible()).toBe(true);
   await jumpButton.hover({});
 
-  await waitFor(
-    async () => {
-      const buttonText = await getByTestName(jumpButton, "JumpToCodeButtonLabel").innerText();
-      const expectedText = shouldBeEnabled ? "Jump to code" : "No results";
-      expect(buttonText).toBe(expectedText);
-    },
-    { timeout: 10_000 }
-  );
+  await waitFor(async () => {
+    const buttonText = await getByTestName(jumpButton, "JumpToCodeButtonLabel").innerText();
+    const expectedText = shouldBeEnabled ? "Jump to code" : "No results";
+    expect(buttonText).toBe(expectedText);
+  });
 
   return jumpButton;
 }
@@ -145,13 +142,10 @@ test(`jump-to-code-01: Test basic jumping functionality`, async ({
   await firstValidKeypressJumpButton.click();
   await waitForSelectedSource(page, "Header.tsx");
   // Should highlight the line that ran
-  await waitFor(
-    async () => {
-      const lineNumber = await getSelectedLineNumber(page, true);
-      expect(lineNumber).toBe(12);
-    },
-    { timeout: 10_000 }
-  );
+  await waitFor(async () => {
+    const lineNumber = await getSelectedLineNumber(page, true);
+    expect(lineNumber).toBe(12);
+  });
 
   // Should also have jumped in time. Since this can vary (slightly different progress %
   // based on timing differences), we'll add a log statement and verify _which_ hit we're at.
@@ -172,13 +166,10 @@ test(`jump-to-code-01: Test basic jumping functionality`, async ({
   await firstValidClickJumpButton.click();
   await waitForSelectedSource(page, "TodoListItem.tsx");
   // Should highlight the line that ran
-  await waitFor(
-    async () => {
-      const lineNumber = await getSelectedLineNumber(page, true);
-      expect(lineNumber).toBe(22);
-    },
-    { timeout: 10_000 }
-  );
+  await waitFor(async () => {
+    const lineNumber = await getSelectedLineNumber(page, true);
+    expect(lineNumber).toBe(22);
+  });
 
   // Should also have jumped in time
   // Should also have jumped in time. Since this can vary (slightly different progress %
