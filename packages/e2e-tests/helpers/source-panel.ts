@@ -823,40 +823,33 @@ export async function waitForSourceLineHitCounts(page: Page, lineNumber: number)
   const lineLocator = await getSourceLine(page, lineNumber);
   await lineLocator.isVisible();
 
-  await waitFor(
-    async () => {
-      const haveHitCountsLoaded =
-        (await lineLocator.getAttribute("data-test-line-has-hits")) != null;
-      if (!haveHitCountsLoaded) {
-        throw Error(`Waiting for line ${lineNumber} to have hit counts loaded`);
-      }
-    },
-    { timeout: 10_000 }
-  );
+  await waitFor(async () => {
+    const haveHitCountsLoaded = (await lineLocator.getAttribute("data-test-line-has-hits")) != null;
+    if (!haveHitCountsLoaded) {
+      throw Error(`Waiting for line ${lineNumber} to have hit counts loaded`);
+    }
+  });
 }
 
 // TODO [FE-626] Rewrite this helper to reduce complexity.
 export async function waitForSelectedSource(page: Page, url: string) {
-  await waitFor(
-    async () => {
-      const editorPanel = page.locator("#toolbox-content-debugger");
-      const sourceHeader = editorPanel.locator(`[data-test-name="Source-${url}"]`);
+  await waitFor(async () => {
+    const editorPanel = page.locator("#toolbox-content-debugger");
+    const sourceHeader = editorPanel.locator(`[data-test-name="Source-${url}"]`);
 
-      await expect(await sourceHeader.getAttribute("data-status")).toBe("active");
+    await expect(await sourceHeader.getAttribute("data-status")).toBe("active");
 
-      // Make sure the visible source is the same source as the selected tab.
-      const headerSourceId = await sourceHeader.getAttribute("data-test-source-id");
-      expect(
-        await page.locator('[data-test-name="Source"]:visible').getAttribute("data-test-source-id")
-      ).toBe(headerSourceId);
+    // Make sure the visible source is the same source as the selected tab.
+    const headerSourceId = await sourceHeader.getAttribute("data-test-source-id");
+    expect(
+      await page.locator('[data-test-name="Source"]:visible').getAttribute("data-test-source-id")
+    ).toBe(headerSourceId);
 
-      // Only succeed when we see formatted lines.
-      const lines = editorPanel.locator(`[data-test-formatted-source="true"]`);
-      const numLines = await lines.count();
-      expect(numLines).toBeGreaterThan(0);
-    },
-    { timeout: 10_000 }
-  );
+    // Only succeed when we see formatted lines.
+    const lines = editorPanel.locator(`[data-test-formatted-source="true"]`);
+    const numLines = await lines.count();
+    expect(numLines).toBeGreaterThan(0);
+  });
 }
 
 export async function rewindToLine(
