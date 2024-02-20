@@ -140,4 +140,6 @@ export default async function testFunction(
 
   await filtersPanel.getByText('Green').click()
   await waitForListItemsCount(2)
+
+  await delay(500);
 }
