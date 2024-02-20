@@ -120,7 +120,10 @@ export async function getAppliedRules(page: Page): Promise<AppliedRules[]> {
   await debugPrint(page, `Gathering CSS rules`, "getAppliedRules");
 
   return await page.evaluate(async () => {
-    const listElement = document.querySelector<HTMLElement>('[data-test-id="RulesList"]')!;
+    const listElement = document.querySelector<HTMLElement>('[data-test-id="RulesList"]');
+    if (!listElement) {
+      return [];
+    }
     const { clientHeight } = listElement;
 
     listElement.scrollTop = 0;
