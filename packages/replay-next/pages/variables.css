@@ -49,7 +49,7 @@
   --primary-accent-hover: #0194ff;
 
   --secondary-accent: #d72451;
-  --secondary-accent-hover: #d72451;
+  --secondary-accent-hover: #c61351;
   --secondary-accent-stroke: var(--secondary-accent);
 
   /* used in our codebase, to be refactored */
@@ -119,6 +119,15 @@
   --z-index-7--mask: var(--z-index-7);
   --z-index-8--modal: var(--z-index-8);
   --z-index-8--dropdown: var(--z-index-8);
+
+  /* The styles below are the same between themes */
+  --support-form-color: var(--grey-90);
+  --support-form-close-icon-color: #ffffff;
+  --support-form-modal-background-color: #ffffff;
+  --support-form-modal-border-color: var(--grey-90);
+  --support-form-link-background-color: var(--grey-20);
+  --support-form-link-background-color-hover: var(--grey-30);
+  --support-form-text-area-background-color: var(--grey-20);
 }
 
 :root,
