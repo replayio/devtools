@@ -1,8 +1,12 @@
 // eslint-disable-next-line no-restricted-imports
 import { client, sendMessage, triggerEvent } from "protocol/socket";
 import { GraphQLService, userData } from "shared/user-data/GraphQL/UserData";
+import { ProtocolError, isCommandError } from "shared/utils/error";
 import { getRecordingId } from "shared/utils/recording";
 import { UIStore } from "ui/actions";
+import { setExpectedError } from "ui/actions/errors";
+import { getDisconnectionError } from "ui/actions/session";
+import { getProtocolError } from "ui/reducers/protocolMessages";
 
 import { ReplaySession, getReplaySession } from "./prefs";
 
@@ -27,6 +31,22 @@ declare global {
 export async function setupAppHelper(store: UIStore) {
   const recordingId = getRecordingId();
   const replaySession = recordingId ? await getReplaySession(recordingId) : undefined;
+
+  window.addEventListener("unhandledrejection", function (event) {
+    const { reason } = event;
+
+    if (
+      reason &&
+      (isCommandError(reason, ProtocolError.UnknownSession) ||
+        isCommandError(reason, ProtocolError.SessionDestroyed))
+    ) {
+      store.dispatch(setExpectedError(getDisconnectionError()));
+
+      return true;
+    }
+
+    return false;
+  });
 
   window.app = {
     store,

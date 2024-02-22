@@ -4,7 +4,10 @@ import test from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "doc_control_flow.html" });
 
-test(`restart debugging session`, async ({ pageWithMeta: { page, recordingId }, exampleKey }) => {
+test(`restart-session: restart debugging session`, async ({
+  pageWithMeta: { page, recordingId },
+  exampleKey,
+}) => {
   await startTest(page, recordingId);
   await openDevToolsTab(page);
   await commandPalette(page, "restart session");

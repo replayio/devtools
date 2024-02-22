@@ -217,11 +217,6 @@ export async function sendMessage<M extends CommandMethods>(
 
     const { code, data, message } = response.error;
 
-    if (method === "Session.listenForLoadChanges" && code === 66) {
-      // We are being disconnected after a timeout, no need to raise
-      return {};
-    }
-
     console.warn("Message failed", method, { code, id, message, params }, data);
 
     let finalMessage = message;

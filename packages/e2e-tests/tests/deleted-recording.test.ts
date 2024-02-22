@@ -1,14 +1,15 @@
-import test, { expect } from "@playwright/test";
+import test from "@playwright/test";
 
 import examples from "../examples.json";
 import { startTest } from "../helpers";
+import { verifyErrorDialog } from "../helpers/errors";
 
 test("deleted-recording: Show error message for deleted recording", async ({ page }) => {
   await startTest(page, examples["deleted-replay"].recording, undefined, undefined, false);
 
-  const error = page.locator('[data-test-id="ExpectedError"]');
-  await error.waitFor({ timeout: 10_000 });
-
-  expect(await error.isVisible()).toBe(true);
-  expect(await error.textContent()).toContain("Recording Deleted");
+  await verifyErrorDialog(page, {
+    expectedDetails: "This recording has been deleted.",
+    expectedTitle: "Recording Deleted",
+    expectedType: "expected",
+  });
 });
