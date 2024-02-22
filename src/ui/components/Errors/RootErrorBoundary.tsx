@@ -3,7 +3,9 @@ import { ErrorBoundary, ErrorBoundaryProps } from "react-error-boundary";
 
 import { UnexpectedErrorForm } from "replay-next/components/errors/UnexpectedErrorForm";
 import { ReplayClientInterface } from "shared/client/types";
+import { ProtocolError, isCommandError } from "shared/utils/error";
 import { setExpectedError, setUnexpectedError } from "ui/actions/errors";
+import { getDisconnectionError } from "ui/actions/session";
 import { useGetUserInfo } from "ui/hooks/users";
 import { getExpectedError, getUnexpectedError } from "ui/reducers/app";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
@@ -29,7 +31,12 @@ export function RootErrorBoundary({
   const currentUserInfo = useGetUserInfo();
 
   const onError = (error: Error, info: ErrorInfo) => {
-    if (error instanceof Error && error.name === "ChunkLoadError") {
+    if (
+      isCommandError(error, ProtocolError.UnknownSession) ||
+      isCommandError(error, ProtocolError.SessionDestroyed)
+    ) {
+      dispatch(setExpectedError(getDisconnectionError()));
+    } else if (error instanceof Error && error.name === "ChunkLoadError") {
       dispatch(
         setExpectedError({
           message: "Replay updated",

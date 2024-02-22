@@ -1,8 +1,10 @@
 import { CSSProperties, ReactNode } from "react";
 
+import { withSessionTimeoutCheck } from "replay-next/components/errors/withSessionTimeoutCheck";
+
 import styles from "./InlineErrorFallback.module.css";
 
-export function InlineErrorFallback({
+export const InlineErrorFallback = withSessionTimeoutCheck(function InlineErrorFallback({
   className,
   message,
   style,
@@ -29,4 +31,4 @@ export function InlineErrorFallback({
       </div>
     </div>
   );
-}
+});
