@@ -341,9 +341,8 @@ export default function Toolbar() {
   const recordingId = useGetRecordingId();
   const { recording } = useGetRecording(recordingId);
   const { comments, loading } = hooks.useGetComments(recordingId);
-  const [protocolPanelExperimentEnabled] = useGraphQLUserData("feature_protocolPanel");
   const [showPassport] = useGraphQLUserData("feature_showPassport");
-  const { nags } = hooks.useGetUserInfo();
+  const { internal: isInternalUser, nags } = hooks.useGetUserInfo();
   const showTour = shouldShowTour(nags);
 
   const [sidePanelCollapsed, setSidePanelCollapsed] = useGraphQLUserData(
@@ -453,7 +452,7 @@ export default function Toolbar() {
             />
           </>
         ) : null}
-        {protocolPanelExperimentEnabled ? (
+        {isInternalUser ? (
           <ToolbarButton
             icon="protocol"
             label="Protocol"

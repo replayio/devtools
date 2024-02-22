@@ -156,11 +156,6 @@ export const config = {
     defaultValue: Boolean(false),
     legacyKey: "devtools.features.commentAttachments",
   },
-  feature_protocolPanel: {
-    defaultValue: Boolean(false),
-    label: "View protocol requests and responses in the panel",
-    legacyKey: "devtools.features.logProtocol",
-  },
   feature_showPassport: {
     defaultValue: Boolean(false),
     label: "Show Replay Passport",

@@ -180,6 +180,8 @@ export function createSocket(recordingId: string): UIThunkAction {
       const [userInfo, recording] = await Promise.all([getUserInfo(), getRecording(recordingId)]);
       assert(recording, "failed to load recording");
 
+      const isInternalUser = userInfo?.internal == true;
+
       if (recording.workspace) {
         dispatch(actions.setRecordingWorkspace(recording.workspace));
       }
@@ -277,7 +279,7 @@ export function createSocket(recordingId: string): UIThunkAction {
             // no-op but required, apparently
           },
           onRequest: (request: CommandRequest) => {
-            if (userData.get("feature_protocolPanel")) {
+            if (isInternalUser) {
               queueProtocolMessage({
                 type: "request",
                 // a couple fields will be filled in on the reducer side
@@ -286,7 +288,7 @@ export function createSocket(recordingId: string): UIThunkAction {
             }
           },
           onResponse: (response: CommandResponse) => {
-            if (userData.get("feature_protocolPanel")) {
+            if (isInternalUser) {
               const clonedResponse = { ...response, recordedAt: window.performance.now() };
 
               if (isSourceContentsCommandResponse(clonedResponse)) {
@@ -305,7 +307,7 @@ export function createSocket(recordingId: string): UIThunkAction {
             }
           },
           onResponseError: (error: CommandResponse) => {
-            if (userData.get("feature_protocolPanel")) {
+            if (isInternalUser) {
               queueProtocolMessage({
                 type: "error",
                 value: { ...error, recordedAt: window.performance.now() },

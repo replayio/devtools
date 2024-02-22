@@ -72,8 +72,6 @@ export function executeCommand(key: CommandKey): UIThunkAction {
       dispatch(setViewMode("dev"));
       dispatch(setSelectedPrimaryPanel("explorer"));
       userData.set("layout_debuggerOutlineExpanded", true);
-    } else if (key == "toggle_protocol_panel") {
-      userData.toggle("feature_protocolPanel");
     } else if (key == "toggle_protocol_timeline") {
       userData.toggle("feature_protocolTimeline");
     } else if (key === "open_viewer") {

@@ -7,7 +7,6 @@ export const PREFERENCES: PreferencesKey[] = [
   "backend_sampleAllTraces",
   "global_logTelemetryEvent",
   "feature_protocolTimeline",
-  "feature_protocolPanel",
   "backend_newControllerOnRefresh",
   "backend_profileWorkerThreads",
   "backend_disableCache",
