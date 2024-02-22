@@ -113,11 +113,24 @@ const baseNextConfig = {
       fs: false,
     };
 
-    const sourceMapRegExp =
-      /node_modules.+(immer|@reduxjs|react-resizable-panels|react|react-dom|react-window|suspense|use-context-menu).+\.js$/;
+    // Source-maps should be uploaded to Next for the following NPM modules
+    const moduleNames = [
+      "@reduxjs",
+      "immer",
+      "react",
+      "react-dom",
+      "react-resizable-panels",
+      "react-window",
+      "suspense",
+      "use-context-menu",
+    ];
+    const separator = `(\\\\|\\\/)`;
+    const moduleRegExp = new RegExp(
+      `node_modules${separator}(${moduleNames.join("|")})${separator}`
+    );
 
     config.module.rules.push({
-      test: sourceMapRegExp,
+      test: moduleRegExp,
       enforce: "pre",
       use: ["source-map-loader"],
     });
