@@ -1,8 +1,8 @@
 import { RecordingId } from "@replayio/protocol";
-import classNames from "classnames";
-import React, { useState } from "react";
+import { useState } from "react";
 
 import { assert } from "protocol/utils";
+import { Button } from "replay-next/components/Button";
 import { Recording } from "shared/graphql/types";
 import { useGetTeamIdFromRoute } from "ui/components/Library/Team/utils";
 import { isTestSuiteReplay } from "ui/components/TestSuite/utils/isTestSuiteReplay";
@@ -10,7 +10,6 @@ import hooks from "ui/hooks";
 import { WorkspaceId } from "ui/state/app";
 import { useIsPublicEnabled } from "ui/utils/org";
 
-import { DisabledButton, getButtonClasses } from "../../../../../shared/Button";
 import { useConfirm } from "../../../../../shared/Confirm";
 import MaterialIcon from "../../../../../shared/MaterialIcon";
 import PortalDropdown from "../../../../../shared/PortalDropdown";
@@ -98,23 +97,22 @@ export default function BatchActionDropdown({
 
   if (!selectedIds.length) {
     return (
-      <DisabledButton className="space-x-1 leading-4">
+      <Button disabled>
         <MaterialIcon outlined className="font-bold" iconSize="sm">
           expand_more
         </MaterialIcon>
         <span>{`${selectedIds.length} item${selectedIds.length > 1 ? "s" : ""} selected`}</span>
-      </DisabledButton>
+      </Button>
     );
   }
 
-  const buttonClasses = classNames("bg-white", getButtonClasses("blue", "secondary", "md"));
   const button = (
-    <span className={"flex flex-row items-center space-x-1 leading-4 text-primaryAccent"}>
+    <Button variant="outline">
       <MaterialIcon outlined className="font-bold" iconSize="sm">
         expand_more
       </MaterialIcon>
       <span>{`${selectedIds.length} item${selectedIds.length > 1 ? "s" : ""} selected`}</span>
-    </span>
+    </Button>
   );
 
   let allRecordingsOwnedByCurrentUser = true;
@@ -147,7 +145,6 @@ export default function BatchActionDropdown({
   return (
     <PortalDropdown
       buttonContent={button}
-      buttonStyle={buttonClasses}
       setExpanded={setExpanded}
       expanded={expanded}
       distance={0}

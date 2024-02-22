@@ -37,18 +37,6 @@
   border-bottom: 1px solid var(--chrome);
 }
 
-:root:global(.theme-dark) .editButton {
-  background-color: var(--theme-base-80);
-  color: #fff;
-  border: none;
-}
-
-:root:global(.theme-dark) .editButton:hover {
-  background-color: var(--primary-accent-hover);
-  color: #fff;
-  border: none;
-}
-
 :root:global(.theme-dark) .recordingsBackground {
   background-color: transparent;
   color: var(--body-color);
@@ -100,15 +88,6 @@
 
 :root:global(.theme-light) .dropdownDivider {
   border-bottom: 1px solid var(--theme-base-90);
-}
-
-:root:global(.theme-light) .editButton {
-  background-color: #fff;
-}
-
-:root:global(.theme-light) .editButton:hover {
-  background-color: var(--primary-accent-hover);
-  color: #fff;
 }
 
 :root:global(.theme-light) .recordingsBackground {
