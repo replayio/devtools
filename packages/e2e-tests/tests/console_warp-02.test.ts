@@ -15,6 +15,8 @@ test("console_warp-02: support pausing, warping, stepping and evaluating console
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
+  const BrowserName = page.context().browser().browserType().name();
+
   await startTest(page, recordingId);
   await openDevToolsTab(page);
   await openConsolePanel(page);
@@ -56,6 +58,10 @@ test("console_warp-02: support pausing, warping, stepping and evaluating console
   await stepOverToLine(page, 21);
   await verifyPausedAtMessage(page, "1 << 7", "terminal-expression");
 
+  // TODO: extra line
+  if (BrowserName == "chromium") {
+    await stepOverToLine(page, 21);
+  }
   await stepOverToLine(page, 22);
   await verifyPausedAtMessage(page, "ExampleFinished", "console-log");
 });
