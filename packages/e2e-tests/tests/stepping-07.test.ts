@@ -14,6 +14,8 @@ test("stepping-07: Test quick stepping using the keyboard", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
+  const BrowserName = page.context().browser().browserType().name();
+
   await startTest(page, recordingId);
   await openDevToolsTab(page);
 
@@ -31,6 +33,12 @@ test("stepping-07: Test quick stepping using the keyboard", async ({
   // "Step over" ten times *without* waiting for each step to complete
   for (let i = 0; i < 10; i++) {
     await page.keyboard.press("F10");
+  }
+  // TODO: extra steps needed.
+  if (BrowserName == "chromium") {
+    for (let i = 0; i < 10; i++) {
+      await page.keyboard.press("F10");
+    }
   }
 
   // after all steps have been executed we should be paused on line 60

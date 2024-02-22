@@ -17,6 +17,7 @@ test("stepping-02: Test fixes for some simple stepping bugs", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
+  const BrowserName = page.context().browser().browserType().name();
   await startTest(page, recordingId);
   await openDevToolsTab(page);
 
@@ -28,6 +29,10 @@ test("stepping-02: Test fixes for some simple stepping bugs", async ({
   await addBreakpoint(page, { lineNumber: 21, url: exampleKey });
   await rewindToLine(page, 21);
 
+  // TODO: extra step needed.
+  if (BrowserName == "chromium") {
+    await stepInToLine(page, 21);
+  }
   await stepInToLine(page, 24);
   await stepOverToLine(page, 25);
   await stepOverToLine(page, 26);

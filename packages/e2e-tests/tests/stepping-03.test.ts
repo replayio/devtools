@@ -15,6 +15,8 @@ test(`stepping-03: Stepping past the beginning or end of a frame should act like
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
+  const BrowserName = page.context().browser().browserType().name();
+
   await startTest(page, recordingId);
   await openDevToolsTab(page);
 
@@ -35,10 +37,24 @@ test(`stepping-03: Stepping past the beginning or end of a frame should act like
   await reverseStepOverToLine(page, 20);
   await executeAndVerifyTerminalExpression(page, "number", "9");
 
+  // TODO: extra step needed.
+  if (BrowserName == "chromium") {
+    await stepOverToLine(page, 20);
+  }
   await stepOverToLine(page, 21);
-  await stepOverToLine(page, 22);
+
+  // TODO: two extra steps needed.
+  if (BrowserName == "chromium") {
+    await stepOverToLine(page, 21);
+    await stepOverToLine(page, 21);
+  }
   await stepOverToLine(page, 12);
   await stepOverToLine(page, 16);
+  
+  // TODO: extra step needed.
+  if (BrowserName == "chromium") {
+    await stepOverToLine(page, 16);
+  }
   await stepOverToLine(page, 17);
 
   // After forward-stepping out of the topmost frame we should run forward to

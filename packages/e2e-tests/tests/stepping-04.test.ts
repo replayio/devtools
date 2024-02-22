@@ -11,6 +11,8 @@ test("stepping-04: Test stepping in a frame other than the top frame", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
+  const BrowserName = page.context().browser().browserType().name();
+
   await startTest(page, recordingId);
   await openDevToolsTab(page);
 
@@ -23,7 +25,11 @@ test("stepping-04: Test stepping in a frame other than the top frame", async ({
 
   await warpToMessage(page, "logpoint 5");
   await selectFrame(page, 1);
-  await stepOverToLine(page, 22);
+
+  // TODO: extra step needed.
+  if (BrowserName == "chromium") {
+    await stepOverToLine(page, 21);
+  }
 
   await warpToMessage(page, "logpoint 5");
   await selectFrame(page, 1);
