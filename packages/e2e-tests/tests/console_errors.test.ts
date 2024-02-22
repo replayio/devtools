@@ -9,7 +9,7 @@ import test from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "doc_exceptions_bundle.html" });
 
-test.skip("console_errors: Test that errors and warnings from various sources are shown in the console", async ({
+test("console_errors: Test that errors and warnings from various sources are shown in the console", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
@@ -28,5 +28,5 @@ test.skip("console_errors: Test that errors and warnings from various sources ar
   await verifyConsoleMessage(page, "Error: UncaughtError");
   await verifyConsoleMessage(page, "{number: 42}");
   await verifyConsoleMessage(page, "{number: 12}");
-  await verifyConsoleMessage(page, "uncaught exception: [object Object]");
+  await verifyConsoleMessage(page, "Uncaught [object Object]");
 });
