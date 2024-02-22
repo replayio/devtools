@@ -3,6 +3,7 @@ steps:
     timeout_in_minutes: 60
     key: "runtime-fe-e2e-tests-linux_x86_64"
     commands:
+      - "mkdir -p /mnt/data/replay"
       - "be_cmd install_yarn -- npm i -g yarn"
       - "be_cmd node_deps -- yarn install"
       - "be_cmd run_tests -- ts-node ./packages/e2e-tests/scripts/buildkite_run_fe_tests_from_artifact-linux-x86_64.ts"
@@ -35,6 +36,7 @@ steps:
           organization: "replay"
           cpus: 4
           memory: 4096
+          storage: 20
           secrets:
             BUILDKITE_AGENT_TOKEN: BUILDKITE_AGENT_TOKEN
             SSH_PRIVATE_RSA_KEY_B64: SSH_PRIVATE_RSA_KEY_B64
@@ -51,3 +53,4 @@ steps:
             DISPLAY: ":1"
             PLAYWRIGHT_HEADLESS: "true"
             PLAYWRIGHT_CHROMIUM: "true"
+            RECORD_REPLAY_DIRECTORY: "/mnt/data/replay"
