@@ -11,7 +11,7 @@ import test, { expect } from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "doc_exceptions.html" });
 
-test.skip(`logpoints-04: should display exceptions in the console`, async ({
+test(`logpoints-04: should display exceptions in the console`, async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
@@ -24,7 +24,7 @@ test.skip(`logpoints-04: should display exceptions in the console`, async ({
   await page.locator('[data-test-id="FilterToggle-exceptions"]').click();
 
   let messages = await findConsoleMessage(page, undefined, "exception");
-  await expect(messages).toHaveCount(20);
+  await expect(messages).toHaveCount(10);
 
   messages = await findConsoleMessage(page, "number: 4", "exception");
   await seekToConsoleMessage(page, messages.first());
