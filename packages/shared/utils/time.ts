@@ -94,8 +94,12 @@ export function isTimeStampedPointRange(
   );
 }
 
+export function isTimeInRegion(time: number, range: TimeStampedPointRange): boolean {
+  return time >= range.begin.time && time <= range.end.time;
+}
+
 export function isTimeInRegions(time: number, regions: TimeStampedPointRange[]): boolean {
-  return regions.find(({ begin, end }) => time >= begin.time && time <= end.time) != null;
+  return regions.find(range => isTimeInRegion(time, range)) != null;
 }
 
 export function toPointRange(range: TimeStampedPointRange | PointRange): PointRange {
