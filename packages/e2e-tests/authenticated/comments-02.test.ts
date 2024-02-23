@@ -1,3 +1,5 @@
+import { BrowserContext } from "@playwright/test";
+
 import { openDevToolsTab, startTest } from "../helpers";
 import { E2E_USER_1, E2E_USER_2 } from "../helpers/authentication";
 import {
@@ -26,6 +28,8 @@ test(`authenticated/comments-02: Test shared comments and replies`, async ({
   pageWithMeta: { recordingId, testScope },
   testUsers,
 }) => {
+  let contextOne: BrowserContext;
+  let contextTwo: BrowserContext;
   let pageOne: Page;
   let pageTwo: Page;
 
@@ -33,8 +37,8 @@ test(`authenticated/comments-02: Test shared comments and replies`, async ({
     console.log("User 1: Add comment");
 
     // User 1
-    const context = await browser.newContext();
-    const page = await context.newPage();
+    contextOne = await browser.newContext();
+    const page = await contextOne.newPage();
 
     await load(page, recordingId, testUsers![0].apiKey, testScope);
 
@@ -51,8 +55,8 @@ test(`authenticated/comments-02: Test shared comments and replies`, async ({
     console.log("User 2: Reply to comment");
 
     // User 2
-    const context = await browser.newContext();
-    const page = await context.newPage();
+    contextTwo = await browser.newContext();
+    const page = await contextTwo.newPage();
     await load(page, recordingId, testUsers![1].apiKey, testScope);
 
     const commentLocator = await getComments(page, {
@@ -85,7 +89,21 @@ test(`authenticated/comments-02: Test shared comments and replies`, async ({
   }
 
   {
+    // User 2
+    const page = pageTwo;
+    await page.reload();
+
+    // Verify reply is visible
+    await getComments(page, {
+      text: "This is a reply from user 2",
+      type: "source-code",
+    });
+  }
+
+  {
     await pageOne.close();
+    await contextOne.close();
     await pageTwo.close();
+    await contextTwo.close();
   }
 });

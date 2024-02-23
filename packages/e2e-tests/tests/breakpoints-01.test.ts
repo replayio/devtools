@@ -7,9 +7,13 @@ import test from "../testFixtureCloneRecording";
 test.use({ exampleKey: "doc_rr_basic_chromium.html" });
 
 test(`breakpoints-01: Test basic breakpoint functionality`, async ({
-  pageWithMeta: { page, recordingId },
+  browser,
+  pageWithMeta: { recordingId },
   exampleKey,
 }) => {
+  const context = await browser.newContext();
+  const page = await context.newPage();
+
   await startTest(page, recordingId);
   await openDevToolsTab(page);
 

@@ -5,6 +5,7 @@ import { ConsoleNag } from "../shared/Nags/Nags";
 
 // Adapter that connects the legacy app Redux stores to the newer React Context providers.
 export default function NewConsoleRoot() {
+  console.log("Rendering NewConsoleRoot");
   const [consoleFilterDrawerDefaultsToOpen] = useGraphQLUserData("console_showFiltersByDefault");
 
   return (
