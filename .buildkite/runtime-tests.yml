@@ -3,8 +3,7 @@ steps:
     key: "runtime-fe-e2e-tests-macos_arm64"
     commands:
       - "be_cmd node_deps -- yarn install"
-      #- "be_cmd run_tests -- ts-node ./packages/e2e-tests/scripts/buildkite_run_fe_tests_from_artifact-macos-arm64.ts"
-      - "be_cmd run_tests -- true"
+      - "be_cmd run_tests -- ts-node ./packages/e2e-tests/scripts/buildkite_run_fe_tests_from_artifact-macos-arm64.ts"
     agents:
       - "os=macos"
       - "queue=default"
