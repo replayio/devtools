@@ -18,7 +18,8 @@ export const RepaintGraphicsCache: Cache<
   },
 });
 
-type StreamingScreenShotCacheStatus =
+export type StreamingScreenShotCacheStatus =
+  | "before-first-paint"
   | "complete"
   | "fetching-cached-paint"
   | "fetching-repaint"
@@ -42,6 +43,12 @@ export const StreamingScreenShotCache = createStreamingCache<
     await PaintsCache.readAsync();
 
     const paintPoint = findMostRecentPaint(time);
+    if (!paintPoint || !paintPoint.paintHash) {
+      // Don't try to paint (or repaint) if the current time is before the first cached paint
+      update(undefined, 1, "before-first-paint");
+      resolve();
+      return;
+    }
 
     if (paintPoint && paintPoint.paintHash) {
       try {
