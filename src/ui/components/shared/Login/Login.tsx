@@ -175,8 +175,15 @@ function AuthError({ error }: { error: any }) {
     return null;
   }
 
+  if (message !== "INVALID_STATE" && message !== "Invalid state") {
+    sendTelemetryEvent("devtools-auth-error-login", {
+      errorMessage: message,
+    });
+  }
+
   switch (message) {
     case "INVALID_STATE":
+    case "Invalid state":
       // This is usually caused by waiting too long to go through the auth process
       // and can be fixed by trying again.
       message = "Your login session expired. Please try logging in again.";
@@ -188,15 +195,12 @@ function AuthError({ error }: { error: any }) {
       break;
     case "IDP_CONFIGURATION_ERROR":
       message =
-        "Failed to login. You've previously used Google. Please contact support to update your login method to SSO.";
+        "Failed to log in due to a configuration problem with your Replay account. Support has been notified!";
     case "IDP_UNEXPECTED_ERROR":
-      message = "Failed to login. Please login with your organization's SSO.";
+      message = "Failed to login. Please try logging in with SSO.";
       break;
     default:
       // We want to capture any other error so we can investigate further.
-      sendTelemetryEvent("devtools-auth-error-login", {
-        errorMessage: message,
-      });
       message = "An unexpected error occurred. Please try again.";
   }
 
