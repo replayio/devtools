@@ -82,7 +82,7 @@ function UnexpectedErrorFormSuspends({
       dataTestId="UnexpectedErrorDetails"
       onDismiss={noop}
       showCloseButton={showContactForm}
-      title={title}
+      title={<span data-test-name="ErrorTitle">{title}</span>}
     >
       {isWindows ? (
         <div className={styles.Message}>
@@ -118,7 +118,11 @@ function UnexpectedErrorFormSuspends({
             onChange={setShowErrorDetails}
           />
 
-          {showErrorDetails && <div className={styles.DetailsText}>{details}</div>}
+          {showErrorDetails && (
+            <div className={styles.DetailsText} data-test-name="ErrorDetails">
+              {details}
+            </div>
+          )}
         </div>
       )}
     </ModalFrame>

@@ -217,12 +217,16 @@ export async function sendMessage<M extends CommandMethods>(
 
     const { code, data, message } = response.error;
 
-    if (method === "Session.listenForLoadChanges" && code === 66) {
-      // We are being disconnected after a timeout, no need to raise
-      return {};
-    }
-
     console.warn("Message failed", method, { code, id, message, params }, data);
+
+    switch (code) {
+      case ProtocolError.UnknownSession:
+      case ProtocolError.SessionDestroyed: {
+        // Special type of "global" error; applies to more than just the specific message it is associated with
+        sessionDestroyedListener();
+        break;
+      }
+    }
 
     let finalMessage = message;
     if (process.env.NODE_ENV === "development") {
@@ -230,6 +234,7 @@ export async function sendMessage<M extends CommandMethods>(
       // _just_ "Internal Error" or similar
       finalMessage = `${message} (request: ${method}, ${JSON.stringify(params)})`;
     }
+
     if (
       !noCallerStackTrace &&
       !noCallerStackTracesForErrorCodes.has(code) &&
@@ -365,4 +370,10 @@ if (typeof window === "object") {
   };
 
   (window as any).protocolClient = client;
+}
+
+let sessionDestroyedListener = () => {};
+
+export function listenForSessionDestroyed(callback: () => void) {
+  sessionDestroyedListener = callback;
 }
