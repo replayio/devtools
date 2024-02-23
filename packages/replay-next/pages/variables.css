@@ -233,7 +233,7 @@
   --color-link: var(--primary-accent);
   --color-primary-button: #ffffff;
   --color-secondary-button: #ffffff;
-  --color-disabled-button: #ffffff;
+  --color-disabled-button: var(--color-default);
   --color-high-contrast-button: #ffffff;
   --color-warning: #fce2a1;
   --color-search-results: #d7d7db;
@@ -745,7 +745,7 @@
   --background-color-contrast-5: #e1e6ed;
 
   --background-color-default: #e9e9e9;
-  --background-color-disabled-button: #666666;
+  --background-color-disabled-button: #e6e7eb;
   --background-color-error: #fcefee;
   --background-color-highlight-change: mark;
   --background-color-high-contrast-button: #f2f2f2;
@@ -777,7 +777,7 @@
   --color-default: #223344;
   --color-dim: rgba(135, 135, 137, 0.9);
   --color-dimmer: #aaaaaa;
-  --color-disabled-button: var(--theme-base-100);
+  --color-disabled-button: var(--color-default);
   --color-error: #ff0000;
   --color-highlight-change: marktext;
   --color-high-contrast-button: #000000;

@@ -157,12 +157,3 @@ export const PrimaryButton = (props: ButtonProps & { color: Colors }) => (
 export const SecondaryButton = (props: ButtonProps & { color: Colors }) => (
   <Button {...props} size="md" style="secondary" />
 );
-export const DisabledButton = ({ className, ...rest }: ButtonProps) => (
-  <Button
-    {...rest}
-    size="md"
-    style="disabled"
-    className={classNames(className, "cursor-default")}
-    color="gray"
-  />
-);

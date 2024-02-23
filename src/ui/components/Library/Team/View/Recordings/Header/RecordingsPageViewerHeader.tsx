@@ -1,15 +1,13 @@
 import { useRouter } from "next/router";
 import React from "react";
 
+import { Button } from "replay-next/components/Button";
 import { Recording } from "shared/graphql/types";
-import { Workspace } from "shared/graphql/types";
 import { setModal } from "ui/actions/app";
 import { MY_LIBRARY_TEAM } from "ui/components/Library/Team/TeamContextRoot";
 import { useGetTeamIdFromRoute } from "ui/components/Library/Team/utils";
-import hooks from "ui/hooks";
 import { useAppDispatch } from "ui/setup/hooks";
 
-import { PrimaryButton, SecondaryButton } from "../../../../../shared/Button";
 import BatchActionDropdown from "./BatchActionDropdown";
 import TeamTrialEnd from "./TeamTrialEnd";
 import styles from "../../../../Library.module.css";
@@ -40,9 +38,7 @@ function ViewerHeaderActions({
           selectedIds={selectedIds}
           recordings={recordings}
         />
-        <PrimaryButton color="blue" onClick={handleDoneEditing}>
-          Done
-        </PrimaryButton>
+        <Button onClick={handleDoneEditing}>Done</Button>
       </>
     );
   }
@@ -56,26 +52,14 @@ function ViewerHeaderActions({
   return (
     <>
       {!isLibrary ? (
-        <SecondaryButton
-          className={styles.editButton}
-          color="blue"
-          onClick={() => launchWorkspaceSettings()}
-        >
-          Add team member
-        </SecondaryButton>
+        <Button onClick={() => launchWorkspaceSettings()}>Add team member</Button>
       ) : (
         <></>
       )}
 
       {recordings.length != 0 ? (
         <>
-          <SecondaryButton
-            className={styles.editButton}
-            color="blue"
-            onClick={() => setIsEditing(true)}
-          >
-            Edit
-          </SecondaryButton>
+          <Button onClick={() => setIsEditing(true)}>Edit</Button>
         </>
       ) : (
         <></>
@@ -113,7 +97,7 @@ export default function ViewerHeader({
   );
 
   return (
-    <div className={`m-2 flex flex-row items-center justify-between ${styles.libraryHeaderButton}`}>
+    <div className={`m-2 flex flex-row items-center justify-between`}>
       {HeaderLeft}
       <div className="flex flex-row items-center space-x-3">
         {currentWorkspaceId ? <TeamTrialEnd currentWorkspaceId={currentWorkspaceId} /> : null}
