@@ -219,12 +219,22 @@ export async function sendMessage<M extends CommandMethods>(
 
     console.warn("Message failed", method, { code, id, message, params }, data);
 
+    switch (code) {
+      case ProtocolError.UnknownSession:
+      case ProtocolError.SessionDestroyed: {
+        // Special type of "global" error; applies to more than just the specific message it is associated with
+        sessionDestroyedListener();
+        break;
+      }
+    }
+
     let finalMessage = message;
     if (process.env.NODE_ENV === "development") {
       // Include details on the method and params in the error string so that we get more than
       // _just_ "Internal Error" or similar
       finalMessage = `${message} (request: ${method}, ${JSON.stringify(params)})`;
     }
+
     if (
       !noCallerStackTrace &&
       !noCallerStackTracesForErrorCodes.has(code) &&
@@ -360,4 +370,10 @@ if (typeof window === "object") {
   };
 
   (window as any).protocolClient = client;
+}
+
+let sessionDestroyedListener = () => {};
+
+export function listenForSessionDestroyed(callback: () => void) {
+  sessionDestroyedListener = callback;
 }

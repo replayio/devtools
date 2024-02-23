@@ -9,7 +9,9 @@ import * as dbgClient from "devtools/client/debugger/src/client";
 import debuggerReducers from "devtools/client/debugger/src/reducers";
 import * as inspectorReducers from "devtools/client/inspector/reducers";
 // eslint-disable-next-line no-restricted-imports
-import { addEventListener, initSocket, client as protocolClient } from "protocol/socket";
+import { addEventListener, initSocket } from "protocol/socket";
+// eslint-disable-next-line no-restricted-imports
+import { listenForSessionDestroyed, client as protocolClient } from "protocol/socket";
 import { assert } from "protocol/utils";
 import { buildIdCache, parseBuildIdComponents } from "replay-next/src/suspense/BuildIdCache";
 import { networkRequestsCache } from "replay-next/src/suspense/NetworkRequestsCache";
@@ -18,6 +20,7 @@ import { ReplayClientInterface } from "shared/client/types";
 import { CONSOLE_SETTINGS_DATABASE, POINTS_DATABASE } from "shared/user-data/IndexedDB/config";
 import { IDBOptions } from "shared/user-data/IndexedDB/types";
 import { UIStore, actions } from "ui/actions";
+import { getDisconnectionError } from "ui/actions/session";
 import { selectors } from "ui/reducers";
 import app from "ui/reducers/app";
 import network from "ui/reducers/network";
@@ -175,6 +178,10 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
       window.app.socket = socket;
     }
   }
+
+  listenForSessionDestroyed(() => {
+    store.dispatch(actions.setExpectedError(getDisconnectionError()));
+  });
 
   addEventListener("Recording.uploadedData", (data: uploadedData) =>
     store.dispatch(actions.onUploadedData(data))
