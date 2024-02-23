@@ -175,21 +175,29 @@ function AuthError({ error }: { error: any }) {
     return null;
   }
 
-  if (message === "Invalid state") {
-    // This is usually caused by waiting too long to go through the auth process
-    // and can be fixed by trying again.
-    message = "Your login session expired. Please try logging in again.";
-  } else {
-    // We want to capture any other error so we can investigate further.
-    sendTelemetryEvent("devtools-auth-error-login", {
-      errorMessage: message,
-    });
-
-    if (message === "Unable to authenticate user") {
+  switch (message) {
+    case "INVALID_STATE":
+      // This is usually caused by waiting too long to go through the auth process
+      // and can be fixed by trying again.
+      message = "Your login session expired. Please try logging in again.";
+      break;
+    case "INTERNAL_ERROR":
       // This usually occurs because our auth hook threw an error but the
       // message itself isn't very useful so we show a more friendly message
       message = "We're sorry but we had a problem authenticating you. We're looking into it now!";
-    }
+      break;
+    case "IDP_CONFIGURATION_ERROR":
+      message =
+        "Failed to login. You've previously used Google. Please contact support to update your login method to SSO.";
+    case "IDP_UNEXPECTED_ERROR":
+      message = "Failed to login. Please login with your organization's SSO.";
+      break;
+    default:
+      // We want to capture any other error so we can investigate further.
+      sendTelemetryEvent("devtools-auth-error-login", {
+        errorMessage: message,
+      });
+      message = "An unexpected error occurred. Please try again.";
   }
 
   return (
