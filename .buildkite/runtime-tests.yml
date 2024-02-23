@@ -12,11 +12,11 @@ steps:
       - seek-oss/aws-sm#v2.3.1:
           region: us-east-2
           env:
-            # AUTOMATED_TEST_SECRET: "graphql-automated-test-secret"
-            # RECORD_REPLAY_API_KEY: "runtime-record-replay-api-key"
-            # SSH_PRIVATE_RSA_KEY_B64: "prod/buildkite-ssh-private-key"
+            BUILDKITE_AGENT_TOKEN: "prod/buildkite-agent-token"
+            AUTOMATED_TEST_SECRET: "graphql-automated-test-secret"
+            RECORD_REPLAY_API_KEY: "runtime-record-replay-api-key"
             HASURA_ADMIN_SECRET: "prod/hasura-admin-secret"
-            # RUNTIME_TEAM_API_KEY: runtime-replay-api-key
+            RUNTIME_TEAM_API_KEY: runtime-replay-api-key
             BUILDEVENT_APIKEY: honeycomb-api-key
             BUILDEVENT_BUILDKITE_API_TOKEN: buildkite-api-token-honeycomb-build-events
       - replayio/buildevents#adb8a05: ~
