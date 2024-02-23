@@ -422,16 +422,23 @@ export async function searchElementsPanel(
   await input.clear();
   await input.focus();
   await input.type(searchText);
+  await input.press("Enter");
+  await delay(500);
 
+  const resultsLabel = page.locator('[data-test-id="ElementsPanel-SearchResult"]');
   await waitFor(async () => {
-    await input.press("Enter");
+    // don't press "Enter" again if the search is already running or has just finished
+    if (
+      !(await page.locator('[data-test-id="ElementsPanel-Searching"]').or(resultsLabel).isVisible())
+    ) {
+      await input.press("Enter");
+    }
 
     await delay(500);
 
     // If the Elements panel is still loading, the search won't be handled.
     // A proxy for confirming that the search has been handled is that a results label will be rendered.
-    const resultsLabel = page.locator('[data-test-id="ElementsPanel-SearchResult"]');
-    await expect(await resultsLabel.count()).toEqual(1);
+    expect(await resultsLabel.count()).toEqual(1);
   });
 }
 

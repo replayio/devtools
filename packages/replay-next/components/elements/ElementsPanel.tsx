@@ -178,7 +178,13 @@ export function ElementsPanel({
             value={query}
           />
         </label>
-        {searchInProgress && <Icon className={styles.SpinnerIcon} type="spinner" />}
+        {searchInProgress && (
+          <Icon
+            className={styles.SpinnerIcon}
+            data-test-id="ElementsPanel-Searching"
+            type="spinner"
+          />
+        )}
         {!searchInProgress && searchState !== null && (
           <div
             className={styles.SearchResults}
