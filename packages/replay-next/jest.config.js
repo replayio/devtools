@@ -39,4 +39,16 @@ module.exports = {
     "^.+\\.module\\.(css|sass|scss)$",
   ],
   setupFilesAfterEnv: ["<rootDir>/jest.setupEnv.js"],
+  reporters: [
+    "default",
+    ["jest-junit", {
+      outputDirectory: "<rootDir>/../../test-results",
+      outputName: "replay-next-test-result-jest.xml",
+      addFileAttribute: "true",
+      uniqueOutputName: "true",
+      ancestorSeparator: "",
+      includeConsoleOutput: "true",
+      reportTestSuiteErrors: "true",
+    }]
+  ]
 };

@@ -74,4 +74,16 @@ module.exports = {
   },
   transformIgnorePatterns: ["/node_modules/", "^.+\\.module\\.(css|sass|scss)$"],
   setupFilesAfterEnv: ["<rootDir>/test/jest/setupEnv.js"],
+  reporters: [
+    "default",
+    ["jest-junit", {
+      outputDirectory: "<rootDir>/test-results",
+      outputName: "test-result-jest.xml",
+      addFileAttribute: "true",
+      uniqueOutputName: "true",
+      ancestorSeparator: "",
+      includeConsoleOutput: "true",
+      reportTestSuiteErrors: "true",
+    }]
+  ]
 };

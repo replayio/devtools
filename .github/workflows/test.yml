@@ -127,6 +127,14 @@ jobs:
         with:
           api-key: ${{ env.RECORD_REPLAY_API_KEY }}
           public: true
+      - name: Upload test results to Trunk
+        uses: trunk-io/analytics-uploader@main
+        with:
+          org-slug: replay
+          junit-paths: test-results/**/*.xml
+          token: ${{ secrets.TRUNK_API_TOKEN }}
+        continue-on-error: true
+
   authenticated-e2etest:
     name: Authenticated end-to-end tests (${{ matrix.shard }})
     runs-on: ubuntu-latest
@@ -189,6 +197,14 @@ jobs:
         with:
           api-key: ${{ env.RECORD_REPLAY_API_KEY }}
           public: true
+      - name: Upload test results to Trunk
+        uses: trunk-io/analytics-uploader@main
+        with:
+          org-slug: replay
+          junit-paths: test-results/**/*.xml
+          token: ${{ secrets.TRUNK_API_TOKEN }}
+        continue-on-error: true
+
   unit-test:
     name: Unit Tests
     runs-on: ubuntu-latest
@@ -219,3 +235,10 @@ jobs:
           YARN_CHECKSUM_BEHAVIOR: "update"
       - name: Run tests
         run: yarn test
+      - name: Upload test results to Trunk
+        uses: trunk-io/analytics-uploader@main
+        with:
+          org-slug: replay
+          junit-paths: test-results/**/*.xml
+          token: ${{ secrets.TRUNK_API_TOKEN }}
+        continue-on-error: true
