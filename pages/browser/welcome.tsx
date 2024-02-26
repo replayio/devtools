@@ -1,7 +1,4 @@
-import Link from "next/link";
-import React from "react";
-
-import { getButtonClasses } from "ui/components/shared/Button";
+import { Button } from "replay-next/components/Button";
 import {
   OnboardingBody,
   OnboardingContent,
@@ -12,7 +9,9 @@ import {
 import styles from "src/ui/components/shared/Onboarding/Onboarding.module.css";
 
 export default function WelcomeToReplay() {
-  const classes = getButtonClasses("blue", "primary", "2xl");
+  const onClick = () => {
+    window.location.replace("/login?returnTo=/browser/choose-role");
+  };
 
   return (
     <div className={styles.stars}>
@@ -21,9 +20,9 @@ export default function WelcomeToReplay() {
           <OnboardingHeader>{`Welcome to Replay`}</OnboardingHeader>
           <OnboardingBody>{` `}</OnboardingBody>
 
-          <Link href="/login?returnTo=/browser/choose-role" className={classes}>
+          <Button onClick={onClick} size="large">
             Let's get started!
-          </Link>
+          </Button>
         </OnboardingContent>
       </OnboardingModalContainer>
       <div className={styles.bottom}>

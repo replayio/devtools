@@ -2,7 +2,6 @@ import { useEffect, useRef } from "react";
 
 import { Button } from "replay-next/components/Button";
 
-import { Button as LegacyButton } from "../Button";
 import {
   Dialog,
   DialogActions,
@@ -69,25 +68,22 @@ export const ConfirmDialog = ({
       {description && <DialogDescription>{description}</DialogDescription>}
       <DialogActions>
         <Button
-          className="mx-3 flex-1 justify-center"
           data-test-id={dataTestId ? `${dataTestId}-DeclineButton` : undefined}
           data-test-name={dataTestName ? `${dataTestName}-DeclineButton` : undefined}
           onClick={onDecline}
         >
           {declineLabel}
         </Button>
-        <LegacyButton
+        <Button
           className="mx-2 flex-1 justify-center"
-          dataTestId={dataTestId ? `${dataTestId}-ConfirmButton` : undefined}
-          dataTestName={dataTestName ? `${dataTestName}-ConfirmButton` : undefined}
-          color={isDestructive ? "pink" : "blue"}
+          color={isDestructive ? "secondary" : "primary"}
+          data-test-id={dataTestId ? `${dataTestId}-ConfirmButton` : undefined}
+          data-test-name={dataTestName ? `${dataTestName}-ConfirmButton` : undefined}
           onClick={onAccept}
           ref={primaryButtonRef}
-          size="md"
-          style="primary"
         >
           {acceptLabel}
-        </LegacyButton>
+        </Button>
       </DialogActions>
     </Dialog>
   );
