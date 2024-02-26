@@ -19,11 +19,16 @@ export function getRecordingURL(recording: Recording): string {
 
 export function getRecordingId(): string | undefined {
   if (typeof window !== "undefined" && window != null) {
-    const parts = window.location.pathname.split("/");
-    if (parts[1] === "recording") {
-      return extractIdAndSlug(parts.slice(2)).id;
-    }
-
-    return undefined;
+    const pathname = window.location.pathname;
+    return extractRecordingIdFromPathname(pathname);
   }
+}
+
+export function extractRecordingIdFromPathname(pathname: string): string | undefined {
+  const parts = pathname.split("/");
+  if (parts[1] === "recording") {
+    return extractIdAndSlug(parts.slice(2)).id;
+  }
+
+  return undefined;
 }
