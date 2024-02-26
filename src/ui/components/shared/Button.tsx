@@ -67,7 +67,7 @@ function getColorClasses(color: Colors, style: ButtonStyles) {
   return `${textStyle} ${bgStyle}`;
 }
 
-export function getButtonClasses(color: Colors, style: ButtonStyles, size: ButtonSizes) {
+function getButtonClasses(color: Colors, style: ButtonStyles, size: ButtonSizes) {
   const standardClasses = STANDARD_CLASSES[size];
   const colorClasses = getColorClasses(color, style);
   const focusClasses = `focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-${getColorCode(
