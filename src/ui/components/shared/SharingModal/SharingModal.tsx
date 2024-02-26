@@ -2,19 +2,14 @@ import React, { useState } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
 import { Button } from "replay-next/components/Button";
-import { CollaboratorRequest, OperationsData, Recording } from "shared/graphql/types";
+import { CollaboratorRequest, Recording } from "shared/graphql/types";
 import { actions } from "ui/actions";
 import { AvatarImage } from "ui/components/Avatar";
 import Modal from "ui/components/shared/NewModal";
-import {
-  Privacy,
-  ToggleShowPrivacyButton,
-  getUniqueDomains,
-} from "ui/components/UploadScreen/Privacy";
+import { Privacy, ToggleShowPrivacyButton } from "ui/components/UploadScreen/Privacy";
 import hooks from "ui/hooks";
 import { useHasNoRole } from "ui/hooks/recordings";
-import { getModalOptions, getRecordingTarget } from "ui/reducers/app";
-import { useAppSelector } from "ui/setup/hooks";
+import { getModalOptions } from "ui/reducers/app";
 import { UIState } from "ui/state";
 
 import Collaborators from "./Collaborators";
@@ -117,32 +112,12 @@ function CollaboratorsSection({
   );
 }
 
-function SecurityWarnings({ operations }: { operations: OperationsData }) {
-  const uniqueDomains = getUniqueDomains(operations);
-
-  if (uniqueDomains.length == 0) {
-    return null;
-  }
-
-  return (
-    <div className="group">
-      <div className="text-xs">{`Contains potentially sensitive data from ${uniqueDomains.length} domains`}</div>
-    </div>
-  );
-}
-
-function EnvironmentVariablesRow() {
-  return <div className="text-xs">This node recording contains all env variables</div>;
-}
-
 function SharingSection({
   recording,
-  showEnvironmentVariables,
   showPrivacy,
   setShowPrivacy,
 }: {
   recording: Recording;
-  showEnvironmentVariables: boolean;
   showPrivacy: boolean;
   setShowPrivacy: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
@@ -160,46 +135,8 @@ function SharingSection({
   );
 }
 
-type ModalMode = "sharing" | "download";
-
-function Header({
-  modalMode,
-  setModalMode,
-}: {
-  modalMode: ModalMode;
-  setModalMode: React.Dispatch<React.SetStateAction<ModalMode>>;
-}) {
-  const Tab = ({
-    label,
-    onClick,
-    active,
-    className = "",
-  }: {
-    label: string;
-    onClick: any;
-    active: boolean;
-    className?: string;
-  }) => (
-    <div
-      onClick={onClick}
-      className={
-        (active
-          ? "rounded-xl bg-menuHoverBgcolor px-4 py-1 font-bold text-slate-700 hover:text-slate-800"
-          : "text-slate-500 hover:text-slate-600") + ` ${className} cursor-pointer`
-      }
-    >
-      {label}
-    </div>
-  );
-
-  return <section></section>;
-}
-
 function SharingModal({ recording, hideModal }: SharingModalProps) {
-  const recordingTarget = useAppSelector(getRecordingTarget);
   const [showPrivacy, setShowPrivacy] = useState(false);
-  const [modalMode, setModalMode] = useState<ModalMode>("sharing");
-  const showEnvironmentVariables = recordingTarget == "node";
 
   const { hasNoRole, loading } = useHasNoRole();
   if (hasNoRole || loading) {
@@ -213,15 +150,11 @@ function SharingModal({ recording, hideModal }: SharingModalProps) {
         style={{ width: showPrivacy ? 720 : 390 }}
       >
         <div className="flex flex-col space-y-0" style={{ width: 390 }}>
-          <Header modalMode={modalMode} setModalMode={setModalMode} />
-          {modalMode == "sharing" ? (
-            <SharingSection
-              recording={recording}
-              showEnvironmentVariables={showEnvironmentVariables}
-              showPrivacy={showPrivacy}
-              setShowPrivacy={setShowPrivacy}
-            />
-          ) : null}
+          <SharingSection
+            recording={recording}
+            showPrivacy={showPrivacy}
+            setShowPrivacy={setShowPrivacy}
+          />
         </div>
         {showPrivacy ? (
           <div className="relative flex overflow-auto bg-themeBase-90">
