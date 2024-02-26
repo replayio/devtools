@@ -1,4 +1,4 @@
-import { ObjectId, PauseId } from "@replayio/protocol";
+import { NodeBounds, ObjectId, PauseId } from "@replayio/protocol";
 import {
   PropsWithChildren,
   createContext,
@@ -153,7 +153,16 @@ export function NodePickerContextRoot({ children }: PropsWithChildren<{}>) {
     }
 
     // Start loading rects eagerly; we'll need them in the hover/click handlers
-    const boundingRectsPromise = boundingRectsCache.readAsync(replayClient, pauseId);
+    let boundingRectsPromise: PromiseLike<NodeBounds[]> | NodeBounds[] | undefined;
+    try {
+      boundingRectsPromise = boundingRectsCache.readAsync(replayClient, pauseId);
+    } catch {
+      setState({
+        status: "error",
+        options,
+      });
+      return;
+    }
 
     const { limitToNodeIds, onSelected } = options;
 
@@ -162,10 +171,18 @@ export function NodePickerContextRoot({ children }: PropsWithChildren<{}>) {
       if (position != null) {
         const { x, y } = position;
 
-        const boundingRects = await boundingRectsPromise;
-        const nodeBounds = getMouseTarget(boundingRects, x, y, limitToNodeIds);
+        try {
+          const boundingRects = await boundingRectsPromise!;
+          const nodeBounds = getMouseTarget(boundingRects, x, y, limitToNodeIds);
 
-        return nodeBounds?.node ?? null;
+          return nodeBounds?.node ?? null;
+        } catch {
+          setState({
+            status: "error",
+            options,
+          });
+          return null;
+        }
       }
 
       return null;
