@@ -3,7 +3,10 @@ import chalk from "chalk";
 
 import { Badge } from "shared/client/types";
 
-import { submitCurrentText as submitCurrentTextLexical, type as typeLexical } from "./lexical";
+import {
+  submitCurrentText as submitCurrentTextLexical,
+  typeTerminalExpression as typeLexical,
+} from "./lexical";
 import { waitForPaused } from "./pause-information-panel";
 import { Expected, MessageType } from "./types";
 import { debugPrint, toggleExpandable, waitFor } from "./utils";
@@ -122,7 +125,7 @@ export async function executeTerminalExpression(
   // Wait for the Console to stop loading
   await consoleRoot.locator("text=Unavailable...").waitFor({ state: "hidden" });
 
-  await typeLexical(page, '[data-test-id="ConsoleTerminalInput"]', text, shouldSubmit);
+  await typeLexical(page, { shouldSubmit, text });
 }
 
 export async function executeAndVerifyTerminalExpression(
@@ -284,7 +287,7 @@ export async function seekToConsoleMessage(
 }
 
 export async function submitCurrentText(page: Page) {
-  await submitCurrentTextLexical(page, '[data-test-id="ConsoleTerminalInput"]');
+  await submitCurrentTextLexical(page, { type: "terminal" });
 }
 
 export async function toggleSideFilters(page: Page, open: boolean): Promise<void> {

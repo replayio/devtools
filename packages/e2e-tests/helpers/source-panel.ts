@@ -3,18 +3,10 @@ import chalk from "chalk";
 
 import { Badge } from "shared/client/types";
 
-import { hideTypeAheadSuggestions, type as typeLexical } from "./lexical";
+import { hideTypeAheadSuggestions, typeLogPoint as typeLexical } from "./lexical";
 import { findPoints, openPauseInformationPanel, removePoint } from "./pause-information-panel";
 import { openSource } from "./source-explorer-panel";
-import {
-  clearTextArea,
-  debugPrint,
-  delay,
-  getByTestName,
-  getCommandKey,
-  mapLocators,
-  waitFor,
-} from "./utils";
+import { clearTextArea, debugPrint, delay, getByTestName, getCommandKey, waitFor } from "./utils";
 import { openDevToolsTab } from ".";
 
 export async function addBreakpoint(
@@ -138,12 +130,12 @@ export async function editConditional(
     "addConditional"
   );
 
-  await typeLexical(
-    page,
-    `${getSourceLineSelector(lineNumber)} [data-test-name="PointPanel-ConditionInput"]`,
-    condition,
-    false
-  );
+  await typeLexical(page, {
+    shouldSubmit: false,
+    sourceLineNumber: lineNumber,
+    text: condition,
+    type: "condition",
+  });
 }
 
 export async function jumpToLogPointHit(
@@ -322,10 +314,6 @@ export async function editLogPoint(
     await editConditional(page, { condition, lineNumber });
   }
 
-  const selector = `${getSourceLineSelector(
-    lineNumber
-  )} [data-test-name="PointPanel-ContentInput"]`;
-
   if (content != null) {
     const isEditing = await line
       .locator('[data-test-name="PointPanel-ContentWrapper"] [data-lexical-editor="true"]')
@@ -336,13 +324,25 @@ export async function editLogPoint(
 
     await debugPrint(page, `Setting log-point content "${chalk.bold(content)}"`, "addLogpoint");
 
-    await typeLexical(page, selector, content, false);
+    await typeLexical(page, {
+      sourceLineNumber: lineNumber,
+      shouldSubmit: false,
+      text: content,
+      type: "content",
+    });
   }
 
   if (saveAfterEdit) {
     // The typeahead popup sometimes sticks around and overlaps the save button.
     // Ensure it goes away.
-    await hideTypeAheadSuggestions(page, selector);
+    await hideTypeAheadSuggestions(page, {
+      sourceLineNumber: lineNumber,
+      type: "log-point-condition",
+    });
+    await hideTypeAheadSuggestions(page, {
+      sourceLineNumber: lineNumber,
+      type: "log-point-content",
+    });
 
     const saveButton = line.locator('[data-test-name="PointPanel-SaveButton"]');
     await expect(saveButton).toBeEnabled();
