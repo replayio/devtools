@@ -33,13 +33,18 @@ export default function Tooltip({ timelineWidth }: { timelineWidth: number }) {
     focusWindow && (focusWindow.begin > hoverTime || focusWindow.end < hoverTime);
 
   const timestamp = getFormattedTime(hoverTime);
+
   const message =
     isHoveredOnNonLoadingRegion || isHoveredOnUnFocusedRegion
-      ? `${timestamp} (Unloaded)`
+      ? "This part of the timeline has been unloaded. Click the icon in the bottom right to adjust this window."
       : timestamp;
 
   return (
-    <div className="timeline-tooltip" style={{ left: offset }}>
+    <div
+      className="timeline-tooltip"
+      data-longer-message={isHoveredOnNonLoadingRegion || isHoveredOnUnFocusedRegion || undefined}
+      style={{ left: offset }}
+    >
       {message}
     </div>
   );
