@@ -96,13 +96,14 @@ export async function submitCurrentText(page: Page, options: InputAndTypeAheadOp
   const input = page.locator(inputSelector);
   const initialText = await input.textContent();
 
-  await hideTypeAheadSuggestions(page, options);
-
   let loopCounter = 0;
 
   // Timing awkwardness;
   // Sometimes the typeahead misses an "Enter" command and doesn't submit the form.
+  // Sometimes the typeahead panel takes a while to popup so we should attempt to re-dismiss it each retry
   while ((await input.textContent()) === initialText) {
+    await hideTypeAheadSuggestions(page, options);
+
     await delay(100);
 
     await input.press("Enter");
