@@ -72,12 +72,8 @@
     "buildId": "linux-gecko-20230919-abf2e86b2910-4d0a9f5b9de2"
   },
   "doc_minified.html": {
-    "recording": "ab6b2a55-658d-4d8f-831a-2e9b2bfc1d35",
-    "buildId": "linux-gecko-20230919-abf2e86b2910-4d0a9f5b9de2"
-  },
-  "doc_minified_chromium.html": {
-    "recording": "ddb0b0f9-3b72-41e7-afcd-b0045169d00d",
-    "buildId": "linux-chromium-20240208-e6ff39de2177-11bb013e140b"
+    "recording": "8c42c8b6-9d98-4d29-ace1-9d9df8b11814",
+    "buildId": "macOS-chromium-20240223-04a97b427e5d-4f2bc3ffc701"
   },
   "doc_navigate.html": {
     "recording": "846c99b2-ec38-46af-a166-e7cac2186827",
