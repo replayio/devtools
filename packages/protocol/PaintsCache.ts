@@ -56,7 +56,7 @@ export async function findFirstMeaningfulPaint() {
           }
         }
       } catch (error) {
-        console.warn(error);
+        // Ignore
       }
     }
   }

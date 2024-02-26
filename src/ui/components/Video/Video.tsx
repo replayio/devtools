@@ -42,7 +42,11 @@ export default function Video() {
     timeToSuspend,
     executionPointToSuspend
   );
-  const { data: status, progress = 0, value: screenShot } = useStreamingValue(streaming);
+  const {
+    data: status = "fetching-cached-paint",
+    progress = 0,
+    value: screenShot,
+  } = useStreamingValue(streaming);
 
   const { addComment, contextMenu, onContextMenu } = useVideoContextMenu();
 
@@ -76,7 +80,7 @@ export default function Video() {
     }
   };
 
-  const screenShotToRender = useDisplayedScreenShot(screenShot, timeToSuspend);
+  const screenShotToRender = useDisplayedScreenShot(screenShot, status, timeToSuspend);
 
   const showLoader = progress < 1 && playbackTime == null;
   const showBeforeAfterTestStepToggles = panel === "cypress";
@@ -90,6 +94,9 @@ export default function Video() {
     <div
       id="video"
       className={styles.Container}
+      data-execution-point={executionPointToSuspend}
+      data-status={status}
+      data-time={timeToSuspend}
       style={{
         cursor: nodePickerStatus === "initializing" ? "progress" : undefined,
       }}

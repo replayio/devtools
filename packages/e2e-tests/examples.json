@@ -184,6 +184,10 @@
     "recording": "d840743d-9737-457d-b337-0cf563e79fd0",
     "buildId": "linux-node-20230531-9e516dd8b367-ae8a9ca6220f"
   },
+  "paint_at_intervals.html": {
+    "recording": "0170568e-dd07-4a18-b5da-7de0099495e5",
+    "buildId": "macOS-chromium-20240220-e1deb92cdc2d-6a9fb5de9041"
+  },
   "playwright/breakpoints-05": {
     "recording": "bc9cb0e1-0aa6-4586-9849-46f54de980fc",
     "buildId": "linux-chromium-20240123-609ec6caa105-50d01be708a2",
