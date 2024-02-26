@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
+import { Button } from "replay-next/components/Button";
 import { CollaboratorRequest, OperationsData, Recording } from "shared/graphql/types";
 import { actions } from "ui/actions";
 import { AvatarImage } from "ui/components/Avatar";
@@ -16,7 +17,6 @@ import { getModalOptions, getRecordingTarget } from "ui/reducers/app";
 import { useAppSelector } from "ui/setup/hooks";
 import { UIState } from "ui/state";
 
-import { PrimaryButton } from "../Button";
 import Collaborators from "./Collaborators";
 import PrivacyDropdown from "./PrivacyDropdown";
 import { CopyButton } from "./ReplayLink";
@@ -70,9 +70,7 @@ function CollaboratorRequests({ recording }: { recording: Recording }) {
                 {c.user.name}
               </span>
             </div>
-            <PrimaryButton color="blue" onClick={() => acceptRecordingRequest(c.id)}>
-              Add
-            </PrimaryButton>
+            <Button onClick={() => acceptRecordingRequest(c.id)}>Add</Button>
           </div>
         ))}
       </div>

@@ -1,7 +1,8 @@
-import classNames from "classnames";
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
-import { Button, SecondaryButton } from "../Button";
+import { Button } from "replay-next/components/Button";
+
+import { Button as LegacyButton } from "../Button";
 import {
   Dialog,
   DialogActions,
@@ -67,16 +68,15 @@ export const ConfirmDialog = ({
       <DialogTitle>{message}</DialogTitle>
       {description && <DialogDescription>{description}</DialogDescription>}
       <DialogActions>
-        <SecondaryButton
-          color="blue"
+        <Button
           className="mx-3 flex-1 justify-center"
-          dataTestId={dataTestId ? `${dataTestId}-DeclineButton` : undefined}
-          dataTestName={dataTestName ? `${dataTestName}-DeclineButton` : undefined}
+          data-test-id={dataTestId ? `${dataTestId}-DeclineButton` : undefined}
+          data-test-name={dataTestName ? `${dataTestName}-DeclineButton` : undefined}
           onClick={onDecline}
         >
           {declineLabel}
-        </SecondaryButton>
-        <Button
+        </Button>
+        <LegacyButton
           className="mx-2 flex-1 justify-center"
           dataTestId={dataTestId ? `${dataTestId}-ConfirmButton` : undefined}
           dataTestName={dataTestName ? `${dataTestName}-ConfirmButton` : undefined}
@@ -87,7 +87,7 @@ export const ConfirmDialog = ({
           style="primary"
         >
           {acceptLabel}
-        </Button>
+        </LegacyButton>
       </DialogActions>
     </Dialog>
   );

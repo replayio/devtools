@@ -1,12 +1,10 @@
-import classNames from "classnames";
-import React from "react";
 import { ConnectedProps, connect } from "react-redux";
 
+import { Button } from "replay-next/components/Button";
 import * as actions from "ui/actions/app";
 import { getSelectedSource } from "ui/reducers/sources";
 import { UIState } from "ui/state";
 
-import { PrimaryButton } from "../Button";
 import { Dialog, DialogActions, DialogDescription, DialogLogo, DialogTitle } from "../Dialog";
 import Modal from "../NewModal";
 
@@ -36,7 +34,7 @@ function SourcemapSetupModal({ hideModal, selectedSource }: PropsFromRedux) {
         <DialogDescription>{msg}</DialogDescription>
         <DialogActions>
           <div className="flex w-full flex-col items-center">
-            <PrimaryButton color="blue" onClick={onClick}>{`Show me how`}</PrimaryButton>
+            <Button onClick={onClick}>{`Show me how`}</Button>
           </div>
         </DialogActions>
       </Dialog>

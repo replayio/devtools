@@ -130,10 +130,3 @@ interface ButtonProps {
   onClick?: () => void;
   type?: "button" | "submit";
 }
-
-export const PrimaryButton = (props: ButtonProps & { color: Colors }) => (
-  <Button {...props} size="md" style="primary" />
-);
-export const SecondaryButton = (props: ButtonProps & { color: Colors }) => (
-  <Button {...props} size="md" style="secondary" />
-);
