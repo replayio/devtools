@@ -2,9 +2,9 @@ import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { PaymentMethod } from "@stripe/stripe-js";
 import React, { useEffect, useState } from "react";
 
+import { Button } from "replay-next/components/Button";
 import hooks from "ui/hooks";
 
-import { Button } from "../Button";
 import { CountrySelect } from "./CountrySelect";
 import { FieldRow } from "./FieldRow";
 import { InputField } from "./InputField";
@@ -175,22 +175,15 @@ export function EnterPaymentMethod({
       <CountrySelect />
       <div className="flex flex-row items-center justify-end space-x-4 border-t border-gray-200 pt-5 pb-2">
         <Button
-          size="sm"
-          color="blue"
-          style="secondary"
+          color="secondary"
+          size="small"
           onClick={onCancel}
           className={saving ? "opacity-60" : undefined}
           type="button"
         >
           Cancel
         </Button>
-        <Button
-          size="sm"
-          color="blue"
-          style="primary"
-          type="submit"
-          className={saving ? "opacity-60" : undefined}
-        >
+        <Button size="small" type="submit" className={saving ? "opacity-60" : undefined}>
           Save
         </Button>
       </div>

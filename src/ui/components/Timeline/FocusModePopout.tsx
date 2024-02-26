@@ -17,7 +17,6 @@ import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { AppDispatch } from "ui/setup/store";
 import { trackEvent } from "ui/utils/telemetry";
 
-import { Button as LegacyButton } from "../shared/Button";
 import Icon from "../shared/Icon";
 import styles from "./FocusModePopout.module.css";
 
@@ -151,15 +150,13 @@ export default function FocusModePopout({
             Cancel
           </Button>
         )}
-        <LegacyButton
-          color="blue"
-          dataTestId="SaveFocusModeButton"
+        <Button
+          data-test-id="SaveFocusModeButton"
+          disabled={isSavePending}
           onClick={savePendingChanges}
-          size="md"
-          style={isSavePending ? "disabled" : "primary"}
         >
           {isSavePending ? "Saving" : "Save"}
-        </LegacyButton>
+        </Button>
       </div>
     </div>
   );

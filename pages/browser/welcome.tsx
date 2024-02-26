@@ -1,6 +1,3 @@
-import Link from "next/link";
-import React from "react";
-
 import { Button } from "replay-next/components/Button";
 import {
   OnboardingBody,

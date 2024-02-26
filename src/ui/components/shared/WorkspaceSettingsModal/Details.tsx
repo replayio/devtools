@@ -1,13 +1,11 @@
-import React from "react";
-
+import { Button } from "replay-next/components/Button";
 import { SubscriptionWithPricing, Workspace } from "shared/graphql/types";
 import { inUnpaidFreeTrial, subscriptionEndsIn } from "ui/utils/workspace";
 
-import { Button } from "../Button";
 import { SettingsHeader } from "../SettingsModal/SettingsBody";
 import { BillingBanners } from "./BillingBanners";
 import { PlanDetails } from "./PlanDetails";
-import { Views, formatPaymentMethod, isSubscriptionCancelled } from "./utils";
+import { formatPaymentMethod, isSubscriptionCancelled } from "./utils";
 
 function TrialDetails({
   workspace,
@@ -44,12 +42,10 @@ function TrialDetails({
           </p>
           <div className="flex justify-center">
             <Button
-              size="xl"
-              color="blue"
-              style="primary"
-              type="submit"
               className="w-full justify-center"
               onClick={onSelectPricing}
+              size="large"
+              type="submit"
             >
               Team Plan Pricing
             </Button>
