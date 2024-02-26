@@ -2,6 +2,7 @@ import { useRouter } from "next/router";
 import React, { ChangeEvent, Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
+import { Button } from "replay-next/components/Button";
 import { CreateNewWorkspace_createWorkspace_workspace } from "shared/graphql/generated/CreateNewWorkspace";
 import { Workspace, WorkspaceUser } from "shared/graphql/types";
 import { removeUrlParameters } from "shared/utils/environment";
@@ -11,7 +12,6 @@ import { isValidTeamName, validateEmail } from "ui/utils/helpers";
 import { trackEvent } from "ui/utils/telemetry";
 
 import { useRedirectToTeam } from "../Library/Team/utils";
-import { PrimaryLgButton } from "./Button";
 import { TextInput } from "./Forms";
 import InvitationLink from "./NewWorkspaceModal/InvitationLink";
 import { DownloadingPage } from "./Onboarding/DownloadingPage";
@@ -52,9 +52,9 @@ function IntroPage({ onSkipToDownload, onNext, organization }: SlideBodyProps) {
         </OnboardingBody>
       </OnboardingContent>
       <OnboardingActions>
-        <PrimaryLgButton color="blue" onClick={onNext}>
+        <Button onClick={onNext} size="large">
           {organization ? "Create an organization" : "Create a team"}
-        </PrimaryLgButton>
+        </Button>
       </OnboardingActions>
     </>
   );
@@ -215,9 +215,9 @@ function TeamMemberInvitationPage({ newWorkspace, onSkipToDownload }: SlideBodyP
         </div>
       </div>
       <OnboardingActions>
-        <PrimaryLgButton color="blue" onClick={() => onSkipToDownload()}>
+        <Button onClick={() => onSkipToDownload()} size="large">
           Next
-        </PrimaryLgButton>
+        </Button>
       </OnboardingActions>
     </>
   );

@@ -1,14 +1,12 @@
-import React from "react";
 import { ConnectedProps, connect } from "react-redux";
 
+import { Button } from "replay-next/components/Button";
 import { launchAndRecordUrl } from "shared/utils/environment";
 import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
 import { trackEvent } from "ui/utils/telemetry";
 
-import { PrimaryLgButton } from "../Button";
-import { TextInputCopy } from "../NewWorkspaceModal/InvitationLink";
 import {
   OnboardingActions,
   OnboardingBody,
@@ -47,12 +45,10 @@ function FirstReplayModal({ hideModal }: PropsFromRedux) {
           </OnboardingBody>
         </OnboardingContent>
         <OnboardingActions>
-          <PrimaryLgButton color="blue" onClick={handleOpen}>
-            {`Ready as I'll ever be, Doc`}
-          </PrimaryLgButton>
-          <PrimaryLgButton color="gray" onClick={handleSkip}>
+          <Button onClick={handleOpen}>{`Ready as I'll ever be, Doc`}</Button>
+          <Button onClick={handleSkip} size="large" variant="outline">
             {`Skip`}
-          </PrimaryLgButton>
+          </Button>
         </OnboardingActions>
       </OnboardingContentWrapper>
     </OnboardingModalContainer>

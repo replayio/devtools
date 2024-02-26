@@ -1,9 +1,7 @@
-import React from "react";
-
+import { Button } from "replay-next/components/Button";
 import Modal from "ui/components/shared/NewModal";
 import useAuth0 from "ui/utils/useAuth0";
 
-import { PrimaryButton } from "./Button";
 import { Dialog, DialogActions, DialogDescription, DialogLogo, DialogTitle } from "./Dialog";
 
 function LoginModal() {
@@ -16,9 +14,7 @@ function LoginModal() {
         <DialogTitle>Sign In Required</DialogTitle>
         <DialogDescription>You need to be signed in to leave a comment</DialogDescription>
         <DialogActions>
-          <PrimaryButton color="blue" onClick={loginAndReturn}>
-            Sign In
-          </PrimaryButton>
+          <Button onClick={loginAndReturn}>Sign In</Button>
         </DialogActions>
       </Dialog>
     </Modal>

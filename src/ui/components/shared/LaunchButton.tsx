@@ -1,10 +1,8 @@
-import React from "react";
 import { ConnectedProps, connect } from "react-redux";
 
+import { Button } from "replay-next/components/Button";
 import * as actions from "ui/actions/app";
 import { trackEvent } from "ui/utils/telemetry";
-
-import { PrimaryButton } from "../shared/Button";
 
 function ShareButton({ setModal }: PropsFromRedux) {
   const onClick = () => {
@@ -17,14 +15,14 @@ function ShareButton({ setModal }: PropsFromRedux) {
   }
 
   return (
-    <PrimaryButton color="blue" onClick={onClick}>
+    <Button onClick={onClick}>
       <div className="flex flex-row items-center space-x-2">
         <div className="material-icons" style={{ fontSize: "1rem" }}>
           open_in_new
         </div>
         <div>Launch Replay</div>
       </div>
-    </PrimaryButton>
+    </Button>
   );
 }
 

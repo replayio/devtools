@@ -1,13 +1,12 @@
-import classNames from "classnames";
-import React, { ChangeEvent, useState } from "react";
+import { ChangeEvent, useState } from "react";
 
+import { Button } from "replay-next/components/Button";
 import { hideModal } from "ui/actions/app";
 import { useUpdateRecordingTitle } from "ui/hooks/recordings";
 import { getModalOptions } from "ui/reducers/app";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
-import { PrimaryButton, SecondaryButton } from "../Button";
-import { Dialog, DialogActions, DialogTitle } from "../Dialog";
+import { Dialog } from "../Dialog";
 import { TextInput } from "../Forms";
 import Modal from "../NewModal";
 
@@ -38,7 +37,7 @@ function RenameReplayModal({
             <TextInput value={title} onChange={onChange} autoFocus />
           </div>
           <div className="gap-3 px-2">
-            <PrimaryButton color="blue" onClick={onSave}>{`Save`}</PrimaryButton>
+            <Button onClick={onSave}>Save</Button>
           </div>
         </div>
       </Dialog>
