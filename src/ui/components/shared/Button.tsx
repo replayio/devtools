@@ -131,13 +131,6 @@ interface ButtonProps {
   type?: "button" | "submit";
 }
 
-export const PrimaryLgButton = (props: ButtonProps & { color: Colors }) => (
-  <Button {...props} size="2xl" style="primary" />
-);
-export const SecondaryLgButton = (props: ButtonProps & { color: Colors }) => (
-  <Button {...props} size="2xl" style="secondary" />
-);
-
 export const PrimaryButton = (props: ButtonProps & { color: Colors }) => (
   <Button {...props} size="md" style="primary" />
 );
