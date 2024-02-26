@@ -153,16 +153,7 @@ export function NodePickerContextRoot({ children }: PropsWithChildren<{}>) {
     }
 
     // Start loading rects eagerly; we'll need them in the hover/click handlers
-    let boundingRectsPromise: PromiseLike<NodeBounds[]> | NodeBounds[] | undefined;
-    try {
-      boundingRectsPromise = boundingRectsCache.readAsync(replayClient, pauseId);
-    } catch {
-      setState({
-        status: "error",
-        options,
-      });
-      return;
-    }
+    boundingRectsCache.prefetch(replayClient, pauseId);
 
     const { limitToNodeIds, onSelected } = options;
 
@@ -172,7 +163,7 @@ export function NodePickerContextRoot({ children }: PropsWithChildren<{}>) {
         const { x, y } = position;
 
         try {
-          const boundingRects = await boundingRectsPromise!;
+          const boundingRects = await boundingRectsCache.readAsync(replayClient, pauseId);
           const nodeBounds = getMouseTarget(boundingRects, x, y, limitToNodeIds);
 
           return nodeBounds?.node ?? null;
