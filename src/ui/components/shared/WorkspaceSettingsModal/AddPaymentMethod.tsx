@@ -175,11 +175,11 @@ export function EnterPaymentMethod({
       <CountrySelect />
       <div className="flex flex-row items-center justify-end space-x-4 border-t border-gray-200 pt-5 pb-2">
         <Button
-          color="secondary"
           size="small"
           onClick={onCancel}
           className={saving ? "opacity-60" : undefined}
           type="button"
+          variant="outline"
         >
           Cancel
         </Button>
