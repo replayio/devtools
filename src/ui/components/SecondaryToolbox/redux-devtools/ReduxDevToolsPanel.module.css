@@ -22,3 +22,7 @@
   height: 100%;
   overflow-y: auto;
 }
+
+.TimeoutPossibleErrorMessage {
+  color: var(--color-error);
+}
