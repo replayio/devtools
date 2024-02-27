@@ -6,6 +6,7 @@ steps:
       - "be_cmd run_tests -- ts-node ./packages/e2e-tests/scripts/buildkite_run_fe_tests_from_artifact-macos-arm64.ts"
     agents:
       - "os=macos"
+      - "arch=arm64"
       - "queue=default"
       - "runtimeType=test"
     plugins:
