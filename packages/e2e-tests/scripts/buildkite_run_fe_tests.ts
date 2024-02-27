@@ -1,6 +1,7 @@
 /* Copyright 2024 Record Replay Inc. */
 
 import { exec, execSync } from "child_process";
+import os from "os";
 import path from "path";
 import chalk from "chalk";
 import difference from "lodash/difference";
@@ -150,7 +151,7 @@ export default function run_fe_tests(
   console.group("START");
   console.time("START time");
 
-  const envWrapper = runInCI ? "xvfb-run" : "";
+  const envWrapper = runInCI && os.platform() === "linux" ? "xvfb-run" : "";
   const TestRootPath = path.join(
     process.env.REPLAY_DIR ? path.join(process.env.REPLAY_DIR, "devtools") : ".",
     "packages/e2e-tests"
