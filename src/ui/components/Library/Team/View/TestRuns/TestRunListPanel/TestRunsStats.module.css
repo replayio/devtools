@@ -32,3 +32,9 @@
   border-radius: 0.25rem;
   z-index: var(--z-index-1--tooltip);
 }
+
+.Tooltip {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
