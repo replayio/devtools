@@ -13,12 +13,13 @@ import { ActionFilter } from "ui/components/SecondaryToolbox/redux-devtools/Acti
 import { ReduxActionAnnotation } from "ui/components/SecondaryToolbox/redux-devtools/annotations";
 import { ReduxDevToolsContents } from "ui/components/SecondaryToolbox/redux-devtools/ReduxDevToolsContents";
 import { ReduxDevToolsList } from "ui/components/SecondaryToolbox/redux-devtools/ReduxDevToolsList";
-import { getRecordingTooLongToSupportRoutines } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
 import { reduxDevToolsAnnotationsCache } from "ui/suspense/annotationsCaches";
 import { applyMiddlewareDeclCache } from "ui/suspense/jumpToLocationCache";
 
 import styles from "./ReduxDevToolsPanel.module.css";
+
+const POSSIBLE_TIMEOUT_AFTER_MS = 30_000;
 
 export default function ReduxDevToolsPanel() {
   const client = useContext(ReplayClientContext);
@@ -29,10 +30,28 @@ export default function ReduxDevToolsPanel() {
 
   const currentExecutionPoint = useAppSelector(getExecutionPoint);
 
+  const [showTimeoutMessage, setShowTimeoutMessage] = useState(false);
   const { status: annotationsStatus, value: parsedAnnotations } = useImperativeCacheValue(
     reduxDevToolsAnnotationsCache,
     client
   );
+
+  useEffect(() => {
+    switch (annotationsStatus) {
+      case "pending": {
+        const timeout = setTimeout(() => {
+          setShowTimeoutMessage(true);
+        }, POSSIBLE_TIMEOUT_AFTER_MS);
+        return () => {
+          clearTimeout(timeout);
+        };
+      }
+      default: {
+        setShowTimeoutMessage(false);
+        break;
+      }
+    }
+  }, [annotationsStatus]);
 
   const [filteredAnnotations, firstAnnotationAfterCurrentExecutionPoint] = useMemo(() => {
     let filteredAnnotations: ReduxActionAnnotation[] = [];
@@ -76,7 +95,18 @@ export default function ReduxDevToolsPanel() {
             <ActionFilter searchValue={searchValue} onSearch={setSearchValue} />
             <div className={styles.ListContainer}>
               {annotationsStatus === "pending" ? (
-                <IndeterminateLoader />
+                <IndeterminateLoader
+                  message={
+                    <>
+                      <p>Processing Redux actions…</p>
+                      {showTimeoutMessage && (
+                        <p className={styles.TimeoutPossibleErrorMessage}>
+                          This is taking longer than expected, which may indicate an error.
+                        </p>
+                      )}
+                    </>
+                  }
+                />
               ) : (
                 <ReduxDevToolsList
                   annotations={filteredAnnotations}
