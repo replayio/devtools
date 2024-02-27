@@ -77,20 +77,23 @@
   flex: 1 1 auto;
 }
 
-.ProtocolFailedPanel {
-  display: flex;
-  align-items: flex-start;
-}
-
+.DisabledDuringPlaybackMessage,
 .NotMountedYetMessage,
 .ProtocolFailedMessage {
   width: 100%;
   display: flex;
   flex-direction: column;
+  color: var(--color-dim);
   gap: 0.5rem;
   padding: 0.5rem;
   border-radius: 0.25rem;
   font-size: var(--font-size-regular);
+}
+.DisabledDuringPlaybackMessage,
+.NotMountedYetMessage {
+  height: 100%;
+  align-items: center;
+  justify-content: center;
 }
 .ProtocolFailedMessage {
   margin: 0.5rem;
