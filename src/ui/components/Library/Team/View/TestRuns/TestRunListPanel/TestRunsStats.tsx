@@ -15,13 +15,32 @@ import styles from "./TestRunsStats.module.css";
 export function TestRunsStats() {
   const { filteredSortedTestRuns: testRuns } = useTestRunsSuspends();
 
+  const { numRunsFailed, numRunsPassed } = useMemo(() => {
+    let numRunsFailed = 0;
+    let numRunsPassed = 0;
+
+    testRuns.forEach(testRun => {
+      const { failed } = testRun.results.counts;
+
+      if (failed > 0) {
+        numRunsFailed++;
+      } else {
+        numRunsPassed++;
+      }
+    });
+
+    return {
+      numRunsFailed,
+      numRunsPassed,
+    };
+  }, [testRuns]);
+
   if (!testRuns.length) {
     return null;
   }
 
-  const buildsCount = testRuns.length;
-  const buildFailuresCount = testRuns.filter(r => r.results.counts.failed > 0).length;
-  const buildFailureRate = buildFailuresCount / buildsCount;
+  const numRunsTotal = numRunsFailed + numRunsPassed;
+  const runFailureRate = Math.round((numRunsFailed / numRunsTotal) * 100);
 
   return (
     <div className={styles.TestRunsStats}>
@@ -35,9 +54,9 @@ export function TestRunsStats() {
       <div
         className={styles.FailureRateDescription}
         data-test-id="TestRunStats-ChartSummaryLabel"
-        title={`${buildFailuresCount}/${buildsCount} failed`}
+        title={`${numRunsFailed}/${numRunsTotal} failed`}
       >
-        <strong>Failure rate:</strong> {Math.round(buildFailureRate * 100)}%
+        <strong>Failure rate:</strong> {runFailureRate}%
       </div>
     </div>
   );
@@ -59,7 +78,12 @@ function ChartWithDimensions({
   const days = Math.floor((endTime.getTime() - startTime.getTime()) / 1000 / 60 / 60 / 24);
   const data = useMemo(() => generateChartData(testRuns, days), [testRuns, days]);
 
-  const [hoverIndex, setHoverIndex] = useState<number | null>(null);
+  const [hoverData, setHoverData] = useState<{
+    chart: "bar" | "line";
+    index: number;
+  } | null>(null);
+
+  const hoverIndex = hoverData?.index ?? null;
 
   let tooltipContent = null;
   if (hoverIndex !== null) {
@@ -67,7 +91,7 @@ function ChartWithDimensions({
   }
 
   const { onMouseEnter, onMouseMove, onMouseLeave, tooltip } = useTooltip({
-    tooltip: tooltipContent,
+    tooltip: <div className={styles.Tooltip}>{tooltipContent}</div>,
   });
 
   const theme = useTheme();
@@ -78,7 +102,7 @@ function ChartWithDimensions({
       drawChart({ canvas, data, height, highlightIndex: hoverIndex, width });
 
       const onMouseLeave = () => {
-        setHoverIndex(null);
+        setHoverData(null);
       };
 
       const onMouseMove = (event: MouseEvent) => {
@@ -86,7 +110,10 @@ function ChartWithDimensions({
         const spacing = width / (data.length - 1);
         const index = Math.round(Math.max(0, event.offsetX) / spacing);
 
-        setHoverIndex(index);
+        setHoverData({
+          chart: event.offsetY < height * 0.33 ? "bar" : "line",
+          index,
+        });
       };
 
       canvas.addEventListener("mouseleave", onMouseLeave);

@@ -1,6 +1,8 @@
 import { getChartCoordinates } from "ui/components/Library/Team/View/TestRuns/TestRunListPanel/getChartCoordinates";
 import { ChartDataType } from "ui/components/Library/Team/View/TestRuns/TestRunListPanel/types";
 
+export const BAR_WIDTH = 8;
+export const BAR_GAP = 2;
 export const LINE_WIDTH = 2;
 export const PADDING = 4;
 export const POINT_RADIUS = 4;
@@ -18,14 +20,14 @@ export function drawChart({
   highlightIndex: number | null;
   width: number;
 }) {
-  const scale = window.devicePixelRatio;
-
   const style = getComputedStyle(canvas);
   const borderColor = style.getPropertyValue("--testsuites-graph-marker");
   const markerColor = style.getPropertyValue("--testsuites-graph-gradient-stroke");
   const gradientStartColor = style.getPropertyValue("--testsuites-graph-gradient-start");
   const gradientEndColor = style.getPropertyValue("--testsuites-graph-gradient-end");
   const highlightMarkerColor = style.getPropertyValue("--secondary-accent");
+
+  const scale = window.devicePixelRatio;
 
   canvas.style.height = `${height}px`;
   canvas.style.width = `${width}px`;
@@ -36,13 +38,18 @@ export function drawChart({
   context.scale(scale, scale);
   context.clearRect(0, 0, width, height);
 
-  // Top and bottom lines
+  const barHeight = height * 0.33;
+  const lineHeight = height * 0.67;
+
+  // Boundary lines
+  context.beginPath();
+  context.fillStyle = borderColor;
+  context.roundRect(0, 0, width, barHeight, 3);
+  context.fill();
+  context.closePath();
   context.beginPath();
   context.lineWidth = 1;
   context.strokeStyle = borderColor;
-  context.moveTo(POINT_RADIUS, PADDING);
-  context.lineTo(width - POINT_RADIUS, PADDING);
-  context.stroke();
   context.moveTo(POINT_RADIUS, height - PADDING);
   context.lineTo(width - POINT_RADIUS, height - PADDING);
   context.stroke();
@@ -56,20 +63,44 @@ export function drawChart({
   gradient.addColorStop(1, gradientEndColor);
 
   for (let index = 0; index < data.length; index++) {
-    const { x, y } = getChartCoordinates({ data, height, index, width });
+    const { numTestsFailed, numTestsPassed } = data[index];
 
-    if (index > 0) {
-      // Gradient under fill
+    const numTestsTotal = numTestsFailed + numTestsPassed;
+
+    let { x, y } = getChartCoordinates({ data, height: lineHeight, index, width });
+    y += barHeight;
+
+    // Bars
+    {
+      const maxBarHeight = barHeight - PADDING * 2;
+      const failBarHeight = Math.max(2, (numTestsFailed / numTestsTotal) * maxBarHeight);
+      const passBarHeight = Math.max(2, (numTestsPassed / numTestsTotal) * maxBarHeight);
+
       context.beginPath();
-      context.fillStyle = gradient;
-      context.moveTo(prevX, prevY);
-      context.lineTo(x, y);
-      context.lineTo(x, height - PADDING);
-      context.lineTo(prevX, height - PADDING);
-      context.lineTo(prevX, prevY);
+      context.fillStyle = "#d72451";
+      context.roundRect(
+        x - BAR_WIDTH - BAR_GAP / 2,
+        barHeight - failBarHeight - PADDING,
+        BAR_WIDTH,
+        failBarHeight,
+        1
+      );
       context.fill();
       context.closePath();
+      context.beginPath();
+      context.fillStyle = "#31d710";
+      context.roundRect(
+        x + BAR_GAP / 2,
+        barHeight - passBarHeight - PADDING,
+        BAR_WIDTH,
+        passBarHeight,
+        1
+      );
+      context.fill();
+      context.closePath();
+    }
 
+    if (index > 0) {
       // Connecting lines
       context.beginPath();
       context.lineWidth = LINE_WIDTH;
@@ -85,7 +116,8 @@ export function drawChart({
   }
 
   for (let index = 0; index < data.length; index++) {
-    const { x, y } = getChartCoordinates({ data, height, index, width });
+    let { x, y } = getChartCoordinates({ data, height: lineHeight, index, width });
+    y += barHeight;
 
     // Circles
     context.beginPath();
