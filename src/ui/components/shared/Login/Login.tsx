@@ -183,6 +183,10 @@ function AuthError({ error }: { error: any }) {
     });
   }
 
+  // Except of "Invalid state" message that comes from
+  // https://auth0.com/docs/customize/integrations/cms/wordpress-plugin/troubleshoot-wordpress-plugin-invalid-state-errors
+  // we define all the other "message"s in our Auth0 Rule.
+  // See more here: https://auth0.com/docs/customize/rules/raise-errors-from-rules
   switch (message) {
     case "INVALID_STATE":
     case "Invalid state":
