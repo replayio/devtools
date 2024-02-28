@@ -177,21 +177,38 @@ function AuthError({ error }: { error: any }) {
     return null;
   }
 
-  if (message === "Invalid state") {
-    // This is usually caused by waiting too long to go through the auth process
-    // and can be fixed by trying again.
-    message = "Your login session expired. Please try logging in again.";
-  } else {
+  // Except for the "Invalid state" message that comes from Auth0 directly
+  // https://auth0.com/docs/customize/integrations/cms/wordpress-plugin/troubleshoot-wordpress-plugin-invalid-state-errors#common-causes-of-the-invalid-state-error
+  // (^ Even though the document is about the WordPress plugin, the cause for the invalid state applies to any Auth0 app).
+  // We define all the other "messages" in our Auth0 Rule.
+  // See more here: https://auth0.com/docs/customize/rules/raise-errors-from-rules
+  if (message !== "INVALID_STATE" && message !== "Invalid state") {
     // We want to capture any other error so we can investigate further.
     sendTelemetryEvent("devtools-auth-error-login", {
       errorMessage: message,
     });
+  }
 
-    if (message === "Unable to authenticate user") {
+  switch (message) {
+    case "INVALID_STATE":
+    case "Invalid state":
+      // This is usually caused by waiting too long to go through the auth process
+      // and can be fixed by trying again.
+      message = "Your login session expired. Please try logging in again.";
+      break;
+    case "INTERNAL_ERROR":
       // This usually occurs because our auth hook threw an error but the
       // message itself isn't very useful so we show a more friendly message
       message = "We're sorry but we had a problem authenticating you. We're looking into it now!";
-    }
+      break;
+    case "IDP_CONFIGURATION_ERROR":
+      message =
+        "Failed to log in due to a configuration problem with your Replay account. Support has been notified!";
+    case "IDP_UNEXPECTED_ERROR":
+      message = "Failed to login. Please try logging in with SSO.";
+      break;
+    default:
+      message = "An unexpected error occurred. Please try again.";
   }
 
   return (
