@@ -75,8 +75,12 @@ export function selectNetworkRequest(requestId: RequestId): UIThunkAction {
       payload: { frames: formattedFrames, point: record.timeStampedPoint.point },
     });
 
-    networkRequestBodyCache.prefetch(replayClient, requestId);
-    networkResponseBodyCache.prefetch(replayClient, requestId);
+    if (record.events.bodyEvent) {
+      networkRequestBodyCache.prefetch(replayClient, requestId);
+    }
+    if (record.events.responseBodyEvent) {
+      networkResponseBodyCache.prefetch(replayClient, requestId);
+    }
   };
 }
 
