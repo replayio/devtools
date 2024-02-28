@@ -193,6 +193,10 @@ export const networkRequestBodyCache = createStreamingCache<
       update(requestBodyData);
     });
 
+    if (requestBodyData.length === 0) {
+      update(requestBodyData);
+    }
+
     resolve();
   },
 });
@@ -213,6 +217,10 @@ export const networkResponseBodyCache = createStreamingCache<
 
       update(responseBodyData);
     });
+
+    if (responseBodyData.length === 0) {
+      update(responseBodyData);
+    }
 
     resolve();
   },
