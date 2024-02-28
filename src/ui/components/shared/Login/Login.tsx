@@ -183,6 +183,7 @@ function AuthError({ error }: { error: any }) {
   // We define all the other "messages" in our Auth0 Rule.
   // See more here: https://auth0.com/docs/customize/rules/raise-errors-from-rules
   if (message !== "INVALID_STATE" && message !== "Invalid state") {
+    // We want to capture any other error so we can investigate further.
     sendTelemetryEvent("devtools-auth-error-login", {
       errorMessage: message,
     });
@@ -207,7 +208,6 @@ function AuthError({ error }: { error: any }) {
       message = "Failed to login. Please try logging in with SSO.";
       break;
     default:
-      // We want to capture any other error so we can investigate further.
       message = "An unexpected error occurred. Please try again.";
   }
 
