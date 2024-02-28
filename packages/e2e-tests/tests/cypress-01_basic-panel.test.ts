@@ -75,7 +75,8 @@ test("cypress-01: Basic Test Suites panel functionality", async ({
 
   // Relative dates can change over time.
   // Check for either the "X units ago" text, or the literal date.
-  expect(await getTestSuiteDate(page).textContent()).toMatch(/ ago|(2\/12\/2023)/);
+  // But in order to account for timezone differences, we just check the year.
+  expect(await getTestSuiteDate(page).textContent()).toMatch(/ ago|\/2024/);
   expect(await getTestSuiteUser(page).textContent()).toMatch("ryanjduffy");
   expect(await getTestSuiteBranch(page).textContent()).toMatch("main");
   expect(await getTestSuiteDuration(page).textContent()).toMatch("0:11");

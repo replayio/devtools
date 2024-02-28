@@ -1,9 +1,7 @@
-import React from "react";
-
+import { Button } from "replay-next/components/Button";
 import ExternalLink from "replay-next/components/ExternalLink";
 import { SubscriptionWithPricing } from "shared/graphql/types";
 
-import { Button } from "../Button";
 import { PlanDetails } from "./PlanDetails";
 
 export function PricingPage({
@@ -24,13 +22,7 @@ export function PricingPage({
         </ExternalLink>
       </p>
       <PlanDetails subscription={subscription} />
-      <Button
-        color="blue"
-        size="xl"
-        style="primary"
-        className="my-6 w-full justify-center"
-        onClick={onEnterCard}
-      >
+      <Button className="my-6 w-full justify-center" onClick={onEnterCard} size="large">
         Add Payment Method
       </Button>
       <ExternalLink href="https://www.replay.io/terms-of-use" className="underline">

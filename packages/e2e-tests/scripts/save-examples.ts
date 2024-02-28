@@ -194,9 +194,13 @@ async function saveExamples(
     const allExampleNames = examplesToRun.map(e => e.filename);
     const invalidInputs = difference(specificExamples, allExampleNames);
     if (invalidInputs.length) {
-      throw new Error(
-        `Invalid examples don't exist or require manual recording: ${invalidInputs.join(",")}`
-      );
+      if (argv.target !== "all") {
+        // If no target is specified, this script will check both Chrome and Node examples;
+        // we shouldn't throw in that case (since it's likely that at least one target will contain no matches)
+        throw new Error(
+          `Invalid examples don't exist or require manual recording: ${invalidInputs.join(",")}`
+        );
+      }
     }
     examplesToRun = examplesToRun.filter(example => specificExamples.includes(example.filename));
   }

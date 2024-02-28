@@ -2,8 +2,8 @@ import { RecordingId } from "@replayio/protocol";
 import sortBy from "lodash/sortBy";
 import { memo, useMemo, useState } from "react";
 
+import { Button } from "replay-next/components/Button";
 import { Recording } from "shared/graphql/types";
-import { SecondaryButton } from "ui/components/shared/Button";
 
 import RecordingRow from "./RecordingListItem/RecordingListItem";
 import { RecordingsError } from "./RecordingsError";
@@ -55,9 +55,7 @@ export const Recordings = memo(function Recordings({
       ))}
       {!showMore && recordings.length > NUM_ROWS_PER_PAGE && (
         <div className="flex justify-center p-4">
-          <SecondaryButton className="" color="blue" onClick={() => toggleShowMore(!showMore)}>
-            Show More
-          </SecondaryButton>
+          <Button onClick={() => toggleShowMore(!showMore)}>Show More</Button>
         </div>
       )}
     </div>

@@ -9,9 +9,9 @@ import React, {
   useState,
 } from "react";
 
+import { Button } from "replay-next/components/Button";
 import { actions } from "ui/actions";
 
-import { PrimaryLgButton } from "../Button";
 import Modal from "../NewModal";
 import ReplayLogo from "../ReplayLogo";
 import styles from "./Onboarding.module.css";
@@ -112,9 +112,9 @@ export function NextButton({
   const buttonText = inferLoading ? "Loading" : text || "Next";
 
   return (
-    <PrimaryLgButton color="blue" onClick={onClick}>
+    <Button onClick={onClick} size="large">
       {buttonText}
-    </PrimaryLgButton>
+    </Button>
   );
 }
 

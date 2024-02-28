@@ -3,6 +3,7 @@ import { ExclamationIcon } from "@heroicons/react/outline";
 import Link from "next/link";
 import { ReactNode, useEffect, useState } from "react";
 
+import { Button } from "replay-next/components/Button";
 import { query } from "shared/graphql/apolloClient";
 import { GetConnection, GetConnectionVariables } from "shared/graphql/generated/GetConnection";
 import { getReadOnlyParamsFromURL } from "shared/utils/environment";
@@ -13,7 +14,6 @@ import { isTeamMemberInvite } from "ui/utils/onboarding";
 import { sendTelemetryEvent } from "ui/utils/telemetry";
 import useAuth0 from "ui/utils/useAuth0";
 
-import { PrimaryLgButton } from "../Button";
 import { OnboardingContentWrapper, OnboardingModalContainer } from "../Onboarding";
 
 const isOSX = isMacOS();
@@ -72,9 +72,9 @@ function SSOLogin({ onLogin }: { onLogin: (connection: string) => void }) {
           onChange={e => setEmail(e.currentTarget.value)}
         />
 
-        <PrimaryLgButton color="blue" onClick={onEnterpriseLogin} className="justify-center">
+        <Button className="justify-center" onClick={onEnterpriseLogin} size="large">
           Sign in
-        </PrimaryLgButton>
+        </Button>
       </div>
       <button
         className="w-full justify-center text-sm font-bold text-primaryAccent underline"
@@ -136,19 +136,21 @@ function SocialLogin({
   return (
     <div className="space-y-6">
       <LoginMessaging />
-      <PrimaryLgButton
-        color="blue"
-        onClick={() => onLogin("google-oauth2")}
+      <Button
         className="w-full justify-center"
+        onClick={() => onLogin("google-oauth2")}
+        size="large"
       >
         Sign in with Google
-      </PrimaryLgButton>
-      <button
+      </Button>
+      <Button
         className="w-full justify-center text-sm font-bold text-primaryAccent underline"
         onClick={onShowSSOLogin}
+        size="large"
+        variant="outline"
       >
         Enterprise Users: Sign in with SSO
-      </button>
+      </Button>
     </div>
   );
 }
@@ -161,9 +163,9 @@ function ReplayBrowserLogin() {
   return (
     <div className="space-y-6">
       <LoginMessaging />
-      <PrimaryLgButton color="blue" onClick={onLogin} className="w-full justify-center">
+      <Button className="w-full justify-center" onClick={onLogin} size="large">
         Sign in
-      </PrimaryLgButton>
+      </Button>
     </div>
   );
 }

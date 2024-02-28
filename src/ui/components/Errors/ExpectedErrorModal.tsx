@@ -1,10 +1,10 @@
 import { useRouter } from "next/router";
 import { ReactNode, useState } from "react";
 
+import { Button } from "replay-next/components/Button";
 import { clearExpectedError, setModal } from "ui/actions/app";
 import { setExpectedError } from "ui/actions/errors";
 import { useGetTeamIdFromRoute } from "ui/components/Library/Team/utils";
-import { PrimaryButton } from "ui/components/shared/Button";
 import { Dialog, DialogActions, DialogDescription, DialogTitle } from "ui/components/shared/Dialog";
 import { DefaultViewportWrapper } from "ui/components/shared/Viewport";
 import { useRequestRecordingAccess } from "ui/hooks/recordings";
@@ -75,11 +75,7 @@ function GoToLibraryButton() {
     window.location.href = window.location.origin;
   };
 
-  return (
-    <PrimaryButton color="blue" onClick={onClick}>
-      Back to Library
-    </PrimaryButton>
-  );
+  return <Button onClick={onClick}>Back to Library</Button>;
 }
 
 function RefreshButton() {
@@ -89,11 +85,7 @@ function RefreshButton() {
     location.reload();
   };
 
-  return (
-    <PrimaryButton color="blue" onClick={onClick}>
-      {clicked ? `Refreshing...` : `Refresh`}
-    </PrimaryButton>
-  );
+  return <Button onClick={onClick}>{clicked ? `Refreshing...` : `Refresh`}</Button>;
 }
 
 function RequestRecordingAccessButton() {
@@ -114,11 +106,7 @@ function RequestRecordingAccessButton() {
     );
   };
 
-  return (
-    <PrimaryButton color="blue" onClick={onClick}>
-      Request access
-    </PrimaryButton>
-  );
+  return <Button onClick={onClick}>Request access</Button>;
 }
 
 function SignInButton() {
@@ -131,11 +119,7 @@ function SignInButton() {
     dispatch(clearExpectedError());
   };
 
-  return (
-    <PrimaryButton color="blue" onClick={onClick}>
-      Sign in to Replay
-    </PrimaryButton>
-  );
+  return <Button onClick={onClick}>Sign in to Replay</Button>;
 }
 
 function TeamBillingButton() {
@@ -150,17 +134,9 @@ function TeamBillingButton() {
     dispatch(setModal("workspace-settings"));
   };
 
-  return (
-    <PrimaryButton color="blue" onClick={onClick}>
-      Update Subscription
-    </PrimaryButton>
-  );
+  return <Button onClick={onClick}>Update Subscription</Button>;
 }
 
 function TryAgainButton({ onAction }: { onAction: () => void }) {
-  return (
-    <PrimaryButton color="blue" onClick={onAction}>
-      Try Again
-    </PrimaryButton>
-  );
+  return <Button onClick={onAction}>Try Again</Button>;
 }

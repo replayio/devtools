@@ -32,6 +32,7 @@ import { useReactDevToolsAnnotations } from "ui/components/SecondaryToolbox/reac
 import { useReplayWall } from "ui/components/SecondaryToolbox/react-devtools/hooks/useReplayWall";
 import { ReactDevToolsListData } from "ui/components/SecondaryToolbox/react-devtools/ReactDevToolsListData";
 import { getDefaultSelectedReactElementId } from "ui/reducers/app";
+import { isPlaying as isPlayingSelector } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
 import {
   ParsedReactDevToolsAnnotation,
@@ -79,6 +80,7 @@ function ReactDevToolsPanelInner({
   const [protocolCheckFailed, setProtocolCheckFailed] = useState(false);
 
   const defaultSelectedReactElementId = useAppSelector(getDefaultSelectedReactElementId);
+  const isPlaying = useAppSelector(isPlayingSelector);
 
   const leftPanelRef = useRef<ImperativePanelHandle>(null);
   const rightPanelRef = useRef<ImperativePanelHandle>(null);
@@ -133,13 +135,17 @@ function ReactDevToolsPanelInner({
     wall,
   });
 
-  if (!hasReactMounted) {
+  if (isPlaying) {
     return (
-      <div className={styles.ProtocolFailedPanel} data-test-id="ReactDevToolsPanel">
-        <div className={styles.NotMountedYetMessage}>
-          <div>React application has not been mounted.</div>
-          <div>Try picking a different point on the timeline.</div>
-        </div>
+      <div className={styles.DisabledDuringPlaybackMessage} data-test-id="ReactDevToolsPanel">
+        This panel is disabled during playback.
+      </div>
+    );
+  } else if (!hasReactMounted) {
+    return (
+      <div className={styles.NotMountedYetMessage} data-test-id="ReactDevToolsPanel">
+        <div>React application has not been mounted.</div>
+        <div>Try picking a different point on the timeline.</div>
       </div>
     );
   }
@@ -174,13 +180,11 @@ function ReactDevToolsPanelInner({
 
   if (protocolCheckFailed) {
     return (
-      <div className={styles.ProtocolFailedPanel} data-test-id="ReactDevToolsPanel">
-        <div className={styles.ProtocolFailedMessage}>
-          <div>React DevTools could not be initialized.</div>
-          <div>
-            Try picking a different point on the timeline or reloading the page. If the problem
-            persists, try creating a new recording with the latest version of the Replay browser.
-          </div>
+      <div className={styles.ProtocolFailedMessage} data-test-id="ReactDevToolsPanel">
+        <div>React DevTools could not be initialized.</div>
+        <div>
+          Try picking a different point on the timeline or reloading the page. If the problem
+          persists, try creating a new recording with the latest version of the Replay browser.
         </div>
       </div>
     );

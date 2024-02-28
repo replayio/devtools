@@ -88,11 +88,9 @@
   "exclude": [
     "node_modules",
 
-    // exclude Cypress from root typechecking to avoid conflicts with globals
-    // like expect()
+    // exclude Cypress from root typechecking to avoid conflicts with globals like expect()
     "packages/e2e-tests/examples/**/*.ts*",
     "packages/e2e-tests/**/*.cy.ts",
-    "packages/e2e-tests/cypress.config.ts",
     "packages/e2e-tests/scripts/*.ts",
   ],
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"]

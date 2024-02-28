@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
+import { Button } from "replay-next/components/Button";
 import { PendingWorkspaceInvitation } from "shared/graphql/types";
-import { PrimaryButton, SecondaryButton } from "ui/components/shared/Button";
 import { useConfirm } from "ui/components/shared/Confirm";
 import hooks from "ui/hooks";
 
@@ -58,12 +58,10 @@ export default function PendingTeamPrompt({
             "Loading…"
           ) : (
             <>
-              <PrimaryButton color="blue" onClick={handleAccept}>
-                Accept
-              </PrimaryButton>
-              <SecondaryButton color="blue" onClick={handleDecline}>
+              <Button onClick={handleAccept}>Accept</Button>
+              <Button color="secondary" onClick={handleDecline}>
                 Decline
-              </SecondaryButton>
+              </Button>
             </>
           )}
         </div>

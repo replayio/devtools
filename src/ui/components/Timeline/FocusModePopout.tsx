@@ -1,6 +1,7 @@
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import { assert } from "protocol/utils";
+import { Button } from "replay-next/components/Button";
 import { useNag } from "replay-next/src/hooks/useNag";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Nag } from "shared/graphql/types";
@@ -16,7 +17,6 @@ import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { AppDispatch } from "ui/setup/store";
 import { trackEvent } from "ui/utils/telemetry";
 
-import { Button, SecondaryButton } from "../shared/Button";
 import Icon from "../shared/Icon";
 import styles from "./FocusModePopout.module.css";
 
@@ -146,16 +146,14 @@ export default function FocusModePopout({
         </div>
 
         {isSavePending || (
-          <SecondaryButton color="pink" onClick={() => discardPendingChanges(false)}>
+          <Button color="secondary" onClick={() => discardPendingChanges(false)}>
             Cancel
-          </SecondaryButton>
+          </Button>
         )}
         <Button
-          color="blue"
-          dataTestId="SaveFocusModeButton"
+          data-test-id="SaveFocusModeButton"
+          disabled={isSavePending}
           onClick={savePendingChanges}
-          size="md"
-          style={isSavePending ? "disabled" : "primary"}
         >
           {isSavePending ? "Saving" : "Save"}
         </Button>

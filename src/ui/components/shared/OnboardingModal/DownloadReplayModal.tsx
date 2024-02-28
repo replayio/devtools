@@ -1,12 +1,12 @@
-import React, { ReactNode, useState } from "react";
+import { ReactNode, useState } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
+import { Button } from "replay-next/components/Button";
 import { removeUrlParameters } from "shared/utils/environment";
 import { actions } from "ui/actions";
 import { Nag, useDismissNag } from "ui/hooks/users";
 import { trackEvent } from "ui/utils/telemetry";
 
-import { PrimaryLgButton, SecondaryLgButton } from "../Button";
 import { DownloadingPage } from "../Onboarding/DownloadingPage";
 import { DownloadPage } from "../Onboarding/DownloadPage";
 import {
@@ -31,12 +31,12 @@ function InitialScreen({
       <OnboardingHeader>Welcome to Replay</OnboardingHeader>
       <OnboardingBody>{children}</OnboardingBody>
       <OnboardingActions>
-        <SecondaryLgButton color="blue" onClick={onSkipToLibrary}>
+        <Button color="primary" onClick={onSkipToLibrary} size="large">
           Go to your Library
-        </SecondaryLgButton>
-        <PrimaryLgButton color="blue" onClick={onNext}>
+        </Button>
+        <Button color="primary" onClick={onNext} size="large">
           {`Download Replay`}
-        </PrimaryLgButton>
+        </Button>
       </OnboardingActions>
     </>
   );
