@@ -26,12 +26,12 @@ test("inspector-computed-01: Basic computed styles can be viewed", async ({
   await checkComputedStyle(page, "background-color", "rgb(0, 128, 0)");
 
   await toggleElementsListRow(page, row, true);
-  await selectElementsListRow(page, { text: "maindiv" });
+  await selectElementsListRow(page, { text: 'div id="maindiv"', type: "opening" });
   await checkComputedStyle(page, "background-color", "rgb(0, 0, 255)");
 
   await addBreakpoint(page, { url: "doc_inspector_styles.html", lineNumber: 11 });
   await rewindToLine(page, 11);
 
-  await selectElementsListRow(page, { text: "maindiv" });
+  await selectElementsListRow(page, { text: 'div id="maindiv"', type: "opening" });
   await checkComputedStyle(page, "background-color", "rgb(255, 0, 0)");
 });
