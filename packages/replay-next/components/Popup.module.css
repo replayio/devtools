@@ -5,11 +5,6 @@
   flex-direction: column;
   padding: 0;
 }
-.Popup[data-style="error"] {
-  --theme-popup-background-color: var(--background-color-error);
-  --theme-popup-border-color: var(--border-color-error);
-  --theme-popup-color: var(--color-error);
-}
 
 .UpArrow,
 .DownArrow {
