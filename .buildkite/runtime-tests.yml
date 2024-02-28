@@ -7,7 +7,7 @@ steps:
     agents:
       - "os=macos"
       - "arch=arm64"
-      - "queue=default"
+      - "queue=runtime"
       - "runtimeType=test"
     plugins:
       - seek-oss/aws-sm#v2.3.1:
