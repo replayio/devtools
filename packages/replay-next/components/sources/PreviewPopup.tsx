@@ -1,13 +1,5 @@
 import { Value as ProtocolValue, SourceId } from "@replayio/protocol";
-import {
-  PropsWithChildren,
-  ReactNode,
-  RefObject,
-  Suspense,
-  useContext,
-  useEffect,
-  useRef,
-} from "react";
+import { ReactNode, RefObject, Suspense, useContext, useEffect, useRef } from "react";
 
 import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBoundary";
 import { SelectedFrameContext } from "replay-next/src/contexts/SelectedFrameContext";
@@ -22,7 +14,7 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { isPointInRegion } from "shared/utils/time";
 
 import SourcePreviewInspector from "../inspector/SourcePreviewInspector";
-import Popup, { PopupStyle } from "../Popup";
+import Popup from "../Popup";
 import styles from "./PreviewPopup.module.css";
 
 type Props = {
@@ -39,11 +31,11 @@ export default function PreviewPopup(props: Props) {
     <InlineErrorBoundary name="PreviewPopup">
       <Suspense
         fallback={
-          <PopupWithChildren {...props}>
+          <Popup {...props} showTail={true}>
             <div className={styles.Wrapper}>
               <div className={styles.LoadingMessage}>Loading...</div>
             </div>
-          </PopupWithChildren>
+          </Popup>
         }
       >
         <SuspendingPreviewPopup {...props} />
@@ -167,11 +159,12 @@ function SuspendingPreviewPopup({
   let children: ReactNode = null;
   if (likelyParsingError) {
     return (
-      <PopupWithChildren
+      <Popup
         className={styles.PopupErrorStyleOverride}
         clientX={clientX}
         containerRef={containerRef}
         dismiss={dismiss}
+        showTail={true}
         target={target}
       >
         <div className={styles.Wrapper}>
@@ -183,28 +176,30 @@ function SuspendingPreviewPopup({
           </div>
           <div className={styles.UnavailableMessage}>This is likely a bug in the Replay UI.</div>
         </div>
-      </PopupWithChildren>
+      </Popup>
     );
   } else if (valueUnavailableMessage !== null) {
     return (
-      <PopupWithChildren
+      <Popup
         className={styles.PopupErrorStyleOverride}
         clientX={clientX}
         containerRef={containerRef}
         dismiss={dismiss}
+        showTail={true}
         target={target}
       >
         <div className={styles.Wrapper}>
           <div className={styles.UnavailableMessage}>{valueUnavailableMessage}</div>
         </div>
-      </PopupWithChildren>
+      </Popup>
     );
   } else if (pauseId !== null && value !== null) {
     return (
-      <PopupWithChildren
+      <Popup
         clientX={clientX}
         containerRef={containerRef}
         dismiss={dismiss}
+        showTail={true}
         target={target}
       >
         <SourcePreviewInspector
@@ -213,44 +208,18 @@ function SuspendingPreviewPopup({
           protocolValue={value}
           ref={popupRef}
         />
-      </PopupWithChildren>
+      </Popup>
     );
   }
 
   return children !== null ? (
-    <PopupWithChildren
-      children={children}
-      clientX={clientX}
-      containerRef={containerRef}
-      dismiss={dismiss}
-      target={target}
-    />
-  ) : null;
-}
-
-function PopupWithChildren({
-  className,
-  children,
-  clientX,
-  containerRef,
-  dismiss,
-  target,
-}: PropsWithChildren & {
-  className?: string;
-  clientX?: number | null;
-  containerRef: RefObject<HTMLElement>;
-  dismiss: () => void;
-  target: HTMLElement;
-}) {
-  return (
     <Popup
       children={children}
       clientX={clientX}
       containerRef={containerRef}
       dismiss={dismiss}
-      className={className}
-      target={target}
       showTail={true}
+      target={target}
     />
-  );
+  ) : null;
 }
