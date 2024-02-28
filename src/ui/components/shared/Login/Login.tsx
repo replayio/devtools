@@ -204,6 +204,7 @@ function AuthError({ error }: { error: any }) {
     case "IDP_CONFIGURATION_ERROR":
       message =
         "Failed to log in due to a configuration problem with your Replay account. Support has been notified!";
+      break;
     case "IDP_UNEXPECTED_ERROR":
       message = "Failed to login. Please try logging in with SSO.";
       break;
