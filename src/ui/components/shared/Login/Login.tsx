@@ -177,16 +177,17 @@ function AuthError({ error }: { error: any }) {
     return null;
   }
 
+  // Except for the "Invalid state" message that comes from Auth0 directly
+  // https://auth0.com/docs/customize/integrations/cms/wordpress-plugin/troubleshoot-wordpress-plugin-invalid-state-errors#common-causes-of-the-invalid-state-error
+  // (^ Even though the document is about the WordPress plugin, the cause for the invalid state applies to any Auth0 app).
+  // We define all the other "messages" in our Auth0 Rule.
+  // See more here: https://auth0.com/docs/customize/rules/raise-errors-from-rules
   if (message !== "INVALID_STATE" && message !== "Invalid state") {
     sendTelemetryEvent("devtools-auth-error-login", {
       errorMessage: message,
     });
   }
 
-  // Except of "Invalid state" message that comes from
-  // https://auth0.com/docs/customize/integrations/cms/wordpress-plugin/troubleshoot-wordpress-plugin-invalid-state-errors
-  // we define all the other "message"s in our Auth0 Rule.
-  // See more here: https://auth0.com/docs/customize/rules/raise-errors-from-rules
   switch (message) {
     case "INVALID_STATE":
     case "Invalid state":
