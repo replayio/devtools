@@ -1,4 +1,5 @@
 import { Value as ProtocolValue, SourceId } from "@replayio/protocol";
+import { DirectiveLocation } from "graphql";
 import { ReactNode, RefObject, Suspense, useContext, useEffect, useRef } from "react";
 
 import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBoundary";
@@ -170,11 +171,9 @@ function SuspendingPreviewPopup({
         <div className={styles.Wrapper}>
           <div className={styles.UnavailableMessage}>
             <h2>Parsing error</h2>
+            <div>We're sorry. This expression could not be parsed.</div>
+            <div>This is likely a bug in the Replay UI.</div>
           </div>
-          <div className={styles.UnavailableMessage}>
-            We're sorry. This expression could not be parsed.
-          </div>
-          <div className={styles.UnavailableMessage}>This is likely a bug in the Replay UI.</div>
         </div>
       </Popup>
     );

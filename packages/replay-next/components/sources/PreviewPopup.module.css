@@ -21,4 +21,8 @@
   color: var(--theme-popup-color);
   font-family: var(--font-family-default);
   font-size: var(--font-size-regular);
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
