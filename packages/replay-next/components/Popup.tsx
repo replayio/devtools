@@ -1,4 +1,4 @@
-import { MouseEvent, ReactNode, RefObject, useLayoutEffect, useRef } from "react";
+import { HTMLAttributes, MouseEvent, ReactNode, RefObject, useLayoutEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 
 import styles from "./Popup.module.css";
@@ -12,22 +12,19 @@ type Dismiss = () => void;
 
 export default function Popup({
   children,
+  className = "",
   clientX = null,
   containerRef = null,
-  dataTestId,
-  dataTestName = "Popup",
   dismiss,
   dismissOnMouseLeave = false,
   horizontalAlignment = "center",
   showTail = false,
-  style = "default",
   target,
-}: {
+  ...rest
+}: Omit<HTMLAttributes<HTMLDivElement>, "onClick"> & {
   children: ReactNode;
   clientX?: number | null;
   containerRef?: RefObject<HTMLElement> | null;
-  dataTestId?: string;
-  dataTestName?: string;
   dismiss: Dismiss;
   dismissOnMouseLeave?: boolean;
   horizontalAlignment?: "left" | "center" | "right";
@@ -218,12 +215,11 @@ export default function Popup({
 
   return createPortal(
     <div
-      className={styles.Popup}
-      data-style={style}
-      data-test-id={dataTestId}
-      data-test-name={dataTestName}
+      className={`${className} ${styles.Popup}`}
+      data-test-name="Popup"
       onClick={blockEvent}
       ref={popoverRef}
+      {...rest}
     >
       <svg ref={arrowRef as any} viewBox="0 0 16 8" preserveAspectRatio="none">
         <polygon className={styles.ArrowBackground} points="8,0 16,8 0,8"></polygon>

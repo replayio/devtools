@@ -40,7 +40,7 @@ export default function PreviewPopup(props: Props) {
       <Suspense
         fallback={
           <PopupWithChildren {...props}>
-            <div className={styles.Popup}>
+            <div className={styles.Wrapper}>
               <div className={styles.LoadingMessage}>Loading...</div>
             </div>
           </PopupWithChildren>
@@ -69,6 +69,7 @@ function SuspendingPreviewPopup({
   const frameId = selectedPauseAndFrameId?.frameId ?? null;
   const pauseId = selectedPauseAndFrameId?.pauseId ?? null;
 
+  let likelyParsingError = false;
   let value: ProtocolValue | null = null;
   let valueUnavailableMessage: string | null = null;
   if (frameId !== null && pauseId !== null) {
@@ -92,12 +93,24 @@ function SuspendingPreviewPopup({
               result.exception.object,
               "canOverflow"
             );
-            if (exceptionPreview?.preview?.properties) {
-              const message = exceptionPreview.preview.properties.find(
-                property => property.name === "message"
-              );
-              if (message) {
-                valueUnavailableMessage = `${exceptionPreview.className}: ${message.value}`;
+
+            switch (exceptionPreview.className) {
+              case "SyntaxError": {
+                // This likely indicates an error in our getExpressionForTokenElement parser
+                // This parser has been optimized for speed and does not handle 100% of possible expressions
+                likelyParsingError = true;
+                break;
+              }
+              default: {
+                if (exceptionPreview?.preview?.properties) {
+                  const message = exceptionPreview.preview.properties.find(
+                    property => property.name === "message"
+                  );
+                  if (message) {
+                    valueUnavailableMessage = `${exceptionPreview.className}: ${message.value}`;
+                  }
+                }
+                break;
               }
             }
           }
@@ -152,16 +165,36 @@ function SuspendingPreviewPopup({
   });
 
   let children: ReactNode = null;
-  if (valueUnavailableMessage !== null) {
+  if (likelyParsingError) {
     return (
       <PopupWithChildren
+        className={styles.PopupErrorStyleOverride}
         clientX={clientX}
         containerRef={containerRef}
         dismiss={dismiss}
-        style="error"
         target={target}
       >
-        <div className={styles.Popup}>
+        <div className={styles.Wrapper}>
+          <div className={styles.UnavailableMessage}>
+            <h2>Parsing error</h2>
+          </div>
+          <div className={styles.UnavailableMessage}>
+            We're sorry. This expression could not be parsed.
+          </div>
+          <div className={styles.UnavailableMessage}>This is likely a bug in the Replay UI.</div>
+        </div>
+      </PopupWithChildren>
+    );
+  } else if (valueUnavailableMessage !== null) {
+    return (
+      <PopupWithChildren
+        className={styles.PopupErrorStyleOverride}
+        clientX={clientX}
+        containerRef={containerRef}
+        dismiss={dismiss}
+        target={target}
+      >
+        <div className={styles.Wrapper}>
           <div className={styles.UnavailableMessage}>{valueUnavailableMessage}</div>
         </div>
       </PopupWithChildren>
@@ -175,7 +208,7 @@ function SuspendingPreviewPopup({
         target={target}
       >
         <SourcePreviewInspector
-          className={styles.Popup}
+          className={styles.Wrapper}
           pauseId={pauseId}
           protocolValue={value}
           ref={popupRef}
@@ -196,17 +229,17 @@ function SuspendingPreviewPopup({
 }
 
 function PopupWithChildren({
+  className,
   children,
   clientX,
   containerRef,
   dismiss,
-  style,
   target,
 }: PropsWithChildren & {
+  className?: string;
   clientX?: number | null;
   containerRef: RefObject<HTMLElement>;
   dismiss: () => void;
-  style?: PopupStyle;
   target: HTMLElement;
 }) {
   return (
@@ -215,7 +248,7 @@ function PopupWithChildren({
       clientX={clientX}
       containerRef={containerRef}
       dismiss={dismiss}
-      style={style}
+      className={className}
       target={target}
       showTail={true}
     />
