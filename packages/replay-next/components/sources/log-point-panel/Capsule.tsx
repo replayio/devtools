@@ -1,5 +1,5 @@
 import { TimeStampedPoint } from "@replayio/protocol";
-import { CSSProperties, useLayoutEffect, useRef } from "react";
+import { CSSProperties, MouseEvent, useLayoutEffect, useRef } from "react";
 
 import { NumberEditor, NumberEditorHandle } from "replay-next/components/lexical/NumberEditor";
 import Spinner from "replay-next/components/Spinner";
@@ -80,6 +80,16 @@ export default function Capsule({
     );
   }
 
+  const onClickFocusContentEditable = (event: MouseEvent) => {
+    const target = event.currentTarget;
+    if (target instanceof HTMLElement) {
+      const focusable = target.querySelector("[contenteditable]");
+      if (focusable instanceof HTMLElement) {
+        focusable.focus();
+      }
+    }
+  };
+
   return (
     <>
       <div
@@ -90,6 +100,7 @@ export default function Capsule({
         <div
           className={styles.Label}
           data-test-state={tooManyPointsToFind ? "too-many-points" : "valid"}
+          onClick={onClickFocusContentEditable}
         >
           <NumberEditor
             data-exact={currentHitPoint !== null || undefined}
