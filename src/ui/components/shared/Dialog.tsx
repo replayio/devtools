@@ -105,5 +105,7 @@ export const DialogDescription = ({
 };
 
 export const DialogActions = ({ children, className, ...props }: HTMLProps<HTMLDivElement>) => {
-  return <div className={classNames("mt-6 flex w-full justify-center", className)}>{children}</div>;
+  return (
+    <div className={classNames("mt-6 flex w-full justify-center gap-2", className)}>{children}</div>
+  );
 };

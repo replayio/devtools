@@ -68,14 +68,16 @@ export const ConfirmDialog = ({
       {description && <DialogDescription>{description}</DialogDescription>}
       <DialogActions>
         <Button
+          className="flex-1 justify-center"
           data-test-id={dataTestId ? `${dataTestId}-DeclineButton` : undefined}
           data-test-name={dataTestName ? `${dataTestName}-DeclineButton` : undefined}
           onClick={onDecline}
+          variant="outline"
         >
           {declineLabel}
         </Button>
         <Button
-          className="mx-2 flex-1 justify-center"
+          className="flex-1 justify-center"
           color={isDestructive ? "secondary" : "primary"}
           data-test-id={dataTestId ? `${dataTestId}-ConfirmButton` : undefined}
           data-test-name={dataTestName ? `${dataTestName}-ConfirmButton` : undefined}
