@@ -208,19 +208,15 @@ export function createSocket(recordingId: string): UIThunkAction {
       }
 
       const experimentalSettings: ExperimentalSettings = {
-        disableScanDataCache: userData.get("backend_disableScanDataCache"),
         disableCache: userData.get("backend_disableCache"),
         listenForMetrics: userData.get("backend_listenForMetrics"),
         profileWorkerThreads: userData.get("backend_profileWorkerThreads"),
         enableRoutines: userData.get("backend_enableRoutines"),
         rerunRoutines: userData.get("backend_rerunRoutines"),
-        disableRecordingAssetsInDatabase: userData.get("backend_disableRecordingAssetsInDatabase"),
         sampleAllTraces: userData.get("backend_sampleAllTraces"),
-        disableIncrementalSnapshots: userData.get("backend_disableIncrementalSnapshots"),
         disableConcurrentControllerLoading: userData.get(
           "backend_disableConcurrentControllerLoading"
         ),
-        disableProtocolQueryCache: userData.get("backend_disableProtocolQueryCache"),
       };
 
       const restartParam = new URL(window.location.href).searchParams.get("restart") || undefined;

@@ -41,38 +41,6 @@ export const config = {
     label: "Disable Concurrent Controller Loading",
     legacyKey: "devtools.features.disableConcurrentControllerLoading",
   },
-  backend_disableIncrementalSnapshots: {
-    defaultValue: Boolean(false),
-    highRisk: Boolean(true),
-    internalOnly: Boolean(true),
-    description: "Disable using diffs between snapshots",
-    label: "Disable using incremental snapshots",
-    legacyKey: "devtools.features.disableIncrementalSnapshots",
-  },
-  backend_disableProtocolQueryCache: {
-    defaultValue: Boolean(false),
-    highRisk: Boolean(true),
-    internalOnly: Boolean(true),
-    description: "Disable storage of previously generated response for protocol commands",
-    label: "Disable query-level storage for protocol commands",
-    legacyKey: "devtools.features.disableProtocolQueryCache",
-  },
-  backend_disableRecordingAssetsInDatabase: {
-    defaultValue: Boolean(false),
-    description:
-      "Disable writing to and reading from the backend database when storing or retrieving recording assets",
-    internalOnly: Boolean(true),
-    label: "Disable tracking recording assets in the database",
-    legacyKey: "devtools.features.disableRecordingAssetsInDatabase",
-  },
-  backend_disableScanDataCache: {
-    defaultValue: Boolean(false),
-    description: "Do not cache the results of indexing the recording",
-    highRisk: Boolean(true),
-    internalOnly: Boolean(true),
-    label: "Disable scan data cache",
-    legacyKey: "devtools.features.disableScanDataCache",
-  },
   backend_enableRoutines: {
     defaultValue: Boolean(false),
     internalOnly: Boolean(true),
