@@ -145,11 +145,9 @@ function CodeEditor({
   }, [editorRef, dataTestId, dataTestName]);
 
   const onFormCancel = (_: EditorState) => {
-    if (onCancel === undefined) {
-      return;
+    if (onCancel != undefined) {
+      onCancel();
     }
-
-    onCancel();
 
     const editor = editorRef.current;
     if (editor) {
@@ -159,7 +157,6 @@ function CodeEditor({
           editor.setEditorState(editorState);
         }
       });
-      editor.setEditable(false);
     }
   };
 

@@ -16,13 +16,13 @@ type InputAndTypeAheadOptions =
     };
 
 export async function clearText(page: Page, selector: string) {
-  await focus(page, selector);
-
   const input = page.locator(selector);
 
   // Timing awkwardness;
   // Make sure we clear all of the text (and not just most of it)
   while (((await input.textContent()) || "").trim() !== "") {
+    await focus(page, selector);
+
     await delay(100);
 
     await page.keyboard.press(`${getCommandKey()}+A`);
@@ -32,8 +32,10 @@ export async function clearText(page: Page, selector: string) {
 
 export async function focus(page: Page, selector: string) {
   // For some reason, locator.focus() does not work as expected;
-  // Lexical's own Playwright tests use page.focus(selector) though and it works.
-  await page.focus(selector);
+  // Lexical's own Playwright tests use page.focus(selector)
+  // though it seems that .click() works more reliably
+  const element = page.locator(selector);
+  await element.click();
 }
 
 export async function hideTypeAheadSuggestions(page: Page, options: InputAndTypeAheadOptions) {

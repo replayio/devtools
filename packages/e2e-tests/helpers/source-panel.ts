@@ -3,7 +3,7 @@ import chalk from "chalk";
 
 import { Badge } from "shared/client/types";
 
-import { hideTypeAheadSuggestions, typeLogPoint as typeLexical } from "./lexical";
+import { clearText, focus, hideTypeAheadSuggestions, typeLogPoint as typeLexical } from "./lexical";
 import { findPoints, openPauseInformationPanel, removePoint } from "./pause-information-panel";
 import { openSource } from "./source-explorer-panel";
 import { clearTextArea, debugPrint, delay, getByTestName, getCommandKey, waitFor } from "./utils";
@@ -153,11 +153,12 @@ export async function jumpToLogPointHit(
     "jumpToLogPointHit"
   );
 
+  await focus(page, '[data-test-name="LogPointCurrentStepInput"]');
+
   const input = page.locator('[data-test-name="LogPointCurrentStepInput"]');
-  await input.focus();
-  await clearTextArea(page, input);
-  await page.keyboard.type(`${number}`);
-  await page.keyboard.press("Enter");
+  await input.press(`${getCommandKey()}+A`);
+  await input.type(`${number}`);
+  await input.press("Enter");
 }
 
 export async function scrollUntilLineIsVisible(page: Page, lineNumber: number) {
@@ -753,7 +754,7 @@ export async function verifyLogpointStep(
     const currentStepInputLocator = lineLocator.locator(
       '[data-test-name="LogPointCurrentStepInput"]'
     );
-    const currentStep = await currentStepInputLocator.inputValue();
+    const currentStep = await currentStepInputLocator.getAttribute("data-value");
     const denominatorLocator = lineLocator.locator('[data-test-name="LogPointDenominator"]');
     const denominator = await denominatorLocator.textContent();
 
@@ -811,7 +812,7 @@ export async function verifyLogPointPanelContent(
 
     if (hitPointsBadge != null) {
       const input = line.locator('[data-test-name="LogPointCurrentStepInput"]');
-      const inputValue = await input.getAttribute("value");
+      const inputValue = await input.getAttribute("data-value");
       const capsule = await line.locator('[data-test-name="LogPointDenominator"]');
       const capsuleText = await capsule.textContent();
       await expect(`${inputValue}/${capsuleText}`).toBe(hitPointsBadge);
