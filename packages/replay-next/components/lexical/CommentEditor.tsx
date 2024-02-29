@@ -193,7 +193,6 @@ export default function CommentEditor({
           editor.setEditorState(editorState);
         }
       });
-      editor.setEditable(false);
     }
   }, []);
 
@@ -205,11 +204,6 @@ export default function CommentEditor({
       onDelete();
     } else {
       onSave(editorState.toJSON());
-
-      const editor = editorRef.current;
-      if (editor) {
-        editor.setEditable(false);
-      }
 
       backupEditorStateRef.current = editorState;
     }
