@@ -103,6 +103,7 @@ export default function Capsule({
           onClick={onClickFocusContentEditable}
         >
           <NumberEditor
+            className={styles.CurrentIndex}
             data-exact={currentHitPoint !== null || undefined}
             data-test-name="LogPointCurrentStepInput"
             data-too-many-points-to-find={tooManyPointsToFind || undefined}

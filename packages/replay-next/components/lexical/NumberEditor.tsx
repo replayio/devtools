@@ -56,6 +56,7 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, "onChange"> & {
 
 function NumberEditorWithForwardedRef({
   autoFocus,
+  className = "",
   defaultValue,
   editable = true,
   maxValue,
@@ -162,7 +163,7 @@ function NumberEditorWithForwardedRef({
   };
 
   return (
-    <div className={styles.Editor} {...rest}>
+    <div {...rest} className={`${className} ${styles.Editor}`}>
       <LexicalComposer initialConfig={createInitialConfig(defaultValue, editable)}>
         <LexicalEditorRefSetter editorRef={editorRef} />
         <>
