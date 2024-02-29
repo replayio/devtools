@@ -62,8 +62,8 @@ export default function Capsule({
 
   const badgeStyle = getBadgeStyleVars(point.badge);
 
-  const onSave = (number: number) => {
-    goToIndex(number - 1);
+  const onSave = (number: number | undefined) => {
+    goToIndex((number ?? 1) - 1);
   };
 
   // Don't show "0/0" while hit points are loading.

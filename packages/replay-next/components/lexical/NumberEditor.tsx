@@ -38,7 +38,7 @@ import styles from "./styles.module.css";
 const NODES: Array<Klass<LexicalNode>> = [ParagraphNode, TextNode];
 
 export interface NumberEditorHandle {
-  getValue(): number;
+  getValue(): number | undefined;
   setValue: (value: number) => void;
 }
 
@@ -49,8 +49,7 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, "onChange"> & {
   maxValue: number;
   minValue: number;
   onCancel?: () => void;
-  onChange?: (value: number) => void;
-  onSave: (value: number) => void;
+  onSave: (value: number | undefined) => void;
   placeholder?: string;
   step?: number;
 };
@@ -62,7 +61,6 @@ function NumberEditorWithForwardedRef({
   maxValue,
   minValue,
   onCancel,
-  onChange,
   onSave,
   placeholder,
   forwardedRef,
@@ -91,7 +89,10 @@ function NumberEditorWithForwardedRef({
 
   const historyState = useMemo(() => createEmptyHistoryState(), []);
 
-  assert(minValue <= maxValue, `Invalid minValue (${minValue}) and maxValue (${maxValue}) props`);
+  assert(
+    minValue == null || maxValue == null || minValue <= maxValue,
+    `Invalid minValue (${minValue}) and maxValue (${maxValue}) props`
+  );
 
   const editorRef = useRef<LexicalEditor>(null);
   const backupEditorStateRef = useRef<EditorState | null>(null);
@@ -100,7 +101,7 @@ function NumberEditorWithForwardedRef({
     forwardedRef,
     () => ({
       getValue: () => {
-        const { defaultValue, maxValue, minValue, step } = committedValuesRef.current;
+        const { maxValue, minValue, step } = committedValuesRef.current;
 
         const editor = editorRef.current;
         assert(editor !== null, "Editor is not initialized");
@@ -109,7 +110,6 @@ function NumberEditorWithForwardedRef({
 
         return editorState.read(() => {
           return parseNumberFromTextContent({
-            defaultValue,
             maxValue,
             minValue,
             step,
@@ -143,27 +143,12 @@ function NumberEditorWithForwardedRef({
     }
   };
 
-  const onFormChange = (editorState: EditorState) => {
-    if (typeof onChange === "function") {
-      editorState.read(() => {
-        const number = parseNumberFromTextContent({
-          defaultValue,
-          maxValue,
-          minValue,
-          step,
-          textContent: $rootTextContent(),
-        });
-
-        onChange(number);
-      });
-    }
-  };
-
   const onFormSubmit = (editorState: EditorState) => {
+    const { maxValue, minValue, step } = committedValuesRef.current;
+
     const editor = editorRef.current;
     if (editor !== null) {
       const number = parseNumberFromTextContent({
-        defaultValue,
         maxValue,
         minValue,
         step,
@@ -194,7 +179,7 @@ function NumberEditorWithForwardedRef({
             placeholder={<div className={styles.Placeholder}>{placeholder}</div>}
             ErrorBoundary={LexicalErrorBoundary}
           />
-          <FormPlugin onCancel={onFormCancel} onChange={onFormChange} onSubmit={onFormSubmit} />
+          <FormPlugin onCancel={onFormCancel} onSubmit={onFormSubmit} />
         </>
       </LexicalComposer>
     </div>

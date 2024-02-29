@@ -13,8 +13,6 @@ import { useEffect, useRef } from "react";
 import { parseNumberFromTextContent } from "replay-next/components/lexical/plugins/number/utils/parseNumberFromTextContent";
 import { updateEditorValue } from "replay-next/components/lexical/plugins/number/utils/updateEditorValue";
 
-import { UpdateListener } from "lexical/LexicalEditor";
-
 export default function NumberPlugin({
   defaultValue,
   maxValue,
@@ -48,26 +46,29 @@ export default function NumberPlugin({
 
   useEffect(() => {
     function onArrowDownCommand(event: KeyboardEvent) {
-      const { defaultValue, maxValue, minValue, step } = committedValuesRef.current;
-
-      if (minValue == null) {
-        return false;
-      }
+      const { maxValue, minValue, step } = committedValuesRef.current;
 
       let result = false;
 
       editor.update(() => {
         let number = parseNumberFromTextContent({
-          defaultValue,
           maxValue,
           minValue,
           step,
           textContent: $rootTextContent(),
         });
 
-        if (number > minValue) {
+        if (number == null) {
+          if (maxValue != null) {
+            number = maxValue;
+          }
+        } else if (minValue == null) {
+          number -= step;
+        } else if (number > minValue) {
           number = Math.max(minValue, number - step);
+        }
 
+        if (number != null) {
           updateEditorValue(editor, number);
 
           event.preventDefault();
@@ -80,26 +81,27 @@ export default function NumberPlugin({
     }
 
     function onArrowUpCommand(event: KeyboardEvent) {
-      const { defaultValue, maxValue, minValue, step } = committedValuesRef.current;
-
-      if (maxValue == null) {
-        return false;
-      }
+      const { maxValue, minValue, step } = committedValuesRef.current;
 
       let result = false;
 
       editor.update(() => {
         let number = parseNumberFromTextContent({
-          defaultValue,
-          maxValue,
-          minValue,
           step,
           textContent: $rootTextContent(),
         });
 
-        if (number < maxValue) {
+        if (number == null) {
+          if (minValue != null) {
+            number = minValue;
+          }
+        } else if (maxValue == null) {
+          number += step;
+        } else if (number < maxValue) {
           number = Math.min(maxValue, number + step);
+        }
 
+        if (number != null) {
           updateEditorValue(editor, number);
 
           event.preventDefault();
@@ -112,7 +114,7 @@ export default function NumberPlugin({
     }
 
     function onTextNodeTransform(node: TextNode) {
-      const { defaultValue, maxValue, minValue, step } = committedValuesRef.current;
+      const { maxValue, minValue, step } = committedValuesRef.current;
 
       if (minValue == null && maxValue == null) {
         return;
@@ -122,7 +124,6 @@ export default function NumberPlugin({
 
       const textContent = node.getTextContent() ?? "";
       const number = parseNumberFromTextContent({
-        defaultValue,
         maxValue,
         minValue,
         step,
@@ -136,28 +137,10 @@ export default function NumberPlugin({
       }
     }
 
-    function onUpdate({ editorState, prevEditorState }: Parameters<UpdateListener>[0]) {
-      const value = editorState.read(() => {
-        return $rootTextContent();
-      });
-      if (value === "") {
-        const prevValue = prevEditorState.read(() => {
-          return $rootTextContent();
-        });
-
-        if (prevValue !== "") {
-          editor.update(() => {
-            editor.setEditorState(prevEditorState);
-          });
-        }
-      }
-    }
-
     return mergeRegister(
       editor.registerCommand(KEY_ARROW_DOWN_COMMAND, onArrowDownCommand, COMMAND_PRIORITY_LOW),
       editor.registerCommand(KEY_ARROW_UP_COMMAND, onArrowUpCommand, COMMAND_PRIORITY_LOW),
-      editor.registerNodeTransform(TextNode, onTextNodeTransform),
-      editor.registerUpdateListener(onUpdate)
+      editor.registerNodeTransform(TextNode, onTextNodeTransform)
     );
   }, [editor]);
 
