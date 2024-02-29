@@ -3,7 +3,7 @@ import { findConsoleMessage } from "../helpers/console-panel";
 import { addLogpoint, jumpToLogPointHit, verifyLogpointStep } from "../helpers/source-panel";
 import test, { expect } from "../testFixtureCloneRecording";
 
-test.use({ exampleKey: "doc_rr_basic_chromium.html" });
+test.use({ exampleKey: "doc_rr_basic.html" });
 
 test(`logpoints-08: should support jumping directly to a hit point via the capsule input`, async ({
   pageWithMeta: { page, recordingId },
