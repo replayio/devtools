@@ -8,7 +8,7 @@ import { clickSourceTreeNode } from "../helpers/source-explorer-panel";
 import { addBreakpoint } from "../helpers/source-panel";
 import test from "../testFixtureCloneRecording";
 
-test.use({ exampleKey: "doc_rr_objects.html" });
+test.use({ exampleKey: "doc_rr_objects_chromium.html" });
 
 test("stepping-07: Test quick stepping using the keyboard", async ({
   pageWithMeta: { page, recordingId },
@@ -29,7 +29,9 @@ test("stepping-07: Test quick stepping using the keyboard", async ({
   await rewindToLine(page, 50);
 
   // "Step over" ten times *without* waiting for each step to complete
-  for (let i = 0; i < 10; i++) {
+  // TODO [RUN-3271] Chromium currently requires 2 steps per line,
+  // so we're stepping 20 times here until RUN-3271 is fixed
+  for (let i = 0; i < 20; i++) {
     await page.keyboard.press("F10");
   }
 
