@@ -27,6 +27,7 @@ import {
   useRef,
 } from "react";
 
+import { useContentEditableNoUserSelect } from "replay-next/components/lexical/hooks/useContentEditableNoUserSelect";
 import LexicalEditorRefSetter from "replay-next/components/lexical/LexicalEditorRefSetter";
 import NumberPlugin from "replay-next/components/lexical/plugins/number/NumberPlugin";
 import { parseNumberFromTextContent } from "replay-next/components/lexical/plugins/number/utils/parseNumberFromTextContent";
@@ -46,6 +47,7 @@ type Props = Omit<HTMLAttributes<HTMLDivElement>, "onChange"> & {
   autoFocus?: boolean;
   defaultValue: number;
   editable?: boolean;
+  disableSelectionWhenNotFocused?: boolean;
   maxValue: number;
   minValue: number;
   onCancel?: () => void;
@@ -58,6 +60,7 @@ function NumberEditorWithForwardedRef({
   autoFocus,
   className = "",
   defaultValue,
+  disableSelectionWhenNotFocused,
   editable = true,
   maxValue,
   minValue,
@@ -162,8 +165,15 @@ function NumberEditorWithForwardedRef({
     }
   };
 
+  const rootElementRef = useRef<HTMLDivElement>(null);
+
+  useContentEditableNoUserSelect(rootElementRef, {
+    autoFocus: autoFocus === true,
+    disableSelectionWhenNotFocused: disableSelectionWhenNotFocused === true,
+  });
+
   return (
-    <div {...rest} className={`${className} ${styles.Editor}`}>
+    <div {...rest} className={`${className} ${styles.Editor}`} ref={rootElementRef}>
       <LexicalComposer initialConfig={createInitialConfig(defaultValue, editable)}>
         <LexicalEditorRefSetter editorRef={editorRef} />
         <>

@@ -83,7 +83,9 @@ export default function Capsule({
   const onClickFocusContentEditable = (event: MouseEvent) => {
     const target = event.currentTarget;
     if (target instanceof HTMLElement) {
-      const focusable = target.querySelector("[contenteditable]");
+      // Because we use the disableSelectionWhenNotFocused prop, we should focus on the focusable element (tabindex)
+      // focusing on the contenteditable won't enable it in time
+      const focusable = target.querySelector("[tabindex]");
       if (focusable instanceof HTMLElement) {
         focusable.focus();
       }
@@ -109,6 +111,7 @@ export default function Capsule({
             data-too-many-points-to-find={tooManyPointsToFind || undefined}
             data-value={closestHitPointIndex + 1}
             defaultValue={closestHitPointIndex + 1}
+            disableSelectionWhenNotFocused
             editable={!tooManyPointsToFind}
             maxValue={Math.max(1, hitPoints.length)}
             minValue={1}

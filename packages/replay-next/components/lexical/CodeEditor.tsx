@@ -34,6 +34,8 @@ import {
   useRef,
 } from "react";
 
+import { useContentEditableNoUserSelect } from "replay-next/components/lexical/hooks/useContentEditableNoUserSelect";
+
 import LexicalEditorRefSetter from "./LexicalEditorRefSetter";
 import CodeCompletionPlugin from "./plugins/code-completion/CodeCompletionPlugin";
 import { Context } from "./plugins/code-completion/findMatches";
@@ -58,6 +60,7 @@ type Props = {
   context: Context;
   dataTestId?: string;
   dataTestName?: string;
+  disableSelectionWhenNotFocused?: boolean;
   editable: boolean;
   executionPoint: ExecutionPoint | null;
   forwardedRef?: ForwardedRef<ImperativeHandle>;
@@ -77,6 +80,7 @@ function CodeEditor({
   context,
   dataTestId,
   dataTestName,
+  disableSelectionWhenNotFocused,
   editable,
   executionPoint,
   forwardedRef,
@@ -224,9 +228,16 @@ function CodeEditor({
     }
   };
 
+  const rootElementRef = useRef<HTMLDivElement>(null);
+
+  useContentEditableNoUserSelect(rootElementRef, {
+    autoFocus: autoFocus === true,
+    disableSelectionWhenNotFocused: disableSelectionWhenNotFocused === true,
+  });
+
   return (
     <LexicalComposer initialConfig={createInitialConfig(initialValue, editable)}>
-      <>
+      <div className={styles.Editor} ref={rootElementRef}>
         <LexicalEditorRefSetter editorRef={editorRef} />
         {autoFocus && <AutoFocusPlugin />}
         <HistoryPlugin externalHistoryState={historyState} />
@@ -244,7 +255,7 @@ function CodeEditor({
           executionPoint={executionPoint}
           time={time}
         />
-      </>
+      </div>
     </LexicalComposer>
   );
 }

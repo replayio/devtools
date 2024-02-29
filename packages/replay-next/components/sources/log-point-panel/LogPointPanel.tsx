@@ -267,7 +267,10 @@ function PointPanelWithHitPoints({
     } else {
       if (!isEditing) {
         startEditing("condition");
+      } else {
+        setEditReason("condition");
       }
+
       editPendingPointText(key, { condition: "" });
     }
   };
@@ -418,6 +421,7 @@ function PointPanelWithHitPoints({
                       context={context}
                       dataTestId={`PointPanel-ConditionInput-${lineNumber}`}
                       dataTestName="PointPanel-ConditionInput"
+                      disableSelectionWhenNotFocused
                       editable={editable}
                       executionPoint={executionPoint}
                       initialValue={condition || ""}
@@ -524,6 +528,7 @@ function PointPanelWithHitPoints({
                     context={context}
                     dataTestId={`PointPanel-ContentInput-${lineNumber}`}
                     dataTestName="PointPanel-ContentInput"
+                    disableSelectionWhenNotFocused
                     editable={editable}
                     executionPoint={executionPoint}
                     initialValue={content}
