@@ -11,13 +11,8 @@ export const PREFERENCES: PreferencesKey[] = [
   "backend_newControllerOnRefresh",
   "backend_profileWorkerThreads",
   "backend_disableCache",
-  "backend_disableScanDataCache",
   "backend_enableRoutines",
   "backend_rerunRoutines",
-  "backend_disableRecordingAssetsInDatabase",
-  "backend_disableIncrementalSnapshots",
-  "backend_disableConcurrentControllerLoading",
-  "backend_disableProtocolQueryCache",
 ];
 
 export function Advanced() {
