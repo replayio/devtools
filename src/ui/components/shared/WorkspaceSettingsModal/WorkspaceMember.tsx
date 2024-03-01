@@ -21,12 +21,19 @@ type WorkspaceMemberProps = {
 
 const memberRoleLabels: Record<WorkspaceUserRole, string> = {
   admin: "Admin",
+  // Not presented in the UI yet
+  contributor: "Contributor",
   debugger: "Developer",
   viewer: "User",
 };
 
-function getMemberRole(member: WorkspaceUser) {
-  return member.roles?.includes("debugger") ? "debugger" : "viewer";
+function getPrimaryMemberRole(member: WorkspaceUser) {
+  const roles = getMemberRoles(member);
+  return roles.includes("debugger") ? "debugger" : "viewer";
+}
+
+function getMemberRoles(member: WorkspaceUser) {
+  return member.roles ?? ["viewer"];
 }
 
 function getIsAdmin(member: WorkspaceUser) {
@@ -36,24 +43,27 @@ function getIsAdmin(member: WorkspaceUser) {
 function WorkspaceMemberRoleOption({
   value,
   selected,
+  disabled,
   onSelect,
 }: {
   value: WorkspaceUserRole;
   selected: boolean;
+  disabled?: boolean;
   onSelect: (value: WorkspaceUserRole) => void;
 }) {
   return (
     <label
-      className={classnames("permissions-dropdown-item block", {
-        "font-bold": selected,
+      className={classnames("permissions-dropdown-item block flex flex-row items-center", {
+        "opacity-50": disabled,
       })}
     >
       <input
         type={value == "admin" ? "checkbox" : "radio"}
         name="workspaceUserRole"
-        className="appearance-none checked:bg-blue-500 indeterminate:bg-gray-300"
+        className="center mx-1 my-0 appearance-none checked:bg-blue-500 indeterminate:bg-gray-300"
         value={value}
         checked={selected}
+        disabled={disabled}
         onChange={e => onSelect(value)}
       />
       <span className="pl-2">{memberRoleLabels[value]}</span>
@@ -70,52 +80,64 @@ function WorkspaceMemberRoles({
   member: WorkspaceUser;
   onClick: () => void;
 }) {
-  const role: WorkspaceUserRole = getMemberRole(member);
+  const roles: WorkspaceUserRole[] = getMemberRoles(member);
   const memberIsAdmin = getIsAdmin(member);
   const { updateWorkspaceMemberRole } = hooks.useUpdateWorkspaceMemberRole();
-  const [selectedRole, setSelectedRole] = useState<WorkspaceUserRole>(role);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => setSelectedRole(role), [role]);
-
-  const selectRole = (updated: WorkspaceUserRole) => {
-    onClick();
-    let roles: WorkspaceUserRole[];
-
-    if (updated !== "admin") {
-      roles = [updated];
-      if (memberIsAdmin) {
-        roles.push("admin");
-      }
-    } else {
-      roles = [role];
-      if (!memberIsAdmin) {
-        roles.push("admin");
-      }
+  const selectRole = (role: WorkspaceUserRole) => {
+    let updatedRoles = new Set(roles);
+    switch (role) {
+      case "viewer":
+        updatedRoles.delete("debugger");
+        break;
+      case "contributor":
+      case "debugger":
+        updatedRoles.add(role);
+        break;
+      case "admin":
+        updatedRoles.has(role) ? updatedRoles.delete(role) : updatedRoles.add(role);
+        break;
     }
 
-    setSelectedRole(updated);
+    setLoading(true);
 
     updateWorkspaceMemberRole({
       variables: {
         id: member.membershipId,
-        roles,
+        roles: [...updatedRoles],
       },
-    }).catch(e => {
-      console.error(e);
-      setSelectedRole(selectedRole);
-    });
+    })
+      .catch(e => {
+        console.error(e);
+      })
+      .finally(() => {
+        setLoading(false);
+        onClick();
+      });
   };
 
   return (
     <div>
-      <WorkspaceMemberRoleOption value="viewer" onSelect={selectRole} selected={role == "viewer"} />
+      <WorkspaceMemberRoleOption
+        value="viewer"
+        onSelect={selectRole}
+        disabled={loading}
+        selected={!roles.includes("debugger")}
+      />
       <WorkspaceMemberRoleOption
         value="debugger"
         onSelect={selectRole}
-        selected={role == "debugger"}
+        disabled={loading}
+        selected={roles.includes("debugger")}
       />
       {isAdmin ? (
-        <WorkspaceMemberRoleOption value="admin" onSelect={selectRole} selected={memberIsAdmin} />
+        <WorkspaceMemberRoleOption
+          value="admin"
+          onSelect={selectRole}
+          disabled={loading}
+          selected={memberIsAdmin}
+        />
       ) : null}
     </div>
   );
@@ -136,7 +158,7 @@ function Status({
       title={title}
     >
       <span className="whitespace-pre">
-        {memberRoleLabels[getMemberRole(member)]}
+        {memberRoleLabels[getPrimaryMemberRole(member)]}
         {member.pending ? " (pending)" : ""}
       </span>
       <MaterialIcon
