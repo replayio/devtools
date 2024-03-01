@@ -132,8 +132,8 @@
     "buildId": "linux-gecko-20230919-abf2e86b2910-4d0a9f5b9de2"
   },
   "doc_stacking_chromium.html": {
-    "recording": "fa5a2a8b-a095-44ef-83ca-324da9f7bde8",
-    "buildId": "linux-chromium-20240126-c9de98d17d37-50d01be708a2"
+    "recording": "6c3a6dd4-6880-4bfc-ace6-690013421ac3",
+    "buildId": "linux-chromium-20240227-947bd2cd266d-e0f1462455a7"
   },
   "flake/adding-spec.ts": {
     "recording": "a667c000-8432-45d7-b08d-a7e4f5002ecb",

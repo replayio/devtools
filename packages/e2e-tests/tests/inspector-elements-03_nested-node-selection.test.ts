@@ -19,7 +19,7 @@ import {
 import { debugPrint, waitFor } from "../helpers/utils";
 import test from "../testFixtureCloneRecording";
 
-test.use({ exampleKey: "doc_stacking.html" });
+test.use({ exampleKey: "doc_stacking_chromium.html" });
 // ref: `doc_stacking.html`
 // note the lack of a `>` on each tag string, due to how
 // the elements tree constructs the text for each node
@@ -91,7 +91,7 @@ test("inspector-elements-03: Nested node picker and selection behavior", async (
     `<div style="width: 40px; height: 20px; overflow: hidden;"`
   );
   await typeKeyAndVerifySelectedElement(page, "ArrowUp", `<div style="left: 200px; top: 300px;"`);
-  await typeKeyAndVerifySelectedElement(page, "ArrowUp", bodyChildDomNodes[15]);
+  await typeKeyAndVerifySelectedElement(page, "ArrowUp", "</div>");
 
   // Searching for a nested node should expand everything above it
   await searchElementsPanel(page, "Foo");

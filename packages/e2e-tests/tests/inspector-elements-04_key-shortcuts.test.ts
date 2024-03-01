@@ -13,7 +13,7 @@ import { closeSidePanel } from "../helpers/pause-information-panel";
 import { waitFor } from "../helpers/utils";
 import test from "../testFixtureCloneRecording";
 
-test.use({ exampleKey: "doc_stacking.html" });
+test.use({ exampleKey: "doc_stacking_chromium.html" });
 // ref: `doc_stacking.html`
 // note the lack of a `>` on each tag string, due to how
 // the elements tree constructs the text for each node
@@ -38,8 +38,6 @@ const bodyChildDomNodes = [
   `<div style="left: 300px; top: 300px;"`,
 ];
 
-const div0ChildDomNodes = [`<div class="box1"`, `<div class="box2"`];
-
 test("inspector-elements-04: Keyboard shortcuts should select the right DOM nodes", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
@@ -59,45 +57,58 @@ test("inspector-elements-04: Keyboard shortcuts should select the right DOM node
   await bodyTag.click();
   await waitForSelectedElementsRow(page, "body");
 
-  // Basic up/down selects the next element in the tree
+  // Basic up/down selects the next element in the tree and left arrow collapses it
   await typeKeyAndVerifySelectedElement(page, "ArrowDown", bodyChildDomNodes[0]);
+  await typeKeyAndVerifySelectedElement(page, "ArrowLeft", bodyChildDomNodes[0]);
   await typeKeyAndVerifySelectedElement(page, "ArrowDown", bodyChildDomNodes[1]);
+  await typeKeyAndVerifySelectedElement(page, "ArrowUp", bodyChildDomNodes[0]);
+  await typeKeyAndVerifySelectedElement(page, "ArrowDown", bodyChildDomNodes[1]);
+  await typeKeyAndVerifySelectedElement(page, "ArrowLeft", bodyChildDomNodes[1]);
   await typeKeyAndVerifySelectedElement(page, "ArrowDown", bodyChildDomNodes[2]);
-  await typeKeyAndVerifySelectedElement(page, "ArrowUp", bodyChildDomNodes[1]);
+  await typeKeyAndVerifySelectedElement(page, "ArrowLeft", bodyChildDomNodes[2]);
+  await typeKeyAndVerifySelectedElement(page, "ArrowDown", bodyChildDomNodes[3]);
+  await typeKeyAndVerifySelectedElement(page, "ArrowLeft", bodyChildDomNodes[3]);
 
-  const div0Box1 = await getElementsListRow(page, { text: div0ChildDomNodes[0] });
+  const div2ChildNode = '<div class="box1" style="z-index: -1;"';
+  const div2Child = await getElementsListRow(page, { text: div2ChildNode });
 
-  expect(await div0Box1.isVisible()).toBe(false);
+  // Children should now be hidden
+  await waitFor(async () => {
+    expect(await div2Child.isVisible()).toBe(false);
+  });
 
   // Right arrow expands the currently selected element
-  await typeKeyAndVerifySelectedElement(page, "ArrowRight", bodyChildDomNodes[1]);
+  await typeKeyAndVerifySelectedElement(page, "ArrowRight", bodyChildDomNodes[3]);
 
   // Children should now be visible
   await waitFor(async () => {
-    expect(await div0Box1.isVisible()).toBe(true);
+    expect(await div2Child.isVisible()).toBe(true);
   });
 
   // Pressing Down should select the first child, as it's the next row
-  await typeKeyAndVerifySelectedElement(page, "ArrowDown", div0ChildDomNodes[0]);
-  await typeKeyAndVerifySelectedElement(page, "ArrowDown", div0ChildDomNodes[1]);
+  await typeKeyAndVerifySelectedElement(page, "ArrowDown", div2ChildNode);
 
   // Pressing Left jumps back to the parent
-  await typeKeyAndVerifySelectedElement(page, "ArrowLeft", bodyChildDomNodes[1]);
-  // and Right while it's open goes  to the child
-  await typeKeyAndVerifySelectedElement(page, "ArrowRight", div0ChildDomNodes[0]);
+  await typeKeyAndVerifySelectedElement(page, "ArrowLeft", bodyChildDomNodes[3]);
+  // and Right while it's open goes to the child
+  await typeKeyAndVerifySelectedElement(page, "ArrowRight", div2ChildNode);
 
   // Going back to the parent and Left again collapses the node
-  await typeKeyAndVerifySelectedElement(page, "ArrowUp", bodyChildDomNodes[1]);
-  await typeKeyAndVerifySelectedElement(page, "ArrowLeft", bodyChildDomNodes[1]);
+  await typeKeyAndVerifySelectedElement(page, "ArrowUp", bodyChildDomNodes[3]);
+  await typeKeyAndVerifySelectedElement(page, "ArrowLeft", bodyChildDomNodes[3]);
 
   // PageDown should jump down 10 rows
-  await typeKeyAndVerifySelectedElement(page, "PageDown", bodyChildDomNodes[11]);
+  await typeKeyAndVerifySelectedElement(page, "PageDown", bodyChildDomNodes[6]);
 
   // PageUp should jump up 10 rows
-  await typeKeyAndVerifySelectedElement(page, "PageUp", bodyChildDomNodes[1]);
+  await typeKeyAndVerifySelectedElement(page, "PageUp", bodyChildDomNodes[3]);
 
   // If we expand the first child, it should still jump 10 rows total
-  await typeKeyAndVerifySelectedElement(page, "ArrowRight", bodyChildDomNodes[1]);
-  await typeKeyAndVerifySelectedElement(page, "PageDown", bodyChildDomNodes[8]);
-  await typeKeyAndVerifySelectedElement(page, "PageUp", bodyChildDomNodes[1]);
+  await typeKeyAndVerifySelectedElement(page, "ArrowRight", bodyChildDomNodes[3]);
+  await typeKeyAndVerifySelectedElement(
+    page,
+    "PageDown",
+    '<div class="box2" style="position: static;"'
+  );
+  await typeKeyAndVerifySelectedElement(page, "PageUp", bodyChildDomNodes[3]);
 });
