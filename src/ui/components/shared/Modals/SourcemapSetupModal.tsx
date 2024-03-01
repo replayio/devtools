@@ -20,8 +20,8 @@ function SourcemapSetupModal({ hideModal, selectedSource }: PropsFromRedux) {
 
   const onClick = () => {
     const docsLink = isNext
-      ? "https://docs.replay.io/docs/1923e679c1e4411db1bda29536eb1e31#6e444abdd19642af9ddc34766ff84bf2"
-      : "https://docs.replay.io/docs/1923e679c1e4411db1bda29536eb1e31#912af13ef09a41f4ae774a90796ebbc1";
+      ? "https://docs.replay.io/resources/next-js"
+      : "https://docs.replay.io/getting-started/teams-admin/uploading-source-maps";
 
     window.open(docsLink);
   };

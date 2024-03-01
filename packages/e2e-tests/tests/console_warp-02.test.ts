@@ -18,8 +18,6 @@ test("console_warp-02: support pausing, warping, stepping and evaluating console
   await startTest(page, recordingId);
   await openDevToolsTab(page);
   await openConsolePanel(page);
-  // hide the favicon exception
-  await toggleConsoleMessageType(page, "errors", false);
 
   // When warping to a message, it is the paused one.
   await warpToMessage(page, "number: 2");
@@ -56,6 +54,8 @@ test("console_warp-02: support pausing, warping, stepping and evaluating console
   await stepOverToLine(page, 21);
   await verifyPausedAtMessage(page, "1 << 7", "terminal-expression");
 
+  // TODO [RUN-3271] Chromium currently requires an extra step here
+  await stepOverToLine(page, 21);
   await stepOverToLine(page, 22);
   await verifyPausedAtMessage(page, "ExampleFinished", "console-log");
 });

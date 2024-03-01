@@ -26,6 +26,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  user-select: none;
 
   /* Visually center the font within the capsule */
   padding-top: 1px;
@@ -40,17 +41,6 @@
 
 .CurrentIndex {
   color: var(--point-panel-timeline-label-unselected-color);
-  padding: 0;
-  line-height: 1;
-  overflow: hidden;
-  background-color: transparent;
-  border: none;
-  appearance: none;
-  font-size: inherit;
-  text-align: right;
-
-  /* Even if all text is deleted, don't shrink smaller than a single digit */
-  min-width: 1;
 }
 .CurrentIndex[data-exact] {
   color: var(--point-panel-timeline-label-selected-color);
@@ -61,8 +51,6 @@
 .CurrentIndex:focus {
   background-color: var(--point-panel-timeline-label-edit-hover-background-color);
   color: var(--point-panel-timeline-label-edit-color);
-  outline: none;
-  box-shadow: none;
 }
 .Label:hover .CurrentIndex:not(:disabled) {
   background-color: var(--point-panel-timeline-label-edit-hover-background-color);

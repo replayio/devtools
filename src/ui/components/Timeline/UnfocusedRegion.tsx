@@ -23,7 +23,6 @@ export default function UnfocusedRegion() {
     <>
       <div
         className="unfocused-regions-container start"
-        title="This region is unfocused"
         style={{
           width: `${clamp(start, 0, 100)}%`,
         }}
@@ -32,7 +31,6 @@ export default function UnfocusedRegion() {
       </div>
       <div
         className="unfocused-regions-container end"
-        title="This region is unfocused"
         style={{
           width: `${clamp(end, 0, 100)}%`,
         }}

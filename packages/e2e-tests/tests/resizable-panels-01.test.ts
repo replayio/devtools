@@ -22,7 +22,7 @@ async function waitForPanelSize(page: Page, expectedSize: number) {
   });
 }
 
-test.use({ exampleKey: "doc_rr_basic_chromium.html" });
+test.use({ exampleKey: "doc_rr_basic.html" });
 
 test("resizable-panels-01: Left side Toolbar and Video should be collapsible", async ({
   pageWithMeta: { page, recordingId },

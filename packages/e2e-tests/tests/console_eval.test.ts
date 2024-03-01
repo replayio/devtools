@@ -6,7 +6,7 @@ import {
 } from "../helpers/console-panel";
 import test from "../testFixtureCloneRecording";
 
-test.use({ exampleKey: "doc_rr_basic_chromium.html" });
+test.use({ exampleKey: "doc_rr_basic.html" });
 
 test("console_eval: support console evaluations", async ({
   pageWithMeta: { page, recordingId },

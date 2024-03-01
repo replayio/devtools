@@ -23,7 +23,7 @@ test("stepping-04: Test stepping in a frame other than the top frame", async ({
 
   await warpToMessage(page, "logpoint 5");
   await selectFrame(page, 1);
-  await stepOverToLine(page, 22);
+  await stepOverToLine(page, 21);
 
   await warpToMessage(page, "logpoint 5");
   await selectFrame(page, 1);

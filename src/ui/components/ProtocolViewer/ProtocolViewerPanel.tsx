@@ -74,7 +74,14 @@ export function LiveProtocolRequests() {
   const requestMap = useAppSelector(getProtocolRequestMap);
   const responseMap = useAppSelector(getProtocolResponseMap);
 
-  return <ProtocolViewer errorMap={errorMap} requestMap={requestMap} responseMap={responseMap} />;
+  return (
+    <ProtocolViewer
+      errorMap={errorMap}
+      requestMap={requestMap}
+      responseMap={responseMap}
+      scope="live"
+    />
+  );
 }
 
 const NO_MESSAGES: RecordedProtocolData[] = [];
@@ -129,5 +136,12 @@ function RecordedProtocolRequests() {
 
   const { requestMap, responseMap, errorMap } = groupedMessageData;
 
-  return <ProtocolViewer errorMap={errorMap} requestMap={requestMap} responseMap={responseMap} />;
+  return (
+    <ProtocolViewer
+      errorMap={errorMap}
+      requestMap={requestMap}
+      responseMap={responseMap}
+      scope="recorded"
+    />
+  );
 }

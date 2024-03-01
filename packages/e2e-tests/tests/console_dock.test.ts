@@ -6,7 +6,7 @@ import {
 } from "../helpers/layout";
 import test from "../testFixtureCloneRecording";
 
-test.use({ exampleKey: "doc_rr_basic_chromium.html" });
+test.use({ exampleKey: "doc_rr_basic.html" });
 
 test("console_dock: Should show the correct docking behavior for recordings with video", async ({
   pageWithMeta: { page, recordingId },

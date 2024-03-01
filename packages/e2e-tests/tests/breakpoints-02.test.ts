@@ -4,7 +4,7 @@ import { rewindToLine } from "../helpers/pause-information-panel";
 import { addBreakpoint } from "../helpers/source-panel";
 import test from "../testFixtureCloneRecording";
 
-test.use({ exampleKey: "doc_rr_basic_chromium.html" });
+test.use({ exampleKey: "doc_rr_basic.html" });
 
 test(`breakpoints-02: Test unhandled divergence while evaluating at a breakpoint`, async ({
   pageWithMeta: { page, recordingId },

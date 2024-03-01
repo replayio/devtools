@@ -9,7 +9,7 @@ import { clickSourceTreeNode } from "../helpers/source-explorer-panel";
 import { addBreakpoint } from "../helpers/source-panel";
 import test from "../testFixtureCloneRecording";
 
-test.use({ exampleKey: "doc_rr_basic_chromium.html" });
+test.use({ exampleKey: "doc_rr_basic.html" });
 
 test("stepping-01: Test basic step-over/back functionality", async ({
   pageWithMeta: { page, recordingId },
@@ -18,7 +18,7 @@ test("stepping-01: Test basic step-over/back functionality", async ({
   await startTest(page, recordingId);
   await openDevToolsTab(page);
 
-  // Open doc_rr_basic_chromium.html
+  // Open doc_rr_basic.html
   await clickSourceTreeNode(page, "test");
   await clickSourceTreeNode(page, "examples");
   await clickSourceTreeNode(page, exampleKey);

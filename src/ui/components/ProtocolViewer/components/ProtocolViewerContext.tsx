@@ -16,6 +16,8 @@ import {
 
 export type FilterByCategory = "failed" | "pending" | "slow";
 
+export type ProtocolViewerScope = "live" | "recorded";
+
 export type ProtocolViewerContextType = {
   clearCurrentRequests: () => void;
   errorMap: ProtocolErrorMap;
@@ -25,6 +27,7 @@ export type ProtocolViewerContextType = {
   longestRequestDuration: number;
   requestMap: ProtocolRequestMap;
   responseMap: ProtocolResponseMap;
+  scope: ProtocolViewerScope;
   selectedRequestId: number | null;
   selectRequest: (id: number | null) => void;
   updateFilterByCategory: (category: FilterByCategory | null) => void;
@@ -38,10 +41,12 @@ export function ProtocolViewerContextRoot({
   errorMap,
   requestMap,
   responseMap,
+  scope,
 }: PropsWithChildren & {
   errorMap: ProtocolErrorMap;
   requestMap: ProtocolRequestMap;
   responseMap: ProtocolResponseMap;
+  scope: ProtocolViewerScope;
 }) {
   const [filterByCategory, updateFilterByCategory] = useState<FilterByCategory | null>(null);
   const [filterByText, updateFilterByText] = useState("");
@@ -148,6 +153,7 @@ export function ProtocolViewerContextRoot({
       longestRequestDuration,
       requestMap,
       responseMap,
+      scope,
       selectedRequestId,
       selectRequest,
       updateFilterByCategory,
@@ -162,6 +168,7 @@ export function ProtocolViewerContextRoot({
       longestRequestDuration,
       requestMap,
       responseMap,
+      scope,
       selectedRequestId,
     ]
   );
