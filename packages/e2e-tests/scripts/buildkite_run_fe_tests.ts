@@ -1,10 +1,10 @@
 /* Copyright 2024 Record Replay Inc. */
 
 import { exec, execSync } from "child_process";
+import http from "http";
 import os from "os";
 import path from "path";
 import chalk from "chalk";
-import http from "http";
 import difference from "lodash/difference";
 import size from "lodash/size";
 
@@ -144,12 +144,12 @@ function waitForHTTPStatus(
   url: string,
   statusCode: number = 200, // by default we wait for OK
   timeoutMs = 15000, // keep waiting for 15s total
-  retryTime = 1000, // retry after 1s
+  retryTime = 1000 // retry after 1s
 ): Promise<void> {
   const startTime = Date.now();
   return new Promise((resolve, reject) => {
     function attemptConnection() {
-      const request = http.get(url, (res) => {
+      const request = http.get(url, res => {
         if (res.statusCode === statusCode) {
           resolve();
           return;
@@ -158,15 +158,17 @@ function waitForHTTPStatus(
         console.error(`Server is up, but responded with status code ${res.statusCode}`);
 
         if (Date.now() - startTime >= timeoutMs) {
-          reject(new Error(`Server did not respond with 200 OK within ${timeoutMs / 1000} seconds`));
+          reject(
+            new Error(`Server did not respond with 200 OK within ${timeoutMs / 1000} seconds`)
+          );
           return;
         }
 
         setTimeout(attemptConnection, 1000); // Retry after 1 second
       });
 
-      request.on('error', (err: Error) => {
-        if (err["code"] === 'ECONNREFUSED') {
+      request.on("error", (err: Error) => {
+        if (err["code"] === "ECONNREFUSED") {
           if (Date.now() - startTime >= timeoutMs) {
             reject(new Error(`Failed to connect to the server within ${timeoutMs / 1000} seconds`));
             return;
@@ -255,7 +257,7 @@ export default async function run_fe_tests(
 
     // make sure the dev server is up and running.
     console.log("waiting for dev server to start up");
-    await waitForHTTPStatus("http://localhost:8080/")
+    await waitForHTTPStatus("http://localhost:8080/");
     console.log("dev server up, continuing with test");
   }
 
