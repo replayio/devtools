@@ -239,7 +239,7 @@ export default async function run_fe_tests(
     });
 
     // Start the webserver.
-    webProc = exec("yarn dev", (error, stdout, stderr) => {
+    webProc = exec("npx yarn dev", (error, stdout, stderr) => {
       if (error) {
         console.error(`yarn dev exec ERROR: ${error}`);
       }
