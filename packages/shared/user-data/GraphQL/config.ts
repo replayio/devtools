@@ -34,13 +34,6 @@ export const config = {
     internalOnly: Boolean(true),
     label: "Disable all caches",
   },
-  backend_disableConcurrentControllerLoading: {
-    defaultValue: Boolean(false),
-    description: "Disable loading regions concurrently at controller startup",
-    internalOnly: Boolean(true),
-    label: "Disable Concurrent Controller Loading",
-    legacyKey: "devtools.features.disableConcurrentControllerLoading",
-  },
   backend_enableRoutines: {
     defaultValue: Boolean(false),
     internalOnly: Boolean(true),

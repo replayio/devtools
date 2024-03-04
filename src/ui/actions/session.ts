@@ -214,9 +214,6 @@ export function createSocket(recordingId: string): UIThunkAction {
         enableRoutines: userData.get("backend_enableRoutines"),
         rerunRoutines: userData.get("backend_rerunRoutines"),
         sampleAllTraces: userData.get("backend_sampleAllTraces"),
-        disableConcurrentControllerLoading: userData.get(
-          "backend_disableConcurrentControllerLoading"
-        ),
       };
 
       const restartParam = new URL(window.location.href).searchParams.get("restart") || undefined;

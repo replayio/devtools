@@ -13,7 +13,6 @@ export const PREFERENCES: PreferencesKey[] = [
   "backend_disableCache",
   "backend_enableRoutines",
   "backend_rerunRoutines",
-  "backend_disableConcurrentControllerLoading",
 ];
 
 export function Advanced() {
