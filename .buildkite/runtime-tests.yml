@@ -1,6 +1,6 @@
 steps:
   - label: "Runtime e2e tests (linux-x86_64)"
-    if: build.env("OS") == "linux" && build.env("ARCH") == "x86_64"
+    if: (build.env("OS") == "linux" && build.env("ARCH") == "x86_64") || (build.env("OS") == null && build.env("ARCH") == null)
     timeout_in_minutes: 60
     commands:
       - "mkdir -p /mnt/data/replay"
