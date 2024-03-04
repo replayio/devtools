@@ -85,18 +85,18 @@ export async function mapLocators<T>(
 }
 
 export async function getSupportFormErrorDetails(page: Page) {
-  if (await page.locator('[data-test-id="SupportForm"]').isVisible()) {
-    let details: string = "";
+  if (await page.locator('[data-test-id="UnexpectedErrorDetails"]').isVisible()) {
     try {
-      const errorDetailsLocator = page.locator('[data-test-id="UnexpectedErrorDetails"]');
-      if (await errorDetailsLocator.isVisible()) {
-        details = await errorDetailsLocator.innerText();
+      const expandableLocator = page.locator('[data-test-name="ExpandablePreview"]');
+      if (await expandableLocator.isVisible()) {
+        await expandableLocator.click();
+        return await page.locator('[data-test-name="ErrorDetails"]').innerText();
       }
     } catch (err) {
       // Ignore locator errors.
       console.error(`ERROR:`, err);
     }
-    return details || "(support form is visible)";
+    return "(unexpected error modal is visible)";
   }
   return null;
 }
@@ -128,10 +128,14 @@ export async function waitForRecordingToFinishIndexing(page: Page): Promise<void
         throw new UnrecoverableError(`Session failed: ${supportFormErrorDetails}`);
       }
 
-      expect(
-        await timelineCapsuleLocator.getAttribute("data-test-progress"),
-        "Recording did not finish processing"
-      ).toBe("100");
+      if (await timelineCapsuleLocator.isVisible()) {
+        expect(
+          await timelineCapsuleLocator.getAttribute("data-test-progress"),
+          "Recording did not finish loading"
+        ).toBe("100");
+      } else {
+        throw new Error("Recording did not finish processing");
+      }
     },
     {
       retryInterval: 1_000,
