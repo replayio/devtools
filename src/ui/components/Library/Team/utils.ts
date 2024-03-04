@@ -12,7 +12,9 @@ export function parseQueryParams(query: ParsedUrlQuery) {
   let testRunId: string | undefined;
   let testId: string | undefined;
 
-  assert(!view || view === "runs" || view === "tests" || view === "recordings");
+  assert(
+    !view || view === "runs" || view === "tests" || view === "recordings" || view === "settings"
+  );
 
   switch (view) {
     case "runs": {
