@@ -9,7 +9,7 @@ import {
 } from "../helpers/console-panel";
 import test from "../testFixtureCloneRecording";
 
-test.use({ exampleKey: "doc_rr_objects_chromium.html" });
+test.use({ exampleKey: "doc_rr_objects.html" });
 
 test(`object_preview-06: HTML elements`, async ({
   pageWithMeta: { page, recordingId },
