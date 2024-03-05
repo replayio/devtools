@@ -106,7 +106,11 @@ function WorkspaceMemberRoles({
   const selectViewerRole = (selected: boolean) => {
     // when switching to viewer role, we remove debugger
     if (selected) {
-      updateRoles(roles.filter(r => r !== "debugger"));
+      const updatedRoles = roles.filter(r => r !== "debugger");
+      if (!updatedRoles.includes("viewer")) {
+        updatedRoles.push("viewer");
+      }
+      updateRoles(updatedRoles);
     }
   };
 
