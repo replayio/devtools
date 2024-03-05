@@ -1,6 +1,8 @@
 /* Copyright 2024 Record Replay Inc. */
 
 import { exec, execSync } from "child_process";
+import http from "http";
+import os from "os";
 import path from "path";
 import chalk from "chalk";
 import difference from "lodash/difference";
@@ -138,7 +140,55 @@ function githubUrlToRepository(url) {
   return url?.replace(/.*github.com[:\/](.*)\.git/, "$1");
 }
 
-export default function run_fe_tests(
+function waitForHTTPStatus(
+  url: string,
+  statusCode: number = 200, // by default we wait for OK
+  timeoutMs = 15000, // keep waiting for 15s total
+  retryTime = 1000 // retry after 1s
+): Promise<void> {
+  const startTime = Date.now();
+  return new Promise((resolve, reject) => {
+    function attemptConnection() {
+      const request = http.get(url, res => {
+        if (res.statusCode === statusCode) {
+          resolve();
+          return;
+        }
+
+        console.error(`Server is up, but responded with status code ${res.statusCode}`);
+
+        if (Date.now() - startTime >= timeoutMs) {
+          reject(
+            new Error(`Server did not respond with 200 OK within ${timeoutMs / 1000} seconds`)
+          );
+          return;
+        }
+
+        setTimeout(attemptConnection, 1000); // Retry after 1 second
+      });
+
+      request.on("error", (err: Error) => {
+        if (err["code"] === "ECONNREFUSED") {
+          if (Date.now() - startTime >= timeoutMs) {
+            reject(new Error(`Failed to connect to the server within ${timeoutMs / 1000} seconds`));
+            return;
+          }
+
+          setTimeout(attemptConnection, 1000); // Retry after 1 second if connection was refused
+          return;
+        }
+
+        reject(new Error(`Error while trying to connect to the server: ${err.message}`));
+      });
+
+      request.end();
+    }
+
+    attemptConnection();
+  });
+}
+
+export default async function run_fe_tests(
   CHROME_BINARY_PATH,
   runInCI = true,
   nWorkers = 4,
@@ -150,7 +200,7 @@ export default function run_fe_tests(
   console.group("START");
   console.time("START time");
 
-  const envWrapper = runInCI ? "xvfb-run" : "";
+  const envWrapper = runInCI && os.platform() === "linux" ? "xvfb-run" : "";
   const TestRootPath = path.join(
     process.env.REPLAY_DIR ? path.join(process.env.REPLAY_DIR, "devtools") : ".",
     "packages/e2e-tests"
@@ -191,7 +241,7 @@ export default function run_fe_tests(
     });
 
     // Start the webserver.
-    webProc = exec("yarn dev", (error, stdout, stderr) => {
+    webProc = exec("npx yarn dev", (error, stdout, stderr) => {
       if (error) {
         console.error(`yarn dev exec ERROR: ${error}`);
       }
@@ -205,8 +255,10 @@ export default function run_fe_tests(
       stdio: "inherit",
     });
 
-    // Wait a little, to let the yarn dev server start up.
-    execSync("sleep 2");
+    // make sure the dev server is up and running.
+    console.log("waiting for dev server to start up");
+    await waitForHTTPStatus("http://localhost:8080/");
+    console.log("dev server up, continuing with test");
   }
 
   try {
