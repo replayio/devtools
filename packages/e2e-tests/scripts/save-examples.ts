@@ -230,6 +230,8 @@ async function saveBrowserExample({ example }: TestRunCallbackArgs) {
   const exampleUrl = `${config.devtoolsUrl}/test/examples/${example.filename}`;
   async function defaultPlaywrightScript(page: Page) {
     await waitUntilMessage(page as Page, "ExampleFinished");
+    // add a little delay to ensure that the recording is complete, see [FE-2286] and [RUN-3258]
+    await sleep(500);
     console.log("Example finished");
   }
   const playwrightScript: PlaywrightScript = example.playwrightScript ?? defaultPlaywrightScript;

@@ -8,7 +8,7 @@ import { clickSourceTreeNode } from "../helpers/source-explorer-panel";
 import { addBreakpoint } from "../helpers/source-panel";
 import test from "../testFixtureCloneRecording";
 
-test.use({ exampleKey: "doc_rr_objects_chromium.html" });
+test.use({ exampleKey: "doc_rr_objects.html" });
 
 test("stepping-07: Test quick stepping using the keyboard", async ({
   pageWithMeta: { page, recordingId },

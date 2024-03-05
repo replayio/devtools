@@ -12,7 +12,7 @@ import {
 import { seekToTimePercent } from "../helpers/timeline";
 import test from "../testFixtureCloneRecording";
 
-test.use({ exampleKey: "doc_stacking_chromium.html" });
+test.use({ exampleKey: "doc_stacking.html" });
 
 test("elements-search: Element panel should support basic and advanced search modes", async ({
   pageWithMeta: { page, recordingId },

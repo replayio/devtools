@@ -20,7 +20,7 @@ test("inspector-rules-01: Basic CSS rules should be viewed", async ({
 
   await openElementsPanel(page);
 
-  await selectElementsListRow(page, { text: "maindiv" });
+  await selectElementsListRow(page, { text: 'id="maindiv"' });
   await checkAppliedRules(page, [
     {
       selector: "div::first-letter",
@@ -59,7 +59,7 @@ test("inspector-rules-01: Basic CSS rules should be viewed", async ({
     },
   ]);
 
-  await selectElementsListRow(page, { text: "conflict" });
+  await selectElementsListRow(page, { text: 'id="conflict"' });
   await checkAppliedRules(page, [
     {
       selector: "div::first-letter",
@@ -107,7 +107,7 @@ test("inspector-rules-01: Basic CSS rules should be viewed", async ({
     },
   ]);
 
-  await selectElementsListRow(page, { text: "important" });
+  await selectElementsListRow(page, { text: 'id="important"' });
   await checkAppliedRules(page, [
     {
       selector: "div::first-letter",
