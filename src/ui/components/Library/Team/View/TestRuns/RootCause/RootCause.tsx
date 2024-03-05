@@ -1,14 +1,12 @@
 import { createContext } from "react";
 
-import { EventKind } from "ui/state/app";
-
 import { Collapsible } from "./Collapsible";
 import { ExecutedStatementSequences } from "./ExecutedStatement";
 import { NetworkEventSequences } from "./NetworkEvent";
 import { ReactComponentSequences } from "./ReactComponent";
 import {
   AnyDiscrepancy,
-  Data,
+  EventKind,
   ExecutedStatementDiscrepancy,
   NetworkEventDiscrepancy,
   ReactComponentDiscrepancy,

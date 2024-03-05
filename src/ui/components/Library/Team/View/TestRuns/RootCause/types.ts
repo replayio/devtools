@@ -175,3 +175,5 @@ interface LocationDescription {
 interface ReactComponent extends DiscrepancyEvent {
   nodeName: string;
 }
+
+export type EventKind = string;
