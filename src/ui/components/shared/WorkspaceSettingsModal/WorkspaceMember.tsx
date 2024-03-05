@@ -49,7 +49,7 @@ function WorkspaceMemberRoleOption({
   value: WorkspaceUserRole;
   selected: boolean;
   disabled?: boolean;
-  onSelect: (value: WorkspaceUserRole) => void;
+  onSelect: (selected: boolean, value: WorkspaceUserRole) => void;
 }) {
   return (
     <label
@@ -64,7 +64,7 @@ function WorkspaceMemberRoleOption({
         value={value}
         checked={selected}
         disabled={disabled}
-        onChange={e => onSelect(value)}
+        onChange={e => onSelect(!selected, value)}
       />
       <span className="pl-2">{memberRoleLabels[value]}</span>
     </label>
@@ -85,27 +85,13 @@ function WorkspaceMemberRoles({
   const { updateWorkspaceMemberRole } = hooks.useUpdateWorkspaceMemberRole();
   const [loading, setLoading] = useState(false);
 
-  const selectRole = (role: WorkspaceUserRole) => {
-    let updatedRoles = new Set(roles);
-    switch (role) {
-      case "viewer":
-        updatedRoles.delete("debugger");
-        break;
-      case "contributor":
-      case "debugger":
-        updatedRoles.add(role);
-        break;
-      case "admin":
-        updatedRoles.has(role) ? updatedRoles.delete(role) : updatedRoles.add(role);
-        break;
-    }
-
+  const updateRoles = (roles: string[]) => {
     setLoading(true);
 
     updateWorkspaceMemberRole({
       variables: {
         id: member.membershipId,
-        roles: [...updatedRoles],
+        roles,
       },
     })
       .catch(e => {
@@ -117,24 +103,47 @@ function WorkspaceMemberRoles({
       });
   };
 
+  const selectViewerRole = (selected: boolean) => {
+    // when switching to viewer role, we remove debugger
+    if (selected) {
+      updateRoles(roles.filter(r => r !== "debugger"));
+    }
+  };
+
+  const selectDebuggerRole = (selected: boolean) => {
+    // when switching to debugger role, we add debugger but retain viewer
+    // because all members should have the viewer role
+    if (selected) {
+      updateRoles([...roles, "debugger"]);
+    }
+  };
+
+  const toggleAdminRole = (selected: boolean) => {
+    if (selected) {
+      updateRoles([...roles, "admin"]);
+    } else {
+      updateRoles(roles.filter(r => r !== "admin"));
+    }
+  };
+
   return (
     <div>
       <WorkspaceMemberRoleOption
         value="viewer"
-        onSelect={selectRole}
+        onSelect={selectViewerRole}
         disabled={loading}
         selected={!roles.includes("debugger")}
       />
       <WorkspaceMemberRoleOption
         value="debugger"
-        onSelect={selectRole}
+        onSelect={selectDebuggerRole}
         disabled={loading}
         selected={roles.includes("debugger")}
       />
       {isAdmin ? (
         <WorkspaceMemberRoleOption
           value="admin"
-          onSelect={selectRole}
+          onSelect={toggleAdminRole}
           disabled={loading}
           selected={memberIsAdmin}
         />
