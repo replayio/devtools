@@ -35,6 +35,8 @@ export class ReplayWall implements Wall {
   private setProtocolCheckFailed: (failed: boolean) => void;
   private unhighlightNode: () => void;
 
+  private pauseIdListeners = new Set<() => void>();
+
   // HACK The Wall requires the Store and the Store requires the Wall
   // So this value is set by the caller after initialization
   public store: StoreWithInternals | null = null;
@@ -65,8 +67,20 @@ export class ReplayWall implements Wall {
     this.unhighlightNode = unhighlightNode;
   }
 
+  getPauseId() {
+    return this.pauseId;
+  }
+
   setPauseId(pauseId: string) {
     this.pauseId = pauseId;
+    for (const listener of this.pauseIdListeners) {
+      listener();
+    }
+  }
+
+  subscribeToPauseIdChange(callback: () => void) {
+    this.pauseIdListeners.add(callback);
+    return () => this.pauseIdListeners.delete(callback);
   }
 
   // called by the frontend to register a listener for receiving backend messages

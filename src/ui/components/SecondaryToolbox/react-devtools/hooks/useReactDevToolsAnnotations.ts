@@ -79,8 +79,6 @@ export function useReactDevToolsAnnotations({
           ? annotations.slice(0, firstExcludedAnnotationIndex)
           : annotations;
 
-      wall.setPauseId(currentPauseId);
-
       // We keep the one RDT UI component instance alive, but operations are additive over time.
       // In order to reset the displayed component tree, we first need to generate a set of fake
       // "remove this React root" operations based on where we _were_ paused, and inject those.
@@ -101,6 +99,8 @@ export function useReactDevToolsAnnotations({
           wall.sendAnnotation(contents);
         }
       }
+
+      wall.setPauseId(currentPauseId);
 
       cacheRendererIdsToFiberIds(currentPauseId, wall.store!);
 

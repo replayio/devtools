@@ -135,6 +135,12 @@ function ReactDevToolsPanelInner({
     wall,
   });
 
+  const wallPauseId = useSyncExternalStore(
+    callback => wall.subscribeToPauseIdChange(callback),
+    () => wall.getPauseId(),
+    () => wall.getPauseId()
+  );
+
   if (isPlaying) {
     return (
       <div className={styles.DisabledDuringPlaybackMessage} data-test-id="ReactDevToolsPanel">
@@ -241,7 +247,7 @@ function ReactDevToolsPanelInner({
           order={2}
           ref={rightPanelRef}
         >
-          {listData && pauseId && selectedElementForDetailsPanel ? (
+          {listData && pauseId && wallPauseId === pauseId && selectedElementForDetailsPanel ? (
             <InlineErrorBoundary
               fallback={
                 <SelectedElementErrorBoundaryFallback element={selectedElementForDetailsPanel} />
