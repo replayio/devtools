@@ -145,7 +145,6 @@ export async function createSession(
     recordingId,
     experimentalSettings,
     focusRequest: focusWindow,
-    blockOnProcessing: true,
   });
 
   setSessionCallbacks(sessionCallbacks);
