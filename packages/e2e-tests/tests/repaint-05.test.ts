@@ -5,8 +5,8 @@ import test, { Page, expect } from "../testFixtureCloneRecording";
 
 test.use({ exampleKey: "paint_at_intervals.html" });
 
-async function seekToTimePercentAndWaitForPaint(page: Page, time: number) {
-  await seekToTimePercent(page, time);
+async function seekToTimePercentAndWaitForPaint(page: Page, percent: number) {
+  await seekToTimePercent(page, percent);
   await waitForGraphicsToLoad(page);
 }
 

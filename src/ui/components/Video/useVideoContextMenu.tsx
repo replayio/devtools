@@ -17,12 +17,12 @@ import { Nag } from "shared/graphql/types";
 import { createFrameComment } from "ui/actions/comments";
 import { setSelectedPanel, setViewMode } from "ui/actions/layout";
 import { stopPlayback } from "ui/actions/timeline";
-import { getMouseEventPosition } from "ui/components/Video/getMouseEventPosition";
+import { getMouseEventPosition } from "ui/components/Video/imperative/getMouseEventPosition";
 import { isPlaying as isPlayingSelector } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { boundingRectsCache, getMouseTarget } from "ui/suspense/nodeCaches";
 
-import styles from "./VideoContextMenu.module.css";
+import styles from "./Video.module.css";
 
 export default function useVideoContextMenu() {
   const { showCommentsPanel } = useContext(InspectorContext);
@@ -128,14 +128,14 @@ export default function useVideoContextMenu() {
           onSelect={() => addComment(mouseEventDataRef.current)}
         >
           <>
-            <Icon className={styles.Icon} type="comment" />
+            <Icon className={styles.ContextMenuIcon} type="comment" />
             Add comment
           </>
         </ContextMenuItem>
       )}
       <ContextMenuItem onSelect={inspectElement}>
         <>
-          <Icon className={styles.Icon} type="inspect" />
+          <Icon className={styles.ContextMenuIcon} type="inspect" />
           Inspect element
         </>
       </ContextMenuItem>

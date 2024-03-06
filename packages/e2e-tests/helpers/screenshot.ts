@@ -96,23 +96,21 @@ export async function getGraphicsTime(page: Page): Promise<number | null> {
 export async function getGraphicsPixelColor(page: Page, x: number, y: number) {
   return await page.evaluate(
     ([x, y]) => {
-      const element = document.querySelector("#graphics");
-      if (element == null) {
+      const element = document.querySelector("#graphics") as HTMLImageElement;
+      if (!element?.getAttribute("src")) {
         return null;
       }
 
-      const imageElement = element as HTMLImageElement;
-
       const canvas = document.createElement("canvas");
-      canvas.width = imageElement.width;
-      canvas.height = imageElement.height;
+      canvas.width = element.width;
+      canvas.height = element.height;
 
       const context = canvas.getContext("2d");
       if (context == null) {
         return null;
       }
 
-      context.drawImage(imageElement, 0, 0);
+      context.drawImage(element, 0, 0);
 
       const { data } = context.getImageData(x, y, 1, 1);
 
@@ -127,7 +125,9 @@ export async function getGraphicsPixelColor(page: Page, x: number, y: number) {
 }
 
 export async function waitForGraphicsToLoad(page: Page) {
+  await debugPrint(page, `Waiting for graphics to load...`, "waitForGraphicsToLoad");
+
   await waitFor(async () => {
-    await expect(await getGraphicsStatus(page)).not.toBe("fetching-cached-paint");
+    await expect(await getGraphicsStatus(page)).toBe("loaded");
   });
 }

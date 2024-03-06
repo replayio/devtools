@@ -1,7 +1,7 @@
 import { createSingleEntryCache } from "suspense";
 
-import { StreamingScreenShotCache } from "protocol/StreamingScreenShotCache";
 import { recordingTargetCache } from "replay-next/src/suspense/BuildIdCache";
+import { screenshotCache } from "replay-next/src/suspense/ScreenshotCache";
 import { find, findIndexGTE, findIndexLTE } from "replay-next/src/utils/array";
 import { getDimensions } from "replay-next/src/utils/image";
 import { replayClient } from "shared/client/ReplayClientContext";
@@ -41,17 +41,16 @@ export async function findFirstMeaningfulPaint() {
       const paint = paints[index];
 
       try {
-        const { value } = await StreamingScreenShotCache.readAsync(
-          replayClient,
-          paint.time,
-          paint.point
-        );
-        if (value && value.hash) {
-          const { width, height } = await getDimensions(value.hash, value.mimeType);
+        const screenShot = paint.paintHash
+          ? await screenshotCache.readAsync(replayClient, paint.point, paint.paintHash)
+          : undefined;
+
+        if (screenShot && screenShot.hash) {
+          const { width, height } = await getDimensions(screenShot.hash, screenShot.mimeType);
 
           // Estimate how "interesting" the screen is based on what % of the image is different pixels.
           // This is done to avoid showing something like a blank page or a mostly empty loading screen.
-          if (value.data.length > (width * height) / 40) {
+          if (screenShot.data.length > (width * height) / 40) {
             return paint;
           }
         }

@@ -3,7 +3,7 @@ import { ReactNode, useLayoutEffect, useRef } from "react";
 
 import { getNodeBoxModelById } from "devtools/client/inspector/markup/reducers/markup";
 import { assert } from "protocol/utils";
-import { subscribe } from "ui/components/Video/MutableGraphicsState";
+import { state } from "ui/components/Video/imperative/MutableGraphicsState";
 import { useAppSelector } from "ui/setup/hooks";
 
 // Note that the order of items in this array is important because it is used
@@ -112,7 +112,7 @@ export function PreviewNodeHighlighter({ nodeId }: { nodeId: string }) {
   useLayoutEffect(() => {
     const element = elementRef.current;
     if (element) {
-      return subscribe(state => {
+      return state.listen(state => {
         const { localScale, recordingScale } = state;
         const scale = localScale * recordingScale;
 

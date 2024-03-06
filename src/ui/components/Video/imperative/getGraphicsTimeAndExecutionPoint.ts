@@ -1,7 +1,6 @@
-import { useDeferredValue } from "react";
+import { TimeStampedPointRange } from "@replayio/protocol";
 
 import { getExecutionPoint, getTime } from "devtools/client/debugger/src/selectors";
-import { useCurrentFocusWindow } from "replay-next/src/hooks/useCurrentFocusWindow";
 import { isTimeInRegion } from "shared/utils/time";
 import {
   getCurrentTime,
@@ -9,19 +8,24 @@ import {
   getPlayback,
   getShowHoverTimeGraphics,
 } from "ui/reducers/timeline";
-import { useAppSelector } from "ui/setup/hooks";
+import { UIState } from "ui/state";
 
-export function useSmartTimeAndExecutionPoint() {
-  const playbackState = useAppSelector(getPlayback);
-  const hoverTime = useAppSelector(getHoverTime);
-  const preferHoverTime = useAppSelector(getShowHoverTimeGraphics);
-  const pauseExecutionPoint = useAppSelector(getExecutionPoint);
-  const pauseTime = useAppSelector(getTime);
-  const currentTime = useAppSelector(getCurrentTime);
-  const focusWindow = useCurrentFocusWindow();
+export function getGraphicsTimeAndExecutionPoint(
+  state: UIState,
+  focusWindow: TimeStampedPointRange | null
+) {
+  const playbackState = getPlayback(state);
+  const hoverTime = getHoverTime(state);
+  const preferHoverTime = getShowHoverTimeGraphics(state);
+  const pauseExecutionPoint = getExecutionPoint(state);
+  const pauseTime = getTime(state);
+  const currentTime = getCurrentTime(state);
+
+  const isHovering = preferHoverTime;
+  const isPlaying = playbackState != null;
 
   let preferCurrentTime = false;
-  if (playbackState != null) {
+  if (isPlaying) {
     preferCurrentTime = true;
   } else if (
     focusWindow &&
@@ -47,16 +51,16 @@ export function useSmartTimeAndExecutionPoint() {
     preferCurrentTime = true;
   }
 
+  let time: number;
   let executionPoint: string | null = null;
-  let time = 0;
   if (preferCurrentTime) {
     time = currentTime;
-  } else if (preferHoverTime && hoverTime != null) {
+  } else if (isHovering && hoverTime != null) {
     time = hoverTime;
   } else {
     time = pauseTime;
     executionPoint = pauseExecutionPoint;
   }
 
-  return useDeferredValue({ executionPoint, time });
+  return { executionPoint, time };
 }

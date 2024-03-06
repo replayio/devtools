@@ -4,7 +4,7 @@ import { useLayoutEffect, useRef } from "react";
 import { isVisualCommentTypeData } from "replay-next/components/sources/utils/comments";
 import { Comment } from "shared/graphql/types";
 import { setHoveredCommentId, setSelectedCommentId } from "ui/actions/app";
-import { subscribe } from "ui/components/Video/MutableGraphicsState";
+import { state } from "ui/components/Video/imperative/MutableGraphicsState";
 import { useAppDispatch } from "ui/setup/hooks";
 
 import styles from "./VideoComment.module.css";
@@ -26,8 +26,8 @@ export default function VideoComment({
     const element = elementRef.current;
     if (element) {
       // Imperatively position and scale these graphics to avoid "render lag" when resizes occur
-      return subscribe(state => {
-        const { height, width } = state;
+      return state.listen(state => {
+        const { height, width } = state.graphicsRect;
         const { scaledX, scaledY } = typeData;
 
         element.style.left = `${scaledX * width}px`;
