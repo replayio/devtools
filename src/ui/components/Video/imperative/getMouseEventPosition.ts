@@ -1,8 +1,9 @@
-import { mutableState } from "ui/components/Video/MutableGraphicsState";
+import { state } from "ui/components/Video/imperative/MutableGraphicsState";
 
 // Get the x/y coordinate of a mouse event relative to the recording's DOM.
 export function getMouseEventPosition(event: MouseEvent) {
-  const { height, left, localScale, recordingScale, top, width } = mutableState;
+  const { graphicsRect, localScale, recordingScale } = state.read();
+  const { height, left, top, width } = graphicsRect;
 
   if (
     event.clientX < left ||

@@ -13,7 +13,7 @@ import {
 import { highlightNode, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 import { useMostRecentLoadedPause } from "replay-next/src/hooks/useMostRecentLoadedPause";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { getMouseEventPosition } from "ui/components/Video/getMouseEventPosition";
+import { getMouseEventPosition } from "ui/components/Video/imperative/getMouseEventPosition";
 import { useAppDispatch } from "ui/setup/hooks";
 import { boundingRectsCache, getMouseTarget } from "ui/suspense/nodeCaches";
 

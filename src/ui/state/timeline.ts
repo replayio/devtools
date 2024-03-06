@@ -1,4 +1,4 @@
-import { Location, TimeStampedPoint } from "@replayio/protocol";
+import { ExecutionPoint, Location, TimeStampedPoint } from "@replayio/protocol";
 
 export interface TimeRange {
   begin: number;
@@ -20,13 +20,13 @@ export interface TimelineState {
   markTimeStampedPoint: TimeStampedPoint | null;
   maxRecordingDurationForRoutines: number;
   playback: {
+    beginPoint: ExecutionPoint | null;
     beginTime: number;
-    beginDate: number;
+    endPoint: ExecutionPoint | null;
     endTime: number;
     time: number;
   } | null;
   playbackFocusWindow: boolean;
-  playbackPrecachedTime: number;
   endpoint: TimeStampedPoint;
   recordingDuration: number | null;
   shouldAnimate: boolean;
@@ -55,6 +55,8 @@ export enum FocusOperation {
 }
 
 export type PlaybackOptions = {
+  beginPoint?: ExecutionPoint | null;
   beginTime: number | null;
+  endPoint?: ExecutionPoint | null;
   endTime: number | null;
 };

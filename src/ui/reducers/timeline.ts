@@ -20,7 +20,6 @@ function initialTimelineState(): TimelineState {
     hoverTime: null,
     playback: null,
     playbackFocusWindow: false,
-    playbackPrecachedTime: 0,
     endpoint: { time: 0, point: "0" },
     recordingDuration: null,
     shouldAnimate: true,
@@ -51,9 +50,6 @@ const timelineSlice = createSlice({
     setHoveredItem(state, action: PayloadAction<HoveredItem | null>) {
       state.hoveredItem = action.payload;
     },
-    setPlaybackPrecachedTime(state, action: PayloadAction<number>) {
-      state.playbackPrecachedTime = action.payload;
-    },
     setPlaybackFocusWindow(state, action: PayloadAction<boolean>) {
       state.playbackFocusWindow = action.payload;
     },
@@ -70,7 +66,6 @@ export const {
   setDragging,
   setHoveredItem,
   setMarkTimeStampPoint,
-  setPlaybackPrecachedTime,
   setPlaybackFocusWindow,
   setFocusWindow,
   setTimelineState,
@@ -92,7 +87,6 @@ export const getTimelineDimensions = (state: UIState) => state.timeline.timeline
 export const getMarkTimeStampedPoint = (state: UIState) => state.timeline.markTimeStampedPoint;
 export const getHoveredItem = (state: UIState) => state.timeline.hoveredItem;
 export const getEndpoint = (state: UIState) => state.timeline.endpoint;
-export const getPlaybackPrecachedTime = (state: UIState) => state.timeline.playbackPrecachedTime;
 export const getPlaybackFocusWindow = (state: UIState) => state.timeline.playbackFocusWindow;
 export const getFocusWindow = (state: UIState) => state.timeline.focusWindow;
 export const isMaximumFocusWindow = (state: UIState) => {
