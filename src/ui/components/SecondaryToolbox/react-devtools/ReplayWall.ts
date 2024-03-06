@@ -1,4 +1,4 @@
-import { ObjectId } from "@replayio/protocol";
+import { ObjectId, PauseId } from "@replayio/protocol";
 import type { SerializedElement, Store, Wall } from "@replayio/react-devtools-inline/frontend";
 import React from "react";
 
@@ -24,6 +24,11 @@ export type StoreWithInternals = Store & {
   _idToElement: Map<number, ElementWithChildren>;
 };
 
+interface Waiter {
+  promise: Promise<void>;
+  resolve: () => void;
+}
+
 export class ReplayWall implements Wall {
   private disableNodePicker: NodePickerContextType["disable"];
   private dismissInspectComponentNag: () => void;
@@ -34,6 +39,8 @@ export class ReplayWall implements Wall {
   private replayClient: ReplayClientInterface;
   private setProtocolCheckFailed: (failed: boolean) => void;
   private unhighlightNode: () => void;
+
+  private pauseIdWaiters = new Map<PauseId, Waiter>();
 
   // HACK The Wall requires the Store and the Store requires the Wall
   // So this value is set by the caller after initialization
@@ -67,6 +74,25 @@ export class ReplayWall implements Wall {
 
   setPauseId(pauseId: string) {
     this.pauseId = pauseId;
+    this.pauseIdWaiters.get(pauseId)?.resolve();
+    this.pauseIdWaiters.delete(pauseId);
+  }
+
+  private async waitForPauseId(pauseId: PauseId) {
+    if (this.pauseId === pauseId) {
+      return;
+    }
+
+    const waiter = this.pauseIdWaiters.get(pauseId);
+    if (waiter) {
+      await waiter.promise;
+      return;
+    }
+
+    let resolve!: () => void;
+    const promise = new Promise<void>(_resolve => (resolve = _resolve));
+    this.pauseIdWaiters.set(pauseId, { promise, resolve });
+    await promise;
   }
 
   // called by the frontend to register a listener for receiving backend messages
@@ -96,7 +122,14 @@ export class ReplayWall implements Wall {
     this.listener?.(message);
   }
 
+  async sendAtPauseId(event: string, payload: any, pauseId: PauseId) {
+    await this.waitForPauseId(pauseId);
+    return await this.send(event, payload);
+  }
+
   // Called by the frontend to send a request to the backend
+  // Don't call this directly if you're sending pause-specific data,
+  // in that case use `sendAtPauseId` instead
   async send(event: string, payload: any) {
     await this.ensureReactDevtoolsBackendLoaded();
 
