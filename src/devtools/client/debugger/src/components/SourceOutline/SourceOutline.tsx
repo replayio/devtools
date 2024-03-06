@@ -26,6 +26,7 @@ import { getOutlineSymbols } from "./getOutlineSymbols";
 import { isFunctionOutline } from "./isFunctionOutline";
 import { SourceOutlineClass } from "./SourceOutlineClass";
 import { SourceOutlineFunction } from "./SourceOutlineFunction";
+import styles from "./SourceOutline.module.css";
 
 export function SourceOutline({
   cursorPosition,
@@ -109,7 +110,7 @@ export function SourceOutline({
     [handleSelectSymbol, outlineSymbols, focusedSymbol]
   );
 
-  if (!selectedSource || !symbols) {
+  if (!selectedSource) {
     return (
       <div className="text-themeBodyColor mx-2 mt-2 mb-4 space-y-3 whitespace-normal rounded-lg bg-chrome p-3 text-center text-xs">
         {`Select a source to see available functions`}
@@ -139,6 +140,9 @@ export function SourceOutline({
   return (
     <div className={classnames("flex h-full flex-col space-y-2")}>
       <OutlineFilter filter={filter} updateFilter={setFilter} />
+      {symbols.hasHitCounts || (
+        <div className={styles.Warning}>Outline hit counts could not be loaded for this source</div>
+      )}
       <div className="outline-list flex-grow">
         <AutoSizer
           children={({ height, width }) => {
