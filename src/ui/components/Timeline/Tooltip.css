@@ -10,7 +10,6 @@
   background: var(--body-bgcolor);
   padding: 0.375rem 0.5rem;
   border: 1px solid var(--theme-toggle-bgcolor);
-  transform: translateX(-50%);
   pointer-events: none;
   user-select: none;
   white-space: nowrap;
