@@ -1,4 +1,3 @@
-import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 
@@ -64,9 +63,6 @@ export default function LibraryLoader() {
   if (userSettingsLoading || userInfo.loading) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
-        <Head>
-          <title>Replay</title>
-        </Head>
         <LibrarySpinner />
       </div>
     );
@@ -104,9 +100,6 @@ function Library({ userSettings, userInfo }: { userSettings: UserSettings; userI
 
   return (
     <div className="flex h-screen w-screen flex-row">
-      <Head>
-        <title>Replay</title>
-      </Head>
       <Navigation />
       <InlineErrorBoundary key={teamId} name="Library">
         <TeamPage />

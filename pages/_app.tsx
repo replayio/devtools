@@ -2,8 +2,9 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { Store } from "@reduxjs/toolkit";
 import type { AppContext, AppProps } from "next/app";
 import NextApp from "next/app";
+import Head from "next/head";
 import { useRouter } from "next/router";
-import React, { ReactNode, useEffect, useState } from "react";
+import React, { ReactNode, memo, useEffect, useState } from "react";
 import { Provider } from "react-redux";
 import "../src/global-css";
 import "../src/test-prep";
@@ -23,6 +24,7 @@ import { useLaunchDarkly } from "ui/utils/launchdarkly";
 import { InstallRouteListener } from "ui/utils/routeListener";
 import tokenManager from "ui/utils/tokenManager";
 import "../src/base.css";
+import { getRecordingId } from "shared/utils/recording";
 
 interface AuthProps {
   apiKey?: string;
@@ -84,13 +86,9 @@ function Routing({ Component, pageProps }: AppProps) {
     return <MaintenanceModeScreen />;
   }
 
-  // Don't set a default title in this component
-  // Else it overrides the recording title when the root error boundary renders
-  // See FE-2041
   return (
     <Provider store={store}>
-    <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
-    <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
+      <MemoizedHeader />
       <RootErrorBoundary replayClient={replayClient}>
         <_App>
           <InstallRouteListener />
@@ -102,6 +100,21 @@ function Routing({ Component, pageProps }: AppProps) {
     </Provider>
   );
 }
+
+  // Don't set a default title within the DevTools app
+  // Else it overrides the recording title when the root error boundary renders
+  // See FE-2041
+const MemoizedHeader = memo(function MemoizedHeader() {
+  const hasRecordingId = getRecordingId() != null;
+
+  return (
+    <Head>
+      <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
+      <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
+      {hasRecordingId || <title>Replay</title>}
+    </Head>
+  );
+});
 
 const App = ({ apiKey, ...props }: AppProps & AuthProps) => {
   useAuthTelemetry();
