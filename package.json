@@ -92,7 +92,7 @@
     "reselect": "^4.1.5",
     "shared": "workspace:*",
     "slugify": "^1.6.5",
-    "suspense": "^0.0.51",
+    "suspense": "^0.0.53",
     "use-context-menu": "0.4.13"
   },
   "devDependencies": {
