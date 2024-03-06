@@ -2,9 +2,8 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { Store } from "@reduxjs/toolkit";
 import type { AppContext, AppProps } from "next/app";
 import NextApp from "next/app";
-import Head from "next/head";
 import { useRouter } from "next/router";
-import React, { ReactNode, memo, useEffect, useState } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import { Provider } from "react-redux";
 import "../src/global-css";
 import "../src/test-prep";
@@ -85,9 +84,13 @@ function Routing({ Component, pageProps }: AppProps) {
     return <MaintenanceModeScreen />;
   }
 
+  // Don't set a default title in this component
+  // Else it overrides the recording title when the root error boundary renders
+  // See FE-2041
   return (
     <Provider store={store}>
-      <MemoizedHeader />
+    <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
       <RootErrorBoundary replayClient={replayClient}>
         <_App>
           <InstallRouteListener />
@@ -99,19 +102,6 @@ function Routing({ Component, pageProps }: AppProps) {
     </Provider>
   );
 }
-
-// Ensure this component only renders once even if the parent component re-renders
-// Otherwise it can temporarily override titles set by child components,
-// causing the document title to flicker.
-const MemoizedHeader = memo(function MemoizedHeader() {
-  return (
-    <Head>
-      <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
-      <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
-      <title>Replay</title>
-    </Head>
-  );
-});
 
 const App = ({ apiKey, ...props }: AppProps & AuthProps) => {
   useAuthTelemetry();
