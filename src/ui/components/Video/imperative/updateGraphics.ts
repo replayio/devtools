@@ -27,6 +27,9 @@ export async function updateGraphics({
   });
 
   await PaintsCache.readAsync();
+  if (abortSignal.aborted) {
+    return;
+  }
 
   // If the current time is before the first paint, we should show nothing
   const paintPoint = findMostRecentPaint(time);

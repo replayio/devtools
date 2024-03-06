@@ -46,7 +46,7 @@ export async function findFirstMeaningfulPaint() {
           : undefined;
 
         if (screenShot && screenShot.hash) {
-          const { width, height } = await getDimensions(screenShot.hash, screenShot.mimeType);
+          const { width, height } = await getDimensions(screenShot.data, screenShot.mimeType);
 
           // Estimate how "interesting" the screen is based on what % of the image is different pixels.
           // This is done to avoid showing something like a blank page or a mostly empty loading screen.
