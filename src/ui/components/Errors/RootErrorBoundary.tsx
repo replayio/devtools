@@ -4,6 +4,7 @@ import { ErrorBoundary, ErrorBoundaryProps } from "react-error-boundary";
 import { UnexpectedErrorForm } from "replay-next/components/errors/UnexpectedErrorForm";
 import { ReplayClientInterface } from "shared/client/types";
 import { setExpectedError, setUnexpectedError } from "ui/actions/errors";
+import { RootErrorDocumentTitle } from "ui/components/Errors/RootErrorDocumentTitle";
 import { useGetUserInfo } from "ui/hooks/users";
 import { getExpectedError, getUnexpectedError } from "ui/reducers/app";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
@@ -50,22 +51,28 @@ export function RootErrorBoundary({
 
   if (expectedError) {
     return (
-      <ExpectedErrorModal
-        action={expectedError.action ?? "refresh"}
-        details={expectedError.content ?? ""}
-        title={expectedError.message ?? "Error"}
-      />
+      <>
+        <RootErrorDocumentTitle />
+        <ExpectedErrorModal
+          action={expectedError.action ?? "refresh"}
+          details={expectedError.content ?? ""}
+          title={expectedError.message ?? "Error"}
+        />
+      </>
     );
   } else if (unexpectedError) {
     return (
-      <UnexpectedErrorForm
-        currentUserEmail={currentUserInfo?.email ?? null}
-        currentUserId={currentUserInfo?.id ?? null}
-        currentUserName={currentUserInfo?.name ?? null}
-        details={unexpectedError.content ?? ""}
-        replayClient={replayClient}
-        title={unexpectedError.message ?? "Session error"}
-      />
+      <>
+        <RootErrorDocumentTitle />
+        <UnexpectedErrorForm
+          currentUserEmail={currentUserInfo?.email ?? null}
+          currentUserId={currentUserInfo?.id ?? null}
+          currentUserName={currentUserInfo?.name ?? null}
+          details={unexpectedError.content ?? ""}
+          replayClient={replayClient}
+          title={unexpectedError.message ?? "Session error"}
+        />
+      </>
     );
   } else {
     return (
