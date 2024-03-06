@@ -1,13 +1,14 @@
-import { FrontendBridge } from "@replayio/react-devtools-inline";
 import { MouseEvent, useContext } from "react";
 
 import Icon from "replay-next/components/Icon";
+import { useMostRecentLoadedPause } from "replay-next/src/hooks/useMostRecentLoadedPause";
 import { NodePickerContext } from "ui/components/NodePickerContext";
 import { ReplayWall } from "ui/components/SecondaryToolbox/react-devtools/ReplayWall";
 
 import styles from "./InspectButton.module.css";
 
 export function InspectButton({ wall }: { wall: ReplayWall }) {
+  const { pauseId } = useMostRecentLoadedPause() ?? {};
   const { status, type } = useContext(NodePickerContext);
 
   let isActive = false;
@@ -35,10 +36,12 @@ export function InspectButton({ wall }: { wall: ReplayWall }) {
     event.preventDefault();
     event.stopPropagation();
 
-    if (isActive) {
-      wall.send("stopInspectingNative", null);
-    } else {
-      wall.send("startInspectingNative", null);
+    if (pauseId) {
+      if (isActive) {
+        wall.sendAtPauseId("stopInspectingNative", null, pauseId);
+      } else {
+        wall.sendAtPauseId("startInspectingNative", null, pauseId);
+      }
     }
   };
 
