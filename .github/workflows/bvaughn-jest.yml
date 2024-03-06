@@ -14,7 +14,7 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith
     steps:
     - name: Check out repository code
       uses: actions/checkout@v4
@@ -23,7 +23,7 @@ jobs:
       id: yarn-cache-dir-path
       run: echo "{dir}={$(yarn config get cacheFolder)}" >> $GITHUB_OUTPUT
     - name: Restore yarn cache
-      uses: actions/cache@v3
+      uses: useblacksmith/cache@v5
       id: yarn-cache
       with:
         path: |
