@@ -10,7 +10,7 @@ on:
 jobs:
   trunk_check_runner:
     name: Trunk Check runner
-    runs-on: ubuntu-latest
+    runs-on: blacksmith
     steps:
       - uses: actions/checkout@v4
       # Get the yarn cache path.
@@ -18,7 +18,7 @@ jobs:
         id: yarn-cache-dir-path
         run: echo "{dir}={$(yarn config get cacheFolder)}" >> $GITHUB_OUTPUT
       - name: Restore yarn cache
-        uses: actions/cache@v3
+        uses: useblacksmith/cache@v5
         id: yarn-cache
         with:
           path: |

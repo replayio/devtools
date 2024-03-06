@@ -4,7 +4,7 @@ on: [pull_request, workflow_dispatch]
 
 jobs:
   typecheck:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith
     steps:
       - uses: actions/checkout@v4
       # Get the yarn cache path.
@@ -12,7 +12,7 @@ jobs:
         id: yarn-cache-dir-path
         run: echo "{dir}={$(yarn config get cacheFolder)}" >> $GITHUB_OUTPUT
       - name: Restore yarn cache
-        uses: actions/cache@v3
+        uses: useblacksmith/cache@v5
         id: yarn-cache
         with:
           path: |
@@ -33,7 +33,7 @@ jobs:
     if: ${{ false }}
     #if: github.event_name == 'workflow_dispatch' || startsWith(github.event.pull_request.head.repo.full_name, 'replayio/')
     name: GraphQL schema types
-    runs-on: ubuntu-latest
+    runs-on: blacksmith
     steps:
       - uses: actions/checkout@v4
       # Get the yarn cache path.
@@ -41,7 +41,7 @@ jobs:
         id: yarn-cache-dir-path
         run: echo "{dir}={$(yarn config get cacheFolder)}" >> $GITHUB_OUTPUT
       - name: Restore yarn cache
-        uses: actions/cache@v3
+        uses: useblacksmith/cache@v5
         id: yarn-cache
         with:
           path: |

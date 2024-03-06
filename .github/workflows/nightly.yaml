@@ -7,7 +7,7 @@ on:
 jobs:
   trunk_check:
     name: Trunk Check Upload
-    runs-on: ubuntu-latest
+    runs-on: blacksmith
 
     steps:
       - name: Checkout

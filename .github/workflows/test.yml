@@ -25,7 +25,7 @@ concurrency:
 jobs:
   download-browser:
     name: Download Replay browser
-    runs-on: ubuntu-latest
+    runs-on: blacksmith
     timeout-minutes: 2
     steps:
       - name: Download
@@ -37,7 +37,7 @@ jobs:
           path: macOS-replay-playwright.tar.xz
   preview-branch:
     name: Wait for Vercel Preview Branch
-    runs-on: ubuntu-latest
+    runs-on: blacksmith
     steps:
       - name: Waiting for 200 from the Vercel Preview
         uses: patrickedqvist/wait-for-vercel-preview@v1.3.1
@@ -51,7 +51,7 @@ jobs:
       url: ${{ steps.waitFor200.outputs.url }}
   generate-test-run-id:
     name: Generate Test Run ID
-    runs-on: ubuntu-latest
+    runs-on: blacksmith
     steps:
       - run: yarn add uuid
         shell: sh
@@ -64,7 +64,7 @@ jobs:
       testRunId: ${{ steps.uuid.outputs.result }}
   e2etest:
     name: End-to-end tests (${{ matrix.shard }})
-    runs-on: ubuntu-latest
+    runs-on: blacksmith
     needs: [preview-branch, generate-test-run-id]
     strategy:
       # GH cancels other matrixed jobs by default if one fails. We want all E2E jobs to complete.
@@ -75,7 +75,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Setup node
-        uses: actions/setup-node@v4
+        uses: useblacksmith/setup-node@v5
         with:
           node-version: "16"
       # Get the yarn cache path.
@@ -83,7 +83,7 @@ jobs:
         id: yarn-cache-dir-path
         run: echo "{dir}={$(yarn config get cacheFolder)}" >> $GITHUB_OUTPUT
       - name: Restore yarn cache
-        uses: actions/cache@v3
+        uses: useblacksmith/cache@v5
         id: yarn-cache
         with:
           path: |
@@ -129,7 +129,7 @@ jobs:
           public: true
   authenticated-e2etest:
     name: Authenticated end-to-end tests (${{ matrix.shard }})
-    runs-on: ubuntu-latest
+    runs-on: blacksmith
     needs: [preview-branch, generate-test-run-id]
     strategy:
       # GH cancels other matrixed jobs by default if one fails. We want all E2E jobs to complete.
@@ -140,7 +140,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Setup node
-        uses: actions/setup-node@v4
+        uses: useblacksmith/setup-node@v5
         with:
           node-version: "16"
       # Get the yarn cache path.
@@ -148,7 +148,7 @@ jobs:
         id: yarn-cache-dir-path
         run: echo "{dir}={$(yarn config get cacheFolder)}" >> $GITHUB_OUTPUT
       - name: Restore yarn cache
-        uses: actions/cache@v3
+        uses: useblacksmith/cache@v5
         id: yarn-cache
         with:
           path: |
@@ -191,12 +191,12 @@ jobs:
           public: true
   unit-test:
     name: Unit Tests
-    runs-on: ubuntu-latest
+    runs-on: blacksmith
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
       - name: Setup node
-        uses: actions/setup-node@v4
+        uses: useblacksmith/setup-node@v5
         with:
           node-version: "16"
       # Get the yarn cache path.
@@ -204,7 +204,7 @@ jobs:
         id: yarn-cache-dir-path
         run: echo "{dir}={$(yarn config get cacheFolder)}" >> $GITHUB_OUTPUT
       - name: Restore yarn cache
-        uses: actions/cache@v3
+        uses: useblacksmith/cache@v5
         id: yarn-cache
         with:
           path: |

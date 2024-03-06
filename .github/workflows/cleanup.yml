@@ -12,7 +12,7 @@ on:
 
 jobs:
   clean:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith
     steps:
       - name: cleanup
         uses: glassechidna/artifact-cleaner@master
