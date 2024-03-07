@@ -141,7 +141,7 @@ function createHttpLink(token: string | undefined, testScope: string | null) {
   const wsLink = new GraphQLWsLink(
     createClient({
       url: process.env.NEXT_PUBLIC_API_SUBSCRIPTION_URL!,
-      connectionParams: { token },
+      connectionParams: { token, testScope },
     })
   );
 
