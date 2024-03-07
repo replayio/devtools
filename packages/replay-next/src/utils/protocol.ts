@@ -135,59 +135,54 @@ export async function protocolValueToClientValue(
 
       let preview: string | undefined;
       let type: ValueType = "object";
-      switch (className) {
-        case "Array":
-        case "BigInt64Array":
-        case "BigUint64Array":
-        case "Float32Array":
-        case "Float64Array":
-        case "Int8Array":
-        case "Int16Array":
-        case "Int32Array":
-        case "Uint8Array":
-        case "Uint8ClampedArray":
-        case "Uint16Array":
-        case "Uint32Array":
-          type = "array";
-          break;
-        case "Date":
-          type = "date";
-          break;
-        case "Function":
-          type = "function";
-          break;
-        case "Map":
-        case "WeakMap":
-          type = "map";
-          break;
-        case "RegExp":
-          type = "regexp";
-          break;
-        case "Set":
-        case "WeakSet":
-          type = "set";
-          break;
-        default:
-          if (
-            className.endsWith("Error") &&
-            object.preview?.properties?.find(property => property.name === "message")
-          ) {
-            type = "error";
-          } else if (className.startsWith("HTML")) {
-            switch (className) {
-              case "HTMLCollection": {
-                type = "array";
-                break;
-              }
-              default: {
-                type = "html-element";
-                break;
-              }
-            }
-          } else if (className === "Text") {
+      if (object.preview?.node?.nodeType === Node.ELEMENT_NODE) {
+        type = "html-element";
+      } else {
+        switch (className) {
+          case "Array":
+          case "BigInt64Array":
+          case "BigUint64Array":
+          case "Float32Array":
+          case "Float64Array":
+          case "Int8Array":
+          case "Int16Array":
+          case "Int32Array":
+          case "Uint8Array":
+          case "Uint8ClampedArray":
+          case "Uint16Array":
+          case "Uint32Array":
+          case "HTMLCollection":
+            type = "array";
+            break;
+          case "Date":
+            type = "date";
+            break;
+          case "Function":
+            type = "function";
+            break;
+          case "Map":
+          case "WeakMap":
+            type = "map";
+            break;
+          case "RegExp":
+            type = "regexp";
+            break;
+          case "Set":
+          case "WeakSet":
+            type = "set";
+            break;
+          case "Text":
             type = "html-text";
-          }
-          break;
+            break;
+          default:
+            if (
+              className.endsWith("Error") &&
+              object.preview?.properties?.find(property => property.name === "message")
+            ) {
+              type = "error";
+            }
+            break;
+        }
       }
 
       return { name, objectId, preview, type };
