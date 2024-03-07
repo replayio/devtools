@@ -102,7 +102,7 @@ function WorkspaceForm() {
     setErrorMessage(null);
     setIsLoading(true);
     await inviteNewWorkspaceMember({
-      variables: { workspaceId: workspaceId!, email: inputValue, roles: ["viewer", "debugger"] },
+      variables: { workspaceId: workspaceId!, email: inputValue },
     });
   };
 
