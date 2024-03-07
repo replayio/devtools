@@ -167,3 +167,13 @@ export const findTestByText = async (page: Page, text: string) => {
   }
   return testItemWithExecutions;
 };
+
+export async function selectTestItem(page: Page, testItem: Locator) {
+  await testItem.click();
+
+  await page.waitForSelector('[data-test-id="NoTestSelected"]', { state: "detached" });
+
+  await waitFor(async () => {
+    await expect(await testItem.getAttribute("data-selected")).toBe("true");
+  });
+}
