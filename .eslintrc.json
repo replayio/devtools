@@ -11,6 +11,7 @@
   },
   "ignorePatterns": [
     "!.storybook",
+    "middleware.ts",
     "test/jest/setupEnv.js",
     "**/*.config.js",
     "**/*.json"
