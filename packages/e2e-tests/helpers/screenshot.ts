@@ -71,6 +71,8 @@ export async function hoverScreenshot(page: Page, xPercentage: number, yPercenta
 }
 
 export async function getGraphicsDataUrl(page: Page): Promise<string | null> {
+  await waitForGraphicsToLoad(page);
+
   return await page.evaluate(() => {
     const element = document.querySelector("#graphics") as HTMLImageElement;
     return element?.src ?? null;
