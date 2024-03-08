@@ -15,7 +15,7 @@ import {
   openReactDevtoolsPanel,
 } from "../helpers/new-react-devtools-panel";
 import { debugPrint, waitFor } from "../helpers/utils";
-import test, { expect } from "../testFixtureCloneRecording";
+import test, { expect } from "../testFixture";
 
 test.use({ exampleKey: "rdt-react-versions/dist/index.html" });
 

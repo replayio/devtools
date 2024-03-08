@@ -14,7 +14,7 @@ import { openReactDevtoolsPanel } from "../helpers/new-react-devtools-panel";
 import { isPassportItemCompleted } from "../helpers/passport";
 import { enablePassport } from "../helpers/settings";
 import { waitFor } from "../helpers/utils";
-import test, { expect } from "../testFixtureCloneRecording";
+import test, { expect } from "../testFixture";
 
 test.use({ exampleKey: "cra/dist/index.html", testUsers: [E2E_USER_1] });
 

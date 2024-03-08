@@ -5,7 +5,7 @@ import {
   toggleSideFilters,
   verifyConsoleMessage,
 } from "../helpers/console-panel";
-import test from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
 test.use({ exampleKey: "doc_exceptions_bundle.html" });
 

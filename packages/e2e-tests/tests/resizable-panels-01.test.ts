@@ -1,7 +1,7 @@
 import { openDevToolsTab, startTest } from "../helpers";
 import { showUserOptionsDropdown } from "../helpers/layout";
 import { debugPrint, delay, waitFor } from "../helpers/utils";
-import test, { Page, expect } from "../testFixtureCloneRecording";
+import test, { Page, expect } from "../testFixture";
 
 async function waitForPanelSize(page: Page, expectedSize: number) {
   await waitFor(async () => {

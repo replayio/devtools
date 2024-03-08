@@ -7,7 +7,7 @@ import {
   selectElementsListRow,
   selectNextElementsPanelSearchResult,
 } from "../helpers/elements-panel";
-import test from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
 test.use({ exampleKey: "doc_inspector_shorthand.html" });
 

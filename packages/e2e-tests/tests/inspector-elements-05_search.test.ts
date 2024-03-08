@@ -6,7 +6,7 @@ import {
   verifySearchResults,
 } from "../helpers/elements-panel";
 import { seekToTimePercent } from "../helpers/timeline";
-import test from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
 test.use({ exampleKey: "doc_inspector_basic.html" });
 

@@ -4,7 +4,7 @@ import {
   verifyToolboxLayout,
   verifyToolboxLayoutOptions,
 } from "../helpers/layout";
-import test from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
 test.use({ exampleKey: "doc_rr_basic.html" });
 
