@@ -321,9 +321,9 @@ export async function inspectCanvasCoordinates(
     "inspectCanvasCoordinates"
   );
 
-  graphicsElement.hover({ position: { x, y } });
-  await delay(250);
-  graphicsElement.click({ position: { x, y } });
+  await graphicsElement.hover({ position: { x, y } });
+  await delay(100);
+  await graphicsElement.click({ position: { x, y } });
 }
 
 export async function openAppliedRulesTab(page: Page) {
