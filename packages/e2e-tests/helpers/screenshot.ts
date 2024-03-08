@@ -96,6 +96,8 @@ export async function getGraphicsTime(page: Page): Promise<number | null> {
 }
 
 export async function getGraphicsPixelColor(page: Page, x: number, y: number) {
+  await waitForGraphicsToLoad(page);
+
   return await page.evaluate(
     ([x, y]) => {
       const element = document.querySelector("#graphics") as HTMLImageElement;
