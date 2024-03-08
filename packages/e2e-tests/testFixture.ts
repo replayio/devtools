@@ -4,6 +4,7 @@ import { Page, test as base } from "@playwright/test";
 import exampleRecordings from "./examples.json";
 import { TestRecordingKey } from "./helpers";
 import { TestUser } from "./helpers/authentication";
+import { resetTestUser } from "./helpers/utils";
 import { loadRecording } from "./scripts/loadRecording";
 
 type TestIsolatedRecordingFixture = {
@@ -52,6 +53,10 @@ const testWithCloneRecording = base.extend<TestIsolatedRecordingFixture>({
         await page.coverage.stopJSCoverage();
       } catch (err: any) {
         console.error("Error stopping JS coverage: ", err);
+      }
+
+      for (const user of testUsers ?? []) {
+        await resetTestUser(user.email, testScope);
       }
     }
   },
