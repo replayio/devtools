@@ -5,7 +5,7 @@ import {
   verifyConsoleMessage,
 } from "../helpers/console-panel";
 import { getByTestName } from "../helpers/utils";
-import test, { expect } from "../testFixtureCloneRecording";
+import test, { expect } from "../testFixture";
 
 test.use({ exampleKey: "node/objects.js" });
 

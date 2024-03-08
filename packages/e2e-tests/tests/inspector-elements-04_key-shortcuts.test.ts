@@ -11,7 +11,7 @@ import {
 } from "../helpers/elements-panel";
 import { closeSidePanel } from "../helpers/pause-information-panel";
 import { waitFor } from "../helpers/utils";
-import test from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
 test.use({ exampleKey: "doc_stacking.html" });
 // ref: `doc_stacking.html`

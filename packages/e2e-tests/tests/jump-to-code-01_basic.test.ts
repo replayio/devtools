@@ -15,7 +15,7 @@ import {
 } from "../helpers/source-panel";
 import { getTimelineCurrentPercent } from "../helpers/timeline";
 import { debugPrint, getByTestName, waitFor } from "../helpers/utils";
-import test from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
 test.use({ exampleKey: "redux-fundamentals/dist/index.html" });
 

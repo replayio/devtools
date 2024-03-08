@@ -10,7 +10,7 @@ import {
 import { openSource } from "../helpers/source-explorer-panel";
 import { addLogpoint } from "../helpers/source-panel";
 import { clearFocusRange, setFocusRange } from "../helpers/timeline";
-import test from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
 test.use({ exampleKey: "doc_rr_region_loading.html" });
 

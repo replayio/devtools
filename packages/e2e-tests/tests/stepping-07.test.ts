@@ -6,7 +6,7 @@ import {
 } from "../helpers/pause-information-panel";
 import { clickSourceTreeNode } from "../helpers/source-explorer-panel";
 import { addBreakpoint } from "../helpers/source-panel";
-import test from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
 test.use({ exampleKey: "doc_rr_objects.html" });
 

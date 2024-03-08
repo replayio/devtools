@@ -16,7 +16,7 @@ import {
   waitForLogpoint,
 } from "../helpers/source-panel";
 import { debugPrint } from "../helpers/utils";
-import test from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
 test.use({ exampleKey: "doc_navigate.html" });
 

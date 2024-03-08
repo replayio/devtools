@@ -19,7 +19,7 @@ import {
 import { getGetterValue } from "../helpers/object-inspector";
 import { clickScreenshot, hoverScreenshot } from "../helpers/screenshot";
 import { waitFor } from "../helpers/utils";
-import test, { expect } from "../testFixtureCloneRecording";
+import test, { expect } from "../testFixture";
 
 test.use({ exampleKey: "cra/dist/index.html" });
 

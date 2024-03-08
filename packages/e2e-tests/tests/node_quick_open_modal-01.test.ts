@@ -1,7 +1,7 @@
 import { openDevToolsTab, startTest } from "../helpers";
 import { openSource } from "../helpers/source-explorer-panel";
 import { getCommandKey } from "../helpers/utils";
-import test from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
 test.use({ exampleKey: "node/basic.js" });
 

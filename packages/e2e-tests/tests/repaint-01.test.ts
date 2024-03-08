@@ -3,7 +3,7 @@ import { rewindToLine, stepOver, waitForPaused } from "../helpers/pause-informat
 import { getGraphicsDataUrl } from "../helpers/screenshot";
 import { addBreakpoint } from "../helpers/source-panel";
 import { waitFor } from "../helpers/utils";
-import { test } from "../testFixtureCloneRecording";
+import { test } from "../testFixture";
 
 test.use({ exampleKey: "doc_control_flow.html" });
 

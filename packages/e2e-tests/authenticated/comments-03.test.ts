@@ -9,7 +9,7 @@ import {
 } from "../helpers/comments";
 import { openNetworkPanel } from "../helpers/network-panel";
 import { openSource } from "../helpers/source-explorer-panel";
-import test, { expect } from "../testFixtureCloneRecording";
+import test, { expect } from "../testFixture";
 
 test.use({ exampleKey: "authenticated_comments.html", testUsers: [E2E_USER_1] });
 

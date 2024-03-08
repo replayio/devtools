@@ -56,7 +56,7 @@ Our old E2E test suite re-recorded those examples every time the test suite ran.
 The tests themselves are written using a set of "page object"-style helper functions that abstract specific pieces of DOM interaction. This allows the tests themselves to be written in a more readable style and focus on the sequence of operations:
 
 ```ts
-import test from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
 test(`Test stepping forward through breakpoints when rewound before the first one.`, async ({
   pageWithMeta: { page, recordingId },

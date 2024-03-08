@@ -9,7 +9,7 @@ import {
   verifySourceSearchSummary,
   verifyVisibleResultsCount,
 } from "../helpers/file-search";
-import test from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
 test.use({ exampleKey: "cra/dist/index.html" });
 

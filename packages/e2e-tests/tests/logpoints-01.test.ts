@@ -10,7 +10,7 @@ import {
 import { resumeToLine, reverseStepOverToLine } from "../helpers/pause-information-panel";
 import { addBreakpoint, addLogpoint } from "../helpers/source-panel";
 import { waitFor } from "../helpers/utils";
-import test, { expect } from "../testFixtureCloneRecording";
+import test, { expect } from "../testFixture";
 
 test.use({ exampleKey: "doc_rr_basic.html" });
 

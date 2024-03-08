@@ -1,6 +1,6 @@
 import { commandPalette, openDevToolsTab, startTest } from "../helpers";
 import { waitForRecordingToFinishIndexing } from "../helpers/utils";
-import test from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
 test.use({ exampleKey: "doc_control_flow.html" });
 

@@ -10,7 +10,7 @@ import {
   waitForFrameTimeline,
   waitForScopeValue,
 } from "../helpers/pause-information-panel";
-import test, { Page, expect } from "../testFixtureCloneRecording";
+import test, { Page, expect } from "../testFixture";
 
 test.use({ exampleKey: "node/async.js" });
 

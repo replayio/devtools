@@ -8,7 +8,7 @@ import {
   waitForSourceLineHitCounts,
 } from "../helpers/source-panel";
 import { getFocusBeginTime, getFocusEndTime, setFocusRange } from "../helpers/timeline";
-import test, { expect } from "../testFixtureCloneRecording";
+import test, { expect } from "../testFixture";
 
 // We need 500...10k hits
 // Line 248 has 847 hits

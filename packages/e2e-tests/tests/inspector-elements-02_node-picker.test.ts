@@ -7,7 +7,7 @@ import {
   openElementsPanel,
   waitForElementsToLoad,
 } from "../helpers/elements-panel";
-import test, { expect } from "../testFixtureCloneRecording";
+import test, { expect } from "../testFixture";
 
 test.use({ exampleKey: "doc_inspector_basic.html" });
 

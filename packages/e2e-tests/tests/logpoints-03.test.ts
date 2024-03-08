@@ -4,7 +4,7 @@ import {
   expandConsoleMessage,
   findConsoleMessage,
 } from "../helpers/console-panel";
-import test, { expect } from "../testFixtureCloneRecording";
+import test, { expect } from "../testFixture";
 
 test.use({ exampleKey: "doc_events.html" });
 

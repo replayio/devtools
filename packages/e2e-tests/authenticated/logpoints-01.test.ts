@@ -10,7 +10,7 @@ import {
 import { openSource } from "../helpers/source-explorer-panel";
 import { addLogpoint, editLogPoint, removeAllLogpoints } from "../helpers/source-panel";
 import { waitForRecordingToFinishIndexing } from "../helpers/utils";
-import test, { Page, expect } from "../testFixtureCloneRecording";
+import test, { Page, expect } from "../testFixture";
 
 const url = "authenticated_logpoints.html";
 const lineNumber = 14;

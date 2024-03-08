@@ -9,7 +9,7 @@ import {
   warpToMessage,
 } from "../helpers/console-panel";
 import { toggleExpandable } from "../helpers/utils";
-import test from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
 test.use({ exampleKey: "doc_rr_objects.html" });
 
