@@ -44,7 +44,7 @@ export function InlineErrorBoundary({
 
   return (
     <ErrorBoundary
-      fallback={fallback ?? <InlineErrorFallback />}
+      fallback={fallback !== undefined ? fallback : <InlineErrorFallback />}
       onError={onError}
       resetKeys={resetKey ? [resetKey] : undefined}
       {...rest}
