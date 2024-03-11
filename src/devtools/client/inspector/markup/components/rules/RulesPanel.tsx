@@ -3,7 +3,7 @@ import AutoSizer from "react-virtualized-auto-sizer";
 
 import { RulesList } from "devtools/client/inspector/markup/components/rules/RulesList";
 import { getSelectedNodeId } from "devtools/client/inspector/markup/selectors/markup";
-import { elementCache } from "replay-next/components/elements-old/suspense/ElementCache";
+import { elementCache } from "replay-next/components/elements-new/suspense/ElementCache";
 import Icon from "replay-next/components/Icon";
 import { useMostRecentLoadedPause } from "replay-next/src/hooks/useMostRecentLoadedPause";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";

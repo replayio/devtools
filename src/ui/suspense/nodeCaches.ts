@@ -1,7 +1,7 @@
 import { BoxModel, NodeBounds, PauseId, Node as ProtocolNode, Quads } from "@replayio/protocol";
 import { Cache, createCache } from "suspense";
 
-import { elementCache } from "replay-next/components/elements-old/suspense/ElementCache";
+import { elementCache } from "replay-next/components/elements-new/suspense/ElementCache";
 import { ReplayClientInterface } from "shared/client/types";
 
 import { computedStyleCache } from "./styleCaches";

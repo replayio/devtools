@@ -16,7 +16,7 @@ import TextProperty, {
   ComputedPropertyInfo,
   Priority,
 } from "devtools/client/inspector/rules/models/text-property";
-import { elementCache } from "replay-next/components/elements-old/suspense/ElementCache";
+import { elementCache } from "replay-next/components/elements-new/suspense/ElementCache";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { cachePauseData } from "replay-next/src/suspense/PauseCache";
 import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
