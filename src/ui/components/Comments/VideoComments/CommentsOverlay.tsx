@@ -1,51 +1,38 @@
-import React from "react";
-import { ConnectedProps, connect } from "react-redux";
+import { useMemo } from "react";
 
+import {
+  VisualComment,
+  isVisualCommentTypeData,
+} from "replay-next/components/sources/utils/comments";
+import { Comment } from "shared/graphql/types";
+import VideoComment from "ui/components/Comments/VideoComments/VideoComment";
 import hooks from "ui/hooks";
-import { selectors } from "ui/reducers";
 import { getHoveredCommentId, getSelectedCommentId } from "ui/reducers/app";
+import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
-import { UIState } from "ui/state";
-import { Comment } from "ui/state/comments";
-
-import VideoComment from "./VideoComment";
 
 function findComment({ comments, currentTime }: { comments: Comment[]; currentTime: number }) {
   return comments.filter(
-    comment => comment && "position" in comment && comment.position && comment.time == currentTime
-  );
+    comment =>
+      isVisualCommentTypeData(comment.type, comment.typeData) && comment.time == currentTime
+  ) as VisualComment[];
 }
 
-function CommentsOverlay({
-  canvas,
-  currentTime,
-  children,
-  showComments,
-}: PropsFromRedux & { children: React.ReactNode; showComments: boolean }) {
+export default function CommentsOverlay({ showComments }: { showComments: boolean }) {
   const recordingId = hooks.useGetRecordingId();
   const { comments: allComments } = hooks.useGetComments(recordingId);
 
+  const currentTime = useAppSelector(getCurrentTime);
   const hoveredCommentId = useAppSelector(getHoveredCommentId);
   const selectedCommentId = useAppSelector(getSelectedCommentId);
 
-  if (!canvas) {
-    return null;
-  }
-
-  const { top, left, width, height, scale } = canvas;
-
-  const commentsAtTime = findComment({ comments: allComments, currentTime });
+  const commentsAtTime = useMemo(
+    () => findComment({ comments: allComments, currentTime }),
+    [allComments, currentTime]
+  );
 
   return (
-    <div
-      className="canvas-overlay"
-      style={{
-        top: top,
-        left: left,
-        width: width * scale - 2,
-        height: height * scale - 2,
-      }}
-    >
+    <div className="canvas-overlay">
       {showComments && (
         <div className="canvas-comments">
           {commentsAtTime.map(comment => {
@@ -59,15 +46,6 @@ function CommentsOverlay({
           })}
         </div>
       )}
-      {children}
     </div>
   );
 }
-
-const connector = connect((state: UIState) => ({
-  canvas: selectors.getCanvas(state),
-  currentTime: selectors.getCurrentTime(state),
-}));
-type PropsFromRedux = ConnectedProps<typeof connector>;
-
-export default connector(CommentsOverlay);

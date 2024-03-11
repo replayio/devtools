@@ -20,7 +20,7 @@ import {
   updateComment as updateCommentGraphQL,
   updateCommentReply as updateCommentReplyGraphQL,
 } from "shared/graphql/Comments";
-import { Comment, CommentSourceLocation, User } from "shared/graphql/types";
+import { Comment, User } from "shared/graphql/types";
 
 import CommentPreview from "./CommentPreview";
 import styles from "./Comment.module.css";
@@ -45,14 +45,7 @@ export default function CommentRenderer({ comment }: { comment: Comment }) {
   };
 
   const editCommentCallback = async (content: string, isPublished: boolean) => {
-    await updateCommentGraphQL(
-      graphQLClient,
-      accessToken!,
-      comment.id,
-      content,
-      isPublished,
-      comment.position
-    );
+    await updateCommentGraphQL(graphQLClient, accessToken!, comment.id, content, isPublished);
   };
 
   return (
@@ -64,11 +57,7 @@ export default function CommentRenderer({ comment }: { comment: Comment }) {
       deleteCallback={deleteCommentCallback}
       editCallback={editCommentCallback}
       isPublished={comment.isPublished}
-      networkRequestId={comment.networkRequestId}
       owner={comment.user}
-      primaryLabel={comment.primaryLabel || null}
-      secondaryLabel={comment.secondaryLabel || null}
-      sourceLocation={comment.sourceLocation}
       type={comment.type}
       typeData={comment.typeData}
     >
@@ -96,11 +85,7 @@ export default function CommentRenderer({ comment }: { comment: Comment }) {
             deleteCallback={deleteCommentReplyCallback}
             editCallback={editCommentReplyCallback}
             isPublished={reply.isPublished}
-            networkRequestId={null}
             owner={reply.user}
-            primaryLabel={null}
-            secondaryLabel={null}
-            sourceLocation={null}
             type={null}
             typeData={null}
           />
@@ -124,11 +109,7 @@ function EditableRemark({
   deleteCallback,
   editCallback,
   isPublished,
-  networkRequestId,
   owner,
-  primaryLabel,
-  secondaryLabel,
-  sourceLocation,
   type,
   typeData,
 }: {
@@ -139,11 +120,7 @@ function EditableRemark({
   deleteCallback: () => Promise<void>;
   editCallback: (newContent: string, newIsPublished: boolean) => Promise<void>;
   isPublished: boolean;
-  networkRequestId: string | null;
   owner: User;
-  primaryLabel: string | null;
-  secondaryLabel: string | null;
-  sourceLocation: CommentSourceLocation | null;
   type: string | null;
   typeData: any | null;
 }) {

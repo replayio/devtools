@@ -1,3 +1,4 @@
+import assert from "assert";
 import { ApolloError, gql, useMutation, useQuery } from "@apollo/client";
 import { RecordingId } from "@replayio/protocol";
 import { useMemo } from "react";
@@ -16,8 +17,8 @@ import {
   UpdateCommentReplyContent,
   UpdateCommentReplyContentVariables,
 } from "shared/graphql/generated/UpdateCommentReplyContent";
+import { Comment } from "shared/graphql/types";
 import { GET_COMMENTS, GET_COMMENTS_TIME } from "ui/graphql/comments";
-import { Comment, CommentPosition } from "ui/state/comments";
 
 export function useGetComments(recordingId: RecordingId): {
   comments: Comment[];
@@ -33,22 +34,32 @@ export function useGetComments(recordingId: RecordingId): {
   }
 
   const comments = useMemo(() => {
-    return (data?.recording?.comments ?? []).map(comment => ({
-      ...comment,
-      recordingId,
-      replies: comment.replies.map(reply => ({
-        ...reply,
+    return (data?.recording?.comments ?? []).map(comment => {
+      assert(comment.user);
+
+      return {
+        ...comment,
+        isPublished: comment.isPublished != null,
         recordingId,
-        parentId: comment.id,
-        hasFrames: comment.hasFrames,
-        sourceLocation: comment.sourceLocation,
-        time: comment.time,
-        point: comment.point,
-        position: comment.position,
-        type: null,
-        typeData: null,
-      })),
-    }));
+        replies: comment.replies.map(reply => {
+          assert(reply.user);
+
+          return {
+            ...reply,
+            isPublished: reply.isPublished != null,
+            recordingId,
+            parentId: comment.id,
+            hasFrames: comment.hasFrames,
+            time: comment.time,
+            point: comment.point,
+            type: null,
+            typeData: null,
+            user: reply.user,
+          };
+        }),
+        user: comment.user,
+      };
+    });
   }, [data, recordingId]);
 
   return { comments, loading, error };
@@ -61,15 +72,9 @@ export function useUpdateComment() {
         $newContent: String!
         $newIsPublished: Boolean!
         $commentId: ID!
-        $newPosition: JSONObject
       ) {
         updateComment(
-          input: {
-            id: $commentId
-            content: $newContent
-            isPublished: $newIsPublished
-            position: $newPosition
-          }
+          input: { id: $commentId, content: $newContent, isPublished: $newIsPublished }
         ) {
           success
         }
@@ -77,15 +82,10 @@ export function useUpdateComment() {
     `
   );
 
-  return async (
-    commentId: string,
-    newContent: string,
-    newIsPublished: boolean,
-    position: CommentPosition | null
-  ) =>
+  return async (commentId: string, newContent: string, newIsPublished: boolean) =>
     updateCommentContent({
       // @ts-ignore TypeScript types don't yet know about the $newIsPublished variable
-      variables: { commentId, newIsPublished, newContent, position },
+      variables: { commentId, newIsPublished, newContent },
     });
 }
 

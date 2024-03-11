@@ -1,11 +1,10 @@
 import { MouseEventHandler, useState } from "react";
 
+import { Comment } from "shared/graphql/types";
 import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
-import { userData } from "shared/user-data/GraphQL/UserData";
 import { setModal } from "ui/actions/app";
 import useAddCommentReply from "ui/hooks/comments/useAddCommentReply";
 import { useAppDispatch } from "ui/setup/hooks";
-import { Comment } from "ui/state/comments";
 import useAuth0 from "ui/utils/useAuth0";
 
 import MaterialIcon from "../shared/MaterialIcon";

@@ -1,4 +1,4 @@
-import { ExecutionPoint } from "@replayio/protocol";
+import { ExecutionPoint, RecordingId } from "@replayio/protocol";
 
 import { AnyGroupedTestCases } from "shared/test-suites/RecordingTestMetadata";
 
@@ -59,42 +59,26 @@ export type UserInfo = {
   features: { library: boolean };
 };
 
-export interface CommentSourceLocation {
-  sourceUrl: string;
-  line: number;
-  column: number;
-  sourceId: string;
-}
-
 // TODO Keep in sync with e2e-tests/helpers/comments
 export type CommentType = "source-code" | "network-request" | "visual";
 
-interface Remark {
+export interface Remark {
   content: string;
   createdAt: string;
   hasFrames: boolean;
   id: string;
   isPublished: boolean;
   point: string;
-  sourceLocation: CommentSourceLocation | null;
+  recordingId: RecordingId;
   time: number;
+  type: string | null;
+  typeData: any | null;
   updatedAt: string;
   user: User;
 }
 
-export interface CommentPosition {
-  x: number;
-  y: number;
-}
-
 export interface Comment extends Remark {
-  position: CommentPosition | null;
-  networkRequestId: string | null;
-  primaryLabel?: string;
   replies: Reply[];
-  secondaryLabel?: string;
-  type: string | null;
-  typeData: any | null;
 }
 
 export interface Reply extends Remark {

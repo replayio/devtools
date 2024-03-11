@@ -2,6 +2,7 @@ import lodashSortBy from "lodash/sortBy";
 import { ReactNode, useContext, useMemo } from "react";
 
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
+import { Comment } from "shared/graphql/types";
 import CommentCard, { PauseOverlayPosition } from "ui/components/Comments/CommentCard";
 import CommentDropDownMenu from "ui/components/Comments/CommentDropDownMenu";
 import useUserCommentPreferences from "ui/components/Comments/useUserCommentPreferences";
@@ -10,7 +11,6 @@ import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
 import { getCurrentTime, isPlaying as isPlayingSelector } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
-import { Comment } from "ui/state/comments";
 import useAuth0 from "ui/utils/useAuth0";
 
 import styles from "./CommentCardsList.module.css";

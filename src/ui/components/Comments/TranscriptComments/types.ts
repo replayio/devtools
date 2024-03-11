@@ -1,4 +1,4 @@
-import { Comment, Reply } from "ui/state/comments";
+import { Comment, Reply } from "shared/graphql/types";
 
 export type CommentData =
   | { type: "comment"; comment: Comment }
