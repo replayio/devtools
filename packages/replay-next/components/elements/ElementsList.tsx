@@ -27,8 +27,6 @@ import styles from "./ElementList.module.css";
 
 export type ImperativeHandle = {
   selectIndex(index: number | null): Promise<void>;
-
-  // TODO [FE-2133] We can remove this API once Gecko support is removed
   selectNode(nodeId: ObjectId | null): Promise<void>;
 };
 
@@ -101,7 +99,6 @@ export function ElementsList({
         listData.setSelectedIndex(index);
       },
 
-      // TODO [FE-2133] We can remove this API once Gecko support is removed
       async selectNode(nodeId: ObjectId | null) {
         await listData.waitUntilLoaded();
         listData.selectNode(nodeId);
