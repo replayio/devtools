@@ -1,7 +1,7 @@
 import { ObjectId, PauseId } from "@replayio/protocol";
 
-import { elementCache } from "replay-next/components/elements/suspense/ElementCache";
-import { createMockReplayClient } from "replay-next/components/elements/utils/tests";
+import { elementCache } from "replay-next/components/elements-old/suspense/ElementCache";
+import { createMockReplayClient } from "replay-next/components/elements-old/utils/tests";
 import { ReplayClientInterface } from "shared/client/types";
 
 describe("ElementCache", () => {

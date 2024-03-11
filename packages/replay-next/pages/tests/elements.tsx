@@ -1,9 +1,9 @@
 import { ObjectId, PauseId } from "@replayio/protocol";
 import { KeyboardEvent, Suspense, useContext, useEffect, useRef, useState } from "react";
 
-import { ImperativeHandle } from "replay-next/components/elements/ElementsList";
-import ElementsPanel from "replay-next/components/elements/index";
-import { elementCache } from "replay-next/components/elements/suspense/ElementCache";
+import { ImperativeHandle } from "replay-next/components/elements-old/ElementsList";
+import ElementsPanel from "replay-next/components/elements-old/index";
+import { elementCache } from "replay-next/components/elements-old/suspense/ElementCache";
 import Loader from "replay-next/components/Loader";
 import { FocusContextRoot } from "replay-next/src/contexts/FocusContext";
 import { KeyboardModifiersContextRoot } from "replay-next/src/contexts/KeyboardModifiersContext";

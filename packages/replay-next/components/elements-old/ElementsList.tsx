@@ -14,10 +14,10 @@ import {
 import { ListOnItemsRenderedProps } from "react-window";
 import { useImperativeCacheValue } from "suspense";
 
-import { ElementsListData } from "replay-next/components/elements/ElementsListData";
-import { NoContentFallback } from "replay-next/components/elements/NoContentFallback";
-import { rootObjectIdCache } from "replay-next/components/elements/suspense/RootObjectIdCache";
-import { Item } from "replay-next/components/elements/types";
+import { ElementsListData } from "replay-next/components/elements-old/ElementsListData";
+import { NoContentFallback } from "replay-next/components/elements-old/NoContentFallback";
+import { rootObjectIdCache } from "replay-next/components/elements-old/suspense/RootObjectIdCache";
+import { Item } from "replay-next/components/elements-old/types";
 import { InlineErrorFallback } from "replay-next/components/errors/InlineErrorFallback";
 import { LoadingProgressBar } from "replay-next/components/LoadingProgressBar";
 import { GenericList } from "replay-next/components/windowing/GenericList";

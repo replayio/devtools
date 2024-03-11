@@ -2,7 +2,7 @@ import assert from "assert";
 import { Node, ObjectId, PauseId } from "@replayio/protocol";
 import { createCache } from "suspense";
 
-import { shouldDisplayNode } from "replay-next/components/elements/utils/shouldDisplayNode";
+import { shouldDisplayNode } from "replay-next/components/elements-old/utils/shouldDisplayNode";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientInterface } from "shared/client/types";
 

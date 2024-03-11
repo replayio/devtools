@@ -3,11 +3,11 @@ import { ObjectId, PauseId } from "@replayio/protocol";
 import type {
   ElementsListData,
   ElementsListData as ElementsListDataType,
-} from "replay-next/components/elements/ElementsListData";
+} from "replay-next/components/elements-old/ElementsListData";
 import {
   IdToMockDataMap,
   createMockReplayClient,
-} from "replay-next/components/elements/utils/tests";
+} from "replay-next/components/elements-old/utils/tests";
 import { MockReplayClientInterface } from "replay-next/src/utils/testing";
 import { ReplayClientInterface } from "shared/client/types";
 
@@ -58,7 +58,7 @@ describe("ElementsListData", () => {
 
   beforeEach(() => {
     // Modules should be reset between tests so that stale cache data from one test doesn't interfere with another
-    const module = require("replay-next/components/elements/ElementsListData");
+    const module = require("replay-next/components/elements-old/ElementsListData");
     ElementsListData = module.ElementsListData;
   });
 

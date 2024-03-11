@@ -3,9 +3,9 @@ import { useContext, useEffect, useRef, useState } from "react";
 
 import { selectNode } from "devtools/client/inspector/markup/actions/markup";
 import { getSelectedNodeId } from "devtools/client/inspector/markup/selectors/markup";
-import OldElementsPanel from "replay-next/components/elements";
 import NewElementsPanel from "replay-next/components/elements-new";
-import { ImperativeHandle } from "replay-next/components/elements/ElementsList";
+import OldElementsPanel from "replay-next/components/elements-old";
+import { ImperativeHandle } from "replay-next/components/elements-old/ElementsList";
 import { useMostRecentLoadedPause } from "replay-next/src/hooks/useMostRecentLoadedPause";
 import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";

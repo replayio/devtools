@@ -1,7 +1,7 @@
 import { ObjectId, PauseId } from "@replayio/protocol";
 
-import { Element, elementCache } from "replay-next/components/elements/suspense/ElementCache";
-import { getDistanceFromRoot } from "replay-next/components/elements/utils/getDistanceFromRoot";
+import { Element, elementCache } from "replay-next/components/elements-old/suspense/ElementCache";
+import { getDistanceFromRoot } from "replay-next/components/elements-old/utils/getDistanceFromRoot";
 import { ReplayClientInterface } from "shared/client/types";
 
 export function loadNodeSubTree(

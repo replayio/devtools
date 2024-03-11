@@ -1,4 +1,4 @@
-import { Metadata } from "replay-next/components/elements/types";
+import { Metadata } from "replay-next/components/elements-old/types";
 
 export function getItemWeight(metadata: Metadata): number {
   // Note that it's important to use subTreeWeight

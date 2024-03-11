@@ -11,8 +11,8 @@ import {
 } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
 
-import { ElementsList, ImperativeHandle } from "replay-next/components/elements/ElementsList";
-import { domSearchCache } from "replay-next/components/elements/suspense/DOMSearchCache";
+import { ElementsList, ImperativeHandle } from "replay-next/components/elements-old/ElementsList";
+import { domSearchCache } from "replay-next/components/elements-old/suspense/DOMSearchCache";
 import Icon from "replay-next/components/Icon";
 import { PanelLoader } from "replay-next/components/PanelLoader";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";

@@ -9,9 +9,9 @@ import {
   useState,
 } from "react";
 
-import { ElementsListData } from "replay-next/components/elements/ElementsListData";
-import { useElementsListItemContextMenu } from "replay-next/components/elements/hooks/useElementsListItemContextMenu";
-import { Item } from "replay-next/components/elements/types";
+import { ElementsListData } from "replay-next/components/elements-old/ElementsListData";
+import { useElementsListItemContextMenu } from "replay-next/components/elements-old/hooks/useElementsListItemContextMenu";
+import { Item } from "replay-next/components/elements-old/types";
 import Icon from "replay-next/components/Icon";
 import { copyToClipboard as copyTextToClipboard } from "replay-next/components/sources/utils/clipboard";
 import { GenericListItemData } from "replay-next/components/windowing/GenericList";

@@ -1,7 +1,7 @@
 import { ContextMenuItem, useContextMenu } from "use-context-menu";
 
-import { ElementsListData } from "replay-next/components/elements/ElementsListData";
-import { Item } from "replay-next/components/elements/types";
+import { ElementsListData } from "replay-next/components/elements-old/ElementsListData";
+import { Item } from "replay-next/components/elements-old/types";
 import Icon from "replay-next/components/Icon";
 import { copyToClipboard } from "replay-next/components/sources/utils/clipboard";
 

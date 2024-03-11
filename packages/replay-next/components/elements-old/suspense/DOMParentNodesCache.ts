@@ -1,7 +1,7 @@
 import { ObjectId, PauseId } from "@replayio/protocol";
 import { createCache } from "suspense";
 
-import { elementCache } from "replay-next/components/elements/suspense/ElementCache";
+import { elementCache } from "replay-next/components/elements-old/suspense/ElementCache";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { cachePauseData } from "replay-next/src/suspense/PauseCache";
 import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";

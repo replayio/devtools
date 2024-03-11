@@ -1,6 +1,6 @@
 import { Node, ObjectId } from "@replayio/protocol";
 
-import { Element } from "replay-next/components/elements/suspense/ElementCache";
+import { Element } from "replay-next/components/elements-old/suspense/ElementCache";
 
 export type Item = {
   // We can't render an element until it's immediate children have been fetched

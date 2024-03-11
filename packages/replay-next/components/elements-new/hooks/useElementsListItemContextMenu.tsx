@@ -3,7 +3,7 @@ import { ContextMenuItem, useContextMenu } from "use-context-menu";
 
 import { ElementsListData } from "replay-next/components/elements-new/ElementsListData";
 import { Item } from "replay-next/components/elements-new/types";
-import { elementCache } from "replay-next/components/elements/suspense/ElementCache";
+import { elementCache } from "replay-next/components/elements-old/suspense/ElementCache";
 import Icon from "replay-next/components/Icon";
 import { copyToClipboard } from "replay-next/components/sources/utils/clipboard";
 import { ReplayClientInterface } from "shared/client/types";
