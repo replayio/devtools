@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 
-import { replayPlayback, startPlayback, stopPlayback } from "ui/actions/timeline";
+import { replayFromBeginning, startPlayback, stopPlayback } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
@@ -20,7 +20,7 @@ export default function PlayPauseButton() {
     icon = "/images/playback-refresh.svg";
     onClick = () => {
       trackEvent("timeline.replay");
-      dispatch(replayPlayback());
+      dispatch(replayFromBeginning());
     };
   } else if (playback) {
     icon = "/images/playback-pause.svg";

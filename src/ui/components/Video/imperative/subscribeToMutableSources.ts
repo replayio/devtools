@@ -54,37 +54,43 @@ export function subscribeToMutableSources({
     );
 
     if (prevExecutionPoint === executionPoint && prevIsPlaying === isPlaying && prevTime === time) {
+      // Ignore Redux updates that aren't relevant to graphics state
       return;
     }
 
     const didStartPlaying = isPlaying && !prevIsPlaying;
+    const didStopPlaying = !isPlaying && prevIsPlaying;
 
     prevTime = time;
     prevExecutionPoint = executionPoint;
     prevIsPlaying = isPlaying;
 
-    if (didStartPlaying) {
-      if (abortController != null) {
-        abortController.abort();
-        abortController = null;
+    if (isPlaying) {
+      if (didStartPlaying) {
+        if (abortController != null) {
+          abortController.abort();
+          abortController = null;
+        }
+
+        abortController = new AbortController();
+
+        runVideoPlayback({
+          abortSignal: abortController.signal,
+          beginPoint: playbackState.beginPoint,
+          beginTime: playbackState.beginTime,
+          containerElement,
+          endPoint: playbackState.endPoint,
+          endTime: playbackState.endTime,
+          reduxStore,
+          replayClient,
+        });
       }
-
-      abortController = new AbortController();
-
-      runVideoPlayback({
-        abortSignal: abortController.signal,
-        beginPoint: playbackState.beginPoint,
-        beginTime: playbackState.beginTime,
-        containerElement,
-        endPoint: playbackState.endPoint,
-        endTime: playbackState.endTime,
-        reduxStore,
-        replayClient,
-      });
-    } else if (!isPlaying) {
-      if (abortController != null) {
-        abortController.abort();
-        abortController = null;
+    } else {
+      if (didStopPlaying) {
+        if (abortController != null) {
+          abortController.abort();
+          abortController = null;
+        }
       }
 
       abortController = new AbortController();

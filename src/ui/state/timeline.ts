@@ -13,7 +13,6 @@ export interface ZoomRegion {
 
 export interface TimelineState {
   currentTime: number;
-  dragging: boolean;
   focusWindow: TimeRange | null;
   hoveredItem: HoveredItem | null;
   hoverTime: number | null;

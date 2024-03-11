@@ -29,7 +29,6 @@ function initialTimelineState(): TimelineState {
     timelineDimensions: { left: 1, top: 1, width: 1 },
     /** @deprecated This appears to be obsolete for now? */
     zoomRegion: { beginTime: 0, endTime: 0, scale: 1 },
-    dragging: false,
   };
 }
 
@@ -37,9 +36,6 @@ const timelineSlice = createSlice({
   name: "timeline",
   initialState: initialTimelineState,
   reducers: {
-    setDragging(state, action: PayloadAction<boolean>) {
-      state.dragging = action.payload;
-    },
     setTimelineState(state, action: PayloadAction<Partial<TimelineState>>) {
       // This is poor action design and we should avoid this :(
       Object.assign(state, action.payload);
@@ -63,7 +59,6 @@ const timelineSlice = createSlice({
 });
 
 export const {
-  setDragging,
   setHoveredItem,
   setMarkTimeStampPoint,
   setPlaybackFocusWindow,
@@ -80,7 +75,6 @@ export const getHoverTime = (state: UIState) => state.timeline.hoverTime;
 export const getPlayback = (state: UIState) => state.timeline.playback;
 export const getShowFocusModeControls = (state: UIState) => state.timeline.showFocusModeControls;
 export const getShowHoverTimeGraphics = (state: UIState) => state.timeline.showHoverTimeGraphics;
-export const isDragging = (state: UIState) => state.timeline.dragging;
 export const isPlaying = (state: UIState) => state.timeline.playback !== null;
 export const getRecordingDuration = (state: UIState) => state.timeline.recordingDuration;
 export const getTimelineDimensions = (state: UIState) => state.timeline.timelineDimensions;
