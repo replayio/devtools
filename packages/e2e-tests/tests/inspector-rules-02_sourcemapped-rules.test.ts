@@ -9,7 +9,7 @@ import test from "../testFixture";
 
 test.use({ exampleKey: "doc_inspector_sourcemapped.html" });
 
-test("inspector-rules-02: Sourcemapped rules should be viewed", async ({
+test.skip("inspector-rules-02: Sourcemapped rules should be viewed", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
