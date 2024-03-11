@@ -1,5 +1,6 @@
 import slugify from "slugify";
 
+import { RecordingTarget, getRecordingTarget } from "replay-next/src/suspense/BuildIdCache";
 import { Recording } from "shared/graphql/types";
 import { SLUG_SEPARATOR, extractIdAndSlug } from "shared/utils/slug";
 
@@ -9,12 +10,21 @@ export const showDurationWarning = (recording: Recording) =>
   !!recording.duration && recording.duration > WARNING_MS;
 
 export function getRecordingURL(recording: Recording): string {
+  const target = recording.buildId ? getRecordingTarget(recording.buildId) : undefined;
+
+  let useLegacyURL = false;
+  switch (target) {
+    case RecordingTarget.gecko:
+      useLegacyURL = true;
+      break;
+  }
+
   let id = recording.id;
   if (recording.title) {
     id = slugify(recording.title, { strict: true }).toLowerCase() + SLUG_SEPARATOR + recording.id;
   }
 
-  return `/recording/${id}`;
+  return useLegacyURL ? `https://legacy.replay.io/recording/${id}` : `/recording/${id}`;
 }
 
 export function getRecordingId(): string | undefined {
