@@ -3,8 +3,8 @@ import { useEffect, useRef, useState } from "react";
 
 import { selectNode } from "devtools/client/inspector/markup/actions/markup";
 import { getSelectedNodeId } from "devtools/client/inspector/markup/selectors/markup";
-import ElementsPanel from "replay-next/components/elements-new";
-import { ImperativeHandle } from "replay-next/components/elements-new/ElementsList";
+import ElementsPanel from "replay-next/components/elements";
+import { ImperativeHandle } from "replay-next/components/elements/ElementsList";
 import { useMostRecentLoadedPause } from "replay-next/src/hooks/useMostRecentLoadedPause";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 

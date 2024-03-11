@@ -9,7 +9,7 @@ import {
 import cloneDeep from "lodash/cloneDeep";
 import { ExternallyManagedCache, createExternallyManagedCache } from "suspense";
 
-import { Element, elementCache } from "replay-next/components/elements-new/suspense/ElementCache";
+import { Element, elementCache } from "replay-next/components/elements/suspense/ElementCache";
 import { createFocusIntervalCacheForExecutionPoints } from "replay-next/src/suspense/FocusIntervalCache";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { cachePauseData, setPointAndTimeForPauseId } from "replay-next/src/suspense/PauseCache";

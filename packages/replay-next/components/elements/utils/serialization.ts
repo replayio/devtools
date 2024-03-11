@@ -1,6 +1,6 @@
 import { ObjectId } from "@replayio/protocol";
 
-import type { Node as NodeType } from "replay-next/components/elements-new/types";
+import type { Node as NodeType } from "replay-next/components/elements/types";
 
 declare var __RECORD_REPLAY_ARGUMENTS__: {
   getPersistentId?: (value: any) => number | null | void;

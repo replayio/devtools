@@ -1,10 +1,7 @@
 import assert from "assert";
 
-import { ElementsListData } from "replay-next/components/elements-new/ElementsListData";
-import {
-  deserializeDOM,
-  serializeDOM,
-} from "replay-next/components/elements-new/utils/serialization";
+import { ElementsListData } from "replay-next/components/elements/ElementsListData";
+import { deserializeDOM, serializeDOM } from "replay-next/components/elements/utils/serialization";
 import { createMockReplayClient } from "replay-next/src/utils/testing";
 
 describe("ElementsListData", () => {

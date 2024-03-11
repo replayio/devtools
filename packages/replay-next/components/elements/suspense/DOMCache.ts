@@ -1,7 +1,7 @@
 import { PauseId } from "@replayio/protocol";
 
-import { Node } from "replay-next/components/elements-new/types";
-import { deserializeDOM } from "replay-next/components/elements-new/utils/serialization";
+import { Node } from "replay-next/components/elements/types";
+import { deserializeDOM } from "replay-next/components/elements/utils/serialization";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { pauseEvaluationsCache } from "replay-next/src/suspense/PauseCache";
 import { joinChunksToString } from "replay-next/src/utils/protocol";
@@ -56,9 +56,7 @@ export const domCache = createCacheWithTelemetry<
 });
 
 async function lazyImportExpression() {
-  const serializationModule = await import(
-    "replay-next/components/elements-new/utils/serialization"
-  );
+  const serializationModule = await import("replay-next/components/elements/utils/serialization");
   serializeDOMString = serializationModule.serializeDOM.toString();
 
   const protocolUtilsModule = await import("replay-next/src/utils/protocol");

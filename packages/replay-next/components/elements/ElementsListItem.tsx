@@ -10,9 +10,9 @@ import {
   useState,
 } from "react";
 
-import { ElementsListData } from "replay-next/components/elements-new/ElementsListData";
-import { useElementsListItemContextMenu } from "replay-next/components/elements-new/hooks/useElementsListItemContextMenu";
-import { Attributes, Item, ItemDisplayMode } from "replay-next/components/elements-new/types";
+import { ElementsListData } from "replay-next/components/elements/ElementsListData";
+import { useElementsListItemContextMenu } from "replay-next/components/elements/hooks/useElementsListItemContextMenu";
+import { Attributes, Item, ItemDisplayMode } from "replay-next/components/elements/types";
 import Icon from "replay-next/components/Icon";
 import { copyToClipboard as copyTextToClipboard } from "replay-next/components/sources/utils/clipboard";
 import { GenericListItemData } from "replay-next/components/windowing/GenericList";

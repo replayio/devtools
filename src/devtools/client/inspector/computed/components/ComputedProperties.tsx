@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { shallowEqual } from "react-redux";
 import { useImperativeCacheValue } from "suspense";
 
-import { elementCache } from "replay-next/components/elements-new/suspense/ElementCache";
+import { elementCache } from "replay-next/components/elements/suspense/ElementCache";
 import { useMostRecentLoadedPause } from "replay-next/src/hooks/useMostRecentLoadedPause";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";

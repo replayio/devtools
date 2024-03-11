@@ -1,7 +1,7 @@
 import assert from "assert";
 import { ObjectId, PauseId } from "@replayio/protocol";
 
-import { domCache } from "replay-next/components/elements-new/suspense/DOMCache";
+import { domCache } from "replay-next/components/elements/suspense/DOMCache";
 import { GenericListData } from "replay-next/components/windowing/GenericListData";
 import { ReplayClientInterface } from "shared/client/types";
 
