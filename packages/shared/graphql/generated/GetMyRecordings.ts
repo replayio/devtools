@@ -53,6 +53,7 @@ export interface GetMyRecordings_viewer_recordings_edges_node_collaborators {
 
 export interface GetMyRecordings_viewer_recordings_edges_node {
   __typename: "Recording";
+  buildId: string | null;
   uuid: any;
   url: string | null;
   title: string | null;
