@@ -1,8 +1,0 @@
-.Message {
-  height: 1rem;
-  line-height: 1rem;
-  font-family: var(--font-family-monospace);
-  font-size: var(--font-size-regular-monospace);
-  font-style: italic;
-  padding: 0 0.5rem;
-}

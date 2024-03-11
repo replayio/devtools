@@ -1,5 +1,5 @@
 import { ObjectId, PauseId } from "@replayio/protocol";
-import { KeyboardEvent, Suspense, useContext, useEffect, useRef, useState } from "react";
+import { Suspense, useContext, useEffect, useState } from "react";
 
 import { ImperativeHandle } from "replay-next/components/elements/ElementsList";
 import ElementsPanel from "replay-next/components/elements/index";
@@ -47,18 +47,6 @@ function Elements() {
     fetchData();
   }, [duration, replayClient, update]);
 
-  const onKeyDown = (event: KeyboardEvent) => {
-    switch (event.key) {
-      case "Enter":
-        if (nodeId) {
-          if (list) {
-            list.selectNode(nodeId);
-          }
-        }
-        break;
-    }
-  };
-
   if (!pauseId) {
     return null;
   }
@@ -66,12 +54,7 @@ function Elements() {
   return (
     <div className={styles.Grid3Columns}>
       <div>
-        <input
-          onChange={event => setNodeId(event.target.value)}
-          onKeyDown={onKeyDown}
-          type="text"
-          value={nodeId}
-        />
+        <input onChange={event => setNodeId(event.target.value)} type="text" value={nodeId} />
       </div>
       <ElementsPanel
         listRefSetter={setList}

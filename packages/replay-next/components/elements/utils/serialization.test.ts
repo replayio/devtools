@@ -1,9 +1,6 @@
-import { ElementsListData } from "replay-next/components/elements-new/ElementsListData";
-import { Node } from "replay-next/components/elements-new/types";
-import {
-  deserializeDOM,
-  serializeDOM,
-} from "replay-next/components/elements-new/utils/serialization";
+import { ElementsListData } from "replay-next/components/elements/ElementsListData";
+import { Node } from "replay-next/components/elements/types";
+import { deserializeDOM, serializeDOM } from "replay-next/components/elements/utils/serialization";
 import { createMockReplayClient } from "replay-next/src/utils/testing";
 
 describe("serializeDOM", () => {

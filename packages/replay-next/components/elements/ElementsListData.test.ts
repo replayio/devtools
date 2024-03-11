@@ -1,65 +1,105 @@
-import { ObjectId, PauseId } from "@replayio/protocol";
+import assert from "assert";
 
-import type {
-  ElementsListData,
-  ElementsListData as ElementsListDataType,
-} from "replay-next/components/elements/ElementsListData";
-import {
-  IdToMockDataMap,
-  createMockReplayClient,
-} from "replay-next/components/elements/utils/tests";
-import { MockReplayClientInterface } from "replay-next/src/utils/testing";
-import { ReplayClientInterface } from "shared/client/types";
+import { ElementsListData } from "replay-next/components/elements/ElementsListData";
+import { deserializeDOM, serializeDOM } from "replay-next/components/elements/utils/serialization";
+import { createMockReplayClient } from "replay-next/src/utils/testing";
 
 describe("ElementsListData", () => {
-  let ElementsListData: new (
-    replayClient: ReplayClientInterface,
-    pauseId: PauseId
-  ) => ElementsListDataType;
   let listData: ElementsListData;
-  let mockObjectWithPreviewData: IdToMockDataMap;
-  let mockReplayClient: MockReplayClientInterface;
-  let rootNodeId: ObjectId;
 
-  function startTest(htmlString: string) {
-    const data = createMockReplayClient(htmlString);
-    mockObjectWithPreviewData = data.mockObjectWithPreviewData;
-    mockReplayClient = data.replayClient;
-    rootNodeId = data.rootNodeId;
+  async function startTest(htmlString: string, rootModifier?: (rootDOMNode: Document) => void) {
+    // Self terminated tags aren't parsed correctly
+    htmlString = htmlString.replace(/<([^\>]+)\s{0,1}\/\>/g, "<$1></$1>");
 
-    listData = new ElementsListData(mockReplayClient, "pause") as ElementsListDataType;
+    document.write(htmlString);
+
+    if (rootModifier) {
+      rootModifier(document);
+    }
+
+    const serialized = serializeDOM(document);
+    const rootNode = deserializeDOM(serialized);
+    assert(rootNode !== null);
+
+    listData = new ElementsListData(createMockReplayClient(), "pause", rootNode);
   }
 
-  async function toggleNodeExpanded(index: number, expanded: boolean) {
+  function toggleNodeExpanded(index: number, expanded: boolean) {
     const item = listData.getItemAtIndex(index);
-    await listData.toggleNodeExpanded(item.id, expanded);
-  }
-
-  function waitForInvalidation() {
-    const prevRevision = listData.getRevision();
-
-    // Wait for the path of nodes to load and expand
-    // but not for the full tree data to be loaded
-    return new Promise<void>(resolve => {
-      const unsubscribe = listData.subscribeToInvalidation(() => {
-        const nextRevision = listData.getRevision();
-
-        if (prevRevision !== nextRevision) {
-          resolve();
-          unsubscribe();
-        }
-      });
-    });
+    listData.toggleNodeExpanded(item.objectId, expanded);
   }
 
   afterEach(() => {
     jest.resetModules();
+
+    // @ts-expect-error
+    delete window.__RECORD_REPLAY_ARGUMENTS__;
   });
 
   beforeEach(() => {
-    // Modules should be reset between tests so that stale cache data from one test doesn't interfere with another
-    const module = require("replay-next/components/elements/ElementsListData");
-    ElementsListData = module.ElementsListData;
+    let fakeObjectId = 0;
+    let fakeObjectMap = new Map();
+
+    // @ts-expect-error
+    window.__RECORD_REPLAY_ARGUMENTS__ = {
+      internal: {
+        registerPlainObject: (value: any) => {
+          if (!fakeObjectMap.has(value)) {
+            fakeObjectMap.set(value, ++fakeObjectId);
+          }
+          return fakeObjectMap.get(value);
+        },
+      },
+    };
+  });
+
+  it("should be return a parent item", async () => {
+    startTest(
+      `
+    <html>
+      <head></head>
+      <body>
+        <script />
+        <div>
+          <main>
+            <h1>Text</h1>
+          </main>
+        </div>
+      </body>
+    </html>
+    `
+    );
+
+    expect(listData.toString()).toMatchInlineSnapshot(`
+      "<html>
+        <head />
+        <body>
+          <script />
+          <div>
+            <main>
+              <h1>
+                Text
+              </h1>
+            </main>
+          </div>
+        </body>
+      </html>"
+    `);
+
+    let item = listData.getItemAtIndex(6);
+    expect(item.tagName).toBe("h1");
+
+    item = listData.getParentItem(item);
+    expect(item.tagName).toBe("main");
+
+    item = listData.getParentItem(item);
+    expect(item.tagName).toBe("div");
+
+    item = listData.getParentItem(item);
+    expect(item.tagName).toBe("body");
+
+    item = listData.getParentItem(item);
+    expect(item.tagName).toBe("html");
   });
 
   it("should load a simple document tree", async () => {
@@ -72,7 +112,6 @@ describe("ElementsListData", () => {
     `
     );
 
-    await listData.registerRootNodeId(rootNodeId, 2);
     expect(listData.toString()).toMatchInlineSnapshot(`
       "<html>
         <head />
@@ -81,46 +120,63 @@ describe("ElementsListData", () => {
     `);
   });
 
-  it("should properly parse comments", async () => {
+  it("should properly parse iframes and contents", async () => {
     startTest(
       `
     <html>
       <body>
-        <!-- Single line comment -->
-        <!--
-          Multi-line
-          comment
-        -->
+        <iframe />
       </body>
     </html>
-    `
+    `,
+      rootDOMNode => {
+        // JSDom doesn't support srcdoc
+        // See github.com/jsdom/jsdom/issues/1892htmlStringToElements(
+        rootDOMNode.querySelector("iframe")!.contentDocument!.write(
+          `
+          <html>
+            <body>
+              <div>This is a div</div>
+            </body>
+          </html>
+        `
+        );
+      }
     );
 
-    await listData.registerRootNodeId(rootNodeId, 4);
     expect(listData.toString()).toMatchInlineSnapshot(`
       "<html>
         <head />
         <body>
-          <!-- Single line comment -->
-          <!-- Multi-line comment -->
+          <iframe>
+            #document
+              <html>
+                <head />
+                <body>
+                  <div>
+                    This is a div
+                  </div>
+                </body>
+              </html>
+          </iframe>
         </body>
       </html>"
     `);
-  });
 
-  it("should properly parse iframes and contents", async () => {
-    const encoded = encodeURIComponent("<html><body><div>This is a div</div></body></html>");
-    startTest(
-      `
-    <html>
-      <body>
-        <iframe src="data:text/html,${encoded}"></iframe>
-      </body>
-    </html>
-    `
-    );
+    // Verify a collapsed #document node works okay (special tail logic)
+    toggleNodeExpanded(4, false);
+    expect(listData.toString()).toMatchInlineSnapshot(`
+          "<html>
+            <head />
+            <body>
+              <iframe>
+                #document
+              </iframe>
+            </body>
+          </html>"
+      `);
 
-    await listData.registerRootNodeId(rootNodeId, 10);
+    toggleNodeExpanded(4, true);
     expect(listData.toString()).toMatchInlineSnapshot(`
       "<html>
         <head />
@@ -141,35 +197,7 @@ describe("ElementsListData", () => {
     `);
   });
 
-  it("should be able to (re)load already cached data (to support HMR)", async () => {
-    startTest(
-      `
-    <html>
-      <head></head>
-      <body></body>
-    </html>
-    `
-    );
-
-    await listData.registerRootNodeId(rootNodeId, 2);
-    expect(listData.toString()).toMatchInlineSnapshot(`
-      "<html>
-        <head />
-        <body />
-      </html>"
-    `);
-
-    listData = new ElementsListData(mockReplayClient, "pause") as ElementsListDataType;
-    await listData.registerRootNodeId(rootNodeId, 2);
-    expect(listData.toString()).toMatchInlineSnapshot(`
-      "<html>
-        <head />
-        <body />
-      </html>"
-    `);
-  });
-
-  it("should gradually load nested items when expanded", async () => {
+  it("should support collapsing and expanding nodes", async () => {
     startTest(
       `
     <html>
@@ -189,271 +217,9 @@ describe("ElementsListData", () => {
     `
     );
 
-    await listData.registerRootNodeId(rootNodeId, 2);
     expect(listData.toString()).toMatchInlineSnapshot(`
       "<html>
         <head>…</head>
-        <body>…</body>
-      </html>"
-    `);
-
-    await toggleNodeExpanded(1, true);
-    expect(listData.toString()).toMatchInlineSnapshot(`
-      "<html>
-        <head>
-          <script>…</script> *
-          <link />
-        </head>
-        <body>…</body>
-      </html>"
-    `);
-
-    await toggleNodeExpanded(2, true);
-    expect(listData.toString()).toMatchInlineSnapshot(`
-      "<html>
-        <head>
-          <script>
-            // Line of text
-          </script>
-          <link />
-        </head>
-        <body>…</body>
-      </html>"
-    `);
-
-    await toggleNodeExpanded(1, false);
-    expect(listData.toString()).toMatchInlineSnapshot(`
-      "<html>
-        <head>…</head>
-        <body>…</body>
-      </html>"
-    `);
-
-    await toggleNodeExpanded(2, true);
-    expect(listData.toString()).toMatchInlineSnapshot(`
-      "<html>
-        <head>…</head>
-        <body>
-          <ul>…</ul> *
-        </body>
-      </html>"
-    `);
-
-    await toggleNodeExpanded(3, true);
-    expect(listData.toString()).toMatchInlineSnapshot(`
-      "<html>
-        <head>…</head>
-        <body>
-          <ul>
-            <li>…</li> *
-            <li>…</li> *
-          </ul>
-        </body>
-      </html>"
-    `);
-
-    await toggleNodeExpanded(4, true);
-    expect(listData.toString()).toMatchInlineSnapshot(`
-      "<html>
-        <head>…</head>
-        <body>
-          <ul>
-            <li>
-              Thing one
-            </li>
-            <li>…</li> *
-          </ul>
-        </body>
-      </html>"
-    `);
-  });
-
-  it("should display a loading indicator while data is being loaded", async () => {
-    startTest(
-      `
-    <html>
-      <head></head>
-      <body>
-        <div />
-        <div />
-      </body>
-    </html>
-    `
-    );
-
-    await listData.registerRootNodeId(rootNodeId, 1);
-    expect(listData.toString()).toMatchInlineSnapshot(`"<html>…</html>"`);
-
-    const htmlPromise = toggleNodeExpanded(0, true);
-    expect(listData.toString()).toMatchInlineSnapshot(`
-      "<html>
-        <head />
-        <body>…</body> *
-      </html>"
-    `);
-
-    const bodyPromise = toggleNodeExpanded(2, true);
-    expect(listData.toString()).toMatchInlineSnapshot(`
-      "<html>
-        <head />
-        <body>
-          Loading…
-        </body>
-      </html>"
-    `);
-
-    await Promise.all([htmlPromise, bodyPromise]);
-    expect(listData.toString()).toMatchInlineSnapshot(`
-      "<html>
-        <head />
-        <body>
-          <div />
-          <div />
-        </body>
-      </html>"
-    `);
-  });
-
-  it("should display multiple loading indicators while multiple subtrees are being loaded", async () => {
-    startTest(
-      `
-    <html>
-      <head>
-        <script>
-          // Text
-        </script>
-      </head>
-      <body>
-        <div>Text</div>
-        <div>Text</div>
-      </body>
-    </html>
-    `
-    );
-
-    await listData.registerRootNodeId(rootNodeId, 1);
-    await toggleNodeExpanded(0, true);
-    expect(listData.toString()).toMatchInlineSnapshot(`
-      "<html>
-        <head>…</head> *
-        <body>…</body> *
-      </html>"
-    `);
-
-    const headPromise = toggleNodeExpanded(1, true);
-    const bodyPromise = toggleNodeExpanded(4, true);
-    expect(listData.toString()).toMatchInlineSnapshot(`
-      "<html>
-        <head>
-          Loading…
-        </head>
-        <body>
-          Loading…
-        </body>
-      </html>"
-    `);
-
-    await Promise.all([headPromise, bodyPromise]);
-    expect(listData.toString()).toMatchInlineSnapshot(`
-      "<html>
-        <head>
-          <script>…</script> *
-        </head>
-        <body>
-          <div>…</div> *
-          <div>…</div> *
-        </body>
-      </html>"
-    `);
-
-    const scriptPromise = toggleNodeExpanded(2, true);
-    const divPromise = toggleNodeExpanded(7, true);
-    expect(listData.toString()).toMatchInlineSnapshot(`
-      "<html>
-        <head>
-          <script>
-            Loading…
-          </script>
-        </head>
-        <body>
-          <div>
-            Loading…
-          </div>
-          <div>…</div> *
-        </body>
-      </html>"
-    `);
-
-    await Promise.all([scriptPromise, divPromise]);
-    expect(listData.toString()).toMatchInlineSnapshot(`
-      "<html>
-        <head>
-          <script>
-            // Text
-          </script>
-        </head>
-        <body>
-          <div>
-            Text
-          </div>
-          <div>…</div> *
-        </body>
-      </html>"
-    `);
-  });
-
-  it("should support collapsing a subtree that is being loaded", async () => {
-    startTest(
-      `
-    <html>
-      <head></head>
-      <body>
-        <div />
-      </body>
-    </html>
-    `
-    );
-
-    await listData.registerRootNodeId(rootNodeId, 1);
-    expect(listData.toString()).toMatchInlineSnapshot(`"<html>…</html>"`);
-
-    const expandPromise = toggleNodeExpanded(0, true);
-    expect(listData.toString()).toMatchInlineSnapshot(`
-      "<html>
-        <head />
-        <body>…</body> *
-      </html>"
-    `);
-
-    const collapsePromise = toggleNodeExpanded(0, false);
-    expect(listData.toString()).toMatchInlineSnapshot(`"<html>…</html>"`);
-
-    await expandPromise;
-    expect(listData.toString()).toMatchInlineSnapshot(`"<html>…</html>"`);
-
-    await collapsePromise;
-    expect(listData.toString()).toMatchInlineSnapshot(`"<html>…</html>"`);
-  });
-
-  it("should expand a path to an already loaded node", async () => {
-    startTest(
-      `
-    <html>
-      <head />
-      <body>
-        <ul>
-          <li>Thing one</li>
-          <li>Thing two</li>
-        </ul>
-      </body>
-    </html>
-    `
-    );
-
-    await listData.registerRootNodeId(rootNodeId, 10);
-    expect(listData.toString()).toMatchInlineSnapshot(`
-      "<html>
-        <head />
         <body>
           <ul>
             <li>
@@ -467,265 +233,192 @@ describe("ElementsListData", () => {
       </html>"
     `);
 
-    await toggleNodeExpanded(3, false);
+    // Expand <head>
+    let id = listData.getItemAtIndex(1).objectId;
+    listData.toggleNodeExpanded(id, true);
     expect(listData.toString()).toMatchInlineSnapshot(`
       "<html>
-        <head />
+        <head>
+          <script type=\\"text/javascript\\">
+            // Line of text
+          </script>
+          <link href=\\"index.css\\" rel=\\"stylesheet\\" />
+        </head>
+        <body>
+          <ul>
+            <li>
+              Thing one
+            </li>
+            <li>
+              Thing two
+            </li>
+          </ul>
+        </body>
+      </html>"
+    `);
+
+    // Collapse <ul>
+    id = listData.getItemAtIndex(8).objectId;
+    listData.toggleNodeExpanded(id, false);
+    expect(listData.toString()).toMatchInlineSnapshot(`
+      "<html>
+        <head>
+          <script type=\\"text/javascript\\">
+            // Line of text
+          </script>
+          <link href=\\"index.css\\" rel=\\"stylesheet\\" />
+        </head>
         <body>
           <ul>…</ul>
         </body>
       </html>"
     `);
 
-    await toggleNodeExpanded(0, false);
-    expect(listData.toString()).toMatchInlineSnapshot(`"<html>…</html>"`);
-
-    await listData.loadPathToNode("15");
+    // Collapse <body>
+    id = listData.getItemAtIndex(7).objectId;
+    listData.toggleNodeExpanded(id, false);
     expect(listData.toString()).toMatchInlineSnapshot(`
       "<html>
-        <head />
+        <head>
+          <script type=\\"text/javascript\\">
+            // Line of text
+          </script>
+          <link href=\\"index.css\\" rel=\\"stylesheet\\" />
+        </head>
+        <body>…</body>
+      </html>"
+    `);
+
+    // Expand <body>
+    id = listData.getItemAtIndex(7).objectId;
+    listData.toggleNodeExpanded(id, true);
+    expect(listData.toString()).toMatchInlineSnapshot(`
+      "<html>
+        <head>
+          <script type=\\"text/javascript\\">
+            // Line of text
+          </script>
+          <link href=\\"index.css\\" rel=\\"stylesheet\\" />
+        </head>
         <body>
-          <ul>
-            <li>
-              Thing one
-            </li>
-            <li>
-              Thing two
-            </li>
-          </ul>
+          <ul>…</ul>
         </body>
       </html>"
     `);
   });
 
-  it("should load and expand a path to a node within an unloaded subtree", async () => {
+  it("should expand the path to a selected node", async () => {
     startTest(
       `
     <html>
       <head />
       <body>
-        <ul>
-          <li>Thing one</li>
-          <li>Thing two</li>
-        </ul>
+        <div id="target" />
       </body>
     </html>
     `
     );
-
-    await listData.registerRootNodeId(rootNodeId, 1);
-    expect(listData.toString()).toMatchInlineSnapshot(`"<html>…</html>"`);
-
-    const loadedPromise = listData.loadPathToNode("15");
-    await waitForInvalidation();
     expect(listData.toString()).toMatchInlineSnapshot(`
       "<html>
         <head />
         <body>
-          Loading…
+          <div id=\\"target\\" />
         </body>
       </html>"
     `);
 
-    await loadedPromise;
+    const targetId = listData.getItemAtIndex(3).objectId;
+
+    // Collapse <ul> and <body>
+    listData.toggleNodeExpanded(listData.getItemAtIndex(2).objectId, false);
+    listData.toggleNodeExpanded(listData.getItemAtIndex(0).objectId, false);
+    expect(listData.toString()).toMatchInlineSnapshot(`"<html>…</html>"`);
+
+    listData.selectNode(targetId);
     expect(listData.toString()).toMatchInlineSnapshot(`
       "<html>
         <head />
         <body>
-          <ul>
-            <li>…</li> *
-            <li>
-              Thing two
-            </li>
-          </ul>
+          <div id=\\"target\\" />
         </body>
       </html>"
     `);
   });
 
-  it("should load and expand multiple subtrees in parallel", async () => {
-    startTest(
-      `
-    <html>
-      <head />
-      <body>
-        <ul>
-          <li>Thing one</li>
-          <li>Thing two</li>
-        </ul>
-        <table>
-          <tr>
-            <td>One</td>
-            <td>Two</td>
-          </tr>
-        </table>
-      </body>
-    </html>
-    `
-    );
-
-    await listData.registerRootNodeId(rootNodeId, 1);
-    expect(listData.toString()).toMatchInlineSnapshot(`"<html>…</html>"`);
-
-    const liPromise = listData.loadPathToNode("14"); // ul > li > "Thing two"
-    await waitForInvalidation();
-    expect(listData.toString()).toMatchInlineSnapshot(`
-      "<html>
-        <head />
-        <body>
-          Loading…
-        </body>
-      </html>"
-    `);
-
-    const tdPromise = listData.loadPathToNode("27"); // table > tr > td > "One"
-    await waitForInvalidation();
-    expect(listData.toString()).toMatchInlineSnapshot(`
-      "<html>
-        <head />
-        <body>
-          Loading…
-        </body>
-      </html>"
-    `);
-
-    await liPromise;
-    expect(listData.toString()).toMatchInlineSnapshot(`
-      "<html>
-        <head />
+  describe("search", () => {
+    it("should match both head and tail tag names", async () => {
+      startTest(
+        `
+      <html>
+        <head>
+          <script type="text/javascript"></script>
+          <link rel="stylesheet" href="index.css" />
+        </head>
         <body>
           <ul>
-            <li>…</li> *
-            <li>
-              Thing two
-            </li>
-          </ul>
-          <table>…</table> *
-        </body>
-      </html>"
-    `);
-
-    await tdPromise;
-    expect(listData.toString()).toMatchInlineSnapshot(`
-      "<html>
-        <head />
-        <body>
-          <ul>
-            <li>…</li> *
-            <li>
-              Thing two
-            </li>
-          </ul>
-          <table>
-            <tbody>
-              <tr>
-                <td>
-                  One
-                </td>
-                <td>…</td> *
-              </tr>
-            </tbody>
-          </table>
-        </body>
-      </html>"
-    `);
-  });
-
-  it("should allow a node to be collapsed while the path to a leaf node is being loaded", async () => {
-    startTest(
-      `
-    <html>
-      <head />
-      <body>
-        <ul>
-          <li>Thing one</li>
-          <li>Thing two</li>
-        </ul>
-      </body>
-    </html>
-    `
-    );
-
-    await listData.registerRootNodeId(rootNodeId, 1);
-    expect(listData.toString()).toMatchInlineSnapshot(`"<html>…</html>"`);
-
-    const loadedPromise = listData.loadPathToNode("15");
-    await waitForInvalidation();
-    expect(listData.toString()).toMatchInlineSnapshot(`
-      "<html>
-        <head />
-        <body>
-          Loading…
-        </body>
-      </html>"
-    `);
-
-    await toggleNodeExpanded(0, false);
-    expect(listData.toString()).toMatchInlineSnapshot(`"<html>…</html>"`);
-
-    await loadedPromise;
-    expect(listData.toString()).toMatchInlineSnapshot(`"<html>…</html>"`);
-
-    await toggleNodeExpanded(0, true);
-    expect(listData.toString()).toMatchInlineSnapshot(`
-      "<html>
-        <head />
-        <body>
-          <ul>
-            <li>…</li> *
-            <li>
-              Thing two
-            </li>
+            <li>Item</li>
+            <li />
           </ul>
         </body>
-      </html>"
-    `);
-  });
-
-  it("should report an error loading a subtree", async () => {
-    startTest(
+      </html>
       `
-    <html>
-      <head></head>
-      <body></body>
-    </html>
-    `
-    );
+      );
 
-    await listData.registerRootNodeId(rootNodeId, 0);
-    expect(listData.toString()).toMatchInlineSnapshot(`"<html>…</html> *"`);
+      expect(listData.toString()).toMatchInlineSnapshot(`
+        "<html>
+          <head>…</head>
+          <body>
+            <ul>
+              <li>
+                Item
+              </li>
+              <li />
+            </ul>
+          </body>
+        </html>"
+      `);
 
-    jest.spyOn(console, "error").mockImplementation(() => {});
+      expect(listData.search("li")).toEqual([4, 6, 7]);
+      expect(listData.search("<li")).toEqual([4, 7]);
+      expect(listData.search("<li>")).toEqual([4]);
+      expect(listData.search("</li>")).toEqual([6]);
+      expect(listData.search("<li />")).toEqual([7]);
 
-    // <head> and <body> and #text nodes
-    delete mockObjectWithPreviewData[3];
-    delete mockObjectWithPreviewData[4];
-    delete mockObjectWithPreviewData[5];
-    delete mockObjectWithPreviewData[6];
+      // Basic search does not support advanced search syntax
+      expect(listData.search('[rel="stylesheet"]')).toEqual([]);
+    });
 
-    await toggleNodeExpanded(0, true);
-
-    expect(listData.didError()).toBe(true);
-    expect(listData.getItemCount()).toBe(0);
-  });
-
-  it("should report an error loading a path to a leaf node", async () => {
-    startTest(
+    it("should match attributes and values", async () => {
+      startTest(
+        `
+      <html>
+        <head>
+          <script type="text/javascript"></script>
+          <link rel="stylesheet" href="index.css" />
+        </head>
+        <body />
+      </html>
       `
-    <html>
-      <head></head>
-      <body></body>
-    </html>
-    `
-    );
+      );
 
-    await listData.registerRootNodeId(rootNodeId, 0);
-    expect(listData.toString()).toMatchInlineSnapshot(`"<html>…</html> *"`);
+      const headId = listData.getItemAtIndex(1).objectId;
+      listData.toggleNodeExpanded(headId, true);
 
-    jest.spyOn(console, "error").mockImplementation(() => {});
+      expect(listData.toString()).toMatchInlineSnapshot(`
+        "<html>
+          <head>
+            <script type=\\"text/javascript\\" />
+            <link href=\\"index.css\\" rel=\\"stylesheet\\" />
+          </head>
+          <body />
+        </html>"
+      `);
 
-    await listData.loadPathToNode("12345");
-    expect(listData.didError()).toBe(true);
-    expect(listData.getItemCount()).toBe(0);
+      expect(listData.search("type")).toEqual([2]);
+      expect(listData.search('"text/javascript"')).toEqual([2]);
+      expect(listData.search('type="text/javascript"')).toEqual([2]);
+      expect(listData.search('<script type="text/javascript"')).toEqual([2]);
+      expect(listData.search('" rel="stylesheet')).toEqual([3]);
+    });
   });
 });

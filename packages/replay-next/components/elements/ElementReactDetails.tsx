@@ -1,7 +1,7 @@
 import { ObjectId } from "@replayio/protocol";
 import { Suspense, useContext } from "react";
 
-import { domReactCache } from "replay-next/components/elements-new/suspense/DOMReactCache";
+import { domReactCache } from "replay-next/components/elements/suspense/DOMReactCache";
 import Icon from "replay-next/components/Icon";
 import { LoadingProgressBar } from "replay-next/components/LoadingProgressBar";
 import { useMostRecentLoadedPause } from "replay-next/src/hooks/useMostRecentLoadedPause";
