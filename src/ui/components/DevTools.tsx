@@ -284,7 +284,7 @@ function _DevTools({
   };
 
   if (unsupportedTarget) {
-    return <UnsupportedTarget target={unsupportedTarget} />;
+    return <UnsupportedTarget />;
   }
 
   if (!loadingFinished) {
