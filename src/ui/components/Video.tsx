@@ -1,11 +1,9 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef } from "react";
 
 import { PreviewNodeHighlighter } from "devtools/client/inspector/markup/components/PreviewNodeHighlighter";
 import { installObserver, refreshGraphics } from "protocol/graphics";
-import Spinner from "replay-next/components/Spinner";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import {
-  getAreMouseTargetsLoading,
   getIsNodePickerActive,
   getIsNodePickerInitializing,
   getRecordingTarget,
@@ -16,8 +14,7 @@ import CommentsOverlay from "ui/components/Comments/VideoComments/index";
 import ToggleButton from "ui/components/TestSuite/views/Toggle/ToggleButton";
 import useVideoContextMenu from "ui/components/useVideoContextMenu";
 import { getSelectedPrimaryPanel } from "ui/reducers/layout";
-import { getPlayback, isPlaybackStalled } from "ui/reducers/timeline";
-import { isPlaying as isPlayingSelector } from "ui/reducers/timeline";
+import { getPlayback, isPlaying as isPlayingSelector } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 import ReplayLogo from "./shared/ReplayLogo";
@@ -35,8 +32,6 @@ export default function Video() {
   const playback = useAppSelector(getPlayback);
   const recordingTarget = useAppSelector(getRecordingTarget);
   const videoUrl = useAppSelector(getVideoUrl);
-  const stalled = useAppSelector(isPlaybackStalled);
-  const mouseTargetsLoading = useAppSelector(getAreMouseTargetsLoading);
   const isPlaying = useAppSelector(isPlayingSelector);
 
   const isPaused = !playback;
@@ -45,21 +40,6 @@ export default function Video() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const { addComment, contextMenu, onContextMenu } = useVideoContextMenu({ canvasRef });
-
-  const [showDelayedSpinner, setShowDelayedSpinner] = useState(false);
-
-  useEffect(() => {
-    if (isNodePickerActive && mouseTargetsLoading) {
-      const timerId = setTimeout(() => {
-        setShowDelayedSpinner(true);
-      }, 700);
-      return () => {
-        clearTimeout(timerId);
-      };
-    } else {
-      setShowDelayedSpinner(false);
-    }
-  }, [isNodePickerActive, mouseTargetsLoading, stalled]);
 
   useEffect(() => {
     installObserver();
@@ -118,13 +98,7 @@ export default function Video() {
         ref={canvasRef}
       />
       {contextMenu}
-      <CommentsOverlay showComments={showComments}>
-        {(showDelayedSpinner || stalled) && (
-          <div className="absolute bottom-5 right-5 z-20 flex opacity-100">
-            <Spinner className="w-5 animate-spin text-black" />
-          </div>
-        )}
-      </CommentsOverlay>
+      <CommentsOverlay showComments={showComments} />
       {isNodePickerInitializing ? <Tooltip label="Loading…" targetID="video" /> : null}
       {panel === "cypress" && <ToggleButton />}
       <div id="highlighter-root">

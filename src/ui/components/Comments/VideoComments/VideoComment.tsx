@@ -1,9 +1,9 @@
 import { ChatAltIcon } from "@heroicons/react/solid";
 import classnames from "classnames";
 
+import { VisualComment } from "replay-next/components/sources/utils/comments";
 import { getCanvas, setHoveredCommentId, setSelectedCommentId } from "ui/actions/app";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { Comment } from "ui/state/comments";
 
 const MARKER_DIAMETER = 28;
 const MARKER_RADIUS = 14;
@@ -12,7 +12,7 @@ export default function VideoComment({
   comment,
   isHighlighted,
 }: {
-  comment: Comment;
+  comment: VisualComment;
   isHighlighted: boolean;
 }) {
   const dispatch = useAppDispatch();
@@ -24,8 +24,8 @@ export default function VideoComment({
 
   const { scale } = canvas;
 
-  const position = comment.position;
-  if (!position) {
+  const { typeData } = comment;
+  if (typeData.pageX == null || typeData.pageY == null) {
     return null;
   }
 
@@ -44,8 +44,8 @@ export default function VideoComment({
         dispatch(setHoveredCommentId(null));
       }}
       style={{
-        top: position.y * scale - MARKER_RADIUS,
-        left: position.x * scale - MARKER_RADIUS,
+        top: typeData.pageY * scale - MARKER_RADIUS,
+        left: typeData.pageX * scale - MARKER_RADIUS,
       }}
     >
       <div

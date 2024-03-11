@@ -3,7 +3,7 @@ import { MouseEventHandler, useState } from "react";
 
 import CommentEditor from "replay-next/components/lexical/CommentEditor";
 import { useNag } from "replay-next/src/hooks/useNag";
-import { Nag } from "shared/graphql/types";
+import { Nag, Remark } from "shared/graphql/types";
 import useCommentContextMenu from "ui/components/Comments/useCommentContextMenu";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { useUpdateComment, useUpdateCommentReply } from "ui/hooks/comments/comments";
@@ -11,7 +11,6 @@ import useDeleteComment from "ui/hooks/comments/useDeleteComment";
 import useDeleteCommentReply from "ui/hooks/comments/useDeleteCommentReply";
 import useRecordingUsers from "ui/hooks/useGetCollaboratorNames";
 import { useGetUserId } from "ui/hooks/users";
-import type { Comment, Remark } from "ui/state/comments";
 import { formatRelativeTime } from "ui/utils/comments";
 
 import { AvatarImage } from "../Avatar";
@@ -43,8 +42,6 @@ export default function EditableRemark({
   // New comments should default to showing edit mode.
   const [isEditing, setIsEditing] = useState(canEdit && content === "");
 
-  const showOptionsMenu = !isEditing && !isPending && canEdit;
-
   const startEditing = () => {
     setIsEditing(true);
   };
@@ -62,7 +59,7 @@ export default function EditableRemark({
     const string = JSON.stringify(editorState);
 
     if (type === "comment") {
-      await updateComment(remarkId, string, true, (remark as Comment).position);
+      await updateComment(remarkId, string, true);
     } else {
       await updateCommentReply(remarkId, string, true);
     }

@@ -33,16 +33,11 @@ export const GET_RECORDING = gql`
         id
         isPublished
         content
-        primaryLabel
-        secondaryLabel
         createdAt
         updatedAt
         hasFrames
-        sourceLocation
         time
         point
-        position
-        networkRequestId
         user {
           id
           name
@@ -134,16 +129,11 @@ export const SUBSCRIBE_RECORDING = gql`
         id
         isPublished
         content
-        primaryLabel
-        secondaryLabel
         createdAt
         updatedAt
         hasFrames
-        sourceLocation
         time
         point
-        position
-        networkRequestId
         user {
           id
           name

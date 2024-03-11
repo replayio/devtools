@@ -1,11 +1,11 @@
 import { MouseEvent } from "react";
 
 import {
-  isNetworkRequestCommentTypeData,
-  isSourceCodeCommentTypeData,
-  isVisualCommentTypeData,
+  isNetworkRequestComment,
+  isSourceCodeComment,
+  isVisualComment,
 } from "replay-next/components/sources/utils/comments";
-import { Comment } from "ui/state/comments";
+import { Comment } from "shared/graphql/types";
 
 import NetworkRequestPreview from "./TranscriptComments/NetworkRequestPreview";
 import SourceCodePreview from "./TranscriptComments/SourceCodePreview";
@@ -19,26 +19,19 @@ export default function CommentPreview({
   comment: Comment;
   onClick: (event: MouseEvent) => void;
 }) {
-  if (comment.sourceLocation || isSourceCodeCommentTypeData(comment.type, comment.typeData)) {
+  if (isSourceCodeComment(comment)) {
     return (
       <div className={styles.Preview} data-test-name="CommentPreview" onClick={onClick}>
         <SourceCodePreview comment={comment} />
       </div>
     );
-  } else if (
-    comment.networkRequestId ||
-    isNetworkRequestCommentTypeData(comment.type, comment.typeData)
-  ) {
+  } else if (isNetworkRequestComment(comment)) {
     return (
       <div className={styles.Preview} data-test-name="CommentPreview" onClick={onClick}>
         <NetworkRequestPreview comment={comment} />
       </div>
     );
-  } else if (
-    (typeof comment.secondaryLabel === "string" &&
-      comment.secondaryLabel.startsWith("data:image")) ||
-    isVisualCommentTypeData(comment.type, comment.typeData)
-  ) {
+  } else if (isVisualComment(comment)) {
     return (
       <div className={styles.Preview} data-test-name="CommentPreview">
         <VisualPreview comment={comment} />

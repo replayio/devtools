@@ -2,7 +2,7 @@ import { FetchResult, gql, useMutation } from "@apollo/client";
 import omit from "lodash/omit";
 
 import { AddComment, AddCommentVariables } from "shared/graphql/generated/AddComment";
-import { Comment } from "ui/state/comments";
+import { Comment } from "shared/graphql/types";
 import { trackEvent } from "ui/utils/telemetry";
 
 export type AddCommentMutation = (comment: Comment) => Promise<FetchResult<AddComment>>;
@@ -27,21 +27,7 @@ export default function useAddComment(): AddCommentMutation {
     return addComment({
       variables: {
         input: {
-          ...omit(comment, [
-            "createdAt",
-            "id",
-            "isPublished",
-            "replies",
-            "updatedAt",
-            "user",
-
-            // TODO [FE-1058] Legacy fields
-            "networkRequestId",
-            "position",
-            "primaryLabel",
-            "secondaryLabel",
-            "sourceLocation",
-          ]),
+          ...omit(comment, ["createdAt", "id", "isPublished", "replies", "updatedAt", "user"]),
           isPublished: comment.isPublished === true,
           recordingId: comment.recordingId,
         },

@@ -8,7 +8,7 @@
 // ====================================================
 
 export interface GetWorkspaceTestExecutions_node_Recording {
-  __typename: "Recording";
+  __typename: "Recording" | "RootCauseAnalysis";
 }
 
 export interface GetWorkspaceTestExecutions_node_Workspace_tests_edges_node_executions_recordings {

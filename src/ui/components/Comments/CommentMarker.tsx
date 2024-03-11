@@ -2,10 +2,10 @@ import classnames from "classnames";
 import React from "react";
 import { ConnectedProps, connect } from "react-redux";
 
+import { Comment } from "shared/graphql/types";
 import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
-import { Comment } from "ui/state/comments";
 import { trackEvent } from "ui/utils/telemetry";
 import { getMarkerLeftOffset } from "ui/utils/timeline";
 
@@ -41,7 +41,7 @@ class CommentMarker extends React.Component<CommentMarkerProps> {
     e.stopPropagation();
     const { comment, seekToComment } = this.props;
     trackEvent("timeline.comment_select");
-    seekToComment(comment, comment.sourceLocation, false);
+    seekToComment(comment, false);
   };
 
   render() {

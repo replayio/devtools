@@ -1,5 +1,5 @@
 import sortBy from "lodash/sortBy";
-import React, { ReactNode, useMemo } from "react";
+import { useMemo } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
 import { useGetComments } from "ui/hooks/comments/comments";

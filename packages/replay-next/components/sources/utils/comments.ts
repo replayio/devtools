@@ -7,6 +7,7 @@ import { getBase64Png } from "replay-next/src/utils/canvas";
 import { getSourceFileName } from "replay-next/src/utils/source";
 import { ParsedToken } from "replay-next/src/utils/syntax-parser";
 import { ReplayClientInterface } from "shared/client/types";
+import { Comment } from "shared/graphql/types";
 
 export enum CanonicalRequestType {
   CSS,
@@ -26,6 +27,11 @@ export const COMMENT_TYPE_NETWORK_REQUEST = "network-request";
 export const COMMENT_TYPE_SOURCE_CODE = "source-code";
 export const COMMENT_TYPE_VISUAL = "visual";
 
+export interface UnrefinedComment {
+  type: string | null;
+  typeData: any;
+}
+
 export interface NetworkRequestCommentTypeData {
   id: string;
   method: string;
@@ -35,6 +41,10 @@ export interface NetworkRequestCommentTypeData {
   type: CanonicalRequestType;
 }
 
+export type NetworkRequestComment = Omit<Comment, "type" | "typeData"> & {
+  type: typeof COMMENT_TYPE_NETWORK_REQUEST;
+  typeData: NetworkRequestCommentTypeData;
+};
 export interface SourceCodeCommentTypeData {
   columnIndex: number;
   lineNumber: number;
@@ -44,6 +54,11 @@ export interface SourceCodeCommentTypeData {
   sourceUrl: string | null;
 }
 
+export type SourceCodeComment = Omit<Comment, "type" | "typeData"> & {
+  type: typeof COMMENT_TYPE_SOURCE_CODE;
+  typeData: SourceCodeCommentTypeData;
+};
+
 export interface VisualCommentTypeData {
   encodedImage: string | null;
   pageX: number | null;
@@ -51,6 +66,11 @@ export interface VisualCommentTypeData {
   scaledX: number | null;
   scaledY: number | null;
 }
+
+export type VisualComment = Omit<Comment, "type" | "typeData"> & {
+  type: typeof COMMENT_TYPE_VISUAL;
+  typeData: VisualCommentTypeData;
+};
 
 export function createTypeDataForNetworkRequestComment(
   requestId: string,
@@ -135,7 +155,7 @@ export async function createTypeDataForVisualComment(
 
   let scaledX: number | null = null;
   let scaledY: number | null = null;
-  if (pageX !== null && pageY !== null) {
+  if (canvas !== null && pageX !== null && pageY !== null) {
     const { height, left, top, width } = canvas.getBoundingClientRect();
 
     scaledX = (pageX - left) / width;
@@ -151,6 +171,12 @@ export async function createTypeDataForVisualComment(
   };
 }
 
+export function isNetworkRequestComment(
+  comment: UnrefinedComment
+): comment is NetworkRequestComment {
+  return isNetworkRequestCommentTypeData(comment.type, comment.typeData);
+}
+
 export function isNetworkRequestCommentTypeData(
   type: string | null,
   typeData: any
@@ -158,11 +184,19 @@ export function isNetworkRequestCommentTypeData(
   return type === COMMENT_TYPE_NETWORK_REQUEST && typeData != null;
 }
 
+export function isSourceCodeComment(comment: UnrefinedComment): comment is SourceCodeComment {
+  return isSourceCodeCommentTypeData(comment.type, comment.typeData);
+}
+
 export function isSourceCodeCommentTypeData(
   type: string | null,
   typeData: any
 ): typeData is SourceCodeCommentTypeData {
   return type === COMMENT_TYPE_SOURCE_CODE && typeData != null;
+}
+
+export function isVisualComment(comment: UnrefinedComment): comment is VisualComment {
+  return isVisualCommentTypeData(comment.type, comment.typeData);
 }
 
 export function isVisualCommentTypeData(

@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import { memo } from "react";
 
-import { Reply } from "ui/state/comments";
+import { Reply } from "shared/graphql/types";
 
 import EditableRemark from "./EditableRemark";
 import styles from "./ReplyCard.module.css";

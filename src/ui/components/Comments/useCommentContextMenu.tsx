@@ -4,9 +4,9 @@ import { ContextMenuDivider, ContextMenuItem, useContextMenu } from "use-context
 
 import Icon from "replay-next/components/Icon";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
+import { Remark } from "shared/graphql/types";
 import { requestFocusWindow } from "ui/actions/timeline";
 import { useAppDispatch } from "ui/setup/hooks";
-import type { Remark } from "ui/state/comments";
 import { trackEvent } from "ui/utils/telemetry";
 
 import { useConfirm } from "../shared/Confirm";
