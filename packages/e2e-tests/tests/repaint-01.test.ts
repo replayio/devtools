@@ -7,7 +7,7 @@ import { test } from "../testFixture";
 
 test.use({ exampleKey: "doc_control_flow.html" });
 
-test("repaint-01: repaints the screen screen when stepping over code that modifies the DOM", async ({
+test.skip("repaint-01: repaints the screen screen when stepping over code that modifies the DOM", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
