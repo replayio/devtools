@@ -44,7 +44,7 @@ const argv = yargs
     alias: "r",
     default: "",
     description: "Override runtime specified in test config",
-    choices: ["", "chromium", "firefox", "node"],
+    choices: ["", "chromium", "node"],
   })
   .option("target", {
     alias: "t",
@@ -68,7 +68,7 @@ type TestExampleFile = {
   category: "browser" | "node";
   filename: string;
   folder: string;
-  runtime: "firefox" | "chromium" | "node";
+  runtime: "chromium" | "node";
   playwrightScript?: PlaywrightScript;
 };
 const examplesJsonPath = join(__dirname, "..", "examples.json");
