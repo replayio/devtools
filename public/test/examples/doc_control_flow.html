@@ -106,7 +106,10 @@ function startNextCallback() {
 }
 
 function updateText(text) {
-  document.getElementById("maindiv").innerHTML = text;
+  let e = document.getElementById("maindiv")
+  console.log(`text is still:'${e.innerHTML}'`);
+  e.innerHTML = text;
+  console.log(`text is now:'${text}'`);
 }
 
 function throwError() {
