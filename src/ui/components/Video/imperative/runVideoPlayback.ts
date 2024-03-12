@@ -52,7 +52,7 @@ export async function runVideoPlayback({
     );
 
     if (nextTimelineTime >= endTime) {
-      reduxStore.dispatch(stopPlayback(true));
+      reduxStore.dispatch(stopPlayback());
       reduxStore.dispatch(seek({ executionPoint: endPoint || undefined, time: endTime }));
 
       break playbackLoop;

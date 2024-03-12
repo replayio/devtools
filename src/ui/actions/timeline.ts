@@ -291,7 +291,7 @@ export function seek({
 
         const timeStampedPoint = await replayClient.getPointNearTime(clampedTime);
         if (getSeekLock(getState()) !== seekLock) {
-          // someone requested seeking to a different point while we were waiting
+          // Someone requested seeking to a different point while we were waiting
           return;
         }
 
@@ -414,25 +414,19 @@ export function startPlayback(
   };
 }
 
-export function stopPlayback(updateTime: boolean = true): UIThunkAction {
+export function stopPlayback(): UIThunkAction {
   return async (dispatch, getState) => {
-    dispatch(setTimelineState({ playback: null }));
-
-    if (updateTime) {
-      const playback = getPlayback(getState());
-
-      if (playback) {
-        dispatch(seek({ time: playback.time }));
-      }
+    const playback = getPlayback(getState());
+    if (playback) {
+      dispatch(setTimelineState({ playback: null }));
+      dispatch(seek({ time: playback.time }));
     }
   };
 }
 
-export function replayPlayback(): UIThunkAction {
-  return (dispatch, getState) => {
-    const beginTime = 0;
-
-    dispatch(seek({ openSource: true, time: beginTime }));
+export function replayFromBeginning(): UIThunkAction {
+  return dispatch => {
+    dispatch(seek({ openSource: true, time: 0 }));
   };
 }
 
