@@ -36,8 +36,7 @@
     "@types/uuid": "^7.0.3",
     "jest": "^28.0.2",
     "jest-environment-jsdom": "^28.0.2",
-    "node-fetch": "^2.0.0",
-    "typescript": "5.0.2"
+    "node-fetch": "^2.0.0"
   },
   "scripts": {
     "dev": "npx next dev",
