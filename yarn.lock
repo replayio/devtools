@@ -15091,7 +15091,7 @@ __metadata:
     tailwindcss: ^3.2.4
     ts-node: ^10.7.0
     tsconfig-paths: ^3.14.1
-    typescript: ^5.4.3
+    typescript: ^5.4.2
     use-context-menu: 0.4.13
     utf-8-validate: ^5.0.8
     uuid: ^7.0.3
