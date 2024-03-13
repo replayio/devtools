@@ -106,7 +106,12 @@ function startNextCallback() {
 }
 
 function updateText(text) {
-  document.getElementById("maindiv").innerHTML = text;
+  const element = document.getElementById("maindiv")
+  console.group(`updateText("${text}")`)
+  console.log(`Element text before: "${element.textContent}"`);
+  element.innerHTML = text;
+  console.log(`Element text after: "${element.textContent}"`);
+  console.groupEnd();
 }
 
 function throwError() {
