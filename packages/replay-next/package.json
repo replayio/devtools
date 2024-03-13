@@ -39,10 +39,7 @@
     "node-fetch": "^2.0.0"
   },
   "scripts": {
-    "dev": "npx next dev",
-    "build": "next build",
-    "start": "next start",
     "test": "jest",
-    "lint": "next lint"
+    "test:watch": "jest --watch"
   }
 }
