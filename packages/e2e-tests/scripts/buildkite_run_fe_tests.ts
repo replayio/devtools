@@ -298,7 +298,7 @@ export default async function run_fe_tests(
     {
       // Run the known-passing tests.
       execSync(
-        `${envWrapper} npx playwright test --grep-invert node_ --project=replay-chromium --workers=${nWorkers} --retries=2 ${testFiles.join(
+        `${envWrapper} npx playwright test --grep-invert node_ --project=replay-chromium --workers=${nWorkers} --retries=0 ${testFiles.join(
           " "
         )}`,
         {
