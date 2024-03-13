@@ -60,10 +60,7 @@ function getFiltersPanel(page: Page) {
   return page.locator('div.filters')
 }
 
-export default async function testFunction(
-  page: Page,
-  expect: typeof expectType
-) {
+export async function testFunction(page: Page, expect: typeof expectType) {
   const listItems = getTodoListItems(page)
 
   async function waitForListItemsCount(count: number) {
@@ -143,5 +140,5 @@ export default async function testFunction(
 
   // add a little delay to ensure that the last click was added
   // to the recording, see [FE-2286] and [RUN-3258]
-  await delay(500);
+  await delay(500)
 }
