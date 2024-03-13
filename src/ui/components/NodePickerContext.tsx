@@ -112,7 +112,7 @@ export function NodePickerContextRoot({ children }: PropsWithChildren<{}>) {
         });
       }
     },
-    [pauseId]
+    [pauseId, replayClient]
   );
 
   const disable = useCallback(() => {
