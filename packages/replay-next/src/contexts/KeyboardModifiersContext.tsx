@@ -57,7 +57,7 @@ export function KeyboardModifiersContextRoot({ children }: PropsWithChildren<{}>
     };
 
     const onMouseMove = (event: MouseEvent) => {
-      const nextMetaKeyActive = event.metaKey;
+      const nextMetaKeyActive = event.metaKey || event.ctrlKey;
       const nextShiftKeyActive = event.shiftKey;
       if (nextMetaKeyActive !== isMetaKeyActive || nextShiftKeyActive !== isShiftKeyActive) {
         startTransition(() => {
