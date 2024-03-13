@@ -78,11 +78,6 @@ export interface Remark {
   user: User;
 }
 
-export interface CommentPosition {
-  x: number;
-  y: number;
-}
-
 export interface Comment extends Remark {
   replies: Reply[];
 }
