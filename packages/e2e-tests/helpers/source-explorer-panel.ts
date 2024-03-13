@@ -84,10 +84,10 @@ export async function openSourceExplorerPanel(page: Page): Promise<void> {
   const isVisible = await pane.isVisible();
   if (!isVisible) {
     const button = page.locator('[data-test-name="ToolbarButton-SourceExplorer"]');
-    await button.click();
 
     await waitFor(async () => {
+      await button.click();
       await expect(await pane.isVisible()).toBe(true);
-    });
+    }, {retryInterval: 500});
   }
 }
