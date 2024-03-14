@@ -72,6 +72,9 @@ export default function useAuth0() {
     return TEST_AUTH;
   }
 
+  // for social logins, the connection (e.g. google-oauth2) is the prefix. For
+  // SAML logins, the connection is the client-specific code after the samlp
+  // prefix (samlp|client-name|user-id).
   const parts = auth.user.sub.split("|");
   const connection = parts[0] === "samlp" ? parts[1] : parts[0];
 

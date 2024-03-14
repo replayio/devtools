@@ -295,6 +295,9 @@ export default function Login({
     if (challenge && state) {
       const authHost = getAuthHost();
       const clientId = getAuthClientId();
+      // when continueToLogin was selected, the user was previously logged in
+      // and wanted to select a different account so force the login prompt by
+      // passing prompt=login to auth0
       window.location.href = `https://${authHost}/authorize?response_type=code&code_challenge_method=S256&code_challenge=${challenge}&client_id=${clientId}&redirect_uri=${returnToPath}&scope=openid profile offline_access&state=${state}&audience=https://api.replay.io&connection=${connection}&prompt=${
         continueToLogin ? "login" : ""
       }`;
