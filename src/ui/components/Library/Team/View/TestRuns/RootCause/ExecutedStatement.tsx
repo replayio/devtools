@@ -63,7 +63,8 @@ function ExecutedStatementDiscrepancy({
   return (
     <div
       onClick={() => console.log(points)}
-      className="flex flex-col gap-2 rounded-lg bg-gray-700 p-3"
+      className="flex flex-col gap-2 rounded-lg p-3"
+      style={{ backgroundColor: "#293347" }}
     >
       <div
         className="flex flex-row items-center justify-between"
@@ -86,7 +87,19 @@ function ExecutedStatementDiscrepancy({
         <div className="flex flex-col gap-2">
           <div className="overflow-auto bg-gray-900">
             {points.map((p: any, i: number) => (
-              <div key={i} className="flex flex-row gap-2 font-mono text-xs">
+              <div
+                key={i}
+                className="flex flex-row gap-2 font-mono text-xs"
+                style={
+                  p.location.line == midLine.line
+                    ? {
+                        backgroundColor: "var(--background-color-current-execution-point)",
+                        borderTop: "1px solid var(--border-color-current-execution-point)",
+                        borderBottom: "1px solid var(--border-color-current-execution-point)",
+                      }
+                    : {}
+                }
+              >
                 <div className="flex flex-row gap-1">
                   <div
                     className={`text-right ${p.breakable ? "" : "opacity-50"}`}
@@ -114,7 +127,7 @@ function ExecutedStatementDiscrepancy({
                 </div>
                 <div
                   className={`whitespace-pre ${
-                    p.location.line === midLine.line ? "font-bold" : ""
+                    p.location.line === midLine.line ? "font-bold opacity-100" : "opacity-70"
                   }`}
                 >
                   {p.text}
