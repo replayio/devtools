@@ -54,11 +54,12 @@ function ExecutedStatementDiscrepancy({
   const endLine = midLine.line + ALLOWANCE;
 
   const points = discrepancy.event.description!.frame.points.filter(
-    p => p.location.line >= beginLine && p.location.line <= endLine
+    (p: any) => p.location.line >= beginLine && p.location.line <= endLine
   );
   const otherPoints = discrepancy.event.description!.frame.otherPoints.filter(
-    p => p.location.line >= beginLine && p.location.line <= endLine
+    (p: any) => p.location.line >= beginLine && p.location.line <= endLine
   );
+  const lines = new Array(endLine - beginLine).fill(beginLine).map((l, i) => l + i);
 
   return (
     <div
@@ -85,55 +86,94 @@ function ExecutedStatementDiscrepancy({
       </div>
       {isCollapsed ? null : (
         <div className="flex flex-col gap-2">
-          <div className="overflow-auto bg-gray-900">
-            {points.map((p: any, i: number) => (
-              <div
-                key={i}
-                className="flex flex-row gap-2 font-mono text-xs"
-                style={
-                  p.location.line == midLine.line
-                    ? {
-                        backgroundColor: "var(--background-color-current-execution-point)",
-                        borderTop: "1px solid var(--border-color-current-execution-point)",
-                        borderBottom: "1px solid var(--border-color-current-execution-point)",
-                      }
-                    : {}
-                }
-              >
-                <div className="flex flex-row gap-1">
+          <div className="flex flex-row overflow-auto bg-gray-900 font-mono text-xs">
+            <div className="flex flex-col items-end" style={{ minWidth: "2rem" }}>
+              {lines.map((l, i) => {
+                return (
                   <div
-                    className={`text-right ${p.breakable ? "" : "opacity-50"}`}
-                    style={{ minWidth: "2rem" }}
+                    key={i}
+                    className="px-1"
+                    style={
+                      l == midLine.line
+                        ? {
+                            backgroundColor: "var(--background-color-current-execution-point)",
+                            borderTop: "1px solid var(--border-color-current-execution-point)",
+                            borderBottom: "1px solid var(--border-color-current-execution-point)",
+                          }
+                        : {}
+                    }
                   >
-                    {p.location.line}
+                    {l}
                   </div>
-                  {p.breakable ? (
-                    <div className="flex flex-row gap-1">
-                      <div className="w-3 bg-green-700 text-center">{p.hits}</div>
-                      <div className="w-3 bg-red-700 text-center">
-                        {
-                          otherPoints.find(
-                            (otherPoint: any) => otherPoint.location.line === p.location.line
-                          )!.hits
-                        }
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex flex-row gap-1">
-                      <div className="w-3 bg-gray-600 text-center" />
-                      <div className="w-3 bg-gray-600 text-center" />
-                    </div>
-                  )}
-                </div>
-                <div
-                  className={`whitespace-pre ${
-                    p.location.line === midLine.line ? "font-bold opacity-100" : "opacity-70"
-                  }`}
-                >
-                  {p.text}
-                </div>
-              </div>
-            ))}
+                );
+              })}
+            </div>
+            <div className="flex flex-col">
+              {lines.map((l, i) => {
+                const point = points.find((p: any) => p.location.line === l);
+                return (
+                  <div
+                    key={i}
+                    style={
+                      l == midLine.line
+                        ? {
+                            borderTop: "1px solid var(--border-color-current-execution-point)",
+                            borderBottom: "1px solid var(--border-color-current-execution-point)",
+                          }
+                        : {}
+                    }
+                    className={`px-1 ${point.breakable ? "bg-green-700" : "bg-gray-600"}`}
+                  >
+                    {points.find((p: any) => p.location.line === l).hits}
+                  </div>
+                );
+              })}
+            </div>
+            <div className="flex flex-col">
+              {lines.map((l, i) => {
+                const point = otherPoints.find((p: any) => p.location.line === l);
+                return (
+                  <div
+                    key={i}
+                    style={
+                      l == midLine.line
+                        ? {
+                            borderTop: "1px solid var(--border-color-current-execution-point)",
+                            borderBottom: "1px solid var(--border-color-current-execution-point)",
+                          }
+                        : {}
+                    }
+                    className={`px-1 ${point.breakable ? "bg-red-700" : "bg-gray-600"}`}
+                  >
+                    {point.hits}
+                  </div>
+                );
+              })}
+            </div>
+            <div className="grid overflow-auto">
+              {/* <div className="flex flex-col overflow-auto"> */}
+              {lines.map((l, i) => {
+                const point = points.find((p: any) => p.location.line === l);
+                return (
+                  <div
+                    key={i}
+                    className="whitespace-pre"
+                    style={
+                      l == midLine.line
+                        ? {
+                            backgroundColor: "var(--background-color-current-execution-point)",
+                            borderTop: "1px solid var(--border-color-current-execution-point)",
+                            borderBottom: "1px solid var(--border-color-current-execution-point)",
+                            fontWeight: "bold",
+                          }
+                        : {}
+                    }
+                  >
+                    {point.text || " "}
+                  </div>
+                );
+              })}
+            </div>
           </div>
           <ReplayLink
             id={recordingId}
