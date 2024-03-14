@@ -1,5 +1,5 @@
 import { openDevToolsTab, startTest } from "../helpers";
-import { E2E_USER_1_API_KEY, E2E_USER_2_API_KEY } from "../helpers/authentication";
+import { E2E_USER_1, E2E_USER_2 } from "../helpers/authentication";
 import { disableAllConsoleMessageTypes, verifyConsoleMessage } from "../helpers/console-panel";
 import {
   findPoints,
@@ -9,16 +9,15 @@ import {
 } from "../helpers/pause-information-panel";
 import { openSource } from "../helpers/source-explorer-panel";
 import { addLogpoint, editLogPoint, removeAllLogpoints } from "../helpers/source-panel";
-import test, { Page, expect } from "../testFixtureCloneRecording";
+import { waitForRecordingToFinishIndexing } from "../helpers/utils";
+import test, { Page, expect } from "../testFixture";
 
-// Each authenticated e2e test must use a unique recording id;
-// else shared state from one test could impact another test running in parallel.
-// TODO [SCS-1066] Share recordings between other tests
-const url = "authenticated_logpoints_1.html";
+const url = "authenticated_logpoints.html";
 const lineNumber = 14;
 
-async function load(page: Page, recordingId: string, apiKey: string) {
-  await startTest(page, recordingId, apiKey);
+async function load(page: Page, recordingId: string, apiKey: string, testScope: string) {
+  await startTest(page, recordingId, { apiKey, testScope });
+  await page.coverage.startJSCoverage();
 
   await openDevToolsTab(page);
   await openSource(page, url);
@@ -27,11 +26,12 @@ async function load(page: Page, recordingId: string, apiKey: string) {
   await disableAllConsoleMessageTypes(page);
 }
 
-test.use({ exampleKey: url });
+test.use({ exampleKey: url, testUsers: [E2E_USER_1, E2E_USER_2] });
 
 test(`authenticated/logpoints-01: Shared logpoints functionality`, async ({
   browser,
-  pageWithMeta: { recordingId },
+  pageWithMeta: { recordingId, testScope },
+  testUsers,
 }) => {
   let pageOne: Page;
   let pageTwo: Page;
@@ -42,11 +42,7 @@ test(`authenticated/logpoints-01: Shared logpoints functionality`, async ({
     // User 1
     const context = await browser.newContext();
     const page = await context.newPage();
-    await load(page, recordingId, E2E_USER_1_API_KEY);
-
-    // Clean up from previous tests
-    // TODO [SCS-1066] Ideally we would create a fresh recording for each test run
-    await removeAllLogpoints(page);
+    await load(page, recordingId, testUsers![0].apiKey, testScope);
 
     // Add log point (will be shared, since we're authenticated)
     await addLogpoint(page, {
@@ -66,7 +62,7 @@ test(`authenticated/logpoints-01: Shared logpoints functionality`, async ({
     // User 2
     const context = await browser.newContext();
     const page = await context.newPage();
-    await load(page, recordingId, E2E_USER_2_API_KEY);
+    await load(page, recordingId, testUsers![1].apiKey, testScope);
 
     const locator = await findPoints(page, "logpoint", { lineNumber });
 
@@ -88,6 +84,8 @@ test(`authenticated/logpoints-01: Shared logpoints functionality`, async ({
     const page = pageOne;
     await page.reload();
 
+    await waitForRecordingToFinishIndexing(page);
+
     // Verify log point is still present and not affected by user 2
     await verifyConsoleMessage(page, "initial:", "log-point", 10);
 
@@ -107,10 +105,10 @@ test(`authenticated/logpoints-01: Shared logpoints functionality`, async ({
     const page = pageTwo;
     await page.reload();
 
+    await waitForRecordingToFinishIndexing(page);
+
     // Point should show updated content
     await verifyConsoleMessage(page, "updated:", "log-point", 10);
-
-    await page.close();
   }
 
   {
@@ -121,7 +119,10 @@ test(`authenticated/logpoints-01: Shared logpoints functionality`, async ({
 
     // Cleanup
     await removeAllLogpoints(page);
+  }
 
-    await page.close();
+  {
+    await pageOne.close();
+    await pageTwo.close();
   }
 });

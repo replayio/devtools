@@ -3,12 +3,9 @@ import React, { ReactNode, Suspense, useContext, useLayoutEffect } from "react";
 import { useImperativeCacheValue } from "suspense";
 
 import { EditorPane } from "devtools/client/debugger/src/components/Editor/EditorPane";
-import LazyOffscreen from "replay-next/components/LazyOffscreen";
+import LazyActivity from "replay-next/components/LazyActivity";
 import { PanelLoader } from "replay-next/components/PanelLoader";
-import {
-  RecordingCapabilities,
-  recordingCapabilitiesCache,
-} from "replay-next/src/suspense/BuildIdCache";
+import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { setSelectedPanel } from "ui/actions/layout";
@@ -33,11 +30,37 @@ import ReplayLogo from "../shared/ReplayLogo";
 import WaitForReduxSlice from "../WaitForReduxSlice";
 import NewConsoleRoot from "./NewConsole";
 import SourcesTabLabel from "./SourcesTabLabel";
+import styles from "./SecondaryToolbox.module.css";
 
 const InspectorApp = React.lazy(() => import("devtools/client/inspector/components/App"));
 
 const ReactDevToolsPanel = React.lazy(() => import("./ReactDevTools"));
 const ReduxDevToolsPanel = React.lazy(() => import("./redux-devtools/ReduxDevToolsPanel"));
+
+type RoutinePanelStatus = "pending" | "loaded" | "not-available" | "recording-too-long";
+
+function calculateRoutinePanelStatus(
+  hasRoutineAnnotations: boolean,
+  hasInitialAnnotations: boolean,
+  recordingTooLongForRoutines: boolean
+): RoutinePanelStatus {
+  // We definitely show these tabs if we have actual annotations from the routine.
+  // If we don't have routine annotations, we want to show the tabs anyway _if_ the recording
+  // is too long, in which case the panels will show a warning message describing why.
+  // Also, we should only show these tabs if we're pretty sure the recording actually has
+  // _some_ kind of React or Redux data available (ie, not a Vue or Angular app).
+  if (hasRoutineAnnotations) {
+    return "loaded";
+  } else if (hasInitialAnnotations) {
+    // TODO We have no way of knowing routine status right now, so we can't show an error state.
+
+    // We'll never hit this case for Firefox recordings,
+    // because we don't have the "initial" annotations from the recording.
+    return recordingTooLongForRoutines ? "recording-too-long" : "pending";
+  } else {
+    return "not-available";
+  }
+}
 
 interface PanelButtonProps {
   panel: SecondaryPanelName;
@@ -65,44 +88,6 @@ const PanelButton = ({ panel, children }: PanelButtonProps) => {
     </button>
   );
 };
-
-function PanelButtons({
-  hasReactComponents,
-  hasReduxAnnotations,
-  recordingCapabilities,
-  showDebuggerTab,
-}: {
-  hasReactComponents: boolean;
-  hasReduxAnnotations: boolean;
-  recordingCapabilities: RecordingCapabilities;
-  showDebuggerTab: boolean;
-}) {
-  const { supportsElementsInspector, supportsNetworkRequests, supportsRepaintingGraphics } =
-    recordingCapabilities;
-
-  const [chromiumNetMonitorEnabled] = useGraphQLUserData("feature_chromiumNetMonitor");
-  const [reduxDevToolsEnabled] = useGraphQLUserData("feature_reduxDevTools");
-
-  return (
-    <div className="panel-buttons theme-tab-font-size flex flex-row items-center overflow-hidden">
-      {supportsRepaintingGraphics && <NodePicker />}
-      <PanelButton panel="console">Console</PanelButton>
-      {supportsElementsInspector && <PanelButton panel="inspector">Elements</PanelButton>}
-      {showDebuggerTab && (
-        <PanelButton panel="debugger">
-          <SourcesTabLabel />
-        </PanelButton>
-      )}
-      {hasReactComponents && <PanelButton panel="react-components">React</PanelButton>}
-      {hasReduxAnnotations && reduxDevToolsEnabled && (
-        <PanelButton panel="redux-devtools">Redux</PanelButton>
-      )}
-      {(chromiumNetMonitorEnabled || supportsNetworkRequests) && (
-        <PanelButton panel="network">Network</PanelButton>
-      )}
-    </div>
-  );
-}
 
 function ConsolePanel() {
   return (
@@ -132,6 +117,14 @@ function InspectorPanel() {
           <InspectorApp />
         </Suspense>
       </WaitForReduxSlice>
+    </div>
+  );
+}
+
+function RoutinePanelUnavailable({ testId }: { testId: string }) {
+  return (
+    <div className={styles.CouldNotLoadMessage} data-test-id={testId}>
+      <div>Data is unavailable because this recording was too long to process</div>
     </div>
   );
 }
@@ -171,19 +164,54 @@ export default function SecondaryToolbox() {
   const chromiumNetMonitorEnabled = useGraphQLUserData("feature_chromiumNetMonitor");
 
   const recordingCapabilities = recordingCapabilitiesCache.read(replayClient);
-  const showDebuggerTab = recordingCapabilities.supportsRepaintingGraphics
+  const { supportsElementsInspector, supportsNetworkRequests, supportsRepaintingGraphics } =
+    recordingCapabilities;
+  const showDebuggerTab = supportsRepaintingGraphics
     ? toolboxLayout !== "ide"
     : toolboxLayout === "full";
 
-  // We definitely show these tabs if we have actual annotations from the routine.
-  // If we don't have routine annotations, we want to show the tabs anyway _if_ the recording
-  // is too long, in which case the panels will show a warning message describing why.
-  // Also, we should only show these tabs if we're pretty sure the recording actually has
-  // _some_ kind of React or Redux data available (ie, not a Vue or Angular app).
-  const shouldShowReactTab =
-    hasReactRoutineAnnotations || (hasReactRecordingAnnotations && recordingTooLongForRoutines);
-  const shouldShowReduxTab =
-    hasReduxRoutineAnnotations || (hasReduxRecordingAnnotations && recordingTooLongForRoutines);
+  const reactPanelStatus = calculateRoutinePanelStatus(
+    hasReactRoutineAnnotations,
+    hasReactRecordingAnnotations,
+    recordingTooLongForRoutines
+  );
+  const reduxPanelStatus = calculateRoutinePanelStatus(
+    hasReduxRoutineAnnotations,
+    hasReduxRecordingAnnotations,
+    recordingTooLongForRoutines
+  );
+  const shouldShowReactTab = reactPanelStatus !== "not-available";
+  const shouldShowReduxTab = reduxPanelStatus !== "not-available";
+
+  let reactPanel: React.ReactNode = null;
+  let reduxPanel: React.ReactNode = null;
+
+  switch (reactPanelStatus) {
+    case "pending":
+      reactPanel = <PanelLoader />;
+      break;
+    case "loaded":
+      reactPanel = <ReactDevToolsPanel />;
+      break;
+    case "recording-too-long":
+      reactPanel = <RoutinePanelUnavailable testId="ReactDevToolsPanel" />;
+      break;
+  }
+
+  switch (reduxPanelStatus) {
+    case "pending":
+      reduxPanel = <PanelLoader />;
+      break;
+    case "loaded":
+      reduxPanel = <ReduxDevToolsPanel />;
+      break;
+    case "recording-too-long":
+      reduxPanel = <RoutinePanelUnavailable testId="ReduxDevTools" />;
+      break;
+  }
+
+  const shouldShowNetworkTab =
+    chromiumNetMonitorEnabled || recordingCapabilities.supportsNetworkRequests;
 
   useLayoutEffect(() => {
     // If the selected panel is not available, switch to the console panel.
@@ -198,19 +226,26 @@ export default function SecondaryToolbox() {
   return (
     <div className={classnames(`secondary-toolbox rounded-lg`)}>
       <header className="secondary-toolbox-header">
-        <PanelButtons
-          hasReactComponents={shouldShowReactTab}
-          hasReduxAnnotations={shouldShowReduxTab}
-          recordingCapabilities={recordingCapabilities}
-          showDebuggerTab={showDebuggerTab}
-        />
+        <div className="panel-buttons theme-tab-font-size flex flex-row items-center overflow-hidden">
+          {supportsRepaintingGraphics && <NodePicker />}
+          <PanelButton panel="console">Console</PanelButton>
+          {supportsElementsInspector && <PanelButton panel="inspector">Elements</PanelButton>}
+          {showDebuggerTab && (
+            <PanelButton panel="debugger">
+              <SourcesTabLabel />
+            </PanelButton>
+          )}
+          {shouldShowReactTab && <PanelButton panel="react-components">React</PanelButton>}
+          {shouldShowReduxTab && <PanelButton panel="redux-devtools">Redux</PanelButton>}
+          {shouldShowNetworkTab && <PanelButton panel="network">Network</PanelButton>}
+        </div>
         <div className="secondary-toolbox-right-buttons-container flex">
           <div className="secondary-toolbox-scroll-overflow-gradient"></div>
         </div>
       </header>
       <Redacted className="secondary-toolbox-content bg-chrome text-xs">
         <Suspense fallback={<PanelLoader />}>
-          {(chromiumNetMonitorEnabled || recordingCapabilities.supportsNetworkRequests) && (
+          {shouldShowNetworkTab && (
             <Panel isActive={selectedPanel === "network"}>
               <NetworkMonitor />
             </Panel>
@@ -221,12 +256,8 @@ export default function SecondaryToolbox() {
           <Panel isActive={selectedPanel === "inspector"}>
             <InspectorPanel />
           </Panel>
-          <Panel isActive={selectedPanel === "react-components"}>
-            <ReactDevToolsPanel />
-          </Panel>
-          <Panel isActive={selectedPanel === "redux-devtools"}>
-            <ReduxDevToolsPanel />
-          </Panel>
+          <Panel isActive={selectedPanel === "react-components"}>{reactPanel}</Panel>
+          <Panel isActive={selectedPanel === "redux-devtools"}>{reduxPanel}</Panel>
           {showDebuggerTab && (
             <Panel isActive={selectedPanel === "debugger"}>
               <EditorPane />
@@ -239,5 +270,5 @@ export default function SecondaryToolbox() {
 }
 
 function Panel({ children, isActive }: { children: ReactNode; isActive: boolean }) {
-  return <LazyOffscreen mode={isActive ? "visible" : "hidden"}>{children}</LazyOffscreen>;
+  return <LazyActivity mode={isActive ? "visible" : "hidden"}>{children}</LazyActivity>;
 }

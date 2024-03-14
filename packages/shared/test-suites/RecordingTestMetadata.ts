@@ -13,6 +13,7 @@ import { insert } from "replay-next/src/utils/array";
 import { assertWithTelemetry, recordData } from "replay-next/src/utils/telemetry";
 import { ReplayClientInterface } from "shared/client/types";
 import { Annotation, PlaywrightTestSources, PlaywrightTestStacks } from "shared/graphql/types";
+import { maxTimeStampedPoint, minTimeStampedPoint } from "shared/utils/time";
 import {
   AnnotationsCache,
   PlaywrightAnnotationsCache,
@@ -189,6 +190,8 @@ export namespace RecordingTestMetadataV3 {
     // Useful for identifying retries of a failed test
     attempt: number;
 
+    testRunnerName: TestRunnerName;
+
     // An error that occurred for this test that was unrelated to a specific event
     // e.g. a JS runtime error in the cypress spec file
     error: TestError | null;
@@ -254,6 +257,8 @@ export namespace RecordingTestMetadataV3 {
 
       // Used to associate chained commands
       parentId: string | null;
+
+      testRunnerName: TestRunnerName;
 
       // This value comes from annotations and so is only available for Cypress tests (for now)
       resultVariable: string | null;
@@ -513,12 +518,16 @@ export async function processCypressTestRecording(
                     time: annotation.time,
                   };
 
-                  resultPoint = {
-                    point: annotation.point,
-                    time: annotation.time,
-                  };
-
                   resultVariable = annotation.message.logVariable ?? null;
+
+                  if (resultVariable) {
+                    // Cypress commands have a `resultVariable` field that we need to find the
+                    // right step details object at the given `result` point.
+                    resultPoint = {
+                      point: annotation.point,
+                      time: annotation.time,
+                    };
+                  }
                   break;
                 }
                 case "step:enqueue": {
@@ -568,6 +577,7 @@ export async function processCypressTestRecording(
                 error,
                 id,
                 parentId,
+                testRunnerName: "cypress",
                 resultVariable,
                 scope,
                 testSourceCallStack: null,
@@ -618,6 +628,7 @@ export async function processCypressTestRecording(
     return {
       attempt,
       error,
+      testRunnerName: "cypress",
       events,
       id,
       result,
@@ -856,6 +867,22 @@ export async function processPlaywrightTestRecording(
           };
         }
 
+        let afterStep: TimeStampedPoint | null = timeStampedPointRange?.end ?? null;
+        let beforeStep: TimeStampedPoint | null = timeStampedPointRange?.begin ?? null;
+        let resultPoint: TimeStampedPoint | null = null;
+
+        if (category === "command" && beforeStep) {
+          // Playwright commands have a "command" category. We'll only look for
+          // steps that have a `locator.something()` command and a locator string arg.
+          if (
+            command.name.startsWith("locator") &&
+            command.arguments.length > 0 &&
+            command.arguments[0].length > 0
+          ) {
+            resultPoint = beforeStep;
+          }
+        }
+
         testEvents.push({
           data: {
             category,
@@ -863,6 +890,7 @@ export async function processPlaywrightTestRecording(
             error,
             id,
             parentId,
+            testRunnerName: "playwright",
             resultVariable: null,
             scope,
             testSourceCallStack: stack
@@ -874,9 +902,9 @@ export async function processPlaywrightTestRecording(
                 }))
               : null,
             timeStampedPoints: {
-              afterStep: timeStampedPointRange?.end ?? null,
-              beforeStep: timeStampedPointRange?.begin ?? null,
-              result: null,
+              afterStep,
+              beforeStep,
+              result: resultPoint,
               viewSource: null,
             },
           },
@@ -888,18 +916,60 @@ export async function processPlaywrightTestRecording(
     return {
       attempt,
       error,
+      testRunnerName: "playwright",
       events,
       id,
       result,
       source,
-      timeStampedPointRange: null,
+      timeStampedPointRange: getPlaywrightTestTimeStampedPointRange(events),
     };
   } else if (isTestRecordingV3(testRecording)) {
+    if (!testRecording.timeStampedPointRange) {
+      testRecording.timeStampedPointRange = getPlaywrightTestTimeStampedPointRange(
+        testRecording.events
+      );
+    }
     return testRecording;
   } else {
     // This function does not support the legacy TestItem format
     throw Error(`Unsupported legacy TestItem value`);
   }
+}
+
+function getPlaywrightTestTimeStampedPointRange(
+  events: RecordingTestMetadataV3.TestRecording["events"]
+) {
+  const allEventsSections = Object.values(events);
+  let testBeginPoint: TimeStampedPoint | null = null;
+  let testEndPoint: TimeStampedPoint | null = null;
+  for (const events of allEventsSections) {
+    for (const event of events) {
+      const executionPoint = getTestEventExecutionPoint(event);
+      if (executionPoint) {
+        if (!testBeginPoint || comparePoints(testBeginPoint.point, executionPoint) > 0) {
+          testBeginPoint = {
+            point: executionPoint,
+            time: getTestEventTime(event)!,
+          };
+        }
+
+        if (!testEndPoint || comparePoints(testEndPoint.point, executionPoint) < 0) {
+          testEndPoint = {
+            point: executionPoint,
+            time: getTestEventTime(event)!,
+          };
+        }
+      }
+    }
+  }
+
+  if (testBeginPoint && testEndPoint) {
+    return {
+      begin: testBeginPoint,
+      end: testEndPoint,
+    };
+  }
+  return null;
 }
 
 // If there are test(s) with completed status (passed/failed/timedOut) but no annotations,
@@ -1030,6 +1100,16 @@ export function getTestEventExecutionPoint(
 
 export function getTestEventTime(testEvent: RecordingTestMetadataV3.TestEvent): number | null {
   return getTestEventTimeStampedPoint(testEvent)?.time ?? null;
+}
+
+export function getUserActionEventRange(
+  userActionEvent: RecordingTestMetadataV3.UserActionEvent
+): TimeStampedPointRange {
+  const { afterStep, beforeStep, result, viewSource } = userActionEvent.data.timeStampedPoints;
+  return {
+    begin: minTimeStampedPoint([afterStep, beforeStep, result, viewSource])!,
+    end: maxTimeStampedPoint([afterStep, beforeStep, result, viewSource])!,
+  };
 }
 
 export function isGroupedTestCasesV1(

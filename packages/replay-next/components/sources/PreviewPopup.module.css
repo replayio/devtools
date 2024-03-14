@@ -1,4 +1,10 @@
-.Popup {
+.PopupErrorStyleOverride {
+  --theme-popup-background-color: var(--background-color-error);
+  --theme-popup-border-color: var(--border-color-error);
+  --theme-popup-color: var(--color-error);
+}
+
+.Wrapper {
   max-width: 400px;
   max-height: 400px;
   height: auto;
@@ -15,4 +21,8 @@
   color: var(--theme-popup-color);
   font-family: var(--font-family-default);
   font-size: var(--font-size-regular);
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }

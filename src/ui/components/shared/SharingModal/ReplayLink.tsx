@@ -1,7 +1,8 @@
 import React, { useRef, useState } from "react";
 
+import { Button } from "replay-next/components/Button";
 import { Recording } from "shared/graphql/types";
-import { getRecordingURL } from "ui/utils/recording";
+import { getRecordingURL } from "shared/utils/recording";
 import { trackEvent } from "ui/utils/telemetry";
 
 import Icon from "../../shared/Icon";
@@ -26,12 +27,10 @@ export function CopyButton({ recording }: { recording: Recording }) {
 
   return (
     <div className="copy-link relative flex flex-shrink-0 flex-col items-center">
-      <button className={styles.copyURL} {...{ onClick }}>
-        <div className="flex">
-          <Icon filename="doc" size="medium" className={styles.copyIcon} />
-          <div>Copy URL</div>
-        </div>
-      </button>
+      <Button {...{ onClick }}>
+        <Icon filename="doc" size="medium" className={styles.copyIcon} />
+        <div>Copy URL</div>
+      </Button>
       {showCopied ? (
         <div className="bg-opacity-900 absolute bottom-full mb-1.5 rounded-lg bg-black p-1.5 text-white shadow-2xl">
           Copied

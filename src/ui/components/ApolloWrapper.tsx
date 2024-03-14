@@ -2,9 +2,10 @@ import { ApolloProvider } from "@apollo/client";
 import { ReactNode } from "react";
 
 import { createApolloClient } from "shared/graphql/apolloClient";
-import { isTest } from "shared/utils/environment";
-import { PopupBlockedError } from "ui/components/shared/Error";
+import { getReadOnlyParamsFromURL, isTest } from "shared/utils/environment";
 import useToken from "ui/utils/useToken";
+
+import { ExpectedErrorModal } from "./Errors/ExpectedErrorModal";
 
 export function ApolloWrapper({
   children,
@@ -21,13 +22,23 @@ export function ApolloWrapper({
 
   if (error) {
     if (error.message === "Could not open popup") {
-      return <PopupBlockedError />;
+      return (
+        <ExpectedErrorModal
+          action="refresh"
+          details="In order to proceed, we need to get you to confirm your credentials. This happens in a separate pop-up window that's currently being blocked by your browser. Please disable your ad-blocker refresh this page."
+          title="Please turn off your ad blocker"
+        />
+      );
     } else {
       return null;
     }
   }
 
   return (
-    <ApolloProvider client={createApolloClient(token, onAuthError)}>{children}</ApolloProvider>
+    <ApolloProvider
+      client={createApolloClient(token, getReadOnlyParamsFromURL().testScope, onAuthError)}
+    >
+      {children}
+    </ApolloProvider>
   );
 }

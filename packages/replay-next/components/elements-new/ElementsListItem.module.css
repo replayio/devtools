@@ -64,7 +64,6 @@
 .HtmlAttribute {
   display: inline;
   color: var(--value-type-html-attribute-name);
-  padding-left: 1ch;
 }
 .HtmlAttribute:focus {
   outline: none;

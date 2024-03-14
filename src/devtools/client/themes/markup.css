@@ -3,9 +3,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 :root {
-  --markup-hidden-attr-name-color: var(--grey-43);
-  --markup-hidden-attr-value-color: var(--grey-55);
-  --markup-hidden-punctuation-color: var(--grey-43);
+  --markup-hidden-attr-name-color: var(--grey-45);
+  --markup-hidden-attr-value-color: var(--grey-50);
+  --markup-hidden-punctuation-color: var(--grey-45);
   --markup-pseudoclass-disk-color: #e9c600;
   --markup-hidden-tag-color: var(--grey-50);
   --markup-outline: var(--theme-splitter-color);
@@ -19,7 +19,7 @@
   --markup-hidden-punctuation-color: #787878;
   --markup-hidden-tag-color: var(--grey-45);
   --markup-outline: var(--theme-selection-background);
-  --markup-drag-line: var(--grey-55);
+  --markup-drag-line: var(--grey-50);
   --markup-drop-line: var(--blue-50);
 }
 
@@ -151,7 +151,7 @@ ul.children + .tag-line::before {
 /* A tag line should have a height of 16px, with a line-height of 14px,
  * (assuming a font-size of 11px). */
 .tag-line {
-  font-size: var(--theme-code-font-size);
+  font-size: var(--font-size-regular-monospace);
   min-height: 1.2727em;
   line-height: 1.2727em;
   padding-block: 1px;

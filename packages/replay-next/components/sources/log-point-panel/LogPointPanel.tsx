@@ -11,6 +11,7 @@ import {
 
 import { assert } from "protocol/utils";
 import AvatarImage from "replay-next/components/AvatarImage";
+import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBoundary";
 import Icon from "replay-next/components/Icon";
 import CodeEditor from "replay-next/components/lexical/CodeEditor";
 import {
@@ -88,10 +89,25 @@ export default function PointPanelWrapper(props: ExternalProps) {
     return loader;
   }
 
+  const errorFallback = (
+    <div
+      className={`${styles.ErrorFallback} ${className}`}
+      style={{
+        height: pointWithPendingEdits.condition
+          ? "var(--point-panel-with-conditional-height)"
+          : "var(--point-panel-height)",
+      }}
+    >
+      Could not load hit points
+    </div>
+  );
+
   return (
-    <Suspense fallback={loader}>
-      <PointPanel {...props} focusRange={focusRange} pointForSuspense={pointForSuspense} />
-    </Suspense>
+    <InlineErrorBoundary name="LogPointPanel" fallback={errorFallback}>
+      <Suspense fallback={loader}>
+        <PointPanel {...props} focusRange={focusRange} pointForSuspense={pointForSuspense} />
+      </Suspense>
+    </InlineErrorBoundary>
   );
 }
 
@@ -251,7 +267,10 @@ function PointPanelWithHitPoints({
     } else {
       if (!isEditing) {
         startEditing("condition");
+      } else {
+        setEditReason("condition");
       }
+
       editPendingPointText(key, { condition: "" });
     }
   };
@@ -402,6 +421,7 @@ function PointPanelWithHitPoints({
                       context={context}
                       dataTestId={`PointPanel-ConditionInput-${lineNumber}`}
                       dataTestName="PointPanel-ConditionInput"
+                      disableSelectionWhenNotFocused
                       editable={editable}
                       executionPoint={executionPoint}
                       initialValue={condition || ""}
@@ -508,6 +528,7 @@ function PointPanelWithHitPoints({
                     context={context}
                     dataTestId={`PointPanel-ContentInput-${lineNumber}`}
                     dataTestName="PointPanel-ContentInput"
+                    disableSelectionWhenNotFocused
                     editable={editable}
                     executionPoint={executionPoint}
                     initialValue={content}

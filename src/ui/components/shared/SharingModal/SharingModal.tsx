@@ -1,31 +1,20 @@
-import { ScreenShot } from "@replayio/protocol";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
-import { getGraphicsAtTime } from "protocol/graphics";
-import { OperationsData } from "shared/graphql/types";
+import { Button } from "replay-next/components/Button";
 import { CollaboratorRequest, Recording } from "shared/graphql/types";
 import { actions } from "ui/actions";
 import { AvatarImage } from "ui/components/Avatar";
 import Modal from "ui/components/shared/NewModal";
-import {
-  Privacy,
-  ToggleShowPrivacyButton,
-  getUniqueDomains,
-} from "ui/components/UploadScreen/Privacy";
+import { Privacy, ToggleShowPrivacyButton } from "ui/components/UploadScreen/Privacy";
 import hooks from "ui/hooks";
 import { useHasNoRole } from "ui/hooks/recordings";
-import { getModalOptions, getRecordingTarget } from "ui/reducers/app";
-import { useAppSelector } from "ui/setup/hooks";
+import { getModalOptions } from "ui/reducers/app";
 import { UIState } from "ui/state";
-import useToken from "ui/utils/useToken";
 
-import { PrimaryButton } from "../Button";
-import MaterialIcon from "../MaterialIcon";
 import Collaborators from "./Collaborators";
 import PrivacyDropdown from "./PrivacyDropdown";
 import { CopyButton } from "./ReplayLink";
-import styles from "./SharingModal.module.css";
 
 function SharingModalWrapper(props: PropsFromRedux) {
   const opts = props.modalOptions;
@@ -76,9 +65,7 @@ function CollaboratorRequests({ recording }: { recording: Recording }) {
                 {c.user.name}
               </span>
             </div>
-            <PrimaryButton color="blue" onClick={() => acceptRecordingRequest(c.id)}>
-              Add
-            </PrimaryButton>
+            <Button onClick={() => acceptRecordingRequest(c.id)}>Add</Button>
           </div>
         ))}
       </div>
@@ -95,12 +82,6 @@ function CollaboratorsSection({
   showPrivacy: boolean;
   setShowPrivacy: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const { hasNoRole, loading } = useHasNoRole();
-
-  if (hasNoRole || loading) {
-    return null;
-  }
-
   return (
     <section className="space-y-4 bg-modalBgcolor p-4">
       <div className="flex w-full flex-col justify-between space-y-3">
@@ -131,32 +112,12 @@ function CollaboratorsSection({
   );
 }
 
-function SecurityWarnings({ operations }: { operations: OperationsData }) {
-  const uniqueDomains = getUniqueDomains(operations);
-
-  if (uniqueDomains.length == 0) {
-    return null;
-  }
-
-  return (
-    <div className="group">
-      <div className="text-xs">{`Contains potentially sensitive data from ${uniqueDomains.length} domains`}</div>
-    </div>
-  );
-}
-
-function EnvironmentVariablesRow() {
-  return <div className="text-xs">This node recording contains all env variables</div>;
-}
-
 function SharingSection({
   recording,
-  showEnvironmentVariables,
   showPrivacy,
   setShowPrivacy,
 }: {
   recording: Recording;
-  showEnvironmentVariables: boolean;
   showPrivacy: boolean;
   setShowPrivacy: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
@@ -167,125 +128,20 @@ function SharingSection({
         showPrivacy={showPrivacy}
         setShowPrivacy={setShowPrivacy}
       />
-      <section className="flex flex-col bg-menuHoverBgcolor px-4 pt-3 pb-5">
-        <div className="mb-2 font-bold">Sharing Options</div>
-
-        <div className="flex">
-          <div className="mr-2">
-            <CopyButton recording={recording} />
-          </div>
-          <div>
-            <DownloadSection recording={recording} />
-          </div>
-        </div>
+      <section className="flex flex-col bg-menuHoverBgcolor px-4 py-3">
+        <CopyButton recording={recording} />
       </section>
     </>
   );
 }
 
-type ModalMode = "sharing" | "download";
-
-function Header({
-  modalMode,
-  setModalMode,
-}: {
-  modalMode: ModalMode;
-  setModalMode: React.Dispatch<React.SetStateAction<ModalMode>>;
-}) {
-  const Tab = ({
-    label,
-    onClick,
-    active,
-    className = "",
-  }: {
-    label: string;
-    onClick: any;
-    active: boolean;
-    className?: string;
-  }) => (
-    <div
-      onClick={onClick}
-      className={
-        (active
-          ? "rounded-xl bg-menuHoverBgcolor px-4 py-1 font-bold text-slate-700 hover:text-slate-800"
-          : "text-slate-500 hover:text-slate-600") + ` ${className} cursor-pointer`
-      }
-    >
-      {label}
-    </div>
-  );
-
-  return <section></section>;
-}
-
-function DownloadSection({ recording }: { recording: Recording }) {
-  const token = useToken();
-
-  const [downloadState, setDownloadState] = useState<
-    "not-started" | "downloading" | "success" | "error"
-  >("not-started");
-
-  const buttonStates = {
-    "not-started": {
-      label: "Download as video",
-      icon: "download",
-    },
-    downloading: {
-      label: "Downloading video ...",
-      icon: "loop",
-    },
-    success: {
-      label: "Video downloaded",
-      icon: "check",
-    },
-    error: {
-      label: "Failed to download",
-      icon: "error",
-    },
-  };
-
-  const onDownload = () => {
-    console.log(`Download recording ${recording.id}`);
-
-    const xhr = new XMLHttpRequest();
-    xhr.responseType = "blob";
-    xhr.onload = function () {
-      const a = document.createElement("a");
-      a.href = window.URL.createObjectURL(xhr.response);
-      setDownloadState("success");
-
-      a.download = "replay.mp4";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    };
-    xhr.onerror = function () {
-      console.error(`Failed to download video ${recording.id}`);
-      setDownloadState("error");
-    };
-    xhr.open("POST", "/api/video");
-    xhr.setRequestHeader("Content-Type", "application/json");
-    xhr.send(JSON.stringify({ recordingId: recording.id, token: token.token }));
-    setDownloadState("downloading");
-  };
-
-  return (
-    <div>
-      <button className={styles.downloadVideo} onClick={onDownload}>
-        <MaterialIcon className={`mr-2 ${downloadState === "downloading" ? "animate-spin" : ""}`}>
-          {buttonStates[downloadState].icon}
-        </MaterialIcon>
-        {buttonStates[downloadState].label}
-      </button>
-    </div>
-  );
-}
-
 function SharingModal({ recording, hideModal }: SharingModalProps) {
-  const recordingTarget = useAppSelector(getRecordingTarget);
   const [showPrivacy, setShowPrivacy] = useState(false);
-  const [modalMode, setModalMode] = useState<ModalMode>("sharing");
-  const showEnvironmentVariables = recordingTarget == "node";
+
+  const { hasNoRole, loading } = useHasNoRole();
+  if (hasNoRole || loading) {
+    return null;
+  }
 
   return (
     <Modal options={{ maskTransparency: "translucent" }} onMaskClick={hideModal}>
@@ -294,15 +150,11 @@ function SharingModal({ recording, hideModal }: SharingModalProps) {
         style={{ width: showPrivacy ? 720 : 390 }}
       >
         <div className="flex flex-col space-y-0" style={{ width: 390 }}>
-          <Header modalMode={modalMode} setModalMode={setModalMode} />
-          {modalMode == "sharing" ? (
-            <SharingSection
-              recording={recording}
-              showEnvironmentVariables={showEnvironmentVariables}
-              showPrivacy={showPrivacy}
-              setShowPrivacy={setShowPrivacy}
-            />
-          ) : null}
+          <SharingSection
+            recording={recording}
+            showPrivacy={showPrivacy}
+            setShowPrivacy={setShowPrivacy}
+          />
         </div>
         {showPrivacy ? (
           <div className="relative flex overflow-auto bg-themeBase-90">

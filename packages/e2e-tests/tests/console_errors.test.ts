@@ -5,7 +5,7 @@ import {
   toggleSideFilters,
   verifyConsoleMessage,
 } from "../helpers/console-panel";
-import test from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
 test.use({ exampleKey: "doc_exceptions_bundle.html" });
 
@@ -28,5 +28,5 @@ test("console_errors: Test that errors and warnings from various sources are sho
   await verifyConsoleMessage(page, "Error: UncaughtError");
   await verifyConsoleMessage(page, "{number: 42}");
   await verifyConsoleMessage(page, "{number: 12}");
-  await verifyConsoleMessage(page, "uncaught exception: [object Object]");
+  await verifyConsoleMessage(page, "Uncaught [object Object]");
 });

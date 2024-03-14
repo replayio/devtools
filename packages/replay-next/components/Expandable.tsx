@@ -11,7 +11,7 @@ import React, {
 import { ExpandablesContext } from "replay-next/src/contexts/ExpandablesContext";
 
 import Icon from "./Icon";
-import LazyOffscreen from "./LazyOffscreen";
+import LazyActivity from "./LazyActivity";
 import styles from "./Expandable.module.css";
 
 export type RenderChildrenFunction = () => ReactNode;
@@ -117,14 +117,14 @@ export default function Expandable({
         {header}
       </span>
 
-      <LazyOffscreen mode={isOpen ? "visible" : "hidden"}>
+      <LazyActivity mode={isOpen ? "visible" : "hidden"}>
         <span
           className={`${childrenClassName} ${styles.Children}`}
           data-test-name="ExpandableChildren"
         >
           {children}
         </span>
-      </LazyOffscreen>
+      </LazyActivity>
     </span>
   );
 }

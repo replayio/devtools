@@ -1,0 +1,18 @@
+:root:global(.theme-dark) .wrapper {
+  color: var(--body-color);
+  background-color: var(--body-bgcolor);
+}
+
+:root:global(.theme-light) .wrapper {
+  background-color: var(--theme-base-100);
+  color: var(--body-color);
+}
+
+.wrapper {
+  position: relative;
+}
+
+.wrapper[data-pending="true"] {
+  opacity: 0.5;
+  pointer-events: none;
+}

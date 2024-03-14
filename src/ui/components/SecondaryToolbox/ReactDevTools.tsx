@@ -1,24 +1,12 @@
-import { NodeBounds, Object as ProtocolObject } from "@replayio/protocol";
+import { ObjectId, Object as ProtocolObject } from "@replayio/protocol";
 import { createBridge, createStore, initialize } from "@replayio/react-devtools-inline/frontend";
-import {
-  useContext,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useReducer,
-  useRef,
-  useState,
-} from "react";
+import { useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useImperativeCacheValue } from "suspense";
 
 import { selectLocation } from "devtools/client/debugger/src/actions/sources";
-import {
-  getExecutionPoint,
-  getThreadContext,
-  getTime,
-} from "devtools/client/debugger/src/reducers/pause";
+import { getExecutionPoint, getThreadContext } from "devtools/client/debugger/src/reducers/pause";
 import { highlightNode, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
-import ErrorBoundary from "replay-next/components/ErrorBoundary";
+import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBoundary";
 import { useIsPointWithinFocusWindow } from "replay-next/src/hooks/useIsPointWithinFocusWindow";
 import { useMostRecentLoadedPause } from "replay-next/src/hooks/useMostRecentLoadedPause";
 import { useNag } from "replay-next/src/hooks/useNag";
@@ -29,24 +17,20 @@ import { ReplayClientInterface } from "shared/client/types";
 import { Nag } from "shared/graphql/types";
 import { useTheme } from "shared/theme/useTheme";
 import { UIThunkAction } from "ui/actions";
-import { fetchMouseTargetsForPause } from "ui/actions/app";
 import { enterFocusMode } from "ui/actions/timeline";
+import { NodePickerContext, NodePickerContextType } from "ui/components/NodePickerContext";
+import { nodesToFiberIdsCache } from "ui/components/SecondaryToolbox/react-devtools/injectReactDevtoolsBackend";
 import {
-  NodeOptsWithoutBounds,
   ReplayWall,
   StoreWithInternals,
 } from "ui/components/SecondaryToolbox/react-devtools/ReplayWall";
-import { nodePickerDisabled, nodePickerInitializing, nodePickerReady } from "ui/reducers/app";
 import { getPreferredLocation } from "ui/reducers/sources";
 import { getRecordingTooLongToSupportRoutines } from "ui/reducers/timeline";
-import { useAppDispatch, useAppSelector, useAppStore } from "ui/setup/hooks";
-import { UIState } from "ui/state";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import {
   ParsedReactDevToolsAnnotation,
   reactDevToolsAnnotationsCache,
 } from "ui/suspense/annotationsCaches";
-import { getMouseTarget } from "ui/suspense/nodeCaches";
-import { NodePicker as NodePickerClass, NodePickerOpts } from "ui/utils/nodePicker";
 
 import { ReactDevToolsPanel as NewReactDevtoolsPanel } from "./react-devtools/components/ReactDevToolsPanel";
 import { generateTreeResetOpsForPoint } from "./react-devtools/rdtProcessing";
@@ -65,28 +49,24 @@ function jumpToComponentPreferredSource(componentPreview: ProtocolObject): UIThu
 }
 
 function createReactDevTools(
-  enablePicker: (opts: NodeOptsWithoutBounds) => void,
-  initializePicker: () => void,
-  disablePicker: () => void,
+  enableNodePicker: NodePickerContextType["enable"],
+  disableNodePicker: NodePickerContextType["disable"],
   highlightNode: (nodeId: string) => void,
   unhighlightNode: () => void,
   setProtocolCheckFailed: (failed: boolean) => void,
-  fetchMouseTargetsForPause: () => Promise<NodeBounds[] | undefined>,
   replayClient: ReplayClientInterface,
   dismissInspectComponentNag: () => void
 ) {
   const target = { postMessage() {} } as unknown as Window;
-  const wall = new ReplayWall(
-    enablePicker,
-    initializePicker,
-    disablePicker,
+  const wall = new ReplayWall({
+    disableNodePicker,
+    dismissInspectComponentNag,
+    enableNodePicker,
     highlightNode,
-    unhighlightNode,
-    setProtocolCheckFailed,
-    fetchMouseTargetsForPause,
     replayClient,
-    dismissInspectComponentNag
-  );
+    setProtocolCheckFailed,
+    unhighlightNode,
+  });
 
   const bridge = createBridge(target, wall);
 
@@ -99,6 +79,7 @@ function createReactDevTools(
     checkBridgeProtocolCompatibility: false,
     supportsNativeInspection: true,
   });
+
   wall.store = store as StoreWithInternals;
 
   const ReactDevTools = initialize(target, { bridge, store });
@@ -106,29 +87,31 @@ function createReactDevTools(
   return [ReactDevTools, wall, bridge] as const;
 }
 
-const nodePickerInstance = new NodePickerClass();
-
 const EMPTY_ANNOTATIONS: ParsedReactDevToolsAnnotation[] = [];
-
-const getIsReactComponentPickerActive = (state: UIState) => {
-  const { activeNodePicker, nodePickerStatus } = state.app;
-  const isReactComponentPickerActive =
-    activeNodePicker === "reactComponent" && nodePickerStatus === "active";
-  return isReactComponentPickerActive;
-};
 
 export function ReactDevtoolsPanel() {
   const dispatch = useAppDispatch();
-  const store = useAppStore();
   const theme = useTheme();
   const replayClient = useContext(ReplayClientContext);
-  const componentPickerActive = useAppSelector(getIsReactComponentPickerActive);
   const currentPoint = useAppSelector(getExecutionPoint);
   const previousPointRef = useRef(currentPoint);
-  const currentTime = useAppSelector(getTime);
   const isFirstAnnotationsInjection = useRef(true);
-  const [, forceRender] = useReducer(c => c + 1, 0);
   const showRecordingTooLongWarning = useAppSelector(getRecordingTooLongToSupportRoutines);
+
+  const {
+    disable: disableNodePicker,
+    enable: enableNodePicker,
+    status: nodePickerStatus,
+    type: nodePickerType,
+  } = useContext(NodePickerContext);
+
+  const nodePickerActive =
+    (nodePickerStatus === "initializing" || nodePickerStatus === "active") &&
+    nodePickerType === "reactComponent";
+
+  // Disable node picker when this component unmounts
+  // It doesn't matter if it's enabled or not (or even if this is the current tool)
+  useLayoutEffect(() => () => disableNodePicker(), [disableNodePicker]);
 
   const isPointWithinFocusWindow = useIsPointWithinFocusWindow(currentPoint);
   const pauseId = useAppSelector(state => state.pause.id);
@@ -144,60 +127,16 @@ export function ReactDevtoolsPanel() {
     annotationsStatus === "resolved" ? parsedAnnotations : EMPTY_ANNOTATIONS;
 
   const [ReactDevTools, wall] = useMemo(() => {
-    function dispatchHighlightNode(nodeId: string) {
-      dispatch(highlightNode(nodeId));
-    }
-
-    function dispatchUnhighlightNode() {
-      dispatch(unhighlightNode());
-    }
-
-    function dispatchFetchMouseTargets() {
-      return dispatch(fetchMouseTargetsForPause());
-    }
-
-    function enablePicker(opts: NodeOptsWithoutBounds) {
-      dispatch(nodePickerReady("reactComponent"));
-
-      const actualOpts: NodePickerOpts = {
-        ...opts,
-        onCheckNodeBounds: async (x, y, nodeIds) => {
-          const boundingRects = await dispatchFetchMouseTargets();
-          return getMouseTarget(boundingRects ?? [], x, y, nodeIds);
-        },
-      };
-      nodePickerInstance.enable(actualOpts);
-      // HACK There _may_ be an issue with React's `<Offscreen>` and dispatched Redux actions.
-      // I can see the "picker active" selector re-running afterwards, but the component doesn't re-render.
-      // It seems like it thinks the value is _already_ `true`, when it shouldn't have changed yet.
-      // To work around this, we force a re-render of the component after enabling the picker.
-      // This is incredibly hacky and I don't feel like it actually _solves_ whatever issue
-      // may actually be there... but it does at least let the E2E test pass.
-      forceRender();
-    }
-
-    function initializePicker() {
-      dispatch(nodePickerInitializing("reactComponent"));
-    }
-
-    function disablePicker() {
-      nodePickerInstance.disable();
-      dispatch(nodePickerDisabled());
-    }
-
-    const [ReactDevTools, wall, bridge] = createReactDevTools(
-      enablePicker,
-      initializePicker,
-      disablePicker,
-      dispatchHighlightNode,
-      dispatchUnhighlightNode,
+    return createReactDevTools(
+      enableNodePicker,
+      disableNodePicker,
+      (nodeId: ObjectId) => dispatch(highlightNode(nodeId)),
+      () => dispatch(unhighlightNode()),
       setProtocolCheckFailed,
-      dispatchFetchMouseTargets,
       replayClient,
       dismissInspectComponentNag
     );
-    return [ReactDevTools, wall, bridge] as const;
-  }, [dispatch, replayClient, dismissInspectComponentNag]);
+  }, [disableNodePicker, dispatch, enableNodePicker, replayClient, dismissInspectComponentNag]);
 
   useLayoutEffect(() => {
     if (
@@ -241,25 +180,12 @@ export function ReactDevtoolsPanel() {
     previousPointRef.current = currentPoint;
   }, [ReactDevTools, wall, currentPoint, annotations, pauseId]);
 
-  useLayoutEffect(() => {
-    return () => {
-      // If the component picker is active when this tab is hidden, ensure that this
-      // is disabled so that we don't interfere with the video or node picker.
-      // We specifically do this in a layout effect, so that it happens before
-      // the `<InspectHostNodesToggle>` inside the RDT component stops listening
-      // for `"stopInspectingNative"` in a `useEffect`.
-      if (wall && getIsReactComponentPickerActive(store.getState())) {
-        wall.disablePickerParentAndInternal();
-      }
-    };
-  }, [wall, store]);
-
   useEffect(() => {
-    if (wall && currentPoint !== null) {
-      // Inject the RDT backend and prefetch node IDs
-      wall.setUpRDTInternalsForCurrentPause();
+    if (pauseId) {
+      // Speed up node picker initialization
+      nodesToFiberIdsCache.prefetch(replayClient, pauseId);
     }
-  }, [currentPoint, wall]);
+  }, [pauseId, replayClient, wall]);
 
   if (currentPoint === null) {
     return null;
@@ -351,7 +277,7 @@ export function ReactDevtoolsPanel() {
       {/* Solely for E2E test usage - need to track our app picker status vs internal RDT status*/}
       <span
         data-test-name="ReactPanelPickerStatus"
-        data-component-picker-active={`${componentPickerActive}`}
+        data-component-picker-active={`${nodePickerActive}`}
       />
     </>
   );
@@ -368,12 +294,12 @@ export default function ReactDevToolsWithErrorBoundary() {
   const showNewDevTools = recordingCapabilities.supportsObjectIdLookupsInEvaluations;
 
   return (
-    <ErrorBoundary name="ReactDevTools" resetKey={pauseId ?? ""}>
+    <InlineErrorBoundary name="ReactDevTools" resetKey={pauseId ?? ""}>
       {showNewDevTools ? (
         <NewReactDevtoolsPanel executionPoint={point ?? null} pauseId={pauseId ?? null} />
       ) : (
         <ReactDevtoolsPanel />
       )}
-    </ErrorBoundary>
+    </InlineErrorBoundary>
   );
 }

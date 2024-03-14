@@ -5,7 +5,6 @@ import QuickOpenModal from "devtools/client/debugger/src/components/QuickOpenMod
 import { getQuickOpenEnabled } from "devtools/client/debugger/src/selectors";
 import { getSystemColorScheme } from "shared/theme/getSystemColorScheme";
 import { Theme } from "shared/theme/types";
-import { useTheme } from "shared/theme/useTheme";
 import { userData } from "shared/user-data/GraphQL/UserData";
 import { isTest } from "shared/utils/environment";
 import { actions } from "ui/actions";
@@ -21,7 +20,6 @@ import { shouldShowNag } from "ui/utils/tour";
 import useAuth0 from "ui/utils/useAuth0";
 
 import { ConfirmRenderer } from "./shared/Confirm";
-import AppErrors from "./shared/Error";
 import LoginModal from "./shared/LoginModal";
 import LoomModal from "./shared/LoomModal";
 import PassportDismissModal from "./shared/Modals/PassportDismissModal";
@@ -36,9 +34,6 @@ const WorkspaceSettingsModal = React.lazy(() => import("./shared/WorkspaceSettin
 const UserSettingsModal = React.lazy(() => import("./shared/UserSettingsModal"));
 const SharingModal = React.lazy(() => import("./shared/SharingModal"));
 const OnboardingModal = React.lazy(() => import("./shared/OnboardingModal/index"));
-const DownloadReplayPromptModal = React.lazy(
-  () => import("./shared/OnboardingModal/DownloadReplayPromptModal")
-);
 const SourcemapSetupModal = React.lazy(() => import("./shared/Modals/SourcemapSetupModal"));
 const FirstReplayModal = React.lazy(() => import("./shared/FirstReplayModal"));
 
@@ -118,7 +113,6 @@ function App({ children, hideModal, modal, quickOpenEnabled }: AppProps) {
   const auth = useAuth0();
   const dismissNag = hooks.useDismissNag();
   const userInfo = useGetUserInfo();
-  const theme = useTheme();
 
   useEffect(() => {
     if (userInfo.nags && shouldShowNag(userInfo.nags, Nag.FIRST_LOG_IN)) {
@@ -190,7 +184,6 @@ function App({ children, hideModal, modal, quickOpenEnabled }: AppProps) {
       ) : null}
       {quickOpenEnabled === true && <QuickOpenModal />}
       <ConfirmRenderer />
-      <AppErrors />
     </div>
   );
 }

@@ -3,7 +3,10 @@ import chalk from "chalk";
 
 import { Badge } from "shared/client/types";
 
-import { submitCurrentText as submitCurrentTextLexical, type as typeLexical } from "./lexical";
+import {
+  submitCurrentText as submitCurrentTextLexical,
+  typeTerminalExpression as typeLexical,
+} from "./lexical";
 import { waitForPaused } from "./pause-information-panel";
 import { Expected, MessageType } from "./types";
 import { debugPrint, toggleExpandable, waitFor } from "./utils";
@@ -122,7 +125,7 @@ export async function executeTerminalExpression(
   // Wait for the Console to stop loading
   await consoleRoot.locator("text=Unavailable...").waitFor({ state: "hidden" });
 
-  await typeLexical(page, '[data-test-id="ConsoleTerminalInput"]', text, shouldSubmit);
+  await typeLexical(page, { shouldSubmit, text });
 }
 
 export async function executeAndVerifyTerminalExpression(
@@ -263,10 +266,17 @@ export async function seekToConsoleMessage(
 
   await debugPrint(page, `Seeking to message "${chalk.bold(textContent)}"`, "seekToConsoleMessage");
 
-  await consoleMessage.scrollIntoViewIfNeeded();
-  await consoleMessage.waitFor();
-  await consoleMessage.hover();
-  await consoleMessage.locator('[data-test-id="ConsoleMessageHoverButton"]').click();
+  await waitFor(async () => {
+    if ((await consoleMessage.getAttribute("data-test-paused-here")) === "true") {
+      return;
+    }
+    await consoleMessage.scrollIntoViewIfNeeded();
+    await consoleMessage.waitFor();
+    await consoleMessage.hover();
+    await consoleMessage
+      .locator('[data-test-id="ConsoleMessageHoverButton"]')
+      .click({ timeout: 1000 });
+  });
 
   await waitFor(
     async () =>
@@ -277,7 +287,7 @@ export async function seekToConsoleMessage(
 }
 
 export async function submitCurrentText(page: Page) {
-  await submitCurrentTextLexical(page, '[data-test-id="ConsoleTerminalInput"]');
+  await submitCurrentTextLexical(page, { type: "terminal" });
 }
 
 export async function toggleSideFilters(page: Page, open: boolean): Promise<void> {
@@ -310,7 +320,7 @@ export async function verifyConsoleMessage(
   );
 
   const messages = await findConsoleMessage(page, expected, messageType);
-  await verifyExpectedCount(messages, expectedCount);
+  await verifyExpectedCount(messages, expectedCount, 10_000);
 }
 
 export async function verifyConsoleMessageObjectContents(
@@ -356,15 +366,22 @@ export async function verifyEvaluationResult(
   await verifyExpectedCount(messages, expectedCount);
 }
 
-export async function verifyExpectedCount(locator: Locator, expectedCount?: number) {
+export async function verifyExpectedCount(
+  locator: Locator,
+  expectedCount?: number,
+  timeout = 5_000
+) {
   if (expectedCount != null) {
     // Verify a specific number of messages
-    await waitFor(async () => {
-      const count = await locator.count();
-      if (count !== expectedCount) {
-        throw `Expected ${expectedCount} messages, but found ${count}`;
-      }
-    });
+    await waitFor(
+      async () => {
+        const count = await locator.count();
+        if (count !== expectedCount) {
+          throw `Expected ${expectedCount} messages, but found ${count}`;
+        }
+      },
+      { timeout }
+    );
   } else {
     // Or just verify that there was at least one
     const message = locator.first();
@@ -473,6 +490,16 @@ export async function warpToMessage(page: Page, text: string, line?: number) {
 
   const messages = await findConsoleMessage(page, text);
   const message = messages.first();
+  await message.waitFor();
+
+  await seekToConsoleMessage(page, message, line);
+}
+
+export async function warpToLastMessage(page: Page, text: string, line?: number) {
+  await openConsolePanel(page);
+
+  const messages = await findConsoleMessage(page, text);
+  const message = messages.last();
   await message.waitFor();
 
   await seekToConsoleMessage(page, message, line);

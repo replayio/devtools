@@ -45,40 +45,6 @@ export function filterNonEnumerableProperties(properties: ProtocolProperty[]): P
   return properties.filter(property => property.flags == null || property.flags & 4);
 }
 
-export function mergePropertiesAndGetterValues(
-  properties: ProtocolProperty[],
-  getterValues: NamedValue[],
-  maxEntries: number = Infinity
-): [Array<NamedValue | ProtocolProperty>, boolean] {
-  const trackedNames: Set<string> = new Set();
-  const mergedProperties: Array<NamedValue | ProtocolProperty> = [];
-
-  for (let index = 0; index < properties.length; index++) {
-    const property = properties[index];
-
-    if (mergedProperties.length >= maxEntries) {
-      return [mergedProperties, true];
-    }
-
-    trackedNames.add(property.name);
-    mergedProperties.push(property);
-  }
-
-  for (let index = 0; index < getterValues.length; index++) {
-    if (mergedProperties.length >= maxEntries) {
-      return [mergedProperties, true];
-    }
-
-    const getterValue = getterValues[index];
-
-    if (!trackedNames.has(getterValue.name)) {
-      mergedProperties.push(getterValue);
-    }
-  }
-
-  return [mergedProperties, false];
-}
-
 function isProtocolProperty(
   valueOrProperty: ProtocolValue | ProtocolNamedValue | ProtocolProperty
 ): valueOrProperty is ProtocolProperty {
@@ -169,59 +135,54 @@ export async function protocolValueToClientValue(
 
       let preview: string | undefined;
       let type: ValueType = "object";
-      switch (className) {
-        case "Array":
-        case "BigInt64Array":
-        case "BigUint64Array":
-        case "Float32Array":
-        case "Float64Array":
-        case "Int8Array":
-        case "Int16Array":
-        case "Int32Array":
-        case "Uint8Array":
-        case "Uint8ClampedArray":
-        case "Uint16Array":
-        case "Uint32Array":
-          type = "array";
-          break;
-        case "Date":
-          type = "date";
-          break;
-        case "Function":
-          type = "function";
-          break;
-        case "Map":
-        case "WeakMap":
-          type = "map";
-          break;
-        case "RegExp":
-          type = "regexp";
-          break;
-        case "Set":
-        case "WeakSet":
-          type = "set";
-          break;
-        default:
-          if (
-            className.endsWith("Error") &&
-            object.preview?.properties?.find(property => property.name === "message")
-          ) {
-            type = "error";
-          } else if (className.startsWith("HTML")) {
-            switch (className) {
-              case "HTMLCollection": {
-                type = "array";
-                break;
-              }
-              default: {
-                type = "html-element";
-                break;
-              }
-            }
-          } else if (className === "Text") {
+      if (object.preview?.node?.nodeType === Node.ELEMENT_NODE) {
+        type = "html-element";
+      } else {
+        switch (className) {
+          case "Array":
+          case "BigInt64Array":
+          case "BigUint64Array":
+          case "Float32Array":
+          case "Float64Array":
+          case "Int8Array":
+          case "Int16Array":
+          case "Int32Array":
+          case "Uint8Array":
+          case "Uint8ClampedArray":
+          case "Uint16Array":
+          case "Uint32Array":
+          case "HTMLCollection":
+            type = "array";
+            break;
+          case "Date":
+            type = "date";
+            break;
+          case "Function":
+            type = "function";
+            break;
+          case "Map":
+          case "WeakMap":
+            type = "map";
+            break;
+          case "RegExp":
+            type = "regexp";
+            break;
+          case "Set":
+          case "WeakSet":
+            type = "set";
+            break;
+          case "Text":
             type = "html-text";
-          }
-          break;
+            break;
+          default:
+            if (
+              className.endsWith("Error") &&
+              object.preview?.properties?.find(property => property.name === "message")
+            ) {
+              type = "error";
+            }
+            break;
+        }
       }
 
       return { name, objectId, preview, type };
@@ -407,12 +368,10 @@ export function splitStringToChunks(string: string) {
 }
 
 export function joinChunksToString(chunks: ProtocolProperty[]): string {
-  let string = "";
-  for (const prop of chunks) {
-    string += prop.value;
-  }
-
-  return string;
+  return chunks
+    .filter(isArrayElement)
+    .map(prop => prop.value)
+    .join("");
 }
 
 export function findProtocolObjectProperty(
@@ -431,4 +390,8 @@ export function findProtocolObjectPropertyValue<Type>(
   name: string
 ): Type | null {
   return findProtocolObjectProperty(sourceObject, name)?.value ?? null;
+}
+
+export function isArrayElement(property: ProtocolProperty): boolean {
+  return /^(0|([1-9]\d*))$/.test(property.name);
 }

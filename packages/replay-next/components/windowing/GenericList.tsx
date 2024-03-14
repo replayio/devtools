@@ -1,12 +1,9 @@
 import {
   CSSProperties,
   ComponentType,
-  LegacyRef,
   ReactElement,
-  forwardRef,
   useEffect,
   useLayoutEffect,
-  useMemo,
   useRef,
   useSyncExternalStore,
 } from "react";
@@ -33,6 +30,7 @@ export type ImperativeHandle = {
 
 export function GenericList<Item, ItemData extends Object>({
   className = "",
+  dataStatus,
   dataTestId,
   dataTestName,
   fallbackForEmptyList,
@@ -48,6 +46,7 @@ export function GenericList<Item, ItemData extends Object>({
   width,
 }: {
   className?: string;
+  dataStatus?: string;
   dataTestId?: string;
   dataTestName?: string;
   fallbackForEmptyList?: ReactElement;
@@ -140,6 +139,7 @@ export function GenericList<Item, ItemData extends Object>({
         switch (event.key) {
           case "ArrowDown": {
             event.preventDefault();
+
             const newSelectedItemIndex = Math.min(selectedItemIndex + 1, itemCount - 1);
             if (selectedItemIndex !== newSelectedItemIndex) {
               listData.setSelectedIndex(newSelectedItemIndex);
@@ -148,6 +148,7 @@ export function GenericList<Item, ItemData extends Object>({
           }
           case "ArrowUp": {
             event.preventDefault();
+
             const newSelectedItemIndex = Math.max(selectedItemIndex - 1, 0);
             if (selectedItemIndex !== newSelectedItemIndex) {
               listData.setSelectedIndex(newSelectedItemIndex);
@@ -156,6 +157,7 @@ export function GenericList<Item, ItemData extends Object>({
           }
           case "PageDown": {
             event.preventDefault();
+
             const newSelectedItemIndex = Math.min(selectedItemIndex + 10, itemCount - 1);
             if (selectedItemIndex !== newSelectedItemIndex) {
               listData.setSelectedIndex(newSelectedItemIndex);
@@ -164,6 +166,7 @@ export function GenericList<Item, ItemData extends Object>({
           }
           case "PageUp": {
             event.preventDefault();
+
             const newSelectedItemIndex = Math.max(selectedItemIndex - 10, 0);
             if (selectedItemIndex !== newSelectedItemIndex) {
               listData.setSelectedIndex(newSelectedItemIndex);
@@ -184,21 +187,24 @@ export function GenericList<Item, ItemData extends Object>({
     }
   }, [itemCount, listData, onKeyDownProp, selectedItemIndex]);
 
-  // react-window doesn't provide a way to declaratively set data-* attributes
-  // but they're very useful for our e2e tests
-  const OuterElement = useMemo(() => {
-    return forwardRef(function OuterElement(props, forwardedRef: LegacyRef<HTMLDivElement>) {
-      return (
-        <div
-          ref={forwardedRef}
-          data-test-id={dataTestId}
-          data-test-name={dataTestName}
-          tabIndex={0}
-          {...props}
-        />
-      );
-    });
-  }, [dataTestId, dataTestName]);
+  useLayoutEffect(() => {
+    const element = outerRef.current;
+    if (element) {
+      element.tabIndex = 0;
+
+      // react-window doesn't provide a way to declaratively set data-* attributes but they're very useful for our e2e tests
+      // Note that an effect is a better fit than the outerElementType because the latter causes a full unmount and remount on change
+      if (dataStatus !== undefined) {
+        element.setAttribute("data-status", dataStatus);
+      }
+      if (dataTestId !== undefined) {
+        element.setAttribute("data-test-id", dataTestId);
+      }
+      if (dataTestName !== undefined) {
+        element.setAttribute("data-test-name", dataTestName);
+      }
+    }
+  });
 
   if (fallbackForEmptyList !== undefined) {
     if (!isLoading && itemCount === 0) {
@@ -221,7 +227,6 @@ export function GenericList<Item, ItemData extends Object>({
       itemSize={itemSize}
       onItemsRendered={onItemsRendered}
       outerRef={outerRef}
-      outerElementType={OuterElement}
       ref={listRef}
       style={style}
       width={width}

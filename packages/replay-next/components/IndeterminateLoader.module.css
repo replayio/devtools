@@ -20,7 +20,7 @@
 .ProgressBarInner {
   width: 100%;
   height: 100%;
-  background-color: var(--color-brand);
+  background-color: var(--primary-accent);
   animation: animation 1s infinite linear;
   transform-origin: 0% 50%;
 }
@@ -28,9 +28,13 @@
 .LoadingLabel {
   flex: 1 1 auto;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  text-align: center;
+  gap: 0.5rem;
   color: var(--color-dim);
+  padding: 1rem;
 }
 
 @keyframes animation {

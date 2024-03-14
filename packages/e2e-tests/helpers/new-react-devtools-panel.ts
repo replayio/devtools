@@ -2,7 +2,7 @@ import { Locator, Page, expect } from "@playwright/test";
 
 import { openConsolePanel, warpToMessage } from "./console-panel";
 import { openReactDevtoolsPanel as openReactDevtoolsPanelOld } from "./legacy-react-devtools-panel";
-import { debugPrint, waitFor } from "./utils";
+import { debugPrint, getByTestName, waitFor } from "./utils";
 
 export async function enableComponentPicker(page: Page) {
   const button = page.locator('[data-test-id="ReactDevTools-InspectButton"]');
@@ -59,7 +59,7 @@ export function getInspectedHook(page: Page, name: string) {
 }
 
 export function getReactComponents(page: Page) {
-  return getReactDevToolsPanel(page).locator('[data-test-name="ReactDevToolsListItem"]');
+  return page.locator('[data-test-name="ReactDevToolsListItem"]');
 }
 
 export function getReactDevToolsList(page: Page) {
@@ -81,7 +81,7 @@ export function getSelectedRow(page: Page) {
 
 export function getViewSourceButton(page: Page) {
   const panel = getReactDevToolsPanel(page);
-  return panel.locator('[title="Jump to definition"]');
+  return getByTestName(panel, "ReactDevTools-JumpToComponentSource");
 }
 
 export async function isComponentPickerEnabled(page: Page) {

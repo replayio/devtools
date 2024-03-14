@@ -2,7 +2,7 @@ import { config } from "shared/user-data/GraphQL/config";
 import { PreferencesKey } from "shared/user-data/GraphQL/types";
 import { BooleanPreference } from "ui/components/shared/UserSettingsModal/components/BooleanPreference";
 
-export const PREFERENCES: PreferencesKey[] = ["feature_reduxDevTools", "feature_reactPanel"];
+export const PREFERENCES: PreferencesKey[] = [];
 
 export function Experimental() {
   return (

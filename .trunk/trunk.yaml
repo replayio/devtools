@@ -2,10 +2,10 @@ version: 0.1
 plugins:
   sources:
     - id: trunk
-      ref: v0.0.3
+      ref: v1.2.1
       uri: https://github.com/trunk-io/plugins
 cli:
-  version: 0.17.0-beta
+  version: 1.17.2
 lint:
   enabled:
     - actionlint@1.6.8
@@ -26,3 +26,11 @@ lint:
         - "./.trunk"
         - "./test"
         - packages/e2e-tests/examples
+        - src/ui/components/TestSuite/suspense/assets/*.js
+actions:
+  enabled:
+    - trunk-upgrade-available
+runtimes:
+  enabled:
+    - go@1.19.5
+    - node@18.12.1

@@ -1,49 +1,34 @@
 // Side-effectful import, has to be imported before event-listeners
 // Ordering matters here
 import { ActionCreatorWithoutPayload, bindActionCreators } from "@reduxjs/toolkit";
-import { MouseEvent, TimeStampedPoint, sessionError, uploadedData } from "@replayio/protocol";
+import { sessionError, uploadedData } from "@replayio/protocol";
 import { IDBPDatabase, openDB } from "idb";
-import debounce from "lodash/debounce";
 
 import { setupSourcesListeners } from "devtools/client/debugger/src/actions/sources";
 import * as dbgClient from "devtools/client/debugger/src/client";
 import debuggerReducers from "devtools/client/debugger/src/reducers";
 import * as inspectorReducers from "devtools/client/inspector/reducers";
-import {
-  Canvas,
-  setAllPaintsReceivedCallback,
-  setMouseDownEventsCallback,
-  setPausedonPausedAtTimeCallback,
-  setPlaybackStatusCallback,
-  setPointsReceivedCallback,
-  setRefreshGraphicsCallback,
-  setVideoUrlCallback,
-  setupGraphics,
-} from "protocol/graphics";
 // eslint-disable-next-line no-restricted-imports
-import { addEventListener, initSocket, client as protocolClient } from "protocol/socket";
+import { addEventListener, initSocket } from "protocol/socket";
+// eslint-disable-next-line no-restricted-imports
+import { listenForSessionDestroyed, client as protocolClient } from "protocol/socket";
 import { assert } from "protocol/utils";
-import { setPointsReceivedCallback as setAnalysisPointsReceivedCallback } from "replay-next/src/suspense/AnalysisCache";
+import { buildIdCache, parseBuildIdComponents } from "replay-next/src/suspense/BuildIdCache";
 import { networkRequestsCache } from "replay-next/src/suspense/NetworkRequestsCache";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientInterface } from "shared/client/types";
 import { CONSOLE_SETTINGS_DATABASE, POINTS_DATABASE } from "shared/user-data/IndexedDB/config";
 import { IDBOptions } from "shared/user-data/IndexedDB/types";
 import { UIStore, actions } from "ui/actions";
-import { setCanvas } from "ui/actions/app";
-import { precacheScreenshots } from "ui/actions/timeline";
+import { getDisconnectionError } from "ui/actions/session";
 import { selectors } from "ui/reducers";
-import app, { loadReceivedEvents, setVideoUrl } from "ui/reducers/app";
+import app from "ui/reducers/app";
 import network from "ui/reducers/network";
 import protocolMessages from "ui/reducers/protocolMessages";
-import timeline, {
-  allPaintsReceived,
-  paintsReceived,
-  pointsReceived,
-  setPlaybackStalled,
-} from "ui/reducers/timeline";
+import timeline from "ui/reducers/timeline";
+import { setUpUrlParamsListener } from "ui/setup/dynamic/url";
 import { UIState } from "ui/state";
-import { UnexpectedError } from "ui/state/app";
+import { ExpectedError, UnexpectedError } from "ui/state/app";
 import {
   REACT_ANNOTATIONS_KIND,
   REDUX_ANNOTATIONS_KIND,
@@ -90,44 +75,45 @@ const defaultMessaging: UnexpectedError = {
   message: "Our apologies!",
 };
 
-let isWindows: boolean = false;
-let isFirefox: boolean = false;
-if (typeof window !== "undefined") {
-  isWindows = window.navigator.platform.toLowerCase().indexOf("win") > -1;
-  isFirefox = window.navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
-}
+async function getSessionErrorMessages(replayClient: ReplayClientInterface) {
+  const buildId = await buildIdCache.readAsync(replayClient);
+  const buildComponents = parseBuildIdComponents(buildId);
+  const isWindows = buildComponents?.platform === "windows";
+  const isFirefox = buildComponents?.runtime === "gecko";
 
-// Reported reasons why a session can be destroyed.
-const SessionErrorMessages: Record<number, Partial<UnexpectedError>> = {
-  [SessionError.BackendDeploy]: {
-    content: "Please wait a few minutes and try again.",
-  },
-  [SessionError.NodeTerminated]: {
-    content: "Our servers hiccuped but things should be back to normal soon.",
-  },
-  [SessionError.UnknownFatalError]: {
-    content:
-      isWindows && isFirefox
-        ? "The browser replayed an event out of order. We are hoping to release a new Chrome based browser in a couple of months which will be more reliable. Thanks for your patience 🙏"
-        : "Refreshing should help.\nIf not, please try recording again.",
-    action: "refresh",
-    message: isWindows ? "Windows replaying error" : "Replaying error",
-  },
-  [SessionError.KnownFatalError]: {
-    content:
-      "This error has been fixed in an updated version of Replay. Please try upgrading Replay and trying a new recording.",
-  },
-  [SessionError.OldBuild]: {
-    content: "This recording is no longer available. Please try recording a new replay.",
-  },
-  [SessionError.LongRecording]: {
-    content: "You’ve hit an error that happens with long recordings. Can you try a shorter one?",
-  },
-  [SessionError.InactivityTimeout]: {
-    content: "This replay timed out to reduce server load.",
-    message: "Ready when you are!",
-  },
-};
+  // Reported reasons why a session can be destroyed.
+  const sessionErrorMessages: Record<number, Partial<ExpectedError>> = {
+    [SessionError.BackendDeploy]: {
+      content: "Please wait a few minutes and try again.",
+    },
+    [SessionError.NodeTerminated]: {
+      content: "Our servers hiccuped but things should be back to normal soon.",
+    },
+    [SessionError.UnknownFatalError]: {
+      content:
+        isWindows && isFirefox
+          ? "The browser replayed an event out of order. We are hoping to release a new Chrome based browser in a couple of months which will be more reliable. Thanks for your patience 🙏"
+          : "Refreshing should help.\nIf not, please try recording again.",
+      action: "refresh",
+      message: isWindows ? "Windows replaying error" : "Replaying error",
+    },
+    [SessionError.KnownFatalError]: {
+      content:
+        "This error has been fixed in an updated version of Replay. Please try upgrading Replay and trying a new recording.",
+    },
+    [SessionError.OldBuild]: {
+      content: "This recording is no longer available. Please try recording a new replay.",
+    },
+    [SessionError.LongRecording]: {
+      content: "You’ve hit an error that happens with long recordings. Can you try a shorter one?",
+    },
+    [SessionError.InactivityTimeout]: {
+      content: "This replay timed out to reduce server load.",
+      message: "Ready when you are!",
+    },
+  };
+  return sessionErrorMessages;
+}
 
 export default async function setupDevtools(store: AppStore, replayClient: ReplayClientInterface) {
   if (window.hasAlreadyBootstrapped) {
@@ -193,6 +179,10 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
     }
   }
 
+  listenForSessionDestroyed(() => {
+    store.dispatch(actions.setExpectedError(getDisconnectionError()));
+  });
+
   addEventListener("Recording.uploadedData", (data: uploadedData) =>
     store.dispatch(actions.onUploadedData(data))
   );
@@ -201,19 +191,19 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
     store.dispatch(actions.setAwaitingSourcemaps(true))
   );
 
-  addEventListener("Recording.sessionError", (error: sessionError) => {
+  addEventListener("Recording.sessionError", async (error: sessionError) => {
+    const sessionErrorMessages = await getSessionErrorMessages(replayClient);
     store.dispatch(
-      actions.setUnexpectedError({
+      actions.setExpectedError({
         ...defaultMessaging,
         ...error,
-        ...SessionErrorMessages[error.code],
+        ...sessionErrorMessages[error.code],
       })
     );
   });
 
-  await setupApp(store, replayClient);
+  setupApp(store, replayClient);
   setupTimeline(store);
-  setupGraphics(store);
 
   networkRequestsCache.prefetch(replayClient);
 
@@ -225,60 +215,7 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
     eventListenersJumpLocationsCache.prefetch(replayClient);
   });
 
-  // Add protocol event listeners for things that the Redux store needs to stay in sync with.
-  // TODO We should revisit this as part of a larger architectural redesign (#6932).
-
-  setMouseDownEventsCallback(
-    // We seem to get duplicate mousedown events each time, like ["a"], ["a"], ["a", "b"], ["a", "b"], etc.
-    // Debounce the callback so we only dispatch the last set.
-    debounce((events: MouseEvent[]) => {
-      if (!events.length) {
-        // No reason to dispatch when there's 0 events
-        return;
-      }
-
-      //
-      store.dispatch(loadReceivedEvents({ mousedown: [...events] }));
-    }, 1_000)
-  );
-  setPausedonPausedAtTimeCallback((time: number) => {
-    store.dispatch(precacheScreenshots(time));
-  });
-  setPlaybackStatusCallback((stalled: boolean) => {
-    store.dispatch(setPlaybackStalled(stalled));
-  });
-
-  // Points come in piecemeal over time. Cut down the number of dispatches by
-  // storing incoming points and debouncing the dispatch considerably.
-  let points: TimeStampedPoint[] = [];
-
-  const onPointsReceived = debounce(() => {
-    store.dispatch(pointsReceived(points.map(({ point, time }) => ({ point, time }))));
-    store.dispatch(paintsReceived(points.filter(p => "screenShots" in p)));
-    points = [];
-  }, 1_000);
-
-  setPointsReceivedCallback(newPoints => {
-    points.push(...newPoints);
-    onPointsReceived();
-  });
-
-  setAnalysisPointsReceivedCallback(newPoints => {
-    points.push(...newPoints);
-    onPointsReceived();
-  });
-
-  setAllPaintsReceivedCallback((received: boolean) => {
-    store.dispatch(allPaintsReceived(received));
-  });
-
-  setRefreshGraphicsCallback((canvas: Canvas) => {
-    store.dispatch(setCanvas(canvas));
-  });
-
-  setVideoUrlCallback((url: string) => {
-    store.dispatch(setVideoUrl(url));
-  });
+  setUpUrlParamsListener(store, replayClient);
 }
 
 interface MigrationSetting {

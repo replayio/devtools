@@ -109,7 +109,7 @@ function getRecordingCapabilities(
         supportsElementsInspector: true,
         supportsEventTypes: true,
         supportsNetworkRequests: false,
-        supportsRepaintingGraphics: userData.get("protocol_chromiumRepaints"),
+        supportsRepaintingGraphics: true,
         supportsPureEvaluation: false,
         supportsObjectIdLookupsInEvaluations,
         maxRecordingDurationForRoutines: MAX_RECORDING_DURATION_FOR_ROUTINES_MS,

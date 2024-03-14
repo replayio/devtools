@@ -1,0 +1,59 @@
+.Button {
+  font-family: var(--font-family-default);
+  font-size: 0.875rem;
+  line-height: 1rem;
+  font-weight: 500;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid transparent;
+  border-radius: 0.375rem;
+  flex-shrink: 0;
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.25rem;
+}
+.Button:disabled {
+  --accent-color: var(--background-color-disabled-button);
+  --accent-color-hover: var(--background-color-disabled-button);
+  --contrast-color: var(--color-disabled-button);
+
+  color: var(--color-dimmer);
+}
+
+.Button[data-color="primary"]:not(:disabled) {
+  --accent-color: var(--primary-accent);
+  --accent-color-hover: var(--primary-accent-hover);
+  --contrast-color: var(--color-primary-button);
+}
+.Button[data-color="secondary"]:not(:disabled) {
+  --accent-color: var(--secondary-accent);
+  --accent-color-hover: var(--secondary-accent-hover);
+  --contrast-color: var(--color-secondary-button);
+}
+
+.Button[data-variant="outline"] {
+  border-color: var(--accent-color);
+}
+.Button[data-variant="outline"]:hover {
+  border-color: var(--accent-color-hover);
+}
+.Button[data-variant="solid"] {
+  background-color: var(--accent-color);
+  color: var(--contrast-color);
+}
+.Button[data-variant="solid"]:hover {
+  background-color: var(--accent-color-hover);
+}
+
+.Button[data-size="large"] {
+  font-size: 1rem;
+  line-height: 1.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.375rem;
+}
+.Button[data-size="small"] {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  padding: 0.375rem 0.625rem;
+  border-radius: 0.25rem;
+}

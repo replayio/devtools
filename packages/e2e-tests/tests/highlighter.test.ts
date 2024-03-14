@@ -1,7 +1,7 @@
 import { openDevToolsTab, startTest } from "../helpers";
 import { openConsolePanel, warpToMessage } from "../helpers/console-panel";
 import { openElementsPanel, selectElementsListRow } from "../helpers/elements-panel";
-import test, { expect } from "../testFixtureCloneRecording";
+import test, { expect } from "../testFixture";
 
 test.use({ exampleKey: "doc_inspector_basic.html" });
 
@@ -16,7 +16,7 @@ test("highlighter: element highlighter works everywhere", async ({
   await warpToMessage(page, "ExampleFinished");
   await openElementsPanel(page);
 
-  await selectElementsListRow(page, { text: "myiframe" });
+  await selectElementsListRow(page, { text: 'iframe id="myiframe"', type: "opening" });
 
   const highlighter = page.locator("#box-model-content");
   await highlighter.waitFor();
@@ -36,6 +36,6 @@ test("highlighter: element highlighter works everywhere", async ({
   // at all (is the box even visible on screen), and 2) is it
   // over the iframe element we're trying to highlight.
   // These coordinates visually match the location of the iframe.
-  const pathDefinitionToCompare = `M8,46 L312,46 L312,200 L8,200`;
+  const pathDefinitionToCompare = `M8,44 L312,44 L312,198 L8,198`;
   expect(normalizedPathDefinition).toBe(pathDefinitionToCompare);
 });

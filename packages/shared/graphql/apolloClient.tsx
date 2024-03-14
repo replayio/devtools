@@ -19,7 +19,8 @@ import { createClient } from "graphql-ws";
 import memoizeOne from "memoize-one";
 
 import { defer } from "protocol/utils";
-import { hasApiKey, isE2ETest } from "shared/utils/environment";
+import { graphqlClientIdHeader } from "shared/graphql/clientIdHeader";
+import { hasApiKey, isTest } from "shared/utils/environment";
 
 export let clientWaiter = defer<ApolloClient<NormalizedCacheObject>>();
 
@@ -33,7 +34,7 @@ export async function query<TData = any, TVariables = OperationVariables>(
 export async function mutate<TData = any, TVariables = OperationVariables>(
   options: MutationOptions<TData, TVariables>
 ) {
-  if (isE2ETest() && !hasApiKey()) {
+  if (isTest() && !hasApiKey()) {
     // Recordings of failed e2e tests may show the Next.js error popup triggered by a failed graphql mutation,
     // making them hard to work with, so disable mutations unless the user is authenticated.
     return;
@@ -44,6 +45,7 @@ export async function mutate<TData = any, TVariables = OperationVariables>(
 
 export const createApolloClient = memoizeOne(function (
   token: string | undefined,
+  testScope: string | null,
   onAuthError?: () => void
 ) {
   let previousWaiter = clientWaiter;
@@ -53,7 +55,7 @@ export const createApolloClient = memoizeOne(function (
 
   const retryLink = createRetryLink();
   const errorLink = createErrorLink(onAuthError);
-  const httpLink = createHttpLink(token);
+  const httpLink = createHttpLink(token, testScope);
 
   const options: any = {
     cache: createApolloCache(),
@@ -114,10 +116,15 @@ export function createApolloCache() {
   });
 }
 
-function createHttpLink(token: string | undefined) {
-  const headers: Record<string, string> = {};
+function createHttpLink(token: string | undefined, testScope: string | null) {
+  const headers: Record<string, string> = {
+    ...graphqlClientIdHeader(),
+  };
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
+  }
+  if (testScope) {
+    headers["replay-test-scope"] = testScope;
   }
 
   const uri = process.env.NEXT_PUBLIC_API_URL;
@@ -134,7 +141,7 @@ function createHttpLink(token: string | undefined) {
   const wsLink = new GraphQLWsLink(
     createClient({
       url: process.env.NEXT_PUBLIC_API_SUBSCRIPTION_URL!,
-      connectionParams: { token },
+      connectionParams: { token, testScope },
     })
   );
 

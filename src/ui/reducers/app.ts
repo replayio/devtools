@@ -1,52 +1,45 @@
-import { PayloadAction, createSelector, createSlice } from "@reduxjs/toolkit";
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { RecordingId } from "@replayio/protocol";
 
 import { RecordingTarget } from "replay-next/src/suspense/BuildIdCache";
-import { compareExecutionPoints } from "replay-next/src/utils/time";
 import { Workspace } from "shared/graphql/types";
+import { getMutableParamsFromURL } from "ui/setup/dynamic/url";
 import { UIState } from "ui/state";
 import {
   AppMode,
   AppState,
-  Canvas,
-  EventKind,
   ExpectedError,
   ModalOptionsType,
   ModalType,
-  NodePickerType,
-  ReplayEvent,
   SettingsTabTitle,
   UnexpectedError,
   UploadInfo,
 } from "ui/state/app";
 
+const { commentId } = getMutableParamsFromURL();
+
 export const initialAppState: AppState = {
   accessToken: null,
-  activeNodePicker: null,
   awaitingSourcemaps: false,
-  canvas: null,
   defaultSelectedReactElementId: null,
   defaultSettingsTab: "Preferences",
   displayedLoadingProgress: null,
-  events: {},
   expectedError: null,
   hoveredCommentId: null,
   loading: 4,
   loadingFinished: false,
-  nodePickerStatus: "disabled",
   modal: null,
   modalOptions: null,
   mode: "devtools",
-  mouseTargetsLoading: false,
+  processing: null,
+  processingProgress: null,
   recordingId: null,
   recordingTarget: null,
   recordingWorkspace: null,
-  selectedCommentId: null,
+  selectedCommentId: commentId,
   sessionId: null,
-  trialExpired: false,
   unexpectedError: null,
   uploading: null,
-  videoUrl: null,
   workspaceId: null,
 };
 
@@ -59,9 +52,6 @@ const appSlice = createSlice({
     },
     setRecordingId(state, action: PayloadAction<RecordingId>) {
       state.recordingId = action.payload;
-    },
-    setMouseTargetsLoading(state, action: PayloadAction<boolean>) {
-      state.mouseTargetsLoading = action.payload;
     },
     setUploading(state, action: PayloadAction<UploadInfo | null>) {
       state.uploading = action.payload;
@@ -84,9 +74,6 @@ const appSlice = createSlice({
       state.modal = null;
       state.modalOptions = null;
     },
-    setTrialExpired(state, action: PayloadAction<boolean | undefined>) {
-      state.trialExpired = action.payload ?? true;
-    },
     setSessionId(state, action: PayloadAction<string>) {
       state.sessionId = action.payload;
     },
@@ -106,29 +93,6 @@ const appSlice = createSlice({
           payload: { modal, options },
         };
       },
-    },
-    loadReceivedEvents(state, action: PayloadAction<Record<EventKind, ReplayEvent[]>>) {
-      // Load multiple event types into state at once
-      Object.assign(state.events, action.payload);
-    },
-    nodePickerInitializing(state, action: PayloadAction<NodePickerType>) {
-      state.activeNodePicker = action.payload;
-      state.nodePickerStatus = "initializing";
-    },
-    nodePickerReady(state, action: PayloadAction<NodePickerType>) {
-      if (state.activeNodePicker === action.payload && state.nodePickerStatus === "initializing") {
-        state.nodePickerStatus = "active";
-      }
-    },
-    nodePickerDisabled(state) {
-      state.activeNodePicker = null;
-      state.nodePickerStatus = "disabled";
-    },
-    setCanvas(state, action: PayloadAction<Canvas>) {
-      state.canvas = action.payload;
-    },
-    setVideoUrl(state, action: PayloadAction<string>) {
-      state.videoUrl = action.payload;
     },
     setDefaultSelectedReactElementId(state, action: PayloadAction<number | null>) {
       state.defaultSelectedReactElementId = action.payload;
@@ -151,6 +115,12 @@ const appSlice = createSlice({
     setSelectedCommentId(state, action: PayloadAction<string | null>) {
       state.selectedCommentId = action.payload;
     },
+    setProcessing(state, action: PayloadAction<boolean>) {
+      state.processing = action.payload;
+    },
+    setProcessingProgress(state, action: PayloadAction<number>) {
+      state.processingProgress = action.payload;
+    },
   },
 });
 
@@ -160,26 +130,20 @@ export const {
   clearExpectedError,
   setAppMode,
   setAwaitingSourcemaps,
-  setCanvas,
   setDefaultSelectedReactElementId,
   setDefaultSettingsTab,
-  loadReceivedEvents,
   setExpectedError,
-  nodePickerDisabled,
-  nodePickerInitializing,
-  nodePickerReady,
   setLoadingFinished,
   setModal,
-  setMouseTargetsLoading,
   setRecordingTarget,
   setRecordingWorkspace,
   setSessionId,
-  setTrialExpired,
   setUnexpectedError,
   setUploading,
-  setVideoUrl,
   setHoveredCommentId,
   setSelectedCommentId,
+  setProcessing,
+  setProcessingProgress,
 } = appSlice.actions;
 
 export default appSlice.reducer;
@@ -199,7 +163,6 @@ export const getAwaitingSourcemaps = (state: UIState) => state.app.awaitingSourc
 export const getSessionId = (state: UIState) => state.app.sessionId;
 export const getExpectedError = (state: UIState) => state.app.expectedError;
 export const getUnexpectedError = (state: UIState) => state.app.unexpectedError;
-export const getTrialExpired = (state: UIState) => state.app.trialExpired;
 export const getModal = (state: UIState) => state.app.modal;
 export const getModalOptions = (state: UIState) => state.app.modalOptions;
 export const getHoveredCommentId = (state: UIState) => state.app.hoveredCommentId;
@@ -207,33 +170,8 @@ export const getDefaultSelectedReactElementId = (state: UIState) =>
   state.app.defaultSelectedReactElementId;
 export const getSelectedCommentId = (state: UIState) => state.app.selectedCommentId;
 
-const NO_EVENTS: MouseEvent[] = [];
-export const getEventsForType = (state: UIState, type: string) =>
-  state.app.events[type] || NO_EVENTS;
-
-export const getSortedEventsForDisplay = createSelector(
-  (state: UIState) => state.app.events,
-  events => {
-    let sortedEvents: ReplayEvent[] = [];
-
-    for (let [eventType, eventsOfType] of Object.entries(events)) {
-      if (["keydown", "keyup"].includes(eventType)) {
-        continue;
-      }
-      sortedEvents = sortedEvents.concat(eventsOfType);
-    }
-
-    sortedEvents.sort((a, b) => compareExecutionPoints(a.point, b.point));
-    return sortedEvents;
-  }
-);
-
-export const getIsNodePickerActive = (state: UIState) => state.app.nodePickerStatus === "active";
-export const getIsNodePickerInitializing = (state: UIState) =>
-  state.app.nodePickerStatus === "initializing";
-export const getCanvas = (state: UIState) => state.app.canvas;
-export const getVideoUrl = (state: UIState) => state.app.videoUrl;
 export const getDefaultSettingsTab = (state: UIState) => state.app.defaultSettingsTab;
 export const getRecordingTarget = (state: UIState) => state.app.recordingTarget;
 export const getRecordingWorkspace = (state: UIState) => state.app.recordingWorkspace;
-export const getAreMouseTargetsLoading = (state: UIState) => state.app.mouseTargetsLoading;
+export const getProcessing = (state: UIState) => state.app.processing;
+export const getProcessingProgress = (state: UIState) => state.app.processingProgress;

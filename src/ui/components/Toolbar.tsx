@@ -201,14 +201,6 @@ function PauseInfoIcon() {
   );
 }
 
-function ReactIcon() {
-  return (
-    <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-      <Icon type="react" />
-    </div>
-  );
-}
-
 function ToolbarButtonTab({ active }: { active: boolean }) {
   return (
     <div
@@ -292,11 +284,6 @@ function ToolbarButton({
       iconContents = <SearchIcon />;
       break;
     }
-
-    case "react": {
-      iconContents = <ReactIcon />;
-      break;
-    }
     default:
       break;
   }
@@ -355,7 +342,6 @@ export default function Toolbar() {
   const { recording } = useGetRecording(recordingId);
   const { comments, loading } = hooks.useGetComments(recordingId);
   const [protocolPanelExperimentEnabled] = useGraphQLUserData("feature_protocolPanel");
-  const [reactPanelExperimentEnabled] = useGraphQLUserData("feature_reactPanel");
   const [showPassport] = useGraphQLUserData("feature_showPassport");
   const { nags } = hooks.useGetUserInfo();
   const showTour = shouldShowTour(nags);
@@ -417,23 +403,23 @@ export default function Toolbar() {
             onClick={handleButtonClick}
           />
         ) : null}
-        {testRunner !== null ? (
-          testRunner === "cypress" ? (
-            <ToolbarButton
-              icon="cypress"
-              label="Cypress Panel"
-              name="cypress"
-              onClick={handleButtonClick}
-            />
-          ) : (
-            <ToolbarButton
-              icon="playwright"
-              label="Test Info"
-              name="cypress"
-              onClick={handleButtonClick}
-            />
-          )
-        ) : (
+        {testRunner === "cypress" && (
+          <ToolbarButton
+            icon="cypress"
+            label="Cypress Panel"
+            name="cypress"
+            onClick={handleButtonClick}
+          />
+        )}
+        {testRunner === "playwright" && (
+          <ToolbarButton
+            icon="playwright"
+            label="Test Info"
+            name="cypress"
+            onClick={handleButtonClick}
+          />
+        )}
+        {testRunner !== "cypress" && (
           <ToolbarButton
             icon="info"
             label="Replay Info"
@@ -465,9 +451,6 @@ export default function Toolbar() {
               showBadgeDimmed={hasPausePreviewLocation}
               onClick={handleButtonClick}
             />
-            {reactPanelExperimentEnabled && (
-              <ToolbarButton icon="react" name="react" label="React" onClick={handleButtonClick} />
-            )}
           </>
         ) : null}
         {protocolPanelExperimentEnabled ? (

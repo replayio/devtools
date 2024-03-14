@@ -1,6 +1,9 @@
 import { Page } from "@playwright/test";
 
 export async function openSettingsModal(page: Page) {
+  // Don't want to use `showUserOptionsDropdown` here, as it
+  // waits for user settings, and the user may not be logged in
+  // in the auth tests
   await page.locator(".user-options").click();
   await page.locator('.dropdown-container button:has-text("Settings")').click();
 }
@@ -12,12 +15,5 @@ export async function closeSettingsModal(page: Page) {
 export async function enablePassport(page: Page) {
   await openSettingsModal(page);
   await page.locator("#BooleanPreference-feature_showPassport").check();
-  await closeSettingsModal(page);
-}
-
-export async function enableReduxDevtools(page: Page) {
-  await openSettingsModal(page);
-  await page.locator('.modal-content li:has-text("Experimental")').click();
-  await page.locator("#BooleanPreference-feature_reduxDevTools").check();
   await closeSettingsModal(page);
 }

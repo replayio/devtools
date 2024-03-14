@@ -1,9 +1,7 @@
-import React from "react";
-
+import { Button } from "replay-next/components/Button";
+import ExternalLink from "replay-next/components/ExternalLink";
 import { useAcceptTOS } from "ui/hooks/users";
 
-import { PrimaryButton } from "./shared/Button";
-import ExternalLink from "./shared/ExternalLink";
 import { DefaultViewportWrapper } from "./shared/Viewport";
 
 export const LATEST_TOS_VERSION = 1;
@@ -56,9 +54,7 @@ export default function TOSScreen() {
           </ExternalLink>{" "}
           which outline how we treat the personal information we collect as you use our services.
         </div>
-        <PrimaryButton color="blue" onClick={handleAccept}>
-          I’ve read and accept the terms of service
-        </PrimaryButton>
+        <Button onClick={handleAccept}>I’ve read and accept the terms of service</Button>
       </div>
     </DefaultViewportWrapper>
   );

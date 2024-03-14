@@ -34,45 +34,6 @@ export const config = {
     internalOnly: Boolean(true),
     label: "Disable all caches",
   },
-  backend_disableConcurrentControllerLoading: {
-    defaultValue: Boolean(false),
-    description: "Disable loading regions concurrently at controller startup",
-    internalOnly: Boolean(true),
-    label: "Disable Concurrent Controller Loading",
-    legacyKey: "devtools.features.disableConcurrentControllerLoading",
-  },
-  backend_disableIncrementalSnapshots: {
-    defaultValue: Boolean(false),
-    highRisk: Boolean(true),
-    internalOnly: Boolean(true),
-    description: "Disable using diffs between snapshots",
-    label: "Disable using incremental snapshots",
-    legacyKey: "devtools.features.disableIncrementalSnapshots",
-  },
-  backend_disableProtocolQueryCache: {
-    defaultValue: Boolean(false),
-    highRisk: Boolean(true),
-    internalOnly: Boolean(true),
-    description: "Disable storage of previously generated response for protocol commands",
-    label: "Disable query-level storage for protocol commands",
-    legacyKey: "devtools.features.disableProtocolQueryCache",
-  },
-  backend_disableRecordingAssetsInDatabase: {
-    defaultValue: Boolean(false),
-    description:
-      "Disable writing to and reading from the backend database when storing or retrieving recording assets",
-    internalOnly: Boolean(true),
-    label: "Disable tracking recording assets in the database",
-    legacyKey: "devtools.features.disableRecordingAssetsInDatabase",
-  },
-  backend_disableScanDataCache: {
-    defaultValue: Boolean(false),
-    description: "Do not cache the results of indexing the recording",
-    highRisk: Boolean(true),
-    internalOnly: Boolean(true),
-    label: "Disable scan data cache",
-    legacyKey: "devtools.features.disableScanDataCache",
-  },
   backend_enableRoutines: {
     defaultValue: Boolean(false),
     internalOnly: Boolean(true),
@@ -148,14 +109,6 @@ export const config = {
     legacyKey: "devtools.debugger.ui.framework-grouping-on",
   },
 
-  feature_basicProcessingLoadingBar: {
-    defaultValue: Boolean(false),
-    description:
-      "Split the loading bar's progress between gathering static resources from the recording and indexing runtime information",
-    label: "Detailed loading bar",
-    legacyKey: "devtools.features.basicProcessingLoadingBar",
-  },
-
   feature_chromiumNetMonitor: {
     defaultValue: Boolean(true),
     legacyKey: "devtools.features.chromiumNetMonitor",
@@ -179,16 +132,9 @@ export const config = {
     label: "Visualize protocol events in the timeline",
     legacyKey: "devtools.features.protocolTimeline",
   },
-  feature_reactPanel: {
+  feature_showLogPointPanelAboveLine: {
     defaultValue: Boolean(false),
-    description: "Enable experimental React render details panel",
-    label: "Enable React Panel",
-    legacyKey: "devtools.features.reactPanel",
-  },
-  feature_reduxDevTools: {
-    defaultValue: Boolean(true),
-    description: "Enable experimental Redux DevTools panel",
-    label: "Enable Redux DevTools",
+    label: "Show log point panel above source line",
     legacyKey: null,
   },
 
@@ -274,11 +220,6 @@ export const config = {
   layout_testsuitesPassportFirstRun: {
     defaultValue: Boolean(true),
     legacyKey: null,
-  },
-  protocol_chromiumRepaints: {
-    defaultValue: Boolean(true),
-    label: "Enable repaintGraphics for Chrome.",
-    legacyKey: "devtools.features.chromiumRepaints",
   },
   protocol_repaintEvaluations: {
     defaultValue: Boolean(false),

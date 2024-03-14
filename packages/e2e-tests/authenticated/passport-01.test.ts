@@ -1,21 +1,19 @@
 import { openDevToolsTab, startTest } from "../helpers";
-import { E2E_USER_1_API_KEY } from "../helpers/authentication";
+import { E2E_USER_1 } from "../helpers/authentication";
 import { warpToMessage } from "../helpers/console-panel";
 import { isPassportItemCompleted, showPassport } from "../helpers/passport";
 import { enablePassport } from "../helpers/settings";
 import { addLogpoint, removeAllLogpoints } from "../helpers/source-panel";
-import { resetTestUser, waitFor } from "../helpers/utils";
-import test, { expect } from "../testFixtureCloneRecording";
+import { waitFor } from "../helpers/utils";
+import test, { expect } from "../testFixture";
 
-test.use({ exampleKey: "doc_rr_console.html" });
+test.use({ exampleKey: "doc_rr_console.html", testUsers: [E2E_USER_1] });
 
 test(`authenticated/passport-01: Time travel`, async ({
-  pageWithMeta: { page, recordingId },
-  exampleKey,
+  pageWithMeta: { page, recordingId, testScope },
+  testUsers,
 }) => {
-  await resetTestUser("frontende2e1@replay.io");
-
-  await startTest(page, recordingId, E2E_USER_1_API_KEY);
+  await startTest(page, recordingId, { apiKey: testUsers![0].apiKey, testScope });
 
   await enablePassport(page);
   await showPassport(page);

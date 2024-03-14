@@ -8,8 +8,7 @@ import styles from "./styles.module.css";
 
 // Adapter component that can handle rendering legacy or modern visual comments.
 export default function VisualPreview({ comment }: { comment: VisualComment }) {
-  const { typeData } = comment;
-  const { encodedImage, scaledX, scaledY } = typeData;
+  const { encodedImage, scaledX, scaledY } = comment.typeData;
 
   const [showPreview, setShowPreview] = useState(false);
 

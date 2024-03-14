@@ -5,8 +5,7 @@ import {
   openReduxDevtoolsPanel,
   waitForReduxActionCount,
 } from "../helpers/redux-devtools-panel";
-import { enableReduxDevtools } from "../helpers/settings";
-import test from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
 test.use({ exampleKey: "redux/dist/index.html" });
 
@@ -17,7 +16,6 @@ test("redux_devtools: Test Redux DevTools.", async ({
   await startTest(page, recordingId);
   await openDevToolsTab(page);
 
-  await enableReduxDevtools(page);
   await openReduxDevtoolsPanel(page);
 
   await waitForReduxActionCount(page, 4);

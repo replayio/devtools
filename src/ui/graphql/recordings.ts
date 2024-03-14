@@ -29,6 +29,9 @@ export const GET_RECORDING = gql`
       isTest
       isProcessed
       isInTestWorkspace
+      testRun {
+        id
+      }
       comments {
         id
         isPublished

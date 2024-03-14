@@ -1,6 +1,7 @@
-import { useContext, useMemo } from "react";
+import { Suspense, useContext, useMemo } from "react";
 
 import Icon from "replay-next/components/Icon";
+import { LoadingProgressBar } from "replay-next/components/LoadingProgressBar";
 import { JsonViewer } from "replay-next/components/SyntaxHighlighter/JsonViewer";
 import { useJsonViewerContextMenu } from "replay-next/components/SyntaxHighlighter/useJsonViewerContextMenu";
 import { ProtocolViewerContext } from "ui/components/ProtocolViewer/components/ProtocolViewerContext";
@@ -14,6 +15,14 @@ const SYNTAX_HIGHLIGHT_MAX_LENGTH = 1_000;
 const PLAIN_TEXT_MAX_LENGTH = 100_000;
 
 export function RequestDetails() {
+  return (
+    <Suspense fallback={<LoadingProgressBar />}>
+      <RequestDetailsSuspends />
+    </Suspense>
+  );
+}
+
+function RequestDetailsSuspends() {
   const { errorMap, requestMap, responseMap, selectedRequestId } =
     useContext(ProtocolViewerContext);
 

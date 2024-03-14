@@ -16,7 +16,6 @@ export function ViewPage({ defaultView }: { defaultView: string }) {
 
 export function ViewPageContent() {
   const { view } = useContext(ViewContext);
-
   return (
     <div className="flex flex-grow flex-col overflow-hidden">
       <FilterBarContainer />
@@ -25,9 +24,9 @@ export function ViewPageContent() {
           <RecordingsPage />
         ) : view === "runs" ? (
           <TestRunsPage />
-        ) : (
+        ) : view === "tests" ? (
           <TestsPage />
-        )}
+        ) : null}
       </div>
     </div>
   );

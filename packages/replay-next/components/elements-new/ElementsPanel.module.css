@@ -36,12 +36,32 @@
   border-radius: 0.25rem;
 }
 .SearchIconAndInput:focus-within {
-  border-color: var(--color-brand);
+  border-color: var(--primary-accent);
 }
 
+.AdvancedButton {
+  flex: 0 1 auto;
+  outline: none;
+  background: none;
+  padding: 0;
+  border: none;
+  cursor: pointer;
+  border: 2px solid #0000;
+  border-radius: 0.25rem;
+}
+.AdvancedButton:focus {
+  border-color: var(--color-control-background-active);
+}
+.AdvancedButton[data-active] {
+  color: var(--color-control-background-active);
+}
+
+.AdvancedIcon,
 .SearchIcon {
   width: 1rem;
   height: 1rem;
+}
+.SearchIcon {
   margin: 0.25rem;
 }
 
@@ -65,6 +85,9 @@
 
 .SearchResults {
   font-size: var(--font-size-small);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .ListRow {

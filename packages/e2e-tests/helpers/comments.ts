@@ -1,9 +1,10 @@
+import assert from "assert";
 import { Locator, Page, expect } from "@playwright/test";
 import chalk from "chalk";
 
 import { selectContextMenuItem } from "./context-menu";
 import { confirmDialog } from "./dialog";
-import { clearText, focus, isEditable, type as typeText } from "./lexical";
+import { clearText, focus, isEditable, typeComment as typeText } from "./lexical";
 import { findNetworkRequestRow } from "./network-panel";
 import { openSource } from "./source-explorer-panel";
 import { getSourceLine } from "./source-panel";
@@ -32,7 +33,7 @@ async function addCommentHelper(
 
   // Wait for new comment to be added
   const commentsLocator = await getComments(page, { type });
-  await waitFor(async () => await expect(await commentsLocator.count()).toBe(idsBefore.size + 1));
+  await waitFor(async () => expect(await commentsLocator.count()).toBe(idsBefore.size + 1));
 
   // Get updated ids
   const idsAfter = await getCommentIds(page, { type });
@@ -45,7 +46,7 @@ async function addCommentHelper(
 
   const lexicalSelector = `[data-test-id="CommentInput-${id}"]`;
   await focus(page, lexicalSelector);
-  await typeText(page, lexicalSelector, text, true);
+  await typeText(page, { commentId: id, shouldSubmit: true, text });
 
   await expect(await isEditable(page, lexicalSelector)).toBe(false);
 }
@@ -156,13 +157,8 @@ export async function addVisualComment(
   await addCommentHelper(
     page,
     async () => {
-      const canvasLocator = page.locator("canvas#graphics");
-      await canvasLocator.click({ position: { x, y } });
-
-      await selectContextMenuItem(page, {
-        contextMenuItemTestName: "ContextMenuItem-AddComment",
-        contextMenuTestId: "ContextMenu-Video",
-      });
+      const element = page.locator("#graphics");
+      await element.click({ position: { x, y } });
     },
     "visual",
     text
@@ -237,7 +233,7 @@ export async function editComment(page: Page, commentLocator: Locator, options: 
 
   await focus(page, lexicalSelector);
   await clearText(page, lexicalSelector);
-  await typeText(page, lexicalSelector, text, true);
+  await typeText(page, { commentId: id, shouldSubmit: true, text });
 
   commentLocator = await getComment(page, id);
 
@@ -310,9 +306,11 @@ export async function replyToComment(
     .last()
     .getAttribute("data-test-comment-id");
 
+  assert(replyId != null);
+
   const lexicalSelector = `[data-test-id="CommentInput-${replyId}"]`;
   await focus(page, lexicalSelector);
-  await typeText(page, lexicalSelector, text, true);
+  await typeText(page, { commentId: replyId, shouldSubmit: true, text });
 
   await expect(await isEditable(page, lexicalSelector)).toBe(false);
 

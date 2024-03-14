@@ -10,7 +10,7 @@ import {
 import { openSource } from "../helpers/source-explorer-panel";
 import { addLogpoint } from "../helpers/source-panel";
 import { clearFocusRange, setFocusRange } from "../helpers/timeline";
-import test from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
 test.use({ exampleKey: "doc_rr_region_loading.html" });
 
@@ -38,14 +38,14 @@ test("focus_mode-01: should filter messages as regions based on the active focus
 
   // Verify fewer messages
   await verifyConsoleMessage(page, "Log point", "log-point", 17);
-  await verifyTrimmedConsoleMessages(page, { expectedBefore: 2, expectedAfter: 0 });
+  await verifyTrimmedConsoleMessages(page, { expectedBefore: 0, expectedAfter: 0 });
 
   // Set end of focus region to force-unload the end of the recording.
   await setConsoleMessageAsFocusEnd(page, await findConsoleMessage(page, "44", "log-point"));
 
   // Verify fewer messages
   await verifyConsoleMessage(page, "Log point", "log-point", 11);
-  await verifyTrimmedConsoleMessages(page, { expectedBefore: 2, expectedAfter: 1 });
+  await verifyTrimmedConsoleMessages(page, { expectedBefore: 0, expectedAfter: 1 });
 
   // Clear focus region
   await clearFocusRange(page);

@@ -133,7 +133,7 @@ export function useUpdateDefaultWorkspace() {
   return null;
 }`);
 
-    // Hook location points to "gql" instead of "useMutation"
+    // Hook location points to "gql" instead of `useMutation`
     // and the rest of the line doesn't contain a hook-like function call
     await expect(
       await hookNameCache.readAsync(mockClient, { sourceId: "fake", line: 6, column: 4 }, "c")

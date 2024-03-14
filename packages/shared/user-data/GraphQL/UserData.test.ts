@@ -58,7 +58,7 @@ describe("UserData", () => {
   it("should return default values for preferences not in localStorage or GraphQL", () => {
     const userData = require("./UserData").userData;
 
-    expect(userData.get("feature_basicProcessingLoadingBar")).toBe(false);
+    expect(userData.get("feature_commentAttachments")).toBe(false);
     expect(userData.get("layout_breakpointsPanelExpanded")).toBe(true);
   });
 
@@ -74,8 +74,7 @@ describe("UserData", () => {
       }
     });
 
-    window.location.search =
-      "?features=feature_basicProcessingLoadingBar,layout_sidePanelCollapsed";
+    window.location.search = "?features=feature_commentAttachments,layout_sidePanelCollapsed";
 
     const userData = require("./UserData").userData;
 
@@ -83,7 +82,7 @@ describe("UserData", () => {
     expect(userData.get("layout_sidePanelCollapsed")).toBe(true);
 
     // null in localStorage, defaults to false, but true in URL
-    expect(userData.get("feature_basicProcessingLoadingBar")).toBe(true);
+    expect(userData.get("feature_commentAttachments")).toBe(true);
   });
 
   it("should read/write values to localStorage", async () => {
@@ -120,7 +119,7 @@ describe("UserData", () => {
     const warn = jest.spyOn(console, "warn").mockImplementation(() => {});
 
     const userData = require("./UserData").userData;
-    userData.set("feature_reactPanel", true);
+    userData.set("feature_protocolTimeline", true);
 
     expect(warn).toHaveBeenCalledTimes(1);
     expect(warn).toHaveBeenCalledWith(

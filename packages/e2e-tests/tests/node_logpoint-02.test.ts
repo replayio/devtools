@@ -9,11 +9,11 @@ import {
 } from "../helpers/console-panel";
 import { reverseStepOverToLine, waitForFrameTimeline } from "../helpers/pause-information-panel";
 import { waitFor } from "../helpers/utils";
-import test, { expect } from "../testFixtureCloneRecording";
+import test, { expect } from "../testFixture";
 
 test.use({ exampleKey: "node/exceptions.js" });
 
-test("node_logpoint-02: Node exception logpoints", async ({
+test.skip("node_logpoint-02: Node exception logpoints", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {

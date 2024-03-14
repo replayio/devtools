@@ -4,7 +4,7 @@ import {
   editLogPoint,
   verifyLogPointContentTypeAheadSuggestions,
 } from "../helpers/source-panel";
-import test from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
 test.use({ exampleKey: "log_points_and_block_scope.html" });
 

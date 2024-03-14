@@ -13,14 +13,8 @@ import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { getUrlString } from "shared/utils/environment";
 import { createFrameComment } from "ui/actions/comments";
-import {
-  MAX_FOCUS_REGION_DURATION,
-  getUrlParams,
-  requestFocusWindow,
-  seek,
-} from "ui/actions/timeline";
+import { MAX_FOCUS_REGION_DURATION, requestFocusWindow, seek } from "ui/actions/timeline";
 import { useAppDispatch } from "ui/setup/hooks";
 
 import styles from "./ContextMenu.module.css";
@@ -49,9 +43,8 @@ export default function useTimelineContextMenu() {
   };
 
   const addComment = async () => {
-    const canvas = document.querySelector("canvas#graphics");
-
-    const typeData = await createTypeDataForVisualComment(canvas as HTMLCanvasElement, null, null);
+    const image = document.getElementById("graphics");
+    const typeData = await createTypeDataForVisualComment(image, null, null);
 
     await dispatch(
       seek({
@@ -84,10 +77,7 @@ export default function useTimelineContextMenu() {
   const shareReplay = async () => {
     const { point, time } = await replayClient.getPointNearTime(currentTime);
 
-    const params = getUrlParams({ focusWindow, point, time });
-    const urlString = getUrlString(params);
-
-    copyToClipboard(urlString);
+    copyToClipboard(window.location.href);
   };
 
   return useContextMenu(

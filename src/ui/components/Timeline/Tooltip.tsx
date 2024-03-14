@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useLayoutEffect, useRef } from "react";
 
 import { getFormattedTime } from "shared/utils/time";
 import { useNonLoadingTimeRanges } from "ui/components/Timeline/useNonLoadingTimeRanges";
@@ -19,11 +19,22 @@ export default function Tooltip({ timelineWidth }: { timelineWidth: number }) {
 
   const focusWindow = useAppSelector(getFocusWindow);
 
+  const ref = useRef<HTMLDivElement>(null);
+
+  const offset = getVisiblePosition({ time: hoverTime, zoom: zoomRegion }) * timelineWidth;
+
+  useLayoutEffect(() => {
+    const element = ref.current;
+    if (element != null && offset != null) {
+      const rect = element.getBoundingClientRect();
+      const left = Math.max(0, offset - rect.width / 2);
+      element.style.left = `${left}px`;
+    }
+  }, [offset]);
+
   if (!hoverTime || showFocusModeControls) {
     return null;
   }
-
-  let offset = getVisiblePosition({ time: hoverTime, zoom: zoomRegion }) * timelineWidth;
 
   const isHoveredOnNonLoadingRegion = nonLoadingTimeRanges.some(
     ({ start, end }) => start <= hoverTime && end >= hoverTime
@@ -33,13 +44,18 @@ export default function Tooltip({ timelineWidth }: { timelineWidth: number }) {
     focusWindow && (focusWindow.begin > hoverTime || focusWindow.end < hoverTime);
 
   const timestamp = getFormattedTime(hoverTime);
+
   const message =
     isHoveredOnNonLoadingRegion || isHoveredOnUnFocusedRegion
-      ? `${timestamp} (Unloaded)`
+      ? "This part of the timeline has been unloaded. Click the icon in the bottom right to adjust this window."
       : timestamp;
 
   return (
-    <div className="timeline-tooltip" style={{ left: offset }}>
+    <div
+      className="timeline-tooltip"
+      data-longer-message={isHoveredOnNonLoadingRegion || isHoveredOnUnFocusedRegion || undefined}
+      ref={ref}
+    >
       {message}
     </div>
   );

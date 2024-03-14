@@ -173,7 +173,6 @@ export class EventEmitter implements EmitterTarget {
         return rv;
       };
 
-      // @ts-expect-error who knows
       newListener[onceOriginalListener] = listener;
       EventEmitter.on(target, type, newListener);
     });

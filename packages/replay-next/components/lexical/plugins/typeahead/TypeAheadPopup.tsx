@@ -262,6 +262,11 @@ function TypeAheadPopUp<Item>({
   // Register Lexical command listeners for mouse and keyboard interactions
   useLayoutEffect(() => {
     function onKeyPress(event: KeyboardEvent) {
+      if (event.shiftKey) {
+        // Edge case but SHIFT+TAB should not accept a suggestion
+        return true;
+      }
+
       if (!editor.isEditable()) {
         return false;
       }

@@ -1,10 +1,10 @@
-import { useContext, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 import PrimaryPanes from "devtools/client/debugger/src/components/PrimaryPanes";
 import SecondaryPanes from "devtools/client/debugger/src/components/SecondaryPanes";
 import Accordion from "devtools/client/debugger/src/components/shared/Accordion";
-import { ReactPanel } from "replay-experimental/src/components/ReactPanel";
-import LazyOffscreen from "replay-next/components/LazyOffscreen";
+import { RecordedEventsCache } from "protocol/RecordedEventsCache";
+import { PanelLoader } from "replay-next/components/PanelLoader";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { isExecutionPointsWithinRange } from "replay-next/src/utils/time";
 import { setSelectedPrimaryPanel } from "ui/actions/layout";
@@ -15,7 +15,6 @@ import TestSuitePanel from "ui/components/TestSuite";
 import { isTestSuiteReplay } from "ui/components/TestSuite/utils/isTestSuiteReplay";
 import hooks from "ui/hooks";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
-import { getSortedEventsForDisplay } from "ui/reducers/app";
 import { getSelectedPrimaryPanel } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { PrimaryPanelName } from "ui/state/layout";
@@ -63,12 +62,21 @@ function useInitialPrimaryPanel() {
 }
 
 export default function SidePanel() {
+  return (
+    <Suspense fallback={<PanelLoader />}>
+      <SidePanelSuspends />
+    </Suspense>
+  );
+}
+
+function SidePanelSuspends() {
   const { range: focusWindow } = useContext(FocusContext);
   const selectedPrimaryPanel = useInitialPrimaryPanel();
   const [replayInfoCollapsed, setReplayInfoCollapsed] = useState(false);
   const [eventsCollapsed, setEventsCollapsed] = useState(false);
-  const events = useAppSelector(getSortedEventsForDisplay);
   const { isAuthenticated } = useAuth0();
+
+  const events = RecordedEventsCache.read();
 
   const hasEventsInFocusWindow = useMemo(
     () =>
@@ -99,12 +107,12 @@ export default function SidePanel() {
       header: (
         <div className={styles.EventsHeader}>
           Events
-          <EventsDropDownMenu />
+          <EventsDropDownMenu events={events} />
         </div>
       ),
       buttons: null,
       className: "events-info flex-1 border-t overflow-hidden border-themeBorder",
-      component: <Events />,
+      component: <Events events={events} />,
       opened: !eventsCollapsed,
       onToggle: () => setEventsCollapsed(!eventsCollapsed),
     });
@@ -179,7 +187,6 @@ export default function SidePanel() {
         {selectedPrimaryPanel === "cypress" && <TestSuitePanel />}
         {selectedPrimaryPanel === "protocol" && <ProtocolViewer />}
         {selectedPrimaryPanel === "search" && <SearchFilesReduxAdapter />}
-        {selectedPrimaryPanel === "react" && <ReactPanel />}
       </div>
     </div>
   );

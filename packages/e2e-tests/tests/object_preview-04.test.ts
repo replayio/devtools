@@ -6,7 +6,7 @@ import {
   waitForScopeValue,
 } from "../helpers/pause-information-panel";
 import { addBreakpoint, addLogpoint, toggleMappedSources } from "../helpers/source-panel";
-import test from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
 test.use({ exampleKey: "doc_prod_bundle.html" });
 
@@ -37,6 +37,9 @@ test(`object_preview-04: Test scope mapping and switching between generated/orig
   await waitForPaused(page, 12);
 
   await expandAllScopesBlocks(page);
-  await waitForScopeValue(page, "e", "(3) [");
-  await waitForScopeValue(page, "o", "{…}");
+  await waitForScopeValue(page, "e", "ƒe()");
+  await waitForScopeValue(page, "n", "(3) [5, 6");
+  // N.B. the two different o's, one a closure, the other an object.
+  await waitForScopeValue(page, "o", "ƒo()");
+  await waitForScopeValue(page, "o", "{barprop1: 2, barprop2: 3");
 });

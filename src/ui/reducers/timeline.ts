@@ -1,21 +1,18 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { TimeStampedPoint } from "@replayio/protocol";
-import sortBy from "lodash/sortBy";
 
-import { getPausePointParams } from "shared/utils/environment";
 import { MAX_FOCUS_REGION_DURATION } from "ui/actions/timeline";
+import { getMutableParamsFromURL } from "ui/setup/dynamic/url";
 import { UIState } from "ui/state";
 import { HoveredItem, TimeRange, TimelineState } from "ui/state/timeline";
-import { mergeSortedPointLists } from "ui/utils/timeline";
 
-const initialFocusWindow = getPausePointParams().focusWindow;
+const { focusWindow: focusWindowFromURL } = getMutableParamsFromURL();
 
 function initialTimelineState(): TimelineState {
   return {
-    allPaintsReceived: false,
     currentTime: 0,
-    focusWindow: initialFocusWindow
-      ? { begin: initialFocusWindow.begin.time, end: initialFocusWindow.end.time }
+    focusWindow: focusWindowFromURL
+      ? { begin: focusWindowFromURL.begin.time, end: focusWindowFromURL.end.time }
       : null,
     hoveredItem: null,
     markTimeStampedPoint: null,
@@ -23,12 +20,11 @@ function initialTimelineState(): TimelineState {
     hoverTime: null,
     playback: null,
     playbackFocusWindow: false,
-    playbackPrecachedTime: 0,
-    paints: [{ time: 0, point: "0" }],
-    points: [{ time: 0, point: "0" }],
+    endpoint: { time: 0, point: "0" },
     recordingDuration: null,
     shouldAnimate: true,
     showFocusModeControls: false,
+    showHoverTimeGraphics: false,
     stalled: false,
     timelineDimensions: { left: 1, top: 1, width: 1 },
     /** @deprecated This appears to be obsolete for now? */
@@ -48,17 +44,11 @@ const timelineSlice = createSlice({
       // This is poor action design and we should avoid this :(
       Object.assign(state, action.payload);
     },
-    setPlaybackStalled(state, action: PayloadAction<boolean>) {
-      state.stalled = action.payload;
-    },
     setMarkTimeStampPoint(state, action: PayloadAction<TimeStampedPoint | null>) {
       state.markTimeStampedPoint = action.payload;
     },
     setHoveredItem(state, action: PayloadAction<HoveredItem | null>) {
       state.hoveredItem = action.payload;
-    },
-    setPlaybackPrecachedTime(state, action: PayloadAction<number>) {
-      state.playbackPrecachedTime = action.payload;
     },
     setPlaybackFocusWindow(state, action: PayloadAction<boolean>) {
       state.playbackFocusWindow = action.payload;
@@ -66,38 +56,20 @@ const timelineSlice = createSlice({
     setFocusWindow(state, action: PayloadAction<TimeRange | null>) {
       state.focusWindow = action.payload;
     },
-    pointsReceived(state, action: PayloadAction<TimeStampedPoint[]>) {
-      const mutablePoints = [...state.points];
-      state.points = mergeSortedPointLists(
-        mutablePoints,
-        sortBy(action.payload, p => BigInt(p.point))
-      );
-    },
-    paintsReceived(state, action: PayloadAction<TimeStampedPoint[]>) {
-      const mutablePaints = [...state.paints];
-      state.paints = mergeSortedPointLists(
-        mutablePaints,
-        sortBy(action.payload, p => BigInt(p.point))
-      );
-    },
-    allPaintsReceived(state, action: PayloadAction<boolean>) {
-      state.allPaintsReceived = action.payload;
+    setEndpoint(state, action: PayloadAction<TimeStampedPoint>) {
+      state.endpoint = action.payload;
     },
   },
 });
 
 export const {
-  allPaintsReceived,
   setDragging,
   setHoveredItem,
   setMarkTimeStampPoint,
-  setPlaybackPrecachedTime,
   setPlaybackFocusWindow,
-  setPlaybackStalled,
   setFocusWindow,
   setTimelineState,
-  pointsReceived,
-  paintsReceived,
+  setEndpoint,
 } = timelineSlice.actions;
 
 export default timelineSlice.reducer;
@@ -107,27 +79,14 @@ export const getCurrentTime = (state: UIState) => state.timeline.currentTime;
 export const getHoverTime = (state: UIState) => state.timeline.hoverTime;
 export const getPlayback = (state: UIState) => state.timeline.playback;
 export const getShowFocusModeControls = (state: UIState) => state.timeline.showFocusModeControls;
+export const getShowHoverTimeGraphics = (state: UIState) => state.timeline.showHoverTimeGraphics;
 export const isDragging = (state: UIState) => state.timeline.dragging;
 export const isPlaying = (state: UIState) => state.timeline.playback !== null;
-export const isPlaybackStalled = (state: UIState) => state.timeline.stalled;
 export const getRecordingDuration = (state: UIState) => state.timeline.recordingDuration;
 export const getTimelineDimensions = (state: UIState) => state.timeline.timelineDimensions;
 export const getMarkTimeStampedPoint = (state: UIState) => state.timeline.markTimeStampedPoint;
 export const getHoveredItem = (state: UIState) => state.timeline.hoveredItem;
-export const getPaints = (state: UIState) => state.timeline.paints;
-export const getPoints = (state: UIState) => state.timeline.points;
-export const getBasicProcessingProgress = (state: UIState) => {
-  if (state.timeline.allPaintsReceived) {
-    return 1.0;
-  }
-  const maxPaint = state.timeline.paints[state.timeline.paints.length - 1];
-  const maxPoint = state.timeline.points[state.timeline.points.length - 1];
-  if (!maxPoint || maxPoint.point === "0") {
-    return 0.0;
-  }
-  return (1.0 * (maxPaint?.time || 0)) / maxPoint.time;
-};
-export const getPlaybackPrecachedTime = (state: UIState) => state.timeline.playbackPrecachedTime;
+export const getEndpoint = (state: UIState) => state.timeline.endpoint;
 export const getPlaybackFocusWindow = (state: UIState) => state.timeline.playbackFocusWindow;
 export const getFocusWindow = (state: UIState) => state.timeline.focusWindow;
 export const isMaximumFocusWindow = (state: UIState) => {

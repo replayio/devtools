@@ -8,6 +8,7 @@ import {
   useMemo,
 } from "react";
 
+import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBoundary";
 import Icon from "replay-next/components/Icon";
 import Loader from "replay-next/components/Loader";
 import { ConsoleFiltersContext } from "replay-next/src/contexts/ConsoleFiltersContext";
@@ -24,7 +25,6 @@ import {
 } from "replay-next/src/utils/loggables";
 import { isExecutionPointsLessThan } from "replay-next/src/utils/time";
 
-import DecoratedErrorBoundary from "../ErrorBoundary";
 import { ConsoleSearchContext } from "./ConsoleSearchContext";
 import CurrentTimeIndicator from "./CurrentTimeIndicator";
 import { Loggable, LoggablesContext } from "./LoggablesContext";
@@ -39,7 +39,7 @@ import rendererStyles from "./renderers/shared.module.css";
 type CurrentTimeIndicatorPlacement = Loggable | "begin" | "end";
 
 const ErrorBoundary = ({ children }: { children: ReactNode }) => (
-  <DecoratedErrorBoundary
+  <InlineErrorBoundary
     name="MessagesList"
     fallback={
       <div className={rendererStyles.Row}>
@@ -48,7 +48,7 @@ const ErrorBoundary = ({ children }: { children: ReactNode }) => (
     }
   >
     {children}
-  </DecoratedErrorBoundary>
+  </InlineErrorBoundary>
 );
 
 // This is an approximation of the console; the UI isn't meant to be the focus of this branch.

@@ -1,5 +1,6 @@
-import { unstable_Offscreen as Offscreen, Suspense, useContext, useMemo, useState } from "react";
+import { unstable_Activity as Activity, Suspense, useContext, useMemo } from "react";
 
+import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBoundary";
 import { PanelLoader } from "replay-next/components/PanelLoader";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { useSources } from "replay-next/src/suspense/SourcesCache";
@@ -51,13 +52,17 @@ export function ProtocolViewerPanel() {
       )}
 
       <div className={styles.Panel}>
-        <Offscreen mode={safeSelectedTab === "live" ? "visible" : "hidden"}>
-          <LiveProtocolRequests />
-        </Offscreen>
+        <Activity mode={safeSelectedTab === "live" ? "visible" : "hidden"}>
+          <InlineErrorBoundary name="LiveProtocolRequests">
+            <LiveProtocolRequests />
+          </InlineErrorBoundary>
+        </Activity>
         {isRecordingOfReplay && safeSelectedTab === "recorded" ? (
-          <Suspense fallback={<PanelLoader />}>
-            <RecordedProtocolRequests />
-          </Suspense>
+          <InlineErrorBoundary name="RecordedProtocolRequests">
+            <Suspense fallback={<PanelLoader />}>
+              <RecordedProtocolRequests />
+            </Suspense>
+          </InlineErrorBoundary>
         ) : null}
       </div>
     </div>
@@ -69,7 +74,14 @@ export function LiveProtocolRequests() {
   const requestMap = useAppSelector(getProtocolRequestMap);
   const responseMap = useAppSelector(getProtocolResponseMap);
 
-  return <ProtocolViewer errorMap={errorMap} requestMap={requestMap} responseMap={responseMap} />;
+  return (
+    <ProtocolViewer
+      errorMap={errorMap}
+      requestMap={requestMap}
+      responseMap={responseMap}
+      scope="live"
+    />
+  );
 }
 
 const NO_MESSAGES: RecordedProtocolData[] = [];
@@ -124,5 +136,12 @@ function RecordedProtocolRequests() {
 
   const { requestMap, responseMap, errorMap } = groupedMessageData;
 
-  return <ProtocolViewer errorMap={errorMap} requestMap={requestMap} responseMap={responseMap} />;
+  return (
+    <ProtocolViewer
+      errorMap={errorMap}
+      requestMap={requestMap}
+      responseMap={responseMap}
+      scope="recorded"
+    />
+  );
 }

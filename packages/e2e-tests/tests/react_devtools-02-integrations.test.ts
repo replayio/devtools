@@ -4,6 +4,7 @@ import {
   getAllVisibleComponentNames,
   getReactComponents,
   getReactDevToolsList,
+  getReactDevToolsPanel,
   getSearchInput,
   getViewSourceButton,
   openReactDevtoolsPanel,
@@ -12,7 +13,7 @@ import {
 } from "../helpers/new-react-devtools-panel";
 import { getSelectedLineNumber, waitForSelectedSource } from "../helpers/source-panel";
 import { debugPrint, waitFor } from "../helpers/utils";
-import test, { expect } from "../testFixtureCloneRecording";
+import test, { expect } from "../testFixture";
 
 // Why is this even getting confused as an API key?
 // trunk-ignore(gitleaks/generic-api-key)
@@ -31,18 +32,25 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
 
   await openDevToolsTab(page);
 
-  await warpToMessage(page, "Waiting for breakpoint at doc_rr_basic.html:21 (waitForBreakpoint)");
+  await warpToMessage(
+    page,
+    "Waiting for breakpoint at doc_rr_basic_chromium.html:21 (waitForBreakpoint)"
+  );
 
   // If the "React" tab shows up, we know that the routine ran
   await openReactDevtoolsPanel(page);
 
   debugPrint(page, "Checking initial list of React components");
 
+  await getReactDevToolsPanel(page).waitFor();
+
   const components = getReactComponents(page);
+
   await waitFor(async () => {
     const numComponents = await components.count();
     return expect(numComponents).toBeGreaterThan(0);
   });
+
   const numComponents = await components.count();
 
   // Should be seeing 20-ish at least, but give some buffer.
@@ -51,65 +59,9 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
   const componentNames = await getAllVisibleComponentNames(page);
 
   /*
-    In production, the first 20-ish component names normally look like this (flattened):
-    [
-      "ea", 
-      "J", 
-      "X", 
-      "z", 
-      "Context.Provider", 
-      "Context.Provider", 
-      "Anonymous", 
-      "Context.Provider", 
-      "Context.Provider", 
-      "Context.Provider", 
-      "Context.Provider", 
-      "n8", 
-      "O", 
-      "Anonymous", 
-      "Anonymous"
-      "Auth0Provider", 
-      "iU",   
-      "Context.Provider", 
-      "Context.Consumer", 
-      "da", 
-      "dn"
-      "Anonymous", 
-      "Anonymous"
-    ]
-
-    In development, however, they are (minus dev-only components):
-
-    [
-      'Root',
-      'Head',
-      'AppContainer',
-      'Container',
-      'AppRouterContext.Provider',
-      'SearchParamsContext.Provider',
-      'PathnameContextProviderAdapter',
-      'PathnameContext.Provider',
-      'RouterContext.Provider',
-      'HeadManagerContext.Provider',
-      'ImageConfigContext.Provider',
-      'App',
-      'SystemProvider',
-      'Head',
-      'SideEffect',
-      'Auth0Provider',
-      'Auth0Provider', // twice? wut?
-      'Context.Provider',
-      'Context.Consumer',
-      'SSRRecordingPage',
-      'RecordingHead',
-      'Head',
-      'SideEffect'
-    ]
-    
-
-    In practice, the routine's name processing currently lose the specific context names, 
-    and a couple components aren't getting their names mapped.
-    But, assuming the routine name mapping worked, we _should_ end up with this:
+    The first 20-ish component names normally look like the list below (flattened)
+    In practice, the routine's name processing currently lose the specific context names,
+    but assuming the routine name mapping worked, we _should_ end up with this:
   */
   const expectedComponentNames = [
     "Root",
@@ -128,7 +80,7 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
     "Head",
     "SideEffect",
     "Auth0Provider",
-    "iU",
+    "Auth0Provider",
     "Context.Provider",
     "Context.Consumer",
     "SSRRecordingPage",
@@ -191,7 +143,7 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
   await searchComponents(page, "Anonymous"); // Search and select 1st result
   await verifySearchResults(page, {
     currentNumber: 1,
-    totalNumber: 17,
+    totalNumber: 15,
   });
 
   await componentSearchInput.focus();
@@ -200,7 +152,7 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
   await componentSearchInput.press("Enter");
   await verifySearchResults(page, {
     currentNumber: 4,
-    totalNumber: 17,
+    totalNumber: 15,
   });
 
   await viewSourceButton.click();
@@ -224,7 +176,7 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
   await searchComponents(page, "Suspense");
   await verifySearchResults(page, {
     currentNumber: 1,
-    totalNumber: 17,
+    totalNumber: 15,
   });
 
   list.evaluate(el => (el.scrollTop = 0));
@@ -232,18 +184,18 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
   // Re-select "App" just so we're back at the top
   await getReactComponents(page).first().click();
 
-  // Should render our `<LazyOffscreen>` components, but _not_ `<Offscreen>`,
+  // Should render our `<LazyActivity>` components, but _not_ `<Activity>`,
   // because RDT already filters those out by default
-  debugPrint(page, `Checking rendering of <Offscreen> components`);
+  debugPrint(page, `Checking rendering of <Activity> components`);
 
-  await searchComponents(page, "Offscreen");
+  await searchComponents(page, "Activity");
   await verifySearchResults(page, {
     currentNumber: 1,
-    totalNumber: 7,
+    totalNumber: 6,
   });
 
   const offscreenSearchComponentNames = await getAllVisibleComponentNames(page);
   expect(offscreenSearchComponentNames.length).toBeGreaterThan(0);
-  expect(offscreenSearchComponentNames.includes("LazyOffscreen")).toBe(true);
-  expect(offscreenSearchComponentNames.includes("Offscreen")).toBe(false);
+  expect(offscreenSearchComponentNames.includes("LazyActivity")).toBe(true);
+  expect(offscreenSearchComponentNames.includes("Activity")).toBe(false);
 });

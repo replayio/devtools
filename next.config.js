@@ -1,6 +1,4 @@
 const { patchWebpackConfig } = require("next-global-css");
-const { RetryChunkLoadPlugin } = require("webpack-retry-chunk-load-plugin");
-const { WebpackReactSourcemapsPlugin } = require("@acemarke/react-prod-sourcemaps");
 
 const withBundleAnalyzer = require("@next/bundle-analyzer")({
   enabled: process.env.ANALYZE === "true",
@@ -97,9 +95,7 @@ const baseNextConfig = {
    *   }
    * ) => import('webpack').Configuration}
    */
-  webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
-    config.plugins.push(new RetryChunkLoadPlugin({ retryDelay: 1000, maxRetries: 2 }));
-
+  webpack: (config, { isServer, webpack }) => {
     // Slim down the Sentry bundle slightly:
     // https://docs.sentry.io/platforms/javascript/guides/nextjs/configuration/tree-shaking/
     config.plugins.push(
@@ -109,38 +105,6 @@ const baseNextConfig = {
       })
     );
 
-    // Check for circular imports and throw errors, but only if the
-    // env variable is set.  Should only be true if manually defined
-    // in a local dev environment.
-    if (process.env.CHECK_CIRCULAR_IMPORTS) {
-      const CircularDependencyPlugin = require("circular-dependency-plugin");
-
-      let numCyclesDetected = 0;
-
-      config.plugins.push(
-        new CircularDependencyPlugin({
-          exclude: /node_modules/,
-          failOnError: true,
-          cwd: process.cwd(),
-          allowAsyncCycles: true,
-          onStart({ compilation }) {
-            numCyclesDetected = 0;
-          },
-          onDetected({ module: webpackModuleRecord, paths, compilation }) {
-            numCyclesDetected++;
-            compilation.warnings.push(new Error(paths.join(" -> ")));
-          },
-          onEnd({ compilation }) {
-            if (numCyclesDetected > 0) {
-              compilation.warnings.push(new Error(`Detected ${numCyclesDetected} cycles`));
-            }
-          },
-        })
-      );
-    }
-
-    config.plugins.push(WebpackReactSourcemapsPlugin({ debug: false }));
-
     // Allow CSS imported from `node_modules`, to work around an error
     // from importing `<Editor>` from `@redux-devtools/ui`
     patchWebpackConfig(config, { isServer });
@@ -149,11 +113,24 @@ const baseNextConfig = {
       fs: false,
     };
 
-    const sourceMapRegExp =
-      /node_modules.+(immer|@reduxjs|react-resizable-panels|react-window|suspense|use-context-menu).+\.js$/;
+    // Source-maps should be uploaded to Next for the following NPM modules
+    const moduleNames = [
+      "@reduxjs",
+      "immer",
+      "react",
+      "react-dom",
+      "react-resizable-panels",
+      "react-window",
+      "suspense",
+      "use-context-menu",
+    ];
+    const separator = `(\\\\|\\\/)`;
+    const moduleRegExp = new RegExp(
+      `node_modules${separator}(${moduleNames.join("|")})${separator}`
+    );
 
     config.module.rules.push({
-      test: sourceMapRegExp,
+      test: moduleRegExp,
       enforce: "pre",
       use: ["source-map-loader"],
     });

@@ -42,7 +42,15 @@ export function defer<T>() {
   return { promise, resolve, reject };
 }
 
-export const waitForTime = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
+export function waitForTime(ms: number) {
+  const start = Date.now();
+  return new Promise<number>(resolve => {
+    setTimeout(() => {
+      const end = Date.now();
+      resolve(end - start);
+    }, ms);
+  });
+}
 
 export function throttle(callback: () => void, time: number) {
   let scheduled = false;

@@ -9,7 +9,7 @@ import {
 import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import useLocalStorageUserData from "shared/user-data/LocalStorage/useLocalStorageUserData";
-import Video from "ui/components/Video";
+import Video from "ui/components/Video/Video";
 import { getToolboxLayout } from "ui/reducers/layout";
 import { useAppSelector } from "ui/setup/hooks";
 import { ToolboxLayout } from "ui/state/layout";
@@ -31,12 +31,10 @@ const Vertical = ({ toolboxLayout }: { toolboxLayout: ToolboxLayout }) => {
   useLayoutEffect(() => {
     const videoPanel = videoPanelRef.current;
     if (videoPanel) {
-      if (videoPanel.getCollapsed() !== videoPanelCollapsed) {
-        if (videoPanelCollapsed) {
-          videoPanel.collapse();
-        } else {
-          videoPanel.expand();
-        }
+      if (videoPanelCollapsed) {
+        videoPanel.collapse();
+      } else {
+        videoPanel.expand();
       }
     }
   }, [videoPanelCollapsed]);
@@ -50,18 +48,17 @@ const Vertical = ({ toolboxLayout }: { toolboxLayout: ToolboxLayout }) => {
       {toolboxLayout !== "full" && (
         <>
           <Panel
-            className="flex-column flex flex-1"
+            className="overflow-hidden"
             collapsible
             defaultSize={50}
             id="Panel-Video"
             minSize={10}
-            onCollapse={onVideoPanelCollapse}
+            onCollapse={() => onVideoPanelCollapse(true)}
+            onExpand={() => onVideoPanelCollapse(false)}
             order={1}
             ref={videoPanelRef}
           >
-            <div className="flex-column flex flex-1">
-              <Video />
-            </div>
+            <Video />
           </Panel>
           <PanelResizeHandle className={videoPanelCollapsed ? "" : "h-1 w-full shrink-0"} />
         </>
@@ -118,7 +115,8 @@ const Horizontal = ({ toolboxLayout }: { toolboxLayout: ToolboxLayout }) => {
             : "Panel-SecondaryToolbox"
         }
         minSize={10}
-        onCollapse={setVideoPanelCollapsed}
+        onCollapse={() => setVideoPanelCollapsed(true)}
+        onExpand={() => setVideoPanelCollapsed(false)}
         order={2}
         ref={videoPanelRef}
       >

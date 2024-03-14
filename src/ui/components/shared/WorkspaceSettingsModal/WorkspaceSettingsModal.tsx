@@ -1,5 +1,6 @@
 import React, { ChangeEvent, useMemo, useState } from "react";
 
+import { Button } from "replay-next/components/Button";
 import { WorkspaceUser } from "shared/graphql/types";
 import * as actions from "ui/actions/app";
 import { useRedirectToTeam } from "ui/components/Library/Team/utils";
@@ -12,7 +13,6 @@ import { validateEmail } from "ui/utils/helpers";
 import { trackEvent } from "ui/utils/telemetry";
 
 import Base64Image from "../Base64Image";
-import { Button, DisabledButton, PrimaryButton } from "../Button";
 import { useConfirm } from "../Confirm";
 import { TextInput } from "../Forms";
 import InvitationLink from "../NewWorkspaceModal/InvitationLink";
@@ -102,7 +102,7 @@ function WorkspaceForm() {
     setErrorMessage(null);
     setIsLoading(true);
     await inviteNewWorkspaceMember({
-      variables: { workspaceId: workspaceId!, email: inputValue, roles: ["viewer", "debugger"] },
+      variables: { workspaceId: workspaceId!, email: inputValue },
     });
   };
 
@@ -117,13 +117,7 @@ function WorkspaceForm() {
           onChange={onChange}
           className="border-inputBorder"
         />
-        {isLoading ? (
-          <DisabledButton>Loading...</DisabledButton>
-        ) : canSubmit ? (
-          <PrimaryButton color="blue">Invite</PrimaryButton>
-        ) : (
-          <DisabledButton>Invite</DisabledButton>
-        )}
+        <Button disabled={isLoading || !canSubmit}>{isLoading ? "Loading..." : "Invite"}</Button>
       </div>
       {errorMessage ? <div className="py-3 text-xs text-red-500">{errorMessage}</div> : null}
     </form>
@@ -225,7 +219,7 @@ const settings: Settings<
               <div className="font-semibold">Delete this team</div>
               <div className="">{`This cannot be reversed.`}</div>
             </div>
-            <Button color="red" onClick={handleDeleteTeam} size="md" style="primary">
+            <Button color="secondary" onClick={handleDeleteTeam}>
               Delete this team
             </Button>
           </div>

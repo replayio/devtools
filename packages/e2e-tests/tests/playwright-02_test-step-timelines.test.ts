@@ -8,7 +8,7 @@ import {
 } from "../helpers/testsuites";
 import { getTimelineCurrentHoverPercent, getTimelineCurrentPercent } from "../helpers/timeline";
 import { waitFor } from "../helpers/utils";
-import test, { expect } from "../testFixtureCloneRecording";
+import test, { expect } from "../testFixture";
 
 test.use({ exampleKey: "playwright/breakpoints-05" });
 
@@ -20,11 +20,6 @@ test("playwright-02: Test Step timeline behavior", async ({
   await openViewerTab(page);
 
   await openPlaywrightTestPanel(page);
-
-  const testPanel = getTestSuitePanel(page);
-
-  const isVisible = await testPanel.isVisible();
-  expect(isVisible).toBe(true);
 
   // has 1 test
   const rows = getTestRows(page);

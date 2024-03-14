@@ -43,25 +43,26 @@ const GET_TEST_RUN_RECORDINGS = gql`
                 triggerUrl
                 user
               }
-              tests {
+              tests(includeNonRecorded: true) {
                 id
                 testId
-                index
-                attempt
                 title
                 scope
                 sourcePath
                 result
                 errors
                 durationMs
-                recordings {
-                  uuid
-                  duration
-                  isProcessed
-                  createdAt
-                  comments {
-                    user {
-                      id
+                executions {
+                  result
+                  recordings {
+                    uuid
+                    duration
+                    isProcessed
+                    createdAt
+                    comments {
+                      user {
+                        id
+                      }
                     }
                   }
                 }
@@ -75,11 +76,11 @@ const GET_TEST_RUN_RECORDINGS = gql`
 `;
 
 const GET_TEST_RUNS = gql`
-  query GetTestsRunsForWorkspace($workspaceId: ID!) {
+  query GetTestsRunsForWorkspace($workspaceId: ID!, $startTime: String, $endTime: String) {
     node(id: $workspaceId) {
       ... on Workspace {
         id
-        testRuns {
+        testRuns(filter: { startTime: $startTime, endTime: $endTime }) {
           edges {
             node {
               id
@@ -137,13 +138,15 @@ export async function getTestRunTestsWithRecordingsGraphQL(
 export async function getTestRunsGraphQL(
   graphQLClient: GraphQLClientInterface,
   accessToken: string | null,
-  workspaceId: string
+  workspaceId: string,
+  startTime?: string | null,
+  endTime?: string | null
 ): Promise<GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node[]> {
   const response = await graphQLClient.send<GetTestsRunsForWorkspace>(
     {
       operationName: "GetTestsRunsForWorkspace",
       query: GET_TEST_RUNS,
-      variables: { workspaceId },
+      variables: { workspaceId, startTime, endTime },
     },
     accessToken
   );

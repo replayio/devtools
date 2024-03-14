@@ -3,16 +3,19 @@
   display: flex;
   position: absolute;
   bottom: 24px;
-  border-radius: 4px;
+  border-radius: 0.25rem;
   align-items: center;
   justify-content: center;
   z-index: var(--z-index-1--tooltip);
   background: var(--body-bgcolor);
-  padding: 3px 5px;
-  border-radius: 4px;
+  padding: 0.375rem 0.5rem;
   border: 1px solid var(--theme-toggle-bgcolor);
-  transform: translateX(-50%);
   pointer-events: none;
   user-select: none;
   white-space: nowrap;
+}
+
+.timeline-tooltip[data-longer-message] {
+  width: 14rem;
+  white-space: normal;
 }

@@ -1,6 +1,9 @@
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
-import { ProtocolViewerContextRoot } from "ui/components/ProtocolViewer/components/ProtocolViewerContext";
+import {
+  ProtocolViewerContextRoot,
+  ProtocolViewerScope,
+} from "ui/components/ProtocolViewer/components/ProtocolViewerContext";
 import { ProtocolViewerList } from "ui/components/ProtocolViewer/components/ProtocolViewerList";
 import { RequestDetails } from "ui/components/ProtocolViewer/components/RequestDetails";
 import {
@@ -15,16 +18,19 @@ export function ProtocolViewer({
   errorMap,
   requestMap,
   responseMap,
+  scope,
 }: {
   errorMap: ProtocolErrorMap;
   requestMap: ProtocolRequestMap;
   responseMap: ProtocolResponseMap;
+  scope: ProtocolViewerScope;
 }) {
   return (
     <ProtocolViewerContextRoot
       errorMap={errorMap}
       requestMap={requestMap}
       responseMap={responseMap}
+      scope={scope}
     >
       <PanelGroup autoSaveId="ProtocolViewer" className={styles.Container} direction="vertical">
         <Panel id="list" minSize={20}>

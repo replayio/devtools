@@ -1,131 +1,20 @@
-import { ExecutionPoint, TimeStampedPointRange } from "@replayio/protocol";
-
 declare global {
   var __IS_RECORD_REPLAY_RUNTIME__: boolean;
 }
 
-function getURL(): URL {
-  // It's not safe to read the window.location.href during module initialization,
-  // because that relies on the order of modules being included,
-  // and the module that mocks the environment for tests may be loaded after this one.
-  return typeof window !== "undefined"
-    ? new URL(window.location.href)
-    : new URL("https://app.replay.io");
-}
+export type ReadOnlyURLParams = {
+  apiKey: string | null;
+  e2e: boolean;
+  referrer: string | null;
+  testScope: string | null;
+};
 
-export function isDevelopment() {
-  return getURL().hostname == "localhost";
-}
-
-export function isFirefox() {
-  return /firefox/i.test(navigator.userAgent);
-}
-
-export function isReplayBrowser() {
-  return typeof window !== "undefined" ? "__IS_RECORD_REPLAY_RUNTIME__" in window : false;
-}
-
-export function getTest() {
-  return getURL().searchParams.get("test");
-}
-
-export function hasApiKey() {
-  return !!getURL().searchParams.get("apiKey");
-}
-
-// Return whether we are running one of the tests in our e2e test suite.
-// We will be connected to a live backend and testing debugging features.
-export function isE2ETest() {
-  if (getURL().searchParams.get("e2e")) {
-    return true;
+export function decodeBase64FromURL(urlParam: string): Object | undefined {
+  try {
+    return JSON.parse(atob(decodeURIComponent(urlParam))) as any;
+  } catch (e) {
+    return undefined;
   }
-
-  return getTest() != null;
-}
-
-export function isTest() {
-  return isE2ETest();
-}
-
-export function skipTelemetry() {
-  return isTest() || isDevelopment() || isDeployPreview();
-}
-
-export function isDeployPreview() {
-  return process.env.NEXT_PUBLIC_VERCEL_ENV === "preview";
-}
-
-// The loading param is currently used to wait for resources
-// such as sourcemaps to load
-export function hasLoadingParam() {
-  return getURL().searchParams.get("loading") != null;
-}
-
-export function getFocusWindow() {
-  const url = getURL();
-  const focusWindowParam = url.searchParams.get("focusWindow");
-  return focusWindowParam ? (decodeBase64FromURL(focusWindowParam) as TimeStampedPointRange) : null;
-}
-
-export function getPausePointParams(): {
-  focusWindow: TimeStampedPointRange | null;
-  point: ExecutionPoint | null;
-  time: number | null;
-} {
-  const url = getURL();
-
-  const pointParam = url.searchParams.get("point");
-  const point = pointParam ? `${pointParam}` : null;
-
-  let time: number | null = null;
-  const timeParam = url.searchParams.get("time");
-  if (timeParam) {
-    const maybeTime = +timeParam;
-    if (!isNaN(maybeTime)) {
-      time = maybeTime;
-    }
-  }
-
-  const focusWindow = getFocusWindow();
-
-  if (time != null && point != null) {
-    return { focusWindow, point, time };
-  } else {
-    return { focusWindow, point: null, time: null };
-  }
-}
-
-export function getParams() {
-  const url = new URL(window.location.toString());
-  return { q: url.searchParams.get("q") };
-}
-
-export function getUrlString(params: Record<string, string | null | undefined>) {
-  const url = new URL(window.location.toString());
-
-  Object.entries(params).forEach(([key, value]) => {
-    if (value !== undefined && value !== null) {
-      url.searchParams.set(key, value);
-    }
-  });
-
-  return url.toString();
-}
-
-export function updateUrlWithParams(params: Record<string, string | null | undefined>) {
-  const urlString = getUrlString(params);
-
-  window.history.replaceState({}, "", urlString);
-}
-
-export function getLoginReferrerParam() {
-  const url = getURL();
-  const referrerParam = url.searchParams.get("login-referrer");
-  return referrerParam === "first-browser-open" ? referrerParam : "default";
-}
-
-export function removeUrlParameters() {
-  window.history.pushState({}, document.title, window.location.pathname);
 }
 
 export function encodeObjectToURL(obj: Object): string | undefined {
@@ -136,12 +25,67 @@ export function encodeObjectToURL(obj: Object): string | undefined {
   }
 }
 
-export function decodeBase64FromURL(urlParam: string): Object | undefined {
-  try {
-    return JSON.parse(atob(decodeURIComponent(urlParam))) as any;
-  } catch (e) {
-    return undefined;
+// Strip the URL of any query parameters
+export function getDisplayedUrl(url: string | undefined) {
+  if (!url) {
+    return "";
   }
+
+  try {
+    const { hostname, pathname } = new URL(url);
+    return `${hostname}${pathname}`;
+  } catch (error) {
+    return "";
+  }
+}
+
+// This method returns a subset of URL parameters, onces that do not change during a session;
+// Parameters that change (e.g. values stored in Redux) are managed by ui/setup/dynamic/url
+export function getReadOnlyParamsFromURL(): ReadOnlyURLParams {
+  const { searchParams } = getURL();
+
+  return {
+    apiKey: searchParams.get("apiKey"),
+
+    // Presumably the "test" param is a legacy one
+    // https://github.com/replayio/devtools/commit/8dd02c0055fe33e714a88e0a3aa19d1fc181bbc9
+    // The newer param is "e2e"
+    // https://github.com/replayio/devtools/commit/bcc9f735258fec7afb951713d8b14d31d900df09
+    e2e: !!searchParams.get("e2e") || !!searchParams.get("test"),
+
+    // This was original added as "login-referrer"
+    // https://github.com/replayio/devtools/commit/4352083de6bc1ed7b24c16c684f7650292f61658
+    referrer: searchParams.get("referrer") ?? searchParams.get("login-referrer"),
+
+    testScope: searchParams.get("testScope"),
+  };
+}
+
+export function getURL(): URL {
+  const url = typeof window !== "undefined" ? window.location.href : "https://app.replay.io";
+  return new URL(url);
+}
+
+export function hasApiKey() {
+  return !!getReadOnlyParamsFromURL().apiKey;
+}
+
+export function isDevelopment() {
+  return getURL().hostname == "localhost";
+}
+
+// Return whether we are running one of the tests in our e2e test suite.
+// We will be connected to a live backend and testing debugging features.
+export function isTest() {
+  return getReadOnlyParamsFromURL().e2e;
+}
+
+export function isFirefox() {
+  return /firefox/i.test(navigator.userAgent);
+}
+
+export function isReplayBrowser() {
+  return typeof window !== "undefined" ? "__IS_RECORD_REPLAY_RUNTIME__" in window : false;
 }
 
 export function launchAndRecordUrl(url: string) {
@@ -155,17 +99,12 @@ export function launchAndRecordUrl(url: string) {
   window.open(autoRecordUrl);
 }
 
-// Strip the URL of any query parameters
-export function getDisplayedUrl(url: string | undefined) {
-  if (!url) {
-    return "";
-  }
+export function removeUrlParameters() {
+  window.history.pushState({}, document.title, window.location.pathname);
+}
 
-  try {
-    const urlObj = new URL(url);
-    const { hostname, pathname } = urlObj;
-    return `${hostname}${pathname}`;
-  } catch (e) {
-    return "";
-  }
+export function skipTelemetry() {
+  const isDeployPreview = process.env.NEXT_PUBLIC_VERCEL_ENV === "preview";
+
+  return isTest() || isDevelopment() || isDeployPreview;
 }

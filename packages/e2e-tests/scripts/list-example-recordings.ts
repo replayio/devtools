@@ -5,6 +5,7 @@ import yargs from "yargs";
 
 import { GetRecording, GetRecordingVariables } from "shared/graphql/generated/GetRecording";
 
+import { ExamplesData } from "../helpers";
 import { graphqlRequest } from "./graphqlClient";
 
 const argv = yargs
@@ -30,11 +31,11 @@ const argv = yargs
 
 const examplesJsonPath = path.join(__dirname, "..", "examples.json");
 
-const examplesData: Record<string, string> = require(examplesJsonPath);
+const examplesData: ExamplesData = require(examplesJsonPath);
 
 const recordingIdsToExampleNames: Record<string, string> = {};
-for (const [exampleName, recordingId] of Object.entries(examplesData)) {
-  recordingIdsToExampleNames[recordingId] = exampleName;
+for (const [exampleName, { recording }] of Object.entries(examplesData)) {
+  recordingIdsToExampleNames[recording] = exampleName;
 }
 
 // Copied from src/ui/hooks/recordings.ts,
@@ -77,10 +78,7 @@ async function fetchRecordingData(recordingId: string): Promise<GetRecording["re
   return data.recording;
 }
 
-function determineRecordingIdsToFetch(
-  args: typeof argv,
-  examples: Record<string, string>
-): string[] {
+function determineRecordingIdsToFetch(args: typeof argv, examples: ExamplesData): string[] {
   if (args.example) {
     return [examples[args.example]];
   } else if (args.recordingId) {
@@ -88,7 +86,7 @@ function determineRecordingIdsToFetch(
   }
 
   console.log("Checking all examples");
-  return Object.values(examples);
+  return Object.values(examples).map(({ recording }) => recording);
 }
 
 (async () => {

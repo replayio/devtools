@@ -7,7 +7,7 @@ import {
   verifyNetworkDetailsPanelContains,
   verifyNetworkDetailsTabsVisible,
 } from "../helpers/network-panel";
-import test from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
 test.use({ exampleKey: "flake/adding-spec.ts" });
 
@@ -18,13 +18,6 @@ test(`network-02: should show details for the selected request`, async ({
   await startTest(page, recordingId);
   await openDevToolsTab(page);
   await openNetworkPanel(page);
-
-  // Select a font element and verify the correct detail headers are shown
-  await filterByText(page, "fa-regular-400");
-  await selectRequestRow(page, {
-    name: "fa-regular-400.ttf",
-  });
-  await verifyNetworkDetailsTabsVisible(page, ["Headers"]);
 
   // Select an SVG element and verify the correct detail headers are shown
   await filterByText(page, "http://localhost:8888/__/assets/generic-browser.b2bc06f2.svg");

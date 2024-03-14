@@ -5,7 +5,7 @@ import {
   verifyConsoleMessage,
 } from "../helpers/console-panel";
 import { getByTestName } from "../helpers/utils";
-import test, { expect } from "../testFixtureCloneRecording";
+import test, { expect } from "../testFixture";
 
 test.use({ exampleKey: "node/objects.js" });
 
@@ -25,7 +25,7 @@ test("node_object_preview: Showing console objects in node", async ({
   await verifyConsoleMessage(page, "WeakMap(20) {{…} → {…}, {…} → {…},");
   await verifyConsoleMessage(page, "{a: 0, a0: 0, a1: 1, a2: 2, a3: 3,");
   await verifyConsoleMessage(page, "/abc/gi");
-  await verifyConsoleMessage(page, "Thu Sep 29 2022");
+  await verifyConsoleMessage(page, "Tue Feb 13 2024");
 
   await verifyConsoleMessage(page, "RangeError: foo");
 

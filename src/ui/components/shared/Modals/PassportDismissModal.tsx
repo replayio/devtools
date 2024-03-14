@@ -1,6 +1,6 @@
-import React from "react";
 import { ConnectedProps, connect } from "react-redux";
 
+import { Button } from "replay-next/components/Button";
 import { userData } from "shared/user-data/GraphQL/UserData";
 import * as actions from "ui/actions/app";
 import { setSelectedPrimaryPanel } from "ui/actions/layout";
@@ -10,8 +10,7 @@ import { getSelectedSource } from "ui/reducers/sources";
 import { UIState } from "ui/state";
 import { PrimaryPanelName } from "ui/state/layout";
 
-import { PrimaryButton, SecondaryButton } from "../Button";
-import { Dialog, DialogActions, DialogDescription, DialogLogo, DialogTitle } from "../Dialog";
+import { Dialog, DialogActions, DialogDescription, DialogTitle } from "../Dialog";
 import Modal from "../NewModal";
 import styles from "./modal.module.css";
 
@@ -49,16 +48,10 @@ function PassportDismissModal({
         </DialogDescription>
         <DialogActions>
           <div className={styles.buttonContainer}>
-            <PrimaryButton color="blue" onClick={confirmDismiss}>
-              OK
-            </PrimaryButton>
-            <SecondaryButton
-              color="gray"
-              onClick={cancelDismiss}
-              className={styles.secondaryButton}
-            >
+            <Button onClick={confirmDismiss}>OK</Button>
+            <Button onClick={cancelDismiss} className={styles.secondaryButton} variant="outline">
               Cancel
-            </SecondaryButton>
+            </Button>
           </div>
         </DialogActions>
       </Dialog>

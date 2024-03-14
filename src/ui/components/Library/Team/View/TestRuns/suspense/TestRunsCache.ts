@@ -1,29 +1,38 @@
-import orderBy from "lodash/orderBy";
-import { createCache } from "suspense";
+import { createCache, createIntervalCache } from "suspense";
 
 import { GraphQLClientInterface } from "shared/graphql/GraphQLClient";
 import { Recording } from "shared/graphql/types";
-import { TestRun, TestRunTestWithRecordings, processTestRun } from "shared/test-suites/TestRun";
+import {
+  TestRun,
+  TestRunTest,
+  TestRunTestWithRecordings,
+  processTestRun,
+} from "shared/test-suites/TestRun";
+import { convertRecording } from "ui/hooks/recordings";
+import { TestGroups, groupRecordings, testFailed, testPassed } from "ui/utils/testRuns";
+
 import {
   getTestRunTestsWithRecordingsGraphQL,
   getTestRunsGraphQL,
-} from "ui/components/Library/Team/View/TestRuns/graphql/TestRunsGraphQL";
-import { convertRecording } from "ui/hooks/recordings";
-import { TestGroups, groupRecordings } from "ui/utils/testRuns";
+} from "../graphql/TestRunsGraphQL";
 
-export const testRunsCache = createCache<
+export const testRunsIntervalCache = createIntervalCache<
+  number,
   [graphQLClient: GraphQLClientInterface, accessToken: string | null, workspaceId: string],
-  TestRun[]
+  TestRun
 >({
-  config: { immutable: true },
-  debugLabel: "testRunsCache",
-  getKey: ([_, __, workspaceId]) => workspaceId,
-  load: async ([graphQLClient, accessToken, workspaceId]) => {
-    const rawTestRuns = await getTestRunsGraphQL(graphQLClient, accessToken, workspaceId);
+  debugLabel: "testRunsIntervalCache",
+  getPointForValue: testRun => new Date(testRun.date).getTime(),
+  load: async (start, end, graphQLClient, accessToken, workspaceId) => {
+    const rawTestRuns = await getTestRunsGraphQL(
+      graphQLClient,
+      accessToken,
+      workspaceId,
+      new Date(start).toISOString(),
+      new Date(end).toISOString()
+    );
 
-    const testRuns = rawTestRuns.map(processTestRun);
-
-    return orderBy(testRuns, "date", "desc");
+    return rawTestRuns.map(processTestRun);
   },
 });
 
@@ -32,6 +41,7 @@ export type TestRunRecordings = {
   durationMs: number;
   groupedTests: TestGroups | null;
   recordings: Recording[] | null;
+  tests: TestRunTestWithRecordings[] | null;
 };
 
 export const testRunDetailsCache = createCache<
@@ -61,12 +71,30 @@ export const testRunDetailsCache = createCache<
     const testsWithRecordings =
       testRunNode?.tests.map<TestRunTestWithRecordings>(test => {
         durationMs += test.durationMs;
-        const recs = orderBy(test.recordings.map(convertRecording), "date", "desc");
-        recordings.push(...recs);
 
         return {
           ...test,
-          recordings: recs,
+          result: test.result as TestRunTest["result"],
+          executions: test.executions.map(e => {
+            const recs = e.recordings.map(convertRecording);
+            recordings.push(...recs);
+
+            // Adapt the execution status to convert "failed" execution status
+            // to "flaky" when the test eventually passes
+            let result = e.result;
+            if (test.result === "flaky") {
+              if (testFailed(e)) {
+                result = "flaky";
+              } else if (testPassed(e)) {
+                result = "passed";
+              }
+            }
+
+            return {
+              result: result as TestRunTest["result"],
+              recordings: recs,
+            };
+          }),
         };
       }) ?? [];
 
@@ -74,6 +102,7 @@ export const testRunDetailsCache = createCache<
       testRun,
       durationMs,
       groupedTests: groupRecordings(testsWithRecordings),
+      tests: testsWithRecordings,
       recordings,
     };
   },

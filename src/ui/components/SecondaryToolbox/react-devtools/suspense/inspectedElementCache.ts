@@ -15,6 +15,30 @@ const TIMEOUT_DELAY = 30_000;
 
 let uidCounter = 0;
 
+type ErrorResponse = {
+  errorType: string;
+  id: number;
+  message: string;
+  responseID: number;
+  stack: string;
+  type: "error";
+};
+
+type FullDataResponse = {
+  id: number;
+  responseID: number;
+  type: "full-data";
+  value: InspectedReactElement;
+};
+
+type NotFoundResponse = {
+  id: number;
+  responseID: number;
+  type: "not-found";
+};
+
+type Response = ErrorResponse | FullDataResponse | NotFoundResponse;
+
 export const inspectedElementCache = createCache<
   [
     replayClient: ReplayClientInterface,
@@ -24,10 +48,10 @@ export const inspectedElementCache = createCache<
     pauseId: PauseId,
     elementId: number
   ],
-  InspectedReactElement
+  InspectedReactElement | null
 >({
   config: { immutable: true },
-  debugLabel: "DOMSearchCache",
+  debugLabel: "inspectedElementCache",
   getKey: ([replayClient, bridge, store, replayWall, pauseId, elementId]) =>
     `${pauseId}:${elementId}`,
   load: async ([replayClient, bridge, store, replayWall, pauseId, elementId]) => {
@@ -37,7 +61,7 @@ export const inspectedElementCache = createCache<
     // Wait until the backend has been injected before sending a message through the wall/bridge
     await reactDevToolsInjectionCache.readAsync(replayClient, pauseId);
 
-    const promise = createPromiseForRequest<{ value: InspectedReactElement }>({
+    const promise = createPromiseForRequest<Response>({
       bridge,
       eventType: "inspectedElement",
       requestID,
@@ -45,16 +69,31 @@ export const inspectedElementCache = createCache<
       timeoutMessage: `Timed out while trying to inspect React element ${elementId}`,
     });
 
-    replayWall.send("inspectElement", {
-      forceFullData: true,
-      id: elementId,
-      path: null,
-      rendererID,
-      requestID,
-    });
+    replayWall.sendAtPauseId(
+      "inspectElement",
+      {
+        forceFullData: true,
+        id: elementId,
+        path: null,
+        rendererID,
+        requestID,
+      },
+      pauseId
+    );
 
     const result = await promise;
 
-    return result.value;
+    switch (result.type) {
+      case "error":
+        console.error(
+          `React element ${elementId} threw an error while being inspected:\n\n${result.message}\n${result.stack}`
+        );
+        return null;
+      case "full-data":
+        return result.value;
+      case "not-found":
+        console.error(`React element ${elementId} could not be found`);
+        return null;
+    }
   },
 });

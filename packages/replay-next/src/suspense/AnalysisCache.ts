@@ -18,6 +18,7 @@ export interface AnalysisParams {
 }
 
 export interface RemoteAnalysisResult {
+  failed: boolean;
   pauseId: PauseId;
   point: ExecutionPoint;
   time: number;
@@ -76,7 +77,6 @@ export function createAnalysisCache<
     load: async (begin, end, client, ...paramsWithCacheLoadOptions) => {
       const params = paramsWithCacheLoadOptions.slice(0, -1) as TParams;
       const points = await findPoints(client, begin, end, ...params);
-      onPointsReceived?.(points);
 
       if (points.length === 0) {
         return [];
@@ -142,6 +142,7 @@ export function createAnalysisCache<
 
               resultsCache.cacheValue(
                 {
+                  failed: result.failed ?? false,
                   pauseId: result.pauseId,
                   point: result.point.point,
                   time: result.point.time,
@@ -168,9 +169,4 @@ export function createAnalysisCache<
     pointsIntervalCache,
     resultsCache,
   };
-}
-
-let onPointsReceived: ((points: TimeStampedPoint[]) => void) | undefined;
-export function setPointsReceivedCallback(callback: typeof onPointsReceived): void {
-  onPointsReceived = callback;
 }

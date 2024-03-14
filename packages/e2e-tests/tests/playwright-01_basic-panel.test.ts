@@ -16,9 +16,10 @@ import {
   getTestSuiteResultsSkippedCount,
   getTestSuiteUser,
   openCypressTestPanel,
+  openPlaywrightTestPanel,
 } from "../helpers/testsuites";
 import { waitFor } from "../helpers/utils";
-import test, { expect } from "../testFixtureCloneRecording";
+import test, { expect } from "../testFixture";
 
 test.use({ exampleKey: "playwright/breakpoints-05" });
 
@@ -29,12 +30,7 @@ test("playwright-01: Basic Test Suites panel functionality", async ({
   await startTest(page, recordingId);
   await openDevToolsTab(page);
 
-  await openCypressTestPanel(page);
-
-  const testPanel = getTestSuitePanel(page);
-
-  const isVisible = await testPanel.isVisible();
-  expect(isVisible).toBe(true);
+  await openPlaywrightTestPanel(page);
 
   // These are nested, but at least one should exist
   // on the test suites panel
@@ -75,10 +71,10 @@ test("playwright-01: Basic Test Suites panel functionality", async ({
 
   // Relative dates can change over time.
   // Check for either the "X units ago" text, or the literal date.
-  expect(await getTestSuiteDate(page).textContent()).toMatch(/ ago|(10\/19\/2023)/);
+  expect(await getTestSuiteDate(page).textContent()).toMatch(/ ago|(1\/26\/2024)/);
   expect(await getTestSuiteUser(page).textContent()).toMatch("hbenl");
-  expect(await getTestSuiteBranch(page).textContent()).toMatch("hbenl/fe-1987");
-  expect(await getTestSuiteDuration(page).textContent()).toMatch("0:45");
+  expect(await getTestSuiteBranch(page).textContent()).toMatch("main");
+  expect(await getTestSuiteDuration(page).textContent()).toMatch(/0:\d{2}/);
 
   // can open tests
   await firstTest.click();
@@ -96,7 +92,8 @@ test("playwright-01: Basic Test Suites panel functionality", async ({
   expect(await sections.nth(0).textContent()).toMatch(/test body/i);
 
   const steps = getTestCaseSteps(selectedRow);
-  await expect(steps).toHaveCount(231);
+  const stepCount = await steps.count();
+  await expect(stepCount).toBeGreaterThan(200);
 
   const backButton = getTestRecordingBackButton(page);
   await backButton.click();

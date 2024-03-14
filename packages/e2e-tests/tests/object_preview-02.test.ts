@@ -6,11 +6,10 @@ import {
   closePrintStatementsAccordionPane,
   getScopeChildren,
   openPauseInformationPanel,
-  openScopeBlocks,
   openScopesAccordionPane,
 } from "../helpers/pause-information-panel";
 import { toggleExpandable } from "../helpers/utils";
-import test, { expect } from "../testFixtureCloneRecording";
+import test, { expect } from "../testFixture";
 
 test.use({ exampleKey: "doc_rr_objects.html" });
 
@@ -31,7 +30,7 @@ test(`object_preview-02: should allow objects in scope to be inspected`, async (
   await closeCallStackAccordionPane(page);
   await openScopesAccordionPane(page);
 
-  const blockScope = getScopeChildren(page, "Block").first();
+  const blockScope = getScopeChildren(page, "foo").first();
 
   // We should be able to expand the window and see its properties.
   await toggleExpandable(page, {

@@ -1,5 +1,5 @@
 import { ApolloError } from "@apollo/client";
-import { uploadedData } from "@replayio/protocol";
+import { processRecordingProgress, uploadedData } from "@replayio/protocol";
 import * as Sentry from "@sentry/react";
 
 import {
@@ -16,17 +16,12 @@ import {
 import { extractGraphQLError } from "shared/graphql/apolloClient";
 import { Recording } from "shared/graphql/types";
 import { userData } from "shared/user-data/GraphQL/UserData";
-import { getPausePointParams, isTest } from "shared/utils/environment";
+import { isTest } from "shared/utils/environment";
 import { UIThunkAction } from "ui/actions";
 import * as actions from "ui/actions/app";
 import { getRecording } from "ui/hooks/recordings";
 import { getUserId, getUserInfo } from "ui/hooks/users";
-import {
-  clearExpectedError,
-  getExpectedError,
-  getUnexpectedError,
-  setTrialExpired,
-} from "ui/reducers/app";
+import { clearExpectedError, getExpectedError, getUnexpectedError } from "ui/reducers/app";
 import { getToolboxLayout } from "ui/reducers/layout";
 import {
   ProtocolEvent,
@@ -35,6 +30,7 @@ import {
   protocolMessagesReceived,
 } from "ui/reducers/protocolMessages";
 import { setFocusWindow } from "ui/reducers/timeline";
+import { getMutableParamsFromURL } from "ui/setup/dynamic/url";
 import type { ExpectedError, UnexpectedError } from "ui/state/app";
 import LogRocket from "ui/utils/logrocket";
 import { endMixpanelSession } from "ui/utils/mixpanel";
@@ -55,6 +51,8 @@ declare global {
   }
 }
 
+const { focusWindow: focusWindowFromURL } = getMutableParamsFromURL();
+
 export function getAccessibleRecording(
   recordingId: string
 ): UIThunkAction<Promise<Recording | null>> {
@@ -72,12 +70,20 @@ export function getAccessibleRecording(
       }
       return recording!;
     } catch (err) {
-      let content = "Unexpected error retrieving recording.";
-      if (err instanceof ApolloError) {
-        content = extractGraphQLError(err)!;
+      if (isRecordingDeletedError(err)) {
+        dispatch(setExpectedError(getDeletedRecordingError()));
+        return null;
       }
 
-      dispatch(setExpectedError({ message: "Error", content }));
+      dispatch(
+        setExpectedError({
+          message: "Error",
+          content:
+            err instanceof ApolloError
+              ? extractGraphQLError(err)!
+              : "Unexpected error retrieving recording.",
+        })
+      );
       return null;
     }
   };
@@ -93,6 +99,13 @@ function clearRecordingNotAccessibleError(): UIThunkAction {
       dispatch(clearExpectedError());
     }
   };
+}
+
+function isRecordingDeletedError(err: unknown): boolean {
+  return (
+    err instanceof ApolloError &&
+    err.graphQLErrors.some(e => e.extensions?.code === "DELETED_OBJECT")
+  );
 }
 
 function getRecordingNotAccessibleError(
@@ -132,6 +145,14 @@ export function getDisconnectionError(): UnexpectedError {
   };
 }
 
+function getDeletedRecordingError(): ExpectedError {
+  return {
+    message: "Recording Deleted",
+    content: "This recording has been deleted.",
+    action: "library",
+  };
+}
+
 interface SourceContentsCommandRespone {
   id: number;
   result: {
@@ -150,10 +171,9 @@ function isSourceContentsCommandResponse(
 
 // Create a session to use while debugging.
 // NOTE: This thunk is dispatched _before_ the rest of the devtools logic
-// is initialized, so `extra.ThreadFront` isn't available yet.
-// We pass `ThreadFront` in as an arg here instead.
+// is initialized
 export function createSocket(recordingId: string): UIThunkAction {
-  return async (dispatch, getState, { replayClient }) => {
+  return async (dispatch, getState, { protocolClient, replayClient }) => {
     try {
       assert(recordingId, "no recordingId");
       dispatch(actions.setRecordingId(recordingId));
@@ -176,23 +196,24 @@ export function createSocket(recordingId: string): UIThunkAction {
         recording.workspace &&
         subscriptionExpired(recording.workspace, new Date(recording.date))
       ) {
-        return dispatch(setTrialExpired());
+        dispatch(
+          setExpectedError({
+            message: "Free Trial Expired",
+            content:
+              "This replay is unavailable because it was recorded after your team's free trial expired.",
+            action: recording.userRole !== "team-admin" ? "library" : "team-billing",
+          })
+        );
+        return;
       }
 
       const experimentalSettings: ExperimentalSettings = {
-        disableScanDataCache: userData.get("backend_disableScanDataCache"),
         disableCache: userData.get("backend_disableCache"),
         listenForMetrics: userData.get("backend_listenForMetrics"),
         profileWorkerThreads: userData.get("backend_profileWorkerThreads"),
         enableRoutines: userData.get("backend_enableRoutines"),
         rerunRoutines: userData.get("backend_rerunRoutines"),
-        disableRecordingAssetsInDatabase: userData.get("backend_disableRecordingAssetsInDatabase"),
         sampleAllTraces: userData.get("backend_sampleAllTraces"),
-        disableIncrementalSnapshots: userData.get("backend_disableIncrementalSnapshots"),
-        disableConcurrentControllerLoading: userData.get(
-          "backend_disableConcurrentControllerLoading"
-        ),
-        disableProtocolQueryCache: userData.get("backend_disableProtocolQueryCache"),
       };
 
       const restartParam = new URL(window.location.href).searchParams.get("restart") || undefined;
@@ -206,7 +227,19 @@ export function createSocket(recordingId: string): UIThunkAction {
         experimentalSettings.controllerKey = String(Date.now());
       }
 
-      const loadPoint = new URL(window.location.href).searchParams.get("point") || undefined;
+      if (!recording.isProcessed) {
+        dispatch(actions.setProcessing(true));
+
+        function onProcessingProgress(progress: processRecordingProgress) {
+          dispatch(actions.setProcessingProgress(progress.progressPercent));
+        }
+
+        protocolClient.Recording.addProcessRecordingProgressListener(onProcessingProgress);
+        await protocolClient.Recording.processRecording({ recordingId, experimentalSettings });
+        protocolClient.Recording.removeProcessRecordingProgressListener(onProcessingProgress);
+      }
+
+      dispatch(actions.setProcessing(false));
 
       const queuedProtocolMessages: ReceivedProtocolMessage[] = [];
       let flushTimeoutId: NodeJS.Timeout | null = null;
@@ -228,13 +261,10 @@ export function createSocket(recordingId: string): UIThunkAction {
         }
       }
 
-      const focusWindowFromParams = getPausePointParams().focusWindow;
-
       const sessionId = await createSession(
         recordingId,
-        loadPoint,
         experimentalSettings,
-        focusWindowFromParams !== null ? focusWindowFromParams : undefined,
+        focusWindowFromURL !== null ? focusWindowFromURL : undefined,
         {
           onEvent: (event: ProtocolEvent) => {
             // no-op but required, apparently
@@ -300,7 +330,7 @@ export function createSocket(recordingId: string): UIThunkAction {
           },
           onSocketClose: (willClose: boolean) => {
             if (!willClose) {
-              dispatch(setUnexpectedError(getDisconnectionError(), true));
+              dispatch(setExpectedError(getDisconnectionError()));
             }
           },
         }
@@ -338,7 +368,6 @@ export function createSocket(recordingId: string): UIThunkAction {
       dispatch(actions.setUploading(null));
       dispatch(actions.setAwaitingSourcemaps(false));
 
-      await replayClient.waitForSession();
       await dispatch(jumpToInitialPausePoint());
 
       dispatch(actions.setLoadingFinished(true));
@@ -346,13 +375,18 @@ export function createSocket(recordingId: string): UIThunkAction {
       const focusWindow = replayClient.getCurrentFocusWindow();
       assert(focusWindow !== null); // replayClient.configure() sets this value
       if (
-        !focusWindowFromParams ||
-        focusWindowFromParams.begin.time !== focusWindow.begin.time ||
-        focusWindowFromParams.end.time !== focusWindow.end.time
+        !focusWindowFromURL ||
+        focusWindowFromURL.begin.time !== focusWindow.begin.time ||
+        focusWindowFromURL.end.time !== focusWindow.end.time
       ) {
         dispatch(setFocusWindow({ begin: focusWindow.begin.time, end: focusWindow.end.time }));
       }
-    } catch (e: any) {
+    } catch (error: any) {
+      if (isRecordingDeletedError(error)) {
+        dispatch(setExpectedError(getDeletedRecordingError()));
+        return;
+      }
+
       const currentError = getUnexpectedError(getState());
 
       // Don't overwrite an existing error.
@@ -360,7 +394,7 @@ export function createSocket(recordingId: string): UIThunkAction {
         dispatch(
           setUnexpectedError({
             message: "Unexpected session error",
-            content: e.message || "The session has closed due to an error.",
+            content: error.message || "The session has closed due to an error.",
             action: "library",
           })
         );
@@ -375,8 +409,4 @@ export function onUploadedData({ uploaded, length }: uploadedData): UIThunkActio
     const lengthMB = length ? (length / (1024 * 1024)).toFixed(2) : undefined;
     dispatch(actions.setUploading({ total: lengthMB, amount: uploadedMB }));
   };
-}
-
-export function clearTrialExpired() {
-  return setTrialExpired(false);
 }

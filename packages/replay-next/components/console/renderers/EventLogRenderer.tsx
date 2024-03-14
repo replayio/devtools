@@ -94,7 +94,11 @@ function EventLogRenderer({
 function AnalyzedContent({ eventLog }: { eventLog: EventLog }) {
   const { showTimestamps } = useContext(ConsoleFiltersContext);
 
-  const { pauseId, values } = eventsCache.resultsCache.read(eventLog.point, eventLog.eventType);
+  const { pauseId, values } = eventsCache.resultsCache.read(
+    eventLog.point,
+    eventLog.eventType,
+    eventLog.label
+  );
 
   const content =
     values.length > 0
@@ -113,7 +117,7 @@ function AnalyzedContent({ eventLog }: { eventLog: EventLog }) {
       )}
       {content ? (
         <span className={styles.LogContents} data-test-name="LogContents">
-          {content}
+          <span className={styles.LogContentsEmpty}>({eventLog.label})</span> {content}
         </span>
       ) : (
         <span className={styles.LogContentsEmpty} data-test-name="LogContents">

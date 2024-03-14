@@ -3,9 +3,10 @@ import { ExclamationIcon } from "@heroicons/react/outline";
 import Link from "next/link";
 import { ReactNode, useEffect, useState } from "react";
 
+import { Button } from "replay-next/components/Button";
 import { query } from "shared/graphql/apolloClient";
 import { GetConnection, GetConnectionVariables } from "shared/graphql/generated/GetConnection";
-import { getLoginReferrerParam } from "shared/utils/environment";
+import { getReadOnlyParamsFromURL } from "shared/utils/environment";
 import { isMacOS } from "shared/utils/os";
 import { getAuthClientId, getAuthHost } from "ui/utils/auth";
 import { requestBrowserLogin, setUserInBrowserPrefs } from "ui/utils/browser";
@@ -13,7 +14,6 @@ import { isTeamMemberInvite } from "ui/utils/onboarding";
 import { sendTelemetryEvent } from "ui/utils/telemetry";
 import useAuth0 from "ui/utils/useAuth0";
 
-import { PrimaryLgButton } from "../Button";
 import { OnboardingContentWrapper, OnboardingModalContainer } from "../Onboarding";
 
 const isOSX = isMacOS();
@@ -72,9 +72,9 @@ function SSOLogin({ onLogin }: { onLogin: (connection: string) => void }) {
           onChange={e => setEmail(e.currentTarget.value)}
         />
 
-        <PrimaryLgButton color="blue" onClick={onEnterpriseLogin} className="justify-center">
+        <Button className="justify-center" onClick={onEnterpriseLogin} size="large">
           Sign in
-        </PrimaryLgButton>
+        </Button>
       </div>
       <button
         className="w-full justify-center text-sm font-bold text-primaryAccent underline"
@@ -87,7 +87,8 @@ function SSOLogin({ onLogin }: { onLogin: (connection: string) => void }) {
 }
 
 function LoginMessaging() {
-  const referrer = getLoginReferrerParam();
+  const { referrer: referrerString } = getReadOnlyParamsFromURL();
+  const referrer = referrerString === "first-browser-open" ? referrerString : "default";
 
   // Custom screen for when the user is seeing the login screen and this is the first
   // time that they have opened the browser.
@@ -135,19 +136,21 @@ function SocialLogin({
   return (
     <div className="space-y-6">
       <LoginMessaging />
-      <PrimaryLgButton
-        color="blue"
-        onClick={() => onLogin("google-oauth2")}
+      <Button
         className="w-full justify-center"
+        onClick={() => onLogin("google-oauth2")}
+        size="large"
       >
         Sign in with Google
-      </PrimaryLgButton>
-      <button
+      </Button>
+      <Button
         className="w-full justify-center text-sm font-bold text-primaryAccent underline"
         onClick={onShowSSOLogin}
+        size="large"
+        variant="outline"
       >
         Enterprise Users: Sign in with SSO
-      </button>
+      </Button>
     </div>
   );
 }
@@ -160,9 +163,9 @@ function ReplayBrowserLogin() {
   return (
     <div className="space-y-6">
       <LoginMessaging />
-      <PrimaryLgButton color="blue" onClick={onLogin} className="w-full justify-center">
+      <Button className="w-full justify-center" onClick={onLogin} size="large">
         Sign in
-      </PrimaryLgButton>
+      </Button>
     </div>
   );
 }
@@ -174,21 +177,39 @@ function AuthError({ error }: { error: any }) {
     return null;
   }
 
-  if (message === "Invalid state") {
-    // This is usually caused by waiting too long to go through the auth process
-    // and can be fixed by trying again.
-    message = "Your login session expired. Please try logging in again.";
-  } else {
+  // Except for the "Invalid state" message that comes from Auth0 directly
+  // https://auth0.com/docs/customize/integrations/cms/wordpress-plugin/troubleshoot-wordpress-plugin-invalid-state-errors#common-causes-of-the-invalid-state-error
+  // (^ Even though the document is about the WordPress plugin, the cause for the invalid state applies to any Auth0 app).
+  // We define all the other "messages" in our Auth0 Rule.
+  // See more here: https://auth0.com/docs/customize/rules/raise-errors-from-rules
+  if (message !== "INVALID_STATE" && message !== "Invalid state") {
     // We want to capture any other error so we can investigate further.
     sendTelemetryEvent("devtools-auth-error-login", {
       errorMessage: message,
     });
+  }
 
-    if (message === "Unable to authenticate user") {
+  switch (message) {
+    case "INVALID_STATE":
+    case "Invalid state":
+      // This is usually caused by waiting too long to go through the auth process
+      // and can be fixed by trying again.
+      message = "Your login session expired. Please try logging in again.";
+      break;
+    case "INTERNAL_ERROR":
       // This usually occurs because our auth hook threw an error but the
       // message itself isn't very useful so we show a more friendly message
       message = "We're sorry but we had a problem authenticating you. We're looking into it now!";
-    }
+      break;
+    case "IDP_CONFIGURATION_ERROR":
+      message =
+        "Failed to log in due to a configuration problem with your Replay account. Support has been notified!";
+      break;
+    case "IDP_UNEXPECTED_ERROR":
+      message = "Failed to login. Please try logging in with SSO.";
+      break;
+    default:
+      message = "An unexpected error occurred. Please try again.";
   }
 
   return (
@@ -208,7 +229,7 @@ export function LoginLink({
   children: ReactNode;
   referrer?: LoginReferrer;
 }) {
-  const href = `/${referrer ? `?login-referrer=${referrer}` : ""}`;
+  const href = referrer ? `/?referrer=${referrer}` : "/";
   return <Link href={href}>{children}</Link>;
 }
 

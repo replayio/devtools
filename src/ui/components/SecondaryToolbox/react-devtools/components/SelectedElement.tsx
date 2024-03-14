@@ -40,6 +40,7 @@ import styles from "./SelectedElement.module.css";
 export function SelectedElement({
   bridge,
   element,
+  isDebounceDelayed,
   listData,
   pauseId: defaultPriorityPauseId,
   replayWall,
@@ -47,6 +48,7 @@ export function SelectedElement({
 }: {
   bridge: FrontendBridge;
   element: ReactElement;
+  isDebounceDelayed: boolean;
   listData: ReactDevToolsListData;
   pauseId: PauseId;
   replayWall: ReplayWall;
@@ -64,12 +66,23 @@ export function SelectedElement({
   // Only Suspend at deferred priority
   const deferredElement = useDeferredValue(element);
 
-  const isPending = element !== deferredElement;
+  const isPending = isDebounceDelayed || element !== deferredElement;
 
   const [inspectedElement, [, fiberIdsToNodeIds]] = suspendInParallel(
     () => inspectedElementCache.read(replayClient, bridge, store, replayWall, pauseId, id),
-    () => nodesToFiberIdsCache.read(replayClient, pauseId!, store)
+    () => nodesToFiberIdsCache.read(replayClient, pauseId!)
   );
+
+  if (inspectedElement == null) {
+    return (
+      <div className={styles.Panel} data-is-pending={isPending || undefined}>
+        <div className={styles.TopRow}>
+          <div className={styles.ComponentName}>{displayName}</div>
+        </div>
+        <div className={styles.Error}>The selected component could not be inspected.</div>
+      </div>
+    );
+  }
 
   const {
     context,
@@ -145,6 +158,7 @@ export function SelectedElement({
             className={styles.IconButton}
             onClick={viewComponentSource}
             title="Jump to definition"
+            data-test-name="ReactDevTools-JumpToComponentSource"
           >
             <Icon className={styles.Icon} type="view-component-source" />
           </button>

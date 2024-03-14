@@ -1,0 +1,59 @@
+.Container {
+  position: relative;
+  background-color: var(--chrome);
+}
+
+.Image {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  max-width: 100%;
+  max-height: 100%;
+  transform: translateX(-50%) translateY(-50%);
+}
+
+.Graphics {
+  position: relative;
+  pointer-events: none;
+}
+
+.Loading {
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+
+.Logo {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.Error {
+  position: absolute;
+  right: 0.75rem;
+  bottom: 0.5rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1ch;
+  background: var(--background-color-error);
+  padding: 0.25rem 1ch 0.25rem 0.25rem;
+  border-radius: 0.25rem;
+  color: var(--color-error);
+  font-size: var(--font-size-regular-monospace);
+}
+
+.ErrorIcon {
+  color: var(--color-error);
+  width: 1rem;
+  height: 1rem;
+}
+
+.ContextMenuIcon {
+  width: 1.5rem;
+  height: 1rem;
+}

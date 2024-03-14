@@ -1,0 +1,83 @@
+steps:
+  - label: "Runtime e2e tests (linux-x86_64)"
+    if: (build.env("OS") == "linux" && build.env("ARCH") == "x86_64") || (build.env("OS") == null && build.env("ARCH") == null)
+    timeout_in_minutes: 60
+    commands:
+      - "mkdir -p /mnt/data/replay"
+      - "be_cmd node_deps -- npx yarn install"
+      - "be_cmd run_tests -- ts-node ./packages/e2e-tests/scripts/buildkite_run_fe_tests_from_artifact-linux-x86_64.ts"
+    agents:
+      - "deploy=true"
+    plugins:
+      - seek-oss/aws-sm#v2.3.1:
+          region: us-east-2
+          env:
+            AUTOMATED_TEST_SECRET: "graphql-automated-test-secret"
+            RECORD_REPLAY_API_KEY: "runtime-record-replay-api-key"
+            FLY_API_TOKEN: "prod/fly-api-token"
+            BUILDKITE_AGENT_TOKEN: "prod/buildkite-agent-token"
+            SSH_PRIVATE_RSA_KEY_B64: "prod/buildkite-ssh-private-key"
+            TAILSCALE_AUTHKEY: "dev/fly-e2e-test-runner-tailscale-auth-key"
+            HASURA_ADMIN_SECRET: "prod/hasura-admin-secret"
+            BUILD_USER_ACCESS_KEY_ID:
+              secret-id: "prod/build-user"
+              json-key: ".access_key_id"
+            BUILD_USER_SECRET_ACCESS_KEY:
+              secret-id: "prod/build-user"
+              json-key: ".secret_access_key"
+            RUNTIME_TEAM_API_KEY: runtime-replay-api-key
+            BUILDEVENT_APIKEY: honeycomb-api-key
+            BUILDEVENT_BUILDKITE_API_TOKEN: buildkite-api-token-honeycomb-build-events
+      - replayio/buildevents#0c2adb2: ~
+      - "ssh://git@github.com/replayio/fly-buildkite-plugin.git#v0.77":
+          # This image's source code is here https://github.com/replayio/backend-e2e-base-image
+          image: "registry.fly.io/buildkite-backend-e2e-tests:v14"
+          organization: "replay"
+          cpus: 4
+          memory: 4096
+          storage: 20
+          secrets:
+            BUILDKITE_AGENT_TOKEN: BUILDKITE_AGENT_TOKEN
+            SSH_PRIVATE_RSA_KEY_B64: SSH_PRIVATE_RSA_KEY_B64
+            FLY_API_TOKEN: FLY_API_TOKEN
+            TAILSCALE_AUTHKEY: TAILSCALE_AUTHKEY
+            HASURA_ADMIN_SECRET: HASURA_ADMIN_SECRET
+            AWS_SECRET_ACCESS_KEY: BUILD_USER_SECRET_ACCESS_KEY
+            AWS_ACCESS_KEY_ID: BUILD_USER_ACCESS_KEY_ID
+            AUTOMATED_TEST_SECRET: AUTOMATED_TEST_SECRET
+            RECORD_REPLAY_API_KEY: RECORD_REPLAY_API_KEY
+            RUNTIME_TEAM_API_KEY: RUNTIME_TEAM_API_KEY
+          env:
+            DISPLAY: ":1"
+            PLAYWRIGHT_HEADLESS: "true"
+            PLAYWRIGHT_CHROMIUM: "true"
+            RECORD_REPLAY_DIRECTORY: "/mnt/data/replay"
+
+  - label: "Runtime e2e tests (macos-arm64)"
+    if: build.env("OS") == "macos" && build.env("ARCH") == "arm64"
+    timeout_in_minutes: 60
+    commands:
+      - "be_cmd node_deps -- npx yarn install"
+      - "be_cmd run_tests -- ts-node ./packages/e2e-tests/scripts/buildkite_run_fe_tests_from_artifact-macos-arm64.ts"
+    agents:
+      - "os=macos"
+      - "arch=arm64"
+      - "queue=runtime"
+      - "runtimeType=test"
+    plugins:
+      - seek-oss/aws-sm#v2.3.1:
+          region: us-east-2
+          env:
+            BUILDKITE_AGENT_TOKEN: "prod/buildkite-agent-token"
+            AUTOMATED_TEST_SECRET: "graphql-automated-test-secret"
+            RECORD_REPLAY_API_KEY: "runtime-record-replay-api-key"
+            HASURA_ADMIN_SECRET: "prod/hasura-admin-secret"
+            RUNTIME_TEAM_API_KEY: runtime-replay-api-key
+            BUILDEVENT_APIKEY: honeycomb-api-key
+            BUILDEVENT_BUILDKITE_API_TOKEN: buildkite-api-token-honeycomb-build-events
+      - replayio/buildevents#0c2adb2: ~
+    env:
+      DISPLAY: ":1"
+      PLAYWRIGHT_HEADLESS: "true"
+      PLAYWRIGHT_CHROMIUM: "true"
+      ARCHITECTURE: "arm64"

@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
+import { Button } from "replay-next/components/Button";
 import { ApiKey, ApiKeyResponse, ApiKeyScope } from "shared/graphql/types";
 
-import { Button, DisabledButton, PrimaryButton } from "./Button";
 import { useConfirm } from "./Confirm";
 import TextInput from "./Forms/TextInput";
 import MaterialIcon from "./MaterialIcon";
@@ -176,11 +176,7 @@ export default function APIKeys({
                   value={label}
                 />
 
-                {canSubmit ? (
-                  <PrimaryButton color="blue">Add</PrimaryButton>
-                ) : (
-                  <DisabledButton>Add</DisabledButton>
-                )}
+                <Button disabled={!canSubmit}>Add</Button>
               </fieldset>
               {scopes && scopes.length > 1 ? (
                 <fieldset className="w-full">

@@ -5,7 +5,6 @@ public
 src/global-css.ts
 
 test/examples
-packages/replay-next/playwright/protocol-fixtures/
 src/ui/utils/intercom.ts
 index.html
 packages/third-party/
@@ -14,3 +13,4 @@ pages/_app.tsx
 *.json
 *.yaml
 src/**/*.raw.js
+src/ui/components/TestSuite/suspense/assets/*.js

@@ -1,0 +1,40 @@
+.TestRunsStats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  overflow: visible;
+  border-radius: 0.375rem;
+  background-color: var(--testsuites-chart-container);
+  padding: 0.5rem;
+}
+
+.FailureRateDescription {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 12px;
+}
+
+.ChartWrapper {
+  position: relative;
+  height: 88px;
+  min-width: 50px;
+}
+
+.Hover {
+  position: absolute;
+  padding: 0.25rem;
+  pointer-events: none;
+  background-color: var(--tooltip-bgcolor);
+  color: var(--tooltip-color);
+  border: --tooltip-border;
+  border-radius: 0.25rem;
+  z-index: var(--z-index-1--tooltip);
+}
+
+.Tooltip {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}

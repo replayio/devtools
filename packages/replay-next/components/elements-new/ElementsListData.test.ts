@@ -56,6 +56,55 @@ describe("ElementsListData", () => {
     };
   });
 
+  it("should be return a parent item", async () => {
+    startTest(
+      `
+    <html>
+      <head></head>
+      <body>
+        <script />
+        <div>
+          <main>
+            <h1>Text</h1>
+          </main>
+        </div>
+      </body>
+    </html>
+    `
+    );
+
+    expect(listData.toString()).toMatchInlineSnapshot(`
+      "<html>
+        <head />
+        <body>
+          <script />
+          <div>
+            <main>
+              <h1>
+                Text
+              </h1>
+            </main>
+          </div>
+        </body>
+      </html>"
+    `);
+
+    let item = listData.getItemAtIndex(6);
+    expect(item.tagName).toBe("h1");
+
+    item = listData.getParentItem(item);
+    expect(item.tagName).toBe("main");
+
+    item = listData.getParentItem(item);
+    expect(item.tagName).toBe("div");
+
+    item = listData.getParentItem(item);
+    expect(item.tagName).toBe("body");
+
+    item = listData.getParentItem(item);
+    expect(item.tagName).toBe("html");
+  });
+
   it("should load a simple document tree", async () => {
     startTest(
       `
@@ -196,7 +245,7 @@ describe("ElementsListData", () => {
           <script type=\\"text/javascript\\">
             // Line of text
           </script>
-          <link rel=\\"stylesheet\\" href=\\"index.css\\" />
+          <link href=\\"index.css\\" rel=\\"stylesheet\\" />
         </head>
         <body>
           <ul>
@@ -220,7 +269,7 @@ describe("ElementsListData", () => {
           <script type=\\"text/javascript\\">
             // Line of text
           </script>
-          <link rel=\\"stylesheet\\" href=\\"index.css\\" />
+          <link href=\\"index.css\\" rel=\\"stylesheet\\" />
         </head>
         <body>
           <ul>…</ul>
@@ -237,7 +286,7 @@ describe("ElementsListData", () => {
           <script type=\\"text/javascript\\">
             // Line of text
           </script>
-          <link rel=\\"stylesheet\\" href=\\"index.css\\" />
+          <link href=\\"index.css\\" rel=\\"stylesheet\\" />
         </head>
         <body>…</body>
       </html>"
@@ -252,7 +301,7 @@ describe("ElementsListData", () => {
           <script type=\\"text/javascript\\">
             // Line of text
           </script>
-          <link rel=\\"stylesheet\\" href=\\"index.css\\" />
+          <link href=\\"index.css\\" rel=\\"stylesheet\\" />
         </head>
         <body>
           <ul>…</ul>
@@ -297,5 +346,82 @@ describe("ElementsListData", () => {
         </body>
       </html>"
     `);
+  });
+
+  describe("search", () => {
+    it("should match both head and tail tag names", async () => {
+      startTest(
+        `
+      <html>
+        <head>
+          <script type="text/javascript"></script>
+          <link rel="stylesheet" href="index.css" />
+        </head>
+        <body>
+          <ul>
+            <li>Item</li>
+            <li />
+          </ul>
+        </body>
+      </html>
+      `
+      );
+
+      expect(listData.toString()).toMatchInlineSnapshot(`
+        "<html>
+          <head>…</head>
+          <body>
+            <ul>
+              <li>
+                Item
+              </li>
+              <li />
+            </ul>
+          </body>
+        </html>"
+      `);
+
+      expect(listData.search("li")).toEqual([4, 6, 7]);
+      expect(listData.search("<li")).toEqual([4, 7]);
+      expect(listData.search("<li>")).toEqual([4]);
+      expect(listData.search("</li>")).toEqual([6]);
+      expect(listData.search("<li />")).toEqual([7]);
+
+      // Basic search does not support advanced search syntax
+      expect(listData.search('[rel="stylesheet"]')).toEqual([]);
+    });
+
+    it("should match attributes and values", async () => {
+      startTest(
+        `
+      <html>
+        <head>
+          <script type="text/javascript"></script>
+          <link rel="stylesheet" href="index.css" />
+        </head>
+        <body />
+      </html>
+      `
+      );
+
+      const headId = listData.getItemAtIndex(1).objectId;
+      listData.toggleNodeExpanded(headId, true);
+
+      expect(listData.toString()).toMatchInlineSnapshot(`
+        "<html>
+          <head>
+            <script type=\\"text/javascript\\" />
+            <link href=\\"index.css\\" rel=\\"stylesheet\\" />
+          </head>
+          <body />
+        </html>"
+      `);
+
+      expect(listData.search("type")).toEqual([2]);
+      expect(listData.search('"text/javascript"')).toEqual([2]);
+      expect(listData.search('type="text/javascript"')).toEqual([2]);
+      expect(listData.search('<script type="text/javascript"')).toEqual([2]);
+      expect(listData.search('" rel="stylesheet')).toEqual([3]);
+    });
   });
 });

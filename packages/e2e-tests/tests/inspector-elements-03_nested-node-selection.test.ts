@@ -17,7 +17,7 @@ import {
   verifyStackingTestCaseSelectedElementUnderCursor,
 } from "../helpers/stacking-test-cases";
 import { debugPrint, waitFor } from "../helpers/utils";
-import test from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
 test.use({ exampleKey: "doc_stacking.html" });
 // ref: `doc_stacking.html`
@@ -68,7 +68,7 @@ test("inspector-elements-03: Nested node picker and selection behavior", async (
     expect(numChildren).toBe(0);
   });
 
-  const canvas = page.locator("canvas#graphics");
+  const element = page.locator("#graphics");
   const rulesContainer = page.locator('[data-test-id="RulesPanel"]');
 
   const bodyTag = await getElementsListRow(page, { text: "body", type: "opening" });
@@ -79,7 +79,7 @@ test("inspector-elements-03: Nested node picker and selection behavior", async (
   // This should select a `<div class="box1">`, 3 levels deep
   await verifyStackingTestCaseSelectedElementUnderCursor(
     page,
-    canvas,
+    element,
     rulesContainer,
     stackingCaseR3C2
   );
@@ -91,7 +91,7 @@ test("inspector-elements-03: Nested node picker and selection behavior", async (
     `<div style="width: 40px; height: 20px; overflow: hidden;"`
   );
   await typeKeyAndVerifySelectedElement(page, "ArrowUp", `<div style="left: 200px; top: 300px;"`);
-  await typeKeyAndVerifySelectedElement(page, "ArrowUp", bodyChildDomNodes[15]);
+  await typeKeyAndVerifySelectedElement(page, "ArrowUp", "</div>");
 
   // Searching for a nested node should expand everything above it
   await searchElementsPanel(page, "Foo");

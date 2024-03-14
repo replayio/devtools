@@ -3,7 +3,7 @@ import { warpToMessage } from "../helpers/console-panel";
 import { selectFrame, stepOutToLine, stepOverToLine } from "../helpers/pause-information-panel";
 import { clickSourceTreeNode } from "../helpers/source-explorer-panel";
 import { addLogpoint } from "../helpers/source-panel";
-import test from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
 test.use({ exampleKey: "doc_rr_basic.html" });
 
@@ -23,7 +23,7 @@ test("stepping-04: Test stepping in a frame other than the top frame", async ({
 
   await warpToMessage(page, "logpoint 5");
   await selectFrame(page, 1);
-  await stepOverToLine(page, 22);
+  await stepOverToLine(page, 21);
 
   await warpToMessage(page, "logpoint 5");
   await selectFrame(page, 1);

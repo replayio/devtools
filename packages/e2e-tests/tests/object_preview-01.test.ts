@@ -9,7 +9,7 @@ import {
   warpToMessage,
 } from "../helpers/console-panel";
 import { toggleExpandable } from "../helpers/utils";
-import test from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
 test.use({ exampleKey: "doc_rr_objects.html" });
 
@@ -41,7 +41,8 @@ test(`object_preview-01: expressions in the console after time warping`, async (
 
   await verifyConsoleMessageObjectContents(page, "Proxy{}", [
     "<target>: {a: 0}",
-    "<handler>: {get: ƒget(target, prop, receiver)}",
+    // TODO add function parameter names when RUN-3146 is fixed
+    "<handler>: {get: ƒget()}",
   ]);
 
   await verifyConsoleMessage(page, "Symbol()");
@@ -91,7 +92,7 @@ test(`object_preview-01: expressions in the console after time warping`, async (
     "1: 2",
     "2: 3",
     "size: 3",
-    "[[Prototype]]: Set.prototype",
+    "[[Prototype]]: Set",
   ]);
 
   await executeTerminalExpression(page, "new Map([[1, {a:1}], [2, {b:2}]])");
@@ -100,7 +101,7 @@ test(`object_preview-01: expressions in the console after time warping`, async (
     "0: {1 → {…}}",
     "1: {2 → {…}}",
     "size: 2",
-    "[[Prototype]]: Map.prototype",
+    "[[Prototype]]: Map",
   ]);
 
   await executeTerminalExpression(page, "new WeakSet([{a:1}, {b:2}])");
@@ -112,7 +113,7 @@ test(`object_preview-01: expressions in the console after time warping`, async (
   await executeTerminalExpression(page, "new Promise(() => {})");
   await verifyConsoleMessageObjectContents(page, "Promise{}", [
     '<state>: "pending"',
-    "[[Prototype]]: Promise.prototype",
+    "[[Prototype]]: Promise",
   ]);
 
   await clearTerminalExpressions(page);
@@ -120,7 +121,7 @@ test(`object_preview-01: expressions in the console after time warping`, async (
   await verifyConsoleMessageObjectContents(page, "Promise{}", [
     '<state>: "fulfilled"',
     "<value>: {a: 1}",
-    "[[Prototype]]: Promise.prototype",
+    "[[Prototype]]: Promise",
   ]);
 
   await clearTerminalExpressions(page);
@@ -128,7 +129,7 @@ test(`object_preview-01: expressions in the console after time warping`, async (
   await verifyConsoleMessageObjectContents(page, "Promise{}", [
     '<state>: "rejected"',
     "<value>: {a: 1}",
-    "[[Prototype]]: Promise.prototype",
+    "[[Prototype]]: Promise",
   ]);
 
   await executeTerminalExpression(page, "baz");

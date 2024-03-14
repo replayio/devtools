@@ -1,4 +1,3 @@
-import { PauseId } from "@replayio/protocol";
 import { FrontendBridge } from "@replayio/react-devtools-inline";
 import { CSSProperties, useEffect } from "react";
 
@@ -23,7 +22,8 @@ export function ReactDevToolsList({
   bridge,
   height,
   listData,
-  pauseId,
+  selectElementHighPriority,
+  selectElementLowPriority,
   store,
   wall,
   width,
@@ -31,7 +31,8 @@ export function ReactDevToolsList({
   bridge: FrontendBridge;
   height: number;
   listData: ReactDevToolsListData;
-  pauseId: PauseId;
+  selectElementHighPriority: (selectedElement: ReactElement | null) => void;
+  selectElementLowPriority: (selectedElement: ReactElement | null) => void;
   store: StoreWithInternals;
   wall: ReplayWall;
   width: number;
@@ -44,14 +45,18 @@ export function ReactDevToolsList({
   const onMouseMove = useHighlightNativeElement(store, wall, listData);
 
   useEffect(() => {
+    // Subscribe to selection changes from Keyboard and Mouse events.
+    return listData.subscribeToSelectedIndex((selectedIndex: number | null) => {
+      selectElementHighPriority(
+        selectedIndex != null ? listData.getItemAtIndex(selectedIndex) : null
+      );
+    });
+  }, [listData, selectElementHighPriority]);
+
+  useEffect(() => {
+    // Subscribe to selection changes from the node picker.
     const onSelectFiber = (id: number) => {
-      const item = listData.getItemById(id);
-      if (item) {
-        const index = listData.getIndexForItem(item);
-        if (index >= 0) {
-          listData.setSelectedIndex(index);
-        }
-      }
+      selectElementLowPriority(listData.getItemById(id));
     };
 
     bridge.addListener("selectFiber", onSelectFiber);
@@ -59,7 +64,7 @@ export function ReactDevToolsList({
     return () => {
       bridge.removeListener("selectFiber", onSelectFiber);
     };
-  }, [bridge, listData]);
+  }, [bridge, listData, selectElementLowPriority]);
 
   const onKeyDown = (event: KeyboardEvent) => {
     const index = listData.getSelectedIndex();

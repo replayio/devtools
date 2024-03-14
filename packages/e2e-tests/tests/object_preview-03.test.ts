@@ -13,7 +13,7 @@ import {
 } from "../helpers/pause-information-panel";
 import { addBreakpoint } from "../helpers/source-panel";
 import { toggleExpandable } from "../helpers/utils";
-import test from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
 test.use({ exampleKey: "doc_rr_preview.html" });
 
@@ -34,24 +34,25 @@ test(`object_preview-03: Test previews when switching between frames and steppin
 
   await expandAllScopesBlocks(page);
 
-  const blockScope = getScopeChildren(page, "Block");
+  const barScope = getScopeChildren(page, "bar");
 
-  await toggleExpandable(page, { scope: blockScope, text: "barobj" });
+  await toggleExpandable(page, { scope: barScope, text: "barobj" });
   await waitForScopeValue(page, "barprop1", 2, false);
   await waitForScopeValue(page, "barprop2", 3, false);
 
-  await waitForFrameTimeline(page, target == "gecko" ? "42%" : "75%");
-
+  await waitForFrameTimeline(page, "75%");
   await verifyFramesCount(page, 2);
   await selectFrame(page, 1);
+
+  const fooScope = getScopeChildren(page, "foo");
   await expandAllScopesBlocks(page);
-  await toggleExpandable(page, { scope: blockScope, text: "fooobj" });
+  await toggleExpandable(page, { scope: fooScope, text: "fooobj" });
   await waitForScopeValue(page, "fooprop1", 0, false);
   await waitForScopeValue(page, "fooprop2", 1, false);
 
   await selectFrame(page, 0);
   await stepOverToLine(page, 18);
-  await waitForFrameTimeline(page, target == "gecko" ? "71%" : "100%");
+  await waitForFrameTimeline(page, "100%");
   await waitForScopeValue(page, "barprop1", '"updated"', false);
   await waitForScopeValue(page, "barprop2", 3, false);
 
@@ -60,10 +61,10 @@ test(`object_preview-03: Test previews when switching between frames and steppin
 
   await stepInToLine(page, 21);
   await stepOverToLine(page, 22);
-  await waitForFrameTimeline(page, target == "gecko" ? "50%" : "100%");
+  await waitForFrameTimeline(page, "66%");
   await verifyFramesCount(page, 3);
   await selectFrame(page, 1);
-  await waitForFrameTimeline(page, target == "gecko" ? "57%" : "75%");
+  await waitForFrameTimeline(page, "75%");
   await selectFrame(page, 2);
-  await waitForFrameTimeline(page, target == "gecko" ? "66%" : "100%");
+  await waitForFrameTimeline(page, "100%");
 });

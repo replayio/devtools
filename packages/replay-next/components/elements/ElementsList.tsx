@@ -18,7 +18,7 @@ import { ElementsListData } from "replay-next/components/elements/ElementsListDa
 import { NoContentFallback } from "replay-next/components/elements/NoContentFallback";
 import { rootObjectIdCache } from "replay-next/components/elements/suspense/RootObjectIdCache";
 import { Item } from "replay-next/components/elements/types";
-import { DefaultFallback } from "replay-next/components/ErrorBoundary";
+import { InlineErrorFallback } from "replay-next/components/errors/InlineErrorFallback";
 import { LoadingProgressBar } from "replay-next/components/LoadingProgressBar";
 import { GenericList } from "replay-next/components/windowing/GenericList";
 import { useHorizontalScrollingListCssVariables } from "replay-next/components/windowing/hooks/useHorizontalScrollingListCssVariables";
@@ -29,6 +29,7 @@ import { ElementsListItem, ElementsListItemData, ITEM_SIZE } from "./ElementsLis
 import styles from "./ElementList.module.css";
 
 export type ImperativeHandle = {
+  selectIndex(index: null): Promise<void>;
   selectNode(nodeId: ObjectId | null): Promise<void>;
 };
 
@@ -95,6 +96,10 @@ export function ElementsList({
   useImperativeHandle(
     forwardedRef,
     () => ({
+      async selectIndex(index: number | null) {
+        await listData.waitUntilLoaded();
+        listData.setSelectedIndex(index);
+      },
       async selectNode(nodeId: ObjectId | null) {
         if (nodeId === null) {
           listData.setSelectedIndex(null);
@@ -125,7 +130,7 @@ export function ElementsList({
   }, [listData, rootObjectId]);
 
   if (didError) {
-    return <DefaultFallback style={{ height }} />;
+    return <InlineErrorFallback style={{ height }} />;
   }
 
   const onKeyDown = (event: KeyboardEvent) => {
@@ -174,6 +179,7 @@ export function ElementsList({
       {isLoading && <LoadingProgressBar />}
       <GenericList<Item, ElementsListItemData>
         className={styles.List}
+        dataStatus={isLoading ? "loading" : "loaded"}
         dataTestId="ElementsList"
         fallbackForEmptyList={<NoContentFallback />}
         height={height}

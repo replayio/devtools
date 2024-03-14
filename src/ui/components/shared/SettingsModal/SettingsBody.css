@@ -14,7 +14,7 @@
 /* Refresh Prompt */
 
 .settings-modal .refresh-prompt {
-  background: var(--cool-gray-200);
+  background: var(--grey-20);
   font-size: 14px;
   display: flex;
   flex-direction: column;

@@ -19,6 +19,7 @@ import { domSearchCache } from "replay-next/components/elements/suspense/DOMSear
 import Icon from "replay-next/components/Icon";
 import { PanelLoader } from "replay-next/components/PanelLoader";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import useLocalStorageUserData from "shared/user-data/LocalStorage/useLocalStorageUserData";
 
 import styles from "./ElementsPanel.module.css";
 
@@ -49,11 +50,15 @@ export function ElementsPanel({
     [pauseId, replayClient]
   );
 
+  const [advancedSearch, setAdvancedSearch] = useLocalStorageUserData(
+    "elementsPanelAdvancedSearch"
+  );
   const [searchInProgress, setSearchInProgress] = useState(false);
   const [searchState, setSearchState] = useState<{
+    advanced: boolean;
     index: number;
+    indices: number[];
     query: string;
-    results: ObjectId[];
   } | null>(null);
   const [query, setQuery] = useState("");
 
@@ -80,25 +85,42 @@ export function ElementsPanel({
       return;
     }
 
+    let indices: number[];
+
     setSearchInProgress(true);
 
-    let results = await domSearchCache.readAsync(replayClient, pauseId, query);
+    if (!advancedSearch) {
+      await listData.waitUntilLoaded();
 
-    // DOM search API may match on nodes that are not displayed locally.
-    results = results.filter(id => listData.contains(id));
+      // Basic search is an in-memory, what-you-see search
+      indices = listData.search(query);
+    } else {
+      // Advanced search uses the protocol API and mirrors Chrome's element search
+      let ids = await domSearchCache.readAsync(replayClient, pauseId, query);
+
+      indices = [];
+
+      ids.forEach(id => {
+        // DOM search API may match on nodes that are not displayed locally
+        if (listData.contains(id)) {
+          indices.push(listData.getIndexForItemId(id));
+        }
+      });
+    }
 
     setSearchInProgress(false);
     setSearchState({
-      index: results.length > 0 ? 0 : -1,
+      advanced: advancedSearch,
+      index: indices.length > 0 ? 0 : -1,
+      indices,
       query,
-      results,
     });
 
-    if (results.length > 0) {
+    if (indices.length > 0) {
       const list = listRef.current;
       if (list) {
-        const id = results[0];
-        list.selectNode(id);
+        const index = indices[0];
+        list.selectIndex(index);
       }
     }
   };
@@ -135,16 +157,18 @@ export function ElementsPanel({
 
         if (query === "") {
           setSearchState(null);
-        } else if (searchState?.query === query) {
-          if (searchState.results.length === 0) {
+        } else if (searchState?.advanced !== advancedSearch || searchState?.query !== query) {
+          runSearch();
+        } else {
+          if (searchState.indices.length === 0) {
             return;
           }
 
           let index = searchState.index;
           if (event.shiftKey) {
-            index = index > 0 ? index - 1 : searchState.results.length - 1;
+            index = index > 0 ? index - 1 : searchState.indices.length - 1;
           } else {
-            index = index < searchState.results.length - 1 ? searchState.index + 1 : 0;
+            index = index < searchState.indices.length - 1 ? searchState.index + 1 : 0;
           }
 
           setSearchState({
@@ -154,11 +178,9 @@ export function ElementsPanel({
 
           const list = listRef.current;
           if (list) {
-            const id = searchState.results[index];
-            list.selectNode(id);
+            const newIndex = searchState.indices[index];
+            list.selectIndex(newIndex);
           }
-        } else {
-          runSearch();
         }
         break;
       }
@@ -169,6 +191,20 @@ export function ElementsPanel({
       }
     }
   };
+
+  const onAdvancedSearchButtonClick = () => {
+    setAdvancedSearch(!advancedSearch);
+    searchInputRef.current?.focus();
+
+    // Don't automatically re-run the search yet, because state hasn't updated.
+    // We don't really know the user's intent either,
+    // So just set focus on the search input and let the user trigger the search when they're ready.
+  };
+
+  let searchResultsText = "";
+  if (!searchInProgress && searchState !== null) {
+    searchResultsText = `${searchState.index + 1} of ${searchState.indices.length}`;
+  }
 
   return (
     <div className={styles.Panel}>
@@ -188,10 +224,29 @@ export function ElementsPanel({
             value={query}
           />
         </label>
-        {searchInProgress && <Icon className={styles.SpinnerIcon} type="spinner" />}
+        <button
+          className={styles.AdvancedButton}
+          data-active={advancedSearch || undefined}
+          data-test-id="ElementsPanel-AdvancedSearchButton"
+          onClick={onAdvancedSearchButtonClick}
+          title="Advanced search"
+        >
+          <Icon className={styles.AdvancedIcon} type="advanced" />
+        </button>
+        {searchInProgress && (
+          <Icon
+            className={styles.SpinnerIcon}
+            data-test-id="ElementsPanel-Searching"
+            type="spinner"
+          />
+        )}
         {!searchInProgress && searchState !== null && (
-          <div className={styles.SearchResults} data-test-id="ElementsPanel-SearchResult">
-            {searchState.index + 1} of {searchState.results.length}
+          <div
+            className={styles.SearchResults}
+            data-test-id="ElementsPanel-SearchResult"
+            title={searchResultsText}
+          >
+            {searchResultsText}
           </div>
         )}
       </div>

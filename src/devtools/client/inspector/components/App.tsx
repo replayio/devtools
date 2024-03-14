@@ -72,11 +72,22 @@ export default function InspectorApp() {
     <div className="inspector-responsive-container theme-body inspector">
       <div id="inspector-splitter-box">
         <PanelGroup autoSaveId="App" className="inspector-sidebar-splitter" direction="horizontal">
-          <Panel collapsible minSize={20} onCollapse={setCollapsedLeft}>
+          <Panel
+            collapsible
+            minSize={20}
+            onCollapse={() => setCollapsedLeft(true)}
+            onExpand={() => setCollapsedLeft(false)}
+          >
             <ElementsPanelAdapter />
           </Panel>
           <PanelResizeHandle className={resizeHandleClassName} />
-          <Panel collapsible defaultSize={40} minSize={20} onCollapse={setCollapsedRight}>
+          <Panel
+            collapsible
+            defaultSize={40}
+            minSize={20}
+            onCollapse={() => setCollapsedRight(true)}
+            onExpand={() => setCollapsedRight(false)}
+          >
             <div className="devtools-inspector-tab-panel">
               <div id="inspector-sidebar-container">
                 <div id="inspector-sidebar">

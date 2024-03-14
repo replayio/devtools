@@ -7,7 +7,7 @@ import {
 } from "../helpers/console-panel";
 import { selectFrame, verifyFramesCount } from "../helpers/pause-information-panel";
 import { addLogpoint } from "../helpers/source-panel";
-import test from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
 test.use({ exampleKey: "doc_async.html" });
 

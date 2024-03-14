@@ -7,6 +7,8 @@ import { ConnectedProps, connect } from "react-redux";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Recording as RecordingInfo } from "shared/graphql/types";
 import { isTest } from "shared/utils/environment";
+import { getRecordingURL } from "shared/utils/recording";
+import { extractIdAndSlug } from "shared/utils/slug";
 import { setModal } from "ui/actions/app";
 import { setExpectedError } from "ui/actions/errors";
 import { getAccessibleRecording } from "ui/actions/session";
@@ -21,10 +23,7 @@ import {
 } from "ui/hooks/recordings";
 import setupDevtools, { migratePerRecordingPersistedSettings } from "ui/setup/dynamic/devtools";
 import { useAppDispatch, useAppStore } from "ui/setup/hooks";
-import { extractIdAndSlug } from "ui/utils/helpers";
 import { startUploadWaitTracking } from "ui/utils/mixpanel";
-import { getRecordingURL } from "ui/utils/recording";
-import { trackEvent } from "ui/utils/telemetry";
 import useToken from "ui/utils/useToken";
 
 import Upload from "./upload";
@@ -209,7 +208,7 @@ function RecordingPage({
     return (
       <>
         {head}
-        <DevTools apiKey={apiKey} uploadComplete={uploadComplete} />
+        <DevTools apiKey={apiKey} replayClient={replayClient} uploadComplete={uploadComplete} />
       </>
     );
   }

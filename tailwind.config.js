@@ -57,6 +57,8 @@ module.exports = {
         testsuitesErrorBgcolor: "var(--testsuites-error-bgcolor)",
         testsuitesErrorBgcolorHover: "var(--testsuites-error-bgcolor-hover)",
         testsuitesErrorColor: "var(--testsuites-error-color)",
+        testsuitesFailedColor: "var(--testsuites-v2-failed-header)",
+        testsuitesFlakyColor: "var(--testsuites-v2-flaky-header)",
         testsuitesSuccessColor: "var(--testsuites-success-color)",
         testsuitesStepsBgcolor: "var(--testsuites-steps-bgcolor)",
         testsuitesStepsBgcolorHover: "var(--testsuites-steps-bgcolor-hover)",
@@ -71,9 +73,7 @@ module.exports = {
         themeTextFieldColor: "var(--theme-text-field-color)",
         themeToggleBgcolor: "var(--theme-toggle-bgcolor)",
         themeToggleHandleBgcolor: "var(--theme-toggle-handle-bgcolor)",
-        themeToggleColor: "var(--theme-toggle-color)",
         themeToolbarPanelIconColor: "var(--theme-toolbar-panel-icon-color)",
-        timejumpText: "var(--timejump-text)",
         toolbarBackground: "var(--theme-toolbar-background)",
         toolbarBackgroundHover: "var(--theme-toolbar-background-hover)",
         toolbarBackgroundAlt: "var(--theme-toolbar-background-alt)",
@@ -82,6 +82,9 @@ module.exports = {
         lightGrey: "var(--light-grey)",
         loadingBackground: "var(--loading-background)",
         loadingBoxes: "var(--loading-boxes)",
+      },
+      fontFamily: {
+        monospace: ["var(--monospace-font-family)"],
       },
       lineHeight: {
         "comment-text": "1.125rem",

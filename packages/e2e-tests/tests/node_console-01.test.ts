@@ -5,7 +5,7 @@ import {
   warpToMessage,
 } from "../helpers/console-panel";
 import { reverseStepOverToLine, waitForScopeValue } from "../helpers/pause-information-panel";
-import test from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
 test.use({ exampleKey: "node/basic.js" });
 

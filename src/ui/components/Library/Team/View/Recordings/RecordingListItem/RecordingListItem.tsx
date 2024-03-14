@@ -9,10 +9,10 @@ import {
   isGroupedTestCasesV2,
 } from "shared/test-suites/RecordingTestMetadata";
 import { getDisplayedUrl } from "shared/utils/environment";
+import { getRecordingURL } from "shared/utils/recording";
 import { TestResultIcon } from "ui/components/TestSuite/components/TestResultIcon";
 import hooks from "ui/hooks";
 import { useGetUserPermissions } from "ui/hooks/users";
-import { getRecordingURL } from "ui/utils/recording";
 import { formatDuration } from "ui/utils/time";
 
 import { Redacted } from "../../../../../Redacted";
@@ -41,12 +41,12 @@ function shortenRelativeDate(date: string) {
     .replace("less than am", "1m");
 }
 
-export function getTruncatedRelativeDate(date: string) {
-  return getRelativeDate(date, true);
+export function getTruncatedRelativeDate(date: string, addSuffix = true) {
+  return getRelativeDate(date, true, addSuffix);
 }
 
-export function getRelativeDate(date: string, truncate: boolean = false) {
-  let content = formatDistanceToNow(new Date(date), { addSuffix: true });
+export function getRelativeDate(date: string, truncate: boolean = false, addSuffix = true) {
+  let content = formatDistanceToNow(new Date(date), { addSuffix });
 
   if (truncate) {
     content = shortenRelativeDate(content);

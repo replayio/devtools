@@ -1,5 +1,5 @@
 import { openDevToolsTab, startTest } from "../helpers";
-import { E2E_USER_1_API_KEY } from "../helpers/authentication";
+import { E2E_USER_1 } from "../helpers/authentication";
 import {
   addNetworkRequestComment,
   addSourceCodeComment,
@@ -9,29 +9,22 @@ import {
 } from "../helpers/comments";
 import { openNetworkPanel } from "../helpers/network-panel";
 import { openSource } from "../helpers/source-explorer-panel";
-import test, { expect } from "../testFixtureCloneRecording";
+import test, { expect } from "../testFixture";
 
-// Each authenticated e2e test must use a unique recording id;
-// else shared state from one test could impact another test running in parallel.
-// TODO [SCS-1066] Share recordings between other tests
-
-test.use({ exampleKey: "authenticated_comments_3.html" });
+test.use({ exampleKey: "authenticated_comments.html", testUsers: [E2E_USER_1] });
 
 test(`authenticated/comments-03: Comment previews`, async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey: url,
+  testUsers,
 }) => {
-  await startTest(page, recordingId, E2E_USER_1_API_KEY);
+  await startTest(page, recordingId, { apiKey: testUsers![0].apiKey, testScope });
   await openDevToolsTab(page);
-
-  // Clean up from previous tests
-  // TODO [SCS-1066] Ideally we would create a fresh recording for each test run
-  await deleteAllComments(page);
 
   // Add and verify source code comment previews
   await openSource(page, url);
   const sourceCodeComment = await addSourceCodeComment(page, {
-    lineNumber: 23,
+    lineNumber: 13,
     text: "source code",
     url,
   });
@@ -43,13 +36,13 @@ test(`authenticated/comments-03: Comment previews`, async ({
   await openNetworkPanel(page);
   const networkRequestComment = await addNetworkRequestComment(page, {
     method: "GET",
-    name: "1",
-    status: 200,
+    name: "favicon.ico",
+    status: 404,
     text: "network request",
   });
   const networkRequestCommentPreviewText =
     (await networkRequestComment.locator('[data-test-name="CommentPreview"]').textContent()) ?? "";
-  await expect(networkRequestCommentPreviewText.trim()).toBe("[GET] 1");
+  await expect(networkRequestCommentPreviewText.trim()).toBe("[GET] favicon.ico");
 
   // Add and verify visual comment
   const visualComment = await addVisualComment(page, {

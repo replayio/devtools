@@ -1,8 +1,6 @@
-import React from "react";
-
+import { Button } from "replay-next/components/Button";
 import { trackEvent } from "ui/utils/telemetry";
 
-import { DisabledLgButton, PrimaryLgButton, SecondaryLgButton } from "../Button";
 import { OnboardingActions, OnboardingBody, OnboardingHeader } from "../Onboarding/index";
 
 function DownloadButtonContent({ text, imgUrl }: { text: string; imgUrl: string }) {
@@ -37,15 +35,15 @@ function DownloadButtons({ onNext }: { onNext: () => void }) {
 
   return (
     <div className="flex w-full flex-row justify-center space-x-3 py-3">
-      <PrimaryLgButton color="blue" onClick={handleMac}>
+      <Button onClick={handleMac} size="large">
         <DownloadButtonContent text="Mac" imgUrl="/images/icon-apple.svg" />
-      </PrimaryLgButton>
-      <PrimaryLgButton color="blue" onClick={handleLinux}>
+      </Button>
+      <Button onClick={handleLinux} size="large">
         <DownloadButtonContent text="Linux" imgUrl="/images/icon-linux.svg" />
-      </PrimaryLgButton>
-      <PrimaryLgButton color="blue" onClick={handleWindows}>
+      </Button>
+      <Button onClick={handleWindows} size="large">
         <DownloadButtonContent text="Windows" imgUrl="/images/icon-windows.svg" />
-      </PrimaryLgButton>
+      </Button>
     </div>
   );
 }
@@ -65,9 +63,9 @@ export function DownloadPage({
       </OnboardingBody>
       <DownloadButtons onNext={onNext} />
       <OnboardingActions>
-        <SecondaryLgButton color="blue" onClick={onSkipToLibrary}>
+        <Button onClick={onSkipToLibrary} size="large">
           Skip for now
-        </SecondaryLgButton>
+        </Button>
       </OnboardingActions>
     </>
   );

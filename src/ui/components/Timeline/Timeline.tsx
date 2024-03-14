@@ -1,4 +1,4 @@
-import { MouseEvent, useContext, useLayoutEffect, useRef, useState } from "react";
+import { MouseEvent, Suspense, useContext, useLayoutEffect, useRef, useState } from "react";
 
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
@@ -150,7 +150,11 @@ export default function Timeline() {
           onMouseUp={onMouseUp}
         >
           <div className="progress-bar-stack" onContextMenu={onContextMenu}>
-            {showProtocolTimeline && <ProtocolTimeline />}
+            {showProtocolTimeline && (
+              <Suspense>
+                <ProtocolTimeline />
+              </Suspense>
+            )}
             <div className="progress-bar" data-test-id="Timeline-ProgressBar" ref={progressBarRef}>
               <ProgressBars />
               <PreviewMarkers />

@@ -1,7 +1,8 @@
+import assert from "assert";
 import { Locator, Page, expect } from "@playwright/test";
 import chalk from "chalk";
 
-import { getScreenshotScale } from "./screenshot";
+import { getGraphicsElementScale } from "./screenshot";
 import { debugPrint, delay, waitFor } from "./utils";
 
 type ElementsListRowOptions = {
@@ -11,7 +12,19 @@ type ElementsListRowOptions = {
 };
 
 export async function activateInspectorTool(page: Page): Promise<void> {
-  await page.locator("#command-button-pick").click();
+  const button = page.locator("#command-button-pick");
+
+  const status = await button.getAttribute("data-status");
+  if (status === "disabled") {
+    await debugPrint(page, `Activating the Elements node picker`, "activateInspectorTool");
+
+    await button.click();
+  }
+
+  await waitFor(async () => {
+    const status = await button.getAttribute("data-status");
+    expect(status).toBe("active");
+  });
 }
 
 export async function checkAppliedRules(page: Page, expected: any) {
@@ -66,6 +79,40 @@ type AppliedRules = {
   source: string;
 };
 
+export async function findElementCoordinates(page: Page, partialText: string) {
+  await selectElementsListRow(page, { text: partialText });
+
+  await debugPrint(
+    page,
+    `Calculating relative coordinates for element "${partialText}"`,
+    "findElementCoordinates"
+  );
+
+  const containerBounds = await page.locator("#overlay-graphics").boundingBox();
+  assert(containerBounds);
+
+  await page.locator(".box-model-regions").waitFor();
+
+  const highlightBounds = await page.locator(".box-model-regions").boundingBox();
+  assert(highlightBounds);
+
+  const relativeHighlightX = highlightBounds.x - containerBounds.x;
+  const relativeHighlightY = highlightBounds.y - containerBounds.y;
+
+  const x = (relativeHighlightX + highlightBounds.width / 2) / containerBounds.width;
+  const y = (relativeHighlightY + highlightBounds.height / 2) / containerBounds.height;
+
+  await debugPrint(
+    page,
+    `Found relative coordinates ${chalk.bold(x.toFixed(2))}%, ${chalk.bold(
+      y.toFixed(2)
+    )}% for element with text "${partialText}"`,
+    "findElementCoordinates"
+  );
+
+  return { x, y };
+}
+
 export async function getAppliedRules(page: Page): Promise<AppliedRules[]> {
   await openAppliedRulesTab(page);
   await expandPseudoElementRules(page);
@@ -73,7 +120,10 @@ export async function getAppliedRules(page: Page): Promise<AppliedRules[]> {
   await debugPrint(page, `Gathering CSS rules`, "getAppliedRules");
 
   return await page.evaluate(async () => {
-    const listElement = document.querySelector<HTMLElement>('[data-test-id="RulesList"]')!;
+    const listElement = document.querySelector<HTMLElement>('[data-test-id="RulesList"]');
+    if (!listElement) {
+      return [];
+    }
     const { clientHeight } = listElement;
 
     listElement.scrollTop = 0;
@@ -238,7 +288,7 @@ export async function inspectCanvasCoordinates(
 
   await debugPrint(
     page,
-    `Inspecting preview Canvas (${xPercentage}%, ${yPercentage}%)`,
+    `Inspecting preview Canvas (${xPercentage}, ${yPercentage})`,
     "inspectCanvasCoordinates"
   );
 
@@ -247,20 +297,19 @@ export async function inspectCanvasCoordinates(
   const pickerButton = page.locator('[title="Select an element in the video to inspect it"]')!;
   await pickerButton.click();
 
-  const canvas = page.locator("#graphics");
-  const heightString = await canvas.getAttribute("height");
-  const widthString = await canvas.getAttribute("width");
-  const height = parseFloat(heightString ?? "0");
-  const width = parseFloat(widthString ?? "0");
+  const graphicsElement = page.locator("#graphics");
+  const { width, height } = (await graphicsElement.boundingBox())!;
 
-  await canvas.getAttribute("scale");
+  expect(height).toBeGreaterThan(0);
+  expect(width).toBeGreaterThan(0);
+
   await debugPrint(
     page,
     `Canvas size ${chalk.bold(Math.round(width))}px by ${chalk.bold(Math.round(height))}px`,
     "inspectCanvasCoordinates"
   );
 
-  const scale = await getScreenshotScale(page);
+  const scale = await getGraphicsElementScale(page);
   const x = xPercentage * width * scale;
   const y = yPercentage * height * scale;
 
@@ -272,7 +321,9 @@ export async function inspectCanvasCoordinates(
     "inspectCanvasCoordinates"
   );
 
-  canvas.click({ position: { x, y } });
+  await graphicsElement.hover({ position: { x, y } });
+  await delay(100);
+  await graphicsElement.click({ position: { x, y } });
 }
 
 export async function openAppliedRulesTab(page: Page) {
@@ -334,7 +385,26 @@ export async function getElementsSearchResultsCount(
   return { current: parseInt(currentString), total: parseInt(totalString) };
 }
 
-export async function searchElementsPanel(page: Page, searchText: string): Promise<void> {
+function getSearchInput(page: Page) {
+  return page.locator('[data-test-id="ElementsSearchInput"]')!;
+}
+
+export async function runOrAdvanceSearch(page: Page) {
+  const input = getSearchInput(page);
+
+  await waitFor(async () => {
+    await expect(await input.isEnabled()).toBe(true);
+  });
+
+  await input.focus();
+  await input.press("Enter");
+}
+
+export async function searchElementsPanel(
+  page: Page,
+  searchText: string,
+  advanced?: boolean
+): Promise<void> {
   await openElementsPanel(page);
 
   await debugPrint(
@@ -343,20 +413,32 @@ export async function searchElementsPanel(page: Page, searchText: string): Promi
     "searchElementsPanel"
   );
 
-  const input = page.locator('[data-test-id="ElementsSearchInput"]')!;
+  if (advanced != undefined) {
+    await toggleAdvanced(page, advanced);
+  }
+
+  const input = getSearchInput(page);
   await input.isEnabled();
+  await input.clear();
   await input.focus();
   await input.type(searchText);
+  await input.press("Enter");
+  await delay(500);
 
+  const resultsLabel = page.locator('[data-test-id="ElementsPanel-SearchResult"]');
   await waitFor(async () => {
-    await input.press("Enter");
+    // don't press "Enter" again if the search is already running or has just finished
+    if (
+      !(await page.locator('[data-test-id="ElementsPanel-Searching"]').or(resultsLabel).isVisible())
+    ) {
+      await input.press("Enter");
+    }
 
-    await delay(250);
+    await delay(500);
 
     // If the Elements panel is still loading, the search won't be handled.
     // A proxy for confirming that the search has been handled is that a results label will be rendered.
-    const resultsLabel = page.locator('[data-test-id="ElementsPanel-SearchResult"]');
-    await expect(await resultsLabel.count()).toEqual(1);
+    expect(await resultsLabel.count()).toEqual(1);
   });
 }
 
@@ -440,7 +522,7 @@ export async function selectRootElementsRow(page: Page): Promise<void> {
 }
 
 export async function selectNextElementsPanelSearchResult(page: Page): Promise<void> {
-  const input = page.locator('[data-test-id="ElementsSearchInput"]')!;
+  const input = getSearchInput(page);
   await input.focus();
   await input.press("Enter");
 }
@@ -449,11 +531,27 @@ export function getElementsList(page: Page) {
   return page.locator(`[data-test-id="ElementsList"]`);
 }
 
-export async function waitForElementsToLoad(page: Page): Promise<void> {
-  await debugPrint(page, "Waiting for elements to load", "waitForElementsToLoad");
+export async function toggleAdvanced(page: Page, advanced: boolean) {
+  const button = page.locator('[data-test-id="ElementsPanel-AdvancedSearchButton"]');
 
-  const elements = getElementsList(page);
-  await elements.waitFor();
+  const state = await button.getAttribute("data-active");
+  if (advanced && state !== null) {
+    return;
+  } else if (!advanced && state === null) {
+    return;
+  }
+
+  await expect(await button.isEnabled()).toBe(true);
+  await button.click();
+
+  await waitFor(async () => {
+    const state = await button.getAttribute("data-active");
+    if (advanced) {
+      expect(state).not.toBe(null);
+    } else {
+      expect(state).toBe(null);
+    }
+  });
 }
 
 export async function toggleElementsListRow(
@@ -486,6 +584,18 @@ export async function toggleElementsListRow(
   }
 }
 
+export async function waitForElementsToLoad(page: Page): Promise<void> {
+  await debugPrint(page, "Waiting for elements to load", "waitForElementsToLoad");
+
+  const elements = getElementsList(page);
+  await elements.waitFor();
+
+  await waitFor(async () => {
+    const status = await elements.getAttribute("data-status");
+    expect(status).toBe("loaded");
+  });
+}
+
 export async function waitForSelectedElementsRow(page: Page, text: string): Promise<Locator> {
   const locator = await getElementsListRow(page, { isSelected: true, text });
   await locator.waitFor();
@@ -497,7 +607,7 @@ export async function typeKeyAndVerifySelectedElement(
   key: string,
   expectedRowText: string
 ) {
-  debugPrint(page, `Typing ${key}...`, "typeKeyAndVerifySelectedElement");
+  await debugPrint(page, `Typing ${key}...`, "typeKeyAndVerifySelectedElement");
   await page.keyboard.press(key);
   await waitForSelectedElementsRow(page, expectedRowText);
   await delay(500);

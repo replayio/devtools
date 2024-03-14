@@ -3,18 +3,10 @@ import chalk from "chalk";
 
 import { Badge } from "shared/client/types";
 
-import { hideTypeAheadSuggestions, type as typeLexical } from "./lexical";
+import { clearText, focus, hideTypeAheadSuggestions, typeLogPoint as typeLexical } from "./lexical";
 import { findPoints, openPauseInformationPanel, removePoint } from "./pause-information-panel";
 import { openSource } from "./source-explorer-panel";
-import {
-  clearTextArea,
-  debugPrint,
-  delay,
-  getByTestName,
-  getCommandKey,
-  mapLocators,
-  waitFor,
-} from "./utils";
+import { clearTextArea, debugPrint, delay, getByTestName, getCommandKey, waitFor } from "./utils";
 import { openDevToolsTab } from ".";
 
 export async function addBreakpoint(
@@ -70,6 +62,13 @@ export async function addBreakpoint(
   });
 
   await waitForBreakpoint(page, options);
+
+  // We want to add a slight delay after adding a breakpoint so that the
+  // breakpoint logic will have time to send protocol commands to the server,
+  // since that is not guaranteed to happen synchronously on click. This is
+  // important for cases where we add a breakpoint and then immediately
+  // attempt to step to the breakpoint location.
+  await delay(2000);
 }
 
 export async function editBadge(
@@ -131,12 +130,12 @@ export async function editConditional(
     "addConditional"
   );
 
-  await typeLexical(
-    page,
-    `${getSourceLineSelector(lineNumber)} [data-test-name="PointPanel-ConditionInput"]`,
-    condition,
-    false
-  );
+  await typeLexical(page, {
+    shouldSubmit: false,
+    sourceLineNumber: lineNumber,
+    text: condition,
+    type: "condition",
+  });
 }
 
 export async function jumpToLogPointHit(
@@ -154,14 +153,15 @@ export async function jumpToLogPointHit(
     "jumpToLogPointHit"
   );
 
+  await focus(page, '[data-test-name="LogPointCurrentStepInput"]');
+
   const input = page.locator('[data-test-name="LogPointCurrentStepInput"]');
-  await input.focus();
-  await clearTextArea(page, input);
-  await page.keyboard.type(`${number}`);
-  await page.keyboard.press("Enter");
+  await input.press(`${getCommandKey()}+A`);
+  await input.type(`${number}`);
+  await input.press("Enter");
 }
 
-async function scrollUntilLineIsVisible(page: Page, lineNumber: number) {
+export async function scrollUntilLineIsVisible(page: Page, lineNumber: number) {
   const lineLocator = await getSourceLine(page, lineNumber);
 
   // Don't rely on lineLocator.isVisible() because it can give false positives for partially visible rows
@@ -315,10 +315,6 @@ export async function editLogPoint(
     await editConditional(page, { condition, lineNumber });
   }
 
-  const selector = `${getSourceLineSelector(
-    lineNumber
-  )} [data-test-name="PointPanel-ContentInput"]`;
-
   if (content != null) {
     const isEditing = await line
       .locator('[data-test-name="PointPanel-ContentWrapper"] [data-lexical-editor="true"]')
@@ -329,13 +325,25 @@ export async function editLogPoint(
 
     await debugPrint(page, `Setting log-point content "${chalk.bold(content)}"`, "addLogpoint");
 
-    await typeLexical(page, selector, content, false);
+    await typeLexical(page, {
+      sourceLineNumber: lineNumber,
+      shouldSubmit: false,
+      text: content,
+      type: "content",
+    });
   }
 
   if (saveAfterEdit) {
     // The typeahead popup sometimes sticks around and overlaps the save button.
     // Ensure it goes away.
-    await hideTypeAheadSuggestions(page, selector);
+    await hideTypeAheadSuggestions(page, {
+      sourceLineNumber: lineNumber,
+      type: "log-point-condition",
+    });
+    await hideTypeAheadSuggestions(page, {
+      sourceLineNumber: lineNumber,
+      type: "log-point-content",
+    });
 
     const saveButton = line.locator('[data-test-name="PointPanel-SaveButton"]');
     await expect(saveButton).toBeEnabled();
@@ -746,7 +754,7 @@ export async function verifyLogpointStep(
     const currentStepInputLocator = lineLocator.locator(
       '[data-test-name="LogPointCurrentStepInput"]'
     );
-    const currentStep = await currentStepInputLocator.inputValue();
+    const currentStep = await currentStepInputLocator.getAttribute("data-value");
     const denominatorLocator = lineLocator.locator('[data-test-name="LogPointDenominator"]');
     const denominator = await denominatorLocator.textContent();
 
@@ -804,7 +812,7 @@ export async function verifyLogPointPanelContent(
 
     if (hitPointsBadge != null) {
       const input = line.locator('[data-test-name="LogPointCurrentStepInput"]');
-      const inputValue = await input.getAttribute("value");
+      const inputValue = await input.getAttribute("data-value");
       const capsule = await line.locator('[data-test-name="LogPointDenominator"]');
       const capsuleText = await capsule.textContent();
       await expect(`${inputValue}/${capsuleText}`).toBe(hitPointsBadge);
@@ -838,22 +846,10 @@ export async function waitForSelectedSource(page: Page, url: string) {
       await page.locator('[data-test-name="Source"]:visible').getAttribute("data-test-source-id")
     ).toBe(headerSourceId);
 
-    // HACK Assume that the source file has loaded when the combined text of the first
-    // 10 lines is no longer an empty string
-    const lines = editorPanel.locator(`[data-test-name="SourceLine"]`);
-
-    const lineTexts = await mapLocators(lines, lineLocator => lineLocator.textContent());
+    // Only succeed when we see formatted lines.
+    const lines = editorPanel.locator(`[data-test-formatted-source="true"]`);
     const numLines = await lines.count();
-
-    const combinedLineText = lineTexts
-      .slice(0, 10)
-      .join()
-      .trim()
-      // Remove zero-width spaces, which would be considered non-empty
-      .replace(/[\u200B-\u200D\uFEFF]/g, "");
-
     expect(numLines).toBeGreaterThan(0);
-    expect(combinedLineText).not.toBe("");
   });
 }
 

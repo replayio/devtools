@@ -7,7 +7,7 @@ import {
 } from "../helpers/pause-information-panel";
 import { clickSourceTreeNode } from "../helpers/source-explorer-panel";
 import { addBreakpoint } from "../helpers/source-panel";
-import test from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
 test.use({ exampleKey: "doc_rr_basic.html" });
 
@@ -35,9 +35,13 @@ test(`stepping-03: Stepping past the beginning or end of a frame should act like
   await reverseStepOverToLine(page, 20);
   await executeAndVerifyTerminalExpression(page, "number", "9");
 
+  // TODO [RUN-3271] Chromium currently requires an extra step here
+  await stepOverToLine(page, 20);
   await stepOverToLine(page, 21);
-  await stepOverToLine(page, 22);
+  await stepOverToLine(page, 21);
   await stepOverToLine(page, 12);
+  await stepOverToLine(page, 16);
+  // TODO [RUN-3271] Chromium currently requires an extra step here
   await stepOverToLine(page, 16);
   await stepOverToLine(page, 17);
 

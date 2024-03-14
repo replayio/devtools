@@ -7,7 +7,7 @@ import {
   verifyConsoleMessage,
   warpToMessage,
 } from "../helpers/console-panel";
-import test from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
 test.use({ exampleKey: "doc_rr_objects.html" });
 
@@ -27,7 +27,7 @@ test(`object_preview-06: HTML elements`, async ({
   await clearConsoleEvaluations(page);
 
   await executeTerminalExpression(page, "document.getElementsByTagName('body')");
-  await verifyConsoleMessage(page, "HTMLCollection(1)");
+  await verifyConsoleMessage(page, "HTMLCollection");
   await verifyConsoleMessage(page, "<body>…<body>");
   await clearConsoleEvaluations(page);
 

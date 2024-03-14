@@ -7,7 +7,7 @@ import {
   verifyStackingTestCaseSelectedElementUnderCursor,
 } from "../helpers/stacking-test-cases";
 import { debugPrint } from "../helpers/utils";
-import test from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
 test.use({ exampleKey: "doc_stacking.html" });
 
@@ -28,11 +28,11 @@ test("stacking: Element highlighter selects the correct element when they overla
   // Dock the console to the _left_ side, to make the video preview as big as possible
   await toggleToolboxLayout(page, "left");
 
-  const canvas = page.locator("canvas#graphics");
+  const element = page.locator("#graphics");
   const rulesContainer = page.locator('[data-test-id="RulesPanel"]');
 
   for (let testCase of stackingTestCases) {
     debugPrint(page, `Stacking test case: ${testCase.id}`);
-    await verifyStackingTestCaseSelectedElementUnderCursor(page, canvas, rulesContainer, testCase);
+    await verifyStackingTestCaseSelectedElementUnderCursor(page, element, rulesContainer, testCase);
   }
 });

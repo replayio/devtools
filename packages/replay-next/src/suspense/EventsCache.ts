@@ -33,6 +33,7 @@ export type EventCategory = {
 
 export type EventLog = PointDescription & {
   eventType: EventHandlerType;
+  label: string;
   type: "EventLog";
 };
 
@@ -79,15 +80,21 @@ export const eventPointsCache = createFocusIntervalCacheForExecutionPoints<
   },
 });
 
-export const eventsCache = createAnalysisCache<EventLog, [EventHandlerType]>(
+export const eventsCache = createAnalysisCache<EventLog, [EventHandlerType, string]>(
   "Events",
   eventType => eventType,
-  (client, begin, end, eventType) =>
-    eventPointsCache.readAsync(BigInt(begin), BigInt(end), client, [eventType]),
-  (client, points, eventType) => {
+  (client, begin, end, eventType, label) =>
+    eventPointsCache.readAsync(BigInt(begin), BigInt(end), client, [eventType, label]),
+  async (client, points, eventType) => {
+    const recordingTarget = await recordingTargetCache.readAsync(client);
+    const expression =
+      recordingTarget === "chromium"
+        ? "__RECORD_REPLAY__.getFrameArgumentsArray()"
+        : "[...arguments]";
+
     return {
       selector: createPointSelector([eventType]),
-      expression: "[...arguments]",
+      expression,
       frameIndex: 0,
     };
   },
@@ -98,8 +105,12 @@ function createPointSelector(eventTypes: EventHandlerType[]): PointSelector {
   return { kind: "event-handlers", eventTypes };
 }
 
-function transformPoint(point: PointDescription, eventType: EventHandlerType): EventLog {
-  return { ...point, eventType, type: "EventLog" };
+function transformPoint(
+  point: PointDescription,
+  eventType: EventHandlerType,
+  label: string
+): EventLog {
+  return { ...point, label, eventType, type: "EventLog" };
 }
 
 export const getInfallibleEventPointsSuspense = createInfallibleSuspenseCache(
@@ -149,7 +160,7 @@ type CountEventsFunction = (eventCountsRaw: Record<string, number>) => EventCate
 
 const CountEvents: Partial<Record<RecordingTarget, CountEventsFunction>> = {
   gecko(eventCountsRaw: Record<string, number>) {
-    const eventTable = STANDARD_EVENT_CATEGORIES.gecko!;
+    const eventTable = STANDARD_EVENT_CATEGORIES.gecko;
     return eventTable.map(category => {
       return {
         ...category,
@@ -162,7 +173,7 @@ const CountEvents: Partial<Record<RecordingTarget, CountEventsFunction>> = {
     });
   },
   chromium(eventCountsRaw: Record<string, number>) {
-    const eventTable = STANDARD_EVENT_CATEGORIES.chromium!;
+    const eventTable = STANDARD_EVENT_CATEGORIES.chromium;
 
     // Merge non-unique CDT category names.
     // NOTE: at this point, we don't care about eventTargets.
@@ -296,12 +307,14 @@ function lookupChromiumEventCategory(
 function makeChromiumEventCategoriesByEventDefault(): EventCategoriesByEvent {
   // TODO: add checks to make sure that each type only has one "default category"
   return Object.fromEntries(
-    STANDARD_EVENT_CATEGORIES.chromium!.flatMap(category => {
-      if (!category.eventTargets || category.eventTargets.includes("*")) {
-        return category.events.map(evt => [evt.type, category.category]);
-      }
-      return null;
-    }).filter(Boolean) as [[string, string]]
+    STANDARD_EVENT_CATEGORIES.chromium
+      .flatMap(category => {
+        if (!category.eventTargets || category.eventTargets.includes("*")) {
+          return category.events.map(evt => [evt.type, category.category]);
+        }
+        return null;
+      })
+      .filter(Boolean) as [[string, string]]
   );
 }
 
@@ -322,19 +335,21 @@ function makeChromiumEventCategoriesByEventDefault(): EventCategoriesByEvent {
  * })
  */
 function makeChromiumEventCategoriesByEventAndTarget(): EventCategoriesByEventAndTarget {
-  const nonUniqueEntries = STANDARD_EVENT_CATEGORIES.chromium!.flatMap(category => {
-    const eventTargets = category.eventTargets && without(category.eventTargets, "*");
-    if (!eventTargets?.length) {
-      return null;
-    }
-    return category.events.map(
-      evt =>
-        [
-          evt.type,
-          eventTargets.map(target => [normalizeEventTargetName(target), category.category]),
-        ] as [string, [string, string][]]
-    );
-  }).filter(Boolean) as [string, [string, string][]][];
+  const nonUniqueEntries = STANDARD_EVENT_CATEGORIES.chromium
+    .flatMap(category => {
+      const eventTargets = category.eventTargets && without(category.eventTargets, "*");
+      if (!eventTargets?.length) {
+        return null;
+      }
+      return category.events.map(
+        evt =>
+          [
+            evt.type,
+            eventTargets.map(target => [normalizeEventTargetName(target), category.category]),
+          ] as [string, [string, string][]]
+      );
+    })
+    .filter(Boolean) as [string, [string, string][]][];
 
   const uniqueEntries = groupEntries(nonUniqueEntries);
   return Object.fromEntries(

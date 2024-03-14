@@ -1,8 +1,17 @@
 import debounce from "lodash/debounce";
-import { MouseEvent, Suspense, useContext, useLayoutEffect, useRef, useState } from "react";
+import {
+  MouseEvent,
+  ReactNode,
+  Suspense,
+  useContext,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { useStreamingValue } from "suspense";
 
+import { InlineErrorFallback } from "replay-next/components/errors/InlineErrorFallback";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import {
   Source as SourceDetails,
@@ -78,7 +87,7 @@ function SourceRenderer({
 
   useLayoutEffect(
     () => () => {
-      // If a hover preview is visible when this Source is hidden for Offscreen
+      // If a hover preview is visible when this Source is hidden for Activity
       // make sure to clean it up so it doesn't remain visible.
       setHoveredState(null);
     },
@@ -88,6 +97,7 @@ function SourceRenderer({
   const sourceRef = useRef<HTMLDivElement>(null);
 
   const { status: sourceContentsStatus } = useStreamingValue(streamingSourceContents);
+  const { status: streamingParserStatus } = useStreamingValue(streamingParser);
 
   const trackMouseHover = () => {
     // Analytics for onboarding
@@ -138,6 +148,53 @@ function SourceRenderer({
     dismissPopup();
   };
 
+  let children: ReactNode = null;
+  if (streamingParserStatus === "rejected" || sourceContentsStatus === "rejected") {
+    children = (
+      <InlineErrorFallback
+        message={
+          <div className={styles.LoadingFailed}>
+            The source you've requested could not be loaded.
+            <br />
+            Reloading the page may fix this.
+          </div>
+        }
+      />
+    );
+  } else {
+    children = (
+      <>
+        <div className={styles.SourceList} onMouseMove={onMouseMove} ref={sourceRef}>
+          <AutoSizer
+            children={({ height, width }) => (
+              <SourceList
+                height={height}
+                source={source}
+                streamingParser={streamingParser}
+                width={width}
+              />
+            )}
+          />
+
+          <StreamingSourceLoadingProgressHeader
+            streamingParser={streamingParser}
+            streamingSourceContents={streamingSourceContents}
+          />
+        </div>
+        {hoveredState ? (
+          <PreviewPopup
+            clientX={hoveredState.clientX}
+            containerRef={sourceRef}
+            dismiss={() => setHoveredState(null)}
+            expression={hoveredState.expression}
+            sourceId={source.sourceId}
+            target={hoveredState.target}
+          />
+        ) : null}
+      </>
+    );
+  }
+
   return (
     <div
       className={styles.Source}
@@ -148,33 +205,7 @@ function SourceRenderer({
       onMouseEnter={trackMouseHover}
       onMouseLeave={dismissPopup}
     >
-      <div className={styles.SourceList} onMouseMove={onMouseMove} ref={sourceRef}>
-        <AutoSizer
-          children={({ height, width }) => (
-            <SourceList
-              height={height}
-              source={source}
-              streamingParser={streamingParser}
-              width={width}
-            />
-          )}
-        />
-
-        <StreamingSourceLoadingProgressHeader
-          streamingParser={streamingParser}
-          streamingSourceContents={streamingSourceContents}
-        />
-      </div>
-      {hoveredState ? (
-        <PreviewPopup
-          clientX={hoveredState.clientX}
-          containerRef={sourceRef}
-          dismiss={() => setHoveredState(null)}
-          expression={hoveredState.expression}
-          sourceId={source.sourceId}
-          target={hoveredState.target}
-        />
-      ) : null}
+      {children}
     </div>
   );
 }

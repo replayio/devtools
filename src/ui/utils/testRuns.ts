@@ -49,10 +49,6 @@ export function groupRecordings(tests: TestRunTestWithRecordings[]): TestGroups 
 
   for (const filePath in recordingsMap) {
     const recordingTests = recordingsMap[filePath];
-    recordingTests.sort((testA, testB) => testA.attempt - testB.attempt);
-
-    const didAnyTestFail = recordingTests.some(testFailed);
-    const didAnyTestPass = recordingTests.some(testPassed);
 
     function addToTestGroup(group: TestGroup, test: TestRunTestWithRecordings) {
       if (group.fileNameToTests[filePath]) {
@@ -65,32 +61,12 @@ export function groupRecordings(tests: TestRunTestWithRecordings[]): TestGroups 
 
     for (const test of recordingTests) {
       if (test.result === "passed") {
-        if (didAnyTestFail) {
-          addToTestGroup(flakyRecordings, test);
-        } else {
-          addToTestGroup(passedRecordings, test);
-        }
+        addToTestGroup(passedRecordings, test);
       } else if (test.result === "failed") {
-        if (didAnyTestPass) {
-          addToTestGroup(flakyRecordings, test);
-        } else {
-          addToTestGroup(failedRecordings, test);
-        }
+        addToTestGroup(failedRecordings, test);
       } else if (test.result === "flaky") {
         addToTestGroup(flakyRecordings, test);
       }
-    }
-
-    if (didAnyTestFail && didAnyTestPass) {
-      flakyRecordings.fileNameToTests[filePath].sort((recordingA, recordingB) => {
-        if (testPassed(recordingA) && testFailed(recordingB)) {
-          return 1;
-        } else if (testFailed(recordingA) && testPassed(recordingB)) {
-          return -1;
-        } else {
-          return 0;
-        }
-      });
     }
   }
 

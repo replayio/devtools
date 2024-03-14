@@ -1,4 +1,5 @@
-import { ExecutionPoint, RecordingId } from "@replayio/protocol";
+import { RecordingId } from "@replayio/protocol";
+import { ExecutionPoint } from "@replayio/protocol";
 
 import { AnyGroupedTestCases } from "shared/test-suites/RecordingTestMetadata";
 
@@ -209,6 +210,7 @@ export interface Recording {
   userId?: string;
   userRole?: RecordingRole;
   workspace?: Workspace;
+  testRunId: string | null;
 }
 
 export type PlaywrightTestSources = {
@@ -322,6 +324,7 @@ export interface Workspace {
   subscription?: Subscription | null;
   isOrganization?: boolean;
   isTest?: boolean;
+  retentionLimit?: number | null;
 }
 
 export interface WorkspaceSettings {
@@ -344,7 +347,7 @@ type DeepPartial<T> = Partial<{ [P in keyof T]: DeepPartial<T[P]> }>;
 
 export type PartialWorkspaceSettingsFeatures = DeepPartial<WorkspaceSettings["features"]>;
 
-export type WorkspaceUserRole = "viewer" | "debugger" | "admin";
+export type WorkspaceUserRole = "viewer" | "debugger" | "admin" | "contributor";
 
 export interface WorkspaceUser {
   membershipId: string;

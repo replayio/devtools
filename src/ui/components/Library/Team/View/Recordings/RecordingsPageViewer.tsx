@@ -33,7 +33,7 @@ export function RecordingsPageViewer({
             isEditing={isEditing}
             setIsEditing={setIsEditing}
           />
-          <div id="recording-list" className="no-scrollbar flex-grow overflow-y-auto">
+          <div id="recording-list" className="flex-grow overflow-y-auto">
             <Recordings
               isEditing={isEditing}
               recordings={recordings}

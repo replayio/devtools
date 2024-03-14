@@ -10,6 +10,7 @@ import {
   SourceId,
   TimeStampedPoint,
 } from "@replayio/protocol";
+import * as Sentry from "@sentry/react";
 import cloneDeep from "lodash/cloneDeep";
 import { Cache, createCache } from "suspense";
 
@@ -65,7 +66,13 @@ export const pauseEvaluationsCache: Cache<
   getKey: ([replayClient, pauseId, frameId, expression, uid = ""]) =>
     `${pauseId}:${frameId}:${expression}:${uid}`,
   load: async ([replayClient, pauseId, frameId, expression, uid = "", pure]) => {
-    const result = await replayClient.evaluateExpression(pauseId, expression, frameId, pure);
+    let result;
+    try {
+      result = await replayClient.evaluateExpression(pauseId, expression, frameId, pure);
+    } catch (error) {
+      Sentry.captureException(error, { extra: { expression, frameId, pauseId } });
+      throw error;
+    }
     const sources = await sourcesByIdCache.readAsync(replayClient);
     cachePauseData(replayClient, sources, pauseId, result.data);
     return { exception: result.exception, failed: result.failed, returned: result.returned };

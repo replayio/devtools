@@ -6,9 +6,9 @@ import {
   waitForReactComponentCount,
 } from "../helpers/new-react-devtools-panel";
 import { getTimelineCurrentPercent, seekToTimePercent } from "../helpers/timeline";
-import test from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
-test.use({ exampleKey: "cra/dist/index_chromium.html" });
+test.use({ exampleKey: "cra/dist/index.html" });
 
 test("react_devtools-04: Component selection is maintained when seeking to a new point", async ({
   pageWithMeta: { page, recordingId },

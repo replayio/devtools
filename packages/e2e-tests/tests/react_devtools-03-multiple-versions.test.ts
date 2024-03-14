@@ -1,5 +1,9 @@
 import { openDevToolsTab, startTest } from "../helpers";
-import { openConsolePanel, verifyConsoleMessage, warpToMessage } from "../helpers/console-panel";
+import {
+  openConsolePanel,
+  verifyConsoleMessage,
+  warpToLastMessage,
+} from "../helpers/console-panel";
 import {
   activateInspectorTool,
   getElementsListRow,
@@ -11,7 +15,7 @@ import {
   openReactDevtoolsPanel,
 } from "../helpers/new-react-devtools-panel";
 import { debugPrint, waitFor } from "../helpers/utils";
-import test, { expect } from "../testFixtureCloneRecording";
+import test, { expect } from "../testFixture";
 
 test.use({ exampleKey: "rdt-react-versions/dist/index.html" });
 
@@ -27,7 +31,7 @@ test("react_devtools-03: process and display multiple React versions in page", a
 
   await openDevToolsTab(page);
 
-  await warpToMessage(page, "ExampleFinished");
+  await warpToLastMessage(page, "ExampleFinished");
 
   // If the "React" tab shows up, we know that the routine ran
   await openReactDevtoolsPanel(page);

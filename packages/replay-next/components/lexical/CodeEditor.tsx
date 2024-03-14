@@ -34,6 +34,8 @@ import {
   useRef,
 } from "react";
 
+import { useContentEditableNoUserSelect } from "replay-next/components/lexical/hooks/useContentEditableNoUserSelect";
+
 import LexicalEditorRefSetter from "./LexicalEditorRefSetter";
 import CodeCompletionPlugin from "./plugins/code-completion/CodeCompletionPlugin";
 import { Context } from "./plugins/code-completion/findMatches";
@@ -58,6 +60,7 @@ type Props = {
   context: Context;
   dataTestId?: string;
   dataTestName?: string;
+  disableSelectionWhenNotFocused?: boolean;
   editable: boolean;
   executionPoint: ExecutionPoint | null;
   forwardedRef?: ForwardedRef<ImperativeHandle>;
@@ -66,6 +69,7 @@ type Props = {
   onChange?: (markdown: string, editorState: SerializedEditorState) => void;
   onSave: (markdown: string, editorState: SerializedEditorState) => void;
   placeholder?: string;
+  preventTabFocusChange?: boolean;
   time: number;
 };
 
@@ -76,6 +80,7 @@ function CodeEditor({
   context,
   dataTestId,
   dataTestName,
+  disableSelectionWhenNotFocused,
   editable,
   executionPoint,
   forwardedRef,
@@ -84,6 +89,7 @@ function CodeEditor({
   onChange,
   onSave,
   placeholder = "",
+  preventTabFocusChange = false,
   time,
 }: Props): JSX.Element {
   const historyState = useMemo(() => createEmptyHistoryState(), []);
@@ -143,11 +149,9 @@ function CodeEditor({
   }, [editorRef, dataTestId, dataTestName]);
 
   const onFormCancel = (_: EditorState) => {
-    if (onCancel === undefined) {
-      return;
+    if (onCancel != undefined) {
+      onCancel();
     }
-
-    onCancel();
 
     const editor = editorRef.current;
     if (editor) {
@@ -157,7 +161,6 @@ function CodeEditor({
           editor.setEditorState(editorState);
         }
       });
-      editor.setEditable(false);
     }
   };
 
@@ -225,9 +228,16 @@ function CodeEditor({
     }
   };
 
+  const rootElementRef = useRef<HTMLDivElement>(null);
+
+  useContentEditableNoUserSelect(rootElementRef, {
+    autoFocus: autoFocus === true,
+    disableSelectionWhenNotFocused: disableSelectionWhenNotFocused === true,
+  });
+
   return (
     <LexicalComposer initialConfig={createInitialConfig(initialValue, editable)}>
-      <>
+      <div className={styles.Editor} ref={rootElementRef}>
         <LexicalEditorRefSetter editorRef={editorRef} />
         {autoFocus && <AutoFocusPlugin />}
         <HistoryPlugin externalHistoryState={historyState} />
@@ -237,7 +247,7 @@ function CodeEditor({
           ErrorBoundary={LexicalErrorBoundary}
         />
         <FormPlugin onCancel={onFormCancel} onChange={onFormChange} onSubmit={onFormSubmit} />
-        <CodePlugin />
+        <CodePlugin preventTabFocusChange={preventTabFocusChange} />
         <CodeCompletionPlugin
           context={context}
           dataTestId={dataTestId ? `${dataTestId}-CodeTypeAhead` : undefined}
@@ -245,7 +255,7 @@ function CodeEditor({
           executionPoint={executionPoint}
           time={time}
         />
-      </>
+      </div>
     </LexicalComposer>
   );
 }

@@ -5,6 +5,6 @@
 }
 
 .Node {
-  color: var(--color-brand);
+  color: var(--primary-accent);
   font-weight: bold;
 }

@@ -1,9 +1,9 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
+import { Button } from "replay-next/components/Button";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
 
-import { PrimaryLgButton } from "../Button";
 import { OnboardingActions, OnboardingBody, OnboardingHeader } from "../Onboarding/index";
 
 export function DownloadingPage({ onFinished }: { onFinished: () => void }) {
@@ -27,9 +27,9 @@ export function DownloadingPage({ onFinished }: { onFinished: () => void }) {
         {`Once the download is finished, install and open the Replay browser. We'll see you there!`}
       </OnboardingBody>
       <OnboardingActions>
-        <PrimaryLgButton color="blue" onClick={onFinished}>
+        <Button onClick={onFinished} size="large">
           Take me to my library
-        </PrimaryLgButton>
+        </Button>
       </OnboardingActions>
     </>
   );

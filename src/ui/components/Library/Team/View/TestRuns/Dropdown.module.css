@@ -1,0 +1,28 @@
+.dropdownTrigger {
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 0.375rem;
+  border: 1px solid var(--input-border);
+  background-color: var(--theme-text-field-bgcolor);
+  padding: 0.125rem 0.625rem;
+  font-size: 0.75rem;
+  color: var(--theme-text-field-color);
+  outline: none;
+  --ring-width: 3px;
+  --ring-color: var(--primary-accent);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.dropdownTrigger.disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+.dropdownTrigger:not(.disabled):focus {
+  box-shadow: 0 0 0 var(--ring-width) var(--ring-color);
+}

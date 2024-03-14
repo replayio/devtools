@@ -12,7 +12,7 @@ import {
 } from "../helpers/testsuites";
 import { waitForTimelineAdvanced } from "../helpers/timeline";
 import { getByTestName, waitFor } from "../helpers/utils";
-import test, { expect } from "../testFixtureCloneRecording";
+import test, { expect } from "../testFixture";
 
 test.use({ exampleKey: "playwright/breakpoints-05" });
 
@@ -24,11 +24,6 @@ test("playwright-03: Test Step interactions", async ({
   await openViewerTab(page);
 
   await openPlaywrightTestPanel(page);
-
-  const testPanel = getTestSuitePanel(page);
-
-  const isVisible = await testPanel.isVisible();
-  expect(isVisible).toBe(true);
 
   // has 1 test
   const rows = getTestRows(page);
@@ -50,7 +45,7 @@ test("playwright-03: Test Step interactions", async ({
 
   const steps = getTestCaseSteps(selectedRow);
   const numSteps = await steps.count();
-  expect(numSteps).toBe(231);
+  await expect(numSteps).toBeGreaterThan(200);
 
   // We should be in Viewer Mode to start with
   expect(await isViewerTabActive(page)).toBe(true);

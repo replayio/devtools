@@ -20,9 +20,7 @@ import { JumpToCodeButton, JumpToCodeStatus } from "ui/components/shared/JumpToC
 import { useJumpToSource } from "ui/components/TestSuite/hooks/useJumpToSource";
 import {
   TestEventDetailsEntry,
-  TestEventDomNodeDetails,
   testEventDetailsResultsCache,
-  testEventDomNodeCache,
 } from "ui/components/TestSuite/suspense/TestEventDetailsCache";
 import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext";
 import { getViewMode } from "ui/reducers/layout";
@@ -55,8 +53,9 @@ export default memo(function UserActionEventRow({
   userActionEvent: UserActionEvent;
 }) {
   const { data } = userActionEvent;
-  const { command, error, parentId, timeStampedPoints, resultVariable } = data;
-  const { result: resultTimeStampedPoint } = timeStampedPoints;
+  const testRunnerName = groupedTestCases.environment.testRunner.name;
+  const { command, error, parentId } = data;
+  const resultPoint = userActionEvent.data.timeStampedPoints.result;
 
   const replayClient = useContext(ReplayClientContext);
 
@@ -112,11 +111,7 @@ export default memo(function UserActionEventRow({
     dispatch(jumpToKnownEventListenerHit(onSeek, jumpToCodeAnnotation));
   };
 
-  const showBadge =
-    isSelected &&
-    command.name === "get" &&
-    resultVariable != null &&
-    resultTimeStampedPoint !== null;
+  const showBadge = isSelected && resultPoint !== null;
   const showJumpToCode = (isHovered || isSelected) && canShowJumpToCode;
 
   let jumpToCodeStatus: JumpToCodeStatus = "loading";
@@ -140,7 +135,7 @@ export default memo(function UserActionEventRow({
         }
 
         if (event === userActionEvent) {
-          return eventNumber;
+          return eventNumber < 10 ? `0${eventNumber}` : eventNumber;
         }
       }
     }
@@ -158,21 +153,23 @@ export default memo(function UserActionEventRow({
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className={styles.Text}>
-        {eventNumber != null ? <span className={styles.Number}>{eventNumber}</span> : null}
-        <span
-          className={`${styles.Name} ${styles.Name}`}
-          data-name={command.name}
-          title={command.name}
-        >
-          {command.name}
-        </span>{" "}
-        <span className={`${styles.Args} ${styles.Args}`} title={argsString}>
-          {argsString}
-        </span>
+        {eventNumber != null ? <div className={styles.Number}>{eventNumber}</div> : null}
+        <div className={styles.Event}>
+          <span
+            className={`${styles.Name} ${styles.Name}`}
+            data-name={command.name}
+            title={command.name}
+          >
+            {command.name}
+          </span>{" "}
+          <span className={`${styles.Args} ${styles.Args}`} title={argsString}>
+            {argsString}
+          </span>
+        </div>
       </div>
       {showBadge && (
         <Suspense fallback={<Loader />}>
-          <Badge isSelected={isSelected} timeStampedPoint={resultTimeStampedPoint} />
+          <Badge isSelected={isSelected} timeStampedPoint={resultPoint} />
         </Suspense>
       )}
       {showJumpToCode && jumpToCodeAnnotation && (

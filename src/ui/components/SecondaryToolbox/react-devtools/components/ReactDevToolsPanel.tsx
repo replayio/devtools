@@ -2,6 +2,7 @@ import { ExecutionPoint, PauseId } from "@replayio/protocol";
 import {
   KeyboardEvent,
   Suspense,
+  useCallback,
   useContext,
   useLayoutEffect,
   useMemo,
@@ -17,8 +18,9 @@ import {
 } from "react-resizable-panels";
 import AutoSizer from "react-virtualized-auto-sizer";
 
-import ErrorBoundary from "replay-next/components/ErrorBoundary";
+import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBoundary";
 import { PanelLoader } from "replay-next/components/PanelLoader";
+import { useDebounce } from "replay-next/src/hooks/useDebounce";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { InspectButton } from "ui/components/SecondaryToolbox/react-devtools/components/InspectButton";
 import { ReactDevToolsList } from "ui/components/SecondaryToolbox/react-devtools/components/ReactDevToolsList";
@@ -30,13 +32,14 @@ import { useReactDevToolsAnnotations } from "ui/components/SecondaryToolbox/reac
 import { useReplayWall } from "ui/components/SecondaryToolbox/react-devtools/hooks/useReplayWall";
 import { ReactDevToolsListData } from "ui/components/SecondaryToolbox/react-devtools/ReactDevToolsListData";
 import { getDefaultSelectedReactElementId } from "ui/reducers/app";
-import { getRecordingTooLongToSupportRoutines } from "ui/reducers/timeline";
+import { isPlaying as isPlayingSelector } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
 import {
   ParsedReactDevToolsAnnotation,
   reactDevToolsAnnotationsCache,
 } from "ui/suspense/annotationsCaches";
 
+import { ReactElement } from "../types";
 import styles from "./ReactDevToolsPanel.module.css";
 
 export function ReactDevToolsPanel({
@@ -75,9 +78,9 @@ function ReactDevToolsPanelInner({
   const [collapsedLeft, setCollapsedLeft] = useState(false);
   const [collapsedRight, setCollapsedRight] = useState(false);
   const [protocolCheckFailed, setProtocolCheckFailed] = useState(false);
-  const showRecordingTooLongWarning = useAppSelector(getRecordingTooLongToSupportRoutines);
 
   const defaultSelectedReactElementId = useAppSelector(getDefaultSelectedReactElementId);
+  const isPlaying = useAppSelector(isPlayingSelector);
 
   const leftPanelRef = useRef<ImperativePanelHandle>(null);
   const rightPanelRef = useRef<ImperativePanelHandle>(null);
@@ -102,6 +105,28 @@ function ReactDevToolsPanelInner({
   const selectedElement =
     listData && selectedIndex != null ? listData.getItemAtIndex(selectedIndex) : null;
 
+  const [debounceElementDetails, setDebounceElementDetails] = useState(false);
+  const selectedElementDebounced = useDebounce(selectedElement, 500);
+  const selectedElementForDetailsPanel = debounceElementDetails
+    ? selectedElementDebounced
+    : selectedElement;
+
+  const selectElementHighPriority = useCallback(
+    (element: ReactElement | null) => {
+      listData.selectElement(element);
+      setDebounceElementDetails(false);
+    },
+    [listData]
+  );
+
+  const selectElementLowPriority = useCallback(
+    (element: ReactElement | null) => {
+      listData.selectElement(element);
+      setDebounceElementDetails(true);
+    },
+    [listData]
+  );
+
   const hasReactMounted = useReactDevToolsAnnotations({
     annotations,
     executionPoint,
@@ -110,25 +135,17 @@ function ReactDevToolsPanelInner({
     wall,
   });
 
-  if (showRecordingTooLongWarning) {
+  if (isPlaying) {
     return (
-      <div className={styles.ProtocolFailedPanel} data-test-id="ReactDevToolsPanel">
-        <div className={styles.NotMountedYetMessage}>
-          <div>
-            React components are unavailable because this recording was too long to process them
-          </div>
-        </div>
+      <div className={styles.DisabledDuringPlaybackMessage} data-test-id="ReactDevToolsPanel">
+        This panel is disabled during playback.
       </div>
     );
-  }
-
-  if (!hasReactMounted) {
+  } else if (!hasReactMounted) {
     return (
-      <div className={styles.ProtocolFailedPanel} data-test-id="ReactDevToolsPanel">
-        <div className={styles.NotMountedYetMessage}>
-          <div>React application has not been mounted.</div>
-          <div>Try picking a different point on the timeline.</div>
-        </div>
+      <div className={styles.NotMountedYetMessage} data-test-id="ReactDevToolsPanel">
+        <div>React application has not been mounted.</div>
+        <div>Try picking a different point on the timeline.</div>
       </div>
     );
   }
@@ -163,13 +180,11 @@ function ReactDevToolsPanelInner({
 
   if (protocolCheckFailed) {
     return (
-      <div className={styles.ProtocolFailedPanel} data-test-id="ReactDevToolsPanel">
-        <div className={styles.ProtocolFailedMessage}>
-          <div>React DevTools could not be initialized.</div>
-          <div>
-            Try picking a different point on the timeline or reloading the page. If the problem
-            persists, try creating a new recording with the latest version of the Replay browser.
-          </div>
+      <div className={styles.ProtocolFailedMessage} data-test-id="ReactDevToolsPanel">
+        <div>React DevTools could not be initialized.</div>
+        <div>
+          Try picking a different point on the timeline or reloading the page. If the problem
+          persists, try creating a new recording with the latest version of the Replay browser.
         </div>
       </div>
     );
@@ -184,12 +199,13 @@ function ReactDevToolsPanelInner({
           defaultSize={65}
           id="tree"
           minSize={25}
-          onCollapse={setCollapsedLeft}
+          onCollapse={() => setCollapsedLeft(true)}
+          onExpand={() => setCollapsedLeft(false)}
           order={1}
           ref={leftPanelRef}
         >
           <div className={styles.LeftPanelTopRow}>
-            <InspectButton bridge={bridge} wall={wall} />
+            <InspectButton wall={wall} />
             <Search listData={listData} pauseId={pauseId} />
           </div>
 
@@ -201,7 +217,8 @@ function ReactDevToolsPanelInner({
                     bridge={bridge}
                     height={height}
                     listData={listData}
-                    pauseId={pauseId}
+                    selectElementHighPriority={selectElementHighPriority}
+                    selectElementLowPriority={selectElementLowPriority}
                     store={store}
                     wall={wall}
                     width={width}
@@ -219,27 +236,33 @@ function ReactDevToolsPanelInner({
           collapsible
           id="properties"
           minSize={25}
-          onCollapse={setCollapsedRight}
+          onCollapse={() => setCollapsedRight(true)}
+          onExpand={() => setCollapsedRight(false)}
           order={2}
           ref={rightPanelRef}
         >
-          {listData && pauseId && selectedElement ? (
-            <ErrorBoundary
-              fallback={<SelectedElementErrorBoundaryFallback element={selectedElement} />}
+          {listData && pauseId && selectedElementForDetailsPanel ? (
+            <InlineErrorBoundary
+              fallback={
+                <SelectedElementErrorBoundaryFallback element={selectedElementForDetailsPanel} />
+              }
               name="ReactDevToolsPanelProperties"
-              resetKey={`${pauseId}:${selectedElement.id}`}
+              resetKey={`${pauseId}:${selectedElementForDetailsPanel.id}`}
             >
-              <Suspense fallback={<SelectedElementLoader element={selectedElement} />}>
+              <Suspense
+                fallback={<SelectedElementLoader element={selectedElementForDetailsPanel} />}
+              >
                 <SelectedElement
                   bridge={bridge}
-                  element={selectedElement}
+                  element={selectedElementForDetailsPanel}
+                  isDebounceDelayed={selectedElementForDetailsPanel.id !== selectedElement?.id}
                   listData={listData}
                   pauseId={pauseId}
                   replayWall={wall}
                   store={store}
                 />
               </Suspense>
-            </ErrorBoundary>
+            </InlineErrorBoundary>
           ) : null}
         </Panel>
       </PanelGroup>

@@ -1,39 +1,54 @@
 import { ChatAltIcon } from "@heroicons/react/solid";
-import classnames from "classnames";
+import { useLayoutEffect, useRef } from "react";
 
-import { VisualComment } from "replay-next/components/sources/utils/comments";
-import { getCanvas, setHoveredCommentId, setSelectedCommentId } from "ui/actions/app";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { isVisualCommentTypeData } from "replay-next/components/sources/utils/comments";
+import { Comment } from "shared/graphql/types";
+import { setHoveredCommentId, setSelectedCommentId } from "ui/actions/app";
+import { state } from "ui/components/Video/imperative/MutableGraphicsState";
+import { useAppDispatch } from "ui/setup/hooks";
 
-const MARKER_DIAMETER = 28;
-const MARKER_RADIUS = 14;
+import styles from "./VideoComment.module.css";
 
 export default function VideoComment({
   comment,
   isHighlighted,
 }: {
-  comment: VisualComment;
+  comment: Comment;
   isHighlighted: boolean;
 }) {
   const dispatch = useAppDispatch();
 
-  const canvas = useAppSelector(getCanvas);
-  if (!canvas || !comment) {
+  const elementRef = useRef<HTMLDivElement>(null);
+
+  const { type, typeData } = comment;
+
+  useLayoutEffect(() => {
+    const element = elementRef.current;
+    if (element) {
+      // Imperatively position and scale these graphics to avoid "render lag" when resizes occur
+      return state.listen(state => {
+        const { height, width } = state.graphicsRect;
+        const { scaledX, scaledY } = typeData;
+
+        element.style.left = `${scaledX * width}px`;
+        element.style.top = `${scaledY * height}px`;
+      });
+    }
+  }, [type, typeData]);
+
+  if (!isVisualCommentTypeData(type, typeData)) {
     return null;
   }
 
-  const { scale } = canvas;
-
-  const { typeData } = comment;
-  if (typeData.pageX == null || typeData.pageY == null) {
+  const { scaledX, scaledY } = typeData;
+  if (scaledX === null || scaledY === null) {
     return null;
   }
-
-  const accentClassName = isHighlighted ? "bg-secondaryAccent" : "bg-primaryAccent";
 
   return (
     <div
-      className={`canvas-comment`}
+      className={styles.Marker}
+      data-active={isHighlighted || undefined}
       onClick={() => {
         dispatch(setSelectedCommentId(comment.id));
       }}
@@ -43,24 +58,9 @@ export default function VideoComment({
       onMouseLeave={() => {
         dispatch(setHoveredCommentId(null));
       }}
-      style={{
-        top: typeData.pageY * scale - MARKER_RADIUS,
-        left: typeData.pageX * scale - MARKER_RADIUS,
-      }}
+      ref={elementRef}
     >
-      <div
-        className="flex items-center justify-center"
-        style={{ width: `${MARKER_DIAMETER}px`, height: `${MARKER_DIAMETER}px` }}
-      >
-        <span
-          className={classnames(
-            accentClassName,
-            "relative inline-flex cursor-pointer rounded-full transition duration-300 ease-in-out"
-          )}
-          style={{ width: `${MARKER_DIAMETER}px`, height: `${MARKER_DIAMETER}px` }}
-        />
-        <ChatAltIcon className="pointer-events-none absolute h-3.5 w-3.5 text-white	" />
-      </div>
+      <ChatAltIcon className={styles.Icon} />
     </div>
   );
 }

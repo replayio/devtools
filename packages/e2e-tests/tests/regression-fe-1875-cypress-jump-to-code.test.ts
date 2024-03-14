@@ -2,7 +2,7 @@ import { openViewerTab, startTest } from "../helpers";
 import { waitForPaused } from "../helpers/pause-information-panel";
 import { getSelectedTestCase, getTestCaseSteps, openCypressTestPanel } from "../helpers/testsuites";
 import { waitForTimelineAdvanced } from "../helpers/timeline";
-import test, { expect } from "../testFixtureCloneRecording";
+import test, { expect } from "../testFixture";
 
 test.use({ exampleKey: "React Hook Form/conditionalField.cy.ts" });
 
@@ -15,7 +15,10 @@ test("fe-1875 :: verify that steps go to the right point in time", async ({
 
   await openCypressTestPanel(page);
 
-  await page.getByText("should reflect correct form state and data collection").click();
+  await page
+    .getByRole("listitem")
+    .getByText("should reflect correct form state and data collection")
+    .click();
 
   const selectedRow = getSelectedTestCase(page);
   const steps = getTestCaseSteps(selectedRow);
@@ -27,22 +30,22 @@ test("fe-1875 :: verify that steps go to the right point in time", async ({
   await clickableSteps.nth(0).click();
 
   let timelinePercent = await waitForTimelineAdvanced(page, 0);
-  expect(Math.round(timelinePercent)).toBe(67);
+  expect(Math.round(timelinePercent)).toBe(72);
 
-  page.click('[data-test-name="JumpToCode"]');
+  await page.click('[data-test-name="JumpToCode"]');
 
-  await waitForPaused(page, 658);
+  await waitForPaused(page, 652);
 
   await openCypressTestPanel(page);
   await clickableSteps.nth(2).click();
 
   timelinePercent = await waitForTimelineAdvanced(page, timelinePercent + 1);
-  expect(Math.round(timelinePercent)).toBe(74);
+  expect(Math.round(timelinePercent)).toBe(79);
 
-  await waitForPaused(page, 201);
+  await waitForPaused(page, 227);
 
   await openCypressTestPanel(page);
-  page.click('[data-test-name="JumpToCode"]');
+  await page.click('[data-test-name="JumpToCode"]');
 
-  await waitForPaused(page, 1060);
+  await waitForPaused(page, 1019);
 });

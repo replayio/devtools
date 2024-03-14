@@ -25,7 +25,7 @@
   font-size: var(--font-size-regular);
 }
 .FilterInput:focus {
-  border-color: var(--color-brand);
+  border-color: var(--primary-accent);
 }
 .FilterInput:disabled {
   opacity: 0.5;

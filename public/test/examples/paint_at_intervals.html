@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+  <head>
+    <script>
+      console.log("Before first paint");
+    </script>
+  </head>
+  <body>
+    <script>
+      function callAfterPaint(callback) {
+        requestAnimationFrame(() => {
+          setTimeout(() => {
+            callback();
+          });
+        });
+      }
+
+      callAfterPaint(() => console.log("Mount"));
+
+      // Generates 3 paints at 1 second intervals
+      const interval = 1_000;
+      const fillColors = [
+        0xFF0000,
+        0x00FF00,
+        0x0000FF,
+      ];
+
+      let index = 0;
+
+      function paint() {
+        if (index >= fillColors.length) {
+          console.log("ExampleFinished");
+
+          return;
+        }
+
+        const fillColor = fillColors[index];
+        const hex = `#${fillColor.toString(16).padStart(6, '0')}`;
+
+        index++;
+
+        console.log('painting', index, hex);
+
+        document.body.style.backgroundColor = hex;
+
+        callAfterPaint(() => {
+          console.log('painted', index, hex);
+
+          schedule();
+        });
+      }
+
+      function schedule() {
+        setTimeout(() => {
+          paint();
+        }, interval);
+      }
+
+      schedule();
+    </script>
+  </body>
+</html>

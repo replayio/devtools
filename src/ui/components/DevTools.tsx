@@ -10,22 +10,23 @@ import {
 import InspectorContextReduxAdapter from "devtools/client/debugger/src/components/shared/InspectorContextReduxAdapter";
 // eslint-disable-next-line no-restricted-imports
 import { client } from "protocol/socket";
+import { SupportForm } from "replay-next/components/errors/SupportForm";
 import { ExpandablesContextRoot } from "replay-next/src/contexts/ExpandablesContext";
 import { PointsContextRoot } from "replay-next/src/contexts/points/PointsContext";
 import { SelectedFrameContextRoot } from "replay-next/src/contexts/SelectedFrameContext";
-import { useIsRecordingProcessed } from "replay-next/src/hooks/useIsRecordingProcessed";
 import usePreferredFontSize from "replay-next/src/hooks/usePreferredFontSize";
 import { setDefaultTags } from "replay-next/src/utils/telemetry";
+import { ReplayClientInterface } from "shared/client/types";
 import { getTestEnvironment } from "shared/test-suites/RecordingTestMetadata";
 import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { userData } from "shared/user-data/GraphQL/UserData";
-import { setAccessToken } from "ui/actions/app";
-import { clearTrialExpired, createSocket } from "ui/actions/session";
+import { getProcessing, setAccessToken } from "ui/actions/app";
+import { setShowSupportForm } from "ui/actions/layout";
+import { createSocket } from "ui/actions/session";
 import { DevToolsDynamicLoadingMessage } from "ui/components/DevToolsDynamicLoadingMessage";
-import { DevToolsProcessingScreen } from "ui/components/DevToolsProcessingScreen";
+import { NodePickerContextRoot } from "ui/components/NodePickerContext";
 import { RecordingDocumentTitle } from "ui/components/RecordingDocumentTitle";
 import TerminalContextAdapter from "ui/components/SecondaryToolbox/TerminalContextAdapter";
-import { SupportForm } from "ui/components/SupportForm";
 import { TestSuiteContextRoot } from "ui/components/TestSuite/views/TestSuiteContext";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { useTrackLoadingIdleTime } from "ui/hooks/tracking";
@@ -43,6 +44,7 @@ import useAuth0 from "ui/utils/useAuth0";
 
 import { selectors } from "../reducers";
 import { CommandPaletteModal } from "./CommandPalette/CommandPaletteModal";
+import { DevToolsProcessingScreen } from "./DevToolsProcessingScreen";
 import FocusContextReduxAdapter from "./FocusContextReduxAdapter";
 import Header from "./Header/index";
 import KeyboardShortcuts from "./KeyboardShortcuts";
@@ -56,11 +58,15 @@ import SidePanel from "./SidePanel";
 import SourcesContextAdapter from "./SourcesContextAdapter";
 import Timeline from "./Timeline/Timeline";
 import Toolbar from "./Toolbar";
-import Video from "./Video";
+import Video from "./Video/Video";
 
 const Viewer = React.lazy(() => import("./Viewer"));
 
-type DevToolsProps = PropsFromRedux & { apiKey?: string; uploadComplete: boolean };
+type DevToolsProps = PropsFromRedux & {
+  apiKey?: string;
+  replayClient: ReplayClientInterface;
+  uploadComplete: boolean;
+};
 
 function ViewLoader() {
   const [showLoader, setShowLoader] = useState(false);
@@ -116,7 +122,8 @@ function Body() {
             defaultSize={20}
             id="Panel-SidePanel"
             minSize={15}
-            onCollapse={onSidePanelCollapse}
+            onCollapse={() => onSidePanelCollapse(true)}
+            onExpand={() => onSidePanelCollapse(false)}
             ref={sidePanelRef}
           >
             <SidePanel />
@@ -143,9 +150,9 @@ function Body() {
 
 function _DevTools({
   apiKey,
-  clearTrialExpired,
   createSocket,
   loadingFinished,
+  replayClient,
   sessionId,
   showCommandPalette,
   showSupportForm,
@@ -157,9 +164,8 @@ function _DevTools({
   const { recording } = useGetRecording(recordingId);
   const { trackLoadingIdleTime } = useTrackLoadingIdleTime(uploadComplete, recording);
   const { userIsAuthor, loading } = useUserIsAuthor();
-  const { id: userId, email: userEmail, loading: userLoading } = useGetUserInfo();
-
-  const isProcessed = useIsRecordingProcessed(recording);
+  const { id: userId, email: userEmail, loading: userLoading, name: userName } = useGetUserInfo();
+  const processing = useAppSelector(getProcessing);
 
   const isExternalRecording = useMemo(
     () => recording?.user && !recording.user.internal,
@@ -219,11 +225,7 @@ function _DevTools({
       .catch(() => {
         console.error("Failed to create session");
       });
-
-    return () => {
-      clearTrialExpired();
-    };
-  }, [dispatch, isAuthenticated, clearTrialExpired, createSocket, recordingId]);
+  }, [dispatch, isAuthenticated, createSocket, recordingId]);
 
   useEffect(() => {
     if (uploadComplete && loadingFinished) {
@@ -258,8 +260,12 @@ function _DevTools({
     }
   }, [recording, userId, userEmail, userLoading]);
 
+  const dismissSupportForm = () => {
+    dispatch(setShowSupportForm(false));
+  };
+
   if (!loadingFinished) {
-    return isProcessed ? <DevToolsDynamicLoadingMessage /> : <DevToolsProcessingScreen />;
+    return processing ? <DevToolsProcessingScreen /> : <DevToolsDynamicLoadingMessage />;
   }
 
   return (
@@ -268,26 +274,38 @@ function _DevTools({
         <FocusContextReduxAdapter>
           <PointsContextRoot>
             <TimelineContextAdapter>
-              <TestSuiteContextRoot>
-                <SelectedFrameContextRoot SelectedFrameContextAdapter={SelectedFrameContextAdapter}>
-                  <TerminalContextAdapter>
-                    <InspectorContextReduxAdapter>
-                      <ExpandablesContextRoot>
-                        <LayoutContextAdapter>
-                          <KeyModifiers>
-                            <RecordingDocumentTitle />
-                            <Header />
-                            <Body />
-                            {showCommandPalette ? <CommandPaletteModal /> : null}
-                            {showSupportForm ? <SupportForm /> : null}
-                            <KeyboardShortcuts />
-                          </KeyModifiers>
-                        </LayoutContextAdapter>
-                      </ExpandablesContextRoot>
-                    </InspectorContextReduxAdapter>
-                  </TerminalContextAdapter>
-                </SelectedFrameContextRoot>
-              </TestSuiteContextRoot>
+              <NodePickerContextRoot>
+                <TestSuiteContextRoot>
+                  <SelectedFrameContextRoot
+                    SelectedFrameContextAdapter={SelectedFrameContextAdapter}
+                  >
+                    <TerminalContextAdapter>
+                      <InspectorContextReduxAdapter>
+                        <ExpandablesContextRoot>
+                          <LayoutContextAdapter>
+                            <KeyModifiers>
+                              <RecordingDocumentTitle />
+                              <Header />
+                              <Body />
+                              {showCommandPalette ? <CommandPaletteModal /> : null}
+                              {showSupportForm ? (
+                                <SupportForm
+                                  currentUserEmail={userEmail}
+                                  currentUserId={userId}
+                                  currentUserName={userName}
+                                  onDismiss={dismissSupportForm}
+                                  replayClient={replayClient}
+                                />
+                              ) : null}
+                              <KeyboardShortcuts />
+                            </KeyModifiers>
+                          </LayoutContextAdapter>
+                        </ExpandablesContextRoot>
+                      </InspectorContextReduxAdapter>
+                    </TerminalContextAdapter>
+                  </SelectedFrameContextRoot>
+                </TestSuiteContextRoot>
+              </NodePickerContextRoot>
             </TimelineContextAdapter>
           </PointsContextRoot>
         </FocusContextReduxAdapter>
@@ -305,7 +323,6 @@ const connector = connect(
   }),
   {
     createSocket,
-    clearTrialExpired,
   }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;

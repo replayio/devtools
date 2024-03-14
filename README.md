@@ -26,7 +26,7 @@ cp .env.sample .env
 yarn dev
 ```
 
-Once you see `Compiled succesfully` in your terminal, open your browser and go to [this link](http://localhost:8080/recording/overboard--5fea8bd7-b755-42d4-8941-e915430137ba).
+Once you see `Compiled succesfully` in your terminal, open your browser and go to [this link](http://localhost:8080/recording/overboard--a616009e-b825-4c54-83b4-e20bd8c0cb25).
 
 **You just successfully opened your first Replay recording!** That recording uses your locally running copy of Replay DevTools to debug our test recording.
 
@@ -47,31 +47,10 @@ Anyone is welcome to contribute to the project! If you're just getting started w
 To run the end-to-end tests make sure that devtools is running locally on port 8080 and run:
 
 ```
-node test/run.js [--pattern pat]
-```
+cd packages/e2e-tests
 
-To run the mock tests:
-
-```
-node test/mock/run.js [--pattern pat]
-```
-
-To run the unit tests:
-
-```
 yarn test
 ```
-
-Note that any options passed after `--` will be passed on to the test runner (jest). So, if you wanted jest to watch the project for changes and run tests when files were saved you could run:
-
-```
-yarn test --watch
-```
-
-#### Running tests in VS Code
-
-Install the [Mocha Test Explorer](https://marketplace.visualstudio.com/items?itemName=hbenl.vscode-mocha-test-adapter) for the e2e and mock tests and [Jest Test Explorer](https://marketplace.visualstudio.com/items?itemName=kavod-io.vscode-jest-test-adapter) for the unit tests.
-You can set environment variables to be used in e2e or mock tests by adding them to the `mochaExplorer.env` setting in `.vscode/settings.json`.
 
 #### Running tests against local builds of the browser
 

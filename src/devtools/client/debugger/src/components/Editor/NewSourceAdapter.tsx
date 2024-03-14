@@ -1,6 +1,6 @@
 import { KeyboardEvent, useContext, useEffect, useLayoutEffect, useRef } from "react";
 
-import LazyOffscreen from "replay-next/components/LazyOffscreen";
+import LazyActivity from "replay-next/components/LazyActivity";
 import Source from "replay-next/components/sources/Source";
 import { SourceFileNameSearchContextRoot } from "replay-next/components/sources/SourceFileNameSearchContext";
 import SourceSearch from "replay-next/components/sources/SourceSearch";
@@ -71,7 +71,7 @@ function NewSourceAdapter() {
       focusedSource?.startLineIndex !== lineIndex ||
       !locationHasScrolled
     ) {
-      openSource("view-source", location.sourceId, lineIndex, lineIndex, columnNumber);
+      openSource("view-source", location.sourceId, lineIndex, lineIndex, columnNumber, false);
     }
   }, [focusedSource, location, locationHasScrolled, openSource]);
 
@@ -153,9 +153,9 @@ function NewSourceAdapter() {
       {activeSourceIds.map(sourceId => {
         const source = getSourceSuspends(replayClient, sourceId);
         return (
-          <LazyOffscreen key={sourceId} mode={sourceId === focusedSourceId ? "visible" : "hidden"}>
+          <LazyActivity key={sourceId} mode={sourceId === focusedSourceId ? "visible" : "hidden"}>
             <Source source={source!} />
-          </LazyOffscreen>
+          </LazyActivity>
         );
       })}
       {sourceSearchState.enabled && (

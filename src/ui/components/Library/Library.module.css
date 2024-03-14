@@ -37,18 +37,6 @@
   border-bottom: 1px solid var(--chrome);
 }
 
-:root:global(.theme-dark) .editButton {
-  background-color: var(--theme-base-80);
-  color: #fff;
-  border: none;
-}
-
-:root:global(.theme-dark) .editButton:hover {
-  background-color: var(--primary-accent-hover);
-  color: #fff;
-  border: none;
-}
-
 :root:global(.theme-dark) .recordingsBackground {
   background-color: transparent;
   color: var(--body-color);
@@ -61,11 +49,6 @@
 
 :root:global(.theme-dark) .workspaceName {
   color: #fff;
-}
-
-:root:global(.theme-dark) .runOverview {
-  color: var(--body-color);
-  background-color: var(--body-bgcolor);
 }
 
 /* Light */
@@ -107,15 +90,6 @@
   border-bottom: 1px solid var(--theme-base-90);
 }
 
-:root:global(.theme-light) .editButton {
-  background-color: #fff;
-}
-
-:root:global(.theme-light) .editButton:hover {
-  background-color: var(--primary-accent-hover);
-  color: #fff;
-}
-
 :root:global(.theme-light) .recordingsBackground {
   background-color: transparent;
   color: var(--body-color);
@@ -128,129 +102,6 @@
 
 :root:global(.theme-light) .workspaceName {
   color: var(--body-color);
-}
-
-:root:global(.theme-light) .runOverview {
-  background-color: var(--theme-base-100);
-  color: var(--body-color);
-}
-
-.recordingLink {
-  display: flex;
-  width: 100%;
-  flex-grow: 1;
-  cursor: pointer;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  overflow: hidden;
-  transition: all 0.15s ease-in-out;
-}
-
-.linkContent {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 1rem;
-}
-
-.icon {
-  margin-left: 2rem;
-  height: 1rem;
-  width: 1rem;
-}
-
-.iconWrapper {
-  display: flex;
-  cursor: pointer;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.15s ease-in-out;
-}
-
-.iconMotion {
-  margin: auto;
-  height: 1.5rem;
-  width: 1.5rem;
-  border-radius: 50%;
-}
-
-.fileInfo {
-  display: flex;
-  flex-shrink: 1;
-  flex-grow: 1;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.title {
-  display: block;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.filePath {
-  display: block;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  color: var(--color-dimmer);
-  font-size: 0.75rem;
-}
-
-.comments {
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
-  flex-direction: row;
-  gap: 1rem;
-  color: var(--body-color);
-}
-
-.commentIcon {
-  width: 1rem;
-}
-
-.libraryRow {
-}
-
-.testsuitesSuccess {
-  background-color: var(--testsuites-success-color);
-}
-
-.failed {
-  color: var(--testsuites-failed-color);
-}
-
-.flaky {
-  color: var(--testsuites-flaky-color);
-}
-
-.passed {
-  color: var(--testsuites-success-color);
-}
-
-.flakyPill {
-  color: var(--theme-base-100);
-  background-color: var(--testsuites-flaky-color);
-}
-
-.failedPill {
-  color: var(--theme-base-100);
-  background-color: var(--testsuites-failed-color);
-}
-
-.successPill {
-  color: var(--theme-base-100);
-  background-color: var(--testsuites-success-color);
-  border-radius: 50%;
-}
-
-.FilterTestsFilter {
-  border: 1px solid var(--input-border);
-  background-color: var(--body-bgcolor);
 }
 
 .dropdownTrigger {
@@ -273,46 +124,4 @@
 
 .dropdownTrigger:focus {
   box-shadow: 0 0 0 var(--ring-width) var(--ring-color);
-}
-
-.testTitle {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.25rem;
-  border-bottom: 1px solid var(--theme-border);
-  padding: 0.93rem 1rem;
-}
-
-.testTitle > div {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 1.125rem;
-  font-weight: 500;
-}
-
-.replayRow {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  border-bottom: 1px solid var(--chrome);
-  padding: 0.625rem 1rem;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.replayListTitle {
-  padding: 0.5rem 1rem 0.08rem;
-  font-size: 1.125rem;
-}
-
-.labelText {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-weight: 500;
 }

@@ -1,12 +1,4 @@
-import {
-  ExecutionPoint,
-  KeyboardEvent,
-  KeyboardEventKind,
-  MouseEvent,
-  MouseEventKind,
-  NavigationEvent,
-  SessionId,
-} from "@replayio/protocol";
+import { SessionId } from "@replayio/protocol";
 
 import type { RecordingTarget } from "replay-next/src/suspense/BuildIdCache";
 import { Reply, Workspace } from "shared/graphql/types";
@@ -78,55 +70,27 @@ export type NodePickerStatus = "disabled" | "initializing" | "active";
 
 export interface AppState {
   accessToken: string | null;
-  activeNodePicker: NodePickerType | null;
   awaitingSourcemaps: boolean;
-  canvas: Canvas | null;
   defaultSelectedReactElementId: number | null;
   defaultSettingsTab: SettingsTabTitle;
   displayedLoadingProgress: number | null;
-  events: Events;
   expectedError: ExpectedError | null;
   hoveredCommentId: string | null;
   loading: number;
   loadingFinished: boolean;
-  nodePickerStatus: NodePickerStatus;
   modal: ModalType | null;
   modalOptions: ModalOptionsType;
   mode: AppMode;
-  mouseTargetsLoading: boolean;
+  processing: boolean | null;
+  processingProgress: number | null;
   recordingId: string | null;
   recordingTarget: RecordingTarget | null;
   recordingWorkspace: Workspace | null;
   selectedCommentId: string | null;
   sessionId: SessionId | null;
-  trialExpired: boolean;
   unexpectedError: UnexpectedError | null;
   uploading: UploadInfo | null;
-  videoUrl: string | null;
   workspaceId: WorkspaceId | null;
 }
 
 export type AppMode = "devtools" | "sourcemap-visualizer";
-
-interface Events {
-  [key: string]: ReplayEvent[];
-}
-
-// Todo: We should move this deifnition to the protocol instead of typing it here.
-export type ReplayNavigationEvent = Omit<NavigationEvent, "kind"> & {
-  kind: "navigation";
-};
-
-export type ReplayEvent = MouseEvent | KeyboardEvent | ReplayNavigationEvent;
-
-export type EventCategory = "mouse" | "keyboard" | "navigation";
-export type EventKind = MouseEventKind | KeyboardEventKind | string;
-
-export interface Canvas {
-  gDevicePixelRatio: number;
-  height: number;
-  left: number;
-  scale: number;
-  top: number;
-  width: number;
-}

@@ -1,5 +1,6 @@
 import { UIEvent, useContext, useLayoutEffect, useRef, useState } from "react";
 
+import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBoundary";
 import useGetDefaultLogPointContent from "replay-next/components/sources/hooks/useGetDefaultLogPointContent";
 import HoverButton from "replay-next/components/sources/HoverButton";
 import useSourceContextMenu from "replay-next/components/sources/useSourceContextMenu";
@@ -121,7 +122,7 @@ export function SourceListRowMouseEvents({
     committedValuesRef.current.toggleBreakpoint = toggleBreakpoint;
   });
 
-  // Use a layout effect rather than a passive effect so event listeners will be removed if the parent Offscreen is hidden
+  // Use a layout effect rather than a passive effect so event listeners will be removed if the parent Activity is hidden
   useLayoutEffect(() => {
     const rowElement = document.querySelector(
       `[data-test-source-id="${sourceId}"] [data-test-name="SourceLine"][data-test-line-number="${lineNumber}"]`
@@ -233,17 +234,19 @@ export function SourceListRowMouseEvents({
       )}
 
       {!isLineNumberHovered && isRowHovered && (
-        <HoverButton
-          addPoint={addPoint}
-          deletePoints={deletePoints}
-          editPendingPointText={editPendingPointText}
-          editPointBehavior={editPointBehavior}
-          lineHitCounts={lineHitCounts}
-          lineNumber={lineNumber}
-          point={pointForDefaultPriority}
-          pointBehavior={pointBehavior}
-          source={source}
-        />
+        <InlineErrorBoundary name="SourceListRowMouseEvents-HoverButton" fallback={null}>
+          <HoverButton
+            addPoint={addPoint}
+            deletePoints={deletePoints}
+            editPendingPointText={editPendingPointText}
+            editPointBehavior={editPointBehavior}
+            lineHitCounts={lineHitCounts}
+            lineNumber={lineNumber}
+            point={pointForDefaultPriority}
+            pointBehavior={pointBehavior}
+            source={source}
+          />
+        </InlineErrorBoundary>
       )}
 
       {contextMenu}

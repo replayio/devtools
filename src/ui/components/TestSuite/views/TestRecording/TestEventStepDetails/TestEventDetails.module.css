@@ -1,0 +1,140 @@
+.Container {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 0 0.75rem 0.75rem;
+  font-family: var(--font-family-monospace);
+}
+
+.Message {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+  color: var(--color-dim);
+  padding: 0 0.75rem;
+}
+
+.UserActionEventDetails {
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 0.5rem;
+}
+
+.UserActionEventDetails[data-is-pending] {
+  opacity: 0.5;
+}
+
+.DetailsTitle {
+  font-size: var(--font-size-small);
+  color: var(--color-dimmer);
+  text-transform: uppercase;
+  font-weight: bold;
+  line-height: 2rem;
+  padding-left: 0.75rem;
+}
+
+.CallStack {
+  display: flex;
+  flex-direction: column;
+  margin: 0 0.5rem;
+  overflow: auto;
+  flex: 0 0 auto;
+  max-height: 20%;
+}
+
+.StackFrame {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: row;
+  gap: 1ch;
+  font-family: var(--font-family-monospace);
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  background-color: var(--testsuites-stack-frame-background-color);
+}
+.StackFrame:hover {
+  background-color: var(--testsuites-stack-frame-background-color-hover);
+}
+.StackFrame[data-selected] {
+  background-color: var(--testsuites-stack-frame-background-color-active);
+}
+
+.StackFrameFunction,
+.StackFrameAnonymousFunction {
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: var(--font-size-regular);
+}
+.StackFrameAnonymousFunction {
+  color: var(--color-dimmer);
+}
+
+.StackFrameLocation {
+  flex: 0 1 hidden;
+  font-size: var(--font-size-small);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  direction: rtl;
+}
+
+.SourceCodeContainer {
+  display: block;
+  margin: 0 0.5rem;
+  padding: 0.5rem 0;
+  background: var(--chrome);
+  overflow: auto;
+  border-radius: 0.25rem;
+}
+
+.SourceCodeLine,
+.SourceCodeLineSelected {
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+  padding: 0 0.5rem;
+}
+.SourceCodeLineSelected {
+  background-color: var(--background-color-current-execution-point);
+}
+
+.TabsContainer {
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+
+.Tabs {
+  display: flex;
+  background: var(--tab-bgcolor);
+  border-bottom: 1px solid var(--theme-splitter-color);
+  flex: 0 0 auto;
+}
+
+.Tab {
+  padding: 0.5rem;
+  border-bottom-color: transparent;
+  background-color: var(--tab-bgcolor);
+  color: var(--tab-color);
+}
+.Tab[data-active] {
+  background-color: var(--tab-selected-bgcolor);
+  color: var(--tab-selected-color);
+  cursor: default;
+}
+.Tab:hover:not(.Tab[data-active]) {
+  background-color: var(--tab-hover-bgcolor);
+  color: var(--tab-hover-color);
+}
+.Tab:focus {
+  outline: none;
+}
+
+.Panel {
+  height: 100%;
+  flex: 1 1 auto;
+}

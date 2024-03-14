@@ -84,6 +84,33 @@ export async function mapLocators<T>(
   );
 }
 
+export async function getSupportFormErrorDetails(page: Page) {
+  if (await page.locator('[data-test-id="UnexpectedErrorDetails"]').isVisible()) {
+    try {
+      const expandableLocator = page.locator('[data-test-name="ExpandablePreview"]');
+      if (await expandableLocator.isVisible()) {
+        await expandableLocator.click();
+        return await page.locator('[data-test-name="ErrorDetails"]').innerText();
+      }
+    } catch (err) {
+      // Ignore locator errors.
+      console.error(`ERROR:`, err);
+    }
+    return "(unexpected error modal is visible)";
+  }
+  return null;
+}
+
+export class UnrecoverableError extends Error {
+  constructor(message?: string) {
+    super(message);
+  }
+
+  get isUnrecoverable() {
+    return true;
+  }
+}
+
 export async function waitForRecordingToFinishIndexing(page: Page): Promise<void> {
   await debugPrint(
     page,
@@ -92,9 +119,23 @@ export async function waitForRecordingToFinishIndexing(page: Page): Promise<void
   );
 
   const timelineCapsuleLocator = page.locator('[data-test-id="Timeline-Capsule"]');
+
+  let supportFormErrorDetails: string | null = null;
   await waitFor(
     async () => {
-      await expect(await timelineCapsuleLocator.getAttribute("data-test-progress")).toBe("100");
+      supportFormErrorDetails = await getSupportFormErrorDetails(page);
+      if (supportFormErrorDetails) {
+        throw new UnrecoverableError(`Session failed: ${supportFormErrorDetails}`);
+      }
+
+      if (await timelineCapsuleLocator.isVisible()) {
+        expect(
+          await timelineCapsuleLocator.getAttribute("data-test-progress"),
+          "Recording did not finish loading"
+        ).toBe("100");
+      } else {
+        throw new Error("Recording did not finish processing");
+      }
     },
     {
       retryInterval: 1_000,
@@ -139,27 +180,49 @@ export async function waitFor(
     timeout?: number;
   } = {}
 ): Promise<void> {
-  const { retryInterval = 250, timeout = 5_000 } = options;
+  const { retryInterval = 250, timeout = 10_000 } = options;
 
   const startTime = performance.now();
 
+  const consoleLog = console.log;
+
   while (true) {
+    // This loop tries failing code many times before giving up.
+    // It's noisy to log expect() failures on every attempt,
+    // so we suppress them for all but the last attempt.
+    const messages: any[] = [];
+    console.log = (...rest) => messages.push(rest);
+
     try {
       await callback();
 
       return;
-    } catch (error) {
-      if (typeof error === "string") {
-        console.log(error);
+    } catch (error: any) {
+      if (error?.message?.includes("crash")) {
+        // We have to resort to heuristics since:
+        // 1. We don't have access to the `Page` object, and
+        // 2. the Error object also has no special properties.
+        throw error;
+      }
+      if (error?.isUnrecoverable) {
+        // We sometimes don't want to keep trying.
+        throw error;
+      }
+      if (!error?.matcherResult) {
+        // Not an `expect` error: → Log it.
+        console.log("ERROR:", error?.stack || error);
       }
 
       if (performance.now() - startTime > timeout) {
+        messages.forEach(args => consoleLog(...args));
         throw error;
       }
 
       await delay(retryInterval);
 
       continue;
+    } finally {
+      console.log = consoleLog;
     }
   }
 }
@@ -186,12 +249,13 @@ export async function locatorTextToNumber(locator: Locator): Promise<number | nu
   return trimmed ? parseInt(trimmed) : null;
 }
 
-export async function resetTestUser(email: string) {
+export async function resetTestUser(email: string, testScope: string) {
   const variables = { email, secret: process.env.AUTOMATED_TEST_SECRET };
 
   return axios({
     url: config.graphqlUrl,
     method: "POST",
+    headers: { "replay-test-scope": testScope },
     data: {
       query: `
         mutation resetTestUser($email: String!, $secret: String!) {
@@ -200,70 +264,6 @@ export async function resetTestUser(email: string) {
           }
         }
       `,
-      variables,
-    },
-  });
-}
-
-export async function cloneTestRecording(recordingId: string): Promise<string> {
-  if (!process.env.AUTHENTICATED_TESTS_WORKSPACE_API_KEY) {
-    throw new Error(
-      "AUTHENTICATED_TESTS_WORKSPACE_API_KEY must be set in order to clone test recordings."
-    );
-  }
-
-  const variables = { recordingId, secret: process.env.AUTOMATED_TEST_SECRET };
-
-  var startTime = performance.now();
-  const clonedRecording = await axios({
-    url: config.graphqlUrl,
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${process.env.AUTHENTICATED_TESTS_WORKSPACE_API_KEY}`,
-    },
-    data: {
-      query: `
-        mutation cloneTestRecording($recordingId: UUID!, $secret: String!) {
-          cloneTestRecording(input: { recordingId: $recordingId, secret: $secret }) {
-            recordingId
-          }
-        }
-      `,
-      variables,
-    },
-  });
-  var endTime = performance.now();
-  const timeInSecs = (endTime - startTime) / 1000;
-  if (timeInSecs > 10) {
-    console.warn(`Cloning took ${timeInSecs} seconds.`);
-  }
-
-  return clonedRecording.data.data.cloneTestRecording.recordingId;
-}
-
-export async function deleteTestRecording(recordingId: string) {
-  if (!process.env.AUTHENTICATED_TESTS_WORKSPACE_API_KEY) {
-    throw new Error(
-      "AUTHENTICATED_TESTS_WORKSPACE_API_KEY must be set in order to delete test recordings."
-    );
-  }
-
-  const variables = { recordingId, secret: process.env.AUTOMATED_TEST_SECRET };
-
-  return axios({
-    url: config.graphqlUrl,
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${process.env.AUTHENTICATED_TESTS_WORKSPACE_API_KEY}`,
-    },
-    data: {
-      query: `
-          mutation deleteTestRecording($recordingId: UUID!, $secret: String!) {
-            deleteTestRecording(input: { recordingId: $recordingId, secret: $secret }) {
-              success
-            }
-          }
-        `,
       variables,
     },
   });

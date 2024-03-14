@@ -50,6 +50,13 @@ describe("getExpressionForTokenElement", () => {
     expect(getExpressionHelper("1|23")).toBe(null);
     expect(getExpressionHelper("tr|ue")).toBe(null);
     expect(getExpressionHelper("fals|e")).toBe(null);
+
+    expect(getExpressionHelper("/|(abd)+/g")).toBe(null);
+    expect(getExpressionHelper("/(|abd)+/g")).toBe(null);
+    expect(getExpressionHelper("/(a|bd)+/g")).toBe(null);
+    expect(getExpressionHelper("/(abd)|+/g")).toBe(null);
+    expect(getExpressionHelper("/(abd)+|/g")).toBe(null);
+    expect(getExpressionHelper("/(abd)+/|g")).toBe(null);
   });
 
   it("should parse simple expressions", () => {
@@ -120,5 +127,33 @@ describe("getExpressionForTokenElement", () => {
   // FE-1735
   it("should support instance properties", () => {
     expect(getExpressionHelper("this.ar|ray")).toBe("this.array");
+  });
+
+  // FE-2253
+  it("should support the optional chaining operator", () => {
+    expect(getExpressionHelper("object?.p|roperty")).toBe("object?.property");
+    expect(getExpressionHelper("object?.propert|y")).toBe("object?.property");
+    expect(getExpressionHelper("object?.property|")).toBe("object?.property");
+  });
+
+  // FE-2314
+  it("should support chained querySelector calls", () => {
+    expect(getExpressionHelper('foo, func("abc").p|rop')).toBe('func("abc").prop');
+    expect(getExpressionHelper("foo, func(123).p|rop")).toBe("func(123).prop");
+    expect(getExpressionHelper("foo, func(true).p|rop")).toBe("func(true).prop");
+
+    // Complex case
+    expect(getExpressionHelper('foo, func([true, 123, "abc"]).p|rop')).toBe(
+      'func([true, 123, "abc"]).prop'
+    );
+
+    // Another complex case
+    expect(getExpressionHelper("/(/g.f|lags")).toBe("/(/g.flags");
+    expect(getExpressionHelper('new RegExp("([])", "g").fl|ags')).toBe('RegExp("([])", "g").flags');
+    expect(getExpressionHelper('new RegExp("([])").fla|gs')).toBe('RegExp("([])").flags');
+  });
+
+  it("should support strings containing special characters", () => {
+    expect(getExpressionHelper('foo, func("([])").p|rop')).toBe('func("([])").prop');
   });
 });

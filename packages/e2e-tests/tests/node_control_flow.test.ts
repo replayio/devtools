@@ -2,7 +2,7 @@ import { startTest } from "../helpers";
 import { resumeToLine, rewindToLine } from "../helpers/pause-information-panel";
 import { openSource, openSourceExplorerPanel } from "../helpers/source-explorer-panel";
 import { addBreakpoint } from "../helpers/source-panel";
-import test, { Page } from "../testFixtureCloneRecording";
+import test, { Page } from "../testFixture";
 
 async function resumeToBreakpoint(page: Page, line: number) {
   await addBreakpoint(page, { url: "control_flow.js", lineNumber: line });

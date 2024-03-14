@@ -3,15 +3,17 @@ import { quickOpen } from "../helpers/commands";
 import {
   addLogpoint,
   getPointPanelLocator,
+  scrollUntilLineIsVisible,
   verifyLogPointPanelContent,
   waitForSourceLineHitCounts,
 } from "../helpers/source-panel";
 import { verifyFocusModeVisible } from "../helpers/timeline";
-import test, { expect } from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
 // We need > 10k hits
-const sourceUrl = "react-dom.production.min.js";
-const lineNumber = 38;
+// Line 150 has >20k hits
+const sourceUrl = "react-dom.production.js";
+const lineNumber = 150;
 
 // trunk-ignore(gitleaks/generic-api-key)
 test.use({ exampleKey: "breakpoints-01" });
@@ -25,6 +27,7 @@ test(`logpoints-10: too-many-points-to-find UX`, async ({
 
   await quickOpen(page, sourceUrl);
 
+  await scrollUntilLineIsVisible(page, lineNumber);
   await waitForSourceLineHitCounts(page, lineNumber);
   await addLogpoint(page, {
     lineNumber,
