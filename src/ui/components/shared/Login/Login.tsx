@@ -131,10 +131,12 @@ function LoginMessaging() {
 
 function SwitchAccountMessage({
   user,
+  label,
   onSwitch,
   onCancel,
 }: {
   user: UserInfo;
+  label: string;
   onCancel: () => void;
   onSwitch: () => void;
 }) {
@@ -144,7 +146,7 @@ function SwitchAccountMessage({
         You are already logged in as <strong>{user.email}</strong>.
       </p>
       <Button className="w-full justify-center" onClick={onCancel} size="large">
-        Continue to Library
+        {label}
       </Button>
       <Button
         className="w-full justify-center text-sm font-bold text-primaryAccent underline"
@@ -275,11 +277,13 @@ export default function Login({
   state?: string;
 }) {
   const router = useRouter();
-  const { loginWithRedirect, error } = useAuth0();
+  const { loginWithRedirect, error, connection } = useAuth0();
   const [sso, setSSO] = useState(false);
   const [continueToLogin, setContinueToLogin] = useState(false);
   const token = useToken();
-  const user = useGetUserInfo();
+  const userInfo = useGetUserInfo();
+
+  const isExternalAuth = Boolean(userInfo && challenge && state);
 
   const url = new URL(returnToPath, window.location.origin);
   if (url.pathname === "/login" || (url.pathname === "/" && url.searchParams.has("state"))) {
@@ -291,7 +295,9 @@ export default function Login({
     if (challenge && state) {
       const authHost = getAuthHost();
       const clientId = getAuthClientId();
-      window.location.href = `https://${authHost}/authorize?response_type=code&code_challenge_method=S256&code_challenge=${challenge}&client_id=${clientId}&redirect_uri=${returnToPath}&scope=openid profile offline_access&state=${state}&audience=https://api.replay.io&connection=${connection}`;
+      window.location.href = `https://${authHost}/authorize?response_type=code&code_challenge_method=S256&code_challenge=${challenge}&client_id=${clientId}&redirect_uri=${returnToPath}&scope=openid profile offline_access&state=${state}&audience=https://api.replay.io&connection=${connection}&prompt=${
+        continueToLogin ? "login" : ""
+      }`;
 
       return;
     }
@@ -302,6 +308,14 @@ export default function Login({
     });
   };
 
+  const handleUseCurrentAuth = async () => {
+    if (isExternalAuth) {
+      await onLogin(connection);
+    } else {
+      router.push("/");
+    }
+  };
+
   useEffect(() => {
     setUserInBrowserPrefs(null);
   }, []);
@@ -309,11 +323,12 @@ export default function Login({
   return (
     <OnboardingModalContainer theme="light">
       <OnboardingContentWrapper overlay>
-        {token.token && user.email && !continueToLogin ? (
+        {token.token && userInfo.email && !continueToLogin ? (
           <SwitchAccountMessage
-            user={user}
+            label={isExternalAuth ? "Continue with this account" : "Continue to Library"}
+            user={userInfo}
             onSwitch={() => setContinueToLogin(true)}
-            onCancel={() => router.push("/")}
+            onCancel={() => handleUseCurrentAuth()}
           />
         ) : global.__IS_RECORD_REPLAY_RUNTIME__ && isOSX ? (
           <ReplayBrowserLogin />

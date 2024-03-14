@@ -11,6 +11,7 @@ const TEST_AUTH = {
   error: undefined,
   isLoading: false,
   isAuthenticated: true,
+  connection: "auth0",
   user: {
     sub: "auth0|60351bdaa6afe80068af126e",
     name: "e2e-testing@replay.io",
@@ -48,6 +49,7 @@ export default function useAuth0() {
       error: undefined,
       isLoading: loading,
       isAuthenticated: true,
+      connection: "external",
       user: loading
         ? undefined
         : {
@@ -70,5 +72,8 @@ export default function useAuth0() {
     return TEST_AUTH;
   }
 
-  return { ...auth, loginAndReturn };
+  const parts = auth.user.sub.split("|");
+  const connection = parts[0] === "samlp" ? parts[1] : parts[0];
+
+  return { ...auth, connection, loginAndReturn };
 }
