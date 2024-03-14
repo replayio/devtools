@@ -48,7 +48,7 @@ function ExtraResponse({
 }: {
   label: string;
   value: any;
-  alternateValue: any;
+  alternateValue?: any;
   point: string;
   time: number;
 }) {
@@ -61,7 +61,9 @@ function ExtraResponse({
           <div>
             <div>Passing value</div>
             <div className="whitespace-pre font-mono">
-              {JSON.stringify(alternateValue, null, 2)}
+              {alternateValue
+                ? JSON.stringify(alternateValue, null, 2)
+                : "No alternate value available"}
             </div>
           </div>
           <div>
@@ -153,18 +155,20 @@ function NetworkEventDiscrepancy({ discrepancy }: { discrepancy: NetworkEventDis
   } = discrepancy;
   let content;
 
+  console.log({ discrepancy });
+
   if (kind == "Extra") {
     if (data.kind === "ResponseJSON") {
       const { data, alternate } = discrepancy.event as {
         data: NetworkEventContentsResponseJSON;
-        alternate: NetworkEventContentsResponseJSON;
+        alternate?: NetworkEventContentsResponseJSON;
       };
 
       content = (
         <ExtraResponse
           label={key}
           value={data.value}
-          alternateValue={alternate.value}
+          alternateValue={alternate?.value}
           point={point}
           time={time}
         />

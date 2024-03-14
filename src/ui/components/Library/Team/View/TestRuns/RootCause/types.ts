@@ -169,7 +169,10 @@ interface LocationDescription {
   line: number;
   column: number;
   text?: string;
+  frame: FrameData;
 }
+
+type FrameData = any;
 
 // Information about a react component that was added.
 interface ReactComponent extends DiscrepancyEvent {

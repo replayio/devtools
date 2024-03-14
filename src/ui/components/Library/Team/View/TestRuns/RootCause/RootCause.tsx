@@ -50,12 +50,15 @@ export function RootCause({ discrepancy }: { discrepancy: RootCauseAnalysisResul
   const successId = testFailure.successRun.id.recordingId;
   const groupedSequences = groupSequences(testFailure.discrepancies);
 
+  console.log({ groupedSequences });
+
   return (
     <RootCauseContext.Provider value={{ failedId, successId }}>
       <div className="flex flex-col">
         <div className="flex flex-col gap-4 px-4">
           <Collapsible
-            label={`ReactComponent (${Object.keys(groupedSequences["ReactComponent"]).length})`}
+            label={`ReactComponent`}
+            // label={`ReactComponent (${Object.keys(groupedSequences["ReactComponent"]).length})`}
           >
             <ReactComponentSequences
               sequences={
@@ -66,9 +69,10 @@ export function RootCause({ discrepancy }: { discrepancy: RootCauseAnalysisResul
             />
           </Collapsible>
           <Collapsible
-            label={`ExecutedStatement (${
-              Object.keys(groupedSequences["ExecutedStatement"]).length
-            })`}
+            label={`ExecutedStatement`}
+            // label={`ExecutedStatement (${
+            //   Object.keys(groupedSequences["ExecutedStatement"]).length
+            // })`}
           >
             <ExecutedStatementSequences
               sequences={
@@ -79,7 +83,8 @@ export function RootCause({ discrepancy }: { discrepancy: RootCauseAnalysisResul
             />
           </Collapsible>
           <Collapsible
-            label={`NetworkEvent (${Object.keys(groupedSequences["NetworkEvent"]).length})`}
+            label={`NetworkEvent`}
+            // label={`NetworkEvent (${Object.keys(groupedSequences["NetworkEvent"]).length})`}
           >
             <NetworkEventSequences
               sequences={

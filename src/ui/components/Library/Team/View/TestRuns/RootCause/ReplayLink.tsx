@@ -12,9 +12,16 @@ export function ReplayLink({
   time: number;
 }) {
   return (
-    <a href={`/recording/${id}?point=${point}&time=${time}`} target="_blank" rel="noreferrer">
-      Go to <span className="italic">{kind}</span> point in <span className="italic">{result}</span>{" "}
-      replay
-    </a>
+    <div className="flex self-end rounded-md bg-gray-500 px-3 py-2">
+      <a
+        href={`/recording/${id}?point=${point}&time=${time}`}
+        target="_blank"
+        rel="noreferrer"
+        className="flex flex-row items-center gap-2"
+      >
+        <div className="h-5 w-5 rounded-full bg-white" />
+        <div>Investigate</div>
+      </a>
+    </div>
   );
 }
