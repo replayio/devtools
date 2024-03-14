@@ -12,7 +12,7 @@ export function ReplayLink({
   time: number;
 }) {
   return (
-    <div className="flex self-end rounded-md bg-gray-500 px-3 py-2">
+    <div className="flex self-end rounded-md bg-primaryAccent p-2 text-white">
       <a
         href={`/recording/${id}?point=${point}&time=${time}`}
         target="_blank"

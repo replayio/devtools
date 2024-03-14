@@ -63,19 +63,24 @@ function ExecutedStatementDiscrepancy({
   return (
     <div
       onClick={() => console.log(points)}
-      className="flex flex-col gap-2 rounded-lg bg-gray-300 p-3"
+      className="flex flex-col gap-2 rounded-lg bg-gray-700 p-3"
     >
       <div
-        className="flex flex-row items-center justify-between text-black"
+        className="flex flex-row items-center justify-between"
         onClick={() => setIsCollapsed(!isCollapsed)}
       >
-        <div className="flex flex-shrink-0 flex-col">
-          <div className="text-lg font-bold" title={sequenceId}>
-            {functionName} function
+        <div className="flex flex-row items-center gap-2">
+          <div className="h-7 w-7 rounded-full bg-white" />
+          <div className="flex flex-shrink-0 flex-col">
+            <div className="text-lg font-bold" title={sequenceId}>
+              {functionName} function
+            </div>
+            <div className="text-sm">{divergenceText}</div>
           </div>
-          <div className="text-xs">{divergenceText}</div>
         </div>
-        <div>{isCollapsed ? "◀" : "▼"}</div>
+        <div className="pointer-events-none cursor-pointer font-mono">
+          {isCollapsed ? "◀" : "▼"}
+        </div>
       </div>
       {isCollapsed ? null : (
         <div className="flex flex-col gap-2">
@@ -83,7 +88,10 @@ function ExecutedStatementDiscrepancy({
             {points.map((p: any, i: number) => (
               <div key={i} className="flex flex-row gap-2 font-mono text-xs">
                 <div className="flex flex-row gap-1">
-                  <div className="text-right" style={{ minWidth: "2rem" }}>
+                  <div
+                    className={`text-right ${p.breakable ? "" : "opacity-50"}`}
+                    style={{ minWidth: "2rem" }}
+                  >
                     {p.location.line}
                   </div>
                   {p.breakable ? (
