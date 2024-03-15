@@ -1,13 +1,22 @@
 import { openDevToolsTab, startTest } from "../helpers";
-import { getGraphicsPixelColor, waitForGraphicsToLoad } from "../helpers/screenshot";
+import {
+  getGraphicsPixelColor,
+  getGraphicsTime,
+  waitForGraphicsToLoad,
+} from "../helpers/screenshot";
 import { seekToTimePercent, setFocusRange } from "../helpers/timeline";
-import { delay } from "../helpers/utils";
+import { delay, waitFor } from "../helpers/utils";
 import test, { Page, expect } from "../testFixture";
 
 test.use({ exampleKey: "paint_at_intervals.html" });
 
 async function seekToTimePercentAndWaitForPaint(page: Page, percent: number) {
+  const currentTime = await getGraphicsTime(page);
   await seekToTimePercent(page, percent);
+  await waitFor(async () => {
+    const newTime = await getGraphicsTime(page);
+    expect(newTime).not.toBe(currentTime);
+  });
   await waitForGraphicsToLoad(page);
 }
 
