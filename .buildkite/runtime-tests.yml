@@ -81,3 +81,30 @@ steps:
       PLAYWRIGHT_HEADLESS: "true"
       PLAYWRIGHT_CHROMIUM: "true"
       ARCHITECTURE: "arm64"
+
+  - label: "Runtime e2e tests (macos-x86_64)"
+    if: build.env("OS") == "macos" && build.env("ARCH") == "x86_64"
+    timeout_in_minutes: 60
+    commands:
+      - "be_cmd node_deps -- npx yarn install"
+      - "be_cmd run_tests -- ts-node ./packages/e2e-tests/scripts/buildkite_run_fe_tests_from_artifact-macos-x86_64.ts"
+    agents:
+      - "os=macos"
+      - "queue=runtime"
+      - "runtimeType=test"
+    plugins:
+      - seek-oss/aws-sm#v2.3.1:
+          region: us-east-2
+          env:
+            BUILDKITE_AGENT_TOKEN: "prod/buildkite-agent-token"
+            AUTOMATED_TEST_SECRET: "graphql-automated-test-secret"
+            RECORD_REPLAY_API_KEY: "runtime-record-replay-api-key"
+            HASURA_ADMIN_SECRET: "prod/hasura-admin-secret"
+            RUNTIME_TEAM_API_KEY: runtime-replay-api-key
+            BUILDEVENT_APIKEY: honeycomb-api-key
+            BUILDEVENT_BUILDKITE_API_TOKEN: buildkite-api-token-honeycomb-build-events
+      - replayio/buildevents#0c2adb2: ~
+    env:
+      DISPLAY: ":1"
+      PLAYWRIGHT_HEADLESS: "true"
+      PLAYWRIGHT_CHROMIUM: "true"
