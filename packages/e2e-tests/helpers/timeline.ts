@@ -47,6 +47,10 @@ export async function saveFocusRange(page: Page): Promise<void> {
   await debugPrint(page, "Saving focus range", "setFocusRange");
 
   await page.locator('[data-test-id="SaveFocusModeButton"]').click();
+  await expect(page.locator('[data-test-id="EditFocusButton"]')).toHaveAttribute(
+    "data-test-state",
+    "off"
+  );
 }
 
 export async function setFocusRange(
