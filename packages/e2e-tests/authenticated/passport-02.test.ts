@@ -1,9 +1,8 @@
 import { openDevToolsTab, startTest } from "../helpers";
 import { E2E_USER_1 } from "../helpers/authentication";
-import { showCommentsPanel } from "../helpers/comments";
 import { warpToMessage } from "../helpers/console-panel";
 import {
-  activateInspectorTool,
+  findElementCoordinates,
   inspectCanvasCoordinates,
   openElementsPanel,
   waitForElementsToLoad,
@@ -36,12 +35,8 @@ test(`authenticated/passport-02: Infrared inspection`, async ({
 
   await openElementsPanel(page);
   await waitForElementsToLoad(page);
-  await activateInspectorTool(page);
-  await inspectCanvasCoordinates(page, 0.05, 0.01);
-
-  // Clicking the canvas will add a comment which can cause timing complications with the passport check below
-  // Easiest way to avoid this is to explicitly wait for the comments panel to be shown before continuing
-  await showCommentsPanel(page);
+  const { x, y } = await findElementCoordinates(page, '<div id="root"');
+  await inspectCanvasCoordinates(page, x, y);
 
   await waitFor(async () =>
     expect(await isPassportItemCompleted(page, "Inspect UI elements")).toBeTruthy()
