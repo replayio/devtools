@@ -148,14 +148,16 @@ function SwitchAccountMessage({
       <Button className="w-full justify-center" onClick={onCancel} size="large">
         {label}
       </Button>
-      <Button
-        className="w-full justify-center text-sm font-bold text-primaryAccent underline"
-        onClick={onSwitch}
-        size="large"
-        variant="outline"
-      >
-        Switch Accounts
-      </Button>
+      {global.__IS_RECORD_REPLAY_RUNTIME__ ? null : (
+        <Button
+          className="w-full justify-center text-sm font-bold text-primaryAccent underline"
+          onClick={onSwitch}
+          size="large"
+          variant="outline"
+        >
+          Switch Accounts
+        </Button>
+      )}
     </div>
   );
 }
@@ -283,7 +285,9 @@ export default function Login({
   const token = useToken();
   const userInfo = useGetUserInfo();
 
-  const isExternalAuth = Boolean(userInfo && challenge && state);
+  // `true` when we're in the process of completing the auth flow from the
+  // Replay browser
+  const isCompletingBrowserAuth = Boolean(userInfo && challenge && state);
 
   const url = new URL(returnToPath, window.location.origin);
   if (url.pathname === "/login" || (url.pathname === "/" && url.searchParams.has("state"))) {
@@ -312,7 +316,7 @@ export default function Login({
   };
 
   const handleUseCurrentAuth = async () => {
-    if (isExternalAuth) {
+    if (isCompletingBrowserAuth && connection) {
       await onLogin(connection);
     } else {
       router.push("/");
@@ -328,7 +332,7 @@ export default function Login({
       <OnboardingContentWrapper overlay>
         {token.token && userInfo.email && !continueToLogin ? (
           <SwitchAccountMessage
-            label={isExternalAuth ? "Continue with this account" : "Continue to Library"}
+            label={isCompletingBrowserAuth ? "Continue with this account" : "Continue to Library"}
             user={userInfo}
             onSwitch={() => setContinueToLogin(true)}
             onCancel={() => handleUseCurrentAuth()}
