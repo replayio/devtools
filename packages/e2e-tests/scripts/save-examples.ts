@@ -4,8 +4,8 @@
 // Use the API key for the "Frontend E2E Test Team" that we have set up in admin,
 // as that should let us mark these recordings as public.
 
-import { execSync } from "child_process";
 import { existsSync, writeFileSync } from "fs";
+import assert from "node:assert/strict";
 import { join } from "path";
 import type { Page, expect as expectFunction } from "@playwright/test";
 import { removeRecording, uploadRecording } from "@replayio/replay";
@@ -176,15 +176,22 @@ async function saveExamples(
     }
 
     if (category === examplesTarget) {
+      let resolvedPlaywrightScript: PlaywrightScript | undefined;
+      if (playwrightScript) {
+        const playwrightScriptModule = require(join("..", playwrightScript));
+        assert(
+          typeof playwrightScriptModule.default === "function",
+          `Expected default export to be a function in ${playwrightScript}`
+        );
+        resolvedPlaywrightScript = playwrightScriptModule.default;
+      }
       examplesToRun.push({
         buildId,
         category,
         filename: key,
         folder,
         runtime: runtime as TestExampleFile["runtime"],
-        playwrightScript: playwrightScript
-          ? require(join("..", playwrightScript)).default
-          : undefined,
+        playwrightScript: resolvedPlaywrightScript,
       });
     }
   }
