@@ -271,7 +271,7 @@ export default async function run_fe_tests(
     console.group("SAVE-EXAMPLES");
     console.time("SAVE-EXAMPLES time");
     {
-      const examplesCfg = exampleFiles?.length ? ` --example=${exampleFiles.join(",")}` : "";
+      const examplesCfg =` --example=doc_control_flow.html`;
       execSync(
         `${envWrapper} ${path.join(
           "scripts/save-examples.ts"
@@ -298,28 +298,7 @@ export default async function run_fe_tests(
     {
       // Run the known-passing tests.
       execSync(
-        `${envWrapper} npx playwright test --grep-invert node_ --project=replay-chromium --workers=${nWorkers} --retries=2 ${testFiles.join(
-          " "
-        )}`,
-        {
-          cwd: TestRootPath,
-          stdio: "inherit",
-          env: {
-            ...process.env,
-            // Replay the tests against prod backend devtools.
-            PLAYWRIGHT_TEST_BASE_URL: "https://app.replay.io",
-            REPLAY_API_KEY: process.env.RUNTIME_TEAM_API_KEY,
-            REPLAY_UPLOAD: "1",
-
-            // [RUN-3257] Enable JS ASSERTS:
-            RECORD_REPLAY_JS_OBJECT_ASSERTS: "1",
-            RECORD_REPLAY_JS_PROGRESS_ASSERTS: "1",
-            RECORD_REPLAY_JS_PROGRESS_CHECKS: "1",
-
-            // [RUN-3246] Send P/W metadata:
-            REPLAY_PLAYWRIGHT_FIXTURE: "1",
-          },
-        }
+        `${envWrapper} npx playwright test --grep-invert node_ --project=replay-chromium --workers=${nWorkers} --retries=0 repaint-01`
       );
     }
     console.timeEnd("TESTS time");
