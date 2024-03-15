@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
 import { ExclamationIcon } from "@heroicons/react/outline";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { ReactNode, useEffect, useState } from "react";
 
 import { Button } from "replay-next/components/Button";
@@ -8,11 +9,13 @@ import { query } from "shared/graphql/apolloClient";
 import { GetConnection, GetConnectionVariables } from "shared/graphql/generated/GetConnection";
 import { getReadOnlyParamsFromURL } from "shared/utils/environment";
 import { isMacOS } from "shared/utils/os";
+import { UserInfo, useGetUserInfo } from "ui/hooks/users";
 import { getAuthClientId, getAuthHost } from "ui/utils/auth";
 import { requestBrowserLogin, setUserInBrowserPrefs } from "ui/utils/browser";
 import { isTeamMemberInvite } from "ui/utils/onboarding";
 import { sendTelemetryEvent } from "ui/utils/telemetry";
 import useAuth0 from "ui/utils/useAuth0";
+import useToken from "ui/utils/useToken";
 
 import { OnboardingContentWrapper, OnboardingModalContainer } from "../Onboarding";
 
@@ -123,6 +126,39 @@ function LoginMessaging() {
         )}
       </div>
     </>
+  );
+}
+
+function SwitchAccountMessage({
+  user,
+  label,
+  onSwitch,
+  onCancel,
+}: {
+  user: UserInfo;
+  label: string;
+  onCancel: () => void;
+  onSwitch: () => void;
+}) {
+  return (
+    <div className="space-y-6">
+      <p className="text-center text-base">
+        You are already logged in as <strong>{user.email}</strong>.
+      </p>
+      <Button className="w-full justify-center" onClick={onCancel} size="large">
+        {label}
+      </Button>
+      {global.__IS_RECORD_REPLAY_RUNTIME__ ? null : (
+        <Button
+          className="w-full justify-center text-sm font-bold text-primaryAccent underline"
+          onClick={onSwitch}
+          size="large"
+          variant="outline"
+        >
+          Switch Accounts
+        </Button>
+      )}
+    </div>
   );
 }
 
@@ -242,8 +278,16 @@ export default function Login({
   challenge?: string;
   state?: string;
 }) {
-  const { loginWithRedirect, error } = useAuth0();
+  const router = useRouter();
+  const { loginWithRedirect, error, connection } = useAuth0();
   const [sso, setSSO] = useState(false);
+  const [continueToLogin, setContinueToLogin] = useState(false);
+  const token = useToken();
+  const userInfo = useGetUserInfo();
+
+  // `true` when we're in the process of completing the auth flow from the
+  // Replay browser
+  const isCompletingBrowserAuth = Boolean(userInfo && challenge && state);
 
   const url = new URL(returnToPath, window.location.origin);
   if (url.pathname === "/login" || (url.pathname === "/" && url.searchParams.has("state"))) {
@@ -255,7 +299,12 @@ export default function Login({
     if (challenge && state) {
       const authHost = getAuthHost();
       const clientId = getAuthClientId();
-      window.location.href = `https://${authHost}/authorize?response_type=code&code_challenge_method=S256&code_challenge=${challenge}&client_id=${clientId}&redirect_uri=${returnToPath}&scope=openid profile offline_access&state=${state}&audience=https://api.replay.io&connection=${connection}`;
+      // when continueToLogin was selected, the user was previously logged in
+      // and wanted to select a different account so force the login prompt by
+      // passing prompt=login to auth0
+      window.location.href = `https://${authHost}/authorize?response_type=code&code_challenge_method=S256&code_challenge=${challenge}&client_id=${clientId}&redirect_uri=${returnToPath}&scope=openid profile offline_access&state=${state}&audience=https://api.replay.io&connection=${connection}&prompt=${
+        continueToLogin ? "login" : ""
+      }`;
 
       return;
     }
@@ -266,6 +315,14 @@ export default function Login({
     });
   };
 
+  const handleUseCurrentAuth = async () => {
+    if (isCompletingBrowserAuth && connection) {
+      await onLogin(connection);
+    } else {
+      router.push("/");
+    }
+  };
+
   useEffect(() => {
     setUserInBrowserPrefs(null);
   }, []);
@@ -273,7 +330,14 @@ export default function Login({
   return (
     <OnboardingModalContainer theme="light">
       <OnboardingContentWrapper overlay>
-        {global.__IS_RECORD_REPLAY_RUNTIME__ && isOSX ? (
+        {token.token && userInfo.email && !continueToLogin ? (
+          <SwitchAccountMessage
+            label={isCompletingBrowserAuth ? "Continue with this account" : "Continue to Library"}
+            user={userInfo}
+            onSwitch={() => setContinueToLogin(true)}
+            onCancel={() => handleUseCurrentAuth()}
+          />
+        ) : global.__IS_RECORD_REPLAY_RUNTIME__ && isOSX ? (
           <ReplayBrowserLogin />
         ) : sso ? (
           <SSOLogin onLogin={onLogin} />
