@@ -84,6 +84,13 @@ export async function mapLocators<T>(
   );
 }
 
+export async function getExpectedErrorDetails(page: Page) {
+  if (await page.locator('[data-test-id="ExpectedError"]').isVisible()) {
+    return await page.locator('[data-test-name="ErrorDetails"]').innerText();
+  }
+  return null;
+}
+
 export async function getSupportFormErrorDetails(page: Page) {
   if (await page.locator('[data-test-id="UnexpectedErrorDetails"]').isVisible()) {
     try {
@@ -120,12 +127,16 @@ export async function waitForRecordingToFinishIndexing(page: Page): Promise<void
 
   const timelineCapsuleLocator = page.locator('[data-test-id="Timeline-Capsule"]');
 
-  let supportFormErrorDetails: string | null = null;
   await waitFor(
     async () => {
-      supportFormErrorDetails = await getSupportFormErrorDetails(page);
+      const supportFormErrorDetails = await getSupportFormErrorDetails(page);
       if (supportFormErrorDetails) {
         throw new UnrecoverableError(`Session failed: ${supportFormErrorDetails}`);
+      }
+
+      const expectedErrorDetails = await getExpectedErrorDetails(page);
+      if (expectedErrorDetails) {
+        throw new UnrecoverableError(`Session failed: ${expectedErrorDetails}`);
       }
 
       if (await timelineCapsuleLocator.isVisible()) {
