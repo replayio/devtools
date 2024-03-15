@@ -21,7 +21,7 @@ test("inspector-computed-02: Complex computed styles can be viewed", async ({
   await warpToMessage(page, "ExampleFinished");
   await activateInspectorTool(page);
 
-  await selectElementsListRow(page, { text: '<div id="first" class="parent">' });
+  await selectElementsListRow(page, { text: '<div class="parent" id="first">' });
   await checkComputedStyle(page, "font-family", "courier", [
     {
       selector: ".parent",
@@ -32,7 +32,7 @@ test("inspector-computed-02: Complex computed styles can be viewed", async ({
     },
   ]);
 
-  await selectElementsListRow(page, { text: '<div class="parent"' });
+  await selectElementsListRow(page, { text: '<div class="parent" style=' });
   await checkComputedStyle(page, "font-family", "serif", [
     { selector: "this.style", value: "serif", label: "element", url: "#", overridden: false },
     {
