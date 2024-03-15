@@ -60,7 +60,10 @@ function getFiltersPanel(page: Page) {
   return page.locator('div.filters')
 }
 
-export async function testFunction(page: Page, expect: typeof expectType) {
+export default async function testFunction(
+  page: Page,
+  expect: typeof expectType
+) {
   const listItems = getTodoListItems(page)
 
   async function waitForListItemsCount(count: number) {
