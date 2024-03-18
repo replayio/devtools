@@ -86,11 +86,9 @@ export function subscribeToMutableSources({
         });
       }
     } else {
-      if (didStopPlaying) {
-        if (abortController != null) {
-          abortController.abort();
-          abortController = null;
-        }
+      if (abortController != null) {
+        abortController.abort();
+        abortController = null;
       }
 
       abortController = new AbortController();

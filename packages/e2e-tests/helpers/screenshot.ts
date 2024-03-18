@@ -84,6 +84,11 @@ export async function getGraphicsExecutionPoint(page: Page): Promise<string | nu
   return await element.getAttribute("data-execution-point");
 }
 
+export async function getGraphicsScreenshotType(page: Page): Promise<string | null> {
+  const element = getVideoElement(page);
+  return await element.getAttribute("data-screenshot-type");
+}
+
 export async function getGraphicsStatus(page: Page): Promise<string | null> {
   const element = getVideoElement(page);
   return await element.getAttribute("data-status");
@@ -133,5 +138,13 @@ export async function waitForGraphicsToLoad(page: Page) {
 
   await waitFor(async () => {
     await expect(await getGraphicsStatus(page)).toBe("loaded");
+  });
+}
+
+export async function waitForRepaintGraphicsToLoad(page: Page) {
+  await debugPrint(page, `Waiting for repaint graphics to load...`, "waitForRepaintGraphicsToLoad");
+
+  await waitFor(async () => {
+    await expect(await getGraphicsScreenshotType(page)).toBe("repaint");
   });
 }

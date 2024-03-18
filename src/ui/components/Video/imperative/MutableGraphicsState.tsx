@@ -25,6 +25,7 @@ interface Rect {
 }
 
 export type Status = "failed" | "loaded" | "loading";
+export type ScreenShotType = "cached-paint" | "repaint";
 
 export interface State {
   currentExecutionPoint: ExecutionPoint | null;
@@ -33,6 +34,7 @@ export interface State {
   localScale: number;
   recordingScale: number;
   screenShot: ScreenShot | undefined;
+  screenShotType: ScreenShotType | undefined;
   status: Status;
 }
 
@@ -48,8 +50,11 @@ export const state = createState<State>({
   localScale: 1,
   recordingScale: 1,
   screenShot: undefined,
+  screenShotType: undefined,
   status: "loading",
 });
+
+let lock = new Object();
 
 export async function updateState(
   containerElement: HTMLElement,
@@ -57,16 +62,21 @@ export async function updateState(
     didResize?: boolean;
     executionPoint: ExecutionPoint | null;
     screenShot: ScreenShot | null;
+    screenShotType: ScreenShotType | null;
     status: Status;
     time: number;
   }> = {}
 ) {
+  const localLock = new Object();
+  lock = localLock;
+
   const prevState = state.read();
 
   let {
     didResize,
     executionPoint = prevState.currentExecutionPoint,
     screenShot = prevState.screenShot,
+    screenShotType = prevState.screenShotType,
     status = prevState.status,
     time = prevState.currentTime,
   } = options;
@@ -76,6 +86,10 @@ export async function updateState(
   let recordingScale = prevState.recordingScale;
   if (screenShot && (screenShot != prevState.screenShot || didResize)) {
     const naturalDimensions = await getDimensions(screenShot.data, screenShot.mimeType);
+    if (lock !== localLock) {
+      return;
+    }
+
     const naturalHeight = naturalDimensions.height;
     const naturalWidth = naturalDimensions.width;
 
@@ -86,6 +100,10 @@ export async function updateState(
       imageHeight: naturalHeight,
       imageWidth: naturalWidth,
     });
+    if (lock !== localLock) {
+      return;
+    }
+
     const clientHeight = scaledDimensions.height;
     const clientWidth = scaledDimensions.width;
 
@@ -107,6 +125,7 @@ export async function updateState(
     localScale,
     recordingScale,
     screenShot: screenShot || undefined,
+    screenShotType: screenShotType || undefined,
     status,
   };
 
