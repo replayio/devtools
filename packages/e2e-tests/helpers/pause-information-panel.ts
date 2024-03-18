@@ -382,7 +382,7 @@ export async function togglePoint(page: Page, pointLocator: Locator, enabled: bo
   const currentState = await toggle.getAttribute("date-test-state");
   if (targetState !== currentState) {
     await debugPrint(page, `Toggling point to ${targetState}`, "togglePoint");
-    await toggle.click();
+    await toggle.locator("input").click();
   } else {
     await debugPrint(page, `Point already ${targetState}`, "togglePoint");
   }
