@@ -26,6 +26,7 @@ export async function clearText(page: Page, selector: string) {
     await delay(100);
 
     await page.keyboard.press(`${getCommandKey()}+A`);
+    await delay(100);
     await page.keyboard.press("Backspace");
   }
 }
