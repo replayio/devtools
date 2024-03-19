@@ -28,7 +28,6 @@ test(`authenticated/passport-02: Infrared inspection`, async ({
   expect(await isPassportItemCompleted(page, "Inspect UI elements")).toBeFalsy();
   expect(await isPassportItemCompleted(page, "Inspect network requests")).toBeFalsy();
   expect(await isPassportItemCompleted(page, "Inspect React components")).toBeFalsy();
-  expect(await isPassportItemCompleted(page, "Jump to code")).toBeFalsy();
 
   await openDevToolsTab(page);
   await warpToMessage(page, "Added an entry");
@@ -56,7 +55,4 @@ test(`authenticated/passport-02: Infrared inspection`, async ({
   await waitFor(async () =>
     expect(await isPassportItemCompleted(page, "Inspect React components")).toBeTruthy()
   );
-
-  // TODO add test for the "Jump to code" item.
-  // Currently we can't make example recordings containing mouse or keyboard events...
 });
