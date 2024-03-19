@@ -1,6 +1,7 @@
 import { ExecutionPoint, ScreenShot } from "@replayio/protocol";
-import { createCache, createExternallyManagedCache } from "suspense";
+import { createCache } from "suspense";
 
+import { paintHashCache } from "replay-next/src/suspense/PaintHashCache";
 import { ReplayClientInterface } from "shared/client/types";
 
 export const screenshotCache = createCache<
@@ -17,11 +18,4 @@ export const screenshotCache = createCache<
 
     return screenShot;
   },
-});
-
-// The backend won't return a screenshot for a given hash more than once; see FE-2357
-export const paintHashCache = createExternallyManagedCache<[paintHash: string], ScreenShot>({
-  config: { immutable: true },
-  debugLabel: "paintHashCache",
-  getKey: ([paintHash]) => paintHash,
 });

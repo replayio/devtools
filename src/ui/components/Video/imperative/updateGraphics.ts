@@ -2,7 +2,7 @@ import { ExecutionPoint, ScreenShot } from "@replayio/protocol";
 
 import { PaintsCache, findMostRecentPaint } from "protocol/PaintsCache";
 import { RepaintGraphicsCache } from "protocol/RepaintGraphicsCache";
-import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
+import { paintHashCache } from "replay-next/src/suspense/PaintHashCache";
 import { screenshotCache } from "replay-next/src/suspense/ScreenshotCache";
 import { ReplayClientInterface } from "shared/client/types";
 import { updateState } from "ui/components/Video/imperative/MutableGraphicsState";
@@ -45,14 +45,21 @@ export async function updateGraphics({
       time,
     });
   } else {
-    promises.push(
-      fetchPaintContents({
-        abortSignal,
-        containerElement,
-        replayClient,
-        time,
-      })
-    );
+    const cachedScreenShot = paintHashCache.getValueIfCached(paintPoint.paintHash);
+    if (cachedScreenShot) {
+      // If this screenshot has already been cached, skip fetching it again
+      // If this is a cached repaint, fetching it may even cause an API error ("no cached paint")
+      promises.push(Promise.resolve(cachedScreenShot));
+    } else {
+      promises.push(
+        fetchPaintContents({
+          abortSignal,
+          containerElement,
+          replayClient,
+          time,
+        })
+      );
+    }
   }
 
   let repaintGraphicsScreenShot: ScreenShot | undefined = undefined;
@@ -170,8 +177,6 @@ async function fetchRepaintGraphics({
   time: number;
   replayClient: ReplayClientInterface;
 }): Promise<ScreenShot | undefined> {
-  const pauseId = await pauseIdCache.readAsync(replayClient, executionPoint, time);
-
   // Until repaints are more reliable, only wait a few seconds before giving up
   // this prevents the UI from getting stuck in a visible loading state
   const timeoutPromise = new Promise<void>(resolve => {
@@ -183,7 +188,7 @@ async function fetchRepaintGraphics({
   let screenShot: ScreenShot | undefined = undefined;
 
   try {
-    const repaintPromise = RepaintGraphicsCache.readAsync(replayClient, pauseId);
+    const repaintPromise = RepaintGraphicsCache.readAsync(replayClient, time, executionPoint);
 
     await Promise.race([repaintPromise, timeoutPromise]).then(result => {
       screenShot = result?.screenShot;

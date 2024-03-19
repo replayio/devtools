@@ -2,8 +2,9 @@ import { createSingleEntryCache } from "suspense";
 
 import { recordingTargetCache } from "replay-next/src/suspense/BuildIdCache";
 import { screenshotCache } from "replay-next/src/suspense/ScreenshotCache";
-import { find, findIndexGTE, findIndexLTE } from "replay-next/src/utils/array";
+import { find, findIndexGTE, findIndexLTE, insert } from "replay-next/src/utils/array";
 import { getDimensions } from "replay-next/src/utils/image";
+import { compareExecutionPoints } from "replay-next/src/utils/time";
 import { replayClient } from "shared/client/ReplayClientContext";
 import { TimeStampedPointWithPaintHash } from "shared/client/types";
 
@@ -24,10 +25,23 @@ export const PaintsCache = createSingleEntryCache<[], TimeStampedPointWithPaintH
   },
 });
 
-export function findClosestPaint(time: number) {
-  const paints = PaintsCache.getValueIfCached() ?? [];
+export const mergedPaintsAndRepaints: TimeStampedPointWithPaintHash[] = [];
 
-  return find(paints, { paintHash: "", point: "", time }, (a, b) => a.time - b.time, false);
+// Merge cached paint data with repaint data so the find-nearest-paint methods can use both
+PaintsCache.subscribe(() => {
+  const paints = PaintsCache.getValueIfCached() ?? [];
+  paints.forEach(paint => {
+    insert(mergedPaintsAndRepaints, paint, (a, b) => compareExecutionPoints(a.point, b.point));
+  });
+});
+
+export function findClosestPaint(time: number) {
+  return find(
+    mergedPaintsAndRepaints,
+    { time } as TimeStampedPointWithPaintHash,
+    (a, b) => a.time - b.time,
+    false
+  );
 }
 
 // The maximum number of paints to be considered when looking for the first meaningful paint
@@ -62,27 +76,28 @@ export async function findFirstMeaningfulPaint() {
 }
 
 export function findMostRecentPaint(time: number) {
-  const paints = PaintsCache.getValueIfCached() ?? [];
   const index = findMostRecentPaintIndex(time);
-  return index >= 0 ? paints[index] : null;
+  return index >= 0 ? mergedPaintsAndRepaints[index] : null;
 }
 
 export function findMostRecentPaintIndex(time: number) {
-  const paints = PaintsCache.getValueIfCached() ?? [];
-  return findIndexLTE(paints, { time } as TimeStampedPointWithPaintHash, (a, b) => a.time - b.time);
+  return findIndexLTE(
+    mergedPaintsAndRepaints,
+    { time } as TimeStampedPointWithPaintHash,
+    (a, b) => a.time - b.time
+  );
 }
 
 export function findNextPaintEvent(time: number) {
-  const paints = PaintsCache.getValueIfCached() ?? [];
   const index = findIndexGTE(
-    paints,
+    mergedPaintsAndRepaints,
     { time } as TimeStampedPointWithPaintHash,
     (a, b) => a.time - b.time
   );
 
-  const paint = paints[index];
+  const paint = mergedPaintsAndRepaints[index];
   if (paint && paint.time == time) {
-    return index + 1 < paints.length ? paints[index + 1] : null;
+    return index + 1 < mergedPaintsAndRepaints.length ? mergedPaintsAndRepaints[index + 1] : null;
   }
 
   return paint;
