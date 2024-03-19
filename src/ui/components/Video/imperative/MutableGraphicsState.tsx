@@ -54,7 +54,7 @@ export const state = createState<State>({
   status: "loading",
 });
 
-let lock = new Object();
+let lock: Object | null = null;
 
 export async function updateState(
   containerElement: HTMLElement,
@@ -67,9 +67,6 @@ export async function updateState(
     time: number;
   }> = {}
 ) {
-  const localLock = new Object();
-  lock = localLock;
-
   const prevState = state.read();
 
   let {
@@ -80,6 +77,17 @@ export async function updateState(
     status = prevState.status,
     time = prevState.currentTime,
   } = options;
+
+  if (shallowEqual(options, { didResize })) {
+    if (lock !== null) {
+      // Don't let an event from the ResizeObserver interrupt an in-progress update;
+      // this should override new SnapShot data
+      return;
+    }
+  }
+
+  const localLock = new Object();
+  lock = localLock;
 
   let graphicsRect = prevState.graphicsRect;
   let localScale = prevState.localScale;
@@ -94,15 +102,12 @@ export async function updateState(
     const naturalWidth = naturalDimensions.width;
 
     const containerRect = containerElement.getBoundingClientRect();
-    const scaledDimensions = await fitImageToContainer({
+    const scaledDimensions = fitImageToContainer({
       containerHeight: containerRect.height,
       containerWidth: containerRect.width,
       imageHeight: naturalHeight,
       imageWidth: naturalWidth,
     });
-    if (lock !== localLock) {
-      return;
-    }
 
     const clientHeight = scaledDimensions.height;
     const clientWidth = scaledDimensions.width;
@@ -132,4 +137,6 @@ export async function updateState(
   if (!shallowEqual(prevState, nextState)) {
     state.update(nextState);
   }
+
+  lock = null;
 }

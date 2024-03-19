@@ -7,18 +7,19 @@ import { expect, test } from "../testFixture";
 
 test.use({ exampleKey: "doc_control_flow.html" });
 
-test.skip("repaint-06: repaints the screen screen when stepping over code that modifies the DOM", async ({
+test("repaint-06: repaints the screen screen when stepping over code that modifies the DOM", async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
   await startTest(page, recordingId);
   await openDevToolsTab(page);
 
+  // TODO [FE-2363] Some of these points fail repaint, so they're disabled until RUN-3397 has been fixed
   const printedStrings = [
-    "catch",
-    "afterCatch",
+    // "catch",
+    // "afterCatch",
     "finally",
-    "yield 1",
+    // "yield 1",
     "generated 1",
     "yield 2",
     "generated 2",
@@ -29,17 +30,13 @@ test.skip("repaint-06: repaints the screen screen when stepping over code that m
     "within iterator",
   ];
 
-  const paints: {
-    [key: string]: {
-      before: string | null;
-      after: string | null;
-    };
+  const textToBase64DataMap: {
+    [text: string]: string | null;
   } = {};
 
   {
     await debugPrint(page, "Testing repaint graphics");
 
-    let graphicsDataUrl: string | null = null;
     let previousGraphicsDataUrl: string | null = null;
 
     for (let index = 0; index < printedStrings.length; index++) {
@@ -49,47 +46,28 @@ test.skip("repaint-06: repaints the screen screen when stepping over code that m
       const locator = await findConsoleMessage(page, text, "console-log");
       await seekToConsoleMessage(page, locator);
 
-      // Step to "Element text before..."
+      // Step from "updateText(...)" to "Element text after..."
+      await stepOver(page);
+      await stepOver(page);
       await stepOver(page);
       await stepOver(page);
 
       await waitForRepaintGraphicsToLoad(page);
 
-      graphicsDataUrl = await getGraphicsDataUrl(page);
+      const graphicsDataUrl = await getGraphicsDataUrl(page);
+
       expect(
         graphicsDataUrl,
-        `Expected graphics before "${string}" not to match previous after graphics`
+        `Expected graphics to have been updated to reflect the text "${string}"`
       ).not.toEqual(previousGraphicsDataUrl);
+
       previousGraphicsDataUrl = graphicsDataUrl;
-
-      const cachedPaints = {
-        before: graphicsDataUrl,
-        after: "" as string | null,
-      };
-
-      // Step to "Element text after..."
-      await stepOver(page);
-      await stepOver(page);
-
-      await waitForRepaintGraphicsToLoad(page);
-
-      graphicsDataUrl = await getGraphicsDataUrl(page);
-      expect(
-        graphicsDataUrl,
-        `Expected graphics after "${string}" not to match the graphics before`
-      ).not.toEqual(previousGraphicsDataUrl);
-      previousGraphicsDataUrl = graphicsDataUrl;
-
-      cachedPaints.after = graphicsDataUrl;
-
-      paints[string] = cachedPaints;
+      textToBase64DataMap[string] = graphicsDataUrl;
     }
   }
 
   {
     await debugPrint(page, "Testing screenshot caching");
-
-    let graphicsDataUrl: string | null = null;
 
     for (let index = 0; index < printedStrings.length; index++) {
       const string = printedStrings[index];
@@ -98,29 +76,21 @@ test.skip("repaint-06: repaints the screen screen when stepping over code that m
       const locator = await findConsoleMessage(page, text, "console-log");
       await seekToConsoleMessage(page, locator);
 
-      // Step to "Element text before..."
+      // Step from "updateText(...)" to "Element text after..."
+      await stepOver(page);
+      await stepOver(page);
       await stepOver(page);
       await stepOver(page);
 
       await waitForRepaintGraphicsToLoad(page);
 
-      graphicsDataUrl = await getGraphicsDataUrl(page);
+      const expectedGraphicsDataUrl = textToBase64DataMap[string];
+      const actualGraphicsDataUrl = await getGraphicsDataUrl(page);
+
       expect(
-        graphicsDataUrl,
-        `Expected graphics before "${string}" to match previous cached graphics`
-      ).toEqual(paints[string]?.before);
-
-      // Step to "Element text after..."
-      await stepOver(page);
-      await stepOver(page);
-
-      await waitForRepaintGraphicsToLoad(page);
-
-      graphicsDataUrl = await getGraphicsDataUrl(page);
-      expect(
-        graphicsDataUrl,
-        `Expected graphics after "${string}" to match previous cached graphics`
-      ).toEqual(paints[string]?.after);
+        actualGraphicsDataUrl,
+        `Expected graphics for the text "${string}" to match previously cached graphics`
+      ).toEqual(expectedGraphicsDataUrl);
     }
   }
 });
