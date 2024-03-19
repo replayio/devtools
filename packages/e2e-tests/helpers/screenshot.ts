@@ -52,8 +52,9 @@ export async function clickScreenshot(page: Page, xPercentage: number, yPercenta
 
 export async function getGraphicsElementScale(page: Page) {
   const element = getGraphicsElement(page);
-  const scaleString = await element.getAttribute("data-scale");
-  return Number(scaleString);
+  const localScaleString = await element.getAttribute("data-local-scale");
+  const recordingScaleString = await element.getAttribute("data-recording-scale");
+  return Number(localScaleString) * Number(recordingScaleString);
 }
 
 export async function hoverScreenshot(page: Page, xPercentage: number, yPercentage: number) {
