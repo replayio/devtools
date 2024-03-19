@@ -25,6 +25,7 @@ interface Rect {
 }
 
 export type Status = "failed" | "loaded" | "loading";
+export type ScreenShotType = "cached-paint" | "repaint";
 
 export interface State {
   currentExecutionPoint: ExecutionPoint | null;
@@ -33,6 +34,7 @@ export interface State {
   localScale: number;
   recordingScale: number;
   screenShot: ScreenShot | undefined;
+  screenShotType: ScreenShotType | undefined;
   status: Status;
 }
 
@@ -48,8 +50,11 @@ export const state = createState<State>({
   localScale: 1,
   recordingScale: 1,
   screenShot: undefined,
+  screenShotType: undefined,
   status: "loading",
 });
+
+let lock: Object | null = null;
 
 export async function updateState(
   containerElement: HTMLElement,
@@ -57,6 +62,7 @@ export async function updateState(
     didResize?: boolean;
     executionPoint: ExecutionPoint | null;
     screenShot: ScreenShot | null;
+    screenShotType: ScreenShotType | null;
     status: Status;
     time: number;
   }> = {}
@@ -67,25 +73,42 @@ export async function updateState(
     didResize,
     executionPoint = prevState.currentExecutionPoint,
     screenShot = prevState.screenShot,
+    screenShotType = prevState.screenShotType,
     status = prevState.status,
     time = prevState.currentTime,
   } = options;
+
+  if (shallowEqual(options, { didResize })) {
+    if (lock !== null) {
+      // Don't let an event from the ResizeObserver interrupt an in-progress update;
+      // this should override new SnapShot data
+      return;
+    }
+  }
+
+  const localLock = new Object();
+  lock = localLock;
 
   let graphicsRect = prevState.graphicsRect;
   let localScale = prevState.localScale;
   let recordingScale = prevState.recordingScale;
   if (screenShot && (screenShot != prevState.screenShot || didResize)) {
     const naturalDimensions = await getDimensions(screenShot.data, screenShot.mimeType);
+    if (lock !== localLock) {
+      return;
+    }
+
     const naturalHeight = naturalDimensions.height;
     const naturalWidth = naturalDimensions.width;
 
     const containerRect = containerElement.getBoundingClientRect();
-    const scaledDimensions = await fitImageToContainer({
+    const scaledDimensions = fitImageToContainer({
       containerHeight: containerRect.height,
       containerWidth: containerRect.width,
       imageHeight: naturalHeight,
       imageWidth: naturalWidth,
     });
+
     const clientHeight = scaledDimensions.height;
     const clientWidth = scaledDimensions.width;
 
@@ -107,10 +130,13 @@ export async function updateState(
     localScale,
     recordingScale,
     screenShot: screenShot || undefined,
+    screenShotType: screenShotType || undefined,
     status,
   };
 
   if (!shallowEqual(prevState, nextState)) {
     state.update(nextState);
   }
+
+  lock = null;
 }

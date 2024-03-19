@@ -71,6 +71,7 @@ export default function Video() {
 
       // The data attributes are sed for e2e tests
       containerElement.setAttribute("data-execution-point", nextState.currentExecutionPoint ?? "");
+      containerElement.setAttribute("data-screenshot-type", "" + nextState.screenShotType);
       containerElement.setAttribute("data-status", "" + nextState.status);
       containerElement.setAttribute("data-time", "" + nextState.currentTime);
       graphicsElement.setAttribute("data-scale", nextState.localScale.toString());

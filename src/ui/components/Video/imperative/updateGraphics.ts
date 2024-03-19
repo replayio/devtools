@@ -31,26 +31,29 @@ export async function updateGraphics({
     return;
   }
 
+  const promises: Promise<ScreenShot | undefined>[] = [];
+
   // If the current time is before the first paint, we should show nothing
   const paintPoint = findMostRecentPaint(time);
-  if (!paintPoint || !paintPoint.paintHash) {
+  const isBeforeFirstCachedPaint = !paintPoint || !paintPoint.paintHash;
+  if (isBeforeFirstCachedPaint) {
     updateState(containerElement, {
       executionPoint,
       screenShot: null,
-      status: "loaded",
+      screenShotType: null,
+      status: executionPoint ? "loading" : "loaded",
       time,
     });
-    return;
+  } else {
+    promises.push(
+      fetchPaintContents({
+        abortSignal,
+        containerElement,
+        replayClient,
+        time,
+      })
+    );
   }
-
-  const promises: Promise<ScreenShot | undefined>[] = [
-    fetchPaintContents({
-      abortSignal,
-      containerElement,
-      replayClient,
-      time,
-    }),
-  ];
 
   let repaintGraphicsScreenShot: ScreenShot | undefined = undefined;
   if (executionPoint) {
@@ -67,6 +70,12 @@ export async function updateGraphics({
     promises.push(promise);
   }
 
+  if (promises.length === 0) {
+    // If we are before the first paint and have no execution point to request a repaint,
+    // then we should clear out the currently visible graphics and bail out
+    return;
+  }
+
   // Fetch paint contents and repaint graphics in parallel
   const screenShot = await Promise.race(promises);
   if (abortSignal.aborted) {
@@ -78,6 +87,7 @@ export async function updateGraphics({
     updateState(containerElement, {
       executionPoint,
       screenShot,
+      screenShotType: repaintGraphicsScreenShot != null ? "repaint" : "cached-paint",
       status: "loaded",
       time,
     });
@@ -101,10 +111,23 @@ export async function updateGraphics({
       updateState(containerElement, {
         executionPoint,
         screenShot: repaintGraphicsScreenShot,
+        screenShotType: "repaint",
         status: "loaded",
         time,
       });
+
+      return;
     }
+  }
+
+  if (screenShot == null) {
+    // If we couldn't load either a cached screenshot or a repaint, update the DOM to reflect that
+    updateState(containerElement, {
+      executionPoint,
+      screenShotType: null,
+      status: isBeforeFirstCachedPaint ? "loaded" : "failed",
+      time,
+    });
   }
 }
 
@@ -149,11 +172,25 @@ async function fetchRepaintGraphics({
 }): Promise<ScreenShot | undefined> {
   const pauseId = await pauseIdCache.readAsync(replayClient, executionPoint, time);
 
-  try {
-    const result = await RepaintGraphicsCache.readAsync(replayClient, pauseId);
+  // Until repaints are more reliable, only wait a few seconds before giving up
+  // this prevents the UI from getting stuck in a visible loading state
+  const timeoutPromise = new Promise<void>(resolve => {
+    setTimeout(() => {
+      resolve();
+    }, 5_000);
+  });
 
-    return result?.screenShot;
+  let screenShot: ScreenShot | undefined = undefined;
+
+  try {
+    const repaintPromise = RepaintGraphicsCache.readAsync(replayClient, pauseId);
+
+    await Promise.race([repaintPromise, timeoutPromise]).then(result => {
+      screenShot = result?.screenShot;
+    });
   } catch (error) {
     // Repaint graphics are currently expected to fail
   }
+
+  return screenShot;
 }
