@@ -301,8 +301,8 @@ export async function waitForPaused(page: Page, line?: number): Promise<void> {
         scopeBlocks.count(),
       ]);
 
-      expect(numFrames).toBeGreaterThan(0);
-      expect(numScopes).toBeGreaterThan(0);
+      expect(numFrames, { message: "Timed out waiting for frames" }).toBeGreaterThan(0);
+      expect(numScopes, { message: "Timed out waiting for scopes" }).toBeGreaterThan(0);
     },
     { timeout: 15_000 }
   );
