@@ -6,6 +6,7 @@ import {
   findMostRecentPaint,
   findNextPaintEvent,
   findPreviousPaintEvent,
+  mergedPaintsAndRepaints,
 } from "protocol/PaintsCache";
 import { screenshotCache } from "replay-next/src/suspense/ScreenshotCache";
 
@@ -14,6 +15,8 @@ describe("PaintsCache", () => {
 
   beforeEach(() => {
     OriginalImage = window.Image;
+
+    mergedPaintsAndRepaints.splice(0);
 
     // jsdom does not load images; we mock it for our purposes to encode expected image dimensions in a JSON string
     // @ts-expect-error
