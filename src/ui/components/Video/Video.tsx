@@ -74,7 +74,8 @@ export default function Video() {
       containerElement.setAttribute("data-screenshot-type", "" + nextState.screenShotType);
       containerElement.setAttribute("data-status", "" + nextState.status);
       containerElement.setAttribute("data-time", "" + nextState.currentTime);
-      graphicsElement.setAttribute("data-scale", nextState.localScale.toString());
+      graphicsElement.setAttribute("data-local-scale", nextState.localScale.toString());
+      graphicsElement.setAttribute("data-recording-scale", nextState.recordingScale.toString());
 
       Object.assign(prevState, nextState);
     });
