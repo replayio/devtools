@@ -5,6 +5,7 @@ import {
   getElementsListRow,
   inspectCanvasCoordinates,
   openElementsPanel,
+  selectElementsListRow,
   waitForElementsToLoad,
 } from "../helpers/elements-panel";
 import test, { expect } from "../testFixture";
@@ -28,6 +29,9 @@ test(`inspector-elements-02_node-picker: element picker and iframe behavior`, as
   // Click on a DIV element and verify the selection
   {
     const { x, y } = await findElementCoordinates(page, 'id="maindiv"');
+    // findElementCoordinates() will select the element, so we need to select
+    // a different one first to test if selecting the element using the picker works
+    await selectElementsListRow(page, { text: "<body>" });
     await inspectCanvasCoordinates(page, x, y);
 
     const selectedRow = await getElementsListRow(page, { isSelected: true });
@@ -37,6 +41,9 @@ test(`inspector-elements-02_node-picker: element picker and iframe behavior`, as
   // Click on the content inside of an iframe and verify the selection
   {
     const { x, y } = await findElementCoordinates(page, 'data-test-id="inner-body"');
+    // findElementCoordinates() will select the element, so we need to select
+    // a different one first to test if selecting the element using the picker works
+    await selectElementsListRow(page, { text: "<body>" });
     await inspectCanvasCoordinates(page, x, y);
 
     const selectedRow = await getElementsListRow(page, { isSelected: true });
