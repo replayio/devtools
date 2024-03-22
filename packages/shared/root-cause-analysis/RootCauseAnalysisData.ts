@@ -138,6 +138,7 @@ export namespace RootCauseAnalysisDataV1 {
     hits: number;
     location: Location;
     breakable: boolean;
+    text: string;
   }
 
   // Reported discrepancies for executed statements include a description of the
@@ -317,9 +318,7 @@ export namespace RootCauseAnalysisDataV1 {
   }
 
   export interface RootCauseAnalysisDatabaseJson {
-    recording_id: string;
-    created_at: string;
-    updated_at: string;
+    id: string;
     result: RootCauseAnalysisDatabaseResultV1;
     version: 1;
   }
@@ -377,6 +376,7 @@ export namespace RootCauseAnalysisDataV2 {
     hits: number;
     location: Location;
     breakable: boolean;
+    text: string;
   }
 
   // Reported discrepancies for executed statements include a description of the
@@ -562,9 +562,7 @@ export namespace RootCauseAnalysisDataV2 {
   }
 
   export interface RootCauseAnalysisDatabaseJson {
-    recording_id: string;
-    created_at: string;
-    updated_at: string;
+    id: string;
     result: RootCauseAnalysisDatabaseResultV2;
     version: 2;
   }
@@ -583,13 +581,13 @@ export type AnyRootCauseAnalysisResult =
   | RootCauseAnalysisDataV2.RootCauseAnalysisResult;
 
 export function isRootCauseAnalysisDataV1(
-  data: AnyRootCauseAnalysisDatabaseJson
+  data: unknown
 ): data is RootCauseAnalysisDataV1.RootCauseAnalysisDatabaseJson {
-  return data.version === 1;
+  return data !== null && typeof data === "object" && "version" in data && data.version === 1;
 }
 
 export function isRootCauseAnalysisDataV2(
   data: AnyRootCauseAnalysisDatabaseJson
 ): data is RootCauseAnalysisDataV2.RootCauseAnalysisDatabaseJson {
-  return data.version === 2;
+  return data !== null && typeof data === "object" && "version" in data && data.version === 2;
 }
