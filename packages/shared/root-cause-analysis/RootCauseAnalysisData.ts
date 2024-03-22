@@ -36,13 +36,21 @@ export interface DiscrepancyEvent {
   key: string;
 }
 
+export type EventKind = "ExecutedStatement" | "ReactComponent" | "NetworkEvent" | "CustomEvent";
+
+export interface Sequence<T extends Discrepancy<any>> {
+  sequenceId: string;
+  kind: "Extra" | "Missing";
+  discrepancies: T[];
+}
+
 // Information about a discrepancy identified in a test failure.
 export interface Discrepancy<T extends DiscrepancyEvent> {
   // The kind of discrepancy.
   kind: DiscrepancyKind;
 
   // The kind of underlying event.
-  eventKind: string;
+  eventKind: EventKind;
 
   // Any ID for a sequence of discrepancies this is associated with.
   sequenceId: string;
@@ -93,20 +101,21 @@ export enum AnalysisResult {
 }
 
 export namespace RootCauseAnalysisDataV1 {
-  // Information about a statement that executed within a recording.
-  export interface ExecutedStatement extends DiscrepancyEvent {
-    // Location of the statement.
-    location: MappedLocation;
-  }
-
   export enum ReactComponentChange {
     Add = "Add",
     Remove = "Remove",
   }
 
+  // Information about a change to a react component.
   export interface ReactComponent extends DiscrepancyEvent {
     nodeName: string;
     change: ReactComponentChange;
+  }
+
+  // Information about a statement that executed within a recording.
+  export interface ExecutedStatement extends DiscrepancyEvent {
+    // Location of the statement.
+    location: MappedLocation;
   }
 
   export interface LocationDescription {
@@ -137,7 +146,7 @@ export namespace RootCauseAnalysisDataV1 {
     description?: LocationDescription;
   }
 
-  interface NetworkEventContentsRequest {
+  export interface NetworkEventContentsRequest {
     kind: "Request";
     requestUrl: string;
     requestMethod: string;
@@ -146,7 +155,7 @@ export namespace RootCauseAnalysisDataV1 {
     initiator: RequestInitiator | undefined;
   }
 
-  interface NetworkEventContentsResponseJSON {
+  export interface NetworkEventContentsResponseJSON {
     kind: "ResponseJSON";
 
     // Information about the associated request.
@@ -171,6 +180,25 @@ export namespace RootCauseAnalysisDataV1 {
   // a description of what the corresponding content is in the other run.
   interface NetworkEventWithAlternate extends NetworkEvent {
     alternate?: NetworkEventContents;
+  }
+
+  interface ExecutedStatementDiscrepancySpec {
+    kind: "ExecutedStatement";
+    discrepancyKind: DiscrepancyKind;
+    key: string;
+    url: string;
+  }
+
+  interface ReactComponentDiscrepancySpec {
+    kind: "ReactComponent";
+    discrepancyKind: DiscrepancyKind;
+    key: string;
+  }
+
+  interface NetworkEventDiscrepancySpec {
+    kind: "NetworkEvent";
+    discrepancyKind: DiscrepancyKind;
+    key: string;
   }
 
   // Discrepancy in the result of a global evaluation at the failure point in the
@@ -205,16 +233,38 @@ export namespace RootCauseAnalysisDataV1 {
     value?: ComparableValue;
   }
 
-  type ExecutedStatementDiscrepancy = Discrepancy<ExecutedStatementWithDescription>;
-  type ReactComponentDiscrepancy = Discrepancy<ReactComponent>;
-  type NetworkEventDiscrepancy = Discrepancy<NetworkEventWithAlternate>;
-  type CustomEventDiscrepancy = Discrepancy<CustomEvent>;
+  export type ExecutedStatementDiscrepancy = Discrepancy<ExecutedStatementWithDescription>;
+  export type ReactComponentDiscrepancy = Discrepancy<ReactComponent>;
+  export type NetworkEventDiscrepancy = Discrepancy<NetworkEventWithAlternate>;
+  export type CustomEventDiscrepancy = Discrepancy<CustomEvent>;
 
   export type AnyDiscrepancy =
     | ExecutedStatementDiscrepancy
     | ReactComponentDiscrepancy
     | NetworkEventDiscrepancy
     | CustomEventDiscrepancy;
+
+  // Discrepancies in a signature can be custom specs or describe discrepancies
+  // automatically found by the RCA.
+  export type DiscrepancySpec =
+    | CustomSpec
+    | ExecutedStatementDiscrepancySpec
+    | ReactComponentDiscrepancySpec
+    | NetworkEventDiscrepancySpec;
+
+  export interface TestFailureSignature {
+    // Description and associated URL to use for failures matching this signature.
+    title: string;
+    url: string;
+
+    // Associated priority, with lower numbers being higher priority. If a failure
+    // matches multiple signatures then the label used will be the highest priority,
+    // or the first one in the signatures array in the case of tied priorities.
+    priority: number;
+
+    // Specs for discrepancies matching this signature.
+    discrepancies: DiscrepancySpec[];
+  }
 
   // Unique identifier for a test.
   export interface TestId {
@@ -238,47 +288,6 @@ export namespace RootCauseAnalysisDataV1 {
     // In a failed recording, the endpoint at which the last steps were repeated
     // the same number of times as in each passing recording.
     failureRepeatEndpoint?: TimeStampedPoint;
-  }
-
-  interface ExecutedStatementDiscrepancySpec {
-    kind: "ExecutedStatement";
-    discrepancyKind: DiscrepancyKind;
-    key: string;
-    url: string;
-  }
-
-  interface ReactComponentDiscrepancySpec {
-    kind: "ReactComponent";
-    discrepancyKind: DiscrepancyKind;
-    key: string;
-  }
-
-  interface NetworkEventDiscrepancySpec {
-    kind: "NetworkEvent";
-    discrepancyKind: DiscrepancyKind;
-    key: string;
-  }
-
-  // Discrepancies in a signature can be custom specs or describe discrepancies
-  // automatically found by the RCA.
-  export type DiscrepancySpec =
-    | CustomSpec
-    | ExecutedStatementDiscrepancySpec
-    | ReactComponentDiscrepancySpec
-    | NetworkEventDiscrepancySpec;
-
-  export interface TestFailureSignature {
-    // Description and associated URL to use for failures matching this signature.
-    title: string;
-    url: string;
-
-    // Associated priority, with lower numbers being higher priority. If a failure
-    // matches multiple signatures then the label used will be the highest priority,
-    // or the first one in the signatures array in the case of tied priorities.
-    priority: number;
-
-    // Specs for discrepancies matching this signature.
-    discrepancies: DiscrepancySpec[];
   }
 
   // Encodes the result of analyzing a flaky test failure.
@@ -317,6 +326,17 @@ export namespace RootCauseAnalysisDataV1 {
 }
 
 export namespace RootCauseAnalysisDataV2 {
+  export enum ReactComponentChange {
+    Add = "Add",
+    Remove = "Remove",
+  }
+
+  // Information about a change to a react component.
+  export interface ReactComponent extends DiscrepancyEvent {
+    nodeName: string;
+    change: ReactComponentChange;
+  }
+
   // Information about a statement that executed within a recording.
   export interface ExecutedStatement extends DiscrepancyEvent {
     // Location of the statement.
@@ -333,13 +353,39 @@ export namespace RootCauseAnalysisDataV2 {
     text?: string;
   }
 
+  interface Exception {
+    // Location of the statement.
+    location: MappedLocation;
+    // Description of an exception's error, where available.
+    error?: ProtocolObject;
+  }
+
+  // Information about a location within a frame.
+  interface Frame {
+    functionName: string;
+    points: FramePoint[];
+    exceptions?: Exception[];
+  }
+
+  // Information about a location within a frame, but with an attached key for the location.
+  interface FrameData extends Frame {
+    key: string;
+  }
+
+  // Information about a location within a frame.
+  export interface FramePoint {
+    hits: number;
+    location: Location;
+    breakable: boolean;
+  }
+
   // Reported discrepancies for executed statements include a description of the
   // statement which is either extra or missing in the failed run.
   interface ExecutedStatementWithDescription extends ExecutedStatement {
     description?: LocationDescription;
   }
 
-  interface NetworkEventContentsRequest {
+  export interface NetworkEventContentsRequest {
     kind: "Request";
     requestUrl: string;
     requestMethod: string;
@@ -348,7 +394,7 @@ export namespace RootCauseAnalysisDataV2 {
     initiator: RequestInitiator | undefined;
   }
 
-  interface NetworkEventContentsResponseJSON {
+  export interface NetworkEventContentsResponseJSON {
     kind: "ResponseJSON";
 
     // Information about the associated request.
@@ -374,28 +420,6 @@ export namespace RootCauseAnalysisDataV2 {
   interface NetworkEventWithAlternate extends NetworkEvent {
     alternate?: NetworkEventContents;
   }
-
-  export enum ReactComponentChange {
-    Add = "Add",
-    Remove = "Remove",
-  }
-
-  // Information about a change to a react component.
-  export interface ReactComponent extends DiscrepancyEvent {
-    nodeName: string;
-    change: ReactComponentChange;
-  }
-
-  type ExecutedStatementDiscrepancy = Discrepancy<ExecutedStatementWithDescription>;
-  type ReactComponentDiscrepancy = Discrepancy<ReactComponent>;
-  type NetworkEventDiscrepancy = Discrepancy<NetworkEventWithAlternate>;
-  type CustomEventDiscrepancy = Discrepancy<CustomEvent>;
-
-  type AnyDiscrepancy =
-    | ExecutedStatementDiscrepancy
-    | ReactComponentDiscrepancy
-    | NetworkEventDiscrepancy
-    | CustomEventDiscrepancy;
 
   interface ExecutedStatementDiscrepancySpec {
     kind: "ExecutedStatement";
@@ -448,6 +472,17 @@ export namespace RootCauseAnalysisDataV2 {
     value?: ComparableValue;
   }
 
+  export type ExecutedStatementDiscrepancy = Discrepancy<ExecutedStatementWithDescription>;
+  export type ReactComponentDiscrepancy = Discrepancy<ReactComponent>;
+  export type NetworkEventDiscrepancy = Discrepancy<NetworkEventWithAlternate>;
+  export type CustomEventDiscrepancy = Discrepancy<CustomEvent>;
+
+  export type AnyDiscrepancy =
+    | ExecutedStatementDiscrepancy
+    | ReactComponentDiscrepancy
+    | NetworkEventDiscrepancy
+    | CustomEventDiscrepancy;
+
   // Discrepancies in a signature can be custom specs or describe discrepancies
   // automatically found by the RCA.
   export type DiscrepancySpec =
@@ -468,32 +503,6 @@ export namespace RootCauseAnalysisDataV2 {
 
     // Specs for discrepancies matching this signature.
     discrepancies: DiscrepancySpec[];
-  }
-
-  interface Exception {
-    // Location of the statement.
-    location: MappedLocation;
-    // Description of an exception's error, where available.
-    error?: ProtocolObject;
-  }
-
-  // Information about a location within a frame.
-  interface Frame {
-    functionName: string;
-    points: FramePoint[];
-    exceptions?: Exception[];
-  }
-
-  // Information about a location within a frame, but with an attached key for the location.
-  interface FrameData extends Frame {
-    key: string;
-  }
-
-  // Information about a location within a frame.
-  export interface FramePoint {
-    hits: number;
-    location: Location;
-    breakable: boolean;
   }
 
   // Unique identifier for a test.
@@ -561,14 +570,26 @@ export namespace RootCauseAnalysisDataV2 {
   }
 }
 
-export type RootCauseAnalysisDatabaseJson =
+export type AnyRootCauseAnalysisDatabaseJson =
   | RootCauseAnalysisDataV1.RootCauseAnalysisDatabaseJson
   | RootCauseAnalysisDataV2.RootCauseAnalysisDatabaseJson;
 
-export type RootCauseAnalysisDatabaseResult =
+export type AnyRootCauseAnalysisDatabaseResult =
   | RootCauseAnalysisDataV1.RootCauseAnalysisDatabaseResultV1
   | RootCauseAnalysisDataV2.RootCauseAnalysisDatabaseResultV2;
 
-export type RootCauseAnalysisResult =
+export type AnyRootCauseAnalysisResult =
   | RootCauseAnalysisDataV1.RootCauseAnalysisResult
   | RootCauseAnalysisDataV2.RootCauseAnalysisResult;
+
+export function isRootCauseAnalysisDataV1(
+  data: AnyRootCauseAnalysisDatabaseJson
+): data is RootCauseAnalysisDataV1.RootCauseAnalysisDatabaseJson {
+  return data.version === 1;
+}
+
+export function isRootCauseAnalysisDataV2(
+  data: AnyRootCauseAnalysisDatabaseJson
+): data is RootCauseAnalysisDataV2.RootCauseAnalysisDatabaseJson {
+  return data.version === 2;
+}
