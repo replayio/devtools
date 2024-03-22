@@ -3,6 +3,10 @@ import { useState } from "react";
 
 import { GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_executions_recordings_rootCauseAnalysis } from "shared/graphql/generated/GetTestRunRecordings";
 import { Recording } from "shared/graphql/types";
+import {
+  RootCauseAnalysisDataV1,
+  isRootCauseAnalysisDataV1,
+} from "shared/root-cause-analysis/RootCauseAnalysisData";
 import { TestRun, TestRunTest } from "shared/test-suites/TestRun";
 import { trackEvent } from "ui/utils/telemetry";
 
@@ -67,6 +71,15 @@ export function TestResultListItem({
 
   const numComments = comments?.length ?? 0;
 
+  let rootCauseAnalysis: RootCauseAnalysisDataV1.RootCauseAnalysisDatabaseJson | null = null;
+
+  if (
+    recording.rootCauseAnalysis != null &&
+    isRootCauseAnalysisDataV1(recording.rootCauseAnalysis)
+  ) {
+    rootCauseAnalysis = recording.rootCauseAnalysis;
+  }
+
   return (
     <div className="flex flex-col">
       <TestRunLibraryRow>
@@ -90,9 +103,7 @@ export function TestResultListItem({
           )}
         </a>
       </TestRunLibraryRow>
-      {recording.rootCauseAnalysis ? (
-        <RootCauseDisplay analysis={recording.rootCauseAnalysis} />
-      ) : null}
+      {rootCauseAnalysis ? <RootCauseDisplay analysis={rootCauseAnalysis} /> : null}
     </div>
   );
 }
@@ -100,14 +111,10 @@ export function TestResultListItem({
 function RootCauseDisplay({
   analysis,
 }: {
-  analysis: GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_executions_recordings_rootCauseAnalysis;
+  analysis: RootCauseAnalysisDataV1.RootCauseAnalysisDatabaseJson;
 }) {
   const [collapsed, setCollapsed] = useState(true);
-  const { result, skipReason, discrepancies } = analysis.result as {
-    result: string;
-    skipReason: string;
-    discrepancies: any[];
-  };
+  const { result, skipReason, discrepancies } = analysis.result;
 
   if (result === "Skipped") {
     return <div className="pl-9">Analysis skipped: {skipReason}</div>;
