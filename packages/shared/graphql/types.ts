@@ -196,6 +196,7 @@ export enum RecordingRole {
 }
 
 export interface Recording {
+  buildId?: string | null;
   collaborators?: string[];
   collaboratorRequests?: CollaboratorRequest[] | null;
   comments?: any;
@@ -355,7 +356,7 @@ type DeepPartial<T> = Partial<{ [P in keyof T]: DeepPartial<T[P]> }>;
 
 export type PartialWorkspaceSettingsFeatures = DeepPartial<WorkspaceSettings["features"]>;
 
-export type WorkspaceUserRole = "viewer" | "debugger" | "admin";
+export type WorkspaceUserRole = "viewer" | "debugger" | "admin" | "contributor";
 
 export interface WorkspaceUser {
   membershipId: string;

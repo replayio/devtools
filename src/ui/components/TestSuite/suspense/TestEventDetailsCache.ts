@@ -30,7 +30,7 @@ import { boundingRectsCache } from "ui/suspense/nodeCaches";
 
 export type TestEventDetailsEntry = TimeStampedPoint & {
   count: number | null;
-  pauseId: PauseId;
+  pauseId: PauseId | null;
   props: ProtocolObject | null;
   testEvent: UserActionEvent;
 };
@@ -123,6 +123,25 @@ export const testEventDetailsIntervalCache = createFocusIntervalCacheForExecutio
       // Store each result in the externally managed cache, to make it easy for the UI
       // to look up a single cache entry by point without needing all the other arguments.
       testEventDetailsResultsCache.cacheValue(processedResult, processedResult.point);
+    }
+
+    // Ensure that we have results for all requested events, even if we didn't receive
+    // any data for them. Otherwise the details panel would get stuck in its loading
+    // state for those events.
+    for (const event of filteredEvents) {
+      const eventPoint = event.data.timeStampedPoints.result;
+      if (eventPoint && !testEventDetailsResultsCache.getValueIfCached(eventPoint.point)) {
+        testEventDetailsResultsCache.cacheValue(
+          {
+            ...eventPoint,
+            count: null,
+            pauseId: null,
+            props: null,
+            testEvent: event,
+          },
+          eventPoint.point
+        );
+      }
     }
 
     return processedResults;

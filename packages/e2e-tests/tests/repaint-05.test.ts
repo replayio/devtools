@@ -1,12 +1,22 @@
 import { openDevToolsTab, startTest } from "../helpers";
-import { getGraphicsPixelColor, waitForGraphicsToLoad } from "../helpers/screenshot";
+import {
+  getGraphicsPixelColor,
+  getGraphicsTime,
+  waitForGraphicsToLoad,
+} from "../helpers/screenshot";
 import { seekToTimePercent, setFocusRange } from "../helpers/timeline";
-import test, { Page, expect } from "../testFixtureCloneRecording";
+import { delay, waitFor } from "../helpers/utils";
+import test, { Page, expect } from "../testFixture";
 
 test.use({ exampleKey: "paint_at_intervals.html" });
 
-async function seekToTimePercentAndWaitForPaint(page: Page, time: number) {
-  await seekToTimePercent(page, time);
+async function seekToTimePercentAndWaitForPaint(page: Page, percent: number) {
+  const currentTime = await getGraphicsTime(page);
+  await seekToTimePercent(page, percent);
+  await waitFor(async () => {
+    const newTime = await getGraphicsTime(page);
+    expect(newTime).not.toBe(currentTime);
+  });
   await waitForGraphicsToLoad(page);
 }
 
@@ -21,11 +31,19 @@ test("repaint-05: prefers current time if pause creation failed outside of the f
     startTimeString: "0:03",
   });
 
-  const color = await getGraphicsPixelColor(page, 0, 0);
+  const finalColor = await getGraphicsPixelColor(page, 0, 0);
 
-  for (let index = 0; index < 1; index += 0.25) {
-    await seekToTimePercentAndWaitForPaint(page, index);
+  let previousColor;
+
+  const percents = [10, 40, 60];
+  for (let index = 0; index < percents.length; index++) {
+    const percent = percents[index];
+    await seekToTimePercentAndWaitForPaint(page, percent);
+    await delay(100);
     const newColor = await getGraphicsPixelColor(page, 0, 0);
-    await expect(newColor).not.toBe(color);
+    await expect(newColor).not.toBe(finalColor);
+    await expect(newColor).not.toBe(previousColor);
+
+    previousColor = newColor;
   }
 });

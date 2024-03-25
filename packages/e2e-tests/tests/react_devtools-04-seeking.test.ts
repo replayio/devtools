@@ -6,7 +6,7 @@ import {
   waitForReactComponentCount,
 } from "../helpers/new-react-devtools-panel";
 import { getTimelineCurrentPercent, seekToTimePercent } from "../helpers/timeline";
-import test from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
 test.use({ exampleKey: "cra/dist/index.html" });
 

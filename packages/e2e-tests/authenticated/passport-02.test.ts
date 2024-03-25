@@ -1,9 +1,8 @@
 import { openDevToolsTab, startTest } from "../helpers";
 import { E2E_USER_1 } from "../helpers/authentication";
-import { showCommentsPanel } from "../helpers/comments";
 import { warpToMessage } from "../helpers/console-panel";
 import {
-  activateInspectorTool,
+  findElementCoordinates,
   inspectCanvasCoordinates,
   openElementsPanel,
   waitForElementsToLoad,
@@ -14,7 +13,7 @@ import { openReactDevtoolsPanel } from "../helpers/new-react-devtools-panel";
 import { isPassportItemCompleted } from "../helpers/passport";
 import { enablePassport } from "../helpers/settings";
 import { waitFor } from "../helpers/utils";
-import test, { expect } from "../testFixtureCloneRecording";
+import test, { expect } from "../testFixture";
 
 test.use({ exampleKey: "cra/dist/index.html", testUsers: [E2E_USER_1] });
 
@@ -29,19 +28,14 @@ test(`authenticated/passport-02: Infrared inspection`, async ({
   expect(await isPassportItemCompleted(page, "Inspect UI elements")).toBeFalsy();
   expect(await isPassportItemCompleted(page, "Inspect network requests")).toBeFalsy();
   expect(await isPassportItemCompleted(page, "Inspect React components")).toBeFalsy();
-  expect(await isPassportItemCompleted(page, "Jump to code")).toBeFalsy();
 
   await openDevToolsTab(page);
   await warpToMessage(page, "Added an entry");
 
   await openElementsPanel(page);
   await waitForElementsToLoad(page);
-  await activateInspectorTool(page);
-  await inspectCanvasCoordinates(page, 0.05, 0.01);
-
-  // Clicking the canvas will add a comment which can cause timing complications with the passport check below
-  // Easiest way to avoid this is to explicitly wait for the comments panel to be shown before continuing
-  await showCommentsPanel(page);
+  const { x, y } = await findElementCoordinates(page, '<div id="root"');
+  await inspectCanvasCoordinates(page, x, y);
 
   await waitFor(async () =>
     expect(await isPassportItemCompleted(page, "Inspect UI elements")).toBeTruthy()
@@ -61,7 +55,4 @@ test(`authenticated/passport-02: Infrared inspection`, async ({
   await waitFor(async () =>
     expect(await isPassportItemCompleted(page, "Inspect React components")).toBeTruthy()
   );
-
-  // TODO add test for the "Jump to code" item.
-  // Currently we can't make example recordings containing mouse or keyboard events...
 });

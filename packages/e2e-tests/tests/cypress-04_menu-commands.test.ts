@@ -9,7 +9,7 @@ import {
 } from "../helpers/testsuites";
 import { getTimelineCurrentPercent, waitForTimelineAdvanced } from "../helpers/timeline";
 import { getByTestName, waitFor } from "../helpers/utils";
-import test, { expect } from "../testFixtureCloneRecording";
+import test, { expect } from "../testFixture";
 
 test.use({ exampleKey: "cypress-realworld/bankaccounts.spec.js" });
 

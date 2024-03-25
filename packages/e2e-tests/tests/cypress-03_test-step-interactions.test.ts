@@ -12,7 +12,7 @@ import {
 } from "../helpers/testsuites";
 import { waitForTimelineAdvanced } from "../helpers/timeline";
 import { delay, getByTestName, waitFor } from "../helpers/utils";
-import test, { expect } from "../testFixtureCloneRecording";
+import test, { expect } from "../testFixture";
 
 test.use({ exampleKey: "flake/adding-spec.ts" });
 

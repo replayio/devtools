@@ -25,13 +25,18 @@ function ExecutedStatementSequence({ group }: { group: Sequence<ExecutedStatemen
     <div className="pl-4">
       <div className="flex flex-col gap-2">
         {group.discrepancies.map((d, i) => (
-          <ExecutedStatementDiscrepancy key={i} discrepancy={d} sequenceId={group.sequenceId} />
+          <ExecutedStatementDiscrepancyDisplay
+            key={i}
+            discrepancy={d}
+            sequenceId={group.sequenceId}
+          />
         ))}
       </div>
     </div>
   );
 }
-function ExecutedStatementDiscrepancy({
+
+function ExecutedStatementDiscrepancyDisplay({
   discrepancy,
   sequenceId,
 }: {

@@ -6,7 +6,7 @@ import {
   verifyRequestRowTimelineState,
 } from "../helpers/network-panel";
 import { fastForwardToLine, waitForSourceContentsToFinishStreaming } from "../helpers/source-panel";
-import test from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
 test.use({ exampleKey: "flake/adding-spec.ts" });
 

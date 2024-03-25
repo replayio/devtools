@@ -11,7 +11,7 @@
     "@codemirror/state_replay_next": "npm:@codemirror/state@6.1.2",
     "@lezer/common_replay_next": "npm:@lezer/common@1.0.1",
     "@lezer/highlight_replay_next": "npm:@lezer/highlight@1.1.1",
-    "@replayio/protocol": "^0.68.0",
+    "@replayio/protocol": "^0.70.0",
     "date-fns": "^2.28.0",
     "design": "workspace:*",
     "escape-html": "^1.0.3",
@@ -25,7 +25,7 @@
     "react-dom": "0.0.0-experimental-03d6f7cf0-20240209",
     "react-virtualized-auto-sizer": "^1.0.19",
     "shared": "workspace:*",
-    "suspense": "^0.0.51",
+    "suspense": "^0.0.53",
     "use-context-menu": "0.4.13",
     "uuid": "^7.0.3"
   },
@@ -38,12 +38,5 @@
     "jest-environment-jsdom": "^28.0.2",
     "node-fetch": "^2.0.0",
     "typescript": "5.0.2"
-  },
-  "scripts": {
-    "dev": "npx next dev",
-    "build": "next build",
-    "start": "next start",
-    "test": "jest",
-    "lint": "next lint"
   }
 }

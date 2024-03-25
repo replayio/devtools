@@ -1,9 +1,5 @@
 import classnames from "classnames";
-import { useEffect } from "react";
 
-// Add the necessary imports for nag functionality
-import { useNag } from "replay-next/src/hooks/useNag";
-import { Nag } from "shared/graphql/types";
 import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 
 import Outline from "../SourceOutline/SourceOutline";
@@ -18,13 +14,6 @@ export default function PrimaryPanes() {
   );
   const [sourcesCollapsed, setSourcesCollapsed] = useGraphQLUserData("layout_sourcesCollapsed");
   const [enableLargeText] = useGraphQLUserData("global_enableLargeText");
-
-  // Add the useNag hook and useEffect block
-  const [, dismissInspectElementNag] = useNag(Nag.INSPECT_ELEMENT);
-
-  useEffect(() => {
-    dismissInspectElementNag();
-  }, [dismissInspectElementNag]);
 
   return (
     <Accordion>

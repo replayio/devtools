@@ -7,7 +7,7 @@ import {
   verifyNetworkDetailsPanelContains,
   verifyNetworkDetailsTabsVisible,
 } from "../helpers/network-panel";
-import test from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
 test.use({ exampleKey: "flake/adding-spec.ts" });
 

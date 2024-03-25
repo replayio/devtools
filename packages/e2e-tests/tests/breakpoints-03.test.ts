@@ -2,7 +2,7 @@ import { openDevToolsTab, startTest } from "../helpers";
 import { executeAndVerifyTerminalExpression } from "../helpers/console-panel";
 import { resumeToLine, rewind, rewindToLine } from "../helpers/pause-information-panel";
 import { addBreakpoint, removeBreakpoint } from "../helpers/source-panel";
-import test from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
 test.use({ exampleKey: "doc_rr_basic.html" });
 

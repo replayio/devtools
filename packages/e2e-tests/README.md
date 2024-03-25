@@ -56,7 +56,7 @@ Our old E2E test suite re-recorded those examples every time the test suite ran.
 The tests themselves are written using a set of "page object"-style helper functions that abstract specific pieces of DOM interaction. This allows the tests themselves to be written in a more readable style and focus on the sequence of operations:
 
 ```ts
-import test from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
 test(`Test stepping forward through breakpoints when rewound before the first one.`, async ({
   pageWithMeta: { page, recordingId },
@@ -147,6 +147,8 @@ Each repo has a link to the Replay dashboard workspace + an invite.
 If you want to update those to fresher recording IDs, open up the team workspace for that repo, find a recent test suite run, copy the recording ID for that test's recording, and overwrite the recording ID in `examples.json`.
 
 You'll also probably need to specifically share that recording as "Public", especially since it's in a Test Suites workspace that would normally not allow anonymous users to view recordings.
+
+We use 1 specific Playwright test recording which is a replay of the breakpoints-05 test from this repo. Similar to the instructions above, to update this to a more recent version, you can visit the dashboard for FE E2E Tests and select a more recent recording ID for that test.
 
 We also now have a "golden recording" of one of our own `breakpoints-01` E2E test runs. This serves as a testbed for checking more advanced behaviors like the React and Redux routines. If we ever need to update this, just copy-paste the recording ID from a test run in our "Frontend E2E tests" workspace.
 

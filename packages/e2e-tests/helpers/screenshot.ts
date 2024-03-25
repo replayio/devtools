@@ -52,8 +52,9 @@ export async function clickScreenshot(page: Page, xPercentage: number, yPercenta
 
 export async function getGraphicsElementScale(page: Page) {
   const element = getGraphicsElement(page);
-  const scaleString = await element.getAttribute("data-scale");
-  return Number(scaleString);
+  const localScaleString = await element.getAttribute("data-local-scale");
+  const recordingScaleString = await element.getAttribute("data-recording-scale");
+  return Number(localScaleString) * Number(recordingScaleString);
 }
 
 export async function hoverScreenshot(page: Page, xPercentage: number, yPercentage: number) {
@@ -71,6 +72,8 @@ export async function hoverScreenshot(page: Page, xPercentage: number, yPercenta
 }
 
 export async function getGraphicsDataUrl(page: Page): Promise<string | null> {
+  await waitForGraphicsToLoad(page);
+
   return await page.evaluate(() => {
     const element = document.querySelector("#graphics") as HTMLImageElement;
     return element?.src ?? null;
@@ -80,6 +83,11 @@ export async function getGraphicsDataUrl(page: Page): Promise<string | null> {
 export async function getGraphicsExecutionPoint(page: Page): Promise<string | null> {
   const element = getVideoElement(page);
   return await element.getAttribute("data-execution-point");
+}
+
+export async function getGraphicsScreenshotType(page: Page): Promise<string | null> {
+  const element = getVideoElement(page);
+  return await element.getAttribute("data-screenshot-type");
 }
 
 export async function getGraphicsStatus(page: Page): Promise<string | null> {
@@ -94,25 +102,25 @@ export async function getGraphicsTime(page: Page): Promise<number | null> {
 }
 
 export async function getGraphicsPixelColor(page: Page, x: number, y: number) {
+  await waitForGraphicsToLoad(page);
+
   return await page.evaluate(
     ([x, y]) => {
-      const element = document.querySelector("#graphics");
-      if (element == null) {
+      const element = document.querySelector("#graphics") as HTMLImageElement;
+      if (!element?.getAttribute("src")) {
         return null;
       }
 
-      const imageElement = element as HTMLImageElement;
-
       const canvas = document.createElement("canvas");
-      canvas.width = imageElement.width;
-      canvas.height = imageElement.height;
+      canvas.width = element.width;
+      canvas.height = element.height;
 
       const context = canvas.getContext("2d");
       if (context == null) {
         return null;
       }
 
-      context.drawImage(imageElement, 0, 0);
+      context.drawImage(element, 0, 0);
 
       const { data } = context.getImageData(x, y, 1, 1);
 
@@ -127,7 +135,17 @@ export async function getGraphicsPixelColor(page: Page, x: number, y: number) {
 }
 
 export async function waitForGraphicsToLoad(page: Page) {
+  await debugPrint(page, `Waiting for graphics to load...`, "waitForGraphicsToLoad");
+
   await waitFor(async () => {
-    await expect(await getGraphicsStatus(page)).not.toBe("fetching-cached-paint");
+    await expect(await getGraphicsStatus(page)).toBe("loaded");
+  });
+}
+
+export async function waitForRepaintGraphicsToLoad(page: Page) {
+  await debugPrint(page, `Waiting for repaint graphics to load...`, "waitForRepaintGraphicsToLoad");
+
+  await waitFor(async () => {
+    await expect(await getGraphicsScreenshotType(page)).toBe("repaint");
   });
 }

@@ -45,9 +45,9 @@ export function install_build_products(RUNTIME_BUILD_ID, PLATFORM, ARCHITECTURE)
 
   // Set Chrome binary path based on OS
   let CHROME_BINARY;
-  if (PLATFORM === "linux") {
+  if (os.platform() === "linux") {
     CHROME_BINARY = path.join(TMP_DIR, "build", "replay-chromium", "chrome");
-  } else if (PLATFORM === "darwin") {
+  } else if (os.platform() === "darwin") {
     CHROME_BINARY = path.join(
       TMP_DIR,
       "build",
@@ -56,10 +56,10 @@ export function install_build_products(RUNTIME_BUILD_ID, PLATFORM, ARCHITECTURE)
       "MacOS",
       "Chromium"
     );
-  } else if (PLATFORM === "win32") {
+  } else if (os.platform() === "win32") {
     CHROME_BINARY = path.join(TMP_DIR, "build", "replay-chromium", "chrome.exe");
   } else {
-    throw new Error(`Unsupported platform: ${PLATFORM}`);
+    throw new Error(`Unsupported platform: ${os.platform()}`);
   }
   return CHROME_BINARY;
 }

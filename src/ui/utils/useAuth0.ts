@@ -7,10 +7,13 @@ import { useGetUserInfo } from "ui/hooks/users";
 import { setAccessTokenInBrowserPrefs } from "./browser";
 import useToken from "./useToken";
 
+export type AuthContext = Auth0ContextInterface | typeof TEST_AUTH;
+
 const TEST_AUTH = {
   error: undefined,
   isLoading: false,
   isAuthenticated: true,
+  connection: "TEST",
   user: {
     sub: "auth0|60351bdaa6afe80068af126e",
     name: "e2e-testing@replay.io",
@@ -23,8 +26,6 @@ const TEST_AUTH = {
   logout: () => {},
   getAccessTokenSilently: () => Promise.resolve(),
 };
-
-export type AuthContext = Auth0ContextInterface | typeof TEST_AUTH;
 
 // TODO [hbenl, ryanjduffy] This function should `useMemo` to memoize the "user" object it returns.
 // As it is, this hooks prevents components like CommentTool from limiting how often their effects run.
@@ -48,6 +49,7 @@ export default function useAuth0() {
       error: undefined,
       isLoading: loading,
       isAuthenticated: true,
+      connection: "EXTERNAL",
       user: loading
         ? undefined
         : {
@@ -70,5 +72,14 @@ export default function useAuth0() {
     return TEST_AUTH;
   }
 
-  return { ...auth, loginAndReturn };
+  // for social logins, the connection (e.g. google-oauth2) is the prefix. For
+  // SAML logins, the connection is the client-specific code after the samlp
+  // prefix (samlp|client-name|user-id).
+  let connection: string | undefined;
+  if (auth.user) {
+    const parts = auth.user.sub.split("|") ?? [];
+    connection = parts[0] === "samlp" ? parts[1] : parts[0];
+  }
+
+  return { ...auth, connection, loginAndReturn };
 }

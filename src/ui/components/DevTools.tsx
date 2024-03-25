@@ -15,6 +15,7 @@ import { ExpandablesContextRoot } from "replay-next/src/contexts/ExpandablesCont
 import { PointsContextRoot } from "replay-next/src/contexts/points/PointsContext";
 import { SelectedFrameContextRoot } from "replay-next/src/contexts/SelectedFrameContext";
 import usePreferredFontSize from "replay-next/src/hooks/usePreferredFontSize";
+import { recordingTargetCache } from "replay-next/src/suspense/BuildIdCache";
 import { setDefaultTags } from "replay-next/src/utils/telemetry";
 import { ReplayClientInterface } from "shared/client/types";
 import { getTestEnvironment } from "shared/test-suites/RecordingTestMetadata";
@@ -28,6 +29,7 @@ import { NodePickerContextRoot } from "ui/components/NodePickerContext";
 import { RecordingDocumentTitle } from "ui/components/RecordingDocumentTitle";
 import TerminalContextAdapter from "ui/components/SecondaryToolbox/TerminalContextAdapter";
 import { TestSuiteContextRoot } from "ui/components/TestSuite/views/TestSuiteContext";
+import { UnsupportedTarget } from "ui/components/UnsupportedTarget";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { useTrackLoadingIdleTime } from "ui/hooks/tracking";
 import { useGetUserInfo, useUserIsAuthor } from "ui/hooks/users";
@@ -167,6 +169,23 @@ function _DevTools({
   const { id: userId, email: userEmail, loading: userLoading, name: userName } = useGetUserInfo();
   const processing = useAppSelector(getProcessing);
 
+  // Sanity check to make sure we aren't viewing a recording from an unsupported target
+  const [unsupportedTarget, setUnsupportedTarget] = useState<null | string>(null);
+  useEffect(() => {
+    (async () => {
+      const target = await recordingTargetCache.readAsync(replayClient);
+      switch (target) {
+        case "chromium":
+        case "node":
+          break;
+        case "gecko":
+        default:
+          setUnsupportedTarget(target);
+          break;
+      }
+    })();
+  });
+
   const isExternalRecording = useMemo(
     () => recording?.user && !recording.user.internal,
     [recording]
@@ -263,6 +282,10 @@ function _DevTools({
   const dismissSupportForm = () => {
     dispatch(setShowSupportForm(false));
   };
+
+  if (unsupportedTarget) {
+    return <UnsupportedTarget />;
+  }
 
   if (!loadingFinished) {
     return processing ? <DevToolsProcessingScreen /> : <DevToolsDynamicLoadingMessage />;

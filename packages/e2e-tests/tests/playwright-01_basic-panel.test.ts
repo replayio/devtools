@@ -19,7 +19,7 @@ import {
   openPlaywrightTestPanel,
 } from "../helpers/testsuites";
 import { waitFor } from "../helpers/utils";
-import test, { expect } from "../testFixtureCloneRecording";
+import test, { expect } from "../testFixture";
 
 test.use({ exampleKey: "playwright/breakpoints-05" });
 

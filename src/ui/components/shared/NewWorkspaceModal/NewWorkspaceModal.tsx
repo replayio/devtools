@@ -20,6 +20,7 @@ import { isValidTeamName, validateEmail } from "ui/utils/helpers";
 
 import { useConfirm } from "../Confirm";
 import { TextInput } from "../Forms";
+import Checkbox from "../Forms/Checkbox";
 import Modal from "../NewModal";
 import { WorkspaceMembers } from "../WorkspaceSettingsModal/WorkspaceSettingsModal";
 import InvitationLink from "./InvitationLink";
@@ -149,9 +150,11 @@ type SlideBodyProps = PropsFromRedux & {
 };
 
 function SlideBody1({ hideModal, setNewWorkspace, setCurrent, total, current }: SlideBodyProps) {
+  const user = hooks.useGetUserInfo();
   const [inputValue, setInputValue] = useState<string>("");
   const [inputError, setInputError] = useState<string | null>(null);
   const [allowNext, setAllowNext] = useState<boolean>(false);
+  const [createInternalTeam, setCreateInternalTeam] = useState(true);
   const textInputRef = useRef<HTMLInputElement>(null);
 
   const createNewWorkspace = hooks.useCreateNewWorkspace(onNewWorkspaceCompleted);
@@ -182,7 +185,7 @@ function SlideBody1({ hideModal, setNewWorkspace, setCurrent, total, current }: 
     createNewWorkspace({
       variables: {
         name: inputValue,
-        planKey: "team-v1",
+        planKey: user.internal && createInternalTeam ? "team-internal-v1" : "team-v1",
       },
     });
   };
@@ -194,12 +197,19 @@ function SlideBody1({ hideModal, setNewWorkspace, setCurrent, total, current }: 
   return (
     <>
       <SlideContent headerText="Team name">
-        {/* <form onSubmit={handleSave} className="flex flex-col space-y-4"> */}
         <div className="flex flex-col py-3 px-0.5">
           <TextInput value={inputValue} onChange={onChange} ref={textInputRef} />
           {inputError ? <div className="text-red-500">{inputError}</div> : null}
         </div>
-        {/* </form> */}
+        {user.internal ? (
+          <div className="flex flex-row items-center gap-3 px-0.5">
+            <Checkbox
+              checked={createInternalTeam}
+              onChange={e => setCreateInternalTeam(e.currentTarget.checked)}
+            />
+            Create Internal Team without Trial
+          </div>
+        ) : null}
       </SlideContent>
       <div className="grid">
         {isValidTeamName(inputValue) ? (

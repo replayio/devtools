@@ -31,7 +31,7 @@
     "@lexical/react": "^0.6.5",
     "@reduxjs/toolkit": "^1.8.4",
     "@replayio/overboard": "^0.4.1",
-    "@replayio/protocol": "^0.68.0",
+    "@replayio/protocol": "0.70.0",
     "@replayio/react-devtools-inline": "4.28.6",
     "@sentry/integrations": "^7.101.1",
     "@sentry/react": "^7.9.0",
@@ -92,7 +92,7 @@
     "reselect": "^4.1.5",
     "shared": "workspace:*",
     "slugify": "^1.6.5",
-    "suspense": "^0.0.51",
+    "suspense": "^0.0.53",
     "use-context-menu": "0.4.13"
   },
   "devDependencies": {
@@ -194,7 +194,7 @@
     "tailwindcss": "^3.2.4",
     "ts-node": "^10.7.0",
     "tsconfig-paths": "^3.14.1",
-    "typescript": "^5.3.3",
+    "typescript": "^5.4.2",
     "utf-8-validate": "^5.0.8",
     "uuid": "^7.0.3",
     "v8-to-istanbul": "^9.0.1",
@@ -226,7 +226,7 @@
     "@auth0/auth0-react": "1.2.0",
     "react-is": "18.2.0",
     "ts-invariant": "0.10.3",
-    "typescript": "5.3.3",
+    "typescript": "5.4.2",
     "react-json-view@1.21.3": "patch:react-json-view@npm:1.21.3#.yarn/patches/react-json-view-npm-1.21.3-7827bb54c4.patch"
   },
   "importSort": {

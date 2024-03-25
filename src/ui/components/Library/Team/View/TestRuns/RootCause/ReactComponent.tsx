@@ -27,7 +27,7 @@ function ReactComponentSequence({ group }: { group: Sequence<ReactComponentDiscr
       <div className="pl-4">
         <div>
           {group.discrepancies.map((d, i) => (
-            <ReactComponentDiscrepancy key={i} discrepancy={d} />
+            <ReactComponentDiscrepancyDisplay key={i} discrepancy={d} />
           ))}
         </div>
         <ReplayLink
@@ -41,6 +41,10 @@ function ReactComponentSequence({ group }: { group: Sequence<ReactComponentDiscr
     </Collapsible>
   );
 }
-function ReactComponentDiscrepancy({ discrepancy }: { discrepancy: ReactComponentDiscrepancy }) {
+function ReactComponentDiscrepancyDisplay({
+  discrepancy,
+}: {
+  discrepancy: ReactComponentDiscrepancy;
+}) {
   return <div>nodeName: {discrepancy.event.nodeName}</div>;
 }

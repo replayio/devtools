@@ -7,7 +7,7 @@ import {
   replyToComment,
 } from "../helpers/comments";
 import { openSource } from "../helpers/source-explorer-panel";
-import test, { Page } from "../testFixtureCloneRecording";
+import test, { Page } from "../testFixture";
 
 const url = "authenticated_comments.html";
 

@@ -1,26 +1,30 @@
+import { PauseId } from "@replayio/protocol";
 import { ContextMenuItem, useContextMenu } from "use-context-menu";
 
 import { ElementsListData } from "replay-next/components/elements/ElementsListData";
+import { elementCache } from "replay-next/components/elements/suspense/ElementCache";
 import { Item } from "replay-next/components/elements/types";
 import Icon from "replay-next/components/Icon";
 import { copyToClipboard } from "replay-next/components/sources/utils/clipboard";
+import { ReplayClientInterface } from "shared/client/types";
 
 import styles from "../ElementsListItem.module.css";
 
 export function useElementsListItemContextMenu({
   elementsListData,
   item,
+  pauseId,
+  replayClient,
 }: {
   elementsListData: ElementsListData;
   item: Item;
+  pauseId: PauseId;
+  replayClient: ReplayClientInterface;
 }) {
-  const { element, id, isExpanded } = item;
-  const { filteredChildNodeIds, node } = element;
-
-  const hasChildren = filteredChildNodeIds.length > 0;
-
-  const copyElement = () => {
+  const copyElement = async () => {
     let string;
+
+    const { node } = await elementCache.readAsync(replayClient, pauseId, item.objectId);
 
     // IMPORTANT
     // Keep this in sync with the rendering logic in ElementsListItem
@@ -48,8 +52,7 @@ export function useElementsListItemContextMenu({
       default: {
         const nodeName = node.nodeName.toLowerCase();
 
-        const attributes =
-          element.node.attributes?.map(({ name, value }) => `${name}="${value}"`) ?? [];
+        const attributes = node.attributes?.map(({ name, value }) => `${name}="${value}"`) ?? [];
 
         if (attributes.length === 0) {
           string = `<${nodeName}>`;
@@ -63,8 +66,11 @@ export function useElementsListItemContextMenu({
     copyToClipboard(string);
   };
 
+  const hasChildren = item.displayMode !== "empty";
+  const isExpanded = hasChildren && item.displayMode !== "collapsed";
+
   const toggleNode = () => {
-    elementsListData.toggleNodeExpanded(id, !isExpanded);
+    elementsListData.toggleNodeExpanded(item.objectId, !isExpanded);
   };
 
   return useContextMenu(
@@ -75,7 +81,7 @@ export function useElementsListItemContextMenu({
           Copy
         </>
       </ContextMenuItem>
-      {hasChildren && (
+      {item.displayMode !== "empty" && (
         <ContextMenuItem dataTestId="ConsoleContextMenu-SetFocusStartButton" onSelect={toggleNode}>
           <>
             <Icon className={styles.ExpandCollapseIcon} type={isExpanded ? "collapse" : "expand"} />

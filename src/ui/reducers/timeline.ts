@@ -20,7 +20,6 @@ function initialTimelineState(): TimelineState {
     hoverTime: null,
     playback: null,
     playbackFocusWindow: false,
-    playbackPrecachedTime: 0,
     endpoint: { time: 0, point: "0" },
     recordingDuration: null,
     shouldAnimate: true,
@@ -30,7 +29,6 @@ function initialTimelineState(): TimelineState {
     timelineDimensions: { left: 1, top: 1, width: 1 },
     /** @deprecated This appears to be obsolete for now? */
     zoomRegion: { beginTime: 0, endTime: 0, scale: 1 },
-    dragging: false,
   };
 }
 
@@ -38,9 +36,6 @@ const timelineSlice = createSlice({
   name: "timeline",
   initialState: initialTimelineState,
   reducers: {
-    setDragging(state, action: PayloadAction<boolean>) {
-      state.dragging = action.payload;
-    },
     setTimelineState(state, action: PayloadAction<Partial<TimelineState>>) {
       // This is poor action design and we should avoid this :(
       Object.assign(state, action.payload);
@@ -50,9 +45,6 @@ const timelineSlice = createSlice({
     },
     setHoveredItem(state, action: PayloadAction<HoveredItem | null>) {
       state.hoveredItem = action.payload;
-    },
-    setPlaybackPrecachedTime(state, action: PayloadAction<number>) {
-      state.playbackPrecachedTime = action.payload;
     },
     setPlaybackFocusWindow(state, action: PayloadAction<boolean>) {
       state.playbackFocusWindow = action.payload;
@@ -67,10 +59,8 @@ const timelineSlice = createSlice({
 });
 
 export const {
-  setDragging,
   setHoveredItem,
   setMarkTimeStampPoint,
-  setPlaybackPrecachedTime,
   setPlaybackFocusWindow,
   setFocusWindow,
   setTimelineState,
@@ -85,14 +75,12 @@ export const getHoverTime = (state: UIState) => state.timeline.hoverTime;
 export const getPlayback = (state: UIState) => state.timeline.playback;
 export const getShowFocusModeControls = (state: UIState) => state.timeline.showFocusModeControls;
 export const getShowHoverTimeGraphics = (state: UIState) => state.timeline.showHoverTimeGraphics;
-export const isDragging = (state: UIState) => state.timeline.dragging;
 export const isPlaying = (state: UIState) => state.timeline.playback !== null;
 export const getRecordingDuration = (state: UIState) => state.timeline.recordingDuration;
 export const getTimelineDimensions = (state: UIState) => state.timeline.timelineDimensions;
 export const getMarkTimeStampedPoint = (state: UIState) => state.timeline.markTimeStampedPoint;
 export const getHoveredItem = (state: UIState) => state.timeline.hoveredItem;
 export const getEndpoint = (state: UIState) => state.timeline.endpoint;
-export const getPlaybackPrecachedTime = (state: UIState) => state.timeline.playbackPrecachedTime;
 export const getPlaybackFocusWindow = (state: UIState) => state.timeline.playbackFocusWindow;
 export const getFocusWindow = (state: UIState) => state.timeline.focusWindow;
 export const isMaximumFocusWindow = (state: UIState) => {

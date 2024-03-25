@@ -139,6 +139,7 @@ const GET_MY_RECORDINGS = gql`
       recordings(filter: $filter) {
         edges {
           node {
+            buildId
             uuid
             url
             title
@@ -282,6 +283,7 @@ export function convertRecording(
     | GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_executions_recordings
 ): Recording {
   const recording: Recording = {
+    buildId: "buildId" in rec ? rec.buildId : undefined,
     id: rec.uuid,
     user: "owner" in rec ? rec.owner : undefined,
     userId: "owner" in rec ? rec.owner?.id : undefined,

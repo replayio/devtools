@@ -41,9 +41,7 @@ export async function recordPlaywright(
   });
   const page = await context.newPage();
   try {
-    return await script(page as any, expect);
-  } catch (err) {
-    console.error("PLAYWRIGHT ERROR", err);
+    return await script(page, expect);
   } finally {
     await page.close();
     await context.close();

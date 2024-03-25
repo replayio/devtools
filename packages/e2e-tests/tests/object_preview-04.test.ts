@@ -6,7 +6,7 @@ import {
   waitForScopeValue,
 } from "../helpers/pause-information-panel";
 import { addBreakpoint, addLogpoint, toggleMappedSources } from "../helpers/source-panel";
-import test from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
 test.use({ exampleKey: "doc_prod_bundle.html" });
 

@@ -24,6 +24,7 @@ import { useLaunchDarkly } from "ui/utils/launchdarkly";
 import { InstallRouteListener } from "ui/utils/routeListener";
 import tokenManager from "ui/utils/tokenManager";
 import "../src/base.css";
+import { getRecordingId } from "shared/utils/recording";
 
 interface AuthProps {
   apiKey?: string;
@@ -100,15 +101,17 @@ function Routing({ Component, pageProps }: AppProps) {
   );
 }
 
-// Ensure this component only renders once even if the parent component re-renders
-// Otherwise it can temporarily override titles set by child components,
-// causing the document title to flicker.
+  // Don't set a default title within the DevTools app
+  // Else it overrides the recording title when the root error boundary renders
+  // See FE-2041
 const MemoizedHeader = memo(function MemoizedHeader() {
+  const hasRecordingId = getRecordingId() != null;
+
   return (
     <Head>
       <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
       <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
-      <title>Replay</title>
+      {hasRecordingId || <title>Replay</title>}
     </Head>
   );
 });

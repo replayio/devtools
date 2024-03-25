@@ -6,6 +6,7 @@ import {
   filterTestRunsByText,
   findTestRunByText,
   noTestSelected,
+  selectTestItem,
   testErrors,
   testItems,
   testRecordings,
@@ -164,30 +165,25 @@ test(`test-suite-dashboard/test-runs-02: failed run in temp branch without sourc
   // > Test Details
 
   // >>> When a test is selected, recording list should be displayed
-  await testItems(page).filter({ hasText: "Cypress Test" }).first().click();
-  await page.waitForSelector('[data-test-id="NoTestSelected"]', { state: "detached" });
+  await selectTestItem(page, testItems(page).filter({ hasText: "Cypress Test" }).first());
   expect(await testRecordings(page).count()).toBe(1);
   expect(await testRecordings(page).nth(0).getAttribute("data-test-status")).toBe("failed");
 
   // >>> When there's no recording, a message should be displayed
-  await testItems(page).filter({ hasText: "Second test" }).click();
-  await page.waitForSelector('[data-test-id="NoTestSelected"]', { state: "detached" });
+  await selectTestItem(page, testItems(page).filter({ hasText: "Second test" }).first());
   expect(await testRecordings(page).count()).toBe(0);
   expect(page.locator('[data-test-id="MISSING_REPLAYS_FOR_TEST_RUN"]')).toBeVisible();
 
   // >>> Errors
-  await testItems(failedTests).filter({ hasText: `Cypress Test` }).first().click();
-  await page.waitForSelector('[data-test-id="NoTestSelected"]', { state: "detached" });
+  await selectTestItem(page, testItems(failedTests).filter({ hasText: `Cypress Test` }).first());
   expect(await testRecordings(page).count()).toBe(1);
   expect(await testErrors(page).count()).toBe(1);
 
-  await testItems(failedTests).filter({ hasNotText: `Cypress Test` }).first().click();
-  await page.waitForSelector('[data-test-id="NoTestSelected"]', { state: "detached" });
+  await selectTestItem(page, testItems(failedTests).filter({ hasNotText: `Cypress Test` }).first());
   expect(await testRecordings(page).count()).toBe(1);
   expect(await testErrors(page).count()).toBe(1);
 
-  await testItems(flakyTests).first().click();
-  await page.waitForSelector('[data-test-id="NoTestSelected"]', { state: "detached" });
+  await selectTestItem(page, testItems(flakyTests).first());
   expect(await testRecordings(page).count()).toBe(1);
   expect(await testErrors(page).count()).toBe(1);
 

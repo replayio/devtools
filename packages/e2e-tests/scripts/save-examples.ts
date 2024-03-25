@@ -4,8 +4,8 @@
 // Use the API key for the "Frontend E2E Test Team" that we have set up in admin,
 // as that should let us mark these recordings as public.
 
-import { execSync } from "child_process";
 import { existsSync, writeFileSync } from "fs";
+import assert from "node:assert/strict";
 import { join } from "path";
 import type { Page, expect as expectFunction } from "@playwright/test";
 import { removeRecording, uploadRecording } from "@replayio/replay";
@@ -44,7 +44,7 @@ const argv = yargs
     alias: "r",
     default: "",
     description: "Override runtime specified in test config",
-    choices: ["", "chromium", "firefox", "node"],
+    choices: ["", "chromium", "node"],
   })
   .option("target", {
     alias: "t",
@@ -68,7 +68,7 @@ type TestExampleFile = {
   category: "browser" | "node";
   filename: string;
   folder: string;
-  runtime: "firefox" | "chromium" | "node";
+  runtime: "chromium" | "node";
   playwrightScript?: PlaywrightScript;
 };
 const examplesJsonPath = join(__dirname, "..", "examples.json");
@@ -176,15 +176,22 @@ async function saveExamples(
     }
 
     if (category === examplesTarget) {
+      let resolvedPlaywrightScript: PlaywrightScript | undefined;
+      if (playwrightScript) {
+        const playwrightScriptModule = require(join("..", playwrightScript));
+        assert(
+          typeof playwrightScriptModule.default === "function",
+          `Expected default export to be a function in ${playwrightScript}`
+        );
+        resolvedPlaywrightScript = playwrightScriptModule.default;
+      }
       examplesToRun.push({
         buildId,
         category,
         filename: key,
         folder,
         runtime: runtime as TestExampleFile["runtime"],
-        playwrightScript: playwrightScript
-          ? require(join("..", playwrightScript)).default
-          : undefined,
+        playwrightScript: resolvedPlaywrightScript,
       });
     }
   }
@@ -230,6 +237,8 @@ async function saveBrowserExample({ example }: TestRunCallbackArgs) {
   const exampleUrl = `${config.devtoolsUrl}/test/examples/${example.filename}`;
   async function defaultPlaywrightScript(page: Page) {
     await waitUntilMessage(page as Page, "ExampleFinished");
+    // add a little delay to ensure that the recording is complete, see [FE-2286] and [RUN-3258]
+    await sleep(500);
     console.log("Example finished");
   }
   const playwrightScript: PlaywrightScript = example.playwrightScript ?? defaultPlaywrightScript;

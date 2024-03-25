@@ -1,8 +1,6 @@
 import { ObjectId } from "@replayio/protocol";
 import { ElementType } from "@replayio/react-devtools-inline";
 
-export type ReactDevToolsInlineModule = typeof import("@replayio/react-devtools-inline/frontend");
-
 // TRICKY
 // Keep the types below in sync with react-devtools-inline package
 
@@ -130,26 +128,3 @@ export type InspectedReactElement = {
   targetErrorBoundaryID: number | null | undefined;
   warnings: Array<[string, number]>;
 };
-
-export function isDehydrated(value: any): value is Dehydrated {
-  return (
-    value != null &&
-    typeof value === "object" &&
-    value.hasOwnProperty("inspectable") &&
-    value.hasOwnProperty("name") &&
-    value.hasOwnProperty("preview_long") &&
-    value.hasOwnProperty("preview_short")
-  );
-}
-
-export function isUnserializable(value: any): value is Unserializable {
-  return (
-    value != null &&
-    typeof value === "object" &&
-    value.hasOwnProperty("inspectable") &&
-    value.hasOwnProperty("name") &&
-    value.hasOwnProperty("preview_long") &&
-    value.hasOwnProperty("preview_short") &&
-    value.hasOwnProperty("unserializable")
-  );
-}

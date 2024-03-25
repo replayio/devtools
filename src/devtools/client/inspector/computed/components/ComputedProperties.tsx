@@ -31,12 +31,35 @@ function isHidden(property: ComputedPropertyState, search: string, showBrowserSt
   return false;
 }
 
-function ComputedProperties() {
-  const dispatch = useAppDispatch();
+function ComputedPropertiesWrapper() {
   const { pauseId } = useMostRecentLoadedPause() ?? {};
-  const { selectedNodeId, expandedProperties, search, showBrowserStyles } = useAppSelector(
+  const selectedNodeId = useAppSelector(getSelectedNodeId);
+
+  return (
+    <div id="computed-container">
+      <div id="computed-container-focusable" tabIndex={-1}>
+        {pauseId && selectedNodeId ? (
+          <ComputedProperties {...{ pauseId, selectedNodeId }} />
+        ) : (
+          <div id="computed-no-results" className="devtools-sidepanel-no-result">
+            No CSS properties found
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ComputedProperties({
+  pauseId,
+  selectedNodeId,
+}: {
+  pauseId: string;
+  selectedNodeId: string;
+}) {
+  const dispatch = useAppDispatch();
+  const { expandedProperties, search, showBrowserStyles } = useAppSelector(
     state => ({
-      selectedNodeId: getSelectedNodeId(state),
       expandedProperties: state.computed.expandedProperties,
       search: state.computed.search,
       showBrowserStyles: state.computed.showBrowserStyles,
@@ -49,8 +72,8 @@ function ComputedProperties() {
   const { value: element, status: elementStatus } = useImperativeCacheValue(
     elementCache,
     replayClient,
-    pauseId!,
-    selectedNodeId!
+    pauseId,
+    selectedNodeId
   );
 
   const canHaveRules = elementStatus === "resolved" && isElement(element.node);
@@ -87,22 +110,15 @@ function ComputedProperties() {
     );
   });
 
-  return (
-    <div id="computed-container">
-      <div id="computed-container-focusable" tabIndex={-1}>
-        <div id="computed-property-container" className="devtools-monospace" tabIndex={0} dir="ltr">
-          {renderedProperties}
-        </div>
-        <div
-          id="computed-no-results"
-          className="devtools-sidepanel-no-result"
-          hidden={!allPropertiesHidden}
-        >
-          {status === "pending" ? "Loading..." : "No CSS properties found"}
-        </div>
-      </div>
+  return allPropertiesHidden ? (
+    <div id="computed-no-results" className="devtools-sidepanel-no-result">
+      {status === "pending" ? "Loading..." : "No CSS properties found"}
+    </div>
+  ) : (
+    <div id="computed-property-container" className="devtools-monospace" tabIndex={0} dir="ltr">
+      {renderedProperties}
     </div>
   );
 }
 
-export default React.memo(ComputedProperties);
+export default React.memo(ComputedPropertiesWrapper);

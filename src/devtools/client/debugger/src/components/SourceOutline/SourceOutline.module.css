@@ -1,0 +1,7 @@
+.Warning {
+  margin: 4px 8px;
+  padding: 4px 8px;
+  border: 1px solid var(--theme-warning-border);
+  background-color: var(--theme-warning-background);
+  color: var(--theme-warning-color);
+}

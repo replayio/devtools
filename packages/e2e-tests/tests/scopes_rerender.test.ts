@@ -1,7 +1,7 @@
 import { openDevToolsTab, startTest } from "../helpers";
 import { openConsolePanel, warpToMessage } from "../helpers/console-panel";
 import { selectFrame, waitForScopeValue } from "../helpers/pause-information-panel";
-import test from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
 test.use({ exampleKey: "doc_recursion.html" });
 

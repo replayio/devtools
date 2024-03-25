@@ -1,7 +1,7 @@
 import { openDevToolsTab, startTest } from "../helpers";
 import { warpToMessage } from "../helpers/console-panel";
 import { getGraphicsPixelColor, waitForGraphicsToLoad } from "../helpers/screenshot";
-import test, { Page, expect } from "../testFixtureCloneRecording";
+import test, { Page, expect } from "../testFixture";
 
 test.use({ exampleKey: "paint_at_intervals.html" });
 
