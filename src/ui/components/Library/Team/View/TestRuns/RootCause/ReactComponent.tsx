@@ -1,14 +1,18 @@
 import { useContext } from "react";
 
+import {
+  RootCauseAnalysisDataV1,
+  Sequence,
+} from "shared/root-cause-analysis/RootCauseAnalysisData";
+
 import { Collapsible } from "./Collapsible";
 import { ReplayLink } from "./ReplayLink";
 import { RootCauseContext } from "./RootCause";
-import { ReactComponentDiscrepancy, Sequence } from "./types";
 
 export function ReactComponentSequences({
   sequences,
 }: {
-  sequences: Sequence<ReactComponentDiscrepancy>[];
+  sequences: Sequence<RootCauseAnalysisDataV1.ReactComponentDiscrepancy>[];
 }) {
   return (
     <div className="flex flex-col gap-2 pl-4">
@@ -18,7 +22,11 @@ export function ReactComponentSequences({
     </div>
   );
 }
-function ReactComponentSequence({ group }: { group: Sequence<ReactComponentDiscrepancy> }) {
+function ReactComponentSequence({
+  group,
+}: {
+  group: Sequence<RootCauseAnalysisDataV1.ReactComponentDiscrepancy>;
+}) {
   const { failedId, successId } = useContext(RootCauseContext);
   const recordingId = group.kind === "Extra" ? failedId : successId;
 
@@ -41,10 +49,11 @@ function ReactComponentSequence({ group }: { group: Sequence<ReactComponentDiscr
     </Collapsible>
   );
 }
+
 function ReactComponentDiscrepancyDisplay({
   discrepancy,
 }: {
-  discrepancy: ReactComponentDiscrepancy;
+  discrepancy: RootCauseAnalysisDataV1.ReactComponentDiscrepancy;
 }) {
   return <div>nodeName: {discrepancy.event.nodeName}</div>;
 }

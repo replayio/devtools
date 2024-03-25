@@ -1,21 +1,29 @@
 import { createContext } from "react";
 
+import {
+  RootCauseAnalysisDataV1,
+  Sequence,
+} from "shared/root-cause-analysis/RootCauseAnalysisData";
+
 import { Collapsible } from "./Collapsible";
 import { ExecutedStatementSequences } from "./ExecutedStatement";
 import { NetworkEventSequences } from "./NetworkEvent";
 import { ReactComponentSequences } from "./ReactComponent";
-import {
-  AnyDiscrepancy,
-  EventKind,
-  ExecutedStatementDiscrepancy,
-  NetworkEventDiscrepancy,
-  ReactComponentDiscrepancy,
-  RootCauseAnalysisResult,
-  Sequence,
-} from "./types";
 
-function groupSequences(discrepancies: AnyDiscrepancy[]) {
-  const grouped: Record<EventKind, Record<string, Sequence<AnyDiscrepancy>>> = {};
+interface GroupedSequences {
+  ExecutedStatement: Record<string, Sequence<RootCauseAnalysisDataV1.ExecutedStatementDiscrepancy>>;
+  NetworkEvent: Record<string, Sequence<RootCauseAnalysisDataV1.NetworkEventDiscrepancy>>;
+  ReactComponent: Record<string, Sequence<RootCauseAnalysisDataV1.ReactComponentDiscrepancy>>;
+  CustomEvent: Record<string, Sequence<RootCauseAnalysisDataV1.CustomEventDiscrepancy>>;
+}
+
+function groupSequences(discrepancies: RootCauseAnalysisDataV1.AnyDiscrepancy[]) {
+  const grouped: GroupedSequences = {
+    ExecutedStatement: {},
+    NetworkEvent: {},
+    ReactComponent: {},
+    CustomEvent: {},
+  };
 
   discrepancies.forEach(d => {
     if (!grouped[d.eventKind]) {
@@ -27,14 +35,15 @@ function groupSequences(discrepancies: AnyDiscrepancy[]) {
       group[d.sequenceId] = {
         sequenceId: d.sequenceId,
         kind: d.kind,
-        discrepancies: [d],
+        // Lame type hack, but it works for now
+        discrepancies: [d] as any[],
       };
     } else {
-      group[d.sequenceId].discrepancies.push(d);
+      group[d.sequenceId].discrepancies.push(d as any);
     }
   });
 
-  return { NetworkEvent: [], ExecutedStatement: [], ReactComponent: [], ...grouped };
+  return grouped;
 }
 
 type RootCauseContextType = {
@@ -44,55 +53,32 @@ type RootCauseContextType = {
 
 export const RootCauseContext = createContext<RootCauseContextType>(null as any);
 
-export function RootCause({ discrepancy }: { discrepancy: RootCauseAnalysisResult }) {
+export function RootCause({
+  discrepancy,
+}: {
+  discrepancy: RootCauseAnalysisDataV1.RootCauseAnalysisResult;
+}) {
   const testFailure = discrepancy;
   const failedId = testFailure.failedRun.id.recordingId;
   const successId = testFailure.successRun.id.recordingId;
   const groupedSequences = groupSequences(testFailure.discrepancies);
 
-  console.log({ groupedSequences });
-
   return (
     <RootCauseContext.Provider value={{ failedId, successId }}>
       <div className="flex flex-col">
         <div className="flex flex-col gap-4 px-4">
-          <Collapsible
-            label={`ReactComponent`}
-            // label={`ReactComponent (${Object.keys(groupedSequences["ReactComponent"]).length})`}
-          >
+          <Collapsible label={`ReactComponent`}>
             <ReactComponentSequences
-              sequences={
-                Object.values(
-                  groupedSequences["ReactComponent"]
-                ) as Sequence<ReactComponentDiscrepancy>[]
-              }
+              sequences={Object.values(groupedSequences["ReactComponent"])}
             />
           </Collapsible>
-          <Collapsible
-            label={`ExecutedStatement`}
-            // label={`ExecutedStatement (${
-            //   Object.keys(groupedSequences["ExecutedStatement"]).length
-            // })`}
-          >
+          <Collapsible label={`ExecutedStatement`}>
             <ExecutedStatementSequences
-              sequences={
-                Object.values(
-                  groupedSequences["ExecutedStatement"]
-                ) as Sequence<ExecutedStatementDiscrepancy>[]
-              }
+              sequences={Object.values(groupedSequences["ExecutedStatement"])}
             />
           </Collapsible>
-          <Collapsible
-            label={`NetworkEvent`}
-            // label={`NetworkEvent (${Object.keys(groupedSequences["NetworkEvent"]).length})`}
-          >
-            <NetworkEventSequences
-              sequences={
-                Object.values(
-                  groupedSequences["NetworkEvent"]
-                ) as Sequence<NetworkEventDiscrepancy>[]
-              }
-            />
+          <Collapsible label={`NetworkEvent`}>
+            <NetworkEventSequences sequences={Object.values(groupedSequences["NetworkEvent"])} />
           </Collapsible>
         </div>
       </div>

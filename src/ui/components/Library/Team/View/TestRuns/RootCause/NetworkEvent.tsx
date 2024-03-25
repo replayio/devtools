@@ -1,19 +1,19 @@
 import { useContext } from "react";
 
+import {
+  EventKind,
+  RootCauseAnalysisDataV1,
+  Sequence,
+} from "shared/root-cause-analysis/RootCauseAnalysisData";
+
 import { Collapsible } from "./Collapsible";
 import { ReplayLink } from "./ReplayLink";
 import { RootCauseContext } from "./RootCause";
-import {
-  NetworkEventContentsRequest,
-  NetworkEventContentsResponseJSON,
-  NetworkEventDiscrepancy,
-  Sequence,
-} from "./types";
 
 export function NetworkEventSequences({
   sequences,
 }: {
-  sequences: Sequence<NetworkEventDiscrepancy>[];
+  sequences: Sequence<RootCauseAnalysisDataV1.NetworkEventDiscrepancy>[];
 }) {
   return (
     <div className="flex flex-col gap-2">
@@ -23,7 +23,11 @@ export function NetworkEventSequences({
     </div>
   );
 }
-function NetworkEventSequence({ group }: { group: Sequence<NetworkEventDiscrepancy> }) {
+function NetworkEventSequence({
+  group,
+}: {
+  group: Sequence<RootCauseAnalysisDataV1.NetworkEventDiscrepancy>;
+}) {
   return (
     <div className="pl-4">
       <Collapsible label={`(${group.kind}) ${group.sequenceId}`}>
@@ -47,8 +51,8 @@ function ExtraResponse({
   time,
 }: {
   label: string;
-  value: any;
-  alternateValue?: any;
+  value: unknown;
+  alternateValue?: unknown;
   point: string;
   time: number;
 }) {
@@ -148,20 +152,22 @@ function MissingRequest({
   );
 }
 
-function NetworkEventDiscrepancyDisplay({ discrepancy }: { discrepancy: NetworkEventDiscrepancy }) {
+function NetworkEventDiscrepancyDisplay({
+  discrepancy,
+}: {
+  discrepancy: RootCauseAnalysisDataV1.NetworkEventDiscrepancy;
+}) {
   const {
     kind,
     event: { data, key, point, time },
   } = discrepancy;
   let content;
 
-  console.log({ discrepancy });
-
   if (kind == "Extra") {
     if (data.kind === "ResponseJSON") {
       const { data, alternate } = discrepancy.event as {
-        data: NetworkEventContentsResponseJSON;
-        alternate?: NetworkEventContentsResponseJSON;
+        data: RootCauseAnalysisDataV1.NetworkEventContentsResponseJSON;
+        alternate?: RootCauseAnalysisDataV1.NetworkEventContentsResponseJSON;
       };
 
       content = (
@@ -178,7 +184,7 @@ function NetworkEventDiscrepancyDisplay({ discrepancy }: { discrepancy: NetworkE
     }
   } else {
     if (data.kind === "ResponseJSON") {
-      const { path, requestTag, requestUrl } = data as NetworkEventContentsResponseJSON;
+      const { path, requestTag, requestUrl } = data;
 
       content = (
         <MissingResponse
@@ -191,7 +197,7 @@ function NetworkEventDiscrepancyDisplay({ discrepancy }: { discrepancy: NetworkE
         />
       );
     } else if (data.kind === "Request") {
-      const { requestMethod, requestUrl } = data as NetworkEventContentsRequest;
+      const { requestMethod, requestUrl } = data;
 
       content = (
         <MissingRequest

@@ -1,16 +1,20 @@
 import { useContext, useState } from "react";
 
+import {
+  RootCauseAnalysisDataV1,
+  Sequence,
+} from "shared/root-cause-analysis/RootCauseAnalysisData";
+
 import { Collapsible } from "./Collapsible";
 import { ReplayLink } from "./ReplayLink";
 import { RootCauseContext } from "./RootCause";
-import { ExecutedStatementDiscrepancy, Sequence } from "./types";
 
 let UNKNOWN_SOURCE = "Unknown source";
 
 export function ExecutedStatementSequences({
   sequences,
 }: {
-  sequences: Sequence<ExecutedStatementDiscrepancy>[];
+  sequences: Sequence<RootCauseAnalysisDataV1.ExecutedStatementDiscrepancy>[];
 }) {
   return (
     <div className="flex flex-col gap-2">
@@ -20,7 +24,11 @@ export function ExecutedStatementSequences({
     </div>
   );
 }
-function ExecutedStatementSequence({ group }: { group: Sequence<ExecutedStatementDiscrepancy> }) {
+function ExecutedStatementSequence({
+  group,
+}: {
+  group: Sequence<RootCauseAnalysisDataV1.ExecutedStatementDiscrepancy>;
+}) {
   return (
     <div className="pl-4">
       <div className="flex flex-col gap-2">
@@ -40,7 +48,7 @@ function ExecutedStatementDiscrepancyDisplay({
   discrepancy,
   sequenceId,
 }: {
-  discrepancy: ExecutedStatementDiscrepancy;
+  discrepancy: RootCauseAnalysisDataV1.ExecutedStatementDiscrepancy;
   sequenceId: string;
 }) {
   const [isCollapsed, setIsCollapsed] = useState(true);
@@ -59,10 +67,10 @@ function ExecutedStatementDiscrepancyDisplay({
   const endLine = midLine.line + ALLOWANCE;
 
   const points = discrepancy.event.description!.frame.points.filter(
-    (p: any) => p.location.line >= beginLine && p.location.line <= endLine
+    p => p.location.line >= beginLine && p.location.line <= endLine
   );
   const otherPoints = discrepancy.event.description!.frame.otherPoints.filter(
-    (p: any) => p.location.line >= beginLine && p.location.line <= endLine
+    p => p.location.line >= beginLine && p.location.line <= endLine
   );
   const lines = new Array(endLine - beginLine).fill(beginLine).map((l, i) => l + i);
 
@@ -115,7 +123,7 @@ function ExecutedStatementDiscrepancyDisplay({
             </div>
             <div className="flex flex-col">
               {lines.map((l, i) => {
-                const point = points.find((p: any) => p.location.line === l);
+                const point = points.find(p => p.location.line === l);
                 return (
                   <div
                     key={i}
@@ -127,16 +135,16 @@ function ExecutedStatementDiscrepancyDisplay({
                           }
                         : {}
                     }
-                    className={`px-1 ${point.breakable ? "bg-green-700" : "bg-gray-600"}`}
+                    className={`px-1 ${point?.breakable ? "bg-green-700" : "bg-gray-600"}`}
                   >
-                    {points.find((p: any) => p.location.line === l).hits}
+                    {point?.hits}
                   </div>
                 );
               })}
             </div>
             <div className="flex flex-col">
               {lines.map((l, i) => {
-                const point = otherPoints.find((p: any) => p.location.line === l);
+                const point = otherPoints.find(p => p.location.line === l);
                 return (
                   <div
                     key={i}
@@ -148,9 +156,9 @@ function ExecutedStatementDiscrepancyDisplay({
                           }
                         : {}
                     }
-                    className={`px-1 ${point.breakable ? "bg-red-700" : "bg-gray-600"}`}
+                    className={`px-1 ${point?.breakable ? "bg-red-700" : "bg-gray-600"}`}
                   >
-                    {point.hits}
+                    {point?.hits}
                   </div>
                 );
               })}
@@ -158,7 +166,7 @@ function ExecutedStatementDiscrepancyDisplay({
             <div className="grid overflow-auto">
               {/* <div className="flex flex-col overflow-auto"> */}
               {lines.map((l, i) => {
-                const point = points.find((p: any) => p.location.line === l);
+                const point = points.find(p => p.location.line === l);
                 return (
                   <div
                     key={i}
@@ -174,7 +182,7 @@ function ExecutedStatementDiscrepancyDisplay({
                         : {}
                     }
                   >
-                    {point.text || " "}
+                    {point?.text || ""}
                   </div>
                 );
               })}
