@@ -7,7 +7,7 @@ import {
 import { reverseStepOverToLine } from "../helpers/pause-information-panel";
 import { openSource } from "../helpers/source-explorer-panel";
 import { addLogpoint } from "../helpers/source-panel";
-import test from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
 test.use({ exampleKey: "node/basic.js" });
 

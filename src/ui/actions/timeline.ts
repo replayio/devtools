@@ -262,6 +262,11 @@ export function seek({
   location?: Location;
 }): UIThunkAction<Promise<void>> {
   return async (dispatch, getState, { replayClient }) => {
+    const isPlaying = getPlayback(getState()) !== null;
+    if (isPlaying) {
+      dispatch(stopPlayback());
+    }
+
     const seekLock = new Object();
     dispatch(pauseRequestedAt({ seekLock, executionPoint, time, location }));
     dispatch(setTimelineState({ currentTime: time, playback: null }));
@@ -286,7 +291,7 @@ export function seek({
 
         const timeStampedPoint = await replayClient.getPointNearTime(clampedTime);
         if (getSeekLock(getState()) !== seekLock) {
-          // someone requested seeking to a different point while we were waiting
+          // Someone requested seeking to a different point while we were waiting
           return;
         }
 
@@ -378,7 +383,7 @@ export function togglePlayback(): UIThunkAction {
 }
 
 export function startPlayback(
-  { beginTime: optBeginTime, endTime: optEndTime }: PlaybackOptions = {
+  { beginPoint = null, beginTime, endPoint = null, endTime }: PlaybackOptions = {
     beginTime: null,
     endTime: null,
   }
@@ -387,21 +392,20 @@ export function startPlayback(
     const state = getState();
     const currentTime = getCurrentTime(state);
 
-    const endTime =
-      optEndTime ||
+    endTime =
+      endTime ||
       (getPlaybackFocusWindow(state) && replayClient.getCurrentFocusWindow()?.end.time) ||
       getZoomRegion(state).endTime;
 
-    const beginDate = Date.now();
-    const beginTime =
-      optBeginTime ||
+    beginTime =
+      beginTime ||
       (currentTime >= endTime
         ? (getPlaybackFocusWindow(state) && replayClient.getCurrentFocusWindow()?.begin.time) || 0
         : currentTime);
 
     dispatch(
       setTimelineState({
-        playback: { beginTime, beginDate, endTime, time: beginTime },
+        playback: { beginPoint, beginTime, endPoint, endTime, time: beginTime },
         currentTime: beginTime,
       })
     );
@@ -410,25 +414,19 @@ export function startPlayback(
   };
 }
 
-export function stopPlayback(updateTime: boolean = true): UIThunkAction {
+export function stopPlayback(): UIThunkAction {
   return async (dispatch, getState) => {
-    if (updateTime) {
-      const playback = getPlayback(getState());
-
-      if (playback) {
-        dispatch(seek({ time: playback.time }));
-      }
+    const playback = getPlayback(getState());
+    if (playback) {
+      dispatch(setTimelineState({ playback: null }));
+      dispatch(seek({ time: playback.time }));
     }
-
-    dispatch(setTimelineState({ playback: null }));
   };
 }
 
-export function replayPlayback(): UIThunkAction {
-  return (dispatch, getState) => {
-    const beginTime = 0;
-
-    dispatch(seek({ openSource: true, time: beginTime }));
+export function replayFromBeginning(): UIThunkAction {
+  return dispatch => {
+    dispatch(seek({ openSource: true, time: 0 }));
   };
 }
 

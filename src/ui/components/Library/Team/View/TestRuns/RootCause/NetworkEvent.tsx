@@ -30,7 +30,7 @@ function NetworkEventSequence({ group }: { group: Sequence<NetworkEventDiscrepan
         <div className="pl-4">
           <div className="flex flex-col gap-2">
             {group.discrepancies.map((d, i) => (
-              <NetworkEventDiscrepancy key={i} discrepancy={d} />
+              <NetworkEventDiscrepancyDisplay key={i} discrepancy={d} />
             ))}
           </div>
         </div>
@@ -148,7 +148,7 @@ function MissingRequest({
   );
 }
 
-function NetworkEventDiscrepancy({ discrepancy }: { discrepancy: NetworkEventDiscrepancy }) {
+function NetworkEventDiscrepancyDisplay({ discrepancy }: { discrepancy: NetworkEventDiscrepancy }) {
   const {
     kind,
     event: { data, key, point, time },

@@ -6,7 +6,7 @@ import LayoutApp from "devtools/client/inspector/layout/components/LayoutApp";
 import { ElementsPanelAdapter } from "devtools/client/inspector/markup/components/ElementsPanelAdapter";
 import { RulesPanel } from "devtools/client/inspector/markup/components/rules";
 import { getSelectedNodeId } from "devtools/client/inspector/markup/selectors/markup";
-import { ElementReactDetails } from "replay-next/components/elements-new/ElementReactDetails";
+import { ElementReactDetails } from "replay-next/components/elements/ElementReactDetails";
 import { useIsPointWithinFocusWindow } from "replay-next/src/hooks/useIsPointWithinFocusWindow";
 import { useMostRecentLoadedPause } from "replay-next/src/hooks/useMostRecentLoadedPause";
 import { ActiveInspectorTab } from "shared/user-data/GraphQL/config";

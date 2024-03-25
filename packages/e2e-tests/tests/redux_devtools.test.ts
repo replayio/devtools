@@ -5,7 +5,7 @@ import {
   openReduxDevtoolsPanel,
   waitForReduxActionCount,
 } from "../helpers/redux-devtools-panel";
-import test from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
 test.use({ exampleKey: "redux/dist/index.html" });
 

@@ -26,7 +26,7 @@ function getCypressMarkerFrame(frames: Frame[]) {
   let cypressSourceId: string | undefined;
   let userSourceId: string | undefined;
 
-  for (let i = 1; i <= frames.length; i++) {
+  for (let i = 1; i < frames.length; i++) {
     const sourceId = frames[i].functionLocation?.[0].sourceId;
     if (!cypressSourceId && sourceId !== pluginSourceId) {
       // The first non-plugin source will be cypress

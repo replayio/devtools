@@ -7,7 +7,7 @@ import {
   verifyStackingTestCaseSelectedElementUnderCursor,
 } from "../helpers/stacking-test-cases";
 import { debugPrint } from "../helpers/utils";
-import test from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
 test.use({ exampleKey: "doc_stacking.html" });
 

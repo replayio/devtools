@@ -2,7 +2,7 @@ import { openDevToolsTab, startTest } from "../helpers";
 import { E2E_USER_1 } from "../helpers/authentication";
 import { addSourceCodeComment, deleteComment, editComment } from "../helpers/comments";
 import { openSource } from "../helpers/source-explorer-panel";
-import test from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
 test.use({ exampleKey: "authenticated_comments.html", testUsers: [E2E_USER_1] });
 

@@ -10,6 +10,7 @@ export function TestRunLibraryRow({
       className={`flex flex-row items-center rounded-lg ${styles.libraryRow} ${
         isSelected ? styles.libraryRowSelected : ""
       } ${className ?? ""}`}
+      data-selected={isSelected || undefined}
       {...rest}
     />
   );

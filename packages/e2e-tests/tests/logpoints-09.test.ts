@@ -1,6 +1,6 @@
 import { openDevToolsTab, startTest } from "../helpers";
 import { addLogpoint, editLogPoint, verifyLogPointPanelContent } from "../helpers/source-panel";
-import test from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
 const lineNumber = 20;
 test.use({ exampleKey: "doc_rr_basic.html" });

@@ -5,7 +5,7 @@ import { assert } from "protocol/utils";
 import { ZoomRegion } from "ui/state/timeline";
 
 // Get the position of a time on the visible part of the timeline,
-// in the range [0, 1] if the timeline is fully zommed out.
+// in the range [0, 1] if the timeline is fully zoomed out.
 export function getVisiblePosition({ time, zoom }: { time: number | null; zoom: ZoomRegion }) {
   if (!time) {
     return 0;

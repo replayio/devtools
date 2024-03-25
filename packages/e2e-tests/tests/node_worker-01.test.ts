@@ -2,7 +2,7 @@ import { startTest } from "../helpers";
 import { openConsolePanel, warpToMessage } from "../helpers/console-panel";
 import { rewindToLine, stepOverToLine } from "../helpers/pause-information-panel";
 import { addBreakpoint } from "../helpers/source-panel";
-import test from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
 test.use({ exampleKey: "node/run_worker.js" });
 

@@ -9,7 +9,7 @@ import {
 } from "../helpers/comments";
 import { openNetworkPanel } from "../helpers/network-panel";
 import { openSource } from "../helpers/source-explorer-panel";
-import test, { expect } from "../testFixtureCloneRecording";
+import test, { expect } from "../testFixture";
 
 test.use({ exampleKey: "authenticated_comments.html", testUsers: [E2E_USER_1] });
 
@@ -36,13 +36,13 @@ test(`authenticated/comments-03: Comment previews`, async ({
   await openNetworkPanel(page);
   const networkRequestComment = await addNetworkRequestComment(page, {
     method: "GET",
-    name: "favicon.ico",
-    status: 404,
+    name: "authenticated_comments.html",
+    status: 200,
     text: "network request",
   });
   const networkRequestCommentPreviewText =
     (await networkRequestComment.locator('[data-test-name="CommentPreview"]').textContent()) ?? "";
-  await expect(networkRequestCommentPreviewText.trim()).toBe("[GET] favicon.ico");
+  await expect(networkRequestCommentPreviewText.trim()).toBe("[GET] authenticated_comments.html");
 
   // Add and verify visual comment
   const visualComment = await addVisualComment(page, {

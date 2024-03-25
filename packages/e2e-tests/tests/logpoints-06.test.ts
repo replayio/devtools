@@ -12,7 +12,7 @@ import {
   removeLogPoint,
   toggleShouldLog,
 } from "../helpers/source-panel";
-import test, { expect } from "../testFixtureCloneRecording";
+import test, { expect } from "../testFixture";
 
 const lineNumber = 5;
 test.use({ exampleKey: "log_points_and_block_scope.html" });

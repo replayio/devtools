@@ -40,7 +40,6 @@ export function TestSectionRow({
   testRunnerName: TestRunnerName | null;
   testSectionName: TestSectionName;
 }) {
-  const { range: focusWindow } = useContext(FocusContext);
   const { executionPoint: currentExecutionPoint } = useContext(TimelineContext);
   const replayClient = useContext(ReplayClientContext);
   const { recordingId } = useContext(SessionContext);

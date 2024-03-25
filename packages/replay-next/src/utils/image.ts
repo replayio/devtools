@@ -14,7 +14,7 @@ export async function getDimensions(base64: string, mimeType: string): Promise<D
       });
     });
     image.addEventListener("error", () => {
-      reject();
+      reject("Image data could not be loaded");
     });
     image.src = `data:${mimeType};base64,${base64}`;
   });

@@ -541,7 +541,7 @@ export async function removeBreakpoint(
   // since that is not guaranteed to happen synchronously on click. This is
   // important for cases where we remove a breakpoint and then immediately
   // attempt to step across the breakpoint location.
-  await delay(500);
+  await delay(1000);
 }
 
 export async function removeConditional(
@@ -849,7 +849,7 @@ export async function waitForSelectedSource(page: Page, url: string) {
     // Only succeed when we see formatted lines.
     const lines = editorPanel.locator(`[data-test-formatted-source="true"]`);
     const numLines = await lines.count();
-    expect(numLines).toBeGreaterThan(0);
+    expect(numLines, { message: "Timed out waiting for source contents" }).toBeGreaterThan(0);
   });
 }
 

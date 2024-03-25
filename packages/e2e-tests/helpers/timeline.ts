@@ -47,6 +47,10 @@ export async function saveFocusRange(page: Page): Promise<void> {
   await debugPrint(page, "Saving focus range", "setFocusRange");
 
   await page.locator('[data-test-id="SaveFocusModeButton"]').click();
+  await expect(page.locator('[data-test-id="EditFocusButton"]')).toHaveAttribute(
+    "data-test-state",
+    "off"
+  );
 }
 
 export async function setFocusRange(
@@ -150,6 +154,8 @@ export async function seekToTimePercent(page: Page, timePercent: number) {
   const width = timelineBoundingBox!.width;
   const x = Math.min(width * (timePercent / 100), width - 1);
   const y = timelineBoundingBox!.height / 2;
+
+  await debugPrint(page, `Clicking timeline at ${x}, ${y}`, "seekToTimePercent");
   await timeline.click({
     position: { x, y },
   });

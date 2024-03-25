@@ -301,8 +301,8 @@ export async function waitForPaused(page: Page, line?: number): Promise<void> {
         scopeBlocks.count(),
       ]);
 
-      expect(numFrames).toBeGreaterThan(0);
-      expect(numScopes).toBeGreaterThan(0);
+      expect(numFrames, { message: "Timed out waiting for frames" }).toBeGreaterThan(0);
+      expect(numScopes, { message: "Timed out waiting for scopes" }).toBeGreaterThan(0);
     },
     { timeout: 15_000 }
   );
@@ -382,7 +382,7 @@ export async function togglePoint(page: Page, pointLocator: Locator, enabled: bo
   const currentState = await toggle.getAttribute("date-test-state");
   if (targetState !== currentState) {
     await debugPrint(page, `Toggling point to ${targetState}`, "togglePoint");
-    await toggle.click();
+    await toggle.locator("input").click();
   } else {
     await debugPrint(page, `Point already ${targetState}`, "togglePoint");
   }

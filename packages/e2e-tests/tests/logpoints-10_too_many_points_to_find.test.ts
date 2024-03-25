@@ -8,7 +8,7 @@ import {
   waitForSourceLineHitCounts,
 } from "../helpers/source-panel";
 import { verifyFocusModeVisible } from "../helpers/timeline";
-import test from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
 // We need > 10k hits
 // Line 150 has >20k hits

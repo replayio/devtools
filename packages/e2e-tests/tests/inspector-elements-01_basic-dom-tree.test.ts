@@ -12,7 +12,7 @@ import {
 import { rewindToLine } from "../helpers/pause-information-panel";
 import { addBreakpoint } from "../helpers/source-panel";
 import { seekToTimePercent } from "../helpers/timeline";
-import test from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
 test.use({ exampleKey: "doc_inspector_basic.html" });
 

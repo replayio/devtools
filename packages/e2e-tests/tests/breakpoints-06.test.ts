@@ -1,7 +1,7 @@
 import { openDevToolsTab, startTest } from "../helpers";
 import { findConsoleMessage } from "../helpers/console-panel";
 import { addLogpoint } from "../helpers/source-panel";
-import test, { Page, expect } from "../testFixtureCloneRecording";
+import test, { Page, expect } from "../testFixture";
 
 async function checkMessageLocation(page: Page, text: string, location: string) {
   const message = await findConsoleMessage(page, text, "log-point");

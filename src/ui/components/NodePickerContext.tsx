@@ -13,7 +13,7 @@ import {
 import { highlightNode, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 import { useMostRecentLoadedPause } from "replay-next/src/hooks/useMostRecentLoadedPause";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { getMouseEventPosition } from "ui/components/Video/getMouseEventPosition";
+import { getMouseEventPosition } from "ui/components/Video/imperative/getMouseEventPosition";
 import { useAppDispatch } from "ui/setup/hooks";
 import { boundingRectsCache, getMouseTarget } from "ui/suspense/nodeCaches";
 
@@ -28,7 +28,7 @@ export type NodePickerOptions = {
 };
 
 export type NodePickerContextType = {
-  enable: (options: NodePickerOptions, initializer: () => Promise<void>) => Promise<void>;
+  enable: (options: NodePickerOptions, initializer?: () => Promise<void>) => Promise<void>;
   disable: () => void;
   status: NodePickerStatus;
   type: NodePickerType | null;
@@ -68,7 +68,11 @@ export function NodePickerContextRoot({ children }: PropsWithChildren<{}>) {
   });
 
   const enable = useCallback(
-    async (options: NodePickerOptions, initializer: () => Promise<void>) => {
+    async (options: NodePickerOptions, initializer?: () => Promise<void>) => {
+      if (!pauseId) {
+        return;
+      }
+
       const { status } = committedStateRef.current;
 
       switch (status) {
@@ -89,7 +93,11 @@ export function NodePickerContextRoot({ children }: PropsWithChildren<{}>) {
       });
 
       try {
-        await initializer();
+        await Promise.all([
+          // Start loading rects eagerly; we'll need them in the hover/click handlers
+          boundingRectsCache.readAsync(replayClient, pauseId),
+          initializer?.(),
+        ]);
 
         setState({
           options,
@@ -104,7 +112,7 @@ export function NodePickerContextRoot({ children }: PropsWithChildren<{}>) {
         });
       }
     },
-    []
+    [pauseId, replayClient]
   );
 
   const disable = useCallback(() => {
@@ -151,9 +159,6 @@ export function NodePickerContextRoot({ children }: PropsWithChildren<{}>) {
       console.error("Canvas not found");
       return;
     }
-
-    // Start loading rects eagerly; we'll need them in the hover/click handlers
-    boundingRectsCache.prefetch(replayClient, pauseId);
 
     const { limitToNodeIds, onSelected } = options;
 

@@ -40,18 +40,13 @@ export function NodePicker() {
         return;
       }
 
-      enable(
-        {
-          onSelected: (nodeId: ObjectId) => {
-            dispatch(setSelectedPanel("inspector"));
-            dispatch(selectNode(nodeId));
-          },
-          type: "domElement",
+      enable({
+        onSelected: (nodeId: ObjectId) => {
+          dispatch(setSelectedPanel("inspector"));
+          dispatch(selectNode(nodeId));
         },
-        async () => {
-          await boundingRectsCache.readAsync(replayClient, pauseId);
-        }
-      );
+        type: "domElement",
+      });
     }
   };
 

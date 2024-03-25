@@ -1,14 +1,10 @@
 import { join } from "path";
 
-export type BrowserName = "firefox" | "chromium";
-
 export default {
   backendUrl: process.env.DISPATCH_ADDRESS || "wss://dispatch.replay.io",
   graphqlUrl: process.env.GRAPHQL_ADDRESS || "https://api.replay.io/v1/graphql",
   browserExamplesPath: join(__dirname, "../../public/test/examples"),
-  browserName: (process.env.RECORD_REPLAY_TARGET === "chromium"
-    ? "chromium"
-    : "firefox") as BrowserName,
+  browserName: "chromium",
   browserPath: process.env.RECORD_REPLAY_PATH,
   devtoolsUrl: process.env.PLAYWRIGHT_TEST_BASE_URL || "http://localhost:8080",
   driverPath: process.env.RECORD_REPLAY_DRIVER,

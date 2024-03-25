@@ -1,7 +1,5 @@
-import { MouseEvent, useContext, useLayoutEffect } from "react";
-import { useStreamingValue } from "suspense";
+import { MouseEvent, useContext, useLayoutEffect, useState } from "react";
 
-import { StreamingScreenShotCache } from "protocol/StreamingScreenShotCache";
 import Icon from "replay-next/components/Icon";
 import { LoadingProgressBar } from "replay-next/components/LoadingProgressBar";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -10,67 +8,99 @@ import CommentsOverlay from "ui/components/Comments/VideoComments";
 import { NodePickerContext } from "ui/components/NodePickerContext";
 import ReplayLogo from "ui/components/shared/ReplayLogo";
 import ToggleButton from "ui/components/TestSuite/views/Toggle/ToggleButton";
-import { subscribe } from "ui/components/Video/MutableGraphicsState";
+import { State, state } from "ui/components/Video/imperative/MutableGraphicsState";
+import { subscribeToMutableSources } from "ui/components/Video/imperative/subscribeToMutableSources";
 import NodeHighlighter from "ui/components/Video/NodeHighlighter";
 import { RecordedCursor } from "ui/components/Video/RecordedCursor";
-import { useDisplayedScreenShot } from "ui/components/Video/useDisplayedScreenShot";
-import { useImperativeVideoPlayback } from "ui/components/Video/useImperativeVideoPlayback";
-import { useSmartTimeAndExecutionPoint } from "ui/components/Video/useSmartTimeAndExecutionPoint";
-import { useUpdateGraphicsContext } from "ui/components/Video/useUpdateGraphicsContext";
 import useVideoContextMenu from "ui/components/Video/useVideoContextMenu";
 import { getSelectedPrimaryPanel } from "ui/reducers/layout";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { useAppDispatch, useAppSelector, useAppStore } from "ui/setup/hooks";
 
 import styles from "./Video.module.css";
 
+const SHOW_LOADING_INDICATOR_AFTER_MS = 1_500;
+
 export default function Video() {
+  const reduxStore = useAppStore();
   const replayClient = useContext(ReplayClientContext);
+
   const { status: nodePickerStatus } = useContext(NodePickerContext);
+
+  const [showLoadingIndicator, setShowLoadingIndicator] = useState(false);
+  const [showError, setShowError] = useState(false);
+
+  useLayoutEffect(() => {
+    const containerElement = document.getElementById("video") as HTMLDivElement;
+    const graphicsElement = document.getElementById("graphics") as HTMLImageElement;
+    const graphicsOverlayElement = document.getElementById("overlay-graphics") as HTMLDivElement;
+
+    let prevState: Partial<State> = {};
+    let stalledTimeout: NodeJS.Timeout | null = null;
+
+    // Keep graphics in sync with the imperatively managed screenshot state
+    state.listen(nextState => {
+      if (nextState.screenShot != prevState.screenShot) {
+        const { screenShot } = nextState;
+        if (screenShot) {
+          graphicsElement.src = `data:${screenShot.mimeType};base64,${screenShot.data}`;
+        } else {
+          graphicsElement.src = "";
+        }
+      }
+
+      // Show loading progress bar if graphics stall for longer than 5s
+      const isLoading = nextState.status === "loading";
+      const wasLoading = prevState.status === "loading";
+      if (isLoading && !wasLoading) {
+        stalledTimeout = setTimeout(() => {
+          setShowLoadingIndicator(true);
+        }, SHOW_LOADING_INDICATOR_AFTER_MS);
+      } else if (!isLoading && wasLoading) {
+        if (stalledTimeout != null) {
+          clearTimeout(stalledTimeout);
+        }
+
+        setShowLoadingIndicator(false);
+      }
+
+      if (nextState.status === "failed") {
+        setShowError(true);
+      } else {
+        setShowError(false);
+      }
+
+      // The data attributes are sed for e2e tests
+      containerElement.setAttribute("data-execution-point", nextState.currentExecutionPoint ?? "");
+      containerElement.setAttribute("data-screenshot-type", "" + nextState.screenShotType);
+      containerElement.setAttribute("data-status", "" + nextState.status);
+      containerElement.setAttribute("data-time", "" + nextState.currentTime);
+      graphicsElement.setAttribute("data-local-scale", nextState.localScale.toString());
+      graphicsElement.setAttribute("data-recording-scale", nextState.recordingScale.toString());
+
+      Object.assign(prevState, nextState);
+    });
+
+    const unsubscribe = subscribeToMutableSources({
+      containerElement,
+      graphicsElement,
+      graphicsOverlayElement,
+      reduxStore,
+      replayClient,
+    });
+
+    return () => {
+      unsubscribe();
+
+      if (stalledTimeout != null) {
+        clearTimeout(stalledTimeout);
+      }
+    };
+  }, [reduxStore, replayClient]);
 
   const dispatch = useAppDispatch();
   const panel = useAppSelector(getSelectedPrimaryPanel);
 
-  const { executionPoint, time } = useSmartTimeAndExecutionPoint();
-
-  const [playbackTime, onCommitCallback] = useImperativeVideoPlayback();
-
-  const executionPointToSuspend = playbackTime != null ? null : executionPoint;
-  const timeToSuspend = playbackTime != null ? playbackTime : time;
-
-  const streaming = StreamingScreenShotCache.stream(
-    replayClient,
-    timeToSuspend,
-    executionPointToSuspend
-  );
-  const {
-    data: status = "fetching-cached-paint",
-    progress = 0,
-    value: screenShot,
-  } = useStreamingValue(streaming);
-
   const { addComment, contextMenu, onContextMenu } = useVideoContextMenu();
-
-  useUpdateGraphicsContext(screenShot);
-
-  useLayoutEffect(() => {
-    // When playback is active, this commit callback notifies the imperative code that a screenshot has been rendered
-    // and it's okay to advance the playback timer to the next frame.
-    // Without this explicit ack, the imperative playback code could advance too quickly and cause "starvation"
-    // where the React scheduler didn't finish rendering a previous update before another one was requested.
-    if (playbackTime != null && screenShot != null) {
-      onCommitCallback(playbackTime);
-    }
-  }, [onCommitCallback, playbackTime, screenShot]);
-
-  useLayoutEffect(() => {
-    subscribe(state => {
-      const graphicsElement = document.getElementById("graphics");
-      if (graphicsElement) {
-        // Scale is used by e2e tests to click on specific elements
-        graphicsElement.setAttribute("data-scale", state.localScale.toString());
-      }
-    });
-  }, []);
 
   const onClick = (event: MouseEvent) => {
     dispatch(stopPlayback());
@@ -80,57 +110,38 @@ export default function Video() {
     }
   };
 
-  const screenShotToRender = useDisplayedScreenShot(screenShot, status, timeToSuspend);
-
-  const showLoader = progress < 1 && playbackTime == null;
   const showBeforeAfterTestStepToggles = panel === "cypress";
-
-  let showError = false;
-  if (status === "loading-failed") {
-    showError = executionPoint != null; // !preferHoverTime && !preferPlaybackTime;
-  }
 
   return (
     <div
       id="video"
       className={styles.Container}
-      data-execution-point={executionPointToSuspend}
-      data-status={status}
-      data-time={timeToSuspend}
       style={{
         cursor: nodePickerStatus === "initializing" ? "progress" : undefined,
       }}
     >
-      {/* Screenshots are rendered in this HTMLImageElement; if there is no screenshot to render, show the Replay logo instead */}
-      {screenShotToRender ? (
-        <img
-          className={styles.Image}
-          data-scale={1}
-          id="graphics"
-          onClick={onClick}
-          onContextMenu={onContextMenu}
-          src={`data:${screenShotToRender.mimeType};base64,${screenShotToRender.data}`}
-        />
-      ) : (
-        <div className={styles.Logo}>
-          <ReplayLogo size="sm" color="gray" />
-        </div>
-      )}
+      <div className={styles.Logo}>
+        <ReplayLogo size="sm" color="gray" />
+      </div>
+
+      <img className={styles.Image} id="graphics" onClick={onClick} onContextMenu={onContextMenu} />
 
       {/* Graphics that are relative to the rendered screenshot go here; this container is automatically positioned to align with the screenshot */}
       <div className={styles.Graphics} id="overlay-graphics">
-        <RecordedCursor time={timeToSuspend} />
+        <RecordedCursor />
         <CommentsOverlay />
         <NodeHighlighter />
       </div>
 
-      {showLoader && <LoadingProgressBar className={styles.Loading} key={executionPoint} />}
+      {showLoadingIndicator && <LoadingProgressBar className={styles.Loading} />}
+
       {showError && (
         <div className={styles.Error}>
           <Icon className={styles.ErrorIcon} type="error" />
           Could not load screenshot
         </div>
       )}
+
       {showBeforeAfterTestStepToggles && <ToggleButton />}
       {contextMenu}
     </div>

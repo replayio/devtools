@@ -1,7 +1,7 @@
 import { openDevToolsTab, startTest } from "../helpers";
 import { resumeToLine, rewindToLine } from "../helpers/pause-information-panel";
 import { addBreakpoint } from "../helpers/source-panel";
-import test, { Page } from "../testFixtureCloneRecording";
+import test, { Page } from "../testFixture";
 
 test.use({ exampleKey: "doc_control_flow.html" });
 

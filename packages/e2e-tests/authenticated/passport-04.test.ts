@@ -4,7 +4,7 @@ import { addSourceCodeComment, deleteComment } from "../helpers/comments";
 import { isPassportItemCompleted } from "../helpers/passport";
 import { enablePassport } from "../helpers/settings";
 import { waitFor } from "../helpers/utils";
-import test, { expect } from "../testFixtureCloneRecording";
+import test, { expect } from "../testFixture";
 
 test.use({ exampleKey: "doc_rr_console.html", testUsers: [E2E_USER_1] });
 

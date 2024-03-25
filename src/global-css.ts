@@ -2,7 +2,7 @@ import "image/image.css";
 import "image/icon.css";
 import "tailwindcss/tailwind.css";
 import "devtools/client/debugger/src/components/variables.css";
-import "replay-next/pages/variables.css";
+import "replay-next/variables.css";
 import "devtools/client/themes/variables.css";
 import "use-context-menu/styles.css";
 

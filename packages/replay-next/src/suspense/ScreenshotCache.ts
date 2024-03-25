@@ -1,6 +1,7 @@
 import { ExecutionPoint, ScreenShot } from "@replayio/protocol";
 import { createCache } from "suspense";
 
+import { paintHashCache } from "replay-next/src/suspense/PaintHashCache";
 import { ReplayClientInterface } from "shared/client/types";
 
 export const screenshotCache = createCache<
@@ -10,5 +11,11 @@ export const screenshotCache = createCache<
   config: { immutable: true },
   debugLabel: "ScreenshotCache",
   getKey: ([client, point, paintHash]) => paintHash,
-  load: ([client, point]) => client.getScreenshot(point),
+  load: async ([client, point]) => {
+    const screenShot = await client.getScreenshot(point);
+
+    paintHashCache.cacheValue(screenShot, screenShot.hash);
+
+    return screenShot;
+  },
 });

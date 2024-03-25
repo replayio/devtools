@@ -2,7 +2,7 @@ import { startTest } from "../helpers";
 import { getGraphicsDataUrl } from "../helpers/screenshot";
 import { getTestCaseSteps, getTestRows } from "../helpers/testsuites";
 import { waitFor } from "../helpers/utils";
-import test, { expect } from "../testFixtureCloneRecording";
+import test, { expect } from "../testFixture";
 
 test.use({ exampleKey: "playwright/breakpoints-05" });
 

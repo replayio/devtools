@@ -1,9 +1,9 @@
 import { listAllRecordings, uploadRecording } from "@replayio/replay";
 import cypress from "cypress";
 
-import config, { BrowserName } from "../config";
+import config from "../config";
 
-export async function recordCypress(browserName: BrowserName, exampleFilename: string) {
+export async function recordCypress(exampleFilename: string) {
   const specName = `cypress/e2e/${exampleFilename}.cy.ts`;
   const exampleUrl = `${config.devtoolsUrl}/test/examples`;
 
@@ -12,7 +12,7 @@ export async function recordCypress(browserName: BrowserName, exampleFilename: s
     "run",
     "-q",
     "--browser",
-    browserName === "chromium" ? "replay-chromium" : "replay-firefox",
+    "replay-chromium",
     "--spec",
     specName,
   ]);

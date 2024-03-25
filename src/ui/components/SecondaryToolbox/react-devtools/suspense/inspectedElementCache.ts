@@ -69,13 +69,17 @@ export const inspectedElementCache = createCache<
       timeoutMessage: `Timed out while trying to inspect React element ${elementId}`,
     });
 
-    replayWall.send("inspectElement", {
-      forceFullData: true,
-      id: elementId,
-      path: null,
-      rendererID,
-      requestID,
-    });
+    replayWall.sendAtPauseId(
+      "inspectElement",
+      {
+        forceFullData: true,
+        id: elementId,
+        path: null,
+        rendererID,
+        requestID,
+      },
+      pauseId
+    );
 
     const result = await promise;
 

@@ -19,7 +19,9 @@ export function TestRunTestPanel() {
   const selectedTest = tests?.find(
     t =>
       t.testId === testId &&
-      (filterTestsByText === "" || t.sourcePath.toLowerCase().includes(filterTestsByText))
+      (filterTestsByText === "" ||
+        t.sourcePath.toLowerCase().includes(filterTestsByText) ||
+        t.title.toLowerCase().includes(filterTestsByText))
   );
 
   if (!tests?.length) {

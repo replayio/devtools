@@ -3611,10 +3611,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/protocol@npm:^0.68.0":
-  version: 0.68.0
-  resolution: "@replayio/protocol@npm:0.68.0"
-  checksum: 2c628c36ce330e01f992aba39a9f2bd55dfccbadf8a928a680a0e3ae09605b06faa3c98c8f298cc62f22b0135d651ab8ca88e120a250f8f87f264979124effbb
+"@replayio/protocol@npm:0.70.0, @replayio/protocol@npm:^0.70.0":
+  version: 0.70.0
+  resolution: "@replayio/protocol@npm:0.70.0"
+  checksum: b43a76831b6646b01faa6b4fef865f48735adf1a55671ca8042b2262960762cbe8f9506247e211f6f07522685613b4064d6db2a75a29e5e690acd4e9678a6193
   languageName: node
   linkType: hard
 
@@ -14948,7 +14948,7 @@ __metadata:
     "@next/bundle-analyzer": ^12.2.0
     "@reduxjs/toolkit": ^1.8.4
     "@replayio/overboard": ^0.4.1
-    "@replayio/protocol": ^0.68.0
+    "@replayio/protocol": 0.70.0
     "@replayio/react-devtools-inline": 4.28.6
     "@replayio/replay": ^0.21.1
     "@sentry/integrations": ^7.101.1
@@ -15087,11 +15087,11 @@ __metadata:
     style-loader: ^3.3.1
     stylelint: ^14.16.0
     stylelint-config-prettier: ^9.0.5
-    suspense: ^0.0.51
+    suspense: ^0.0.53
     tailwindcss: ^3.2.4
     ts-node: ^10.7.0
     tsconfig-paths: ^3.14.1
-    typescript: ^5.3.3
+    typescript: ^5.4.2
     use-context-menu: 0.4.13
     utf-8-validate: ^5.0.8
     uuid: ^7.0.3
@@ -15247,7 +15247,7 @@ __metadata:
     "@lezer/common_replay_next": "npm:@lezer/common@1.0.1"
     "@lezer/highlight_replay_next": "npm:@lezer/highlight@1.1.1"
     "@playwright/test": ^1.35.0
-    "@replayio/protocol": ^0.68.0
+    "@replayio/protocol": ^0.70.0
     "@testing-library/jest-dom": ^5.16.3
     "@testing-library/react": ^13.2.0
     "@types/uuid": ^7.0.3
@@ -15267,7 +15267,7 @@ __metadata:
     react-dom: 0.0.0-experimental-03d6f7cf0-20240209
     react-virtualized-auto-sizer: ^1.0.19
     shared: "workspace:*"
-    suspense: ^0.0.51
+    suspense: ^0.0.53
     typescript: 5.0.2
     use-context-menu: 0.4.13
     uuid: ^7.0.3
@@ -16570,9 +16570,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"suspense@npm:^0.0.51":
-  version: 0.0.51
-  resolution: "suspense@npm:0.0.51"
+"suspense@npm:^0.0.53":
+  version: 0.0.53
+  resolution: "suspense@npm:0.0.53"
   dependencies:
     "@types/deep-equal": ^1.0.1
     array-sorting-utilities: ^0.0.1
@@ -16583,7 +16583,7 @@ __metadata:
   peerDependencies:
     react: ^18.0.0
     react-dom: ^18.0.0
-  checksum: 59d5dc585536caefc14b8402ddaf7f61abbc9ff333ca4b4dd44cd57401083997a2c5c72f21a31f9037f3aea7d0c41097b3a7cd404e4e53bf3681dc0ba0340be6
+  checksum: 68165fa8843b7f14a8bb7f99a6f5ed3bb5273438208d8af83f7ec3608bfec5c6a9303dacad92fc96fc8cd62e9ce7efab03b9b82c0810de562c900abd41268e89
   languageName: node
   linkType: hard
 
@@ -17208,23 +17208,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:5.3.3":
-  version: 5.3.3
-  resolution: "typescript@npm:5.3.3"
+"typescript@npm:5.4.2":
+  version: 5.4.2
+  resolution: "typescript@npm:5.4.2"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 2007ccb6e51bbbf6fde0a78099efe04dc1c3dfbdff04ca3b6a8bc717991862b39fd6126c0c3ebf2d2d98ac5e960bcaa873826bb2bb241f14277034148f41f6a2
+  checksum: 96d80fde25a09bcb04d399082fb27a808a9e17c2111e43849d2aafbd642d835e4f4ef0de09b0ba795ec2a700be6c4c2c3f62bf4660c05404c948727b5bbfb32a
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@npm%3A5.3.3#~builtin<compat/typescript>":
-  version: 5.3.3
-  resolution: "typescript@patch:typescript@npm%3A5.3.3#~builtin<compat/typescript>::version=5.3.3&hash=7ad353"
+"typescript@patch:typescript@npm%3A5.4.2#~builtin<compat/typescript>":
+  version: 5.4.2
+  resolution: "typescript@patch:typescript@npm%3A5.4.2#~builtin<compat/typescript>::version=5.4.2&hash=7ad353"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: f61375590b3162599f0f0d5b8737877ac0a7bc52761dbb585d67e7b8753a3a4c42d9a554c4cc929f591ffcf3a2b0602f65ae3ce74714fd5652623a816862b610
+  checksum: c1b669146bca5529873aae60870e243fa8140c85f57ca32c42f898f586d73ce4a6b4f6bb02ae312729e214d7f5859a0c70da3e527a116fdf5ad00c9fc733ecc6
   languageName: node
   linkType: hard
 

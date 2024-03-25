@@ -1,7 +1,7 @@
 import { openDevToolsTab, startTest } from "../helpers";
 import { findConsoleMessage } from "../helpers/console-panel";
 import { addLogpoint, jumpToLogPointHit, verifyLogpointStep } from "../helpers/source-panel";
-import test, { expect } from "../testFixtureCloneRecording";
+import test, { expect } from "../testFixture";
 
 test.use({ exampleKey: "doc_rr_basic.html" });
 

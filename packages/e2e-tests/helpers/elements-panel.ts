@@ -2,7 +2,6 @@ import assert from "assert";
 import { Locator, Page, expect } from "@playwright/test";
 import chalk from "chalk";
 
-import { getGraphicsElementScale } from "./screenshot";
 import { debugPrint, delay, waitFor } from "./utils";
 
 type ElementsListRowOptions = {
@@ -294,9 +293,6 @@ export async function inspectCanvasCoordinates(
 
   await activateInspectorTool(page);
 
-  const pickerButton = page.locator('[title="Select an element in the video to inspect it"]')!;
-  await pickerButton.click();
-
   const graphicsElement = page.locator("#graphics");
   const { width, height } = (await graphicsElement.boundingBox())!;
 
@@ -309,9 +305,8 @@ export async function inspectCanvasCoordinates(
     "inspectCanvasCoordinates"
   );
 
-  const scale = await getGraphicsElementScale(page);
-  const x = xPercentage * width * scale;
-  const y = yPercentage * height * scale;
+  const x = xPercentage * width;
+  const y = yPercentage * height;
 
   await debugPrint(
     page,
@@ -321,9 +316,9 @@ export async function inspectCanvasCoordinates(
     "inspectCanvasCoordinates"
   );
 
-  graphicsElement.hover({ position: { x, y } });
-  await delay(250);
-  graphicsElement.click({ position: { x, y } });
+  await graphicsElement.hover({ position: { x, y } });
+  await delay(100);
+  await graphicsElement.click({ position: { x, y } });
 }
 
 export async function openAppliedRulesTab(page: Page) {

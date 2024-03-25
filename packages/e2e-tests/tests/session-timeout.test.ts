@@ -1,6 +1,6 @@
 import { openDevToolsTab, startTest } from "../helpers";
 import { verifyErrorDialog } from "../helpers/errors";
-import test from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
 test.use({ exampleKey: "doc_control_flow.html" });
 

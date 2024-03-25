@@ -70,7 +70,7 @@ export function parseBuildIdComponents(buildId: string): BuildComponents | null 
   return null;
 }
 
-function getRecordingTarget(buildId: string): RecordingTarget {
+export function getRecordingTarget(buildId: string): RecordingTarget {
   if (buildId.includes("gecko")) {
     return RecordingTarget.gecko;
   }

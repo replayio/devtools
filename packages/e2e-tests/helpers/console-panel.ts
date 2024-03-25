@@ -326,9 +326,10 @@ export async function verifyConsoleMessage(
 export async function verifyConsoleMessageObjectContents(
   page: Page,
   expected: Expected,
-  contents: string[]
+  contents: string[],
+  messageType?: MessageType
 ) {
-  const objectInspector = (await findConsoleMessage(page, expected)).locator(
+  const objectInspector = (await findConsoleMessage(page, expected, messageType)).locator(
     '[data-test-name="LogContents"]'
   );
   toggleExpandable(page, { scope: objectInspector, targetState: "open" });

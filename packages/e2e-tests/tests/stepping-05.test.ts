@@ -12,7 +12,7 @@ import {
   stepOverToLine,
 } from "../helpers/pause-information-panel";
 import { addBreakpoint } from "../helpers/source-panel";
-import test from "../testFixtureCloneRecording";
+import test from "../testFixture";
 
 test.use({ exampleKey: "doc_minified.html" });
 

@@ -1,4 +1,4 @@
-import { MouseEvent, Suspense, useContext, useLayoutEffect, useRef, useState } from "react";
+import { Suspense, useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
@@ -6,11 +6,7 @@ import { throttle } from "shared/utils/function";
 import { seek, setDisplayedFocusWindow, setHoverTime, stopPlayback } from "ui/actions/timeline";
 import useTimelineContextMenu from "ui/components/Timeline/useTimelineContextMenu";
 import { selectors } from "ui/reducers";
-import {
-  isPlaying as isPlayingSelector,
-  setDragging,
-  setTimelineState,
-} from "ui/reducers/timeline";
+import { isPlaying as isPlayingSelector, setTimelineState } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { AppDispatch } from "ui/setup/store";
 import { getTimeFromPosition } from "ui/utils/timeline";
@@ -48,10 +44,21 @@ export default function Timeline() {
   const progressBarRef = useRef<HTMLDivElement>(null);
 
   const [isHovered, setIsHovered] = useState<boolean>(false);
-  const [resumePlaybackOnMouseUp, setResumePlaybackOnMouseUp] = useState<boolean>(false);
 
   const [editMode, setEditMode] = useState<EditMode | null>(null);
   const [showLoadingProgress, setShowLoadingProgress] = useState<boolean>(false);
+
+  const committedValuesRef = useRef({
+    editMode,
+    hoverTime,
+    mouseDown: false,
+    zoomRegion,
+  });
+  useLayoutEffect(() => {
+    committedValuesRef.current.editMode = editMode;
+    committedValuesRef.current.hoverTime = hoverTime;
+    committedValuesRef.current.zoomRegion = zoomRegion;
+  });
 
   const { contextMenu, onContextMenu } = useTimelineContextMenu();
 
@@ -77,55 +84,75 @@ export default function Timeline() {
     };
   }, [dispatch]);
 
-  const onMouseDown = (event: MouseEvent) => {
+  const onMouseDown = () => {
+    committedValuesRef.current.mouseDown = true;
+
     if (isPlaying) {
-      setResumePlaybackOnMouseUp(true);
-      dispatch(stopPlayback(false));
-    }
-  };
-
-  const onMouseMove = (event: MouseEvent) => {
-    const mouseTime = getTimeFromPosition(
-      event.pageX,
-      progressBarRef.current!.getBoundingClientRect(),
-      zoomRegion
-    );
-    const isDragging = event.buttons === 1;
-
-    dispatch(setDragging(isDragging));
-
-    if (hoverTime != mouseTime) {
-      dispatch(setHoverTime(mouseTime, isDragging));
-    }
-
-    if (isDragging) {
-      dispatch(setTimelineState({ currentTime: mouseTime }));
-    }
-  };
-
-  const onMouseUp = (event: MouseEvent) => {
-    const mouseTime = getTimeFromPosition(
-      event.pageX,
-      progressBarRef.current!.getBoundingClientRect(),
-      zoomRegion
-    );
-
-    if (!editMode) {
-      // If we're editing focus mode, don't update the current time marker.
-      dispatch(seek({ autoPlay: resumePlaybackOnMouseUp, time: mouseTime }));
-    }
-
-    dispatch(setDragging(false));
-
-    if (resumePlaybackOnMouseUp) {
-      setResumePlaybackOnMouseUp(false);
+      dispatch(stopPlayback());
     }
   };
 
   const onMouseLeave = () => {
     setIsHovered(false);
+
     dispatch(setHoverTime(null, false));
   };
+
+  useEffect(() => {
+    const onMouseMove = (event: MouseEvent) => {
+      const { hoverTime, mouseDown, zoomRegion } = committedValuesRef.current;
+
+      if (!mouseDown) {
+        return;
+      }
+
+      const mouseTime = getTimeFromPosition(
+        event.pageX,
+        progressBarRef.current!.getBoundingClientRect(),
+        zoomRegion
+      );
+
+      const isDragging = event.buttons === 1;
+
+      if (hoverTime != mouseTime) {
+        dispatch(setHoverTime(mouseTime, isDragging));
+      }
+
+      if (isDragging) {
+        dispatch(setTimelineState({ currentTime: mouseTime }));
+      }
+    };
+
+    const onMouseUp = (event: MouseEvent) => {
+      const { editMode, mouseDown, zoomRegion } = committedValuesRef.current;
+
+      committedValuesRef.current.mouseDown = false;
+
+      if (mouseDown && !editMode) {
+        const progressBar = progressBarRef.current;
+        if (!progressBar) {
+          return;
+        }
+
+        const mouseTime = getTimeFromPosition(
+          event.pageX,
+          progressBar.getBoundingClientRect(),
+          zoomRegion
+        );
+
+        // If we're editing focus mode, don't update the current time marker.
+        dispatch(seek({ time: mouseTime }));
+      }
+    };
+
+    document.body.addEventListener("mousemove", onMouseMove);
+    document.body.addEventListener("mouseup", onMouseUp);
+
+    return () => {
+      document.body.removeEventListener("mousemove", onMouseMove);
+      document.body.removeEventListener("mouseup", onMouseUp);
+    };
+  }, [dispatch]);
 
   return (
     <>
@@ -146,8 +173,6 @@ export default function Timeline() {
           onMouseDown={onMouseDown}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={onMouseLeave}
-          onMouseMove={onMouseMove}
-          onMouseUp={onMouseUp}
         >
           <div className="progress-bar-stack" onContextMenu={onContextMenu}>
             {showProtocolTimeline && (

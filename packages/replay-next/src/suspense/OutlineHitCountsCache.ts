@@ -21,6 +21,7 @@ export interface FunctionOutlineWithHitCount extends FunctionOutline {
 export interface SourceOutlineWithHitCounts {
   classes: ClassOutline[];
   functions: FunctionOutlineWithHitCount[];
+  hasHitCounts: boolean;
 }
 
 export const outlineHitCountsCache: Cache<
@@ -37,7 +38,7 @@ export const outlineHitCountsCache: Cache<
     sourceId && focusRange ? `${sourceId}:${focusRange.begin}-${focusRange.end}` : sourceId ?? "",
   load: async ([replayClient, sourceId, focusRange]) => {
     if (!sourceId) {
-      return { classes: [], functions: [] };
+      return { classes: [], functions: [], hasHitCounts: true };
     }
 
     const { classes, functions } = await sourceOutlineCache.readAsync(replayClient, sourceId);
@@ -53,6 +54,7 @@ export const outlineHitCountsCache: Cache<
     const sources = await sourcesByIdCache.readAsync(replayClient);
     const correspondingSourceIds = getCorrespondingSourceIds(sources, sourceId);
 
+    let tooManyLocations = false;
     const hitCountsByLocationKey = new Map<string, number>();
     await Promise.all(
       correspondingSourceIds.map(async sourceId => {
@@ -65,12 +67,18 @@ export const outlineHitCountsCache: Cache<
             hitCountsByLocationKey.set(locationKey, previous + hits);
           });
         } catch (error) {
-          if (!isCommandError(error, ProtocolError.TooManyLocations)) {
+          if (isCommandError(error, ProtocolError.TooManyLocations)) {
+            tooManyLocations = true;
+          } else {
             throw error;
           }
         }
       })
     );
+
+    if (tooManyLocations) {
+      return { classes, functions, hasHitCounts: false };
+    }
 
     const functionsWithHitCounts = functions.map(functionOutline => {
       const location = functionOutline.breakpointLocation;
@@ -82,6 +90,6 @@ export const outlineHitCountsCache: Cache<
       return Object.assign({}, functionOutline, { hits });
     });
 
-    return { classes, functions: functionsWithHitCounts };
+    return { classes, functions: functionsWithHitCounts, hasHitCounts: true };
   },
 });
