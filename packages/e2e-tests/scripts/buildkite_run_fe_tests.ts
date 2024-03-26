@@ -21,8 +21,6 @@ let TestFileOverrideList = [];
 
 // Disable some tests that we know to be problematic.
 const TestFileBlackList = new Set([
-  // https://linear.app/replay/issue/RUN-3274/
-  "tests/repaint-01.test.ts",
 ]);
 
 // Enable some tests that we have recently fixed but not yet enabled everywhere.
