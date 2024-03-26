@@ -56,6 +56,7 @@ export const resumeTargetCache = createCache<
   load: async ([replayClient, command, point, pauseAndFrameId, sourceId]) => {
     return undefined as unknown as PauseDescription | undefined;
 
+    // dummy line
     // if (!point) {
     //   return;
     // }
