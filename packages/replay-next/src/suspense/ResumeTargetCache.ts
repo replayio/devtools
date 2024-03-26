@@ -54,62 +54,64 @@ export const resumeTargetCache = createCache<
   getKey: ([, command, point, pauseAndFrameId, sourceId]) =>
     `${command}:${point}:${pauseAndFrameId?.pauseId}:${pauseAndFrameId?.frameId}:${sourceId}`,
   load: async ([replayClient, command, point, pauseAndFrameId, sourceId]) => {
-    if (!point) {
-      return;
-    }
+    return undefined as unknown as PauseDescription | undefined;
 
-    let currentPoint = point;
-    if (pauseAndFrameId) {
-      const [pausePoint] = getPointAndTimeForPauseId(pauseAndFrameId.pauseId);
-      if (!pausePoint) {
-        return;
-      }
+    // if (!point) {
+    //   return;
+    // }
 
-      const frames = await framesCache.readAsync(replayClient, pauseAndFrameId.pauseId);
-      const frameIndex = frames?.findIndex(frame => frame.frameId === pauseAndFrameId.frameId);
-      if (frameIndex === undefined || frameIndex < 0) {
-        return;
-      }
+    // let currentPoint = point;
+    // if (pauseAndFrameId) {
+    //   const [pausePoint] = getPointAndTimeForPauseId(pauseAndFrameId.pauseId);
+    //   if (!pausePoint) {
+    //     return;
+    //   }
 
-      if (frameIndex > 0) {
-        const pointStack = await pointStackCache.readAsync(0, frameIndex, replayClient, pausePoint);
-        const frame = pointStack[frameIndex];
-        if (!frame.point) {
-          // Avoid stepping in the top frame - we need to step in the _current_ frame.
-          // Note that it's unlikely that we _will_ hit this case.
-          // Per Josh, the most likely reason a stack frame would _not_ have an execution point
-          // is if there's no actual code inside, such as `class B extends A` where B has no constructor.
-          // We _could_ look for the next frame that _does_ have an execution point instead.
-          return;
-        }
-        currentPoint = frame.point.point;
-      }
-    }
+    //   const frames = await framesCache.readAsync(replayClient, pauseAndFrameId.pauseId);
+    //   const frameIndex = frames?.findIndex(frame => frame.frameId === pauseAndFrameId.frameId);
+    //   if (frameIndex === undefined || frameIndex < 0) {
+    //     return;
+    //   }
 
-    let locationsToSkip: SourceLocation[] | undefined = undefined;
-    if ((command === "findStepOverTarget" || command === "findReverseStepOverTarget") && sourceId) {
-      const symbols = await sourceOutlineCache.readAsync(replayClient, sourceId);
-      locationsToSkip = symbols.functions.map(f => f.body).filter(Boolean) as SourceLocation[];
-    }
+    //   if (frameIndex > 0) {
+    //     const pointStack = await pointStackCache.readAsync(0, frameIndex, replayClient, pausePoint);
+    //     const frame = pointStack[frameIndex];
+    //     if (!frame.point) {
+    //       // Avoid stepping in the top frame - we need to step in the _current_ frame.
+    //       // Note that it's unlikely that we _will_ hit this case.
+    //       // Per Josh, the most likely reason a stack frame would _not_ have an execution point
+    //       // is if there's no actual code inside, such as `class B extends A` where B has no constructor.
+    //       // We _could_ look for the next frame that _does_ have an execution point instead.
+    //       return;
+    //     }
+    //     currentPoint = frame.point.point;
+    //   }
+    // }
 
-    while (true) {
-      let target: PauseDescription;
-      try {
-        target = await resumeTargetForPointCache.readAsync(replayClient, command, currentPoint);
-      } catch {
-        return;
-      }
+    // let locationsToSkip: SourceLocation[] | undefined = undefined;
+    // if ((command === "findStepOverTarget" || command === "findReverseStepOverTarget") && sourceId) {
+    //   const symbols = await sourceOutlineCache.readAsync(replayClient, sourceId);
+    //   locationsToSkip = symbols.functions.map(f => f.body).filter(Boolean) as SourceLocation[];
+    // }
 
-      if (locationsToSkip) {
-        const location = target.frame?.find(location => location.sourceId === sourceId);
-        if (location && locationsInclude(locationsToSkip, location)) {
-          currentPoint = target.point;
-          continue;
-        }
-      }
+    // while (true) {
+    //   let target: PauseDescription;
+    //   try {
+    //     target = await resumeTargetForPointCache.readAsync(replayClient, command, currentPoint);
+    //   } catch {
+    //     return;
+    //   }
 
-      return target;
-    }
+    //   if (locationsToSkip) {
+    //     const location = target.frame?.find(location => location.sourceId === sourceId);
+    //     if (location && locationsInclude(locationsToSkip, location)) {
+    //       currentPoint = target.point;
+    //       continue;
+    //     }
+    //   }
+
+    //   return target;
+    // }
   },
 });
 
