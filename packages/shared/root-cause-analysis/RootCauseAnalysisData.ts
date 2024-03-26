@@ -151,9 +151,9 @@ export namespace RootCauseAnalysisDataV1 {
     kind: "Request";
     requestUrl: string;
     requestMethod: string;
-    requestTag: string | undefined;
-    responseCode: number | undefined;
-    initiator: RequestInitiator | undefined;
+    requestTag?: string;
+    responseCode?: number;
+    initiator?: RequestInitiator;
   }
 
   export interface NetworkEventContentsResponseJSON {
@@ -161,7 +161,7 @@ export namespace RootCauseAnalysisDataV1 {
 
     // Information about the associated request.
     requestUrl: string;
-    requestTag: string | undefined;
+    requestTag?: string;
 
     // Path to the JSON value being described.
     path: string;
@@ -367,7 +367,7 @@ export namespace RootCauseAnalysisDataV2 {
   }
 
   // Information about a location within a frame, but with an attached key for the location.
-  interface FrameData extends Frame {
+  export interface FrameData extends Frame {
     key: string;
   }
 
@@ -389,9 +389,9 @@ export namespace RootCauseAnalysisDataV2 {
     kind: "Request";
     requestUrl: string;
     requestMethod: string;
-    requestTag: string | undefined;
-    responseCode: number | undefined;
-    initiator: RequestInitiator | undefined;
+    requestTag?: string;
+    responseCode?: number;
+    initiator?: RequestInitiator;
   }
 
   export interface NetworkEventContentsResponseJSON {
@@ -399,7 +399,7 @@ export namespace RootCauseAnalysisDataV2 {
 
     // Information about the associated request.
     requestUrl: string;
-    requestTag: string | undefined;
+    requestTag?: string;
 
     // Path to the JSON value being described.
     path: string;
@@ -587,7 +587,13 @@ export function isRootCauseAnalysisDataV1(
 }
 
 export function isRootCauseAnalysisDataV2(
-  data: AnyRootCauseAnalysisDatabaseJson
+  data: unknown
 ): data is RootCauseAnalysisDataV2.RootCauseAnalysisDatabaseJson {
-  return data !== null && typeof data === "object" && "version" in data && data.version === 2;
+  if (data !== null && typeof data === "object") {
+    const isActuallyV2 = "version" in data && data.version === 2;
+    const isV2WithoutBumpedVersion = "failingFrames" in data && "passingFrames" in data;
+    return isActuallyV2 || isV2WithoutBumpedVersion;
+  }
+
+  return false;
 }

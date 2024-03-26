@@ -2,7 +2,7 @@ import { useContext } from "react";
 
 import {
   EventKind,
-  RootCauseAnalysisDataV1,
+  RootCauseAnalysisDataV2,
   Sequence,
 } from "shared/root-cause-analysis/RootCauseAnalysisData";
 
@@ -13,7 +13,7 @@ import { RootCauseContext } from "./RootCause";
 export function NetworkEventSequences({
   sequences,
 }: {
-  sequences: Sequence<RootCauseAnalysisDataV1.NetworkEventDiscrepancy>[];
+  sequences: Sequence<RootCauseAnalysisDataV2.NetworkEventDiscrepancy>[];
 }) {
   return (
     <div className="flex flex-col gap-2">
@@ -26,7 +26,7 @@ export function NetworkEventSequences({
 function NetworkEventSequence({
   group,
 }: {
-  group: Sequence<RootCauseAnalysisDataV1.NetworkEventDiscrepancy>;
+  group: Sequence<RootCauseAnalysisDataV2.NetworkEventDiscrepancy>;
 }) {
   return (
     <div className="pl-4">
@@ -155,7 +155,7 @@ function MissingRequest({
 function NetworkEventDiscrepancyDisplay({
   discrepancy,
 }: {
-  discrepancy: RootCauseAnalysisDataV1.NetworkEventDiscrepancy;
+  discrepancy: RootCauseAnalysisDataV2.NetworkEventDiscrepancy;
 }) {
   const {
     kind,
@@ -166,8 +166,8 @@ function NetworkEventDiscrepancyDisplay({
   if (kind == "Extra") {
     if (data.kind === "ResponseJSON") {
       const { data, alternate } = discrepancy.event as {
-        data: RootCauseAnalysisDataV1.NetworkEventContentsResponseJSON;
-        alternate?: RootCauseAnalysisDataV1.NetworkEventContentsResponseJSON;
+        data: RootCauseAnalysisDataV2.NetworkEventContentsResponseJSON;
+        alternate?: RootCauseAnalysisDataV2.NetworkEventContentsResponseJSON;
       };
 
       content = (

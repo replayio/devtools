@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
 
 import {
-  RootCauseAnalysisDataV1,
+  RootCauseAnalysisDataV2,
   Sequence,
 } from "shared/root-cause-analysis/RootCauseAnalysisData";
 
@@ -13,21 +13,34 @@ let UNKNOWN_SOURCE = "Unknown source";
 
 export function ExecutedStatementSequences({
   sequences,
+  failingFrames,
+  passingFrames,
 }: {
-  sequences: Sequence<RootCauseAnalysisDataV1.ExecutedStatementDiscrepancy>[];
+  sequences: Sequence<RootCauseAnalysisDataV2.ExecutedStatementDiscrepancy>[];
+  failingFrames: RootCauseAnalysisDataV2.FrameData[];
+  passingFrames: RootCauseAnalysisDataV2.FrameData[];
 }) {
   return (
     <div className="flex flex-col gap-2">
       {sequences.map((d, i) => (
-        <ExecutedStatementSequence group={d} key={i} />
+        <ExecutedStatementSequence
+          group={d}
+          key={i}
+          failingFrames={failingFrames}
+          passingFrames={passingFrames}
+        />
       ))}
     </div>
   );
 }
 function ExecutedStatementSequence({
   group,
+  failingFrames,
+  passingFrames,
 }: {
-  group: Sequence<RootCauseAnalysisDataV1.ExecutedStatementDiscrepancy>;
+  group: Sequence<RootCauseAnalysisDataV2.ExecutedStatementDiscrepancy>;
+  failingFrames: RootCauseAnalysisDataV2.FrameData[];
+  passingFrames: RootCauseAnalysisDataV2.FrameData[];
 }) {
   return (
     <div className="pl-4">
@@ -37,6 +50,8 @@ function ExecutedStatementSequence({
             key={i}
             discrepancy={d}
             sequenceId={group.sequenceId}
+            failingFrames={failingFrames}
+            passingFrames={passingFrames}
           />
         ))}
       </div>
@@ -44,20 +59,31 @@ function ExecutedStatementSequence({
   );
 }
 
+function generateFrameKey(sourceId: string, line: number, column: number) {
+  return `${sourceId}:${line}:${column}`;
+}
+
 function ExecutedStatementDiscrepancyDisplay({
   discrepancy,
   sequenceId,
+  failingFrames,
+  passingFrames,
 }: {
-  discrepancy: RootCauseAnalysisDataV1.ExecutedStatementDiscrepancy;
+  discrepancy: RootCauseAnalysisDataV2.ExecutedStatementDiscrepancy;
   sequenceId: string;
+  failingFrames: RootCauseAnalysisDataV2.FrameData[];
+  passingFrames: RootCauseAnalysisDataV2.FrameData[];
 }) {
   const [isCollapsed, setIsCollapsed] = useState(true);
   const { failedId, successId } = useContext(RootCauseContext);
-  const source = getSource(discrepancy.event.description?.url);
+
   const { kind, event } = discrepancy;
   const recordingId = kind === "Extra" ? failedId : successId;
 
-  const functionName = discrepancy.event.description!.frame.functionName;
+  let functionName: string | undefined = undefined;
+  let points: RootCauseAnalysisDataV2.FramePoint[] = [];
+  let otherPoints: RootCauseAnalysisDataV2.FramePoint[] = [];
+
   const divergenceText =
     kind === "Extra" ? "Detected an extra statement" : "Detected a missing statement";
 
@@ -66,12 +92,25 @@ function ExecutedStatementDiscrepancyDisplay({
   const beginLine = midLine.line - ALLOWANCE;
   const endLine = midLine.line + ALLOWANCE;
 
-  const points = discrepancy.event.description!.frame.points.filter(
-    p => p.location.line >= beginLine && p.location.line <= endLine
-  );
-  const otherPoints = discrepancy.event.description!.frame.otherPoints.filter(
-    p => p.location.line >= beginLine && p.location.line <= endLine
-  );
+  if (event.description) {
+    const { sourceId, line, column } = event.description;
+    const frameKey = generateFrameKey(sourceId, line, column);
+    const failingFrame = failingFrames.find(f => f.key === frameKey);
+    const passingFrame = passingFrames.find(f => f.key === frameKey);
+
+    if (failingFrame) {
+      functionName = failingFrame.functionName;
+      points = failingFrame.points.filter(
+        p => p.location.line >= beginLine && p.location.line <= endLine
+      );
+    }
+    if (passingFrame) {
+      otherPoints = passingFrame.points.filter(
+        p => p.location.line >= beginLine && p.location.line <= endLine
+      );
+    }
+  }
+
   const lines = new Array(endLine - beginLine).fill(beginLine).map((l, i) => l + i);
 
   return (

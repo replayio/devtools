@@ -4,8 +4,8 @@ import { useState } from "react";
 import { GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_executions_recordings_rootCauseAnalysis } from "shared/graphql/generated/GetTestRunRecordings";
 import { Recording } from "shared/graphql/types";
 import {
-  RootCauseAnalysisDataV1,
-  isRootCauseAnalysisDataV1,
+  RootCauseAnalysisDataV2,
+  isRootCauseAnalysisDataV2,
 } from "shared/root-cause-analysis/RootCauseAnalysisData";
 import { TestRun, TestRunTest } from "shared/test-suites/TestRun";
 import { trackEvent } from "ui/utils/telemetry";
@@ -71,11 +71,11 @@ export function TestResultListItem({
 
   const numComments = comments?.length ?? 0;
 
-  let rootCauseAnalysis: RootCauseAnalysisDataV1.RootCauseAnalysisDatabaseJson | null = null;
+  let rootCauseAnalysis: RootCauseAnalysisDataV2.RootCauseAnalysisDatabaseJson | null = null;
 
   if (
     recording.rootCauseAnalysis != null &&
-    isRootCauseAnalysisDataV1(recording.rootCauseAnalysis)
+    isRootCauseAnalysisDataV2(recording.rootCauseAnalysis)
   ) {
     rootCauseAnalysis = recording.rootCauseAnalysis;
   }
@@ -111,7 +111,7 @@ export function TestResultListItem({
 function RootCauseDisplay({
   analysis,
 }: {
-  analysis: RootCauseAnalysisDataV1.RootCauseAnalysisDatabaseJson;
+  analysis: RootCauseAnalysisDataV2.RootCauseAnalysisDatabaseJson;
 }) {
   const [collapsed, setCollapsed] = useState(true);
   const { result, skipReason, discrepancies } = analysis.result;
