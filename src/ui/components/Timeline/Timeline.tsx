@@ -156,7 +156,7 @@ export default function Timeline() {
 
   return (
     <>
-      <FocusModePopout updateFocusWindowThrottled={updateFocusWindowThrottled} />
+      <FocusModePopout />
       <div
         className="timeline"
         data-protocol-timeline-enabled={showProtocolTimeline || undefined}
@@ -190,11 +190,7 @@ export default function Timeline() {
               <NonLoadingRegions />
               <UnfocusedRegion />
               {showLoadingProgress && <LoadingProgressBars />}
-              <Focuser
-                editMode={editMode}
-                setEditMode={setEditMode}
-                updateFocusWindowThrottled={updateFocusWindowThrottled}
-              />
+              <Focuser editMode={editMode} setEditMode={setEditMode} />
             </div>
           </div>
 
@@ -207,7 +203,3 @@ export default function Timeline() {
     </>
   );
 }
-
-const updateFocusWindowThrottled = throttle((dispatch: AppDispatch, begin: number, end: number) => {
-  return dispatch(setDisplayedFocusWindow({ begin, end }));
-}, 250);
