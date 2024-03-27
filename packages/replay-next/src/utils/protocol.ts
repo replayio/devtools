@@ -181,6 +181,23 @@ export async function protocolValueToClientValue(
             ) {
               type = "error";
             }
+
+            if (object.preview == null) {
+              // At this point, the information we have could only tell us that the value is some type of object.
+              // We specifically can't detect HTMLElements because that requires preview information.
+              // In order to properly render those value types, we need to fetch some preview info.
+              // Hopefully the impact of this should be minor since (a) in many cases we'll already have a preview
+              // and (b) this doesn't affect many value types (above) nor primitive types (with no objectId)
+              const objectWithPreview = await objectCache.readAsync(
+                client,
+                pauseId,
+                objectId,
+                "canOverflow"
+              );
+              if (objectWithPreview.preview?.node?.nodeType === Node.ELEMENT_NODE) {
+                type = "html-element";
+              }
+            }
             break;
         }
       }
