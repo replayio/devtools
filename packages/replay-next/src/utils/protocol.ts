@@ -130,7 +130,7 @@ export async function protocolValueToClientValue(
     }
 
     if (objectId) {
-      const object = await objectCache.readAsync(client, pauseId, objectId, "none");
+      const object = await objectCache.readAsync(client, pauseId, objectId, "canOverflow");
       const className = object.className;
 
       let preview: string | undefined;
