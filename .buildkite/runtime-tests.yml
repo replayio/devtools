@@ -31,7 +31,7 @@ steps:
       - replayio/buildevents#0c2adb2: ~
       - "ssh://git@github.com/replayio/fly-buildkite-plugin.git#v0.77":
           # This image's source code is here https://github.com/replayio/backend-e2e-base-image
-          image: "registry.fly.io/buildkite-backend-e2e-tests:v14"
+          image: "registry.fly.io/buildkite-backend-e2e-tests:v15"
           organization: "replay"
           cpus: 4
           memory: 4096
