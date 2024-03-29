@@ -16,7 +16,8 @@ export default function ObjectRenderer({ context, object, pauseId }: ObjectPrevi
   const properties = preview?.properties?.slice(0, MAX_PROPERTIES_TO_PREVIEW) ?? [];
   let propertiesList: ReactNode[] | null = null;
   if (context !== "nested") {
-    const showOverflowMarker = preview?.overflow || properties.length > MAX_PROPERTIES_TO_PREVIEW;
+    const showOverflowMarker =
+      preview?.overflow || (preview?.properties?.length ?? 0) > MAX_PROPERTIES_TO_PREVIEW;
 
     propertiesList = properties.map((property, index) => (
       <span key={index} className={styles.Value}>
