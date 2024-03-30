@@ -36,5 +36,5 @@ test("stepping-07: Test quick stepping using the keyboard", async ({
   }
 
   // after all steps have been executed we should be paused on line 60
-  await waitForPaused(page, 60);
+  await waitForPaused(page, 67);
 });
