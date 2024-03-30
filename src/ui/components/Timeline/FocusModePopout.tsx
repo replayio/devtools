@@ -5,8 +5,7 @@ import { Button } from "replay-next/components/Button";
 import { useNag } from "replay-next/src/hooks/useNag";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Nag } from "shared/graphql/types";
-import { DebouncedOrThrottledFunction } from "shared/utils/function";
-import { exitFocusMode, requestFocusWindow } from "ui/actions/timeline";
+import { exitFocusMode, requestFocusWindow, setHoverTime } from "ui/actions/timeline";
 import {
   getFocusWindow,
   getShowFocusModeControls,
@@ -14,19 +13,12 @@ import {
   setFocusWindow,
 } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { AppDispatch } from "ui/setup/store";
 import { trackEvent } from "ui/utils/telemetry";
 
 import Icon from "../shared/Icon";
 import styles from "./FocusModePopout.module.css";
 
-export default function FocusModePopout({
-  updateFocusWindowThrottled,
-}: {
-  updateFocusWindowThrottled: DebouncedOrThrottledFunction<
-    (dispatch: AppDispatch, begin: number, end: number) => void
-  >;
-}) {
+export default function FocusModePopout() {
   const replayClient = useContext(ReplayClientContext);
 
   const [isSavePending, setIsSavePending] = useState(false);
@@ -43,15 +35,14 @@ export default function FocusModePopout({
   const discardPendingChanges = async (isImplicit: boolean) => {
     hideModal();
 
-    if (updateFocusWindowThrottled.hasPending()) {
-      updateFocusWindowThrottled.cancel();
-    }
-
     const currentFocusWindow = replayClient.getCurrentFocusWindow();
     assert(currentFocusWindow);
     dispatch(
       setFocusWindow({ begin: currentFocusWindow.begin.time, end: currentFocusWindow.end.time })
     );
+
+    // hoverTime may have been set by one of the focus mode time inputs
+    dispatch(setHoverTime(null, false));
 
     if (isImplicit) {
       trackEvent("timeline.discard_focus_implicit");
@@ -63,10 +54,6 @@ export default function FocusModePopout({
   const savePendingChanges = async () => {
     setIsSavePending(true);
 
-    if (updateFocusWindowThrottled.hasPending()) {
-      await updateFocusWindowThrottled.flush();
-    }
-
     assert(focusWindow);
     await dispatch(
       requestFocusWindow({
@@ -74,6 +61,9 @@ export default function FocusModePopout({
         end: { time: focusWindow.end },
       })
     );
+
+    // hoverTime may have been set by one of the focus mode time inputs
+    dispatch(setHoverTime(null, false));
 
     trackEvent("timeline.save_focus");
 

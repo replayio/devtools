@@ -591,7 +591,14 @@ export function requestFocusWindow(
           replayClient,
           focusWindow.begin.time
         );
-        begin = pointsBoundingTime.before;
+
+        // If there is an exact match, use it;
+        // else use the nearest point before the requested time
+        // This avoids unintentionally clipping out something the user wanted to include
+        begin =
+          focusWindow.begin.time === pointsBoundingTime.after.time
+            ? pointsBoundingTime.after
+            : pointsBoundingTime.before;
       }
     } else {
       begin = currentFocusWindow.begin;
@@ -606,7 +613,14 @@ export function requestFocusWindow(
           replayClient,
           focusWindow.end.time
         );
-        end = pointsBoundingTime.after;
+
+        // If there is an exact match, use it;
+        // else use the nearest point after the requested time
+        // This avoids unintentionally clipping out something the user wanted to include
+        end =
+          focusWindow.end.time === pointsBoundingTime.before.time
+            ? pointsBoundingTime.before
+            : pointsBoundingTime.after;
       }
     } else {
       end = currentFocusWindow.end;
