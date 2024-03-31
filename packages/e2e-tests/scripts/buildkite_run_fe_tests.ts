@@ -20,8 +20,7 @@ const CONFIG = {
 let TestFileOverrideList = [];
 
 // Disable some tests that we know to be problematic.
-const TestFileBlackList = new Set([
-]);
+const TestFileBlackList = new Set([]);
 
 // Enable some tests that we have recently fixed but not yet enabled everywhere.
 const TestFileWhiteList = new Set([]);
