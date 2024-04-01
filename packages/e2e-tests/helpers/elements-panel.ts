@@ -90,6 +90,10 @@ export async function findElementCoordinates(page: Page, partialText: string) {
   const containerBounds = await page.locator("#overlay-graphics").boundingBox();
   assert(containerBounds);
 
+  if (containerBounds.width === 0 || containerBounds.height === 0) {
+    throw Error("Graphics not loaded");
+  }
+
   await page.locator(".box-model-regions").waitFor();
 
   const highlightBounds = await page.locator(".box-model-regions").boundingBox();
