@@ -47,6 +47,14 @@ var o = Symbol();
 var p = Symbol("symbol");
 var q = { [o]: 42, [p]: o };
 var r = { _foo: new C(), get foo() { return this._foo; } }
+const objectWithSixProperties = {
+  a: 1,
+  b: 2,
+  c: 3,
+  d: 4,
+  e: 5,
+  f: 6,
+};
 console.log(a);
 console.log(b);
 console.log(c);
@@ -65,6 +73,7 @@ console.log(o);
 console.log(p);
 console.log(q);
 console.log(r);
+console.log('objectWithSixProperties:', objectWithSixProperties)
 console.log("Done");
 window.setTimeout(recordingFinished);
 }
