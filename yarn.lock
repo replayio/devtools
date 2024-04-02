@@ -3651,16 +3651,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/replay@npm:^0.21.1":
-  version: 0.21.1
-  resolution: "@replayio/replay@npm:0.21.1"
+"@replayio/replay@npm:^0.21.4":
+  version: 0.21.7
+  resolution: "@replayio/replay@npm:0.21.7"
   dependencies:
-    "@replayio/sourcemap-upload": ^1.1.1
+    "@replayio/sourcemap-upload": ^1.1.5
     "@types/semver": ^7.5.6
-    commander: ^7.2.0
+    commander: ^12.0.0
     debug: ^4.3.4
     is-uuid: ^1.0.2
     jsonata: ^1.8.6
+    launchdarkly-node-client-sdk: ^3.1.0
     node-fetch: ^2.6.8
     p-map: ^4.0.0
     query-registry: ^2.6.0
@@ -3669,8 +3670,8 @@ __metadata:
     text-table: ^0.2.0
     ws: ^7.5.0
   bin:
-    replay: bin/replay.js
-  checksum: 8884f6707a570782c365ae35e254e474da0b8659787156bed2161959d93e0b4276ad7db0de5d47cc62007215d07bb01362ebef9529101ce23c14595e2b024e40
+    replay: ./bin.js
+  checksum: ae346b34f90aa5a63a9a8224a5404a6bd5308a828ff458c9b6b4c8d1a517c5377f18488b4c3e45d3effffcf04cf445265b50de89833f57bafd77ca7c5ced5226
   languageName: node
   linkType: hard
 
@@ -3684,6 +3685,19 @@ __metadata:
     node-fetch: ^2.6.1
     string.prototype.matchall: ^4.0.5
   checksum: e47252d133fc34b87a5a7b68e3c792120ff51e12082f45bbf2f91286df39cefd6b6c647e9111c2f3fd89743f7fc30867644ae3647dd1ddb6e83146d12711e9b5
+  languageName: node
+  linkType: hard
+
+"@replayio/sourcemap-upload@npm:^1.1.5":
+  version: 1.1.5
+  resolution: "@replayio/sourcemap-upload@npm:1.1.5"
+  dependencies:
+    commander: ^7.2.0
+    debug: ^4.3.1
+    glob: ^7.1.6
+    node-fetch: ^2.6.1
+    string.prototype.matchall: ^4.0.5
+  checksum: 1874d46f922100e4fc4df582d109a443f315a0dc6c7033d133f157eeffce6c30a86d162620e0ffa4dc94ac76f459524c600bc90c55a55ef3a8a614df56b283d7
   languageName: node
   linkType: hard
 
@@ -7113,6 +7127,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"commander@npm:^12.0.0":
+  version: 12.0.0
+  resolution: "commander@npm:12.0.0"
+  checksum: bce9e243dc008baba6b8d923f95b251ad115e6e7551a15838d7568abebcca0fc832da1800cf37caf37852f35ce4b7fb794ba7a4824b88c5adb1395f9268642df
+  languageName: node
+  linkType: hard
+
 "commander@npm:^2.20.0":
   version: 2.20.3
   resolution: "commander@npm:2.20.3"
@@ -9908,6 +9929,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"graceful-fs@npm:^4.1.11":
+  version: 4.2.11
+  resolution: "graceful-fs@npm:4.2.11"
+  checksum: ac85f94da92d8eb6b7f5a8b20ce65e43d66761c55ce85ac96df6865308390da45a8d3f0296dd3a663de65d30ba497bd46c696cc1e248c72b13d6d567138a4fc7
+  languageName: node
+  linkType: hard
+
 "graceful-fs@npm:^4.1.15, graceful-fs@npm:^4.1.2, graceful-fs@npm:^4.1.6, graceful-fs@npm:^4.2.0, graceful-fs@npm:^4.2.4, graceful-fs@npm:^4.2.6, graceful-fs@npm:^4.2.9":
   version: 4.2.10
   resolution: "graceful-fs@npm:4.2.10"
@@ -12050,6 +12078,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"launchdarkly-eventsource@npm:1.4.3":
+  version: 1.4.3
+  resolution: "launchdarkly-eventsource@npm:1.4.3"
+  dependencies:
+    original: ^1.0.2
+  checksum: 764e1133d681f2de6900444e3194b6e5bbeb6ef25e06891a5fc7a2d58ba820f10861c9f2448b4e8af4b4b1b4db934444b1edf5be83dd69b484b444f04a8395ff
+  languageName: node
+  linkType: hard
+
 "launchdarkly-js-client-sdk@npm:^3.0.0":
   version: 3.1.4
   resolution: "launchdarkly-js-client-sdk@npm:3.1.4"
@@ -12068,6 +12105,28 @@ __metadata:
     fast-deep-equal: ^2.0.1
     uuid: ^8.0.0
   checksum: 69f03217e1810f4a8a1d7f72035022902b96aa0fe4b6a45fe29b9430120a7becdb3540c3a0ffcf2044f88d62aaebef9bc1bb068a59ddc1cacfd447be988aa97f
+  languageName: node
+  linkType: hard
+
+"launchdarkly-js-sdk-common@npm:5.1.0":
+  version: 5.1.0
+  resolution: "launchdarkly-js-sdk-common@npm:5.1.0"
+  dependencies:
+    base64-js: ^1.3.0
+    fast-deep-equal: ^2.0.1
+    uuid: ^8.0.0
+  checksum: 0e6cc4fc848b6a3b02ad929d852c02ab8cb94e57a76d4bee579d97c0eea814e5ebbda5267f873d2600aebedc536eb4f657d86c0af5fc04653b59f00c79f77138
+  languageName: node
+  linkType: hard
+
+"launchdarkly-node-client-sdk@npm:^3.1.0":
+  version: 3.1.0
+  resolution: "launchdarkly-node-client-sdk@npm:3.1.0"
+  dependencies:
+    launchdarkly-eventsource: 1.4.3
+    launchdarkly-js-sdk-common: 5.1.0
+    node-localstorage: ^1.3.1
+  checksum: 0719605989f0dfc4b2a785a1dc0879de7536bfad6d372f0d317ad53c78fa2abe052eaa116d389997e224a6e07aab4101d2ec168f95fdd49a28f14d50a84c3e54
   languageName: node
   linkType: hard
 
@@ -13249,6 +13308,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"node-localstorage@npm:^1.3.1":
+  version: 1.3.1
+  resolution: "node-localstorage@npm:1.3.1"
+  dependencies:
+    write-file-atomic: ^1.1.4
+  checksum: adbeb54e63a16a13fc28ca92ca616a79da039822962d6d9c8d026779a9c9ddad9c40d848c324ea4472193dd1c06b48e153047ef45d3efd7741d13462ec0aec37
+  languageName: node
+  linkType: hard
+
 "node-protocol@workspace:*, node-protocol@workspace:packages/node-protocol":
   version: 0.0.0-use.local
   resolution: "node-protocol@workspace:packages/node-protocol"
@@ -13597,6 +13665,15 @@ __metadata:
     type-check: ^0.4.0
     word-wrap: ^1.2.3
   checksum: dbc6fa065604b24ea57d734261914e697bd73b69eff7f18e967e8912aa2a40a19a9f599a507fa805be6c13c24c4eae8c71306c239d517d42d4c041c942f508a0
+  languageName: node
+  linkType: hard
+
+"original@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "original@npm:1.0.2"
+  dependencies:
+    url-parse: ^1.4.3
+  checksum: 8dca9311dab50c8953366127cb86b7c07bf547d6aa6dc6873a75964b7563825351440557e5724d9c652c5e99043b8295624f106af077f84bccf19592e421beb9
   languageName: node
   linkType: hard
 
@@ -14455,6 +14532,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"querystringify@npm:^2.1.1":
+  version: 2.2.0
+  resolution: "querystringify@npm:2.2.0"
+  checksum: 5641ea231bad7ef6d64d9998faca95611ed4b11c2591a8cae741e178a974f6a8e0ebde008475259abe1621cb15e692404e6b6626e927f7b849d5c09392604b15
+  languageName: node
+  linkType: hard
+
 "queue-microtask@npm:^1.2.2":
   version: 1.2.3
   resolution: "queue-microtask@npm:1.2.3"
@@ -14950,7 +15034,7 @@ __metadata:
     "@replayio/overboard": ^0.4.1
     "@replayio/protocol": 0.70.0
     "@replayio/react-devtools-inline": 4.28.6
-    "@replayio/replay": ^0.21.1
+    "@replayio/replay": ^0.21.4
     "@sentry/integrations": ^7.101.1
     "@sentry/react": ^7.9.0
     "@sentry/tracing": ^7.9.0
@@ -15301,6 +15385,13 @@ __metadata:
   version: 1.2.0
   resolution: "requireindex@npm:1.2.0"
   checksum: 50d8b10a1ff1fdf6aea7a1870bc7bd238b0fb1917d8d7ca17fd03afc38a65dcd7a8a4eddd031f89128b5f0065833d5c92c4fef67f2c04e8624057fe626c9cf94
+  languageName: node
+  linkType: hard
+
+"requires-port@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "requires-port@npm:1.0.0"
+  checksum: eee0e303adffb69be55d1a214e415cf42b7441ae858c76dfc5353148644f6fd6e698926fc4643f510d5c126d12a705e7c8ed7e38061113bdf37547ab356797ff
   languageName: node
   linkType: hard
 
@@ -15914,6 +16005,13 @@ __metadata:
     astral-regex: ^2.0.0
     is-fullwidth-code-point: ^3.0.0
   checksum: 4a82d7f085b0e1b070e004941ada3c40d3818563ac44766cca4ceadd2080427d337554f9f99a13aaeb3b4a94d9964d9466c807b3d7b7541d1ec37ee32d308756
+  languageName: node
+  linkType: hard
+
+"slide@npm:^1.1.5":
+  version: 1.1.6
+  resolution: "slide@npm:1.1.6"
+  checksum: 5768635d227172e215b7a1a91d32f8781f5783b4961feaaf3d536bbf83cc51878928c137508cde7659fea6d7c04074927cab982731302771ee0051518ff24896
   languageName: node
   linkType: hard
 
@@ -17423,6 +17521,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"url-parse@npm:^1.4.3":
+  version: 1.5.10
+  resolution: "url-parse@npm:1.5.10"
+  dependencies:
+    querystringify: ^2.1.1
+    requires-port: ^1.0.0
+  checksum: fbdba6b1d83336aca2216bbdc38ba658d9cfb8fc7f665eb8b17852de638ff7d1a162c198a8e4ed66001ddbf6c9888d41e4798912c62b4fd777a31657989f7bdf
+  languageName: node
+  linkType: hard
+
 "use-composed-ref@npm:^1.3.0":
   version: 1.3.0
   resolution: "use-composed-ref@npm:1.3.0"
@@ -18053,6 +18161,17 @@ __metadata:
   version: 1.0.2
   resolution: "wrappy@npm:1.0.2"
   checksum: 159da4805f7e84a3d003d8841557196034155008f817172d4e986bd591f74aa82aa7db55929a54222309e01079a65a92a9e6414da5a6aa4b01ee44a511ac3ee5
+  languageName: node
+  linkType: hard
+
+"write-file-atomic@npm:^1.1.4":
+  version: 1.3.4
+  resolution: "write-file-atomic@npm:1.3.4"
+  dependencies:
+    graceful-fs: ^4.1.11
+    imurmurhash: ^0.1.4
+    slide: ^1.1.5
+  checksum: ed5a1fc812abe99dd03cd42be145a5e13af42609e19873244510c71b2e261a169db6d06cb9a92b6b0489dd05f045e53bf464d9ad7713e443934af9b81a9cc65d
   languageName: node
   linkType: hard
 
