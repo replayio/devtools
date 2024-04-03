@@ -1,7 +1,7 @@
 import { useContext } from "react";
 
 import {
-  RootCauseAnalysisDataV2,
+  RootCauseAnalysisDataV3,
   Sequence,
 } from "shared/root-cause-analysis/RootCauseAnalysisData";
 
@@ -12,7 +12,7 @@ import { RootCauseContext } from "./RootCause";
 export function ReactComponentSequences({
   sequences,
 }: {
-  sequences: Sequence<RootCauseAnalysisDataV2.ReactComponentDiscrepancy>[];
+  sequences: Sequence<RootCauseAnalysisDataV3.ReactComponentDiscrepancy>[];
 }) {
   return (
     <div className="flex flex-col gap-2 pl-4">
@@ -25,7 +25,7 @@ export function ReactComponentSequences({
 function ReactComponentSequence({
   group,
 }: {
-  group: Sequence<RootCauseAnalysisDataV2.ReactComponentDiscrepancy>;
+  group: Sequence<RootCauseAnalysisDataV3.ReactComponentDiscrepancy>;
 }) {
   const { failedId, successId } = useContext(RootCauseContext);
   const recordingId = group.kind === "Extra" ? failedId : successId;
@@ -53,7 +53,7 @@ function ReactComponentSequence({
 function ReactComponentDiscrepancyDisplay({
   discrepancy,
 }: {
-  discrepancy: RootCauseAnalysisDataV2.ReactComponentDiscrepancy;
+  discrepancy: RootCauseAnalysisDataV3.ReactComponentDiscrepancy;
 }) {
   return <div>nodeName: {discrepancy.event.nodeName}</div>;
 }

@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
 
 import {
-  RootCauseAnalysisDataV2,
+  RootCauseAnalysisDataV3,
   Sequence,
 } from "shared/root-cause-analysis/RootCauseAnalysisData";
 
@@ -16,9 +16,9 @@ export function ExecutedStatementSequences({
   failingFrames,
   passingFrames,
 }: {
-  sequences: Sequence<RootCauseAnalysisDataV2.ExecutedStatementDiscrepancy>[];
-  failingFrames: RootCauseAnalysisDataV2.FrameData[];
-  passingFrames: RootCauseAnalysisDataV2.FrameData[];
+  sequences: Sequence<RootCauseAnalysisDataV3.ExecutedStatementDiscrepancy>[];
+  failingFrames: RootCauseAnalysisDataV3.FormattedFrame[];
+  passingFrames: RootCauseAnalysisDataV3.FormattedFrame[];
 }) {
   return (
     <div className="flex flex-col gap-2">
@@ -38,9 +38,9 @@ function ExecutedStatementSequence({
   failingFrames,
   passingFrames,
 }: {
-  group: Sequence<RootCauseAnalysisDataV2.ExecutedStatementDiscrepancy>;
-  failingFrames: RootCauseAnalysisDataV2.FrameData[];
-  passingFrames: RootCauseAnalysisDataV2.FrameData[];
+  group: Sequence<RootCauseAnalysisDataV3.ExecutedStatementDiscrepancy>;
+  failingFrames: RootCauseAnalysisDataV3.FormattedFrame[];
+  passingFrames: RootCauseAnalysisDataV3.FormattedFrame[];
 }) {
   return (
     <div className="pl-4">
@@ -69,10 +69,10 @@ function ExecutedStatementDiscrepancyDisplay({
   failingFrames,
   passingFrames,
 }: {
-  discrepancy: RootCauseAnalysisDataV2.ExecutedStatementDiscrepancy;
+  discrepancy: RootCauseAnalysisDataV3.ExecutedStatementDiscrepancy;
   sequenceId: string;
-  failingFrames: RootCauseAnalysisDataV2.FrameData[];
-  passingFrames: RootCauseAnalysisDataV2.FrameData[];
+  failingFrames: RootCauseAnalysisDataV3.FormattedFrame[];
+  passingFrames: RootCauseAnalysisDataV3.FormattedFrame[];
 }) {
   const [isCollapsed, setIsCollapsed] = useState(true);
   const { failedId, successId } = useContext(RootCauseContext);
@@ -81,8 +81,8 @@ function ExecutedStatementDiscrepancyDisplay({
   const recordingId = kind === "Extra" ? failedId : successId;
 
   let functionName: string | undefined = undefined;
-  let points: RootCauseAnalysisDataV2.FramePoint[] = [];
-  let otherPoints: RootCauseAnalysisDataV2.FramePoint[] = [];
+  let points: RootCauseAnalysisDataV3.FramePoint[] = [];
+  let otherPoints: RootCauseAnalysisDataV3.FramePoint[] = [];
 
   const divergenceText =
     kind === "Extra" ? "Detected an extra statement" : "Detected a missing statement";
@@ -100,18 +100,16 @@ function ExecutedStatementDiscrepancyDisplay({
 
     if (failingFrame) {
       functionName = failingFrame.functionName;
-      points = failingFrame.points.filter(
-        p => p.location.line >= beginLine && p.location.line <= endLine
-      );
+      points = frameToFramePoints(failingFrame, beginLine, endLine);
     }
     if (passingFrame) {
-      otherPoints = passingFrame.points.filter(
-        p => p.location.line >= beginLine && p.location.line <= endLine
-      );
+      otherPoints = frameToFramePoints(passingFrame, beginLine, endLine);
     }
   }
 
-  const lines = new Array(endLine - beginLine).fill(beginLine).map((l, i) => l + i);
+  const lines: number[] = new Array(endLine - beginLine).fill(beginLine).map((l, i) => l + i);
+
+  // TODO Rewrite this component to be line-oriented instead of column-oriented
 
   return (
     <div
@@ -238,6 +236,27 @@ function ExecutedStatementDiscrepancyDisplay({
       )}
     </div>
   );
+}
+
+function frameToFramePoints(
+  frame: RootCauseAnalysisDataV3.FormattedFrame,
+  beginLine: number,
+  endLine: number
+) {
+  const firstArrayIndex = beginLine - frame.startingLineNumber;
+  const numLines = endLine - beginLine;
+  const lineHits = frame.hitCounts.slice(firstArrayIndex, firstArrayIndex + numLines);
+  const sourceLines = frame.sourceLines.slice(firstArrayIndex, firstArrayIndex + numLines);
+  return lineHits.map((h, i) => ({
+    hits: h,
+    text: sourceLines[i],
+    breakable: false,
+    location: {
+      sourceId: frame.sourceId,
+      line: beginLine + i,
+      column: 0,
+    },
+  }));
 }
 
 function getSource(url?: string) {

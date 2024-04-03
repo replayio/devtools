@@ -1,11 +1,11 @@
+import { useQuery } from "@apollo/client/react";
 import { useRouter } from "next/router";
 import { useState } from "react";
 
-import { GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_executions_recordings_rootCauseAnalysis } from "shared/graphql/generated/GetTestRunRecordings";
 import { Recording } from "shared/graphql/types";
 import {
-  RootCauseAnalysisDataV2,
-  isRootCauseAnalysisDataV2,
+  RootCauseAnalysisDataV3,
+  isRootCauseAnalysisSummaryV3,
 } from "shared/root-cause-analysis/RootCauseAnalysisData";
 import { TestRun, TestRunTest } from "shared/test-suites/TestRun";
 import { trackEvent } from "ui/utils/telemetry";
@@ -15,6 +15,10 @@ import {
   getTruncatedRelativeDate,
 } from "../../Recordings/RecordingListItem/RecordingListItem";
 import { StatusIcon } from "../../StatusIcon";
+import {
+  GET_RECORDING_ROOT_CAUSE_ANALYSIS_FULL,
+  GET_RECORDING_ROOT_CAUSE_ANALYSIS_SUMMARY,
+} from "../graphql/RootCauseAnalysisGraphQL";
 import { RootCause } from "../RootCause/RootCause";
 import { TestRunLibraryRow } from "../TestRunLibraryRow";
 import { AttributeContainer } from "./AttributeContainer";
@@ -65,19 +69,24 @@ export function TestResultListItem({
   test: TestRunTest;
 }) {
   const { comments, isProcessed, id: recordingId } = recording;
+  const { data: rootCauseAnalysisEntry } =
+    useQuery<RootCauseAnalysisDataV3.RootCauseAnalysisDatabaseSummary>(
+      GET_RECORDING_ROOT_CAUSE_ANALYSIS_SUMMARY,
+      {
+        variables: { recordingId },
+      }
+    );
   const { title } = test;
 
   const { apiKey, e2e } = useRouter().query;
 
   const numComments = comments?.length ?? 0;
 
-  let rootCauseAnalysis: RootCauseAnalysisDataV2.RootCauseAnalysisDatabaseJson | null = null;
+  let rootCauseAnalysisSummary: RootCauseAnalysisDataV3.RootCauseAnalysisDatabaseSummary | null =
+    null;
 
-  if (
-    recording.rootCauseAnalysis != null &&
-    isRootCauseAnalysisDataV2(recording.rootCauseAnalysis)
-  ) {
-    rootCauseAnalysis = recording.rootCauseAnalysis;
+  if (rootCauseAnalysisEntry != null && isRootCauseAnalysisSummaryV3(rootCauseAnalysisEntry)) {
+    rootCauseAnalysisSummary = rootCauseAnalysisEntry;
   }
 
   return (
@@ -103,32 +112,63 @@ export function TestResultListItem({
           )}
         </a>
       </TestRunLibraryRow>
-      {rootCauseAnalysis ? <RootCauseDisplay analysis={rootCauseAnalysis} /> : null}
+      {rootCauseAnalysisSummary ? (
+        <RootCauseCollapsibleWrapper
+          analysis={rootCauseAnalysisSummary}
+          recordingId={recording.id}
+        />
+      ) : null}
     </div>
   );
 }
 
-function RootCauseDisplay({
+function RootCauseCollapsibleWrapper({
+  recordingId,
   analysis,
 }: {
-  analysis: RootCauseAnalysisDataV2.RootCauseAnalysisDatabaseJson;
+  recordingId: string;
+  analysis: RootCauseAnalysisDataV3.RootCauseAnalysisDatabaseSummary;
 }) {
   const [collapsed, setCollapsed] = useState(true);
-  const { result, skipReason, discrepancies } = analysis.result;
+  const { analysisStatus, analysisSkipReason } = analysis;
 
-  if (result === "Skipped") {
-    return <div className="pl-9">Analysis skipped: {skipReason}</div>;
+  if (analysisStatus === "Skipped") {
+    return <div className="pl-9">Analysis skipped: {analysisSkipReason}</div>;
+  } else if (analysisStatus === "Failure") {
+    return <div className="pl-9">Analysis failed</div>;
   }
 
   return (
-    <div className="flex flex-col gap-2 pl-9">
+    <>
       <button onClick={() => setCollapsed(!collapsed)} className="flex flex-row gap-1">
         <div className="font-mono">{collapsed ? "▶" : "▼"}</div>
         <div>Root cause available</div>
       </button>
-      {discrepancies && !collapsed
-        ? discrepancies.map((d, i) => <RootCause key={i} discrepancy={d} />)
-        : null}
+      {!collapsed ? <RootCauseDisplay recordingId={recordingId} /> : null}
+    </>
+  );
+}
+
+function RootCauseDisplay({ recordingId }: { recordingId: string }) {
+  const { data: rootCauseAnalysis, error } =
+    useQuery<RootCauseAnalysisDataV3.RootCauseAnalysisDatabaseJson>(
+      GET_RECORDING_ROOT_CAUSE_ANALYSIS_FULL,
+      {
+        variables: { recordingId },
+      }
+    );
+
+  if (!rootCauseAnalysis) {
+    return null;
+  }
+
+  const { discrepancies } = rootCauseAnalysis.result;
+
+  return (
+    <div className="flex flex-col gap-2 pl-9">
+      {discrepancies?.map((d, i) => (
+        <RootCause key={i} discrepancy={d} />
+      ))}
     </div>
   );
 }
