@@ -7,6 +7,7 @@ import {
   CommandResponse,
   ExperimentalSettings,
   createSession,
+  listenForSessionDestroyed,
 } from "protocol/socket";
 import { assert } from "protocol/utils";
 import {
@@ -136,15 +137,6 @@ function getRecordingNotAccessibleError(
   };
 }
 
-export function getDisconnectionError(): UnexpectedError {
-  endMixpanelSession("disconnected");
-  return {
-    action: "refresh",
-    content: "This replay timed out to reduce server load.",
-    message: "Ready when you are!",
-  };
-}
-
 function getDeletedRecordingError(): ExpectedError {
   return {
     message: "Recording Deleted",
@@ -261,6 +253,34 @@ export function createSocket(recordingId: string): UIThunkAction {
         }
       }
 
+      let sessionMayDestroy = false;
+      addEventListener("Session.mayDestroy", () => {
+        sessionMayDestroy = true;
+      });
+
+      function setSessionDestroyedError(error: UnexpectedError) {
+        endMixpanelSession("disconnected");
+        if (sessionMayDestroy) {
+          dispatch(
+            setExpectedError({
+              action: "refresh",
+              content: "This replay timed out to reduce server load.",
+              message: "Ready when you are!",
+            })
+          );
+        } else {
+          dispatch(setUnexpectedError(error));
+        }
+      }
+
+      listenForSessionDestroyed(() =>
+        setSessionDestroyedError({
+          action: "refresh",
+          content: "The session was destroyed unexpectedly. Please refresh the page.",
+          message: "Unexpected end of session",
+        })
+      );
+
       const sessionId = await createSession(
         recordingId,
         experimentalSettings,
@@ -318,19 +338,23 @@ export function createSocket(recordingId: string): UIThunkAction {
                 })
               );
             } else {
-              dispatch(
-                setUnexpectedError({
-                  action: "refresh",
-                  content: "The socket has closed due to an error. Please refresh the page.",
-                  message: "Unexpected socket error",
-                  ...evt,
-                })
-              );
+              setSessionDestroyedError({
+                action: "refresh",
+                content:
+                  "The connection to our server was closed due to an error. Please refresh the page.",
+                message: "Unexpected socket error",
+                ...evt,
+              });
             }
           },
           onSocketClose: (willClose: boolean) => {
             if (!willClose) {
-              dispatch(setExpectedError(getDisconnectionError()));
+              setSessionDestroyedError({
+                action: "refresh",
+                content:
+                  "The connection to our server was closed unexpectedly. Please refresh the page.",
+                message: "Unexpected disconnect",
+              });
             }
           },
         }

@@ -4,7 +4,7 @@ import test from "../testFixture";
 
 test.use({ exampleKey: "doc_control_flow.html" });
 
-test(`session-timeout: errors caused by session failure should bubble to the root`, async ({
+test(`session-destroyed: errors caused by session failure should bubble to the root`, async ({
   pageWithMeta: { page, recordingId },
   exampleKey,
 }) => {
@@ -19,8 +19,8 @@ test(`session-timeout: errors caused by session failure should bubble to the roo
   });
 
   await verifyErrorDialog(page, {
-    expectedDetails: "This replay timed out to reduce server load.",
-    expectedTitle: "Ready when you are!",
-    expectedType: "expected",
+    expectedDetails: "The session was destroyed unexpectedly. Please refresh the page.",
+    expectedTitle: "Unexpected end of session",
+    expectedType: "unexpected",
   });
 });
