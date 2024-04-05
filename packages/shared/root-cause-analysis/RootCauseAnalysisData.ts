@@ -100,231 +100,7 @@ export enum AnalysisResult {
   Skipped = "Skipped",
 }
 
-export namespace RootCauseAnalysisDataV1 {
-  export enum ReactComponentChange {
-    Add = "Add",
-    Remove = "Remove",
-  }
-
-  // Information about a change to a react component.
-  export interface ReactComponent extends DiscrepancyEvent {
-    nodeName: string;
-    change: ReactComponentChange;
-  }
-
-  // Information about a statement that executed within a recording.
-  export interface ExecutedStatement extends DiscrepancyEvent {
-    // Location of the statement.
-    location: MappedLocation;
-  }
-
-  export interface LocationDescription {
-    url: string | undefined;
-    line: number;
-    column: number;
-    frame: Frame;
-    functionText?: string[];
-    functionOutline?: FunctionOutline;
-    text?: string;
-  }
-
-  interface Frame {
-    functionName: string;
-    points: FramePoint[];
-    otherPoints: FramePoint[];
-  }
-
-  export interface FramePoint {
-    hits: number;
-    location: Location;
-    breakable: boolean;
-    text: string;
-  }
-
-  // Reported discrepancies for executed statements include a description of the
-  // statement which is either extra or missing in the failed run.
-  interface ExecutedStatementWithDescription extends ExecutedStatement {
-    description?: LocationDescription;
-  }
-
-  export interface NetworkEventContentsRequest {
-    kind: "Request";
-    requestUrl: string;
-    requestMethod: string;
-    requestTag?: string;
-    responseCode?: number;
-    initiator?: RequestInitiator;
-  }
-
-  export interface NetworkEventContentsResponseJSON {
-    kind: "ResponseJSON";
-
-    // Information about the associated request.
-    requestUrl: string;
-    requestTag?: string;
-
-    // Path to the JSON value being described.
-    path: string;
-
-    // Value in the JSON at the associated path.
-    value: ComparableValue;
-  }
-
-  export type NetworkEventContents = NetworkEventContentsRequest | NetworkEventContentsResponseJSON;
-
-  export interface NetworkEvent extends DiscrepancyEvent {
-    requestId: string;
-    data: NetworkEventContents;
-  }
-
-  // Reported discrepancies for the contents of network requests/responses include
-  // a description of what the corresponding content is in the other run.
-  interface NetworkEventWithAlternate extends NetworkEvent {
-    alternate?: NetworkEventContents;
-  }
-
-  interface ExecutedStatementDiscrepancySpec {
-    kind: "ExecutedStatement";
-    discrepancyKind: DiscrepancyKind;
-    key: string;
-    url: string;
-  }
-
-  interface ReactComponentDiscrepancySpec {
-    kind: "ReactComponent";
-    discrepancyKind: DiscrepancyKind;
-    key: string;
-  }
-
-  interface NetworkEventDiscrepancySpec {
-    kind: "NetworkEvent";
-    discrepancyKind: DiscrepancyKind;
-    key: string;
-  }
-
-  // Discrepancy in the result of a global evaluation at the failure point in the
-  // failed vs. passing recordings.
-  interface CustomSpecGlobalEval {
-    kind: "GlobalEval";
-    expression: string;
-  }
-
-  // Discrepancy in the result of evaluating an expression at the last time some
-  // statement executed before the failure.
-  interface CustomSpecFrameEval {
-    kind: "FrameEval";
-    expression: string;
-
-    // URL where we should look for the source to evaluate the expression.
-    url: string;
-
-    // Text for the statement within the URL to evaluate the expression at.
-    fragment: string;
-  }
-
-  // Specification for a custom discrepancy to check for.
-  export type CustomSpec = CustomSpecGlobalEval | CustomSpecFrameEval;
-
-  // Information about an event associated with a custom discrepancy spec.
-  export interface CustomEvent extends DiscrepancyEvent {
-    // Discrepancy which we checked for.
-    custom: CustomSpec;
-
-    // Any value produced by an evaluation in the discrepancy.
-    value?: ComparableValue;
-  }
-
-  export type ExecutedStatementDiscrepancy = Discrepancy<ExecutedStatementWithDescription>;
-  export type ReactComponentDiscrepancy = Discrepancy<ReactComponent>;
-  export type NetworkEventDiscrepancy = Discrepancy<NetworkEventWithAlternate>;
-  export type CustomEventDiscrepancy = Discrepancy<CustomEvent>;
-
-  export type AnyDiscrepancy =
-    | ExecutedStatementDiscrepancy
-    | ReactComponentDiscrepancy
-    | NetworkEventDiscrepancy
-    | CustomEventDiscrepancy;
-
-  // Discrepancies in a signature can be custom specs or describe discrepancies
-  // automatically found by the RCA.
-  export type DiscrepancySpec =
-    | CustomSpec
-    | ExecutedStatementDiscrepancySpec
-    | ReactComponentDiscrepancySpec
-    | NetworkEventDiscrepancySpec;
-
-  export interface TestFailureSignature {
-    // Description and associated URL to use for failures matching this signature.
-    title: string;
-    url: string;
-
-    // Associated priority, with lower numbers being higher priority. If a failure
-    // matches multiple signatures then the label used will be the highest priority,
-    // or the first one in the signatures array in the case of tied priorities.
-    priority: number;
-
-    // Specs for discrepancies matching this signature.
-    discrepancies: DiscrepancySpec[];
-  }
-
-  // Unique identifier for a test.
-  export interface TestId {
-    recordingId: string;
-    testId: number;
-    attempt: number;
-  }
-
-  // Describes a test run handled by the root cause analysis.
-  export interface TestRunInfo {
-    // Test which was analyzed.
-    id: TestId;
-
-    // Range of the recording in which the test ran.
-    start: TimeStampedPoint;
-    end: TimeStampedPoint;
-
-    // Any earlier endpoint for the range which was analyzed.
-    analyzeEndpoint?: TimeStampedPoint;
-
-    // In a failed recording, the endpoint at which the last steps were repeated
-    // the same number of times as in each passing recording.
-    failureRepeatEndpoint?: TimeStampedPoint;
-  }
-
-  // Encodes the result of analyzing a flaky test failure.
-  export interface RootCauseAnalysisResult {
-    // The failed test run which was analyzed.
-    failedRun: TestRunInfo;
-
-    // A particular successful run which the discrepancies will be in relation to.
-    successRun: TestRunInfo;
-
-    // Additional successful runs which were analyzed.
-    additionalSuccessRuns: TestRunInfo[];
-
-    // Discrepancies found while analyzing the failure.
-    discrepancies: AnyDiscrepancy[];
-
-    // The highest priority signature which matches this failure, if any.
-    matchingSignature?: TestFailureSignature;
-  }
-
-  export interface RootCauseAnalysisDatabaseResultV1 {
-    branch: string | undefined;
-    result: AnalysisResult;
-    skipReason: string | undefined;
-    error: Record<string, unknown> | undefined;
-    discrepancies: RootCauseAnalysisResult[] | undefined;
-  }
-
-  export interface RootCauseAnalysisDatabaseJson {
-    id: string;
-    result: RootCauseAnalysisDatabaseResultV1;
-    version: 1;
-  }
-}
-
-export namespace RootCauseAnalysisDataV2 {
+export namespace RootCauseAnalysisDataV3 {
   export enum ReactComponentChange {
     Add = "Add",
     Remove = "Remove",
@@ -359,25 +135,27 @@ export namespace RootCauseAnalysisDataV2 {
     error?: ProtocolObject;
   }
 
-  // Information about a location within a frame.
-  interface Frame {
+  export interface FormattedFrame {
+    key: string;
+    sourceId: string;
     functionName: string;
-    points: FramePoint[];
+    startingLineNumber: number;
+    sourceLines: string[];
+    hitCounts: number[];
+    breakableLines: boolean[];
     exceptions?: Exception[];
   }
 
-  // Information about a location within a frame, but with an attached key for the location.
-  export interface FrameData extends Frame {
-    key: string;
-  }
-
-  // Information about a location within a frame.
+  // Left over from v1/v2 - can be dropped when we rewrite `<ExecutedStatement>`
+  // to be line-oriented.
   export interface FramePoint {
     hits: number;
     location: Location;
     breakable: boolean;
     text: string;
   }
+
+  // Information about a location within a frame, but with an attached key for the location.
 
   // Reported discrepancies for executed statements include a description of the
   // statement which is either extra or missing in the failed run.
@@ -544,16 +322,16 @@ export namespace RootCauseAnalysisDataV2 {
     discrepancies: AnyDiscrepancy[];
 
     // Frame data for the failing run.
-    failingFrames: FrameData[];
+    failingFrames: FormattedFrame[];
 
     // Frame data for the passing run.
-    passingFrames: FrameData[];
+    passingFrames: FormattedFrame[];
 
     // The highest priority signature which matches this failure, if any.
     matchingSignature?: TestFailureSignature;
   }
 
-  export interface RootCauseAnalysisDatabaseResultV2 {
+  export interface RootCauseAnalysisDatabaseResultV3 {
     branch: string | undefined;
     result: AnalysisResult;
     skipReason: string | undefined;
@@ -561,38 +339,54 @@ export namespace RootCauseAnalysisDataV2 {
     discrepancies: RootCauseAnalysisResult[] | undefined;
   }
 
+  export interface RootCauseAnalysisDatabaseSummary {
+    id: string;
+    analysisStatus: RootCauseAnalysisDatabaseResultV3["result"];
+    analysisSkipReason: RootCauseAnalysisDatabaseResultV3["skipReason"];
+    version: 3;
+  }
+
   export interface RootCauseAnalysisDatabaseJson {
     id: string;
-    result: RootCauseAnalysisDatabaseResultV2;
-    version: 2;
+    result: RootCauseAnalysisDatabaseResultV3;
+    version: 3;
+  }
+
+  export interface RootCauseAnalysisGraphQLWrapperv3 {
+    recording: {
+      rootCauseAnalysis: RootCauseAnalysisDatabaseJson;
+    };
   }
 }
 
 export type AnyRootCauseAnalysisDatabaseJson =
-  | RootCauseAnalysisDataV1.RootCauseAnalysisDatabaseJson
-  | RootCauseAnalysisDataV2.RootCauseAnalysisDatabaseJson;
+  RootCauseAnalysisDataV3.RootCauseAnalysisDatabaseJson;
 
 export type AnyRootCauseAnalysisDatabaseResult =
-  | RootCauseAnalysisDataV1.RootCauseAnalysisDatabaseResultV1
-  | RootCauseAnalysisDataV2.RootCauseAnalysisDatabaseResultV2;
+  RootCauseAnalysisDataV3.RootCauseAnalysisDatabaseResultV3;
 
-export type AnyRootCauseAnalysisResult =
-  | RootCauseAnalysisDataV1.RootCauseAnalysisResult
-  | RootCauseAnalysisDataV2.RootCauseAnalysisResult;
+export type AnyRootCauseAnalysisResult = RootCauseAnalysisDataV3.RootCauseAnalysisResult;
 
-export function isRootCauseAnalysisDataV1(
+export function isRootCauseAnalysisSummaryV3(
   data: unknown
-): data is RootCauseAnalysisDataV1.RootCauseAnalysisDatabaseJson {
-  return data !== null && typeof data === "object" && "version" in data && data.version === 1;
+): data is RootCauseAnalysisDataV3.RootCauseAnalysisDatabaseJson {
+  if (data !== null && typeof data === "object") {
+    return (
+      "version" in data &&
+      data.version === 3 &&
+      "analysisStatus" in data &&
+      "analysisSkipReason" in data
+    );
+  }
+
+  return false;
 }
 
-export function isRootCauseAnalysisDataV2(
+export function isRootCauseAnalysisDataV3(
   data: unknown
-): data is RootCauseAnalysisDataV2.RootCauseAnalysisDatabaseJson {
+): data is RootCauseAnalysisDataV3.RootCauseAnalysisDatabaseJson {
   if (data !== null && typeof data === "object") {
-    const isActuallyV2 = "version" in data && data.version === 2;
-    const isV2WithoutBumpedVersion = "failingFrames" in data && "passingFrames" in data;
-    return isActuallyV2 || isV2WithoutBumpedVersion;
+    return "version" in data && data.version === 3 && "result" in data;
   }
 
   return false;

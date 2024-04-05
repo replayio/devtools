@@ -1,7 +1,7 @@
 import { createContext } from "react";
 
 import {
-  RootCauseAnalysisDataV2,
+  RootCauseAnalysisDataV3,
   Sequence,
 } from "shared/root-cause-analysis/RootCauseAnalysisData";
 
@@ -11,13 +11,13 @@ import { NetworkEventSequences } from "./NetworkEvent";
 import { ReactComponentSequences } from "./ReactComponent";
 
 interface GroupedSequences {
-  ExecutedStatement: Record<string, Sequence<RootCauseAnalysisDataV2.ExecutedStatementDiscrepancy>>;
-  NetworkEvent: Record<string, Sequence<RootCauseAnalysisDataV2.NetworkEventDiscrepancy>>;
-  ReactComponent: Record<string, Sequence<RootCauseAnalysisDataV2.ReactComponentDiscrepancy>>;
-  CustomEvent: Record<string, Sequence<RootCauseAnalysisDataV2.CustomEventDiscrepancy>>;
+  ExecutedStatement: Record<string, Sequence<RootCauseAnalysisDataV3.ExecutedStatementDiscrepancy>>;
+  NetworkEvent: Record<string, Sequence<RootCauseAnalysisDataV3.NetworkEventDiscrepancy>>;
+  ReactComponent: Record<string, Sequence<RootCauseAnalysisDataV3.ReactComponentDiscrepancy>>;
+  CustomEvent: Record<string, Sequence<RootCauseAnalysisDataV3.CustomEventDiscrepancy>>;
 }
 
-function groupSequences(discrepancies: RootCauseAnalysisDataV2.AnyDiscrepancy[]) {
+function groupSequences(discrepancies: RootCauseAnalysisDataV3.AnyDiscrepancy[]) {
   const grouped: GroupedSequences = {
     ExecutedStatement: {},
     NetworkEvent: {},
@@ -56,7 +56,7 @@ export const RootCauseContext = createContext<RootCauseContextType>(null as any)
 export function RootCause({
   discrepancy,
 }: {
-  discrepancy: RootCauseAnalysisDataV2.RootCauseAnalysisResult;
+  discrepancy: RootCauseAnalysisDataV3.RootCauseAnalysisResult;
 }) {
   const testFailure = discrepancy;
   const failedId = testFailure.failedRun.id.recordingId;

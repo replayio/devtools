@@ -39,7 +39,6 @@ import {
   GetRecordingUserId,
   GetRecordingUserIdVariables,
 } from "shared/graphql/generated/GetRecordingUserId";
-import { GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_executions_recordings } from "shared/graphql/generated/GetTestRunRecordings";
 import { GetTestsRun_node_Workspace_testRuns_edges_node_tests_recordings } from "shared/graphql/generated/GetTestsRun";
 import {
   GetWorkspaceRecordings,
@@ -280,7 +279,6 @@ export function convertRecording(
     | GetWorkspaceRecordings_node_Workspace_recordings_edges_node
     | GetTestsRun_node_Workspace_testRuns_edges_node_tests_recordings
     | GetWorkspaceTestExecutions_node_Workspace_tests_edges_node_executions_recordings
-    | GetTestRunRecordings_node_Workspace_testRuns_edges_node_tests_executions_recordings
 ): Recording {
   const recording: Recording = {
     buildId: "buildId" in rec ? rec.buildId : undefined,
@@ -299,7 +297,6 @@ export function convertRecording(
     userRole: "userRole" in rec ? (rec.userRole as RecordingRole) : undefined,
     isTest: "isTest" in rec ? rec.isTest : undefined,
     isInTestWorkspace: "isInTestWorkspace" in rec ? rec.isInTestWorkspace : undefined,
-    rootCauseAnalysis: "rootCauseAnalysis" in rec ? rec.rootCauseAnalysis : undefined,
     testRunId: null,
   };
 
