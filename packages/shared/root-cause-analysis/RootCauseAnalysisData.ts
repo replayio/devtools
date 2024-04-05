@@ -142,6 +142,7 @@ export namespace RootCauseAnalysisDataV3 {
     startingLineNumber: number;
     sourceLines: string[];
     hitCounts: number[];
+    breakableLines: boolean[];
     exceptions?: Exception[];
   }
 
@@ -346,9 +347,15 @@ export namespace RootCauseAnalysisDataV3 {
   }
 
   export interface RootCauseAnalysisDatabaseJson {
-    recordingId: string;
+    id: string;
     result: RootCauseAnalysisDatabaseResultV3;
     version: 3;
+  }
+
+  export interface RootCauseAnalysisGraphQLWrapperv3 {
+    recording: {
+      rootCauseAnalysis: RootCauseAnalysisDatabaseJson;
+    };
   }
 }
 
@@ -379,7 +386,7 @@ export function isRootCauseAnalysisDataV3(
   data: unknown
 ): data is RootCauseAnalysisDataV3.RootCauseAnalysisDatabaseJson {
   if (data !== null && typeof data === "object") {
-    return "version" in data && data.version === 3;
+    return "version" in data && data.version === 3 && "result" in data;
   }
 
   return false;

@@ -247,10 +247,11 @@ function frameToFramePoints(
   const numLines = endLine - beginLine;
   const lineHits = frame.hitCounts.slice(firstArrayIndex, firstArrayIndex + numLines);
   const sourceLines = frame.sourceLines.slice(firstArrayIndex, firstArrayIndex + numLines);
+  const breakableLines = frame.breakableLines.slice(firstArrayIndex, firstArrayIndex + numLines);
   return lineHits.map((h, i) => ({
     hits: h,
     text: sourceLines[i],
-    breakable: false,
+    breakable: breakableLines[i] ?? false,
     location: {
       sourceId: frame.sourceId,
       line: beginLine + i,
