@@ -19,6 +19,5 @@ export interface UpdateWorkspaceSettings {
 export interface UpdateWorkspaceSettingsVariables {
   workspaceId: string;
   name?: string | null;
-  motd?: string | null;
   features?: any | null;
 }
