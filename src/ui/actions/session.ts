@@ -6,6 +6,7 @@ import {
   CommandRequest,
   CommandResponse,
   ExperimentalSettings,
+  addEventListener,
   createSession,
   listenForSessionDestroyed,
 } from "protocol/socket";
