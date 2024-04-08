@@ -3,6 +3,7 @@
   flex-direction: column;
   flex: 1 1 auto;
   overflow: hidden;
+  margin-right: 10px;
 }
 
 .secondary-toolbox-header {
