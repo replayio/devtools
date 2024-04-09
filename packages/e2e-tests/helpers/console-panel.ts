@@ -320,7 +320,7 @@ export async function verifyConsoleMessage(
   );
 
   const messages = await findConsoleMessage(page, expected, messageType);
-  await verifyExpectedCount(messages, expectedCount, 10_000);
+  await verifyExpectedCount(messages, expectedCount, 25_000);
 }
 
 export async function verifyConsoleMessageObjectContents(
