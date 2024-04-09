@@ -13,6 +13,7 @@ import { trackEvent } from "ui/utils/telemetry";
 
 import { useRedirectToTeam } from "../Library/Team/utils";
 import { TextInput } from "./Forms";
+import Radio from "./Forms/Radio";
 import InvitationLink from "./NewWorkspaceModal/InvitationLink";
 import { DownloadingPage } from "./Onboarding/DownloadingPage";
 import { DownloadPage } from "./Onboarding/DownloadPage";
@@ -40,6 +41,7 @@ type SlideBodyProps = PropsFromRedux & {
   newWorkspace: Workspace | null;
   current: number;
   organization?: boolean;
+  testSuites?: boolean;
 };
 
 function IntroPage({ onSkipToDownload, onNext, organization }: SlideBodyProps) {
@@ -66,6 +68,7 @@ function TeamNamePage({
   setCurrent,
   current,
   organization,
+  testSuites,
 }: SlideBodyProps) {
   const [inputValue, setInputValue] = useState<string>("");
   const [allowNext, setAllowNext] = useState<boolean>(false);
@@ -96,10 +99,17 @@ function TeamNamePage({
       return;
     }
 
+    let planKey = "team-v1";
+    if (testSuites) {
+      planKey = "testsuites-ryan";
+    } else if (organization) {
+      planKey = "org-v1";
+    }
+
     createNewWorkspace({
       variables: {
         name: inputValue,
-        planKey: organization ? "org-v1" : "team-v1",
+        planKey,
       },
     });
     trackEvent("onboarding.created_team");
@@ -113,7 +123,7 @@ function TeamNamePage({
     <>
       <OnboardingContent>
         <OnboardingHeader>What should we call you?</OnboardingHeader>
-        <OnboardingBody>{`Keep it simple! Your company name is perfect`}</OnboardingBody>
+        <OnboardingBody>{`Keep it simple! Your company name is perfect. Test Suites = ${testSuites}`}</OnboardingBody>
       </OnboardingContent>
       <div className="flex w-full flex-col py-3">
         <TextInput
@@ -226,7 +236,7 @@ function TeamMemberInvitationPage({ newWorkspace, onSkipToDownload }: SlideBodyP
 // This modal is used whenever a user is invited to Replay via the Replay invitations
 // tab in the settings panel. This should guide them through 1) creating a team, and/or
 // 2) downloading the Replay browser.
-function TeamOnboarding(props: { organization?: boolean } & PropsFromRedux) {
+function TeamOnboarding(props: { organization?: boolean; testSuites?: boolean } & PropsFromRedux) {
   const router = useRouter();
   const [current, setCurrent] = useState<number>(1);
   const [randomNumber, setRandomNumber] = useState<number>(Math.random());

@@ -155,6 +155,7 @@ function SlideBody1({ hideModal, setNewWorkspace, setCurrent, total, current }: 
   const [inputError, setInputError] = useState<string | null>(null);
   const [allowNext, setAllowNext] = useState<boolean>(false);
   const [createInternalTeam, setCreateInternalTeam] = useState(true);
+  const [createTestSuiteTeam, setCreateTestSuitesTeam] = useState(false);
   const textInputRef = useRef<HTMLInputElement>(null);
 
   const createNewWorkspace = hooks.useCreateNewWorkspace(onNewWorkspaceCompleted);
@@ -182,10 +183,17 @@ function SlideBody1({ hideModal, setNewWorkspace, setCurrent, total, current }: 
       return;
     }
 
+    let planKey = "team-v1";
+    if (createTestSuiteTeam) {
+      planKey = "testsuites-ryan";
+    } else if (user.internal && createInternalTeam) {
+      planKey = "team-internal-v1";
+    }
+
     createNewWorkspace({
       variables: {
         name: inputValue,
-        planKey: user.internal && createInternalTeam ? "team-internal-v1" : "team-v1",
+        planKey,
       },
     });
   };
@@ -210,6 +218,13 @@ function SlideBody1({ hideModal, setNewWorkspace, setCurrent, total, current }: 
             Create Internal Team without Trial
           </div>
         ) : null}
+        <div className="flex flex-row items-center gap-3 px-0.5">
+          <Checkbox
+            checked={createTestSuiteTeam}
+            onChange={e => setCreateTestSuitesTeam(e.currentTarget.checked)}
+          />
+          Test Suites!
+        </div>
       </SlideContent>
       <div className="grid">
         {isValidTeamName(inputValue) ? (
