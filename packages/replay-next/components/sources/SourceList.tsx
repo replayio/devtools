@@ -19,8 +19,8 @@ import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { PointsContext } from "replay-next/src/contexts/points/PointsContext";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import {
-  BreakpointPositionsResult,
-  breakpointPositionsCache,
+  BreakpointPositionsByLine,
+  breakpointPositionsByLineCache,
 } from "replay-next/src/suspense/BreakpointPositionsCache";
 import { getCachedMinMaxSourceHitCounts } from "replay-next/src/suspense/SourceHitCountsCache";
 import { Source } from "replay-next/src/suspense/SourcesCache";
@@ -33,7 +33,7 @@ import SourceListRow from "./SourceListRow";
 import getScrollbarWidth from "./utils/getScrollbarWidth";
 import styles from "./SourceList.module.css";
 
-const NO_BREAKABLE_POSITIONS: BreakpointPositionsResult = [[], new Map()];
+const NO_BREAKABLE_POSITIONS: BreakpointPositionsByLine = new Map();
 
 // render a few placeholder lines of text so that the source viewer isn't empty.
 const STREAMING_IN_PROGRESS_PLACEHOLDER_LINE_COUNT = 10;
@@ -84,12 +84,13 @@ export default function SourceList({
   const { data } = useStreamingValue(streamingParser);
   const lineCount = data?.lineCount;
 
-  const { value: breakablePositionsValue = NO_BREAKABLE_POSITIONS } = useImperativeCacheValue(
-    breakpointPositionsCache,
+  const { value: breakablePositionsByLine = NO_BREAKABLE_POSITIONS } = useImperativeCacheValue(
+    breakpointPositionsByLineCache,
     client,
-    sourceId
+    sourceId,
+    visibleLines?.start.line ?? 0,
+    visibleLines?.end.line ?? 0
   );
-  const [, breakablePositionsByLine] = breakablePositionsValue;
 
   useLayoutEffect(
     () => () => {

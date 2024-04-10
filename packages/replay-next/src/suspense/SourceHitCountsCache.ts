@@ -5,8 +5,9 @@ import { LineHitCounts, LineNumberToHitCountMap, ReplayClientInterface } from "s
 import { ProtocolError, isCommandError } from "shared/utils/error";
 import { toPointRange } from "shared/utils/time";
 
+import { bucketBreakpointLines } from "../utils/source";
 import { getCorrespondingSourceIds } from "../utils/sources";
-import { breakpointPositionsCache } from "./BreakpointPositionsCache";
+import { breakpointPositionsIntervalCache } from "./BreakpointPositionsCache";
 import { createFocusIntervalCache } from "./FocusIntervalCache";
 import { sourcesByIdCache } from "./SourcesCache";
 
@@ -34,7 +35,14 @@ export const sourceHitCountsCache = createFocusIntervalCache<
   getKey,
   load: async (begin, end, client, sourceId, focusRange) => {
     try {
-      const [locations] = await breakpointPositionsCache.readAsync(client, sourceId);
+      const [startLine, endLine] = bucketBreakpointLines(begin, end);
+
+      const locations = await breakpointPositionsIntervalCache.readAsync(
+        startLine,
+        endLine,
+        client,
+        sourceId
+      );
 
       // Note that since this is a sorted array, we can do better than a plain .filter() for performance.
       const startIndex = binarySearch(

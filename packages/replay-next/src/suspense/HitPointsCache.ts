@@ -1,7 +1,8 @@
 import { Location, PointDescription, PointRange, TimeStampedPoint } from "@replayio/protocol";
 import { createCache } from "suspense";
 
-import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPositionsCache";
+import { breakpointPositionsIntervalCache } from "replay-next/src/suspense/BreakpointPositionsCache";
+import { bucketBreakpointLines } from "replay-next/src/utils/source";
 import { compareNumericStrings } from "replay-next/src/utils/string";
 import { MAX_POINTS_TO_RUN_EVALUATION } from "shared/client/ReplayClient";
 import {
@@ -29,7 +30,15 @@ export const hitPointsCache = createFocusIntervalCacheForExecutionPoints<
     const sources = await sourcesByIdCache.readAsync(replayClient);
     const locations = getCorrespondingLocations(sources, location);
     await Promise.all(
-      locations.map(location => breakpointPositionsCache.readAsync(replayClient, location.sourceId))
+      locations.map(location => {
+        const [startLine, endLine] = bucketBreakpointLines(location.line, location.line);
+        return breakpointPositionsIntervalCache.readAsync(
+          startLine,
+          endLine,
+          replayClient,
+          location.sourceId
+        );
+      })
     );
 
     let hitPoints: PointDescription[] = [];
