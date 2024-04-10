@@ -17,8 +17,10 @@ import { getPauseFrameSuspense } from "ui/suspense/frameCache";
 import { PauseAndFrameId } from "../reducers/pause";
 import { isBowerComponent, isNodeModule } from "./source";
 
-// TODO
-type CursorPosition = any;
+export type CursorPosition = {
+  readonly column: number;
+  readonly line: number;
+};
 
 export function getSourceIDsToSearch(
   sourcesById: Map<string, SourceDetails>,
