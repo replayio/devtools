@@ -48,7 +48,6 @@ export interface User {
 }
 
 export type UserInfo = {
-  motd: string | null;
   acceptedTOSVersion: number | null;
   name: string | null;
   picture: string | null;
@@ -339,7 +338,6 @@ export interface WorkspaceSettings {
       blockList: string[] | null;
     };
   };
-  motd: string | null;
 }
 
 // https://typeofnan.dev/creating-your-own-deeppartial-type-in-typescript/

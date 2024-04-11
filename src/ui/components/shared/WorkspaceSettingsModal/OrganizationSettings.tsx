@@ -1,6 +1,6 @@
 import { QuestionMarkCircleIcon } from "@heroicons/react/outline";
 import classNames from "classnames";
-import React, { useEffect } from "react";
+import React from "react";
 
 import { PartialWorkspaceSettingsFeatures } from "shared/graphql/types";
 import hooks from "ui/hooks";
@@ -69,16 +69,6 @@ const Row = ({ children }: { children: React.ReactNode }) => {
 const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
   const { workspace, loading } = hooks.useGetWorkspace(workspaceId);
   const updateWorkspaceSettings = hooks.useUpdateWorkspaceSettings();
-  const [message, setMessage, resetMessage] = useDebounceState(
-    workspace?.settings?.motd || undefined,
-    motd =>
-      updateWorkspaceSettings({
-        variables: {
-          workspaceId,
-          motd,
-        },
-      })
-  );
 
   const features: PartialWorkspaceSettingsFeatures = workspace?.settings?.features || {};
   const updateFeature = (features: PartialWorkspaceSettingsFeatures) => {
@@ -89,17 +79,6 @@ const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
       },
     });
   };
-
-  useEffect(() => {
-    if (workspace) {
-      resetMessage(workspace.settings?.motd || "");
-    }
-    // workspace can referentially change from polling for changes without the
-    // workspace actually having changed so we're tying this hook invocation to
-    // the id change which will indicate when the workspace becomes loaded (or if
-    // a new workspace is somehow selected) eslint-disable-line
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [workspace?.id, resetMessage]);
 
   if (!workspace) {
     return null;
@@ -245,25 +224,6 @@ const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
           </label>
         </Input>
       </Row> */}
-      <Row>
-        <Label className="self-start">Welcome Message</Label>
-        <div>
-          <textarea
-            className={classNames("h-20 w-full rounded-md text-sm", {
-              "bg-themeTextFieldBgcolor": disabled,
-              "border-inputBorder": disabled,
-            })}
-            disabled={disabled}
-            onChange={e => setMessage(e.currentTarget.value)}
-            value={message}
-          />
-          {disabled ? null : (
-            <a href="/browser/new-tab" rel="noreferrer noopener" target="_blank">
-              Preview
-            </a>
-          )}
-        </div>
-      </Row>
     </div>
   );
 };

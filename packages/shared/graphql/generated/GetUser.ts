@@ -22,7 +22,6 @@ export interface GetUser_viewer_features {
 export interface GetUser_viewer {
   __typename: "AuthenticatedUser";
   user: GetUser_viewer_user;
-  motd: string | null;
   features: GetUser_viewer_features;
   acceptedTOSVersion: number | null;
   email: string;

@@ -16,7 +16,6 @@ export const GET_USER_INFO = gql`
         picture
         id
       }
-      motd
       features {
         library
       }

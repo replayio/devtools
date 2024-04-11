@@ -22,7 +22,6 @@ export interface GetNonPendingWorkspaces_viewer_workspaces_edges_node_subscripti
 
 export interface GetNonPendingWorkspaces_viewer_workspaces_edges_node_settings {
   __typename: "WorkspaceSettings";
-  motd: string | null;
   features: any | null;
 }
 
