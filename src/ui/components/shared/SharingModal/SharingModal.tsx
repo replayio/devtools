@@ -6,7 +6,6 @@ import { CollaboratorRequest, Recording } from "shared/graphql/types";
 import { actions } from "ui/actions";
 import { AvatarImage } from "ui/components/Avatar";
 import Modal from "ui/components/shared/NewModal";
-import { Privacy, ToggleShowPrivacyButton } from "ui/components/UploadScreen/Privacy";
 import hooks from "ui/hooks";
 import { useHasNoRole } from "ui/hooks/recordings";
 import { getModalOptions } from "ui/reducers/app";
@@ -73,15 +72,7 @@ function CollaboratorRequests({ recording }: { recording: Recording }) {
   );
 }
 
-function CollaboratorsSection({
-  recording,
-  showPrivacy,
-  setShowPrivacy,
-}: {
-  recording: Recording;
-  showPrivacy: boolean;
-  setShowPrivacy: React.Dispatch<React.SetStateAction<boolean>>;
-}) {
+function CollaboratorsSection({ recording }: { recording: Recording }) {
   return (
     <section className="space-y-4 bg-modalBgcolor p-4">
       <div className="flex w-full flex-col justify-between space-y-3">
@@ -93,16 +84,6 @@ function CollaboratorsSection({
               <PrivacyDropdown recording={recording} />
             </div>
 
-            <div>
-              {!recording.private && recording.operations && (
-                <ToggleShowPrivacyButton
-                  showPrivacy={showPrivacy}
-                  operations={recording.operations}
-                  setShowPrivacy={setShowPrivacy}
-                />
-              )}
-            </div>
-
             <Collaborators recordingId={recording.id} />
           </div>
           <CollaboratorRequests recording={recording} />
@@ -112,22 +93,10 @@ function CollaboratorsSection({
   );
 }
 
-function SharingSection({
-  recording,
-  showPrivacy,
-  setShowPrivacy,
-}: {
-  recording: Recording;
-  showPrivacy: boolean;
-  setShowPrivacy: React.Dispatch<React.SetStateAction<boolean>>;
-}) {
+function SharingSection({ recording }: { recording: Recording }) {
   return (
     <>
-      <CollaboratorsSection
-        recording={recording}
-        showPrivacy={showPrivacy}
-        setShowPrivacy={setShowPrivacy}
-      />
+      <CollaboratorsSection recording={recording} />
       <section className="flex flex-col bg-menuHoverBgcolor px-4 py-3">
         <CopyButton recording={recording} />
       </section>
@@ -136,8 +105,6 @@ function SharingSection({
 }
 
 function SharingModal({ recording, hideModal }: SharingModalProps) {
-  const [showPrivacy, setShowPrivacy] = useState(false);
-
   const { hasNoRole, loading } = useHasNoRole();
   if (hasNoRole || loading) {
     return null;
@@ -145,22 +112,10 @@ function SharingModal({ recording, hideModal }: SharingModalProps) {
 
   return (
     <Modal options={{ maskTransparency: "translucent" }} onMaskClick={hideModal}>
-      <div
-        className="sharing-modal relative flex flex-row overflow-hidden rounded-lg border border-inputBorder text-sm shadow-xl"
-        style={{ width: showPrivacy ? 720 : 390 }}
-      >
+      <div className="sharing-modal relative flex flex-row overflow-hidden rounded-lg border border-inputBorder text-sm shadow-xl">
         <div className="flex flex-col space-y-0" style={{ width: 390 }}>
-          <SharingSection
-            recording={recording}
-            showPrivacy={showPrivacy}
-            setShowPrivacy={setShowPrivacy}
-          />
+          <SharingSection recording={recording} />
         </div>
-        {showPrivacy ? (
-          <div className="relative flex overflow-auto bg-themeBase-90">
-            <Privacy />
-          </div>
-        ) : null}
       </div>
     </Modal>
   );

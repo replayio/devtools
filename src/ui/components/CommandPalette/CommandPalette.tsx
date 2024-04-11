@@ -39,7 +39,6 @@ export type CommandKey =
   | "show_comments"
   | "show_console_filters"
   | "show_events"
-  | "show_privacy"
   | "show_replay_info"
   | "show_sharing"
   | "toggle_dark_mode"
@@ -69,7 +68,6 @@ const COMMANDS: readonly Command[] = [
   { key: "show_comments", label: "Show Comments" },
   { key: "show_console_filters", label: "Show Console Filters" },
   { key: "show_events", label: "Show Events" },
-  { key: "show_privacy", label: "Show Privacy" },
   { key: "show_replay_info", label: "Show Replay Info" },
   { key: "show_sharing", label: "Show Sharing Options" },
   { key: "toggle_dark_mode", label: "Toggle Dark Mode", shortcut: "Alt+Shift+T" },
