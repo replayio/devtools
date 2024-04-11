@@ -16,7 +16,7 @@ const url = "authenticated_logpoints.html";
 const lineNumber = 14;
 
 async function load(page: Page, recordingId: string, apiKey: string, testScope: string) {
-  await startTest(page, recordingId, { apiKey, testScope });
+  await startTest(page, recordingId, testScope, apiKey);
   await page.coverage.startJSCoverage();
 
   await openDevToolsTab(page);

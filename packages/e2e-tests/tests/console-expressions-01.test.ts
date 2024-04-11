@@ -15,10 +15,10 @@ import test from "../testFixture";
 test.use({ exampleKey: "doc_async.html" });
 
 test("console-expressions-01: should cache input eager eval and terminal expressions per instance", async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
   await openConsolePanel(page);
 

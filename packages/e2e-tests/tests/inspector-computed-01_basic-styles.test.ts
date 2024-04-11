@@ -13,10 +13,10 @@ import test from "../testFixture";
 test.use({ exampleKey: "doc_inspector_styles.html" });
 
 test("inspector-computed-01: Basic computed styles can be viewed", async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
   await openConsolePanel(page);
   await warpToMessage(page, "ExampleFinished");

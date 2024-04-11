@@ -18,10 +18,10 @@ const lineNumber = 5;
 test.use({ exampleKey: "log_points_and_block_scope.html" });
 
 test(`logpoints-06: should be temporarily disabled`, async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
 
   let MESSAGE = "Test log point";

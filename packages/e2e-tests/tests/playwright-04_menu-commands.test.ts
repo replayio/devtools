@@ -18,10 +18,10 @@ import test, { expect } from "../testFixture";
 test.use({ exampleKey: "playwright/breakpoints-05" });
 
 test("playwright-04: Test Step buttons and menu item", async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openViewerTab(page);
 
   await openPlaywrightTestPanel(page);

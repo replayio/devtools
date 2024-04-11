@@ -10,10 +10,10 @@ import test, { expect } from "../testFixture";
 test.use({ exampleKey: "node/objects.js" });
 
 test("node_object_preview: Showing console objects in node", async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
 
   await openConsolePanel(page);
 

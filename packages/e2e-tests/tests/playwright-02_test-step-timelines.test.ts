@@ -13,10 +13,10 @@ import test, { expect } from "../testFixture";
 test.use({ exampleKey: "playwright/breakpoints-05" });
 
 test("playwright-02: Test Step timeline behavior", async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openViewerTab(page);
 
   await openPlaywrightTestPanel(page);

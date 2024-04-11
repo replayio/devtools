@@ -65,7 +65,7 @@ async function checkForJumpButton(eventLocator: Locator, shouldBeEnabled: boolea
 }
 
 test(`jump-to-code-01: Test basic jumping functionality`, async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
   const queryParams = new URLSearchParams();
@@ -73,7 +73,7 @@ test(`jump-to-code-01: Test basic jumping functionality`, async ({
   // See pref names in packages/shared/user-data/GraphQL/config.ts
   // queryParams.set("features", "backend_rerunRoutines");
 
-  await startTest(page, recordingId, undefined, queryParams);
+  await startTest(page, recordingId, testScope, undefined, queryParams);
   await openDevToolsTab(page);
 
   await openSourceExplorerPanel(page);

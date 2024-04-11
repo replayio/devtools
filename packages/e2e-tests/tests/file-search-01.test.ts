@@ -13,8 +13,10 @@ import test from "../testFixture";
 
 test.use({ exampleKey: "cra/dist/index.html" });
 
-test("file-search-01: should search files", async ({ pageWithMeta: { page, recordingId } }) => {
-  await startTest(page, recordingId);
+test("file-search-01: should search files", async ({
+  pageWithMeta: { page, recordingId, testScope },
+}) => {
+  await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
   await openFileSearchPanel(page);
 

@@ -16,8 +16,10 @@ import test, { expect } from "../testFixture";
 
 test.use({ exampleKey: "flake/adding-spec.ts" });
 
-test("cypress-03: Test Step interactions", async ({ pageWithMeta: { page, recordingId } }) => {
-  await startTest(page, recordingId);
+test("cypress-03: Test Step interactions", async ({
+  pageWithMeta: { page, recordingId, testScope },
+}) => {
+  await startTest(page, recordingId, testScope);
   await openViewerTab(page);
 
   await openCypressTestPanel(page);

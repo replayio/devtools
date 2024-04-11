@@ -7,8 +7,8 @@ import test, { expect } from "../testFixture";
 
 test.use({ exampleKey: "playwright/breakpoints-05" });
 
-test("repaint-03: repaints on seek", async ({ pageWithMeta: { page, recordingId } }) => {
-  await startTest(page, recordingId);
+test("repaint-03: repaints on seek", async ({ pageWithMeta: { page, recordingId, testScope } }) => {
+  await startTest(page, recordingId, testScope);
 
   const endingScreenShot = await getGraphicsDataUrl(page);
   const initialFocusBeginTime = await getFocusBeginTime(page);

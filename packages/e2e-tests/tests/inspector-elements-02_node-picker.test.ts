@@ -13,10 +13,10 @@ import test, { expect } from "../testFixture";
 test.use({ exampleKey: "doc_inspector_basic.html" });
 
 test(`inspector-elements-02_node-picker: element picker and iframe behavior`, async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
 
   // DOM/document may not be available at the end of the recording;

@@ -21,9 +21,9 @@ async function seekToTimePercentAndWaitForPaint(page: Page, percent: number) {
 }
 
 test("repaint-05: prefers current time if pause creation failed outside of the focus window", async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
 
   await setFocusRange(page, {
