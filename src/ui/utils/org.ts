@@ -16,7 +16,6 @@ export function getDefaultOrganizationSettings(): WorkspaceSettings {
         blockList: [],
       },
     },
-    motd: null,
   };
 }
 
