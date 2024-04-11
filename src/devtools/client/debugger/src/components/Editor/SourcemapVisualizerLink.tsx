@@ -9,8 +9,10 @@ import { useAppSelector } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
 
 import { getSelectedFrameId } from "../../reducers/pause";
-import { getSourcemapVisualizerURLSuspense } from "../../utils/sourceVisualizations";
-import { CursorPosition } from "./Footer";
+import {
+  CursorPosition,
+  getSourcemapVisualizerURLSuspense,
+} from "../../utils/sourceVisualizations";
 
 export default function SourcemapVisualizerLinkSuspends({
   cursorPosition,

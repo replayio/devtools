@@ -2,8 +2,9 @@ import { BreakpointId, Location } from "@replayio/protocol";
 import { useContext, useEffect, useRef } from "react";
 
 import { PointBehaviorsObject } from "replay-next/src/contexts/points/types";
-import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPositionsCache";
+import { breakpointPositionsIntervalCache } from "replay-next/src/suspense/BreakpointPositionsCache";
 import { sourcesByIdCache, sourcesCache } from "replay-next/src/suspense/SourcesCache";
+import { bucketBreakpointLines } from "replay-next/src/utils/source";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { POINT_BEHAVIOR_ENABLED, Point, PointKey } from "shared/client/types";
 import { ReplayClientInterface } from "shared/client/types";
@@ -49,7 +50,6 @@ export default function useBreakpointIdsFromServer(
           for (let source of allSources) {
             allSourceIds.add(source.sourceId);
           }
-          const sourcesWithFetchedPositions = new Set<string>();
 
           const pointsToRemove: string[] = [];
 
@@ -66,11 +66,13 @@ export default function useBreakpointIdsFromServer(
               continue;
             }
 
-            if (!sourcesWithFetchedPositions.has(sourceId)) {
-              sourcesWithFetchedPositions.add(sourceId);
-              // We haven't fetched breakable positions for this yet. Get them.
-              await breakpointPositionsCache.readAsync(client, sourceId);
-            }
+            const [startLine, endLine] = bucketBreakpointLines(line, line);
+            await breakpointPositionsIntervalCache.readAsync(
+              startLine,
+              endLine,
+              replayClient,
+              sourceId
+            );
 
             // _Now_ we can tell the backend about this breakpoint.
             if (pointBehavior?.shouldBreak === POINT_BEHAVIOR_ENABLED) {

@@ -1,10 +1,11 @@
 import { Dictionary } from "@reduxjs/toolkit";
-import type { SourceId } from "@replayio/protocol";
+import type { SameLineSourceLocations, SourceId } from "@replayio/protocol";
 import sortBy from "lodash/sortBy";
 
 import { assert } from "protocol/utils";
-import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPositionsCache";
+import { breakpointPositionsIntervalCache } from "replay-next/src/suspense/BreakpointPositionsCache";
 import { mappedLocationCache } from "replay-next/src/suspense/MappedLocationCache";
+import { bucketBreakpointLines } from "replay-next/src/utils/source";
 import { ReplayClientInterface } from "shared/client/types";
 import {
   SourceDetails,
@@ -17,8 +18,10 @@ import { getPauseFrameSuspense } from "ui/suspense/frameCache";
 import { PauseAndFrameId } from "../reducers/pause";
 import { isBowerComponent, isNodeModule } from "./source";
 
-// TODO
-type CursorPosition = any;
+export type CursorPosition = {
+  readonly column: number;
+  readonly line: number;
+};
 
 export function getSourceIDsToSearch(
   sourcesById: Map<string, SourceDetails>,
@@ -196,40 +199,28 @@ function getAlternateSourceIdForPositionSuspense(
   position: CursorPosition,
   sourcesById: Dictionary<SourceDetails>
 ) {
-  const [breakablePositions, breakablePositionsByLine] = breakpointPositionsCache.read(
+  const [startLine, endLine] = bucketBreakpointLines(position.line, position.line);
+  const breakablePositions = breakpointPositionsIntervalCache.read(
+    startLine,
+    endLine,
     client,
     source.id
   );
 
   // We want to find the first breakable line starting from the given cursor location,
   // so that we can translate that position into an alternate mapped location.
-  let firstBreakableLineAfterPosition: number | null = null;
+  let firstBreakableLineAfterPosition = breakablePositions.find(bp => bp.line > position.line);
 
-  // Grab the last line off the array. It's possible there might _not_ be any breakable lines.
-  const [lastBreakableLine] = breakablePositions.slice(-1);
-
-  // We have a Map with line numbers as keys. Rather than check the entire array,
-  // start from the position's line and check succeeding line numbers to find the
-  // next line number that has a breakable position.
-  for (let lineToCheck = position.line; lineToCheck <= lastBreakableLine?.line; lineToCheck++) {
-    if (breakablePositionsByLine.has(lineToCheck)) {
-      firstBreakableLineAfterPosition = lineToCheck;
-      break;
-    }
-  }
-
-  if (firstBreakableLineAfterPosition === null) {
+  if (!firstBreakableLineAfterPosition) {
     return undefined;
   }
 
-  const breakableLineLocations = breakablePositionsByLine.get(firstBreakableLineAfterPosition)!;
-
   // Now we can ask the backend for alternate locations with that line.
-  let breakableColumn = breakableLineLocations.columns[0];
+  let breakableColumn = firstBreakableLineAfterPosition.columns[0];
 
   const mappedLocation = mappedLocationCache.read(client, {
     sourceId: source.id,
-    line: breakableLineLocations.line,
+    line: firstBreakableLineAfterPosition.line,
     column: breakableColumn,
   });
   return source.isSourceMapped
