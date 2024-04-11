@@ -25,10 +25,10 @@ async function waitForPanelSize(page: Page, expectedSize: number) {
 test.use({ exampleKey: "doc_rr_basic.html" });
 
 test("resizable-panels-01: Left side Toolbar and Video should be collapsible", async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
 
   const button = page.locator('[data-test-name="ToolbarButton-ExpandSidePanel"]');
   const resizeHandle = page.locator('[data-panel-resize-handle-id="PanelResizeHandle-SidePanel"]');

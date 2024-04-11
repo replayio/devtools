@@ -15,10 +15,10 @@ import test from "../testFixture";
 test.use({ exampleKey: "doc_stacking.html" });
 
 test("elements-search: Element panel should support basic and advanced search modes", async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
   await warpToMessage(page, "ExampleFinished");
   await openElementsPanel(page);

@@ -17,13 +17,13 @@ import test, { expect } from "../testFixture";
 test.use({ exampleKey: "doc_rr_blackbox.html" });
 
 test(`source-line-highlights: Test source line highlighting`, async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
   const firstSource = exampleKey;
   const secondSource = "blackbox.js";
 
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
 
   await addBreakpoint(page, { lineNumber: 16, url: firstSource });

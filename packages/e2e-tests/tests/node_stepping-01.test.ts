@@ -15,10 +15,10 @@ import test, { Page, expect } from "../testFixture";
 test.use({ exampleKey: "node/async.js" });
 
 test("node_stepping-01: Test stepping in async frames and async call stacks", async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
 
   await openPauseInformationPanel(page);
 

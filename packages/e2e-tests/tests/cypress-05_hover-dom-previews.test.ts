@@ -12,10 +12,10 @@ import test, { expect } from "../testFixture";
 test.use({ exampleKey: "cypress-realworld/bankaccounts.spec.js" });
 
 test("cypress-05: Test DOM node preview on user action step hover", async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openViewerTab(page);
 
   await openCypressTestPanel(page);

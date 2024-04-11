@@ -7,10 +7,10 @@ import test, { expect } from "../testFixture";
 test.use({ exampleKey: "React Hook Form/conditionalField.cy.ts" });
 
 test("fe-1875 :: verify that steps go to the right point in time", async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openViewerTab(page);
 
   await openCypressTestPanel(page);

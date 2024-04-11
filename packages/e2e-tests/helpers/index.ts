@@ -123,7 +123,8 @@ export interface AuthInfo {
 export async function startTest(
   page: Page,
   recordingId: string,
-  auth?: AuthInfo,
+  testScope: string,
+  apiKey?: string,
   additionalQueryParams?: URLSearchParams,
   shouldWaitForIndexing: boolean = true
 ) {
@@ -131,10 +132,10 @@ export async function startTest(
 
   const params = new URLSearchParams();
   params.append("e2e", "1");
-  if (auth) {
-    params.append("apiKey", auth.apiKey);
-    params.append("testScope", auth.testScope);
+  if (apiKey) {
+    params.append("apiKey", apiKey);
   }
+  params.append("testScope", testScope);
 
   if (additionalQueryParams) {
     for (const [key, value] of additionalQueryParams) {

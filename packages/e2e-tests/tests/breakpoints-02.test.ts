@@ -7,10 +7,10 @@ import test from "../testFixture";
 test.use({ exampleKey: "doc_rr_basic.html" });
 
 test(`breakpoints-02: Test unhandled divergence while evaluating at a breakpoint`, async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
 
   await addBreakpoint(page, { lineNumber: 21, url: exampleKey });

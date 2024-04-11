@@ -11,11 +11,11 @@ import test from "../testFixture";
 test.use({ exampleKey: "cra/dist/index.html" });
 
 test("react_devtools-04: Component selection is maintained when seeking to a new point", async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
 }) => {
   const queryParams = new URLSearchParams();
 
-  await startTest(page, recordingId, undefined, queryParams);
+  await startTest(page, recordingId, testScope, undefined, queryParams);
   await openDevToolsTab(page);
 
   // Seek to the first console message and check that the initial tree has 3 components

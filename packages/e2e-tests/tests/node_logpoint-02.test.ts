@@ -14,10 +14,10 @@ import test, { expect } from "../testFixture";
 test.use({ exampleKey: "node/exceptions.js" });
 
 test.skip("node_logpoint-02: Node exception logpoints", async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
 
   await openConsolePanel(page);
   await toggleSideFilters(page, true);

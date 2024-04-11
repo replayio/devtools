@@ -8,10 +8,10 @@ import { test } from "../testFixture";
 test.use({ exampleKey: "doc_control_flow.html" });
 
 test("repaint-01: repaints the screen screen when stepping over code that modifies the DOM", async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
 
   await addBreakpoint(page, { lineNumber: 50, url: exampleKey });

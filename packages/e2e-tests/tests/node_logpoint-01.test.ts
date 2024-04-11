@@ -12,10 +12,10 @@ import test from "../testFixture";
 test.use({ exampleKey: "node/basic.js" });
 
 test("node_logpoint-01: Basic node logpoints", async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
 
   await openConsolePanel(page);
 

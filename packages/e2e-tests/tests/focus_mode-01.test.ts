@@ -15,10 +15,10 @@ import test from "../testFixture";
 test.use({ exampleKey: "doc_rr_region_loading.html" });
 
 test("focus_mode-01: should filter messages as regions based on the active focus mode", async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
 
   await openSource(page, exampleKey);

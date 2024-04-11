@@ -18,7 +18,7 @@ test(`authenticated/comments-03: Comment previews`, async ({
   exampleKey: url,
   testUsers,
 }) => {
-  await startTest(page, recordingId, { apiKey: testUsers![0].apiKey, testScope });
+  await startTest(page, recordingId, testScope, testUsers![0].apiKey);
   await openDevToolsTab(page);
 
   // Add and verify source code comment previews
