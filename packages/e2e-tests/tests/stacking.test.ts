@@ -12,10 +12,10 @@ import test from "../testFixture";
 test.use({ exampleKey: "doc_stacking.html" });
 
 test("stacking: Element highlighter selects the correct element when they overlap", async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
 
   await warpToMessage(page, "ExampleFinished");

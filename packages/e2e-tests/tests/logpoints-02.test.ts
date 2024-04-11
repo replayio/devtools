@@ -16,10 +16,10 @@ import test, { expect } from "../testFixture";
 test.use({ exampleKey: "doc_rr_basic.html" });
 
 test(`logpoints-02: conditional log-points`, async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
 
   await addLogpoint(page, {

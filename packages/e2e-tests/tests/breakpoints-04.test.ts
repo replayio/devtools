@@ -7,10 +7,10 @@ test.use({ exampleKey: "doc_control_flow.html" });
 
 // Test hitting breakpoints when using tricky control flow constructs:
 test(`breakpoints-04: catch, finally, generators, and async/await`, async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
 
   await rewindToBreakpoint(page, 10);

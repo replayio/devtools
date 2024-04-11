@@ -11,10 +11,10 @@ import test, { expect } from "../testFixture";
 test.use({ exampleKey: "doc_navigate.html" });
 
 test(`breakpoints-08: should be temporarily disabled`, async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
 
   // Add breakpoint and verify text in console

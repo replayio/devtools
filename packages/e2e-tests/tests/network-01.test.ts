@@ -11,10 +11,10 @@ import test from "../testFixture";
 test.use({ exampleKey: "flake/adding-spec.ts" });
 
 test(`network-01: should filter requests by type and text`, async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
   await openNetworkPanel(page);
 

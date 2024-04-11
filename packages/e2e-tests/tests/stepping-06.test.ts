@@ -16,10 +16,10 @@ test.use({ exampleKey: "doc_async.html" });
 // Because stepping works differently between gecko and chromium,
 // frame timeline percentages are different in this test.
 test(`stepping-06: Test stepping in async frames and async call stacks`, async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
 
   await warpToMessage(page, "baz 2");

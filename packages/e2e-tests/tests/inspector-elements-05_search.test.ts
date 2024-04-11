@@ -11,10 +11,10 @@ import test from "../testFixture";
 test.use({ exampleKey: "doc_inspector_basic.html" });
 
 test(`inspector-elements-05_search: element picker and iframe behavior`, async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
   await openElementsPanel(page);
 

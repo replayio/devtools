@@ -12,10 +12,10 @@ async function checkMessageLocation(page: Page, text: string, location: string) 
 test.use({ exampleKey: "doc_prod_bundle.html" });
 
 test(`breakpoints-06: Test log point in a sourcemapped file`, async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
 
   // Log point added to line 15 should map to line 15

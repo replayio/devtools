@@ -10,10 +10,10 @@ import test from "../testFixture";
 test.use({ exampleKey: "doc_rr_console.html" });
 
 test(`object_preview-07: inspect objects in the console while paused somewhere else`, async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
 
   await verifyConsoleMessageObjectContents(page, "Iteration 3", [

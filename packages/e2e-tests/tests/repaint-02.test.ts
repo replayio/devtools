@@ -6,8 +6,10 @@ import test, { expect } from "../testFixture";
 
 test.use({ exampleKey: "playwright/breakpoints-05" });
 
-test("repaint-02: repaints on hover", async ({ pageWithMeta: { page, recordingId } }) => {
-  await startTest(page, recordingId);
+test("repaint-02: repaints on hover", async ({
+  pageWithMeta: { page, recordingId, testScope },
+}) => {
+  await startTest(page, recordingId, testScope);
 
   const initialScreenShot = await getGraphicsDataUrl(page);
 

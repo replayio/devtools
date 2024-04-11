@@ -6,10 +6,10 @@ const lineNumber = 20;
 test.use({ exampleKey: "doc_rr_basic.html" });
 
 test(`logpoints-09: should support pending edits`, async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
 
   await addLogpoint(page, {

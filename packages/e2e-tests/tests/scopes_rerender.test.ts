@@ -6,10 +6,10 @@ import test from "../testFixture";
 test.use({ exampleKey: "doc_recursion.html" });
 
 test("scopes_rerender: Test that scopes are rerendered", async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
   await openConsolePanel(page);
 

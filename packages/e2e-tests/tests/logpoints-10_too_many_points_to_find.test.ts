@@ -19,10 +19,10 @@ const lineNumber = 150;
 test.use({ exampleKey: "breakpoints-01" });
 
 test(`logpoints-10: too-many-points-to-find UX`, async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
 
   await quickOpen(page, sourceUrl);

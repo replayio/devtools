@@ -17,11 +17,11 @@ import test from "../testFixture";
 test.use({ exampleKey: "doc_minified.html" });
 
 test(`stepping-05: Test stepping in pretty-printed code`, async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
   page.setDefaultTimeout(120000);
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
 
   await addBreakpoint(page, { url: "bundle_input.js", lineNumber: 4 });

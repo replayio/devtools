@@ -10,10 +10,10 @@ import test from "../testFixture";
 test.use({ exampleKey: "redux/dist/index.html" });
 
 test("redux_devtools: Test Redux DevTools.", async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
 
   await openReduxDevtoolsPanel(page);

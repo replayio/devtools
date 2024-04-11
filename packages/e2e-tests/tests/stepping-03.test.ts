@@ -12,10 +12,10 @@ import test from "../testFixture";
 test.use({ exampleKey: "doc_rr_basic.html" });
 
 test(`stepping-03: Stepping past the beginning or end of a frame should act like a step-out`, async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
 
   // Open doc_rr_basic.html

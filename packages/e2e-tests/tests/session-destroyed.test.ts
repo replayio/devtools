@@ -5,10 +5,10 @@ import test from "../testFixture";
 test.use({ exampleKey: "doc_control_flow.html" });
 
 test(`session-destroyed: errors caused by session failure should bubble to the root`, async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
 
   await page.evaluate(() => {

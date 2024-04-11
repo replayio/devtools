@@ -14,10 +14,10 @@ import test, { expect } from "../testFixture";
 test.use({ exampleKey: "cypress-realworld/bankaccounts.spec.js" });
 
 test("cypress-04: Test Step buttons and menu item", async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openViewerTab(page);
 
   await openCypressTestPanel(page);
