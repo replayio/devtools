@@ -20,14 +20,14 @@ import test, { expect } from "../testFixture";
 test.use({ exampleKey: "rdt-react-versions/dist/index.html" });
 
 test("react_devtools-03: process and display multiple React versions in page", async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
 }) => {
   const queryParams = new URLSearchParams();
   // Force this test to always re-run the RDT (and other) routines
   // See pref names in packages/shared/user-data/GraphQL/config.ts
   queryParams.set("features", "backend_rerunRoutines");
 
-  await startTest(page, recordingId, undefined, queryParams);
+  await startTest(page, recordingId, testScope, undefined, queryParams);
 
   await openDevToolsTab(page);
 

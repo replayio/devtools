@@ -24,9 +24,9 @@ import test, { expect } from "../testFixture";
 test.use({ exampleKey: "flake/adding-spec.ts" });
 
 test("cypress-01: Basic Test Suites panel functionality", async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
 
   await openCypressTestPanel(page);

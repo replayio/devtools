@@ -14,10 +14,10 @@ import test from "../testFixture";
 test.use({ exampleKey: "doc_rr_basic.html" });
 
 test("stepping-02: Test fixes for some simple stepping bugs", async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
 
   // Open doc_rr_basic.html

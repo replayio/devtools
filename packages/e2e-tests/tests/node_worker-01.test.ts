@@ -7,10 +7,10 @@ import test from "../testFixture";
 test.use({ exampleKey: "node/run_worker.js" });
 
 test("node_worker-01: make sure node workers don't cause crashes", async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
 
   await openConsolePanel(page);
 

@@ -11,10 +11,10 @@ import test, { expect } from "../testFixture";
 test.use({ exampleKey: "cra/dist/index.html" });
 
 test("sourcemap_stacktrace: Test that stacktraces are sourcemapped", async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
   await openConsolePanel(page);
 

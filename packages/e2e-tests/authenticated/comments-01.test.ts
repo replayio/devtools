@@ -11,7 +11,7 @@ test(`authenticated/comments-01: Test add, edit, and delete comment functionalit
   exampleKey,
   testUsers,
 }) => {
-  await startTest(page, recordingId, { apiKey: testUsers![0].apiKey, testScope });
+  await startTest(page, recordingId, testScope, testUsers![0].apiKey);
   await openDevToolsTab(page);
   await openSource(page, exampleKey);
 

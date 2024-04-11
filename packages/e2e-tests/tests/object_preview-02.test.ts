@@ -14,10 +14,10 @@ import test, { expect } from "../testFixture";
 test.use({ exampleKey: "doc_rr_objects.html" });
 
 test(`object_preview-02: should allow objects in scope to be inspected`, async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
   await waitForTerminal(page);
 

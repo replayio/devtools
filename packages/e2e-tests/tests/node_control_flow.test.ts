@@ -12,12 +12,12 @@ async function resumeToBreakpoint(page: Page, line: number) {
 test.use({ exampleKey: "node/control_flow.js" });
 
 test("node_control_flow: catch, finally, generators, and async/await", async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
   // Default timeout is 30s. Mostly taking 40s in local dev. Bump to 120s.
   test.setTimeout(120000);
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
 
   await openSource(page, "control_flow.js");
 

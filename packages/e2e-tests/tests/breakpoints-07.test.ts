@@ -21,10 +21,10 @@ import test from "../testFixture";
 test.use({ exampleKey: "doc_navigate.html" });
 
 test(`breakpoints-07: rewind and seek using command bar and console messages`, async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
 
   await quickOpen(page, "bundle_input.js");

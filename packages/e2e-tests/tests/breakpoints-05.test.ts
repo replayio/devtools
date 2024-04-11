@@ -10,10 +10,10 @@ import test from "../testFixture";
 test.use({ exampleKey: "doc_debugger_statements.html" });
 
 test(`breakpoints-05: Test interaction of breakpoints with debugger statements`, async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
   await openPauseInformationPanel(page);
   // wait for the recording to be fully loaded

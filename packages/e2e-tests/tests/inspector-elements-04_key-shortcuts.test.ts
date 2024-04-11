@@ -39,10 +39,10 @@ const bodyChildDomNodes = [
 ];
 
 test("inspector-elements-04: Keyboard shortcuts should select the right DOM nodes", async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
 
   await warpToMessage(page, "ExampleFinished");

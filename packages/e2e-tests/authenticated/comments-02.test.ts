@@ -12,7 +12,7 @@ import test, { Page } from "../testFixture";
 const url = "authenticated_comments.html";
 
 async function load(page: Page, recordingId: string, apiKey: string, testScope: string) {
-  await startTest(page, recordingId, { apiKey, testScope });
+  await startTest(page, recordingId, testScope, apiKey);
   await page.coverage.startJSCoverage();
 
   await openDevToolsTab(page);

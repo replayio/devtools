@@ -9,10 +9,10 @@ import test from "../testFixture";
 test.use({ exampleKey: "log_points_and_block_scope.html" });
 
 test(`logpoints-05: should auto-complete based on log point location`, async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
 
   await addLogpoint(page, { lineNumber: 5, url: exampleKey });

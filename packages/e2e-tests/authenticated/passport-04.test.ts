@@ -13,7 +13,7 @@ test(`authenticated/passport-04: Multiplayer`, async ({
   exampleKey,
   testUsers,
 }) => {
-  await startTest(page, recordingId, { apiKey: testUsers![0].apiKey, testScope });
+  await startTest(page, recordingId, testScope, testUsers![0].apiKey);
 
   await enablePassport(page);
 
