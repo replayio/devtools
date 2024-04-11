@@ -1,11 +1,8 @@
 import React from "react";
 
 import { LoadingScreenTemplate } from "ui/components/shared/LoadingScreen";
-import { useGetUserInfo } from "ui/hooks/users";
 
 export default function NewTab() {
-  const { motd } = useGetUserInfo();
-
   // Function to detect if the user is on Windows
   const isWindows = () => {
     return window.navigator.platform.indexOf("Win") !== -1;
@@ -14,7 +11,6 @@ export default function NewTab() {
   return (
     <LoadingScreenTemplate>
       <div className="space-y-8 text-center">
-        {motd ? <h2 className="text-2xl">{motd}</h2> : null}
         {isWindows() ? (
           <div className="rounded-lg p-4">
             <div className="mb-4 text-lg font-bold">Replay on Windows is in beta</div>
