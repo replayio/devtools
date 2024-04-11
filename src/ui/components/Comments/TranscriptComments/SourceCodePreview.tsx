@@ -43,7 +43,7 @@ export default function SourceCodePreview({ comment }: { comment: SourceCodeComm
 
     location = (
       <div>
-        ${fileName}:{lineNumber}
+        {fileName}:{lineNumber}
       </div>
     );
   }
