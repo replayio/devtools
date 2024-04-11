@@ -21,7 +21,6 @@ export type ModalType =
   | "new-workspace"
   | "onboarding"
   | "passport-dismiss"
-  | "privacy"
   | "rename-replay"
   | "settings"
   | "sharing"

@@ -13,7 +13,6 @@ import LoadingScreen from "../shared/LoadingScreen";
 import ReplayLogo from "../shared/ReplayLogo";
 import { DefaultViewportWrapper } from "../shared/Viewport";
 import { MY_LIBRARY } from "./libraryConstants";
-import { Privacy, ToggleShowPrivacyButton } from "./Privacy";
 import ReplayTitle from "./ReplayTitle";
 import Sharing from "./Sharing";
 import { UploadRecordingTrialEnd } from "./UploadRecordingTrialEnd";
@@ -121,8 +120,6 @@ export default function UploadScreen({
 
   const workspaces = allWorkspaces.filter(workspace => workspace.isTest === recording.isTest);
 
-  const [showPrivacy, setShowPrivacy] = useState(false);
-
   const [status, setStatus] = useState<Status>(null);
   const [inputValue, setInputValue] = useState(recording?.title || "Untitled");
   // The actual replay in the database is public by default, for test purposes.
@@ -215,25 +212,8 @@ export default function UploadScreen({
                   isPublic={isPublic}
                   setIsPublic={setIsPublic}
                 />
-                {isPublic && recording.operations ? (
-                  <div className="border border-inputBorder focus:bg-red-500 focus:text-blue-800">
-                    <ToggleShowPrivacyButton
-                      showPrivacy={showPrivacy}
-                      operations={recording.operations}
-                      setShowPrivacy={setShowPrivacy}
-                    />
-                  </div>
-                ) : null}
               </div>
             </div>
-            {showPrivacy && isPublic ? (
-              <div
-                className="relative flex h-full overflow-hidden rounded-xl bg-themeBase-90 shadow-xl"
-                style={{ width: "440px" }}
-              >
-                <Privacy />
-              </div>
-            ) : null}
           </div>
           <Actions onDiscard={onDiscard} status={status} />
         </form>

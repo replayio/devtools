@@ -25,7 +25,6 @@ import LoomModal from "./shared/LoomModal";
 import PassportDismissModal from "./shared/Modals/PassportDismissModal";
 import RenameReplayModal from "./shared/Modals/RenameReplayModal";
 import NewAttachment from "./shared/NewAttachment";
-import PrivacyModal from "./shared/PrivacyModal";
 import TOSScreen, { LATEST_TOS_VERSION } from "./TOSScreen";
 
 const LaunchBrowserModal = React.lazy(() => import("./shared/LaunchBrowserModal"));
@@ -84,9 +83,6 @@ function AppModal({ hideModal, modal }: { hideModal: () => void; modal: ModalTyp
     }
     case "first-replay": {
       return <FirstReplayModal />;
-    }
-    case "privacy": {
-      return <PrivacyModal />;
     }
     case "loom": {
       return <LoomModal />;
