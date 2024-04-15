@@ -60,9 +60,11 @@ export function Dropdown({
 
 export function DropdownItem({
   children,
+  disabled,
   onClick,
 }: {
   children: string | React.ReactElement;
+  disabled?: boolean;
   onClick: (e: React.MouseEvent) => void;
 }) {
   return (
@@ -72,6 +74,7 @@ export function DropdownItem({
           href="#"
           className={classNames(
             active ? "bg-menuHoverBgcolor text-menuHoverColor" : "text-menuColor",
+            disabled ? "cursor-not-allowed opacity-50" : "",
             "block px-4 py-2"
           )}
           onClick={onClick}
