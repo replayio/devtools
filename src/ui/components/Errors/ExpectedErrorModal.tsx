@@ -10,6 +10,7 @@ import { DefaultViewportWrapper } from "ui/components/shared/Viewport";
 import { useRequestRecordingAccess } from "ui/hooks/recordings";
 import { useAppDispatch } from "ui/setup/hooks";
 import { ErrorActions } from "ui/state/app";
+import { login } from "ui/utils/auth";
 
 // Full screen modal to be shown in the event of an expected error that is fatal/blocking.
 // For example, no recording id or no access to a recording.
@@ -110,16 +111,7 @@ function RequestRecordingAccessButton() {
 }
 
 function SignInButton() {
-  const router = useRouter();
-  const dispatch = useAppDispatch();
-
-  const onClick = async () => {
-    const returnToPath = window.location.pathname + window.location.search;
-    await router.push({ pathname: "/login", query: { returnTo: returnToPath } });
-    dispatch(clearExpectedError());
-  };
-
-  return <Button onClick={onClick}>Sign in to Replay</Button>;
+  return <Button onClick={() => login()}>Sign in to Replay</Button>;
 }
 
 function TeamBillingButton() {

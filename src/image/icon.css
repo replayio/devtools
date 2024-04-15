@@ -22,235 +22,235 @@ but without a background color so we can use hover effects
 /* global menu */
 
 .icon.docs {
-  -webkit-mask-image: url(/icons/docs.svg);
+  -webkit-mask-image: url(/recording/icons/docs.svg);
 }
 
 .icon.help {
-  -webkit-mask-image: url(/icons/help.svg);
+  -webkit-mask-image: url(/recording/icons/help.svg);
 }
 
 .icon.settings {
-  -webkit-mask-image: url(/icons/settings.svg);
+  -webkit-mask-image: url(/recording/icons/settings.svg);
 }
 
 .icon.replay-logo {
-  -webkit-mask-image: url(/icons/replay-logo.svg);
+  -webkit-mask-image: url(/recording/icons/replay-logo.svg);
 }
 
 /* context menu */
 
 .icon.copy {
-  -webkit-mask-image: url(/icons/copy.svg);
+  -webkit-mask-image: url(/recording/icons/copy.svg);
 }
 
 /* replay info */
 
 .icon.globe {
-  -webkit-mask-image: url(/icons/globe.svg);
+  -webkit-mask-image: url(/recording/icons/globe.svg);
 }
 
 .icon.group {
-  -webkit-mask-image: url(/icons/group.svg);
+  -webkit-mask-image: url(/recording/icons/group.svg);
 }
 
 .icon.lock {
-  -webkit-mask-image: url(/icons/lock.svg);
+  -webkit-mask-image: url(/recording/icons/lock.svg);
 }
 
 .icon.external {
-  -webkit-mask-image: url(/icons/external.svg);
+  -webkit-mask-image: url(/recording/icons/external.svg);
 }
 
 .icon.shield-check {
-  -webkit-mask-image: url(/icons/shield-check.svg);
+  -webkit-mask-image: url(/recording/icons/shield-check.svg);
 }
 
 .icon.globe-circle {
-  -webkit-mask-image: url(/icons/globe-circle.svg);
+  -webkit-mask-image: url(/recording/icons/globe-circle.svg);
 }
 
 .icon.group-circle {
-  -webkit-mask-image: url(/icons/group-circle.svg);
+  -webkit-mask-image: url(/recording/icons/group-circle.svg);
 }
 
 .icon.lock-circle {
-  -webkit-mask-image: url(/icons/lock-circle.svg);
+  -webkit-mask-image: url(/recording/icons/lock-circle.svg);
 }
 
 .icon.link-circle {
-  -webkit-mask-image: url(/icons/link-circle.svg);
+  -webkit-mask-image: url(/recording/icons/link-circle.svg);
 }
 
 .icon.shield-check-circle {
-  -webkit-mask-image: url(/icons/shield-check-circle.svg);
+  -webkit-mask-image: url(/recording/icons/shield-check-circle.svg);
 }
 
 .icon.learnmore-questionmark {
-  -webkit-mask-image: url(/icons/learnmore-questionmark.svg);
+  -webkit-mask-image: url(/recording/icons/learnmore-questionmark.svg);
 }
 
 .icon.drawer {
-  -webkit-mask-image: url(/icons/drawer.svg);
+  -webkit-mask-image: url(/recording/icons/drawer.svg);
 }
 
 .icon.trash {
-  -webkit-mask-image: url(/icons/trash.svg);
+  -webkit-mask-image: url(/recording/icons/trash.svg);
 }
 
 /* check-in widget */
 
 .icon.active {
-  -webkit-mask-image: url(/icons/active.svg);
+  -webkit-mask-image: url(/recording/icons/active.svg);
 }
 
 .icon.resolved {
-  -webkit-mask-image: url(/icons/resolved.svg);
+  -webkit-mask-image: url(/recording/icons/resolved.svg);
 }
 
 /* upload screen */
 
 .icon.warning {
-  -webkit-mask-image: url(/icons/warning.svg);
+  -webkit-mask-image: url(/recording/icons/warning.svg);
 }
 
 /* print statements */
 
 .icon.filter {
-  -webkit-mask-image: url(/icons/filter.svg);
+  -webkit-mask-image: url(/recording/icons/filter.svg);
 }
 
 /* focus mode */
 
 .icon.focus {
-  -webkit-mask-image: url(/icons/focus.svg);
+  -webkit-mask-image: url(/recording/icons/focus.svg);
 }
 
 /* network */
 
 .icon.palette {
-  -webkit-mask-image: url(/icons/palette.svg);
+  -webkit-mask-image: url(/recording/icons/palette.svg);
 }
 
 .icon.doc {
-  -webkit-mask-image: url(/icons/doc.svg);
+  -webkit-mask-image: url(/recording/icons/doc.svg);
 }
 
 .icon.typography {
-  -webkit-mask-image: url(/icons/typography.svg);
+  -webkit-mask-image: url(/recording/icons/typography.svg);
 }
 
 .icon.image {
-  -webkit-mask-image: url(/icons/image.svg);
+  -webkit-mask-image: url(/recording/icons/image.svg);
 }
 
 .icon.code {
-  -webkit-mask-image: url(/icons/code.svg);
+  -webkit-mask-image: url(/recording/icons/code.svg);
 }
 
 .icon.list {
-  -webkit-mask-image: url(/icons/list.svg);
+  -webkit-mask-image: url(/recording/icons/list.svg);
 }
 
 .icon.questionmark {
-  -webkit-mask-image: url(/icons/questionmark.svg);
+  -webkit-mask-image: url(/recording/icons/questionmark.svg);
 }
 
 .icon.other {
-  -webkit-mask-image: url(/icons/other.svg);
+  -webkit-mask-image: url(/recording/icons/other.svg);
 }
 
 .icon.tool {
-  -webkit-mask-image: url(/icons/tool.svg);
+  -webkit-mask-image: url(/recording/icons/tool.svg);
 }
 
 .icon.reload {
-  -webkit-mask-image: url(/icons/reload.svg);
+  -webkit-mask-image: url(/recording/icons/reload.svg);
 }
 
 .icon.checked {
-  -webkit-mask-image: url(/icons/checked.svg);
+  -webkit-mask-image: url(/recording/icons/checked.svg);
 }
 
 .icon.unchecked {
-  -webkit-mask-image: url(/icons/unchecked.svg);
+  -webkit-mask-image: url(/recording/icons/unchecked.svg);
 }
 
 .icon.dock-bottom {
-  -webkit-mask-image: url(/icons/dock-bottom.svg);
+  -webkit-mask-image: url(/recording/icons/dock-bottom.svg);
 }
 
 .icon.dock-left {
-  -webkit-mask-image: url(/icons/dock-left.svg);
+  -webkit-mask-image: url(/recording/icons/dock-left.svg);
 }
 
 .icon.dock-full {
-  -webkit-mask-image: url(/icons/dock-full.svg);
+  -webkit-mask-image: url(/recording/icons/dock-full.svg);
 }
 
 .icon.dock-bottom-right {
-  -webkit-mask-image: url(/icons/dock-bottom-right.svg);
+  -webkit-mask-image: url(/recording/icons/dock-bottom-right.svg);
 }
 
 .icon.video {
-  -webkit-mask-image: url(/icons/video.svg);
+  -webkit-mask-image: url(/recording/icons/video.svg);
 }
 
 /* global loader component */
 
 .icon.cloud {
-  -webkit-mask-image: url(/icons/cloud.svg);
+  -webkit-mask-image: url(/recording/icons/cloud.svg);
 }
 
 .icon.turtle {
-  -webkit-mask-image: url(/icons/turtle.svg);
+  -webkit-mask-image: url(/recording/icons/turtle.svg);
 }
 
 .icon.set-focus-end {
-  -webkit-mask-image: url(/icons/set-focus-end.svg);
+  -webkit-mask-image: url(/recording/icons/set-focus-end.svg);
 }
 
 .icon.set-focus-start {
-  -webkit-mask-image: url(/icons/set-focus-start.svg);
+  -webkit-mask-image: url(/recording/icons/set-focus-start.svg);
 }
 
 /* disclosure menus */
 
 .icon.chevron {
-  -webkit-mask-image: url(/icons/chevron.svg);
+  -webkit-mask-image: url(/recording/icons/chevron.svg);
 }
 
 /* library */
 
 .icon.library {
-  -webkit-mask-image: url(/icons/library.svg);
+  -webkit-mask-image: url(/recording/icons/library.svg);
 }
 
 .icon.team {
-  -webkit-mask-image: url(/icons/team.svg);
+  -webkit-mask-image: url(/recording/icons/team.svg);
 }
 
 .icon.tests {
-  -webkit-mask-image: url(/icons/tests.svg);
+  -webkit-mask-image: url(/recording/icons/tests.svg);
 }
 
 /* testsuites */
 
 .icon.testsuites-success {
-  -webkit-mask-image: url(/icons/testsuites-success.svg);
+  -webkit-mask-image: url(/recording/icons/testsuites-success.svg);
 }
 
 .icon.testsuites-fail {
-  -webkit-mask-image: url(/icons/testsuites-fail.svg);
+  -webkit-mask-image: url(/recording/icons/testsuites-fail.svg);
 }
 
 .icon.testsuites-skip {
-  -webkit-mask-image: url(/icons/questionmark.svg);
+  -webkit-mask-image: url(/recording/icons/questionmark.svg);
 }
 
 .icon.testsuites-v2-failed {
-  -webkit-mask-image: url(/icons/testsuites-v2-failed.svg);
+  -webkit-mask-image: url(/recording/icons/testsuites-v2-failed.svg);
 }
 
 .icon.testsuites-v2-flaky {
-  -webkit-mask-image: url(/icons/testsuites-v2-flaky.svg);
+  -webkit-mask-image: url(/recording/icons/testsuites-v2-flaky.svg);
 }

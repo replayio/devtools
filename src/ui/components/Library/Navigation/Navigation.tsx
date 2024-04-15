@@ -32,7 +32,7 @@ export default function Navigation() {
   return (
     <div className={`flex w-64 flex-shrink-0 flex-col ${styles.navigation}`}>
       <div className="p-4">
-        <img className="h-8 w-8" src="/images/logo.svg" />
+        <img className="h-8 w-8" src="/recording/images/logo.svg" />
       </div>
       <div
         className="library-sidebar flex flex-grow flex-col overflow-auto text-sm"

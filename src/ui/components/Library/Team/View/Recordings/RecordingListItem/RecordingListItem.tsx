@@ -102,7 +102,10 @@ function RowWrapper({
   return isEditing ? (
     <div onClick={onClick}> {children}</div>
   ) : (
-    <a href={getRecordingURL(recording)} style={{ color: "inherit", textDecoration: "inherit" }}>
+    <a
+      href={getRecordingURL(recording, true)}
+      style={{ color: "inherit", textDecoration: "inherit" }}
+    >
       {children}
     </a>
   );
@@ -181,14 +184,14 @@ function RecordingRow({
                   className="flex flex-row items-center space-x-1 overflow-hidden overflow-ellipsis whitespace-pre"
                   style={{ minWidth: "5rem" }}
                 >
-                  <img src="/images/timer.svg" className="w-3" />
+                  <img src="/recording/images/timer.svg" className="w-3" />
                   <span>{getDurationString(recording.duration)}</span>
                 </div>
                 <div
                   className="flex flex-row items-center space-x-1 overflow-hidden overflow-ellipsis whitespace-pre"
                   style={{ minWidth: "6rem" }}
                 >
-                  <img src="/images/today.svg" className="w-3" />
+                  <img src="/recording/images/today.svg" className="w-3" />
                   <span>{getRelativeDate(recording.date)}</span>
                 </div>
                 <div className="overflow-hidden overflow-ellipsis whitespace-pre font-light text-gray-400">
@@ -217,7 +220,7 @@ function RecordingRow({
             <div className="inline-block">
               <div className="flex flex-row space-x-1">
                 <span>{recording.comments.length}</span>
-                <img src="/images/comment-outline.svg" className="w-3" />
+                <img src="/recording/images/comment-outline.svg" className="w-3" />
               </div>
             </div>
           ) : (

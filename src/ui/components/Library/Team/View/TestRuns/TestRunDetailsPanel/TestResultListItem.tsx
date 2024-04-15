@@ -80,7 +80,7 @@ export function TestResultListItem({
         </div>
         {numComments > 0 && (
           <div className={styles.comments}>
-            <img src="/images/comment-outline.svg" className={styles.commentIcon} />
+            <img src="/recording/images/comment-outline.svg" className={styles.commentIcon} />
             <span>{numComments}</span>
           </div>
         )}

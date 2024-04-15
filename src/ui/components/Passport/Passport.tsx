@@ -300,7 +300,7 @@ const Passport = (props: PropsFromRedux) => {
     <div className={`${styles.PassportBoxWrapper} flex h-screen flex-col`}>
       {selectedItem.completed && (
         <img
-          src={`/images/passport/${selectedItem.imageBaseName}-complete.png`}
+          src={`/recording/images/passport/${selectedItem.imageBaseName}-complete.png`}
           className={styles.largeCompletedImage}
           style={{
             zIndex: 0,

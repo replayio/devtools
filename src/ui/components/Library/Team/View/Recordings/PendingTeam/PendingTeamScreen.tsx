@@ -46,14 +46,14 @@ function MockRecordingRow({ date, name }: { date: string; name: string }) {
                 className="flex flex-row items-center space-x-1 overflow-hidden overflow-ellipsis whitespace-pre"
                 style={{ minWidth: "5rem" }}
               >
-                <img src="/images/timer.svg" className="w-3" />
+                <img src="/recording/images/timer.svg" className="w-3" />
                 <span>{getDurationString(Math.floor(Math.random() * 120000))}</span>
               </div>
               <div
                 className="flex flex-row items-center space-x-1 overflow-hidden overflow-ellipsis whitespace-pre"
                 style={{ minWidth: "6rem" }}
               >
-                <img src="/images/today.svg" className="w-3" />
+                <img src="/recording/images/today.svg" className="w-3" />
                 <span>{getRelativeDate(date)}</span>
               </div>
               <div className="overflow-hidden overflow-ellipsis whitespace-pre text-gray-400">
@@ -74,7 +74,7 @@ function MockRecordingRow({ date, name }: { date: string; name: string }) {
         <div className="inline-block">
           <div className="flex flex-row space-x-1">
             <span>{Math.floor(Math.random() * 20)}</span>
-            <img src="/images/comment-outline.svg" className="w-3" />
+            <img src="/recording/images/comment-outline.svg" className="w-3" />
           </div>
         </div>
       </div>

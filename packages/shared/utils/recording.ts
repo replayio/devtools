@@ -9,7 +9,7 @@ const WARNING_MS = 60 * 2 * 1000;
 export const showDurationWarning = (recording: Recording) =>
   !!recording.duration && recording.duration > WARNING_MS;
 
-export function getRecordingURL(recording: Recording): string {
+export function getRecordingURL(recording: Recording, includeBasePath: boolean): string {
   const target = recording.buildId ? getRecordingTarget(recording.buildId) : undefined;
 
   let useLegacyURL = false;
@@ -24,7 +24,11 @@ export function getRecordingURL(recording: Recording): string {
     id = slugify(recording.title, { strict: true }).toLowerCase() + SLUG_SEPARATOR + recording.id;
   }
 
-  return useLegacyURL ? `https://legacy.replay.io/recording/${id}` : `/recording/${id}`;
+  return useLegacyURL
+    ? `https://legacy.replay.io/recording/${id}`
+    : includeBasePath
+    ? `/recording/${id}`
+    : `/${id}`;
 }
 
 export function getRecordingId(): string | undefined {

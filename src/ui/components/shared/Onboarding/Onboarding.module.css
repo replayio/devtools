@@ -42,7 +42,7 @@
 
 .grid {
   background: #0e1c3f;
-  background-image: url("/images/grid.png");
+  background-image: url("/recording/images/grid.png");
   background-size: 100% 100%;
   background-repeat: no-repeat;
   width: 100%;
@@ -50,7 +50,7 @@
 }
 
 .stars {
-  background-image: url("/images/stars.png");
+  background-image: url("/recording/images/stars.png");
   width: 100%;
   height: 100%;
   background-size: contain;

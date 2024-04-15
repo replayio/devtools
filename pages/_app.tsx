@@ -110,7 +110,7 @@ const MemoizedHeader = memo(function MemoizedHeader() {
   return (
     <Head>
       <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
-      <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
+      <link rel="icon" type="image/svg+xml" href="/recording/images/favicon.svg" />
       {hasRecordingId || <title>Replay</title>}
     </Head>
   );
@@ -130,9 +130,30 @@ const App = ({ apiKey, ...props }: AppProps & AuthProps) => {
   if (props.__N_SSP && router.pathname.match(/^\/recording\//)) {
     head = <props.Component {...props.pageProps} headOnly />;
   }
+
+  const [token, setToken] = useState<{ token?: string } | undefined>(apiKey ? { token: apiKey } : undefined);
+  useEffect(() => {
+    async function fetchToken() {
+      const response = await fetch("/api/token");
+      const token = response.ok ? await response.text() : undefined;
+      setToken({ token });
+    }
+    if (!token) {
+      if (!window.__IS_RECORD_REPLAY_RUNTIME__) {
+        fetchToken();
+      } else {
+        setToken({});
+      }
+    }
+  }, [token, setToken]);
+
+  if (!token) {
+    return;
+  }
+
   return (
     <SystemProvider>
-      <tokenManager.Auth0Provider apiKey={apiKey}>
+      <tokenManager.Auth0Provider apiKey={token.token}>
         {head}
         <AppUtilities>
           <Routing {...props} />

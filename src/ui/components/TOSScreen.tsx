@@ -18,7 +18,7 @@ export default function TOSScreen() {
         style={{ width: "520px" }}
       >
         <div className="place-content-center space-y-4">
-          <img className="mx-auto h-12 w-12" src="/images/logo.svg" />
+          <img className="mx-auto h-12 w-12" src="/recording/images/logo.svg" />
         </div>
         <div className="text-2xl font-bold">Terms of Use</div>
         <div>

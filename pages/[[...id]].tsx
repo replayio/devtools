@@ -104,7 +104,7 @@ function useRecordingSlug(recordingId: string) {
 
   useEffect(() => {
     if (recording?.title) {
-      const url = getRecordingURL(recording);
+      const url = getRecordingURL(recording, false);
       const currentURL = new URL(window.location.origin + router.asPath).pathname;
       if (url !== currentURL) {
         // clone the query object to remove the id parameter
