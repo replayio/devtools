@@ -1,6 +1,6 @@
 import { RecordingId } from "@replayio/protocol";
 import classNames from "classnames";
-import React, { useState } from "react";
+import { useState } from "react";
 
 import { Recording } from "shared/graphql/types";
 import { setModal } from "ui/actions/app";
@@ -120,10 +120,9 @@ function MoveRecordingOption({
   const { permissions } = useGetUserPermissions(recording);
   const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
   const updateRecordingWorkspace = hooks.useUpdateRecordingWorkspace();
-  const currentWorkspaceId = useGetTeamIdFromRoute();
 
   const updateRecording = (targetWorkspaceId: WorkspaceId | null) => {
-    updateRecordingWorkspace(recording.id, currentWorkspaceId, targetWorkspaceId);
+    updateRecordingWorkspace(recording.id, targetWorkspaceId);
     onOptionClick();
   };
 

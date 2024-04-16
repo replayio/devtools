@@ -88,9 +88,7 @@ export default function BatchActionDropdown({
   };
 
   const updateRecordings = (targetWorkspaceId: WorkspaceId | null) => {
-    selectedIds.forEach(recordingId =>
-      updateRecordingWorkspace(recordingId, currentWorkspaceId, targetWorkspaceId)
-    );
+    selectedIds.forEach(recordingId => updateRecordingWorkspace(recordingId, targetWorkspaceId));
     setSelectedIds([]);
     setExpanded(false);
   };

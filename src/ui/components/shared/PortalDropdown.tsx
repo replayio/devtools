@@ -1,4 +1,4 @@
-import React, { CSSProperties, RefObject, useCallback, useRef, useState } from "react";
+import React, { CSSProperties, RefObject, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { getToolboxLayout } from "ui/reducers/layout";

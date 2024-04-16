@@ -79,7 +79,7 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
           {isAuthenticated ? (
             <Row>
               <Icon filename={`${icon}-circle`} className="cursor-pointer bg-iconColor" />
-              <div>
+              <div className="rounded-md border border-inputBorder bg-themeTextFieldBgcolor p-2 hover:bg-themeTextFieldBgcolorHover">
                 <PrivacyDropdown {...{ recording }} />
               </div>
             </Row>
