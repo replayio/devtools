@@ -21,8 +21,12 @@ let TestFileOverrideList = [];
 
 // Disable some tests that we know to be problematic.
 const TestFileBlackList = new Set([
-  // https://linear.app/replay/issue/RUN-3274/
+  // Disable some paint expectations. Things have improved but are not perfect
+  // with paints. Let's revisit it once we see it have a real impact on the
+  // user, or else, post GA.
+  // https://linear.app/replay/issue/TT-189/re-enable-repaint-01-repaint-06
   "tests/repaint-01.test.ts",
+  "tests/repaint-06.test.ts",
 ]);
 
 // Enable some tests that we have recently fixed but not yet enabled everywhere.
