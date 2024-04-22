@@ -1,5 +1,6 @@
 import { Dispatch, ReactNode, SetStateAction, useState } from "react";
 
+import Icon from "replay-next/components/Icon";
 import { Recording, Workspace } from "shared/graphql/types";
 import { Dropdown, DropdownItem, DropdownItemContent } from "ui/components/Library/LibraryDropdown";
 import hooks from "ui/hooks";
@@ -33,10 +34,28 @@ export function getPrivacySummaryAndIcon(recording: Recording) {
   return { icon: "lock", summary: "Only people with access can view" };
 }
 
-function DropdownButton({ disabled, children }: { disabled?: boolean; children: ReactNode }) {
+function DropdownButton({
+  didError = false,
+  disabled,
+  children,
+}: {
+  didError?: boolean;
+  disabled: boolean;
+  children: ReactNode;
+}) {
+  let classNames =
+    "bg-themeTextFieldBgcolor hover:bg-themeTextFieldBgcolorHover border-inputBorder";
+  if (disabled) {
+    classNames = "pointer-default opacity-50 border-transparent";
+  } else if (didError) {
+    classNames = "border-transparent bg-errorBgcolor text-errorColor";
+  }
+
   return (
-    <div className="flex flex-row items-center space-x-1">
-      <span className="whitespace-pre">{children}</span>
+    <div
+      className={`flex grow flex-row items-center space-x-1 overflow-hidden rounded border-inputBorder p-2 ${classNames}`}
+    >
+      <span className="truncate whitespace-pre">{children}</span>
       {!disabled ? (
         <div style={{ lineHeight: "0px" }}>
           <MaterialIcon>expand_more</MaterialIcon>
@@ -160,19 +179,19 @@ export default function PrivacyDropdown({ recording }: { recording: Recording })
 
   return (
     <>
-      <div
-        className={`rounded-md border border-inputBorder bg-themeTextFieldBgcolor p-2 ${
-          isPending ? "pointer-default opacity-50" : "hover:bg-themeTextFieldBgcolorHover"
-        }`}
-      >
-        <div style={{ display: "none" }}>
-          <MaterialIcon>globe</MaterialIcon>
-          <MaterialIcon>group</MaterialIcon>
-          <MaterialIcon>lock</MaterialIcon>
-          <MaterialIcon>expand_more</MaterialIcon>
-        </div>
+      <div style={{ display: "none" }}>
+        <MaterialIcon>globe</MaterialIcon>
+        <MaterialIcon>group</MaterialIcon>
+        <MaterialIcon>lock</MaterialIcon>
+        <MaterialIcon>expand_more</MaterialIcon>
+      </div>
+      <div className="flex flex-row items-center justify-start">
         <PortalDropdown
-          buttonContent={<DropdownButton>{summary}</DropdownButton>}
+          buttonContent={
+            <DropdownButton didError={updateWorkspaceFailed} disabled={isPending}>
+              {summary}
+            </DropdownButton>
+          }
           buttonStyle={"overflow-hidden"}
           disabled={isPending}
           setExpanded={setExpanded}
@@ -182,12 +201,12 @@ export default function PrivacyDropdown({ recording }: { recording: Recording })
         >
           <Dropdown menuItemsClassName="z-50 overflow-auto max-h-48">{privacyOptions}</Dropdown>
         </PortalDropdown>
+        {updateWorkspaceFailed && (
+          <div title="Something went wrong. Try again.">
+            <Icon className="h-4 w-4 text-errorColor" type="warning" />
+          </div>
+        )}
       </div>
-      {updateWorkspaceFailed && (
-        <div className="mt-2 rounded bg-errorBgcolor px-2 py-1 text-errorColor">
-          Something went wrong. Try again.
-        </div>
-      )}
     </>
   );
 }
