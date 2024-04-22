@@ -3,7 +3,7 @@ import { useContext } from "react";
 import Icon from "replay-next/components/Icon";
 import { NetworkRequestComment } from "replay-next/components/sources/utils/comments";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
-import { setSelectedPanel } from "ui/actions/layout";
+import { setSelectedPanel, setViewMode } from "ui/actions/layout";
 import { selectNetworkRequest } from "ui/actions/network";
 import { useAppDispatch } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
@@ -21,6 +21,8 @@ export default function NetworkRequestPreview({ comment }: { comment: NetworkReq
 
   const onClick = () => {
     trackEvent("comments.select_request");
+
+    dispatch(setViewMode("dev"));
     dispatch(setSelectedPanel("network"));
     dispatch(selectNetworkRequest(id));
   };
