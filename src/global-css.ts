@@ -74,7 +74,6 @@ import "ui/components/shared/SettingsModal/SettingsModal.css";
 import "ui/components/shared/SettingsModal/SettingsNavigation.css";
 import "ui/components/shared/SharingModal/CollaboratorsList.css";
 import "ui/components/shared/SharingModal/EmailForm.css";
-import "ui/components/shared/WorkspaceSettingsModal/WorkspaceMember.css";
 import "ui/components/Timeline/MessageMarker.css";
 import "ui/components/Timeline/Timeline.css";
 import "ui/components/Timeline/Tooltip.css";

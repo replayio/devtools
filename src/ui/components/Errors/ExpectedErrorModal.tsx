@@ -1,14 +1,13 @@
-import { useRouter } from "next/router";
 import { ReactNode, useState } from "react";
 
 import { Button } from "replay-next/components/Button";
-import { clearExpectedError, setModal } from "ui/actions/app";
 import { setExpectedError } from "ui/actions/errors";
-import { useGetTeamIdFromRoute } from "ui/components/Library/Team/utils";
 import { Dialog, DialogActions, DialogDescription, DialogTitle } from "ui/components/shared/Dialog";
 import { DefaultViewportWrapper } from "ui/components/shared/Viewport";
 import { useRequestRecordingAccess } from "ui/hooks/recordings";
+import { getRecordingWorkspace } from "ui/reducers/app";
 import { useAppDispatch } from "ui/setup/hooks";
+import { useAppSelector } from "ui/setup/hooks";
 import { ErrorActions } from "ui/state/app";
 import { login } from "ui/utils/auth";
 
@@ -115,15 +114,11 @@ function SignInButton() {
 }
 
 function TeamBillingButton() {
-  const dispatch = useAppDispatch();
+  const workspace = useAppSelector(getRecordingWorkspace);
+  const currentWorkspaceId = workspace?.id ?? "me";
 
-  const currentWorkspaceId = useGetTeamIdFromRoute();
-
-  const router = useRouter();
-  const onClick = async () => {
-    await router.push(`/team/${currentWorkspaceId}/settings/billing`);
-    dispatch(clearExpectedError());
-    dispatch(setModal("workspace-settings"));
+  const onClick = () => {
+    window.location.href = `${window.location.origin}/team/${currentWorkspaceId}/settings/billing`;
   };
 
   return <Button onClick={onClick}>Update Subscription</Button>;
