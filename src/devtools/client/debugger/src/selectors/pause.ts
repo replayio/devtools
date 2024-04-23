@@ -4,22 +4,17 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 import { ReplayClientInterface } from "shared/client/types";
 import type { UIState } from "ui/state";
-import { getPauseFrameAsync, getPauseFrameSuspense } from "ui/suspense/frameCache";
+import { getPauseFrameSuspense } from "ui/suspense/frameCache";
 
-import { getSelectedFrameId } from "../reducers/pause";
+import { PauseAndFrameId } from "../reducers/pause";
 
-export function getSelectedFrameSuspense(replayClient: ReplayClientInterface, state: UIState) {
-  const selectedFrameId = getSelectedFrameId(state);
+export function getSelectedFrameSuspense(
+  replayClient: ReplayClientInterface,
+  state: UIState,
+  selectedFrameId: PauseAndFrameId | null
+) {
   if (!selectedFrameId) {
     return null;
   }
   return getPauseFrameSuspense(replayClient, selectedFrameId, state.sources) || null;
-}
-
-export async function getSelectedFrameAsync(replayClient: ReplayClientInterface, state: UIState) {
-  const selectedFrameId = getSelectedFrameId(state);
-  if (!selectedFrameId) {
-    return null;
-  }
-  return (await getPauseFrameAsync(replayClient, selectedFrameId, state.sources)) || null;
 }
