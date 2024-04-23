@@ -234,20 +234,42 @@ export default async function run_fe_tests(
   // Debug replay:cli by default.
   process.env.DEBUG = "replay:cli";
 
-  let webProc;
+  let dashboardProc;
+  let devtoolsProc;
   if (runInCI) {
     // Get ready.
     execSync("cp .env.sample .env", {
       stdio: "inherit",
     });
 
-    // Start the webserver.
-    webProc = exec("npx yarn dev", (error, stdout, stderr) => {
-      if (error) {
-        console.error(`yarn dev exec ERROR: ${error}`);
+    // Start the dashboard server
+    dashboardProc = exec("pnpm dev -- -p 8080", {
+      env: {
+        ...process.env,
+        DEVTOOLS_URL: "http://localhost:8081",
       }
-      console.error(`yarn dev stdout: ${stdout}`);
-      console.error(`yarn dev stderr: ${stderr}`);
+    },
+    (error, stdout, stderr) => {
+      if (error) {
+        console.error(`dashboard server ERROR: ${error}`);
+      }
+      console.error(`dashboard server stdout: ${stdout}`);
+      console.error(`dashboard server stderr: ${stderr}`);
+    });
+
+    // Start the devtools server.
+    devtoolsProc = exec("npm exec next dev -- -p 8081", {
+      env: {
+        ...process.env,
+        DASHBOARD_URL: "http://localhost:8080",
+      }
+    },
+    (error, stdout, stderr) => {
+      if (error) {
+        console.error(`devtools server ERROR: ${error}`);
+      }
+      console.error(`devtools server stdout: ${stdout}`);
+      console.error(`devtools server stderr: ${stderr}`);
     });
 
     // Debug: Allow verifying the replay-cli version.
@@ -256,10 +278,10 @@ export default async function run_fe_tests(
       stdio: "inherit",
     });
 
-    // make sure the dev server is up and running.
-    console.log("waiting for dev server to start up");
+    // make sure the servers are up and running.
+    console.log("waiting for dev servers to start up");
     await testHttpConnection("http://localhost:8080/");
-    console.log("dev server up, continuing with test");
+    console.log("dev servers up, continuing with test");
   }
 
   try {
@@ -327,14 +349,16 @@ export default async function run_fe_tests(
     }
     console.timeEnd("TESTS time");
     console.groupEnd();
-    // Make sure the web server shuts down.
-    webProc?.kill("SIGKILL");
+    // Make sure the web servers shut down.
+    dashboardProc?.kill("SIGKILL");
+    devtoolsProc?.kill("SIGKILL");
 
     // Without this, we can hang--no idea why.
     process.exit(0);
   } finally {
-    // Make sure the web server shuts down in case of exceptions.
-    webProc?.kill("SIGKILL");
+    // Make sure the web servers shut down in case of exceptions.
+    dashboardProc?.kill("SIGKILL");
+    devtoolsProc?.kill("SIGKILL");
   }
 }
 
