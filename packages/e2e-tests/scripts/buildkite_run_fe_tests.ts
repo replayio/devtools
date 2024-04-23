@@ -286,7 +286,7 @@ export default async function run_fe_tests(
 
     // make sure the servers are up and running.
     console.log("waiting for dev servers to start up");
-    await testHttpConnection("http://localhost:8081/");
+    await testHttpConnection("http://localhost:8081/login");
     console.log("dev servers up, continuing with test");
   }
 
