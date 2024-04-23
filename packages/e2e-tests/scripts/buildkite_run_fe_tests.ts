@@ -280,7 +280,7 @@ export default async function run_fe_tests(
 
     // make sure the servers are up and running.
     console.log("waiting for dev servers to start up");
-    await testHttpConnection("http://localhost:8080/");
+    await testHttpConnection("http://localhost:8081/");
     console.log("dev servers up, continuing with test");
   }
 
@@ -307,7 +307,7 @@ export default async function run_fe_tests(
           env: {
             ...process.env,
             // Run the tests against the local dev server.
-            PLAYWRIGHT_TEST_BASE_URL: "http://localhost:8080",
+            PLAYWRIGHT_TEST_BASE_URL: "http://localhost:8081",
           },
         }
       );
