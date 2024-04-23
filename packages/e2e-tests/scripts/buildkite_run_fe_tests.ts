@@ -243,34 +243,40 @@ export default async function run_fe_tests(
     });
 
     // Start the dashboard server
-    dashboardProc = exec("pnpm dev -- -p 8080", {
-      env: {
-        ...process.env,
-        DEVTOOLS_URL: "http://localhost:8081",
+    dashboardProc = exec(
+      "pnpm dev -- -p 8080",
+      {
+        env: {
+          ...process.env,
+          DEVTOOLS_URL: "http://localhost:8081",
+        },
+      },
+      (error, stdout, stderr) => {
+        if (error) {
+          console.error(`dashboard server ERROR: ${error}`);
+        }
+        console.error(`dashboard server stdout: ${stdout}`);
+        console.error(`dashboard server stderr: ${stderr}`);
       }
-    },
-    (error, stdout, stderr) => {
-      if (error) {
-        console.error(`dashboard server ERROR: ${error}`);
-      }
-      console.error(`dashboard server stdout: ${stdout}`);
-      console.error(`dashboard server stderr: ${stderr}`);
-    });
+    );
 
     // Start the devtools server.
-    devtoolsProc = exec("npm exec next dev -- -p 8081", {
-      env: {
-        ...process.env,
-        DASHBOARD_URL: "http://localhost:8080",
+    devtoolsProc = exec(
+      "npm exec next dev -- -p 8081",
+      {
+        env: {
+          ...process.env,
+          DASHBOARD_URL: "http://localhost:8080",
+        },
+      },
+      (error, stdout, stderr) => {
+        if (error) {
+          console.error(`devtools server ERROR: ${error}`);
+        }
+        console.error(`devtools server stdout: ${stdout}`);
+        console.error(`devtools server stderr: ${stderr}`);
       }
-    },
-    (error, stdout, stderr) => {
-      if (error) {
-        console.error(`devtools server ERROR: ${error}`);
-      }
-      console.error(`devtools server stdout: ${stdout}`);
-      console.error(`devtools server stderr: ${stderr}`);
-    });
+    );
 
     // Debug: Allow verifying the replay-cli version.
     console.log(`Checking @replayio/replay version...`);
