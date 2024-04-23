@@ -29,7 +29,7 @@ yarn install
 yarn dev
 ```
 
-Once you see `Compiled succesfully` in your terminal, open your browser and go to [this link](http://localhost:8080/recording/overboard--a616009e-b825-4c54-83b4-e20bd8c0cb25).
+At this point the Dashboard will be accessible at [localhost:8080](http://localhost:8080/) but it will not load recordings. To be able to test the end-to-end interaction of both apps, use [localhost:8081](http://localhost:8081/). It will serve both Dashboard and DevTools routes.
 
 **You just successfully opened your first Replay recording!** That recording uses your locally running copy of Replay DevTools to debug our test recording.
 
