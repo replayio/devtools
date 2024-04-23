@@ -142,17 +142,16 @@ function githubUrlToRepository(url) {
   return url?.replace(/.*github.com[:\/](.*)\.git/, "$1");
 }
 
-function waitForHTTPStatus(
+function testHttpConnection(
   url: string,
-  statusCode: number = 200, // by default we wait for OK
-  timeoutMs = 15000, // keep waiting for 15s total
-  retryTime = 1000 // retry after 1s
+  timeoutMs = 15000 // keep waiting for 15s total
 ): Promise<void> {
   const startTime = Date.now();
   return new Promise((resolve, reject) => {
     function attemptConnection() {
-      const request = http.get(url, res => {
-        if (res.statusCode === statusCode) {
+      const request = http.get(url, async res => {
+        if (res.statusCode < 500) {
+          // As long as we can connect at all, we should be fine.
           resolve();
           return;
         }
@@ -259,7 +258,7 @@ export default async function run_fe_tests(
 
     // make sure the dev server is up and running.
     console.log("waiting for dev server to start up");
-    await waitForHTTPStatus("http://localhost:8080/");
+    await testHttpConnection("http://localhost:8080/");
     console.log("dev server up, continuing with test");
   }
 
