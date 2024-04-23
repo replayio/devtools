@@ -4,10 +4,10 @@ import { ConnectedProps, connect } from "react-redux";
 import { getDisplayedUrl } from "shared/utils/environment";
 import { getRecordingId, showDurationWarning } from "shared/utils/recording";
 import * as actions from "ui/actions/app";
-import { getTruncatedRelativeDate } from "ui/components/Library/Team/View/Recordings/RecordingListItem/RecordingListItem";
 import hooks from "ui/hooks";
 import { getRecordingTarget } from "ui/reducers/app";
 import { useAppSelector } from "ui/setup/hooks";
+import { getRelativeDate } from "ui/utils/time";
 import useAuth0 from "ui/utils/useAuth0";
 
 import { AvatarImage } from "../Avatar";
@@ -43,7 +43,7 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
     return null;
   }
 
-  const time = getTruncatedRelativeDate(recording.date);
+  const time = getRelativeDate(recording.date);
   const date = new Date(recording.date);
   const fullDateString = date.toLocaleString();
   const { icon } = getPrivacySummaryAndIcon(recording);

@@ -4,8 +4,8 @@ import React, { useState } from "react";
 import { Workspace } from "shared/graphql/types";
 import { useGetUserInfo } from "ui/hooks/users";
 
-import { Dropdown, DropdownItem } from "../Library/LibraryDropdown";
 import PortalDropdown from "../shared/PortalDropdown";
+import { Dropdown, DropdownItem } from "../shared/SharingModal/LibraryDropdown";
 import { personalWorkspace } from "./libraryConstants";
 
 const TeamSelectButton = ({

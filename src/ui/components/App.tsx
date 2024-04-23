@@ -3,12 +3,12 @@ import { ConnectedProps, connect } from "react-redux";
 
 import QuickOpenModal from "devtools/client/debugger/src/components/QuickOpenModal";
 import { getQuickOpenEnabled } from "devtools/client/debugger/src/selectors";
+import Spinner from "replay-next/components/Spinner";
 import { getSystemColorScheme } from "shared/theme/getSystemColorScheme";
 import { Theme } from "shared/theme/types";
 import { userData } from "shared/user-data/GraphQL/UserData";
 import { isTest } from "shared/utils/environment";
 import { actions } from "ui/actions";
-import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 import hooks from "ui/hooks";
 import { Nag, useGetUserInfo } from "ui/hooks/users";
 import { getLoadingFinished, getModal } from "ui/reducers/app";
@@ -28,13 +28,9 @@ import NewAttachment from "./shared/NewAttachment";
 import TOSScreen, { LATEST_TOS_VERSION } from "./TOSScreen";
 
 const LaunchBrowserModal = React.lazy(() => import("./shared/LaunchBrowserModal"));
-const NewWorkspaceModal = React.lazy(() => import("./shared/NewWorkspaceModal"));
-const WorkspaceSettingsModal = React.lazy(() => import("./shared/WorkspaceSettingsModal"));
 const UserSettingsModal = React.lazy(() => import("./shared/UserSettingsModal"));
 const SharingModal = React.lazy(() => import("./shared/SharingModal"));
-const OnboardingModal = React.lazy(() => import("./shared/OnboardingModal/index"));
 const SourcemapSetupModal = React.lazy(() => import("./shared/Modals/SourcemapSetupModal"));
-const FirstReplayModal = React.lazy(() => import("./shared/FirstReplayModal"));
 
 function AppModal({ hideModal, modal }: { hideModal: () => void; modal: ModalType }) {
   const loadingFinished = useAppSelector(getLoadingFinished);
@@ -66,23 +62,8 @@ function AppModal({ hideModal, modal }: { hideModal: () => void; modal: ModalTyp
     case "settings": {
       return <UserSettingsModal />;
     }
-    case "new-workspace": {
-      return <NewWorkspaceModal />;
-    }
-    case "workspace-settings": {
-      return <WorkspaceSettingsModal />;
-    }
-    case "onboarding": {
-      return <OnboardingModal />;
-    }
-    case "single-invite": {
-      return <OnboardingModal />;
-    }
     case "browser-launch": {
       return <LaunchBrowserModal />;
-    }
-    case "first-replay": {
-      return <FirstReplayModal />;
     }
     case "loom": {
       return <LoomModal />;
@@ -156,7 +137,7 @@ function App({ children, hideModal, modal, quickOpenEnabled }: AppProps) {
   if (auth.isLoading || userInfo.loading) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
-        <LibrarySpinner />
+        <Spinner />
       </div>
     );
   }

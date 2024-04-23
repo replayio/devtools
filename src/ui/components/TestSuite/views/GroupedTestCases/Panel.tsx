@@ -8,7 +8,6 @@ import {
   TestEnvironmentError,
 } from "shared/test-suites/RecordingTestMetadata";
 import { getFormattedTime } from "shared/utils/time";
-import { getTruncatedRelativeDate } from "ui/components/Library/Team/View/Recordings/RecordingListItem/RecordingListItem";
 import LabeledIcon from "ui/components/TestSuite/components/LabeledIcon";
 import { TestResultIcon } from "ui/components/TestSuite/components/TestResultIcon";
 import { RecordingCache } from "ui/components/TestSuite/suspense/RecordingCache";
@@ -17,6 +16,7 @@ import { formatTitle } from "ui/components/TestSuite/utils/formatTitle";
 import { createTestTree } from "ui/components/TestSuite/views/GroupedTestCases/createTestTree";
 import { TestRecordingTree } from "ui/components/TestSuite/views/GroupedTestCases/TestRecordingTree";
 import { sendTelemetryEvent } from "ui/utils/telemetry";
+import { getRelativeDate } from "ui/utils/time";
 
 import styles from "./Panel.module.css";
 
@@ -103,7 +103,7 @@ export default function Panel() {
           <LabeledIcon
             className={styles.Attribute}
             icon="schedule"
-            label={getTruncatedRelativeDate(recording.date)}
+            label={getRelativeDate(recording.date)}
             title={date.toLocaleString()}
             dataTestName="TestSuiteDate"
           />

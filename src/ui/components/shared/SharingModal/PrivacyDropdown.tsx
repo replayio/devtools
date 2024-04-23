@@ -1,8 +1,7 @@
-import { Dispatch, ReactNode, SetStateAction, useState } from "react";
+import { ReactNode, useState } from "react";
 
 import Icon from "replay-next/components/Icon";
 import { Recording, Workspace } from "shared/graphql/types";
-import { Dropdown, DropdownItem, DropdownItemContent } from "ui/components/Library/LibraryDropdown";
 import hooks from "ui/hooks";
 import { WorkspaceId } from "ui/state/app";
 import { isPublicDisabled } from "ui/utils/org";
@@ -10,6 +9,7 @@ import { trackEvent } from "ui/utils/telemetry";
 
 import MaterialIcon from "../MaterialIcon";
 import PortalDropdown from "../PortalDropdown";
+import { Dropdown, DropdownItem, DropdownItemContent } from "./LibraryDropdown";
 
 const WorkspacePrivacySummary = ({ workspace: { name } }: { workspace: Workspace }) => (
   <span>
