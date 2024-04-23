@@ -38,7 +38,7 @@ export default function AvatarImage({ className, name, src, title, ...rest }: Pr
     if (name) {
       setShowNameBadge(true);
     } else {
-      setSource("/images/avatar-fallback.png");
+      setSource("/recording/images/avatar-fallback.png");
     }
   };
 

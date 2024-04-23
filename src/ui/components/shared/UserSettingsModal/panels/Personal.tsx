@@ -1,10 +1,9 @@
 import { AvatarImage } from "ui/components/Avatar";
 import { useGetUserInfo } from "ui/hooks/users";
-import useAuth0 from "ui/utils/useAuth0";
+import { logout } from "ui/utils/auth";
 
 export function Personal() {
   const { name, email, picture } = useGetUserInfo();
-  const { logout } = useAuth0();
 
   return (
     <div className="space-y-12">
@@ -17,7 +16,7 @@ export function Personal() {
       </div>
       <div>
         <button
-          onClick={() => logout({ returnTo: window.location.origin + "/login" })}
+          onClick={() => logout()}
           className="max-w-max items-center rounded-md border border-transparent bg-primaryAccent px-3 py-1.5 font-medium text-white shadow-sm hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-primaryAccent focus:ring-offset-2"
         >
           Log Out

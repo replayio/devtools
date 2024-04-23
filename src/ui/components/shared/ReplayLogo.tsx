@@ -42,7 +42,8 @@ export default function ReplayLogo({
   const height = logoSizes[size];
 
   if (wide) {
-    const src = theme === "dark" ? "/images/logo-wide-dark.svg" : "/images/logo-wide.svg";
+    const src =
+      theme === "dark" ? "/recording/images/logo-wide-dark.svg" : "/recording/images/logo-wide.svg";
     return <img className={`${height} w-auto`} src={src} />;
   }
 

@@ -11,7 +11,7 @@ import styles from "./SharingModal.module.css";
 export function CopyButton({ recording }: { recording: Recording }) {
   const [showCopied, setShowCopied] = useState(false);
   const timeoutKey = useRef<NodeJS.Timeout | null>(null);
-  const url = window?.location.origin + getRecordingURL(recording);
+  const url = window?.location.origin + getRecordingURL(recording, true);
 
   const onClick = () => {
     navigator.clipboard.writeText(url);

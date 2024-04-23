@@ -7,6 +7,7 @@ const withBundleAnalyzer = require("@next/bundle-analyzer")({
 /**
  * @type {Pick<
  *   import('next').NextConfig,
+ *   | 'basePath'
  *   | 'webpack'
  *   | 'experimental'
  *   | 'eslint'
@@ -16,6 +17,7 @@ const withBundleAnalyzer = require("@next/bundle-analyzer")({
  * >}
  */
 const baseNextConfig = {
+  basePath: "/recording",
   eslint: {
     // which folders to run ESLint on during production builds (next build)
     dirs: ["src", "pages", "packages"],
@@ -156,7 +158,7 @@ const baseNextConfig = {
       loader: "file-loader",
       options: {
         name: "icon-sprite.[contenthash].svg",
-        publicPath: `/_next/static/images/`,
+        publicPath: `/recording/_next/static/images/`,
         outputPath: "static/images",
       },
     });

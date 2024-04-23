@@ -1,13 +1,13 @@
 .passportBackground {
   position: relative;
-  background-image: url(/images/passport/passportBG.png);
+  background-image: url(/recording/images/passport/passportBG.png);
   background-repeat: repeat;
   color: #38383d;
   padding-top: 2rem;
 }
 
 .stamp {
-  background-image: url(/images/passport/tour_grad-default.png);
+  background-image: url(/recording/images/passport/tour_grad-default.png);
   background-repeat: no-repeat;
   background-size: cover;
   height: 100px;

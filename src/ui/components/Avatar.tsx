@@ -1,8 +1,8 @@
 import classNames from "classnames/bind";
-import React from "react";
+import React, { useContext } from "react";
 
+import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { User } from "shared/graphql/types";
-import useAuth0 from "ui/utils/useAuth0";
 import { getAvatarColor } from "ui/utils/user";
 
 import css from "./Avatar.module.css";
@@ -19,7 +19,7 @@ export const AvatarImage = (props: AvatarImageProps) => (
     data-private
     {...props}
     src={props.src || undefined}
-    onError={e => (e.currentTarget.src = "/images/clear.png")}
+    onError={e => (e.currentTarget.src = "/recording/images/clear.png")}
   />
 );
 
@@ -38,10 +38,10 @@ export interface AvatarProps {
 }
 
 export default function Avatar({ player, isFirstPlayer, index }: AvatarProps) {
-  let auth = useAuth0();
+  const { currentUserInfo } = useContext(SessionContext);
 
-  if (auth.isAuthenticated && isFirstPlayer) {
-    return <AuthAvatar user={auth.user} />;
+  if (currentUserInfo && isFirstPlayer) {
+    return <AuthAvatar user={currentUserInfo} />;
   }
 
   if (player.name) {

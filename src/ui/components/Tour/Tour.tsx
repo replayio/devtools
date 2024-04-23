@@ -203,7 +203,7 @@ const Tour: React.FC = () => {
           </a>
         </p>
         <img
-          src={`/images/passport/tour_grad-default.png`}
+          src={`/recording/images/passport/tour_grad-default.png`}
           className={styles.largeCompletedImage}
           style={{
             zIndex: 0,
@@ -254,7 +254,7 @@ const Tour: React.FC = () => {
       <div className="absolute bottom-28 p-3">
         {(isNewUser || viewMode === "non-dev") && (
           <div className="relative -bottom-6">
-            <img src="/images/illustrations/larry_wave.png" className="z-1 w-full" />
+            <img src="/recording/images/illustrations/larry_wave.png" className="z-1 w-full" />
           </div>
         )}
         {!isNewUser && viewMode !== "non-dev" && (

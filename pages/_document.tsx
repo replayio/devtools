@@ -62,8 +62,8 @@ export default class MyDocument extends Document {
         <Head>
           {/* nosemgrep typescript.react.security.audit.react-http-leak.react-http-leak */}
           <meta httpEquiv="Content-Security-Policy" content={csp(this.props)} />
-          <link rel="stylesheet" href="/fonts/inter/inter.css" />
-          <link rel="stylesheet" href="/fonts/material_icons/material_icons.css" />
+          <link rel="stylesheet" href="/recording/fonts/inter/inter.css" />
+          <link rel="stylesheet" href="/recording/fonts/material_icons/material_icons.css" />
         </Head>
         <body>
           <Main />

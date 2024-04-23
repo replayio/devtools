@@ -21,7 +21,7 @@ function LaunchBrowser({
     <section className="relative m-auto w-full max-w-xl overflow-hidden rounded-lg border border-inputBorder bg-modalBgcolor text-sm text-bodyColor shadow-lg">
       <div className="flex flex-col items-center space-y-9 p-6">
         <div className="place-content-center space-y-3">
-          <img className="mx-auto h-12 w-12" src="/images/logo.svg" />
+          <img className="mx-auto h-12 w-12" src="/recording/images/logo.svg" />
         </div>
         <div className="flex flex-col items-center space-y-4 text-center">
           <div className="text-lg font-bold">Launching Replay...</div>

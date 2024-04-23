@@ -36,13 +36,13 @@ function DownloadButtons({ onNext }: { onNext: () => void }) {
   return (
     <div className="flex w-full flex-row justify-center space-x-3 py-3">
       <Button onClick={handleMac} size="large">
-        <DownloadButtonContent text="Mac" imgUrl="/images/icon-apple.svg" />
+        <DownloadButtonContent text="Mac" imgUrl="/recording/images/icon-apple.svg" />
       </Button>
       <Button onClick={handleLinux} size="large">
-        <DownloadButtonContent text="Linux" imgUrl="/images/icon-linux.svg" />
+        <DownloadButtonContent text="Linux" imgUrl="/recording/images/icon-linux.svg" />
       </Button>
       <Button onClick={handleWindows} size="large">
-        <DownloadButtonContent text="Windows" imgUrl="/images/icon-windows.svg" />
+        <DownloadButtonContent text="Windows" imgUrl="/recording/images/icon-windows.svg" />
       </Button>
     </div>
   );

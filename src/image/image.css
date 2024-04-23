@@ -157,7 +157,7 @@
   background-image: url(~devtools/client/themes/images/help.svg) !important;
 }
 .logo {
-  background-image: url(/images/logo.svg) !important;
+  background-image: url(/recording/images/logo.svg) !important;
 }
 .comment-close {
   background-image: url(~devtools/client/themes/images/close.svg) !important;
@@ -510,23 +510,23 @@ button.open-inspector {
   -webkit-mask-image: url(~devtools/client/themes/images/open-inspector.svg);
 }
 .img.lightning {
-  -webkit-mask-image: url(/images/lightning.svg);
+  -webkit-mask-image: url(/recording/images/lightning.svg);
 }
 
 .img.loom {
-  -webkit-mask-image: url(/images/Loom.svg);
+  -webkit-mask-image: url(/recording/images/Loom.svg);
 }
 .img.k-icon {
-  -webkit-mask-image: url(/images/k-icon.svg);
+  -webkit-mask-image: url(/recording/images/k-icon.svg);
 }
 .img.cmd-icon {
-  -webkit-mask-image: url(/images/cmd-icon.svg);
+  -webkit-mask-image: url(/recording/images/cmd-icon.svg);
 }
 .img.palette {
-  -webkit-mask-image: url(/images/palette.svg);
+  -webkit-mask-image: url(/recording/images/palette.svg);
 }
 .img.replay-logo {
-  -webkit-mask-image: url(/images/replay-logo.svg);
+  -webkit-mask-image: url(/recording/images/replay-logo.svg);
 }
 .overlay-container.rewind .img {
   -webkit-mask-image: url(~devtools/client/debugger/images/rewind-button.svg);

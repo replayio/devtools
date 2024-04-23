@@ -190,7 +190,9 @@ export default function Header() {
     if (recording.workspace != null) {
       fallbackUrl = `/team/${recording.workspace.id}`;
       if (isTestSuiteReplay(recording) && recording.testRunId) {
-        fallbackUrl += `/runs/${recording.testRunId}`;
+        fallbackUrl += `/runs?${new URLSearchParams({ testRunId: recording.testRunId })}`;
+      } else {
+        fallbackUrl += "/recordings";
       }
     } else {
       fallbackUrl = "/team/me/recordings";
