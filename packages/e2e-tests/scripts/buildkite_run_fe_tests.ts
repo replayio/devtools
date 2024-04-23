@@ -144,7 +144,7 @@ function githubUrlToRepository(url) {
 
 function testHttpConnection(
   url: string,
-  timeoutMs = 15000, // keep waiting for 15s total
+  timeoutMs = 15000 // keep waiting for 15s total
 ): Promise<void> {
   const startTime = Date.now();
   return new Promise((resolve, reject) => {
