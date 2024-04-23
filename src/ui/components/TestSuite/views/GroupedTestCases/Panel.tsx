@@ -16,7 +16,7 @@ import { formatTitle } from "ui/components/TestSuite/utils/formatTitle";
 import { createTestTree } from "ui/components/TestSuite/views/GroupedTestCases/createTestTree";
 import { TestRecordingTree } from "ui/components/TestSuite/views/GroupedTestCases/TestRecordingTree";
 import { sendTelemetryEvent } from "ui/utils/telemetry";
-import { getTruncatedRelativeDate } from "ui/utils/time";
+import { getRelativeDate } from "ui/utils/time";
 
 import styles from "./Panel.module.css";
 
@@ -103,7 +103,7 @@ export default function Panel() {
           <LabeledIcon
             className={styles.Attribute}
             icon="schedule"
-            label={getTruncatedRelativeDate(recording.date)}
+            label={getRelativeDate(recording.date)}
             title={date.toLocaleString()}
             dataTestName="TestSuiteDate"
           />

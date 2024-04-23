@@ -7,7 +7,7 @@ import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
 import { getRecordingTarget } from "ui/reducers/app";
 import { useAppSelector } from "ui/setup/hooks";
-import { getTruncatedRelativeDate } from "ui/utils/time";
+import { getRelativeDate } from "ui/utils/time";
 import useAuth0 from "ui/utils/useAuth0";
 
 import { AvatarImage } from "../Avatar";
@@ -43,7 +43,7 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
     return null;
   }
 
-  const time = getTruncatedRelativeDate(recording.date);
+  const time = getRelativeDate(recording.date);
   const date = new Date(recording.date);
   const fullDateString = date.toLocaleString();
   const { icon } = getPrivacySummaryAndIcon(recording);

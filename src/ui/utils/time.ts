@@ -11,14 +11,6 @@ export function formatTimestamp(ms: number) {
   return `${Math.floor(seconds / 60)}:${padStart(String(seconds % 60), 2, "0")}`;
 }
 
-export function getDurationString(durationMs: number | null | undefined) {
-  if (typeof durationMs !== "number") {
-    return "";
-  }
-
-  return formatDuration(durationMs);
-}
-
 function shortenRelativeDate(date: string) {
   return date
     .replace("about", "")
@@ -34,9 +26,7 @@ function shortenRelativeDate(date: string) {
 }
 
 export function getRelativeDate(date: string) {
-  let content = shortenRelativeDate(
-    formatDistanceToNow(new Date(date), { addSuffix: true })
-  );
+  let content = shortenRelativeDate(formatDistanceToNow(new Date(date), { addSuffix: true }));
 
   const daysSince = (new Date().getTime() - new Date(date).getTime()) / (1000 * 3600 * 24);
 
