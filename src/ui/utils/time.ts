@@ -33,16 +33,10 @@ function shortenRelativeDate(date: string) {
     .replace("less than am", "1m");
 }
 
-export function getTruncatedRelativeDate(date: string, addSuffix = true) {
-  return getRelativeDate(date, true, addSuffix);
-}
-
-export function getRelativeDate(date: string, truncate: boolean = false, addSuffix = true) {
-  let content = formatDistanceToNow(new Date(date), { addSuffix });
-
-  if (truncate) {
-    content = shortenRelativeDate(content);
-  }
+export function getRelativeDate(date: string) {
+  let content = shortenRelativeDate(
+    formatDistanceToNow(new Date(date), { addSuffix: true })
+  );
 
   const daysSince = (new Date().getTime() - new Date(date).getTime()) / (1000 * 3600 * 24);
 
