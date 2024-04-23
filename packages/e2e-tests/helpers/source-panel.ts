@@ -337,7 +337,7 @@ export async function editLogPoint(
     // The typeahead popup sometimes sticks around and overlaps the save button.
     // Sometimes, it will show up after we check the first time (PRO-238) so we
     // retry a couple times to ensure that we can clear it and move forward.
-    waitFor(
+    await waitFor(
       async () => {
         await hideTypeAheadSuggestions(page, {
           sourceLineNumber: lineNumber,
