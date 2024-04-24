@@ -19,8 +19,8 @@ test("stepping-01: Test basic step-over/back functionality", async ({
   await openDevToolsTab(page);
 
   // Open doc_rr_basic.html
-  await clickSourceTreeNode(page, "test");
-  await clickSourceTreeNode(page, "examples");
+  await clickSourceTreeNode(page, "recording");
+  await clickSourceTreeNode(page, "test/examples");
   await clickSourceTreeNode(page, exampleKey);
 
   // Pause on line 20

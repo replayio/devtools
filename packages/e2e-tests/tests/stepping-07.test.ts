@@ -18,8 +18,8 @@ test("stepping-07: Test quick stepping using the keyboard", async ({
   await openDevToolsTab(page);
 
   // Open doc_rr_objects.html
-  await clickSourceTreeNode(page, "test");
-  await clickSourceTreeNode(page, "examples");
+  await clickSourceTreeNode(page, "recording");
+  await clickSourceTreeNode(page, "test/examples");
   await clickSourceTreeNode(page, exampleKey);
 
   await openPauseInformationPanel(page);

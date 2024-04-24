@@ -19,8 +19,8 @@ test(`stepping-03: Stepping past the beginning or end of a frame should act like
   await openDevToolsTab(page);
 
   // Open doc_rr_basic.html
-  await clickSourceTreeNode(page, "test");
-  await clickSourceTreeNode(page, "examples");
+  await clickSourceTreeNode(page, "recording");
+  await clickSourceTreeNode(page, "test/examples");
   await clickSourceTreeNode(page, exampleKey);
 
   await addBreakpoint(page, { lineNumber: 20, url: exampleKey });
