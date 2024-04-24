@@ -244,7 +244,7 @@ export default async function run_fe_tests(
 
     // Start the dashboard server
     dashboardProc = exec(
-      "npx -y pnpm dev -- -p 8080",
+      "npx -y pnpm@latest-8 dev -- -p 8080",
       {
         env: {
           ...process.env,
