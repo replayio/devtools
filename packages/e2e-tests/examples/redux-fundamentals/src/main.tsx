@@ -12,7 +12,7 @@ import './index.css'
 async function bootstrap() {
   const baseUrl =
     process.env.NODE_ENV === 'production'
-      ? '/test/examples/redux-fundamentals/dist'
+      ? '/recording/test/examples/redux-fundamentals/dist'
       : ''
   await worker.start({
     waitUntilReady: true,

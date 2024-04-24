@@ -15,8 +15,8 @@ test("stepping-04: Test stepping in a frame other than the top frame", async ({
   await openDevToolsTab(page);
 
   // Open doc_rr_basic.html
-  await clickSourceTreeNode(page, "test");
-  await clickSourceTreeNode(page, "examples");
+  await clickSourceTreeNode(page, "recording");
+  await clickSourceTreeNode(page, "test/examples");
   await clickSourceTreeNode(page, exampleKey);
 
   await addLogpoint(page, { lineNumber: 24, url: exampleKey, content: "'logpoint', number" });

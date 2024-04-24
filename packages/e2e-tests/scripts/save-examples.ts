@@ -234,7 +234,7 @@ async function saveBrowserExamples() {
 async function saveBrowserExample({ example }: TestRunCallbackArgs) {
   console.log(`Recording example ${chalk.gray.bold(example.filename)}`);
 
-  const exampleUrl = `${config.devtoolsUrl}/test/examples/${example.filename}`;
+  const exampleUrl = `${config.devtoolsUrl}/recording/test/examples/${example.filename}`;
   async function defaultPlaywrightScript(page: Page) {
     await waitUntilMessage(page as Page, "ExampleFinished");
     // add a little delay to ensure that the recording is complete, see [FE-2286] and [RUN-3258]
