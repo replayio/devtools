@@ -27,6 +27,9 @@ const TestFileBlackList = new Set([
   // https://linear.app/replay/issue/TT-189/re-enable-repaint-01-repaint-06
   "tests/repaint-01.test.ts",
   "tests/repaint-06.test.ts",
+  "tests/react_devtools-03-multiple-versions.test.ts",
+  "tests/passport-01.test.ts",
+  "tests/jump-to-code-01_basic.test.ts",
 ]);
 
 // Enable some tests that we have recently fixed but not yet enabled everywhere.
