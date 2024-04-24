@@ -13,11 +13,7 @@ import {
   DeleteRecording,
   DeleteRecordingVariables,
 } from "shared/graphql/generated/DeleteRecording";
-import {
-  GetMyRecordings,
-  GetMyRecordingsVariables,
-  GetMyRecordings_viewer_recordings_edges_node,
-} from "shared/graphql/generated/GetMyRecordings";
+import { GetMyRecordings_viewer_recordings_edges_node } from "shared/graphql/generated/GetMyRecordings";
 import {
   GetOwnerAndCollaborators,
   GetOwnerAndCollaboratorsVariables,
@@ -40,11 +36,7 @@ import {
   GetRecordingUserIdVariables,
 } from "shared/graphql/generated/GetRecordingUserId";
 import { GetTestsRun_node_Workspace_testRuns_edges_node_tests_recordings } from "shared/graphql/generated/GetTestsRun";
-import {
-  GetWorkspaceRecordings,
-  GetWorkspaceRecordingsVariables,
-  GetWorkspaceRecordings_node_Workspace_recordings_edges_node,
-} from "shared/graphql/generated/GetWorkspaceRecordings";
+import { GetWorkspaceRecordings_node_Workspace_recordings_edges_node } from "shared/graphql/generated/GetWorkspaceRecordings";
 import { GetWorkspaceTestExecutions_node_Workspace_tests_edges_node_executions_recordings } from "shared/graphql/generated/GetWorkspaceTestExecutions";
 import {
   InitializeRecording,
@@ -58,10 +50,6 @@ import {
   SetRecordingIsPrivate,
   SetRecordingIsPrivateVariables,
 } from "shared/graphql/generated/SetRecordingIsPrivate";
-import {
-  UpdateRecordingResolution,
-  UpdateRecordingResolutionVariables,
-} from "shared/graphql/generated/UpdateRecordingResolution";
 import {
   UpdateRecordingTitle,
   UpdateRecordingTitleVariables,
@@ -82,99 +70,6 @@ import { useGetUserId } from "./users";
 function isTest() {
   return new URL(window.location.href).searchParams.get("test");
 }
-
-const GET_WORKSPACE_RECORDINGS = gql`
-  query GetWorkspaceRecordings($workspaceId: ID!, $filter: String) {
-    node(id: $workspaceId) {
-      ... on Workspace {
-        id
-        recordings(filter: $filter) {
-          edges {
-            node {
-              uuid
-              url
-              title
-              duration
-              createdAt
-              private
-              isInitialized
-              userRole
-              metadata
-              comments {
-                user {
-                  id
-                }
-              }
-              owner {
-                id
-                name
-                picture
-              }
-              comments {
-                user {
-                  id
-                }
-              }
-              workspace {
-                id
-                hasPaymentMethod
-                subscription {
-                  status
-                  trialEnds
-                  effectiveUntil
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-`;
-
-const GET_MY_RECORDINGS = gql`
-  query GetMyRecordings($filter: String) {
-    viewer {
-      recordings(filter: $filter) {
-        edges {
-          node {
-            buildId
-            uuid
-            url
-            title
-            duration
-            createdAt
-            private
-            isInitialized
-            userRole
-            owner {
-              id
-              name
-              picture
-            }
-            comments {
-              user {
-                id
-              }
-            }
-            collaborators {
-              edges {
-                node {
-                  ... on RecordingUserCollaborator {
-                    id
-                    user {
-                      id
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-`;
 
 export function useGetRawRecordingIdWithSlug() {
   return useRouter().query.id;
@@ -524,71 +419,6 @@ export function useIsOwner() {
   return userId === recording.owner.id;
 }
 
-export function useGetPersonalRecordings(
-  filter: string
-):
-  | { error: null; recordings: null; loading: true }
-  | { error: ApolloError; recordings: null; loading: false }
-  | { error: null; recordings: Recording[]; loading: false } {
-  const { data, error, loading } = useQuery<GetMyRecordings, GetMyRecordingsVariables>(
-    GET_MY_RECORDINGS,
-    {
-      pollInterval: 5000,
-      variables: { filter },
-    }
-  );
-
-  const recordings: Recording[] = useMemo(() => {
-    if (loading || error) {
-      return EMPTY_ARRAY;
-    }
-
-    if (data?.viewer) {
-      return data.viewer.recordings.edges.map(({ node }) => convertRecording(node)!);
-    }
-
-    return EMPTY_ARRAY;
-  }, [data, error, loading]);
-
-  if (loading) {
-    return { error: null, recordings: null, loading };
-  } else if (error) {
-    console.error("Failed to fetch recordings:", error);
-    return { error, recordings: null, loading };
-  } else {
-    return { error: null, recordings, loading };
-  }
-}
-
-export function useGetWorkspaceRecordings(
-  currentWorkspaceId: WorkspaceId,
-  filter: string
-): { recordings: null; loading: true } | { recordings: Recording[]; loading: false } {
-  const { data, error, loading } = useQuery<
-    GetWorkspaceRecordings,
-    GetWorkspaceRecordingsVariables
-  >(GET_WORKSPACE_RECORDINGS, {
-    variables: { workspaceId: currentWorkspaceId, filter },
-    pollInterval: 5000,
-  });
-
-  if (loading) {
-    return { recordings: null, loading };
-  }
-
-  if (error) {
-    console.error("Failed to fetch recordings:", error);
-  }
-
-  let recordings: Recording[] = [];
-
-  if (data?.node && "recordings" in data.node && data.node.recordings) {
-    recordings = data.node.recordings.edges.map(({ node }) => convertRecording(node)!);
-  }
-
-  return { recordings, loading };
-}
-
 export function useUpdateRecordingWorkspace() {
   const [updateRecordingWorkspace] = useMutation<
     UpdateRecordingWorkspace,
@@ -634,19 +464,6 @@ export function useDeleteRecording(onCompleted: () => void) {
   );
 
   return deleteRecording;
-}
-
-export function useDeleteRecordingFromLibrary() {
-  const [deleteRecording] = useMutation<DeleteRecording, DeleteRecordingVariables>(
-    DELETE_RECORDING
-  );
-
-  return (recordingId: RecordingId, workspaceId: WorkspaceId | null) => {
-    deleteRecording({
-      variables: { recordingId },
-      refetchQueries: ["GetMyRecordings", "GetWorkspaceRecordings"],
-    });
-  };
 }
 
 export function useInitializeRecording() {
@@ -775,22 +592,4 @@ export function useAcceptRecordingRequest() {
   );
 
   return (requestId: string) => acceptRecordingRequest({ variables: { requestId } });
-}
-
-export function useUpdateRecordingResolution(recordingId: RecordingId) {
-  const [updateRecordingResolution] = useMutation<
-    UpdateRecordingResolution,
-    UpdateRecordingResolutionVariables
-  >(
-    gql`
-      mutation UpdateRecordingResolution($id: ID!, $isResolved: Boolean!) {
-        updateRecordingResolution(input: { id: $id, isResolved: $isResolved }) {
-          success
-        }
-      }
-    `
-  );
-
-  return (isResolved: boolean) =>
-    updateRecordingResolution({ variables: { id: recordingId, isResolved } });
 }
