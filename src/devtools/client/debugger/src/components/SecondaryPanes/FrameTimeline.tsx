@@ -28,7 +28,12 @@ import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
 
 import { PartialLocation } from "../../actions/sources/select";
-import { PauseFrame, getExecutionPoint } from "../../reducers/pause";
+import {
+  PauseAndFrameId,
+  PauseFrame,
+  getExecutionPoint,
+  getSelectedFrameId,
+} from "../../reducers/pause";
 import { getSelectedFrameSuspense } from "../../selectors/pause";
 
 function getBoundingClientRect(element?: HTMLElement) {
@@ -227,12 +232,14 @@ class FrameTimelineRenderer extends Component<FrameTimelineProps, FrameTimelineS
   }
 }
 
-function FrameTimeline() {
+function FrameTimeline({ selectedFrameId }: { selectedFrameId: PauseAndFrameId | null }) {
   const replayClient = useContext(ReplayClientContext);
   const sourcesState = useAppSelector(state => state.sources);
   const executionPoint = useAppSelector(getExecutionPoint);
   const selectedLocation = useAppSelector(getSelectedLocation);
-  const selectedFrame = useAppSelector(state => getSelectedFrameSuspense(replayClient, state));
+  const selectedFrame = useAppSelector(state =>
+    getSelectedFrameSuspense(replayClient, state, selectedFrameId)
+  );
   const sourceId = useAppSelector(getSelectedSourceId);
   const source = sourceId ? getSourceSuspends(replayClient, sourceId) : null;
   const symbols = source ? sourceOutlineCache.read(replayClient, source.id) : null;
@@ -261,8 +268,10 @@ function FrameTimeline() {
 }
 
 export default function FrameTimelineSuspenseWrapper() {
+  const selectedFrameId = useAppSelector(getSelectedFrameId);
   return (
     <Suspense
+      key={selectedFrameId ? `${selectedFrameId.pauseId}:${selectedFrameId.frameId}` : null}
       fallback={
         <div
           data-tip="Frame Progress"
@@ -273,7 +282,7 @@ export default function FrameTimelineSuspenseWrapper() {
         </div>
       }
     >
-      <FrameTimeline />
+      <FrameTimeline selectedFrameId={selectedFrameId} />
     </Suspense>
   );
 }
