@@ -271,7 +271,6 @@ export default function FrameTimelineSuspenseWrapper() {
   const selectedFrameId = useAppSelector(getSelectedFrameId);
   return (
     <Suspense
-      key={selectedFrameId ? `${selectedFrameId.pauseId}:${selectedFrameId.frameId}` : null}
       fallback={
         <div
           data-tip="Frame Progress"
