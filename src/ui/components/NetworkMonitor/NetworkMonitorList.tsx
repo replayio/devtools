@@ -64,7 +64,7 @@ export function NetworkMonitorList({
         }
       }
     }
-  }, [firstRequestIdAfterCurrentTime, listRef, selectedRequestId]);
+  }, [firstRequestIdAfterCurrentTime, listRef, requests, selectedRequestId]);
 
   useEffect(() => {
     if (selectedRequestId !== null) {
@@ -109,7 +109,7 @@ export function NetworkMonitorList({
         };
       }
     }
-  }, [requests, selectRequest, selectedRequestId]);
+  }, [listRef, requests, selectRequest, selectedRequestId]);
 
   const itemData: ItemData = {
     columns: enabledColumns,
