@@ -9,7 +9,10 @@ import { sourcesByIdCache } from "./SourcesCache";
 
 function getKey([client, pauseId, frameId]: [ReplayClientInterface, PauseId, FrameId]) {
   const focusWindow = client.getCurrentFocusWindow();
-  return `${pauseId}:${frameId}` + (focusWindow ? `:${focusWindow.begin}-${focusWindow.end}` : "");
+  return (
+    `${pauseId}:${frameId}` +
+    (focusWindow ? `:${focusWindow.begin.point}-${focusWindow.end.point}` : "")
+  );
 }
 
 export const frameStepsCache: Cache<
