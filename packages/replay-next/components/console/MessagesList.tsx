@@ -12,7 +12,6 @@ import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBo
 import Icon from "replay-next/components/Icon";
 import Loader from "replay-next/components/Loader";
 import { ConsoleFiltersContext } from "replay-next/src/contexts/ConsoleFiltersContext";
-import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { useMostRecentLoadedPause } from "replay-next/src/hooks/useMostRecentLoadedPause";
 import { useStreamingMessages } from "replay-next/src/hooks/useStreamingMessages";
 import {
@@ -65,7 +64,6 @@ function MessagesListSuspends({ forwardedRef }: { forwardedRef: ForwardedRef<HTM
     showTimestamps,
     showWarnings,
   } = useContext(ConsoleFiltersContext);
-  const { isTransitionPending: isFocusTransitionPending } = useContext(FocusContext);
   const { loggables, streamingStatus } = useContext(LoggablesContext);
   const [searchState] = useContext(ConsoleSearchContext);
   const { point: currentExecutionPoint } = useMostRecentLoadedPause() ?? {};
@@ -92,12 +90,6 @@ function MessagesListSuspends({ forwardedRef }: { forwardedRef: ForwardedRef<HTM
   const {
     messageMetadata: { countAfter, countBefore, didOverflow },
   } = useStreamingMessages();
-
-  // This component only needs to render a pending UI when a focus changes,
-  // because this might require an async backend request.
-  // Filter text changes are always processed synchronously,
-  // so dimming the UI would just cause a short flicker which we can avoid.
-  const isTransitionPending = isFocusTransitionPending;
 
   const currentSearchResult =
     searchState.query !== "" && searchState.results.length > 0

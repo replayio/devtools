@@ -1,5 +1,5 @@
 import { request } from "http";
-import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList as List } from "react-window";
 
@@ -51,14 +51,25 @@ export function NetworkMonitorList({
     return null;
   }, [currentTime, requests]);
 
-  const listRef = useRef<List>(null);
+  const [listRef, setListRef] = useState<List | null>(null);
   const listWrapperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Don't auto-scroll the list if the user has selected a request; this would be jarring
+    if (firstRequestIdAfterCurrentTime !== null && selectedRequestId === null) {
+      if (listRef !== null) {
+        const index = requests.findIndex(request => request.id === firstRequestIdAfterCurrentTime);
+        if (index >= 0) {
+          listRef.scrollToItem(index, "smart");
+        }
+      }
+    }
+  }, [firstRequestIdAfterCurrentTime, listRef, selectedRequestId]);
+
+  useEffect(() => {
     if (selectedRequestId !== null) {
-      const list = listRef.current;
       const listWrapper = listWrapperRef.current;
-      if (list !== null && listWrapper !== null) {
+      if (listRef !== null && listWrapper !== null) {
         const onKeyDown = (event: KeyboardEvent) => {
           switch (event.key) {
             case "ArrowDown":
@@ -76,7 +87,7 @@ export function NetworkMonitorList({
                 const request = requests[newIndex];
                 selectRequest(request);
 
-                list.scrollToItem(newIndex, "smart");
+                listRef.scrollToItem(newIndex, "smart");
 
                 // Move focus to the newly selected item
                 const listItem = listWrapper.querySelector(
@@ -129,7 +140,7 @@ export function NetworkMonitorList({
               itemCount={itemCount}
               itemData={itemData}
               itemSize={LIST_ROW_HEIGHT}
-              ref={listRef}
+              ref={setListRef}
               width="100%"
             >
               {NetworkMonitorListRow}
