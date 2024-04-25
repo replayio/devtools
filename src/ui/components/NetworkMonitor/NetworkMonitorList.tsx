@@ -29,7 +29,7 @@ export function NetworkMonitorList({
   requests: RequestSummary[];
   seekToRequest: (request: RequestSummary) => void;
   selectedRequestId: string | null;
-  selectRequest: (request: RequestSummary) => void;
+  selectRequest: (request: RequestSummary | null) => void;
 }) {
   const [enabledColumns] = useNetworkMonitorColumns();
 

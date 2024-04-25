@@ -162,7 +162,7 @@ export default function NetworkMonitor() {
                 dismissInspectNetworkRequestNag();
 
                 trackEvent("net_monitor.select_request_row");
-                dispatch(selectNetworkRequest(request.id));
+                dispatch(selectNetworkRequest(request ? request.id : null));
               }}
             />
           </Panel>
