@@ -7,10 +7,6 @@ describe("Time util", () => {
     return { time, point: `${time * 1000}` };
   }
 
-  function toTSPR(beginTime: number, endTime: number): TimeStampedPointRange {
-    return { begin: toTSP(beginTime), end: toTSP(endTime) };
-  }
-
   describe("formatDuration", () => {
     it("should format values", () => {
       expect(formatDuration(0)).toEqual("0ms");
