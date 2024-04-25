@@ -8,8 +8,7 @@ import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 import { showAlternateSource } from "../../actions/sources/select";
 import { getSelectedFrameId } from "../../reducers/pause";
-import { getAlternateSourceIdSuspense } from "../../utils/sourceVisualizations";
-import { CursorPosition } from "./Footer";
+import { CursorPosition, getAlternateSourceIdSuspense } from "../../utils/sourceVisualizations";
 import Toggle from "./Toggle";
 
 function SourcemapError({ why }: { why: "no-sourcemap" | "not-unique" | undefined }) {

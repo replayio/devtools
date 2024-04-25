@@ -21,10 +21,10 @@ test.use({ exampleKey: "doc_rr_preview.html" });
 // frame timeline percentages are different in the test below.
 
 test(`object_preview-03: Test previews when switching between frames and stepping`, async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
 
   const target = await getRecordingTarget(page);

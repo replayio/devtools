@@ -125,6 +125,7 @@ jobs:
       - uses: replayio/action-upload@v0.5.1
         if: always()
         with:
+          cli-version: 0.21.4
           api-key: ${{ env.RECORD_REPLAY_API_KEY }}
           public: true
   authenticated-e2etest:
@@ -187,6 +188,7 @@ jobs:
       - uses: replayio/action-upload@v0.5.1
         if: always()
         with:
+          cli-version: 0.21.4
           api-key: ${{ env.RECORD_REPLAY_API_KEY }}
           public: true
   unit-test:

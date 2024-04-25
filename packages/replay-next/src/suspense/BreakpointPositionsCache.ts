@@ -2,38 +2,68 @@ import {
   SameLineSourceLocations as ProtocolSameLineSourceLocations,
   SourceId as ProtocolSourceId,
 } from "@replayio/protocol";
-import { Cache, createCache } from "suspense";
+import { Cache, IntervalCache, createCache, createIntervalCache } from "suspense";
 
 import { ReplayClientInterface } from "shared/client/types";
 
-export type BreakpointPositionsResult = [
-  breakablePositions: ProtocolSameLineSourceLocations[],
-  breakablePositionsByLine: Map<number, ProtocolSameLineSourceLocations>
-];
+import { bucketBreakpointLines } from "../utils/source";
 
-export const breakpointPositionsCache: Cache<
+export type BreakpointPositionsByLine = Map<number, ProtocolSameLineSourceLocations>;
+
+export const breakpointPositionsIntervalCache: IntervalCache<
+  number,
   [replayClient: ReplayClientInterface, sourceId: ProtocolSourceId],
-  BreakpointPositionsResult
+  ProtocolSameLineSourceLocations
+> = createIntervalCache({
+  debugLabel: "BreakpointPositions2",
+  getKey: (client, sourceId) => sourceId,
+  getPointForValue: location => location.line,
+  load: async (begin, end, client, sourceId) => {
+    const breakablePositions = await client.getBreakpointPositions(sourceId, {
+      start: {
+        line: begin,
+        column: 0,
+      },
+      end: {
+        line: end,
+        column: Number.MAX_SAFE_INTEGER,
+      },
+    });
+
+    return breakablePositions;
+  },
+});
+
+export const breakpointPositionsByLineCache: Cache<
+  [
+    replayClient: ReplayClientInterface,
+    sourceId: ProtocolSourceId,
+    startLine: number,
+    endLine: number
+  ],
+  Map<number, ProtocolSameLineSourceLocations>
 > = createCache({
   config: { immutable: true },
-  debugLabel: "BreakpointPositions",
-  getKey: ([client, sourceId]) => sourceId,
-  load: async ([client, sourceId]) => {
-    const breakablePositions = await client.getBreakpointPositions(sourceId, null);
+  debugLabel: "BreakpointPositionsByLine",
+  getKey: ([client, sourceId, begin, end]) => {
+    const [startLine, endLine] = bucketBreakpointLines(begin, end);
+    return `${sourceId}:${startLine}-${endLine}`;
+  },
+  load: async ([client, sourceId, begin, end]) => {
+    const [startLine, endLine] = bucketBreakpointLines(begin, end);
+    const breakablePositions = await breakpointPositionsIntervalCache.readAsync(
+      startLine,
+      endLine,
+      client,
+      sourceId
+    );
 
     const breakablePositionsByLine = new Map<number, ProtocolSameLineSourceLocations>();
-    // The positions are already sorted by line number in `ReplayClient.getBreakpointPositions`
-    for (let position of breakablePositions) {
-      // TODO BAC-2329
-      // The backend sometimes returns duplicate columns per line;
-      // In order to prevent the frontend from showing something weird, let's dedupe them here.
-      const uniqueSortedColumns = Array.from(new Set(position.columns));
-      uniqueSortedColumns.sort((a, b) => a - b);
-      position.columns = uniqueSortedColumns;
-
+    for (const position of breakablePositions) {
       // Maps iterate items in insertion order - this is useful later
       breakablePositionsByLine.set(position.line, position);
     }
-    return [breakablePositions, breakablePositionsByLine];
+
+    return breakablePositionsByLine;
   },
 });

@@ -10,10 +10,10 @@ import test, { expect } from "../testFixture";
 test.use({ exampleKey: "node/objects.js" });
 
 test("node_object_preview: Showing console objects in node", async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
 
   await openConsolePanel(page);
 
@@ -25,7 +25,7 @@ test("node_object_preview: Showing console objects in node", async ({
   await verifyConsoleMessage(page, "WeakMap(20) {{…} → {…}, {…} → {…},");
   await verifyConsoleMessage(page, "{a: 0, a0: 0, a1: 1, a2: 2, a3: 3,");
   await verifyConsoleMessage(page, "/abc/gi");
-  await verifyConsoleMessage(page, "Tue Feb 13 2024");
+  await verifyConsoleMessage(page, "Wed Apr 24 2024");
 
   await verifyConsoleMessage(page, "RangeError: foo");
 

@@ -11,15 +11,15 @@ import test from "../testFixture";
 test.use({ exampleKey: "doc_rr_objects.html" });
 
 test("stepping-07: Test quick stepping using the keyboard", async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
 
   // Open doc_rr_objects.html
-  await clickSourceTreeNode(page, "test");
-  await clickSourceTreeNode(page, "examples");
+  await clickSourceTreeNode(page, "recording");
+  await clickSourceTreeNode(page, "test/examples");
   await clickSourceTreeNode(page, exampleKey);
 
   await openPauseInformationPanel(page);

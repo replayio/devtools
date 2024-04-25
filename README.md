@@ -1,14 +1,14 @@
 ![](/public/images/logo.svg)
 
-## Replay
+# Replay
 
 Replay is a new debugger for recording and replaying software. Debugging with Replay should be as simple as viewing print statements and more powerful than pausing with breakpoints. Of course, debugging should be collaborative as well!
 
-### Issues
+## Issues
 
 Feel free to file any issues you see while recording or replaying.
 
-### Setup instructions:
+## Getting started
 
 Replay's DevTools is a React app built on top of the Replay [protocol](https://www.notion.so/replayio/Protocol-d8e7b5f428594589ab60c42afad782c1). Make sure to install [nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
 
@@ -17,18 +17,35 @@ Replay's DevTools is a React app built on top of the Replay [protocol](https://w
 
 Getting started is as simple as:
 
-```
-git clone git@github.com:RecordReplay/devtools.git
-cd devtools
+```sh
+# Setup environment variables
+cp .env.sample .env
+
+# Install dependencies
 nvm use
 yarn install
-cp .env.sample .env
+
+# Run dev server (localhost:8080 by default)
 yarn dev
 ```
 
-Once you see `Compiled succesfully` in your terminal, open your browser and go to [this link](http://localhost:8080/recording/overboard--a616009e-b825-4c54-83b4-e20bd8c0cb25).
+Once you see `Compiled successfully` in your terminal, open your browser and go to [this link](http://localhost:8081/recording/overboard--a616009e-b825-4c54-83b4-e20bd8c0cb25).
 
 **You just successfully opened your first Replay recording!** That recording uses your locally running copy of Replay DevTools to debug our test recording.
+
+### Local development
+
+To run both the DevTools and [Dashboard](https://github.com/replayio/dashboard) projects locally:
+
+```sh
+# DevTools root (this project)
+DASHBOARD_URL=http://localhost:8080 npm exec next dev -- -p 8081
+
+# Dashboard root
+DEVTOOLS_URL=http://localhost:8081 pnpm dev -- -p 8080
+```
+
+At this point the Dashboard will be accessible at [localhost:8080](http://localhost:8080/) but it will not load recordings. To be able to test the end-to-end interaction of both apps, use [localhost:8081](http://localhost:8081/). It will serve both Dashboard and DevTools routes.
 
 ### Next steps
 

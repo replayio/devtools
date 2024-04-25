@@ -1,14 +1,13 @@
 import React, { ReactNode } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
-import { OperationsData } from "shared/graphql/types";
 import { getDisplayedUrl } from "shared/utils/environment";
 import { getRecordingId, showDurationWarning } from "shared/utils/recording";
 import * as actions from "ui/actions/app";
-import { getTruncatedRelativeDate } from "ui/components/Library/Team/View/Recordings/RecordingListItem/RecordingListItem";
 import hooks from "ui/hooks";
 import { getRecordingTarget } from "ui/reducers/app";
 import { useAppSelector } from "ui/setup/hooks";
+import { getRelativeDate } from "ui/utils/time";
 import useAuth0 from "ui/utils/useAuth0";
 
 import { AvatarImage } from "../Avatar";
@@ -18,7 +17,6 @@ import { getPrivacySummaryAndIcon } from "../shared/SharingModal/PrivacyDropdown
 import PrivacyDropdown from "../shared/SharingModal/PrivacyDropdown";
 import LabeledIcon from "../TestSuite/components/LabeledIcon";
 import { isTestSuiteReplay } from "../TestSuite/utils/isTestSuiteReplay";
-import { getUniqueDomains } from "../UploadScreen/Privacy";
 import styles from "./ReplayInfo.module.css";
 
 const Row = ({ children, onClick }: { children: ReactNode; onClick?: () => void }) => {
@@ -45,14 +43,10 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
     return null;
   }
 
-  const time = getTruncatedRelativeDate(recording.date);
+  const time = getRelativeDate(recording.date);
   const date = new Date(recording.date);
   const fullDateString = date.toLocaleString();
-  const { summary, icon } = getPrivacySummaryAndIcon(recording);
-
-  const showOperations = () => {
-    setModal("privacy");
-  };
+  const { icon } = getPrivacySummaryAndIcon(recording);
 
   const isTest = isTestSuiteReplay(recording);
   return (
@@ -85,7 +79,7 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
           {isAuthenticated ? (
             <Row>
               <Icon filename={`${icon}-circle`} className="cursor-pointer bg-iconColor" />
-              <div>
+              <div className="flex w-full flex-col overflow-hidden">
                 <PrivacyDropdown {...{ recording }} />
               </div>
             </Row>
@@ -135,9 +129,6 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
             </>
           )}
         </div>
-        {recording.operations ? (
-          <OperationsRow operations={recording.operations} onClick={showOperations} />
-        ) : null}
         {showEnvironmentVariables ? <EnvironmentVariablesRow /> : null}
 
         {showDurationWarning(recording) ? <DurationWarningRow /> : null}
@@ -163,38 +154,6 @@ function DurationWarningRow() {
       <Row>
         <Icon filename="warning" className="bg-iconColor" />
         <div>This replay is over two minutes, which can cause delays</div>
-      </Row>
-    </div>
-  );
-}
-
-function OperationsRow({
-  operations,
-  onClick,
-}: {
-  operations: OperationsData;
-  onClick: () => void;
-}) {
-  const uniqueDomains = getUniqueDomains(operations);
-
-  if (uniqueDomains.length == 0) {
-    return null;
-  }
-
-  return (
-    <div>
-      <Row>
-        <Icon filename="shield-check-circle" className="bg-[#F39A32]" />
-        <div className="flex">
-          {`Potentially sensitive data`}{" "}
-          <span className="ml-1 flex align-top" onClick={onClick}>
-            <Icon
-              filename="learnmore-questionmark"
-              className="bg-bodyColor hover:cursor-pointer"
-              size="small"
-            />
-          </span>
-        </div>
       </Row>
     </div>
   );

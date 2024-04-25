@@ -37,10 +37,8 @@ export default function useTooltip({
 } {
   const tooltipRef = useRef<HTMLDivElement>(null);
 
-  const [mouseCoordinates, setMouseCoordinates] = useState<Pick<
-    MouseEvent,
-    "clientX" | "clientY"
-  > | null>(null);
+  const [clientX, setClientX] = useState<number | null>(null);
+  const [clientY, setClientY] = useState<number | null>(null);
 
   const [mouseTarget, setMouseTarget] = useState<HTMLElement | null>(null);
 
@@ -51,7 +49,7 @@ export default function useTooltip({
   }, delay);
 
   useLayoutEffect(() => {
-    if (mouseCoordinates === null || mouseTarget === null || showTooltip === false) {
+    if (clientX === null || clientY === null || mouseTarget === null || showTooltip === false) {
       return;
     }
 
@@ -96,8 +94,8 @@ export default function useTooltip({
             break;
         }
       } else {
-        styleLeft = mouseCoordinates.clientX + MARGIN_LARGE;
-        styleTop = mouseCoordinates.clientY + MARGIN_LARGE;
+        styleLeft = clientX + MARGIN_LARGE;
+        styleTop = clientY + MARGIN_LARGE;
 
         // For the target we intentionally use the bounding rect (rather than clientWidth/clientHeight)
         // because this takes scale into consideration, which is important for targets like HTMLCanvasElements.
@@ -117,7 +115,8 @@ export default function useTooltip({
     };
 
     const onScroll = () => {
-      setMouseCoordinates(null);
+      setClientX(null);
+      setClientY(null);
       setMouseTarget(null);
       setShowTooltip(false);
     };
@@ -149,7 +148,7 @@ export default function useTooltip({
       observer.unobserve(mouseTarget);
       observer.disconnect();
     };
-  }, [containerRef, mouseCoordinates, mouseTarget, position, showTooltip]);
+  }, [clientX, clientY, containerRef, mouseTarget, position, showTooltip]);
 
   let renderedTooltip: ReactNode = null;
   if (showTooltip) {
@@ -161,10 +160,8 @@ export default function useTooltip({
   }
 
   const onMouseEnter = (event: MouseEvent) => {
-    setMouseCoordinates({
-      clientX: event.clientX,
-      clientY: event.clientY,
-    });
+    setClientX(event.clientX);
+    setClientX(event.clientY);
     setMouseTarget(event.currentTarget as HTMLElement);
 
     if (delay === 0) {
@@ -175,7 +172,8 @@ export default function useTooltip({
   };
 
   const onMouseLeave = (event: MouseEvent) => {
-    setMouseCoordinates(null);
+    setClientX(null);
+    setClientX(null);
     setMouseTarget(null);
     setShowTooltip(false);
     setShowTooltipDebounced.cancel();
@@ -186,10 +184,8 @@ export default function useTooltip({
       return;
     }
 
-    setMouseCoordinates({
-      clientX: event.clientX,
-      clientY: event.clientY,
-    });
+    setClientX(event.clientX);
+    setClientX(event.clientY);
   };
 
   return { onMouseEnter, onMouseLeave, onMouseMove, tooltip: renderedTooltip };

@@ -17,19 +17,19 @@ export default function PlayPauseButton() {
   let onClick;
   let icon;
   if (isAtEnd) {
-    icon = "/images/playback-refresh.svg";
+    icon = "/recording/images/playback-refresh.svg";
     onClick = () => {
       trackEvent("timeline.replay");
       dispatch(replayFromBeginning());
     };
   } else if (playback) {
-    icon = "/images/playback-pause.svg";
+    icon = "/recording/images/playback-pause.svg";
     onClick = () => {
       trackEvent("timeline.pause");
       dispatch(stopPlayback());
     };
   } else {
-    icon = "/images/playback-play.svg";
+    icon = "/recording/images/playback-play.svg";
     onClick = () => {
       trackEvent("timeline.play");
       dispatch(startPlayback());

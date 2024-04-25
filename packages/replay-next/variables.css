@@ -409,8 +409,8 @@
   --theme-arrowpanel-separator: rgba(249, 249, 250, 0.1);
 
   /* src/devtools/client/themes/splitview.css */
-  --sidemenu-selected-arrow-rtl: url("/images/item-arrow-dark-rtl.svg");
-  --sidemenu-selected-arrow: url("/images/item-arrow-dark-ltr.svg");
+  --sidemenu-selected-arrow-rtl: url("/recording/images/item-arrow-dark-rtl.svg");
+  --sidemenu-selected-arrow: url("/recording/images/item-arrow-dark-ltr.svg");
 
   /* src/devtools/client/themes/boxmodel.css */
   --borderbox-color: var(--grey-70);
@@ -450,8 +450,8 @@
   --frame-link-source: var(--blue-40);
 
   /* src/devtools/client/themes/widgets.css */
-  --sidemenu-selected-arrow-rtl: url("/images/item-arrow-dark-rtl.svg");
-  --sidemenu-selected-arrow: url("/images/item-arrow-dark-ltr.svg");
+  --sidemenu-selected-arrow-rtl: url("/recording/images/item-arrow-dark-rtl.svg");
+  --sidemenu-selected-arrow: url("/recording/images/item-arrow-dark-ltr.svg");
   --table-splitter-color: rgba(255, 255, 255, 0.15);
   --table-zebra-background: rgba(255, 255, 255, 0.05);
 
@@ -468,7 +468,7 @@
 
   /* Timeline (Dark) */
   --progressbar-preview-min: var(--primary-accent);
-  --unloaded-region-img: url("/images/dotted-mask-dark.svg");
+  --unloaded-region-img: url("/recording/images/dotted-mask-dark.svg");
 
   /* Menus (Dark) */
   --menu-bgcolor: var(--theme-base-100);
@@ -961,8 +961,8 @@
   --theme-arrowpanel-separator: rgba(249, 249, 250, 0.1);
 
   /* src/devtools/client/themes/splitview.css */
-  --sidemenu-selected-arrow-rtl: url("/images/item-arrow-rtl.svg");
-  --sidemenu-selected-arrow: url("/images/item-arrow-ltr.svg");
+  --sidemenu-selected-arrow-rtl: url("/recording/images/item-arrow-rtl.svg");
+  --sidemenu-selected-arrow: url("/recording/images/item-arrow-ltr.svg");
 
   /* src/devtools/client/themes/boxmodel.css */
   --borderbox-color: var(--grey-50);
@@ -1002,8 +1002,8 @@
   --frame-link-source: var(--theme-highlight-purple);
 
   /* src/devtools/client/themes/widgets.css */
-  --sidemenu-selected-arrow-rtl: url("/images/item-arrow-rtl.svg");
-  --sidemenu-selected-arrow: url("/images/item-arrow-ltr.svg");
+  --sidemenu-selected-arrow-rtl: url("/recording/images/item-arrow-rtl.svg");
+  --sidemenu-selected-arrow: url("/recording/images/item-arrow-ltr.svg");
   --table-splitter-color: rgba(0, 0, 0, 0.15);
   --table-zebra-background: rgba(0, 0, 0, 0.05);
 
@@ -1020,7 +1020,7 @@
 
   /* Timeline (Light) */
   --progressbar-preview-min: var(--primary-accent);
-  --unloaded-region-img: url("/images/dotted-mask-light.svg");
+  --unloaded-region-img: url("/recording/images/dotted-mask-light.svg");
 
   /* Menus (Light) */
   --menu-bgcolor: var(--theme-toolbar-background);

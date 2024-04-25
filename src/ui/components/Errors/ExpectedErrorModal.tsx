@@ -1,15 +1,15 @@
-import { useRouter } from "next/router";
 import { ReactNode, useState } from "react";
 
 import { Button } from "replay-next/components/Button";
-import { clearExpectedError, setModal } from "ui/actions/app";
 import { setExpectedError } from "ui/actions/errors";
-import { useGetTeamIdFromRoute } from "ui/components/Library/Team/utils";
 import { Dialog, DialogActions, DialogDescription, DialogTitle } from "ui/components/shared/Dialog";
 import { DefaultViewportWrapper } from "ui/components/shared/Viewport";
 import { useRequestRecordingAccess } from "ui/hooks/recordings";
+import { getRecordingWorkspace } from "ui/reducers/app";
 import { useAppDispatch } from "ui/setup/hooks";
+import { useAppSelector } from "ui/setup/hooks";
 import { ErrorActions } from "ui/state/app";
+import { login } from "ui/utils/auth";
 
 // Full screen modal to be shown in the event of an expected error that is fatal/blocking.
 // For example, no recording id or no access to a recording.
@@ -110,28 +110,15 @@ function RequestRecordingAccessButton() {
 }
 
 function SignInButton() {
-  const router = useRouter();
-  const dispatch = useAppDispatch();
-
-  const onClick = async () => {
-    const returnToPath = window.location.pathname + window.location.search;
-    await router.push({ pathname: "/login", query: { returnTo: returnToPath } });
-    dispatch(clearExpectedError());
-  };
-
-  return <Button onClick={onClick}>Sign in to Replay</Button>;
+  return <Button onClick={() => login()}>Sign in to Replay</Button>;
 }
 
 function TeamBillingButton() {
-  const dispatch = useAppDispatch();
+  const workspace = useAppSelector(getRecordingWorkspace);
+  const currentWorkspaceId = workspace?.id ?? "me";
 
-  const currentWorkspaceId = useGetTeamIdFromRoute();
-
-  const router = useRouter();
-  const onClick = async () => {
-    await router.push(`/team/${currentWorkspaceId}/settings/billing`);
-    dispatch(clearExpectedError());
-    dispatch(setModal("workspace-settings"));
+  const onClick = () => {
+    window.location.href = `${window.location.origin}/team/${currentWorkspaceId}/settings/billing`;
   };
 
   return <Button onClick={onClick}>Update Subscription</Button>;

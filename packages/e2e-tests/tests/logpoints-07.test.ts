@@ -16,10 +16,10 @@ import test from "../testFixture";
 test.use({ exampleKey: "cra/dist/index.html" });
 
 test(`logpoints-07: should use the correct scope in auto-complete`, async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
 
   let url = "App.js";

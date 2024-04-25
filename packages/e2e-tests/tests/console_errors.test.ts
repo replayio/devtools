@@ -10,10 +10,10 @@ import test from "../testFixture";
 test.use({ exampleKey: "doc_exceptions_bundle.html" });
 
 test("console_errors: Test that errors and warnings from various sources are shown in the console", async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
   await openConsolePanel(page);
 

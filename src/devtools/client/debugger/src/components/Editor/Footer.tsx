@@ -3,18 +3,14 @@ import { Suspense, memo, useContext } from "react";
 import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBoundary";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 
+import { CursorPosition } from "../../utils/sourceVisualizations";
 import SourcemapToggleSuspends from "./SourcemapToggle";
 import SourcemapVisualizerLinkSuspends from "./SourcemapVisualizerLink";
-
-export type CursorPosition = {
-  readonly column: number;
-  readonly line: number;
-};
 
 function SourceFooter() {
   const { cursorColumnIndex, cursorLineIndex } = useContext(SourcesContext);
 
-  const cursorPosition = {
+  const cursorPosition: CursorPosition = {
     column: cursorColumnIndex || 0,
     line: cursorLineIndex || 0,
   };

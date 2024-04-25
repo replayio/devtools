@@ -8,15 +8,15 @@ import test from "../testFixture";
 test.use({ exampleKey: "doc_rr_basic.html" });
 
 test("stepping-04: Test stepping in a frame other than the top frame", async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
 
   // Open doc_rr_basic.html
-  await clickSourceTreeNode(page, "test");
-  await clickSourceTreeNode(page, "examples");
+  await clickSourceTreeNode(page, "recording");
+  await clickSourceTreeNode(page, "test/examples");
   await clickSourceTreeNode(page, exampleKey);
 
   await addLogpoint(page, { lineNumber: 24, url: exampleKey, content: "'logpoint', number" });

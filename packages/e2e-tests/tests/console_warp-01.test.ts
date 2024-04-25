@@ -15,10 +15,10 @@ import test from "../testFixture";
 test.use({ exampleKey: "doc_rr_error.html" });
 
 test(`console_warp-01: should support warping to console messages`, async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
   await openConsolePanel(page);
 

@@ -85,8 +85,6 @@ export function executeCommand(key: CommandKey): UIThunkAction {
       dispatch(setSelectedPanel("console"));
     } else if (key === "show_events" || key === "show_replay_info") {
       dispatch(setSelectedPrimaryPanel("events"));
-    } else if (key === "show_privacy") {
-      dispatch(setModal("privacy"));
     } else if (key === "show_sharing") {
       dispatch(setModal("sharing", { recordingId }));
     } else if (key === "toggle_edit_focus") {

@@ -8,10 +8,10 @@ import { expect, test } from "../testFixture";
 test.use({ exampleKey: "doc_control_flow.html" });
 
 test("repaint-06: repaints the screen screen when stepping over code that modifies the DOM", async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
 
   // TODO [FE-2363] Some of these points fail repaint, so they're disabled until RUN-3397 has been fixed

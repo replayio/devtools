@@ -24,7 +24,7 @@ import test, { expect } from "../testFixture";
 test.use({ exampleKey: "cra/dist/index.html" });
 
 test("react_devtools-01: Basic RDT behavior", async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
   const queryParams = new URLSearchParams();
@@ -32,7 +32,7 @@ test("react_devtools-01: Basic RDT behavior", async ({
   // See pref names in packages/shared/user-data/GraphQL/config.ts
   queryParams.set("features", "backend_rerunRoutines");
 
-  await startTest(page, recordingId, undefined, queryParams);
+  await startTest(page, recordingId, testScope, undefined, queryParams);
 
   await openDevToolsTab(page);
 

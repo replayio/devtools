@@ -198,14 +198,9 @@ export function useUpdateWorkspaceSettings() {
     UpdateWorkspaceSettingsVariables
   >(
     gql`
-      mutation UpdateWorkspaceSettings(
-        $workspaceId: ID!
-        $name: String
-        $motd: String
-        $features: JSONObject
-      ) {
+      mutation UpdateWorkspaceSettings($workspaceId: ID!, $name: String, $features: JSONObject) {
         updateWorkspaceSettings(
-          input: { workspaceId: $workspaceId, name: $name, motd: $motd, features: $features }
+          input: { workspaceId: $workspaceId, name: $name, features: $features }
         ) {
           success
         }
@@ -248,7 +243,6 @@ export function useGetNonPendingWorkspaces(): { workspaces: Workspace[]; loading
                   }
                 }
                 settings {
-                  motd
                   features
                 }
                 members {

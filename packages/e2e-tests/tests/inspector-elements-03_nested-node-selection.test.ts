@@ -45,10 +45,10 @@ const bodyChildDomNodes = [
 ];
 
 test("inspector-elements-03: Nested node picker and selection behavior", async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
 
   await warpToMessage(page, "ExampleFinished");

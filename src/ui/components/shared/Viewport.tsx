@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import React, { CSSProperties, ReactNode } from "react";
 
-import ModalBackground from "./Onboarding/ModalBackground";
+import ModalBackground from "./ModalBackground";
 
 function FullViewportWrapper({
   children,

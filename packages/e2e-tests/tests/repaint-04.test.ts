@@ -11,9 +11,9 @@ async function warpToMessageAndWaitForPaint(page: Page, message: string) {
 }
 
 test("repaint-04: prefers nearest (<=) paint when seeking between paints", async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
 
   let currentColor: string | null = null;

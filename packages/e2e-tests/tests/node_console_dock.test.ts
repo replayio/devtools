@@ -9,10 +9,10 @@ import test from "../testFixture";
 test.use({ exampleKey: "node/basic.js" });
 
 test("node_console_dock: Should show the correct docking behavior for recordings without video", async ({
-  pageWithMeta: { page, recordingId },
+  pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
-  await startTest(page, recordingId);
+  await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
 
   // Verify default docking position

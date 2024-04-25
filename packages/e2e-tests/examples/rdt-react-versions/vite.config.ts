@@ -18,7 +18,7 @@ export default defineConfig(({ command }) => {
           react17: "../react17/assets/react17.js",
         };
 
-  const base = command === "serve" ? "" : "/test/examples/rdt-react-versions/dist/";
+  const base = command === "serve" ? "" : "/recording/test/examples/rdt-react-versions/dist/";
 
   return {
     base,

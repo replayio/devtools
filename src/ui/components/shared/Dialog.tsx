@@ -75,7 +75,7 @@ export const DialogIllustration = ({
   ...props
 }: HTMLProps<HTMLHeadingElement>) => {
   const randomNum = Math.floor(Math.random() * 5) + 1;
-  const imagePath = `/images/illustrations/ready${randomNum}.png`;
+  const imagePath = `/recording/images/illustrations/ready${randomNum}.png`;
 
   return (
     <div>

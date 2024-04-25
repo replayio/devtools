@@ -62,7 +62,7 @@ class TokenManager {
       }
     }
 
-    if (typeof window !== "undefined") {
+    if (typeof window !== "undefined" && window.__IS_RECORD_REPLAY_RUNTIME__) {
       listenForAccessToken(token => {
         this.setExternalAuth(token);
       });

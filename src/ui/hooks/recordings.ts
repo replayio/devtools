@@ -589,7 +589,7 @@ export function useGetWorkspaceRecordings(
   return { recordings, loading };
 }
 
-export function useUpdateRecordingWorkspace(isOptimistic: boolean = true) {
+export function useUpdateRecordingWorkspace() {
   const [updateRecordingWorkspace] = useMutation<
     UpdateRecordingWorkspace,
     UpdateRecordingWorkspaceVariables
@@ -609,12 +609,8 @@ export function useUpdateRecordingWorkspace(isOptimistic: boolean = true) {
     `
   );
 
-  return (
-    recordingId: RecordingId,
-    currentWorkspaceId: WorkspaceId | null,
-    targetWorkspaceId: WorkspaceId | null
-  ) => {
-    updateRecordingWorkspace({
+  return async (recordingId: RecordingId, targetWorkspaceId: WorkspaceId | null) => {
+    await updateRecordingWorkspace({
       variables: { recordingId, workspaceId: targetWorkspaceId },
       refetchQueries: ["GetMyRecordings", "GetWorkspaceRecordings"],
     });

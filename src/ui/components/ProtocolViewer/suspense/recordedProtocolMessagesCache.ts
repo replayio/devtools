@@ -5,7 +5,6 @@ import {
   TimeStampedPoint,
 } from "@replayio/protocol";
 
-import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPositionsCache";
 import { recordingTargetCache } from "replay-next/src/suspense/BuildIdCache";
 import { createFocusIntervalCacheForExecutionPoints } from "replay-next/src/suspense/FocusIntervalCache";
 import { hitPointsForLocationCache } from "replay-next/src/suspense/HitPointsCache";
@@ -34,10 +33,6 @@ export const recordedProtocolMessagesCache = createFocusIntervalCacheForExecutio
   debugLabel: "RecordedProtocolMessages",
   getPointForValue: data => data.point.point,
   async load(rangeStart, rangeEnd, replayClient, sessionSource, sourcesState) {
-    const [breakablePositionsSorted] = await breakpointPositionsCache.readAsync(
-      replayClient,
-      sessionSource.id
-    );
     const symbols = await sourceOutlineCache.readAsync(replayClient, sessionSource.id);
     const recordingTarget = await recordingTargetCache.readAsync(replayClient);
 
@@ -62,12 +57,7 @@ export const recordedProtocolMessagesCache = createFocusIntervalCacheForExecutio
           return [];
         }
 
-        const { begin, end } = functionEntry.location;
-
-        // There should be a breakable position starting on the next line
-        const firstBreakablePosition = breakablePositionsSorted.find(
-          bp => bp.line > begin.line && bp.line < end.line
-        );
+        const firstBreakablePosition = functionEntry.breakpointLocation;
 
         if (!firstBreakablePosition) {
           return [];
@@ -76,7 +66,7 @@ export const recordedProtocolMessagesCache = createFocusIntervalCacheForExecutio
         const position: Location = {
           sourceId: sessionSource.id,
           line: firstBreakablePosition.line,
-          column: firstBreakablePosition.columns[0],
+          column: firstBreakablePosition.column,
         };
 
         // Get all the times that first line was hit

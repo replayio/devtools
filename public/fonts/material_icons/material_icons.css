@@ -3,8 +3,8 @@
   font-style: normal;
   font-weight: 400;
   font-display: block;
-  src: url(/fonts/material_icons/MaterialIcons-Regular.woff2) format("woff2"),
-    url(/fonts/material_icons/MaterialIcons-Regular.ttf) format("truetype");
+  src: url(/recording/fonts/material_icons/MaterialIcons-Regular.woff2) format("woff2"),
+    url(/recording/fonts/material_icons/MaterialIcons-Regular.ttf) format("truetype");
 }
 
 @font-face {
@@ -12,8 +12,8 @@
   font-style: normal;
   font-weight: 400;
   font-display: block;
-  src: url(/fonts/material_icons/MaterialIconsOutlined-Regular.woff2) format("woff2"),
-    url(/fonts/material_icons/MaterialIconsOutlined-Regular.otf) format("opentype");
+  src: url(/recording/fonts/material_icons/MaterialIconsOutlined-Regular.woff2) format("woff2"),
+    url(/recording/fonts/material_icons/MaterialIconsOutlined-Regular.otf) format("opentype");
 }
 
 .material-icons,

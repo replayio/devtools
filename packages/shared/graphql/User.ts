@@ -11,7 +11,6 @@ query GetUser {
         id
         __typename
       }
-      motd
       features {
         library
         __typename
@@ -45,7 +44,6 @@ export async function getCurrentUserInfo(accessToken: string | null): Promise<Us
   return {
     name: viewer.user.name,
     picture: viewer.user.picture,
-    motd: viewer.motd,
     acceptedTOSVersion: viewer.acceptedTOSVersion,
     email: viewer.email,
     id: viewer.user.id,

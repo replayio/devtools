@@ -15,19 +15,13 @@ export type ModalOptionsType = {
 export type ModalType =
   | "attachment"
   | "browser-launch"
-  | "first-replay"
   | "login"
   | "loom"
-  | "new-workspace"
-  | "onboarding"
   | "passport-dismiss"
-  | "privacy"
   | "rename-replay"
   | "settings"
   | "sharing"
-  | "single-invite"
-  | "sourcemap-setup"
-  | "workspace-settings";
+  | "sourcemap-setup";
 export type WorkspaceId = string;
 export type WorkspaceUuid = string;
 export type SettingsTabTitle =
