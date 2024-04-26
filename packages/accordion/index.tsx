@@ -53,12 +53,13 @@ function ResizeHandle({
   return (
     <div
       className={classNames(
-        "absolute w-full border-chrome hover:border-blue-400",
+        "absolute w-full hover:border-blue-400",
         isResizing ? "border-blue-400" : ""
       )}
       style={{
         cursor: "ns-resize",
         borderBottomWidth: `${HANDLE_HEIGHT}px`,
+        borderColor: "var(--chrome)",
         top: `${BORDER_HEIGHT - HANDLE_HEIGHT}px`,
       }}
       onMouseDown={onResizeStart}
