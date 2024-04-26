@@ -22,7 +22,6 @@
   },
   "dependencies": {
     "@apollo/client": "^3.5.10",
-    "@auth0/auth0-react": "1.2.0",
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "@headlessui/react": "^1.4.3",
     "@heroicons/react": "^1.0.6",
@@ -223,7 +222,6 @@
     "@babel/traverse": "7.18.5",
     "@babel/types": "7.18.4",
     "graphql": "15.8.0",
-    "@auth0/auth0-react": "1.2.0",
     "react-is": "18.2.0",
     "ts-invariant": "0.10.3",
     "typescript": "5.4.2",

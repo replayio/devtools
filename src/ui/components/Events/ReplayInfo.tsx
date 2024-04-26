@@ -5,10 +5,9 @@ import { getDisplayedUrl } from "shared/utils/environment";
 import { getRecordingId, showDurationWarning } from "shared/utils/recording";
 import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
-import { getRecordingTarget } from "ui/reducers/app";
+import { getAccessToken, getRecordingTarget } from "ui/reducers/app";
 import { useAppSelector } from "ui/setup/hooks";
 import { getRelativeDate } from "ui/utils/time";
-import useAuth0 from "ui/utils/useAuth0";
 
 import { AvatarImage } from "../Avatar";
 import Icon from "../shared/Icon";
@@ -35,7 +34,7 @@ const Row = ({ children, onClick }: { children: ReactNode; onClick?: () => void 
 
 function ReplayInfo({ setModal }: PropsFromRedux) {
   const { recording } = hooks.useGetRecording(getRecordingId()!);
-  const { isAuthenticated } = useAuth0();
+  const isAuthenticated = !!useAppSelector(getAccessToken);
   const recordingTarget = useAppSelector(getRecordingTarget);
   const showEnvironmentVariables = recordingTarget == "node";
 

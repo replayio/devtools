@@ -1,11 +1,21 @@
+import { useRouter } from "next/router";
+
 import { Button } from "replay-next/components/Button";
 import Modal from "ui/components/shared/NewModal";
-import useAuth0 from "ui/utils/useAuth0";
 
 import { Dialog, DialogActions, DialogDescription, DialogLogo, DialogTitle } from "./Dialog";
 
 function LoginModal() {
-  const { loginAndReturn } = useAuth0();
+  const router = useRouter();
+
+  const loginAndReturn = () => {
+    router.push({
+      pathname: "/login",
+      query: {
+        returnTo: window.location.pathname + window.location.search,
+      },
+    });
+  };
 
   return (
     <Modal>

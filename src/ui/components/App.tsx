@@ -11,13 +11,12 @@ import { isTest } from "shared/utils/environment";
 import { actions } from "ui/actions";
 import hooks from "ui/hooks";
 import { Nag, useGetUserInfo } from "ui/hooks/users";
-import { getLoadingFinished, getModal } from "ui/reducers/app";
+import { getAccessToken, getLoadingFinished, getModal } from "ui/reducers/app";
 import { useAppSelector } from "ui/setup/hooks";
 import { UIState } from "ui/state";
 import { ModalType } from "ui/state/app";
 import { trackEvent } from "ui/utils/telemetry";
 import { shouldShowNag } from "ui/utils/tour";
-import useAuth0 from "ui/utils/useAuth0";
 
 import { ConfirmRenderer } from "./shared/Confirm";
 import LoginModal from "./shared/LoginModal";
@@ -86,8 +85,7 @@ function AppModal({ hideModal, modal }: { hideModal: () => void; modal: ModalTyp
   }
 }
 
-function App({ children, hideModal, modal, quickOpenEnabled }: AppProps) {
-  const auth = useAuth0();
+function App({ children, hideModal, modal, quickOpenEnabled, accessToken }: AppProps) {
   const dismissNag = hooks.useDismissNag();
   const userInfo = useGetUserInfo();
 
@@ -134,7 +132,7 @@ function App({ children, hideModal, modal, quickOpenEnabled }: AppProps) {
     userData.subscribe("global_theme", updateTheme);
   }, []);
 
-  if (auth.isLoading || userInfo.loading) {
+  if (userInfo.loading) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
         <Spinner />
@@ -144,7 +142,7 @@ function App({ children, hideModal, modal, quickOpenEnabled }: AppProps) {
 
   if (
     !isTest() &&
-    auth.isAuthenticated &&
+    accessToken &&
     userInfo.acceptedTOSVersion &&
     userInfo.acceptedTOSVersion !== LATEST_TOS_VERSION
   ) {
@@ -171,6 +169,8 @@ const connector = connect(
 
     // Only read quick open state if it exists, to ensure safe loads
     quickOpenEnabled: !!state.quickOpen && getQuickOpenEnabled(state),
+
+    accessToken: getAccessToken(state),
   }),
   {
     hideModal: actions.hideModal,

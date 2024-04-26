@@ -1,18 +1,17 @@
-import { useAuth0 } from "@auth0/auth0-react";
+import { ApolloProvider } from "@apollo/client";
 import { Store } from "@reduxjs/toolkit";
 import type { AppContext, AppProps } from "next/app";
 import NextApp from "next/app";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import React, { ReactNode, memo, useEffect, useState } from "react";
+import React, { memo, useEffect, useState } from "react";
 import { Provider } from "react-redux";
-import "../src/global-css";
-import "../src/test-prep";
 
 import { SystemProvider } from "design";
-import { recordData as recordTelemetryData } from "replay-next/src/utils/telemetry";
 import { replayClient } from "shared/client/ReplayClientContext";
-import { ApolloWrapper } from "ui/components/ApolloWrapper";
+import { createApolloClient } from "shared/graphql/apolloClient";
+import { getReadOnlyParamsFromURL, isTest } from "shared/utils/environment";
+import { getRecordingId } from "shared/utils/recording";
 import _App from "ui/components/App";
 import { RootErrorBoundary } from "ui/components/Errors/RootErrorBoundary";
 import MaintenanceModeScreen from "ui/components/MaintenanceMode";
@@ -20,63 +19,25 @@ import { ConfirmProvider } from "ui/components/shared/Confirm";
 import LoadingScreen from "ui/components/shared/LoadingScreen";
 import useAuthTelemetry from "ui/hooks/useAuthTelemetry";
 import { bootstrapApp } from "ui/setup";
+import { listenForAccessToken } from "ui/utils/browser";
 import { useLaunchDarkly } from "ui/utils/launchdarkly";
 import { InstallRouteListener } from "ui/utils/routeListener";
-import tokenManager from "ui/utils/tokenManager";
+
+import "../src/global-css";
+import "../src/test-prep";
 import "../src/base.css";
-import { getRecordingId } from "shared/utils/recording";
 
 interface AuthProps {
   apiKey?: string;
 }
 
-// We need to ensure that we always pass the same handleAuthError function
-// to ApolloWrapper, otherwise it will create a new apolloClient every time
-// and parts of the UI will reset (https://github.com/RecordReplay/devtools/issues/6168).
-// But handleAuthError needs access to the current values from useAuth0(),
-// so we use a constant wrapper around the _handleAuthError() function that
-// will be recreated with the current values.
-let _handleAuthError: () => Promise<void>;
-function handleAuthError() {
-  _handleAuthError?.();
-}
-
-function AppUtilities({ children }: { children: ReactNode }) {
-  const router = useRouter();
-  const { getAccessTokenSilently, isAuthenticated } = useAuth0();
-
-  _handleAuthError = async () => {
-    // This handler attempts to handle the scenario in which the frontend and
-    // our auth client think the user has a valid auth session but the backend
-    // disagrees. In this case, we should refresh the token so we can continue
-    // or, if that fails, return to the login page so the user can resume.
-    if (!isAuthenticated || router.pathname.startsWith("/login")) {
-      return;
-    }
-
-    try {
-      recordTelemetryData("devtools-auth-error-refresh");
-      await getAccessTokenSilently({ ignoreCache: true });
-    } catch {
-      recordTelemetryData("devtools-auth-error-refresh-fail");
-      const returnToPath = window.location.pathname + window.location.search;
-      router.push({ pathname: "/login", query: { returnTo: returnToPath } });
-    }
-  };
-
-  return (
-    <ApolloWrapper onAuthError={handleAuthError}>
-      <ConfirmProvider>{children}</ConfirmProvider>
-    </ApolloWrapper>
-  );
-}
-function Routing({ Component, pageProps }: AppProps) {
+function Routing({ Component, pageProps, accessToken }: AppProps & { accessToken: string | null }) {
   const [store, setStore] = useState<Store | null>(null);
   const { getFeatureFlag } = useLaunchDarkly();
 
   useEffect(() => {
-    bootstrapApp().then((store: Store) => setStore(store));
-  }, []);
+    bootstrapApp(accessToken).then(setStore);
+  }, [accessToken]);
 
   if (!store) {
     return null;
@@ -131,18 +92,31 @@ const App = ({ apiKey, ...props }: AppProps & AuthProps) => {
     head = <props.Component {...props.pageProps} headOnly />;
   }
 
-  const [token, setToken] = useState<{ token?: string } | undefined>(apiKey ? { token: apiKey } : undefined);
+  const tokenFromHeader = apiKey ? { token: apiKey } : undefined;
+  const tokenFromURL = isTest() ? { token: getReadOnlyParamsFromURL().apiKey } : undefined;
+  const [token, setToken] = useState<{ token: string | null } | undefined>(tokenFromHeader || tokenFromURL);
   useEffect(() => {
     async function fetchToken() {
       const response = await fetch("/api/token");
-      const token = response.ok ? await response.text() : undefined;
+      const token = response.ok ? await response.text() : null;
       setToken({ token });
     }
+
+    async function getTokenFromBrowser() {
+      const token = await Promise.race([
+        new Promise<string>(resolve => listenForAccessToken(resolve)),
+        // if the user is not logged in, the listenForAccessToken callback
+        // is never called, so we add this timeout to continue without a token
+        new Promise<null>(resolve => setTimeout(() => resolve(null), 500)),
+      ]);
+      setToken({ token });
+    }
+
     if (!token) {
       if (!window.__IS_RECORD_REPLAY_RUNTIME__) {
         fetchToken();
       } else {
-        setToken({});
+        getTokenFromBrowser();
       }
     }
   }, [token, setToken]);
@@ -153,12 +127,14 @@ const App = ({ apiKey, ...props }: AppProps & AuthProps) => {
 
   return (
     <SystemProvider>
-      <tokenManager.Auth0Provider apiKey={token.token}>
-        {head}
-        <AppUtilities>
-          <Routing {...props} />
-        </AppUtilities>
-      </tokenManager.Auth0Provider>
+      {head}
+      <ApolloProvider
+        client={createApolloClient(token.token ?? undefined, getReadOnlyParamsFromURL().testScope)}
+      >
+        <ConfirmProvider>
+          <Routing {...props} accessToken={token.token} />
+        </ConfirmProvider>
+      </ApolloProvider>
     </SystemProvider>
   );
 };

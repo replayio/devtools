@@ -13,11 +13,9 @@ export default {
   createSession: ({
     recording,
     userInfo,
-    auth0User,
   }: {
     recording?: Recording;
     userInfo?: Omit<UserInfo, "loading">;
-    auth0User: any;
   }) => {
     // Skip if the recording was either created or viewed by an internal user
     if (
@@ -43,11 +41,11 @@ export default {
     });
 
     // only identify the session if there is a logged in user
-    if (auth0User) {
-      LogRocket.identify(auth0User.sub, {
-        name: auth0User.name,
-        email: auth0User.email,
-        id: auth0User.email,
+    if (userInfo) {
+      LogRocket.identify(userInfo.id, {
+        name: userInfo.name || "",
+        email: userInfo.email,
+        id: userInfo.email,
       });
     }
   },

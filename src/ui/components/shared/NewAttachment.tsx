@@ -2,10 +2,11 @@ import React, { useState } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
 import * as actions from "ui/actions/app";
+import { getAccessToken } from "ui/actions/app";
 import hooks from "ui/hooks";
 import { selectors } from "ui/reducers";
+import { useAppSelector } from "ui/setup/hooks";
 import { UIState } from "ui/state";
-import useAuth0 from "ui/utils/useAuth0";
 
 import Modal from "./NewModal";
 
@@ -25,7 +26,7 @@ function NewAttachment({ hideModal, modalOptions }: PropsFromRedux) {
   const addCommentReply = hooks.useAddCommentReply();
   const [url, setUrl] = useState("");
   const loom = url.match(/loom\.com\/share\/(\S*?)(\"|\?|$)/)?.[1];
-  const { isAuthenticated } = useAuth0();
+  const isAuthenticated = !!useAppSelector(getAccessToken);
 
   const onChange = (e: any) => {
     setUrl(e.target.value);

@@ -14,12 +14,12 @@ import { userData } from "shared/user-data/GraphQL/UserData";
 import { UIThunkAction, actions } from "ui/actions";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import { selectors } from "ui/reducers";
+import { getAccessToken } from "ui/reducers/app";
 import { getSelectedSourceId } from "ui/reducers/sources";
 import { useAppSelector } from "ui/setup/hooks";
 import { UIState } from "ui/state";
 import { addGlobalShortcut, isEditableElement, removeGlobalShortcut } from "ui/utils/key-shortcuts";
 import { trackEvent } from "ui/utils/telemetry";
-import useAuth0 from "ui/utils/useAuth0";
 
 import { getCommandPaletteInput } from "./CommandPalette/SearchInput";
 
@@ -60,7 +60,7 @@ function KeyboardShortcuts({
   jumpToNextPause,
 }: PropsFromRedux) {
   const recordingId = useGetRecordingId();
-  const { isAuthenticated } = useAuth0();
+  const isAuthenticated = !!useAppSelector(getAccessToken);
   const [, dismissFindFileNag] = useNag(Nag.FIND_FILE);
 
   const selectedSourceId = useAppSelector(getSelectedSourceId);

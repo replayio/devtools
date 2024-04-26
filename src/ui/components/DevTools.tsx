@@ -21,7 +21,7 @@ import { ReplayClientInterface } from "shared/client/types";
 import { getTestEnvironment } from "shared/test-suites/RecordingTestMetadata";
 import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { userData } from "shared/user-data/GraphQL/UserData";
-import { getProcessing, setAccessToken } from "ui/actions/app";
+import { getAccessToken, getProcessing } from "ui/actions/app";
 import { setShowSupportForm } from "ui/actions/layout";
 import { createSocket } from "ui/actions/session";
 import { DevToolsDynamicLoadingMessage } from "ui/components/DevToolsDynamicLoadingMessage";
@@ -41,8 +41,6 @@ import {
   maybeSetGuestMixpanelContext,
   trackEventOnce,
 } from "ui/utils/mixpanel";
-import tokenManager, { TokenState } from "ui/utils/tokenManager";
-import useAuth0 from "ui/utils/useAuth0";
 
 import { selectors } from "../reducers";
 import { CommandPaletteModal } from "./CommandPalette/CommandPaletteModal";
@@ -161,7 +159,8 @@ function _DevTools({
   uploadComplete,
 }: DevToolsProps) {
   const dispatch = useAppDispatch();
-  const { isAuthenticated } = useAuth0();
+  const accessToken = useAppSelector(getAccessToken);
+  const isAuthenticated = !!accessToken;
   const recordingId = useGetRecordingId();
   const { recording } = useGetRecording(recordingId);
   const { trackLoadingIdleTime } = useTrackLoadingIdleTime(uploadComplete, recording);
@@ -227,24 +226,15 @@ function _DevTools({
   });
 
   useEffect(() => {
-    let token: Promise<TokenState | void> = Promise.resolve();
-    if (isAuthenticated) {
-      token = tokenManager.getToken();
+    async function createSocketWithToken() {
+      if (accessToken) {
+        await client.Authentication.setAccessToken({ accessToken });
+      }
+
+      createSocket(recordingId);
     }
-
-    token
-      .then(async ts => {
-        if (ts?.token) {
-          dispatch(setAccessToken(ts.token));
-          await client.Authentication.setAccessToken({ accessToken: ts.token });
-        }
-
-        createSocket(recordingId);
-      })
-      .catch(() => {
-        console.error("Failed to create session");
-      });
-  }, [dispatch, isAuthenticated, createSocket, recordingId]);
+    createSocketWithToken();
+  }, [accessToken, createSocket, recordingId]);
 
   useEffect(() => {
     if (uploadComplete && loadingFinished) {

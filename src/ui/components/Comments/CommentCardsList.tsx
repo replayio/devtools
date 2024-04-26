@@ -9,9 +9,9 @@ import useUserCommentPreferences from "ui/components/Comments/useUserCommentPref
 import LoginButton from "ui/components/LoginButton";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
+import { getAccessToken } from "ui/reducers/app";
 import { getCurrentTime, isPlaying as isPlayingSelector } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
-import useAuth0 from "ui/utils/useAuth0";
 
 import styles from "./CommentCardsList.module.css";
 
@@ -21,12 +21,10 @@ export default function CommentCardsList() {
   const recordingId = hooks.useGetRecordingId();
   const { comments, loading } = hooks.useGetComments(recordingId);
   const recording = hooks.useGetRecording(recordingId);
-  const auth = useAuth0();
 
   const { filter, sortBy } = useUserCommentPreferences();
 
-  const { isAuthenticated } = useAuth0();
-
+  const isAuthenticated = !!useAppSelector(getAccessToken);
   const currentTime = useAppSelector(getCurrentTime);
   const isPlaying = useAppSelector(isPlayingSelector);
 
@@ -116,7 +114,7 @@ export default function CommentCardsList() {
     }
   }, [currentTime, displayedComments, isAuthenticated, showPauseOverlayAtTime]);
 
-  if (loading || auth.isLoading || recording.loading) {
+  if (loading || recording.loading) {
     return null;
   }
 

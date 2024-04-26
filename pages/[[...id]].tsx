@@ -24,7 +24,6 @@ import {
 import setupDevtools, { migratePerRecordingPersistedSettings } from "ui/setup/dynamic/devtools";
 import { useAppDispatch, useAppStore } from "ui/setup/hooks";
 import { startUploadWaitTracking } from "ui/utils/mixpanel";
-import useToken from "ui/utils/useToken";
 
 import Upload from "./upload";
 
@@ -134,7 +133,6 @@ function RecordingPage({
   setExpectedError,
   head,
 }: PropsFromRedux & { apiKey?: string; head?: React.ReactNode }) {
-  const token = useToken();
   const store = useAppStore();
   const { query } = useRouter();
   const dispatch = useAppDispatch();
@@ -182,7 +180,6 @@ function RecordingPage({
     recordingId,
     setExpectedError,
     store,
-    token.token,
     replayClient,
   ]);
   const onUpload = () => {
