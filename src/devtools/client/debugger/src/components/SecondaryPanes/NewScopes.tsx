@@ -17,15 +17,25 @@ import { getPreferredGeneratedSources } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { pickScopes } from "ui/suspense/scopeCache";
 
-import { getSelectedFrameId } from "../../selectors";
+import { getSeekLock, getSelectedFrameId } from "../../selectors";
 import { ConvertedScope, convertScopes } from "../../utils/pause/scopes/convertScopes";
 import styles from "./NewObjectInspector.module.css";
+
+function LoadingInfo() {
+  return <div className="pane-info">Loading…</div>;
+}
 
 function ScopesRenderer() {
   const replayClient = useContext(ReplayClientContext);
   const sourcesById = sourcesByIdCache.read(replayClient);
   const preferredGeneratedSources = useAppSelector(getPreferredGeneratedSources);
   const selectedFrameId = useAppSelector(getSelectedFrameId);
+  const seekLock = useAppSelector(getSeekLock);
+
+  if (seekLock) {
+    return <LoadingInfo />;
+  }
+
   if (!selectedFrameId) {
     return (
       <div className="pane pane-info">
@@ -117,7 +127,7 @@ function Scope({
   return null;
 }
 
-export default function Scopes() {
+export default function NewScopes() {
   const selectedFrameId = useAppSelector(getSelectedFrameId);
   const dispatch = useAppDispatch();
 
@@ -146,7 +156,7 @@ export default function Scopes() {
           key={`${selectedFrameId?.pauseId}:${selectedFrameId?.frameId}`}
           fallback={<div className="pane-info">Error loading scopes</div>}
         >
-          <Suspense fallback={<div className="pane-info">Loading…</div>}>
+          <Suspense fallback={<LoadingInfo />}>
             <ScopesRenderer />
           </Suspense>
         </InlineErrorBoundary>
