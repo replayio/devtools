@@ -1,11 +1,19 @@
-import { unstable_Activity as Activity, Suspense, useContext, useMemo } from "react";
+import {
+  unstable_Activity as Activity,
+  Suspense,
+  useContext,
+  useLayoutEffect,
+  useMemo,
+} from "react";
 
 import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBoundary";
 import { PanelLoader } from "replay-next/components/PanelLoader";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { useSources } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import useLocalStorageUserData from "shared/user-data/LocalStorage/useLocalStorageUserData";
+import { setSelectedPrimaryPanel } from "ui/actions/layout";
 import { ProtocolViewer } from "ui/components/ProtocolViewer/components/ProtocolViewer";
 import { useIsRecordingOfReplay } from "ui/components/ProtocolViewer/hooks/useIsRecordingOfReplay";
 import {
@@ -20,15 +28,32 @@ import {
   getProtocolRequestMap,
   getProtocolResponseMap,
 } from "ui/reducers/protocolMessages";
-import { useAppSelector } from "ui/setup/hooks";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 import styles from "./ProtocolViewerPanel.module.css";
 
 export function ProtocolViewerPanel() {
+  const dispatch = useAppDispatch();
+
+  const [showProtocolPanel] = useGraphQLUserData("feature_protocolPanel");
+
   const [unsafeSelectedTab, selectTab] = useLocalStorageUserData("protocolViewerSelectedTab");
 
   const isRecordingOfReplay = useIsRecordingOfReplay();
   const safeSelectedTab = isRecordingOfReplay ? unsafeSelectedTab : "live";
+
+  useLayoutEffect(() => {
+    if (!showProtocolPanel) {
+      // If this panel was opened because of a URL parameter, and the user has opted out of this (advanced) feature,
+      // then the panel will be blank and may confuse the user.
+      // In that case, fall back to the "events" panel.
+      dispatch(setSelectedPrimaryPanel("events"));
+    }
+  }, [dispatch, showProtocolPanel]);
+
+  if (!showProtocolPanel) {
+    return null;
+  }
 
   return (
     <div className={styles.Container}>

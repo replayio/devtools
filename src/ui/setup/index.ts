@@ -17,6 +17,7 @@ import { getUserInfo } from "ui/hooks/users";
 import { initialAppState } from "ui/reducers/app";
 import { syncInitialLayoutState } from "ui/reducers/layout";
 import { SourcesState, initialState as initialSourcesState } from "ui/reducers/sources";
+import { getMutableParamsFromURL } from "ui/setup/dynamic/url";
 import { ReplaySession, getReplaySession } from "ui/setup/prefs";
 import type { LayoutState } from "ui/state/layout";
 import { setUserInBrowserPrefs } from "ui/utils/browser";
@@ -44,6 +45,11 @@ const getDefaultSelectedPrimaryPanel = (
   session: ReplaySession | undefined,
   recording?: Recording
 ) => {
+  const { primaryPanel } = getMutableParamsFromURL();
+  if (primaryPanel) {
+    return primaryPanel;
+  }
+
   if (session) {
     return session.selectedPrimaryPanel;
   }
