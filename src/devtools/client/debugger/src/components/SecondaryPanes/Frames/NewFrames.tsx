@@ -233,7 +233,7 @@ function Frames({ panel, point, time }: FramesProps) {
   );
 }
 
-export default function FramesSuspenseWrapper(props: FramesProps) {
+export default function NewFrames(props: FramesProps) {
   return (
     <Suspense
       fallback={
