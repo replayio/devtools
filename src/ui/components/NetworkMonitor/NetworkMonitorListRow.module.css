@@ -20,7 +20,6 @@
   --status-background-color: var(--testsuites-failed-color);
   --status-color: var(--testsuites-error-color);
 }
-.Row:focus,
 .Row:hover {
   background-color: var(--theme-table-selection-background-hover);
   outline: none;
@@ -33,7 +32,6 @@
   color: var(--theme-base-80);
 }
 .Row[data-selected],
-.Row[data-selected]:focus,
 .Row[data-selected]:hover {
   background: var(--primary-accent-dimmed);
   color: var(--primary-accent-dimmed-foreground-text);
@@ -91,7 +89,6 @@
   color: #fff;
   font-weight: bold;
 }
-.Row:focus .SeekButton,
 .Row:hover .SeekButton {
   display: flex;
 }
@@ -138,7 +135,6 @@
 }
 
 .Row[data-selected] .TimingContainer,
-.Row[data-selected]:focus .TimingContainer,
 .Row[data-selected]:hover .TimingContainer {
   background-color: var(--timing-container-selected-row);
 }

@@ -33,15 +33,20 @@ export function hideRequestDetails() {
   };
 }
 
-export function showRequestDetails(requestId: RequestId) {
+export function showRequestDetails(requestId: RequestId | null) {
   return {
     requestId,
     type: "SHOW_REQUEST_DETAILS",
   };
 }
 
-export function selectNetworkRequest(requestId: RequestId): UIThunkAction {
+export function selectNetworkRequest(requestId: RequestId | null): UIThunkAction {
   return async (dispatch, getState, { replayClient }) => {
+    if (requestId === null) {
+      dispatch(showRequestDetails(null));
+      return;
+    }
+
     let state = getState();
 
     const stream = networkRequestsCache.stream(replayClient);

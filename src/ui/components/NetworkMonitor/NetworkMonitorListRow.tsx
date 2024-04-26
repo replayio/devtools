@@ -1,4 +1,4 @@
-import { CSSProperties, useContext } from "react";
+import { CSSProperties, MouseEvent, useContext } from "react";
 
 import Icon from "replay-next/components/Icon";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
@@ -20,7 +20,7 @@ export type ItemData = {
   firstRequestIdAfterCurrentTime: string | null;
   requests: RequestSummary[];
   seekToRequest: (row: RequestSummary) => void;
-  selectRequest: (row: RequestSummary) => void;
+  selectRequest: (row: RequestSummary | null) => void;
   selectedRequestId: string | null;
 };
 
@@ -123,6 +123,16 @@ function RequestRow({
     dismissJumpToNetworkRequestNag(); // Replay Passport
   };
 
+  const onClick = (event: MouseEvent<HTMLDivElement>) => {
+    if (selectedRequestId === request.id) {
+      selectRequest(null);
+
+      event.currentTarget.blur();
+    } else {
+      selectRequest(request);
+    }
+  };
+
   return (
     <>
       <div
@@ -132,7 +142,7 @@ function RequestRow({
         data-status-category={statusCategory}
         data-test-id={`Network-RequestRow-${id}`}
         data-test-name="Network-RequestRow"
-        onClick={() => selectRequest(request)}
+        onClick={onClick}
         onContextMenu={onContextMenu}
         style={style}
         tabIndex={0}
