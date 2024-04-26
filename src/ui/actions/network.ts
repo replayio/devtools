@@ -43,7 +43,7 @@ export function showRequestDetails(requestId: RequestId | null) {
 export function selectNetworkRequest(requestId: RequestId | null): UIThunkAction {
   return async (dispatch, getState, { replayClient }) => {
     if (requestId === null) {
-      dispatch(showRequestDetails(requestId));
+      dispatch(showRequestDetails(null));
       return;
     }
 
