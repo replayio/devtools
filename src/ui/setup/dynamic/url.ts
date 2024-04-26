@@ -20,7 +20,7 @@ export type MutableURLParams = {
   viewMode: ViewMode | null;
 };
 
-// This method returns a subset of URL parameters, onces that change to mirror Redux state;
+// This method returns a subset of URL parameters, ones that change to mirror Redux state;
 // Read-only parameters are managed by shared/utils/environment
 export function getMutableParamsFromURL(): MutableURLParams {
   const { searchParams } = getURL();
