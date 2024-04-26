@@ -14,12 +14,11 @@ test("repaint-06: repaints the screen screen when stepping over code that modifi
   await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
 
-  // TODO [FE-2363] Some of these points fail repaint, so they're disabled until RUN-3397 has been fixed
   const printedStrings = [
-    // "catch",
-    // "afterCatch",
+    "catch",
+    "afterCatch",
     "finally",
-    // "yield 1",
+    "yield 1",
     "generated 1",
     "yield 2",
     "generated 2",
