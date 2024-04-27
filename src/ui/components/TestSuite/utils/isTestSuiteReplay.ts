@@ -7,7 +7,6 @@ import {
 export function isTestSuiteReplay(recording: Recording): boolean {
   const testMetadata = recording?.metadata?.test;
   return (
-    !!recording.isInTestWorkspace &&
     testMetadata != null &&
     (isGroupedTestCasesV2(testMetadata) || isGroupedTestCasesV3(testMetadata))
   );
