@@ -197,6 +197,7 @@ export default function Panel() {
             className={styles.TestEventDetailsPanel}
             collapsible
             defaultSize={35}
+            minSize={10}
             onCollapse={() => setStepDetailsPanelCollapsed(true)}
             onExpand={() => setStepDetailsPanelCollapsed(false)}
             ref={stepDetailsPanelRef}
