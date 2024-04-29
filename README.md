@@ -25,24 +25,29 @@ cp .env.sample .env
 nvm use
 yarn install
 
-# Run dev server (localhost:8080 by default)
-yarn dev
+# Run dev server (see below)
 ```
 
-Once you see `Compiled successfully` in your terminal, open your browser and go to [this link](http://localhost:8081/recording/overboard--a616009e-b825-4c54-83b4-e20bd8c0cb25).
+### Developing against production
 
-**You just successfully opened your first Replay recording!** That recording uses your locally running copy of Replay DevTools to debug our test recording.
+To run DevTools locally, paired with the production [Dashboard](https://github.com/replayio/dashboard) project:
+
+```sh
+yarn dev:prod
+```
+
+At this point DevTools will be accessible at [localhost:8080](http://localhost:8080/) and will proxy any library or authentication requests to the production deployment of the [Dashboard](https://github.com/replayio/dashboard) project.
 
 ### Local development
 
 To run both the DevTools and [Dashboard](https://github.com/replayio/dashboard) projects locally:
 
 ```sh
-# DevTools root (this project)
-DASHBOARD_URL=http://localhost:8080 npm exec next dev -- -p 8081
+# DevTools (this project)
+yarn dev:local
 
-# Dashboard root
-DEVTOOLS_URL=http://localhost:8081 pnpm dev -- -p 8080
+# Dashboard
+pnpm dev:local
 ```
 
 At this point the Dashboard will be accessible at [localhost:8080](http://localhost:8080/) but it will not load recordings. To be able to test the end-to-end interaction of both apps, use [localhost:8081](http://localhost:8081/). It will serve both Dashboard and DevTools routes.

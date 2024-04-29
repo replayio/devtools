@@ -4,7 +4,9 @@
   "description": "Web app with developer tools built on the Record Replay Protocol",
   "main": "postcss.config.js",
   "scripts": {
-    "dev": "next dev -p 8080 ",
+    "dev": "npm run dev:prod",
+    "dev:local": "DASHBOARD_URL=http://localhost:8080 npm exec next dev -- -p 8081",
+    "dev:prod": "next dev -p 8080",
     "preprod": "NEXT_PUBLIC_API_URL=http://graphql-api.pre-prod.replay.prod/v1/graphql NEXT_PUBLIC_DISPATCH_URL=ws://agent.pre-prod.replay.prod next dev -p 8080",
     "export": "next build && next export -o dist",
     "test": "jest",
