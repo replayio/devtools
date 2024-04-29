@@ -14805,15 +14805,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-resizable-panels@npm:^2.0.5":
-  version: 2.0.5
-  resolution: "react-resizable-panels@npm:2.0.5"
-  dependencies:
-    stacking-order: ^1
+"react-resizable-panels@npm:^2.0.19":
+  version: 2.0.19
+  resolution: "react-resizable-panels@npm:2.0.19"
   peerDependencies:
     react: ^16.14.0 || ^17.0.0 || ^18.0.0
     react-dom: ^16.14.0 || ^17.0.0 || ^18.0.0
-  checksum: e000172f01eb1cb6d14825581e6c22ae4cd71f220456b0033089b7f53bb607e518e50d3ff517572b60bbe4bf60eabc50e4bba1890b7cb787d4d90df131c45de3
+  checksum: d09e07bf2514fb8bb60b6150708943bb784ca1827c4c45dfe8354fb33e4edde795292789b56383886e974d381503333112194679d606808fbc9bab7ec232430e
   languageName: node
   linkType: hard
 
@@ -15158,7 +15156,7 @@ __metadata:
     react-lazyload: ^3.2.0
     react-merge-refs: ^1.1.0
     react-redux: ^8.0.2
-    react-resizable-panels: ^2.0.5
+    react-resizable-panels: ^2.0.19
     react-tooltip: ^4.5.1
     react-transition-group: ^4.4.2
     react-virtualized-auto-sizer: ^1.0.19
@@ -16245,13 +16243,6 @@ __metadata:
   version: 1.3.4
   resolution: "stackframe@npm:1.3.4"
   checksum: bae1596873595c4610993fa84f86a3387d67586401c1816ea048c0196800c0646c4d2da98c2ee80557fd9eff05877efe33b91ba6cd052658ed96ddc85d19067d
-  languageName: node
-  linkType: hard
-
-"stacking-order@npm:^1":
-  version: 1.0.1
-  resolution: "stacking-order@npm:1.0.1"
-  checksum: f1dfc1d3743dc8b212e50ca5700c301851696d607e91475e0540fcfc2101a4c0872d74566a3026e28444a6e10ba42e3419dbac094631590c92223f395db2ed07
   languageName: node
   linkType: hard
 
