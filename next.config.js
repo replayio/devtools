@@ -4,6 +4,8 @@ const withBundleAnalyzer = require("@next/bundle-analyzer")({
   enabled: process.env.ANALYZE === "true",
 });
 
+const dashboardUrl = process.env.DASHBOARD_URL || "https://replay-dashboard.vercel.app";
+
 /**
  * @type {Pick<
  *   import('next').NextConfig,
@@ -52,6 +54,16 @@ const baseNextConfig = {
         permanent: true,
       },
     ];
+  },
+
+  async rewrites() {
+    return [
+      {
+        source: "/:path((?!recording).*)*",
+        destination: `${dashboardUrl}/:path*`,
+        basePath: false,
+      }
+    ]
   },
 
   async headers() {
