@@ -17,8 +17,9 @@ import {
 import { UserSettings } from "shared/graphql/types";
 import { isTest } from "shared/utils/environment";
 import { ADD_USER_API_KEY, DELETE_USER_API_KEY, GET_USER_SETTINGS } from "ui/graphql/settings";
+import { getAccessToken } from "ui/reducers/app";
+import { useAppSelector } from "ui/setup/hooks";
 import { maybeTrackTeamChange } from "ui/utils/mixpanel";
-import useAuth0 from "ui/utils/useAuth0";
 
 const emptySettings: UserSettings = {
   apiKeys: [],
@@ -52,7 +53,7 @@ export async function getUserSettings(): Promise<UserSettings> {
 }
 
 export function useGetUserSettings() {
-  const { isAuthenticated } = useAuth0();
+  const isAuthenticated = !!useAppSelector(getAccessToken);
   const { data: userSettings, error, loading } = useQuery<GetUserSettings>(GET_USER_SETTINGS);
 
   if (isTest()) {

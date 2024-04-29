@@ -20,11 +20,9 @@ import { SourcesState, initialState as initialSourcesState } from "ui/reducers/s
 import { getMutableParamsFromURL } from "ui/setup/dynamic/url";
 import { ReplaySession, getReplaySession } from "ui/setup/prefs";
 import type { LayoutState } from "ui/state/layout";
-import { setUserInBrowserPrefs } from "ui/utils/browser";
 import { initLaunchDarkly } from "ui/utils/launchdarkly";
 import { maybeSetMixpanelContext } from "ui/utils/mixpanel";
 import { setTelemetryContext, setupTelemetry, trackEvent } from "ui/utils/telemetry";
-import tokenManager from "ui/utils/tokenManager";
 
 import { setupDOMHelpers } from "./dom";
 import { setupAppHelper } from "./helpers";
@@ -121,7 +119,7 @@ export const getInitialSourcesState = async (): Promise<SourcesState> => {
 
 const IDB_PREFS_DATABASES = [CONSOLE_SETTINGS_DATABASE, POINTS_DATABASE];
 
-export async function bootstrapApp() {
+export async function bootstrapApp(accessToken: string | null) {
   const recordingId = getRecordingId();
 
   // Load all async/IDB prefs in parallel before we continue.
@@ -135,7 +133,10 @@ export async function bootstrapApp() {
   ] as const);
 
   const initialState = {
-    app: initialAppState,
+    app: {
+      ...initialAppState,
+      accessToken,
+    },
     layout: initialLayoutState,
     tabs: initialTabsState,
     sources: initialSourcesState,
@@ -177,15 +178,7 @@ export async function bootstrapApp() {
   }
   document.body.parentElement!.className = theme || "";
 
-  tokenManager.addListener(async tokenState => {
-    if (tokenState.loading || tokenState.error) {
-      return;
-    }
-
-    const auth0User = tokenManager.auth0Client?.user;
-    setUserInBrowserPrefs(auth0User);
-
-    const userInfo = await getUserInfo();
+  getUserInfo().then(async userInfo => {
     if (userInfo) {
       const recordingId = getRecordingId();
       let rec = null;

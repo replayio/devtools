@@ -1,9 +1,8 @@
 import { Support } from "ui/components/shared/UserSettingsModal/panels/Support";
 import { useGetUserInfo } from "ui/hooks/users";
-import { getDefaultSettingsTab, getModalOptions } from "ui/reducers/app";
+import { getAccessToken, getDefaultSettingsTab, getModalOptions } from "ui/reducers/app";
 import { useAppSelector } from "ui/setup/hooks";
 import { SettingsTabTitle } from "ui/state/app";
-import useAuth0 from "ui/utils/useAuth0";
 
 import SettingsModal from "../SettingsModal";
 import { Settings } from "../SettingsModal/types";
@@ -61,7 +60,7 @@ export default function UserSettingsModal() {
   const defaultSettingsTab = useAppSelector(getDefaultSettingsTab);
 
   const { loading, features } = useGetUserInfo();
-  const { isAuthenticated } = useAuth0();
+  const isAuthenticated = !!useAppSelector(getAccessToken);
 
   const hiddenTabs = [];
   if (!isAuthenticated) {

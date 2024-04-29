@@ -1,8 +1,8 @@
 import { AddCommentButton } from "design";
 import { createNetworkRequestComment } from "ui/actions/comments";
 import { useGetRecordingId } from "ui/hooks/recordings";
-import { useAppDispatch } from "ui/setup/hooks";
-import useAuth0 from "ui/utils/useAuth0";
+import { getAccessToken } from "ui/reducers/app";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 import { RequestSummary } from "./utils";
 
@@ -15,7 +15,7 @@ export default function AddNetworkRequestCommentButton({
 }) {
   const dispatch = useAppDispatch();
   const recordingId = useGetRecordingId();
-  const { isAuthenticated } = useAuth0();
+  const isAuthenticated = !!useAppSelector(getAccessToken);
 
   const addRequestComment = () => {
     dispatch(createNetworkRequestComment(request, recordingId));

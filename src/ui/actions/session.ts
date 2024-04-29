@@ -22,7 +22,7 @@ import { isTest } from "shared/utils/environment";
 import { UIThunkAction } from "ui/actions";
 import * as actions from "ui/actions/app";
 import { getRecording } from "ui/hooks/recordings";
-import { getUserId, getUserInfo } from "ui/hooks/users";
+import { getUserInfo } from "ui/hooks/users";
 import { clearExpectedError, getExpectedError, getUnexpectedError } from "ui/reducers/app";
 import { getToolboxLayout } from "ui/reducers/layout";
 import {
@@ -37,7 +37,6 @@ import type { ExpectedError, UnexpectedError } from "ui/state/app";
 import LogRocket from "ui/utils/logrocket";
 import { endMixpanelSession } from "ui/utils/mixpanel";
 import { registerRecording, trackEvent } from "ui/utils/telemetry";
-import tokenManager from "ui/utils/tokenManager";
 import { subscriptionExpired } from "ui/utils/workspace";
 
 import { setExpectedError, setUnexpectedError } from "./errors";
@@ -58,11 +57,12 @@ const { focusWindow: focusWindowFromURL } = getMutableParamsFromURL();
 export function getAccessibleRecording(
   recordingId: string
 ): UIThunkAction<Promise<Recording | null>> {
-  return async dispatch => {
+  return async (dispatch, getState) => {
     try {
-      const [recording, userId] = await Promise.all([getRecording(recordingId), getUserId()]);
+      const recording = await getRecording(recordingId);
       if (!recording || recording.isInitialized) {
-        const expectedError = getRecordingNotAccessibleError(recording, userId);
+        const isAuthenticated = !!actions.getAccessToken(getState());
+        const expectedError = getRecordingNotAccessibleError(recording, isAuthenticated);
         if (expectedError) {
           dispatch(setExpectedError(expectedError));
           return null;
@@ -112,10 +112,9 @@ function isRecordingDeletedError(err: unknown): boolean {
 
 function getRecordingNotAccessibleError(
   recording?: Recording,
-  userId?: string
+  isAuthenticated?: boolean
 ): ExpectedError | undefined {
   const isAuthorized = !!(isTest() || recording);
-  const isAuthenticated = !!(isTest() || !!tokenManager.getState()?.token);
 
   if (isAuthorized) {
     return undefined;
@@ -177,11 +176,7 @@ export function createSocket(recordingId: string): UIThunkAction {
         dispatch(actions.setRecordingWorkspace(recording.workspace));
       }
 
-      LogRocket.createSession({
-        recording,
-        userInfo,
-        auth0User: tokenManager.auth0Client?.user,
-      });
+      LogRocket.createSession({ recording, userInfo });
 
       registerRecording({ recording });
 

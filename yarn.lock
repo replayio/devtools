@@ -150,33 +150,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@auth0/auth0-react@npm:1.2.0":
-  version: 1.2.0
-  resolution: "@auth0/auth0-react@npm:1.2.0"
-  dependencies:
-    "@auth0/auth0-spa-js": ^1.13.1
-  peerDependencies:
-    react: ^16.11.0 || ^17
-    react-dom: ^16.11.0 || ^17
-  checksum: 6f8fdee7761a1074308462433b5b9ac56b4283cee9139aedd5cf57f0df77cb6b59af0f4cb6993ec71feeffb5a8b8ca86f32bbfade24a5746ee7aef067be4827d
-  languageName: node
-  linkType: hard
-
-"@auth0/auth0-spa-js@npm:^1.13.1":
-  version: 1.22.2
-  resolution: "@auth0/auth0-spa-js@npm:1.22.2"
-  dependencies:
-    abortcontroller-polyfill: ^1.7.3
-    browser-tabs-lock: ^1.2.15
-    core-js: ^3.23.2
-    es-cookie: ^1.3.2
-    fast-text-encoding: ^1.0.4
-    promise-polyfill: ^8.2.3
-    unfetch: ^4.2.0
-  checksum: 24f3fed2eb38a5898dd07aabb61f42b220668d64d382b92c5187bd58d19bcff2f4974e6725684fc7b7d37ca713fd8bb990eef499ab3ab8af3b9f23e413f965b5
-  languageName: node
-  linkType: hard
-
 "@babel/code-frame@npm:^7.0.0, @babel/code-frame@npm:^7.10.4, @babel/code-frame@npm:^7.12.13, @babel/code-frame@npm:^7.16.7":
   version: 7.16.7
   resolution: "@babel/code-frame@npm:7.16.7"
@@ -5199,13 +5172,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"abortcontroller-polyfill@npm:^1.7.3":
-  version: 1.7.3
-  resolution: "abortcontroller-polyfill@npm:1.7.3"
-  checksum: 55739d7f0c9bd6afa2aabb3148778967c4dd4dcff91f6b9259df38da34f9882d3f7730b0954e9767a19cc16a8dd9a58915da4e8a50220300d45af3817d7557b1
-  languageName: node
-  linkType: hard
-
 "accepts@npm:~1.3.5":
   version: 1.3.8
   resolution: "accepts@npm:1.3.8"
@@ -6406,15 +6372,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"browser-tabs-lock@npm:^1.2.15":
-  version: 1.2.15
-  resolution: "browser-tabs-lock@npm:1.2.15"
-  dependencies:
-    lodash: ">=4.17.21"
-  checksum: 79194361d5dbd0bf83f1e7e56fdbc209161d1c86f8211214512388df126d69b152512f073392e9415dec8d5e3b427045f9a9a3cb089ae7e7f6ed48dd6022ae74
-  languageName: node
-  linkType: hard
-
 "browserslist@npm:^4.14.5, browserslist@npm:^4.20.2, browserslist@npm:^4.20.3, browserslist@npm:^4.20.4":
   version: 4.20.4
   resolution: "browserslist@npm:4.20.4"
@@ -7278,7 +7235,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"core-js@npm:^3.0.1, core-js@npm:^3.23.2, core-js@npm:^3.4":
+"core-js@npm:^3.0.1, core-js@npm:^3.4":
   version: 3.24.1
   resolution: "core-js@npm:3.24.1"
   checksum: 6fb5bf0fd9e9f3e69d95616dd03332fea6758a715d2628c108b5faf17b48b0f580e90c4febb0a523c4665b0991a810de16289f86187fe79d70cc722dbd3edf0e
@@ -8276,13 +8233,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"es-cookie@npm:^1.3.2":
-  version: 1.3.2
-  resolution: "es-cookie@npm:1.3.2"
-  checksum: 8509355a7d00bd2e3fcab4a76a90e0da35b40c1e76f114f8ffe805ab3fdfff51e8fc0e7cdccd9bf1536066150b6b9861e37d78ae14f80680513901902ac4f0df
-  languageName: node
-  linkType: hard
-
 "es-get-iterator@npm:^1.1.3":
   version: 1.1.3
   resolution: "es-get-iterator@npm:1.1.3"
@@ -9019,13 +8969,6 @@ __metadata:
   dependencies:
     fastest-levenshtein: ^1.0.7
   checksum: 02732ba6c656797ca7e987c25f3e53718c8fcc39a4bfab46def78eef7a8729eb629632d4a7eca4c27a33e10deabffa9984839557e18a96e91ecf7ccaeedb9890
-  languageName: node
-  linkType: hard
-
-"fast-text-encoding@npm:^1.0.4":
-  version: 1.0.4
-  resolution: "fast-text-encoding@npm:1.0.4"
-  checksum: aa92d27451ad972ac8391b40f8680dc6722513b0b9c123bc6991fb789e46302a89d76a4e23a3071ca2071a63e5e116a0c75d790703a5568b22019350196e405d
   languageName: node
   linkType: hard
 
@@ -12440,7 +12383,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash@npm:>=4.17.21, lodash@npm:^4.17.11, lodash@npm:^4.17.15, lodash@npm:^4.17.20, lodash@npm:^4.17.21, lodash@npm:^4.7.0, lodash@npm:~4.17.10":
+"lodash@npm:^4.17.11, lodash@npm:^4.17.15, lodash@npm:^4.17.20, lodash@npm:^4.17.21, lodash@npm:^4.7.0, lodash@npm:~4.17.10":
   version: 4.17.21
   resolution: "lodash@npm:4.17.21"
   checksum: eb835a2e51d381e561e508ce932ea50a8e5a68f4ebdd771ea240d3048244a8d13658acbd502cd4829768c56f2e16bdd4340b9ea141297d472517b83868e677f7
@@ -14385,13 +14328,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"promise-polyfill@npm:^8.2.3":
-  version: 8.2.3
-  resolution: "promise-polyfill@npm:8.2.3"
-  checksum: f320278bab8b8ce32f0e2f377d75aabe35c90a79f92b3e001db084d635da1fb8740ba8a26b5c1c2b4cdca5a4c988f9b6b3eb30f0b151d0362d3d9c1675024a8f
-  languageName: node
-  linkType: hard
-
 "promise-retry@npm:^2.0.1":
   version: 2.0.1
   resolution: "promise-retry@npm:2.0.1"
@@ -15008,7 +14944,6 @@ __metadata:
   resolution: "recordreplay-devtools@workspace:."
   dependencies:
     "@apollo/client": ^3.5.10
-    "@auth0/auth0-react": 1.2.0
     "@babel/core": ^7.17.8
     "@babel/generator": ^7.17.7
     "@babel/parser": ^7.17.8

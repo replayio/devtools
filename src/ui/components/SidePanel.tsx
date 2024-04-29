@@ -15,11 +15,11 @@ import TestSuitePanel from "ui/components/TestSuite";
 import { isTestSuiteReplay } from "ui/components/TestSuite/utils/isTestSuiteReplay";
 import hooks from "ui/hooks";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
+import { getAccessToken } from "ui/reducers/app";
 import { getSelectedPrimaryPanel } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { PrimaryPanelName } from "ui/state/layout";
 import { shouldShowTour } from "ui/utils/onboarding";
-import useAuth0 from "ui/utils/useAuth0";
 
 import CommentCardsList from "./Comments/CommentCardsList";
 import EventsDropDownMenu from "./Events/EventsDropDownMenu";
@@ -37,7 +37,7 @@ function useInitialPrimaryPanel() {
 
   const { nags } = hooks.useGetUserInfo();
   const showTour = shouldShowTour(nags);
-  const { isAuthenticated } = useAuth0();
+  const isAuthenticated = !!useAppSelector(getAccessToken);
 
   const { comments } = hooks.useGetComments(recordingId);
 
@@ -74,7 +74,7 @@ function SidePanelSuspends() {
   const selectedPrimaryPanel = useInitialPrimaryPanel();
   const [replayInfoCollapsed, setReplayInfoCollapsed] = useState(false);
   const [eventsCollapsed, setEventsCollapsed] = useState(false);
-  const { isAuthenticated } = useAuth0();
+  const isAuthenticated = !!useAppSelector(getAccessToken);
 
   const events = RecordedEventsCache.read();
 

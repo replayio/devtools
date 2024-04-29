@@ -6,9 +6,8 @@ import { ClipboardEvent, KeyboardEvent, useLayoutEffect, useRef, useState } from
 
 import { RecordingTarget } from "replay-next/src/suspense/BuildIdCache";
 import { Recording } from "shared/graphql/types";
-import { getTestRunId } from "shared/test-suites/RecordingTestMetadata";
 import { selectAll } from "shared/utils/selection";
-import { getRecordingTarget } from "ui/actions/app";
+import { getAccessToken, getRecordingTarget } from "ui/actions/app";
 import Avatar from "ui/components/Avatar";
 import UserOptions from "ui/components/Header/UserOptions";
 import ViewToggle, { shouldShowDevToolsNag } from "ui/components/Header/ViewToggle";
@@ -18,7 +17,6 @@ import { useGetActiveSessions } from "ui/hooks/sessions";
 import { getViewMode } from "ui/reducers/layout";
 import { useAppSelector } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
-import useAuth0 from "ui/utils/useAuth0";
 
 import { isTestSuiteReplay } from "../TestSuite/utils/isTestSuiteReplay";
 import { RecordingTrialEnd } from "./RecordingTrialEnd";
@@ -51,7 +49,7 @@ function Avatars({ recordingId }: { recordingId: RecordingId | null }) {
 
 function Links({ recordingTarget }: { recordingTarget: RecordingTarget | null }) {
   const recordingId = hooks.useGetRecordingId();
-  const { isAuthenticated } = useAuth0();
+  const isAuthenticated = !!useAppSelector(getAccessToken);
   const { nags } = hooks.useGetUserInfo();
 
   const viewMode = useAppSelector(getViewMode);
@@ -169,7 +167,7 @@ function HeaderTitle({
 export default function Header() {
   const router = useRouter();
   const recordingTarget = useAppSelector(getRecordingTarget);
-  const { isAuthenticated } = useAuth0();
+  const isAuthenticated = !!useAppSelector(getAccessToken);
   const recordingId = hooks.useGetRecordingId();
   const { recording, loading } = hooks.useGetRecording(recordingId);
   const backIcon = <div className={classNames(styles.BackButton, "img", "arrowhead-right")} />;

@@ -7,13 +7,12 @@ import { client, initSocket } from "protocol/socket";
 import { assert } from "protocol/utils";
 import renderSourcemap from "third-party/sourcemap-visualizer/sourcemapVisualizer";
 import { UIStore } from "ui/actions";
-import { setAppMode } from "ui/actions/app";
+import { getAccessToken, setAppMode } from "ui/actions/app";
 import { getAccessibleRecording } from "ui/actions/session";
 import { ExpectedErrorModal } from "ui/components/Errors/ExpectedErrorModal";
 import LoadingScreen from "ui/components/shared/LoadingScreen";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import { useAppDispatch, useAppStore } from "ui/setup/hooks";
-import tokenManager from "ui/utils/tokenManager";
 
 type SourcemapResult =
   | {
@@ -47,9 +46,9 @@ async function loadSourceMap(
       }
     }
 
-    const token = await tokenManager.getToken();
-    if (token.token) {
-      await client.Authentication.setAccessToken({ accessToken: token.token });
+    const accessToken = getAccessToken(store.getState());
+    if (accessToken) {
+      await client.Authentication.setAccessToken({ accessToken });
     }
     const { sessionId } = await client.Recording.createSession({ recordingId });
 
