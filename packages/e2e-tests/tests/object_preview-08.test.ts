@@ -26,7 +26,7 @@ test(`object_preview-08: should render ellipsis for collapsed objects with trunc
 
   {
     // Properties truncated by the client (no overflow)
-    const message = await findConsoleMessage(page, "76objectWithSixProperties", "console-log");
+    const message = await findConsoleMessage(page, "objectWithSixProperties", "console-log");
     const textContent = await message.textContent();
     expect(textContent).toContain("{a: 1, b: 2, c: 3, d: 4, e: 5, …}");
   }
