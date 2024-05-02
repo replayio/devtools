@@ -24,7 +24,6 @@
   font-family: var(--font-family-default);
   background-color: var(--support-form-modal-background-color);
   color: var(--support-form-color);
-  border: 1px solid var(--support-form-modal-border-color);
   border-radius: 0.75rem;
   filter: var(--context-menu-filter);
 }
