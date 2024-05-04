@@ -8008,6 +8008,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"dub@npm:^0.26.0":
+  version: 0.26.0
+  resolution: "dub@npm:0.26.0"
+  peerDependencies:
+    zod: ">= 3"
+  checksum: 707781a25c5467b62ff5d5c671cd02d5e14691735c13c76d99819afd327477e327b3301a484f12041a3729c55d5558d72463ed851f4d4612d0f35ffd7383a559
+  languageName: node
+  linkType: hard
+
 "duplexer@npm:^0.1.2":
   version: 0.1.2
   resolution: "duplexer@npm:0.1.2"
@@ -15022,6 +15031,7 @@ __metadata:
     date-fns: ^2.28.0
     design: "workspace:*"
     dotenv: ^16.0.0
+    dub: ^0.26.0
     error-stack-parser: ^2.1.4
     escape-html: ^1.0.3
     eslint: ^8.13.0
@@ -15117,6 +15127,7 @@ __metadata:
     v8-to-istanbul: ^9.0.1
     webpack: ^5.71.0
     webpack-cli: ^4.9.2
+    zod: ^3.23.6
   languageName: unknown
   linkType: soft
 
@@ -18351,5 +18362,12 @@ __metadata:
   version: 0.8.15
   resolution: "zen-observable@npm:0.8.15"
   checksum: b7289084bc1fc74a559b7259faa23d3214b14b538a8843d2b001a35e27147833f4107590b1b44bf5bc7f6dfe6f488660d3a3725f268e09b3925b3476153b7821
+  languageName: node
+  linkType: hard
+
+"zod@npm:^3.23.6":
+  version: 3.23.6
+  resolution: "zod@npm:3.23.6"
+  checksum: f534119e2a54e86bf77e5c6ff630ef4ec50b87dd9d9faf66dc7a663a489d37130b716ebd836cdd9d7fc6e124a1accdc0d53f388243a236c10e632dcc945eaa27
   languageName: node
   linkType: hard
