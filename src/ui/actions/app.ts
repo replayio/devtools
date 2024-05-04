@@ -9,6 +9,7 @@ import { getSystemColorScheme } from "shared/theme/getSystemColorScheme";
 import { userData } from "shared/user-data/GraphQL/UserData";
 import { getRecordingId } from "shared/utils/recording";
 import { CommandKey } from "ui/components/CommandPalette/CommandPalette";
+import { createShortLink } from "ui/utils/shortLink";
 
 import { setModal, setSessionId } from "../reducers/app";
 import {
@@ -110,6 +111,8 @@ export function executeCommand(key: CommandKey): UIThunkAction {
       const url = new URL(window.location.href);
       url.searchParams.append("restart", "true");
       window.location.href = url.toString();
+    } else if (key === "short-link") {
+      createShortLink(window.location.href);
     }
 
     dispatch(hideCommandPalette());

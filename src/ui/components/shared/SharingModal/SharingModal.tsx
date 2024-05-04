@@ -94,7 +94,7 @@ function SharingSection({ recording }: { recording: Recording }) {
     <>
       <CollaboratorsSection recording={recording} />
       <section className="flex flex-col bg-menuHoverBgcolor px-4 py-3">
-        <CopyButton recording={recording} />
+        <CopyButton />
       </section>
     </>
   );

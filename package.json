@@ -48,6 +48,7 @@
     "date-fns": "^2.28.0",
     "design": "workspace:*",
     "dotenv": "^16.0.0",
+    "dub": "^0.29.0",
     "error-stack-parser": "^2.1.4",
     "escape-html": "^1.0.3",
     "fluent-ffmpeg": "^2.1.2",
@@ -94,7 +95,8 @@
     "shared": "workspace:*",
     "slugify": "^1.6.5",
     "suspense": "^0.0.53",
-    "use-context-menu": "0.4.13"
+    "use-context-menu": "0.4.13",
+    "zod": "^3.23.6"
   },
   "devDependencies": {
     "@babel/core": "^7.17.8",

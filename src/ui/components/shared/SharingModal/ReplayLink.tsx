@@ -2,19 +2,18 @@ import React, { useRef, useState } from "react";
 
 import { Button } from "replay-next/components/Button";
 import { Recording } from "shared/graphql/types";
-import { getRecordingURL } from "shared/utils/recording";
+import { createShortLink } from "ui/utils/shortLink";
 import { trackEvent } from "ui/utils/telemetry";
 
 import Icon from "../../shared/Icon";
 import styles from "./SharingModal.module.css";
 
-export function CopyButton({ recording }: { recording: Recording }) {
+export function CopyButton() {
   const [showCopied, setShowCopied] = useState(false);
   const timeoutKey = useRef<NodeJS.Timeout | null>(null);
-  const url = window?.location.origin + getRecordingURL(recording, true);
 
-  const onClick = () => {
-    navigator.clipboard.writeText(url);
+  const onClick = async () => {
+    await createShortLink(window.location.href);
     trackEvent("share_modal.copy_link");
 
     if (timeoutKey.current) {
