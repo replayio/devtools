@@ -21,7 +21,7 @@
   "license": "ISC",
   "devDependencies": {
     "@playwright/test": "^1.37.0",
-    "@replayio/playwright": "^3.0.0-alpha.3",
+    "@replayio/playwright": "3.0.0-alpha.7",
     "cli-spinners": "^2.7.0",
     "cypress": "^12.5.1",
     "ts-node": "^10.7.0",
