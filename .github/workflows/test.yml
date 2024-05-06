@@ -105,7 +105,6 @@ jobs:
         run: npx playwright test --shard ${{ matrix.shard }}/10 tests/*.ts --project replay-chromium
         working-directory: ./packages/e2e-tests
         env:
-          REPLAY_PLAYWRIGHT_FIXTURE: 1
           RECORD_REPLAY_TEST_RUN_ID: ${{ needs.generate-test-run-id.outputs.testRunId }}
           PLAYWRIGHT_TEST_BASE_URL: ${{ needs.preview-branch.outputs.url }}
           INPUT_STRIPE: ${{ matrix.shard }}/10
@@ -115,7 +114,7 @@ jobs:
           AUTOMATED_TEST_SECRET: ${{ secrets.AUTOMATED_TEST_SECRET }}
           AUTHENTICATED_TESTS_WORKSPACE_API_KEY: ${{ secrets.AUTHENTICATED_TESTS_WORKSPACE_API_KEY }}
           GOLDEN_TEST_RUN_WORKSPACE_API_KEY: ${{ secrets.GOLDEN_TEST_RUN_WORKSPACE_API_KEY }}
-      - name: Archive Playwright report results with code coverage 
+      - name: Archive Playwright report results with code coverage
         uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -168,7 +167,6 @@ jobs:
         run: npx playwright test --shard ${{ matrix.shard }}/1 authenticated/ test-suite-dashboard/ --project replay-chromium
         working-directory: ./packages/e2e-tests
         env:
-          REPLAY_PLAYWRIGHT_FIXTURE: 1
           RECORD_REPLAY_TEST_RUN_ID: ${{ needs.generate-test-run-id.outputs.testRunId }}
           PLAYWRIGHT_TEST_BASE_URL: ${{ needs.preview-branch.outputs.url }}
           INPUT_STRIPE: ${{ matrix.shard }}/1
@@ -177,7 +175,7 @@ jobs:
           AUTOMATED_TEST_SECRET: ${{ secrets.AUTOMATED_TEST_SECRET }}
           AUTHENTICATED_TESTS_WORKSPACE_API_KEY: ${{ secrets.AUTHENTICATED_TESTS_WORKSPACE_API_KEY }}
           GOLDEN_TEST_RUN_WORKSPACE_API_KEY: ${{ secrets.GOLDEN_TEST_RUN_WORKSPACE_API_KEY }}
-      - name: Archive Playwright report results with code coverage 
+      - name: Archive Playwright report results with code coverage
         uses: actions/upload-artifact@v4
         if: always()
         with:
