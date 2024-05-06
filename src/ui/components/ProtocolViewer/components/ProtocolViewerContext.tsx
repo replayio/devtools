@@ -7,12 +7,14 @@ import {
   useState,
 } from "react";
 
+import { seek } from "ui/actions/timeline";
 import { REQUEST_DURATION_SLOW_THRESHOLD_MS } from "ui/components/ProtocolViewer/components/ProtocolViewerListItem";
 import {
   ProtocolErrorMap,
   ProtocolRequestMap,
   ProtocolResponseMap,
 } from "ui/reducers/protocolMessages";
+import { useAppDispatch } from "ui/setup/hooks";
 
 export type FilterByCategory = "failed" | "pending" | "slow";
 
@@ -52,6 +54,25 @@ export function ProtocolViewerContextRoot({
   const [filterByText, updateFilterByText] = useState("");
   const [selectedRequestId, selectRequest] = useState<number | null>(null);
   const [clearBeforeIndex, setClearBeforeIndex] = useState(-1);
+
+  const dispatch = useAppDispatch();
+
+  const selectRequestWrapper = useCallback(
+    (id: number | null) => {
+      selectRequest(id);
+
+      if (scope == "recorded") {
+        if (id) {
+          const request = requestMap[id];
+          if (request) {
+            const time = request.recordedAt;
+            dispatch(seek({ time, openSource: false }));
+          }
+        }
+      }
+    },
+    [dispatch, requestMap, scope]
+  );
 
   const clearCurrentRequests = useCallback(() => {
     const length = Object.keys(requestMap).length;
@@ -155,7 +176,7 @@ export function ProtocolViewerContextRoot({
       responseMap,
       scope,
       selectedRequestId,
-      selectRequest,
+      selectRequest: selectRequestWrapper,
       updateFilterByCategory,
       updateFilterByText,
     }),
@@ -168,6 +189,7 @@ export function ProtocolViewerContextRoot({
       longestRequestDuration,
       requestMap,
       responseMap,
+      selectRequestWrapper,
       scope,
       selectedRequestId,
     ]
