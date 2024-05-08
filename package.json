@@ -114,7 +114,7 @@
     "@jest/console": "^28.0.2",
     "@jridgewell/trace-mapping": "^0.3.14",
     "@next/bundle-analyzer": "^12.2.0",
-    "@replayio/replay": "^0.21.4",
+    "@replayio/replay": "^0.22.4",
     "@tailwindcss/forms": "^0.5.0",
     "@testing-library/jest-dom": "^5.16.3",
     "@testing-library/react": "^13.3.0",
