@@ -27,7 +27,7 @@ type Props = {
   target: HTMLElement;
 };
 
-export default function PreviewPopup(props: Props) {
+export default function PreviewPopup({ expression, sourceId, ...props }: Props) {
   return (
     <InlineErrorBoundary name="PreviewPopup">
       <Suspense
@@ -39,7 +39,7 @@ export default function PreviewPopup(props: Props) {
           </Popup>
         }
       >
-        <SuspendingPreviewPopup {...props} />
+        <SuspendingPreviewPopup expression={expression} sourceId={sourceId} {...props} />
       </Suspense>
     </InlineErrorBoundary>
   );
