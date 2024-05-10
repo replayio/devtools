@@ -5,6 +5,7 @@
   border-radius: 0.25rem;
   padding: 0.25rem 0.5rem;
   border: none;
+  line-height: 1.25rem;
   font-family: var(--font-family-default);
   font-size: var(--font-size-regular);
   background-color: var(--support-form-text-area-background-color);
