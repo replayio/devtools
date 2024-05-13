@@ -36,7 +36,7 @@ export function DevToolsProcessingScreen() {
 
   if (showStalledMessage) {
     secondaryMessage = "There may be a problem. This is taking much longer than expected.";
-  } else if (recording?.duration != null) {
+  } else if (recording?.duration) {
     const durationLabel = formatEstimatedProcessingDuration(recording?.duration);
     secondaryMessage = `Based on the length of this Replay, we expect processing will take about ${durationLabel}`;
   }
