@@ -143,7 +143,7 @@ export async function detectAndRecordBuildReason() {
   return await storeChromiumBranchReason("master");
 }
 
-async function graphql<ResultT, VariablesT = Record<string, unknown>(query: string, variables: VariablesT) {
+async function graphql<ResultT, VariablesT = Record<string, unknown>>(query: string, variables: VariablesT) {
   return new Promise<ResultT>((resolve, reject) => {
     const postBody = JSON.stringify({ query, variables });
 
