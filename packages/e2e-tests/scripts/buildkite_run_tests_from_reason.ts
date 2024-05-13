@@ -1,20 +1,19 @@
 /* Copyright 2020-2024 Record Replay Inc. */
 
-import * as path from "path";
 import { execSync } from "child_process";
+import * as path from "path";
 
 import { getSecret } from "./aws_secrets";
-import {
-  detectAndRecordBuildReason,
-  fetchRuntimeBuildIdFromChromiumBuildId,
-  fetchRuntimeBuildIdFromChromiumBuildNumber,
-  fetchLatestChromiumBuildOnBranch,
-} from "./detect_and_record_build_reason";
-
 import { install_build_products } from "./build_products";
 import run_fe_tests from "./buildkite_run_fe_tests";
+import {
+  detectAndRecordBuildReason,
+  fetchLatestChromiumBuildOnBranch,
+  fetchRuntimeBuildIdFromChromiumBuildId,
+  fetchRuntimeBuildIdFromChromiumBuildNumber,
+} from "./detect_and_record_build_reason";
 
-function run_fe_tests_from_build_id(os: string, arch:  string, runtimeBuildId: string) {
+function run_fe_tests_from_build_id(os: string, arch: string, runtimeBuildId: string) {
   console.group("BUILD PREP");
   console.time("BUILD PREP");
   process.env.RUNTIME_BUILD_ID = runtimeBuildId;
@@ -40,10 +39,7 @@ export async function build_from_reason(os, arch) {
   const buildReason = await detectAndRecordBuildReason();
 
   if (!process.env.BUILDKITE_TOKEN) {
-    process.env.BUILDKITE_TOKEN = getSecret(
-      "prod/buildkite-retry-graphql-token",
-      "us-east-2"
-    );
+    process.env.BUILDKITE_TOKEN = getSecret("prod/buildkite-retry-graphql-token", "us-east-2");
   }
 
   switch (buildReason.reason) {
@@ -87,19 +83,16 @@ export async function build_from_reason(os, arch) {
         }\\\`: [#${buildNumber}](${buildUrl("chromium-build", buildNumber)})`,
         buildReason.rebuild
       );
-      const runtimeBuildId = await fetchRuntimeBuildIdFromChromiumBuildId(
-        os,
-        arch,
-        buildId
-      );
+      const runtimeBuildId = await fetchRuntimeBuildIdFromChromiumBuildId(os, arch, buildId);
       run_fe_tests_from_build_id(os, arch, runtimeBuildId);
       break;
     }
     case "triggered": {
       describeReason(
-        `Testing triggered from [${buildReason.pipelineSlug}#${
+        `Testing triggered from [${buildReason.pipelineSlug}#${buildReason.buildNumber}](${buildUrl(
+          buildReason.pipelineSlug,
           buildReason.buildNumber
-        }](${buildUrl(buildReason.pipelineSlug, buildReason.buildNumber)})`,
+        )})`,
         buildReason.rebuild
       );
       const runtimeBuildId = await fetchRuntimeBuildIdFromChromiumBuildId(

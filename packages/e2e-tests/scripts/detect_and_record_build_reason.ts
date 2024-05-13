@@ -1,9 +1,9 @@
 /* Copyright 2020-2024 Record Replay Inc. */
 
-import * as fs from "fs";
-import * as path from "path";
 import { execSync } from "child_process";
+import * as fs from "fs";
 import * as https from "https";
+import * as path from "path";
 
 export type ChromiumBuildNumberReason = {
   reason: "chromium-build-number";
@@ -37,8 +37,7 @@ export type BuildReason =
   | ChromiumBuildNumberReason
   | ChromiumBranchReason
   | TriggeredBuildReason
-  | RuntimeChromiumBuildIdReason
-  ;
+  | RuntimeChromiumBuildIdReason;
 
 const BuildReasonArtifactPath = "build_reason.json";
 async function fetchBuildReason(buildId: string): Promise<BuildReason> {
@@ -56,7 +55,11 @@ async function storeBuildReason(buildReason: BuildReason) {
   return buildReason;
 }
 
-async function storeTriggeredBuildReason(pipelineSlug: string, buildNumber: number, buildId:  string) {
+async function storeTriggeredBuildReason(
+  pipelineSlug: string,
+  buildNumber: number,
+  buildId: string
+) {
   return await storeBuildReason({
     reason: "triggered",
     pipelineSlug,
@@ -123,9 +126,7 @@ export async function detectAndRecordBuildReason() {
   if (RUNTIME_CHROMIUM_BUILDKITE_BUILD_NUMBER) {
     // the user specified a build number from the chromium pipeline.  fetch the build_id from
     // there and record our artifact.
-    return await storeChromiumBuildNumberReason(
-      parseInt(RUNTIME_CHROMIUM_BUILDKITE_BUILD_NUMBER)
-    );
+    return await storeChromiumBuildNumberReason(parseInt(RUNTIME_CHROMIUM_BUILDKITE_BUILD_NUMBER));
   }
 
   if (RUNTIME_CHROMIUM_BUILDKITE_BRANCH) {
@@ -143,7 +144,10 @@ export async function detectAndRecordBuildReason() {
   return await storeChromiumBranchReason("master");
 }
 
-async function graphql<ResultT, VariablesT = Record<string, unknown>>(query: string, variables: VariablesT) {
+async function graphql<ResultT, VariablesT = Record<string, unknown>>(
+  query: string,
+  variables: VariablesT
+) {
   return new Promise<ResultT>((resolve, reject) => {
     const postBody = JSON.stringify({ query, variables });
 
@@ -190,7 +194,7 @@ async function graphql<ResultT, VariablesT = Record<string, unknown>>(query: str
 export async function fetchLatestChromiumBuildOnBranch(token, branch) {
   type VariablesType = {
     branch: string;
-  }
+  };
   type ResultType = {
     pipeline: {
       builds: {
@@ -328,7 +332,5 @@ async function fetchArtifactContents(buildId, artifactPath) {
 
 async function uploadArtifactContents(artifactPath, contents, contentType) {
   fs.writeFileSync(artifactPath, contents);
-  execSync(
-    `buildkite-agent artifact upload --content-type ${contentType} ${artifactPath}`
-  );
+  execSync(`buildkite-agent artifact upload --content-type ${contentType} ${artifactPath}`);
 }
