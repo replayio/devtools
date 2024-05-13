@@ -5,7 +5,7 @@ steps:
     commands:
       - "mkdir -p /mnt/data/replay"
       - "be_cmd node_deps -- npx yarn install"
-      - "be_cmd run_tests -- ts-node ./packages/e2e-tests/scripts/buildkite_run_fe_tests_from_reason-linux-x86_64.ts"
+      - "be_cmd run_tests -- ts-node ./packages/e2e-tests/scripts/buildkite_run_tests_from_reason-linux-x86_64.ts"
     agents:
       - "deploy=true"
     plugins:
@@ -58,7 +58,7 @@ steps:
     timeout_in_minutes: 60
     commands:
       - "be_cmd node_deps -- npx yarn install"
-      - "be_cmd run_tests -- ts-node ./packages/e2e-tests/scripts/buildkite_run_fe_tests_from_reason-macos-arm64.ts"
+      - "be_cmd run_tests -- ts-node ./packages/e2e-tests/scripts/buildkite_run_tests_from_reason-macos-arm64.ts"
     agents:
       - "os=macos"
       - "arch=arm64"
