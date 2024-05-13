@@ -11,22 +11,18 @@ import {
   fetchLatestChromiumBuildOnBranch,
 } from "./detect_and_record_build_reason";
 
-function build(os, arch, runtimeBuildId) {
+import { install_build_products } from "./build_products";
+import run_fe_tests from "./buildkite_run_fe_tests";
+
+function run_fe_tests_from_build_id(os: string, arch:  string, runtimeBuildId: string) {
+  console.group("BUILD PREP");
+  console.time("BUILD PREP");
   process.env.RUNTIME_BUILD_ID = runtimeBuildId;
-  process.env.OS = os;
+  let CHROME_BINARY_PATH = install_build_products(runtimeBuildId, os, arch);
+  console.timeEnd("BUILD PREP");
+  console.groupEnd();
 
-  if (!process.env.HASURA_ADMIN_SECRET) {
-    process.env.HASURA_ADMIN_SECRET = getSecret("prod/hasura-admin-secret", "us-east-2");
-  }
-
-  const scriptPath = path.join(
-    process.env.BUILDKITE_BUILD_CHECKOUT_PATH,
-    "scripts",
-    "chromium",
-    "tests",
-    "buildkite_run_tests.js"
-  );
-  execSync(`node ${scriptPath} ${process.env.RUNTIME_TEST_FILE}`, { stdio: "inherit" });
+  run_fe_tests(CHROME_BINARY_PATH);
 }
 
 function buildUrl(pipelineSlug, buildNumber) {
@@ -56,7 +52,7 @@ export async function build_from_reason(os, arch) {
         `Testing against chromium buildid ${buildReason.chromiumBuildId}`,
         buildReason.rebuild
       );
-      build(os, arch, buildReason.chromiumBuildId);
+      run_fe_tests_from_build_id(os, arch, buildReason.chromiumBuildId);
       break;
     }
     case "chromium-build-number": {
@@ -72,7 +68,7 @@ export async function build_from_reason(os, arch) {
         arch,
         buildReason.buildNumber
       );
-      build(os, arch, runtimeBuildId);
+      run_fe_tests_from_build_id(os, arch, runtimeBuildId);
       break;
     }
     case "chromium-branch": {
@@ -96,7 +92,7 @@ export async function build_from_reason(os, arch) {
         arch,
         buildId
       );
-      build(os, arch, runtimeBuildId);
+      run_fe_tests_from_build_id(os, arch, runtimeBuildId);
       break;
     }
     case "triggered": {
@@ -111,7 +107,7 @@ export async function build_from_reason(os, arch) {
         arch,
         buildReason.buildId
       );
-      build(os, arch, runtimeBuildId);
+      run_fe_tests_from_build_id(os, arch, runtimeBuildId);
       break;
     }
     default:
