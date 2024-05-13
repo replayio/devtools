@@ -225,7 +225,13 @@ function _DevTools({
     });
   });
 
+  const didInitializeSocketRef = useRef<boolean>(false);
   useEffect(() => {
+    if (didInitializeSocketRef.current) {
+      return;
+    }
+    didInitializeSocketRef.current = true;
+
     async function createSocketWithToken() {
       if (accessToken) {
         await client.Authentication.setAccessToken({ accessToken });
