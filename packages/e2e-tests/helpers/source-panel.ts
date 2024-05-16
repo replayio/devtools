@@ -337,24 +337,21 @@ export async function editLogPoint(
     // The typeahead popup sometimes sticks around and overlaps the save button.
     // Sometimes, it will show up after we check the first time (PRO-238) so we
     // retry a couple times to ensure that we can clear it and move forward.
-    await waitFor(
-      async () => {
-        await hideTypeAheadSuggestions(page, {
-          sourceLineNumber: lineNumber,
-          type: "log-point-condition",
-        });
-        await hideTypeAheadSuggestions(page, {
-          sourceLineNumber: lineNumber,
-          type: "log-point-content",
-        });
+    await waitFor(async () => {
+      await hideTypeAheadSuggestions(page, {
+        sourceLineNumber: lineNumber,
+        type: "log-point-condition",
+      });
+      await hideTypeAheadSuggestions(page, {
+        sourceLineNumber: lineNumber,
+        type: "log-point-content",
+      });
 
-        const saveButton = line.locator('[data-test-name="PointPanel-SaveButton"]');
-        await expect(saveButton).toBeEnabled();
-        await saveButton.click();
-        await saveButton.waitFor({ state: "detached" });
-      },
-      { timeout: 2_000 }
-    );
+      const saveButton = line.locator('[data-test-name="PointPanel-SaveButton"]');
+      await expect(saveButton).toBeEnabled();
+      await saveButton.click({ timeout: 1_000 });
+      await saveButton.waitFor({ state: "detached" });
+    });
   }
 }
 
