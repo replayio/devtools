@@ -97,8 +97,8 @@ jobs:
         env:
           YARN_CHECKSUM_BEHAVIOR: "update"
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
-      - name: Install Replay Playwright
-        run: npx @replayio/playwright install
+      - name: Install Replay Chromium
+        run: npx replayio install
         env:
           RECORD_REPLAY_CHROMIUM_DOWNLOAD_FILE: ${{ github.event.inputs.linuxBuildFile }}
       - name: Run Playwright
@@ -161,8 +161,8 @@ jobs:
         env:
           YARN_CHECKSUM_BEHAVIOR: "update"
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
-      - name: Install Replay Playwright
-        run: npx @replayio/playwright install
+      - name: Install Replay Chromium
+        run: npx replayio install
       - name: Run Playwright
         run: npx playwright test --shard ${{ matrix.shard }}/1 authenticated/ test-suite-dashboard/ --project replay-chromium
         working-directory: ./packages/e2e-tests
