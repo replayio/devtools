@@ -1,5 +1,5 @@
 import { PlaywrightTestConfig, ReporterDescription, devices } from "@playwright/test";
-import { devices as replayDevices } from "@replayio/playwright";
+import { devices as replayDevices, replayReporter } from "@replayio/playwright";
 
 const { CI, SLOW_MO } = process.env;
 
@@ -17,7 +17,7 @@ const projects = [
   {
     name: "replay-chromium",
     use: {
-      ...(replayDevices["Replay Chromium"] as any),
+      ...replayDevices["Replay Chromium"],
     },
   },
   {
@@ -29,7 +29,7 @@ const projects = [
 const reporter: ReporterDescription[] = [["line"]];
 
 if (CI) {
-  reporter.unshift(["@replayio/playwright/reporter"]);
+  reporter.unshift(replayReporter());
 }
 
 const config: PlaywrightTestConfig = {
