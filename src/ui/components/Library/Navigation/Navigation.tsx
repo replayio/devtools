@@ -1,9 +1,7 @@
-import { Workspace } from "shared/graphql/types";
 import hooks from "ui/hooks";
 
 import { LibrarySpinner } from "../LibrarySpinner";
 import { MY_LIBRARY_TEAM } from "../Team/TeamContextRoot";
-import { Invitations } from "./Invitations";
 import { NewTeamButton } from "./NewTeamButton";
 import Profile from "./Profile";
 import { TeamButton } from "./TeamButton";
@@ -40,7 +38,6 @@ export default function Navigation() {
       >
         <div className="flex flex-col">
           <TeamButton label={MY_LIBRARY_TEAM.name} id={MY_LIBRARY_TEAM.id} />
-          <Invitations />
           <Teams />
           <NewTeamButton />
         </div>

@@ -13,11 +13,6 @@ function queryParams() {
 // opens that link and is shown a customized login screen
 export const isTeamMemberInvite = () => queryParams().get("teaminvite");
 
-// This is for the user onboarding flow where the user signs up for Replay using
-// a Replay team invite that they received in their email.
-export const singleInvitation = (invitations: number, workspaces: number): boolean =>
-  invitations === 1 && workspaces === 0;
-
 // This is for the user onboarding flow where the user opens the Replay
 // browser for the first time. It teaches them how to create their first replay.
 export function firstReplay(nags: Nag[]): boolean {

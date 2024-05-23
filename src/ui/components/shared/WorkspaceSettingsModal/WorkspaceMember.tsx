@@ -166,14 +166,8 @@ function Status({
   title?: string;
 }) {
   return (
-    <div
-      className={classnames("flex flex-row items-center", { italic: member.pending })}
-      title={title}
-    >
-      <span className="whitespace-pre">
-        {memberRoleLabels[getPrimaryMemberRole(member)]}
-        {member.pending ? " (pending)" : ""}
-      </span>
+    <div className="flex flex-row items-center" title={title}>
+      <span className="whitespace-pre">{memberRoleLabels[getPrimaryMemberRole(member)]}</span>
       <MaterialIcon
         className={classnames("material-icons opacity-0", {
           "group-hover:opacity-100": !hideArrow,
@@ -310,7 +304,7 @@ function Role({
           </>
         ) : null}
         <DropdownItem onClick={handleDelete}>
-          {member.pending ? "Cancel" : localUserId == userId ? "Leave" : "Remove"}
+          {localUserId == userId ? "Leave" : "Remove"}
         </DropdownItem>
       </Dropdown>
     </PortalDropdown>

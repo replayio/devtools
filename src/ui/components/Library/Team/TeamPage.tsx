@@ -30,11 +30,11 @@ export function TeamPage() {
 }
 
 function TeamContent() {
-  const { team, isPendingTeam } = useContext(TeamContext);
+  const { team } = useContext(TeamContext);
 
   return (
     <>
-      <ViewPage defaultView={team?.isTest && !isPendingTeam ? "runs" : "recordings"} />
+      <ViewPage defaultView={team?.isTest ? "runs" : "recordings"} />
       <ParamHandler />
     </>
   );

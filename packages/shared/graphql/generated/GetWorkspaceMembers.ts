@@ -12,25 +12,7 @@ export interface GetWorkspaceMembers_node_Recording {
 }
 
 export interface GetWorkspaceMembers_node_Workspace_members_edges_node_WorkspacePendingEmailMember {
-  __typename: "WorkspacePendingEmailMember";
-  id: string;
-  roles: string[];
-  email: string;
-  createdAt: any;
-}
-
-export interface GetWorkspaceMembers_node_Workspace_members_edges_node_WorkspacePendingUserMember_user {
-  __typename: "User";
-  id: string;
-  name: string | null;
-  picture: string | null;
-}
-
-export interface GetWorkspaceMembers_node_Workspace_members_edges_node_WorkspacePendingUserMember {
-  __typename: "WorkspacePendingUserMember";
-  id: string;
-  roles: string[];
-  user: GetWorkspaceMembers_node_Workspace_members_edges_node_WorkspacePendingUserMember_user;
+  __typename: "WorkspacePendingEmailMember" | "WorkspacePendingUserMember";
 }
 
 export interface GetWorkspaceMembers_node_Workspace_members_edges_node_WorkspaceUserMember_user {
@@ -47,7 +29,7 @@ export interface GetWorkspaceMembers_node_Workspace_members_edges_node_Workspace
   user: GetWorkspaceMembers_node_Workspace_members_edges_node_WorkspaceUserMember_user;
 }
 
-export type GetWorkspaceMembers_node_Workspace_members_edges_node = GetWorkspaceMembers_node_Workspace_members_edges_node_WorkspacePendingEmailMember | GetWorkspaceMembers_node_Workspace_members_edges_node_WorkspacePendingUserMember | GetWorkspaceMembers_node_Workspace_members_edges_node_WorkspaceUserMember;
+export type GetWorkspaceMembers_node_Workspace_members_edges_node = GetWorkspaceMembers_node_Workspace_members_edges_node_WorkspacePendingEmailMember | GetWorkspaceMembers_node_Workspace_members_edges_node_WorkspaceUserMember;
 
 export interface GetWorkspaceMembers_node_Workspace_members_edges {
   __typename: "WorkspaceMemberEdge";

@@ -42,10 +42,9 @@ const useGetTeamId = (defaultTeamId: string | null) => {
 };
 
 function useGetIsValidTeamId(teamId: string | null) {
-  const { workspaces, loading: loading1 } = hooks.useGetNonPendingWorkspaces();
-  const { pendingWorkspaces, loading: loading2 } = hooks.useGetPendingWorkspaces();
+  const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
 
-  if (loading1 || loading2) {
+  if (loading) {
     return null;
   }
 
@@ -53,7 +52,7 @@ function useGetIsValidTeamId(teamId: string | null) {
     return true;
   }
 
-  return !!(workspaces.find(w => w.id === teamId) || pendingWorkspaces?.find(w => w.id === teamId));
+  return !!workspaces.find(w => w.id === teamId);
 }
 
 export default function LibraryLoader() {

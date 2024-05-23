@@ -303,10 +303,6 @@ export interface OperationsData {
   storage?: string[];
 }
 
-export interface PendingWorkspaceInvitation extends Workspace {
-  inviterEmail: string | null;
-}
-
 export interface Workspace {
   apiKeys?: ApiKey[];
   logo?: string | null;
@@ -349,7 +345,6 @@ export type WorkspaceUserRole = "viewer" | "debugger" | "admin" | "contributor";
 
 export interface WorkspaceUser {
   membershipId: string;
-  pending: boolean;
   email?: string;
   user?: User;
   userId?: string;
