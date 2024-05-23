@@ -13,7 +13,7 @@ export async function recordPlaywright(
 ) {
   let executablePath: string | undefined = undefined;
   if (config.shouldRecordTest) {
-    executablePath = config.browserPath || getExecutablePath("chromium");
+    executablePath = config.browserPath || getExecutablePath();
   }
 
   const browserServer = await chromium.launchServer({
