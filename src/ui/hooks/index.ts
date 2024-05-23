@@ -5,7 +5,6 @@ import * as sessionHooks from "./sessions";
 import * as settingsHooks from "./settings";
 import * as usersHooks from "./users";
 import * as workspacesHooks from "./workspaces";
-import * as workspaceMembersHooks from "./workspaces_user";
 
 export default {
   ...commentsHooks,
@@ -14,6 +13,5 @@ export default {
   ...settingsHooks,
   ...collaboratorsHooks,
   ...workspacesHooks,
-  ...workspaceMembersHooks,
   ...usersHooks,
 };
