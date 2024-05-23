@@ -31,7 +31,6 @@ import {
   DeleteWorkspacePaymentMethodVariables,
 } from "shared/graphql/generated/DeleteWorkspacePaymentMethod";
 import { GetNonPendingWorkspaces } from "shared/graphql/generated/GetNonPendingWorkspaces";
-import { GetPendingWorkspaces } from "shared/graphql/generated/GetPendingWorkspaces";
 import {
   GetWorkspaceApiKeys,
   GetWorkspaceApiKeysVariables,
@@ -64,7 +63,7 @@ import {
   UpdateWorkspaceSettings,
   UpdateWorkspaceSettingsVariables,
 } from "shared/graphql/generated/UpdateWorkspaceSettings";
-import { PendingWorkspaceInvitation, Subscription, Workspace } from "shared/graphql/types";
+import { Subscription, Workspace } from "shared/graphql/types";
 import {
   ACTIVATE_WORKSPACE_SUBSCRIPTION,
   ADD_WORKSPACE_API_KEY,
@@ -114,48 +113,6 @@ export function useCreateNewWorkspace(
   }
 
   return createNewWorkspace;
-}
-
-export function useGetPendingWorkspaces() {
-  const { data, loading, error } = useQuery<GetPendingWorkspaces>(
-    gql`
-      query GetPendingWorkspaces {
-        viewer {
-          workspaceInvitations {
-            edges {
-              node {
-                workspace {
-                  id
-                  name
-                  recordingCount
-                  isOrganization
-                }
-                inviterEmail
-              }
-            }
-          }
-        }
-      }
-    `,
-    {
-      pollInterval: 5000,
-    }
-  );
-
-  if (error) {
-    console.error("Apollo error while fetching pending workspace invitations:", error);
-  }
-
-  let pendingWorkspaces: PendingWorkspaceInvitation[] = [];
-  if (data?.viewer) {
-    pendingWorkspaces = data.viewer.workspaceInvitations.edges.map(
-      ({ node: { workspace, inviterEmail } }) => ({
-        ...workspace,
-        inviterEmail,
-      })
-    );
-  }
-  return { pendingWorkspaces, loading };
 }
 
 export function useGetWorkspace(workspaceId: string | null): {

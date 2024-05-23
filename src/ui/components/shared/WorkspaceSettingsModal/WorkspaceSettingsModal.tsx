@@ -33,17 +33,11 @@ export function WorkspaceMembers({
   members: WorkspaceUser[];
   isAdmin: boolean;
 }) {
-  const sortedMembers = useMemo(() => {
-    return members
-      .slice()
-      .sort((a: WorkspaceUser, b: WorkspaceUser) => Number(b.pending) - Number(a.pending));
-  }, [members]);
-
-  const adminCount = members.filter(a => a.roles?.includes("admin") && !a.pending).length;
+  const adminCount = members.filter(a => a.roles?.includes("admin")).length;
 
   return (
     <ul className="flex flex-col space-y-2.5">
-      {sortedMembers.map(member =>
+      {members.map(member =>
         member.email ? (
           <NonRegisteredWorkspaceMember
             member={member}

@@ -217,6 +217,7 @@ function SlideBody1({ hideModal, setNewWorkspace, setCurrent, total, current }: 
 }
 
 function SlideBody2({ hideModal, setCurrent, newWorkspace, total, current }: SlideBodyProps) {
+  const { userId } = hooks.useGetUserId();
   const [inputValue, setInputValue] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -228,13 +229,8 @@ function SlideBody2({ hideModal, setCurrent, newWorkspace, total, current }: Sli
   const textInputRef = useRef<HTMLInputElement>(null);
   const { confirmDestructive } = useConfirm();
 
-  // This is hacky. A member entry will only have an e-mail if it was pending. If
-  // they had already accepted, we don't expose that member's e-mail. This is not
-  // a concern for now, since this will only run right as the team is created. It's
-  // unlikely that while this slide is up that a pending member would accept the invite
-  // immediately.
-  const pendingMembers = members?.filter(m => m.email) || [];
-  const sortedMembers = pendingMembers.sort(
+  const invitedMembers = members?.filter(m => m.userId !== userId) || [];
+  const sortedMembers = invitedMembers.sort(
     (a: WorkspaceUser, b: WorkspaceUser) =>
       new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()
   );
@@ -247,9 +243,6 @@ function SlideBody2({ hideModal, setCurrent, newWorkspace, total, current }: Sli
 
     if (!validateEmail(inputValue)) {
       setErrorMessage("Invalid email address");
-      return;
-    } else if (pendingMembers.map(m => m.email).includes(inputValue)) {
-      setErrorMessage("Address has already been invited");
       return;
     }
 
