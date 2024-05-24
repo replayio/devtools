@@ -6,12 +6,13 @@ import Modal from "ui/components/shared/NewModal";
 import hooks from "ui/hooks";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import { trackEvent } from "ui/utils/telemetry";
-import { decodeWorkspaceId } from "ui/utils/workspace";
+import { decodeWorkspaceId, subscriptionExpired } from "ui/utils/workspace";
 
 import Icon from "../shared/Icon";
 import LoadingScreen from "../shared/LoadingScreen";
 import ReplayLogo from "../shared/ReplayLogo";
 import { DefaultViewportWrapper } from "../shared/Viewport";
+import ExpiredWorkspaces from "./ExpiredWorkspaces";
 import { MY_LIBRARY } from "./libraryConstants";
 import ReplayTitle from "./ReplayTitle";
 import Sharing from "./Sharing";
@@ -133,7 +134,8 @@ export default function UploadScreen({
       return MY_LIBRARY;
     }
 
-    if (workspaces.find(workspace => workspace.id === workspaceId)) {
+    const workspace = workspaces.find(workspace => workspace.id === workspaceId);
+    if (workspace && !subscriptionExpired(workspace)) {
       return workspaceId;
     }
 
@@ -189,6 +191,7 @@ export default function UploadScreen({
   return (
     <DefaultViewportWrapper>
       <div className="flex flex-col items-center">
+        <ExpiredWorkspaces workspaces={workspaces} />
         <UploadRecordingTrialEnd {...{ selectedWorkspaceId, workspaces }} />
         <form className="relative flex flex-col items-center overflow-auto" onSubmit={onSubmit}>
           <div className="mb-10 flex flex-row space-x-4 short:h-auto">

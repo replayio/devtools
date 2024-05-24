@@ -322,7 +322,7 @@ export interface Workspace {
   id: string;
   invitationCode?: string | null;
   isDomainLimitedCode?: boolean | null;
-  members?: User[];
+  members?: WorkspaceUser[];
   name?: string;
   recordingCount?: number;
   settings?: WorkspaceSettings | null;

@@ -63,7 +63,7 @@ import {
   UpdateWorkspaceSettings,
   UpdateWorkspaceSettingsVariables,
 } from "shared/graphql/generated/UpdateWorkspaceSettings";
-import { Subscription, Workspace } from "shared/graphql/types";
+import { Subscription, Workspace, WorkspaceUserRole } from "shared/graphql/types";
 import {
   ACTIVATE_WORKSPACE_SUBSCRIPTION,
   ADD_WORKSPACE_API_KEY,
@@ -206,6 +206,8 @@ export function useGetNonPendingWorkspaces(): { workspaces: Workspace[]; loading
                   edges {
                     node {
                       ... on WorkspaceUserMember {
+                        id
+                        roles
                         user {
                           id
                           name
@@ -237,7 +239,13 @@ export function useGetNonPendingWorkspaces(): { workspaces: Workspace[]; loading
         .filter(({ node }) => "user" in node)
         .map(({ node }) => {
           assert("user" in node, "No user in workspace member");
-          return node.user;
+          return {
+            membershipId: node.id,
+            userId: node.user.id,
+            pending: false,
+            user: node.user,
+            roles: node.roles as WorkspaceUserRole[],
+          };
         });
       return {
         ...node,

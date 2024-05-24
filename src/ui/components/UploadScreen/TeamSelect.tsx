@@ -3,6 +3,7 @@ import React, { useState } from "react";
 
 import { Workspace } from "shared/graphql/types";
 import { useGetUserInfo } from "ui/hooks/users";
+import { subscriptionExpired } from "ui/utils/workspace";
 
 import PortalDropdown from "../shared/PortalDropdown";
 import { Dropdown, DropdownItem } from "../shared/SharingModal/LibraryDropdown";
@@ -25,7 +26,8 @@ const TeamSelectButton = ({
 
 interface DisplayedWorkspace {
   id: string;
-  name?: string;
+  name: string;
+  expired?: boolean;
 }
 
 export default function TeamSelect({
@@ -39,15 +41,26 @@ export default function TeamSelect({
 }) {
   const userInfo = useGetUserInfo();
   const [expanded, setExpanded] = useState(false);
-  let displayedWorkspaces: DisplayedWorkspace[] = [...workspaces].sort();
+  let displayedWorkspaces: DisplayedWorkspace[] = workspaces
+    .map(workspace => {
+      const expired = subscriptionExpired(workspace);
+      let name = workspace.name ?? "";
+      if (expired) {
+        name += " (Expired)";
+      }
+      return { id: workspace.id, name, expired };
+    })
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   if (userInfo.features.library) {
     displayedWorkspaces = [personalWorkspace, ...displayedWorkspaces];
   }
 
   const handleSelect = (workspace: DisplayedWorkspace) => {
-    handleWorkspaceSelect(workspace.id);
-    setExpanded(false);
+    if (!workspace.expired) {
+      handleWorkspaceSelect(workspace.id);
+      setExpanded(false);
+    }
   };
 
   const selectedWorkspace =
@@ -67,7 +80,11 @@ export default function TeamSelect({
       <Dropdown widthClass="w-64" fontSizeClass="text-base">
         <div className="max-h-48 overflow-auto">
           {displayedWorkspaces.map(workspace => (
-            <DropdownItem onClick={() => handleSelect(workspace)} key={workspace.id}>
+            <DropdownItem
+              disabled={workspace.expired}
+              onClick={() => handleSelect(workspace)}
+              key={workspace.id}
+            >
               {workspace.name || ""}
             </DropdownItem>
           ))}
