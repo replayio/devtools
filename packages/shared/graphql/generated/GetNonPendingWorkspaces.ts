@@ -38,6 +38,8 @@ export interface GetNonPendingWorkspaces_viewer_workspaces_edges_node_members_ed
 
 export interface GetNonPendingWorkspaces_viewer_workspaces_edges_node_members_edges_node_WorkspaceUserMember {
   __typename: "WorkspaceUserMember";
+  id: string;
+  roles: string[];
   user: GetNonPendingWorkspaces_viewer_workspaces_edges_node_members_edges_node_WorkspaceUserMember_user;
 }
 

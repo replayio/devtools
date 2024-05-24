@@ -1,0 +1,19 @@
+.wrapper {
+  position: absolute;
+  top: -4rem;
+  background-color: #fffbd2;
+  color: #6e4400;
+  border: 1px solid #f7ea9c;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  cursor: default;
+}
+
+.warning {
+  font-weight: bold;
+}
+
+.wrapper a {
+  margin-left: 0.3rem;
+  text-decoration: underline;
+}
