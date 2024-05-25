@@ -59,6 +59,7 @@ const argv = yargs
 const CONFIG = {
   recordingTimeout: 60_000,
   uploadTimeout: 60_000,
+  recordingAttempts: 2,
 };
 
 type PlaywrightScript = (page: Page, expect: typeof expectFunction) => Promise<void>;
@@ -242,28 +243,44 @@ async function saveBrowserExample({ example }: TestRunCallbackArgs) {
     console.log("Example finished");
   }
   const playwrightScript: PlaywrightScript = example.playwrightScript ?? defaultPlaywrightScript;
-  await raceForTime(
-    CONFIG.recordingTimeout,
-    recordPlaywright(async (page, expect) => {
-      const waitForLogPromise = playwrightScript(page, expect);
-      const goToPagePromise = page.goto(exampleUrl);
 
-      await Promise.all([goToPagePromise, waitForLogPromise]);
-    })
-  );
+  let recordingError: any;
+  for (let i = 0; i < CONFIG.recordingAttempts; ++i) {
+    try {
+      await raceForTime(
+        CONFIG.recordingTimeout,
+        recordPlaywright(async (page, expect) => {
+          const waitForLogPromise = playwrightScript(page, expect);
+          const goToPagePromise = page.goto(exampleUrl);
 
-  const recordingId = await raceForTime(CONFIG.uploadTimeout, uploadLastRecording(exampleUrl));
-  if (recordingId == null) {
-    throw new Error(`Recording "${example.filename}" not uploaded`);
+          await Promise.all([goToPagePromise, waitForLogPromise]);
+        })
+      );
+
+      const recordingId = await raceForTime(CONFIG.uploadTimeout, uploadLastRecording(exampleUrl));
+      if (!recordingId) {
+        throw new Error(`Recording "${example.filename}" not uploaded`);
+      }
+      exampleToNewRecordingId[example.filename] = recordingId;
+
+      if (config.useExampleFile && recordingId) {
+        await saveRecording(example.filename, config.replayApiKey, recordingId, true);
+      }
+
+      if (recordingId) {
+        removeRecording(recordingId);
+      }
+      break;
+    } catch (err: any) {
+      console.warn(`❌ Recording or upload failed: ${err.stack}`);
+      console.warn(`    ATTEMPTING AGAIN WITH VERBOSE MODE ENABLED: ${i + 2}/${CONFIG.recordingAttempts}...`);
+      recordingError ||= err;
+      process.env.RECORD_REPLAY_VERBOSE = "1";
+    }
   }
-  exampleToNewRecordingId[example.filename] = recordingId;
 
-  if (config.useExampleFile && recordingId) {
-    await saveRecording(example.filename, config.replayApiKey, recordingId, true);
-  }
-
-  if (recordingId) {
-    removeRecording(recordingId);
+  if (recordingError) {
+    throw new Error("❌ Recording failed with reason: " + recordingError.message);
   }
 }
 
@@ -446,8 +463,7 @@ async function waitUntilMessage(
 
     process.exit(0);
   } catch (error) {
-    console.error("Unexpected error: ", error);
-
+    console.error("☠☠☠ save-examples failed - ", error?.stack || error);
     process.exit(1);
   }
 })();
