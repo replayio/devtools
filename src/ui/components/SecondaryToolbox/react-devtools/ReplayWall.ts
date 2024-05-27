@@ -168,7 +168,10 @@ export class ReplayWall implements Wall {
           // Get the first node ID we found for this fiber ID, if available.
           const [nodeId] = fiberIdsToNodeIds.get(fiberId) ?? [];
           if (!nodeId) {
-            sendTelemetryEvent("reactdevtools.node_not_found", payload);
+            // skip on hitting this again for the same fiberId (maybe combo it with pauseId?)
+            sendTelemetryEvent("reactdevtools.node_not_found", payload, {
+              id: fiberId,
+            });
             return;
           }
 
