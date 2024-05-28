@@ -131,12 +131,16 @@ export async function waitForRecordingToFinishIndexing(page: Page): Promise<void
     async () => {
       const supportFormErrorDetails = await getSupportFormErrorDetails(page);
       if (supportFormErrorDetails) {
-        throw new UnrecoverableError(`Session failed: ${supportFormErrorDetails}`);
+        throw new UnrecoverableError(
+          `Session failed (visiting ${page.url()}): ${supportFormErrorDetails}`
+        );
       }
 
       const expectedErrorDetails = await getExpectedErrorDetails(page);
       if (expectedErrorDetails) {
-        throw new UnrecoverableError(`Session failed: ${expectedErrorDetails}`);
+        throw new UnrecoverableError(
+          `Session failed (visiting ${page.url()}): ${expectedErrorDetails}`
+        );
       }
 
       if (await timelineCapsuleLocator.isVisible()) {
