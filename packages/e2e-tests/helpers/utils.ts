@@ -132,14 +132,14 @@ export async function waitForRecordingToFinishIndexing(page: Page): Promise<void
       const supportFormErrorDetails = await getSupportFormErrorDetails(page);
       if (supportFormErrorDetails) {
         throw new UnrecoverableError(
-          `Session failed (visiting ${page.url()}): ${supportFormErrorDetails}`
+          `Session failed "${supportFormErrorDetails}" (visiting ${page.url()})`
         );
       }
 
       const expectedErrorDetails = await getExpectedErrorDetails(page);
       if (expectedErrorDetails) {
         throw new UnrecoverableError(
-          `Session failed (visiting ${page.url()}): ${expectedErrorDetails}`
+          `Session failed: "${expectedErrorDetails}" (visiting ${page.url()})`
         );
       }
 
