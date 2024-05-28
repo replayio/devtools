@@ -116,16 +116,20 @@ const sentEvents = new Set<string>();
 
 type TelemetryOptions = {
   /** It can be used to avoid sending repeated events. It's always combined with `event` for that purpose */
-  id?: string;
+  distinctOn?: string;
 };
 
-export function sendTelemetryEvent(event: string, tags: any = {}, { id }: TelemetryOptions = {}) {
+export function sendTelemetryEvent(
+  event: string,
+  tags: any = {},
+  { distinctOn }: TelemetryOptions = {}
+) {
   if (userData.get("global_logTelemetryEvent")) {
     console.log("telemetry event", { event, tags });
   }
 
-  if (id) {
-    const key = `${event}:${id}`;
+  if (distinctOn) {
+    const key = `${event}:${distinctOn}`;
     if (sentEvents.has(key)) {
       return;
     }
