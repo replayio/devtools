@@ -7,7 +7,7 @@ import {
   replyToComment,
 } from "../helpers/comments";
 import { openSource } from "../helpers/source-explorer-panel";
-import test, { Page } from "../testFixture";
+import test, { Page, expect } from "../testFixture";
 
 const url = "authenticated_comments.html";
 
@@ -61,7 +61,7 @@ test(`authenticated/comments-02: Test shared comments and replies`, async ({
     });
 
     await replyToComment(page, commentLocator, {
-      text: "This is a reply from user 2",
+      text: "This is a reply from user 3",
       url,
     });
 
@@ -76,10 +76,11 @@ test(`authenticated/comments-02: Test shared comments and replies`, async ({
     await page.reload();
 
     // Verify reply is visible
-    await getComments(page, {
+    const comment = await getComments(page, {
       text: "This is a reply from user 2",
       type: "source-code",
     });
+    await expect(comment).toBeVisible();
 
     await deleteAllComments(page);
   }
