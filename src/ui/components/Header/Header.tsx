@@ -4,10 +4,12 @@ import classNames from "classnames";
 import { useRouter } from "next/router";
 import { ClipboardEvent, KeyboardEvent, useLayoutEffect, useRef, useState } from "react";
 
+import Icon, { IconType } from "replay-next/components/Icon";
+import { useNag } from "replay-next/src/hooks/useNag";
 import { RecordingTarget } from "replay-next/src/suspense/BuildIdCache";
-import { Recording } from "shared/graphql/types";
+import { Nag, Recording } from "shared/graphql/types";
 import { selectAll } from "shared/utils/selection";
-import { getAccessToken, getRecordingTarget } from "ui/actions/app";
+import { getAccessToken, getRecordingTarget, setModal } from "ui/actions/app";
 import Avatar from "ui/components/Avatar";
 import UserOptions from "ui/components/Header/UserOptions";
 import ViewToggle, { shouldShowDevToolsNag } from "ui/components/Header/ViewToggle";
@@ -15,7 +17,7 @@ import IconWithTooltip from "ui/components/shared/IconWithTooltip";
 import hooks from "ui/hooks";
 import { useGetActiveSessions } from "ui/hooks/sessions";
 import { getViewMode } from "ui/reducers/layout";
-import { useAppSelector } from "ui/setup/hooks";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
 
 import { isTestSuiteReplay } from "../TestSuite/utils/isTestSuiteReplay";
@@ -169,8 +171,12 @@ export default function Header() {
   const recordingTarget = useAppSelector(getRecordingTarget);
   const isAuthenticated = !!useAppSelector(getAccessToken);
   const recordingId = hooks.useGetRecordingId();
-  const { recording, loading } = hooks.useGetRecording(recordingId);
+  const { loading, recording } = hooks.useGetRecording(recordingId);
   const backIcon = <div className={classNames(styles.BackButton, "img", "arrowhead-right")} />;
+
+  const dispatch = useAppDispatch();
+
+  const [, dismissShareNag] = useNag(Nag.SHARE); // Properly call useNag and destructure dismissShareNag
 
   if (loading) {
     return <div className={styles.Header}></div>;
@@ -197,6 +203,25 @@ export default function Header() {
     }
   }
 
+  let iconType: IconType;
+  let visibilityLabel: string;
+  if (!recording.private) {
+    iconType = "visibility-public";
+    visibilityLabel = "Public";
+  } else if (recording.workspace) {
+    iconType = "visibility-team";
+    visibilityLabel = "Team";
+  } else {
+    iconType = "visibility-private";
+    visibilityLabel = "Private";
+  }
+
+  const onClick = () => {
+    trackEvent("header.open_share");
+    dismissShareNag();
+    dispatch(setModal("sharing", { recordingId: recordingId! }));
+  };
+
   return (
     <div className={styles.Header}>
       <div className="relative flex flex-grow flex-row items-center overflow-hidden">
@@ -210,6 +235,9 @@ export default function Header() {
         ) : (
           <div className={styles.ReadOnlyTitle}>Recordings</div>
         )}
+        <button className={styles.VisibilityIconAndText} onClick={onClick}>
+          <Icon className={styles.VisibilityIcon} type={iconType} /> {visibilityLabel}
+        </button>
         <div className="flex-grow">&nbsp;</div>
       </div>
       <Links recordingTarget={recordingTarget} />
