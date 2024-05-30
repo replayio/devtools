@@ -12,8 +12,7 @@ import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
-import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
-import { createEmptyHistoryState } from "@lexical/react/LexicalHistoryPlugin";
+import { HistoryPlugin, createEmptyHistoryState } from "@lexical/react/LexicalHistoryPlugin";
 import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import * as Sentry from "@sentry/react";
@@ -181,17 +180,19 @@ export default function CommentEditor({
   }, [editable, editorRef]);
 
   const onFormCancel = useCallback((_: EditorState) => {
-    const { onCancel } = committedStateRef.current;
+    const { onCancel, onDelete } = committedStateRef.current;
 
-    onCancel();
+    const prevEditorState = backupEditorStateRef.current;
+    if (isEditorStateEmpty(prevEditorState)) {
+      onDelete();
+    } else {
+      onCancel();
+    }
 
     const editor = editorRef.current;
-    if (editor) {
+    if (editor && prevEditorState) {
       editor.update(() => {
-        const editorState = backupEditorStateRef.current;
-        if (editorState) {
-          editor.setEditorState(editorState);
-        }
+        editor.setEditorState(prevEditorState);
       });
     }
   }, []);
@@ -199,8 +200,7 @@ export default function CommentEditor({
   const onFormSubmit = useCallback((editorState: EditorState) => {
     const { onDelete, onSave } = committedStateRef.current;
 
-    const textContent = serialize(editorState);
-    if (textContent.trim() === "") {
+    if (isEditorStateEmpty(editorState)) {
       onDelete();
     } else {
       onSave(editorState.toJSON());
@@ -314,3 +314,7 @@ const LexicalTheme = {
     underlineStrikethrough: styles.LexicalUnderlineStrikethrough,
   },
 };
+
+function isEditorStateEmpty(editorState: EditorState | null): boolean {
+  return !editorState || !serialize(editorState).trim();
+}
