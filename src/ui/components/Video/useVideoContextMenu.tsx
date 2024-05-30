@@ -156,12 +156,6 @@ export default function useVideoContextMenu() {
   }, [contextMenu, hideMenu, isPlaying]);
 
   return {
-    addComment: (e: React.MouseEvent) =>
-      addComment({
-        pageX: e.pageX,
-        pageY: e.pageY,
-        position: getPositionForAddingComment(e),
-      }),
     contextMenu,
     onContextMenu,
   };
