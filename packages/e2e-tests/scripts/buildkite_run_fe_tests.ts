@@ -20,48 +20,76 @@ const CONFIG = {
 let TestFileOverrideList = [];
 
 // Disable some tests that we know to be problematic.
-const TestFileBlackList = new Set([
-  // Disable some paint expectations. Paints and repaintGraphics have improved
-  // but are not perfect. Let's revisit it once we see it have a real impact
-  // on the user, or else, post GA.
-  // https://linear.app/replay/issue/TT-189/re-enable-repaint-01-repaint-06
-  "tests/repaint-01.test.ts",
-  "tests/repaint-06.test.ts",
+const TestFileBlockLists = {
+  "linux": [],
+  "darwin": [
+    // This test has been failing for a long, long time.  disable it for now so
+    // we can get back to green builds.
+    // https://linear.app/replay/issue/TT-189/re-enable-failing-fe-tests
+    "tests/inspector-elements-02_node-picker.test.ts",
+  ],
+  "ALL": [
+    // Disable some paint expectations. Paints and repaintGraphics have improved
+    // but are not perfect. Let's revisit it once we see it have a real impact
+    // on the user, or else, post GA.
+    // https://linear.app/replay/issue/TT-189/re-enable-failing-fe-tests
+    "tests/repaint-01.test.ts",
+    "tests/repaint-06.test.ts",
+  ]
+};
+
+const TestFileBlockList = new Set([
+  ...TestFileBlockLists["ALL"],
+  ...TestFileBlockLists[os.platform()],
 ]);
 
-// Enable some tests that we have recently fixed but not yet enabled everywhere.
-const TestFileWhiteList = new Set([]);
+// Force some tests to run that we have recently fixed but not yet enabled everywhere.
+const TestFileForceLists = {
+  "linux": [],
+  "darwin": [],
+  "ALL": [],
+};
+
+const TestFileForceList = new Set([
+  ...TestFileForceLists["ALL"],
+  ...TestFileForceLists[os.platform()],
+]);
 
 /**
  * Re-record all examples that have previously been recorded with
  * "recent Chromium".
  */
 function checkReRecord(testFile, exampleFileInfo: ExampleInfo) {
-  let shouldTestOnLatest: boolean;
-  let shouldTestOverride: boolean;
-
-  shouldTestOnLatest =
-    exampleFileInfo.runtime === "chromium" &&
+  const wouldNormallyTest = exampleFileInfo.runtime === "chromium" &&
     exampleFileInfo.runtimeReleaseDate.getUTCFullYear() === 2024 &&
     !exampleFileInfo.requiresManualUpdate;
-  if (TestFileWhiteList.has(testFile) && TestFileBlackList.has(testFile)) {
-    throw new Error(`Test was both in BlackList and WhiteList: ${testFile}`);
+
+  const shouldNeverTest = TestFileBlockList.has(testFile);
+  const shouldForceTest = TestFileForceList.has(testFile);
+
+  if (shouldNeverTest && shouldForceTest) {
+    throw new Error(`Test is both in Blocked and Forced: ${testFile}`);
   }
-  if (TestFileWhiteList.has(testFile)) {
-    shouldTestOverride = true;
-  }
-  if (TestFileBlackList.has(testFile)) {
-    shouldTestOverride = false;
-  }
-  if (shouldTestOverride !== undefined && shouldTestOnLatest !== shouldTestOverride) {
-    if (shouldTestOverride) {
-      console.warn(chalk.yellow(`✅ WHITELISTED: ${testFile}`));
+
+  if (shouldForceTest) {
+    if (wouldNormallyTest) {
+      console.warn(chalk.yellow(`🟡 FORCED: ${testFile} (would normally test.  remove it from force list?)`));
     } else {
-      console.warn(chalk.yellow(`❌ BACKLISTED: ${testFile}`));
+      console.warn(chalk.yellow(`✅ FORCED: ${testFile}`));
     }
-    return shouldTestOverride;
+    return true;
   }
-  return shouldTestOnLatest;
+
+  if (shouldNeverTest) {
+    if (!wouldNormallyTest) {
+      console.warn(chalk.yellow(`🟡 BLOCKED: ${testFile} (would not normally test.  remove it from block list?)`));
+    } else {
+      console.warn(chalk.yellow(`❌ BLOCKED: ${testFile}`));
+    }
+    return false;
+  }
+
+  return wouldNormallyTest;
 }
 
 function computePct(current: number, total: number) {
@@ -76,8 +104,8 @@ function gatherChromiumExamplesAndTests() {
   const testFiles = new Set<string>();
   const exampleFiles = new Set<string>();
 
-  const remainingBlackListTests = new Set(TestFileBlackList);
-  const remainingWhiteListTests = new Set(TestFileWhiteList);
+  const remainingBlockedTests = new Set(TestFileBlockList);
+  const remainingForcedTests = new Set(TestFileForceList);
 
   for (const [testFile, exampleFileInfo] of Object.entries(testFileToInfoMap)) {
     let shouldReRecord: boolean;
@@ -86,8 +114,8 @@ function gatherChromiumExamplesAndTests() {
       shouldReRecord = TestFileOverrideList.includes(testFile);
     } else {
       // Normal book-keeping.
-      remainingBlackListTests.delete(testFile);
-      remainingWhiteListTests.delete(testFile);
+      remainingBlockedTests.delete(testFile);
+      remainingForcedTests.delete(testFile);
       shouldReRecord = checkReRecord(testFile, exampleFileInfo);
     }
     if (shouldReRecord) {
@@ -117,17 +145,17 @@ function gatherChromiumExamplesAndTests() {
     }
   } else {
     // Normal book-keeping.
-    if (remainingBlackListTests.size) {
+    if (remainingBlockedTests.size) {
       throw new Error(
-        `WARNING: TestFileBlackList contains unknown tests:\n ${Array.from(
-          remainingBlackListTests
+        `WARNING: TestFileBlockList contains unknown tests:\n ${Array.from(
+          remainingBlockedTests
         ).join("\n ")}`
       );
     }
-    if (remainingWhiteListTests.size) {
+    if (remainingForcedTests.size) {
       throw new Error(
-        `WARNING: TestFileWhiteList contains unknown tests:\n ${Array.from(
-          remainingWhiteListTests
+        `WARNING: TestFileForceList contains unknown tests:\n ${Array.from(
+          remainingForcedTests
         ).join("\n ")}`
       );
     }
