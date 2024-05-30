@@ -21,21 +21,21 @@ let TestFileOverrideList = [];
 
 // Disable some tests that we know to be problematic.
 const TestFileBlockLists = {
-  "linux": [],
-  "darwin": [
+  linux: [],
+  darwin: [
     // This test has been failing for a long, long time.  disable it for now so
     // we can get back to green builds.
     // https://linear.app/replay/issue/TT-189/re-enable-failing-fe-tests
     "tests/inspector-elements-02_node-picker.test.ts",
   ],
-  "ALL": [
+  ALL: [
     // Disable some paint expectations. Paints and repaintGraphics have improved
     // but are not perfect. Let's revisit it once we see it have a real impact
     // on the user, or else, post GA.
     // https://linear.app/replay/issue/TT-189/re-enable-failing-fe-tests
     "tests/repaint-01.test.ts",
     "tests/repaint-06.test.ts",
-  ]
+  ],
 };
 
 const TestFileBlockList = new Set([
@@ -45,9 +45,9 @@ const TestFileBlockList = new Set([
 
 // Force some tests to run that we have recently fixed but not yet enabled everywhere.
 const TestFileForceLists = {
-  "linux": [],
-  "darwin": [],
-  "ALL": [],
+  linux: [],
+  darwin: [],
+  ALL: [],
 };
 
 const TestFileForceList = new Set([
@@ -60,7 +60,8 @@ const TestFileForceList = new Set([
  * "recent Chromium".
  */
 function checkReRecord(testFile, exampleFileInfo: ExampleInfo) {
-  const wouldNormallyTest = exampleFileInfo.runtime === "chromium" &&
+  const wouldNormallyTest =
+    exampleFileInfo.runtime === "chromium" &&
     exampleFileInfo.runtimeReleaseDate.getUTCFullYear() === 2024 &&
     !exampleFileInfo.requiresManualUpdate;
 
@@ -73,7 +74,9 @@ function checkReRecord(testFile, exampleFileInfo: ExampleInfo) {
 
   if (shouldForceTest) {
     if (wouldNormallyTest) {
-      console.warn(chalk.yellow(`🟡 FORCED: ${testFile} (would normally test.  remove it from force list?)`));
+      console.warn(
+        chalk.yellow(`🟡 FORCED: ${testFile} (would normally test.  remove it from force list?)`)
+      );
     } else {
       console.warn(chalk.yellow(`✅ FORCED: ${testFile}`));
     }
@@ -82,7 +85,11 @@ function checkReRecord(testFile, exampleFileInfo: ExampleInfo) {
 
   if (shouldBlockTest) {
     if (!wouldNormallyTest) {
-      console.warn(chalk.yellow(`🟡 BLOCKED: ${testFile} (would not normally test.  remove it from block list?)`));
+      console.warn(
+        chalk.yellow(
+          `🟡 BLOCKED: ${testFile} (would not normally test.  remove it from block list?)`
+        )
+      );
     } else {
       console.warn(chalk.yellow(`❌ BLOCKED: ${testFile}`));
     }
