@@ -64,10 +64,10 @@ function checkReRecord(testFile, exampleFileInfo: ExampleInfo) {
     exampleFileInfo.runtimeReleaseDate.getUTCFullYear() === 2024 &&
     !exampleFileInfo.requiresManualUpdate;
 
-  const shouldNeverTest = TestFileBlockList.has(testFile);
+  const shouldBlockTest = TestFileBlockList.has(testFile);
   const shouldForceTest = TestFileForceList.has(testFile);
 
-  if (shouldNeverTest && shouldForceTest) {
+  if (shouldBlockTest && shouldForceTest) {
     throw new Error(`Test is both in Blocked and Forced: ${testFile}`);
   }
 
@@ -80,7 +80,7 @@ function checkReRecord(testFile, exampleFileInfo: ExampleInfo) {
     return true;
   }
 
-  if (shouldNeverTest) {
+  if (shouldBlockTest) {
     if (!wouldNormallyTest) {
       console.warn(chalk.yellow(`🟡 BLOCKED: ${testFile} (would not normally test.  remove it from block list?)`));
     } else {
