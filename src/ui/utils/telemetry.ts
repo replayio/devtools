@@ -112,9 +112,28 @@ export function setTelemetryContext({ id, email, internal }: TelemetryUser) {
   }
 }
 
-export function sendTelemetryEvent(event: string, tags: any = {}) {
+const sentEvents = new Set<string>();
+
+type TelemetryOptions = {
+  /** It can be used to avoid sending repeated events. It's always combined with `event` for that purpose */
+  distinctOn?: string;
+};
+
+export function sendTelemetryEvent(
+  event: string,
+  tags: any = {},
+  { distinctOn }: TelemetryOptions = {}
+) {
   if (userData.get("global_logTelemetryEvent")) {
     console.log("telemetry event", { event, tags });
+  }
+
+  if (distinctOn) {
+    const key = `${event}:${distinctOn}`;
+    if (sentEvents.has(key)) {
+      return;
+    }
+    sentEvents.add(key);
   }
 
   if (skipTelemetry()) {

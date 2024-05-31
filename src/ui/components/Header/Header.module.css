@@ -57,3 +57,26 @@
   transform: rotate(180deg);
   margin: 2px 2px 0 6px;
 }
+
+.VisibilityIcon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.VisibilityIconAndText {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1ch;
+  font-size: var(--font-size-regular);
+  background-color: var(--body-bgcolor);
+  border-radius: 1rem;
+  overflow: hidden;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+}
+
+.VisibilityIconAndText:hover {
+  background-color: var(--title-hover-bgcolor);
+}

@@ -1,0 +1,16 @@
+.Messages {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  text-align: center;
+}
+
+.Message {
+  color: var(--color-dim);
+  transition: height 0.3s;
+}
+
+.DiscordLink {
+  text-decoration: underline;
+  cursor: pointer;
+}
