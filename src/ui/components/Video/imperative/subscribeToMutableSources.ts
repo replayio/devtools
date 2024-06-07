@@ -35,7 +35,7 @@ export function subscribeToMutableSources({
     });
 
     // When the graphics element resizes, the mutable state should recalculate the its layout
-    updateState(containerElement, { didResize: true });
+    updateState(graphicsElement, { didResize: true });
   });
 
   resizeObserver.observe(containerElement);
