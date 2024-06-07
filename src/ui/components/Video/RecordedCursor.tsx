@@ -27,14 +27,14 @@ export function RecordedCursor() {
           const originalHeight = height / localScale;
           const originalWidth = width / localScale;
 
-          const mouseX = (mouseEvent.clientX / originalWidth) * width;
-          const mouseY = (mouseEvent.clientY / originalHeight) * height;
+          const mouseX = (mouseEvent.clientX / originalWidth) * 100;
+          const mouseY = (mouseEvent.clientY / originalHeight) * 100;
 
           const cursorScale = Math.min(1, Math.max(0.25, localScale * recordingScale));
 
           element.style.display = "block";
-          element.style.left = `${mouseX}px`;
-          element.style.top = `${mouseY}px`;
+          element.style.left = `${mouseX}%`;
+          element.style.top = `${mouseY}%`;
           element.style.transform = `scale(${cursorScale})`;
           element.style.setProperty("--click-display", shouldDrawClick ? "block" : "none");
         } else {
