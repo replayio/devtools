@@ -302,7 +302,7 @@ async function fetchAndCachePossibleCypressDomNode(
 ) {
   // Prefer "Yielded", because it's what the test step settled on
   // (such as a `eq` step selecting some element from a list)
-  const propNamesWithPotentialElements = ["Yielded", "Applied To"] as const;
+  const propNamesWithPotentialElements = ["Yielded", "yielded", "Applied To"] as const;
   // Find the matching properties, in the same preference order
   const propsWithPotentialElements = propNamesWithPotentialElements.map(propName =>
     findProtocolObjectProperty(sanitized, propName)
