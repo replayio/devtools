@@ -7,12 +7,17 @@ import {
   TimeStampedPoint,
 } from "@replayio/protocol";
 import cloneDeep from "lodash/cloneDeep";
-import { ExternallyManagedCache, createExternallyManagedCache } from "suspense";
+import { Cache, ExternallyManagedCache, createCache, createExternallyManagedCache } from "suspense";
 
+import { assert } from "protocol/utils";
 import { Element, elementCache } from "replay-next/components/elements/suspense/ElementCache";
 import { createFocusIntervalCacheForExecutionPoints } from "replay-next/src/suspense/FocusIntervalCache";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
-import { cachePauseData, setPointAndTimeForPauseId } from "replay-next/src/suspense/PauseCache";
+import {
+  cachePauseData,
+  pauseIdCache,
+  setPointAndTimeForPauseId,
+} from "replay-next/src/suspense/PauseCache";
 import { Source, sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
 import {
   findProtocolObjectProperty,
@@ -43,9 +48,17 @@ export type TestEventDomNodeDetails = TimeStampedPoint & {
 
 let getPlaywrightTestStepDomNodesString: string | null = null;
 
-async function lazyImportExpression() {
+let findDOMNodeObjectIdForPersistentIdExpression: string | null = null;
+
+async function lazyImportPlaywrightExpression() {
   const module = await import("../utils/playwrightStepDomNodes");
   getPlaywrightTestStepDomNodesString = module.getPlaywrightTestStepDomNodes.toString();
+}
+
+async function lazyImportCypressExpression() {
+  const module = await import("../utils/cypressStepDomNodes");
+  findDOMNodeObjectIdForPersistentIdExpression =
+    module.findDOMNodeObjectIdForPersistentId.toString();
 }
 
 // The interval cache is used by `<Panel>` to fetch all of the step details and DOM node data for a single test.
@@ -168,6 +181,83 @@ export const testEventDomNodeCache: ExternallyManagedCache<
   debugLabel: `TestEventDetailsResultsCache`,
   getKey: ([executionPoint, ...params]) => {
     return executionPoint;
+  },
+});
+
+interface FindDOMNodeObjectIdForPersistentIdResult {
+  persistentId: string;
+  domNodeId: string;
+}
+
+const domNodeIdForPersistentIdCache: Cache<
+  [replayClient: ReplayClientInterface, point: ExecutionPoint, persistentIds: (string | number)[]],
+  { pauseId: string; domNodeIds: FindDOMNodeObjectIdForPersistentIdResult[] }
+> = createCache({
+  debugLabel: "DomNodeIdForPersistentIdCache",
+  getKey: ([replayClient, point, persistentIds]) => `${point}:${persistentIds.join()}`,
+  async load([replayClient, point, persistentIds]) {
+    if (findDOMNodeObjectIdForPersistentIdExpression === null) {
+      await lazyImportCypressExpression();
+    }
+
+    const evalResults: RunEvaluationResult[] = [];
+
+    // The runtime expects these to be numbers, so we need to convert them.
+    const persistentIdsAsNumbers = persistentIds.map(id => Number(id));
+
+    const sources = await sourcesByIdCache.readAsync(replayClient);
+
+    await replayClient.runEvaluation(
+      {
+        selector: {
+          kind: "points",
+          points: [point],
+        },
+        expression: `
+          const findDOMNodeObjectIdForPersistentId = ${findDOMNodeObjectIdForPersistentIdExpression};
+
+          const persistentIds = ${JSON.stringify(persistentIdsAsNumbers)};
+
+          const results = persistentIds.map(persistentId => {
+            const domNodeId = findDOMNodeObjectIdForPersistentId(persistentId)
+            return {
+              persistentId,
+              domNodeId,
+            }
+          })
+
+          const stringifiedResults = JSON.stringify(results);
+
+          // Implicit return
+          stringifiedResults;
+        `,
+        limits: { begin: point, end: point },
+      },
+      results => {
+        // This logic copy-pasted from AnalysisCache.ts
+        for (const result of results) {
+          // Immediately cache pause ID and data so we have it available for reuse
+          setPointAndTimeForPauseId(result.pauseId, result.point);
+          cachePauseData(replayClient, sources, result.pauseId, result.data);
+        }
+        // Collect them all so we process them in a single batch
+        evalResults.push(...results);
+      }
+    );
+
+    assert(evalResults.length === 1, "Expected exactly one result from the eval.");
+
+    const [result] = evalResults;
+    const { returned } = result;
+    assert(returned?.value, "Expected a value to be returned from the eval.");
+    assert(typeof returned.value === "string", "Expected the value to be a string.");
+
+    const parsedResults = JSON.parse(returned.value) as FindDOMNodeObjectIdForPersistentIdResult[];
+
+    return {
+      pauseId: result.pauseId,
+      domNodeIds: parsedResults,
+    };
   },
 });
 
@@ -346,7 +436,59 @@ async function fetchAndCachePossibleCypressDomNode(
     }
   }
 
-  await cacheDomNodeEntry(possibleDomNodes, replayClient, pauseId, timeStampedPoint, testEvent);
+  let finalDomNodeDetails = {
+    possibleDomNodes,
+    pauseId,
+  };
+
+  // [PRO-599] If this is a click event, we need to find the DOM node as it existed
+  // _before_ the step
+  if (testEvent.data.command.name === "click") {
+    // If this is a click event, we need to find the DOM node as it
+    // existed _before_ the step, as it may have been disconnected
+    // during the step handling.
+    const beforeStep = testEvent.data.timeStampedPoints.beforeStep;
+
+    if (!beforeStep) {
+      return;
+    }
+
+    const persistentIds = possibleDomNodes.map(node => node.persistentId).filter(Boolean);
+
+    const { pauseId: beforeStepPauseId, domNodeIds } =
+      await domNodeIdForPersistentIdCache.readAsync(replayClient, beforeStep.point, persistentIds);
+
+    const parsedResultsWithValidNodeIds = domNodeIds.filter(({ domNodeId }) => !!domNodeId);
+
+    if (parsedResultsWithValidNodeIds.length === 0) {
+      return;
+    }
+
+    const matchingDomNodes = await Promise.all(
+      parsedResultsWithValidNodeIds.map(({ domNodeId }) =>
+        objectCache.readAsync(replayClient, beforeStepPauseId, domNodeId, "canOverflow")
+      )
+    );
+
+    // Note that in this case, we'll have the DOM nodes and pause ID from the before step,
+    // but we're going to put them in the cache with the result point as the key.
+    // This is okay! The test step row consistently uses the result point as the key,
+    // and this _is_ the DOM node and pause ID that relate to the step.
+    // `highlightNodes()` just needs these values, so it's fine if they're at a different
+    // point in time than the step itself.
+    finalDomNodeDetails = {
+      possibleDomNodes: matchingDomNodes,
+      pauseId: beforeStepPauseId,
+    };
+  }
+
+  await cacheDomNodeEntry(
+    finalDomNodeDetails.possibleDomNodes,
+    replayClient,
+    finalDomNodeDetails.pauseId,
+    timeStampedPoint,
+    testEvent
+  );
 }
 
 async function cacheDomNodeEntry(
@@ -411,7 +553,7 @@ async function fetchPlaywrightStepDetails(
   );
 
   if (getPlaywrightTestStepDomNodesString === null) {
-    await lazyImportExpression();
+    await lazyImportPlaywrightExpression();
   }
 
   // These arguments and the preload eval string correspond to the Playwright setup logic
