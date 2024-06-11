@@ -13,6 +13,7 @@ import { assert } from "protocol/utils";
 import { Element, elementCache } from "replay-next/components/elements/suspense/ElementCache";
 import { createFocusIntervalCacheForExecutionPoints } from "replay-next/src/suspense/FocusIntervalCache";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
+import { pauseEvaluationsCache } from "replay-next/src/suspense/PauseCache";
 import {
   cachePauseData,
   pauseIdCache,
@@ -190,7 +191,11 @@ interface FindDOMNodeObjectIdForPersistentIdResult {
 }
 
 const domNodeIdForPersistentIdCache: Cache<
-  [replayClient: ReplayClientInterface, point: ExecutionPoint, persistentIds: (string | number)[]],
+  [
+    replayClient: ReplayClientInterface,
+    point: TimeStampedPoint,
+    persistentIds: (string | number)[]
+  ],
   { pauseId: string; domNodeIds: FindDOMNodeObjectIdForPersistentIdResult[] }
 > = createCache({
   debugLabel: "DomNodeIdForPersistentIdCache",
@@ -200,62 +205,38 @@ const domNodeIdForPersistentIdCache: Cache<
       await lazyImportCypressExpression();
     }
 
-    const evalResults: RunEvaluationResult[] = [];
-
     // The runtime expects these to be numbers, so we need to convert them.
     const persistentIdsAsNumbers = persistentIds.map(id => Number(id));
 
-    const sources = await sourcesByIdCache.readAsync(replayClient);
+    const expression = `
+      const findDOMNodeObjectIdForPersistentId = ${findDOMNodeObjectIdForPersistentIdExpression};
 
-    await replayClient.runEvaluation(
-      {
-        selector: {
-          kind: "points",
-          points: [point],
-        },
-        expression: `
-          const findDOMNodeObjectIdForPersistentId = ${findDOMNodeObjectIdForPersistentIdExpression};
+      const persistentIds = ${JSON.stringify(persistentIdsAsNumbers)};
 
-          const persistentIds = ${JSON.stringify(persistentIdsAsNumbers)};
-
-          const results = persistentIds.map(persistentId => {
-            const domNodeId = findDOMNodeObjectIdForPersistentId(persistentId)
-            return {
-              persistentId,
-              domNodeId,
-            }
-          })
-
-          const stringifiedResults = JSON.stringify(results);
-
-          // Implicit return
-          stringifiedResults;
-        `,
-        limits: { begin: point, end: point },
-      },
-      results => {
-        // This logic copy-pasted from AnalysisCache.ts
-        for (const result of results) {
-          // Immediately cache pause ID and data so we have it available for reuse
-          setPointAndTimeForPauseId(result.pauseId, result.point);
-          cachePauseData(replayClient, sources, result.pauseId, result.data);
+      const results = persistentIds.map(persistentId => {
+        const domNodeId = findDOMNodeObjectIdForPersistentId(persistentId)
+        return {
+          persistentId,
+          domNodeId,
         }
-        // Collect them all so we process them in a single batch
-        evalResults.push(...results);
-      }
-    );
+      })
 
-    assert(evalResults.length === 1, "Expected exactly one result from the eval.");
+      const stringifiedResults = JSON.stringify(results);
 
-    const [result] = evalResults;
+      // Implicit return
+      stringifiedResults;
+    `;
+
+    const pauseId = await pauseIdCache.readAsync(replayClient, point.point, point.time);
+    const result = await pauseEvaluationsCache.readAsync(replayClient, pauseId, null, expression);
+
     const { returned } = result;
-    assert(returned?.value, "Expected a value to be returned from the eval.");
-    assert(typeof returned.value === "string", "Expected the value to be a string.");
+    assert(typeof returned?.value === "string", "Expected a string to be returned from the eval.");
 
     const parsedResults = JSON.parse(returned.value) as FindDOMNodeObjectIdForPersistentIdResult[];
 
     return {
-      pauseId: result.pauseId,
+      pauseId,
       domNodeIds: parsedResults,
     };
   },
@@ -441,13 +422,11 @@ async function fetchAndCachePossibleCypressDomNode(
     pauseId,
   };
 
-  // [PRO-599] If this is a click event, we need to find the DOM node as it existed
-  // _before_ the step
   if (testEvent.data.command.name === "click") {
     // If this is a click event, we need to find the DOM node as it
     // existed _before_ the step, as it may have been disconnected
     // during the step handling.
-    const beforeStep = testEvent.data.timeStampedPoints.beforeStep;
+    const { beforeStep } = testEvent.data.timeStampedPoints;
 
     if (!beforeStep) {
       return;
@@ -456,7 +435,7 @@ async function fetchAndCachePossibleCypressDomNode(
     const persistentIds = possibleDomNodes.map(node => node.persistentId).filter(Boolean);
 
     const { pauseId: beforeStepPauseId, domNodeIds } =
-      await domNodeIdForPersistentIdCache.readAsync(replayClient, beforeStep.point, persistentIds);
+      await domNodeIdForPersistentIdCache.readAsync(replayClient, beforeStep, persistentIds);
 
     const parsedResultsWithValidNodeIds = domNodeIds.filter(({ domNodeId }) => !!domNodeId);
 

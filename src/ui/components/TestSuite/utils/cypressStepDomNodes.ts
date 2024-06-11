@@ -34,14 +34,6 @@ export function findDOMNodeObjectIdForPersistentId(persistentId: number): string
 
   function getObjectId(value: any) {
     if (typeof __RECORD_REPLAY_ARGUMENTS__ !== "undefined" && __RECORD_REPLAY_ARGUMENTS__ != null) {
-      // TODO [FE-2005][FE-2067] With persistent DOM ids, presumably we should switch to using this API?
-      // if (__RECORD_REPLAY_ARGUMENTS__.getPersistentId) {
-      //   const id = __RECORD_REPLAY_ARGUMENTS__.getPersistentId(value);
-      //   if (id) {
-      //     return id;
-      //   }
-      // }
-
       if (
         __RECORD_REPLAY_ARGUMENTS__.internal &&
         __RECORD_REPLAY_ARGUMENTS__.internal.registerPlainObject
@@ -56,8 +48,8 @@ export function findDOMNodeObjectIdForPersistentId(persistentId: number): string
     throw Error("Could not find object id");
   }
 
-  const rootNode = document;
-  let queue: (number | ChildNode | Document | Element)[] = [0, rootNode];
+  let objectId: string | null = null;
+  let queue: (ChildNode | Document | Element)[] = [document];
 
   // This loop modified from the version in `serialization.ts`,
   // which is used to serialize the entire DOM tree.
@@ -66,15 +58,12 @@ export function findDOMNodeObjectIdForPersistentId(persistentId: number): string
   // It's important that we be able to drill down through iframes,
   // especially since Cypress tests always run in an iframe.
   while (queue.length > 0) {
-    const _parentObjectId = queue.shift() as number;
     const domNodeOrText = queue.shift() as Element;
-
-    const objectId = getObjectId(domNodeOrText);
     const nodePersistentId = getPersistentId(domNodeOrText);
 
     if (persistentId === nodePersistentId) {
       // Turn this back into a string
-      domNodeId = `${objectId}`;
+      objectId = `${getObjectId(domNodeOrText)}`;
       break;
     }
 
@@ -88,13 +77,11 @@ export function findDOMNodeObjectIdForPersistentId(persistentId: number): string
           }
           case Node.TEXT_NODE: {
             if (child.textContent?.trim()) {
-              queue.push(objectId);
               queue.push(child);
             }
             break;
           }
           default: {
-            queue.push(objectId);
             queue.push(child);
             break;
           }
@@ -106,7 +93,6 @@ export function findDOMNodeObjectIdForPersistentId(persistentId: number): string
       case Node.ELEMENT_NODE: {
         if (domNodeOrText instanceof HTMLIFrameElement) {
           if (domNodeOrText.contentDocument != null) {
-            queue.push(objectId);
             queue.push(domNodeOrText.contentDocument);
           }
         }
@@ -115,5 +101,5 @@ export function findDOMNodeObjectIdForPersistentId(persistentId: number): string
     }
   }
 
-  return domNodeId;
+  return objectId;
 }
