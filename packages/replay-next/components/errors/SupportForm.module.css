@@ -61,3 +61,7 @@
 .SubmitButton:hover {
   background-color: var(--primary-accent-hover);
 }
+
+.ConfirmationMessage {
+  text-align: center;
+}
