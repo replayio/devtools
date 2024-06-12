@@ -10,9 +10,11 @@ import {
   getSelectedFrameId,
   getThreadContext,
 } from "devtools/client/debugger/src/selectors";
+import { isFocusWindowApplied } from "devtools/client/debugger/src/utils/focus";
 import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBoundary";
 import { copyToClipboard } from "replay-next/components/sources/utils/clipboard";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
+import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { useCurrentFocusWindow } from "replay-next/src/hooks/useCurrentFocusWindow";
 import { useIsPointWithinFocusWindow } from "replay-next/src/hooks/useIsPointWithinFocusWindow";
 import { getPointAndTimeForPauseId, pauseIdCache } from "replay-next/src/suspense/PauseCache";
@@ -44,11 +46,8 @@ function FramesRenderer({
   const replayClient = useContext(ReplayClientContext);
   const sourcesState = useAppSelector(state => state.sources);
   const { rangeForSuspense: focusWindow } = useContext(FocusContext);
+  const { endpoint } = useContext(SessionContext);
   const dispatch = useAppDispatch();
-
-  if (focusWindow === null) {
-    return null;
-  }
 
   const asyncSeparator =
     asyncIndex > 0 ? (
@@ -70,11 +69,17 @@ function FramesRenderer({
       <>
         {asyncSeparator}
         <div className="pane-info empty">
-          This part of the call stack is unavailable because it is outside{" "}
-          <span className="cursor-pointer underline" onClick={() => dispatch(enterFocusMode())}>
-            your debugging window
-          </span>
-          .
+          This part of the call stack is unavailable.
+          {isFocusWindowApplied(focusWindow, endpoint) && (
+            <>
+              {" "}
+              Perhaps it is outside of{" "}
+              <span className="cursor-pointer underline" onClick={() => dispatch(enterFocusMode())}>
+                your debugging window
+              </span>
+              .
+            </>
+          )}
         </div>
       </>
     );
