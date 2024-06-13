@@ -57,7 +57,7 @@ export const state = createState<State>({
 let lock: Object | null = null;
 
 export async function updateState(
-  containerElement: HTMLElement,
+  graphicsElement: HTMLElement,
   options: Partial<{
     didResize?: boolean;
     executionPoint: ExecutionPoint | null;
@@ -101,7 +101,7 @@ export async function updateState(
     const naturalHeight = naturalDimensions.height;
     const naturalWidth = naturalDimensions.width;
 
-    const containerRect = containerElement.getBoundingClientRect();
+    const containerRect = graphicsElement.getBoundingClientRect();
     const scaledDimensions = fitImageToContainer({
       containerHeight: containerRect.height,
       containerWidth: containerRect.width,

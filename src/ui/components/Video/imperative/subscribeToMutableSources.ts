@@ -6,7 +6,7 @@ import { updateState } from "ui/components/Video/imperative/MutableGraphicsState
 import { repositionGraphicsOverlayElements } from "ui/components/Video/imperative/repositionGraphicsOverlayElements";
 import { runVideoPlayback } from "ui/components/Video/imperative/runVideoPlayback";
 import { updateGraphics } from "ui/components/Video/imperative/updateGraphics";
-import { getPlayback, isPlaying } from "ui/reducers/timeline";
+import { getPlayback } from "ui/reducers/timeline";
 import { AppStore } from "ui/setup/store";
 
 export function subscribeToMutableSources({
@@ -59,7 +59,6 @@ export function subscribeToMutableSources({
     }
 
     const didStartPlaying = isPlaying && !prevIsPlaying;
-    const didStopPlaying = !isPlaying && prevIsPlaying;
 
     prevTime = time;
     prevExecutionPoint = executionPoint;
@@ -78,7 +77,7 @@ export function subscribeToMutableSources({
           abortSignal: abortController.signal,
           beginPoint: playbackState.beginPoint,
           beginTime: playbackState.beginTime,
-          containerElement,
+          graphicsElement,
           endPoint: playbackState.endPoint,
           endTime: playbackState.endTime,
           reduxStore,
@@ -95,7 +94,7 @@ export function subscribeToMutableSources({
 
       updateGraphics({
         abortSignal: abortController.signal,
-        containerElement,
+        graphicsElement,
         executionPoint,
         replayClient,
         time,

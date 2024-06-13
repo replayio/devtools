@@ -10,7 +10,7 @@ export async function runVideoPlayback({
   abortSignal,
   beginPoint,
   beginTime,
-  containerElement,
+  graphicsElement,
   endPoint,
   endTime,
   reduxStore,
@@ -19,7 +19,7 @@ export async function runVideoPlayback({
   abortSignal: AbortSignal;
   beginPoint: ExecutionPoint | null;
   beginTime: number;
-  containerElement: HTMLElement;
+  graphicsElement: HTMLElement;
   endPoint: ExecutionPoint | null;
   endTime: number;
   reduxStore: AppStore;
@@ -59,7 +59,7 @@ export async function runVideoPlayback({
     } else {
       const updateGraphicsPromise = updateGraphics({
         abortSignal,
-        containerElement,
+        graphicsElement,
         executionPoint: null,
         replayClient,
         time: nextTimelineTime,
