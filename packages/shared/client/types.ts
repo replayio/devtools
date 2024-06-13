@@ -164,6 +164,12 @@ export interface TimeStampedPointWithPaintHash extends TimeStampedPoint {
 
 export type AnnotationListener = (annotation: Annotation) => void;
 
+export interface DependencyChainStep {
+  code: string;
+  time?: number;
+  point?: string;
+}
+
 export interface ReplayClientInterface {
   get loadedRegions(): LoadedRegions | null;
   addEventListener(type: ReplayClientEvents, handler: Function): void;
@@ -311,5 +317,6 @@ export interface ReplayClientInterface {
     }) => void,
     onSourceContentsChunk: ({ chunk, sourceId }: { chunk: string; sourceId: SourceId }) => void
   ): Promise<void>;
+  getDependencies(point: ExecutionPoint): Promise<DependencyChainStep[]>;
   waitForSession(): Promise<string>;
 }
