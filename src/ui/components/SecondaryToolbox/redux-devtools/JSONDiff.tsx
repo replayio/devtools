@@ -192,7 +192,7 @@ export class JSONDiff extends Component<Props, State> {
     );
 
   valueRenderer = (raw: any, value: any) => {
-    const { styling, isWideLayout } = this.props;
+    const { isWideLayout } = this.props;
 
     function renderSpan(name: string, body: string) {
       return (

@@ -9,18 +9,18 @@ import { updateState } from "ui/components/Video/imperative/MutableGraphicsState
 
 export async function updateGraphics({
   abortSignal,
-  containerElement,
+  graphicsElement,
   executionPoint,
   replayClient,
   time,
 }: {
   abortSignal: AbortSignal;
-  containerElement: HTMLElement;
+  graphicsElement: HTMLElement;
   executionPoint: ExecutionPoint | null;
   time: number;
   replayClient: ReplayClientInterface;
 }) {
-  updateState(containerElement, {
+  updateState(graphicsElement, {
     executionPoint,
     status: "loading",
     time,
@@ -37,7 +37,7 @@ export async function updateGraphics({
   const paintPoint = findMostRecentPaint(time);
   const isBeforeFirstCachedPaint = !paintPoint || !paintPoint.paintHash;
   if (isBeforeFirstCachedPaint) {
-    updateState(containerElement, {
+    updateState(graphicsElement, {
       executionPoint,
       screenShot: null,
       screenShotType: null,
@@ -54,7 +54,7 @@ export async function updateGraphics({
       promises.push(
         fetchPaintContents({
           abortSignal,
-          containerElement,
+          graphicsElement,
           replayClient,
           time,
         })
@@ -91,7 +91,7 @@ export async function updateGraphics({
 
   // Show the first screenshot we get back (if we've found one)
   if (screenShot != null) {
-    updateState(containerElement, {
+    updateState(graphicsElement, {
       executionPoint,
       screenShot,
       screenShotType: repaintGraphicsScreenShot != null ? "repaint" : "cached-paint",
@@ -115,7 +115,7 @@ export async function updateGraphics({
 
     if (repaintGraphicsScreenShot != null) {
       // The repaint graphics API fails a lot; it should fail quietly here
-      updateState(containerElement, {
+      updateState(graphicsElement, {
         executionPoint,
         screenShot: repaintGraphicsScreenShot,
         screenShotType: "repaint",
@@ -129,7 +129,7 @@ export async function updateGraphics({
 
   if (screenShot == null) {
     // If we couldn't load either a cached screenshot or a repaint, update the DOM to reflect that
-    updateState(containerElement, {
+    updateState(graphicsElement, {
       executionPoint,
       screenShotType: null,
       status: isBeforeFirstCachedPaint ? "loaded" : "failed",
@@ -140,12 +140,12 @@ export async function updateGraphics({
 
 async function fetchPaintContents({
   abortSignal,
-  containerElement,
+  graphicsElement,
   replayClient,
   time,
 }: {
   abortSignal: AbortSignal;
-  containerElement: HTMLElement;
+  graphicsElement: HTMLElement;
   time: number;
   replayClient: ReplayClientInterface;
 }): Promise<ScreenShot | undefined> {
@@ -162,7 +162,7 @@ async function fetchPaintContents({
       return;
     }
 
-    updateState(containerElement, {
+    updateState(graphicsElement, {
       status: "failed",
     });
   }
