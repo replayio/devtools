@@ -25,6 +25,7 @@ import { trackEvent } from "ui/utils/telemetry";
 import { selectors } from "../../reducers";
 import NetworkMonitor from "../NetworkMonitor";
 import { NodePicker } from "../NodePicker";
+import { LoadDependenciesButton } from "../LoadDependenciesButton";
 import { Redacted } from "../Redacted";
 import ReplayLogo from "../shared/ReplayLogo";
 import WaitForReduxSlice from "../WaitForReduxSlice";
@@ -228,6 +229,7 @@ export default function SecondaryToolbox() {
       <header className="secondary-toolbox-header">
         <div className="panel-buttons theme-tab-font-size flex flex-row items-center overflow-hidden">
           {supportsRepaintingGraphics && <NodePicker />}
+          <LoadDependenciesButton />
           <PanelButton panel="console">Console</PanelButton>
           {supportsElementsInspector && <PanelButton panel="inspector">Elements</PanelButton>}
           {showDebuggerTab && (
