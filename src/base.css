@@ -1,5 +1,10 @@
 /* NOTE: this is added to protect against React DevTools */
 
+[data-private] {
+  background-color: rgba(255, 0, 0, 0.5) !important;
+  outline: 2px solid red !important;
+}
+
 html,
 body {
   height: 100vh;

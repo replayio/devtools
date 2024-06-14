@@ -187,7 +187,7 @@ function SuspendingPreviewPopup({
         showTail={true}
         target={target}
       >
-        <div className={styles.Wrapper}>
+        <div className={styles.Wrapper} data-private>
           <div className={styles.UnavailableMessage}>{valueUnavailableMessage}</div>
         </div>
       </Popup>
