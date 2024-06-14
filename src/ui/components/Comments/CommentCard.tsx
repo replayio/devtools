@@ -110,6 +110,7 @@ function CommentCard({
         isFocused || styles.UnfocusedDimmed
       )}
       data-highlighted={isHighlighted || undefined}
+      data-private
       data-test-comment-id={comment.id}
       data-test-comment-type={comment.type}
       data-test-id={`CommentCard-${comment.id}`}

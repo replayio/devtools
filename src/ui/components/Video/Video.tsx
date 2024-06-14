@@ -108,6 +108,7 @@ export default function Video() {
     <div
       id="video"
       className={styles.Container}
+      data-private
       style={{
         cursor: nodePickerStatus === "initializing" ? "progress" : undefined,
       }}
