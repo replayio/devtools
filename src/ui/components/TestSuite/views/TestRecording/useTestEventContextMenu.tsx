@@ -19,10 +19,12 @@ import { TestSuiteCache } from "ui/components/TestSuite/suspense/TestSuiteCache"
 import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext";
 import { useAppDispatch } from "ui/setup/hooks";
 
-export function useTestEventContextMenu(testEvent: TestEvent) {
+export function useTestEventContextMenu(testEvent: TestEvent, testEvents: TestEvent[]) {
   const { contextMenu, onContextMenu } = useContextMenu(
     <>
-      {isUserActionTestEvent(testEvent) && <JumpToSourceMenuItem userActionEvent={testEvent} />}
+      {isUserActionTestEvent(testEvent) && (
+        <JumpToSourceMenuItem testEvents={testEvents} userActionEvent={testEvent} />
+      )}
       <PlayToHereMenuItem testEvent={testEvent} />
       <PlayFromHereMenuItem testEvent={testEvent} />
       {isUserActionTestEvent(testEvent) && <ShowBeforeMenuItem userActionEvent={testEvent} />}
@@ -33,7 +35,13 @@ export function useTestEventContextMenu(testEvent: TestEvent) {
   return { contextMenu, onContextMenu };
 }
 
-function JumpToSourceMenuItem({ userActionEvent }: { userActionEvent: UserActionEvent }) {
+function JumpToSourceMenuItem({
+  testEvents,
+  userActionEvent,
+}: {
+  testEvents: TestEvent[];
+  userActionEvent: UserActionEvent;
+}) {
   const replayClient = useContext(ReplayClientContext);
   const { recordingId } = useContext(SessionContext);
   const { setTestEvent, testRecording } = useContext(TestSuiteContext);
@@ -45,6 +53,7 @@ function JumpToSourceMenuItem({ userActionEvent }: { userActionEvent: UserAction
   const { disabled, onClick } = useJumpToSource({
     groupedTestCases,
     testEvent: userActionEvent,
+    testEvents,
     testRecording,
     openSourceAutomatically: true,
   });
