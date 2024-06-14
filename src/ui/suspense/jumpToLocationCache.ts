@@ -1,6 +1,5 @@
 import {
   ExecutionPoint,
-  FunctionMatch,
   FunctionOutline,
   Location,
   PointDescription,
@@ -23,44 +22,64 @@ interface ApplyMiddlewareDecl {
 
 export const applyMiddlewareDeclCache = createSingleEntryCache<
   [replayClient: ReplayClientInterface],
-  ApplyMiddlewareDecl | null
+  ApplyMiddlewareDecl[]
 >({
   debugLabel: "ApplyMiddlewareDecl",
   load: async ([replayClient]) => {
-    const dispatchMatches: FunctionMatch[] = [];
+    const matches = await Promise.all([
+      findMiddlewareLocation(replayClient, "/redux/", "dispatch", "applyMiddleware"),
+      findMiddlewareLocation(
+        replayClient,
+        "/redux-promise/",
+        "promiseMiddleware",
+        "promiseMiddleware"
+      ),
+    ]);
 
-    const sourcesById = await sourcesByIdCache.readAsync(replayClient);
-    const reduxSources = Array.from(sourcesById.values()).filter(source =>
-      source.url?.includes("/redux/")
-    );
+    return matches.filter(Boolean);
+  },
+});
 
-    if (reduxSources.length === 0) {
-      return null;
-    }
+async function findMiddlewareLocation(
+  replayClient: ReplayClientInterface,
+  packageName: string,
+  dispatchFunctionName: string,
+  middlewareFunctionName: string
+): Promise<ApplyMiddlewareDecl | undefined> {
+  const sourcesById = await sourcesByIdCache.readAsync(replayClient);
+  const sourcesByValue = Array.from(sourcesById.values());
+  const packageSource = sourcesByValue.filter(source => source.url?.includes(packageName));
+  if (packageSource.length > 0) {
+    let location: Location | null = null;
 
     await replayClient.searchFunctions(
-      { query: "dispatch", sourceIds: reduxSources.map(source => source.id) },
+      { query: dispatchFunctionName, sourceIds: packageSource.map(source => source.id) },
       matches => {
-        dispatchMatches.push(...matches);
+        if (!location) {
+          const match = matches[0];
+          if (match) {
+            location = match.loc;
+          }
+        }
       }
     );
 
-    const [firstMatch] = dispatchMatches;
-    if (!firstMatch) {
-      return null;
+    if (location != null) {
+      const preferredLocation = getPreferredLocation(sourcesById, [], [location]);
+      const { id, sourceId } = sourcesById.get(preferredLocation.sourceId)!;
+      const fileOutline = await sourceOutlineCache.readAsync(replayClient, id);
+      const functionMatch = fileOutline.functions.find(
+        outline => outline.name === middlewareFunctionName
+      );
+      if (functionMatch) {
+        return {
+          location: functionMatch.location,
+          sourceId,
+        };
+      }
     }
-    const preferredLocation = getPreferredLocation(sourcesById, [], [firstMatch.loc]);
-    const reduxSource = sourcesById.get(preferredLocation.sourceId)!;
-    const fileOutline = await sourceOutlineCache.readAsync(replayClient, reduxSource.id);
-
-    const applyMiddlwareFunction = fileOutline.functions.find(o => o.name === "applyMiddleware")!;
-
-    return {
-      sourceId: reduxSource.sourceId,
-      location: applyMiddlwareFunction.location,
-    };
-  },
-});
+  }
+}
 
 function isFrameInDecl(decl: ApplyMiddlewareDecl, frame: FormattedPointStackFrame) {
   return (
@@ -87,24 +106,20 @@ async function searchingCallstackForDispatch(
 ) {
   // The first 2 elements in filtered pause frames are from replay's redux stub, so they should be ignored
   // The 3rd element is the user function that calls it, and will most likely be the `dispatch` call
-  let preferredFrameIdx = 2;
-  const applyMiddlewareDecl = await applyMiddlewareDeclCache.readAsync(replayClient);
-
-  if (!applyMiddlewareDecl) {
+  const middlewareFrames = await applyMiddlewareDeclCache.readAsync(replayClient);
+  if (middlewareFrames.length === 0) {
     return null;
   }
 
   for (let frameIdx = 2; frameIdx < pauseFrames.length; frameIdx++) {
     const frame = pauseFrames[frameIdx];
-
-    if (isFrameInDecl(applyMiddlewareDecl, frame)) {
+    const value = middlewareFrames.find(middlewareFrame => isFrameInDecl(middlewareFrame, frame));
+    if (value) {
       // this is the frame inside `applyMiddleware` where the initial dispatch occurs
       // the frame just before this one is the user `dispatch`
-      preferredFrameIdx = frameIdx + 1;
-      return preferredFrameIdx;
+      return frameIdx + 1;
     }
   }
-
   return null;
 }
 

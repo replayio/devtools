@@ -1,6 +1,7 @@
 .ListItem {
   line-height: 1.5rem;
   padding: 0 1ch;
+  white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
   border-bottom: 1px solid var(--listitem-row-divider);
