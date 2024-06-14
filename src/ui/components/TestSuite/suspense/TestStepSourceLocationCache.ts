@@ -1,12 +1,18 @@
 import assert from "assert";
 import { Frame, Location } from "@replayio/protocol";
 import { compare } from "compare-versions";
+import { Cache } from "suspense";
 
 import { framesCache } from "replay-next/src/suspense/FrameCache";
 import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { createCacheWithTelemetry } from "replay-next/src/utils/suspense";
 import { ReplayClientInterface } from "shared/client/types";
-import { GroupedTestCases, UserActionEvent } from "shared/test-suites/RecordingTestMetadata";
+import {
+  GroupedTestCases,
+  TestEvent,
+  UserActionEvent,
+  isUserActionTestEvent,
+} from "shared/test-suites/RecordingTestMetadata";
 
 function getCypressMarkerFrame(frames: Frame[]) {
   const markerFrameIndex = frames.findIndex(
@@ -43,14 +49,19 @@ function getCypressMarkerFrame(frames: Frame[]) {
   return -1;
 }
 
-export const TestStepSourceLocationCache = createCacheWithTelemetry<
-  [client: ReplayClientInterface, groupedTestCases: GroupedTestCases, testEvent: UserActionEvent],
+export const TestStepSourceLocationCache: Cache<
+  [
+    client: ReplayClientInterface,
+    groupedTestCases: GroupedTestCases,
+    testEvent: UserActionEvent,
+    testEvents: TestEvent[]
+  ],
   Location | undefined
->({
+> = createCacheWithTelemetry({
   debugLabel: "TestStepSourceLocationCache",
   getKey: ([client, groupedTestCases, testEvent]) =>
     `${groupedTestCases.source.title}:${testEvent.data.id}`,
-  load: async ([client, groupedTestCases, testEvent]) => {
+  load: async ([client, groupedTestCases, testEvent, testEvents]) => {
     const runner = groupedTestCases.environment.testRunner.name;
     const runnerVersion = groupedTestCases.environment.testRunner.version;
 
@@ -64,6 +75,24 @@ export const TestStepSourceLocationCache = createCacheWithTelemetry<
       if (frames) {
         if (compare(runnerVersion, "8.0.0", ">=")) {
           const markerFrameIndex = getCypressMarkerFrame(frames);
+          if (markerFrameIndex < 0) {
+            if (testEvent.data.parentId) {
+              // If we couldn't find a marker frame,
+              // the parent event location would still be a meaningful place to jump to
+              const parentId = testEvent.data.parentId;
+              const parentTestEvent = testEvents.find(
+                testEvent => isUserActionTestEvent(testEvent) && testEvent.data.id === parentId
+              );
+              if (parentTestEvent) {
+                return await TestStepSourceLocationCache.readAsync(
+                  client,
+                  groupedTestCases,
+                  parentTestEvent as UserActionEvent,
+                  testEvents
+                );
+              }
+            }
+          }
 
           // and extract its sourceId
           const markerSourceId = frames[markerFrameIndex]?.functionLocation?.[0].sourceId;
