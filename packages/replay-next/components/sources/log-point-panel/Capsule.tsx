@@ -104,20 +104,24 @@ export default function Capsule({
           data-test-state={tooManyPointsToFind ? "too-many-points" : "valid"}
           onClick={onClickFocusContentEditable}
         >
-          <NumberEditor
-            className={styles.CurrentIndex}
-            data-exact={currentHitPoint !== null || undefined}
-            data-test-name="LogPointCurrentStepInput"
-            data-too-many-points-to-find={tooManyPointsToFind || undefined}
-            data-value={closestHitPointIndex + 1}
-            defaultValue={closestHitPointIndex + 1}
-            disableSelectionWhenNotFocused
-            editable={!tooManyPointsToFind}
-            maxValue={Math.max(1, hitPoints.length)}
-            minValue={1}
-            onSave={onSave}
-            ref={editorRef}
-          />
+          {hitPoints.length === 0 ? (
+            <div className={styles.CurrentIndex}>0</div>
+          ) : (
+            <NumberEditor
+              className={styles.CurrentIndex}
+              data-exact={currentHitPoint !== null || undefined}
+              data-test-name="LogPointCurrentStepInput"
+              data-too-many-points-to-find={tooManyPointsToFind || undefined}
+              data-value={closestHitPointIndex + 1}
+              defaultValue={closestHitPointIndex + 1}
+              disableSelectionWhenNotFocused
+              editable={!tooManyPointsToFind}
+              maxValue={Math.max(1, hitPoints.length)}
+              minValue={1}
+              onSave={onSave}
+              ref={editorRef}
+            />
+          )}
           {tooManyPointsToFind || <span className={styles.Divider}>/</span>}
         </div>
 
