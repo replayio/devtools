@@ -41,6 +41,7 @@ export function TestSuiteContextRoot({ children }: PropsWithChildren) {
   const setTestRecordingWrapper = useCallback(
     async (testRecording: TestRecording | null) => {
       setTestRecording(testRecording);
+      setTestEvent(null);
 
       if (testRecording != null) {
         const { timeStampedPointRange } = testRecording;
