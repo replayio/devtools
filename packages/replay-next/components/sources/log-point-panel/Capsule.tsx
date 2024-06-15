@@ -116,7 +116,7 @@ export default function Capsule({
               defaultValue={closestHitPointIndex + 1}
               disableSelectionWhenNotFocused
               editable={!tooManyPointsToFind}
-              maxValue={Math.max(1, hitPoints.length)}
+              maxValue={hitPoints.length}
               minValue={1}
               onSave={onSave}
               ref={editorRef}
