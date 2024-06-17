@@ -311,8 +311,8 @@
   --point-panel-background-color: #1f2b43;
   --point-panel-conditional-icon: var(--blue-40);
   --point-panel-input-background-color: var(--theme-base-100);
-  --point-panel-input-border-color: transparent;
-  --point-panel-input-border-color-hover: #273149;
+  --point-panel-input-border-color: #273149;
+  --point-panel-input-border-color-hover: #38425a;
   --point-panel-input-border-color-focus: var(--theme-selection-background);
   --point-panel-input-edit-button-color: #747476;
   --point-panel-input-edit-button-color-hover: var(--primary-accent);
@@ -861,9 +861,9 @@
   --point-panel-background-color: #f0f1f4;
   --point-panel-conditional-icon: var(--blue-60);
   --point-panel-input-background-color: var(--theme-base-100);
+  --point-panel-input-border-color: #e9ebef;
+  --point-panel-input-border-color-hover: #d8dade;
   --point-panel-input-border-color-focus: var(--theme-selection-background);
-  --point-panel-input-border-color-hover: #e9ebef;
-  --point-panel-input-border-color: transparent;
   --point-panel-input-cancel-button-color-hover: #afafb5;
   --point-panel-input-cancel-button-color: #e2e2e2;
   --point-panel-input-disabled-background-color: #e4e4e4;
