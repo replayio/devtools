@@ -1,4 +1,4 @@
-import { useContext, useLayoutEffect, useRef, useState } from "react";
+import { RefObject, useContext, useLayoutEffect, useRef } from "react";
 import {
   ImperativePanelHandle,
   Panel,
@@ -17,28 +17,17 @@ import { ToolboxLayout } from "ui/state/layout";
 import SecondaryToolbox from "./SecondaryToolbox";
 import Toolbox from "./Toolbox";
 
-const Vertical = ({ toolboxLayout }: { toolboxLayout: ToolboxLayout }) => {
-  const videoPanelRef = useRef<ImperativePanelHandle>(null);
-
-  const [videoPanelCollapsed, setVideoPanelCollapsed] = useLocalStorageUserData(
-    "replayVideoPanelCollapsed"
-  );
-
-  const onVideoPanelCollapse = (collapsed: boolean) => {
-    setVideoPanelCollapsed(collapsed);
-  };
-
-  useLayoutEffect(() => {
-    const videoPanel = videoPanelRef.current;
-    if (videoPanel) {
-      if (videoPanelCollapsed) {
-        videoPanel.collapse();
-      } else {
-        videoPanel.expand();
-      }
-    }
-  }, [videoPanelCollapsed]);
-
+const Vertical = ({
+  onVideoPanelCollapse,
+  toolboxLayout,
+  videoPanelCollapsed,
+  videoPanelRef,
+}: {
+  onVideoPanelCollapse: (collapsed: boolean) => void;
+  toolboxLayout: ToolboxLayout;
+  videoPanelCollapsed: boolean;
+  videoPanelRef: RefObject<ImperativePanelHandle>;
+}) => {
   return (
     <PanelGroup
       autoSaveId="Viewer-Inner-Vertical"
@@ -76,12 +65,17 @@ const Vertical = ({ toolboxLayout }: { toolboxLayout: ToolboxLayout }) => {
   );
 };
 
-const Horizontal = ({ toolboxLayout }: { toolboxLayout: ToolboxLayout }) => {
+const Horizontal = ({
+  onVideoPanelCollapse,
+  videoPanelCollapsed,
+  videoPanelRef,
+}: {
+  onVideoPanelCollapse: (collapsed: boolean) => void;
+  videoPanelCollapsed: boolean;
+  videoPanelRef: RefObject<ImperativePanelHandle>;
+}) => {
   const replayClient = useContext(ReplayClientContext);
   const recordingCapabilities = recordingCapabilitiesCache.read(replayClient);
-
-  const videoPanelRef = useRef<ImperativePanelHandle>(null);
-  const [videoPanelCollapsed, setVideoPanelCollapsed] = useState(false);
 
   return (
     <PanelGroup
@@ -115,8 +109,8 @@ const Horizontal = ({ toolboxLayout }: { toolboxLayout: ToolboxLayout }) => {
             : "Panel-SecondaryToolbox"
         }
         minSize={10}
-        onCollapse={() => setVideoPanelCollapsed(true)}
-        onExpand={() => setVideoPanelCollapsed(false)}
+        onCollapse={() => onVideoPanelCollapse(true)}
+        onExpand={() => onVideoPanelCollapse(false)}
         order={2}
         ref={videoPanelRef}
       >
@@ -128,6 +122,27 @@ const Horizontal = ({ toolboxLayout }: { toolboxLayout: ToolboxLayout }) => {
 
 export default function Viewer() {
   const toolboxLayout = useAppSelector(getToolboxLayout);
+
+  const videoPanelRef = useRef<ImperativePanelHandle>(null);
+
+  const [videoPanelCollapsed, setVideoPanelCollapsed] = useLocalStorageUserData(
+    "replayVideoPanelCollapsed"
+  );
+
+  const onVideoPanelCollapse = (collapsed: boolean) => {
+    setVideoPanelCollapsed(collapsed);
+  };
+
+  useLayoutEffect(() => {
+    const videoPanel = videoPanelRef.current;
+    if (videoPanel) {
+      if (videoPanelCollapsed) {
+        videoPanel.collapse();
+      } else {
+        videoPanel.expand();
+      }
+    }
+  }, [videoPanelCollapsed]);
 
   return (
     <PanelGroup autoSaveId="Viewer-Outer" className="w-full overflow-hidden" direction="horizontal">
@@ -141,9 +156,18 @@ export default function Viewer() {
       )}
       <Panel minSize={25} order={2}>
         {toolboxLayout === "left" ? (
-          <Horizontal toolboxLayout={toolboxLayout} />
+          <Horizontal
+            onVideoPanelCollapse={onVideoPanelCollapse}
+            videoPanelCollapsed={videoPanelCollapsed}
+            videoPanelRef={videoPanelRef}
+          />
         ) : (
-          <Vertical toolboxLayout={toolboxLayout} />
+          <Vertical
+            onVideoPanelCollapse={onVideoPanelCollapse}
+            toolboxLayout={toolboxLayout}
+            videoPanelCollapsed={videoPanelCollapsed}
+            videoPanelRef={videoPanelRef}
+          />
         )}
       </Panel>
     </PanelGroup>
