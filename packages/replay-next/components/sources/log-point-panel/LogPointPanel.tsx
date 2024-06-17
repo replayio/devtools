@@ -163,10 +163,12 @@ export function PointPanelWithHitPoints({
   hitPointStatus,
   pointWithPendingEdits,
   pointForSuspense,
+  readOnlyMode = false,
   setFocusToBeginning,
   setFocusToEnd,
 }: InternalProps & {
   pointForSuspense: Point;
+  readOnlyMode?: boolean;
 }) {
   const graphQLClient = useContext(GraphQLClientContext);
   const { showCommentsPanel } = useContext(InspectorContext);
@@ -185,13 +187,13 @@ export function PointPanelWithHitPoints({
   // Only parts that may suspend should use lower priority values.
   const { condition, content, key, location, user } = pointWithPendingEdits;
 
-  const editable = user?.id === currentUserInfo?.id;
+  const editable = user?.id === currentUserInfo?.id && !readOnlyMode;
 
   const [showEditBreakpointNag, dismissEditBreakpointNag] = useNag(Nag.FIRST_BREAKPOINT_EDIT);
 
   const invalidateCache = useCacheRefresh();
 
-  const [isEditing, setIsEditing] = useState(showEditBreakpointNag);
+  const [isEditing, setIsEditing] = useState(!readOnlyMode && showEditBreakpointNag);
   const [editReason, setEditReason] = useState<EditReason | null>(null);
 
   const [isPending, startTransition] = useTransition();

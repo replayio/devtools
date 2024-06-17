@@ -19,6 +19,7 @@ export function LogPointPanelDoubleBuffer({ sourceId }: { sourceId: string }) {
         hitPointStatus={null}
         pointForSuspense={EMPTY_POINT}
         pointWithPendingEdits={EMPTY_POINT}
+        readOnlyMode
         setFocusToBeginning={noop}
         setFocusToEnd={noop}
       />
