@@ -85,7 +85,7 @@ class Breakpoint extends PureComponent<BreakpointProps> {
     const location = `${line}${columnVal}`;
 
     return (
-      <div className={styles.Location} data-test-name="PointLocation">
+      <div className={styles.Location} data-private data-test-name="PointLocation">
         {location}
       </div>
     );

@@ -10,6 +10,7 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import {
   GroupedTestCases,
   RecordingTestMetadataV3,
+  TestEvent,
   TestSectionName,
   UserActionEvent,
   isUserActionTestEvent,
@@ -44,18 +45,20 @@ const cypressStepTypesToEventTypes = {
 export default memo(function UserActionEventRow({
   groupedTestCases,
   isSelected,
+  testEvents,
   testSectionName,
   userActionEvent,
 }: {
   groupedTestCases: RecordingTestMetadataV3.GroupedTestCases;
   isSelected: boolean;
+  testEvents: TestEvent[];
   testSectionName: TestSectionName;
   userActionEvent: UserActionEvent;
 }) {
   const { data } = userActionEvent;
-  const testRunnerName = groupedTestCases.environment.testRunner.name;
-  const { command, error, parentId } = data;
-  const resultPoint = userActionEvent.data.timeStampedPoints.result;
+  const { command, error, parentId, timeStampedPoints } = data;
+
+  const resultPoint = timeStampedPoints.result;
 
   const replayClient = useContext(ReplayClientContext);
 
@@ -82,6 +85,7 @@ export default memo(function UserActionEventRow({
   const { disabled: jumpToTestSourceDisabled, onClick: onClickJumpToTestSource } = useJumpToSource({
     groupedTestCases,
     testEvent: userActionEvent,
+    testEvents,
     testRecording,
     openSourceAutomatically: viewMode === "dev",
   });

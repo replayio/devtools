@@ -39,7 +39,7 @@ export const SyntaxHighlighter = memo(function SyntaxHighlighter({
   );
 
   return (
-    <div className={`${styles.SyntaxHighlighter} ${className}`} title={code} {...rest}>
+    <div className={`${styles.SyntaxHighlighter} ${className}`} title={code} {...rest} data-private>
       {formattedTokens.map((tokens, index) =>
         lineRenderer({
           className: lineClassName,

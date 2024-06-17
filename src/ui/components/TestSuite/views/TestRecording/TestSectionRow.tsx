@@ -4,7 +4,6 @@ import { ReactNode, useContext, useMemo } from "react";
 
 import { highlightNodes, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 import Icon from "replay-next/components/Icon";
-import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { isExecutionPointsGreaterThan } from "replay-next/src/utils/time";
@@ -33,10 +32,12 @@ import styles from "./TestSectionRow.module.css";
 
 export function TestSectionRow({
   testEvent,
+  testEvents,
   testRunnerName,
   testSectionName,
 }: {
   testEvent: TestEvent;
+  testEvents: TestEvent[];
   testRunnerName: TestRunnerName | null;
   testSectionName: TestSectionName;
 }) {
@@ -54,7 +55,7 @@ export function TestSectionRow({
 
   const dispatch = useAppDispatch();
 
-  const { contextMenu, onContextMenu } = useTestEventContextMenu(testEvent);
+  const { contextMenu, onContextMenu } = useTestEventContextMenu(testEvent, testEvents);
 
   const position = useMemo(() => {
     let position: Position = "after";
@@ -109,6 +110,7 @@ export function TestSectionRow({
         <UserActionEventRow
           groupedTestCases={groupedTestCases}
           isSelected={isSelected}
+          testEvents={testEvents}
           testSectionName={testSectionName}
           userActionEvent={testEvent}
         />

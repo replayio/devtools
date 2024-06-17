@@ -117,6 +117,7 @@ export default memo(function Event({
           "text-lightGrey": currentTime < time,
           "font-semibold text-primaryAccent": isPaused,
         })}
+        data-private
         onClick={onClickSeek}
         onContextMenu={onContextMenu}
         onKeyDown={onKeyDown}

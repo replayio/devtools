@@ -163,6 +163,11 @@ export async function addVisualComment(
     async () => {
       const element = page.locator("#graphics");
       await element.click({ position: { x, y } });
+
+      await selectContextMenuItem(page, {
+        contextMenuItemTestName: "ContextMenuItem-AddComment",
+        contextMenuTestId: "ContextMenu-Video",
+      });
     },
     "visual",
     text

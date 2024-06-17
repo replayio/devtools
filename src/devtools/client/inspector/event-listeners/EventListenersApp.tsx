@@ -1,7 +1,10 @@
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import { Suspense, useContext, useEffect, useMemo, useState } from "react";
 
 import { getSelectedDomNodeId } from "devtools/client/inspector/markup/reducers/markup";
+import { getSelectedNodeId } from "devtools/client/inspector/markup/selectors/markup";
 import { onViewSourceInDebugger } from "devtools/client/webconsole/actions/toolbox";
+import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBoundary";
+import { PanelLoader } from "replay-next/components/PanelLoader";
 import { useMostRecentLoadedPause } from "replay-next/src/hooks/useMostRecentLoadedPause";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -10,13 +13,24 @@ import {
   EventListenerWithFunctionInfo,
   NodeWithPreview,
 } from "ui/actions/eventListeners/eventListenerUtils";
-import { useAppDispatch } from "ui/setup/hooks";
-import { useAppSelector } from "ui/setup/hooks";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 import { ExpandableItem } from "./ExpandableItem";
 import { XHTMLNode } from "./XHTMLNode";
 
-export const EventListenersApp = () => {
+export function EventListenersApp() {
+  const selectedNodeId = useAppSelector(getSelectedNodeId);
+
+  return (
+    <InlineErrorBoundary name="EventListeners" resetKey={selectedNodeId ?? undefined}>
+      <Suspense fallback={<PanelLoader />}>
+        <EventListenersAppSuspends />
+      </Suspense>
+    </InlineErrorBoundary>
+  );
+}
+
+function EventListenersAppSuspends() {
   const [listeners, setListeners] = useState<EventListenerWithFunctionInfo[]>([]);
   const selectedDomNodeId = useAppSelector(getSelectedDomNodeId);
   const dispatch = useAppDispatch();
@@ -149,4 +163,4 @@ export const EventListenersApp = () => {
       )}
     </div>
   );
-};
+}

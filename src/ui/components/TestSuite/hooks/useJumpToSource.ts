@@ -19,11 +19,13 @@ import { AwaitTimeout, awaitWithTimeout } from "ui/utils/awaitWithTimeout";
 export function useJumpToSource({
   groupedTestCases,
   testEvent,
+  testEvents,
   testRecording,
   openSourceAutomatically = false,
 }: {
   groupedTestCases: GroupedTestCases;
   testEvent: TestEvent;
+  testEvents: TestEvent[];
   testRecording: TestRecording;
   openSourceAutomatically: boolean;
 }) {
@@ -57,7 +59,8 @@ export function useJumpToSource({
       const locationPromise = TestStepSourceLocationCache.readAsync(
         replayClient,
         groupedTestCases,
-        testEvent
+        testEvent,
+        testEvents
       );
 
       let location;

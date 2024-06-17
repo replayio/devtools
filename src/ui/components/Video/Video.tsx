@@ -100,15 +100,7 @@ export default function Video() {
   const dispatch = useAppDispatch();
   const panel = useAppSelector(getSelectedPrimaryPanel);
 
-  const { addComment, contextMenu, onContextMenu } = useVideoContextMenu();
-
-  const onClick = (event: MouseEvent) => {
-    dispatch(stopPlayback());
-
-    if (nodePickerStatus == "disabled") {
-      addComment(event);
-    }
-  };
+  const { contextMenu, onContextMenu: onClick } = useVideoContextMenu();
 
   const showBeforeAfterTestStepToggles = panel === "cypress";
 
@@ -116,6 +108,7 @@ export default function Video() {
     <div
       id="video"
       className={styles.Container}
+      data-private
       style={{
         cursor: nodePickerStatus === "initializing" ? "progress" : undefined,
       }}
@@ -124,7 +117,7 @@ export default function Video() {
         <ReplayLogo size="sm" color="gray" />
       </div>
 
-      <img className={styles.Image} id="graphics" onClick={onClick} onContextMenu={onContextMenu} />
+      <img className={styles.Image} id="graphics" onClick={onClick} />
 
       {/* Graphics that are relative to the rendered screenshot go here; this container is automatically positioned to align with the screenshot */}
       <div className={styles.Graphics} id="overlay-graphics">

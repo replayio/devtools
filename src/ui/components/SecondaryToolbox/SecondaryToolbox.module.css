@@ -7,3 +7,13 @@
   border-radius: 0.25rem;
   font-size: var(--font-size-regular);
 }
+
+.CouldNotLoadMessage {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  text-align: center;
+  color: var(--color-dim);
+}
