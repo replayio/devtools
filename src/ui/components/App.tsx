@@ -163,6 +163,8 @@ function App({ children, hideModal, modal, quickOpenEnabled, accessToken }: AppP
   );
 }
 
+//test
+
 const connector = connect(
   (state: UIState) => ({
     modal: getModal(state),
