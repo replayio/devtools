@@ -32,6 +32,7 @@
   align-items: center;
   justify-content: center;
   color: var(--color-dimmer);
+  height: calc(100% - var(--line-height));
 }
 .Loader {
   background-color: var(--point-panel-background-color);
@@ -98,11 +99,6 @@
 }
 
 .Content {
-  /* Allows height for horizontal scrollbar without shifting text */
-  height: 1.5rem;
-  max-height: 1.5rem;
-  line-height: 1.5rem;
-
   flex: 1 1 auto;
   white-space: pre;
   overflow-y: hidden;
@@ -114,6 +110,7 @@
   display: flex;
   flex-direction: row;
   align-items: center;
+  gap: 1ch;
 
   /* Firefox fixes */
   scrollbar-width: thin;
@@ -128,14 +125,14 @@
 .Content:focus {
   border-color: var(--logpoint-border-color-focused);
 }
+.Content [data-test-name="PointPanel-ConditionInput"],
 .Content [data-test-name="PointPanel-ContentInput"] {
-  white-space: pre !important;
+  padding: 0.25rem 0;
 }
 
 .EditButton,
 .RemoveConditionalButton,
-.SaveButton,
-.ToggleVisibilityButton {
+.SaveButton {
   background: none;
   border: none;
   margin: 0;
@@ -148,58 +145,35 @@
 .EditButton:disabled,
 .RemoveConditionalButton[data-invalid],
 .RemoveConditionalButton:disabled,
-.SaveButton[data-invalid],
-.SaveButton:disabled .ToggleVisibilityButton:disabled {
+.SaveButton[data-invalid] {
   cursor: default;
 }
 
-.EditButton,
-.ToggleVisibilityButton {
+.ButtonWithIcon {
   flex-grow: 0;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   line-height: 1.5rem;
+  height: 1rem;
+  width: 1rem;
+  cursor: pointer;
   color: var(--point-panel-input-edit-button-color);
 }
-.ContentWrapper[data-state-editable="true"]:hover .EditButton,
-.EditButton:hover,
-.ToggleVisibilityButton:hover {
+.ButtonWithIcon:hover {
   color: var(--point-panel-input-edit-button-color-hover);
 }
-
-.RemoveConditionalButton {
-  color: var(--point-panel-input-cancel-button-color);
+.ButtonWithIcon[data-invalid] {
+  color: var(--badge-picker-invalid-background-color);
 }
-.RemoveConditionalButton:hover {
-  color: var(--point-panel-input-cancel-button-color-hover);
-}
-.RemoveConditionalButton[data-invalid] {
-  color: var(--point-panel-input-disabled-cancel-button-color);
-}
-.RemoveConditionalButton[data-invalid]:hover {
+.ButtonWithIcon[data-invalid]:hover {
   color: var(--point-panel-input-disabled-cancel-button-color-hover);
-}
-
-.RemoveConditionalButtonIcon {
-  width: 1rem;
-  height: 1rem;
-}
-
-.EditButtonIcon,
-.ToggleVisibilityButtonIcon {
-  height: 1rem;
-  width: 1rem;
 }
 
 .ContentInput,
 .ContentInputWithNag {
   width: 100%;
-
-  /* Allows height for horizontal scrollbar without shifting text */
-  height: 1.5rem;
-  line-height: 1.5rem;
 }
 .ContentInputWithNag::selection {
   background-color: var(--nag-background-color);
@@ -235,32 +209,8 @@
   flex: 0 0 1.5rem;
 }
 
-.SaveButton {
-  flex: 0 0 1.5rem;
-  height: 1.5rem;
-  width: 1.5rem;
-  border-radius: 1.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-family-default);
-  font-size: var(--font-size-regular);
-  background-color: var(--background-color-primary-button);
-  color: var(--color-primary-button);
-}
-.SaveButton[data-invalid] {
-  background-color: var(--background-color-primary-button-disabled);
-}
-.SaveButton:disabled {
-  background-color: var(--background-color-primary-button-disabled);
-}
-
-.SaveButtonIcon {
-  height: 1rem;
-  width: 1rem;
-}
-
 .DisabledIconAndAvatar {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -271,4 +221,11 @@
   height: 1rem;
   width: 1rem;
   border-radius: 1rem;
+}
+
+.SyntaxHighlighter {
+  flex-grow: 1;
+  white-space: pre-wrap;
+  word-break: break-word;
+  padding: 0.25rem 0;
 }
