@@ -3567,19 +3567,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/playwright@npm:3.0.0-alpha.14":
-  version: 3.0.0-alpha.14
-  resolution: "@replayio/playwright@npm:3.0.0-alpha.14"
+"@replayio/playwright@npm:0.0.0-pr536-20240618142255":
+  version: 0.0.0-pr536-20240618142255
+  resolution: "@replayio/playwright@npm:0.0.0-pr536-20240618142255"
   dependencies:
-    "@replayio/replay": ^0.22.5
-    "@replayio/test-utils": ^2.1.1
+    "@replayio/replay": ^0.0.0-pr536-20240618142255
+    "@replayio/test-utils": ^0.0.0-pr536-20240618142255
     debug: ^4.3.4
     stack-utils: ^2.0.6
     uuid: ^8.3.2
     ws: ^8.13.0
   peerDependencies:
     "@playwright/test": ^1.34.0
-  checksum: 4bb7f265e9350a57a242efa711c43a674196db9ba547319e48297cab7aa729159ddbe7a387bf1aa9bb9d6a5f8049c88ea69c3706fc8d6cb5bd25d8c003c2b1c6
+  checksum: 6c7420fb00cf2e285c757acda609ab0ae6626ce91647567828974af4f8dc8d89fa9f68d2e53e0ffdaf846c5eb521ace1705143e8d3a378aeda111d6698945d3d
   languageName: node
   linkType: hard
 
@@ -3600,7 +3600,31 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/replay@npm:^0.22.4, @replayio/replay@npm:^0.22.5":
+"@replayio/replay@npm:^0.0.0-pr536-20240618142255":
+  version: 0.0.0-pr536-20240618142255
+  resolution: "@replayio/replay@npm:0.0.0-pr536-20240618142255"
+  dependencies:
+    "@replayio/sourcemap-upload": ^2.0.4
+    "@types/semver": ^7.5.6
+    commander: ^12.0.0
+    debug: ^4.3.4
+    is-uuid: ^1.0.2
+    jsonata: ^1.8.6
+    launchdarkly-node-client-sdk: ^3.2.1
+    node-fetch: ^2.6.8
+    p-map: ^4.0.0
+    query-registry: ^2.6.0
+    semver: ^7.5.4
+    superstruct: ^0.15.4
+    text-table: ^0.2.0
+    ws: ^7.5.0
+  bin:
+    replay: ./bin.js
+  checksum: bc4aa9ae07b23a5482f3feb5180c28eeeaad97f00d1ec656b7618b16f21f1abe2948b1482074b50a6da7a568553c9bb8270746661bf4de041aa1419ddcd96316
+  languageName: node
+  linkType: hard
+
+"@replayio/replay@npm:^0.22.4":
   version: 0.22.5
   resolution: "@replayio/replay@npm:0.22.5"
   dependencies:
@@ -3638,16 +3662,30 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/test-utils@npm:^2.1.1":
-  version: 2.1.1
-  resolution: "@replayio/test-utils@npm:2.1.1"
+"@replayio/sourcemap-upload@npm:^2.0.4":
+  version: 2.0.4
+  resolution: "@replayio/sourcemap-upload@npm:2.0.4"
   dependencies:
-    "@replayio/replay": ^0.22.5
+    commander: ^7.2.0
+    debug: ^4.3.1
+    glob: ^7.1.6
+    node-fetch: ^2.6.1
+    p-map: ^4.0.0
+    string.prototype.matchall: ^4.0.5
+  checksum: a583ff0ace329a13e03b1acb35f0a247fcd3b2a27249ec181d4dcf42b8c18007f5e06078bb20856f63623e732f7a0cda9f8eb279f28f20f68625720f438448c7
+  languageName: node
+  linkType: hard
+
+"@replayio/test-utils@npm:^0.0.0-pr536-20240618142255":
+  version: 0.0.0-pr536-20240618142255
+  resolution: "@replayio/test-utils@npm:0.0.0-pr536-20240618142255"
+  dependencies:
+    "@replayio/replay": ^0.0.0-pr536-20240618142255
     debug: ^4.3.4
     node-fetch: ^2.6.7
     sha-1: ^1.0.0
     uuid: ^8.3.2
-  checksum: f0247cc75876f6e00086422315ba702612d494a0ba63d821be073ecf38cb7867ce6c7bd2e9eca5855596f90cdfa679ed4876aafd32218c2347fa9d90a3cf3ad6
+  checksum: bda354d40ea41a14efc4c9c0c912b5bf0b8c7c0219a0be14642040200e43c25c1dc2843ad14fbbd9e6284fe494da541c9be15383b615a98ff3501685cc467370
   languageName: node
   linkType: hard
 
@@ -9460,7 +9498,7 @@ __metadata:
   resolution: "functional-tests@workspace:packages/e2e-tests"
   dependencies:
     "@playwright/test": ^1.37.0
-    "@replayio/playwright": 3.0.0-alpha.14
+    "@replayio/playwright": 0.0.0-pr536-20240618142255
     chalk: ^4
     cli-spinners: ^2.7.0
     cypress: ^12.5.1
@@ -11995,6 +12033,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"launchdarkly-eventsource@npm:2.0.3":
+  version: 2.0.3
+  resolution: "launchdarkly-eventsource@npm:2.0.3"
+  checksum: c0e63aef73bf377e3838357e8903800b523a32e882b70df5c6c03bf22ea65d3305e7acb2843d0f9d6b0bb741f7d0d0da562f1f9693e28fbdac2e3851a6ca807e
+  languageName: node
+  linkType: hard
+
 "launchdarkly-js-client-sdk@npm:^3.0.0":
   version: 3.1.4
   resolution: "launchdarkly-js-client-sdk@npm:3.1.4"
@@ -12027,6 +12072,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"launchdarkly-js-sdk-common@npm:5.2.0":
+  version: 5.2.0
+  resolution: "launchdarkly-js-sdk-common@npm:5.2.0"
+  dependencies:
+    base64-js: ^1.3.0
+    fast-deep-equal: ^2.0.1
+    uuid: ^8.0.0
+  checksum: c4eab1818834748133e976ace96995c9451c00cfe8923960bbcd2ad333e6578a35e145dace3cd03885d2a7b57be0af53c72dee3a4d61f4d09bf8468a2600e58f
+  languageName: node
+  linkType: hard
+
 "launchdarkly-node-client-sdk@npm:^3.1.0":
   version: 3.1.0
   resolution: "launchdarkly-node-client-sdk@npm:3.1.0"
@@ -12035,6 +12091,17 @@ __metadata:
     launchdarkly-js-sdk-common: 5.1.0
     node-localstorage: ^1.3.1
   checksum: 0719605989f0dfc4b2a785a1dc0879de7536bfad6d372f0d317ad53c78fa2abe052eaa116d389997e224a6e07aab4101d2ec168f95fdd49a28f14d50a84c3e54
+  languageName: node
+  linkType: hard
+
+"launchdarkly-node-client-sdk@npm:^3.2.1":
+  version: 3.2.1
+  resolution: "launchdarkly-node-client-sdk@npm:3.2.1"
+  dependencies:
+    launchdarkly-eventsource: 2.0.3
+    launchdarkly-js-sdk-common: 5.2.0
+    node-localstorage: ^1.3.1
+  checksum: 207ab82a2dc22730296ece9286fb660ea5189423d8881a4b5eaaef7b7f7557643efaf4cb5c96be96345f36d6e52e6b72ea2daab65bab10ea123e2807523587e3
   languageName: node
   linkType: hard
 
