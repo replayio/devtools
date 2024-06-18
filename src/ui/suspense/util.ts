@@ -12,7 +12,7 @@ export function getAsyncParentPauseIdSuspense(
   replayClient: ReplayClientInterface,
   pauseId: PauseId,
   asyncIndex: number,
-  focusWindow: TimeStampedPointRange | null
+  focusWindow: TimeStampedPointRange
 ): PauseId | null {
   while (asyncIndex > 0) {
     const frames = framesCache.read(replayClient, pauseId)!;
