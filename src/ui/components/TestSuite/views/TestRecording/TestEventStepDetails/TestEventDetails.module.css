@@ -99,7 +99,7 @@
   padding: 0 0.5rem;
 }
 .SourceCodeLineSelected {
-  background-color: var(--background-color-current-execution-point);
+  background-color: var(--background-color-current-execution-point-test-code);
 }
 
 .TabsContainer {
