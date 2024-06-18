@@ -10,64 +10,84 @@ import { createCache, createSingleEntryCache } from "suspense";
 
 import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
 import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
-import { getPreferredLocation } from "replay-next/src/utils/sources";
 import { ReplayClientInterface } from "shared/client/types";
 import { IGNORABLE_PARTIAL_SOURCE_URLS } from "ui/actions/eventListeners/eventListenerUtils";
 import { findFunctionOutlineForLocation } from "ui/actions/eventListeners/jumpToCode";
 import { FormattedPointStackFrame, formattedPointStackCache } from "ui/suspense/frameCache";
 
-interface ApplyMiddlewareDecl {
+interface FunctionBoundaries {
   location: SourceLocationRange;
   sourceId: string;
 }
 
-export const applyMiddlewareDeclCache = createSingleEntryCache<
+export const reduxStoreDetailsCache = createSingleEntryCache<
   [replayClient: ReplayClientInterface],
-  ApplyMiddlewareDecl | null
+  FunctionBoundaries[] | null
 >({
-  debugLabel: "ApplyMiddlewareDecl",
+  debugLabel: "ReduxStoreDetails",
   load: async ([replayClient]) => {
-    const dispatchMatches: FunctionMatch[] = [];
-
     const sourcesById = await sourcesByIdCache.readAsync(replayClient);
-    const reduxSources = Array.from(sourcesById.values()).filter(source =>
-      source.url?.includes("/redux/")
+
+    const reduxSources = Array.from(sourcesById.values()).filter(
+      source => source.url?.includes("/redux/") && source.isSourceMapped
     );
 
     if (reduxSources.length === 0) {
       return null;
     }
 
+    const replaceReducerMatches: FunctionMatch[] = [];
     await replayClient.searchFunctions(
-      { query: "dispatch", sourceIds: reduxSources.map(source => source.id) },
+      // This is a good function to look for to find the actual `createStore` method
+      { query: "replaceReducer", sourceIds: reduxSources.map(source => source.id) },
       matches => {
-        dispatchMatches.push(...matches);
+        replaceReducerMatches.push(...matches);
       }
     );
 
-    const [firstMatch] = dispatchMatches;
-    if (!firstMatch) {
+    if (replaceReducerMatches.length === 0) {
       return null;
     }
-    const preferredLocation = getPreferredLocation(sourcesById, [], [firstMatch.loc]);
-    const reduxSource = sourcesById.get(preferredLocation.sourceId)!;
-    const fileOutline = await sourceOutlineCache.readAsync(replayClient, reduxSource.id);
 
-    const applyMiddlwareFunction = fileOutline.functions.find(o => o.name === "applyMiddleware")!;
+    // Find _all_ `applyMiddleware` definitions across whatever original or pretty-printed
+    // versions of `redux.js` we have.
+    const applyMiddlewareLocations: FunctionBoundaries[] = (
+      await Promise.all(
+        replaceReducerMatches.map(async m => {
+          const sourceOutline = await sourceOutlineCache.readAsync(replayClient, m.loc.sourceId);
+          const applyMiddlewareFunction = sourceOutline.functions.find(
+            o => o.name === "applyMiddleware"
+          );
 
-    return {
-      sourceId: reduxSource.sourceId,
-      location: applyMiddlwareFunction.location,
-    };
+          if (!applyMiddlewareFunction) {
+            return null;
+          }
+
+          return {
+            sourceId: m.loc.sourceId,
+            location: applyMiddlewareFunction.location,
+          };
+        })
+      )
+    ).filter(Boolean);
+
+    if (applyMiddlewareLocations.length === 0) {
+      return null;
+    }
+
+    return applyMiddlewareLocations;
   },
 });
 
-function isFrameInDecl(decl: ApplyMiddlewareDecl, frame: FormattedPointStackFrame) {
-  return (
-    frame.executionLocation.line >= decl.location.begin.line &&
-    frame.executionLocation.line < decl.location.end.line &&
-    frame.executionLocation.sourceId === decl.sourceId
-  );
+function isFrameInDecl(functions: FunctionBoundaries[], frame: FormattedPointStackFrame) {
+  // Check to see if the frame is inside any of the listed function definitions
+  return functions.some(decl => {
+    return (
+      frame.executionLocation.line >= decl.location.begin.line &&
+      frame.executionLocation.line < decl.location.end.line &&
+      frame.executionLocation.sourceId === decl.sourceId
+    );
+  });
 }
 
 function isNestedInside(child: SourceLocationRange, parent: SourceLocationRange) {
@@ -81,28 +101,35 @@ function isNestedInside(child: SourceLocationRange, parent: SourceLocationRange)
   return startsBefore && endsAfter;
 }
 
-async function searchingCallstackForDispatch(
+async function findLikelyAppDispatchFrame(
   pauseFrames: FormattedPointStackFrame[],
   replayClient: ReplayClientInterface
 ) {
-  // The first 2 elements in filtered pause frames are from replay's redux stub, so they should be ignored
-  // The 3rd element is the user function that calls it, and will most likely be the `dispatch` call
-  let preferredFrameIdx = 2;
-  const applyMiddlewareDecl = await applyMiddlewareDeclCache.readAsync(replayClient);
+  const applyMiddlewareLocations = await reduxStoreDetailsCache.readAsync(replayClient);
 
-  if (!applyMiddlewareDecl) {
+  if (!applyMiddlewareLocations) {
     return null;
   }
 
-  for (let frameIdx = 2; frameIdx < pauseFrames.length; frameIdx++) {
-    const frame = pauseFrames[frameIdx];
+  // The first 2 elements in filtered pause frames are from replay's redux stub, so they should be ignored
+  // The 3rd element is the user function that calls it, and will most likely be the `dispatch` call
+  const framesWithoutReplayStub = pauseFrames.slice(2);
 
-    if (isFrameInDecl(applyMiddlewareDecl, frame)) {
+  for (const frame of framesWithoutReplayStub) {
+    // console.log("Checking middleware status: ", frame);
+    const isMiddleware = await isReduxMiddleware(replayClient, frame.executionLocation);
+    if (isMiddleware) {
+      continue;
+    }
+
+    if (isFrameInDecl(applyMiddlewareLocations, frame)) {
       // this is the frame inside `applyMiddleware` where the initial dispatch occurs
       // the frame just before this one is the user `dispatch`
-      preferredFrameIdx = frameIdx + 1;
-      return preferredFrameIdx;
+      continue;
     }
+
+    // Return the first frame that is _not_ a middleware or `applyMiddleware`
+    return frame;
   }
 
   return null;
@@ -151,29 +178,6 @@ async function isReduxMiddleware(replayClient: ReplayClientInterface, location: 
   return false;
 }
 
-async function searchSourceOutlineForDispatch(
-  pauseFrames: FormattedPointStackFrame[],
-  replayClient: ReplayClientInterface
-) {
-  // The first 2 elements in filtered pause frames are from replay's redux stub, so they should be ignored
-  // The 3rd element is the user function that calls it, and will most likely be the `dispatch` call
-  let preferredFrameIdx = 2;
-  let isMiddleware = true;
-
-  while (isMiddleware && preferredFrameIdx < pauseFrames.length) {
-    let preferredFrame = pauseFrames[preferredFrameIdx];
-
-    if (await isReduxMiddleware(replayClient, preferredFrame.executionLocation)) {
-      isMiddleware = true;
-      preferredFrameIdx++;
-    } else {
-      isMiddleware = false;
-    }
-  }
-
-  return preferredFrameIdx;
-}
-
 export const reduxDispatchJumpLocationCache = createCache<
   [replayClient: ReplayClientInterface, point: ExecutionPoint, time: number],
   PointDescription | undefined
@@ -194,15 +198,11 @@ export const reduxDispatchJumpLocationCache = createCache<
     );
     const { filteredFrames: filteredPauseFrames } = frames;
 
-    let preferredFrameIdx = await searchingCallstackForDispatch(filteredPauseFrames, replayClient);
+    const possibleDispatchFrame = await findLikelyAppDispatchFrame(
+      filteredPauseFrames,
+      replayClient
+    );
 
-    if (preferredFrameIdx === null) {
-      // couldn't find the frame through the call stack
-      // now try finding a function in the call stack
-      // that matches (store => next => action => {})
-      preferredFrameIdx = await searchSourceOutlineForDispatch(filteredPauseFrames, replayClient);
-    }
-
-    return filteredPauseFrames[preferredFrameIdx].point;
+    return possibleDispatchFrame?.point;
   },
 });
