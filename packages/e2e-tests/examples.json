@@ -35,6 +35,10 @@
     "recording": "e1eba430-f744-47b3-a097-e0e26c9992fc",
     "buildId": "linux-chromium-20240418-4747c93165f9-4699f489a2b6"
   },
+  "doc_async_stack.html": {
+    "recording": "02747835-34e8-4ea0-9ed5-432a133aa785",
+    "buildId": "linux-chromium-20240614-d742f2be668d-7ad782ed38d0"
+  },
   "doc_control_flow.html": {
     "recording": "4762689b-f2c2-4205-8229-377992d54b6b",
     "buildId": "linux-chromium-20240418-4747c93165f9-4699f489a2b6"

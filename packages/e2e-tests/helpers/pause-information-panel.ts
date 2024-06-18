@@ -243,6 +243,21 @@ export async function stepOver(page: Page): Promise<void> {
   await clickCommandBarButton(page, "Step Over");
 }
 
+export function waitForAllFramesToLoad(page: Page) {
+  return waitFor(async () => {
+    expect(await page.locator('[data-test-name="FramesLoading"]').count()).toBe(0);
+  });
+}
+
+export function getAsyncParentCount(page: Page) {
+  return page.locator('[data-test-name="AsyncParentLabel"]').count();
+}
+
+export async function isAsyncParentUnavailable(page: Page) {
+  const asyncParentUnavailable = page.locator('[data-test-name="AsyncParentUnavailable"]');
+  return (await asyncParentUnavailable.count()) > 0;
+}
+
 export async function verifyFramesCount(page: Page, expectedCount: number) {
   const framesPanel = getFramesPanel(page);
   return waitFor(async () => {

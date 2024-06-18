@@ -6,36 +6,36 @@ import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { isExecutionPointsWithinRange } from "replay-next/src/utils/time";
 import { ReplayClientInterface } from "shared/client/types";
 
-// returns undefined if the async parent pause doesn't exist
-// or null if it is not in a loaded region
+// returns false if the async parent pause doesn't exist
+// or true if it is not in a loaded region
 export function getAsyncParentPauseIdSuspense(
   replayClient: ReplayClientInterface,
   pauseId: PauseId,
   asyncIndex: number,
-  focusWindow: TimeStampedPointRange
-): PauseId | null {
+  focusWindow: TimeStampedPointRange | null
+): PauseId | boolean {
   while (asyncIndex > 0) {
     const frames = framesCache.read(replayClient, pauseId)!;
     if (!frames?.length) {
-      return null;
+      return false;
     }
 
     const steps = frameStepsCache.read(replayClient, pauseId, frames[frames.length - 1].frameId);
     if (!steps || steps.length === 0) {
-      return null;
+      return false;
     }
 
     const executionPoint = steps[0].point;
     if (
-      focusWindow === null ||
+      focusWindow &&
       !isExecutionPointsWithinRange(executionPoint, focusWindow.begin.point, focusWindow.end.point)
     ) {
-      return null;
+      return true;
     }
 
     const parentPauseId = pauseIdCache.read(replayClient, steps[0].point, steps[0].time);
     if (parentPauseId === pauseId) {
-      return null;
+      return false;
     }
 
     pauseId = parentPauseId;

@@ -53,7 +53,7 @@ function FramesRenderer({
   const asyncSeparator =
     asyncIndex > 0 ? (
       <div role="listitem">
-        <span className="location-async-cause">
+        <span className="location-async-cause" data-test-name="AsyncParentLabel">
           <span className="async-label">async</span>
         </span>
       </div>
@@ -65,11 +65,11 @@ function FramesRenderer({
     asyncIndex,
     focusWindow
   );
-  if (asyncParentPauseId === null) {
+  if (asyncParentPauseId === true) {
     return (
       <>
         {asyncSeparator}
-        <div className="pane-info empty">
+        <div className="pane-info empty" data-test-name="AsyncParentUnavailable">
           This part of the call stack is unavailable because it is outside{" "}
           <span className="cursor-pointer underline" onClick={() => dispatch(enterFocusMode())}>
             your debugging window
@@ -80,9 +80,10 @@ function FramesRenderer({
     );
   }
 
-  let frames = asyncParentPauseId
-    ? getPauseFramesSuspense(replayClient, asyncParentPauseId, sourcesState)
-    : undefined;
+  let frames =
+    typeof asyncParentPauseId === "string"
+      ? getPauseFramesSuspense(replayClient, asyncParentPauseId, sourcesState)
+      : undefined;
   if (asyncIndex > 0) {
     frames = frames?.slice(1);
   }
@@ -103,7 +104,13 @@ function FramesRenderer({
         name="NewFrames"
         fallback={<div className="pane-info empty">Error loading frames :(</div>}
       >
-        <Suspense fallback={<div className="pane-info empty">Loading async frames…</div>}>
+        <Suspense
+          fallback={
+            <div className="pane-info empty" data-test-name="FramesLoading">
+              Loading async frames…
+            </div>
+          }
+        >
           <FramesRenderer panel={panel} pauseId={pauseId} asyncIndex={asyncIndex + 1} />
         </Suspense>
       </InlineErrorBoundary>
@@ -223,7 +230,13 @@ function Frames({ panel, point, time }: FramesProps) {
         name="Frames"
         fallback={<div className="pane-info empty">Error loading frames :((</div>}
       >
-        <Suspense fallback={<div className="pane-info empty">Loading...</div>}>
+        <Suspense
+          fallback={
+            <div className="pane-info empty" data-test-name="FramesLoading">
+              Loading...
+            </div>
+          }
+        >
           <div role="list">
             <FramesRenderer pauseId={pauseId} panel={panel} />
           </div>
@@ -238,7 +251,9 @@ export default function NewFrames(props: FramesProps) {
     <Suspense
       fallback={
         <div className="pane">
-          <div className="pane-info empty">Loading...</div>
+          <div className="pane-info empty" data-test-name="FramesLoading">
+            Loading...
+          </div>
         </div>
       }
     >
