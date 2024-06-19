@@ -37,7 +37,6 @@ export function BooleanPreference({
     <label
       className="flex cursor-pointer flex-col transition-opacity"
       style={{ gridTemplateColumns: "auto minmax(0, 1fr)", gap: "0 0.5rem" }}
-      data-private
       htmlFor={preferencesKey}
       onClick={() => {
         setChecked(!checked);

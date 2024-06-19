@@ -37,11 +37,7 @@ export default function Inspector({
     return keyValue;
   } else {
     return (
-      <div
-        className={`${styles.Inspector} ${className || ""}`}
-        data-private
-        data-test-name="InspectorRoot"
-      >
+      <div className={`${styles.Inspector} ${className || ""}`} data-test-name="InspectorRoot">
         {keyValue}
       </div>
     );

@@ -49,10 +49,7 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
 
   const isTest = isTestSuiteReplay(recording);
   return (
-    <div
-      className="flex-column flex items-center overflow-hidden border-splitter bg-bodyBgcolor"
-      data-private
-    >
+    <div className="flex-column flex items-center overflow-hidden border-splitter bg-bodyBgcolor">
       <div className="mt-.5 mb-2 flex w-full cursor-default flex-col self-stretch overflow-hidden px-1.5 pb-0 text-xs">
         <Row>
           {recording.user ? (

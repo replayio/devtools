@@ -16,7 +16,6 @@ export function Redacted({
   return (
     <div
       {...rest}
-      data-private={true}
       className={classnames(className, { showRedactions })}
       ref={refToForward as Ref<HTMLDivElement>}
     />
@@ -30,11 +29,6 @@ export function RedactedSpan({
 }: HTMLProps<HTMLSpanElement> & RefProp) {
   const [showRedactions] = useGraphQLUserData("global_showRedactions");
   return (
-    <span
-      {...rest}
-      data-private={true}
-      className={classnames(className, { showRedactions })}
-      ref={refToForward}
-    />
+    <span {...rest} className={classnames(className, { showRedactions })} ref={refToForward} />
   );
 }
