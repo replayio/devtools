@@ -6,7 +6,6 @@ import classNames from "classnames";
 import React from "react";
 
 import type { PauseFrame } from "devtools/client/debugger/src/reducers/pause";
-import { Redacted } from "ui/components/Redacted";
 import { trackEvent } from "ui/utils/telemetry";
 
 import { formatDisplayName } from "../../../utils/pause/frames";
@@ -121,7 +120,7 @@ export function FrameComponent({
 
   return (
     <>
-      <Redacted
+      <div
         role="listitem"
         key={frame.id}
         className={className}
@@ -140,7 +139,7 @@ export function FrameComponent({
           {!hideLocation && <FrameLocation frame={frame} displayFullUrl={displayFullUrl} />}
           {isSelectable && <br className="clipboard-only" />}
         </div>
-      </Redacted>
+      </div>
 
       {/*Keep the context menu separate to avoid `onMouseDown`
       bubbling up and causing unwanted frame selection behavior*/}

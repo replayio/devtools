@@ -2,7 +2,6 @@ import classnames from "classnames";
 import React from "react";
 
 import { FunctionOutlineWithHitCount } from "replay-next/src/suspense/OutlineHitCountsCache";
-import { Redacted } from "ui/components/Redacted";
 
 import PreviewFunction from "../shared/PreviewFunction";
 
@@ -25,9 +24,9 @@ export const SourceOutlineFunction = React.memo(function OutlineFunction({
     >
       <div>
         <span className="outline-list__element-icon">λ</span>
-        <Redacted className="inline-block">
+        <div className="inline-block">
           <PreviewFunction func={func} />
-        </Redacted>
+        </div>
       </div>
       {func.hits !== undefined && (
         <div className="rounded bg-themeMenuHighlight px-2 text-bodyColor">{func.hits}</div>

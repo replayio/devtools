@@ -163,7 +163,6 @@ export type CombinedExperimentalUserSettings = ExperimentalUserSettings &
 
 - `ui/actions/session.ts`: `disableCache`,  `listenForMetrics`
 - `ui/components/DevTools.tsx`: `sidePanelSize`
-- `ui/components/Redacted.tsx`: `showRedactions`
 - `ui/components/SkeletonLoader.tsx`: `sidePanelSize`
 - `ui/components/Viewer.tsx`: `secondaryPanelHeight`,  `sidePanelSize`,  `toolboxSize`
 - `ui/hooks/settings.ts`: all,  passed as key to `useStringPref` and `useBoolPref`
