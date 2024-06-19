@@ -145,7 +145,7 @@ export function initializeMixpanel() {
   mixpanel.init("ffaeda9ef8fb976a520ca3a65bba5014");
 
   // Add the recordingId to the event metadata so we have a cookie crumb
-  // trail for following flows in LogRocket.
+  // trail for following in other telemetry systems
   mixpanel.register({ recordingId: getRecordingId() });
 }
 

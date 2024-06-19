@@ -134,7 +134,6 @@
 export type ExperimentalUserSettings = {
   apiKeys: ApiKey[];
   defaultWorkspaceId: null | string;
-  disableLogRocket: boolean;
   enableTeams: boolean;
   enableLargeText: boolean;
 };

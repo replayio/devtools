@@ -34,7 +34,6 @@ import {
 import { setFocusWindow } from "ui/reducers/timeline";
 import { getMutableParamsFromURL } from "ui/setup/dynamic/url";
 import type { ExpectedError, UnexpectedError } from "ui/state/app";
-import LogRocket from "ui/utils/logrocket";
 import { endMixpanelSession } from "ui/utils/mixpanel";
 import { registerRecording, trackEvent } from "ui/utils/telemetry";
 import { subscriptionExpired } from "ui/utils/workspace";
@@ -175,8 +174,6 @@ export function createSocket(recordingId: string): UIThunkAction {
       if (recording.workspace) {
         dispatch(actions.setRecordingWorkspace(recording.workspace));
       }
-
-      LogRocket.createSession({ recording, userInfo });
 
       registerRecording({ recording });
 

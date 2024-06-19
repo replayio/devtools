@@ -42,16 +42,6 @@ export function Preferences() {
         />
       </div>
 
-      <div className="space-y-4">
-        <div className="text-lg">Privacy</div>
-        <div className="flex flex-col space-y-2">
-          <BooleanPreference
-            preference={config.global_disableLogRocket}
-            preferencesKey="global_disableLogRocket"
-          />
-        </div>
-      </div>
-
       {unsubscribedEmailTypes ? (
         <div className="space-y-4">
           <div className="text-lg">Notifications</div>
