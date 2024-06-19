@@ -10,7 +10,6 @@ import { ContextMenuItem, useContextMenu } from "use-context-menu";
 
 import Icon from "replay-next/components/Icon";
 import { copyToClipboard } from "replay-next/components/sources/utils/clipboard";
-import { Redacted } from "ui/components/Redacted";
 import type { SourceDetails } from "ui/reducers/sources";
 
 import { getSourceQueryString } from "../../utils/source";
@@ -196,10 +195,10 @@ function SourceTreeItem2({
         {itemArrow}
         <SourceTreeIcon source={source} depth={depth} item={item} />
 
-        <Redacted className="label">
+        <div className="label">
           {getItemName(item)}
           {query}
-        </Redacted>
+        </div>
       </div>
       {contextMenu}
     </>

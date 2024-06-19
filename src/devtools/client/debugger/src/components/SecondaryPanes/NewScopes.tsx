@@ -12,7 +12,6 @@ import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
 import { getPreferredLocation, getPreferredSourceId } from "replay-next/src/utils/sources";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { enterFocusMode } from "ui/actions/timeline";
-import { Redacted } from "ui/components/Redacted";
 import { getPreferredGeneratedSources } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { pickScopes } from "ui/suspense/scopeCache";
@@ -150,7 +149,7 @@ export default function NewScopes() {
 
   return (
     <div className="scopes-content">
-      <Redacted className="pane scopes-list" data-test-name="ScopesList">
+      <div className="pane scopes-list" data-test-name="ScopesList">
         <InlineErrorBoundary
           name="NewScopes"
           key={`${selectedFrameId?.pauseId}:${selectedFrameId?.frameId}`}
@@ -160,7 +159,7 @@ export default function NewScopes() {
             <ScopesRenderer />
           </Suspense>
         </InlineErrorBoundary>
-      </Redacted>
+      </div>
     </div>
   );
 }

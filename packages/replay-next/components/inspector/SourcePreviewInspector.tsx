@@ -33,7 +33,6 @@ export default forwardRef<HTMLDivElement, Props>(function SourcePreviewInspector
       return (
         <div
           className={`${styles.SourcePreviewInspector} ${className}`}
-          data-private
           data-test-name="SourcePreviewInspector"
           ref={ref}
         >
@@ -48,7 +47,7 @@ export default forwardRef<HTMLDivElement, Props>(function SourcePreviewInspector
           data-test-name="SourcePreviewInspector"
           ref={ref}
         >
-          <div className={styles.InspectorWrapper} data-private>
+          <div className={styles.InspectorWrapper}>
             <Suspense fallback={<Loader />}>
               <Inspector
                 className={styles.Inspector}

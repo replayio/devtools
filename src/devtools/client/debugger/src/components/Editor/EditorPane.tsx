@@ -1,9 +1,8 @@
 import classNames from "classnames";
-import { useLayoutEffect, useRef } from "react";
+import { useRef } from "react";
 
 import { IndeterminateProgressBar } from "replay-next/components/IndeterminateLoader";
 import { userData } from "shared/user-data/GraphQL/UserData";
-import { Redacted } from "ui/components/Redacted";
 import { getToolboxLayout } from "ui/reducers/layout";
 import { getSelectedSourceId, getSourcesUserActionPending } from "ui/reducers/sources";
 import { useAppSelector } from "ui/setup/hooks";
@@ -35,9 +34,9 @@ export const EditorPane = () => {
         {sourcesUserActionPending ? <IndeterminateProgressBar /> : null}
         <EditorTabs />
         {selectedSourceId ? (
-          <Redacted className="h-full">
+          <div className="h-full">
             <NewSourceAdapter />
-          </Redacted>
+          </div>
         ) : (
           <WelcomeBox />
         )}

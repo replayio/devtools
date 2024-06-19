@@ -138,11 +138,6 @@ export const config = {
     legacyKey: null,
   },
 
-  global_disableLogRocket: {
-    defaultValue: Boolean(false),
-    label: "Disable LogRocket session replay",
-    legacyKey: "devtools.disableLogRocket",
-  },
   global_enableLargeText: {
     defaultValue: Boolean(false),
     label: "Enable large text for Editor",
