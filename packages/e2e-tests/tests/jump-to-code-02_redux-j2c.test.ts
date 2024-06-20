@@ -7,6 +7,7 @@ import { closeSource, verifyJumpToCodeResults } from "../helpers/source-panel";
 import { getByTestName, waitFor } from "../helpers/utils";
 import test from "../testFixture";
 
+// trunk-ignore(gitleaks/generic-api-key)
 test.use({ exampleKey: "breakpoints-01" });
 
 async function checkForJumpButton(actionListItem: Locator, shouldBeEnabled: boolean) {
