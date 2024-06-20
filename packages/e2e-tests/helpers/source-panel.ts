@@ -442,6 +442,35 @@ export async function getSelectedLineNumber(
   return parseInt(textContent, 10);
 }
 
+export async function verifyJumpToCodeResults(
+  page: Page,
+  filename: string,
+  lineNumber: number,
+  expectedHits?: { current: number; total: number }
+) {
+  await waitForSelectedSource(page, filename);
+  // Should highlight the line that ran
+  await waitFor(async () => {
+    const lineNumber = await getSelectedLineNumber(page, true);
+    expect(lineNumber).toBe(lineNumber);
+  });
+
+  if (expectedHits) {
+    // Should also have jumped in time. Since this can vary (slightly different progress %
+    // based on timing differences), we'll add a log statement and verify _which_ hit we're at.
+    await addLogpoint(page, {
+      url: filename,
+      lineNumber,
+    });
+
+    const { current, total } = expectedHits;
+
+    // Should have paused on the handler for the first valid keystroke
+    await verifyLogpointStep(page, `${current}/${total}`, { url: filename, lineNumber });
+    await removeLogPoint(page, { url: filename, lineNumber });
+  }
+}
+
 export function getSourceLocator(page: Page, sourceId: string): Locator {
   return page.locator(getSourceSelector(sourceId));
 }

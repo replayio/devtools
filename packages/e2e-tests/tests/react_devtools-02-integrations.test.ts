@@ -32,10 +32,7 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
 
   await openDevToolsTab(page);
 
-  await warpToMessage(
-    page,
-    "Waiting for breakpoint at doc_rr_basic_chromium.html:21 (waitForBreakpoint)"
-  );
+  await warpToMessage(page, "Waiting for breakpoint at doc_rr_basic.html:21 (waitForBreakpoint)");
 
   // If the "React" tab shows up, we know that the routine ran
   await openReactDevtoolsPanel(page);
@@ -79,14 +76,14 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
     "SystemProvider",
     "Head",
     "SideEffect",
-    "Auth0Provider",
-    "Auth0Provider",
+    // Tough transpiled variable, apparently: `export var ApolloProvider = function (_a) {`
+    "c",
+    "ApolloContext.Consumer",
+    "ApolloContext.Provider",
+    "ConfirmProvider",
     "Context.Provider",
-    "Context.Consumer",
-    "SSRRecordingPage",
-    "RecordingHead",
-    "Head",
-    "SideEffect",
+    "Routing",
+    "Provider",
   ];
 
   debugPrint(page, "Checking list of rewritten component names");
@@ -143,7 +140,7 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
   await searchComponents(page, "Anonymous"); // Search and select 1st result
   await verifySearchResults(page, {
     currentNumber: 1,
-    totalNumber: 15,
+    totalNumber: 16,
   });
 
   await componentSearchInput.focus();
@@ -152,7 +149,7 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
   await componentSearchInput.press("Enter");
   await verifySearchResults(page, {
     currentNumber: 4,
-    totalNumber: 15,
+    totalNumber: 16,
   });
 
   await viewSourceButton.click();
@@ -161,7 +158,7 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
   await waitForSelectedSource(page, "SourcesTreeItem.tsx");
   await waitFor(async () => {
     const lineNumber = await getSelectedLineNumber(page, false);
-    expect(lineNumber).toBe(133);
+    expect(lineNumber).toBe(132);
   });
 
   list.evaluate(el => (el.scrollTop = 0));
