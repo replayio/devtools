@@ -116,7 +116,6 @@ async function findLikelyAppDispatchFrame(
   const framesWithoutReplayStub = pauseFrames.slice(2);
 
   for (const frame of framesWithoutReplayStub) {
-    // console.log("Checking middleware status: ", frame);
     const isMiddleware = await isReduxMiddleware(replayClient, frame.executionLocation);
     if (isMiddleware) {
       continue;
