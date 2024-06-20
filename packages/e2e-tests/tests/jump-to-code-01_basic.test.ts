@@ -71,7 +71,7 @@ test(`jump-to-code-01: Test basic jumping functionality`, async ({
   const queryParams = new URLSearchParams();
   // Force this test to always re-run the Event Listeners (and other) routines
   // See pref names in packages/shared/user-data/GraphQL/config.ts
-  // queryParams.set("features", "backend_rerunRoutines");
+  queryParams.set("features", "backend_rerunRoutines");
 
   await startTest(page, recordingId, testScope, undefined, queryParams);
   await openDevToolsTab(page);
