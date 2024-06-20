@@ -10,6 +10,7 @@ import { openSourceExplorerPanel } from "../helpers/source-explorer-panel";
 import {
   addLogpoint,
   getSelectedLineNumber,
+  verifyJumpToCodeResults,
   verifyLogpointStep,
   waitForSelectedSource,
 } from "../helpers/source-panel";
@@ -140,22 +141,11 @@ test(`jump-to-code-01: Test basic jumping functionality`, async ({
 
   debugPrint(page, "Checking that the first keypress J2C jumps to the correct line");
   await firstValidKeypressJumpButton.click();
-  await waitForSelectedSource(page, "Header.tsx");
-  // Should highlight the line that ran
-  await waitFor(async () => {
-    const lineNumber = await getSelectedLineNumber(page, true);
-    expect(lineNumber).toBe(12);
-  });
 
+  // Should have paused on the handler for the first valid keystroke.
   // Should also have jumped in time. Since this can vary (slightly different progress %
   // based on timing differences), we'll add a log statement and verify _which_ hit we're at.
-  await addLogpoint(page, {
-    url: "Header.tsx",
-    lineNumber: 12,
-  });
-
-  // Should have paused on the handler for the first valid keystroke
-  await verifyLogpointStep(page, "1/22", { url: "Header.tsx", lineNumber: 12 });
+  await verifyJumpToCodeResults(page, "Header.tsx", 12, { current: 1, total: 22 });
 
   // the next clicks were on real buttons, so there is a handler
   debugPrint(page, "Checking for an enabled click 'Jump' button");
@@ -164,24 +154,6 @@ test(`jump-to-code-01: Test basic jumping functionality`, async ({
 
   debugPrint(page, "Checking that the first click J2C jumps to the correct line");
   await firstValidClickJumpButton.click();
-  await waitForSelectedSource(page, "TodoListItem.tsx");
-  // Should highlight the line that ran
-  await waitFor(async () => {
-    const lineNumber = await getSelectedLineNumber(page, true);
-    expect(lineNumber).toBe(22);
-  });
 
-  // Should also have jumped in time
-  // Should also have jumped in time. Since this can vary (slightly different progress %
-  // based on timing differences), we'll add a log statement and verify _which_ hit we're at.
-  await addLogpoint(page, {
-    url: "TodoListItem.tsx",
-    lineNumber: 22,
-  });
-
-  // Should have paused on the handler for the first valid click
-  await verifyLogpointStep(page, "1/2", {
-    url: "TodoListItem.tsx",
-    lineNumber: 22,
-  });
+  await verifyJumpToCodeResults(page, "TodoListItem.tsx", 22, { current: 1, total: 2 });
 });
