@@ -244,8 +244,6 @@ export function PointPanelWithHitPoints({
     }
 
     if (hasCondition) {
-      editPendingPointText(key, { condition: null });
-
       // If we're removing a condition, we need to account for pending partial edits
       // Ideally we would stash them, save the log point without a condition, and then reapply them
       // But the save+render cycle is async so it's easiest to just save the pending edit along with the condition change
