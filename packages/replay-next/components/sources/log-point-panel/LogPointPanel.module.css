@@ -3,7 +3,6 @@
 .ErrorFallback {
   width: calc(var(--list-width) - var(--source-line-number-offset));
   border-left: var(--hit-count-bar-size) solid var(--color-hit-counts-bar-0);
-  font-size: var(--font-size-small);
   user-select: none;
 
   display: flex;
@@ -11,6 +10,9 @@
   padding: 0.5rem;
   gap: 0.25rem;
   background-color: var(--point-panel-background-color);
+
+  font-size: var(--font-size-regular);
+  line-height: var(--line-height);
 
   --badge-picker-button-size: 1.25rem;
   --badge-picker-icon-size: 1rem;
