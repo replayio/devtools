@@ -7,7 +7,7 @@ export function Personal() {
 
   return (
     <div className="space-y-12">
-      <div className="flex flex-row items-center space-x-3" data-private>
+      <div className="flex flex-row items-center space-x-3">
         <AvatarImage src={picture} className="avatar w-12 rounded-full" />
         <div>
           <div className="text-base">{name}</div>

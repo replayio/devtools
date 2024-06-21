@@ -76,7 +76,7 @@ function ApiKeyList({ apiKeys, onDelete }: { apiKeys: ApiKey[]; onDelete: (id: s
               : `(${apiKey.recordingCount} recordings)`;
           return (
             <div className="flex flex-row items-center py-1.5 pr-4" key={apiKey.id}>
-              <span className="flex-auto" data-private>
+              <span className="flex-auto">
                 {apiKey.label}
                 <span className="ml-2 text-bodySubColor">{usage}</span>
               </span>

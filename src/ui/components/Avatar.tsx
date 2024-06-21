@@ -16,7 +16,6 @@ type AvatarImageProps = Omit<React.ImgHTMLAttributes<HTMLImageElement>, "src"> &
 };
 export const AvatarImage = (props: AvatarImageProps) => (
   <img
-    data-private
     {...props}
     src={props.src || undefined}
     onError={e => (e.currentTarget.src = "/recording/images/clear.png")}

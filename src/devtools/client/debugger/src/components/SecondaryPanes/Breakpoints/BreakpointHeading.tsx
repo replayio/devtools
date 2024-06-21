@@ -4,7 +4,6 @@ import { ConnectedProps, connect } from "react-redux";
 
 import type { Context } from "devtools/client/debugger/src/reducers/pause";
 import { Point } from "shared/client/types";
-import { Redacted } from "ui/components/Redacted";
 import { MiniSource, getSourceDetails } from "ui/reducers/sources";
 import type { UIState } from "ui/state";
 
@@ -83,7 +82,7 @@ class BreakpointHeading extends PureComponent<BreakpointsProps> {
         onContextMenu={this.onContextMenu}
         onClick={this.onClick}
       >
-        <Redacted className={styles.Label}>{fileName}</Redacted>
+        <div className={styles.Label}>{fileName}</div>
         {allBreakpointsAreShared || (
           <CloseButton
             handleClick={this.removeBreakpoint}

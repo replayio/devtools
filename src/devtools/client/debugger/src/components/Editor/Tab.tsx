@@ -8,7 +8,6 @@ import useTabContextMenu from "devtools/client/debugger/src/components/Editor/us
 import useTooltip from "replay-next/src/hooks/useTooltip";
 import { useSourcesById } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { Redacted } from "ui/components/Redacted";
 import { SourceDetails, getSelectedSourceId } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
@@ -87,7 +86,7 @@ export default function Tab({
 
   return (
     <>
-      <Redacted
+      <div
         draggable
         onDragOver={onDragOver}
         onDragStart={onDragStart}
@@ -103,7 +102,7 @@ export default function Tab({
         onMouseLeave={onMouseLeave}
         // Accommodate middle click to close tab
         onMouseUp={e => e.button === 1 && closeTab(cx, source)}
-        refToForward={elementRef => setTabRef(sourceId, elementRef as HTMLDivElement | null)}
+        ref={elementRef => setTabRef(sourceId, elementRef as HTMLDivElement | null)}
       >
         <SourceIcon
           source={source}
@@ -111,7 +110,7 @@ export default function Tab({
         />
         <div className="filename">{getTruncatedFileName(source, query)}</div>
         <CloseButton buttonClass="" handleClick={onClickClose} tooltip={"Close tab"} />
-      </Redacted>
+      </div>
       {contextMenu}
       {tooltip}
     </>

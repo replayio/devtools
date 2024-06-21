@@ -25,7 +25,6 @@ import { trackEvent } from "ui/utils/telemetry";
 import { selectors } from "../../reducers";
 import NetworkMonitor from "../NetworkMonitor";
 import { NodePicker } from "../NodePicker";
-import { Redacted } from "../Redacted";
 import ReplayLogo from "../shared/ReplayLogo";
 import WaitForReduxSlice from "../WaitForReduxSlice";
 import NewConsoleRoot from "./NewConsole";
@@ -243,7 +242,7 @@ export default function SecondaryToolbox() {
           <div className="secondary-toolbox-scroll-overflow-gradient"></div>
         </div>
       </header>
-      <Redacted className="secondary-toolbox-content bg-chrome text-xs">
+      <div className="secondary-toolbox-content bg-chrome text-xs">
         <Suspense fallback={<PanelLoader />}>
           {shouldShowNetworkTab && (
             <Panel isActive={selectedPanel === "network"}>
@@ -264,7 +263,7 @@ export default function SecondaryToolbox() {
             </Panel>
           )}
         </Suspense>
-      </Redacted>
+      </div>
     </div>
   );
 }

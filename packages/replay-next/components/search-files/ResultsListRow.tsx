@@ -108,7 +108,7 @@ function LocationRow({
         header={
           <>
             <Icon className={styles.LocationIcon} type="file" />
-            <div className={styles.Location} data-private title={locationString}>
+            <div className={styles.Location} title={locationString}>
               {locationString}
             </div>
             <div className={styles.Count}>
@@ -153,7 +153,6 @@ function MatchRow({
     <div
       className={styles.MatchRow}
       data-hit-count={hitCount}
-      data-private
       data-test-name="SearchFiles-ResultRow"
       data-test-type="Match"
       onClick={() => {

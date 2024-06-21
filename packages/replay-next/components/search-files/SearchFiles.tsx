@@ -131,7 +131,6 @@ export default function SearchFiles({ limit }: { limit?: number }) {
           <input
             autoFocus
             className={styles.Input}
-            data-private
             data-test-id="FileSearch-Input"
             onChange={onChange(setQueryForDisplay)}
             onClick={onInputClick}
@@ -168,7 +167,6 @@ export default function SearchFiles({ limit }: { limit?: number }) {
           <Icon className={styles.Icon} type="folder-open" />
           <input
             className={styles.Input}
-            data-private
             data-test-id="FileInclude-Input"
             onChange={onChange(setIncludedFiles)}
             onClick={onInputClick}
@@ -192,7 +190,6 @@ export default function SearchFiles({ limit }: { limit?: number }) {
           <Icon className={styles.Icon} type="folder-closed" />
           <input
             className={styles.Input}
-            data-private
             data-test-id="FileExclude-Input"
             onChange={onChange(setExcludedFiles)}
             onClick={onInputClick}

@@ -13,8 +13,8 @@
     "buildId": "linux-chromium-20240418-4747c93165f9-4699f489a2b6"
   },
   "breakpoints-01": {
-    "recording": "0dc24b18-85c1-44d0-97bc-5025e80b9250",
-    "buildId": "linux-chromium-20240208-e6ff39de2177-11bb013e140b",
+    "recording": "c44d99c0-6eeb-4dda-bf00-bfed2a4710ea",
+    "buildId": "linux-chromium-20240614-d742f2be668d-7ad782ed38d0",
     "requiresManualUpdate": true
   },
   "cra/dist/index.html": {
@@ -34,6 +34,10 @@
   "doc_async.html": {
     "recording": "e1eba430-f744-47b3-a097-e0e26c9992fc",
     "buildId": "linux-chromium-20240418-4747c93165f9-4699f489a2b6"
+  },
+  "doc_async_stack.html": {
+    "recording": "02747835-34e8-4ea0-9ed5-432a133aa785",
+    "buildId": "linux-chromium-20240614-d742f2be668d-7ad782ed38d0"
   },
   "doc_control_flow.html": {
     "recording": "4762689b-f2c2-4205-8229-377992d54b6b",

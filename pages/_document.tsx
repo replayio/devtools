@@ -26,7 +26,7 @@ const csp = (props: any) => {
   const authHost = getAuthHost();
   return [
     `default-src 'self'`,
-    `connect-src 'self' https://api.replay.io wss://api.replay.io wss://dispatch.replay.io ws://*.replay.prod http://*.replay.prod https://telemetry.replay.io https://${authHost} https://api-js.mixpanel.com https://*.sentry.io https://*.launchdarkly.com https://*.logrocket.io https://*.lr-ingest.io https://*.logrocket.com https://*.lr-in.com https://api.stripe.com https://vitals.vercel-insights.com ${
+    `connect-src 'self' https://api.replay.io wss://api.replay.io wss://dispatch.replay.io ws://*.replay.prod http://*.replay.prod https://telemetry.replay.io https://${authHost} https://api-js.mixpanel.com https://*.sentry.io https://*.launchdarkly.com https://*.lr-ingest.io https://*.lr-in.com https://api.stripe.com https://vitals.vercel-insights.com ${
       // Required to talk to local backend in development. Enabling
       // localhost:8000 for prod to support the ?dispatch parameter when running
       // the local backend
@@ -34,22 +34,22 @@ const csp = (props: any) => {
     }`,
     `frame-src replay: https://js.stripe.com https://hooks.stripe.com https://${authHost} https://www.loom.com/`,
     // Required by some of our external services
-    `script-src 'self' 'unsafe-eval' https://cdn.logrocket.io https://cdn.lr-ingest.io https://cdn.lr-in.com https://js.stripe.com ${hash}`,
+    `script-src 'self' 'unsafe-eval' https://cdn.lr-ingest.io https://cdn.lr-in.com https://js.stripe.com ${hash}`,
     `form-action https://${authHost}`,
 
     // From vercel's CSP config and Google fonts
     `font-src 'self' data: https://fonts.gstatic.com`,
     // Google fonts
     `style-src-elem 'self' 'unsafe-inline' https://fonts.gstatic.com`,
-    // Required by LogRocket
-    `child-src 'self' blob:`,
-    `worker-src 'self' blob:`,
 
     // Required by some of our external services
     `style-src 'self' 'unsafe-inline'`,
 
     // Required to inline images from the database and from external avaters
     `img-src 'self' data: https:`,
+
+    // Required for our logpoint analysis cache (which uses a Web worker)
+    `worker-src 'self' blob:`,
   ]
     .filter(Boolean)
     .join("; ");

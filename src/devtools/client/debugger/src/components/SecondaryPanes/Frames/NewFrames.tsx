@@ -10,11 +10,9 @@ import {
   getSelectedFrameId,
   getThreadContext,
 } from "devtools/client/debugger/src/selectors";
-import { isFocusWindowApplied } from "devtools/client/debugger/src/utils/focus";
 import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBoundary";
 import { copyToClipboard } from "replay-next/components/sources/utils/clipboard";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
-import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { useCurrentFocusWindow } from "replay-next/src/hooks/useCurrentFocusWindow";
 import { useIsPointWithinFocusWindow } from "replay-next/src/hooks/useIsPointWithinFocusWindow";
 import { getPointAndTimeForPauseId, pauseIdCache } from "replay-next/src/suspense/PauseCache";
@@ -46,13 +44,16 @@ function FramesRenderer({
   const replayClient = useContext(ReplayClientContext);
   const sourcesState = useAppSelector(state => state.sources);
   const { rangeForSuspense: focusWindow } = useContext(FocusContext);
-  const { endpoint } = useContext(SessionContext);
   const dispatch = useAppDispatch();
+
+  if (focusWindow === null) {
+    return null;
+  }
 
   const asyncSeparator =
     asyncIndex > 0 ? (
       <div role="listitem">
-        <span className="location-async-cause">
+        <span className="location-async-cause" data-test-name="AsyncParentLabel">
           <span className="async-label">async</span>
         </span>
       </div>
@@ -64,30 +65,25 @@ function FramesRenderer({
     asyncIndex,
     focusWindow
   );
-  if (asyncParentPauseId === null) {
+  if (asyncParentPauseId === true) {
     return (
       <>
         {asyncSeparator}
-        <div className="pane-info empty">
-          This part of the call stack is unavailable.
-          {isFocusWindowApplied(focusWindow, endpoint) && (
-            <>
-              {" "}
-              Perhaps it is outside of{" "}
-              <span className="cursor-pointer underline" onClick={() => dispatch(enterFocusMode())}>
-                your debugging window
-              </span>
-              .
-            </>
-          )}
+        <div className="pane-info empty" data-test-name="AsyncParentUnavailable">
+          This part of the call stack is unavailable because it is outside{" "}
+          <span className="cursor-pointer underline" onClick={() => dispatch(enterFocusMode())}>
+            your debugging window
+          </span>
+          .
         </div>
       </>
     );
   }
 
-  let frames = asyncParentPauseId
-    ? getPauseFramesSuspense(replayClient, asyncParentPauseId, sourcesState)
-    : undefined;
+  let frames =
+    typeof asyncParentPauseId === "string"
+      ? getPauseFramesSuspense(replayClient, asyncParentPauseId, sourcesState)
+      : undefined;
   if (asyncIndex > 0) {
     frames = frames?.slice(1);
   }
@@ -108,7 +104,13 @@ function FramesRenderer({
         name="NewFrames"
         fallback={<div className="pane-info empty">Error loading frames :(</div>}
       >
-        <Suspense fallback={<div className="pane-info empty">Loading async frames…</div>}>
+        <Suspense
+          fallback={
+            <div className="pane-info empty" data-test-name="FramesLoading">
+              Loading async frames…
+            </div>
+          }
+        >
           <FramesRenderer panel={panel} pauseId={pauseId} asyncIndex={asyncIndex + 1} />
         </Suspense>
       </InlineErrorBoundary>
@@ -228,7 +230,13 @@ function Frames({ panel, point, time }: FramesProps) {
         name="Frames"
         fallback={<div className="pane-info empty">Error loading frames :((</div>}
       >
-        <Suspense fallback={<div className="pane-info empty">Loading...</div>}>
+        <Suspense
+          fallback={
+            <div className="pane-info empty" data-test-name="FramesLoading">
+              Loading...
+            </div>
+          }
+        >
           <div role="list">
             <FramesRenderer pauseId={pauseId} panel={panel} />
           </div>
@@ -243,7 +251,9 @@ export default function NewFrames(props: FramesProps) {
     <Suspense
       fallback={
         <div className="pane">
-          <div className="pane-info empty">Loading...</div>
+          <div className="pane-info empty" data-test-name="FramesLoading">
+            Loading...
+          </div>
         </div>
       }
     >
