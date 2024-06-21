@@ -48,7 +48,7 @@ export function useSourceListCssVariables({
     return () => {
       observer.disconnect();
     };
-  }, []);
+  }, [elementRef]);
 
   useLayoutEffect(() => {
     const element = elementRef.current;
