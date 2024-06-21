@@ -31,7 +31,10 @@ export type EditPointBehavior = (
   createdByCurrentUser: boolean
 ) => void;
 
-export type SaveOrDiscardPendingText = (key: PointKey) => void;
+export type SaveOrDiscardPendingText = (
+  key: PointKey,
+  partialPoint?: Partial<Pick<Point, "condition" | "content">>
+) => void;
 
 export type SaveLocalAndRemotePoints = (
   key: PointKey,

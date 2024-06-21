@@ -20,9 +20,9 @@ export default function useSavePendingPointText({
   setPointBehaviors: SetLocalPointBehaviors;
 }) {
   return useCallback<SaveOrDiscardPendingText>(
-    (key: PointKey) => {
+    (key: PointKey, partialPoint?: Partial<Pick<Point, "condition" | "content">>) => {
       const { pendingPointText } = committedValuesRef.current;
-      const pendingPoint = pendingPointText.get(key);
+      const pendingPoint = partialPoint ?? pendingPointText.get(key);
       if (pendingPoint) {
         saveLocalAndRemotePoints(key, pendingPoint);
 
