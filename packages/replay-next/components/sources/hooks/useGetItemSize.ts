@@ -98,11 +98,21 @@ function measurePanelSize(sourceId: string, content: string, condition: string |
     '[data-test-name="PointPanel-Condition"]'
   ) as HTMLElement;
   assert(conditionElement, "Syntax highlighted condition element not found");
-  conditionElement.textContent = condition ?? "";
+  conditionElement.textContent = processTextForMeasuring(condition ?? "");
 
   const contentElement = root.querySelector('[data-test-name="PointPanel-Content"]') as HTMLElement;
   assert(contentElement, "Syntax highlighted content element not found");
-  contentElement.textContent = content;
+  contentElement.textContent = processTextForMeasuring(content);
 
   return root.clientHeight;
+}
+
+function processTextForMeasuring(text: string): string {
+  const lines = text.split(/[\r\n]/);
+  if (lines[lines.length - 1].length === 0) {
+    // If the last line is empty (e.g. Shift+Enter) then we don't always measure the size correctly
+    // Adding a space to the last line fixes this
+    return text + " ";
+  }
+  return text;
 }
