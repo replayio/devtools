@@ -49,7 +49,7 @@ export default function useGetItemSize({
     });
 
     setMeasurements(newMap);
-  }, [availableWidth, pointsWithPendingEdits, sourceId]);
+  }, [availableWidth, lineHeight, pointsWithPendingEdits, sourceId]);
 
   const getItemSize = useCallback(
     (index: number) => {
