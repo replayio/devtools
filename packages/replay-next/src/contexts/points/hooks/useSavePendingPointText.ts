@@ -36,7 +36,7 @@ export default function useSavePendingPointText({
 
       setPointBehaviors(prev => {
         const pointBehavior = prev[key];
-        return prev[key].shouldLog === POINT_BEHAVIOR_ENABLED
+        return prev[key]?.shouldLog === POINT_BEHAVIOR_ENABLED
           ? prev
           : {
               ...prev,
