@@ -57,7 +57,7 @@ export default function LoadingScreen({ message }: { message: ReactNode }) {
   );
 }
 
-const colorOptions: Array<"blue" | "green" | "red"> = ["blue", "green", "red"];
+const colorOptions = ["blue", "green", "red"] as const;
 
 const Hoverboard = dynamic(() => import("./Hoverboard"), {
   ssr: false,

@@ -27,12 +27,12 @@ export function DevToolsProcessingScreen() {
   // Sync latest permission values to a ref so we they can be checked during an unmount
   const notificationPermissionStateRef = useRef({
     permission: notificationPermission,
-    permissionsRequested: requestedNotificationPermission,
+    permissionRequested: requestedNotificationPermission,
   });
   useEffect(() => {
     const current = notificationPermissionStateRef.current;
     current.permission = notificationPermission;
-    current.permissionsRequested = requestedNotificationPermission;
+    current.permissionRequested = requestedNotificationPermission;
   });
 
   const processingProgress = useAppSelector(getProcessingProgress);
@@ -56,11 +56,13 @@ export function DevToolsProcessingScreen() {
   useEffect(() => {
     return () => {
       // eslint-disable-next-line react-hooks/exhaustive-deps
-      const { permission, permissionsRequested } = notificationPermissionStateRef.current;
-      if (permissionsRequested && permission === "granted" && recording) {
+      const { permission, permissionRequested } = notificationPermissionStateRef.current;
+      if (permissionRequested && permission === "granted" && recording) {
         const progress = getProcessingProgress(store.getState());
-        if (progress === 100) {
-          new Notification(`"${recording.title}" has loaded`);
+        if (progress === 100 && !document.hasFocus()) {
+          new Notification(`"${recording.title}" has loaded`, {
+            tag: recording.id,
+          });
         }
       }
     };
@@ -86,7 +88,6 @@ export function DevToolsProcessingScreen() {
       const granted = await requestNotificationPermission();
       if (!granted) {
         event.target.checked = false;
-        event.target.blur();
       }
     }
   };
