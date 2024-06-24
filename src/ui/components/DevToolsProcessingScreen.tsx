@@ -55,6 +55,9 @@ export function DevToolsProcessingScreen() {
 
   useEffect(() => {
     return () => {
+      // We are intentionally referencing this mutable object in a cleanup effect
+      // React warns that this may be a mistake (because the render and cleanup values may be different)
+      // but in our case, we want the latest imperative value (which may cause this component to be unmounted)
       // eslint-disable-next-line react-hooks/exhaustive-deps
       const { permission, permissionRequested } = notificationPermissionStateRef.current;
       if (permissionRequested && permission === "granted" && recording) {
