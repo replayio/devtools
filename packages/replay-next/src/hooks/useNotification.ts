@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState, useSyncExternalStore } from "react";
 
 export type Permission = NotificationPermission | PermissionState;
 export type RequestPermission = () => Promise<boolean>;
@@ -9,28 +9,24 @@ export function useNotification(): {
   requestPermission: RequestPermission;
   supported: boolean;
 } {
-  const [permission, setPermission] = useState<Permission>(Notification.permission);
+  const permission = useSyncExternalStore(
+    function subscribe(change: () => void) {
+      let permissionStatus: PermissionStatus;
 
-  useEffect(() => {
-    let permissionStatus: PermissionStatus;
+      (async () => {
+        permissionStatus = await navigator.permissions.query({ name: "notifications" });
+        permissionStatus.addEventListener("change", change);
+      })();
 
-    const onChange = () => {
-      if (permissionStatus) {
-        setPermission(permissionStatus.state);
-      }
-    };
-
-    (async () => {
-      permissionStatus = await navigator.permissions.query({ name: "notifications" });
-      permissionStatus.addEventListener("change", onChange);
-    })();
-
-    return () => {
-      if (permissionStatus) {
-        permissionStatus.removeEventListener("change", onChange);
-      }
-    };
-  }, []);
+      return () => {
+        if (permissionStatus) {
+          permissionStatus.removeEventListener("change", change);
+        }
+      };
+    },
+    () => Notification.permission,
+    () => Notification.permission
+  );
 
   const [requested, setRequested] = useState(false);
 
