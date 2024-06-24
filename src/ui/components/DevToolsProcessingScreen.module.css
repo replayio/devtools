@@ -1,0 +1,19 @@
+.SecondaryMessage {
+  color: var(--color-dim);
+}
+
+.NotifyMessage {
+  border: 1px solid var(--checkbox-border);
+  padding: 0.5rem 01rem;
+  border-radius: 2rem;
+  font-size: var(--font-size-regular);
+  cursor: pointer;
+}
+.NotifyMessage[data-disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.Checkbox {
+  border-radius: 0.25rem;
+}
