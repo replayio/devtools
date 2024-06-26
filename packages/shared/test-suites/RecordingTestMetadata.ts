@@ -1173,6 +1173,50 @@ export function isUserActionTestEvent(
   return value.type === "user-action";
 }
 
+export function isUserClickEvent(event: TestEvent) {
+  if (isUserActionTestEvent(event)) {
+    const { category, command, testRunnerName } = event.data;
+    if (category !== "command") {
+      return false;
+    }
+
+    switch (testRunnerName) {
+      case "cypress": {
+        return ["click", "check", "uncheck"].includes(command.name);
+      }
+      case "playwright": {
+        return ["locator.click", "locator.check", "locator.uncheck"].some(name =>
+          command.name.startsWith(name)
+        );
+      }
+    }
+  }
+
+  return false;
+}
+
+export function isUserKeyboardEvent(event: TestEvent) {
+  if (isUserActionTestEvent(event)) {
+    const { category, command, testRunnerName } = event.data;
+    if (category !== "command") {
+      return false;
+    }
+
+    switch (testRunnerName) {
+      case "cypress": {
+        return ["type"].includes(command.name);
+      }
+      case "playwright": {
+        return ["locator.type", "keyboard.down", "keyboard.press", "keyboard.type"].some(name =>
+          command.name.startsWith(name)
+        );
+      }
+    }
+  }
+
+  return false;
+}
+
 export function compareTestEventExecutionPoints(
   a: RecordingTestMetadataV3.TestEvent,
   b: RecordingTestMetadataV3.TestEvent
