@@ -86,10 +86,9 @@ export const recordedProtocolMessagesCache = createFocusIntervalCacheForExecutio
           return [];
         }
 
-        const preferredLocation = getPreferredLocation(
-          sourcesState,
-          pointDescriptions[0].frame ?? []
-        );
+        const preferredLocation =
+          pointDescriptions[0].frame &&
+          getPreferredLocation(sourcesState, pointDescriptions[0].frame);
 
         if (!preferredLocation) {
           return [];

@@ -88,7 +88,7 @@ export interface FormattedPointStackFrame {
   url?: string;
   source: Source;
   functionLocation: Location;
-  executionLocation: Location;
+  executionLocation?: Location;
   point?: PointDescription;
   functionDetails?: FormattedEventListener;
 }
@@ -123,7 +123,8 @@ export const formattedPointStackCache: Cache<
     const formattedFrames = pointStack.map(frame => {
       updateMappedLocationForPointStackFrame(sourcesById, frame);
       const functionLocation = getPreferredLocation(sourcesById, [], frame.functionLocation);
-      const executionLocation = getPreferredLocation(sourcesById, [], frame.point?.frame ?? []);
+      const executionLocation =
+        frame.point?.frame && getPreferredLocation(sourcesById, [], frame.point.frame);
 
       const source = sourcesById.get(functionLocation.sourceId)!;
 
@@ -210,11 +211,13 @@ export const relevantAppFrameCache: Cache<
         resultPoint = relevantAppCodeFrame.point;
       }
 
-      const formattedFunction = await formatFunctionDetailsFromLocation(
-        replayClient,
-        "unknown",
-        relevantAppCodeFrame.executionLocation
-      );
+      const formattedFunction =
+        relevantAppCodeFrame.executionLocation &&
+        (await formatFunctionDetailsFromLocation(
+          replayClient,
+          "unknown",
+          relevantAppCodeFrame.executionLocation
+        ));
 
       functionName = formattedFunction?.functionName;
     }
