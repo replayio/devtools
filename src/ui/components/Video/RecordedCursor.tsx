@@ -2,6 +2,7 @@ import assert from "assert";
 import { useLayoutEffect, useRef } from "react";
 
 import { findMostRecentClickEvent, findMostRecentMouseEvent } from "protocol/RecordedEventsCache";
+import { useCurrentFocusWindow } from "replay-next/src/hooks/useCurrentFocusWindow";
 import { state } from "ui/components/Video/imperative/MutableGraphicsState";
 
 // One frame seems reasonable for a click to be considered
@@ -10,6 +11,7 @@ const CLICK_TIMING_THRESHOLD_MS = 16.67;
 
 export function RecordedCursor() {
   const elementRef = useRef<HTMLDivElement>(null);
+  const focusWindow = useCurrentFocusWindow();
 
   useLayoutEffect(() => {
     const element = elementRef.current;
@@ -20,8 +22,8 @@ export function RecordedCursor() {
       ({ currentTime, graphicsRect, localScale, recordingScale }) => {
         const { height, width } = graphicsRect;
 
-        const mouseEvent = findMostRecentMouseEvent(currentTime);
-        const clickEvent = findMostRecentClickEvent(currentTime);
+        const mouseEvent = findMostRecentMouseEvent(currentTime, focusWindow?.begin.time);
+        const clickEvent = findMostRecentClickEvent(currentTime, focusWindow?.begin.time);
         const shouldDrawClick =
           clickEvent && clickEvent.time + CLICK_TIMING_THRESHOLD_MS >= currentTime;
 
@@ -49,7 +51,7 @@ export function RecordedCursor() {
     return () => {
       unsubscribe();
     };
-  }, []);
+  }, [focusWindow]);
 
   return (
     <div

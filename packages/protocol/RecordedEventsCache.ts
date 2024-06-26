@@ -83,14 +83,25 @@ export const RecordedNavigationEventsCache = createSingleEntryCache<[], Navigati
   },
 });
 
-export function findMostRecentClickEvent(time: number) {
+export function findMostRecentClickEvent(time: number, startTime: number = 0) {
   const events = RecordedClickEventsCache.getValueIfCached() ?? [];
   const index = findIndexLTE(events, { time } as MouseEvent, (a, b) => a.time - b.time);
-  return index >= 0 ? events[index] : null;
+  if (index < 0) {
+    return null;
+  }
+  const event = events[index];
+  return event.time >= startTime ? event : null;
 }
 
-export function findMostRecentMouseEvent(time: number) {
+export function findMostRecentMouseEvent(time: number, startTime: number = 0) {
   const events = RecordedMouseEventsCache.getValueIfCached() ?? [];
   const index = findIndexLTE(events, { time } as MouseEvent, (a, b) => a.time - b.time);
-  return index >= 0 ? events[index] : null;
+  if (index < 0) {
+    return null;
+  }
+  if (index < 0) {
+    return null;
+  }
+  const event = events[index];
+  return event.time >= startTime ? event : null;
 }
