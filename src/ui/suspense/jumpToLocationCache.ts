@@ -82,6 +82,9 @@ export const reduxStoreDetailsCache = createSingleEntryCache<
 function isFrameInDecl(functions: FunctionBoundaries[], frame: FormattedPointStackFrame) {
   // Check to see if the frame is inside any of the listed function definitions
   return functions.some(decl => {
+    if (!frame.executionLocation) {
+      return false;
+    }
     return (
       frame.executionLocation.line >= decl.location.begin.line &&
       frame.executionLocation.line < decl.location.end.line &&
@@ -148,7 +151,13 @@ export function findFunctionParent(functions: FunctionOutline[], fnIndex: number
   return null;
 }
 
-async function isReduxMiddleware(replayClient: ReplayClientInterface, location: Location) {
+async function isReduxMiddleware(
+  replayClient: ReplayClientInterface,
+  location: Location | undefined
+) {
+  if (!location) {
+    return false;
+  }
   const sourceOutline = await sourceOutlineCache.readAsync(replayClient, location.sourceId);
   const dispatchFn = findFunctionOutlineForLocation(location, sourceOutline);
   const functions = sourceOutline.functions;
