@@ -14,6 +14,8 @@ import {
   TestSectionName,
   UserActionEvent,
   isUserActionTestEvent,
+  isUserClickEvent,
+  isUserKeyboardEvent,
 } from "shared/test-suites/RecordingTestMetadata";
 import { jumpToKnownEventListenerHit } from "ui/actions/eventListeners/jumpToCode";
 import { seek } from "ui/actions/timeline";
@@ -94,7 +96,6 @@ export default memo(function UserActionEventRow({
     annotationsStatus === STATUS_RESOLVED ? parsedAnnotations : NO_ANNOTATIONS;
 
   const [canShowJumpToCode, jumpToCodeAnnotation] = findJumpToCodeDetailsIfAvailable(
-    groupedTestCases,
     userActionEvent,
     jumpToCodeAnnotations
   );
@@ -215,65 +216,24 @@ function Badge({
 }
 
 function findJumpToCodeDetailsIfAvailable(
-  groupedTestCases: GroupedTestCases,
   userActionEvent: UserActionEvent,
   jumpToCodeAnnotations: ParsedJumpToCodeAnnotation[]
 ) {
   let canShowJumpToCode = false;
   let jumpToCodeAnnotation: ParsedJumpToCodeAnnotation | undefined = undefined;
 
-  if (groupedTestCases.environment.testRunner.name === "cypress") {
-    const { data } = userActionEvent;
-    const { category, command, timeStampedPoints } = data;
-    const { name } = command;
+  const { data } = userActionEvent;
+  const { timeStampedPoints } = data;
 
-    if (timeStampedPoints.beforeStep !== null && timeStampedPoints.afterStep !== null) {
-      // TODO This is very Cypress-specific.
-      // Playwright steps have a `name` like `locator.click("blah")`.
-      // We only care about click events and keyboard events. Keyboard events appear to be a "type" command,
-      // as in "type this text into the input".
-      canShowJumpToCode =
-        category === "command" && ["click", "type", "check", "uncheck"].includes(name);
-
-      if (canShowJumpToCode) {
-        const eventKind =
-          cypressStepTypesToEventTypes[name as keyof typeof cypressStepTypesToEventTypes];
-
-        if (eventKind) {
-          jumpToCodeAnnotation = jumpToCodeAnnotations.find(a =>
-            isExecutionPointsWithinRange(
-              a.point,
-              timeStampedPoints.beforeStep!.point,
-              timeStampedPoints.afterStep!.point
-            )
-          );
-        }
-      }
-    }
-  } else if (groupedTestCases.environment.testRunner.name === "playwright") {
-    const { data } = userActionEvent;
-    const { category, command, timeStampedPoints } = data;
-    const { name } = command;
-
-    if (timeStampedPoints.beforeStep !== null && timeStampedPoints.afterStep !== null) {
-      canShowJumpToCode =
-        category === "command" &&
-        (name.startsWith("locator.click") ||
-          name.startsWith("locator.type") ||
-          name.startsWith("keyboard.down") ||
-          name.startsWith("keyboard.press") ||
-          name.startsWith("keyboard.type"));
-
-      if (canShowJumpToCode) {
-        jumpToCodeAnnotation = jumpToCodeAnnotations.find(a =>
-          isExecutionPointsWithinRange(
-            a.point,
-            timeStampedPoints.beforeStep!.point,
-            timeStampedPoints.afterStep!.point
-          )
-        );
-      }
-    }
+  if (timeStampedPoints.beforeStep !== null && timeStampedPoints.afterStep !== null) {
+    canShowJumpToCode = isUserClickEvent(userActionEvent) || isUserKeyboardEvent(userActionEvent);
+    jumpToCodeAnnotation = jumpToCodeAnnotations.find(a =>
+      isExecutionPointsWithinRange(
+        a.point,
+        timeStampedPoints.beforeStep!.point,
+        timeStampedPoints.afterStep!.point
+      )
+    );
   }
 
   return [canShowJumpToCode, jumpToCodeAnnotation] as const;

@@ -4,7 +4,9 @@ import { useLayoutEffect, useRef } from "react";
 import { findMostRecentClickEvent, findMostRecentMouseEvent } from "protocol/RecordedEventsCache";
 import { state } from "ui/components/Video/imperative/MutableGraphicsState";
 
-const CLICK_TIMING_THRESHOLD_MS = 200;
+// One frame seems reasonable for a click to be considered
+// recent enough to be drawn on the screen
+const CLICK_TIMING_THRESHOLD_MS = 16.67;
 
 export function RecordedCursor() {
   const elementRef = useRef<HTMLDivElement>(null);
