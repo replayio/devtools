@@ -39,9 +39,18 @@ export function RecordedCursor() {
           element.style.top = `${mouseY}%`;
           element.style.transform = `scale(${cursorScale})`;
           element.style.setProperty("--click-display", shouldDrawClick ? "block" : "none");
+          // Testing support
+
+          element.dataset.cursordisplay = "true";
+          element.dataset.clickdisplay = shouldDrawClick ? "true" : "false";
+          element.dataset.clientx = `${mouseEvent.clientX}`;
+          element.dataset.clienty = `${mouseEvent.clientY}`;
         } else {
           element.style.display = "none";
           element.style.setProperty("--click-display", "none");
+
+          element.dataset.cursordisplay = "false";
+          element.dataset.clickdisplay = "false";
         }
       }
     );
@@ -58,6 +67,11 @@ export function RecordedCursor() {
         display: "none",
         position: "absolute",
       }}
+      data-test-name="recorded-cursor"
+      data-cursordisplay="false"
+      data-clickdisplay="false"
+      data-clientx="0"
+      data-clienty="0"
     >
       <div
         style={{

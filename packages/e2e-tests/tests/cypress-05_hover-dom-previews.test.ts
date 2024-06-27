@@ -6,7 +6,7 @@ import {
   getTestSuitePanel,
   openCypressTestPanel,
 } from "../helpers/testsuites";
-import { debugPrint, waitFor } from "../helpers/utils";
+import { debugPrint, getByTestName, waitFor } from "../helpers/utils";
 import test, { expect } from "../testFixture";
 
 test.use({ exampleKey: "cypress-realworld/bankaccounts.spec.js" });
@@ -79,12 +79,54 @@ test("cypress-05: Test DOM node preview on user action step hover", async ({
   await waitFor(async () =>
     expect(await firstClickStep.getAttribute("data-selected")).toBe("true")
   );
+
+  debugPrint(page, "Checking recorded cursor location for a click");
+  const recordedCursor = getByTestName(page, "recorded-cursor");
+
+  function getCursorAttributes(node: HTMLElement) {
+    return {
+      cursordisplay: node.dataset.cursordisplay,
+      clickdisplay: node.dataset.clickdisplay,
+      clientX: node.dataset.clientx,
+      clientYX: node.dataset.clienty,
+    };
+  }
+  const clickCursorAttributes = await recordedCursor.evaluate(getCursorAttributes);
+
+  expect(clickCursorAttributes).toEqual({
+    cursordisplay: "true",
+    clickdisplay: "true",
+    // Read directly from the mouse event in this test
+    clientX: "323",
+    clientYX: "245",
+  });
+
   // Make the highlighter go away
   await firstStep.hover();
   await highlighter.waitFor({ state: "hidden" });
   // Hover over the selected `firstClickStep` and verify that the highlighter is shown again
   await firstClickStep.hover();
   await highlighter.waitFor({ state: "visible" });
+
+  debugPrint(page, "Checking recorded cursor location after a click has finished");
+
+  const openedBankAccountsStep = steps
+    .filter({
+      hasText: "Opened http://localhost:3000/bankaccounts",
+    })
+    .first();
+  await openedBankAccountsStep.hover();
+
+  const afterClickCursorAttributes = await recordedCursor.evaluate(getCursorAttributes);
+
+  expect(afterClickCursorAttributes).toEqual({
+    cursordisplay: "true",
+    // No click display after the click has finished
+    clickdisplay: "false",
+    // Read directly from the mouse event in this test
+    clientX: "323",
+    clientYX: "245",
+  });
 
   debugPrint(page, "Checking highlighting for multiple nodes");
 
