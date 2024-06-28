@@ -198,6 +198,9 @@
 
   --background-color-current-execution-point: #25364e;
   --background-color-current-execution-point-column: #2663c080;
+  --background-color-current-execution-point-test-code: var(
+    --background-color-current-execution-point-column
+  );
   --background-color-current-search-result: #25364e;
   --background-color-default: var(--chrome);
   --background-color-disabled-button: #454950;
@@ -311,8 +314,8 @@
   --point-panel-background-color: #1f2b43;
   --point-panel-conditional-icon: var(--blue-40);
   --point-panel-input-background-color: var(--theme-base-100);
-  --point-panel-input-border-color: transparent;
-  --point-panel-input-border-color-hover: #273149;
+  --point-panel-input-border-color: #273149;
+  --point-panel-input-border-color-hover: #38425a;
   --point-panel-input-border-color-focus: var(--theme-selection-background);
   --point-panel-input-edit-button-color: #747476;
   --point-panel-input-edit-button-color-hover: var(--primary-accent);
@@ -755,6 +758,9 @@
 
   --background-color-current-execution-point: #eaf3ff;
   --background-color-current-execution-point-column: #b8d7ff;
+  --background-color-current-execution-point-test-code: var(
+    --background-color-current-execution-point-column
+  );
   --background-color-current-search-result: #eaf3ff;
   --background-color-inputs: var(--theme-text-field-bgcolor);
   --background-color-resize-handle: #cfcfcf;
@@ -861,9 +867,9 @@
   --point-panel-background-color: #f0f1f4;
   --point-panel-conditional-icon: var(--blue-60);
   --point-panel-input-background-color: var(--theme-base-100);
+  --point-panel-input-border-color: #e9ebef;
+  --point-panel-input-border-color-hover: #d8dade;
   --point-panel-input-border-color-focus: var(--theme-selection-background);
-  --point-panel-input-border-color-hover: #e9ebef;
-  --point-panel-input-border-color: transparent;
   --point-panel-input-cancel-button-color-hover: #afafb5;
   --point-panel-input-cancel-button-color: #e2e2e2;
   --point-panel-input-disabled-background-color: #e4e4e4;

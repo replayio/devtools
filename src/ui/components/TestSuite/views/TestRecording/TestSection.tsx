@@ -31,6 +31,7 @@ export default function TestSection({
         <TestSectionRow
           key={index}
           testEvent={testEvent}
+          testEvents={testEvents}
           testRunnerName={testRunnerName}
           testSectionName={testSectionName}
         />

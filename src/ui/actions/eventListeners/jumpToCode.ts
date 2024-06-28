@@ -15,10 +15,8 @@ import { getThreadContext } from "devtools/client/debugger/src/reducers/pause";
 import { RecordingTarget, recordingTargetCache } from "replay-next/src/suspense/BuildIdCache";
 import { eventCountsCache, eventPointsCache } from "replay-next/src/suspense/EventsCache";
 import { topFrameCache } from "replay-next/src/suspense/FrameCache";
-import { hitPointsForLocationCache } from "replay-next/src/suspense/HitPointsCache";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
-import { pauseEvaluationsCache, pauseIdCache } from "replay-next/src/suspense/PauseCache";
-import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
+import { pauseEvaluationsCache } from "replay-next/src/suspense/PauseCache";
 import { sourcesCache } from "replay-next/src/suspense/SourcesCache";
 import { isLocationBefore } from "replay-next/src/utils/source";
 import { ReplayClientInterface } from "shared/client/types";
@@ -29,9 +27,6 @@ import {
   isFunctionPreview,
   shouldIgnoreEventFromSource,
 } from "ui/actions/eventListeners/eventListenerUtils";
-import { setViewMode } from "ui/actions/layout";
-import { JumpToCodeStatus } from "ui/components/shared/JumpToCodeButton";
-import { getViewMode } from "ui/reducers/layout";
 import { SourcesState, getPreferredLocation, getSourceDetailsEntities } from "ui/reducers/sources";
 import { UIState } from "ui/state";
 import { ParsedJumpToCodeAnnotation } from "ui/suspense/annotationsCaches";
@@ -139,158 +134,6 @@ export const nextInteractionEventCache: Cache<
     return firstSuitableHandledEvent;
   },
 });
-
-/*
-Jump to the function location that ran for a given info sidebar event list item,
-such as "Click" or "Key Press: L"
-
-This requires stringing together a series of assumptions and special cases:
-
-- The info sidebar "Click" events come from `Session.findMouseEvents`, and keyboard events
-  from `Session.findKeyboardEvents`
-  These events are recorded in our browser forks _before_ any actual JS code runs.
-- However, we can assume that a _real_ "user interaction event" such as 
-  `"click"` or `"keypress"` event occurs shortly thereafter.
-- We can find that event based on a timeboxed search, with the initial sidebar event time
-  as the starting point.
-- We can use the interaction event's stack frame to know the location of the JS event handler
-  that started running in response to the event. _However_, React attaches noop handlers,
-  and implements its own event listener lookups at the top level (delegation).
-- Fortunately, React 16/17/18 add a secret expando property to DOM nodes, containing 
-  the actual props that the user rendered for that DOM node, such as `onClick`.
-- All interaction events will have a JS event object such as `MouseEvent`or `InputEvent`
-   as one of their arguments
-- Once we find the event object, we can look at `event.target` to find the clicked node
-- But, the _target_ may not have had the handler due to delegation - the user-provided
-  React handler prop may have been on an ancestor DOM node instead.
-- So, we can walk up the parent node chain and find the first node that has a React
-  handler prop with a relevant name attached to it, if any, and return that
-- In order to optimize the API calls and network traffic, that parent node traversal
-  is done via a single JS evaluation, which returns `{target, handlerProp?}`.
-- If we found a React event handler prop in the chain, jump to that location. Otherwise,
-  jump to the location of the plain JS event handler in the stack frame.
-
-We _could_ do more analysis and find the nearest time where the first breakable location
-inside that function is running, then seek to that point in time, but skipping for now.
-*/
-export function jumpToClickEventFunctionLocation(
-  onSeek: (point: ExecutionPoint, time: number) => void,
-  event: PointWithEventType,
-  end?: TimeStampedPoint
-): UIThunkAction<Promise<JumpToCodeStatus>> {
-  return async (dispatch, getState, { replayClient }) => {
-    const { point: executionPoint, time } = event;
-    const sourcesState = getState().sources;
-
-    try {
-      // Actual browser click events get recorded a fraction later then the
-      // "mouse events" used by the sidebar.
-      // Look for the next click event within a short timeframe after the "mouse event".
-      // Yes, this is hacky, but it does seem pretty consistent.
-      if (!end) {
-        const arbitraryEndTime = time + 500;
-        const pointNearEndTime = await replayClient.getPointNearTime(arbitraryEndTime);
-        end = pointNearEndTime;
-      }
-      const actualEnd = end!;
-
-      const focusWindow = replayClient.getCurrentFocusWindow();
-
-      // Safety check: don't ask for points if this time isn't loaded
-      const isEndTimeInLoadedRegion =
-        focusWindow != null &&
-        focusWindow.begin.time <= actualEnd.time &&
-        focusWindow.end.time >= actualEnd.time;
-
-      if (!isEndTimeInLoadedRegion) {
-        return "not_focused";
-      }
-
-      // Go ahead and ensure that we're on DevTools mode right away,
-      // even before we know if there's a valid location to jump to
-      if (getViewMode(getState()) !== "dev") {
-        dispatch(setViewMode("dev"));
-      }
-
-      // The sidebar event time/point is a fraction earlier than any
-      // actual JS that executed in response. Find the next click event
-      // within a small time window
-      const nextClickEvent = await nextInteractionEventCache.readAsync(
-        replayClient,
-        executionPoint,
-        actualEnd,
-        event.kind as InteractionEventKind,
-        sourcesState
-      );
-
-      if (!nextClickEvent) {
-        return "no_hits";
-      }
-
-      const pauseId = await pauseIdCache.readAsync(
-        replayClient,
-        nextClickEvent.point,
-        nextClickEvent.time
-      );
-
-      const functionSourceLocation = await eventListenerLocationCache.readAsync(
-        replayClient,
-        getState,
-        pauseId,
-        event.kind as InteractionEventKind
-      );
-
-      if (functionSourceLocation) {
-        const symbols = await sourceOutlineCache.readAsync(
-          replayClient,
-          functionSourceLocation.sourceId
-        );
-
-        const functionOutline = findFunctionOutlineForLocation(functionSourceLocation, symbols);
-
-        const cx = getThreadContext(getState());
-
-        const nextBreakablePosition: Location | null = functionOutline?.breakpointLocation
-          ? {
-              ...functionOutline?.breakpointLocation,
-              sourceId: functionSourceLocation.sourceId,
-            }
-          : null;
-        const locationToOpen = nextBreakablePosition ?? functionSourceLocation;
-
-        // Open the source file and jump to the found position.
-        // This is either the function definition itself, or the first position _inside_ the function.
-        dispatch(selectLocation(cx, locationToOpen));
-
-        if (nextBreakablePosition) {
-          // We think we know the first position _inside_ the function.
-          // Run analysis to find the next time this position got hit.
-          const [hitPoints] = await hitPointsForLocationCache.readAsync(
-            replayClient,
-            { begin: executionPoint, end: end.point },
-            nextBreakablePosition,
-            null
-          );
-
-          const [firstHitPoint] = hitPoints;
-          if (firstHitPoint) {
-            // Assuming the position got hit, timewarp to that exact time.
-            // This should put the execution line+time inside the function,
-            // where the actual event listener logic is executing.
-            onSeek(firstHitPoint.point, firstHitPoint.time);
-          }
-        }
-        return "found";
-      } else {
-        return "no_hits";
-      }
-    } catch (err) {
-      // Let's just swallow this silently for now
-    }
-
-    return "no_hits";
-  };
-}
 
 // TODO This cache looks unsafe because it's not idempotent;
 // it accepts a state getter function but does not reflect the state it reads as part of the cache key.

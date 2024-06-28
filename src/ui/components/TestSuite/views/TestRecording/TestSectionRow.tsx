@@ -3,11 +3,14 @@ import { TimeStampedPoint, TimeStampedPointRange } from "@replayio/protocol";
 import { ReactNode, useContext, useMemo } from "react";
 
 import { highlightNodes, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
+import { RecordedMouseEventsCache } from "protocol/RecordedEventsCache";
 import Icon from "replay-next/components/Icon";
-import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
-import { isExecutionPointsGreaterThan } from "replay-next/src/utils/time";
+import {
+  isExecutionPointsGreaterThan,
+  isExecutionPointsWithinRange,
+} from "replay-next/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import {
   TestEvent,
@@ -17,6 +20,7 @@ import {
   getTestEventTimeStampedPoint,
   getUserActionEventRange,
   isUserActionTestEvent,
+  isUserClickEvent,
 } from "shared/test-suites/RecordingTestMetadata";
 import { extendFocusWindowIfNecessary, seek, setHoverTime } from "ui/actions/timeline";
 import { TestSuiteCache } from "ui/components/TestSuite/suspense/TestSuiteCache";
@@ -33,10 +37,12 @@ import styles from "./TestSectionRow.module.css";
 
 export function TestSectionRow({
   testEvent,
+  testEvents,
   testRunnerName,
   testSectionName,
 }: {
   testEvent: TestEvent;
+  testEvents: TestEvent[];
   testRunnerName: TestRunnerName | null;
   testSectionName: TestSectionName;
 }) {
@@ -54,7 +60,7 @@ export function TestSectionRow({
 
   const dispatch = useAppDispatch();
 
-  const { contextMenu, onContextMenu } = useTestEventContextMenu(testEvent);
+  const { contextMenu, onContextMenu } = useTestEventContextMenu(testEvent, testEvents);
 
   const position = useMemo(() => {
     let position: Position = "after";
@@ -109,6 +115,7 @@ export function TestSectionRow({
         <UserActionEventRow
           groupedTestCases={groupedTestCases}
           isSelected={isSelected}
+          testEvents={testEvents}
           testSectionName={testSectionName}
           userActionEvent={testEvent}
         />
@@ -146,7 +153,41 @@ export function TestSectionRow({
   };
 
   const onMouseEnter = async () => {
-    dispatch(setHoverTime(getTestEventTime(testEvent)));
+    let hoverTime: number | null = null;
+    if (isUserActionTestEvent(testEvent) && isUserClickEvent(testEvent)) {
+      // Find the actual mouse event that _should_ have occurred
+      // inside of this test step. We want to use that as the hover
+      // time, so that the `RecordedCursor` logic will show the mouse
+      // event correctly instead of finding an _earlier_ mouse event
+      // that happened _before_ this test step.
+      const { data } = testEvent;
+      const { timeStampedPoints } = data;
+      const mouseEvents = RecordedMouseEventsCache.getValueIfCached();
+
+      if (timeStampedPoints.beforeStep !== null && timeStampedPoints.afterStep !== null) {
+        const mouseEvent = mouseEvents?.find(e => {
+          return (
+            e.kind === "mousedown" &&
+            isExecutionPointsWithinRange(
+              e.point,
+              timeStampedPoints.beforeStep!.point,
+              timeStampedPoints.afterStep!.point
+            )
+          );
+        });
+
+        hoverTime = mouseEvent?.time ?? null;
+      }
+    }
+
+    if (!hoverTime) {
+      // Otherwise, default the hover time to whatever is most
+      // appropriate for this test step based on its type.
+      hoverTime = getTestEventTime(testEvent);
+    }
+
+    dispatch(setHoverTime(hoverTime));
+
     if (!isUserActionTestEvent(testEvent)) {
       return;
     }

@@ -1,6 +1,5 @@
 import { TimeStampedPoint, TimeStampedPointRange } from "@replayio/protocol";
 import {
-  MouseEvent,
   Suspense,
   unstable_useCacheRefresh as useCacheRefresh,
   useContext,
@@ -72,34 +71,16 @@ export default function PointPanelWrapper(props: ExternalProps) {
     return null;
   }
 
-  const { className, pointForSuspense, pointWithPendingEdits } = props;
+  const { className, pointForSuspense } = props;
 
-  const loader = (
-    <Loader
-      className={`${styles.Loader} ${className}`}
-      style={{
-        height: pointWithPendingEdits.condition
-          ? "var(--point-panel-with-conditional-height)"
-          : "var(--point-panel-height)",
-      }}
-    />
-  );
+  const loader = <Loader className={`${styles.Loader} ${className}`} />;
 
   if (pointForSuspense == null) {
     return loader;
   }
 
   const errorFallback = (
-    <div
-      className={`${styles.ErrorFallback} ${className}`}
-      style={{
-        height: pointWithPendingEdits.condition
-          ? "var(--point-panel-with-conditional-height)"
-          : "var(--point-panel-height)",
-      }}
-    >
-      Could not load hit points
-    </div>
+    <div className={`${styles.ErrorFallback} ${className}`}>Could not load hit points</div>
   );
 
   return (
@@ -174,17 +155,19 @@ function PointPanel(
   );
 }
 
-function PointPanelWithHitPoints({
+export function PointPanelWithHitPoints({
   className,
   enterFocusMode,
   hitPoints,
   hitPointStatus,
   pointWithPendingEdits,
   pointForSuspense,
+  readOnlyMode = false,
   setFocusToBeginning,
   setFocusToEnd,
 }: InternalProps & {
   pointForSuspense: Point;
+  readOnlyMode?: boolean;
 }) {
   const graphQLClient = useContext(GraphQLClientContext);
   const { showCommentsPanel } = useContext(InspectorContext);
@@ -203,13 +186,13 @@ function PointPanelWithHitPoints({
   // Only parts that may suspend should use lower priority values.
   const { condition, content, key, location, user } = pointWithPendingEdits;
 
-  const editable = user?.id === currentUserInfo?.id;
+  const editable = user?.id === currentUserInfo?.id && !readOnlyMode;
 
   const [showEditBreakpointNag, dismissEditBreakpointNag] = useNag(Nag.FIRST_BREAKPOINT_EDIT);
 
   const invalidateCache = useCacheRefresh();
 
-  const [isEditing, setIsEditing] = useState(showEditBreakpointNag);
+  const [isEditing, setIsEditing] = useState(!readOnlyMode && showEditBreakpointNag);
   const [editReason, setEditReason] = useState<EditReason | null>(null);
 
   const [isPending, startTransition] = useTransition();
@@ -261,10 +244,13 @@ function PointPanelWithHitPoints({
     }
 
     if (hasCondition) {
-      editPendingPointText(key, { condition: null });
-
-      // TODO [FE-1886] Also save the point; otherwise this change won't be applied on reload
+      // If we're removing a condition, we need to account for pending partial edits
+      // Ideally we would stash them, save the log point without a condition, and then reapply them
+      // But the save+render cycle is async so it's easiest to just save the pending edit along with the condition change
+      savePendingPointText(key, { condition: null, content });
+      setIsEditing(false);
     } else {
+      // If we're adding a condition, just focus to the condition field
       if (!isEditing) {
         startEditing("condition");
       } else {
@@ -283,13 +269,6 @@ function PointPanelWithHitPoints({
       },
       user?.id === currentUserInfo?.id
     );
-  };
-
-  const onClickEyeIcon = (event: MouseEvent) => {
-    event.preventDefault();
-    event.stopPropagation();
-
-    toggleShouldLog();
   };
 
   let showTooManyPointsErrorMessage = false;
@@ -392,7 +371,10 @@ function PointPanelWithHitPoints({
     >
       {
         hasCondition && (
-          <div className={styles.EditableContentWrapperRow}>
+          <div
+            className={styles.EditableContentWrapperRow}
+            data-test-name="PointPanel-ConditionalWrapperRow"
+          >
             <div
               className={isConditionValid ? styles.ContentWrapper : styles.ContentWrapperInvalid}
               data-state-editable={editable}
@@ -415,7 +397,6 @@ function PointPanelWithHitPoints({
                     }
                   >
                     <CodeEditor
-                      allowWrapping={false}
                       autoFocus={editReason === "condition"}
                       autoSelect={editReason === "condition"}
                       context={context}
@@ -428,6 +409,7 @@ function PointPanelWithHitPoints({
                       onCancel={onCancel}
                       onChange={onEditableConditionChange}
                       onSave={onSubmit}
+                      placeholder="Enter a condition"
                       time={time}
                     />
                   </div>
@@ -441,7 +423,12 @@ function PointPanelWithHitPoints({
               ) : (
                 <>
                   <div className={styles.Content}>
-                    <SyntaxHighlighter code={condition!} fileExtension=".js" />
+                    <SyntaxHighlighter
+                      className={styles.SyntaxHighlighter}
+                      data-test-name="PointPanel-Condition"
+                      code={condition!}
+                      fileExtension=".js"
+                    />
                   </div>
 
                   <RemoveConditionalButton
@@ -453,7 +440,7 @@ function PointPanelWithHitPoints({
               )}
             </div>
 
-            {isEditing ? saveButton : addCommentButton}
+            {addCommentButton}
           </div>
         ) /* hasCondition */
       }
@@ -514,15 +501,14 @@ function PointPanelWithHitPoints({
               point={pointWithPendingEdits}
             />
 
-            {isEditing ? (
-              <div className={styles.Content}>
+            <div className={styles.Content}>
+              {isEditing ? (
                 <div
                   className={
                     showEditBreakpointNag ? styles.ContentInputWithNag : styles.ContentInput
                   }
                 >
                   <CodeEditor
-                    allowWrapping={false}
                     autoFocus={showEditBreakpointNag || editReason === "content"}
                     autoSelect={editReason === "content"}
                     context={context}
@@ -538,39 +524,37 @@ function PointPanelWithHitPoints({
                     time={time}
                   />
                 </div>
+              ) : (
+                <SyntaxHighlighter
+                  className={styles.SyntaxHighlighter}
+                  data-test-name="PointPanel-Content"
+                  code={content}
+                  fileExtension=".js"
+                />
+              )}
+              <div className={styles.DisabledIconAndAvatar}>
+                {isEditing ? (
+                  saveButton
+                ) : editable ? (
+                  <button
+                    className={styles.ButtonWithIcon}
+                    data-test-name="PointPanel-EditButton"
+                    disabled={isPending}
+                  >
+                    <Icon className={styles.ButtonIcon} type={shouldLog ? "edit" : "toggle-off"} />
+                  </button>
+                ) : null}
+                <AvatarImage
+                  className={styles.CreatedByAvatar}
+                  src={user?.picture || undefined}
+                  title={user?.name || undefined}
+                />
               </div>
-            ) : (
-              <>
-                <div className={styles.Content}>
-                  <SyntaxHighlighter code={content} fileExtension=".js" />
-                </div>
-                <div className={styles.DisabledIconAndAvatar}>
-                  {shouldLog || (
-                    <button className={styles.ToggleVisibilityButton} onClick={onClickEyeIcon}>
-                      <Icon className={styles.ToggleVisibilityButtonIcon} type="toggle-off" />
-                    </button>
-                  )}
-                  {editable && (
-                    <button
-                      className={styles.EditButton}
-                      data-test-name="PointPanel-EditButton"
-                      disabled={isPending}
-                    >
-                      <Icon className={styles.EditButtonIcon} type="edit" />
-                    </button>
-                  )}
-                  <AvatarImage
-                    className={styles.CreatedByAvatar}
-                    src={user?.picture || undefined}
-                    title={user?.name || undefined}
-                  />
-                </div>
-              </>
-            )}
+            </div>
           </div>
         )}
 
-        {hasCondition ? contentSpacer : isEditing ? saveButton : addCommentButton}
+        {hasCondition ? contentSpacer : addCommentButton}
       </div>
 
       <div className={styles.TimelineWrapperRow}>
@@ -599,12 +583,12 @@ function RemoveConditionalButton({
 }) {
   return (
     <button
-      className={styles.RemoveConditionalButton}
+      className={styles.ButtonWithIcon}
       data-invalid={invalid || undefined}
       disabled={disabled}
       onClick={onClick}
     >
-      <Icon className={styles.RemoveConditionalButtonIcon} type="remove-alternate" />
+      <Icon className={styles.ButtonIcon} type="remove-alternate" />
     </button>
   );
 }
@@ -620,13 +604,13 @@ function SaveButton({
 }) {
   return (
     <button
-      className={styles.SaveButton}
+      className={styles.ButtonWithIcon}
       data-invalid={invalid || undefined}
       data-test-name="PointPanel-SaveButton"
       disabled={disabled}
       onClick={onClick}
     >
-      <Icon className={styles.SaveButtonIcon} type="check" />
+      <Icon className={styles.ButtonIcon} type="check" />
     </button>
   );
 }

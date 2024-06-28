@@ -9,7 +9,6 @@ import {
 import { Immer } from "immer";
 
 import tabsReducer from "devtools/client/debugger/src/reducers/tabs";
-import { skipTelemetry } from "shared/utils/environment";
 import { UIAction } from "ui/actions";
 import appReducer from "ui/reducers/app";
 import layoutReducer from "ui/reducers/layout";
@@ -17,7 +16,6 @@ import protocolMessages from "ui/reducers/protocolMessages";
 import sources from "ui/reducers/sources";
 import { context } from "ui/setup/redux/middleware/context";
 import { UIState } from "ui/state";
-import LogRocket from "ui/utils/logrocket";
 import { ThunkExtraArgs, extraThunkArgs } from "ui/utils/thunk";
 
 import { listenerMiddleware } from "./listenerMiddleware";
@@ -98,14 +96,6 @@ export function bootstrapStore(initialState: Partial<UIState>) {
       }).prepend(listenerMiddleware.middleware);
 
       let updatedMiddlewareArray = originalMiddlewareArray.concat([context] as UIStateMiddleware[]);
-
-      const telemetryMiddleware = skipTelemetry()
-        ? undefined
-        : (LogRocket.reduxMiddleware() as UIStateMiddleware);
-
-      if (telemetryMiddleware) {
-        updatedMiddlewareArray = updatedMiddlewareArray.concat(telemetryMiddleware);
-      }
 
       return updatedMiddlewareArray as typeof originalMiddlewareArray;
     },

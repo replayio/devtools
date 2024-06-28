@@ -16,11 +16,6 @@ body {
   scrollbar-color: transparent;
 }
 
-.showRedactions[data-private="true"] {
-  background: black !important;
-  border: 2px solid black !important;
-}
-
 :root {
   --dark-blue: #2d7eff;
   --dark-grey: #696969;
