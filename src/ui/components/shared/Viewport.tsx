@@ -25,15 +25,17 @@ function FullViewportWrapper({
 
 export function DefaultViewportWrapper({
   children,
+  className = "",
   footer,
 }: {
   children?: ReactNode;
+  className?: string;
   footer?: ReactNode;
 }) {
   return (
     <FullViewportWrapper>
       <ModalBackground />
-      <div className="relative space-y-4">{children}</div>
+      <div className={`relative space-y-4 ${className}`}>{children}</div>
       {footer}
     </FullViewportWrapper>
   );

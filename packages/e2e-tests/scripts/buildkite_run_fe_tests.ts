@@ -255,6 +255,7 @@ export default async function run_fe_tests(
   }
   // process.env.RECORD_REPLAY_DIRECTORY =
 
+  process.env.REPLAY_ENABLE_ASSERTS = process.env.RECORD_REPLAY_ENABLE_ASSERTS = "1";
   process.env.HASURA_ADMIN_SECRET ||= getSecret("prod/hasura-admin-secret", "us-east-2");
   process.env.DISPATCH_ADDRESS ||= "wss://dispatch.replay.io";
   process.env.AUTHENTICATED_TESTS_WORKSPACE_API_KEY = process.env.RECORD_REPLAY_API_KEY;

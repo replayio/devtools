@@ -14,7 +14,7 @@ import { getPositionFromTime, getTimeFromPosition } from "ui/utils/timeline";
 
 import { EditMode } from "./Timeline";
 
-function stopEvent(event: MouseEvent) {
+function stopEvent(event: MouseEvent | React.MouseEvent) {
   event.preventDefault();
   event.stopPropagation();
 }
@@ -206,7 +206,7 @@ function Focuser({ editMode, setEditMode }: Props) {
   const right = getPositionFromTime(focusWindow.end, zoomRegion);
 
   return (
-    <div className="relative top-0 left-0 h-full w-full" ref={containerRef}>
+    <div className="relative top-0 left-0 h-full w-full" onMouseDown={stopEvent} ref={containerRef}>
       <div
         className="group absolute h-full"
         ref={draggableAreaRef}

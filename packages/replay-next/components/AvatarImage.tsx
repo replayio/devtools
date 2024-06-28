@@ -47,7 +47,6 @@ export default function AvatarImage({ className, name, src, title, ...rest }: Pr
       <img
         {...rest}
         className={`${styles.Image} ${className}`}
-        data-private
         onError={onError}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}

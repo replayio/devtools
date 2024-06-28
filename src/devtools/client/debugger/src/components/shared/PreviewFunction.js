@@ -5,9 +5,7 @@
 import flatten from "lodash/flatten";
 import times from "lodash/times";
 import zip from "lodash/zip";
-import React, { Component } from "react";
-
-import { RedactedSpan } from "ui/components/Redacted";
+import { Component } from "react";
 
 export default class PreviewFunction extends Component {
   renderFunctionName(func) {
@@ -39,12 +37,12 @@ export default class PreviewFunction extends Component {
   render() {
     const { func } = this.props;
     return (
-      <RedactedSpan className="function-signature">
+      <span className="function-signature">
         {this.renderFunctionName(func)}
         <span className="paren">(</span>
         {this.renderParams(func)}
         <span className="paren">)</span>
-      </RedactedSpan>
+      </span>
     );
   }
 }

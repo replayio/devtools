@@ -21,8 +21,12 @@ export function getGraphicsTimeAndExecutionPoint(
   const pauseTime = getTime(state);
   const currentTime = getCurrentTime(state);
 
-  const isHovering = preferHoverTime;
+  const isHovering = hoverTime != null && preferHoverTime;
   const isPlaying = playbackState != null;
+
+  if (isHovering && !isPlaying) {
+    return { executionPoint: null, time: hoverTime };
+  }
 
   let preferCurrentTime = false;
   if (isPlaying) {
@@ -51,16 +55,9 @@ export function getGraphicsTimeAndExecutionPoint(
     preferCurrentTime = true;
   }
 
-  let time: number;
-  let executionPoint: string | null = null;
   if (preferCurrentTime) {
-    time = currentTime;
-  } else if (isHovering && hoverTime != null) {
-    time = hoverTime;
+    return { executionPoint: null, time: currentTime };
   } else {
-    time = pauseTime;
-    executionPoint = pauseExecutionPoint;
+    return { executionPoint: pauseExecutionPoint, time: pauseTime };
   }
-
-  return { executionPoint, time };
 }

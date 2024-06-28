@@ -1,9 +1,8 @@
-import { MouseEvent, useContext, useLayoutEffect, useState } from "react";
+import { useContext, useLayoutEffect, useState } from "react";
 
 import Icon from "replay-next/components/Icon";
 import { LoadingProgressBar } from "replay-next/components/LoadingProgressBar";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { stopPlayback } from "ui/actions/timeline";
 import CommentsOverlay from "ui/components/Comments/VideoComments";
 import { NodePickerContext } from "ui/components/NodePickerContext";
 import ReplayLogo from "ui/components/shared/ReplayLogo";

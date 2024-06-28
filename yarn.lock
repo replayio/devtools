@@ -4510,15 +4510,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/logrocket-react@npm:^3.0.0":
-  version: 3.0.0
-  resolution: "@types/logrocket-react@npm:3.0.0"
-  dependencies:
-    logrocket: 1.0.1
-  checksum: 6a7e865e11d28fea0ddd06f22676e5f795ba2a4d783bc3ae407f9282e137bc11eb052e2edf7be930c28c588af97cc184b0158973750f4f398ac05ca93c7bf95e
-  languageName: node
-  linkType: hard
-
 "@types/minimatch@npm:*":
   version: 3.0.5
   resolution: "@types/minimatch@npm:3.0.5"
@@ -12395,31 +12386,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"logrocket-react@npm:^5.0.1":
-  version: 5.0.1
-  resolution: "logrocket-react@npm:5.0.1"
-  peerDependencies:
-    logrocket: ">=2.0"
-    react: ">=17.0"
-    react-dom: ">=17.0"
-  checksum: 28547380bdaffb959dc863e61c0369c1e1680febeef78c9dab3abb7bbbcf13531caa3043acba98532e97904b37675d6872140c9cd146a09fcd351381298f68a9
-  languageName: node
-  linkType: hard
-
-"logrocket@npm:1.0.1":
-  version: 1.0.1
-  resolution: "logrocket@npm:1.0.1"
-  checksum: e1929487e9339eefa5649178707251cca36b28a2e08c87844b870c0ad784dde324f8448300b9ad148e4e54a0acd41467ca64899660c404e30179e125a22c0104
-  languageName: node
-  linkType: hard
-
-"logrocket@npm:^2.2.1":
-  version: 2.2.1
-  resolution: "logrocket@npm:2.2.1"
-  checksum: 23d2880b921e940a17bc711bdd7eef2a87cd607decb98c1e5659bea017baf1ac8225dda7cde9e45ab9b02fcf7a205faed9693db0dc79d77780c45ba4bdd23122
-  languageName: node
-  linkType: hard
-
 "loose-envify@npm:^1.0.0, loose-envify@npm:^1.1.0, loose-envify@npm:^1.4.0":
   version: 1.4.0
   resolution: "loose-envify@npm:1.4.0"
@@ -14956,7 +14922,6 @@ __metadata:
     "@types/isomorphic-fetch": ^0.0.36
     "@types/jest": ^27.4.1
     "@types/lodash": ^4.14.181
-    "@types/logrocket-react": ^3.0.0
     "@types/mixpanel-browser": ^2.35.6
     "@types/node": ^18.0.0
     "@types/react": ^18.0.12
@@ -15022,8 +14987,6 @@ __metadata:
     launchdarkly-js-client-sdk: ^3.0.0
     lexical: ^0.6.5
     lodash: ^4.17.21
-    logrocket: ^2.2.1
-    logrocket-react: ^5.0.1
     memoize-one: ^6.0.0
     mini-css-extract-plugin: ^2.6.0
     minimatch: ^9.0.3

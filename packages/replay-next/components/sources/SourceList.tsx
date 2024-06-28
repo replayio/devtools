@@ -10,10 +10,11 @@ import {
 import { VariableSizeList as List, ListOnItemsRenderedProps } from "react-window";
 import { useImperativeCacheValue, useStreamingValue } from "suspense";
 
+import useGetItemSize from "replay-next/components/sources/hooks/useGetItemSize";
 import { useLineHighlights } from "replay-next/components/sources/hooks/useLineHighlights";
 import { useMaxStringLengths } from "replay-next/components/sources/hooks/useMaxStringLengths";
 import { useSourceListCssVariables } from "replay-next/components/sources/hooks/useSourceListCssVariables";
-import { findPointForLocation } from "replay-next/components/sources/utils/points";
+import { LogPointPanelDoubleBuffer } from "replay-next/components/sources/log-point-panel/LogPointPanelDoubleBuffer";
 import { scrollToLineAndColumn } from "replay-next/components/sources/utils/scrollToLineAndColumn";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { PointsContext } from "replay-next/src/contexts/points/PointsContext";
@@ -26,9 +27,7 @@ import { getCachedMinMaxSourceHitCounts } from "replay-next/src/suspense/SourceH
 import { Source } from "replay-next/src/suspense/SourcesCache";
 import { StreamingParser } from "replay-next/src/suspense/SyntaxParsingCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { POINT_BEHAVIOR_DISABLED, POINT_BEHAVIOR_ENABLED } from "shared/client/types";
 
-import useFontBasedListMeasurements from "./hooks/useFontBasedListMeasurements";
 import SourceListRow from "./SourceListRow";
 import getScrollbarWidth from "./utils/getScrollbarWidth";
 import styles from "./SourceList.module.css";
@@ -74,9 +73,6 @@ export default function SourceList({
   } = useContext(SourcesContext);
 
   const hasMountedRef = useRef<boolean>(false);
-
-  const { lineHeight, pointPanelHeight, pointPanelWithConditionalHeight } =
-    useFontBasedListMeasurements(listRef);
 
   const { executionPointLineHighlight, searchResultLineHighlight, viewSourceLineHighlight } =
     useLineHighlights(sourceId);
@@ -139,6 +135,15 @@ export default function SourceList({
     }
   }, [focusedSource, lineCount, markPendingFocusUpdateProcessed, pendingFocusUpdate, sourceId]);
 
+  const { data: streamingData, value: streamingValue } = useStreamingValue(streamingParser);
+
+  const [getItemSize, lineHeight] = useGetItemSize({
+    availableWidth: width - scrollbarWidth,
+    pointBehaviors,
+    pointsWithPendingEdits,
+    sourceId,
+  });
+
   useLayoutEffect(() => {
     // TODO
     // This is overly expensive; ideally we'd only reset this...
@@ -148,48 +153,7 @@ export default function SourceList({
     if (list) {
       list.resetAfterIndex(0);
     }
-  }, [pointBehaviors, pointsWithPendingEdits]);
-
-  const { data: streamingData, value: streamingValue } = useStreamingValue(streamingParser);
-
-  const getItemSize = useCallback(
-    (index: number) => {
-      const lineNumber = index + 1;
-      const point = findPointForLocation(pointsWithPendingEdits, sourceId, lineNumber);
-      if (!point) {
-        // If the Point has been removed by some external action,
-        // e.g. the Pause Information side panel,
-        // Then ignore any cached Point state.
-        return lineHeight;
-      }
-
-      const pointBehavior = pointBehaviors[point.key];
-      // This Point might have been restored by a previous session.
-      // In this case we should use its persisted values.
-      // Else by default, shared print statements should be shown.
-      // Points that have no content (breakpoints) should be hidden by default though.
-      const shouldLog =
-        pointBehavior?.shouldLog ??
-        (point.content ? POINT_BEHAVIOR_ENABLED : POINT_BEHAVIOR_DISABLED);
-      if (shouldLog !== POINT_BEHAVIOR_DISABLED) {
-        if (point.condition !== null) {
-          return lineHeight + pointPanelWithConditionalHeight;
-        } else {
-          return lineHeight + pointPanelHeight;
-        }
-      }
-
-      return lineHeight;
-    },
-    [
-      lineHeight,
-      pointBehaviors,
-      pointPanelHeight,
-      pointPanelWithConditionalHeight,
-      pointsWithPendingEdits,
-      sourceId,
-    ]
-  );
+  }, [getItemSize]);
 
   const [minHitCount, maxHitCount] = getCachedMinMaxSourceHitCounts(sourceId, focusRange);
 
@@ -234,9 +198,21 @@ export default function SourceList({
   };
 
   return (
-    <>
+    <div
+      style={
+        {
+          "--hit-count-size": `${maxHitCountStringLength}ch`,
+          "--line-height": `${lineHeight}px`,
+          "--line-number-size": `${maxLineIndexStringLength + 1}ch`,
+          "--list-width": `${width - scrollbarWidth}px`,
+          ...cssVariablesRef.current,
+        } as CSSProperties
+      }
+    >
+      <LogPointPanelDoubleBuffer sourceId={sourceId} />
       <List
         className={styles.List}
+        data-test-name="SourceList"
         estimatedItemSize={lineHeight}
         height={height}
         innerRef={innerRef}
@@ -246,22 +222,11 @@ export default function SourceList({
         onItemsRendered={onItemsRendered}
         outerRef={outerRef}
         ref={listRef}
-        style={
-          {
-            "--hit-count-size": `${maxHitCountStringLength}ch`,
-            "--line-height": `${lineHeight}px`,
-            "--line-number-size": `${maxLineIndexStringLength + 1}ch`,
-            "--list-width": `${width - scrollbarWidth}px`,
-            "--point-panel-height": `${pointPanelHeight}px`,
-            "--point-panel-with-conditional-height": `${pointPanelWithConditionalHeight}px`,
-            ...cssVariablesRef.current,
-          } as CSSProperties
-        }
         useIsScrolling
         width={width}
       >
         {SourceListRow}
       </List>
-    </>
+    </div>
   );
 }
