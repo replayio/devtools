@@ -164,11 +164,131 @@ export interface TimeStampedPointWithPaintHash extends TimeStampedPoint {
 
 export type AnnotationListener = (annotation: Annotation) => void;
 
-export interface DependencyChainStep {
-  code: string;
-  time?: number;
-  point?: string;
+// Copied from `src/analysis/dependencies/dependencyDescription.ts` in the backend
+
+export interface URLLocation {
+  line: number;
+  column: number;
+  url: string;
 }
+
+export type DependencyChainStepInfo =
+  | {
+      // The document has started to load.
+      code: "DocumentBeginLoad";
+      url: string;
+    }
+  | {
+      // A script in a document began execution after all other required
+      // resources were received.
+      code: "DocumentExecuteBlockedScript";
+      url: string;
+    }
+  | {
+      // A script in a document began execution after being downloaded.
+      code: "DocumentExecuteScript";
+      url: string;
+    }
+  | {
+      // A script in a document has been scheduled for async compilation.
+      code: "DocumentAsyncCompileScript";
+      url: string;
+    }
+  | {
+      // A network request referenced by a document's contents was initiated.
+      code: "DocumentInitiateNetworkRequest";
+      url: string;
+    }
+  | {
+      // A script triggered a network request.
+      code: "ScriptInitiateNetworkRequest";
+      url: string;
+    }
+  | {
+      // Some data has been received over the network.
+      code: "NetworkReceiveData";
+      numBytes: number;
+    }
+  | {
+      // A network resource finished being received.
+      code: "NetworkReceiveResource";
+    }
+  | {
+      // Event handlers for user input were called.
+      code: "DispatchInputEventHandler";
+      type: string;
+    }
+  | {
+      // A script created a new websocket.
+      code: "ScriptCreateWebSocket";
+      url: string;
+    }
+  | {
+      // A websocket connected and open handlers were called.
+      code: "WebSocketConnected";
+    }
+  | {
+      // A script sent a message over a websocket.
+      code: "ScriptSendWebSocketMessage";
+    }
+  | {
+      // A websocket message determined to be a response to an earlier message
+      // was received and message handlers were called.
+      code: "WebSocketMessageReceived";
+    }
+  | {
+      // A promise settled and its then/catch hooks were called.
+      code: "PromiseSettled";
+    }
+  | {
+      // React hydration has started.
+      code: "ReactHydrateRoot";
+    }
+  | {
+      // React has rendered a component.
+      code: "ReactRender";
+      calleeLocation?: URLLocation;
+    }
+  | {
+      // React was able to resume rendering after a suspense promise resolved.
+      code: "ReactResumeSuspendedRender";
+    }
+  | {
+      // An application render function returned an existing element object for
+      // converting into a component.
+      code: "ReactReturnElement";
+    }
+  | {
+      // An application render function created an element object for converting
+      // into a component.
+      code: "ReactCreateElement";
+    }
+  | {
+      // An application render function called setState().
+      code: "ReactCallSetState";
+    }
+  | {
+      // An application render function called useEffect().
+      code: "ReactCallUseEffect";
+    }
+  | {
+      // An effect hook is called for the first time after the original useEffect().
+      code: "ReactEffectFirstCall";
+      calleeLocation?: URLLocation;
+    }
+  | {
+      code: "UnknownNode";
+      node: unknown;
+    }
+  | {
+      code: "UnknownEdge";
+      edge: unknown;
+    };
+
+export type DependencyChainStep = DependencyChainStepInfo & {
+  time?: number;
+  point?: ExecutionPoint;
+};
 
 export interface ReplayClientInterface {
   get loadedRegions(): LoadedRegions | null;

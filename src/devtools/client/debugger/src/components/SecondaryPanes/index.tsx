@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { useAppSelector } from "ui/setup/hooks";
 
@@ -8,6 +10,7 @@ import NewFrames from "./Frames/NewFrames";
 import FrameTimeline from "./FrameTimeline";
 import LogpointsPane from "./LogpointsPane";
 import NewScopes from "./NewScopes";
+import { ReactComponentStack } from "./ReactComponentStack";
 
 import { Accordion, AccordionPane } from "@recordreplay/accordion";
 
@@ -25,6 +28,7 @@ export default function SecondaryPanes() {
   const [logpointsVisible, setLogpointsVisible] = useGraphQLUserData(
     "layout_logpointsPanelExpanded"
   );
+  const [reactStackVisible, setReactStackVisible] = useState(false);
 
   return (
     <div className="secondary-panes-wrapper">
@@ -54,6 +58,14 @@ export default function SecondaryPanes() {
           onToggle={() => setCallStackVisible(!callStackVisible)}
         >
           {currentPoint && <NewFrames point={currentPoint} time={currentTime} panel="debugger" />}
+        </AccordionPane>
+        <AccordionPane
+          header="Dependency Graph Prototype"
+          className="react-component-stack-pane"
+          expanded={reactStackVisible}
+          onToggle={() => setReactStackVisible(!reactStackVisible)}
+        >
+          {currentPoint && <ReactComponentStack />}
         </AccordionPane>
         <AccordionPane
           header="Scopes"

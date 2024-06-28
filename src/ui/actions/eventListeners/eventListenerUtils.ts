@@ -27,6 +27,7 @@ export interface EventListenerWithFunctionInfo {
   firstBreakablePosition: Location;
   functionParameterNames: string[];
   framework?: string;
+  classComponentName?: string;
 }
 
 export type FunctionWithPreview = Omit<ProtocolObject, "preview"> & {
@@ -107,7 +108,8 @@ export const formatFunctionDetailsFromLocation = async (
   replayClient: ReplayClientInterface,
   type: string,
   locationInFunction: Location | MappedLocation,
-  framework?: string
+  framework?: string,
+  mightBeComponent = false
 ): Promise<FormattedEventListener | undefined> => {
   const sourcesById = await sourcesByIdCache.readAsync(replayClient);
   let location: Location | undefined;
@@ -131,27 +133,36 @@ export const formatFunctionDetailsFromLocation = async (
   // See if we can get any better details from the parsed source outline
   const symbols = await sourceOutlineCache.readAsync(replayClient, location.sourceId);
 
-  const functionOutline = findFunctionOutlineForLocation(location, symbols);
+  let functionOutline = findFunctionOutlineForLocation(location, symbols);
+  const possibleMatchingClassDefinition = findClassOutlineForLocation(location, symbols);
 
-  if (!functionOutline?.breakpointLocation) {
-    return;
-  }
+  // Sometimes we don't find a valid function outline for this location.
+  // This could be because we actually got a location for an entire class component,
+  // or there could be some kind of other mismatch.
+  if (!functionOutline) {
+    if (mightBeComponent && possibleMatchingClassDefinition) {
+      // If the caller is using this to format components, see if
+      // we can find the `render()` method.  If so, use that so we
+      // have _some_ function outline to work with here.
+      const renderFunction = symbols.functions.find(
+        f =>
+          f.name === "render" &&
+          f.location.begin.line >= possibleMatchingClassDefinition.location.begin.line &&
+          f.location.end.line <= possibleMatchingClassDefinition.location.end.line
+      );
 
-  let functionName = functionOutline.name!;
-  const functionParameterNames = functionOutline.parameters;
-
-  if (!functionName) {
-    // Might be an anonymous callback. This annoyingly happens with thunks.
-    // Let's see if we can find a parent with a reasonable name.
-    const currentIndex = symbols.functions.indexOf(functionOutline);
-    if (currentIndex > -1) {
-      const maybeParent = findFunctionParent(symbols.functions, currentIndex);
-
-      if (maybeParent?.name) {
-        functionName = maybeParent.name;
+      if (renderFunction) {
+        functionOutline = renderFunction;
       }
     }
+
+    if (!functionOutline) {
+      return;
+    }
   }
+
+  const functionName = possibleMatchingClassDefinition?.name ?? functionOutline.name ?? "Anonymous";
+  const functionParameterNames = functionOutline.parameters;
 
   return {
     type,
@@ -160,11 +171,12 @@ export const formatFunctionDetailsFromLocation = async (
     locationUrl,
     firstBreakablePosition: {
       sourceId: sourceDetails?.id,
-      ...functionOutline.breakpointLocation,
+      ...functionOutline.breakpointLocation!,
     },
-    functionName: functionName || "Anonymous()",
+    functionName: functionName || "Anonymous",
     functionParameterNames,
     framework,
+    classComponentName: possibleMatchingClassDefinition?.name,
   };
 };
 
