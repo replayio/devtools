@@ -39,9 +39,20 @@ export function RecordedCursor() {
           element.style.top = `${mouseY}%`;
           element.style.transform = `scale(${cursorScale})`;
           element.style.setProperty("--click-display", shouldDrawClick ? "block" : "none");
+
+          // Set data attributes describing the cursor state for use in our E2E tests
+          element.dataset.cursorDisplay = "true";
+          element.dataset.clickDisplay = shouldDrawClick ? "true" : "false";
+          element.dataset.clientX = `${mouseEvent.clientX}`;
+          element.dataset.clientY = `${mouseEvent.clientY}`;
         } else {
           element.style.display = "none";
           element.style.setProperty("--click-display", "none");
+
+          element.dataset.cursorDisplay = "false";
+          element.dataset.clickDisplay = "false";
+          element.dataset.clientX = "0";
+          element.dataset.clientY = "0";
         }
       }
     );
@@ -58,6 +69,11 @@ export function RecordedCursor() {
         display: "none",
         position: "absolute",
       }}
+      data-test-name="recorded-cursor"
+      data-cursor-display="false"
+      data-click-display="false"
+      data-client-x="0"
+      data-client-y="0"
     >
       <div
         style={{
