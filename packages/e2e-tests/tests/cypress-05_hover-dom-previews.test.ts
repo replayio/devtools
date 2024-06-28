@@ -85,20 +85,20 @@ test("cypress-05: Test DOM node preview on user action step hover", async ({
 
   function getCursorAttributes(node: HTMLElement) {
     return {
-      cursordisplay: node.dataset.cursordisplay,
-      clickdisplay: node.dataset.clickdisplay,
-      clientX: node.dataset.clientx,
-      clientYX: node.dataset.clienty,
+      cursorDisplay: node.dataset.cursorDisplay,
+      clickDisplay: node.dataset.clickDisplay,
+      clientX: node.dataset.clientX,
+      clientY: node.dataset.clientY,
     };
   }
   const clickCursorAttributes = await recordedCursor.evaluate(getCursorAttributes);
 
   expect(clickCursorAttributes).toEqual({
-    cursordisplay: "true",
-    clickdisplay: "true",
+    cursorDisplay: "true",
+    clickDisplay: "true",
     // Read directly from the mouse event in this test
     clientX: "323",
-    clientYX: "245",
+    clientY: "245",
   });
 
   // Make the highlighter go away
@@ -120,12 +120,12 @@ test("cypress-05: Test DOM node preview on user action step hover", async ({
   const afterClickCursorAttributes = await recordedCursor.evaluate(getCursorAttributes);
 
   expect(afterClickCursorAttributes).toEqual({
-    cursordisplay: "true",
+    cursorDisplay: "true",
     // No click display after the click has finished
-    clickdisplay: "false",
+    clickDisplay: "false",
     // Read directly from the mouse event in this test
     clientX: "323",
-    clientYX: "245",
+    clientY: "245",
   });
 
   debugPrint(page, "Checking highlighting for multiple nodes");
