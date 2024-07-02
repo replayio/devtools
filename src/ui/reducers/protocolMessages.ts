@@ -1,5 +1,6 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { EventMethods, EventParams } from "@replayio/protocol";
+import cloneDeep from "lodash/cloneDeep";
 
 import { CommandRequest, CommandResponse } from "protocol/socket";
 import { UIState } from "ui/state";
@@ -61,7 +62,7 @@ const protocolMessagesSlice = createSlice({
             const [requestClass, requestMethod] = request.method.split(".");
 
             const clonedRequest = {
-              ...request,
+              ...cloneDeep(request),
               class: requestClass,
               method: requestMethod,
               pending: !state.idToResponseMap[request.id],
@@ -73,7 +74,7 @@ const protocolMessagesSlice = createSlice({
           }
           case "response": {
             const { value: response } = message;
-            state.idToResponseMap[response.id] = response;
+            state.idToResponseMap[response.id] = cloneDeep(response);
 
             const request = state.idToRequestMap[response.id];
             if (request) {
@@ -83,7 +84,7 @@ const protocolMessagesSlice = createSlice({
           }
           case "error": {
             const { value: error } = message;
-            state.idToErrorMap[error.id] = error;
+            state.idToErrorMap[error.id] = cloneDeep(error);
             const request = state.idToRequestMap[error.id];
             if (request) {
               request.pending = false;
