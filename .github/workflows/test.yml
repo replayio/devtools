@@ -19,6 +19,7 @@ env:
   RECORD_REPLAY_API_KEY: rwk_yaEG8jo6gcisGHHoMj8SNoOMIHSbT7REuU5E1QnKCiL
   RECORD_REPLAY_METADATA_TEST_RUN_TITLE: E2E Tests
   RECORD_REPLAY_DISABLE_FEATURES: '["no-dependency-graph"]'
+  DEBUG: replay:cli*
 concurrency:
   group: ${{ github.ref }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
