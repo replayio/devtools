@@ -125,9 +125,13 @@ function installReactDevToolsIntoPause() {
 const injectGlobalHookSource = require("./installHook.raw.js").default;
 const reactDevtoolsBackendSource = require("./react_devtools_backend.raw.js").default;
 
+// Use function replacer syntax to avoid accidentally replacing special
+// characters like `$&`, which could show up in the bundle source
+// if the minifier renames things in an annoyingly specific way
+// (such as `c === $ && x` becoming `c===$&&x`)
 const rdtInjectionExpression = `(${installReactDevToolsIntoPause})()`
-  .replace("INSTALL_HOOK_PLACEHOLDER", `(${injectGlobalHookSource})`)
-  .replace("DEVTOOLS_PLACEHOLDER", `(${reactDevtoolsBackendSource})`);
+  .replace("INSTALL_HOOK_PLACEHOLDER", () => `(${injectGlobalHookSource})`)
+  .replace("DEVTOOLS_PLACEHOLDER", () => `(${reactDevtoolsBackendSource})`);
 
 export const reactDevToolsInjectionCache: Cache<
   [replayClient: ReplayClientInterface, pauseId: PauseId],
