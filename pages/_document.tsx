@@ -26,7 +26,7 @@ const csp = (props: any) => {
   const authHost = getAuthHost();
   return [
     `default-src 'self'`,
-    `connect-src 'self' https://api.replay.io wss://api.replay.io wss://dispatch.replay.io ws://*.replay.prod http://*.replay.prod https://telemetry.replay.io https://${authHost} https://api-js.mixpanel.com https://*.sentry.io https://*.launchdarkly.com https://*.lr-ingest.io https://*.lr-in.com https://api.stripe.com https://vitals.vercel-insights.com ${
+    `connect-src 'self' https://api.replay.io wss://api.replay.io wss://dispatch.replay.io ws://*.replay.prod http://*.replay.prod https://telemetry.replay.io https://${authHost} https://mixpanel-proxy.replay.io https://*.sentry.io https://*.launchdarkly.com https://*.lr-ingest.io https://*.lr-in.com https://api.stripe.com https://vitals.vercel-insights.com ${
       // Required to talk to local backend in development. Enabling
       // localhost:8000 for prod to support the ?dispatch parameter when running
       // the local backend

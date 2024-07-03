@@ -142,7 +142,9 @@ let mixpanelDisabled = true;
 const enableMixpanel = () => (mixpanelDisabled = false);
 
 export function initializeMixpanel() {
-  mixpanel.init("ffaeda9ef8fb976a520ca3a65bba5014");
+  mixpanel.init("ffaeda9ef8fb976a520ca3a65bba5014", {
+    api_host: "https://mixpanel-proxy.replay.io",
+  });
 
   // Add the recordingId to the event metadata so we have a cookie crumb
   // trail for following in other telemetry systems
