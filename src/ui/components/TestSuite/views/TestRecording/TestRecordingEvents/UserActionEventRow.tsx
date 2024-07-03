@@ -1,6 +1,6 @@
 import assert from "assert";
 import { ExecutionPoint, Location, TimeStampedPoint } from "@replayio/protocol";
-import { Suspense, memo, useContext, useMemo, useState } from "react";
+import { Suspense, memo, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Cache, STATUS_PENDING, STATUS_RESOLVED, useImperativeCacheValue } from "suspense";
 
 import { getExecutionPoint } from "devtools/client/debugger/src/selectors";
@@ -47,12 +47,14 @@ const cypressStepTypesToEventTypes = {
 export default memo(function UserActionEventRow({
   groupedTestCases,
   isSelected,
+  scrollIntoView,
   testEvents,
   testSectionName,
   userActionEvent,
 }: {
   groupedTestCases: RecordingTestMetadataV3.GroupedTestCases;
   isSelected: boolean;
+  scrollIntoView?: boolean;
   testEvents: TestEvent[];
   testSectionName: TestSectionName;
   userActionEvent: UserActionEvent;
@@ -148,6 +150,16 @@ export default memo(function UserActionEventRow({
     return null;
   }, [parentId, testRecording, testSectionName, userActionEvent]);
 
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (scrollIntoView) {
+      // Chrome sometimes ignores scrollIntoView here if it is called immediately
+      setTimeout(() => {
+        ref.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+    }
+  }, [scrollIntoView]);
+
   return (
     <div
       className={styles.Row}
@@ -156,6 +168,7 @@ export default memo(function UserActionEventRow({
       onClick={jumpToTestSourceDisabled ? undefined : onClickJumpToTestSource}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      ref={ref}
     >
       <div className={styles.Text}>
         {eventNumber != null ? <div className={styles.Number}>{eventNumber}</div> : null}

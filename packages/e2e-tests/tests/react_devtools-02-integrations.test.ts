@@ -140,7 +140,7 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
   await searchComponents(page, "Anonymous"); // Search and select 1st result
   await verifySearchResults(page, {
     currentNumber: 1,
-    totalNumber: 16,
+    totalNumber: 17,
   });
 
   await componentSearchInput.focus();
@@ -149,7 +149,7 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
   await componentSearchInput.press("Enter");
   await verifySearchResults(page, {
     currentNumber: 4,
-    totalNumber: 16,
+    totalNumber: 17,
   });
 
   await viewSourceButton.click();
