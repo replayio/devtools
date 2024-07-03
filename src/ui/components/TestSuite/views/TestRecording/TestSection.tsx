@@ -1,3 +1,5 @@
+import findLast from "lodash/findLast";
+
 import {
   TestEvent,
   TestRunnerName,
@@ -22,6 +24,11 @@ export default function TestSection({
     return null;
   }
 
+  const scrollToEvent =
+    testSectionName === "main"
+      ? findLast(testEvents, evt => evt.type === "user-action" && !!evt.data.error)
+      : undefined;
+
   return (
     <>
       <div className={styles.Title} data-test-name="TestSection">
@@ -30,6 +37,7 @@ export default function TestSection({
       {testEvents.map((testEvent, index) => (
         <TestSectionRow
           key={index}
+          scrollIntoView={testEvent === scrollToEvent}
           testEvent={testEvent}
           testEvents={testEvents}
           testRunnerName={testRunnerName}

@@ -1,4 +1,5 @@
 import assert from "assert";
+import findLast from "lodash/findLast";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import {
   ImperativePanelHandle,
@@ -115,12 +116,8 @@ export default function Panel() {
     // Select first failed event by default
     if (testRecording.result === "failed") {
       chosenTestEvent =
-        main.find(testEvent => {
-          switch (testEvent.type) {
-            case "user-action":
-              return testEvent.data.error != null;
-          }
-        }) ?? null;
+        findLast(main, testEvent => testEvent.type === "user-action" && !!testEvent.data.error) ??
+        null;
     }
 
     // Or just select first event
