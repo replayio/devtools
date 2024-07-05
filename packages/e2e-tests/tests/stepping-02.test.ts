@@ -1,14 +1,13 @@
 import { openDevToolsTab, startTest } from "../helpers";
 import {
   reverseStepOverToLine,
-  rewindToLine,
   stepInToLine,
   stepOutToLine,
   stepOverToLine,
   waitForScopeValue,
 } from "../helpers/pause-information-panel";
-import { clickSourceTreeNode } from "../helpers/source-explorer-panel";
-import { addBreakpoint } from "../helpers/source-panel";
+import { clickSourceTreeNode, openSource } from "../helpers/source-explorer-panel";
+import { rewindToLine } from "../helpers/source-panel";
 import test from "../testFixture";
 
 test.use({ exampleKey: "doc_rr_basic.html" });
@@ -25,8 +24,8 @@ test("stepping-02: Test fixes for some simple stepping bugs", async ({
   await clickSourceTreeNode(page, "test/examples");
   await clickSourceTreeNode(page, exampleKey);
 
-  await addBreakpoint(page, { lineNumber: 21, url: exampleKey });
-  await rewindToLine(page, 21);
+  await openSource(page, exampleKey);
+  await rewindToLine(page, { lineNumber: 21 });
 
   await stepInToLine(page, 24);
   await stepOverToLine(page, 25);

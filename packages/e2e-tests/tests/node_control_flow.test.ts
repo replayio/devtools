@@ -1,12 +1,11 @@
 import { startTest } from "../helpers";
-import { resumeToLine, rewindToLine } from "../helpers/pause-information-panel";
-import { openSource, openSourceExplorerPanel } from "../helpers/source-explorer-panel";
-import { addBreakpoint } from "../helpers/source-panel";
+import { openSource } from "../helpers/source-explorer-panel";
+import { addBreakpoint, fastForwardToLine, rewindToLine } from "../helpers/source-panel";
 import test, { Page } from "../testFixture";
 
 async function resumeToBreakpoint(page: Page, line: number) {
   await addBreakpoint(page, { url: "control_flow.js", lineNumber: line });
-  await resumeToLine(page, line);
+  await fastForwardToLine(page, { lineNumber: line });
 }
 
 test.use({ exampleKey: "node/control_flow.js" });
@@ -21,7 +20,7 @@ test("node_control_flow: catch, finally, generators, and async/await", async ({
 
   await openSource(page, "control_flow.js");
 
-  await rewindToLine(page, 84);
+  await rewindToLine(page, { lineNumber: 84 });
 
   await resumeToBreakpoint(page, 10);
   await resumeToBreakpoint(page, 12);
@@ -30,8 +29,8 @@ test("node_control_flow: catch, finally, generators, and async/await", async ({
   await resumeToBreakpoint(page, 32);
   await resumeToBreakpoint(page, 27);
 
-  await resumeToLine(page, 32);
-  await resumeToLine(page, 27);
+  await fastForwardToLine(page, { lineNumber: 32 });
+  await fastForwardToLine(page, { lineNumber: 27 });
 
   await resumeToBreakpoint(page, 42);
   await resumeToBreakpoint(page, 44);

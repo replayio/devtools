@@ -901,13 +901,22 @@ export async function rewindToLine(
   const lineLocator = await getSourceLine(page, lineNumber);
   const buttonLocator = lineLocator.locator('[data-test-name="ContinueToButton"]');
 
+  // Account for the fact that SourceListRow doesn't render SourceListRowMouseEvents while scrolling
+  await waitFor(async () => {
+    const isScrolling = await lineLocator.getAttribute("data-test-is-scrolling");
+    expect(isScrolling).toBe(null);
+  });
+
   await lineLocator.locator('[data-test-name="SourceLine-HitCount"]').hover({ force: true });
+  await page.keyboard.down("Shift");
   await page.keyboard.down(getCommandKey());
 
-  const state = await buttonLocator.getAttribute("data-test-state");
-  expect(state).toBe("previous");
+  await expect(await buttonLocator.getAttribute("data-test-state")).toBe("previous");
 
   await buttonLocator.click({ force: true });
+
+  await page.keyboard.up(getCommandKey());
+  await page.keyboard.up("Shift");
 }
 
 export async function fastForwardToLine(
@@ -926,13 +935,20 @@ export async function fastForwardToLine(
   const lineLocator = await getSourceLine(page, lineNumber);
   const buttonLocator = lineLocator.locator('[data-test-name="ContinueToButton"]');
 
+  // Account for the fact that SourceListRow doesn't render SourceListRowMouseEvents while scrolling
+  await waitFor(async () => {
+    const isScrolling = await lineLocator.getAttribute("data-test-is-scrolling");
+    expect(isScrolling).toBe(null);
+  });
+
   await lineLocator.locator('[data-test-name="SourceLine-HitCount"]').hover({ force: true });
   await page.keyboard.down(getCommandKey());
 
-  const state = await buttonLocator.getAttribute("data-test-state");
-  expect(state).toBe("next");
+  await expect(await buttonLocator.getAttribute("data-test-state")).toBe("next");
 
   await buttonLocator.click({ force: true });
+
+  await page.keyboard.up(getCommandKey());
 }
 
 export async function waitForSourceContentsToFinishStreaming(

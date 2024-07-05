@@ -11,17 +11,13 @@ import { pointStackCache } from "./PointStackCache";
 import { sourceOutlineCache } from "./SourceOutlineCache";
 import { sourcesByIdCache } from "./SourcesCache";
 
-export const FIND_RESUME_TARGET_COMMANDS = ["findRewindTarget", "findResumeTarget"] as const;
 export const FIND_STEP_TARGET_COMMANDS = [
   "findStepInTarget",
   "findStepOutTarget",
   "findStepOverTarget",
   "findReverseStepOverTarget",
 ] as const;
-export const FIND_TARGET_COMMANDS = [
-  ...FIND_RESUME_TARGET_COMMANDS,
-  ...FIND_STEP_TARGET_COMMANDS,
-] as const;
+export const FIND_TARGET_COMMANDS = [...FIND_STEP_TARGET_COMMANDS] as const;
 export type FindTargetCommand = (typeof FIND_TARGET_COMMANDS)[number];
 
 const resumeTargetForPointCache = createCache<

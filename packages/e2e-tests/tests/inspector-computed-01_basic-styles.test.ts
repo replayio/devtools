@@ -6,8 +6,8 @@ import {
   selectElementsListRow,
   toggleElementsListRow,
 } from "../helpers/elements-panel";
-import { rewindToLine } from "../helpers/pause-information-panel";
-import { addBreakpoint } from "../helpers/source-panel";
+import { openSource } from "../helpers/source-explorer-panel";
+import { rewindToLine } from "../helpers/source-panel";
 import test from "../testFixture";
 
 test.use({ exampleKey: "doc_inspector_styles.html" });
@@ -29,8 +29,8 @@ test("inspector-computed-01: Basic computed styles can be viewed", async ({
   await selectElementsListRow(page, { text: 'div id="maindiv"', type: "opening" });
   await checkComputedStyle(page, "background-color", "rgb(0, 0, 255)");
 
-  await addBreakpoint(page, { url: "doc_inspector_styles.html", lineNumber: 11 });
-  await rewindToLine(page, 11);
+  await openSource(page, "doc_inspector_styles.html");
+  await rewindToLine(page, { lineNumber: 11 });
 
   await selectElementsListRow(page, { text: 'div id="maindiv"', type: "opening" });
   await checkComputedStyle(page, "background-color", "rgb(255, 0, 0)");

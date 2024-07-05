@@ -158,14 +158,6 @@ export async function openScopeBlocks(page: Page, text: string): Promise<void> {
   });
 }
 
-export async function resumeToLine(page: Page, line: number): Promise<void> {
-  await debugPrint(page, `Resuming to line ${chalk.bold(line)}`, "resumeToLine");
-
-  await clickCommandBarButton(page, "Resume");
-
-  await waitForPaused(page, line);
-}
-
 export async function clickCommandBarButton(page: Page, title: string): Promise<void> {
   await debugPrint(page, title, "clickCommandBarButton");
 
@@ -186,20 +178,6 @@ export async function reverseStepOverToLine(page: Page, line: number) {
   await debugPrint(page, `Reverse step over to line ${chalk.bold(line)}`, "reverseStepOverToLine");
 
   await clickCommandBarButton(page, "Reverse Step Over");
-
-  await waitForPaused(page, line);
-}
-
-export async function rewind(page: Page) {
-  await debugPrint(page, "Rewinding", "rewind");
-
-  await clickCommandBarButton(page, "Rewind Execution");
-}
-
-export async function rewindToLine(page: Page, line: number): Promise<void> {
-  await debugPrint(page, `Rewinding to line ${chalk.bold(line)}`, "rewindToLine");
-
-  await clickCommandBarButton(page, "Rewind Execution");
 
   await waitForPaused(page, line);
 }

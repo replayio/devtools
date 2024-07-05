@@ -7,7 +7,7 @@ import {
   setLogpointBadge,
   verifyLogpointBadge,
 } from "../helpers/console-panel";
-import { resumeToLine, reverseStepOverToLine } from "../helpers/pause-information-panel";
+import { reverseStepOverToLine } from "../helpers/pause-information-panel";
 import { addBreakpoint, addLogpoint } from "../helpers/source-panel";
 import { waitFor } from "../helpers/utils";
 import test, { expect } from "../testFixture";
@@ -64,6 +64,4 @@ test(`logpoints-01: log-points appear in the correct order and allow time warpin
 
   await executeAndVerifyTerminalExpression(page, "number", 5);
   await reverseStepOverToLine(page, 19);
-
-  await resumeToLine(page, 20);
 });

@@ -11,7 +11,7 @@ async function checkMessageLocation(page: Page, text: string, location: string) 
 
 test.use({ exampleKey: "doc_prod_bundle.html" });
 
-test(`breakpoints-06: Test log point in a sourcemapped file`, async ({
+test(`logpoints-13: Test log point in a sourcemapped file`, async ({
   pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {

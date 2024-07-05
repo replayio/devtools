@@ -197,8 +197,7 @@ export interface ReplayClientInterface {
   }>;
   findPaints(): Promise<TimeStampedPointWithPaintHash[]>;
   findPoints(selector: PointSelector, limits?: PointLimits): Promise<PointDescription[]>;
-  findRewindTarget(point: ExecutionPoint): Promise<PauseDescription>;
-  findResumeTarget(point: ExecutionPoint): Promise<PauseDescription>;
+
   findStepInTarget(point: ExecutionPoint): Promise<PauseDescription>;
   findStepOutTarget(point: ExecutionPoint): Promise<PauseDescription>;
   findStepOverTarget(point: ExecutionPoint): Promise<PauseDescription>;

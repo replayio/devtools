@@ -1,7 +1,8 @@
 import { openDevToolsTab, startTest } from "../helpers";
-import { rewindToLine, stepOver, waitForPaused } from "../helpers/pause-information-panel";
+import { stepOver, waitForPaused } from "../helpers/pause-information-panel";
 import { getGraphicsDataUrl } from "../helpers/screenshot";
-import { addBreakpoint } from "../helpers/source-panel";
+import { openSource } from "../helpers/source-explorer-panel";
+import { rewindToLine } from "../helpers/source-panel";
 import { waitFor } from "../helpers/utils";
 import { test } from "../testFixture";
 
@@ -14,8 +15,8 @@ test("repaint-01: repaints the screen screen when stepping over code that modifi
   await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
 
-  await addBreakpoint(page, { lineNumber: 50, url: exampleKey });
-  await rewindToLine(page, 50);
+  await openSource(page, exampleKey);
+  await rewindToLine(page, { lineNumber: 50 });
 
   const prevSource = await getGraphicsDataUrl(page);
 

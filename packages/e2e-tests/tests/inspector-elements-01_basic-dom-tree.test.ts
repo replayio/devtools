@@ -9,8 +9,8 @@ import {
   verifyElementsNotAvailable,
   waitForSelectedElementsRow,
 } from "../helpers/elements-panel";
-import { rewindToLine } from "../helpers/pause-information-panel";
-import { addBreakpoint } from "../helpers/source-panel";
+import { openSource } from "../helpers/source-explorer-panel";
+import { rewindToLine } from "../helpers/source-panel";
 import { seekToTimePercent } from "../helpers/timeline";
 import test from "../testFixture";
 
@@ -32,8 +32,8 @@ test("inspector-elements-01: Basic DOM tree node display", async ({
   let node = await getElementsListRow(page, { text: 'id="maindiv"' });
   await node.waitFor();
 
-  await addBreakpoint(page, { url: "doc_inspector_basic.html", lineNumber: 9 });
-  await rewindToLine(page, 9);
+  await openSource(page, "doc_inspector_basic.html");
+  await rewindToLine(page, { lineNumber: 9 });
 
   node = await getElementsListRow(page, { text: 'id="maindiv"' });
   await node.waitFor();
