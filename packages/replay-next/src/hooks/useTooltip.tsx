@@ -161,7 +161,7 @@ export default function useTooltip({
 
   const onMouseEnter = (event: MouseEvent) => {
     setClientX(event.clientX);
-    setClientX(event.clientY);
+    setClientY(event.clientY);
     setMouseTarget(event.currentTarget as HTMLElement);
 
     if (delay === 0) {
@@ -173,7 +173,7 @@ export default function useTooltip({
 
   const onMouseLeave = (event: MouseEvent) => {
     setClientX(null);
-    setClientX(null);
+    setClientY(null);
     setMouseTarget(null);
     setShowTooltip(false);
     setShowTooltipDebounced.cancel();
@@ -185,7 +185,7 @@ export default function useTooltip({
     }
 
     setClientX(event.clientX);
-    setClientX(event.clientY);
+    setClientY(event.clientY);
   };
 
   return { onMouseEnter, onMouseLeave, onMouseMove, tooltip: renderedTooltip };
