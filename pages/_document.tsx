@@ -48,6 +48,8 @@ const csp = (props: any) => {
     // Required to inline images from the database and from external avaters
     `img-src 'self' data: https:`,
 
+    `media-src 'self' data: https:`,
+
     // Required for our logpoint analysis cache (which uses a Web worker)
     `worker-src 'self' blob:`,
   ]

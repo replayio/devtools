@@ -45,6 +45,7 @@ import {
   TimeStampedPoint,
   TimeStampedPointRange,
   VariableMapping,
+  Video,
   annotations,
   createPauseResult,
   findPointsResults,
@@ -808,6 +809,15 @@ export class ReplayClient implements ReplayClientInterface {
       sessionId
     );
     return screen;
+  }
+
+  async getVideos(): Promise<Video[]> {
+    const sessionId = await this.waitForSession();
+    const { videos } = await client.Graphics.getVideos(
+      { mimeType: "video/webm" },
+      sessionId
+    );
+    return videos;
   }
 
   async mapExpressionToGeneratedScope(expression: string, location: Location): Promise<string> {

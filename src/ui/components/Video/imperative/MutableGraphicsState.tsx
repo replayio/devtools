@@ -11,7 +11,7 @@
 //
 // This approach is unusual, but it's arguably cleaner than sharing these values via the DOM.
 
-import { ExecutionPoint, ScreenShot } from "@replayio/protocol";
+import { ExecutionPoint, ScreenShot, Video } from "@replayio/protocol";
 
 import { fitImageToContainer, getDimensions } from "replay-next/src/utils/image";
 import { shallowEqual } from "shared/utils/compare";
@@ -34,8 +34,10 @@ export interface State {
   localScale: number;
   recordingScale: number;
   screenShot: ScreenShot | undefined;
+  videos: Video[];
   screenShotType: ScreenShotType | undefined;
   status: Status;
+  paintIndex: number | null;
 }
 
 export const state = createState<State>({
@@ -52,6 +54,8 @@ export const state = createState<State>({
   screenShot: undefined,
   screenShotType: undefined,
   status: "loading",
+  paintIndex: null,
+  videos: [],
 });
 
 let lock: Object | null = null;
@@ -62,9 +66,11 @@ export async function updateState(
     didResize?: boolean;
     executionPoint: ExecutionPoint | null;
     screenShot: ScreenShot | null;
+    videos: Video[];
     screenShotType: ScreenShotType | null;
     status: Status;
     time: number;
+    paintIndex: number | null;
   }> = {}
 ) {
   const prevState = state.read();
@@ -76,6 +82,8 @@ export async function updateState(
     screenShotType = prevState.screenShotType,
     status = prevState.status,
     time = prevState.currentTime,
+    paintIndex = prevState.paintIndex,
+    videos = prevState.videos,
   } = options;
 
   if (shallowEqual(options, { didResize })) {
@@ -92,7 +100,41 @@ export async function updateState(
   let graphicsRect = prevState.graphicsRect;
   let localScale = prevState.localScale;
   let recordingScale = prevState.recordingScale;
-  if (screenShot && (screenShot != prevState.screenShot || didResize)) {
+  if (videos.length > 0) {
+    const naturalDimensions = {
+      aspectRatio: videos[0].width / videos[0].height,
+      height: videos[0].height,
+      width: videos[0].width,
+    }
+
+    if (lock !== localLock) {
+      return;
+    }
+
+    const naturalHeight = naturalDimensions.height;
+    const naturalWidth = naturalDimensions.width;
+
+    const containerRect = graphicsElement.getBoundingClientRect();
+    const scaledDimensions = fitImageToContainer({
+      containerHeight: containerRect.height,
+      containerWidth: containerRect.width,
+      imageHeight: naturalHeight,
+      imageWidth: naturalWidth,
+    });
+
+    const clientHeight = scaledDimensions.height;
+    const clientWidth = scaledDimensions.width;
+
+    localScale = clientWidth / naturalWidth;
+    recordingScale = 1.0;
+
+    graphicsRect = {
+      height: clientHeight,
+      left: containerRect.left + (containerRect.width - clientWidth) / 2,
+      top: containerRect.top + (containerRect.height - clientHeight) / 2,
+      width: clientWidth,
+    };
+  } else if (screenShot && (screenShot != prevState.screenShot || didResize)) {
     const naturalDimensions = await getDimensions(screenShot.data, screenShot.mimeType);
     if (lock !== localLock) {
       return;
@@ -132,6 +174,8 @@ export async function updateState(
     screenShot: screenShot || undefined,
     screenShotType: screenShotType || undefined,
     status,
+    paintIndex,
+    videos
   };
 
   if (!shallowEqual(prevState, nextState)) {
