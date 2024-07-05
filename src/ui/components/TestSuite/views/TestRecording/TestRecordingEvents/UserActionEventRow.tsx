@@ -118,7 +118,10 @@ export default memo(function UserActionEventRow({
     dispatch(jumpToKnownEventListenerHit(onSeek, jumpToCodeAnnotation));
   };
 
-  const showBadge = isSelected && resultPoint !== null;
+  const isCypressContainsEvent =
+    groupedTestCases.environment.testRunner.name === "cypress" &&
+    userActionEvent.data.command.name === "contains";
+  const showBadge = isSelected && resultPoint !== null && !isCypressContainsEvent;
   const showJumpToCode = (isHovered || isSelected) && canShowJumpToCode;
 
   let jumpToCodeStatus: JumpToCodeStatus = "loading";
