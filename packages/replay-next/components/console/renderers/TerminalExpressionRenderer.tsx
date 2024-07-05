@@ -101,7 +101,7 @@ function TerminalExpressionRenderer({
             <span className={styles.LogContents} data-test-name="TerminalExpression-Result">
               <Icon className={styles.EagerEvaluationIcon} type="eager-evaluation" />
               <Suspense fallback={<Loader />}>
-                <EvaluatedContent terminalExpression={terminalExpression} />
+                <EvaluatedContent terminalExpression={{ ...terminalExpression, expression: "" }} />
               </Suspense>
             </span>
           </span>
