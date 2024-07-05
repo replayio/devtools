@@ -9,11 +9,27 @@ import { useAppSelector } from "ui/setup/hooks";
 import { DefaultViewportWrapper } from "./Viewport";
 import styles from "./LoadingScreen.module.css";
 
-export default function LoadingScreen({ message }: { message: ReactNode }) {
+export default function LoadingScreen({
+  footer,
+  message,
+}: {
+  footer?: ReactNode;
+  message: ReactNode;
+}) {
   const isAwaitingSourceMaps = useAppSelector(getAwaitingSourcemaps);
   const uploadingInfo = useAppSelector(getUploading);
 
-  const showHighRiskWarning = useHighRiskSettingCount() > 0;
+  const highRiskSettingsActive = useHighRiskSettingCount() > 0;
+
+  if (!footer) {
+    if (highRiskSettingsActive) {
+      footer = (
+        <div className={styles.HighRiskWarning}>
+          You have advanced settings enabled that may negatively affect performance
+        </div>
+      );
+    }
+  }
 
   const [colorIndex, setColorIndex] = useState(0);
   const color = colorOptions[colorIndex % colorOptions.length];
@@ -47,11 +63,7 @@ export default function LoadingScreen({ message }: { message: ReactNode }) {
         </div>
         {content}
         <div className={styles.Spacer}></div>
-        {showHighRiskWarning && (
-          <div className={styles.HighRiskWarning}>
-            You have advanced settings enabled that may negatively affect performance
-          </div>
-        )}
+        {footer}
       </DefaultViewportWrapper>
     </>
   );

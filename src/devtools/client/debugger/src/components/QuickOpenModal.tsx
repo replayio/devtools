@@ -1,7 +1,3 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
-
 import { Dictionary } from "@reduxjs/toolkit";
 import fuzzyAldrin from "fuzzaldrin-plus";
 import debounce from "lodash/debounce";
@@ -9,6 +5,7 @@ import memoizeOne from "memoize-one";
 import React, { Component } from "react";
 import { useImperativeCacheValue } from "suspense";
 
+import { ReportProblemLink } from "replay-next/components/errors/ReportProblemLink";
 import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
 import {
   streamingSourceContentsCache,
@@ -442,8 +439,11 @@ class QuickOpenModal extends Component<QuickOpenModalProps, QOMState> {
     }
 
     const items = this.highlightMatching(query, results || []);
+    const resultsCount = this.getResultCount();
     const expanded = !!items && items.length > 0;
     const showLoadingResults = query?.replace(/@/g, "") && results === null;
+    const showReportProblemLink =
+      !sourcesLoading && !showLoadingResults && query && resultsCount < 5;
 
     return (
       <Modal
@@ -455,7 +455,7 @@ class QuickOpenModal extends Component<QuickOpenModalProps, QOMState> {
         <SearchInput
           query={query}
           hasPrefix={true}
-          count={this.getResultCount()}
+          count={resultsCount}
           dataTestId="QuickOpenInput"
           placeholder={"Go to file…"}
           summaryMsg={this.getSummaryMessage()}
@@ -482,6 +482,21 @@ class QuickOpenModal extends Component<QuickOpenModalProps, QOMState> {
             expanded={expanded}
             {...(this.isSourceSearch() ? SIZE_BIG : SIZE_DEFAULT)}
           />
+        )}
+        {showReportProblemLink && (
+          <div className="report-a-problem">
+            <span className="report-a-problem-icon" />
+            <span className="report-a-problem-text">Something missing from this list?</span>
+            <ReportProblemLink
+              context={{
+                id: "file-search",
+                query,
+                results,
+              }}
+              onClick={this.props.closeQuickOpen}
+              title="Report a problem with file search"
+            />
+          </div>
         )}
       </Modal>
     );

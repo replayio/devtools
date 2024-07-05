@@ -20,8 +20,7 @@ export type ModalType =
   | "passport-dismiss"
   | "rename-replay"
   | "settings"
-  | "sharing"
-  | "sourcemap-setup";
+  | "sharing";
 export type WorkspaceId = string;
 export type WorkspaceUuid = string;
 export type SettingsTabTitle =

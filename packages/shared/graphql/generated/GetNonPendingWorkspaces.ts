@@ -25,25 +25,19 @@ export interface GetNonPendingWorkspaces_viewer_workspaces_edges_node_settings {
   features: any | null;
 }
 
-export interface GetNonPendingWorkspaces_viewer_workspaces_edges_node_members_edges_node_WorkspacePendingEmailMember {
-  __typename: "WorkspacePendingEmailMember" | "WorkspacePendingUserMember";
-}
-
-export interface GetNonPendingWorkspaces_viewer_workspaces_edges_node_members_edges_node_WorkspaceUserMember_user {
+export interface GetNonPendingWorkspaces_viewer_workspaces_edges_node_members_edges_node_user {
   __typename: "User";
   id: string;
   name: string | null;
   picture: string | null;
 }
 
-export interface GetNonPendingWorkspaces_viewer_workspaces_edges_node_members_edges_node_WorkspaceUserMember {
+export interface GetNonPendingWorkspaces_viewer_workspaces_edges_node_members_edges_node {
   __typename: "WorkspaceUserMember";
   id: string;
   roles: string[];
-  user: GetNonPendingWorkspaces_viewer_workspaces_edges_node_members_edges_node_WorkspaceUserMember_user;
+  user: GetNonPendingWorkspaces_viewer_workspaces_edges_node_members_edges_node_user;
 }
-
-export type GetNonPendingWorkspaces_viewer_workspaces_edges_node_members_edges_node = GetNonPendingWorkspaces_viewer_workspaces_edges_node_members_edges_node_WorkspacePendingEmailMember | GetNonPendingWorkspaces_viewer_workspaces_edges_node_members_edges_node_WorkspaceUserMember;
 
 export interface GetNonPendingWorkspaces_viewer_workspaces_edges_node_members_edges {
   __typename: "WorkspaceMemberEdge";

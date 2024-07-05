@@ -35,7 +35,7 @@ export function DefaultViewportWrapper({
   return (
     <FullViewportWrapper>
       <ModalBackground />
-      <div className={`relative space-y-4 ${className}`}>{children}</div>
+      <div className={`relative space-y-2 ${className}`}>{children}</div>
       {footer}
     </FullViewportWrapper>
   );

@@ -10,6 +10,7 @@ import {
 } from "react";
 
 import useConsoleContextMenu from "replay-next/components/console/useConsoleContextMenu";
+import { ReportProblemLink } from "replay-next/components/errors/ReportProblemLink";
 import Icon from "replay-next/components/Icon";
 import Inspector from "replay-next/components/inspector";
 import ClientValueValueRenderer from "replay-next/components/inspector/values/ClientValueValueRenderer";
@@ -146,7 +147,23 @@ function EvaluatedContent({ terminalExpression }: { terminalExpression: Terminal
 
   let children: ReactNode | null = null;
   if (exception) {
-    children = <Inspector context="console" pauseId={pauseId} protocolValue={exception} />;
+    children = (
+      <>
+        <Inspector context="console" pauseId={pauseId} protocolValue={exception} />
+        <div className={styles.ReportProblem}>
+          <ReportProblemLink
+            context={{
+              executionPoint: terminalExpression.point,
+              expression: terminalExpression.expression,
+              id: "terminal-expression",
+              frameId,
+              pauseId,
+            }}
+          />{" "}
+          if this is unexpected
+        </div>
+      </>
+    );
   } else if (returned) {
     children = returned.value ? (
       <ClientValueValueRenderer

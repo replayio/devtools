@@ -1,5 +1,7 @@
 import { ChangeEvent, ReactNode, useEffect, useRef, useState } from "react";
 
+import { ReportProblemLink } from "replay-next/components/errors/ReportProblemLink";
+import { SupportContextRoot } from "replay-next/components/errors/SupportContext";
 import { useNotification } from "replay-next/src/hooks/useNotification";
 import LoadingScreen from "ui/components/shared/LoadingScreen";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
@@ -97,6 +99,19 @@ export function DevToolsProcessingScreen() {
 
   return (
     <LoadingScreen
+      footer={
+        <div className={styles.Footer}>
+          <SupportContextRoot>
+            <ReportProblemLink
+              context={{
+                id: "processing-screen",
+              }}
+              promptText="Please share information about what type of recording this is"
+            />
+          </SupportContextRoot>
+          <div>if you think this is taking longer than it should.</div>
+        </div>
+      }
       message={
         <>
           <div className={styles.Message}>{message}</div>
@@ -113,7 +128,6 @@ export function DevToolsProcessingScreen() {
             >
               <input
                 disabled={notificationPermission === "denied"}
-                className={styles.Checkbox}
                 onChange={onChange}
                 type="checkbox"
               />{" "}

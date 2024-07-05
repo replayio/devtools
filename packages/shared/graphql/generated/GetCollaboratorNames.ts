@@ -40,22 +40,16 @@ export interface GetCollaboratorNames_recording_collaborators {
   edges: GetCollaboratorNames_recording_collaborators_edges[];
 }
 
-export interface GetCollaboratorNames_recording_workspace_members_edges_node_WorkspacePendingEmailMember {
-  __typename: "WorkspacePendingEmailMember" | "WorkspacePendingUserMember";
-}
-
-export interface GetCollaboratorNames_recording_workspace_members_edges_node_WorkspaceUserMember_user {
+export interface GetCollaboratorNames_recording_workspace_members_edges_node_user {
   __typename: "User";
   id: string;
   name: string | null;
 }
 
-export interface GetCollaboratorNames_recording_workspace_members_edges_node_WorkspaceUserMember {
+export interface GetCollaboratorNames_recording_workspace_members_edges_node {
   __typename: "WorkspaceUserMember";
-  user: GetCollaboratorNames_recording_workspace_members_edges_node_WorkspaceUserMember_user;
+  user: GetCollaboratorNames_recording_workspace_members_edges_node_user;
 }
-
-export type GetCollaboratorNames_recording_workspace_members_edges_node = GetCollaboratorNames_recording_workspace_members_edges_node_WorkspacePendingEmailMember | GetCollaboratorNames_recording_workspace_members_edges_node_WorkspaceUserMember;
 
 export interface GetCollaboratorNames_recording_workspace_members_edges {
   __typename: "WorkspaceMemberEdge";

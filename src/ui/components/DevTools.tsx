@@ -7,10 +7,12 @@ import {
   PanelResizeHandle,
 } from "react-resizable-panels";
 
+import QuickOpenModal from "devtools/client/debugger/src/components/QuickOpenModal";
 import InspectorContextReduxAdapter from "devtools/client/debugger/src/components/shared/InspectorContextReduxAdapter";
+import { getQuickOpenEnabled } from "devtools/client/debugger/src/selectors";
 // eslint-disable-next-line no-restricted-imports
 import { client } from "protocol/socket";
-import { SupportForm } from "replay-next/components/errors/SupportForm";
+import { SupportContextRoot } from "replay-next/components/errors/SupportContext";
 import { ExpandablesContextRoot } from "replay-next/src/contexts/ExpandablesContext";
 import { PointsContextRoot } from "replay-next/src/contexts/points/PointsContext";
 import { SelectedFrameContextRoot } from "replay-next/src/contexts/SelectedFrameContext";
@@ -22,7 +24,6 @@ import { getTestEnvironment } from "shared/test-suites/RecordingTestMetadata";
 import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { userData } from "shared/user-data/GraphQL/UserData";
 import { getAccessToken, getProcessing } from "ui/actions/app";
-import { setShowSupportForm } from "ui/actions/layout";
 import { createSocket } from "ui/actions/session";
 import { DevToolsDynamicLoadingMessage } from "ui/components/DevToolsDynamicLoadingMessage";
 import { NodePickerContextRoot } from "ui/components/NodePickerContext";
@@ -34,7 +35,7 @@ import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { useTrackLoadingIdleTime } from "ui/hooks/tracking";
 import { useGetUserInfo, useUserIsAuthor } from "ui/hooks/users";
 import { getViewMode } from "ui/reducers/layout";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { useAppSelector } from "ui/setup/hooks";
 import { UIState } from "ui/state";
 import {
   endUploadWaitTracking,
@@ -155,17 +156,16 @@ function _DevTools({
   replayClient,
   sessionId,
   showCommandPalette,
-  showSupportForm,
   uploadComplete,
 }: DevToolsProps) {
-  const dispatch = useAppDispatch();
+  const quickOpenEnabled = useAppSelector(getQuickOpenEnabled);
   const accessToken = useAppSelector(getAccessToken);
   const isAuthenticated = !!accessToken;
   const recordingId = useGetRecordingId();
   const { recording } = useGetRecording(recordingId);
   const { trackLoadingIdleTime } = useTrackLoadingIdleTime(uploadComplete, recording);
   const { userIsAuthor, loading } = useUserIsAuthor();
-  const { id: userId, email: userEmail, loading: userLoading, name: userName } = useGetUserInfo();
+  const { id: userId, email: userEmail, loading: userLoading } = useGetUserInfo();
   const processing = useAppSelector(getProcessing);
 
   // Sanity check to make sure we aren't viewing a recording from an unsupported target
@@ -269,10 +269,6 @@ function _DevTools({
     }
   }, [recording, userId, userEmail, userLoading]);
 
-  const dismissSupportForm = () => {
-    dispatch(setShowSupportForm(false));
-  };
-
   if (unsupportedTarget) {
     return <UnsupportedTarget />;
   }
@@ -283,46 +279,40 @@ function _DevTools({
 
   return (
     <SessionContextAdapter apiKey={apiKey ?? null}>
-      <SourcesContextAdapter>
-        <FocusContextReduxAdapter>
-          <PointsContextRoot>
-            <TimelineContextAdapter>
-              <NodePickerContextRoot>
-                <TestSuiteContextRoot>
-                  <SelectedFrameContextRoot
-                    SelectedFrameContextAdapter={SelectedFrameContextAdapter}
-                  >
-                    <TerminalContextAdapter>
-                      <InspectorContextReduxAdapter>
-                        <ExpandablesContextRoot>
-                          <LayoutContextAdapter>
-                            <KeyModifiers>
-                              <RecordingDocumentTitle />
-                              <Header />
-                              <Body />
-                              {showCommandPalette ? <CommandPaletteModal /> : null}
-                              {showSupportForm ? (
-                                <SupportForm
-                                  currentUserEmail={userEmail}
-                                  currentUserId={userId}
-                                  currentUserName={userName}
-                                  onDismiss={dismissSupportForm}
-                                  replayClient={replayClient}
-                                />
-                              ) : null}
-                              <KeyboardShortcuts />
-                            </KeyModifiers>
-                          </LayoutContextAdapter>
-                        </ExpandablesContextRoot>
-                      </InspectorContextReduxAdapter>
-                    </TerminalContextAdapter>
-                  </SelectedFrameContextRoot>
-                </TestSuiteContextRoot>
-              </NodePickerContextRoot>
-            </TimelineContextAdapter>
-          </PointsContextRoot>
-        </FocusContextReduxAdapter>
-      </SourcesContextAdapter>
+      <SupportContextRoot>
+        <SourcesContextAdapter>
+          <FocusContextReduxAdapter>
+            <PointsContextRoot>
+              <TimelineContextAdapter>
+                <NodePickerContextRoot>
+                  <TestSuiteContextRoot>
+                    <SelectedFrameContextRoot
+                      SelectedFrameContextAdapter={SelectedFrameContextAdapter}
+                    >
+                      <TerminalContextAdapter>
+                        <InspectorContextReduxAdapter>
+                          <ExpandablesContextRoot>
+                            <LayoutContextAdapter>
+                              <KeyModifiers>
+                                <RecordingDocumentTitle />
+                                <Header />
+                                <Body />
+                                {showCommandPalette ? <CommandPaletteModal /> : null}
+                                {quickOpenEnabled ? <QuickOpenModal /> : null}
+                                <KeyboardShortcuts />
+                              </KeyModifiers>
+                            </LayoutContextAdapter>
+                          </ExpandablesContextRoot>
+                        </InspectorContextReduxAdapter>
+                      </TerminalContextAdapter>
+                    </SelectedFrameContextRoot>
+                  </TestSuiteContextRoot>
+                </NodePickerContextRoot>
+              </TimelineContextAdapter>
+            </PointsContextRoot>
+          </FocusContextReduxAdapter>
+        </SourcesContextAdapter>
+      </SupportContextRoot>
     </SessionContextAdapter>
   );
 }
@@ -332,7 +322,6 @@ const connector = connect(
     loadingFinished: selectors.getLoadingFinished(state),
     sessionId: selectors.getSessionId(state),
     showCommandPalette: selectors.getShowCommandPalette(state),
-    showSupportForm: selectors.getShowSupportForm(state),
   }),
   {
     createSocket,

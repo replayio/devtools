@@ -1,16 +1,27 @@
 import { SessionId } from "@replayio/protocol";
 
+import { SupportFormContext } from "replay-next/components/errors/SupportContext";
 import { getRecordingId } from "shared/utils/recording";
 
-export async function submitSupportForm(
-  sessionId: SessionId | null,
-  text: string,
+export async function submitSupportForm({
+  context,
+  currentUser,
+  sessionId,
+  shareWithReplaySupport,
+  text,
+}: {
+  context: SupportFormContext;
   currentUser: null | {
     email: string;
     id: string;
-    name: string;
-  }
-) {
+    name: string | null;
+  };
+  sessionId: SessionId | null;
+  shareWithReplaySupport: boolean;
+  text: string;
+}) {
+  // TODO [PRO-698] Replace Form Carry with Honeycomb and pass along context
+
   const result = await fetch("/api/feedback", {
     method: "POST",
     headers: {
