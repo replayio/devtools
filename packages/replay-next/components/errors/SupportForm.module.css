@@ -13,6 +13,9 @@
   color: var(--support-form-color);
   caret-color: var(--support-form-color);
 }
+.TextArea:disabled {
+  opacity: 0.5;
+}
 .TextArea:focus {
   box-shadow: none;
   outline-offset: 0;
@@ -28,6 +31,7 @@
   flex-direction: row;
   align-items: center;
   gap: 1ch;
+  height: 2rem;
 }
 
 .CancelCloseButton,
@@ -61,7 +65,34 @@
 .SubmitButton:hover {
   background-color: var(--primary-accent-hover);
 }
+.CancelCloseButton:disabled,
+.SubmitButton:disabled {
+  opacity: 0.5;
+}
 
 .ConfirmationMessage {
   text-align: center;
+}
+
+.Form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.ShareOption {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.25ch;
+}
+.ShareOption[data-disabled] {
+  opacity: 0.5;
+}
+
+.Checkbox:disabled {
+  opacity: 0.5;
 }

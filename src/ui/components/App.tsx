@@ -1,91 +1,24 @@
-import React, { ReactNode, useEffect } from "react";
-import { ConnectedProps, connect } from "react-redux";
+import { PropsWithChildren, useEffect } from "react";
 
-import QuickOpenModal from "devtools/client/debugger/src/components/QuickOpenModal";
-import { getQuickOpenEnabled } from "devtools/client/debugger/src/selectors";
 import Spinner from "replay-next/components/Spinner";
 import { getSystemColorScheme } from "shared/theme/getSystemColorScheme";
 import { Theme } from "shared/theme/types";
 import { userData } from "shared/user-data/GraphQL/UserData";
 import { isTest } from "shared/utils/environment";
-import { actions } from "ui/actions";
+import { AppModal } from "ui/components/AppModal";
 import hooks from "ui/hooks";
 import { Nag, useGetUserInfo } from "ui/hooks/users";
-import { getAccessToken, getLoadingFinished, getModal } from "ui/reducers/app";
+import { getAccessToken } from "ui/reducers/app";
 import { useAppSelector } from "ui/setup/hooks";
-import { UIState } from "ui/state";
-import { ModalType } from "ui/state/app";
 import { trackEvent } from "ui/utils/telemetry";
 import { shouldShowNag } from "ui/utils/tour";
 
 import { ConfirmRenderer } from "./shared/Confirm";
-import LoginModal from "./shared/LoginModal";
-import LoomModal from "./shared/LoomModal";
-import PassportDismissModal from "./shared/Modals/PassportDismissModal";
-import RenameReplayModal from "./shared/Modals/RenameReplayModal";
-import NewAttachment from "./shared/NewAttachment";
 import TOSScreen, { LATEST_TOS_VERSION } from "./TOSScreen";
 
-const LaunchBrowserModal = React.lazy(() => import("./shared/LaunchBrowserModal"));
-const UserSettingsModal = React.lazy(() => import("./shared/UserSettingsModal"));
-const SharingModal = React.lazy(() => import("./shared/SharingModal"));
-const SourcemapSetupModal = React.lazy(() => import("./shared/Modals/SourcemapSetupModal"));
+export default function App({ children }: PropsWithChildren) {
+  const accessToken = useAppSelector(getAccessToken);
 
-function AppModal({ hideModal, modal }: { hideModal: () => void; modal: ModalType }) {
-  const loadingFinished = useAppSelector(getLoadingFinished);
-
-  // Dismiss modal if the "Escape" key is pressed.
-  useEffect(() => {
-    const onDocumentKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        hideModal();
-      }
-    };
-    document.addEventListener("keydown", onDocumentKeyDown);
-    return () => {
-      document.removeEventListener("keydown", onDocumentKeyDown);
-    };
-  }, [hideModal]);
-
-  if (!loadingFinished) {
-    return null;
-  }
-
-  switch (modal) {
-    case "sharing": {
-      return <SharingModal />;
-    }
-    case "login": {
-      return <LoginModal />;
-    }
-    case "settings": {
-      return <UserSettingsModal />;
-    }
-    case "browser-launch": {
-      return <LaunchBrowserModal />;
-    }
-    case "loom": {
-      return <LoomModal />;
-    }
-    case "attachment": {
-      return <NewAttachment />;
-    }
-    case "sourcemap-setup": {
-      return <SourcemapSetupModal />;
-    }
-    case "rename-replay": {
-      return <RenameReplayModal />;
-    }
-    case "passport-dismiss": {
-      return <PassportDismissModal />;
-    }
-    default: {
-      return null;
-    }
-  }
-}
-
-function App({ children, hideModal, modal, quickOpenEnabled, accessToken }: AppProps) {
   const dismissNag = hooks.useDismissNag();
   const userInfo = useGetUserInfo();
 
@@ -152,30 +85,8 @@ function App({ children, hideModal, modal, quickOpenEnabled, accessToken }: AppP
   return (
     <div id="app-container">
       {children}
-      {modal ? (
-        <React.Suspense>
-          <AppModal hideModal={hideModal} modal={modal} />
-        </React.Suspense>
-      ) : null}
-      {quickOpenEnabled === true && <QuickOpenModal />}
+      <AppModal />
       <ConfirmRenderer />
     </div>
   );
 }
-
-const connector = connect(
-  (state: UIState) => ({
-    modal: getModal(state),
-
-    // Only read quick open state if it exists, to ensure safe loads
-    quickOpenEnabled: !!state.quickOpen && getQuickOpenEnabled(state),
-
-    accessToken: getAccessToken(state),
-  }),
-  {
-    hideModal: actions.hideModal,
-  }
-);
-export type AppProps = ConnectedProps<typeof connector> & { children?: ReactNode };
-
-export default connector(App);

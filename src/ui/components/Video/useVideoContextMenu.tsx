@@ -1,4 +1,4 @@
-import React, { MouseEvent, UIEvent, useContext, useEffect, useRef } from "react";
+import { MouseEvent, UIEvent, useContext, useEffect, useRef } from "react";
 import { ContextMenuItem, assertMouseEvent, useContextMenu } from "use-context-menu";
 
 import {
@@ -6,6 +6,7 @@ import {
   selectNode,
   unhighlightNode,
 } from "devtools/client/inspector/markup/actions/markup";
+import { SupportContext } from "replay-next/components/errors/SupportContext";
 import Icon from "replay-next/components/Icon";
 import { createTypeDataForVisualComment } from "replay-next/components/sources/utils/comments";
 import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
@@ -28,6 +29,7 @@ export default function useVideoContextMenu() {
   const { showCommentsPanel } = useContext(InspectorContext);
   const replayClient = useContext(ReplayClientContext);
   const { accessToken, recordingId } = useContext(SessionContext);
+  const { showSupportForm } = useContext(SupportContext);
 
   const { pauseId } = useMostRecentLoadedPause() ?? {};
 
@@ -137,6 +139,25 @@ export default function useVideoContextMenu() {
         <>
           <Icon className={styles.ContextMenuIcon} type="inspect" />
           Inspect element
+        </>
+      </ContextMenuItem>
+      <ContextMenuItem
+        onSelect={() =>
+          showSupportForm({
+            context: {
+              executionPoint: document
+                .getElementById("video")
+                ?.getAttribute("data-execution-point"),
+              id: "video",
+            },
+            promptText: "Describe what was unexpected or confusing in the video",
+            title: "Report a problem with the video",
+          })
+        }
+      >
+        <>
+          <Icon className={styles.ContextMenuIcon} type="report-problem" />
+          Report problem
         </>
       </ContextMenuItem>
     </>,

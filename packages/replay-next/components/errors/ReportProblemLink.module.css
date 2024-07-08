@@ -1,0 +1,21 @@
+.Flex {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.Icon {
+  width: 1.75ch;
+  height: 1.75ch;
+  color: var(--color-link);
+}
+
+.Link {
+  text-decoration: underline;
+  color: var(--color-link);
+  cursor: pointer;
+}
+.Link:hover {
+  text-decoration: none;
+}

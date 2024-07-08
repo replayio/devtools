@@ -215,3 +215,12 @@
     box-shadow: 0 0 0 0 var(--pulse-color-off);
   }
 }
+
+.ReportProblem {
+  font-family: var(--font-family-default);
+  font-size: var(--font-size-regular);
+  margin-top: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}

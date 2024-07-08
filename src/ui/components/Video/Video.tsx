@@ -115,7 +115,7 @@ export default function Video() {
         <ReplayLogo size="sm" color="gray" />
       </div>
 
-      <img className={styles.Image} id="graphics" onClick={onClick} />
+      <img className={styles.Image} id="graphics" onClick={onClick} onContextMenu={onClick} />
 
       {/* Graphics that are relative to the rendered screenshot go here; this container is automatically positioned to align with the screenshot */}
       <div className={styles.Graphics} id="overlay-graphics">

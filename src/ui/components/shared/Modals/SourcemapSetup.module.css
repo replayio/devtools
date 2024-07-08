@@ -1,0 +1,12 @@
+.Text {
+  font-size: var(--font-size-regular);
+  font-weight: normal;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.Link {
+  color: var(--color-link);
+  text-decoration: underline;
+}

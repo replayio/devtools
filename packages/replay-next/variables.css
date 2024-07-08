@@ -164,7 +164,6 @@
   --checkbox-border: var(--input-border);
   --checkbox: var(--theme-base-80);
   --chrome: #081120; /* bg app */
-  --dropshadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --icon-color: var(--body-color);
   --modal-bgcolor: var(--theme-base-100);
   --modal-border: #222;
@@ -713,7 +712,6 @@
   --checkbox-border: var(--input-border);
   --checkbox: var(--theme-base-100);
   --chrome: var(--theme-base-95); /* bg app */
-  --dropshadow: 0 4px 6px -1px rgb(100 100 255 / 0.7), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --icon-color: var(--body-color);
   --modal-bgcolor: rgba(255, 255, 255, 0.98);
   --modal-border: none;
