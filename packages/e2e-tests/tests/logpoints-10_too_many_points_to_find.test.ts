@@ -15,8 +15,7 @@ import test from "../testFixture";
 const sourceUrl = "react-dom.production.js";
 const lineNumber = 150;
 
-// trunk-ignore(gitleaks/generic-api-key)
-test.use({ exampleKey: "breakpoints-02" });
+test.use({ exampleKey: "logpoints-01" });
 
 test(`logpoints-10: too-many-points-to-find UX`, async ({
   pageWithMeta: { page, recordingId, testScope },
