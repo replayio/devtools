@@ -8,7 +8,7 @@ import { getByTestName, waitFor } from "../helpers/utils";
 import test from "../testFixture";
 
 // trunk-ignore(gitleaks/generic-api-key)
-test.use({ exampleKey: "breakpoints-01" });
+test.use({ exampleKey: "breakpoints-02" });
 
 async function checkForJumpButton(actionListItem: Locator, shouldBeEnabled: boolean) {
   const jumpButton = getEventJumpButton(actionListItem);

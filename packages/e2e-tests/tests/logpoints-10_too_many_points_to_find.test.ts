@@ -16,7 +16,7 @@ const sourceUrl = "react-dom.production.js";
 const lineNumber = 150;
 
 // trunk-ignore(gitleaks/generic-api-key)
-test.use({ exampleKey: "breakpoints-01" });
+test.use({ exampleKey: "breakpoints-02" });
 
 test(`logpoints-10: too-many-points-to-find UX`, async ({
   pageWithMeta: { page, recordingId, testScope },

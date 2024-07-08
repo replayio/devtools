@@ -501,18 +501,6 @@ export class ReplayClient implements ReplayClientInterface {
     return points;
   }
 
-  async findRewindTarget(point: ExecutionPoint): Promise<PauseDescription> {
-    const sessionId = await this.waitForSession();
-    const { target } = await client.Debugger.findRewindTarget({ point }, sessionId);
-    return target;
-  }
-
-  async findResumeTarget(point: ExecutionPoint): Promise<PauseDescription> {
-    const sessionId = await this.waitForSession();
-    const { target } = await client.Debugger.findResumeTarget({ point }, sessionId);
-    return target;
-  }
-
   async findStepInTarget(point: ExecutionPoint): Promise<PauseDescription> {
     const sessionId = await this.waitForSession();
     const { target } = await client.Debugger.findStepInTarget({ point }, sessionId);

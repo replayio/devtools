@@ -31,8 +31,6 @@ type MixpanelEvent =
   | ["console.events.category_select"]
   | ["console.events.search"]
   | ["console.overflow"]
-  | ["debugger.rewind"]
-  | ["debugger.resume"]
   | ["debugger.reverse_step_over"]
   | ["debugger.step_over"]
   | ["debugger.step_in"]

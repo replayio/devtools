@@ -1,11 +1,7 @@
 import { openDevToolsTab, startTest } from "../helpers";
-import {
-  openPauseInformationPanel,
-  rewindToLine,
-  waitForPaused,
-} from "../helpers/pause-information-panel";
+import { openPauseInformationPanel, waitForPaused } from "../helpers/pause-information-panel";
 import { clickSourceTreeNode } from "../helpers/source-explorer-panel";
-import { addBreakpoint } from "../helpers/source-panel";
+import { rewindToLine } from "../helpers/source-panel";
 import test from "../testFixture";
 
 test.use({ exampleKey: "doc_rr_objects.html" });
@@ -25,8 +21,7 @@ test("stepping-07: Test quick stepping using the keyboard", async ({
   await openPauseInformationPanel(page);
 
   // Pause on line 54
-  await addBreakpoint(page, { lineNumber: 54, url: exampleKey });
-  await rewindToLine(page, 54);
+  await rewindToLine(page, { lineNumber: 54 });
 
   // "Step over" ten times *without* waiting for each step to complete
   // TODO [RUN-3271] Chromium currently requires 2 steps per line,
