@@ -17,7 +17,7 @@ import test, { expect } from "../testFixture";
 
 // Why is this even getting confused as an API key?
 // trunk-ignore(gitleaks/generic-api-key)
-test.use({ exampleKey: "breakpoints-02" });
+test.use({ exampleKey: "logpoints-01" });
 
 test("react_devtools-02: RDT integrations (Chromium)", async ({
   pageWithMeta: { page, recordingId, testScope },
@@ -32,7 +32,7 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
 
   await openDevToolsTab(page);
 
-  await warpToMessage(page, "Waiting for breakpoint at doc_rr_basic.html:21 (waitForBreakpoint)");
+  await warpToMessage(page, "Waiting for breakpoint at doc_rr_basic.html:20 (waitForBreakpoint)");
 
   // If the "React" tab shows up, we know that the routine ran
   await openReactDevtoolsPanel(page);
