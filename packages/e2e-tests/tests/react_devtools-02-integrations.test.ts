@@ -17,7 +17,7 @@ import test, { expect } from "../testFixture";
 
 // Why is this even getting confused as an API key?
 // trunk-ignore(gitleaks/generic-api-key)
-test.use({ exampleKey: "breakpoints-01" });
+test.use({ exampleKey: "breakpoints-02" });
 
 test("react_devtools-02: RDT integrations (Chromium)", async ({
   pageWithMeta: { page, recordingId, testScope },

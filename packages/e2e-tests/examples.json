@@ -12,9 +12,9 @@
     "recording": "ee962319-b43a-4e3e-bbdd-db2ccf7a57b8",
     "buildId": "linux-chromium-20240418-4747c93165f9-4699f489a2b6"
   },
-  "breakpoints-01": {
-    "recording": "c44d99c0-6eeb-4dda-bf00-bfed2a4710ea",
-    "buildId": "linux-chromium-20240614-d742f2be668d-7ad782ed38d0",
+  "breakpoints-02": {
+    "recording": "dbe7a147-98b4-4f90-9196-678c0f3e6fc9",
+    "buildId": "linux-chromium-20240705-cc8ac2ff87ab-6c7e9991dcf5",
     "requiresManualUpdate": true
   },
   "cra/dist/index.html": {
