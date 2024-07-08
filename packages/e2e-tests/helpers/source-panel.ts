@@ -456,7 +456,7 @@ export async function removeAllLogpoints(page: Page): Promise<void> {
   await debugPrint(page, `Removing all logpoints for the current source`, "removeAllLogpoints");
 
   await openPauseInformationPanel(page);
-  const points = await findPoints(page, "logpoint");
+  const points = await findPoints(page);
   const count = await points.count();
   for (let index = count - 1; index >= 0; index--) {
     const point = points.nth(index);

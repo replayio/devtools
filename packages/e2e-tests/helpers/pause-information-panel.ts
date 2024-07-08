@@ -332,7 +332,6 @@ export async function waitForScopeValue(
 
 export function findPoints(
   page: Page,
-  type: "logpoint",
   options: {
     sourceId?: SourceId;
     lineNumber?: number;

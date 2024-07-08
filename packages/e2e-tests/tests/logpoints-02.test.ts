@@ -46,7 +46,7 @@ test(`logpoints-02: conditional log-points`, async ({
   await expect(logPointMessages.first()).toHaveText(/Beginning/);
   await expect(logPointMessages.last()).toHaveText(/Ending/);
 
-  const logpoint = findPoints(page, "logpoint", { lineNumber: 20 });
+  const logpoint = findPoints(page, { lineNumber: 20 });
   await togglePoint(page, logpoint, false);
   await expect(logPointMessages).toHaveCount(2);
   await togglePoint(page, logpoint, true);

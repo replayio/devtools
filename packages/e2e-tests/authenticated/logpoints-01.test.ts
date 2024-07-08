@@ -64,7 +64,7 @@ test(`authenticated/logpoints-01: Shared logpoints functionality`, async ({
     const page = await context.newPage();
     await load(page, recordingId, testUsers![1].apiKey, testScope);
 
-    const locator = await findPoints(page, "logpoint", { lineNumber });
+    const locator = await findPoints(page, { lineNumber });
 
     // Verify point is not editable
     await expect(await isPointEditable(locator)).toBe(false);
