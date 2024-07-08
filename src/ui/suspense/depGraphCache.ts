@@ -20,24 +20,32 @@ import {
   getSourceIdToDisplayForUrl,
   getSourceToDisplayForUrl,
 } from "replay-next/src/utils/sources";
-import { DependencyChainStep, ReplayClientInterface } from "shared/client/types";
+import {
+  DependencyChainStep,
+  DependencyGraphMode,
+  ReplayClientInterface,
+} from "shared/client/types";
 import { formatFunctionDetailsFromLocation } from "ui/actions/eventListeners/eventListenerUtils";
 import { findFunctionOutlineForLocation } from "ui/actions/eventListeners/jumpToCode";
 
 import { formattedPointStackCache } from "./frameCache";
 
 export const depGraphCache: Cache<
-  [replayClient: ReplayClientInterface, point: ExecutionPoint | null],
+  [
+    replayClient: ReplayClientInterface,
+    point: ExecutionPoint | null,
+    mode: DependencyGraphMode | null
+  ],
   DependencyChainStep[] | null
 > = createCache({
   config: { immutable: true },
   debugLabel: "depGraphCache",
-  getKey: ([replayClient, point]) => point ?? "null",
-  load: async ([replayClient, point]) => {
+  getKey: ([replayClient, point, mode]) => `${point ?? "null"}:${mode ?? "none"}`,
+  load: async ([replayClient, point, mode]) => {
     if (!point) {
       return null;
     }
-    const dependencies = await replayClient.getDependencies(point);
+    const dependencies = await replayClient.getDependencies(point, mode ?? undefined);
 
     console.log("Deps for point: ", point, dependencies);
     return dependencies;
@@ -49,17 +57,55 @@ interface ReactComponentStackEntry extends TimeStampedPoint {
   componentName: string;
 }
 
+export const REACT_DOM_SOURCE_URLS = [
+  // React 18 and earlier
+  "react-dom.",
+  // React 19
+  "react-dom-client.",
+];
+
+export const isReactUrl = (url?: string) =>
+  REACT_DOM_SOURCE_URLS.some(partial => url?.includes(partial));
+
 export const reactComponentStackCache: Cache<
-  [replayClient: ReplayClientInterface, point: ExecutionPoint | null],
+  [replayClient: ReplayClientInterface, point: TimeStampedPoint | null],
   ReactComponentStackEntry[] | null
 > = createCache({
   config: { immutable: true },
   debugLabel: "reactComponentStackCache",
-  getKey: ([replayClient, point]) => point ?? "null",
+  getKey: ([replayClient, point]) => point?.point ?? "null",
   load: async ([replayClient, point]) => {
-    const dependencies = await depGraphCache.readAsync(replayClient, point);
+    if (!point) {
+      return null;
+    }
 
-    if (!dependencies) {
+    const currentPointStack = await formattedPointStackCache.readAsync(
+      replayClient,
+      {
+        ...point,
+        frameDepth: 2,
+      },
+      []
+    );
+
+    console.log("Point stack for point: ", point, currentPointStack);
+
+    const precedingFrame = currentPointStack.allFrames[1];
+
+    if (!isReactUrl(precedingFrame?.url)) {
+      return null;
+    }
+
+    const originalDependencies = await depGraphCache.readAsync(replayClient, point.point, null);
+    const reactDependencies = await depGraphCache.readAsync(
+      replayClient,
+      point.point,
+      DependencyGraphMode.ReactParentRenders
+    );
+
+    console.log("Deps: ", { originalDependencies, reactDependencies });
+
+    if (!originalDependencies || !reactDependencies) {
       return null;
     }
 
@@ -67,7 +113,7 @@ export const reactComponentStackCache: Cache<
 
     const sourcesById = await sourcesByIdCache.readAsync(replayClient);
 
-    const remainingDepEntries = dependencies.slice().reverse();
+    const remainingDepEntries = reactDependencies.slice().reverse();
     while (remainingDepEntries.length) {
       const depEntry = remainingDepEntries.shift()!;
 
