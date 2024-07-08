@@ -2,12 +2,11 @@ import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData"
 import { useAppSelector } from "ui/setup/hooks";
 
 import { getExecutionPoint, getTime } from "../../selectors";
-import BreakpointsPane from "./BreakpointsPane";
 import CommandBar from "./CommandBar";
 import NewFrames from "./Frames/NewFrames";
 import FrameTimeline from "./FrameTimeline";
-import LogpointsPane from "./LogpointsPane";
 import NewScopes from "./NewScopes";
+import LogpointsPane from "./Points/LogpointsPane";
 
 import { Accordion, AccordionPane } from "@recordreplay/accordion";
 
@@ -18,9 +17,6 @@ export default function SecondaryPanes() {
   const [scopesVisible, setScopesVisible] = useGraphQLUserData("layout_scopesPanelExpanded");
   const [callStackVisible, setCallStackVisible] = useGraphQLUserData(
     "layout_callStackPanelExpanded"
-  );
-  const [breakpointsVisible, setBreakpointsVisible] = useGraphQLUserData(
-    "layout_breakpointsPanelExpanded"
   );
   const [logpointsVisible, setLogpointsVisible] = useGraphQLUserData(
     "layout_logpointsPanelExpanded"
@@ -38,14 +34,6 @@ export default function SecondaryPanes() {
           onToggle={() => setLogpointsVisible(!logpointsVisible)}
         >
           <LogpointsPane />
-        </AccordionPane>
-        <AccordionPane
-          header="Breakpoints"
-          className="breakpoints-pane"
-          expanded={breakpointsVisible}
-          onToggle={() => setBreakpointsVisible(!breakpointsVisible)}
-        >
-          <BreakpointsPane />
         </AccordionPane>
         <AccordionPane
           header="Call Stack"

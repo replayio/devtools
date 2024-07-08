@@ -57,7 +57,6 @@ export default function useAddPoint({
 
       const pointBehavior: PointBehavior = {
         key,
-        shouldBreak: POINT_BEHAVIOR_DISABLED,
         shouldLog: POINT_BEHAVIOR_DISABLED,
         ...partialPointBehavior,
       };

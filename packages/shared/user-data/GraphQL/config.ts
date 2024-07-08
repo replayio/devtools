@@ -175,10 +175,6 @@ export const config = {
     legacyKey: "devtools.inspector.show_pseudo_elements",
   },
 
-  layout_breakpointsPanelExpanded: {
-    defaultValue: Boolean(true),
-    legacyKey: "devtools.debugger.breakpoints-visible",
-  },
   layout_callStackPanelExpanded: {
     defaultValue: Boolean(true),
     legacyKey: "devtools.debugger.call-stack-visible",

@@ -189,11 +189,11 @@ export function PointPanelWithHitPoints({
 
   const editable = user?.id === currentUserInfo?.id && !readOnlyMode;
 
-  const [showEditBreakpointNag, dismissEditBreakpointNag] = useNag(Nag.FIRST_BREAKPOINT_EDIT);
+  const [showEditLogPointNag, dismissEditLogPointNag] = useNag(Nag.FIRST_PRINT_STATEMENT_EDIT);
 
   const invalidateCache = useCacheRefresh();
 
-  const [isEditing, setIsEditing] = useState(!readOnlyMode && showEditBreakpointNag);
+  const [isEditing, setIsEditing] = useState(!readOnlyMode && showEditLogPointNag);
   const [isHovering, setIsHovering] = useState(false);
   const [editReason, setEditReason] = useState<EditReason | null>(null);
 
@@ -347,7 +347,7 @@ export function PointPanelWithHitPoints({
     if (isConditionValid && isContentValid) {
       setIsEditing(false);
       savePendingPointText(key);
-      dismissEditBreakpointNag();
+      dismissEditLogPointNag();
     }
   };
 
@@ -395,7 +395,7 @@ export function PointPanelWithHitPoints({
                 <div className={styles.Content}>
                   <div
                     className={
-                      showEditBreakpointNag ? styles.ContentInputWithNag : styles.ContentInput
+                      showEditLogPointNag ? styles.ContentInputWithNag : styles.ContentInput
                     }
                   >
                     <CodeEditor
@@ -524,12 +524,10 @@ export function PointPanelWithHitPoints({
             <div className={styles.Content}>
               {isEditing ? (
                 <div
-                  className={
-                    showEditBreakpointNag ? styles.ContentInputWithNag : styles.ContentInput
-                  }
+                  className={showEditLogPointNag ? styles.ContentInputWithNag : styles.ContentInput}
                 >
                   <CodeEditor
-                    autoFocus={showEditBreakpointNag || editReason === "content"}
+                    autoFocus={showEditLogPointNag || editReason === "content"}
                     autoSelect={editReason === "content"}
                     context={context}
                     dataTestId={`PointPanel-ContentInput-${lineNumber}`}

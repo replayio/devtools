@@ -1,5 +1,4 @@
 import {
-  BreakpointId,
   Result as EvaluationResult,
   ExecutionPoint,
   FrameId,
@@ -155,25 +154,6 @@ export class ReplayClient implements ReplayClientInterface {
 
     const handlers = this._eventHandlers.get(type)!;
     handlers.push(handler);
-  }
-
-  async breakpointAdded(location: Location, condition: string | null): Promise<BreakpointId> {
-    const sessionId = await this.waitForSession();
-
-    const { breakpointId } = await client.Debugger.setBreakpoint(
-      {
-        condition: condition || undefined,
-        location,
-      },
-      sessionId
-    );
-
-    return breakpointId;
-  }
-
-  async breakpointRemoved(breakpointId: BreakpointId): Promise<void> {
-    const sessionId = await this.waitForSession();
-    await client.Debugger.removeBreakpoint({ breakpointId }, sessionId);
   }
 
   async getBuildId(): Promise<string> {

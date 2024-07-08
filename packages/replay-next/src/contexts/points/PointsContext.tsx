@@ -16,7 +16,6 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Badge, Point, PointKey } from "shared/client/types";
 import { updatePoint as updatePointGraphQL } from "shared/graphql/Points";
 
-import useBreakpointIdsFromServer from "../../hooks/useBreakpointIdsFromServer";
 import { SessionContext } from "../SessionContext";
 import useAddPoint from "./hooks/useAddPoint";
 import useDeletePoints from "./hooks/useDeletePoints";
@@ -236,8 +235,6 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
     setPendingPointText,
     setPointBehaviors: setLocalPointBehaviors,
   });
-
-  useBreakpointIdsFromServer(replayClient, savedPoints, localPointBehaviors, deletePoints);
 
   const context = useMemo<PointsContextType>(
     () => ({

@@ -175,7 +175,6 @@ export default function SourceListRow({
        */}
       {isScrolling || (
         <SourceListRowMouseEvents
-          lineHasLogPoint={showPointPanel}
           lineHitCounts={lineHitCounts}
           lineNumber={lineNumber}
           pointBehavior={pointBehavior}

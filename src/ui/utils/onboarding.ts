@@ -35,12 +35,12 @@ export function shouldShowConsoleNavigate(nags: Nag[]): boolean {
   return shouldShowNag(nags, Nag.FIRST_CONSOLE_NAVIGATE);
 }
 
-export function shouldShowBreakpointAdd(nags: Nag[]): boolean {
-  return shouldShowNag(nags, Nag.FIRST_BREAKPOINT_ADD);
+export function shouldShowAddLogPoint(nags: Nag[]): boolean {
+  return shouldShowNag(nags, Nag.FIRST_PRINT_STATEMENT_ADD);
 }
 
-export function shouldShowBreakpointEdit(nags: Nag[]): boolean {
-  return shouldShowNag(nags, Nag.FIRST_BREAKPOINT_EDIT);
+export function shouldShowEditLogPoint(nags: Nag[]): boolean {
+  return shouldShowNag(nags, Nag.FIRST_PRINT_STATEMENT_EDIT);
 }
 
 export function shouldShowAddComment(nags: Nag[]): boolean {
@@ -125,6 +125,6 @@ export function shouldShowInspectReactComponent(nags: Nag[]): boolean {
 
 export function shouldShowTour(nags: Nag[]): boolean {
   const showTour = shouldShowNag(nags, Nag.DISMISS_TOUR);
-  const showBreakpointEdit = shouldShowBreakpointEdit(nags);
+  const showBreakpointEdit = shouldShowEditLogPoint(nags);
   return showTour && showBreakpointEdit;
 }
