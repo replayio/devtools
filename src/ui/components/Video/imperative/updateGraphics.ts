@@ -1,9 +1,9 @@
 import { ExecutionPoint, ScreenShot } from "@replayio/protocol";
 
-import { PaintsCache, findMostRecentPaint } from "protocol/PaintsCache";
+import { PaintsCache, findMostRecentPaint, findMostRecentPaintIndex } from "protocol/PaintsCache";
 import { RepaintGraphicsCache } from "protocol/RepaintGraphicsCache";
 import { paintHashCache } from "replay-next/src/suspense/PaintHashCache";
-import { screenshotCache } from "replay-next/src/suspense/ScreenshotCache";
+import { screenshotCache, videoCache } from "replay-next/src/suspense/ScreenshotCache";
 import { ReplayClientInterface } from "shared/client/types";
 import { updateState } from "ui/components/Video/imperative/MutableGraphicsState";
 
@@ -32,9 +32,11 @@ export async function updateGraphics({
   }
 
   const promises: Promise<ScreenShot | undefined>[] = [];
+  const videos = await videoCache.readAsync(replayClient);
 
   // If the current time is before the first paint, we should show nothing
   const paintPoint = findMostRecentPaint(time);
+  const paintIndex = findMostRecentPaintIndex(time);
   const isBeforeFirstCachedPaint = !paintPoint || !paintPoint.paintHash;
   if (isBeforeFirstCachedPaint) {
     updateState(graphicsElement, {
@@ -44,7 +46,7 @@ export async function updateGraphics({
       status: executionPoint ? "loading" : "loaded",
       time,
     });
-  } else {
+  } else if (videos.length == 0) {
     const cachedScreenShot = paintHashCache.getValueIfCached(paintPoint.paintHash);
     if (cachedScreenShot) {
       // If this screenshot has already been cached, skip fetching it again
@@ -63,19 +65,33 @@ export async function updateGraphics({
   }
 
   let repaintGraphicsScreenShot: ScreenShot | undefined = undefined;
-  if (executionPoint) {
-    const promise = fetchRepaintGraphics({
-      executionPoint,
-      replayClient,
-      time,
-    }).then(screenShot => {
-      repaintGraphicsScreenShot = screenShot;
+  // if (executionPoint) {
+  //   const promise = fetchRepaintGraphics({
+  //     executionPoint,
+  //     replayClient,
+  //     time,
+  //   }).then(screenShot => {
+  //     repaintGraphicsScreenShot = screenShot;
 
-      return screenShot;
+  //     return screenShot;
+  //   });
+
+  //   promises.push(promise);
+  // }
+
+  if (videos.length > 0) {
+    updateState(graphicsElement, {
+      executionPoint,
+      screenShotType: repaintGraphicsScreenShot != null ? "repaint" : "cached-paint",
+      status: "loaded",
+      time,
+      paintIndex,
+      videos
     });
 
-    promises.push(promise);
+    return true;
   }
+
 
   if (promises.length === 0) {
     // If we are before the first paint and have no execution point to request a repaint,
@@ -97,6 +113,7 @@ export async function updateGraphics({
       screenShotType: repaintGraphicsScreenShot != null ? "repaint" : "cached-paint",
       status: "loaded",
       time,
+      paintIndex,
     });
 
     if (repaintGraphicsScreenShot != null) {

@@ -31,6 +31,8 @@ export default function Video() {
   useLayoutEffect(() => {
     const containerElement = document.getElementById("video") as HTMLDivElement;
     const graphicsElement = document.getElementById("graphics") as HTMLImageElement;
+    const videoElement = document.getElementById("webmvideo") as HTMLVideoElement;
+    const videoSourceElement = document.getElementById("videoSrc") as HTMLSourceElement;
     const graphicsOverlayElement = document.getElementById("overlay-graphics") as HTMLDivElement;
 
     let prevState: Partial<State> = {};
@@ -38,13 +40,27 @@ export default function Video() {
 
     // Keep graphics in sync with the imperatively managed screenshot state
     state.listen(nextState => {
-      if (nextState.screenShot != prevState.screenShot) {
-        const { screenShot } = nextState;
-        if (screenShot) {
-          graphicsElement.src = `data:${screenShot.mimeType};base64,${screenShot.data}`;
-        } else {
-          graphicsElement.src = "";
+      if (nextState.videos.length > 0 && !videoElement.src) {
+        graphicsElement.hidden = true;
+        videoElement.hidden = false;
+        videoElement.src = `data:video/webm;base64,${nextState.videos[0].data}`;
+      } else {
+        if (nextState.screenShot != prevState.screenShot) {
+          const { screenShot } = nextState;
+          if (screenShot) {
+            graphicsElement.src = `data:${screenShot.mimeType};base64,${screenShot.data}`;
+            graphicsElement.hidden = false;
+            videoElement.hidden = true;
+          } else {
+            graphicsElement.src = "";
+            videoSourceElement.src = "";
+          }
         }
+      }
+
+      const { videos, paintIndex } = nextState;
+      if (videos.length > 0 && paintIndex !== null && paintIndex > 0) {
+        videoElement.currentTime = (paintIndex - 1) * (1.0 / videos[0].fps);
       }
 
       // Show loading progress bar if graphics stall for longer than 5s
@@ -116,6 +132,9 @@ export default function Video() {
       </div>
 
       <img className={styles.Image} id="graphics" onClick={onClick} />
+      <video className={styles.Image} id="webmvideo" onClick={onClick}>
+        <source type="video/webm" id="videoSrc"/>
+      </video>
 
       {/* Graphics that are relative to the rendered screenshot go here; this container is automatically positioned to align with the screenshot */}
       <div className={styles.Graphics} id="overlay-graphics">

@@ -1,4 +1,4 @@
-import { ExecutionPoint, ScreenShot } from "@replayio/protocol";
+import { ExecutionPoint, ScreenShot, Video } from "@replayio/protocol";
 import { createCache } from "suspense";
 
 import { paintHashCache } from "replay-next/src/suspense/PaintHashCache";
@@ -17,5 +17,18 @@ export const screenshotCache = createCache<
     paintHashCache.cacheValue(screenShot, screenShot.hash);
 
     return screenShot;
+  },
+});
+
+export const videoCache = createCache<
+  [replayClient: ReplayClientInterface],
+  Video[]
+>({
+  config: { immutable: true },
+  debugLabel: "ScreenshotCache",
+  getKey: ([client]) => client.getRecordingId() || "",
+  load: async ([client]) => {
+    const videos = await client.getVideos();
+    return videos;
   },
 });
