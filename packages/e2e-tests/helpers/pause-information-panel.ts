@@ -343,7 +343,6 @@ export function findPoints(
 
   const selectorCriteria = [
     '[data-test-name="LogPoint"]',
-    `[data-test-type="${type}"]`,
     columnIndex != null ? `[data-test-column-index="${columnIndex}"]` : "",
     lineNumber != null ? `[data-test-line-number="${lineNumber}"]` : "",
     sourceId != null ? `[data-test-source-id="${sourceId}"]` : "",

@@ -10,7 +10,6 @@ import {
   seekToPreviousLogPointHit,
   verifyLogpointStep,
 } from "../helpers/source-panel";
-import { delay } from "../helpers/utils";
 import test, { expect } from "../testFixture";
 
 test.use({ exampleKey: "doc_rr_basic.html" });
