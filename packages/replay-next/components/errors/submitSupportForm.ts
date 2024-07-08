@@ -21,6 +21,11 @@ export async function submitSupportForm({
   text: string;
 }) {
   // TODO [PRO-698] Replace Form Carry with Honeycomb and pass along context
+  text = JSON.stringify({
+    context,
+    shareWithReplaySupport,
+    text,
+  });
 
   const result = await fetch("/api/feedback", {
     method: "POST",
