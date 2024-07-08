@@ -268,6 +268,10 @@ export type DependencyChainStepInfo =
       code: "ReactCallSetState";
     }
   | {
+      // A React external store triggered a rerender.
+      code: "ReactExternalStoreRerender";
+    }
+  | {
       // An application render function called useEffect().
       code: "ReactCallUseEffect";
     }
@@ -289,6 +293,12 @@ export type DependencyChainStep = DependencyChainStepInfo & {
   time?: number;
   point?: ExecutionPoint;
 };
+
+export enum DependencyGraphMode {
+  // Renders of a fiber depend on the last time the parent of that fiber was
+  // rendered, instead of whatever triggered the fiber's render.
+  ReactParentRenders = "ReactParentRenders",
+}
 
 export interface ReplayClientInterface {
   get loadedRegions(): LoadedRegions | null;
@@ -437,6 +447,9 @@ export interface ReplayClientInterface {
     }) => void,
     onSourceContentsChunk: ({ chunk, sourceId }: { chunk: string; sourceId: SourceId }) => void
   ): Promise<void>;
-  getDependencies(point: ExecutionPoint): Promise<DependencyChainStep[]>;
+  getDependencies(
+    point: ExecutionPoint,
+    mode?: DependencyGraphMode
+  ): Promise<DependencyChainStep[]>;
   waitForSession(): Promise<string>;
 }
