@@ -33,6 +33,8 @@ export async function closePrintStatementsAccordionPane(page: Page): Promise<voi
 export async function expandAllScopesBlocks(page: Page): Promise<void> {
   await debugPrint(page, "Expanding all Scopes blocks", "expandAllScopesBlocks");
 
+  await openPauseInformationPanel(page);
+
   const scopesPanel = getScopesPanel(page);
   const blocks = scopesPanel.locator('[data-test-name="ScopesInspector"]');
 
@@ -184,6 +186,8 @@ export async function reverseStepOverToLine(page: Page, line: number) {
 
 export async function selectFrame(page: Page, index: number): Promise<void> {
   await debugPrint(page, `Select frame ${chalk.bold(index)}`, "selectFrame");
+
+  await openPauseInformationPanel(page);
 
   const framesPanel = getFramesPanel(page);
 
