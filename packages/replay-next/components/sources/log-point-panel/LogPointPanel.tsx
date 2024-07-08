@@ -263,12 +263,7 @@ export function PointPanelWithHitPoints({
     }
   };
 
-  const toggleShouldLog = (event?: MouseEvent<HTMLElement>) => {
-    if (event) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
-
+  const toggleShouldLog = () => {
     editPointBehavior(
       key,
       {
@@ -515,7 +510,12 @@ export function PointPanelWithHitPoints({
                 className={styles.ButtonWithIcon}
                 data-test-name="PointPanel-DisabledButton"
                 disabled={isPending}
-                onClick={toggleShouldLog}
+                onClick={event => {
+                  event.preventDefault();
+                  event.stopPropagation();
+
+                  toggleShouldLog();
+                }}
               >
                 <Icon className={styles.DisabledIcon} data-disabled type="toggle-off" />
               </button>
