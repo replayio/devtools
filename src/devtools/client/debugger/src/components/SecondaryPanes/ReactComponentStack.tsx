@@ -43,6 +43,10 @@ function ReactComponentStack({ point }: { point?: TimeStampedPoint }) {
     point ?? null
   );
 
+  if (!point) {
+    return null;
+  }
+
   let reactStackContent: React.ReactNode = undefined;
 
   if (reactStackStatus === "rejected") {
@@ -50,15 +54,27 @@ function ReactComponentStack({ point }: { point?: TimeStampedPoint }) {
   } else if (reactStackStatus === "pending") {
     reactStackContent = <Loader />;
   } else {
+    const firstItem = reactStackValue?.[0];
     reactStackContent = (
       <div className="m-1 flex grow flex-col border">
         <h3 className="text-base font-bold">React Component Stack</h3>
+        {/* Show the _current_ location, by itself */}
+        {firstItem && (
+          <div className="m-1 flex flex-col">
+            <div title={firstItem.componentLocation?.url}>
+              {firstItem.componentName} ({point.time.toFixed(2)}){" "}
+              <JumpToDefinitionButton point={point} />
+            </div>
+          </div>
+        )}
         {reactStackValue?.map((entry, index) => {
           const jumpButton = entry.point ? <JumpToDefinitionButton point={entry} /> : null;
           return (
             <div key={index} className="m-1 flex flex-col">
-              <div title={entry.parentLocation.url}>
-                &lt;{entry.componentName}&gt; {jumpButton}
+              <div title={entry.parentLocation?.url}>
+                {/* Show the parent->child rendering relationship */}
+                {entry.parentComponentName} &#8594; &lt;{entry.componentName}&gt; (
+                {entry.time?.toFixed(2)}) {jumpButton}
               </div>
             </div>
           );
@@ -75,7 +91,7 @@ function DepGraphDisplay({
   mode,
   title,
 }: {
-  point: ExecutionPoint;
+  point?: ExecutionPoint;
   mode?: DependencyGraphMode;
   title: string;
 }) {
@@ -84,7 +100,7 @@ function DepGraphDisplay({
   const { status: depGraphStatus, value: depGraphValue } = useImperativeCacheValue(
     depGraphCache,
     replayClient,
-    point,
+    point ?? null,
     mode ?? null
   );
 
@@ -142,21 +158,19 @@ function DepGraphDisplay({
 export function DepGraphPrototypePanel() {
   const { point, time, pauseId } = useMostRecentLoadedPause() ?? {};
   const replayClient = useContext(ReplayClientContext);
-  const [currentPoint, setCurrentPoint] = useState<ExecutionPoint | null>(null);
+  const [currentPoint, setCurrentPoint] = useState<TimeStampedPoint | null>(null);
 
   if (!pauseId || !point || !time) {
     return <div>Not paused at a point</div>;
   }
 
-  let timeStampedPoint: TimeStampedPoint = { point, time };
-
   return (
     <div className="react-component-stack flex flex-col">
-      <Button className="self-start" onClick={() => setCurrentPoint(point)}>
+      <Button className="self-start" onClick={() => setCurrentPoint({ point, time })}>
         Load dependencies
       </Button>
-      <ReactComponentStack point={timeStampedPoint} />
-      <DepGraphDisplay point={point} title="Dep Graph (Regular)" />
+      <ReactComponentStack point={currentPoint ?? undefined} />
+      <DepGraphDisplay point={currentPoint?.point} title="Dep Graph (Regular)" />
       <DepGraphDisplay
         point={point}
         mode={DependencyGraphMode.ReactParentRenders}
