@@ -320,6 +320,7 @@ export async function editLogPoint(
       .locator('[data-test-name="PointPanel-ContentWrapper"] [data-lexical-editor="true"]')
       .isVisible();
     if (!isEditing) {
+      await line.locator('[data-test-name="PointPanel-IconAndAvatar"]').hover();
       await line.locator('[data-test-name="PointPanel-EditButton"]').click();
     }
 
