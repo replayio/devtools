@@ -15,8 +15,6 @@ import { getSelectedLineNumber, waitForSelectedSource } from "../helpers/source-
 import { debugPrint, waitFor } from "../helpers/utils";
 import test, { expect } from "../testFixture";
 
-// Why is this even getting confused as an API key?
-// trunk-ignore(gitleaks/generic-api-key)
 test.use({ exampleKey: "logpoints-01" });
 
 test("react_devtools-02: RDT integrations (Chromium)", async ({

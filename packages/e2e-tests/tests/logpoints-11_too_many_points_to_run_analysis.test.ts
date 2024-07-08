@@ -15,7 +15,6 @@ import test, { expect } from "../testFixture";
 const sourceUrl = "react-dom.production.js";
 const lineNumber = 12196;
 
-// trunk-ignore(gitleaks/generic-api-key)
 test.use({ exampleKey: "logpoints-01" });
 
 test(`logpoints-11: too-many-points-to-run-analysis UX`, async ({
