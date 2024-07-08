@@ -78,7 +78,13 @@ import throttle from "lodash/throttle";
 import uniqueId from "lodash/uniqueId";
 
 // eslint-disable-next-line no-restricted-imports
-import { addEventListener, client, initSocket, removeEventListener, sendMessage } from "protocol/socket";
+import {
+  addEventListener,
+  client,
+  initSocket,
+  removeEventListener,
+  sendMessage,
+} from "protocol/socket";
 import { assert, compareNumericStrings, defer, waitForTime } from "protocol/utils";
 import { initProtocolMessagesStore } from "replay-next/components/protocol/ProtocolMessagesStore";
 import { insert } from "replay-next/src/utils/array";
@@ -88,11 +94,12 @@ import { isPointInRegion, isRangeInRegions } from "shared/utils/time";
 
 import {
   AnnotationListener,
+  DependencyChainStep,
+  DependencyGraphMode,
   ReplayClientEvents,
   ReplayClientInterface,
   SourceLocationRange,
   TimeStampedPointWithPaintHash,
-  DependencyChainStep,
 } from "./types";
 
 export const MAX_POINTS_TO_FIND = 10_000;
@@ -1208,9 +1215,16 @@ export class ReplayClient implements ReplayClientInterface {
     return this.focusWindow;
   }
 
-  async getDependencies(point: ExecutionPoint): Promise<DependencyChainStep[]> {
+  async getDependencies(
+    point: ExecutionPoint,
+    mode?: DependencyGraphMode
+  ): Promise<DependencyChainStep[]> {
     const sessionId = await this.waitForSession();
-    const result = await sendMessage("Session.experimentalCommand", { name: "analyzeDependencies", params: { point } }, sessionId);
+    const result = await sendMessage(
+      "Session.experimentalCommand",
+      { name: "analyzeDependencies", params: { point, mode } },
+      sessionId
+    );
     return result.rval.dependencies;
   }
 

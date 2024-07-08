@@ -10,7 +10,7 @@ import NewFrames from "./Frames/NewFrames";
 import FrameTimeline from "./FrameTimeline";
 import LogpointsPane from "./LogpointsPane";
 import NewScopes from "./NewScopes";
-import { ReactComponentStack } from "./ReactComponentStack";
+import { DepGraphPrototypePanel } from "./ReactComponentStack";
 
 import { Accordion, AccordionPane } from "@recordreplay/accordion";
 
@@ -65,7 +65,7 @@ export default function SecondaryPanes() {
           expanded={reactStackVisible}
           onToggle={() => setReactStackVisible(!reactStackVisible)}
         >
-          {currentPoint && <ReactComponentStack />}
+          {currentPoint && <DepGraphPrototypePanel />}
         </AccordionPane>
         <AccordionPane
           header="Scopes"
