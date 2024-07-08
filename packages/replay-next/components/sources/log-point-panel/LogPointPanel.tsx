@@ -1,5 +1,6 @@
 import { TimeStampedPoint, TimeStampedPointRange } from "@replayio/protocol";
 import {
+  MouseEvent,
   Suspense,
   unstable_useCacheRefresh as useCacheRefresh,
   useContext,
@@ -193,6 +194,7 @@ export function PointPanelWithHitPoints({
   const invalidateCache = useCacheRefresh();
 
   const [isEditing, setIsEditing] = useState(!readOnlyMode && showEditBreakpointNag);
+  const [isHovering, setIsHovering] = useState(false);
   const [editReason, setEditReason] = useState<EditReason | null>(null);
 
   const [isPending, startTransition] = useTransition();
@@ -415,7 +417,7 @@ export function PointPanelWithHitPoints({
                   </div>
 
                   <RemoveConditionalButton
-                    disabled={isPending}
+                    disabled={isPending || !editable}
                     invalid={!isConditionValid}
                     onClick={toggleCondition}
                   />
@@ -432,7 +434,7 @@ export function PointPanelWithHitPoints({
                   </div>
 
                   <RemoveConditionalButton
-                    disabled={isPending}
+                    disabled={isPending || !editable}
                     invalid={!isConditionValid}
                     onClick={toggleCondition}
                   />
@@ -494,12 +496,30 @@ export function PointPanelWithHitPoints({
             data-state-logging-enabled={shouldLog}
             data-test-name="PointPanel-ContentWrapper"
             onClick={() => startEditing("content")}
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
           >
-            <BadgePicker
-              disabled={!editable}
-              invalid={!isContentValid}
-              point={pointWithPendingEdits}
-            />
+            {shouldLog ? (
+              <BadgePicker
+                disabled={!editable}
+                invalid={!isContentValid}
+                point={pointWithPendingEdits}
+              />
+            ) : (
+              <button
+                className={styles.ButtonWithIcon}
+                data-test-name="PointPanel-DisabledButton"
+                disabled={isPending}
+                onClick={event => {
+                  event.preventDefault();
+                  event.stopPropagation();
+
+                  toggleShouldLog();
+                }}
+              >
+                <Icon className={styles.DisabledIcon} data-disabled type="toggle-off" />
+              </button>
+            )}
 
             <div className={styles.Content}>
               {isEditing ? (
@@ -532,23 +552,24 @@ export function PointPanelWithHitPoints({
                   fileExtension=".js"
                 />
               )}
-              <div className={styles.DisabledIconAndAvatar}>
+              <div className={styles.IconAndAvatar} data-test-name="PointPanel-IconAndAvatar">
                 {isEditing ? (
                   saveButton
-                ) : editable ? (
+                ) : editable && isHovering ? (
                   <button
                     className={styles.ButtonWithIcon}
                     data-test-name="PointPanel-EditButton"
                     disabled={isPending}
                   >
-                    <Icon className={styles.ButtonIcon} type={shouldLog ? "edit" : "toggle-off"} />
+                    <Icon className={styles.ButtonIcon} type="edit" />
                   </button>
-                ) : null}
-                <AvatarImage
-                  className={styles.CreatedByAvatar}
-                  src={user?.picture || undefined}
-                  title={user?.name || undefined}
-                />
+                ) : (
+                  <AvatarImage
+                    className={styles.CreatedByAvatar}
+                    src={user?.picture || undefined}
+                    title={user?.name || undefined}
+                  />
+                )}
               </div>
             </div>
           </div>

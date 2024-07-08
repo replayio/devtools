@@ -159,7 +159,7 @@
   justify-content: center;
   line-height: 1.5rem;
   height: 1rem;
-  width: 1rem;
+  min-width: 1rem;
   cursor: pointer;
   color: var(--point-panel-input-edit-button-color);
 }
@@ -171,6 +171,11 @@
 }
 .ButtonWithIcon[data-invalid]:hover {
   color: var(--point-panel-input-disabled-cancel-button-color-hover);
+}
+.ButtonWithIcon:disabled,
+.ButtonWithIcon:disabled:hover {
+  cursor: default;
+  color: var(--point-panel-input-edit-button-color);
 }
 
 .ContentInput,
@@ -211,7 +216,7 @@
   flex: 0 0 1.5rem;
 }
 
-.DisabledIconAndAvatar {
+.IconAndAvatar {
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -230,4 +235,14 @@
   white-space: pre-wrap;
   word-break: break-word;
   padding: 0.25rem 0;
+}
+
+.ButtonIcon {
+  height: 1rem;
+  width: 1rem;
+}
+
+.DisabledIcon {
+  height: 1rem;
+  width: 1.25rem;
 }
