@@ -1,0 +1,41 @@
+.Buttons {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1px;
+}
+
+.Button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 1rem;
+  width: 0.75rem;
+
+  outline: none;
+  border: none;
+  padding: 0;
+}
+.Button[data-test-name="RewindButton"] {
+  border-bottom-left-radius: 0.125rem;
+  border-top-left-radius: 0.125rem;
+}
+.Button[data-test-name="FastForwardButton"] {
+  border-bottom-right-radius: 0.125rem;
+  border-top-right-radius: 0.125rem;
+}
+
+.Button {
+  background-color: var(--background-color-primary-button);
+  color: var(--color-primary-button);
+}
+.Button[disabled] {
+  background-color: var(--background-color-disabled-button);
+  color: var(--color-disabled-button);
+  cursor: default;
+}
+
+.Icon {
+  width: 0.5rem;
+  height: 0.5rem;
+}

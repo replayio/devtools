@@ -1,8 +1,5 @@
 .Button,
 .ButtonWithNag {
-  position: absolute;
-  left: calc(var(--source-line-number-offset) + var(--source-hit-count-offset));
-
   border-radius: 0.25rem;
 
   display: flex;
@@ -29,4 +26,9 @@
 .ButtonWithNag {
   background-color: var(--background-color-secondary-button);
   color: var(--color-secondary-button);
+}
+
+.Icon {
+  width: 0.75rem;
+  height: 0.75rem;
 }

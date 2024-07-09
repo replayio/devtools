@@ -8,7 +8,6 @@ import {
   SourceSearchContext,
   SourceSearchContextRoot,
 } from "replay-next/components/sources/SourceSearchContext";
-import { KeyboardModifiersContextRoot } from "replay-next/src/contexts/KeyboardModifiersContext";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import { getSourceSuspends } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -22,13 +21,11 @@ import "replay-next/components/sources/CodeMirror.css";
 
 export default function NewSourceAdapterRoot() {
   return (
-    <KeyboardModifiersContextRoot>
-      <SourceFileNameSearchContextRoot>
-        <SourceSearchContextRoot>
-          <NewSourceAdapter />
-        </SourceSearchContextRoot>
-      </SourceFileNameSearchContextRoot>
-    </KeyboardModifiersContextRoot>
+    <SourceFileNameSearchContextRoot>
+      <SourceSearchContextRoot>
+        <NewSourceAdapter />
+      </SourceSearchContextRoot>
+    </SourceFileNameSearchContextRoot>
   );
 }
 
