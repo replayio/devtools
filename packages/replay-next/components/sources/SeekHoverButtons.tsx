@@ -99,7 +99,7 @@ function Buttons({
         disabled={goToPrevPoint == null}
         onClick={goToPrevPoint}
       >
-        <Icon className={styles.Icon} type="rewind" />
+        <Icon className={styles.Icon} type="arrow-left" />
       </button>
       <button
         className={styles.Button}
@@ -107,7 +107,7 @@ function Buttons({
         disabled={goToNextPoint == null}
         onClick={goToNextPoint}
       >
-        <Icon className={styles.Icon} type="fast-forward" />
+        <Icon className={styles.Icon} type="arrow-right" />
       </button>
     </div>
   );

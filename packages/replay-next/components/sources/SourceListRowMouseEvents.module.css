@@ -12,13 +12,8 @@
   font-size: var(--font-size-small);
   width: calc(var(--line-number-size) + 2ch - 0.25rem);
   justify-content: flex-end;
-  border-right: none;
+  background-color: var(--body-bgcolor);
 }
 .PositionRight {
   left: calc(var(--source-line-number-offset) + var(--source-hit-count-offset) - 0.25rem);
-}
-
-.BackgroundBlocker {
-  background-color: var(--body-bgcolor);
-  border-radius: 0.25rem;
 }
