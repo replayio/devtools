@@ -109,7 +109,7 @@ export function SourceListRowMouseEvents({
       {isRowHovered && lineHitCounts && (
         <InlineErrorBoundary name="SourceListRowMouseEvents-HoverButton" fallback={null}>
           <div className={styles.PositionLeft}>
-            <div className={styles.Background}>
+            <div className={styles.BackgroundBlocker}>
               <SeekHoverButtons
                 lineHitCounts={lineHitCounts}
                 lineNumber={lineNumber}
@@ -118,19 +118,17 @@ export function SourceListRowMouseEvents({
             </div>
           </div>
           <div className={styles.PositionRight}>
-            <div className={styles.Background}>
-              <LogpointHoverButton
-                addPoint={addPoint}
-                deletePoints={deletePoints}
-                editPendingPointText={editPendingPointText}
-                editPointBehavior={editPointBehavior}
-                lineHitCounts={lineHitCounts}
-                lineNumber={lineNumber}
-                point={pointForDefaultPriority}
-                pointBehavior={pointBehavior}
-                source={source}
-              />
-            </div>
+            <LogpointHoverButton
+              addPoint={addPoint}
+              deletePoints={deletePoints}
+              editPendingPointText={editPendingPointText}
+              editPointBehavior={editPointBehavior}
+              lineHitCounts={lineHitCounts}
+              lineNumber={lineNumber}
+              point={pointForDefaultPriority}
+              pointBehavior={pointBehavior}
+              source={source}
+            />
           </div>
         </InlineErrorBoundary>
       )}

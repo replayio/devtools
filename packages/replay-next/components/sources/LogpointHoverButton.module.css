@@ -11,21 +11,27 @@
   outline: none;
   border: none;
   padding: 0;
-}
-
-.Button {
   background-color: var(--background-color-primary-button);
   color: var(--color-primary-button);
+  transition: 200ms;
 }
-.Button[disabled] {
-  background-color: var(--background-color-disabled-button);
-  color: var(--color-disabled-button);
-  cursor: default;
+.Button:hover:not(:disabled) {
+  background-color: var(--background-color-primary-button-hover);
 }
 
 .ButtonWithNag {
   background-color: var(--background-color-secondary-button);
   color: var(--color-secondary-button);
+}
+.ButtonWithNag:hover:not(:disabled) {
+  background-color: var(--background-color-secondary-button-hover);
+}
+
+.Button[disabled],
+.ButtonWithNag[disabled] {
+  background-color: var(--background-color-disabled-button);
+  color: var(--color-disabled-button);
+  cursor: default;
 }
 
 .Icon {

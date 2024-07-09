@@ -15,7 +15,19 @@
   outline: none;
   border: none;
   padding: 0;
+  background-color: var(--background-color-primary-button);
+  color: var(--color-primary-button);
+  transition: 200ms;
 }
+.Button:hover:not(:disabled) {
+  background-color: var(--background-color-primary-button-hover);
+}
+.Button[disabled] {
+  background-color: var(--background-color-disabled-button);
+  color: var(--color-disabled-button);
+  cursor: default;
+}
+
 .Button[data-test-name="RewindButton"] {
   border-bottom-left-radius: 0.125rem;
   border-top-left-radius: 0.125rem;
@@ -23,16 +35,6 @@
 .Button[data-test-name="FastForwardButton"] {
   border-bottom-right-radius: 0.125rem;
   border-top-right-radius: 0.125rem;
-}
-
-.Button {
-  background-color: var(--background-color-primary-button);
-  color: var(--color-primary-button);
-}
-.Button[disabled] {
-  background-color: var(--background-color-disabled-button);
-  color: var(--color-disabled-button);
-  cursor: default;
 }
 
 .Icon {
