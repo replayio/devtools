@@ -1,7 +1,6 @@
 import { openDevToolsTab, startTest } from "../helpers";
 import { waitForTerminal, warpToMessage } from "../helpers/console-panel";
 import {
-  closeBreakpointsAccordionPane,
   closeCallStackAccordionPane,
   closePrintStatementsAccordionPane,
   getScopeChildren,
@@ -25,7 +24,6 @@ test(`object_preview-02: should allow objects in scope to be inspected`, async (
 
   await openPauseInformationPanel(page);
 
-  await closeBreakpointsAccordionPane(page);
   await closePrintStatementsAccordionPane(page);
   await closeCallStackAccordionPane(page);
   await openScopesAccordionPane(page);

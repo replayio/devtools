@@ -33,7 +33,7 @@ test(`logpoints-06: should be temporarily disabled`, async ({
   // Find the newly added point in the side panel
   await openPauseInformationPanel(page);
   await openPrintStatementsAccordionPane(page);
-  const logpoints = findPoints(page, "logpoint", { lineNumber });
+  const logpoints = findPoints(page, { lineNumber });
   await expect(await logpoints.count()).toBe(1);
   const logpoint = logpoints.first();
 

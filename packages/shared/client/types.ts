@@ -1,6 +1,5 @@
 import {
   Annotation,
-  BreakpointId,
   ContentType,
   Result as EvaluationResult,
   EventHandlerType,
@@ -140,7 +139,6 @@ export type Point = {
 // Behaviors are modifiable by everyone (regardless of who created a point).
 export type PointBehavior = {
   key: PointKey;
-  shouldBreak: POINT_BEHAVIOR;
   shouldLog: POINT_BEHAVIOR;
 };
 
@@ -167,8 +165,6 @@ export type AnnotationListener = (annotation: Annotation) => void;
 export interface ReplayClientInterface {
   get loadedRegions(): LoadedRegions | null;
   addEventListener(type: ReplayClientEvents, handler: Function): void;
-  breakpointAdded(location: Location, condition: string | null): Promise<BreakpointId>;
-  breakpointRemoved(breakpointId: BreakpointId): Promise<void>;
   configure(sessionId: string): Promise<void>;
   createPause(executionPoint: ExecutionPoint): Promise<createPauseResult>;
   evaluateExpression(

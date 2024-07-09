@@ -1,5 +1,5 @@
 import { SourceId } from "@replayio/protocol";
-import { ReactNode, useContext, useMemo } from "react";
+import { useContext, useMemo } from "react";
 
 import { PointsContext } from "replay-next/src/contexts/points/PointsContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
@@ -7,19 +7,13 @@ import { useSourcesById } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { POINT_BEHAVIOR_DISABLED, Point } from "shared/client/types";
 
-import Breakpoint from "./Breakpoint";
-import BreakpointHeading from "./BreakpointHeading";
-import styles from "./Breakpoints.module.css";
+import Logpoint from "./Logpoint";
+import LogpointHeading from "./LogpointHeading";
+import styles from "./LogpointsPane.module.css";
 
 export type SourceIdToPointsMap = { [key: SourceId]: Point[] };
 
-export default function Breakpoints({
-  emptyContent,
-  type,
-}: {
-  emptyContent: ReactNode;
-  type: "breakpoint" | "logpoint";
-}) {
+export default function LogpointsPane() {
   const replayClient = useContext(ReplayClientContext);
   const {
     deletePoints,
@@ -41,31 +35,25 @@ export default function Breakpoints({
           // Ensure we only show points that have valid sources available.
           const sourceExists = sourceDetailsEntities.has(point.location.sourceId);
 
-          const { shouldBreak, shouldLog } = pointBehaviors[point.key] ?? {};
+          const { shouldLog } = pointBehaviors[point.key] ?? {};
 
           // Show both enabled and temporarily disabled points.
           // Also show all shared points (even if disabled).
-          const behavior = type === "breakpoint" ? shouldBreak : shouldLog;
-
           let matchesType = false;
-          if (behavior != null) {
-            matchesType = behavior !== POINT_BEHAVIOR_DISABLED;
+          if (shouldLog != null) {
+            matchesType = shouldLog !== POINT_BEHAVIOR_DISABLED;
           } else {
-            if (type === "logpoint") {
-              // Don't show shared print statements without content;
-              // it would be a confusing user experience (since they aren't editable anyway).
-              // Note this is an edge case guard that shouldn't be necessary
-              // because useRemotePoints filters breaking-only points.
-              matchesType = !!point.content;
-            } else {
-              matchesType = true;
-            }
+            // Don't show shared print statements without content;
+            // it would be a confusing user experience (since they aren't editable anyway).
+            // Note this is an edge case guard that shouldn't be necessary
+            // because useRemotePoints filters breaking-only points.
+            matchesType = !!point.content;
           }
 
           return sourceExists && matchesType;
         })
         .sort((a, b) => a.location.line - b.location.line),
-    [pointBehaviors, points, type, sourceDetailsEntities]
+    [pointBehaviors, points, sourceDetailsEntities]
   );
 
   const sourceIdToPointsMap = useMemo(() => {
@@ -81,8 +69,8 @@ export default function Breakpoints({
 
   if (filteredAndSortedPoints.length === 0) {
     return (
-      <div className={styles.Breakpoints}>
-        <div className={styles.Empty}>{emptyContent}</div>
+      <div className={styles.LogpointsPane}>
+        <div className={styles.Empty}>Click in the editor to add a print statement</div>
       </div>
     );
   }
@@ -90,18 +78,18 @@ export default function Breakpoints({
   const entries = Object.entries(sourceIdToPointsMap);
 
   return (
-    <div className={styles.Breakpoints}>
+    <div className={styles.LogpointsPane}>
       {entries.map(([sourceId, points]) => {
-        const allBreakpointsAreShared =
+        const allLogPointsAreShared =
           points.filter(point => point.user?.id == currentUserInfo?.id).length === 0;
 
         return (
-          <div className={styles.List} data-test-name="BreakpointsList" key={sourceId}>
-            <BreakpointHeading
-              allBreakpointsAreShared={allBreakpointsAreShared}
-              breakpoint={points[0]}
+          <div className={styles.List} data-test-name="LogPointsList" key={sourceId}>
+            <LogpointHeading
+              allLogPointsAreShared={allLogPointsAreShared}
+              logPoint={points[0]}
               key="header"
-              onRemoveBreakpoints={() => deletePoints(...points.map(point => point.key))}
+              onRemoveLogPoints={() => deletePoints(...points.map(point => point.key))}
               sourceId={sourceId}
             />
             {points.map(point => {
@@ -109,16 +97,14 @@ export default function Breakpoints({
               const editable = point.user?.id === currentUserInfo?.id;
 
               return (
-                <Breakpoint
+                <Logpoint
                   currentUserInfo={currentUserInfo}
                   editable={editable}
                   key={point.key}
                   onEditPointBehavior={editPointBehavior}
-                  onRemoveBreakpoint={editable ? () => deletePoints(point.key) : () => {}}
+                  onRemoveLogPoint={editable ? () => deletePoints(point.key) : () => {}}
                   point={point}
-                  shouldBreak={pointBehavior?.shouldBreak ?? POINT_BEHAVIOR_DISABLED}
                   shouldLog={pointBehavior?.shouldLog ?? POINT_BEHAVIOR_DISABLED}
-                  type={type}
                 />
               );
             })}

@@ -66,7 +66,7 @@ export default function useGetItemSize({
       // This Point might have been restored by a previous session.
       // In this case we should use its persisted values.
       // Else by default, shared print statements should be shown.
-      // Points that have no content (breakpoints) should be hidden by default though.
+      // Points that have no content should be hidden by default though.
       const shouldLog =
         pointBehavior?.shouldLog ??
         (point.content ? POINT_BEHAVIOR_ENABLED : POINT_BEHAVIOR_DISABLED);

@@ -10,8 +10,8 @@ import { useHasNoRole } from "ui/hooks/recordings";
 import {
   shouldShowAddComment,
   shouldShowAddUnicornBadge,
-  shouldShowBreakpointEdit,
   shouldShowConsoleNavigate,
+  shouldShowEditLogPoint,
   shouldShowFindFile,
   shouldShowInspectElement,
   shouldShowInspectNetworkRequest,
@@ -37,7 +37,7 @@ const Passport = (props: PropsFromRedux) => {
   const { nags } = hooks.useGetUserInfo();
   const showAddComment = shouldShowAddComment(nags);
   const showAddUnicornBadge = shouldShowAddUnicornBadge(nags);
-  const showBreakpointEdit = shouldShowBreakpointEdit(nags);
+  const showEditLogPoint = shouldShowEditLogPoint(nags);
   const showConsoleNavigate = shouldShowConsoleNavigate(nags);
   const showFindFile = shouldShowFindFile(nags);
   const showInspectElement = shouldShowInspectElement(nags);
@@ -93,7 +93,7 @@ const Passport = (props: PropsFromRedux) => {
     },
     {
       label: "Add a console log",
-      completed: !showBreakpointEdit,
+      completed: !showEditLogPoint,
       videoUrl: "https://vercel.replay.io/passport/set_print_statement.gif",
       imageBaseName: "set_a_print_statement",
       docsLink: "https://docs.replay.io/learn/replay-course#console-logs-overview",

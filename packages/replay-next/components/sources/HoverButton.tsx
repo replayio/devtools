@@ -179,7 +179,7 @@ function NormalHoverButton({
     source,
   });
 
-  const [showNag, dismissNag] = useNag(Nag.FIRST_BREAKPOINT_ADD);
+  const [showNag, dismissNag] = useNag(Nag.FIRST_PRINT_STATEMENT_ADD);
 
   // Don't render hover buttons when other user's hit points already exist on the line
   if (point?.user && point.user.id !== currentUserInfo?.id) {
@@ -220,18 +220,15 @@ function NormalHoverButton({
     }
   };
 
-  const {
-    shouldBreak = POINT_BEHAVIOR_DISABLED,
-    shouldLog = point?.content ? POINT_BEHAVIOR_ENABLED : POINT_BEHAVIOR_DISABLED,
-  } = pointBehavior || {};
+  const { shouldLog = point?.content ? POINT_BEHAVIOR_ENABLED : POINT_BEHAVIOR_DISABLED } =
+    pointBehavior || {};
 
   // If a point's behavior has been temporarily disabled, the hover button should take that into account.
-  const hasOrDidBreak = shouldBreak !== POINT_BEHAVIOR_DISABLED;
   const hasOrDidLog = shouldLog !== POINT_BEHAVIOR_DISABLED;
 
   const togglePoint = () => {
     if (point) {
-      if (!hasOrDidLog || hasOrDidBreak) {
+      if (!hasOrDidLog) {
         const newShouldLog = hasOrDidLog ? POINT_BEHAVIOR_DISABLED : POINT_BEHAVIOR_ENABLED;
         editPointBehavior(
           point.key,

@@ -10,7 +10,6 @@ import {
   seekToPreviousLogPointHit,
   verifyLogpointStep,
 } from "../helpers/source-panel";
-import { delay } from "../helpers/utils";
 import test, { expect } from "../testFixture";
 
 test.use({ exampleKey: "doc_rr_basic.html" });
@@ -47,7 +46,7 @@ test(`logpoints-02: conditional log-points`, async ({
   await expect(logPointMessages.first()).toHaveText(/Beginning/);
   await expect(logPointMessages.last()).toHaveText(/Ending/);
 
-  const logpoint = findPoints(page, "logpoint", { lineNumber: 20 });
+  const logpoint = findPoints(page, { lineNumber: 20 });
   await togglePoint(page, logpoint, false);
   await expect(logPointMessages).toHaveCount(2);
   await togglePoint(page, logpoint, true);
