@@ -47,7 +47,6 @@ export function Group({
   disableContextMenu,
   panel,
 }: GroupProps) {
-  const [expanded, setExpanded] = useState(false);
   const isSelectable = panel == "console";
 
   const { contextMenu, onContextMenu } = useStackFrameContextMenu({
@@ -56,6 +55,11 @@ export function Group({
     copyStackTrace,
   });
 
+  const containsSelectedFrame = group.some(
+    frame =>
+      selectedFrameId?.pauseId === frame.pauseId && selectedFrameId?.frameId === frame.protocolId
+  );
+  const [expanded, setExpanded] = useState(containsSelectedFrame);
   const toggleFrames = (event: React.MouseEvent) => {
     event.stopPropagation();
     setExpanded(prevExpanded => !prevExpanded);
