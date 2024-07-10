@@ -98,15 +98,16 @@ export async function createComputedProperties(
       for (const declaration of rule.declarations) {
         for (const property of declaration.computed || NO_COMPUTEDS) {
           if (property.name === name) {
-            const combinedNameValue = `${name}:${property.value}`;
+            const value = property.value + (property.priority ? ` !${property.priority}` : "");
+            const combinedNameValue = `${name}:${value}`;
             let parsedValue = cachedParsedProperties.get(combinedNameValue)!;
             if (!parsedValue) {
-              parsedValue = outputParser.parseCssProperty(name, property.value);
+              parsedValue = outputParser.parseCssProperty(name, value);
               cachedParsedProperties.set(combinedNameValue, parsedValue);
             }
 
             selectors.push({
-              value: property.value,
+              value,
               parsedValue,
               selector,
               stylesheet,
