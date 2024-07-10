@@ -101,7 +101,7 @@ export async function createComputedProperties(
             const combinedNameValue = `${name}:${property.value}`;
             let parsedValue = cachedParsedProperties.get(combinedNameValue)!;
             if (!parsedValue) {
-              parsedValue = outputParser.parseCssProperty(name, value);
+              parsedValue = outputParser.parseCssProperty(name, property.value);
               cachedParsedProperties.set(combinedNameValue, parsedValue);
             }
 
