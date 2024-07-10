@@ -1,0 +1,19 @@
+.PositionLeft,
+.PositionRight {
+  position: absolute;
+  z-index: 5;
+  overflow: visible;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.PositionLeft {
+  font-family: var(--font-family-monospace);
+  font-size: var(--font-size-small);
+  width: calc(var(--line-number-size) + 2ch - 0.25rem);
+  justify-content: flex-end;
+  background-color: var(--body-bgcolor);
+}
+.PositionRight {
+  left: calc(var(--source-line-number-offset) + var(--source-hit-count-offset) - 0.25rem);
+}

@@ -754,7 +754,6 @@ export async function rewindToLine(
   await debugPrint(page, `Rewinding to line ${chalk.bold(lineNumber)}`, "rewindToLine");
 
   const lineLocator = await getSourceLine(page, lineNumber);
-  const buttonLocator = lineLocator.locator('[data-test-name="ContinueToButton"]');
 
   // Account for the fact that SourceListRow doesn't render SourceListRowMouseEvents while scrolling
   await waitFor(async () => {
@@ -763,15 +762,13 @@ export async function rewindToLine(
   });
 
   await lineLocator.locator('[data-test-name="SourceLine-HitCount"]').hover({ force: true });
-  await page.keyboard.down("Shift");
-  await page.keyboard.down(getCommandKey());
 
-  await expect(await buttonLocator.getAttribute("data-test-state")).toBe("previous");
-
-  await buttonLocator.click({ force: true });
-
-  await page.keyboard.up(getCommandKey());
-  await page.keyboard.up("Shift");
+  const buttonLocator = lineLocator.locator('[data-test-name="RewindButton"]');
+  await waitFor(async () => {
+    const isDisabled = await buttonLocator.getAttribute("disabled");
+    expect(isDisabled).toBe(null);
+  });
+  await buttonLocator.click();
 }
 
 export async function fastForwardToLine(
@@ -788,7 +785,6 @@ export async function fastForwardToLine(
   await debugPrint(page, `Fast forwarding to line ${chalk.bold(lineNumber)}`, "fastForwardToLine");
 
   const lineLocator = await getSourceLine(page, lineNumber);
-  const buttonLocator = lineLocator.locator('[data-test-name="ContinueToButton"]');
 
   // Account for the fact that SourceListRow doesn't render SourceListRowMouseEvents while scrolling
   await waitFor(async () => {
@@ -797,11 +793,13 @@ export async function fastForwardToLine(
   });
 
   await lineLocator.locator('[data-test-name="SourceLine-HitCount"]').hover({ force: true });
-  await page.keyboard.down(getCommandKey());
 
-  await expect(await buttonLocator.getAttribute("data-test-state")).toBe("next");
-
-  await buttonLocator.click({ force: true });
+  const buttonLocator = lineLocator.locator('[data-test-name="FastForwardButton"]');
+  await waitFor(async () => {
+    const isDisabled = await buttonLocator.getAttribute("disabled");
+    expect(isDisabled).toBe(null);
+  });
+  await buttonLocator.click();
 
   await page.keyboard.up(getCommandKey());
 }

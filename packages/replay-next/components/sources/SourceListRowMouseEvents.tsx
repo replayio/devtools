@@ -1,12 +1,15 @@
 import { UIEvent, useContext, useLayoutEffect, useRef, useState } from "react";
 
 import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBoundary";
-import HoverButton from "replay-next/components/sources/HoverButton";
+import LogpointHoverButton from "replay-next/components/sources/LogpointHoverButton";
+import { SeekHoverButtons } from "replay-next/components/sources/SeekHoverButtons";
 import useSourceContextMenu from "replay-next/components/sources/useSourceContextMenu";
 import { PointsContext } from "replay-next/src/contexts/points/PointsContext";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import { Source } from "replay-next/src/suspense/SourcesCache";
 import { LineHitCounts, Point, PointBehavior } from "shared/client/types";
+
+import styles from "./SourceListRowMouseEvents.module.css";
 
 export function SourceListRowMouseEvents({
   lineHitCounts,
@@ -92,10 +95,6 @@ export function SourceListRowMouseEvents({
       rowElement.addEventListener("mouseleave", onRowMouseLeave);
       rowElement.addEventListener("contextmenu", onRowContextWrapper);
 
-      const lineNumberElement = rowElement.querySelector(
-        '[data-test-name="SourceLine-LineNumber"]'
-      );
-
       return () => {
         rowElement.removeEventListener("click", onRowClick);
         rowElement.removeEventListener("mouseenter", onRowMouseEnter);
@@ -107,19 +106,28 @@ export function SourceListRowMouseEvents({
 
   return (
     <>
-      {isRowHovered && (
+      {isRowHovered && lineHitCounts && (
         <InlineErrorBoundary name="SourceListRowMouseEvents-HoverButton" fallback={null}>
-          <HoverButton
-            addPoint={addPoint}
-            deletePoints={deletePoints}
-            editPendingPointText={editPendingPointText}
-            editPointBehavior={editPointBehavior}
-            lineHitCounts={lineHitCounts}
-            lineNumber={lineNumber}
-            point={pointForDefaultPriority}
-            pointBehavior={pointBehavior}
-            source={source}
-          />
+          <div className={styles.PositionLeft}>
+            <SeekHoverButtons
+              lineHitCounts={lineHitCounts}
+              lineNumber={lineNumber}
+              source={source}
+            />
+          </div>
+          <div className={styles.PositionRight}>
+            <LogpointHoverButton
+              addPoint={addPoint}
+              deletePoints={deletePoints}
+              editPendingPointText={editPendingPointText}
+              editPointBehavior={editPointBehavior}
+              lineHitCounts={lineHitCounts}
+              lineNumber={lineNumber}
+              point={pointForDefaultPriority}
+              pointBehavior={pointBehavior}
+              source={source}
+            />
+          </div>
         </InlineErrorBoundary>
       )}
 
