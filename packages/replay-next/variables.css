@@ -210,8 +210,10 @@
   --background-color-light: #18181a;
   --background-color-primary-button-disabled: #17527b;
   --background-color-primary-button: var(--primary-accent);
+  --background-color-primary-button-hover: var(--primary-accent-hover);
   --background-color-resize-handle: #242e3d;
   --background-color-secondary-button: var(--secondary-accent);
+  --background-color-secondary-button-hover: var(--secondary-accent-hover);
   --background-color-source-search: #25364e;
   --background-color-warning: #42381f;
   --background-color-high-risk-setting: #310f21;
@@ -752,7 +754,9 @@
   --background-color-light: #f9f9fa;
   --background-color-primary-button-disabled: #d2d2d2;
   --background-color-primary-button: var(--primary-accent);
+  --background-color-primary-button-hover: var(--primary-accent-hover);
   --background-color-secondary-button: var(--secondary-accent);
+  --background-color-secondary-button-hover: var(--secondary-accent-hover);
 
   --background-color-current-execution-point: #eaf3ff;
   --background-color-current-execution-point-column: #b8d7ff;

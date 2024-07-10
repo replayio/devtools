@@ -2,6 +2,9 @@ import { useEffect, useRef } from "react";
 
 import { formatHitCount } from "replay-next/components/sources/utils/formatHitCount";
 
+// Reserve some minimum amount of space for the fast-forward and rewind hover buttons
+const MIN_LINE_LENGTH = 3;
+
 export function useMaxStringLengths({
   lineCount,
   maxHitCount,
@@ -27,7 +30,7 @@ export function useMaxStringLengths({
   maxHitCount = maxHitCount ?? prevMaxHitCountRef.current;
 
   return {
-    maxLineIndexStringLength: `${lineCount}`.length,
+    maxLineIndexStringLength: Math.max(`${lineCount}`.length, MIN_LINE_LENGTH),
     maxHitCountStringLength: `${formatHitCount(maxHitCount)}`.length,
   };
 }
