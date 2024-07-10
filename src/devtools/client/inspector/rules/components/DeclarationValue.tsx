@@ -10,12 +10,13 @@ interface DeclarationValueProps {
   colorSpanClassName: string;
   colorSwatchClassName: string;
   fontFamilySpanClassName: string;
+  priority?: string;
   values: (string | Record<string, string>)[];
 }
 
 class DeclarationValue extends React.PureComponent<DeclarationValueProps> {
   render() {
-    return this.props.values.map(v => {
+    const values = this.props.values.map(v => {
       if (typeof v === "string") {
         return v;
       }
@@ -46,6 +47,13 @@ class DeclarationValue extends React.PureComponent<DeclarationValueProps> {
 
       return value;
     });
+
+    return (
+      <>
+        {values}
+        {this.props.priority ? ` !${this.props.priority}` : null}
+      </>
+    );
   }
 }
 

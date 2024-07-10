@@ -9,6 +9,7 @@ export interface MatchedSelectorState {
   selector: string;
   value: string;
   parsedValue: any[];
+  priority: string;
   overridden: boolean;
   stylesheet: string;
   stylesheetURL: string;

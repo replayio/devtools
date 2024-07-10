@@ -30,6 +30,7 @@ export default function MatchedSelector(props: MatchedSelectorProps) {
             colorSpanClassName="computed-color"
             colorSwatchClassName="computed-colorswatch"
             fontFamilySpanClassName="computed-font-family"
+            priority={selector.priority}
             values={selector.parsedValue}
           />
         </div>
