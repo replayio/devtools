@@ -108,6 +108,7 @@ export async function createComputedProperties(
             selectors.push({
               value: property.value,
               parsedValue,
+              priority: property.priority,
               selector,
               stylesheet,
               stylesheetURL,
