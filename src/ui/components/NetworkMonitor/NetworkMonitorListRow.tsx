@@ -1,13 +1,23 @@
-import { CSSProperties, MouseEvent, useContext } from "react";
+import { CSSProperties, MouseEvent, useContext, useEffect, useState } from "react";
 
 import Icon from "replay-next/components/Icon";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { useNag } from "replay-next/src/hooks/useNag";
+import { networkRequestBodyCache } from "replay-next/src/suspense/NetworkRequestsCache";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Nag } from "shared/graphql/types";
 import useNetworkContextMenu from "ui/components/NetworkMonitor/useNetworkContextMenu";
 import { EnabledColumns } from "ui/components/NetworkMonitor/useNetworkMonitorColumns";
-import { RequestSummary } from "ui/components/NetworkMonitor/utils";
+import { RequestSummary, findHeader } from "ui/components/NetworkMonitor/utils";
 
+import {
+  BodyPartsToUInt8Array,
+  Displayable,
+  RawToImageMaybe,
+  RawToUTF8,
+  StringToObjectMaybe,
+  URLEncodedToPlaintext,
+} from "./content";
 import styles from "./NetworkMonitorListRow.module.css";
 
 export const LIST_ROW_HEIGHT = 26;
@@ -56,6 +66,21 @@ export function NetworkMonitorListRow({
   }
 }
 
+function isLikelyGraphQLRequest(request: RequestSummary): boolean {
+  // TODO Hacky heuristic here, improve this?
+  return request.path.includes("graphql") || request.url.includes("graphql");
+}
+
+interface GraphqlOperationBody {
+  operationName: string;
+  variables: Record<string, unknown>;
+  query?: string;
+}
+
+function isGraphqlOperationBody(value: unknown): value is GraphqlOperationBody {
+  return typeof value === "object" && value !== null && "operationName" in value;
+}
+
 function RequestRow({
   itemData,
   request,
@@ -65,6 +90,7 @@ function RequestRow({
   request: RequestSummary;
   style: CSSProperties;
 }) {
+  const [graphqlOperationName, setGraphqlOperationName] = useState<string | null>(null);
   const {
     columns,
     currentTime,
@@ -74,6 +100,7 @@ function RequestRow({
     selectedRequestId,
   } = itemData;
 
+  const replayClient = useContext(ReplayClientContext);
   const { duration: recordingDuration } = useContext(SessionContext);
 
   const {
@@ -117,6 +144,36 @@ function RequestRow({
   }
 
   const [, dismissJumpToNetworkRequestNag] = useNag(Nag.JUMP_TO_NETWORK_REQUEST);
+
+  useEffect(() => {
+    async function getGraphqlOperationNameIfRelevant() {
+      if (isLikelyGraphQLRequest(request)) {
+        const reqBodyStreaming = await networkRequestBodyCache.readAsync(replayClient, request.id);
+
+        const value = reqBodyStreaming.value;
+
+        if (value) {
+          const raw = BodyPartsToUInt8Array(
+            value,
+            findHeader(request.requestHeaders, "content-type") || "unknown"
+          );
+
+          const displayable = StringToObjectMaybe(
+            URLEncodedToPlaintext(RawToUTF8(RawToImageMaybe(raw)))
+          );
+
+          if (displayable.as == Displayable.JSON) {
+            const { content } = displayable;
+            if (isGraphqlOperationBody(content)) {
+              setGraphqlOperationName(content.operationName);
+            }
+          }
+        }
+      }
+    }
+
+    getGraphqlOperationNameIfRelevant();
+  }, [path, replayClient, request]);
 
   const seekToRequestWrapper = (request: RequestSummary) => {
     seekToRequest(request);
@@ -168,7 +225,7 @@ function RequestRow({
         )}
         {columns.name && (
           <div className={styles.Column} data-name="name">
-            {name}
+            {name} {graphqlOperationName && `(GraphQL: ${graphqlOperationName})`}
           </div>
         )}
         {columns.method && (
