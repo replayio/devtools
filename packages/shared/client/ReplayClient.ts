@@ -77,13 +77,9 @@ import throttle from "lodash/throttle";
 import uniqueId from "lodash/uniqueId";
 
 // eslint-disable-next-line no-restricted-imports
-import {
-  addEventListener,
-  client,
-  initSocket,
-  removeEventListener,
-  sendMessage,
-} from "protocol/socket";
+import { addEventListener, removeEventListener } from "protocol/socket";
+// eslint-disable-next-line no-restricted-imports
+import { client, initSocket, sendMessage } from "protocol/socket";
 import { assert, compareNumericStrings, defer, waitForTime } from "protocol/utils";
 import { initProtocolMessagesStore } from "replay-next/components/protocol/ProtocolMessagesStore";
 import { insert } from "replay-next/src/utils/array";
