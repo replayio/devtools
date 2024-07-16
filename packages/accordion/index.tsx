@@ -5,6 +5,7 @@ import React, {
   FC,
   MouseEventHandler,
   ReactElement,
+  ReactNode,
   useEffect,
   useReducer,
   useRef,
@@ -75,9 +76,9 @@ export function AccordionPane({
   dispatch = () => ({}),
   expanded,
   header,
+  headerNode,
   height = 0,
   index,
-  initialHeight,
   isBeingResized = false,
   isResizable = false,
   onResizeStart = () => ({}),
@@ -90,9 +91,9 @@ export function AccordionPane({
   dispatch?: Dispatch<AccordionAction>;
   expanded?: boolean;
   header: string;
+  headerNode?: ReactNode;
   height?: SectionHeight;
   index?: number;
-  initialHeight?: number;
   isBeingResized?: boolean;
   isResizable?: boolean;
   onResizeStart?: (e: React.MouseEvent) => void;
@@ -128,7 +129,9 @@ export function AccordionPane({
         >
           <div className="flex select-none items-center space-x-2">
             <div className={classNames("img arrow", { expanded: _expanded })} />
-            <span className="overflow-hidden overflow-ellipsis whitespace-pre">{header}</span>
+            <span className="overflow-hidden overflow-ellipsis whitespace-pre">
+              {headerNode ?? header}
+            </span>
           </div>
           {button ? button : null}
         </div>

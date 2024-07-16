@@ -48,7 +48,12 @@ export default function SecondaryPanes() {
           {currentPoint && <NewFrames point={currentPoint} time={currentTime} panel="debugger" />}
         </AccordionPane>
         <AccordionPane
-          header="Dependency Graph Prototype"
+          header="Dependency Graph"
+          headerNode={
+            <>
+              Dependency Graph <small className="text-warning">(experimental)</small>
+            </>
+          }
           className="react-component-stack-pane"
           expanded={reactStackVisible}
           onToggle={() => setReactStackVisible(!reactStackVisible)}
