@@ -23,7 +23,6 @@ export default function PrimaryPanes() {
         className={classnames("sources-pane", enableLargeText ? "text-base" : "text-xs")}
         expanded={!sourcesCollapsed}
         onToggle={() => setSourcesCollapsed(!sourcesCollapsed)}
-        initialHeight={400}
         button={<QuickOpenButton />}
       >
         <SourcesTree />

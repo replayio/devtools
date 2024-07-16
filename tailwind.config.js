@@ -82,6 +82,7 @@ module.exports = {
         lightGrey: "var(--light-grey)",
         loadingBackground: "var(--loading-background)",
         loadingBoxes: "var(--loading-boxes)",
+        warning: "var(--yellow-65)",
       },
       fontFamily: {
         monospace: ["var(--monospace-font-family)"],
