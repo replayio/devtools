@@ -2,6 +2,7 @@ import { TimeStampedPoint } from "@replayio/protocol";
 import { useMemo, useState } from "react";
 
 import { ReactComponentStack } from "devtools/client/debugger/src/components/SecondaryPanes/DependencyGraph/ReactComponentStack";
+import { DependencyGraphMode } from "shared/client/types";
 import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { useAppSelector } from "ui/setup/hooks";
 
@@ -35,6 +36,7 @@ export default function SecondaryPanes() {
     "layout_logpointsPanelExpanded"
   );
   const [dependencyGraphVisible, setDependencyGraphVisible] = useState(false);
+  const [reactDependencyGraphVisible, setReactDependencyGraphVisible] = useState(false);
   const [reactStackVisible, setReactStackVisible] = useState(false);
 
   return (
@@ -71,6 +73,23 @@ export default function SecondaryPanes() {
           onToggle={() => setReactStackVisible(!reactStackVisible)}
         >
           <ReactComponentStack timeStampedPoint={timeStampedPoint} />
+        </AccordionPane>
+        <AccordionPane
+          header="React Dependency Graph"
+          headerNode={
+            <>
+              <span className="img react !bg-primaryAccent" /> Dependency Graph{" "}
+              <small className="text-warning">(experimental)</small>
+            </>
+          }
+          className="react-dependency-graph-pane"
+          expanded={reactDependencyGraphVisible}
+          onToggle={() => setReactDependencyGraphVisible(!reactDependencyGraphVisible)}
+        >
+          <DependencyGraph
+            mode={DependencyGraphMode.ReactParentRenders}
+            point={timeStampedPoint?.point}
+          />
         </AccordionPane>
         <AccordionPane
           header="Dependency Graph"

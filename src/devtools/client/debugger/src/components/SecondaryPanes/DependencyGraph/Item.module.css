@@ -13,6 +13,9 @@
   background-color: var(--theme-selection-background);
   color: white;
 }
+.Item[data-disabled] {
+  color: var(--color-dim);
+}
 .Item[data-disabled]:hover {
   background-color: transparent;
   cursor: default;
