@@ -34,11 +34,11 @@ export const depGraphCache: Cache<
   },
 });
 
-interface LocationWithUrl extends Location {
+export interface LocationWithUrl extends Location {
   url: string;
 }
 
-interface ReactComponentStackEntry extends TimeStampedPoint {
+export interface ReactComponentStackEntry extends TimeStampedPoint {
   parentLocation: LocationWithUrl | null;
   componentLocation: LocationWithUrl | null;
   componentName: string;

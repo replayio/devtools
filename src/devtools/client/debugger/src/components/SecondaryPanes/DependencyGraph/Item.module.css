@@ -1,0 +1,42 @@
+.Item {
+  padding: 0.25rem 0.5rem;
+  display: flex;
+  flex-direction: row;
+  gap: 0.25rem;
+  white-space: nowrap;
+}
+.Item:hover {
+  background-color: var(--theme-selection-background-hover);
+  cursor: pointer;
+}
+.Item[data-selected] {
+  background-color: var(--theme-selection-background);
+  color: white;
+}
+.Item[data-disabled]:hover {
+  background-color: transparent;
+  cursor: default;
+}
+
+.NameColumn {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.TimestampColumn {
+  flex: 1;
+  font-size: var(--font-size-small);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.LocationColumn {
+  color: var(--color-dim);
+  flex-grow: 0;
+  flex-shrink: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.Item[data-selected] .LocationColumn {
+  display: none;
+}
