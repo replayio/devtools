@@ -22,7 +22,3 @@
   font-size: var(--font-size-regular);
   color: var(--color-dim);
 }
-
-.ShareButton {
-  color: var(--color-default);
-}
