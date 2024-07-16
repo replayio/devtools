@@ -59,7 +59,7 @@ describe("UserData", () => {
     const userData = require("./UserData").userData;
 
     expect(userData.get("feature_commentAttachments")).toBe(false);
-    expect(userData.get("layout_breakpointsPanelExpanded")).toBe(true);
+    expect(userData.get("layout_logpointsPanelExpanded")).toBe(true);
   });
 
   it("should support URL overrides for boolean preferences", () => {
@@ -146,7 +146,7 @@ describe("UserData", () => {
           viewer: {
             preferences: {
               console_showFiltersByDefault: false,
-              layout_breakpointsPanelExpanded: false,
+              layout_logpointsPanelExpanded: false,
             },
           },
         },
@@ -157,7 +157,7 @@ describe("UserData", () => {
 
     expect(userData.get("debugger_frameworkGroupingOn")).toBe(false);
     expect(userData.get("console_showFiltersByDefault")).toBe(true);
-    expect(userData.get("layout_breakpointsPanelExpanded")).toBe(true);
+    expect(userData.get("layout_logpointsPanelExpanded")).toBe(true);
 
     await userData.initialize(true);
 
@@ -167,12 +167,12 @@ describe("UserData", () => {
     // GraphQL should be called after initialization and preferences should be merged with localStorage
     expect(userData.get("debugger_frameworkGroupingOn")).toBe(false);
     expect(userData.get("console_showFiltersByDefault")).toBe(false);
-    expect(userData.get("layout_breakpointsPanelExpanded")).toBe(false);
+    expect(userData.get("layout_logpointsPanelExpanded")).toBe(false);
 
     // Updated values should be written to both localStorage and GraphQL
     expect(localStorageMock.setItem).toHaveBeenCalledTimes(1);
     expect(mutateGraphQL).not.toHaveBeenCalled();
-    userData.set("layout_breakpointsPanelExpanded", true);
+    userData.set("layout_logpointsPanelExpanded", true);
     expect(localStorageMock.setItem).toHaveBeenCalledTimes(2);
     expect(mutateGraphQL).toHaveBeenCalledTimes(1);
   });

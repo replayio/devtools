@@ -1,10 +1,11 @@
 import React, { ReactNode, useContext, useEffect, useState } from "react";
 
+import { SupportContext } from "replay-next/components/errors/SupportContext";
 import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import useLocalStorageUserData from "shared/user-data/LocalStorage/useLocalStorageUserData";
 import { setModal } from "ui/actions/app";
-import { setShowSupportForm, setToolboxLayout } from "ui/actions/layout";
+import { setToolboxLayout } from "ui/actions/layout";
 import LoginButton from "ui/components/LoginButton";
 import Dropdown from "ui/components/shared/Dropdown";
 import Icon from "ui/components/shared/Icon";
@@ -17,6 +18,7 @@ import styles from "./UserOptions.module.css";
 
 export default function UserOptions() {
   const replayClient = useContext(ReplayClientContext);
+  const { showSupportForm } = useContext(SupportContext);
 
   const dispatch = useAppDispatch();
   const toolboxLayout = useAppSelector(getToolboxLayout);
@@ -171,7 +173,12 @@ export default function UserOptions() {
   };
 
   const onSupportClick = () => {
-    dispatch(setShowSupportForm(true));
+    showSupportForm({
+      context: { id: "contact-us" },
+      promptText: "Bugs, suggestions, questions are all welcome!",
+      title: "Support",
+    });
+
     setExpanded(false);
   };
 

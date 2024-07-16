@@ -1,7 +1,7 @@
-import { ReactNode, Suspense, useState } from "react";
+import { ReactNode, Suspense, useContext, useState } from "react";
 
 import { ModalFrame } from "replay-next/components/errors/ModalFrame";
-import { SupportForm } from "replay-next/components/errors/SupportForm";
+import { SupportContext } from "replay-next/components/errors/SupportContext";
 import { useSessionId } from "replay-next/components/errors/useSessionId";
 import Expandable from "replay-next/components/Expandable";
 import ExternalLink from "replay-next/components/ExternalLink";
@@ -16,12 +16,10 @@ import styles from "./UnexpectedErrorForm.module.css";
 // If additional error details can be shown, they should be passed in as props.
 
 type Props = {
-  currentUserEmail: string | null;
-  currentUserId: string | null;
-  currentUserName: string | null;
   details?: ReactNode;
   replayClient: ReplayClientInterface;
   title: ReactNode;
+  unexpectedError: any;
 };
 
 export function UnexpectedErrorForm(props: Props) {
@@ -32,36 +30,12 @@ export function UnexpectedErrorForm(props: Props) {
   );
 }
 
-function UnexpectedErrorFormSuspends({
-  currentUserEmail,
-  currentUserId,
-  currentUserName,
-  details,
-  replayClient,
-  title,
-}: Props) {
+function UnexpectedErrorFormSuspends({ details, replayClient, title, unexpectedError }: Props) {
+  const { showSupportForm, state: supportFormState } = useContext(SupportContext);
+
   const sessionId = useSessionId(replayClient);
 
   const [showErrorDetails, setShowErrorDetails] = useState(false);
-  const [showContactForm, setShowContactForm] = useState(false);
-
-  if (showContactForm) {
-    const onDismiss = () => {
-      setShowContactForm(false);
-    };
-
-    return (
-      <SupportForm
-        currentUserEmail={currentUserEmail}
-        currentUserId={currentUserId}
-        currentUserName={currentUserName}
-        onDismiss={onDismiss}
-        placeholder=""
-        replayClient={replayClient}
-        title="Submit a ticket"
-      />
-    );
-  }
 
   let isWindows = false;
   if (sessionId) {
@@ -74,14 +48,21 @@ function UnexpectedErrorFormSuspends({
   }
 
   const onSubmitTicketClick = () => {
-    setShowContactForm(true);
+    showSupportForm({
+      context: {
+        id: "unexpected-error",
+        unexpectedError,
+      },
+      promptText: "",
+      title: "Submit a ticket",
+    });
   };
 
   return (
     <ModalFrame
       dataTestId="UnexpectedErrorDetails"
       onDismiss={noop}
-      showCloseButton={showContactForm}
+      showCloseButton={!!supportFormState}
       title={<span data-test-name="ErrorTitle">{title}</span>}
     >
       {isWindows ? (

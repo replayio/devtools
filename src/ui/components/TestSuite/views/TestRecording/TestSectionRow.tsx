@@ -36,11 +36,13 @@ import { Position } from "./types";
 import styles from "./TestSectionRow.module.css";
 
 export function TestSectionRow({
+  scrollIntoView,
   testEvent,
   testEvents,
   testRunnerName,
   testSectionName,
 }: {
+  scrollIntoView?: boolean;
   testEvent: TestEvent;
   testEvents: TestEvent[];
   testRunnerName: TestRunnerName | null;
@@ -118,6 +120,7 @@ export function TestSectionRow({
           testEvents={testEvents}
           testSectionName={testSectionName}
           userActionEvent={testEvent}
+          scrollIntoView={scrollIntoView}
         />
       );
       status = testEvent.data.error ? "error" : "success";

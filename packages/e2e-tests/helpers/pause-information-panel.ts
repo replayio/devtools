@@ -18,10 +18,6 @@ async function toggleAccordionPane(page: Page, pane: Locator, targetState: "open
   }
 }
 
-export async function closeBreakpointsAccordionPane(page: Page): Promise<void> {
-  await toggleAccordionPane(page, getBreakpointsAccordionPane(page), "closed");
-}
-
 export async function closeCallStackAccordionPane(page: Page): Promise<void> {
   await toggleAccordionPane(page, getCallStackAccordionPane(page), "closed");
 }
@@ -32,6 +28,8 @@ export async function closePrintStatementsAccordionPane(page: Page): Promise<voi
 
 export async function expandAllScopesBlocks(page: Page): Promise<void> {
   await debugPrint(page, "Expanding all Scopes blocks", "expandAllScopesBlocks");
+
+  await openPauseInformationPanel(page);
 
   const scopesPanel = getScopesPanel(page);
   const blocks = scopesPanel.locator('[data-test-name="ScopesInspector"]');
@@ -47,17 +45,13 @@ export async function expandAllScopesBlocks(page: Page): Promise<void> {
 
 export async function closeSidePanel(page: Page) {
   // Ensure that it's closed by forcing the "Pause" pane to open instead...
-  const pane = getBreakpointsAccordionPane(page);
+  const pane = getPrintStatementsAccordionPane(page);
   const pauseButton = page.locator('[data-test-name="ToolbarButton-PauseInformation"]');
   await pauseButton.click();
   const isVisible = await pane.isVisible();
   if (isVisible) {
     await pauseButton.click();
   }
-}
-
-export function getBreakpointsAccordionPane(page: Page): Locator {
-  return page.locator('[data-test-id="AccordionPane-Breakpoints"]');
 }
 
 export function getCallStackAccordionPane(page: Page): Locator {
@@ -108,17 +102,13 @@ export function getScopesPanel(page: Page): Locator {
   return page.locator('[data-test-name="ScopesList"]');
 }
 
-export async function openBreakpointsAccordionPane(page: Page): Promise<void> {
-  await toggleAccordionPane(page, getBreakpointsAccordionPane(page), "open");
-}
-
 export async function openCallStackPane(page: Page): Promise<void> {
   await toggleAccordionPane(page, getCallStackAccordionPane(page), "open");
 }
 
 export async function openPauseInformationPanel(page: Page): Promise<void> {
   // Only click if it's not already open; clicking again will collapse the side bar.
-  const pane = getBreakpointsAccordionPane(page);
+  const pane = getPrintStatementsAccordionPane(page);
 
   let isVisible = await pane.isVisible();
   if (!isVisible) {
@@ -158,14 +148,6 @@ export async function openScopeBlocks(page: Page, text: string): Promise<void> {
   });
 }
 
-export async function resumeToLine(page: Page, line: number): Promise<void> {
-  await debugPrint(page, `Resuming to line ${chalk.bold(line)}`, "resumeToLine");
-
-  await clickCommandBarButton(page, "Resume");
-
-  await waitForPaused(page, line);
-}
-
 export async function clickCommandBarButton(page: Page, title: string): Promise<void> {
   await debugPrint(page, title, "clickCommandBarButton");
 
@@ -190,22 +172,10 @@ export async function reverseStepOverToLine(page: Page, line: number) {
   await waitForPaused(page, line);
 }
 
-export async function rewind(page: Page) {
-  await debugPrint(page, "Rewinding", "rewind");
-
-  await clickCommandBarButton(page, "Rewind Execution");
-}
-
-export async function rewindToLine(page: Page, line: number): Promise<void> {
-  await debugPrint(page, `Rewinding to line ${chalk.bold(line)}`, "rewindToLine");
-
-  await clickCommandBarButton(page, "Rewind Execution");
-
-  await waitForPaused(page, line);
-}
-
 export async function selectFrame(page: Page, index: number): Promise<void> {
   await debugPrint(page, `Select frame ${chalk.bold(index)}`, "selectFrame");
+
+  await openPauseInformationPanel(page);
 
   const framesPanel = getFramesPanel(page);
 
@@ -362,7 +332,6 @@ export async function waitForScopeValue(
 
 export function findPoints(
   page: Page,
-  type: "logpoint" | "breakpoint",
   options: {
     sourceId?: SourceId;
     lineNumber?: number;
@@ -372,8 +341,7 @@ export function findPoints(
   const { columnIndex, lineNumber, sourceId } = options;
 
   const selectorCriteria = [
-    '[data-test-name="Breakpoint"]',
-    `[data-test-type="${type}"]`,
+    '[data-test-name="LogPoint"]',
     columnIndex != null ? `[data-test-column-index="${columnIndex}"]` : "",
     lineNumber != null ? `[data-test-line-number="${lineNumber}"]` : "",
     sourceId != null ? `[data-test-source-id="${sourceId}"]` : "",
@@ -383,17 +351,17 @@ export function findPoints(
 }
 
 export async function isPointEditable(pointLocator: Locator) {
-  const editButton = pointLocator.locator('[data-test-name="RemoveBreakpointButton"]');
+  const editButton = pointLocator.locator('[data-test-name="RemoveLogPointButton"]');
   return (await editButton.count()) > 0;
 }
 
 export async function removePoint(pointLocator: Locator) {
-  await pointLocator.locator('[data-test-name="RemoveBreakpointButton"]').first().click();
+  await pointLocator.locator('[data-test-name="RemoveLogPointButton"]').first().click();
 }
 
 export async function togglePoint(page: Page, pointLocator: Locator, enabled: boolean) {
   const targetState = enabled ? POINT_BEHAVIOR_ENABLED : POINT_BEHAVIOR_DISABLED_TEMPORARILY;
-  const toggle = pointLocator.locator('[data-test-name="BreakpointToggle"]');
+  const toggle = pointLocator.locator('[data-test-name="LogPointToggle"]');
   const currentState = await toggle.getAttribute("date-test-state");
   if (targetState !== currentState) {
     await debugPrint(page, `Toggling point to ${targetState}`, "togglePoint");

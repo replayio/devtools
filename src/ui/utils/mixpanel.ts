@@ -31,8 +31,6 @@ type MixpanelEvent =
   | ["console.events.category_select"]
   | ["console.events.search"]
   | ["console.overflow"]
-  | ["debugger.rewind"]
-  | ["debugger.resume"]
   | ["debugger.reverse_step_over"]
   | ["debugger.step_over"]
   | ["debugger.step_in"]
@@ -142,7 +140,9 @@ let mixpanelDisabled = true;
 const enableMixpanel = () => (mixpanelDisabled = false);
 
 export function initializeMixpanel() {
-  mixpanel.init("ffaeda9ef8fb976a520ca3a65bba5014");
+  mixpanel.init("ffaeda9ef8fb976a520ca3a65bba5014", {
+    api_host: "https://mixpanel-proxy.replay.io",
+  });
 
   // Add the recordingId to the event metadata so we have a cookie crumb
   // trail for following in other telemetry systems

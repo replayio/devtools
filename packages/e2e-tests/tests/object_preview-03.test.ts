@@ -1,9 +1,8 @@
-import { getRecordingTarget, openDevToolsTab, startTest } from "../helpers";
+import { openDevToolsTab, startTest } from "../helpers";
 import {
   expandAllScopesBlocks,
   getScopeChildren,
   reverseStepOverToLine,
-  rewindToLine,
   selectFrame,
   stepInToLine,
   stepOverToLine,
@@ -11,7 +10,8 @@ import {
   waitForFrameTimeline,
   waitForScopeValue,
 } from "../helpers/pause-information-panel";
-import { addBreakpoint } from "../helpers/source-panel";
+import { openSource } from "../helpers/source-explorer-panel";
+import { rewindToLine } from "../helpers/source-panel";
 import { toggleExpandable } from "../helpers/utils";
 import test from "../testFixture";
 
@@ -27,10 +27,8 @@ test(`object_preview-03: Test previews when switching between frames and steppin
   await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
 
-  const target = await getRecordingTarget(page);
-
-  await addBreakpoint(page, { lineNumber: 17, url: exampleKey });
-  await rewindToLine(page, 17);
+  await openSource(page, exampleKey);
+  await rewindToLine(page, { lineNumber: 17 });
 
   await expandAllScopesBlocks(page);
 

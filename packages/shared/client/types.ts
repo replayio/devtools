@@ -1,6 +1,5 @@
 import {
   Annotation,
-  BreakpointId,
   ContentType,
   Result as EvaluationResult,
   EventHandlerType,
@@ -140,7 +139,6 @@ export type Point = {
 // Behaviors are modifiable by everyone (regardless of who created a point).
 export type PointBehavior = {
   key: PointKey;
-  shouldBreak: POINT_BEHAVIOR;
   shouldLog: POINT_BEHAVIOR;
 };
 
@@ -303,8 +301,6 @@ export enum DependencyGraphMode {
 export interface ReplayClientInterface {
   get loadedRegions(): LoadedRegions | null;
   addEventListener(type: ReplayClientEvents, handler: Function): void;
-  breakpointAdded(location: Location, condition: string | null): Promise<BreakpointId>;
-  breakpointRemoved(breakpointId: BreakpointId): Promise<void>;
   configure(sessionId: string): Promise<void>;
   createPause(executionPoint: ExecutionPoint): Promise<createPauseResult>;
   evaluateExpression(
@@ -333,8 +329,7 @@ export interface ReplayClientInterface {
   }>;
   findPaints(): Promise<TimeStampedPointWithPaintHash[]>;
   findPoints(selector: PointSelector, limits?: PointLimits): Promise<PointDescription[]>;
-  findRewindTarget(point: ExecutionPoint): Promise<PauseDescription>;
-  findResumeTarget(point: ExecutionPoint): Promise<PauseDescription>;
+
   findStepInTarget(point: ExecutionPoint): Promise<PauseDescription>;
   findStepOutTarget(point: ExecutionPoint): Promise<PauseDescription>;
   findStepOverTarget(point: ExecutionPoint): Promise<PauseDescription>;

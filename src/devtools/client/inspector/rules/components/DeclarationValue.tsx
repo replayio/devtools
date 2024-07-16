@@ -2,6 +2,7 @@ import React from "react";
 
 import { COLOR, FONT_FAMILY, URI } from "third-party/css/output-parser";
 
+import { Priority } from "../models/text-property";
 import Color from "./value/Color";
 import FontFamily from "./value/FontFamily";
 import Url from "./value/Url";
@@ -10,12 +11,13 @@ interface DeclarationValueProps {
   colorSpanClassName: string;
   colorSwatchClassName: string;
   fontFamilySpanClassName: string;
+  priority?: Priority;
   values: (string | Record<string, string>)[];
 }
 
 class DeclarationValue extends React.PureComponent<DeclarationValueProps> {
   render() {
-    return this.props.values.map(v => {
+    const values = this.props.values.map(v => {
       if (typeof v === "string") {
         return v;
       }
@@ -46,6 +48,13 @@ class DeclarationValue extends React.PureComponent<DeclarationValueProps> {
 
       return value;
     });
+
+    return (
+      <>
+        {values}
+        {this.props.priority ? ` !${this.props.priority}` : null}
+      </>
+    );
   }
 }
 

@@ -309,6 +309,8 @@ input[type="checkbox"] {
 input[type="checkbox"]:checked,
 input[type="checkbox"]:checked:hover {
   background-color: var(--primary-accent);
+}
+input[type="checkbox"] {
   border-radius: 0.25rem;
 }
 

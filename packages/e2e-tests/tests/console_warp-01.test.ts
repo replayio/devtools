@@ -4,12 +4,9 @@ import {
   openConsolePanel,
   warpToMessage,
 } from "../helpers/console-panel";
-import {
-  resumeToLine,
-  reverseStepOverToLine,
-  rewindToLine,
-} from "../helpers/pause-information-panel";
-import { addBreakpoint } from "../helpers/source-panel";
+import { reverseStepOverToLine } from "../helpers/pause-information-panel";
+import { openSource } from "../helpers/source-explorer-panel";
+import { fastForwardToLine, rewindToLine } from "../helpers/source-panel";
 import test from "../testFixture";
 
 test.use({ exampleKey: "doc_rr_error.html" });
@@ -25,10 +22,10 @@ test(`console_warp-01: should support warping to console messages`, async ({
   await warpToMessage(page, "Number 5", 19);
   await executeAndVerifyTerminalExpression(page, "number", 5);
 
-  await addBreakpoint(page, { lineNumber: 12, url: exampleKey });
-  await rewindToLine(page, 12);
+  await openSource(page, exampleKey);
+  await rewindToLine(page, { lineNumber: 12 });
   await executeAndVerifyTerminalExpression(page, "number", 4);
-  await resumeToLine(page, 12);
+  await fastForwardToLine(page, { lineNumber: 12 });
   await executeAndVerifyTerminalExpression(page, "number", 5);
 
   await warpToMessage(page, "Cannot set properties of undefined");

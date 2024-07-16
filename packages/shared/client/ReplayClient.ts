@@ -1,5 +1,4 @@
 import {
-  BreakpointId,
   Result as EvaluationResult,
   ExecutionPoint,
   FrameId,
@@ -163,25 +162,6 @@ export class ReplayClient implements ReplayClientInterface {
 
     const handlers = this._eventHandlers.get(type)!;
     handlers.push(handler);
-  }
-
-  async breakpointAdded(location: Location, condition: string | null): Promise<BreakpointId> {
-    const sessionId = await this.waitForSession();
-
-    const { breakpointId } = await client.Debugger.setBreakpoint(
-      {
-        condition: condition || undefined,
-        location,
-      },
-      sessionId
-    );
-
-    return breakpointId;
-  }
-
-  async breakpointRemoved(breakpointId: BreakpointId): Promise<void> {
-    const sessionId = await this.waitForSession();
-    await client.Debugger.removeBreakpoint({ breakpointId }, sessionId);
   }
 
   async getBuildId(): Promise<string> {
@@ -507,18 +487,6 @@ export class ReplayClient implements ReplayClientInterface {
 
     points.sort((a, b) => compareNumericStrings(a.point, b.point));
     return points;
-  }
-
-  async findRewindTarget(point: ExecutionPoint): Promise<PauseDescription> {
-    const sessionId = await this.waitForSession();
-    const { target } = await client.Debugger.findRewindTarget({ point }, sessionId);
-    return target;
-  }
-
-  async findResumeTarget(point: ExecutionPoint): Promise<PauseDescription> {
-    const sessionId = await this.waitForSession();
-    const { target } = await client.Debugger.findResumeTarget({ point }, sessionId);
-    return target;
   }
 
   async findStepInTarget(point: ExecutionPoint): Promise<PauseDescription> {

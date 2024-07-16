@@ -1,8 +1,9 @@
-import React, { useContext } from "react";
+import { useContext } from "react";
 
+import { ReportProblemLink } from "replay-next/components/errors/ReportProblemLink";
 import { useSourcesById } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { setModal } from "ui/actions/app";
+import SourcemapSetup from "ui/components/shared/Modals/SourcemapSetup";
 import { getSelectedSourceId } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
@@ -11,7 +12,13 @@ import { getSelectedFrameId } from "../../reducers/pause";
 import { CursorPosition, getAlternateSourceIdSuspense } from "../../utils/sourceVisualizations";
 import Toggle from "./Toggle";
 
-function SourcemapError({ why }: { why: "no-sourcemap" | "not-unique" | undefined }) {
+function SourcemapError({
+  sourceId,
+  why,
+}: {
+  sourceId: string | undefined;
+  why: "no-sourcemap" | "not-unique" | undefined;
+}) {
   const dispatch = useAppDispatch();
 
   if (!why) {
@@ -19,22 +26,18 @@ function SourcemapError({ why }: { why: "no-sourcemap" | "not-unique" | undefine
   }
 
   if (why === "no-sourcemap") {
-    const onClick = () => {
-      dispatch(setModal("sourcemap-setup"));
-    };
     return (
-      <div className="flex items-center space-x-1" onClick={onClick}>
+      <div className="flex items-center space-x-1">
         <span>No sourcemaps found.</span>
-        <button className="underline">Learn more</button>
+        <ReportProblemLink
+          context={{ id: "source-viewer-source-maps", sourceId }}
+          title={<SourcemapSetup />}
+        />
       </div>
     );
   }
 
-  return (
-    <div className="flex items-center space-x-1">
-      <span>The currently selected position is not mapped</span>
-    </div>
-  );
+  return <span>The currently selected position is not mapped.</span>;
 }
 
 export default function SourcemapToggleSuspends({
@@ -71,7 +74,7 @@ export default function SourcemapToggleSuspends({
 
   return (
     <label
-      className="mapped-source flex items-center space-x-1 pt-0.5 pl-3"
+      className="mapped-source flex items-center space-x-2 pt-0.5 pl-3"
       data-test-id="SourceMapToggle"
       data-test-state={enabled ? "on" : "off"}
     >
@@ -80,7 +83,10 @@ export default function SourcemapToggleSuspends({
         setEnabled={setEnabled}
         disabled={!alternateSourceIdResult.sourceId}
       />
-      <SourcemapError why={alternateSourceIdResult.why} />
+      <SourcemapError
+        sourceId={alternateSourceIdResult.sourceId}
+        why={alternateSourceIdResult.why}
+      />
     </label>
   );
 }

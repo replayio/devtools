@@ -35,9 +35,6 @@ export default function useEditPointBehavior({
       // Shared points should never be fully disabled, because they would be hidden (but not deleted).
       // Make sure they're disabled temporarily instead so they remain visible in the left side bar.
       if (!createdByCurrentUser) {
-        if (pointBehavior.shouldBreak === POINT_BEHAVIOR_DISABLED) {
-          pointBehavior.shouldBreak = POINT_BEHAVIOR_DISABLED_TEMPORARILY;
-        }
         if (pointBehavior.shouldLog === POINT_BEHAVIOR_DISABLED) {
           pointBehavior.shouldLog = POINT_BEHAVIOR_DISABLED_TEMPORARILY;
         }
@@ -52,7 +49,6 @@ export default function useEditPointBehavior({
       setPointBehaviors(prev => ({
         ...prev,
         [key]: {
-          shouldBreak: prevPointBehavior?.shouldBreak ?? defaultBehavior,
           shouldLog: prevPointBehavior?.shouldLog ?? defaultBehavior,
           ...pointBehavior,
           key,

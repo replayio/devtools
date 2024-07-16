@@ -114,29 +114,29 @@ export default class ElementStyle {
 
     // Show relevant rules applied to parent elements.
     while (parentNodeId) {
-      const nodeObject = await objectCache.readAsync(
+      const parentObject = await objectCache.readAsync(
         this.replayClient,
         this.pauseId,
         parentNodeId,
         "canOverflow"
       );
-      const elem = nodeObject.preview?.node;
-      if (!elem) {
+      const parentNode = parentObject.preview?.node;
+      if (!parentNode) {
         break;
       }
-      const elemNodeWithId = { nodeId: parentNodeId, node: elem };
+      const parentNodeWithId = { nodeId: parentNodeId, node: parentNode };
 
-      if (elem.nodeType == Node.ELEMENT_NODE) {
-        if (elem.style) {
+      if (parentNode.nodeType == Node.ELEMENT_NODE) {
+        if (parentNode.style) {
           const styleObject = await objectCache.readAsync(
             this.replayClient,
             this.pauseId,
-            elem.style!,
+            parentNode.style!,
             "canOverflow"
           );
           const parentInline = new StyleFront(styleObject);
           if (parentInline.properties.length > 0) {
-            this._maybeAddRule(parentInline, elemNodeWithId);
+            this._maybeAddRule(parentInline, parentNodeWithId);
           }
         }
 
@@ -153,12 +153,16 @@ export default class ElementStyle {
 
         for (const { rule, pseudoElement } of parentApplied) {
           if (!pseudoElement) {
-            this._maybeAddRule(rule, elemNodeWithId);
+            this._maybeAddRule(rule, parentNodeWithId);
           }
         }
       }
 
-      parentNodeId = elem.parentNode;
+      if (parentObject.preview?.node?.nodeName === "HTML") {
+        break;
+      }
+
+      parentNodeId = parentNode.parentNode;
     }
 
     // Store a list of all pseudo-element types found in the matching rules.

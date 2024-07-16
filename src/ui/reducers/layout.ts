@@ -8,7 +8,6 @@ const { primaryPanel, secondaryPanel, viewMode } = getMutableParamsFromURL();
 
 export const syncInitialLayoutState: LayoutState = {
   showCommandPalette: false,
-  showSupportForm: false,
   selectedPrimaryPanel: primaryPanel,
   viewMode: viewMode || userData.get("layout_defaultViewMode"),
   toolboxLayout: "ide",
@@ -22,13 +21,6 @@ export default function update(state = syncInitialLayoutState, action: LayoutAct
       return {
         ...state,
         showCommandPalette: action.value,
-      };
-    }
-
-    case "set_show_support_form": {
-      return {
-        ...state,
-        showSupportForm: action.value,
       };
     }
 
@@ -66,7 +58,6 @@ export default function update(state = syncInitialLayoutState, action: LayoutAct
 export const isInspectorSelected = (state: UIState) =>
   getViewMode(state) === "dev" && getSelectedPanel(state) == "inspector";
 export const getShowCommandPalette = (state: UIState) => state.layout.showCommandPalette;
-export const getShowSupportForm = (state: UIState) => state.layout.showSupportForm;
 export const getSelectedPrimaryPanel = (state: UIState) => state.layout.selectedPrimaryPanel;
 export const getSelectedPanel = (state: UIState) => state.layout.selectedPanel;
 export const getViewMode = (state: UIState) => state.layout.viewMode;

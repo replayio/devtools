@@ -7,8 +7,7 @@ import { closeSource, verifyJumpToCodeResults } from "../helpers/source-panel";
 import { getByTestName, waitFor } from "../helpers/utils";
 import test from "../testFixture";
 
-// trunk-ignore(gitleaks/generic-api-key)
-test.use({ exampleKey: "breakpoints-01" });
+test.use({ exampleKey: "logpoints-01" });
 
 async function checkForJumpButton(actionListItem: Locator, shouldBeEnabled: boolean) {
   const jumpButton = getEventJumpButton(actionListItem);
@@ -90,8 +89,8 @@ test(`jump-to-code-02: Redux J2C functionality`, async ({
   await closeSource(page, "SourcesTree.tsx");
 
   // Inside of an adapter that passes dispatch-wrapped actions to <QuickOpenModal>
-  // This is also one tick off, but should still _display_ as "1/3"
+  // This is also one tick off, but should still _display_ as "1/10"
   jumpToReduxDispatch(page, "quickOpen/setQuickOpenQuery");
-  await verifyJumpToCodeResults(page, "QuickOpenModal.tsx", 551, { current: 1, total: 3 });
+  await verifyJumpToCodeResults(page, "QuickOpenModal.tsx", 551, { current: 1, total: 10 });
   await closeSource(page, "QuickOpenModal.tsx");
 });

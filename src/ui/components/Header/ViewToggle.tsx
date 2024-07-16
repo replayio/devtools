@@ -24,7 +24,7 @@ export const shouldShowDevToolsNag = (nags: Nag[], viewMode: ViewMode) => {
   // If they haven't added a print statement yet, consider them "new"
   // This should avoid showing it to existing users who have used the app,
   // but haven't seen the "See DevTools" nag we're adding.
-  const isNewUser = shouldShowNag(nags, Nag.FIRST_BREAKPOINT_ADD);
+  const isNewUser = shouldShowNag(nags, Nag.FIRST_PRINT_STATEMENT_ADD);
 
   const hasSeenDevtoolsNag = !shouldShowNag(nags, Nag.VIEW_DEVTOOLS);
   const isViewerMode = viewMode === "non-dev";

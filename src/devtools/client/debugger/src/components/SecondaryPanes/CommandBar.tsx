@@ -28,25 +28,22 @@ import { trackEvent } from "ui/utils/telemetry";
 
 const isOSX = isMacOS();
 
-const COMMANDS = ["findResumeTarget", ...FIND_STEP_TARGET_COMMANDS] as const;
+const COMMANDS = FIND_STEP_TARGET_COMMANDS;
 
 const KEYS: Record<"WINNT" | "Darwin" | "Linux", Record<(typeof COMMANDS)[number], string>> = {
   WINNT: {
-    findResumeTarget: "F8",
     findReverseStepOverTarget: "Shift+F10",
     findStepOverTarget: "F10",
     findStepInTarget: "F11",
     findStepOutTarget: "Shift+F11",
   },
   Darwin: {
-    findResumeTarget: "Cmd+\\",
     findReverseStepOverTarget: "Cmd+Shift+'",
     findStepOverTarget: "Cmd+'",
     findStepInTarget: "Cmd+;",
     findStepOutTarget: "Cmd+Shift+;",
   },
   Linux: {
-    findResumeTarget: "F8",
     findReverseStepOverTarget: "Shift+F10",
     findStepOverTarget: "F10",
     findStepInTarget: "F11",
@@ -114,21 +111,6 @@ export default function CommandBar() {
 
   return (
     <div className="command-bar">
-      <StepButton
-        key="rewind"
-        command="findRewindTarget"
-        mixpanelEvent="debugger.rewind"
-        tooltip="Rewind Execution"
-        type="rewind"
-      />
-      <StepButton
-        key="resume"
-        command="findResumeTarget"
-        mixpanelEvent="debugger.resume"
-        tooltip={`Resume ${formatKey("findResumeTarget")}`}
-        type="resume"
-      />
-      <div key="divider-2" className="divider" />
       <StepButton
         key="reverseStepOver"
         command="findReverseStepOverTarget"

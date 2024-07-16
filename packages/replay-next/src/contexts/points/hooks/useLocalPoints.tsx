@@ -19,7 +19,6 @@ type LegacyPoint = {
   id: string;
   location: Location;
   recordingId: RecordingId;
-  shouldBreak: PointBehavior;
   shouldLog: PointBehavior;
 };
 

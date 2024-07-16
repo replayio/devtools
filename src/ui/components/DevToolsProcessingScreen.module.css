@@ -14,6 +14,11 @@
   cursor: not-allowed;
 }
 
-.Checkbox {
-  border-radius: 0.25rem;
+.Footer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5ch;
+  font-size: var(--font-size-regular);
+  color: var(--color-dim);
 }

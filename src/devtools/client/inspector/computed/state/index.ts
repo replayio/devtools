@@ -1,3 +1,5 @@
+import { Priority } from "../../rules/models/text-property";
+
 export interface ComputedPropertyState {
   name: string;
   value: string;
@@ -9,6 +11,7 @@ export interface MatchedSelectorState {
   selector: string;
   value: string;
   parsedValue: any[];
+  priority: Priority;
   overridden: boolean;
   stylesheet: string;
   stylesheetURL: string;

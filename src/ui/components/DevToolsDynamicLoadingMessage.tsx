@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 
 import LoadingScreen from "ui/components/shared/LoadingScreen";
 
 export function DevToolsDynamicLoadingMessage() {
-  const [message, setMessage] = useState<string>("Loading...");
+  const [message, setMessage] = useState<ReactNode>("Loading...");
 
   useEffect(() => {
     const changeMessage = () => {
@@ -69,7 +69,15 @@ const FILLER_PHRASES = [
   "Compiling tachyonic antitelephone scripts...",
 ];
 
-const LONG_WAIT_MESSAGE =
-  "<div><p>This is taking longer than expected.</p><p><a href='http://replay.io/discord' target='discord'>Contact us on Discord</a></p>";
+const LONG_WAIT_MESSAGE = (
+  <div>
+    <p>This is taking longer than expected.</p>
+    <p>
+      <a href="http://replay.io/discord" target="discord">
+        Contact us on Discord
+      </a>
+    </p>
+  </div>
+);
 
 const LONG_WAIT_DURATION = 20_000;

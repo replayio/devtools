@@ -11,12 +11,11 @@ import { getFocusBeginTime, getFocusEndTime, setFocusRange } from "../helpers/ti
 import test, { expect } from "../testFixture";
 
 // We need 500...10k hits
-// Line 248 has 847 hits
+// Line 12196 has 4.4k hits
 const sourceUrl = "react-dom.production.js";
-const lineNumber = 248;
+const lineNumber = 12196;
 
-// trunk-ignore(gitleaks/generic-api-key)
-test.use({ exampleKey: "breakpoints-01" });
+test.use({ exampleKey: "logpoints-01" });
 
 test(`logpoints-11: too-many-points-to-run-analysis UX`, async ({
   pageWithMeta: { page, recordingId, testScope },

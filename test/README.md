@@ -10,7 +10,7 @@ Tests are defined in the `manifest.js` file.
 // Example browser based e2e tests
 {
   "example": "doc_rr_basic.html",
-  "script": "breakpoints-01.js",
+  "script": "logpoints-01.js",
   "targets": ["gecko", "chromium"]
 },
 

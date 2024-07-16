@@ -11,9 +11,9 @@ import { Nag, useDismissNag } from "ui/hooks/users";
 import { getViewMode } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import {
-  shouldShowBreakpointAdd,
-  shouldShowBreakpointEdit,
+  shouldShowAddLogPoint,
   shouldShowConsoleNavigate,
+  shouldShowEditLogPoint,
 } from "ui/utils/onboarding";
 
 import styles from "./Tour.module.css";
@@ -41,12 +41,11 @@ const Tour: React.FC = () => {
   const showDevtoolsNag = shouldShowDevToolsNag(nags, viewMode);
 
   const showConsoleNavigate = shouldShowConsoleNavigate(nags);
-  const showBreakpointAdd = shouldShowBreakpointAdd(nags);
-  const showBreakpointEdit = shouldShowBreakpointEdit(nags);
+  const showAddLogPoint = shouldShowAddLogPoint(nags);
+  const showEditLogPoint = shouldShowEditLogPoint(nags);
 
-  const isNewUser =
-    showDevtoolsNag && showConsoleNavigate && showBreakpointAdd && showBreakpointEdit;
-  const hasCompletedTour = !showBreakpointEdit;
+  const isNewUser = showDevtoolsNag && showConsoleNavigate && showAddLogPoint && showEditLogPoint;
+  const hasCompletedTour = !showEditLogPoint;
 
   const recordingId = useGetRecordingId();
   const { recording } = useGetRecording(recordingId);
@@ -236,11 +235,8 @@ const Tour: React.FC = () => {
                     {!hasCompletedTour && (
                       <>
                         {showConsoleNavigate && timeTravel}
-                        {!showConsoleNavigate && showBreakpointAdd && oneClickLogs}
-                        {!showConsoleNavigate &&
-                          !showBreakpointAdd &&
-                          showBreakpointEdit &&
-                          editLogs}
+                        {!showConsoleNavigate && showAddLogPoint && oneClickLogs}
+                        {!showConsoleNavigate && !showAddLogPoint && showEditLogPoint && editLogs}
                       </>
                     )}
                     {hasCompletedTour && <CompletedTour dismissTourNag={dismissTourNag} />}
@@ -262,10 +258,8 @@ const Tour: React.FC = () => {
             {!hasCompletedTour && ( // some people jump to the final step of the tour, so this lets them
               <>
                 {showConsoleNavigate && <TimeTravelGif />}
-                {!showConsoleNavigate && !showBreakpointAdd && showBreakpointEdit && (
-                  <EditLogsGif />
-                )}
-                {!showConsoleNavigate && showBreakpointAdd && <OneClickLogsGif />}
+                {!showConsoleNavigate && !showAddLogPoint && showEditLogPoint && <EditLogsGif />}
+                {!showConsoleNavigate && showAddLogPoint && <OneClickLogsGif />}
               </>
             )}
             {hasCompletedTour && <CompletedTourGif />}

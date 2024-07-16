@@ -4,11 +4,12 @@ import {
   searchSources,
   selectSourceSearchResult,
 } from "../helpers/file-search";
-import { getScopesPanel, rewindToLine, selectFrame } from "../helpers/pause-information-panel";
+import { getScopesPanel, selectFrame } from "../helpers/pause-information-panel";
+import { openSource } from "../helpers/source-explorer-panel";
 import {
-  addBreakpoint,
   closeSource,
   getSelectedLineNumber,
+  rewindToLine,
   waitForSourceToBeShown,
 } from "../helpers/source-panel";
 import { getByTestName, waitFor } from "../helpers/utils";
@@ -26,8 +27,8 @@ test(`source-line-highlights: Test source line highlighting`, async ({
   await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
 
-  await addBreakpoint(page, { lineNumber: 16, url: firstSource });
-  await rewindToLine(page, 16);
+  await openSource(page, firstSource);
+  await rewindToLine(page, { lineNumber: 16 });
 
   // the location of the top frame is highlighted
   await waitFor(async () => expect(await getSelectedLineNumber(page, true)).toBe(16));

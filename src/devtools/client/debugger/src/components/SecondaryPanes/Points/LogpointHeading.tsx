@@ -12,12 +12,12 @@ import { getExecutionPoint } from "../../../reducers/pause";
 import { getContext } from "../../../selectors";
 import { getFileURL, getSourceQueryString, getTruncatedFileName } from "../../../utils/source";
 import { CloseButton } from "../../shared/Button";
-import styles from "./BreakpointHeading.module.css";
+import styles from "./LogpointHeading.module.css";
 
 type BHExtraProps = {
-  breakpoint: Point;
-  allBreakpointsAreShared: boolean;
-  onRemoveBreakpoints: (cx: Context, source: MiniSource) => void;
+  logPoint: Point;
+  allLogPointsAreShared: boolean;
+  onRemoveLogPoints: (cx: Context, source: MiniSource) => void;
   sourceId: SourceId;
 };
 
@@ -36,16 +36,16 @@ const connector = connect(mapStateToProps, {
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
-type BreakpointsProps = PropsFromRedux & BHExtraProps;
+type LogPointsProps = PropsFromRedux & BHExtraProps;
 
-class BreakpointHeading extends PureComponent<BreakpointsProps> {
+class LogpointHeading extends PureComponent<LogPointsProps> {
   onContextMenu = () => {
     return;
   };
 
   getLabel() {
-    const { breakpoint, source } = this.props;
-    const { column, line } = breakpoint?.location ?? {};
+    const { logPoint, source } = this.props;
+    const { column, line } = logPoint?.location ?? {};
 
     const columnVal = column != null ? `:${column}` : "";
     const location = `:${line}${columnVal}`;
@@ -56,11 +56,11 @@ class BreakpointHeading extends PureComponent<BreakpointsProps> {
     return `${fileName}${location}`;
   }
 
-  removeBreakpoint = (event: React.MouseEvent) => {
-    const { cx, source, onRemoveBreakpoints } = this.props;
+  removeLogPoint = (event: React.MouseEvent) => {
+    const { cx, source, onRemoveLogPoints } = this.props;
     event.stopPropagation();
 
-    onRemoveBreakpoints(cx, source);
+    onRemoveLogPoints(cx, source);
   };
 
   onClick = () => {
@@ -70,7 +70,7 @@ class BreakpointHeading extends PureComponent<BreakpointsProps> {
   };
 
   render() {
-    const { allBreakpointsAreShared, source } = this.props;
+    const { allLogPointsAreShared, source } = this.props;
 
     const query = getSourceQueryString(source);
     const fileName = getTruncatedFileName(source, query);
@@ -83,10 +83,10 @@ class BreakpointHeading extends PureComponent<BreakpointsProps> {
         onClick={this.onClick}
       >
         <div className={styles.Label}>{fileName}</div>
-        {allBreakpointsAreShared || (
+        {allLogPointsAreShared || (
           <CloseButton
-            handleClick={this.removeBreakpoint}
-            tooltip={"Remove all breakpoint from this source"}
+            handleClick={this.removeLogPoint}
+            tooltip={"Remove all logpoints from this source"}
           />
         )}
       </div>
@@ -94,4 +94,4 @@ class BreakpointHeading extends PureComponent<BreakpointsProps> {
   }
 }
 
-export default connector(BreakpointHeading);
+export default connector(LogpointHeading);

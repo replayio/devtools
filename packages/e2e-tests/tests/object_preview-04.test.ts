@@ -5,7 +5,7 @@ import {
   waitForPaused,
   waitForScopeValue,
 } from "../helpers/pause-information-panel";
-import { addBreakpoint, addLogpoint, toggleMappedSources } from "../helpers/source-panel";
+import { addLogpoint, toggleMappedSources } from "../helpers/source-panel";
 import test from "../testFixture";
 
 test.use({ exampleKey: "doc_prod_bundle.html" });
@@ -17,7 +17,6 @@ test(`object_preview-04: Test scope mapping and switching between generated/orig
   await startTest(page, recordingId, testScope);
   await openDevToolsTab(page);
 
-  await addBreakpoint(page, { lineNumber: 15, url: "bundle_input.js" });
   await addLogpoint(page, {
     content: "barobj.barprop1 * 10",
     lineNumber: 15,

@@ -3,73 +3,11 @@ import chalk from "chalk";
 
 import { Badge } from "shared/client/types";
 
-import { clearText, focus, hideTypeAheadSuggestions, typeLogPoint as typeLexical } from "./lexical";
+import { focus, hideTypeAheadSuggestions, typeLogPoint as typeLexical } from "./lexical";
 import { findPoints, openPauseInformationPanel, removePoint } from "./pause-information-panel";
 import { openSource } from "./source-explorer-panel";
-import { clearTextArea, debugPrint, delay, getByTestName, getCommandKey, waitFor } from "./utils";
+import { clearTextArea, debugPrint, getByTestName, getCommandKey, waitFor } from "./utils";
 import { openDevToolsTab } from ".";
-
-export async function addBreakpoint(
-  page: Page,
-  options: {
-    columnIndex?: number;
-    lineNumber: number;
-    url: string;
-  }
-): Promise<void> {
-  const { lineNumber, url } = options;
-
-  await openDevToolsTab(page);
-
-  if (url) {
-    await openSource(page, url);
-  }
-
-  await debugPrint(
-    page,
-    `Adding breakpoint at ${chalk.bold(`${url}:${lineNumber}`)}`,
-    "addBreakpoint"
-  );
-
-  await scrollUntilLineIsVisible(page, lineNumber);
-  await waitForSourceLineHitCounts(page, lineNumber);
-
-  const lineLocator = await getSourceLine(page, lineNumber);
-
-  // Account for the fact that SourceListRow doesn't render SourceListRowMouseEvents while scrolling
-  await waitFor(async () => {
-    const isScrolling = await lineLocator.getAttribute("data-test-is-scrolling");
-    expect(isScrolling).toBe(null);
-  });
-
-  const lineNumberLocator = lineLocator.locator('[data-test-name="SourceLine-LineNumber"]');
-  await lineNumberLocator.waitFor();
-
-  const breakpointToggleLocator = lineLocator.locator('[data-test-name="BreakpointToggle"]');
-
-  await waitFor(async () => {
-    // Mouse out then back over
-    await page.mouse.move(0, 0);
-    await lineNumberLocator.hover({ force: true });
-
-    // Wait for breakpoint toggle from mouse over
-    await breakpointToggleLocator.waitFor();
-
-    const state = await breakpointToggleLocator.getAttribute("data-test-state");
-    if (state === "off") {
-      await lineLocator.locator('[data-test-name="SourceLine-LineNumber"]').click({ force: true });
-    }
-  });
-
-  await waitForBreakpoint(page, options);
-
-  // We want to add a slight delay after adding a breakpoint so that the
-  // breakpoint logic will have time to send protocol commands to the server,
-  // since that is not guaranteed to happen synchronously on click. This is
-  // important for cases where we add a breakpoint and then immediately
-  // attempt to step to the breakpoint location.
-  await delay(2000);
-}
 
 export async function editBadge(
   page: Page,
@@ -320,6 +258,7 @@ export async function editLogPoint(
       .locator('[data-test-name="PointPanel-ContentWrapper"] [data-lexical-editor="true"]')
       .isVisible();
     if (!isEditing) {
+      await line.locator('[data-test-name="PointPanel-IconAndAvatar"]').hover();
       await line.locator('[data-test-name="PointPanel-EditButton"]').click();
     }
 
@@ -513,67 +452,16 @@ export async function openLogPointPanelContextMenu(
   }
 }
 
-export async function removeAllBreakpoints(page: Page): Promise<void> {
-  await debugPrint(page, `Removing all breakpoints for the current source`, "removeBreakpoint");
-
-  await openPauseInformationPanel(page);
-  const points = await findPoints(page, "breakpoint");
-  const count = await points.count();
-  for (let index = count - 1; index >= 0; index--) {
-    const point = points.nth(index);
-    await removePoint(point);
-  }
-}
-
 export async function removeAllLogpoints(page: Page): Promise<void> {
-  await debugPrint(page, `Removing all breakpoints for the current source`, "removeBreakpoint");
+  await debugPrint(page, `Removing all logpoints for the current source`, "removeAllLogpoints");
 
   await openPauseInformationPanel(page);
-  const points = await findPoints(page, "logpoint");
+  const points = await findPoints(page);
   const count = await points.count();
   for (let index = count - 1; index >= 0; index--) {
     const point = points.nth(index);
     await removePoint(point);
   }
-}
-
-export async function removeBreakpoint(
-  page: Page,
-  options: {
-    lineNumber: number;
-    url: string;
-  }
-): Promise<void> {
-  const { lineNumber, url } = options;
-
-  await debugPrint(
-    page,
-    `Removing breakpoint at ${chalk.bold(`${url}:${lineNumber}`)}`,
-    "removeBreakpoint"
-  );
-
-  await openDevToolsTab(page);
-
-  if (url) {
-    await openSource(page, url);
-  }
-
-  const lineLocator = await getSourceLine(page, lineNumber);
-  const numberLocator = lineLocator.locator(`[data-test-name="SourceLine-LineNumber"]`);
-  await numberLocator.hover({ force: true });
-  const state = await lineLocator
-    .locator('[data-test-name="BreakpointToggle"]')
-    .getAttribute("data-test-state");
-  if (state !== "off") {
-    await numberLocator.click({ force: true });
-  }
-
-  // We want to add a slight delay after removing a breakpoint so that the
-  // breakpoint logic will have time to send protocol commands to the server,
-  // since that is not guaranteed to happen synchronously on click. This is
-  // important for cases where we remove a breakpoint and then immediately
-  // attempt to step across the breakpoint location.
-  await delay(1000);
 }
 
 export async function removeConditional(
@@ -697,39 +585,6 @@ export async function toggleMappedSources(page: Page, targetState: "on" | "off")
   }
 }
 
-export async function waitForBreakpoint(
-  page: Page,
-  options: {
-    columnIndex?: number;
-    lineNumber: number;
-    url: string;
-  }
-): Promise<void> {
-  const { columnIndex, lineNumber, url } = options;
-
-  await debugPrint(
-    page,
-    `Waiting for breakpoint at ${chalk.bold(`${url}:${lineNumber}`)}`,
-    "waitForBreakpoint"
-  );
-
-  await openPauseInformationPanel(page);
-
-  const breakpointGroup = await page.waitForSelector(
-    `[data-test-name="BreakpointsList"]:has-text("${url}")`
-  );
-
-  if (columnIndex != null) {
-    await breakpointGroup.waitForSelector(
-      `[data-test-name="PointLocation"]:has-text("${lineNumber}:${columnIndex}")`
-    );
-  } else {
-    await breakpointGroup.waitForSelector(
-      `[data-test-name="PointLocation"]:has-text("${lineNumber}")`
-    );
-  }
-}
-
 export async function waitForLogpoint(
   page: Page,
   options: {
@@ -774,7 +629,7 @@ export async function verifyLogpointStep(
 
   await debugPrint(
     page,
-    `Verifying breakpoint status "${chalk.bold(expectedStatus)}" for line ${chalk.bold(
+    `Verifying logpoint status "${chalk.bold(expectedStatus)}" for line ${chalk.bold(
       options.lineNumber
     )}`,
     "verifyLogpointStep"
@@ -899,15 +754,21 @@ export async function rewindToLine(
   await debugPrint(page, `Rewinding to line ${chalk.bold(lineNumber)}`, "rewindToLine");
 
   const lineLocator = await getSourceLine(page, lineNumber);
-  const buttonLocator = lineLocator.locator('[data-test-name="ContinueToButton"]');
+
+  // Account for the fact that SourceListRow doesn't render SourceListRowMouseEvents while scrolling
+  await waitFor(async () => {
+    const isScrolling = await lineLocator.getAttribute("data-test-is-scrolling");
+    expect(isScrolling).toBe(null);
+  });
 
   await lineLocator.locator('[data-test-name="SourceLine-HitCount"]').hover({ force: true });
-  await page.keyboard.down(getCommandKey());
 
-  const state = await buttonLocator.getAttribute("data-test-state");
-  expect(state).toBe("previous");
-
-  await buttonLocator.click({ force: true });
+  const buttonLocator = lineLocator.locator('[data-test-name="RewindButton"]');
+  await waitFor(async () => {
+    const isDisabled = await buttonLocator.getAttribute("disabled");
+    expect(isDisabled).toBe(null);
+  });
+  await buttonLocator.click();
 }
 
 export async function fastForwardToLine(
@@ -924,15 +785,23 @@ export async function fastForwardToLine(
   await debugPrint(page, `Fast forwarding to line ${chalk.bold(lineNumber)}`, "fastForwardToLine");
 
   const lineLocator = await getSourceLine(page, lineNumber);
-  const buttonLocator = lineLocator.locator('[data-test-name="ContinueToButton"]');
+
+  // Account for the fact that SourceListRow doesn't render SourceListRowMouseEvents while scrolling
+  await waitFor(async () => {
+    const isScrolling = await lineLocator.getAttribute("data-test-is-scrolling");
+    expect(isScrolling).toBe(null);
+  });
 
   await lineLocator.locator('[data-test-name="SourceLine-HitCount"]').hover({ force: true });
-  await page.keyboard.down(getCommandKey());
 
-  const state = await buttonLocator.getAttribute("data-test-state");
-  expect(state).toBe("next");
+  const buttonLocator = lineLocator.locator('[data-test-name="FastForwardButton"]');
+  await waitFor(async () => {
+    const isDisabled = await buttonLocator.getAttribute("disabled");
+    expect(isDisabled).toBe(null);
+  });
+  await buttonLocator.click();
 
-  await buttonLocator.click({ force: true });
+  await page.keyboard.up(getCommandKey());
 }
 
 export async function waitForSourceContentsToFinishStreaming(
