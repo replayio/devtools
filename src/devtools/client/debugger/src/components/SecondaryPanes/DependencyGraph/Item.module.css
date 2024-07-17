@@ -9,16 +9,17 @@
   background-color: var(--theme-selection-background-hover);
   cursor: pointer;
 }
-.Item[data-selected] {
-  background-color: var(--theme-selection-background);
-  color: white;
-}
 .Item[data-disabled] {
   color: var(--color-dim);
 }
 .Item[data-disabled]:hover {
   background-color: transparent;
   cursor: default;
+}
+.Item[data-selected],
+.Item[data-selected]:hover {
+  background-color: var(--theme-selection-background);
+  color: white;
 }
 
 .NameColumn {
@@ -41,5 +42,5 @@
   text-overflow: ellipsis;
 }
 .Item[data-selected] .LocationColumn {
-  display: none;
+  color: white;
 }
