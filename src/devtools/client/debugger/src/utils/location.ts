@@ -4,7 +4,7 @@
 import type { Location, SourceLocation } from "@replayio/protocol";
 import sortBy from "lodash/sortBy";
 
-export function comparePosition(a: Location, b: Location) {
+export function comparePosition(a: Partial<Location>, b: Partial<Location>) {
   return a && b && a.line == b.line && a.column == b.column;
 }
 

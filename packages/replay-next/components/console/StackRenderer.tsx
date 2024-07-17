@@ -1,8 +1,7 @@
 import { CallStack, Frame, FrameId } from "@replayio/protocol";
-import React, { Suspense, memo, useContext } from "react";
+import { Suspense, memo } from "react";
 
 import Loader from "replay-next/components/Loader";
-import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import Source from "./Source";
 import styles from "./StackRenderer.module.css";
@@ -26,8 +25,6 @@ function StackRenderer({ frames, stack }: { frames: Frame[]; stack: CallStack })
 }
 
 function StackFrameRenderer({ frameId, frames }: { frameId: FrameId; frames: Frame[] }) {
-  const client = useContext(ReplayClientContext);
-
   const frame = frames.find(frame => frame.frameId === frameId);
   if (frame == null) {
     return null;

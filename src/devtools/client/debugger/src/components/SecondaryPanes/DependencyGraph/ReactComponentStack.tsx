@@ -32,16 +32,15 @@ function ReactComponentStackSuspends({ timeStampedPoint }: Props) {
     return <Message>No frames to display</Message>;
   }
 
-  const firstItem = reactStackValue[0];
+  const leafNode = reactStackValue[0];
 
   return (
     <>
-      {firstItem && (
+      {leafNode && (
         <Item
-          isCurrent
-          location={firstItem.componentLocation}
-          name={firstItem.componentName}
-          timeStampedPoint={firstItem}
+          location={leafNode.componentLocation}
+          name={leafNode.componentName}
+          timeStampedPoint={leafNode}
         />
       )}
       {reactStackValue?.map((entry, index) => (
