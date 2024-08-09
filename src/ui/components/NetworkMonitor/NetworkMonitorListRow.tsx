@@ -225,7 +225,7 @@ function RequestRow({
         )}
         {columns.name && (
           <div className={styles.Column} data-name="name">
-            {name} {graphqlOperationName && `(GraphQL: ${graphqlOperationName})`}
+            {name} {graphqlOperationName && `(${graphqlOperationName})`}
           </div>
         )}
         {columns.method && (
