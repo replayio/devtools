@@ -134,12 +134,17 @@ function urlToLanguage(fileName: string): LRLanguage {
   const extension = fileName.split(".").pop()!.split("?").shift()!;
   switch (extension) {
     case "js":
+    case "mjs":
+    case "cjs":
       return javascriptLanguage;
     case "jsx":
       return jsxLanguage;
     case "ts":
       return typescriptLanguage;
     case "tsx":
+    // .mts and .cts follow .tsx parsing rules (they don't support angle bracket casting and they allow JSX)
+    case "mts":
+    case "cts":
       return tsxLanguage;
     case "json":
       return jsonLanguage;
