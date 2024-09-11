@@ -128,7 +128,6 @@ let gSessionCallbacks: SessionCallbacks | undefined;
 
 export function setSessionCallbacks(sessionCallbacks: SessionCallbacks) {
   if (gSessionCallbacks !== undefined) {
-    console.error("Session callbacks can only be set once");
     return;
   }
 

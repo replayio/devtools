@@ -162,10 +162,18 @@ export interface TimeStampedPointWithPaintHash extends TimeStampedPoint {
 
 export type AnnotationListener = (annotation: Annotation) => void;
 
+export interface SupplementalRecording {
+  recordingId: string;
+}
+
+export interface SupplementalSession extends SupplementalRecording {
+  sessionId: string;
+}
+
 export interface ReplayClientInterface {
   get loadedRegions(): LoadedRegions | null;
   addEventListener(type: ReplayClientEvents, handler: Function): void;
-  configure(sessionId: string): Promise<void>;
+  configure(sessionId: string, supplemental: SupplementalSession[]): Promise<void>;
   createPause(executionPoint: ExecutionPoint): Promise<createPauseResult>;
   evaluateExpression(
     pauseId: PauseId,

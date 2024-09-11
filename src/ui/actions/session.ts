@@ -41,6 +41,7 @@ import { subscriptionExpired } from "ui/utils/workspace";
 import { setExpectedError, setUnexpectedError } from "./errors";
 import { setToolboxLayout, setViewMode } from "./layout";
 import { jumpToInitialPausePoint } from "./timeline";
+import { SupplementalRecording } from "shared/client/types";
 
 export { setExpectedError, setUnexpectedError };
 
@@ -88,6 +89,14 @@ export function getAccessibleRecording(
       return null;
     }
   };
+}
+
+function getSupplementalRecordings(recordingId: string): SupplementalRecording[] {
+  switch (recordingId) {
+    case "d5513383-5986-4de5-ab9d-2a7e1f367e90":
+      return [{ recordingId: "c54962d6-9ac6-428a-a6af-2bb2bf6633ca" }];
+  }
+  return [];
 }
 
 function clearRecordingNotAccessibleError(): UIThunkAction {
@@ -274,7 +283,7 @@ export function createSocket(recordingId: string): UIThunkAction {
         })
       );
 
-      const sessionId = await createSession(
+      const doCreateSession = (recordingId: string) => createSession(
         recordingId,
         experimentalSettings,
         focusWindowFromURL !== null ? focusWindowFromURL : undefined,
@@ -353,12 +362,22 @@ export function createSocket(recordingId: string): UIThunkAction {
         }
       );
 
+      const sessionId = await doCreateSession(recordingId);
+      console.log("MainSessionId", JSON.stringify({ recordingId, sessionId }));
+
+      const supplementalRecordings = getSupplementalRecordings(recordingId);
+      const supplemental = await Promise.all(supplementalRecordings.map(async ({ recordingId }) => {
+        const sessionId = await doCreateSession(recordingId);
+        console.log("SupplementalSessionId", JSON.stringify({ recordingId, sessionId }));
+        return { recordingId, sessionId };
+      }));
+
       Sentry.configureScope(scope => {
         scope.setExtra("sessionId", sessionId);
       });
 
       window.sessionId = sessionId;
-      await replayClient.configure(sessionId);
+      await replayClient.configure(sessionId, supplemental);
       const recordingTarget = await recordingTargetCache.readAsync(replayClient);
       dispatch(actions.setRecordingTarget(recordingTarget));
 

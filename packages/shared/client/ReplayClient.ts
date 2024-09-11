@@ -78,7 +78,7 @@ import uniqueId from "lodash/uniqueId";
 
 // eslint-disable-next-line no-restricted-imports
 import { addEventListener, client, initSocket, removeEventListener } from "protocol/socket";
-import { assert, compareNumericStrings, defer, waitForTime } from "protocol/utils";
+import { assert, compareNumericStrings, defer, Deferred, waitForTime } from "protocol/utils";
 import { initProtocolMessagesStore } from "replay-next/components/protocol/ProtocolMessagesStore";
 import { insert } from "replay-next/src/utils/array";
 import { TOO_MANY_POINTS_TO_FIND } from "shared/constants";
@@ -90,6 +90,7 @@ import {
   ReplayClientEvents,
   ReplayClientInterface,
   SourceLocationRange,
+  SupplementalSession,
   TimeStampedPointWithPaintHash,
 } from "./types";
 
@@ -111,6 +112,8 @@ export class ReplayClient implements ReplayClientInterface {
 
   private sessionWaiter = defer<SessionId>();
 
+  private supplemental: SupplementalSession[] = [];
+
   private focusWindow: TimeStampedPointRange | null = null;
 
   private nextFindPointsId = 1;
@@ -131,16 +134,40 @@ export class ReplayClient implements ReplayClientInterface {
   // Configures the client to use an already initialized session iD.
   // This method should be used for apps that use the protocol package directly.
   // Apps that only communicate with the Replay protocol through this client should use the initialize method instead.
-  async configure(sessionId: string): Promise<void> {
+  async configure(sessionId: string, supplemental: SupplementalSession[]): Promise<void> {
     this._sessionId = sessionId;
     this._dispatchEvent("sessionCreated");
     this.sessionWaiter.resolve(sessionId);
-
+    this.supplemental.push(...supplemental);
     await this.syncFocusWindow();
   }
 
   waitForSession() {
     return this.sessionWaiter.promise;
+  }
+
+  private async forEachSession(callback: (sessionId: string, supplementalIndex: number) => Promise<void>) {
+    const sessionId = await this.waitForSession();
+    await callback(sessionId, 0);
+    for (let i = 0; i < this.supplemental.length; i++) {
+      await callback(this.supplemental[i].sessionId, i + 1);
+    }
+  }
+
+  private transformSupplementalId(id: string, supplementalIndex: number) {
+    return `s${supplementalIndex}-${id}`;
+  }
+
+  private async breakdownSupplementalId(id: string): Promise<{ id: string, sessionId: string }> {
+    const match = /^s(\d+)-(.*)/.exec(id);
+    if (!match) {
+      const sessionId = await this.waitForSession();
+      return { id, sessionId };
+    }
+    const supplementalIndex = +match[1];
+    const supplementalInfo = this.supplemental[supplementalIndex - 1];
+    assert(supplementalInfo);
+    return { id: match[2], sessionId: supplementalInfo.sessionId };
   }
 
   get loadedRegions(): LoadedRegions | null {
@@ -508,24 +535,26 @@ export class ReplayClient implements ReplayClientInterface {
   async findSources(): Promise<Source[]> {
     const sources: Source[] = [];
 
-    await this.waitForSession();
-
-    const sessionId = await this.waitForSession();
-
-    const newSourceListener = (source: Source) => {
-      sources.push(source);
-    };
-    const newSourcesListener = ({ sources: sourcesList }: newSources) => {
-      for (const source of sourcesList) {
+    await this.forEachSession(async (sessionId, supplementalIndex) => {
+      const newSourceListener = (source: Source) => {
         sources.push(source);
-      }
-    };
+      };
+      const newSourcesListener = ({ sources: sourcesList }: newSources) => {
+        for (const source of sourcesList) {
+          if (supplementalIndex) {
+            source.sourceId = this.transformSupplementalId(source.sourceId, supplementalIndex);
+            source.generatedSourceIds = source.generatedSourceIds?.map(id => this.transformSupplementalId(id, supplementalIndex));
+          }
+          sources.push(source);
+        }
+      };
 
-    client.Debugger.addNewSourceListener(newSourceListener);
-    client.Debugger.addNewSourcesListener(newSourcesListener);
-    await client.Debugger.findSources({}, sessionId);
-    client.Debugger.removeNewSourceListener(newSourceListener);
-    client.Debugger.removeNewSourcesListener(newSourcesListener);
+      client.Debugger.addNewSourceListener(newSourceListener);
+      client.Debugger.addNewSourcesListener(newSourcesListener);
+      await client.Debugger.findSources({}, sessionId);
+      client.Debugger.removeNewSourceListener(newSourceListener);
+      client.Debugger.removeNewSourcesListener(newSourcesListener);
+    });
 
     return sources;
   }
@@ -796,14 +825,15 @@ export class ReplayClient implements ReplayClientInterface {
   getSessionId = (): SessionId | null => this._sessionId;
 
   async getSourceHitCounts(
-    sourceId: SourceId,
+    transformedSourceId: SourceId,
     locations: SameLineSourceLocations[],
     focusRange: PointRange | null
   ) {
-    const sessionId = await this.waitForSession();
+    const { id: sourceId, sessionId } = await this.breakdownSupplementalId(transformedSourceId);
+
     await this.waitForRangeToBeInFocusRange(focusRange);
     const { hits } = await client.Debugger.getHitCounts(
-      { sourceId, locations, maxHits: TOO_MANY_POINTS_TO_FIND, range: focusRange || undefined },
+      { sourceId, locations, maxHits: TOO_MANY_POINTS_TO_FIND, range: /*focusRange ||*/ undefined },
       sessionId
     );
     return hits;
@@ -815,10 +845,11 @@ export class ReplayClient implements ReplayClientInterface {
   }
 
   async getBreakpointPositions(
-    sourceId: SourceId,
+    transformedSourceId: SourceId,
     locationRange: SourceLocationRange | null
   ): Promise<SameLineSourceLocations[]> {
-    const sessionId = await this.waitForSession();
+    const { id: sourceId, sessionId } = await this.breakdownSupplementalId(transformedSourceId);
+
     const begin = locationRange ? locationRange.start : undefined;
     const end = locationRange ? locationRange.end : undefined;
 
@@ -1063,11 +1094,11 @@ export class ReplayClient implements ReplayClientInterface {
   }
 
   async streamSourceContents(
-    sourceId: SourceId,
+    transformedSourceId: SourceId,
     onSourceContentsInfo: (params: sourceContentsInfo) => void,
     onSourceContentsChunk: (params: sourceContentsChunk) => void
   ): Promise<void> {
-    const sessionId = await this.waitForSession();
+    const { id: sourceId, sessionId } = await this.breakdownSupplementalId(transformedSourceId);
 
     let pendingChunk = "";
     let pendingThrottlePromise: Promise<void> | null = null;
