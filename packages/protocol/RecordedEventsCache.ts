@@ -5,7 +5,7 @@ import {
 } from "@replayio/protocol";
 import { createSingleEntryCache } from "suspense";
 
-import { compareExecutionPoints } from "protocol/utils";
+import { compareNumericStrings } from "protocol/utils";
 import { findIndexLTE } from "replay-next/src/utils/array";
 import { replayClient } from "shared/client/ReplayClientContext";
 
@@ -39,7 +39,7 @@ export const RecordedEventsCache = createSingleEntryCache<[], RecordedEvent[]>({
 
     const events = [...keyboardEvents, ...mouseEvents, ...navigationEvents];
 
-    return events.sort((a, b) => compareExecutionPoints(a.point, b.point));
+    return events.sort((a, b) => compareNumericStrings(a.point, b.point));
   },
 });
 

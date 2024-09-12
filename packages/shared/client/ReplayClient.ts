@@ -78,7 +78,7 @@ import uniqueId from "lodash/uniqueId";
 
 // eslint-disable-next-line no-restricted-imports
 import { addEventListener, client, initSocket, removeEventListener } from "protocol/socket";
-import { assert, compareExecutionPoints, defer, waitForTime, transformSupplementalId, breakdownSupplementalId } from "protocol/utils";
+import { assert, compareNumericStrings, defer, waitForTime, transformSupplementalId, breakdownSupplementalId, transformSupplementalNumericString } from "protocol/utils";
 import { initProtocolMessagesStore } from "replay-next/components/protocol/ProtocolMessagesStore";
 import { insert } from "replay-next/src/utils/array";
 import { TOO_MANY_POINTS_TO_FIND } from "shared/constants";
@@ -314,7 +314,7 @@ export class ReplayClient implements ReplayClientInterface {
         let middleIndex = (lowIndex + highIndex) >>> 1;
         const message = sortedMessages[middleIndex];
 
-        if (compareExecutionPoints(message.point.point, newMessagePoint)) {
+        if (compareNumericStrings(message.point.point, newMessagePoint)) {
           lowIndex = middleIndex + 1;
         } else {
           highIndex = middleIndex;
@@ -357,7 +357,7 @@ export class ReplayClient implements ReplayClientInterface {
     const sortedMessages = response.messages.sort((messageA: Message, messageB: Message) => {
       const pointA = messageA.point.point;
       const pointB = messageB.point.point;
-      return compareExecutionPoints(pointA, pointB);
+      return compareNumericStrings(pointA, pointB);
     });
 
     return {
@@ -537,9 +537,9 @@ export class ReplayClient implements ReplayClientInterface {
       throw commandError("Too many points", ProtocolError.TooManyPoints);
     }
 
-    points.sort((a, b) => compareExecutionPoints(a.point, b.point));
+    points.sort((a, b) => compareNumericStrings(a.point, b.point));
     return points.map(desc => {
-      const point = transformSupplementalId(desc.point, supplementalIndex);
+      const point = transformSupplementalNumericString(desc.point, supplementalIndex);
       return { ...desc, point };
     });
   }

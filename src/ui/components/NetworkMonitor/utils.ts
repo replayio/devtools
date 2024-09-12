@@ -11,7 +11,7 @@ import {
 } from "@replayio/protocol";
 import keyBy from "lodash/keyBy";
 
-import { assert, compareExecutionPoints } from "protocol/utils";
+import { assert, compareNumericStrings } from "protocol/utils";
 import { NetworkRequestsCacheData } from "replay-next/src/suspense/NetworkRequestsCache";
 
 export enum CanonicalRequestType {
@@ -174,7 +174,7 @@ export const partialRequestsToCompleteSummaries = (
     })
     .filter(row => types.size === 0 || types.has(row.type));
 
-  summaries.sort((a, b) => compareExecutionPoints(a.point.point, b.point.point));
+  summaries.sort((a, b) => compareNumericStrings(a.point.point, b.point.point));
 
   return summaries;
 };
