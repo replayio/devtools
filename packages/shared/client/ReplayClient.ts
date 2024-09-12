@@ -159,15 +159,15 @@ export class ReplayClient implements ReplayClientInterface {
     }
   }
 
-  private async breakdownSupplementalIdAndSession(transformedId: string): Promise<{ id: string, sessionId: string }> {
+  private async breakdownSupplementalIdAndSession(transformedId: string): Promise<{ id: string, sessionId: string, supplementalIndex: number }> {
     const { id, supplementalIndex } = breakdownSupplementalId(transformedId);
     if (!supplementalIndex) {
       const sessionId = await this.waitForSession();
-      return { id, sessionId };
+      return { id, sessionId, supplementalIndex };
     }
     const supplementalInfo = this.supplemental[supplementalIndex - 1];
     assert(supplementalInfo);
-    return { id, sessionId: supplementalInfo.sessionId };
+    return { id, sessionId: supplementalInfo.sessionId, supplementalIndex };
   }
 
   get loadedRegions(): LoadedRegions | null {
@@ -465,32 +465,34 @@ export class ReplayClient implements ReplayClientInterface {
   }
 
   async breakdownSupplementalLocation(location: Location) {
-    const { id: sourceId, sessionId } = await this.breakdownSupplementalIdAndSession(location.sourceId);
-    return { location: { ...location, sourceId }, sessionId };
+    const { id: sourceId, sessionId, supplementalIndex } = await this.breakdownSupplementalIdAndSession(location.sourceId);
+    return { location: { ...location, sourceId }, sessionId, supplementalIndex };
   }
 
   async breakdownSupplementalPointSelector(pointSelector: PointSelector) {
     switch (pointSelector.kind) {
       case "location": {
-        const { location, sessionId } = await this.breakdownSupplementalLocation(pointSelector.location);
-        return { pointSelector: { ...pointSelector, location }, sessionId };
+        const { location, sessionId, supplementalIndex } = await this.breakdownSupplementalLocation(pointSelector.location);
+        return { pointSelector: { ...pointSelector, location }, sessionId, supplementalIndex };
       }
       case "locations": {
         let commonSessionId: string | undefined;
+        let commonSupplementalIndex = 0;
         const locations = await Promise.all(pointSelector.locations.map(async transformedLocation => {
-          const { location, sessionId } = await this.breakdownSupplementalLocation(transformedLocation);
+          const { location, sessionId, supplementalIndex } = await this.breakdownSupplementalLocation(transformedLocation);
           if (commonSessionId) {
             assert(commonSessionId == sessionId);
           } else {
             commonSessionId = sessionId;
+            commonSupplementalIndex = supplementalIndex;
           }
           return location;
         }));
         assert(commonSessionId);
-        return { pointSelector: { ...pointSelector, locations }, sessionId: commonSessionId };
+        return { pointSelector: { ...pointSelector, locations }, sessionId: commonSessionId, supplementalIndex: commonSupplementalIndex };
       }
       default:
-        return { pointSelector, sessionId: await this.waitForSession() };
+        return { pointSelector, sessionId: await this.waitForSession(), supplementalIndex: 0 };
     }
   }
 
@@ -498,7 +500,7 @@ export class ReplayClient implements ReplayClientInterface {
     transformedPointSelector: PointSelector,
     pointLimits?: PointPageLimits
   ): Promise<PointDescription[]> {
-    const { pointSelector, sessionId } = await this.breakdownSupplementalPointSelector(transformedPointSelector);
+    const { pointSelector, sessionId, supplementalIndex } = await this.breakdownSupplementalPointSelector(transformedPointSelector);
 
     const points: PointDescription[] = [];
     const findPointsId = String(this.nextFindPointsId++);
@@ -536,7 +538,10 @@ export class ReplayClient implements ReplayClientInterface {
     }
 
     points.sort((a, b) => compareExecutionPoints(a.point, b.point));
-    return points;
+    return points.map(desc => {
+      const point = transformSupplementalId(desc.point, supplementalIndex);
+      return { ...desc, point };
+    });
   }
 
   async findStepInTarget(point: ExecutionPoint): Promise<PauseDescription> {
