@@ -3,7 +3,7 @@ import { createCache } from "suspense";
 
 import { breakpointPositionsIntervalCache } from "replay-next/src/suspense/BreakpointPositionsCache";
 import { bucketBreakpointLines } from "replay-next/src/utils/source";
-import { compareNumericStrings } from "replay-next/src/utils/string";
+import { compareExecutionPoints } from "protocol/utils";
 import { MAX_POINTS_TO_RUN_EVALUATION } from "shared/client/ReplayClient";
 import {
   HitPointStatus,
@@ -69,7 +69,7 @@ export const hitPointsCache = createFocusIntervalCacheForExecutionPoints<
           );
         }
       );
-      hitPoints.sort((a, b) => compareNumericStrings(a.point, b.point));
+      hitPoints.sort((a, b) => compareExecutionPoints(a.point, b.point));
     } else {
       const pointDescriptions = await replayClient.findPoints(
         { kind: "locations", locations },

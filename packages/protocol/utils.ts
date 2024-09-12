@@ -140,13 +140,30 @@ export class ArrayMap<K, V> {
   }
 }
 
+export function transformSupplementalId(id: string, supplementalIndex: number) {
+  return `s${supplementalIndex}-${id}`;
+}
+
+export function breakdownSupplementalId(id: string): { id: string, supplementalIndex: number } {
+  const match = /^s(\d+)-(.*)/.exec(id);
+  if (!match) {
+    return { id, supplementalIndex: 0 };
+  }
+  const supplementalIndex = +match[1];
+  assert(supplementalIndex > 0);
+  return { id: match[2], supplementalIndex };
+}
+
 /**
  * Compare 2 integers encoded as numeric strings, because we want to avoid using BigInt (for now).
  * This will only work correctly if both strings encode positive integers (without decimal places),
  * using the same base (usually 10) and don't use "fancy stuff" like leading "+", "0" or scientific
  * notation.
  */
-export function compareNumericStrings(a: string, b: string) {
+export function compareExecutionPoints(transformedA: string, transformedB: string) {
+  const { id: a, supplementalIndex: indexA } = breakdownSupplementalId(transformedA);
+  const { id: b, supplementalIndex: indexB } = breakdownSupplementalId(transformedB);
+  assert(indexA == indexB);
   return a.length < b.length ? -1 : a.length > b.length ? 1 : a < b ? -1 : a > b ? 1 : 0;
 }
 

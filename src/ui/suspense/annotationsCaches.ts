@@ -1,7 +1,7 @@
 import { Annotation, TimeStampedPoint } from "@replayio/protocol";
 import { Cache, createCache, createSingleEntryCache } from "suspense";
 
-import { compareNumericStrings } from "protocol/utils";
+import { compareExecutionPoints } from "protocol/utils";
 import { ReplayClientInterface } from "shared/client/types";
 import { InteractionEventKind } from "ui/actions/eventListeners/constants";
 import { EventListenerWithFunctionInfo } from "ui/actions/eventListeners/eventListenerUtils";
@@ -58,7 +58,7 @@ export const reactDevToolsAnnotationsCache = createSingleEntryCache<
       receivedAnnotations.push(annotation);
     });
 
-    receivedAnnotations.sort((a1, a2) => compareNumericStrings(a1.point, a2.point));
+    receivedAnnotations.sort((a1, a2) => compareExecutionPoints(a1.point, a2.point));
 
     const parsedAnnotations: ParsedReactDevToolsAnnotation[] = receivedAnnotations.map(
       ({ point, time, contents }) => ({
@@ -84,7 +84,7 @@ export const reduxDevToolsAnnotationsCache = createSingleEntryCache<
       receivedAnnotations.push(annotation);
     });
 
-    receivedAnnotations.sort((a1, a2) => compareNumericStrings(a1.point, a2.point));
+    receivedAnnotations.sort((a1, a2) => compareExecutionPoints(a1.point, a2.point));
 
     const parsedAnnotations = processReduxAnnotations(receivedAnnotations);
 
@@ -104,7 +104,7 @@ export const eventListenersJumpLocationsCache = createSingleEntryCache<
       receivedAnnotations.push(annotation);
     });
 
-    receivedAnnotations.sort((a1, a2) => compareNumericStrings(a1.point, a2.point));
+    receivedAnnotations.sort((a1, a2) => compareExecutionPoints(a1.point, a2.point));
 
     const parsedAnnotations: ParsedJumpToCodeAnnotation[] = receivedAnnotations.map(
       ({ point, time, contents }) => ({

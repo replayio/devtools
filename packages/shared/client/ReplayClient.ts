@@ -78,7 +78,7 @@ import uniqueId from "lodash/uniqueId";
 
 // eslint-disable-next-line no-restricted-imports
 import { addEventListener, client, initSocket, removeEventListener } from "protocol/socket";
-import { assert, compareNumericStrings, defer, Deferred, waitForTime } from "protocol/utils";
+import { assert, compareExecutionPoints, defer, waitForTime, transformSupplementalId, breakdownSupplementalId } from "protocol/utils";
 import { initProtocolMessagesStore } from "replay-next/components/protocol/ProtocolMessagesStore";
 import { insert } from "replay-next/src/utils/array";
 import { TOO_MANY_POINTS_TO_FIND } from "shared/constants";
@@ -146,6 +146,11 @@ export class ReplayClient implements ReplayClientInterface {
     return this.sessionWaiter.promise;
   }
 
+  isMainSession(sessionId: string) {
+    assert(this._sessionId);
+    return sessionId == this._sessionId;
+  }
+
   private async forEachSession(callback: (sessionId: string, supplementalIndex: number) => Promise<void>) {
     const sessionId = await this.waitForSession();
     await callback(sessionId, 0);
@@ -154,20 +159,15 @@ export class ReplayClient implements ReplayClientInterface {
     }
   }
 
-  private transformSupplementalId(id: string, supplementalIndex: number) {
-    return `s${supplementalIndex}-${id}`;
-  }
-
-  private async breakdownSupplementalId(id: string): Promise<{ id: string, sessionId: string }> {
-    const match = /^s(\d+)-(.*)/.exec(id);
-    if (!match) {
+  private async breakdownSupplementalIdAndSession(transformedId: string): Promise<{ id: string, sessionId: string }> {
+    const { id, supplementalIndex } = breakdownSupplementalId(transformedId);
+    if (!supplementalIndex) {
       const sessionId = await this.waitForSession();
       return { id, sessionId };
     }
-    const supplementalIndex = +match[1];
     const supplementalInfo = this.supplemental[supplementalIndex - 1];
     assert(supplementalInfo);
-    return { id: match[2], sessionId: supplementalInfo.sessionId };
+    return { id, sessionId: supplementalInfo.sessionId };
   }
 
   get loadedRegions(): LoadedRegions | null {
@@ -314,7 +314,7 @@ export class ReplayClient implements ReplayClientInterface {
         let middleIndex = (lowIndex + highIndex) >>> 1;
         const message = sortedMessages[middleIndex];
 
-        if (compareNumericStrings(message.point.point, newMessagePoint)) {
+        if (compareExecutionPoints(message.point.point, newMessagePoint)) {
           lowIndex = middleIndex + 1;
         } else {
           highIndex = middleIndex;
@@ -357,7 +357,7 @@ export class ReplayClient implements ReplayClientInterface {
     const sortedMessages = response.messages.sort((messageA: Message, messageB: Message) => {
       const pointA = messageA.point.point;
       const pointB = messageB.point.point;
-      return compareNumericStrings(pointA, pointB);
+      return compareExecutionPoints(pointA, pointB);
     });
 
     return {
@@ -464,14 +464,45 @@ export class ReplayClient implements ReplayClientInterface {
     return sortedPaints;
   }
 
+  async breakdownSupplementalLocation(location: Location) {
+    const { id: sourceId, sessionId } = await this.breakdownSupplementalIdAndSession(location.sourceId);
+    return { location: { ...location, sourceId }, sessionId };
+  }
+
+  async breakdownSupplementalPointSelector(pointSelector: PointSelector) {
+    switch (pointSelector.kind) {
+      case "location": {
+        const { location, sessionId } = await this.breakdownSupplementalLocation(pointSelector.location);
+        return { pointSelector: { ...pointSelector, location }, sessionId };
+      }
+      case "locations": {
+        let commonSessionId: string | undefined;
+        const locations = await Promise.all(pointSelector.locations.map(async transformedLocation => {
+          const { location, sessionId } = await this.breakdownSupplementalLocation(transformedLocation);
+          if (commonSessionId) {
+            assert(commonSessionId == sessionId);
+          } else {
+            commonSessionId = sessionId;
+          }
+          return location;
+        }));
+        assert(commonSessionId);
+        return { pointSelector: { ...pointSelector, locations }, sessionId: commonSessionId };
+      }
+      default:
+        return { pointSelector, sessionId: await this.waitForSession() };
+    }
+  }
+
   async findPoints(
-    pointSelector: PointSelector,
+    transformedPointSelector: PointSelector,
     pointLimits?: PointPageLimits
   ): Promise<PointDescription[]> {
+    const { pointSelector, sessionId } = await this.breakdownSupplementalPointSelector(transformedPointSelector);
+
     const points: PointDescription[] = [];
-    const sessionId = await this.waitForSession();
     const findPointsId = String(this.nextFindPointsId++);
-    pointLimits = pointLimits ? { ...pointLimits } : {};
+    pointLimits = (pointLimits && this.isMainSession(sessionId)) ? { ...pointLimits } : {};
     if (!pointLimits.maxCount) {
       pointLimits.maxCount = MAX_POINTS_TO_FIND;
     }
@@ -504,7 +535,7 @@ export class ReplayClient implements ReplayClientInterface {
       throw commandError("Too many points", ProtocolError.TooManyPoints);
     }
 
-    points.sort((a, b) => compareNumericStrings(a.point, b.point));
+    points.sort((a, b) => compareExecutionPoints(a.point, b.point));
     return points;
   }
 
@@ -542,8 +573,8 @@ export class ReplayClient implements ReplayClientInterface {
       const newSourcesListener = ({ sources: sourcesList }: newSources) => {
         for (const source of sourcesList) {
           if (supplementalIndex) {
-            source.sourceId = this.transformSupplementalId(source.sourceId, supplementalIndex);
-            source.generatedSourceIds = source.generatedSourceIds?.map(id => this.transformSupplementalId(id, supplementalIndex));
+            source.sourceId = transformSupplementalId(source.sourceId, supplementalIndex);
+            source.generatedSourceIds = source.generatedSourceIds?.map(id => transformSupplementalId(id, supplementalIndex));
           }
           sources.push(source);
         }
@@ -829,18 +860,18 @@ export class ReplayClient implements ReplayClientInterface {
     locations: SameLineSourceLocations[],
     focusRange: PointRange | null
   ) {
-    const { id: sourceId, sessionId } = await this.breakdownSupplementalId(transformedSourceId);
+    const { id: sourceId, sessionId } = await this.breakdownSupplementalIdAndSession(transformedSourceId);
 
     await this.waitForRangeToBeInFocusRange(focusRange);
     const { hits } = await client.Debugger.getHitCounts(
-      { sourceId, locations, maxHits: TOO_MANY_POINTS_TO_FIND, range: /*focusRange ||*/ undefined },
+      { sourceId, locations, maxHits: TOO_MANY_POINTS_TO_FIND, range: (this.isMainSession(sessionId) && focusRange) || undefined },
       sessionId
     );
     return hits;
   }
 
-  async getSourceOutline(sourceId: SourceId) {
-    const sessionId = await this.waitForSession();
+  async getSourceOutline(transformedSourceId: SourceId) {
+    const { id: sourceId, sessionId } = await this.breakdownSupplementalIdAndSession(transformedSourceId);
     return client.Debugger.getSourceOutline({ sourceId }, sessionId);
   }
 
@@ -848,7 +879,7 @@ export class ReplayClient implements ReplayClientInterface {
     transformedSourceId: SourceId,
     locationRange: SourceLocationRange | null
   ): Promise<SameLineSourceLocations[]> {
-    const { id: sourceId, sessionId } = await this.breakdownSupplementalId(transformedSourceId);
+    const { id: sourceId, sessionId } = await this.breakdownSupplementalIdAndSession(transformedSourceId);
 
     const begin = locationRange ? locationRange.start : undefined;
     const end = locationRange ? locationRange.end : undefined;
@@ -1098,7 +1129,7 @@ export class ReplayClient implements ReplayClientInterface {
     onSourceContentsInfo: (params: sourceContentsInfo) => void,
     onSourceContentsChunk: (params: sourceContentsChunk) => void
   ): Promise<void> {
-    const { id: sourceId, sessionId } = await this.breakdownSupplementalId(transformedSourceId);
+    const { id: sourceId, sessionId } = await this.breakdownSupplementalIdAndSession(transformedSourceId);
 
     let pendingChunk = "";
     let pendingThrottlePromise: Promise<void> | null = null;
