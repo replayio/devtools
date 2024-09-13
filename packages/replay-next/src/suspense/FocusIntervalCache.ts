@@ -7,6 +7,7 @@ import {
 } from "suspense";
 
 import { ProtocolError, isCommandError } from "shared/utils/error";
+import { breakdownSupplementalId, transformSupplementalNumericString } from "protocol/utils";
 
 type Options<Point extends number | bigint, Params extends Array<any>, Value> = {
   debugLabel?: string;
@@ -35,7 +36,10 @@ export function createFocusIntervalCacheForExecutionPoints<Params extends Array<
   return createFocusIntervalCache<bigint, Params, Value>({
     ...rest,
     getPointForValue: (value: Value): bigint => {
-      return BigInt(getPointForValue(value));
+      const transformedPoint = getPointForValue(value);
+      const { id: point, supplementalIndex } = breakdownSupplementalId(transformedPoint);
+      const newPoint = transformSupplementalNumericString(point, supplementalIndex);
+      return BigInt(newPoint);
     },
     load: (start: bigint, end: bigint, ...params: [...Params, IntervalCacheLoadOptions<Value>]) =>
       load(start.toString(), end.toString(), ...params),

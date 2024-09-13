@@ -7,7 +7,7 @@ import { TerminalExpression } from "replay-next/src/contexts/TerminalContext";
 import { EventLog } from "replay-next/src/suspense/EventsCache";
 import { UncaughtException } from "replay-next/src/suspense/ExceptionsCache";
 
-import { compareExecutionPoints } from "./time";
+import { compareTimeStampedPoints } from "protocol/utils";
 
 export function isEventLog(loggable: Loggable): loggable is EventLog {
   return loggable.type === "EventLog";
@@ -80,5 +80,8 @@ export function loggableSort(a: Loggable, b: Loggable): number {
     }
   }
 
-  return compareExecutionPoints(aPoint, bPoint);
+  const aTime = getLoggableTime(a);
+  const bTime = getLoggableTime(b);
+
+  return compareTimeStampedPoints({ point: aPoint, time: aTime }, { point: bPoint, time: bTime });
 }

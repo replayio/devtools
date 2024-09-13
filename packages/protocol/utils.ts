@@ -1,4 +1,4 @@
-import { SourceLocation } from "@replayio/protocol";
+import { SourceLocation, TimeStampedPoint } from "@replayio/protocol";
 
 type ErrorHandler = (error: Error) => void;
 
@@ -154,17 +154,47 @@ export function breakdownSupplementalId(id: string): { id: string, supplementalI
   return { id: match[2], supplementalIndex };
 }
 
-/**
+export function sameSupplementalIndex(idA: string, idB: string) {
+  return breakdownSupplementalId(idA).supplementalIndex == breakdownSupplementalId(idB).supplementalIndex;
+}
+
+const SupplementalNumericStringShift = 200;
+
+export function transformSupplementalNumericString(v: string, supplementalIndex: number): string {
+  assert(BigInt(v) < BigInt(1) << BigInt(SupplementalNumericStringShift));
+  if (!supplementalIndex) {
+    return v;
+  }
+  return (BigInt(v) | (BigInt(1) << BigInt(SupplementalNumericStringShift))).toString();
+}
+
+/*
  * Compare 2 integers encoded as numeric strings, because we want to avoid using BigInt (for now).
  * This will only work correctly if both strings encode positive integers (without decimal places),
  * using the same base (usually 10) and don't use "fancy stuff" like leading "+", "0" or scientific
  * notation.
  */
+function compareNumericIntegers(a: string, b: string) {
+  return a.length < b.length ? -1 : a.length > b.length ? 1 : a < b ? -1 : a > b ? 1 : 0;
+}
+
+// Compare execution points, which must be from the same recording.
 export function compareExecutionPoints(transformedA: string, transformedB: string) {
   const { id: a, supplementalIndex: indexA } = breakdownSupplementalId(transformedA);
   const { id: b, supplementalIndex: indexB } = breakdownSupplementalId(transformedB);
-  assert(indexA == indexB);
-  return a.length < b.length ? -1 : a.length > b.length ? 1 : a < b ? -1 : a > b ? 1 : 0;
+  assert(indexA == indexB, `Points ${transformedA} and ${transformedB} are not comparable`);
+  return compareNumericIntegers(a, b);
+}
+
+// Compare execution points along with their times. Falls back onto time
+// comparison for points from different recordings.
+export function compareTimeStampedPoints(transformedA: TimeStampedPoint, transformedB: TimeStampedPoint) {
+  const { id: a, supplementalIndex: indexA } = breakdownSupplementalId(transformedA.point);
+  const { id: b, supplementalIndex: indexB } = breakdownSupplementalId(transformedB.point);
+  if (indexA == indexB) {
+    return compareNumericIntegers(a, b);
+  }
+  return transformedA.time - transformedB.time;
 }
 
 export function locationsInclude(haystack: SourceLocation[], needle: SourceLocation) {

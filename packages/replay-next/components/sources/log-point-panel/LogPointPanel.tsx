@@ -9,7 +9,7 @@ import {
   useTransition,
 } from "react";
 
-import { assert } from "protocol/utils";
+import { assert, sameSupplementalIndex } from "protocol/utils";
 import AvatarImage from "replay-next/components/AvatarImage";
 import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBoundary";
 import Icon from "replay-next/components/Icon";
@@ -212,6 +212,9 @@ export function PointPanelWithHitPoints({
   // which may be paused at a different location.
   const closestHitPoint = useMemo(() => {
     if (!currentExecutionPoint) {
+      return null;
+    }
+    if (!sameSupplementalIndex(currentExecutionPoint, location.sourceId)) {
       return null;
     }
     const executionPoints = hitPoints.map(hitPoint => hitPoint.point);

@@ -3,7 +3,7 @@ import { createCache } from "suspense";
 
 import { breakpointPositionsIntervalCache } from "replay-next/src/suspense/BreakpointPositionsCache";
 import { bucketBreakpointLines } from "replay-next/src/utils/source";
-import { compareExecutionPoints } from "protocol/utils";
+import { compareExecutionPoints, breakdownSupplementalId } from "protocol/utils";
 import { MAX_POINTS_TO_RUN_EVALUATION } from "shared/client/ReplayClient";
 import {
   HitPointStatus,
@@ -107,13 +107,25 @@ export const hitPointsForLocationCache = createCache<
     let hitPoints: TimeStampedPoint[] = [];
     let status: HitPointStatus = "complete";
     try {
-      hitPoints = await hitPointsCache.readAsync(
-        BigInt(range.begin),
-        BigInt(range.end),
-        replayClient,
-        location,
-        condition
-      );
+      const { id: sourceId, supplementalIndex } = breakdownSupplementalId(location.sourceId);
+      if (supplementalIndex) {
+        if (condition) {
+          throw new Error("NYI");
+        }
+        const sources = await sourcesByIdCache.readAsync(replayClient);
+        const locations = getCorrespondingLocations(sources, location);
+        hitPoints = await replayClient.findPoints(
+          { kind: "locations", locations }, undefined
+        );
+      } else {
+        hitPoints = await hitPointsCache.readAsync(
+          BigInt(range.begin),
+          BigInt(range.end),
+          replayClient,
+          location,
+          condition
+        );
+      }
       if (hitPoints.length > MAX_POINTS_TO_RUN_EVALUATION) {
         status = "too-many-points-to-run-analysis";
       }

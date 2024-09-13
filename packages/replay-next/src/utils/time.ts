@@ -6,10 +6,9 @@ import differenceInWeeks from "date-fns/differenceInWeeks";
 import differenceInYears from "date-fns/differenceInYears";
 import padStart from "lodash/padStart";
 import prettyMilliseconds from "pretty-ms";
+import { compareExecutionPoints as baseCompareExecutionPoints } from "protocol/utils";
 
-export function compareExecutionPoints(a: ExecutionPoint, b: ExecutionPoint): number {
-  return Number(BigInt(a) - BigInt(b));
-}
+export const compareExecutionPoints = baseCompareExecutionPoints;
 
 export function isExecutionPointsGreaterThan(a: ExecutionPoint, b: ExecutionPoint): boolean {
   return compareExecutionPoints(a, b) > 0;

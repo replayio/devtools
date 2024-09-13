@@ -16,13 +16,13 @@ import { useMostRecentLoadedPause } from "replay-next/src/hooks/useMostRecentLoa
 import { useStreamingMessages } from "replay-next/src/hooks/useStreamingMessages";
 import {
   getLoggableExecutionPoint,
+  getLoggableTime,
   isEventLog,
   isPointInstance,
   isProtocolMessage,
   isTerminalExpression,
   isUncaughtException,
 } from "replay-next/src/utils/loggables";
-import { isExecutionPointsLessThan } from "replay-next/src/utils/time";
 
 import { ConsoleSearchContext } from "./ConsoleSearchContext";
 import CurrentTimeIndicator from "./CurrentTimeIndicator";
@@ -34,6 +34,7 @@ import TerminalExpressionRenderer from "./renderers/TerminalExpressionRenderer";
 import UncaughtExceptionRenderer from "./renderers/UncaughtExceptionRenderer";
 import styles from "./MessagesList.module.css";
 import rendererStyles from "./renderers/shared.module.css";
+import { compareTimeStampedPoints } from "protocol/utils";
 
 type CurrentTimeIndicatorPlacement = Loggable | "begin" | "end";
 
@@ -66,21 +67,23 @@ function MessagesListSuspends({ forwardedRef }: { forwardedRef: ForwardedRef<HTM
   } = useContext(ConsoleFiltersContext);
   const { loggables, streamingStatus } = useContext(LoggablesContext);
   const [searchState] = useContext(ConsoleSearchContext);
-  const { point: currentExecutionPoint } = useMostRecentLoadedPause() ?? {};
+  const { point: currentExecutionPoint, time: currentTime } = useMostRecentLoadedPause() ?? {};
 
   // The Console should render a line indicating the current execution point.
   // This point might match multiple logs– or it might be between logs, or after the last log, etc.
   // This looking finds the best place to render the indicator.
   const currentTimeIndicatorPlacement = useMemo<CurrentTimeIndicatorPlacement | null>(() => {
-    if (!currentExecutionPoint) {
+    if (!currentExecutionPoint || !currentTime) {
       return null;
     }
     if (currentExecutionPoint === "0") {
       return "begin";
     }
     const nearestLoggable = loggables.find(loggable => {
-      const executionPoint = getLoggableExecutionPoint(loggable);
-      if (!isExecutionPointsLessThan(executionPoint, currentExecutionPoint)) {
+      const point = getLoggableExecutionPoint(loggable);
+      const time = getLoggableTime(loggable);
+      const v = compareTimeStampedPoints({ point, time }, { point: currentExecutionPoint, time: currentTime });
+      if (v >= 0) {
         return true;
       }
     });
