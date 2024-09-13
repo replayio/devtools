@@ -7,7 +7,7 @@ import {
 } from "suspense";
 
 import { ProtocolError, isCommandError } from "shared/utils/error";
-import { breakdownSupplementalId, transformSupplementalNumericString } from "protocol/utils";
+import { assert, breakdownSupplementalId } from "protocol/utils";
 
 type Options<Point extends number | bigint, Params extends Array<any>, Value> = {
   debugLabel?: string;
@@ -20,6 +20,26 @@ type Options<Point extends number | bigint, Params extends Array<any>, Value> = 
     ...params: [...Params, IntervalCacheLoadOptions<Value>]
   ) => PromiseLike<Array<Value>> | Array<Value>;
 };
+
+const gSupplementalFocusPointMap = new Map<ExecutionPoint, number>();
+
+// This is an especially stupid hack to get the focus interval cache to include
+// points from other recordings. As long as the focus interval contains the start
+// of the recording we treat points in supplemental recordings as having a low
+// yet unique (to avoid deduping) execution point that will be part of the
+// focus window in the main recording.
+function getSupplementalFocusIntervalPoint(transformedPoint: ExecutionPoint): bigint {
+  const { supplementalIndex } = breakdownSupplementalId(transformedPoint);
+  if (!supplementalIndex) {
+    return BigInt(transformedPoint);
+  }
+  if (!gSupplementalFocusPointMap.has(transformedPoint)) {
+    gSupplementalFocusPointMap.set(transformedPoint, gSupplementalFocusPointMap.size);
+  }
+  let existing = gSupplementalFocusPointMap.get(transformedPoint);
+  assert(typeof existing == "number");
+  return BigInt(existing);
+}
 
 // Convenience wrapper around createFocusIntervalCache that converts BigInts to ExecutionPoints (strings)
 export function createFocusIntervalCacheForExecutionPoints<Params extends Array<any>, Value>(
@@ -37,9 +57,7 @@ export function createFocusIntervalCacheForExecutionPoints<Params extends Array<
     ...rest,
     getPointForValue: (value: Value): bigint => {
       const transformedPoint = getPointForValue(value);
-      const { id: point, supplementalIndex } = breakdownSupplementalId(transformedPoint);
-      const newPoint = transformSupplementalNumericString(point, supplementalIndex);
-      return BigInt(newPoint);
+      return getSupplementalFocusIntervalPoint(transformedPoint);
     },
     load: (start: bigint, end: bigint, ...params: [...Params, IntervalCacheLoadOptions<Value>]) =>
       load(start.toString(), end.toString(), ...params),

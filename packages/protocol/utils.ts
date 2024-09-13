@@ -161,16 +161,6 @@ export function sameSupplementalIndex(idA: string, idB: string) {
   return breakdownSupplementalId(idA).supplementalIndex == breakdownSupplementalId(idB).supplementalIndex;
 }
 
-const SupplementalNumericStringShift = 200;
-
-export function transformSupplementalNumericString(v: string, supplementalIndex: number): string {
-  assert(BigInt(v) < BigInt(1) << BigInt(SupplementalNumericStringShift));
-  if (!supplementalIndex) {
-    return v;
-  }
-  return (BigInt(v) | (BigInt(1) << BigInt(SupplementalNumericStringShift))).toString();
-}
-
 /*
  * Compare 2 integers encoded as numeric strings, because we want to avoid using BigInt (for now).
  * This will only work correctly if both strings encode positive integers (without decimal places),

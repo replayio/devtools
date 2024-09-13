@@ -519,6 +519,22 @@ export class ReplayClient implements ReplayClientInterface {
         assert(commonSessionId);
         return { pointSelector: { ...pointSelector, locations }, sessionId: commonSessionId, supplementalIndex: commonSupplementalIndex };
       }
+      case "points": {
+        let commonSessionId: string | undefined;
+        let commonSupplementalIndex = 0;
+        const points = await Promise.all(pointSelector.points.map(async transformedPoint => {
+          const { id: point, sessionId, supplementalIndex } = await this.breakdownSupplementalIdAndSession(transformedPoint);
+          if (commonSessionId) {
+            assert(commonSessionId == sessionId);
+          } else {
+            commonSessionId = sessionId;
+            commonSupplementalIndex = supplementalIndex;
+          }
+          return point;
+        }));
+        assert(commonSessionId);
+        return { pointSelector: { ...pointSelector, points }, sessionId: commonSessionId, supplementalIndex: commonSupplementalIndex };
+      }
       default:
         return { pointSelector, sessionId: await this.waitForSession(), supplementalIndex: 0 };
     }
@@ -528,7 +544,7 @@ export class ReplayClient implements ReplayClientInterface {
     transformedPointSelector: PointSelector,
     pointLimits?: PointPageLimits
   ): Promise<PointDescription[]> {
-    const { pointSelector, sessionId, supplementalIndex } = await this.breakdownSupplementalPointSelector(transformedPointSelector);
+    const { pointSelector, sessionId } = await this.breakdownSupplementalPointSelector(transformedPointSelector);
 
     const points: PointDescription[] = [];
     const findPointsId = String(this.nextFindPointsId++);
@@ -1168,9 +1184,9 @@ export class ReplayClient implements ReplayClientInterface {
     },
     onResults: (results: RunEvaluationResult[]) => void
   ): Promise<void> {
-    const { pointSelector, sessionId } = await this.breakdownSupplementalPointSelector(opts.selector);
+    const { pointSelector, sessionId, supplementalIndex } = await this.breakdownSupplementalPointSelector(opts.selector);
     const runEvaluationId = String(this.nextRunEvaluationId++);
-    const pointLimits: PointPageLimits = opts.limits ? { ...opts.limits } : {};
+    const pointLimits: PointPageLimits = (opts.limits && !supplementalIndex) ? { ...opts.limits } : {};
     if (!pointLimits.maxCount) {
       pointLimits.maxCount = MAX_POINTS_TO_RUN_EVALUATION;
     }
@@ -1181,11 +1197,15 @@ export class ReplayClient implements ReplayClientInterface {
         : null
     );
 
-    function onResultsWrapper(results: runEvaluationResults) {
+    const onResultsWrapper = (results: runEvaluationResults) => {
       if (results.runEvaluationId === runEvaluationId) {
+        for (const result of results.results) {
+          this.transformSupplementalPointDescription(result.point, sessionId);
+          this.transformSupplementalPauseData(result.data, sessionId);
+        }
         onResults(results.results);
       }
-    }
+    };
 
     addEventListener("Session.runEvaluationResults", onResultsWrapper);
 
