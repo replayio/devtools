@@ -4,6 +4,7 @@ import {
   TimeStampedPoint,
   TimeStampedPointRange,
 } from "@replayio/protocol";
+import { sameSupplementalIndex } from "protocol/utils";
 
 const supportsPerformanceNow =
   typeof performance !== "undefined" && typeof performance.now === "function";
@@ -74,6 +75,9 @@ export function isRangeInRegions(
 }
 
 export function isPointInRegion(point: ExecutionPoint, range: TimeStampedPointRange): boolean {
+  if (!sameSupplementalIndex(point, range.begin.point)) {
+    return true;
+  }
   const pointNumber = BigInt(point);
   return pointNumber >= BigInt(range.begin.point) && pointNumber <= BigInt(range.end.point);
 }

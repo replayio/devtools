@@ -1,8 +1,7 @@
 import { ExecutionPoint, SourceId, TimeStampedPoint } from "@replayio/protocol";
 
-import { binarySearch } from "protocol/utils";
+import { binarySearch, compareTimeStampedPoints, sameSupplementalIndex } from "protocol/utils";
 import {
-  compareExecutionPoints,
   isExecutionPointsGreaterThan,
   isExecutionPointsLessThan,
 } from "replay-next/src/utils/time";
@@ -15,23 +14,30 @@ export const noMatchTuple: NoMatchTuple = [null, -1];
 
 export function findClosestHitPoint(
   hitPoints: TimeStampedPoint[],
-  executionPoint: ExecutionPoint
+  executionPoint: TimeStampedPoint
 ): HitPointAndIndexTuple | NoMatchTuple {
   const index = binarySearch(0, hitPoints.length, (index: number) =>
-    compareExecutionPoints(executionPoint, hitPoints[index].point)
+    compareTimeStampedPoints(executionPoint, hitPoints[index])
   );
 
   if (index >= 0 && index < hitPoints.length) {
     const hitPoint = hitPoints[index];
-    if (hitPoint.point === executionPoint) {
+    if (hitPoint.point === executionPoint.point) {
       // Exact match
       return [hitPoint, index];
     }
 
-    const executionBigInt = BigInt(executionPoint);
+    if (!sameSupplementalIndex(executionPoint.point, hitPoint.point)) {
+      return [hitPoint, index];
+    }
+
+    // Note (bhackett): The code below should be removed, it isn't valid
+    // to do any operations on the BigInts in execution points other than
+    // comparing them.
+    const executionBigInt = BigInt(executionPoint.point);
     const currentBigInt = BigInt(hitPoint.point);
 
-    if (executionBigInt < currentBigInt) {
+    if (compareTimeStampedPoints(executionPoint, hitPoint) < 0) {
       const currentDelta = currentBigInt - executionBigInt;
       const prevHitPoint = hitPoints[index - 1] ?? null;
       if (prevHitPoint) {
@@ -62,12 +68,12 @@ export function findClosestHitPoint(
 
 export function findHitPoint(
   hitPoints: TimeStampedPoint[],
-  executionPoint: ExecutionPoint,
+  executionPoint: TimeStampedPoint,
   exactMatch: boolean = true
 ): HitPointAndIndexTuple | NoMatchTuple {
   const [hitPoint, hitPointIndex] = findClosestHitPoint(hitPoints, executionPoint);
   if (hitPoint !== null) {
-    if (hitPoint.point === executionPoint) {
+    if (hitPoint.point === executionPoint.point) {
       return [hitPoint, hitPointIndex];
     } else if (!exactMatch) {
       return [hitPoint, hitPointIndex];
@@ -78,11 +84,11 @@ export function findHitPoint(
 
 export function findHitPointAfter(
   hitPoints: TimeStampedPoint[],
-  executionPoint: ExecutionPoint
+  executionPoint: TimeStampedPoint
 ): HitPointAndIndexTuple | NoMatchTuple {
   const [hitPoint, index] = findClosestHitPoint(hitPoints, executionPoint);
   if (hitPoint !== null) {
-    if (isExecutionPointsGreaterThan(hitPoint.point, executionPoint)) {
+    if (compareTimeStampedPoints(hitPoint, executionPoint) > 0) {
       return [hitPoint, index];
     } else {
       const nextIndex = index + 1;
@@ -96,11 +102,11 @@ export function findHitPointAfter(
 
 export function findHitPointBefore(
   hitPoints: TimeStampedPoint[],
-  executionPoint: ExecutionPoint
+  executionPoint: TimeStampedPoint
 ): HitPointAndIndexTuple | NoMatchTuple {
   const [hitPoint, index] = findClosestHitPoint(hitPoints, executionPoint);
   if (hitPoint !== null) {
-    if (isExecutionPointsLessThan(hitPoint.point, executionPoint)) {
+    if (compareTimeStampedPoints(hitPoint, executionPoint) < 0) {
       return [hitPoint, index];
     } else {
       const prevIndex = index - 1;

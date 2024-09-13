@@ -133,7 +133,7 @@ function FastForwardButton({
   lineNumber: number;
   sourceId: SourceId;
 }) {
-  const { executionPoint: currentExecutionPoint, update } = useContext(TimelineContext);
+  const { executionPoint: currentExecutionPoint, time: currentTime, update } = useContext(TimelineContext);
 
   const [hitPoints, hitPointStatus] = useDeferredHitCounts({
     lineHitCounts,
@@ -143,7 +143,7 @@ function FastForwardButton({
 
   let fastForwardToExecutionPoint: TimeStampedPoint | null = null;
   if (currentExecutionPoint && hitPoints !== null && hitPointStatus !== "too-many-points-to-find") {
-    fastForwardToExecutionPoint = findNextHitPoint(hitPoints, currentExecutionPoint);
+    fastForwardToExecutionPoint = findNextHitPoint(hitPoints, { point: currentExecutionPoint, time: currentTime });
   }
 
   const fastForward = () => {
@@ -172,7 +172,7 @@ function RewindButton({
   lineNumber: number;
   sourceId: SourceId;
 }) {
-  const { executionPoint: currentExecutionPoint, update } = useContext(TimelineContext);
+  const { executionPoint: currentExecutionPoint, time: currentTime, update } = useContext(TimelineContext);
 
   const [hitPoints, hitPointStatus] = useDeferredHitCounts({
     lineHitCounts,
@@ -182,7 +182,7 @@ function RewindButton({
 
   let rewindToExecutionPoint: TimeStampedPoint | null = null;
   if (currentExecutionPoint && hitPoints !== null && hitPointStatus !== "too-many-points-to-find") {
-    rewindToExecutionPoint = findLastHitPoint(hitPoints, currentExecutionPoint);
+    rewindToExecutionPoint = findLastHitPoint(hitPoints, { point: currentExecutionPoint, time: currentTime });
   }
 
   const rewind = () => {

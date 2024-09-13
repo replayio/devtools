@@ -14,16 +14,13 @@ import Icon from "replay-next/components/Icon";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { imperativelyGetClosestPointForTime } from "replay-next/src/suspense/ExecutionPointsCache";
-import {
-  isExecutionPointsGreaterThan,
-  isExecutionPointsLessThan,
-} from "replay-next/src/utils/time";
 import { formatTimestamp } from "replay-next/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { HitPointStatus, Point } from "shared/client/types";
 
 import { findHitPointAfter, findHitPointBefore, noMatchTuple } from "../utils/points";
 import { findHitPoint } from "../utils/points";
+import { compareTimeStampedPoints } from "protocol/utils";
 import Capsule from "./Capsule";
 import styles from "./HitPointTimeline.module.css";
 
@@ -53,6 +50,8 @@ export default function HitPointTimeline({
     update,
   } = useContext(TimelineContext);
 
+  const currentTS: TimeStampedPoint = { point: currentExecutionPoint!, time: currentTime };
+
   const pointEditable = point.user?.id === currentUserInfo?.id;
 
   const [hoverCoordinates, setHoverCoordinates] = useState<{
@@ -73,7 +72,7 @@ export default function HitPointTimeline({
 
   const [closestHitPoint, closestHitPointIndex] = useMemo(
     () =>
-      currentExecutionPoint ? findHitPoint(hitPoints, currentExecutionPoint, false) : noMatchTuple,
+      currentExecutionPoint ? findHitPoint(hitPoints, currentTS, false) : noMatchTuple,
     [currentExecutionPoint, hitPoints]
   );
 
@@ -116,11 +115,11 @@ export default function HitPointTimeline({
   const previousButtonEnabled =
     currentExecutionPoint &&
     firstHitPoint != null &&
-    isExecutionPointsLessThan(firstHitPoint.point, currentExecutionPoint);
+    compareTimeStampedPoints(firstHitPoint, currentTS) < 0;
   const nextButtonEnabled =
     currentExecutionPoint &&
     lastHitPoint != null &&
-    isExecutionPointsGreaterThan(lastHitPoint.point, currentExecutionPoint);
+    compareTimeStampedPoints(lastHitPoint, currentTS) > 0;
 
   const goToIndex = (index: number) => {
     const hitPoint = hitPoints[index];
@@ -134,7 +133,7 @@ export default function HitPointTimeline({
     if (!currentExecutionPoint) {
       return;
     }
-    const [prevHitPoint] = findHitPointBefore(hitPoints, currentExecutionPoint);
+    const [prevHitPoint] = findHitPointBefore(hitPoints, currentTS);
     if (prevHitPoint !== null) {
       setOptimisticTime(prevHitPoint.time);
       update(prevHitPoint.time, prevHitPoint.point, false, point.location);
@@ -144,7 +143,7 @@ export default function HitPointTimeline({
     if (!currentExecutionPoint) {
       return;
     }
-    const [nextHitPoint] = findHitPointAfter(hitPoints, currentExecutionPoint);
+    const [nextHitPoint] = findHitPointAfter(hitPoints, currentTS);
     if (nextHitPoint !== null) {
       setOptimisticTime(nextHitPoint.time);
       update(nextHitPoint.time, nextHitPoint.point, false, point.location);

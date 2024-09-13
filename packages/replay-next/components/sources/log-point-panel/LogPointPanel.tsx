@@ -9,7 +9,7 @@ import {
   useTransition,
 } from "react";
 
-import { assert, sameSupplementalIndex } from "protocol/utils";
+import { assert } from "protocol/utils";
 import AvatarImage from "replay-next/components/AvatarImage";
 import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBoundary";
 import Icon from "replay-next/components/Icon";
@@ -28,8 +28,8 @@ import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { useNag } from "replay-next/src/hooks/useNag";
 import { hitPointsForLocationCache } from "replay-next/src/suspense/HitPointsCache";
 import { getSourceSuspends } from "replay-next/src/suspense/SourcesCache";
-import { findIndexBigInt } from "replay-next/src/utils/array";
 import { validateCode } from "replay-next/src/utils/code";
+import { findHitPointBefore } from "../utils/points";
 import { MAX_POINTS_TO_RUN_EVALUATION } from "shared/client/ReplayClient";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import {
@@ -214,12 +214,8 @@ export function PointPanelWithHitPoints({
     if (!currentExecutionPoint) {
       return null;
     }
-    if (!sameSupplementalIndex(currentExecutionPoint, location.sourceId)) {
-      return null;
-    }
-    const executionPoints = hitPoints.map(hitPoint => hitPoint.point);
-    const index = findIndexBigInt(executionPoints, currentExecutionPoint, false);
-    return hitPoints[index] || null;
+    const [hitPoint] = findHitPointBefore(hitPoints, { point: currentExecutionPoint, time: currentTime });
+    return hitPoint || null;
   }, [hitPoints, currentExecutionPoint]);
 
   // If we've found a hit point match, use data from its scope.

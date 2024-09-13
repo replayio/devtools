@@ -33,7 +33,7 @@ export function SeekHoverButtons(props: Props) {
 function SuspendingComponent({ lineHitCounts, lineNumber, source }: Props) {
   const { rangeForSuspense: focusRange } = useContext(FocusContext);
   const replayClient = useContext(ReplayClientContext);
-  const { executionPoint, update } = useContext(TimelineContext);
+  const { executionPoint, time, update } = useContext(TimelineContext);
 
   let hitPoints: TimeStampedPoint[] | null = null;
   let hitPointStatus: HitPointStatus | null = null;
@@ -56,7 +56,7 @@ function SuspendingComponent({ lineHitCounts, lineNumber, source }: Props) {
   let goToPrevPoint: undefined | EventHandler = undefined;
   let goToNextPoint: undefined | EventHandler = undefined;
   if (executionPoint && hitPoints !== null && hitPointStatus !== "too-many-points-to-find") {
-    const prevTargetPoint = findLastHitPoint(hitPoints, executionPoint);
+    const prevTargetPoint = findLastHitPoint(hitPoints, { point: executionPoint, time });
     if (prevTargetPoint) {
       goToPrevPoint = () => {
         const location = {
@@ -68,7 +68,7 @@ function SuspendingComponent({ lineHitCounts, lineNumber, source }: Props) {
       };
     }
 
-    const nextTargetPoint = findNextHitPoint(hitPoints, executionPoint);
+    const nextTargetPoint = findNextHitPoint(hitPoints, { point: executionPoint, time });
     if (nextTargetPoint) {
       goToNextPoint = () => {
         const location = {

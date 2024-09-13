@@ -22,10 +22,10 @@ import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { useNag } from "replay-next/src/hooks/useNag";
 import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
 import { getPreferredLocationWorkaround } from "replay-next/src/utils/sources";
-import { isExecutionPointsGreaterThan } from "replay-next/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { addComment as addCommentGraphQL } from "shared/graphql/Comments";
 import { Nag } from "shared/graphql/types";
+import { compareTimeStampedPoints } from "protocol/utils";
 
 import styles from "./MessageHoverButton.module.css";
 
@@ -48,7 +48,7 @@ export default function MessageHoverButton({
   const { inspectFunctionDefinition, showCommentsPanel } = useContext(InspectorContext);
   const { accessToken, recordingId, trackEvent } = useContext(SessionContext);
   const graphQLClient = useContext(GraphQLClientContext);
-  const { executionPoint: currentExecutionPoint, update } = useContext(TimelineContext);
+  const { executionPoint: currentExecutionPoint, time: currentTime, update } = useContext(TimelineContext);
   const { canShowConsoleAndSources } = useContext(LayoutContext);
 
   const invalidateCache = useCacheRefresh();
@@ -134,9 +134,11 @@ export default function MessageHoverButton({
       dismissFirstConsoleNavigateNag();
     };
 
+    const pointTS = { point: executionPoint, time };
+
     const label =
       currentExecutionPoint === null ||
-      isExecutionPointsGreaterThan(executionPoint, currentExecutionPoint)
+      compareTimeStampedPoints(pointTS, { point: currentExecutionPoint, time: currentTime }) > 0
         ? "Fast-forward"
         : "Rewind";
 
@@ -153,7 +155,7 @@ export default function MessageHoverButton({
           className={styles.ConsoleMessageHoverButtonIcon}
           type={
             currentExecutionPoint === null ||
-            isExecutionPointsGreaterThan(executionPoint, currentExecutionPoint)
+            compareTimeStampedPoints(pointTS, { point: currentExecutionPoint, time: currentTime }) > 0
               ? "fast-forward"
               : "rewind"
           }
