@@ -32,9 +32,11 @@ import {
   PauseAndFrameId,
   PauseFrame,
   getExecutionPoint,
+  getTime,
   getSelectedFrameId,
 } from "../../reducers/pause";
 import { getSelectedFrameSuspense } from "../../selectors/pause";
+import { compareTimeStampedPoints } from "protocol/utils";
 
 function getBoundingClientRect(element?: HTMLElement) {
   if (!element) {
@@ -51,6 +53,7 @@ interface FrameTimelineState {
 
 interface FrameTimelineProps {
   executionPoint: string | null;
+  time: number;
   selectedLocation: PartialLocation | null;
   selectedFrame: PauseFrame | null;
   frameSteps: PointDescription[] | undefined;
@@ -176,7 +179,7 @@ class FrameTimelineRenderer extends Component<FrameTimelineProps, FrameTimelineS
 
   getVisibleProgress() {
     const { scrubbing, scrubbingProgress, lastDisplayIndex } = this.state;
-    const { frameSteps, selectedLocation, executionPoint } = this.props;
+    const { frameSteps, selectedLocation, executionPoint, time } = this.props;
 
     if (!frameSteps) {
       return 0;
@@ -193,7 +196,7 @@ class FrameTimelineRenderer extends Component<FrameTimelineProps, FrameTimelineS
     }
 
     const filteredSteps = frameSteps.filter(
-      position => BigInt(position.point) <= BigInt(executionPoint)
+      position => compareTimeStampedPoints(position, { point: executionPoint, time }) <= 0
     );
 
     // Check if the current executionPoint's corresponding index is similar to the
@@ -236,6 +239,7 @@ function FrameTimeline({ selectedFrameId }: { selectedFrameId: PauseAndFrameId |
   const replayClient = useContext(ReplayClientContext);
   const sourcesState = useAppSelector(state => state.sources);
   const executionPoint = useAppSelector(getExecutionPoint);
+  const time = useAppSelector(getTime);
   const selectedLocation = useAppSelector(getSelectedLocation);
   const selectedFrame = useAppSelector(state =>
     getSelectedFrameSuspense(replayClient, state, selectedFrameId)
@@ -256,6 +260,7 @@ function FrameTimeline({ selectedFrameId }: { selectedFrameId: PauseAndFrameId |
   return (
     <FrameTimelineRenderer
       executionPoint={executionPoint}
+      time={time}
       selectedLocation={selectedLocation}
       selectedFrame={selectedFrame}
       frameSteps={frameSteps}

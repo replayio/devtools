@@ -6,7 +6,7 @@ import differenceInWeeks from "date-fns/differenceInWeeks";
 import differenceInYears from "date-fns/differenceInYears";
 import padStart from "lodash/padStart";
 import prettyMilliseconds from "pretty-ms";
-import { compareExecutionPoints as baseCompareExecutionPoints } from "protocol/utils";
+import { compareExecutionPoints as baseCompareExecutionPoints, sameSupplementalIndex } from "protocol/utils";
 
 export const compareExecutionPoints = baseCompareExecutionPoints;
 
@@ -23,6 +23,9 @@ export function isExecutionPointsWithinRange(
   beginPoint: ExecutionPoint,
   endPoint: ExecutionPoint
 ): boolean {
+  if (!sameSupplementalIndex(point, beginPoint)) {
+    return true;
+  }
   return !(
     isExecutionPointsLessThan(point, beginPoint) || isExecutionPointsGreaterThan(point, endPoint)
   );

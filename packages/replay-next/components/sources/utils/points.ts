@@ -1,6 +1,6 @@
 import { ExecutionPoint, SourceId, TimeStampedPoint } from "@replayio/protocol";
 
-import { binarySearch, compareTimeStampedPoints, sameSupplementalIndex } from "protocol/utils";
+import { binarySearch, compareTimeStampedPoints, breakdownSupplementalId } from "protocol/utils";
 import {
   isExecutionPointsGreaterThan,
   isExecutionPointsLessThan,
@@ -27,7 +27,8 @@ export function findClosestHitPoint(
       return [hitPoint, index];
     }
 
-    if (!sameSupplementalIndex(executionPoint.point, hitPoint.point)) {
+    if (breakdownSupplementalId(executionPoint.point).supplementalIndex ||
+        breakdownSupplementalId(hitPoint.point).supplementalIndex) {
       return [hitPoint, index];
     }
 

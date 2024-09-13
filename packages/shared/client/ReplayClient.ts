@@ -177,6 +177,15 @@ export class ReplayClient implements ReplayClientInterface {
     return sessionId || await this.waitForSession();
   }
 
+  private getSessionIdSupplementalIndex(sessionId: string) {
+    for (let i = 0; i < this.supplemental.length; i++) {
+      if (sessionId == this.supplemental[i].sessionId) {
+        return i + 1;
+      }
+    }
+    return 0;
+  }
+
   get loadedRegions(): LoadedRegions | null {
     return this._loadedRegions;
   }
@@ -234,6 +243,7 @@ export class ReplayClient implements ReplayClientInterface {
         sessionId,
         pauseId
       );
+      this.transformSupplementalPauseData(response.result.data, sessionId);
       return response.result;
     } else {
       const response = await client.Pause.evaluateInFrame(
@@ -246,6 +256,7 @@ export class ReplayClient implements ReplayClientInterface {
         sessionId,
         pauseId
       );
+      this.transformSupplementalPauseData(response.result.data, sessionId);
       return response.result;
     }
   }
@@ -558,24 +569,28 @@ export class ReplayClient implements ReplayClientInterface {
   async findStepInTarget(transformedPoint: ExecutionPoint): Promise<PauseDescription> {
     const { id: point, sessionId } = await this.breakdownSupplementalIdAndSession(transformedPoint);
     const { target } = await client.Debugger.findStepInTarget({ point }, sessionId);
+    this.transformSupplementalPointDescription(target, sessionId);
     return target;
   }
 
   async findStepOutTarget(transformedPoint: ExecutionPoint): Promise<PauseDescription> {
     const { id: point, sessionId } = await this.breakdownSupplementalIdAndSession(transformedPoint);
     const { target } = await client.Debugger.findStepOutTarget({ point }, sessionId);
+    this.transformSupplementalPointDescription(target, sessionId);
     return target;
   }
 
   async findStepOverTarget(transformedPoint: ExecutionPoint): Promise<PauseDescription> {
     const { id: point, sessionId } = await this.breakdownSupplementalIdAndSession(transformedPoint);
     const { target } = await client.Debugger.findStepOverTarget({ point }, sessionId);
+    this.transformSupplementalPointDescription(target, sessionId);
     return target;
   }
 
   async findReverseStepOverTarget(transformedPoint: ExecutionPoint): Promise<PauseDescription> {
     const { id: point, sessionId } = await this.breakdownSupplementalIdAndSession(transformedPoint);
     const { target } = await client.Debugger.findReverseStepOverTarget({ point }, sessionId);
+    this.transformSupplementalPointDescription(target, sessionId);
     return target;
   }
 
@@ -606,9 +621,43 @@ export class ReplayClient implements ReplayClientInterface {
     return sources;
   }
 
+  private transformSupplementalLocation(location: Location, supplementalIndex: number) {
+    location.sourceId = transformSupplementalId(location.sourceId, supplementalIndex);
+  }
+
+  private transformSupplementalMappedLocation(mappedLocation: MappedLocation | undefined, supplementalIndex: number) {
+    for (const location of mappedLocation || []) {
+      this.transformSupplementalLocation(location, supplementalIndex);
+    }
+  }
+
+  private transformSupplementalPauseData(data: PauseData, sessionId: string) {
+    const supplementalIndex = this.getSessionIdSupplementalIndex(sessionId);
+    if (!supplementalIndex) {
+      return;
+    }
+    for (const frame of data.frames || []) {
+      this.transformSupplementalMappedLocation(frame.location, supplementalIndex);
+      this.transformSupplementalMappedLocation(frame.functionLocation, supplementalIndex);
+    }
+    for (const object of data.objects || []) {
+      this.transformSupplementalMappedLocation(object.preview?.functionLocation, supplementalIndex);
+    }
+  }
+
+  private transformSupplementalPointDescription(point: PointDescription, sessionId: string) {
+    const supplementalIndex = this.getSessionIdSupplementalIndex(sessionId);
+    if (!supplementalIndex) {
+      return;
+    }
+    point.point = transformSupplementalId(point.point, supplementalIndex);
+    this.transformSupplementalMappedLocation(point.frame, supplementalIndex);
+  }
+
   async getAllFrames(pauseId: PauseId): Promise<getAllFramesResult> {
     const sessionId = await this.getPauseSessionId(pauseId);
     const result = await client.Pause.getAllFrames({}, sessionId, pauseId);
+    this.transformSupplementalPauseData(result.data, sessionId);
     return result;
   }
 
@@ -671,6 +720,7 @@ export class ReplayClient implements ReplayClientInterface {
   async getTopFrame(pauseId: PauseId): Promise<getTopFrameResult> {
     const sessionId = await this.getPauseSessionId(pauseId);
     const result = await client.Pause.getTopFrame({}, sessionId, pauseId);
+    this.transformSupplementalPauseData(result.data, sessionId);
     return result;
   }
 
@@ -767,7 +817,9 @@ export class ReplayClient implements ReplayClientInterface {
 
   async getExceptionValue(pauseId: PauseId): Promise<getExceptionValueResult> {
     const sessionId = await this.getPauseSessionId(pauseId);
-    return client.Pause.getExceptionValue({}, sessionId, pauseId);
+    const result = await client.Pause.getExceptionValue({}, sessionId, pauseId);
+    this.transformSupplementalPauseData(result.data, sessionId);
+    return result;
   }
 
   private async syncFocusWindow(): Promise<TimeStampedPointRange> {
@@ -781,6 +833,9 @@ export class ReplayClient implements ReplayClientInterface {
   async getFrameSteps(pauseId: PauseId, frameId: FrameId): Promise<PointDescription[]> {
     const sessionId = await this.getPauseSessionId(pauseId);
     const { steps } = await client.Pause.getFrameSteps({ frameId }, sessionId, pauseId);
+    for (const step of steps) {
+      this.transformSupplementalPointDescription(step, sessionId);
+    }
     return steps;
   }
 
@@ -798,6 +853,7 @@ export class ReplayClient implements ReplayClientInterface {
       sessionId,
       pauseId
     );
+    this.transformSupplementalPauseData(result.data, sessionId);
     return result;
   }
 
@@ -812,6 +868,7 @@ export class ReplayClient implements ReplayClientInterface {
       sessionId,
       pauseId || undefined
     );
+    this.transformSupplementalPauseData(result.data, sessionId);
     return result.data;
   }
 
