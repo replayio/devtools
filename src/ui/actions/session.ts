@@ -123,6 +123,32 @@ function getSupplementalRecordings(recordingId: string): SupplementalRecording[]
               time: 54294.69953306548,
             },
           },
+          // Second /public network call is made.
+          {
+            clientFirst: true,
+            clientRecordingId: "d5513383-5986-4de5-ab9d-2a7e1f367e90",
+            clientPoint: {
+              point: "56141709792928477884264450686451782",
+              time: 25301.991150442478,
+            },
+            serverPoint: {
+              point: "20444669041365036140696939482054693",
+              time: 66999.47944537815,
+            },
+          },
+          // Second /public network call returns.
+          {
+            clientFirst: false,
+            clientRecordingId: "d5513383-5986-4de5-ab9d-2a7e1f367e90",
+            clientPoint: {
+              point: "56790746901441151898702525872734210",
+              time: 25524.865255979654,
+            },
+            serverPoint: {
+              point: "20444669041638352324265057053573869",
+              time: 68611.1162184874,
+            },
+          },
         ],
       }];
   }

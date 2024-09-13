@@ -1389,24 +1389,40 @@ function waitForOpenConnection(
   });
 }
 
+// Compute the delta to adjust the timestamps for a supplemental server recording.
+// A delta is the time difference between the base recording and the supplemental
+// recording: a smaller delta moves the supplemental recording later, and a larger
+// delta moves the supplemental recording closer.
+//
+// We want to find a delta that is small enough that all client-first connections
+// happen on the client before they happen on the server, and large enough that
+// all client-last connections happen on the server before they happen on the client.
 function computeSupplementalTimeDelta(recordingId: string, supplemental: SupplementalSession) {
-  let minDelta: number | undefined;
-  let maxDelta: number | undefined;
+  // Delta which ensures that all clientFirst connections happen
+  // on the client before they happen on the server.
+  let clientFirstDelta: number | undefined;
+
+  // Delta which ensures that all clientLast connections happen
+  // on the server before they happen on the client.
+  let clientLastDelta: number | undefined;
+
   for (const { clientFirst, clientRecordingId, clientPoint, serverPoint } of supplemental.connections) {
     assert(recordingId == clientRecordingId);
     const delta = serverPoint.time - clientPoint.time;
+    console.log("FoundDelta", delta, clientFirst);
     if (clientFirst) {
-      if (typeof maxDelta == "undefined" || delta > maxDelta) {
-        maxDelta = delta;
+      if (typeof clientFirstDelta == "undefined" || delta < clientFirstDelta) {
+        clientFirstDelta = delta;
       }
     } else {
-      if (typeof minDelta == "undefined" || delta < minDelta) {
-        minDelta = delta;
+      if (typeof clientLastDelta == "undefined" || delta > clientLastDelta) {
+        clientLastDelta = delta;
       }
     }
   }
-  assert(typeof minDelta != "undefined");
-  assert(typeof maxDelta != "undefined");
-  assert(minDelta <= maxDelta);
-  return (minDelta + maxDelta) / 2;
+  console.log("Deltas", clientFirstDelta, clientLastDelta);
+  assert(typeof clientFirstDelta != "undefined");
+  assert(typeof clientLastDelta != "undefined");
+  assert(clientFirstDelta >= clientLastDelta);
+  return (clientFirstDelta + clientLastDelta) / 2;
 }
