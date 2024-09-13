@@ -94,7 +94,37 @@ export function getAccessibleRecording(
 function getSupplementalRecordings(recordingId: string): SupplementalRecording[] {
   switch (recordingId) {
     case "d5513383-5986-4de5-ab9d-2a7e1f367e90":
-      return [{ recordingId: "c54962d6-9ac6-428a-a6af-2bb2bf6633ca" }];
+      return [{
+        serverRecordingId: "c54962d6-9ac6-428a-a6af-2bb2bf6633ca",
+        connections: [
+          // First /public network call is made.
+          {
+            clientFirst: true,
+            clientRecordingId: "d5513383-5986-4de5-ab9d-2a7e1f367e90",
+            clientPoint: {
+              point: "16225927684179678680302888878605214",
+              time: 10800,
+            },
+            serverPoint: {
+              point: "17848520611783618390044493509296165",
+              time: 53985.21055489196,
+            },
+          },
+          // First /public network call returns.
+          {
+            clientFirst: false,
+            clientRecordingId: "d5513383-5986-4de5-ab9d-2a7e1f367e90",
+            clientPoint: {
+              point: "18173039006159032102657777614192642",
+              time: 11394.013505789708,
+            },
+            serverPoint: {
+              point: "17848520612057445317839151914025709",
+              time: 54294.69953306548,
+            },
+          },
+        ],
+      }];
   }
   return [];
 }
@@ -366,10 +396,11 @@ export function createSocket(recordingId: string): UIThunkAction {
       console.log("MainSessionId", JSON.stringify({ recordingId, sessionId }));
 
       const supplementalRecordings = getSupplementalRecordings(recordingId);
-      const supplemental = await Promise.all(supplementalRecordings.map(async ({ recordingId }) => {
-        const sessionId = await doCreateSession(recordingId);
-        console.log("SupplementalSessionId", JSON.stringify({ recordingId, sessionId }));
-        return { recordingId, sessionId };
+      const supplemental = await Promise.all(supplementalRecordings.map(async supplemental => {
+        const { serverRecordingId } = supplemental;
+        const sessionId = await doCreateSession(serverRecordingId);
+        console.log("SupplementalSessionId", JSON.stringify({ serverRecordingId, sessionId }));
+        return { ...supplemental, sessionId };
       }));
 
       Sentry.configureScope(scope => {
@@ -377,7 +408,7 @@ export function createSocket(recordingId: string): UIThunkAction {
       });
 
       window.sessionId = sessionId;
-      await replayClient.configure(sessionId, supplemental);
+      await replayClient.configure(recordingId, sessionId, supplemental);
       const recordingTarget = await recordingTargetCache.readAsync(replayClient);
       dispatch(actions.setRecordingTarget(recordingTarget));
 

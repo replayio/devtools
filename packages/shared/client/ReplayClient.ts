@@ -113,6 +113,7 @@ export class ReplayClient implements ReplayClientInterface {
   private sessionWaiter = defer<SessionId>();
 
   private supplemental: SupplementalSession[] = [];
+  private supplementalTimeDeltas: number[] = [];
 
   private pauseIdToSessionId = new Map<string, string>();
 
@@ -136,11 +137,16 @@ export class ReplayClient implements ReplayClientInterface {
   // Configures the client to use an already initialized session iD.
   // This method should be used for apps that use the protocol package directly.
   // Apps that only communicate with the Replay protocol through this client should use the initialize method instead.
-  async configure(sessionId: string, supplemental: SupplementalSession[]): Promise<void> {
+  async configure(recordingId: string, sessionId: string, supplemental: SupplementalSession[]): Promise<void> {
+    this._recordingId = recordingId;
     this._sessionId = sessionId;
     this._dispatchEvent("sessionCreated");
     this.sessionWaiter.resolve(sessionId);
     this.supplemental.push(...supplemental);
+    for (const supplementalSession of supplemental) {
+      const timeDelta = computeSupplementalTimeDelta(recordingId, supplementalSession);
+      this.supplementalTimeDeltas.push(timeDelta);
+    }
     await this.syncFocusWindow();
   }
 
@@ -560,10 +566,8 @@ export class ReplayClient implements ReplayClientInterface {
     }
 
     points.sort((a, b) => compareExecutionPoints(a.point, b.point));
-    return points.map(desc => {
-      const point = transformSupplementalId(desc.point, supplementalIndex);
-      return { ...desc, point };
-    });
+    points.forEach(desc => this.transformSupplementalPointDescription(desc, sessionId));
+    return points;
   }
 
   async findStepInTarget(transformedPoint: ExecutionPoint): Promise<PauseDescription> {
@@ -645,12 +649,24 @@ export class ReplayClient implements ReplayClientInterface {
     }
   }
 
+  // Convert a time from either the main or a supplemental recording into a time
+  // for the main recording.
+  private normalizeSupplementalTime(time: number, supplementalIndex: number) {
+    if (!supplementalIndex) {
+      return 0;
+    }
+    const delta = this.supplementalTimeDeltas[supplementalIndex - 1];
+    assert(typeof delta == "number");
+    return time - delta;
+  }
+
   private transformSupplementalPointDescription(point: PointDescription, sessionId: string) {
     const supplementalIndex = this.getSessionIdSupplementalIndex(sessionId);
     if (!supplementalIndex) {
       return;
     }
     point.point = transformSupplementalId(point.point, supplementalIndex);
+    point.time = this.normalizeSupplementalTime(point.time, supplementalIndex);
     this.transformSupplementalMappedLocation(point.frame, supplementalIndex);
   }
 
@@ -1351,4 +1367,26 @@ function waitForOpenConnection(
       }
     }, intervalMs);
   });
+}
+
+function computeSupplementalTimeDelta(recordingId: string, supplemental: SupplementalSession) {
+  let minDelta: number | undefined;
+  let maxDelta: number | undefined;
+  for (const { clientFirst, clientRecordingId, clientPoint, serverPoint } of supplemental.connections) {
+    assert(recordingId == clientRecordingId);
+    const delta = serverPoint.time - clientPoint.time;
+    if (clientFirst) {
+      if (typeof maxDelta == "undefined" || delta > maxDelta) {
+        maxDelta = delta;
+      }
+    } else {
+      if (typeof minDelta == "undefined" || delta < minDelta) {
+        minDelta = delta;
+      }
+    }
+  }
+  assert(typeof minDelta != "undefined");
+  assert(typeof maxDelta != "undefined");
+  assert(minDelta <= maxDelta);
+  return (minDelta + maxDelta) / 2;
 }

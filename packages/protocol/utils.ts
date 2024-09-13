@@ -141,6 +141,9 @@ export class ArrayMap<K, V> {
 }
 
 export function transformSupplementalId(id: string, supplementalIndex: number) {
+  if (!supplementalIndex) {
+    return id;
+  }
   return `s${supplementalIndex}-${id}`;
 }
 
