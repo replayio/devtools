@@ -113,7 +113,7 @@ export class ReplayClient implements ReplayClientInterface {
   private sessionWaiter = defer<SessionId>();
 
   private supplemental: SupplementalSession[] = [];
-  private supplementalTimeDeltas: number[] = [];
+  private supplementalTimeDeltas: (number | undefined)[] = [];
 
   private pauseIdToSessionId = new Map<string, string>();
 
@@ -672,8 +672,13 @@ export class ReplayClient implements ReplayClientInterface {
       return 0;
     }
     const delta = this.supplementalTimeDeltas[supplementalIndex - 1];
-    assert(typeof delta == "number");
-    return time - delta;
+    if (typeof delta == "number") {
+      return time - delta;
+    }
+    const supplementalSession = this.supplemental[supplementalIndex - 1];
+    assert(this._recordingId);
+    assert(supplementalSession);
+    return interpolateSupplementalTime(this._recordingId, supplementalSession, time);
   }
 
   private transformSupplementalPointDescription(point: PointDescription, sessionId: string) {
@@ -1397,7 +1402,10 @@ function waitForOpenConnection(
 // We want to find a delta that is small enough that all client-first connections
 // happen on the client before they happen on the server, and large enough that
 // all client-last connections happen on the server before they happen on the client.
-function computeSupplementalTimeDelta(recordingId: string, supplemental: SupplementalSession) {
+//
+// If there is no such delta then we're seeing inconsistent timing information with
+// the connections and will fall back onto interpolateSupplementalTime.
+function computeSupplementalTimeDelta(recordingId: string, supplemental: SupplementalSession): number | undefined {
   // Delta which ensures that all clientFirst connections happen
   // on the client before they happen on the server.
   let clientFirstDelta: number | undefined;
@@ -1423,6 +1431,52 @@ function computeSupplementalTimeDelta(recordingId: string, supplemental: Supplem
   console.log("Deltas", clientFirstDelta, clientLastDelta);
   assert(typeof clientFirstDelta != "undefined");
   assert(typeof clientLastDelta != "undefined");
-  assert(clientFirstDelta >= clientLastDelta);
+
+  if (clientFirstDelta < clientLastDelta) {
+    // There is no single delta we'll be able to use.
+    return undefined;
+  }
+
   return (clientFirstDelta + clientLastDelta) / 2;
+}
+
+// Use an interpolation strategy to normalize a time from a supplemental recording
+// to a time in the base recording.
+//
+// This works even if there is no single consistent delta to use throughout the
+// recording, and requires that events on either side of the connections happen
+// in the same order in the two recordings.
+function interpolateSupplementalTime(recordingId: string, supplemental: SupplementalSession, supplementalTime: number): number {
+  assert(supplemental.connections.length);
+  for (const connection of supplemental.connections) {
+    assert(connection.clientRecordingId == recordingId);
+  }
+
+  // Check if the time happens between two connections.
+  for (let i = 1; i < supplemental.connections.length; i++) {
+    const previous = supplemental.connections[i - 1];
+    const next = supplemental.connections[i];
+    assert(previous.clientPoint.time <= next.clientPoint.time);
+    assert(previous.serverPoint.time <= next.serverPoint.time);
+    if (supplementalTime >= previous.serverPoint.time &&
+        supplementalTime <= next.serverPoint.time) {
+      const clientElapsed = next.clientPoint.time - previous.clientPoint.time;
+      const serverElapsed = next.serverPoint.time - previous.serverPoint.time;
+      const fraction = (supplementalTime - previous.serverPoint.time) / serverElapsed;
+      return previous.clientPoint.time + fraction * clientElapsed;
+    }
+  }
+
+  // Check if the time happened before the first connection.
+  const firstConnection = supplemental.connections[0];
+  if (supplementalTime <= firstConnection.serverPoint.time) {
+    const delta = firstConnection.serverPoint.time - firstConnection.clientPoint.time;
+    return supplementalTime - delta;
+  }
+
+  // The time must have happened after the last connection.
+  const lastConnection = supplemental.connections[supplemental.connections.length - 1];
+  assert(supplementalTime >= lastConnection.serverPoint.time);
+  const delta = lastConnection.serverPoint.time - lastConnection.clientPoint.time;
+  return supplementalTime - delta;
 }
