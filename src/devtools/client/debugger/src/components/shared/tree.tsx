@@ -936,10 +936,17 @@ export class Tree<T> extends React.Component<TreeProps<T>, TreeState> {
     const traversal = this._dfsFromRoots();
     const { active, focused } = this.props;
 
-    const nodes = traversal.map((v, i) => {
+    const seenKeys = new Set<string>();
+
+    const nodes: JSX.Element[] = [];
+    traversal.forEach((v, i) => {
       const { item, depth } = v;
       const key = this.props.getKey(item);
-      return (
+      if (seenKeys.has(key)) {
+        return;
+      }
+      seenKeys.add(key);
+      nodes.push(
         <TreeNode<any>
           // We make a key unique depending on whether the tree node is in active
           // or inactive state to make sure that it is actually replaced and the
