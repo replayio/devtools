@@ -91,6 +91,7 @@ import {
   ReplayClientInterface,
   SourceLocationRange,
   SupplementalSession,
+  SupplementalRecordingConnection,
   TimeStampedPointWithPaintHash,
 } from "./types";
 
@@ -1417,7 +1418,6 @@ function computeSupplementalTimeDelta(recordingId: string, supplemental: Supplem
   for (const { clientFirst, clientRecordingId, clientPoint, serverPoint } of supplemental.connections) {
     assert(recordingId == clientRecordingId);
     const delta = serverPoint.time - clientPoint.time;
-    console.log("FoundDelta", delta, clientFirst);
     if (clientFirst) {
       if (typeof clientFirstDelta == "undefined" || delta < clientFirstDelta) {
         clientFirstDelta = delta;
@@ -1428,7 +1428,6 @@ function computeSupplementalTimeDelta(recordingId: string, supplemental: Supplem
       }
     }
   }
-  console.log("Deltas", clientFirstDelta, clientLastDelta);
   assert(typeof clientFirstDelta != "undefined");
   assert(typeof clientLastDelta != "undefined");
 
@@ -1438,6 +1437,26 @@ function computeSupplementalTimeDelta(recordingId: string, supplemental: Supplem
   }
 
   return (clientFirstDelta + clientLastDelta) / 2;
+}
+
+// If necessary add an artificial small time difference between client
+// server points in a connection when interpolating. This ensures that
+// client events in the connection actually happen before the server
+// event on the timeline instead of at the exact same time, which can
+// cause console messages to be rendered in the wrong order.
+function adjustInterpolateSupplementalTime(connection: SupplementalRecordingConnection, clientTime: number) {
+  const { clientFirst, clientPoint } = connection;
+  const Epsilon = 0.1;
+  if (clientFirst) {
+    if (clientTime >= clientPoint.time && clientTime - clientPoint.time <= Epsilon) {
+      return clientPoint.time + Epsilon;
+    }
+  } else {
+    if (clientTime <= clientPoint.time && clientPoint.time - clientTime <= Epsilon) {
+      return clientPoint.time - Epsilon;
+    }
+  }
+  return clientTime;
 }
 
 // Use an interpolation strategy to normalize a time from a supplemental recording
@@ -1463,7 +1482,12 @@ function interpolateSupplementalTime(recordingId: string, supplemental: Suppleme
       const clientElapsed = next.clientPoint.time - previous.clientPoint.time;
       const serverElapsed = next.serverPoint.time - previous.serverPoint.time;
       const fraction = (supplementalTime - previous.serverPoint.time) / serverElapsed;
-      return previous.clientPoint.time + fraction * clientElapsed;
+      const clientTime = previous.clientPoint.time + fraction * clientElapsed;
+      const adjustPrevious = adjustInterpolateSupplementalTime(previous, clientTime);
+      if (adjustPrevious != clientTime) {
+        return adjustPrevious;
+      }
+      return adjustInterpolateSupplementalTime(next, clientTime);
     }
   }
 
@@ -1471,12 +1495,12 @@ function interpolateSupplementalTime(recordingId: string, supplemental: Suppleme
   const firstConnection = supplemental.connections[0];
   if (supplementalTime <= firstConnection.serverPoint.time) {
     const delta = firstConnection.serverPoint.time - firstConnection.clientPoint.time;
-    return supplementalTime - delta;
+    return adjustInterpolateSupplementalTime(firstConnection, supplementalTime - delta);
   }
 
   // The time must have happened after the last connection.
   const lastConnection = supplemental.connections[supplemental.connections.length - 1];
   assert(supplementalTime >= lastConnection.serverPoint.time);
   const delta = lastConnection.serverPoint.time - lastConnection.clientPoint.time;
-  return supplementalTime - delta;
+  return adjustInterpolateSupplementalTime(lastConnection, supplementalTime - delta);
 }
