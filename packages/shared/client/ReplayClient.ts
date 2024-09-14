@@ -77,7 +77,7 @@ import throttle from "lodash/throttle";
 import uniqueId from "lodash/uniqueId";
 
 // eslint-disable-next-line no-restricted-imports
-import { addEventListener, client, initSocket, removeEventListener } from "protocol/socket";
+import { addEventListener, client, initSocket, sendMessage, removeEventListener } from "protocol/socket";
 import { assert, compareExecutionPoints, defer, waitForTime, transformSupplementalId, breakdownSupplementalId } from "protocol/utils";
 import { initProtocolMessagesStore } from "replay-next/components/protocol/ProtocolMessagesStore";
 import { insert } from "replay-next/src/utils/array";
@@ -168,15 +168,19 @@ export class ReplayClient implements ReplayClientInterface {
     }
   }
 
-  private async breakdownSupplementalIdAndSession(transformedId: string): Promise<{ id: string, sessionId: string, supplementalIndex: number }> {
-    const { id, supplementalIndex } = breakdownSupplementalId(transformedId);
+  private async getSupplementalIndexSession(supplementalIndex: number) {
     if (!supplementalIndex) {
-      const sessionId = await this.waitForSession();
-      return { id, sessionId, supplementalIndex };
+      return this.waitForSession();
     }
     const supplementalInfo = this.supplemental[supplementalIndex - 1];
     assert(supplementalInfo);
-    return { id, sessionId: supplementalInfo.sessionId, supplementalIndex };
+    return supplementalInfo.sessionId;
+  }
+
+  private async breakdownSupplementalIdAndSession(transformedId: string): Promise<{ id: string, sessionId: string, supplementalIndex: number }> {
+    const { id, supplementalIndex } = breakdownSupplementalId(transformedId);
+    const sessionId = await this.getSupplementalIndexSession(supplementalIndex);
+    return { id, sessionId, supplementalIndex };
   }
 
   private async getPauseSessionId(pauseId: string): Promise<string> {
@@ -587,8 +591,68 @@ export class ReplayClient implements ReplayClientInterface {
     return points;
   }
 
+  private getSupplementalIndexRecordingId(supplementalIndex: number) {
+    if (!supplementalIndex) {
+      assert(this._recordingId);
+      return this._recordingId;
+    }
+    return this.supplemental[supplementalIndex - 1].serverRecordingId;
+  }
+
+  private forAllConnections(callback: (serverRecordingId: string, connection: SupplementalRecordingConnection, supplementalIndex: number) => void) {
+    this.supplemental.forEach(({ serverRecordingId, connections }, i) => {
+      for (const connection of connections) {
+        callback(serverRecordingId, connection, i + 1);
+      }
+    });
+  }
+
+  private async maybeGetConnectionStepTarget(point: ExecutionPoint, pointSupplementalIndex: number): Promise<PauseDescription | null> {
+    const recordingId = this.getSupplementalIndexRecordingId(pointSupplementalIndex);
+
+    console.log("STEP_IN", point, recordingId);
+
+    let targetPoint: ExecutionPoint | undefined;
+    let targetSupplementalIndex = 0;
+    this.forAllConnections((serverRecordingId, connection, supplementalIndex) => {
+      const { clientFirst, clientRecordingId, clientPoint, serverPoint } = connection;
+      if (clientFirst) {
+        if (clientRecordingId == recordingId && clientPoint.point == point) {
+          targetPoint = serverPoint.point;
+          targetSupplementalIndex = supplementalIndex;
+        }
+      } else {
+        if (serverRecordingId == recordingId && serverPoint.point == point) {
+          assert(clientRecordingId == this._recordingId, "NYI");
+          targetPoint = clientPoint.point;
+          targetSupplementalIndex = 0;
+        }
+      }
+    });
+
+    console.log("TARGET_POINT", targetPoint, targetSupplementalIndex);
+
+    if (!targetPoint) {
+      return null;
+    }
+
+    const sessionId = await this.getSupplementalIndexSession(targetSupplementalIndex);
+
+    const response = await sendMessage("Session.getPointFrameSteps", { point: targetPoint }, sessionId);
+    const { steps } = response;
+    const desc = steps.find(step => step.point == targetPoint);
+    assert(desc);
+
+    this.transformSupplementalPointDescription(desc, sessionId);
+    return { ...desc, reason: "step" };
+  }
+
   async findStepInTarget(transformedPoint: ExecutionPoint): Promise<PauseDescription> {
-    const { id: point, sessionId } = await this.breakdownSupplementalIdAndSession(transformedPoint);
+    const { id: point, sessionId, supplementalIndex } = await this.breakdownSupplementalIdAndSession(transformedPoint);
+    const connectionStepTarget = await this.maybeGetConnectionStepTarget(point, supplementalIndex);
+    if (connectionStepTarget) {
+      return connectionStepTarget;
+    }
     const { target } = await client.Debugger.findStepInTarget({ point }, sessionId);
     this.transformSupplementalPointDescription(target, sessionId);
     return target;
