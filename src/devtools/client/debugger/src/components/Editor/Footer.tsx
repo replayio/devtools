@@ -20,7 +20,7 @@ function SourceFooter() {
       <div className="source-footer">
         <InlineErrorBoundary
           name="SourceFooter"
-          fallback={<div className="error">An error occurred while replaying</div>}
+          fallback={<div className="error"></div>}
         >
           <Suspense>
             <SourcemapToggleSuspends cursorPosition={cursorPosition} />

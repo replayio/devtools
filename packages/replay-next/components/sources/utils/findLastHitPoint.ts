@@ -1,15 +1,15 @@
-import { ExecutionPoint, TimeStampedPoint } from "@replayio/protocol";
+import { TimeStampedPoint } from "@replayio/protocol";
 import findLast from "lodash/findLast";
 
-import { compareExecutionPoints, isExecutionPointsLessThan } from "replay-next/src/utils/time";
+import { compareTimeStampedPoints } from "protocol/utils";
 
-export function findLastHitPoint(hitPoints: TimeStampedPoint[], executionPoint: ExecutionPoint) {
+export function findLastHitPoint(hitPoints: TimeStampedPoint[], executionPoint: TimeStampedPoint) {
   const hitPoint = findLast(
     hitPoints,
-    point => compareExecutionPoints(point.point, executionPoint) < 0
+    point => compareTimeStampedPoints(point, executionPoint) < 0
   );
   if (hitPoint != null) {
-    if (isExecutionPointsLessThan(hitPoint.point, executionPoint)) {
+    if (compareTimeStampedPoints(hitPoint, executionPoint) < 0) {
       return hitPoint;
     }
   }

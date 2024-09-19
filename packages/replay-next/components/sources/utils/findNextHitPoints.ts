@@ -1,11 +1,11 @@
-import { ExecutionPoint, TimeStampedPoint } from "@replayio/protocol";
+import { TimeStampedPoint } from "@replayio/protocol";
 
-import { compareExecutionPoints, isExecutionPointsGreaterThan } from "replay-next/src/utils/time";
+import { compareTimeStampedPoints } from "protocol/utils";
 
-export function findNextHitPoint(hitPoints: TimeStampedPoint[], executionPoint: ExecutionPoint) {
-  const hitPoint = hitPoints.find(point => compareExecutionPoints(point.point, executionPoint) > 0);
+export function findNextHitPoint(hitPoints: TimeStampedPoint[], executionPoint: TimeStampedPoint) {
+  const hitPoint = hitPoints.find(point => compareTimeStampedPoints(point, executionPoint) > 0);
   if (hitPoint != null) {
-    if (isExecutionPointsGreaterThan(hitPoint.point, executionPoint)) {
+    if (compareTimeStampedPoints(hitPoint, executionPoint) > 0) {
       return hitPoint;
     }
   }

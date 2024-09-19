@@ -62,7 +62,9 @@ export function updateTree({ newSources, prevSources, uncollapsedTree }: UpdateT
   // produce a fully immutable update.
   const newUncollapsedTree = createNextState(uncollapsedTree, draft => {
     for (const source of sourcesToAdd) {
-      addToTree(draft, source, debuggeeHost!);
+      if (!ignoreSource(source)) {
+        addToTree(draft, source, debuggeeHost!);
+      }
     }
   });
 
@@ -73,4 +75,11 @@ export function updateTree({ newSources, prevSources, uncollapsedTree }: UpdateT
     sourceTree: newSourceTree,
     parentMap: createParentMap(newSourceTree),
   };
+}
+
+function ignoreSource(source: SourceDetails) {
+  if (source.url?.startsWith("browser-external:")) {
+    return true;
+  }
+  return false;
 }

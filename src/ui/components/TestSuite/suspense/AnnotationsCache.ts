@@ -1,4 +1,4 @@
-import { compareNumericStrings } from "protocol/utils";
+import { compareExecutionPoints } from "protocol/utils";
 import { insert } from "replay-next/src/utils/array";
 import { createSingleEntryCacheWithTelemetry } from "replay-next/src/utils/suspense";
 import { ReplayClientInterface } from "shared/client/types";
@@ -20,7 +20,7 @@ export const AnnotationsCache = createSingleEntryCacheWithTelemetry<
       };
 
       insert(sortedAnnotations, processedAnnotation, (a, b) =>
-        compareNumericStrings(a.point, b.point)
+        compareExecutionPoints(a.point, b.point)
       );
     });
 
@@ -47,7 +47,7 @@ export const PlaywrightAnnotationsCache = createSingleEntryCacheWithTelemetry<
         };
 
         insert(sortedAnnotations, processedAnnotation, (a, b) =>
-          compareNumericStrings(a.point, b.point)
+          compareExecutionPoints(a.point, b.point)
         );
       }
     });
