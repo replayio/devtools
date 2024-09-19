@@ -108,7 +108,7 @@ class ManagedTree<T extends { name: string }> extends Component<
   expandListItems(listItems: T[]) {
     const { expanded } = this.state;
     listItems.forEach(item => expanded.add(this.props.getPath(item)));
-    this.props.onFocus(listItems[0]);
+    //this.props.onFocus(listItems[0]);
     this.setState({ expanded });
   }
 

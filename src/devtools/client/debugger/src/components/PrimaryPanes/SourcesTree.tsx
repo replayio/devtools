@@ -28,6 +28,7 @@ import {
 } from "ui/reducers/sources";
 import type { UIState } from "ui/state";
 import { trackEvent } from "ui/utils/telemetry";
+import { breakdownSupplementalId } from "protocol/utils";
 
 // Utils
 import {
@@ -86,6 +87,8 @@ const connector = connect(mapStateToProps, {
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
+type AllProps = PropsFromRedux & { supplementalIndex: number };
+
 interface STState {
   uncollapsedTree: TreeDirectory;
   sourceTree: TreeNode;
@@ -94,13 +97,23 @@ interface STState {
   highlightItems?: TreeNode[];
 }
 
-class SourcesTree extends Component<PropsFromRedux, STState> {
-  constructor(props: PropsFromRedux) {
+function filterSources(sources: SourcesMap, supplementalIndex: number): SourcesMap {
+  const rv: SourcesMap = {};
+  for (const [path, source] of Object.entries(sources)) {
+    if (breakdownSupplementalId(source.id).supplementalIndex == supplementalIndex) {
+      rv[path] = source;
+    }
+  }
+  return rv;
+}
+
+class SourcesTree extends Component<AllProps, STState> {
+  constructor(props: AllProps) {
     super(props);
-    const { sources } = this.props;
+    const { sources, supplementalIndex } = this.props;
 
     const state = createTree({
-      sources: sources as SourcesMap,
+      sources: filterSources(sources as SourcesMap, supplementalIndex)
     }) as STState;
 
     if (props.shownSource) {
@@ -119,8 +132,8 @@ class SourcesTree extends Component<PropsFromRedux, STState> {
     this.state = state;
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps: PropsFromRedux) {
-    const { sources, shownSource, selectedSource } = this.props;
+  UNSAFE_componentWillReceiveProps(nextProps: AllProps) {
+    const { sources, shownSource, selectedSource, supplementalIndex } = this.props;
     const { uncollapsedTree, sourceTree } = this.state;
 
     if (nextProps.shownSource && nextProps.shownSource != shownSource) {
@@ -130,6 +143,7 @@ class SourcesTree extends Component<PropsFromRedux, STState> {
 
     if (nextProps.selectedSource && nextProps.selectedSource != selectedSource) {
       const highlightItems = getDirectories(nextProps.selectedSource, sourceTree as TreeDirectory);
+      console.log("HighlightItems", supplementalIndex, highlightItems);
       this.setState({ highlightItems });
     }
 
@@ -139,7 +153,7 @@ class SourcesTree extends Component<PropsFromRedux, STState> {
       this.setState(
         updateTree({
           debuggeeUrl: "",
-          newSources: nextProps.sources,
+          newSources: filterSources(nextProps.sources, supplementalIndex),
           prevSources: sources,
           uncollapsedTree,
           sourceTree,
@@ -305,7 +319,7 @@ class SourcesTree extends Component<PropsFromRedux, STState> {
   }
 }
 
-const WrappedSourcesTree = (props: PropsFromRedux) => {
+const WrappedSourcesTree = (props: AllProps) => {
   const [, dismissExploreSourcesNag] = useNag(Nag.EXPLORE_SOURCES);
 
   useEffect(() => {

@@ -17,7 +17,7 @@ describe("utils/points", () => {
 
   describe("findClosestHitPoint", () => {
     function verifyIndex(executionPoint: ExecutionPoint, expectedIndex: number) {
-      const match = findClosestHitPoint(hitPoints, executionPoint);
+      const match = findClosestHitPoint(hitPoints, { point: executionPoint, time: 0 });
       expect(match).toHaveLength(2);
       expect(match[1]).toBe(expectedIndex);
     }
@@ -49,7 +49,7 @@ describe("utils/points", () => {
       exactMatch: boolean,
       expectedIndex: number
     ) {
-      const match = findHitPoint(hitPoints, executionPoint, exactMatch);
+      const match = findHitPoint(hitPoints, { point: executionPoint, time: 0 }, exactMatch);
       expect(match).toHaveLength(2);
       expect(match[1]).toBe(expectedIndex);
     }
@@ -92,7 +92,7 @@ describe("utils/points", () => {
 
   describe("findHitPointAfter", () => {
     function verifyIndex(executionPoint: ExecutionPoint, expectedIndex: number) {
-      const match = findHitPointAfter(hitPoints, executionPoint);
+      const match = findHitPointAfter(hitPoints, { point: executionPoint, time: 0 });
       expect(match).toHaveLength(2);
       expect(match[1]).toBe(expectedIndex);
     }
@@ -119,7 +119,7 @@ describe("utils/points", () => {
   // 0:1000, 1:4000, 2:6000
   describe("findHitPointBefore", () => {
     function verifyIndex(executionPoint: ExecutionPoint, expectedIndex: number) {
-      const match = findHitPointBefore(hitPoints, executionPoint);
+      const match = findHitPointBefore(hitPoints, { point: executionPoint, time: 0 });
       expect(match).toHaveLength(2);
       expect(match[1]).toBe(expectedIndex);
     }

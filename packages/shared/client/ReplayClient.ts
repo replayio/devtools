@@ -160,6 +160,10 @@ export class ReplayClient implements ReplayClientInterface {
     return sessionId == this._sessionId;
   }
 
+  numSupplementalRecordings() {
+    return this.supplemental.length;
+  }
+
   private async forEachSession(callback: (sessionId: string, supplementalIndex: number) => Promise<void>) {
     const sessionId = await this.waitForSession();
     await callback(sessionId, 0);
@@ -610,8 +614,6 @@ export class ReplayClient implements ReplayClientInterface {
   private async maybeGetConnectionStepTarget(point: ExecutionPoint, pointSupplementalIndex: number): Promise<PauseDescription | null> {
     const recordingId = this.getSupplementalIndexRecordingId(pointSupplementalIndex);
 
-    console.log("STEP_IN", point, recordingId);
-
     let targetPoint: ExecutionPoint | undefined;
     let targetSupplementalIndex = 0;
     this.forAllConnections((serverRecordingId, connection, supplementalIndex) => {
@@ -630,17 +632,15 @@ export class ReplayClient implements ReplayClientInterface {
       }
     });
 
-    console.log("TARGET_POINT", targetPoint, targetSupplementalIndex);
-
     if (!targetPoint) {
       return null;
     }
 
     const sessionId = await this.getSupplementalIndexSession(targetSupplementalIndex);
 
-    const response = await sendMessage("Session.getPointFrameSteps", { point: targetPoint }, sessionId);
+    const response = await sendMessage("Session.getPointFrameSteps" as any, { point: targetPoint }, sessionId);
     const { steps } = response;
-    const desc = steps.find(step => step.point == targetPoint);
+    const desc = steps.find((step: PointDescription) => step.point == targetPoint);
     assert(desc);
 
     this.transformSupplementalPointDescription(desc, sessionId);
