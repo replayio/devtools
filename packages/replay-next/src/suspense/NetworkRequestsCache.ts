@@ -41,6 +41,7 @@ export type NetworkRequestsData = {
   };
   timeStampedPoint: TimeStampedPoint;
   triggerPoint: TimeStampedPoint | null;
+  serverPoint: { point: ExecutionPoint, supplementalIndex: number } | null;
 };
 
 export type NetworkRequestsCacheData = {
@@ -57,7 +58,7 @@ export const networkRequestsCache = createStreamingCache<
   getKey: () => "single-entry-cache",
   load: async (
     options: StreamingCacheLoadOptions<RequestId[], Record<RequestId, NetworkRequestsData>>,
-    replayClient
+    replayClient: ReplayClientInterface
   ) => {
     const { update, resolve } = options;
 
@@ -69,7 +70,7 @@ export const networkRequestsCache = createStreamingCache<
     // Use the createOnRequestsReceived() adapter to ensure that RequestInfo objects
     // are always received before any associated RequestEventInfo objects
     const onRequestsReceived = createOnRequestsReceived(function onRequestsReceived(data) {
-      data.requests.forEach(({ id, point, time, triggerPoint }) => {
+      data.requests.forEach(({ id, point, time, triggerPoint },) => {
         assert(
           previousExecutionPoint === null || comparePoints(previousExecutionPoint, point) <= 0,
           "Requests should be in order"
@@ -78,6 +79,11 @@ export const networkRequestsCache = createStreamingCache<
         previousExecutionPoint = point;
 
         ids.push(id);
+
+        const targetPoint = replayClient.getTargetPoint(point, 0);
+
+
+
 
         records[id] = {
           id,
@@ -92,6 +98,7 @@ export const networkRequestsCache = createStreamingCache<
             responseEvent: null,
             responseRawHeaderEvent: null,
           },
+          serverPoint: targetPoint,
           requestBodyData: null,
           responseBodyData: null,
           timeStampedPoint: {

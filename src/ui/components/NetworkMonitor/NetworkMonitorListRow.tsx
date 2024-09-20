@@ -116,8 +116,15 @@ function RequestRow({
     start: startTime,
     status,
     triggerPoint,
+    serverPoint,
     url,
   } = request;
+
+
+  if (serverPoint) {
+    console.log("serverPoint!!", serverPoint);
+  }
+
 
   let type = documentType || cause;
   if (type === "unknown") {
@@ -225,7 +232,10 @@ function RequestRow({
         )}
         {columns.name && (
           <div className={styles.Column} data-name="name">
-            {name} {graphqlOperationName && `(${graphqlOperationName})`}
+            {serverPoint && (
+              <span style={{ color: "red" }}>Server {serverPoint.supplementalIndex} {serverPoint.point}</span>
+            )}
+            {/* {name} {graphqlOperationName && `(${graphqlOperationName})`} */}
           </div>
         )}
         {columns.method && (
@@ -254,7 +264,27 @@ function RequestRow({
           </div>
         )}
 
-        {triggerPoint && triggerPoint.time !== currentTime && (
+        {serverPoint && (
+          <button
+            className={styles.ServerSeekButton}
+            data-test-name="Network-RequestRow-SeekButton"
+            onClick={() => seekToRequestWrapper(request)}
+            tabIndex={0}
+            style={{
+              backgroundColor: "red !important",
+            }}
+          >
+            <Icon
+              className={styles.SeekButtonIcon}
+              type={isAfterCurrentTime ? "fast-forward" : "rewind"}
+            />
+            <span className={styles.SeekButtonText}>
+              {isAfterCurrentTime ? "Fast-forward" : "Rewind"}
+            </span>
+          </button>
+        )}
+
+        {!serverPoint && triggerPoint && triggerPoint.time !== currentTime && (
           <button
             className={styles.SeekButton}
             data-test-name="Network-RequestRow-SeekButton"

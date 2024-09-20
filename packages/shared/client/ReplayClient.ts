@@ -611,7 +611,9 @@ export class ReplayClient implements ReplayClientInterface {
     });
   }
 
-  private async maybeGetConnectionStepTarget(point: ExecutionPoint, pointSupplementalIndex: number): Promise<PauseDescription | null> {
+  getTargetPoint(point: ExecutionPoint, pointSupplementalIndex: number): {
+    point: ExecutionPoint | undefined, supplementalIndex: number
+  } | null {
     const recordingId = this.getSupplementalIndexRecordingId(pointSupplementalIndex);
 
     let targetPoint: ExecutionPoint | undefined;
@@ -636,11 +638,21 @@ export class ReplayClient implements ReplayClientInterface {
       return null;
     }
 
-    const sessionId = await this.getSupplementalIndexSession(targetSupplementalIndex);
+    return { point: targetPoint, supplementalIndex: targetSupplementalIndex };
+  }
 
-    const response = await sendMessage("Session.getPointFrameSteps" as any, { point: targetPoint }, sessionId);
+  private async maybeGetConnectionStepTarget(point: ExecutionPoint, pointSupplementalIndex: number): Promise<PauseDescription | null> {
+
+    const targetPoint = this.getTargetPoint(point, pointSupplementalIndex);
+    if (!targetPoint) {
+      return null;
+    }
+
+    const sessionId = await this.getSupplementalIndexSession(targetPoint.supplementalIndex);
+
+    const response = await sendMessage("Session.getPointFrameSteps" as any, { point: targetPoint.point }, sessionId);
     const { steps } = response;
-    const desc = steps.find((step: PointDescription) => step.point == targetPoint);
+    const desc = steps.find((step: PointDescription) => step.point == targetPoint.point);
     assert(desc);
 
     this.transformSupplementalPointDescription(desc, sessionId);
@@ -1542,7 +1554,7 @@ function interpolateSupplementalTime(recordingId: string, supplemental: Suppleme
     assert(previous.clientPoint.time <= next.clientPoint.time);
     assert(previous.serverPoint.time <= next.serverPoint.time);
     if (supplementalTime >= previous.serverPoint.time &&
-        supplementalTime <= next.serverPoint.time) {
+      supplementalTime <= next.serverPoint.time) {
       const clientElapsed = next.clientPoint.time - previous.clientPoint.time;
       const serverElapsed = next.serverPoint.time - previous.serverPoint.time;
       const fraction = (supplementalTime - previous.serverPoint.time) / serverElapsed;

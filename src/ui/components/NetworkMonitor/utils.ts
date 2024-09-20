@@ -1,4 +1,5 @@
 import {
+  ExecutionPoint,
   Header,
   RequestBodyEvent,
   RequestDoneEvent,
@@ -46,6 +47,7 @@ export type RequestSummary = {
   requestHeaders: Header[];
   responseHeaders: Header[];
   start: number;
+  serverPoint: { point: ExecutionPoint; supplementalIndex: number } | null;
   status: number | undefined;
   type: CanonicalRequestType;
   url: string;
@@ -168,6 +170,7 @@ export const partialRequestsToCompleteSummaries = (
         start: record.timeStampedPoint.time,
         status: responseEvent?.responseStatus,
         triggerPoint: record.triggerPoint,
+        serverPoint: record.serverPoint,
         type: REQUEST_TYPES[openEvent.requestCause || ""] ?? CanonicalRequestType.OTHER,
         url: openEvent.requestUrl,
       };

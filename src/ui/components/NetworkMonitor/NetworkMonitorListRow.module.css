@@ -89,11 +89,42 @@
   color: #fff;
   font-weight: bold;
 }
+
 .Row:hover .SeekButton {
   display: flex;
 }
 .SeekButton:focus,
 .SeekButton:hover {
+  outline: none;
+}
+
+
+.ServerSeekButton {
+  display: none;
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+
+  padding: 0.25rem;
+  padding-right: 1ch;
+  border-top-right-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
+
+  flex-direction: row;
+  align-items: center;
+  gap: 1ch;
+
+  background: red !important;
+  color: #fff;
+  font-weight: bold;
+}
+
+.Row:hover .ServerSeekButton {
+  display: flex;
+}
+.Server:focus,
+.Server:hover {
   outline: none;
 }
 
