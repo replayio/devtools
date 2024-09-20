@@ -142,20 +142,20 @@ export default function NetworkMonitor() {
               filteredAfterCount={countAfter}
               filteredBeforeCount={countBefore}
               requests={filteredRequests}
-              seekToRequest={request => {
+              seekToRequest={({point, id}) => {
                 trackEvent("net_monitor.seek_to_request");
                 dispatch(
                   seek({
-                    executionPoint: request.point.point,
+                    executionPoint: point.point,
                     openSource: true,
-                    time: request.point.time,
+                    time: point.time,
                   })
                 );
 
                 dismissInspectNetworkRequestNag();
 
                 trackEvent("net_monitor.select_request_row");
-                dispatch(selectNetworkRequest(request.id));
+                dispatch(selectNetworkRequest(id));
               }}
               selectedRequestId={selectedRequestId}
               selectRequest={request => {

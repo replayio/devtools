@@ -41,7 +41,7 @@ export type NetworkRequestsData = {
   };
   timeStampedPoint: TimeStampedPoint;
   triggerPoint: TimeStampedPoint | null;
-  serverPoint: { point: ExecutionPoint, supplementalIndex: number } | null;
+  serverPoint: TimeStampedPoint | null;
 };
 
 export type NetworkRequestsCacheData = {
@@ -82,9 +82,6 @@ export const networkRequestsCache = createStreamingCache<
 
         const targetPoint = replayClient.getTargetPoint(point, 0);
 
-
-
-
         records[id] = {
           id,
           events: {
@@ -98,7 +95,7 @@ export const networkRequestsCache = createStreamingCache<
             responseEvent: null,
             responseRawHeaderEvent: null,
           },
-          serverPoint: targetPoint,
+          serverPoint: targetPoint?.point ?? null,
           requestBodyData: null,
           responseBodyData: null,
           timeStampedPoint: {

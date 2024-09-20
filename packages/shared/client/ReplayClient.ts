@@ -612,23 +612,23 @@ export class ReplayClient implements ReplayClientInterface {
   }
 
   getTargetPoint(point: ExecutionPoint, pointSupplementalIndex: number): {
-    point: ExecutionPoint | undefined, supplementalIndex: number
+    point: TimeStampedPoint, supplementalIndex: number
   } | null {
     const recordingId = this.getSupplementalIndexRecordingId(pointSupplementalIndex);
 
-    let targetPoint: ExecutionPoint | undefined;
+    let targetPoint: TimeStampedPoint | undefined;
     let targetSupplementalIndex = 0;
     this.forAllConnections((serverRecordingId, connection, supplementalIndex) => {
       const { clientFirst, clientRecordingId, clientPoint, serverPoint } = connection;
       if (clientFirst) {
         if (clientRecordingId == recordingId && clientPoint.point == point) {
-          targetPoint = serverPoint.point;
+          targetPoint = serverPoint;
           targetSupplementalIndex = supplementalIndex;
         }
       } else {
         if (serverRecordingId == recordingId && serverPoint.point == point) {
           assert(clientRecordingId == this._recordingId, "NYI");
-          targetPoint = clientPoint.point;
+          targetPoint = clientPoint;
           targetSupplementalIndex = 0;
         }
       }
@@ -652,7 +652,7 @@ export class ReplayClient implements ReplayClientInterface {
 
     const response = await sendMessage("Session.getPointFrameSteps" as any, { point: targetPoint.point }, sessionId);
     const { steps } = response;
-    const desc = steps.find((step: PointDescription) => step.point == targetPoint.point);
+    const desc = steps.find((step: PointDescription) => step.point == targetPoint.point?.point);
     assert(desc);
 
     this.transformSupplementalPointDescription(desc, sessionId);

@@ -9,6 +9,7 @@ import { Nag } from "shared/graphql/types";
 import useNetworkContextMenu from "ui/components/NetworkMonitor/useNetworkContextMenu";
 import { EnabledColumns } from "ui/components/NetworkMonitor/useNetworkMonitorColumns";
 import { RequestSummary, findHeader } from "ui/components/NetworkMonitor/utils";
+import { TimeStampedPoint } from "@replayio/protocol";
 
 import {
   BodyPartsToUInt8Array,
@@ -29,7 +30,7 @@ export type ItemData = {
   filteredBeforeCount: number;
   firstRequestIdAfterCurrentTime: string | null;
   requests: RequestSummary[];
-  seekToRequest: (row: RequestSummary) => void;
+  seekToRequest: ({point, id}: {point: TimeStampedPoint, id: string}) => void;
   selectRequest: (row: RequestSummary | null) => void;
   selectedRequestId: string | null;
 };
@@ -182,8 +183,8 @@ function RequestRow({
     getGraphqlOperationNameIfRelevant();
   }, [path, replayClient, request]);
 
-  const seekToRequestWrapper = (request: RequestSummary) => {
-    seekToRequest(request);
+  const seekToRequestWrapper = ({point, id}: {point: TimeStampedPoint, id: string}) => {
+    seekToRequest({point, id});
     dismissJumpToNetworkRequestNag(); // Replay Passport
   };
 
@@ -233,9 +234,9 @@ function RequestRow({
         {columns.name && (
           <div className={styles.Column} data-name="name">
             {serverPoint && (
-              <span style={{ color: "red" }}>Server {serverPoint.supplementalIndex} {serverPoint.point}</span>
+              <span style={{ color: "red" }}>Server</span>
             )}
-            {/* {name} {graphqlOperationName && `(${graphqlOperationName})`} */}
+            {name} {graphqlOperationName && `(${graphqlOperationName})`}
           </div>
         )}
         {columns.method && (
@@ -268,7 +269,7 @@ function RequestRow({
           <button
             className={styles.ServerSeekButton}
             data-test-name="Network-RequestRow-SeekButton"
-            onClick={() => seekToRequestWrapper(request)}
+            onClick={() => seekToRequestWrapper({point: serverPoint, id: id})}
             tabIndex={0}
             style={{
               backgroundColor: "red !important",
@@ -288,7 +289,7 @@ function RequestRow({
           <button
             className={styles.SeekButton}
             data-test-name="Network-RequestRow-SeekButton"
-            onClick={() => seekToRequestWrapper(request)}
+            onClick={() => seekToRequestWrapper({point: request.point, id: request.id})}
             tabIndex={0}
           >
             <Icon

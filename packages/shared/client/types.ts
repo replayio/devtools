@@ -207,7 +207,7 @@ export interface ReplayClientInterface {
     events: RequestEventInfo[];
     requests: RequestInfo[];
   }>;
-  getTargetPoint(point: ExecutionPoint, pointSupplementalIndex: number): { point: ExecutionPoint | undefined, supplementalIndex: number } | null;
+  getTargetPoint(point: ExecutionPoint, pointSupplementalIndex: number): { point: TimeStampedPoint | undefined, supplementalIndex: number } | null;
   findPaints(): Promise<TimeStampedPointWithPaintHash[]>;
   findPoints(selector: PointSelector, limits?: PointLimits): Promise<PointDescription[]>;
 

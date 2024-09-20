@@ -47,7 +47,7 @@ export type RequestSummary = {
   requestHeaders: Header[];
   responseHeaders: Header[];
   start: number;
-  serverPoint: { point: ExecutionPoint; supplementalIndex: number } | null;
+  serverPoint: TimeStampedPoint | null;
   status: number | undefined;
   type: CanonicalRequestType;
   url: string;
