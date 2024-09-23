@@ -14,6 +14,7 @@ import keyBy from "lodash/keyBy";
 
 import { assert, compareExecutionPoints } from "protocol/utils";
 import { NetworkRequestsCacheData } from "replay-next/src/suspense/NetworkRequestsCache";
+import { TargetPoint } from "shared/client/types";
 
 export enum CanonicalRequestType {
   CSS,
@@ -47,7 +48,7 @@ export type RequestSummary = {
   requestHeaders: Header[];
   responseHeaders: Header[];
   start: number;
-  serverPoint: TimeStampedPoint | null;
+  targetPoint: TargetPoint | null;
   status: number | undefined;
   type: CanonicalRequestType;
   url: string;
@@ -170,7 +171,7 @@ export const partialRequestsToCompleteSummaries = (
         start: record.timeStampedPoint.time,
         status: responseEvent?.responseStatus,
         triggerPoint: record.triggerPoint,
-        serverPoint: record.serverPoint,
+        targetPoint: record.targetPoint,
         type: REQUEST_TYPES[openEvent.requestCause || ""] ?? CanonicalRequestType.OTHER,
         url: openEvent.requestUrl,
       };

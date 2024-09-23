@@ -178,6 +178,11 @@ export interface SupplementalSession extends SupplementalRecording {
   sessionId: string;
 }
 
+export interface TargetPoint {
+  point: TimeStampedPoint;
+  supplementalIndex: number
+}
+
 export interface ReplayClientInterface {
   get loadedRegions(): LoadedRegions | null;
   addEventListener(type: ReplayClientEvents, handler: Function): void;
@@ -207,7 +212,7 @@ export interface ReplayClientInterface {
     events: RequestEventInfo[];
     requests: RequestInfo[];
   }>;
-  getTargetPoint(point: ExecutionPoint, pointSupplementalIndex: number): { point: TimeStampedPoint | undefined, supplementalIndex: number } | null;
+  getTargetPoint(point: ExecutionPoint, pointSupplementalIndex: number): TargetPoint | null;
   findPaints(): Promise<TimeStampedPointWithPaintHash[]>;
   findPoints(selector: PointSelector, limits?: PointLimits): Promise<PointDescription[]>;
 

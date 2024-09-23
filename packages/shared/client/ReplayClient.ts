@@ -93,6 +93,7 @@ import {
   SupplementalSession,
   SupplementalRecordingConnection,
   TimeStampedPointWithPaintHash,
+  TargetPoint,
 } from "./types";
 
 export const MAX_POINTS_TO_FIND = 10_000;
@@ -611,9 +612,7 @@ export class ReplayClient implements ReplayClientInterface {
     });
   }
 
-  getTargetPoint(point: ExecutionPoint, pointSupplementalIndex: number): {
-    point: TimeStampedPoint, supplementalIndex: number
-  } | null {
+  getTargetPoint(point: ExecutionPoint, pointSupplementalIndex: number): TargetPoint | null {
     const recordingId = this.getSupplementalIndexRecordingId(pointSupplementalIndex);
 
     let targetPoint: TimeStampedPoint | undefined;
@@ -642,7 +641,6 @@ export class ReplayClient implements ReplayClientInterface {
   }
 
   private async maybeGetConnectionStepTarget(point: ExecutionPoint, pointSupplementalIndex: number): Promise<PauseDescription | null> {
-
     const targetPoint = this.getTargetPoint(point, pointSupplementalIndex);
     if (!targetPoint) {
       return null;

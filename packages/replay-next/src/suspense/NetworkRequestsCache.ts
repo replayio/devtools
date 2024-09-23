@@ -16,11 +16,12 @@ import {
   ResponseBodyData,
   TimeStampedPoint,
 } from "@replayio/protocol";
+import { transformSupplementalId } from "protocol/utils"
 import { StreamingCacheLoadOptions, createStreamingCache } from "suspense";
 
 import { comparePoints } from "protocol/execution-point-utils";
 import { assert } from "protocol/utils";
-import { ReplayClientInterface } from "shared/client/types";
+import { ReplayClientInterface, TargetPoint } from "shared/client/types";
 
 export type NetworkEventWithTime<EventType> = EventType & {
   time: number;
@@ -41,7 +42,7 @@ export type NetworkRequestsData = {
   };
   timeStampedPoint: TimeStampedPoint;
   triggerPoint: TimeStampedPoint | null;
-  serverPoint: TimeStampedPoint | null;
+  targetPoint: TargetPoint | null;
 };
 
 export type NetworkRequestsCacheData = {
@@ -81,6 +82,7 @@ export const networkRequestsCache = createStreamingCache<
         ids.push(id);
 
         const targetPoint = replayClient.getTargetPoint(point, 0);
+        console.log(`TARGET`, transformSupplementalId(targetPoint?.point?.point ?? "", targetPoint?.supplementalIndex ?? 0))
 
         records[id] = {
           id,
@@ -95,13 +97,13 @@ export const networkRequestsCache = createStreamingCache<
             responseEvent: null,
             responseRawHeaderEvent: null,
           },
-          serverPoint: targetPoint?.point ?? null,
           requestBodyData: null,
           responseBodyData: null,
           timeStampedPoint: {
             point,
             time,
           },
+          targetPoint: targetPoint ?? null,
           triggerPoint: triggerPoint ?? null,
         } as NetworkRequestsData;
       });

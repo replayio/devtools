@@ -20,6 +20,10 @@ import {
   URLEncodedToPlaintext,
 } from "./content";
 import styles from "./NetworkMonitorListRow.module.css";
+import { transformSupplementalId } from "protocol/utils"
+
+import { useAppDispatch } from "ui/setup/hooks";
+import { seek } from "ui/actions/timeline";
 
 export const LIST_ROW_HEIGHT = 26;
 
@@ -117,13 +121,13 @@ function RequestRow({
     start: startTime,
     status,
     triggerPoint,
-    serverPoint,
+    targetPoint,
     url,
   } = request;
 
 
-  if (serverPoint) {
-    console.log("serverPoint!!", serverPoint);
+  if (targetPoint) {
+    console.log("targetPoint!!", targetPoint);
   }
 
 
@@ -150,6 +154,9 @@ function RequestRow({
       statusCategory = "redirect";
     }
   }
+
+
+  const dispatch = useAppDispatch();
 
   const [, dismissJumpToNetworkRequestNag] = useNag(Nag.JUMP_TO_NETWORK_REQUEST);
 
@@ -233,7 +240,7 @@ function RequestRow({
         )}
         {columns.name && (
           <div className={styles.Column} data-name="name">
-            {serverPoint && (
+            {targetPoint && (
               <span style={{ color: "red" }}>Server</span>
             )}
             {name} {graphqlOperationName && `(${graphqlOperationName})`}
@@ -265,11 +272,19 @@ function RequestRow({
           </div>
         )}
 
-        {serverPoint && (
+        {targetPoint && (
           <button
             className={styles.ServerSeekButton}
             data-test-name="Network-RequestRow-SeekButton"
-            onClick={() => seekToRequestWrapper({point: serverPoint, id: id})}
+            onClick={() => {
+              dispatch(
+                seek({
+                  executionPoint: transformSupplementalId(targetPoint.point.point, targetPoint.supplementalIndex),
+                  openSource: true,
+                  time: targetPoint.point.time,
+                })
+              );
+            }}
             tabIndex={0}
             style={{
               backgroundColor: "red !important",
@@ -285,7 +300,7 @@ function RequestRow({
           </button>
         )}
 
-        {!serverPoint && triggerPoint && triggerPoint.time !== currentTime && (
+        {!targetPoint && triggerPoint && triggerPoint.time !== currentTime && (
           <button
             className={styles.SeekButton}
             data-test-name="Network-RequestRow-SeekButton"
