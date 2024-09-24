@@ -33,7 +33,7 @@ export type ItemData = {
   filteredBeforeCount: number;
   firstRequestIdAfterCurrentTime: string | null;
   requests: RequestSummary[];
-  seekToRequest: ({ point, id }: { point: TimeStampedPoint; id: string }) => void;
+  seekToRequest: (request: RequestSummary) => void;
   selectRequest: (row: RequestSummary | null) => void;
   selectedRequestId: string | null;
 };
@@ -186,8 +186,8 @@ function RequestRow({
     getGraphqlOperationNameIfRelevant();
   }, [path, replayClient, request]);
 
-  const seekToRequestWrapper = ({ point, id }: { point: TimeStampedPoint; id: string }) => {
-    seekToRequest({ point, id });
+  const seekToRequestWrapper = (request: RequestSummary) => {
+    seekToRequest(request);
     dismissJumpToNetworkRequestNag(); // Replay Passport
   };
 
@@ -304,7 +304,7 @@ function RequestRow({
           <button
             className={styles.SeekButton}
             data-test-name="Network-RequestRow-SeekButton"
-            onClick={() => seekToRequestWrapper({ point: request.point, id: request.id })}
+            onClick={() => seekToRequestWrapper(request)}
             tabIndex={0}
           >
             <Icon

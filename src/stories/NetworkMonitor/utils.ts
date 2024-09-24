@@ -96,6 +96,7 @@ export const requestSummary = (
     name: "replay.io",
     path: getPathFromUrl(url),
     point: { point: "0", time: 0 },
+    targetPoint: null,
     queryParams: [["foo", "bar"]],
     triggerPoint: { point: "0", time: 0 },
     requestHeaders: [{ name: "foo", value: "bar" }],
