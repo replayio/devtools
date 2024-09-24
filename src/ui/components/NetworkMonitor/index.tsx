@@ -142,7 +142,7 @@ export default function NetworkMonitor() {
               filteredAfterCount={countAfter}
               filteredBeforeCount={countBefore}
               requests={filteredRequests}
-              seekToRequest={({point, id}) => {
+              seekToRequest={({ point, id }) => {
                 trackEvent("net_monitor.seek_to_request");
                 dispatch(
                   seek({

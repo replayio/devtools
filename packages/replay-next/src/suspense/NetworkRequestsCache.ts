@@ -16,10 +16,10 @@ import {
   ResponseBodyData,
   TimeStampedPoint,
 } from "@replayio/protocol";
-import { transformSupplementalId } from "protocol/utils"
 import { StreamingCacheLoadOptions, createStreamingCache } from "suspense";
 
 import { comparePoints } from "protocol/execution-point-utils";
+import { transformSupplementalId } from "protocol/utils";
 import { assert } from "protocol/utils";
 import { ReplayClientInterface, TargetPoint } from "shared/client/types";
 
@@ -71,7 +71,7 @@ export const networkRequestsCache = createStreamingCache<
     // Use the createOnRequestsReceived() adapter to ensure that RequestInfo objects
     // are always received before any associated RequestEventInfo objects
     const onRequestsReceived = createOnRequestsReceived(function onRequestsReceived(data) {
-      data.requests.forEach(({ id, point, time, triggerPoint },) => {
+      data.requests.forEach(({ id, point, time, triggerPoint }) => {
         assert(
           previousExecutionPoint === null || comparePoints(previousExecutionPoint, point) <= 0,
           "Requests should be in order"
@@ -82,7 +82,6 @@ export const networkRequestsCache = createStreamingCache<
         ids.push(id);
 
         const targetPoint = replayClient.getTargetPoint(point, 0);
-        console.log(`TARGET`, transformSupplementalId(targetPoint?.point?.point ?? "", targetPoint?.supplementalIndex ?? 0))
 
         records[id] = {
           id,

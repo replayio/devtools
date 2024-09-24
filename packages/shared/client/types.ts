@@ -180,13 +180,17 @@ export interface SupplementalSession extends SupplementalRecording {
 
 export interface TargetPoint {
   point: TimeStampedPoint;
-  supplementalIndex: number
+  supplementalIndex: number;
 }
 
 export interface ReplayClientInterface {
   get loadedRegions(): LoadedRegions | null;
   addEventListener(type: ReplayClientEvents, handler: Function): void;
-  configure(recordingId: string, sessionId: string, supplemental: SupplementalSession[]): Promise<void>;
+  configure(
+    recordingId: string,
+    sessionId: string,
+    supplemental: SupplementalSession[]
+  ): Promise<void>;
   createPause(executionPoint: ExecutionPoint): Promise<createPauseResult>;
   evaluateExpression(
     pauseId: PauseId,

@@ -1,15 +1,18 @@
+import { TimeStampedPoint } from "@replayio/protocol";
 import { CSSProperties, MouseEvent, useContext, useEffect, useState } from "react";
 
+import { transformSupplementalId } from "protocol/utils";
 import Icon from "replay-next/components/Icon";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { useNag } from "replay-next/src/hooks/useNag";
 import { networkRequestBodyCache } from "replay-next/src/suspense/NetworkRequestsCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Nag } from "shared/graphql/types";
+import { seek } from "ui/actions/timeline";
 import useNetworkContextMenu from "ui/components/NetworkMonitor/useNetworkContextMenu";
 import { EnabledColumns } from "ui/components/NetworkMonitor/useNetworkMonitorColumns";
 import { RequestSummary, findHeader } from "ui/components/NetworkMonitor/utils";
-import { TimeStampedPoint } from "@replayio/protocol";
+import { useAppDispatch } from "ui/setup/hooks";
 
 import {
   BodyPartsToUInt8Array,
@@ -20,10 +23,6 @@ import {
   URLEncodedToPlaintext,
 } from "./content";
 import styles from "./NetworkMonitorListRow.module.css";
-import { transformSupplementalId } from "protocol/utils"
-
-import { useAppDispatch } from "ui/setup/hooks";
-import { seek } from "ui/actions/timeline";
 
 export const LIST_ROW_HEIGHT = 26;
 
@@ -34,7 +33,7 @@ export type ItemData = {
   filteredBeforeCount: number;
   firstRequestIdAfterCurrentTime: string | null;
   requests: RequestSummary[];
-  seekToRequest: ({point, id}: {point: TimeStampedPoint, id: string}) => void;
+  seekToRequest: ({ point, id }: { point: TimeStampedPoint; id: string }) => void;
   selectRequest: (row: RequestSummary | null) => void;
   selectedRequestId: string | null;
 };
@@ -125,11 +124,9 @@ function RequestRow({
     url,
   } = request;
 
-
   if (targetPoint) {
     console.log("targetPoint!!", targetPoint);
   }
-
 
   let type = documentType || cause;
   if (type === "unknown") {
@@ -154,7 +151,6 @@ function RequestRow({
       statusCategory = "redirect";
     }
   }
-
 
   const dispatch = useAppDispatch();
 
@@ -190,8 +186,8 @@ function RequestRow({
     getGraphqlOperationNameIfRelevant();
   }, [path, replayClient, request]);
 
-  const seekToRequestWrapper = ({point, id}: {point: TimeStampedPoint, id: string}) => {
-    seekToRequest({point, id});
+  const seekToRequestWrapper = ({ point, id }: { point: TimeStampedPoint; id: string }) => {
+    seekToRequest({ point, id });
     dismissJumpToNetworkRequestNag(); // Replay Passport
   };
 
@@ -240,9 +236,6 @@ function RequestRow({
         )}
         {columns.name && (
           <div className={styles.Column} data-name="name">
-            {targetPoint && (
-              <span style={{ color: "red" }}>Server</span>
-            )}
             {name} {graphqlOperationName && `(${graphqlOperationName})`}
           </div>
         )}
@@ -273,38 +266,45 @@ function RequestRow({
         )}
 
         {targetPoint && (
-          <button
-            className={styles.ServerSeekButton}
-            data-test-name="Network-RequestRow-SeekButton"
-            onClick={() => {
-              dispatch(
-                seek({
-                  executionPoint: transformSupplementalId(targetPoint.point.point, targetPoint.supplementalIndex),
-                  openSource: true,
-                  time: targetPoint.point.time,
-                })
-              );
-            }}
-            tabIndex={0}
-            style={{
-              backgroundColor: "red !important",
-            }}
-          >
-            <Icon
-              className={styles.SeekButtonIcon}
-              type={isAfterCurrentTime ? "fast-forward" : "rewind"}
-            />
-            <span className={styles.SeekButtonText}>
-              {isAfterCurrentTime ? "Fast-forward" : "Rewind"}
-            </span>
-          </button>
+          <div className={styles.ServerSeekButton}>
+            <button
+              className={styles.ServerSeekJumpButton}
+              data-test-name="Network-RequestRow-SeekButton"
+              onClick={() => seekToRequestWrapper(request)}
+              tabIndex={0}
+            >
+              <Icon className={styles.SeekButtonIcon} style={{ transform: 'rotate(180deg) scaleX(-1)' }} type={"arrow-nested"} />
+            </button>
+            <button
+              className={styles.ServerSeekJumpButton}
+              data-test-name="Network-RequestRow-SeekButton"
+              onClick={(e) => dispatch(
+                  seek({
+                    executionPoint: transformSupplementalId(
+                      targetPoint.point.point,
+                      targetPoint.supplementalIndex
+                    ),
+                    openSource: true,
+                    time: targetPoint.point.time,
+                  })
+                )
+              }
+              tabIndex={0}
+              style={{
+                borderTopRightRadius: '0.5rem',
+                borderBottomRightRadius: '0.5rem'
+              }}
+            >
+              <Icon className={styles.SeekButtonIcon} style={{ transform: 'rotate(-90deg) scaleX(-1)' }} type={"arrow-nested"} />
+            </button>
+          </div>
         )}
 
         {!targetPoint && triggerPoint && triggerPoint.time !== currentTime && (
           <button
             className={styles.SeekButton}
             data-test-name="Network-RequestRow-SeekButton"
-            onClick={() => seekToRequestWrapper({point: request.point, id: request.id})}
+            onClick={() => seekToRequestWrapper({ point: request.point, id: request.id })}
             tabIndex={0}
           >
             <Icon
