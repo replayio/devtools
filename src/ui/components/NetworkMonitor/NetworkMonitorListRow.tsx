@@ -278,7 +278,8 @@ function RequestRow({
             <button
               className={styles.ServerSeekJumpButton}
               data-test-name="Network-RequestRow-SeekButton"
-              onClick={(e) => dispatch(
+              onClick={(e) => {
+                dispatch(
                   seek({
                     executionPoint: transformSupplementalId(
                       targetPoint.point.point,
@@ -287,7 +288,9 @@ function RequestRow({
                     openSource: true,
                     time: targetPoint.point.time,
                   })
-                )
+                );
+                selectRequest(request);
+              }
               }
               tabIndex={0}
               style={{
