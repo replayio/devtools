@@ -89,11 +89,51 @@
   color: #fff;
   font-weight: bold;
 }
+
 .Row:hover .SeekButton {
   display: flex;
 }
 .SeekButton:focus,
 .SeekButton:hover {
+  outline: none;
+}
+
+.ServerSeekButton {
+  display: none;
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+
+  border-top-right-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
+
+  flex-direction: row;
+  align-items: center;
+  padding: 0;
+  gap: 2px;
+
+  background: var(--body-bgcolor);
+  color: #fff;
+  font-weight: bold;
+}
+
+.Row:hover .ServerSeekButton {
+  display: flex;
+}
+
+.ServerSeekJumpButton {
+  background: var(--background-color-primary-button);
+  gap: 1ch;
+  padding: 0.25rem 1ch;
+}
+
+.ServerSeekJumpButton:hover {
+  background-color:  var(--background-color-primary-button-hover);
+}
+
+.Server:focus,
+.Server:hover {
   outline: none;
 }
 

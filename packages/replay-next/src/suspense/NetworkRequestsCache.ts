@@ -19,8 +19,9 @@ import {
 import { StreamingCacheLoadOptions, createStreamingCache } from "suspense";
 
 import { comparePoints } from "protocol/execution-point-utils";
+import { transformSupplementalId } from "protocol/utils";
 import { assert } from "protocol/utils";
-import { ReplayClientInterface } from "shared/client/types";
+import { ReplayClientInterface, TargetPoint } from "shared/client/types";
 
 export type NetworkEventWithTime<EventType> = EventType & {
   time: number;
@@ -41,6 +42,7 @@ export type NetworkRequestsData = {
   };
   timeStampedPoint: TimeStampedPoint;
   triggerPoint: TimeStampedPoint | null;
+  targetPoint: TargetPoint | null;
 };
 
 export type NetworkRequestsCacheData = {
@@ -57,7 +59,7 @@ export const networkRequestsCache = createStreamingCache<
   getKey: () => "single-entry-cache",
   load: async (
     options: StreamingCacheLoadOptions<RequestId[], Record<RequestId, NetworkRequestsData>>,
-    replayClient
+    replayClient: ReplayClientInterface
   ) => {
     const { update, resolve } = options;
 
@@ -79,6 +81,8 @@ export const networkRequestsCache = createStreamingCache<
 
         ids.push(id);
 
+        const targetPoint = replayClient.getTargetPoint(point, 0);
+
         records[id] = {
           id,
           events: {
@@ -98,6 +102,7 @@ export const networkRequestsCache = createStreamingCache<
             point,
             time,
           },
+          targetPoint: targetPoint ?? null,
           triggerPoint: triggerPoint ?? null,
         } as NetworkRequestsData;
       });

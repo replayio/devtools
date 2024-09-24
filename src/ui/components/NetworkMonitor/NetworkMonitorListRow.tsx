@@ -1,14 +1,18 @@
+import { TimeStampedPoint } from "@replayio/protocol";
 import { CSSProperties, MouseEvent, useContext, useEffect, useState } from "react";
 
+import { transformSupplementalId } from "protocol/utils";
 import Icon from "replay-next/components/Icon";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { useNag } from "replay-next/src/hooks/useNag";
 import { networkRequestBodyCache } from "replay-next/src/suspense/NetworkRequestsCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Nag } from "shared/graphql/types";
+import { seek } from "ui/actions/timeline";
 import useNetworkContextMenu from "ui/components/NetworkMonitor/useNetworkContextMenu";
 import { EnabledColumns } from "ui/components/NetworkMonitor/useNetworkMonitorColumns";
 import { RequestSummary, findHeader } from "ui/components/NetworkMonitor/utils";
+import { useAppDispatch } from "ui/setup/hooks";
 
 import {
   BodyPartsToUInt8Array,
@@ -29,7 +33,7 @@ export type ItemData = {
   filteredBeforeCount: number;
   firstRequestIdAfterCurrentTime: string | null;
   requests: RequestSummary[];
-  seekToRequest: (row: RequestSummary) => void;
+  seekToRequest: (request: RequestSummary) => void;
   selectRequest: (row: RequestSummary | null) => void;
   selectedRequestId: string | null;
 };
@@ -116,8 +120,13 @@ function RequestRow({
     start: startTime,
     status,
     triggerPoint,
+    targetPoint,
     url,
   } = request;
+
+  if (targetPoint) {
+    console.log("targetPoint!!", targetPoint);
+  }
 
   let type = documentType || cause;
   if (type === "unknown") {
@@ -142,6 +151,8 @@ function RequestRow({
       statusCategory = "redirect";
     }
   }
+
+  const dispatch = useAppDispatch();
 
   const [, dismissJumpToNetworkRequestNag] = useNag(Nag.JUMP_TO_NETWORK_REQUEST);
 
@@ -254,7 +265,45 @@ function RequestRow({
           </div>
         )}
 
-        {triggerPoint && triggerPoint.time !== currentTime && (
+        {targetPoint && (
+          <div className={styles.ServerSeekButton}>
+            <button
+              className={styles.ServerSeekJumpButton}
+              data-test-name="Network-RequestRow-SeekButton"
+              onClick={() => seekToRequestWrapper(request)}
+              tabIndex={0}
+            >
+              <Icon className={styles.SeekButtonIcon} style={{ transform: 'rotate(180deg) scaleX(-1)' }} type={"arrow-nested"} />
+            </button>
+            <button
+              className={styles.ServerSeekJumpButton}
+              data-test-name="Network-RequestRow-SeekButton"
+              onClick={(e) => {
+                dispatch(
+                  seek({
+                    executionPoint: transformSupplementalId(
+                      targetPoint.point.point,
+                      targetPoint.supplementalIndex
+                    ),
+                    openSource: true,
+                    time: targetPoint.point.time,
+                  })
+                );
+                selectRequest(request);
+              }
+              }
+              tabIndex={0}
+              style={{
+                borderTopRightRadius: '0.5rem',
+                borderBottomRightRadius: '0.5rem'
+              }}
+            >
+              <Icon className={styles.SeekButtonIcon} style={{ transform: 'rotate(-90deg) scaleX(-1)' }} type={"arrow-nested"} />
+            </button>
+          </div>
+        )}
+
+        {!targetPoint && triggerPoint && triggerPoint.time !== currentTime && (
           <button
             className={styles.SeekButton}
             data-test-name="Network-RequestRow-SeekButton"
