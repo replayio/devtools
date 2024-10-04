@@ -90,7 +90,7 @@ function getReactInfo(domNodeId: ObjectId): Data {
             ) {
               const id = __RECORD_REPLAY_ARGUMENTS__.getPersistentId(debugOwner);
               if (id) {
-                const displayName = debugOwner.type.name ?? debugOwner.type.displayName ?? null;
+                const displayName = debugOwner.type.displayName ?? debugOwner.type.name ?? null;
 
                 return [id, displayName];
               }
