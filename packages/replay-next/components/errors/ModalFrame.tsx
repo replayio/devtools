@@ -15,7 +15,7 @@ export function ModalFrame({
 }: {
   children: ReactNode;
   dataTestId?: string;
-  onDismiss: () => void;
+  onDismiss?: () => void;
   showCloseButton?: boolean;
   title: ReactNode;
 }) {
