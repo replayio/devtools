@@ -1,14 +1,18 @@
 import { MutableRefObject, RefObject, useEffect } from "react";
 
+// TODO: this doesn't work correctly when multiple stacked modals are open
+// they are unaware of each other and the global listeners added by them compete between each other
+// in a way that the "outer" can perform its action and call `.preventDefault` - preventing the "inner" one from closing
+
 // Closes a modal dialog if the user clicks outside of it or types "Escape"
 export default function useModalDismissSignal(
   modalRef: MutableRefObject<HTMLDivElement> | RefObject<HTMLDivElement>,
-  dismissCallback: () => void,
+  dismissCallback: (() => void) | undefined,
   dismissOnClickOutside: boolean = true
 ) {
   useEffect(() => {
     const element = modalRef.current;
-    if (element === null) {
+    if (element === null || !dismissCallback) {
       return;
     }
 

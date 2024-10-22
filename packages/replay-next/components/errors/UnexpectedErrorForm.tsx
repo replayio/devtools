@@ -61,7 +61,6 @@ function UnexpectedErrorFormSuspends({ details, replayClient, title, unexpectedE
   return (
     <ModalFrame
       dataTestId="UnexpectedErrorDetails"
-      onDismiss={noop}
       showCloseButton={!!supportFormState}
       title={<span data-test-name="ErrorTitle">{title}</span>}
     >
@@ -109,5 +108,3 @@ function UnexpectedErrorFormSuspends({ details, replayClient, title, unexpectedE
     </ModalFrame>
   );
 }
-
-function noop() {}
