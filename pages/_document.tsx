@@ -31,7 +31,7 @@ const csp = (props: any) => {
       // localhost:8000 for prod to support the ?dispatch parameter when running
       // the local backend
       "http://localhost:* http://*.replay.local ws://*.replay.local ws://localhost:*"
-    }`,
+    } https://swapi.dev`,
     `frame-src replay: https://js.stripe.com https://hooks.stripe.com https://${authHost} https://www.loom.com/`,
     // Required by some of our external services
     `script-src 'self' 'unsafe-eval' https://cdn.lr-ingest.io https://cdn.lr-in.com https://js.stripe.com ${hash}`,

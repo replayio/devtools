@@ -38,7 +38,7 @@ function Routing({ Component, pageProps, accessToken }: AppProps & { accessToken
   useEffect(() => {
     // @ts-ignore
     async function fetchAndLog(url: string): any {
-      const response = await fetch('https://swapi.dev/api/people');
+      const response = await fetch(url);
       const json = await response.json();
       console.log(json);
       return json;
