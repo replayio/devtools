@@ -36,7 +36,22 @@ function Routing({ Component, pageProps, accessToken }: AppProps & { accessToken
   const { getFeatureFlag } = useLaunchDarkly();
 
   useEffect(() => {
-    bootstrapApp(accessToken).then(setStore);
+    // @ts-ignore
+    async function fetchAndLog(url: string): any {
+      const response = await fetch('https://swapi.dev/api/people');
+      const json = await response.json();
+      console.log(json);
+      return json;
+    }
+    bootstrapApp(accessToken)
+      .then(async store => {
+        try {
+          const response = await fetchAndLog('https://swapi.dev/api/people');
+          await fetchAndLog(response.next)
+        } catch {}
+        return store;
+      })
+      .then(setStore);
   }, [accessToken]);
 
   if (!store) {
