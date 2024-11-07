@@ -43,15 +43,18 @@ function Routing({ Component, pageProps, accessToken }: AppProps & { accessToken
       console.log(json);
       return json;
     }
-    bootstrapApp(accessToken)
-      .then(async store => {
-        try {
-          const response = await fetchAndLog('https://swapi.dev/api/people');
-          await fetchAndLog(response.next)
-        } catch {}
-        return store;
-      })
-      .then(store => setStore(store));
+    async function init() {
+      const store = await bootstrapApp(accessToken)
+
+      try {
+        const response = await fetchAndLog('https://swapi.dev/api/people');
+        await fetchAndLog(response.next)
+      } catch {}
+
+      setStore(store)
+    }
+
+    init()
   }, [accessToken]);
 
   if (!store) {
