@@ -51,7 +51,7 @@ function Routing({ Component, pageProps, accessToken }: AppProps & { accessToken
         } catch {}
         return store;
       })
-      .then(setStore);
+      .then(store => setStore(store));
   }, [accessToken]);
 
   if (!store) {
