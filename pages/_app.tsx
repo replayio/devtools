@@ -27,6 +27,23 @@ import "../src/global-css";
 import "../src/test-prep";
 import "../src/base.css";
 
+if (typeof window !== "undefined") {
+  // @ts-expect-error
+  Promise.prototype.finally = function (callback) {
+    debugger;
+    this.then(
+      result => {
+        callback && callback();
+        return result;
+      },
+      result => {
+        callback && callback();
+        throw result;
+      }
+    );
+  };
+}
+
 interface AuthProps {
   apiKey?: string;
 }
