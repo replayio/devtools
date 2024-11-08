@@ -27,6 +27,21 @@ import "../src/global-css";
 import "../src/test-prep";
 import "../src/base.css";
 
+if (typeof window !== "undefined") {
+  Promise.prototype.finally = function (callback) {
+    return this.then(
+      result => {
+        callback && callback();
+        return result;
+      },
+      result => {
+        callback && callback();
+        throw result;
+      }
+    );
+  };
+}
+
 interface AuthProps {
   apiKey?: string;
 }
@@ -36,7 +51,25 @@ function Routing({ Component, pageProps, accessToken }: AppProps & { accessToken
   const { getFeatureFlag } = useLaunchDarkly();
 
   useEffect(() => {
-    bootstrapApp(accessToken).then(setStore);
+    // @ts-ignore
+    async function fetchAndLog(url: string): any {
+      const response = await fetch(url);
+      const json = await response.json();
+      console.log(json);
+      return json;
+    }
+    async function init() {
+      const store = await bootstrapApp(accessToken)
+
+      try {
+        const response = await fetchAndLog('https://swapi.dev/api/people');
+        await fetchAndLog(response.next)
+      } catch {}
+
+      setStore(store)
+    }
+
+    init()
   }, [accessToken]);
 
   if (!store) {
