@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import * as Sentry from "@sentry/browser";
 import Document, { Head, Html, Main, NextScript } from "next/document";
+import Script from "next/script";
 import React from "react";
 
 import { setErrorHandler } from "protocol/utils";
@@ -64,6 +65,25 @@ export default class MyDocument extends Document {
           <meta httpEquiv="Content-Security-Policy" content={csp(this.props)} />
           <link rel="stylesheet" href="/recording/fonts/inter/inter.css" />
           <link rel="stylesheet" href="/recording/fonts/material_icons/material_icons.css" />
+          <Script
+            dangerouslySetInnerHTML={{
+              __html: `(${function () {
+                // @ts-expect-error
+                Promise.prototype.finally = function (callback) {
+                  this.then(
+                    result => {
+                      callback && callback();
+                      return result;
+                    },
+                    result => {
+                      callback && callback();
+                      throw result;
+                    }
+                  );
+                };
+              }.toString()})()`,
+            }}
+          ></Script>
         </Head>
         <body>
           <Main />
