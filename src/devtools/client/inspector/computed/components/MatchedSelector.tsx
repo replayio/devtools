@@ -31,6 +31,7 @@ export default function MatchedSelector(props: MatchedSelectorProps) {
             colorSwatchClassName="computed-colorswatch"
             fontFamilySpanClassName="computed-font-family"
             values={selector.parsedValue}
+            important={selector.important}
           />
         </div>
       </span>
