@@ -11,7 +11,7 @@ interface DeclarationValueProps {
   colorSwatchClassName: string;
   fontFamilySpanClassName: string;
   values: (string | Record<string, string>)[];
-  important: boolean;
+  important?: boolean;
 }
 
 class DeclarationValue extends React.PureComponent<DeclarationValueProps> {
