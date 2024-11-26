@@ -87,7 +87,7 @@ export default function SecondaryPanes() {
           onToggle={() => setReactDependencyGraphVisible(!reactDependencyGraphVisible)}
         >
           <DependencyGraph
-            mode={DependencyGraphMode.ReactParentRenders}
+            mode={DependencyGraphMode.ReactOwnerRenders}
             point={timeStampedPoint?.point}
           />
         </AccordionPane>

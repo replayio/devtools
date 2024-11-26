@@ -201,7 +201,7 @@ export const reactComponentStackCache: Cache<
     const reactDependencies = await depGraphCache.readAsync(
       replayClient,
       point.point,
-      DependencyGraphMode.ReactParentRenders
+      DependencyGraphMode.ReactOwnerRenders
     );
 
     if (!originalDependencies || !reactDependencies) {

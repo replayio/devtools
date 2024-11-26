@@ -293,9 +293,9 @@ export type DependencyChainStep = DependencyChainStepInfo & {
 };
 
 export enum DependencyGraphMode {
-  // Renders of a fiber depend on the last time the parent of that fiber was
+  // Renders of a fiber depend on the last time the owner of that fiber was
   // rendered, instead of whatever triggered the fiber's render.
-  ReactParentRenders = "ReactParentRenders",
+  ReactOwnerRenders = "ReactOwnerRenders",
 }
 
 export interface ReplayClientInterface {
