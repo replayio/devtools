@@ -30,6 +30,8 @@ jobs:
         run: yarn install
         env:
           YARN_CHECKSUM_BEHAVIOR: "update"
+      - name: Install Replay Chromium
+        run: npx replayio@latest install
       - name: Run performance analysis
         run: yarn run perf-analysis
         env:
