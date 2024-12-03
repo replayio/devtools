@@ -32,10 +32,18 @@ jobs:
           YARN_CHECKSUM_BEHAVIOR: "update"
       - name: Install Replay Chromium
         run: npx replayio@latest install
+      - name: Wait for Vercel preview deployment to be ready
+        uses: patrickedqvist/wait-for-vercel-preview@v1.3.1
+        if: github.event_name == 'pull_request'
+        id: wait-for-vercel-preview
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          max_timeout: 240
       - name: Run performance analysis
         run: yarn run perf-analysis
         env:
           REPLAY_API_KEY: ${{ secrets.PERFORMANCE_ANALYSIS_REPLAY_API_KEY }}
+          DEVTOOLS_URL: ${{ steps.wait-for-vercel-preview.outputs.url }}
           GITHUB_REPOSITORY: ${{ env.GITHUB_REPOSITORY }}
           GITHUB_REF_NAME: ${{ env.GITHUB_REF_NAME }}
           GITHUB_PR: ${{ github.event.pull_request && github.event.pull_request.number }}
