@@ -1,0 +1,13 @@
+{
+    "name": "@devtools-repo/playwright-recorder",
+    "private": true,
+    "version": "0.0.0",
+    "main": "./dist/index.js",
+    "dependencies": {
+        "@playwright/test": "^1.37.0",
+        "@replayio/replay": "^0.22.4",
+        "axios": "^0.21.1",
+        "chalk": "^4",
+        "strip-ansi": "^6.0.0"
+    }
+}

@@ -1,14 +1,14 @@
 {
   "compilerOptions": {
+    "composite": true,
     "strict": true,
-    "target": "es2018",
+    "target": "ES2022",
+    "lib": ["es2023"],
     "moduleResolution": "Node",
     "downlevelIteration": true,
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "types": ["cypress", "node"],
-    "paths": {
-      "@devtools-repo/playwright-recorder": ["../playwright-recorder/src/index.ts"],
-    }
+    "rootDir": "./src",
+    "outDir": "./dist",
   }
 }

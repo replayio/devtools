@@ -20,11 +20,13 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@devtools-repo/playwright-recorder": "*",
     "@playwright/test": "^1.37.0",
     "@replayio/playwright": "3.0.0-alpha.14",
+    "axios": "^0.21.1",
     "cli-spinners": "^2.7.0",
     "cypress": "^12.5.1",
-    "ts-node": "^10.7.0",
+    "ts-node": "^10.9.2",
     "ws": "^7.4.6",
     "yargs": "^17.6.0"
   },

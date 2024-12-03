@@ -53,6 +53,7 @@
       ],
       "replay-next": ["packages/replay-next/*"],
       "@recordreplay/accordion": ["packages/accordion/index.tsx"],
+      "@devtools-repo/playwright-recorder": ["packages/playwright-recorder/src/index.ts"],
       "components": ["packages/design/index.ts"],
       "components/*": ["packages/design/*"],
       "icons": ["packages/icons/index.tsx"],

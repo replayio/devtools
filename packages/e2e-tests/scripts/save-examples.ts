@@ -6,24 +6,26 @@
 
 import { existsSync, writeFileSync } from "fs";
 import assert from "node:assert/strict";
-import { join } from "path";
+import path from "path";
 import type { Page, expect as expectFunction } from "@playwright/test";
-import { removeRecording, uploadRecording } from "@replayio/replay";
-import axios from "axios";
 import chalk from "chalk";
 import difference from "lodash/difference";
 import { v4 as uuidv4 } from "uuid";
 import yargs from "yargs";
 
-import { SetRecordingIsPrivateVariables } from "../../shared/graphql/generated/SetRecordingIsPrivate";
-import { UpdateRecordingTitleVariables } from "../../shared/graphql/generated/UpdateRecordingTitle";
 import config from "../config";
 import examplesJson from "../examples.json";
 import { TestRecordingIntersectionValue } from "../helpers";
 import { getStats } from "./get-stats";
 import { loadRecording } from "./loadRecording";
 import { recordNodeExample } from "./record-node";
-import { recordPlaywright, uploadLastRecording } from "./record-playwright";
+
+import {
+  saveRecording,
+  recordPlaywright,
+  findLastRecordingId,
+  removeRecording,
+} from "@devtools-repo/playwright-recorder";
 
 type Target = "all" | "browser" | "node";
 
@@ -71,55 +73,15 @@ type TestExampleFile = {
   runtime: "chromium" | "node";
   playwrightScript?: PlaywrightScript;
 };
-const examplesJsonPath = join(__dirname, "..", "examples.json");
+const examplesJsonPath = path.join(__dirname, "..", "examples.json");
 
-let mutableExamplesJSON = { ...examplesJson };
+let mutableExamplesJSON: Record<string, { recording: string; buildId: string }> = {
+  ...examplesJson,
+};
 
-const exampleToNewRecordingId: { [example: string]: string } = {};
+const exampleToNewRecordingId: Record<string, string> = {};
 
-async function saveRecording(
-  example: string,
-  apiKey: string,
-  recordingId: string,
-  skipUpload?: boolean
-) {
-  console.log(
-    `Saving ${chalk.grey.bold(example)} with recording id ${chalk.yellow.bold(recordingId)}`
-  );
-
-  if (!skipUpload) {
-    await uploadRecording(recordingId, {
-      apiKey,
-      server: config.backendUrl,
-      strict: true,
-    });
-  }
-
-  const response = await axios({
-    url: config.graphqlUrl,
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-    },
-    data: {
-      query: `
-          query GetRecordingBuildId($recordingId: UUID!) {
-            recording(uuid: $recordingId) {
-              buildId
-            }
-          }
-        `,
-      variables: {
-        recordingId,
-      },
-    },
-  });
-
-  const buildId = response.data.data.recording.buildId;
-
-  await makeReplayPublic(apiKey, recordingId);
-  await updateRecordingTitle(apiKey, recordingId, `E2E Example: ${example}`);
-
+function updateExamplesJSONFile(example: string, recordingId: string, buildId: string) {
   mutableExamplesJSON = {
     ...mutableExamplesJSON,
     [example]: {
@@ -132,6 +94,28 @@ async function saveRecording(
   writeFileSync(examplesJsonPath, JSON.stringify(mutableExamplesJSON, null, 2));
 }
 
+// When running the Replay backend tests, we run against a selfcontained backend and we don't
+// want to force it to run Recording.processRecording on every test fixture because it would be
+// really slow and not do anything useful. By hardcoding this metadata, we can convince the Replay
+// upload library that since this was a "passed" result, it does not need to process the recording.
+const fakeTestPassedRecordingMetadata = {
+  test: {
+    file: "fake.html",
+    path: ["fake.html"],
+    result: "passed",
+    runner: {
+      name: "fake",
+      version: "",
+    },
+    run: {
+      id: "00000000-0000-4000-8000-000000000000",
+      title: "fake",
+    },
+    title: "",
+    version: 1,
+  },
+};
+
 interface TestRunCallbackArgs {
   example: TestExampleFile;
   examplePath: string;
@@ -143,7 +127,8 @@ async function saveExamples(
 ) {
   let examplesToRun: TestExampleFile[] = [];
 
-  for (const key in examplesJson) {
+  let key: keyof typeof examplesJson;
+  for (key in examplesJson) {
     const {
       buildId,
       playwrightScript,
@@ -158,8 +143,8 @@ async function saveExamples(
 
     const [_, runtime] = buildId.split("-");
 
-    let category: TestExampleFile["category"];
-    let folder: TestExampleFile["folder"];
+    let category: TestExampleFile["category"] | undefined;
+    let folder: TestExampleFile["folder"] | undefined;
 
     switch (runtime) {
       case "chromium":
@@ -175,10 +160,13 @@ async function saveExamples(
       }
     }
 
+    assert(category, "Unknown category for runtime: " + runtime);
+    assert(folder, "Unknown folder for runtime: " + runtime);
+
     if (category === examplesTarget) {
       let resolvedPlaywrightScript: PlaywrightScript | undefined;
       if (playwrightScript) {
-        const playwrightScriptModule = require(join("..", playwrightScript));
+        const playwrightScriptModule = require(path.join("..", playwrightScript));
         assert(
           typeof playwrightScriptModule.default === "function",
           `Expected default export to be a function in ${playwrightScript}`
@@ -218,7 +206,7 @@ async function saveExamples(
   }
 
   for (const example of examplesToRun) {
-    const examplePath = join(example.folder, example.filename);
+    const examplePath = path.join(example.folder, example.filename);
     if (existsSync(examplePath)) {
       await callback({ example, examplePath });
     } else {
@@ -252,19 +240,23 @@ async function saveBrowserExample({ example }: TestRunCallbackArgs) {
     })
   );
 
-  const recordingId = await raceForTime(CONFIG.uploadTimeout, uploadLastRecording(exampleUrl));
-  if (recordingId == null) {
-    throw new Error(`Recording "${example.filename}" not uploaded`);
-  }
+  const recordingId = findLastRecordingId(exampleUrl);
   exampleToNewRecordingId[example.filename] = recordingId;
 
-  if (config.useExampleFile && recordingId) {
-    await saveRecording(example.filename, config.replayApiKey, recordingId, true);
+  const { buildId } = await saveRecording(
+    {
+      recordingId,
+      title: `E2E Example: ${example.filename}`,
+      metadata: fakeTestPassedRecordingMetadata,
+    },
+    config.replayApiKey
+  );
+
+  if (config.useExampleFile) {
+    updateExamplesJSONFile(example.filename, recordingId, buildId);
   }
 
-  if (recordingId) {
-    removeRecording(recordingId);
-  }
+  removeRecording(recordingId);
 }
 
 async function saveNodeExamples() {
@@ -275,7 +267,14 @@ async function saveNodeExamples() {
 
     const recordingId = await recordNodeExample(examplePath);
     if (recordingId) {
-      await saveRecording(example.filename, config.replayApiKey, recordingId);
+      const { buildId } = await saveRecording(
+        {
+          recordingId,
+          title: `E2E Example: ${example.filename}`,
+        },
+        config.replayApiKey
+      );
+      updateExamplesJSONFile(example.filename, recordingId, buildId);
       removeRecording(recordingId);
 
       exampleToNewRecordingId[example.filename] = recordingId;
@@ -284,75 +283,6 @@ async function saveNodeExamples() {
 
       throw `Unable to save recording for ${chalk.bold(example.filename)}`;
     }
-  });
-}
-
-function logError(e: any, variables: any) {
-  if (e.response) {
-    console.log("Parameters");
-    console.log(JSON.stringify(variables, undefined, 2));
-    console.log("Response");
-    console.log(JSON.stringify(e.response.data, undefined, 2));
-  }
-
-  throw e.message;
-}
-
-async function makeReplayPublic(apiKey: string, recordingId: string) {
-  const variables: SetRecordingIsPrivateVariables = {
-    recordingId: recordingId,
-    isPrivate: false,
-  };
-
-  return axios({
-    url: config.graphqlUrl,
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-    },
-    data: {
-      query: `
-        mutation MakeReplayPublic($recordingId: ID!, $isPrivate: Boolean!) {
-          updateRecordingPrivacy(input: { id: $recordingId, private: $isPrivate }) {
-            success
-          }
-        }
-      `,
-      variables,
-    },
-  }).catch(e => {
-    logError(e, variables);
-  });
-}
-
-async function updateRecordingTitle(apiKey: string, recordingId: string, title: string) {
-  const variables: UpdateRecordingTitleVariables = {
-    recordingId: recordingId,
-    title,
-  };
-
-  return axios({
-    url: config.graphqlUrl,
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-    },
-    data: {
-      query: `
-        mutation UpdateRecordingTitle($recordingId: ID!, $title: String!) {
-          updateRecordingTitle(input: { id: $recordingId, title: $title }) {
-            success
-            recording {
-              uuid
-              title
-            }
-          }
-        }
-      `,
-      variables,
-    },
-  }).catch(e => {
-    logError(e, variables);
   });
 }
 
@@ -427,7 +357,7 @@ async function waitUntilMessage(
     for (const recordingId of newRecordingIds) {
       try {
         await loadRecording(recordingId);
-      } catch (e) {
+      } catch (e: any) {
         console.error(`Ignored error during processing: ${e?.stack || e}`);
       }
     }
