@@ -93,7 +93,7 @@ async function main() {
               testTitle: test.title,
               repo: process.env.GITHUB_REPOSITORY,
               branch: process.env.GITHUB_REF_NAME,
-              pullRequest: process.env.GITHUB_PR,
+              pullRequest: process.env.GITHUB_PR ? parseInt(process.env.GITHUB_PR, 0) : undefined,
               commit: process.env.GITHUB_SHA,
             },
           },
