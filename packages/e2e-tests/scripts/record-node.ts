@@ -15,13 +15,13 @@ function getRecordingId(file: string) {
       }
       return contents;
     }
-    return null;
+    return;
   } catch (e) {
-    return null;
+    return;
   }
 }
 
-export async function recordNodeExample(scriptPath: string): Promise<string> {
+export async function recordNodeExample(scriptPath: string): Promise<string | undefined> {
   const nodePath = config.nodePath || execSync("which replay-node").toString().trim();
   if (!nodePath) {
     console.warn("\x1b[1m\x1b[31m" + "Node e2e tests require @replayio/node" + "\x1b[0m");
