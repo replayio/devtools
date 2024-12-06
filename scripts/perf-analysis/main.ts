@@ -14,12 +14,12 @@ import {
 
 const PLAYWRIGHT_TIMEOUT = 60_000;
 const DISPATCH_URL = process.env.DISPATCH_ADDRESS ?? "wss://dispatch.replay.io";
-const DEVTOOL_URL = process.env.DEVTOOLS_URL ?? "https://app.replay.io";
+const DEVTOOLS_URL = process.env.DEVTOOLS_URL || "https://app.replay.io";
 
 const tests = [
   {
     title: "devtools-object-preview",
-    url: `${DEVTOOL_URL}/recording/appreplayio--87db126a-82cf-4477-b244-b57a118d0b1b`,
+    url: `${DEVTOOLS_URL}/recording/appreplayio--87db126a-82cf-4477-b244-b57a118d0b1b`,
     script: devtoolsObjectPreview,
   },
 ];
