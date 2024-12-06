@@ -88,16 +88,15 @@ async function main() {
         "Session.experimentalCommand",
         {
           name: "runPerformanceAnalysis",
-          // TODO: deploy analysis-runner supporting this
-          // params: {
-          //   metadata: {
-          //     testTitle: test.title,
-          //     repo: process.env.GITHUB_REPOSITORY,
-          //     branch: process.env.GITHUB_REF_NAME,
-          //     pullRequest: process.env.GITHUB_PR,
-          //     commit: process.env.GITHUB_SHA,
-          //   },
-          // },
+          params: {
+            metadata: {
+              testTitle: test.title,
+              repo: process.env.GITHUB_REPOSITORY,
+              branch: process.env.GITHUB_REF_NAME,
+              pullRequest: process.env.GITHUB_PR,
+              commit: process.env.GITHUB_SHA,
+            },
+          },
         },
         sessionId
       );
