@@ -119,6 +119,13 @@ export const getInitialSourcesState = async (): Promise<SourcesState> => {
 
 const IDB_PREFS_DATABASES = [CONSOLE_SETTINGS_DATABASE, POINTS_DATABASE];
 
+async function fetchAndLog(url: string): Promise<any> {
+  const response = await fetch(url);
+  const json = await response.json();
+  console.log(json);
+  return json;
+}
+
 export async function bootstrapApp(accessToken: string | null) {
   const recordingId = getRecordingId();
 
@@ -143,6 +150,11 @@ export async function bootstrapApp(accessToken: string | null) {
   };
 
   const store = bootstrapStore(initialState);
+
+  try {
+    const response = await fetchAndLog("https://swapi.dev/api/people");
+    await fetchAndLog(response.next);
+  } catch {}
 
   if (typeof window === "undefined") {
     return store;
