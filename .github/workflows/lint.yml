@@ -32,4 +32,4 @@ jobs:
         env:
           YARN_CHECKSUM_BEHAVIOR: "update"
       - name: Trunk Check
-        uses: trunk-io/trunk-action@v1.0.1
+        uses: trunk-io/trunk-action@v1.1.19
