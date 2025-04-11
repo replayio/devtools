@@ -18,7 +18,7 @@
     "idb": "^7.1.1",
     "jest-mock-extended": "^3.0.4",
     "lodash": "^4.17.21",
-    "next": "^13.2",
+    "next": "^13.5",
     "pretty-ms": "^7.0.1",
     "protocol": "workspace:*",
     "react": "0.0.0-experimental-03d6f7cf0-20240209",
