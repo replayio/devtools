@@ -113,6 +113,9 @@ export async function detectAndRecordBuildReason() {
   if (BUILDKITE_TRIGGERED_FROM_BUILD_ID) {
     // if we're running due to a triggered build, record that info in an artifact.
     // we assume if BUILDKITE_TRIGGERED_FROM_BUILD_ID is set, then the other two are also set.
+    if (!BUILDKITE_TRIGGERED_FROM_BUILD_PIPELINE_SLUG || !BUILDKITE_TRIGGERED_FROM_BUILD_NUMBER) {
+      throw new Error("Missing required environment variables for triggered build");
+    }
     return await storeTriggeredBuildReason(
       BUILDKITE_TRIGGERED_FROM_BUILD_PIPELINE_SLUG,
       parseInt(BUILDKITE_TRIGGERED_FROM_BUILD_NUMBER),
@@ -191,7 +194,7 @@ async function graphql<ResultT, VariablesT = Record<string, unknown>>(
 
 // apparently we wouldn't need this function (and could use the buildkite-agent cli directly) if
 // we upgraded (there's `buildkite-agent build ...`?)
-export async function fetchLatestChromiumBuildOnBranch(token, branch) {
+export async function fetchLatestChromiumBuildOnBranch(token: string, branch: string) {
   type VariablesType = {
     branch: string;
   };
@@ -233,11 +236,11 @@ export async function fetchLatestChromiumBuildOnBranch(token, branch) {
   };
 }
 
-export async function fetchRuntimeBuildIdFromChromiumBuildId(os, arch, buildId) {
+export async function fetchRuntimeBuildIdFromChromiumBuildId(os: string, arch: string, buildId: string) {
   return fetchArtifactContents(buildId, path.join("build_id", os, arch, "build_id"));
 }
 
-export async function fetchRuntimeBuildIdFromChromiumBuildNumber(os, arch, buildNumber) {
+export async function fetchRuntimeBuildIdFromChromiumBuildNumber(os: string, arch: string, buildNumber: number) {
   const pageSize = 25;
 
   // fetch the first page of builds
@@ -324,13 +327,13 @@ export async function fetchRuntimeBuildIdFromChromiumBuildNumber(os, arch, build
   throw new Error("did not find build number");
 }
 
-async function fetchArtifactContents(buildId, artifactPath) {
+async function fetchArtifactContents(buildId: string, artifactPath: string) {
   execSync(`buildkite-agent artifact download ${artifactPath} . --build ` + buildId);
 
   return fs.readFileSync(artifactPath, "utf8").trim();
 }
 
-async function uploadArtifactContents(artifactPath, contents, contentType) {
+async function uploadArtifactContents(artifactPath: string, contents: string, contentType: string) {
   fs.writeFileSync(artifactPath, contents);
   execSync(`buildkite-agent artifact upload --content-type ${contentType} ${artifactPath}`);
 }

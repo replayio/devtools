@@ -24,18 +24,18 @@ function run_fe_tests_from_build_id(os: string, arch: string, runtimeBuildId: st
   run_fe_tests(CHROME_BINARY_PATH);
 }
 
-function buildUrl(pipelineSlug, buildNumber) {
+function buildUrl(pipelineSlug: string, buildNumber: string | number) {
   return `https://buildkite.com/replay/${pipelineSlug}/builds/${buildNumber}`;
 }
 
-function describeReason(markdownMessage, rebuild) {
+function describeReason(markdownMessage: string, rebuild?: boolean) {
   // do something with `rebuild` here...
   execSync(`buildkite-agent annotate --style info "${markdownMessage}"`, {
     stdio: "inherit",
   });
 }
 
-export async function build_from_reason(os, arch) {
+export async function build_from_reason(os: string, arch: string) {
   const buildReason = await detectAndRecordBuildReason();
 
   if (!process.env.BUILDKITE_TOKEN) {
@@ -46,7 +46,7 @@ export async function build_from_reason(os, arch) {
     case "runtime-chromium-build-id": {
       describeReason(
         `Testing against chromium buildid ${buildReason.chromiumBuildId}`,
-        buildReason.rebuild
+        buildReason.rebuild ?? false
       );
       run_fe_tests_from_build_id(os, arch, buildReason.chromiumBuildId);
       break;
@@ -57,7 +57,7 @@ export async function build_from_reason(os, arch) {
           "chromium-build",
           buildReason.buildNumber
         )})`,
-        buildReason.rebuild
+        buildReason.rebuild ?? false
       );
       const runtimeBuildId = await fetchRuntimeBuildIdFromChromiumBuildNumber(
         os,
@@ -81,7 +81,7 @@ export async function build_from_reason(os, arch) {
         `Testing against latest chromium build on branch \\\`${
           buildReason.branch
         }\\\`: [#${buildNumber}](${buildUrl("chromium-build", buildNumber)})`,
-        buildReason.rebuild
+        buildReason.rebuild ?? false
       );
       const runtimeBuildId = await fetchRuntimeBuildIdFromChromiumBuildId(os, arch, buildId);
       run_fe_tests_from_build_id(os, arch, runtimeBuildId);
@@ -93,7 +93,7 @@ export async function build_from_reason(os, arch) {
           buildReason.pipelineSlug,
           buildReason.buildNumber
         )})`,
-        buildReason.rebuild
+        buildReason.rebuild ?? false
       );
       const runtimeBuildId = await fetchRuntimeBuildIdFromChromiumBuildId(
         os,
