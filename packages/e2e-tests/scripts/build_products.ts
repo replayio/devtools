@@ -5,7 +5,7 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 
-export function install_build_products(RUNTIME_BUILD_ID, PLATFORM, ARCHITECTURE) {
+export function install_build_products(RUNTIME_BUILD_ID: string, PLATFORM: string, ARCHITECTURE: string) {
   // Set BUILD_FILE based on ARCHITECTURE and PLATFORM
   let BUILD_FILE;
   let ARCH_SUFFIX = "";

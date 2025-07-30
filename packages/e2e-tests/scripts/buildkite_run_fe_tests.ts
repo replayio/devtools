@@ -17,10 +17,10 @@ const CONFIG = {
 };
 
 // We use this for debugging purposes only.
-let TestFileOverrideList = [];
+let TestFileOverrideList: string[] = [];
 
 // Disable some tests that we know to be problematic.
-const TestFileBlockLists = {
+const TestFileBlockLists: Record<string, string[]> = {
   linux: [],
   darwin: [
     // This test has been failing for a long, long time.  disable it for now so
@@ -40,11 +40,11 @@ const TestFileBlockLists = {
 
 const TestFileBlockList = new Set([
   ...TestFileBlockLists["ALL"],
-  ...TestFileBlockLists[os.platform()],
+  ...(TestFileBlockLists[os.platform()] || []),
 ]);
 
 // Force some tests to run that we have recently fixed but not yet enabled everywhere.
-const TestFileForceLists = {
+const TestFileForceLists: Record<string, string[]> = {
   linux: [],
   darwin: [],
   ALL: [],
@@ -52,14 +52,14 @@ const TestFileForceLists = {
 
 const TestFileForceList = new Set([
   ...TestFileForceLists["ALL"],
-  ...TestFileForceLists[os.platform()],
+  ...(TestFileForceLists[os.platform()] || []),
 ]);
 
 /**
  * Re-record all examples that have previously been recorded with
  * "recent Chromium".
  */
-function checkReRecord(testFile, exampleFileInfo: ExampleInfo) {
+function checkReRecord(testFile: string, exampleFileInfo: ExampleInfo) {
   const wouldNormallyTest =
     exampleFileInfo.runtime === "chromium" &&
     exampleFileInfo.runtimeReleaseDate.getUTCFullYear() === 2024 &&
@@ -173,7 +173,7 @@ function gatherChromiumExamplesAndTests() {
 
 // transforms https://github.com/replayio/chromium.git or
 // git@github.com:replayio/chromium to replayio/chromium
-function githubUrlToRepository(url) {
+function githubUrlToRepository(url: string | undefined) {
   return url?.replace(/.*github.com[:\/](.*)\.git/, "$1");
 }
 
@@ -184,8 +184,8 @@ function testHttpConnection(
   const startTime = Date.now();
   return new Promise((resolve, reject) => {
     function attemptConnection() {
-      const request = http.get(url, async res => {
-        if (res.statusCode < 500) {
+      const request = http.get(url, async (res: http.IncomingMessage) => {
+        if (res.statusCode && res.statusCode < 500) {
           // As long as we can connect at all, we should be fine.
           resolve();
           return;
@@ -203,8 +203,8 @@ function testHttpConnection(
         setTimeout(attemptConnection, 1000); // Retry after 1 second
       });
 
-      request.on("error", (err: Error) => {
-        if (err["code"] === "ECONNREFUSED") {
+      request.on("error", (err: Error & { code?: string }) => {
+        if (err.code === "ECONNREFUSED") {
           if (Date.now() - startTime >= timeoutMs) {
             reject(new Error(`Failed to connect to the server within ${timeoutMs / 1000} seconds`));
             return;
@@ -225,7 +225,7 @@ function testHttpConnection(
 }
 
 export default async function run_fe_tests(
-  CHROME_BINARY_PATH,
+  CHROME_BINARY_PATH: string | undefined,
   runInCI = true,
   nWorkers = 4,
   testOverrides?: string[]
