@@ -23,9 +23,17 @@ import { listenForAccessToken } from "ui/utils/browser";
 import { useLaunchDarkly } from "ui/utils/launchdarkly";
 import { InstallRouteListener } from "ui/utils/routeListener";
 
+import * as sys from "@mui/system";
+import * as m from "@mui/material";
+import * as i from "@mui/icons-material";
+import * as s from "@emotion/styled";
+import * as r from "@emotion/react";
+
 import "../src/global-css";
 import "../src/test-prep";
 import "../src/base.css";
+
+console.log(sys, m, i, s, r);
 
 interface AuthProps {
   apiKey?: string;
