@@ -921,7 +921,7 @@ export async function processPlaywrightTestRecording(
       id,
       result,
       source,
-      timeStampedPointRange: getPlaywrightTestTimeStampedPointRange(events),
+      timeStampedPointRange: null
     };
   } else if (isTestRecordingV3(testRecording)) {
     return testRecording;
