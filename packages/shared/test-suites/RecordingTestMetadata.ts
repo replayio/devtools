@@ -924,11 +924,6 @@ export async function processPlaywrightTestRecording(
       timeStampedPointRange: getPlaywrightTestTimeStampedPointRange(events),
     };
   } else if (isTestRecordingV3(testRecording)) {
-    if (!testRecording.timeStampedPointRange) {
-      testRecording.timeStampedPointRange = getPlaywrightTestTimeStampedPointRange(
-        testRecording.events
-      );
-    }
     return testRecording;
   } else {
     // This function does not support the legacy TestItem format
