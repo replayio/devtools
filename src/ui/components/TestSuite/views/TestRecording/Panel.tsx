@@ -54,6 +54,7 @@ export default function Panel() {
   const enableCache =
     testRecording.testRunnerName === "playwright" ||
     (focusWindow &&
+      testRecording.timeStampedPointRange &&
       isExecutionPointsWithinRange(
         focusWindow.begin.point,
         testRecording.timeStampedPointRange.begin.point,
