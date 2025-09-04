@@ -52,18 +52,18 @@ export default function Panel() {
   // to match the range of the test recording.  Experimentation shows there can be some renders
   // where the focus range and test range are mismatched, so try to avoid caching in those cases.
   const enableCache =
-    focusWindow &&
-    testRecording.timeStampedPointRange?.begin &&
-    isExecutionPointsWithinRange(
-      focusWindow.begin.point,
-      testRecording.timeStampedPointRange.begin.point,
-      testRecording.timeStampedPointRange.end.point
-    ) &&
-    isExecutionPointsWithinRange(
-      focusWindow.end.point,
-      testRecording.timeStampedPointRange.begin.point,
-      testRecording.timeStampedPointRange.end.point
-    );
+    testRecording.testRunnerName === "playwright" ||
+    (focusWindow &&
+      isExecutionPointsWithinRange(
+        focusWindow.begin.point,
+        testRecording.timeStampedPointRange.begin.point,
+        testRecording.timeStampedPointRange.end.point
+      ) &&
+      isExecutionPointsWithinRange(
+        focusWindow.end.point,
+        testRecording.timeStampedPointRange.begin.point,
+        testRecording.timeStampedPointRange.end.point
+      ));
 
   useImperativeIntervalCacheValues(
     testEventDetailsIntervalCache,
