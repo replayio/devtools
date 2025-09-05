@@ -931,7 +931,7 @@ export async function processPlaywrightTestRecording(
   }
 }
 
-function getPlaywrightTestTimeStampedPointRange(
+export function getPlaywrightTestTimeStampedPointRange(
   events: RecordingTestMetadataV3.TestRecording["events"]
 ) {
   const allEventsSections = Object.values(events);
