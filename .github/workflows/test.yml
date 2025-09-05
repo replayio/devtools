@@ -26,7 +26,7 @@ concurrency:
 jobs:
   download-browser:
     name: Download Replay browser
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     timeout-minutes: 2
     steps:
       - name: Download
@@ -38,7 +38,7 @@ jobs:
           path: macOS-replay-playwright.tar.xz
   preview-branch:
     name: Wait for Vercel Preview Branch
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Waiting for 200 from the Vercel Preview
         uses: patrickedqvist/wait-for-vercel-preview@v1.3.1
@@ -52,7 +52,7 @@ jobs:
       url: ${{ steps.waitFor200.outputs.url }}
   generate-test-run-id:
     name: Generate Test Run ID
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - run: yarn add uuid
         shell: sh
@@ -65,7 +65,7 @@ jobs:
       testRunId: ${{ steps.uuid.outputs.result }}
   e2etest:
     name: End-to-end tests (${{ matrix.shard }})
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: [preview-branch, generate-test-run-id]
     strategy:
       # GH cancels other matrixed jobs by default if one fails. We want all E2E jobs to complete.
@@ -129,7 +129,7 @@ jobs:
           public: true
   authenticated-e2etest:
     name: Authenticated end-to-end tests (${{ matrix.shard }})
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: [preview-branch, generate-test-run-id]
     strategy:
       # GH cancels other matrixed jobs by default if one fails. We want all E2E jobs to complete.
@@ -190,7 +190,7 @@ jobs:
           public: true
   unit-test:
     name: Unit Tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
