@@ -11,7 +11,11 @@ import {
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
-import { TestEvent, TestRecording } from "shared/test-suites/RecordingTestMetadata";
+import {
+  TestEvent,
+  TestRecording,
+  getPlaywrightTestTimeStampedPointRange,
+} from "shared/test-suites/RecordingTestMetadata";
 
 type TestSuiteContextType = {
   setTestRecording: (value: TestRecording | null) => Promise<void>;
@@ -57,8 +61,13 @@ export function TestSuiteContextRoot({ children }: PropsWithChildren) {
               sync: true,
             }
           );
-
-          seekToTime(timeStampedPointRange.begin.time, timeStampedPointRange.begin.point, false);
+        }
+        let beginPoint = timeStampedPointRange?.begin;
+        if (testRecording.testRunnerName === "playwright") {
+          beginPoint = getPlaywrightTestTimeStampedPointRange(testRecording.events)?.begin;
+        }
+        if (beginPoint) {
+          seekToTime(beginPoint.time, beginPoint.point, false);
         }
       } else {
         await updateForTimelineImprecise([0, duration], {

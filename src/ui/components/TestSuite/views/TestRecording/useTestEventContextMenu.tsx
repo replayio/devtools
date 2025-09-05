@@ -111,7 +111,7 @@ function PlayToHereMenuItem({ testEvent }: { testEvent: TestEvent }) {
 
   const beginTimeStampedPoint = testRecording.timeStampedPointRange?.begin ?? null;
   const endPoint = getTestEventExecutionPoint(testEvent);
-  if (beginTimeStampedPoint == null || endPoint == null) {
+  if (endPoint == null) {
     return null;
   }
 
@@ -120,7 +120,7 @@ function PlayToHereMenuItem({ testEvent }: { testEvent: TestEvent }) {
 
     dispatch(
       startPlayback({
-        beginTime: beginTimeStampedPoint.time,
+        beginTime: beginTimeStampedPoint?.time ?? 0,
         endTime: getTestEventTime(testEvent),
       })
     );

@@ -921,14 +921,9 @@ export async function processPlaywrightTestRecording(
       id,
       result,
       source,
-      timeStampedPointRange: getPlaywrightTestTimeStampedPointRange(events),
+      timeStampedPointRange: null,
     };
   } else if (isTestRecordingV3(testRecording)) {
-    if (!testRecording.timeStampedPointRange) {
-      testRecording.timeStampedPointRange = getPlaywrightTestTimeStampedPointRange(
-        testRecording.events
-      );
-    }
     return testRecording;
   } else {
     // This function does not support the legacy TestItem format
@@ -936,7 +931,7 @@ export async function processPlaywrightTestRecording(
   }
 }
 
-function getPlaywrightTestTimeStampedPointRange(
+export function getPlaywrightTestTimeStampedPointRange(
   events: RecordingTestMetadataV3.TestRecording["events"]
 ) {
   const allEventsSections = Object.values(events);

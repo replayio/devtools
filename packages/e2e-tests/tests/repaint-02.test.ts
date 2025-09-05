@@ -11,14 +11,14 @@ test("repaint-02: repaints on hover", async ({
 }) => {
   await startTest(page, recordingId, testScope);
 
-  const initialScreenShot = await getGraphicsDataUrl(page);
+  const endingScreenShot = await getGraphicsDataUrl(page);
 
   const testLink = getTestRows(page).first();
   await testLink.click();
 
-  // Wait for the test to open and focus
+  // Wait for the test to open
   await waitFor(async () => {
-    await expect(await getGraphicsDataUrl(page)).not.toBe(initialScreenShot);
+    await expect(await getGraphicsDataUrl(page)).not.toBe(endingScreenShot);
   });
 
   // By default, the screenshot shown should correspond to the start of the test

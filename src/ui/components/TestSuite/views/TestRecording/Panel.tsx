@@ -49,21 +49,26 @@ export default function Panel() {
   });
 
   // We only want to cache the test event details when the focus window has been updated
-  // to match the range of the test recording.  Experimentation shows there can be some renders
+  // to match the range of the test recording in the case of Cypress tests. Experimentation shows there can be some renders
   // where the focus range and test range are mismatched, so try to avoid caching in those cases.
+  //
+  // Entering the panel in the case of Playwright recording doesn't change the focus range.
+  // Playwright recordings are usually much shorter given each page is recorded separately
+  // and it's OK to prefetch all of the test event details for them right away.
   const enableCache =
-    focusWindow &&
-    testRecording.timeStampedPointRange?.begin &&
-    isExecutionPointsWithinRange(
-      focusWindow.begin.point,
-      testRecording.timeStampedPointRange.begin.point,
-      testRecording.timeStampedPointRange.end.point
-    ) &&
-    isExecutionPointsWithinRange(
-      focusWindow.end.point,
-      testRecording.timeStampedPointRange.begin.point,
-      testRecording.timeStampedPointRange.end.point
-    );
+    testRecording.testRunnerName === "playwright" ||
+    (focusWindow &&
+      testRecording.timeStampedPointRange &&
+      isExecutionPointsWithinRange(
+        focusWindow.begin.point,
+        testRecording.timeStampedPointRange.begin.point,
+        testRecording.timeStampedPointRange.end.point
+      ) &&
+      isExecutionPointsWithinRange(
+        focusWindow.end.point,
+        testRecording.timeStampedPointRange.begin.point,
+        testRecording.timeStampedPointRange.end.point
+      ));
 
   useImperativeIntervalCacheValues(
     testEventDetailsIntervalCache,

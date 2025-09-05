@@ -11,14 +11,13 @@ test("repaint-03: repaints on seek", async ({ pageWithMeta: { page, recordingId,
   await startTest(page, recordingId, testScope);
 
   const endingScreenShot = await getGraphicsDataUrl(page);
-  const initialFocusBeginTime = await getFocusBeginTime(page);
 
   const testLink = getTestRows(page).first();
   await testLink.click();
 
-  // Wait for the test to open and focus
+  // Wait for the test to open
   await waitFor(async () => {
-    await expect(await getFocusBeginTime(page)).not.toBe(initialFocusBeginTime);
+    await expect(await getGraphicsDataUrl(page)).not.toBe(endingScreenShot);
   });
 
   // By default, the screenshot shown should correspond to the start of the test
