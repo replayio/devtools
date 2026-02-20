@@ -15,10 +15,10 @@ steps:
             AUTOMATED_TEST_SECRET: "graphql-automated-test-secret"
             RECORD_REPLAY_API_KEY: "runtime-record-replay-api-key"
             HASURA_ADMIN_SECRET: "prod/hasura-admin-secret"
-            AWS_ACCESS_KEY_ID:
+            BUILD_USER_ACCESS_KEY_ID:
               secret-id: "prod/build-user"
               json-key: ".access_key_id"
-            AWS_SECRET_ACCESS_KEY:
+            BUILD_USER_SECRET_ACCESS_KEY:
               secret-id: "prod/build-user"
               json-key: ".secret_access_key"
             RUNTIME_TEAM_API_KEY: runtime-replay-api-key
