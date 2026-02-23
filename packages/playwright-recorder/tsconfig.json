@@ -4,6 +4,7 @@
     "strict": true,
     "skipLibCheck": true,
     "target": "ES2022",
+    "module": "CommonJS",
     "lib": ["es2023"],
     "moduleResolution": "Node",
     "downlevelIteration": true,
