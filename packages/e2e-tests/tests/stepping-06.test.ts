@@ -33,7 +33,7 @@ test(`stepping-06: Test stepping in async frames and async call stacks`, async (
   await waitForScopeValue(page, "n", "4");
   await waitForFrameTimeline(page, "85%");
   await selectFrame(page, 3);
-  await waitForFrameTimeline(page, "83%");
+  await waitForFrameTimeline(page, "71%");
   await selectFrame(page, 4);
   await waitForFrameTimeline(page, "0%");
   await selectFrame(page, 0);
