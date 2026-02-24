@@ -23,7 +23,7 @@ test(`object_preview-04: Test scope mapping and switching between generated/orig
     url: "bundle_input.js",
   });
 
-  await warpToMessage(page, "20", 15);
+  await warpToMessage(page, "20", 19);
 
   await expandAllScopesBlocks(page);
   await waitForScopeValue(page, "bar", "ƒo()");
