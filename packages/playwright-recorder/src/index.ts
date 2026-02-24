@@ -150,6 +150,7 @@ export async function recordPlaywright(
   let executablePath = config.browserPath ?? getExecutablePath() ?? undefined;
 
   const browserServer = await chromium.launchServer({
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
     env: {
       ...process.env,
       RECORD_ALL_CONTENT: "1",

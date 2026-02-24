@@ -36,6 +36,7 @@ const config: PlaywrightTestConfig = {
   use: {
     launchOptions: {
       slowMo: SLOW_MO ? parseInt(SLOW_MO, 10) : 0,
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
     },
     viewport: {
       width: 1280,
