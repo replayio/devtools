@@ -162,19 +162,27 @@ export async function recordPlaywright(
     headless: config.headless,
   });
 
-  if (process.env.RECORD_REPLAY_VERBOSE) {
-    // TODO: Always keep logs, and make them available if the recording failed.
-    const stderr = browserServer.process().stderr;
-    stderr?.addListener("data", data => {
-      console.debug(`[RUNTIME] ${data}`);
-    });
-  }
+  const stderr = browserServer.process().stderr;
+  stderr?.addListener("data", data => {
+    console.debug(`[RUNTIME] ${data}`);
+  });
 
   const browser = await chromium.connect(browserServer.wsEndpoint());
   const context = await browser.newContext({
     ignoreHTTPSErrors: true,
   });
   const page = await context.newPage();
+
+  page.on("console", msg => {
+    console.log(`[PAGE] ${msg.type()}: ${msg.text()}`);
+  });
+  page.on("pageerror", error => {
+    console.error(`[PAGE ERROR] ${error}`);
+  });
+  page.on("crash", () => {
+    console.error(`[PAGE CRASH]`);
+  });
+
   try {
     return await script(page, expect);
   } finally {
