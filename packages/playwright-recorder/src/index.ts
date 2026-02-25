@@ -182,6 +182,14 @@ export async function recordPlaywright(
   page.on("crash", () => {
     console.error(`[PAGE CRASH]`);
   });
+  page.on("response", response => {
+    if (response.status() >= 400) {
+      console.error(`[HTTP ${response.status()}] ${response.url()}`);
+    }
+  });
+  page.on("requestfailed", request => {
+    console.error(`[REQUEST FAILED] ${request.url()} - ${request.failure()?.errorText}`);
+  });
 
   try {
     return await script(page, expect);
