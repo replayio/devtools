@@ -26,7 +26,7 @@
   "dependencies": {
     "@apollo/client": "^3.5.10",
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
-    "@headlessui/react": "^1.4.3",
+    "@headlessui/react": "^2",
     "@heroicons/react": "^1.0.6",
     "@lexical/link": "^0.6.5",
     "@lexical/mark": "^0.6.5",
@@ -132,6 +132,7 @@
     "@types/lodash": "^4.14.181",
     "@types/mixpanel-browser": "^2.35.6",
     "@types/node": "^18.0.0",
+    "@types/prop-types": "^15.7.15",
     "@types/react": "^19.0.0",
     "@types/react-devtools-inline": "^4.24.3",
     "@types/react-dom": "^19.0.0",
