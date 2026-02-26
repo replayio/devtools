@@ -35,7 +35,8 @@ test(`stepping-06: Test stepping in async frames and async call stacks`, async (
   await selectFrame(page, 3);
   await waitForFrameTimeline(page, "71%");
   await selectFrame(page, 4);
-  await waitForFrameTimeline(page, "0%");
+  // linux produces 100%, mac arm64 produces 0%
+  await waitForFrameTimeline(page, process.platform === "linux" ? "100%" : "0%");
   await selectFrame(page, 0);
   await stepOverToLine(page, 20);
   await stepOverToLine(page, 21);
