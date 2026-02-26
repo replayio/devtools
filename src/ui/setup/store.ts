@@ -3,6 +3,7 @@ import {
   Reducer,
   Store,
   ThunkDispatch,
+  UnknownAction,
   combineReducers,
   configureStore,
 } from "@reduxjs/toolkit";
@@ -105,9 +106,12 @@ export function bootstrapStore(initialState: Partial<UIState>) {
   return store;
 }
 
-export type AppStore = ReturnType<typeof bootstrapStore>;
-// TODO Actually duplicated this with ./index.ts
-export type AppDispatch = AppStore["dispatch"];
+type BaseAppStore = ReturnType<typeof bootstrapStore>;
+// Explicitly include ThunkDispatch since the @ts-ignore on middleware
+// prevents TS from inferring it from the store's dispatch type.
+export type AppDispatch = ThunkDispatch<UIState, ThunkExtraArgs, UnknownAction> &
+  BaseAppStore["dispatch"];
+export type AppStore = Omit<BaseAppStore, "dispatch"> & { dispatch: AppDispatch };
 
 export function extendStore(
   store: Store,

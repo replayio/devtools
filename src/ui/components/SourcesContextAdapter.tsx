@@ -33,7 +33,7 @@ export default function SourcesContextWrapper({ children }: PropsWithChildren) {
     (location: PartialLocation | null) => {
       if (location === null) {
         if (selectedLocation !== null) {
-          dispatch(clearSelectedLocation);
+          dispatch(clearSelectedLocation());
         }
       } else {
         if (

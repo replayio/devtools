@@ -1,4 +1,4 @@
-import { Action, AnyAction, Store, ThunkAction } from "@reduxjs/toolkit";
+import { Action, Store, ThunkAction, UnknownAction } from "@reduxjs/toolkit";
 
 import debuggerActions from "devtools/client/debugger/src/actions";
 import { QuickOpenActions } from "devtools/client/debugger/src/actions/quick-open";
@@ -21,7 +21,7 @@ export type UIThunkAction<TReturn = void> = ThunkAction<
   TReturn,
   UIState,
   ThunkExtraArgs,
-  AnyAction
+  UnknownAction
 >;
 
 export type UIStore = AppStore;

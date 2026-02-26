@@ -35,9 +35,7 @@ declare global {
   }
 }
 
-// Just to grab the type of Dispatch
-let store: UIStore;
-export type AppDispatch = typeof store.dispatch;
+export type { AppDispatch } from "./store";
 
 const getDefaultSelectedPrimaryPanel = (
   session: ReplaySession | undefined,
