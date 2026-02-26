@@ -1,4 +1,5 @@
-import { Dictionary } from "@reduxjs/toolkit";
+type Dictionary<T> = Record<string, T | undefined>;
+
 import fuzzyAldrin from "fuzzaldrin-plus";
 import debounce from "lodash/debounce";
 import memoizeOne from "memoize-one";

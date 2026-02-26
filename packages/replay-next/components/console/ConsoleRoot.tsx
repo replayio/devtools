@@ -74,10 +74,10 @@ function Console({
   searchInputRef,
   showFiltersByDefault,
 }: {
-  messageListRef: RefObject<HTMLElement>;
+  messageListRef: RefObject<HTMLElement | null>;
   filterDrawerOpenDefault?: boolean;
   nagHeader?: ReactNode;
-  searchInputRef: RefObject<HTMLInputElement>;
+  searchInputRef: RefObject<HTMLInputElement | null>;
   showFiltersByDefault?: boolean;
 }) {
   const inputRef = useRef<ImperativeHandle>(null);

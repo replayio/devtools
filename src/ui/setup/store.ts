@@ -22,7 +22,7 @@ import { ThunkExtraArgs, extraThunkArgs } from "ui/utils/thunk";
 import { listenerMiddleware } from "./listenerMiddleware";
 
 type UIStateReducers = {
-  [key in keyof UIState]: Reducer<UIState[key]>;
+  [key in keyof UIState]: Reducer<UIState[key], UnknownAction, UIState[key] | undefined>;
 };
 
 // TODO This isn't exported from RTK. Mark should fix that.
@@ -123,7 +123,7 @@ export function extendStore(
   Object.assign(extraThunkArgs, newThunkArgs);
 
   const combinedReducers = combineReducers(reducers);
-  const reducer = (state: UIState | undefined, action: UIAction) => {
+  const reducer = (state: UIState | undefined, action: UnknownAction) => {
     if (newInitialState) {
       state = { ...newInitialState, ...state } as UIState;
       newInitialState = undefined;

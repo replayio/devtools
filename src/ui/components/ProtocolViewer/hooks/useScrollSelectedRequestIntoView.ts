@@ -1,9 +1,7 @@
-import { MutableRefObject, useContext, useLayoutEffect, useRef } from "react";
-
-import { ProtocolViewerContext } from "ui/components/ProtocolViewer/components/ProtocolViewerContext";
+import { RefObject, useLayoutEffect, useRef } from "react";
 
 export function useScrollSelectedRequestIntoView(
-  divRef: MutableRefObject<HTMLDivElement>,
+  divRef: RefObject<HTMLDivElement | null>,
   isSelected: boolean
 ) {
   const prevIsSelectedRef = useRef<boolean>(false);

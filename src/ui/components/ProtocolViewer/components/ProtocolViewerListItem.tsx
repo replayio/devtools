@@ -53,7 +53,7 @@ const MemoizedProtocolViewerListItem = memo(function MemoizedProtocolViewerListI
   response: ProtocolResponse;
   selectRequest: (id: number | null) => void;
 }) {
-  const ref = useRef<HTMLDivElement>() as MutableRefObject<HTMLDivElement>;
+  const ref = useRef<HTMLDivElement>(null);
 
   const didError = error != null;
 

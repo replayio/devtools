@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import type { AnyAction, Middleware } from "@reduxjs/toolkit";
+import type { Middleware, UnknownAction } from "@reduxjs/toolkit";
 
 import type { ThreadContext } from "devtools/client/debugger/src/reducers/pause";
 //
@@ -47,7 +47,7 @@ export function validateContext(state: UIState, cx: ThreadContext) {
   }
 }
 
-function validateActionContext(getState: () => UIState, cx: ThreadContext, action: AnyAction) {
+function validateActionContext(getState: () => UIState, cx: ThreadContext, action: UnknownAction) {
   // Watch for other actions which are unaffected by thread changes.
 
   try {
@@ -59,17 +59,19 @@ function validateActionContext(getState: () => UIState, cx: ThreadContext, actio
   }
 }
 
-export const getContextFromAction = (action: AnyAction): ThreadContext | null => {
-  return action.cx ?? action.meta?.cx ?? action.payload?.cx ?? action?.meta?.arg?.cx ?? null;
+export const getContextFromAction = (action: UnknownAction): ThreadContext | null => {
+  const a = action as Record<string, any>;
+  return a.cx ?? a.meta?.cx ?? a.payload?.cx ?? a.meta?.arg?.cx ?? null;
 };
 
 // Middleware which looks for actions that have a cx property and ignores
 // them if the context is no longer valid.
 export const context: Middleware = storeApi => {
   return next => action => {
-    const cx = getContextFromAction(action);
+    const a = action as UnknownAction;
+    const cx = getContextFromAction(a);
     if (cx) {
-      validateActionContext(storeApi.getState, cx, action);
+      validateActionContext(storeApi.getState, cx, a);
     }
 
     return next(action);

@@ -24,7 +24,7 @@ export default function TypeAheadListRenderer<Item>({
   itemRenderer: (item: Item, query: string) => ReactNode;
   items: Item[];
   listClassName: string;
-  popupRef: RefObject<HTMLDivElement>;
+  popupRef: RefObject<HTMLDivElement | null>;
   query: string;
   selectedItem: Item | null;
 }) {

@@ -154,7 +154,8 @@ export function serializeDOM(rootNode: Document): number[] {
 
     const objectId = getObjectId(domNodeOrText);
 
-    let { childNodes, classList, id, nodeType, tagName, textContent } = domNodeOrText;
+    let { childNodes, classList, id, nodeType, tagName } = domNodeOrText;
+    let textContent: string | null = domNodeOrText.textContent;
 
     switch (nodeType) {
       case Node.DOCUMENT_NODE: {

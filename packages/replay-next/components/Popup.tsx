@@ -24,7 +24,7 @@ export default function Popup({
 }: Omit<HTMLAttributes<HTMLDivElement>, "onClick"> & {
   children: ReactNode;
   clientX?: number | null;
-  containerRef?: RefObject<HTMLElement> | null;
+  containerRef?: RefObject<HTMLElement | null> | null;
   dismiss: Dismiss;
   dismissOnMouseLeave?: boolean;
   horizontalAlignment?: "left" | "center" | "right";

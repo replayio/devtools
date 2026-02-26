@@ -3,7 +3,6 @@ import classnames from "classnames";
 import { Suspense, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList as List } from "react-window";
-import { useImperativeCacheValue } from "suspense";
 
 import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBoundary";
 import Spinner from "replay-next/components/Spinner";
@@ -28,6 +27,8 @@ import { SourceOutlineClass } from "./SourceOutlineClass";
 import { SourceOutlineFunction } from "./SourceOutlineFunction";
 import styles from "./SourceOutline.module.css";
 
+import { useImperativeCacheValue } from "suspense";
+
 export function SourceOutline({
   cursorPosition,
   selectedSource,
@@ -46,7 +47,7 @@ export function SourceOutline({
     [symbols, filter]
   );
   const [focusedSymbol, setFocusedSymbol] = useState<ClassOutline | FunctionOutline | null>(null);
-  const listRef = useRef<any>();
+  const listRef = useRef<any>(null);
 
   const closestSymbolIndex = useMemo(() => {
     if (!cursorPosition) {

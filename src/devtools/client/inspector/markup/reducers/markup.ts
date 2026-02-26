@@ -7,12 +7,12 @@ import { UIState } from "ui/state";
 
 export interface MarkupState {
   highlightedNodes: string[] | null;
-  nodeBoxModels: EntityState<BoxModel>;
+  nodeBoxModels: EntityState<BoxModel, string>;
   selectedNode: string | null;
 }
 
-const boxModelAdapter = createEntityAdapter<BoxModel>({
-  selectId: boxModel => boxModel.node,
+const boxModelAdapter = createEntityAdapter({
+  selectId: (boxModel: BoxModel) => boxModel.node,
 });
 
 export const { selectById: getNodeBoxModelById } = boxModelAdapter.getSelectors(
