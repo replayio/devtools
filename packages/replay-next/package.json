@@ -37,6 +37,6 @@
     "jest": "^28.0.2",
     "jest-environment-jsdom": "^28.0.2",
     "node-fetch": "^2.0.0",
-    "typescript": "5.0.2"
+    "typescript": "^5.9.0"
   }
 }
