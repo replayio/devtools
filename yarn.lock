@@ -14996,18 +14996,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-dom@npm:0.0.0-experimental-03d6f7cf0-20240209":
-  version: 0.0.0-experimental-03d6f7cf0-20240209
-  resolution: "react-dom@npm:0.0.0-experimental-03d6f7cf0-20240209"
-  dependencies:
-    loose-envify: ^1.1.0
-    scheduler: 0.0.0-experimental-03d6f7cf0-20240209
-  peerDependencies:
-    react: 0.0.0-experimental-03d6f7cf0-20240209
-  checksum: 6986479708d921e93fd0d271d196e01bca0faf7bf144b5c19ca21d4b4cb1c70d945a6c55a147606644f8d8fbc4bf92ad101b70921403852fd88736b2753f2801
-  languageName: node
-  linkType: hard
-
 "react-dom@npm:0.0.0-experimental-98ce535f-20260226":
   version: 0.0.0-experimental-98ce535f-20260226
   resolution: "react-dom@npm:0.0.0-experimental-98ce535f-20260226"
@@ -15215,15 +15203,6 @@ __metadata:
   dependencies:
     loose-envify: ^1.1.0
   checksum: 88e38092da8839b830cda6feef2e8505dec8ace60579e46aa5490fc3dc9bba0bd50336507dc166f43e3afc1c42939c09fe33b25fae889d6f402721dcd78fca1b
-  languageName: node
-  linkType: hard
-
-"react@npm:0.0.0-experimental-03d6f7cf0-20240209":
-  version: 0.0.0-experimental-03d6f7cf0-20240209
-  resolution: "react@npm:0.0.0-experimental-03d6f7cf0-20240209"
-  dependencies:
-    loose-envify: ^1.1.0
-  checksum: 8afc985f294c6589603f3ff66d40c6ce397816697badff32139ecd9d9a3e55c013a88a313defd8cd8b37e4ed263912c4de0649243a832f88443ba78606f3dd93
   languageName: node
   linkType: hard
 
@@ -15681,8 +15660,8 @@ __metadata:
     node-fetch: ^2.0.0
     pretty-ms: ^7.0.1
     protocol: "workspace:*"
-    react: 0.0.0-experimental-03d6f7cf0-20240209
-    react-dom: 0.0.0-experimental-03d6f7cf0-20240209
+    react: 0.0.0-experimental-98ce535f-20260226
+    react-dom: 0.0.0-experimental-98ce535f-20260226
     react-virtualized-auto-sizer: ^1.0.19
     shared: "workspace:*"
     suspense: ^0.0.53
@@ -15960,15 +15939,6 @@ __metadata:
   dependencies:
     xmlchars: ^2.2.0
   checksum: 5636b55cf15f7cf0baa73f2797bf992bdcf75d1b39d82c0aa4608555c774368f6ac321cb641fd5f3d3ceb87805122cd47540da6a7b5960fe0dbdb8f8c263f000
-  languageName: node
-  linkType: hard
-
-"scheduler@npm:0.0.0-experimental-03d6f7cf0-20240209":
-  version: 0.0.0-experimental-03d6f7cf0-20240209
-  resolution: "scheduler@npm:0.0.0-experimental-03d6f7cf0-20240209"
-  dependencies:
-    loose-envify: ^1.1.0
-  checksum: 9946e7080b5ba1a5b11e103035e7309a70a63ae999dcbd2693f8c243cdc8af411c511ab15cb0b56db414dc1f61ac942d69c73e4f278cd53caf6c8c9f81259f5f
   languageName: node
   linkType: hard
 
