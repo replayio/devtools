@@ -30,7 +30,7 @@ const makeKeypressEvent = (key: string): KeypressEvent => ({ type: "keypress", k
 
 const expectedEvents: Event[] = (
   [
-    { type: "navigation", url: "localhost:8080" },
+    { type: "navigation", url: "localhost:3000" },
     { type: "mousedown" },
     { type: "mousedown" },
     [..."test"].map(makeKeypressEvent),
