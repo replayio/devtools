@@ -36,6 +36,6 @@ test("highlighter: element highlighter works everywhere", async ({
   // at all (is the box even visible on screen), and 2) is it
   // over the iframe element we're trying to highlight.
   // These coordinates visually match the location of the iframe.
-  const pathDefinitionToCompare = `M8,45 L312,45 L312,199 L8,199`;
-  expect(normalizedPathDefinition).toBe(pathDefinitionToCompare);
+  // Y coordinates differ by 1px between linux (44/198) and mac arm64 (45/199).
+  expect(normalizedPathDefinition).toMatch(/^M8,4[45] L312,4[45] L312,19[89] L8,19[89]$/);
 });
