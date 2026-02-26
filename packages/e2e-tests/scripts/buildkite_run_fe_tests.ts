@@ -277,8 +277,9 @@ export default async function run_fe_tests(
       stdio: "inherit",
     });
 
-    // Start the webserver.
-    webProc = exec("npx yarn dev", (error, stdout, stderr) => {
+    // Start the webserver on port 3000 to avoid conflicting with the
+    // buildkite agent health check endpoint which runs on port 8080.
+    webProc = exec("npx next dev -p 3000", (error, stdout, stderr) => {
       if (error) {
         console.error(`yarn dev exec ERROR: ${error}`);
       }
@@ -294,7 +295,7 @@ export default async function run_fe_tests(
 
     // make sure the dev server is up and running.
     console.log("waiting for dev server to start up");
-    await testHttpConnection("http://localhost:8080/");
+    await testHttpConnection("http://localhost:3000/");
     console.log("dev server up, continuing with test");
   }
 
@@ -321,7 +322,7 @@ export default async function run_fe_tests(
           env: {
             ...process.env,
             // Run the tests against the local dev server.
-            PLAYWRIGHT_TEST_BASE_URL: "http://localhost:8080",
+            PLAYWRIGHT_TEST_BASE_URL: "http://localhost:3000",
           },
         }
       );
