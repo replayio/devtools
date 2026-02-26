@@ -1,10 +1,4 @@
-import {
-  unstable_Activity as Activity,
-  Suspense,
-  useContext,
-  useLayoutEffect,
-  useMemo,
-} from "react";
+import { Activity, Suspense, useContext, useLayoutEffect, useMemo } from "react";
 
 import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBoundary";
 import { PanelLoader } from "replay-next/components/PanelLoader";

@@ -25,6 +25,7 @@ import {
 } from "lexical";
 import {
   ForwardedRef,
+  JSX,
   createElement,
   forwardRef,
   useEffect,

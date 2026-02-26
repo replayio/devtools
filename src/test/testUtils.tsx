@@ -1,6 +1,6 @@
 import type { RenderOptions } from "@testing-library/react";
 import * as rtl from "@testing-library/react";
-import React, { PropsWithChildren } from "react";
+import React, { JSX, PropsWithChildren } from "react";
 import { act } from "react-dom/test-utils";
 import { Provider } from "react-redux";
 

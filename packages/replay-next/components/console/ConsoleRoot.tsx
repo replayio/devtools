@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import {
-  unstable_Activity as Activity,
+  Activity,
   KeyboardEvent,
   MouseEvent,
   ReactNode,
