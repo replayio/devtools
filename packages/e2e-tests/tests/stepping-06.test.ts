@@ -35,7 +35,7 @@ test(`stepping-06: Test stepping in async frames and async call stacks`, async (
   await selectFrame(page, 3);
   await waitForFrameTimeline(page, "71%");
   await selectFrame(page, 4);
-  await waitForFrameTimeline(page, "0%");
+  await waitForFrameTimeline(page, "100%");
   await selectFrame(page, 0);
   await stepOverToLine(page, 20);
   await stepOverToLine(page, 21);
