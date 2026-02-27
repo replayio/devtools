@@ -1,5 +1,5 @@
 import React, { MutableRefObject, useRef, useState } from "react";
-import { act } from "react-dom/test-utils";
+import { act } from "react";
 
 import { render } from "../utils/testing";
 import useSearchDOM from "./useSearchDOM";

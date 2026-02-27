@@ -1,7 +1,7 @@
 import type { RenderOptions } from "@testing-library/react";
 import * as rtl from "@testing-library/react";
 import React, { JSX, PropsWithChildren } from "react";
-import { act } from "react-dom/test-utils";
+import { act } from "react";
 import { Provider } from "react-redux";
 
 import { createMockReplayClient } from "replay-next/src/utils/testing";

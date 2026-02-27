@@ -124,8 +124,7 @@ export function reactDevToolsBeforeEach() {
 
   // Import ReactDOM after DevTools has been initialized/configured so that it connects
   const ReactDOMClient = require("react-dom/client");
-  const ReactDOMTestUtils = require("react-dom/test-utils");
-
+  const React = require("react");
   const testAppRoot = ReactDOMClient.createRoot(document.createElement("div"));
 
   const api: {
@@ -148,7 +147,7 @@ export function reactDevToolsBeforeEach() {
     getOperations: (callback: Function) => {
       operations.splice(0);
 
-      ReactDOMTestUtils.act(callback);
+      React.act(callback);
 
       // Flush pending DevTools postMessage() calls
       jest.runAllTimers();
