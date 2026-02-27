@@ -2,7 +2,6 @@ import classNames from "classnames";
 import type { MouseEventHandler } from "react";
 import { forwardRef, useRef, useState } from "react";
 import mergeRefs from "react-merge-refs";
-import { Transition } from "react-transition-group";
 
 import { Icon } from "design/Icon";
 
@@ -67,23 +66,15 @@ export const AddCommentButton = forwardRef<HTMLButtonElement, AddCommentButtonPr
   }
 );
 
-// Duration must match `transition` rule in module.css file
-const duration = 100;
-
-const states = {
-  entering: { opacity: 0, transform: "scale(0.98)" },
-  entered: { opacity: 1, transform: "scale(1)" },
-  exiting: { opacity: 0, transform: "scale(0.98)" },
-  exited: { display: "none", opacity: 0, transform: "scale(0.98)" },
-  unmounted: { display: "none", opacity: 0, transform: "scale(0.98)" },
-};
-
 const TextFade = ({ children, visible }: { children: React.ReactNode; visible: boolean }) => (
-  <Transition in={visible} timeout={duration}>
-    {state => (
-      <span className={styles.TextFade} style={states[state]}>
-        {children}
-      </span>
-    )}
-  </Transition>
+  <span
+    className={styles.TextFade}
+    style={
+      visible
+        ? { opacity: 1, transform: "scale(1)" }
+        : { display: "none", opacity: 0, transform: "scale(0.98)" }
+    }
+  >
+    {children}
+  </span>
 );

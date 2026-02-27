@@ -6,9 +6,6 @@
 
 import classnames from "classnames";
 import React from "react";
-import { Transition } from "react-transition-group";
-
-export const transitionTimeout = 50;
 
 interface IModalProps {
   additionalClass: string;
@@ -47,17 +44,13 @@ export default function Slide({
   handleClose,
 }: ISlideProps) {
   return (
-    <Transition in={inProp} timeout={transitionTimeout} appear>
-      {status => (
-        <Modal
-          width={width}
-          status={status}
-          additionalClass={additionalClass}
-          handleClose={handleClose}
-        >
-          {children}
-        </Modal>
-      )}
-    </Transition>
+    <Modal
+      width={width}
+      status={inProp ? "entered" : "exited"}
+      additionalClass={additionalClass}
+      handleClose={handleClose}
+    >
+      {children}
+    </Modal>
   );
 }
