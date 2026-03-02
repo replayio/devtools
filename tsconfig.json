@@ -12,7 +12,7 @@
     ] /* Specify library files to be included in the compilation. */,
     // "allowJs": true,                       /* Allow javascript files to be compiled. */
     // "checkJs": true,                       /* Report errors in .js files. */
-    "jsx": "react-jsx" /* Specify JSX code generation: 'preserve', 'react-native', or 'react'. */,
+    "jsx": "preserve" /* Specify JSX code generation: 'preserve', 'react-native', or 'react'. */,
     // "declaration": true,                   /* Generates corresponding '.d.ts' file. */
     // "declarationMap": true,                /* Generates a sourcemap for each corresponding '.d.ts' file. */
     // "sourceMap": true,                     /* Generates corresponding '.map' file. */
@@ -51,22 +51,50 @@
         "src/devtools/client/shared/vendor/*",
         "node_modules/*"
       ],
-      "replay-next": ["packages/replay-next/*"],
-      "@recordreplay/accordion": ["packages/accordion/index.tsx"],
-      "@devtools-repo/playwright-recorder": ["packages/playwright-recorder/src/index.ts"],
-      "components": ["packages/design/index.ts"],
-      "components/*": ["packages/design/*"],
-      "icons": ["packages/icons/index.tsx"],
-      "icons/*": ["packages/icons/*"],
-      "protocol": ["packages/protocol/index.ts"],
-      "protocol/*": ["packages/protocol/*"],
-      "shared": ["packages/shared/index.ts"],
-      "shared/*": ["packages/shared/*"],
-      "third-party/*": ["packages/third-party/*"]
+      "replay-next": [
+        "packages/replay-next/*"
+      ],
+      "@recordreplay/accordion": [
+        "packages/accordion/index.tsx"
+      ],
+      "@devtools-repo/playwright-recorder": [
+        "packages/playwright-recorder/src/index.ts"
+      ],
+      "components": [
+        "packages/design/index.ts"
+      ],
+      "components/*": [
+        "packages/design/*"
+      ],
+      "icons": [
+        "packages/icons/index.tsx"
+      ],
+      "icons/*": [
+        "packages/icons/*"
+      ],
+      "protocol": [
+        "packages/protocol/index.ts"
+      ],
+      "protocol/*": [
+        "packages/protocol/*"
+      ],
+      "shared": [
+        "packages/shared/index.ts"
+      ],
+      "shared/*": [
+        "packages/shared/*"
+      ],
+      "third-party/*": [
+        "packages/third-party/*"
+      ]
     } /* A series of entries which re-map imports to lookup locations relative to the 'baseUrl'. */,
     // "rootDirs": [],                        /* List of root folders whose combined content represents the structure of the project at runtime. */
     // "typeRoots": [],                       /* List of folders to include type definitions from. */
-    "types": ["jest", "@testing-library/jest-dom", "node"],
+    "types": [
+      "jest",
+      "@testing-library/jest-dom",
+      "node"
+    ],
     // "allowSyntheticDefaultImports": true,  /* Allow default imports from modules with no default export. This does not affect code emit, just typechecking. */
     "esModuleInterop": true /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */,
     // "preserveSymlinks": true,              /* Do not resolve the real path of symlinks. */
@@ -88,11 +116,14 @@
   },
   "exclude": [
     "node_modules",
-
     // exclude Cypress from root typechecking to avoid conflicts with globals like expect()
     "packages/e2e-tests/examples/**/*.ts*",
     "packages/e2e-tests/**/*.cy.ts",
-    "packages/e2e-tests/scripts/*.ts",
+    "packages/e2e-tests/scripts/*.ts"
   ],
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx"
+  ]
 }
