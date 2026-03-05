@@ -151,6 +151,8 @@ export const getCorrespondingSourceIdsFromSourcesState = (sources: SourcesState,
   return source?.correspondingSourceIds || [id];
 };
 
+/* dummy change */
+
 export const getSelectedLocationHasScrolled = (state: UIState) =>
   state.sources.selectedLocationHasScrolled;
 
