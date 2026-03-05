@@ -16,7 +16,7 @@ import test from "../testFixture";
 
 test.use({ exampleKey: "doc_inspector_basic.html" });
 
-test.only("inspector-elements-01: Basic DOM tree node display", async ({
+test("inspector-elements-01: Basic DOM tree node display", async ({
   pageWithMeta: { page, recordingId, testScope },
   exampleKey,
 }) => {
