@@ -1,0 +1,37 @@
+diff --git a/dist/backend.js b/dist/backend.js
+index 3f760fc6b271b12d6ac05bcab347c0a6eea30e28..90a6da63c6cba3a3d8f4afd87e574c1b4515a60b 100644
+--- a/dist/backend.js
++++ b/dist/backend.js
+@@ -5627,7 +5627,7 @@ const external_react_namespaceObject = require("react");
+  * 
+  */
+ 
+-const ReactSharedInternals = external_react_namespaceObject.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
++const ReactSharedInternals = external_react_namespaceObject.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED || (function() { var ni = external_react_namespaceObject.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE; return ni ? { ReactCurrentDispatcher: { get current() { return ni.H; }, set current(v) { ni.H = v; } }, ReactCurrentOwner: { get current() { return ni.A; }, set current(v) { ni.A = v; } }, ReactCurrentBatchConfig: { get transition() { return ni.T; }, set transition(v) { ni.T = v; } } } : {}; })();
+ /* harmony default export */ const shared_ReactSharedInternals = (ReactSharedInternals);
+ ;// CONCATENATED MODULE: ../react-reconciler/src/ReactWorkTags.js
+ /**
+@@ -14841,8 +14841,8 @@ function initBackend(hook, agent, global) {
+     let rendererInterface = hook.rendererInterfaces.get(id); // Inject any not-yet-injected renderers (if we didn't reload-and-profile)
+ 
+     if (rendererInterface == null) {
+-      if (typeof renderer.findFiberByHostInstance === 'function') {
+-        // react-reconciler v16+
++      if (typeof renderer.findFiberByHostInstance === 'function' || typeof renderer.getCurrentFiber === 'function') {
++        // react-reconciler v16+ (findFiberByHostInstance) or React 19+ (getCurrentFiber)
+         rendererInterface = attach(hook, id, renderer, global);
+       } else if (renderer.ComponentTree) {
+         // react-dom v15
+diff --git a/dist/frontend.js b/dist/frontend.js
+index 3cee5fd2a7483b4bf3d742e824a9a4af668c7a17..4ba7a1c940cf390e8006432758a4e077f86f69d2 100644
+--- a/dist/frontend.js
++++ b/dist/frontend.js
+@@ -23242,7 +23242,7 @@ function Button_Button({
+ const Pending = 0;
+ const Resolved = 1;
+ const Rejected = 2;
+-const ReactCurrentDispatcher = external_react_namespaceObject.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.ReactCurrentDispatcher;
++const ReactCurrentDispatcher = (external_react_namespaceObject.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED || {}).ReactCurrentDispatcher || { get current() { return (external_react_namespaceObject.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE || {}).H; }, set current(v) { (external_react_namespaceObject.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE || {}).H = v; } };
+ 
+ function readContext(Context) {
+   const dispatcher = ReactCurrentDispatcher.current;

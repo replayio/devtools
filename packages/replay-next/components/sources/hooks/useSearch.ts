@@ -223,7 +223,8 @@ export default function useSearch<Item, Result, QueryData = never>(
   }
 
   const [state, dispatch] = useReducer<
-    React.Reducer<State<Item, Result, QueryData>, Action<Item, Result, QueryData>>
+    State<Item, Result, QueryData>,
+    [Action<Item, Result, QueryData>]
   >(reducer, {
     cachedScopes: {},
     currentScopeId: null,
@@ -237,7 +238,7 @@ export default function useSearch<Item, Result, QueryData = never>(
   const onChangeDispatchingRef = useRef<OnChangeDispatching<Result> | null>(
     onChangeDispatching || null
   );
-  const stateRef = useRef<State<Item, Result, QueryData>>(state);
+  const stateRef = useRef(state);
   useLayoutEffect(() => {
     onChangeDispatchingRef.current = onChangeDispatching || null;
     stateRef.current = state;

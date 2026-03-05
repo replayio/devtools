@@ -26,7 +26,7 @@ const Vertical = ({
   onVideoPanelCollapse: (collapsed: boolean) => void;
   toolboxLayout: ToolboxLayout;
   videoPanelCollapsed: boolean;
-  videoPanelRef: RefObject<ImperativePanelHandle>;
+  videoPanelRef: RefObject<ImperativePanelHandle | null>;
 }) => {
   return (
     <PanelGroup
@@ -72,7 +72,7 @@ const Horizontal = ({
 }: {
   onVideoPanelCollapse: (collapsed: boolean) => void;
   videoPanelCollapsed: boolean;
-  videoPanelRef: RefObject<ImperativePanelHandle>;
+  videoPanelRef: RefObject<ImperativePanelHandle | null>;
 }) => {
   const replayClient = useContext(ReplayClientContext);
   const recordingCapabilities = recordingCapabilitiesCache.read(replayClient);

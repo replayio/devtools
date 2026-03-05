@@ -1,4 +1,5 @@
-import { Dictionary } from "@reduxjs/toolkit";
+type Dictionary<T> = Record<string, T | undefined>;
+
 import type { SameLineSourceLocations, SourceId } from "@replayio/protocol";
 import sortBy from "lodash/sortBy";
 

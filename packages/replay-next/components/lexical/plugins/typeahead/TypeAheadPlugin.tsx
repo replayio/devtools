@@ -11,7 +11,7 @@ import {
   LexicalNode,
   TextNode,
 } from "lexical";
-import { ReactNode, Suspense, useEffect, useRef, useState } from "react";
+import { JSX, ReactNode, Suspense, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { INSERT_ITEM_COMMAND } from "./commands";

@@ -3,6 +3,7 @@ import {
   Reducer,
   Store,
   ThunkDispatch,
+  UnknownAction,
   combineReducers,
   configureStore,
 } from "@reduxjs/toolkit";
@@ -21,7 +22,7 @@ import { ThunkExtraArgs, extraThunkArgs } from "ui/utils/thunk";
 import { listenerMiddleware } from "./listenerMiddleware";
 
 type UIStateReducers = {
-  [key in keyof UIState]: Reducer<UIState[key]>;
+  [key in keyof UIState]: Reducer<UIState[key], UnknownAction, UIState[key] | undefined>;
 };
 
 // TODO This isn't exported from RTK. Mark should fix that.
@@ -105,9 +106,12 @@ export function bootstrapStore(initialState: Partial<UIState>) {
   return store;
 }
 
-export type AppStore = ReturnType<typeof bootstrapStore>;
-// TODO Actually duplicated this with ./index.ts
-export type AppDispatch = AppStore["dispatch"];
+type BaseAppStore = ReturnType<typeof bootstrapStore>;
+// Explicitly include ThunkDispatch since the @ts-ignore on middleware
+// prevents TS from inferring it from the store's dispatch type.
+export type AppDispatch = ThunkDispatch<UIState, ThunkExtraArgs, UnknownAction> &
+  BaseAppStore["dispatch"];
+export type AppStore = Omit<BaseAppStore, "dispatch"> & { dispatch: AppDispatch };
 
 export function extendStore(
   store: Store,
@@ -119,7 +123,7 @@ export function extendStore(
   Object.assign(extraThunkArgs, newThunkArgs);
 
   const combinedReducers = combineReducers(reducers);
-  const reducer = (state: UIState | undefined, action: UIAction) => {
+  const reducer = (state: UIState | undefined, action: UnknownAction) => {
     if (newInitialState) {
       state = { ...newInitialState, ...state } as UIState;
       newInitialState = undefined;

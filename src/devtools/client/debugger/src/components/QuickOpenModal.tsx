@@ -1,9 +1,9 @@
-import { Dictionary } from "@reduxjs/toolkit";
+type Dictionary<T> = Record<string, T | undefined>;
+
 import fuzzyAldrin from "fuzzaldrin-plus";
 import debounce from "lodash/debounce";
 import memoizeOne from "memoize-one";
-import React, { Component } from "react";
-import { useImperativeCacheValue } from "suspense";
+import React, { Component, JSX } from "react";
 
 import { ReportProblemLink } from "replay-next/components/errors/ReportProblemLink";
 import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
@@ -47,6 +47,8 @@ import {
 import Modal from "./shared/Modal";
 import ResultList from "./shared/ResultList";
 import SearchInput from "./shared/SearchInput";
+
+import { useImperativeCacheValue } from "suspense";
 
 const maxResults = 100;
 

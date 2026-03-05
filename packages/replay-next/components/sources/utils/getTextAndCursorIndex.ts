@@ -1,15 +1,3 @@
-declare global {
-  interface CaretPosition {
-    readonly offset: number;
-    readonly offsetNode: Node;
-    getClientRect(): DOMRect | null;
-  }
-
-  interface Document {
-    readonly caretPositionFromPoint: (clientX: number, clientY: number) => CaretPosition | null;
-  }
-}
-
 export default function getTextAndCursorIndex(
   clientX: number,
   clientY: number

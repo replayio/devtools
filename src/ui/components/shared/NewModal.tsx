@@ -47,7 +47,7 @@ export default function Modal({
   );
 }
 
-export function ModalContent({ children }: { children: React.ReactChild | React.ReactChild[] }) {
+export function ModalContent({ children }: { children: React.ReactNode | React.ReactNode[] }) {
   return (
     <div
       className="relative justify-between rounded-lg bg-white p-9 text-lg shadow-xl"

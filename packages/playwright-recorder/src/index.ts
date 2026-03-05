@@ -153,6 +153,8 @@ export async function recordPlaywright(
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
     env: {
       ...process.env,
+      RECORD_REPLAY_ENABLE_ASSERTS: "1",
+      RECORD_REPLAY_JS_ASSERTS: "1",
       RECORD_ALL_CONTENT: "1",
       ...(config.driverPath && {
         RECORD_REPLAY_DRIVER: config.driverPath,

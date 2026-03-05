@@ -1,4 +1,4 @@
-import { Suspense } from "react";
+import { JSX, Suspense } from "react";
 
 import { LoomLinkNode } from "./LoomLinkNode";
 import styles from "./LoomLink.module.css";

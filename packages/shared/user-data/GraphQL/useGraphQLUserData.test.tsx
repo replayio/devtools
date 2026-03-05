@@ -62,7 +62,7 @@ describe("useGraphQLUserData", () => {
   });
 
   it("should return the current user preference", async () => {
-    const { act } = require("react-dom/test-utils");
+    const { act } = require("react");
 
     act(() => {
       mount("layout_defaultViewMode");
@@ -80,7 +80,7 @@ describe("useGraphQLUserData", () => {
   });
 
   it("should trigger a re-render when a preference changes", async () => {
-    const { act } = require("react-dom/test-utils");
+    const { act } = require("react");
 
     act(() => {
       mount("inspector_inactiveCssEnabled");
