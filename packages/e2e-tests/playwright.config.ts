@@ -36,6 +36,11 @@ const config: PlaywrightTestConfig = {
   use: {
     launchOptions: {
       slowMo: SLOW_MO ? parseInt(SLOW_MO, 10) : 0,
+      env: {
+        ...process.env,
+        RECORD_REPLAY_ENABLE_ASSERTS: "1",
+        RECORD_REPLAY_JS_ASSERTS: "1",
+      },
     },
     viewport: {
       width: 1280,
