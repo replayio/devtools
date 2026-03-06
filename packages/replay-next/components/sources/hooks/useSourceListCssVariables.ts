@@ -17,7 +17,7 @@ export function useSourceListCssVariables({
   maxHitCountStringLength,
   maxLineIndexStringLength,
 }: {
-  elementRef: RefObject<HTMLElement>;
+  elementRef: RefObject<HTMLElement | null>;
   maxHitCountStringLength: number;
   maxLineIndexStringLength: number;
 }) {

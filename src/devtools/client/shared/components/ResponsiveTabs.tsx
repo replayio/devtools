@@ -150,7 +150,9 @@ export const ResponsiveTabs = ({
         {orderedTabs.map((tab, idx) => (
           <span
             key={tab.key}
-            ref={ref => (tabsRef.current[indicesOrder[idx]] = ref!)}
+            ref={ref => {
+              tabsRef.current[indicesOrder[idx]] = ref!;
+            }}
             style={{
               pointerEvents: idx < visibleItemsCount ? "auto" : "none",
               opacity: idx < visibleItemsCount ? 1 : 0,

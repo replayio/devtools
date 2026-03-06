@@ -80,7 +80,7 @@ export default function PortalDropdown(props: PortalDropdownProps) {
 
 function getContentPosition(
   props: PortalDropdownProps,
-  buttonRef: RefObject<HTMLButtonElement>,
+  buttonRef: RefObject<HTMLButtonElement | null>,
   dropdownNode: HTMLDivElement | null
 ): CSSProperties {
   if (props.expanded && buttonRef.current) {

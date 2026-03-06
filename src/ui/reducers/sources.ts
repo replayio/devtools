@@ -1,5 +1,4 @@
 import {
-  Dictionary,
   EntityState,
   PayloadAction,
   createEntityAdapter,
@@ -12,6 +11,8 @@ import type { PartialLocation } from "devtools/client/debugger/src/actions/sourc
 import { assert } from "protocol/utils";
 import { Source } from "replay-next/src/suspense/SourcesCache";
 import { UIState } from "ui/state";
+
+type Dictionary<T> = Record<string, T | undefined>;
 
 export type SourceDetails = Source;
 
@@ -35,7 +36,7 @@ export const {
 
 export interface SourcesState {
   allSourcesReceived: boolean;
-  sourceDetails: EntityState<SourceDetails>;
+  sourceDetails: EntityState<SourceDetails, string>;
   selectedLocation: PartialLocation | null;
   selectedLocationHistory: PartialLocation[];
   selectedLocationHasScrolled: boolean;

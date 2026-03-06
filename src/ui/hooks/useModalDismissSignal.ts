@@ -1,4 +1,4 @@
-import { MutableRefObject, RefObject, useEffect } from "react";
+import { RefObject, useEffect } from "react";
 
 // TODO: this doesn't work correctly when multiple stacked modals are open
 // they are unaware of each other and the global listeners added by them compete between each other
@@ -6,7 +6,7 @@ import { MutableRefObject, RefObject, useEffect } from "react";
 
 // Closes a modal dialog if the user clicks outside of it or types "Escape"
 export default function useModalDismissSignal(
-  modalRef: MutableRefObject<HTMLDivElement> | RefObject<HTMLDivElement>,
+  modalRef: RefObject<HTMLDivElement | null>,
   dismissCallback: (() => void) | undefined,
   dismissOnClickOutside: boolean = true
 ) {

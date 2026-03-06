@@ -2,7 +2,7 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import { mergeRegister } from "@lexical/utils";
 import { ExecutionPoint } from "@replayio/protocol";
 import { $createTextNode, TextNode } from "lexical";
-import { useContext, useEffect } from "react";
+import { JSX, useContext, useEffect } from "react";
 
 import { useCurrentFocusWindow } from "replay-next/src/hooks/useCurrentFocusWindow";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";

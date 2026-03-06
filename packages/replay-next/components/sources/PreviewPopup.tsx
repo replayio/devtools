@@ -20,7 +20,7 @@ import styles from "./PreviewPopup.module.css";
 
 type Props = {
   clientX?: number | null;
-  containerRef: RefObject<HTMLElement>;
+  containerRef: RefObject<HTMLElement | null>;
   dismiss: () => void;
   expression: string;
   sourceId: SourceId;

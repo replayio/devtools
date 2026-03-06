@@ -79,9 +79,9 @@ export default function useSearchDOM<Item>(
   ) => Item[],
   listRef: MutableRefObject<HTMLElement | null>
 ): [State<Item>, Actions] {
-  const [state, dispatch] = useReducer<React.Reducer<State<Item>, Action<Item>>>(reducer, {
+  const [state, dispatch] = useReducer(reducer, {
     index: -1,
-    results: EMPTY_ARRAY,
+    results: EMPTY_ARRAY as Item[],
     query: "",
   });
 

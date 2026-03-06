@@ -34,7 +34,7 @@ module.exports = {
     "^.+\\.properties$": "<rootDir>/../../test/jest/jest-text-transformer.js",
   },
   transformIgnorePatterns: [
-    "<rootDir>/node_modules/",
+    "<rootDir>/node_modules/(?!(suspense|array-sorting-utilities|interval-utilities|point-utilities)/)",
     "<rootDir>/tests",
     "^.+\\.module\\.(css|sass|scss)$",
   ],

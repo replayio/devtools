@@ -66,15 +66,20 @@ export function Picker<Values extends any>({
           throw Error("Picker children must be a valid React element.");
         }
 
+        // @ts-expect-error Can't enforce props type
         if (!child.props.id) {
           const name = typeof child.type === "string" ? child.type : child.type.name;
           throw Error(`Immediate Picker child "${name}" must pass an "id" prop.`);
         }
 
+        // @ts-expect-error Can't enforce props type
         const isToggle = child.props.id === "toggle";
         const showToggle = value === undefined && isToggle;
+        // @ts-expect-error Can't enforce props type
         const isChildActive = value === child.props.id || showToggle;
+        // @ts-expect-error Can't enforce props type
         const wasChildActive = previousId.current === child.props.id;
+        // @ts-expect-error Can't enforce props type
         const childVariants = child.props.variants || {};
         const onSelect = () => {
           const nextIsOpen = !isOpen;
@@ -93,8 +98,10 @@ export function Picker<Values extends any>({
             transitioning.current = true;
           }
 
+          // @ts-expect-error Can't enforce props type
           const nextActiveId = isToggle ? undefined : child.props.id;
 
+          // @ts-expect-error Can't enforce props type
           previousId.current = isChildActive ? child.props.id : undefined;
 
           onChange(nextActiveId);
@@ -116,12 +123,14 @@ export function Picker<Values extends any>({
           },
           transition: {
             ...transition,
+            // @ts-expect-error Can't enforce props type
             ...child.props.transition,
           },
           style: {
             zIndex: isChildActive || wasChildActive ? 10 : 1,
             gridColumn: isOpen ? undefined : 1,
             gridRow: 1,
+            // @ts-expect-error Can't enforce props type
             ...child.props.style,
           },
           onClick: onSelect,

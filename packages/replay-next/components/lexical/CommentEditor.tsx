@@ -30,7 +30,7 @@ import {
   SerializedEditorState,
   TextNode,
 } from "lexical";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { JSX, useCallback, useEffect, useMemo, useRef } from "react";
 
 import LexicalEditorRefSetter from "./LexicalEditorRefSetter";
 import { AutoLinkNode } from "./plugins/auto-link/AutoLinkNode";

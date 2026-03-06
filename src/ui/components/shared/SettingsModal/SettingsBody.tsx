@@ -7,7 +7,7 @@ interface SettingsBodyProps<T extends string, P extends Record<string, unknown>>
   panelProps: P;
 }
 
-function SettingsBodyWrapper({ children }: { children: (React.ReactChild | null)[] }) {
+function SettingsBodyWrapper({ children }: { children: (React.ReactNode | null)[] }) {
   return <main className="flex w-full flex-col overflow-hidden p-8 text-sm">{children}</main>;
 }
 
@@ -15,7 +15,7 @@ export function SettingsHeader({ children }: { children: React.ReactNode }) {
   return <h1 className="text-2xl">{children}</h1>;
 }
 
-export function SettingsBodyHeader({ children }: { children: React.ReactChild }) {
+export function SettingsBodyHeader({ children }: { children: React.ReactNode }) {
   return <h2 className="text-lg">{children}</h2>;
 }
 

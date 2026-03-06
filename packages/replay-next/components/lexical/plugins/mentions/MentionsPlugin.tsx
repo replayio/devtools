@@ -1,6 +1,6 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { mergeRegister } from "@lexical/utils";
-import { useCallback, useEffect } from "react";
+import { JSX, useCallback, useEffect } from "react";
 
 import TypeAheadPlugin from "../typeahead/TypeAheadPlugin";
 import findMatches from "./findMatches";
