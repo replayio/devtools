@@ -149,9 +149,10 @@ export const Accordion: FC<{
       };
     }
 
+    const props = (c as ReactElement).props as Record<string, any>;
     return {
-      expanded: !!(c as ReactElement).props.expanded ?? false,
-      initialHeight: (c as ReactElement).props.initialHeight,
+      expanded: !!props.expanded,
+      initialHeight: props.initialHeight,
     };
   });
   const [state, dispatch] = useReducer(reducer, getInitialState(initialState!));

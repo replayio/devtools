@@ -72,6 +72,9 @@ module.exports = {
     // Handle text file imports
     "^.+\\.properties$": "<rootDir>/test/jest/jest-text-transformer.js",
   },
-  transformIgnorePatterns: ["/node_modules/", "^.+\\.module\\.(css|sass|scss)$"],
+  transformIgnorePatterns: [
+    "/node_modules/(?!(suspense|array-sorting-utilities|interval-utilities|point-utilities)/)",
+    "^.+\\.module\\.(css|sass|scss)$",
+  ],
   setupFilesAfterEnv: ["<rootDir>/test/jest/setupEnv.js"],
 };

@@ -71,7 +71,7 @@ type DevToolsProps = PropsFromRedux & {
 
 function ViewLoader() {
   const [showLoader, setShowLoader] = useState(false);
-  const idRef = useRef<ReturnType<typeof setTimeout>>();
+  const idRef = useRef<ReturnType<typeof setTimeout>>(null);
   useEffect(() => {
     idRef.current = setTimeout(() => {
       setShowLoader(true);

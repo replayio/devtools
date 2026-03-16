@@ -15,8 +15,8 @@ export default function SourceSearch({
   containerRef,
   inputRef,
 }: {
-  containerRef: RefObject<HTMLElement>;
-  inputRef: RefObject<HTMLInputElement>;
+  containerRef: RefObject<HTMLElement | null>;
+  inputRef: RefObject<HTMLInputElement | null>;
 }) {
   const [searchState, searchActions] = useContext(SourceSearchContext);
 

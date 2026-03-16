@@ -87,7 +87,7 @@ function logErrorToSentry(error: Error, info: ErrorInfo, name: string) {
     componentStack = ErrorStackParser.parse({
       message: "",
       name: "",
-      stack: info.componentStack,
+      stack: info.componentStack ?? undefined,
     })
       .filter(frame => {
         // Filter DOM elements from the stack trace.

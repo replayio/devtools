@@ -241,7 +241,9 @@ class SearchInput extends Component<SearchInputProps> {
             placeholder={placeholder}
             value={query}
             spellCheck={false}
-            ref={(c: HTMLInputElement | null) => (this.$input = c)}
+            ref={(c: HTMLInputElement | null) => {
+              this.$input = c;
+            }}
           />
           {this.renderSpinner()}
           {this.renderSummaryMsg()}

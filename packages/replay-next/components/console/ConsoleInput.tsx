@@ -22,7 +22,11 @@ import EagerEvaluationResult from "./EagerEvaluationResult";
 import useTerminalHistory from "./hooks/useTerminalHistory";
 import styles from "./ConsoleInput.module.css";
 
-export default function ConsoleInput({ inputRef }: { inputRef?: RefObject<ImperativeHandle> }) {
+export default function ConsoleInput({
+  inputRef,
+}: {
+  inputRef?: RefObject<ImperativeHandle | null>;
+}) {
   const { executionPoint } = useContext(TimelineContext);
   const { enterFocusMode } = useContext(FocusContext);
 
@@ -69,7 +73,7 @@ export default function ConsoleInput({ inputRef }: { inputRef?: RefObject<Impera
   );
 }
 
-function ConsoleInputSuspends({ inputRef }: { inputRef?: RefObject<ImperativeHandle> }) {
+function ConsoleInputSuspends({ inputRef }: { inputRef?: RefObject<ImperativeHandle | null> }) {
   const [searchState] = useContext(ConsoleSearchContext);
   const { selectedPauseAndFrameId } = useContext(SelectedFrameContext);
   const replayClient = useContext(ReplayClientContext);

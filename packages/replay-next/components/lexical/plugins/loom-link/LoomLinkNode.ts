@@ -1,6 +1,6 @@
 import type { EditorConfig, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from "lexical";
 import { $applyNodeReplacement, DecoratorNode } from "lexical";
-import { createElement, lazy } from "react";
+import { JSX, createElement, lazy } from "react";
 
 const LoomLink = lazy(
   // @ts-ignore

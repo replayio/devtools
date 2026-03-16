@@ -2,7 +2,7 @@ import assert from "assert";
 import { RefObject, useEffect } from "react";
 
 export function useContentEditableNoUserSelect(
-  rootElementRef: RefObject<HTMLElement>,
+  rootElementRef: RefObject<HTMLElement | null>,
   options: {
     autoFocus: boolean;
     disableSelectionWhenNotFocused: boolean;
