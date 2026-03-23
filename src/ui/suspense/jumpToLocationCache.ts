@@ -6,7 +6,6 @@ import {
   PointDescription,
   SourceLocationRange,
 } from "@replayio/protocol";
-import { createCache, createSingleEntryCache } from "suspense";
 
 import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
 import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
@@ -14,6 +13,8 @@ import { ReplayClientInterface } from "shared/client/types";
 import { IGNORABLE_PARTIAL_SOURCE_URLS } from "ui/actions/eventListeners/eventListenerUtils";
 import { findFunctionOutlineForLocation } from "ui/actions/eventListeners/jumpToCode";
 import { FormattedPointStackFrame, formattedPointStackCache } from "ui/suspense/frameCache";
+
+import { createCache, createSingleEntryCache } from "suspense";
 
 interface FunctionBoundaries {
   location: SourceLocationRange;
@@ -85,6 +86,8 @@ function isFrameInDecl(functions: FunctionBoundaries[], frame: FormattedPointSta
     if (!frame.executionLocation) {
       return false;
     }
+
+    console.log("Bump");
     return (
       frame.executionLocation.line >= decl.location.begin.line &&
       frame.executionLocation.line < decl.location.end.line &&
