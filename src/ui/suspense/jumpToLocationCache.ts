@@ -80,7 +80,7 @@ export const reduxStoreDetailsCache = createSingleEntryCache<
   },
 });
 
-// bump
+function someDummyCode() {}
 
 function isFrameInDecl(functions: FunctionBoundaries[], frame: FormattedPointStackFrame) {
   // Check to see if the frame is inside any of the listed function definitions
