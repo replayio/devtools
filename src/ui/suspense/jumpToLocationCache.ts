@@ -88,6 +88,8 @@ function isFrameInDecl(functions: FunctionBoundaries[], frame: FormattedPointSta
     if (!frame.executionLocation) {
       return false;
     }
+
+    console.log("Dummy code here");
     return (
       frame.executionLocation.line >= decl.location.begin.line &&
       frame.executionLocation.line < decl.location.end.line &&
