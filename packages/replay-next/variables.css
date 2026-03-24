@@ -121,6 +121,8 @@
   --z-index-8--dropdown: var(--z-index-8);
 
   /* The styles below are the same between themes */
+  /* List/tree/source selection (see --theme-selection-background in theme blocks) */
+  --theme-selection-accent: #01acfd;
   --support-form-color: var(--grey-90);
   --support-form-close-icon-color: #ffffff;
   --support-form-modal-background-color: #ffffff;
@@ -581,13 +583,15 @@
   --theme-accordion-header-background: var(--theme-base-95);
   --theme-accordion-header-hover: var(--theme-base-90);
 
-  /* Selection (Dark) */
-  --theme-selection-background-hover: #353b48;
-  --theme-selection-background: var(--primary-accent);
+  /* Selection (Dark) — --theme-selection-accent set in :root */
+  --theme-selection-background-hover: #33bcfd;
+  --theme-selection-background: var(--theme-selection-accent);
   --theme-selection-color: #fff;
   --theme-selection-focus-background: var(--grey-60);
   --theme-selection-focus-color: var(--grey-30);
   --theme-table-selection-background-hover: var(--theme-toolbar-background);
+  /* Softer selected row (network, sub-panels) — blue, not --primary-accent-dimmed (rose) */
+  --theme-list-selection-background: rgb(1 172 253 / 0.24);
 
   /* Border color that splits the toolbars/panels/headers. (Dark) */
   --theme-emphasized-splitter-color-hover: var(--theme-base-70);
@@ -1141,12 +1145,13 @@
   --theme-accordion-header-hover: var(--theme-base-90);
 
   /* Selection (Light) */
-  --theme-selection-background-hover: #f0f9fe;
-  --theme-selection-background: var(--primary-accent);
-  --theme-selection-color: var(--theme-base-100);
+  --theme-selection-background-hover: rgb(1 172 253 / 0.22);
+  --theme-selection-background: var(--theme-selection-accent);
+  --theme-selection-color: #fff;
   --theme-selection-focus-background: var(--toolbarbutton-hover-background);
   --theme-selection-focus-color: var(--grey-70);
   --theme-table-selection-background-hover: var(--theme-toolbar-background);
+  --theme-list-selection-background: rgb(1 172 253 / 0.14);
 
   /* Border color that splits the toolbars/panels/headers. */
   --theme-emphasized-splitter-color-hover: var(--theme-base-70);

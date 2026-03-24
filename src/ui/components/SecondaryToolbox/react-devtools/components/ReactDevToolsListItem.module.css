@@ -5,7 +5,7 @@
   padding-left: calc(var(--data-depth) * var(--indentation-size));
 }
 .Row[data-selected] {
-  background-color: var(--primary-accent-dimmed);
+  background-color: var(--theme-list-selection-background);
   color: var(--value-type-html-tag);
 }
 

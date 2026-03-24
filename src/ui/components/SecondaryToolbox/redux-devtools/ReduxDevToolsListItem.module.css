@@ -18,7 +18,7 @@
   opacity: 1;
 }
 .ListItem[data-selected] {
-  background-color: var(--primary-accent-dimmed);
+  background-color: var(--theme-list-selection-background);
   color: var(--body-color);
   opacity: 1;
 }
