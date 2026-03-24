@@ -5,7 +5,7 @@ import { EMPTY_TABS } from "devtools/client/debugger/src/reducers/tabs";
 import { preCacheExecutionPointForTime } from "replay-next/src/suspense/ExecutionPointsCache";
 import { replayClient } from "shared/client/ReplayClientContext";
 import { Recording } from "shared/graphql/types";
-import { getSystemColorScheme } from "shared/theme/getSystemColorScheme";
+import { applyThemeToDOM, getEffectiveTheme } from "shared/theme/replayTheme";
 import { userData } from "shared/user-data/GraphQL/UserData";
 import { CONSOLE_SETTINGS_DATABASE, POINTS_DATABASE } from "shared/user-data/IndexedDB/config";
 import { preloadIDBInitialValues } from "shared/user-data/IndexedDB/utils";
@@ -170,11 +170,7 @@ export async function bootstrapApp(accessToken: string | null) {
   registerStoreObserver(store, updatePrefs);
   await setupAppHelper(store);
 
-  let theme = userData.get("global_theme");
-  if (theme === "system") {
-    theme = getSystemColorScheme();
-  }
-  document.body.parentElement!.className = theme || "";
+  applyThemeToDOM(getEffectiveTheme(userData.get("global_theme")));
 
   getUserInfo().then(async userInfo => {
     if (userInfo) {

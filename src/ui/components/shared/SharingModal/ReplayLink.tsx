@@ -1,12 +1,10 @@
 import React, { useRef, useState } from "react";
 
-import { Button } from "replay-next/components/Button";
 import { Recording } from "shared/graphql/types";
 import { getRecordingURL } from "shared/utils/recording";
 import { trackEvent } from "ui/utils/telemetry";
 
 import Icon from "../../shared/Icon";
-import styles from "./SharingModal.module.css";
 
 export function CopyButton({ recording }: { recording: Recording }) {
   const [showCopied, setShowCopied] = useState(false);
@@ -26,13 +24,20 @@ export function CopyButton({ recording }: { recording: Recording }) {
   };
 
   return (
-    <div className="copy-link relative flex flex-shrink-0 flex-col items-center">
-      <Button {...{ onClick }}>
-        <Icon filename="doc" size="medium" className={styles.copyIcon} />
-        <div>Copy URL</div>
-      </Button>
+    <div className="copy-link relative flex w-full flex-col items-stretch">
+      <button
+        type="button"
+        onClick={onClick}
+        className="inline-flex w-full items-center justify-center gap-2 rounded-md border border-border bg-background px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+      >
+        <Icon className="h-4 w-4 shrink-0 bg-muted-foreground" filename="doc" size="small" />
+        <span>Copy URL</span>
+      </button>
       {showCopied ? (
-        <div className="bg-opacity-900 absolute bottom-full mb-1.5 rounded-lg bg-black p-1.5 text-white shadow-2xl">
+        <div
+          role="status"
+          className="absolute bottom-full left-1/2 z-10 mb-2 -translate-x-1/2 rounded-md border border-border bg-popover px-2 py-1.5 text-xs text-popover-foreground shadow-md"
+        >
           Copied
         </div>
       ) : null}
@@ -56,17 +61,21 @@ export function UrlCopy({ url }: { url: string }) {
   };
 
   return (
-    <div className="copy-link relative flex flex-col items-center">
+    <div className="relative flex w-full flex-col items-stretch">
       <input
-        className="text-sm"
+        className="w-full cursor-pointer rounded-lg border border-border bg-background px-2 py-2 text-sm text-foreground"
         type="text"
+        readOnly
         value={url}
         onKeyDown={e => e.preventDefault()}
         onChange={e => e.preventDefault()}
         onClick={onClick}
       />
       {showCopied ? (
-        <div className="bg-opacity-900 absolute bottom-full mb-1.5 rounded-lg bg-black p-1.5 text-white shadow-2xl">
+        <div
+          role="status"
+          className="absolute bottom-full left-1/2 z-10 mb-2 -translate-x-1/2 rounded-md border border-border bg-popover px-2 py-1.5 text-xs text-popover-foreground shadow-md"
+        >
           Copied to Clipboard
         </div>
       ) : null}

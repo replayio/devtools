@@ -17,7 +17,7 @@ export async function devtoolsObjectPreview(page: Page) {
   await page.locator('[data-test-id="ConsoleMessageHoverButton"]').click();
   await waitForTime(MsPerSecond);
 
-  await page.locator("div:nth-child(5) > .toolbar-panel-button > button").click();
+  await page.locator('[data-test-name="ToolbarButton-Search"]').click();
   await waitForTime(MsPerSecond);
 
   await page.getByRole("button", { name: "<this>: console{debug: ƒ(...r" }).click();

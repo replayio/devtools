@@ -33,12 +33,12 @@
 .Row[data-status="success"][data-position="before"],
 .Row[data-type="navigation"][data-position="before"],
 .Row[data-type="network-request"][data-position="before"] {
-  --border-left-color: var(--primary-accent);
+  --border-left-color: var(--theme-selection-accent);
 }
 .Row[data-status="success"][data-selected],
 .Row[data-type="navigation"][data-selected],
 .Row[data-type="network-request"][data-selected] {
-  --border-left-color: var(--primary-accent);
+  --border-left-color: var(--theme-selection-accent);
   --row-background-color: var(--testsuites-active-bgcolor);
   --row-background-color-hover: var(--testsuites-active-bgcolor);
 }

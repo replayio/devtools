@@ -1,3 +1,4 @@
+import classnames from "classnames";
 import React from "react";
 
 import { Setting } from "./types";
@@ -8,15 +9,31 @@ interface SettingsBodyProps<T extends string, P extends Record<string, unknown>>
 }
 
 function SettingsBodyWrapper({ children }: { children: (React.ReactNode | null)[] }) {
-  return <main className="flex w-full flex-col overflow-hidden p-8 text-sm">{children}</main>;
+  return (
+    <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto bg-card p-8 text-sm text-card-foreground">
+      {children}
+    </main>
+  );
 }
 
-export function SettingsHeader({ children }: { children: React.ReactNode }) {
-  return <h1 className="text-2xl">{children}</h1>;
+export function SettingsHeader({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <h1
+      className={classnames("font-semibold tracking-tight text-foreground", className ?? "text-xl")}
+    >
+      {children}
+    </h1>
+  );
 }
 
 export function SettingsBodyHeader({ children }: { children: React.ReactNode }) {
-  return <h2 className="text-lg">{children}</h2>;
+  return <h2 className="text-sm font-semibold text-foreground">{children}</h2>;
 }
 
 export default function SettingsBody<T extends string, P extends Record<string, unknown>>({

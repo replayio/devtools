@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { ConnectedProps, connect } from "react-redux";
 
 import { Button } from "replay-next/components/Button";
@@ -21,7 +21,6 @@ function SharingModalWrapper(props: PropsFromRedux) {
   const { recording, loading } = hooks.useGetRecording(recordingId);
 
   if (loading || !recording) {
-    // Todo: Use an actual loader here
     return null;
   }
 
@@ -40,63 +39,31 @@ function CollaboratorRequests({ recording }: { recording: Recording }) {
     return null;
   }
 
-  // Remove duplicates
   const displayedRequests = collaboratorRequests.reduce((acc: CollaboratorRequest[], request) => {
     const userMatch = acc.find(r => r.user.id === request.user.id);
-
     return userMatch ? acc : [...acc, request];
   }, []);
 
   return (
-    <section className="space-y-1.5">
-      <div className="font-bold">Requests to access this replay</div>
-      <div className="space-y-1.5 overflow-auto" style={{ maxHeight: "160px" }}>
-        {displayedRequests.map((c, i) => (
-          <div
-            className="hover:bg-theme-base-90 flex items-center justify-between space-x-2 rounded-lg p-2"
-            key={i}
+    <section className="space-y-2">
+      <h3 className="font-semibold text-foreground">Requests to access this replay</h3>
+      <ul className="max-h-40 space-y-1.5 overflow-auto pr-0.5">
+        {displayedRequests.map(request => (
+          <li
+            key={request.id}
+            className="flex items-center justify-between gap-2 rounded-lg p-2 transition-colors hover:bg-accent"
           >
-            <div className="flex items-center space-x-2">
-              <div className="w-8 flex-shrink-0 overflow-hidden rounded-full">
-                <AvatarImage src={c.user.picture} />
+            <div className="flex min-w-0 items-center gap-2">
+              <div className="h-8 w-8 shrink-0 overflow-hidden rounded-full">
+                <AvatarImage src={request.user.picture} />
               </div>
-              <span className="overflow-hidden overflow-ellipsis whitespace-pre">
-                {c.user.name}
-              </span>
+              <span className="truncate">{request.user.name}</span>
             </div>
-            <Button onClick={() => acceptRecordingRequest(c.id)}>Add</Button>
-          </div>
+            <Button onClick={() => acceptRecordingRequest(request.id)}>Add</Button>
+          </li>
         ))}
-      </div>
+      </ul>
     </section>
-  );
-}
-
-function CollaboratorsSection({ recording }: { recording: Recording }) {
-  return (
-    <section className="space-y-4 bg-modalBgcolor p-4">
-      <div className="flex w-full flex-col justify-between space-y-3">
-        <div className="w-full space-y-4">
-          <div>
-            <div className="mb-2 font-bold">Team</div>
-            <PrivacyDropdown recording={recording} />
-            <Collaborators recordingId={recording.id} />
-          </div>
-          <CollaboratorRequests recording={recording} />
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function SharingSection({ recording }: { recording: Recording }) {
-  return (
-    <>
-      <CollaboratorsSection recording={recording} />
-      <section className="flex flex-col bg-menuHoverBgcolor px-4 py-3">
-        <CopyButton recording={recording} />
-      </section>
-    </>
   );
 }
 
@@ -108,10 +75,18 @@ function SharingModal({ recording, hideModal }: SharingModalProps) {
 
   return (
     <Modal options={{ maskTransparency: "translucent" }} onMaskClick={hideModal}>
-      <div className="sharing-modal relative flex flex-row overflow-hidden rounded-lg border border-inputBorder text-sm shadow-xl">
-        <div className="flex flex-col space-y-0" style={{ width: 390 }}>
-          <SharingSection recording={recording} />
+      <div className="sharing-modal flex w-[390px] flex-col overflow-hidden rounded-lg border border-border bg-card text-sm text-foreground shadow-xl">
+        <div className="space-y-4 p-4">
+          <section>
+            <h3 className="mb-2 font-semibold text-foreground">Team</h3>
+            <PrivacyDropdown recording={recording} />
+            <Collaborators recordingId={recording.id} />
+          </section>
+          <CollaboratorRequests recording={recording} />
         </div>
+        <footer className="border-t border-border px-4 py-3">
+          <CopyButton recording={recording} />
+        </footer>
       </div>
     </Modal>
   );

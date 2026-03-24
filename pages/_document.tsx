@@ -4,6 +4,7 @@ import Document, { Head, Html, Main, NextScript } from "next/document";
 import React from "react";
 
 import { setErrorHandler } from "protocol/utils";
+import { themeInitScript } from "shared/theme/replayTheme";
 import { isDevelopment } from "shared/utils/environment";
 import { getAuthHost } from "ui/utils/auth";
 
@@ -21,6 +22,7 @@ const cspHashOf = (text: string) => {
 };
 
 const isDev = process.env.NODE_ENV !== "production";
+const themeInitCspHash = cspHashOf(themeInitScript);
 const csp = (props: any) => {
   const hash = cspHashOf(NextScript.getInlineScriptSource(props));
   const authHost = getAuthHost();
@@ -34,7 +36,7 @@ const csp = (props: any) => {
     }`,
     `frame-src replay: https://js.stripe.com https://hooks.stripe.com https://${authHost} https://www.loom.com/`,
     // Required by some of our external services
-    `script-src 'self' 'unsafe-eval' https://cdn.lr-ingest.io https://cdn.lr-in.com https://js.stripe.com ${hash}`,
+    `script-src 'self' 'unsafe-eval' https://cdn.lr-ingest.io https://cdn.lr-in.com https://js.stripe.com ${hash} ${themeInitCspHash}`,
     `form-action https://${authHost}`,
 
     // From vercel's CSP config and Google fonts
@@ -58,14 +60,15 @@ const csp = (props: any) => {
 export default class MyDocument extends Document {
   render() {
     return (
-      <Html>
+      <Html suppressHydrationWarning>
         <Head>
           {/* nosemgrep typescript.react.security.audit.react-http-leak.react-http-leak */}
+          <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
           <meta httpEquiv="Content-Security-Policy" content={csp(this.props)} />
           <link rel="stylesheet" href="/recording/fonts/inter/inter.css" />
           <link rel="stylesheet" href="/recording/fonts/material_icons/material_icons.css" />
         </Head>
-        <body>
+        <body suppressHydrationWarning>
           <Main />
           <NextScript />
         </body>

@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import { motion } from "framer-motion";
 import React, { ReactNode } from "react";
 
@@ -9,6 +10,7 @@ export interface DropdownProps {
   expanded: boolean;
   position?: "top-right" | "bottom-right" | "top-left" | "bottom-left";
   buttonStyle?: string;
+  buttonClassName?: string;
   orientation?: "bottom" | "right" | void;
 }
 
@@ -25,12 +27,13 @@ export default function Dropdown({
   expanded,
   position = "bottom-left",
   buttonStyle = "primary",
+  buttonClassName,
   orientation = "bottom",
 }: DropdownProps) {
   return (
     <div className="dropdown-wrapper">
       <button
-        className={`expand-dropdown ${buttonStyle}`}
+        className={classNames("expand-dropdown", buttonStyle, buttonClassName)}
         onClick={() => setExpanded(true)}
         data-dropdown-state={expanded ? "open" : "closed"}
         data-test-id={`${dataTestId}-DropdownButton`}

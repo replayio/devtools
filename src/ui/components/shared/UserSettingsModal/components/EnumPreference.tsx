@@ -44,9 +44,9 @@ export function EnumPreference<Value>({
   }
 
   return (
-    <div className="flex flex-row justify-between">
-      <div>{label}</div>
-      <div className="w-2/3">
+    <div className="flex flex-row items-center justify-between gap-4 py-0.5">
+      <div className="text-sm text-foreground">{label}</div>
+      <div className="w-full max-w-xs shrink-0 sm:w-2/5">
         <SelectMenu
           options={options}
           selected={selected as string}

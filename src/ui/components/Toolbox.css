@@ -5,7 +5,7 @@
   display: flex;
   flex-direction: row;
   padding-right: 1px; /* Without this, the console message overlay buttons cover the splitbox splitter. */
-  --toolbox-bgcolor: #f9f9fa;
+  --toolbox-bgcolor: var(--chrome);
   --paused-background-color: var(--secondary-accent);
 }
 
@@ -22,7 +22,7 @@
   justify-content: space-between;
   border-top: 0px;
   background: var(--chrome);
-  border-right: 1px solid var(--chrome);
+  border-right: 1px solid var(--theme-splitter-color);
 }
 
 /* Split Console styles */
@@ -39,51 +39,4 @@
   min-height: 0;
 }
 
-/* Toolbar Styles */
-.toolbar-panel-button:first-child {
-  margin-top: 0;
-}
-
-.toolbar-panel-button {
-  display: flex;
-  cursor: default;
-  color: var(--theme-toolbar-color);
-  align-items: center;
-  border-radius: 4px;
-  cursor: pointer;
-  transition-duration: 200ms;
-  margin-top: 4px;
-}
-
-.toolbar-panel-button:hover {
-  background-color: var(--toolbarbutton-focus-bgcolor);
-}
-
-.toolbar-panel-icon {
-  width: 28px;
-  height: 28px;
-  mask-repeat: no-repeat;
-  mask-size: cover;
-  margin: 4px;
-  color: var(--theme-toolbar-panel-icon-color);
-}
-
-.toolbar-panel-button.active {
-  color: var(--theme-toolbar-selected-color);
-}
-
-.toolbar-panel-button.active .toolbar-panel-icon {
-  color: var(--primary-accent);
-}
-
-.toolbar-panel-badge {
-  position: absolute;
-  height: 0.5rem;
-  width: 0.5rem;
-  border-radius: 100%;
-  background-color: var(--secondary-accent);
-}
-
-.toolbar-panel-badge.dimmed {
-  opacity: 0.5;
-}
+/* Primary sidebar nav: styles live in Toolbar (Tailwind). */

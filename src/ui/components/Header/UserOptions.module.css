@@ -32,13 +32,13 @@
 }
 
 .HorizontalDivider {
-  border-top: 1px solid var(--theme-base-90);
+  border-top: 1px solid hsl(var(--border));
   margin: 0.5rem 0;
 }
 
 .VerticalDivider {
   height: 1em;
-  border-right: 1px solid var(--theme-base-90);
+  border-right: 1px solid hsl(var(--border));
   padding-right: 0.25rem;
   margin-right: 0.25rem;
 }

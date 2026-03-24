@@ -3,14 +3,18 @@
   flex-direction: column;
   flex: 1 1 auto;
   overflow: hidden;
-  margin-right: 10px;
+  margin-right: 8px;
 }
 
 .secondary-toolbox-header {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  align-items: stretch;
   background: var(--tab-bgcolor);
+  border-bottom: 1px solid var(--theme-splitter-color);
+  padding: 0 4px;
+  gap: 2px;
 }
 
 .secondary-toolbox-header .panel-buttons {
@@ -24,17 +28,20 @@
   position: relative;
   height: calc(var(--editor-header-height) - 1px);
   cursor: pointer;
-  transition: color 200ms;
+  transition: color 150ms ease, background-color 150ms ease, box-shadow 150ms ease;
   display: flex;
   flex: 0 0 auto;
   flex-direction: row;
-  align-items: flex-end;
+  align-items: center;
   overflow: hidden;
-  background-color: var(--tab-bgcolor);
+  background-color: transparent;
+  border-radius: var(--radius-md, 0.5rem) var(--radius-md, 0.5rem) 0 0;
 }
 
 .secondary-toolbox-header .panel-buttons button {
-  padding: 8px 12px;
+  padding: 8px 14px;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
 }
 
 .secondary-toolbox-header button > *:not(:last-child) {
@@ -59,9 +66,9 @@
 }
 
 .secondary-toolbox-header button.expanded {
-  background: inherit;
   background: var(--tab-selected-bgcolor);
   color: var(--tab-selected-color);
+  box-shadow: inset 0 -2px 0 0 var(--primary-accent);
 }
 
 .secondary-toolbox-header button:is(:hover, :focus-visible) {

@@ -46,14 +46,14 @@ export function BooleanPreference({
         }
       }}
     >
-      <div className="flex flex-row items-center gap-2">
+      <div className="flex flex-row items-center gap-2 pl-1">
         <Checkbox id={`BooleanPreference-${preferencesKey}`} checked={checked as boolean} />
-        <div>{label}</div>
+        <div className="text-sm text-foreground">{label}</div>
       </div>
 
       <div className="ml-6">
         {description ? (
-          <div className="mb-1 text-xs text-bodySubColor" style={{ gridColumnStart: "2" }}>
+          <div className="mb-1 text-xs text-muted-foreground" style={{ gridColumnStart: "2" }}>
             {description}
           </div>
         ) : null}

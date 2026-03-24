@@ -17,9 +17,11 @@ export const PREFERENCES: PreferencesKey[] = [
 
 export function Advanced() {
   return (
-    <div className="flex flex-col space-y-2 overflow-y-auto p-1">
+    <div className="flex min-h-0 flex-1 flex-col divide-y divide-border overflow-y-auto">
       {PREFERENCES.map(key => (
-        <BooleanPreference key={key} preference={config[key]} preferencesKey={key} />
+        <div key={key} className="py-3 first:pt-0 last:pb-0">
+          <BooleanPreference preference={config[key]} preferencesKey={key} />
+        </div>
       ))}
     </div>
   );

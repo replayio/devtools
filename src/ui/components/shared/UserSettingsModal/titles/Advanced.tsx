@@ -20,15 +20,15 @@ export function Advanced({ location }: { location: "body" | "navigation" }) {
       );
     case "navigation":
       return (
-        <>
-          Advanced
+        <span className="flex min-w-0 flex-1 items-center gap-1.5">
+          <span className="truncate">Advanced</span>
           <MaterialIcon
-            className={classNames("material-warning-icon", showWarningIcon || "invisible")}
-            iconSize="lg"
+            className={classNames("material-warning-icon shrink-0", showWarningIcon || "invisible")}
+            iconSize="base"
           >
             warning
           </MaterialIcon>
-        </>
+        </span>
       );
   }
 }

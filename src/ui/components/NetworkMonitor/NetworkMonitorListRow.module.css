@@ -33,10 +33,10 @@
 }
 .Row[data-selected],
 .Row[data-selected]:hover {
-  background: var(--primary-accent-dimmed);
-  color: var(--primary-accent-dimmed-foreground-text);
+  background: var(--theme-list-selection-background);
+  color: var(--body-color);
 
-  --status-color: var(--primary-accent-dimmed-foreground-text);
+  --status-color: var(--body-color);
 }
 
 /* These styles should stay in sync with NetworkMonitorListHeader */

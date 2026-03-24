@@ -1,8 +1,8 @@
 .ConsoleRoot {
   flex: 1 1 auto;
   overflow: hidden;
-  border-bottom-left-radius: 0.5rem;
-  border-bottom-right-radius: 0.5rem;
+  border-bottom-left-radius: var(--radius-lg, 0.625rem);
+  border-bottom-right-radius: var(--radius-lg, 0.625rem);
   background-color: var(--body-bgcolor);
   word-break: break-all;
   font-size: var(--font-size-regular);
@@ -28,6 +28,7 @@
   overflow: auto;
   height: 100%;
   border-top: 1px solid var(--theme-splitter-color);
+  background-color: var(--tab-bgcolor-alt-subtle);
 }
 
 .PanelResizeHandleContainer {
@@ -70,6 +71,7 @@
   display: flex;
   flex-direction: column;
   border-top: 1px solid var(--theme-splitter-color);
+  background-color: var(--body-bgcolor);
 }
 
 .ConsoleSearchRow {

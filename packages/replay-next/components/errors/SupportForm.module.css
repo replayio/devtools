@@ -19,8 +19,8 @@
 .TextArea:focus {
   box-shadow: none;
   outline-offset: 0;
-  outline: 1px solid var(--primary-accent);
-  border: 1px solid var(--primary-accent);
+  outline: 1px solid var(--focus-ring-input);
+  border: 1px solid var(--focus-ring-input);
 }
 .TextArea::placeholder {
   color: var(--color-dimmer);

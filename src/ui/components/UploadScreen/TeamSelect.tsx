@@ -15,7 +15,7 @@ const TeamSelectButton = ({
   selectedWorkspaceName: string | undefined;
 }) => {
   return (
-    <div className="relative w-full cursor-default rounded-md border border-inputBorder bg-jellyfishBgcolor py-1.5 pl-2.5 pr-8 text-left shadow-sm focus:border-primaryAccentHover focus:outline-none focus:ring-1 focus:ring-primaryAccent">
+    <div className="relative w-full cursor-default rounded-md border border-inputBorder bg-jellyfishBgcolor py-1.5 pl-2.5 pr-8 text-left shadow-sm focus:border-border focus:outline-none focus:ring-1 focus:ring-ring focus:ring-offset-0">
       <span className="block truncate">{selectedWorkspaceName}</span>
       <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-1.5">
         <SelectorIcon className="h-4 w-4 text-inputBorder" aria-hidden="true" />

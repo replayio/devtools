@@ -1,10 +1,40 @@
 .toolboxToolbarContainer {
   display: flex;
+  width: 72px;
+  flex-shrink: 0;
   flex-direction: column;
+  height: 100%;
+  background-color: hsl(var(--accent));
+  border-right: 1px solid hsl(var(--border));
 }
 
 .toolboxToolbar {
+  display: flex;
+  min-height: 0;
   flex: 1;
+  flex-direction: column;
+  align-items: stretch;
+  overflow-y: auto;
+}
+
+.logoLink {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  color: var(--primary-accent);
+  transition: opacity 0.15s ease;
+}
+
+.logoLink:hover {
+  opacity: 0.85;
+}
+
+.toolbarFooter {
+  flex-shrink: 0;
+  border-top: 1px solid hsl(var(--border) / 0.65);
 }
 
 .MaterialIcon {

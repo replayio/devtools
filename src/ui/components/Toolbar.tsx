@@ -2,13 +2,13 @@ import { default as classNames, default as classnames } from "classnames";
 import { JSX, useContext, useEffect, useState } from "react";
 
 import { getPauseId, getPausePreviewLocation } from "devtools/client/debugger/src/selectors";
-import Icon from "replay-next/components/Icon";
+import useTooltip from "replay-next/src/hooks/useTooltip";
 import { framesCache } from "replay-next/src/suspense/FrameCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { isGroupedTestCasesV1 } from "shared/test-suites/RecordingTestMetadata";
 import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
-import IconWithTooltip from "ui/components/shared/IconWithTooltip";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
+import ReplayLogo from "ui/components/shared/ReplayLogo";
 import hooks from "ui/hooks";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { getSelectedPrimaryPanel } from "ui/reducers/layout";
@@ -202,24 +202,10 @@ function PauseInfoIcon() {
   );
 }
 
-function ToolbarButtonTab({ active }: { active: boolean }) {
-  return (
-    <div
-      className={classnames("absolute left-0 h-2/3 w-1 bg-primaryAccent", {
-        invisible: !active,
-      })}
-      style={{
-        borderRadius: "0 2px 2px 0",
-        top: "50%",
-        transform: "translateY(-49%)",
-      }}
-    />
-  );
-}
-
 function ToolbarButton({
   icon,
   label,
+  navLabel,
   name,
   onClick,
   showBadge,
@@ -227,6 +213,8 @@ function ToolbarButton({
 }: {
   icon: string;
   label: string;
+  /** Short label shown under the icon (SideNav-style). */
+  navLabel: string;
   name: PrimaryPanelName;
   onClick: (name: PrimaryPanelName) => void;
   showBadge?: boolean;
@@ -289,37 +277,71 @@ function ToolbarButton({
       break;
   }
 
-  const imageIcon = (
-    <MaterialIcon className={classNames("toolbar-panel-icon", name, styles.MaterialIcon)}>
-      {iconContents}
-    </MaterialIcon>
+  const iconSlotClass = classNames(
+    "flex h-5 w-5 shrink-0 items-center justify-center text-current [&_svg]:h-5 [&_svg]:w-5 [&_svg]:max-h-5 [&_svg]:max-w-5",
+    styles.MaterialIcon
   );
 
+  const imageIcon =
+    typeof iconContents === "string" ? (
+      <MaterialIcon className={iconSlotClass} iconSize="base" outlined>
+        {iconContents}
+      </MaterialIcon>
+    ) : (
+      <MaterialIcon className={iconSlotClass}>{iconContents}</MaterialIcon>
+    );
+
+  const { onMouseEnter, onMouseLeave, tooltip } = useTooltip({
+    className: "replay-toolbar-tooltip",
+    delay: 120,
+    position: "right-of",
+    tooltip: label,
+  });
+
   return (
-    <div className="relative px-2">
-      <ToolbarButtonTab active={isActive} />
-      <div
-        className={classnames("toolbar-panel-button", name, {
-          active: isActive,
-        })}
+    <div className="relative w-full">
+      <button
+        type="button"
+        aria-label={label}
+        aria-pressed={isActive}
+        className={classnames(
+          "toolbar-panel-button",
+          name,
+          "group relative flex min-h-[3.5rem] w-full flex-col items-center justify-center gap-1 rounded-md px-1 py-1.5 text-sm font-medium transition-all duration-200",
+          "focus:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/30",
+          isActive
+            ? "border border-border bg-card text-rose-500 shadow-sm"
+            : "border border-transparent bg-transparent text-muted-foreground hover:text-foreground hover:shadow-md"
+        )}
+        data-test-name={`ToolbarButton-${label.replace(/ /g, "")}`}
+        onClick={() => onClick(name)}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
       >
-        <IconWithTooltip
-          icon={imageIcon}
-          content={label}
-          dataTestName={`ToolbarButton-${label.replace(/ /g, "")}`}
-          onClick={() => onClick(name)}
-        />
-      </div>
+        {imageIcon}
+        <span
+          className={classnames(
+            "max-w-full truncate px-0.5 text-center text-[11px] font-medium leading-none",
+            isActive ? "text-rose-500" : "text-current"
+          )}
+        >
+          {navLabel}
+        </span>
+      </button>
       {showBadge ? (
         <div
-          className={classnames("toolbar-panel-badge", { dimmed: showBadgeDimmed })}
+          className={classnames(
+            "pointer-events-none absolute z-[1] h-2 w-2 rounded-full",
+            "bg-[var(--primary-accent)] shadow-sm ring-2 ring-background",
+            showBadgeDimmed && "opacity-50"
+          )}
           style={{
-            // FE-1096 Aiming for pixel perfect badge alignment over icons with inconsistent shapes
-            right: name === "comments" ? ".7rem" : ".8em",
-            top: name === "debugger" ? ".5em" : "0.5em",
+            right: name === "comments" ? "0.35rem" : "0.45rem",
+            top: name === "debugger" ? "0.35rem" : "0.35rem",
           }}
         />
       ) : null}
+      {tooltip}
     </div>
   );
 }
@@ -367,6 +389,17 @@ export default function Toolbar() {
     setSidePanelCollapsed(!sidePanelCollapsed);
   };
 
+  const {
+    onMouseEnter: onCollapseEnter,
+    onMouseLeave: onCollapseLeave,
+    tooltip: collapseTooltip,
+  } = useTooltip({
+    className: "replay-toolbar-tooltip",
+    delay: 120,
+    position: "right-of",
+    tooltip: sidePanelCollapsed ? "Expand side panel" : "Collapse side panel",
+  });
+
   const handleButtonClick = (panelName: PrimaryPanelName) => {
     const samePanelSelected = selectedPrimaryPanel === panelName;
     const shouldTogglePanel = sidePanelCollapsed || samePanelSelected;
@@ -392,95 +425,122 @@ export default function Toolbar() {
 
   return (
     <div className={styles.toolboxToolbarContainer}>
-      <div className={styles.toolboxToolbar}>
-        {showTour ? (
-          <ToolbarButton icon="tour" name="tour" label="Replay Tour" onClick={handleButtonClick} />
-        ) : null}
-        {showPassport ? (
-          <ToolbarButton
-            icon="passport"
-            name="passport"
-            label="Replay Passport"
-            onClick={handleButtonClick}
-          />
-        ) : null}
-        {testRunner === "cypress" && (
-          <ToolbarButton
-            icon="cypress"
-            label="Cypress Panel"
-            name="cypress"
-            onClick={handleButtonClick}
-          />
-        )}
-        {testRunner === "playwright" && (
-          <ToolbarButton
-            icon="playwright"
-            label="Test Info"
-            name="cypress"
-            onClick={handleButtonClick}
-          />
-        )}
-        {testRunner !== "cypress" && (
-          <ToolbarButton
-            icon="info"
-            label="Replay Info"
-            name="events"
-            onClick={handleButtonClick}
-          />
-        )}
-        <ToolbarButton
-          icon="forum"
-          label="Comments"
-          name="comments"
-          showBadge={showCommentsBadge}
-          onClick={handleButtonClick}
-        />
-        {viewMode == "dev" ? (
-          <>
-            <ToolbarButton
-              icon="description"
-              name="explorer"
-              label="Source Explorer"
-              onClick={handleButtonClick}
-            />
-            <ToolbarButton icon="search" name="search" label="Search" onClick={handleButtonClick} />
-            <ToolbarButton
-              icon="motion_photos_paused"
-              name="debugger"
-              label="Pause Information"
-              showBadge={hasFrames || hasPausePreviewLocation}
-              showBadgeDimmed={hasPausePreviewLocation}
-              onClick={handleButtonClick}
-            />
-          </>
-        ) : null}
-        {protocolPanelExperimentEnabled ? (
-          <ToolbarButton
-            icon="protocol"
-            label="Protocol"
-            name="protocol"
-            onClick={handleButtonClick}
-          />
-        ) : null}
+      <a className={classnames(styles.logoLink, "my-2")} href="/" aria-label="Replay home">
+        <ReplayLogo color="fuschia" size="sm" />
+      </a>
 
-        <div className="flex-grow"></div>
+      <div className={styles.toolboxToolbar}>
+        <nav className="flex min-h-0 flex-1 flex-col items-stretch gap-1 overflow-y-auto px-2 pb-1">
+          {showTour ? (
+            <ToolbarButton
+              icon="tour"
+              label="Replay Tour"
+              name="tour"
+              navLabel="Tour"
+              onClick={handleButtonClick}
+            />
+          ) : null}
+          {showPassport ? (
+            <ToolbarButton
+              icon="passport"
+              label="Replay Passport"
+              name="passport"
+              navLabel="Passport"
+              onClick={handleButtonClick}
+            />
+          ) : null}
+          {testRunner === "cypress" && (
+            <ToolbarButton
+              icon="cypress"
+              label="Cypress Panel"
+              name="cypress"
+              navLabel="Cypress"
+              onClick={handleButtonClick}
+            />
+          )}
+          {testRunner === "playwright" && (
+            <ToolbarButton
+              icon="playwright"
+              label="Test Info"
+              name="cypress"
+              navLabel="Tests"
+              onClick={handleButtonClick}
+            />
+          )}
+          {testRunner !== "cypress" && (
+            <ToolbarButton
+              icon="info"
+              label="Replay Info"
+              name="events"
+              navLabel="Info"
+              onClick={handleButtonClick}
+            />
+          )}
+          <ToolbarButton
+            icon="forum"
+            label="Comments"
+            name="comments"
+            navLabel="Chat"
+            showBadge={showCommentsBadge}
+            onClick={handleButtonClick}
+          />
+          {viewMode == "dev" ? (
+            <>
+              <ToolbarButton
+                icon="description"
+                label="Source Explorer"
+                name="explorer"
+                navLabel="Source"
+                onClick={handleButtonClick}
+              />
+              <ToolbarButton
+                icon="search"
+                label="Search"
+                name="search"
+                navLabel="Search"
+                onClick={handleButtonClick}
+              />
+              <ToolbarButton
+                icon="motion_photos_paused"
+                label="Pause Information"
+                name="debugger"
+                navLabel="Pause"
+                showBadge={hasFrames || hasPausePreviewLocation}
+                showBadgeDimmed={hasPausePreviewLocation}
+                onClick={handleButtonClick}
+              />
+            </>
+          ) : null}
+          {protocolPanelExperimentEnabled ? (
+            <ToolbarButton
+              icon="protocol"
+              label="Protocol"
+              name="protocol"
+              navLabel="Protocol"
+              onClick={handleButtonClick}
+            />
+          ) : null}
+
+          <div className="min-h-0 flex-grow" aria-hidden />
+        </nav>
       </div>
 
-      <div className="relative px-2">
-        <div className="toolbar-panel-button">
-          <IconWithTooltip
-            icon={
-              <MaterialIcon
-                className="toolbar-panel-icon text-themeToolbarPanelIconColor"
-                iconSize="2xl"
-              >
-                {sidePanelCollapsed ? "keyboard_double_arrow_right" : "keyboard_double_arrow_left"}
-              </MaterialIcon>
-            }
-            content={sidePanelCollapsed ? "Expand side panel" : "Collapse side panel"}
-            dataTestName={`ToolbarButton-ExpandSidePanel`}
+      <div className={styles.toolbarFooter}>
+        <div className="flex justify-center px-2 py-3">
+          <button
+            type="button"
+            aria-label={sidePanelCollapsed ? "Expand side panel" : "Collapse side panel"}
+            className="flex h-10 w-10 items-center justify-center rounded-md text-muted-foreground transition-all duration-200 hover:bg-card hover:text-foreground hover:shadow-md focus:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/30"
+            data-test-name="ToolbarButton-ExpandSidePanel"
             onClick={togglePanel}
-          />
+            onMouseEnter={onCollapseEnter}
+            onMouseLeave={onCollapseLeave}
+          >
+            <MaterialIcon className={styles.MaterialIcon} iconSize="2xl" outlined>
+              {sidePanelCollapsed ? "keyboard_double_arrow_right" : "keyboard_double_arrow_left"}
+            </MaterialIcon>
+          </button>
+          {collapseTooltip}
         </div>
       </div>
     </div>
