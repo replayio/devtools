@@ -1,6 +1,12 @@
+import { REPLAY_THEME_STORAGE_KEY } from "shared/theme/replayTheme";
 import { ConsoleEventFilterPreferences, config } from "shared/user-data/GraphQL/config";
 import { LOCAL_STORAGE_KEY } from "shared/user-data/GraphQL/constants";
 import { PreferencesKey } from "shared/user-data/GraphQL/types";
+
+/** Align with dashboard `replay_theme` bootstrap so UserData does not call storeTheme/saveLocal for theme in tests. */
+function getReplayThemeFromMock(): string {
+  return "system";
+}
 
 describe("UserData", () => {
   let localStorageMock: {
@@ -65,9 +71,12 @@ describe("UserData", () => {
   it("should support URL overrides for boolean preferences", () => {
     localStorageMock.getItem.mockImplementation((key: string) => {
       switch (key) {
+        case REPLAY_THEME_STORAGE_KEY:
+          return getReplayThemeFromMock();
         case LOCAL_STORAGE_KEY:
           return JSON.stringify({
             layout_sidePanelCollapsed: false,
+            global_theme: "system",
           });
         default:
           return null;
@@ -88,9 +97,12 @@ describe("UserData", () => {
   it("should read/write values to localStorage", async () => {
     localStorageMock.getItem.mockImplementation((key: string) => {
       switch (key) {
+        case REPLAY_THEME_STORAGE_KEY:
+          return getReplayThemeFromMock();
         case LOCAL_STORAGE_KEY:
           return JSON.stringify({
             console_showFiltersByDefault: true,
+            global_theme: "system",
           });
         default:
           return null;
@@ -130,10 +142,13 @@ describe("UserData", () => {
   it("should read/write values to GraphQL for authenticated users", async () => {
     localStorageMock.getItem.mockImplementation((key: string) => {
       switch (key) {
+        case REPLAY_THEME_STORAGE_KEY:
+          return getReplayThemeFromMock();
         case LOCAL_STORAGE_KEY:
           return JSON.stringify({
             debugger_frameworkGroupingOn: false,
             console_showFiltersByDefault: true,
+            global_theme: "system",
           });
         default:
           return null;
@@ -243,6 +258,8 @@ describe("UserData", () => {
     it("should be migrated from useLocalStorage hook", () => {
       localStorageMock.getItem.mockImplementation((key: string) => {
         switch (key) {
+          case REPLAY_THEME_STORAGE_KEY:
+            return getReplayThemeFromMock();
           case config.layout_sidePanelCollapsed.legacyKey:
             return JSON.stringify(true);
           default:
@@ -258,6 +275,8 @@ describe("UserData", () => {
     it("should migrated from Mozilla preferences service", () => {
       localStorageMock.getItem.mockImplementation((key: string) => {
         switch (key) {
+          case REPLAY_THEME_STORAGE_KEY:
+            return getReplayThemeFromMock();
           case `Services.prefs:${config.protocol_repaintEvaluations.legacyKey}`:
             return JSON.stringify({
               hasUserValue: true,
@@ -276,6 +295,8 @@ describe("UserData", () => {
     it("should memoize parsed legacy values", () => {
       localStorageMock.getItem.mockImplementation((key: string) => {
         switch (key) {
+          case REPLAY_THEME_STORAGE_KEY:
+            return getReplayThemeFromMock();
           case config.console_eventFilters.legacyKey:
             return JSON.stringify({
               keyboard: true,
