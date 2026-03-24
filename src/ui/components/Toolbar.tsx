@@ -299,12 +299,15 @@ function ToolbarButton({
   });
 
   return (
-    <div className={classnames("relative w-full", name)}>
+    <div className="relative w-full">
       <button
         type="button"
         aria-label={label}
+        aria-pressed={isActive}
         className={classnames(
-          "toolbar-panel-button group relative flex min-h-[3.5rem] w-full flex-col items-center justify-center gap-1 rounded-md px-1 py-1.5 text-sm font-medium transition-all duration-200",
+          "toolbar-panel-button",
+          name,
+          "group relative flex min-h-[3.5rem] w-full flex-col items-center justify-center gap-1 rounded-md px-1 py-1.5 text-sm font-medium transition-all duration-200",
           "focus:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/30",
           isActive
             ? "border border-border bg-card text-rose-500 shadow-sm"
