@@ -22,47 +22,62 @@ export default function WelcomeBox() {
   };
 
   return (
-    <div className="flex h-full w-full flex-col items-center overflow-hidden">
-      <div className="relative flex h-full w-full justify-center px-8 pt-24">
-        <div className="relative flex h-full w-full flex-col items-center text-sm">
-          <div className="flex w-full flex-col space-y-1 text-menuColor">
-            <div
-              className="group flex flex-row space-x-4 hover:cursor-pointer hover:text-menuHoverColor"
+    <div className="flex h-full w-full flex-col items-center overflow-hidden bg-bodyBgcolor">
+      <div className="relative flex h-full w-full max-w-md justify-center px-6 pt-20 sm:px-8 sm:pt-28">
+        <div className="relative flex w-full flex-col items-stretch">
+          <p className="mb-4 text-center text-sm text-muted-foreground">Keyboard shortcuts</p>
+          <div className="rounded-xl border border-border/60 bg-card/80 p-1 shadow-sm backdrop-blur-sm">
+            <button
+              type="button"
+              className="group flex w-full cursor-pointer flex-row items-center justify-between gap-4 rounded-lg px-3 py-2.5 text-left text-sm text-foreground transition-colors hover:bg-accent"
               onClick={openCommandPalette}
             >
-              <div className="w-full truncate pt-1 text-right">Command palette</div>
-              <div className="flex w-full flex-row">
-                <img src="/recording/images/command.svg" /> <img src="/recording/images/k.svg" />
-              </div>
-            </div>
-            <div
-              className="group flex flex-row space-x-4 hover:cursor-pointer hover:text-menuHoverColor"
+              <span className="font-medium">Command palette</span>
+              <span className="flex shrink-0 flex-row items-center gap-0.5 opacity-80 group-hover:opacity-100">
+                <img alt="" src="/recording/images/command.svg" />{" "}
+                <img alt="" src="/recording/images/k.svg" />
+              </span>
+            </button>
+            <button
+              type="button"
+              className="group flex w-full cursor-pointer flex-row items-center justify-between gap-4 rounded-lg px-3 py-2.5 text-left text-sm text-foreground transition-colors hover:bg-accent"
               onClick={openQuickOpen}
             >
-              <div className="w-full pt-1 text-right">Go to file</div>
-              <div className="flex w-full flex-row">
-                <img src="/recording/images/command.svg" /> <img src="/recording/images/p.svg" />
-              </div>
-            </div>
-            <div
-              className="group flex flex-row space-x-4 hover:cursor-pointer hover:text-menuHoverColor"
+              <span className="font-medium">Go to file</span>
+              <span className="flex shrink-0 flex-row items-center gap-0.5 opacity-80 group-hover:opacity-100">
+                <img alt="" src="/recording/images/command.svg" />{" "}
+                <img alt="" src="/recording/images/p.svg" />
+              </span>
+            </button>
+            <button
+              type="button"
+              className="group flex w-full cursor-pointer flex-row items-center justify-between gap-4 rounded-lg px-3 py-2.5 text-left text-sm text-foreground transition-colors hover:bg-accent"
               onClick={openFullTextSearch}
             >
-              <div className="w-full pt-1 text-right">Find in file</div>
-              <div className="flex w-full flex-row">
-                <img src="/recording/images/command.svg" />{" "}
-                <img src="/recording/images/shift.svg" /> <img src="/recording/images/f.svg" />
-              </div>
-            </div>
+              <span className="font-medium">Find in file</span>
+              <span className="flex shrink-0 flex-row items-center gap-0.5 opacity-80 group-hover:opacity-100">
+                <img alt="" src="/recording/images/command.svg" />{" "}
+                <img alt="" src="/recording/images/shift.svg" />{" "}
+                <img alt="" src="/recording/images/f.svg" />
+              </span>
+            </button>
           </div>
-          <div className="absolute bottom-16 flex w-full flex-row">
-            <div className="left-0 w-full">
-              <a href="https://docs.replay.io" className="hover:underline">
+          <div className="absolute bottom-12 flex w-full flex-row text-sm text-muted-foreground">
+            <div className="w-full">
+              <a
+                href="https://docs.replay.io"
+                className="rounded-md px-1 py-0.5 transition-colors hover:bg-accent hover:text-accent-foreground"
+              >
                 Docs
               </a>
             </div>
-            <div className="text-right hover:underline">
-              <a href="https://replay.io/discord">Discord</a>
+            <div className="w-full text-right">
+              <a
+                href="https://replay.io/discord"
+                className="rounded-md px-1 py-0.5 transition-colors hover:bg-accent hover:text-accent-foreground"
+              >
+                Discord
+              </a>
             </div>
           </div>
         </div>

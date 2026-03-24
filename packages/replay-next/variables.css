@@ -45,11 +45,11 @@
   /* The photon animation curve */
   --animation-curve: cubic-bezier(0.07, 0.95, 0, 1);
 
-  --primary-accent: #01acfd;
-  --primary-accent-hover: #0194ff;
+  --primary-accent: #f43f5e;
+  --primary-accent-hover: #e11d48;
 
-  --secondary-accent: #d72451;
-  --secondary-accent-hover: #c61351;
+  --secondary-accent: #e11d48;
+  --secondary-accent-hover: #be123c;
   --secondary-accent-stroke: var(--secondary-accent);
 
   /* used in our codebase, to be refactored */
@@ -134,18 +134,18 @@
   --color-transparent: rgba(0, 0, 0, 0);
   --primary-accent-foreground-text: #fff;
 
-  --primary-accent-dimmed: #163e58;
-  --primary-accent-dimmed-hover: #12374f;
+  --primary-accent-dimmed: #3f1724;
+  --primary-accent-dimmed-hover: #4c1d2a;
   --primary-accent-dimmed-foreground-text: var(--body-color);
 
-  /* Color ramp (Dark) */
-  --theme-base-100: #000; /* background chrome */
-  --theme-base-95: var(--grey-90); /* tab bars */
-  --theme-base-90: var(--grey-70); /* editor and selected tab */
-  --theme-base-85: var(--grey-60); /* textfields */
-  --theme-base-80: #797d81;
-  --theme-base-70: #a2a6a8;
-  --theme-base-60: #c3c6c8;
+  /* Color ramp (Dark) — aligned with replay-dashboard surfaces */
+  --theme-base-100: #0a0a0a;
+  --theme-base-95: #141414;
+  --theme-base-90: #1a1a1a;
+  --theme-base-85: #262626;
+  --theme-base-80: #404040;
+  --theme-base-70: #737373;
+  --theme-base-60: #a3a3a3;
 
   /* Tabs (Dark) */
   --tab-bgcolor: var(--theme-base-100);
@@ -157,13 +157,15 @@
   --tab-standard-color: rgba(255, 255, 255, 0.5);
 
   /* Core classes (Dark) */
-  --body-bgcolor: var(--theme-base-95);
+  --body-bgcolor: #0e0e0e;
   --body-color: var(--color-default);
   --body-sub-color: var(--grey-40);
   --buttontext-color: #f4f8fa;
   --checkbox-border: var(--input-border);
   --checkbox: var(--theme-base-80);
-  --chrome: #081120; /* bg app */
+  /* Checkmark on checked box (stroke contrasts with --color-default fill) */
+  --checkbox-checked-mark-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230a0a0a' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
+  --chrome: #0e0e0e; /* bg app */
   --icon-color: var(--body-color);
   --modal-bgcolor: var(--theme-base-100);
   --modal-border: #222;
@@ -171,6 +173,8 @@
   --tab-bgcolor-alt-subtle: var(--theme-base-95); /* info, events */
   --tab-selected-bgcolor: var(--theme-base-95);
   --input-border: var(--theme-base-85);
+  /* Neutral focus for text/search fields (not brand primary) */
+  --focus-ring-input: var(--theme-base-70);
   --theme-border: var(--theme-base-100);
   --theme-focuser-bgcolor: var(--primary-accent);
   --theme-sidebar-background: var(--body-bgcolor);
@@ -553,11 +557,11 @@
   /* DevTools left nav (Dark) */
   --toolbarbutton-focus-bgcolor: var(--theme-base-95);
 
-  /* Toolbar (Dark) */
-  --theme-tab-toolbar-background: var(--grey-90);
-  --theme-toolbar-background-alt: var(--grey-85);
-  --theme-toolbar-background-hover: #232327;
-  --theme-toolbar-background: #18181a;
+  /* Toolbar (Dark) — lifted surfaces + visible splits (dashboard-style) */
+  --theme-tab-toolbar-background: var(--theme-base-95);
+  --theme-toolbar-background-alt: var(--theme-base-90);
+  --theme-toolbar-background-hover: var(--theme-base-90);
+  --theme-toolbar-background: var(--theme-base-95);
   --theme-toolbar-color: var(--body-color);
   --theme-toolbar-hover-active: #252526;
   --theme-toolbar-hover: #232327;
@@ -574,8 +578,8 @@
   --theme-button-background: rgba(249, 249, 250, 0.1);
 
   /* Accordion headers (Dark) */
-  --theme-accordion-header-background: #232327;
-  --theme-accordion-header-hover: #2a2a2e;
+  --theme-accordion-header-background: var(--theme-base-95);
+  --theme-accordion-header-hover: var(--theme-base-90);
 
   /* Selection (Dark) */
   --theme-selection-background-hover: #353b48;
@@ -586,9 +590,9 @@
   --theme-table-selection-background-hover: var(--theme-toolbar-background);
 
   /* Border color that splits the toolbars/panels/headers. (Dark) */
-  --theme-emphasized-splitter-color-hover: var(--grey-50);
-  --theme-emphasized-splitter-color: var(--grey-60);
-  --theme-splitter-color: black;
+  --theme-emphasized-splitter-color-hover: var(--theme-base-70);
+  --theme-emphasized-splitter-color: var(--theme-base-85);
+  --theme-splitter-color: #2e2e2e;
 
   /* Icon colors (Dark) */
   --theme-icon-checked-color: var(--blue-30);
@@ -666,13 +670,13 @@
   --focus-mode-capsule-bgcolor: var(--body-bgcolor);
   --focus-mode-loaded-indexed-color: var(--primary-accent);
   --focus-mode-loading-color: #00567f;
-  --focus-mode-popout-icon-background-color: white;
+  --focus-mode-popout-icon-background-color: #fafafa;
   --focus-mode-popout-icon-color: var(--theme-base-100);
-  --focus-mode-popout-text-input-background-color: var(--theme-base-100);
-  --focus-mode-popout-text-input-ring: var(--theme-base-90);
-  --focus-mode-popout-background-color: rgba(67, 71, 73, 0.6);
-  --focus-mode-popout-background-color-no-transparency: rgba(0, 0, 0, 1);
-  --focus-mode-popout-color: white;
+  --focus-mode-popout-text-input-background-color: #161616;
+  --focus-mode-popout-text-input-ring: var(--theme-base-85);
+  --focus-mode-popout-background-color: rgba(14, 14, 14, 0.72);
+  --focus-mode-popout-background-color-no-transparency: #161616;
+  --focus-mode-popout-color: #f2f2f2;
 
   /* Miscellaneous (Dark) */
   --jellyfish-bgcolor: rgba(40, 40, 40, 0.8); /* Tailwind class used in upload, sharing, team */
@@ -684,18 +688,18 @@
   --color-transparent: rgba(255, 255, 255, 0);
   --primary-accent-foreground-text: #fff;
 
-  --primary-accent-dimmed: #cceeff;
-  --primary-accent-dimmed-hover: #c5e9fa;
+  --primary-accent-dimmed: #ffe4e6;
+  --primary-accent-dimmed-hover: #fecdd3;
   --primary-accent-dimmed-foreground-text: var(--body-color);
 
-  /* Color ramp (Light) */
-  --theme-base-100: hsl(0, 0%, 100%);
-  --theme-base-95: var(--grey-10);
-  --theme-base-90: var(--grey-20);
-  --theme-base-85: var(--grey-30);
-  --theme-base-80: hsl(0, 0%, 80%);
-  --theme-base-70: hsl(0, 0%, 70%);
-  --theme-base-60: hsl(0, 0%, 60%);
+  /* Color ramp (Light) — replay-dashboard neutrals */
+  --theme-base-100: #ffffff;
+  --theme-base-95: #fafafa;
+  --theme-base-90: #f5f5f5;
+  --theme-base-85: #e5e5e5;
+  --theme-base-80: #d4d4d4;
+  --theme-base-70: #a3a3a3;
+  --theme-base-60: #737373;
 
   /* Tabs (Light) */
   --tab-bgcolor: var(--theme-base-90);
@@ -713,7 +717,8 @@
   --buttontext-color: #f4f8fa;
   --checkbox-border: var(--input-border);
   --checkbox: var(--theme-base-100);
-  --chrome: var(--theme-base-95); /* bg app */
+  --checkbox-checked-mark-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
+  --chrome: #fafafa; /* bg app */
   --icon-color: var(--body-color);
   --modal-bgcolor: rgba(255, 255, 255, 0.98);
   --modal-border: none;
@@ -721,7 +726,8 @@
   --tab-bgcolor-alt-subtle: var(--theme-base-100); /* info, events */
   --tab-selected-bgcolor: var(--theme-base-100); /* current tab */
   --input-border: var(--grey-20);
-  --theme-border: #d2d5da;
+  --focus-ring-input: var(--theme-base-60);
+  --theme-border: #e5e5e5;
   --theme-focuser-bgcolor: var(--primary-accent);
   --theme-sidebar-background: var(--theme-base-100);
   --theme-text-field-bgcolor-hover: var(--theme-base-95);
@@ -781,7 +787,7 @@
   --color-brand-react: #8c65d0;
   --color-contrast: var(--theme-base-100);
   --color-current: var(--secondary-accent);
-  --color-default: #223344;
+  --color-default: #0a0a0a;
   --color-dim: rgba(135, 135, 137, 0.9);
   --color-dimmer: #aaaaaa;
   --color-disabled-button: var(--color-default);
@@ -1110,11 +1116,11 @@
   /* DevTools left nav (Light) */
   --toolbarbutton-focus-bgcolor: var(--theme-base-90);
 
-  /* Toolbar */
-  --theme-tab-toolbar-background: var(--grey-20);
-  --theme-toolbar-background-alt: #f5f5f5;
-  --theme-toolbar-background-hover: rgba(221, 225, 228, 0.66);
-  --theme-toolbar-background: var(--grey-10);
+  /* Toolbar (Light) — softer chrome */
+  --theme-tab-toolbar-background: var(--theme-base-95);
+  --theme-toolbar-background-alt: var(--theme-base-90);
+  --theme-toolbar-background-hover: var(--theme-base-90);
+  --theme-toolbar-background: var(--theme-base-100);
   --theme-toolbar-color: var(--body-color);
   --theme-toolbar-hover-active: var(--grey-20);
   --theme-toolbar-hover: var(--theme-base-100);
@@ -1131,8 +1137,8 @@
   --theme-button-background: rgba(12, 12, 13, 0.05);
 
   /* Accordion headers (Light) */
-  --theme-accordion-header-background: var(--theme-toolbar-background);
-  --theme-accordion-header-hover: var(--theme-toolbar-hover);
+  --theme-accordion-header-background: var(--theme-base-95);
+  --theme-accordion-header-hover: var(--theme-base-90);
 
   /* Selection (Light) */
   --theme-selection-background-hover: #f0f9fe;
@@ -1143,9 +1149,9 @@
   --theme-table-selection-background-hover: var(--theme-toolbar-background);
 
   /* Border color that splits the toolbars/panels/headers. */
-  --theme-emphasized-splitter-color-hover: var(--grey-40);
-  --theme-emphasized-splitter-color: var(--grey-30);
-  --theme-splitter-color: #e0e0e2;
+  --theme-emphasized-splitter-color-hover: var(--theme-base-70);
+  --theme-emphasized-splitter-color: var(--theme-base-85);
+  --theme-splitter-color: var(--theme-base-85);
 
   /* Icon colors (Light) */
   --theme-icon-checked-color: var(--blue-60);

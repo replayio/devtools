@@ -1,4 +1,5 @@
 import { ENUMS, config } from "shared/user-data/GraphQL/config";
+import { ThemeSwitch } from "ui/components/shared/ThemeSwitch";
 import { BooleanPreference } from "ui/components/shared/UserSettingsModal/components/BooleanPreference";
 import { EnumPreference } from "ui/components/shared/UserSettingsModal/components/EnumPreference";
 import hooks from "ui/hooks";
@@ -15,38 +16,41 @@ const EMAIL_NOTIFICATIONS = {
 export function Preferences() {
   const { unsubscribedEmailTypes } = hooks.useGetUserInfo();
   return (
-    <div className="space-y-6 overflow-auto">
-      <div className="mr-4 space-y-4">
-        <div className="text-lg">Appearance</div>
-        <EnumPreference
-          preference={config.global_theme}
-          preferencesKey="global_theme"
-          values={ENUMS.theme}
-        />
-        <EnumPreference
-          preference={config.layout_defaultViewMode}
-          preferencesKey="layout_defaultViewMode"
-          values={ENUMS.defaultViewMode}
-        />
-        <BooleanPreference
-          preference={config.global_enableLargeText}
-          preferencesKey="global_enableLargeText"
-        />
-        <BooleanPreference
-          preference={config.feature_showPassport}
-          preferencesKey="feature_showPassport"
-        />
-        <BooleanPreference
-          preference={config.console_showFiltersByDefault}
-          preferencesKey="console_showFiltersByDefault"
-        />
+    <div className="flex min-h-0 flex-1 flex-col gap-0 overflow-auto pr-1">
+      <div className="pb-2">
+        <ThemeSwitch />
+      </div>
+
+      <div className="space-y-4 py-6">
+        <div className="text-sm font-medium text-foreground">Layout &amp; display</div>
+        <div className="space-y-4">
+          <EnumPreference
+            preference={config.layout_defaultViewMode}
+            preferencesKey="layout_defaultViewMode"
+            values={ENUMS.defaultViewMode}
+          />
+          <BooleanPreference
+            preference={config.global_enableLargeText}
+            preferencesKey="global_enableLargeText"
+          />
+          <BooleanPreference
+            preference={config.feature_showPassport}
+            preferencesKey="feature_showPassport"
+          />
+          <BooleanPreference
+            preference={config.console_showFiltersByDefault}
+            preferencesKey="console_showFiltersByDefault"
+          />
+        </div>
       </div>
 
       {unsubscribedEmailTypes ? (
-        <div className="space-y-4">
-          <div className="text-lg">Notifications</div>
-          <div>Choose which email updates you would like to receive:</div>
-          <div className="flex flex-col space-y-2 p-1">
+        <div className="space-y-4 border-t border-border pt-6">
+          <div className="text-sm font-medium text-foreground">Notifications</div>
+          <p className="text-sm text-muted-foreground">
+            Choose which email updates you would like to receive:
+          </p>
+          <div className="flex flex-col gap-3">
             {Object.entries(EMAIL_NOTIFICATIONS).map(([emailType, content]: string[], i) => (
               <EmailNotification
                 emailType={emailType as EmailSubscription}
@@ -85,12 +89,12 @@ function EmailNotification({
 
   return (
     <label
-      className="grid cursor-pointer items-center transition-opacity"
-      style={{ gridTemplateColumns: "auto minmax(0, 1fr)", gap: "0 0.5rem" }}
+      className="grid cursor-pointer items-start gap-x-2 transition-opacity"
+      style={{ gridTemplateColumns: "auto minmax(0, 1fr)" }}
       htmlFor={emailType}
     >
       <Checkbox id={emailType} checked={checked} onChange={onChange} />
-      <div>{label}</div>
+      <div className="text-sm text-foreground">{label}</div>
     </label>
   );
 }

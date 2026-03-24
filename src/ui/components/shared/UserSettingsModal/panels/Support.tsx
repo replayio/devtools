@@ -3,26 +3,34 @@ import { SettingsBodyHeader } from "ui/components/shared/SettingsModal/SettingsB
 
 export function Support() {
   return (
-    <ul>
-      <li className="flex flex-row items-center">
-        <label className="flex-grow space-y-1.5 pr-36">
-          <SettingsBodyHeader>Join us on Discord</SettingsBodyHeader>
-          <div className="description">
-            Come chat with us on our{" "}
-            <ExternalLink href="https://discord.gg/n2dTK6kcRX">Discord server.</ExternalLink>
-          </div>
-        </label>
-      </li>
-      <li className="flex flex-row items-center">
-        <label className="flex-grow space-y-1.5 pr-36">
-          <SettingsBodyHeader>Send us an email</SettingsBodyHeader>
-          <div className="description">
-            You can also send an email at <a href="mailto:support@replay.io">support@replay.io</a>.
-            It goes straight to the people making the product, and we&apos;d love to hear your
-            feedback!
-          </div>
-        </label>
-      </li>
-    </ul>
+    <div className="flex flex-col divide-y divide-border">
+      <section className="pb-6 pr-2 sm:pr-8">
+        <SettingsBodyHeader>Join us on Discord</SettingsBodyHeader>
+        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+          Come chat with us on our{" "}
+          <ExternalLink
+            className="font-medium text-foreground underline-offset-4 hover:underline"
+            href="https://discord.gg/n2dTK6kcRX"
+          >
+            Discord server
+          </ExternalLink>
+          .
+        </p>
+      </section>
+      <section className="py-6 pr-2 sm:pr-8">
+        <SettingsBodyHeader>Send us an email</SettingsBodyHeader>
+        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+          You can also send an email at{" "}
+          <a
+            className="font-medium text-foreground underline-offset-4 hover:underline"
+            href="mailto:support@replay.io"
+          >
+            support@replay.io
+          </a>
+          . It goes straight to the people making the product, and we&apos;d love to hear your
+          feedback!
+        </p>
+      </section>
+    </div>
   );
 }

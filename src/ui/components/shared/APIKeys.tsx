@@ -25,18 +25,18 @@ function NewApiKey({ keyValue, onDone }: { keyValue: string; onDone: () => void 
     <>
       <div className="flex items-center justify-between space-x-3">
         <div className="w-0 flex-auto">
-          <div className="flex h-9 w-full items-center rounded-md border border-inputBorder bg-themeTextFieldBgcolor px-2.5 text-themeTextFieldColor text-primaryAccent">
+          <div className="flex h-9 w-full items-center rounded-md border border-border bg-muted/40 px-2.5 text-sm text-foreground">
             <input
               readOnly
               value={keyValue}
-              className="flex-auto truncate bg-themeTextFieldBgcolor focus:outline-none"
+              className="flex-auto truncate bg-transparent focus:outline-none"
               onFocus={ev => ev.target.setSelectionRange(0, keyValue.length)}
             />
             {copied ? (
-              <div className="text-primaryAccent">Copied</div>
+              <div className="text-sm font-medium text-primaryAccent">Copied</div>
             ) : (
               <MaterialIcon
-                className="material-icons w-5 cursor-pointer text-primaryAccent hover:text-primaryAccentHover"
+                className="material-icons h-5 w-5 shrink-0 cursor-pointer text-muted-foreground hover:text-foreground"
                 iconSize="lg"
                 onClick={() => navigator.clipboard.writeText(keyValue!).then(() => setCopied(true))}
               >
@@ -45,14 +45,11 @@ function NewApiKey({ keyValue, onDone }: { keyValue: string; onDone: () => void 
             )}
           </div>
         </div>
-        <button
-          className="inline-flex h-9 items-center rounded-md border border-transparent bg-primaryAccent px-2.5 py-1.5 font-medium leading-4 text-buttontextColor shadow-sm hover:bg-primaryAccentHover focus:bg-primaryAccentHover focus:outline-none"
-          onClick={onDone}
-        >
+        <Button variant="solid" onClick={onDone}>
           Done
-        </button>
+        </Button>
       </div>
-      <div className="flex items-center rounded-md border border-inputBorder bg-red-100 p-2.5 text-red-800">
+      <div className="rounded-md border border-destructive/25 bg-destructive/10 p-3 text-sm text-destructive">
         Make sure to copy your API key now. You won{"'"}t be able to see it again!
       </div>
     </>
@@ -66,22 +63,26 @@ function ApiKeyList({ apiKeys, onDelete }: { apiKeys: ApiKey[]; onDelete: (id: s
   }
 
   return (
-    <section className="flex flex-auto flex-col">
-      <h3 className="text-base font-semibold uppercase">API Keys</h3>
-      <div className="h-0 flex-auto overflow-auto">
+    <section className="flex flex-auto flex-col gap-3">
+      <h3 className="text-sm font-medium text-foreground">Your API keys</h3>
+      <div className="h-0 flex-auto divide-y divide-border overflow-auto rounded-md border border-border">
         {apiKeys.map(apiKey => {
           const usage =
             typeof apiKey.maxRecordings === "number"
               ? `(${apiKey.recordingCount} / ${apiKey.maxRecordings} recordings)`
               : `(${apiKey.recordingCount} recordings)`;
           return (
-            <div className="flex flex-row items-center py-1.5 pr-4" key={apiKey.id}>
-              <span className="flex-auto">
+            <div
+              className="flex flex-row items-center gap-3 py-3 pl-3 pr-2 first:pt-3 last:pb-3"
+              key={apiKey.id}
+            >
+              <span className="min-w-0 flex-auto text-sm text-foreground">
                 {apiKey.label}
-                <span className="ml-2 text-bodySubColor">{usage}</span>
+                <span className="ml-2 text-muted-foreground">{usage}</span>
               </span>
               <button
-                className="inline-flex items-center rounded-md bg-gray-100 p-2.5 text-sm leading-4 text-red-500 shadow-sm hover:text-red-700 focus:text-red-700 focus:outline-none"
+                type="button"
+                className="inline-flex shrink-0 items-center rounded-md px-2.5 py-1.5 text-sm font-medium text-destructive transition-colors hover:bg-destructive/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 onClick={() => {
                   confirmDestructive({
                     message: "Delete API key?",
@@ -142,20 +143,20 @@ export default function APIKeys({
   }, [keyValue]);
 
   return (
-    <div className="flex h-0 flex-auto flex-col space-y-8">
-      <label className="setting-item">
-        <div className="description">{description}</div>
-      </label>
+    <div className="flex h-0 flex-auto flex-col gap-8">
+      <p className="text-sm leading-relaxed text-muted-foreground">{description}</p>
       {error ? (
-        <div>Unable to add an API key at this time. Please try again later.</div>
+        <p className="text-sm text-destructive">
+          Unable to add an API key at this time. Please try again later.
+        </p>
       ) : keyValue ? (
         <NewApiKey keyValue={keyValue} onDone={() => setKeyValue(undefined)} />
       ) : (
         <>
-          <section className="space-y-2.5 text-sm">
-            <h3 className="text-xs font-semibold uppercase">Create new API Key</h3>
+          <section className="space-y-3 text-sm">
+            <h3 className="text-base font-semibold text-foreground">Create API key</h3>
             <form
-              className="space-y-3"
+              className="space-y-4"
               onSubmit={ev => {
                 canSubmit &&
                   addKey(label, selectedScopes).then(resp => {
@@ -167,41 +168,46 @@ export default function APIKeys({
                 ev.preventDefault();
               }}
             >
-              <fieldset className="flex w-full flex-row space-x-1.5">
-                <TextInput
-                  disabled={loading}
-                  placeholder="API Key Label"
-                  onChange={e => setLabel((e.target as HTMLInputElement).value)}
-                  ref={labelRef}
-                  value={label}
-                />
-
-                <Button disabled={!canSubmit}>Add</Button>
+              <fieldset className="flex w-full flex-col gap-2 sm:flex-row sm:items-center sm:gap-2">
+                <div className="min-w-0 flex-1">
+                  <TextInput
+                    disabled={loading}
+                    placeholder="API key label"
+                    onChange={e => setLabel((e.target as HTMLInputElement).value)}
+                    ref={labelRef}
+                    value={label}
+                  />
+                </div>
+                <Button className="h-9 shrink-0" disabled={!canSubmit} variant="solid">
+                  Add
+                </Button>
               </fieldset>
               {scopes && scopes.length > 1 ? (
-                <fieldset className="w-full">
-                  <h4 className="text-sm font-semibold uppercase">Permissions</h4>
-                  {scopes.map(scope => (
-                    <label key={scope} className="mx-1.5 inline-block space-x-1.5">
-                      <input
-                        type="checkbox"
-                        className="border-inputBorder"
-                        onChange={e =>
-                          selectScopes(current => {
-                            if ((e.target as HTMLInputElement).checked) {
-                              return [...current, scope];
-                            } else {
-                              return current.filter(s => s !== scope);
-                            }
-                          })
-                        }
-                        checked={selectedScopes.includes(scope)}
-                      />
-                      <span>{scopeLabels[scope]}</span>
-                    </label>
-                  ))}
+                <fieldset className="w-full space-y-2">
+                  <h4 className="text-sm font-medium text-foreground">Permissions</h4>
+                  <div className="flex flex-wrap gap-x-4 gap-y-2">
+                    {scopes.map(scope => (
+                      <label key={scope} className="inline-flex cursor-pointer items-center gap-2">
+                        <input
+                          type="checkbox"
+                          className="rounded border-border"
+                          onChange={e =>
+                            selectScopes(current => {
+                              if ((e.target as HTMLInputElement).checked) {
+                                return [...current, scope];
+                              } else {
+                                return current.filter(s => s !== scope);
+                              }
+                            })
+                          }
+                          checked={selectedScopes.includes(scope)}
+                        />
+                        <span className="text-sm text-foreground">{scopeLabels[scope]}</span>
+                      </label>
+                    ))}
+                  </div>
                   {selectedScopes.length === 0 ? (
-                    <div className="mt-2.5 flex items-center rounded-md border border-inputBorder bg-red-100 p-2.5">
+                    <div className="rounded-md border border-destructive/25 bg-destructive/10 p-2.5 text-sm text-destructive">
                       At least one permission must be selected.
                     </div>
                   ) : null}

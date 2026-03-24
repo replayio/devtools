@@ -308,7 +308,11 @@ input[type="checkbox"] {
 
 input[type="checkbox"]:checked,
 input[type="checkbox"]:checked:hover {
-  background-color: var(--primary-accent);
+  background-color: var(--color-default);
+  background-image: var(--checkbox-checked-mark-image);
+  background-size: 0.75rem;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 input[type="checkbox"] {
   border-radius: 0.25rem;

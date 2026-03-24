@@ -1,7 +1,11 @@
 import { PropsWithChildren, useEffect } from "react";
 
 import Spinner from "replay-next/components/Spinner";
-import { getSystemColorScheme } from "shared/theme/getSystemColorScheme";
+import {
+  REPLAY_THEME_STORAGE_KEY,
+  applyThemeToDOM,
+  getEffectiveTheme,
+} from "shared/theme/replayTheme";
 import { Theme } from "shared/theme/types";
 import { userData } from "shared/user-data/GraphQL/UserData";
 import { isTest } from "shared/utils/environment";
@@ -53,16 +57,38 @@ export default function App({ children }: PropsWithChildren) {
   }, []);
 
   useEffect(() => {
-    const updateTheme = (theme: Theme) => {
-      if (theme === "system") {
-        theme = getSystemColorScheme();
-      }
-      document.body.parentElement!.className = `theme-${theme}`;
+    const updateTheme = (preference: Theme) => {
+      applyThemeToDOM(getEffectiveTheme(preference));
     };
 
     updateTheme(userData.get("global_theme"));
 
-    userData.subscribe("global_theme", updateTheme);
+    const unsub = userData.subscribe("global_theme", updateTheme);
+
+    const onStorage = (e: StorageEvent) => {
+      if (e.storageArea !== localStorage || e.key !== REPLAY_THEME_STORAGE_KEY) {
+        return;
+      }
+      const v = e.newValue;
+      if (v === "light" || v === "dark" || v === "system") {
+        void userData.set("global_theme", v);
+      }
+    };
+    window.addEventListener("storage", onStorage);
+
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    const onOsThemeChange = () => {
+      if (userData.get("global_theme") === "system") {
+        applyThemeToDOM(getEffectiveTheme("system"));
+      }
+    };
+    mq.addEventListener("change", onOsThemeChange);
+
+    return () => {
+      unsub();
+      window.removeEventListener("storage", onStorage);
+      mq.removeEventListener("change", onOsThemeChange);
+    };
   }, []);
 
   if (userInfo.loading) {

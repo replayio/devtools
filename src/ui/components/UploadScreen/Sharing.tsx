@@ -55,7 +55,7 @@ export default function EditableSettings({
         <div
           className={classNames(
             publicDisabled ? "opacity-60" : undefined,
-            "flex w-full cursor-default select-none flex-row items-center justify-between space-x-2 rounded-md border border-inputBorder bg-jellyfishBgcolor px-2.5 py-1.5 text-left shadow-sm focus:border-primaryAccentHover focus:outline-none focus:ring-1 focus:ring-primaryAccent"
+            "flex w-full cursor-default select-none flex-row items-center justify-between space-x-2 rounded-md border border-inputBorder bg-jellyfishBgcolor px-2.5 py-1.5 text-left shadow-sm focus:border-border focus:outline-none focus:ring-1 focus:ring-ring focus:ring-offset-0"
           )}
           onClick={() => !publicDisabled && setIsPublic(!isPublic)}
         >

@@ -22,7 +22,7 @@ body {
   --faint-red: rgba(255, 0, 0, 0.5);
   --light-blue: #61cdff;
   --light-grey: #969696;
-  font-family: "Inter", sans-serif;
+  font-family: Inter, system-ui, sans-serif;
 }
 
 #__next,
@@ -35,10 +35,13 @@ body {
   position: relative;
   width: 100%;
   background: var(--chrome);
+  transition-property: background-color, color;
+  transition-duration: 150ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .inter {
-  font-family: "Inter", sans-serif;
+  font-family: Inter, system-ui, sans-serif;
 }
 
 img.avatar,

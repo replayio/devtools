@@ -8,13 +8,11 @@ export default React.forwardRef<
   Omit<React.HTMLProps<HTMLInputElement>, "type" | "className"> & {
     textSize?: "base" | "lg" | "2xl";
     center?: boolean;
-    theme?: "light" | "dark";
     className?: string;
   }
 >(function TextInput(props, ref) {
-  const { textSize, center, theme, className, ...otherProps } = props;
+  const { textSize, center, className, ...otherProps } = props;
 
-  const themeClass = theme || "system";
   let textSizeClass = "text-sm";
 
   // Explicitly map textSize prop to Tailwind classes
@@ -31,7 +29,6 @@ export default React.forwardRef<
   }
 
   const inputClass = classNames(
-    styles[themeClass],
     styles.textInput,
     textSizeClass,
     center ? styles.textCenter : "",

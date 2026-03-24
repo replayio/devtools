@@ -25,15 +25,24 @@ function SettingNavigationItem<T extends string, P extends Record<string, unknow
   setSelectedTab,
 }: SettingNavigationItemProps<T, P>) {
   const { icon, title, titleComponent: TitleComponent } = setting;
-
-  const onClick = () => {
-    setSelectedTab(title);
-  };
+  const selected = title === selectedTab;
 
   return (
-    <li onClick={onClick} className={classnames({ selected: title === selectedTab })}>
-      <MaterialIcon iconSize="lg">{icon}</MaterialIcon>
-      {TitleComponent ? <TitleComponent location="navigation" /> : title}
+    <li className="settings-modal-nav-item">
+      <button
+        type="button"
+        onClick={() => setSelectedTab(title)}
+        className={classnames("settings-modal-nav-button", { "is-selected": selected })}
+      >
+        <MaterialIcon iconSize="base" outlined className="settings-modal-nav-icon">
+          {icon}
+        </MaterialIcon>
+        {TitleComponent ? (
+          <TitleComponent location="navigation" />
+        ) : (
+          <span className="min-w-0 flex-1 truncate text-left">{title}</span>
+        )}
+      </button>
     </li>
   );
 }
@@ -46,9 +55,9 @@ export default function SettingNavigation<T extends string, P extends Record<str
   title = "Settings",
 }: SettingNavigationProps<T, P>) {
   return (
-    <nav style={{ maxWidth: 240 }}>
-      <SettingsHeader>{title}</SettingsHeader>
-      <ul>
+    <nav className="settings-modal-nav">
+      <SettingsHeader className="text-lg">{title}</SettingsHeader>
+      <ul className="settings-modal-nav-list">
         {settings
           .filter(setting => !hiddenTabs || !hiddenTabs.includes(setting.title))
           .map((setting, index) => (

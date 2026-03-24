@@ -9,15 +9,40 @@
 
 .settings-modal .modal-container .modal-content {
   height: 520px;
-  width: 780px;
-  padding: 0px;
+  width: 800px;
+  max-width: calc(100vw - 2rem);
+  padding: 0;
   min-width: auto;
   display: flex;
   flex-direction: row;
+  align-items: stretch;
   justify-content: stretch;
-  min-height: auto;
+  min-height: 0;
+  border-radius: 12px;
+  background: hsl(var(--card));
+  color: hsl(var(--card-foreground));
+  border: 1px solid hsl(var(--border));
+  box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+}
+
+.theme-light .settings-modal .modal-container .modal-content {
+  box-shadow: 0 25px 50px -12px rgb(15 23 42 / 0.12);
 }
 
 .settings-modal.settings-modal-large .modal-container .modal-content {
   height: 600px;
+}
+
+.settings-modal .modal-close {
+  top: 1rem;
+  right: 1rem;
+  z-index: 1;
+  border-radius: 6px;
+  color: hsl(var(--muted-foreground));
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.settings-modal .modal-close:hover {
+  background-color: hsl(var(--accent));
+  color: hsl(var(--accent-foreground));
 }

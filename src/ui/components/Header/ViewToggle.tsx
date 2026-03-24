@@ -63,7 +63,8 @@ export default function ViewToggle() {
         <div
           className="handle"
           style={{
-            left: `${(MODES.findIndex(({ mode }) => mode === viewMode) / MODES.length) * 100}%`,
+            left:
+              MODES.findIndex(({ mode }) => mode === viewMode) === 0 ? "3px" : "calc(50% + 1.5px)",
           }}
         ></div>
         {MODES.map(({ mode, label }) => (

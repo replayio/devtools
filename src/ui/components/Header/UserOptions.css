@@ -5,7 +5,9 @@
 
 .user-options button.expand-dropdown {
   background: none;
-  padding: 0px 4px;
+  border: none;
+  width: auto;
+  min-width: 0;
 }
 
 .user-options button.expand-dropdown .img {
@@ -13,9 +15,17 @@
 }
 
 .user-options .dropdown-container .content {
-  width: 240px;
+  min-width: 220px;
+  width: max-content;
+  max-width: min(320px, 100vw - 2rem);
   right: -8px;
-  font-size: 15px;
+  padding: 0.5rem 0;
+  font-size: 0.875rem;
+  border-radius: var(--radius-lg, 0.625rem);
+  border: 1px solid hsl(var(--border));
+  background-color: hsl(var(--card));
+  color: hsl(var(--card-foreground));
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 }
 
 .user-options .dropdown-container .content button {
@@ -53,12 +63,25 @@
 }
 
 .user-options .row.logout {
-  padding: 8px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 0;
+  width: 100%;
+  justify-content: flex-start;
+  gap: 0.625rem;
+  padding: 0.5rem;
+  border-radius: 0;
+  border: none;
+  background: transparent;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: hsl(var(--foreground));
 }
 
-.user-options .row.logout button {
-  display: flex;
-  align-items: center;
+.user-options .row.logout:hover {
+  background-color: hsl(var(--accent));
+  color: hsl(var(--accent-foreground));
 }
 
 .user-options a.logout {
@@ -67,11 +90,25 @@
   height: 24px;
 }
 
-.user-options .dropdown-wrapper button {
+.user-options .dropdown-wrapper button.row {
   width: 100%;
-  color: var(--theme-icon-color);
+  color: inherit;
   background: transparent;
-  line-height: 16px;
+  line-height: 1.25;
+}
+
+.user-options .dropdown-container .inactive-row {
+  padding: 0.75rem 1rem;
+  user-select: none;
+}
+
+.user-options .dropdown-container .row.group {
+  border-radius: 0;
+}
+
+.user-options .dropdown-container .row.group:hover {
+  background-color: hsl(var(--accent));
+  color: hsl(var(--accent-foreground));
 }
 
 .dropdown-container .content {

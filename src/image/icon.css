@@ -33,6 +33,10 @@ but without a background color so we can use hover effects
   -webkit-mask-image: url(/recording/icons/settings.svg);
 }
 
+.icon.logout {
+  -webkit-mask-image: url(/recording/icons/logout.svg);
+}
+
 .icon.replay-logo {
   -webkit-mask-image: url(/recording/icons/replay-logo.svg);
 }

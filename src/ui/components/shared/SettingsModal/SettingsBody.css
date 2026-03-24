@@ -1,14 +1,13 @@
 .settings-modal main > :not(:first-child) {
-  margin-top: 32px;
+  margin-top: 1.5rem;
 }
 
 .settings-modal main ul {
   list-style-type: none;
-  /* overflow: auto; */
 }
 
 .settings-modal main > ul > :not(:first-child) {
-  margin-top: 32px;
+  margin-top: 0;
 }
 
 /* Refresh Prompt */
@@ -32,6 +31,10 @@
 
 /* Support */
 
-.settings-modal a {
-  color: var(--primary-accent);
+.settings-modal main a {
+  color: inherit;
+}
+
+.settings-modal main a:hover {
+  color: hsl(var(--foreground));
 }

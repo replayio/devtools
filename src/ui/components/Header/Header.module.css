@@ -1,11 +1,15 @@
 .Header {
-  background-color: var(--chrome);
+  background-color: hsl(var(--card));
+  border-bottom: 1px solid hsl(var(--border) / 0.5);
   height: 50px;
   display: flex;
   align-items: center;
   flex-shrink: 0;
-  padding: 0 8px;
+  padding: 0 12px;
   justify-content: space-between;
+  transition-property: background-color, border-color;
+  transition-duration: 150ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .Links {
@@ -27,13 +31,15 @@
 .ReadOnlyTitle {
   flex: 0 1 auto;
   margin: 0 0.25em;
-  padding: 0.25em;
+  padding: 0.25em 0.375em;
   border: 2px solid transparent;
-  border-radius: 0.25em;
+  border-radius: var(--radius-md);
 
-  font-family: Inter, sans-serif;
-  font-size: 18px;
-  line-height: 22px;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 1.125rem;
+  font-weight: 500;
+  line-height: 1.5rem;
+  color: hsl(var(--foreground));
 
   overflow: hidden;
   text-overflow: ellipsis;
@@ -44,11 +50,11 @@
   cursor: pointer;
 }
 .EditableTitle:hover {
-  background-color: var(--title-hover-bgcolor);
+  background-color: hsl(var(--accent));
 }
 .EditableTitle:focus {
   outline: none;
-  border-color: var(--primary-accent);
+  border-color: hsl(var(--ring));
 }
 
 .BackButton {
@@ -69,14 +75,18 @@
   flex-direction: row;
   align-items: center;
   gap: 1ch;
-  font-size: var(--font-size-regular);
-  background-color: var(--body-bgcolor);
-  border-radius: 1rem;
+  font-size: 0.9375rem;
+  line-height: 1.375rem;
+  color: hsl(var(--muted-foreground));
+  background-color: hsl(var(--muted));
+  border: 1px solid hsl(var(--border) / 0.6);
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  padding: 0.25rem 0.5rem;
+  padding: 0.25rem 0.625rem;
   cursor: pointer;
 }
 
 .VisibilityIconAndText:hover {
-  background-color: var(--title-hover-bgcolor);
+  background-color: hsl(var(--accent));
+  color: hsl(var(--accent-foreground));
 }

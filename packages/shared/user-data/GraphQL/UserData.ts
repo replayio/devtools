@@ -7,6 +7,12 @@ import {
   UpdateUserPreferences,
   UpdateUserPreferencesVariables,
 } from "shared/graphql/generated/UpdateUserPreferences";
+import {
+  REPLAY_THEME_STORAGE_KEY,
+  readLocalStorageTheme,
+  storeTheme,
+} from "shared/theme/replayTheme";
+import type { Theme } from "shared/theme/types";
 import { config } from "shared/user-data/GraphQL/config";
 import { LOCAL_STORAGE_KEY } from "shared/user-data/GraphQL/constants";
 import { GET_USER_PREFERENCES, UPDATE_USER_PREFERENCES } from "shared/user-data/GraphQL/queries";
@@ -50,9 +56,31 @@ class UserData implements GraphQLService {
     this.subscriberMap = new Map();
 
     try {
-      const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
-      if (raw !== null) {
-        this.cachedUserPreferences = JSON.parse(raw) as any;
+      if (typeof localStorage !== "undefined") {
+        const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
+        if (raw !== null) {
+          this.cachedUserPreferences = JSON.parse(raw) as any;
+        }
+      }
+    } catch (error) {}
+
+    try {
+      const dash = readLocalStorageTheme();
+      if (dash !== null) {
+        const prev = this.cachedUserPreferences.global_theme;
+        this.cachedUserPreferences = { ...this.cachedUserPreferences, global_theme: dash };
+        if (prev !== dash) {
+          this.saveLocal(this.cachedUserPreferences);
+        }
+      } else {
+        const ud: Theme =
+          this.cachedUserPreferences.global_theme ?? config.global_theme.defaultValue;
+        if (
+          typeof localStorage !== "undefined" &&
+          localStorage.getItem(REPLAY_THEME_STORAGE_KEY) === null
+        ) {
+          storeTheme(ud);
+        }
       }
     } catch (error) {}
 
@@ -109,6 +137,15 @@ class UserData implements GraphQLService {
         }
       }
     }
+
+    try {
+      const dash = readLocalStorageTheme();
+      if (dash !== null && this.cachedUserPreferences.global_theme !== dash) {
+        this.cachedUserPreferences = { ...this.cachedUserPreferences, global_theme: dash };
+        this.saveLocal(this.cachedUserPreferences);
+        this.notifySubscribers("global_theme", dash);
+      }
+    } catch (error) {}
 
     this.initialized = true;
   }
@@ -191,6 +228,10 @@ class UserData implements GraphQLService {
 
     if (equal(value, this.get(key))) {
       return;
+    }
+
+    if (key === "global_theme") {
+      storeTheme(value as Theme);
     }
 
     this.cachedUserPreferences = {
