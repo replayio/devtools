@@ -33,6 +33,11 @@ import styles from "./shared.module.css";
 
 const EMPTY_ARRAY: any[] = [];
 
+// TEMP: Component that throws on render, for testing error boundary instrumentation
+function ThrowOnRender(): never {
+  throw new Error("Intentional error for error boundary instrumentation testing");
+}
+
 // This is a crappy approximation of the console; the UI isn't meant to be the focus of this branch.
 // It would be nice to re-implement the whole Console UI though and re-write all of the legacy object inspector code.
 function MessageRenderer({
@@ -122,6 +127,9 @@ function MessageRenderer({
       " "
     );
 
+  // TEMP: Force error boundary catch for instrumentation testing
+  const shouldThrow = index === 0;
+
   const logContents = (
     <span className={styles.LogContents} data-test-name="LogContents">
       {message.text && <span className={styles.MessageText}>{message.text}</span>}
@@ -129,6 +137,7 @@ function MessageRenderer({
         name="MessageRenderer"
         fallback={<div className={styles.ErrorBoundaryFallback}>Something went wrong.</div>}
       >
+        {shouldThrow && <ThrowOnRender />}
         {primaryContent}
       </InlineErrorBoundary>
     </span>
