@@ -100,8 +100,8 @@ jobs:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
       - name: Install Replay Chromium
         run: npx replayio install
-        env:
-          RECORD_REPLAY_CHROMIUM_DOWNLOAD_FILE: ${{ github.event.inputs.linuxBuildFile }}
+        env: 
+          RECORD_REPLAY_CHROMIUM_DOWNLOAD_FILE: linux-chromium-20260416-95c6685a0f12-6839a25e2468-dev.tar.xz
       - name: Run Playwright
         run: npx playwright test --shard ${{ matrix.shard }}/10 tests/*.ts --project replay-chromium
         working-directory: ./packages/e2e-tests
@@ -164,6 +164,8 @@ jobs:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
       - name: Install Replay Chromium
         run: npx replayio install
+        env: 
+          RECORD_REPLAY_CHROMIUM_DOWNLOAD_FILE: linux-chromium-20260416-95c6685a0f12-6839a25e2468-dev.tar.xz
       - name: Run Playwright
         run: npx playwright test --shard ${{ matrix.shard }}/1 authenticated/ test-suite-dashboard/ --project replay-chromium
         working-directory: ./packages/e2e-tests
