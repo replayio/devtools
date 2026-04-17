@@ -1,6 +1,6 @@
 import { Property } from "@replayio/protocol";
 
-import { UnknownFunction } from "ui/setup/dynamic/devtools";
+import type { UnknownFunction } from "ui/setup/dynamic/devtools";
 
 export type ChunksArray = (UnknownFunction | string | number)[];
 
