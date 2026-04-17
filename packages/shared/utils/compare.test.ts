@@ -1,8 +1,4 @@
-import {
-  arrayShallowEqual,
-  shallowEqual,
-  strictEqual,
-} from "./compare";
+import { arrayShallowEqual, shallowEqual, strictEqual } from "./compare";
 
 describe("compare", () => {
   describe("strictEqual", () => {

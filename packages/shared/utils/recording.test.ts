@@ -13,16 +13,11 @@ jest.mock("replay-next/src/suspense/BuildIdCache", () => ({
   getRecordingTarget: jest.fn(),
 }));
 
+import { RecordingTarget, getRecordingTarget } from "replay-next/src/suspense/BuildIdCache";
 import type { Recording } from "shared/graphql/types";
-
-import { getRecordingTarget, RecordingTarget } from "replay-next/src/suspense/BuildIdCache";
 import { SLUG_SEPARATOR } from "shared/utils/slug";
 
-import {
-  extractRecordingIdFromPathname,
-  getRecordingURL,
-  showDurationWarning,
-} from "./recording";
+import { extractRecordingIdFromPathname, getRecordingURL, showDurationWarning } from "./recording";
 
 function minimalRecording(overrides: Partial<Recording> = {}): Recording {
   return {
@@ -35,7 +30,9 @@ function minimalRecording(overrides: Partial<Recording> = {}): Recording {
 }
 
 describe("recording", () => {
-  const getRecordingTargetMock = getRecordingTarget as jest.MockedFunction<typeof getRecordingTarget>;
+  const getRecordingTargetMock = getRecordingTarget as jest.MockedFunction<
+    typeof getRecordingTarget
+  >;
 
   beforeEach(() => {
     getRecordingTargetMock.mockReset();
@@ -54,7 +51,9 @@ describe("recording", () => {
     });
 
     it("returns undefined when not under /recording/", () => {
-      expect(extractRecordingIdFromPathname(`/${"aaaaaaaa-bbbb-4ccc-dddd-eeeeeeeeeeee"}`)).toBeUndefined();
+      expect(
+        extractRecordingIdFromPathname(`/${"aaaaaaaa-bbbb-4ccc-dddd-eeeeeeeeeeee"}`)
+      ).toBeUndefined();
       expect(extractRecordingIdFromPathname("/")).toBeUndefined();
     });
   });
@@ -72,9 +71,7 @@ describe("recording", () => {
     it("uses legacy host for gecko targets", () => {
       getRecordingTargetMock.mockReturnValue(RecordingTarget.gecko);
       const rec = minimalRecording({ buildId: "firefox-gecko", title: null });
-      expect(getRecordingURL(rec, true)).toBe(
-        `https://legacy.replay.io/recording/${rec.id}`
-      );
+      expect(getRecordingURL(rec, true)).toBe(`https://legacy.replay.io/recording/${rec.id}`);
     });
 
     it("includes /recording/ path when includeBasePath is true for non-gecko", () => {
@@ -95,9 +92,7 @@ describe("recording", () => {
         buildId: "chromium",
         title: "MyTitle",
       });
-      expect(getRecordingURL(rec, true)).toBe(
-        `/recording/mytitle${SLUG_SEPARATOR}${rec.id}`
-      );
+      expect(getRecordingURL(rec, true)).toBe(`/recording/mytitle${SLUG_SEPARATOR}${rec.id}`);
     });
   });
 });
