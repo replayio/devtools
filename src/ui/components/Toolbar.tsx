@@ -402,7 +402,7 @@ export default function Toolbar() {
 
   const handleButtonClick = (panelName: PrimaryPanelName) => {
     const samePanelSelected = selectedPrimaryPanel === panelName;
-    const shouldTogglePanel = sidePanelCollapsed || samePanelSelected;
+    const shouldTogglePanel = !(sidePanelCollapsed || samePanelSelected);
 
     if (!samePanelSelected) {
       trackEvent(`toolbox.primary.${panelName}_select`);
