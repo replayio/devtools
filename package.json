@@ -10,6 +10,8 @@
     "preprod": "NEXT_PUBLIC_API_URL=http://graphql-api.pre-prod.replay.prod/v1/graphql NEXT_PUBLIC_DISPATCH_URL=ws://agent.pre-prod.replay.prod DASHBOARD_URL=http://localhost:8080 next dev -- -p 8081",
     "export": "next build && next export -o dist",
     "test": "jest",
+    "test:coverage": "jest --coverage",
+    "test:coverage:summary": "jest --coverage --coverageReporters=text-summary --silent",
     "test:watch": "jest --watch",
     "start": "next start -p 8080",
     "build": "next build",

@@ -2,12 +2,16 @@ module.exports = {
   collectCoverageFrom: [
     "packages/protocol/**/*.{js,jsx,ts,tsx}",
     "packages/shared/**/*.{js,jsx,ts,tsx}",
+    "packages/replay-next/**/*.{js,jsx,ts,tsx}",
     "src/**/*.{js,jsx,ts,tsx}",
     "!**/*.d.ts",
     "!**/node_modules/**",
     "!**/fixtures/**",
     "!packages/shared/graphql/generated/*.ts",
   ],
+  // "text" = per-file table (no totals). Put "text-summary" last so overall % sits just above "Test Suites: …"
+  // (if summary is first, it scrolls away above thousands of table lines in the terminal).
+  coverageReporters: ["text", "text-summary"],
   moduleNameMapper: {
     "^devtools/(.*)": "<rootDir>/src/devtools/$1",
     "^highlighter/(.*)": "<rootDir>/src/highlighter/$1",
