@@ -19,6 +19,7 @@ import { ConfirmProvider } from "ui/components/shared/Confirm";
 import LoadingScreen from "ui/components/shared/LoadingScreen";
 import useAuthTelemetry from "ui/hooks/useAuthTelemetry";
 import { bootstrapApp } from "ui/setup";
+import { captureAdAttribution } from "ui/utils/adAttribution";
 import { listenForAccessToken } from "ui/utils/browser";
 import { useLaunchDarkly } from "ui/utils/launchdarkly";
 import { InstallRouteListener } from "ui/utils/routeListener";
@@ -81,6 +82,10 @@ const App = ({ apiKey, ...props }: AppProps & AuthProps) => {
   useAuthTelemetry();
   const router = useRouter();
   let head: React.ReactNode;
+
+  useEffect(() => {
+    captureAdAttribution();
+  }, []);
 
   // HACK: Coordinates with the recording page to render its <head> contents for
   // social meta tags. This can be removed once we are able to handle SSP
