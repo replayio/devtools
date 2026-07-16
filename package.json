@@ -17,7 +17,7 @@
     "build": "next build",
     "lint": "trunk check",
     "lint:fix": "trunk check --fix",
-    "typecheck": "tsc",
+    "typecheck": "tsc --no-emit",
     "checks": "npm run typecheck && npm run lint",
     "typecheck:watch": "yarn typecheck --watch",
     "gql:schema": "gq https://graphql.replay.io/v1/graphql -H \"X-Hasura-Admin-Secret: $HASURA_KEY\" --introspect > schema.graphql",
@@ -240,5 +240,6 @@
       "parser": "typescript",
       "style": "replay"
     }
-  }
+  },
+  "packageManager": "yarn@4.9.1+sha512.f95ce356460e05be48d66401c1ae64ef84d163dd689964962c6888a9810865e39097a5e9de748876c2e0bf89b232d583c33982773e9903ae7a76257270986538"
 }

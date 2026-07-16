@@ -7,6 +7,7 @@ import {
 import {
   addLogpoint,
   editLogPoint,
+  findLineWithHits,
   toggleMappedSources,
   verifyLogPointContentTypeAheadSuggestions,
 } from "../helpers/source-panel";
@@ -42,8 +43,10 @@ test(`logpoints-07: should use the correct scope in auto-complete`, async ({
   await toggleMappedSources(page, "off");
   await delay(1000);
 
-  // We expect that this line in the minified bundle will have hits.
-  lineNumber = 20;
+  // We expect the hit body in the minified bundle to land on line 20 or 21,
+  // depending on how the generated source was pretty-printed (blank-line
+  // placement differs between the V8 and js-beautify engines).
+  lineNumber = await findLineWithHits(page, [20, 21]);
 
   await addLogpoint(page, { lineNumber });
   await editLogPoint(page, { content: "set", lineNumber, saveAfterEdit: false });
