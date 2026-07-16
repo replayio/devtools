@@ -719,6 +719,31 @@ export async function waitForSourceLineHitCounts(page: Page, lineNumber: number)
   });
 }
 
+// Pretty-printing a generated source can shift a statement between adjacent lines
+// (blank-line placement differs between the V8 and js-beautify engines). Resolve the
+// candidate line that actually has hits so tests don't hardcode one layout.
+export async function findLineWithHits(page: Page, candidateLineNumbers: number[]): Promise<number> {
+  let lineWithHits: number | null = null;
+
+  await waitFor(async () => {
+    for (const lineNumber of candidateLineNumbers) {
+      await scrollUntilLineIsVisible(page, lineNumber);
+      await waitForSourceLineHitCounts(page, lineNumber);
+
+      const lineLocator = await getSourceLine(page, lineNumber);
+      const hasHits = await lineLocator.getAttribute("data-test-line-has-hits");
+      if (hasHits === "true") {
+        lineWithHits = lineNumber;
+        return;
+      }
+    }
+
+    throw Error(`None of the candidate lines ${candidateLineNumbers.join(", ")} have hits`);
+  });
+
+  return lineWithHits!;
+}
+
 // TODO [FE-626] Rewrite this helper to reduce complexity.
 export async function waitForSelectedSource(page: Page, url: string) {
   await waitFor(async () => {

@@ -9,6 +9,7 @@ import difference from "lodash/difference";
 import size from "lodash/size";
 
 import { getSecret } from "./aws_secrets";
+import { withExponentialBackoff } from "./exponential-backoff";
 import { ExampleInfo, getStats } from "./get-stats";
 
 const CONFIG = {
@@ -312,19 +313,23 @@ export default async function run_fe_tests(
     console.time("SAVE-EXAMPLES time");
     {
       const examplesCfg = exampleFiles?.length ? ` --example=${exampleFiles.join(",")}` : "";
-      execSync(
-        `${envWrapper} ${path.join(
-          "scripts/save-examples.ts"
-        )} --runtime=chromium --target=browser ${examplesCfg}`,
-        {
-          cwd: TestRootPath,
-          stdio: "inherit",
-          env: {
-            ...process.env,
-            // Run the tests against the local dev server.
-            PLAYWRIGHT_TEST_BASE_URL: "http://localhost:3000",
-          },
-        }
+      const saveExamplesCmd = `${envWrapper} ${path.join(
+        "scripts/save-examples.ts"
+      )} --runtime=chromium --target=browser ${examplesCfg}`;
+
+      await withExponentialBackoff(
+        async () =>
+          execSync(saveExamplesCmd, {
+            cwd: TestRootPath,
+            stdio: "inherit",
+            env: {
+              ...process.env,
+              // Run the tests against the local dev server.
+              PLAYWRIGHT_TEST_BASE_URL: "http://localhost:3000",
+            },
+          }),
+        1000,
+        3
       );
 
       // Without the wait, the next xvfb-run command can fail.
