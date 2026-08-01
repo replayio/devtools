@@ -8,6 +8,7 @@ import {
   addLogpoint,
   editLogPoint,
   findLineWithHits,
+  rewindToLine,
   toggleMappedSources,
   verifyLogPointContentTypeAheadSuggestions,
 } from "../helpers/source-panel";
@@ -47,6 +48,7 @@ test(`logpoints-07: should use the correct scope in auto-complete`, async ({
   // depending on how the generated source was pretty-printed (blank-line
   // placement differs between the V8 and js-beautify engines).
   lineNumber = await findLineWithHits(page, [20, 21]);
+  await rewindToLine(page, { lineNumber });
 
   await addLogpoint(page, { lineNumber });
   await editLogPoint(page, { content: "set", lineNumber, saveAfterEdit: false });

@@ -260,7 +260,7 @@ export async function openMessageSource(page: Page, message: Locator): Promise<v
 export async function seekToConsoleMessage(
   page: Page,
   consoleMessage: Locator,
-  line?: number
+  line?: number | number[]
 ): Promise<void> {
   const textContent = await consoleMessage.locator('[data-test-name="LogContents"]').textContent();
 
@@ -486,7 +486,7 @@ export async function verifyTrimmedConsoleMessages(
   });
 }
 
-export async function warpToMessage(page: Page, text: string, line?: number) {
+export async function warpToMessage(page: Page, text: string, line?: number | number[]) {
   await openConsolePanel(page);
 
   const messages = await findConsoleMessage(page, text);
@@ -496,7 +496,7 @@ export async function warpToMessage(page: Page, text: string, line?: number) {
   await seekToConsoleMessage(page, message, line);
 }
 
-export async function warpToLastMessage(page: Page, text: string, line?: number) {
+export async function warpToLastMessage(page: Page, text: string, line?: number | number[]) {
   await openConsolePanel(page);
 
   const messages = await findConsoleMessage(page, text);
