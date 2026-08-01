@@ -265,10 +265,14 @@ export async function waitForFrameTimeline(page: Page, widthPercentage: string) 
   });
 }
 
-export async function waitForPaused(page: Page, line?: number): Promise<void> {
+export async function waitForPaused(page: Page, line?: number | number[]): Promise<void> {
+  const candidateLines = line == null ? null : Array.isArray(line) ? line : [line];
+
   await debugPrint(
     page,
-    `Waiting for pause ${line != null ? `at ${chalk.bold(line)}` : ""}`,
+    `Waiting for pause ${
+      candidateLines != null ? `at ${chalk.bold(candidateLines.join(" | "))}` : ""
+    }`,
     "waitForPaused"
   );
 
@@ -292,10 +296,10 @@ export async function waitForPaused(page: Page, line?: number): Promise<void> {
     { timeout: 15_000 }
   );
 
-  if (line) {
+  if (candidateLines != null) {
     await waitFor(async () => {
       const { lineNumber } = await getCurrentCallStackFrameInfo(page);
-      expect(lineNumber).toBe(line);
+      expect(candidateLines).toContain(lineNumber);
     });
   }
 }
