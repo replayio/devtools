@@ -17,7 +17,7 @@
     "build": "next build",
     "lint": "trunk check",
     "lint:fix": "trunk check --fix",
-    "typecheck": "tsc --no-emit",
+    "typecheck": "tsc --noEmit",
     "checks": "npm run typecheck && npm run lint",
     "typecheck:watch": "yarn typecheck --watch",
     "gql:schema": "gq https://graphql.replay.io/v1/graphql -H \"X-Hasura-Admin-Secret: $HASURA_KEY\" --introspect > schema.graphql",
