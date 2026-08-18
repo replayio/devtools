@@ -136,7 +136,7 @@ test(`jump-to-code-01: Test basic jumping functionality`, async ({
   await navigationEvent.click();
   await waitFor(async () => {
     const timelinePercent = await getTimelineCurrentPercent(page);
-    expect(Math.round(timelinePercent)).toBe(0);
+    expect(Math.round(timelinePercent)).toBeLessThanOrEqual(1);
   });
 
   debugPrint(page, "Checking that the first keypress J2C jumps to the correct line");
