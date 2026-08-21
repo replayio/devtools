@@ -237,10 +237,12 @@ export async function verifyFramesCount(page: Page, expectedCount: number) {
   });
 }
 
-export async function waitForFrameTimeline(page: Page, widthPercentage: string) {
+export async function waitForFrameTimeline(page: Page, widthPercentage: string | string[]) {
+  const candidateWidths = Array.isArray(widthPercentage) ? widthPercentage : [widthPercentage];
+
   await debugPrint(
     page,
-    `Waiting for frame progress ${chalk.bold(widthPercentage)}`,
+    `Waiting for frame progress ${chalk.bold(candidateWidths.join(" | "))}`,
     "waitForFrameTimeline"
   );
 
@@ -253,10 +255,10 @@ export async function waitForFrameTimeline(page: Page, widthPercentage: string) 
       const match = style.match("width: ([0-9]+%);");
       if (match) {
         const width = match![1];
-        if (width === widthPercentage) {
+        if (candidateWidths.includes(width)) {
           return;
         } else {
-          throw `Frame progress is ${width}, expected ${widthPercentage}`;
+          throw `Frame progress is ${width}, expected ${candidateWidths.join(" | ")}`;
         }
       }
     }

@@ -7,9 +7,15 @@ import {
   selectElementsListRow,
   selectNextElementsPanelSearchResult,
 } from "../helpers/elements-panel";
-import test from "../testFixture";
+import test, { expect } from "../testFixture";
 
 test.use({ exampleKey: "doc_inspector_shorthand.html" });
+
+// The port in stylesheet URLs comes from whatever dev server recorded the example.
+// GitHub Actions replays a pinned recording made on port 8080; Buildkite re-records on port 3000.
+const shorthandStylesUrl = expect.stringMatching(
+  /^http:\/\/localhost:\d+\/recording\/test\/examples\/shorthand_styles\.css$/
+) as unknown as string;
 
 test("inspector-computed-02: Complex computed styles can be viewed", async ({
   pageWithMeta: { page, recordingId, testScope },
@@ -27,7 +33,7 @@ test("inspector-computed-02: Complex computed styles can be viewed", async ({
       selector: ".parent",
       value: "courier",
       label: "shorthand_styles.css:1",
-      url: "http://localhost:3000/recording/test/examples/shorthand_styles.css",
+      url: shorthandStylesUrl,
       overridden: false,
     },
   ]);
@@ -39,7 +45,7 @@ test("inspector-computed-02: Complex computed styles can be viewed", async ({
       selector: ".parent",
       value: "courier",
       label: "shorthand_styles.css:1",
-      url: "http://localhost:3000/recording/test/examples/shorthand_styles.css",
+      url: shorthandStylesUrl,
       overridden: true,
     },
   ]);
@@ -50,14 +56,14 @@ test("inspector-computed-02: Complex computed styles can be viewed", async ({
       selector: ".child",
       value: "sans-serif",
       label: "shorthand_styles.css:6",
-      url: "http://localhost:3000/recording/test/examples/shorthand_styles.css",
+      url: shorthandStylesUrl,
       overridden: false,
     },
     {
       selector: ".parent",
       value: "courier",
       label: "shorthand_styles.css:1",
-      url: "http://localhost:3000/recording/test/examples/shorthand_styles.css",
+      url: shorthandStylesUrl,
       overridden: true,
     },
   ]);
@@ -69,7 +75,7 @@ test("inspector-computed-02: Complex computed styles can be viewed", async ({
       selector: ".child",
       value: "sans-serif",
       label: "shorthand_styles.css:6",
-      url: "http://localhost:3000/recording/test/examples/shorthand_styles.css",
+      url: shorthandStylesUrl,
       overridden: true,
     },
     { selector: "DIV[1].style", value: "serif", label: "element", url: "#", overridden: true },
@@ -77,7 +83,7 @@ test("inspector-computed-02: Complex computed styles can be viewed", async ({
       selector: ".parent",
       value: "courier",
       label: "shorthand_styles.css:1",
-      url: "http://localhost:3000/recording/test/examples/shorthand_styles.css",
+      url: shorthandStylesUrl,
       overridden: true,
     },
   ]);
