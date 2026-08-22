@@ -722,7 +722,10 @@ export async function waitForSourceLineHitCounts(page: Page, lineNumber: number)
 // Pretty-printing a generated source can shift a statement between adjacent lines
 // (blank-line placement differs between the V8 and js-beautify engines). Resolve the
 // candidate line that actually has hits so tests don't hardcode one layout.
-export async function findLineWithHits(page: Page, candidateLineNumbers: number[]): Promise<number> {
+export async function findLineWithHits(
+  page: Page,
+  candidateLineNumbers: number[]
+): Promise<number> {
   let lineWithHits: number | null = null;
 
   await waitFor(async () => {
