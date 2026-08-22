@@ -833,9 +833,10 @@ export async function waitForSourceContentsToFinishStreaming(
   page: Page,
   options: {
     sourceId: string;
+    timeout?: number;
   }
 ): Promise<void> {
-  const { sourceId } = options;
+  const { sourceId, timeout = 15_000 } = options;
 
   await debugPrint(page, `Waiting on streaming content for source "${sourceId}"`, "quickOpen");
   await page.waitForSelector(`[data-test-id="Source-${sourceId}"]`);
@@ -845,7 +846,7 @@ export async function waitForSourceContentsToFinishStreaming(
       const status = await sourceLocator.getAttribute("data-test-source-contents-status");
       expect(status).toBe("resolved");
     },
-    { retryInterval: 1_000, timeout: 15_000 }
+    { retryInterval: 1_000, timeout }
   );
 }
 

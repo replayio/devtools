@@ -46,7 +46,7 @@ function getBoundingClientRect(element?: HTMLElement) {
 interface FrameTimelineState {
   scrubbing: boolean;
   scrubbingProgress: number;
-  lastDisplayIndex: number;
+  lastDisplayIndex: number | null;
 }
 
 interface FrameTimelineProps {
@@ -63,10 +63,10 @@ interface FrameTimelineProps {
 class FrameTimelineRenderer extends Component<FrameTimelineProps, FrameTimelineState> {
   _timeline = React.createRef<HTMLDivElement>();
 
-  state = {
+  state: FrameTimelineState = {
     scrubbing: false,
     scrubbingProgress: 0,
-    lastDisplayIndex: 0,
+    lastDisplayIndex: null,
   };
 
   componentDidUpdate(prevProps: FrameTimelineProps, prevState: FrameTimelineState) {
@@ -199,8 +199,9 @@ class FrameTimelineRenderer extends Component<FrameTimelineProps, FrameTimelineS
     // Check if the current executionPoint's corresponding index is similar to the
     // last index that we stopped scrubbing on. If it is, just use the same progress
     // value that we had while scrubbing so instead of snapping to the executionPoint's
-    // progress.
-    if (lastDisplayIndex == filteredSteps.length - 1) {
+    // progress. `lastDisplayIndex` is null until the user actually scrubs, so a frame
+    // with a single step ahead of the execution point doesn't match index 0 by accident.
+    if (lastDisplayIndex !== null && lastDisplayIndex === filteredSteps.length - 1) {
       return scrubbingProgress;
     }
 
