@@ -11,9 +11,10 @@ import { getFocusBeginTime, getFocusEndTime, setFocusRange } from "../helpers/ti
 import test, { expect } from "../testFixture";
 
 // We need 500...10k hits
-// Line 12196 has 4.4k hits
+// Line 12194 (`didReceiveUpdate = true;` in the legacy-suspense branch) has ~3.9k hits.
+// Note: line numbers in this file depend on the backend pretty-printer version.
 const sourceUrl = "react-dom.production.js";
-const lineNumber = 12196;
+const lineNumber = 12194;
 
 test.use({ exampleKey: "logpoints-01" });
 
