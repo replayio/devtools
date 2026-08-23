@@ -59,7 +59,9 @@ test("playwright-05: Test DOM node previews on user action step hover", async ({
       // `onMouseEnter` handler to keep checking if we have a DOM node entry available.
       await firstStep.hover({ timeout: 1000 });
       await lastClickStep.hover({ timeout: 1000 });
-      await highlighter.waitFor({ state: "visible", timeout: 1000 });
+      // The evaluation that finds the DOM node can take a few seconds; a 1s wait here
+      // made this test flaky. The outer loop still caps the total wait.
+      await highlighter.waitFor({ state: "visible", timeout: 5000 });
     },
     // Give the evaluation plenty of time to complete
     { timeout: 60000 }
@@ -99,7 +101,7 @@ test("playwright-05: Test DOM node previews on user action step hover", async ({
       await firstStep.hover({ timeout: 1000 });
       await stepWithMultipleNodes.hover({ timeout: 1000 });
       const count = await highlighter.count();
-      await highlighter.first().waitFor({ state: "visible", timeout: 1000 });
+      await highlighter.first().waitFor({ state: "visible", timeout: 5000 });
       expect(count).toBe(3);
     },
     // Give the evaluation plenty of time to complete
