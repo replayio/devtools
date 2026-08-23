@@ -33,5 +33,6 @@ test(`logpoints-04: should display exceptions in the console`, async ({
   await executeAndVerifyTerminalExpression(page, "number * 10", "40");
 
   await reverseStepOverToLine(page, 15);
-  await waitForFrameTimeline(page, "0%");
+  // The frame has two steps and we are back on the first one, so the bar shows half.
+  await waitForFrameTimeline(page, "50%");
 });

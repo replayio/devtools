@@ -722,7 +722,10 @@ export async function waitForSourceLineHitCounts(page: Page, lineNumber: number)
 // Pretty-printing a generated source can shift a statement between adjacent lines
 // (blank-line placement differs between the V8 and js-beautify engines). Resolve the
 // candidate line that actually has hits so tests don't hardcode one layout.
-export async function findLineWithHits(page: Page, candidateLineNumbers: number[]): Promise<number> {
+export async function findLineWithHits(
+  page: Page,
+  candidateLineNumbers: number[]
+): Promise<number> {
   let lineWithHits: number | null = null;
 
   await waitFor(async () => {
@@ -819,6 +822,8 @@ export async function fastForwardToLine(
 
   await lineLocator.locator('[data-test-name="SourceLine-HitCount"]').hover({ force: true });
 
+  // The button stays disabled until the hit points for this line resolve, so a slow
+  // lookup is indistinguishable from a line that has nothing left to fast-forward to.
   const buttonLocator = lineLocator.locator('[data-test-name="FastForwardButton"]');
   await waitFor(async () => {
     const isDisabled = await buttonLocator.getAttribute("disabled");
@@ -833,9 +838,10 @@ export async function waitForSourceContentsToFinishStreaming(
   page: Page,
   options: {
     sourceId: string;
+    timeout?: number;
   }
 ): Promise<void> {
-  const { sourceId } = options;
+  const { sourceId, timeout = 15_000 } = options;
 
   await debugPrint(page, `Waiting on streaming content for source "${sourceId}"`, "quickOpen");
   await page.waitForSelector(`[data-test-id="Source-${sourceId}"]`);
@@ -845,7 +851,7 @@ export async function waitForSourceContentsToFinishStreaming(
       const status = await sourceLocator.getAttribute("data-test-source-contents-status");
       expect(status).toBe("resolved");
     },
-    { retryInterval: 1_000, timeout: 15_000 }
+    { retryInterval: 1_000, timeout }
   );
 }
 

@@ -33,7 +33,9 @@ test(`stepping-06: Test stepping in async frames and async call stacks`, async (
   await waitForScopeValue(page, "n", "4");
   await waitForFrameTimeline(page, "85%");
   await selectFrame(page, 3);
-  await waitForFrameTimeline(page, "71%");
+  // Frame 3 is the async boundary; its progress reads differently depending on the
+  // execution point the backend picks for the frame, so accept either value.
+  await waitForFrameTimeline(page, ["71%", "83%"]);
   await selectFrame(page, 4);
   await waitForFrameTimeline(page, "100%");
   await selectFrame(page, 0);

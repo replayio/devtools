@@ -20,7 +20,9 @@ import test from "../testFixture";
 
 test.use({ exampleKey: "redux-fundamentals/dist/index.html" });
 
-type NavEvent = { type: "navigation"; url: string };
+// The port comes from whatever dev server recorded the example.
+// GitHub Actions replays a pinned recording made on port 8080; Buildkite re-records on port 3000.
+type NavEvent = { type: "navigation"; url: readonly string[] };
 type KeypressEvent = { type: "keypress"; key: string };
 type ClickEvent = { type: "mousedown" };
 
@@ -30,7 +32,7 @@ const makeKeypressEvent = (key: string): KeypressEvent => ({ type: "keypress", k
 
 const expectedEvents: Event[] = (
   [
-    { type: "navigation", url: "localhost:3000" },
+    { type: "navigation", url: ["localhost:3000", "localhost:8080"] },
     { type: "mousedown" },
     { type: "mousedown" },
     [..."test"].map(makeKeypressEvent),
@@ -92,28 +94,28 @@ test(`jump-to-code-01: Test basic jumping functionality`, async ({
   for (const [index, event] of expectedEvents.entries()) {
     const eventLocator = eventListItems.nth(index);
 
-    let expectedText = "";
+    let expectedTexts: readonly string[] = [];
     switch (event.type) {
       case "navigation": {
-        expectedText = event.url;
+        expectedTexts = event.url;
         break;
       }
       case "keypress": {
-        expectedText = `Key Press ${event.key}`;
+        expectedTexts = [`Key Press ${event.key}`];
         break;
       }
       case "mousedown": {
-        expectedText = "Click";
+        expectedTexts = ["Click"];
         break;
       }
     }
 
-    debugPrint(page, `Checking event: ${event.type} (text: '${expectedText}')`);
+    debugPrint(page, `Checking event: ${event.type} (text: '${expectedTexts.join(" | ")}')`);
 
     const type = await eventLocator.getAttribute("data-test-type");
     expect(type).toBe(event.type);
     const labelText = await getByTestName(eventLocator, "EventLabel").innerText();
-    expect(labelText).toBe(expectedText);
+    expect(expectedTexts).toContain(labelText);
   }
 
   debugPrint(page, "Checking for a disabled click 'Jump' button");

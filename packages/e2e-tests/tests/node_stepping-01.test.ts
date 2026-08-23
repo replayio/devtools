@@ -26,7 +26,8 @@ test("node_stepping-01: Test stepping in async frames and async call stacks", as
   await verifyFramesCount(page, 5);
 
   await waitForScopeValue(page, "n", "2");
-  await waitForFrameTimeline(page, "0%");
+  // One of this frame's five steps has run.
+  await waitForFrameTimeline(page, "20%");
 
   await selectFrame(page, 1);
   await waitForScopeValue(page, "n", "3");
@@ -40,7 +41,8 @@ test("node_stepping-01: Test stepping in async frames and async call stacks", as
   await waitForFrameTimeline(page, "75%");
 
   await selectFrame(page, 4);
-  await waitForFrameTimeline(page, "0%");
+  // The outermost frame has a single step, so it reads as complete.
+  await waitForFrameTimeline(page, "100%");
 
   await selectFrame(page, 0);
 

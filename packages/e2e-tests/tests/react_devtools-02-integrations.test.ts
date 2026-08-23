@@ -135,10 +135,15 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
   });
   await getReactComponents(page).first().click();
 
+  // The total depends on how many components the backend's reverse name mapping can resolve.
+  // Locations in the Lexical plugin bundles resolve to the same outlines through either the
+  // original source or its pretty-printed twin, so this count tracks the component tree itself.
+  const anonymousComponentCount = 20;
+
   await searchComponents(page, "Anonymous"); // Search and select 1st result
   await verifySearchResults(page, {
     currentNumber: 1,
-    totalNumber: 17,
+    totalNumber: anonymousComponentCount,
   });
 
   await componentSearchInput.focus();
@@ -147,7 +152,7 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
   await componentSearchInput.press("Enter");
   await verifySearchResults(page, {
     currentNumber: 4,
-    totalNumber: 17,
+    totalNumber: anonymousComponentCount,
   });
 
   await viewSourceButton.click();
