@@ -86,6 +86,11 @@ test(`authenticated/logpoints-01: Shared logpoints functionality`, async ({
 
     await waitForRecordingToFinishIndexing(page);
 
+    // Reloading does not reliably restore the previously opened source tab, and
+    // editLogPoint requires the source to be visible, so re-open it explicitly.
+    await openDevToolsTab(page);
+    await openSource(page, url);
+
     // Verify log point is still present and not affected by user 2
     await verifyConsoleMessage(page, "initial:", "log-point", 10);
 
