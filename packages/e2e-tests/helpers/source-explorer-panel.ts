@@ -23,6 +23,11 @@ export async function openSource(page: Page, url: string): Promise<void> {
   const sourceTab = getSourceTab(page, url);
   if (await sourceTab.isVisible()) {
     await debugPrint(page, `Source "${chalk.bold(url)}" already open`, "openSource");
+    // A restored tab (e.g. after a reload) can be visible without being selected;
+    // it never becomes active on its own, so click it.
+    if ((await sourceTab.getAttribute("data-status")) !== "active") {
+      await sourceTab.click();
+    }
     // Even if the tab is selected, make sure the editor itself has loaded.
     await waitForSelectedSource(page, url);
     return;
