@@ -1,11 +1,12 @@
 import { openDevToolsTab, startTest } from "../helpers";
+import { quickOpen } from "../helpers/commands";
 import {
   openNetworkPanel,
   seekToRequestRow,
   selectRequestRow,
   verifyRequestRowTimelineState,
 } from "../helpers/network-panel";
-import { fastForwardToLine, waitForSourceContentsToFinishStreaming } from "../helpers/source-panel";
+import { fastForwardToLine } from "../helpers/source-panel";
 import test from "../testFixture";
 
 test.use({ exampleKey: "flake/adding-spec.ts" });
@@ -56,13 +57,12 @@ test(`network-03: should sync and display the current time in relation to the ne
     "after"
   );
 
-  // Changes to the current should update the indicator in the Network panel also
-  // Seeking to the "cypress_runner.js" request will have opened "cypress_runner.css"
-  // cypress_runner.js is a very large bundle. Direct measurement puts the streaming
-  // time under a second, but it has repeatedly exceeded the 15s default in CI, so give
-  // it a wider budget. If it still times out here, the stream is stuck rather than slow.
-  await waitForSourceContentsToFinishStreaming(page, { sourceId: "pp6", timeout: 45_000 });
-  await fastForwardToLine(page, { lineNumber: 118 });
+  // Moving the current time from outside the Network panel should update the indicator
+  // too. "todoModel.js" is a small unminified app source, so its line numbers don't move
+  // when the backend changes how it formats sources, and line 30 runs a dozen times
+  // across the recording — all of them after the request we just seeked to.
+  await quickOpen(page, "todoModel.js");
+  await fastForwardToLine(page, { lineNumber: 30 });
   await verifyRequestRowTimelineState(
     page,
     {

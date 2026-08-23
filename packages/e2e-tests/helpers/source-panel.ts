@@ -822,6 +822,8 @@ export async function fastForwardToLine(
 
   await lineLocator.locator('[data-test-name="SourceLine-HitCount"]').hover({ force: true });
 
+  // The button stays disabled until the hit points for this line resolve, so a slow
+  // lookup is indistinguishable from a line that has nothing left to fast-forward to.
   const buttonLocator = lineLocator.locator('[data-test-name="FastForwardButton"]');
   await waitFor(async () => {
     const isDisabled = await buttonLocator.getAttribute("disabled");
