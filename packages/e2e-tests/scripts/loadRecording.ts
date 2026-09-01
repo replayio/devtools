@@ -1,6 +1,7 @@
 import { SimpleProtocolClient } from "@replayio/protocol";
 import chalk from "chalk";
 import WebSocket from "ws";
+
 import { withExponentialBackoff } from "./exponential-backoff";
 
 const DISPATCH_URL =

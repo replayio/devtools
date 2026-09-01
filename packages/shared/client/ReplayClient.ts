@@ -784,7 +784,7 @@ export class ReplayClient implements ReplayClientInterface {
       { expression, location },
       sessionId
     );
-    return result.expression;
+    return result.expression ?? expression;
   }
 
   async getSessionEndpoint(): Promise<TimeStampedPoint> {
