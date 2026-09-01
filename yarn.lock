@@ -4156,7 +4156,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/protocol@npm:0.70.0, @replayio/protocol@npm:^0.70.0":
+"@replayio/protocol@npm:0.104.1":
+  version: 0.104.1
+  resolution: "@replayio/protocol@npm:0.104.1"
+  checksum: bc579f27086c1322ee91e434a27dbef9d5bf92f32879bed2456ae8b6cc482b97c1b4238bdd019c20a953b4058422c99cdf1d2c3ff2bf84b6dc4fd4b814c645a3
+  languageName: node
+  linkType: hard
+
+"@replayio/protocol@npm:^0.70.0":
   version: 0.70.0
   resolution: "@replayio/protocol@npm:0.70.0"
   checksum: b43a76831b6646b01faa6b4fef865f48735adf1a55671ca8042b2262960762cbe8f9506247e211f6f07522685613b4064d6db2a75a29e5e690acd4e9678a6193
@@ -15801,7 +15808,7 @@ __metadata:
     "@next/bundle-analyzer": ^12.2.0
     "@reduxjs/toolkit": ^2.0.0
     "@replayio/overboard": ^0.4.1
-    "@replayio/protocol": 0.70.0
+    "@replayio/protocol": 0.104.1
     "@replayio/react-devtools-inline": 4.28.6
     "@replayio/replay": ^0.22.4
     "@sentry/integrations": ^7.101.1
