@@ -1,37 +1,17 @@
 import { SimpleProtocolClient } from "@replayio/protocol";
 import chalk from "chalk";
 import WebSocket from "ws";
+import { withExponentialBackoff } from "./exponential-backoff";
 
 const DISPATCH_URL =
   process.env.DISPATCH_ADDRESS ||
   process.env.NEXT_PUBLIC_DISPATCH_URL ||
   "wss://dispatch.replay.io";
 
-const MAX_ATTEMPTS = 5;
-const BASE_DELAY_MS = 1000;
-
 export async function loadRecording(recordingId: string) {
   console.log(`Processing recording ${chalk.bold.yellow(recordingId)}`);
 
-  let lastError: unknown;
-  for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-    try {
-      await loadRecordingOnce(recordingId);
-      return;
-    } catch (err) {
-      lastError = err;
-      if (attempt === MAX_ATTEMPTS - 1) {
-        break;
-      }
-      const delayMs = BASE_DELAY_MS * 2 ** attempt;
-      console.log(
-        `Processing recording ${chalk.bold.yellow(recordingId)} failed ` +
-          `(attempt ${attempt + 1}/${MAX_ATTEMPTS}): ${err}. Retrying in ${delayMs}ms`
-      );
-      await new Promise<void>(resolve => setTimeout(resolve, delayMs));
-    }
-  }
-  throw lastError;
+  await withExponentialBackoff(() => loadRecordingOnce(recordingId), 1000, 5);
 }
 
 async function loadRecordingOnce(recordingId: string) {
