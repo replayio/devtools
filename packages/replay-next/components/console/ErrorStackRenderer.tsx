@@ -2,7 +2,6 @@ import { ObjectId, PauseId } from "@replayio/protocol";
 import ErrorStackParser from "error-stack-parser";
 import { ReactNode, Suspense, useContext } from "react";
 
-import { assert } from "protocol/utils";
 import Loader from "replay-next/components/Loader";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import { mappedLocationCache } from "replay-next/src/suspense/MappedLocationCache";
@@ -41,7 +40,13 @@ function ErrorStackRendererSuspends({
 }) {
   const client = useContext(ReplayClientContext);
   const stack = objectPropertyCache.read(client, pauseId, errorObjectId, "stack")?.value;
-  assert(typeof stack === "string", "no stack string found in error object");
+
+  // Chrome has error-like WebIDL objects that expose a message but are not JavaScript Errors.
+  // For example, GeolocationPositionError has no object-level .stack property.
+  if (typeof stack !== "string") {
+    return <span>No stack available</span>;
+  }
+
   // Handle cases where there is no meaningful stack string;
   if (stack.trim().length === 0) {
     return <span>No stack available</span>;
