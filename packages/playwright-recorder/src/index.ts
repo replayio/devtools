@@ -105,6 +105,8 @@ export async function saveRecording(
     `Saving ${chalk.grey.bold(title)} with recording id ${chalk.yellow.bold(recordingId)}`
   );
 
+  await waitForRecordingWritten(recordingId);
+
   if (metadata) {
     cli.addLocalRecordingMetadata(recordingId, metadata);
   }
@@ -226,6 +228,37 @@ export function findLastRecordingId(url?: string) {
     );
   }
   return recordingId;
+}
+
+const RECORDING_WRITE_TIMEOUT_MS = 30_000;
+
+// The recorder appends writeFinished to recordings.log once it has closed the
+// recording file, which can happen after the browser has exited. Until then the
+// recording is "startedWrite" and its file may still be growing, but
+// @replayio/replay uploads it anyway, and a recording cut off before its last
+// checkpoints can't be replayed (the backend reports it as an EmptyRecording).
+async function waitForRecordingWritten(recordingId: string) {
+  const deadline = Date.now() + RECORDING_WRITE_TIMEOUT_MS;
+  while (true) {
+    const recording = cli.listAllRecordings({ all: true }).find(rec => rec.id === recordingId);
+    switch (recording?.status) {
+      case "onDisk":
+        return;
+      case "crashed":
+        throw new Error(`Recording ${recordingId} crashed`);
+      case "unusable":
+        throw new Error(`Recording ${recordingId} is unusable: ${recording.unusableReason}`);
+    }
+    if (Date.now() >= deadline) {
+      const recordingsLog = readRecordingsLog().split("\n").slice(-11).join("\n");
+      throw new Error(
+        `Recording ${recordingId} was not written within ${RECORDING_WRITE_TIMEOUT_MS}ms ` +
+          `(status: ${recording?.status ?? "not listed"})\n` +
+          `Last 10 lines of recordings.log:\n${recordingsLog}`
+      );
+    }
+    await new Promise(resolve => setTimeout(resolve, 250));
+  }
 }
 
 function readRecordingsLog() {
