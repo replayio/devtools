@@ -230,13 +230,31 @@ export function findLastRecordingId(url?: string) {
   return recordingId;
 }
 
-const RECORDING_WRITE_TIMEOUT_MS = 30_000;
+const RECORDING_WRITE_TIMEOUT_MS = 10_000;
 
-// The recorder appends writeFinished to recordings.log once it has closed the
-// recording file, which can happen after the browser has exited. Until then the
+// Waits until the recording is written: the driver appends writeFinished to
+// recordings.log only once it has closed the recording file. Until then the
 // recording is "startedWrite" and its file may still be growing, but
-// @replayio/replay uploads it anyway, and a recording cut off before its last
-// checkpoints can't be replayed (the backend reports it as an EmptyRecording).
+// @replayio/replay uploads it anyway.
+//
+// Usually nothing is left to wait for. A renderer finishes its recording when
+// its connection to the browser closes and exits right after, and Chromium
+// doesn't wait for it. But the renderers inherit the browser's stdout and
+// stderr, and closing a browser launched by Playwright resolves on the browser
+// process's "close" event, which Node emits only once every process holding
+// those pipes has closed them, so by then the renderers have exited.
+// Playwright 1.37 resolved on "exit" instead and didn't wait for the
+// renderers, and save-examples uploaded recordings that were still being
+// written.
+//
+// A recording can still be left unfinished: a renderer killed before it
+// finished (e.g. by Chromium's SIGKILL of a renderer still alive 2 s after its
+// host was torn down, or Playwright's process group SIGKILL when closing takes
+// over 30 s) never writes writeFinished, and a renderer that doesn't hold
+// those pipes isn't waited for. Such a recording is cut off before its last
+// checkpoints and can't be replayed: the backend rejects every session that
+// opens it as an EmptyRecording, which fails the tests using it far from the
+// cause.
 async function waitForRecordingWritten(recordingId: string) {
   const deadline = Date.now() + RECORDING_WRITE_TIMEOUT_MS;
   while (true) {
