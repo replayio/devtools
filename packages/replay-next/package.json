@@ -30,7 +30,7 @@
     "uuid": "^7.0.3"
   },
   "devDependencies": {
-    "@playwright/test": "^1.35.0",
+    "@playwright/test": "^1.62.1",
     "@testing-library/jest-dom": "^5.16.3",
     "@testing-library/react": "^16",
     "@types/uuid": "^7.0.3",
