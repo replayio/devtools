@@ -245,7 +245,9 @@ const RECORDING_WRITE_TIMEOUT_MS = 10_000;
 // those pipes has closed them, so by then the renderers have exited.
 // Playwright 1.37 resolved on "exit" instead and didn't wait for the
 // renderers, and save-examples uploaded recordings that were still being
-// written.
+// written. That was only seen on CI; recording the same pages locally, on 1.37
+// and 1.62, under CPU contention too, never left a recording unwritten once
+// closing returned.
 //
 // A recording can still be left unfinished: a renderer killed before it
 // finished (e.g. by Chromium's SIGKILL of a renderer still alive 2 s after its
