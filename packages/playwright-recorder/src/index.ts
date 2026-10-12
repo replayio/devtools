@@ -243,20 +243,14 @@ const RECORDING_WRITE_TIMEOUT_MS = 10_000;
 // stderr, and closing a browser launched by Playwright resolves on the browser
 // process's "close" event, which Node emits only once every process holding
 // those pipes has closed them, so by then the renderers have exited.
-// Playwright 1.37 resolved on "exit" instead and didn't wait for the
-// renderers, and save-examples uploaded recordings that were still being
-// written. That was only seen on CI; recording the same pages locally, on 1.37
-// and 1.62, under CPU contention too, never left a recording unwritten once
-// closing returned.
 //
-// A recording can still be left unfinished: a renderer killed before it
-// finished (e.g. by Chromium's SIGKILL of a renderer still alive 2 s after its
-// host was torn down, or Playwright's process group SIGKILL when closing takes
-// over 30 s) never writes writeFinished, and a renderer that doesn't hold
-// those pipes isn't waited for. Such a recording is cut off before its last
-// checkpoints and can't be replayed: the backend rejects every session that
-// opens it as an EmptyRecording, which fails the tests using it far from the
-// cause.
+// A renderer killed before it finished (e.g. by Chromium's SIGKILL of a
+// renderer still alive 2 s after its host was torn down, or Playwright's
+// process group SIGKILL when closing takes over 30 s) never writes
+// writeFinished, and waiting can't save its recording, which is cut off before
+// its last checkpoints. Failing here names it, where uploading it would make
+// the backend reject every session that opens it as a confusing
+// EmptyRecording.
 async function waitForRecordingWritten(recordingId: string) {
   const deadline = Date.now() + RECORDING_WRITE_TIMEOUT_MS;
   while (true) {
