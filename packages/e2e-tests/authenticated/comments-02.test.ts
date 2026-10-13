@@ -19,7 +19,9 @@ async function load(page: Page, recordingId: string, apiKey: string, testScope: 
   await openSource(page, url);
 }
 
-test.use({ exampleKey: url, testUsers: [E2E_USER_1, E2E_USER_2] });
+// Playwright reads an array whose second element is an object as a fixture
+// tuple ([value, options]), so the users are passed inside one.
+test.use({ exampleKey: url, testUsers: [[E2E_USER_1, E2E_USER_2], { scope: "test" }] });
 
 test(`authenticated/comments-02: Test shared comments and replies`, async ({
   browser,
