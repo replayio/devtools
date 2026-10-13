@@ -32,7 +32,7 @@ function NagHat({
     <div
       className={classNames(
         NAG_HAT_CLASS,
-        "flex hidden select-none items-center space-x-2 py-1 px-2 leading-tight text-white"
+        "flex hidden select-none items-center space-x-2 px-2 py-1 leading-tight text-white"
       )}
       style={{
         boxShadow: "rgb(184 0 89 / 50%) 0px 0px 4px inset",

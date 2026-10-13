@@ -14,3 +14,13 @@ pages/_app.tsx
 *.yaml
 src/**/*.raw.js
 src/ui/components/TestSuite/suspense/assets/*.js
+# Recorded example apps: the e2e tests depend on their exact source, line
+# numbers included (test/examples above is the same for Node examples).
+packages/e2e-tests/examples
+# Build output and generated code.
+**/dist
+**/generated
+# Yarn's own release and plugins.
+.yarn
+# prettier-plugin-import-sort fails on it ("style is not a function").
+packages/docs/next.config.mjs

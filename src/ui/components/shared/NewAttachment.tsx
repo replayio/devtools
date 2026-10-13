@@ -67,7 +67,7 @@ function NewAttachment({ hideModal, modalOptions }: PropsFromRedux) {
               value={url}
               className="align-center mr-3 h-9 flex-grow border-none text-gray-500 placeholder-gray-300 focus:ring-0"
             ></input>
-            <button className={`${color} rounded-lg py-1 px-2 text-white`} onClick={onSubmit}>
+            <button className={`${color} rounded-lg px-2 py-1 text-white`} onClick={onSubmit}>
               Save
             </button>
           </form>

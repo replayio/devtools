@@ -74,7 +74,7 @@ export default function SourcemapToggleSuspends({
 
   return (
     <label
-      className="mapped-source flex items-center space-x-2 pt-0.5 pl-3"
+      className="mapped-source flex items-center space-x-2 pl-3 pt-0.5"
       data-test-id="SourceMapToggle"
       data-test-state={enabled ? "on" : "off"}
     >

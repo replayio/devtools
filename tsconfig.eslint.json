@@ -1,4 +1,4 @@
 {
   "extends": "./tsconfig.json",
-  "include": ["src", "packages", "pages", "scripts"]
+  "include": ["src", "packages", "pages", "scripts", "__mocks__", "test/jest"]
 }

@@ -1,5 +1,6 @@
 import { default as classNames, default as classnames } from "classnames";
 import { JSX, useContext, useEffect, useState } from "react";
+import { useImperativeCacheValue } from "suspense";
 
 import { getPauseId, getPausePreviewLocation } from "devtools/client/debugger/src/selectors";
 import useTooltip from "replay-next/src/hooks/useTooltip";
@@ -21,8 +22,6 @@ import { actions } from "../actions";
 import { selectors } from "../reducers";
 import { isTestSuiteReplay } from "./TestSuite/utils/isTestSuiteReplay";
 import styles from "./Toolbar.module.css";
-
-import { useImperativeCacheValue } from "suspense";
 
 function CypressIcon() {
   return (

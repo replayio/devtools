@@ -4,8 +4,8 @@
 
 "use strict";
 
-import EventEmitter from "devtools/shared/event-emitter";
 import { KeyCodes } from "devtools/client/shared/keycodes";
+import EventEmitter from "devtools/shared/event-emitter";
 
 // List of electron keys mapped to DOM API (DOM_VK_*) key code
 const ElectronKeysMapping = {

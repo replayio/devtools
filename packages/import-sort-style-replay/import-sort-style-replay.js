@@ -11,7 +11,6 @@ function sortImports(styleApi) {
     dotSegmentCount,
     hasNoMember,
     isAbsoluteModule,
-    isInstalledModule,
     isNodeModule,
     isRelativeModule,
     moduleName,
@@ -23,17 +22,34 @@ function sortImports(styleApi) {
     Boolean(imported.moduleName.match(/^(react|react-dom|prop-types|redux|\@reduxjs|next)/));
 
   const isNewPrototypeModule = imported =>
-    Boolean(imported.moduleName.match(/^(replay-next|shared)/));
-  const isProtocolModule = imported => Boolean(imported.moduleName.match(/^protocol/));
+    Boolean(imported.moduleName.match(/^(replay-next|shared)(\/|$)/));
+  const isProtocolModule = imported => Boolean(imported.moduleName.match(/^protocol(\/|$)/));
   const isOtherInternalPackageModule = imported =>
-    Boolean(imported.moduleName.match(/^(accordion|design|third-party)/));
+    Boolean(imported.moduleName.match(/^(accordion|design|third-party)(\/|$)/));
 
   const isGlobalReduxStoreConfig = imported =>
-    Boolean(imported.moduleName.match(/^(ui\/state|ui\/setup\/hooks)/));
+    Boolean(imported.moduleName.match(/^(ui\/state|ui\/setup\/hooks)(\/|$)/));
 
-  const isMainSrcFolder = imported => Boolean(imported.moduleName.match(/^(devtools|ui)/));
+  const isMainSrcFolder = imported => Boolean(imported.moduleName.match(/^(devtools|ui)(\/|$)/));
   const isOtherSrcFolder = imported =>
-    Boolean(imported.moduleName.match(/^(graphql|image|test|src)/));
+    Boolean(imported.moduleName.match(/^(image|test|src)(\/|$)/));
+
+  // The app's own non-relative modules: its source folders, workspace
+  // packages and aliases.
+  const isOwnModule = or(
+    isNewPrototypeModule,
+    isProtocolModule,
+    isOtherInternalPackageModule,
+    isGlobalReduxStoreConfig,
+    isMainSrcFolder,
+    isOtherSrcFolder,
+    imported => Boolean(imported.moduleName.match(/^@(devtools-repo|recordreplay)\//))
+  );
+  // Any other bare import is a third-party package, told apart by its name as
+  // import/order does. import-sort's isInstalledModule resolves the import
+  // instead, which fails for packages that only declare "exports" (e.g.
+  // suspense), so those got sorted with the app's own modules.
+  const isThirdPartyModule = and(isAbsoluteModule, not(isOwnModule));
 
   const isStylesModule = imported => Boolean(imported.moduleName.match(/\.(s?css|less)$/));
   const isImageModule = imported =>
@@ -65,7 +81,7 @@ function sortImports(styleApi) {
         // import React from "react";
         and(isReactEcosystemModule, not(isStylesModule)),
         // import uniq from 'lodash/uniq'
-        and(isInstalledModule(__filename), not(isRelativeModule), not(isStylesModule))
+        and(isThirdPartyModule, not(isRelativeModule), not(isStylesModule))
       ),
       sort: moduleName(naturally),
       sortNamedMembers: alias(unicode),
@@ -108,6 +124,11 @@ function sortImports(styleApi) {
     },
 
     // Assets
+
+    // import "some/global.css";
+    // Left in the order they're written in, which is the order their rules
+    // apply in, like the relative ones below.
+    { match: and(hasNoMember, isStylesModule, not(isRelativeModule)) },
 
     // import styles from "bvaughn/something/Component.css"
     {

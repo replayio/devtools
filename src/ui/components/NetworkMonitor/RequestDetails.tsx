@@ -332,7 +332,7 @@ const RequestDetails = ({
         data-test-id="Network-Details"
       >
         <div>
-          <div className="absolute top-1 right-1">
+          <div className="absolute right-1 top-1">
             <AddNetworkRequestCommentButton request={request} />
           </div>
           {activeTabDeferred === "headers" && <HeadersPanel request={request} />}

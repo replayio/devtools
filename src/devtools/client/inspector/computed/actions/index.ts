@@ -1,6 +1,6 @@
 import { Action } from "@reduxjs/toolkit";
-import QuickLRU from "shared/utils/quick-lru";
 
+import QuickLRU from "shared/utils/quick-lru";
 import CSSProperties from "third-party/css/css-properties";
 import { OutputParser } from "third-party/css/output-parser";
 

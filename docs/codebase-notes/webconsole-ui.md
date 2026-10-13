@@ -4,8 +4,11 @@
 
 - Uses: `messages.overflow`, `consoleUI.filterBarDisplayMode`
 - Renders:
+
   - `<FilterBar>`
+
     - Renders:
+
       - `<FilterDrawerToggle>`
 
       - `<FilterSearchBox>`
@@ -14,6 +17,7 @@
         - Uses: `getAllMessagesById / messages.messagesById`
         - Dispatches: `messagesClearEvaluations`
         - \*_Note_: does a seemingly expensive `Map > array` conversion on every render just to see if any messages match types "COMMAND" or "RESULT". Should really be a memoized selector?
+
   - `<FilterDrawer>`
     - Renders:
       - `<FilterSettings>`

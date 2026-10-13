@@ -94,16 +94,10 @@ RECORD_REPLAY_SERVER=ws://localhost:8000 RECORD_REPLAY_DRIVER=~/devel/backend/ou
 
 Replace the paths with the appropriate paths within the `backend` repo as appropriate in your environment.
 
-#### Installing the trunk launcher
-
-This project uses [trunk](https://trunk.io) to lint and format its code. Trunk is installed as a dev dependency so you can invoke it as `npx trunk`.
-To learn more about `trunk`, check out the [documentation](https://docs.trunk.io).
-
 #### Linting your changes
 
-In most cases you can simply run `trunk check` which will autodetect the changes you have made and lint them.
-If you would like to only autoformat your changes, you can run `trunk fmt`.
-More information on using trunk can be found [here](https://docs.trunk.io/getting-started/usage).
+`yarn lint` checks the code with ESLint, Prettier and Stylelint, as the Lint workflow does on every pull request.
+`yarn lint:fix` fixes what they can fix automatically, including formatting.
 
 #### Generating GraphQL types for Typescript
 

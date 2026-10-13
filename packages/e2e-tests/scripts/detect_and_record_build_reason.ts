@@ -236,11 +236,19 @@ export async function fetchLatestChromiumBuildOnBranch(token: string, branch: st
   };
 }
 
-export async function fetchRuntimeBuildIdFromChromiumBuildId(os: string, arch: string, buildId: string) {
+export async function fetchRuntimeBuildIdFromChromiumBuildId(
+  os: string,
+  arch: string,
+  buildId: string
+) {
   return fetchArtifactContents(buildId, path.join("build_id", os, arch, "build_id"));
 }
 
-export async function fetchRuntimeBuildIdFromChromiumBuildNumber(os: string, arch: string, buildNumber: number) {
+export async function fetchRuntimeBuildIdFromChromiumBuildNumber(
+  os: string,
+  arch: string,
+  buildNumber: number
+) {
   const pageSize = 25;
 
   // fetch the first page of builds

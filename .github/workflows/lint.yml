@@ -8,8 +8,8 @@ on:
       - main
 
 jobs:
-  trunk_check_runner:
-    name: Trunk Check runner
+  lint:
+    name: Lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -36,5 +36,5 @@ jobs:
         run: yarn install
         env:
           YARN_CHECKSUM_BEHAVIOR: "update"
-      - name: Trunk Check
-        uses: trunk-io/trunk-action@v1.1.19
+      - name: Lint
+        run: yarn lint
