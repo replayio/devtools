@@ -24,18 +24,6 @@ concurrency:
   cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
 
 jobs:
-  download-browser:
-    name: Download Replay browser
-    runs-on: ubuntu-22.04
-    timeout-minutes: 2
-    steps:
-      - name: Download
-        run: wget https://static.replay.io/downloads/macOS-replay-playwright.tar.xz
-      - name: Create artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: macOS-replay-playwright
-          path: macOS-replay-playwright.tar.xz
   preview-branch:
     name: Wait for Vercel Preview Branch
     runs-on: ubuntu-22.04
