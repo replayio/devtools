@@ -1,7 +1,7 @@
 import { openDevToolsTab, startTest } from "../helpers";
 import { openPauseInformationPanel, waitForPaused } from "../helpers/pause-information-panel";
 import { clickSourceTreeNode } from "../helpers/source-explorer-panel";
-import { rewindToLine } from "../helpers/source-panel";
+import { rewindToLine, waitForSelectedSource } from "../helpers/source-panel";
 import test from "../testFixture";
 
 test.use({ exampleKey: "doc_rr_objects.html" });
@@ -17,6 +17,7 @@ test("stepping-07: Test quick stepping using the keyboard", async ({
   await clickSourceTreeNode(page, "recording");
   await clickSourceTreeNode(page, "test/examples");
   await clickSourceTreeNode(page, exampleKey);
+  await waitForSelectedSource(page, exampleKey);
 
   await openPauseInformationPanel(page);
 

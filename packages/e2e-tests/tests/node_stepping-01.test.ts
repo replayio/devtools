@@ -26,19 +26,19 @@ test("node_stepping-01: Test stepping in async frames and async call stacks", as
   await verifyFramesCount(page, 5);
 
   await waitForScopeValue(page, "n", "2");
-  // One of this frame's five steps has run.
-  await waitForFrameTimeline(page, "20%");
+  // Two of this frame's seven steps have run.
+  await waitForFrameTimeline(page, "28%");
 
   await selectFrame(page, 1);
   await waitForScopeValue(page, "n", "3");
-  await waitForFrameTimeline(page, "80%");
+  await waitForFrameTimeline(page, "85%");
 
   await selectFrame(page, 2);
   await waitForScopeValue(page, "n", "4");
-  await waitForFrameTimeline(page, "80%");
+  await waitForFrameTimeline(page, "85%");
 
   await selectFrame(page, 3);
-  await waitForFrameTimeline(page, "75%");
+  await waitForFrameTimeline(page, "71%");
 
   await selectFrame(page, 4);
   // The outermost frame has a single step, so it reads as complete.
@@ -48,6 +48,8 @@ test("node_stepping-01: Test stepping in async frames and async call stacks", as
 
   await stepOverToLine(page, 20);
   await stepOverToLine(page, 21);
+  // Line 22 steps twice: the await, then the baz call it awaits.
+  await stepOverToLine(page, 22);
   await stepOverToLine(page, 22);
   await stepOverToLine(page, 24);
   await executeAndVerifyTerminalExpression(page, "n", 2);

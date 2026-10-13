@@ -22,7 +22,7 @@ function foo() {
     g[`a${i}`] = i;
   }
   var h = /abc/gi;
-  var i = new Date();
+  var i = new Date("2024-04-24T12:00:00Z"); // fixed, so re-recording logs the same date
   var j = RangeError("foo");
   var l = bar;
   var m = [undefined, true, 3, null, "z", 40n];
