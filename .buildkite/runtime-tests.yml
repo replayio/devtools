@@ -4,10 +4,10 @@ steps:
     timeout_in_minutes: 60
     commands:
       - "mkdir -p /mnt/data/replay"
-      # The e2e=true pods still run Node 18, which Playwright 1.62 refuses. Use .nvmrc's Node 22
+      # The e2e=true pods still run Node 18, which Playwright 1.62 refuses. Use .nvmrc's Node
       # from the official tarball until the buildkite-e2e image is rebuilt with a newer Node.
       - |
-        NODE_VERSION=22.23.3
+        NODE_VERSION=$$(tr -d 'v[:space:]' < .nvmrc)
         NODE_DIR=$$(mktemp -d)
         trap 'rm -rf "$$NODE_DIR"' EXIT
         curl -fsSL "https://nodejs.org/dist/v$${NODE_VERSION}/node-v$${NODE_VERSION}-linux-x64.tar.xz" | tar -xJ -C "$$NODE_DIR" --strip-components=1
