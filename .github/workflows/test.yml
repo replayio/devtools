@@ -76,9 +76,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Setup node
+        id: setup-node
         uses: actions/setup-node@v4
         with:
-          node-version: "16"
+          node-version-file: .nvmrc
       # Get the yarn cache path.
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
@@ -90,8 +91,8 @@ jobs:
           path: |
             ${{ steps.yarn-cache-dir-path.outputs.dir }}
             **/node_modules
-          key: yarn-cache-folder-${{ hashFiles('**/yarn.lock', '.yarnrc.yml') }}
-          restore-keys: "yarn-cache-folder-"
+          key: yarn-cache-folder-${{ steps.setup-node.outputs.node-version }}-${{ hashFiles('**/yarn.lock', '.yarnrc.yml') }}
+          restore-keys: "yarn-cache-folder-${{ steps.setup-node.outputs.node-version }}-"
       # Actually install packages with Yarn
       - name: Install packages
         run: yarn install
@@ -140,9 +141,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Setup node
+        id: setup-node
         uses: actions/setup-node@v4
         with:
-          node-version: "16"
+          node-version-file: .nvmrc
       # Get the yarn cache path.
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
@@ -154,8 +156,8 @@ jobs:
           path: |
             ${{ steps.yarn-cache-dir-path.outputs.dir }}
             **/node_modules
-          key: yarn-cache-folder-${{ hashFiles('**/yarn.lock', '.yarnrc.yml') }}
-          restore-keys: "yarn-cache-folder-"
+          key: yarn-cache-folder-${{ steps.setup-node.outputs.node-version }}-${{ hashFiles('**/yarn.lock', '.yarnrc.yml') }}
+          restore-keys: "yarn-cache-folder-${{ steps.setup-node.outputs.node-version }}-"
       # Actually install packages with Yarn
       - name: Install packages
         run: yarn install
@@ -195,9 +197,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Setup node
+        id: setup-node
         uses: actions/setup-node@v4
         with:
-          node-version: "16"
+          node-version-file: .nvmrc
       # Get the yarn cache path.
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
@@ -209,8 +212,8 @@ jobs:
           path: |
             ${{ steps.yarn-cache-dir-path.outputs.dir }}
             **/node_modules
-          key: yarn-cache-folder-${{ hashFiles('**/yarn.lock', '.yarnrc.yml') }}
-          restore-keys: "yarn-cache-folder-"
+          key: yarn-cache-folder-${{ steps.setup-node.outputs.node-version }}-${{ hashFiles('**/yarn.lock', '.yarnrc.yml') }}
+          restore-keys: "yarn-cache-folder-${{ steps.setup-node.outputs.node-version }}-"
       # Actually install packages with Yarn
       - name: Install packages
         run: yarn install
