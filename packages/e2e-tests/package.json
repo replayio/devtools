@@ -22,7 +22,7 @@
   "devDependencies": {
     "@devtools-repo/playwright-recorder": "*",
     "@playwright/test": "^1.62.1",
-    "@replayio/playwright": "3.0.0-alpha.14",
+    "@replayio/playwright": "^5.0.3",
     "axios": "^0.21.1",
     "cli-spinners": "^2.7.0",
     "cypress": "^12.5.1",
