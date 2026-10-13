@@ -7,11 +7,17 @@ jobs:
   mirror_job:
     runs-on: ubuntu-latest
     name: Mirror main branch to staging branch
+    permissions:
+      contents: write
     steps:
-    - name: Mirror action step
-      id: mirror
-      uses: google/mirror-branch-action@v1.0
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        source: 'main'
-        dest: 'staging'
+      - name: Point staging at main
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          sha=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)
+          if gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/staging" > /dev/null 2>&1; then
+            gh api --method PATCH "repos/$GITHUB_REPOSITORY/git/refs/heads/staging" -f sha="$sha" -F force=true > /dev/null
+          else
+            gh api --method POST "repos/$GITHUB_REPOSITORY/git/refs" -f ref=refs/heads/staging -f sha="$sha" > /dev/null
+          fi
+          echo "Set staging to $sha."
