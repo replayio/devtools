@@ -106,7 +106,7 @@ jobs:
           name: all-code-coverage-reports_${{ matrix.shard }}
           path: packages/e2e-tests/test-results
           retention-days: 3
-      - uses: replayio/action-upload@02d7ff2da88d9a4fca19cd4119feb8e8222a4ac6 # v0.6.0
+      - uses: replayio/action-upload@715f00955415fcc6873ce268396489a2ad07dca2 # v0.5.1
         if: always()
         with:
           api-key: ${{ env.RECORD_REPLAY_API_KEY }}
@@ -168,7 +168,7 @@ jobs:
           name: all-code-coverage-reports_auth
           path: packages/e2e-tests/test-results
           retention-days: 3
-      - uses: replayio/action-upload@02d7ff2da88d9a4fca19cd4119feb8e8222a4ac6 # v0.6.0
+      - uses: replayio/action-upload@715f00955415fcc6873ce268396489a2ad07dca2 # v0.5.1
         if: always()
         with:
           api-key: ${{ env.RECORD_REPLAY_API_KEY }}
