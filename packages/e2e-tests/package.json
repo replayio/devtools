@@ -21,7 +21,7 @@
   "license": "ISC",
   "devDependencies": {
     "@devtools-repo/playwright-recorder": "*",
-    "@playwright/test": "^1.37.0",
+    "@playwright/test": "^1.62.1",
     "@replayio/playwright": "3.0.0-alpha.14",
     "axios": "^0.21.1",
     "cli-spinners": "^2.7.0",

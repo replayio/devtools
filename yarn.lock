@@ -1814,7 +1814,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@devtools-repo/playwright-recorder@workspace:packages/playwright-recorder"
   dependencies:
-    "@playwright/test": ^1.37.0
+    "@playwright/test": ^1.62.1
     "@replayio/replay": ^0.22.4
     axios: ^0.21.1
     chalk: ^4
@@ -3964,19 +3964,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@playwright/test@npm:^1.35.0, @playwright/test@npm:^1.37.0":
-  version: 1.37.1
-  resolution: "@playwright/test@npm:1.37.1"
+"@playwright/test@npm:^1.62.1":
+  version: 1.62.1
+  resolution: "@playwright/test@npm:1.62.1"
   dependencies:
-    "@types/node": "*"
-    fsevents: 2.3.2
-    playwright-core: 1.37.1
-  dependenciesMeta:
-    fsevents:
-      optional: true
+    playwright: 1.62.1
   bin:
     playwright: cli.js
-  checksum: b7038f29000289103c08b215eff7aabdda70cdc1375fa7dad0e81651be71086a1e2fc0e0e29dc70348037c366cf0cc69f762373fda34ba1a74aa1658741d9195
+  checksum: 168f3c0436aa6ddfdfca955ce7b329c42fddef27b1f8898d09c7af34e51f54739bc421f24058e9a851d9d9b26f68d2dec87cc9564826d15539f3b572c1ed9aea
   languageName: node
   linkType: hard
 
@@ -10276,7 +10271,7 @@ __metadata:
   resolution: "functional-tests@workspace:packages/e2e-tests"
   dependencies:
     "@devtools-repo/playwright-recorder": "*"
-    "@playwright/test": ^1.37.0
+    "@playwright/test": ^1.62.1
     "@replayio/playwright": 3.0.0-alpha.14
     axios: ^0.21.1
     chalk: ^4
@@ -14800,12 +14795,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"playwright-core@npm:1.37.1":
-  version: 1.37.1
-  resolution: "playwright-core@npm:1.37.1"
+"playwright-core@npm:1.62.1":
+  version: 1.62.1
+  resolution: "playwright-core@npm:1.62.1"
   bin:
     playwright-core: cli.js
-  checksum: 69f818da2230057584140d5b3af7778a4f4a822b5b18d133abfc5d259128becb943c343a2ddf6b0635277a69f28983e83e2bc3fce23595ececb1e410475b6368
+  checksum: 270674de6b921dd09e00d01e9a725117d03097f0e540ed681fb70d183d2f7855188640b0d7de1b9c0f8a2fb334eb33dedf1f34eeed86792fe88dc14633b06121
+  languageName: node
+  linkType: hard
+
+"playwright@npm:1.62.1":
+  version: 1.62.1
+  resolution: "playwright@npm:1.62.1"
+  dependencies:
+    fsevents: 2.3.2
+    playwright-core: 1.62.1
+  dependenciesMeta:
+    fsevents:
+      optional: true
+  bin:
+    playwright: cli.js
+  checksum: 1e18e684d97b3d42ac6c80defe676c4c6c85d96394b690407f75b7a9007d8d44d774c9e9c40957a7319ff70a4d4dad103d6362415b81055256b823abe89abdca
   languageName: node
   linkType: hard
 
@@ -16113,7 +16123,7 @@ __metadata:
     "@codemirror/state_replay_next": "npm:@codemirror/state@6.1.2"
     "@lezer/common_replay_next": "npm:@lezer/common@1.0.1"
     "@lezer/highlight_replay_next": "npm:@lezer/highlight@1.1.1"
-    "@playwright/test": ^1.35.0
+    "@playwright/test": ^1.62.1
     "@replayio/protocol": ^0.70.0
     "@testing-library/jest-dom": ^5.16.3
     "@testing-library/react": ^16
