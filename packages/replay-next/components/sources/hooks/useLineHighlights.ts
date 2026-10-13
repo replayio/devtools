@@ -11,6 +11,9 @@ import { SourceSearchContext } from "../SourceSearchContext";
 
 export type ExecutionPointLineHighlight = {
   columnIndex: number;
+  // A pause is still being created for a requested location, so the line may
+  // not be where the pause ends up.
+  isPreview: boolean;
   lineIndex: number;
   type: "execution-point";
 };
@@ -61,6 +64,7 @@ export function useLineHighlights(sourceId: SourceId): {
   if (previewSourceId === focusedSourceId && previewLineNumber != null) {
     executionPointLineHighlight = {
       columnIndex: previewColumnIndex ?? 0,
+      isPreview: true,
       lineIndex: previewLineNumber - 1,
       type: "execution-point",
     };
@@ -72,6 +76,9 @@ export function useLineHighlights(sourceId: SourceId): {
       if (location) {
         executionPointLineHighlight = {
           columnIndex: location.column,
+          // The selected frame can still be the previous pause's while a new
+          // one is being created.
+          isPreview: previewLocation != null,
           lineIndex: location.line - 1,
           type: "execution-point",
         };

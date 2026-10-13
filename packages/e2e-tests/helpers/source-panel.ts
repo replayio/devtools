@@ -352,9 +352,14 @@ export async function getSelectedLineNumber(
   page: Page,
   lineIsCurrentPoint: boolean
 ): Promise<number | null> {
-  const highlightLineTestName = lineIsCurrentPoint
-    ? "CurrentExecutionPointLineHighlight"
-    : "ViewSourceHighlight";
+  // While a pause is being created, the current execution point is shown at
+  // the requested location ("preview-location"), which needn't be the line the
+  // pause ends up at.
+  const highlightLocator = lineIsCurrentPoint
+    ? page.locator(
+        '[data-test-name="CurrentExecutionPointLineHighlight"][data-test-type="execution-point"]'
+      )
+    : getByTestName(page, "ViewSourceHighlight");
 
   const sourceLocator = await getCurrentSource(page);
   if (sourceLocator == null) {
@@ -362,7 +367,7 @@ export async function getSelectedLineNumber(
   }
 
   const lineLocator = sourceLocator.locator(`[data-test-id^=SourceLine]`, {
-    has: getByTestName(page, highlightLineTestName),
+    has: highlightLocator,
   });
 
   const count = await lineLocator.count();
@@ -381,6 +386,19 @@ export async function getSelectedLineNumber(
   return parseInt(textContent, 10);
 }
 
+// Creating the pause for a seek can take more than 10s when the session is
+// still cold, e.g. for the first seek into a recording.
+const PAUSE_CREATION_TIMEOUT = 30_000;
+
+export async function waitForCurrentExecutionPointLine(page: Page, lineNumber: number) {
+  await waitFor(
+    async () => {
+      expect(await getSelectedLineNumber(page, true)).toBe(lineNumber);
+    },
+    { timeout: PAUSE_CREATION_TIMEOUT }
+  );
+}
+
 export async function verifyJumpToCodeResults(
   page: Page,
   filename: string,
@@ -389,10 +407,7 @@ export async function verifyJumpToCodeResults(
 ) {
   await waitForSelectedSource(page, filename);
   // Should highlight the line that ran
-  await waitFor(async () => {
-    const lineNumber = await getSelectedLineNumber(page, true);
-    expect(lineNumber).toBe(lineNumber);
-  });
+  await waitForCurrentExecutionPointLine(page, lineNumber);
 
   if (expectedHits) {
     // Should also have jumped in time. Since this can vary (slightly different progress %

@@ -1,5 +1,10 @@
 import { openDevToolsTab, openViewerTab, startTest } from "../helpers";
-import { closeSource, getSelectedLineNumber, waitForSelectedSource } from "../helpers/source-panel";
+import {
+  closeSource,
+  getSelectedLineNumber,
+  waitForCurrentExecutionPointLine,
+  waitForSelectedSource,
+} from "../helpers/source-panel";
 import {
   getSelectedTestCase,
   getTestCaseSteps,
@@ -58,10 +63,7 @@ test("cypress-04: Test Step buttons and menu item", async ({
   await jumpToCodeButton.click();
 
   await waitForSelectedSource(page, "Link.js");
-  await waitFor(async () => {
-    const lineNumber = await getSelectedLineNumber(page, true);
-    expect(lineNumber).toBe(38);
-  });
+  await waitForCurrentExecutionPointLine(page, 38);
 
   // Avoid "selected line" locator errors by closing this tab first
   await waitForSelectedSource(page, "Link.js");

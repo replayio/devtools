@@ -11,6 +11,9 @@ import test, { expect } from "../testFixture";
 
 test.use({ exampleKey: "cypress-realworld/bankaccounts.spec.js" });
 
+// Looking up a step's DOM nodes evaluates in the recording, which can take a while.
+const DOM_NODE_LOOKUP_TIMEOUT = 30_000;
+
 test("cypress-05: Test DOM node preview on user action step hover", async ({
   pageWithMeta: { page, recordingId, testScope },
   exampleKey,
@@ -58,17 +61,10 @@ test("cypress-05: Test DOM node preview on user action step hover", async ({
   // Note that the ID is dynamically generated based on the piece of the box model shown
   const highlighter = page.locator("#box-model-content");
 
-  await waitFor(
-    async () => {
-      // Repeatedly hover over the first step and then the click step, to force the
-      // `onMouseEnter` handler to keep checking if we have a DOM node entry available.
-      await firstStep.hover({ timeout: 1000 });
-      await firstClickStep.hover({ timeout: 1000 });
-      await highlighter.waitFor({ state: "visible", timeout: 1000 });
-    },
-    // Give the evaluation plenty of time to complete
-    { timeout: 30000 }
-  );
+  // The step's DOM nodes are looked up in the background once the test is
+  // selected, and are highlighted as soon as they're found.
+  await firstClickStep.hover();
+  await expect(highlighter).toBeVisible({ timeout: DOM_NODE_LOOKUP_TIMEOUT });
 
   const pathDefinition = await highlighter.getAttribute("d");
   // Should have a meaningful SVG path of some kind for the highlighter
@@ -139,20 +135,9 @@ test("cypress-05: Test DOM node preview on user action step hover", async ({
 
   // There should now be 2 highlighters in the page,
   // one per found list item DOM node
-
-  await waitFor(
-    async () => {
-      // Repeatedly hover over the first step and then the actual step, to force the
-      // `onMouseEnter` handler to keep checking if we have a DOM node entry available.
-      await firstStep.hover({ timeout: 1000 });
-      await stepWithMultipleNodes.hover({ timeout: 1000 });
-      const count = await highlighter.count();
-      await highlighter.first().waitFor({ state: "visible", timeout: 1000 });
-      expect(count).toBe(2);
-    },
-    // Give the evaluation plenty of time to complete
-    { timeout: 30000 }
-  );
+  await stepWithMultipleNodes.hover();
+  await expect(highlighter).toHaveCount(2, { timeout: DOM_NODE_LOOKUP_TIMEOUT });
+  await expect(highlighter.first()).toBeVisible();
 
   debugPrint(page, "Checking found nodes badge");
 
