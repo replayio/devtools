@@ -1,4 +1,5 @@
 import { ExecutionPoint, repaintGraphicsResult } from "@replayio/protocol";
+import { Cache, createCache } from "suspense";
 
 import { mergedPaintsAndRepaints } from "protocol/PaintsCache";
 import { paintHashCache } from "replay-next/src/suspense/PaintHashCache";
@@ -6,8 +7,6 @@ import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { insert } from "replay-next/src/utils/array";
 import { compareExecutionPoints } from "replay-next/src/utils/time";
 import { ReplayClientInterface, TimeStampedPointWithPaintHash } from "shared/client/types";
-
-import { Cache, createCache } from "suspense";
 
 export const RepaintGraphicsCache: Cache<
   [replayClient: ReplayClientInterface, time: number, executionPoint: ExecutionPoint],

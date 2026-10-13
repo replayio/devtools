@@ -1,8 +1,7 @@
 import { Location } from "@replayio/protocol";
+import { createCache } from "suspense";
 
 import { ReplayClientInterface } from "shared/client/types";
-
-import { createCache } from "suspense";
 
 export const mappedExpressionCache = createCache<
   [client: ReplayClientInterface, expression: string, location: Location],

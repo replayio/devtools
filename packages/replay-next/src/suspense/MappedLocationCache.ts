@@ -2,10 +2,9 @@ import {
   Location as ProtocolLocation,
   MappedLocation as ProtocolMappedLocation,
 } from "@replayio/protocol";
+import { Cache, createCache } from "suspense";
 
 import { ReplayClientInterface } from "shared/client/types";
-
-import { Cache, createCache } from "suspense";
 
 export const mappedLocationCache: Cache<
   [replayClient: ReplayClientInterface, location: ProtocolLocation],

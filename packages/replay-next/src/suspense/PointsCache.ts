@@ -1,10 +1,9 @@
 import { RecordingId } from "@replayio/protocol";
+import { Cache, createCache } from "suspense";
 
 import { Point } from "shared/client/types";
 import { GraphQLClientInterface } from "shared/graphql/GraphQLClient";
 import { getPoints as getPointsGraphQL } from "shared/graphql/Points";
-
-import { Cache, createCache } from "suspense";
 
 export const pointsCache: Cache<
   [graphQLClient: GraphQLClientInterface, accessToken: string | null, recordingId: RecordingId],

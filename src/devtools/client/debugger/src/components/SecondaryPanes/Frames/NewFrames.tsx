@@ -1,5 +1,6 @@
 import { ExecutionPoint, PauseId } from "@replayio/protocol";
 import { Suspense, useContext, useMemo } from "react";
+import { useImperativeCacheValue } from "suspense";
 
 import {
   Context,
@@ -30,8 +31,6 @@ import { collapseFrames, formatCopyName } from "../../../utils/pause/frames";
 import { FrameComponent as Frame } from "./Frame";
 import { Group } from "./Group";
 import { CommonFrameComponentProps } from ".";
-
-import { useImperativeCacheValue } from "suspense";
 
 function FramesRenderer({
   panel,

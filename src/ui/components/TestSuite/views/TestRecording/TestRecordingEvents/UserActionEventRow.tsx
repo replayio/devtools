@@ -1,6 +1,7 @@
 import assert from "assert";
 import { ExecutionPoint, Location, TimeStampedPoint } from "@replayio/protocol";
 import { Suspense, memo, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { Cache, STATUS_PENDING, STATUS_RESOLVED, useImperativeCacheValue } from "suspense";
 
 import { getExecutionPoint } from "devtools/client/debugger/src/selectors";
 import Loader from "replay-next/components/Loader";
@@ -33,8 +34,6 @@ import {
 } from "ui/suspense/annotationsCaches";
 
 import styles from "./UserActionEventRow.module.css";
-
-import { Cache, STATUS_PENDING, STATUS_RESOLVED, useImperativeCacheValue } from "suspense";
 
 const NO_ANNOTATIONS: ParsedJumpToCodeAnnotation[] = [];
 

@@ -1,8 +1,7 @@
 import { IDBPDatabase, openDB } from "idb";
+import { Cache, createCache } from "suspense";
 
 import { IDBOptions } from "shared/user-data/IndexedDB/types";
-
-import { Cache, createCache } from "suspense";
 
 export const indexedDbCache: Cache<[dbOptions: IDBOptions], IDBPDatabase> = createCache({
   debugLabel: "IndexedDB",

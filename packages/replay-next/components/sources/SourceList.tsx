@@ -8,6 +8,7 @@ import {
   useRef,
 } from "react";
 import { VariableSizeList as List, ListOnItemsRenderedProps } from "react-window";
+import { useImperativeCacheValue, useStreamingValue } from "suspense";
 
 import useGetItemSize from "replay-next/components/sources/hooks/useGetItemSize";
 import { useLineHighlights } from "replay-next/components/sources/hooks/useLineHighlights";
@@ -30,8 +31,6 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import SourceListRow from "./SourceListRow";
 import getScrollbarWidth from "./utils/getScrollbarWidth";
 import styles from "./SourceList.module.css";
-
-import { useImperativeCacheValue, useStreamingValue } from "suspense";
 
 const NO_BREAKABLE_POSITIONS: BreakpointPositionsByLine = new Map();
 

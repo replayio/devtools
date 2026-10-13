@@ -1,4 +1,5 @@
 import { ChangeEvent, MouseEvent, Suspense, useContext, useEffect, useRef, useState } from "react";
+import { STATUS_REJECTED, useStreamingValue } from "suspense";
 
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import { useDebounce } from "replay-next/src/hooks/useDebounce";
@@ -12,8 +13,6 @@ import Icon, { IconType } from "../Icon";
 import ResultsList from "./ResultsList";
 import SearchResults from "./SearchResults";
 import styles from "./SearchFiles.module.css";
-
-import { STATUS_REJECTED, useStreamingValue } from "suspense";
 
 export const SHOW_GLOBAL_SEARCH_EVENT_TYPE = "show-global-search";
 

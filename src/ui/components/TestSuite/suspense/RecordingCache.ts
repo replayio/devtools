@@ -1,10 +1,9 @@
 import assert from "assert";
 import { RecordingId } from "@replayio/protocol";
+import { createSingleEntryCache } from "suspense";
 
 import { Recording } from "shared/graphql/types";
 import { getRecording } from "ui/hooks/recordings";
-
-import { createSingleEntryCache } from "suspense";
 
 export const RecordingCache = createSingleEntryCache<[recordingId: RecordingId], Recording>({
   debugLabel: "RecordingCache",

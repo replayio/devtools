@@ -1,4 +1,5 @@
 import { ContentType, SourceId } from "@replayio/protocol";
+import { StreamingCacheLoadOptions, createStreamingCache } from "suspense";
 
 import { assert } from "protocol/utils";
 import {
@@ -8,8 +9,6 @@ import {
 import { ReplayClientInterface } from "shared/client/types";
 
 import { ParsedToken, createIncrementalParser } from "../utils/syntax-parser";
-
-import { StreamingCacheLoadOptions, createStreamingCache } from "suspense";
 
 const parseCache = new Map<string, ParsedToken[][]>();
 

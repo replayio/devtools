@@ -1,4 +1,5 @@
 import { ExecutionPoint, PauseDescription, SourceId, SourceLocation } from "@replayio/protocol";
+import { createCache } from "suspense";
 
 import { locationsInclude } from "protocol/utils";
 import { ReplayClientInterface } from "shared/client/types";
@@ -9,8 +10,6 @@ import { getPointAndTimeForPauseId, updateMappedLocation } from "./PauseCache";
 import { pointStackCache } from "./PointStackCache";
 import { sourceOutlineCache } from "./SourceOutlineCache";
 import { sourcesByIdCache } from "./SourcesCache";
-
-import { createCache } from "suspense";
 
 export const FIND_STEP_TARGET_COMMANDS = [
   "findStepInTarget",

@@ -1,12 +1,11 @@
 import { PauseId, PointDescription, PointSelector, Value } from "@replayio/protocol";
+import { createCache } from "suspense";
 
 import { ReplayClientInterface } from "shared/client/types";
 
 import { createAnalysisCache } from "./AnalysisCache";
 import { cachePauseData } from "./PauseCache";
 import { sourcesByIdCache } from "./SourcesCache";
-
-import { createCache } from "suspense";
 
 export type UncaughtException = PointDescription & {
   type: "UncaughtException";

@@ -1,10 +1,9 @@
 import { RecordingId } from "@replayio/protocol";
+import { Cache, createCache } from "suspense";
 
 import { getComments as getCommentsGraphQL } from "shared/graphql/Comments";
 import { GraphQLClientInterface } from "shared/graphql/GraphQLClient";
 import { Comment } from "shared/graphql/types";
-
-import { Cache, createCache } from "suspense";
 
 export const commentsCache: Cache<
   [graphQLClient: GraphQLClientInterface, accessToken: string | null, recordingId: RecordingId],

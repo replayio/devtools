@@ -1,11 +1,10 @@
 import { ObjectId, PauseId } from "@replayio/protocol";
+import { createCache } from "suspense";
 
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { pauseEvaluationsCache } from "replay-next/src/suspense/PauseCache";
 import { findProtocolObjectPropertyValue } from "replay-next/src/utils/protocol";
 import { ReplayClientInterface } from "shared/client/types";
-
-import { createCache } from "suspense";
 
 declare var __RECORD_REPLAY__: {
   getObjectFromProtocolId?: (id: string | number) => any;

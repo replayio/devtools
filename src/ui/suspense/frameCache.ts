@@ -13,6 +13,7 @@ import {
   TimeStampedPointRange,
 } from "@replayio/protocol";
 import findLast from "lodash/findLast";
+import { Cache, createCache } from "suspense";
 
 import { createFrame } from "devtools/client/debugger/src/client/create";
 import { PauseAndFrameId } from "devtools/client/debugger/src/selectors";
@@ -28,8 +29,6 @@ import {
   formatFunctionDetailsFromLocation,
 } from "ui/actions/eventListeners/eventListenerUtils";
 import { SourcesState } from "ui/reducers/sources";
-
-import { Cache, createCache } from "suspense";
 
 export function getPauseFramesSuspense(
   replayClient: ReplayClientInterface,

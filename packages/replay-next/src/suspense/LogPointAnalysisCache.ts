@@ -7,6 +7,7 @@ import {
   TimeStampedPoint,
   Value,
 } from "@replayio/protocol";
+import { Cache, createCache } from "suspense";
 
 import { parse } from "replay-next/src/suspense/SyntaxParsingCache";
 import { ReplayClientInterface } from "shared/client/types";
@@ -15,8 +16,6 @@ import { createFetchAsyncFromFetchSuspense } from "../utils/suspense";
 import { createAnalysisCache } from "./AnalysisCache";
 import { hitPointsCache } from "./HitPointsCache";
 import { mappedExpressionCache } from "./MappedExpressionCache";
-
-import { Cache, createCache } from "suspense";
 
 export type LogPointAnalysisResult = {
   executionPoint: ExecutionPoint;

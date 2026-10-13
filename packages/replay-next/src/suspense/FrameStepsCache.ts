@@ -1,12 +1,11 @@
 import { FrameId, Location, PauseId, PointDescription } from "@replayio/protocol";
 import cloneDeep from "lodash/cloneDeep";
+import { Cache, createCache } from "suspense";
 
 import { ReplayClientInterface } from "shared/client/types";
 
 import { updateMappedLocation } from "./PauseCache";
 import { sourcesByIdCache } from "./SourcesCache";
-
-import { Cache, createCache } from "suspense";
 
 function getKey([client, pauseId, frameId]: [ReplayClientInterface, PauseId, FrameId]) {
   const focusWindow = client.getCurrentFocusWindow();

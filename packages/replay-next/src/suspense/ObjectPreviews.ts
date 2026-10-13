@@ -9,6 +9,7 @@ import {
   SourceId,
 } from "@replayio/protocol";
 import * as Sentry from "@sentry/react";
+import { Cache, createCache } from "suspense";
 
 import { assert } from "protocol/utils";
 
@@ -16,8 +17,6 @@ import { ReplayClientInterface } from "../../../shared/client/types";
 import { Value as ClientValue, protocolValueToClientValue } from "../utils/protocol";
 import { cachePauseData, updateMappedLocation } from "./PauseCache";
 import { Source, sourcesByIdCache } from "./SourcesCache";
-
-import { Cache, createCache } from "suspense";
 
 export const objectCache: Cache<
   [

@@ -1,3 +1,5 @@
+import { createSingleEntryCache } from "suspense";
+
 import { recordingTargetCache } from "replay-next/src/suspense/BuildIdCache";
 import { screenshotCache } from "replay-next/src/suspense/ScreenshotCache";
 import { find, findIndexGTE, findIndexLTE, insert } from "replay-next/src/utils/array";
@@ -5,8 +7,6 @@ import { getDimensions } from "replay-next/src/utils/image";
 import { compareExecutionPoints } from "replay-next/src/utils/time";
 import { replayClient } from "shared/client/ReplayClientContext";
 import { TimeStampedPointWithPaintHash } from "shared/client/types";
-
-import { createSingleEntryCache } from "suspense";
 
 // This could be a streaming cache, but streaming APIs are more awkward to interop with
 // Since we wait for processing to complete before loading a recording, paints should always load very quickly

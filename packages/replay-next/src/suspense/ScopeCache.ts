@@ -1,4 +1,5 @@
 import { FrameId, MappedLocation, PauseId, Scope, ScopeId } from "@replayio/protocol";
+import { Cache, createCache } from "suspense";
 
 import { assert } from "protocol/utils";
 import { ReplayClientInterface } from "shared/client/types";
@@ -6,8 +7,6 @@ import { ReplayClientInterface } from "shared/client/types";
 import { framesCache } from "./FrameCache";
 import { cachePauseData } from "./PauseCache";
 import { sourcesByIdCache } from "./SourcesCache";
-
-import { Cache, createCache } from "suspense";
 
 export interface FrameScopes {
   frameLocation: MappedLocation;

@@ -1,10 +1,9 @@
 import { SetStateAction, useCallback, useEffect } from "react";
+import { Status, useCacheMutation, useCacheStatus } from "suspense";
 
 import { indexedDbCache } from "shared/user-data/IndexedDB/cache";
 import { IDBOptions } from "shared/user-data/IndexedDB/types";
 import { latestIndexedDbCache } from "shared/user-data/IndexedDB/utils";
-
-import { Status, useCacheMutation, useCacheStatus } from "suspense";
 
 // Stores value in IndexedDB and synchronizes it between sessions.
 //

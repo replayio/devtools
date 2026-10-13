@@ -1,11 +1,10 @@
 import assert from "assert";
 import { Node, ObjectId, PauseId } from "@replayio/protocol";
+import { createCache } from "suspense";
 
 import { shouldDisplayNode } from "replay-next/components/elements/utils/shouldDisplayNode";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientInterface } from "shared/client/types";
-
-import { createCache } from "suspense";
 
 // Unlike Object preview Nodes (from the objectCache),
 // Elements are pre-filtered to remove child nodes that shouldn't be shown (like empty text nodes)

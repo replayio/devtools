@@ -3,12 +3,11 @@ import {
   MouseEvent,
   NavigationEvent as ProtocolNavigationEvent,
 } from "@replayio/protocol";
+import { createSingleEntryCache } from "suspense";
 
 import { compareNumericStrings } from "protocol/utils";
 import { findIndexLTE } from "replay-next/src/utils/array";
 import { replayClient } from "shared/client/ReplayClientContext";
-
-import { createSingleEntryCache } from "suspense";
 
 // TODO [BAC-4618] Update the type definition in the protocol package
 // This hack dates back to 2021 (github.com/replayio/devtools/pull/4713)

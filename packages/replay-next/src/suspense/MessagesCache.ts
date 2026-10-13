@@ -1,4 +1,10 @@
 import { Message, PointRange } from "@replayio/protocol";
+import {
+  IntervalCacheLoadOptions,
+  StreamingValue,
+  createIntervalCache,
+  createStreamingCache,
+} from "suspense";
 
 import {
   isExecutionPointsGreaterThan,
@@ -8,13 +14,6 @@ import type { ReplayClientInterface } from "shared/client/types";
 
 import { cachePauseData } from "./PauseCache";
 import { sourcesByIdCache } from "./SourcesCache";
-
-import {
-  IntervalCacheLoadOptions,
-  StreamingValue,
-  createIntervalCache,
-  createStreamingCache,
-} from "suspense";
 
 export type CategoryCounts = {
   errors: number;

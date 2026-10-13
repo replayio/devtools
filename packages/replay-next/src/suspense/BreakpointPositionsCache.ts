@@ -2,12 +2,11 @@ import {
   SameLineSourceLocations as ProtocolSameLineSourceLocations,
   SourceId as ProtocolSourceId,
 } from "@replayio/protocol";
+import { Cache, IntervalCache, createCache, createIntervalCache } from "suspense";
 
 import { ReplayClientInterface } from "shared/client/types";
 
 import { bucketBreakpointLines } from "../utils/source";
-
-import { Cache, IntervalCache, createCache, createIntervalCache } from "suspense";
 
 export type BreakpointPositionsByLine = Map<number, ProtocolSameLineSourceLocations>;
 

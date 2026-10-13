@@ -7,6 +7,7 @@ import {
   TimeStampedPoint,
 } from "@replayio/protocol";
 import cloneDeep from "lodash/cloneDeep";
+import { Cache, ExternallyManagedCache, createCache, createExternallyManagedCache } from "suspense";
 
 import { assert } from "protocol/utils";
 import { Element, elementCache } from "replay-next/components/elements/suspense/ElementCache";
@@ -32,8 +33,6 @@ import {
   isUserActionTestEvent,
 } from "shared/test-suites/RecordingTestMetadata";
 import { boundingRectsCache } from "ui/suspense/nodeCaches";
-
-import { Cache, ExternallyManagedCache, createCache, createExternallyManagedCache } from "suspense";
 
 export type TestEventDetailsEntry = TimeStampedPoint & {
   count: number | null;

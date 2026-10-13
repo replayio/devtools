@@ -1,6 +1,7 @@
 import classNames from "classnames";
 import sortedLastIndex from "lodash/sortedLastIndex";
 import React, { memo, useContext, useMemo } from "react";
+import { STATUS_PENDING, STATUS_RESOLVED, useImperativeCacheValue } from "suspense";
 
 import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
 import { RecordedEvent } from "protocol/RecordedEventsCache";
@@ -18,8 +19,6 @@ import {
 import { trackEvent } from "ui/utils/telemetry";
 
 import Event from "./Event";
-
-import { STATUS_PENDING, STATUS_RESOLVED, useImperativeCacheValue } from "suspense";
 
 export function CurrentTimeLine({ isActive }: { isActive: boolean }) {
   return (

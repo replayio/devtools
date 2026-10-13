@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import { shallowEqual } from "react-redux";
+import { useImperativeCacheValue } from "suspense";
 
 import { elementCache } from "replay-next/components/elements/suspense/ElementCache";
 import { useMostRecentLoadedPause } from "replay-next/src/hooks/useMostRecentLoadedPause";
@@ -12,8 +13,6 @@ import { getSelectedNodeId } from "../../markup/selectors/markup";
 import { setComputedPropertyExpanded } from "../actions";
 import { ComputedPropertyState } from "../state";
 import ComputedProperty from "./ComputedProperty";
-
-import { useImperativeCacheValue } from "suspense";
 
 function isHidden(property: ComputedPropertyState, search: string, showBrowserStyles: boolean) {
   if (property.selectors.length === 0 && !showBrowserStyles) {

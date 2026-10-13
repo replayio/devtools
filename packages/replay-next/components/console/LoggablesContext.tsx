@@ -7,6 +7,7 @@ import {
   useLayoutEffect,
   useMemo,
 } from "react";
+import { Status, useImperativeIntervalCacheValues } from "suspense";
 
 import { usePointInstances } from "replay-next/components/console/hooks/usePointInstances";
 import { ConsoleFiltersContext } from "replay-next/src/contexts/ConsoleFiltersContext";
@@ -23,8 +24,6 @@ import { isInNodeModules } from "replay-next/src/utils/messages";
 import { suspendInParallel } from "replay-next/src/utils/suspense";
 import { isExecutionPointsWithinRange } from "replay-next/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-
-import { Status, useImperativeIntervalCacheValues } from "suspense";
 
 export type ProtocolMessage = Message & {
   type: "ProtocolMessage";

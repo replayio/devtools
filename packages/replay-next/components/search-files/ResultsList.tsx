@@ -1,5 +1,6 @@
 import { useContext, useEffect, useMemo } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
+import { STATUS_PENDING, STATUS_RESOLVED, useStreamingValue } from "suspense";
 
 import Icon from "replay-next/components/Icon";
 import { FileSearchListData, Item } from "replay-next/components/search-files/FileSearchListData";
@@ -11,8 +12,6 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import type { ItemData } from "./ResultsListRow";
 import ResultsListRow, { ITEM_SIZE } from "./ResultsListRow";
 import styles from "./ResultsList.module.css";
-
-import { STATUS_PENDING, STATUS_RESOLVED, useStreamingValue } from "suspense";
 
 const EMPTY_ARRAY = [] as SourceSearchResult[];
 

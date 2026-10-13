@@ -1,5 +1,6 @@
 import camelCase from "lodash/camelCase";
 import React, { PropsWithChildren, ReactNode, Suspense, useContext, useMemo } from "react";
+import { isPromiseLike } from "suspense";
 
 import { Badge, Checkbox } from "design";
 import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBoundary";
@@ -17,8 +18,6 @@ import { ProtocolError, isCommandError } from "shared/utils/error";
 
 import EventsList from "./EventsList";
 import styles from "./FilterToggles.module.css";
-
-import { isPromiseLike } from "suspense";
 
 export default function FilterToggles() {
   const {

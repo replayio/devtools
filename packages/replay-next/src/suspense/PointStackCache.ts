@@ -1,11 +1,10 @@
 import { ExecutionPoint, PointStackFrame } from "@replayio/protocol";
+import { IntervalCache, createIntervalCache } from "suspense";
 
 import { ReplayClientInterface } from "shared/client/types";
 
 import { updateMappedLocation } from "./PauseCache";
 import { Source, sourcesByIdCache } from "./SourcesCache";
-
-import { IntervalCache, createIntervalCache } from "suspense";
 
 export const pointStackCache: IntervalCache<
   number,

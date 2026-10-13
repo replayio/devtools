@@ -5,10 +5,6 @@ import {
   SourceKind as ProtocolSourceKind,
   SourceId,
 } from "@replayio/protocol";
-
-import { ArrayMap, assert } from "protocol/utils";
-import { ReplayClientInterface } from "shared/client/types";
-
 import {
   Cache,
   StreamingCache,
@@ -18,6 +14,9 @@ import {
   createStreamingCache,
   useImperativeCacheValue,
 } from "suspense";
+
+import { ArrayMap, assert } from "protocol/utils";
+import { ReplayClientInterface } from "shared/client/types";
 
 export type ProtocolSourceContents = {
   contents: string;

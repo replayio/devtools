@@ -12,6 +12,7 @@ import {
 } from "@replayio/protocol";
 import * as Sentry from "@sentry/react";
 import cloneDeep from "lodash/cloneDeep";
+import { Cache, createCache } from "suspense";
 
 import { ReplayClientInterface } from "shared/client/types";
 
@@ -20,8 +21,6 @@ import { framesCache } from "./FrameCache";
 import { preCacheObjects } from "./ObjectPreviews";
 import { scopesCache } from "./ScopeCache";
 import { Source, sourcesByIdCache } from "./SourcesCache";
-
-import { Cache, createCache } from "suspense";
 
 const pauseIdToPointAndTimeMap: Map<PauseId, [ExecutionPoint, number]> = new Map();
 

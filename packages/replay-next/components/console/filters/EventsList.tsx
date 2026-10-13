@@ -7,6 +7,7 @@ import {
   useState,
   useTransition,
 } from "react";
+import { STATUS_RESOLVED, useCacheStatus } from "suspense";
 
 import Loader from "replay-next/components/Loader";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
@@ -17,8 +18,6 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import EventCategory from "./EventCategory";
 import styles from "./EventsList.module.css";
-
-import { STATUS_RESOLVED, useCacheStatus } from "suspense";
 
 export default function EventsList() {
   const { trackEvent } = useContext(SessionContext);

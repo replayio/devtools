@@ -11,6 +11,7 @@ import {
   LexicalEditor,
 } from "lexical";
 import { ReactNode, useLayoutEffect, useRef, useState } from "react";
+import { isPromiseLike } from "suspense";
 
 import { INSERT_ITEM_COMMAND } from "./commands";
 import TypeAheadListRenderer from "./TypeAheadListRenderer";
@@ -18,8 +19,6 @@ import { QueryData } from "./types";
 import getDOMRangeRect from "./utils/getDOMRangeRect";
 import getLexicalEditorForDomNode from "./utils/getLexicalEditorForDomNode";
 import setFloatingElemPosition from "./utils/setFloatingElemPosition";
-
-import { isPromiseLike } from "suspense";
 
 const EMPTY_ARRAY: any[] = [];
 

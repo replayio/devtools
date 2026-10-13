@@ -1,4 +1,5 @@
 import { CSSProperties, useContext } from "react";
+import { Status, useCacheStatus } from "suspense";
 
 import { getExecutionPoint } from "devtools/client/debugger/src/selectors";
 import { isExecutionPointsGreaterThan } from "replay-next/src/utils/time";
@@ -11,8 +12,6 @@ import { reduxDispatchJumpLocationCache } from "ui/suspense/jumpToLocationCache"
 
 import useReduxDevtoolsContextMenu from "./useReduxDevtoolsContextMenu";
 import styles from "./ReduxDevToolsListItem.module.css";
-
-import { Status, useCacheStatus } from "suspense";
 
 export const ITEM_SIZE = 26;
 

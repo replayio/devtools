@@ -2,6 +2,7 @@ import { ObjectId, PauseId } from "@replayio/protocol";
 import type { RendererInterface } from "@replayio/react-devtools-inline";
 import type { DevToolsHook } from "@replayio/react-devtools-inline/backend";
 import type { SerializedElement, Store } from "@replayio/react-devtools-inline/frontend";
+import { Cache, createCache, createExternallyManagedCache } from "suspense";
 
 import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
@@ -9,8 +10,6 @@ import { pauseEvaluationsCache } from "replay-next/src/suspense/PauseCache";
 import { evaluate } from "replay-next/src/utils/evaluate";
 import { ReplayClientInterface } from "shared/client/types";
 import { ChunksArray, deserializeChunkedString } from "ui/utils/evalChunkedStrings";
-
-import { Cache, createCache, createExternallyManagedCache } from "suspense";
 
 // Our modified RDT bundle exports some additional methods
 type RendererInterfaceWithAdditions = RendererInterface & {

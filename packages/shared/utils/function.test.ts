@@ -1,6 +1,6 @@
-import { DebouncedOrThrottledFunction, debounce, throttle } from "./function";
-
 import { Deferred, Status, createDeferred } from "suspense";
+
+import { DebouncedOrThrottledFunction, debounce, throttle } from "./function";
 
 describe("function", () => {
   describe("debounce", () => {

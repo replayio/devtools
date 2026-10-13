@@ -1,10 +1,9 @@
 import { useContext } from "react";
+import { useStreamingValue } from "suspense";
 
 import { useCurrentFocusPointRange } from "replay-next/src/hooks/useCurrentFocusPointRange";
 import { MessageMetadata, streamingMessagesCache } from "replay-next/src/suspense/MessagesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-
-import { useStreamingValue } from "suspense";
 
 const EMPTY_ARRAY: any[] = [];
 const EMPTY_MESSAGE_METADATA: MessageMetadata = {

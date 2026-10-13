@@ -1,12 +1,11 @@
 import { Frame, FrameId, PauseId } from "@replayio/protocol";
+import { Cache, createCache } from "suspense";
 
 import { assert } from "protocol/utils";
 import { ReplayClientInterface } from "shared/client/types";
 
 import { cachePauseData, sortFramesAndUpdateLocations } from "./PauseCache";
 import { sourcesByIdCache } from "./SourcesCache";
-
-import { Cache, createCache } from "suspense";
 
 export const framesCache: Cache<
   [replayClient: ReplayClientInterface, pauseId: PauseId | undefined],

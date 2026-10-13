@@ -1,8 +1,7 @@
 import { Location, VariableMapping } from "@replayio/protocol";
+import { Cache, createCache } from "suspense";
 
 import { ReplayClientInterface } from "shared/client/types";
-
-import { Cache, createCache } from "suspense";
 
 export const scopeMapCache: Cache<
   [replayClient: ReplayClientInterface, location: Location],

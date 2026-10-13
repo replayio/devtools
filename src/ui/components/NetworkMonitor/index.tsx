@@ -1,5 +1,6 @@
 import { useContext, useDeferredValue, useMemo, useRef, useState } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
+import { useStreamingValue } from "suspense";
 
 import IndeterminateLoader from "replay-next/components/IndeterminateLoader";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
@@ -24,8 +25,6 @@ import { timeMixpanelEvent } from "ui/utils/mixpanel";
 import { trackEvent } from "ui/utils/telemetry";
 
 import { CanonicalRequestType, RequestSummary, partialRequestsToCompleteSummaries } from "./utils";
-
-import { useStreamingValue } from "suspense";
 
 export default function NetworkMonitor() {
   const dispatch = useAppDispatch();

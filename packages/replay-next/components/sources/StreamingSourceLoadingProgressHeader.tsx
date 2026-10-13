@@ -1,9 +1,9 @@
+import { useStreamingValue } from "suspense";
+
 import { StreamingSourceContentsValue } from "replay-next/src/suspense/SourcesCache";
 import { StreamingParser } from "replay-next/src/suspense/SyntaxParsingCache";
 
 import styles from "./StreamingSourceLoadingProgressHeader.module.css";
-
-import { useStreamingValue } from "suspense";
 
 // In case the initial source contents request hangs,
 // render some minimal amount of progress so that the source viewer isn't empty

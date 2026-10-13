@@ -3,6 +3,7 @@ import classnames from "classnames";
 import { Suspense, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList as List } from "react-window";
+import { useImperativeCacheValue } from "suspense";
 
 import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBoundary";
 import Spinner from "replay-next/components/Spinner";
@@ -26,8 +27,6 @@ import { isFunctionOutline } from "./isFunctionOutline";
 import { SourceOutlineClass } from "./SourceOutlineClass";
 import { SourceOutlineFunction } from "./SourceOutlineFunction";
 import styles from "./SourceOutline.module.css";
-
-import { useImperativeCacheValue } from "suspense";
 
 export function SourceOutline({
   cursorPosition,

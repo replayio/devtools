@@ -5,6 +5,7 @@ import {
   SameLineSourceLocations,
   SourceId,
 } from "@replayio/protocol";
+import { Cache, createCache } from "suspense";
 
 import { ReplayClientInterface } from "shared/client/types";
 import { ProtocolError, isCommandError } from "shared/utils/error";
@@ -12,8 +13,6 @@ import { ProtocolError, isCommandError } from "shared/utils/error";
 import { getCorrespondingSourceIds } from "../utils/sources";
 import { sourceOutlineCache } from "./SourceOutlineCache";
 import { sourcesByIdCache } from "./SourcesCache";
-
-import { Cache, createCache } from "suspense";
 
 export interface FunctionOutlineWithHitCount extends FunctionOutline {
   hits?: number;

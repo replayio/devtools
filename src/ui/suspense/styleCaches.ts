@@ -1,5 +1,6 @@
 import { PauseId, Object as ProtocolObject } from "@replayio/protocol";
 import uniqBy from "lodash/uniqBy";
+import { Cache, createCache } from "suspense";
 
 import { createComputedProperties } from "devtools/client/inspector/computed/actions";
 import { ComputedPropertyState } from "devtools/client/inspector/computed/state";
@@ -21,8 +22,6 @@ import { cachePauseData } from "replay-next/src/suspense/PauseCache";
 import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientInterface } from "shared/client/types";
 import { isElement } from "ui/suspense/nodeCaches";
-
-import { Cache, createCache } from "suspense";
 
 export interface WiredAppliedRule {
   rule: RuleFront;

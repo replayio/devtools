@@ -1,8 +1,8 @@
 import { Object as ProtocolObject, Rule } from "@replayio/protocol";
-import QuickLRU from "shared/utils/quick-lru";
 
 import { assert } from "protocol/utils";
 import { getCachedObject } from "replay-next/src/suspense/ObjectPreviews";
+import QuickLRU from "shared/utils/quick-lru";
 
 import { StyleFront } from "./style";
 import { StyleSheetFront } from "./styleSheet";

@@ -2,6 +2,29 @@
 // Used by https://github.com/renke/import-sort, via https://github.com/ggascoigne/prettier-plugin-import-sort
 // Based on https://github.com/AndrewIngram/import-sort-style-andy as a starting point
 
+const fs = require("fs");
+const path = require("path");
+
+// Whether the import is from a third-party package, installed in node_modules.
+// import-sort's isInstalledModule resolves the import instead, which fails for
+// packages that only declare "exports" (e.g. suspense) and for workspace
+// packages whose entry point hasn't been built, so those got sorted with the
+// app's own modules. Workspace packages are linked into node_modules too, but
+// they're the app's own code, so a package only counts if it really lives there.
+function isThirdPartyModule(imported) {
+  const [scopeOrName, name] = imported.moduleName.split("/");
+  const packageName = scopeOrName.startsWith("@") ? `${scopeOrName}/${name}` : scopeOrName;
+  for (let dir = __dirname; ; dir = path.dirname(dir)) {
+    const packageDir = path.join(dir, "node_modules", packageName);
+    if (fs.existsSync(path.join(packageDir, "package.json"))) {
+      return fs.realpathSync(packageDir).split(path.sep).includes("node_modules");
+    }
+    if (path.dirname(dir) === dir) {
+      return false;
+    }
+  }
+}
+
 function sortImports(styleApi) {
   const {
     alias,
@@ -11,7 +34,6 @@ function sortImports(styleApi) {
     dotSegmentCount,
     hasNoMember,
     isAbsoluteModule,
-    isInstalledModule,
     isNodeModule,
     isRelativeModule,
     moduleName,
@@ -65,7 +87,7 @@ function sortImports(styleApi) {
         // import React from "react";
         and(isReactEcosystemModule, not(isStylesModule)),
         // import uniq from 'lodash/uniq'
-        and(isInstalledModule(__filename), not(isRelativeModule), not(isStylesModule))
+        and(isThirdPartyModule, not(isRelativeModule), not(isStylesModule))
       ),
       sort: moduleName(naturally),
       sortNamedMembers: alias(unicode),
