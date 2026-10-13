@@ -4,7 +4,6 @@
 
 import React, { useContext } from "react";
 import { shallowEqual } from "react-redux";
-import { useImperativeCacheValue } from "suspense";
 
 import { useMostRecentLoadedPause } from "replay-next/src/hooks/useMostRecentLoadedPause";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -13,6 +12,8 @@ import { layoutCache } from "ui/suspense/styleCaches";
 
 import { BoxModel } from "../../boxmodel/components/BoxModel";
 import { getSelectedNodeId } from "../../markup/selectors/markup";
+
+import { useImperativeCacheValue } from "suspense";
 
 function LayoutApp() {
   const replayClient = useContext(ReplayClientContext);

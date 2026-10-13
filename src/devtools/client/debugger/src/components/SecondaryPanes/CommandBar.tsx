@@ -3,7 +3,6 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import { useContext, useEffect } from "react";
-import { useImperativeCacheValue } from "suspense";
 
 import CommandBarButton from "devtools/client/debugger/src/components/shared/Button/CommandBarButton";
 import {
@@ -25,6 +24,8 @@ import { step } from "ui/actions/timeline";
 import { getSelectedSourceId } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
+
+import { useImperativeCacheValue } from "suspense";
 
 const isOSX = isMacOS();
 

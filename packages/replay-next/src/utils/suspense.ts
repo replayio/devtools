@@ -1,6 +1,6 @@
-import { Cache, CreateCacheOptions, createCache, isPromiseLike } from "suspense";
-
 import { recordData as recordTelemetryData } from "./telemetry";
+
+import { Cache, CreateCacheOptions, createCache, isPromiseLike } from "suspense";
 
 type AnyFunction<ReturnType> = (...args: any[]) => ReturnType;
 

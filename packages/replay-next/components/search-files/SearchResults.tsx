@@ -1,10 +1,11 @@
 import { ReactNode, useMemo } from "react";
-import { STATUS_PENDING, STATUS_REJECTED, useStreamingValue } from "suspense";
 
 import Icon from "replay-next/components/Icon";
 import { SourceSearchResult, StreamingSearchValue } from "replay-next/src/suspense/SearchCache";
 
 import styles from "./SearchResults.module.css";
+
+import { STATUS_PENDING, STATUS_REJECTED, useStreamingValue } from "suspense";
 
 const EMPTY_ARRAY = [] as SourceSearchResult[];
 

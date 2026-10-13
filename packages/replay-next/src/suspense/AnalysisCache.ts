@@ -1,6 +1,5 @@
 import { ExecutionPoint, PauseId, PointDescription, TimeStampedPoint } from "@replayio/protocol";
 import { PointSelector, Value } from "@replayio/protocol";
-import { ExternallyManagedCache, IntervalCache, createExternallyManagedCache } from "suspense";
 
 import { MAX_POINTS_TO_RUN_EVALUATION } from "shared/client/ReplayClient";
 import { ReplayClientInterface } from "shared/client/types";
@@ -10,6 +9,8 @@ import { createFocusIntervalCacheForExecutionPoints } from "./FocusIntervalCache
 import { objectCache, objectPropertyCache } from "./ObjectPreviews";
 import { cachePauseData, setPointAndTimeForPauseId } from "./PauseCache";
 import { sourcesByIdCache } from "./SourcesCache";
+
+import { ExternallyManagedCache, IntervalCache, createExternallyManagedCache } from "suspense";
 
 export interface AnalysisParams {
   selector: PointSelector;

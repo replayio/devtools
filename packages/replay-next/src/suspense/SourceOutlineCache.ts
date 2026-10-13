@@ -1,7 +1,8 @@
 import { SourceId, getSourceOutlineResult } from "@replayio/protocol";
-import { createCache } from "suspense";
 
 import { ReplayClientInterface } from "shared/client/types";
+
+import { createCache } from "suspense";
 
 export const sourceOutlineCache = createCache<
   [replayClient: ReplayClientInterface, sourceId: SourceId | undefined],

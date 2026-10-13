@@ -1,10 +1,11 @@
 import { BoxModel, NodeBounds, PauseId, Node as ProtocolNode, Quads } from "@replayio/protocol";
-import { Cache, createCache } from "suspense";
 
 import { elementCache } from "replay-next/components/elements/suspense/ElementCache";
 import { ReplayClientInterface } from "shared/client/types";
 
 import { computedStyleCache } from "./styleCaches";
+
+import { Cache, createCache } from "suspense";
 
 export const boundingRectsCache: Cache<
   [replayClient: ReplayClientInterface, pauseId: PauseId],

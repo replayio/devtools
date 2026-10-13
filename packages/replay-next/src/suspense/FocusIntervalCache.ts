@@ -1,12 +1,13 @@
 import { ExecutionPoint } from "@replayio/protocol";
+
+import { ProtocolError, isCommandError } from "shared/utils/error";
+
 import {
   GetPointForValue,
   IntervalCache,
   IntervalCacheLoadOptions,
   createIntervalCache,
 } from "suspense";
-
-import { ProtocolError, isCommandError } from "shared/utils/error";
 
 type Options<Point extends number | bigint, Params extends Array<any>, Value> = {
   debugLabel?: string;

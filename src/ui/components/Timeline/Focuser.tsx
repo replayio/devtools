@@ -206,7 +206,7 @@ function Focuser({ editMode, setEditMode }: Props) {
   const right = getPositionFromTime(focusWindow.end, zoomRegion);
 
   return (
-    <div className="relative top-0 left-0 h-full w-full" onMouseDown={stopEvent} ref={containerRef}>
+    <div className="relative left-0 top-0 h-full w-full" onMouseDown={stopEvent} ref={containerRef}>
       <div
         className="group absolute h-full"
         ref={draggableAreaRef}
@@ -224,7 +224,7 @@ function Focuser({ editMode, setEditMode }: Props) {
         />
 
         <div
-          className="absolute top-0 left-0 -ml-2 h-full w-2 transform cursor-ew-resize"
+          className="absolute left-0 top-0 -ml-2 h-full w-2 transform cursor-ew-resize"
           onMouseDown={setEditModeToResizeStart}
         >
           <div
@@ -236,7 +236,7 @@ function Focuser({ editMode, setEditMode }: Props) {
         </div>
 
         <div
-          className="absolute top-0 right-0 -mr-2 h-full w-2 transform cursor-ew-resize"
+          className="absolute right-0 top-0 -mr-2 h-full w-2 transform cursor-ew-resize"
           onMouseDown={setEditModeToResizeEnd}
         >
           <div

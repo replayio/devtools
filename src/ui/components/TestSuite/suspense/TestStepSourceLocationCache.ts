@@ -1,7 +1,6 @@
 import assert from "assert";
 import { Frame, Location } from "@replayio/protocol";
 import { compare } from "compare-versions";
-import { Cache } from "suspense";
 
 import { framesCache } from "replay-next/src/suspense/FrameCache";
 import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
@@ -13,6 +12,8 @@ import {
   UserActionEvent,
   isUserActionTestEvent,
 } from "shared/test-suites/RecordingTestMetadata";
+
+import { Cache } from "suspense";
 
 function getCypressMarkerFrame(frames: Frame[]) {
   const markerFrameIndex = frames.findIndex(

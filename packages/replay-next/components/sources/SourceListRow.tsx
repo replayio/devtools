@@ -1,6 +1,5 @@
 import { SameLineSourceLocations } from "@replayio/protocol";
 import { CSSProperties, useContext, useMemo } from "react";
-import { STATUS_PENDING, useImperativeIntervalCacheValues } from "suspense";
 
 import Icon from "replay-next/components/Icon";
 import {
@@ -32,6 +31,8 @@ import LogPointPanel from "./log-point-panel/LogPointPanel";
 import { formatHitCount } from "./utils/formatHitCount";
 import { findPointForLocation, findPointsForLocation } from "./utils/points";
 import styles from "./SourceListRow.module.css";
+
+import { STATUS_PENDING, useImperativeIntervalCacheValues } from "suspense";
 
 export type ItemData = {
   breakablePositionsByLine: Map<number, SameLineSourceLocations>;

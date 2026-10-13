@@ -1,5 +1,4 @@
 import { ExecutionPoint, Value } from "@replayio/protocol";
-import { Cache, createCache } from "suspense";
 
 import { topFrameCache } from "replay-next/src/suspense/FrameCache";
 import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
@@ -7,6 +6,8 @@ import { evaluate } from "replay-next/src/utils/evaluate";
 import { ReplayClientInterface } from "shared/client/types";
 
 import type { Delta } from "./JSONDiff";
+
+import { Cache, createCache } from "suspense";
 
 export type ReduxActionStateValues = readonly [pauseId: string, action: Value, state: Value];
 

@@ -2,7 +2,6 @@ import { PointDescription, PointRange, PointSelector } from "@replayio/protocol"
 import { EventHandlerType } from "@replayio/protocol";
 import isEmpty from "lodash/isEmpty";
 import without from "lodash/without";
-import { Cache, createCache } from "suspense";
 
 import { RecordingTarget, recordingTargetCache } from "replay-next/src/suspense/BuildIdCache";
 import { ReplayClientInterface } from "shared/client/types";
@@ -15,6 +14,8 @@ import { createAnalysisCache } from "./AnalysisCache";
 import { createFocusIntervalCacheForExecutionPoints } from "./FocusIntervalCache";
 import { updateMappedLocation } from "./PauseCache";
 import { sourcesByIdCache } from "./SourcesCache";
+
+import { Cache, createCache } from "suspense";
 
 export type Event = {
   count: number;

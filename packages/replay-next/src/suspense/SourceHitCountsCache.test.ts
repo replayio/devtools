@@ -1,9 +1,10 @@
 import { HitCount, PointRange, SameLineSourceLocations, SourceId } from "@replayio/protocol";
-import { IntervalCache } from "suspense";
 
 import { LineHitCounts, ReplayClientInterface, SourceLocationRange } from "shared/client/types";
 
 import { MockReplayClientInterface, createMockReplayClient } from "../utils/testing";
+
+import { IntervalCache } from "suspense";
 
 const DEFAULT_SOURCE_ID = "fake-source-id";
 const DEFAULT_FOCUS_RANGE = {

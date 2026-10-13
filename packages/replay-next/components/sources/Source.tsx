@@ -9,7 +9,6 @@ import {
   useState,
 } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
-import { useStreamingValue } from "suspense";
 
 import { InlineErrorFallback } from "replay-next/components/errors/InlineErrorFallback";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
@@ -33,6 +32,8 @@ import getExpressionForTokenElement from "./utils/getExpressionForTokenElement";
 import getExpressionFromString from "./utils/getExpressionFromString";
 import getTextAndCursorIndex from "./utils/getTextAndCursorIndex";
 import styles from "./Source.module.css";
+
+import { useStreamingValue } from "suspense";
 
 const MOUSE_MOVE_DEBOUNCE_DURATION = 250;
 

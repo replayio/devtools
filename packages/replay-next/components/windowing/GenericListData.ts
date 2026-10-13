@@ -1,7 +1,8 @@
 import assert from "assert";
-import { Deferred, STATUS_RESOLVED, createDeferred } from "suspense";
 
 import { EventEmitter } from "shared/EventEmitter";
+
+import { Deferred, STATUS_RESOLVED, createDeferred } from "suspense";
 
 export abstract class GenericListData<Item> extends EventEmitter<{
   invalidate: () => void;

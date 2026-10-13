@@ -30,7 +30,7 @@ const TextBodyComponent = ({ raw, text }: { raw: RawBody; text: string }) => {
       <pre className="whitespace-pre-wrap">
         {text}
         <div
-          className="absolute top-0 right-1 z-10"
+          className="absolute right-1 top-0 z-10"
           onClick={() => {
             const asString = RawToUTF8(raw) as TextBody;
             const blob = new Blob([asString.content], { type: "text/plain" });

@@ -1,4 +1,11 @@
 import {
+  __setCircularThenableCheckMaxCount,
+  createFetchAsyncFromFetchSuspense,
+  createInfallibleSuspenseCache,
+  suspendInParallel,
+} from "./suspense";
+
+import {
   Deferred,
   STATUS_PENDING,
   STATUS_REJECTED,
@@ -8,13 +15,6 @@ import {
   StatusResolved,
   createDeferred,
 } from "suspense";
-
-import {
-  __setCircularThenableCheckMaxCount,
-  createFetchAsyncFromFetchSuspense,
-  createInfallibleSuspenseCache,
-  suspendInParallel,
-} from "./suspense";
 
 describe("Suspense util", () => {
   describe("createFetchAsyncFromFetchSuspense", () => {

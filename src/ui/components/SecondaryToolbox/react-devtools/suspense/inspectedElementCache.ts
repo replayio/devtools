@@ -1,6 +1,5 @@
 import { PauseId } from "@replayio/protocol";
 import { FrontendBridge } from "@replayio/react-devtools-inline";
-import { createCache } from "suspense";
 
 import { ReplayClientInterface } from "shared/client/types";
 import { reactDevToolsInjectionCache } from "ui/components/SecondaryToolbox/react-devtools/injectReactDevtoolsBackend";
@@ -10,6 +9,8 @@ import {
 } from "ui/components/SecondaryToolbox/react-devtools/ReplayWall";
 import { InspectedReactElement } from "ui/components/SecondaryToolbox/react-devtools/types";
 import { createPromiseForRequest } from "ui/components/SecondaryToolbox/react-devtools/utils/createPromiseForRequest";
+
+import { createCache } from "suspense";
 
 const TIMEOUT_DELAY = 30_000;
 

@@ -1,6 +1,5 @@
 import { ExecutionPoint, TimeStampedPoint } from "@replayio/protocol";
 import { useMemo } from "react";
-import { Cache, STATUS_PENDING, useImperativeCacheValue } from "suspense";
 
 import PropertiesRenderer from "replay-next/components/inspector/PropertiesRenderer";
 import { InspectableTimestampedPointContext } from "replay-next/src/contexts/InspectorContext";
@@ -11,6 +10,8 @@ import {
 } from "ui/components/TestSuite/suspense/TestEventDetailsCache";
 
 import { LoadingFailedMessage, LoadingInProgress } from "./TestEventDetailsLoadingMessages";
+
+import { Cache, STATUS_PENDING, useImperativeCacheValue } from "suspense";
 
 export function UserActionEventPropsInspector({ testEvent }: { testEvent: UserActionEvent }) {
   // Parent ensures this exists

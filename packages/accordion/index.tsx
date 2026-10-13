@@ -229,7 +229,7 @@ function ResizeMask({
     <div
       onMouseUp={onMouseUp}
       onMouseMove={onMouseMove}
-      className="fixed top-0 left-0 h-full w-full"
+      className="fixed left-0 top-0 h-full w-full"
       style={{ cursor: "ns-resize" }}
     />
   );

@@ -1,8 +1,9 @@
 import { ExecutionPoint, ScreenShot } from "@replayio/protocol";
-import { createCache } from "suspense";
 
 import { paintHashCache } from "replay-next/src/suspense/PaintHashCache";
 import { ReplayClientInterface } from "shared/client/types";
+
+import { createCache } from "suspense";
 
 export const screenshotCache = createCache<
   [replayClient: ReplayClientInterface, point: ExecutionPoint, paintHash: string],

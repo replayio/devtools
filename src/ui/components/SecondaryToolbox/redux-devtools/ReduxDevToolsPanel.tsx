@@ -1,6 +1,5 @@
 import { Suspense, useContext, useEffect, useMemo, useState } from "react";
 import { PanelGroup, PanelResizeHandle, Panel as ResizablePanel } from "react-resizable-panels";
-import { useImperativeCacheValue } from "suspense";
 
 import { getExecutionPoint } from "devtools/client/debugger/src/selectors";
 import IndeterminateLoader from "replay-next/components/IndeterminateLoader";
@@ -18,6 +17,8 @@ import { reduxDevToolsAnnotationsCache } from "ui/suspense/annotationsCaches";
 import { reduxStoreDetailsCache } from "ui/suspense/jumpToLocationCache";
 
 import styles from "./ReduxDevToolsPanel.module.css";
+
+import { useImperativeCacheValue } from "suspense";
 
 const POSSIBLE_TIMEOUT_AFTER_MS = 30_000;
 

@@ -7,7 +7,6 @@ import {
   PanelResizeHandle,
   Panel as ResizablePanel,
 } from "react-resizable-panels";
-import { useImperativeIntervalCacheValues } from "suspense";
 
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
@@ -28,6 +27,8 @@ import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext
 
 import { testEventDetailsIntervalCache } from "../../suspense/TestEventDetailsCache";
 import styles from "./Panel.module.css";
+
+import { useImperativeIntervalCacheValues } from "suspense";
 
 export default function Panel() {
   const { setTestEvent, setTestRecording, testEvent, testRecording } = useContext(TestSuiteContext);

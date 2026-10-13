@@ -1,9 +1,10 @@
 import { ObjectId, PauseId } from "@replayio/protocol";
-import { createCache } from "suspense";
 
 import { cachePauseData } from "replay-next/src/suspense/PauseCache";
 import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientInterface } from "shared/client/types";
+
+import { createCache } from "suspense";
 
 export const domSearchCache = createCache<
   [replayClient: ReplayClientInterface, pauseId: PauseId, query: string],

@@ -41,7 +41,7 @@ export default function Modal({
       />
       <div className="relative z-10">
         {children}
-        {actions ? <div className="absolute top-4 right-4">{actions}</div> : null}
+        {actions ? <div className="absolute right-4 top-4">{actions}</div> : null}
       </div>
     </div>
   );

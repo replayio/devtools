@@ -96,7 +96,7 @@ export default function ProtocolTimeline() {
       dynamically by this component. And if they are not statically in the
       build, then tailwind will not include the rules for them, which makes them
       not work.  */}
-      <div className="hidden bg-gray-500 bg-orange-500 bg-green-500 bg-sky-500 fill-sky-500 stroke-sky-500"></div>
+      <div className="hidden bg-gray-500 bg-green-500 bg-orange-500 bg-sky-500 fill-sky-500 stroke-sky-500"></div>
       <Spans regions={loadedRegions.loading} color="gray-500" title="Loading" />
       <Spans regions={loadedRegions.loaded} color="orange-500" title="Loaded" />
       <Spans regions={loadedRegions.indexed} color="green-500" title="Indexed" />

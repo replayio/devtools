@@ -1,9 +1,10 @@
 import { RequestBodyData, RequestId } from "@replayio/protocol";
 import { useContext } from "react";
-import { useStreamingValue } from "suspense";
 
 import { networkRequestBodyCache } from "replay-next/src/suspense/NetworkRequestsCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+
+import { useStreamingValue } from "suspense";
 
 export function useNetworkRequestBody(requestId: RequestId): RequestBodyData[] | null {
   const replayClient = useContext(ReplayClientContext);

@@ -1,5 +1,4 @@
 import { Annotation, TimeStampedPoint } from "@replayio/protocol";
-import { Cache, createCache, createSingleEntryCache } from "suspense";
 
 import { compareNumericStrings } from "protocol/utils";
 import { ReplayClientInterface } from "shared/client/types";
@@ -7,6 +6,8 @@ import { InteractionEventKind } from "ui/actions/eventListeners/constants";
 import { EventListenerWithFunctionInfo } from "ui/actions/eventListeners/eventListenerUtils";
 import type { ReduxActionAnnotation } from "ui/components/SecondaryToolbox/redux-devtools/annotations";
 import { processReduxAnnotations } from "ui/components/SecondaryToolbox/redux-devtools/annotations";
+
+import { Cache, createCache, createSingleEntryCache } from "suspense";
 
 export interface ParsedReactDevToolsAnnotation extends TimeStampedPoint {
   contents: {

@@ -1,5 +1,4 @@
 import { Location, PointDescription, PointRange, TimeStampedPoint } from "@replayio/protocol";
-import { createCache } from "suspense";
 
 import { breakpointPositionsIntervalCache } from "replay-next/src/suspense/BreakpointPositionsCache";
 import { bucketBreakpointLines } from "replay-next/src/utils/source";
@@ -17,6 +16,8 @@ import { createFocusIntervalCacheForExecutionPoints } from "./FocusIntervalCache
 import { mappedExpressionCache } from "./MappedExpressionCache";
 import { cachePauseData, setPointAndTimeForPauseId, updateMappedLocation } from "./PauseCache";
 import { sourcesByIdCache } from "./SourcesCache";
+
+import { createCache } from "suspense";
 
 export const hitPointsCache = createFocusIntervalCacheForExecutionPoints<
   [replayClient: ReplayClientInterface, location: Location, condition: string | null],

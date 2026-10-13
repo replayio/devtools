@@ -1,5 +1,4 @@
 import { CSSProperties, useContext, useMemo } from "react";
-import { useImperativeIntervalCacheValues } from "suspense";
 
 import Expandable from "replay-next/components/Expandable";
 import Icon from "replay-next/components/Icon";
@@ -22,6 +21,8 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { toPointRange } from "shared/utils/time";
 
 import styles from "./ResultsListRow.module.css";
+
+import { useImperativeIntervalCacheValues } from "suspense";
 
 export const ITEM_SIZE = 20;
 

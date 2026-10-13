@@ -1,7 +1,6 @@
 import assert from "assert";
 import { Location, SearchSourceContentsMatch, SourceId } from "@replayio/protocol";
 import { Minimatch } from "minimatch";
-import { StreamingCacheLoadOptions, StreamingValue, createStreamingCache } from "suspense";
 
 import { insert } from "replay-next/src/utils/array";
 import {
@@ -15,6 +14,8 @@ import { ReplayClientInterface } from "shared/client/types";
 import { Source } from "../suspense/SourcesCache";
 import { getCorrespondingSourceIds } from "../utils/sources";
 import { sourcesByIdCache } from "./SourcesCache";
+
+import { StreamingCacheLoadOptions, StreamingValue, createStreamingCache } from "suspense";
 
 // TODO Create a generic cache variant that
 // (1) supports streaming data and

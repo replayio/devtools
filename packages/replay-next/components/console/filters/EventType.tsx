@@ -1,5 +1,4 @@
 import { MouseEvent, useContext } from "react";
-import { STATUS_PENDING, STATUS_REJECTED, useIntervalCacheStatus } from "suspense";
 
 import { Badge, Checkbox } from "design";
 import Icon from "replay-next/components/Icon";
@@ -11,6 +10,8 @@ import { MAX_POINTS_TO_RUN_EVALUATION } from "shared/client/ReplayClient";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import styles from "./EventType.module.css";
+
+import { STATUS_PENDING, STATUS_REJECTED, useIntervalCacheStatus } from "suspense";
 
 export default function EventType({
   categoryLabel,

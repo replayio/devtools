@@ -95,7 +95,7 @@ export default function Home() {
                 <div className="prose">
                   <h1>Accordion</h1>
                 </div>
-                <div className="prose mb-9.5 mt-4">
+                <div className="mb-9.5 prose mt-4">
                   <p className="text-lg">
                     Replay's Accordion is modeled after other application split views such as VS
                     Code and Figma. The goal is to provide a flex-like layout for a collection of
@@ -109,14 +109,14 @@ export default function Home() {
                 <div className="prose">
                   <h2>Installation</h2>
                 </div>
-                <div className="prose mb-9.5 mt-4">
+                <div className="mb-9.5 prose mt-4">
                   <p className="text-lg">To get started, install Headless UI via npm or yarn:</p>
                 </div>
 
                 <div className="prose mt-12">
                   <h2>Basic example</h2>
                 </div>
-                <div className="prose mb-9.5 mt-4">
+                <div className="mb-9.5 prose mt-4">
                   <p className="text-lg">
                     Listboxes are built using the Listbox, Listbox.Button, Listbox.Options,
                     Listbox.Option and Listbox.Label components. The Listbox.Button will

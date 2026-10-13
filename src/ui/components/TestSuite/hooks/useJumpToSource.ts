@@ -1,5 +1,4 @@
 import { useContext } from "react";
-import { isPromiseLike } from "suspense";
 
 import { selectLocation } from "devtools/client/debugger/src/actions/sources";
 import { getContext } from "devtools/client/debugger/src/selectors";
@@ -15,6 +14,8 @@ import { TestStepSourceLocationCache } from "ui/components/TestSuite/suspense/Te
 import { setSourcesUserActionPending } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { AwaitTimeout, awaitWithTimeout } from "ui/utils/awaitWithTimeout";
+
+import { isPromiseLike } from "suspense";
 
 export function useJumpToSource({
   groupedTestCases,

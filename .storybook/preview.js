@@ -1,8 +1,9 @@
 import "base.css";
-import "image/image.css";
 import "devtools/client/debugger/src/components/shared/AccessibleImage.css";
 import "devtools/client/themes/variables.css";
+import "image/image.css";
 import "tailwindcss/tailwind.css";
+
 import { withRootAttribute } from "storybook-addon-root-attribute";
 
 export const decorators = [withRootAttribute];

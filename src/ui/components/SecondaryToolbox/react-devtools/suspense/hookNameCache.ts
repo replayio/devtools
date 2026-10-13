@@ -1,5 +1,4 @@
 import { Location, MappedLocation } from "@replayio/protocol";
-import { createCache } from "suspense";
 
 import { updateMappedLocation } from "replay-next/src/suspense/PauseCache";
 import {
@@ -9,6 +8,8 @@ import {
 import { getPreferredLocation } from "replay-next/src/utils/sources";
 import { ReplayClientInterface } from "shared/client/types";
 import { locationToString } from "ui/actions/eventListeners/eventListenerUtils";
+
+import { createCache } from "suspense";
 
 const MAX_LINE_LENGTH = 200;
 

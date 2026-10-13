@@ -19,7 +19,7 @@ export default function Collaborators({ recordingId }: CollaboratorsProps) {
 
   return (
     <>
-      <div className="mt-4 mb-2 font-bold">Add People</div>
+      <div className="mb-2 mt-4 font-bold">Add People</div>
       <section className="flex w-full flex-col space-y-4">
         <div className="border border-transparent">
           <EmailForm recordingId={recordingId} />

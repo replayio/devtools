@@ -1,6 +1,5 @@
 import { SourceId } from "@replayio/protocol";
 import { useContext } from "react";
-import { useImperativeCacheValue } from "suspense";
 
 import { SelectedFrameContext } from "replay-next/src/contexts/SelectedFrameContext";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
@@ -8,6 +7,8 @@ import { framesCache } from "replay-next/src/suspense/FrameCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import { SourceSearchContext } from "../SourceSearchContext";
+
+import { useImperativeCacheValue } from "suspense";
 
 export type ExecutionPointLineHighlight = {
   columnIndex: number;

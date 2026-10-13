@@ -16,11 +16,12 @@ import {
   ResponseBodyData,
   TimeStampedPoint,
 } from "@replayio/protocol";
-import { StreamingCacheLoadOptions, createStreamingCache } from "suspense";
 
 import { comparePoints } from "protocol/execution-point-utils";
 import { assert } from "protocol/utils";
 import { ReplayClientInterface } from "shared/client/types";
+
+import { StreamingCacheLoadOptions, createStreamingCache } from "suspense";
 
 export type NetworkEventWithTime<EventType> = EventType & {
   time: number;

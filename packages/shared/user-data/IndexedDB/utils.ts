@@ -1,7 +1,8 @@
 import { IDBPDatabase, openDB } from "idb";
-import { Cache, createCache } from "suspense";
 
 import { IDBOptions } from "shared/user-data/IndexedDB/types";
+
+import { Cache, createCache } from "suspense";
 
 export async function preloadIDBInitialValues(
   idbPrefsDatabase: IDBOptions[],

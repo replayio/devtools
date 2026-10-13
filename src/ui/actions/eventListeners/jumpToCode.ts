@@ -8,7 +8,6 @@ import {
   TimeStampedPoint,
   getSourceOutlineResult,
 } from "@replayio/protocol";
-import { Cache, createCache } from "suspense";
 
 import { selectLocation } from "devtools/client/debugger/src/actions/sources/select";
 import { getThreadContext } from "devtools/client/debugger/src/reducers/pause";
@@ -32,6 +31,8 @@ import { UIState } from "ui/state";
 import { ParsedJumpToCodeAnnotation } from "ui/suspense/annotationsCaches";
 
 import { createReactEventMapper } from "./evaluationMappers";
+
+import { Cache, createCache } from "suspense";
 
 export interface PointWithEventType extends TimeStampedPoint {
   kind: "keypress" | "mousedown";

@@ -1,6 +1,5 @@
 import classnames from "classnames";
 import React, { ReactNode, Suspense, useContext, useLayoutEffect } from "react";
-import { useImperativeCacheValue } from "suspense";
 
 import { EditorPane } from "devtools/client/debugger/src/components/Editor/EditorPane";
 import LazyActivity from "replay-next/components/LazyActivity";
@@ -30,6 +29,8 @@ import WaitForReduxSlice from "../WaitForReduxSlice";
 import NewConsoleRoot from "./NewConsole";
 import SourcesTabLabel from "./SourcesTabLabel";
 import styles from "./SecondaryToolbox.module.css";
+
+import { useImperativeCacheValue } from "suspense";
 
 const InspectorApp = React.lazy(() => import("devtools/client/inspector/components/App"));
 

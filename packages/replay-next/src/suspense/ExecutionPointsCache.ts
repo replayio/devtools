@@ -4,12 +4,13 @@ import {
   TimeStampedPoint,
 } from "@replayio/protocol";
 import clamp from "lodash/clamp";
-import { Cache, Deferred, createCache, createDeferred, createSingleEntryCache } from "suspense";
 
 import { ReplayClientInterface } from "shared/client/types";
 import { ProtocolError, isCommandError } from "shared/utils/error";
 
 import { isExecutionPointsLessThan } from "../utils/time";
+
+import { Cache, Deferred, createCache, createDeferred, createSingleEntryCache } from "suspense";
 
 export type CachedPointsForTime = Map<number, ExecutionPoint>;
 type ChangeHandler = (timeStampedPoint: TimeStampedPoint) => void;

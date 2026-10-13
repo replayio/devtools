@@ -70,7 +70,7 @@ function Actions({ onDiscard, status }: { onDiscard: () => void; status: Status 
         type="button"
         onClick={onDiscard}
         disabled={shouldDisableActions}
-        className="py-3.5 px-8 text-secondaryAccent hover:underline focus:underline focus:outline-none"
+        className="px-8 py-3.5 text-secondaryAccent hover:underline focus:underline focus:outline-none"
       >
         {isDeleting ? `Discarding…` : `Discard`}
       </button>
@@ -79,7 +79,7 @@ function Actions({ onDiscard, status }: { onDiscard: () => void; status: Status 
         disabled={shouldDisableActions}
         value={isSaving ? `Uploading…` : `Save`}
         ref={saveButtonRef}
-        className="mb-8 cursor-pointer rounded-xl bg-primaryAccent py-3.5 px-16 font-bold text-buttontextColor shadow-sm ring-offset-1 hover:bg-primaryAccentHover focus:border-primaryAccent focus:outline-none focus:ring-2 focus:ring-primaryAccent"
+        className="mb-8 cursor-pointer rounded-xl bg-primaryAccent px-16 py-3.5 font-bold text-buttontextColor shadow-sm ring-offset-1 hover:bg-primaryAccentHover focus:border-primaryAccent focus:outline-none focus:ring-2 focus:ring-primaryAccent"
       />
     </div>
   );

@@ -1,7 +1,7 @@
-import { createSingleEntryCache } from "suspense";
-
 import { ReplayClientInterface } from "shared/client/types";
 import { userData } from "shared/user-data/GraphQL/UserData";
+
+import { createSingleEntryCache } from "suspense";
 
 export const buildIdCache = createSingleEntryCache<[replayClient: ReplayClientInterface], string>({
   config: { immutable: true },

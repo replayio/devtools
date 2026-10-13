@@ -1,5 +1,4 @@
 import { PropsWithChildren, ReactNode, Suspense } from "react";
-import { useStreamingValue } from "suspense";
 
 import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBoundary";
 import ExternalLink from "replay-next/components/ExternalLink";
@@ -9,6 +8,8 @@ import { TimeoutCache } from "replay-next/src/suspense/TimeoutCache";
 
 import { ReactDevToolsPanel } from "./react-devtools/components/ReactDevToolsPanel";
 import styles from "./ReactDevTools.module.css";
+
+import { useStreamingValue } from "suspense";
 
 export default function ReactDevToolsWithErrorBoundary() {
   const { point, pauseId } = useMostRecentLoadedPause() ?? {};

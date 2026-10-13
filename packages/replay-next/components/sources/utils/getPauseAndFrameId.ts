@@ -1,11 +1,12 @@
 import { ExecutionPoint, FrameId, PauseId, TimeStampedPointRange } from "@replayio/protocol";
-import { isPromiseLike } from "suspense";
 
 import { topFrameCache } from "replay-next/src/suspense/FrameCache";
 import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { createFetchAsyncFromFetchSuspense } from "replay-next/src/utils/suspense";
 import { ReplayClientInterface } from "shared/client/types";
 import { isPointInRegion } from "shared/utils/time";
+
+import { isPromiseLike } from "suspense";
 
 export function getPauseAndFrameIdSuspends(
   replayClient: ReplayClientInterface,
