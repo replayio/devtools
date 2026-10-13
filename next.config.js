@@ -24,7 +24,7 @@ const baseNextConfig = {
     // which folders to run ESLint on during production builds (next build)
     dirs: ["src", "pages", "packages"],
 
-    // We rely on Trunk's hold-the-line functionality.
+    // Linting runs on its own, in the Lint workflow (yarn lint).
     ignoreDuringBuilds: true,
   },
   productionBrowserSourceMaps: true,

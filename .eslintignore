@@ -10,3 +10,9 @@ packages/shared/graphql/generated
 **/.eslintrc*
 **/*.d.ts
 src/ui/components/SecondaryToolbox/**/*.raw.js
+docs/codebase-notes/
+test/
+packages/import-sort-style-replay/
+packages/e2e-tests/examples/
+src/ui/components/TestSuite/suspense/assets/*.js
+packages/playwright-recorder/dist/

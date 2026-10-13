@@ -14,3 +14,12 @@ pages/_app.tsx
 *.yaml
 src/**/*.raw.js
 src/ui/components/TestSuite/suspense/assets/*.js
+docs/codebase-notes
+test
+packages/import-sort-style-replay
+packages/e2e-tests/examples
+**/*.config.js
+packages/playwright-recorder/dist
+packages/shared/graphql/generated
+.yarn
+**/*.config.mjs

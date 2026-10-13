@@ -3,7 +3,12 @@
   "extends": ["stylelint-config-prettier"],
   "ignoreFiles": [
     "pages/**/*.css",
-    "src/**/*.css"
+    "src/**/*.css",
+    "docs/codebase-notes/**",
+    "packages/accordion/website/**",
+    "packages/e2e-tests/examples/**",
+    "public/**",
+    "test/**"
   ],
   "rules": {
     "unit-disallowed-list": ["em"]
