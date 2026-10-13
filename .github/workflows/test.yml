@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Waiting for 200 from the Vercel Preview
-        uses: patrickedqvist/wait-for-vercel-preview@v1.3.1
+        uses: patrickedqvist/wait-for-vercel-preview@d7982701e6fcd3ae073bff929e408e004404d38d # v1.3.3
         id: waitFor200
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -42,13 +42,8 @@ jobs:
     name: Generate Test Run ID
     runs-on: ubuntu-22.04
     steps:
-      - run: yarn add uuid
-        shell: sh
-      - uses: actions/github-script@v6
-        id: uuid
-        with:
-          result-encoding: string
-          script: return require("uuid").v4()
+      - id: uuid
+        run: echo "result=$(cat /proc/sys/kernel/random/uuid)" >> "$GITHUB_OUTPUT"
     outputs:
       testRunId: ${{ steps.uuid.outputs.result }}
   e2etest:
@@ -62,10 +57,10 @@ jobs:
         shard: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Setup node
         id: setup-node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
       # Get the yarn cache path.
@@ -73,7 +68,7 @@ jobs:
         id: yarn-cache-dir-path
         run: echo "{dir}={$(yarn config get cacheFolder)}" >> $GITHUB_OUTPUT
       - name: Restore yarn cache
-        uses: actions/cache@v3
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         id: yarn-cache
         with:
           path: |
@@ -105,13 +100,13 @@ jobs:
           AUTHENTICATED_TESTS_WORKSPACE_API_KEY: ${{ secrets.AUTHENTICATED_TESTS_WORKSPACE_API_KEY }}
           GOLDEN_TEST_RUN_WORKSPACE_API_KEY: ${{ secrets.GOLDEN_TEST_RUN_WORKSPACE_API_KEY }}
       - name: Archive Playwright report results with code coverage
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
           name: all-code-coverage-reports_${{ matrix.shard }}
           path: packages/e2e-tests/test-results
           retention-days: 3
-      - uses: replayio/action-upload@v0.5.1
+      - uses: replayio/action-upload@02d7ff2da88d9a4fca19cd4119feb8e8222a4ac6 # v0.6.0
         if: always()
         with:
           api-key: ${{ env.RECORD_REPLAY_API_KEY }}
@@ -127,10 +122,10 @@ jobs:
         shard: ["1"]
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Setup node
         id: setup-node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
       # Get the yarn cache path.
@@ -138,7 +133,7 @@ jobs:
         id: yarn-cache-dir-path
         run: echo "{dir}={$(yarn config get cacheFolder)}" >> $GITHUB_OUTPUT
       - name: Restore yarn cache
-        uses: actions/cache@v3
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         id: yarn-cache
         with:
           path: |
@@ -167,13 +162,13 @@ jobs:
           AUTHENTICATED_TESTS_WORKSPACE_API_KEY: ${{ secrets.AUTHENTICATED_TESTS_WORKSPACE_API_KEY }}
           GOLDEN_TEST_RUN_WORKSPACE_API_KEY: ${{ secrets.GOLDEN_TEST_RUN_WORKSPACE_API_KEY }}
       - name: Archive Playwright report results with code coverage
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
           name: all-code-coverage-reports_auth
           path: packages/e2e-tests/test-results
           retention-days: 3
-      - uses: replayio/action-upload@v0.5.1
+      - uses: replayio/action-upload@02d7ff2da88d9a4fca19cd4119feb8e8222a4ac6 # v0.6.0
         if: always()
         with:
           api-key: ${{ env.RECORD_REPLAY_API_KEY }}
@@ -183,10 +178,10 @@ jobs:
     runs-on: ubuntu-22.04
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Setup node
         id: setup-node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
       # Get the yarn cache path.
@@ -194,7 +189,7 @@ jobs:
         id: yarn-cache-dir-path
         run: echo "{dir}={$(yarn config get cacheFolder)}" >> $GITHUB_OUTPUT
       - name: Restore yarn cache
-        uses: actions/cache@v3
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         id: yarn-cache
         with:
           path: |

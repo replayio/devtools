@@ -15,6 +15,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: cleanup
-        uses: glassechidna/artifact-cleaner@master
+        uses: glassechidna/artifact-cleaner@430d9257d21e295fd5c7ffe4449c2b6dd4fb5423 # v2
         with:
           minimumAge: 86400 # all artifacts at least one day old
