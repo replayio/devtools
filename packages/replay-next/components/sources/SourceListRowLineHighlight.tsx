@@ -38,7 +38,7 @@ export const SourceListRowLineHighlight = memo(function SourceListRowLineHighlig
           <div
             className={styles.CurrentExecutionPoint}
             data-test-name="CurrentExecutionPointLineHighlight"
-            data-test-type="preview-location"
+            data-test-type={lineHighlight.isPreview ? "preview-location" : "execution-point"}
           />
           {highlightColumnBegin != null && highlightColumnEnd != null && (
             <div

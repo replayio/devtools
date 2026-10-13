@@ -69,9 +69,7 @@ export async function toggleSearchResultsForFileName(
     const currentIsOpen = state === "open";
     if (isOpen !== currentIsOpen) {
       await locationRow.click();
-      await expect(await expandable.getAttribute("data-test-state")).toBe(
-        isOpen ? "open" : "closed"
-      );
+      await expect(expandable).toHaveAttribute("data-test-state", isOpen ? "open" : "closed");
     }
   }
 }

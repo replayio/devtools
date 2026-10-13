@@ -1,6 +1,6 @@
 import assert from "assert";
 import { TimeStampedPoint, TimeStampedPointRange } from "@replayio/protocol";
-import { ReactNode, useContext, useMemo } from "react";
+import { ReactNode, useContext, useMemo, useRef } from "react";
 
 import { highlightNodes, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 import { RecordedMouseEventsCache } from "protocol/RecordedEventsCache";
@@ -61,6 +61,9 @@ export function TestSectionRow({
   const isSelected = testEvent === selectedTestEvent;
 
   const dispatch = useAppDispatch();
+  // Bumped whenever the mouse enters or leaves the row, so that DOM node
+  // details arriving after that don't highlight for a stale hover.
+  const hoverIdRef = useRef(0);
 
   const { contextMenu, onContextMenu } = useTestEventContextMenu(testEvent, testEvents);
 
@@ -156,6 +159,7 @@ export function TestSectionRow({
   };
 
   const onMouseEnter = async () => {
+    const hoverId = ++hoverIdRef.current;
     let hoverTime: number | null = null;
     if (isUserActionTestEvent(testEvent) && isUserClickEvent(testEvent)) {
       // Find the actual mouse event that _should_ have occurred
@@ -195,16 +199,21 @@ export function TestSectionRow({
       return;
     }
 
-    // We hope to have details on the relevant DOM node cached by now.
-    // If we do, go ahead and read that synchronously so we can highlight the node.
     const resultPoint = testEvent.data.timeStampedPoints.result;
     if (!resultPoint) {
       return;
     }
 
-    const domNodesDetails = testEventDomNodeCache.getValueIfCached(resultPoint.point);
-
-    if (!domNodesDetails) {
+    // The details on the relevant DOM node are usually cached by now, but they
+    // are loaded in the background, so they can still arrive while the mouse
+    // is over the row.
+    let domNodesDetails;
+    try {
+      domNodesDetails = await testEventDomNodeCache.readAsync(resultPoint.point);
+    } catch {
+      return;
+    }
+    if (hoverIdRef.current !== hoverId) {
       return;
     }
 
@@ -219,6 +228,7 @@ export function TestSectionRow({
   };
 
   const onMouseLeave = () => {
+    hoverIdRef.current++;
     dispatch(setHoverTime(null));
 
     if (isUserActionTestEvent(testEvent)) {
