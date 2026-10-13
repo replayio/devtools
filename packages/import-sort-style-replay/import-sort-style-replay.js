@@ -2,29 +2,6 @@
 // Used by https://github.com/renke/import-sort, via https://github.com/ggascoigne/prettier-plugin-import-sort
 // Based on https://github.com/AndrewIngram/import-sort-style-andy as a starting point
 
-const fs = require("fs");
-const path = require("path");
-
-// Whether the import is from a third-party package, installed in node_modules.
-// import-sort's isInstalledModule resolves the import instead, which fails for
-// packages that only declare "exports" (e.g. suspense) and for workspace
-// packages whose entry point hasn't been built, so those got sorted with the
-// app's own modules. Workspace packages are linked into node_modules too, but
-// they're the app's own code, so a package only counts if it really lives there.
-function isThirdPartyModule(imported) {
-  const [scopeOrName, name] = imported.moduleName.split("/");
-  const packageName = scopeOrName.startsWith("@") ? `${scopeOrName}/${name}` : scopeOrName;
-  for (let dir = __dirname; ; dir = path.dirname(dir)) {
-    const packageDir = path.join(dir, "node_modules", packageName);
-    if (fs.existsSync(path.join(packageDir, "package.json"))) {
-      return fs.realpathSync(packageDir).split(path.sep).includes("node_modules");
-    }
-    if (path.dirname(dir) === dir) {
-      return false;
-    }
-  }
-}
-
 function sortImports(styleApi) {
   const {
     alias,
@@ -45,17 +22,34 @@ function sortImports(styleApi) {
     Boolean(imported.moduleName.match(/^(react|react-dom|prop-types|redux|\@reduxjs|next)/));
 
   const isNewPrototypeModule = imported =>
-    Boolean(imported.moduleName.match(/^(replay-next|shared)/));
-  const isProtocolModule = imported => Boolean(imported.moduleName.match(/^protocol/));
+    Boolean(imported.moduleName.match(/^(replay-next|shared)(\/|$)/));
+  const isProtocolModule = imported => Boolean(imported.moduleName.match(/^protocol(\/|$)/));
   const isOtherInternalPackageModule = imported =>
-    Boolean(imported.moduleName.match(/^(accordion|design|third-party)/));
+    Boolean(imported.moduleName.match(/^(accordion|design|third-party)(\/|$)/));
 
   const isGlobalReduxStoreConfig = imported =>
-    Boolean(imported.moduleName.match(/^(ui\/state|ui\/setup\/hooks)/));
+    Boolean(imported.moduleName.match(/^(ui\/state|ui\/setup\/hooks)(\/|$)/));
 
-  const isMainSrcFolder = imported => Boolean(imported.moduleName.match(/^(devtools|ui)/));
+  const isMainSrcFolder = imported => Boolean(imported.moduleName.match(/^(devtools|ui)(\/|$)/));
   const isOtherSrcFolder = imported =>
-    Boolean(imported.moduleName.match(/^(graphql|image|test|src)/));
+    Boolean(imported.moduleName.match(/^(image|test|src)(\/|$)/));
+
+  // The app's own non-relative modules: its source folders, workspace
+  // packages and aliases.
+  const isOwnModule = or(
+    isNewPrototypeModule,
+    isProtocolModule,
+    isOtherInternalPackageModule,
+    isGlobalReduxStoreConfig,
+    isMainSrcFolder,
+    isOtherSrcFolder,
+    imported => Boolean(imported.moduleName.match(/^@(devtools-repo|recordreplay)\//))
+  );
+  // Any other bare import is a third-party package, told apart by its name as
+  // import/order does. import-sort's isInstalledModule resolves the import
+  // instead, which fails for packages that only declare "exports" (e.g.
+  // suspense), so those got sorted with the app's own modules.
+  const isThirdPartyModule = and(isAbsoluteModule, not(isOwnModule));
 
   const isStylesModule = imported => Boolean(imported.moduleName.match(/\.(s?css|less)$/));
   const isImageModule = imported =>

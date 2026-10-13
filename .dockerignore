@@ -1,6 +1,5 @@
 .github
 .next
-.storybook
 .vscode
 .yarn
 .yarnrc.yml
