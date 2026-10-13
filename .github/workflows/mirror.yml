@@ -11,19 +11,13 @@ jobs:
       contents: write
     steps:
       - name: Point staging at main
-        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
-        with:
-          script: |
-            const { owner, repo } = context.repo;
-            const { data: main } = await github.rest.git.getRef({ owner, repo, ref: "heads/main" });
-            const sha = main.object.sha;
-            try {
-              await github.rest.git.updateRef({ owner, repo, ref: "heads/staging", sha, force: true });
-            } catch (error) {
-              // 422 "Reference does not exist": staging hasn't been created yet.
-              if (error.status !== 422) {
-                throw error;
-              }
-              await github.rest.git.createRef({ owner, repo, ref: "refs/heads/staging", sha });
-            }
-            console.log(`Set staging to ${sha}.`);
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          sha=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)
+          if gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/staging" > /dev/null 2>&1; then
+            gh api --method PATCH "repos/$GITHUB_REPOSITORY/git/refs/heads/staging" -f sha="$sha" -F force=true > /dev/null
+          else
+            gh api --method POST "repos/$GITHUB_REPOSITORY/git/refs" -f ref=refs/heads/staging -f sha="$sha" > /dev/null
+          fi
+          echo "Set staging to $sha."
