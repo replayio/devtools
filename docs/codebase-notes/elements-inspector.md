@@ -3,14 +3,15 @@
 ## Overview
 
 Generally lives in `devtools/client/inspector/`
-  - subfolders for the various concepts / sub-tabs (`boxmodel`, `changes`, `computed`, `layout`, `markup`, `rules`, `event-listeners`). Each of those in turn mostly have their own `actions/reducers/components/selectors` subfolders
-  - additional folders for shared code: `actions`, `reducers`, `state`, `shared`
+
+- subfolders for the various concepts / sub-tabs (`boxmodel`, `changes`, `computed`, `layout`, `markup`, `rules`, `event-listeners`). Each of those in turn mostly have their own `actions/reducers/components/selectors` subfolders
+- additional folders for shared code: `actions`, `reducers`, `state`, `shared`
 
 ### General Architecture
 
-The React components mostly expect POJOs, like `NodeInfo` and `RuleState`.  These are generally stored in Redux.
+The React components mostly expect POJOs, like `NodeInfo` and `RuleState`. These are generally stored in Redux.
 
-However, the logic that drives those lives in `$PANELView` components like `RuleView`. These are singleton classes that are instantiated by the `Inspector` class.  They listen for `"new-node-front"` events from the `Selection` singleton, which stores a `NodeFront` value. They then grab the selected `NodeFront` instance and call various methods to fetch data like CSS rules, parent/child nodes, and other DOM details.  The fetched data is run through additional processing to determine things like CSS inheritance and overrides, box model layouts, computed properties, etc, and then put into Redux.
+However, the logic that drives those lives in `$PANELView` components like `RuleView`. These are singleton classes that are instantiated by the `Inspector` class. They listen for `"new-node-front"` events from the `Selection` singleton, which stores a `NodeFront` value. They then grab the selected `NodeFront` instance and call various methods to fetch data like CSS rules, parent/child nodes, and other DOM details. The fetched data is run through additional processing to determine things like CSS inheritance and overrides, box model layouts, computed properties, etc, and then put into Redux.
 
 There's interaction with several vanilla JS classes for things like highlighting elements as you mouse over them,and some vanilla JS "components" for things like the "breadcrumbs" leading to the selected element.
 
@@ -19,10 +20,10 @@ In general, there's a lot of complex logic that really expects to work with `Nod
 ### Entry Points
 
 #### `<InspectorApp>` component
-  
+
 - Lives in `./components/App.tsx`
 - Imported in 5 locations, all dynamic imports:
-  - `inspector/actions/markup.ts`:  `selectNode()` (use of `window.gInspector` global)
+  - `inspector/actions/markup.ts`: `selectNode()` (use of `window.gInspector` global)
   - `webconsole/actions/toolbox.ts`: `highlightDomElement()`, `unHighlightDomElement()`, `openNodeInInspector()` (use of `window.gInspector` global)
   - `ui/components/SecondaryToolbox/index.ts`: wrapped in `React.lazy()` for actual rendering
 - Imports several other "$FEATUREApp" components, one per tab in the UI (`ComputedApp`, `LayoutApp`, `MarkupApp`, RulesApp`, EventListenersApp`
@@ -43,9 +44,7 @@ In general, there's a lot of complex logic that really expects to work with `Nod
   - Stores references to `window`, `window.document`, `window.app.store`, and a singleton `Highlighter` class instance
 - Has getters for `Highlighter`, a `HighlightersOverlay`, and `CSSProperties`
 - `getCommonComponentProps()`: returns `{setSelectedNode, onShowBoxModelHighlighterForNode}` (although `onSBMHFN` is empty and does nothing)
-  
-  
-  
+
 ## "Elements" Markup Panel
 
 ### Entry Point - `<MarkupApp>`
@@ -58,7 +57,7 @@ In general, there's a lot of complex logic that really expects to work with `Nod
   - "Add Node" and "Eyedropper toggle" buttons (both invisible and obsolete?)
   - HTML breadcrumbs container
 - Instantiates a `MarkupSearchbox` and `HTMLBreadCrumbs`, with `inspector` as a constructor arg. These are vanilla JS logic for those parts of the UI
-  
+
 ### Search Box
 
 - Parent lives in `markup/searchbox.ts`:
@@ -70,7 +69,7 @@ In general, there's a lot of complex logic that really expects to work with `Nod
   - listens for `"keydown"` and `"input"` events, makes itself an `EventEmitter`, stores the last query as a promise that tests can wait for (but that appears to be unused)
   - Calls `ThreadFront.searchDOM()`, waits for results
   - Accesses `this.inspector.selection.nodeFront` to check for a node index, and calls `this.inspector.selection.setNodeFront(node, {reason: "inspectorsearch"})`
-  
+
 ### HTML Breadcrumbs
 
 - Location: `./breadcrumbs.js`
@@ -90,7 +89,7 @@ In general, there's a lot of complex logic that really expects to work with `Nod
 - Node buttons:
   - Hovering calls `this.inspector.highlighter.highlight(node)`
   - Clicking calls `this.selection.setNodeFront(node)`
-  
+
 ### Selection Tracking - `class Selection`
 
 - Location: `devtools/client/framework/selection.ts` (up and over a folder from the rest of the inspector code)
@@ -101,10 +100,10 @@ In general, there's a lot of complex logic that really expects to work with `Nod
 - Methods:
   - `setNodeFront(nodeFront, {reason, isSlotted})`: saves a `NodeFront` reference and calls `this.emit("new-node-front")` indicating selection has changed
 - Getters: lots of helpers for things like `isElementNode`, `isAttributeNode`, `isAnonymousNode`, `isShadowRootNode`, etc
-    
+
 ### Markup State - `class MarkupView`
 
-This is effectively state management logic.  It tries to tie together the "current selected `NodeFront` value" with the Redux store, dispatches actions when there's a pause or resume, and handles node expand/collapse/select from clicks, 
+This is effectively state management logic. It tries to tie together the "current selected `NodeFront` value" with the Redux store, dispatches actions when there's a pause or resume, and handles node expand/collapse/select from clicks,
 
 - Location: `./markup/markup.ts`
 - Setup:
@@ -115,10 +114,10 @@ This is effectively state management logic.  It tries to tie together the "curre
   - Subscribes to the Redux store with `this.updateIsInspectorVisible`
 - Methods:
   - `updateIsInspectorVisible()`: reads Redux state to see if the Inspector is selected, updates the boolean, and calls `this.loadNewDocument()` if needed
-  - `getMarkupProps()`: returns props for the `<Nodes>` component: `{onSelectNode, onToggleNodeExpanded, onMouseEnter/LeaveNode}`.  The props are the actual class methods
+  - `getMarkupProps()`: returns props for the `<Nodes>` component: `{onSelectNode, onToggleNodeExpanded, onMouseEnter/LeaveNode}`. The props are the actual class methods
   - `onPaused()`: Dispatches the `reset()` action, which also resets the `rootNodeWaiter` promise in `actions/markup.ts`, and either loads a new document now or waits until the "Elements" tab is selected and made visible
   - `onResumed()`: calls `selection.setNodeFront(null)` and dispatches `reset()`
-  - `loadNewDocument()`: 
+  - `loadNewDocument()`:
     - Ensures sources are loaded
     - Gets current `pause`
     - Clears selected node front if necessary
@@ -128,9 +127,9 @@ This is effectively state management logic.  It tries to tie together the "curre
   - `onSelectNode()`: looks up a `NodeFront` by ID from `ThreadFront` and passes that to `selection.setNodeFront()`
   - `onMouseEnter/LeaveNode()`: Highlights or unhilights a node using the `Highlighter` class
   - `update()`: if the inspector is visible, dispatches `selectionChanged()`
-  
+
 ### Elements Display Components
-  
+
 #### `<Nodes>`
 
 - Location: `./markup/components/Nodes.tsx`
@@ -141,7 +140,6 @@ This is effectively state management logic.  It tries to tie together the "curre
 - Adds keyboard shortcuts for those keyboard actions
 - Renders the node tree root items with an outer ARIA `role="tree"` and `<Node nodeId={nodeId}`
 
-
 #### `<Node>`
 
 - Location: `./markup/components/Node.tsx`
@@ -149,12 +147,12 @@ This is effectively state management logic.  It tries to tie together the "curre
   - `mapState`: `{node, rootNodeId, isSelectedNode, isScrollIntoViewNode}`
   - `mapDispatch`: `{setActiveTab}`
   - Parent: `{nodeId}` + `MarkupProps` interaction methods from above
-- Renders: 
+- Renders:
   - line item + expander
   - "component" (`ElementNode/TextNode/ReadOnlyNode`)
   - "events badge" (indicating if there's event listeners attached)
-  - child nodes / loading spinner (based on `node.isLoadingChildren`), 
-  
+  - child nodes / loading spinner (based on `node.isLoadingChildren`),
+
 #### Node Types
 
 - `<ElementNode>`:
@@ -165,32 +163,32 @@ This is effectively state management logic.  It tries to tie together the "curre
   - Just formats `displayName/isDocType/pseudoType`
 - `<TextNode>`:
   - Formats text or comments, replaces whitespace if needed
-  
+
 ### Elements Redux Logic
 
 #### `./markup/actions/markup.ts`
-  
+
 - Plain Redux action creators for `updateNodeExpanded`, `updateSelectedNode`, `updateChildrenLoading`, `updateScrollIntoViewNode`, `newRoot`, `addChildren`
 - Has a `rootNodeWaiter` deferred
 - Selectors for checking node relations: `getLast/Previous/NextNodeId`
 - Thunks for keyboard interactions: `Up/Dwn/Left/Right/PageUp/PageDown` that look up node IDs and dispatch `selectNode()`
 - Thunks for additional operations:
-    - `selectNode`:
-      - Reads `const nodeFront = ThreadFront.currentPause?.getNodeFront(nodeId);` 
-      - Calls `Highlighter.highlight(nodeFront)`
-      - Calls `window.gInspector.selection.setNodeFront(nodeFront)`
-    - `expandNode`:
-      - Dispatches `updateNodeExpanded(nodeId, true)`
-      - Dispatches to mark all children as loading, and possibly scroll into view
-      - `const childNodes = await nodeFront.childNodes()`
-      - `dispatch(addChildren())`
-      - `dispatch(updateChildrenLoading())`
-    - `selectionChanged`:
-      - `dispatch(updateSelectedNode())`
-      - Uses `NodeFront`s to recurse up the parents and `dispatch(expandNode(ancestor.objectId()))`
+  - `selectNode`:
+    - Reads `const nodeFront = ThreadFront.currentPause?.getNodeFront(nodeId);`
+    - Calls `Highlighter.highlight(nodeFront)`
+    - Calls `window.gInspector.selection.setNodeFront(nodeFront)`
+  - `expandNode`:
+    - Dispatches `updateNodeExpanded(nodeId, true)`
+    - Dispatches to mark all children as loading, and possibly scroll into view
+    - `const childNodes = await nodeFront.childNodes()`
+    - `dispatch(addChildren())`
+    - `dispatch(updateChildrenLoading())`
+  - `selectionChanged`:
+    - `dispatch(updateSelectedNode())`
+    - Uses `NodeFront`s to recurse up the parents and `dispatch(expandNode(ancestor.objectId()))`
 - `convertNode(node: NodeFront): Promise<NodeInfo>`:
   - converts a `NodeFront` class instance into a simpler `NodeInfo` POJO
-  
+
 #### `./markup/reducers/markup.ts`
 
 - Legacy-style Redux reducers, albeit written as a lookup table and a homegrown `createReducer` function rather than a `switch/case`
@@ -202,14 +200,12 @@ This is effectively state management logic.  It tries to tie together the "curre
   - `"UPDATE_NODE_EXPANDED"`: updates a node's `isExpanded` field
   - `"UPDATE_CHILDREN_LOADED"`: updates a node's `isLoadingChildren` field
   - `"UPDATE_SELECTED_NODE/UPDATE_SCROLL_INTO_VIEW_NODE"`: sets the matching node ID field
-  
+
 ### Other Logic and Files
 
 - `constants.js`: a single array of HTML elements with no closing tag
 - `types.js`: `PropTypes` definitions for markup and DOM node components
 - `utils.js`: vanilla JS/DOM methods for flashing elements, autocomplete max width, checking `display` types, and parsing attribute values
-
-
 
 ## "Rules" Sub-Panel
 
@@ -230,6 +226,7 @@ This is effectively state management logic.  It tries to tie together the "curre
   - All the rule elements are then memoized too
     - Really we can skip the `useCallbacks`, and move the "render X" methods inside the `useMemo`
   - Renders `<Toolbar>`, which contains `<SearchBox>`, state is controlled here in `<RulesApp>`
+
 #####
 
 ### Rules Components
@@ -240,7 +237,6 @@ This is effectively state management logic.  It tries to tie together the "curre
 - `<Declarations>`: Maps over a `DeclarationsState[]` and renders `<Declaration>`
 - `<Declaration>`: renders expander, styles, and a `<DeclarationValue>`
 - `<DeclarationValue>`: depending on the value, returns a color/font/URI component, or just shows the string
-
 
 ### Rules State - `class RulesView`
 
@@ -262,15 +258,12 @@ This is effectively state management logic.  It tries to tie together the "curre
   - `update()`: either `dispatch(updateRules())` if no element, or creates a `new ElementStyle()` object and calls `this.updateElementStyle()`
   - `updateElementStyle()`: awaits an empty `Promise`, calls `this.elementStyle.populate()`, calls `this.updateRules()`
   - `updateRules()`: just dispatches Redux actions for `updateRules` and `setComputedProperties`, both reading from the new `this.elementStyle`
-  
-  
 
 ### Rules Redux Logic
 
-
 - `actions/class-list.ts`:
   - plain action creators for `updateClasses` and `updateClassPanelExpanded`
-- `actions/rules.ts`: 
+- `actions/rules.ts`:
   - plain action creators for `updateAddRuleEnabled`, `updateHighlightedSelector`, `updateRules`, and `updateSourceLink`
   - `getDeclarationState:` maps a `declaration: TextProperty` class instance to a descriptive object with info about that CSS declaration
   - `getRuleState`: maps a `Rule` class instance to a descriptive object with info about the CSS rule
@@ -280,10 +273,10 @@ This is effectively state management logic.  It tries to tie together the "curre
 ### Rules "Models"
 
 There are several plain JS classes that are responsible for doing parsing and processing of CSS rules and declarations, all in `./rules/models/`:
-  
+
 #### `class ClassList`
 
-- Location: `./rules/models/class-list.ts`: 
+- Location: `./rules/models/class-list.ts`:
 - has a module-scoped `WeakMap<NodeFront, ClassInfo[]>` cache of classes applied to a given node, and tracks which classes are and aren't applied
 - manages classnames applied to a `NodeFront`. Currently half of its methods are commented out.
 
@@ -294,29 +287,28 @@ There are several plain JS classes that are responsible for doing parsing and pr
   - `element: NodeFront`
   - `ruleView: RuleView`
   - `store: UIStore` (Redux)
-    - Note: this actually mutates the store object itself, by adding `store.userProperties = new UserPoperties()`.  This is bizarre and we shouldn't do that.
+    - Note: this actually mutates the store object itself, by adding `store.userProperties = new UserPoperties()`. This is bizarre and we shouldn't do that.
     - Looks like `UserProperties` (which I will get to documenting shortly) is "CSS declarations mapped to properties that have been changed by the user", except that we don't allow editing anything any more so that _should_ be dead
   - `pageStyle: PageStyleFront`
   - `rules: Rule[]`
 - Methods:
-  - `populate()`: 
+  - `populate()`:
     - Resets `this.rules = []`
     - Calls `this.element.getAppliedRules()` (part of `NodeFront`)
       - in turn calls `client.CSS.getAppliedRules()` for the current pause, adds data to the `pause`, tries to unique-ify rules, and resolves a promise with `this._waiters.rules.resolve(uniqueRules.map())`
-     - Gets a `StyleFront` with `this.element.getInlineStyles()`
-       - side note: Several of these methods ultimately come down to `Pause.getDOMFront()`, which looks up internal objects by `objectId`, and looks at `data.preview[$FIELD_NAME]` to determine whether to create and return a `Node/Rule/Style/StyleSheetFront`
-     - recurses upwards through parent DOM nodes to ask for their styles and applied rules
-     - filters a list of pseudo-elements
-     - calls `this.onRuleUpdated()`, which in turn calls `this.updateDeclarations()` for itself and all pseudo-elements
+    - Gets a `StyleFront` with `this.element.getInlineStyles()`
+      - side note: Several of these methods ultimately come down to `Pause.getDOMFront()`, which looks up internal objects by `objectId`, and looks at `data.preview[$FIELD_NAME]` to determine whether to create and return a `Node/Rule/Style/StyleSheetFront`
+    - recurses upwards through parent DOM nodes to ask for their styles and applied rules
+    - filters a list of pseudo-elements
+    - calls `this.onRuleUpdated()`, which in turn calls `this.updateDeclarations()` for itself and all pseudo-elements
   - `_maybeAddRule()`: ignores system rules (Replay-specific edit), otherwise adds a `new Rule()` instance to `this.rules`
-  - `updateDeclarations()`: 
+  - `updateDeclarations()`:
     - Calls `this._getDeclarations()` to return a list of text property declarations for the element
     - Collects all computed properties
     - Finds property names, and loops over properties to find duplicate names and priorities / overriden values
   - `_hasUpdatedCSSVariable()`: dead
   - `_getDeclarations()`: loops over all rules to filter based on the current element/pseudo-element
   - bunch of other methods that have been commented out entirely (`modifySelector`, `toggleDeclaration`, `_getValueAndExtraPoperties`, etc)
-  
 
 #### `class Rule`
 
@@ -340,16 +332,16 @@ There are several plain JS classes that are responsible for doing parsing and pr
   - various other things like `title`, `line`, `column`
 - Methods:
   - `getUniqueSelector`: returns a string by joining a `string[]` together. (This is `async`, but all the "inherited" async logic has been commented out)
-  - `getTextProperties()`: 
+  - `getTextProperties()`:
     - calls `parseNamedDeclarations()` to get a list of properties from the style
     - access `store.userProperties` (!?!?!?) to look up property values based on a rule
     - creates new `TextProperties` instances for each property and returns them
   - bunch of other methods have been commented out entirely ( `_updateTextProperty`, `refresh`, `_getDisabledProperties`, etc)
-  
+
 #### `class TextProperty`
 
 - Location: `./rules/models/text-property.ts`
-- Fields: 
+- Fields:
   - `rule: Rule`
   - `elementStyle: ElementStyle`
   - `userProperties: UserProperties`
@@ -374,20 +366,16 @@ There are several plain JS classes that are responsible for doing parsing and pr
 - Location: `./rules/models/user-properties.ts`
 - Stores a `Map<string, Record<string, string>>`: maps a style key (`objectId + name`) to an object of style values that have been overridden by the user
   - This _has_ to be dead given how Replay works, right?
-  
-  
+
 ### Other Rules Logic
 
 - `utils/utils.js`: several utils to go from a a DOM node to a `Rule/Declaration`/etc; other utils to go from a DOM node to computed properties or info about shapes
 
-
 ## "Changes" Sub-Panel
 
-This appears to be entirely dead.  There's a `ChangesView` class that isn't imported anywhere, and `ChangesApp` is only imported by `ChangesView`.
+This appears to be entirely dead. There's a `ChangesView` class that isn't imported anywhere, and `ChangesApp` is only imported by `ChangesView`.
 
 The `changesReducer` is being added to the store, but that's it.
-
-
 
 ## "Layout" Sub-Panel
 
@@ -410,7 +398,6 @@ These live over in `./boxmodel/components/`
     - **Note**: this seems kinda half-broken atm. When I mouse over parts of the box model rectangles, I do see some highlight flickering in our video preview, but it doesn't stick even if I then keep the mouse still - it always goes away immediately
 - `<BoxModelProperties>`: renders a list of `<ComputedProperty>` instances displaying values like `line-height: "normal"`
 - `<ComputedProperty>`: formats a property name and value
-
 
 ### Box Model State - `class BoxModel`
 
@@ -445,15 +432,15 @@ These live over in `./boxmodel/components/`
 - `<MatchedSelector>`: renders `<ExternalLink` and `<DeclarationValue>` describing the selector and property
 
 ### Computed Redux Logic:
-  
-- `computed/actions/index.ts`: 
+
+- `computed/actions/index.ts`:
   - A couple plain action creators for `setComputedPropertySearch` and `setShowBrowserStyles`, etc
   - `setComputedProperties`: async thunk that takes an `ElementStyle` and calls `createComputedProperties` to read values from the underlying `NodeFront`
   - `createComputedProperties`:
     - calls `await elementStyle.element.getComputedStyle()`
     - Creates `new OutputParser(document, CSSProperties)`
     - For every computed property, does some calculations around rules and inheritance, and calls `outputParser.parseCssProperty()` for each declaration
-    
+
 ## "Event Listeners" Sub-PanelenersApp>`
 
 Really just one component:
@@ -477,7 +464,7 @@ Really just one component:
 - Methods:
   - `highlight(node: NodeFront)`:
     - waits for `node.getBoxModel()` if not available, then calls `this.boxModelHighlighter.show(node)`
-    
+
 ### `class BoxModelHighlighter`
 
 - Location: `src/devtools/server/actors/highlighters/box-model.js`
@@ -489,4 +476,4 @@ Really just one component:
   - `_update()`: calls `this._showBoxModel()`, which removes the `"hidden"` attribute on the overlay DOM node
   - `_updateBoxModel()`:
     - loops through all the box data and sets style attributes on the overlay DOM node
-    - 
+    -

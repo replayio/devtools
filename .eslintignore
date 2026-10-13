@@ -5,14 +5,14 @@ src/devtools/client/shared/sourceeditor/codemirror
 packages/third-party/
 public/test/examples
 packages/accordion/website/
-packages/shared/graphql/generated
 **/*.config.js
 **/.eslintrc*
 **/*.d.ts
 src/ui/components/SecondaryToolbox/**/*.raw.js
-docs/codebase-notes/
-test/
-packages/import-sort-style-replay/
+# Recorded example apps: the e2e tests depend on their exact source, line
+# numbers included.
 packages/e2e-tests/examples/
-src/ui/components/TestSuite/suspense/assets/*.js
-packages/playwright-recorder/dist/
+test/examples/
+# Build output and generated code.
+**/dist/
+**/generated/

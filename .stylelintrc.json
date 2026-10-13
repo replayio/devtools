@@ -4,11 +4,9 @@
   "ignoreFiles": [
     "pages/**/*.css",
     "src/**/*.css",
-    "docs/codebase-notes/**",
     "packages/accordion/website/**",
     "packages/e2e-tests/examples/**",
-    "public/**",
-    "test/**"
+    "public/**"
   ],
   "rules": {
     "unit-disallowed-list": ["em"]

@@ -62,8 +62,8 @@ const baseNextConfig = {
         source: "/:path((?!recording).*)*",
         destination: `${dashboardUrl}/:path*`,
         basePath: false,
-      }
-    ]
+      },
+    ];
   },
 
   async headers() {
