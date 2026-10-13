@@ -109,6 +109,11 @@ function sortImports(styleApi) {
 
     // Assets
 
+    // import "some/global.css";
+    // Left in the order they're written in, which is the order their rules
+    // apply in, like the relative ones below.
+    { match: and(hasNoMember, isStylesModule, not(isRelativeModule)) },
+
     // import styles from "bvaughn/something/Component.css"
     {
       match: and(isStylesModule, not(isRelativeModule)),
