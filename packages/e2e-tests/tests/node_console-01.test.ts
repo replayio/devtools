@@ -20,5 +20,9 @@ test("node_console-01: Basic node console behavior", async ({
 
   await executeAndVerifyTerminalExpression(page, "num", 1);
   await waitForScopeValue(page, "num", "1");
+  // The message is logged by the console.log call itself, partway through its
+  // statement, so stepping back reaches the start of the statement before the
+  // caller.
+  await reverseStepOverToLine(page, 9);
   await reverseStepOverToLine(page, 4);
 });
