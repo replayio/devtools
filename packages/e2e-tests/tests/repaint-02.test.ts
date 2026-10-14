@@ -4,7 +4,7 @@ import { getTestCaseSteps, getTestRows } from "../helpers/testsuites";
 import { waitFor } from "../helpers/utils";
 import test, { expect } from "../testFixture";
 
-test.use({ exampleKey: "playwright/breakpoints-05" });
+test.use({ exampleKey: "playwright/debugger-statements" });
 
 test("repaint-02: repaints on hover", async ({
   pageWithMeta: { page, recordingId, testScope },
@@ -24,7 +24,7 @@ test("repaint-02: repaints on hover", async ({
   // By default, the screenshot shown should correspond to the start of the test
   const startOfTestScreenShot = await getGraphicsDataUrl(page);
 
-  const stepLink = getTestCaseSteps(page).getByText("expect").first();
+  const stepLink = getTestCaseSteps(page).getByText("expect", { exact: true }).first();
   await stepLink.hover();
 
   // Hovering over a test step should update the graphics

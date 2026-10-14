@@ -91,6 +91,6 @@ test(`jump-to-code-02: Redux J2C functionality`, async ({
   // Inside of an adapter that passes dispatch-wrapped actions to <QuickOpenModal>
   // This is also one tick off, but should still _display_ as "1/10"
   jumpToReduxDispatch(page, "quickOpen/setQuickOpenQuery");
-  await verifyJumpToCodeResults(page, "QuickOpenModal.tsx", 551, { current: 1, total: 10 });
+  await verifyJumpToCodeResults(page, "QuickOpenModal.tsx", 567, { current: 1, total: 10 });
   await closeSource(page, "QuickOpenModal.tsx");
 });

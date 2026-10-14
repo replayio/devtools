@@ -61,7 +61,10 @@ const TestFileForceList = new Set([
  */
 function checkReRecord(testFile: string, exampleFileInfo: ExampleInfo) {
   const wouldNormallyTest =
-    exampleFileInfo.runtime === "chromium" && !exampleFileInfo.requiresManualUpdate;
+    exampleFileInfo.runtime === "chromium" &&
+    !exampleFileInfo.requiresManualUpdate &&
+    // This pipeline only re-records the browser target.
+    !exampleFileInfo.recordsTestRun;
 
   const shouldBlockTest = TestFileBlockList.has(testFile);
   const shouldForceTest = TestFileForceList.has(testFile);
