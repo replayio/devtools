@@ -57,14 +57,11 @@ const TestFileForceList = new Set([
 ]);
 
 /**
- * Re-record all examples that have previously been recorded with
- * "recent Chromium".
+ * Re-record all Chromium examples that save-examples.ts can record.
  */
 function checkReRecord(testFile: string, exampleFileInfo: ExampleInfo) {
   const wouldNormallyTest =
-    exampleFileInfo.runtime === "chromium" &&
-    exampleFileInfo.runtimeReleaseDate.getUTCFullYear() === 2024 &&
-    !exampleFileInfo.requiresManualUpdate;
+    exampleFileInfo.runtime === "chromium" && !exampleFileInfo.requiresManualUpdate;
 
   const shouldBlockTest = TestFileBlockList.has(testFile);
   const shouldForceTest = TestFileForceList.has(testFile);
