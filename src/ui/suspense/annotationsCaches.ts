@@ -30,7 +30,11 @@ export interface ParsedJumpToCodeAnnotation extends TimeStampedPoint {
 }
 
 export const REACT_SETUP_ANNOTATIONS_KIND = "react-devtools-hook:v1:commit-fiber-root";
-export const REACT_ANNOTATIONS_KIND = "react-devtools-bridge";
+// The operations in these use the format of React DevTools 7.0+, which the bundled
+// react-devtools-inline Store parses. The previous kind, "react-devtools-bridge", had the
+// earlier format, indistinguishable to a parser; with a separate kind, a frontend and
+// backend that disagree (e.g. during a deploy) show no React tree rather than a wrong one.
+export const REACT_ANNOTATIONS_KIND = "react-devtools-bridge-v2";
 export const REDUX_SETUP_ANNOTATIONS_KIND = "redux-devtools-setup";
 export const REDUX_ANNOTATIONS_KIND = "redux-devtools-data";
 export const JUMP_ANNOTATION_KIND = "event-listeners-jump-location";
