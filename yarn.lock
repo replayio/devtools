@@ -3002,17 +3002,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@jridgewell/sourcemap-codec@npm:1.5.5, @jridgewell/sourcemap-codec@npm:^1.4.14, @jridgewell/sourcemap-codec@npm:^1.5.0":
+  version: 1.5.5
+  resolution: "@jridgewell/sourcemap-codec@npm:1.5.5"
+  checksum: c2e36e67971f719a8a3a85ef5a5f580622437cc723c35d03ebd0c9c0b06418700ef006f58af742791f71f6a4fc68fcfaf1f6a74ec2f9a3332860e9373459dae7
+  languageName: node
+  linkType: hard
+
 "@jridgewell/sourcemap-codec@npm:^1.4.10":
   version: 1.4.15
   resolution: "@jridgewell/sourcemap-codec@npm:1.4.15"
   checksum: b881c7e503db3fc7f3c1f35a1dd2655a188cc51a3612d76efc8a6eb74728bef5606e6758ee77423e564092b4a518aba569bbb21c9bac5ab7a35b0c6ae7e344c8
-  languageName: node
-  linkType: hard
-
-"@jridgewell/sourcemap-codec@npm:^1.4.14, @jridgewell/sourcemap-codec@npm:^1.5.0":
-  version: 1.5.5
-  resolution: "@jridgewell/sourcemap-codec@npm:1.5.5"
-  checksum: c2e36e67971f719a8a3a85ef5a5f580622437cc723c35d03ebd0c9c0b06418700ef006f58af742791f71f6a4fc68fcfaf1f6a74ec2f9a3332860e9373459dae7
   languageName: node
   linkType: hard
 
@@ -4389,26 +4389,6 @@ __metadata:
   version: 0.70.0
   resolution: "@replayio/protocol@npm:0.70.0"
   checksum: b43a76831b6646b01faa6b4fef865f48735adf1a55671ca8042b2262960762cbe8f9506247e211f6f07522685613b4064d6db2a75a29e5e690acd4e9678a6193
-  languageName: node
-  linkType: hard
-
-"@replayio/react-devtools-inline@npm:4.28.6":
-  version: 4.28.6
-  resolution: "@replayio/react-devtools-inline@npm:4.28.6"
-  dependencies:
-    source-map-js: ^0.6.2
-    sourcemap-codec: ^1.4.8
-  checksum: 1b7ebbfd0c309792a3680ef783912dafa6ea3b2aafa98ffe89265818614ec7aa872772c13102fde8d64e568344dbdb0b3052e5584e97b9cc06b9a1aa6007fd49
-  languageName: node
-  linkType: hard
-
-"@replayio/react-devtools-inline@patch:@replayio/react-devtools-inline@npm:4.28.6#.yarn/patches/@replayio-react-devtools-inline-npm-4.28.6-9200d215d5.patch::locator=recordreplay-devtools%40workspace%3A.":
-  version: 4.28.6
-  resolution: "@replayio/react-devtools-inline@patch:@replayio/react-devtools-inline@npm%3A4.28.6#.yarn/patches/@replayio-react-devtools-inline-npm-4.28.6-9200d215d5.patch::version=4.28.6&hash=afde07&locator=recordreplay-devtools%40workspace%3A."
-  dependencies:
-    source-map-js: ^0.6.2
-    sourcemap-codec: ^1.4.8
-  checksum: b6e37c74327e37800681616469df0dd452288eda09e6971d0f0deebe29dd5d2db35ba5c4358bfde134a30f4f45ea581dfcd238cdb987e4645ea0defe61383e28
   languageName: node
   linkType: hard
 
@@ -15896,6 +15876,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-devtools-inline@npm:8.0.0":
+  version: 8.0.0
+  resolution: "react-devtools-inline@npm:8.0.0"
+  dependencies:
+    "@jridgewell/sourcemap-codec": 1.5.5
+    source-map-js: ^0.6.2
+  checksum: 7cec601d1c76c94c22b2ab0f70d193858c62ced418893320a2f0f993efff747d665ef204bb0a2fce2e68ce7d2b516f80a4b4c9814a01e05b1fe4af884e43ed5c
+  languageName: node
+  linkType: hard
+
 "react-dom@npm:0.0.0-experimental-98ce535f-20260226":
   version: 0.0.0-experimental-98ce535f-20260226
   resolution: "react-dom@npm:0.0.0-experimental-98ce535f-20260226"
@@ -16245,7 +16235,6 @@ __metadata:
     "@reduxjs/toolkit": ^2.0.0
     "@replayio/overboard": ^0.4.1
     "@replayio/protocol": 0.104.1
-    "@replayio/react-devtools-inline": 4.28.6
     "@replayio/replay": ^0.22.4
     "@sentry/integrations": ^7.101.1
     "@sentry/react": ^7.9.0
@@ -16359,6 +16348,7 @@ __metadata:
     react: 0.0.0-experimental-98ce535f-20260226
     react-canvas-confetti: ^1.3.0
     react-circular-progressbar: ^2.0.4
+    react-devtools-inline: 8.0.0
     react-dom: 0.0.0-experimental-98ce535f-20260226
     react-error-boundary: ^4.0.12
     react-is: ^18.2.0
@@ -17542,13 +17532,6 @@ __metadata:
   version: 0.6.1
   resolution: "source-map@npm:0.6.1"
   checksum: 59ce8640cf3f3124f64ac289012c2b8bd377c238e316fb323ea22fbfe83da07d81e000071d7242cad7a23cd91c7de98e4df8830ec3f133cb6133a5f6e9f67bc2
-  languageName: node
-  linkType: hard
-
-"sourcemap-codec@npm:^1.4.8":
-  version: 1.4.8
-  resolution: "sourcemap-codec@npm:1.4.8"
-  checksum: b57981c05611afef31605732b598ccf65124a9fcb03b833532659ac4d29ac0f7bfacbc0d6c5a28a03e84c7510e7e556d758d0bb57786e214660016fb94279316
   languageName: node
   linkType: hard
 

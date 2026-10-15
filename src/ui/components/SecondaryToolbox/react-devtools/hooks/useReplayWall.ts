@@ -1,5 +1,5 @@
-import { createBridge, createStore } from "@replayio/react-devtools-inline/frontend";
 import { Dispatch, SetStateAction, useContext, useMemo } from "react";
+import { createBridge, createStore } from "react-devtools-inline/frontend";
 
 import {
   highlightNode as highlightNodeAction,

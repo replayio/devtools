@@ -1,6 +1,6 @@
 import { ObjectId, PauseId } from "@replayio/protocol";
-import type { SerializedElement, Store, Wall } from "@replayio/react-devtools-inline/frontend";
 import React from "react";
+import type { SerializedElement, Store, Wall } from "react-devtools-inline/frontend";
 
 import { assert } from "protocol/utils";
 import { recordingTargetCache } from "replay-next/src/suspense/BuildIdCache";

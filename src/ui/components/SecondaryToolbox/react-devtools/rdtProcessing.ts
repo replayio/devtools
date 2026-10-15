@@ -2,16 +2,18 @@
 
 // React DevTools routine result processing logic
 
-import { ExecutionPoint, TimeStampedPoint } from "@replayio/protocol";
-
-import { isExecutionPointsWithinRange } from "replay-next/src/utils/time";
-import { ParsedReactDevToolsAnnotation } from "ui/suspense/annotationsCaches";
+import { ExecutionPoint } from "@replayio/protocol";
 
 import {
   ElementTypeRoot,
+  SUSPENSE_TREE_OPERATION_ADD,
+  SUSPENSE_TREE_OPERATION_REMOVE,
+  SUSPENSE_TREE_OPERATION_REORDER_CHILDREN,
+  SUSPENSE_TREE_OPERATION_RESIZE,
+  SUSPENSE_TREE_OPERATION_SUSPENDERS,
   TREE_OPERATION_ADD,
+  TREE_OPERATION_APPLIED_ACTIVITY_SLICE_CHANGE,
   TREE_OPERATION_REMOVE,
-  TREE_OPERATION_REMOVE_ROOT,
   TREE_OPERATION_REORDER_CHILDREN,
   TREE_OPERATION_SET_SUBTREE_MODE,
   TREE_OPERATION_UPDATE_ERRORS_OR_WARNINGS,
@@ -24,12 +26,6 @@ export interface OperationsInfo {
   point: ExecutionPoint;
   time: number;
   deconstructedOperations: DeconstructedOperationsPieces;
-}
-
-interface RootNodeOperation extends TimeStampedPoint {
-  type: "root-added" | "root-removed";
-  rendererId: number;
-  rootId: number;
 }
 
 export interface DeconstructedOperationsPieces {
@@ -59,6 +55,8 @@ interface TreeOperationAddNodeContents {
   ownerId: number;
   stringTableIndex: number;
   keyStringTableIndex: number;
+  // The `name` prop of e.g. Suspense and Activity boundaries
+  namePropStringTableIndex: number;
 }
 
 interface TreeOperationAddBase {
@@ -81,11 +79,6 @@ interface TreeOperationRemove {
   type: typeof TREE_OPERATION_REMOVE;
   name: "remove";
   nodeIds: number[];
-}
-
-interface TreeOperationRemoveRoot {
-  type: typeof TREE_OPERATION_REMOVE_ROOT;
-  name: "removeRoot";
 }
 
 interface TreeOperationSetSubtreeMode {
@@ -117,15 +110,80 @@ interface TreeOperationUpdateErrorsOrWarnings {
   warnings: number;
 }
 
+// Suspense boundaries are reported a second time, as a separate tree of
+// "suspense nodes" (with the same IDs as their elements), for the Suspense tab.
+// The bounding rectangles are null when the backend didn't measure them.
+type SuspenseNodeRects = number[][] | null;
+
+interface SuspenseTreeOperationAdd {
+  type: typeof SUSPENSE_TREE_OPERATION_ADD;
+  name: "addSuspenseNode";
+  nodeId: number;
+  parentId: number;
+  nameStringTableIndex: number;
+  isSuspended: boolean;
+  rects: SuspenseNodeRects;
+}
+
+interface SuspenseTreeOperationRemove {
+  type: typeof SUSPENSE_TREE_OPERATION_REMOVE;
+  name: "removeSuspenseNodes";
+  nodeIds: number[];
+}
+
+interface SuspenseTreeOperationReorderChildren {
+  type: typeof SUSPENSE_TREE_OPERATION_REORDER_CHILDREN;
+  name: "reorderSuspenseChildren";
+  nodeId: number;
+  children: number[];
+}
+
+interface SuspenseTreeOperationResize {
+  type: typeof SUSPENSE_TREE_OPERATION_RESIZE;
+  name: "resizeSuspenseNode";
+  nodeId: number;
+  rects: SuspenseNodeRects;
+}
+
+interface TreeOperationAppliedActivitySliceChange {
+  type: typeof TREE_OPERATION_APPLIED_ACTIVITY_SLICE_CHANGE;
+  name: "appliedActivitySliceChange";
+  activitySliceId: number;
+}
+
 export type ParsedReactDevtoolsTreeOperations =
   | TreeOperationAddRoot
   | TreeOperationAddNode
   | TreeOperationRemove
-  | TreeOperationRemoveRoot
   | TreeOperationSetSubtreeMode
   | TreeOperationReorderChildren
   | TreeOperationUpdateTreeBaseDuration
-  | TreeOperationUpdateErrorsOrWarnings;
+  | TreeOperationUpdateErrorsOrWarnings
+  | SuspenseTreeOperationAdd
+  | SuspenseTreeOperationRemove
+  | SuspenseTreeOperationReorderChildren
+  | SuspenseTreeOperationResize
+  | TreeOperationAppliedActivitySliceChange;
+
+function parseRects(
+  treeOperations: number[],
+  i: number
+): { rects: SuspenseNodeRects; next: number } {
+  const numRects = treeOperations[i++];
+  if (numRects === -1) {
+    return { rects: null, next: i };
+  }
+  const rects: number[][] = [];
+  for (let rectIndex = 0; rectIndex < numRects; rectIndex++) {
+    rects.push(treeOperations.slice(i, i + 4));
+    i += 4;
+  }
+  return { rects, next: i };
+}
+
+function encodeRects(rects: SuspenseNodeRects): number[] {
+  return rects === null ? [-1] : [rects.length, ...rects.flat()];
+}
 
 export function deconstructOperationsArray(originalOperations: number[]) {
   const rendererId = originalOperations[0];
@@ -172,7 +230,6 @@ export function parseTreeOperations(treeOperations: number[]): ParsedReactDevtoo
     if (++loopCounter > 100000) {
       throw new Error("TREE_OPERATION_PARSING_INFINITE_LOOP");
     }
-
     const operation = treeOperations[i];
 
     switch (operation) {
@@ -209,6 +266,7 @@ export function parseTreeOperations(treeOperations: number[]): ParsedReactDevtoo
           const ownerId = treeOperations[i++];
           const stringTableIndex = treeOperations[i++];
           const keyStringTableIndex = treeOperations[i++];
+          const namePropStringTableIndex = treeOperations[i++];
 
           const operation: TreeOperationAddNode = {
             type: TREE_OPERATION_ADD,
@@ -221,6 +279,7 @@ export function parseTreeOperations(treeOperations: number[]): ParsedReactDevtoo
               parentId,
               ownerId,
               keyStringTableIndex,
+              namePropStringTableIndex,
             },
           };
 
@@ -245,17 +304,6 @@ export function parseTreeOperations(treeOperations: number[]): ParsedReactDevtoo
           type: TREE_OPERATION_REMOVE,
           name: "remove",
           nodeIds,
-        };
-
-        parsedOperations.push(operation);
-        break;
-      }
-      case TREE_OPERATION_REMOVE_ROOT: {
-        i += 1;
-
-        const operation: TreeOperationRemoveRoot = {
-          type: TREE_OPERATION_REMOVE_ROOT,
-          name: "removeRoot",
         };
 
         parsedOperations.push(operation);
@@ -331,6 +379,91 @@ export function parseTreeOperations(treeOperations: number[]): ParsedReactDevtoo
         parsedOperations.push(operation);
         break;
       }
+      case SUSPENSE_TREE_OPERATION_ADD: {
+        const nodeId = treeOperations[i + 1];
+        const parentId = treeOperations[i + 2];
+        const nameStringTableIndex = treeOperations[i + 3];
+        const isSuspended = treeOperations[i + 4] === 1;
+        const { rects, next } = parseRects(treeOperations, i + 5);
+        i = next;
+
+        parsedOperations.push({
+          type: SUSPENSE_TREE_OPERATION_ADD,
+          name: "addSuspenseNode",
+          nodeId,
+          parentId,
+          nameStringTableIndex,
+          isSuspended,
+          rects,
+        });
+        break;
+      }
+      case SUSPENSE_TREE_OPERATION_REMOVE: {
+        const removeLength = treeOperations[i + 1];
+        const nodeIds = treeOperations.slice(i + 2, i + 2 + removeLength);
+        i += 2 + removeLength;
+
+        parsedOperations.push({
+          type: SUSPENSE_TREE_OPERATION_REMOVE,
+          name: "removeSuspenseNodes",
+          nodeIds,
+        });
+        break;
+      }
+      case SUSPENSE_TREE_OPERATION_REORDER_CHILDREN: {
+        const nodeId = treeOperations[i + 1];
+        const numChildren = treeOperations[i + 2];
+        const children = treeOperations.slice(i + 3, i + 3 + numChildren);
+        i += 3 + numChildren;
+
+        parsedOperations.push({
+          type: SUSPENSE_TREE_OPERATION_REORDER_CHILDREN,
+          name: "reorderSuspenseChildren",
+          nodeId,
+          children,
+        });
+        break;
+      }
+      case SUSPENSE_TREE_OPERATION_RESIZE: {
+        const nodeId = treeOperations[i + 1];
+        const { rects, next } = parseRects(treeOperations, i + 2);
+        i = next;
+
+        parsedOperations.push({
+          type: SUSPENSE_TREE_OPERATION_RESIZE,
+          name: "resizeSuspenseNode",
+          nodeId,
+          rects,
+        });
+        break;
+      }
+      case SUSPENSE_TREE_OPERATION_SUSPENDERS: {
+        // What each Suspense boundary is suspended by. Only the Suspense tab
+        // uses that, and it's the one piece of data that depends on which
+        // replay process computed the operations: a React DevTools backend
+        // set up partway into the recording has to derive it from the current
+        // state, while one that ran from the start saw the boundaries suspend.
+        // Drop it, so that the operations are the same either way.
+        i++;
+        const changeLength = treeOperations[i++];
+        for (let changeIndex = 0; changeIndex < changeLength; changeIndex++) {
+          i += 4; // id, hasUniqueSuspenders, endTime, isSuspended
+          const environmentNamesLength = treeOperations[i++];
+          i += environmentNamesLength;
+        }
+        break;
+      }
+      case TREE_OPERATION_APPLIED_ACTIVITY_SLICE_CHANGE: {
+        const activitySliceId = treeOperations[i + 1];
+        i += 2;
+
+        parsedOperations.push({
+          type: TREE_OPERATION_APPLIED_ACTIVITY_SLICE_CHANGE,
+          name: "appliedActivitySliceChange",
+          activitySliceId,
+        });
+        break;
+      }
       default:
         throw new Error("UNEXPECTED_PARSED_OPERATION_TYPE");
     }
@@ -381,20 +514,27 @@ export function reconstructOperationsArray({
               hasOwnerMetadata ? 1 : 0
             );
           } else {
-            const { stringTableIndex, parentId, ownerId, keyStringTableIndex } = contents;
+            const {
+              stringTableIndex,
+              parentId,
+              ownerId,
+              keyStringTableIndex,
+              namePropStringTableIndex,
+            } = contents;
 
-            instructions.push(parentId, ownerId, stringTableIndex, keyStringTableIndex);
+            instructions.push(
+              parentId,
+              ownerId,
+              stringTableIndex,
+              keyStringTableIndex,
+              namePropStringTableIndex
+            );
           }
           break;
         }
         case TREE_OPERATION_REMOVE: {
           const { nodeIds } = op;
           instructions.push(nodeIds.length, ...nodeIds);
-          break;
-        }
-        case TREE_OPERATION_REMOVE_ROOT: {
-          // No additional fields other than the operation type,
-          // since the root ID is already in the operations array
           break;
         }
         case TREE_OPERATION_SET_SUBTREE_MODE: {
@@ -415,6 +555,36 @@ export function reconstructOperationsArray({
         case TREE_OPERATION_UPDATE_ERRORS_OR_WARNINGS: {
           const { nodeId, errors, warnings } = op;
           instructions.push(nodeId, errors, warnings);
+          break;
+        }
+        case SUSPENSE_TREE_OPERATION_ADD: {
+          const { nodeId, parentId, nameStringTableIndex, isSuspended, rects } = op;
+          instructions.push(
+            nodeId,
+            parentId,
+            nameStringTableIndex,
+            isSuspended ? 1 : 0,
+            ...encodeRects(rects)
+          );
+          break;
+        }
+        case SUSPENSE_TREE_OPERATION_REMOVE: {
+          const { nodeIds } = op;
+          instructions.push(nodeIds.length, ...nodeIds);
+          break;
+        }
+        case SUSPENSE_TREE_OPERATION_REORDER_CHILDREN: {
+          const { nodeId, children } = op;
+          instructions.push(nodeId, children.length, ...children);
+          break;
+        }
+        case SUSPENSE_TREE_OPERATION_RESIZE: {
+          const { nodeId, rects } = op;
+          instructions.push(nodeId, ...encodeRects(rects));
+          break;
+        }
+        case TREE_OPERATION_APPLIED_ACTIVITY_SLICE_CHANGE: {
+          instructions.push(op.activitySliceId);
           break;
         }
         default:
@@ -441,93 +611,57 @@ export function reconstructOperationsArray({
   return operations;
 }
 
-const deconstructedOperationsByPoint = new Map<string, DeconstructedOperationsPieces>();
+// Just enough of React DevTools' Store to read the tree it currently holds.
+interface StoreContents {
+  roots: ReadonlyArray<number>;
+  _idToElement: Map<number, { children: number[] }>;
+  _rootIDToRendererID: Map<number, number>;
+  _idToSuspense: Map<number, { children: number[] }>;
+}
 
-export function generateTreeResetOpsForPoint(
-  executionPoint: ExecutionPoint,
-  annotations: ParsedReactDevToolsAnnotation[]
-) {
-  const rootNodeEvents: RootNodeOperation[] = [];
-
+// The Store only learns about the tree from operations, which are additive.
+// To show the tree at another point in time, we first remove everything it
+// holds, the way React DevTools' backend removes a root that unmounts: the
+// Suspense nodes first, then the elements, both children-first (the root
+// itself last).
+export function generateTreeResetOperations(store: StoreContents): number[][] {
   const removalOperations: number[][] = [];
 
-  // Find every time that a React root was added or removed
-  for (const { point, time, contents } of annotations) {
-    if (contents.event !== "operations") {
-      continue;
-    }
-
-    const { payload } = contents;
-    let deconstructedOperations: DeconstructedOperationsPieces;
-
-    // Avoid recalculating these repeatedly
-    if (deconstructedOperationsByPoint.has(point)) {
-      deconstructedOperations = deconstructedOperationsByPoint.get(point)!;
-    } else {
-      deconstructedOperations = deconstructOperationsArray(payload);
-      deconstructedOperationsByPoint.set(point, deconstructedOperations);
-    }
-
-    const { rendererId, rootId, treeOperations: parsedOperations } = deconstructedOperations;
-
-    for (const op of parsedOperations) {
-      if (op.type === TREE_OPERATION_ADD && op.contents.nodeType === "root") {
-        rootNodeEvents.push({
-          type: "root-added",
-          rendererId,
-          rootId,
-          point,
-          time,
-        });
-      } else if (op.type == TREE_OPERATION_REMOVE_ROOT) {
-        rootNodeEvents.push({
-          type: "root-removed",
-          rendererId,
-          rootId,
-          point,
-          time,
-        });
+  const childrenFirst = (
+    nodes: Map<number, { children: number[] }>,
+    id: number,
+    ids: number[] = []
+  ) => {
+    const node = nodes.get(id);
+    if (node) {
+      for (const childId of node.children) {
+        childrenFirst(nodes, childId, ids);
       }
+      ids.push(id);
     }
-  }
+    return ids;
+  };
 
-  let activeRoots: Map<number, Set<number>> = new Map();
-
-  const rootEventsInTimeframe = rootNodeEvents.filter(({ point }) =>
-    isExecutionPointsWithinRange(point, "0", executionPoint)
-  );
-
-  for (const rootEvent of rootEventsInTimeframe) {
-    const { rendererId, rootId } = rootEvent;
-
-    if (!activeRoots.has(rendererId)) {
-      activeRoots.set(rendererId, new Set());
+  for (const rootId of store.roots) {
+    const rendererId = store._rootIDToRendererID.get(rootId) ?? 0;
+    const suspenseNodeIds = childrenFirst(store._idToSuspense, rootId);
+    const elementIds = childrenFirst(store._idToElement, rootId);
+    const treeOperations: ParsedReactDevtoolsTreeOperations[] = [];
+    if (suspenseNodeIds.length > 0) {
+      treeOperations.push({
+        type: SUSPENSE_TREE_OPERATION_REMOVE,
+        name: "removeSuspenseNodes",
+        nodeIds: suspenseNodeIds,
+      });
     }
-
-    const activeRootsForRenderer = activeRoots.get(rendererId)!;
-    if (rootEvent.type === "root-added") {
-      activeRootsForRenderer.add(rootId);
-    } else {
-      activeRootsForRenderer.delete(rootId);
-    }
-
-    // These don't even include a root ID, since it's already in the operations array header
-    const removeRootOp: TreeOperationRemoveRoot = {
-      type: TREE_OPERATION_REMOVE_ROOT,
-      name: "removeRoot",
-    };
-
-    for (const [rendererId, activeRootsForRenderer] of activeRoots.entries()) {
-      for (const _activeRoot of activeRootsForRenderer) {
-        const removalOp = reconstructOperationsArray({
-          rendererId,
-          rootId,
-          stringTable: [],
-          treeOperations: [removeRootOp],
-        });
-        removalOperations.push(removalOp);
-      }
-    }
+    treeOperations.push({
+      type: TREE_OPERATION_REMOVE,
+      name: "remove",
+      nodeIds: elementIds,
+    });
+    removalOperations.push(
+      reconstructOperationsArray({ rendererId, rootId, stringTable: [], treeOperations })
+    );
   }
 
   return removalOperations;

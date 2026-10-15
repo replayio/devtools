@@ -1,7 +1,7 @@
 import { ObjectId, PauseId } from "@replayio/protocol";
-import type { RendererInterface } from "@replayio/react-devtools-inline";
-import type { DevToolsHook } from "@replayio/react-devtools-inline/backend";
-import type { SerializedElement, Store } from "@replayio/react-devtools-inline/frontend";
+import type { RendererInterface } from "react-devtools-inline";
+import type { DevToolsHook } from "react-devtools-inline/backend";
+import type { SerializedElement, Store } from "react-devtools-inline/frontend";
 import { Cache, createCache, createExternallyManagedCache } from "suspense";
 
 import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
@@ -11,10 +11,9 @@ import { evaluate } from "replay-next/src/utils/evaluate";
 import { ReplayClientInterface } from "shared/client/types";
 import { ChunksArray, deserializeChunkedString } from "ui/utils/evalChunkedStrings";
 
-// Our modified RDT bundle exports some additional methods
-type RendererInterfaceWithAdditions = RendererInterface & {
-  getOrGenerateFiberID: (fiber: any) => number;
-  setRootPseudoKey: (id: number, fiber: any) => void;
+// The renderer interface method we use, not included in `@types/react-devtools-inline`
+type RendererInterfaceWithHostInstances = RendererInterface & {
+  findHostInstancesForElementID: (id: number) => HTMLElement[] | null;
 };
 
 // Some internal values not currently included in `@types/react-devtools-inline`
@@ -59,79 +58,102 @@ function installReactDevToolsIntoPause() {
   // @ts-ignore
   delete window.__REACT_DEVTOOLS_GLOBAL_HOOK__;
 
-  // Evaluate the actual RDT hook installation file, so that this pause
-  // has the initial RDT infrastructure available
+  // Evaluate the RDT bundle (react-devtools-core's backend: the global hook, the
+  // renderer and the agent), see `rdtBackendWithGlobals` below.
+  const moduleShim: { exports: any } = { exports: {} };
   // @ts-ignore
-  INSTALL_HOOK_PLACEHOLDER();
+  DEVTOOLS_PLACEHOLDER(moduleShim);
+  const ReactDevToolsBackend = moduleShim.exports;
 
-  // The only time we have access to the React root objects is when `onCommitFiberRoot` gets called.
-  // Our Chromium fork specifically captures all those and saves them.
-  // As part of the setup process, we have to copy those root references over to the real RDT
-  // global hook object, so it has them available when it tries to walk the component tree.
-  const savedRoots = window.__REACT_DEVTOOLS_STUB_FIBER_ROOTS;
-  for (let [rendererID, rendererRoots] of Object.entries(savedRoots)) {
-    const numericRendererID = Number(rendererID);
-    const hookRoots = window.__REACT_DEVTOOLS_GLOBAL_HOOK__.getFiberRoots(numericRendererID);
-    for (let root of rendererRoots) {
-      hookRoots.add(root);
+  // Install the hook with the default component filters, and attach an agent to
+  // it over a bridge that goes nowhere: we call the agent directly, below.
+  ReactDevToolsBackend.initialize();
+  ReactDevToolsBackend.connectWithCustomMessagingProtocol({
+    onSubscribe: () => {},
+    onUnsubscribe: () => {},
+    onMessage: () => {},
+    isReloadAndProfileSupported: false,
+    isProfiling: false,
+  });
+  const hook = window.__REACT_DEVTOOLS_GLOBAL_HOOK__;
+
+  // The frontend can't exchange bridge messages with a paused recording. Instead it
+  // evaluates a call to this function in the pause, which runs the agent's handler for
+  // the request (e.g. `inspectElement`, `getBridgeProtocol`, `viewElementSource`) and
+  // returns the message that the handler would have sent back over the bridge.
+  window.__RECORD_REPLAY_REACT_DEVTOOLS_SEND_MESSAGE__ = (event: string, data: any) => {
+    const agent: any = (hook as any).reactDevtoolsAgent;
+    let response: any;
+    agent._bridge = {
+      send(responseEvent: string, responseData: any) {
+        response = { event: responseEvent, data: responseData };
+      },
+    };
+    try {
+      agent[event](data);
+    } catch (error: any) {
+      window.logMessage(`Error executing bridge message '${event}': ${error}, ${error?.stack}`);
     }
-  }
+    return response;
+  };
 
-  // Evaluate the actual RDT backend logic file, so that the rest of the
-  // RDT logic is installed in this pause.
-  // @ts-ignore
-  DEVTOOLS_PLACEHOLDER();
-
-  function traverseComponentTree(fiberNode: any, callback: (fiber: any) => void) {
-    callback(fiberNode);
-
-    let child = fiberNode.child;
-    while (child) {
-      traverseComponentTree(child, callback);
-      child = child.sibling;
+  // Only Fiber renderers (React 16+) are supported. Inject them in the order Chromium's stub
+  // saw them, like the backend routine does, so that renderer IDs match the operations.
+  // The stub numbered all renderers in that order; map its IDs to the hook's.
+  const rendererIDs = new Map<number, number>();
+  window.__REACT_DEVTOOLS_SAVED_RENDERERS__.forEach((renderer, index) => {
+    const isFiberRenderer =
+      typeof renderer.getCurrentComponentInfo !== "function" &&
+      (typeof renderer.findFiberByHostInstance === "function" ||
+        renderer.currentDispatcherRef != null);
+    if (isFiberRenderer) {
+      window.logMessage("Injecting renderer");
+      const rendererID = hook.inject(renderer);
+      if (rendererID != null) {
+        rendererIDs.set(index + 1, rendererID);
+      }
     }
-  }
-
-  window.__REACT_DEVTOOLS_SAVED_RENDERERS__.forEach(renderer => {
-    window.logMessage("Injecting renderer");
-    // Similarly, we need to take the real renderer references, and attach them
-    // to the real RDT global hook now that it's in the page.
-    window.__REACT_DEVTOOLS_GLOBAL_HOOK__.inject(renderer);
   });
 
-  for (let [
-    rendererID,
-    renderer,
-  ] of window.__REACT_DEVTOOLS_GLOBAL_HOOK__.rendererInterfaces.entries()) {
-    const rendererWithAdditions = renderer as RendererInterfaceWithAdditions;
-    const hookRoots = window.__REACT_DEVTOOLS_GLOBAL_HOOK__.getFiberRoots(rendererID);
-    for (let root of hookRoots) {
-      const rootID = rendererWithAdditions.getOrGenerateFiberID(root.current);
-      rendererWithAdditions.setRootPseudoKey(rootID, root.current);
-      traverseComponentTree(root.current, fiber => {
-        rendererWithAdditions.getOrGenerateFiberID(fiber);
-      });
-
-      // Force the extension to crawl the current DOM contents so it knows what nodes exist
-      window.__REACT_DEVTOOLS_GLOBAL_HOOK__.onCommitFiberRoot(
-        rendererID,
-        root as unknown as Record<string, unknown>,
-        1
-      );
+  // The only time we have access to the React root objects is when `onCommitFiberRoot` gets
+  // called. Our Chromium fork captures all those and saves them. A commit for each root makes
+  // this fresh backend mount the current tree, so it knows the elements (by the same IDs as in
+  // the operations: those come from Replay's persistent object IDs).
+  const savedRoots = window.__REACT_DEVTOOLS_STUB_FIBER_ROOTS;
+  for (const [stubRendererID, rendererRoots] of Object.entries(savedRoots)) {
+    const rendererID = rendererIDs.get(Number(stubRendererID));
+    if (rendererID === undefined) {
+      continue;
+    }
+    for (const root of rendererRoots) {
+      hook.onCommitFiberRoot(rendererID, root, 1);
     }
   }
 }
 
-const injectGlobalHookSource = require("./installHook.raw.js").default;
 const reactDevtoolsBackendSource = require("./react_devtools_backend.raw.js").default;
 
 // Use function replacer syntax to avoid accidentally replacing special
 // characters like `$&`, which could show up in the bundle source
 // if the minifier renames things in an annoyingly specific way
 // (such as `c === $ && x` becoming `c===$&&x`)
-const rdtInjectionExpression = `(${installReactDevToolsIntoPause})()`
-  .replace("INSTALL_HOOK_PLACEHOLDER", () => `(${injectGlobalHookSource})`)
-  .replace("DEVTOOLS_PLACEHOLDER", () => `(${reactDevtoolsBackendSource})`);
+// The RDT bundle is a UMD bundle: let it export to us rather than to whatever module
+// system the page uses. React DevTools persists some settings in Web Storage (behind
+// try/catch), which must not be touched in a pause, and its bridge flushes in a
+// microtask, which nothing here needs. This is a string rather than a function so that
+// these names can't be changed when this file is compiled.
+const rdtBackendWithGlobals = `(function (module) {
+  var exports = module.exports;
+  var localStorage = undefined;
+  var sessionStorage = undefined;
+  var queueMicrotask = function () {};
+  (${reactDevtoolsBackendSource})();
+})`;
+
+const rdtInjectionExpression = `(${installReactDevToolsIntoPause})()`.replace(
+  "DEVTOOLS_PLACEHOLDER",
+  () => rdtBackendWithGlobals
+);
 
 export const reactDevToolsInjectionCache: Cache<
   [replayClient: ReplayClientInterface, pauseId: PauseId],
@@ -210,9 +232,9 @@ function getComponentSpecificNodesToFiberIDs(
       continue;
     }
 
-    const renderer = rendererInterface as RendererInterfaceWithAdditions;
+    const renderer = rendererInterface as RendererInterfaceWithHostInstances;
     for (const fiberId of fiberIdsForRenderer) {
-      const nodes: HTMLElement[] = renderer.findNativeNodesForFiberID(fiberId) ?? [];
+      const nodes: HTMLElement[] = renderer.findHostInstancesForElementID(fiberId) ?? [];
 
       for (const node of nodes) {
         if (isObjectIdCapable) {

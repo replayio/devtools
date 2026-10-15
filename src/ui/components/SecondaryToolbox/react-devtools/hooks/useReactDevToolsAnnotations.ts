@@ -2,7 +2,7 @@ import { ExecutionPoint, PauseId } from "@replayio/protocol";
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import { isExecutionPointsGreaterThan } from "replay-next/src/utils/time";
-import { generateTreeResetOpsForPoint } from "ui/components/SecondaryToolbox/react-devtools/rdtProcessing";
+import { generateTreeResetOperations } from "ui/components/SecondaryToolbox/react-devtools/rdtProcessing";
 import { ReactDevToolsListData } from "ui/components/SecondaryToolbox/react-devtools/ReactDevToolsListData";
 import { ReplayWall } from "ui/components/SecondaryToolbox/react-devtools/ReplayWall";
 import { isPlaying as isPlayingSelector } from "ui/reducers/timeline";
@@ -82,13 +82,10 @@ export function useReactDevToolsAnnotations({
       wall.setPauseId(currentPauseId);
 
       // We keep the one RDT UI component instance alive, but operations are additive over time.
-      // In order to reset the displayed component tree, we first need to generate a set of fake
-      // "remove this React root" operations based on where we _were_ paused, and inject those.
-      if (previousExecutionPoint) {
-        const clearTreeOperations = generateTreeResetOpsForPoint(
-          previousExecutionPoint,
-          annotations
-        );
+      // In order to reset the displayed component tree, we first need to generate operations
+      // that remove everything the store currently holds, and inject those.
+      if (previousExecutionPoint && wall.store) {
+        const clearTreeOperations = generateTreeResetOperations(wall.store as any);
 
         for (const rootRemovalOp of clearTreeOperations) {
           wall.sendAnnotation({ event: "operations", payload: rootRemovalOp });
