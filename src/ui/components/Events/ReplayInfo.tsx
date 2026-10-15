@@ -1,6 +1,9 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useContext } from "react";
 import { ConnectedProps, connect } from "react-redux";
+import { useImperativeCacheValue } from "suspense";
 
+import { buildIdCache, isWorkerdBuildId } from "replay-next/src/suspense/BuildIdCache";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { getDisplayedUrl } from "shared/utils/environment";
 import { getRecordingId, showDurationWarning } from "shared/utils/recording";
 import * as actions from "ui/actions/app";
@@ -37,6 +40,9 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
   const isAuthenticated = !!useAppSelector(getAccessToken);
   const recordingTarget = useAppSelector(getRecordingTarget);
   const showEnvironmentVariables = recordingTarget == "node";
+  const replayClient = useContext(ReplayClientContext);
+  const { value: buildId } = useImperativeCacheValue(buildIdCache, replayClient);
+  const isWorkerd = buildId != null && isWorkerdBuildId(buildId);
 
   if (!recording) {
     return null;
@@ -128,7 +134,7 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
             </>
           )}
         </div>
-        {showEnvironmentVariables ? <EnvironmentVariablesRow /> : null}
+        {showEnvironmentVariables ? <EnvironmentVariablesRow isWorkerd={isWorkerd} /> : null}
 
         {showDurationWarning(recording) ? <DurationWarningRow /> : null}
       </div>
@@ -136,12 +142,15 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
   );
 }
 
-function EnvironmentVariablesRow() {
+function EnvironmentVariablesRow({ isWorkerd }: { isWorkerd: boolean }) {
   return (
     <div>
       <Row>
         <Icon filename="warning" className="bg-iconColor" />
-        <div>This node recording contains all environment variables</div>
+        <div>
+          This {isWorkerd ? "workerd (Cloudflare Workers)" : "node"} recording contains all
+          environment variables
+        </div>
       </Row>
     </div>
   );
