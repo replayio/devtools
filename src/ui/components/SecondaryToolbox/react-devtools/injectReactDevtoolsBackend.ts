@@ -83,6 +83,7 @@ function installReactDevToolsIntoPause() {
   // returns the message that the handler would have sent back over the bridge.
   window.__RECORD_REPLAY_REACT_DEVTOOLS_SEND_MESSAGE__ = (event: string, data: any) => {
     const agent: any = (hook as any).reactDevtoolsAgent;
+    const originalBridge = agent._bridge;
     let response: any;
     agent._bridge = {
       send(responseEvent: string, responseData: any) {
@@ -93,6 +94,8 @@ function installReactDevToolsIntoPause() {
       agent[event](data);
     } catch (error: any) {
       window.logMessage(`Error executing bridge message '${event}': ${error}, ${error?.stack}`);
+    } finally {
+      agent._bridge = originalBridge;
     }
     return response;
   };
@@ -144,7 +147,9 @@ const reactDevtoolsBackendSource = require("./react_devtools_backend.raw.js").de
 // either, so each batch is sent (to nowhere) right away. It reports exceptions thrown by
 // its event listeners with `reportError()`, which would dispatch an error event on the
 // page, and it reads resource timings and evaluates stylesheets' media queries, neither
-// of which matters here. This is a string rather than a function so that these names
+// of which matters here. Its agent schedules a timer to persist the selection (to Web
+// Storage), and its hook wraps `console.error`/`console.warn`: neither may reach the
+// page's timers or console. This is a string rather than a function so that these names
 // can't be changed when this file is compiled.
 const rdtBackendWithGlobals = `(function (module) {
   var exports = module.exports;
@@ -158,6 +163,15 @@ const rdtBackendWithGlobals = `(function (module) {
   };
   var performance = {};
   var matchMedia = undefined;
+  var setTimeout = function () {
+    return 0;
+  };
+  var clearTimeout = function () {};
+  var console = {
+    log: function () {},
+    warn: function () {},
+    error: function () {},
+  };
   (${reactDevtoolsBackendSource})();
 })`;
 
