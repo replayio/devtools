@@ -83,6 +83,13 @@ export function getRecordingTarget(buildId: string): RecordingTarget {
   return RecordingTarget.unknown;
 }
 
+// Recordings from Replay's workerd (Cloudflare Workers) fork use a node build ID with an extra
+// segment, e.g. "linux-node-20261015-workerd-<workerd rev>-<driver rev>", and are treated as
+// node recordings everywhere except in user-facing labels.
+export function isWorkerdBuildId(buildId: string): boolean {
+  return buildId.split("-").includes("workerd");
+}
+
 export const recordingTargetCache = createSingleEntryCache<
   [replayClient: ReplayClientInterface],
   RecordingTarget
