@@ -141,8 +141,11 @@ const reactDevtoolsBackendSource = require("./react_devtools_backend.raw.js").de
 // system the page uses. React DevTools persists some settings in Web Storage (behind
 // try/catch), which must not be touched in a pause. Its bridge batches messages and sends
 // them in a microtask: nothing listens to it here, but it must not keep queueing them
-// either, so each batch is sent (to nowhere) right away. This is a string rather than a
-// function so that these names can't be changed when this file is compiled.
+// either, so each batch is sent (to nowhere) right away. It reports exceptions thrown by
+// its event listeners with `reportError()`, which would dispatch an error event on the
+// page, and it reads resource timings and evaluates stylesheets' media queries, neither
+// of which matters here. This is a string rather than a function so that these names
+// can't be changed when this file is compiled.
 const rdtBackendWithGlobals = `(function (module) {
   var exports = module.exports;
   var localStorage = undefined;
@@ -150,6 +153,11 @@ const rdtBackendWithGlobals = `(function (module) {
   var queueMicrotask = function (callback) {
     callback();
   };
+  var reportError = function (error) {
+    window.logMessage("Reported error: " + error);
+  };
+  var performance = {};
+  var matchMedia = undefined;
   (${reactDevtoolsBackendSource})();
 })`;
 
