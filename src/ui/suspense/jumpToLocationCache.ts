@@ -201,7 +201,10 @@ export const reduxDispatchJumpLocationCache = createCache<
         "serializableStateInvariantMiddleware",
         "immutableStateInvariantMiddleware",
         "redux-thunk",
-        "bindActionCreators"
+        "bindActionCreators",
+        // react-redux 9 ships as a single bundle, so its bindActionCreators
+        // can't be matched by file name
+        "react-redux"
       )
     );
     const { filteredFrames: filteredPauseFrames } = frames;
