@@ -139,14 +139,17 @@ const reactDevtoolsBackendSource = require("./react_devtools_backend.raw.js").de
 // (such as `c === $ && x` becoming `c===$&&x`)
 // The RDT bundle is a UMD bundle: let it export to us rather than to whatever module
 // system the page uses. React DevTools persists some settings in Web Storage (behind
-// try/catch), which must not be touched in a pause, and its bridge flushes in a
-// microtask, which nothing here needs. This is a string rather than a function so that
-// these names can't be changed when this file is compiled.
+// try/catch), which must not be touched in a pause. Its bridge batches messages and sends
+// them in a microtask: nothing listens to it here, but it must not keep queueing them
+// either, so each batch is sent (to nowhere) right away. This is a string rather than a
+// function so that these names can't be changed when this file is compiled.
 const rdtBackendWithGlobals = `(function (module) {
   var exports = module.exports;
   var localStorage = undefined;
   var sessionStorage = undefined;
-  var queueMicrotask = function () {};
+  var queueMicrotask = function (callback) {
+    callback();
+  };
   (${reactDevtoolsBackendSource})();
 })`;
 
