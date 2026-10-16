@@ -1,5 +1,5 @@
 import { ObjectId } from "@replayio/protocol";
-import { ElementType } from "@replayio/react-devtools-inline";
+import { ElementType } from "react-devtools-inline";
 
 // TRICKY
 // Keep the types below in sync with react-devtools-inline package

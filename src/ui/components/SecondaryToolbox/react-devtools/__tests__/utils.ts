@@ -1,5 +1,5 @@
-import type { Store } from "@replayio/react-devtools-inline";
 import { createElement } from "react";
+import type { Store } from "react-devtools-inline";
 import { createRoot } from "react-dom/client";
 
 import { deconstructOperationsArray, reconstructOperationsArray } from "../rdtProcessing";
@@ -67,12 +67,12 @@ export function reactDevToolsBeforeEach() {
     activate: activateBackend,
     createBridge: createBackendBridge,
     initialize: initializeBackend,
-  } = require("@replayio/react-devtools-inline/backend");
+  } = require("react-devtools-inline/backend");
   const {
     initialize: createDevTools,
     createBridge: createFrontendBridge,
     createStore,
-  } = require("@replayio/react-devtools-inline/frontend");
+  } = require("react-devtools-inline/frontend");
 
   const listeners: Set<Function> = new Set();
   const wall = {

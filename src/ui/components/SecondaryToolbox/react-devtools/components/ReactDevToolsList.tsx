@@ -1,5 +1,5 @@
-import { FrontendBridge } from "@replayio/react-devtools-inline";
 import { CSSProperties, useEffect } from "react";
+import { FrontendBridge } from "react-devtools-inline";
 
 import { GenericList } from "replay-next/components/windowing/GenericList";
 import { useDynamicIndentationListCSSVariables } from "replay-next/components/windowing/hooks/useDynamicIndentationListCSSVariables";

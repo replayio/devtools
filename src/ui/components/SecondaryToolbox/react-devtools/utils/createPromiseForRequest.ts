@@ -1,4 +1,4 @@
-import { BackendEvents, FrontendBridge } from "@replayio/react-devtools-inline";
+import { BackendEvents, FrontendBridge } from "react-devtools-inline";
 
 export function createPromiseForRequest<Value>({
   bridge,

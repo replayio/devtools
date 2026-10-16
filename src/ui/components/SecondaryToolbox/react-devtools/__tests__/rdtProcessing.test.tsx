@@ -1,5 +1,5 @@
-import type { Store } from "@replayio/react-devtools-inline";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
+import type { Store } from "react-devtools-inline";
 import type { Root } from "react-dom/client";
 
 import {
@@ -15,7 +15,6 @@ import { deconstructOperationsArray } from "ui/components/SecondaryToolbox/react
 import {
   TREE_OPERATION_ADD,
   TREE_OPERATION_REMOVE,
-  TREE_OPERATION_REMOVE_ROOT,
   TREE_OPERATION_REORDER_CHILDREN,
   TREE_OPERATION_SET_SUBTREE_MODE,
   TREE_OPERATION_UPDATE_ERRORS_OR_WARNINGS,
@@ -68,7 +67,7 @@ describe("RDT processing", () => {
                 "hasOwnerMetadata": true,
                 "isStrictModeCompliant": false,
                 "nodeType": "root",
-                "profilingFlags": 1,
+                "profilingFlags": 5,
                 "supportsStrictMode": true,
               },
               "name": "addRoot",
@@ -77,8 +76,18 @@ describe("RDT processing", () => {
               "type": 1,
             },
             Object {
+              "isSuspended": false,
+              "name": "addSuspenseNode",
+              "nameStringTableIndex": 0,
+              "nodeId": 1,
+              "parentId": 0,
+              "rects": null,
+              "type": 8,
+            },
+            Object {
               "contents": Object {
                 "keyStringTableIndex": 2,
+                "namePropStringTableIndex": 0,
                 "nodeType": "node",
                 "ownerId": 0,
                 "parentId": 1,
@@ -92,6 +101,7 @@ describe("RDT processing", () => {
             Object {
               "contents": Object {
                 "keyStringTableIndex": 3,
+                "namePropStringTableIndex": 0,
                 "nodeType": "node",
                 "ownerId": 0,
                 "parentId": 1,
@@ -130,10 +140,18 @@ describe("RDT processing", () => {
           ],
           "treeOperations": Array [
             Object {
+              "name": "removeSuspenseNodes",
+              "nodeIds": Array [
+                1,
+              ],
+              "type": 9,
+            },
+            Object {
               "name": "remove",
               "nodeIds": Array [
-                2,
                 3,
+                2,
+                1,
               ],
               "type": 2,
             },
@@ -231,7 +249,7 @@ describe("RDT processing", () => {
                 "hasOwnerMetadata": true,
                 "isStrictModeCompliant": false,
                 "nodeType": "root",
-                "profilingFlags": 1,
+                "profilingFlags": 5,
                 "supportsStrictMode": true,
               },
               "name": "addRoot",
@@ -240,22 +258,32 @@ describe("RDT processing", () => {
               "type": 1,
             },
             Object {
+              "isSuspended": false,
+              "name": "addSuspenseNode",
+              "nameStringTableIndex": 0,
+              "nodeId": 1,
+              "parentId": 0,
+              "rects": null,
+              "type": 8,
+            },
+            Object {
               "contents": Object {
                 "keyStringTableIndex": 0,
+                "namePropStringTableIndex": 0,
                 "nodeType": "node",
                 "ownerId": 0,
                 "parentId": 1,
                 "stringTableIndex": 1,
               },
               "name": "addNode",
-              "nodeId": 3,
+              "nodeId": 2,
               "nodeType": 5,
               "type": 1,
             },
             Object {
               "mode": 1,
               "name": "setSubtreeMode",
-              "rootId": 3,
+              "rootId": 2,
               "type": 7,
             },
           ],
@@ -334,54 +362,67 @@ describe("RDT processing", () => {
       store.componentFilters = [{} as any];
     });
 
-    assertContainsOperationType(operationsArrays, TREE_OPERATION_REMOVE_ROOT);
+    // React DevTools removes a root with a regular REMOVE operation, after its descendants
+    assertContainsOperationType(operationsArrays, TREE_OPERATION_REMOVE);
     verifySerialization(operationsArrays);
     expect(operationsArrays.map(deconstructOperationsArray)).toMatchInlineSnapshot(`
       Array [
         Object {
           "rendererId": 1,
-          "rootId": 1,
-          "stringTable": Array [
-            null,
-          ],
-          "treeOperations": Array [
-            Object {
-              "name": "removeRoot",
-              "type": 6,
-            },
-          ],
-        },
-        Object {
-          "rendererId": 1,
-          "rootId": 1,
+          "rootId": -1,
           "stringTable": Array [
             null,
             "Component",
           ],
           "treeOperations": Array [
             Object {
+              "name": "removeSuspenseNodes",
+              "nodeIds": Array [
+                1,
+              ],
+              "type": 9,
+            },
+            Object {
+              "name": "remove",
+              "nodeIds": Array [
+                2,
+                1,
+              ],
+              "type": 2,
+            },
+            Object {
               "contents": Object {
                 "hasOwnerMetadata": true,
                 "isStrictModeCompliant": false,
                 "nodeType": "root",
-                "profilingFlags": 1,
+                "profilingFlags": 5,
                 "supportsStrictMode": true,
               },
               "name": "addRoot",
-              "nodeId": 1,
+              "nodeId": 3,
               "nodeType": 11,
               "type": 1,
             },
             Object {
+              "isSuspended": false,
+              "name": "addSuspenseNode",
+              "nameStringTableIndex": 0,
+              "nodeId": 3,
+              "parentId": 0,
+              "rects": null,
+              "type": 8,
+            },
+            Object {
               "contents": Object {
                 "keyStringTableIndex": 0,
+                "namePropStringTableIndex": 0,
                 "nodeType": "node",
                 "ownerId": 0,
-                "parentId": 1,
+                "parentId": 3,
                 "stringTableIndex": 1,
               },
               "name": "addNode",
-              "nodeId": 2,
+              "nodeId": 4,
               "nodeType": 5,
               "type": 1,
             },

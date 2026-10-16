@@ -1,5 +1,5 @@
 import { PauseId } from "@replayio/protocol";
-import { FrontendBridge } from "@replayio/react-devtools-inline";
+import { FrontendBridge } from "react-devtools-inline";
 import { createCache } from "suspense";
 
 import { ReplayClientInterface } from "shared/client/types";

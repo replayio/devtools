@@ -1,7 +1,7 @@
 import assert from "assert";
 import { ObjectId, PauseId } from "@replayio/protocol";
-import { FrontendBridge } from "@replayio/react-devtools-inline";
 import { MouseEvent, ReactNode, Suspense, useContext, useDeferredValue } from "react";
+import { FrontendBridge } from "react-devtools-inline";
 
 import { selectNode } from "devtools/client/inspector/markup/actions/markup";
 import Expandable from "replay-next/components/Expandable";

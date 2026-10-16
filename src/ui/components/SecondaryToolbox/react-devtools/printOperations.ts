@@ -8,14 +8,23 @@
 // This file contains React utilities pulled from https://github.com/facebook/react/blob/5309f102854475030fb91ab732141411b49c1126/packages/react-devtools-shared/src/utils.js#L195
 // We do not run this in production, but we do use it for testing the
 // React routine locally so we keep it in the repo for that usecase.
+// The operations format is the one of React DevTools 7.0+ (see
+// react-devtools-shared/src/constants.js and devtools/store.js in React DevTools 8.0.0).
 
 export const TREE_OPERATION_ADD = 1;
 export const TREE_OPERATION_REMOVE = 2;
 export const TREE_OPERATION_REORDER_CHILDREN = 3;
 export const TREE_OPERATION_UPDATE_TREE_BASE_DURATION = 4;
 export const TREE_OPERATION_UPDATE_ERRORS_OR_WARNINGS = 5;
-export const TREE_OPERATION_REMOVE_ROOT = 6;
+// React DevTools 8.0 removed TREE_OPERATION_REMOVE_ROOT (6): a root is removed
+// by a TREE_OPERATION_REMOVE of its ID, after all of its descendants.
 export const TREE_OPERATION_SET_SUBTREE_MODE = 7;
+export const SUSPENSE_TREE_OPERATION_ADD = 8;
+export const SUSPENSE_TREE_OPERATION_REMOVE = 9;
+export const SUSPENSE_TREE_OPERATION_REORDER_CHILDREN = 10;
+export const SUSPENSE_TREE_OPERATION_RESIZE = 11;
+export const SUSPENSE_TREE_OPERATION_SUSPENDERS = 12;
+export const TREE_OPERATION_APPLIED_ACTIVITY_SLICE_CHANGE = 13;
 
 export const ElementTypeClass = 1;
 export const ElementTypeContext = 2;
@@ -29,9 +38,13 @@ export const ElementTypeRoot = 11;
 export const ElementTypeSuspense = 12;
 export const ElementTypeSuspenseList = 13;
 export const ElementTypeTracingMarker = 14;
+export const ElementTypeVirtual = 15;
+export const ElementTypeViewTransition = 16;
+export const ElementTypeActivity = 17;
 
-export const PROFILING_FLAG_BASIC_SUPPORT = 0b01;
-export const PROFILING_FLAG_TIMELINE_SUPPORT = 0b10;
+export const PROFILING_FLAG_BASIC_SUPPORT = 0b001;
+export const PROFILING_FLAG_TIMELINE_SUPPORT = 0b010;
+export const PROFILING_FLAG_PERFORMANCE_TRACKS_SUPPORT = 0b100;
 
 const encodedStringCache: Map<string, number[]> = new Map();
 
@@ -115,7 +128,7 @@ export function printOperationsArray(operations: Array<number>) {
           logs.push(`Add new root node ${id}`);
 
           i++; // isStrictModeCompliant
-          i++; // supportsProfiling
+          i++; // profilingFlags
           i++; // supportsStrictMode
           i++; // hasOwnerMetadata
         } else {
@@ -129,6 +142,7 @@ export function printOperationsArray(operations: Array<number>) {
           i++;
 
           i++; // key
+          i++; // name prop
 
           logs.push(`Add node ${id} (${displayName || "null"}) as child of ${parentID}`);
         }
@@ -146,15 +160,9 @@ export function printOperationsArray(operations: Array<number>) {
         }
         break;
       }
-      case TREE_OPERATION_REMOVE_ROOT: {
-        i += 1;
-
-        logs.push(`Remove root ${rootID}`);
-        break;
-      }
       case TREE_OPERATION_SET_SUBTREE_MODE: {
         const id = operations[i + 1];
-        const mode = operations[i + 1];
+        const mode = operations[i + 2];
 
         i += 3;
 
@@ -185,6 +193,60 @@ export function printOperationsArray(operations: Array<number>) {
         i += 4;
 
         logs.push(`Node ${id} has ${numErrors} errors and ${numWarnings} warnings`);
+        break;
+      }
+      case SUSPENSE_TREE_OPERATION_ADD: {
+        const id = operations[i + 1];
+        const parentID = operations[i + 2];
+        const numRects = operations[i + 5];
+        i += 6 + Math.max(numRects, 0) * 4;
+
+        logs.push(`Add suspense node ${id} as child of ${parentID}`);
+        break;
+      }
+      case SUSPENSE_TREE_OPERATION_REMOVE: {
+        const removeLength = operations[i + 1];
+        const ids = operations.slice(i + 2, i + 2 + removeLength);
+        i += 2 + removeLength;
+
+        logs.push(`Remove suspense nodes ${ids.join(",")}`);
+        break;
+      }
+      case SUSPENSE_TREE_OPERATION_REORDER_CHILDREN: {
+        const id = operations[i + 1];
+        const numChildren = operations[i + 2];
+        const children = operations.slice(i + 3, i + 3 + numChildren);
+        i += 3 + numChildren;
+
+        logs.push(`Re-order suspense node ${id} children ${children.join(",")}`);
+        break;
+      }
+      case SUSPENSE_TREE_OPERATION_RESIZE: {
+        const id = operations[i + 1];
+        const numRects = operations[i + 2];
+        i += 3 + Math.max(numRects, 0) * 4;
+
+        logs.push(`Resize suspense node ${id}`);
+        break;
+      }
+      case SUSPENSE_TREE_OPERATION_SUSPENDERS: {
+        i++;
+        const changeLength = operations[i++];
+        for (let changeIndex = 0; changeIndex < changeLength; changeIndex++) {
+          const id = operations[i];
+          i += 4; // id, hasUniqueSuspenders, endTime, isSuspended
+          const environmentNamesLength = operations[i++];
+          i += environmentNamesLength;
+
+          logs.push(`Suspenders changed for suspense node ${id}`);
+        }
+        break;
+      }
+      case TREE_OPERATION_APPLIED_ACTIVITY_SLICE_CHANGE: {
+        const activitySliceID = operations[i + 1];
+        i += 2;
+
+        logs.push(`Applied activity slice ${activitySliceID}`);
         break;
       }
       default:
