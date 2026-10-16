@@ -29,6 +29,11 @@ import ProtocolViewer from "./ProtocolViewer";
 import Tour from "./Tour/Tour";
 import styles from "src/ui/components/SidePanel.module.css";
 
+// The welcome box for signed-out viewers is turned off: it's so eye-catching that it
+// draws attention away from the debugging controls right next to it. Bring it back only
+// with a toned-down design (or a different kind of onboarding).
+const SHOW_WELCOME_BOX = false;
+
 function useInitialPrimaryPanel() {
   const dispatch = useAppDispatch();
   const selectedPrimaryPanel = useAppSelector(getSelectedPrimaryPanel);
@@ -139,7 +144,7 @@ function SidePanelSuspends() {
 
   return (
     <div className="flex w-full flex-col gap-2">
-      {!isAuthenticated && !testSuite && isNGXHeaderVisible && (
+      {SHOW_WELCOME_BOX && !isAuthenticated && !testSuite && isNGXHeaderVisible && (
         <div className={styles.TourBox}>
           <h2>Welcome to Replay!</h2>
           {comments.length > 0 ? (
@@ -159,7 +164,7 @@ function SidePanelSuspends() {
           )}
         </div>
       )}
-      {!isAuthenticated && testSuite && isNGXHeaderVisible && (
+      {SHOW_WELCOME_BOX && !isAuthenticated && testSuite && isNGXHeaderVisible && (
         <div className={styles.TourBox}>
           <h2>Welcome! 👋</h2>
           <p>We've written some docs to get the most out of Replay test suites. Check them out!</p>
