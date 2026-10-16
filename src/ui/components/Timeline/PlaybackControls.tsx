@@ -6,6 +6,7 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { replayFromBeginning, startPlayback, stopPlayback } from "ui/actions/timeline";
 import { subscribeToPlaybackWithoutGraphics } from "ui/components/Timeline/subscribeToPlaybackWithoutGraphics";
 import { selectors } from "ui/reducers";
+import { getViewMode } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector, useAppStore } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
 
@@ -17,8 +18,14 @@ export default function PlayPauseButton() {
   const recordingDuration = useAppSelector(selectors.getRecordingDuration);
   const reduxStore = useAppStore();
   const replayClient = useContext(ReplayClientContext);
+  const viewMode = useAppSelector(getViewMode);
 
   useEffect(() => {
+    // The viewer mode always shows <Video />.
+    if (viewMode !== "dev") {
+      return;
+    }
+
     let unsubscribe: (() => void) | undefined;
     let unmounted = false;
 
@@ -35,7 +42,7 @@ export default function PlayPauseButton() {
       unmounted = true;
       unsubscribe?.();
     };
-  }, [reduxStore, replayClient]);
+  }, [reduxStore, replayClient, viewMode]);
 
   const isAtEnd = focusWindow ? currentTime === focusWindow.end : currentTime == recordingDuration;
 
