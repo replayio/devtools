@@ -169,14 +169,17 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
   // Re-select "App" just so we're back at the top
   await getReactComponents(page).first().click();
 
-  // Should render `<Suspense>` components
+  // Should render `<Suspense>` components. React DevTools leaves out the children of
+  // hidden Offscreen fibers: this recording predates React's separate Activity fiber, so a
+  // hidden `<Activity>` is a plain hidden Offscreen, and one `<Suspense>` (in a hidden
+  // panel) is inside one until the end of the recording.
 
   debugPrint(page, `Checking rendering of <Suspense> components`);
 
   await searchComponents(page, "Suspense");
   await verifySearchResults(page, {
     currentNumber: 1,
-    totalNumber: 15,
+    totalNumber: 14,
   });
 
   list.evaluate(el => (el.scrollTop = 0));
