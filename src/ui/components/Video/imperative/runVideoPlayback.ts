@@ -3,32 +3,30 @@ import { ExecutionPoint } from "@replayio/protocol";
 import { ReplayClientInterface } from "shared/client/types";
 import { seek, stopPlayback } from "ui/actions/timeline";
 import { updateGraphics } from "ui/components/Video/imperative/updateGraphics";
-import { getPlayback, setTimelineState } from "ui/reducers/timeline";
+import { setTimelineState } from "ui/reducers/timeline";
 import { AppStore } from "ui/setup/store";
-import { TimelineState } from "ui/state/timeline";
 
 export async function runVideoPlayback({
   abortSignal,
   beginPoint,
   beginTime,
-  graphicsElement,
   endPoint,
   endTime,
+  getGraphicsElement,
   reduxStore,
   replayClient,
 }: {
   abortSignal: AbortSignal;
   beginPoint: ExecutionPoint | null;
   beginTime: number;
-  graphicsElement: HTMLElement | null;
   endPoint: ExecutionPoint | null;
   endTime: number;
+  getGraphicsElement: () => HTMLElement | null;
   reduxStore: AppStore;
   replayClient: ReplayClientInterface;
 }) {
   let previousDateNow = Date.now();
   let previousTimelineTime = beginTime;
-  let playback: TimelineState["playback"] = null;
 
   playbackLoop: while (true) {
     const currentDateNow = Date.now();
@@ -46,8 +44,12 @@ export async function runVideoPlayback({
     );
     previousTimelineTime = nextTimelineTime;
 
-    playback = { beginPoint, beginTime, endPoint, endTime, time: nextTimelineTime };
-    reduxStore.dispatch(setTimelineState({ currentTime: nextTimelineTime, playback }));
+    reduxStore.dispatch(
+      setTimelineState({
+        currentTime: nextTimelineTime,
+        playback: { beginPoint, beginTime, endPoint, endTime, time: nextTimelineTime },
+      })
+    );
 
     if (nextTimelineTime >= endTime) {
       reduxStore.dispatch(stopPlayback());
@@ -55,6 +57,7 @@ export async function runVideoPlayback({
 
       break playbackLoop;
     } else {
+      const graphicsElement = getGraphicsElement();
       const updateGraphicsPromise =
         graphicsElement &&
         updateGraphics({
@@ -70,13 +73,8 @@ export async function runVideoPlayback({
       // 16ms chosen because it allows an overall rate of 60fps
       await Promise.all([new Promise(resolve => setTimeout(resolve, 16)), updateGraphicsPromise]);
 
+      // Aborted once playback has stopped (or the DevTools unmounted), so there is nothing left to stop.
       if (abortSignal.aborted) {
-        // Playback may have been paused and started again while this loop waited, and the new
-        // playback belongs to another loop.
-        if (getPlayback(reduxStore.getState()) === playback) {
-          reduxStore.dispatch(stopPlayback());
-        }
-
         break playbackLoop;
       }
     }

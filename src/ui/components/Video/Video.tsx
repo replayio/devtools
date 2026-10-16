@@ -5,6 +5,7 @@ import { LoadingProgressBar } from "replay-next/components/LoadingProgressBar";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import CommentsOverlay from "ui/components/Comments/VideoComments";
 import { NodePickerContext } from "ui/components/NodePickerContext";
+import { PlaybackContext } from "ui/components/PlaybackContext";
 import ReplayLogo from "ui/components/shared/ReplayLogo";
 import ToggleButton from "ui/components/TestSuite/views/Toggle/ToggleButton";
 import { State, state } from "ui/components/Video/imperative/MutableGraphicsState";
@@ -24,6 +25,7 @@ export default function Video() {
   const replayClient = useContext(ReplayClientContext);
 
   const { status: nodePickerStatus } = useContext(NodePickerContext);
+  const { registerGraphicsElement } = useContext(PlaybackContext);
 
   const [showLoadingIndicator, setShowLoadingIndicator] = useState(false);
   const [showError, setShowError] = useState(false);
@@ -79,6 +81,8 @@ export default function Video() {
       Object.assign(prevState, nextState);
     });
 
+    const unregisterGraphicsElement = registerGraphicsElement(graphicsElement);
+
     const unsubscribe = subscribeToMutableSources({
       containerElement,
       graphicsElement,
@@ -89,12 +93,13 @@ export default function Video() {
 
     return () => {
       unsubscribe();
+      unregisterGraphicsElement();
 
       if (stalledTimeout != null) {
         clearTimeout(stalledTimeout);
       }
     };
-  }, [reduxStore, replayClient]);
+  }, [reduxStore, registerGraphicsElement, replayClient]);
 
   const dispatch = useAppDispatch();
   const panel = useAppSelector(getSelectedPrimaryPanel);

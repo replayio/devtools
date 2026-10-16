@@ -27,6 +27,7 @@ import { getAccessToken, getProcessing } from "ui/actions/app";
 import { createSocket } from "ui/actions/session";
 import { DevToolsDynamicLoadingMessage } from "ui/components/DevToolsDynamicLoadingMessage";
 import { NodePickerContextRoot } from "ui/components/NodePickerContext";
+import { PlaybackContextRoot } from "ui/components/PlaybackContext";
 import { RecordingDocumentTitle } from "ui/components/RecordingDocumentTitle";
 import TerminalContextAdapter from "ui/components/SecondaryToolbox/TerminalContextAdapter";
 import { TestSuiteContextRoot } from "ui/components/TestSuite/views/TestSuiteContext";
@@ -285,28 +286,30 @@ function _DevTools({
             <PointsContextRoot>
               <TimelineContextAdapter>
                 <NodePickerContextRoot>
-                  <TestSuiteContextRoot>
-                    <SelectedFrameContextRoot
-                      SelectedFrameContextAdapter={SelectedFrameContextAdapter}
-                    >
-                      <TerminalContextAdapter>
-                        <InspectorContextReduxAdapter>
-                          <ExpandablesContextRoot>
-                            <LayoutContextAdapter>
-                              <KeyModifiers>
-                                <RecordingDocumentTitle />
-                                <Header />
-                                <Body />
-                                {showCommandPalette ? <CommandPaletteModal /> : null}
-                                {quickOpenEnabled ? <QuickOpenModal /> : null}
-                                <KeyboardShortcuts />
-                              </KeyModifiers>
-                            </LayoutContextAdapter>
-                          </ExpandablesContextRoot>
-                        </InspectorContextReduxAdapter>
-                      </TerminalContextAdapter>
-                    </SelectedFrameContextRoot>
-                  </TestSuiteContextRoot>
+                  <PlaybackContextRoot>
+                    <TestSuiteContextRoot>
+                      <SelectedFrameContextRoot
+                        SelectedFrameContextAdapter={SelectedFrameContextAdapter}
+                      >
+                        <TerminalContextAdapter>
+                          <InspectorContextReduxAdapter>
+                            <ExpandablesContextRoot>
+                              <LayoutContextAdapter>
+                                <KeyModifiers>
+                                  <RecordingDocumentTitle />
+                                  <Header />
+                                  <Body />
+                                  {showCommandPalette ? <CommandPaletteModal /> : null}
+                                  {quickOpenEnabled ? <QuickOpenModal /> : null}
+                                  <KeyboardShortcuts />
+                                </KeyModifiers>
+                              </LayoutContextAdapter>
+                            </ExpandablesContextRoot>
+                          </InspectorContextReduxAdapter>
+                        </TerminalContextAdapter>
+                      </SelectedFrameContextRoot>
+                    </TestSuiteContextRoot>
+                  </PlaybackContextRoot>
                 </NodePickerContextRoot>
               </TimelineContextAdapter>
             </PointsContextRoot>

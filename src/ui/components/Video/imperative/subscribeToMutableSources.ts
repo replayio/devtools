@@ -4,7 +4,6 @@ import { ReplayClientInterface } from "shared/client/types";
 import { getGraphicsTimeAndExecutionPoint } from "ui/components/Video/imperative/getGraphicsTimeAndExecutionPoint";
 import { updateState } from "ui/components/Video/imperative/MutableGraphicsState";
 import { repositionGraphicsOverlayElements } from "ui/components/Video/imperative/repositionGraphicsOverlayElements";
-import { runVideoPlayback } from "ui/components/Video/imperative/runVideoPlayback";
 import { updateGraphics } from "ui/components/Video/imperative/updateGraphics";
 import { getPlayback } from "ui/reducers/timeline";
 import { AppStore } from "ui/setup/store";
@@ -58,31 +57,15 @@ export function subscribeToMutableSources({
       return;
     }
 
-    const didStartPlaying = isPlaying && !prevIsPlaying;
-
     prevTime = time;
     prevExecutionPoint = executionPoint;
     prevIsPlaying = isPlaying;
 
     if (isPlaying) {
-      if (didStartPlaying) {
-        if (abortController != null) {
-          abortController.abort();
-          abortController = null;
-        }
-
-        abortController = new AbortController();
-
-        runVideoPlayback({
-          abortSignal: abortController.signal,
-          beginPoint: playbackState.beginPoint,
-          beginTime: playbackState.beginTime,
-          graphicsElement,
-          endPoint: playbackState.endPoint,
-          endTime: playbackState.endTime,
-          reduxStore,
-          replayClient,
-        });
+      // Playback draws its own frames (see PlaybackContextRoot).
+      if (abortController != null) {
+        abortController.abort();
+        abortController = null;
       }
     } else {
       if (abortController != null) {
