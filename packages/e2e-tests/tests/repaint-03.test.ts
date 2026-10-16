@@ -5,7 +5,7 @@ import { getFocusBeginTime, seekToTimePercent } from "../helpers/timeline";
 import { waitFor } from "../helpers/utils";
 import test, { expect } from "../testFixture";
 
-test.use({ exampleKey: "playwright/breakpoints-05" });
+test.use({ exampleKey: "playwright/debugger-statements" });
 
 test("repaint-03: repaints on seek", async ({ pageWithMeta: { page, recordingId, testScope } }) => {
   await startTest(page, recordingId, testScope);
@@ -23,7 +23,7 @@ test("repaint-03: repaints on seek", async ({ pageWithMeta: { page, recordingId,
   // By default, the screenshot shown should correspond to the start of the test
   const startOfTestScreenShot = await getGraphicsDataUrl(page);
 
-  const stepLink = getTestCaseSteps(page).getByText("expect").first();
+  const stepLink = getTestCaseSteps(page).getByText("expect", { exact: true }).first();
   await stepLink.click();
 
   // Wait for the graphics to update

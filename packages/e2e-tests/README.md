@@ -148,9 +148,21 @@ If you want to update those to fresher recording IDs, open up the team workspace
 
 You'll also probably need to specifically share that recording as "Public", especially since it's in a Test Suites workspace that would normally not allow anonymous users to view recordings.
 
-We use 1 specific Playwright test recording which is a replay of the breakpoints-05 test from this repo. Similar to the instructions above, to update this to a more recent version, you can visit the dashboard for FE E2E Tests and select a more recent recording ID for that test.
+### Test Run Examples
 
-We also now have a "golden recording" of one of our own `logpoints-01` E2E test runs. This serves as a testbed for checking more advanced behaviors like the React and Redux routines. If we ever need to update this, just copy-paste the recording ID from a test run in our "Frontend E2E tests" workspace.
+A few examples are recordings of Playwright test runs, which debug other examples in the Replay app:
+
+- `"playwright/debugger-statements"`: the Playwright Test Suites panel tests check its test steps
+- `"logpoints-01"`: a recording of the Replay app itself, which the React and Redux panel tests inspect
+
+Their `testRunSpec` in `examples.json` names the spec in `test-run-examples/`, which the main suite doesn't run. `save-examples.ts` runs that spec in Replay Chromium against the Replay app served at `PLAYWRIGHT_TEST_BASE_URL` (`localhost:8080` by default) and saves the recording with the test metadata the Replay reporter attached to it:
+
+```sh
+yarn build && yarn start # from the root of the repo, in another terminal
+./scripts/save-examples.ts --target=test-run
+```
+
+Serve a production build, as CI tests against one: the tests that inspect the app's own sources depend on its production bundles. Re-recording these examples records the current app, so tests that pin its source lines, Redux actions or React components need updating along with them.
 
 ### Test Suite Dashboard Tests
 

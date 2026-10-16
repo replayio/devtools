@@ -21,7 +21,7 @@ import {
 import { waitFor } from "../helpers/utils";
 import test, { expect } from "../testFixture";
 
-test.use({ exampleKey: "playwright/breakpoints-05" });
+test.use({ exampleKey: "playwright/debugger-statements" });
 
 test("playwright-01: Basic Test Suites panel functionality", async ({
   pageWithMeta: { page, recordingId, testScope },
@@ -70,10 +70,11 @@ test("playwright-01: Basic Test Suites panel functionality", async ({
   // Simplest way to check is just see if the text exists.
 
   // Relative dates can change over time.
-  // Check for either the "X units ago" text, or the literal date.
-  expect(await getTestSuiteDate(page).textContent()).toMatch(/ ago|(1\/26\/2024)/);
-  expect(await getTestSuiteUser(page).textContent()).toMatch("hbenl");
-  expect(await getTestSuiteBranch(page).textContent()).toMatch("main");
+  // Check for either the "X units ago" text, or a literal date.
+  expect(await getTestSuiteDate(page).textContent()).toMatch(/ ago|\d+\/\d+\/\d{4}/);
+  // save-examples.ts records the run as triggered by itself, on the branch it ran on.
+  expect(await getTestSuiteUser(page).textContent()).toMatch("save-examples");
+  await expect(getTestSuiteBranch(page)).toBeVisible();
   expect(await getTestSuiteDuration(page).textContent()).toMatch(/0:\d{2}/);
 
   // can open tests

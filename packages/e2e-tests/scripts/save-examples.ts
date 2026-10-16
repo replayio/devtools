@@ -4,10 +4,13 @@
 // Use the API key for the "Frontend E2E Test Team" that we have set up in admin,
 // as that should let us mark these recordings as public.
 
-import { existsSync, writeFileSync } from "fs";
+import { execFileSync } from "child_process";
+import { existsSync, mkdtempSync, rmSync, writeFileSync } from "fs";
 import assert from "node:assert/strict";
+import os from "os";
 import path from "path";
 import type { Page, expect as expectFunction } from "@playwright/test";
+import { getExecutablePath } from "@replayio/playwright";
 import chalk from "chalk";
 import difference from "lodash/difference";
 import { v4 as uuidv4 } from "uuid";
@@ -24,10 +27,11 @@ import {
   saveRecording,
   recordPlaywright,
   findLastRecordingId,
+  findTestRecordingId,
   removeRecording,
 } from "@devtools-repo/playwright-recorder";
 
-type Target = "all" | "browser" | "node";
+type Target = "all" | "browser" | "node" | "test-run";
 
 const argv = yargs
   .option("example", {
@@ -52,7 +56,7 @@ const argv = yargs
     alias: "t",
     default: "all",
     description: "Only re-generate tests for this target",
-    choices: ["all", "browser", "node"],
+    choices: ["all", "browser", "node", "test-run"],
   })
   .help()
   .alias("help", "h")
@@ -67,11 +71,12 @@ type PlaywrightScript = (page: Page, expect: typeof expectFunction) => Promise<v
 
 type TestExampleFile = {
   buildId: string;
-  category: "browser" | "node";
+  category: "browser" | "node" | "test-run";
   filename: string;
   folder: string;
   runtime: "chromium" | "node";
   playwrightScript?: PlaywrightScript;
+  testRunSpec?: string;
 };
 const examplesJsonPath = path.join(__dirname, "..", "examples.json");
 
@@ -133,6 +138,7 @@ async function saveExamples(
       buildId,
       playwrightScript,
       requiresManualUpdate = false,
+      testRunSpec,
     } = examplesJson[key] as TestRecordingIntersectionValue;
 
     if (requiresManualUpdate) {
@@ -146,7 +152,12 @@ async function saveExamples(
     let category: TestExampleFile["category"] | undefined;
     let folder: TestExampleFile["folder"] | undefined;
 
-    switch (runtime) {
+    switch (testRunSpec ? "test-run" : runtime) {
+      case "test-run": {
+        category = "test-run";
+        folder = path.join(__dirname, "..");
+        break;
+      }
       case "chromium":
       case "gecko": {
         category = "browser";
@@ -180,6 +191,7 @@ async function saveExamples(
         folder,
         runtime: runtime as TestExampleFile["runtime"],
         playwrightScript: resolvedPlaywrightScript,
+        testRunSpec,
       });
     }
   }
@@ -206,7 +218,7 @@ async function saveExamples(
   }
 
   for (const example of examplesToRun) {
-    const examplePath = path.join(example.folder, example.filename);
+    const examplePath = path.join(example.folder, example.testRunSpec ?? example.filename);
     if (existsSync(examplePath)) {
       await callback({ example, examplePath });
     } else {
@@ -286,6 +298,76 @@ async function saveNodeExamples() {
   });
 }
 
+async function saveTestRunExamples() {
+  await saveExamples("test-run", saveTestRunExample);
+}
+
+// Records a Playwright run of the example's spec, which debugs other examples'
+// recordings in the devtools served at `config.devtoolsUrl`.
+async function saveTestRunExample({ example, examplePath }: TestRunCallbackArgs) {
+  console.log(`Recording example ${chalk.gray.bold(example.filename)}`);
+
+  // The browser is looked up in the default Replay directory, before the run
+  // replaces it with a directory of its own, which then holds only its recordings.
+  const executablePath = config.browserPath ?? getExecutablePath();
+  assert(executablePath, "Replay Chromium is not installed");
+  const recordingDirectory = mkdtempSync(path.join(os.tmpdir(), "replay-test-run-example-"));
+  const previousRecordingDirectory = process.env.RECORD_REPLAY_DIRECTORY;
+  try {
+    execFileSync(
+      "npx",
+      ["playwright", "test", "--config", config.testRunExamplesConfigPath, examplePath],
+      {
+        cwd: path.join(__dirname, ".."),
+        stdio: "inherit",
+        env: {
+          ...process.env,
+          RECORD_REPLAY_DIRECTORY: recordingDirectory,
+          REPLAY_CHROMIUM_EXECUTABLE_PATH: executablePath,
+          RECORD_REPLAY_METADATA_TEST_RUN_ID: uuidv4(),
+          ...getSourceMetadataEnv(),
+        },
+      }
+    );
+
+    process.env.RECORD_REPLAY_DIRECTORY = recordingDirectory;
+    const recordingId = findTestRecordingId();
+    exampleToNewRecordingId[example.filename] = recordingId;
+
+    const { buildId } = await saveRecording(
+      {
+        recordingId,
+        title: `E2E Example: ${example.filename}`,
+      },
+      config.replayApiKey
+    );
+    updateExamplesJSONFile(example.filename, recordingId, buildId);
+    rmSync(recordingDirectory, { force: true, recursive: true });
+  } catch (error) {
+    console.error(`Kept the run's recordings in ${chalk.bold(recordingDirectory)}`);
+    throw error;
+  } finally {
+    if (previousRecordingDirectory === undefined) {
+      delete process.env.RECORD_REPLAY_DIRECTORY;
+    } else {
+      process.env.RECORD_REPLAY_DIRECTORY = previousRecordingDirectory;
+    }
+  }
+}
+
+// The Test Suites panel shows the run's branch and the user who triggered it,
+// which the reporter otherwise only finds in CI's environment.
+function getSourceMetadataEnv() {
+  const git = (...args: string[]) =>
+    execFileSync("git", args, { cwd: __dirname, encoding: "utf8" }).trim();
+
+  return {
+    RECORD_REPLAY_METADATA_SOURCE_BRANCH: git("rev-parse", "--abbrev-ref", "HEAD"),
+    RECORD_REPLAY_METADATA_SOURCE_COMMIT_ID: git("rev-parse", "HEAD"),
+    RECORD_REPLAY_METADATA_SOURCE_TRIGGER_USER: "save-examples",
+  };
+}
+
 async function sleep(timeoutMs: number) {
   return new Promise<void>(r => setTimeout(() => r(), timeoutMs));
 }
@@ -327,6 +409,7 @@ async function waitUntilMessage(
     const functionsForTarget = {
       browser: saveBrowserExamples,
       node: saveNodeExamples,
+      "test-run": saveTestRunExamples,
     };
 
     const target: Target = argv.target as Target;
@@ -335,7 +418,8 @@ async function waitUntilMessage(
       throw new Error("Only one target value is allowed");
     }
 
-    let targetsToRun: Target[] = ["browser", "node"];
+    // Test runs go last, so their specs debug the examples recorded before them.
+    let targetsToRun: Target[] = ["browser", "node", "test-run"];
     if (target !== "all") {
       targetsToRun = [target];
     }
