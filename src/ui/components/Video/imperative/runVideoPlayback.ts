@@ -19,7 +19,7 @@ export async function runVideoPlayback({
   abortSignal: AbortSignal;
   beginPoint: ExecutionPoint | null;
   beginTime: number;
-  graphicsElement: HTMLElement;
+  graphicsElement: HTMLElement | null;
   endPoint: ExecutionPoint | null;
   endTime: number;
   reduxStore: AppStore;
@@ -57,13 +57,15 @@ export async function runVideoPlayback({
 
       break playbackLoop;
     } else {
-      const updateGraphicsPromise = updateGraphics({
-        abortSignal,
-        graphicsElement,
-        executionPoint: null,
-        replayClient,
-        time: nextTimelineTime,
-      });
+      const updateGraphicsPromise =
+        graphicsElement &&
+        updateGraphics({
+          abortSignal,
+          graphicsElement,
+          executionPoint: null,
+          replayClient,
+          time: nextTimelineTime,
+        });
 
       // We may have already cached screenshot data, or we may be able to fetch it quickly
       // In order to avoid starving the rendering pipeline, wait a minimum amount of time before continuing
