@@ -1,6 +1,8 @@
 import { Suspense, useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
+import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { throttle } from "shared/utils/function";
 import { seek, setDisplayedFocusWindow, setHoverTime, stopPlayback } from "ui/actions/timeline";
@@ -36,6 +38,8 @@ export default function Timeline() {
   const timelineDimensions = useAppSelector(selectors.getTimelineDimensions);
   const zoomRegion = useAppSelector(selectors.getZoomRegion);
   const isPlaying = useAppSelector(isPlayingSelector);
+  const replayClient = useContext(ReplayClientContext);
+  const { supportsRepaintingGraphics } = recordingCapabilitiesCache.read(replayClient);
 
   const [showProtocolTimeline] = useGraphQLUserData("feature_protocolTimeline");
 
@@ -164,9 +168,11 @@ export default function Timeline() {
         data-test-focus-begin-time={rangeForDisplay?.begin}
         data-test-focus-end-time={rangeForDisplay?.end}
       >
-        <div className="commands">
-          <PlayPauseButton />
-        </div>
+        {supportsRepaintingGraphics && (
+          <div className="commands">
+            <PlayPauseButton />
+          </div>
+        )}
 
         <div
           className="progress-bar-container"

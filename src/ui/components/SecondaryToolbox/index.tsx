@@ -5,7 +5,11 @@ import { useImperativeCacheValue } from "suspense";
 import { EditorPane } from "devtools/client/debugger/src/components/Editor/EditorPane";
 import LazyActivity from "replay-next/components/LazyActivity";
 import { PanelLoader } from "replay-next/components/PanelLoader";
-import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
+import {
+  RecordingTarget,
+  recordingCapabilitiesCache,
+  recordingTargetCache,
+} from "replay-next/src/suspense/BuildIdCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { setSelectedPanel } from "ui/actions/layout";
@@ -160,7 +164,7 @@ export default function SecondaryToolbox() {
     REDUX_SETUP_ANNOTATIONS_KIND
   );
 
-  const chromiumNetMonitorEnabled = useGraphQLUserData("feature_chromiumNetMonitor");
+  const [chromiumNetMonitorEnabled] = useGraphQLUserData("feature_chromiumNetMonitor");
 
   const recordingCapabilities = recordingCapabilitiesCache.read(replayClient);
   const { supportsElementsInspector, supportsNetworkRequests, supportsRepaintingGraphics } =
@@ -209,18 +213,21 @@ export default function SecondaryToolbox() {
       break;
   }
 
+  const recordingTarget = recordingTargetCache.read(replayClient);
   const shouldShowNetworkTab =
-    chromiumNetMonitorEnabled || recordingCapabilities.supportsNetworkRequests;
+    recordingCapabilities.supportsNetworkRequests ||
+    (recordingTarget === RecordingTarget.chromium && chromiumNetMonitorEnabled);
 
   useLayoutEffect(() => {
     // If the selected panel is not available, switch to the console panel.
     if (
       (selectedPanel === "react-components" && !shouldShowReactTab) ||
-      (selectedPanel === "redux-devtools" && !shouldShowReduxTab)
+      (selectedPanel === "redux-devtools" && !shouldShowReduxTab) ||
+      (selectedPanel === "network" && !shouldShowNetworkTab)
     ) {
       dispatch(setSelectedPanel("console"));
     }
-  }, [selectedPanel, shouldShowReactTab, shouldShowReduxTab, dispatch]);
+  }, [selectedPanel, shouldShowNetworkTab, shouldShowReactTab, shouldShowReduxTab, dispatch]);
 
   return (
     <div className={classnames(`secondary-toolbox rounded-lg`)}>

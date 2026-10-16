@@ -139,7 +139,7 @@ function getRecordingCapabilities(
         supportsEagerEvaluation: true,
         supportsElementsInspector: false,
         supportsEventTypes: false,
-        supportsNetworkRequests: true,
+        supportsNetworkRequests: false,
         supportsRepaintingGraphics: false,
         supportsPureEvaluation: false,
         supportsObjectIdLookupsInEvaluations: false,

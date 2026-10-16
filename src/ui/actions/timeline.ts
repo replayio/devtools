@@ -370,7 +370,13 @@ async function clampTime(client: ReplayClientInterface, time: number) {
 }
 
 export function togglePlayback(): UIThunkAction {
-  return (dispatch, getState) => {
+  return async (dispatch, getState, { replayClient }) => {
+    // Playback only shows graphics, so recordings without them have no play button.
+    const { supportsRepaintingGraphics } = await recordingCapabilitiesCache.readAsync(replayClient);
+    if (!supportsRepaintingGraphics) {
+      return;
+    }
+
     const state = getState();
     const playback = getPlayback(state);
 
