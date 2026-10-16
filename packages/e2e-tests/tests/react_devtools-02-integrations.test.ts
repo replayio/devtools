@@ -70,10 +70,12 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
     "Context.Provider",
     "Context.Provider",
     "Context.Provider",
+    "Context.Provider",
     "App",
     "SystemProvider",
     "Head",
-    "SideEffect",
+    // Next's `SideEffect` function component
+    "i",
     // Tough transpiled variable, apparently: `export var ApolloProvider = function (_a) {`
     "c",
     "ApolloContext.Consumer",
@@ -81,7 +83,6 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
     "ConfirmProvider",
     "Context.Provider",
     "Routing",
-    "Provider",
   ];
 
   debugPrint(page, "Checking list of rewritten component names");
@@ -138,7 +139,7 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
   // The total depends on how many components the backend's reverse name mapping can resolve.
   // Locations in the Lexical plugin bundles resolve to the same outlines through either the
   // original source or its pretty-printed twin, so this count tracks the component tree itself.
-  const anonymousComponentCount = 20;
+  const anonymousComponentCount = 33;
 
   await searchComponents(page, "Anonymous"); // Search and select 1st result
   await verifySearchResults(page, {
@@ -169,17 +170,14 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
   // Re-select "App" just so we're back at the top
   await getReactComponents(page).first().click();
 
-  // Should render `<Suspense>` components. React DevTools leaves out the children of
-  // hidden Offscreen fibers: this recording predates React's separate Activity fiber, so a
-  // hidden `<Activity>` is a plain hidden Offscreen, and one `<Suspense>` (in a hidden
-  // panel) is inside one until the end of the recording.
+  // Should render `<Suspense>` components
 
   debugPrint(page, `Checking rendering of <Suspense> components`);
 
   await searchComponents(page, "Suspense");
   await verifySearchResults(page, {
     currentNumber: 1,
-    totalNumber: 14,
+    totalNumber: 37,
   });
 
   list.evaluate(el => (el.scrollTop = 0));
@@ -187,18 +185,17 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
   // Re-select "App" just so we're back at the top
   await getReactComponents(page).first().click();
 
-  // Should render our `<LazyActivity>` components, but _not_ `<Activity>`,
-  // because RDT already filters those out by default
+  // Should render our `<LazyActivity>` components and the `<Activity>` components they render
   debugPrint(page, `Checking rendering of <Activity> components`);
 
   await searchComponents(page, "Activity");
   await verifySearchResults(page, {
     currentNumber: 1,
-    totalNumber: 6,
+    totalNumber: 9,
   });
 
   const offscreenSearchComponentNames = await getAllVisibleComponentNames(page);
   expect(offscreenSearchComponentNames.length).toBeGreaterThan(0);
   expect(offscreenSearchComponentNames.includes("LazyActivity")).toBe(true);
-  expect(offscreenSearchComponentNames.includes("Activity")).toBe(false);
+  expect(offscreenSearchComponentNames.includes("Activity")).toBe(true);
 });

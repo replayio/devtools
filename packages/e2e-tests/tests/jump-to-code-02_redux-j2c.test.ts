@@ -78,7 +78,7 @@ test(`jump-to-code-02: Redux J2C functionality`, async ({
 
   // Inside of a `useEffect`
   jumpToReduxDispatch(page, "set_selected_primary_panel");
-  await verifyJumpToCodeResults(page, "SidePanel.tsx", 57, { current: 1, total: 1 });
+  await verifyJumpToCodeResults(page, "SidePanel.tsx", 62, { current: 1, total: 1 });
   await closeSource(page, "SidePanel.tsx");
 
   // Inside of a `connect()`ed class component, with `this.props.setExpandedState()`.

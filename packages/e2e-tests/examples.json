@@ -13,8 +13,8 @@
     "buildId": "linux-chromium-20261012-69219d393078-ec57537e1467"
   },
   "logpoints-01": {
-    "recording": "e23e4a2c-724d-479b-97c1-392d2bcff566",
-    "buildId": "linux-chromium-20261012-69219d393078-ec57537e1467",
+    "recording": "f057b3ae-1af0-47ac-9555-5ed9e10ad765",
+    "buildId": "linux-chromium-20261016-84a8f3af2313-79c74ec18d79",
     "testRunSpec": "test-run-examples/logpoints-01.spec.ts"
   },
   "cra/dist/index.html": {
@@ -177,8 +177,8 @@
     "buildId": "linux-chromium-20261012-69219d393078-ec57537e1467"
   },
   "playwright/debugger-statements": {
-    "recording": "84585d14-9845-4196-a9fb-c7367cfb589d",
-    "buildId": "linux-chromium-20261012-69219d393078-ec57537e1467",
+    "recording": "1ddcd980-4fdc-48b3-8189-6933f0fe9baf",
+    "buildId": "linux-chromium-20261016-84a8f3af2313-79c74ec18d79",
     "testRunSpec": "test-run-examples/debugger-statements.spec.ts"
   },
   "rdt-react-versions/dist/index.html": {
