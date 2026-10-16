@@ -3,8 +3,9 @@ import { ExecutionPoint } from "@replayio/protocol";
 import { ReplayClientInterface } from "shared/client/types";
 import { seek, stopPlayback } from "ui/actions/timeline";
 import { updateGraphics } from "ui/components/Video/imperative/updateGraphics";
-import { setTimelineState } from "ui/reducers/timeline";
+import { getPlayback, setTimelineState } from "ui/reducers/timeline";
 import { AppStore } from "ui/setup/store";
+import { TimelineState } from "ui/state/timeline";
 
 export async function runVideoPlayback({
   abortSignal,
@@ -27,6 +28,7 @@ export async function runVideoPlayback({
 }) {
   let previousDateNow = Date.now();
   let previousTimelineTime = beginTime;
+  let playback: TimelineState["playback"] = null;
 
   playbackLoop: while (true) {
     const currentDateNow = Date.now();
@@ -44,12 +46,8 @@ export async function runVideoPlayback({
     );
     previousTimelineTime = nextTimelineTime;
 
-    reduxStore.dispatch(
-      setTimelineState({
-        currentTime: nextTimelineTime,
-        playback: { beginPoint, beginTime, endPoint, endTime, time: nextTimelineTime },
-      })
-    );
+    playback = { beginPoint, beginTime, endPoint, endTime, time: nextTimelineTime };
+    reduxStore.dispatch(setTimelineState({ currentTime: nextTimelineTime, playback }));
 
     if (nextTimelineTime >= endTime) {
       reduxStore.dispatch(stopPlayback());
@@ -73,7 +71,11 @@ export async function runVideoPlayback({
       await Promise.all([new Promise(resolve => setTimeout(resolve, 16)), updateGraphicsPromise]);
 
       if (abortSignal.aborted) {
-        reduxStore.dispatch(stopPlayback());
+        // Playback may have been paused and started again while this loop waited, and the new
+        // playback belongs to another loop.
+        if (getPlayback(reduxStore.getState()) === playback) {
+          reduxStore.dispatch(stopPlayback());
+        }
 
         break playbackLoop;
       }
