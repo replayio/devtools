@@ -85,8 +85,7 @@ export function getRecordingTarget(buildId: string): RecordingTarget {
 
 // Recordings from Replay's workerd (Cloudflare Workers) fork use a node build ID with an extra
 // segment, e.g. "linux-node-20261015-workerd-<workerd rev>-<driver rev>", and are treated as
-// node recordings except in user-facing labels and for network requests, which the fork doesn't
-// record.
+// node recordings everywhere except in user-facing labels.
 export function isWorkerdBuildId(buildId: string): boolean {
   return buildId.split("-").includes("workerd");
 }
@@ -140,7 +139,7 @@ function getRecordingCapabilities(
         supportsEagerEvaluation: true,
         supportsElementsInspector: false,
         supportsEventTypes: false,
-        supportsNetworkRequests: true,
+        supportsNetworkRequests: false,
         supportsRepaintingGraphics: false,
         supportsPureEvaluation: false,
         supportsObjectIdLookupsInEvaluations: false,
@@ -178,10 +177,6 @@ export const recordingCapabilitiesCache = createSingleEntryCache<
       runtime: "unknown",
       date: "",
     };
-    const capabilities = getRecordingCapabilities(recordingTarget, buildComponents);
-    if (isWorkerdBuildId(buildId)) {
-      return { ...capabilities, supportsNetworkRequests: false };
-    }
-    return capabilities;
+    return getRecordingCapabilities(recordingTarget, buildComponents);
   },
 });
