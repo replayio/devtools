@@ -14,7 +14,7 @@ import { waitForTimelineAdvanced } from "../helpers/timeline";
 import { getByTestName, waitFor } from "../helpers/utils";
 import test, { expect } from "../testFixture";
 
-test.use({ exampleKey: "playwright/breakpoints-05" });
+test.use({ exampleKey: "playwright/debugger-statements" });
 
 test("playwright-03: Test Step interactions", async ({
   pageWithMeta: { page, recordingId, testScope },
@@ -32,7 +32,7 @@ test("playwright-03: Test Step interactions", async ({
   });
 
   const breakpointsTest = rows
-    .filter({ hasText: "breakpoints-05: Test interaction of breakpoints with debugger statements" })
+    .filter({ hasText: "debugger-statements: rewind and fast-forward between debugger statements" })
     .first();
 
   // can open tests
@@ -76,7 +76,7 @@ test("playwright-03: Test Step interactions", async ({
   await afterButton.click();
   prevPercent = await waitForTimelineAdvanced(page, prevPercent);
 
-  const SPEC_FILE = /breakpoints-05/;
+  const SPEC_FILE = /debugger-statements/;
 
   // Clicking each step should change the details pane
   await waitFor(async () => {
