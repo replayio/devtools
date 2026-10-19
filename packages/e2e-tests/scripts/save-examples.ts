@@ -31,7 +31,7 @@ import {
   removeRecording,
 } from "@devtools-repo/playwright-recorder";
 
-type Target = "all" | "browser" | "node" | "test-run";
+type Target = "all" | "browser" | "node";
 
 const argv = yargs
   .option("example", {
@@ -56,7 +56,7 @@ const argv = yargs
     alias: "t",
     default: "all",
     description: "Only re-generate tests for this target",
-    choices: ["all", "browser", "node", "test-run"],
+    choices: ["all", "browser", "node"],
   })
   .help()
   .alias("help", "h")
@@ -71,7 +71,7 @@ type PlaywrightScript = (page: Page, expect: typeof expectFunction) => Promise<v
 
 type TestExampleFile = {
   buildId: string;
-  category: "browser" | "node" | "test-run";
+  category: "browser" | "node";
   filename: string;
   folder: string;
   runtime: "chromium" | "node";
@@ -152,16 +152,11 @@ async function saveExamples(
     let category: TestExampleFile["category"] | undefined;
     let folder: TestExampleFile["folder"] | undefined;
 
-    switch (testRunSpec ? "test-run" : runtime) {
-      case "test-run": {
-        category = "test-run";
-        folder = path.join(__dirname, "..");
-        break;
-      }
+    switch (runtime) {
       case "chromium":
       case "gecko": {
         category = "browser";
-        folder = config.browserExamplesPath;
+        folder = testRunSpec ? path.join(__dirname, "..") : config.browserExamplesPath;
         break;
       }
       case "node": {
@@ -217,6 +212,9 @@ async function saveExamples(
     examplesToRun = examplesToRun.filter(example => example.buildId.includes(buildId));
   }
 
+  // Test run examples debug other examples' recordings, so they're recorded last.
+  examplesToRun.sort((a, b) => Number(!!a.testRunSpec) - Number(!!b.testRunSpec));
+
   for (const example of examplesToRun) {
     const examplePath = path.join(example.folder, example.testRunSpec ?? example.filename);
     if (existsSync(examplePath)) {
@@ -228,7 +226,9 @@ async function saveExamples(
 }
 
 async function saveBrowserExamples() {
-  await saveExamples("browser", saveBrowserExample);
+  await saveExamples("browser", args =>
+    args.example.testRunSpec ? saveTestRunExample(args) : saveBrowserExample(args)
+  );
 }
 
 async function saveBrowserExample({ example }: TestRunCallbackArgs) {
@@ -296,10 +296,6 @@ async function saveNodeExamples() {
       throw `Unable to save recording for ${chalk.bold(example.filename)}`;
     }
   });
-}
-
-async function saveTestRunExamples() {
-  await saveExamples("test-run", saveTestRunExample);
 }
 
 // Records a Playwright run of the example's spec, which debugs other examples'
@@ -409,7 +405,6 @@ async function waitUntilMessage(
     const functionsForTarget = {
       browser: saveBrowserExamples,
       node: saveNodeExamples,
-      "test-run": saveTestRunExamples,
     };
 
     const target: Target = argv.target as Target;
@@ -418,8 +413,7 @@ async function waitUntilMessage(
       throw new Error("Only one target value is allowed");
     }
 
-    // Test runs go last, so their specs debug the examples recorded before them.
-    let targetsToRun: Target[] = ["browser", "node", "test-run"];
+    let targetsToRun: Target[] = ["browser", "node"];
     if (target !== "all") {
       targetsToRun = [target];
     }

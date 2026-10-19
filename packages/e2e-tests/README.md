@@ -155,14 +155,14 @@ A few examples are recordings of Playwright test runs, which debug other example
 - `"playwright/debugger-statements"`: the Playwright Test Suites panel tests check its test steps
 - `"logpoints-01"`: a recording of the Replay app itself, which the React and Redux panel tests inspect
 
-Their `testRunSpec` in `examples.json` names the spec in `test-run-examples/`, which the main suite doesn't run. `save-examples.ts` runs that spec in Replay Chromium against the Replay app served at `PLAYWRIGHT_TEST_BASE_URL` (`localhost:8080` by default) and saves the recording with the test metadata the Replay reporter attached to it:
+Their `testRunSpec` in `examples.json` names the spec in `test-run-examples/`, which the main suite doesn't run. They're browser examples: `save-examples.ts` records them after the other browser examples, since their specs debug those recordings. It runs the spec in Replay Chromium against the Replay app served at `PLAYWRIGHT_TEST_BASE_URL` (`localhost:8080` by default) and saves the recording with the test metadata the Replay reporter attached to it:
 
 ```sh
 yarn build && yarn start # from the root of the repo, in another terminal
-./scripts/save-examples.ts --target=test-run
+./scripts/save-examples.ts --target=browser --example=logpoints-01,playwright/debugger-statements
 ```
 
-Serve a production build, as CI tests against one: the tests that inspect the app's own sources depend on its production bundles. Re-recording these examples records the current app, so tests that pin its source lines, Redux actions or React components need updating along with them.
+Serve a production build, as CI does: the tests that inspect the app's own sources depend on its production bundles. Re-recording these examples records the current app, so tests that pin its source lines, Redux actions or React components need updating along with them.
 
 ### Test Suite Dashboard Tests
 

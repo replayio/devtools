@@ -12,7 +12,6 @@ type AllExampleProps = {
   buildId: string;
   playwrightScript?: string;
   requiresManualUpdate?: boolean;
-  testRunSpec?: string;
 };
 type Stats = {
   [buildId: string]: {
@@ -32,7 +31,6 @@ export type ExampleInfo = {
   recordingId: string;
   exampleName: string;
   requiresManualUpdate: boolean;
-  recordsTestRun: boolean;
 };
 
 export function getStats() {
@@ -60,7 +58,7 @@ export function getStats() {
   basePaths.forEach(crawl);
 
   for (let exampleName in exampleJSON) {
-    const { buildId, recording, requiresManualUpdate, testRunSpec } = exampleJSON[
+    const { buildId, recording, requiresManualUpdate } = exampleJSON[
       exampleName as keyof Examples
     ] as AllExampleProps;
 
@@ -99,7 +97,6 @@ export function getStats() {
           runtimeOS: os,
           recordingId: recording,
           requiresManualUpdate: !!requiresManualUpdate,
-          recordsTestRun: !!testRunSpec,
         };
       }
     });

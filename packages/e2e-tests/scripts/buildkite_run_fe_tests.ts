@@ -61,10 +61,7 @@ const TestFileForceList = new Set([
  */
 function checkReRecord(testFile: string, exampleFileInfo: ExampleInfo) {
   const wouldNormallyTest =
-    exampleFileInfo.runtime === "chromium" &&
-    !exampleFileInfo.requiresManualUpdate &&
-    // This pipeline only re-records the browser target.
-    !exampleFileInfo.recordsTestRun;
+    exampleFileInfo.runtime === "chromium" && !exampleFileInfo.requiresManualUpdate;
 
   const shouldBlockTest = TestFileBlockList.has(testFile);
   const shouldForceTest = TestFileForceList.has(testFile);
@@ -278,14 +275,20 @@ export default async function run_fe_tests(
       stdio: "inherit",
     });
 
+    // Serve a production build: the test run examples record the Replay app
+    // itself, and the tests built on them depend on its production bundles.
+    execSync("npx next build", {
+      stdio: "inherit",
+    });
+
     // Start the webserver on port 3000 to avoid conflicting with the
     // buildkite agent health check endpoint which runs on port 8080.
-    webProc = exec("npx next dev -p 3000", (error, stdout, stderr) => {
+    webProc = exec("npx next start -p 3000", (error, stdout, stderr) => {
       if (error) {
-        console.error(`yarn dev exec ERROR: ${error}`);
+        console.error(`next start exec ERROR: ${error}`);
       }
-      console.error(`yarn dev stdout: ${stdout}`);
-      console.error(`yarn dev stderr: ${stderr}`);
+      console.error(`next start stdout: ${stdout}`);
+      console.error(`next start stderr: ${stderr}`);
     });
 
     // Debug: Allow verifying the replay-cli version.
@@ -294,10 +297,10 @@ export default async function run_fe_tests(
       stdio: "inherit",
     });
 
-    // make sure the dev server is up and running.
-    console.log("waiting for dev server to start up");
+    // make sure the web server is up and running.
+    console.log("waiting for web server to start up");
     await testHttpConnection("http://localhost:3000/");
-    console.log("dev server up, continuing with test");
+    console.log("web server up, continuing with test");
   }
 
   try {
@@ -324,7 +327,7 @@ export default async function run_fe_tests(
             stdio: "inherit",
             env: {
               ...process.env,
-              // Run the tests against the local dev server.
+              // Run the tests against the local web server.
               PLAYWRIGHT_TEST_BASE_URL: "http://localhost:3000",
             },
           }),
