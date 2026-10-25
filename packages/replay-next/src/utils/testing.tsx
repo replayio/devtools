@@ -215,6 +215,7 @@ export function createMockReplayClient() {
   mockClient.findMouseEvents.mockImplementation(async () => []);
   mockClient.findNavigationEvents.mockImplementation(async () => []);
   mockClient.findSources.mockImplementation(async () => []);
+  mockClient.isProcessorBacked.mockImplementation(async () => false);
   mockClient.removeEventListener.mockImplementation(() => {});
   mockClient.getCurrentFocusWindow.mockImplementation(() => null);
   mockClient.waitForSession.mockImplementation(() => Promise.resolve(""));

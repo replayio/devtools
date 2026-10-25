@@ -141,7 +141,7 @@ export async function createSession(
   focusWindow: FocusWindow | undefined,
   sessionCallbacks: SessionCallbacks
 ) {
-  const { sessionId } = await sendMessage("Recording.createSession", {
+  const { sessionId, processorBacked } = await sendMessage("Recording.createSession", {
     recordingId,
     experimentalSettings,
     focusRequest: focusWindow,
@@ -149,7 +149,7 @@ export async function createSession(
 
   setSessionCallbacks(sessionCallbacks);
 
-  return sessionId;
+  return { sessionId, processorBacked: processorBacked === true };
 }
 
 export function initSocket(address: string): WebSocket | null {

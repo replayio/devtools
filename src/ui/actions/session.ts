@@ -274,7 +274,7 @@ export function createSocket(recordingId: string): UIThunkAction {
         })
       );
 
-      const sessionId = await createSession(
+      const { sessionId, processorBacked } = await createSession(
         recordingId,
         experimentalSettings,
         focusWindowFromURL !== null ? focusWindowFromURL : undefined,
@@ -358,7 +358,8 @@ export function createSocket(recordingId: string): UIThunkAction {
       });
 
       window.sessionId = sessionId;
-      await replayClient.configure(sessionId);
+      dispatch(actions.setProcessorBacked(processorBacked));
+      await replayClient.configure(sessionId, processorBacked);
       const recordingTarget = await recordingTargetCache.readAsync(replayClient);
       dispatch(actions.setRecordingTarget(recordingTarget));
 

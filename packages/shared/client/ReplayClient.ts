@@ -72,6 +72,10 @@ import {
   searchSourceContentsMatches,
   sourceContentsChunk,
   sourceContentsInfo,
+  Interaction,
+  ReduxAction,
+  getComponentTreeResult,
+  getLibraryStatusResult,
 } from "@replayio/protocol";
 import throttle from "lodash/throttle";
 import uniqueId from "lodash/uniqueId";
@@ -108,6 +112,7 @@ export class ReplayClient implements ReplayClientInterface {
   private _loadedRegions: LoadedRegions | null = null;
   private _recordingId: RecordingId | null = null;
   private _sessionId: SessionId | null = null;
+  private _processorBacked = false;
 
   private sessionWaiter = defer<SessionId>();
 
@@ -131,7 +136,8 @@ export class ReplayClient implements ReplayClientInterface {
   // Configures the client to use an already initialized session iD.
   // This method should be used for apps that use the protocol package directly.
   // Apps that only communicate with the Replay protocol through this client should use the initialize method instead.
-  async configure(sessionId: string): Promise<void> {
+  async configure(sessionId: string, processorBacked = false): Promise<void> {
+    this._processorBacked = processorBacked;
     this._sessionId = sessionId;
     this._dispatchEvent("sessionCreated");
     this.sessionWaiter.resolve(sessionId);
@@ -227,8 +233,9 @@ export class ReplayClient implements ReplayClientInterface {
       await client.Authentication.setAccessToken({ accessToken });
     }
 
-    const { sessionId } = await client.Recording.createSession({ recordingId });
+    const { sessionId, processorBacked } = await client.Recording.createSession({ recordingId });
 
+    this._processorBacked = processorBacked === true;
     this._sessionId = sessionId;
     this._dispatchEvent("sessionCreated");
     this.sessionWaiter.resolve(sessionId);
@@ -608,6 +615,33 @@ export class ReplayClient implements ReplayClientInterface {
     const sessionId = await this.waitForSession();
     const { kinds } = await client.Session.getAnnotationKinds({}, sessionId);
     return kinds;
+  }
+
+  async isProcessorBacked(): Promise<boolean> {
+    await this.waitForSession();
+    return this._processorBacked;
+  }
+
+  async getLibraryStatus(): Promise<getLibraryStatusResult> {
+    const sessionId = await this.waitForSession();
+    return client.Session.getLibraryStatus({}, sessionId);
+  }
+
+  async getInteractionHandlers(): Promise<Interaction[]> {
+    const sessionId = await this.waitForSession();
+    const { interactions } = await client.Session.getInteractionHandlers({}, sessionId);
+    return interactions;
+  }
+
+  async getReactComponentTree(point: ExecutionPoint): Promise<getComponentTreeResult> {
+    const sessionId = await this.waitForSession();
+    return client.React.getComponentTree({ point }, sessionId);
+  }
+
+  async getReduxActions(): Promise<ReduxAction[]> {
+    const sessionId = await this.waitForSession();
+    const { actions } = await client.Redux.getActions({}, sessionId);
+    return actions;
   }
 
   async getAllBoundingClientRects(pauseId: string): Promise<getAllBoundingClientRectsResult> {

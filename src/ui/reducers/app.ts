@@ -33,6 +33,7 @@ export const initialAppState: AppState = {
   mode: "devtools",
   processing: null,
   processingProgress: null,
+  processorBacked: false,
   recordingId: null,
   recordingTarget: null,
   recordingWorkspace: null,
@@ -121,6 +122,9 @@ const appSlice = createSlice({
     setProcessingProgress(state, action: PayloadAction<number>) {
       state.processingProgress = action.payload;
     },
+    setProcessorBacked(state, action: PayloadAction<boolean>) {
+      state.processorBacked = action.payload;
+    },
   },
 });
 
@@ -144,6 +148,7 @@ export const {
   setSelectedCommentId,
   setProcessing,
   setProcessingProgress,
+  setProcessorBacked,
 } = appSlice.actions;
 
 export default appSlice.reducer;
@@ -175,3 +180,4 @@ export const getRecordingTarget = (state: UIState) => state.app.recordingTarget;
 export const getRecordingWorkspace = (state: UIState) => state.app.recordingWorkspace;
 export const getProcessing = (state: UIState) => state.app.processing;
 export const getProcessingProgress = (state: UIState) => state.app.processingProgress;
+export const getProcessorBacked = (state: UIState) => state.app.processorBacked;
