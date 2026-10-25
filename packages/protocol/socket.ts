@@ -113,6 +113,7 @@ export type ExperimentalSettings = {
   listenForMetrics: boolean;
   profileWorkerThreads?: boolean;
   rerunRoutines?: boolean;
+  useProcessorController?: boolean;
 };
 
 type SessionCallbacks = {

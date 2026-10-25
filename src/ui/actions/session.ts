@@ -212,6 +212,10 @@ export function createSocket(recordingId: string): UIThunkAction {
         experimentalSettings.controllerKey = String(Date.now());
       }
 
+      if (new URL(window.location.href).searchParams.has("processor")) {
+        experimentalSettings.useProcessorController = true;
+      }
+
       if (!recording.isProcessed) {
         dispatch(actions.setProcessing(true));
 
