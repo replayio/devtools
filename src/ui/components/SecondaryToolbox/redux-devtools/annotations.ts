@@ -1,4 +1,6 @@
-import { Annotation, TimeStampedPoint } from "@replayio/protocol";
+import { Annotation, ReduxAction, TimeStampedPoint } from "@replayio/protocol";
+
+import { compareNumericStrings } from "protocol/utils";
 
 interface ReduxActionFields {
   actionType: string;
@@ -23,4 +25,16 @@ export const processReduxAnnotations = (annotations: Annotation[]): ReduxActionA
     const fields = JSON.parse(contents) as ReduxAnnotationContents;
     return { kind, time, point, ...fields };
   });
+};
+
+export const processReduxActions = (actions: ReduxAction[]): ReduxActionAnnotation[] => {
+  return actions
+    .map(({ point, time, actionType, shouldIgnoreAction = false, connectionType, instanceId }) => ({
+      kind: "redux-devtools-data",
+      point,
+      time,
+      event: "action",
+      payload: { actionType, shouldIgnoreAction, connectionType, instanceId },
+    }))
+    .sort((a1, a2) => compareNumericStrings(a1.point, a2.point));
 };

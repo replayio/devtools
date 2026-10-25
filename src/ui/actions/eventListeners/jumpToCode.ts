@@ -29,7 +29,7 @@ import {
 } from "ui/actions/eventListeners/eventListenerUtils";
 import { SourcesState, getPreferredLocation, getSourceDetailsEntities } from "ui/reducers/sources";
 import { UIState } from "ui/state";
-import { ParsedJumpToCodeAnnotation } from "ui/suspense/annotationsCaches";
+import { ParsedJumpToCodeAnnotation, listenerPointCache } from "ui/suspense/annotationsCaches";
 
 import { createReactEventMapper } from "./evaluationMappers";
 
@@ -302,15 +302,16 @@ export function jumpToKnownEventListenerHit(
   onSeek: (point: ExecutionPoint, time: number, location: Location) => void,
   jumpToCodeDetails: ParsedJumpToCodeAnnotation
 ): UIThunkAction<Promise<void>> {
-  return async (dispatch, getState) => {
+  return async (dispatch, getState, { replayClient }) => {
     const cx = getThreadContext(getState());
 
-    const { eventListener, listenerPoint } = jumpToCodeDetails;
+    const { eventListener } = jumpToCodeDetails;
     const { location, firstBreakablePosition } = eventListener;
 
     // Open the source file and jump to the found position.
     // This is either the function definition itself, or the first position _inside_ the function.
     dispatch(selectLocation(cx, firstBreakablePosition));
+    const listenerPoint = await listenerPointCache.readAsync(replayClient, jumpToCodeDetails);
     onSeek(listenerPoint.point, listenerPoint.time, location);
   };
 }
