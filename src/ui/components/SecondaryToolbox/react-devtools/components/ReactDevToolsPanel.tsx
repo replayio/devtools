@@ -88,8 +88,8 @@ interface ResolvedComponentTree {
   pauseId: PauseId;
 }
 
-// Keeps showing the last loaded tree while the tree for a new point loads,
-// rather than suspending and replacing the panel with a loader on every pause.
+// Keeps the panel (and its React DevTools store) mounted while the tree for a new point loads,
+// rather than suspending and recreating it on every pause.
 function ComponentTreeReactDevToolsPanel({
   executionPoint,
   pauseId,
@@ -108,7 +108,9 @@ function ComponentTreeReactDevToolsPanel({
   const [resolved, setResolved] = useState<ResolvedComponentTree | null>(null);
   if (
     status === STATUS_RESOLVED &&
-    (resolved?.annotations !== value || resolved.executionPoint !== executionPoint)
+    (resolved?.annotations !== value ||
+      resolved.executionPoint !== executionPoint ||
+      resolved.pauseId !== pauseId)
   ) {
     setResolved({ annotations: value, executionPoint, pauseId });
   }
@@ -128,6 +130,7 @@ function ComponentTreeReactDevToolsPanel({
     <ReactDevToolsPanelInner
       annotations={resolved.annotations}
       executionPoint={resolved.executionPoint}
+      isLoading={resolved.executionPoint !== executionPoint || resolved.pauseId !== pauseId}
       pauseId={resolved.pauseId}
     />
   );
@@ -136,10 +139,12 @@ function ComponentTreeReactDevToolsPanel({
 function ReactDevToolsPanelInner({
   annotations,
   executionPoint,
+  isLoading = false,
   pauseId,
 }: {
   annotations: ReactOperationsAnnotation[];
   executionPoint: ExecutionPoint | null;
+  isLoading?: boolean;
   pauseId: PauseId | null;
 }) {
   const [collapsedLeft, setCollapsedLeft] = useState(false);
@@ -208,6 +213,8 @@ function ReactDevToolsPanelInner({
         This panel is disabled during playback.
       </div>
     );
+  } else if (isLoading) {
+    return <PanelLoader />;
   } else if (!hasReactMounted) {
     return (
       <div className={styles.NotMountedYetMessage} data-test-id="ReactDevToolsPanel">
