@@ -76,7 +76,7 @@
     "buildId": "linux-chromium-20261021-8febdce13963-9c1a8933f184"
   },
   "doc_long_busy.html": {
-    "recording": "063712ef-1c14-44e7-a8f7-b5aba1c0eb19",
+    "recording": "64e21541-6010-4efe-b459-98b5b62814b0",
     "buildId": "linux-chromium-20261021-8febdce13963-9c1a8933f184",
     "playwrightScript": "examples/long-busy/example-script",
     "recordingTimeout": 180000
