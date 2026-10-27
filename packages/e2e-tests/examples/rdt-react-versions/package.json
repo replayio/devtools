@@ -5,10 +5,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "build:15": "cd react-15-app && yarn build",
     "build:16": "cd react-16-app && yarn build",
     "build:17": "cd react-17-app && yarn build",
-    "build:all": "yarn build:15 && yarn build:16 && yarn build:17 && yarn updateExamplesDev && yarn build",
+    "build:all": "yarn build:16 && yarn build:17 && yarn updateExamplesDev && yarn build",
     "updateExamplesDev": "node ./updateExample.js dev",
     "updateExample": "node ./updateExample.js"
   },
@@ -27,7 +26,6 @@
     "vite": "^4.4.5"
   },
   "workspaces": [
-    "react-15-app",
     "react-16-app",
     "react-17-app"
   ]
