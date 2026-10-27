@@ -12,15 +12,11 @@ export async function clearFocusRange(page: Page): Promise<void> {
   await saveFocusRange(page);
 }
 
+// The input ignores edits that aren't valid time strings (including an empty value),
+// so reset it to "0" rather than deleting characters until it is empty.
 async function clearTimeInput(page: Page, input: Locator): Promise<void> {
-  while (true) {
-    const value = await input.inputValue();
-    if (value !== "0") {
-      await page.keyboard.press("Backspace");
-    } else {
-      return;
-    }
-  }
+  await input.fill("0");
+  await expect(input).toHaveValue("0");
 }
 
 export async function enterFocusMode(page: Page): Promise<void> {

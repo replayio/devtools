@@ -7,7 +7,7 @@ const remapping = require("@ampproject/remapping");
 
 const copyToLocalDev = process.argv.includes("dev");
 
-const reactSubVersions = ["15", "16", "17"];
+const reactSubVersions = ["16", "17", "19"];
 
 const currentFolder = __dirname;
 const repoRoot = path.join(currentFolder, "../../../../");

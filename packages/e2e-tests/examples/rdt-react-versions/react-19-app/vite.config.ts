@@ -7,8 +7,8 @@ export default defineConfig({
   plugins: [
     react(),
     federation({
-      name: "react15",
-      filename: "react15.js",
+      name: "react19",
+      filename: "react19.js",
 
       exposes: {
         "./appInjector": "./src/appInjector",
