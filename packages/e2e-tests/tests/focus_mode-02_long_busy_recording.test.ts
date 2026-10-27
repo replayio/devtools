@@ -34,7 +34,7 @@ const NUM_CLICKS = 24;
 const HELD_CLICK_NUMBER = 13;
 // The script lives in its own JS file because jump-to-code ignores handlers in inline HTML scripts
 const SOURCE_URL = "long_busy.js";
-const CLICK_HANDLER_LINE = 38;
+const CLICK_HANDLER_LINE = 42;
 
 // Loading a multi-minute focus window can be slow; give it more time than the defaults
 const LOAD_TIMEOUT = 60_000;
