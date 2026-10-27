@@ -1,6 +1,7 @@
 import { ExecutionPoint } from "@replayio/protocol";
 
 import { findMostRecentPaintIndex, mergedPaintsAndRepaints } from "protocol/PaintsCache";
+import { paintHashCache } from "replay-next/src/suspense/PaintHashCache";
 import { screenshotCache } from "replay-next/src/suspense/ScreenshotCache";
 import { ReplayClientInterface } from "shared/client/types";
 import { seek, stopPlayback } from "ui/actions/timeline";
@@ -26,7 +27,9 @@ function prefetchScreenshots(replayClient: ReplayClientInterface, time: number, 
     const { paintHash, point, time: paintTime } = mergedPaintsAndRepaints[index];
     if (paintTime > lookaheadEndTime) {
       break;
-    } else if (!paintHash) {
+    } else if (!paintHash || paintHashCache.getValueIfCached(paintHash)) {
+      // Skip screenshots that are already cached, the same as updateGraphics does;
+      // fetching a cached repaint by its hash can fail with "no cached paint"
       continue;
     }
 
