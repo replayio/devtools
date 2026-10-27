@@ -44,8 +44,11 @@ jobs:
     steps:
       - id: uuid
         run: echo "result=$(cat /proc/sys/kernel/random/uuid)" >> "$GITHUB_OUTPUT"
+      - id: processor-uuid
+        run: echo "result=$(cat /proc/sys/kernel/random/uuid)" >> "$GITHUB_OUTPUT"
     outputs:
       testRunId: ${{ steps.uuid.outputs.result }}
+      processorTestRunId: ${{ steps.processor-uuid.outputs.result }}
   e2etest:
     name: End-to-end tests (${{ matrix.shard }})
     runs-on: ubuntu-22.04
@@ -104,6 +107,72 @@ jobs:
         if: always()
         with:
           name: all-code-coverage-reports_${{ matrix.shard }}
+          path: packages/e2e-tests/test-results
+          retention-days: 3
+      - uses: replayio/action-upload@715f00955415fcc6873ce268396489a2ad07dca2 # v0.5.1
+        if: always()
+        with:
+          api-key: ${{ env.RECORD_REPLAY_API_KEY }}
+          public: true
+  e2etest-processor:
+    name: End-to-end tests, processor sessions (${{ matrix.shard }})
+    runs-on: ubuntu-22.04
+    needs: [preview-branch, generate-test-run-id]
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Setup node
+        id: setup-node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "{dir}={$(yarn config get cacheFolder)}" >> $GITHUB_OUTPUT
+      - name: Restore yarn cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        id: yarn-cache
+        with:
+          path: |
+            ${{ steps.yarn-cache-dir-path.outputs.dir }}
+            **/node_modules
+          key: yarn-cache-folder-${{ steps.setup-node.outputs.node-version }}-${{ hashFiles('**/yarn.lock', '.yarnrc.yml') }}
+          restore-keys: "yarn-cache-folder-${{ steps.setup-node.outputs.node-version }}-"
+      - name: Install packages
+        run: yarn install
+        env:
+          YARN_CHECKSUM_BEHAVIOR: "update"
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+      - name: Install Replay Chromium
+        run: npx replayio install
+        env:
+          RECORD_REPLAY_CHROMIUM_DOWNLOAD_FILE: ${{ github.event.inputs.linuxBuildFile }}
+      # Fewer workers than the controller job: each processor session starts cold, and too many
+      # at once slow down session startup and screenshot loading.
+      - name: Run Playwright
+        run: npx playwright test --shard ${{ matrix.shard }}/10 tests/*.ts --project replay-chromium --workers 2
+        working-directory: ./packages/e2e-tests
+        env:
+          E2E_PROCESSOR_SESSIONS: 1
+          RECORD_REPLAY_METADATA_TEST_RUN_TITLE: E2E Tests (processor sessions)
+          RECORD_REPLAY_TEST_RUN_ID: ${{ needs.generate-test-run-id.outputs.processorTestRunId }}
+          PLAYWRIGHT_TEST_BASE_URL: ${{ needs.preview-branch.outputs.url }}
+          INPUT_STRIPE: ${{ matrix.shard }}/10
+          SHARD_NUMBER: ${{ matrix.shard }}
+          RECORD_REPLAY_WEBHOOK_URL: ${{ secrets.RECORD_REPLAY_WEBHOOK_URL }}
+          RECORD_REPLAY_TEST_METRICS: 1
+          AUTOMATED_TEST_SECRET: ${{ secrets.AUTOMATED_TEST_SECRET }}
+          AUTHENTICATED_TESTS_WORKSPACE_API_KEY: ${{ secrets.AUTHENTICATED_TESTS_WORKSPACE_API_KEY }}
+          GOLDEN_TEST_RUN_WORKSPACE_API_KEY: ${{ secrets.GOLDEN_TEST_RUN_WORKSPACE_API_KEY }}
+      - name: Archive Playwright report results with code coverage
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: all-code-coverage-reports_processor_${{ matrix.shard }}
           path: packages/e2e-tests/test-results
           retention-days: 3
       - uses: replayio/action-upload@715f00955415fcc6873ce268396489a2ad07dca2 # v0.5.1
