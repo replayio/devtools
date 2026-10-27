@@ -65,6 +65,8 @@ export const annotationKindsCache: Cache<
   },
 });
 
+// The backend only answers with final statuses (ready, failed, notApplicable), so this
+// is read once per session and never refreshed.
 export const libraryStatusCache = createSingleEntryCache<
   [client: ReplayClientInterface],
   getLibraryStatusResult | null
