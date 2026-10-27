@@ -76,6 +76,7 @@ export interface AppState {
   mode: AppMode;
   processing: boolean | null;
   processingProgress: number | null;
+  processorBacked: boolean;
   recordingId: string | null;
   recordingTarget: RecordingTarget | null;
   recordingWorkspace: Workspace | null;

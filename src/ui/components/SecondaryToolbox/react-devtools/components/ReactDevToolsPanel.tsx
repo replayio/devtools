@@ -17,6 +17,7 @@ import {
   PanelResizeHandle,
 } from "react-resizable-panels";
 import AutoSizer from "react-virtualized-auto-sizer";
+import { STATUS_REJECTED, STATUS_RESOLVED, useImperativeCacheValue } from "suspense";
 
 import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBoundary";
 import { PanelLoader } from "replay-next/components/PanelLoader";
@@ -31,11 +32,12 @@ import { SelectedElementLoader } from "ui/components/SecondaryToolbox/react-devt
 import { useReactDevToolsAnnotations } from "ui/components/SecondaryToolbox/react-devtools/hooks/useReactDevToolsAnnotations";
 import { useReplayWall } from "ui/components/SecondaryToolbox/react-devtools/hooks/useReplayWall";
 import { ReactDevToolsListData } from "ui/components/SecondaryToolbox/react-devtools/ReactDevToolsListData";
-import { getDefaultSelectedReactElementId } from "ui/reducers/app";
+import { getDefaultSelectedReactElementId, getProcessorBacked } from "ui/reducers/app";
 import { isPlaying as isPlayingSelector } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
 import {
-  ParsedReactDevToolsAnnotation,
+  ReactOperationsAnnotation,
+  reactComponentTreeCache,
   reactDevToolsAnnotationsCache,
 } from "ui/suspense/annotationsCaches";
 
@@ -49,11 +51,25 @@ export function ReactDevToolsPanel({
   executionPoint: ExecutionPoint | null;
   pauseId: PauseId | null;
 }) {
-  const replayClient = useContext(ReplayClientContext);
+  const processorBacked = useAppSelector(getProcessorBacked);
 
   if (executionPoint == null || pauseId == null) {
     return <PanelLoader />;
+  } else if (processorBacked) {
+    return <ComponentTreeReactDevToolsPanel executionPoint={executionPoint} pauseId={pauseId} />;
+  } else {
+    return <AnnotationsReactDevToolsPanel executionPoint={executionPoint} pauseId={pauseId} />;
   }
+}
+
+function AnnotationsReactDevToolsPanel({
+  executionPoint,
+  pauseId,
+}: {
+  executionPoint: ExecutionPoint;
+  pauseId: PauseId;
+}) {
+  const replayClient = useContext(ReplayClientContext);
 
   const annotations = reactDevToolsAnnotationsCache.read(replayClient);
 
@@ -66,13 +82,69 @@ export function ReactDevToolsPanel({
   );
 }
 
-function ReactDevToolsPanelInner({
-  annotations,
+interface ResolvedComponentTree {
+  annotations: ReactOperationsAnnotation[];
+  executionPoint: ExecutionPoint;
+  pauseId: PauseId;
+}
+
+// Keeps the panel (and its React DevTools store) mounted while the tree for a new point loads,
+// rather than suspending and recreating it on every pause.
+function ComponentTreeReactDevToolsPanel({
   executionPoint,
   pauseId,
 }: {
-  annotations: ParsedReactDevToolsAnnotation[];
+  executionPoint: ExecutionPoint;
+  pauseId: PauseId;
+}) {
+  const replayClient = useContext(ReplayClientContext);
+
+  const { status, value } = useImperativeCacheValue(
+    reactComponentTreeCache,
+    replayClient,
+    executionPoint
+  );
+
+  const [resolved, setResolved] = useState<ResolvedComponentTree | null>(null);
+  if (
+    status === STATUS_RESOLVED &&
+    (resolved?.annotations !== value ||
+      resolved.executionPoint !== executionPoint ||
+      resolved.pauseId !== pauseId)
+  ) {
+    setResolved({ annotations: value, executionPoint, pauseId });
+  }
+
+  if (status === STATUS_REJECTED) {
+    return (
+      <div className={styles.ProtocolFailedMessage} data-test-id="ReactDevToolsPanel">
+        <div>The React component tree could not be loaded.</div>
+        <div>Try picking a different point on the timeline or reloading the page.</div>
+      </div>
+    );
+  } else if (resolved == null) {
+    return <PanelLoader />;
+  }
+
+  return (
+    <ReactDevToolsPanelInner
+      annotations={resolved.annotations}
+      executionPoint={resolved.executionPoint}
+      isLoading={resolved.executionPoint !== executionPoint || resolved.pauseId !== pauseId}
+      pauseId={resolved.pauseId}
+    />
+  );
+}
+
+function ReactDevToolsPanelInner({
+  annotations,
+  executionPoint,
+  isLoading = false,
+  pauseId,
+}: {
+  annotations: ReactOperationsAnnotation[];
   executionPoint: ExecutionPoint | null;
+  isLoading?: boolean;
   pauseId: PauseId | null;
 }) {
   const [collapsedLeft, setCollapsedLeft] = useState(false);
@@ -141,6 +213,8 @@ function ReactDevToolsPanelInner({
         This panel is disabled during playback.
       </div>
     );
+  } else if (isLoading) {
+    return <PanelLoader />;
   } else if (!hasReactMounted) {
     return (
       <div className={styles.NotMountedYetMessage} data-test-id="ReactDevToolsPanel">

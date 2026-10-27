@@ -2,13 +2,9 @@ import classNames from "classnames";
 import clamp from "lodash/clamp";
 import React, { useEffect, useRef } from "react";
 
-import {
-  MAX_FOCUS_REGION_DURATION,
-  MIN_FOCUS_REGION_DURATION,
-  setDisplayedFocusWindow,
-} from "ui/actions/timeline";
+import { MIN_FOCUS_REGION_DURATION, setDisplayedFocusWindow } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
-import { setTimelineState } from "ui/reducers/timeline";
+import { getMaxFocusRegionDuration, setTimelineState } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { getPositionFromTime, getTimeFromPosition } from "ui/utils/timeline";
 
@@ -39,6 +35,7 @@ function Focuser({ editMode, setEditMode }: Props) {
   const dispatch = useAppDispatch();
   const focusWindow = useAppSelector(selectors.getFocusWindow)!;
   const zoomRegion = useAppSelector(selectors.getZoomRegion);
+  const maxFocusRegionDuration = useAppSelector(getMaxFocusRegionDuration);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const draggableAreaRef = useRef<HTMLDivElement>(null);
@@ -111,7 +108,7 @@ function Focuser({ editMode, setEditMode }: Props) {
             // If we're resizing the window, make sure we honor the min and max focus window size
             begin = clamp(
               begin,
-              mouseTime - MAX_FOCUS_REGION_DURATION,
+              mouseTime - maxFocusRegionDuration,
               mouseTime - MIN_FOCUS_REGION_DURATION
             );
 
@@ -123,7 +120,7 @@ function Focuser({ editMode, setEditMode }: Props) {
             end = clamp(
               end,
               mouseTime + MIN_FOCUS_REGION_DURATION,
-              mouseTime + MAX_FOCUS_REGION_DURATION
+              mouseTime + maxFocusRegionDuration
             );
 
             dispatch(setDisplayedFocusWindow({ begin: mouseTime, end }));

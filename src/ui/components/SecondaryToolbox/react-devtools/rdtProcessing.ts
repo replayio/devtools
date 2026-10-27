@@ -2,7 +2,7 @@
 
 // React DevTools routine result processing logic
 
-import { ExecutionPoint } from "@replayio/protocol";
+import { ComponentTreeRoot, ExecutionPoint } from "@replayio/protocol";
 
 import {
   ElementTypeRoot,
@@ -609,6 +609,66 @@ export function reconstructOperationsArray({
   ];
 
   return operations;
+}
+
+// Processor sessions return the committed tree at a point instead of the operations
+// that built it. Build one operations array per root that adds the whole tree to an
+// empty Store. Elements arrive in pre-order, so each parent is added before its children.
+export function generateComponentTreeOperations(
+  roots: ComponentTreeRoot[],
+  rendererId: number
+): number[][] {
+  return roots.map(({ rootId, elements }) => {
+    const stringTable: string[] = [];
+    const stringIds = new Map<string, number>();
+    const getStringId = (value: string | undefined) => {
+      if (value === undefined) {
+        return 0;
+      }
+      let id = stringIds.get(value);
+      if (id === undefined) {
+        stringTable.push(value);
+        id = stringTable.length;
+        stringIds.set(value, id);
+      }
+      return id;
+    };
+
+    const treeOperations: ParsedReactDevtoolsTreeOperations[] = [
+      {
+        type: TREE_OPERATION_ADD,
+        name: "addRoot",
+        nodeId: rootId,
+        nodeType: ElementTypeRoot,
+        contents: {
+          nodeType: "root",
+          isStrictModeCompliant: true,
+          profilingFlags: 0,
+          supportsStrictMode: false,
+          hasOwnerMetadata: false,
+        },
+      },
+    ];
+
+    for (const { id, parentId, type, displayName, key } of elements) {
+      treeOperations.push({
+        type: TREE_OPERATION_ADD,
+        name: "addNode",
+        nodeId: id,
+        nodeType: type,
+        contents: {
+          nodeType: "node",
+          parentId,
+          ownerId: 0,
+          stringTableIndex: getStringId(displayName),
+          keyStringTableIndex: getStringId(key),
+          namePropStringTableIndex: 0,
+        },
+      });
+    }
+
+    return reconstructOperationsArray({ rendererId, rootId, stringTable, treeOperations });
+  });
 }
 
 // Just enough of React DevTools' Store to read the tree it currently holds.
