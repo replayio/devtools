@@ -75,6 +75,12 @@
     "recording": "c6eb2e57-fa06-4260-a85d-4a1e3d9d6b12",
     "buildId": "linux-chromium-20261021-8febdce13963-9c1a8933f184"
   },
+  "doc_long_busy.html": {
+    "recording": "063712ef-1c14-44e7-a8f7-b5aba1c0eb19",
+    "buildId": "linux-chromium-20261021-8febdce13963-9c1a8933f184",
+    "playwrightScript": "examples/long-busy/example-script",
+    "recordingTimeout": 180000
+  },
   "doc_minified.html": {
     "recording": "cec32235-f540-4b95-87ba-1c0249d1bca5",
     "buildId": "linux-chromium-20261021-8febdce13963-9c1a8933f184"

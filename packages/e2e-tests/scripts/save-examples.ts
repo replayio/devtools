@@ -72,6 +72,7 @@ type TestExampleFile = {
   folder: string;
   runtime: "chromium" | "node";
   playwrightScript?: PlaywrightScript;
+  recordingTimeout?: number;
 };
 const examplesJsonPath = path.join(__dirname, "..", "examples.json");
 
@@ -132,6 +133,7 @@ async function saveExamples(
     const {
       buildId,
       playwrightScript,
+      recordingTimeout,
       requiresManualUpdate = false,
     } = examplesJson[key] as TestRecordingIntersectionValue;
 
@@ -180,6 +182,7 @@ async function saveExamples(
         folder,
         runtime: runtime as TestExampleFile["runtime"],
         playwrightScript: resolvedPlaywrightScript,
+        recordingTimeout,
       });
     }
   }
@@ -231,7 +234,7 @@ async function saveBrowserExample({ example }: TestRunCallbackArgs) {
   }
   const playwrightScript: PlaywrightScript = example.playwrightScript ?? defaultPlaywrightScript;
   await raceForTime(
-    CONFIG.recordingTimeout,
+    example.recordingTimeout ?? CONFIG.recordingTimeout,
     recordPlaywright(async (page, expect) => {
       const waitForLogPromise = playwrightScript(page, expect);
       const goToPagePromise = page.goto(exampleUrl);
