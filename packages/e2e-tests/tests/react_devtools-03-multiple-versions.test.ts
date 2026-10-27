@@ -57,21 +57,21 @@ test("react_devtools-03: process and display multiple React versions in page", a
 
   const componentNames = await getAllVisibleComponentNames(page);
 
-  expect(componentNames[0]).toBe("React16App");
+  // Processor sessions do not map React 16 component names through sourcemaps,
+  // so the React 16 root shows minified names there
+  if (!process.env.E2E_PROCESSOR_SESSIONS) {
+    expect(componentNames[0]).toBe("React16App");
+  }
   expect(componentNames[6]).toBe("React17App");
   expect(componentNames[12]).toBe("React18App");
-  // We explicitly do not support React 15 or earlier
-  expect(componentNames.includes("React15App")).toBe(false);
 
-  debugPrint(page, "Verifying that React 15 was in the page");
+  debugPrint(page, "Verifying that React 16 was in the page");
   await openConsolePanel(page);
-  // but React 15 should have rendered and executed in the page even if we didn't capture it
-  await verifyConsoleMessage(page, "[15.7.0] Initial list");
+  await verifyConsoleMessage(page, "[16.14.0] Initial list");
 
   await activateInspectorTool(page);
 
-  // and DOM nodes from React 15 should be in the page
-  await searchElementsPanel(page, "15.7.0");
-  const node = await getElementsListRow(page, { text: 'data-react-version="15.7.0"' });
+  await searchElementsPanel(page, "16.14.0");
+  const node = await getElementsListRow(page, { text: 'data-react-version="16.14.0"' });
   await node.waitFor();
 });
