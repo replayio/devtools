@@ -114,10 +114,44 @@ jobs:
         with:
           api-key: ${{ env.RECORD_REPLAY_API_KEY }}
           public: true
+  # Starts a processor for each example recording while the Vercel preview builds, so the
+  # processor-session tests don't each wait for a cold start. Processors stay up for 30 minutes
+  # without activity.
+  warm-processor-recordings:
+    name: Warm example recordings for processor sessions
+    runs-on: ubuntu-22.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Setup node
+        id: setup-node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "{dir}={$(yarn config get cacheFolder)}" >> $GITHUB_OUTPUT
+      - name: Restore yarn cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        id: yarn-cache
+        with:
+          path: |
+            ${{ steps.yarn-cache-dir-path.outputs.dir }}
+            **/node_modules
+          key: yarn-cache-folder-${{ steps.setup-node.outputs.node-version }}-${{ hashFiles('**/yarn.lock', '.yarnrc.yml') }}
+          restore-keys: "yarn-cache-folder-${{ steps.setup-node.outputs.node-version }}-"
+      - name: Install packages
+        run: yarn install
+        env:
+          YARN_CHECKSUM_BEHAVIOR: "update"
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+      - name: Warm recordings
+        run: yarn ts-node scripts/warm-processor-recordings.ts
+        working-directory: ./packages/e2e-tests
   e2etest-processor:
     name: End-to-end tests, processor sessions (${{ matrix.shard }})
     runs-on: ubuntu-22.04
-    needs: [preview-branch, generate-test-run-id]
+    needs: [preview-branch, generate-test-run-id, warm-processor-recordings]
     strategy:
       fail-fast: false
       matrix:
