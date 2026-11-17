@@ -215,7 +215,7 @@ export async function fetchLatestChromiumBuildOnBranch(token: string, branch: st
     `
       query getLatestBuildIdOnBranch($branch: String!) {
         pipeline(slug: "replay/chromium-build") {
-          builds(branch: [$branch], first: 1) {
+          builds(branch: [$branch], state: [PASSED], first: 1) {
             edges {
               node {
                 uuid
@@ -229,7 +229,12 @@ export async function fetchLatestChromiumBuildOnBranch(token: string, branch: st
     { branch }
   );
 
-  const build = result.pipeline.builds.edges[0].node;
+  // A failed build may have no build_id, or one it did not build.
+  const edge = result.pipeline.builds.edges[0];
+  if (!edge) {
+    throw new Error(`no passed chromium-build build on branch ${branch}`);
+  }
+  const build = edge.node;
   return {
     buildId: build.uuid,
     buildNumber: build.number,

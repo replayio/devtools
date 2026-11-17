@@ -78,7 +78,7 @@ export async function build_from_reason(os: string, arch: string) {
         buildReason.branch
       );
       describeReason(
-        `Testing against latest chromium build on branch \\\`${
+        `Testing against latest passed chromium build on branch \\\`${
           buildReason.branch
         }\\\`: [#${buildNumber}](${buildUrl("chromium-build", buildNumber)})`,
         buildReason.rebuild ?? false
