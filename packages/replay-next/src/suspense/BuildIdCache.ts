@@ -70,6 +70,10 @@ export function parseBuildIdComponents(buildId: string): BuildComponents | null 
   return null;
 }
 
+// Server-side runtimes other than node: no DOM and no paints, so they are node recordings.
+// Electron builds use the Chromium fork's build IDs, with `-node-` for run-as-node processes.
+const NodeLikeRuntimes = ["workerd", "bun", "python"];
+
 export function getRecordingTarget(buildId: string): RecordingTarget {
   if (buildId.includes("gecko")) {
     return RecordingTarget.gecko;
@@ -77,15 +81,17 @@ export function getRecordingTarget(buildId: string): RecordingTarget {
   if (buildId.includes("chromium")) {
     return RecordingTarget.chromium;
   }
-  if (buildId.includes("node")) {
+  const runtime = parseBuildIdComponents(buildId)?.runtime;
+  if (buildId.includes("node") || (runtime && NodeLikeRuntimes.includes(runtime))) {
     return RecordingTarget.node;
   }
   return RecordingTarget.unknown;
 }
 
-// Recordings from Replay's workerd (Cloudflare Workers) fork use a node build ID with an extra
-// segment, e.g. "linux-node-20261015-workerd-<workerd rev>-<driver rev>", and are treated as
-// node recordings everywhere except in user-facing labels.
+// Recordings from Replay's workerd (Cloudflare Workers) fork are treated as node recordings
+// everywhere except in user-facing labels. Their build IDs are either workerd-shaped, e.g.
+// "linux-workerd-<date>-<workerd rev>-<driver rev>", or node-shaped with an extra segment, e.g.
+// "linux-node-<date>-workerd-<workerd rev>-<driver rev>".
 export function isWorkerdBuildId(buildId: string): boolean {
   return buildId.split("-").includes("workerd");
 }
