@@ -77,15 +77,16 @@ export function getRecordingTarget(buildId: string): RecordingTarget {
   if (buildId.includes("chromium")) {
     return RecordingTarget.chromium;
   }
-  if (buildId.includes("node")) {
+  if (buildId.includes("node") || isWorkerdBuildId(buildId)) {
     return RecordingTarget.node;
   }
   return RecordingTarget.unknown;
 }
 
-// Recordings from Replay's workerd (Cloudflare Workers) fork use a node build ID with an extra
-// segment, e.g. "linux-node-20261015-workerd-<workerd rev>-<driver rev>", and are treated as
-// node recordings everywhere except in user-facing labels.
+// Recordings from Replay's workerd (Cloudflare Workers) fork are treated as node recordings
+// everywhere except in user-facing labels. Their build IDs are either workerd-shaped, e.g.
+// "linux-workerd-<date>-<workerd rev>-<driver rev>", or node-shaped with an extra segment, e.g.
+// "linux-node-<date>-workerd-<workerd rev>-<driver rev>".
 export function isWorkerdBuildId(buildId: string): boolean {
   return buildId.split("-").includes("workerd");
 }
