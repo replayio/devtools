@@ -83,19 +83,25 @@ export const getHoveredItem = (state: UIState) => state.timeline.hoveredItem;
 export const getEndpoint = (state: UIState) => state.timeline.endpoint;
 export const getPlaybackFocusWindow = (state: UIState) => state.timeline.playbackFocusWindow;
 export const getFocusWindow = (state: UIState) => state.timeline.focusWindow;
+// Processor-backed sessions have no focus window size limit.
+export const getMaxFocusRegionDuration = (state: UIState) =>
+  state.app.processorBacked ? Infinity : MAX_FOCUS_REGION_DURATION;
 export const isMaximumFocusWindow = (state: UIState) => {
   const focusWindow = getFocusWindow(state);
   if (focusWindow) {
     const duration = focusWindow.end - focusWindow.begin;
     // JavaScript floating point numbers are not precise enough,
     // so in order to avoid occasional flickers from rounding errors, fuzz it a bit.
-    return duration + 0.1 >= MAX_FOCUS_REGION_DURATION;
+    return duration + 0.1 >= getMaxFocusRegionDuration(state);
   } else {
     return false;
   }
 };
 
 export const getRecordingTooLongToSupportRoutines = (state: UIState) => {
+  if (state.app.processorBacked) {
+    return false;
+  }
   const { recordingDuration, maxRecordingDurationForRoutines } = state.timeline;
   return recordingDuration !== null && recordingDuration! > maxRecordingDurationForRoutines;
 };

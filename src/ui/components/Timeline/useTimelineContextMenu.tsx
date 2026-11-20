@@ -14,8 +14,9 @@ import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { createFrameComment } from "ui/actions/comments";
-import { MAX_FOCUS_REGION_DURATION, requestFocusWindow, seek } from "ui/actions/timeline";
-import { useAppDispatch } from "ui/setup/hooks";
+import { requestFocusWindow, seek } from "ui/actions/timeline";
+import { getMaxFocusRegionDuration } from "ui/reducers/timeline";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 import styles from "./ContextMenu.module.css";
 
@@ -26,6 +27,7 @@ export default function useTimelineContextMenu() {
   const { accessToken, duration, recordingId } = useContext(SessionContext);
 
   const dispatch = useAppDispatch();
+  const maxFocusRegionDuration = useAppSelector(getMaxFocusRegionDuration);
 
   const [relativePosition, setRelativePosition] = useState(0);
 
@@ -62,14 +64,14 @@ export default function useTimelineContextMenu() {
 
   const setFocusBegin = async () => {
     let end = focusEndTime ?? duration;
-    end = Math.min(end, currentTime + MAX_FOCUS_REGION_DURATION);
+    end = Math.min(end, currentTime + maxFocusRegionDuration);
 
     await dispatch(requestFocusWindow({ begin: { time: currentTime }, end: { time: end } }));
   };
 
   const setFocusEnd = async () => {
     let begin = focusBeginTime ?? 0;
-    begin = Math.max(begin, currentTime - MAX_FOCUS_REGION_DURATION);
+    begin = Math.max(begin, currentTime - maxFocusRegionDuration);
 
     await dispatch(requestFocusWindow({ begin: { time: begin }, end: { time: currentTime } }));
   };

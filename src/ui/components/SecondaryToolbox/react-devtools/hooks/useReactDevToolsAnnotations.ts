@@ -7,7 +7,7 @@ import { ReactDevToolsListData } from "ui/components/SecondaryToolbox/react-devt
 import { ReplayWall } from "ui/components/SecondaryToolbox/react-devtools/ReplayWall";
 import { isPlaying as isPlayingSelector } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
-import { ParsedReactDevToolsAnnotation } from "ui/suspense/annotationsCaches";
+import { ReactOperationsAnnotation } from "ui/suspense/annotationsCaches";
 
 import { cacheRendererIdsToFiberIds } from "../injectReactDevtoolsBackend";
 
@@ -18,7 +18,7 @@ export function useReactDevToolsAnnotations({
   pauseId: currentPauseId,
   wall,
 }: {
-  annotations: ParsedReactDevToolsAnnotation[];
+  annotations: ReactOperationsAnnotation[];
   executionPoint: ExecutionPoint | null;
   listData: ReactDevToolsListData | null;
   pauseId: PauseId | null;
