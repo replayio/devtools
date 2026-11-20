@@ -212,8 +212,12 @@ export function createSocket(recordingId: string): UIThunkAction {
         experimentalSettings.controllerKey = String(Date.now());
       }
 
-      if (new URL(window.location.href).searchParams.has("processor")) {
+      const searchParams = new URL(window.location.href).searchParams;
+      if (searchParams.has("processor")) {
         experimentalSettings.useProcessorController = true;
+      }
+      if (searchParams.has("e2e")) {
+        experimentalSettings.useEndToEndTestOperators = true;
       }
 
       if (!recording.isProcessed) {
