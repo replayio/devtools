@@ -7,15 +7,15 @@ export default defineConfig(({ command }) => {
   const remotes: Remotes =
     command === "serve"
       ? {
-          react15: "./public/react15/assets/react15.js",
           react16: "./public/react16/assets/react16.js",
           react17: "./public/react17/assets/react17.js",
+          react19: "./public/react19/assets/react19.js",
         }
       : {
           // Go up a level to remove a prefixed "/assets/" from the path in prod 🤷‍♂️
-          react15: "../react15/assets/react15.js",
           react16: "../react16/assets/react16.js",
           react17: "../react17/assets/react17.js",
+          react19: "../react19/assets/react19.js",
         };
 
   const base = command === "serve" ? "" : "/recording/test/examples/rdt-react-versions/dist/";

@@ -30,7 +30,7 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
 
   await openDevToolsTab(page);
 
-  await warpToMessage(page, "Waiting for breakpoint at doc_rr_basic.html:20 (waitForBreakpoint)");
+  await warpToMessage(page, "Waiting for log-point at doc_rr_basic.html:7 (waitForLogpoint)");
 
   // If the "React" tab shows up, we know that the routine ran
   await openReactDevtoolsPanel(page);
@@ -70,14 +70,17 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
     "Context.Provider",
     "Context.Provider",
     "Context.Provider",
+    "Context.Provider",
     "App",
     "SystemProvider",
     "Head",
-    "SideEffect",
+    // Older recordings resolved this one as `SideEffect`; it now keeps its minified name
+    "i",
     // Tough transpiled variable, apparently: `export var ApolloProvider = function (_a) {`
     "c",
     "ApolloContext.Consumer",
-    "ApolloContext.Provider",
+    // Processor sessions don't resolve the display name of this context provider
+    process.env.E2E_PROCESSOR_SESSIONS ? "Context.Provider" : "ApolloContext.Provider",
     "ConfirmProvider",
     "Context.Provider",
     "Routing",
@@ -122,10 +125,9 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
     // expect(lineNumber).toBe(280);
   });
 
-  // As of this recording, our `<SourceTreeItem>` is a function component that is wrapped
-  // in `React.memo()`, and for some reason we're _not_ getting a real name for it (likely
-  // due to use of `export default React.memo()`).
-  // Still, this is a reasonable example to check "Jump to Component Source" behavior.
+  // Our `<SourceTreeItem2>` is a function component wrapped in `export default React.memo()`.
+  // Controller sessions show it as "Anonymous" (the 4th one); processor sessions resolve its real name.
+  // Either way, this is a reasonable example to check "Jump to Component Source" behavior.
 
   debugPrint(page, `Checking "Jump to Component Source" for function component <SourcesTreeItem>`);
 
@@ -136,9 +138,7 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
   await getReactComponents(page).first().click();
 
   // The total depends on how many components the backend's reverse name mapping can resolve.
-  // Locations in the Lexical plugin bundles resolve to the same outlines through either the
-  // original source or its pretty-printed twin, so this count tracks the component tree itself.
-  const anonymousComponentCount = 20;
+  const anonymousComponentCount = process.env.E2E_PROCESSOR_SESSIONS ? 12 : 49;
 
   await searchComponents(page, "Anonymous"); // Search and select 1st result
   await verifySearchResults(page, {
@@ -146,14 +146,23 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
     totalNumber: anonymousComponentCount,
   });
 
-  await componentSearchInput.focus();
-  await componentSearchInput.press("Enter");
-  await componentSearchInput.press("Enter");
-  await componentSearchInput.press("Enter");
-  await verifySearchResults(page, {
-    currentNumber: 4,
-    totalNumber: anonymousComponentCount,
-  });
+  if (process.env.E2E_PROCESSOR_SESSIONS) {
+    await searchComponents(page, "SourceTreeItem2");
+    await verifySearchResults(page, {
+      currentNumber: 1,
+      name: "SourceTreeItem2",
+      totalNumber: 4,
+    });
+  } else {
+    await componentSearchInput.focus();
+    await componentSearchInput.press("Enter");
+    await componentSearchInput.press("Enter");
+    await componentSearchInput.press("Enter");
+    await verifySearchResults(page, {
+      currentNumber: 4,
+      totalNumber: anonymousComponentCount,
+    });
+  }
 
   await viewSourceButton.click();
 
@@ -169,17 +178,14 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
   // Re-select "App" just so we're back at the top
   await getReactComponents(page).first().click();
 
-  // Should render `<Suspense>` components. React DevTools leaves out the children of
-  // hidden Offscreen fibers: this recording predates React's separate Activity fiber, so a
-  // hidden `<Activity>` is a plain hidden Offscreen, and one `<Suspense>` (in a hidden
-  // panel) is inside one until the end of the recording.
-
+  // Should render `<Suspense>` components
   debugPrint(page, `Checking rendering of <Suspense> components`);
 
   await searchComponents(page, "Suspense");
   await verifySearchResults(page, {
     currentNumber: 1,
-    totalNumber: 14,
+    // Processor sessions resolve more component names, so one more matches
+    totalNumber: process.env.E2E_PROCESSOR_SESSIONS ? 41 : 40,
   });
 
   list.evaluate(el => (el.scrollTop = 0));
@@ -187,18 +193,17 @@ test("react_devtools-02: RDT integrations (Chromium)", async ({
   // Re-select "App" just so we're back at the top
   await getReactComponents(page).first().click();
 
-  // Should render our `<LazyActivity>` components, but _not_ `<Activity>`,
-  // because RDT already filters those out by default
+  // Should render our `<LazyActivity>` components and the built-in `<Activity>` they render
   debugPrint(page, `Checking rendering of <Activity> components`);
 
   await searchComponents(page, "Activity");
   await verifySearchResults(page, {
     currentNumber: 1,
-    totalNumber: 6,
+    totalNumber: 9,
   });
 
   const offscreenSearchComponentNames = await getAllVisibleComponentNames(page);
   expect(offscreenSearchComponentNames.length).toBeGreaterThan(0);
   expect(offscreenSearchComponentNames.includes("LazyActivity")).toBe(true);
-  expect(offscreenSearchComponentNames.includes("Activity")).toBe(false);
+  expect(offscreenSearchComponentNames.includes("Activity")).toBe(true);
 });

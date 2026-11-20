@@ -1,11 +1,51 @@
 import { ExecutionPoint } from "@replayio/protocol";
 
+import { findMostRecentPaintIndex, mergedPaintsAndRepaints } from "protocol/PaintsCache";
+import { paintHashCache } from "replay-next/src/suspense/PaintHashCache";
+import { screenshotCache } from "replay-next/src/suspense/ScreenshotCache";
 import { ReplayClientInterface } from "shared/client/types";
 import { seek, stopPlayback } from "ui/actions/timeline";
 import { updateGraphics } from "ui/components/Video/imperative/updateGraphics";
 import { getPlayback, setTimelineState } from "ui/reducers/timeline";
 import { AppStore } from "ui/setup/store";
 import { TimelineState } from "ui/state/timeline";
+
+const SCREENSHOT_PREFETCH_LOOKAHEAD_MS = 3_000;
+const MAX_SCREENSHOT_PREFETCHES_IN_FLIGHT = 5;
+
+// Fetching the first screenshot of a region can take seconds (the backend may have to replay
+// that region), so request upcoming screenshots before playback reaches them.
+function prefetchScreenshots(replayClient: ReplayClientInterface, time: number, endTime: number) {
+  const lookaheadEndTime = Math.min(endTime, time + SCREENSHOT_PREFETCH_LOOKAHEAD_MS);
+
+  let inFlightCount = 0;
+  for (
+    let index = Math.max(0, findMostRecentPaintIndex(time));
+    index < mergedPaintsAndRepaints.length;
+    index++
+  ) {
+    const { paintHash, point, time: paintTime } = mergedPaintsAndRepaints[index];
+    if (paintTime > lookaheadEndTime) {
+      break;
+    } else if (!paintHash || paintHashCache.getValueIfCached(paintHash)) {
+      // Skip screenshots that are already cached, the same as updateGraphics does;
+      // fetching a cached repaint by its hash can fail with "no cached paint"
+      continue;
+    }
+
+    const status = screenshotCache.getStatus(replayClient, point, paintHash);
+    if (status === "pending") {
+      inFlightCount++;
+    } else if (status === "not-found" || status === "aborted") {
+      if (inFlightCount >= MAX_SCREENSHOT_PREFETCHES_IN_FLIGHT) {
+        break;
+      }
+
+      screenshotCache.prefetch(replayClient, point, paintHash);
+      inFlightCount++;
+    }
+  }
+}
 
 export async function runVideoPlayback({
   abortSignal,
@@ -55,6 +95,8 @@ export async function runVideoPlayback({
 
       break playbackLoop;
     } else {
+      prefetchScreenshots(replayClient, nextTimelineTime, endTime);
+
       const updateGraphicsPromise = updateGraphics({
         abortSignal,
         graphicsElement,
