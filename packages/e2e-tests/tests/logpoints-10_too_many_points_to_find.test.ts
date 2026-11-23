@@ -11,9 +11,9 @@ import { verifyFocusModeVisible } from "../helpers/timeline";
 import test from "../testFixture";
 
 // We need > 10k hits
-// Line 150 has >20k hits
-const sourceUrl = "react-dom.production.js";
-const lineNumber = 150;
+// Line 369 (`cursor.current = value;` in `push`) has >30k hits
+const sourceUrl = "react-dom-client.production.js";
+const lineNumber = 369;
 
 test.use({ exampleKey: "logpoints-01" });
 

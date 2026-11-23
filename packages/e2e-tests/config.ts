@@ -11,6 +11,7 @@ export default {
   headless: process.env.RECORD_REPLAY_PLAYWRIGHT_HEADLESS != "false",
   nodeExamplesPath: join(__dirname, "../../test/examples"),
   nodePath: process.env.RECORD_REPLAY_NODE,
+  testRunExamplesConfigPath: join(__dirname, "test-run-examples/playwright.config.ts"),
   // Browser recordings go into our "FE E2E Node 'Golden' Recordings'" workspace.
   // (Despite the name, this now includes _all_ new recordings, not just Node ones.)
   // This API key allows access to the whole team that holds all these test recordings.

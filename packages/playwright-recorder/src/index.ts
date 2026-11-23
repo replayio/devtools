@@ -230,6 +230,19 @@ export function findLastRecordingId(url?: string) {
   return recordingId;
 }
 
+// The Replay reporter attaches the test's metadata to the recording of the
+// page the test ran in.
+export function findTestRecordingId() {
+  const recordings = cli.listAllRecordings().filter(rec => rec.metadata.test);
+  assert(
+    recordings.length === 1,
+    `Expected one recording of a test, found ${recordings.length}: ${recordings
+      .map(rec => rec.id)
+      .join(", ")}`
+  );
+  return recordings[0].id;
+}
+
 const RECORDING_WRITE_TIMEOUT_MS = 10_000;
 
 // Waits until the recording is written: the driver appends writeFinished to

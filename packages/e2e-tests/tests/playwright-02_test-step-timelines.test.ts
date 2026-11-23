@@ -10,7 +10,7 @@ import { getTimelineCurrentHoverPercent, getTimelineCurrentPercent } from "../he
 import { waitFor } from "../helpers/utils";
 import test, { expect } from "../testFixture";
 
-test.use({ exampleKey: "playwright/breakpoints-05" });
+test.use({ exampleKey: "playwright/debugger-statements" });
 
 test("playwright-02: Test Step timeline behavior", async ({
   pageWithMeta: { page, recordingId, testScope },

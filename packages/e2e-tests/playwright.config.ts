@@ -33,6 +33,8 @@ if (CI) {
 }
 
 const config: PlaywrightTestConfig = {
+  // Specs that test run examples record; see scripts/save-examples.ts
+  testIgnore: "test-run-examples/**",
   use: {
     launchOptions: {
       slowMo: SLOW_MO ? parseInt(SLOW_MO, 10) : 0,

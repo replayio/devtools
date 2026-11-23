@@ -9,7 +9,7 @@ import {
 import { debugPrint, waitFor } from "../helpers/utils";
 import test, { expect } from "../testFixture";
 
-test.use({ exampleKey: "playwright/breakpoints-05" });
+test.use({ exampleKey: "playwright/debugger-statements" });
 
 // Skipped: the step-details pipeline behind hover previews is too slow for this to pass
 // reliably. The batched runEvaluation over all step points takes ~45s on this recording,
@@ -32,7 +32,7 @@ test.skip("playwright-05: Test DOM node previews on user action step hover", asy
   });
 
   const breakpointsTest = rows
-    .filter({ hasText: "breakpoints-05: Test interaction of breakpoints with debugger statements" })
+    .filter({ hasText: "debugger-statements: rewind and fast-forward between debugger statements" })
     .first();
 
   await breakpointsTest.click();
