@@ -5,6 +5,7 @@ import {
   getEventJumpButton,
   getEventListItems,
   openEventsPanel,
+  waitForJumpToCodeLabel,
 } from "../helpers/info-event-panel";
 import { openSourceExplorerPanel } from "../helpers/source-explorer-panel";
 import {
@@ -56,13 +57,8 @@ const expectedEvents: Event[] = (
 async function checkForJumpButton(eventLocator: Locator, shouldBeEnabled: boolean) {
   const jumpButton = getEventJumpButton(eventLocator);
   expect(await jumpButton.isVisible()).toBe(true);
-  await jumpButton.hover({});
 
-  await waitFor(async () => {
-    const buttonText = await getByTestName(jumpButton, "JumpToCodeButtonLabel").innerText();
-    const expectedText = shouldBeEnabled ? "Jump to code" : "No results";
-    expect(buttonText).toBe(expectedText);
-  });
+  await waitForJumpToCodeLabel(jumpButton, shouldBeEnabled ? "Jump to code" : "No results");
 
   return jumpButton;
 }

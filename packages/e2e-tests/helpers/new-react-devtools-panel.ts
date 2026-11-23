@@ -2,7 +2,7 @@ import { Locator, Page, expect } from "@playwright/test";
 
 import { openConsolePanel, warpToMessage } from "./console-panel";
 import { openReactDevtoolsPanel as openReactDevtoolsPanelOld } from "./legacy-react-devtools-panel";
-import { debugPrint, getByTestName, waitFor } from "./utils";
+import { ANALYSIS_DATA_TIMEOUT, debugPrint, getByTestName, waitFor } from "./utils";
 
 export async function enableComponentPicker(page: Page) {
   const button = page.locator('[data-test-id="ReactDevTools-InspectButton"]');
@@ -192,7 +192,15 @@ export async function verifySelectedComponentName(page: Page, expectedName: stri
   });
 }
 
+export async function waitForReactComponentsToLoad(page: Page) {
+  const components = getReactComponents(page);
+  return waitFor(async () => expect(await components.count()).toBeGreaterThan(0), {
+    timeout: ANALYSIS_DATA_TIMEOUT,
+  });
+}
+
 export async function waitForReactComponentCount(page: Page, expected: number) {
+  await waitForReactComponentsToLoad(page);
   const components = getReactComponents(page);
   return waitFor(async () => expect(await components.count()).toBe(expected));
 }

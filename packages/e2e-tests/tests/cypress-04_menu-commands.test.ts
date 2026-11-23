@@ -1,4 +1,5 @@
 import { openDevToolsTab, openViewerTab, startTest } from "../helpers";
+import { waitForJumpToCodeLabel } from "../helpers/info-event-panel";
 import {
   closeSource,
   getSelectedLineNumber,
@@ -59,7 +60,7 @@ test("cypress-04: Test Step buttons and menu item", async ({
   const firstJ2CStep = stepsWithMaybeJ2C.nth(0);
   await firstJ2CStep.hover();
   const jumpToCodeButton = getByTestName(firstJ2CStep, "JumpToCode");
-  await jumpToCodeButton.hover();
+  await waitForJumpToCodeLabel(jumpToCodeButton, "Jump to code");
   await jumpToCodeButton.click();
 
   await waitForSelectedSource(page, "Link.js");

@@ -132,6 +132,7 @@ export function reactDevToolsBeforeEach() {
     getOperations: GetOperations;
     root: ReturnType<typeof createRoot>;
     store: Store;
+    wall: typeof wall;
   } = {
     destroy: () => {
       testAppRoot.unmount();
@@ -156,6 +157,7 @@ export function reactDevToolsBeforeEach() {
     },
     root: testAppRoot,
     store,
+    wall,
   };
 
   return api;

@@ -1,6 +1,6 @@
 import classnames from "classnames";
 import React, { ReactNode, Suspense, useContext, useLayoutEffect } from "react";
-import { useImperativeCacheValue } from "suspense";
+import { STATUS_REJECTED, useImperativeCacheValue } from "suspense";
 
 import { EditorPane } from "devtools/client/debugger/src/components/Editor/EditorPane";
 import LazyActivity from "replay-next/components/LazyActivity";
@@ -13,6 +13,7 @@ import {
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { useGraphQLUserData } from "shared/user-data/GraphQL/useGraphQLUserData";
 import { setSelectedPanel } from "ui/actions/layout";
+import { getProcessorBacked } from "ui/reducers/app";
 import { getSelectedPanel, getToolboxLayout } from "ui/reducers/layout";
 import { getRecordingTooLongToSupportRoutines } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
@@ -23,6 +24,7 @@ import {
   REDUX_ANNOTATIONS_KIND,
   REDUX_SETUP_ANNOTATIONS_KIND,
   annotationKindsCache,
+  libraryStatusCache,
 } from "ui/suspense/annotationsCaches";
 import { trackEvent } from "ui/utils/telemetry";
 
@@ -32,6 +34,11 @@ import { NodePicker } from "../NodePicker";
 import ReplayLogo from "../shared/ReplayLogo";
 import WaitForReduxSlice from "../WaitForReduxSlice";
 import NewConsoleRoot from "./NewConsole";
+import {
+  RoutinePanelStatus,
+  calculateProcessorPanelStatus,
+  calculateRoutinePanelStatus,
+} from "./panelStatus";
 import SourcesTabLabel from "./SourcesTabLabel";
 import styles from "./SecondaryToolbox.module.css";
 
@@ -39,31 +46,6 @@ const InspectorApp = React.lazy(() => import("devtools/client/inspector/componen
 
 const ReactDevToolsPanel = React.lazy(() => import("./ReactDevTools"));
 const ReduxDevToolsPanel = React.lazy(() => import("./redux-devtools/ReduxDevToolsPanel"));
-
-type RoutinePanelStatus = "pending" | "loaded" | "not-available" | "recording-too-long";
-
-function calculateRoutinePanelStatus(
-  hasRoutineAnnotations: boolean,
-  hasInitialAnnotations: boolean,
-  recordingTooLongForRoutines: boolean
-): RoutinePanelStatus {
-  // We definitely show these tabs if we have actual annotations from the routine.
-  // If we don't have routine annotations, we want to show the tabs anyway _if_ the recording
-  // is too long, in which case the panels will show a warning message describing why.
-  // Also, we should only show these tabs if we're pretty sure the recording actually has
-  // _some_ kind of React or Redux data available (ie, not a Vue or Angular app).
-  if (hasRoutineAnnotations) {
-    return "loaded";
-  } else if (hasInitialAnnotations) {
-    // TODO We have no way of knowing routine status right now, so we can't show an error state.
-
-    // We'll never hit this case for Firefox recordings,
-    // because we don't have the "initial" annotations from the recording.
-    return recordingTooLongForRoutines ? "recording-too-long" : "pending";
-  } else {
-    return "not-available";
-  }
-}
 
 interface PanelButtonProps {
   panel: SecondaryPanelName;
@@ -132,14 +114,20 @@ function RoutinePanelUnavailable({ testId }: { testId: string }) {
   );
 }
 
-export default function SecondaryToolbox() {
-  const selectedPanel = useAppSelector(getSelectedPanel);
-  const toolboxLayout = useAppSelector(getToolboxLayout);
-  const dispatch = useAppDispatch();
+function RoutinePanelFailed({ library, testId }: { library: string; testId: string }) {
+  return (
+    <div className={styles.CouldNotLoadMessage} data-test-id={testId}>
+      <div>{library} data could not be loaded for this recording</div>
+    </div>
+  );
+}
+
+function useLibraryPanelStatuses(): { react: RoutinePanelStatus; redux: RoutinePanelStatus } {
   const replayClient = useContext(ReplayClientContext);
+  const processorBacked = useAppSelector(getProcessorBacked);
   const recordingTooLongForRoutines = useAppSelector(getRecordingTooLongToSupportRoutines);
 
-  // Don't suspend when waiting for annotations to load
+  // Don't suspend when waiting for annotations or library status to load
   const { value: hasReactRoutineAnnotations = false } = useImperativeCacheValue(
     annotationKindsCache,
     replayClient,
@@ -164,6 +152,48 @@ export default function SecondaryToolbox() {
     REDUX_SETUP_ANNOTATIONS_KIND
   );
 
+  const { status: libraryStatusRequestStatus, value: libraryStatus } = useImperativeCacheValue(
+    libraryStatusCache,
+    replayClient
+  );
+
+  if (processorBacked) {
+    const requestFailed = libraryStatusRequestStatus === STATUS_REJECTED;
+    return {
+      react: calculateProcessorPanelStatus({
+        libraryStatus: libraryStatus?.react,
+        requestFailed,
+        hasInitialAnnotations: hasReactRecordingAnnotations,
+      }),
+      redux: calculateProcessorPanelStatus({
+        libraryStatus: libraryStatus?.redux,
+        requestFailed,
+        hasInitialAnnotations: hasReduxRecordingAnnotations,
+      }),
+    };
+  }
+
+  return {
+    react: calculateRoutinePanelStatus(
+      hasReactRoutineAnnotations,
+      hasReactRecordingAnnotations,
+      recordingTooLongForRoutines
+    ),
+    redux: calculateRoutinePanelStatus(
+      hasReduxRoutineAnnotations,
+      hasReduxRecordingAnnotations,
+      recordingTooLongForRoutines
+    ),
+  };
+}
+
+export default function SecondaryToolbox() {
+  const selectedPanel = useAppSelector(getSelectedPanel);
+  const toolboxLayout = useAppSelector(getToolboxLayout);
+  const dispatch = useAppDispatch();
+  const replayClient = useContext(ReplayClientContext);
+  const { react: reactPanelStatus, redux: reduxPanelStatus } = useLibraryPanelStatuses();
+
   const [chromiumNetMonitorEnabled] = useGraphQLUserData("feature_chromiumNetMonitor");
 
   const recordingCapabilities = recordingCapabilitiesCache.read(replayClient);
@@ -173,16 +203,6 @@ export default function SecondaryToolbox() {
     ? toolboxLayout !== "ide"
     : toolboxLayout === "full";
 
-  const reactPanelStatus = calculateRoutinePanelStatus(
-    hasReactRoutineAnnotations,
-    hasReactRecordingAnnotations,
-    recordingTooLongForRoutines
-  );
-  const reduxPanelStatus = calculateRoutinePanelStatus(
-    hasReduxRoutineAnnotations,
-    hasReduxRecordingAnnotations,
-    recordingTooLongForRoutines
-  );
   const shouldShowReactTab = reactPanelStatus !== "not-available";
   const shouldShowReduxTab = reduxPanelStatus !== "not-available";
 
@@ -199,6 +219,9 @@ export default function SecondaryToolbox() {
     case "recording-too-long":
       reactPanel = <RoutinePanelUnavailable testId="ReactDevToolsPanel" />;
       break;
+    case "failed":
+      reactPanel = <RoutinePanelFailed library="React" testId="ReactDevToolsPanel" />;
+      break;
   }
 
   switch (reduxPanelStatus) {
@@ -210,6 +233,9 @@ export default function SecondaryToolbox() {
       break;
     case "recording-too-long":
       reduxPanel = <RoutinePanelUnavailable testId="ReduxDevTools" />;
+      break;
+    case "failed":
+      reduxPanel = <RoutinePanelFailed library="Redux" testId="ReduxDevTools" />;
       break;
   }
 

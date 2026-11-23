@@ -8,8 +8,11 @@ import {
   waitForElementsToLoad,
 } from "../helpers/elements-panel";
 import { findNetworkRequestRow, openNetworkPanel } from "../helpers/network-panel";
-import { getReactComponents } from "../helpers/new-react-devtools-panel";
-import { openReactDevtoolsPanel } from "../helpers/new-react-devtools-panel";
+import {
+  getReactComponents,
+  openReactDevtoolsPanel,
+  waitForReactComponentsToLoad,
+} from "../helpers/new-react-devtools-panel";
 import { isPassportItemCompleted } from "../helpers/passport";
 import { enablePassport } from "../helpers/settings";
 import { waitFor } from "../helpers/utils";
@@ -50,6 +53,7 @@ test(`authenticated/passport-02: Infrared inspection`, async ({
   );
 
   await openReactDevtoolsPanel(page);
+  await waitForReactComponentsToLoad(page);
   await getReactComponents(page).nth(0).click();
 
   await waitFor(async () =>

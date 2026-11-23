@@ -30,9 +30,12 @@ import { UIState } from "ui/state";
 import { ExpectedError, UnexpectedError } from "ui/state/app";
 import {
   REACT_ANNOTATIONS_KIND,
+  REACT_SETUP_ANNOTATIONS_KIND,
   REDUX_ANNOTATIONS_KIND,
+  REDUX_SETUP_ANNOTATIONS_KIND,
   annotationKindsCache,
   eventListenersJumpLocationsCache,
+  libraryStatusCache,
   reactDevToolsAnnotationsCache,
 } from "ui/suspense/annotationsCaches";
 import type { ThunkExtraArgs } from "ui/utils/thunk";
@@ -202,7 +205,15 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
 
   networkRequestsCache.prefetch(replayClient);
 
-  replayClient.waitForSession().then(() => {
+  replayClient.waitForSession().then(async () => {
+    if (await replayClient.isProcessorBacked()) {
+      annotationKindsCache.prefetch(replayClient, REACT_SETUP_ANNOTATIONS_KIND);
+      annotationKindsCache.prefetch(replayClient, REDUX_SETUP_ANNOTATIONS_KIND);
+      libraryStatusCache.prefetch(replayClient);
+      eventListenersJumpLocationsCache.prefetch(replayClient);
+      return;
+    }
+
     // Precache annotations
     annotationKindsCache.prefetch(replayClient, REACT_ANNOTATIONS_KIND);
     annotationKindsCache.prefetch(replayClient, REDUX_ANNOTATIONS_KIND);

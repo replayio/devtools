@@ -136,6 +136,9 @@ export async function startTest(
     params.append("apiKey", apiKey);
   }
   params.append("testScope", testScope);
+  if (process.env.E2E_PROCESSOR_SESSIONS) {
+    params.append("processor", "1");
+  }
 
   if (additionalQueryParams) {
     for (const [key, value] of additionalQueryParams) {

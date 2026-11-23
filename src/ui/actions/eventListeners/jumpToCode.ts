@@ -20,6 +20,7 @@ import { pauseEvaluationsCache } from "replay-next/src/suspense/PauseCache";
 import { sourcesCache } from "replay-next/src/suspense/SourcesCache";
 import { isLocationBefore } from "replay-next/src/utils/source";
 import { ReplayClientInterface } from "shared/client/types";
+import { isPointInRegion } from "shared/utils/time";
 import type { UIThunkAction } from "ui/actions";
 import { InteractionEventKind } from "ui/actions/eventListeners/constants";
 import {
@@ -29,7 +30,7 @@ import {
 } from "ui/actions/eventListeners/eventListenerUtils";
 import { SourcesState, getPreferredLocation, getSourceDetailsEntities } from "ui/reducers/sources";
 import { UIState } from "ui/state";
-import { ParsedJumpToCodeAnnotation } from "ui/suspense/annotationsCaches";
+import { ParsedJumpToCodeAnnotation, listenerPointCache } from "ui/suspense/annotationsCaches";
 
 import { createReactEventMapper } from "./evaluationMappers";
 
@@ -302,15 +303,33 @@ export function jumpToKnownEventListenerHit(
   onSeek: (point: ExecutionPoint, time: number, location: Location) => void,
   jumpToCodeDetails: ParsedJumpToCodeAnnotation
 ): UIThunkAction<Promise<void>> {
-  return async (dispatch, getState) => {
+  return async (dispatch, getState, { replayClient }) => {
     const cx = getThreadContext(getState());
 
-    const { eventListener, listenerPoint } = jumpToCodeDetails;
+    const { eventListener } = jumpToCodeDetails;
     const { location, firstBreakablePosition } = eventListener;
 
     // Open the source file and jump to the found position.
     // This is either the function definition itself, or the first position _inside_ the function.
     dispatch(selectLocation(cx, firstBreakablePosition));
-    onSeek(listenerPoint.point, listenerPoint.time, location);
+
+    // Resolving a bare listener point waits for it to be inside the focus window, which
+    // never happens if it is past the window end. Seek to the event itself in that case,
+    // or if the listener point can't be found.
+    const { listenerPoint } = jumpToCodeDetails;
+    const focusWindow = replayClient.getCurrentFocusWindow();
+    const canResolveListenerPoint =
+      typeof listenerPoint !== "string" ||
+      (focusWindow !== null && isPointInRegion(listenerPoint, focusWindow));
+    if (canResolveListenerPoint) {
+      try {
+        const resolved = await listenerPointCache.readAsync(replayClient, jumpToCodeDetails);
+        onSeek(resolved.point, resolved.time, location);
+        return;
+      } catch (error) {
+        console.warn("Could not resolve the event listener point", error);
+      }
+    }
+    onSeek(jumpToCodeDetails.point, jumpToCodeDetails.time, location);
   };
 }

@@ -13,8 +13,9 @@ import {
   getAllVisibleComponentNames,
   getReactComponents,
   openReactDevtoolsPanel,
+  waitForReactComponentsToLoad,
 } from "../helpers/new-react-devtools-panel";
-import { debugPrint, waitFor } from "../helpers/utils";
+import { debugPrint } from "../helpers/utils";
 import test, { expect } from "../testFixture";
 
 test.use({ exampleKey: "rdt-react-versions/dist/index.html" });
@@ -38,11 +39,8 @@ test("react_devtools-03: process and display multiple React versions in page", a
 
   debugPrint(page, "Checking list of React components for versions 16, 17, and 18");
 
+  await waitForReactComponentsToLoad(page);
   const components = getReactComponents(page);
-  await waitFor(async () => {
-    const numComponents = await components.count();
-    return expect(numComponents).toBeGreaterThan(0);
-  });
   const numComponents = await components.count();
 
   // We should have roots for React 16, 17, and 18.

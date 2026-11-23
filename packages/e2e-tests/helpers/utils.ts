@@ -188,6 +188,11 @@ export async function toggleExpandable(
   }
 }
 
+// Processor sessions show the recording once basic data is ready, but framework
+// data (React, Redux, jump-to-code) is only answered after the processor finishes
+// analysis, which can take minutes on a cold processor.
+export const ANALYSIS_DATA_TIMEOUT = 180_000;
+
 export async function waitFor(
   callback: () => Promise<void>,
   options: {

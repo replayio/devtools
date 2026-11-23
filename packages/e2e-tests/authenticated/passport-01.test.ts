@@ -1,7 +1,7 @@
 import { openDevToolsTab, startTest } from "../helpers";
 import { E2E_USER_1 } from "../helpers/authentication";
 import { warpToMessage } from "../helpers/console-panel";
-import { openEventsPanel } from "../helpers/info-event-panel";
+import { openEventsPanel, waitForJumpToCodeLabel } from "../helpers/info-event-panel";
 import { openNetworkPanel } from "../helpers/network-panel";
 import { isPassportItemCompleted, showPassport } from "../helpers/passport";
 import { enablePassport } from "../helpers/settings";
@@ -44,7 +44,9 @@ test(`authenticated/passport-01: Time travel`, async ({
   await openEventsPanel(page);
   const event = page.locator('[data-test-name="Event"]:has-text("Key Press W")');
   await event.hover();
-  await event.locator('[data-test-name="JumpToCode"]').click();
+  const jumpButton = event.locator('[data-test-name="JumpToCode"]');
+  await waitForJumpToCodeLabel(jumpButton, "Jump to code");
+  await jumpButton.click();
 
   await waitFor(async () =>
     expect(await isPassportItemCompleted(page, "Jump to code")).toBeTruthy()

@@ -7,6 +7,7 @@ import {
   FrameId,
   FunctionMatch,
   HitCount,
+  Interaction,
   KeyboardEvent,
   loadedRegions as LoadedRegions,
   Location,
@@ -28,6 +29,7 @@ import {
   PointStackFrame,
   getPointsBoundingTimeResult as PointsBoundingTime,
   RecordingId,
+  ReduxAction,
   RequestBodyData,
   requestBodyData as RequestBodyDataEvent,
   RequestEventInfo,
@@ -55,10 +57,12 @@ import {
   getAppliedRulesResult,
   getBoundingClientRectResult,
   getBoxModelResult,
+  getComponentTreeResult,
   getComputedStyleResult,
   getDocumentResult,
   getEventListenersResult,
   getExceptionValueResult,
+  getLibraryStatusResult,
   getParentNodesResult,
   getScopeResult,
   getSourceOutlineResult,
@@ -165,7 +169,7 @@ export type AnnotationListener = (annotation: Annotation) => void;
 export interface ReplayClientInterface {
   get loadedRegions(): LoadedRegions | null;
   addEventListener(type: ReplayClientEvents, handler: Function): void;
-  configure(sessionId: string): Promise<void>;
+  configure(sessionId: string, processorBacked?: boolean): Promise<void>;
   createPause(executionPoint: ExecutionPoint): Promise<createPauseResult>;
   evaluateExpression(
     pauseId: PauseId,
@@ -221,6 +225,8 @@ export interface ReplayClientInterface {
   getEventListeners(pauseId: PauseId, nodeId: string): Promise<getEventListenersResult>;
   getExceptionValue(pauseId: PauseId): Promise<getExceptionValueResult>;
   getFrameSteps(pauseId: PauseId, frameId: FrameId): Promise<PointDescription[]>;
+  getInteractionHandlers(): Promise<Interaction[]>;
+  getLibraryStatus(): Promise<getLibraryStatusResult>;
   getMappedLocation(location: Location): Promise<MappedLocation>;
   getObjectWithPreview(
     objectId: ObjectId,
@@ -231,7 +237,9 @@ export interface ReplayClientInterface {
   getParentNodes(pauseId: PauseId, nodeId: string): Promise<getParentNodesResult>;
   getPointNearTime(time: number): Promise<TimeStampedPoint>;
   getPointsBoundingTime(time: number): Promise<PointsBoundingTime>;
+  getReactComponentTree(point: ExecutionPoint): Promise<getComponentTreeResult>;
   getRecordingId(): RecordingId | null;
+  getReduxActions(): Promise<ReduxAction[]>;
   getNetworkRequestBody(
     requestId: RequestId,
     onRequestBodyData?: (event: RequestBodyDataEvent) => void
@@ -254,6 +262,7 @@ export interface ReplayClientInterface {
   getTopFrame(pauseId: PauseId): Promise<getTopFrameResult>;
   hasAnnotationKind(kind: string): Promise<boolean>;
   initialize(recordingId: string, accessToken: string | null): Promise<SessionId>;
+  isProcessorBacked(): Promise<boolean>;
   mapExpressionToGeneratedScope(expression: string, location: Location): Promise<string>;
   requestFocusWindow(params: PointRangeFocusRequest): Promise<TimeStampedPointRange>;
   getCurrentFocusWindow(): TimeStampedPointRange | null;

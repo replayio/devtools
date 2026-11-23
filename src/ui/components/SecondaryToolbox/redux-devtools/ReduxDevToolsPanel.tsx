@@ -13,6 +13,7 @@ import { ActionFilter } from "ui/components/SecondaryToolbox/redux-devtools/Acti
 import { ReduxActionAnnotation } from "ui/components/SecondaryToolbox/redux-devtools/annotations";
 import { ReduxDevToolsContents } from "ui/components/SecondaryToolbox/redux-devtools/ReduxDevToolsContents";
 import { ReduxDevToolsList } from "ui/components/SecondaryToolbox/redux-devtools/ReduxDevToolsList";
+import { getProcessorBacked } from "ui/reducers/app";
 import { useAppSelector } from "ui/setup/hooks";
 import { reduxDevToolsAnnotationsCache } from "ui/suspense/annotationsCaches";
 import { reduxStoreDetailsCache } from "ui/suspense/jumpToLocationCache";
@@ -20,6 +21,8 @@ import { reduxStoreDetailsCache } from "ui/suspense/jumpToLocationCache";
 import styles from "./ReduxDevToolsPanel.module.css";
 
 const POSSIBLE_TIMEOUT_AFTER_MS = 30_000;
+// Processor sessions have no per-command time limit and can take minutes on long recordings.
+const PROCESSOR_SESSION_POSSIBLE_TIMEOUT_AFTER_MS = 180_000;
 
 export default function ReduxDevToolsPanel() {
   const client = useContext(ReplayClientContext);
@@ -29,6 +32,7 @@ export default function ReduxDevToolsPanel() {
   const [searchValue, setSearchValue] = useState("");
 
   const currentExecutionPoint = useAppSelector(getExecutionPoint);
+  const processorBacked = useAppSelector(getProcessorBacked);
 
   const [showTimeoutMessage, setShowTimeoutMessage] = useState(false);
   const { status: annotationsStatus, value: parsedAnnotations } = useImperativeCacheValue(
@@ -36,12 +40,16 @@ export default function ReduxDevToolsPanel() {
     client
   );
 
+  const timeoutAfterMs = processorBacked
+    ? PROCESSOR_SESSION_POSSIBLE_TIMEOUT_AFTER_MS
+    : POSSIBLE_TIMEOUT_AFTER_MS;
+
   useEffect(() => {
     switch (annotationsStatus) {
       case "pending": {
         const timeout = setTimeout(() => {
           setShowTimeoutMessage(true);
-        }, POSSIBLE_TIMEOUT_AFTER_MS);
+        }, timeoutAfterMs);
         return () => {
           clearTimeout(timeout);
         };
@@ -51,7 +59,7 @@ export default function ReduxDevToolsPanel() {
         break;
       }
     }
-  }, [annotationsStatus]);
+  }, [annotationsStatus, timeoutAfterMs]);
 
   const [filteredAnnotations, firstAnnotationAfterCurrentExecutionPoint] = useMemo(() => {
     let filteredAnnotations: ReduxActionAnnotation[] = [];

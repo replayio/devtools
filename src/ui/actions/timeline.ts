@@ -52,6 +52,7 @@ import { ReplayClientInterface } from "shared/client/types";
 import { isTest } from "shared/utils/environment";
 import { isPointInRegion, maxTimeStampedPoint, minTimeStampedPoint } from "shared/utils/time";
 import { getFirstComment } from "ui/hooks/comments/comments";
+import { getProcessorBacked } from "ui/reducers/app";
 import {
   getPreferredLocation,
   getSelectedLocation,
@@ -120,9 +121,10 @@ export function jumpToInitialPausePoint(): UIThunkAction<Promise<void>> {
     const zoomRegion = getZoomRegion(state);
     const newZoomRegion = { ...zoomRegion, endTime: time };
 
-    const { maxRecordingDurationForRoutines } = await recordingCapabilitiesCache.readAsync(
-      replayClient
-    );
+    // Processor-backed sessions run their library analysis on recordings of any length.
+    const maxRecordingDurationForRoutines = getProcessorBacked(state)
+      ? Number.MAX_SAFE_INTEGER
+      : (await recordingCapabilitiesCache.readAsync(replayClient)).maxRecordingDurationForRoutines;
 
     dispatch(
       setTimelineState({

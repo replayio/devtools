@@ -1,10 +1,13 @@
 import { Locator, Page, expect } from "@playwright/test";
 
 import { openDevToolsTab, startTest } from "../helpers";
-import { getEventJumpButton } from "../helpers/info-event-panel";
-import { getReduxActions, openReduxDevtoolsPanel } from "../helpers/redux-devtools-panel";
+import { getEventJumpButton, waitForJumpToCodeLabel } from "../helpers/info-event-panel";
+import {
+  getReduxActions,
+  openReduxDevtoolsPanel,
+  waitForReduxActionsToLoad,
+} from "../helpers/redux-devtools-panel";
 import { closeSource, verifyJumpToCodeResults } from "../helpers/source-panel";
-import { getByTestName, waitFor } from "../helpers/utils";
 import test from "../testFixture";
 
 test.use({ exampleKey: "logpoints-01" });
@@ -12,13 +15,8 @@ test.use({ exampleKey: "logpoints-01" });
 async function checkForJumpButton(actionListItem: Locator, shouldBeEnabled: boolean) {
   const jumpButton = getEventJumpButton(actionListItem);
   expect(await jumpButton.isVisible()).toBe(true);
-  await jumpButton.hover();
 
-  await waitFor(async () => {
-    const buttonText = await getByTestName(jumpButton, "JumpToCodeButtonLabel").innerText();
-    const expectedText = shouldBeEnabled ? "Jump to code" : "No results";
-    expect(buttonText).toBe(expectedText);
-  });
+  await waitForJumpToCodeLabel(jumpButton, shouldBeEnabled ? "Jump to code" : "No results");
 
   return jumpButton;
 }
@@ -47,13 +45,7 @@ test(`jump-to-code-02: Redux J2C functionality`, async ({
   await openDevToolsTab(page);
 
   await openReduxDevtoolsPanel(page);
-
-  const reduxListItemsLocator = getReduxActions(page);
-
-  await waitFor(async () => {
-    const numListItems = await reduxListItemsLocator.count();
-    expect(numListItems).toBeGreaterThan(0);
-  });
+  await waitForReduxActionsToLoad(page);
 
   // Inside of a thunk
   await jumpToReduxDispatch(page, "app/setRecordingId");
@@ -72,25 +64,25 @@ test(`jump-to-code-02: Redux J2C functionality`, async ({
   await closeSource(page, "index.ts");
 
   // Inside of an RTK listener middleware effect
-  jumpToReduxDispatch(page, "tabs/tabsRestored");
+  await jumpToReduxDispatch(page, "tabs/tabsRestored");
   await verifyJumpToCodeResults(page, "newSources.ts", 43, { current: 1, total: 1 });
   await closeSource(page, "newSources.ts");
 
   // Inside of a `useEffect`
-  jumpToReduxDispatch(page, "set_selected_primary_panel");
+  await jumpToReduxDispatch(page, "set_selected_primary_panel");
   await verifyJumpToCodeResults(page, "SidePanel.tsx", 57, { current: 1, total: 1 });
   await closeSource(page, "SidePanel.tsx");
 
   // Inside of a `connect()`ed class component, with `this.props.setExpandedState()`.
   // Note that this appears to be one or two execution ticks off, so the line hit won't
   // line up perfectly, but it should still _display_ as "1/4"
-  jumpToReduxDispatch(page, "SET_EXPANDED_STATE");
+  await jumpToReduxDispatch(page, "SET_EXPANDED_STATE");
   await verifyJumpToCodeResults(page, "SourcesTree.tsx", 196, { current: 1, total: 4 });
   await closeSource(page, "SourcesTree.tsx");
 
   // Inside of an adapter that passes dispatch-wrapped actions to <QuickOpenModal>
   // This is also one tick off, but should still _display_ as "1/10"
-  jumpToReduxDispatch(page, "quickOpen/setQuickOpenQuery");
+  await jumpToReduxDispatch(page, "quickOpen/setQuickOpenQuery");
   await verifyJumpToCodeResults(page, "QuickOpenModal.tsx", 551, { current: 1, total: 10 });
   await closeSource(page, "QuickOpenModal.tsx");
 });
