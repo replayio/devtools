@@ -1,10 +1,19 @@
+import { Page } from "@playwright/test";
+
 import { openViewerTab, startTest } from "../helpers";
+import { waitForJumpToCodeLabel } from "../helpers/info-event-panel";
 import { waitForPaused } from "../helpers/pause-information-panel";
 import { getSelectedTestCase, getTestCaseSteps, openCypressTestPanel } from "../helpers/testsuites";
 import { waitForTimelineAdvanced } from "../helpers/timeline";
 import test, { expect } from "../testFixture";
 
 test.use({ exampleKey: "React Hook Form/conditionalField.cy.ts" });
+
+async function clickJumpToCode(page: Page) {
+  const jumpButton = page.locator('[data-test-name="JumpToCode"]').first();
+  await waitForJumpToCodeLabel(jumpButton, "Jump to code");
+  await jumpButton.click();
+}
 
 test("fe-1875 :: verify that steps go to the right point in time", async ({
   pageWithMeta: { page, recordingId, testScope },
@@ -32,7 +41,7 @@ test("fe-1875 :: verify that steps go to the right point in time", async ({
   let timelinePercent = await waitForTimelineAdvanced(page, 0);
   expect(Math.round(timelinePercent)).toBe(72);
 
-  await page.click('[data-test-name="JumpToCode"]');
+  await clickJumpToCode(page);
 
   await waitForPaused(page, 652);
 
@@ -45,7 +54,7 @@ test("fe-1875 :: verify that steps go to the right point in time", async ({
   await waitForPaused(page, 227);
 
   await openCypressTestPanel(page);
-  await page.click('[data-test-name="JumpToCode"]');
+  await clickJumpToCode(page);
 
   await waitForPaused(page, 1019);
 });

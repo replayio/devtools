@@ -1,7 +1,13 @@
 import { Locator, Page, expect } from "@playwright/test";
 
 import { openConsolePanel, warpToMessage } from "./console-panel";
-import { getByTestName, getByTestNameNoSpace, getElementClasses, waitFor } from "./utils";
+import {
+  ANALYSIS_DATA_TIMEOUT,
+  getByTestName,
+  getByTestNameNoSpace,
+  getElementClasses,
+  waitFor,
+} from "./utils";
 
 export function getComponentPickerButton(page: Page) {
   return page.locator(
@@ -74,7 +80,15 @@ export async function openReactDevtoolsPanel(page: Page) {
   await page.locator('[data-test-id="PanelButton-react-components"]').click();
 }
 
+export async function waitForReactComponentsToLoad(page: Page) {
+  const components = getReactComponents(page);
+  return waitFor(async () => expect(await components.count()).toBeGreaterThan(0), {
+    timeout: ANALYSIS_DATA_TIMEOUT,
+  });
+}
+
 export async function waitForReactComponentCount(page: Page, expected: number) {
+  await waitForReactComponentsToLoad(page);
   const components = getReactComponents(page);
   return waitFor(async () => expect(await components.count()).toBe(expected));
 }

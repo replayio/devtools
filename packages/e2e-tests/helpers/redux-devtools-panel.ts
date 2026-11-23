@@ -1,6 +1,6 @@
 import { Locator, Page, expect } from "@playwright/test";
 
-import { waitFor } from "./utils";
+import { ANALYSIS_DATA_TIMEOUT, waitFor } from "./utils";
 
 export function getReduxActions(page: Page) {
   return page.locator('[data-test-id="ReduxDevToolsListItem"]');
@@ -15,7 +15,15 @@ export async function assertTabValue(page: Page, tab: string, expectedValue: str
   await waitFor(async () => expect(await inspector.innerText()).toBe(expectedValue));
 }
 
+export async function waitForReduxActionsToLoad(page: Page) {
+  const actions = getReduxActions(page);
+  return waitFor(async () => expect(await actions.count()).toBeGreaterThan(0), {
+    timeout: ANALYSIS_DATA_TIMEOUT,
+  });
+}
+
 export async function waitForReduxActionCount(page: Page, expected: number) {
+  await waitForReduxActionsToLoad(page);
   const actions = getReduxActions(page);
   return waitFor(async () => expect(await actions.count()).toBe(expected));
 }
