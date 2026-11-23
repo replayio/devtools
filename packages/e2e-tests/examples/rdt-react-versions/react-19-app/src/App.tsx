@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 // this example contains some delays for now to work around RecordReplay/gecko-dev#349
 function waitForTime(ms: number) {
@@ -14,33 +14,25 @@ interface Item {
   text: string;
 }
 
-interface AppState {
-  list: Item[];
-}
+const version = "19.3.1";
 
-const version = "15.7.0";
+function React19App() {
+  const [list, setList] = useState<Item[]>([]);
 
-class React15App extends React.Component<any, AppState> {
-  state = {
-    list: [],
-  };
-
-  componentDidMount = () => {
-    const update = async () => {
-      this.setState({ list: [{ key: "1", text: "Foo" }] });
+  useEffect(() => {
+    async function update() {
+      setList([{ key: "1", text: "Foo" }]);
       await waitForTime(2000);
       console.log(`[${version}] Initial list`);
 
-      this.setState({
-        list: [
-          { key: "1", text: "Foo" },
-          { key: "2", text: "Bar" },
-        ],
-      });
+      setList([
+        { key: "1", text: "Foo" },
+        { key: "2", text: "Bar" },
+      ]);
       await waitForTime(100);
       console.log(`[${version}] Added an entry`);
 
-      this.setState({ list: [{ key: "2", text: "Bar" }] });
+      setList([{ key: "2", text: "Bar" }]);
       await waitForTime(100);
       console.log(`[${version}] Removed an entry`);
 
@@ -52,20 +44,17 @@ class React15App extends React.Component<any, AppState> {
 
       // eslint-disable-next-line no-undef
       console.log(`[${version}] ExampleFinished`);
-    };
+    }
     update();
-  };
+  }, []);
 
-  render() {
-    const { list } = this.state;
-    return (
-      <div data-react-version={version} style={{ display: "flex", flexDirection: "column" }}>
-        <h2>Version: {version}</h2>
-        <React15List list={list} />
-        <React15FizzBuzzCounterClass version={version} />
-      </div>
-    );
-  }
+  return (
+    <div data-react-version={version}>
+      <h2>Version: {version}</h2>
+      <React19List list={list} />
+      <React19FizzBuzzCounterClass version={version} />
+    </div>
+  );
 }
 
 function IsEven() {
@@ -120,7 +109,7 @@ interface FizzBuzzCounter {
   counter: number;
 }
 
-class React15FizzBuzzCounterClass extends React.Component<FizzBuzzCounterProps, FizzBuzzCounter> {
+class React19FizzBuzzCounterClass extends React.Component<FizzBuzzCounterProps, FizzBuzzCounter> {
   state = {
     counter: 0,
   };
@@ -159,7 +148,7 @@ class React15FizzBuzzCounterClass extends React.Component<FizzBuzzCounterProps, 
   }
 }
 
-function React15List({ list }: { list: Item[] }) {
+function React19List({ list }: { list: Item[] }) {
   return (
     <ul style={{ width: "100px" }}>
       {list.map(data => (
@@ -173,4 +162,4 @@ function Item({ text }: { text: string }) {
   return <li>{text}</li>;
 }
 
-export default React15App;
+export default React19App;
