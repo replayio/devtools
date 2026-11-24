@@ -9,6 +9,7 @@ import {
 } from "devtools/client/debugger/src/reducers/pause";
 import AvatarImage from "replay-next/components/AvatarImage";
 import { EditPointBehavior } from "replay-next/src/contexts/points/types";
+import { SessionUserInfo } from "replay-next/src/contexts/SessionContext";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import {
   POINT_BEHAVIOR,
@@ -17,7 +18,6 @@ import {
   Point,
   ReplayClientInterface,
 } from "shared/client/types";
-import { UserInfo } from "shared/graphql/types";
 import Checkbox from "ui/components/shared/Forms/Checkbox";
 import type { UIState } from "ui/state";
 import { getPauseFrameSuspense } from "ui/suspense/frameCache";
@@ -40,7 +40,7 @@ const connector = connect(mapStateToProps, {
 });
 type PropsFromRedux = ConnectedProps<typeof connector>;
 interface PropsFromParent {
-  currentUserInfo: UserInfo | null;
+  currentUserInfo: SessionUserInfo | null;
   editable: boolean;
   onEditPointBehavior: EditPointBehavior;
   onRemoveLogPoint: (cx: Context, point: Point) => void;

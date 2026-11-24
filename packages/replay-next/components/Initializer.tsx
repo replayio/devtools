@@ -7,11 +7,12 @@ import { ReactNode, useContext, useEffect, useRef, useState } from "react";
 import { useIndexingProgress } from "replay-next/src/hooks/useIndexingProgress";
 import { preCacheExecutionPointForTime } from "replay-next/src/suspense/ExecutionPointsCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { UserInfo } from "shared/graphql/types";
+import { Nag, UserInfo } from "shared/graphql/types";
 import { getCurrentUserInfo } from "shared/graphql/User";
 import { CONSOLE_SETTINGS_DATABASE, POINTS_DATABASE } from "shared/user-data/IndexedDB/config";
 import { preloadIDBInitialValues } from "shared/user-data/IndexedDB/utils";
 
+import { NagsContext } from "../src/contexts/NagsContext";
 import { SessionContext, SessionContextType } from "../src/contexts/SessionContext";
 import Loader from "./Loader";
 import styles from "./Initializer.module.css";
@@ -37,6 +38,7 @@ export default function Initializer({
 }) {
   const client = useContext(ReplayClientContext);
   const [context, setContext] = useState<SessionContextType | null>(null);
+  const [nags, setNags] = useState<Nag[] | null>(null);
   const didInitializeRef = useRef<boolean>(false);
   const indexingProgress = useIndexingProgress();
 
@@ -68,6 +70,7 @@ export default function Initializer({
           currentUserInfo = await getCurrentUserInfo(activeAccessToken);
         }
 
+        setNags(currentUserInfo?.nags ?? null);
         setContext({
           accessToken: activeAccessToken,
           currentUserInfo,
@@ -120,5 +123,9 @@ export default function Initializer({
     return <Loader className={styles.Loader} />;
   }
 
-  return <SessionContext.Provider value={context}>{children}</SessionContext.Provider>;
+  return (
+    <SessionContext.Provider value={context}>
+      <NagsContext.Provider value={nags}>{children}</NagsContext.Provider>
+    </SessionContext.Provider>
+  );
 }

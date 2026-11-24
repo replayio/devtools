@@ -158,7 +158,6 @@ function _DevTools({
   showCommandPalette,
   uploadComplete,
 }: DevToolsProps) {
-  const quickOpenEnabled = useAppSelector(getQuickOpenEnabled);
   const accessToken = useAppSelector(getAccessToken);
   const isAuthenticated = !!accessToken;
   const recordingId = useGetRecordingId();
@@ -277,8 +276,23 @@ function _DevTools({
     return processing ? <DevToolsProcessingScreen /> : <DevToolsDynamicLoadingMessage />;
   }
 
+  return <DevToolsLayout apiKey={apiKey ?? null} showCommandPalette={showCommandPalette} />;
+}
+
+// _DevTools re-renders whenever the user, the recording or the loading state changes, e.g.
+// after a nag is dismissed. Memoizing the layout keeps those updates from re-rendering every
+// component in the app.
+const DevToolsLayout = React.memo(function DevToolsLayout({
+  apiKey,
+  showCommandPalette,
+}: {
+  apiKey: string | null;
+  showCommandPalette: boolean;
+}) {
+  const quickOpenEnabled = useAppSelector(getQuickOpenEnabled);
+
   return (
-    <SessionContextAdapter apiKey={apiKey ?? null}>
+    <SessionContextAdapter apiKey={apiKey}>
       <SupportContextRoot>
         <SourcesContextAdapter>
           <FocusContextReduxAdapter>
@@ -315,7 +329,7 @@ function _DevTools({
       </SupportContextRoot>
     </SessionContextAdapter>
   );
-}
+});
 
 const connector = connect(
   (state: UIState) => ({

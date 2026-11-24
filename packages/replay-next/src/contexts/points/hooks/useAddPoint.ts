@@ -2,11 +2,10 @@ import { Location, RecordingId } from "@replayio/protocol";
 import { useCallback } from "react";
 import { v4 as uuid } from "uuid";
 
-import { TrackEvent } from "replay-next/src/contexts/SessionContext";
+import { SessionUserInfo, TrackEvent } from "replay-next/src/contexts/SessionContext";
 import { POINT_BEHAVIOR_DISABLED, Point, PointBehavior } from "shared/client/types";
 import { GraphQLClientInterface } from "shared/graphql/GraphQLClient";
 import { addPoint as addPointGraphQL } from "shared/graphql/Points";
-import { UserInfo } from "shared/graphql/types";
 
 import { AddPoint } from "../types";
 import { SetLocalPointBehaviors } from "./useLocalPointBehaviors";
@@ -22,7 +21,7 @@ export default function useAddPoint({
   trackEvent,
 }: {
   accessToken: string | null;
-  currentUserInfo: UserInfo | null;
+  currentUserInfo: SessionUserInfo | null;
   graphQLClient: GraphQLClientInterface;
   recordingId: RecordingId;
   setLocalPoints: SetLocalPoints;
