@@ -133,18 +133,14 @@ yarn test:debug_local breakpoints-05
 
 ### Updating Other Test Examples
 
-Most of our E2E tests work by having "golden recordings" of the small HTML+JS example files in `public/test`. However, for our Cypress Test Panel E2E tests, we need to work with existing Cypress test recordings as the "golden recordings" that our UI is checked against.
+Most of our E2E tests work by having "golden recordings" of the small HTML+JS example files in `public/test`. The network tests instead use an existing Cypress test recording:
 
-We currently use 2 specific Cypress test recordings, from these repos:
-
-- `"cypress-realworld/bankaccounts.spec.js"`:
-  - repo: https://github.com/replayio-public/cypress-realworld-app
 - `"flake/adding-spec.ts"`:
   - repo: https://github.com/replayio-public/flake
 
-Each repo has a link to the Replay dashboard workspace + an invite.
+The repo has a link to the Replay dashboard workspace + an invite.
 
-If you want to update those to fresher recording IDs, open up the team workspace for that repo, find a recent test suite run, copy the recording ID for that test's recording, and overwrite the recording ID in `examples.json`.
+If you want to update it to a fresher recording ID, open up the team workspace for that repo, find a recent test suite run, copy the recording ID for that test's recording, and overwrite the recording ID in `examples.json`.
 
 You'll also probably need to specifically share that recording as "Public", especially since it's in a Test Suites workspace that would normally not allow anonymous users to view recordings.
 
