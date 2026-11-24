@@ -16,9 +16,11 @@ test("repaint-02: repaints on hover", async ({
   const testLink = getTestRows(page).first();
   await testLink.click();
 
-  // Wait for the test to open
+  // Wait for the test to open and its first paint to load (an empty <img> src reads as the page URL)
   await waitFor(async () => {
-    await expect(await getGraphicsDataUrl(page)).not.toBe(endingScreenShot);
+    const dataUrl = await getGraphicsDataUrl(page);
+    await expect(dataUrl).not.toBe(endingScreenShot);
+    await expect(dataUrl).toMatch(/^data:image\//);
   });
 
   // By default, the screenshot shown should correspond to the start of the test
