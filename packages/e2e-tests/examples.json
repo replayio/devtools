@@ -1,9 +1,4 @@
 {
-  "React Hook Form/conditionalField.cy.ts": {
-    "recording": "0fd173b9-7fb9-42df-a6b6-7a54b6be3988",
-    "buildId": "macOS-chromium-20240206-0e5b896139cc-11bb013e140b",
-    "requiresManualUpdate": true
-  },
   "authenticated_comments.html": {
     "recording": "90f3192d-82c3-4d41-8d8d-75b112121f0e",
     "buildId": "linux-chromium-20261021-8febdce13963-9c1a8933f184"
@@ -20,11 +15,6 @@
   "cra/dist/index.html": {
     "recording": "e2d82bc5-e92c-48eb-83d1-f08ab75eb0d2",
     "buildId": "linux-chromium-20261021-8febdce13963-9c1a8933f184"
-  },
-  "cypress-realworld/bankaccounts.spec.js": {
-    "recording": "d6245b53-b3fe-4e8c-9044-4d518d92805a",
-    "buildId": "linux-chromium-20240627-ae45befcc072-6c7e9991dcf5",
-    "requiresManualUpdate": true
   },
   "deleted-replay": {
     "recording": "94f1729a-3aab-449b-98d6-10865a5e83c5",
