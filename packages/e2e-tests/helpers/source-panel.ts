@@ -273,19 +273,10 @@ export async function editLogPoint(
   }
 
   if (saveAfterEdit) {
-    const saveButton = line.locator('[data-test-name="PointPanel-SaveButton"]');
-    await expect(saveButton).toBeEnabled();
-
     // The typeahead popup sometimes sticks around and overlaps the save button.
     // Sometimes, it will show up after we check the first time (PRO-238) so we
-    // retry until the save takes effect, which removes the button. A click can
-    // land after Playwright has timed out on it, so a retry can find the button
-    // already gone.
+    // retry a couple times to ensure that we can clear it and move forward.
     await waitFor(async () => {
-      if ((await saveButton.count()) === 0) {
-        return;
-      }
-
       await hideTypeAheadSuggestions(page, {
         sourceLineNumber: lineNumber,
         type: "log-point-condition",
@@ -295,6 +286,8 @@ export async function editLogPoint(
         type: "log-point-content",
       });
 
+      const saveButton = line.locator('[data-test-name="PointPanel-SaveButton"]');
+      await expect(saveButton).toBeEnabled();
       await saveButton.click({ timeout: 1_000 });
       await saveButton.waitFor({ state: "detached" });
     });
