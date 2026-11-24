@@ -1,7 +1,7 @@
 import { startTest } from "../helpers";
-import { getGraphicsDataUrl } from "../helpers/screenshot";
+import { getGraphicsDataUrl, getGraphicsTime } from "../helpers/screenshot";
 import { getTestCaseSteps, getTestRows } from "../helpers/testsuites";
-import { getFocusBeginTime, seekToTimePercent } from "../helpers/timeline";
+import { seekToTimePercent } from "../helpers/timeline";
 import { waitFor } from "../helpers/utils";
 import test, { expect } from "../testFixture";
 
@@ -15,22 +15,27 @@ test("repaint-03: repaints on seek", async ({ pageWithMeta: { page, recordingId,
   const testLink = getTestRows(page).first();
   await testLink.click();
 
-  // Wait for the test to open and its first paint to load (an empty <img> src reads as the page URL)
+  // The start of the test is before the page's first paint, so select a step after it
+  const steps = getTestCaseSteps(page);
+  await steps.filter({ hasText: /click/ }).first().click();
+
+  let firstStepTime: number | null = null;
+  let firstStepScreenShot: string | null = null;
   await waitFor(async () => {
-    const dataUrl = await getGraphicsDataUrl(page);
-    await expect(dataUrl).not.toBe(endingScreenShot);
-    await expect(dataUrl).toMatch(/^data:image\//);
+    firstStepScreenShot = await getGraphicsDataUrl(page);
+    await expect(firstStepScreenShot).toMatch(/^data:image\//);
+    await expect(firstStepScreenShot).not.toBe(endingScreenShot);
+    firstStepTime = await getGraphicsTime(page);
   });
 
-  // By default, the screenshot shown should correspond to the start of the test
-  const startOfTestScreenShot = await getGraphicsDataUrl(page);
+  await steps.getByText("expect").last().click();
 
-  const stepLink = getTestCaseSteps(page).getByText("expect").first();
-  await stepLink.click();
-
-  // Wait for the graphics to update
+  // Selecting a later step should update the graphics
   await waitFor(async () => {
-    await expect(await getGraphicsDataUrl(page)).not.toBe(startOfTestScreenShot);
+    await expect(await getGraphicsTime(page)).not.toBe(firstStepTime);
+    const dataUrl = await getGraphicsDataUrl(page);
+    await expect(dataUrl).toMatch(/^data:image\//);
+    await expect(dataUrl).not.toBe(firstStepScreenShot);
   });
 
   // Seeking to the end of the recording should update the graphics
