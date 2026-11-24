@@ -4,7 +4,7 @@ import { getTestCaseSteps, getTestRows } from "../helpers/testsuites";
 import { waitFor } from "../helpers/utils";
 import test, { expect } from "../testFixture";
 
-test.use({ exampleKey: "playwright/breakpoints-05" });
+test.use({ exampleKey: "playwright/stepping-02" });
 
 test("repaint-02: repaints on hover", async ({
   pageWithMeta: { page, recordingId, testScope },

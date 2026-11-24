@@ -21,7 +21,7 @@ import {
 import { waitFor } from "../helpers/utils";
 import test, { expect } from "../testFixture";
 
-test.use({ exampleKey: "playwright/breakpoints-05" });
+test.use({ exampleKey: "playwright/stepping-02" });
 
 test("playwright-01: Basic Test Suites panel functionality", async ({
   pageWithMeta: { page, recordingId, testScope },
@@ -71,8 +71,8 @@ test("playwright-01: Basic Test Suites panel functionality", async ({
 
   // Relative dates can change over time.
   // Check for either the "X units ago" text, or the literal date.
-  expect(await getTestSuiteDate(page).textContent()).toMatch(/ ago|(1\/26\/2024)/);
-  expect(await getTestSuiteUser(page).textContent()).toMatch("hbenl");
+  expect(await getTestSuiteDate(page).textContent()).toMatch(/ ago|(11\/24\/2026)/);
+  expect(await getTestSuiteUser(page).textContent()).toMatch("markerikson");
   expect(await getTestSuiteBranch(page).textContent()).toMatch("main");
   expect(await getTestSuiteDuration(page).textContent()).toMatch(/0:\d{2}/);
 

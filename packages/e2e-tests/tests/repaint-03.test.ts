@@ -5,7 +5,7 @@ import { getFocusBeginTime, seekToTimePercent } from "../helpers/timeline";
 import { waitFor } from "../helpers/utils";
 import test, { expect } from "../testFixture";
 
-test.use({ exampleKey: "playwright/breakpoints-05" });
+test.use({ exampleKey: "playwright/stepping-02" });
 
 test("repaint-03: repaints on seek", async ({ pageWithMeta: { page, recordingId, testScope } }) => {
   await startTest(page, recordingId, testScope);

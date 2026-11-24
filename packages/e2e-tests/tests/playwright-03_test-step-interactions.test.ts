@@ -14,7 +14,7 @@ import { waitForTimelineAdvanced } from "../helpers/timeline";
 import { getByTestName, waitFor } from "../helpers/utils";
 import test, { expect } from "../testFixture";
 
-test.use({ exampleKey: "playwright/breakpoints-05" });
+test.use({ exampleKey: "playwright/stepping-02" });
 
 test("playwright-03: Test Step interactions", async ({
   pageWithMeta: { page, recordingId, testScope },
@@ -31,12 +31,12 @@ test("playwright-03: Test Step interactions", async ({
     await expect(rows).toHaveCount(1);
   });
 
-  const breakpointsTest = rows
-    .filter({ hasText: "breakpoints-05: Test interaction of breakpoints with debugger statements" })
+  const steppingTest = rows
+    .filter({ hasText: "stepping-02: Test fixes for some simple stepping bugs" })
     .first();
 
   // can open tests
-  await breakpointsTest.click();
+  await steppingTest.click();
   const selectedRow = getSelectedTestCase(page);
   await waitFor(async () => {
     expect(await selectedRow.isVisible()).toBe(true);
@@ -76,7 +76,7 @@ test("playwright-03: Test Step interactions", async ({
   await afterButton.click();
   prevPercent = await waitForTimelineAdvanced(page, prevPercent);
 
-  const SPEC_FILE = /breakpoints-05/;
+  const SPEC_FILE = /stepping-02/;
 
   // Clicking each step should change the details pane
   await waitFor(async () => {
