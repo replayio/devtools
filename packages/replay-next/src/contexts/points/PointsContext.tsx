@@ -36,7 +36,9 @@ import {
   SaveOrDiscardPendingText,
 } from "./types";
 
-export type PointsContextType = {
+// The point editing methods live apart from the point values because their identities don't
+// change when points do, so components that only edit points don't re-render on every edit.
+export type PointActionsContextType = {
   // Saves a new point to IndexedDB as well as GraphQL (if authenticated).
   addPoint: AddPoint;
 
@@ -47,6 +49,18 @@ export type PointsContextType = {
   editPointBadge: EditPointBadge;
   editPointBehavior: EditPointBehavior;
 
+  // These methods make pending changes to point text.
+  // They must be explicitly saved or discarded once editing has finished.
+  // Changes update SourceList points at normal priority (for editing UI)
+  // but do not update Console points until/unless they are explicitly saved.
+  discardPendingPointText: SaveOrDiscardPendingText;
+  editPendingPointText: EditPendingPointText;
+  savePendingPointText: SaveOrDiscardPendingText;
+};
+
+export const PointActionsContext = createContext<PointActionsContextType>(null as any);
+
+export type PointsContextType = {
   /************************************
    * Intended for use with components that suspend as a result of point text or behaviors.
    */
@@ -72,14 +86,6 @@ export type PointsContextType = {
    */
 
   pointsWithPendingEdits: Point[];
-
-  // These methods make pending changes to point text.
-  // They must be explicitly saved or discarded once editing has finished.
-  // Changes update SourceList points at normal priority (for editing UI)
-  // but do not update Console points until/unless they are explicitly saved.
-  discardPendingPointText: SaveOrDiscardPendingText;
-  editPendingPointText: EditPendingPointText;
-  savePendingPointText: SaveOrDiscardPendingText;
 };
 
 export const PointsContext = createContext<PointsContextType>(null as any);
@@ -236,7 +242,7 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
     setPointBehaviors: setLocalPointBehaviors,
   });
 
-  const context = useMemo<PointsContextType>(
+  const actions = useMemo<PointActionsContextType>(
     () => ({
       addPoint,
       deletePoints,
@@ -244,30 +250,41 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
       editPendingPointText,
       editPointBadge,
       editPointBehavior,
+      savePendingPointText,
+    }),
+    [
+      addPoint,
+      deletePoints,
+      discardPendingPointText,
+      editPendingPointText,
+      editPointBadge,
+      editPointBehavior,
+      savePendingPointText,
+    ]
+  );
+
+  const context = useMemo<PointsContextType>(
+    () => ({
       pointBehaviorsForSuspense: deferredPointBehaviors,
       pointBehaviorsForDefaultPriority: localPointBehaviors,
       pointsForSuspense: deferredPoints,
       pointsForDefaultPriority: savedPoints,
       pointsTransitionPending,
       pointsWithPendingEdits,
-      savePendingPointText,
     }),
     [
-      addPoint,
       deferredPointBehaviors,
       deferredPoints,
-      deletePoints,
-      discardPendingPointText,
-      editPendingPointText,
-      editPointBadge,
-      editPointBehavior,
       localPointBehaviors,
       pointsTransitionPending,
       pointsWithPendingEdits,
       savedPoints,
-      savePendingPointText,
     ]
   );
 
-  return <PointsContext.Provider value={context}>{children}</PointsContext.Provider>;
+  return (
+    <PointActionsContext.Provider value={actions}>
+      <PointsContext.Provider value={context}>{children}</PointsContext.Provider>
+    </PointActionsContext.Provider>
+  );
 }

@@ -1,4 +1,4 @@
-import { SetStateAction, useCallback, useEffect } from "react";
+import { SetStateAction, useCallback, useEffect, useRef } from "react";
 import { Status, useCacheMutation, useCacheStatus } from "suspense";
 
 import { indexedDbCache } from "shared/user-data/IndexedDB/cache";
@@ -38,11 +38,20 @@ export default function useIndexedDBUserData<Value>(options: {
     }
   }, [database, storeName, recordName]);
 
+  // Callers usually pass a new initialValue on every render, so keep the first one to let
+  // setValue stay stable.
+  const initialValueRef = useRef(initialValue);
+
+  // setValue reads the latest value from the cache rather than closing over the rendered one,
+  // so it keeps its identity across updates and consecutive updates don't overwrite each other.
   const setValue = useCallback(
     (action: SetStateAction<Value>) => {
       let newValue: Value;
       if (action instanceof Function) {
-        newValue = action(value);
+        const prevValue =
+          latestIndexedDbCache.getValueIfCached(database, storeName, recordName) ??
+          initialValueRef.current;
+        newValue = action(prevValue);
       } else {
         newValue = action;
       }
@@ -55,7 +64,7 @@ export default function useIndexedDBUserData<Value>(options: {
         return dbInstance;
       });
     },
-    [database, mutateDbAsync, mutateLatestSync, recordName, storeName, value]
+    [database, mutateDbAsync, mutateLatestSync, recordName, storeName]
   );
 
   return {

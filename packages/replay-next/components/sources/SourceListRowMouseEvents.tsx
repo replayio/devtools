@@ -4,7 +4,7 @@ import { InlineErrorBoundary } from "replay-next/components/errors/InlineErrorBo
 import LogpointHoverButton from "replay-next/components/sources/LogpointHoverButton";
 import { SeekHoverButtons } from "replay-next/components/sources/SeekHoverButtons";
 import useSourceContextMenu from "replay-next/components/sources/useSourceContextMenu";
-import { PointsContext } from "replay-next/src/contexts/points/PointsContext";
+import { PointActionsContext } from "replay-next/src/contexts/points/PointsContext";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import { Source } from "replay-next/src/suspense/SourcesCache";
 import { LineHitCounts, Point, PointBehavior } from "shared/client/types";
@@ -29,7 +29,7 @@ export function SourceListRowMouseEvents({
   const lineHasHits = lineHitCounts != null && lineHitCounts.count > 0;
 
   const { addPoint, deletePoints, editPendingPointText, editPointBehavior } =
-    useContext(PointsContext);
+    useContext(PointActionsContext);
   const { setCursorLocation, setHoveredLocation } = useContext(SourcesContext);
 
   const [isRowHovered, setIsRowHovered] = useState(false);

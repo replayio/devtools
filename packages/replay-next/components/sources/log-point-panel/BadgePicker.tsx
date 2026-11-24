@@ -1,6 +1,6 @@
 import { MouseEvent, useContext, useState } from "react";
 
-import { PointsContext } from "replay-next/src/contexts/points/PointsContext";
+import { PointActionsContext } from "replay-next/src/contexts/points/PointsContext";
 import { useNag } from "replay-next/src/hooks/useNag";
 import { Badge, Point } from "shared/client/types";
 import { Nag } from "shared/graphql/types";
@@ -21,7 +21,7 @@ export default function BadgePicker({
   invalid: boolean;
   point: Point;
 }) {
-  const { editPointBadge } = useContext(PointsContext);
+  const { editPointBadge } = useContext(PointActionsContext);
 
   const [state, setState] = useState<State>("initial");
   const [, dismissAddUnicornBadgeNag] = useNag(Nag.ADD_UNICORN_BADGE);
