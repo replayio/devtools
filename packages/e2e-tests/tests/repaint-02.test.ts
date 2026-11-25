@@ -17,6 +17,8 @@ test("repaint-02: repaints on hover", async ({
   // The start of the test is before the page's first paint, so select a step after it
   const steps = getTestCaseSteps(page);
   await steps.filter({ hasText: /click/ }).first().click();
+  // Move off the clicked step so its hover preview doesn't stand in for the selected step
+  await page.mouse.move(0, 0);
 
   let selectedTime: number | null = null;
   let selectedScreenShot: string | null = null;
