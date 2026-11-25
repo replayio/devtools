@@ -172,9 +172,9 @@
     "recording": "d6e65d79-0001-4dc9-84e0-5bbd212580f0",
     "buildId": "linux-chromium-20261021-8febdce13963-9c1a8933f184"
   },
-  "playwright/breakpoints-05": {
-    "recording": "bc9cb0e1-0aa6-4586-9849-46f54de980fc",
-    "buildId": "linux-chromium-20240123-609ec6caa105-50d01be708a2",
+  "playwright/stepping-02": {
+    "recording": "9a593cc1-19d2-47e4-83ca-0e0a0f98f82f",
+    "buildId": "linux-chromium-20261123-7774bf407153-c36bdc061298",
     "requiresManualUpdate": true
   },
   "rdt-react-versions/dist/index.html": {

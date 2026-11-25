@@ -16,7 +16,7 @@ import { getTimelineCurrentPercent, waitForTimelineAdvanced } from "../helpers/t
 import { getByTestName, waitFor } from "../helpers/utils";
 import test, { expect } from "../testFixture";
 
-test.use({ exampleKey: "playwright/breakpoints-05" });
+test.use({ exampleKey: "playwright/stepping-02" });
 
 test("playwright-04: Test Step buttons and menu item", async ({
   pageWithMeta: { page, recordingId, testScope },
@@ -33,12 +33,12 @@ test("playwright-04: Test Step buttons and menu item", async ({
     await expect(rows).toHaveCount(1);
   });
 
-  const breakpointsTest = rows
-    .filter({ hasText: "breakpoints-05: Test interaction of breakpoints with debugger statements" })
+  const steppingTest = rows
+    .filter({ hasText: "stepping-02: Test fixes for some simple stepping bugs" })
     .first();
 
   // can open tests
-  await breakpointsTest.click();
+  await steppingTest.click();
   const selectedRow = getSelectedTestCase(page);
   await waitFor(async () => {
     expect(await selectedRow.isVisible()).toBe(true);
@@ -61,7 +61,7 @@ test("playwright-04: Test Step buttons and menu item", async ({
   await waitForSelectedSource(page, "ViewToggle.tsx");
   await waitFor(async () => {
     const lineNumber = await getSelectedLineNumber(page, true);
-    expect(lineNumber).toBe(70);
+    expect(lineNumber).toBe(71);
   });
 
   // Avoid "selected line" locator errors by closing this tab first

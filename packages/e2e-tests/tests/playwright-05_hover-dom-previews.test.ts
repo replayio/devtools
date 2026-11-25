@@ -9,7 +9,7 @@ import {
 import { debugPrint, waitFor } from "../helpers/utils";
 import test, { expect } from "../testFixture";
 
-test.use({ exampleKey: "playwright/breakpoints-05" });
+test.use({ exampleKey: "playwright/stepping-02" });
 
 // Skipped: the step-details pipeline behind hover previews is too slow for this to pass
 // reliably. The batched runEvaluation over all step points takes ~45s on this recording,
@@ -31,11 +31,11 @@ test.skip("playwright-05: Test DOM node previews on user action step hover", asy
     await expect(rows).toHaveCount(1);
   });
 
-  const breakpointsTest = rows
-    .filter({ hasText: "breakpoints-05: Test interaction of breakpoints with debugger statements" })
+  const steppingTest = rows
+    .filter({ hasText: "stepping-02: Test fixes for some simple stepping bugs" })
     .first();
 
-  await breakpointsTest.click();
+  await steppingTest.click();
   const selectedRow = getSelectedTestCase(page);
   await waitFor(async () => {
     expect(await selectedRow.isVisible()).toBe(true);
