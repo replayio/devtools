@@ -5,14 +5,15 @@ import { Nag } from "shared/graphql/types";
 import { dismissNag } from "shared/graphql/User";
 
 import { GraphQLClientContext } from "../contexts/GraphQLClientContext";
+import { NagsContext } from "../contexts/NagsContext";
 import { SessionContext } from "../contexts/SessionContext";
 
 export function useNag(nag: Nag): [shouldShow: boolean, dismiss: () => void] {
   const { accessToken, currentUserInfo, refetchUser } = useContext(SessionContext);
   const graphQLClient = useContext(GraphQLClientContext);
+  const nags = useContext(NagsContext);
 
   const id = currentUserInfo?.id || null;
-  const nags = currentUserInfo?.nags || null;
 
   const shouldShow = useMemo(() => {
     return nags !== null && !nags.includes(nag);

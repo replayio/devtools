@@ -1,7 +1,12 @@
 import { useApolloClient } from "@apollo/client";
 import { ReactNode, useCallback, useMemo } from "react";
 
-import { SessionContext, SessionContextType } from "replay-next/src/contexts/SessionContext";
+import { NagsContext } from "replay-next/src/contexts/NagsContext";
+import {
+  SessionContext,
+  SessionContextType,
+  SessionUserInfo,
+} from "replay-next/src/contexts/SessionContext";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import { useGetUserInfo } from "ui/hooks/users";
 import { getAccessToken, getSessionId } from "ui/reducers/app";
@@ -18,8 +23,15 @@ export default function SessionContextAdapter({
   children: ReactNode;
 }) {
   const recordingId = useGetRecordingId();
-  const currentUserInfo = useGetUserInfo();
+  const { email, id, nags, name, picture } = useGetUserInfo();
   const apolloClient = useApolloClient();
+
+  // useGetUserInfo returns new objects on every render, and the user is refetched whenever
+  // a nag is dismissed. Rebuilding this only when a field changes keeps SessionContext stable.
+  const currentUserInfo = useMemo<SessionUserInfo>(
+    () => ({ email, id, name, picture }),
+    [email, id, name, picture]
+  );
 
   const refetchUser = useCallback(() => {
     apolloClient.refetchQueries({
@@ -49,5 +61,9 @@ export default function SessionContextAdapter({
     [accessToken, apiKey, currentUserInfo, duration, endpoint, recordingId, refetchUser, sessionId]
   );
 
-  return <SessionContext.Provider value={sessionContext}>{children}</SessionContext.Provider>;
+  return (
+    <SessionContext.Provider value={sessionContext}>
+      <NagsContext.Provider value={nags ?? null}>{children}</NagsContext.Provider>
+    </SessionContext.Provider>
+  );
 }
