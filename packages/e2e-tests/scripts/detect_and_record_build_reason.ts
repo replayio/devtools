@@ -143,8 +143,8 @@ export async function detectAndRecordBuildReason() {
   }
 
   // if we got here, the user clicked New Build but didn't specify any other environment variables.
-  // act as if they had specified RUNTIME_CHROMIUM_BUILDKITE_BRANCH=master and record our artifact.
-  return await storeChromiumBranchReason("master");
+  // act as if they had specified RUNTIME_CHROMIUM_BUILDKITE_BRANCH=main and record our artifact.
+  return await storeChromiumBranchReason("main");
 }
 
 async function graphql<ResultT, VariablesT = Record<string, unknown>>(
