@@ -1,7 +1,7 @@
 import { SourceId } from "@replayio/protocol";
 import { useContext, useMemo } from "react";
 
-import { PointsContext } from "replay-next/src/contexts/points/PointsContext";
+import { PointActionsContext, PointsContext } from "replay-next/src/contexts/points/PointsContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { useSourcesById } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -15,12 +15,9 @@ export type SourceIdToPointsMap = { [key: SourceId]: Point[] };
 
 export default function LogpointsPane() {
   const replayClient = useContext(ReplayClientContext);
-  const {
-    deletePoints,
-    editPointBehavior,
-    pointsForDefaultPriority: points,
-    pointBehaviorsForDefaultPriority: pointBehaviors,
-  } = useContext(PointsContext);
+  const { deletePoints, editPointBehavior } = useContext(PointActionsContext);
+  const { pointsForDefaultPriority: points, pointBehaviorsForDefaultPriority: pointBehaviors } =
+    useContext(PointsContext);
   const { currentUserInfo } = useContext(SessionContext);
 
   const sourceDetailsEntities = useSourcesById(replayClient);

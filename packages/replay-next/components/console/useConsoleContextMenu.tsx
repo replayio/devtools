@@ -4,7 +4,7 @@ import { ContextMenuDivider, ContextMenuItem, useContextMenu } from "use-context
 import { scrollCurrentTimeIndicatorIntoView } from "replay-next/components/console/CurrentTimeIndicator";
 import Icon from "replay-next/components/Icon";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
-import { PointsContext } from "replay-next/src/contexts/points/PointsContext";
+import { PointActionsContext } from "replay-next/src/contexts/points/PointsContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import {
   getLoggableExecutionPoint,
@@ -20,7 +20,7 @@ const BADGES: Badge[] = ["green", "yellow", "orange", "purple"];
 
 export default function useConsoleContextMenu(loggable: Loggable) {
   const { range, update } = useContext(FocusContext);
-  const { editPointBadge, editPointBehavior } = useContext(PointsContext);
+  const { editPointBadge, editPointBehavior } = useContext(PointActionsContext);
   const { currentUserInfo, duration, endpoint } = useContext(SessionContext);
 
   const setFocusBegin = () => {

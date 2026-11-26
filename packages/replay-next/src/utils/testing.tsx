@@ -13,7 +13,12 @@ import {
   ConsoleFiltersContextType,
 } from "../contexts/ConsoleFiltersContext";
 import { FocusContext, FocusContextType } from "../contexts/FocusContext";
-import { PointsContext, PointsContextType } from "../contexts/points/PointsContext";
+import {
+  PointActionsContext,
+  PointActionsContextType,
+  PointsContext,
+  PointsContextType,
+} from "../contexts/points/PointsContext";
 import { SessionContext, SessionContextType } from "../contexts/SessionContext";
 import { TimelineContext, TimelineContextType } from "../contexts/TimelineContext";
 
@@ -80,6 +85,7 @@ export async function renderFocused(
     consoleFiltersContext?: Partial<ConsoleFiltersContextType>;
     focusContext?: Partial<FocusContextType>;
     timelineContext?: Partial<TimelineContextType>;
+    pointActionsContext?: Partial<PointActionsContextType>;
     pointsContext?: Partial<PointsContextType>;
     replayClient?: Partial<ReplayClientInterface>;
     sessionContext?: Partial<SessionContextType>;
@@ -128,33 +134,39 @@ export async function renderFocused(
     ...options?.timelineContext,
   };
 
-  const pointsContext: PointsContextType = {
+  const pointActionsContext: PointActionsContextType = {
     addPoint: jest.fn(),
-    pointsTransitionPending: false,
     deletePoints: jest.fn(),
     discardPendingPointText: jest.fn(),
     editPendingPointText: jest.fn(),
     editPointBadge: jest.fn(),
     editPointBehavior: jest.fn(),
+    savePendingPointText: jest.fn(),
+    ...options?.pointActionsContext,
+  };
+
+  const pointsContext: PointsContextType = {
+    pointsTransitionPending: false,
     pointBehaviorsForSuspense: {},
     pointBehaviorsForDefaultPriority: {},
     pointsForSuspense: [],
     pointsForDefaultPriority: [],
     pointsWithPendingEdits: [],
-    savePendingPointText: jest.fn(),
     ...options?.pointsContext,
   };
 
   const renderResponse = await render(
-    <PointsContext.Provider value={pointsContext}>
-      <TimelineContext.Provider value={timelineContext}>
-        <FocusContext.Provider value={focusContext}>
-          <ConsoleFiltersContext.Provider value={consoleFiltersContext}>
-            {children}
-          </ConsoleFiltersContext.Provider>
-        </FocusContext.Provider>
-      </TimelineContext.Provider>
-    </PointsContext.Provider>,
+    <PointActionsContext.Provider value={pointActionsContext}>
+      <PointsContext.Provider value={pointsContext}>
+        <TimelineContext.Provider value={timelineContext}>
+          <FocusContext.Provider value={focusContext}>
+            <ConsoleFiltersContext.Provider value={consoleFiltersContext}>
+              {children}
+            </ConsoleFiltersContext.Provider>
+          </FocusContext.Provider>
+        </TimelineContext.Provider>
+      </PointsContext.Provider>
+    </PointActionsContext.Provider>,
     {
       replayClient: options?.replayClient,
       sessionContext: options?.sessionContext,

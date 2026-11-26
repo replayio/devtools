@@ -22,7 +22,7 @@ import { SyntaxHighlighter } from "replay-next/components/SyntaxHighlighter/Synt
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { GraphQLClientContext } from "replay-next/src/contexts/GraphQLClientContext";
 import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
-import { PointsContext } from "replay-next/src/contexts/points/PointsContext";
+import { PointActionsContext, PointsContext } from "replay-next/src/contexts/points/PointsContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { useNag } from "replay-next/src/hooks/useNag";
@@ -172,13 +172,9 @@ export function PointPanelWithHitPoints({
 }) {
   const graphQLClient = useContext(GraphQLClientContext);
   const { showCommentsPanel } = useContext(InspectorContext);
-  const {
-    discardPendingPointText,
-    editPendingPointText,
-    editPointBehavior,
-    pointBehaviorsForDefaultPriority: pointBehaviors,
-    savePendingPointText,
-  } = useContext(PointsContext);
+  const { discardPendingPointText, editPendingPointText, editPointBehavior, savePendingPointText } =
+    useContext(PointActionsContext);
+  const { pointBehaviorsForDefaultPriority: pointBehaviors } = useContext(PointsContext);
   const client = useContext(ReplayClientContext);
   const { accessToken, currentUserInfo, recordingId, trackEvent } = useContext(SessionContext);
   const { executionPoint: currentExecutionPoint, time: currentTime } = useContext(TimelineContext);
