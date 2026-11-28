@@ -1,6 +1,10 @@
 import { openDevToolsTab, startTest } from "../helpers";
 import { warpToMessage } from "../helpers/console-panel";
-import { getGraphicsPixelColor, waitForGraphicsToLoad } from "../helpers/screenshot";
+import {
+  getGraphicsPixelColor,
+  getGraphicsScreenshotType,
+  waitForGraphicsToLoad,
+} from "../helpers/screenshot";
 import test, { Page, expect } from "../testFixture";
 
 test.use({ exampleKey: "paint_at_intervals.html" });
@@ -20,11 +24,12 @@ test("repaint-04: prefers nearest (<=) paint when seeking between paints", async
   let mostRecentColor: string | null = null;
 
   {
-    // Before the first paint should be empty
+    // Before the first paint there is no earlier paint to show, and the next one must not be used.
+    // A repaint may still render the document as it is at this point, which is still empty.
     await warpToMessageAndWaitForPaint(page, "Before first paint");
 
-    const color = await getGraphicsPixelColor(page, 0, 0);
-    expect(color).toBe(null);
+    expect(await getGraphicsScreenshotType(page)).not.toBe("cached-paint");
+    expect([null, "#FFFFFF"]).toContain(await getGraphicsPixelColor(page, 0, 0));
   }
 
   {
